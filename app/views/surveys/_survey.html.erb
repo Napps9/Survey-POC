@@ -1,0 +1,47 @@
+<%= turbo_frame_tag "survey" do %>
+  <article class="border rounded-lg p-6 bg-white shadow-sm">
+    <h2 class="text-2xl font-semibold mb-1"><%= survey["title"] %></h2>
+    <p class="text-gray-600 mb-6"><%= survey["description"] %></p>
+
+    <ol class="space-y-5 list-decimal list-inside">
+      <% Array(survey["questions"]).each do |q| %>
+        <li>
+          <div class="inline-block">
+            <span class="font-medium"><%= q["text"] %></span>
+            <span class="ml-2 text-xs uppercase tracking-wide text-gray-500">
+              <%= q["type"].to_s.tr("_", " ") %>
+            </span>
+          </div>
+
+          <div class="mt-2 ml-5">
+            <% case q["type"] %>
+            <% when "multiple_choice" %>
+              <% Array(q["options"]).each do |opt| %>
+                <label class="block text-gray-700">
+                  <input type="radio" disabled class="mr-2"><%= opt %>
+                </label>
+              <% end %>
+            <% when "yes_no" %>
+              <label class="mr-4"><input type="radio" disabled class="mr-1">Yes</label>
+              <label><input type="radio" disabled class="mr-1">No</label>
+            <% when "rating" %>
+              <div class="flex gap-2 text-gray-400">
+                <% (1..5).each do |n| %>
+                  <span class="w-8 h-8 border rounded flex items-center justify-center"><%= n %></span>
+                <% end %>
+              </div>
+            <% when "open_ended" %>
+              <textarea disabled rows="2" class="w-full border rounded p-2 bg-gray-50"></textarea>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+
+    <div class="mt-6">
+      <%= link_to "Generate another", root_path,
+            class: "text-indigo-600 hover:underline",
+            data: { turbo_frame: "_top" } %>
+    </div>
+  </article>
+<% end %>
