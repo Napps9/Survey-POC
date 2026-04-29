@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: survey-poc
+    runtime: ruby
+    plan: free
+    region: oregon
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec rails server -e production -p $PORT"
+    healthCheckPath: /up
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: RACK_ENV
+        value: production
+      - key: RAILS_LOG_TO_STDOUT
+        value: "1"
+      - key: RAILS_SERVE_STATIC_FILES
+        value: "1"
+      - key: WEB_CONCURRENCY
+        value: "1"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: RAILS_MASTER_KEY
+        sync: false
