@@ -3,14 +3,22 @@ class SurveysController < ApplicationController
   end
 
   def generate
-    prompt = params[:prompt].to_s.strip
+    theme        = params[:theme].to_s.strip
+    audience_age = params[:audience_age].to_s.strip
+    key_insight  = params[:key_insight].to_s.strip
+    notes        = params[:notes].to_s.strip
 
-    if prompt.empty?
-      flash.now[:alert] = "Please describe the survey you want to create."
+    if theme.empty? || audience_age.empty? || key_insight.empty?
+      flash.now[:alert] = "Theme, audience age, and key insight are all required."
       return render :new, status: :unprocessable_entity
     end
 
-    @survey = SurveyGenerator.new.call(prompt)
+    @survey = SurveyGenerator.new.call(
+      theme: theme,
+      audience_age: audience_age,
+      key_insight: key_insight,
+      notes: notes
+    )
     render partial: "survey", locals: { survey: @survey }
   rescue => e
     Rails.logger.error("[SurveyGenerator] #{e.class}: #{e.message}")

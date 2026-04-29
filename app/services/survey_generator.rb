@@ -4,60 +4,144 @@ class SurveyGenerator
   MODEL = "claude-sonnet-4-6"
   MAX_TOKENS = 4096
 
+  CARD_TYPES = %w[
+    welcome_card
+    static_page
+    multiple_choice
+    select_many
+    select_one_grid
+    select_many_grid
+    tap_card
+    range
+    rating
+    yes_no
+    open_ended
+  ].freeze
+
   TOOL = {
     name: "emit_survey",
-    description: "Emit a structured survey based on the user's described goal.",
+    description: "Emit a structured survey that strictly follows the survey design rules.",
     input_schema: {
       type: "object",
       properties: {
-        title: { type: "string", description: "Short survey title" },
-        description: { type: "string", description: "1-2 sentence intro shown to respondents" },
-        questions: {
+        title:        { type: "string", description: "Short survey title" },
+        description:  { type: "string", description: "1-2 sentence intro shown to respondents" },
+        theme:        { type: "string", description: "Echo the user's provided theme" },
+        audience_age: { type: "string", description: "Echo the user's target audience age" },
+        key_insight:  { type: "string", description: "Echo the user's key insight goal" },
+        cards: {
           type: "array",
-          minItems: 3,
+          minItems: 10,
+          maxItems: 17,
+          description: "Ordered list. Question count (excluding welcome_card and static_page) must be 10-15.",
           items: {
             type: "object",
             properties: {
-              text: { type: "string" },
-              type: {
+              type: { type: "string", enum: CARD_TYPES },
+              text: {
                 type: "string",
-                enum: %w[multiple_choice rating open_ended yes_no]
+                description: "Question or card text. Target 50-70 chars; never exceed 100. Description below counts toward this budget."
+              },
+              description: {
+                type: "string",
+                description: "Optional sub-text shown under the question. Counts toward the 100-char budget."
               },
               options: {
                 type: "array",
-                items: { type: "string" },
-                description: "Required when type is multiple_choice; otherwise omit."
+                items: { type: "string", description: "Each option <= 20 chars in select-one lists." },
+                description: <<~DESC
+                  Required for: multiple_choice, select_many, select_one_grid, select_many_grid,
+                  tap_card, range, rating. Bounds:
+                  - tap_card: 3 to 5
+                  - multiple_choice / select_many: 3 to 5
+                  - select_one_grid / select_many_grid: even count, max 10 including any "Other"
+                  - range / rating: 3 to 5 points
+                DESC
               }
             },
-            required: %w[text type]
+            required: %w[type text]
           }
         }
       },
-      required: %w[title description questions]
+      required: %w[title description theme audience_age key_insight cards]
     }
   }.freeze
 
   SYSTEM = <<~PROMPT.freeze
-    You design clear, unbiased survey questions. Given a user's goal, produce a
-    concise survey with a sensible mix of question types. Prefer specific,
-    actionable wording; avoid leading or double-barreled questions. Use
-    multiple_choice when the answer space is well-defined; rating for
-    satisfaction or agreement scales; yes_no for simple gating; open_ended
-    sparingly for qualitative depth.
+    You are a survey designer. Given a brief, produce a survey that strictly
+    follows the rules below. Deviate only when the brief explicitly requires it,
+    and in that case keep the deviation minimal. Echo the user's theme,
+    audience_age, and key_insight into the output unchanged.
+
+    Do's and Don'ts:
+
+    1. Length — Target 10 to 15 questions. Fewer questions is not necessarily
+       easier or faster. Do NOT exceed 15 questions. Welcome cards and static
+       pages do not count toward the question total.
+
+    2. Question definition — A "question" is anything the user must read and
+       respond to with a choice. A range counts as 1 question. A tap_card with 5
+       cards counts as 5 questions.
+       - Do NOT include more than 2 of the same answer type in a row in the flow
+         (rare exceptions allowed).
+       - tap_card must have 3 to 5 cards. Never fewer than 3, never more than 5.
+
+    3. Static page — If the survey has 15 questions, include ONE midway
+       static_page to break flow and add light humor. Do NOT use narrative cards
+       (they bloat the survey).
+
+    4. Welcome cards — Include ONE welcome_card only for cold/new audiences,
+       briefly stating the survey purpose. Do NOT include a welcome_card for
+       captive audiences or events where introduction is unnecessary. Maximum 1
+       welcome card.
+
+    5. Answer diversity — No flow may contain more than two of the same answer
+       type consecutively. Exceptions allowed only when the brief demands it.
+
+    6. Number of answer choices — Provide 3 to 5 choices per question. Do NOT
+       exceed 5 for range/rating except in specific cases.
+
+    7. Grid format (select_one_grid / select_many_grid) — Use an EVEN number of
+       answer choices for visual balance. Total options including any "Other"
+       must not exceed 10.
+
+    8. Question length — Keep question text between 50 and 70 characters. Up to
+       100 characters is allowed only when the answer type genuinely requires
+       it. Never exceed 100 without strong reason.
+
+    9. Descriptions below questions — A description below a question counts
+       toward the same character budget. Do NOT exceed limits.
+
+    10. Answer length — Keep each answer choice up to 20 characters in a
+        select-one list. For grids, weigh option count against legibility.
+
+    Output via the emit_survey tool. Choose card types thoughtfully:
+    - tap_card for visual choice between 3-5 distinct concepts
+    - range / rating for scales
+    - yes_no for gating
+    - open_ended sparingly for qualitative depth
+    - grids when comparing the same options across multiple dimensions
   PROMPT
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
     @client = Anthropic::Client.new(api_key: api_key)
   end
 
-  def call(prompt)
+  def call(theme:, audience_age:, key_insight:, notes: nil)
+    user_message = <<~MSG
+      Theme: #{theme}
+      Target audience age: #{audience_age}
+      Key insight hoping to be achieved: #{key_insight}
+      Additional notes: #{notes.to_s.strip.empty? ? '(none)' : notes}
+    MSG
+
     response = @client.messages.create(
       model: MODEL,
       max_tokens: MAX_TOKENS,
       system: SYSTEM,
       tools: [TOOL],
       tool_choice: { type: "tool", name: "emit_survey" },
-      messages: [{ role: "user", content: prompt }]
+      messages: [{ role: "user", content: user_message }]
     )
 
     block = Array(response.content).find { |b| tool_use?(b) }

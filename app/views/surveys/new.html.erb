@@ -1,7 +1,7 @@
 <div class="max-w-2xl mx-auto p-6">
   <h1 class="text-3xl font-bold mb-2">AI Survey Generator</h1>
   <p class="text-gray-600 mb-6">
-    Describe what you want to learn, and Claude will draft a survey for you.
+    Tell us the brief and Claude will draft a survey that follows the design rules.
   </p>
 
   <% if flash[:alert] %>
@@ -11,11 +11,35 @@
   <% end %>
 
   <%= form_with url: generate_survey_path, method: :post,
-                data: { turbo_frame: "survey" }, class: "space-y-3" do |f| %>
-    <%= f.text_area :prompt,
-          rows: 4,
-          placeholder: "e.g. Survey for new SaaS users about their onboarding experience",
-          class: "w-full rounded border-gray-300 p-3 shadow-sm focus:ring focus:ring-indigo-200" %>
+                data: { turbo_frame: "survey" }, class: "space-y-4" do |f| %>
+    <div>
+      <%= f.label :theme, "Theme", class: "block text-sm font-medium mb-1" %>
+      <%= f.text_field :theme,
+            placeholder: "e.g. Onboarding for new SaaS users",
+            class: "w-full rounded border-gray-300 p-2 shadow-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :audience_age, "Target audience age", class: "block text-sm font-medium mb-1" %>
+      <%= f.text_field :audience_age,
+            placeholder: "e.g. 25-40",
+            class: "w-full rounded border-gray-300 p-2 shadow-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :key_insight, "Key insight you hope to achieve", class: "block text-sm font-medium mb-1" %>
+      <%= f.text_area :key_insight, rows: 2,
+            placeholder: "e.g. Where do users get stuck in week 1?",
+            class: "w-full rounded border-gray-300 p-2 shadow-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :notes, "Additional notes (optional)", class: "block text-sm font-medium mb-1" %>
+      <%= f.text_area :notes, rows: 3,
+            placeholder: "Anything else: tone, captive vs cold audience, must-ask topics…",
+            class: "w-full rounded border-gray-300 p-2 shadow-sm" %>
+    </div>
+
     <%= f.submit "Generate survey",
           class: "px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 cursor-pointer",
           data: { turbo_submits_with: "Generating…" } %>

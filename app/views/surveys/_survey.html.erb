@@ -1,39 +1,107 @@
 <%= turbo_frame_tag "survey" do %>
   <article class="border rounded-lg p-6 bg-white shadow-sm">
     <h2 class="text-2xl font-semibold mb-1"><%= survey["title"] %></h2>
-    <p class="text-gray-600 mb-6"><%= survey["description"] %></p>
+    <p class="text-gray-600 mb-4"><%= survey["description"] %></p>
+
+    <dl class="grid grid-cols-3 gap-2 text-xs text-gray-600 mb-6 bg-gray-50 p-3 rounded">
+      <div><dt class="font-semibold">Theme</dt><dd><%= survey["theme"] %></dd></div>
+      <div><dt class="font-semibold">Audience age</dt><dd><%= survey["audience_age"] %></dd></div>
+      <div><dt class="font-semibold">Key insight</dt><dd><%= survey["key_insight"] %></dd></div>
+    </dl>
 
     <ol class="space-y-5 list-decimal list-inside">
-      <% Array(survey["questions"]).each do |q| %>
-        <li>
-          <div class="inline-block">
-            <span class="font-medium"><%= q["text"] %></span>
-            <span class="ml-2 text-xs uppercase tracking-wide text-gray-500">
-              <%= q["type"].to_s.tr("_", " ") %>
-            </span>
-          </div>
-
-          <div class="mt-2 ml-5">
-            <% case q["type"] %>
-            <% when "multiple_choice" %>
-              <% Array(q["options"]).each do |opt| %>
-                <label class="block text-gray-700">
-                  <input type="radio" disabled class="mr-2"><%= opt %>
-                </label>
+      <% Array(survey["cards"]).each do |c| %>
+        <li class="<%= 'list-none' if %w[welcome_card static_page].include?(c['type']) %>">
+          <% if c["type"] == "welcome_card" %>
+            <div class="p-4 border-2 border-indigo-200 bg-indigo-50 rounded text-center">
+              <div class="text-xs uppercase tracking-wide text-indigo-700 mb-1">Welcome</div>
+              <div class="font-medium"><%= c["text"] %></div>
+              <% if c["description"].present? %>
+                <div class="text-sm text-gray-600 mt-1"><%= c["description"] %></div>
               <% end %>
-            <% when "yes_no" %>
-              <label class="mr-4"><input type="radio" disabled class="mr-1">Yes</label>
-              <label><input type="radio" disabled class="mr-1">No</label>
-            <% when "rating" %>
-              <div class="flex gap-2 text-gray-400">
-                <% (1..5).each do |n| %>
-                  <span class="w-8 h-8 border rounded flex items-center justify-center"><%= n %></span>
-                <% end %>
-              </div>
-            <% when "open_ended" %>
-              <textarea disabled rows="2" class="w-full border rounded p-2 bg-gray-50"></textarea>
+            </div>
+
+          <% elsif c["type"] == "static_page" %>
+            <div class="p-4 border-2 border-amber-200 bg-amber-50 rounded text-center">
+              <div class="text-xs uppercase tracking-wide text-amber-700 mb-1">Static page</div>
+              <div class="font-medium"><%= c["text"] %></div>
+              <% if c["description"].present? %>
+                <div class="text-sm text-gray-600 mt-1"><%= c["description"] %></div>
+              <% end %>
+            </div>
+
+          <% else %>
+            <div class="inline-block">
+              <span class="font-medium"><%= c["text"] %></span>
+              <span class="ml-2 text-xs uppercase tracking-wide text-gray-500">
+                <%= c["type"].to_s.tr("_", " ") %>
+              </span>
+            </div>
+            <% if c["description"].present? %>
+              <div class="text-sm text-gray-600 ml-5"><%= c["description"] %></div>
             <% end %>
-          </div>
+
+            <div class="mt-2 ml-5">
+              <% case c["type"] %>
+              <% when "multiple_choice" %>
+                <% Array(c["options"]).each do |opt| %>
+                  <label class="block text-gray-700">
+                    <input type="radio" disabled class="mr-2"><%= opt %>
+                  </label>
+                <% end %>
+
+              <% when "select_many" %>
+                <% Array(c["options"]).each do |opt| %>
+                  <label class="block text-gray-700">
+                    <input type="checkbox" disabled class="mr-2"><%= opt %>
+                  </label>
+                <% end %>
+
+              <% when "tap_card" %>
+                <div class="grid grid-cols-2 gap-2">
+                  <% Array(c["options"]).each do |opt| %>
+                    <div class="border rounded p-3 text-center bg-gray-50"><%= opt %></div>
+                  <% end %>
+                </div>
+
+              <% when "select_one_grid", "select_many_grid" %>
+                <% input_type = c["type"] == "select_one_grid" ? "radio" : "checkbox" %>
+                <div class="grid grid-cols-2 gap-2">
+                  <% Array(c["options"]).each do |opt| %>
+                    <label class="border rounded p-2 flex items-center gap-2 bg-gray-50">
+                      <input type="<%= input_type %>" disabled><%= opt %>
+                    </label>
+                  <% end %>
+                </div>
+
+              <% when "yes_no" %>
+                <label class="mr-4"><input type="radio" disabled class="mr-1">Yes</label>
+                <label><input type="radio" disabled class="mr-1">No</label>
+
+              <% when "rating" %>
+                <% n = (Array(c["options"]).size.nonzero? || 5) %>
+                <div class="flex gap-2 text-gray-400">
+                  <% (1..n).each do |i| %>
+                    <span class="w-8 h-8 border rounded flex items-center justify-center"><%= i %></span>
+                  <% end %>
+                </div>
+
+              <% when "range" %>
+                <% labels = Array(c["options"]) %>
+                <div class="flex justify-between text-sm text-gray-600">
+                  <% labels.each do |l| %>
+                    <span class="flex flex-col items-center">
+                      <span class="w-4 h-4 rounded-full border bg-gray-50"></span>
+                      <span class="mt-1"><%= l %></span>
+                    </span>
+                  <% end %>
+                </div>
+
+              <% when "open_ended" %>
+                <textarea disabled rows="2" class="w-full border rounded p-2 bg-gray-50"></textarea>
+              <% end %>
+            </div>
+          <% end %>
         </li>
       <% end %>
     </ol>
