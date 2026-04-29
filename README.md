@@ -30,9 +30,8 @@ This repo includes a `render.yaml` Blueprint.
 
 1. Push the branch to GitHub.
 2. In Render, **New → Blueprint**, point at this repo, pick the branch.
-3. When prompted, set the two `sync: false` env vars:
-   - `ANTHROPIC_API_KEY` — your Claude API key
-   - `RAILS_MASTER_KEY` — contents of `config/master.key` (gitignored)
+3. When prompted, set `ANTHROPIC_API_KEY` (your Claude API key).
+   `SECRET_KEY_BASE` is generated automatically by Render.
 4. Render runs `bin/render-build.sh` (bundle, precompile, db:prepare) and
    starts Puma on `$PORT`. Health check hits `/up`.
 

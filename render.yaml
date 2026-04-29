@@ -20,5 +20,5 @@ services:
         value: "1"
       - key: ANTHROPIC_API_KEY
         sync: false
-      - key: RAILS_MASTER_KEY
-        sync: false
+      - key: SECRET_KEY_BASE
+        generateValue: true
