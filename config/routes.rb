@@ -11,4 +11,5 @@ Rails.application.routes.draw do
 
   root "surveys#new"
   post "surveys/generate", to: "surveys#generate", as: :generate_survey
+  resources :surveys, only: [:show, :update]
 end

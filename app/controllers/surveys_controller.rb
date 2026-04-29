@@ -1,5 +1,13 @@
 class SurveysController < ApplicationController
+  # JSON updates from the inline editor are same-origin fetches without CSRF tokens.
+  protect_from_forgery with: :null_session, only: :update
+
   def new
+  end
+
+  def show
+    @survey = Survey.find(params[:id])
+    render :show
   end
 
   def generate
@@ -13,16 +21,56 @@ class SurveysController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    @survey = SurveyGenerator.new.call(
+    result = SurveyGenerator.new.call(
       theme: theme,
       audience_age: audience_age,
       key_insight: key_insight,
       notes: notes
     )
-    render partial: "survey", locals: { survey: @survey }
+
+    @survey = Survey.create!(
+      title:        result["title"],
+      description:  result["description"],
+      theme:        result["theme"].presence || theme,
+      audience_age: result["audience_age"].presence || audience_age,
+      key_insight:  result["key_insight"].presence || key_insight,
+      cards:        result["cards"]
+    )
+
+    render partial: "survey", locals: { survey: survey_payload(@survey) }
   rescue => e
     Rails.logger.error("[SurveyGenerator] #{e.class}: #{e.message}")
     flash.now[:alert] = "Generation failed: #{e.message}"
     render :new, status: :unprocessable_entity
+  end
+
+  def update
+    survey = Survey.find(params[:id])
+    payload = JSON.parse(request.body.read)
+
+    survey.update!(
+      title:       payload["title"],
+      description: payload["description"],
+      cards:       payload["cards"]
+    )
+
+    render json: { ok: true, id: survey.id, updated_at: survey.updated_at }
+  rescue => e
+    Rails.logger.error("[SurveysController#update] #{e.class}: #{e.message}")
+    render json: { ok: false, error: e.message }, status: :unprocessable_entity
+  end
+
+  private
+
+  def survey_payload(s)
+    {
+      "id"           => s.id,
+      "title"        => s.title,
+      "description"  => s.description,
+      "theme"        => s.theme,
+      "audience_age" => s.audience_age,
+      "key_insight"  => s.key_insight,
+      "cards"        => s.cards
+    }
   end
 end

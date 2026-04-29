@@ -1,9 +1,13 @@
 <%= turbo_frame_tag "survey" do %>
   <article class="border rounded-lg p-6 bg-white shadow-sm"
-           data-controller="survey-editor">
+           data-controller="survey-editor"
+           data-survey-editor-id-value="<%= survey['id'] %>"
+           data-survey-editor-url-value="<%= survey['id'] ? survey_path(survey['id']) : '' %>">
     <h2 class="text-2xl font-semibold mb-1" contenteditable="true"
+        data-survey-editor-target="title"
         data-action="input->survey-editor#edit"><%= survey["title"] %></h2>
     <p class="text-gray-600 mb-4" contenteditable="true"
+       data-survey-editor-target="surveyDescription"
        data-action="input->survey-editor#edit"><%= survey["description"] %></p>
 
     <div class="flex items-center justify-between mb-4 bg-gray-50 p-3 rounded">
@@ -105,6 +109,18 @@
       <%= link_to "Generate another", root_path,
             class: "text-indigo-600 hover:underline",
             data: { turbo_frame: "_top" } %>
+      <div class="flex items-center gap-3">
+        <span data-survey-editor-target="status" class="text-xs text-gray-500"></span>
+        <button type="button"
+                class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
+                data-action="click->survey-editor#save"
+                data-survey-editor-target="saveButton">Save changes</button>
+        <% if survey["id"] %>
+          <%= link_to "Permalink", survey_path(survey["id"]),
+                class: "text-indigo-600 hover:underline text-sm",
+                data: { turbo_frame: "_top" } %>
+        <% end %>
+      </div>
     </div>
   </article>
 <% end %>

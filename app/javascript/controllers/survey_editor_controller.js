@@ -1,9 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Inline editor enforcing the survey design rules.
-// Rules: 10-15 questions; text 50-70 target / 100 hard max;
-// options 3-5 (tap_card, select_one, select_many, range, rating);
-// grids even count, max 10; option text <= 20 chars in select-one lists.
 const TYPE_BOUNDS = {
   tap_card:         { min: 3, max: 5 },
   multiple_choice:  { min: 3, max: 5 },
@@ -24,13 +20,13 @@ const QUESTIONS_MIN = 10
 const QUESTIONS_MAX = 15
 
 export default class extends Controller {
-  static targets = ["card", "summary"]
+  static targets = ["card", "summary", "title", "surveyDescription", "saveButton", "status"]
+  static values  = { id: Number, url: String }
 
   connect() {
     this.refreshAll()
   }
 
-  // Re-evaluate all warnings/disabled states.
   refreshAll() {
     this.cardTargets.forEach(c => this.refreshCard(c))
     this.refreshSummary()
@@ -93,10 +89,10 @@ export default class extends Controller {
     }
   }
 
-  // Stimulus actions
-
   edit(event) {
-    this.refreshCard(event.currentTarget.closest("[data-survey-editor-target='card']"))
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    if (card) this.refreshCard(card)
+    this.markDirty()
   }
 
   addOption(event) {
@@ -108,6 +104,7 @@ export default class extends Controller {
     const node = template.content.firstElementChild.cloneNode(true)
     list.appendChild(node)
     this.refreshCard(card)
+    this.markDirty()
     node.querySelector("[data-role='option']")?.focus()
   }
 
@@ -116,6 +113,7 @@ export default class extends Controller {
     const card = event.currentTarget.closest("[data-survey-editor-target='card']")
     event.currentTarget.closest("[data-role='option-row']").remove()
     this.refreshCard(card)
+    this.markDirty()
   }
 
   deleteCard(event) {
@@ -124,5 +122,63 @@ export default class extends Controller {
     if (!confirm("Delete this card?")) return
     card.remove()
     this.refreshAll()
+    this.markDirty()
+  }
+
+  markDirty() {
+    if (this.hasStatusTarget) {
+      this.statusTarget.textContent = "Unsaved changes"
+      this.statusTarget.className = "text-xs text-amber-600"
+    }
+  }
+
+  serialize() {
+    const cards = this.cardTargets.map(card => {
+      const type = card.dataset.cardType
+      const text = card.querySelector("[data-role='text']")?.textContent.trim() || ""
+      const description = card.querySelector("[data-role='description']")?.textContent.trim() || ""
+      const options = Array.from(card.querySelectorAll("[data-role='option']"))
+        .map(o => o.textContent.trim()).filter(Boolean)
+      const out = { type, text }
+      if (description) out.description = description
+      if (options.length) out.options = options
+      return out
+    })
+
+    return {
+      title: this.titleTarget.textContent.trim(),
+      description: this.surveyDescriptionTarget.textContent.trim(),
+      cards
+    }
+  }
+
+  async save(event) {
+    event.preventDefault()
+    if (!this.hasUrlValue || !this.urlValue) {
+      this.flash("Nothing to save (no survey id)", "text-red-600")
+      return
+    }
+    this.saveButtonTarget.disabled = true
+    this.flash("Saving…", "text-gray-500")
+    try {
+      const res = await fetch(this.urlValue, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(this.serialize())
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const json = await res.json()
+      this.flash(`Saved ${new Date(json.updated_at).toLocaleTimeString()}`, "text-emerald-700")
+    } catch (err) {
+      this.flash(`Save failed: ${err.message}`, "text-red-600")
+    } finally {
+      this.saveButtonTarget.disabled = false
+    }
+  }
+
+  flash(text, klass) {
+    if (!this.hasStatusTarget) return
+    this.statusTarget.textContent = text
+    this.statusTarget.className = `text-xs ${klass}`
   }
 }
