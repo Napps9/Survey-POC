@@ -37,7 +37,7 @@ class SurveysController < ApplicationController
       cards:        result["cards"]
     )
 
-    render partial: "survey", locals: { survey: survey_payload(@survey) }
+    redirect_to survey_path(@survey)
   rescue => e
     Rails.logger.error("[SurveyGenerator] #{e.class}: #{e.message}")
     flash.now[:alert] = "Generation failed: #{e.message}"

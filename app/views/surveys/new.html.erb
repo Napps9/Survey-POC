@@ -10,8 +10,7 @@
     </div>
   <% end %>
 
-  <%= form_with url: generate_survey_path, method: :post,
-                data: { turbo_frame: "survey" }, class: "space-y-5" do |f| %>
+  <%= form_with url: generate_survey_path, method: :post, class: "space-y-5" do |f| %>
     <div>
       <%= f.label :theme, "Theme", class: "display block text-sm text-hot-pink tracking-widest mb-2" %>
       <%= f.text_field :theme,
@@ -45,5 +44,4 @@
           data: { turbo_submits_with: "Generating…" } %>
   <% end %>
 
-  <%= turbo_frame_tag "survey", class: "block mt-10" %>
 </div>
