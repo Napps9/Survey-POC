@@ -1,6 +1,6 @@
-<div class="max-w-2xl mx-auto p-6">
-  <%= link_to "← New survey", root_path, class: "text-indigo-600 hover:underline text-sm" %>
-  <div class="mt-4">
+<div>
+  <%= link_to "← New survey", root_path, class: "text-smoke/70 hover:text-hot-pink text-sm" %>
+  <div class="mt-5">
     <%= render partial: "survey", locals: { survey: {
       "id" => @survey.id,
       "title" => @survey.title,

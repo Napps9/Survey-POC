@@ -1,49 +1,49 @@
-<div class="max-w-2xl mx-auto p-6">
-  <h1 class="text-3xl font-bold mb-2">AI Survey Generator</h1>
-  <p class="text-gray-600 mb-6">
-    Tell us the brief and Claude will draft a survey that follows the design rules.
+<div>
+  <h1 class="display text-5xl mb-2">AI Survey Generator</h1>
+  <p class="text-smoke/70 mb-8">
+    Tell us the brief — we'll draft a survey that follows the Playverto design rules.
   </p>
 
   <% if flash[:alert] %>
-    <div class="mb-4 p-3 rounded bg-red-50 text-red-800 border border-red-200">
+    <div class="mb-6 p-3 rounded-xl bg-hot-pink/10 text-hot-pink border border-hot-pink/40">
       <%= flash[:alert] %>
     </div>
   <% end %>
 
   <%= form_with url: generate_survey_path, method: :post,
-                data: { turbo_frame: "survey" }, class: "space-y-4" do |f| %>
+                data: { turbo_frame: "survey" }, class: "space-y-5" do |f| %>
     <div>
-      <%= f.label :theme, "Theme", class: "block text-sm font-medium mb-1" %>
+      <%= f.label :theme, "Theme", class: "display block text-sm text-hot-pink tracking-widest mb-2" %>
       <%= f.text_field :theme,
             placeholder: "e.g. Onboarding for new SaaS users",
-            class: "w-full rounded border-gray-300 p-2 shadow-sm" %>
+            class: "w-full bg-slate border border-smoke/20 rounded-xl px-4 py-3 text-smoke placeholder-smoke/40 focus:border-hot-pink focus:outline-none" %>
     </div>
 
     <div>
-      <%= f.label :audience_age, "Target audience age", class: "block text-sm font-medium mb-1" %>
+      <%= f.label :audience_age, "Target audience age", class: "display block text-sm text-hot-pink tracking-widest mb-2" %>
       <%= f.text_field :audience_age,
             placeholder: "e.g. 25-40",
-            class: "w-full rounded border-gray-300 p-2 shadow-sm" %>
+            class: "w-full bg-slate border border-smoke/20 rounded-xl px-4 py-3 text-smoke placeholder-smoke/40 focus:border-hot-pink focus:outline-none" %>
     </div>
 
     <div>
-      <%= f.label :key_insight, "Key insight you hope to achieve", class: "block text-sm font-medium mb-1" %>
+      <%= f.label :key_insight, "Key insight you hope to achieve", class: "display block text-sm text-hot-pink tracking-widest mb-2" %>
       <%= f.text_area :key_insight, rows: 2,
             placeholder: "e.g. Where do users get stuck in week 1?",
-            class: "w-full rounded border-gray-300 p-2 shadow-sm" %>
+            class: "w-full bg-slate border border-smoke/20 rounded-xl px-4 py-3 text-smoke placeholder-smoke/40 focus:border-hot-pink focus:outline-none" %>
     </div>
 
     <div>
-      <%= f.label :notes, "Additional notes (optional)", class: "block text-sm font-medium mb-1" %>
+      <%= f.label :notes, "Additional notes (optional)", class: "display block text-sm text-hot-pink tracking-widest mb-2" %>
       <%= f.text_area :notes, rows: 3,
             placeholder: "Anything else: tone, captive vs cold audience, must-ask topics…",
-            class: "w-full rounded border-gray-300 p-2 shadow-sm" %>
+            class: "w-full bg-slate border border-smoke/20 rounded-xl px-4 py-3 text-smoke placeholder-smoke/40 focus:border-hot-pink focus:outline-none" %>
     </div>
 
     <%= f.submit "Generate survey",
-          class: "px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 cursor-pointer",
+          class: "display bg-light-yellow text-slate text-lg tracking-widest px-7 py-3 rounded-full hover:brightness-95 cursor-pointer",
           data: { turbo_submits_with: "Generating…" } %>
   <% end %>
 
-  <%= turbo_frame_tag "survey", class: "block mt-8" %>
+  <%= turbo_frame_tag "survey", class: "block mt-10" %>
 </div>

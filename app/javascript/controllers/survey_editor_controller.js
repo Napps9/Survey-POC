@@ -60,7 +60,7 @@ export default class extends Controller {
         if (bounds.even && count % 2 !== 0) messages.push("must be even")
         const ok = count >= bounds.min && count <= bounds.max && (!bounds.even || count % 2 === 0)
         status.textContent = messages.join(" · ")
-        status.className = "text-xs " + (ok ? "text-gray-500" : "text-red-600 font-medium")
+        status.className = "text-xs " + (ok ? "text-smoke/50" : "text-hot-pink font-medium")
       }
     }
   }
@@ -69,23 +69,23 @@ export default class extends Controller {
     if (!this.hasSummaryTarget) return
     const questionCount = this.cardTargets.filter(c => COUNTABLE.has(c.dataset.cardType)).length
     const ok = questionCount >= QUESTIONS_MIN && questionCount <= QUESTIONS_MAX
-    this.summaryTarget.textContent = `${questionCount} questions (rule: ${QUESTIONS_MIN}-${QUESTIONS_MAX})`
-    this.summaryTarget.className = "text-sm font-medium " + (ok ? "text-emerald-700" : "text-red-700")
+    this.summaryTarget.textContent = `${questionCount} Q (${QUESTIONS_MIN}-${QUESTIONS_MAX})`
+    this.summaryTarget.className = "display text-sm tracking-widest " + (ok ? "text-aquamarine" : "text-hot-pink")
   }
 
   setCharWarning(el, hardMax, target) {
     const len = (el.textContent || "").length
     el.dataset.len = len
     let color = "border-transparent"
-    if (len > hardMax) color = "border-red-500"
-    else if (len > target) color = "border-amber-400"
-    el.classList.remove("border-transparent", "border-red-500", "border-amber-400")
+    if (len > hardMax) color = "border-hot-pink"
+    else if (len > target) color = "border-light-yellow"
+    el.classList.remove("border-transparent", "border-hot-pink", "border-light-yellow")
     el.classList.add(color)
 
     const counter = el.parentElement.querySelector("[data-role='char-counter']")
     if (counter) {
       counter.textContent = `${len}/${hardMax}`
-      counter.className = "text-xs " + (len > hardMax ? "text-red-600 font-medium" : len > target ? "text-amber-600" : "text-gray-400")
+      counter.className = "text-xs " + (len > hardMax ? "text-hot-pink font-medium" : len > target ? "text-light-yellow" : "text-smoke/40")
     }
   }
 
@@ -128,7 +128,7 @@ export default class extends Controller {
   markDirty() {
     if (this.hasStatusTarget) {
       this.statusTarget.textContent = "Unsaved changes"
-      this.statusTarget.className = "text-xs text-amber-600"
+      this.statusTarget.className = "text-xs text-light-yellow"
     }
   }
 
@@ -155,11 +155,11 @@ export default class extends Controller {
   async save(event) {
     event.preventDefault()
     if (!this.hasUrlValue || !this.urlValue) {
-      this.flash("Nothing to save (no survey id)", "text-red-600")
+      this.flash("Nothing to save (no survey id)", "text-hot-pink")
       return
     }
     this.saveButtonTarget.disabled = true
-    this.flash("Saving…", "text-gray-500")
+    this.flash("Saving…", "text-smoke/60")
     try {
       const res = await fetch(this.urlValue, {
         method: "PATCH",
@@ -168,9 +168,9 @@ export default class extends Controller {
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = await res.json()
-      this.flash(`Saved ${new Date(json.updated_at).toLocaleTimeString()}`, "text-emerald-700")
+      this.flash(`Saved ${new Date(json.updated_at).toLocaleTimeString()}`, "text-aquamarine")
     } catch (err) {
-      this.flash(`Save failed: ${err.message}`, "text-red-600")
+      this.flash(`Save failed: ${err.message}`, "text-hot-pink")
     } finally {
       this.saveButtonTarget.disabled = false
     }

@@ -1,75 +1,100 @@
+<% type_accent = {
+  "welcome_card" => "border-light-yellow",
+  "static_page" => "border-smoke/40",
+  "tap_card" => "border-aquamarine",
+  "select_one_grid" => "border-purple",
+  "select_many_grid" => "border-purple",
+  "range" => "border-sky-blue",
+  "rating" => "border-sky-blue",
+  "yes_no" => "border-aquamarine",
+  "open_ended" => "border-smoke/40",
+  "multiple_choice" => "border-hot-pink",
+  "select_many" => "border-hot-pink"
+} %>
+
 <%= turbo_frame_tag "survey" do %>
-  <article class="border rounded-lg p-6 bg-white shadow-sm"
+  <article class="bg-slate border border-smoke/15 rounded-2xl p-6"
            data-controller="survey-editor"
            data-survey-editor-id-value="<%= survey['id'] %>"
            data-survey-editor-url-value="<%= survey['id'] ? survey_path(survey['id']) : '' %>">
-    <h2 class="text-2xl font-semibold mb-1" contenteditable="true"
+    <h2 class="display text-3xl mb-2 outline-none" contenteditable="true"
         data-survey-editor-target="title"
         data-action="input->survey-editor#edit"><%= survey["title"] %></h2>
-    <p class="text-gray-600 mb-4" contenteditable="true"
+    <p class="text-smoke/70 mb-5 outline-none" contenteditable="true"
        data-survey-editor-target="surveyDescription"
        data-action="input->survey-editor#edit"><%= survey["description"] %></p>
 
-    <div class="flex items-center justify-between mb-4 bg-gray-50 p-3 rounded">
-      <dl class="grid grid-cols-3 gap-2 text-xs text-gray-600 flex-1">
-        <div><dt class="font-semibold">Theme</dt><dd><%= survey["theme"] %></dd></div>
-        <div><dt class="font-semibold">Audience age</dt><dd><%= survey["audience_age"] %></dd></div>
-        <div><dt class="font-semibold">Key insight</dt><dd><%= survey["key_insight"] %></dd></div>
+    <div class="flex items-center justify-between mb-5 bg-smoke/5 border border-smoke/10 p-4 rounded-xl">
+      <dl class="grid grid-cols-3 gap-3 text-xs flex-1">
+        <div>
+          <dt class="display text-hot-pink tracking-widest mb-1">Theme</dt>
+          <dd class="text-smoke/90"><%= survey["theme"] %></dd>
+        </div>
+        <div>
+          <dt class="display text-hot-pink tracking-widest mb-1">Audience</dt>
+          <dd class="text-smoke/90"><%= survey["audience_age"] %></dd>
+        </div>
+        <div>
+          <dt class="display text-hot-pink tracking-widest mb-1">Insight</dt>
+          <dd class="text-smoke/90"><%= survey["key_insight"] %></dd>
+        </div>
       </dl>
       <div class="ml-4" data-survey-editor-target="summary"></div>
     </div>
 
-    <p class="text-xs text-gray-500 mb-4">
-      Click any text to edit. Limits: question 50–70 chars (max 100), option max 20 chars,
-      questions 10–15. Warnings turn amber/red when you exceed targets.
+    <p class="text-xs text-smoke/50 mb-5">
+      Tap any text to edit. Q 50–70 chars (max 100) · option max 20 chars · 10–15 questions.
     </p>
 
-    <ol class="space-y-5">
+    <ol class="space-y-4">
       <% Array(survey["cards"]).each do |c| %>
         <% type = c["type"] %>
-        <li class="relative border rounded p-3"
+        <% accent = type_accent[type] || "border-smoke/30" %>
+        <li class="relative bg-smoke/[0.03] border-l-4 <%= accent %> rounded-r-xl p-4"
             data-survey-editor-target="card"
             data-card-type="<%= type %>">
 
           <button type="button"
-                  class="absolute top-2 right-2 text-gray-400 hover:text-red-600 text-sm"
+                  class="absolute top-2 right-2 text-smoke/40 hover:text-hot-pink text-lg leading-none"
                   data-action="click->survey-editor#deleteCard"
                   title="Delete card">×</button>
 
-          <div class="flex items-baseline gap-2 mb-1">
-            <span class="text-xs uppercase tracking-wide text-gray-500"><%= type.to_s.tr('_', ' ') %></span>
-            <span data-role="char-counter" class="text-xs text-gray-400"></span>
+          <div class="flex items-baseline gap-2 mb-2">
+            <span class="display bg-hot-pink text-slate text-xs tracking-widest px-2 py-0.5 rounded">
+              <%= type.to_s.tr('_', ' ') %>
+            </span>
+            <span data-role="char-counter" class="text-xs text-smoke/40"></span>
           </div>
 
-          <div class="border-b-2 border-transparent">
+          <div>
             <div contenteditable="true"
-                 class="font-medium outline-none"
+                 class="font-medium outline-none border-b-2 border-transparent text-smoke"
                  data-role="text"
                  data-action="input->survey-editor#edit"><%= c["text"] %></div>
           </div>
 
           <% if c["description"].present? || %w[welcome_card static_page].include?(type) %>
-            <div class="mt-1">
+            <div class="mt-2">
               <div contenteditable="true"
-                   class="text-sm text-gray-600 outline-none border-b-2 border-transparent"
+                   class="text-sm text-smoke/70 outline-none border-b-2 border-transparent"
                    data-role="description"
                    data-action="input->survey-editor#edit"><%= c["description"] %></div>
-              <div data-role="char-counter" class="text-xs text-gray-400"></div>
+              <div data-role="char-counter" class="text-xs text-smoke/40"></div>
             </div>
           <% end %>
 
           <% if %w[multiple_choice select_many select_one_grid select_many_grid tap_card range rating].include?(type) %>
-            <div class="mt-3 ml-2">
-              <ul data-role="option-list" class="space-y-1">
+            <div class="mt-3">
+              <ul data-role="option-list" class="space-y-1.5">
                 <% Array(c["options"]).each do |opt| %>
                   <li data-role="option-row" class="flex items-center gap-2">
-                    <span class="text-gray-400">•</span>
+                    <span class="text-smoke/40">•</span>
                     <span contenteditable="true"
-                          class="flex-1 outline-none border-b border-transparent focus:border-gray-300"
+                          class="flex-1 outline-none border-b border-transparent focus:border-smoke/30 text-smoke"
                           data-role="option"
                           data-action="input->survey-editor#edit"><%= opt %></span>
                     <button type="button"
-                            class="text-gray-400 hover:text-red-600 disabled:opacity-30 disabled:hover:text-gray-400 text-xs"
+                            class="text-smoke/40 hover:text-hot-pink disabled:opacity-30 disabled:hover:text-smoke/40 text-xs"
                             data-action="click->survey-editor#removeOption">remove</button>
                   </li>
                 <% end %>
@@ -77,47 +102,47 @@
 
               <template data-role="option-template">
                 <li data-role="option-row" class="flex items-center gap-2">
-                  <span class="text-gray-400">•</span>
+                  <span class="text-smoke/40">•</span>
                   <span contenteditable="true"
-                        class="flex-1 outline-none border-b border-gray-300"
+                        class="flex-1 outline-none border-b border-smoke/30 text-smoke"
                         data-role="option"
                         data-action="input->survey-editor#edit">New option</span>
                   <button type="button"
-                          class="text-gray-400 hover:text-red-600 text-xs"
+                          class="text-smoke/40 hover:text-hot-pink text-xs"
                           data-action="click->survey-editor#removeOption">remove</button>
                 </li>
               </template>
 
-              <div class="mt-2 flex items-center gap-3">
+              <div class="mt-3 flex items-center gap-3">
                 <button type="button"
-                        class="text-xs px-2 py-1 border rounded hover:bg-gray-50 disabled:opacity-40"
+                        class="text-xs px-3 py-1 border border-smoke/20 rounded-full hover:border-sky-blue text-smoke/80 disabled:opacity-40"
                         data-action="click->survey-editor#addOption">+ Add option</button>
-                <span data-role="option-status" class="text-xs text-gray-500"></span>
+                <span data-role="option-status" class="text-xs text-smoke/50"></span>
               </div>
             </div>
 
           <% elsif type == "yes_no" %>
-            <div class="mt-2 ml-2 text-gray-500 text-sm">Yes / No (fixed)</div>
+            <div class="mt-2 text-smoke/60 text-sm italic">Yes / No (fixed)</div>
           <% elsif type == "open_ended" %>
-            <div class="mt-2 ml-2 text-gray-500 text-sm italic">Free-text response</div>
+            <div class="mt-2 text-smoke/60 text-sm italic">Free-text response</div>
           <% end %>
         </li>
       <% end %>
     </ol>
 
-    <div class="mt-6 flex items-center justify-between">
-      <%= link_to "Generate another", root_path,
-            class: "text-indigo-600 hover:underline",
+    <div class="mt-7 flex items-center justify-between flex-wrap gap-3">
+      <%= link_to "← Generate another", root_path,
+            class: "text-smoke/70 hover:text-hot-pink text-sm",
             data: { turbo_frame: "_top" } %>
       <div class="flex items-center gap-3">
-        <span data-survey-editor-target="status" class="text-xs text-gray-500"></span>
+        <span data-survey-editor-target="status" class="text-xs text-smoke/50"></span>
         <button type="button"
-                class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
+                class="display bg-light-yellow text-slate tracking-widest px-5 py-2 rounded-full hover:brightness-95 disabled:opacity-50"
                 data-action="click->survey-editor#save"
                 data-survey-editor-target="saveButton">Save changes</button>
         <% if survey["id"] %>
           <%= link_to "Permalink", survey_path(survey["id"]),
-                class: "text-indigo-600 hover:underline text-sm",
+                class: "text-smoke/70 hover:text-hot-pink text-sm",
                 data: { turbo_frame: "_top" } %>
         <% end %>
       </div>

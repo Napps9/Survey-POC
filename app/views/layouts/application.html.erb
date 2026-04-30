@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Survey Poc" %></title>
+    <title><%= content_for(:title) || "Playverto Survey Generator" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nanum+Pen+Script&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.png" type="image/png">
@@ -18,8 +22,19 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="bg-slate text-smoke font-sans min-h-screen">
+    <header class="border-b border-smoke/10">
+      <div class="max-w-3xl mx-auto px-5 py-5 flex items-center justify-between">
+        <%= link_to root_path, class: "flex items-center gap-2 group" do %>
+          <span class="display text-3xl tracking-wide">
+            <span class="text-smoke">play</span><span class="text-hot-pink">verto</span>
+          </span>
+        <% end %>
+        <span class="display text-xs tracking-widest text-smoke/50">Survey Generator</span>
+      </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-5 py-10">
       <%= yield %>
     </main>
   </body>
