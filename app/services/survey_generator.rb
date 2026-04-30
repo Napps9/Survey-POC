@@ -134,7 +134,7 @@ class SurveyGenerator
 
   def call(theme:, audience_age:, key_insight:, notes: nil)
     brief = [theme, audience_age, key_insight, notes].compact.join(" ")
-    examples = QuestionCorpus.search(brief, limit: 15)
+    examples = QuestionCorpus.search(brief, limit: 8, min_overlap: 2)
     Rails.logger.info("[corpus] matched #{examples.size} of #{QuestionCorpus.all.size}: " +
                       examples.first(5).map { |e| e[:question].truncate(60) }.join(" | "))
 
@@ -146,15 +146,30 @@ class SurveyGenerator
     MSG
 
     if examples.any?
-      user_message << "\nHistorical Playverto questions used in similar contexts " \
-                      "(inspiration only — adapt wording to the audience; the noted " \
-                      "type is what worked historically):\n"
+      user_message << "\nVocabulary reference (NOT a checklist, NOT to be copied): " \
+                      "a few historical Playverto questions touching similar topics, " \
+                      "useful only for tone and which answer types tend to suit which " \
+                      "concepts. Ignore any that don't fit this brief.\n"
       examples.each do |e|
         type_hint = e[:primary_type].presence || "n/a"
-        user_message << %(- "#{e[:question]}" — historical type: #{type_hint} ) \
-                        "(used #{e[:appearances]}x)\n"
+        user_message << %(- "#{e[:question]}" [#{type_hint}]\n)
       end
     end
+
+    user_message << <<~REMINDER
+
+      Now design the survey for THIS brief. Strictly follow the design rules
+      from the system prompt:
+      - 10 to 15 questions total (welcome_card / static_page don't count)
+      - no more than 2 of the same answer type in a row
+      - tap_card 3-5 options · multi-choice 3-5 options · grids even count, ≤10
+      - question text 50-70 chars target, never exceed 100
+      - option text ≤ 20 chars in select-one lists
+      - include a welcome_card only if the audience is cold/new
+      - include one static_page only if the survey hits 15 questions
+      Echo theme, audience_age, key_insight unchanged. Output via the
+      emit_survey tool.
+    REMINDER
 
     response = @client.messages.create(
       model: MODEL,

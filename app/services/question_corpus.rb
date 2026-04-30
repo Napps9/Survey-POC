@@ -35,13 +35,13 @@ class QuestionCorpus
       @all ||= load
     end
 
-    def search(brief, limit: 15)
+    def search(brief, limit: 8, min_overlap: 2)
       tokens = tokenise(brief)
       return [] if tokens.empty?
 
       scored = all.map do |row|
         overlap = (row[:tokens] & tokens).size
-        next nil if overlap.zero?
+        next nil if overlap < min_overlap
         score = overlap * 2.0 + Math.log10(row[:total_viewings] + 1)
         [score, row]
       end.compact
