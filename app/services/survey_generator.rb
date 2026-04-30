@@ -115,12 +115,44 @@ class SurveyGenerator
     10. Answer length — Keep each answer choice up to 20 characters in a
         select-one list. For grids, weigh option count against legibility.
 
-    Output via the emit_survey tool. Choose card types thoughtfully:
-    - tap_card for visual choice between 3-5 distinct concepts
-    - range / rating for scales
-    - yes_no for gating
-    - open_ended sparingly for qualitative depth
-    - grids when comparing the same options across multiple dimensions
+    Output via the emit_survey tool. Choose card types thoughtfully — the
+    Verto answer type definitions below tell you when each is the right fit:
+
+    - multiple_choice (Verto "Select One"): the most popular type. List or
+      grid of options, player picks one. Use list for any number of options;
+      use a grid (even count) when the option count is even and looks tidy
+      on mobile. Up to ~5 options. Can include an "Other" entry. Use this
+      whenever the answer space is well-defined and discrete.
+    - select_many (Verto "Select Many"): same UI as Select One but allows
+      multiple choices. Use when more than one answer is genuinely possible.
+    - select_one_grid / select_many_grid (Verto "Matrix"): up to ~8 sub-
+      questions sharing the SAME answer set, with consistent column labels.
+      Great for rating multiple sub-topics on the same scale efficiently.
+    - tap_card (Verto "Tap"): a sequence of cards, each card is its own
+      mini-question with 2–3 quick choices. Best when you want lots of data
+      points fast across related concepts (e.g. quick reactions to a series
+      of statements or images). Aim for 3–5 cards; per Verto rules tap_card
+      "options" should reflect ~3 cards' worth of distinct concepts.
+    - range (Verto "Range"): playful 5-point sliding scale for emotion or
+      agree/disagree. Five custom icons animate as the player drags. Use for
+      mood, satisfaction, agreement — anything qualitative-scaled.
+    - rating (Verto "Rating"): icon-based scale (stars by default, but icons
+      can be customised). Use for "how good was X" questions. Can also stand
+      in for range when iconography matters more than animation.
+    - nps (use type "rating" with appropriate options): Verto's NPS is a
+      0–10 drag scale, also customisable to 4- or 5-point. Labels can be
+      numbers, agreement, or emotion. Pick rating with a wider option count
+      when you want NPS-style.
+    - yes_no: simple gating only. Use sparingly — Select One with two
+      options is often richer.
+    - open_ended (Verto "Freeform"): text input, can be voice-recorded too.
+      Use sparingly to capture authentic qualitative voice.
+    - select_one_grid as "Prioritise" surrogate: Verto's Prioritise lets
+      players drag-rank ~5 items. We don't have a dedicated type — use
+      select_one_grid with 4–6 options and phrase the question as ranking
+      ("In what order would you…"). Prefer this over a flat select for
+      explicit priority questions.
+    - welcome_card / static_page: not questions; flow control per the rules.
 
     When relevant historical Playverto questions are provided in the brief,
     use them to inform wording style and answer-type selection. Do NOT copy
