@@ -121,6 +121,11 @@ class SurveyGenerator
     - yes_no for gating
     - open_ended sparingly for qualitative depth
     - grids when comparing the same options across multiple dimensions
+
+    When relevant historical Playverto questions are provided in the brief,
+    use them to inform wording style and answer-type selection. Do NOT copy
+    them verbatim — adapt to the brief's audience and insight. The 10 design
+    rules above always override any pattern from the historical examples.
   PROMPT
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
@@ -128,12 +133,28 @@ class SurveyGenerator
   end
 
   def call(theme:, audience_age:, key_insight:, notes: nil)
-    user_message = <<~MSG
+    brief = [theme, audience_age, key_insight, notes].compact.join(" ")
+    examples = QuestionCorpus.search(brief, limit: 15)
+    Rails.logger.info("[corpus] matched #{examples.size} of #{QuestionCorpus.all.size}: " +
+                      examples.first(5).map { |e| e[:question].truncate(60) }.join(" | "))
+
+    user_message = +<<~MSG
       Theme: #{theme}
       Target audience age: #{audience_age}
       Key insight hoping to be achieved: #{key_insight}
       Additional notes: #{notes.to_s.strip.empty? ? '(none)' : notes}
     MSG
+
+    if examples.any?
+      user_message << "\nHistorical Playverto questions used in similar contexts " \
+                      "(inspiration only — adapt wording to the audience; the noted " \
+                      "type is what worked historically):\n"
+      examples.each do |e|
+        type_hint = e[:primary_type].presence || "n/a"
+        user_message << %(- "#{e[:question]}" — historical type: #{type_hint} ) \
+                        "(used #{e[:appearances]}x)\n"
+      end
+    end
 
     response = @client.messages.create(
       model: MODEL,
