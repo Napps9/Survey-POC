@@ -1,22 +1,41 @@
-<% type_accent = {
-  "welcome_card" => "border-light-yellow",
-  "static_page" => "border-smoke/40",
-  "tap_card" => "border-aquamarine",
-  "select_one_grid" => "border-purple",
-  "select_many_grid" => "border-purple",
-  "range" => "border-sky-blue",
-  "rating" => "border-sky-blue",
-  "yes_no" => "border-aquamarine",
-  "open_ended" => "border-smoke/40",
-  "multiple_choice" => "border-hot-pink",
-  "select_many" => "border-hot-pink"
-} %>
+<%
+  palette = %w[bg-aquamarine bg-hot-pink bg-purple bg-sky-blue bg-light-yellow]
+
+  type_label = {
+    "multiple_choice"  => "Select one",
+    "select_many"      => "Select many",
+    "select_one_grid"  => "Select one",
+    "select_many_grid" => "Select many",
+    "tap_card"         => "Tap on the icon you agree with",
+    "range"            => "Drag the slider",
+    "rating"           => "Tap on a star",
+    "yes_no"           => "Select one",
+    "open_ended"       => "Type in your answer",
+    "welcome_card"     => "Welcome",
+    "static_page"      => "Take a break"
+  }
+
+  type_accent = {
+    "welcome_card"     => "border-light-yellow",
+    "static_page"      => "border-smoke/40",
+    "tap_card"         => "border-aquamarine",
+    "select_one_grid"  => "border-purple",
+    "select_many_grid" => "border-purple",
+    "range"            => "border-sky-blue",
+    "rating"           => "border-sky-blue",
+    "yes_no"           => "border-aquamarine",
+    "open_ended"       => "border-smoke/40",
+    "multiple_choice"  => "border-hot-pink",
+    "select_many"      => "border-hot-pink"
+  }
+%>
 
 <%= turbo_frame_tag "survey" do %>
   <article class="bg-slate border border-smoke/15 rounded-2xl p-6"
            data-controller="survey-editor"
            data-survey-editor-id-value="<%= survey['id'] %>"
            data-survey-editor-url-value="<%= survey['id'] ? survey_path(survey['id']) : '' %>">
+
     <h2 class="display text-3xl mb-2 outline-none" contenteditable="true"
         data-survey-editor-target="title"
         data-action="input->survey-editor#edit"><%= survey["title"] %></h2>
@@ -46,85 +65,291 @@
       Tap any text to edit. Q 50–70 chars (max 100) · option max 20 chars · 10–15 questions.
     </p>
 
-    <ol class="space-y-4">
+    <ol class="space-y-6">
       <% Array(survey["cards"]).each do |c| %>
         <% type = c["type"] %>
         <% accent = type_accent[type] || "border-smoke/30" %>
-        <li class="relative bg-smoke/[0.03] border-l-4 <%= accent %> rounded-r-xl p-4"
+        <% label = type_label[type] || type.to_s.tr('_', ' ') %>
+        <% is_prioritise = type.to_s.include?("grid") && c["text"].to_s.match?(/\b(rank|order|priorit)/i) %>
+
+        <li class="relative bg-slate border-l-4 <%= accent %> rounded-r-xl"
             data-survey-editor-target="card"
             data-card-type="<%= type %>">
 
-          <button type="button"
-                  class="absolute top-2 right-2 text-smoke/40 hover:text-hot-pink text-lg leading-none"
-                  data-action="click->survey-editor#deleteCard"
-                  title="Delete card">×</button>
-
-          <div class="flex items-baseline gap-2 mb-2">
-            <span class="display bg-hot-pink text-slate text-xs tracking-widest px-2 py-0.5 rounded">
-              <%= type.to_s.tr('_', ' ') %>
-            </span>
-            <span data-role="char-counter" class="text-xs text-smoke/40"></span>
+          <%# ───── Edit chrome (dark band above the preview) ───── %>
+          <div class="flex items-center justify-between px-4 py-2 text-xs text-smoke/60">
+            <div class="flex items-center gap-2">
+              <span class="display bg-hot-pink text-slate tracking-widest px-2 py-0.5 rounded text-[10px]">
+                <%= type.to_s.tr('_', ' ') %>
+              </span>
+              <span data-role="char-counter"></span>
+            </div>
+            <button type="button"
+                    class="text-smoke/40 hover:text-hot-pink text-lg leading-none"
+                    data-action="click->survey-editor#deleteCard"
+                    title="Delete card">×</button>
           </div>
 
-          <div>
-            <div contenteditable="true"
-                 class="font-medium outline-none border-b-2 border-transparent text-smoke"
-                 data-role="text"
-                 data-action="input->survey-editor#edit"><%= c["text"] %></div>
-          </div>
-
-          <% if c["description"].present? || %w[welcome_card static_page].include?(type) %>
-            <div class="mt-2">
+          <%# ───── Phone-card preview (white) ───── %>
+          <% if type == "static_page" %>
+            <div class="bg-slate border border-dashed border-smoke/30 mx-4 mb-4 rounded-3xl p-8 text-center">
+              <div class="display text-smoke/60 tracking-widest text-xs mb-2">
+                <%= label %>
+              </div>
               <div contenteditable="true"
-                   class="text-sm text-smoke/70 outline-none border-b-2 border-transparent"
-                   data-role="description"
-                   data-action="input->survey-editor#edit"><%= c["description"] %></div>
-              <div data-role="char-counter" class="text-xs text-smoke/40"></div>
+                   class="display text-2xl text-smoke italic outline-none border-b-2 border-transparent"
+                   data-role="text"
+                   data-action="input->survey-editor#edit"><%= c["text"] %></div>
+              <% if c["description"].present? %>
+                <div contenteditable="true"
+                     class="text-sm text-smoke/60 mt-2 outline-none border-b-2 border-transparent"
+                     data-role="description"
+                     data-action="input->survey-editor#edit"><%= c["description"] %></div>
+                <div data-role="char-counter" class="text-xs text-smoke/40 mt-1"></div>
+              <% end %>
+            </div>
+
+          <% elsif type == "welcome_card" %>
+            <div class="bg-light-yellow text-slate mx-4 mb-4 rounded-3xl p-8 text-center">
+              <div class="display tracking-widest text-xs text-slate/70 mb-2"><%= label %></div>
+              <div contenteditable="true"
+                   class="display text-3xl outline-none border-b-2 border-transparent"
+                   data-role="text"
+                   data-action="input->survey-editor#edit"><%= c["text"] %></div>
+              <% if c["description"].present? %>
+                <div contenteditable="true"
+                     class="text-base text-slate/80 mt-3 outline-none border-b-2 border-transparent"
+                     data-role="description"
+                     data-action="input->survey-editor#edit"><%= c["description"] %></div>
+                <div data-role="char-counter" class="text-xs text-slate/60 mt-1"></div>
+              <% end %>
+            </div>
+
+          <% else %>
+            <div class="bg-smoke text-slate mx-4 mb-4 rounded-3xl p-6 shadow-sm">
+              <%# Top instruction label %>
+              <div class="display text-center text-hot-pink tracking-widest text-xs mb-3">
+                <%= label %>
+              </div>
+
+              <%# Question text %>
+              <div contenteditable="true"
+                   class="display text-2xl text-slate text-center outline-none border-b-2 border-transparent"
+                   data-role="text"
+                   data-action="input->survey-editor#edit"><%= c["text"] %></div>
+
+              <%# Optional description %>
+              <% if c["description"].present? %>
+                <div contenteditable="true"
+                     class="text-sm text-slate/60 text-center mt-2 outline-none border-b-2 border-transparent"
+                     data-role="description"
+                     data-action="input->survey-editor#edit"><%= c["description"] %></div>
+                <div data-role="char-counter" class="text-xs text-slate/40 text-center mt-1"></div>
+              <% end %>
+
+              <%# Type-specific answer preview %>
+              <div class="mt-5">
+                <% case type %>
+                <% when "multiple_choice", "select_many" %>
+                  <ul data-role="option-list" class="space-y-2">
+                    <% Array(c["options"]).each_with_index do |opt, i| %>
+                      <li data-role="option-row"
+                          class="flex items-center gap-3 bg-white border border-slate/10 rounded-full pl-2 pr-4 py-1">
+                        <span class="<%= palette[i % palette.size] %> w-9 h-9 rounded-full flex items-center justify-center text-slate font-bold">
+                          <%= type == "select_many" ? "☐" : (i + 1) %>
+                        </span>
+                        <span contenteditable="true"
+                              class="flex-1 outline-none border-b border-transparent focus:border-slate/30 text-slate font-medium"
+                              data-role="option"
+                              data-action="input->survey-editor#edit"><%= opt %></span>
+                        <button type="button"
+                                class="text-slate/30 hover:text-hot-pink disabled:opacity-30 text-xs"
+                                data-action="click->survey-editor#removeOption">remove</button>
+                      </li>
+                    <% end %>
+                  </ul>
+
+                <% when "select_one_grid", "select_many_grid" %>
+                  <% if is_prioritise %>
+                    <%# Prioritise treatment: numbered drag-rank rows %>
+                    <ul data-role="option-list" class="space-y-2">
+                      <% Array(c["options"]).each_with_index do |opt, i| %>
+                        <li data-role="option-row"
+                            class="flex items-center gap-3 bg-sky-blue text-slate rounded-full pl-2 pr-4 py-1">
+                          <span class="bg-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
+                            <%= i + 1 %>
+                          </span>
+                          <span contenteditable="true"
+                                class="flex-1 outline-none border-b border-transparent focus:border-slate/30 font-medium"
+                                data-role="option"
+                                data-action="input->survey-editor#edit"><%= opt %></span>
+                          <span class="text-slate/40 text-lg">⋮⋮</span>
+                          <button type="button"
+                                  class="text-slate/30 hover:text-hot-pink disabled:opacity-30 text-xs"
+                                  data-action="click->survey-editor#removeOption">remove</button>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% else %>
+                    <ul data-role="option-list" class="grid grid-cols-2 gap-2">
+                      <% Array(c["options"]).each_with_index do |opt, i| %>
+                        <li data-role="option-row"
+                            class="flex items-center gap-2 <%= palette[i % palette.size] %> rounded-full pl-2 pr-3 py-1">
+                          <span class="bg-white/80 w-7 h-7 rounded-full flex items-center justify-center text-slate font-bold text-sm">
+                            <%= type == "select_many_grid" ? "☐" : (i + 1) %>
+                          </span>
+                          <span contenteditable="true"
+                                class="flex-1 outline-none border-b border-transparent focus:border-slate/30 text-slate font-medium text-sm"
+                                data-role="option"
+                                data-action="input->survey-editor#edit"><%= opt %></span>
+                          <button type="button"
+                                  class="text-slate/40 hover:text-hot-pink disabled:opacity-30 text-xs"
+                                  data-action="click->survey-editor#removeOption">×</button>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% end %>
+
+                <% when "tap_card" %>
+                  <%# Mock card-stack preview %>
+                  <div class="relative h-44 mb-4">
+                    <div class="absolute inset-x-6 top-2 bottom-2 bg-purple rounded-2xl rotate-[-2deg]"></div>
+                    <div class="absolute inset-x-3 top-1 bottom-1 bg-aquamarine rounded-2xl rotate-[1deg]"></div>
+                    <div class="absolute inset-0 bg-white border border-slate/10 rounded-2xl flex flex-col items-center justify-center p-4 text-center">
+                      <div class="display text-xs text-aquamarine tracking-widest mb-2">Tap agree or disagree</div>
+                      <div class="text-slate font-semibold mb-3">Card preview</div>
+                      <div class="flex gap-2">
+                        <span class="bg-hot-pink text-white rounded-full px-3 py-1 text-xs">Disagree</span>
+                        <span class="bg-light-yellow text-slate rounded-full px-3 py-1 text-xs">Unsure</span>
+                        <span class="bg-aquamarine text-slate rounded-full px-3 py-1 text-xs">Agree</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="display tracking-widest text-xs text-slate/50 mb-2">Cards</div>
+                  <ul data-role="option-list" class="space-y-2">
+                    <% Array(c["options"]).each_with_index do |opt, i| %>
+                      <li data-role="option-row"
+                          class="flex items-center gap-3 bg-white border border-slate/10 rounded-xl px-3 py-2">
+                        <span class="<%= palette[i % palette.size] %> w-8 h-8 rounded-md flex items-center justify-center text-slate font-bold text-sm">
+                          <%= i + 1 %>
+                        </span>
+                        <span contenteditable="true"
+                              class="flex-1 outline-none border-b border-transparent focus:border-slate/30 text-slate text-sm"
+                              data-role="option"
+                              data-action="input->survey-editor#edit"><%= opt %></span>
+                        <button type="button"
+                                class="text-slate/30 hover:text-hot-pink disabled:opacity-30 text-xs"
+                                data-action="click->survey-editor#removeOption">remove</button>
+                      </li>
+                    <% end %>
+                  </ul>
+
+                <% when "range" %>
+                  <% labels = Array(c["options"]) %>
+                  <div class="px-2 py-3">
+                    <div class="relative h-3 rounded-full bg-gradient-to-r from-aquamarine via-light-yellow to-hot-pink">
+                      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-white border-2 border-slate rounded-full shadow"></div>
+                    </div>
+                  </div>
+                  <ul data-role="option-list" class="flex flex-wrap justify-between gap-2 text-xs">
+                    <% Array(c["options"]).each_with_index do |opt, i| %>
+                      <li data-role="option-row" class="flex items-center gap-1">
+                        <span class="text-slate/50"><%= i + 1 %>.</span>
+                        <span contenteditable="true"
+                              class="outline-none border-b border-transparent focus:border-slate/30 text-slate"
+                              data-role="option"
+                              data-action="input->survey-editor#edit"><%= opt %></span>
+                        <button type="button"
+                                class="text-slate/30 hover:text-hot-pink disabled:opacity-30"
+                                data-action="click->survey-editor#removeOption">×</button>
+                      </li>
+                    <% end %>
+                  </ul>
+
+                <% when "rating" %>
+                  <% n = (Array(c["options"]).size.nonzero? || 5) %>
+                  <% if n >= 7 %>
+                    <%# NPS-style: large numeric strip %>
+                    <div class="flex items-stretch rounded-full overflow-hidden text-sm font-bold">
+                      <% (0..(n - 1)).each do |i| %>
+                        <div class="flex-1 text-center py-2
+                                    <%= i < n / 3 ? 'bg-hot-pink text-white' : i < 2 * n / 3 ? 'bg-light-yellow text-slate' : 'bg-aquamarine text-slate' %>">
+                          <%= i %>
+                        </div>
+                      <% end %>
+                    </div>
+                    <ul data-role="option-list" class="flex justify-between mt-2 text-xs text-slate/60">
+                      <% Array(c["options"]).each_with_index do |opt, i| %>
+                        <li data-role="option-row" class="flex items-center gap-1">
+                          <span contenteditable="true"
+                                class="outline-none border-b border-transparent focus:border-slate/30"
+                                data-role="option"
+                                data-action="input->survey-editor#edit"><%= opt %></span>
+                          <button type="button"
+                                  class="text-slate/30 hover:text-hot-pink disabled:opacity-30"
+                                  data-action="click->survey-editor#removeOption">×</button>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% else %>
+                    <div class="flex justify-center gap-2 text-3xl text-hot-pink">
+                      <% n.times { %>★<% } %>
+                    </div>
+                    <ul data-role="option-list" class="flex justify-center flex-wrap gap-2 mt-3 text-xs">
+                      <% Array(c["options"]).each_with_index do |opt, i| %>
+                        <li data-role="option-row" class="flex items-center gap-1 bg-slate/5 rounded-full px-2 py-1">
+                          <span class="text-slate/50"><%= i + 1 %>★</span>
+                          <span contenteditable="true"
+                                class="outline-none border-b border-transparent focus:border-slate/30 text-slate"
+                                data-role="option"
+                                data-action="input->survey-editor#edit"><%= opt %></span>
+                          <button type="button"
+                                  class="text-slate/30 hover:text-hot-pink disabled:opacity-30"
+                                  data-action="click->survey-editor#removeOption">×</button>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% end %>
+
+                <% when "yes_no" %>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-aquamarine text-slate text-center rounded-full py-3 font-bold">Yes</div>
+                    <div class="bg-hot-pink text-white text-center rounded-full py-3 font-bold">No</div>
+                  </div>
+
+                <% when "open_ended" %>
+                  <div class="border border-slate/15 rounded-xl p-3">
+                    <div class="text-slate/30 italic">Type answer…</div>
+                    <div class="h-24"></div>
+                    <div class="text-right text-xs text-slate/40 bg-slate/5 inline-block float-right rounded-full px-2 py-0.5">0/200 Characters</div>
+                    <div class="clear-both"></div>
+                  </div>
+                <% end %>
+              </div>
             </div>
           <% end %>
 
+          <%# ───── Edit footer (option add/status, lives on dark) ───── %>
           <% if %w[multiple_choice select_many select_one_grid select_many_grid tap_card range rating].include?(type) %>
-            <div class="mt-3">
-              <ul data-role="option-list" class="space-y-1.5">
-                <% Array(c["options"]).each do |opt| %>
-                  <li data-role="option-row" class="flex items-center gap-2">
-                    <span class="text-smoke/40">•</span>
-                    <span contenteditable="true"
-                          class="flex-1 outline-none border-b border-transparent focus:border-smoke/30 text-smoke"
-                          data-role="option"
-                          data-action="input->survey-editor#edit"><%= opt %></span>
-                    <button type="button"
-                            class="text-smoke/40 hover:text-hot-pink disabled:opacity-30 disabled:hover:text-smoke/40 text-xs"
-                            data-action="click->survey-editor#removeOption">remove</button>
-                  </li>
-                <% end %>
-              </ul>
-
-              <template data-role="option-template">
-                <li data-role="option-row" class="flex items-center gap-2">
-                  <span class="text-smoke/40">•</span>
-                  <span contenteditable="true"
-                        class="flex-1 outline-none border-b border-smoke/30 text-smoke"
-                        data-role="option"
-                        data-action="input->survey-editor#edit">New option</span>
-                  <button type="button"
-                          class="text-smoke/40 hover:text-hot-pink text-xs"
-                          data-action="click->survey-editor#removeOption">remove</button>
-                </li>
-              </template>
-
-              <div class="mt-3 flex items-center gap-3">
-                <button type="button"
-                        class="text-xs px-3 py-1 border border-smoke/20 rounded-full hover:border-sky-blue text-smoke/80 disabled:opacity-40"
-                        data-action="click->survey-editor#addOption">+ Add option</button>
-                <span data-role="option-status" class="text-xs text-smoke/50"></span>
-              </div>
+            <div class="flex items-center gap-3 px-4 pb-3">
+              <button type="button"
+                      class="text-xs px-3 py-1 border border-smoke/20 rounded-full hover:border-sky-blue text-smoke/80 disabled:opacity-40"
+                      data-action="click->survey-editor#addOption">+ Add option</button>
+              <span data-role="option-status" class="text-xs text-smoke/50"></span>
             </div>
 
-          <% elsif type == "yes_no" %>
-            <div class="mt-2 text-smoke/60 text-sm italic">Yes / No (fixed)</div>
-          <% elsif type == "open_ended" %>
-            <div class="mt-2 text-smoke/60 text-sm italic">Free-text response</div>
+            <template data-role="option-template">
+              <li data-role="option-row" class="flex items-center gap-3 bg-white border border-slate/10 rounded-full pl-2 pr-4 py-1">
+                <span class="bg-aquamarine w-9 h-9 rounded-full flex items-center justify-center text-slate font-bold">+</span>
+                <span contenteditable="true"
+                      class="flex-1 outline-none border-b border-slate/30 text-slate font-medium"
+                      data-role="option"
+                      data-action="input->survey-editor#edit">New option</span>
+                <button type="button"
+                        class="text-slate/40 hover:text-hot-pink text-xs"
+                        data-action="click->survey-editor#removeOption">remove</button>
+              </li>
+            </template>
           <% end %>
         </li>
       <% end %>
@@ -132,8 +357,7 @@
 
     <div class="mt-7 flex items-center justify-between flex-wrap gap-3">
       <%= link_to "← Generate another", root_path,
-            class: "text-smoke/70 hover:text-hot-pink text-sm",
-            data: { turbo_frame: "_top" } %>
+            class: "text-smoke/70 hover:text-hot-pink text-sm" %>
       <div class="flex items-center gap-3">
         <span data-survey-editor-target="status" class="text-xs text-smoke/50"></span>
         <button type="button"
@@ -142,8 +366,7 @@
                 data-survey-editor-target="saveButton">Save changes</button>
         <% if survey["id"] %>
           <%= link_to "Permalink", survey_path(survey["id"]),
-                class: "text-smoke/70 hover:text-hot-pink text-sm",
-                data: { turbo_frame: "_top" } %>
+                class: "text-smoke/70 hover:text-hot-pink text-sm" %>
         <% end %>
       </div>
     </div>
