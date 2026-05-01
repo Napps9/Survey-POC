@@ -1,10 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Pointer-drag thumb on a horizontal gradient track. Snaps to N steps and
-// updates a label element to the current step's option text.
+// Pointer-drag thumb on a track. Supports horizontal or vertical orientation.
+// Snaps to N steps; updates a label element to the current step's text.
 export default class extends Controller {
-  static targets = ["track", "thumb", "label", "step"]
-  static values  = { steps: Number, index: { type: Number, default: 0 } }
+  static targets = ["track", "thumb", "fill", "label", "step"]
+  static values  = {
+    steps:       Number,
+    index:       { type: Number,  default: 0 },
+    orientation: { type: String,  default: "horizontal" } // or "vertical"
+  }
 
   connect() {
     this._onMove = this.onMove.bind(this)
@@ -21,20 +25,18 @@ export default class extends Controller {
     window.addEventListener("pointerup",   this._onUp, { once: true })
   }
 
-  onMove(event) {
-    if (!this.dragging) return
-    this.updateFromEvent(event)
-  }
-
+  onMove(event) { if (this.dragging) this.updateFromEvent(event) }
   onUp() {
     this.dragging = false
     window.removeEventListener("pointermove", this._onMove)
   }
 
   updateFromEvent(event) {
-    const rect = this.trackTarget.getBoundingClientRect()
-    const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width))
-    const n = Math.max(1, this.stepsValue)
+    const rect  = this.trackTarget.getBoundingClientRect()
+    const ratio = this.orientationValue === "vertical"
+      ? Math.max(0, Math.min(1, (event.clientY - rect.top)  / rect.height))
+      : Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width))
+    const n   = Math.max(1, this.stepsValue)
     const idx = Math.round(ratio * (n - 1))
     if (idx !== this.indexValue) {
       this.indexValue = idx
@@ -46,7 +48,18 @@ export default class extends Controller {
     const n = Math.max(1, this.stepsValue)
     const ratio = n === 1 ? 0.5 : this.indexValue / (n - 1)
     if (this.hasThumbTarget) {
-      this.thumbTarget.style.left = `${ratio * 100}%`
+      if (this.orientationValue === "vertical") {
+        this.thumbTarget.style.top = `${ratio * 100}%`
+      } else {
+        this.thumbTarget.style.left = `${ratio * 100}%`
+      }
+    }
+    if (this.hasFillTarget) {
+      if (this.orientationValue === "vertical") {
+        this.fillTarget.style.height = `${ratio * 100}%`
+      } else {
+        this.fillTarget.style.width = `${ratio * 100}%`
+      }
     }
     if (this.hasLabelTarget && this.hasStepTarget) {
       const step = this.stepTargets[this.indexValue]
