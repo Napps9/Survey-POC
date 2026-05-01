@@ -28,6 +28,20 @@
     "multiple_choice"  => "border-hot-pink",
     "select_many"      => "border-hot-pink"
   }
+
+  type_figma = {
+    "multiple_choice"  => "select.svg",
+    "select_many"      => "select.svg",
+    "select_one_grid"  => "select.svg",
+    "select_many_grid" => "select.svg",
+    "tap_card"         => "AgreeDisagree.svg",
+    "range"            => "Range.svg",
+    "rating"           => "star_rating.svg",
+    "yes_no"           => "AgreeDisagree.svg",
+    "open_ended"       => "textbox.svg",
+    "welcome_card"     => "WelcomeEnding.svg",
+    "static_page"      => "WelcomeEnding.svg"
+  }
 %>
 
 <%= turbo_frame_tag "survey" do %>
@@ -90,52 +104,65 @@
                     title="Delete card">×</button>
           </div>
 
-          <%# ───── Phone-card preview (white) ───── %>
-          <% if type == "static_page" %>
-            <div class="bg-slate border border-dashed border-smoke/30 mx-4 mb-4 rounded-3xl p-8 text-center">
-              <div class="display text-smoke/60 tracking-widest text-xs mb-2">
-                <%= label %>
-              </div>
-              <div contenteditable="true"
-                   class="display text-2xl text-smoke italic outline-none border-b-2 border-transparent"
-                   data-role="text"
-                   data-action="input->survey-editor#edit"><%= c["text"] %></div>
-              <% if c["description"].present? %>
-                <div contenteditable="true"
-                     class="text-sm text-smoke/60 mt-2 outline-none border-b-2 border-transparent"
-                     data-role="description"
-                     data-action="input->survey-editor#edit"><%= c["description"] %></div>
-                <div data-role="char-counter" class="text-xs text-smoke/40 mt-1"></div>
+          <%# ───── Two-column: Figma reference (left) + interactive phone-card (right) ───── %>
+          <div class="grid grid-cols-1 md:grid-cols-[1fr_360px] gap-6 mx-4 mb-4 items-start">
+
+            <%# Left: Figma reference image, scaled to match phone card height %>
+            <div class="rounded-[2.5rem] overflow-hidden bg-slate/30 ring-1 ring-smoke/10 aspect-[9/14] max-h-[640px]">
+              <% if type_figma[type] %>
+                <%= image_tag type_figma[type],
+                      alt: "Figma reference",
+                      class: "w-full h-full object-cover" %>
               <% end %>
             </div>
 
-          <% elsif type == "welcome_card" %>
-            <%# Figma WelcomeEnding: green hero, big white text, %>
-            <%# centered play triangle, CTA pill at the bottom. %>
-            <div class="bg-aquamarine text-white mx-4 mb-4 rounded-3xl p-8 text-center flex flex-col items-center gap-4">
-              <div class="display tracking-widest text-xs text-white/70"><%= label %></div>
-              <div contenteditable="true"
-                   class="display text-3xl outline-none border-b-2 border-transparent"
-                   data-role="text"
-                   data-action="input->survey-editor#edit"><%= c["text"] %></div>
-              <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center">
-                <span class="border-y-[10px] border-y-transparent border-l-[16px] border-l-white ml-1"></span>
-              </div>
-              <% if c["description"].present? %>
+            <%# Right: phone-shaped interactive card. Portrait aspect, %>
+            <%# rounded corners ≈ Figma rx=20 (here 2.5rem to feel phone-like). %>
+            <% if type == "static_page" %>
+              <div class="bg-slate border border-dashed border-smoke/30 rounded-[2.5rem] p-8 text-center aspect-[9/14] max-h-[640px] w-full max-w-[360px] flex flex-col items-center justify-center gap-3 shadow-2xl ring-1 ring-smoke/10">
+                <div class="display text-smoke/60 tracking-widest text-xs">
+                  <%= label %>
+                </div>
                 <div contenteditable="true"
-                     class="text-base text-white/90 outline-none border-b-2 border-transparent"
-                     data-role="description"
-                     data-action="input->survey-editor#edit"><%= c["description"] %></div>
-                <div data-role="char-counter" class="text-xs text-white/60"></div>
-              <% end %>
-              <button type="button"
-                      class="display tracking-widest text-sm bg-white text-aquamarine rounded-2xl px-8 py-3 mt-2 hover:brightness-95">
-                Get started
-              </button>
-            </div>
+                     class="display text-2xl text-smoke italic outline-none border-b-2 border-transparent"
+                     data-role="text"
+                     data-action="input->survey-editor#edit"><%= c["text"] %></div>
+                <% if c["description"].present? %>
+                  <div contenteditable="true"
+                       class="text-sm text-smoke/60 outline-none border-b-2 border-transparent"
+                       data-role="description"
+                       data-action="input->survey-editor#edit"><%= c["description"] %></div>
+                  <div data-role="char-counter" class="text-xs text-smoke/40"></div>
+                <% end %>
+              </div>
 
-          <% else %>
-            <div class="bg-smoke text-slate mx-4 mb-4 rounded-3xl p-6 shadow-sm">
+            <% elsif type == "welcome_card" %>
+              <%# Figma WelcomeEnding: green hero, big white text, %>
+              <%# centered play triangle, CTA pill at the bottom. %>
+              <div class="bg-aquamarine text-white rounded-[2.5rem] p-8 text-center flex flex-col items-center justify-center gap-4 aspect-[9/14] max-h-[640px] w-full max-w-[360px] shadow-2xl ring-1 ring-slate/10">
+                <div class="display tracking-widest text-xs text-white/70"><%= label %></div>
+                <div contenteditable="true"
+                     class="display text-3xl outline-none border-b-2 border-transparent"
+                     data-role="text"
+                     data-action="input->survey-editor#edit"><%= c["text"] %></div>
+                <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center">
+                  <span class="border-y-[10px] border-y-transparent border-l-[16px] border-l-white ml-1"></span>
+                </div>
+                <% if c["description"].present? %>
+                  <div contenteditable="true"
+                       class="text-base text-white/90 outline-none border-b-2 border-transparent"
+                       data-role="description"
+                       data-action="input->survey-editor#edit"><%= c["description"] %></div>
+                  <div data-role="char-counter" class="text-xs text-white/60"></div>
+                <% end %>
+                <button type="button"
+                        class="display tracking-widest text-sm bg-white text-aquamarine rounded-2xl px-8 py-3 mt-2 hover:brightness-95">
+                  Get started
+                </button>
+              </div>
+
+            <% else %>
+              <div class="bg-smoke text-slate rounded-[2.5rem] p-6 shadow-2xl ring-1 ring-slate/10 aspect-[9/14] max-h-[640px] w-full max-w-[360px] flex flex-col overflow-y-auto">
               <%# Top instruction label %>
               <div class="display text-center text-hot-pink tracking-widest text-xs mb-3">
                 <%= label %>
@@ -446,7 +473,8 @@
                 <% end %>
               </div>
             </div>
-          <% end %>
+            <% end %>
+          </div>
 
           <%# ───── Edit footer (option add/status, lives on dark) ───── %>
           <% if %w[multiple_choice select_many select_one_grid select_many_grid range rating].include?(type) %>
