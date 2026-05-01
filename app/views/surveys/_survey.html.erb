@@ -151,11 +151,17 @@
               <div class="mt-5">
                 <% case type %>
                 <% when "multiple_choice", "select_many" %>
-                  <ul data-role="option-list" class="space-y-2">
+                  <ul data-role="option-list"
+                      data-controller="picker"
+                      data-picker-mode-value="<%= type == 'select_many' ? 'multi' : 'single' %>"
+                      class="space-y-2">
                     <% Array(c["options"]).each_with_index do |opt, i| %>
                       <li data-role="option-row"
-                          class="flex items-center gap-3 bg-white border border-slate/10 rounded-full pl-2 pr-4 py-1">
-                        <span class="<%= palette[i % palette.size] %> w-9 h-9 rounded-full flex items-center justify-center text-slate font-bold">
+                          data-picker-target="item"
+                          data-action="click->picker#pick"
+                          data-selected="false"
+                          class="flex items-center gap-3 bg-white border border-slate/10 rounded-full pl-2 pr-4 py-1 cursor-pointer transition data-[selected=true]:bg-hot-pink/10 data-[selected=true]:border-hot-pink data-[selected=true]:ring-2 data-[selected=true]:ring-hot-pink/40">
+                        <span class="<%= palette[i % palette.size] %> w-9 h-9 rounded-full flex items-center justify-center text-slate font-bold pointer-events-none">
                           <%= type == "select_many" ? "☐" : (i + 1) %>
                         </span>
                         <span contenteditable="true"
@@ -171,19 +177,30 @@
 
                 <% when "select_one_grid", "select_many_grid" %>
                   <% if is_prioritise %>
-                    <%# Prioritise treatment: numbered drag-rank rows %>
-                    <ul data-role="option-list" class="space-y-2">
+                    <%# Prioritise treatment: numbered reorderable rows %>
+                    <ul data-role="option-list"
+                        data-controller="prioritise"
+                        class="space-y-2">
                       <% Array(c["options"]).each_with_index do |opt, i| %>
                         <li data-role="option-row"
-                            class="flex items-center gap-3 bg-sky-blue text-slate rounded-full pl-2 pr-4 py-1">
-                          <span class="bg-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
+                            data-prioritise-target="item"
+                            class="flex items-center gap-3 bg-sky-blue text-slate rounded-full pl-2 pr-4 py-1 transition-transform">
+                          <span data-role="rank-number"
+                                class="bg-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
                             <%= i + 1 %>
                           </span>
                           <span contenteditable="true"
                                 class="flex-1 outline-none border-b border-transparent focus:border-slate/30 font-medium"
                                 data-role="option"
                                 data-action="input->survey-editor#edit"><%= opt %></span>
-                          <span class="text-slate/40 text-lg">⋮⋮</span>
+                          <button type="button"
+                                  class="text-slate/60 hover:text-slate text-sm leading-none"
+                                  data-action="click->prioritise#up"
+                                  title="Move up">▲</button>
+                          <button type="button"
+                                  class="text-slate/60 hover:text-slate text-sm leading-none"
+                                  data-action="click->prioritise#down"
+                                  title="Move down">▼</button>
                           <button type="button"
                                   class="text-slate/30 hover:text-hot-pink disabled:opacity-30 text-xs"
                                   data-action="click->survey-editor#removeOption">remove</button>
@@ -191,11 +208,17 @@
                       <% end %>
                     </ul>
                   <% else %>
-                    <ul data-role="option-list" class="grid grid-cols-2 gap-2">
+                    <ul data-role="option-list"
+                        data-controller="picker"
+                        data-picker-mode-value="<%= type == 'select_many_grid' ? 'multi' : 'single' %>"
+                        class="grid grid-cols-2 gap-2">
                       <% Array(c["options"]).each_with_index do |opt, i| %>
                         <li data-role="option-row"
-                            class="flex items-center gap-2 <%= palette[i % palette.size] %> rounded-full pl-2 pr-3 py-1">
-                          <span class="bg-white/80 w-7 h-7 rounded-full flex items-center justify-center text-slate font-bold text-sm">
+                            data-picker-target="item"
+                            data-action="click->picker#pick"
+                            data-selected="false"
+                            class="flex items-center gap-2 <%= palette[i % palette.size] %> rounded-full pl-2 pr-3 py-1 cursor-pointer transition data-[selected=true]:ring-4 data-[selected=true]:ring-slate/40">
+                          <span class="bg-white/80 w-7 h-7 rounded-full flex items-center justify-center text-slate font-bold text-sm pointer-events-none">
                             <%= type == "select_many_grid" ? "☐" : (i + 1) %>
                           </span>
                           <span contenteditable="true"
@@ -211,71 +234,90 @@
                   <% end %>
 
                 <% when "tap_card" %>
-                  <%# Mock card-stack preview %>
-                  <div class="relative h-44 mb-4">
-                    <div class="absolute inset-x-6 top-2 bottom-2 bg-purple rounded-2xl rotate-[-2deg]"></div>
-                    <div class="absolute inset-x-3 top-1 bottom-1 bg-aquamarine rounded-2xl rotate-[1deg]"></div>
-                    <div class="absolute inset-0 bg-white border border-slate/10 rounded-2xl flex flex-col items-center justify-center p-4 text-center">
-                      <div class="display text-xs text-aquamarine tracking-widest mb-2">Tap agree or disagree</div>
-                      <div class="text-slate font-semibold mb-3">Card preview</div>
-                      <div class="flex gap-2">
-                        <span class="bg-hot-pink text-white rounded-full px-3 py-1 text-xs">Disagree</span>
-                        <span class="bg-light-yellow text-slate rounded-full px-3 py-1 text-xs">Unsure</span>
-                        <span class="bg-aquamarine text-slate rounded-full px-3 py-1 text-xs">Agree</span>
-                      </div>
+                  <div data-controller="tap-stack">
+                    <div class="relative h-48 mb-4">
+                      <% Array(c["options"]).each_with_index do |opt, i| %>
+                        <div data-tap-stack-target="card"
+                             class="absolute inset-0 <%= palette[i % palette.size] %> border border-slate/10 rounded-2xl flex flex-col items-center justify-center p-4 text-center shadow">
+                          <div class="display text-xs text-slate tracking-widest mb-2">Card <%= i + 1 %></div>
+                          <div contenteditable="true"
+                               class="text-slate font-semibold outline-none border-b border-transparent focus:border-slate/30"
+                               data-role="option"
+                               data-action="input->survey-editor#edit"><%= opt %></div>
+                        </div>
+                      <% end %>
+                    </div>
+                    <div class="flex gap-2 justify-center mb-2">
+                      <button type="button"
+                              data-action="click->tap-stack#pick"
+                              data-tap-stack-direction="left"
+                              class="bg-hot-pink text-white rounded-full px-4 py-1 text-xs font-bold">Disagree</button>
+                      <button type="button"
+                              data-action="click->tap-stack#pick"
+                              data-tap-stack-direction="up"
+                              class="bg-light-yellow text-slate rounded-full px-4 py-1 text-xs font-bold">Unsure</button>
+                      <button type="button"
+                              data-action="click->tap-stack#pick"
+                              data-tap-stack-direction="right"
+                              class="bg-aquamarine text-slate rounded-full px-4 py-1 text-xs font-bold">Agree</button>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-slate/50">
+                      <span data-tap-stack-target="counter"></span>
+                      <button type="button"
+                              data-action="click->tap-stack#reset"
+                              class="hover:text-hot-pink">↺ Reset stack</button>
                     </div>
                   </div>
-                  <div class="display tracking-widest text-xs text-slate/50 mb-2">Cards</div>
-                  <ul data-role="option-list" class="space-y-2">
-                    <% Array(c["options"]).each_with_index do |opt, i| %>
-                      <li data-role="option-row"
-                          class="flex items-center gap-3 bg-white border border-slate/10 rounded-xl px-3 py-2">
-                        <span class="<%= palette[i % palette.size] %> w-8 h-8 rounded-md flex items-center justify-center text-slate font-bold text-sm">
-                          <%= i + 1 %>
-                        </span>
-                        <span contenteditable="true"
-                              class="flex-1 outline-none border-b border-transparent focus:border-slate/30 text-slate text-sm"
-                              data-role="option"
-                              data-action="input->survey-editor#edit"><%= opt %></span>
-                        <button type="button"
-                                class="text-slate/30 hover:text-hot-pink disabled:opacity-30 text-xs"
-                                data-action="click->survey-editor#removeOption">remove</button>
-                      </li>
-                    <% end %>
-                  </ul>
 
                 <% when "range" %>
-                  <% labels = Array(c["options"]) %>
-                  <div class="px-2 py-3">
-                    <div class="relative h-3 rounded-full bg-gradient-to-r from-aquamarine via-light-yellow to-hot-pink">
-                      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-white border-2 border-slate rounded-full shadow"></div>
+                  <% range_steps = Array(c["options"]).size.nonzero? || 5 %>
+                  <div data-controller="range-picker"
+                       data-range-picker-steps-value="<%= range_steps %>">
+                    <div class="text-center display tracking-widest text-xs text-hot-pink mb-2"
+                         data-range-picker-target="label"></div>
+                    <div class="px-2 py-3">
+                      <div data-range-picker-target="track"
+                           data-action="pointerdown->range-picker#start"
+                           class="relative h-3 rounded-full bg-gradient-to-r from-aquamarine via-light-yellow to-hot-pink cursor-pointer touch-none">
+                        <div data-range-picker-target="thumb"
+                             class="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-white border-2 border-slate rounded-full shadow pointer-events-none"
+                             style="left: 0%"></div>
+                      </div>
                     </div>
+                    <ul data-role="option-list" class="flex flex-wrap justify-between gap-2 text-xs">
+                      <% Array(c["options"]).each_with_index do |opt, i| %>
+                        <li data-role="option-row"
+                            data-range-picker-target="step"
+                            class="flex items-center gap-1">
+                          <span class="text-slate/50"><%= i + 1 %>.</span>
+                          <span contenteditable="true"
+                                class="outline-none border-b border-transparent focus:border-slate/30 text-slate"
+                                data-role="option"
+                                data-action="input->survey-editor#edit"><%= opt %></span>
+                          <button type="button"
+                                  class="text-slate/30 hover:text-hot-pink disabled:opacity-30"
+                                  data-action="click->survey-editor#removeOption">×</button>
+                        </li>
+                      <% end %>
+                    </ul>
                   </div>
-                  <ul data-role="option-list" class="flex flex-wrap justify-between gap-2 text-xs">
-                    <% Array(c["options"]).each_with_index do |opt, i| %>
-                      <li data-role="option-row" class="flex items-center gap-1">
-                        <span class="text-slate/50"><%= i + 1 %>.</span>
-                        <span contenteditable="true"
-                              class="outline-none border-b border-transparent focus:border-slate/30 text-slate"
-                              data-role="option"
-                              data-action="input->survey-editor#edit"><%= opt %></span>
-                        <button type="button"
-                                class="text-slate/30 hover:text-hot-pink disabled:opacity-30"
-                                data-action="click->survey-editor#removeOption">×</button>
-                      </li>
-                    <% end %>
-                  </ul>
 
                 <% when "rating" %>
                   <% n = (Array(c["options"]).size.nonzero? || 5) %>
                   <% if n >= 7 %>
-                    <%# NPS-style: large numeric strip %>
-                    <div class="flex items-stretch rounded-full overflow-hidden text-sm font-bold">
+                    <%# NPS-style: numeric strip, single-pick %>
+                    <div data-controller="picker"
+                         data-picker-mode-value="single"
+                         class="flex items-stretch rounded-full overflow-hidden text-sm font-bold">
                       <% (0..(n - 1)).each do |i| %>
-                        <div class="flex-1 text-center py-2
-                                    <%= i < n / 3 ? 'bg-hot-pink text-white' : i < 2 * n / 3 ? 'bg-light-yellow text-slate' : 'bg-aquamarine text-slate' %>">
+                        <button type="button"
+                                data-picker-target="item"
+                                data-action="click->picker#pick"
+                                data-selected="false"
+                                class="flex-1 text-center py-2 transition data-[selected=true]:ring-4 data-[selected=true]:ring-inset data-[selected=true]:ring-slate
+                                       <%= i < n / 3 ? 'bg-hot-pink text-white' : i < 2 * n / 3 ? 'bg-light-yellow text-slate' : 'bg-aquamarine text-slate' %>">
                           <%= i %>
-                        </div>
+                        </button>
                       <% end %>
                     </div>
                     <ul data-role="option-list" class="flex justify-between mt-2 text-xs text-slate/60">
@@ -292,8 +334,16 @@
                       <% end %>
                     </ul>
                   <% else %>
-                    <div class="flex justify-center gap-2 text-3xl text-hot-pink">
-                      <% n.times { %>★<% } %>
+                    <div data-controller="picker"
+                         data-picker-mode-value="stars"
+                         class="flex justify-center gap-2 text-4xl">
+                      <% n.times do %>
+                        <button type="button"
+                                data-picker-target="item"
+                                data-action="click->picker#pick"
+                                data-selected="false"
+                                class="text-slate/20 transition transform data-[selected=true]:text-hot-pink data-[selected=true]:scale-110">★</button>
+                      <% end %>
                     </div>
                     <ul data-role="option-list" class="flex justify-center flex-wrap gap-2 mt-3 text-xs">
                       <% Array(c["options"]).each_with_index do |opt, i| %>
@@ -312,17 +362,36 @@
                   <% end %>
 
                 <% when "yes_no" %>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-aquamarine text-slate text-center rounded-full py-3 font-bold">Yes</div>
-                    <div class="bg-hot-pink text-white text-center rounded-full py-3 font-bold">No</div>
+                  <div data-controller="picker"
+                       data-picker-mode-value="single"
+                       class="grid grid-cols-2 gap-3">
+                    <button type="button"
+                            data-picker-target="item"
+                            data-action="click->picker#pick"
+                            data-selected="false"
+                            class="bg-aquamarine text-slate text-center rounded-full py-3 font-bold transition data-[selected=true]:ring-4 data-[selected=true]:ring-slate">Yes</button>
+                    <button type="button"
+                            data-picker-target="item"
+                            data-action="click->picker#pick"
+                            data-selected="false"
+                            class="bg-hot-pink text-white text-center rounded-full py-3 font-bold transition data-[selected=true]:ring-4 data-[selected=true]:ring-slate">No</button>
                   </div>
 
                 <% when "open_ended" %>
-                  <div class="border border-slate/15 rounded-xl p-3">
-                    <div class="text-slate/30 italic">Type answer…</div>
-                    <div class="h-24"></div>
-                    <div class="text-right text-xs text-slate/40 bg-slate/5 inline-block float-right rounded-full px-2 py-0.5">0/200 Characters</div>
-                    <div class="clear-both"></div>
+                  <div data-controller="freeform"
+                       data-freeform-max-value="200"
+                       class="border border-slate/15 rounded-xl p-3">
+                    <textarea data-freeform-target="input"
+                              data-action="input->freeform#update"
+                              placeholder="Type answer…"
+                              class="w-full h-24 outline-none resize-none bg-transparent text-slate placeholder:text-slate/30"></textarea>
+                    <div class="flex items-center justify-between">
+                      <button type="button"
+                              class="w-8 h-8 rounded-full bg-hot-pink text-white text-sm flex items-center justify-center"
+                              title="Voice answer (visual only)">🎤</button>
+                      <span data-freeform-target="counter"
+                            class="text-xs text-slate/50 bg-slate/5 rounded-full px-2 py-0.5">0/200 Characters</span>
+                    </div>
                   </div>
                 <% end %>
               </div>
@@ -330,7 +399,7 @@
           <% end %>
 
           <%# ───── Edit footer (option add/status, lives on dark) ───── %>
-          <% if %w[multiple_choice select_many select_one_grid select_many_grid tap_card range rating].include?(type) %>
+          <% if %w[multiple_choice select_many select_one_grid select_many_grid range rating].include?(type) %>
             <div class="flex items-center gap-3 px-4 pb-3">
               <button type="button"
                       class="text-xs px-3 py-1 border border-smoke/20 rounded-full hover:border-sky-blue text-smoke/80 disabled:opacity-40"
