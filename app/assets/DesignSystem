@@ -1,0 +1,2738 @@
+/* ============================================================
+   VERTO DESIGN SYSTEM — colors_and_type.css
+   Base + Semantic CSS variables for Play Verto Client 2.0
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Alata&display=swap');
+
+/* ── FONTS ─────────────────────────────────────────────── */
+/* Primary: ABeeZee (Google Fonts — loaded above)          */
+/* Secondary: Eina 03 — commercial font; substitute Alata  */
+/* Fallback stack uses rounded sans-serifs                 */
+
+:root {
+
+  /* ── BASE COLOR TOKENS ─────────────────────────────── */
+
+  /* Green (Primary Action) */
+  --color-green-500: #00A950;   /* rgb(0,169,80)   — primary CTA */
+  --color-green-400: #01A850;   /* rgb(1,168,80)   — slight variant */
+  --color-green-300: #02A750;   /* rgb(2,167,80)   — slider/active */
+
+  /* Navy / Dark (Backgrounds & Secondary Buttons) */
+  --color-navy-900: #1C2034;    /* rgb(28,32,52)   — darkest, back buttons */
+  --color-navy-800: #272D4A;    /* rgb(39,45,74)   — desktop background */
+  --color-navy-750: #2A2D3A;    /* rgb(42,45,58)   — mobile background */
+  --color-navy-700: #333B5F;    /* rgb(51,59,95)   — panel bg */
+  --color-navy-600: #4D588A;    /* rgb(77,88,138)  — lighter navy accent */
+  --color-navy-500: #4F5E9C;    /* rgb(79,94,156)  — mid navy */
+  --color-navy-deep: #070F41;   /* rgb(7,15,65)    — content canvas */
+
+  /* Neutrals */
+  --color-black: #000000;
+  --color-grey-900: #1D1D1D;    /* near-black text */
+  --color-grey-700: #434343;
+  --color-grey-500: #767680;    /* muted grey */
+  --color-grey-300: #C4C4C4;    /* unchecked checkbox */
+  --color-grey-200: #D2D2D2;
+  --color-grey-100: #E7E7E7;
+  --color-grey-50:  #F0F0F0;
+  --color-white: #FFFFFF;
+
+  /* Accent / Brand */
+  --color-yellow: #FFD21D;      /* rgb(255,210,29) — LEGO accent */
+  --color-blue-ios: #007AFF;    /* rgb(0,122,255)  — iOS blue */
+  --color-blue-600: #0052B4;    /* rgb(0,82,180)   — deeper blue */
+  --color-red: #D80027;         /* rgb(216,0,39)   — flag/error */
+  --color-orange: #EB6B35;      /* rgb(235,107,53) — occasional accent */
+  --color-purple: #A10097;      /* rgb(161,0,151)  — flag */
+
+
+  /* ── SEMANTIC COLOR TOKENS ─────────────────────────── */
+
+  /* Backgrounds */
+  --bg-page-desktop: var(--color-navy-800);       /* desktop page bg */
+  --bg-page-mobile: var(--color-navy-750);        /* mobile page bg */
+  --bg-card: var(--color-white);                  /* content card */
+  --bg-input: rgba(0,0,0,0.04);                   /* form field bg */
+  --bg-input-hover: rgba(0,0,0,0.06);
+  --bg-slider-track: rgba(0,0,0,0.07);
+  --bg-overlay: rgba(0,0,0,0.5);                  /* modal overlay */
+  --bg-nav-ios: rgba(29,29,29,0.94);              /* iOS nav bar */
+  --bg-frosted: rgba(255,255,255,0.6);            /* language picker */
+
+  /* Text */
+  --text-primary: var(--color-black);             /* main text on white */
+  --text-secondary: rgba(0,0,0,0.75);             /* body copy on white */
+  --text-muted: rgba(0,0,0,0.5);                  /* captions/hints */
+  --text-on-dark: var(--color-white);             /* text on dark bg */
+  --text-on-dark-muted: rgba(255,255,255,0.65);   /* muted on dark */
+  --text-accent: var(--color-green-500);          /* green label/link */
+  --text-inactive: rgba(255,255,255,0.5);         /* disabled btn text */
+
+  /* Interactive */
+  --color-cta: var(--color-green-500);            /* primary button */
+  --color-cta-active: var(--color-green-300);
+  --color-btn-secondary: var(--color-navy-900);   /* back button */
+  --color-checkbox-checked: var(--color-green-400);
+  --color-checkbox-unchecked: var(--color-grey-300);
+  --color-progress-track: rgba(0,0,0,0.5);
+  --color-progress-fill: var(--color-white);
+
+
+  /* ── BORDER RADII ───────────────────────────────────── */
+  --radius-card: 20px;
+  --radius-btn: 16px;
+  --radius-input: 12px;
+  --radius-input-lg: 15px;
+  --radius-checkbox: 5px;
+  --radius-progress: 8px;
+  --radius-slider-track: 20px;
+  --radius-tag: 100px;
+
+
+  /* ── SHADOWS ────────────────────────────────────────── */
+  --shadow-card: 0px 10px 40px rgba(0,0,0,0.15);
+  --shadow-card-raised: 0px 20px 40px rgba(0,0,0,0.15);
+  --shadow-btn: 0px 10px 40px rgba(0,0,0,0.15);
+  --shadow-tooltip: 0px 4px 40px rgba(0,0,0,0.15);
+  --shadow-play: 0px 10px 30px rgba(0,0,0,0.3);
+
+
+  /* ── SPACING ────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Mobile layout */
+  --layout-mobile-width: 375px;
+  --layout-mobile-inset: 23px;       /* horizontal card padding */
+  --layout-btn-height-mobile: 54px;
+  --layout-btn-height-desktop: 72px;
+
+  /* Desktop layout */
+  --layout-desktop-width: 1152px;
+  --layout-card-panel-width: 444px;
+  --layout-card-height: 680px;
+
+
+  /* ── TYPOGRAPHY ─────────────────────────────────────── */
+
+  /* Font families */
+  --font-primary: 'ABeeZee', 'Nunito', 'Varela Round', sans-serif;
+  --font-label: 'Alata', 'Eina 03', 'DM Sans', sans-serif;
+                                       /* Alata = nearest free match to Eina 03 */
+  --font-system: -apple-system, 'SF Pro Text', BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+
+  /* Font sizes */
+  --text-xs: 12px;      /* label/tag */
+  --text-sm: 13px;      /* caption */
+  --text-base: 14px;    /* small body */
+  --text-md: 16px;      /* body */
+  --text-lg: 19px;      /* section label */
+  --text-xl: 20px;      /* brand tagline */
+  --text-2xl: 25px;     /* desktop body */
+  --text-3xl: 26px;     /* question heading */
+  --text-4xl: 30px;     /* display heading */
+
+  /* Line heights */
+  --leading-tight: 1.2;
+  --leading-snug: 1.4;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Semantic type roles */
+  --type-display: 600 var(--text-4xl)/1.2 var(--font-primary);
+  --type-question: 400 var(--text-3xl)/1.4 var(--font-primary);
+  --type-body-lg: 400 var(--text-2xl)/1.5 var(--font-primary);
+  --type-body: 400 var(--text-md)/1.625 var(--font-primary);
+  --type-body-sm: 400 var(--text-base)/1.4 var(--font-primary);
+  --type-caption: 400 var(--text-sm)/1.1 var(--font-primary);
+  --type-label: 600 var(--text-base)/1.4 var(--font-label);
+  --type-label-sm: 600 var(--text-xs)/1.4 var(--font-label);
+  --type-brand: 700 var(--text-xl)/1.5 var(--font-label);
+  --type-btn-desktop: 400 var(--text-2xl)/1.6 var(--font-primary);
+  --type-btn-mobile: 400 var(--text-md)/1.625 var(--font-primary);
+}
+
+/* ── UTILITY CLASSES ──────────────────────────────────── */
+
+body {
+  font-family: var(--font-primary);
+  color: var(--text-primary);
+  background: var(--bg-page-mobile);
+}
+
+.text-display  { font: var(--type-display); }
+.text-question { font: var(--type-question); }
+.text-body-lg  { font: var(--type-body-lg); }
+.text-body     { font: var(--type-body); }
+.text-body-sm  { font: var(--type-body-sm); }
+.text-caption  { font: var(--type-caption); color: var(--text-muted); }
+.text-label    { font: var(--type-label); }
+.text-label-sm { font: var(--type-label-sm); }
+.text-brand    { font: var(--type-brand); opacity: 0.65; color: var(--color-white); }
+.text-accent   { color: var(--text-accent); }
+.text-muted    { color: var(--text-muted); }
+.text-on-dark  { color: var(--text-on-dark); }
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.btn-primary {
+  background: var(--color-cta);
+  color: var(--color-white);
+  border-radius: var(--radius-btn);
+  box-shadow: var(--shadow-btn);
+  border: none;
+  cursor: pointer;
+  font: var(--type-btn-mobile);
+}
+
+.btn-secondary {
+  background: var(--color-btn-secondary);
+  color: rgba(255,255,255,0.5);
+  border-radius: var(--radius-btn);
+  box-shadow: var(--shadow-btn);
+  border: none;
+  cursor: pointer;
+  font: var(--type-btn-mobile);
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Verto — Question Types</title>
+<link href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Alata&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #00A950;
+  --green-dark: #009044;
+  --navy-900: #1C2034;
+  --navy-800: #272D4A;
+  --navy-750: #2A2D3A;
+  --white: #ffffff;
+  --grey-100: #E7E7E7;
+  --grey-200: #D2D2D2;
+  --grey-300: #C4C4C4;
+  --shadow-card: 0 10px 40px rgba(0,0,0,0.15);
+  --shadow-raised: 0 20px 40px rgba(0,0,0,0.15);
+  --font-ui: 'ABeeZee', sans-serif;
+  --font-label: 'Alata', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--navy-800);
+  min-height: 100vh;
+  padding: 48px 32px 80px;
+}
+
+/* ── PAGE HEADER ───────────────────────────────── */
+.page-header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+.page-tagline {
+  font-family: var(--font-label);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.page-title {
+  font-family: var(--font-ui);
+  font-size: 36px;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.page-subtitle {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  color: rgba(255,255,255,0.5);
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── SECTION ───────────────────────────────────── */
+.section {
+  margin-bottom: 64px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.section-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--green);
+  color: white;
+  font-family: var(--font-label);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.section-name {
+  font-family: var(--font-label);
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+}
+.section-desc {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  margin-left: 46px;
+  margin-top: -18px;
+  margin-bottom: 20px;
+}
+
+/* ── DESKTOP SPLIT CARD ────────────────────────── */
+.split-card {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-raised);
+  background: white;
+  min-height: 480px;
+}
+
+.split-left {
+  width: 380px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.split-left-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.split-left-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.3));
+}
+.split-left-dark {
+  background: var(--navy-750);
+}
+
+.split-right {
+  flex: 1;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+}
+
+/* Progress bar on left panel top */
+.panel-progress {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  height: 10px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.35);
+  overflow: hidden;
+  z-index: 5;
+}
+.panel-progress-fill {
+  height: 100%;
+  border-radius: 8px;
+  background: white;
+}
+
+/* Brand tagline on image */
+.panel-tagline {
+  position: absolute;
+  top: 36px;
+  left: 0; right: 0;
+  text-align: center;
+  font-family: var(--font-label);
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.65);
+  z-index: 5;
+}
+
+/* ── TYPE LABELS ───────────────────────────────── */
+.q-eyebrow {
+  font-family: var(--font-label);
+  font-size: 13px;
+  color: var(--green);
+  letter-spacing: 0.01em;
+}
+.q-title {
+  font-family: var(--font-ui);
+  font-size: 26px;
+  color: #000;
+  line-height: 1.35;
+}
+.q-subtitle {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  color: rgba(0,0,0,0.6);
+  line-height: 1.6;
+}
+
+/* ── NAV BUTTONS ───────────────────────────────── */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 24px;
+}
+.btn-back {
+  flex: 1;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--navy-900);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 20px;
+  color: rgba(255,255,255,0.5);
+  box-shadow: var(--shadow-card);
+  transition: opacity 0.15s;
+}
+.btn-back:hover { opacity: 0.8; }
+.btn-next {
+  flex: 1;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--green);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 20px;
+  color: white;
+  box-shadow: var(--shadow-card);
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-next:hover { background: var(--green-dark); }
+.btn-next:active { transform: scale(0.98); }
+
+/* ══════════════════════════════════════════════
+   COMPONENT STYLES
+══════════════════════════════════════════════ */
+
+/* ── 1. SLIDER ─────────────────────────────────── */
+.slider-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 8px;
+}
+.slider-track-wrap {
+  position: relative;
+  width: 100%;
+  height: 80px;
+}
+.slider-track {
+  width: 100%;
+  height: 64px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.06);
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 24px;
+}
+.s-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.12);
+  flex-shrink: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: background 0.2s;
+}
+.s-dot.active { background: rgba(0,169,80,0.5); }
+.slider-thumb {
+  position: absolute;
+  width: 52px; height: 48px;
+  border-radius: 16px;
+  background: var(--green);
+  box-shadow: 0 4px 20px rgba(0,169,80,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  top: 8px;
+  transition: left 0.18s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  z-index: 2;
+}
+.s-line { width: 2px; height: 20px; background: rgba(255,255,255,0.7); border-radius: 2px; }
+.slider-tooltip {
+  position: absolute;
+  top: -38px;
+  transform: translateX(-50%);
+  background: var(--green);
+  border-radius: 10px;
+  padding: 6px 14px;
+  box-shadow: 0 4px 20px rgba(0,169,80,0.3);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: left 0.18s cubic-bezier(.4,0,.2,1);
+  z-index: 10;
+}
+.slider-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -7px; left: 50%; transform: translateX(-50%);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 8px solid var(--green);
+}
+.slider-tooltip-text {
+  font-family: var(--font-label);
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+}
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px;
+  margin-top: 6px;
+}
+.slider-label-text {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: rgba(0,0,0,0.35);
+}
+
+/* ── 2. MULTIPLE CHOICE 4 ──────────────────────── */
+.choice-grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.choice-card {
+  border-radius: 14px;
+  height: 110px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+.choice-card:hover { transform: scale(1.02); }
+.choice-card.selected { outline: 3px solid var(--green); outline-offset: 0; }
+.choice-card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.choice-bg-1 { background: linear-gradient(135deg, #d4edda, #a8d5b5); }
+.choice-bg-2 { background: linear-gradient(135deg, #d1ecf1, #9fd5df); }
+.choice-bg-3 { background: linear-gradient(135deg, #fff3cd, #ffd88a); }
+.choice-bg-4 { background: linear-gradient(135deg, #f8d7da, #f5a8b0); }
+.choice-bg-5 { background: linear-gradient(135deg, #e2d9f3, #c3aee8); }
+.choice-bg-6 { background: linear-gradient(135deg, #d0e8ff, #9fcfff); }
+.choice-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(transparent 45%, rgba(0,0,0,0.4));
+}
+.choice-card.selected .choice-overlay { background: linear-gradient(transparent 45%, rgba(0,100,40,0.35)); }
+.choice-tick {
+  display: none;
+  position: absolute; top: 8px; right: 8px;
+  width: 22px; height: 22px;
+  background: var(--green);
+  border-radius: 50%;
+  align-items: center; justify-content: center;
+}
+.choice-card.selected .choice-tick { display: flex; }
+.choice-label {
+  position: absolute; bottom: 8px; left: 0; right: 0;
+  text-align: center;
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  padding: 0 8px;
+}
+
+/* ── 3. MULTIPLE CHOICE 6 ──────────────────────── */
+.choice-grid-6 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+/* ── 4. PICK LIST ──────────────────────────────── */
+.pick-list { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; border: 1px solid rgba(0,0,0,0.07); }
+.pick-item {
+  display: flex; align-items: center;
+  padding: 13px 16px; gap: 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer;
+  background: white;
+  transition: background 0.12s;
+}
+.pick-item:last-child { border-bottom: none; }
+.pick-item:hover { background: rgba(0,0,0,0.025); }
+.pick-item.selected { background: rgba(0,169,80,0.05); }
+.pick-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--grey-300);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.pick-item.selected .pick-dot {
+  background: var(--green);
+  border-color: var(--green);
+}
+.pick-text {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  color: #111;
+}
+.pick-item.selected .pick-text {
+  font-family: var(--font-label);
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* ── 5. ACTIVITY ───────────────────────────────── */
+.activity-content { display: flex; flex-direction: column; gap: 12px; }
+.activity-tag {
+  font-family: var(--font-label);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(0,0,0,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.activity-title {
+  font-family: var(--font-ui);
+  font-size: 22px;
+  color: #000;
+  line-height: 1.4;
+}
+.activity-desc {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: rgba(0,0,0,0.55);
+  line-height: 1.6;
+}
+.activity-check {
+  display: flex; align-items: flex-start;
+  gap: 14px; padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.04);
+  cursor: pointer;
+  margin-top: 4px;
+  user-select: none;
+}
+.activity-check:hover { background: rgba(0,0,0,0.06); }
+.check-box {
+  width: 22px; height: 22px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+  background: var(--grey-300);
+}
+.check-box.checked { background: #01A850; }
+.check-texts { display: flex; flex-direction: column; gap: 3px; }
+.check-main { font-size: 14px; color: #000; line-height: 1.4; }
+.check-sub { font-size: 12px; color: rgba(0,0,0,0.45); }
+
+/* ── 6. VIDEO ──────────────────────────────────── */
+.video-wrap {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 16px;
+  background: var(--navy-750);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+}
+.video-thumb {
+  position: absolute; inset: 0;
+  background: url('assets/activity-image.png') center/cover;
+  opacity: 0.45;
+}
+.play-wrap {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+}
+.play-circle {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s;
+}
+.play-circle:hover { transform: scale(1.08); }
+.video-duration {
+  position: absolute; bottom: 10px; right: 12px;
+  font-family: var(--font-label);
+  font-size: 12px; font-weight: 600;
+  color: white;
+  background: rgba(0,0,0,0.6);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+.video-played-overlay {
+  display: none;
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.5);
+  align-items: center; justify-content: center;
+  z-index: 3;
+}
+.video-played-overlay.show { display: flex; }
+.video-played-msg {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  color: white;
+  text-align: center;
+}
+
+/* ── 7. AUDIO CAPTURE ──────────────────────────── */
+.audio-ui {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 20px;
+  padding: 16px 0;
+}
+.audio-visualiser {
+  display: flex; align-items: center; gap: 5px;
+  height: 60px;
+}
+.audio-bar {
+  width: 5px;
+  border-radius: 3px;
+  background: var(--green);
+  opacity: 0.7;
+  animation: none;
+  transition: height 0.15s;
+}
+.audio-bar.animating {
+  animation: audioPulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes audioPulse {
+  from { height: 8px; opacity: 0.4; }
+  to { height: var(--h, 40px); opacity: 1; }
+}
+.audio-time {
+  font-family: var(--font-label);
+  font-size: 28px;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: 0.05em;
+}
+.audio-controls { display: flex; gap: 12px; align-items: center; }
+.audio-btn {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.12s;
+}
+.audio-btn:hover { transform: scale(1.06); }
+.audio-btn-record { background: var(--green); }
+.audio-btn-stop { background: #D80027; }
+.audio-btn-play { background: var(--navy-900); }
+.audio-hint {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: rgba(0,0,0,0.4);
+  text-align: center;
+}
+.audio-recorded {
+  display: none;
+  align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(0,169,80,0.08);
+  border: 1px solid rgba(0,169,80,0.2);
+  width: 100%;
+}
+.audio-recorded.show { display: flex; }
+.audio-wave { flex: 1; height: 32px; background: rgba(0,169,80,0.15); border-radius: 8px; position: relative; overflow: hidden; }
+.audio-wave-inner { height: 100%; background: repeating-linear-gradient(90deg, transparent 0px, transparent 3px, rgba(0,169,80,0.5) 3px, rgba(0,169,80,0.5) 5px); }
+.audio-rec-time { font-family: var(--font-label); font-size: 13px; font-weight: 600; color: var(--green); }
+
+/* ── 8. ROTATE / SWIPE ─────────────────────────── */
+.rotate-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 16px;
+}
+.rotate-card-stack {
+  position: relative;
+  width: 260px; height: 180px;
+  margin: 0 auto;
+}
+.rotate-card {
+  position: absolute;
+  width: 230px; height: 160px;
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+  background: white;
+  display: flex; align-items: center; justify-content: center;
+  cursor: grab;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: rgba(0,0,0,0.4);
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  user-select: none;
+  overflow: hidden;
+}
+.rotate-card:active { cursor: grabbing; }
+.rotate-card-1 { transform: rotate(-4deg) translate(-10px, 10px); z-index: 1; background: #f0f4f8; }
+.rotate-card-2 { transform: rotate(2deg) translate(8px, 6px); z-index: 2; background: #e8f5e9; }
+.rotate-card-top { transform: rotate(0deg); z-index: 3; background: white; }
+.rotate-card-img {
+  width: 100%; height: 100%;
+  background: url('assets/activity-image.png') center/cover;
+  opacity: 0.6;
+}
+.rotate-hint {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: rgba(0,0,0,0.4);
+  text-align: center;
+}
+.rotate-actions { display: flex; gap: 24px; margin-top: 8px; }
+.rotate-action-btn {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 2px solid;
+  background: white;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-card);
+  font-size: 20px;
+  transition: transform 0.12s;
+}
+.rotate-action-btn:hover { transform: scale(1.1); }
+.rotate-action-no { border-color: #D80027; color: #D80027; }
+.rotate-action-yes { border-color: var(--green); color: var(--green); }
+.swipe-indicator { display: flex; gap: 8px; align-items: center; }
+.swipe-arrow { font-size: 18px; color: rgba(0,0,0,0.25); }
+
+/* ── 9. PROFILE CREATION ───────────────────────── */
+.profile-fields { display: flex; flex-direction: column; gap: 10px; }
+.profile-field {
+  display: flex; align-items: center;
+  height: 54px; border-radius: 12px;
+  background: rgba(0,0,0,0.05);
+  padding: 0 16px; gap: 12px;
+  cursor: pointer; transition: background 0.12s;
+}
+.profile-field:hover { background: rgba(0,0,0,0.08); }
+.profile-field-icon { font-size: 16px; opacity: 0.35; flex-shrink: 0; }
+.profile-field-label { font-family: var(--font-label); font-size: 15px; color: rgba(0,0,0,0.38); flex: 1; }
+.profile-field-value { font-family: var(--font-label); font-size: 15px; color: #111; flex: 1; }
+.profile-field-arrow { font-size: 11px; color: rgba(0,0,0,0.3); }
+.profile-divider { height: 1px; background: rgba(0,0,0,0.07); margin: 4px 0; }
+.profile-dropdown {
+  display: none;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f4f4f4;
+  box-shadow: var(--shadow-card);
+  margin-top: -6px;
+  margin-bottom: 4px;
+}
+.profile-dropdown.open { display: flex; }
+.profile-dropdown-item {
+  padding: 12px 16px;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: #111;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.profile-dropdown-item:last-child { border-bottom: none; }
+.profile-dropdown-item:hover { background: rgba(0,169,80,0.07); }
+.profile-dropdown-item.chosen { color: var(--green); font-family: var(--font-label); font-weight: 600; }
+
+/* ── LEFT PANEL ILLUSTRATIONS ──────────────────── */
+.illustration-audio {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--navy-750);
+}
+.mic-icon {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.mic-body {
+  width: 44px; height: 68px;
+  border-radius: 22px 22px 22px 22px;
+  background: var(--green);
+  position: relative;
+}
+.mic-base {
+  width: 70px; height: 32px;
+  border-radius: 0 0 35px 35px;
+  border: 3px solid rgba(255,255,255,0.4);
+  border-top: none;
+  position: relative;
+}
+.mic-stand { width: 3px; height: 12px; background: rgba(255,255,255,0.4); margin: 0 auto; }
+.mic-foot { width: 30px; height: 3px; background: rgba(255,255,255,0.4); border-radius: 2px; }
+
+.illustration-rotate {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--navy-750);
+}
+.rotate-phone-icon {
+  width: 60px; height: 80px;
+  border: 3px solid rgba(255,255,255,0.4);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+
+/* ── SCROLL NAV ────────────────────────────────── */
+.scroll-nav {
+  position: fixed;
+  top: 24px; right: 24px;
+  background: rgba(28,32,52,0.92);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 999;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.scroll-nav-title {
+  font-family: var(--font-label);
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+.scroll-nav a {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  transition: color 0.15s;
+}
+.scroll-nav a:hover { color: white; }
+.scroll-nav a .nav-num {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  font-family: var(--font-label);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.scroll-nav a:hover .nav-num { background: var(--green); color: white; }
+</style>
+</head>
+<body>
+
+<!-- Scroll Nav -->
+<nav class="scroll-nav">
+  <div class="scroll-nav-title">Question Types</div>
+  <a href="#s1"><span class="nav-num">1</span> Slider</a>
+  <a href="#s2"><span class="nav-num">2</span> Choice ×4</a>
+  <a href="#s3"><span class="nav-num">3</span> Choice ×6</a>
+  <a href="#s4"><span class="nav-num">4</span> Pick List</a>
+  <a href="#s5"><span class="nav-num">5</span> Activity</a>
+  <a href="#s6"><span class="nav-num">6</span> Video</a>
+  <a href="#s7"><span class="nav-num">7</span> Audio</a>
+  <a href="#s8"><span class="nav-num">8</span> Rotate</a>
+  <a href="#s9"><span class="nav-num">9</span> Profile</a>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="page-tagline">Verto Design System</div>
+  <div class="page-title">Question Types</div>
+  <div class="page-subtitle">All 9 interactive content modules — desktop split-card layout, default state</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     1. SLIDER
+══════════════════════════════════════════════ -->
+<div class="section" id="s1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <div class="section-name">Slider</div>
+  </div>
+  <div class="section-desc">5-point emotional scale — drag to set a sentiment value</div>
+  <div class="split-card">
+    <div class="split-left">
+      <div class="split-left-img" style="background-image:url('assets/hero-image.png')"></div>
+      <div class="split-left-overlay"></div>
+      <div class="panel-progress"><div class="panel-progress-fill" style="width:35%"></div></div>
+      <div class="panel-tagline">Build the change</div>
+    </div>
+    <div class="split-right">
+      <div class="q-eyebrow">Drag the slider</div>
+      <div class="q-title">When facing environmental challenges I feel...</div>
+      <div class="slider-section">
+        <div class="slider-track-wrap">
+          <div class="slider-tooltip" id="sliderTooltip" style="left:50%">
+            <span class="slider-tooltip-text" id="sliderTooltipText">I feel fine!</span>
+          </div>
+          <div class="slider-track" id="sliderTrack" onmousedown="startSlider(event)" ontouchstart="startSliderTouch(event)">
+            <div class="s-dot" id="sdot0"></div>
+            <div class="s-dot" id="sdot1"></div>
+            <div class="s-dot active" id="sdot2"></div>
+            <div class="s-dot" id="sdot3"></div>
+            <div class="s-dot" id="sdot4"></div>
+            <div class="slider-thumb" id="sliderThumb" style="left:calc(50% - 26px)">
+              <div class="s-line"></div><div class="s-line"></div><div class="s-line"></div>
+            </div>
+          </div>
+        </div>
+        <div class="slider-labels">
+          <span class="slider-label-text">Very scared</span>
+          <span class="slider-label-text">I feel fine!</span>
+          <span class="slider-label-text">Amazing!</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back">Back</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     2. MULTIPLE CHOICE × 4
+══════════════════════════════════════════════ -->
+<div class="section" id="s2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <div class="section-name">Multiple Choice — 4 Options</div>
+  </div>
+  <div class="section-desc">Image-led option grid — tap to select one</div>
+  <div class="split-card">
+    <div class="split-left">
+      <div class="split-left-img" style="background-image:url('assets/activity-image.png')"></div>
+      <div class="split-left-overlay"></div>
+      <div class="panel-progress"><div class="panel-progress-fill" style="width:50%"></div></div>
+      <div class="panel-tagline">Build the change</div>
+    </div>
+    <div class="split-right">
+      <div class="q-eyebrow">Choose one</div>
+      <div class="q-title">When it comes to the environment, I care most about...</div>
+      <div class="choice-grid-4" id="grid4">
+        <div class="choice-card" onclick="selectChoice('grid4', this)">
+          <div class="choice-card-bg choice-bg-1"></div>
+          <div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">Air Quality</div>
+        </div>
+        <div class="choice-card selected" onclick="selectChoice('grid4', this)">
+          <div class="choice-card-bg choice-bg-2"></div>
+          <div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">Ocean Health</div>
+        </div>
+        <div class="choice-card" onclick="selectChoice('grid4', this)">
+          <div class="choice-card-bg choice-bg-3"></div>
+          <div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">Wildlife</div>
+        </div>
+        <div class="choice-card" onclick="selectChoice('grid4', this)">
+          <div class="choice-card-bg choice-bg-4"></div>
+          <div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">Climate Change</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back">Back</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     3. MULTIPLE CHOICE × 6
+══════════════════════════════════════════════ -->
+<div class="section" id="s3">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <div class="section-name">Multiple Choice — 6 Options</div>
+  </div>
+  <div class="section-desc">Wider image grid — 3 columns, single selection</div>
+  <div class="split-card">
+    <div class="split-left">
+      <div class="split-left-img" style="background-image:url('assets/hero-image.png')"></div>
+      <div class="split-left-overlay"></div>
+      <div class="panel-progress"><div class="panel-progress-fill" style="width:60%"></div></div>
+      <div class="panel-tagline">Build the change</div>
+    </div>
+    <div class="split-right">
+      <div class="q-eyebrow">Choose one</div>
+      <div class="q-title">Which shoe fits your style?</div>
+      <div class="choice-grid-6" id="grid6">
+        <div class="choice-card" style="height:90px" onclick="selectChoice('grid6', this)">
+          <div class="choice-card-bg choice-bg-1"></div><div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">White shoes</div>
+        </div>
+        <div class="choice-card selected" style="height:90px" onclick="selectChoice('grid6', this)">
+          <div class="choice-card-bg choice-bg-3"></div><div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">Yellow shoes</div>
+        </div>
+        <div class="choice-card" style="height:90px" onclick="selectChoice('grid6', this)">
+          <div class="choice-card-bg choice-bg-2"></div><div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">Cool shoes</div>
+        </div>
+        <div class="choice-card" style="height:90px" onclick="selectChoice('grid6', this)">
+          <div class="choice-card-bg choice-bg-4"></div><div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">Red shoes</div>
+        </div>
+        <div class="choice-card" style="height:90px" onclick="selectChoice('grid6', this)">
+          <div class="choice-card-bg choice-bg-5"></div><div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">Purple shoes</div>
+        </div>
+        <div class="choice-card" style="height:90px" onclick="selectChoice('grid6', this)">
+          <div class="choice-card-bg choice-bg-6"></div><div class="choice-overlay"></div>
+          <div class="choice-tick"><svg width="10" height="8" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="choice-label">Something else</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back">Back</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     4. PICK ONE — LIST
+══════════════════════════════════════════════ -->
+<div class="section" id="s4">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <div class="section-name">Pick One — List</div>
+  </div>
+  <div class="section-desc">Vertical list of text options — single selection</div>
+  <div class="split-card">
+    <div class="split-left">
+      <div class="split-left-img" style="background-image:url('assets/activity-image.png')"></div>
+      <div class="split-left-overlay"></div>
+      <div class="panel-progress"><div class="panel-progress-fill" style="width:45%"></div></div>
+      <div class="panel-tagline">Build the change</div>
+    </div>
+    <div class="split-right">
+      <div class="q-title">What causes you the most stress?</div>
+      <div class="pick-list" id="pickList">
+        <div class="pick-item selected" onclick="selectPick(this)">
+          <div class="pick-dot"><svg width="8" height="7" viewBox="0 0 10 8" fill="white"><path d="M3 7.295L.499 4.79C.22 4.511-.222 4.511-.501 4.79-.78 5.069-.78 5.513-.501 5.792L2.495 8.791c.278.279.729.279 1.008 0L10.08 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg></div>
+          <div class="pick-text">Family</div>
+        </div>
+        <div class="pick-item" onclick="selectPick(this)"><div class="pick-dot"></div><div class="pick-text">The environment</div></div>
+        <div class="pick-item" onclick="selectPick(this)"><div class="pick-dot"></div><div class="pick-text">School</div></div>
+        <div class="pick-item" onclick="selectPick(this)"><div class="pick-dot"></div><div class="pick-text">Homework</div></div>
+        <div class="pick-item" onclick="selectPick(this)"><div class="pick-dot"></div><div class="pick-text">The news</div></div>
+        <div class="pick-item" onclick="selectPick(this)"><div class="pick-dot"></div><div class="pick-text">Something else</div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back">Back</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     5. ACTIVITY
+══════════════════════════════════════════════ -->
+<div class="section" id="s5">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <div class="section-name">Activity</div>
+  </div>
+  <div class="section-desc">Off-screen task prompt with completion checkbox before continuing</div>
+  <div class="split-card">
+    <div class="split-left">
+      <div class="split-left-img" style="background-image:url('assets/activity-image.png')"></div>
+      <div class="split-left-overlay"></div>
+      <div class="panel-progress"><div class="panel-progress-fill" style="width:70%"></div></div>
+      <div class="panel-tagline">Build the change</div>
+    </div>
+    <div class="split-right">
+      <div class="activity-content">
+        <div class="activity-tag">Activity</div>
+        <div class="activity-title">Create your own fantasy creature in just 3 minutes.</div>
+        <div class="activity-desc">Use the materials on your desk. Hit the next button when you are done.</div>
+        <div class="activity-check" onclick="toggleActivityCheck(this)">
+          <div class="check-box" id="actCheckBox"></div>
+          <div class="check-texts">
+            <div class="check-main">I've completed this activity</div>
+            <div class="check-sub">Tick this off before you continue! : )</div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back">Back</button>
+        <button class="btn-next" id="actNextBtn" style="opacity:0.5;pointer-events:none;">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     6. VIDEO
+══════════════════════════════════════════════ -->
+<div class="section" id="s6">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <div class="section-name">Video</div>
+  </div>
+  <div class="section-desc">Embedded video prompt — user watches before proceeding</div>
+  <div class="split-card">
+    <div class="split-left">
+      <div class="split-left-img" style="background-image:url('assets/hero-image.png')"></div>
+      <div class="split-left-overlay"></div>
+      <div class="panel-progress"><div class="panel-progress-fill" style="width:25%"></div></div>
+      <div class="panel-tagline">Build the change</div>
+    </div>
+    <div class="split-right">
+      <div class="q-eyebrow">Watch the video</div>
+      <div class="q-title">Welcome to build the change.</div>
+      <div class="q-subtitle">Create your own fantasy creature in just 3 minutes.</div>
+      <div class="video-wrap" id="videoWrap" onclick="playVideo()">
+        <div class="video-thumb"></div>
+        <div class="play-wrap">
+          <div class="play-circle" id="playCircle">
+            <svg width="20" height="24" viewBox="0 0 45 55" fill="#272D4A"><path d="M0 4.455L0 50.545C0 54.059 3.859 56.195 6.831 54.282L42.937 31.237C45.688 29.502 45.688 25.498 42.937 23.718L6.831.718C3.859-1.195 0 .941 0 4.455z"/></svg>
+          </div>
+        </div>
+        <div class="video-duration">2:34</div>
+        <div class="video-played-overlay" id="videoPlayedOverlay">
+          <div class="video-played-msg">▶ Playing…<br><span style="font-size:13px;opacity:0.7">Click again to stop</span></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back">Back</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     7. AUDIO CAPTURE
+══════════════════════════════════════════════ -->
+<div class="section" id="s7">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <div class="section-name">Audio Capture</div>
+  </div>
+  <div class="section-desc">Mic recording — tap record, speak, stop and review before submitting</div>
+  <div class="split-card">
+    <div class="split-left split-left-dark">
+      <div class="illustration-audio">
+        <div class="mic-icon">
+          <div class="mic-body"></div>
+          <div class="mic-base"></div>
+          <div class="mic-stand"></div>
+          <div class="mic-foot"></div>
+        </div>
+      </div>
+      <div class="panel-progress" style="background:rgba(255,255,255,0.15)"><div class="panel-progress-fill" style="width:80%"></div></div>
+      <div class="panel-tagline">Build the change</div>
+    </div>
+    <div class="split-right">
+      <div class="q-eyebrow">Record your answer</div>
+      <div class="q-title">Describe how climate change makes you feel.</div>
+      <div class="audio-ui">
+        <div class="audio-visualiser" id="audioVis">
+          <div class="audio-bar" style="height:8px;--h:12px"></div>
+          <div class="audio-bar" style="height:8px;--h:28px"></div>
+          <div class="audio-bar" style="height:8px;--h:44px"></div>
+          <div class="audio-bar" style="height:8px;--h:20px"></div>
+          <div class="audio-bar" style="height:8px;--h:38px"></div>
+          <div class="audio-bar" style="height:8px;--h:50px"></div>
+          <div class="audio-bar" style="height:8px;--h:24px"></div>
+          <div class="audio-bar" style="height:8px;--h:42px"></div>
+          <div class="audio-bar" style="height:8px;--h:16px"></div>
+          <div class="audio-bar" style="height:8px;--h:36px"></div>
+          <div class="audio-bar" style="height:8px;--h:52px"></div>
+          <div class="audio-bar" style="height:8px;--h:22px"></div>
+        </div>
+        <div class="audio-time" id="audioTime">0:00</div>
+        <div class="audio-recorded" id="audioRecorded">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="#00A950"><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M12.5 8a.5.5 0 0 1 .5.5A5 5 0 0 1 3 8.5.5.5 0 0 1 4 8.5a4 4 0 0 0 8 0 .5.5 0 0 1 .5-.5z"/></svg>
+          <div class="audio-wave"><div class="audio-wave-inner"></div></div>
+          <div class="audio-rec-time" id="audioRecTime">0:00</div>
+          <button onclick="deleteRecording()" style="background:none;border:none;cursor:pointer;color:#D80027;font-size:14px;padding:4px;">✕</button>
+        </div>
+        <div class="audio-controls">
+          <button class="audio-btn audio-btn-play" id="audioPlayBtn" onclick="playRecording()" style="display:none" title="Play">
+            <svg width="16" height="18" viewBox="0 0 45 55" fill="white"><path d="M0 4.455L0 50.545C0 54.059 3.859 56.195 6.831 54.282L42.937 31.237C45.688 29.502 45.688 25.498 42.937 23.718L6.831.718C3.859-1.195 0 .941 0 4.455z"/></svg>
+          </button>
+          <button class="audio-btn audio-btn-record" id="audioRecBtn" onclick="toggleRecord()" title="Record">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="white"><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M12.5 8a.5.5 0 0 1 .5.5A5 5 0 0 1 3 8.5.5.5 0 0 1 4 8.5a4 4 0 0 0 8 0 .5.5 0 0 1 .5-.5z"/></svg>
+          </button>
+        </div>
+        <div class="audio-hint" id="audioHint">Tap the microphone to start recording</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back">Back</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     8. ROTATE IMAGE / SWIPE
+══════════════════════════════════════════════ -->
+<div class="section" id="s8">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <div class="section-name">Rotate Image / Swipe</div>
+  </div>
+  <div class="section-desc">Gesture-based card interaction — swipe left/right to respond</div>
+  <div class="split-card">
+    <div class="split-left split-left-dark">
+      <div class="illustration-rotate">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="font-size:28px;color:rgba(255,255,255,0.2)">←</span>
+            <div style="width:64px;height:88px;border:3px solid rgba(255,255,255,0.4);border-radius:14px;background:rgba(255,255,255,0.05);"></div>
+            <span style="font-size:28px;color:rgba(255,255,255,0.2)">→</span>
+          </div>
+          <span style="font-family:var(--font-label);font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Swipe to respond</span>
+        </div>
+      </div>
+      <div class="panel-progress" style="background:rgba(255,255,255,0.15)"><div class="panel-progress-fill" style="width:65%"></div></div>
+      <div class="panel-tagline">Build the change</div>
+    </div>
+    <div class="split-right">
+      <div class="q-eyebrow">Swipe to respond</div>
+      <div class="q-title">Does this image represent something you care about?</div>
+      <div class="rotate-wrap">
+        <div class="rotate-card-stack" id="rotateStack">
+          <div class="rotate-card rotate-card-1"><div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:18px;"></div></div>
+          <div class="rotate-card rotate-card-2"><div style="width:100%;height:100%;background:linear-gradient(135deg,#fff3cd,#ffd88a);border-radius:18px;"></div></div>
+          <div class="rotate-card rotate-card-top" id="rotateTopCard">
+            <div class="rotate-card-img"></div>
+          </div>
+        </div>
+        <div class="swipe-indicator">
+          <span class="swipe-arrow" style="color:#D80027;opacity:0.6">← No</span>
+          <span style="font-family:var(--font-ui);font-size:12px;color:rgba(0,0,0,0.3);margin:0 12px;">drag card to answer</span>
+          <span class="swipe-arrow" style="color:var(--green);opacity:0.6">Yes →</span>
+        </div>
+        <div class="rotate-actions">
+          <button class="rotate-action-btn rotate-action-no" onclick="swipeCard('no')" title="No">✕</button>
+          <button class="rotate-action-btn rotate-action-yes" onclick="swipeCard('yes')" title="Yes">✓</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back">Back</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     9. PROFILE CREATION
+══════════════════════════════════════════════ -->
+<div class="section" id="s9">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <div class="section-name">Profile Creation</div>
+  </div>
+  <div class="section-desc">Demographic data form — name, age, gender, location</div>
+  <div class="split-card">
+    <div class="split-left">
+      <div class="split-left-img" style="background-image:url('assets/hero-image.png')"></div>
+      <div class="split-left-overlay"></div>
+      <div class="panel-progress"><div class="panel-progress-fill" style="width:15%"></div></div>
+      <div class="panel-tagline">Build the change</div>
+    </div>
+    <div class="split-right">
+      <div class="q-eyebrow">Build your profile</div>
+      <div class="q-title">Fill in your details below.</div>
+      <div class="profile-fields">
+        <div class="profile-field" onclick="focusField(this)">
+          <div class="profile-field-icon">✎</div>
+          <div class="profile-field-value" contenteditable="true" style="outline:none;flex:1;font-family:var(--font-label);font-size:15px;color:#111;" spellcheck="false">Alex</div>
+        </div>
+        <div class="profile-divider"></div>
+        <div class="profile-field" onclick="toggleDropdown('ageDropdown', this)">
+          <div class="profile-field-icon">🎂</div>
+          <div class="profile-field-label" id="ageLabel">Your age</div>
+          <div class="profile-field-arrow">▾</div>
+        </div>
+        <div class="profile-dropdown" id="ageDropdown">
+          <div class="profile-dropdown-item" onclick="pickOption('ageLabel','ageDropdown','Under 13',this)">Under 13</div>
+          <div class="profile-dropdown-item" onclick="pickOption('ageLabel','ageDropdown','13–17',this)">13–17</div>
+          <div class="profile-dropdown-item chosen" onclick="pickOption('ageLabel','ageDropdown','18–24',this)">18–24</div>
+          <div class="profile-dropdown-item" onclick="pickOption('ageLabel','ageDropdown','25–34',this)">25–34</div>
+          <div class="profile-dropdown-item" onclick="pickOption('ageLabel','ageDropdown','35+',this)">35+</div>
+        </div>
+        <div class="profile-field" onclick="toggleDropdown('genderDropdown', this)">
+          <div class="profile-field-icon">👤</div>
+          <div class="profile-field-label" id="genderLabel">Your gender</div>
+          <div class="profile-field-arrow">▾</div>
+        </div>
+        <div class="profile-dropdown" id="genderDropdown">
+          <div class="profile-dropdown-item" onclick="pickOption('genderLabel','genderDropdown','Male',this)">Male</div>
+          <div class="profile-dropdown-item" onclick="pickOption('genderLabel','genderDropdown','Female',this)">Female</div>
+          <div class="profile-dropdown-item" onclick="pickOption('genderLabel','genderDropdown','Non-binary',this)">Non-binary</div>
+          <div class="profile-dropdown-item" onclick="pickOption('genderLabel','genderDropdown','Prefer not to say',this)">Prefer not to say</div>
+        </div>
+        <div class="profile-field">
+          <svg width="15" height="15" viewBox="0 0 17.49 17.49" fill="rgba(0,0,0,0.3)" style="flex-shrink:0"><path d="M12.5 11L11.71 11L11.43 10.73C12.41 9.59 13 8.11 13 6.5C13 2.91 10.09 0 6.5 0C2.91 0 0 2.91 0 6.5C0 10.09 2.91 13 6.5 13C8.11 13 9.59 12.41 10.73 11.43L11 11.71L11 12.5L16 17.49L17.49 16L12.5 11ZM6.5 11C4.01 11 2 8.99 2 6.5C2 4.01 4.01 2 6.5 2C8.99 2 11 4.01 11 6.5C11 8.99 8.99 11 6.5 11Z"/></svg>
+          <div class="profile-field-label" id="locationLabel">Your town, region or post code…</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back">Back</button>
+        <button class="btn-next">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ── SLIDER ──────────────────────────────── */
+const sliderLabels = ['Very scared.', 'A bit scared.', 'I feel fine!', 'Pretty good!', 'Amazing!'];
+const sliderPositions = [8, 25, 43, 61, 80]; // % from left
+let sliderPos = 2;
+let isDragging = false;
+
+function setSlider(pct) {
+  const pos = Math.max(0, Math.min(4, Math.round((pct / 100) * 4)));
+  sliderPos = pos;
+  const leftPct = sliderPositions[pos];
+  document.getElementById('sliderThumb').style.left = `calc(${leftPct}% - 26px)`;
+  document.getElementById('sliderTooltip').style.left = `${leftPct}%`;
+  document.getElementById('sliderTooltipText').textContent = sliderLabels[pos];
+  for (let i = 0; i < 5; i++) {
+    document.getElementById('sdot' + i).className = 's-dot' + (i === pos ? ' active' : '');
+  }
+}
+
+function startSlider(e) {
+  isDragging = true;
+  moveSlider(e);
+  document.addEventListener('mousemove', moveSlider);
+  document.addEventListener('mouseup', () => { isDragging = false; document.removeEventListener('mousemove', moveSlider); });
+}
+function startSliderTouch(e) {
+  document.addEventListener('touchmove', moveSliderTouch, { passive: false });
+  document.addEventListener('touchend', () => document.removeEventListener('touchmove', moveSliderTouch));
+  moveSliderTouch(e);
+}
+function moveSlider(e) {
+  if (!isDragging && e.type === 'mousemove') return;
+  const track = document.getElementById('sliderTrack');
+  const rect = track.getBoundingClientRect();
+  const pct = ((e.clientX - rect.left) / rect.width) * 100;
+  setSlider(pct);
+}
+function moveSliderTouch(e) {
+  e.preventDefault();
+  const track = document.getElementById('sliderTrack');
+  const rect = track.getBoundingClientRect();
+  const pct = ((e.touches[0].clientX - rect.left) / rect.width) * 100;
+  setSlider(pct);
+}
+
+/* ── CHOICE GRID ─────────────────────────── */
+function selectChoice(gridId, card) {
+  document.querySelectorAll('#' + gridId + ' .choice-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+/* ── PICK LIST ───────────────────────────── */
+function selectPick(item) {
+  const list = item.closest('.pick-list');
+  list.querySelectorAll('.pick-item').forEach(p => {
+    p.classList.remove('selected');
+    p.querySelector('.pick-dot').innerHTML = '';
+  });
+  item.classList.add('selected');
+  item.querySelector('.pick-dot').innerHTML = '<svg width="8" height="7" viewBox="0 0 10 8" fill="white"><path d="M3 7.295L.499 4.79C.22 4.511-.222 4.511-.501 4.79-.78 5.069-.78 5.513-.501 5.792L2.495 8.791c.278.279.729.279 1.008 0L10.08 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg>';
+}
+
+/* ── ACTIVITY ────────────────────────────── */
+function toggleActivityCheck(el) {
+  const box = el.querySelector('.check-box');
+  const next = document.getElementById('actNextBtn');
+  const checked = box.classList.toggle('checked');
+  box.innerHTML = checked ? '<svg width="12" height="9" viewBox="0 0 12 9" fill="white"><path d="M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z"/></svg>' : '';
+  next.style.opacity = checked ? '1' : '0.5';
+  next.style.pointerEvents = checked ? 'auto' : 'none';
+}
+
+/* ── VIDEO ───────────────────────────────── */
+let videoPlaying = false;
+function playVideo() {
+  videoPlaying = !videoPlaying;
+  const overlay = document.getElementById('videoPlayedOverlay');
+  const circle = document.getElementById('playCircle');
+  overlay.classList.toggle('show', videoPlaying);
+  circle.innerHTML = videoPlaying
+    ? '<svg width="14" height="18" viewBox="0 0 24 24" fill="#272D4A"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+    : '<svg width="20" height="24" viewBox="0 0 45 55" fill="#272D4A"><path d="M0 4.455L0 50.545C0 54.059 3.859 56.195 6.831 54.282L42.937 31.237C45.688 29.502 45.688 25.498 42.937 23.718L6.831.718C3.859-1.195 0 .941 0 4.455z"/></svg>';
+}
+
+/* ── AUDIO CAPTURE ───────────────────────── */
+let audioRecording = false;
+let audioTimer = null;
+let audioSeconds = 0;
+let hasRecording = false;
+
+function toggleRecord() {
+  if (audioRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+}
+function startRecording() {
+  audioRecording = true;
+  audioSeconds = 0;
+  document.getElementById('audioHint').textContent = 'Recording… tap to stop';
+  document.getElementById('audioRecBtn').className = 'audio-btn audio-btn-stop';
+  document.getElementById('audioRecBtn').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+  document.querySelectorAll('.audio-bar').forEach(b => b.classList.add('animating'));
+  audioTimer = setInterval(() => {
+    audioSeconds++;
+    const m = Math.floor(audioSeconds / 60);
+    const s = audioSeconds % 60;
+    document.getElementById('audioTime').textContent = m + ':' + String(s).padStart(2, '0');
+  }, 1000);
+}
+function stopRecording() {
+  audioRecording = false;
+  clearInterval(audioTimer);
+  hasRecording = true;
+  document.querySelectorAll('.audio-bar').forEach(b => b.classList.remove('animating'));
+  document.getElementById('audioRecBtn').className = 'audio-btn audio-btn-record';
+  document.getElementById('audioRecBtn').innerHTML = '<svg width="20" height="20" viewBox="0 0 16 16" fill="white"><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M12.5 8a.5.5 0 0 1 .5.5A5 5 0 0 1 3 8.5.5.5 0 0 1 4 8.5a4 4 0 0 0 8 0 .5.5 0 0 1 .5-.5z"/></svg>';
+  document.getElementById('audioHint').textContent = 'Recording saved';
+  const m = Math.floor(audioSeconds / 60);
+  const s = audioSeconds % 60;
+  document.getElementById('audioRecTime').textContent = m + ':' + String(s).padStart(2, '0');
+  document.getElementById('audioRecorded').classList.add('show');
+  document.getElementById('audioPlayBtn').style.display = 'flex';
+}
+function playRecording() {
+  document.getElementById('audioHint').textContent = 'Playing recording…';
+  setTimeout(() => { document.getElementById('audioHint').textContent = 'Recording saved'; }, 2000);
+}
+function deleteRecording() {
+  hasRecording = false;
+  audioSeconds = 0;
+  document.getElementById('audioTime').textContent = '0:00';
+  document.getElementById('audioRecorded').classList.remove('show');
+  document.getElementById('audioPlayBtn').style.display = 'none';
+  document.getElementById('audioHint').textContent = 'Tap the microphone to start recording';
+}
+
+/* ── ROTATE / SWIPE ──────────────────────── */
+let rotateCount = 0;
+const rotateColors = [
+  'linear-gradient(135deg,#d4edda,#a8d5b5)',
+  'linear-gradient(135deg,#d1ecf1,#9fd5df)',
+  'linear-gradient(135deg,#fff3cd,#ffd88a)',
+  'linear-gradient(135deg,#f8d7da,#f5a8b0)',
+  'linear-gradient(135deg,#e2d9f3,#c3aee8)',
+];
+function swipeCard(dir) {
+  const top = document.getElementById('rotateTopCard');
+  const x = dir === 'yes' ? 300 : -300;
+  top.style.transition = 'transform 0.35s cubic-bezier(.4,0,.2,1), opacity 0.3s';
+  top.style.transform = `translateX(${x}px) rotate(${dir === 'yes' ? 15 : -15}deg)`;
+  top.style.opacity = '0';
+  setTimeout(() => {
+    rotateCount++;
+    top.style.transition = 'none';
+    top.style.transform = 'rotate(0deg)';
+    top.style.opacity = '1';
+    top.style.background = rotateColors[rotateCount % rotateColors.length];
+    top.innerHTML = `<div style="width:100%;height:100%;background:${rotateColors[rotateCount % rotateColors.length]};border-radius:18px;display:flex;align-items:center;justify-content:center;color:rgba(0,0,0,0.25);font-family:var(--font-ui);font-size:13px;">Image ${rotateCount + 1}</div>`;
+  }, 380);
+}
+
+/* ── PROFILE ─────────────────────────────── */
+function toggleDropdown(id, field) {
+  const dd = document.getElementById(id);
+  const isOpen = dd.classList.contains('open');
+  document.querySelectorAll('.profile-dropdown').forEach(d => d.classList.remove('open'));
+  if (!isOpen) dd.classList.add('open');
+}
+function pickOption(labelId, dropdownId, value, item) {
+  document.getElementById(labelId).textContent = value;
+  document.getElementById(labelId).style.color = '#111';
+  document.getElementById(labelId).style.fontFamily = 'var(--font-label)';
+  document.querySelectorAll('#' + dropdownId + ' .profile-dropdown-item').forEach(i => i.classList.remove('chosen'));
+  item.classList.add('chosen');
+  document.getElementById(dropdownId).classList.remove('open');
+  event.stopPropagation();
+}
+</script>
+
+</body>
+</html>
+
+# Handoff: Verto Question Types
+
+## Overview
+
+This package contains high-fidelity design references for all **9 interactive question/content module types** used in the Verto Client 2.0 web app (playverto.com). The Verto Client is a step-through branded survey/activity experience delivered via mobile and desktop web browsers at client subdomains like `lego.playverto.com`.
+
+This handoff covers the **desktop split-card layout** for all question types. A companion mobile prototype exists at `ui_kits/verto_client/index.html` in the design system project.
+
+---
+
+## About the Design Files
+
+The HTML files in this bundle are **design references created as prototypes** — they show intended visual appearance and interactive behavior, but are **not production code to copy directly**.
+
+Your task is to **recreate these designs in your target codebase** using its existing component library, framework (React, Vue, etc.), and established patterns. If no framework exists yet, React + TypeScript is recommended given the component-driven nature of the question types.
+
+---
+
+## Fidelity
+
+**High-fidelity.** These are pixel-accurate mockups with final colors, typography, spacing, and interactions. Recreate the UI to match as closely as possible using your codebase's existing libraries and patterns.
+
+---
+
+## Design Tokens
+
+All tokens are also available in `colors_and_type.css` in the design system project.
+
+### Colors
+```
+--green-500:     #00A950   /* Primary CTA, active states, selection */
+--green-400:     #01A850   /* Checkbox checked, slight variant */
+--navy-900:      #1C2034   /* Back buttons, dark backgrounds */
+--navy-800:      #272D4A   /* Desktop page background */
+--navy-750:      #2A2D3A   /* Mobile page background, dark panels */
+--white:         #FFFFFF   /* Card backgrounds */
+--black:         #000000   /* Primary text */
+--grey-300:      #C4C4C4   /* Unchecked checkboxes, borders */
+--text-secondary: rgba(0,0,0,0.75)
+--text-muted:    rgba(0,0,0,0.5)
+--text-accent:   #00A950
+--bg-input:      rgba(0,0,0,0.04)
+--bg-input-hover: rgba(0,0,0,0.06)
+--bg-slider-track: rgba(0,0,0,0.07)
+```
+
+### Typography
+```
+Primary font:  'ABeeZee' (Google Fonts) — body, questions, buttons
+Label font:    'Alata' (Google Fonts) — labels, tooltips, brand tagline
+               (Alata substitutes commercial "Eina 03")
+
+Type scale:
+  Display heading:   ABeeZee 30px / 1.2  (Hi there!, Thank you!)
+  Question heading:  ABeeZee 26px / 1.35 (question text on desktop)
+  Section label:     ABeeZee 19px / 1.4  (question text on mobile)
+  Body:              ABeeZee 16px / 1.625
+  Body small:        ABeeZee 14px / 1.4
+  Caption:           ABeeZee 13px / 1.1
+  Label:             Alata 14px 600      (tooltips, active picks)
+  Label small:       Alata 12px 600      (tags, eyebrow text)
+  Brand tagline:     Alata 20px 700 / 65% white opacity
+```
+
+### Spacing
+```
+4px, 8px, 12px, 16px, 20px, 24px, 32px, 40px, 48px
+Card inset (mobile): 23px
+```
+
+### Border Radii
+```
+Card:           20px
+Button:         16px
+Input field:    12px (sm), 15px (lg)
+Checkbox:       5px
+Progress bar:   8px
+Slider track:   20px
+Choice card:    14px
+```
+
+### Shadows
+```
+Card:           0 10px 40px rgba(0,0,0,0.15)
+Card raised:    0 20px 40px rgba(0,0,0,0.15)
+Button:         0 10px 40px rgba(0,0,0,0.15)
+Slider thumb:   0 4px 20px rgba(0,169,80,0.35)
+```
+
+---
+
+## Layout — Desktop Split-Card
+
+Every question type uses the same outer shell:
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Dark navy page background (#272D4A)                │
+│  ┌──────────────────────────────────────────────┐   │
+│  │         Split Card (max-width: 900px)        │   │
+│  │  border-radius:20px  box-shadow: 0 20px 40px │   │
+│  │ ┌──────────────┐ ┌──────────────────────────┐│   │
+│  │ │  LEFT PANEL  │ │      RIGHT PANEL         ││   │
+│  │ │  380px wide  │ │  flex:1 padding:40px 36px││   │
+│  │ │  image/media │ │  content + interaction   ││   │
+│  │ │              │ │                          ││   │
+│  │ │ Progress bar │ │  eyebrow label (green)   ││   │
+│  │ │ at top       │ │  question title (26px)   ││   │
+│  │ │              │ │  [question component]    ││   │
+│  │ │ "Build the   │ │                          ││   │
+│  │ │  change"     │ │  [Back] [Next] buttons   ││   │
+│  │ │  tagline     │ │                          ││   │
+│  │ └──────────────┘ └──────────────────────────┘│   │
+│  └──────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────┘
+```
+
+### Left Panel
+- Width: 380px, fixed
+- Background: hero/activity image (`object-fit: cover`)
+- Gradient overlay: `linear-gradient(transparent 60%, rgba(0,0,0,0.3))`
+- Progress bar: absolute, top 14px, left 14px, right 14px, height 10px, `border-radius:8px`, track `rgba(0,0,0,0.35)`, fill `#fff`
+- Tagline: absolute, top 36px, centered, `font-family:Alata, font-size:16px, font-weight:700, color:rgba(255,255,255,0.65)`
+- Dark variant (Audio, Rotate): `background:#2A2D3A` with centered SVG illustration
+
+### Right Panel
+- `flex:1`, `padding: 40px 36px`
+- `display:flex; flex-direction:column; justify-content:center; gap:16px`
+- Eyebrow label: `font-family:Alata, font-size:13px, color:#00A950`
+- Question title: `font-family:ABeeZee, font-size:26px, color:#000, line-height:1.35`
+- Nav buttons always at bottom (`margin-top:auto`)
+
+### Nav Buttons
+```
+Back button:  flex:1, height:56px, border-radius:16px, background:#1C2034,
+              color:rgba(255,255,255,0.5), font:ABeeZee 20px,
+              box-shadow:0 10px 40px rgba(0,0,0,0.15)
+
+Next button:  flex:1, height:56px, border-radius:16px, background:#00A950,
+              color:#fff, font:ABeeZee 20px,
+              box-shadow:0 10px 40px rgba(0,0,0,0.15)
+              hover: background:#009044
+              disabled: opacity:0.5, pointer-events:none
+```
+
+---
+
+## Question Type Specifications
+
+---
+
+### 1. Slider
+
+**Purpose:** User drags a thumb to express a sentiment on a 5-point scale.
+
+**Layout (right panel):**
+```
+eyebrow:   "Drag the slider"   (Alata 13px green)
+title:     Question text        (ABeeZee 26px)
+tooltip:   floating above thumb (green pill, Alata 14px 600 white)
+track:     full width, height 64px, border-radius 20px, bg rgba(0,0,0,0.06)
+  - 5 dots evenly distributed (10×10px circles, rgba(0,0,0,0.12))
+  - active dot: rgba(0,169,80,0.5)
+  - thumb: 52×48px, border-radius 16px, background #00A950,
+           box-shadow 0 4px 20px rgba(0,169,80,0.35)
+           contains 3 vertical lines (2px × 20px, rgba(255,255,255,0.7))
+labels:    "Very scared" — "I feel fine!" — "Amazing!" (ABeeZee 11px, rgba(0,0,0,0.35))
+```
+
+**Tooltip:**
+```
+background: #00A950, border-radius:10px, padding:6px 14px
+arrow: CSS border-trick pointing downward, color #00A950
+text: Alata 13px 600 white
+positions/labels: [8%, "Very scared."], [25%, "A bit scared."],
+                  [43%, "I feel fine!"], [61%, "Pretty good!"], [80%, "Amazing!"]
+```
+
+**Behavior:**
+- Draggable on mouse + touch
+- Snaps to nearest of 5 positions on release
+- Tooltip and thumb animate together (`transition: left 0.18s cubic-bezier(.4,0,.2,1)`)
+- Active dot updates on each position change
+
+---
+
+### 2. Multiple Choice — 4 Options
+
+**Purpose:** User picks one image-labelled option from a 2×2 grid.
+
+**Layout:**
+```
+eyebrow:  "Choose one"
+title:    question text
+grid:     display:grid, grid-template-columns:1fr 1fr, gap:10px
+```
+
+**Choice Card:**
+```
+height: 110px, border-radius:14px, overflow:hidden
+cursor:pointer, box-shadow:0 4px 16px rgba(0,0,0,0.1)
+hover: transform:scale(1.02), transition:0.15s
+
+layers (bottom to top):
+  1. background image/color fill (object-fit:cover)
+  2. gradient overlay: linear-gradient(transparent 45%, rgba(0,0,0,0.4))
+  3. tick badge (top-right, 22×22px circle, #00A950, hidden unless selected)
+  4. label text (bottom-center, Alata 12px 600, white, text-shadow)
+
+selected state:
+  outline: 3px solid #00A950
+  overlay: linear-gradient(transparent 45%, rgba(0,100,40,0.35))
+  tick badge: display:flex
+```
+
+**Behavior:** Single select — clicking deselects all others, selects clicked card.
+
+---
+
+### 3. Multiple Choice — 6 Options
+
+Same as type 2 but:
+```
+grid: grid-template-columns: 1fr 1fr 1fr  (3 columns)
+card height: 90px (shorter to fit 6 in same space)
+```
+
+---
+
+### 4. Pick One — List
+
+**Purpose:** User selects one item from a vertical text list.
+
+**Layout:**
+```
+title: question text (no eyebrow)
+list: display:flex, flex-direction:column
+      border-radius:14px, overflow:hidden
+      border:1px solid rgba(0,0,0,0.07)
+```
+
+**List Item:**
+```
+padding: 13px 16px, gap:14px
+border-bottom: 1px solid rgba(0,0,0,0.06)
+cursor:pointer
+hover: background:rgba(0,0,0,0.025)
+
+radio dot: 18×18px circle, border:2px solid #C4C4C4
+text:      ABeeZee 16px, color:#111
+
+selected state:
+  background: rgba(0,169,80,0.05)
+  dot: filled #00A950, border-color:#00A950, white checkmark inside
+  text: Alata 16px 600, color:#00A950
+```
+
+**Behavior:** Single select — clicking a row deselects all others.
+
+---
+
+### 5. Activity
+
+**Purpose:** Presents an off-screen task. User must tick a completion checkbox before Next is enabled.
+
+**Layout:**
+```
+tag:    "Activity" (Alata 11px 700, uppercase, rgba(0,0,0,0.35))
+title:  activity name (ABeeZee 22px)
+desc:   instructions (ABeeZee 15px, rgba(0,0,0,0.55), line-height 1.6)
+checkbox row (see below)
+```
+
+**Completion Checkbox Row:**
+```
+container: padding:14px 16px, border-radius:14px, background:rgba(0,0,0,0.04)
+           cursor:pointer
+           hover: background:rgba(0,0,0,0.06)
+
+checkbox:  22×22px, border-radius:5px
+  unchecked: background:#C4C4C4
+  checked:   background:#01A850 + white SVG checkmark
+
+main text:  ABeeZee 14px, color:#000
+sub text:   ABeeZee 12px, color:rgba(0,0,0,0.45)
+```
+
+**Behavior:**
+- Next button starts disabled (`opacity:0.5, pointer-events:none`)
+- Checking the box enables Next (`opacity:1, pointer-events:auto`)
+- Unchecking re-disables Next
+
+---
+
+### 6. Video
+
+**Purpose:** Presents a video for the user to watch before proceeding.
+
+**Layout:**
+```
+eyebrow: "Watch the video"
+title:   screen title (ABeeZee 26px)
+desc:    subtitle text (ABeeZee 16px, rgba(0,0,0,0.6))
+video player (see below)
+```
+
+**Video Player:**
+```
+container: width:100%, aspect-ratio:16/9, border-radius:16px
+           background:#2A2D3A, overflow:hidden, cursor:pointer
+           box-shadow:0 6px 24px rgba(0,0,0,0.18)
+
+layers:
+  1. thumbnail image (background-image, cover, opacity:0.45)
+  2. play button circle: 64×64px, border-radius:50%,
+                         background:rgba(255,255,255,0.95)
+                         box-shadow:0 10px 30px rgba(0,0,0,0.3)
+                         contains: play triangle SVG (fill:#272D4A)
+                         hover: transform:scale(1.08)
+  3. duration badge:    bottom-right, Alata 12px 600 white,
+                        background:rgba(0,0,0,0.6), border-radius:6px, padding:3px 8px
+
+playing state:
+  overlay: rgba(0,0,0,0.5) covers video
+  play icon swaps to pause icon (two vertical bars)
+```
+
+**Behavior:** Toggle play/pause on click.
+
+---
+
+### 7. Audio Capture
+
+**Purpose:** User records a spoken answer via microphone.
+
+**Left panel:** Dark navy background with centered microphone illustration (SVG shapes).
+
+**Layout (right panel):**
+```
+eyebrow:      "Record your answer"
+title:        question text
+visualiser:   12 animated bars (5px wide, border-radius:3px, color:#00A950)
+              animate height when recording (audioPulse keyframe)
+timer:        Alata 28px 700, color:#111, format "0:00"
+recording pill (shows after recording):
+              flex row, border-radius:12px, background:rgba(0,169,80,0.08)
+              border:1px solid rgba(0,169,80,0.2)
+              contains: mic icon, waveform bar, timestamp, delete button
+controls:     record button (64×64px circle, #00A950)
+              play button (64×64px circle, #1C2034, hidden until recording exists)
+hint text:    ABeeZee 13px, rgba(0,0,0,0.4)
+```
+
+**States:**
+```
+idle:       record button green + mic icon, hint: "Tap the microphone to start"
+recording:  button turns red (stop icon), bars animate, timer counts up
+stopped:    bars freeze, recording pill appears, play button appears
+            hint: "Recording saved"
+```
+
+**Behavior:**
+- Record toggles between recording/stopped
+- Timer counts seconds while recording
+- Delete button removes recording and resets to idle
+
+---
+
+### 8. Rotate Image / Swipe
+
+**Purpose:** User swipes cards left (no) or right (yes) to respond to images.
+
+**Left panel:** Dark navy with swipe gesture illustration.
+
+**Layout (right panel):**
+```
+eyebrow: "Swipe to respond"
+title:   question text
+card stack: 3 layered cards with rotation offsets:
+  card-1 (bottom): rotate(-4deg) translate(-10px,10px), z-index:1
+  card-2 (mid):    rotate(2deg) translate(8px,6px), z-index:2
+  card-top:        rotate(0deg), z-index:3, cursor:grab
+swipe hint: "← No  drag card to answer  Yes →"
+            left label: color:#D80027, right label: color:#00A950
+action buttons: ✕ (circle, border:#D80027, color:#D80027) 
+                ✓ (circle, border:#00A950, color:#00A950)
+                52×52px, hover:scale(1.1)
+```
+
+**Card:**
+```
+width:230px, height:160px, border-radius:18px
+box-shadow:0 10px 40px rgba(0,0,0,0.15)
+```
+
+**Swipe animation:**
+```
+on dismiss (left):  transform:translateX(-300px) rotate(-15deg), opacity:0
+                    transition:0.35s cubic-bezier(.4,0,.2,1)
+on dismiss (right): transform:translateX(300px) rotate(15deg), opacity:0
+after dismiss: next card slides in (reset transform, fade in)
+```
+
+---
+
+### 9. Profile Creation
+
+**Purpose:** Collects user demographic data (name, age, gender, location).
+
+**Layout:**
+```
+eyebrow: "Build your profile"
+title:   "Fill in your details below."
+form fields (see below)
+```
+
+**Form Field:**
+```
+height:54px, border-radius:12px, background:rgba(0,0,0,0.05)
+padding:0 16px, gap:12px, cursor:pointer
+hover: background:rgba(0,0,0,0.08)
+
+icon:  16px opacity:0.35 (emoji or SVG)
+label: Alata 15px, color:rgba(0,0,0,0.38) (placeholder)
+value: Alata 15px, color:#111 (when filled)
+arrow: "▾" for dropdown fields
+```
+
+**Dropdown:**
+```
+opens below field, border-radius:12px, background:#f4f4f4
+box-shadow:0 10px 40px rgba(0,0,0,0.15)
+item: padding:12px 16px, ABeeZee 15px, border-bottom:1px solid rgba(0,0,0,0.05)
+item hover: background:rgba(0,169,80,0.07)
+item selected: color:#00A950, Alata 15px 600
+```
+
+**Fields:**
+1. Name — free text input (contenteditable or `<input>`)
+2. Age — dropdown: Under 13 / 13–17 / 18–24 / 25–34 / 35+
+3. Gender — dropdown: Male / Female / Non-binary / Prefer not to say
+4. Location — search field with magnifier icon, free text
+
+**Divider:** 1px `rgba(0,0,0,0.07)` between Name and Age fields.
+
+---
+
+## Interactions & Behavior Summary
+
+| Type | Key Interaction | State Change |
+|------|----------------|--------------|
+| Slider | Drag thumb | Tooltip text + dot updates |
+| MCQ ×4/×6 | Click card | Green outline + tick badge |
+| Pick List | Click row | Green radio + text style change |
+| Activity | Check checkbox | Next button enabled |
+| Video | Click player | Play/pause toggle |
+| Audio | Record/stop | Timer, waveform, play button |
+| Rotate/Swipe | ✕/✓ button | Card flies off, next appears |
+| Profile | Click field | Dropdown opens/closes |
+
+---
+
+## Assets
+
+| File | Usage |
+|------|-------|
+| `assets/hero-image.png` | Left panel: LEGO tree hero image |
+| `assets/activity-image.png` | Left panel: activity question image |
+| `assets/lego-logo.png` | Finish screen client logo |
+| `assets/icons/wifi.svg` | iOS status bar |
+| `assets/icons/cellular.svg` | iOS status bar |
+
+**Fonts (Google Fonts CDN):**
+```html
+<link href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Alata&display=swap" rel="stylesheet">
+```
+
+---
+
+## Files in This Package
+
+| File | Description |
+|------|-------------|
+| `README.md` | This document |
+| `question-types.html` | Interactive reference prototype — all 9 types |
+| `ui_kit.html` | Mobile 8-screen flow prototype |
+| `colors_and_type.css` | Full CSS variable token file |
+
+---
+
+## Implementation Notes for Claude Code
+
+1. **Component architecture:** Each question type should be its own component (e.g. `<SliderQuestion>`, `<MultipleChoiceQuestion>`, `<PickListQuestion>`) that accepts a `question` prop with the question text and options.
+
+2. **Shared shell:** The split-card layout (left image panel + right content panel + nav buttons) should be a shared wrapper component that all question types render inside.
+
+3. **Progress bar:** Driven by a step counter passed as a prop (`currentStep / totalSteps`).
+
+4. **State pattern:** Each question type emits an `onChange(value)` callback. The parent Verto runner tracks all answers.
+
+5. **Fonts:** Import ABeeZee and Alata via Google Fonts. These are the only non-system fonts used.
+
+6. **No icon library needed:** All icons in the prototype are inline SVG paths — copy them directly or recreate with your existing icon system.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verto Client 2.0 — UI Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Alata&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #00A950;
+  --green-dark: #009044;
+  --navy-900: #1C2034;
+  --navy-800: #272D4A;
+  --navy-750: #2A2D3A;
+  --white: #ffffff;
+  --black: #000000;
+  --grey-300: #C4C4C4;
+  --font-primary: 'ABeeZee', 'Nunito', sans-serif;
+  --font-label: 'Alata', 'DM Sans', sans-serif;
+  --shadow-card: 0 10px 40px rgba(0,0,0,0.15);
+  --shadow-raised: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+body {
+  font-family: var(--font-primary);
+  background: var(--navy-750);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* ─── PHONE FRAME ─────────────────────────────── */
+.phone-frame {
+  width: 375px;
+  height: 812px;
+  background: var(--navy-750);
+  position: relative;
+  overflow: hidden;
+  border-radius: 44px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+
+/* ─── BROWSER CHROME (iOS Safari) ────────────── */
+.browser-chrome {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 94px;
+  background: rgba(29,29,29,0.94);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0.5px 0 rgba(255,255,255,0.15);
+  z-index: 100;
+  flex-shrink: 0;
+}
+.chrome-status { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px 0; }
+.chrome-time { font-family: -apple-system,sans-serif; font-size: 15px; font-weight: 700; color: white; letter-spacing: -0.28px; }
+.chrome-icons { display: flex; gap: 6px; align-items: center; }
+.chrome-bar { margin: 8px 10px 0; background: rgba(118,118,128,0.24); border-radius: 10px; height: 36px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.chrome-lock { font-size: 12px; color: rgba(255,255,255,0.8); }
+.chrome-url { font-family: -apple-system, sans-serif; font-size: 15px; color: white; letter-spacing: -0.1px; }
+
+/* ─── SCREEN CONTAINER ────────────────────────── */
+.screen-wrap {
+  position: absolute;
+  top: 94px; bottom: 0; left: 0; right: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.screen-wrap::-webkit-scrollbar { display: none; }
+
+/* ─── SCREENS ─────────────────────────────────── */
+.screen { display: none; min-height: calc(812px - 94px); background: white; position: relative; }
+.screen.active { display: block; }
+
+/* ─── PROGRESS BAR ────────────────────────────── */
+.progress-bar { position: absolute; top: 0; left: -4px; width: 383px; height: 12px; border-radius: 8px; background: rgba(0,0,0,0.4); z-index: 10; }
+.progress-fill { height: 100%; border-radius: 8px; background: white; transition: width 0.4s ease; }
+
+/* ─── HERO IMAGE ──────────────────────────────── */
+.hero-image { width: 375px; height: 221px; background: url('../../assets/hero-image.png') center/cover no-repeat; position: relative; border-radius: 0 0 20px 20px; box-shadow: var(--shadow-raised); flex-shrink: 0; }
+.activity-image { width: 375px; height: 221px; background: url('../../assets/activity-image.png') center/cover no-repeat; border-radius: 0 0 20px 20px; box-shadow: var(--shadow-raised); }
+
+/* ─── SCREEN CONTENT ──────────────────────────── */
+.screen-content { padding: 20px 23px 120px; }
+
+.screen-label { font-family: var(--font-label); font-size: 16px; color: var(--green); text-align: center; margin-bottom: 8px; }
+.screen-title { font-family: var(--font-primary); font-size: 28px; color: #000; text-align: center; line-height: 1.2; margin-bottom: 10px; }
+.screen-desc { font-family: var(--font-primary); font-size: 16px; color: rgba(0,0,0,0.7); text-align: center; line-height: 1.6; margin-bottom: 24px; }
+.screen-question { font-family: var(--font-primary); font-size: 19px; color: #000; text-align: center; line-height: 1.4; margin-bottom: 20px; }
+
+/* ─── CHECKBOX ROWS ───────────────────────────── */
+.checkbox-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.checkbox-row { display: flex; align-items: flex-start; gap: 14px; padding: 13px 18px; border-radius: 15px; background: rgba(0,0,0,0.04); cursor: pointer; user-select: none; }
+.checkbox-row:hover { background: rgba(0,0,0,0.06); }
+.checkbox-box { width: 22px; height: 22px; border-radius: 5px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.checkbox-box.checked { background: #01A850; }
+.checkbox-box.unchecked { background: var(--grey-300); }
+.checkbox-text-group { display: flex; flex-direction: column; gap: 4px; }
+.checkbox-main { font-size: 14px; color: #000; line-height: 1.4; }
+.checkbox-sub { font-size: 13px; color: rgba(0,0,0,0.5); }
+
+/* ─── NAV BUTTONS ─────────────────────────────── */
+.nav-buttons {
+  position: fixed;
+  bottom: 0;
+  width: 375px;
+  padding: 0 23px 32px;
+  background: linear-gradient(transparent, white 30%);
+  display: flex;
+  gap: 10px;
+  z-index: 50;
+}
+.btn-back { flex: 1; height: 54px; border-radius: 16px; background: var(--navy-900); border: none; cursor: pointer; font-family: var(--font-primary); font-size: 16px; color: rgba(255,255,255,0.5); box-shadow: var(--shadow-card); transition: opacity 0.15s; }
+.btn-back:hover { opacity: 0.85; }
+.btn-next { flex: 1; height: 54px; border-radius: 16px; background: var(--green); border: none; cursor: pointer; font-family: var(--font-primary); font-size: 16px; color: white; box-shadow: var(--shadow-card); transition: transform 0.1s, opacity 0.15s; }
+.btn-next:active { transform: scale(0.97); }
+.btn-next:hover { background: var(--green-dark); }
+.btn-next.disabled { opacity: 0.5; pointer-events: none; }
+.btn-next-full { width: 100%; height: 54px; border-radius: 16px; background: var(--green); border: none; cursor: pointer; font-family: var(--font-primary); font-size: 16px; color: white; box-shadow: var(--shadow-card); }
+
+/* ─── LANGUAGE PICKER ─────────────────────────── */
+.lang-picker { position: absolute; top: 15px; right: 15px; display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.6); backdrop-filter: blur(40px); border-radius: 12px; padding: 7px 10px; z-index: 20; }
+.lang-flag { width: 24px; height: 24px; border-radius: 6px; background: #e8e8e8; object-fit: cover; }
+.lang-text { font-family: var(--font-label); font-size: 12px; font-weight: 600; color: #000; }
+.lang-arrow { font-size: 10px; color: #333; }
+
+/* ─── FORM FIELDS ─────────────────────────────── */
+.form-fields { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.form-field { display: flex; align-items: center; padding: 0 16px; height: 58px; border-radius: 12px; background: rgba(0,0,0,0.06); gap: 10px; cursor: pointer; }
+.form-field-label { font-family: var(--font-label); font-size: 16px; color: rgba(0,0,0,0.4); flex: 1; }
+.form-field-value { font-family: var(--font-label); font-size: 16px; color: #000; flex: 1; }
+.form-field-icon { font-size: 14px; color: rgba(0,0,0,0.4); }
+.form-divider { height: 1px; background: rgba(0,0,0,0.08); margin: 4px 0; }
+
+/* ─── SLIDER ──────────────────────────────────── */
+.slider-wrap { position: relative; width: 329px; margin: 0 auto; margin-bottom: 20px; }
+.slider-tooltip { background: var(--green); border-radius: 12px; padding: 8px 16px; text-align: center; box-shadow: 0 4px 40px rgba(0,0,0,0.15); margin-bottom: 10px; position: relative; display: inline-block; left: 50%; transform: translateX(-50%); }
+.slider-tooltip::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 9px solid var(--green); }
+.slider-tooltip-text { font-family: var(--font-label); font-size: 14px; font-weight: 600; color: white; white-space: nowrap; }
+.slider-track { width: 329px; height: 68px; border-radius: 20px; background: rgba(0,0,0,0.07); display: flex; align-items: center; justify-content: space-around; padding: 0 20px; position: relative; cursor: pointer; }
+.slider-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(0,0,0,0.15); transition: background 0.2s; }
+.slider-dot.active { background: rgba(0,169,80,0.5); }
+.slider-thumb { position: absolute; width: 49px; height: 52px; border-radius: 16px; background: var(--green); box-shadow: 0 4px 20px rgba(0,169,80,0.4); display: flex; align-items: center; justify-content: center; gap: 4px; transition: left 0.2s ease; top: 8px; }
+.slider-thumb-line { width: 2px; height: 22px; background: rgba(255,255,255,0.7); border-radius: 2px; }
+
+/* ─── CHOICE GRID ─────────────────────────────── */
+.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.choice-card { border-radius: 12px; overflow: hidden; position: relative; height: 130px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.15s; }
+.choice-card:hover { transform: scale(1.02); }
+.choice-card.selected { outline: 3px solid var(--green); }
+.choice-card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.choice-card-bg-1 { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); }
+.choice-card-bg-2 { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+.choice-card-bg-3 { background: linear-gradient(135deg, #fff8e1, #ffecb3); }
+.choice-card-bg-4 { background: linear-gradient(135deg, #fce4ec, #f8bbd0); }
+.choice-card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgba(0,0,0,0.45)); }
+.choice-card.selected .choice-card-overlay { background: linear-gradient(transparent 40%, rgba(0,169,80,0.3)); }
+.choice-card-label { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-family: var(--font-label); font-size: 12px; font-weight: 600; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.5); padding: 0 6px; }
+
+/* ─── PICK LIST ───────────────────────────────── */
+.pick-list { display: flex; flex-direction: column; }
+.pick-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.07); cursor: pointer; transition: background 0.15s; gap: 14px; }
+.pick-item:last-child { border-bottom: none; }
+.pick-item:hover { background: rgba(0,0,0,0.03); }
+.pick-item.selected { background: rgba(0,169,80,0.06); }
+.pick-item-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.pick-item-dot.selected { background: var(--green); }
+.pick-item-dot.unselected { border: 2px solid var(--grey-300); background: transparent; }
+.pick-item-text { font-family: var(--font-primary); font-size: 16px; color: #000; flex: 1; }
+.pick-item.selected .pick-item-text { color: var(--green); font-family: var(--font-label); font-weight: 600; }
+
+/* ─── ACTIVITY ────────────────────────────────── */
+.activity-label { font-family: var(--font-label); font-size: 12px; font-weight: 600; color: rgba(0,0,0,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.activity-title { font-family: var(--font-primary); font-size: 19px; color: #000; line-height: 1.4; margin-bottom: 8px; }
+.activity-desc { font-family: var(--font-primary); font-size: 15px; color: rgba(0,0,0,0.6); line-height: 1.5; }
+
+/* ─── VIDEO SCREEN ────────────────────────────── */
+.video-placeholder { width: 329px; height: 185px; border-radius: 16px; background: var(--navy-800); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.video-thumb { position: absolute; inset: 0; background: url('../../assets/activity-image.png') center/cover; opacity: 0.4; }
+.play-btn { width: 60px; height: 72px; background: white; clip-path: polygon(0 0, 0 100%, 100% 50%); box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 1; cursor: pointer; }
+
+/* ─── MODAL ───────────────────────────────────── */
+.modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 200; }
+.modal-card { width: 320px; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 32px 24px 24px; text-align: center; }
+.modal-title { font-family: var(--font-primary); font-size: 24px; color: #000; margin-bottom: 12px; }
+.modal-desc { font-family: var(--font-primary); font-size: 16px; color: rgba(0,0,0,0.6); margin-bottom: 24px; line-height: 1.5; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btn { flex: 1; height: 54px; border-radius: 16px; border: none; cursor: pointer; font-family: var(--font-primary); font-size: 16px; box-shadow: var(--shadow-card); }
+.modal-btn-finish { background: var(--navy-900); color: rgba(255,255,255,0.7); }
+.modal-btn-results { background: var(--green); color: white; }
+
+/* ─── STEP INDICATOR ──────────────────────────── */
+.step-indicator { position: fixed; top: 108px; right: 20px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 4px 10px; font-size: 11px; color: rgba(255,255,255,0.7); font-family: var(--font-label); z-index: 150; pointer-events: none; }
+
+/* ─── SCROLLABLE FIX ──────────────────────────── */
+.screen-inner { padding-bottom: 100px; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame" id="phoneFrame">
+
+  <!-- Browser Chrome -->
+  <div class="browser-chrome">
+    <div class="chrome-status">
+      <div class="chrome-time">9:41</div>
+      <div class="chrome-icons">
+        <img src="../../assets/icons/cellular.svg" style="height:11px;opacity:0.9" alt="">
+        <img src="../../assets/icons/wifi.svg" style="height:11px;opacity:0.9" alt="">
+        <div style="width:22px;height:11px;border-radius:2.5px;border:1px solid rgba(255,255,255,0.35);padding:1.5px;display:flex;align-items:center;">
+          <div style="width:16px;height:6px;background:white;border-radius:1px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chrome-bar">
+      <span class="chrome-lock">🔒</span>
+      <span class="chrome-url" id="chromeUrl">lego.playverto.com</span>
+    </div>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="step-indicator" id="stepIndicator">1 / 8</div>
+
+  <!-- Screen Container -->
+  <div class="screen-wrap" id="screenWrap">
+
+    <!-- ══ SCREEN 1: START ══ -->
+    <div class="screen active" id="screen-1" data-screen-label="01 Start">
+      <div class="hero-image" style="border-radius:0;">
+        <div class="progress-bar" style="top:8px;left:8px;width:calc(100% - 16px);">
+          <div class="progress-fill" style="width:5%"></div>
+        </div>
+        <div class="lang-picker">
+          <div class="lang-flag" style="background:linear-gradient(#012169 33%,#fff 33%,#fff 66%,#C8102E 66%);"></div>
+          <span class="lang-text">English</span>
+          <span class="lang-arrow">▾</span>
+        </div>
+      </div>
+      <div class="screen-content">
+        <div class="screen-title" style="margin-top:16px">Hi there!</div>
+        <div class="screen-desc">Create your own fantasy creature in just 3 minutes. Hit the next button when you are done.</div>
+        <div class="checkbox-group">
+          <div class="checkbox-row" onclick="toggleCheckbox(this)">
+            <div class="checkbox-box checked">
+              <svg width="12" height="9" viewBox="0 0 12 9" fill="white"><path d="M 3.712 7.295 L 1.21 4.79 C 0.931 4.511 0.488 4.511 0.209 4.79 C -0.07 5.069 -0.07 5.513 0.209 5.792 L 3.205 8.791 C 3.483 9.07 3.934 9.07 4.213 8.791 L 11.791 1.211 C 12.07 0.932 12.07 0.488 11.791 0.209 C 11.512 -0.07 11.069 -0.07 10.79 0.209 Z"/></svg>
+            </div>
+            <div class="checkbox-text-group">
+              <div class="checkbox-main">I am more than 18 years old &amp; accept the terms &amp; conditions.</div>
+              <div class="checkbox-sub">You can find our terms here.</div>
+            </div>
+          </div>
+          <div class="checkbox-row" onclick="toggleCheckbox(this)">
+            <div class="checkbox-box unchecked"></div>
+            <div class="checkbox-text-group">
+              <div class="checkbox-main">Accept all cookies</div>
+              <div class="checkbox-sub">You can review our cookie policy here.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons" style="justify-content:flex-end;">
+        <button class="btn-next" onclick="goTo(2)" style="flex:1">Next</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 2: PROFILE ══ -->
+    <div class="screen" id="screen-2" data-screen-label="02 Profile">
+      <div class="hero-image" style="border-radius:0;">
+        <div class="progress-bar" style="top:8px;left:8px;width:calc(100% - 16px);">
+          <div class="progress-fill" style="width:14%"></div>
+        </div>
+        <div class="lang-picker">
+          <div class="lang-flag" style="background:linear-gradient(#012169 33%,#fff 33%,#fff 66%,#C8102E 66%);"></div>
+          <span class="lang-text">English</span>
+          <span class="lang-arrow">▾</span>
+        </div>
+      </div>
+      <div class="screen-content">
+        <div class="screen-label" style="margin-top:16px">Build your profile</div>
+        <div class="screen-title">Fill in your details below.</div>
+        <div class="form-divider"></div>
+        <div class="form-fields" style="margin-top:16px">
+          <div class="form-field">
+            <div class="form-field-value">Alex</div>
+            <div class="form-field-icon">✎</div>
+          </div>
+          <div class="form-field">
+            <div class="form-field-label">Your age</div>
+            <div class="form-field-icon">▾</div>
+          </div>
+          <div class="form-field">
+            <div class="form-field-label">Your gender</div>
+            <div class="form-field-icon">▾</div>
+          </div>
+          <div class="form-field">
+            <svg width="16" height="16" viewBox="0 0 17.49 17.49" fill="rgba(0,0,0,0.35)"><path d="M 12.5 11 L 11.71 11 L 11.43 10.73 C 12.41 9.59 13 8.11 13 6.5 C 13 2.91 10.09 0 6.5 0 C 2.91 0 0 2.91 0 6.5 C 0 10.09 2.91 13 6.5 13 C 8.11 13 9.59 12.41 10.73 11.43 L 11 11.71 L 11 12.5 L 16 17.49 L 17.49 16 Z M 6.5 11 C 4.01 11 2 8.99 2 6.5 C 2 4.01 4.01 2 6.5 2 C 8.99 2 11 4.01 11 6.5 C 11 8.99 8.99 11 6.5 11 Z"/></svg>
+            <div class="form-field-label">Your town, region or post code…</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn-back" onclick="goTo(1)">Back</button>
+        <button class="btn-next" onclick="goTo(3)">Next</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 3: VIDEO ══ -->
+    <div class="screen" id="screen-3" data-screen-label="03 Video">
+      <div class="hero-image" style="border-radius:0;">
+        <div class="progress-bar" style="top:8px;left:8px;width:calc(100% - 16px);">
+          <div class="progress-fill" style="width:28%"></div>
+        </div>
+      </div>
+      <div class="screen-content">
+        <div class="screen-label" style="margin-top:16px">Watch the video</div>
+        <div class="screen-title">Welcome to build the change.</div>
+        <div class="screen-desc">Create your own fantasy creature in just 3 minutes. Hit the next button when you are done.</div>
+        <div class="video-placeholder">
+          <div class="video-thumb"></div>
+          <svg width="45" height="55" viewBox="0 0 45 55" fill="white" style="z-index:2;filter:drop-shadow(0 10px 30px rgba(0,0,0,0.3));cursor:pointer;">
+            <path d="M 0 4.455 L 0 50.545 C 0 54.059 3.859 56.195 6.831 54.282 L 42.937 31.237 C 45.688 29.502 45.688 25.498 42.937 23.718 L 6.831 0.718 C 3.859 -1.195 0 0.941 0 4.455 Z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn-back" onclick="goTo(2)">Back</button>
+        <button class="btn-next" onclick="goTo(4)">Next</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 4: SLIDER ══ -->
+    <div class="screen" id="screen-4" data-screen-label="04 Slider">
+      <div style="background: var(--navy-750); padding-top: 20px;">
+        <div class="progress-bar" style="position:relative;top:auto;left:4px;width:calc(100% - 8px);margin:0 auto 20px;background:rgba(255,255,255,0.2);">
+          <div class="progress-fill" style="width:42%"></div>
+        </div>
+      </div>
+      <div style="background:white;border-radius:20px;margin:0 10px;box-shadow:var(--shadow-raised);padding:24px 20px 20px;">
+        <div class="screen-label">Drag the slider</div>
+        <div class="screen-question">When facing environmental challenges I feel...</div>
+        <div class="slider-wrap">
+          <div style="text-align:center;margin-bottom:10px;">
+            <div class="slider-tooltip"><span class="slider-tooltip-text" id="sliderLabel">I feel fine!</span></div>
+          </div>
+          <div class="slider-track" id="sliderTrack" onclick="handleSliderClick(event)">
+            <div class="slider-dot" id="dot-0"></div>
+            <div class="slider-dot" id="dot-1"></div>
+            <div class="slider-dot active" id="dot-2"></div>
+            <div class="slider-dot" id="dot-3"></div>
+            <div class="slider-dot" id="dot-4"></div>
+            <div class="slider-thumb" id="sliderThumb" style="left:calc(50% - 24.5px)">
+              <div class="slider-thumb-line"></div>
+              <div class="slider-thumb-line"></div>
+              <div class="slider-thumb-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons" style="background:linear-gradient(transparent,var(--navy-750) 30%);">
+        <button class="btn-back" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);" onclick="goTo(3)">Back</button>
+        <button class="btn-next" onclick="goTo(5)">Next</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 5: MULTIPLE CHOICE ══ -->
+    <div class="screen" id="screen-5" data-screen-label="05 Multiple Choice">
+      <div style="background: white; padding: 20px 23px 8px;">
+        <div class="progress-bar" style="position:relative;top:auto;left:0;width:100%;margin-bottom:16px;background:rgba(0,0,0,0.15);">
+          <div class="progress-fill" style="width:57%;background:#00A950"></div>
+        </div>
+        <div class="screen-label">Choose one</div>
+        <div class="screen-question">When it comes to the environment, I care most about...</div>
+      </div>
+      <div style="padding:0 23px;">
+        <div class="choice-grid" id="choiceGrid">
+          <div class="choice-card" onclick="selectChoice(this)">
+            <div class="choice-card-bg choice-card-bg-1"></div>
+            <div class="choice-card-overlay"></div>
+            <div class="choice-card-label">Air Quality</div>
+          </div>
+          <div class="choice-card selected" onclick="selectChoice(this)">
+            <div class="choice-card-bg choice-card-bg-2"></div>
+            <div class="choice-card-overlay"></div>
+            <div class="choice-card-label">Ocean Health</div>
+          </div>
+          <div class="choice-card" onclick="selectChoice(this)">
+            <div class="choice-card-bg choice-card-bg-3"></div>
+            <div class="choice-card-overlay"></div>
+            <div class="choice-card-label">Wildlife</div>
+          </div>
+          <div class="choice-card" onclick="selectChoice(this)">
+            <div class="choice-card-bg choice-card-bg-4"></div>
+            <div class="choice-card-overlay"></div>
+            <div class="choice-card-label">Climate Change</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn-back" onclick="goTo(4)">Back</button>
+        <button class="btn-next" onclick="goTo(6)">Next</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 6: PICK LIST ══ -->
+    <div class="screen" id="screen-6" data-screen-label="06 Pick List">
+      <div style="background:white;padding:20px 23px 8px;">
+        <div class="progress-bar" style="position:relative;top:auto;left:0;width:100%;margin-bottom:16px;background:rgba(0,0,0,0.15);">
+          <div class="progress-fill" style="width:71%;background:#00A950"></div>
+        </div>
+        <div class="screen-question" style="text-align:center;">What causes you the most stress?</div>
+      </div>
+      <div style="padding:0 16px;">
+        <div class="pick-list" id="pickList">
+          <div class="pick-item selected" onclick="selectPick(this)">
+            <div class="pick-item-dot selected"></div>
+            <div class="pick-item-text">Family</div>
+          </div>
+          <div class="pick-item" onclick="selectPick(this)">
+            <div class="pick-item-dot unselected"></div>
+            <div class="pick-item-text">The environment</div>
+          </div>
+          <div class="pick-item" onclick="selectPick(this)">
+            <div class="pick-item-dot unselected"></div>
+            <div class="pick-item-text">School</div>
+          </div>
+          <div class="pick-item" onclick="selectPick(this)">
+            <div class="pick-item-dot unselected"></div>
+            <div class="pick-item-text">Homework</div>
+          </div>
+          <div class="pick-item" onclick="selectPick(this)">
+            <div class="pick-item-dot unselected"></div>
+            <div class="pick-item-text">The news</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn-back" onclick="goTo(5)">Back</button>
+        <button class="btn-next" onclick="goTo(7)">Next</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 7: ACTIVITY ══ -->
+    <div class="screen" id="screen-7" data-screen-label="07 Activity">
+      <div class="activity-image" style="border-radius:0;"></div>
+      <div style="padding:0 23px 0;margin-top:-20px;position:relative;z-index:5;">
+        <div class="progress-bar" style="position:relative;top:auto;left:0;width:100%;margin-bottom:16px;background:rgba(0,0,0,0.25);">
+          <div class="progress-fill" style="width:85%"></div>
+        </div>
+      </div>
+      <div class="screen-content" style="padding-top:8px;">
+        <div class="activity-label">Activity</div>
+        <div class="activity-title">Create your own fantasy creature in just 3 minutes.</div>
+        <div class="activity-desc">Hit the next button when you are done.</div>
+        <div style="height:16px;"></div>
+        <div class="checkbox-row" onclick="toggleCheckbox(this)" style="margin-bottom:8px;">
+          <div class="checkbox-box unchecked"></div>
+          <div class="checkbox-text-group">
+            <div class="checkbox-main">I've completed this activity</div>
+            <div class="checkbox-sub">Tick this off before you continue! : )</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn-back" onclick="goTo(6)">Back</button>
+        <button class="btn-next" onclick="goTo(8)">Next</button>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 8: FINISH ══ -->
+    <div class="screen" id="screen-8" data-screen-label="08 Finish">
+      <div class="hero-image" style="border-radius:0;">
+        <div class="progress-bar" style="top:8px;left:8px;width:calc(100% - 16px);">
+          <div class="progress-fill" style="width:100%"></div>
+        </div>
+        <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);">
+          <img src="../../assets/lego-logo.png" alt="LEGO" style="height:40px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));">
+        </div>
+      </div>
+      <div class="screen-content" style="padding-top:20px">
+        <div class="screen-title">Thanks for playing!</div>
+        <div class="screen-desc">What did you think of this Verto?</div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;">😊</div>
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(0,169,80,0.1);border:2px solid #00A950;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;">😍</div>
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;">😐</div>
+        </div>
+      </div>
+      <!-- Modal -->
+      <div class="modal-overlay" id="finishModal">
+        <div class="modal-card">
+          <div class="modal-title">Thank you!</div>
+          <div class="modal-desc">Would you like to play again?</div>
+          <div class="modal-btns">
+            <button class="modal-btn modal-btn-finish" onclick="goTo(1)">Finish</button>
+            <button class="modal-btn modal-btn-results" onclick="document.getElementById('finishModal').style.display='none'">Show Results</button>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn-back" onclick="goTo(7)">Back</button>
+        <button class="btn-next" onclick="document.getElementById('finishModal').style.display='flex'">Finish</button>
+      </div>
+    </div>
+
+  </div><!-- end screen-wrap -->
+</div><!-- end phone-frame -->
+
+<script>
+const TOTAL = 8;
+let current = 1;
+
+const sliderLabels = ['Very scared.', 'A bit scared.', 'I feel fine!', 'Pretty good!', 'Amazing!'];
+let sliderPos = 2;
+
+function goTo(n) {
+  document.getElementById('screen-' + current).classList.remove('active');
+  current = n;
+  document.getElementById('screen-' + current).classList.add('active');
+  document.getElementById('stepIndicator').textContent = n + ' / ' + TOTAL;
+  document.getElementById('screenWrap').scrollTop = 0;
+  // hide modal if visible
+  const modal = document.getElementById('finishModal');
+  if (modal) modal.style.display = '';
+}
+
+function toggleCheckbox(row) {
+  const box = row.querySelector('.checkbox-box');
+  if (box.classList.contains('checked')) {
+    box.classList.remove('checked');
+    box.classList.add('unchecked');
+    box.innerHTML = '';
+  } else {
+    box.classList.remove('unchecked');
+    box.classList.add('checked');
+    box.innerHTML = '<svg width="12" height="9" viewBox="0 0 12 9" fill="white"><path d="M 3.712 7.295 L 1.21 4.79 C 0.931 4.511 0.488 4.511 0.209 4.79 C -0.07 5.069 -0.07 5.513 0.209 5.792 L 3.205 8.791 C 3.483 9.07 3.934 9.07 4.213 8.791 L 11.791 1.211 C 12.07 0.932 12.07 0.488 11.791 0.209 C 11.512 -0.07 11.069 -0.07 10.79 0.209 Z"/></svg>';
+  }
+}
+
+function selectChoice(card) {
+  document.querySelectorAll('#choiceGrid .choice-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+function selectPick(item) {
+  document.querySelectorAll('#pickList .pick-item').forEach(p => {
+    p.classList.remove('selected');
+    p.querySelector('.pick-item-dot').className = 'pick-item-dot unselected';
+    p.querySelector('.pick-item-text').style.color = '#000';
+  });
+  item.classList.add('selected');
+  item.querySelector('.pick-item-dot').className = 'pick-item-dot selected';
+}
+
+function handleSliderClick(e) {
+  const track = document.getElementById('sliderTrack');
+  const rect = track.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width;
+  const pos = Math.max(0, Math.min(4, Math.round(x * 4)));
+  updateSlider(pos);
+}
+
+function updateSlider(pos) {
+  sliderPos = pos;
+  const positions = [7, 25, 43, 61, 79]; // percentages
+  const thumb = document.getElementById('sliderThumb');
+  thumb.style.left = 'calc(' + positions[pos] + '% - 24.5px)';
+  document.getElementById('sliderLabel').textContent = sliderLabels[pos];
+  for (let i = 0; i < 5; i++) {
+    const dot = document.getElementById('dot-' + i);
+    dot.className = 'slider-dot' + (i === pos ? ' active' : '');
+  }
+}
+</script>
+
+</body>
+</html>
