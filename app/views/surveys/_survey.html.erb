@@ -104,20 +104,8 @@
                     title="Delete card">×</button>
           </div>
 
-          <%# ───── Two-column: Figma reference (left) + interactive phone-card (right) ───── %>
-          <div class="grid grid-cols-1 md:grid-cols-[1fr_360px] gap-6 mx-4 mb-4 items-start">
-
-            <%# Left: Figma reference image, scaled to match phone card height %>
-            <div class="rounded-[2.5rem] overflow-hidden bg-slate/30 ring-1 ring-smoke/10 aspect-[9/14] max-h-[640px]">
-              <% if type_figma[type] %>
-                <%= image_tag type_figma[type],
-                      alt: "Figma reference",
-                      class: "w-full h-full object-cover" %>
-              <% end %>
-            </div>
-
-            <%# Right: phone-shaped interactive card. Portrait aspect, %>
-            <%# rounded corners ≈ Figma rx=20 (here 2.5rem to feel phone-like). %>
+          <%# ───── Phone-shaped interactive preview ───── %>
+          <div class="flex justify-center mx-4 mb-4">
             <% if type == "static_page" %>
               <div class="bg-slate border border-dashed border-smoke/30 rounded-[2.5rem] p-8 text-center aspect-[9/14] max-h-[640px] w-full max-w-[360px] flex flex-col items-center justify-center gap-3 shadow-2xl ring-1 ring-smoke/10">
                 <div class="display text-smoke/60 tracking-widest text-xs">
