@@ -11,8 +11,7 @@ export default class extends Controller {
     const len = (this.inputTarget.value || "").length
     if (this.hasCounterTarget) {
       this.counterTarget.textContent = `${len}/${this.maxValue} Characters`
-      this.counterTarget.classList.toggle("text-hot-pink", len > this.maxValue)
-      this.counterTarget.classList.toggle("font-medium",   len > this.maxValue)
+      this.counterTarget.classList.toggle("over", len > this.maxValue)
     }
   }
 }

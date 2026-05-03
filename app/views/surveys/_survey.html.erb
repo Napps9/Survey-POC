@@ -1,507 +1,321 @@
 <%
-  palette = %w[bg-aquamarine bg-hot-pink bg-purple bg-sky-blue bg-light-yellow]
-
-  type_label = {
-    "multiple_choice"  => "Select one",
-    "select_many"      => "Select many",
-    "select_one_grid"  => "Select one",
-    "select_many_grid" => "Select many",
-    "tap_card"         => "Tap on the icon you agree with",
+  type_eyebrow = {
+    "multiple_choice"  => "Choose one",
+    "select_many"      => "Choose all that apply",
+    "select_one_grid"  => "Choose one",
+    "select_many_grid" => "Choose all that apply",
+    "tap_card"         => "Swipe to respond",
     "range"            => "Drag the slider",
-    "rating"           => "Tap on a star",
-    "yes_no"           => "Select one",
-    "open_ended"       => "Type in your answer",
+    "rating"           => "Drag the slider",
+    "yes_no"           => "Choose one",
+    "open_ended"       => "Type your answer",
     "welcome_card"     => "Welcome",
-    "static_page"      => "Take a break"
+    "static_page"      => "Activity"
   }
 
-  type_accent = {
-    "welcome_card"     => "border-light-yellow",
-    "static_page"      => "border-smoke/40",
-    "tap_card"         => "border-aquamarine",
-    "select_one_grid"  => "border-purple",
-    "select_many_grid" => "border-purple",
-    "range"            => "border-sky-blue",
-    "rating"           => "border-sky-blue",
-    "yes_no"           => "border-aquamarine",
-    "open_ended"       => "border-smoke/40",
-    "multiple_choice"  => "border-hot-pink",
-    "select_many"      => "border-hot-pink"
-  }
-
-  type_figma = {
-    "multiple_choice"  => "select.svg",
-    "select_many"      => "select.svg",
-    "select_one_grid"  => "select.svg",
-    "select_many_grid" => "select.svg",
-    "tap_card"         => "AgreeDisagree.svg",
-    "range"            => "Range.svg",
-    "rating"           => "star_rating.svg",
-    "yes_no"           => "AgreeDisagree.svg",
-    "open_ended"       => "textbox.svg",
-    "welcome_card"     => "WelcomeEnding.svg",
-    "static_page"      => "WelcomeEnding.svg"
-  }
+  # Pre-compute progress fill % for the left-panel bar (visual only).
+  total_q = Array(survey["cards"]).count { |c| !%w[welcome_card static_page].include?(c["type"]) }
+  q_index = 0
 %>
 
 <%= turbo_frame_tag "survey" do %>
-  <article class="bg-slate border border-smoke/15 rounded-2xl p-6"
+  <article class="bg-navy-800 p-6"
            data-controller="survey-editor"
            data-survey-editor-id-value="<%= survey['id'] %>"
            data-survey-editor-url-value="<%= survey['id'] ? survey_path(survey['id']) : '' %>">
 
-    <h2 class="display text-3xl mb-2 outline-none" contenteditable="true"
-        data-survey-editor-target="title"
-        data-action="input->survey-editor#edit"><%= survey["title"] %></h2>
-    <p class="text-smoke/70 mb-5 outline-none" contenteditable="true"
-       data-survey-editor-target="surveyDescription"
-       data-action="input->survey-editor#edit"><%= survey["description"] %></p>
+    <%# Survey-level header %>
+    <div class="max-w-[900px] mx-auto mb-8">
+      <div class="text-green-500 text-xs tracking-widest uppercase font-bold mb-2"
+           style="font-family:'Alata',sans-serif">Verto Survey</div>
+      <h2 class="text-3xl text-white outline-none mb-2" contenteditable="true"
+          data-survey-editor-target="title"
+          data-action="input->survey-editor#edit"><%= survey["title"] %></h2>
+      <p class="text-white/60 outline-none" contenteditable="true"
+         data-survey-editor-target="surveyDescription"
+         data-action="input->survey-editor#edit"><%= survey["description"] %></p>
 
-    <div class="flex items-center justify-between mb-5 bg-smoke/5 border border-smoke/10 p-4 rounded-xl">
-      <dl class="grid grid-cols-3 gap-3 text-xs flex-1">
-        <div>
-          <dt class="display text-hot-pink tracking-widest mb-1">Theme</dt>
-          <dd class="text-smoke/90"><%= survey["theme"] %></dd>
+      <div class="mt-4 flex items-center justify-between gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs">
+        <div class="flex gap-6 text-white/70">
+          <div><span class="text-green-500 uppercase tracking-widest font-bold mr-2" style="font-family:'Alata',sans-serif">Theme</span><%= survey["theme"] %></div>
+          <div><span class="text-green-500 uppercase tracking-widest font-bold mr-2" style="font-family:'Alata',sans-serif">Audience</span><%= survey["audience_age"] %></div>
+          <div><span class="text-green-500 uppercase tracking-widest font-bold mr-2" style="font-family:'Alata',sans-serif">Insight</span><%= survey["key_insight"] %></div>
         </div>
-        <div>
-          <dt class="display text-hot-pink tracking-widest mb-1">Audience</dt>
-          <dd class="text-smoke/90"><%= survey["audience_age"] %></dd>
-        </div>
-        <div>
-          <dt class="display text-hot-pink tracking-widest mb-1">Insight</dt>
-          <dd class="text-smoke/90"><%= survey["key_insight"] %></dd>
-        </div>
-      </dl>
-      <div class="ml-4" data-survey-editor-target="summary"></div>
+        <div data-survey-editor-target="summary"></div>
+      </div>
     </div>
 
-    <p class="text-xs text-smoke/50 mb-5">
-      Tap any text to edit. Q 50–70 chars (max 100) · option max 20 chars · 10–15 questions.
-    </p>
-
     <ol class="space-y-6">
-      <% Array(survey["cards"]).each do |c| %>
+      <% Array(survey["cards"]).each_with_index do |c, idx| %>
         <% type = c["type"] %>
-        <% accent = type_accent[type] || "border-smoke/30" %>
-        <% label = type_label[type] || type.to_s.tr('_', ' ') %>
-        <% is_prioritise = type.to_s.include?("grid") && c["text"].to_s.match?(/\b(rank|order|priorit)/i) %>
+        <% eyebrow = type_eyebrow[type] || type.to_s.tr('_', ' ') %>
+        <% is_question = !%w[welcome_card static_page].include?(type) %>
+        <% q_index += 1 if is_question %>
+        <% progress = total_q.zero? ? 0 : ((q_index.to_f / total_q) * 100).round %>
 
-        <li class="relative bg-slate border-l-4 <%= accent %> rounded-r-xl"
+        <li class="max-w-[900px] mx-auto"
             data-survey-editor-target="card"
             data-card-type="<%= type %>">
 
-          <%# ───── Edit chrome (dark band above the preview) ───── %>
-          <div class="flex items-center justify-between px-4 py-2 text-xs text-smoke/60">
+          <%# Editor chrome (above split-card) %>
+          <div class="edit-chrome">
             <div class="flex items-center gap-2">
-              <span class="display bg-hot-pink text-slate tracking-widest px-2 py-0.5 rounded text-[10px]">
-                <%= type.to_s.tr('_', ' ') %>
-              </span>
-              <span data-role="char-counter"></span>
+              <span class="type-tag"><%= type.to_s.tr('_', ' ') %></span>
+              <span class="text-white/40">Card <%= idx + 1 %></span>
             </div>
-            <button type="button"
-                    class="text-smoke/40 hover:text-hot-pink text-lg leading-none"
-                    data-action="click->survey-editor#deleteCard"
-                    title="Delete card">×</button>
+            <div class="flex gap-3">
+              <button type="button"
+                      class="text-white/40 hover:text-red-500 leading-none"
+                      data-action="click->survey-editor#deleteCard"
+                      title="Delete card">×</button>
+            </div>
           </div>
 
-          <%# ───── Phone-shaped interactive preview ───── %>
-          <div class="flex justify-center mx-4 mb-4">
-            <% if type == "static_page" %>
-              <div class="bg-slate border border-dashed border-smoke/30 rounded-[2.5rem] p-8 text-center aspect-[9/14] max-h-[640px] w-full max-w-[360px] flex flex-col items-center justify-center gap-3 shadow-2xl ring-1 ring-smoke/10">
-                <div class="display text-smoke/60 tracking-widest text-xs">
-                  <%= label %>
+          <%# Verto split-card %>
+          <div class="split-card">
+            <%# ── LEFT PANEL ── %>
+            <% if %w[tap_card open_ended].include?(type) %>
+              <div class="split-left split-left-dark">
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="text-white/20 text-6xl"><%= type == "tap_card" ? "↔" : "✎" %></div>
                 </div>
-                <div contenteditable="true"
-                     class="display text-2xl text-smoke italic outline-none border-b-2 border-transparent"
-                     data-role="text"
-                     data-action="input->survey-editor#edit"><%= c["text"] %></div>
-                <% if c["description"].present? %>
-                  <div contenteditable="true"
-                       class="text-sm text-smoke/60 outline-none border-b-2 border-transparent"
-                       data-role="description"
-                       data-action="input->survey-editor#edit"><%= c["description"] %></div>
-                  <div data-role="char-counter" class="text-xs text-smoke/40"></div>
-                <% end %>
-              </div>
-
-            <% elsif type == "welcome_card" %>
-              <%# Figma WelcomeEnding: green hero, big white text, %>
-              <%# centered play triangle, CTA pill at the bottom. %>
-              <div class="bg-aquamarine text-white rounded-[2.5rem] p-8 text-center flex flex-col items-center justify-center gap-4 aspect-[9/14] max-h-[640px] w-full max-w-[360px] shadow-2xl ring-1 ring-slate/10">
-                <div class="display tracking-widest text-xs text-white/70"><%= label %></div>
-                <div contenteditable="true"
-                     class="display text-3xl outline-none border-b-2 border-transparent"
-                     data-role="text"
-                     data-action="input->survey-editor#edit"><%= c["text"] %></div>
-                <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center">
-                  <span class="border-y-[10px] border-y-transparent border-l-[16px] border-l-white ml-1"></span>
+                <div class="panel-progress" style="background:rgba(255,255,255,0.15)">
+                  <div class="panel-progress-fill" style="width:<%= progress %>%"></div>
                 </div>
-                <% if c["description"].present? %>
-                  <div contenteditable="true"
-                       class="text-base text-white/90 outline-none border-b-2 border-transparent"
-                       data-role="description"
-                       data-action="input->survey-editor#edit"><%= c["description"] %></div>
-                  <div data-role="char-counter" class="text-xs text-white/60"></div>
-                <% end %>
-                <button type="button"
-                        class="display tracking-widest text-sm bg-white text-aquamarine rounded-2xl px-8 py-3 mt-2 hover:brightness-95">
-                  Get started
-                </button>
+                <div class="panel-tagline">Build the change</div>
               </div>
-
             <% else %>
-              <div class="bg-smoke text-slate rounded-[2.5rem] p-6 shadow-2xl ring-1 ring-slate/10 aspect-[9/14] max-h-[640px] w-full max-w-[360px] flex flex-col overflow-y-auto">
-              <%# Top instruction label %>
-              <div class="display text-center text-hot-pink tracking-widest text-xs mb-3">
-                <%= label %>
+              <div class="split-left">
+                <%# Placeholder gradient until brand imagery lands %>
+                <div class="split-left-img"
+                     style="background: linear-gradient(135deg, #00A950 0%, #1C2034 70%);"></div>
+                <div class="split-left-overlay"></div>
+                <div class="panel-progress">
+                  <div class="panel-progress-fill" style="width:<%= progress %>%"></div>
+                </div>
+                <div class="panel-tagline">Build the change</div>
               </div>
+            <% end %>
 
-              <%# Question text %>
-              <div contenteditable="true"
-                   class="display text-2xl text-slate text-center outline-none border-b-2 border-transparent"
+            <%# ── RIGHT PANEL ── %>
+            <div class="split-right">
+
+              <% if is_question %>
+                <div class="q-eyebrow"><%= eyebrow %></div>
+              <% end %>
+
+              <% if type == "static_page" %>
+                <div class="activity-tag">Activity</div>
+              <% end %>
+
+              <div class="<%= type == 'static_page' ? 'activity-title' : 'q-title' %>"
+                   contenteditable="true"
                    data-role="text"
                    data-action="input->survey-editor#edit"><%= c["text"] %></div>
 
-              <%# Optional description %>
               <% if c["description"].present? %>
-                <div contenteditable="true"
-                     class="text-sm text-slate/60 text-center mt-2 outline-none border-b-2 border-transparent"
+                <div class="<%= type == 'static_page' ? 'activity-desc' : 'q-subtitle' %>"
+                     contenteditable="true"
                      data-role="description"
                      data-action="input->survey-editor#edit"><%= c["description"] %></div>
-                <div data-role="char-counter" class="text-xs text-slate/40 text-center mt-1"></div>
               <% end %>
 
-              <%# Type-specific answer preview %>
-              <div class="mt-5">
-                <% case type %>
-                <% when "multiple_choice", "select_many" %>
-                  <%# Figma: vertical list of rounded rows, light-gray bg, %>
-                  <%# square checkbox (rx=5) on the left — green when on, %>
-                  <%# mute when off. Single-select uses a circle indicator. %>
-                  <ul data-role="option-list"
-                      data-controller="picker"
-                      data-picker-mode-value="<%= type == 'select_many' ? 'multi' : 'single' %>"
-                      class="space-y-2">
+              <%# ── Type-specific component ── %>
+              <div class="mt-2">
+              <%- case type
+                  when "multiple_choice", "select_many", "yes_no" -%>
+                <%# Pick list. yes_no uses fixed Yes/No items. %>
+                <% items = type == "yes_no" ? %w[Yes No] : Array(c["options"]) %>
+                <% multi = (type == "select_many") %>
+                <ul class="pick-list"
+                    data-controller="picker"
+                    data-picker-mode-value="<%= multi ? 'multi' : 'single' %>"
+                    data-role="option-list">
+                  <% items.each do |opt| %>
+                    <li class="pick-item"
+                        data-picker-target="item"
+                        data-action="click->picker#pick"
+                        data-selected="false">
+                      <span class="<%= multi ? 'pick-square' : 'pick-dot' %>" data-role="indicator">✓</span>
+                      <span class="pick-text"
+                            <% if type != "yes_no" %>contenteditable="true"<% end %>
+                            data-role="<%= type == 'yes_no' ? 'option-fixed' : 'option' %>"
+                            data-action="input->survey-editor#edit"><%= opt %></span>
+                      <% if type != "yes_no" %>
+                        <button type="button"
+                                class="text-black/30 hover:text-red-500 text-xs"
+                                data-action="click->survey-editor#removeOption">remove</button>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ul>
+
+              <% when "select_one_grid", "select_many_grid" %>
+                <% n = Array(c["options"]).size %>
+                <% cols = n >= 5 ? 3 : 2 %>
+                <% multi = (type == "select_many_grid") %>
+                <ul class="choice-grid choice-grid-<%= cols %>"
+                    data-controller="picker"
+                    data-picker-mode-value="<%= multi ? 'multi' : 'single' %>"
+                    data-role="option-list">
+                  <% Array(c["options"]).each_with_index do |opt, i| %>
+                    <li class="choice-card"
+                        data-picker-target="item"
+                        data-action="click->picker#pick"
+                        data-selected="false"
+                        data-role="option-row">
+                      <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>"></div>
+                      <div class="choice-overlay"></div>
+                      <div class="choice-tick">✓</div>
+                      <div class="choice-label"
+                           contenteditable="true"
+                           data-role="option"
+                           data-action="input->survey-editor#edit"><%= opt %></div>
+                      <button type="button"
+                              class="absolute top-1 left-1 text-white/60 hover:text-red-500 text-xs leading-none bg-black/40 rounded-full w-5 h-5 flex items-center justify-center"
+                              data-action="click->survey-editor#removeOption"
+                              title="remove">×</button>
+                    </li>
+                  <% end %>
+                </ul>
+
+              <% when "tap_card" %>
+                <%# Rotate / Swipe stack %>
+                <div class="rotate-wrap"
+                     data-controller="tap-stack"
+                     data-role="option-list">
+                  <div class="rotate-card-stack">
                     <% Array(c["options"]).each_with_index do |opt, i| %>
-                      <li data-role="option-row"
-                          data-picker-target="item"
-                          data-action="click->picker#pick"
-                          data-selected="false"
-                          class="flex items-center gap-3 bg-slate/[0.04] border border-transparent rounded-2xl pl-3 pr-4 py-3 cursor-pointer transition data-[selected=true]:bg-aquamarine/10 data-[selected=true]:border-aquamarine">
-                        <span class="bg-mute w-6 h-6 <%= type == 'select_many' ? 'rounded-md' : 'rounded-full' %> flex items-center justify-center text-white text-xs font-bold pointer-events-none transition-colors [[data-selected=true]_&]:bg-aquamarine">
-                          <span class="opacity-0 [[data-selected=true]_&]:opacity-100">✓</span>
-                        </span>
+                      <div class="rotate-card"
+                           data-tap-stack-target="card"
+                           data-role="option-row"
+                           style="background: linear-gradient(135deg, <%= ['#d4edda','#d1ecf1','#fff3cd','#f8d7da','#e2d9f3'][i % 5] %>, <%= ['#a8d5b5','#9fd5df','#ffd88a','#f5a8b0','#c3aee8'][i % 5] %>);">
                         <span contenteditable="true"
-                              class="flex-1 outline-none border-b border-transparent focus:border-slate/30 text-slate font-medium"
+                              class="outline-none"
+                              data-role="option"
+                              data-action="input->survey-editor#edit"><%= opt %></span>
+                      </div>
+                    <% end %>
+                  </div>
+                  <div class="swipe-indicator">
+                    <span style="color:#D80027;font-weight:700">← No</span>
+                    <span class="mx-3">drag card to answer</span>
+                    <span style="color:#00A950;font-weight:700">Yes →</span>
+                  </div>
+                  <div class="rotate-actions">
+                    <button type="button"
+                            class="rotate-action-btn rotate-action-no"
+                            data-action="click->tap-stack#pick"
+                            data-tap-stack-direction="left"
+                            title="No">✕</button>
+                    <button type="button"
+                            class="rotate-action-btn rotate-action-yes"
+                            data-action="click->tap-stack#pick"
+                            data-tap-stack-direction="right"
+                            title="Yes">✓</button>
+                  </div>
+                  <div class="text-xs text-black/40 flex items-center gap-3">
+                    <span data-tap-stack-target="counter"></span>
+                    <button type="button"
+                            class="hover:text-green-500"
+                            data-action="click->tap-stack#reset">↺ Reset stack</button>
+                  </div>
+                </div>
+
+              <% when "range", "rating" %>
+                <% labels = Array(c["options"]) %>
+                <% n = [labels.size, 2].max %>
+                <div class="slider-wrap"
+                     data-controller="slider"
+                     data-slider-steps-value="<%= n %>"
+                     data-role="option-list">
+                  <div class="slider-track-wrap">
+                    <div class="slider-tooltip" data-slider-target="tooltip" style="left:50%;">
+                      <span class="slider-tooltip-text" data-slider-target="tooltipText"></span>
+                    </div>
+                    <div class="slider-track"
+                         data-slider-target="track"
+                         data-action="pointerdown->slider#start">
+                      <% n.times do |i| %>
+                        <div class="s-dot" data-slider-target="dot" style="left:<%= (i.to_f / (n - 1) * 100).round(2) %>%"></div>
+                      <% end %>
+                      <div class="slider-thumb" data-slider-target="thumb" style="left:50%;">
+                        <div class="s-line"></div><div class="s-line"></div><div class="s-line"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="slider-labels">
+                    <% labels.each_with_index do |opt, i| %>
+                      <span class="slider-label-text"
+                            data-slider-target="label"
+                            data-role="option-row">
+                        <span contenteditable="true"
+                              class="outline-none"
                               data-role="option"
                               data-action="input->survey-editor#edit"><%= opt %></span>
                         <button type="button"
-                                class="text-slate/30 hover:text-hot-pink disabled:opacity-30 text-xs"
-                                data-action="click->survey-editor#removeOption">remove</button>
-                      </li>
+                                class="text-black/30 hover:text-red-500 ml-1"
+                                data-action="click->survey-editor#removeOption">×</button>
+                      </span>
                     <% end %>
-                  </ul>
-
-                <% when "select_one_grid", "select_many_grid" %>
-                  <% if is_prioritise %>
-                    <%# Figma rearrange: stacked green rows, no gaps, white %>
-                    <%# circle badge (r=13) inside dark drag handle on left. %>
-                    <ul data-role="option-list"
-                        data-controller="prioritise"
-                        class="rounded-2xl overflow-hidden">
-                      <% Array(c["options"]).each_with_index do |opt, i| %>
-                        <li data-role="option-row"
-                            data-prioritise-target="item"
-                            class="flex items-stretch bg-aquamarine text-white border-b border-white/15 last:border-b-0 transition-transform">
-                          <div class="flex items-center justify-center w-14 bg-black/25">
-                            <span data-role="rank-number"
-                                  class="bg-white text-aquamarine w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm">
-                              <%= i + 1 %>
-                            </span>
-                          </div>
-                          <span contenteditable="true"
-                                class="flex-1 outline-none border-b border-transparent focus:border-white/40 font-medium px-4 py-3"
-                                data-role="option"
-                                data-action="input->survey-editor#edit"><%= opt %></span>
-                          <div class="flex items-center gap-1 pr-2">
-                            <button type="button"
-                                    class="w-7 h-7 rounded-full hover:bg-white/15 text-white text-sm"
-                                    data-action="click->prioritise#up"
-                                    title="Move up">▲</button>
-                            <button type="button"
-                                    class="w-7 h-7 rounded-full hover:bg-white/15 text-white text-sm"
-                                    data-action="click->prioritise#down"
-                                    title="Move down">▼</button>
-                            <button type="button"
-                                    class="text-white/60 hover:text-white text-xs px-1"
-                                    data-action="click->survey-editor#removeOption">×</button>
-                          </div>
-                        </li>
-                      <% end %>
-                    </ul>
-                  <% else %>
-                    <%# Matrix grid: 2-col grid of light pills, %>
-                    <%# checkbox indicator like select. %>
-                    <ul data-role="option-list"
-                        data-controller="picker"
-                        data-picker-mode-value="<%= type == 'select_many_grid' ? 'multi' : 'single' %>"
-                        class="grid grid-cols-2 gap-2">
-                      <% Array(c["options"]).each_with_index do |opt, i| %>
-                        <li data-role="option-row"
-                            data-picker-target="item"
-                            data-action="click->picker#pick"
-                            data-selected="false"
-                            class="flex items-center gap-2 bg-slate/[0.04] border border-transparent rounded-2xl pl-2 pr-3 py-2 cursor-pointer transition data-[selected=true]:bg-aquamarine/10 data-[selected=true]:border-aquamarine">
-                          <span class="bg-mute w-5 h-5 <%= type == 'select_many_grid' ? 'rounded' : 'rounded-full' %> flex items-center justify-center text-white text-[10px] font-bold pointer-events-none [[data-selected=true]_&]:bg-aquamarine">
-                            <span class="opacity-0 [[data-selected=true]_&]:opacity-100">✓</span>
-                          </span>
-                          <span contenteditable="true"
-                                class="flex-1 outline-none border-b border-transparent focus:border-slate/30 text-slate font-medium text-sm"
-                                data-role="option"
-                                data-action="input->survey-editor#edit"><%= opt %></span>
-                          <button type="button"
-                                  class="text-slate/40 hover:text-hot-pink disabled:opacity-30 text-xs"
-                                  data-action="click->survey-editor#removeOption">×</button>
-                        </li>
-                      <% end %>
-                    </ul>
-                  <% end %>
-
-                <% when "tap_card" %>
-                  <div data-controller="tap-stack">
-                    <div class="relative h-48 mb-4">
-                      <% Array(c["options"]).each_with_index do |opt, i| %>
-                        <div data-tap-stack-target="card"
-                             class="absolute inset-0 <%= palette[i % palette.size] %> border border-slate/10 rounded-2xl flex flex-col items-center justify-center p-4 text-center shadow">
-                          <div class="display text-xs text-slate tracking-widest mb-2">Card <%= i + 1 %></div>
-                          <div contenteditable="true"
-                               class="text-slate font-semibold outline-none border-b border-transparent focus:border-slate/30"
-                               data-role="option"
-                               data-action="input->survey-editor#edit"><%= opt %></div>
-                        </div>
-                      <% end %>
-                    </div>
-                    <%# Figma: two big circular buttons — slate ✕ disagree, %>
-                    <%# green ✓ agree. No "Unsure". %>
-                    <div class="flex gap-6 justify-center mb-2">
-                      <button type="button"
-                              data-action="click->tap-stack#pick"
-                              data-tap-stack-direction="left"
-                              title="Disagree"
-                              class="bg-slate text-white w-14 h-14 rounded-full text-xl font-bold flex items-center justify-center hover:scale-105 transition">✕</button>
-                      <button type="button"
-                              data-action="click->tap-stack#pick"
-                              data-tap-stack-direction="right"
-                              title="Agree"
-                              class="bg-aquamarine text-white w-14 h-14 rounded-full text-xl font-bold flex items-center justify-center hover:scale-105 transition">✓</button>
-                    </div>
-                    <div class="flex items-center justify-between text-xs text-slate/50">
-                      <span data-tap-stack-target="counter"></span>
-                      <button type="button"
-                              data-action="click->tap-stack#reset"
-                              class="hover:text-hot-pink">↺ Reset stack</button>
-                    </div>
                   </div>
+                </div>
 
-                <% when "range" %>
-                  <% range_steps = Array(c["options"]).size.nonzero? || 5 %>
-                  <%# Figma Range: vertical track 81×329 rx=40.5, fills %>
-                  <%# from top to thumb in green; rest is slate. Label %>
-                  <%# pill sits to the right showing the current step. %>
-                  <div data-controller="range-picker"
-                       data-range-picker-steps-value="<%= range_steps %>"
-                       data-range-picker-orientation-value="vertical"
-                       class="flex gap-6 items-stretch py-4">
-                    <div class="flex flex-col items-center">
-                      <div data-range-picker-target="track"
-                           data-action="pointerdown->range-picker#start"
-                           class="relative w-12 h-72 rounded-full bg-slate overflow-hidden cursor-pointer touch-none">
-                        <div data-range-picker-target="fill"
-                             class="absolute top-0 left-0 right-0 bg-aquamarine transition-[height]"
-                             style="height: 0%"></div>
-                        <div data-range-picker-target="thumb"
-                             class="absolute -translate-y-1/2 left-1/2 -translate-x-1/2 w-14 h-14 bg-aquamarine border-4 border-white rounded-full shadow pointer-events-none transition-[top]"
-                             style="top: 0%"></div>
-                      </div>
-                    </div>
-                    <div class="flex-1 flex flex-col justify-between text-sm">
-                      <ul data-role="option-list" class="space-y-2">
-                        <% Array(c["options"]).each_with_index do |opt, i| %>
-                          <li data-role="option-row"
-                              data-range-picker-target="step"
-                              class="flex items-center gap-2">
-                            <span class="text-slate/40 text-xs w-4"><%= i + 1 %>.</span>
-                            <span contenteditable="true"
-                                  class="flex-1 outline-none border-b border-transparent focus:border-slate/30 text-slate"
-                                  data-role="option"
-                                  data-action="input->survey-editor#edit"><%= opt %></span>
-                            <button type="button"
-                                    class="text-slate/30 hover:text-hot-pink disabled:opacity-30"
-                                    data-action="click->survey-editor#removeOption">×</button>
-                          </li>
-                        <% end %>
-                      </ul>
-                      <div class="display tracking-widest text-xs text-aquamarine bg-aquamarine/10 rounded-full px-3 py-1 self-start"
-                           data-range-picker-target="label"></div>
-                    </div>
-                  </div>
-                  </div>
+              <% when "open_ended" %>
+                <div class="freeform-wrap"
+                     data-controller="freeform"
+                     data-freeform-max-value="200">
+                  <textarea class="freeform-textarea"
+                            placeholder="Type answer…"
+                            data-freeform-target="input"
+                            data-action="input->freeform#update"></textarea>
+                  <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
+                </div>
 
-                <% when "rating" %>
-                  <% n = (Array(c["options"]).size.nonzero? || 5) %>
-                  <% if n >= 7 %>
-                    <%# Figma slider.svg: horizontal pill rx=20, light bg, %>
-                    <%# 5 step dots, chunky vertical green thumb (49×80). %>
-                    <%# Used for NPS-style ratings. Drag-snap to step. %>
-                    <div data-controller="range-picker"
-                         data-range-picker-steps-value="<%= n %>"
-                         class="py-4">
-                      <div class="display tracking-widest text-xs text-aquamarine bg-aquamarine/10 rounded-full px-3 py-1 inline-block mb-3"
-                           data-range-picker-target="label"></div>
-                      <div data-range-picker-target="track"
-                           data-action="pointerdown->range-picker#start"
-                           class="relative h-16 rounded-full bg-slate/[0.06] cursor-pointer touch-none flex items-center px-6">
-                        <div class="flex-1 flex justify-between">
-                          <% n.times do %>
-                            <span class="w-3 h-3 rounded-full bg-slate/25"></span>
-                          <% end %>
-                        </div>
-                        <div data-range-picker-target="thumb"
-                             class="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-20 bg-aquamarine rounded-2xl shadow pointer-events-none flex items-center justify-center transition-[left]"
-                             style="left: 0%">
-                          <div class="flex gap-0.5">
-                            <span class="w-0.5 h-7 bg-white/30"></span>
-                            <span class="w-0.5 h-7 bg-white/30"></span>
-                            <span class="w-0.5 h-7 bg-white/30"></span>
-                          </div>
-                        </div>
-                      </div>
-                      <ul data-role="option-list" class="flex justify-between mt-3 text-xs text-slate/60">
-                        <% Array(c["options"]).each_with_index do |opt, i| %>
-                          <li data-role="option-row"
-                              data-range-picker-target="step"
-                              class="flex items-center gap-1">
-                            <span contenteditable="true"
-                                  class="outline-none border-b border-transparent focus:border-slate/30"
-                                  data-role="option"
-                                  data-action="input->survey-editor#edit"><%= opt %></span>
-                            <button type="button"
-                                    class="text-slate/30 hover:text-hot-pink disabled:opacity-30"
-                                    data-action="click->survey-editor#removeOption">×</button>
-                          </li>
-                        <% end %>
-                      </ul>
-                    </div>
-                  <% else %>
-                    <%# Figma star rating: row of 5 green stars, fill 0..idx %>
-                    <div data-controller="picker"
-                         data-picker-mode-value="stars"
-                         class="flex justify-center gap-3 text-5xl mb-3">
-                      <% n.times do %>
-                        <button type="button"
-                                data-picker-target="item"
-                                data-action="click->picker#pick"
-                                data-selected="false"
-                                class="text-slate/15 transition transform hover:scale-110 data-[selected=true]:text-aquamarine data-[selected=true]:scale-110">★</button>
-                      <% end %>
-                    </div>
-                    <ul data-role="option-list" class="flex justify-center flex-wrap gap-2 text-xs">
-                      <% Array(c["options"]).each_with_index do |opt, i| %>
-                        <li data-role="option-row" class="flex items-center gap-1 bg-slate/[0.04] rounded-full px-2 py-1">
-                          <span class="text-aquamarine"><%= i + 1 %>★</span>
-                          <span contenteditable="true"
-                                class="outline-none border-b border-transparent focus:border-slate/30 text-slate"
-                                data-role="option"
-                                data-action="input->survey-editor#edit"><%= opt %></span>
-                          <button type="button"
-                                  class="text-slate/30 hover:text-hot-pink disabled:opacity-30"
-                                  data-action="click->survey-editor#removeOption">×</button>
-                        </li>
-                      <% end %>
-                    </ul>
-                  <% end %>
+              <% when "welcome_card" %>
+                <%# Welcome uses just title + description; nothing extra. %>
 
-                <% when "yes_no" %>
-                  <%# Figma: two big circular buttons like AgreeDisagree. %>
-                  <div data-controller="picker"
-                       data-picker-mode-value="single"
-                       class="flex gap-6 justify-center">
-                    <button type="button"
-                            data-picker-target="item"
-                            data-action="click->picker#pick"
-                            data-selected="false"
-                            title="No"
-                            class="bg-slate text-white w-14 h-14 rounded-full text-xl font-bold flex items-center justify-center hover:scale-105 transition data-[selected=true]:ring-4 data-[selected=true]:ring-slate/40">✕</button>
-                    <button type="button"
-                            data-picker-target="item"
-                            data-action="click->picker#pick"
-                            data-selected="false"
-                            title="Yes"
-                            class="bg-aquamarine text-white w-14 h-14 rounded-full text-xl font-bold flex items-center justify-center hover:scale-105 transition data-[selected=true]:ring-4 data-[selected=true]:ring-aquamarine/40">✓</button>
-                  </div>
+              <% when "static_page" %>
+                <%# Static page uses activity layout (already rendered above). %>
 
-                <% when "open_ended" %>
-                  <%# Figma textbox: input frame (light slate fill, rx=20), %>
-                  <%# counter pill bottom-right, mic button top-right. %>
-                  <div data-controller="freeform"
-                       data-freeform-max-value="200"
-                       class="bg-slate/[0.06] rounded-2xl p-4 relative">
-                    <textarea data-freeform-target="input"
-                              data-action="input->freeform#update"
-                              placeholder="Type answer…"
-                              class="w-full h-32 outline-none resize-none bg-transparent text-slate placeholder:text-slate/30"></textarea>
-                    <button type="button"
-                            class="absolute top-3 right-3 w-9 h-9 rounded-full bg-aquamarine text-white text-sm flex items-center justify-center shadow"
-                            title="Voice answer (visual only)">🎤</button>
-                    <div class="flex justify-end">
-                      <span data-freeform-target="counter"
-                            class="text-xs text-slate/50 bg-slate/[0.04] rounded-full px-3 py-1">0/200 Characters</span>
-                    </div>
-                  </div>
-                <% end %>
+              <% end %>
               </div>
+
+              <%# ── Add option footer (lives at bottom of right panel) ── %>
+              <% if %w[multiple_choice select_many select_one_grid select_many_grid tap_card range rating].include?(type) %>
+                <div class="mt-auto pt-4 flex items-center gap-3 text-xs">
+                  <button type="button"
+                          class="px-3 py-1 border border-black/15 rounded-full hover:border-green-500 text-black/60"
+                          data-action="click->survey-editor#addOption">+ Add option</button>
+                  <span data-role="option-status" class="text-black/50"></span>
+                </div>
+                <template data-role="option-template">
+                  <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false" data-role="option-row">
+                    <span class="pick-dot" data-role="indicator">✓</span>
+                    <span class="pick-text" contenteditable="true" data-role="option" data-action="input->survey-editor#edit">New option</span>
+                    <button type="button" class="text-black/30 hover:text-red-500 text-xs" data-action="click->survey-editor#removeOption">remove</button>
+                  </li>
+                </template>
+              <% end %>
             </div>
-            <% end %>
           </div>
-
-          <%# ───── Edit footer (option add/status, lives on dark) ───── %>
-          <% if %w[multiple_choice select_many select_one_grid select_many_grid range rating].include?(type) %>
-            <div class="flex items-center gap-3 px-4 pb-3">
-              <button type="button"
-                      class="text-xs px-3 py-1 border border-smoke/20 rounded-full hover:border-sky-blue text-smoke/80 disabled:opacity-40"
-                      data-action="click->survey-editor#addOption">+ Add option</button>
-              <span data-role="option-status" class="text-xs text-smoke/50"></span>
-            </div>
-
-            <template data-role="option-template">
-              <li data-role="option-row" class="flex items-center gap-3 bg-white border border-slate/10 rounded-full pl-2 pr-4 py-1">
-                <span class="bg-aquamarine w-9 h-9 rounded-full flex items-center justify-center text-slate font-bold">+</span>
-                <span contenteditable="true"
-                      class="flex-1 outline-none border-b border-slate/30 text-slate font-medium"
-                      data-role="option"
-                      data-action="input->survey-editor#edit">New option</span>
-                <button type="button"
-                        class="text-slate/40 hover:text-hot-pink text-xs"
-                        data-action="click->survey-editor#removeOption">remove</button>
-              </li>
-            </template>
-          <% end %>
         </li>
       <% end %>
     </ol>
 
-    <div class="mt-7 flex items-center justify-between flex-wrap gap-3">
+    <div class="max-w-[900px] mx-auto mt-8 flex items-center justify-between flex-wrap gap-3">
       <%= link_to "← Generate another", root_path,
-            class: "text-smoke/70 hover:text-hot-pink text-sm" %>
+            class: "text-white/70 hover:text-green-500 text-sm" %>
       <div class="flex items-center gap-3">
-        <span data-survey-editor-target="status" class="text-xs text-smoke/50"></span>
+        <span data-survey-editor-target="status" class="text-xs text-white/50"></span>
         <button type="button"
-                class="display bg-light-yellow text-slate tracking-widest px-5 py-2 rounded-full hover:brightness-95 disabled:opacity-50"
+                class="bg-green-500 text-white tracking-widest px-5 py-2 rounded-2xl hover:bg-green-dark disabled:opacity-50 font-bold"
+                style="font-family:'Alata',sans-serif"
                 data-action="click->survey-editor#save"
                 data-survey-editor-target="saveButton">Save changes</button>
         <% if survey["id"] %>
           <%= link_to "Permalink", survey_path(survey["id"]),
-                class: "text-smoke/70 hover:text-hot-pink text-sm" %>
+                class: "text-white/70 hover:text-green-500 text-sm" %>
         <% end %>
       </div>
     </div>
