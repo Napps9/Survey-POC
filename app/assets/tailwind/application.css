@@ -554,13 +554,13 @@
 /* ══════════════════════════════════════════════════
    SCREEN 2 — RESULTS
 ══════════════════════════════════════════════════ */
-.results-rainbow { position: relative; }
-.results-rainbow::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 100;
+.results-rainbow {
   border: 3px solid transparent;
-  background:
-    linear-gradient(#272D4A, #272D4A) padding-box,
-    linear-gradient(135deg, #00e5ff, #00e676, #a8ff56, #ffcc00, #ff6b35, #FF1E6F, #615BF5, #00e5ff) border-box;
+  background-image:
+    linear-gradient(#272D4A, #272D4A),
+    linear-gradient(135deg, #00e5ff, #00e676, #a8ff56, #ffcc00, #ff6b35, #FF1E6F, #615BF5, #00e5ff);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .brief-strip {
