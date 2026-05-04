@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Playverto Survey Generator" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <link rel="manifest" href="/manifest.json">
+    <%= favicon_link_tag "favicon.svg", type: "image/svg+xml" %>
+    <%= favicon_link_tag "favicon.svg", rel: "apple-touch-icon", type: "image/svg+xml" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body style="height:100vh;overflow:hidden;background:#272D4A;color:#F7F7F7;font-family:'ABeeZee',sans-serif;">
+    <%= yield %>
+  </body>
+</html>
