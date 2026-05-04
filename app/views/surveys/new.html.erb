@@ -1,4 +1,71 @@
-<div>
+<div data-controller="generating">
+
+  <%# ── Generating overlay — hidden until form submits ── %>
+  <div class="fixed inset-0 z-50 hidden flex-col"
+       style="background:#1C2034;"
+       data-generating-target="overlay">
+
+    <%# Nav %>
+    <nav style="height:54px;background:#1C2034;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;"
+         class="flex items-center justify-between px-9">
+      <%= image_tag "playverto.svg", alt: "Playverto", class: "h-7 w-auto" %>
+      <span style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.45);">Survey Generator</span>
+    </nav>
+
+    <%# Body %>
+    <div class="flex-1 flex flex-col items-center justify-center gap-10 px-12 py-8">
+
+      <div class="gen-tagline">✦ &nbsp;Building your Verto</div>
+
+      <div class="text-center">
+        <div class="gen-hero-theme" data-generating-target="heroTheme"></div>
+        <div style="font-family:'ABeeZee',sans-serif;font-size:18px;color:rgba(255,255,255,0.4);letter-spacing:-0.2px;"
+             data-generating-target="heroAge"></div>
+      </div>
+
+      <div class="flex gap-2.5 flex-wrap justify-center">
+        <div class="gen-pill">
+          <div class="gen-pill-dot" style="background:#00A950;"></div>
+          <span class="gen-pill-label">Audience</span>
+          <span data-generating-target="pillAudience"></span>
+        </div>
+        <div class="gen-pill">
+          <div class="gen-pill-dot" style="background:#FF1E6F;"></div>
+          <span class="gen-pill-label">Tone</span>
+          <span>Conversational</span>
+        </div>
+        <div class="gen-pill">
+          <div class="gen-pill-dot" style="background:#0CA7FF;"></div>
+          <span class="gen-pill-label">Cards</span>
+          <span>10–15</span>
+        </div>
+      </div>
+
+      <div class="gen-insight" data-generating-target="insightText"></div>
+
+      <div class="gen-steps-row">
+        <div class="gen-step" data-state="done" data-generating-target="step1">
+          <div class="step-dot">✓</div>
+          <span>Brief read</span>
+        </div>
+        <div class="gen-step" data-state="active" data-generating-target="step2">
+          <div class="step-dot"></div>
+          <span>Writing questions</span>
+        </div>
+        <div class="gen-step" data-state="pending" data-generating-target="step3">
+          <div class="step-dot"></div>
+          <span>Picking formats</span>
+        </div>
+        <div class="gen-step" data-state="pending" data-generating-target="step4">
+          <div class="step-dot"></div>
+          <span>Applying design</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <%# ── Form ── %>
   <h1 class="display text-5xl mb-2">AI Survey Generator</h1>
   <p class="text-smoke/70 mb-8">
     Tell us the brief — we'll draft a survey that follows the Playverto design rules.
@@ -10,7 +77,8 @@
     </div>
   <% end %>
 
-  <%= form_with url: generate_survey_path, method: :post, class: "space-y-5" do |f| %>
+  <%= form_with url: generate_survey_path, method: :post, class: "space-y-5",
+        data: { action: "submit->generating#show" } do |f| %>
     <div>
       <%= f.label :theme, "Theme", class: "display block text-sm text-hot-pink tracking-widest mb-2" %>
       <%= f.text_field :theme,
