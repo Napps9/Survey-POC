@@ -708,6 +708,29 @@
 }
 .type-opt.active .type-opt-radio { background: #00A950; border-color: #00A950; }
 .type-opt.active .type-opt-radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
+
+/* Relevance score badge injected by type_panel_controller */
+.type-opt-score {
+  font-family: "Alata", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.38);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.type-opt-score[data-primary="true"] {
+  background: rgba(0,169,80,0.15);
+  color: #00A950;
+}
+.type-opt.active .type-opt-score {
+  background: rgba(0,169,80,0.2);
+  color: #00A950;
+}
+
 .type-panel-footer {
   flex-shrink: 0; padding: 10px 12px 14px;
   border-top: 1px solid rgba(255,255,255,0.07);
