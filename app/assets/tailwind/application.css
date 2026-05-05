@@ -49,19 +49,35 @@
 .split-card {
   display: flex;
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  border-radius: 20px;
+  max-width: 100%;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
   background: white;
-  min-height: 460px;
+  min-height: 420px;
 }
 .split-left {
-  width: 320px;
+  width: 38%;
   flex-shrink: 0;
   position: relative;
-  background: var(--color-navy-750);
+  background: #2E3564;          /* design system navy-750 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+/* 2×3 placeholder grid shown on the left panel */
+.split-left-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 68%;
+  margin-top: 20px;             /* push below progress/tagline */
+  opacity: 0.55;
+}
+.split-left-grid-cell {
+  height: 56px;
+  border-radius: 10px;
 }
 .split-left-img {
   position: absolute; inset: 0;
@@ -80,6 +96,7 @@
   background: rgba(0,0,0,0.35);
   border-radius: 8px;
   overflow: hidden;
+  z-index: 2;
 }
 .panel-progress-fill { height: 100%; background: white; border-radius: 8px; }
 .panel-tagline {
@@ -91,6 +108,7 @@
   font-weight: 700;
   color: rgba(255,255,255,0.65);
   letter-spacing: 0.05em;
+  z-index: 2;
 }
 
 .split-right {
@@ -700,6 +718,20 @@
 }
 .phone-bottom .activity-title { font-size: 14px; }
 .phone-bottom .activity-desc  { font-size: 11px; }
+
+/* Survey card wrapper (for the results show page) */
+.survey-card-wrap {
+  cursor: pointer;
+}
+.survey-card-wrap .split-card {
+  border: 2px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.survey-card-wrap:hover .split-card { transform: translateY(-1px); }
+.survey-card-wrap.selected .split-card {
+  border-color: #FF1E6F;
+  box-shadow: 0 0 0 3px rgba(255,30,111,0.2), 0 16px 40px rgba(0,0,0,0.25);
+}
 
 /* Compact survey card */
 .s-card {

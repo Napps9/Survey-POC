@@ -198,24 +198,6 @@ export default class extends Controller {
     const eyebrow = card.querySelector(".q-eyebrow")
     if (eyebrow && meta.label) eyebrow.textContent = meta.label
 
-    // Toggle dark phone-top for tap_card / open_ended; otherwise gradient
-    const phoneTop = card.querySelector(".phone-top")
-    if (phoneTop) {
-      const dark = (type === "tap_card" || type === "open_ended")
-      phoneTop.classList.toggle("phone-top-dark", dark)
-      let icon = phoneTop.querySelector(".phone-top-icon")
-      if (dark) {
-        if (!icon) {
-          icon = document.createElement("div")
-          icon.className = "phone-top-icon"
-          phoneTop.appendChild(icon)
-        }
-        icon.textContent = type === "tap_card" ? "↔" : "✎"
-      } else if (icon) {
-        icon.remove()
-      }
-    }
-
     card.dataset.cardType = type
 
     if (card === this.activeCardEl) {
