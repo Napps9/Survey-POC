@@ -23,7 +23,7 @@
 %>
 
 <div class="results-rainbow flex flex-col h-screen"
-     data-controller="type-panel">
+     data-controller="type-panel preview-verto">
 
   <%# Nav %>
   <nav style="height:54px;background:#1C2034;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;"
@@ -294,12 +294,21 @@
           <strong style="color:#fff;" data-type-panel-target="cardCount"><%= cards.size %> cards</strong>
           &nbsp;·&nbsp; Estimated ~<%= est_min %> min<%= est_min != 1 ? "s" : "" %>
         </div>
-        <%= link_to root_path,
-              style: "padding:10px 26px;border-radius:16px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s;",
-              onmouseover: "this.style.background='#009044'",
-              onmouseout:  "this.style.background='#00A950'" do %>
-          Publish Verto →
-        <% end %>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button type="button"
+                  style="padding:10px 22px;border-radius:16px;background:transparent;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size:13px;border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all 0.15s;"
+                  onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.35)'"
+                  onmouseout="this.style.color='rgba(255,255,255,0.65)';this.style.borderColor='rgba(255,255,255,0.15)'"
+                  data-action="click->preview-verto#open">
+            ▶ Preview Verto
+          </button>
+          <%= link_to root_path,
+                style: "padding:10px 26px;border-radius:16px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s;",
+                onmouseover: "this.style.background='#009044'",
+                onmouseout:  "this.style.background='#00A950'" do %>
+            Publish Verto →
+          <% end %>
+        </div>
       </div>
 
     </div><%# /cards column %>
@@ -379,5 +388,78 @@
     <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#00A950;margin-right:7px;vertical-align:middle;"></span>
     <span data-type-panel-target="toastMsg"></span>
   </div>
+
+  <%# ── Preview Verto overlay ── %>
+  <div class="preview-overlay hidden"
+       data-preview-verto-target="overlay">
+
+    <%# Nav %>
+    <nav class="preview-nav">
+      <%= image_tag "playverto.svg", alt: "Playverto", class: "h-6 w-auto" %>
+      <span class="preview-nav-title">Preview Verto</span>
+      <button type="button" class="preview-close-btn"
+              data-action="click->preview-verto#close">✕ Close</button>
+    </nav>
+
+    <%# Card display area %>
+    <div class="preview-body">
+
+      <%# One preview-card div per survey card — only the active one is shown %>
+      <%
+        prev_q_idx = 0
+        prev_total = cards.count { |c| !%w[welcome_card static_page].include?(c["type"]) }
+      %>
+      <% cards.each_with_index do |pcard, pidx| %>
+        <%
+          ptype    = pcard["type"].to_s
+          p_is_q   = !%w[welcome_card static_page].include?(ptype)
+          prev_q_idx += 1 if p_is_q
+          pprogress = prev_total > 0 ? ((prev_q_idx.to_f / prev_total) * 100).round : 5
+          pprogress = 5 unless p_is_q
+        %>
+        <div class="preview-card" data-preview-verto-target="card">
+          <%= render "surveys/preview_card",
+                card: pcard,
+                progress: pprogress %>
+        </div>
+      <% end %>
+
+      <%# Thank you screen — shown after Finish %>
+      <div class="preview-thankyou" data-preview-verto-target="thankyou">
+        <div class="preview-thankyou-emoji">🎉</div>
+        <div class="preview-thankyou-title">Thank you!</div>
+        <div class="preview-thankyou-sub">
+          Your responses have been recorded.<br>Thanks for completing this Verto.
+        </div>
+        <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.25);">
+          Powered by Playverto
+        </div>
+      </div>
+
+    </div><%# /preview-body %>
+
+    <%# Footer navigation %>
+    <div class="preview-footer">
+      <button type="button" class="preview-btn preview-btn-back"
+              data-preview-verto-target="backBtn"
+              data-action="click->preview-verto#back">← Back</button>
+
+      <span class="preview-progress-text"
+            data-preview-verto-target="progress"></span>
+
+      <button type="button" class="preview-btn preview-btn-next"
+              data-preview-verto-target="nextBtn"
+              data-action="click->preview-verto#next">Next →</button>
+
+      <button type="button" class="preview-btn preview-btn-finish hidden"
+              data-preview-verto-target="finishBtn"
+              data-action="click->preview-verto#finish">Finish ✓</button>
+
+      <button type="button" class="preview-btn preview-btn-return hidden"
+              data-preview-verto-target="returnBtn"
+              data-action="click->preview-verto#returnToDesign">← Back to Design</button>
+    </div>
+
+  </div><%# /preview-overlay %>
 
 </div><%# /results-rainbow %>

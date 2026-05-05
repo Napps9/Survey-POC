@@ -1,0 +1,215 @@
+<%
+  type    = card["type"].to_s
+  eyebrow = {
+    "multiple_choice"  => "Choose one",
+    "select_many"      => "Choose all that apply",
+    "select_one_grid"  => "Choose one",
+    "select_many_grid" => "Choose all that apply",
+    "tap_card"         => "Swipe to respond",
+    "range"            => "Drag the slider",
+    "rating"           => "Tap to rate",
+    "yes_no"           => "Choose one",
+    "open_ended"       => "Type your answer",
+    "welcome_card"     => "",
+    "static_page"      => ""
+  }[type] || type.tr("_", " ")
+  is_q = !%w[welcome_card static_page].include?(type)
+%>
+
+<div class="split-card">
+
+  <%# ── Left panel: illustration ── %>
+  <div class="split-left">
+    <div class="panel-progress">
+      <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
+    </div>
+    <div class="panel-tagline">Build the change</div>
+    <div class="split-left-illustration">
+      <%= interaction_illustration(type) %>
+    </div>
+  </div>
+
+  <%# ── Right panel: question + interactive component ── %>
+  <div class="split-right">
+
+    <% if is_q %>
+      <div class="q-eyebrow"><%= eyebrow %></div>
+    <% end %>
+
+    <% if type == "static_page" %>
+      <div class="activity-tag">Activity</div>
+    <% end %>
+
+    <div class="<%= type == 'static_page' ? 'activity-title' : 'q-title' %>">
+      <%= card["text"] %>
+    </div>
+
+    <% if card["description"].present? %>
+      <div class="<%= type == 'static_page' ? 'activity-desc' : 'q-subtitle' %>">
+        <%= card["description"] %>
+      </div>
+    <% end %>
+
+    <%# Interactive component — no edit chrome (no delete/add buttons, no contenteditable) %>
+    <div class="mt-2">
+      <% case type
+         when "multiple_choice", "select_many" %>
+        <% items = Array(card["options"]) %>
+        <% multi = (type == "select_many") %>
+        <ul class="pick-list"
+            data-controller="picker"
+            data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
+          <% items.each do |opt| %>
+            <li class="pick-item"
+                data-picker-target="item"
+                data-action="click->picker#pick"
+                data-selected="false">
+              <span class="<%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
+              <span class="pick-text"><%= opt %></span>
+            </li>
+          <% end %>
+        </ul>
+
+      <% when "yes_no" %>
+        <ul class="pick-list"
+            data-controller="picker"
+            data-picker-mode-value="single">
+          <% %w[Yes No].each do |opt| %>
+            <li class="pick-item"
+                data-picker-target="item"
+                data-action="click->picker#pick"
+                data-selected="false">
+              <span class="pick-dot">✓</span>
+              <span class="pick-text"><%= opt %></span>
+            </li>
+          <% end %>
+        </ul>
+
+      <% when "select_one_grid", "select_many_grid" %>
+        <% opts = Array(card["options"]) %>
+        <% cols = opts.size >= 5 ? 3 : 2 %>
+        <% multi = (type == "select_many_grid") %>
+        <ul class="choice-grid choice-grid-<%= cols %>"
+            data-controller="picker"
+            data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
+          <% opts.each_with_index do |opt, i| %>
+            <li class="choice-card"
+                data-picker-target="item"
+                data-action="click->picker#pick"
+                data-selected="false">
+              <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>"></div>
+              <div class="choice-overlay"></div>
+              <div class="choice-tick">✓</div>
+              <div class="choice-label"><%= opt %></div>
+            </li>
+          <% end %>
+        </ul>
+
+      <% when "tap_card" %>
+        <div class="rotate-wrap" data-controller="tap-stack">
+          <div class="rotate-card-stack">
+            <% Array(card["options"]).each_with_index do |opt, i| %>
+              <div class="rotate-card"
+                   data-tap-stack-target="card"
+                   style="background:linear-gradient(135deg,<%= ['#d4edda','#d1ecf1','#fff3cd','#f8d7da','#e2d9f3'][i % 5] %>,<%= ['#a8d5b5','#9fd5df','#ffd88a','#f5a8b0','#c3aee8'][i % 5] %>);">
+                <span><%= opt %></span>
+              </div>
+            <% end %>
+          </div>
+          <div class="swipe-indicator">
+            <span style="color:#D80027;font-weight:700">← No</span>
+            <span class="mx-3">drag card to answer</span>
+            <span style="color:#00A950;font-weight:700">Yes →</span>
+          </div>
+          <div class="rotate-actions">
+            <button type="button" class="rotate-action-btn rotate-action-no"
+                    data-action="click->tap-stack#pick"
+                    data-tap-stack-direction="left">✕</button>
+            <button type="button" class="rotate-action-btn rotate-action-yes"
+                    data-action="click->tap-stack#pick"
+                    data-tap-stack-direction="right">✓</button>
+          </div>
+          <div class="text-xs text-black/40 flex items-center gap-3">
+            <span data-tap-stack-target="counter"></span>
+            <button type="button" class="hover:text-green-500"
+                    data-action="click->tap-stack#reset">↺ Reset</button>
+          </div>
+        </div>
+
+      <% when "range" %>
+        <% labels = Array(card["options"]) %>
+        <% n = [labels.size, 2].max %>
+        <div class="slider-wrap"
+             data-controller="slider"
+             data-slider-steps-value="<%= n %>">
+          <div class="slider-track-wrap">
+            <div class="slider-tooltip" data-slider-target="tooltip" style="left:50%;">
+              <span class="slider-tooltip-text" data-slider-target="tooltipText"></span>
+            </div>
+            <div class="slider-track"
+                 data-slider-target="track"
+                 data-action="pointerdown->slider#start">
+              <% n.times do |i| %>
+                <div class="s-dot" data-slider-target="dot"
+                     style="left:<%= (i.to_f / (n - 1) * 100).round(2) %>%"></div>
+              <% end %>
+              <div class="slider-thumb" data-slider-target="thumb" style="left:50%;">
+                <div class="s-line"></div><div class="s-line"></div><div class="s-line"></div>
+              </div>
+            </div>
+          </div>
+          <div class="slider-labels">
+            <% labels.each do |opt| %>
+              <span class="slider-label-text"><%= opt %></span>
+            <% end %>
+          </div>
+        </div>
+
+      <% when "rating" %>
+        <% labels    = Array(card["options"]) %>
+        <% first_lbl = labels.first || "Poor" %>
+        <% last_lbl  = labels.last  || "Excellent" %>
+        <div class="rating-wrap" data-controller="rating">
+          <div class="rating-stars">
+            <% 5.times do |i| %>
+              <span class="rating-star"
+                    data-rating-target="star"
+                    data-rating-index="<%= i %>"
+                    data-action="click->rating#pick mouseover->rating#hover mouseout->rating#unhover">☆</span>
+            <% end %>
+          </div>
+          <div class="rating-labels">
+            <span class="rating-label"><%= first_lbl %></span>
+            <span class="rating-label"><%= last_lbl %></span>
+          </div>
+        </div>
+
+      <% when "open_ended" %>
+        <div class="freeform-wrap"
+             data-controller="freeform"
+             data-freeform-max-value="200">
+          <textarea class="freeform-textarea"
+                    placeholder="Type answer…"
+                    data-freeform-target="input"
+                    data-action="input->freeform#update"></textarea>
+          <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
+        </div>
+
+      <% when "static_page" %>
+        <div class="activity-check"
+             onclick="this.querySelector('.check-box').dataset.selected = this.querySelector('.check-box').dataset.selected === 'true' ? 'false' : 'true'">
+          <div class="check-box" data-selected="false">✓</div>
+          <div class="check-texts">
+            <div class="check-main">Mark as complete</div>
+            <div class="check-sub">Tap when you've finished the activity</div>
+          </div>
+        </div>
+
+      <% when "welcome_card" %>
+        <%# Welcome card — no interactive component %>
+
+      <% end %>
+    </div>
+
+  </div><%# /split-right %>
+</div><%# /split-card %>
