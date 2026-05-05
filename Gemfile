@@ -32,7 +32,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 
 # Anthropic Claude SDK
-gem "anthropic", "~> 1.13"
+gem "anthropic", "~> 1.37"
 gem "csv"
 # Load .env in development
 gem "dotenv-rails", groups: [:development, :test]
