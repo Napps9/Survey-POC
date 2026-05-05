@@ -1,5 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
 
+// Calibrated for the typical Claude survey-generation latency (~8–14s).
+// If the API takes longer, the final step keeps pulsing — Turbo will
+// unmount this overlay when the response arrives.
+const STEP2_DONE_MS = 4500   // "Writing questions" → done
+const STEP3_DONE_MS = 9000   // "Picking formats"   → done
+const STEP4_HINT_MS = 13000  // soften the message; we're still waiting
+
 export default class extends Controller {
   static targets = [
     "overlay", "heroTheme", "heroAge", "insightText", "pillAudience",
@@ -7,13 +14,13 @@ export default class extends Controller {
   ]
 
   show(event) {
-    const form   = this.element.querySelector("form")
-    const theme  = form?.querySelector('[name="theme"]')?.value.trim()       || "Your survey"
-    const age    = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
-    const insight= form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
+    const form    = this.element.querySelector("form")
+    const theme   = form?.querySelector('[name="theme"]')?.value.trim()        || "Your survey"
+    const age     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
+    const insight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
 
-    this.heroThemeTarget.innerHTML  = `<em>${this._esc(theme)}</em>`
-    this.heroAgeTarget.textContent  = age ? `for ${age} year olds` : ""
+    this.heroThemeTarget.innerHTML     = `<em>${this._esc(theme)}</em>`
+    this.heroAgeTarget.textContent     = age ? `for ${age} year olds` : ""
     this.insightTextTarget.textContent = insight ? `"${insight}"` : ""
     if (this.hasPillAudienceTarget) this.pillAudienceTarget.textContent = age
 
@@ -24,19 +31,22 @@ export default class extends Controller {
   }
 
   _runSteps() {
-    setTimeout(() => this._done(this.step2Target), 1100)
-    setTimeout(() => this._active(this.step3Target), 1200)
+    // Step 2: Writing questions → done; step 3 active
+    setTimeout(() => {
+      this._done(this.step2Target)
+      this._active(this.step3Target)
+    }, STEP2_DONE_MS)
+
+    // Step 3: Picking formats → done; step 4 active
     setTimeout(() => {
       this._done(this.step3Target)
       this._active(this.step4Target)
-      this.heroThemeTarget.textContent = "Almost there…"
-      this.heroAgeTarget.textContent   = "applying Playverto design rules"
-    }, 2400)
+    }, STEP3_DONE_MS)
+
+    // If the API is taking a while, change the message but keep step 4 pulsing
     setTimeout(() => {
-      this._done(this.step4Target)
-      this.heroThemeTarget.textContent = "Your Verto is ready!"
-      this.heroAgeTarget.textContent   = ""
-    }, 3600)
+      this.heroAgeTarget.textContent = "applying Playverto design rules…"
+    }, STEP4_HINT_MS)
   }
 
   _done(el) {
