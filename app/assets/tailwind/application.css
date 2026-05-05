@@ -58,10 +58,10 @@
   background: white;
 }
 .split-left {
-  width: 38%;
+  width: 401px;                 /* 845 total − 444 right = 401 */
   flex-shrink: 0;
   position: relative;
-  background: #2E3564;          /* design system navy-750 */
+  background: #2E3564;
   display: flex;
   flex-direction: column;
   align-items: center;
