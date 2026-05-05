@@ -1,22 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
 
 const TYPE_META = {
-  range:            { badge: "RANGE",         css: "sb-range",    label: "DRAG THE SLIDER"       },
-  rating:           { badge: "RATING",         css: "sb-range",    label: "DRAG THE SLIDER"       },
-  multiple_choice:  { badge: "PICK ONE",       css: "sb-range",    label: "CHOOSE ONE"            },
-  select_many:      { badge: "SELECT MANY",    css: "sb-range",    label: "CHOOSE ALL THAT APPLY" },
-  yes_no:           { badge: "YES / NO",       css: "sb-range",    label: "CHOOSE ONE"            },
-  select_one_grid:  { badge: "IMAGE GRID",     css: "sb-choice",   label: "CHOOSE ONE"            },
-  select_many_grid: { badge: "IMAGE GRID",     css: "sb-choice",   label: "CHOOSE ALL THAT APPLY" },
-  tap_card:         { badge: "SWIPE",          css: "sb-swipe",    label: "SWIPE TO RESPOND"      },
-  open_ended:       { badge: "OPEN TEXT",      css: "sb-text",     label: "TYPE YOUR ANSWER"      },
-  static_page:      { badge: "ACTIVITY",       css: "sb-activity", label: "COMPLETE THE TASK"     },
-  welcome_card:     { badge: "WELCOME CARD",   css: "sb-welcome",  label: ""                      },
+  range:            { badge: "RANGE",         css: "sb-range",    label: "DRAG THE SLIDER",       eyebrow: "Drag the slider"        },
+  rating:           { badge: "RATING",         css: "sb-range",    label: "DRAG THE SLIDER",       eyebrow: "Drag the slider"        },
+  multiple_choice:  { badge: "PICK ONE",       css: "sb-range",    label: "CHOOSE ONE",            eyebrow: "Choose one"             },
+  select_many:      { badge: "SELECT MANY",    css: "sb-range",    label: "CHOOSE ALL THAT APPLY", eyebrow: "Choose all that apply"  },
+  yes_no:           { badge: "YES / NO",       css: "sb-range",    label: "CHOOSE ONE",            eyebrow: "Choose one"             },
+  select_one_grid:  { badge: "IMAGE GRID",     css: "sb-choice",   label: "CHOOSE ONE",            eyebrow: "Choose one"             },
+  select_many_grid: { badge: "IMAGE GRID",     css: "sb-choice",   label: "CHOOSE ALL THAT APPLY", eyebrow: "Choose all that apply"  },
+  tap_card:         { badge: "SWIPE",          css: "sb-swipe",    label: "SWIPE TO RESPOND",      eyebrow: "Swipe to respond"       },
+  open_ended:       { badge: "OPEN TEXT",      css: "sb-text",     label: "TYPE YOUR ANSWER",      eyebrow: "Type your answer"       },
+  static_page:      { badge: "ACTIVITY",       css: "sb-activity", label: "COMPLETE THE TASK",     eyebrow: ""                       },
+  welcome_card:     { badge: "WELCOME CARD",   css: "sb-welcome",  label: "",                      eyebrow: ""                       },
 }
 
-// Ordered list of valid alternative types per source type, with relevance score.
-// Score 100 = the AI's chosen type (primary fit).
-// Lower scores = valid but less ideal substitutes per the Do's & Don'ts rules.
 const COMPATIBILITY = {
   multiple_choice: [
     { type: "multiple_choice",  score: 100, note: "Best fit — discrete single-pick list" },
@@ -80,6 +77,144 @@ const COMPATIBILITY = {
     { type: "static_page",      score: 100, note: "Best fit — off-screen activity break" },
     { type: "welcome_card",     score: 60,  note: "Use as an intro card instead" },
   ],
+}
+
+const DEFAULT_OPTIONS = {
+  range:            ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
+  rating:           ["Poor", "Fair", "Good", "Great", "Excellent"],
+  multiple_choice:  ["Option A", "Option B", "Option C"],
+  select_many:      ["Option A", "Option B", "Option C", "Option D"],
+  yes_no:           ["Yes", "No"],
+  select_one_grid:  ["A", "B", "C", "D"],
+  select_many_grid: ["A", "B", "C", "D"],
+  tap_card:         ["Statement 1", "Statement 2", "Statement 3"],
+  open_ended:       [],
+  static_page:      [],
+  welcome_card:     [],
+}
+
+const SWIPE_FILLS = [
+  ["#d4edda","#a8d5b5"], ["#d1ecf1","#9fd5df"], ["#fff3cd","#ffd88a"],
+  ["#f8d7da","#f5a8b0"], ["#e2d9f3","#c3aee8"]
+]
+
+function esc(s) {
+  return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;")
+                       .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+}
+
+// HTML builders for the right-side interactive component on each card
+const COMPONENTS = {
+  multiple_choice: (opts) => `
+    <ul class="pick-list" data-controller="picker" data-picker-mode-value="single">
+      ${opts.map(o => `
+        <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false">
+          <span class="pick-dot">✓</span>
+          <span class="pick-text">${esc(o)}</span>
+        </li>`).join("")}
+    </ul>`,
+
+  select_many: (opts) => `
+    <ul class="pick-list" data-controller="picker" data-picker-mode-value="multi">
+      ${opts.map(o => `
+        <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false">
+          <span class="pick-square">✓</span>
+          <span class="pick-text">${esc(o)}</span>
+        </li>`).join("")}
+    </ul>`,
+
+  yes_no: () => `
+    <ul class="pick-list" data-controller="picker" data-picker-mode-value="single">
+      ${["Yes","No"].map(o => `
+        <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false">
+          <span class="pick-dot">✓</span>
+          <span class="pick-text">${o}</span>
+        </li>`).join("")}
+    </ul>`,
+
+  select_one_grid:  (opts) => gridHtml(opts, "single"),
+  select_many_grid: (opts) => gridHtml(opts, "multi"),
+
+  tap_card: (opts) => `
+    <div class="rotate-wrap" data-controller="tap-stack">
+      <div class="rotate-card-stack">
+        ${opts.map((o,i) => {
+          const [a,b] = SWIPE_FILLS[i % SWIPE_FILLS.length]
+          return `<div class="rotate-card" data-tap-stack-target="card"
+                       style="background:linear-gradient(135deg,${a},${b});">
+                    <span>${esc(o)}</span>
+                  </div>`
+        }).join("")}
+      </div>
+      <div class="swipe-indicator">
+        <span style="color:#D80027;font-weight:700">← No</span>
+        <span class="mx-3">drag card to answer</span>
+        <span style="color:#00A950;font-weight:700">Yes →</span>
+      </div>
+      <div class="rotate-actions">
+        <button type="button" class="rotate-action-btn rotate-action-no"
+                data-action="click->tap-stack#pick" data-tap-stack-direction="left">✕</button>
+        <button type="button" class="rotate-action-btn rotate-action-yes"
+                data-action="click->tap-stack#pick" data-tap-stack-direction="right">✓</button>
+      </div>
+    </div>`,
+
+  range:  (opts) => sliderHtml(opts),
+  rating: (opts) => sliderHtml(opts),
+
+  open_ended: () => `
+    <div class="freeform-wrap" data-controller="freeform" data-freeform-max-value="200">
+      <textarea class="freeform-textarea" placeholder="Type answer…"
+                data-freeform-target="input"
+                data-action="input->freeform#update"></textarea>
+      <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
+    </div>`,
+
+  welcome_card: () => "",
+  static_page:  () => "",
+}
+
+function gridHtml(opts, mode) {
+  const cols = opts.length >= 5 ? 3 : 2
+  const indicator = mode === "multi" ? "pick-square" : "pick-dot"
+  return `
+    <ul class="choice-grid choice-grid-${cols}" data-controller="picker"
+        data-picker-mode-value="${mode}">
+      ${opts.map((o,i) => `
+        <li class="choice-card" data-picker-target="item"
+            data-action="click->picker#pick" data-selected="false">
+          <div class="choice-card-bg choice-bg-${(i % 6) + 1}"></div>
+          <div class="choice-overlay"></div>
+          <div class="choice-tick">✓</div>
+          <div class="choice-label">${esc(o)}</div>
+        </li>`).join("")}
+    </ul>`
+}
+
+function sliderHtml(opts) {
+  const labels = opts.length ? opts : DEFAULT_OPTIONS.range
+  const n = Math.max(labels.length, 2)
+  const dots = Array.from({length: n}, (_, i) =>
+    `<div class="s-dot" data-slider-target="dot" style="left:${(i / (n - 1) * 100).toFixed(2)}%"></div>`
+  ).join("")
+  return `
+    <div class="slider-wrap" data-controller="slider" data-slider-steps-value="${n}">
+      <div class="slider-track-wrap">
+        <div class="slider-tooltip" data-slider-target="tooltip" style="left:50%;">
+          <span class="slider-tooltip-text" data-slider-target="tooltipText"></span>
+        </div>
+        <div class="slider-track" data-slider-target="track"
+             data-action="pointerdown->slider#start">
+          ${dots}
+          <div class="slider-thumb" data-slider-target="thumb" style="left:50%;">
+            <div class="s-line"></div><div class="s-line"></div><div class="s-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="slider-labels">
+        ${labels.map(o => `<span class="slider-label-text">${esc(o)}</span>`).join("")}
+      </div>
+    </div>`
 }
 
 export default class extends Controller {
@@ -150,25 +285,18 @@ export default class extends Controller {
 
   _renderCompatibleTypes(cardType) {
     const compat = COMPATIBILITY[cardType] || [{ type: cardType, score: 100, note: "" }]
-    const compatMap = {}
-    compat.forEach(c => { compatMap[c.type] = c })
+    const compatMap = Object.fromEntries(compat.map(c => [c.type, c]))
 
     this.typeOptTargets.forEach(opt => {
       const type  = opt.dataset.type
       const entry = compatMap[type]
 
-      if (!entry) {
-        opt.style.display = "none"
-        return
-      }
+      if (!entry) { opt.style.display = "none"; return }
 
       opt.style.display = ""
       opt.classList.toggle("active", type === cardType)
 
-      // Remove any previously injected score badge
       opt.querySelector(".type-opt-score")?.remove()
-
-      // Inject score badge
       const badge = document.createElement("div")
       badge.className = "type-opt-score"
       if (type === cardType) {
@@ -177,12 +305,9 @@ export default class extends Controller {
       } else {
         badge.textContent = `${entry.score}%`
       }
-
-      // Insert before the radio dot
       const radio = opt.querySelector(".type-opt-radio")
       if (radio) radio.before(badge)
 
-      // Update tooltip / description line with the note
       const descEl = opt.querySelector(".type-opt-desc")
       if (descEl && entry.note) descEl.textContent = entry.note
     })
@@ -192,11 +317,20 @@ export default class extends Controller {
     const meta = TYPE_META[type]
     if (!meta) return
 
+    // 1. Update badge + eyebrow
     const badge = card.querySelector(".s-badge")
     if (badge) { badge.textContent = meta.badge; badge.className = `s-badge ${meta.css}` }
 
     const eyebrow = card.querySelector(".q-eyebrow")
-    if (eyebrow && meta.label) eyebrow.textContent = meta.label
+    if (eyebrow) eyebrow.textContent = meta.eyebrow
+
+    // 2. Swap the interactive component HTML
+    const slot = card.querySelector("[data-card-component]")
+    if (slot) {
+      const opts = this._optionsFor(card, type)
+      const builder = COMPONENTS[type] || (() => "")
+      slot.innerHTML = builder(opts)
+    }
 
     card.dataset.cardType = type
 
@@ -206,6 +340,14 @@ export default class extends Controller {
       this._renderCompatibleTypes(type)
       this.pendingType = type
     }
+  }
+
+  _optionsFor(card, type) {
+    let original = []
+    try { original = JSON.parse(card.dataset.cardOptions || "[]") } catch (_) {}
+    if (type === "yes_no") return ["Yes", "No"]
+    if (original.length) return original
+    return DEFAULT_OPTIONS[type] || []
   }
 
   _updateCount() {

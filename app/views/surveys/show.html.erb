@@ -72,6 +72,7 @@
                data-type-panel-target="card"
                data-card-type="<%= type %>"
                data-card-num="<%= idx + 1 %>"
+               data-card-options="<%= Array(card['options']).to_json %>"
                data-action="click->type-panel#selectCard">
 
             <%# Chrome row above card %>
@@ -138,7 +139,7 @@
                   </div>
                 <% end %>
 
-                <div class="mt-2">
+                <div class="mt-2" data-card-component>
                   <% case type
                      when "multiple_choice", "select_many", "yes_no" %>
                     <% items = type == "yes_no" ? %w[Yes No] : Array(card["options"]) %>
@@ -297,28 +298,33 @@
 
       <div class="type-list" style="display:none;" data-type-panel-target="typeList">
         <% [
-          { key: "range",            icon: "↔",  name: "Range / Slider",      desc: "Drag along a scale" },
-          { key: "rating",           icon: "★",  name: "Rating",              desc: "Slider with star rating" },
-          { key: "multiple_choice",  icon: "◉",  name: "Pick One",            desc: "Single choice from list" },
-          { key: "select_many",      icon: "☑",  name: "Select Many",         desc: "Choose all that apply" },
-          { key: "yes_no",           icon: "⇌",  name: "Yes / No",            desc: "Simple two-option choice" },
-          { key: "select_one_grid",  icon: "▣",  name: "Image Grid — One",    desc: "Photo grid, single pick" },
-          { key: "select_many_grid", icon: "⊞",  name: "Image Grid — Many",   desc: "Photo grid, multi-pick" },
-          { key: "tap_card",         icon: "⇄",  name: "Swipe Cards",         desc: "Swipe to agree / disagree" },
-          { key: "open_ended",       icon: "✏",  name: "Open Text",           desc: "Free-form written answer" },
-          { key: "static_page",      icon: "✔",  name: "Activity",            desc: "Off-screen task + checkbox" },
-          { key: "welcome_card",     icon: "👋", name: "Welcome Card",        desc: "Intro — no answer required" },
+          { key: "range",            icon: "↔",  name: "Range / Slider",    desc: "Drag along a scale" },
+          { key: "rating",           icon: "★",  name: "Rating",            desc: "Slider with star rating" },
+          { key: "multiple_choice",  icon: "◉",  name: "Pick One",          desc: "Single choice from list" },
+          { key: "select_many",      icon: "☑",  name: "Select Many",       desc: "Choose all that apply" },
+          { key: "yes_no",           icon: "⇌",  name: "Yes / No",          desc: "Simple two-option choice" },
+          { key: "select_one_grid",  icon: "▣",  name: "Image Grid — One",  desc: "Photo grid, single pick" },
+          { key: "select_many_grid", icon: "⊞",  name: "Image Grid — Many", desc: "Photo grid, multi-pick" },
+          { key: "tap_card",         icon: "⇄",  name: "Swipe Cards",       desc: "Swipe to agree / disagree" },
+          { key: "open_ended",       icon: "✏",  name: "Open Text",         desc: "Free-form written answer" },
+          { key: "static_page",      icon: "✔",  name: "Activity",          desc: "Off-screen task + checkbox" },
+          { key: "welcome_card",     icon: "👋", name: "Welcome Card",      desc: "Intro — no answer required" },
         ].each do |opt| %>
           <div class="type-opt"
                data-type="<%= opt[:key] %>"
                data-type-panel-target="typeOpt"
                data-action="click->type-panel#setType">
-            <div class="type-opt-icon"><%= opt[:icon] %></div>
-            <div style="flex:1;min-width:0;">
-              <div class="type-opt-name"><%= opt[:name] %></div>
-              <div class="type-opt-desc"><%= opt[:desc] %></div>
+            <div class="type-opt-preview">
+              <%= mini_preview_html({ "type" => opt[:key], "options" => [] }) %>
             </div>
-            <div class="type-opt-radio"></div>
+            <div class="type-opt-row">
+              <div class="type-opt-icon"><%= opt[:icon] %></div>
+              <div style="flex:1;min-width:0;">
+                <div class="type-opt-name"><%= opt[:name] %></div>
+                <div class="type-opt-desc"><%= opt[:desc] %></div>
+              </div>
+              <div class="type-opt-radio"></div>
+            </div>
           </div>
         <% end %>
       </div>
