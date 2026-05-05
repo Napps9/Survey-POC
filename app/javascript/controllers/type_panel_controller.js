@@ -95,12 +95,8 @@ export default class extends Controller {
     if (event.target.closest("button[data-action*='deleteCard']")) return
 
     const card = event.currentTarget
-    this.cardTargets.forEach(c => {
-      c.style.borderColor = "transparent"
-      c.style.boxShadow = "none"
-    })
-    card.style.borderColor = "#FF1E6F"
-    card.style.boxShadow = "0 0 0 2px rgba(255,30,111,0.2)"
+    this.cardTargets.forEach(c => c.classList.remove("selected"))
+    card.classList.add("selected")
     this.activeCardEl = card
 
     const cardType = card.dataset.cardType
@@ -201,6 +197,24 @@ export default class extends Controller {
 
     const eyebrow = card.querySelector(".q-eyebrow")
     if (eyebrow && meta.label) eyebrow.textContent = meta.label
+
+    // Toggle dark phone-top for tap_card / open_ended; otherwise gradient
+    const phoneTop = card.querySelector(".phone-top")
+    if (phoneTop) {
+      const dark = (type === "tap_card" || type === "open_ended")
+      phoneTop.classList.toggle("phone-top-dark", dark)
+      let icon = phoneTop.querySelector(".phone-top-icon")
+      if (dark) {
+        if (!icon) {
+          icon = document.createElement("div")
+          icon.className = "phone-top-icon"
+          phoneTop.appendChild(icon)
+        }
+        icon.textContent = type === "tap_card" ? "↔" : "✎"
+      } else if (icon) {
+        icon.remove()
+      }
+    }
 
     card.dataset.cardType = type
 

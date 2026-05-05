@@ -578,6 +578,129 @@
   padding: 2px 9px; border-radius: 100px;
 }
 
+/* ── Phone-shaped survey card (vertical, iPhone-ratio) ── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px 22px;
+  justify-items: center;
+  align-items: start;
+}
+.phone-wrap {
+  width: 300px;
+  display: flex; flex-direction: column; gap: 8px;
+  cursor: pointer;
+}
+.phone-chrome {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 6px;
+}
+.phone-card {
+  width: 300px;
+  height: 612px;                    /* 300 / 612 ≈ 9 / 18.4, iPhone-like */
+  background: #1C2034;
+  border-radius: 38px;
+  padding: 7px;                     /* bezel */
+  box-shadow: 0 16px 36px rgba(0,0,0,0.4),
+              inset 0 0 0 1px rgba(255,255,255,0.08);
+  border: 2px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+.phone-wrap:hover .phone-card { transform: translateY(-2px); }
+.phone-wrap.selected .phone-card {
+  border-color: #FF1E6F;
+  box-shadow: 0 0 0 3px rgba(255,30,111,0.25),
+              0 16px 36px rgba(0,0,0,0.4),
+              inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+.phone-screen {
+  width: 100%; height: 100%;
+  background: #fff;
+  border-radius: 32px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.phone-top {
+  height: 33%;
+  position: relative;
+  background: linear-gradient(135deg, #00A950 0%, #1C2034 75%);
+  flex-shrink: 0;
+}
+.phone-top-dark { background: var(--color-navy-750); }
+.phone-top-icon {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px;
+  color: rgba(255,255,255,0.18);
+  pointer-events: none;
+}
+.phone-top-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(transparent 60%, rgba(0,0,0,0.3));
+}
+.phone-progress {
+  position: absolute;
+  top: 12px; left: 12px; right: 12px;
+  height: 6px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 6px; overflow: hidden;
+  z-index: 2;
+}
+.phone-progress-fill { height: 100%; background: #fff; border-radius: 6px; }
+.phone-tagline {
+  position: absolute;
+  top: 26px; left: 0; right: 0;
+  text-align: center;
+  font-family: "Alata", sans-serif;
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.05em;
+  z-index: 2;
+}
+.phone-bottom {
+  flex: 1;
+  padding: 16px 18px 18px;
+  display: flex; flex-direction: column;
+  gap: 8px;
+  color: #000;
+  overflow: hidden;
+}
+.phone-bottom .q-eyebrow { font-size: 10px; }
+.phone-bottom .q-title   { font-size: 15px; line-height: 1.3; }
+.phone-bottom .q-subtitle{ font-size: 12px; line-height: 1.4; }
+
+/* Shrink interactive components for the smaller phone screen */
+.phone-bottom .pick-list { gap: 5px; }
+.phone-bottom .pick-item { padding: 8px 10px; font-size: 12px; border-radius: 10px; }
+.phone-bottom .pick-dot, .phone-bottom .pick-square { width: 14px; height: 14px; font-size: 9px; }
+.phone-bottom .pick-text { font-size: 12px; }
+
+.phone-bottom .choice-grid { gap: 6px; }
+.phone-bottom .choice-card { height: 64px; border-radius: 10px; }
+.phone-bottom .choice-grid-3 .choice-card { height: 52px; }
+.phone-bottom .choice-label { font-size: 10px; padding: 3px 6px; }
+
+.phone-bottom .slider-wrap { gap: 6px; padding-top: 16px; }
+.phone-bottom .slider-thumb { width: 38px; height: 38px; }
+.phone-bottom .slider-tooltip { font-size: 10px; padding: 3px 8px; }
+.phone-bottom .slider-label-text { font-size: 9px; }
+
+.phone-bottom .freeform-wrap { padding: 8px; }
+.phone-bottom .freeform-textarea { font-size: 12px; min-height: 70px; }
+.phone-bottom .freeform-counter  { font-size: 10px; }
+
+.phone-bottom .rotate-wrap { gap: 8px; }
+.phone-bottom .rotate-card-stack { height: 130px; }
+.phone-bottom .rotate-action-btn { width: 32px; height: 32px; font-size: 14px; }
+
+.phone-bottom .activity-tag {
+  font-size: 9px; padding: 2px 8px;
+}
+.phone-bottom .activity-title { font-size: 14px; }
+.phone-bottom .activity-desc  { font-size: 11px; }
+
 /* Compact survey card */
 .s-card {
   border-radius: 14px; overflow: hidden;

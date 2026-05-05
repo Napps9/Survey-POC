@@ -49,30 +49,30 @@
         <div class="brief-q-count"><%= total_q %> questions</div>
       </div>
 
-      <%# Cards feed %>
-      <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5"
+      <%# Cards feed — phone-shaped grid %>
+      <div class="flex-1 overflow-y-auto p-6 cards-grid"
            style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;">
 
         <% cards.each_with_index do |card, idx| %>
           <%
-            type       = card["type"].to_s
-            meta       = card_type_meta(type)
-            is_q       = !%w[welcome_card static_page].include?(type)
-            q_idx     += 1 if is_q
-            progress   = total_q > 0 ? ((q_idx.to_f / total_q) * 100).round : 5
-            progress   = 5 if !is_q
-            eyebrow    = type_eyebrow[type] || type.tr('_', ' ')
+            type     = card["type"].to_s
+            meta     = card_type_meta(type)
+            is_q     = !%w[welcome_card static_page].include?(type)
+            q_idx   += 1 if is_q
+            progress = total_q > 0 ? ((q_idx.to_f / total_q) * 100).round : 5
+            progress = 5 if !is_q
+            eyebrow  = type_eyebrow[type] || type.tr('_', ' ')
+            dark_top = %w[tap_card open_ended].include?(type)
           %>
 
-          <%# Card wrapper — clickable for type panel, no border/bg itself %>
-          <div data-type-panel-target="card"
+          <div class="phone-wrap"
+               data-type-panel-target="card"
                data-card-type="<%= type %>"
                data-card-num="<%= idx + 1 %>"
-               data-action="click->type-panel#selectCard"
-               style="cursor:pointer;border-radius:22px;border:2px solid transparent;transition:border-color 0.2s;">
+               data-action="click->type-panel#selectCard">
 
-            <%# Card chrome row %>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
+            <%# Chrome row above the phone %>
+            <div class="phone-chrome">
               <span class="s-badge <%= meta[:badge_css] %>"><%= meta[:badge] %></span>
               <span style="font-size:11px;color:rgba(255,255,255,0.3);">Card <%= idx + 1 %></span>
               <button type="button"
@@ -82,174 +82,153 @@
                       data-action="click->type-panel#deleteCard">×</button>
             </div>
 
-            <%# Full Verto split-card %>
-            <div class="split-card" style="max-width:100%;min-height:200px;">
+            <%# Phone-shaped card %>
+            <div class="phone-card">
+              <div class="phone-screen">
 
-              <%# LEFT PANEL %>
-              <% if %w[tap_card open_ended].include?(type) %>
-                <div class="split-left split-left-dark" style="width:180px;">
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <div style="color:rgba(255,255,255,0.15);font-size:36px;"><%= type == "tap_card" ? "↔" : "✎" %></div>
+                <%# TOP — green gradient or dark, with progress + tagline %>
+                <div class="phone-top <%= 'phone-top-dark' if dark_top %>">
+                  <div class="phone-progress">
+                    <div class="phone-progress-fill" style="width:<%= progress %>%;"></div>
                   </div>
-                  <div class="panel-progress" style="background:rgba(255,255,255,0.15);">
-                    <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
-                  </div>
-                  <div class="panel-tagline">Build the change</div>
-                </div>
-              <% else %>
-                <div class="split-left" style="width:180px;">
-                  <div class="split-left-img" style="background:linear-gradient(135deg,#00A950 0%,#1C2034 70%);"></div>
-                  <div class="split-left-overlay"></div>
-                  <div class="panel-progress">
-                    <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
-                  </div>
-                  <div class="panel-tagline">Build the change</div>
-                </div>
-              <% end %>
-
-              <%# RIGHT PANEL %>
-              <div class="split-right" style="padding:20px 22px;gap:10px;">
-
-                <% if is_q %>
-                  <div class="q-eyebrow"><%= eyebrow %></div>
-                <% end %>
-
-                <% if type == "static_page" %>
-                  <div class="activity-tag">Activity</div>
-                <% end %>
-
-                <div class="<%= type == 'static_page' ? 'activity-title' : 'q-title' %>"
-                     style="font-size:17px;">
-                  <%= card["text"] %>
-                </div>
-
-                <% if card["description"].present? %>
-                  <div class="<%= type == 'static_page' ? 'activity-desc' : 'q-subtitle' %>">
-                    <%= card["description"] %>
-                  </div>
-                <% end %>
-
-                <%# Type-specific interactive component %>
-                <div class="mt-1">
-                  <% case type
-                     when "multiple_choice", "select_many", "yes_no" %>
-                    <% items = type == "yes_no" ? %w[Yes No] : Array(card["options"]) %>
-                    <% multi = (type == "select_many") %>
-                    <ul class="pick-list"
-                        data-controller="picker"
-                        data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
-                      <% items.each do |opt| %>
-                        <li class="pick-item"
-                            data-picker-target="item"
-                            data-action="click->picker#pick"
-                            data-selected="false">
-                          <span class="<%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
-                          <span class="pick-text"><%= opt %></span>
-                        </li>
-                      <% end %>
-                    </ul>
-
-                  <% when "select_one_grid", "select_many_grid" %>
-                    <% opts = Array(card["options"]) %>
-                    <% cols = opts.size >= 5 ? 3 : 2 %>
-                    <% multi = (type == "select_many_grid") %>
-                    <ul class="choice-grid choice-grid-<%= cols %>"
-                        data-controller="picker"
-                        data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
-                      <% opts.each_with_index do |opt, i| %>
-                        <li class="choice-card"
-                            data-picker-target="item"
-                            data-action="click->picker#pick"
-                            data-selected="false">
-                          <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>"></div>
-                          <div class="choice-overlay"></div>
-                          <div class="choice-tick">✓</div>
-                          <div class="choice-label"><%= opt %></div>
-                        </li>
-                      <% end %>
-                    </ul>
-
-                  <% when "tap_card" %>
-                    <div class="rotate-wrap"
-                         data-controller="tap-stack">
-                      <div class="rotate-card-stack">
-                        <% Array(card["options"]).each_with_index do |opt, i| %>
-                          <div class="rotate-card"
-                               data-tap-stack-target="card"
-                               style="background:linear-gradient(135deg,<%= ['#d4edda','#d1ecf1','#fff3cd','#f8d7da','#e2d9f3'][i % 5] %>,<%= ['#a8d5b5','#9fd5df','#ffd88a','#f5a8b0','#c3aee8'][i % 5] %>);">
-                            <span><%= opt %></span>
-                          </div>
-                        <% end %>
-                      </div>
-                      <div class="swipe-indicator">
-                        <span style="color:#D80027;font-weight:700">← No</span>
-                        <span class="mx-3">drag card to answer</span>
-                        <span style="color:#00A950;font-weight:700">Yes →</span>
-                      </div>
-                      <div class="rotate-actions">
-                        <button type="button" class="rotate-action-btn rotate-action-no"
-                                data-action="click->tap-stack#pick"
-                                data-tap-stack-direction="left">✕</button>
-                        <button type="button" class="rotate-action-btn rotate-action-yes"
-                                data-action="click->tap-stack#pick"
-                                data-tap-stack-direction="right">✓</button>
-                      </div>
-                      <div class="text-xs text-black/40 flex items-center gap-3">
-                        <span data-tap-stack-target="counter"></span>
-                        <button type="button" class="hover:text-green-500"
-                                data-action="click->tap-stack#reset">↺ Reset</button>
-                      </div>
-                    </div>
-
-                  <% when "range", "rating" %>
-                    <% labels = Array(card["options"]) %>
-                    <% n = [labels.size, 2].max %>
-                    <div class="slider-wrap"
-                         data-controller="slider"
-                         data-slider-steps-value="<%= n %>">
-                      <div class="slider-track-wrap">
-                        <div class="slider-tooltip" data-slider-target="tooltip" style="left:50%;">
-                          <span class="slider-tooltip-text" data-slider-target="tooltipText"></span>
-                        </div>
-                        <div class="slider-track"
-                             data-slider-target="track"
-                             data-action="pointerdown->slider#start">
-                          <% n.times do |i| %>
-                            <div class="s-dot" data-slider-target="dot" style="left:<%= (i.to_f / (n - 1) * 100).round(2) %>%"></div>
-                          <% end %>
-                          <div class="slider-thumb" data-slider-target="thumb" style="left:50%;">
-                            <div class="s-line"></div><div class="s-line"></div><div class="s-line"></div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="slider-labels">
-                        <% labels.each do |opt| %>
-                          <span class="slider-label-text"><%= opt %></span>
-                        <% end %>
-                      </div>
-                    </div>
-
-                  <% when "open_ended" %>
-                    <div class="freeform-wrap"
-                         data-controller="freeform"
-                         data-freeform-max-value="200">
-                      <textarea class="freeform-textarea"
-                                placeholder="Type answer…"
-                                data-freeform-target="input"
-                                data-action="input->freeform#update"></textarea>
-                      <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
-                    </div>
-
-                  <% when "welcome_card", "static_page" %>
-                    <%# No interactive component needed %>
-
+                  <div class="phone-tagline">Build the change</div>
+                  <% if dark_top %>
+                    <div class="phone-top-icon"><%= type == "tap_card" ? "↔" : "✎" %></div>
+                  <% else %>
+                    <div class="phone-top-overlay"></div>
                   <% end %>
                 </div>
 
-              </div><%# /split-right %>
-            </div><%# /split-card %>
+                <%# BOTTOM — question content + interactive component %>
+                <div class="phone-bottom">
 
-          </div><%# /card wrapper %>
+                  <% if is_q %>
+                    <div class="q-eyebrow"><%= eyebrow %></div>
+                  <% end %>
+
+                  <% if type == "static_page" %>
+                    <div class="activity-tag">Activity</div>
+                  <% end %>
+
+                  <div class="<%= type == 'static_page' ? 'activity-title' : 'q-title' %>">
+                    <%= card["text"] %>
+                  </div>
+
+                  <% if card["description"].present? %>
+                    <div class="<%= type == 'static_page' ? 'activity-desc' : 'q-subtitle' %>">
+                      <%= card["description"] %>
+                    </div>
+                  <% end %>
+
+                  <div class="mt-1" style="overflow:hidden;flex:1;">
+                    <% case type
+                       when "multiple_choice", "select_many", "yes_no" %>
+                      <% items = type == "yes_no" ? %w[Yes No] : Array(card["options"]) %>
+                      <% multi = (type == "select_many") %>
+                      <ul class="pick-list"
+                          data-controller="picker"
+                          data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
+                        <% items.each do |opt| %>
+                          <li class="pick-item"
+                              data-picker-target="item"
+                              data-action="click->picker#pick"
+                              data-selected="false">
+                            <span class="<%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
+                            <span class="pick-text"><%= opt %></span>
+                          </li>
+                        <% end %>
+                      </ul>
+
+                    <% when "select_one_grid", "select_many_grid" %>
+                      <% opts = Array(card["options"]) %>
+                      <% cols = opts.size >= 5 ? 3 : 2 %>
+                      <% multi = (type == "select_many_grid") %>
+                      <ul class="choice-grid choice-grid-<%= cols %>"
+                          data-controller="picker"
+                          data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
+                        <% opts.each_with_index do |opt, i| %>
+                          <li class="choice-card"
+                              data-picker-target="item"
+                              data-action="click->picker#pick"
+                              data-selected="false">
+                            <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>"></div>
+                            <div class="choice-overlay"></div>
+                            <div class="choice-tick">✓</div>
+                            <div class="choice-label"><%= opt %></div>
+                          </li>
+                        <% end %>
+                      </ul>
+
+                    <% when "tap_card" %>
+                      <div class="rotate-wrap"
+                           data-controller="tap-stack">
+                        <div class="rotate-card-stack">
+                          <% Array(card["options"]).each_with_index do |opt, i| %>
+                            <div class="rotate-card"
+                                 data-tap-stack-target="card"
+                                 style="background:linear-gradient(135deg,<%= ['#d4edda','#d1ecf1','#fff3cd','#f8d7da','#e2d9f3'][i % 5] %>,<%= ['#a8d5b5','#9fd5df','#ffd88a','#f5a8b0','#c3aee8'][i % 5] %>);">
+                              <span><%= opt %></span>
+                            </div>
+                          <% end %>
+                        </div>
+                        <div class="rotate-actions">
+                          <button type="button" class="rotate-action-btn rotate-action-no"
+                                  data-action="click->tap-stack#pick"
+                                  data-tap-stack-direction="left">✕</button>
+                          <button type="button" class="rotate-action-btn rotate-action-yes"
+                                  data-action="click->tap-stack#pick"
+                                  data-tap-stack-direction="right">✓</button>
+                        </div>
+                      </div>
+
+                    <% when "range", "rating" %>
+                      <% labels = Array(card["options"]) %>
+                      <% n = [labels.size, 2].max %>
+                      <div class="slider-wrap"
+                           data-controller="slider"
+                           data-slider-steps-value="<%= n %>">
+                        <div class="slider-track-wrap">
+                          <div class="slider-tooltip" data-slider-target="tooltip" style="left:50%;">
+                            <span class="slider-tooltip-text" data-slider-target="tooltipText"></span>
+                          </div>
+                          <div class="slider-track"
+                               data-slider-target="track"
+                               data-action="pointerdown->slider#start">
+                            <% n.times do |i| %>
+                              <div class="s-dot" data-slider-target="dot" style="left:<%= (i.to_f / (n - 1) * 100).round(2) %>%"></div>
+                            <% end %>
+                            <div class="slider-thumb" data-slider-target="thumb" style="left:50%;">
+                              <div class="s-line"></div><div class="s-line"></div><div class="s-line"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="slider-labels">
+                          <% labels.each do |opt| %>
+                            <span class="slider-label-text"><%= opt %></span>
+                          <% end %>
+                        </div>
+                      </div>
+
+                    <% when "open_ended" %>
+                      <div class="freeform-wrap"
+                           data-controller="freeform"
+                           data-freeform-max-value="200">
+                        <textarea class="freeform-textarea"
+                                  placeholder="Type answer…"
+                                  data-freeform-target="input"
+                                  data-action="input->freeform#update"></textarea>
+                        <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
+                      </div>
+
+                    <% when "welcome_card", "static_page" %>
+                      <%# No interactive component %>
+                    <% end %>
+                  </div>
+
+                </div><%# /phone-bottom %>
+              </div><%# /phone-screen %>
+            </div><%# /phone-card %>
+          </div><%# /phone-wrap %>
         <% end %>
 
       </div><%# /cards feed %>
@@ -283,7 +262,6 @@
              data-type-panel-target="panelHint">Click any card on the left.</div>
       </div>
 
-      <%# Empty state %>
       <div class="type-panel-empty" data-type-panel-target="panelEmpty">
         <div style="font-size:28px;opacity:0.18;">↖</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.28);line-height:1.5;">
@@ -291,7 +269,6 @@
         </div>
       </div>
 
-      <%# Type options list (hidden until a card is selected) %>
       <div class="type-list" style="display:none;" data-type-panel-target="typeList">
         <% [
           { key: "range",            icon: "↔",  name: "Range / Slider",      desc: "Drag along a scale" },
@@ -320,7 +297,6 @@
         <% end %>
       </div>
 
-      <%# Footer buttons (hidden until a card is selected) %>
       <div class="type-panel-footer" style="display:none;" data-type-panel-target="panelFooter">
         <button type="button"
                 style="width:100%;padding:10px;border-radius:16px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;border:none;cursor:pointer;transition:background 0.15s;"
