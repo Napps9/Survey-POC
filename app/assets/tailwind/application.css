@@ -68,6 +68,16 @@
   justify-content: center;
 }
 /* 2×3 placeholder grid shown on the left panel */
+/* Interaction illustration in the left panel */
+.split-left-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 16px;
+  margin-top: 16px;
+}
+
 .split-left-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

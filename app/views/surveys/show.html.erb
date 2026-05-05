@@ -35,7 +35,7 @@
   </nav>
 
   <%# Main grid: cards feed | type panel %>
-  <div class="flex-1 overflow-hidden" style="display:grid;grid-template-columns:1fr 300px;">
+  <div class="flex-1 overflow-hidden" style="display:grid;grid-template-columns:1fr 444px;">
 
     <%# ── LEFT: Cards column ── %>
     <div class="flex flex-col overflow-hidden">
@@ -89,34 +89,16 @@
             <%# Horizontal split-card %>
             <div class="split-card">
 
-              <%# ── LEFT PANEL ── %>
-              <% if dark_top %>
-                <div class="split-left split-left-dark">
-                  <div class="panel-progress" style="background:rgba(255,255,255,0.15);">
-                    <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
-                  </div>
-                  <div class="panel-tagline">Build the change</div>
-                  <%# Placeholder grid %>
-                  <div class="split-left-grid">
-                    <% grid_colours.each do |c| %>
-                      <div class="split-left-grid-cell <%= c %>"></div>
-                    <% end %>
-                  </div>
+              <%# ── LEFT PANEL — interaction illustration ── %>
+              <div class="split-left">
+                <div class="panel-progress">
+                  <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
                 </div>
-              <% else %>
-                <div class="split-left">
-                  <div class="panel-progress">
-                    <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
-                  </div>
-                  <div class="panel-tagline">Build the change</div>
-                  <%# Placeholder grid %>
-                  <div class="split-left-grid">
-                    <% grid_colours.each do |c| %>
-                      <div class="split-left-grid-cell <%= c %>"></div>
-                    <% end %>
-                  </div>
+                <div class="panel-tagline">Build the change</div>
+                <div class="split-left-illustration" data-card-illustration>
+                  <%= interaction_illustration(type) %>
                 </div>
-              <% end %>
+              </div>
 
               <%# ── RIGHT PANEL ── %>
               <div class="split-right">

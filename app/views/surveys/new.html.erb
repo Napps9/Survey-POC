@@ -21,25 +21,22 @@
     </nav>
 
     <%# Body %>
-    <div class="gen-stage flex-1 flex flex-col items-center justify-center gap-9 px-12 py-8">
-
-      <%# Spinning Verto asterisk %>
-      <div class="gen-asterisk"></div>
+    <div class="gen-stage flex-1 flex flex-col items-center justify-center gap-8 px-16 py-10">
 
       <%# Shimmer tagline %>
       <div class="gen-shimmer"
-           style="font-family:'Alata',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">
+           style="font-family:'Alata',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">
         Building your Verto
       </div>
 
-      <%# Hero theme + age %>
-      <div class="text-center">
+      <%# Large reflective message — updated by controller as stages progress %>
+      <div class="text-center" style="max-width:680px;">
         <div class="gen-hero-theme" data-generating-target="heroTheme"></div>
-        <div style="font-family:'ABeeZee',sans-serif;font-size:18px;color:rgba(255,255,255,0.4);letter-spacing:-0.2px;"
+        <div style="font-family:'ABeeZee',sans-serif;font-size:17px;color:rgba(255,255,255,0.38);letter-spacing:-0.2px;line-height:1.5;margin-top:6px;"
              data-generating-target="heroAge"></div>
       </div>
 
-      <%# Brand pills %>
+      <%# Brand pills — audience, tone, cards %>
       <div class="flex gap-2.5 flex-wrap justify-center">
         <div class="gen-pill">
           <div class="gen-pill-dot" style="background:#00A950;"></div>
@@ -58,14 +55,7 @@
         </div>
       </div>
 
-      <%# Mini-card preview stack — three brand-coloured cards fan in %>
-      <div class="gen-card-stack">
-        <div class="gen-mini-card">↔</div>
-        <div class="gen-mini-card">◉</div>
-        <div class="gen-mini-card">⇄</div>
-      </div>
-
-      <%# Echoed insight quote %>
+      <%# Insight quote echoed back %>
       <div class="gen-insight" data-generating-target="insightText"></div>
 
       <%# 4-step indicator %>
