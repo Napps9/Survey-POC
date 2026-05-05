@@ -2,7 +2,7 @@ module ApplicationHelper
   CARD_TYPE_META = {
     "welcome_card"     => { badge: "WELCOME CARD", badge_css: "sb-welcome",  q_label: "" },
     "range"            => { badge: "RANGE",         badge_css: "sb-range",    q_label: "DRAG THE SLIDER" },
-    "rating"           => { badge: "RATING",        badge_css: "sb-range",    q_label: "DRAG THE SLIDER" },
+    "rating"           => { badge: "RATING",        badge_css: "sb-range",    q_label: "TAP TO RATE" },
     "multiple_choice"  => { badge: "PICK ONE",      badge_css: "sb-range",    q_label: "CHOOSE ONE" },
     "select_many"      => { badge: "SELECT MANY",   badge_css: "sb-range",    q_label: "CHOOSE ALL THAT APPLY" },
     "yes_no"           => { badge: "YES / NO",      badge_css: "sb-range",    q_label: "CHOOSE ONE" },
@@ -25,7 +25,7 @@ module ApplicationHelper
     c = "font-family:'Alata',sans-serif"
 
     html = case type.to_s
-    when "range", "rating"
+    when "range"
       <<~HTML
         <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:10px;">
           <div style="display:flex;align-items:center;gap:8px;#{w}">
@@ -39,6 +39,16 @@ module ApplicationHelper
             <span style="font-size:16px;opacity:0.5;">→</span>
           </div>
           <div style="#{d}">Drag the slider to your answer</div>
+        </div>
+      HTML
+
+    when "rating"
+      <<~HTML
+        <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <div style="display:flex;gap:8px;">
+            #{ (0..4).map { |i| "<span style=\"font-size:34px;line-height:1;#{i < 3 ? "color:#FFCC00;" : "color:rgba(255,255,255,0.2);"}\">#{i < 3 ? "★" : "☆"}</span>" }.join }
+          </div>
+          <div style="#{d}">Tap a star to rate</div>
         </div>
       HTML
 
@@ -160,12 +170,16 @@ module ApplicationHelper
     bgs  = %w[mini-bg-1 mini-bg-2 mini-bg-3 mini-bg-4 mini-bg-5 mini-bg-6]
 
     html = case type
-    when "range", "rating"
+    when "range"
       dots = (0..4).map { |i| "<div class=\"mini-s-dot#{i.between?(1,2) ? ' active' : ''}\"></div>" }.join
       "<div class=\"mini-tooltip\">Neutral</div>" \
       "<div class=\"mini-slider-track\">#{dots}" \
       "<div class=\"mini-s-thumb\"><div class=\"mini-s-line\"></div><div class=\"mini-s-line\"></div><div class=\"mini-s-line\"></div></div>" \
       "</div>"
+
+    when "rating"
+      stars = (0..4).map { |i| "<span class=\"mini-rating-star\" style=\"color:#{i < 3 ? '#FFCC00' : 'rgba(255,255,255,0.2)'}\">#{i < 3 ? '★' : '☆'}</span>" }.join
+      "<div class=\"mini-rating-stars\">#{stars}</div>"
 
     when "multiple_choice", "select_many", "yes_no"
       items = type == "yes_no" ? %w[Yes No] : (opts.empty? ? ["Option A", "Option B", "Option C"] : opts.first(3))

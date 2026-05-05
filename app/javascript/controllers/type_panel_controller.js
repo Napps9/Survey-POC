@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 const TYPE_META = {
   range:            { badge: "RANGE",         css: "sb-range",    label: "DRAG THE SLIDER",       eyebrow: "Drag the slider"        },
-  rating:           { badge: "RATING",         css: "sb-range",    label: "DRAG THE SLIDER",       eyebrow: "Drag the slider"        },
+  rating:           { badge: "RATING",         css: "sb-range",    label: "TAP TO RATE",           eyebrow: "Tap to rate"            },
   multiple_choice:  { badge: "PICK ONE",       css: "sb-range",    label: "CHOOSE ONE",            eyebrow: "Choose one"             },
   select_many:      { badge: "SELECT MANY",    css: "sb-range",    label: "CHOOSE ALL THAT APPLY", eyebrow: "Choose all that apply"  },
   yes_no:           { badge: "YES / NO",       css: "sb-range",    label: "CHOOSE ONE",            eyebrow: "Choose one"             },
@@ -96,7 +96,17 @@ const ILLUSTRATIONS = {
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;text-align:center;">Drag the slider to your answer</div>
     </div>`,
 
-  rating: () => ILLUSTRATIONS.range(),
+  rating: () => `
+    <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <div style="display:flex;gap:8px;">
+        ${[0,1,2,3,4].map(i =>
+          `<span style="font-size:34px;line-height:1;${i<3?"color:#FFCC00;":"color:rgba(255,255,255,0.2);"}">
+            ${i<3?"★":"☆"}
+          </span>`
+        ).join("")}
+      </div>
+      <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;text-align:center;">Tap a star to rate</div>
+    </div>`,
 
   multiple_choice: () => `
     <div style="width:80%;display:flex;flex-direction:column;gap:4px;">
@@ -222,21 +232,29 @@ function esc(s) {
 // HTML builders for the right-side interactive component on each card
 const COMPONENTS = {
   multiple_choice: (opts) => `
-    <ul class="pick-list" data-controller="picker" data-picker-mode-value="single">
+    <ul class="pick-list" data-controller="picker card-editor" data-picker-mode-value="single">
       ${opts.map(o => `
         <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false">
           <span class="pick-dot">✓</span>
-          <span class="pick-text">${esc(o)}</span>
+          <span class="pick-text" contenteditable="true">${esc(o)}</span>
+          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
         </li>`).join("")}
+      <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
+        <span>＋</span> Add option
+      </li>
     </ul>`,
 
   select_many: (opts) => `
-    <ul class="pick-list" data-controller="picker" data-picker-mode-value="multi">
+    <ul class="pick-list" data-controller="picker card-editor" data-picker-mode-value="multi">
       ${opts.map(o => `
         <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false">
           <span class="pick-square">✓</span>
-          <span class="pick-text">${esc(o)}</span>
+          <span class="pick-text" contenteditable="true">${esc(o)}</span>
+          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
         </li>`).join("")}
+      <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
+        <span>＋</span> Add option
+      </li>
     </ul>`,
 
   yes_no: () => `
@@ -244,7 +262,7 @@ const COMPONENTS = {
       ${["Yes","No"].map(o => `
         <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false">
           <span class="pick-dot">✓</span>
-          <span class="pick-text">${o}</span>
+          <span class="pick-text" contenteditable="true">${o}</span>
         </li>`).join("")}
     </ul>`,
 
@@ -252,13 +270,14 @@ const COMPONENTS = {
   select_many_grid: (opts) => gridHtml(opts, "multi"),
 
   tap_card: (opts) => `
-    <div class="rotate-wrap" data-controller="tap-stack">
+    <div class="rotate-wrap" data-controller="tap-stack card-editor">
       <div class="rotate-card-stack">
         ${opts.map((o,i) => {
           const [a,b] = SWIPE_FILLS[i % SWIPE_FILLS.length]
           return `<div class="rotate-card" data-tap-stack-target="card"
                        style="background:linear-gradient(135deg,${a},${b});">
-                    <span>${esc(o)}</span>
+                    <span contenteditable="true" style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;">${esc(o)}</span>
+                    <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption">×</button>
                   </div>`
         }).join("")}
       </div>
@@ -273,10 +292,31 @@ const COMPONENTS = {
         <button type="button" class="rotate-action-btn rotate-action-yes"
                 data-action="click->tap-stack#pick" data-tap-stack-direction="right">✓</button>
       </div>
+      <button type="button" class="tap-add-btn" data-action="click->card-editor#addTapOption">＋ Add statement</button>
     </div>`,
 
-  range:  (opts) => sliderHtml(opts),
-  rating: (opts) => sliderHtml(opts),
+  range: (opts) => sliderHtml(opts),
+
+  rating: (opts) => {
+    const labels = opts.length >= 2 ? opts : ["Poor", "Fair", "Good", "Great", "Excellent"]
+    const first  = labels[0] || "Poor"
+    const last   = labels[labels.length - 1] || "Excellent"
+    return `
+      <div class="rating-wrap" data-controller="rating">
+        <div class="rating-stars">
+          ${[0,1,2,3,4].map(i => `
+            <span class="rating-star"
+                  data-rating-target="star"
+                  data-rating-index="${i}"
+                  data-action="click->rating#pick mouseover->rating#hover mouseout->rating#unhover">☆</span>
+          `).join("")}
+        </div>
+        <div class="rating-labels">
+          <span class="rating-label" contenteditable="true">${esc(first)}</span>
+          <span class="rating-label" contenteditable="true">${esc(last)}</span>
+        </div>
+      </div>`
+  },
 
   open_ended: () => `
     <div class="freeform-wrap" data-controller="freeform" data-freeform-max-value="200">
@@ -292,7 +332,6 @@ const COMPONENTS = {
 
 function gridHtml(opts, mode) {
   const cols = opts.length >= 5 ? 3 : 2
-  const indicator = mode === "multi" ? "pick-square" : "pick-dot"
   return `
     <ul class="choice-grid choice-grid-${cols}" data-controller="picker"
         data-picker-mode-value="${mode}">
@@ -302,7 +341,7 @@ function gridHtml(opts, mode) {
           <div class="choice-card-bg choice-bg-${(i % 6) + 1}"></div>
           <div class="choice-overlay"></div>
           <div class="choice-tick">✓</div>
-          <div class="choice-label">${esc(o)}</div>
+          <div class="choice-label" contenteditable="true">${esc(o)}</div>
         </li>`).join("")}
     </ul>`
 }
@@ -328,7 +367,7 @@ function sliderHtml(opts) {
         </div>
       </div>
       <div class="slider-labels">
-        ${labels.map(o => `<span class="slider-label-text">${esc(o)}</span>`).join("")}
+        ${labels.map(o => `<span class="slider-label-text" contenteditable="true">${esc(o)}</span>`).join("")}
       </div>
     </div>`
 }

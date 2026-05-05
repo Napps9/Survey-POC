@@ -1195,3 +1195,98 @@
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 4px 16px rgba(0,169,80,0.35);
 }
+
+/* ── Mini rating stars (type-panel preview) ─────── */
+.mini-rating-stars { display: flex; gap: 2px; justify-content: center; align-items: center; }
+.mini-rating-star  { font-size: 14px; line-height: 1; }
+
+/* ── Rating component ────────────────────────────── */
+.rating-wrap   { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 20px; }
+.rating-stars  { display: flex; gap: 8px; }
+.rating-star {
+  font-size: 40px;
+  cursor: pointer;
+  color: #D1D5DB;
+  transition: color 0.1s, transform 0.12s;
+  user-select: none;
+  line-height: 1;
+}
+.rating-star.active { color: #FFCC00; }
+.rating-star:hover  { transform: scale(1.18); }
+.rating-labels {
+  display: flex; justify-content: space-between;
+  width: 100%; padding: 0 4px;
+}
+.rating-label {
+  font-size: 11px; color: rgba(0,0,0,0.4);
+  font-family: "ABeeZee", sans-serif;
+  outline: none;
+}
+
+/* ── Inline editing ──────────────────────────────── */
+[contenteditable="true"]:hover:not(:focus) {
+  outline: 1px dashed rgba(0,0,0,0.13);
+  border-radius: 4px;
+  cursor: text;
+}
+[contenteditable="true"]:focus {
+  outline: 2px solid rgba(0,169,80,0.4) !important;
+  border-radius: 4px;
+  background: rgba(0,169,80,0.025);
+  cursor: text;
+}
+/* left-panel contenteditable — light outline on dark bg */
+.split-left [contenteditable="true"]:hover:not(:focus) {
+  outline-color: rgba(255,255,255,0.18);
+}
+.split-left [contenteditable="true"]:focus {
+  outline-color: rgba(0,169,80,0.6) !important;
+  background: rgba(255,255,255,0.04);
+}
+
+/* ── Option delete button (pick items) ───────────── */
+.pick-item-delete {
+  width: 20px; height: 20px;
+  border-radius: 50%; border: none; background: transparent;
+  color: rgba(0,0,0,0.2); font-size: 15px;
+  cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+  padding: 0; line-height: 1;
+}
+.pick-item:hover .pick-item-delete { opacity: 1; }
+.pick-item-delete:hover { color: #D80027; background: rgba(216,0,39,0.08); }
+
+/* ── Add option row (inside pick-list) ───────────── */
+.pick-add-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: rgba(0,169,80,0.75);
+  font-family: "ABeeZee", sans-serif; font-size: 13px;
+  border-top: 1px dashed rgba(0,0,0,0.08);
+  list-style: none;
+  transition: background 0.12s;
+}
+.pick-add-btn:hover { background: rgba(0,169,80,0.04); }
+
+/* ── Tap card delete & add ───────────────────────── */
+.tap-card-delete {
+  position: absolute; top: 7px; right: 9px;
+  background: transparent; border: none;
+  cursor: pointer; color: rgba(0,0,0,0.2); font-size: 15px;
+  opacity: 0; transition: opacity 0.15s, color 0.15s;
+  z-index: 10; line-height: 1; padding: 0;
+}
+.rotate-card:hover .tap-card-delete { opacity: 1; }
+.tap-card-delete:hover { color: #D80027; }
+.tap-add-btn {
+  background: transparent;
+  border: 1px dashed rgba(0,0,0,0.15); border-radius: 12px;
+  padding: 7px 18px; cursor: pointer;
+  color: rgba(0,169,80,0.75);
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
+  transition: all 0.15s;
+}
+.tap-add-btn:hover { background: rgba(0,169,80,0.05); border-color: rgba(0,169,80,0.3); }
