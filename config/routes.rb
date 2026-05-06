@@ -19,5 +19,6 @@ Rails.application.routes.draw do
   post "surveys/:id/publish",    to: "surveys#publish",  as: :publish_survey
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results
   get  "surveys/:id/results/summary", to: "survey_summaries#show",  as: :survey_results_summary
+  post "surveys/:survey_id/chat",     to: "survey_chats#create",    as: :survey_chat
   resources :surveys, only: [:show, :update]
 end

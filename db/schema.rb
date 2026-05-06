@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_06_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_06_000003) do
   create_table "responses", force: :cascade do |t|
     t.json "answers", default: {}, null: false
     t.datetime "created_at", null: false
@@ -30,6 +30,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_000002) do
     t.text "key_insight"
     t.string "publish_token"
     t.datetime "published_at"
+    t.text "results_summary"
+    t.integer "results_summary_response_count"
     t.string "theme"
     t.string "title"
     t.datetime "updated_at", null: false
