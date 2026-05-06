@@ -1,3 +1,4 @@
+<% content_for :title, "#{@survey.theme} · Playverto" %>
 <%
   cards   = Array(@survey.cards)
   total_q = cards.count { |c| !%w[welcome_card static_page].include?(c["type"]) }
@@ -9,9 +10,9 @@
      data-player-submit-url-value="<%= submit_survey_url(@survey.publish_token) %>">
 
   <nav class="preview-nav">
-    <span style="font-family:'Alata',sans-serif;font-size:15px;color:white;font-weight:600;">Playverto</span>
+    <%= image_tag "playverto.svg", style: "height:22px;width:auto;flex-shrink:0;" %>
     <span class="preview-nav-title"><%= @survey.theme %></span>
-    <span></span>
+    <span style="width:22px;"></span><%# balance the logo width so title stays centred %>
   </nav>
 
   <div class="preview-body">
@@ -32,12 +33,14 @@
     <% end %>
 
     <div class="preview-thankyou" data-player-target="thankyou">
+      <%= image_tag "playverto.svg", style: "height:32px;width:auto;opacity:0.7;margin-bottom:8px;" %>
       <div class="preview-thankyou-emoji">🎉</div>
       <div class="preview-thankyou-title">Thank you!</div>
       <div class="preview-thankyou-sub">Your responses have been recorded.</div>
-      <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.25);margin-top:8px;">
-        Powered by Playverto
-      </p>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:12px;opacity:0.3;">
+        <%= image_tag "playverto.svg", style: "height:14px;width:auto;filter:brightness(0) invert(1);" %>
+        <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#fff;">Powered by Playverto</span>
+      </div>
     </div>
   </div>
 
