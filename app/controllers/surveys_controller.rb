@@ -1,8 +1,10 @@
 class SurveysController < ApplicationController
+  include ActionController::Live
+
   layout "fullscreen", only: :show
 
   # JSON updates from the inline editor are same-origin fetches without CSRF tokens.
-  protect_from_forgery with: :null_session, only: :update
+  protect_from_forgery with: :null_session, only: [:update, :results_summary]
 
   before_action :set_survey, only: [:show, :publish, :results, :results_summary]
 
@@ -79,19 +81,21 @@ class SurveysController < ApplicationController
   end
 
   def results_summary
-    responses   = @survey.responses.where(status: "completed").order(created_at: :desc)
-    total       = responses.count
-    aggregated  = aggregate_results(Array(@survey.cards), responses)
+    responses  = @survey.responses.where(status: "completed").order(created_at: :desc)
+    total      = responses.count
+    aggregated = aggregate_results(Array(@survey.cards), responses)
 
     response.headers["Content-Type"]      = "text/plain; charset=utf-8"
     response.headers["X-Accel-Buffering"] = "no"
     response.headers["Cache-Control"]     = "no-cache"
 
-    self.response_body = Enumerator.new do |yielder|
-      ResultsSummariser.new.call(survey: @survey, aggregated: aggregated, total: total) do |chunk|
-        yielder << chunk
-      end
+    ResultsSummariser.new.call(survey: @survey, aggregated: aggregated, total: total) do |chunk|
+      response.stream.write(chunk)
     end
+  rescue => e
+    response.stream.write("Insights unavailable: #{e.message}") rescue nil
+  ensure
+    response.stream.close
   end
 
   private

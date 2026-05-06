@@ -29,10 +29,10 @@ class ResultsSummariser
     )
 
     stream.each do |raw_event|
-      next unless raw_event.respond_to?(:type) && raw_event.type == "content_block_delta"
+      next unless raw_event.respond_to?(:type) && raw_event.type == :content_block_delta
       delta = raw_event.delta
-      text  = delta.respond_to?(:text) ? delta.text : delta&.dig("text")
-      yield text if text
+      next unless delta.respond_to?(:type) && delta.type == :text_delta
+      yield delta.text if delta.text
     end
   end
 
