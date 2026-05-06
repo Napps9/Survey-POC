@@ -3,7 +3,7 @@ class SurveySummariesController < ApplicationController
   protect_from_forgery with: :null_session
 
   def show
-    survey     = Survey.find(params[:survey_id])
+    survey     = Survey.find(params[:id])
     responses  = survey.responses.where(status: "completed").order(created_at: :desc)
     total      = responses.count
     aggregated = aggregate_results(Array(survey.cards), responses)
