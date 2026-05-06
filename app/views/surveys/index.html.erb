@@ -6,79 +6,68 @@
   drafts    = @surveys.reject { |s| s.publish_token.present? }
 %>
 
-<div style="min-height:100vh;background:#1C2034;display:flex;flex-direction:column;">
+<div style="display:flex;min-height:100vh;background:#1C2034;">
 
-  <%# ── Nav ── %>
-  <nav style="position:sticky;top:0;z-index:50;height:54px;background:#272D4A;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0;">
-    <%= image_tag "playverto.svg", style: "height:22px;width:auto;" %>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <%= link_to new_survey_path,
-            style: "display:flex;align-items:center;gap:7px;padding:9px 20px;border-radius:100px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s;",
-            onmouseover: "this.style.background='#009044'",
-            onmouseout:  "this.style.background='#00A950'" do %>
-        <span style="font-size:16px;line-height:1;">+</span> Create Verto
-      <% end %>
-    </div>
-  </nav>
+  <%= render "shared/sidebar", active: "dashboard" %>
 
-  <%# ── Hero ── %>
-  <div style="position:relative;overflow:hidden;padding:52px 32px 44px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
-    <%# orbs %>
-    <div class="gen-orbs" style="opacity:0.35;">
-      <div class="gen-orb gen-orb-1"></div>
-      <div class="gen-orb gen-orb-2"></div>
-      <div class="gen-orb gen-orb-3"></div>
-      <div class="gen-orb gen-orb-4"></div>
-    </div>
+  <%# ── Main content ── %>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
 
-    <div style="position:relative;z-index:1;max-width:900px;margin:0 auto;">
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:24px;">
+    <%# ── Hero ── %>
+    <div style="position:relative;overflow:hidden;padding:48px 36px 40px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
+      <div class="gen-orbs" style="opacity:0.3;">
+        <div class="gen-orb gen-orb-1"></div>
+        <div class="gen-orb gen-orb-2"></div>
+        <div class="gen-orb gen-orb-3"></div>
+        <div class="gen-orb gen-orb-4"></div>
+      </div>
 
-        <div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">Welcome back</div>
-          <h1 style="font-family:'Alata',sans-serif;font-size:40px;color:#fff;line-height:1.1;margin:0 0 8px;">
-            Your Vertes
-          </h1>
-          <p style="font-family:'ABeeZee',sans-serif;font-size:15px;color:rgba(255,255,255,0.45);margin:0;max-width:440px;line-height:1.6;">
-            Create engaging surveys, share them with your audience,<br>and uncover insights — all in one place.
-          </p>
+      <div style="position:relative;z-index:1;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:24px;">
+
+          <div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;">Welcome back</div>
+            <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 8px;">
+              Your Vertos
+            </h1>
+            <p style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.4);margin:0;max-width:400px;line-height:1.6;">
+              Create engaging surveys, share them with your audience,<br>and uncover insights — all in one place.
+            </p>
+          </div>
+
+          <%# Stats strip %>
+          <div style="display:flex;gap:1px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+            <% [
+                 ["#{@surveys.size}",      "Verto#{"s" if @surveys.size != 1}",      "#272D4A"],
+                 ["#{published.size}",     "Published",                               "#1a3d2a"],
+                 ["#{drafts.size}",        "Draft#{"s" if drafts.size != 1}",         "#272D4A"],
+                 ["#{@total_responses}",   "Response#{"s" if @total_responses != 1}", "#1a3d2a"],
+               ].each do |num, label, bg| %>
+              <div style="background:<%= bg %>;padding:16px 22px;text-align:center;">
+                <div style="font-family:'Alata',sans-serif;font-size:26px;color:#00A950;line-height:1;"><%= num %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);margin-top:3px;white-space:nowrap;"><%= label %></div>
+              </div>
+            <% end %>
+          </div>
+
         </div>
-
-        <%# Stats strip %>
-        <div style="display:flex;gap:1px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
-          <% [
-               ["#{@surveys.size}", "Verto#{"s" if @surveys.size != 1}", "#272D4A"],
-               ["#{published.size}", "Published", "#1a3d2a"],
-               ["#{drafts.size}", "Draft#{"s" if drafts.size != 1}", "#272D4A"],
-               ["#{@total_responses}", "Response#{"s" if @total_responses != 1}", "#1a3d2a"],
-             ].each do |num, label, bg| %>
-            <div style="background:<%= bg %>;padding:16px 24px;text-align:center;">
-              <div style="font-family:'Alata',sans-serif;font-size:26px;color:#00A950;line-height:1;"><%= num %></div>
-              <div style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.35);margin-top:3px;white-space:nowrap;"><%= label %></div>
-            </div>
-          <% end %>
-        </div>
-
       </div>
     </div>
-  </div>
 
-  <%# ── Body ── %>
-  <div style="flex:1;padding:32px 28px 60px;">
-    <div style="max-width:900px;margin:0 auto;">
+    <%# ── Body ── %>
+    <div style="flex:1;padding:28px 36px 60px;">
 
       <% if @surveys.empty? %>
-        <%# ── Empty state ── %>
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 32px;text-align:center;gap:20px;">
-          <div class="gen-asterisk" style="width:56px;height:56px;"></div>
+          <div class="gen-asterisk" style="width:52px;height:52px;"></div>
           <div>
-            <div style="font-family:'Alata',sans-serif;font-size:24px;color:#fff;margin-bottom:8px;">No Vertes yet</div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.4);max-width:320px;line-height:1.6;">
+            <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;margin-bottom:8px;">No Vertos yet</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.35);max-width:300px;line-height:1.6;">
               Create your first Verto and start collecting insights from your audience.
             </div>
           </div>
           <%= link_to "Create your first Verto →", new_survey_path,
-                style: "padding:12px 28px;border-radius:100px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:14px;text-decoration:none;" %>
+                style: "padding:11px 26px;border-radius:100px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;" %>
         </div>
 
       <% else %>
@@ -86,12 +75,12 @@
         <%# ── Published section ── %>
         <% if published.any? %>
           <div style="margin-bottom:28px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-              <span style="font-family:'Alata',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;">Published</span>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Published</span>
               <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
-              <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);"><%= published.size %></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.2);"><%= published.size %></span>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;">
               <% published.each do |survey| %>
                 <%= render "surveys/dashboard_card", survey: survey %>
               <% end %>
@@ -102,12 +91,12 @@
         <%# ── Drafts section ── %>
         <% if drafts.any? %>
           <div>
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-              <span style="font-family:'Alata',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;">Drafts</span>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Drafts</span>
               <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
-              <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);"><%= drafts.size %></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.2);"><%= drafts.size %></span>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;">
               <% drafts.each do |survey| %>
                 <%= render "surveys/dashboard_card", survey: survey %>
               <% end %>
@@ -117,6 +106,6 @@
 
       <% end %>
     </div>
-  </div>
 
+  </div>
 </div>

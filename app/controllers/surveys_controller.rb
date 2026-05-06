@@ -1,5 +1,5 @@
 class SurveysController < ApplicationController
-  layout "fullscreen", only: :show
+  layout "fullscreen", only: [:show, :new]
 
   # JSON updates from the inline editor are same-origin fetches without CSRF tokens.
   protect_from_forgery with: :null_session, only: :update
