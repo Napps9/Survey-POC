@@ -9,7 +9,7 @@ export default class extends Controller {
   deleteOption(event) {
     event.stopPropagation()
     const item = event.currentTarget.closest(".pick-item, .rotate-card")
-    if (item) item.remove()
+    if (item) { item.remove(); this.dispatch("changed") }
   }
 
   addPickOption() {
@@ -26,6 +26,7 @@ export default class extends Controller {
       <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
     `
     addBtn ? addBtn.before(li) : this.element.appendChild(li)
+    this.dispatch("changed")
     const editable = li.querySelector("[contenteditable]")
     editable?.focus()
     // Select all text so user can immediately type replacement
@@ -51,6 +52,7 @@ export default class extends Controller {
       <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption">×</button>
     `
     stack.appendChild(card)
+    this.dispatch("changed")
     // Notify tap-stack controller to re-layout
     const tapStack = this.element.querySelector("[data-controller~='tap-stack']") || this.element
     tapStack.dispatchEvent(new Event("tap-stack:reset"))

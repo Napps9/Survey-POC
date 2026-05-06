@@ -59,9 +59,11 @@ class SurveysController < ApplicationController
     payload = JSON.parse(request.body.read)
 
     survey.update!(
-      title:       payload["title"],
-      description: payload["description"],
-      cards:       payload["cards"]
+      title:                          payload["title"],
+      description:                    payload["description"],
+      cards:                          payload["cards"],
+      results_summary:                nil,
+      results_summary_response_count: nil
     )
 
     render json: { ok: true, id: survey.id, updated_at: survey.updated_at }

@@ -20,8 +20,10 @@ const QUESTIONS_MIN = 10
 const QUESTIONS_MAX = 15
 
 export default class extends Controller {
-  static targets = ["card", "summary", "title", "surveyDescription", "saveButton", "status"]
-  static values  = { id: Number, url: String }
+  static targets = ["card", "summary", "saveButton", "status"]
+  static values  = { url: String, title: String, description: String }
+
+  _saveTimer = null
 
   connect() {
     this.refreshAll()
@@ -126,40 +128,51 @@ export default class extends Controller {
   }
 
   markDirty() {
-    if (this.hasStatusTarget) {
-      this.statusTarget.textContent = "Unsaved changes"
-      this.statusTarget.className = "text-xs text-light-yellow"
-    }
+    this.flash("Unsaved changes", "text-light-yellow")
+    clearTimeout(this._saveTimer)
+    this._saveTimer = setTimeout(() => this._doSave(), 1500)
   }
 
   serialize() {
     const cards = this.cardTargets.map(card => {
       const type = card.dataset.cardType
-      const text = card.querySelector("[data-role='text']")?.textContent.trim() || ""
-      const description = card.querySelector("[data-role='description']")?.textContent.trim() || ""
-      const options = Array.from(card.querySelectorAll("[data-role='option']"))
-        .map(o => o.textContent.trim()).filter(Boolean)
-      const out = { type, text }
-      if (description) out.description = description
-      if (options.length) out.options = options
+      const out  = { type }
+      out.text = card.querySelector('.q-title, .activity-title')?.textContent.trim() || ""
+      const desc = card.querySelector('.q-subtitle, .activity-desc')?.textContent.trim()
+      if (desc) out.description = desc
+      const opts = []
+      if (['multiple_choice', 'select_many', 'yes_no'].includes(type))
+        card.querySelectorAll('.pick-text').forEach(el => opts.push(el.textContent.trim()))
+      else if (['select_one_grid', 'select_many_grid'].includes(type))
+        card.querySelectorAll('.choice-label').forEach(el => opts.push(el.textContent.trim()))
+      else if (type === 'range')
+        card.querySelectorAll('.slider-label-text').forEach(el => opts.push(el.textContent.trim()))
+      else if (type === 'rating')
+        card.querySelectorAll('.rating-label').forEach(el => opts.push(el.textContent.trim()))
+      else if (type === 'tap_card')
+        card.querySelectorAll('.rotate-card span[contenteditable]').forEach(el => opts.push(el.textContent.trim()))
+      if (opts.length) out.options = opts.filter(Boolean)
       return out
     })
 
     return {
-      title: this.titleTarget.textContent.trim(),
-      description: this.surveyDescriptionTarget.textContent.trim(),
+      title:       this.titleValue,
+      description: this.descriptionValue,
       cards
     }
   }
 
   async save(event) {
-    event.preventDefault()
-    if (!this.hasUrlValue || !this.urlValue) {
-      this.flash("Nothing to save (no survey id)", "text-hot-pink")
-      return
-    }
-    this.saveButtonTarget.disabled = true
+    event?.preventDefault()
+    if (this.hasSaveButtonTarget) this.saveButtonTarget.disabled = true
     this.flash("Saving…", "text-smoke/60")
+    clearTimeout(this._saveTimer)
+    await this._doSave()
+    if (this.hasSaveButtonTarget) this.saveButtonTarget.disabled = false
+  }
+
+  async _doSave() {
+    if (!this.hasUrlValue || !this.urlValue) return
     try {
       const res = await fetch(this.urlValue, {
         method: "PATCH",
@@ -171,8 +184,6 @@ export default class extends Controller {
       this.flash(`Saved ${new Date(json.updated_at).toLocaleTimeString()}`, "text-aquamarine")
     } catch (err) {
       this.flash(`Save failed: ${err.message}`, "text-hot-pink")
-    } finally {
-      this.saveButtonTarget.disabled = false
     }
   }
 

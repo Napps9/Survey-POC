@@ -414,12 +414,14 @@ export default class extends Controller {
     if (!this.activeCardEl || !this.pendingType) return
     this._applyToCard(this.activeCardEl, this.pendingType)
     this._toast(`Answer type updated to ${TYPE_META[this.pendingType]?.badge || this.pendingType}`)
+    this.dispatch("changed")
   }
 
   applyAll() {
     if (!this.pendingType) return
     this.cardTargets.forEach(card => this._applyToCard(card, this.pendingType))
     this._toast(`Applied to all ${this.cardTargets.length} cards`)
+    this.dispatch("changed")
   }
 
   deleteCard(event) {
@@ -434,6 +436,7 @@ export default class extends Controller {
       this.panelFooterTarget.style.display = "none"
     }
     this._updateCount()
+    this.dispatch("changed")
   }
 
   // ── private ──────────────────────────────────────────
