@@ -9,7 +9,13 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
+  # Public player
+  get  "play/:token",        to: "player#show",   as: :play_survey
+  post "play/:token/submit", to: "player#submit", as: :submit_survey
+
   root "surveys#new"
-  post "surveys/generate", to: "surveys#generate", as: :generate_survey
+  post "surveys/generate",       to: "surveys#generate", as: :generate_survey
+  post "surveys/:id/publish",    to: "surveys#publish",  as: :publish_survey
+  get  "surveys/:id/results",    to: "surveys#results",  as: :survey_results
   resources :surveys, only: [:show, :update]
 end

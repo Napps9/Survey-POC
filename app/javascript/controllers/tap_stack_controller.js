@@ -9,6 +9,7 @@ export default class extends Controller {
 
   connect() {
     this.position = 0
+    this.swipeResults = {}
     this.layout()
   }
 
@@ -17,6 +18,9 @@ export default class extends Controller {
     const dir = event.currentTarget.dataset.tapStackDirection || "right"
     const top = this.cardTargets[this.position]
     if (!top) return
+    const label = top.querySelector("span")?.textContent?.trim() || `Card ${this.position + 1}`
+    this.swipeResults[label] = dir === "right" ? "yes" : "no"
+    this.element.dataset.swipeResults = JSON.stringify(this.swipeResults)
     const tx = dir === "left" ? "-120%" : dir === "right" ? "120%" : "0"
     const ty = dir === "up"   ? "-120%" : "0"
     const rot = dir === "left" ? "-15deg" : dir === "right" ? "15deg" : "0deg"
@@ -30,6 +34,8 @@ export default class extends Controller {
   reset(event) {
     if (event) event.preventDefault()
     this.position = 0
+    this.swipeResults = {}
+    this.element.dataset.swipeResults = "{}"
     this.cardTargets.forEach((c) => {
       c.style.transition = "none"
       c.style.opacity    = ""

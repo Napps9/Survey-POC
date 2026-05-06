@@ -302,11 +302,28 @@
                   data-action="click->preview-verto#open">
             ▶ Preview Verto
           </button>
-          <%= link_to root_path,
-                style: "padding:10px 26px;border-radius:16px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s;",
-                onmouseover: "this.style.background='#009044'",
-                onmouseout:  "this.style.background='#00A950'" do %>
-            Publish Verto →
+          <% if @survey.publish_token.present? %>
+            <span style="font-family:'Alata',sans-serif;font-size:12px;color:#00A950;">✓ Published</span>
+            <input type="text" readonly
+                   id="publish-url-<%= @survey.id %>"
+                   value="<%= play_survey_url(@survey.publish_token) %>"
+                   style="padding:8px 12px;border-radius:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size:11px;width:220px;outline:none;" />
+            <button type="button"
+                    onclick="navigator.clipboard.writeText(document.getElementById('publish-url-<%= @survey.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',2000)})"
+                    style="padding:8px 16px;border-radius:12px;background:transparent;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
+              Copy link
+            </button>
+            <%= link_to "View Results →", survey_results_path(@survey),
+                  style: "padding:10px 22px;border-radius:16px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s;",
+                  onmouseover: "this.style.background='#009044'",
+                  onmouseout:  "this.style.background='#00A950'" %>
+          <% else %>
+            <%= button_to "Publish Verto →", publish_survey_path(@survey),
+                  method: :post,
+                  style: "padding:10px 26px;border-radius:16px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;border:none;cursor:pointer;transition:background 0.15s;",
+                  form: { style: "display:inline;" },
+                  onmouseover: "this.style.background='#009044'",
+                  onmouseout:  "this.style.background='#00A950'" %>
           <% end %>
         </div>
       </div>

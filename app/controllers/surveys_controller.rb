@@ -4,11 +4,12 @@ class SurveysController < ApplicationController
   # JSON updates from the inline editor are same-origin fetches without CSRF tokens.
   protect_from_forgery with: :null_session, only: :update
 
+  before_action :set_survey, only: [:show, :publish, :results]
+
   def new
   end
 
   def show
-    @survey = Survey.find(params[:id])
     render :show
   end
 
@@ -62,7 +63,59 @@ class SurveysController < ApplicationController
     render json: { ok: false, error: e.message }, status: :unprocessable_entity
   end
 
+  def publish
+    @survey.update!(
+      publish_token: @survey.publish_token || SecureRandom.urlsafe_base64(18),
+      published_at:  @survey.published_at  || Time.current
+    )
+    redirect_to survey_path(@survey)
+  end
+
+  def results
+    @responses  = @survey.responses.where(status: "completed").order(created_at: :desc)
+    @total      = @responses.count
+    @aggregated = aggregate_results(Array(@survey.cards), @responses)
+    render :results, layout: "fullscreen"
+  end
+
   private
+
+  def set_survey
+    @survey = Survey.find(params[:id])
+  end
+
+  def aggregate_results(cards, responses)
+    cards.map.with_index do |card, idx|
+      key  = idx.to_s
+      type = card["type"].to_s
+      vals = responses.filter_map { |r| r.answers[key]&.dig("value") }
+      case type
+      when "multiple_choice", "yes_no", "select_one_grid"
+        counts = Hash.new(0).tap { |h| vals.each { |v| h[v.to_s] += 1 } }
+        { type:, card:, total: vals.size, counts: }
+      when "select_many", "select_many_grid"
+        counts = Hash.new(0).tap { |h| vals.each { |a| Array(a).each { |v| h[v.to_s] += 1 } } }
+        { type:, card:, total: vals.size, counts: }
+      when "tap_card"
+        counts = {}
+        vals.each { |obj| obj.each { |l, d| (counts[l] ||= { "yes" => 0, "no" => 0 })[d] += 1 } if obj.is_a?(Hash) }
+        { type:, card:, total: vals.size, counts: }
+      when "range"
+        counts = Hash.new(0).tap { |h| vals.each { |v| h[v.to_i] += 1 } }
+        { type:, card:, total: vals.size, counts: }
+      when "rating"
+        counts = Hash.new(0).tap { |h| vals.each { |v| h[v.to_i] += 1 } }
+        avg = vals.any? ? (vals.sum(&:to_f) / vals.size).round(1) : 0.0
+        { type:, card:, total: vals.size, counts:, avg: }
+      when "open_ended"
+        { type:, card:, total: vals.size, texts: vals.map(&:to_s).reject(&:blank?) }
+      when "static_page"
+        { type:, card:, total: vals.size, completed: vals.count { |v| v == true } }
+      else
+        { type:, card:, total: responses.count, counts: {} }
+      end
+    end
+  end
 
   def survey_payload(s)
     {

@@ -1,0 +1,56 @@
+<%
+  cards   = Array(@survey.cards)
+  total_q = cards.count { |c| !%w[welcome_card static_page].include?(c["type"]) }
+  prev_q  = 0
+%>
+<div class="preview-overlay flex flex-col"
+     style="height:100vh;"
+     data-controller="player"
+     data-player-submit-url-value="<%= submit_survey_url(@survey.publish_token) %>">
+
+  <nav class="preview-nav">
+    <span style="font-family:'Alata',sans-serif;font-size:15px;color:white;font-weight:600;">Playverto</span>
+    <span class="preview-nav-title"><%= @survey.theme %></span>
+    <span></span>
+  </nav>
+
+  <div class="preview-body">
+    <% cards.each_with_index do |card, idx| %>
+      <%
+        type  = card["type"].to_s
+        is_q  = !%w[welcome_card static_page].include?(type)
+        prev_q += 1 if is_q
+        prog  = total_q > 0 ? ((prev_q.to_f / total_q) * 100).round : 5
+        prog  = 5 unless is_q
+      %>
+      <div class="preview-card"
+           data-player-target="card"
+           data-card-index="<%= idx %>"
+           data-card-type="<%= type %>">
+        <%= render "player/play_card", card: card, progress: prog %>
+      </div>
+    <% end %>
+
+    <div class="preview-thankyou" data-player-target="thankyou">
+      <div class="preview-thankyou-emoji">🎉</div>
+      <div class="preview-thankyou-title">Thank you!</div>
+      <div class="preview-thankyou-sub">Your responses have been recorded.</div>
+      <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.25);margin-top:8px;">
+        Powered by Playverto
+      </p>
+    </div>
+  </div>
+
+  <div class="preview-footer">
+    <button class="preview-btn preview-btn-back invisible"
+            data-player-target="backBtn"
+            data-action="click->player#back">← Back</button>
+    <span class="preview-progress-text" data-player-target="progress"></span>
+    <button class="preview-btn preview-btn-next"
+            data-player-target="nextBtn"
+            data-action="click->player#next">Next →</button>
+    <button class="preview-btn preview-btn-finish hidden"
+            data-player-target="finishBtn"
+            data-action="click->player#finish">Submit ✓</button>
+  </div>
+</div>
