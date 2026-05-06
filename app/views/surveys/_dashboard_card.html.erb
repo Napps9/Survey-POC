@@ -1,0 +1,73 @@
+<%
+  published   = survey.publish_token.present?
+  resp_count  = survey.responses.size
+  card_count  = Array(survey.cards).size
+  q_count     = Array(survey.cards).count { |c| !%w[welcome_card static_page].include?(c["type"].to_s) }
+  accent      = published ? "#00A950" : "rgba(255,255,255,0.2)"
+  accent_dim  = published ? "rgba(0,169,80,0.08)" : "rgba(255,255,255,0.03)"
+%>
+
+<div style="border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid <%= published ? 'rgba(0,169,80,0.2)' : 'rgba(255,255,255,0.07)' %>;display:flex;flex-direction:column;overflow:hidden;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;"
+     onmouseover="this.style.borderColor='<%= published ? 'rgba(0,169,80,0.45)' : 'rgba(255,255,255,0.18)' %>';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.25)'"
+     onmouseout="this.style.borderColor='<%= published ? 'rgba(0,169,80,0.2)' : 'rgba(255,255,255,0.07)' %>';this.style.transform='';this.style.boxShadow=''">
+
+  <%# Top accent bar + badge row %>
+  <div style="height:3px;background:<%= published ? 'linear-gradient(90deg,#00A950,#01cf63)' : 'rgba(255,255,255,0.08)' %>;flex-shrink:0;"></div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0;">
+    <% if published %>
+      <span style="font-family:'Alata',sans-serif;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:#00A950;color:#fff;">Published</span>
+    <% else %>
+      <span style="font-family:'Alata',sans-serif;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);">Draft</span>
+    <% end %>
+    <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.2);">
+      <%= survey.updated_at.strftime("%-d %b %Y") %>
+    </span>
+  </div>
+
+  <%# Theme + title %>
+  <div style="padding:12px 16px 14px;flex:1;">
+    <div style="font-family:'Alata',sans-serif;font-size:18px;color:#fff;line-height:1.25;margin-bottom:4px;">
+      <%= survey.theme.truncate(48) %>
+    </div>
+    <% if survey.title.present? && survey.title != survey.theme %>
+      <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);line-height:1.4;">
+        <%= survey.title.truncate(60) %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Stats row %>
+  <div style="display:flex;align-items:center;gap:0;border-top:1px solid rgba(255,255,255,0.05);margin:0 16px;padding:10px 0;">
+    <div style="flex:1;display:flex;align-items:center;gap:5px;">
+      <span style="font-family:'Alata',sans-serif;font-size:15px;color:<%= resp_count > 0 ? '#00A950' : 'rgba(255,255,255,0.2)' %>;line-height:1;"><%= resp_count %></span>
+      <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);">response<%= resp_count == 1 ? "" : "s" %></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;">
+      <span style="font-family:'Alata',sans-serif;font-size:15px;color:rgba(255,255,255,0.4);line-height:1;"><%= q_count %></span>
+      <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.25);">question<%= q_count == 1 ? "" : "s" %></span>
+    </div>
+  </div>
+
+  <%# Action row %>
+  <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 14px;">
+    <%= link_to "Edit Verto", survey_path(survey),
+          style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;transition:all 0.15s;",
+          onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
+          onmouseout:  "this.style.color='rgba(255,255,255,0.6)';this.style.background='rgba(255,255,255,0.05)'" %>
+
+    <% if published %>
+      <%= link_to "Results →", survey_results_path(survey),
+            style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(0,169,80,0.12);border:1px solid rgba(0,169,80,0.25);color:#00A950;font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;transition:all 0.15s;",
+            onmouseover: "this.style.background='rgba(0,169,80,0.22)'",
+            onmouseout:  "this.style.background='rgba(0,169,80,0.12)'" %>
+    <% else %>
+      <%= button_to "Publish →", publish_survey_path(survey),
+            method: :post,
+            style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(0,169,80,0.12);border:1px solid rgba(0,169,80,0.25);color:#00A950;font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;transition:all 0.15s;",
+            form: { style: "flex:1;display:flex;" },
+            onmouseover: "this.style.background='rgba(0,169,80,0.22)'",
+            onmouseout:  "this.style.background='rgba(0,169,80,0.12)'" %>
+    <% end %>
+  </div>
+</div>

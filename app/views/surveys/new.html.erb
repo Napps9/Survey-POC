@@ -16,8 +16,11 @@
     <%# Nav %>
     <nav style="height:54px;background:rgba(28,32,52,0.6);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;position:relative;z-index:1;"
          class="flex items-center justify-between px-9">
-      <%= image_tag "playverto.svg", alt: "Playverto", class: "h-7 w-auto" %>
-      <span style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.45);">Survey Generator</span>
+      <%= link_to root_path do %>
+        <%= image_tag "playverto.svg", alt: "Playverto", class: "h-7 w-auto" %>
+      <% end %>
+      <span style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.45);">Create Verto</span>
+      <span></span>
     </nav>
 
     <%# Body %>
@@ -85,9 +88,13 @@
   </div>
 
   <%# ── Form ── %>
-  <h1 class="display text-5xl mb-2">AI Survey Generator</h1>
+  <div style="margin-bottom:24px;">
+    <%= link_to "← Dashboard", root_path,
+          style: "font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);text-decoration:none;" %>
+  </div>
+  <h1 class="display text-5xl mb-2">Create a Verto</h1>
   <p class="text-smoke/70 mb-8">
-    Tell us the brief — we'll draft a survey that follows the Playverto design rules.
+    Tell us the brief — we'll design a survey that follows the Playverto rules.
   </p>
 
   <% if flash[:alert] %>

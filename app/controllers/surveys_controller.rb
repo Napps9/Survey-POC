@@ -8,6 +8,12 @@ class SurveysController < ApplicationController
 
   before_action :set_survey, only: [:show, :publish, :results, :results_summary]
 
+  def index
+    @surveys = Survey.includes(:responses).order(updated_at: :desc)
+    @total_responses = Response.count
+    render :index, layout: "fullscreen"
+  end
+
   def new
   end
 

@@ -13,8 +13,9 @@ Rails.application.routes.draw do
   get  "play/:token",        to: "player#show",   as: :play_survey
   post "play/:token/submit", to: "player#submit", as: :submit_survey
 
-  root "surveys#new"
-  post "surveys/generate",       to: "surveys#generate", as: :generate_survey
+  root "surveys#index"
+  get  "surveys/new",       to: "surveys#new",    as: :new_survey
+  post "surveys/generate",  to: "surveys#generate", as: :generate_survey
   post "surveys/:id/publish",    to: "surveys#publish",  as: :publish_survey
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results
   get  "surveys/:id/results/summary", to: "surveys#results_summary", as: :survey_results_summary
