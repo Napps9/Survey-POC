@@ -548,12 +548,11 @@
   50%     { transform: translate(-200px,-100px) scale(1.1); }
 }
 
-/* Rotating Verto-style asterisk (8-pointed star) */
+/* Verto-style asterisk (8-pointed star) — static */
 .gen-asterisk {
   width: 88px; height: 88px;
   position: relative;
-  animation: gen-asterisk-spin 12s linear infinite;
-  filter: drop-shadow(0 0 28px rgba(255,30,111,0.35));
+  opacity: 0.6;
 }
 .gen-asterisk::before,
 .gen-asterisk::after {
@@ -573,9 +572,6 @@
 .gen-asterisk::after {
   clip-path: polygon(45% 0,55% 0,55% 45%,100% 45%,100% 55%,55% 55%,55% 100%,45% 100%,45% 55%,0 55%,0 45%,45% 45%);
   transform: rotate(45deg);
-}
-@keyframes gen-asterisk-spin {
-  to { transform: rotate(360deg); }
 }
 
 /* Rainbow shimmer text */
