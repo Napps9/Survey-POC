@@ -134,7 +134,8 @@ export default class extends Controller {
   }
 
   serialize() {
-    const cards = this.cardTargets.map(card => {
+    const cardEls = Array.from(this.element.querySelectorAll('[data-type-panel-target="card"]'))
+    const cards = cardEls.map(card => {
       const type = card.dataset.cardType
       const out  = { type }
       out.text = card.querySelector('.q-title, .activity-title')?.textContent.trim() || ""
@@ -154,7 +155,6 @@ export default class extends Controller {
       if (opts.length) out.options = opts.filter(Boolean)
       return out
     })
-
     return {
       title:       this.titleValue,
       description: this.descriptionValue,
