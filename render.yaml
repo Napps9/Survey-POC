@@ -22,9 +22,12 @@ services:
         sync: false
       - key: SECRET_KEY_BASE
         generateValue: true
-      - key: SQLITE_DB_PATH
-        value: /data/production.sqlite3
-    disk:
-      name: survey-poc-db
-      mountPath: /data
-      sizeGB: 1
+      - key: DATABASE_URL
+        fromDatabase:
+          name: survey-poc-db
+          property: connectionString
+
+databases:
+  - name: survey-poc-db
+    plan: free
+    region: oregon
