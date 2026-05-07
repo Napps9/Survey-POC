@@ -2,7 +2,7 @@ services:
   - type: web
     name: survey-poc
     runtime: ruby
-    plan: free
+    plan: starter
     region: oregon
     buildCommand: "./bin/render-build.sh"
     startCommand: "bundle exec rails server -e production -p $PORT"
@@ -29,5 +29,5 @@ services:
 
 databases:
   - name: survey-poc-db
-    plan: free
+    plan: starter
     region: oregon
