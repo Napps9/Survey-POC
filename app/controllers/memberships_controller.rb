@@ -3,31 +3,8 @@ class MembershipsController < ApplicationController
   before_action :require_admin!
 
   def index
-    @memberships = current_organisation.memberships.includes(:user).order("users.name")
-  end
-
-  def new
-    @membership = Membership.new
-  end
-
-  def create
-    email = params[:email_address].to_s.strip.downcase
-    user  = User.find_by(email_address: email)
-
-    unless user
-      flash.now[:alert] = "No user found with that email address."
-      @membership = Membership.new
-      return render :new, status: :unprocessable_entity
-    end
-
-    if current_organisation.memberships.exists?(user: user)
-      flash.now[:alert] = "That user is already a member of this organisation."
-      @membership = Membership.new
-      return render :new, status: :unprocessable_entity
-    end
-
-    current_organisation.memberships.create!(user: user, role: params[:role].presence || "member")
-    redirect_to organisation_memberships_path(current_organisation), notice: "#{user.name} added."
+    @memberships      = current_organisation.memberships.includes(:user).order("users.name")
+    @pending_invites  = current_organisation.invites.pending.includes(:invited_by).order(created_at: :desc)
   end
 
   def destroy

@@ -13,8 +13,13 @@ Rails.application.routes.draw do
 
   # Org management (admin only)
   resources :organisations, only: [:edit, :update] do
-    resources :memberships, only: [:index, :new, :create, :destroy]
+    resources :memberships, only: [:index, :destroy]
+    resources :invites,     only: [:new, :create]
   end
+
+  # Public invite acceptance (no auth)
+  get  "invites/:token",        to: "invites#show",   as: :invite
+  post "invites/:token/accept", to: "invites#accept", as: :accept_invite
 
   # Health + PWA
   get "up"             => "rails/health#show", as: :rails_health_check

@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_07_051948) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_07_070616) do
+  create_table "invites", force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.datetime "expires_at", null: false
+    t.integer "invited_by_id", null: false
+    t.integer "organisation_id", null: false
+    t.string "role", default: "member", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invited_by_id"], name: "index_invites_on_invited_by_id"
+    t.index ["organisation_id"], name: "index_invites_on_organisation_id"
+    t.index ["token"], name: "index_invites_on_token", unique: true
+  end
+
   create_table "memberships", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "organisation_id", null: false
@@ -77,6 +92,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_07_051948) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "invites", "organisations"
+  add_foreign_key "invites", "users", column: "invited_by_id"
   add_foreign_key "memberships", "organisations"
   add_foreign_key "memberships", "users"
   add_foreign_key "responses", "surveys"
