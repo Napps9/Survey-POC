@@ -1,5 +1,7 @@
 class SurveyChatsController < ApplicationController
   include ActionController::Live
+  skip_before_action :require_authentication
+  skip_before_action :set_current_organisation
   include AggregatesSurveyResults
   protect_from_forgery with: :null_session
 

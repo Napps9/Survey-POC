@@ -10,7 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_06_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_07_051948) do
+  create_table "memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "organisation_id", null: false
+    t.string "role", default: "member", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["organisation_id"], name: "index_memberships_on_organisation_id"
+    t.index ["user_id", "organisation_id"], name: "index_memberships_on_user_id_and_organisation_id", unique: true
+    t.index ["user_id"], name: "index_memberships_on_user_id"
+  end
+
+  create_table "organisations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_organisations_on_slug", unique: true
+  end
+
   create_table "responses", force: :cascade do |t|
     t.json "answers", default: {}, null: false
     t.datetime "created_at", null: false
@@ -22,12 +41,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_000003) do
     t.index ["survey_id"], name: "index_responses_on_survey_id"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "surveys", force: :cascade do |t|
     t.string "audience_age"
     t.json "cards"
     t.datetime "created_at", null: false
     t.text "description"
     t.text "key_insight"
+    t.integer "organisation_id", null: false
     t.string "publish_token"
     t.datetime "published_at"
     t.text "results_summary"
@@ -35,8 +64,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_000003) do
     t.string "theme"
     t.string "title"
     t.datetime "updated_at", null: false
+    t.index ["organisation_id"], name: "index_surveys_on_organisation_id"
     t.index ["publish_token"], name: "index_surveys_on_publish_token", unique: true
   end
 
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.string "name", default: "", null: false
+    t.string "password_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
+  add_foreign_key "memberships", "organisations"
+  add_foreign_key "memberships", "users"
   add_foreign_key "responses", "surveys"
+  add_foreign_key "sessions", "users"
+  add_foreign_key "surveys", "organisations"
 end

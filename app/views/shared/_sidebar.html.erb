@@ -70,4 +70,47 @@
   <%# Spacer %>
   <div style="flex:1;"></div>
 
+  <%# Admin: Members link %>
+  <% if current_membership&.admin? %>
+    <div style="padding:0 10px 4px;">
+      <a href="<%= organisation_memberships_path(current_organisation) %>"
+         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;transition:color 0.15s;"
+         onmouseover="this.style.color='rgba(255,255,255,0.7)'"
+         onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;">
+          <circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M1.5 12c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        Members
+      </a>
+    </div>
+  <% end %>
+
+  <%# Org + user footer %>
+  <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 14px 12px;"></div>
+  <div style="padding:0 14px 18px;display:flex;flex-direction:column;gap:10px;">
+
+    <%# Org switcher %>
+    <% if defined?(current_organisation) && current_organisation %>
+      <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.06em;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:0 2px;"><%= current_organisation.name %></div>
+      <% if Current.user.organisations.many? %>
+        <% Current.user.organisations.each do |org| %>
+          <% next if org == current_organisation %>
+          <%= button_to org.name, switch_organisation_path, method: :post,
+                params: { organisation_id: org.id },
+                style: "display:block;width:100%;text-align:left;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 10px;color:rgba(255,255,255,0.5);font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;" %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%# User + logout %>
+    <% if defined?(Current) && Current.user %>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= Current.user.name.presence || Current.user.email_address %></span>
+        <%= button_to "Sign out", session_path, method: :delete,
+              style: "flex-shrink:0;background:none;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:4px 9px;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size:11px;cursor:pointer;white-space:nowrap;" %>
+      </div>
+    <% end %>
+  </div>
+
 </aside>

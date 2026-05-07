@@ -1,5 +1,7 @@
 class PlayerController < ApplicationController
   layout "fullscreen"
+  skip_before_action :require_authentication
+  skip_before_action :set_current_organisation
   protect_from_forgery with: :null_session, only: :submit
 
   def show

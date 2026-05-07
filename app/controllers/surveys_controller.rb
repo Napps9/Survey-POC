@@ -8,8 +8,8 @@ class SurveysController < ApplicationController
   before_action :set_survey, only: [:show, :publish, :results]
 
   def index
-    @surveys = Survey.includes(:responses).order(updated_at: :desc)
-    @total_responses = Response.count
+    @surveys = Current.organisation.surveys.includes(:responses).order(updated_at: :desc)
+    @total_responses = Current.organisation.surveys.joins(:responses).count
     render :index, layout: "fullscreen"
   end
 
@@ -38,7 +38,7 @@ class SurveysController < ApplicationController
       notes: notes
     )
 
-    @survey = Survey.create!(
+    @survey = Current.organisation.surveys.create!(
       title:        result["title"],
       description:  result["description"],
       theme:        result["theme"].presence || theme,
@@ -55,7 +55,7 @@ class SurveysController < ApplicationController
   end
 
   def update
-    survey = Survey.find(params[:id])
+    survey = Current.organisation.surveys.find(params[:id])
     payload = JSON.parse(request.body.read)
 
     survey.update!(
@@ -90,7 +90,7 @@ class SurveysController < ApplicationController
   private
 
   def set_survey
-    @survey = Survey.find(params[:id])
+    @survey = Current.organisation.surveys.find(params[:id])
   end
 
   def survey_payload(s)
