@@ -5,8 +5,8 @@ if [ -z "${LD_PRELOAD+x}" ] && [ -f /usr/lib/*/libjemalloc.so.2 ]; then
   export LD_PRELOAD="$(echo /usr/lib/*/libjemalloc.so.2)"
 fi
 
-# If running the rails server then create or migrate existing database
-if [ -n "${DATABASE_URL}" ] && [[ "$*" == *"rails server"* ]]; then
+# Migrate/create database on every container start when DATABASE_URL is set
+if [ -n "${DATABASE_URL}" ]; then
   bundle exec rails db:prepare
   bundle exec rails db:seed
 fi
