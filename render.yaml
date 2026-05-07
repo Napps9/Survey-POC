@@ -5,6 +5,7 @@ services:
     plan: starter
     region: oregon
     buildCommand: "./bin/render-build.sh"
+    preDeployCommand: "bundle exec rails db:prepare && bundle exec rails db:seed"
     startCommand: "bundle exec rails server -e production -p $PORT"
     healthCheckPath: /up
     envVars:
