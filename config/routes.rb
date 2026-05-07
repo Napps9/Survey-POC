@@ -4,8 +4,9 @@ Rails.application.routes.draw do
   post "play/:token/submit", to: "player#submit", as: :submit_survey
 
   # Auth
-  resource  :session,   only: [:new, :create, :destroy]
-  resources :passwords, param: :token, only: [:new, :create, :edit, :update]
+  resource  :session,       only: [:new, :create, :destroy]
+  resources :passwords,     param: :token, only: [:new, :create, :edit, :update]
+  resources :registrations, only: [:new, :create]
 
   # Org switcher
   post "switch_organisation", to: "organisations#switch", as: :switch_organisation

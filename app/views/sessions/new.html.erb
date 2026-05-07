@@ -4,7 +4,8 @@
   <div style="width:100%;max-width:400px;">
     <div style="text-align:center;margin-bottom:40px;">
       <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
-      <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;letter-spacing:0.05em;">Sign in to Playverto</h1>
+      <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;">Sign in to Playverto</h1>
+      <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.35);margin:0;">New here? <%= link_to "Create an account", new_registration_path, style: "color:#00A950;text-decoration:none;" %></p>
     </div>
 
     <% if alert = flash[:alert] %>
