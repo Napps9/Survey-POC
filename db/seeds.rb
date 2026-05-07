@@ -4,7 +4,7 @@ end
 
 user = User.find_or_create_by!(email_address: "admin@playverto.com") do |u|
   u.name     = "Admin"
-  u.password = "changeme123"
+  u.password = "changeme123456"
 end
 
 Membership.find_or_create_by!(user: user, organisation: org) do |m|
