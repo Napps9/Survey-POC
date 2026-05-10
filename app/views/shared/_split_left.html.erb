@@ -1,0 +1,44 @@
+<%# Card left panel — shared by editor (surveys/show), preview
+    (surveys/_preview_card), and player (player/_play_card).
+
+    Locals:
+      card     — the card hash
+      progress — integer 0–100
+      mode     — :editor, :preview, or :player (default: :preview)
+%>
+<%
+  mode    ||= :preview
+  editable = (mode == :editor)
+  has_img  = card["image"].present?
+%>
+
+<div class="split-left">
+  <% if has_img %>
+    <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
+         style="background-image:url('<%= card["image"] %>');"></div>
+    <div class="split-left-overlay"<%= " data-card-media".html_safe if editable %>></div>
+  <% end %>
+
+  <div class="panel-progress">
+    <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
+  </div>
+  <div class="panel-tagline">Build the change</div>
+
+  <%# In edit mode the illustration container always renders so the
+      type-panel can swap its contents when the answer type changes;
+      in read-only modes it's only shown when there's no media image. %>
+  <% if editable || !has_img %>
+    <div class="split-left-illustration"<%= " data-card-illustration".html_safe if editable %>>
+      <%= interaction_illustration(card["type"].to_s) %>
+    </div>
+  <% end %>
+
+  <% if editable %>
+    <button type="button" class="add-media-fab"
+            data-action="click->media-picker#open"
+            title="Add an image to this card">
+      <span class="add-media-fab-plus">＋</span>
+      <span>Add media</span>
+    </button>
+  <% end %>
+</div>
