@@ -905,6 +905,20 @@
   50%      { box-shadow: 0 0 0 6px rgba(1,234,203,0); }
 }
 
+/* Playful "nope" head-shake on the Generate Verto CTA when the form
+   is submitted with required fields empty. Triggered from
+   generating_controller#show. */
+@keyframes verto-shake-no {
+  0%, 100%       { transform: translateX(0); }
+  12%, 36%, 60%  { transform: translateX(-9px) rotate(-1deg); }
+  24%, 48%, 72%  { transform: translateX(9px) rotate(1deg); }
+  84%            { transform: translateX(-4px); }
+}
+.is-shaking {
+  animation: verto-shake-no 0.55s cubic-bezier(.36,.07,.19,.97) both;
+  transform-origin: center;
+}
+
 /* ══════════════════════════════════════════════════
    SCREEN 2 — RESULTS
 ══════════════════════════════════════════════════ */

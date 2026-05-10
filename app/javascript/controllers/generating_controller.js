@@ -12,9 +12,21 @@ export default class extends Controller {
 
   show(event) {
     const form    = this.element.querySelector("form")
-    const theme   = form?.querySelector('[name="theme"]')?.value.trim()        || "your Verto"
-    const age     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
-    const insight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
+    const rawTheme   = form?.querySelector('[name="theme"]')?.value.trim()        || ""
+    const rawAge     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
+    const rawInsight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
+
+    // Required-field gate. Cancel the submit and shake the CTA so the
+    // user gets a playful "nope" instead of a server-side flash bounce.
+    if (!rawTheme || !rawAge || !rawInsight) {
+      event?.preventDefault()
+      this._shakeSubmit(form)
+      return
+    }
+
+    const theme   = rawTheme   || "your Verto"
+    const age     = rawAge
+    const insight = rawInsight
 
     this._theme   = theme
     this._age     = age
@@ -125,5 +137,14 @@ export default class extends Controller {
   _esc(str) {
     return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;")
                             .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+  }
+
+  _shakeSubmit(form) {
+    const btn = form?.querySelector('input[type="submit"], button[type="submit"]')
+    if (!btn) return
+    btn.classList.remove("is-shaking")
+    void btn.offsetWidth // restart the CSS animation
+    btn.classList.add("is-shaking")
+    btn.addEventListener("animationend", () => btn.classList.remove("is-shaking"), { once: true })
   }
 }
