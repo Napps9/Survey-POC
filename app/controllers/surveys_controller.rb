@@ -27,7 +27,7 @@ class SurveysController < ApplicationController
     notes        = params[:notes].to_s.strip
 
     if theme.empty? || audience_age.empty? || key_insight.empty?
-      flash.now[:alert] = "Theme, audience age, and key insight are all required."
+      flash.now[:alert] = "Tell us what your Verto's about, who's answering, and what you want to learn — those three are required."
       return render :new, status: :unprocessable_entity
     end
 
