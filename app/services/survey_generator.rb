@@ -111,18 +111,32 @@ class SurveyGenerator
        select-one list. For grids, weigh option count against legibility.
 
     Output via the emit_survey tool. Choose card types thoughtfully — the
-    Verto answer type definitions below tell you when each is the right fit:
+    Verto answer type definitions below tell you when each is the right fit.
 
-    - multiple_choice (Verto "Select One"): the most popular type. List or
-      grid of options, player picks one. Use list for any number of options;
-      use a grid (even count) when the option count is even and looks tidy
-      on mobile. Up to ~5 options. Can include an "Other" entry. Use this
-      whenever the answer space is well-defined and discrete.
-    - select_many (Verto "Select Many"): same UI as Select One but allows
-      multiple choices. Use when more than one answer is genuinely possible.
-    - select_one_grid / select_many_grid (Verto "Matrix"): up to ~8 sub-
-      questions sharing the SAME answer set, with consistent column labels.
-      Great for rating multiple sub-topics on the same scale efficiently.
+    DEFAULT FOR ANY "CHOOSE ONE" QUESTION: use select_one_grid.
+    DEFAULT FOR ANY "CHOOSE MANY" QUESTION: use select_many_grid.
+    The visual grid is core to Playverto's gamified feel, so always prefer
+    it over the plain text list. Only fall back to multiple_choice or
+    select_many when ALL of the following are true: option labels are too
+    long to fit a tile (over ~14 characters), or the question genuinely
+    needs more than 10 options. Otherwise, default to the grid.
+
+    - select_one_grid (Verto "Pick One — image grid"): DEFAULT for single-
+      pick questions. 2×2 to 3×3 visual tiles, even option counts up to 10.
+      Each tile can carry an image, icon, or coloured swatch — far more
+      engaging than a plain list. Use this whenever options can be
+      represented visually or fit short labels.
+    - select_many_grid (Verto "Select Many — image grid"): DEFAULT for
+      multi-pick questions. Same visual tile grid, multi-select. Even option
+      counts up to 10. Use this whenever multiple answers can apply and
+      options can be represented visually or fit short labels.
+    - multiple_choice (Verto "Pick One — text list"): plain text list,
+      single pick. Use ONLY as a fallback when option labels are too long
+      to fit a grid tile (over ~14 chars), or when the question needs more
+      than 10 options. Up to ~5 options is best. Can include an "Other".
+    - select_many (Verto "Select Many — text list"): plain text list,
+      multi-pick. Use ONLY when select_many_grid won't fit (long labels
+      or more than 10 options).
     - tap_card (Verto "Tap"): a sequence of cards, each card is its own
       mini-question with 2–3 quick choices. Best when you want lots of data
       points fast across related concepts (e.g. quick reactions to a series
@@ -138,8 +152,8 @@ class SurveyGenerator
       0–10 drag scale, also customisable to 4- or 5-point. Labels can be
       numbers, agreement, or emotion. Pick rating with a wider option count
       when you want NPS-style.
-    - yes_no: simple gating only. Use sparingly — Select One with two
-      options is often richer.
+    - yes_no: simple gating only. Use sparingly — a select_one_grid with
+      two visual options is often richer.
     - open_ended (Verto "Freeform"): text input, can be voice-recorded too.
       Use sparingly to capture authentic qualitative voice.
     - select_one_grid as "Prioritise" surrogate: Verto's Prioritise lets
@@ -189,9 +203,13 @@ class SurveyGenerator
       from the system prompt:
       - 10 to 15 questions total (welcome_card doesn't count)
       - no more than 2 of the same answer type in a row
-      - tap_card 3-5 options · multi-choice 3-5 options · grids even count, ≤10
+      - DEFAULT every single-pick question to select_one_grid and every
+        multi-pick to select_many_grid; only fall back to multiple_choice /
+        select_many when option labels are over ~14 chars or the question
+        needs more than 10 options
+      - tap_card 3-5 options · grids even count, ≤10
       - question text 50-70 chars target, never exceed 100
-      - option text ≤ 20 chars in select-one lists
+      - option text ≤ 14 chars when using a grid; ≤ 20 chars in a text list
       - include a welcome_card only if the audience is cold/new
       Echo theme, audience_age, key_insight unchanged. Output via the
       emit_survey tool.
