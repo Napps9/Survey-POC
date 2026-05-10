@@ -11,7 +11,9 @@ export default class extends Controller {
   ]
 
   show(event) {
-    const form    = this.element.querySelector("form")
+    // On a submit event, event.target IS the form that was submitted.
+    // Fall back to a DOM lookup so a manual call (no event) still works.
+    const form = event?.target?.closest?.("form") || this.element.querySelector("form")
     const rawTheme   = form?.querySelector('[name="theme"]')?.value.trim()        || ""
     const rawAge     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
     const rawInsight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
