@@ -1,12 +1,9 @@
 class SurveyChatsController < ApplicationController
   include ActionController::Live
-  skip_before_action :require_authentication
-  skip_before_action :set_current_organisation
   include AggregatesSurveyResults
-  protect_from_forgery with: :null_session
 
   def create
-    survey    = Survey.find(params[:survey_id])
+    survey    = Current.organisation.surveys.find(params[:survey_id])
     responses = survey.responses.where(status: "completed").order(created_at: :desc)
     total     = responses.count
     aggregated = aggregate_results(Array(survey.cards), responses)

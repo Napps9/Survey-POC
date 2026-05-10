@@ -38,9 +38,13 @@ export default class extends Controller {
   async _stream(bubble) {
     let aiText = ""
     try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
       const res = await fetch(this.urlValue, {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {})
+        },
         body:    JSON.stringify({ messages: this._messages })
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
