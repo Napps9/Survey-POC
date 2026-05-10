@@ -356,18 +356,18 @@
     <div class="type-panel">
 
       <div class="type-panel-top">
-        <div style="font-family:'Alata',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.35);margin-bottom:4px;">
+        <div style="font-family:'Alata',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
           Answer Type
         </div>
-        <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:#FF1E6F;line-height:1.3;min-height:16px;"
+        <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#FF1E6F;line-height:1.3;min-height:18px;"
              data-type-panel-target="panelCardName">Select a card to change its type</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:3px;line-height:1.4;"
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:5px;line-height:1.45;"
              data-type-panel-target="panelHint">Click any card on the left.</div>
       </div>
 
       <div class="type-panel-empty" data-type-panel-target="panelEmpty">
-        <div style="font-size:28px;opacity:0.18;">↖</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.28);line-height:1.5;">
+        <div style="font-size:28px;opacity:0.25;">↖</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.55;max-width:240px;">
           Select a question card to switch its answer format
         </div>
       </div>
@@ -383,7 +383,6 @@
           { key: "select_many_grid", icon: "⊞",  name: "Image Grid — Many", desc: "Photo grid, multi-pick" },
           { key: "tap_card",         icon: "⇄",  name: "Swipe Cards",       desc: "Swipe to agree / disagree" },
           { key: "open_ended",       icon: "✏",  name: "Open Text",         desc: "Free-form written answer" },
-          { key: "static_page",      icon: "✔",  name: "Activity",          desc: "Off-screen task + checkbox" },
           { key: "welcome_card",     icon: "👋", name: "Welcome Card",      desc: "Intro — no answer required" },
         ].each do |opt| %>
           <div class="type-opt"

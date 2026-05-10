@@ -12,7 +12,7 @@ export default class extends Controller {
 
   show(event) {
     const form    = this.element.querySelector("form")
-    const theme   = form?.querySelector('[name="theme"]')?.value.trim()        || "your survey"
+    const theme   = form?.querySelector('[name="theme"]')?.value.trim()        || "your Verto"
     const age     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
     const insight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
 
@@ -91,7 +91,7 @@ export default class extends Controller {
     const messages = [
       `Choosing the formats that'll keep <em>${audience}</em> engaged — sliders, swipe cards, image grids and more`,
       `Matching each question about <em>${this._esc(theme)}</em> to the format that gets the most honest response`,
-      `Mixing question types so the survey stays fresh from card 1 to the last — no two consecutive formats are the same`,
+      `Mixing question types so the Verto stays fresh from card 1 to the last — no two consecutive formats are the same`,
     ]
     return messages[Math.floor(Math.random() * messages.length)]
   }

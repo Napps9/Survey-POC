@@ -1226,8 +1226,8 @@
 .type-opt-row {
   display: flex; align-items: center; gap: 8px;
 }
-.type-opt-name  { font-family: "Alata", sans-serif; font-size: 12px; color: #fff; margin-bottom: 1px; }
-.type-opt-desc  { font-size: 10px; color: rgba(255,255,255,0.38); line-height: 1.3; }
+.type-opt-name  { font-family: "Alata", sans-serif; font-size: 14px; color: #fff; margin-bottom: 2px; }
+.type-opt-desc  { font-size: 12.5px; color: rgba(255,255,255,0.62); line-height: 1.45; }
 .type-opt-radio {
   width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
   border: 1.5px solid rgba(255,255,255,0.18);
@@ -1237,16 +1237,16 @@
 .type-opt.active .type-opt-radio { background: #01EACB; border-color: #01EACB; }
 .type-opt.active .type-opt-radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
 
-/* Relevance score badge injected by type_panel_controller */
+/* Fit-tier badge injected by type_panel_controller (was a numeric %). */
 .type-opt-score {
   font-family: "Alata", sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.04em;
-  padding: 2px 6px;
+  padding: 3px 9px;
   border-radius: 100px;
   background: rgba(255,255,255,0.07);
-  color: rgba(255,255,255,0.38);
+  color: rgba(255,255,255,0.7);
   white-space: nowrap;
   flex-shrink: 0;
 }

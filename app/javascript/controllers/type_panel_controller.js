@@ -14,68 +14,66 @@ const TYPE_META = {
   welcome_card:     { badge: "WELCOME CARD",   css: "sb-welcome",  label: "",                      eyebrow: ""                       },
 }
 
+// Each entry's `note` is shown as the natural-language reason this type
+// works (or doesn't) for the selected card. The `score` only drives the
+// fit-tier badge ("Best fit" / "Strong alternative" / etc.).
 const COMPATIBILITY = {
   multiple_choice: [
-    { type: "multiple_choice",  score: 100, note: "Best fit — discrete single-pick list" },
-    { type: "select_many",      score: 85,  note: "Same UI, allow multiple picks instead" },
-    { type: "select_one_grid",  score: 70,  note: "Grid layout — works with even option counts" },
-    { type: "yes_no",           score: 55,  note: "Simplify to a binary gate" },
-    { type: "range",            score: 40,  note: "Use only if answer is scale-like" },
+    { type: "multiple_choice",  score: 100, note: "Cleanest read on a single decision — respondents pick one and move on, giving you a clear winner." },
+    { type: "select_many",      score: 85,  note: "Same look, but lets people pick everything that applies — better when the answer isn't black-and-white." },
+    { type: "select_one_grid",  score: 70,  note: "Visual grid feels more playful; great when each option has a clear image to anchor it." },
+    { type: "yes_no",           score: 55,  note: "Collapses nuance to two answers — only do this if you actually want a hard yes/no signal." },
+    { type: "range",            score: 40,  note: "Loses the categorical clarity of a list — only swap if the answer is really on a scale." },
   ],
   select_many: [
-    { type: "select_many",      score: 100, note: "Best fit — multi-pick list" },
-    { type: "multiple_choice",  score: 80,  note: "Constrain to a single pick" },
-    { type: "select_many_grid", score: 70,  note: "Grid layout for multi-pick" },
-    { type: "select_one_grid",  score: 45,  note: "Grid layout, single pick only" },
+    { type: "select_many",      score: 100, note: "Captures every option people relate to, which is gold for understanding overlapping motivations." },
+    { type: "multiple_choice",  score: 80,  note: "Forces a single pick — sharper signal, but you'll miss the nuance of secondary preferences." },
+    { type: "select_many_grid", score: 70,  note: "Visual grid version; pairs well with image-led options and keeps multi-select intact." },
+    { type: "select_one_grid",  score: 45,  note: "Visual but single-pick only — drops the multi-select richness of the original." },
   ],
   select_one_grid: [
-    { type: "select_one_grid",  score: 100, note: "Best fit — image grid, single pick" },
-    { type: "select_many_grid", score: 80,  note: "Allow multiple picks in the grid" },
-    { type: "multiple_choice",  score: 65,  note: "Flatten to a list instead" },
-    { type: "select_many",      score: 45,  note: "Flat list with multi-pick" },
+    { type: "select_one_grid",  score: 100, note: "Visual single-pick — best when imagery does the talking and you want a fast, gut response." },
+    { type: "select_many_grid", score: 80,  note: "Same imagery, multi-pick — better when more than one option might resonate." },
+    { type: "multiple_choice",  score: 65,  note: "Flatten to a text list — useful if your audience is on a small screen or low bandwidth." },
+    { type: "select_many",      score: 45,  note: "Text list with multi-pick — drops the visual cue but keeps wider answers." },
   ],
   select_many_grid: [
-    { type: "select_many_grid", score: 100, note: "Best fit — image grid, multi-pick" },
-    { type: "select_one_grid",  score: 80,  note: "Constrain grid to single pick" },
-    { type: "select_many",      score: 65,  note: "Flatten to a multi-pick list" },
-    { type: "multiple_choice",  score: 45,  note: "Flat list, single pick only" },
+    { type: "select_many_grid", score: 100, note: "Visual multi-pick — best when respondents may identify with several image-led options at once." },
+    { type: "select_one_grid",  score: 80,  note: "Same visual feel but constrained to one — pick this if you need a single decisive choice." },
+    { type: "select_many",      score: 65,  note: "Text-only multi-pick — keeps breadth but loses the visual fluency of the grid." },
+    { type: "multiple_choice",  score: 45,  note: "Text-only single-pick — sharpest read but the most reductive option here." },
   ],
   tap_card: [
-    { type: "tap_card",         score: 100, note: "Best fit — rapid swipe reactions" },
-    { type: "range",            score: 60,  note: "Replace with a single agree/disagree scale" },
-    { type: "rating",           score: 55,  note: "Icon-based scale as alternative" },
-    { type: "multiple_choice",  score: 40,  note: "Simplify to a static choice list" },
+    { type: "tap_card",         score: 100, note: "Quick, gamified gut reactions — perfect for testing several short statements without survey fatigue." },
+    { type: "range",            score: 60,  note: "Replaces speed with nuance — use if you'd rather see how strongly people agree than how fast." },
+    { type: "rating",           score: 55,  note: "Stars give a familiar scale, but you lose the rapid-fire feel of swipe." },
+    { type: "multiple_choice",  score: 40,  note: "Removes the playful mechanic entirely — only swap if the question really is a single static choice." },
   ],
   range: [
-    { type: "range",            score: 100, note: "Best fit — animated qualitative scale" },
-    { type: "rating",           score: 85,  note: "Icon-based scale — similar feel" },
-    { type: "tap_card",         score: 50,  note: "Replace with sequential swipe cards" },
-    { type: "yes_no",           score: 30,  note: "Only if a binary answer is sufficient" },
+    { type: "range",            score: 100, note: "Best at capturing strength of feeling — gives you a clean distribution to read insight from." },
+    { type: "rating",           score: 85,  note: "Similar shape, but stars are more familiar and a touch less expressive." },
+    { type: "tap_card",         score: 50,  note: "Trades the scale for a yes/no per statement — more engaging, less granular." },
+    { type: "yes_no",           score: 30,  note: "Strips the scale to two answers — most data goes with it. Only use if the binary is the insight." },
   ],
   rating: [
-    { type: "rating",           score: 100, note: "Best fit — icon-rated scale" },
-    { type: "range",            score: 85,  note: "Animated scale — similar feel" },
-    { type: "tap_card",         score: 50,  note: "Replace with sequential swipe cards" },
-    { type: "multiple_choice",  score: 35,  note: "Flatten to a list of rating labels" },
+    { type: "rating",           score: 100, note: "Star scale is instantly understood and gives a comparable score across questions." },
+    { type: "range",            score: 85,  note: "More expressive scale with custom endpoints — better when the spectrum isn't generic 'good/bad'." },
+    { type: "tap_card",         score: 50,  note: "Loses the scale, but more engaging if you want a quick gut take across several items." },
+    { type: "multiple_choice",  score: 35,  note: "Flattens the scale into discrete labels — loses the smoothness people respond to in stars." },
   ],
   yes_no: [
-    { type: "yes_no",           score: 100, note: "Best fit — simple binary gate" },
-    { type: "multiple_choice",  score: 75,  note: "Expand to more defined options" },
-    { type: "range",            score: 45,  note: "Use if nuance on a scale is needed" },
-    { type: "tap_card",         score: 35,  note: "Sequential yes/no across statements" },
+    { type: "yes_no",           score: 100, note: "Crisp signal when you genuinely need a binary — easy to read and easy to answer." },
+    { type: "multiple_choice",  score: 75,  note: "Adds nuance with a few defined options — better when 'yes/no' is hiding the real answer." },
+    { type: "range",            score: 45,  note: "Captures the strength of the yes or no — useful when degree matters more than the answer." },
+    { type: "tap_card",         score: 35,  note: "Run a quick yes/no across several statements at once — only swap if you have multiple to test." },
   ],
   open_ended: [
-    { type: "open_ended",       score: 100, note: "Best fit — free-form qualitative voice" },
-    { type: "multiple_choice",  score: 45,  note: "Constrain to predefined options" },
-    { type: "range",            score: 30,  note: "Only if reducible to a single scale" },
+    { type: "open_ended",       score: 100, note: "Lets people answer in their own words — richest qualitative signal, but harder to aggregate." },
+    { type: "multiple_choice",  score: 45,  note: "Trades raw quotes for fast, comparable categories — pick this if you already know the likely answers." },
+    { type: "range",            score: 30,  note: "Only works if the answer collapses to a single scale — usually loses the point of going open-ended." },
   ],
   welcome_card: [
-    { type: "welcome_card",     score: 100, note: "Best fit — cold audience intro card" },
-    { type: "static_page",      score: 60,  note: "Use as a mid-survey break instead" },
-  ],
-  static_page: [
-    { type: "static_page",      score: 100, note: "Best fit — off-screen activity break" },
-    { type: "welcome_card",     score: 60,  note: "Use as an intro card instead" },
+    { type: "welcome_card",     score: 100, note: "Sets the tone before any questions — ideal first card for cold audiences who need context." },
   ],
 }
 
@@ -227,6 +225,15 @@ const SWIPE_FILLS = [
 function esc(s) {
   return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;")
                        .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+}
+
+// Bucket a 0–100 compatibility score into a short, plain-English fit tier.
+function fitTier(score) {
+  if (score >= 100) return "Best fit"
+  if (score >= 80)  return "Strong alternative"
+  if (score >= 60)  return "Solid alternative"
+  if (score >= 40)  return "Workable"
+  return "Use sparingly"
 }
 
 // HTML builders for the right-side interactive component on each card
@@ -461,7 +468,7 @@ export default class extends Controller {
         badge.textContent = "Current"
         badge.setAttribute("data-primary", "true")
       } else {
-        badge.textContent = `${entry.score}%`
+        badge.textContent = fitTier(entry.score)
       }
       const radio = opt.querySelector(".type-opt-radio")
       if (radio) radio.before(badge)
