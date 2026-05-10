@@ -10,7 +10,8 @@
      data-player-submit-url-value="<%= submit_survey_url(@survey.publish_token) %>">
 
   <nav class="preview-nav">
-    <%= image_tag "playverto.svg", style: "height:22px;width:auto;flex-shrink:0;" %>
+    <%# Respondents see the publishing org's logo, not Playverto's. %>
+    <%= brand_logo_tag @survey.organisation, style: "height:24px;width:auto;max-width:160px;flex-shrink:0;" %>
     <span class="preview-nav-title"><%= @survey.theme %></span>
     <span style="width:22px;"></span><%# balance the logo width so title stays centred %>
   </nav>
@@ -33,13 +34,13 @@
     <% end %>
 
     <div class="preview-thankyou" data-player-target="thankyou">
-      <%= image_tag "playverto.svg", style: "height:32px;width:auto;opacity:0.7;margin-bottom:8px;" %>
       <div class="preview-thankyou-emoji">🎉</div>
       <div class="preview-thankyou-title">Thank you!</div>
       <div class="preview-thankyou-sub">Your responses have been recorded.</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:12px;opacity:0.3;">
-        <%= image_tag "playverto.svg", style: "height:14px;width:auto;filter:brightness(0) invert(1);" %>
-        <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#fff;">Powered by Playverto</span>
+      <%# "Powered by" appears once, followed by the Playverto wordmark image. %>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;opacity:0.55;">
+        <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#fff;">Powered by</span>
+        <%= image_tag "playverto.svg", alt: "", style: "height:14px;width:auto;" %>
       </div>
     </div>
   </div>

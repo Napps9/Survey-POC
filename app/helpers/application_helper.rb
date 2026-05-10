@@ -25,6 +25,20 @@ module ApplicationHelper
     Dir.children(dir).select { |f| f =~ /\.(jpe?g|png|webp|svg)\z/i }.sort
   end
 
+  # Renders the organisation's uploaded logo if present, otherwise falls back
+  # to the Playverto wordmark. `style` overrides the default sizing.
+  def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil)
+    if organisation&.logo&.attached?
+      image_tag(
+        rails_blob_path(organisation.logo, only_path: true),
+        style: "#{style};object-fit:contain;",
+        alt:   alt || "#{organisation.name} logo"
+      )
+    else
+      image_tag("playverto.svg", style: style, alt: alt || "Playverto")
+    end
+  end
+
   # Interaction illustration shown in the left (dark) panel of each split-card.
   # Explains HOW to interact with the question type using a simple visual.
   def interaction_illustration(type)

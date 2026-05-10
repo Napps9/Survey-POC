@@ -16,10 +16,16 @@ class OrganisationsController < ApplicationController
 
   def update
     @organisation = current_organisation
-    if @organisation.update(params.require(:organisation).permit(:name))
-      redirect_to edit_organisation_path(@organisation), notice: "Organisation updated."
+    attrs = params.require(:organisation).permit(:name, :logo, :remove_logo)
+    remove = ActiveModel::Type::Boolean.new.cast(attrs.delete(:remove_logo))
+    @organisation.logo.purge if remove
+
+    if @organisation.update(attrs)
+      redirect_to organisation_memberships_path(@organisation),
+                  notice: remove ? "Logo removed." : "Brand updated."
     else
-      render :edit, status: :unprocessable_entity
+      redirect_to organisation_memberships_path(@organisation),
+                  alert: @organisation.errors.full_messages.to_sentence.presence || "Could not update organisation."
     end
   end
 end

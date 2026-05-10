@@ -21,6 +21,46 @@
         </div>
       <% end %>
 
+      <%# ── Brand: organisation logo ── %>
+      <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:22px 24px;margin-bottom:32px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div>
+            <div style="font-family:'Alata',sans-serif;font-size:14px;color:#F7F7F7;">Brand</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);margin-top:3px;line-height:1.5;">
+              Your logo replaces the Playverto wordmark at the top of every Verto preview and shared play link.
+            </div>
+          </div>
+          <div style="height:44px;min-width:120px;display:flex;align-items:center;justify-content:center;padding:6px 14px;border-radius:10px;background:rgba(28,32,52,0.7);border:1px solid rgba(255,255,255,0.06);">
+            <%= brand_logo_tag current_organisation, style: "height:32px;width:auto;max-width:160px;" %>
+          </div>
+        </div>
+
+        <%= form_with model: current_organisation,
+              url: organisation_path(current_organisation),
+              method: :patch,
+              multipart: true,
+              data: { turbo: false },
+              html: { style: "display:flex;flex-wrap:wrap;align-items:center;gap:10px;" } do |f| %>
+          <%= f.file_field :logo,
+                accept: "image/png,image/jpeg,image/svg+xml,image/webp",
+                style: "flex:1;min-width:200px;padding:10px 12px;border-radius:10px;background:#272D4A;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size:12px;" %>
+          <%= f.submit "Upload",
+                style: "padding:10px 20px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.04em;border:none;cursor:pointer;" %>
+          <% if current_organisation.logo.attached? %>
+            <%= button_to "Remove",
+                  organisation_path(current_organisation),
+                  method: :patch,
+                  params: { organisation: { remove_logo: "1" } },
+                  data: { turbo_confirm: "Remove your organisation's logo and revert to the Playverto wordmark?" },
+                  form: { style: "display:inline;margin:0;" },
+                  style: "padding:10px 16px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;" %>
+          <% end %>
+        <% end %>
+        <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);margin-top:10px;">
+          PNG, JPG, SVG or WebP · transparent backgrounds work best.
+        </div>
+      </div>
+
       <%# Active members %>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:32px;">
         <% @memberships.each do |membership| %>

@@ -431,9 +431,9 @@
   <div class="preview-overlay hidden"
        data-preview-verto-target="overlay">
 
-    <%# Nav %>
+    <%# Nav — respondents see the org's brand here, not Playverto's %>
     <nav class="preview-nav">
-      <%= image_tag "playverto.svg", alt: "Playverto", class: "h-6 w-auto" %>
+      <%= brand_logo_tag current_organisation, style: "height:24px;width:auto;max-width:160px;flex-shrink:0;" %>
       <span class="preview-nav-title">Preview Verto</span>
       <button type="button" class="preview-close-btn"
               data-action="click->preview-verto#close">✕ Close</button>
@@ -462,15 +462,17 @@
         </div>
       <% end %>
 
-      <%# Thank you screen — shown after Finish %>
+      <%# Thank you screen — shown after Finish. "Powered by" is mentioned
+          only once here, followed by the Playverto wordmark image. %>
       <div class="preview-thankyou" data-preview-verto-target="thankyou">
         <div class="preview-thankyou-emoji">🎉</div>
         <div class="preview-thankyou-title">Thank you!</div>
         <div class="preview-thankyou-sub">
           Your responses have been recorded.<br>Thanks for completing this Verto.
         </div>
-        <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.25);">
-          Powered by Playverto
+        <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0.55;">
+          <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.6);">Powered by</span>
+          <%= image_tag "playverto.svg", alt: "", style: "height:14px;width:auto;" %>
         </div>
       </div>
 
