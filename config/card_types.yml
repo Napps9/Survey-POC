@@ -1,0 +1,110 @@
+# Single source of truth for question-card type metadata.
+#
+# Consumed by:
+#   - Ruby: app/lib/card_types.rb (class methods used by helpers + views)
+#   - JS:   app/javascript/controllers/type_panel_controller.js, which reads
+#           a JSON blob emitted by surveys/show.html.erb (from the same YAML).
+#
+# Order matters — it's the order the picker shows. `pickable: false` hides
+# a type from the picker but keeps its metadata available for rendering
+# saved cards.
+
+range:
+  badge:        "RANGE"
+  badge_css:    "sb-range"
+  panel_label:  "DRAG THE SLIDER"
+  eyebrow:      "Drag the slider"
+  picker_name:  "Range / Slider"
+  picker_desc:  "Drag along a scale"
+  picker_icon:  "↔"
+  pickable:     true
+
+rating:
+  badge:        "RATING"
+  badge_css:    "sb-range"
+  panel_label:  "TAP TO RATE"
+  eyebrow:      "Tap to rate"
+  picker_name:  "Rating"
+  picker_desc:  "Slider with star rating"
+  picker_icon:  "★"
+  pickable:     true
+
+multiple_choice:
+  badge:        "PICK ONE"
+  badge_css:    "sb-range"
+  panel_label:  "CHOOSE ONE"
+  eyebrow:      "Choose one"
+  picker_name:  "Pick One"
+  picker_desc:  "Single choice from list"
+  picker_icon:  "◉"
+  pickable:     true
+
+select_many:
+  badge:        "SELECT MANY"
+  badge_css:    "sb-range"
+  panel_label:  "CHOOSE ALL THAT APPLY"
+  eyebrow:      "Choose all that apply"
+  picker_name:  "Select Many"
+  picker_desc:  "Choose all that apply"
+  picker_icon:  "☑"
+  pickable:     true
+
+yes_no:
+  badge:        "YES / NO"
+  badge_css:    "sb-range"
+  panel_label:  "CHOOSE ONE"
+  eyebrow:      "Choose one"
+  picker_name:  "Yes / No"
+  picker_desc:  "Simple two-option choice"
+  picker_icon:  "⇌"
+  pickable:     true
+
+select_one_grid:
+  badge:        "IMAGE GRID"
+  badge_css:    "sb-choice"
+  panel_label:  "CHOOSE ONE"
+  eyebrow:      "Choose one"
+  picker_name:  "Image Grid — One"
+  picker_desc:  "Photo grid, single pick"
+  picker_icon:  "▣"
+  pickable:     true
+
+select_many_grid:
+  badge:        "IMAGE GRID"
+  badge_css:    "sb-choice"
+  panel_label:  "CHOOSE ALL THAT APPLY"
+  eyebrow:      "Choose all that apply"
+  picker_name:  "Image Grid — Many"
+  picker_desc:  "Photo grid, multi-pick"
+  picker_icon:  "⊞"
+  pickable:     true
+
+tap_card:
+  badge:        "SWIPE"
+  badge_css:    "sb-swipe"
+  panel_label:  "SWIPE TO RESPOND"
+  eyebrow:      "Swipe to respond"
+  picker_name:  "Swipe Cards"
+  picker_desc:  "Swipe to agree / disagree"
+  picker_icon:  "⇄"
+  pickable:     true
+
+open_ended:
+  badge:        "OPEN TEXT"
+  badge_css:    "sb-text"
+  panel_label:  "TYPE YOUR ANSWER"
+  eyebrow:      "Type your answer"
+  picker_name:  "Open Text"
+  picker_desc:  "Free-form written answer"
+  picker_icon:  "✏"
+  pickable:     true
+
+welcome_card:
+  badge:        "WELCOME CARD"
+  badge_css:    "sb-welcome"
+  panel_label:  ""
+  eyebrow:      ""
+  picker_name:  "Welcome Card"
+  picker_desc:  "Intro — no answer required"
+  picker_icon:  "👋"
+  pickable:     true

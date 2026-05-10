@@ -4,22 +4,14 @@
   q_idx   = 0
   est_min = [(total_q * 30 / 60.0).ceil, 1].max
 
-  type_eyebrow = {
-    "multiple_choice"  => "Choose one",
-    "select_many"      => "Choose all that apply",
-    "select_one_grid"  => "Choose one",
-    "select_many_grid" => "Choose all that apply",
-    "tap_card"         => "Swipe to respond",
-    "range"            => "Drag the slider",
-    "rating"           => "Tap to rate",
-    "yes_no"           => "Choose one",
-    "open_ended"       => "Type your answer",
-    "welcome_card"     => ""
-  }
-
   # Placeholder grid colours for left panel (6 cells, 2 cols × 3 rows)
   grid_colours = %w[choice-bg-1 choice-bg-2 choice-bg-3 choice-bg-4 choice-bg-5 choice-bg-6]
 %>
+
+<%# Single source of truth for card-type metadata, read by
+    type_panel_controller at boot. Same data drives the Ruby helpers
+    above. %>
+<script id="card-types" type="application/json"><%= CardTypes.to_json.html_safe %></script>
 
 <div class="results-rainbow flex flex-col h-screen"
      data-controller="type-panel preview-verto survey-editor media-picker"
@@ -71,7 +63,7 @@
             q_idx   += 1 if is_q
             progress = total_q > 0 ? ((q_idx.to_f / total_q) * 100).round : 5
             progress = 5 if !is_q
-            eyebrow  = type_eyebrow[type] || type.tr('_', ' ')
+            eyebrow  = CardTypes.eyebrow(type).presence || type.tr('_', ' ')
           %>
 
           <div class="survey-card-wrap"
@@ -365,30 +357,19 @@
       </div>
 
       <div class="type-list" style="display:none;" data-type-panel-target="typeList">
-        <% [
-          { key: "range",            icon: "↔",  name: "Range / Slider",    desc: "Drag along a scale" },
-          { key: "rating",           icon: "★",  name: "Rating",            desc: "Slider with star rating" },
-          { key: "multiple_choice",  icon: "◉",  name: "Pick One",          desc: "Single choice from list" },
-          { key: "select_many",      icon: "☑",  name: "Select Many",       desc: "Choose all that apply" },
-          { key: "yes_no",           icon: "⇌",  name: "Yes / No",          desc: "Simple two-option choice" },
-          { key: "select_one_grid",  icon: "▣",  name: "Image Grid — One",  desc: "Photo grid, single pick" },
-          { key: "select_many_grid", icon: "⊞",  name: "Image Grid — Many", desc: "Photo grid, multi-pick" },
-          { key: "tap_card",         icon: "⇄",  name: "Swipe Cards",       desc: "Swipe to agree / disagree" },
-          { key: "open_ended",       icon: "✏",  name: "Open Text",         desc: "Free-form written answer" },
-          { key: "welcome_card",     icon: "👋", name: "Welcome Card",      desc: "Intro — no answer required" },
-        ].each do |opt| %>
+        <% CardTypes.pickable.each do |key, t| %>
           <div class="type-opt"
-               data-type="<%= opt[:key] %>"
+               data-type="<%= key %>"
                data-type-panel-target="typeOpt"
                data-action="click->type-panel#setType">
             <div class="type-opt-preview">
-              <%= mini_preview_html({ "type" => opt[:key], "options" => [] }) %>
+              <%= mini_preview_html({ "type" => key, "options" => [] }) %>
             </div>
             <div class="type-opt-row">
-              <div class="type-opt-icon"><%= opt[:icon] %></div>
+              <div class="type-opt-icon"><%= t["picker_icon"] %></div>
               <div style="flex:1;min-width:0;">
-                <div class="type-opt-name"><%= opt[:name] %></div>
-                <div class="type-opt-desc"><%= opt[:desc] %></div>
+                <div class="type-opt-name"><%= t["picker_name"] %></div>
+                <div class="type-opt-desc"><%= t["picker_desc"] %></div>
               </div>
               <div class="type-opt-radio"></div>
             </div>

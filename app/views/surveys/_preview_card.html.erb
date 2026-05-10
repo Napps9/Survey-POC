@@ -1,18 +1,7 @@
 <%
   type    = card["type"].to_s
-  eyebrow = {
-    "multiple_choice"  => "Choose one",
-    "select_many"      => "Choose all that apply",
-    "select_one_grid"  => "Choose one",
-    "select_many_grid" => "Choose all that apply",
-    "tap_card"         => "Swipe to respond",
-    "range"            => "Drag the slider",
-    "rating"           => "Tap to rate",
-    "yes_no"           => "Choose one",
-    "open_ended"       => "Type your answer",
-    "welcome_card"     => ""
-  }[type] || type.tr("_", " ")
-  is_q = type != "welcome_card"
+  eyebrow = CardTypes.eyebrow(type).presence || type.tr("_", " ")
+  is_q    = type != "welcome_card"
 %>
 
 <div class="split-card">

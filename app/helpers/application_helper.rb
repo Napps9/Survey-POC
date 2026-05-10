@@ -1,19 +1,11 @@
 module ApplicationHelper
-  CARD_TYPE_META = {
-    "welcome_card"     => { badge: "WELCOME CARD", badge_css: "sb-welcome",  q_label: "" },
-    "range"            => { badge: "RANGE",         badge_css: "sb-range",    q_label: "DRAG THE SLIDER" },
-    "rating"           => { badge: "RATING",        badge_css: "sb-range",    q_label: "TAP TO RATE" },
-    "multiple_choice"  => { badge: "PICK ONE",      badge_css: "sb-range",    q_label: "CHOOSE ONE" },
-    "select_many"      => { badge: "SELECT MANY",   badge_css: "sb-range",    q_label: "CHOOSE ALL THAT APPLY" },
-    "yes_no"           => { badge: "YES / NO",      badge_css: "sb-range",    q_label: "CHOOSE ONE" },
-    "select_one_grid"  => { badge: "IMAGE GRID",    badge_css: "sb-choice",   q_label: "CHOOSE ONE" },
-    "select_many_grid" => { badge: "IMAGE GRID",    badge_css: "sb-choice",   q_label: "CHOOSE ALL THAT APPLY" },
-    "tap_card"         => { badge: "SWIPE",         badge_css: "sb-swipe",    q_label: "SWIPE TO RESPOND" },
-    "open_ended"       => { badge: "OPEN TEXT",     badge_css: "sb-text",     q_label: "TYPE YOUR ANSWER" },
-  }.freeze
-
+  # All card-type metadata lives in config/card_types.yml. This helper
+  # returns the symbol-keyed shape that the existing views were written
+  # against, with a graceful fallback for unknown types.
   def card_type_meta(type)
-    CARD_TYPE_META[type.to_s] || { badge: type.to_s.tr("_", " ").upcase, badge_css: "sb-range", q_label: "" }
+    m = CardTypes.meta(type)
+    return { badge: type.to_s.tr("_", " ").upcase, badge_css: "sb-range", q_label: "" } if m.empty?
+    { badge: m["badge"], badge_css: m["badge_css"], q_label: m["panel_label"] }
   end
 
   # Filenames present in app/assets/images/verto-library/. Picked up at request

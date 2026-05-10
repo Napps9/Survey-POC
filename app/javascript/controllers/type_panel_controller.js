@@ -1,17 +1,26 @@
 import { Controller } from "@hotwired/stimulus"
 
-const TYPE_META = {
-  range:            { badge: "RANGE",         css: "sb-range",    label: "DRAG THE SLIDER",       eyebrow: "Drag the slider"        },
-  rating:           { badge: "RATING",         css: "sb-range",    label: "TAP TO RATE",           eyebrow: "Tap to rate"            },
-  multiple_choice:  { badge: "PICK ONE",       css: "sb-range",    label: "CHOOSE ONE",            eyebrow: "Choose one"             },
-  select_many:      { badge: "SELECT MANY",    css: "sb-range",    label: "CHOOSE ALL THAT APPLY", eyebrow: "Choose all that apply"  },
-  yes_no:           { badge: "YES / NO",       css: "sb-range",    label: "CHOOSE ONE",            eyebrow: "Choose one"             },
-  select_one_grid:  { badge: "IMAGE GRID",     css: "sb-choice",   label: "CHOOSE ONE",            eyebrow: "Choose one"             },
-  select_many_grid: { badge: "IMAGE GRID",     css: "sb-choice",   label: "CHOOSE ALL THAT APPLY", eyebrow: "Choose all that apply"  },
-  tap_card:         { badge: "SWIPE",          css: "sb-swipe",    label: "SWIPE TO RESPOND",      eyebrow: "Swipe to respond"       },
-  open_ended:       { badge: "OPEN TEXT",      css: "sb-text",     label: "TYPE YOUR ANSWER",      eyebrow: "Type your answer"       },
-  welcome_card:     { badge: "WELCOME CARD",   css: "sb-welcome",  label: "",                      eyebrow: ""                       },
-}
+// Read the canonical card-type metadata that the editor view emits as a
+// JSON blob (sourced from config/card_types.yml). Falls back to an empty
+// object so the controller still loads on pages without the blob.
+const RAW_TYPE_META = (() => {
+  try {
+    return JSON.parse(document.getElementById("card-types")?.textContent || "{}")
+  } catch (_) {
+    return {}
+  }
+})()
+
+// Local shape mirrors what this controller used to declare inline:
+// { badge, css, label, eyebrow }. Keys come from card_types.yml.
+const TYPE_META = Object.fromEntries(
+  Object.entries(RAW_TYPE_META).map(([key, t]) => [key, {
+    badge:   t.badge,
+    css:     t.badge_css,
+    label:   t.panel_label,
+    eyebrow: t.eyebrow,
+  }])
+)
 
 // Each entry's `note` is shown as the natural-language reason this type
 // works (or doesn't) for the selected card. The `score` only drives the
