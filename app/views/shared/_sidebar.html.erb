@@ -23,7 +23,7 @@
     <%# Dashboard %>
     <% is_db = active_key == "dashboard" %>
     <a href="<%= root_path %>"
-       style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_db ? '#00A950' : 'transparent' %>;background:<%= is_db ? 'rgba(0,169,80,0.12)' : 'transparent' %>;color:<%= is_db ? '#fff' : 'rgba(255,255,255,0.45)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
+       style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_db ? '#01EACB' : 'transparent' %>;background:<%= is_db ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_db ? '#fff' : 'rgba(255,255,255,0.45)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
        onmouseover="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='rgba(255,255,255,0.05)';this.style.color='rgba(255,255,255,0.8)'}"
        onmouseout="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='transparent';this.style.color='rgba(255,255,255,0.45)'}">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;">
@@ -38,7 +38,7 @@
     <%# Create Verto %>
     <% is_create = active_key == "create" %>
     <a href="<%= new_survey_path %>"
-       style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_create ? '#00A950' : 'transparent' %>;background:<%= is_create ? 'rgba(0,169,80,0.12)' : 'transparent' %>;color:<%= is_create ? '#fff' : 'rgba(255,255,255,0.45)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
+       style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_create ? '#01EACB' : 'transparent' %>;background:<%= is_create ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_create ? '#fff' : 'rgba(255,255,255,0.45)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
        onmouseover="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='rgba(255,255,255,0.05)';this.style.color='rgba(255,255,255,0.8)'}"
        onmouseout="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='transparent';this.style.color='rgba(255,255,255,0.45)'}">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;">
@@ -53,7 +53,7 @@
       <% is_results = active_key == "results" %>
       <div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 2px;"></div>
       <a href="<%= survey_results_path(ctx_survey) %>"
-         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_results ? '#00A950' : 'transparent' %>;background:<%= is_results ? 'rgba(0,169,80,0.12)' : 'transparent' %>;color:<%= is_results ? '#fff' : 'rgba(255,255,255,0.45)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
+         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_results ? '#01EACB' : 'transparent' %>;background:<%= is_results ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_results ? '#fff' : 'rgba(255,255,255,0.45)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
          onmouseover="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='rgba(255,255,255,0.05)';this.style.color='rgba(255,255,255,0.8)'}"
          onmouseout="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='transparent';this.style.color='rgba(255,255,255,0.45)'}">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;">

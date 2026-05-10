@@ -207,7 +207,7 @@
                       <div class="swipe-indicator">
                         <span style="color:#D80027;font-weight:700">← No</span>
                         <span class="mx-3">drag card to answer</span>
-                        <span style="color:#00A950;font-weight:700">Yes →</span>
+                        <span style="color:#01EACB;font-weight:700">Yes →</span>
                       </div>
                       <div class="rotate-actions">
                         <button type="button" class="rotate-action-btn rotate-action-no"
@@ -312,7 +312,7 @@
             ▶ Preview Verto
           </button>
           <% if @survey.publish_token.present? %>
-            <span style="font-family:'Alata',sans-serif;font-size:12px;color:#00A950;">✓ Published</span>
+            <span style="font-family:'Alata',sans-serif;font-size:12px;color:#01EACB;">✓ Published</span>
             <input type="text" readonly
                    id="publish-url-<%= @survey.id %>"
                    value="<%= play_survey_url(@survey.publish_token) %>"
@@ -323,16 +323,16 @@
               Copy link
             </button>
             <%= link_to "View Results →", survey_results_path(@survey),
-                  style: "padding:10px 22px;border-radius:16px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s;",
-                  onmouseover: "this.style.background='#009044'",
-                  onmouseout:  "this.style.background='#00A950'" %>
+                  style: "padding:10px 22px;border-radius:16px;background:#01EACB;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s;",
+                  onmouseover: "this.style.background='#00C4AB'",
+                  onmouseout:  "this.style.background='#01EACB'" %>
           <% else %>
             <%= button_to "Publish Verto →", publish_survey_path(@survey),
                   method: :post,
-                  style: "padding:10px 26px;border-radius:16px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;border:none;cursor:pointer;transition:background 0.15s;",
+                  style: "padding:10px 26px;border-radius:16px;background:#01EACB;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;border:none;cursor:pointer;transition:background 0.15s;",
                   form: { style: "display:inline;" },
-                  onmouseover: "this.style.background='#009044'",
-                  onmouseout:  "this.style.background='#00A950'" %>
+                  onmouseover: "this.style.background='#00C4AB'",
+                  onmouseout:  "this.style.background='#01EACB'" %>
           <% end %>
         </div>
       </div>
@@ -394,9 +394,9 @@
 
       <div class="type-panel-footer" style="display:none;" data-type-panel-target="panelFooter">
         <button type="button"
-                style="width:100%;padding:10px;border-radius:16px;background:#00A950;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;border:none;cursor:pointer;transition:background 0.15s;"
-                onmouseover="this.style.background='#009044'"
-                onmouseout="this.style.background='#00A950'"
+                style="width:100%;padding:10px;border-radius:16px;background:#01EACB;color:white;font-family:'ABeeZee',sans-serif;font-size:13px;border:none;cursor:pointer;transition:background 0.15s;"
+                onmouseover="this.style.background='#00C4AB'"
+                onmouseout="this.style.background='#01EACB'"
                 data-action="click->type-panel#applyType">Apply to this card</button>
         <button type="button"
                 style="width:100%;padding:8px;border-radius:16px;background:transparent;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:all 0.15s;"
@@ -411,7 +411,7 @@
 
   <%# Toast %>
   <div class="toast-bar" data-type-panel-target="toast">
-    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#00A950;margin-right:7px;vertical-align:middle;"></span>
+    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#01EACB;margin-right:7px;vertical-align:middle;"></span>
     <span data-type-panel-target="toastMsg"></span>
   </div>
 

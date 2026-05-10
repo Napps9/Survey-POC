@@ -54,7 +54,7 @@
         <%# Stats strip %>
         <div style="display:flex;align-items:center;gap:16px;padding:2px 0 6px;">
           <div style="display:flex;align-items:baseline;gap:5px;">
-            <span style="font-family:'Alata',sans-serif;font-size:34px;color:#00A950;line-height:1;"><%= @total %></span>
+            <span style="font-family:'Alata',sans-serif;font-size:34px;color:#01EACB;line-height:1;"><%= @total %></span>
             <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">response<%= @total == 1 ? "" : "s" %></span>
           </div>
           <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
@@ -69,7 +69,7 @@
         </div>
 
         <%# ── Ask Verto summary card ── %>
-        <div style="border-radius:14px;background:rgba(0,169,80,0.05);border:1px solid rgba(0,169,80,0.18);padding:18px 22px;">
+        <div style="border-radius:14px;background:rgba(1,234,203,0.05);border:1px solid rgba(1,234,203,0.18);padding:18px 22px;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
             <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;">Ask Verto</span>
             <span id="av-thinking" style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.2);margin-left:2px;">Analysing responses…</span>
@@ -120,7 +120,7 @@
             <div class="s-card-header" style="padding:9px 14px;gap:10px;">
               <span class="s-badge <%= card_meta[:badge_css] %>"><%= card_meta[:badge] %></span>
               <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);">Card <%= idx + 1 %></span>
-              <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size:11px;color:<%= total_ans > 0 ? '#00A950' : 'rgba(255,255,255,0.2)' %>;">
+              <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size:11px;color:<%= total_ans > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;">
                 <%= total_ans %> answer<%= total_ans == 1 ? "" : "s" %>
               </span>
             </div>
@@ -142,7 +142,7 @@
 
                 <% elsif type == "welcome_card" %>
                   <div style="display:flex;align-items:baseline;gap:5px;">
-                    <span style="font-family:'Alata',sans-serif;font-size:24px;color:#00A950;line-height:1;"><%= @total %></span>
+                    <span style="font-family:'Alata',sans-serif;font-size:24px;color:#01EACB;line-height:1;"><%= @total %></span>
                     <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.4);">respondent<%= @total == 1 ? "" : "s" %> started</span>
                   </div>
 
@@ -153,8 +153,8 @@
                       <% pct = ((count / grand) * 100).round %>
                       <div style="display:flex;align-items:center;gap:8px;">
                         <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#111;min-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<%= label %>"><%= label.truncate(20) %></span>
-                        <div style="flex:1;height:7px;border-radius:4px;background:rgba(0,169,80,0.1);overflow:hidden;">
-                          <div style="height:100%;border-radius:4px;background:#00A950;width:<%= pct %>%;"></div>
+                        <div style="flex:1;height:7px;border-radius:4px;background:rgba(1,234,203,0.1);overflow:hidden;">
+                          <div style="height:100%;border-radius:4px;background:#01EACB;width:<%= pct %>%;"></div>
                         </div>
                         <span style="font-family:'Alata',sans-serif;font-size:10px;color:rgba(0,0,0,0.4);min-width:42px;text-align:right;"><%= count %> (<%= pct %>%)</span>
                       </div>
@@ -168,8 +168,8 @@
                       <% count = result[:counts][i].to_i; label = labels[i] || "Step #{i + 1}"; pct = ((count / grand) * 100).round %>
                       <div style="display:flex;align-items:center;gap:8px;">
                         <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#111;min-width:100px;"><%= label.truncate(20) %></span>
-                        <div style="flex:1;height:7px;border-radius:4px;background:rgba(0,169,80,0.1);overflow:hidden;">
-                          <div style="height:100%;border-radius:4px;background:#00A950;width:<%= pct %>%;"></div>
+                        <div style="flex:1;height:7px;border-radius:4px;background:rgba(1,234,203,0.1);overflow:hidden;">
+                          <div style="height:100%;border-radius:4px;background:#01EACB;width:<%= pct %>%;"></div>
                         </div>
                         <span style="font-family:'Alata',sans-serif;font-size:10px;color:rgba(0,0,0,0.4);min-width:42px;text-align:right;"><%= count %> (<%= pct %>%)</span>
                       </div>
@@ -182,14 +182,14 @@
                     <div style="font-size:18px;letter-spacing:2px;">
                       <% 5.times do |i| %><span style="color:<%= i < avg.round ? '#FFCC00' : 'rgba(0,0,0,0.12)' %>"><%= i < avg.round ? "★" : "☆" %></span><% end %>
                     </div>
-                    <span style="font-family:'Alata',sans-serif;font-size:22px;color:#00A950;line-height:1;"><%= avg %></span>
+                    <span style="font-family:'Alata',sans-serif;font-size:22px;color:#01EACB;line-height:1;"><%= avg %></span>
                   </div>
                   <div style="display:flex;flex-direction:column;gap:3px;">
                     <% (5).downto(1) do |star| %>
                       <% count = result[:counts][star].to_i; pct = ((count / grand) * 100).round %>
                       <div style="display:flex;align-items:center;gap:8px;">
                         <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(0,0,0,0.45);min-width:24px;"><%="★" * star %></span>
-                        <div style="flex:1;height:5px;border-radius:3px;background:rgba(0,169,80,0.1);overflow:hidden;">
+                        <div style="flex:1;height:5px;border-radius:3px;background:rgba(1,234,203,0.1);overflow:hidden;">
                           <div style="height:100%;border-radius:3px;background:#FFCC00;width:<%= pct %>%;"></div>
                         </div>
                         <span style="font-family:'Alata',sans-serif;font-size:10px;color:rgba(0,0,0,0.35);min-width:28px;text-align:right;"><%= count %></span>
@@ -204,7 +204,7 @@
                       <div>
                         <div style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(0,0,0,0.45);margin-bottom:3px;"><%= label.truncate(55) %></div>
                         <div style="display:flex;height:18px;border-radius:5px;overflow:hidden;">
-                          <div style="background:#00A950;width:<%= ((yes_c / tot) * 100).round %>%;display:flex;align-items:center;justify-content:center;">
+                          <div style="background:#01EACB;width:<%= ((yes_c / tot) * 100).round %>%;display:flex;align-items:center;justify-content:center;">
                             <% if ((yes_c / tot) * 100).round > 15 %>
                               <span style="font-family:'Alata',sans-serif;font-size:9px;color:white;"><%= ((yes_c / tot) * 100).round %>% Yes</span>
                             <% end %>
@@ -216,7 +216,7 @@
                           </div>
                         </div>
                         <div style="display:flex;justify-content:space-between;margin-top:2px;">
-                          <span style="font-family:'Alata',sans-serif;font-size:9px;color:#00A950;">Yes · <%= yes_c %></span>
+                          <span style="font-family:'Alata',sans-serif;font-size:9px;color:#01EACB;">Yes · <%= yes_c %></span>
                           <span style="font-family:'Alata',sans-serif;font-size:9px;color:#D80027;">No · <%= no_c %></span>
                         </div>
                       </div>
@@ -226,7 +226,7 @@
                 <% elsif type == "open_ended" %>
                   <div style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;">
                     <% result[:texts].first(20).each do |text| %>
-                      <div style="padding:7px 11px;border-radius:7px;background:rgba(0,0,0,0.03);border-left:2px solid rgba(0,169,80,0.25);font-family:'ABeeZee',sans-serif;font-size:12px;color:#111;line-height:1.5;">
+                      <div style="padding:7px 11px;border-radius:7px;background:rgba(0,0,0,0.03);border-left:2px solid rgba(1,234,203,0.25);font-family:'ABeeZee',sans-serif;font-size:12px;color:#111;line-height:1.5;">
                         <%= text.truncate(200) %>
                       </div>
                     <% end %>
@@ -238,10 +238,10 @@
                 <% elsif type == "static_page" %>
                   <% pct = @total > 0 ? ((result[:completed].to_f / @total) * 100).round : 0 %>
                   <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="flex:1;height:8px;border-radius:4px;background:rgba(0,169,80,0.1);overflow:hidden;">
-                      <div style="height:100%;border-radius:4px;background:#00A950;width:<%= pct %>%;"></div>
+                    <div style="flex:1;height:8px;border-radius:4px;background:rgba(1,234,203,0.1);overflow:hidden;">
+                      <div style="height:100%;border-radius:4px;background:#01EACB;width:<%= pct %>%;"></div>
                     </div>
-                    <span style="font-family:'Alata',sans-serif;font-size:12px;color:#00A950;white-space:nowrap;"><%= result[:completed] %> / <%= @total %> (<%= pct %>%)</span>
+                    <span style="font-family:'Alata',sans-serif;font-size:12px;color:#01EACB;white-space:nowrap;"><%= result[:completed] %> / <%= @total %> (<%= pct %>%)</span>
                   </div>
                 <% end %>
 
@@ -265,7 +265,7 @@
     <div style="flex-shrink:0;padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,0.07);">
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="font-family:'Alata',sans-serif;font-size:13px;color:#fff;letter-spacing:0.03em;">Ask Verto</span>
-        <span style="margin-left:auto;font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.25);background:rgba(0,169,80,0.12);border:1px solid rgba(0,169,80,0.2);border-radius:20px;padding:2px 8px;">AI</span>
+        <span style="margin-left:auto;font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.25);background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.2);border-radius:20px;padding:2px 8px;">AI</span>
       </div>
       <p style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);margin:6px 0 0;line-height:1.5;">Ask questions about your survey results</p>
     </div>
@@ -283,13 +283,13 @@
                   placeholder="Ask about your results…"
                   rows="2"
                   style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 12px;color:rgba(255,255,255,0.8);font-family:'ABeeZee',sans-serif;font-size:13px;resize:none;outline:none;line-height:1.5;"
-                  onfocus="this.style.borderColor='rgba(0,169,80,0.4)'"
+                  onfocus="this.style.borderColor='rgba(1,234,203,0.4)'"
                   onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
         <button data-results-chat-target="sendBtn"
                 data-action="click->results-chat#send"
-                style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:#00A950;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;"
-                onmouseover="this.style.background='#009044'"
-                onmouseout="this.style.background='#00A950'">
+                style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:#01EACB;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;"
+                onmouseover="this.style.background='#00C4AB'"
+                onmouseout="this.style.background='#01EACB'">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M1 7h12M7 1l6 6-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>

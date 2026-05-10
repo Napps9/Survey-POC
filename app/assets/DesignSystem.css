@@ -15,9 +15,9 @@
   /* ── BASE COLOR TOKENS ─────────────────────────────── */
 
   /* Green (Primary Action) */
-  --color-green-500: #00A950;   /* rgb(0,169,80)   — primary CTA */
-  --color-green-400: #01A850;   /* rgb(1,168,80)   — slight variant */
-  --color-green-300: #02A750;   /* rgb(2,167,80)   — slider/active */
+  --color-green-500: #01EACB;   /* rgb(1,234,203)   — primary CTA */
+  --color-green-400: #01EACB;   /* rgb(1,168,80)   — slight variant */
+  --color-green-300: #01EACB;   /* rgb(2,167,80)   — slider/active */
 
   /* Navy / Dark (Backgrounds & Secondary Buttons) */
   --color-navy-900: #1C2034;    /* rgb(28,32,52)   — darkest, back buttons */
@@ -220,8 +220,8 @@ body {
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --green: #00A950;
-  --green-dark: #009044;
+  --green: #01EACB;
+  --green-dark: #00C4AB;
   --navy-900: #1C2034;
   --navy-800: #272D4A;
   --navy-750: #2A2D3A;
@@ -482,13 +482,13 @@ body {
   z-index: 1;
   transition: background 0.2s;
 }
-.s-dot.active { background: rgba(0,169,80,0.5); }
+.s-dot.active { background: rgba(1,234,203,0.5); }
 .slider-thumb {
   position: absolute;
   width: 52px; height: 48px;
   border-radius: 16px;
   background: var(--green);
-  box-shadow: 0 4px 20px rgba(0,169,80,0.35);
+  box-shadow: 0 4px 20px rgba(1,234,203,0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -506,7 +506,7 @@ body {
   background: var(--green);
   border-radius: 10px;
   padding: 6px 14px;
-  box-shadow: 0 4px 20px rgba(0,169,80,0.3);
+  box-shadow: 0 4px 20px rgba(1,234,203,0.3);
   white-space: nowrap;
   pointer-events: none;
   transition: left 0.18s cubic-bezier(.4,0,.2,1);
@@ -606,7 +606,7 @@ body {
 }
 .pick-item:last-child { border-bottom: none; }
 .pick-item:hover { background: rgba(0,0,0,0.025); }
-.pick-item.selected { background: rgba(0,169,80,0.05); }
+.pick-item.selected { background: rgba(1,234,203,0.05); }
 .pick-dot {
   width: 18px; height: 18px;
   border-radius: 50%;
@@ -671,7 +671,7 @@ body {
   transition: background 0.2s;
   background: var(--grey-300);
 }
-.check-box.checked { background: #01A850; }
+.check-box.checked { background: #01EACB; }
 .check-texts { display: flex; flex-direction: column; gap: 3px; }
 .check-main { font-size: 14px; color: #000; line-height: 1.4; }
 .check-sub { font-size: 12px; color: rgba(0,0,0,0.45); }
@@ -786,13 +786,13 @@ body {
   align-items: center; gap: 10px;
   padding: 10px 14px;
   border-radius: 12px;
-  background: rgba(0,169,80,0.08);
-  border: 1px solid rgba(0,169,80,0.2);
+  background: rgba(1,234,203,0.08);
+  border: 1px solid rgba(1,234,203,0.2);
   width: 100%;
 }
 .audio-recorded.show { display: flex; }
-.audio-wave { flex: 1; height: 32px; background: rgba(0,169,80,0.15); border-radius: 8px; position: relative; overflow: hidden; }
-.audio-wave-inner { height: 100%; background: repeating-linear-gradient(90deg, transparent 0px, transparent 3px, rgba(0,169,80,0.5) 3px, rgba(0,169,80,0.5) 5px); }
+.audio-wave { flex: 1; height: 32px; background: rgba(1,234,203,0.15); border-radius: 8px; position: relative; overflow: hidden; }
+.audio-wave-inner { height: 100%; background: repeating-linear-gradient(90deg, transparent 0px, transparent 3px, rgba(1,234,203,0.5) 3px, rgba(1,234,203,0.5) 5px); }
 .audio-rec-time { font-family: var(--font-label); font-size: 13px; font-weight: 600; color: var(--green); }
 
 /* ── 8. ROTATE / SWIPE ─────────────────────────── */
@@ -889,7 +889,7 @@ body {
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 .profile-dropdown-item:last-child { border-bottom: none; }
-.profile-dropdown-item:hover { background: rgba(0,169,80,0.07); }
+.profile-dropdown-item:hover { background: rgba(1,234,203,0.07); }
 .profile-dropdown-item.chosen { color: var(--green); font-family: var(--font-label); font-weight: 600; }
 
 /* ── LEFT PANEL ILLUSTRATIONS ──────────────────── */
@@ -1325,7 +1325,7 @@ body {
         </div>
         <div class="audio-time" id="audioTime">0:00</div>
         <div class="audio-recorded" id="audioRecorded">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="#00A950"><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M12.5 8a.5.5 0 0 1 .5.5A5 5 0 0 1 3 8.5.5.5 0 0 1 4 8.5a4 4 0 0 0 8 0 .5.5 0 0 1 .5-.5z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="#01EACB"><path d="M8 1a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M12.5 8a.5.5 0 0 1 .5.5A5 5 0 0 1 3 8.5.5.5 0 0 1 4 8.5a4 4 0 0 0 8 0 .5.5 0 0 1 .5-.5z"/></svg>
           <div class="audio-wave"><div class="audio-wave-inner"></div></div>
           <div class="audio-rec-time" id="audioRecTime">0:00</div>
           <button onclick="deleteRecording()" style="background:none;border:none;cursor:pointer;color:#D80027;font-size:14px;padding:4px;">✕</button>
@@ -1679,8 +1679,8 @@ All tokens are also available in `colors_and_type.css` in the design system proj
 
 ### Colors
 ```
---green-500:     #00A950   /* Primary CTA, active states, selection */
---green-400:     #01A850   /* Checkbox checked, slight variant */
+--green-500:     #01EACB   /* Primary CTA, active states, selection */
+--green-400:     #01EACB   /* Checkbox checked, slight variant */
 --navy-900:      #1C2034   /* Back buttons, dark backgrounds */
 --navy-800:      #272D4A   /* Desktop page background */
 --navy-750:      #2A2D3A   /* Mobile page background, dark panels */
@@ -1689,7 +1689,7 @@ All tokens are also available in `colors_and_type.css` in the design system proj
 --grey-300:      #C4C4C4   /* Unchecked checkboxes, borders */
 --text-secondary: rgba(0,0,0,0.75)
 --text-muted:    rgba(0,0,0,0.5)
---text-accent:   #00A950
+--text-accent:   #01EACB
 --bg-input:      rgba(0,0,0,0.04)
 --bg-input-hover: rgba(0,0,0,0.06)
 --bg-slider-track: rgba(0,0,0,0.07)
@@ -1735,7 +1735,7 @@ Choice card:    14px
 Card:           0 10px 40px rgba(0,0,0,0.15)
 Card raised:    0 20px 40px rgba(0,0,0,0.15)
 Button:         0 10px 40px rgba(0,0,0,0.15)
-Slider thumb:   0 4px 20px rgba(0,169,80,0.35)
+Slider thumb:   0 4px 20px rgba(1,234,203,0.35)
 ```
 
 ---
@@ -1777,7 +1777,7 @@ Every question type uses the same outer shell:
 ### Right Panel
 - `flex:1`, `padding: 40px 36px`
 - `display:flex; flex-direction:column; justify-content:center; gap:16px`
-- Eyebrow label: `font-family:Alata, font-size:13px, color:#00A950`
+- Eyebrow label: `font-family:Alata, font-size:13px, color:#01EACB`
 - Question title: `font-family:ABeeZee, font-size:26px, color:#000, line-height:1.35`
 - Nav buttons always at bottom (`margin-top:auto`)
 
@@ -1787,10 +1787,10 @@ Back button:  flex:1, height:56px, border-radius:16px, background:#1C2034,
               color:rgba(255,255,255,0.5), font:ABeeZee 20px,
               box-shadow:0 10px 40px rgba(0,0,0,0.15)
 
-Next button:  flex:1, height:56px, border-radius:16px, background:#00A950,
+Next button:  flex:1, height:56px, border-radius:16px, background:#01EACB,
               color:#fff, font:ABeeZee 20px,
               box-shadow:0 10px 40px rgba(0,0,0,0.15)
-              hover: background:#009044
+              hover: background:#00C4AB
               disabled: opacity:0.5, pointer-events:none
 ```
 
@@ -1811,17 +1811,17 @@ title:     Question text        (ABeeZee 26px)
 tooltip:   floating above thumb (green pill, Alata 14px 600 white)
 track:     full width, height 64px, border-radius 20px, bg rgba(0,0,0,0.06)
   - 5 dots evenly distributed (10×10px circles, rgba(0,0,0,0.12))
-  - active dot: rgba(0,169,80,0.5)
-  - thumb: 52×48px, border-radius 16px, background #00A950,
-           box-shadow 0 4px 20px rgba(0,169,80,0.35)
+  - active dot: rgba(1,234,203,0.5)
+  - thumb: 52×48px, border-radius 16px, background #01EACB,
+           box-shadow 0 4px 20px rgba(1,234,203,0.35)
            contains 3 vertical lines (2px × 20px, rgba(255,255,255,0.7))
 labels:    "Very scared" — "I feel fine!" — "Amazing!" (ABeeZee 11px, rgba(0,0,0,0.35))
 ```
 
 **Tooltip:**
 ```
-background: #00A950, border-radius:10px, padding:6px 14px
-arrow: CSS border-trick pointing downward, color #00A950
+background: #01EACB, border-radius:10px, padding:6px 14px
+arrow: CSS border-trick pointing downward, color #01EACB
 text: Alata 13px 600 white
 positions/labels: [8%, "Very scared."], [25%, "A bit scared."],
                   [43%, "I feel fine!"], [61%, "Pretty good!"], [80%, "Amazing!"]
@@ -1855,11 +1855,11 @@ hover: transform:scale(1.02), transition:0.15s
 layers (bottom to top):
   1. background image/color fill (object-fit:cover)
   2. gradient overlay: linear-gradient(transparent 45%, rgba(0,0,0,0.4))
-  3. tick badge (top-right, 22×22px circle, #00A950, hidden unless selected)
+  3. tick badge (top-right, 22×22px circle, #01EACB, hidden unless selected)
   4. label text (bottom-center, Alata 12px 600, white, text-shadow)
 
 selected state:
-  outline: 3px solid #00A950
+  outline: 3px solid #01EACB
   overlay: linear-gradient(transparent 45%, rgba(0,100,40,0.35))
   tick badge: display:flex
 ```
@@ -1901,9 +1901,9 @@ radio dot: 18×18px circle, border:2px solid #C4C4C4
 text:      ABeeZee 16px, color:#111
 
 selected state:
-  background: rgba(0,169,80,0.05)
-  dot: filled #00A950, border-color:#00A950, white checkmark inside
-  text: Alata 16px 600, color:#00A950
+  background: rgba(1,234,203,0.05)
+  dot: filled #01EACB, border-color:#01EACB, white checkmark inside
+  text: Alata 16px 600, color:#01EACB
 ```
 
 **Behavior:** Single select — clicking a row deselects all others.
@@ -1930,7 +1930,7 @@ container: padding:14px 16px, border-radius:14px, background:rgba(0,0,0,0.04)
 
 checkbox:  22×22px, border-radius:5px
   unchecked: background:#C4C4C4
-  checked:   background:#01A850 + white SVG checkmark
+  checked:   background:#01EACB + white SVG checkmark
 
 main text:  ABeeZee 14px, color:#000
 sub text:   ABeeZee 12px, color:rgba(0,0,0,0.45)
@@ -1990,14 +1990,14 @@ playing state:
 ```
 eyebrow:      "Record your answer"
 title:        question text
-visualiser:   12 animated bars (5px wide, border-radius:3px, color:#00A950)
+visualiser:   12 animated bars (5px wide, border-radius:3px, color:#01EACB)
               animate height when recording (audioPulse keyframe)
 timer:        Alata 28px 700, color:#111, format "0:00"
 recording pill (shows after recording):
-              flex row, border-radius:12px, background:rgba(0,169,80,0.08)
-              border:1px solid rgba(0,169,80,0.2)
+              flex row, border-radius:12px, background:rgba(1,234,203,0.08)
+              border:1px solid rgba(1,234,203,0.2)
               contains: mic icon, waveform bar, timestamp, delete button
-controls:     record button (64×64px circle, #00A950)
+controls:     record button (64×64px circle, #01EACB)
               play button (64×64px circle, #1C2034, hidden until recording exists)
 hint text:    ABeeZee 13px, rgba(0,0,0,0.4)
 ```
@@ -2032,9 +2032,9 @@ card stack: 3 layered cards with rotation offsets:
   card-2 (mid):    rotate(2deg) translate(8px,6px), z-index:2
   card-top:        rotate(0deg), z-index:3, cursor:grab
 swipe hint: "← No  drag card to answer  Yes →"
-            left label: color:#D80027, right label: color:#00A950
+            left label: color:#D80027, right label: color:#01EACB
 action buttons: ✕ (circle, border:#D80027, color:#D80027) 
-                ✓ (circle, border:#00A950, color:#00A950)
+                ✓ (circle, border:#01EACB, color:#01EACB)
                 52×52px, hover:scale(1.1)
 ```
 
@@ -2082,8 +2082,8 @@ arrow: "▾" for dropdown fields
 opens below field, border-radius:12px, background:#f4f4f4
 box-shadow:0 10px 40px rgba(0,0,0,0.15)
 item: padding:12px 16px, ABeeZee 15px, border-bottom:1px solid rgba(0,0,0,0.05)
-item hover: background:rgba(0,169,80,0.07)
-item selected: color:#00A950, Alata 15px 600
+item hover: background:rgba(1,234,203,0.07)
+item selected: color:#01EACB, Alata 15px 600
 ```
 
 **Fields:**
@@ -2165,8 +2165,8 @@ item selected: color:#00A950, Alata 15px 600
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --green: #00A950;
-  --green-dark: #009044;
+  --green: #01EACB;
+  --green-dark: #00C4AB;
   --navy-900: #1C2034;
   --navy-800: #272D4A;
   --navy-750: #2A2D3A;
@@ -2255,7 +2255,7 @@ body {
 .checkbox-row { display: flex; align-items: flex-start; gap: 14px; padding: 13px 18px; border-radius: 15px; background: rgba(0,0,0,0.04); cursor: pointer; user-select: none; }
 .checkbox-row:hover { background: rgba(0,0,0,0.06); }
 .checkbox-box { width: 22px; height: 22px; border-radius: 5px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-.checkbox-box.checked { background: #01A850; }
+.checkbox-box.checked { background: #01EACB; }
 .checkbox-box.unchecked { background: var(--grey-300); }
 .checkbox-text-group { display: flex; flex-direction: column; gap: 4px; }
 .checkbox-main { font-size: 14px; color: #000; line-height: 1.4; }
@@ -2301,8 +2301,8 @@ body {
 .slider-tooltip-text { font-family: var(--font-label); font-size: 14px; font-weight: 600; color: white; white-space: nowrap; }
 .slider-track { width: 329px; height: 68px; border-radius: 20px; background: rgba(0,0,0,0.07); display: flex; align-items: center; justify-content: space-around; padding: 0 20px; position: relative; cursor: pointer; }
 .slider-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(0,0,0,0.15); transition: background 0.2s; }
-.slider-dot.active { background: rgba(0,169,80,0.5); }
-.slider-thumb { position: absolute; width: 49px; height: 52px; border-radius: 16px; background: var(--green); box-shadow: 0 4px 20px rgba(0,169,80,0.4); display: flex; align-items: center; justify-content: center; gap: 4px; transition: left 0.2s ease; top: 8px; }
+.slider-dot.active { background: rgba(1,234,203,0.5); }
+.slider-thumb { position: absolute; width: 49px; height: 52px; border-radius: 16px; background: var(--green); box-shadow: 0 4px 20px rgba(1,234,203,0.4); display: flex; align-items: center; justify-content: center; gap: 4px; transition: left 0.2s ease; top: 8px; }
 .slider-thumb-line { width: 2px; height: 22px; background: rgba(255,255,255,0.7); border-radius: 2px; }
 
 /* ─── CHOICE GRID ─────────────────────────────── */
@@ -2316,7 +2316,7 @@ body {
 .choice-card-bg-3 { background: linear-gradient(135deg, #fff8e1, #ffecb3); }
 .choice-card-bg-4 { background: linear-gradient(135deg, #fce4ec, #f8bbd0); }
 .choice-card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgba(0,0,0,0.45)); }
-.choice-card.selected .choice-card-overlay { background: linear-gradient(transparent 40%, rgba(0,169,80,0.3)); }
+.choice-card.selected .choice-card-overlay { background: linear-gradient(transparent 40%, rgba(1,234,203,0.3)); }
 .choice-card-label { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-family: var(--font-label); font-size: 12px; font-weight: 600; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.5); padding: 0 6px; }
 
 /* ─── PICK LIST ───────────────────────────────── */
@@ -2324,7 +2324,7 @@ body {
 .pick-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.07); cursor: pointer; transition: background 0.15s; gap: 14px; }
 .pick-item:last-child { border-bottom: none; }
 .pick-item:hover { background: rgba(0,0,0,0.03); }
-.pick-item.selected { background: rgba(0,169,80,0.06); }
+.pick-item.selected { background: rgba(1,234,203,0.06); }
 .pick-item-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .pick-item-dot.selected { background: var(--green); }
 .pick-item-dot.unselected { border: 2px solid var(--grey-300); background: transparent; }
@@ -2528,7 +2528,7 @@ body {
     <div class="screen" id="screen-5" data-screen-label="05 Multiple Choice">
       <div style="background: white; padding: 20px 23px 8px;">
         <div class="progress-bar" style="position:relative;top:auto;left:0;width:100%;margin-bottom:16px;background:rgba(0,0,0,0.15);">
-          <div class="progress-fill" style="width:57%;background:#00A950"></div>
+          <div class="progress-fill" style="width:57%;background:#01EACB"></div>
         </div>
         <div class="screen-label">Choose one</div>
         <div class="screen-question">When it comes to the environment, I care most about...</div>
@@ -2567,7 +2567,7 @@ body {
     <div class="screen" id="screen-6" data-screen-label="06 Pick List">
       <div style="background:white;padding:20px 23px 8px;">
         <div class="progress-bar" style="position:relative;top:auto;left:0;width:100%;margin-bottom:16px;background:rgba(0,0,0,0.15);">
-          <div class="progress-fill" style="width:71%;background:#00A950"></div>
+          <div class="progress-fill" style="width:71%;background:#01EACB"></div>
         </div>
         <div class="screen-question" style="text-align:center;">What causes you the most stress?</div>
       </div>
@@ -2643,7 +2643,7 @@ body {
         <div class="screen-desc">What did you think of this Verto?</div>
         <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;">
           <div style="width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;">😊</div>
-          <div style="width:40px;height:40px;border-radius:50%;background:rgba(0,169,80,0.1);border:2px solid #00A950;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;">😍</div>
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(1,234,203,0.1);border:2px solid #01EACB;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;">😍</div>
           <div style="width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;">😐</div>
         </div>
       </div>

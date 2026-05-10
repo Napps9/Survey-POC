@@ -86,9 +86,9 @@ const ILLUSTRATIONS = {
       <div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.9);">
         <span style="font-size:16px;opacity:0.5;">←</span>
         <div style="position:relative;flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.15);">
-          <div style="position:absolute;width:40%;height:100%;border-radius:3px;background:#00A950;"></div>
+          <div style="position:absolute;width:40%;height:100%;border-radius:3px;background:#01EACB;"></div>
           <div style="position:absolute;left:38%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
-            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 5H1m6 0H9M5 3V1m0 8V7" stroke="#00A950" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 5H1m6 0H9M5 3V1m0 8V7" stroke="#01EACB" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
         </div>
         <span style="font-size:16px;opacity:0.5;">→</span>
@@ -111,9 +111,9 @@ const ILLUSTRATIONS = {
   multiple_choice: () => `
     <div style="width:80%;display:flex;flex-direction:column;gap:4px;">
       ${[["◉","Option A",true],["○","Option B",false],["○","Option C",false]].map(([dot,label,sel]) =>
-        `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;${sel?"background:rgba(0,169,80,0.15)":""}">
-          <span style="font-size:14px;${sel?"color:#00A950":"color:rgba(255,255,255,0.6)"}">${dot}</span>
-          <span style="font-size:12px;font-family:'Alata',sans-serif;${sel?"color:#00A950":"color:rgba(255,255,255,0.6)"}">${label}</span>
+        `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;${sel?"background:rgba(1,234,203,0.15)":""}">
+          <span style="font-size:14px;${sel?"color:#01EACB":"color:rgba(255,255,255,0.6)"}">${dot}</span>
+          <span style="font-size:12px;font-family:'Alata',sans-serif;${sel?"color:#01EACB":"color:rgba(255,255,255,0.6)"}">${label}</span>
         </div>`
       ).join("")}
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;margin-top:4px;text-align:center;">Tap one option to select</div>
@@ -122,9 +122,9 @@ const ILLUSTRATIONS = {
   select_many: () => `
     <div style="width:80%;display:flex;flex-direction:column;gap:4px;">
       ${[["☑","Option A",true],["☑","Option B",true],["☐","Option C",false]].map(([dot,label,sel]) =>
-        `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;${sel?"background:rgba(0,169,80,0.12)":""}">
-          <span style="font-size:14px;${sel?"color:#00A950":"color:rgba(255,255,255,0.6)"}">${dot}</span>
-          <span style="font-size:12px;font-family:'Alata',sans-serif;${sel?"color:#00A950":"color:rgba(255,255,255,0.6)"}">${label}</span>
+        `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;${sel?"background:rgba(1,234,203,0.12)":""}">
+          <span style="font-size:14px;${sel?"color:#01EACB":"color:rgba(255,255,255,0.6)"}">${dot}</span>
+          <span style="font-size:12px;font-family:'Alata',sans-serif;${sel?"color:#01EACB":"color:rgba(255,255,255,0.6)"}">${label}</span>
         </div>`
       ).join("")}
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;margin-top:4px;text-align:center;">Tap all that apply</div>
@@ -133,7 +133,7 @@ const ILLUSTRATIONS = {
   yes_no: () => `
     <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
       <div style="display:flex;gap:12px;width:100%;">
-        <div style="flex:1;padding:10px;border-radius:12px;background:#00A950;text-align:center;font-family:'Alata',sans-serif;font-size:13px;color:white;">Yes</div>
+        <div style="flex:1;padding:10px;border-radius:12px;background:#01EACB;text-align:center;font-family:'Alata',sans-serif;font-size:13px;color:white;">Yes</div>
         <div style="flex:1;padding:10px;border-radius:12px;background:rgba(255,255,255,0.08);text-align:center;font-family:'Alata',sans-serif;font-size:13px;color:rgba(255,255,255,0.5);">No</div>
       </div>
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;text-align:center;">Tap to choose one</div>
@@ -143,9 +143,9 @@ const ILLUSTRATIONS = {
     <div style="width:80%;display:flex;flex-direction:column;gap:8px;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
         ${[["A","#d4edda",true],["B","#d1ecf1",false],["C","#fff3cd",false],["D","#f8d7da",false]].map(([l,bg,sel]) =>
-          `<div style="position:relative;height:44px;border-radius:8px;background:${bg};display:flex;align-items:center;justify-content:center;${sel?"outline:2px solid #00A950;outline-offset:-2px;":""}">
+          `<div style="position:relative;height:44px;border-radius:8px;background:${bg};display:flex;align-items:center;justify-content:center;${sel?"outline:2px solid #01EACB;outline-offset:-2px;":""}">
             <span style="font-size:11px;color:rgba(0,0,0,0.55);font-family:'Alata',sans-serif;">${l}</span>
-            ${sel?`<div style="position:absolute;top:3px;right:4px;color:#00A950;font-size:10px;font-weight:700;">✓</div>`:""}
+            ${sel?`<div style="position:absolute;top:3px;right:4px;color:#01EACB;font-size:10px;font-weight:700;">✓</div>`:""}
           </div>`
         ).join("")}
       </div>
@@ -156,9 +156,9 @@ const ILLUSTRATIONS = {
     <div style="width:80%;display:flex;flex-direction:column;gap:8px;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
         ${[["A","#d4edda",true],["B","#d1ecf1",true],["C","#fff3cd",false],["D","#f8d7da",false]].map(([l,bg,sel]) =>
-          `<div style="position:relative;height:44px;border-radius:8px;background:${bg};display:flex;align-items:center;justify-content:center;${sel?"outline:2px solid #00A950;outline-offset:-2px;":""}">
+          `<div style="position:relative;height:44px;border-radius:8px;background:${bg};display:flex;align-items:center;justify-content:center;${sel?"outline:2px solid #01EACB;outline-offset:-2px;":""}">
             <span style="font-size:11px;color:rgba(0,0,0,0.55);font-family:'Alata',sans-serif;">${l}</span>
-            ${sel?`<div style="position:absolute;top:3px;right:4px;color:#00A950;font-size:10px;font-weight:700;">✓</div>`:""}
+            ${sel?`<div style="position:absolute;top:3px;right:4px;color:#01EACB;font-size:10px;font-weight:700;">✓</div>`:""}
           </div>`
         ).join("")}
       </div>
@@ -176,7 +176,7 @@ const ILLUSTRATIONS = {
       </div>
       <div style="display:flex;justify-content:space-between;width:90%;font-size:11px;">
         <span style="color:#e05555;font-family:'Alata',sans-serif;">← No</span>
-        <span style="color:#00A950;font-family:'Alata',sans-serif;">Yes →</span>
+        <span style="color:#01EACB;font-family:'Alata',sans-serif;">Yes →</span>
       </div>
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;text-align:center;">Swipe cards left or right</div>
     </div>`,
@@ -185,14 +185,14 @@ const ILLUSTRATIONS = {
     <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:10px;">
       <div style="width:100%;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;background:rgba(255,255,255,0.04);">
         <div style="font-size:11px;color:rgba(255,255,255,0.3);font-family:'ABeeZee',sans-serif;">Type your answer…</div>
-        <div style="height:2px;width:6px;background:#00A950;margin-top:6px;border-radius:2px;"></div>
+        <div style="height:2px;width:6px;background:#01EACB;margin-top:6px;border-radius:2px;"></div>
       </div>
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;text-align:center;">Tap and type your response</div>
     </div>`,
 
   static_page: () => `
     <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
-      <div style="width:52px;height:52px;border-radius:50%;background:rgba(0,169,80,0.15);border:2px solid #00A950;display:flex;align-items:center;justify-content:center;">
+      <div style="width:52px;height:52px;border-radius:50%;background:rgba(1,234,203,0.15);border:2px solid #01EACB;display:flex;align-items:center;justify-content:center;">
         <span style="font-size:24px;">✓</span>
       </div>
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;text-align:center;line-height:1.4;">Complete the activity then tap the checkbox</div>
@@ -284,7 +284,7 @@ const COMPONENTS = {
       <div class="swipe-indicator">
         <span style="color:#D80027;font-weight:700">← No</span>
         <span class="mx-3">drag card to answer</span>
-        <span style="color:#00A950;font-weight:700">Yes →</span>
+        <span style="color:#01EACB;font-weight:700">Yes →</span>
       </div>
       <div class="rotate-actions">
         <button type="button" class="rotate-action-btn rotate-action-no"

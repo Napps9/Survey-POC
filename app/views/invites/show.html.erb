@@ -8,7 +8,7 @@
       <% if @invite.accepted? %>
         <h1 style="font-family:'Alata',sans-serif;font-size:22px;color:#F7F7F7;margin:0 0 8px;">Invite already used</h1>
         <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);margin:0;">
-          This invite link has already been accepted. <%= link_to "Sign in", new_session_path, style: "color:#00A950;text-decoration:none;" %>
+          This invite link has already been accepted. <%= link_to "Sign in", new_session_path, style: "color:#01EACB;text-decoration:none;" %>
         </p>
       <% elsif @invite.expired? %>
         <h1 style="font-family:'Alata',sans-serif;font-size:22px;color:#F7F7F7;margin:0 0 8px;">Invite expired</h1>
@@ -71,7 +71,7 @@
         </div>
 
         <%= f.submit "Accept invite →",
-              style: "width:100%;background:#00A950;border:none;border-radius:8px;padding:14px;color:#fff;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.05em;cursor:pointer;" %>
+              style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#fff;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.05em;cursor:pointer;" %>
 
       <% end %>
 

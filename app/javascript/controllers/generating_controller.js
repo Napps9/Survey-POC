@@ -24,7 +24,7 @@ export default class extends Controller {
     this.insightTextTarget.textContent = insight ? `"${insight}"` : ""
 
     // Stage 1 message — echo theme back as a forward-looking statement
-    this.heroThemeTarget.innerHTML = this._stage1Message(theme, age)
+    this._setHero(this._stage1Message(theme, age))
     this.heroAgeTarget.textContent = ""
 
     this.overlayTarget.classList.remove("hidden")
@@ -38,7 +38,7 @@ export default class extends Controller {
       this._done(this.step2Target)
       this._active(this.step3Target)
       // Stage 2 — picking the right formats
-      this.heroThemeTarget.innerHTML = this._stage2Message(this._theme, this._age)
+      this._setHero(this._stage2Message(this._theme, this._age))
       this.heroAgeTarget.textContent = ""
     }, STEP2_DONE_MS)
 
@@ -46,15 +46,33 @@ export default class extends Controller {
       this._done(this.step3Target)
       this._active(this.step4Target)
       // Stage 3 — design rules applied
-      this.heroThemeTarget.innerHTML = this._stage3Message(this._age, this._insight)
+      this._setHero(this._stage3Message(this._age, this._insight))
       this.heroAgeTarget.textContent = ""
     }, STEP3_DONE_MS)
 
     setTimeout(() => {
       // Still waiting — soften the message
-      this.heroThemeTarget.innerHTML = this._stage4Message()
+      this._setHero(this._stage4Message())
       this.heroAgeTarget.textContent = "Every question crafted. Putting the final touches on…"
     }, STEP4_HINT_MS)
+  }
+
+  // Set hero text and scale font-size so longer messages still fill
+  // roughly the same on-screen area as shorter ones.
+  _setHero(html) {
+    const el = this.heroThemeTarget
+    el.innerHTML = html
+    const len = (el.textContent || "").length
+    // Tuned around expected message lengths (~80–220 chars).
+    // Shorter copy → bigger text; longer copy → smaller text.
+    let fit
+    if (len <= 60)        fit = 1.25
+    else if (len <= 100)  fit = 1.10
+    else if (len <= 140)  fit = 1.00
+    else if (len <= 180)  fit = 0.88
+    else if (len <= 220)  fit = 0.78
+    else                  fit = 0.70
+    el.style.setProperty("--hero-fit", fit)
   }
 
   // Each message reflects the user's actual input without just repeating it
