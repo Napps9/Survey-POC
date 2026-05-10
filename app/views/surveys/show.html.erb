@@ -23,7 +23,7 @@
 %>
 
 <div class="results-rainbow flex flex-col h-screen"
-     data-controller="type-panel preview-verto survey-editor"
+     data-controller="type-panel preview-verto survey-editor media-picker"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"
      data-survey-editor-description-value="<%= @survey.description %>"
@@ -78,8 +78,10 @@
 
           <div class="survey-card-wrap"
                data-type-panel-target="card"
+               data-survey-editor-target="card"
                data-card-type="<%= type %>"
                data-card-num="<%= idx + 1 %>"
+               data-card-image="<%= card['image'].to_s %>"
                data-card-options="<%= Array(card['options']).to_json %>"
                data-action="click->type-panel#selectCard">
 
@@ -97,8 +99,13 @@
             <%# Horizontal split-card %>
             <div class="split-card">
 
-              <%# ── LEFT PANEL — interaction illustration ── %>
+              <%# ── LEFT PANEL — interaction illustration + optional media ── %>
               <div class="split-left">
+                <% if card["image"].present? %>
+                  <div class="split-left-img" data-card-media
+                       style="background-image:url('<%= card["image"] %>');"></div>
+                  <div class="split-left-overlay" data-card-media></div>
+                <% end %>
                 <div class="panel-progress">
                   <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
                 </div>
@@ -106,6 +113,12 @@
                 <div class="split-left-illustration" data-card-illustration>
                   <%= interaction_illustration(type) %>
                 </div>
+                <button type="button" class="add-media-fab"
+                        data-action="click->media-picker#open"
+                        title="Add an image to this card">
+                  <span class="add-media-fab-plus">＋</span>
+                  <span>Add media</span>
+                </button>
               </div>
 
               <%# ── RIGHT PANEL ── %>
@@ -487,5 +500,7 @@
     </div>
 
   </div><%# /preview-overlay %>
+
+  <%= render "surveys/media_modal" %>
 
 </div><%# /results-rainbow %>

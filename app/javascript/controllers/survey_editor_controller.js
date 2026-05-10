@@ -141,6 +141,8 @@ export default class extends Controller {
       out.text = card.querySelector('.q-title, .activity-title')?.textContent.trim() || ""
       const desc = card.querySelector('.q-subtitle, .activity-desc')?.textContent.trim()
       if (desc) out.description = desc
+      const image = card.dataset.cardImage
+      if (image) out.image = image
       const opts = []
       if (['multiple_choice', 'select_many', 'yes_no'].includes(type))
         card.querySelectorAll('.pick-text').forEach(el => opts.push(el.textContent.trim()))

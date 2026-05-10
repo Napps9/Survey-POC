@@ -1,0 +1,84 @@
+<%# Media picker modal — opened from the "+ Add media" CTA on each card's left panel. %>
+<div class="media-modal-backdrop"
+     data-media-picker-target="backdrop"
+     data-action="click->media-picker#backdropClick"
+     hidden>
+  <div class="media-modal" data-media-picker-target="modal">
+
+    <div class="media-modal-head">
+      <div class="media-modal-title">Add media</div>
+      <button type="button" class="media-modal-close"
+              data-action="click->media-picker#close"
+              aria-label="Close">✕</button>
+    </div>
+
+    <div class="media-modal-tabs" role="tablist">
+      <button type="button" class="media-modal-tab"
+              role="tab" aria-selected="true"
+              data-tab="upload"
+              data-media-picker-target="tab"
+              data-action="click->media-picker#switchTab">Upload</button>
+      <button type="button" class="media-modal-tab"
+              role="tab" aria-selected="false"
+              data-tab="library"
+              data-media-picker-target="tab"
+              data-action="click->media-picker#switchTab">Verto Library</button>
+    </div>
+
+    <div class="media-modal-body">
+      <%# Upload pane %>
+      <div data-media-picker-target="pane" data-pane="upload">
+        <label class="media-upload-zone"
+               data-media-picker-target="dropzone"
+               data-action="dragover->media-picker#dragover dragleave->media-picker#dragleave drop->media-picker#drop">
+          <div class="media-upload-zone-icon">⬆</div>
+          <div>Click to choose an image, or drag &amp; drop</div>
+          <div class="media-upload-hint">PNG, JPG, WebP or SVG · scaled to fit the card panel</div>
+          <input type="file" accept="image/*" hidden
+                 data-media-picker-target="fileInput"
+                 data-action="change->media-picker#fileChosen" />
+        </label>
+      </div>
+
+      <%# Library pane %>
+      <div data-media-picker-target="pane" data-pane="library" hidden>
+        <% imgs = verto_library_images %>
+        <% if imgs.any? %>
+          <div class="media-library-grid">
+            <% imgs.each do |fname| %>
+              <% url = asset_path("verto-library/#{fname}") %>
+              <button type="button"
+                      class="media-library-item"
+                      title="<%= fname %>"
+                      style="background-image:url('<%= url %>');"
+                      data-url="<%= url %>"
+                      data-media-picker-target="libraryItem"
+                      data-action="click->media-picker#pickLibraryItem"
+                      aria-selected="false"></button>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="media-library-empty">
+            The library is empty. Drop image files into
+            <code style="color:#01EACB;">app/assets/images/verto-library/</code>
+            to populate this picker.
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="media-modal-foot">
+      <button type="button" class="media-clear-btn"
+              data-media-picker-target="clearBtn"
+              data-action="click->media-picker#clearImage"
+              hidden>Remove current media</button>
+      <button type="button" class="media-btn-ghost"
+              data-action="click->media-picker#close">Cancel</button>
+      <button type="button" class="media-btn-primary"
+              data-media-picker-target="applyBtn"
+              data-action="click->media-picker#applyImage"
+              disabled>Apply</button>
+    </div>
+
+  </div>
+</div>

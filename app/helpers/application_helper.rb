@@ -17,6 +17,14 @@ module ApplicationHelper
     CARD_TYPE_META[type.to_s] || { badge: type.to_s.tr("_", " ").upcase, badge_css: "sb-range", q_label: "" }
   end
 
+  # Filenames present in app/assets/images/verto-library/. Picked up at request
+  # time so dropping a new file in the folder requires no rebuild.
+  def verto_library_images
+    dir = Rails.root.join("app/assets/images/verto-library")
+    return [] unless Dir.exist?(dir)
+    Dir.children(dir).select { |f| f =~ /\.(jpe?g|png|webp|svg)\z/i }.sort
+  end
+
   # Interaction illustration shown in the left (dark) panel of each split-card.
   # Explains HOW to interact with the question type using a simple visual.
   def interaction_illustration(type)
@@ -31,9 +39,9 @@ module ApplicationHelper
           <div style="display:flex;align-items:center;gap:8px;#{w}">
             <span style="font-size:16px;opacity:0.5;">←</span>
             <div style="position:relative;flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.15);">
-              <div style="position:absolute;width:40%;height:100%;border-radius:3px;background:#00A950;"></div>
+              <div style="position:absolute;width:40%;height:100%;border-radius:3px;background:#01EACB;"></div>
               <div style="position:absolute;left:38%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
-                <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 5H1m6 0H9M5 3V1m0 8V7" stroke="#00A950" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 5H1m6 0H9M5 3V1m0 8V7" stroke="#01EACB" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
             </div>
             <span style="font-size:16px;opacity:0.5;">→</span>
@@ -55,8 +63,8 @@ module ApplicationHelper
     when "multiple_choice"
       items = [["◉", "Option A", true], ["○", "Option B", false], ["○", "Option C", false]]
       rows = items.map { |dot, label, sel|
-        bg = sel ? "background:rgba(0,169,80,0.15);" : ""
-        clr = sel ? "color:#00A950;" : "color:rgba(255,255,255,0.7);"
+        bg = sel ? "background:rgba(1,234,203,0.15);" : ""
+        clr = sel ? "color:#01EACB;" : "color:rgba(255,255,255,0.7);"
         "<div style=\"display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;#{bg}\">" \
         "<span style=\"font-size:14px;#{clr}\">#{dot}</span>" \
         "<span style=\"font-size:12px;#{clr}#{c}\">#{label}</span></div>"
@@ -71,8 +79,8 @@ module ApplicationHelper
     when "select_many"
       items = [["☑", "Option A", true], ["☑", "Option B", true], ["☐", "Option C", false]]
       rows = items.map { |dot, label, sel|
-        bg = sel ? "background:rgba(0,169,80,0.12);" : ""
-        clr = sel ? "color:#00A950;" : "color:rgba(255,255,255,0.6);"
+        bg = sel ? "background:rgba(1,234,203,0.12);" : ""
+        clr = sel ? "color:#01EACB;" : "color:rgba(255,255,255,0.6);"
         "<div style=\"display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;#{bg}\">" \
         "<span style=\"font-size:14px;#{clr}\">#{dot}</span>" \
         "<span style=\"font-size:12px;#{clr}#{c}\">#{label}</span></div>"
@@ -88,7 +96,7 @@ module ApplicationHelper
       <<~HTML
         <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
           <div style="display:flex;gap:12px;width:100%;">
-            <div style="flex:1;padding:10px;border-radius:12px;background:#00A950;text-align:center;#{c};font-size:13px;color:white;">Yes</div>
+            <div style="flex:1;padding:10px;border-radius:12px;background:#01EACB;text-align:center;#{c};font-size:13px;color:white;">Yes</div>
             <div style="flex:1;padding:10px;border-radius:12px;background:rgba(255,255,255,0.08);text-align:center;#{c};font-size:13px;color:rgba(255,255,255,0.5);">No</div>
           </div>
           <div style="#{d}">Tap to choose one</div>
@@ -100,8 +108,8 @@ module ApplicationHelper
       cells = ["A","B","C","D"].map.with_index { |l, i|
         bg = %w[#d4edda #d1ecf1 #fff3cd #f8d7da][i]
         sel = i.zero? || (multi && i == 1)
-        ring = sel ? "outline:2px solid #00A950;outline-offset:-2px;" : ""
-        tick = sel ? "<div style=\"position:absolute;top:3px;right:4px;color:#00A950;font-size:10px;font-weight:700;\">✓</div>" : ""
+        ring = sel ? "outline:2px solid #01EACB;outline-offset:-2px;" : ""
+        tick = sel ? "<div style=\"position:absolute;top:3px;right:4px;color:#01EACB;font-size:10px;font-weight:700;\">✓</div>" : ""
         "<div style=\"position:relative;height:44px;border-radius:8px;background:#{bg};display:flex;align-items:center;justify-content:center;#{ring}\">" \
         "<span style=\"font-size:11px;color:rgba(0,0,0,0.55);font-family:'Alata',sans-serif;\">#{l}</span>#{tick}</div>"
       }.join
@@ -125,7 +133,7 @@ module ApplicationHelper
           </div>
           <div style="display:flex;justify-content:space-between;width:90%;font-size:11px;">
             <span style="color:#e05555;#{c}">← No</span>
-            <span style="color:#00A950;#{c}">Yes →</span>
+            <span style="color:#01EACB;#{c}">Yes →</span>
           </div>
           <div style="#{d}">Swipe cards left or right</div>
         </div>
@@ -136,7 +144,7 @@ module ApplicationHelper
         <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:10px;">
           <div style="width:100%;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;background:rgba(255,255,255,0.04);">
             <div style="font-size:11px;color:rgba(255,255,255,0.3);font-family:'ABeeZee',sans-serif;">Type your answer…</div>
-            <div style="height:2px;width:6px;background:#00A950;margin-top:6px;border-radius:2px;animation:blink 1s step-end infinite;"></div>
+            <div style="height:2px;width:6px;background:#01EACB;margin-top:6px;border-radius:2px;animation:blink 1s step-end infinite;"></div>
           </div>
           <div style="#{d}">Tap and type your response</div>
         </div>
@@ -145,7 +153,7 @@ module ApplicationHelper
     when "static_page"
       <<~HTML
         <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
-          <div style="width:52px;height:52px;border-radius:50%;background:rgba(0,169,80,0.15);border:2px solid #00A950;display:flex;align-items:center;justify-content:center;">
+          <div style="width:52px;height:52px;border-radius:50%;background:rgba(1,234,203,0.15);border:2px solid #01EACB;display:flex;align-items:center;justify-content:center;">
             <span style="font-size:24px;">✓</span>
           </div>
           <div style="#{d}">Complete the activity then tap the checkbox</div>
@@ -217,7 +225,7 @@ module ApplicationHelper
 
     when "static_page"
       "<div style=\"width:100%;display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.05)\">" \
-      "<div style=\"width:16px;height:16px;border-radius:4px;background:#00A950;flex-shrink:0;display:flex;align-items:center;justify-content:center\">" \
+      "<div style=\"width:16px;height:16px;border-radius:4px;background:#01EACB;flex-shrink:0;display:flex;align-items:center;justify-content:center\">" \
       "<svg width=\"8\" height=\"6\" viewBox=\"0 0 12 9\" fill=\"white\"><path d=\"M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z\"/></svg>" \
       "</div><div style=\"font-size:9px;color:rgba(255,255,255,0.55);line-height:1.4\">Complete the activity</div></div>"
 

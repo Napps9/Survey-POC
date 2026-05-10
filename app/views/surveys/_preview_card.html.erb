@@ -18,15 +18,21 @@
 
 <div class="split-card">
 
-  <%# ── Left panel: illustration ── %>
+  <%# ── Left panel: optional media + illustration ── %>
   <div class="split-left">
+    <% if card["image"].present? %>
+      <div class="split-left-img" style="background-image:url('<%= card["image"] %>');"></div>
+      <div class="split-left-overlay"></div>
+    <% end %>
     <div class="panel-progress">
       <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
     </div>
     <div class="panel-tagline">Build the change</div>
-    <div class="split-left-illustration">
-      <%= interaction_illustration(type) %>
-    </div>
+    <% unless card["image"].present? %>
+      <div class="split-left-illustration">
+        <%= interaction_illustration(type) %>
+      </div>
+    <% end %>
   </div>
 
   <%# ── Right panel: question + interactive component ── %>
