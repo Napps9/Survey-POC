@@ -10,10 +10,9 @@
     "rating"           => "Tap to rate",
     "yes_no"           => "Choose one",
     "open_ended"       => "Type your answer",
-    "welcome_card"     => "",
-    "static_page"      => ""
+    "welcome_card"     => ""
   }[type] || type.tr("_", " ")
-  is_q = !%w[welcome_card static_page].include?(type)
+  is_q = type != "welcome_card"
 %>
 
 <div class="split-card">
@@ -42,16 +41,12 @@
       <div class="q-eyebrow"><%= eyebrow %></div>
     <% end %>
 
-    <% if type == "static_page" %>
-      <div class="activity-tag">Activity</div>
-    <% end %>
-
-    <div class="<%= type == 'static_page' ? 'activity-title' : 'q-title' %>">
+    <div class="q-title">
       <%= card["text"] %>
     </div>
 
     <% if card["description"].present? %>
-      <div class="<%= type == 'static_page' ? 'activity-desc' : 'q-subtitle' %>">
+      <div class="q-subtitle">
         <%= card["description"] %>
       </div>
     <% end %>
@@ -199,16 +194,6 @@
                     data-freeform-target="input"
                     data-action="input->freeform#update"></textarea>
           <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
-        </div>
-
-      <% when "static_page" %>
-        <div class="activity-check"
-             onclick="this.querySelector('.check-box').dataset.selected = this.querySelector('.check-box').dataset.selected === 'true' ? 'false' : 'true'">
-          <div class="check-box" data-selected="false">✓</div>
-          <div class="check-texts">
-            <div class="check-main">Mark as complete</div>
-            <div class="check-sub">Tap when you've finished the activity</div>
-          </div>
         </div>
 
       <% when "welcome_card" %>

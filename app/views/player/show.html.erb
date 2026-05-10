@@ -1,7 +1,7 @@
 <% content_for :title, "#{@survey.theme} · Playverto" %>
 <%
   cards   = Array(@survey.cards)
-  total_q = cards.count { |c| !%w[welcome_card static_page].include?(c["type"]) }
+  total_q = cards.count { |c| c["type"] != "welcome_card" }
   prev_q  = 0
 %>
 <div class="preview-overlay flex flex-col"
@@ -20,7 +20,7 @@
     <% cards.each_with_index do |card, idx| %>
       <%
         type  = card["type"].to_s
-        is_q  = !%w[welcome_card static_page].include?(type)
+        is_q  = type != "welcome_card"
         prev_q += 1 if is_q
         prog  = total_q > 0 ? ((prev_q.to_f / total_q) * 100).round : 5
         prog  = 5 unless is_q

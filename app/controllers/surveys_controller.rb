@@ -50,7 +50,7 @@ class SurveysController < ApplicationController
     redirect_to survey_path(@survey)
   rescue => e
     Rails.logger.error("[SurveyGenerator] #{e.class}: #{e.message}")
-    flash.now[:alert] = "Generation failed: #{e.message}"
+    flash.now[:alert] = "We couldn't generate your Verto. Try again in a moment."
     render :new, status: :unprocessable_entity
   end
 
@@ -91,17 +91,5 @@ class SurveysController < ApplicationController
 
   def set_survey
     @survey = Current.organisation.surveys.find(params[:id])
-  end
-
-  def survey_payload(s)
-    {
-      "id"           => s.id,
-      "title"        => s.title,
-      "description"  => s.description,
-      "theme"        => s.theme,
-      "audience_age" => s.audience_age,
-      "key_insight"  => s.key_insight,
-      "cards"        => s.cards
-    }
   end
 end

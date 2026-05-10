@@ -1,8 +1,8 @@
 <%
   published   = survey.publish_token.present?
-  resp_count  = survey.responses.size
+  resp_count  = survey.responses.length
   card_count  = Array(survey.cards).size
-  q_count     = Array(survey.cards).count { |c| !%w[welcome_card static_page].include?(c["type"].to_s) }
+  q_count     = Array(survey.cards).count { |c| c["type"].to_s != "welcome_card" }
   accent      = published ? "#01EACB" : "rgba(255,255,255,0.2)"
   accent_dim  = published ? "rgba(1,234,203,0.08)" : "rgba(255,255,255,0.03)"
 %>

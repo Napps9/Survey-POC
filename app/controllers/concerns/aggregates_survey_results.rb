@@ -28,8 +28,6 @@ module AggregatesSurveyResults
         { type:, card:, total: vals.size, counts:, avg: }
       when "open_ended"
         { type:, card:, total: vals.size, texts: vals.map(&:to_s).reject(&:blank?) }
-      when "static_page"
-        { type:, card:, total: vals.size, completed: vals.count { |v| v == true } }
       else
         { type:, card:, total: responses.count, counts: {} }
       end

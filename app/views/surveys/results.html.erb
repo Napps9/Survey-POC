@@ -1,7 +1,6 @@
 <%
   svg_for = {
     "welcome_card"     => "WelcomeEnding.svg",
-    "static_page"      => "WelcomeEnding.svg",
     "multiple_choice"  => "select.svg",
     "select_many"      => "select.svg",
     "select_one_grid"  => "select.svg",
@@ -14,7 +13,6 @@
   }
   left_bg_for = {
     "welcome_card"     => "linear-gradient(150deg,#0d3d22 0%,#051408 100%)",
-    "static_page"      => "linear-gradient(150deg,#0d3d22 0%,#051408 100%)",
     "multiple_choice"  => "linear-gradient(150deg,#1a1550 0%,#0a0833 100%)",
     "select_many"      => "linear-gradient(150deg,#1a1550 0%,#0a0833 100%)",
     "select_one_grid"  => "linear-gradient(150deg,#1a1550 0%,#0a0833 100%)",
@@ -235,14 +233,6 @@
                     <% end %>
                   </div>
 
-                <% elsif type == "static_page" %>
-                  <% pct = @total > 0 ? ((result[:completed].to_f / @total) * 100).round : 0 %>
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="flex:1;height:8px;border-radius:4px;background:rgba(1,234,203,0.1);overflow:hidden;">
-                      <div style="height:100%;border-radius:4px;background:#01EACB;width:<%= pct %>%;"></div>
-                    </div>
-                    <span style="font-family:'Alata',sans-serif;font-size:12px;color:#01EACB;white-space:nowrap;"><%= result[:completed] %> / <%= @total %> (<%= pct %>%)</span>
-                  </div>
                 <% end %>
 
               </div><%# end right panel %>

@@ -10,7 +10,6 @@ const TYPE_META = {
   select_many_grid: { badge: "IMAGE GRID",     css: "sb-choice",   label: "CHOOSE ALL THAT APPLY", eyebrow: "Choose all that apply"  },
   tap_card:         { badge: "SWIPE",          css: "sb-swipe",    label: "SWIPE TO RESPOND",      eyebrow: "Swipe to respond"       },
   open_ended:       { badge: "OPEN TEXT",      css: "sb-text",     label: "TYPE YOUR ANSWER",      eyebrow: "Type your answer"       },
-  static_page:      { badge: "ACTIVITY",       css: "sb-activity", label: "COMPLETE THE TASK",     eyebrow: ""                       },
   welcome_card:     { badge: "WELCOME CARD",   css: "sb-welcome",  label: "",                      eyebrow: ""                       },
 }
 
@@ -189,14 +188,6 @@ const ILLUSTRATIONS = {
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;text-align:center;">Tap and type your response</div>
     </div>`,
 
-  static_page: () => `
-    <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
-      <div style="width:52px;height:52px;border-radius:50%;background:rgba(1,234,203,0.15);border:2px solid #01EACB;display:flex;align-items:center;justify-content:center;">
-        <span style="font-size:24px;">✓</span>
-      </div>
-      <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;text-align:center;line-height:1.4;">Complete the activity then tap the checkbox</div>
-    </div>`,
-
   welcome_card: () => `
     <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
       <div style="font-size:40px;line-height:1;">👋</div>
@@ -214,7 +205,6 @@ const DEFAULT_OPTIONS = {
   select_many_grid: ["A", "B", "C", "D"],
   tap_card:         ["Statement 1", "Statement 2", "Statement 3"],
   open_ended:       [],
-  static_page:      [],
   welcome_card:     [],
 }
 
@@ -335,7 +325,6 @@ const COMPONENTS = {
     </div>`,
 
   welcome_card: () => "",
-  static_page:  () => "",
 }
 
 function gridHtml(opts, mode) {

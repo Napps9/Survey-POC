@@ -10,7 +10,6 @@ module ApplicationHelper
     "select_many_grid" => { badge: "IMAGE GRID",    badge_css: "sb-choice",   q_label: "CHOOSE ALL THAT APPLY" },
     "tap_card"         => { badge: "SWIPE",         badge_css: "sb-swipe",    q_label: "SWIPE TO RESPOND" },
     "open_ended"       => { badge: "OPEN TEXT",     badge_css: "sb-text",     q_label: "TYPE YOUR ANSWER" },
-    "static_page"      => { badge: "ACTIVITY",      badge_css: "sb-activity", q_label: "ACTIVITY" },
   }.freeze
 
   def card_type_meta(type)
@@ -164,16 +163,6 @@ module ApplicationHelper
         </div>
       HTML
 
-    when "static_page"
-      <<~HTML
-        <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
-          <div style="width:52px;height:52px;border-radius:50%;background:rgba(1,234,203,0.15);border:2px solid #01EACB;display:flex;align-items:center;justify-content:center;">
-            <span style="font-size:24px;">✓</span>
-          </div>
-          <div style="#{d}">Complete the activity then tap the checkbox</div>
-        </div>
-      HTML
-
     else  # welcome_card
       <<~HTML
         <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
@@ -236,12 +225,6 @@ module ApplicationHelper
 
     when "open_ended"
       "<textarea class=\"mini-textarea\" placeholder=\"Type your answer here…\" readonly></textarea>"
-
-    when "static_page"
-      "<div style=\"width:100%;display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.05)\">" \
-      "<div style=\"width:16px;height:16px;border-radius:4px;background:#01EACB;flex-shrink:0;display:flex;align-items:center;justify-content:center\">" \
-      "<svg width=\"8\" height=\"6\" viewBox=\"0 0 12 9\" fill=\"white\"><path d=\"M3.712 7.295L1.21 4.79C.931 4.511.488 4.511.209 4.79-.07 5.069-.07 5.513.209 5.792L3.205 8.791c.278.279.729.279 1.008 0L11.791 1.211c.279-.279.279-.723 0-1.002-.279-.279-.722-.279-1.001 0z\"/></svg>" \
-      "</div><div style=\"font-size:9px;color:rgba(255,255,255,0.55);line-height:1.4\">Complete the activity</div></div>"
 
     else
       ""

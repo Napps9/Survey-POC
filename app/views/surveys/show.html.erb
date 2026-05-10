@@ -1,6 +1,6 @@
 <%
   cards   = Array(@survey.cards)
-  total_q = cards.count { |c| !%w[welcome_card static_page].include?(c["type"]) }
+  total_q = cards.count { |c| c["type"] != "welcome_card" }
   q_idx   = 0
   est_min = [(total_q * 30 / 60.0).ceil, 1].max
 
@@ -14,8 +14,7 @@
     "rating"           => "Tap to rate",
     "yes_no"           => "Choose one",
     "open_ended"       => "Type your answer",
-    "welcome_card"     => "",
-    "static_page"      => ""
+    "welcome_card"     => ""
   }
 
   # Placeholder grid colours for left panel (6 cells, 2 cols × 3 rows)
@@ -68,12 +67,11 @@
           <%
             type     = card["type"].to_s
             meta     = card_type_meta(type)
-            is_q     = !%w[welcome_card static_page].include?(type)
+            is_q     = type != "welcome_card"
             q_idx   += 1 if is_q
             progress = total_q > 0 ? ((q_idx.to_f / total_q) * 100).round : 5
             progress = 5 if !is_q
             eyebrow  = type_eyebrow[type] || type.tr('_', ' ')
-            dark_top = %w[tap_card open_ended].include?(type)
           %>
 
           <div class="survey-card-wrap"
@@ -128,18 +126,12 @@
                   <div class="q-eyebrow"><%= eyebrow %></div>
                 <% end %>
 
-                <% if type == "static_page" %>
-                  <div class="activity-tag">Activity</div>
-                <% end %>
-
-                <div class="<%= type == 'static_page' ? 'activity-title' : 'q-title' %>"
-                     contenteditable="true">
+                <div class="q-title" contenteditable="true">
                   <%= card["text"] %>
                 </div>
 
                 <% if card["description"].present? %>
-                  <div class="<%= type == 'static_page' ? 'activity-desc' : 'q-subtitle' %>"
-                       contenteditable="true">
+                  <div class="q-subtitle" contenteditable="true">
                     <%= card["description"] %>
                   </div>
                 <% end %>
@@ -297,7 +289,7 @@
                       <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
                     </div>
 
-                  <% when "welcome_card", "static_page" %>
+                  <% when "welcome_card" %>
                     <%# No interactive component %>
                   <% end %>
                 </div>
@@ -445,12 +437,12 @@
       <%# One preview-card div per survey card — only the active one is shown %>
       <%
         prev_q_idx = 0
-        prev_total = cards.count { |c| !%w[welcome_card static_page].include?(c["type"]) }
+        prev_total = cards.count { |c| c["type"] != "welcome_card" }
       %>
       <% cards.each_with_index do |pcard, pidx| %>
         <%
           ptype    = pcard["type"].to_s
-          p_is_q   = !%w[welcome_card static_page].include?(ptype)
+          p_is_q   = ptype != "welcome_card"
           prev_q_idx += 1 if p_is_q
           pprogress = prev_total > 0 ? ((prev_q_idx.to_f / prev_total) * 100).round : 5
           pprogress = 5 unless p_is_q

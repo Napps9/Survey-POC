@@ -75,9 +75,6 @@ class ResultsChat
         lines << "  Average: #{result[:avg]} / 5 (#{result[:total]} responses)"
       when "open_ended"
         lines << "  #{result[:total]} text responses. Sample: #{result[:texts].first(3).map { |t| "\"#{t.truncate(80)}\"" }.join(", ")}"
-      when "static_page"
-        pct = total > 0 ? ((result[:completed].to_f / total) * 100).round : 0
-        lines << "  Completed: #{result[:completed]} / #{total} (#{pct}%)"
       end
       lines << ""
     end

@@ -94,10 +94,6 @@ class ResultsSummariser
         sample = result[:texts].first(5)
         lines << "  Sample responses (#{result[:total]} total):"
         sample.each { |t| lines << "    - \"#{t.truncate(120)}\"" }
-
-      when "static_page"
-        pct = total > 0 ? ((result[:completed].to_f / total) * 100).round : 0
-        lines << "  Completed: #{result[:completed]} of #{total} (#{pct}%)"
       end
 
       lines << ""

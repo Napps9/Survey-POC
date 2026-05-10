@@ -86,9 +86,6 @@ export default class extends Controller {
       case "open_ended":
         return card.querySelector("textarea")?.value?.trim() || null
 
-      case "static_page":
-        return card.querySelector(".check-box")?.dataset.selected === "true"
-
       default:
         return null
     }
