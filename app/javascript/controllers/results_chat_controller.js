@@ -72,12 +72,12 @@ export default class extends Controller {
 
     if (role === "user") {
       wrap.style.cssText = "display:flex;justify-content:flex-end;margin-bottom:12px;padding:0 4px;"
-      wrap.innerHTML = `<div style="max-width:82%;background:#00A950;color:#fff;padding:10px 14px;border-radius:16px 16px 3px 16px;font-family:'ABeeZee',sans-serif;font-size:13px;line-height:1.55;">${this._esc(text)}</div>`
+      wrap.innerHTML = `<div style="max-width:82%;background:#01EACB;color:#fff;padding:10px 14px;border-radius:16px 16px 3px 16px;font-family:'ABeeZee',sans-serif;font-size:13px;line-height:1.55;">${this._esc(text)}</div>`
     } else {
       wrap.style.cssText = "display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;padding:0 4px;"
       wrap.innerHTML = `
-        <div style="width:24px;height:24px;flex-shrink:0;margin-top:3px;background:rgba(0,169,80,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;">
-          <span style="font-size:11px;color:#00A950;line-height:1;">✦</span>
+        <div style="width:24px;height:24px;flex-shrink:0;margin-top:3px;background:rgba(1,234,203,0.15);border-radius:7px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:11px;color:#01EACB;line-height:1;">✦</span>
         </div>
         <div class="chat-ai-bubble" style="flex:1;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.78);padding:10px 14px;border-radius:3px 16px 16px 16px;font-family:'ABeeZee',sans-serif;font-size:13px;line-height:1.6;white-space:pre-wrap;">${this._esc(text)}</div>`
     }
