@@ -6,7 +6,7 @@
     <div style="text-align:center;margin-bottom:36px;">
       <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
       <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;">Create your account</h1>
-      <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.35);margin:0;">Already have one? <%= link_to "Sign in", new_session_path, style: "color:#01EACB;text-decoration:none;" %></p>
+      <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin:0;">Already have one? <%= link_to "Sign in", new_session_path, style: "color:#01EACB;text-decoration:none;" %></p>
     </div>
 
     <% if flash[:alert] %>
@@ -63,7 +63,7 @@
       </div>
 
       <%= f.submit "Create account →",
-            style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#fff;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.05em;cursor:pointer;" %>
+            style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.05em;cursor:pointer;" %>
 
     <% end %>
   </div>

@@ -16,11 +16,11 @@
 
   <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0;">
     <% if published %>
-      <span style="font-family:'Alata',sans-serif;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:#01EACB;color:#fff;">Published</span>
+      <span style="font-family:'Alata',sans-serif;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:#01EACB;color:#1C2034;">Published</span>
     <% else %>
       <span style="font-family:'Alata',sans-serif;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);">Draft</span>
     <% end %>
-    <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.2);">
+    <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);">
       <%= survey.updated_at.strftime("%-d %b %Y") %>
     </span>
   </div>
@@ -52,9 +52,9 @@
   <%# Action row %>
   <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 14px;">
     <%= link_to "Edit Verto", survey_path(survey),
-          style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;transition:all 0.15s;",
+          style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;transition:all 0.15s;",
           onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
-          onmouseout:  "this.style.color='rgba(255,255,255,0.6)';this.style.background='rgba(255,255,255,0.05)'" %>
+          onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
 
     <% if published %>
       <%= link_to "Results →", survey_results_path(survey),
