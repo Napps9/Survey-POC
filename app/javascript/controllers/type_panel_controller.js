@@ -386,10 +386,15 @@ export default class extends Controller {
   activeCardEl = null
   pendingType  = null
 
-  connect() {
-    // Re-read the card-types blob on every Turbo navigation so the cache
-    // from the page where the module first loaded doesn't bleed in.
-    this.typeMeta = loadTypeMeta()
+  // Lazy getter so the JSON blob is read from the current page's DOM on
+  // first use, no matter when the module loaded. This avoids both Turbo
+  // cache bleed (module-load IIFE saw the previous page) and any
+  // connect() lifecycle race with the script tag.
+  get typeMeta() {
+    if (!this._typeMeta || Object.keys(this._typeMeta).length === 0) {
+      this._typeMeta = loadTypeMeta()
+    }
+    return this._typeMeta
   }
 
   selectCard(event) {
