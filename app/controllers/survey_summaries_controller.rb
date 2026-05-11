@@ -28,10 +28,12 @@ class SurveySummariesController < ApplicationController
       results_summary:                full_text,
       results_summary_response_count: total
     ) if full_text.present?
+  rescue ActiveRecord::RecordNotFound
+    raise # let Rails return a clean 404 before any stream is opened
   rescue => e
     Rails.logger.error "[SurveySummariesController] #{e.class}: #{e.message}"
     response.stream.write("Insights unavailable.") rescue nil
   ensure
-    response.stream.close
+    response.stream.close if response.committed?
   end
 end

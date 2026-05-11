@@ -23,10 +23,12 @@ class SurveyChatsController < ApplicationController
     ) do |chunk|
       response.stream.write(chunk)
     end
+  rescue ActiveRecord::RecordNotFound
+    raise # let Rails return a clean 404 before any stream is opened
   rescue => e
     Rails.logger.error "[SurveyChatsController] #{e.class}: #{e.message}"
     response.stream.write("Sorry, I couldn't answer that right now.") rescue nil
   ensure
-    response.stream.close
+    response.stream.close if response.committed?
   end
 end

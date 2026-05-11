@@ -8,6 +8,8 @@ class SurveysController < ApplicationController
   before_action :set_survey, only: [:show, :publish, :results]
 
   def index
+    # NB: includes(:responses) is required by _dashboard_card.html.erb,
+    # which uses .length to avoid a per-card COUNT query.
     @surveys = Current.organisation.surveys.includes(:responses).order(updated_at: :desc)
     @total_responses = Current.organisation.surveys.joins(:responses).count
     render :index, layout: "fullscreen"
