@@ -9,13 +9,13 @@
     </div>
 
     <% if alert = flash[:alert] %>
-      <div style="background:rgba(216,0,39,0.15);border:1px solid rgba(216,0,39,0.4);border-radius:8px;padding:12px 16px;margin-bottom:20px;color:#ff6b6b;font-size:14px;font-family:'ABeeZee',sans-serif;">
+      <div class="alert-error">
         <%= alert %>
       </div>
     <% end %>
 
     <% if notice = flash[:notice] %>
-      <div style="background:rgba(1,234,203,0.15);border:1px solid rgba(1,234,203,0.4);border-radius:8px;padding:12px 16px;margin-bottom:20px;color:#01EACB;font-size:14px;font-family:'ABeeZee',sans-serif;">
+      <div class="alert-success">
         <%= notice %>
       </div>
     <% end %>
@@ -26,7 +26,7 @@
         <%= form.email_field :email_address,
               required: true, autofocus: true, autocomplete: "username",
               placeholder: "you@example.com", value: params[:email_address],
-              style: "width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 16px;color:#F7F7F7;font-family:'ABeeZee',sans-serif;font-size:15px;box-sizing:border-box;outline:none;" %>
+              class: "form-input" %>
       </div>
 
       <div style="margin-bottom:32px;">
@@ -34,7 +34,7 @@
         <%= form.password_field :password,
               required: true, autocomplete: "current-password",
               placeholder: "••••••••", maxlength: 72,
-              style: "width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 16px;color:#F7F7F7;font-family:'ABeeZee',sans-serif;font-size:15px;box-sizing:border-box;outline:none;" %>
+              class: "form-input" %>
       </div>
 
       <%= form.submit "Sign in →",
