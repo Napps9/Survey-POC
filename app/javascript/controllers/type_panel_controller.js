@@ -1,26 +1,25 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Read the canonical card-type metadata that the editor view emits as a
-// JSON blob (sourced from config/card_types.yml). Falls back to an empty
-// object so the controller still loads on pages without the blob.
-const RAW_TYPE_META = (() => {
+// JSON blob (sourced from config/card_types.yml). Called from connect()
+// so each Turbo navigation re-reads the blob — otherwise the cache from
+// the first page visited (e.g. dashboard, which has no blob) sticks.
+function loadTypeMeta() {
+  let raw = {}
   try {
-    return JSON.parse(document.getElementById("card-types")?.textContent || "{}")
+    raw = JSON.parse(document.getElementById("card-types")?.textContent || "{}")
   } catch (_) {
-    return {}
+    raw = {}
   }
-})()
-
-// Local shape mirrors what this controller used to declare inline:
-// { badge, css, label, eyebrow }. Keys come from card_types.yml.
-const TYPE_META = Object.fromEntries(
-  Object.entries(RAW_TYPE_META).map(([key, t]) => [key, {
-    badge:   t.badge,
-    css:     t.badge_css,
-    label:   t.panel_label,
-    eyebrow: t.eyebrow,
-  }])
-)
+  return Object.fromEntries(
+    Object.entries(raw).map(([key, t]) => [key, {
+      badge:   t.badge,
+      css:     t.badge_css,
+      label:   t.panel_label,
+      eyebrow: t.eyebrow,
+    }])
+  )
+}
 
 // Each entry's `note` is shown as the natural-language reason this type
 // works (or doesn't) for the selected card. The `score` only drives the
@@ -387,6 +386,12 @@ export default class extends Controller {
   activeCardEl = null
   pendingType  = null
 
+  connect() {
+    // Re-read the card-types blob on every Turbo navigation so the cache
+    // from the page where the module first loaded doesn't bleed in.
+    this.typeMeta = loadTypeMeta()
+  }
+
   selectCard(event) {
     if (event.target.closest("button[data-action*='deleteCard']")) return
 
@@ -399,7 +404,7 @@ export default class extends Controller {
     const cardNum  = card.dataset.cardNum
     this.pendingType = cardType
 
-    const meta = TYPE_META[cardType]
+    const meta = this.typeMeta[cardType]
     this.panelCardNameTarget.textContent = `Card ${cardNum} · ${meta?.badge || cardType}`
     this.panelHintTarget.textContent     = "Choose an answer format below."
 
@@ -419,7 +424,7 @@ export default class extends Controller {
   applyType() {
     if (!this.activeCardEl || !this.pendingType) return
     this._applyToCard(this.activeCardEl, this.pendingType)
-    this._toast(`Answer type updated to ${TYPE_META[this.pendingType]?.badge || this.pendingType}`)
+    this._toast(`Answer type updated to ${this.typeMeta[this.pendingType]?.badge || this.pendingType}`)
     this.dispatch("changed")
   }
 
@@ -478,7 +483,7 @@ export default class extends Controller {
   }
 
   _applyToCard(card, type) {
-    const meta = TYPE_META[type]
+    const meta = this.typeMeta[type]
     if (!meta) return
 
     // 1. Update badge + eyebrow
