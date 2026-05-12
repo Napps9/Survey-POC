@@ -25,11 +25,12 @@ class InvitesController < ApplicationController
     end
 
     # Expire any previous pending invite for this email in this org
-    current_organisation.invites.pending.where(email_address: email).update_all(expires_at: Time.current)
+    current_organisation.invites.pending.where(email_address: email, kind: "member").update_all(expires_at: Time.current)
 
     @invite = current_organisation.invites.create!(
       email_address: email,
       role:          role,
+      kind:          "member",
       invited_by:    Current.user,
       expires_at:    7.days.from_now
     )
@@ -46,6 +47,19 @@ class InvitesController < ApplicationController
       return redirect_to new_session_path, alert: "This invite has expired. Ask your admin to resend it."
     end
 
+    if @invite.partner?
+      accept_partner_invite
+    else
+      accept_member_invite
+    end
+  rescue ActiveRecord::RecordInvalid => e
+    flash.now[:alert] = e.record.errors.full_messages.first
+    render :show, status: :unprocessable_entity
+  end
+
+  private
+
+  def accept_member_invite
     name     = params[:name].to_s.strip
     password = params[:password]
     confirm  = params[:password_confirmation]
@@ -72,12 +86,64 @@ class InvitesController < ApplicationController
     end
 
     redirect_to root_path, notice: "Welcome to #{@invite.organisation.name}!"
-  rescue ActiveRecord::RecordInvalid => e
-    flash.now[:alert] = e.record.errors.full_messages.first
-    render :show, status: :unprocessable_entity
   end
 
-  private
+  def accept_partner_invite
+    existing_user = User.find_by(email_address: @invite.email_address)
+    admin_org     = existing_user && existing_user.memberships.admin.first&.organisation
+
+    if admin_org
+      # Existing creator Org becomes a partner of inviter's Org.
+      # Require password to authorise linking, since the invite URL alone shouldn't grant login.
+      password = params[:password]
+      unless password.present? && existing_user.authenticate(password)
+        flash.now[:alert] = "Enter your existing Playverto password to link your organisation."
+        return render :show, status: :unprocessable_entity
+      end
+      ActiveRecord::Base.transaction do
+        link_partner_org(admin_org)
+        @invite.update!(accepted_at: Time.current)
+        start_new_session_for existing_user
+      end
+      redirect_to root_path, notice: "#{admin_org.name} is now a partner of #{@invite.organisation.name}."
+    else
+      # External user → create a partner-only Org
+      name         = params[:name].to_s.strip
+      org_name     = params[:organisation_name].to_s.strip.presence || "#{name}'s organisation"
+      password     = params[:password]
+      confirm      = params[:password_confirmation]
+
+      if name.blank?
+        flash.now[:alert] = "Name is required."
+        return render :show, status: :unprocessable_entity
+      end
+      if password.blank? || password != confirm
+        flash.now[:alert] = "Passwords are required and must match."
+        return render :show, status: :unprocessable_entity
+      end
+
+      ActiveRecord::Base.transaction do
+        user = existing_user || User.create!(name: name, email_address: @invite.email_address, password: password)
+        partner_org = Organisation.create!(
+          name: org_name,
+          slug: Organisation.generate_unique_slug(org_name),
+          kind: "partner"
+        )
+        partner_org.memberships.create!(user: user, role: "admin")
+        link_partner_org(partner_org)
+        @invite.update!(accepted_at: Time.current)
+        start_new_session_for user
+      end
+      redirect_to root_path, notice: "Welcome! You're now a partner of #{@invite.organisation.name}."
+    end
+  end
+
+  def link_partner_org(partner_org)
+    Alliance.find_or_create_by!(
+      organisation: @invite.organisation,
+      partner_organisation: partner_org
+    ) { |a| a.status = "active" }
+  end
 
   def load_invite
     @invite = Invite.find_by(token: params[:token])

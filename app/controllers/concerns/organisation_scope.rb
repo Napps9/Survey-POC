@@ -30,4 +30,9 @@ module OrganisationScope
   def require_admin!
     redirect_to root_path, alert: "Not authorised." unless current_membership&.admin?
   end
+
+  def require_creator_org!
+    return if current_organisation&.creator?
+    redirect_to alliance_vertos_path, alert: "Partner organisations can't do that."
+  end
 end

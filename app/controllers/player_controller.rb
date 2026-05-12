@@ -5,17 +5,18 @@ class PlayerController < ApplicationController
   skip_before_action :set_current_organisation
   protect_from_forgery with: :null_session, only: :submit
 
+  before_action :load_survey_and_share
+
   def show
-    @survey = Survey.find_by!(publish_token: params[:token])
-  rescue ActiveRecord::RecordNotFound
-    render plain: "Survey not found", status: :not_found
+    return render plain: "Survey not found", status: :not_found unless @survey
   end
 
   def submit
-    survey = Survey.find_by!(publish_token: params[:token])
-    data   = JSON.parse(request.body.read)
+    return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
+    data = JSON.parse(request.body.read)
     Response.create!(
-      survey:        survey,
+      survey:        @survey,
+      survey_share:  @survey_share,
       session_token: data["session_token"] || SecureRandom.uuid,
       answers:       data["answers"] || {},
       status:        "completed"
@@ -26,13 +27,13 @@ class PlayerController < ApplicationController
   end
 
   def results
-    survey = Survey.find_by!(publish_token: params[:token])
-    unless survey.show_results_comparison?
+    return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
+    unless @survey.show_results_comparison?
       return render json: { ok: false, error: "Comparison not enabled" }, status: :forbidden
     end
 
-    responses  = survey.responses.where(status: "completed")
-    aggregated = aggregate_results(Array(survey.cards), responses).map.with_index do |row, idx|
+    responses  = @survey.responses.where(status: "completed")
+    aggregated = aggregate_results(Array(@survey.cards), responses).map.with_index do |row, idx|
       {
         index:  idx,
         type:   row[:type],
@@ -44,7 +45,17 @@ class PlayerController < ApplicationController
       }
     end
     render json: { ok: true, total_responses: responses.count, results: aggregated }
-  rescue ActiveRecord::RecordNotFound
-    render json: { ok: false, error: "Survey not found" }, status: :not_found
+  end
+
+  private
+
+  def load_survey_and_share
+    token = params[:token]
+    if (share = SurveyShare.find_by(share_token: token))
+      @survey_share = share
+      @survey = share.survey
+    else
+      @survey = Survey.find_by(publish_token: token)
+    end
   end
 end

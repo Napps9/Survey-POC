@@ -1,0 +1,75 @@
+<% content_for :title, "#{@survey.title} — Shared Verto" %>
+<div style="display:flex;min-height:100vh;background:#1C2034;">
+  <%= render "shared/sidebar", active: "alliance_vertos" %>
+
+  <div style="flex:1;display:flex;flex-direction:column;padding:60px 48px;overflow-y:auto;">
+    <div style="width:100%;max-width:840px;">
+
+      <div style="margin-bottom:24px;">
+        <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;">From <%= @survey.organisation.name %></div>
+        <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;margin:0 0 8px;"><%= @survey.title %></h1>
+        <% if @survey.description.present? %>
+          <p style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.5);margin:0;line-height:1.6;"><%= @survey.description %></p>
+        <% end %>
+      </div>
+
+      <%# Share link %>
+      <% url = play_survey_url(@share.share_token) %>
+      <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;margin-bottom:28px;">
+        <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:8px;">Your share link</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);word-break:break-all;"><%= url %></span>
+          <button type="button"
+                  onclick="navigator.clipboard.writeText('<%= url %>').then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
+                  style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:7px 14px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;">Copy</button>
+        </div>
+      </div>
+
+      <%# Scope tabs %>
+      <div style="display:flex;gap:8px;margin-bottom:20px;">
+        <% %w[mine aggregate].each do |sc| %>
+          <%= link_to (sc == "mine" ? "My results" : "Aggregate"),
+                alliance_verto_path(@share, scope: sc),
+                style: "padding:8px 16px;border-radius:8px;font-family:'Alata',sans-serif;font-size:13px;text-decoration:none;background:#{@scope == sc ? 'rgba(1,234,203,0.15)' : 'rgba(255,255,255,0.04)'};color:#{@scope == sc ? '#01EACB' : 'rgba(255,255,255,0.6)'};border:1px solid #{@scope == sc ? 'rgba(1,234,203,0.3)' : 'rgba(255,255,255,0.08)'};" %>
+        <% end %>
+      </div>
+
+      <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:20px;">
+        <%= @total %> response<%= "s" unless @total == 1 %><%= @scope == "mine" ? " from your link" : " across all partners" %>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <% @aggregated.each_with_index do |row, idx| %>
+          <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:18px 20px;">
+            <div style="font-family:'Alata',sans-serif;font-size:14px;color:#F7F7F7;margin-bottom:10px;">
+              <%= row[:card]["text"].presence || row[:card]["prompt"].presence || row[:card]["title"].presence || "Card #{idx + 1}" %>
+            </div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:8px;">
+              <%= row[:type] %> · <%= row[:total] %> answered<% if row[:avg] %> · avg <%= row[:avg] %><% end %>
+            </div>
+            <% if row[:counts]&.any? %>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <% row[:counts].each do |label, count| %>
+                  <div style="display:flex;justify-content:space-between;font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);">
+                    <span><%= label %></span><span style="color:#01EACB;"><%= count %></span>
+                  </div>
+                <% end %>
+              </div>
+            <% elsif row[:texts]&.any? %>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <% row[:texts].first(20).each do |t| %>
+                  <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.03);border-radius:6px;padding:8px 12px;">"<%= t %>"</div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <div style="margin-top:32px;">
+        <%= link_to "← Back to shared Vertos", alliance_vertos_path,
+              style: "font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;" %>
+      </div>
+    </div>
+  </div>
+</div>

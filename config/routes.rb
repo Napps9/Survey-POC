@@ -36,5 +36,17 @@ Rails.application.routes.draw do
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results
   get  "surveys/:id/results/summary", to: "survey_summaries#show",  as: :survey_results_summary
   post "surveys/:survey_id/chat",     to: "survey_chats#create",    as: :survey_chat
+  get  "surveys/:survey_id/shares", to: "survey_shares#index",  as: :survey_shares
+  post "surveys/:survey_id/shares", to: "survey_shares#create", as: :create_survey_share
+  delete "surveys/:survey_id/shares/:id", to: "survey_shares#destroy", as: :survey_share
+
   resources :surveys, only: [:show, :update]
+
+  # Alliances (partner orgs)
+  resources :alliances, only: [:index, :destroy]
+  resources :alliance_invites, only: [:new, :create]
+
+  # Partner-side dashboard
+  get "alliance_vertos",     to: "alliance_vertos#index", as: :alliance_vertos
+  get "alliance_vertos/:id", to: "alliance_vertos#show",  as: :alliance_verto
 end

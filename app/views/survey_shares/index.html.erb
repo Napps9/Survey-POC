@@ -1,0 +1,72 @@
+<% content_for :title, "Share with partners — Playverto" %>
+<div style="display:flex;min-height:100vh;background:#1C2034;">
+  <%= render "shared/sidebar", survey: @survey %>
+
+  <div style="flex:1;display:flex;flex-direction:column;padding:60px 48px;overflow-y:auto;">
+    <div style="width:100%;max-width:720px;">
+
+      <div style="margin-bottom:32px;">
+        <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;"><%= @survey.title %></div>
+        <h1 style="font-family:'Alata',sans-serif;font-size:22px;color:#F7F7F7;margin:0 0 6px;">Share with partners</h1>
+        <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);margin:0;">
+          Each partner gets their own unique share link. Responses through that link are attributed to them.
+        </p>
+      </div>
+
+      <% if flash[:notice] %>
+        <div style="background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:8px;padding:10px 14px;margin-bottom:20px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:13px;"><%= flash[:notice] %></div>
+      <% end %>
+
+      <% if @alliances.empty? %>
+        <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:12px;padding:32px 24px;text-align:center;color:rgba(255,255,255,0.45);font-family:'ABeeZee',sans-serif;font-size:14px;">
+          You don't have any partners yet. <%= link_to "Invite one →", new_alliance_invite_path, style: "color:#01EACB;text-decoration:none;" %>
+        </div>
+      <% else %>
+        <% shared_alliance_ids = @shares.map(&:alliance_id) %>
+
+        <h2 style="font-family:'Alata',sans-serif;font-size:14px;letter-spacing:0.08em;color:rgba(255,255,255,0.5);text-transform:uppercase;margin:0 0 12px;">Active shares</h2>
+        <% if @shares.empty? %>
+          <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.35);margin:0 0 24px;">No partner shares yet.</p>
+        <% else %>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
+            <% @shares.each do |share| %>
+              <% url = play_survey_url(share.share_token) %>
+              <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                  <div style="font-family:'Alata',sans-serif;font-size:15px;color:#F7F7F7;"><%= share.partner_organisation.name %></div>
+                  <%= button_to "Revoke", survey_share_path(@survey, share), method: :delete,
+                        data: { turbo_confirm: "Revoke this share?" },
+                        style: "background:none;border:1px solid rgba(255,255,255,0.18);border-radius:7px;padding:6px 12px;color:rgba(255,255,255,0.5);font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;" %>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border-radius:7px;padding:8px 12px;">
+                  <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);word-break:break-all;"><%= url %></span>
+                  <button type="button"
+                          onclick="navigator.clipboard.writeText('<%= url %>').then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
+                          style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size:11px;cursor:pointer;">Copy</button>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% available = @alliances.reject { |a| shared_alliance_ids.include?(a.id) } %>
+        <% if available.any? %>
+          <h2 style="font-family:'Alata',sans-serif;font-size:14px;letter-spacing:0.08em;color:rgba(255,255,255,0.5);text-transform:uppercase;margin:0 0 12px;">Add partner share</h2>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <% available.each do |a| %>
+              <%= button_to "+ Share with #{a.partner_organisation.name}",
+                    create_survey_share_path(@survey), method: :post,
+                    params: { alliance_id: a.id },
+                    style: "text-align:left;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:11px 16px;color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size:13px;cursor:pointer;" %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <div style="margin-top:32px;">
+        <%= link_to "← Back to Verto", survey_path(@survey),
+              style: "font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;" %>
+      </div>
+    </div>
+  </div>
+</div>

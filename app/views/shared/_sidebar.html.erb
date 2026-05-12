@@ -35,8 +35,9 @@
       Dashboard
     </a>
 
-    <%# Create Verto %>
+    <%# Create Verto (creator orgs only) %>
     <% is_create = active_key == "create" %>
+    <% if current_organisation&.creator? %>
     <a href="<%= new_survey_path %>"
        style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_create ? '#01EACB' : 'transparent' %>;background:<%= is_create ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_create ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
        onmouseover="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='rgba(255,255,255,0.05)';this.style.color='#fff'}"
@@ -47,6 +48,27 @@
       </svg>
       Create Verto
     </a>
+    <% end %>
+
+    <%# Alliance Vertos (partner orgs) %>
+    <% if current_organisation && !current_organisation.creator? %>
+      <% is_av = active_key == "alliance_vertos" %>
+      <a href="<%= alliance_vertos_path %>"
+         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_av ? '#01EACB' : 'transparent' %>;background:<%= is_av ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_av ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;"><path d="M7.5 1l6 3v4.5c0 3-2.5 5-6 5.5C4 13.5 1.5 11.5 1.5 8.5V4l6-3z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+        Shared Vertos
+      </a>
+    <% end %>
+
+    <%# Partners (creator org admins only) %>
+    <% if current_organisation&.creator? && current_membership&.admin? %>
+      <% is_part = active_key == "partners" %>
+      <a href="<%= alliances_path %>"
+         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_part ? '#01EACB' : 'transparent' %>;background:<%= is_part ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_part ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;"><circle cx="5" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/><circle cx="10" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 13c0.5-2 1.8-3 3.5-3M13.5 13c-0.5-2-1.8-3-3.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Partners
+      </a>
+    <% end %>
 
     <%# Results — only shown when a survey context is provided %>
     <% if ctx_survey %>
