@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_07_070616) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_12_000001) do
   create_table "invites", force: :cascade do |t|
     t.datetime "accepted_at"
     t.datetime "created_at", null: false
@@ -79,6 +79,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_07_070616) do
     t.string "theme"
     t.string "title"
     t.datetime "updated_at", null: false
+    t.boolean "show_results_comparison", default: false, null: false
     t.index ["organisation_id"], name: "index_surveys_on_organisation_id"
     t.index ["publish_token"], name: "index_surveys_on_publish_token", unique: true
   end

@@ -7,7 +7,9 @@
 <div class="preview-overlay flex flex-col"
      style="height:100vh;"
      data-controller="player"
-     data-player-submit-url-value="<%= submit_survey_url(@survey.publish_token) %>">
+     data-player-submit-url-value="<%= submit_survey_url(@survey.publish_token) %>"
+     data-player-results-url-value="<%= @survey.show_results_comparison? ? player_results_url(@survey.publish_token) : '' %>"
+     data-player-show-comparison-value="<%= @survey.show_results_comparison? %>">
 
   <nav class="preview-nav">
     <%# Respondents see the publishing org's logo, not Playverto's. %>
@@ -34,14 +36,45 @@
     <% end %>
 
     <div class="preview-thankyou" data-player-target="thankyou">
-      <div class="preview-thankyou-emoji">🎉</div>
-      <div class="preview-thankyou-title">Thank you!</div>
-      <div class="preview-thankyou-sub">Your responses have been recorded.</div>
-      <%# "Powered by" appears once, followed by the Playverto wordmark image. %>
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;opacity:0.55;">
-        <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#fff;">Powered by</span>
-        <%= image_tag "playverto.svg", alt: "", style: "height:14px;width:auto;" %>
+      <div data-player-target="thankyouMain">
+        <div class="preview-thankyou-emoji">🎉</div>
+        <div class="preview-thankyou-title">Thank you!</div>
+        <div class="preview-thankyou-sub">Your responses have been recorded.</div>
+
+        <% if @survey.show_results_comparison? %>
+          <button type="button"
+                  data-player-target="compareBtn"
+                  data-action="click->player#showComparison"
+                  style="margin-top:22px;padding:11px 22px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
+            See your results compared to others →
+          </button>
+        <% end %>
+
+        <%# "Powered by" appears once, followed by the Playverto wordmark image. %>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;opacity:0.55;">
+          <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#fff;">Powered by</span>
+          <%= image_tag "playverto.svg", alt: "", style: "height:14px;width:auto;" %>
+        </div>
       </div>
+
+      <% if @survey.show_results_comparison? %>
+        <div data-player-target="comparison" class="hidden"
+             style="width:100%;max-width:640px;margin:0 auto;padding:24px 18px 32px;overflow-y:auto;max-height:calc(100vh - 120px);">
+          <div style="text-align:center;margin-bottom:18px;">
+            <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;">Your answers vs everyone</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"
+                 data-player-target="comparisonMeta"></div>
+          </div>
+          <div data-player-target="comparisonList" style="display:flex;flex-direction:column;gap:14px;"></div>
+          <div style="display:flex;justify-content:center;margin-top:18px;">
+            <button type="button"
+                    data-action="click->player#hideComparison"
+                    style="padding:9px 18px;border-radius:100px;background:transparent;color:#fff;font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
+              ← Back
+            </button>
+          </div>
+        </div>
+      <% end %>
     </div>
   </div>
 

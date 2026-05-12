@@ -27,6 +27,7 @@ class SurveysController < ApplicationController
     audience_age = params[:audience_age].to_s.strip
     key_insight  = params[:key_insight].to_s.strip
     notes        = params[:notes].to_s.strip
+    show_compare = ActiveModel::Type::Boolean.new.cast(params[:show_results_comparison])
 
     if theme.empty? || audience_age.empty? || key_insight.empty?
       flash.now[:alert] = "Tell us what your Verto's about, who's answering, and what you want to learn — those three are required."
@@ -46,7 +47,8 @@ class SurveysController < ApplicationController
       theme:        result["theme"].presence || theme,
       audience_age: result["audience_age"].presence || audience_age,
       key_insight:  result["key_insight"].presence || key_insight,
-      cards:        result["cards"]
+      cards:        result["cards"],
+      show_results_comparison: show_compare
     )
 
     redirect_to survey_path(@survey)
