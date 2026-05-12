@@ -98,10 +98,23 @@
 
       <%# Finalize bar %>
       <div class="finalize-bar">
-        <div style="font-size:13px;color:rgba(255,255,255,0.65);">
-          <strong style="color:#fff;" data-type-panel-target="cardCount"><%= cards.size %> cards</strong>
-          &nbsp;·&nbsp; Estimated ~<%= est_min %> min<%= est_min != 1 ? "s" : "" %>
-          &nbsp;·&nbsp; <span data-survey-editor-target="status" style="font-size:11px;"></span>
+        <div style="font-size:13px;color:rgba(255,255,255,0.65);display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <span>
+            <strong style="color:#fff;" data-type-panel-target="cardCount"><%= cards.size %> cards</strong>
+            &nbsp;·&nbsp; Estimated ~<%= est_min %> min<%= est_min != 1 ? "s" : "" %>
+            &nbsp;·&nbsp; <span data-survey-editor-target="status" style="font-size:11px;"></span>
+          </span>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true,
+                style: "display:inline-flex;align-items:center;gap:8px;margin:0;" do %>
+            <input type="hidden" name="show_results_comparison" value="0" />
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.7);">
+              <input type="checkbox" name="show_results_comparison" value="1"
+                     <%= "checked" if @survey.show_results_comparison? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;" />
+              Show results comparison to respondents
+            </label>
+          <% end %>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <button type="button"

@@ -5,7 +5,7 @@ class SurveysController < ApplicationController
   # JSON updates from the inline editor are same-origin fetches without CSRF tokens.
   protect_from_forgery with: :null_session, only: :update
 
-  before_action :set_survey, only: [:show, :publish, :results]
+  before_action :set_survey, only: [:show, :publish, :results, :update_settings]
 
   def index
     # NB: includes(:responses) is required by _dashboard_card.html.erb,
@@ -81,6 +81,12 @@ class SurveysController < ApplicationController
       publish_token: @survey.publish_token || SecureRandom.urlsafe_base64(18),
       published_at:  @survey.published_at  || Time.current
     )
+    redirect_to survey_path(@survey)
+  end
+
+  def update_settings
+    show_compare = ActiveModel::Type::Boolean.new.cast(params[:show_results_comparison])
+    @survey.update!(show_results_comparison: show_compare)
     redirect_to survey_path(@survey)
   end
 
