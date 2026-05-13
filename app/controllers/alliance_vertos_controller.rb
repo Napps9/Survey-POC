@@ -14,11 +14,13 @@ class AllianceVertosController < ApplicationController
 
   def show
     @survey = @share.survey
-    @scope = params[:scope].presence_in(%w[mine aggregate]) || "mine"
-    base = @survey.responses.where(status: "completed")
-    @responses = @scope == "mine" ? base.where(survey_share_id: @share.id) : base
-    @total = @responses.count
-    @aggregated = aggregate_results(Array(@survey.cards), @responses)
+    base    = @survey.responses.where(status: "completed")
+    mine    = base.where(survey_share_id: @share.id)
+
+    @mine_total       = mine.count
+    @aggregate_total  = base.count
+    @mine_results      = aggregate_results(Array(@survey.cards), mine)
+    @aggregate_results = aggregate_results(Array(@survey.cards), base)
   end
 
   private

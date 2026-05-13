@@ -1,49 +1,113 @@
 <% content_for :title, "#{@survey.title} — Shared Verto" %>
 <%
-  cards      = Array(@survey.cards)
-  result_by_index = @aggregated.each_with_index.to_h { |row, i| [i, row] }
+  cards = Array(@survey.cards)
+
+  render_counts = ->(counts, total, accent) do
+    return "" if counts.blank?
+    rows = counts.map do |label, count|
+      pct = total.to_i.positive? ? (count.to_f / total * 100).round : 0
+      <<~HTML
+        <div style="display:flex;align-items:center;gap:8px;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);">
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">#{ERB::Util.h(label)}</span>
+          <div style="position:relative;flex-shrink:0;width:60px;height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
+            <div style="position:absolute;inset:0 auto 0 0;width:#{pct}%;background:#{accent};"></div>
+          </div>
+          <span style="flex-shrink:0;min-width:40px;text-align:right;color:#{accent};font-variant-numeric:tabular-nums;">#{count} · #{pct}%</span>
+        </div>
+      HTML
+    end
+    rows.join.html_safe
+  end
+
+  render_section = ->(label, total, row, accent) do
+    if row.nil? || total.to_i.zero?
+      <<~HTML.html_safe
+        <div>
+          <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:4px;">#{label}</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);">No data</div>
+        </div>
+      HTML
+    else
+      body = if row[:counts]&.any?
+        render_counts.call(row[:counts], row[:total], accent)
+      elsif row[:texts]&.any?
+        row[:texts].first(3).map { |t| %(<div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.03);border-radius:5px;padding:5px 8px;line-height:1.35;">"#{ERB::Util.h(t)}"</div>) }.join.html_safe
+      else
+        ""
+      end
+      meta = "#{row[:total]} answered"
+      meta += " · avg #{row[:avg]}" if row[:avg]
+      <<~HTML.html_safe
+        <div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:#{accent};text-transform:uppercase;">#{label}</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.35);">#{meta}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">#{body}</div>
+        </div>
+      HTML
+    end
+  end
+
+  render_comparison = ->(mine, agg) do
+    return "" if mine.nil? || agg.nil?
+    return "" if mine[:counts].blank? || agg[:counts].blank?
+    labels = (mine[:counts].keys + agg[:counts].keys).uniq
+    mine_total = mine[:total].to_i
+    agg_total  = agg[:total].to_i
+    rows = labels.map do |label|
+      m_count = mine[:counts][label].to_i
+      a_count = agg[:counts][label].to_i
+      m_pct = mine_total.positive? ? (m_count.to_f / mine_total * 100).round : 0
+      a_pct = agg_total.positive?  ? (a_count.to_f / agg_total  * 100).round : 0
+      <<~HTML
+        <div style="display:flex;align-items:center;gap:8px;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);">
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">#{ERB::Util.h(label)}</span>
+          <span style="flex-shrink:0;color:#01EACB;font-variant-numeric:tabular-nums;width:42px;text-align:right;">#{m_pct}%</span>
+          <span style="flex-shrink:0;color:rgba(255,255,255,0.3);">vs</span>
+          <span style="flex-shrink:0;color:#FF1E6F;font-variant-numeric:tabular-nums;width:42px;text-align:right;">#{a_pct}%</span>
+        </div>
+      HTML
+    end
+    rows.join.html_safe
+  end
 %>
-<div style="display:flex;min-height:100vh;background:#1C2034;">
+<div style="display:flex;height:100vh;background:#1C2034;">
   <%= render "shared/sidebar", active: "alliance_vertos" %>
 
-  <div style="flex:1;display:flex;flex-direction:column;padding:48px 40px;overflow-y:auto;">
-    <div style="width:100%;max-width:1080px;margin:0 auto;">
+  <div style="flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:40px 36px;">
+    <div style="width:100%;max-width:1240px;margin:0 auto;">
 
-      <div style="margin-bottom:24px;">
+      <div style="margin-bottom:20px;">
         <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;">From <%= @survey.organisation.name %></div>
-        <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;margin:0 0 8px;"><%= @survey.title %></h1>
+        <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;margin:0 0 6px;"><%= @survey.title %></h1>
         <% if @survey.description.present? %>
-          <p style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.5);margin:0;line-height:1.6;"><%= @survey.description %></p>
+          <p style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.5);margin:0;line-height:1.55;"><%= @survey.description %></p>
         <% end %>
       </div>
 
       <%# Share link %>
       <% url = play_survey_url(@share.share_token) %>
-      <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;margin-bottom:24px;">
-        <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:8px;">Your share link</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);word-break:break-all;"><%= url %></span>
-          <button type="button"
-                  onclick="navigator.clipboard.writeText('<%= url %>').then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
-                  style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:7px 14px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;">Copy</button>
+      <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
+        <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;flex-shrink:0;">Share link</div>
+        <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.6);word-break:break-all;"><%= url %></span>
+        <button type="button"
+                onclick="navigator.clipboard.writeText('<%= url %>').then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
+                style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size:11px;cursor:pointer;flex-shrink:0;">Copy</button>
+      </div>
+
+      <%# Totals strip %>
+      <div style="display:flex;gap:10px;margin-bottom:22px;font-family:'ABeeZee',sans-serif;font-size:12px;">
+        <div style="background:rgba(1,234,203,0.08);border:1px solid rgba(1,234,203,0.25);border-radius:8px;padding:7px 12px;color:#01EACB;">
+          <strong style="font-family:'Alata',sans-serif;"><%= @mine_total %></strong> from your link
+        </div>
+        <div style="background:rgba(255,30,111,0.08);border:1px solid rgba(255,30,111,0.25);border-radius:8px;padding:7px 12px;color:#FF1E6F;">
+          <strong style="font-family:'Alata',sans-serif;"><%= @aggregate_total %></strong> across all partners
         </div>
       </div>
 
-      <%# Scope tabs %>
-      <div style="display:flex;gap:8px;margin-bottom:14px;">
-        <% %w[mine aggregate].each do |sc| %>
-          <%= link_to (sc == "mine" ? "My results" : "Aggregate"),
-                alliance_verto_path(@share, scope: sc),
-                style: "padding:8px 16px;border-radius:8px;font-family:'Alata',sans-serif;font-size:13px;text-decoration:none;background:#{@scope == sc ? 'rgba(1,234,203,0.15)' : 'rgba(255,255,255,0.04)'};color:#{@scope == sc ? '#01EACB' : 'rgba(255,255,255,0.6)'};border:1px solid #{@scope == sc ? 'rgba(1,234,203,0.3)' : 'rgba(255,255,255,0.08)'};" %>
-        <% end %>
-      </div>
-
-      <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px;">
-        <%= @total %> response<%= "s" unless @total == 1 %><%= @scope == "mine" ? " from your link" : " across all partners" %>
-      </div>
-
-      <%# Card-by-card: Verto preview + results side-by-side %>
-      <div style="display:flex;flex-direction:column;gap:24px;">
+      <%# Card-by-card: Verto preview + side-by-side results %>
+      <div style="display:flex;flex-direction:column;gap:20px;">
         <%
           total_q = cards.count { |c| c["type"] != "welcome_card" }
           q_idx = 0
@@ -54,55 +118,41 @@
             q_idx   += 1 if is_q
             progress = total_q > 0 ? ((q_idx.to_f / total_q) * 100).round : 5
             progress = 5 unless is_q
-            row      = result_by_index[idx]
+            mine_row = @mine_results[idx]
+            agg_row  = @aggregate_results[idx]
           %>
 
-          <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start;">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start;">
 
             <%# Verto card preview %>
-            <div style="background:#0F1326;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;">
-              <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:10px;">Card <%= idx + 1 %></div>
-              <div style="transform:scale(0.78);transform-origin:top left;width:128%;">
+            <div style="background:#0F1326;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px;overflow:hidden;">
+              <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:8px;">Card <%= idx + 1 %></div>
+              <div style="transform:scale(0.72);transform-origin:top left;width:139%;height:360px;">
                 <%= render "surveys/preview_card", card: card, progress: progress %>
               </div>
             </div>
 
-            <%# Results summary for this card %>
-            <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;align-self:start;">
-              <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:8px;">Results</div>
-              <% if row %>
-                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:10px;">
-                  <%= row[:type] %> · <%= row[:total] %> answered<% if row[:avg] %> · avg <%= row[:avg] %><% end %>
+            <%# Results panel: Mine + Aggregate + Comparison %>
+            <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:14px;align-self:start;">
+              <%= render_section.call("My results", @mine_total, mine_row, "#01EACB") %>
+              <div style="height:1px;background:rgba(255,255,255,0.06);"></div>
+              <%= render_section.call("Aggregate", @aggregate_total, agg_row, "#FF1E6F") %>
+              <%
+                comp_html = render_comparison.call(mine_row, agg_row)
+              %>
+              <% if comp_html.present? %>
+                <div style="height:1px;background:rgba(255,255,255,0.06);"></div>
+                <div>
+                  <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:6px;">Comparison <span style="color:rgba(255,255,255,0.3);text-transform:none;letter-spacing:0;">· you vs all</span></div>
+                  <div style="display:flex;flex-direction:column;gap:4px;"><%= comp_html %></div>
                 </div>
-                <% if row[:counts]&.any? %>
-                  <div style="display:flex;flex-direction:column;gap:5px;">
-                    <% row[:counts].each do |label, count| %>
-                      <div style="display:flex;justify-content:space-between;gap:10px;font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);">
-                        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= label %></span><span style="color:#01EACB;flex-shrink:0;"><%= count %></span>
-                      </div>
-                    <% end %>
-                  </div>
-                <% elsif row[:texts]&.any? %>
-                  <div style="display:flex;flex-direction:column;gap:6px;">
-                    <% row[:texts].first(8).each do |t| %>
-                      <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.03);border-radius:6px;padding:7px 10px;line-height:1.4;">"<%= t %>"</div>
-                    <% end %>
-                    <% if row[:texts].length > 8 %>
-                      <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.35);">+ <%= row[:texts].length - 8 %> more</div>
-                    <% end %>
-                  </div>
-                <% else %>
-                  <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">No data yet.</div>
-                <% end %>
-              <% else %>
-                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">—</div>
               <% end %>
             </div>
           </div>
         <% end %>
       </div>
 
-      <div style="margin-top:32px;">
+      <div style="margin:28px 0 12px;">
         <%= link_to "← Back to shared Vertos", alliance_vertos_path,
               style: "font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;" %>
       </div>
