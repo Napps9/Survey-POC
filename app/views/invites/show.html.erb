@@ -28,7 +28,9 @@
           <% else %>
             as a <span style="color:rgba(255,255,255,0.55);"><%= @invite.role %></span>
           <% end %>
-          · for <span style="color:rgba(255,255,255,0.55);"><%= @invite.email_address %></span>
+          <% if @invite.email_address.present? %>
+            · for <span style="color:rgba(255,255,255,0.55);"><%= @invite.email_address %></span>
+          <% end %>
         </div>
       <% end %>
     </div>
@@ -51,7 +53,7 @@
                 class: "form-input" %>
         </div>
 
-        <% if @invite.partner? && !User.exists?(email_address: @invite.email_address) %>
+        <% if @invite.partner? && (@invite.email_address.blank? || !User.exists?(email_address: @invite.email_address)) %>
           <div style="margin-bottom:18px;">
             <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Your organisation name</label>
             <%= f.text_field :organisation_name,
@@ -62,9 +64,16 @@
 
         <div style="margin-bottom:18px;">
           <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email</label>
-          <div style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size:15px;box-sizing:border-box;">
-            <%= @invite.email_address %>
-          </div>
+          <% if @invite.email_address.present? %>
+            <div style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size:15px;box-sizing:border-box;">
+              <%= @invite.email_address %>
+            </div>
+          <% else %>
+            <%= f.email_field :email_address,
+                  required: true, autocomplete: "email",
+                  placeholder: "you@example.com", value: params[:email_address],
+                  class: "form-input" %>
+          <% end %>
         </div>
 
         <div style="margin-bottom:18px;">

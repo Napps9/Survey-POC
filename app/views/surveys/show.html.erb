@@ -150,6 +150,43 @@
         </div>
       </div>
 
+      <% if @survey.publish_token.present? && current_organisation&.creator? && current_membership&.admin? %>
+        <% partner_shares = @survey.survey_shares.includes(alliance: :partner_organisation).order(:created_at) %>
+        <div style="background:#161B2E;border-top:1px solid rgba(255,255,255,0.06);padding:18px 28px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+            <div>
+              <div style="font-family:'Alata',sans-serif;font-size:13px;color:#F7F7F7;letter-spacing:0.04em;">Partner share links</div>
+              <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;">
+                Generate unique links to share this Verto with partners. Responses through each link are attributed separately.
+              </div>
+            </div>
+            <%= button_to "Generate partner link →", create_survey_share_path(@survey), method: :post,
+                  style: "flex-shrink:0;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:12px;padding:8px 16px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;",
+                  form: { style: "display:inline;" } %>
+          </div>
+          <% if partner_shares.any? %>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <% partner_shares.each do |share| %>
+                <% url = play_survey_url(share.share_token) %>
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;">
+                  <span style="flex-shrink:0;font-family:'Alata',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);min-width:120px;"><%= share.display_name %></span>
+                  <input type="text" readonly value="<%= url %>"
+                         id="share-url-<%= share.id %>"
+                         style="flex:1;background:transparent;border:none;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size:12px;outline:none;" />
+                  <button type="button"
+                          onclick="navigator.clipboard.writeText(document.getElementById('share-url-<%= share.id %>').value).then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
+                          style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size:11px;cursor:pointer;">Copy</button>
+                  <%= button_to "Revoke", survey_share_path(@survey, share), method: :delete,
+                        data: { turbo_confirm: "Revoke this partner link?" },
+                        form: { style: "display:inline;" },
+                        style: "background:none;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.45);font-family:'ABeeZee',sans-serif;font-size:11px;cursor:pointer;" %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
     </div><%# /cards column %>
 
     <%# ── RIGHT: Answer type panel ── %>

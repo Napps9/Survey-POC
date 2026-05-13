@@ -89,12 +89,11 @@ class InvitesController < ApplicationController
   end
 
   def accept_partner_invite
-    existing_user = User.find_by(email_address: @invite.email_address)
+    email         = (@invite.email_address.presence || params[:email_address].to_s.strip.downcase)
+    existing_user = email.present? ? User.find_by(email_address: email) : nil
     admin_org     = existing_user && existing_user.memberships.admin.first&.organisation
 
     if admin_org
-      # Existing creator Org becomes a partner of inviter's Org.
-      # Require password to authorise linking, since the invite URL alone shouldn't grant login.
       password = params[:password]
       unless password.present? && existing_user.authenticate(password)
         flash.now[:alert] = "Enter your existing Playverto password to link your organisation."
@@ -107,14 +106,17 @@ class InvitesController < ApplicationController
       end
       redirect_to root_path, notice: "#{admin_org.name} is now a partner of #{@invite.organisation.name}."
     else
-      # External user → create a partner-only Org
-      name         = params[:name].to_s.strip
-      org_name     = params[:organisation_name].to_s.strip.presence || "#{name}'s organisation"
-      password     = params[:password]
-      confirm      = params[:password_confirmation]
+      name     = params[:name].to_s.strip
+      org_name = params[:organisation_name].to_s.strip.presence || "#{name}'s organisation"
+      password = params[:password]
+      confirm  = params[:password_confirmation]
 
       if name.blank?
         flash.now[:alert] = "Name is required."
+        return render :show, status: :unprocessable_entity
+      end
+      if email.blank?
+        flash.now[:alert] = "Email is required."
         return render :show, status: :unprocessable_entity
       end
       if password.blank? || password != confirm
@@ -123,7 +125,7 @@ class InvitesController < ApplicationController
       end
 
       ActiveRecord::Base.transaction do
-        user = existing_user || User.create!(name: name, email_address: @invite.email_address, password: password)
+        user = existing_user || User.create!(name: name, email_address: email, password: password)
         partner_org = Organisation.create!(
           name: org_name,
           slug: Organisation.generate_unique_slug(org_name),

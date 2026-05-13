@@ -33,7 +33,7 @@
               <% url = play_survey_url(share.share_token) %>
               <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-                  <div style="font-family:'Alata',sans-serif;font-size:15px;color:#F7F7F7;"><%= share.partner_organisation.name %></div>
+                  <div style="font-family:'Alata',sans-serif;font-size:15px;color:#F7F7F7;"><%= share.display_name %></div>
                   <%= button_to "Revoke", survey_share_path(@survey, share), method: :delete,
                         data: { turbo_confirm: "Revoke this share?" },
                         style: "background:none;border:1px solid rgba(255,255,255,0.18);border-radius:7px;padding:6px 12px;color:rgba(255,255,255,0.5);font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;" %>

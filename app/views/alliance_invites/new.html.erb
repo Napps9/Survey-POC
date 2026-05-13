@@ -1,4 +1,4 @@
-<% content_for :title, "Invite partner — Playverto" %>
+<% content_for :title, "Generate partner link — Playverto" %>
 <div style="display:flex;min-height:100vh;background:#1C2034;">
   <%= render "shared/sidebar", active: "partners" %>
 
@@ -6,27 +6,16 @@
     <div style="width:100%;max-width:460px;">
 
       <div style="margin-bottom:32px;">
-        <h1 style="font-family:'Alata',sans-serif;font-size:22px;color:#F7F7F7;margin:0 0 8px;">Invite a partner</h1>
+        <h1 style="font-family:'Alata',sans-serif;font-size:22px;color:#F7F7F7;margin:0 0 8px;">Generate a partner join link</h1>
         <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);margin:0;line-height:1.6;">
-          Their organisation will be able to view and distribute Vertos you share with them through their own unique link.
-          If they're not on Playverto yet, they'll create a partner organisation when accepting.
+          Anyone with the link can join as a partner organisation. They'll then be able to distribute Vertos you share with them.
+          The link expires in 14 days.
         </p>
       </div>
 
-      <% if flash[:alert] %>
-        <div class="alert-error"><%= flash[:alert] %></div>
-      <% end %>
-
       <%= form_with url: alliance_invites_path, method: :post do |f| %>
-        <div style="margin-bottom:24px;">
-          <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Partner email</label>
-          <%= f.email_field :email_address,
-                required: true, autofocus: true, placeholder: "partner@example.com",
-                value: params[:email_address], class: "form-input" %>
-        </div>
-
         <div style="display:flex;gap:12px;align-items:center;">
-          <%= f.submit "Generate partner link →",
+          <%= f.submit "Generate link →",
                 style: "background:#01EACB;border:none;border-radius:8px;padding:12px 24px;color:#1C2034;font-family:'Alata',sans-serif;font-size:14px;letter-spacing:0.05em;cursor:pointer;" %>
           <%= link_to "Cancel", alliances_path,
                 style: "font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none;" %>
