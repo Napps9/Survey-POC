@@ -10,23 +10,22 @@ class SurveySharesController < ApplicationController
   end
 
   def create
-    if params[:alliance_id].present?
-      alliance = current_organisation.alliances.find(params[:alliance_id])
-      @survey.survey_shares.find_or_create_by!(alliance: alliance)
-    else
-      label = params[:label].to_s.strip.presence ||
-              "Partner link ##{@survey.survey_shares.where(alliance_id: nil).count + 1}"
-      @survey.survey_shares.create!(alliance: nil, label: label)
+    alliance = current_organisation.alliances.active.find_by(id: params[:alliance_id])
+    if alliance.nil?
+      redirect_back fallback_location: survey_path(@survey),
+                    alert: "Select a partner organisation first."
+      return
     end
 
-    redirect_back fallback_location: survey_shares_path(@survey),
-                  notice: "Partner link generated."
+    @survey.survey_shares.find_or_create_by!(alliance: alliance)
+    redirect_back fallback_location: survey_path(@survey),
+                  notice: "Partner link generated for #{alliance.partner_organisation.name}."
   end
 
   def destroy
     share = @survey.survey_shares.find(params[:id])
     share.destroy!
-    redirect_back fallback_location: survey_shares_path(@survey),
+    redirect_back fallback_location: survey_path(@survey),
                   notice: "Partner link removed."
   end
 
