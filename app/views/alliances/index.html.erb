@@ -20,6 +20,21 @@
         <div style="background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:8px;padding:10px 14px;margin-bottom:20px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:13px;"><%= flash[:notice] %></div>
       <% end %>
 
+      <% if params[:new_invite_token].present? %>
+        <% new_url = invite_url(params[:new_invite_token]) %>
+        <div style="background:#161B2E;border:1px solid rgba(1,234,203,0.35);border-radius:12px;padding:18px 20px;margin-bottom:24px;">
+          <div style="font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;letter-spacing:0.05em;margin-bottom:4px;">New partner join link</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:12px;">Anyone with this link can join as a partner organisation. Expires in 14 days.</div>
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
+            <input type="text" readonly id="new-partner-link" value="<%= new_url %>"
+                   style="flex:1;background:transparent;border:none;color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;" />
+            <button type="button"
+                    onclick="navigator.clipboard.writeText(document.getElementById('new-partner-link').value).then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
+                    style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;">Copy</button>
+          </div>
+        </div>
+      <% end %>
+
       <% if @alliances.empty? %>
         <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:12px;padding:48px 24px;text-align:center;color:rgba(255,255,255,0.45);font-family:'ABeeZee',sans-serif;font-size:14px;">
           No partners yet. Invite one to get started.
