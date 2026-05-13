@@ -33,6 +33,6 @@ module OrganisationScope
 
   def require_creator_org!
     return if current_organisation&.creator?
-    redirect_to alliance_vertos_path, alert: "Partner organisations can't do that."
+    redirect_to alliance_vertos_path
   end
 end
