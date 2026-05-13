@@ -1,9 +1,13 @@
 <% content_for :title, "#{@survey.title} — Shared Verto" %>
+<%
+  cards      = Array(@survey.cards)
+  result_by_index = @aggregated.each_with_index.to_h { |row, i| [i, row] }
+%>
 <div style="display:flex;min-height:100vh;background:#1C2034;">
   <%= render "shared/sidebar", active: "alliance_vertos" %>
 
-  <div style="flex:1;display:flex;flex-direction:column;padding:60px 48px;overflow-y:auto;">
-    <div style="width:100%;max-width:840px;">
+  <div style="flex:1;display:flex;flex-direction:column;padding:48px 40px;overflow-y:auto;">
+    <div style="width:100%;max-width:1080px;margin:0 auto;">
 
       <div style="margin-bottom:24px;">
         <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;">From <%= @survey.organisation.name %></div>
@@ -15,7 +19,7 @@
 
       <%# Share link %>
       <% url = play_survey_url(@share.share_token) %>
-      <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;margin-bottom:28px;">
+      <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;margin-bottom:24px;">
         <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:8px;">Your share link</div>
         <div style="display:flex;align-items:center;gap:10px;">
           <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);word-break:break-all;"><%= url %></span>
@@ -26,7 +30,7 @@
       </div>
 
       <%# Scope tabs %>
-      <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
         <% %w[mine aggregate].each do |sc| %>
           <%= link_to (sc == "mine" ? "My results" : "Aggregate"),
                 alliance_verto_path(@share, scope: sc),
@@ -34,34 +38,66 @@
         <% end %>
       </div>
 
-      <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:20px;">
+      <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px;">
         <%= @total %> response<%= "s" unless @total == 1 %><%= @scope == "mine" ? " from your link" : " across all partners" %>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <% @aggregated.each_with_index do |row, idx| %>
-          <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:18px 20px;">
-            <div style="font-family:'Alata',sans-serif;font-size:14px;color:#F7F7F7;margin-bottom:10px;">
-              <%= row[:card]["text"].presence || row[:card]["prompt"].presence || row[:card]["title"].presence || "Card #{idx + 1}" %>
+      <%# Card-by-card: Verto preview + results side-by-side %>
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <%
+          total_q = cards.count { |c| c["type"] != "welcome_card" }
+          q_idx = 0
+        %>
+        <% cards.each_with_index do |card, idx| %>
+          <%
+            is_q     = card["type"].to_s != "welcome_card"
+            q_idx   += 1 if is_q
+            progress = total_q > 0 ? ((q_idx.to_f / total_q) * 100).round : 5
+            progress = 5 unless is_q
+            row      = result_by_index[idx]
+          %>
+
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start;">
+
+            <%# Verto card preview %>
+            <div style="background:#0F1326;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;">
+              <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:10px;">Card <%= idx + 1 %></div>
+              <div style="transform:scale(0.78);transform-origin:top left;width:128%;">
+                <%= render "surveys/preview_card", card: card, progress: progress %>
+              </div>
             </div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:8px;">
-              <%= row[:type] %> · <%= row[:total] %> answered<% if row[:avg] %> · avg <%= row[:avg] %><% end %>
-            </div>
-            <% if row[:counts]&.any? %>
-              <div style="display:flex;flex-direction:column;gap:4px;">
-                <% row[:counts].each do |label, count| %>
-                  <div style="display:flex;justify-content:space-between;font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);">
-                    <span><%= label %></span><span style="color:#01EACB;"><%= count %></span>
+
+            <%# Results summary for this card %>
+            <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;align-self:start;">
+              <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:8px;">Results</div>
+              <% if row %>
+                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:10px;">
+                  <%= row[:type] %> · <%= row[:total] %> answered<% if row[:avg] %> · avg <%= row[:avg] %><% end %>
+                </div>
+                <% if row[:counts]&.any? %>
+                  <div style="display:flex;flex-direction:column;gap:5px;">
+                    <% row[:counts].each do |label, count| %>
+                      <div style="display:flex;justify-content:space-between;gap:10px;font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);">
+                        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= label %></span><span style="color:#01EACB;flex-shrink:0;"><%= count %></span>
+                      </div>
+                    <% end %>
                   </div>
+                <% elsif row[:texts]&.any? %>
+                  <div style="display:flex;flex-direction:column;gap:6px;">
+                    <% row[:texts].first(8).each do |t| %>
+                      <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.03);border-radius:6px;padding:7px 10px;line-height:1.4;">"<%= t %>"</div>
+                    <% end %>
+                    <% if row[:texts].length > 8 %>
+                      <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.35);">+ <%= row[:texts].length - 8 %> more</div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">No data yet.</div>
                 <% end %>
-              </div>
-            <% elsif row[:texts]&.any? %>
-              <div style="display:flex;flex-direction:column;gap:6px;">
-                <% row[:texts].first(20).each do |t| %>
-                  <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.03);border-radius:6px;padding:8px 12px;">"<%= t %>"</div>
-                <% end %>
-              </div>
-            <% end %>
+              <% else %>
+                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">—</div>
+              <% end %>
+            </div>
           </div>
         <% end %>
       </div>
