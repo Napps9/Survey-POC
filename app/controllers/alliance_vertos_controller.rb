@@ -1,6 +1,6 @@
 class AllianceVertosController < ApplicationController
   include AggregatesSurveyResults
-  layout "fullscreen", only: [:show]
+  layout "fullscreen"
 
   before_action :set_share, only: [:show]
 

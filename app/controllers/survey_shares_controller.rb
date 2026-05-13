@@ -1,4 +1,5 @@
 class SurveySharesController < ApplicationController
+  layout "fullscreen"
   before_action :require_creator_org!
   before_action :require_admin!, only: [:create, :destroy]
   before_action :set_survey

@@ -1,4 +1,5 @@
 class AllianceInvitesController < ApplicationController
+  layout "fullscreen"
   before_action :require_creator_org!
   before_action :require_admin!
 
