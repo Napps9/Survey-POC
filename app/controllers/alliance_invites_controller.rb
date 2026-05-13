@@ -8,7 +8,7 @@ class AllianceInvitesController < ApplicationController
 
   def create
     @invite = current_organisation.invites.create!(
-      email_address: nil,
+      email_address: "link-#{SecureRandom.hex(8)}@partner.invite",
       role:          "admin",
       kind:          "partner",
       invited_by:    Current.user,

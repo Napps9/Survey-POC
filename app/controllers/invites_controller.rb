@@ -89,7 +89,7 @@ class InvitesController < ApplicationController
   end
 
   def accept_partner_invite
-    email         = (@invite.email_address.presence || params[:email_address].to_s.strip.downcase)
+    email         = (@invite.addressed_email || params[:email_address].to_s.strip.downcase)
     existing_user = email.present? ? User.find_by(email_address: email) : nil
     admin_org     = existing_user && existing_user.memberships.admin.first&.organisation
 

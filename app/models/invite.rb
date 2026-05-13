@@ -11,4 +11,10 @@ class Invite < ApplicationRecord
   def accepted? = accepted_at.present?
   def expired?  = expires_at < Time.current
   def pending?  = !accepted? && !expired?
+
+  def addressed_email
+    return nil if email_address.blank?
+    return nil if email_address.end_with?("@partner.invite")
+    email_address
+  end
 end
