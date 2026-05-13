@@ -127,10 +127,8 @@
             <%# Verto card preview %>
             <div style="background:#0F1326;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px;">
               <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:8px;">Card <%= idx + 1 %></div>
-              <div style="height:260px;overflow:hidden;border-radius:18px;">
-                <div style="transform:scale(0.72);transform-origin:top left;width:139%;">
-                  <%= render "surveys/preview_card", card: card, progress: progress %>
-                </div>
+              <div style="zoom:0.72;">
+                <%= render "surveys/preview_card", card: card, progress: progress %>
               </div>
             </div>
 
