@@ -4,8 +4,8 @@
   <div style="width:100%;max-width:400px;">
     <div style="text-align:center;margin-bottom:40px;">
       <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
-      <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;">Forgot your password?</h1>
-      <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin:0;">Enter your email and we'll send a reset link.</p>
+      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;">Forgot your password?</h1>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);margin:0;">Enter your email and we'll send a reset link.</p>
     </div>
 
     <% if alert = flash[:alert] %>
@@ -18,7 +18,7 @@
 
     <%= form_with url: passwords_path do |form| %>
       <div style="margin-bottom:32px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email address</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email address</label>
         <%= form.email_field :email_address,
               required: true, autofocus: true, autocomplete: "username",
               placeholder: "you@example.com", value: params[:email_address],
@@ -26,7 +26,7 @@
       </div>
 
       <%= form.submit "Email reset instructions",
-            style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.05em;cursor:pointer;" %>
+            style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
     <% end %>
 
     <p style="text-align:center;margin-top:24px;">

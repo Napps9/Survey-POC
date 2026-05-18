@@ -16,22 +16,22 @@
 
   <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0;">
     <% if published %>
-      <span style="font-family:'Alata',sans-serif;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:#01EACB;color:#1C2034;">Published</span>
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:#01EACB;color:#1C2034;">Published</span>
     <% else %>
-      <span style="font-family:'Alata',sans-serif;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);">Draft</span>
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);">Draft</span>
     <% end %>
-    <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);">
+    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);">
       <%= survey.updated_at.strftime("%-d %b %Y") %>
     </span>
   </div>
 
   <%# Theme + title %>
   <div style="padding:12px 16px 14px;flex:1;">
-    <div style="font-family:'Alata',sans-serif;font-size:18px;color:#fff;line-height:1.25;margin-bottom:4px;">
+    <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;line-height:1.25;margin-bottom:4px;">
       <%= survey.theme.truncate(48) %>
     </div>
     <% if survey.title.present? && survey.title != survey.theme %>
-      <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);line-height:1.4;">
+      <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);line-height:1.4;">
         <%= survey.title.truncate(60) %>
       </div>
     <% end %>
@@ -40,31 +40,31 @@
   <%# Stats row %>
   <div style="display:flex;align-items:center;gap:0;border-top:1px solid rgba(255,255,255,0.05);margin:0 16px;padding:10px 0;">
     <div style="flex:1;display:flex;align-items:center;gap:5px;">
-      <span style="font-family:'Alata',sans-serif;font-size:15px;color:<%= resp_count > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;line-height:1;"><%= resp_count %></span>
-      <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);">response<%= resp_count == 1 ? "" : "s" %></span>
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:<%= resp_count > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;line-height:1;"><%= resp_count %></span>
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">response<%= resp_count == 1 ? "" : "s" %></span>
     </div>
     <div style="display:flex;align-items:center;gap:5px;">
-      <span style="font-family:'Alata',sans-serif;font-size:15px;color:rgba(255,255,255,0.4);line-height:1;"><%= q_count %></span>
-      <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.25);">question<%= q_count == 1 ? "" : "s" %></span>
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:rgba(255,255,255,0.4);line-height:1;"><%= q_count %></span>
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);">question<%= q_count == 1 ? "" : "s" %></span>
     </div>
   </div>
 
   <%# Action row %>
   <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 14px;">
     <%= link_to "Edit Verto", survey_path(survey),
-          style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;transition:all 0.15s;",
+          style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
           onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
           onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
 
     <% if published %>
       <%= link_to "Results →", survey_results_path(survey),
-            style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.25);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;transition:all 0.15s;",
+            style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.25);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
             onmouseover: "this.style.background='rgba(1,234,203,0.22)'",
             onmouseout:  "this.style.background='rgba(1,234,203,0.12)'" %>
     <% else %>
       <%= button_to "Publish →", publish_survey_path(survey),
             method: :post,
-            style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.25);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;transition:all 0.15s;",
+            style: "flex:1;text-align:center;padding:8px 12px;border-radius:10px;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.25);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;transition:all 0.15s;",
             form: { style: "flex:1;display:flex;" },
             onmouseover: "this.style.background='rgba(1,234,203,0.22)'",
             onmouseout:  "this.style.background='rgba(1,234,203,0.12)'" %>

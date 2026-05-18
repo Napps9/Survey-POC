@@ -28,6 +28,22 @@
   --font-display: "Alata", system-ui, sans-serif;
   --font-sans:    "ABeeZee", system-ui, sans-serif;
   --font-hand:    "Nanum Pen Script", cursive;
+
+  /* Type scale — admin/creator surfaces.
+     Each token bumps the previous px size by ~1–2px so body copy and UI
+     labels become more readable while preserving the deliberate small-caps
+     Alata label rhythm. Change a value here to bump all admin text. */
+  --text-2xs:  10px;  /* was 9px  — micro caption / numbered marker */
+  --text-xs:   11px;  /* was 10px — uppercase Alata label */
+  --text-sm:   13px;  /* was 11px — small caption / helper text */
+  --text-base: 14px;  /* was 12px — UI label, secondary copy */
+  --text-md:   15px;  /* was 13px — body copy */
+  --text-lg:   16px;  /* was 14px — primary body, form input */
+  --text-xl:   17px;  /* was 15px — emphasis body */
+  --text-2xl:  19px;  /* was 17–18px — section heading */
+  --text-3xl:  24px;  /* was 22px — medium heading */
+  --text-4xl:  26px;  /* was 24px — large heading */
+  --text-5xl:  34px;  /* was 32px — page title */
 }
 
 @layer base {
@@ -833,7 +849,7 @@
   border: 1px solid rgba(255,255,255,0.08);
   backdrop-filter: blur(6px);
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
+  font-size: var(--text-3xl);
   opacity: 0;
   animation: gen-mini-pop 1.4s ease-out forwards;
 }
@@ -853,7 +869,7 @@
 
 .gen-tagline {
   font-family: "Alata", sans-serif;
-  font-size: 11px;
+  font-size: var(--text-sm);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: #01EACB;
@@ -881,12 +897,12 @@
   padding: 7px 16px; border-radius: 100px;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.04);
-  font-size: 13px; color: #fff;
+  font-size: var(--text-md); color: #fff;
 }
 .gen-pill-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .gen-pill-label {
   font-family: "Alata", sans-serif;
-  font-size: 10px; color: rgba(255,255,255,0.35);
+  font-size: var(--text-xs); color: rgba(255,255,255,0.35);
   text-transform: uppercase; letter-spacing: 0.06em;
 }
 .gen-insight {
@@ -896,7 +912,7 @@
   background: rgba(1,234,203,0.05);
   border-radius: 0 12px 12px 0;
   font-family: "ABeeZee", sans-serif;
-  font-size: 15px; color: rgba(255,255,255,0.7);
+  font-size: var(--text-xl); color: rgba(255,255,255,0.7);
   line-height: 1.6; font-style: italic;
 }
 
@@ -905,7 +921,7 @@
 .gen-step {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; gap: 8px;
-  position: relative; font-size: 12px;
+  position: relative; font-size: var(--text-base);
   color: rgba(255,255,255,0.55); text-align: center;
   transition: color 0.4s;
 }
@@ -922,7 +938,7 @@
   width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
   border: 1.5px solid rgba(255,255,255,0.15);
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; transition: all 0.35s;
+  font-size: var(--text-sm); transition: all 0.35s;
   background: #1C2034; position: relative; z-index: 1;
 }
 .gen-step[data-state="done"]   .step-dot { background: #01EACB; border-color: #01EACB; color: #fff; }
@@ -952,7 +968,7 @@
   padding: 12px 16px;
   color: #F7F7F7;
   font-family: "ABeeZee", sans-serif;
-  font-size: 15px;
+  font-size: var(--text-xl);
   box-sizing: border-box;
   outline: none;
 }
@@ -974,7 +990,7 @@
   border: 0;
   padding: 4px 8px;
   font-family: "Alata", sans-serif;
-  font-size: 11px;
+  font-size: var(--text-sm);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(247,247,247,0.6);
@@ -986,7 +1002,7 @@
 
 .auth-link {
   font-family: "ABeeZee", sans-serif;
-  font-size: 13px;
+  font-size: var(--text-md);
   color: rgba(255,255,255,0.6);
   text-decoration: none;
 }
@@ -997,7 +1013,7 @@
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 20px;
-  font-size: 14px;
+  font-size: var(--text-lg);
   font-family: "ABeeZee", sans-serif;
 }
 .alert-error {

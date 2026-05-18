@@ -23,7 +23,7 @@
     <%# Dashboard %>
     <% is_db = active_key == "dashboard" %>
     <a href="<%= root_path %>"
-       style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_db ? '#01EACB' : 'transparent' %>;background:<%= is_db ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_db ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
+       style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_db ? '#01EACB' : 'transparent' %>;background:<%= is_db ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_db ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;transition:background 0.15s,color 0.15s;"
        onmouseover="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='rgba(255,255,255,0.05)';this.style.color='#fff'}"
        onmouseout="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'}">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;">
@@ -39,7 +39,7 @@
     <% is_create = active_key == "create" %>
     <% if current_organisation&.creator? %>
     <a href="<%= new_survey_path %>"
-       style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_create ? '#01EACB' : 'transparent' %>;background:<%= is_create ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_create ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
+       style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_create ? '#01EACB' : 'transparent' %>;background:<%= is_create ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_create ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;transition:background 0.15s,color 0.15s;"
        onmouseover="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='rgba(255,255,255,0.05)';this.style.color='#fff'}"
        onmouseout="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'}">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;">
@@ -54,7 +54,7 @@
     <% if current_organisation && !current_organisation.creator? %>
       <% is_av = active_key == "alliance_vertos" %>
       <a href="<%= alliance_vertos_path %>"
-         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_av ? '#01EACB' : 'transparent' %>;background:<%= is_av ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_av ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;">
+         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_av ? '#01EACB' : 'transparent' %>;background:<%= is_av ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_av ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;"><path d="M7.5 1l6 3v4.5c0 3-2.5 5-6 5.5C4 13.5 1.5 11.5 1.5 8.5V4l6-3z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
         Shared Vertos
       </a>
@@ -64,7 +64,7 @@
     <% if current_organisation&.creator? && current_membership&.admin? %>
       <% is_part = active_key == "partners" %>
       <a href="<%= alliances_path %>"
-         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_part ? '#01EACB' : 'transparent' %>;background:<%= is_part ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_part ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;">
+         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_part ? '#01EACB' : 'transparent' %>;background:<%= is_part ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_part ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;"><circle cx="5" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/><circle cx="10" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 13c0.5-2 1.8-3 3.5-3M13.5 13c-0.5-2-1.8-3-3.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         Partners
       </a>
@@ -75,7 +75,7 @@
       <% is_results = active_key == "results" %>
       <div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 2px;"></div>
       <a href="<%= survey_results_path(ctx_survey) %>"
-         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_results ? '#01EACB' : 'transparent' %>;background:<%= is_results ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_results ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s,color 0.15s;"
+         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_results ? '#01EACB' : 'transparent' %>;background:<%= is_results ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_results ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;transition:background 0.15s,color 0.15s;"
          onmouseover="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='rgba(255,255,255,0.05)';this.style.color='#fff'}"
          onmouseout="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'}">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:0.8;">
@@ -96,7 +96,7 @@
   <% if current_membership&.admin? %>
     <div style="padding:0 10px 4px;">
       <a href="<%= organisation_memberships_path(current_organisation) %>"
-         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:color 0.15s;"
+         style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;transition:color 0.15s;"
          onmouseover="this.style.color='#fff'"
          onmouseout="this.style.color='rgba(255,255,255,0.65)'">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;">
@@ -114,13 +114,13 @@
 
     <%# Org switcher %>
     <% if defined?(current_organisation) && current_organisation %>
-      <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.06em;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:0 2px;"><%= current_organisation.name %></div>
+      <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.06em;color:rgba(255,255,255,0.35);text-transform:uppercase;padding:0 2px;"><%= current_organisation.name %></div>
       <% if Current.user.organisations.many? %>
         <% Current.user.organisations.each do |org| %>
           <% next if org == current_organisation %>
           <%= button_to org.name, switch_organisation_path, method: :post,
                 params: { organisation_id: org.id },
-                style: "display:block;width:100%;text-align:left;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 10px;color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size:13px;cursor:pointer;" %>
+                style: "display:block;width:100%;text-align:left;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 10px;color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;" %>
         <% end %>
       <% end %>
     <% end %>
@@ -128,9 +128,9 @@
     <%# User + logout %>
     <% if defined?(Current) && Current.user %>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <span style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= Current.user.name.presence || Current.user.email_address %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.65);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= Current.user.name.presence || Current.user.email_address %></span>
         <%= button_to "Sign out", session_path, method: :delete,
-              style: "flex-shrink:0;background:none;border:1px solid rgba(255,255,255,0.22);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;" %>
+              style: "flex-shrink:0;background:none;border:1px solid rgba(255,255,255,0.22);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;white-space:nowrap;" %>
       </div>
     <% end %>
   </div>

@@ -4,8 +4,8 @@
   <div style="width:100%;max-width:400px;">
     <div style="text-align:center;margin-bottom:40px;">
       <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
-      <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;">Set a new password</h1>
-      <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin:0;">Pick something only you would guess.</p>
+      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;">Set a new password</h1>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);margin:0;">Pick something only you would guess.</p>
     </div>
 
     <% if alert = flash[:alert] %>
@@ -14,7 +14,7 @@
 
     <%= form_with url: password_path(params[:token]), method: :put do |form| %>
       <div style="margin-bottom:18px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">New password</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">New password</label>
         <div class="password-field" data-controller="password-visibility">
           <%= form.password_field :password,
                 required: true, autofocus: true, autocomplete: "new-password",
@@ -28,7 +28,7 @@
       </div>
 
       <div style="margin-bottom:32px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Confirm new password</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Confirm new password</label>
         <div class="password-field" data-controller="password-visibility">
           <%= form.password_field :password_confirmation,
                 required: true, autocomplete: "new-password",
@@ -42,7 +42,7 @@
       </div>
 
       <%= form.submit "Save new password",
-            style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.05em;cursor:pointer;" %>
+            style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
     <% end %>
   </div>
 </div>

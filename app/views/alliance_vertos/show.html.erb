@@ -7,7 +7,7 @@
     rows = counts.map do |label, count|
       pct = total.to_i.positive? ? (count.to_f / total * 100).round : 0
       <<~HTML
-        <div style="display:flex;align-items:center;gap:8px;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);">
+        <div style="display:flex;align-items:center;gap:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.7);">
           <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">#{ERB::Util.h(label)}</span>
           <div style="position:relative;flex-shrink:0;width:60px;height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
             <div style="position:absolute;inset:0 auto 0 0;width:#{pct}%;background:#{accent};"></div>
@@ -23,15 +23,15 @@
     if row.nil? || total.to_i.zero?
       <<~HTML.html_safe
         <div>
-          <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:4px;">#{label}</div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);">No data</div>
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xs);letter-spacing:0.08em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:4px;">#{label}</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);">No data</div>
         </div>
       HTML
     else
       body = if row[:counts]&.any?
         render_counts.call(row[:counts], row[:total], accent)
       elsif row[:texts]&.any?
-        row[:texts].first(3).map { |t| %(<div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.03);border-radius:5px;padding:5px 8px;line-height:1.35;">"#{ERB::Util.h(t)}"</div>) }.join.html_safe
+        row[:texts].first(3).map { |t| %(<div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.03);border-radius:5px;padding:5px 8px;line-height:1.35;">"#{ERB::Util.h(t)}"</div>) }.join.html_safe
       else
         ""
       end
@@ -40,8 +40,8 @@
       <<~HTML.html_safe
         <div>
           <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;">
-            <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:#{accent};text-transform:uppercase;">#{label}</div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.35);">#{meta}</div>
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-xs);letter-spacing:0.08em;color:#{accent};text-transform:uppercase;">#{label}</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">#{meta}</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;">#{body}</div>
         </div>
@@ -61,7 +61,7 @@
       m_pct = mine_total.positive? ? (m_count.to_f / mine_total * 100).round : 0
       a_pct = agg_total.positive?  ? (a_count.to_f / agg_total  * 100).round : 0
       <<~HTML
-        <div style="display:flex;align-items:center;gap:8px;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);">
+        <div style="display:flex;align-items:center;gap:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.7);">
           <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">#{ERB::Util.h(label)}</span>
           <span style="flex-shrink:0;color:#01EACB;font-variant-numeric:tabular-nums;width:42px;text-align:right;">#{m_pct}%</span>
           <span style="flex-shrink:0;color:rgba(255,255,255,0.3);">vs</span>
@@ -79,25 +79,25 @@
     <div style="width:100%;max-width:1240px;margin:0 auto;">
 
       <div style="margin-bottom:20px;">
-        <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;">From <%= @survey.organisation.name %></div>
-        <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;margin:0 0 6px;"><%= @survey.title %></h1>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);margin-bottom:4px;">From <%= @survey.organisation.name %></div>
+        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;margin:0 0 6px;"><%= @survey.title %></h1>
         <% if @survey.description.present? %>
-          <p style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.5);margin:0;line-height:1.55;"><%= @survey.description %></p>
+          <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.5);margin:0;line-height:1.55;"><%= @survey.description %></p>
         <% end %>
       </div>
 
       <%# Share link %>
       <% url = play_survey_url(@share.share_token) %>
       <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;">
-        <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;flex-shrink:0;">Share link</div>
-        <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.6);word-break:break-all;"><%= url %></span>
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-xs);letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;flex-shrink:0;">Share link</div>
+        <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.6);word-break:break-all;"><%= url %></span>
         <button type="button"
                 onclick="navigator.clipboard.writeText('<%= url %>').then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
-                style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size:11px;cursor:pointer;flex-shrink:0;">Copy</button>
+                style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size: var(--text-sm);cursor:pointer;flex-shrink:0;">Copy</button>
       </div>
 
       <%# Totals strip %>
-      <div style="display:flex;gap:10px;margin-bottom:22px;font-family:'ABeeZee',sans-serif;font-size:12px;">
+      <div style="display:flex;gap:10px;margin-bottom:22px;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);">
         <div style="background:rgba(1,234,203,0.08);border:1px solid rgba(1,234,203,0.25);border-radius:8px;padding:7px 12px;color:#01EACB;">
           <strong style="font-family:'Alata',sans-serif;"><%= @mine_total %></strong> from your link
         </div>
@@ -126,7 +126,7 @@
 
             <%# Verto card preview %>
             <div style="background:#0F1326;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px;">
-              <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:8px;">Card <%= idx + 1 %></div>
+              <div style="font-family:'Alata',sans-serif;font-size: var(--text-xs);letter-spacing:0.08em;color:rgba(255,255,255,0.35);text-transform:uppercase;margin-bottom:8px;">Card <%= idx + 1 %></div>
               <div style="zoom:0.72;">
                 <%= render "surveys/preview_card", card: card, progress: progress %>
               </div>
@@ -143,7 +143,7 @@
               <% if comp_html.present? %>
                 <div style="height:1px;background:rgba(255,255,255,0.06);"></div>
                 <div>
-                  <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:6px;">Comparison <span style="color:rgba(255,255,255,0.3);text-transform:none;letter-spacing:0;">· you vs all</span></div>
+                  <div style="font-family:'Alata',sans-serif;font-size: var(--text-xs);letter-spacing:0.08em;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:6px;">Comparison <span style="color:rgba(255,255,255,0.3);text-transform:none;letter-spacing:0;">· you vs all</span></div>
                   <div style="display:flex;flex-direction:column;gap:4px;"><%= comp_html %></div>
                 </div>
               <% end %>
@@ -154,7 +154,7 @@
 
       <div style="margin:28px 0 12px;">
         <%= link_to "← Back to shared Vertos", alliance_vertos_path,
-              style: "font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;" %>
+              style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);text-decoration:none;" %>
       </div>
     </div>
   </div>

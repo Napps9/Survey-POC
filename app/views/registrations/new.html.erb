@@ -5,8 +5,8 @@
 
     <div style="text-align:center;margin-bottom:36px;">
       <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
-      <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;">Create your account</h1>
-      <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin:0;">Already have one? <%= link_to "Sign in", new_session_path, style: "color:#01EACB;text-decoration:none;" %></p>
+      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;">Create your account</h1>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);margin:0;">Already have one? <%= link_to "Sign in", new_session_path, style: "color:#01EACB;text-decoration:none;" %></p>
     </div>
 
     <% if flash[:alert] %>
@@ -18,7 +18,7 @@
     <%= form_with url: registrations_path, method: :post do |f| %>
 
       <div style="margin-bottom:18px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Your name</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Your name</label>
         <%= f.text_field :name,
               required: true, autofocus: true, autocomplete: "name",
               placeholder: "Jane Smith",
@@ -27,7 +27,7 @@
       </div>
 
       <div style="margin-bottom:18px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Organisation name</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Organisation name</label>
         <%= f.text_field :organisation_name,
               required: true, autocomplete: "organization",
               placeholder: "Acme Inc.",
@@ -38,7 +38,7 @@
       <div style="height:1px;background:rgba(255,255,255,0.07);margin:20px 0;"></div>
 
       <div style="margin-bottom:18px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email address</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email address</label>
         <%= f.email_field :email_address,
               required: true, autocomplete: "username",
               placeholder: "you@example.com",
@@ -47,7 +47,7 @@
       </div>
 
       <div style="margin-bottom:18px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Password</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Password</label>
         <div class="password-field" data-controller="password-visibility">
           <%= f.password_field :password,
                 required: true, autocomplete: "new-password",
@@ -61,7 +61,7 @@
       </div>
 
       <div style="margin-bottom:32px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Confirm password</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Confirm password</label>
         <div class="password-field" data-controller="password-visibility">
           <%= f.password_field :password_confirmation,
                 required: true, autocomplete: "new-password",
@@ -75,7 +75,7 @@
       </div>
 
       <%= f.submit "Create account →",
-            style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.05em;cursor:pointer;" %>
+            style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
 
     <% end %>
   </div>

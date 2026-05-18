@@ -25,7 +25,7 @@
       <%= link_to root_path do %>
         <%= image_tag "playverto.svg", alt: "Playverto", class: "h-7 w-auto" %>
       <% end %>
-      <span style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.45);">Create Verto</span>
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.45);">Create Verto</span>
       <span></span>
     </nav>
 
@@ -33,13 +33,13 @@
     <div class="gen-stage flex-1 flex flex-col items-center justify-center gap-8 px-16 py-10">
 
       <div class="gen-shimmer"
-           style="font-family:'Alata',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">
+           style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">
         Building your Verto
       </div>
 
       <div class="text-center" style="max-width:680px;">
         <div class="gen-hero-theme" data-generating-target="heroTheme"></div>
-        <div style="font-family:'ABeeZee',sans-serif;font-size:17px;color:rgba(255,255,255,0.38);letter-spacing:-0.2px;line-height:1.5;margin-top:6px;"
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xl);color:rgba(255,255,255,0.38);letter-spacing:-0.2px;line-height:1.5;margin-top:6px;"
              data-generating-target="heroAge"></div>
       </div>
 
@@ -92,15 +92,15 @@
     <div style="max-width:680px;width:100%;padding:56px 32px 80px;">
 
     <% if flash[:alert] %>
-      <div style="margin-bottom:20px;padding:12px 16px;border-radius:12px;background:rgba(255,30,111,0.1);color:#FF1E6F;border:1px solid rgba(255,30,111,0.3);font-family:'ABeeZee',sans-serif;font-size:13px;">
+      <div style="margin-bottom:20px;padding:12px 16px;border-radius:12px;background:rgba(255,30,111,0.1);color:#FF1E6F;border:1px solid rgba(255,30,111,0.3);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);">
         <%= flash[:alert] %>
       </div>
     <% end %>
 
     <div style="margin-bottom:32px;text-align:center;">
-      <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">New Verto</div>
-      <h1 style="font-family:'Alata',sans-serif;font-size:32px;color:#fff;margin:0 0 8px;line-height:1.1;">Create a Verto</h1>
-      <p style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.45);margin:0 auto;line-height:1.6;max-width:520px;">
+      <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">New Verto</div>
+      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-5xl);color:#fff;margin:0 0 8px;line-height:1.1;">Create a Verto</h1>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.45);margin:0 auto;line-height:1.6;max-width:520px;">
         Answer the four questions below — we'll turn your brief into a Verto that follows the Playverto rules.
       </p>
     </div>
@@ -123,19 +123,19 @@
         <% f1 = fields[0] %>
         <div style="background:rgba(39,45,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px 20px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f1[:color] %>;"><%= f1[:num] %></span>
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f1[:color] %>;"><%= f1[:num] %></span>
             <span style="width:6px;height:6px;border-radius:50%;background:<%= f1[:color] %>;flex-shrink:0;"></span>
-            <label style="font-family:'Alata',sans-serif;font-size:10px;color:<%= f1[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">What's your Verto about? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size:11px;letter-spacing:0;">— the single overarching topic</span></label>
+            <label style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= f1[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">What's your Verto about? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);letter-spacing:0;">— the single overarching topic</span></label>
           </div>
           <%= f.text_field :theme,
                 placeholder: "e.g. Youth wellbeing",
-                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size:14px;outline:none;box-sizing:border-box;",
+                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;",
                 onfocus: "this.style.borderColor='#{f1[:color]}80'",
                 onblur:  "this.style.borderColor='rgba(255,255,255,0.1)'" %>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
             <% ["Climate action", "Refugee education", "Food security"].each do |ex| %>
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);">
-                <span style="font-family:'Alata',sans-serif;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);">
+                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
                 <%= ex %>
               </span>
             <% end %>
@@ -146,19 +146,19 @@
         <% f2 = fields[1] %>
         <div style="background:rgba(39,45,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px 20px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f2[:color] %>;"><%= f2[:num] %></span>
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f2[:color] %>;"><%= f2[:num] %></span>
             <span style="width:6px;height:6px;border-radius:50%;background:<%= f2[:color] %>;flex-shrink:0;"></span>
-            <label style="font-family:'Alata',sans-serif;font-size:10px;color:<%= f2[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">Who's answering — and what age are they?</label>
+            <label style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= f2[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">Who's answering — and what age are they?</label>
           </div>
           <%= f.text_field :audience_age,
                 placeholder: "e.g. 18–24 university students in Kenya",
-                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size:14px;outline:none;box-sizing:border-box;",
+                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;",
                 onfocus: "this.style.borderColor='#{f2[:color]}80'",
                 onblur:  "this.style.borderColor='rgba(255,255,255,0.1)'" %>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
             <% ["35–55 frontline community-health workers"].each do |ex| %>
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);">
-                <span style="font-family:'Alata',sans-serif;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);">
+                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
                 <%= ex %>
               </span>
             <% end %>
@@ -169,19 +169,19 @@
         <% f3 = fields[2] %>
         <div style="background:rgba(39,45,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px 20px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f3[:color] %>;"><%= f3[:num] %></span>
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f3[:color] %>;"><%= f3[:num] %></span>
             <span style="width:6px;height:6px;border-radius:50%;background:<%= f3[:color] %>;flex-shrink:0;"></span>
-            <label style="font-family:'Alata',sans-serif;font-size:10px;color:<%= f3[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">What do you want to learn from them? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size:11px;letter-spacing:0;">— the insight that would change a decision</span></label>
+            <label style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= f3[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">What do you want to learn from them? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);letter-spacing:0;">— the insight that would change a decision</span></label>
           </div>
           <%= f.text_area :key_insight, rows: 3,
                 placeholder: "e.g. Why do volunteers drop off after month three?",
-                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size:14px;outline:none;resize:vertical;box-sizing:border-box;line-height:1.55;",
+                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;resize:vertical;box-sizing:border-box;line-height:1.55;",
                 onfocus: "this.style.borderColor='#{f3[:color]}80'",
                 onblur:  "this.style.borderColor='rgba(255,255,255,0.1)'" %>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
             <% ["What's stopping people from accessing our food bank?", "Does our youth programme actually shift confidence — and where exactly?"].each do |ex| %>
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);">
-                <span style="font-family:'Alata',sans-serif;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);">
+                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
                 <%= ex %>
               </span>
             <% end %>
@@ -192,19 +192,19 @@
         <% f4 = fields[3] %>
         <div style="background:rgba(39,45,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px 20px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f4[:color] %>;"><%= f4[:num] %></span>
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f4[:color] %>;"><%= f4[:num] %></span>
             <span style="width:6px;height:6px;border-radius:50%;background:<%= f4[:color] %>;flex-shrink:0;"></span>
-            <label style="font-family:'Alata',sans-serif;font-size:10px;color:<%= f4[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">Anything else we should know? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size:11px;letter-spacing:0;">— context, tone, must-asks</span></label>
+            <label style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= f4[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">Anything else we should know? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);letter-spacing:0;">— context, tone, must-asks</span></label>
           </div>
           <%= f.text_area :notes, rows: 4,
                 placeholder: "e.g. Audience has never used Playverto before, keep tone warm, not corporate.",
-                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size:14px;outline:none;resize:vertical;box-sizing:border-box;line-height:1.55;",
+                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;resize:vertical;box-sizing:border-box;line-height:1.55;",
                 onfocus: "this.style.borderColor='#{f4[:color]}80'",
                 onblur:  "this.style.borderColor='rgba(255,255,255,0.1)'" %>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
             <% ["Must include a question about funding routes and barriers to grants.", "We'll run this during our impact summit, so respondents are bought-in.", "Avoid jargon — many respondents speak English as a second language."].each do |ex| %>
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);">
-                <span style="font-family:'Alata',sans-serif;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);">
+                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
                 <%= ex %>
               </span>
             <% end %>
@@ -218,10 +218,10 @@
                     style: "margin-top:3px;width:18px;height:18px;accent-color:#01EACB;cursor:pointer;flex-shrink:0;" },
                   "1", "0" %>
             <span>
-              <span style="display:block;font-family:'Alata',sans-serif;font-size:13px;color:#fff;letter-spacing:0.02em;">
+              <span style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;letter-spacing:0.02em;">
                 Let respondents compare their answers
               </span>
-              <span style="display:block;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;line-height:1.5;">
+              <span style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.5);margin-top:4px;line-height:1.5;">
                 After they finish, show a CTA on the thank-you page that reveals how their answers stack up against everyone else's.
               </span>
             </span>
@@ -229,7 +229,7 @@
         </div>
 
         <%= f.submit "Generate Verto →",
-              style: "margin-top:8px;padding:13px 32px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.05em;border:none;cursor:pointer;transition:background 0.15s;",
+              style: "margin-top:8px;padding:13px 32px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;border:none;cursor:pointer;transition:background 0.15s;",
               onmouseover: "this.style.background='#00C4AB'",
               onmouseout:  "this.style.background='#01EACB'",
               data: { turbo_submits_with: "Generating…" } %>

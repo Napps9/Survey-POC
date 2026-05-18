@@ -6,8 +6,8 @@
     <div style="width:100%;max-width:460px;">
 
       <div style="margin-bottom:32px;">
-        <h1 style="font-family:'Alata',sans-serif;font-size:22px;color:#F7F7F7;margin:0 0 8px;">Generate a partner join link</h1>
-        <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);margin:0;line-height:1.6;">
+        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#F7F7F7;margin:0 0 8px;">Generate a partner join link</h1>
+        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;line-height:1.6;">
           Anyone with the link can join as a partner organisation. They'll then be able to distribute Vertos you share with them.
           The link expires in 14 days.
         </p>
@@ -16,9 +16,9 @@
       <%= form_with url: alliance_invites_path, method: :post do |f| %>
         <div style="display:flex;gap:12px;align-items:center;">
           <%= f.submit "Generate link →",
-                style: "background:#01EACB;border:none;border-radius:8px;padding:12px 24px;color:#1C2034;font-family:'Alata',sans-serif;font-size:14px;letter-spacing:0.05em;cursor:pointer;" %>
+                style: "background:#01EACB;border:none;border-radius:8px;padding:12px 24px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-lg);letter-spacing:0.05em;cursor:pointer;" %>
           <%= link_to "Cancel", alliances_path,
-                style: "font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.35);text-decoration:none;" %>
+                style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.35);text-decoration:none;" %>
         </div>
       <% end %>
     </div>

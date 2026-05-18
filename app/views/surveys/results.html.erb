@@ -36,11 +36,11 @@
 
     <%# Top bar %>
     <div style="height:54px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;padding:0 24px;gap:12px;background:#1C2034;">
-      <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Results</span>
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Results</span>
       <span style="color:rgba(255,255,255,0.15);">·</span>
-      <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;"><%= @survey.theme %></span>
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;"><%= @survey.theme %></span>
       <%= link_to "← Editor", survey_path(@survey),
-            style: "flex-shrink:0;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);text-decoration:none;padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);transition:all 0.15s;",
+            style: "flex-shrink:0;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);text-decoration:none;padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);transition:all 0.15s;",
             onmouseover: "this.style.color='white';this.style.borderColor='rgba(255,255,255,0.3)'",
             onmouseout:  "this.style.color='rgba(255,255,255,0.4)';this.style.borderColor='rgba(255,255,255,0.1)'" %>
     </div>
@@ -53,15 +53,15 @@
         <div style="display:flex;align-items:center;gap:16px;padding:2px 0 6px;">
           <div style="display:flex;align-items:baseline;gap:5px;">
             <span style="font-family:'Alata',sans-serif;font-size:34px;color:#01EACB;line-height:1;"><%= @total %></span>
-            <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">response<%= @total == 1 ? "" : "s" %></span>
+            <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);">response<%= @total == 1 ? "" : "s" %></span>
           </div>
           <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
           <% if @survey.published_at %>
-            <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);">Published <%= @survey.published_at.strftime("%b %-d, %Y") %></span>
+            <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);">Published <%= @survey.published_at.strftime("%b %-d, %Y") %></span>
           <% end %>
           <div style="margin-left:auto;">
             <%= link_to play_survey_url(@survey.publish_token),
-                  style: "font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);text-decoration:none;",
+                  style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);text-decoration:none;",
                   target: "_blank" do %>↗ Play link<% end %>
           </div>
         </div>
@@ -69,11 +69,11 @@
         <%# ── Ask Verto summary card ── %>
         <div style="border-radius:14px;background:rgba(1,234,203,0.05);border:1px solid rgba(1,234,203,0.18);padding:18px 22px;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;">Ask Verto</span>
-            <span id="av-thinking" style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.2);margin-left:2px;">Analysing responses…</span>
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;">Ask Verto</span>
+            <span id="av-thinking" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);margin-left:2px;">Analysing responses…</span>
           </div>
           <div id="av-text"
-               style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.8;white-space:pre-wrap;min-height:18px;"></div>
+               style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.65);line-height:1.8;white-space:pre-wrap;min-height:18px;"></div>
         </div>
 
         <script>
@@ -117,8 +117,8 @@
 
             <div class="s-card-header" style="padding:9px 14px;gap:10px;">
               <span class="s-badge <%= card_meta[:badge_css] %>"><%= card_meta[:badge] %></span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);">Card <%= idx + 1 %></span>
-              <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size:11px;color:<%= total_ans > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;">
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);">Card <%= idx + 1 %></span>
+              <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:<%= total_ans > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;">
                 <%= total_ans %> answer<%= total_ans == 1 ? "" : "s" %>
               </span>
             </div>
@@ -127,21 +127,21 @@
 
               <div style="background:<%= left_bg %>;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 8px;gap:6px;border-bottom-left-radius:14px;">
                 <%= image_tag svg_file, style:"width:48px;height:48px;object-fit:contain;opacity:0.75;filter:brightness(0) invert(1);" %>
-                <span style="font-family:'ABeeZee',sans-serif;font-size:9px;color:rgba(255,255,255,0.3);text-align:center;line-height:1.4;"><%= card_meta[:q_label].downcase.capitalize %></span>
+                <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);text-align:center;line-height:1.4;"><%= card_meta[:q_label].downcase.capitalize %></span>
               </div>
 
               <div style="background:#fff;padding:14px 18px;display:flex;flex-direction:column;gap:10px;border-bottom-right-radius:14px;">
-                <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:#111;line-height:1.45;font-weight:500;">
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:#111;line-height:1.45;font-weight:500;">
                   <%= card_data["text"] %>
                 </div>
 
                 <% if total_ans == 0 %>
-                  <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(0,0,0,0.25);font-style:italic;">No responses yet</div>
+                  <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(0,0,0,0.25);font-style:italic;">No responses yet</div>
 
                 <% elsif type == "welcome_card" %>
                   <div style="display:flex;align-items:baseline;gap:5px;">
-                    <span style="font-family:'Alata',sans-serif;font-size:24px;color:#01EACB;line-height:1;"><%= @total %></span>
-                    <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.4);">respondent<%= @total == 1 ? "" : "s" %> started</span>
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#01EACB;line-height:1;"><%= @total %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.4);">respondent<%= @total == 1 ? "" : "s" %> started</span>
                   </div>
 
                 <% elsif %w[multiple_choice yes_no select_one_grid select_many select_many_grid].include?(type) %>
@@ -150,11 +150,11 @@
                     <% counts.sort_by { |_, v| -v }.each do |label, count| %>
                       <% pct = ((count / grand) * 100).round %>
                       <div style="display:flex;align-items:center;gap:8px;">
-                        <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#111;min-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<%= label %>"><%= label.truncate(20) %></span>
+                        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#111;min-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<%= label %>"><%= label.truncate(20) %></span>
                         <div style="flex:1;height:7px;border-radius:4px;background:rgba(1,234,203,0.1);overflow:hidden;">
                           <div style="height:100%;border-radius:4px;background:#01EACB;width:<%= pct %>%;"></div>
                         </div>
-                        <span style="font-family:'Alata',sans-serif;font-size:10px;color:rgba(0,0,0,0.4);min-width:42px;text-align:right;"><%= count %> (<%= pct %>%)</span>
+                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.4);min-width:42px;text-align:right;"><%= count %> (<%= pct %>%)</span>
                       </div>
                     <% end %>
                   </div>
@@ -165,11 +165,11 @@
                     <% n.times do |i| %>
                       <% count = result[:counts][i].to_i; label = labels[i] || "Step #{i + 1}"; pct = ((count / grand) * 100).round %>
                       <div style="display:flex;align-items:center;gap:8px;">
-                        <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#111;min-width:100px;"><%= label.truncate(20) %></span>
+                        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#111;min-width:100px;"><%= label.truncate(20) %></span>
                         <div style="flex:1;height:7px;border-radius:4px;background:rgba(1,234,203,0.1);overflow:hidden;">
                           <div style="height:100%;border-radius:4px;background:#01EACB;width:<%= pct %>%;"></div>
                         </div>
-                        <span style="font-family:'Alata',sans-serif;font-size:10px;color:rgba(0,0,0,0.4);min-width:42px;text-align:right;"><%= count %> (<%= pct %>%)</span>
+                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.4);min-width:42px;text-align:right;"><%= count %> (<%= pct %>%)</span>
                       </div>
                     <% end %>
                   </div>
@@ -177,20 +177,20 @@
                 <% elsif type == "rating" %>
                   <% avg = result[:avg]; grand = [result[:counts].values.sum.to_f, 1.0].max %>
                   <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-                    <div style="font-size:18px;letter-spacing:2px;">
+                    <div style="font-size: var(--text-2xl);letter-spacing:2px;">
                       <% 5.times do |i| %><span style="color:<%= i < avg.round ? '#FFCC00' : 'rgba(0,0,0,0.12)' %>"><%= i < avg.round ? "★" : "☆" %></span><% end %>
                     </div>
-                    <span style="font-family:'Alata',sans-serif;font-size:22px;color:#01EACB;line-height:1;"><%= avg %></span>
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#01EACB;line-height:1;"><%= avg %></span>
                   </div>
                   <div style="display:flex;flex-direction:column;gap:3px;">
                     <% (5).downto(1) do |star| %>
                       <% count = result[:counts][star].to_i; pct = ((count / grand) * 100).round %>
                       <div style="display:flex;align-items:center;gap:8px;">
-                        <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(0,0,0,0.45);min-width:24px;"><%="★" * star %></span>
+                        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.45);min-width:24px;"><%="★" * star %></span>
                         <div style="flex:1;height:5px;border-radius:3px;background:rgba(1,234,203,0.1);overflow:hidden;">
                           <div style="height:100%;border-radius:3px;background:#FFCC00;width:<%= pct %>%;"></div>
                         </div>
-                        <span style="font-family:'Alata',sans-serif;font-size:10px;color:rgba(0,0,0,0.35);min-width:28px;text-align:right;"><%= count %></span>
+                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.35);min-width:28px;text-align:right;"><%= count %></span>
                       </div>
                     <% end %>
                   </div>
@@ -200,22 +200,22 @@
                     <% result[:counts].each do |label, dirs| %>
                       <% yes_c = dirs["yes"].to_i; no_c = dirs["no"].to_i; tot = [(yes_c + no_c).to_f, 1.0].max %>
                       <div>
-                        <div style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(0,0,0,0.45);margin-bottom:3px;"><%= label.truncate(55) %></div>
+                        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.45);margin-bottom:3px;"><%= label.truncate(55) %></div>
                         <div style="display:flex;height:18px;border-radius:5px;overflow:hidden;">
                           <div style="background:#01EACB;width:<%= ((yes_c / tot) * 100).round %>%;display:flex;align-items:center;justify-content:center;">
                             <% if ((yes_c / tot) * 100).round > 15 %>
-                              <span style="font-family:'Alata',sans-serif;font-size:9px;color:#1C2034;"><%= ((yes_c / tot) * 100).round %>% Yes</span>
+                              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#1C2034;"><%= ((yes_c / tot) * 100).round %>% Yes</span>
                             <% end %>
                           </div>
                           <div style="background:#D80027;flex:1;display:flex;align-items:center;justify-content:center;">
                             <% if ((no_c / tot) * 100).round > 15 %>
-                              <span style="font-family:'Alata',sans-serif;font-size:9px;color:white;"><%= ((no_c / tot) * 100).round %>% No</span>
+                              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:white;"><%= ((no_c / tot) * 100).round %>% No</span>
                             <% end %>
                           </div>
                         </div>
                         <div style="display:flex;justify-content:space-between;margin-top:2px;">
-                          <span style="font-family:'Alata',sans-serif;font-size:9px;color:#01EACB;">Yes · <%= yes_c %></span>
-                          <span style="font-family:'Alata',sans-serif;font-size:9px;color:#D80027;">No · <%= no_c %></span>
+                          <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#01EACB;">Yes · <%= yes_c %></span>
+                          <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#D80027;">No · <%= no_c %></span>
                         </div>
                       </div>
                     <% end %>
@@ -224,12 +224,12 @@
                 <% elsif type == "open_ended" %>
                   <div style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;">
                     <% result[:texts].first(20).each do |text| %>
-                      <div style="padding:7px 11px;border-radius:7px;background:rgba(0,0,0,0.03);border-left:2px solid rgba(1,234,203,0.25);font-family:'ABeeZee',sans-serif;font-size:12px;color:#111;line-height:1.5;">
+                      <div style="padding:7px 11px;border-radius:7px;background:rgba(0,0,0,0.03);border-left:2px solid rgba(1,234,203,0.25);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:#111;line-height:1.5;">
                         <%= text.truncate(200) %>
                       </div>
                     <% end %>
                     <% if result[:texts].size > 20 %>
-                      <div style="font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(0,0,0,0.3);padding:3px 11px;">+ <%= result[:texts].size - 20 %> more</div>
+                      <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.3);padding:3px 11px;">+ <%= result[:texts].size - 20 %> more</div>
                     <% end %>
                   </div>
 
@@ -254,10 +254,10 @@
     <%# Chat header %>
     <div style="flex-shrink:0;padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,0.07);">
       <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-family:'Alata',sans-serif;font-size:13px;color:#fff;letter-spacing:0.03em;">Ask Verto</span>
-        <span style="margin-left:auto;font-family:'ABeeZee',sans-serif;font-size:10px;color:rgba(255,255,255,0.25);background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.2);border-radius:20px;padding:2px 8px;">AI</span>
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;letter-spacing:0.03em;">Ask Verto</span>
+        <span style="margin-left:auto;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.2);border-radius:20px;padding:2px 8px;">AI</span>
       </div>
-      <p style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);margin:6px 0 0;line-height:1.5;">Ask questions about your Verto results</p>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);margin:6px 0 0;line-height:1.5;">Ask questions about your Verto results</p>
     </div>
 
     <%# Messages area %>
@@ -272,7 +272,7 @@
                   data-action="keydown->results-chat#keydown"
                   placeholder="Ask about your results…"
                   rows="2"
-                  style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 12px;color:rgba(255,255,255,0.8);font-family:'ABeeZee',sans-serif;font-size:13px;resize:none;outline:none;line-height:1.5;"
+                  style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:9px 12px;color:rgba(255,255,255,0.8);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);resize:none;outline:none;line-height:1.5;"
                   onfocus="this.style.borderColor='rgba(1,234,203,0.4)'"
                   onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
         <button data-results-chat-target="sendBtn"

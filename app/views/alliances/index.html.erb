@@ -7,36 +7,36 @@
 
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:32px;">
         <div style="flex:1;min-width:0;">
-          <h1 style="font-family:'Alata',sans-serif;font-size:22px;color:#F7F7F7;margin:0 0 6px;">Partners</h1>
-          <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.4);margin:0;">
+          <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#F7F7F7;margin:0 0 6px;">Partners</h1>
+          <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
             Organisations in your alliance can distribute your Vertos through their own share links.
           </p>
         </div>
         <%= link_to "Generate join link →", new_alliance_invite_path,
-              style: "flex-shrink:0;background:#01EACB;border-radius:8px;padding:11px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;text-decoration:none;white-space:nowrap;" %>
+              style: "flex-shrink:0;background:#01EACB;border-radius:8px;padding:11px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.05em;text-decoration:none;white-space:nowrap;" %>
       </div>
 
       <% if flash[:notice] %>
-        <div style="background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:8px;padding:10px 14px;margin-bottom:20px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:13px;"><%= flash[:notice] %></div>
+        <div style="background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:8px;padding:10px 14px;margin-bottom:20px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:notice] %></div>
       <% end %>
 
       <% if params[:new_invite_token].present? %>
         <% new_url = invite_url(params[:new_invite_token]) %>
         <div style="background:#161B2E;border:1px solid rgba(1,234,203,0.35);border-radius:12px;padding:18px 20px;margin-bottom:24px;">
-          <div style="font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;letter-spacing:0.05em;margin-bottom:4px;">New partner join link</div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:12px;">Anyone with this link can join as a partner organisation. Expires in 14 days.</div>
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#01EACB;letter-spacing:0.05em;margin-bottom:4px;">New partner join link</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);margin-bottom:12px;">Anyone with this link can join as a partner organisation. Expires in 14 days.</div>
           <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;">
             <input type="text" readonly id="new-partner-link" value="<%= new_url %>"
-                   style="flex:1;background:transparent;border:none;color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;" />
+                   style="flex:1;background:transparent;border:none;color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;" />
             <button type="button"
                     onclick="navigator.clipboard.writeText(document.getElementById('new-partner-link').value).then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
-                    style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;">Copy</button>
+                    style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size: var(--text-base);cursor:pointer;">Copy</button>
           </div>
         </div>
       <% end %>
 
       <% if @alliances.empty? %>
-        <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:12px;padding:48px 24px;text-align:center;color:rgba(255,255,255,0.45);font-family:'ABeeZee',sans-serif;font-size:14px;">
+        <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:12px;padding:48px 24px;text-align:center;color:rgba(255,255,255,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);">
           No partners yet. Invite one to get started.
         </div>
       <% else %>
@@ -44,14 +44,14 @@
           <% @alliances.each do |a| %>
             <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;">
               <div>
-                <div style="font-family:'Alata',sans-serif;font-size:15px;color:#F7F7F7;"><%= a.partner_organisation.name %></div>
-                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-top:3px;">
+                <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#F7F7F7;"><%= a.partner_organisation.name %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);margin-top:3px;">
                   <%= a.status.capitalize %> · added <%= a.created_at.to_date.to_s(:long) rescue a.created_at.to_date %>
                 </div>
               </div>
               <%= button_to "Remove", alliance_path(a), method: :delete,
                     data: { turbo_confirm: "Remove #{a.partner_organisation.name} from your alliance?" },
-                    style: "background:none;border:1px solid rgba(255,255,255,0.18);border-radius:7px;padding:7px 14px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;" %>
+                    style: "background:none;border:1px solid rgba(255,255,255,0.18);border-radius:7px;padding:7px 14px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size: var(--text-base);cursor:pointer;" %>
             </div>
           <% end %>
         </div>

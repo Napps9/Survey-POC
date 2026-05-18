@@ -5,9 +5,9 @@
     <div style="max-width:700px;margin:0 auto;width:100%;">
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;">
-        <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;margin:0;">Members</h1>
+        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;margin:0;">Members</h1>
         <%= link_to "Invite member →", new_organisation_invite_path(current_organisation),
-              style: "background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;padding:10px 22px;border-radius:20px;text-decoration:none;" %>
+              style: "background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.05em;padding:10px 22px;border-radius:20px;text-decoration:none;" %>
       </div>
 
       <% if flash[:alert] %>
@@ -25,8 +25,8 @@
       <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:22px 24px;margin-bottom:32px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
           <div>
-            <div style="font-family:'Alata',sans-serif;font-size:14px;color:#F7F7F7;">Brand</div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);margin-top:3px;line-height:1.5;">
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-lg);color:#F7F7F7;">Brand</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);margin-top:3px;line-height:1.5;">
               Your logo replaces the Playverto wordmark at the top of every Verto preview and shared play link.
             </div>
           </div>
@@ -43,9 +43,9 @@
               html: { style: "display:flex;flex-wrap:wrap;align-items:center;gap:10px;" } do |f| %>
           <%= f.file_field :logo,
                 accept: "image/png,image/jpeg,image/svg+xml,image/webp",
-                style: "flex:1;min-width:200px;padding:10px 12px;border-radius:10px;background:#272D4A;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size:12px;" %>
+                style: "flex:1;min-width:200px;padding:10px 12px;border-radius:10px;background:#272D4A;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);" %>
           <%= f.submit "Upload",
-                style: "padding:10px 20px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.04em;border:none;cursor:pointer;" %>
+                style: "padding:10px 20px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;border:none;cursor:pointer;" %>
           <% if current_organisation.logo.attached? %>
             <%= button_to "Remove",
                   organisation_path(current_organisation),
@@ -53,10 +53,10 @@
                   params: { organisation: { remove_logo: "1" } },
                   data: { turbo_confirm: "Remove your organisation's logo and revert to the Playverto wordmark?" },
                   form: { style: "display:inline;margin:0;" },
-                  style: "padding:10px 16px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;" %>
+                  style: "padding:10px 16px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;" %>
           <% end %>
         <% end %>
-        <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);margin-top:10px;">
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:10px;">
           PNG, JPG, SVG or WebP · transparent backgrounds work best.
         </div>
       </div>
@@ -66,10 +66,10 @@
         <% @memberships.each do |membership| %>
           <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;">
             <div style="flex:1;">
-              <div style="font-family:'Alata',sans-serif;font-size:14px;color:#F7F7F7;"><%= membership.user.name.presence || "—" %></div>
-              <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);"><%= membership.user.email_address %></div>
+              <div style="font-family:'Alata',sans-serif;font-size: var(--text-lg);color:#F7F7F7;"><%= membership.user.name.presence || "—" %></div>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);"><%= membership.user.email_address %></div>
             </div>
-            <span style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:<%= membership.admin? ? 'rgba(1,234,203,0.15)' : 'rgba(255,255,255,0.06)' %>;color:<%= membership.admin? ? '#01EACB' : 'rgba(255,255,255,0.4)' %>;">
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:<%= membership.admin? ? 'rgba(1,234,203,0.15)' : 'rgba(255,255,255,0.06)' %>;color:<%= membership.admin? ? '#01EACB' : 'rgba(255,255,255,0.4)' %>;">
               <%= membership.role %>
             </span>
             <% if membership.user != Current.user %>
@@ -77,7 +77,7 @@
                     organisation_membership_path(current_organisation, membership),
                     method: :delete,
                     data: { turbo_confirm: "Remove #{membership.user.name} from #{current_organisation.name}?" },
-                    style: "background:none;border:1px solid rgba(216,0,39,0.3);border-radius:8px;padding:5px 12px;color:rgba(216,0,39,0.7);font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;" %>
+                    style: "background:none;border:1px solid rgba(216,0,39,0.3);border-radius:8px;padding:5px 12px;color:rgba(216,0,39,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;" %>
             <% end %>
           </div>
         <% end %>
@@ -87,25 +87,25 @@
       <% if @pending_invites.any? %>
         <div style="margin-top:8px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Pending invites</span>
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Pending invites</span>
             <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <% @pending_invites.each do |invite| %>
               <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:16px;">
                 <div style="flex:1;">
-                  <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);"><%= invite.email_address %></div>
-                  <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);margin-top:2px;">
+                  <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);"><%= invite.email_address %></div>
+                  <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);margin-top:2px;">
                     Expires <%= distance_of_time_in_words_to_now(invite.expires_at) %> from now
                     · invited by <%= invite.invited_by.name.presence || invite.invited_by.email_address %>
                   </div>
                 </div>
-                <span style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.35);">
+                <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.35);">
                   <%= invite.role %>
                 </span>
                 <button type="button"
                         onclick="navigator.clipboard.writeText('<%= invite_url(invite.token) %>').then(()=>{this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy link'},2000)})"
-                        style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:7px;padding:5px 12px;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">
+                        style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:7px;padding:5px 12px;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;white-space:nowrap;">
                   Copy link
                 </button>
               </div>
