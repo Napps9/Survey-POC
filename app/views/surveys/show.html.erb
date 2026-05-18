@@ -18,7 +18,7 @@
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"
      data-survey-editor-description-value="<%= @survey.description %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty">
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#close">
 
   <%# Nav %>
   <nav style="height:54px;background:#1C2034;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;"
@@ -277,8 +277,9 @@
           <% end %>
         </div>
 
-        <%# Partner share links %>
-        <% if @survey.publish_token.present? && current_organisation&.creator? && current_membership&.admin? %>
+        <%# Partner share links (available even before publish — share tokens are
+            independent of the public publish_token). %>
+        <% if current_organisation&.creator? && current_membership&.admin? %>
           <% partner_shares    = @survey.survey_shares.includes(alliance: :partner_organisation).order(:created_at) %>
           <% active_alliances  = current_organisation.alliances.active.includes(:partner_organisation) %>
           <% shared_ally_ids   = partner_shares.map(&:alliance_id).compact %>

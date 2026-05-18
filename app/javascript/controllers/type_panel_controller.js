@@ -408,6 +408,10 @@ export default class extends Controller {
   selectCard(event) {
     if (event.target.closest("button[data-action*='deleteCard']")) return
 
+    // If the publish-and-share panel is open, drop back to the answer-type
+    // picker so the click reveals the card's edit options.
+    this.dispatch("cardSelected")
+
     const card = event.currentTarget
     this.cardTargets.forEach(c => c.classList.remove("selected"))
     card.classList.add("selected")
@@ -494,6 +498,15 @@ export default class extends Controller {
       .sort((a, b) => b.score - a.score)
       .slice(0, this.TOP_N)
     const rankMap = new Map(ranked.map((c, i) => [c.type, { entry: c, rank: i }]))
+
+    // Reorder the DOM so wraps render in rank order (1st → 4th, top to
+    // bottom). Without this they stay in CardTypes.pickable order.
+    const list = this.typeListTarget
+    ranked.forEach(({ type }) => {
+      const opt  = this.typeOptTargets.find(o => o.dataset.type === type)
+      const wrap = opt?.closest(".type-opt-wrap")
+      if (wrap && list) list.appendChild(wrap)
+    })
 
     this.typeOptTargets.forEach(opt => {
       const type  = opt.dataset.type
