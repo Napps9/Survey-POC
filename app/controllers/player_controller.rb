@@ -9,10 +9,12 @@ class PlayerController < ApplicationController
 
   def show
     return render plain: "Survey not found", status: :not_found unless @survey
+    return render plain: "This Verto is no longer available.", status: :gone if @survey.deleted?
   end
 
   def submit
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
     data = JSON.parse(request.body.read)
     Response.create!(
       survey:        @survey,
@@ -28,6 +30,7 @@ class PlayerController < ApplicationController
 
   def results
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
     unless @survey.show_results_comparison?
       return render json: { ok: false, error: "Comparison not enabled" }, status: :forbidden
     end

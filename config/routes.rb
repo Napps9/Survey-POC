@@ -40,10 +40,10 @@ Rails.application.routes.draw do
   post "surveys/:survey_id/shares", to: "survey_shares#create", as: :create_survey_share
   delete "surveys/:survey_id/shares/:id", to: "survey_shares#destroy", as: :survey_share
 
-  resources :surveys, only: [:show, :update]
+  resources :surveys, only: [:show, :update, :destroy]
 
   # Alliances (partner orgs)
-  resources :alliances, only: [:index, :destroy]
+  resources :alliances, only: [:index, :show, :destroy]
   resources :alliance_invites, only: [:new, :create]
 
   # Partner-side dashboard

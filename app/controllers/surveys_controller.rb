@@ -1,15 +1,17 @@
 class SurveysController < ApplicationController
   include AggregatesSurveyResults
-  layout "fullscreen", only: [:show, :new]
+  layout "fullscreen", only: [ :show, :new ]
 
   before_action :require_creator_org!
-  before_action :set_survey, only: [:show, :publish, :results, :update_settings]
+  before_action :require_admin!,       only: [ :destroy ]
+  before_action :set_survey,           only: [ :show, :publish, :update_settings ]
+  before_action :set_survey_including_archived, only: [ :results ]
 
   def index
-    # NB: includes(:responses) is required by _dashboard_card.html.erb,
-    # which uses .length to avoid a per-card COUNT query.
-    @surveys = Current.organisation.surveys.includes(:responses).order(updated_at: :desc)
-    @total_responses = Current.organisation.surveys.joins(:responses).count
+    kept_surveys = Current.organisation.surveys.kept.includes(:responses).order(updated_at: :desc)
+    @surveys          = kept_surveys
+    @archived_surveys = Current.organisation.surveys.archived.includes(:responses).order(deleted_at: :desc)
+    @total_responses  = Current.organisation.surveys.kept.joins(:responses).count
     render :index, layout: "fullscreen"
   end
 
@@ -57,7 +59,7 @@ class SurveysController < ApplicationController
   end
 
   def update
-    survey = Current.organisation.surveys.find(params[:id])
+    survey = Current.organisation.surveys.kept.find(params[:id])
     payload = JSON.parse(request.body.read)
 
     survey.update!(
@@ -88,6 +90,12 @@ class SurveysController < ApplicationController
     redirect_to survey_path(@survey)
   end
 
+  def destroy
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    survey.archive!
+    redirect_to root_path, notice: "“#{survey.theme.presence || survey.title.presence || 'Verto'}” deleted. Responders' link no longer works; results stay in your Archived list."
+  end
+
   def results
     @responses  = @survey.responses.where(status: "completed").order(created_at: :desc)
     @total      = @responses.count
@@ -98,6 +106,10 @@ class SurveysController < ApplicationController
   private
 
   def set_survey
+    @survey = Current.organisation.surveys.kept.find(params[:id])
+  end
+
+  def set_survey_including_archived
     @survey = Current.organisation.surveys.find(params[:id])
   end
 end

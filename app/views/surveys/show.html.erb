@@ -27,6 +27,15 @@
     <%# ── LEFT: Cards column ── %>
     <div class="flex flex-col overflow-hidden">
 
+      <% if @survey.publish_token.present? %>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,30,111,0.08);border-bottom:1px solid rgba(255,30,111,0.22);padding:10px 20px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#FF1E6F;box-shadow:0 0 10px rgba(255,30,111,0.7);flex-shrink:0;"></span>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.78);line-height:1.4;">
+            <strong style="color:#FF1E6F;font-weight:600;letter-spacing:0.04em;">LIVE</strong> — editing questions while this Verto is collecting responses will affect data quality. Answers before and after the edit won't be directly comparable.
+          </div>
+        </div>
+      <% end %>
+
       <%# Brief strip %>
       <div class="brief-strip">
         <span style="color:rgba(255,255,255,0.85);font-weight:600;"><%= @survey.theme %></span>

@@ -7,7 +7,7 @@
   show_shared     = org && !org.creator?
   show_create     = org&.creator?
 
-  recent_surveys  = org ? org.surveys.recent.limit(5) : []
+  recent_surveys  = org ? org.surveys.kept.recent.limit(5) : []
   partner_orgs    = show_partners ? org.partner_organisations.limit(8) : []
   org_members     = (mem&.admin? && org) ? org.memberships.includes(:user).limit(8) : []
 %>
