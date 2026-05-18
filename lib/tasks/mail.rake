@@ -11,12 +11,13 @@ namespace :mail do
     puts
 
     print "Sending to #{to}... "
-    ActionMailer::Base.mail(
-      to:      to,
-      from:    ApplicationMailer.default[:from],
-      subject: "Playverto SMTP smoke test (#{Time.current.iso8601})",
-      body:    "If you can read this, SMTP works."
-    ).deliver_now
+    mail = Mail.new
+    mail.from    ApplicationMailer.default[:from]
+    mail.to      to
+    mail.subject "Playverto SMTP smoke test (#{Time.current.iso8601})"
+    mail.body    "If you can read this, SMTP works."
+    mail.delivery_method :smtp, ActionMailer::Base.smtp_settings
+    mail.deliver!
 
     puts "OK"
   rescue => e
