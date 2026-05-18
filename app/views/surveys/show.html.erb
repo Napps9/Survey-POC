@@ -13,7 +13,7 @@
     above. %>
 <script id="card-types" type="application/json"><%= CardTypes.to_json.html_safe %></script>
 
-<div class="results-rainbow flex flex-col h-screen"
+<div class="results-rainbow flex flex-col h-full"
      data-controller="type-panel preview-verto survey-editor media-picker publish-panel"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"

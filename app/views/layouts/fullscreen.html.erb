@@ -4,6 +4,16 @@
     <%= render "layouts/head" %>
   </head>
   <body style="height:100vh;overflow:hidden;background:#272D4A;color:#F7F7F7;font-family:'ABeeZee',sans-serif;">
-    <%= yield %>
+    <% if Current.user %>
+      <div style="height: calc(100vh - 56px); overflow: auto;">
+        <%= yield %>
+      </div>
+      <div data-controller="command-palette">
+        <%= render "shared/bottom_bar" %>
+        <%= render "shared/command_palette" %>
+      </div>
+    <% else %>
+      <%= yield %>
+    <% end %>
   </body>
 </html>

@@ -1,0 +1,88 @@
+<%
+  path = request.path
+  org  = current_organisation
+  mem  = current_membership
+
+  show_partners  = org&.creator? && mem&.admin?
+  show_shared    = org && !org.creator?
+  show_create    = org&.creator?
+
+  active_partners = show_partners && (path.start_with?("/alliances") || path.start_with?("/alliance_invites"))
+  active_shared   = show_shared   && path.start_with?("/alliance_vertos")
+  active_results  = path == "/"
+  active_create   = show_create && path == new_survey_path
+%>
+<nav class="bottom-bar" aria-label="Primary">
+  <div class="bottom-bar-left">
+    <button type="button" class="bottom-bar-logo"
+            data-action="click->command-palette#open"
+            aria-label="Open command palette">
+      <%= image_tag "playverto.svg", alt: "Playverto" %>
+    </button>
+  </div>
+
+  <div class="bottom-bar-centre">
+    <% if show_partners %>
+      <a href="<%= alliances_path %>" class="bottom-bar-chip" data-active="<%= active_partners %>">
+        <span class="bottom-bar-chip-dot" style="background:#FF1E6F;"></span>
+        Partners
+      </a>
+    <% elsif show_shared %>
+      <a href="<%= alliance_vertos_path %>" class="bottom-bar-chip" data-active="<%= active_shared %>">
+        <span class="bottom-bar-chip-dot" style="background:#FF1E6F;"></span>
+        Shared Vertos
+      </a>
+    <% end %>
+
+    <a href="<%= root_path %>" class="bottom-bar-chip" data-active="<%= active_results %>">
+      <span class="bottom-bar-chip-dot" style="background:#01EACB;"></span>
+      Results
+    </a>
+
+    <% if show_create %>
+      <a href="<%= new_survey_path %>" class="bottom-bar-chip" data-active="<%= active_create %>">
+        <span class="bottom-bar-chip-dot" style="background:#0CA7FF;"></span>
+        Create
+      </a>
+    <% end %>
+  </div>
+
+  <div class="bottom-bar-right">
+    <% if Current.user %>
+      <div style="position:relative;">
+        <button type="button" class="bottom-bar-user"
+                data-action="click->command-palette#toggleUser">
+          <span class="bottom-bar-user-name"><%= Current.user.name.presence || Current.user.email_address %></span>
+          <svg class="bottom-bar-user-caret" width="10" height="6" viewBox="0 0 10 6" fill="none">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div class="bottom-bar-user-popover" data-command-palette-target="userPopover" hidden>
+          <% if org %>
+            <div class="bottom-bar-user-popover-section"><%= org.name %></div>
+            <% if Current.user.organisations.many? %>
+              <% Current.user.organisations.each do |o| %>
+                <% next if o == org %>
+                <%= button_to o.name, switch_organisation_path, method: :post,
+                      params: { organisation_id: o.id },
+                      class: "bottom-bar-user-item",
+                      form: { style: "margin:0;" } %>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <% if mem&.admin? %>
+            <div style="height:1px;background:rgba(255,255,255,0.06);margin:6px 4px;"></div>
+            <%= link_to "Members", organisation_memberships_path(org), class: "bottom-bar-user-item" %>
+          <% end %>
+
+          <div style="height:1px;background:rgba(255,255,255,0.06);margin:6px 4px;"></div>
+          <%= button_to "Sign out", session_path, method: :delete,
+                class: "bottom-bar-user-item",
+                form: { style: "margin:0;" } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</nav>

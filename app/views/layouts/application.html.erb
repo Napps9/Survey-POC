@@ -7,18 +7,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nanum+Pen+Script&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
 
-  <body class="bg-slate text-smoke font-sans min-h-screen">
-    <header class="border-b border-smoke/10">
-      <div class="max-w-3xl mx-auto px-5 py-5 flex items-center justify-between">
-        <%= link_to root_path, class: "flex items-center gap-2 group" do %>
-          <%= image_tag "playverto.svg", alt: "Playverto", class: "h-8 w-auto" %>
-        <% end %>
-        <span class="display text-xs tracking-widest text-smoke/50">Verto Studio</span>
-      </div>
-    </header>
+  <body class="bg-slate text-smoke font-sans min-h-screen <%= 'has-bottom-bar' if Current.user %>">
+    <% unless Current.user %>
+      <header class="border-b border-smoke/10">
+        <div class="max-w-3xl mx-auto px-5 py-5 flex items-center justify-between">
+          <%= link_to root_path, class: "flex items-center gap-2 group" do %>
+            <%= image_tag "playverto.svg", alt: "Playverto", class: "h-8 w-auto" %>
+          <% end %>
+          <span class="display text-xs tracking-widest text-smoke/50">Verto Studio</span>
+        </div>
+      </header>
+    <% end %>
 
-    <main class="max-w-3xl mx-auto px-5 py-10">
+    <main class="<%= 'max-w-3xl mx-auto px-5 py-10' unless Current.user %>">
       <%= yield %>
     </main>
+
+    <% if Current.user %>
+      <div data-controller="command-palette">
+        <%= render "shared/bottom_bar" %>
+        <%= render "shared/command_palette" %>
+      </div>
+    <% end %>
   </body>
 </html>

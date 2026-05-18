@@ -26,10 +26,7 @@
 %>
 
 <%# Full-viewport app-shell — body stays overflow:hidden from fullscreen layout %>
-<div style="height:100vh;background:#1C2034;display:flex;overflow:hidden;">
-
-  <%# ── Sidebar ── %>
-  <%= render "shared/sidebar", active: "results", survey: @survey %>
+<div style="height:100%;background:#1C2034;display:flex;overflow:hidden;">
 
   <%# ── Middle: top-bar + scrollable content ── %>
   <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">

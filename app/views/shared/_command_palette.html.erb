@@ -1,0 +1,203 @@
+<%
+  org  = current_organisation
+  mem  = current_membership
+  user = Current.user
+
+  show_partners   = org&.creator? && mem&.admin?
+  show_shared     = org && !org.creator?
+  show_create     = org&.creator?
+
+  recent_surveys  = org ? org.surveys.recent.limit(5) : []
+  partner_orgs    = show_partners ? org.partner_organisations.limit(8) : []
+  org_members     = (mem&.admin? && org) ? org.memberships.includes(:user).limit(8) : []
+%>
+<div class="command-palette-backdrop"
+     data-command-palette-target="backdrop"
+     data-action="click->command-palette#closeOnBackdrop"
+     hidden
+     aria-hidden="true"
+     role="dialog"
+     aria-modal="true"
+     aria-label="Quick navigation">
+  <div class="command-palette">
+    <div class="gen-rainbow-bar"></div>
+
+    <div class="command-palette-search">
+      <input type="text"
+             class="command-palette-input"
+             data-command-palette-target="input"
+             data-action="input->command-palette#filter"
+             placeholder="Jump to a Verto, partner, or page…"
+             autocomplete="off"
+             spellcheck="false">
+    </div>
+
+    <div class="command-palette-tiles">
+      <a href="<%= root_path %>"
+         class="command-palette-tile"
+         data-command-palette-target="item"
+         data-search-text="dashboard home">
+        <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
+          <rect x="1" y="1" width="5.5" height="5.5" rx="1.3" fill="currentColor"/>
+          <rect x="8.5" y="1" width="5.5" height="5.5" rx="1.3" fill="currentColor"/>
+          <rect x="1" y="8.5" width="5.5" height="5.5" rx="1.3" fill="currentColor"/>
+          <rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.3" fill="currentColor"/>
+        </svg>
+        Dashboard
+      </a>
+
+      <% if show_create %>
+        <a href="<%= new_survey_path %>"
+           class="command-palette-tile"
+           data-command-palette-target="item"
+           data-search-text="create new verto survey">
+          <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
+            <circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M7.5 4.5v6M4.5 7.5h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          Create Verto
+        </a>
+      <% end %>
+
+      <% if show_partners %>
+        <a href="<%= alliances_path %>"
+           class="command-palette-tile"
+           data-command-palette-target="item"
+           data-search-text="partners alliances">
+          <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
+            <circle cx="5" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="10" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M1.5 13c0.5-2 1.8-3 3.5-3M13.5 13c-0.5-2-1.8-3-3.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          Partners
+        </a>
+      <% elsif show_shared %>
+        <a href="<%= alliance_vertos_path %>"
+           class="command-palette-tile"
+           data-command-palette-target="item"
+           data-search-text="shared vertos partners">
+          <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
+            <path d="M7.5 1l6 3v4.5c0 3-2.5 5-6 5.5C4 13.5 1.5 11.5 1.5 8.5V4l6-3z" stroke="currentColor" stroke-width="1.3" fill="none"/>
+          </svg>
+          Shared Vertos
+        </a>
+      <% end %>
+    </div>
+
+    <div class="command-palette-scroll">
+      <% if recent_surveys.any? %>
+        <div class="command-palette-section" data-section="vertos">
+          <div class="command-palette-section-title">Recent Vertos</div>
+          <% recent_surveys.each do |s| %>
+            <a href="<%= survey_path(s) %>"
+               class="command-palette-item"
+               data-command-palette-target="item"
+               data-search-text="<%= [s.title, s.theme, s.audience_age].compact.join(' ').downcase %>">
+              <svg class="command-palette-item-icon" viewBox="0 0 15 15" fill="none">
+                <rect x="2" y="2" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M5 6h5M5 9h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+              <span><%= s.title.presence || "Untitled Verto" %></span>
+              <span class="command-palette-item-meta">
+                <%= s.publish_token.present? ? "Live" : "Draft" %>
+              </span>
+            </a>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if show_partners %>
+        <div class="command-palette-section" data-section="partners">
+          <div class="command-palette-section-title">Partners</div>
+          <a href="<%= alliances_path %>"
+             class="command-palette-item"
+             data-command-palette-target="item"
+             data-search-text="all partners alliances">
+            <svg class="command-palette-item-icon" viewBox="0 0 15 15" fill="none">
+              <path d="M7.5 4v7M4 7.5h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            View all partners
+          </a>
+          <% partner_orgs.each do |p| %>
+            <a href="<%= alliances_path %>"
+               class="command-palette-item"
+               data-command-palette-target="item"
+               data-search-text="<%= p.name.downcase %>">
+              <svg class="command-palette-item-icon" viewBox="0 0 15 15" fill="none">
+                <circle cx="7.5" cy="6" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M2 13c0.5-2.5 2.5-4 5.5-4s5 1.5 5.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+              <%= p.name %>
+            </a>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if mem&.admin? && org %>
+        <div class="command-palette-section" data-section="people">
+          <div class="command-palette-section-title">People</div>
+          <a href="<%= new_organisation_invite_path(org) %>"
+             class="command-palette-item"
+             data-command-palette-target="item"
+             data-search-text="invite people members">
+            <svg class="command-palette-item-icon" viewBox="0 0 15 15" fill="none">
+              <circle cx="6" cy="5" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M1.5 13c0.5-2.5 2.2-4 4.5-4s4 1.5 4.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              <path d="M12 4v4M10 6h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            Invite people
+          </a>
+          <a href="<%= organisation_memberships_path(org) %>"
+             class="command-palette-item"
+             data-command-palette-target="item"
+             data-search-text="all members team">
+            <svg class="command-palette-item-icon" viewBox="0 0 15 15" fill="none">
+              <circle cx="5" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+              <circle cx="10" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M1.5 13c0.5-2 1.8-3 3.5-3M13.5 13c-0.5-2-1.8-3-3.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            All members
+          </a>
+          <% org_members.each do |m| %>
+            <a href="<%= organisation_memberships_path(org) %>"
+               class="command-palette-item"
+               data-command-palette-target="item"
+               data-search-text="<%= (m.user.name.presence || m.user.email_address).downcase %>">
+              <svg class="command-palette-item-icon" viewBox="0 0 15 15" fill="none">
+                <circle cx="7.5" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M2 13c0.5-2.5 2.5-4 5.5-4s5 1.5 5.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+              <%= m.user.name.presence || m.user.email_address %>
+              <% if m.admin? %><span class="command-palette-item-meta">Admin</span><% end %>
+            </a>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="command-palette-section" data-section="settings">
+        <div class="command-palette-section-title">Settings</div>
+        <%= button_to session_path, method: :delete,
+              class: "command-palette-item",
+              data: { "command-palette-target": "item", "search-text": "sign out logout" },
+              form: { style: "margin:0;" } do %>
+          <svg class="command-palette-item-icon" viewBox="0 0 15 15" fill="none">
+            <path d="M9.5 4V2.5C9.5 1.7 8.8 1 8 1H3C2.2 1 1.5 1.7 1.5 2.5v10c0 0.8 0.7 1.5 1.5 1.5h5c0.8 0 1.5-0.7 1.5-1.5V11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M6 7.5h7.5M11 5l2.5 2.5L11 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Sign out
+        <% end %>
+      </div>
+
+      <div class="command-palette-empty"
+           data-command-palette-target="empty"
+           hidden>
+        Nothing matches that search.
+      </div>
+    </div>
+
+    <div class="command-palette-footer">
+      <%= image_tag "playverto.svg", alt: "Playverto" %>
+      <span>Verto Studio</span>
+    </div>
+  </div>
+</div>
