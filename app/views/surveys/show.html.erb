@@ -232,6 +232,7 @@
                data-type="<%= key %>"
                data-type-panel-target="typeOpt"
                data-action="click->type-panel#setType">
+            <div class="type-opt-rank"></div>
             <div class="type-opt-preview">
               <%= mini_preview_html({ "type" => key, "options" => [] }) %>
             </div>
@@ -254,10 +255,49 @@
                 onmouseout="this.style.background='#01EACB'"
                 data-action="click->type-panel#applyType">Apply to this card</button>
         <button type="button"
-                style="width:100%;padding:8px;border-radius:16px;background:transparent;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:all 0.15s;"
-                onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.25)'"
-                onmouseout="this.style.color='rgba(255,255,255,0.4)';this.style.borderColor='rgba(255,255,255,0.1)'"
-                data-action="click->type-panel#applyAll">Apply to all cards</button>
+                style="width:100%;padding:8px;border-radius:16px;background:transparent;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all 0.15s;"
+                onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.35)'"
+                onmouseout="this.style.color='rgba(255,255,255,0.65)';this.style.borderColor='rgba(255,255,255,0.15)'"
+                data-action="click->type-panel#openAllTypes">See all question types</button>
+      </div>
+
+      <%# ── All question types modal ── %>
+      <div class="all-types-overlay hidden"
+           data-type-panel-target="allTypesModal"
+           data-action="click->type-panel#closeAllTypes">
+        <div class="all-types-modal" data-action="click->type-panel#stopPropagation">
+          <div class="all-types-header">
+            <div>
+              <div style="font-family:'Alata',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:4px;">
+                All Question Types
+              </div>
+              <div style="font-family:'ABeeZee',sans-serif;font-size:15px;color:#fff;line-height:1.3;">
+                Ranked by fit for <span data-type-panel-target="modalCardName" style="color:#FF1E6F;">this card</span>
+              </div>
+            </div>
+            <button type="button" class="all-types-close"
+                    data-action="click->type-panel#closeAllTypes">✕</button>
+          </div>
+          <div class="all-types-grid" data-type-panel-target="allTypesList">
+            <% CardTypes.pickable.each do |key, t| %>
+              <div class="type-opt all-type-opt"
+                   data-type="<%= key %>"
+                   data-type-panel-target="allTypeOpt"
+                   data-action="click->type-panel#applyTypeFromAll">
+                <div class="type-opt-preview">
+                  <%= mini_preview_html({ "type" => key, "options" => [] }) %>
+                </div>
+                <div class="type-opt-row">
+                  <div class="type-opt-icon"><%= t["picker_icon"] %></div>
+                  <div style="flex:1;min-width:0;">
+                    <div class="type-opt-name"><%= t["picker_name"] %></div>
+                    <div class="type-opt-desc"><%= t["picker_desc"] %></div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
       </div>
 
     </div><%# /type panel %>

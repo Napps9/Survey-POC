@@ -383,8 +383,13 @@ function sliderHtml(opts) {
 export default class extends Controller {
   static targets = [
     "card", "panelEmpty", "typeList", "panelFooter",
-    "panelCardName", "panelHint", "typeOpt", "toast", "toastMsg", "cardCount"
+    "panelCardName", "panelHint", "typeOpt", "toast", "toastMsg", "cardCount",
+    "allTypesModal", "allTypesList", "allTypeOpt", "modalCardName"
   ]
+
+  // Emoji shown next to each recommended type in the side panel — 1st-4th place.
+  RANK_EMOJI = ["🥇", "🥈", "🥉", "⭐"]
+  TOP_N      = 4
 
   activeCardEl = null
   pendingType  = null
@@ -436,11 +441,33 @@ export default class extends Controller {
     this.dispatch("changed")
   }
 
-  applyAll() {
-    if (!this.pendingType) return
-    this.cardTargets.forEach(card => this._applyToCard(card, this.pendingType))
-    this._toast(`Applied to all ${this.cardTargets.length} cards`)
+  openAllTypes() {
+    if (!this.activeCardEl) return
+    const cardType = this.activeCardEl.dataset.cardType
+    const meta = this.typeMeta[cardType]
+    if (this.hasModalCardNameTarget) {
+      this.modalCardNameTarget.textContent = meta?.badge || cardType
+    }
+    this._renderAllTypesModal(cardType)
+    this.allTypesModalTarget.classList.remove("hidden")
+  }
+
+  closeAllTypes() {
+    this.allTypesModalTarget.classList.add("hidden")
+  }
+
+  stopPropagation(event) {
+    event.stopPropagation()
+  }
+
+  applyTypeFromAll(event) {
+    const type = event.currentTarget.dataset.type
+    if (!this.activeCardEl || !type) return
+    this.pendingType = type
+    this._applyToCard(this.activeCardEl, type)
+    this._toast(`Answer type updated to ${this.typeMeta[type]?.badge || type}`)
     this.dispatch("changed")
+    this.closeAllTypes()
   }
 
   deleteCard(event) {
@@ -462,16 +489,24 @@ export default class extends Controller {
 
   _renderCompatibleTypes(cardType) {
     const compat = COMPATIBILITY[cardType] || [{ type: cardType, score: 100, note: "" }]
-    const compatMap = Object.fromEntries(compat.map(c => [c.type, c]))
+    // Keep only the top N recommendations, ranked by score descending.
+    const ranked = [...compat]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, this.TOP_N)
+    const rankMap = new Map(ranked.map((c, i) => [c.type, { entry: c, rank: i }]))
 
     this.typeOptTargets.forEach(opt => {
       const type  = opt.dataset.type
-      const entry = compatMap[type]
+      const slot  = rankMap.get(type)
 
-      if (!entry) { opt.style.display = "none"; return }
+      if (!slot) { opt.style.display = "none"; return }
 
+      const { entry, rank } = slot
       opt.style.display = ""
       opt.classList.toggle("active", type === cardType)
+
+      const rankEl = opt.querySelector(".type-opt-rank")
+      if (rankEl) rankEl.textContent = this.RANK_EMOJI[rank] || ""
 
       opt.querySelector(".type-opt-score")?.remove()
       const badge = document.createElement("div")
@@ -489,6 +524,49 @@ export default class extends Controller {
       if (descEl && entry.note) descEl.textContent = entry.note
     })
   }
+
+  // Modal: sort every pickable type by its fit score for the current card,
+  // re-order the DOM, and decorate each tile with a fit-tier badge.
+  _renderAllTypesModal(cardType) {
+    if (!this.hasAllTypeOptTarget) return
+    const compat = COMPATIBILITY[cardType] || []
+    const scoreFor = (t) => {
+      if (t === cardType) return 101
+      const hit = compat.find(c => c.type === t)
+      return hit ? hit.score : 0
+    }
+    const noteFor = (t) => compat.find(c => c.type === t)?.note || ""
+
+    const sorted = [...this.allTypeOptTargets].sort((a, b) =>
+      scoreFor(b.dataset.type) - scoreFor(a.dataset.type)
+    )
+    const list = this.allTypesListTarget || sorted[0]?.parentElement
+    sorted.forEach(el => list && list.appendChild(el))
+
+    this.allTypeOptTargets.forEach(opt => {
+      const type  = opt.dataset.type
+      const score = scoreFor(type)
+
+      opt.classList.toggle("active", type === cardType)
+
+      opt.querySelector(".type-opt-score")?.remove()
+      const badge = document.createElement("div")
+      badge.className = "type-opt-score"
+      if (type === cardType) {
+        badge.textContent = "Current"
+        badge.setAttribute("data-primary", "true")
+      } else {
+        badge.textContent = score > 0 ? fitTier(score) : "Off-brief"
+      }
+      const row = opt.querySelector(".type-opt-row > div[style]")
+      if (row) row.parentElement.appendChild(badge)
+
+      const descEl = opt.querySelector(".type-opt-desc")
+      const note = noteFor(type)
+      if (descEl && note) descEl.textContent = note
+    })
+  }
+
 
   _applyToCard(card, type) {
     const meta = this.typeMeta[type]
