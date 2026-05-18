@@ -1,8 +1,4 @@
-<% content_for :head do %>
-  <style>body { overflow: auto !important; height: auto !important; background: #1C2034 !important; }</style>
-<% end %>
-
-<div data-controller="generating" style="display:flex;min-height:100vh;background:#1C2034;">
+<div data-controller="generating" style="height:100%;display:flex;flex-direction:column;background:#1C2034;">
 
   <%# ── Generating overlay — hidden until form submits ── %>
   <div class="fixed inset-0 z-50 hidden flex-col overflow-hidden"
@@ -85,158 +81,182 @@
     <div class="gen-rainbow-bar"></div>
   </div>
 
-  <%# ── Form area ── %>
-  <div style="flex:1;display:flex;justify-content:center;overflow-y:auto;">
-    <div style="max-width:680px;width:100%;padding:56px 32px 80px;">
+  <%# ── Wizard form ── %>
+  <% if flash[:alert] %>
+    <div style="margin:16px 24px 0;padding:12px 16px;border-radius:12px;background:rgba(255,30,111,0.1);color:#FF1E6F;border:1px solid rgba(255,30,111,0.3);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
 
-    <% if flash[:alert] %>
-      <div style="margin-bottom:20px;padding:12px 16px;border-radius:12px;background:rgba(255,30,111,0.1);color:#FF1E6F;border:1px solid rgba(255,30,111,0.3);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);">
-        <%= flash[:alert] %>
-      </div>
-    <% end %>
+  <%= form_with url: generate_survey_path, method: :post,
+        data: { controller: "create-wizard",
+                action: "submit->generating#show" },
+        style: "display:flex;flex-direction:column;flex:1;min-height:0;" do |f| %>
 
-    <div style="margin-bottom:32px;text-align:center;">
-      <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">New Verto</div>
-      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-5xl);color:#fff;margin:0 0 8px;line-height:1.1;">Create a Verto</h1>
-      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.45);margin:0 auto;line-height:1.6;max-width:520px;">
-        Answer the four questions below — we'll turn your brief into a Verto that follows the Playverto rules.
-      </p>
+    <%
+      # Light-theme styles for inputs/chips inside the white card right-panel
+      light_input_style = "width:100%;background:#fafbfc;border:1px solid rgba(0,0,0,0.12);border-radius:12px;padding:12px 16px;color:#000;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;"
+      light_textarea_style = "#{light_input_style};resize:vertical;line-height:1.55;"
+      chip_style = "display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(0,0,0,0.08);background:rgba(0,0,0,0.025);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);"
+      chip_eg_style = "font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(0,0,0,0.35);letter-spacing:0.05em;text-transform:uppercase;"
+    %>
+
+    <%# Card stage %>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px;overflow:auto;min-height:0;">
+
+      <%# ── Card 1 · Welcome ── %>
+      <section class="preview-card active" data-create-wizard-target="card">
+        <div class="split-card">
+          <%= render "shared/split_left", card: { "type" => "welcome_card" }, progress: 5 %>
+          <div class="split-right" style="text-align:left;justify-content:center;gap:12px;">
+            <div class="q-eyebrow" style="color:#01EACB;">New Verto</div>
+            <div style="font-family:'Alata',sans-serif;font-size:30px;line-height:1.15;color:#1C2034;">Let's build your Verto.</div>
+            <p class="q-subtitle" style="margin:0;">Answer the four questions ahead — we'll turn your brief into a Verto that follows the Playverto rules.</p>
+            <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.4);margin:0;">Press <strong style="color:rgba(0,0,0,0.6);">Next</strong> when you're ready.</p>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Card 2 · Q01 Theme ── %>
+      <section class="preview-card" data-create-wizard-target="card">
+        <div class="split-card">
+          <%= render "shared/split_left", card: { "type" => "multiple_choice" }, progress: 25 %>
+          <div class="split-right" style="text-align:left;justify-content:center;gap:14px;">
+            <div class="q-eyebrow" style="color:#FF1E6F;">Step 01 · About your Verto</div>
+            <div class="q-title">What's your Verto about?</div>
+            <p class="q-subtitle" style="margin:0;">The single overarching topic.</p>
+            <%= f.text_field :theme,
+                  required: true,
+                  data: { required: "true" },
+                  placeholder: "e.g. Youth wellbeing",
+                  style: light_input_style,
+                  onfocus: "this.style.borderColor='#FF1E6F'",
+                  onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <% ["Climate action", "Refugee education", "Food security"].each do |ex| %>
+                <span style="<%= chip_style %>">
+                  <span style="<%= chip_eg_style %>">e.g.</span>
+                  <%= ex %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Card 3 · Q02 Audience ── %>
+      <section class="preview-card" data-create-wizard-target="card">
+        <div class="split-card">
+          <%= render "shared/split_left", card: { "type" => "select_one_grid" }, progress: 50 %>
+          <div class="split-right" style="text-align:left;justify-content:center;gap:14px;">
+            <div class="q-eyebrow" style="color:#01EACB;">Step 02 · Who's answering</div>
+            <div class="q-title">Who's answering — and what age are they?</div>
+            <p class="q-subtitle" style="margin:0;">Be specific. Lifestyle, role, region all help.</p>
+            <%= f.text_field :audience_age,
+                  required: true,
+                  data: { required: "true" },
+                  placeholder: "e.g. 18–24 university students in Kenya",
+                  style: light_input_style,
+                  onfocus: "this.style.borderColor='#01EACB'",
+                  onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <span style="<%= chip_style %>">
+                <span style="<%= chip_eg_style %>">e.g.</span>
+                35–55 frontline community-health workers
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Card 4 · Q03 Key insight ── %>
+      <section class="preview-card" data-create-wizard-target="card">
+        <div class="split-card">
+          <%= render "shared/split_left", card: { "type" => "open_ended" }, progress: 75 %>
+          <div class="split-right" style="text-align:left;justify-content:center;gap:14px;">
+            <div class="q-eyebrow" style="color:#0CA7FF;">Step 03 · The learning goal</div>
+            <div class="q-title">What do you want to learn from them?</div>
+            <p class="q-subtitle" style="margin:0;">The insight that would change a decision.</p>
+            <%= f.text_area :key_insight, rows: 3,
+                  required: true,
+                  data: { required: "true" },
+                  placeholder: "e.g. Why do volunteers drop off after month three?",
+                  style: light_textarea_style,
+                  onfocus: "this.style.borderColor='#0CA7FF'",
+                  onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <% ["What's stopping people from accessing our food bank?", "Does our youth programme actually shift confidence — and where exactly?"].each do |ex| %>
+                <span style="<%= chip_style %>">
+                  <span style="<%= chip_eg_style %>">e.g.</span>
+                  <%= ex %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Card 5 · Q04 Notes (optional) ── %>
+      <section class="preview-card" data-create-wizard-target="card">
+        <div class="split-card">
+          <%= render "shared/split_left", card: { "type" => "tap_card" }, progress: 100 %>
+          <div class="split-right" style="text-align:left;justify-content:center;gap:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+              <div class="q-eyebrow" style="color:#615BF5;">Step 04 · Context</div>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#615BF5;letter-spacing:0.14em;text-transform:uppercase;padding:3px 10px;border-radius:100px;background:rgba(97,91,245,0.1);border:1px solid rgba(97,91,245,0.25);">Optional</span>
+            </div>
+            <div class="q-title">Anything else we should know?</div>
+            <p class="q-subtitle" style="margin:0;">Context, tone, must-asks.</p>
+            <%= f.text_area :notes, rows: 3,
+                  placeholder: "e.g. Audience has never used Playverto before, keep tone warm, not corporate.",
+                  style: light_textarea_style,
+                  onfocus: "this.style.borderColor='#615BF5'",
+                  onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <% ["Must include a question about funding routes and barriers to grants.", "Avoid jargon — many respondents speak English as a second language."].each do |ex| %>
+                <span style="<%= chip_style %>">
+                  <span style="<%= chip_eg_style %>">e.g.</span>
+                  <%= ex %>
+                </span>
+              <% end %>
+            </div>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-top:4px;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);">
+              <%= f.check_box :show_results_comparison,
+                    { checked: false,
+                      style: "margin-top:2px;width:16px;height:16px;accent-color:#01EACB;cursor:pointer;flex-shrink:0;" },
+                    "1", "0" %>
+              <span>
+                <span style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);color:#1C2034;letter-spacing:0.02em;">
+                  Let respondents compare their answers
+                </span>
+                <span style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.5);margin-top:2px;line-height:1.4;">
+                  Show a CTA on the thank-you page that reveals how their answers stack up against everyone else's.
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+
     </div>
 
-    <%= form_with url: generate_survey_path, method: :post,
-          data: { action: "submit->generating#show" } do |f| %>
+    <%# Footer %>
+    <div class="preview-footer">
+      <button type="button" class="preview-btn preview-btn-back invisible"
+              data-create-wizard-target="back"
+              data-action="click->create-wizard#back">← Back</button>
 
-      <div style="display:flex;flex-direction:column;gap:16px;">
+      <span class="preview-progress-text" data-create-wizard-target="counter">Step 1 of 5</span>
 
-        <%
-          fields = [
-            { num: "01", color: "#FF1E6F" },
-            { num: "02", color: "#01EACB" },
-            { num: "03", color: "#0CA7FF" },
-            { num: "04", color: "#615BF5" }
-          ]
-        %>
+      <button type="button" class="preview-btn preview-btn-next"
+              data-create-wizard-target="next"
+              data-action="click->create-wizard#next">Next →</button>
 
-        <%# ── Field 01 · Theme ── %>
-        <% f1 = fields[0] %>
-        <div style="background:rgba(39,45,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px 20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f1[:color] %>;"><%= f1[:num] %></span>
-            <span style="width:6px;height:6px;border-radius:50%;background:<%= f1[:color] %>;flex-shrink:0;"></span>
-            <label style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= f1[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">What's your Verto about? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);letter-spacing:0;">— the single overarching topic</span></label>
-          </div>
-          <%= f.text_field :theme,
-                placeholder: "e.g. Youth wellbeing",
-                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;",
-                onfocus: "this.style.borderColor='#{f1[:color]}80'",
-                onblur:  "this.style.borderColor='rgba(255,255,255,0.1)'" %>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
-            <% ["Climate action", "Refugee education", "Food security"].each do |ex| %>
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);">
-                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
-                <%= ex %>
-              </span>
-            <% end %>
-          </div>
-        </div>
-
-        <%# ── Field 02 · Audience ── %>
-        <% f2 = fields[1] %>
-        <div style="background:rgba(39,45,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px 20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f2[:color] %>;"><%= f2[:num] %></span>
-            <span style="width:6px;height:6px;border-radius:50%;background:<%= f2[:color] %>;flex-shrink:0;"></span>
-            <label style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= f2[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">Who's answering — and what age are they?</label>
-          </div>
-          <%= f.text_field :audience_age,
-                placeholder: "e.g. 18–24 university students in Kenya",
-                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;",
-                onfocus: "this.style.borderColor='#{f2[:color]}80'",
-                onblur:  "this.style.borderColor='rgba(255,255,255,0.1)'" %>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
-            <% ["35–55 frontline community-health workers"].each do |ex| %>
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);">
-                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
-                <%= ex %>
-              </span>
-            <% end %>
-          </div>
-        </div>
-
-        <%# ── Field 03 · Key insight ── %>
-        <% f3 = fields[2] %>
-        <div style="background:rgba(39,45,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px 20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f3[:color] %>;"><%= f3[:num] %></span>
-            <span style="width:6px;height:6px;border-radius:50%;background:<%= f3[:color] %>;flex-shrink:0;"></span>
-            <label style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= f3[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">What do you want to learn from them? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);letter-spacing:0;">— the insight that would change a decision</span></label>
-          </div>
-          <%= f.text_area :key_insight, rows: 3,
-                placeholder: "e.g. Why do volunteers drop off after month three?",
-                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;resize:vertical;box-sizing:border-box;line-height:1.55;",
-                onfocus: "this.style.borderColor='#{f3[:color]}80'",
-                onblur:  "this.style.borderColor='rgba(255,255,255,0.1)'" %>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
-            <% ["What's stopping people from accessing our food bank?", "Does our youth programme actually shift confidence — and where exactly?"].each do |ex| %>
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);">
-                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
-                <%= ex %>
-              </span>
-            <% end %>
-          </div>
-        </div>
-
-        <%# ── Field 04 · Notes ── %>
-        <% f4 = fields[3] %>
-        <div style="background:rgba(39,45,74,0.4);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px 20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f4[:color] %>;"><%= f4[:num] %></span>
-            <span style="width:6px;height:6px;border-radius:50%;background:<%= f4[:color] %>;flex-shrink:0;"></span>
-            <label style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= f4[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">Anything else we should know? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);letter-spacing:0;">— context, tone, must-asks</span></label>
-            <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:<%= f4[:color] %>;letter-spacing:0.14em;text-transform:uppercase;padding:3px 10px;border-radius:100px;background:<%= f4[:color] %>1A;border:1px solid <%= f4[:color] %>40;flex-shrink:0;">Optional</span>
-          </div>
-          <%= f.text_area :notes, rows: 4,
-                placeholder: "e.g. Audience has never used Playverto before, keep tone warm, not corporate.",
-                style: "width:100%;background:#272D4A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;resize:vertical;box-sizing:border-box;line-height:1.55;",
-                onfocus: "this.style.borderColor='#{f4[:color]}80'",
-                onblur:  "this.style.borderColor='rgba(255,255,255,0.1)'" %>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
-            <% ["Must include a question about funding routes and barriers to grants.", "We'll run this during our impact summit, so respondents are bought-in.", "Avoid jargon — many respondents speak English as a second language."].each do |ex| %>
-              <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);">
-                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);letter-spacing:0.05em;text-transform:uppercase;">e.g.</span>
-                <%= ex %>
-              </span>
-            <% end %>
-          </div>
-        </div>
-
-        <div style="margin-top:4px;padding:16px;border-radius:12px;background:#272D4A;border:1px solid rgba(255,255,255,0.1);">
-          <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
-            <%= f.check_box :show_results_comparison,
-                  { checked: false,
-                    style: "margin-top:3px;width:18px;height:18px;accent-color:#01EACB;cursor:pointer;flex-shrink:0;" },
-                  "1", "0" %>
-            <span>
-              <span style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;letter-spacing:0.02em;">
-                Let respondents compare their answers
-              </span>
-              <span style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.5);margin-top:4px;line-height:1.5;">
-                After they finish, show a CTA on the thank-you page that reveals how their answers stack up against everyone else's.
-              </span>
-            </span>
-          </label>
-        </div>
-
-        <%= f.submit "Generate Verto →",
-              style: "margin-top:8px;padding:13px 32px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;border:none;cursor:pointer;transition:background 0.15s;",
-              onmouseover: "this.style.background='#00C4AB'",
-              onmouseout:  "this.style.background='#01EACB'",
-              data: { turbo_submits_with: "Generating…" } %>
-
-      </div>
-    <% end %>
-
+      <%= f.submit "Generate Verto →",
+            class: "preview-btn preview-btn-finish hidden",
+            data: { create_wizard_target: "finish", turbo_submits_with: "Generating…" } %>
     </div>
-  </div>
+
+  <% end %>
 
 </div>

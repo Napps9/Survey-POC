@@ -1824,6 +1824,7 @@
 .preview-btn-return:hover { background: #00C4AB; }
 .preview-btn.hidden     { display: none !important; }
 .preview-btn.invisible  { visibility: hidden; pointer-events: none; }
+.preview-btn[data-disabled="true"] { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
 /* ── Results view ── */
 .result-bar-row   { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
