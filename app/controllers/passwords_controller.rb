@@ -22,16 +22,17 @@ class PasswordsController < ApplicationController
   def update
     if @user.update(params.permit(:password, :password_confirmation))
       @user.sessions.destroy_all
-      redirect_to new_session_path, notice: "Password has been reset."
+      redirect_to new_session_path, notice: "Password has been reset. Sign in with your new password."
     else
-      redirect_to edit_password_path(params[:token]), alert: "Passwords did not match."
+      redirect_to edit_password_path(params[:token]),
+        alert: @user.errors.full_messages.to_sentence.presence || "Passwords did not match."
     end
   end
 
   private
     def set_user_by_token
       @user = User.find_by_password_reset_token!(params[:token])
-    rescue ActiveSupport::MessageVerifier::InvalidSignature
+    rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveRecord::RecordNotFound
       redirect_to new_password_path, alert: "Password reset link is invalid or has expired."
     end
 end
