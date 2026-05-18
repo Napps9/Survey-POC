@@ -67,16 +67,17 @@
       </ul>
 
     <% when "yes_no" %>
-      <ul class="pick-list"
+      <ul class="choice-list"
           data-controller="picker"
           data-picker-mode-value="single">
-        <% %w[Yes No].each do |opt| %>
-          <li class="pick-item"
+        <% [["Yes", 1], ["No", 4]].each do |label, bg| %>
+          <li class="choice-list-item pick-item"
               data-picker-target="item"
               data-action="click->picker#pick"
               data-selected="false">
-            <span class="pick-dot">✓</span>
-            <span class="pick-text" <%= ce_attr %>><%= opt %></span>
+            <div class="choice-list-tile choice-bg-<%= bg %>"></div>
+            <span class="pick-text choice-list-label" <%= ce_attr %>><%= label %></span>
+            <span class="choice-list-tick pick-dot">✓</span>
           </li>
         <% end %>
       </ul>

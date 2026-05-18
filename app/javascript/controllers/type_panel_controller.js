@@ -139,12 +139,15 @@ const ILLUSTRATIONS = {
     </div>`,
 
   yes_no: () => `
-    <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
-      <div style="display:flex;gap:12px;width:100%;">
-        <div style="flex:1;padding:10px;border-radius:12px;background:#01EACB;text-align:center;font-family:'Alata',sans-serif;font-size:13px;color:white;">Yes</div>
-        <div style="flex:1;padding:10px;border-radius:12px;background:rgba(255,255,255,0.08);text-align:center;font-family:'Alata',sans-serif;font-size:13px;color:rgba(255,255,255,0.5);">No</div>
-      </div>
-      <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;text-align:center;">Tap to choose one</div>
+    <div style="width:80%;display:flex;flex-direction:column;gap:6px;">
+      ${[["Yes", ["#d4edda","#a8d5b5"], true], ["No", ["#f8d7da","#f5a8b0"], false]].map(([label,[a,b],sel]) =>
+        `<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;${sel?"background:rgba(1,234,203,0.15);outline:1px solid rgba(1,234,203,0.5);":""}">
+          <div style="width:22px;height:22px;border-radius:6px;flex-shrink:0;background:linear-gradient(135deg,${a},${b});box-shadow:0 1px 3px rgba(0,0,0,0.25);"></div>
+          <span style="flex:1;font-size:12px;font-family:'Alata',sans-serif;${sel?"color:#01EACB":"color:rgba(255,255,255,0.7)"}">${label}</span>
+          ${sel?`<span style="color:#01EACB;font-size:11px;font-weight:700;">✓</span>`:""}
+        </div>`
+      ).join("")}
+      <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;margin-top:4px;text-align:center;">Tap to choose one</div>
     </div>`,
 
   select_one_grid: () => `
@@ -243,11 +246,13 @@ const COMPONENTS = {
   select_many:     (opts) => choiceListHtml(opts, "multi"),
 
   yes_no: () => `
-    <ul class="pick-list" data-controller="picker" data-picker-mode-value="single">
-      ${["Yes","No"].map(o => `
-        <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false">
-          <span class="pick-dot">✓</span>
-          <span class="pick-text" contenteditable="true">${o}</span>
+    <ul class="choice-list" data-controller="picker" data-picker-mode-value="single">
+      ${[["Yes", 1], ["No", 4]].map(([label, bg]) => `
+        <li class="choice-list-item pick-item" data-picker-target="item"
+            data-action="click->picker#pick" data-selected="false">
+          <div class="choice-list-tile choice-bg-${bg}"></div>
+          <span class="pick-text choice-list-label" contenteditable="true">${label}</span>
+          <span class="choice-list-tick pick-dot">✓</span>
         </li>`).join("")}
     </ul>`,
 
