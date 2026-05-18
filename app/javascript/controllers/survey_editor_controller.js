@@ -176,9 +176,14 @@ export default class extends Controller {
   async _doSave() {
     if (!this.hasUrlValue || !this.urlValue) return
     try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
       const res = await fetch(this.urlValue, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": csrfToken
+        },
         body: JSON.stringify(this.serialize())
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)

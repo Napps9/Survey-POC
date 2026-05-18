@@ -2,9 +2,6 @@ class SurveysController < ApplicationController
   include AggregatesSurveyResults
   layout "fullscreen", only: [:show, :new]
 
-  # JSON updates from the inline editor are same-origin fetches without CSRF tokens.
-  protect_from_forgery with: :null_session, only: :update
-
   before_action :require_creator_org!
   before_action :set_survey, only: [:show, :publish, :results, :update_settings]
 
