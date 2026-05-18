@@ -40,16 +40,17 @@
        when "multiple_choice", "select_many" %>
       <% items = Array(card["options"]) %>
       <% multi = (type == "select_many") %>
-      <ul class="pick-list"
+      <ul class="choice-list"
           data-controller="<%= picker_controllers %>"
           data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
-        <% items.each do |opt| %>
-          <li class="pick-item"
+        <% items.each_with_index do |opt, i| %>
+          <li class="choice-list-item pick-item"
               data-picker-target="item"
               data-action="click->picker#pick"
               data-selected="false">
-            <span class="<%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
-            <span class="pick-text" <%= ce_attr %>><%= opt %></span>
+            <div class="choice-list-tile choice-card-bg choice-bg-<%= (i % 6) + 1 %>"></div>
+            <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
+            <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
             <% if editable %>
               <button type="button" class="pick-item-delete"
                       data-action="click->card-editor#deleteOption">×</button>

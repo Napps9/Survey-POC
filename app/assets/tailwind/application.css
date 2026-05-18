@@ -135,6 +135,7 @@
   color: #000;
 }
 .split-right .pick-list,
+.split-right .choice-list,
 .split-right .choice-grid,
 .split-right .slider-wrap,
 .split-right .freeform-wrap,
@@ -456,6 +457,32 @@
   font-weight: 600;
   color: var(--color-green-500);
 }
+
+/* ── Image list (single + multi) ────────────────── */
+.choice-list { display: flex; flex-direction: column; gap: 8px; }
+.choice-list-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 12px 8px 8px;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.choice-list-item:hover { background: rgba(0,0,0,0.025); }
+.choice-list-item[data-selected="true"] {
+  background: rgba(1,234,203,0.06);
+  border-color: var(--color-green-500);
+}
+.choice-list-tile {
+  position: relative;
+  width: 56px; height: 56px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.choice-list-label { flex: 1; }
+.choice-list-tick { margin-left: auto; }
 
 /* ── MCQ grid ───────────────────────────────────── */
 .choice-grid    { display: grid; gap: 10px; }
@@ -1080,6 +1107,10 @@
 .phone-bottom .pick-item { padding: 8px 10px; font-size: 12px; border-radius: 10px; }
 .phone-bottom .pick-dot, .phone-bottom .pick-square { width: 14px; height: 14px; font-size: 9px; }
 .phone-bottom .pick-text { font-size: 12px; }
+
+.phone-bottom .choice-list { gap: 4px; }
+.phone-bottom .choice-list-item { padding: 6px 10px 6px 6px; border-radius: 10px; }
+.phone-bottom .choice-list-tile { width: 40px; height: 40px; border-radius: 8px; }
 
 .phone-bottom .choice-grid { gap: 6px; }
 .phone-bottom .choice-card { height: 64px; border-radius: 10px; }

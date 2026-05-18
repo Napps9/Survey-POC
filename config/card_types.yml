@@ -34,8 +34,8 @@ multiple_choice:
   badge_css:    "sb-range"
   panel_label:  "CHOOSE ONE"
   eyebrow:      "Choose one"
-  picker_name:  "Pick One"
-  picker_desc:  "Single choice from list"
+  picker_name:  "Image List — One"
+  picker_desc:  "Single choice, image left of each option"
   picker_icon:  "◉"
   pickable:     true
 
@@ -44,8 +44,8 @@ select_many:
   badge_css:    "sb-range"
   panel_label:  "CHOOSE ALL THAT APPLY"
   eyebrow:      "Choose all that apply"
-  picker_name:  "Select Many"
-  picker_desc:  "Choose all that apply"
+  picker_name:  "Image List — Many"
+  picker_desc:  "Multi-choice, image left of each option"
   picker_icon:  "☑"
   pickable:     true
 

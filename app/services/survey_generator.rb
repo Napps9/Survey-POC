@@ -115,11 +115,12 @@ class SurveyGenerator
 
     DEFAULT FOR ANY "CHOOSE ONE" QUESTION: use select_one_grid.
     DEFAULT FOR ANY "CHOOSE MANY" QUESTION: use select_many_grid.
-    The visual grid is core to Playverto's gamified feel, so always prefer
-    it over the plain text list. Only fall back to multiple_choice or
-    select_many when ALL of the following are true: option labels are too
-    long to fit a tile (over ~14 characters), or the question genuinely
-    needs more than 10 options. Otherwise, default to the grid.
+    Every single- or multi-pick question is now visual — the plain text
+    button list has been retired. Default to the grid; only fall back to
+    multiple_choice or select_many (which render as an image LIST — a
+    small coloured tile on the left of each row instead of a button) when
+    option labels are too long to fit a tile (over ~14 characters) or the
+    question genuinely needs more than 10 options.
 
     - select_one_grid (Verto "Pick One — image grid"): DEFAULT for single-
       pick questions. 2×2 to 3×3 visual tiles, even option counts up to 10.
@@ -130,13 +131,14 @@ class SurveyGenerator
       multi-pick questions. Same visual tile grid, multi-select. Even option
       counts up to 10. Use this whenever multiple answers can apply and
       options can be represented visually or fit short labels.
-    - multiple_choice (Verto "Pick One — text list"): plain text list,
-      single pick. Use ONLY as a fallback when option labels are too long
-      to fit a grid tile (over ~14 chars), or when the question needs more
-      than 10 options. Up to ~5 options is best. Can include an "Other".
-    - select_many (Verto "Select Many — text list"): plain text list,
-      multi-pick. Use ONLY when select_many_grid won't fit (long labels
-      or more than 10 options).
+    - multiple_choice (Verto "Pick One — image list"): vertical list,
+      single pick, with a small coloured tile on the left of each option.
+      Use as the fallback when labels are too long for a grid tile
+      (over ~14 chars) or the question needs more than 10 options. Up to
+      ~5 options is best. Can include an "Other".
+    - select_many (Verto "Select Many — image list"): same image-list
+      layout, multi-pick. Use ONLY when select_many_grid won't fit (long
+      labels or more than 10 options).
     - tap_card (Verto "Tap"): a sequence of cards, each card is its own
       mini-question with 2–3 quick choices. Best when you want lots of data
       points fast across related concepts (e.g. quick reactions to a series
