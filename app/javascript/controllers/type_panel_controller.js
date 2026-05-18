@@ -498,14 +498,17 @@ export default class extends Controller {
     this.typeOptTargets.forEach(opt => {
       const type  = opt.dataset.type
       const slot  = rankMap.get(type)
+      // The tile lives inside a .type-opt-wrap whose left rail holds the
+      // medal/star emoji — hide/show the wrap so the rail goes with it.
+      const wrap = opt.closest(".type-opt-wrap") || opt
 
-      if (!slot) { opt.style.display = "none"; return }
+      if (!slot) { wrap.style.display = "none"; return }
 
       const { entry, rank } = slot
-      opt.style.display = ""
+      wrap.style.display = ""
       opt.classList.toggle("active", type === cardType)
 
-      const rankEl = opt.querySelector(".type-opt-rank")
+      const rankEl = wrap.querySelector(".type-opt-rank")
       if (rankEl) rankEl.textContent = this.RANK_EMOJI[rank] || ""
 
       opt.querySelector(".type-opt-score")?.remove()

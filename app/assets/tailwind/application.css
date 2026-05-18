@@ -1230,6 +1230,17 @@
   border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;
 }
 
+/* Right column hosts both the answer-type picker and the publish & share
+   panel — only one is visible at a time, toggled by publish-panel controller. */
+.right-column {
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.right-column > .type-panel,
+.right-column > .publish-panel { flex: 1; min-height: 0; }
+.type-panel.hidden,
+.publish-panel.hidden { display: none; }
+
 /* Answer type panel */
 .type-panel {
   border-left: 1px solid rgba(255,255,255,0.07);
@@ -1346,20 +1357,26 @@
   display: flex; flex-direction: column; gap: 6px;
 }
 
-/* Medal/star ribbon shown on each of the top-4 recommended types. */
-.type-opt-rank {
-  position: absolute;
-  top: 6px; left: 6px;
-  font-size: 16px;
-  line-height: 1;
-  padding: 3px 5px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.55);
-  z-index: 2;
-  pointer-events: none;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+/* Each recommended type renders as: [rank rail] [tile]. The rail is a
+   fixed-width column so the four medal/star emoji line up vertically and
+   read as a 1st→4th ranked list down the panel. */
+.type-opt-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
 }
-.type-opt-rank:empty { display: none; }
+.type-opt-wrap .type-opt { flex: 1; min-width: 0; }
+.type-opt-rank {
+  flex-shrink: 0;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.type-opt-rank:empty { visibility: hidden; }
 
 /* "See all question types" modal */
 .all-types-overlay {
@@ -1409,6 +1426,60 @@
 }
 .all-type-opt { cursor: pointer; }
 @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+/* Publish & share panel — drops into the right column in place of the
+   answer-type picker. Reuses .type-panel chrome for visual consistency. */
+.publish-panel-back {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.55);
+  font-family: "ABeeZee", sans-serif;
+  font-size: 12px;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.publish-panel-back:hover { color: #01EACB; }
+
+.publish-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+
+.publish-block {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 12px;
+}
+.publish-block-title {
+  font-family: "Alata", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 8px;
+}
+.publish-block-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  background: transparent;
+  color: rgba(255,255,255,0.85);
+  font-family: "ABeeZee", sans-serif;
+  font-size: 13px;
+  border: 1px solid rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.publish-block-btn:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.04);
+}
 
 /* Toast */
 .toast-bar {

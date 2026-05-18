@@ -14,7 +14,7 @@
 <script id="card-types" type="application/json"><%= CardTypes.to_json.html_safe %></script>
 
 <div class="results-rainbow flex flex-col h-screen"
-     data-controller="type-panel preview-verto survey-editor media-picker"
+     data-controller="type-panel preview-verto survey-editor media-picker publish-panel"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"
      data-survey-editor-description-value="<%= @survey.description %>"
@@ -96,7 +96,8 @@
 
       </div><%# /cards feed %>
 
-      <%# Finalize bar %>
+      <%# Slim editor footer — survey facts on the left, single CTA on the right.
+          All publish/share controls now live in the right-hand publish panel. %>
       <div class="finalize-bar">
         <div style="font-size:13px;color:rgba(255,255,255,0.65);display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
           <span>
@@ -104,110 +105,21 @@
             &nbsp;·&nbsp; Estimated ~<%= est_min %> min<%= est_min != 1 ? "s" : "" %>
             &nbsp;·&nbsp; <span data-survey-editor-target="status" style="font-size:11px;"></span>
           </span>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true,
-                style: "display:inline-flex;align-items:center;gap:8px;margin:0;" do %>
-            <input type="hidden" name="show_results_comparison" value="0" />
-            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.7);">
-              <input type="checkbox" name="show_results_comparison" value="1"
-                     <%= "checked" if @survey.show_results_comparison? %>
-                     onchange="this.form.requestSubmit()"
-                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;" />
-              Show results comparison to respondents
-            </label>
-          <% end %>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <button type="button"
-                  style="padding:10px 22px;border-radius:16px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size:13px;border:1px solid rgba(255,255,255,0.25);cursor:pointer;transition:all 0.15s;"
-                  onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.45)'"
-                  onmouseout="this.style.color='rgba(255,255,255,0.78)';this.style.borderColor='rgba(255,255,255,0.25)'"
-                  data-action="click->preview-verto#open">
-            ▶ Preview Verto
-          </button>
-          <% if @survey.publish_token.present? %>
-            <span style="font-family:'Alata',sans-serif;font-size:12px;color:#01EACB;">✓ Published</span>
-            <input type="text" readonly
-                   id="publish-url-<%= @survey.id %>"
-                   value="<%= play_survey_url(@survey.publish_token) %>"
-                   style="padding:8px 12px;border-radius:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size:11px;width:220px;outline:none;" />
-            <button type="button"
-                    onclick="navigator.clipboard.writeText(document.getElementById('publish-url-<%= @survey.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',2000)})"
-                    style="padding:8px 16px;border-radius:12px;background:transparent;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
-              Copy link
-            </button>
-            <%= link_to "View Results →", survey_results_path(@survey),
-                  style: "padding:10px 22px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size:13px;text-decoration:none;transition:background 0.15s;",
-                  onmouseover: "this.style.background='#00C4AB'",
-                  onmouseout:  "this.style.background='#01EACB'" %>
-          <% else %>
-            <%= button_to "Publish Verto →", publish_survey_path(@survey),
-                  method: :post,
-                  style: "padding:10px 26px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size:13px;border:none;cursor:pointer;transition:background 0.15s;",
-                  form: { style: "display:inline;" },
-                  onmouseover: "this.style.background='#00C4AB'",
-                  onmouseout:  "this.style.background='#01EACB'" %>
-          <% end %>
+                  style="padding:10px 26px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size:13px;border:none;cursor:pointer;transition:background 0.15s;"
+                  onmouseover="this.style.background='#00C4AB'"
+                  onmouseout="this.style.background='#01EACB'"
+                  data-action="click->publish-panel#open">Publish &amp; share →</button>
         </div>
       </div>
 
-      <% if @survey.publish_token.present? && current_organisation&.creator? && current_membership&.admin? %>
-        <% partner_shares    = @survey.survey_shares.includes(alliance: :partner_organisation).order(:created_at) %>
-        <% active_alliances  = current_organisation.alliances.active.includes(:partner_organisation) %>
-        <% shared_ally_ids   = partner_shares.map(&:alliance_id).compact %>
-        <% available_allies  = active_alliances.reject { |a| shared_ally_ids.include?(a.id) } %>
-        <div style="background:#161B2E;border-top:1px solid rgba(255,255,255,0.06);padding:18px 28px;display:flex;flex-direction:column;gap:12px;">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:240px;">
-              <div style="font-family:'Alata',sans-serif;font-size:13px;color:#F7F7F7;letter-spacing:0.04em;">Partner share links</div>
-              <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;">
-                Pick a partner organisation to generate them a unique share link. Responses are attributed to that partner; they'll see their own results plus the aggregate.
-              </div>
-            </div>
-            <% if active_alliances.empty? %>
-              <%= link_to "Invite a partner →", new_alliance_invite_path,
-                    style: "flex-shrink:0;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:12px;padding:8px 16px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;white-space:nowrap;" %>
-            <% elsif available_allies.empty? %>
-              <span style="flex-shrink:0;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">All partners already have a link.</span>
-            <% else %>
-              <%= form_with url: create_survey_share_path(@survey), method: :post,
-                    data: { turbo: false },
-                    style: "display:flex;gap:8px;align-items:center;flex-shrink:0;" do |f| %>
-                <%= f.select :alliance_id,
-                      available_allies.map { |a| [a.partner_organisation.name, a.id] },
-                      { include_blank: "Select partner…" },
-                      style: "background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:7px 10px;color:rgba(255,255,255,0.8);font-family:'ABeeZee',sans-serif;font-size:12px;" %>
-                <%= f.submit "Generate link →",
-                      style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:12px;padding:8px 16px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;" %>
-              <% end %>
-            <% end %>
-          </div>
-          <% if partner_shares.any? %>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <% partner_shares.each do |share| %>
-                <% url = play_survey_url(share.share_token) %>
-                <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;">
-                  <span style="flex-shrink:0;font-family:'Alata',sans-serif;font-size:12px;color:rgba(255,255,255,0.7);min-width:140px;"><%= share.display_name %></span>
-                  <input type="text" readonly value="<%= url %>"
-                         id="share-url-<%= share.id %>"
-                         style="flex:1;background:transparent;border:none;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size:12px;outline:none;" />
-                  <button type="button"
-                          onclick="navigator.clipboard.writeText(document.getElementById('share-url-<%= share.id %>').value).then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
-                          style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size:11px;cursor:pointer;">Copy</button>
-                  <%= button_to "Revoke", survey_share_path(@survey, share), method: :delete,
-                        data: { turbo_confirm: "Revoke this partner link?" },
-                        form: { style: "display:inline;" },
-                        style: "background:none;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.45);font-family:'ABeeZee',sans-serif;font-size:11px;cursor:pointer;" %>
-                </div>
-              <% end %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-
     </div><%# /cards column %>
 
-    <%# ── RIGHT: Answer type panel ── %>
-    <div class="type-panel">
+    <%# ── RIGHT: Answer type panel + Publish panel (toggled) ── %>
+    <div class="right-column">
+    <div class="type-panel" data-publish-panel-target="typeView">
 
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
@@ -228,21 +140,23 @@
 
       <div class="type-list" style="display:none;" data-type-panel-target="typeList">
         <% CardTypes.pickable.each do |key, t| %>
-          <div class="type-opt"
-               data-type="<%= key %>"
-               data-type-panel-target="typeOpt"
-               data-action="click->type-panel#setType">
+          <div class="type-opt-wrap">
             <div class="type-opt-rank"></div>
-            <div class="type-opt-preview">
-              <%= mini_preview_html({ "type" => key, "options" => [] }) %>
-            </div>
-            <div class="type-opt-row">
-              <div class="type-opt-icon"><%= t["picker_icon"] %></div>
-              <div style="flex:1;min-width:0;">
-                <div class="type-opt-name"><%= t["picker_name"] %></div>
-                <div class="type-opt-desc"><%= t["picker_desc"] %></div>
+            <div class="type-opt"
+                 data-type="<%= key %>"
+                 data-type-panel-target="typeOpt"
+                 data-action="click->type-panel#setType">
+              <div class="type-opt-preview">
+                <%= mini_preview_html({ "type" => key, "options" => [] }) %>
               </div>
-              <div class="type-opt-radio"></div>
+              <div class="type-opt-row">
+                <div class="type-opt-icon"><%= t["picker_icon"] %></div>
+                <div style="flex:1;min-width:0;">
+                  <div class="type-opt-name"><%= t["picker_name"] %></div>
+                  <div class="type-opt-desc"><%= t["picker_desc"] %></div>
+                </div>
+                <div class="type-opt-radio"></div>
+              </div>
             </div>
           </div>
         <% end %>
@@ -301,6 +215,126 @@
       </div>
 
     </div><%# /type panel %>
+
+    <%# ── Publish & share panel (toggles in place of the answer-type panel) ── %>
+    <div class="type-panel publish-panel hidden" data-publish-panel-target="publishView">
+
+      <div class="type-panel-top">
+        <button type="button" class="publish-panel-back"
+                data-action="click->publish-panel#close">← Answer type</button>
+        <div style="font-family:'Alata',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;margin-top:8px;">
+          Publish &amp; share
+        </div>
+        <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#fff;line-height:1.3;">
+          Preview, publish and distribute this Verto.
+        </div>
+      </div>
+
+      <div class="publish-panel-body">
+
+        <%# Preview %>
+        <button type="button" class="publish-block-btn"
+                data-action="click->preview-verto#open">▶ Preview Verto</button>
+
+        <%# Publish status / link %>
+        <div class="publish-block">
+          <div class="publish-block-title">Status</div>
+          <% if @survey.publish_token.present? %>
+            <div style="font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;margin-bottom:8px;">✓ Published</div>
+            <input type="text" readonly
+                   id="publish-url-<%= @survey.id %>"
+                   value="<%= play_survey_url(@survey.publish_token) %>"
+                   style="width:100%;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size:11px;outline:none;" />
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button type="button"
+                      onclick="navigator.clipboard.writeText(document.getElementById('publish-url-<%= @survey.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',2000)})"
+                      style="flex:1;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy link</button>
+              <%= link_to "View Results →", survey_results_path(@survey),
+                    style: "flex:1;text-align:center;padding:8px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;" %>
+            </div>
+          <% else %>
+            <div style="font-family:'Alata',sans-serif;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:10px;">Draft — not yet published</div>
+            <%= button_to "Publish Verto →", publish_survey_path(@survey),
+                  method: :post,
+                  style: "width:100%;padding:10px;border-radius:12px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size:13px;border:none;cursor:pointer;",
+                  form: { style: "margin:0;" } %>
+          <% end %>
+        </div>
+
+        <%# Results comparison toggle %>
+        <div class="publish-block">
+          <div class="publish-block-title">Respondent view</div>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true,
+                style: "margin:0;" do %>
+            <input type="hidden" name="show_results_comparison" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="show_results_comparison" value="1"
+                     <%= "checked" if @survey.show_results_comparison? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Show results comparison to respondents after they finish.</span>
+            </label>
+          <% end %>
+        </div>
+
+        <%# Partner share links %>
+        <% if @survey.publish_token.present? && current_organisation&.creator? && current_membership&.admin? %>
+          <% partner_shares    = @survey.survey_shares.includes(alliance: :partner_organisation).order(:created_at) %>
+          <% active_alliances  = current_organisation.alliances.active.includes(:partner_organisation) %>
+          <% shared_ally_ids   = partner_shares.map(&:alliance_id).compact %>
+          <% available_allies  = active_alliances.reject { |a| shared_ally_ids.include?(a.id) } %>
+          <div class="publish-block">
+            <div class="publish-block-title">Partner share links</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:10px;line-height:1.45;">
+              Generate per-partner links. Responses are attributed to that partner; they'll see their own results plus the aggregate.
+            </div>
+            <% if active_alliances.empty? %>
+              <%= link_to "Invite a partner →", new_alliance_invite_path,
+                    style: "display:inline-block;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:10px;padding:7px 14px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:12px;text-decoration:none;" %>
+            <% elsif available_allies.empty? %>
+              <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);">All partners already have a link.</span>
+            <% else %>
+              <%= form_with url: create_survey_share_path(@survey), method: :post,
+                    data: { turbo: false },
+                    style: "display:flex;flex-direction:column;gap:8px;margin:0;" do |f| %>
+                <%= f.select :alliance_id,
+                      available_allies.map { |a| [a.partner_organisation.name, a.id] },
+                      { include_blank: "Select partner…" },
+                      style: "background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px;color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size:12px;" %>
+                <%= f.submit "Generate link →",
+                      style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:10px;padding:8px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:12px;cursor:pointer;" %>
+              <% end %>
+            <% end %>
+            <% if partner_shares.any? %>
+              <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
+                <% partner_shares.each do |share| %>
+                  <% url = play_survey_url(share.share_token) %>
+                  <div style="display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:9px 11px;">
+                    <span style="font-family:'Alata',sans-serif;font-size:12px;color:rgba(255,255,255,0.78);"><%= share.display_name %></span>
+                    <input type="text" readonly value="<%= url %>"
+                           id="share-url-<%= share.id %>"
+                           style="width:100%;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 8px;color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size:11px;outline:none;" />
+                    <div style="display:flex;gap:6px;">
+                      <button type="button"
+                              onclick="navigator.clipboard.writeText(document.getElementById('share-url-<%= share.id %>').value).then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
+                              style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size:11px;cursor:pointer;">Copy</button>
+                      <%= button_to "Revoke", survey_share_path(@survey, share), method: :delete,
+                            data: { turbo_confirm: "Revoke this partner link?" },
+                            form: { style: "display:inline;flex:1;margin:0;" },
+                            style: "width:100%;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.5);font-family:'ABeeZee',sans-serif;font-size:11px;cursor:pointer;" %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+      </div><%# /publish-panel-body %>
+
+    </div><%# /publish panel %>
+
+    </div><%# /right column %>
 
   </div><%# /main grid %>
 
