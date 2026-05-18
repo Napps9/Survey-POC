@@ -27,29 +27,29 @@ function loadTypeMeta() {
 const COMPATIBILITY = {
   multiple_choice: [
     { type: "select_one_grid",  score: 100, note: "The Playverto default for a single-pick — visual grid feels playful, drives engagement, and lets you anchor each option with imagery or colour." },
-    { type: "multiple_choice",  score: 75,  note: "Plain text list — fall back to this only when option labels are long, or you have too many options to fit a tidy grid." },
+    { type: "multiple_choice",  score: 75,  note: "Image list, single pick — small tile left of each option. Fall back to this when labels are long or there are too many options to grid neatly." },
     { type: "select_many_grid", score: 70,  note: "Same visual grid, but lets people pick more than one — switch to this when the answer isn't a single choice." },
-    { type: "select_many",      score: 60,  note: "Text list with multi-pick — broader answer set, but loses the visual fluency of a grid." },
+    { type: "select_many",      score: 60,  note: "Image list, multi-pick — same tile-left layout, broader answer set; use when the grid can't fit." },
     { type: "yes_no",           score: 55,  note: "Collapses nuance to two answers — only do this if you genuinely want a hard yes/no signal." },
     { type: "range",            score: 40,  note: "Loses the categorical clarity of a list — only swap if the answer is really on a scale." },
   ],
   select_many: [
     { type: "select_many_grid", score: 100, note: "The Playverto default for multi-pick — visual grid with imagery or colour swatches gets richer answers than a flat list." },
-    { type: "select_many",      score: 75,  note: "Plain text list with multi-pick — fall back to this only when option labels are long, or you have too many options to grid neatly." },
+    { type: "select_many",      score: 75,  note: "Image list, multi-pick — small tile left of each option. Fall back to this when labels are long or there are too many options to grid neatly." },
     { type: "select_one_grid",  score: 70,  note: "Same visual grid but constrained to a single pick — switch when one decisive answer matters more than breadth." },
-    { type: "multiple_choice",  score: 60,  note: "Text list, single pick — sharpest read but the most reductive option here." },
+    { type: "multiple_choice",  score: 60,  note: "Image list, single pick — same tile-left layout, sharpest read but most reductive option here." },
   ],
   select_one_grid: [
     { type: "select_one_grid",  score: 100, note: "Visual single-pick — best when imagery or colour does the talking and you want a fast, gut response." },
     { type: "select_many_grid", score: 80,  note: "Same imagery, multi-pick — better when more than one option might resonate." },
-    { type: "multiple_choice",  score: 55,  note: "Flatten to a plain text list — only when options are long or you've got too many to fit a grid." },
-    { type: "select_many",      score: 40,  note: "Plain text list with multi-pick — loses the visual cue and the single-pick clarity." },
+    { type: "multiple_choice",  score: 55,  note: "Image list, single pick — small tile left of each option. Switch when options are long or there are too many to fit a grid." },
+    { type: "select_many",      score: 40,  note: "Image list, multi-pick — same tile-left layout, loses the single-pick clarity." },
   ],
   select_many_grid: [
     { type: "select_many_grid", score: 100, note: "Visual multi-pick — best when respondents may identify with several image-led options at once." },
     { type: "select_one_grid",  score: 80,  note: "Same visual feel but constrained to one — pick this if you need a single decisive choice." },
-    { type: "select_many",      score: 55,  note: "Plain text list with multi-pick — only fall back to this when option labels are long or there are too many to grid." },
-    { type: "multiple_choice",  score: 40,  note: "Plain text list, single pick — sharpest read but the most reductive option here." },
+    { type: "select_many",      score: 55,  note: "Image list, multi-pick — small tile left of each option. Fall back when labels are long or there are too many to grid." },
+    { type: "multiple_choice",  score: 40,  note: "Image list, single pick — same tile-left layout, sharpest read but most reductive option here." },
   ],
   tap_card: [
     { type: "tap_card",         score: 100, note: "Quick, gamified gut reactions — perfect for testing several short statements without survey fatigue." },
@@ -115,22 +115,24 @@ const ILLUSTRATIONS = {
     </div>`,
 
   multiple_choice: () => `
-    <div style="width:80%;display:flex;flex-direction:column;gap:4px;">
-      ${[["◉","Option A",true],["○","Option B",false],["○","Option C",false]].map(([dot,label,sel]) =>
-        `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;${sel?"background:rgba(1,234,203,0.15)":""}">
-          <span style="font-size:14px;${sel?"color:#01EACB":"color:rgba(255,255,255,0.6)"}">${dot}</span>
-          <span style="font-size:12px;font-family:'Alata',sans-serif;${sel?"color:#01EACB":"color:rgba(255,255,255,0.6)"}">${label}</span>
+    <div style="width:80%;display:flex;flex-direction:column;gap:6px;">
+      ${[["A",SWIPE_FILLS[0],true],["B",SWIPE_FILLS[1],false],["C",SWIPE_FILLS[2],false]].map(([label,[a,b],sel]) =>
+        `<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;${sel?"background:rgba(1,234,203,0.15);outline:1px solid rgba(1,234,203,0.5);":""}">
+          <div style="width:22px;height:22px;border-radius:6px;flex-shrink:0;background:linear-gradient(135deg,${a},${b});box-shadow:0 1px 3px rgba(0,0,0,0.25);"></div>
+          <span style="flex:1;font-size:12px;font-family:'Alata',sans-serif;${sel?"color:#01EACB":"color:rgba(255,255,255,0.7)"}">Option ${label}</span>
+          ${sel?`<span style="color:#01EACB;font-size:11px;font-weight:700;">✓</span>`:""}
         </div>`
       ).join("")}
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;margin-top:4px;text-align:center;">Tap one option to select</div>
     </div>`,
 
   select_many: () => `
-    <div style="width:80%;display:flex;flex-direction:column;gap:4px;">
-      ${[["☑","Option A",true],["☑","Option B",true],["☐","Option C",false]].map(([dot,label,sel]) =>
-        `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;${sel?"background:rgba(1,234,203,0.12)":""}">
-          <span style="font-size:14px;${sel?"color:#01EACB":"color:rgba(255,255,255,0.6)"}">${dot}</span>
-          <span style="font-size:12px;font-family:'Alata',sans-serif;${sel?"color:#01EACB":"color:rgba(255,255,255,0.6)"}">${label}</span>
+    <div style="width:80%;display:flex;flex-direction:column;gap:6px;">
+      ${[["A",SWIPE_FILLS[0],true],["B",SWIPE_FILLS[1],true],["C",SWIPE_FILLS[2],false]].map(([label,[a,b],sel]) =>
+        `<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;${sel?"background:rgba(1,234,203,0.12);outline:1px solid rgba(1,234,203,0.45);":""}">
+          <div style="width:22px;height:22px;border-radius:6px;flex-shrink:0;background:linear-gradient(135deg,${a},${b});box-shadow:0 1px 3px rgba(0,0,0,0.25);"></div>
+          <span style="flex:1;font-size:12px;font-family:'Alata',sans-serif;${sel?"color:#01EACB":"color:rgba(255,255,255,0.7)"}">Option ${label}</span>
+          ${sel?`<span style="color:#01EACB;font-size:11px;font-weight:700;">✓</span>`:""}
         </div>`
       ).join("")}
       <div style="color:rgba(255,255,255,0.45);font-size:11px;font-family:'ABeeZee',sans-serif;margin-top:4px;text-align:center;">Tap all that apply</div>
@@ -237,31 +239,8 @@ function fitTier(score) {
 
 // HTML builders for the right-side interactive component on each card
 const COMPONENTS = {
-  multiple_choice: (opts) => `
-    <ul class="pick-list" data-controller="picker card-editor" data-picker-mode-value="single">
-      ${opts.map(o => `
-        <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false">
-          <span class="pick-dot">✓</span>
-          <span class="pick-text" contenteditable="true">${esc(o)}</span>
-          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
-        </li>`).join("")}
-      <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
-        <span>＋</span> Add option
-      </li>
-    </ul>`,
-
-  select_many: (opts) => `
-    <ul class="pick-list" data-controller="picker card-editor" data-picker-mode-value="multi">
-      ${opts.map(o => `
-        <li class="pick-item" data-picker-target="item" data-action="click->picker#pick" data-selected="false">
-          <span class="pick-square">✓</span>
-          <span class="pick-text" contenteditable="true">${esc(o)}</span>
-          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
-        </li>`).join("")}
-      <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
-        <span>＋</span> Add option
-      </li>
-    </ul>`,
+  multiple_choice: (opts) => choiceListHtml(opts, "single"),
+  select_many:     (opts) => choiceListHtml(opts, "multi"),
 
   yes_no: () => `
     <ul class="pick-list" data-controller="picker" data-picker-mode-value="single">
@@ -333,6 +312,25 @@ const COMPONENTS = {
     </div>`,
 
   welcome_card: () => "",
+}
+
+function choiceListHtml(opts, mode) {
+  const tick = mode === "multi" ? "pick-square" : "pick-dot"
+  return `
+    <ul class="choice-list" data-controller="picker card-editor"
+        data-picker-mode-value="${mode}">
+      ${opts.map((o, i) => `
+        <li class="choice-list-item pick-item" data-picker-target="item"
+            data-action="click->picker#pick" data-selected="false">
+          <div class="choice-list-tile choice-card-bg choice-bg-${(i % 6) + 1}"></div>
+          <span class="pick-text choice-list-label" contenteditable="true">${esc(o)}</span>
+          <span class="choice-list-tick ${tick}">✓</span>
+          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
+        </li>`).join("")}
+      <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
+        <span>＋</span> Add option
+      </li>
+    </ul>`
 }
 
 function gridHtml(opts, mode) {
