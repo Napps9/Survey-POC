@@ -322,7 +322,7 @@ function choiceListHtml(opts, mode) {
       ${opts.map((o, i) => `
         <li class="choice-list-item pick-item" data-picker-target="item"
             data-action="click->picker#pick" data-selected="false">
-          <div class="choice-list-tile choice-card-bg choice-bg-${(i % 6) + 1}"></div>
+          <div class="choice-list-tile choice-bg-${(i % 6) + 1}"></div>
           <span class="pick-text choice-list-label" contenteditable="true">${esc(o)}</span>
           <span class="choice-list-tick ${tick}">✓</span>
           <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>

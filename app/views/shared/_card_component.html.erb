@@ -48,7 +48,7 @@
               data-picker-target="item"
               data-action="click->picker#pick"
               data-selected="false">
-            <div class="choice-list-tile choice-card-bg choice-bg-<%= (i % 6) + 1 %>"></div>
+            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
             <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
             <% if editable %>
