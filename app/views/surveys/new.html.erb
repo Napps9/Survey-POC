@@ -195,6 +195,7 @@
             <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);letter-spacing:0.08em;padding-bottom:2px;border-bottom:1px solid <%= f4[:color] %>;"><%= f4[:num] %></span>
             <span style="width:6px;height:6px;border-radius:50%;background:<%= f4[:color] %>;flex-shrink:0;"></span>
             <label style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= f4[:color] %>;letter-spacing:0.12em;text-transform:uppercase;">Anything else we should know? <span style="color:rgba(255,255,255,0.45);text-transform:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);letter-spacing:0;">— context, tone, must-asks</span></label>
+            <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:<%= f4[:color] %>;letter-spacing:0.14em;text-transform:uppercase;padding:3px 10px;border-radius:100px;background:<%= f4[:color] %>1A;border:1px solid <%= f4[:color] %>40;flex-shrink:0;">Optional</span>
           </div>
           <%= f.text_area :notes, rows: 4,
                 placeholder: "e.g. Audience has never used Playverto before, keep tone warm, not corporate.",
