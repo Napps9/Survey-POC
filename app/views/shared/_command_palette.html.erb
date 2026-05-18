@@ -20,8 +20,6 @@
      aria-modal="true"
      aria-label="Quick navigation">
   <div class="command-palette">
-    <div class="gen-rainbow-bar"></div>
-
     <div class="command-palette-search">
       <input type="text"
              class="command-palette-input"
@@ -35,20 +33,22 @@
     <div class="command-palette-tiles">
       <a href="<%= root_path %>"
          class="command-palette-tile"
+         style="--tile-accent:#01EACB;"
          data-command-palette-target="item"
-         data-search-text="dashboard home">
+         data-search-text="my vertos dashboard home">
         <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
           <rect x="1" y="1" width="5.5" height="5.5" rx="1.3" fill="currentColor"/>
           <rect x="8.5" y="1" width="5.5" height="5.5" rx="1.3" fill="currentColor"/>
           <rect x="1" y="8.5" width="5.5" height="5.5" rx="1.3" fill="currentColor"/>
           <rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.3" fill="currentColor"/>
         </svg>
-        Dashboard
+        My Vertos
       </a>
 
       <% if show_create %>
         <a href="<%= new_survey_path %>"
            class="command-palette-tile"
+           style="--tile-accent:#FF1E6F;"
            data-command-palette-target="item"
            data-search-text="create new verto survey">
           <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
@@ -62,6 +62,7 @@
       <% if show_partners %>
         <a href="<%= alliances_path %>"
            class="command-palette-tile"
+           style="--tile-accent:#0CA7FF;"
            data-command-palette-target="item"
            data-search-text="partners alliances">
           <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
@@ -74,6 +75,7 @@
       <% elsif show_shared %>
         <a href="<%= alliance_vertos_path %>"
            class="command-palette-tile"
+           style="--tile-accent:#0CA7FF;"
            data-command-palette-target="item"
            data-search-text="shared vertos partners">
           <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
@@ -87,7 +89,10 @@
     <div class="command-palette-scroll">
       <% if recent_surveys.any? %>
         <div class="command-palette-section" data-section="vertos">
-          <div class="command-palette-section-title">Recent Vertos</div>
+          <div class="command-palette-section-title">
+            <span class="command-palette-section-dot" style="background:#01EACB;"></span>
+            Recent Vertos
+          </div>
           <% recent_surveys.each do |s| %>
             <a href="<%= survey_path(s) %>"
                class="command-palette-item"
@@ -108,7 +113,10 @@
 
       <% if show_partners %>
         <div class="command-palette-section" data-section="partners">
-          <div class="command-palette-section-title">Partners</div>
+          <div class="command-palette-section-title">
+            <span class="command-palette-section-dot" style="background:#0CA7FF;"></span>
+            Partners
+          </div>
           <a href="<%= alliances_path %>"
              class="command-palette-item"
              data-command-palette-target="item"
@@ -135,7 +143,10 @@
 
       <% if mem&.admin? && org %>
         <div class="command-palette-section" data-section="people">
-          <div class="command-palette-section-title">People</div>
+          <div class="command-palette-section-title">
+            <span class="command-palette-section-dot" style="background:#FF1E6F;"></span>
+            People
+          </div>
           <a href="<%= new_organisation_invite_path(org) %>"
              class="command-palette-item"
              data-command-palette-target="item"
@@ -175,7 +186,10 @@
       <% end %>
 
       <div class="command-palette-section" data-section="settings">
-        <div class="command-palette-section-title">Settings</div>
+        <div class="command-palette-section-title">
+          <span class="command-palette-section-dot" style="background:#615BF5;"></span>
+          Settings
+        </div>
         <%= button_to session_path, method: :delete,
               class: "command-palette-item",
               data: { "command-palette-target": "item", "search-text": "sign out logout" },
