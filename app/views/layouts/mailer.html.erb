@@ -2,12 +2,13 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-      /* Email styles need to be inline */
-    </style>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title><%= content_for(:title) || "Playverto" %></title>
   </head>
-
-  <body>
+  <body style="margin:0;padding:0;background:#272D4A;-webkit-text-size-adjust:100%;">
     <%= yield %>
   </body>
 </html>

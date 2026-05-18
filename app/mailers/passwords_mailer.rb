@@ -1,6 +1,11 @@
 class PasswordsMailer < ApplicationMailer
   def reset(user)
     @user = user
-    mail subject: "Reset your password", to: user.email_address
+    headers["X-Entity-Ref-ID"] = SecureRandom.uuid
+    mail(
+      to:       user.email_address,
+      subject:  "Reset your Playverto password",
+      reply_to: ENV["MAIL_REPLY_TO"].presence
+    )
   end
 end

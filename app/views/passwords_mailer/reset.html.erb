@@ -1,23 +1,80 @@
-<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1C2034;">
-  <h1 style="font-size:20px;margin:0 0 16px;">Reset your Playverto password</h1>
-  <p style="font-size:14px;line-height:1.55;margin:0 0 20px;">
-    We received a request to reset the password for your Playverto account.
-    Click the button below to choose a new one.
-  </p>
-  <p style="margin:0 0 24px;">
-    <%= link_to "Reset password", edit_password_url(@user.password_reset_token),
-          style: "display:inline-block;background:#01EACB;color:#1C2034;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;" %>
-  </p>
-  <p style="font-size:13px;color:#555;line-height:1.55;margin:0 0 8px;">
-    Or paste this link into your browser:
-  </p>
-  <p style="font-size:13px;word-break:break-all;margin:0 0 24px;">
-    <%= edit_password_url(@user.password_reset_token) %>
-  </p>
-  <p style="font-size:12px;color:#888;margin:0 0 4px;">
-    This link expires in <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>.
-  </p>
-  <p style="font-size:12px;color:#888;margin:0;">
-    If you didn't ask to reset your password, you can safely ignore this email.
-  </p>
-</div>
+<%# Inline styles + table layout for max email-client compatibility (Outlook, Gmail, Apple Mail). %>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#272D4A;margin:0;padding:0;width:100%;">
+  <tr>
+    <td align="center" style="padding:40px 16px;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width:520px;background:#1C2034;border-radius:16px;">
+
+        <%# Branded wordmark — text-based so it renders identically everywhere %>
+        <tr>
+          <td align="center" style="padding:40px 32px 8px;">
+            <span style="font-family:'Alata','Helvetica Neue',Arial,sans-serif;font-size:30px;letter-spacing:1.5px;line-height:1;">
+              <span style="color:#F7F7F7;">play</span><span style="color:#FF1E6F;">verto</span>
+            </span>
+          </td>
+        </tr>
+
+        <%# Title %>
+        <tr>
+          <td align="center" style="padding:24px 32px 12px;">
+            <h1 style="font-family:'Alata','Helvetica Neue',Arial,sans-serif;font-size:22px;color:#F7F7F7;margin:0;font-weight:400;letter-spacing:0.5px;">
+              Reset your password
+            </h1>
+          </td>
+        </tr>
+
+        <%# Body %>
+        <tr>
+          <td align="center" style="padding:0 40px 28px;">
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.6;color:rgba(247,247,247,0.7);margin:0;">
+              Someone (hopefully you) asked to reset the password for your Playverto account.
+              Tap the button below to choose a new one.
+            </p>
+          </td>
+        </tr>
+
+        <%# Primary CTA — aquamarine pill, brand colour for action %>
+        <tr>
+          <td align="center" style="padding:0 32px 32px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+              <tr>
+                <td align="center" bgcolor="#01EACB" style="background:#01EACB;border-radius:10px;">
+                  <%= link_to "Reset my password", edit_password_url(@user.password_reset_token),
+                        style: "display:inline-block;padding:14px 32px;font-family:'Alata','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:0.5px;color:#1C2034;text-decoration:none;font-weight:400;" %>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <%# Fallback URL %>
+        <tr>
+          <td style="padding:0 40px 8px;border-top:1px solid rgba(255,255,255,0.07);">
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.55;color:rgba(247,247,247,0.5);margin:24px 0 8px;">
+              Button not working? Copy and paste this link into your browser:
+            </p>
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.55;margin:0 0 24px;word-break:break-all;">
+              <a href="<%= edit_password_url(@user.password_reset_token) %>" style="color:#01EACB;text-decoration:none;">
+                <%= edit_password_url(@user.password_reset_token) %>
+              </a>
+            </p>
+          </td>
+        </tr>
+
+        <%# Expiry + ignore note %>
+        <tr>
+          <td align="center" style="padding:0 40px 36px;">
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.55;color:rgba(247,247,247,0.4);margin:0;">
+              This link expires in <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>.
+              If you didn't ask to reset your password you can safely ignore this email — nothing will change.
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <%# Outer footer %>
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;color:rgba(247,247,247,0.35);margin:20px 0 0;">
+        Sent by Playverto
+      </p>
+    </td>
+  </tr>
+</table>
