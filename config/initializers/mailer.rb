@@ -26,8 +26,10 @@ if ENV["SMTP_ADDRESS"].present?
 end
 
 # Public host used to build links inside emails (password reset, etc.)
-if ENV["APP_HOST"].present?
-  host  = ENV["APP_HOST"]
+# Render injects RENDER_EXTERNAL_HOSTNAME automatically; APP_HOST wins
+# when a custom domain is attached.
+host = ENV["APP_HOST"].presence || ENV["RENDER_EXTERNAL_HOSTNAME"].presence
+if host
   proto = ENV.fetch("APP_PROTOCOL", "https")
   Rails.application.config.action_mailer.default_url_options = { host: host, protocol: proto }
   Rails.application.routes.default_url_options[:host]        = host
