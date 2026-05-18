@@ -1842,10 +1842,10 @@
    Replaces the left sidebar across admin/creator surfaces.
    ───────────────────────────────────────────────────────── */
 .bottom-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
+  position: fixed; top: 0; left: 0; right: 0;
   height: 56px; z-index: 40;
   background: #161B2E;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 16px;
   font-family: "ABeeZee", sans-serif;
@@ -1902,7 +1902,7 @@
 .bottom-bar-user-caret { opacity: 0.5; flex-shrink: 0; }
 
 .bottom-bar-user-popover {
-  position: absolute; bottom: calc(100% + 8px); right: 0;
+  position: absolute; top: calc(100% + 8px); right: 0;
   min-width: 240px;
   background: #1C2034;
   border: 1px solid rgba(255,255,255,0.08);
@@ -2047,4 +2047,4 @@
 .command-palette-footer img { height: 14px; width: auto; opacity: 0.5; }
 
 /* Pad page content so the bar doesn't sit over it */
-.has-bottom-bar { padding-bottom: 72px; }
+.has-bottom-bar { padding-top: 72px; }
