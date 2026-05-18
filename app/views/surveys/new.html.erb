@@ -94,11 +94,17 @@
         style: "display:flex;flex-direction:column;flex:1;min-height:0;" do |f| %>
 
     <%
-      # Light-theme styles for inputs/chips inside the white card right-panel
-      light_input_style = "width:100%;background:#fafbfc;border:1px solid rgba(0,0,0,0.12);border-radius:12px;padding:12px 16px;color:#000;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;"
+      # Light-theme styles for inputs inside the white card right-panel
+      light_input_style    = "width:100%;background:#fafbfc;border:1px solid rgba(0,0,0,0.12);border-radius:12px;padding:14px 18px;color:#000;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;"
       light_textarea_style = "#{light_input_style};resize:vertical;line-height:1.55;"
-      chip_style = "display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;border:1px solid rgba(0,0,0,0.08);background:rgba(0,0,0,0.025);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);"
-      chip_eg_style = "font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(0,0,0,0.35);letter-spacing:0.05em;text-transform:uppercase;"
+
+      # Dark-theme styles for the instructions/examples left panel
+      left_pad_style  = "position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:80px 36px 48px;gap:18px;text-align:left;"
+      eyebrow_style   = "font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.16em;text-transform:uppercase;font-weight:700;"
+      instr_lead      = "font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;line-height:1.3;letter-spacing:-0.01em;"
+      instr_body      = "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);line-height:1.55;"
+      ex_label_style  = "font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.14em;text-transform:uppercase;font-weight:700;"
+      ex_item_style   = "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.78);padding:9px 14px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);line-height:1.4;"
     %>
 
     <%# Card stage %>
@@ -107,11 +113,31 @@
       <%# ── Card 1 · Welcome ── %>
       <section class="preview-card active" data-create-wizard-target="card">
         <div class="split-card">
-          <%= render "shared/split_left", card: { "type" => "welcome_card" }, progress: 5 %>
-          <div class="split-right" style="text-align:left;justify-content:center;gap:12px;">
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
+            <div class="panel-tagline">Build the change</div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#01EACB;">What's coming up</div>
+              <div style="<%= instr_lead %>">Four quick questions and we'll draft your Verto.</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+                <% [
+                     ["01", "About your Verto",       "#FF1E6F"],
+                     ["02", "Who's answering",         "#01EACB"],
+                     ["03", "What you want to learn",  "#0CA7FF"],
+                     ["04", "Context (optional)",      "#615BF5"],
+                   ].each do |num, label, accent| %>
+                  <div style="display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= accent %>;letter-spacing:0.08em;font-weight:700;"><%= num %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.75);"><%= label %></span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
             <div class="q-eyebrow" style="color:#01EACB;">New Verto</div>
             <div style="font-family:'Alata',sans-serif;font-size:30px;line-height:1.15;color:#1C2034;">Let's build your Verto.</div>
-            <p class="q-subtitle" style="margin:0;">Answer the four questions ahead — we'll turn your brief into a Verto that follows the Playverto rules.</p>
+            <p class="q-subtitle" style="margin:0;">We'll turn your brief into a Verto that follows the Playverto rules.</p>
             <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.4);margin:0;">Press <strong style="color:rgba(0,0,0,0.6);">Next</strong> when you're ready.</p>
           </div>
         </div>
@@ -120,11 +146,25 @@
       <%# ── Card 2 · Q01 Theme ── %>
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
-          <%= render "shared/split_left", card: { "type" => "multiple_choice" }, progress: 25 %>
-          <div class="split-right" style="text-align:left;justify-content:center;gap:14px;">
-            <div class="q-eyebrow" style="color:#FF1E6F;">Step 01 · About your Verto</div>
-            <div class="q-title">What's your Verto about?</div>
-            <p class="q-subtitle" style="margin:0;">The single overarching topic.</p>
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:25%;"></div></div>
+            <div class="panel-tagline">Build the change</div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#FF1E6F;">Step 01 · About your Verto</div>
+              <div style="<%= instr_lead %>">The single overarching topic.</div>
+              <div style="<%= instr_body %>">Keep it broad — you'll narrow the angle in the next steps. One or two words is usually plenty.</div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+                <div style="<%= ex_label_style %>">Examples</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <% [ "Climate action", "Refugee education", "Food security" ].each do |ex| %>
+                    <div style="<%= ex_item_style %>"><%= ex %></div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
+            <div class="q-title" style="font-size:28px;line-height:1.2;">What's your Verto about?</div>
             <%= f.text_field :theme,
                   required: true,
                   data: { required: "true" },
@@ -132,14 +172,6 @@
                   style: light_input_style,
                   onfocus: "this.style.borderColor='#FF1E6F'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-              <% ["Climate action", "Refugee education", "Food security"].each do |ex| %>
-                <span style="<%= chip_style %>">
-                  <span style="<%= chip_eg_style %>">e.g.</span>
-                  <%= ex %>
-                </span>
-              <% end %>
-            </div>
           </div>
         </div>
       </section>
@@ -147,11 +179,29 @@
       <%# ── Card 3 · Q02 Audience ── %>
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
-          <%= render "shared/split_left", card: { "type" => "select_one_grid" }, progress: 50 %>
-          <div class="split-right" style="text-align:left;justify-content:center;gap:14px;">
-            <div class="q-eyebrow" style="color:#01EACB;">Step 02 · Who's answering</div>
-            <div class="q-title">Who's answering — and what age are they?</div>
-            <p class="q-subtitle" style="margin:0;">Be specific. Lifestyle, role, region all help.</p>
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:50%;"></div></div>
+            <div class="panel-tagline">Build the change</div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#01EACB;">Step 02 · Who's answering</div>
+              <div style="<%= instr_lead %>">Be specific.</div>
+              <div style="<%= instr_body %>">Lifestyle, role, region, language — anything that shapes how this group thinks. The more concrete, the better the questions we can write.</div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+                <div style="<%= ex_label_style %>">Examples</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <% [
+                       "18–24 university students in Kenya",
+                       "35–55 frontline community-health workers",
+                       "Parents of school-age kids in rural NSW",
+                     ].each do |ex| %>
+                    <div style="<%= ex_item_style %>"><%= ex %></div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
+            <div class="q-title" style="font-size:28px;line-height:1.2;">Who's answering — and what age are they?</div>
             <%= f.text_field :audience_age,
                   required: true,
                   data: { required: "true" },
@@ -159,12 +209,6 @@
                   style: light_input_style,
                   onfocus: "this.style.borderColor='#01EACB'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-              <span style="<%= chip_style %>">
-                <span style="<%= chip_eg_style %>">e.g.</span>
-                35–55 frontline community-health workers
-              </span>
-            </div>
           </div>
         </div>
       </section>
@@ -172,26 +216,36 @@
       <%# ── Card 4 · Q03 Key insight ── %>
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
-          <%= render "shared/split_left", card: { "type" => "open_ended" }, progress: 75 %>
-          <div class="split-right" style="text-align:left;justify-content:center;gap:14px;">
-            <div class="q-eyebrow" style="color:#0CA7FF;">Step 03 · The learning goal</div>
-            <div class="q-title">What do you want to learn from them?</div>
-            <p class="q-subtitle" style="margin:0;">The insight that would change a decision.</p>
-            <%= f.text_area :key_insight, rows: 3,
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:75%;"></div></div>
+            <div class="panel-tagline">Build the change</div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#0CA7FF;">Step 03 · The learning goal</div>
+              <div style="<%= instr_lead %>">The insight that would change a decision.</div>
+              <div style="<%= instr_body %>">Skip the things you already know. Aim for the one thing that, if you learned it, would shift what you do next.</div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+                <div style="<%= ex_label_style %>">Examples</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <% [
+                       "Why do volunteers drop off after month three?",
+                       "What's stopping people from accessing our food bank?",
+                       "Does our youth programme actually shift confidence — and where exactly?",
+                     ].each do |ex| %>
+                    <div style="<%= ex_item_style %>"><%= ex %></div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
+            <div class="q-title" style="font-size:28px;line-height:1.2;">What do you want to learn from them?</div>
+            <%= f.text_area :key_insight, rows: 4,
                   required: true,
                   data: { required: "true" },
                   placeholder: "e.g. Why do volunteers drop off after month three?",
                   style: light_textarea_style,
                   onfocus: "this.style.borderColor='#0CA7FF'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-              <% ["What's stopping people from accessing our food bank?", "Does our youth programme actually shift confidence — and where exactly?"].each do |ex| %>
-                <span style="<%= chip_style %>">
-                  <span style="<%= chip_eg_style %>">e.g.</span>
-                  <%= ex %>
-                </span>
-              <% end %>
-            </div>
           </div>
         </div>
       </section>
@@ -199,28 +253,38 @@
       <%# ── Card 5 · Q04 Notes (optional) ── %>
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
-          <%= render "shared/split_left", card: { "type" => "tap_card" }, progress: 100 %>
-          <div class="split-right" style="text-align:left;justify-content:center;gap:12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-              <div class="q-eyebrow" style="color:#615BF5;">Step 04 · Context</div>
-              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#615BF5;letter-spacing:0.14em;text-transform:uppercase;padding:3px 10px;border-radius:100px;background:rgba(97,91,245,0.1);border:1px solid rgba(97,91,245,0.25);">Optional</span>
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:100%;"></div></div>
+            <div class="panel-tagline">Build the change</div>
+            <div style="<%= left_pad_style %>">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="<%= eyebrow_style %>color:#615BF5;">Step 04 · Context</div>
+                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#615BF5;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(97,91,245,0.14);border:1px solid rgba(97,91,245,0.3);">Optional</span>
+              </div>
+              <div style="<%= instr_lead %>">Anything else we should bake in?</div>
+              <div style="<%= instr_body %>">Tone, must-asks, things to avoid, audience quirks. Skip if there's nothing extra.</div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+                <div style="<%= ex_label_style %>">Examples</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <% [
+                       "Must include a question about funding routes and barriers to grants.",
+                       "Avoid jargon — many respondents speak English as a second language.",
+                       "Keep tone warm, not corporate.",
+                     ].each do |ex| %>
+                    <div style="<%= ex_item_style %>"><%= ex %></div>
+                  <% end %>
+                </div>
+              </div>
             </div>
-            <div class="q-title">Anything else we should know?</div>
-            <p class="q-subtitle" style="margin:0;">Context, tone, must-asks.</p>
-            <%= f.text_area :notes, rows: 3,
+          </div>
+          <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
+            <div class="q-title" style="font-size:28px;line-height:1.2;">Anything else we should know?</div>
+            <%= f.text_area :notes, rows: 4,
                   placeholder: "e.g. Audience has never used Playverto before, keep tone warm, not corporate.",
                   style: light_textarea_style,
                   onfocus: "this.style.borderColor='#615BF5'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-              <% ["Must include a question about funding routes and barriers to grants.", "Avoid jargon — many respondents speak English as a second language."].each do |ex| %>
-                <span style="<%= chip_style %>">
-                  <span style="<%= chip_eg_style %>">e.g.</span>
-                  <%= ex %>
-                </span>
-              <% end %>
-            </div>
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-top:4px;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);">
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-top:4px;padding:12px 14px;border-radius:12px;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);">
               <%= f.check_box :show_results_comparison,
                     { checked: false,
                       style: "margin-top:2px;width:16px;height:16px;accent-color:#01EACB;cursor:pointer;flex-shrink:0;" },
