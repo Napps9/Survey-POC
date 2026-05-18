@@ -1,6 +1,23 @@
-<p>
-  You can reset your password on
-  <%= link_to "this password reset page", edit_password_url(@user.password_reset_token) %>.
-
-  This link will expire in <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>.
-</p>
+<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1C2034;">
+  <h1 style="font-size:20px;margin:0 0 16px;">Reset your Playverto password</h1>
+  <p style="font-size:14px;line-height:1.55;margin:0 0 20px;">
+    We received a request to reset the password for your Playverto account.
+    Click the button below to choose a new one.
+  </p>
+  <p style="margin:0 0 24px;">
+    <%= link_to "Reset password", edit_password_url(@user.password_reset_token),
+          style: "display:inline-block;background:#01EACB;color:#1C2034;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;" %>
+  </p>
+  <p style="font-size:13px;color:#555;line-height:1.55;margin:0 0 8px;">
+    Or paste this link into your browser:
+  </p>
+  <p style="font-size:13px;word-break:break-all;margin:0 0 24px;">
+    <%= edit_password_url(@user.password_reset_token) %>
+  </p>
+  <p style="font-size:12px;color:#888;margin:0 0 4px;">
+    This link expires in <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>.
+  </p>
+  <p style="font-size:12px;color:#888;margin:0;">
+    If you didn't ask to reset your password, you can safely ignore this email.
+  </p>
+</div>

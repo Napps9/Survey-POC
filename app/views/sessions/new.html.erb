@@ -29,13 +29,24 @@
               class: "form-input" %>
       </div>
 
-      <div style="margin-bottom:32px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Password</label>
-        <%= form.password_field :password,
-              required: true, autocomplete: "current-password",
-              placeholder: "••••••••", maxlength: 72,
-              class: "form-input" %>
+      <div style="margin-bottom:12px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">
+          <label style="font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);text-transform:uppercase;">Password</label>
+          <%= link_to "Forgot password?", new_password_path, class: "auth-link", style: "font-size:12px;" %>
+        </div>
+        <div class="password-field" data-controller="password-visibility">
+          <%= form.password_field :password,
+                required: true, autocomplete: "current-password",
+                placeholder: "••••••••", maxlength: 72,
+                class: "form-input",
+                data: { password_visibility_target: "input" } %>
+          <button type="button" class="password-field__toggle"
+                  data-action="password-visibility#toggle"
+                  data-password-visibility-target="button">Show</button>
+        </div>
       </div>
+
+      <div style="margin-bottom:32px;"></div>
 
       <%= form.submit "Sign in →",
             style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.05em;cursor:pointer;" %>

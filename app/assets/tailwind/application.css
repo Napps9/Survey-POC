@@ -958,6 +958,40 @@
 }
 .form-input:focus { border-color: rgba(1,234,203,0.45); }
 
+/* Wrap a .form-input together with the show/hide toggle button. */
+.password-field {
+  position: relative;
+}
+.password-field .form-input {
+  padding-right: 64px;
+}
+.password-field__toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  padding: 4px 8px;
+  font-family: "Alata", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(247,247,247,0.6);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.password-field__toggle:hover  { color: #01EACB; }
+.password-field__toggle:focus  { outline: 1px solid rgba(1,234,203,0.45); }
+
+.auth-link {
+  font-family: "ABeeZee", sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+}
+.auth-link:hover { color: #01EACB; }
+
 .alert-error,
 .alert-success {
   border-radius: 8px;

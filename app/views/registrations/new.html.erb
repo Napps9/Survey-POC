@@ -48,18 +48,30 @@
 
       <div style="margin-bottom:18px;">
         <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Password</label>
-        <%= f.password_field :password,
-              required: true, autocomplete: "new-password",
-              placeholder: "At least 12 characters", maxlength: 72, minlength: 12,
-              class: "form-input" %>
+        <div class="password-field" data-controller="password-visibility">
+          <%= f.password_field :password,
+                required: true, autocomplete: "new-password",
+                placeholder: "At least 12 characters", maxlength: 72, minlength: 12,
+                class: "form-input",
+                data: { password_visibility_target: "input" } %>
+          <button type="button" class="password-field__toggle"
+                  data-action="password-visibility#toggle"
+                  data-password-visibility-target="button">Show</button>
+        </div>
       </div>
 
       <div style="margin-bottom:32px;">
         <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Confirm password</label>
-        <%= f.password_field :password_confirmation,
-              required: true, autocomplete: "new-password",
-              placeholder: "••••••••••••", maxlength: 72,
-              class: "form-input" %>
+        <div class="password-field" data-controller="password-visibility">
+          <%= f.password_field :password_confirmation,
+                required: true, autocomplete: "new-password",
+                placeholder: "••••••••••••", maxlength: 72,
+                class: "form-input",
+                data: { password_visibility_target: "input" } %>
+          <button type="button" class="password-field__toggle"
+                  data-action="password-visibility#toggle"
+                  data-password-visibility-target="button">Show</button>
+        </div>
       </div>
 
       <%= f.submit "Create account →",
