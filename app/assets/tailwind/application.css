@@ -2159,106 +2159,108 @@
     overflow: hidden;
   }
 
-  /* No-image cards: small illustration above the title, no dark hero strip */
-  .preview-overlay .split-card .split-left {
+  /* Player split-card: white background everywhere — matches desktop's
+     right pane. Dark navy is reserved for the nav and footer chrome. */
+  .preview-overlay .split-card {
+    flex-direction: column;
     width: 100%;
-    flex: 0 0 auto;
+    max-width: 100%;
     height: auto;
-    min-height: 0;
-    max-height: none;
-    background: transparent;
-    padding: 20px 20px 0;
-    justify-content: flex-start;
-    align-items: center;
-  }
-  .preview-overlay .split-card .panel-progress,
-  .preview-overlay .split-card .panel-tagline { display: none; }
-  .preview-overlay .split-card .split-left-illustration {
-    flex: 0 0 auto;
-    width: 96px; height: 96px;
+    min-height: 100%;
     margin: 0;
-    padding: 0;
+    background: #fff;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
   }
+
+  /* No-image cards: hide the .split-left entirely so the white card
+     sits flush under the magenta progress bar. */
+  .preview-overlay .split-card .split-left { display: none; }
 
   /* Image cards: full-width hero strip with rounded bottom corners */
   .preview-overlay .split-card:has(.split-left-img) .split-left {
+    display: block;
     position: relative;
+    width: 100%;
+    flex: 0 0 auto;
     height: 36vh;
     min-height: 220px;
     max-height: 40vh;
     padding: 0;
     border-radius: 0 0 18px 18px;
     overflow: hidden;
+    background: #2E3564;
   }
+  .preview-overlay .split-card:has(.split-left-img) .panel-progress,
+  .preview-overlay .split-card:has(.split-left-img) .panel-tagline,
   .preview-overlay .split-card:has(.split-left-img) .split-left-illustration { display: none; }
   .preview-overlay .split-card:has(.split-left-img) .split-left-img,
   .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
     border-radius: 0 0 18px 18px;
   }
 
-  /* Player right pane: dark navy stack, white text — leave room for the
-     fixed footer so content doesn't sit behind it */
+  /* Player right pane on white — matches desktop colours */
   .preview-overlay .split-card .split-right {
     width: 100%;
     flex: 1 1 auto;
-    padding: 22px 22px calc(96px + env(safe-area-inset-bottom));
-    background: transparent;
-    color: #fff;
+    padding: 30px 24px calc(96px + env(safe-area-inset-bottom));
+    background: #fff;
+    color: #1C2034;
     text-align: center;
     justify-content: flex-start;
     gap: 14px;
   }
-  .preview-overlay .q-eyebrow  { color: #01EACB; font-size: 12px; letter-spacing: 0.14em; }
-  .preview-overlay .q-title    { color: #fff; font-size: 24px; line-height: 1.25; }
-  .preview-overlay .q-subtitle { color: rgba(255,255,255,0.6); font-size: 14px; }
+  .preview-overlay .q-eyebrow {
+    color: #FF1E6F;
+    font-family: "Alata", sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .preview-overlay .q-title {
+    color: #1C2034;
+    font-family: "Alata", sans-serif;
+    font-size: 26px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+  }
+  .preview-overlay .q-subtitle {
+    color: rgba(28,32,52,0.55);
+    font-family: "ABeeZee", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
 
-  /* On dark navy, picker rows need a light contrast background */
+  /* Picker rows on the white card — light gray pills with magenta accent */
   .preview-overlay .choice-list,
   .preview-overlay .pick-list { gap: 10px; }
   .preview-overlay .choice-list-item,
   .preview-overlay .pick-item {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.06);
     border-radius: 14px;
-    color: #fff;
+    color: #1C2034;
   }
   .preview-overlay .choice-list-label,
-  .preview-overlay .pick-text { color: #fff; }
+  .preview-overlay .pick-text { color: #1C2034; }
   .preview-overlay .pick-item[data-selected="true"],
   .preview-overlay .choice-list-item[data-selected="true"] {
-    background: rgba(1,234,203,0.12);
-    border-color: rgba(1,234,203,0.6);
+    background: rgba(255,30,111,0.08);
+    border-color: #FF1E6F;
   }
   .preview-overlay .freeform-textarea {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #fff;
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.08);
+    color: #1C2034;
+    border-radius: 14px;
   }
-  .preview-overlay .freeform-textarea::placeholder { color: rgba(255,255,255,0.35); }
-  .preview-overlay .freeform-counter { color: rgba(255,255,255,0.4); }
+  .preview-overlay .freeform-textarea::placeholder { color: rgba(0,0,0,0.35); }
+  .preview-overlay .freeform-counter { color: rgba(0,0,0,0.4); }
 
-  /* Choice-grid cards: white background, 2-col image tiles */
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .split-card,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .split-card {
-    background: #fff;
-  }
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .split-right,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .split-right {
-    background: #fff;
-    color: #1C2034;
-  }
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .q-eyebrow,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .q-eyebrow {
-    color: #FF1E6F;
-  }
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .q-title,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .q-title {
-    color: #1C2034;
-  }
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .q-subtitle,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .q-subtitle {
-    color: rgba(0,0,0,0.55);
-  }
+  /* Choice-grid cards: 2-col image tiles, same white card */
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(2, 1fr);
