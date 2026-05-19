@@ -50,6 +50,7 @@ export default class extends Controller {
     const total = this.cardTargets.length
     const idx   = this.currentValue
     this.cardTargets.forEach((c, i) => c.classList.toggle("active", i === idx))
+    this.element.style.setProperty("--wizard-progress", `${Math.round(((idx + 1) / total) * 100)}%`)
 
     if (this.hasCounterTarget) {
       this.counterTarget.textContent = `Step ${idx + 1} of ${total}`

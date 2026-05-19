@@ -164,6 +164,7 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FF1E6F;">Step 01 · About your Verto</div>
             <div class="q-title" style="font-size:28px;line-height:1.2;">What's your Verto about?</div>
             <%= f.text_field :theme,
                   required: true,
@@ -172,6 +173,10 @@
                   style: light_input_style,
                   onfocus: "this.style.borderColor='#FF1E6F'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+            <div class="wizard-mobile-hint">
+              <p class="wizard-mobile-hint-lead">The single overarching topic.</p>
+              <p class="wizard-mobile-hint-body">Keep it broad — you'll narrow the angle in the next steps.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -201,6 +206,7 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#01EACB;">Step 02 · Who's answering</div>
             <div class="q-title" style="font-size:28px;line-height:1.2;">Who's answering — and what age are they?</div>
             <%= f.text_field :audience_age,
                   required: true,
@@ -209,6 +215,10 @@
                   style: light_input_style,
                   onfocus: "this.style.borderColor='#01EACB'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+            <div class="wizard-mobile-hint">
+              <p class="wizard-mobile-hint-lead">Be specific.</p>
+              <p class="wizard-mobile-hint-body">Lifestyle, role, region, language — anything that shapes how this group thinks.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -238,6 +248,7 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#0CA7FF;">Step 03 · The learning goal</div>
             <div class="q-title" style="font-size:28px;line-height:1.2;">What do you want to learn from them?</div>
             <%= f.text_area :key_insight, rows: 4,
                   required: true,
@@ -246,6 +257,10 @@
                   style: light_textarea_style,
                   onfocus: "this.style.borderColor='#0CA7FF'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+            <div class="wizard-mobile-hint">
+              <p class="wizard-mobile-hint-lead">The insight that would change a decision.</p>
+              <p class="wizard-mobile-hint-body">Skip what you already know — aim for the one thing that would shift what you do next.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -278,12 +293,17 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#615BF5;">Step 04 · Context · Optional</div>
             <div class="q-title" style="font-size:28px;line-height:1.2;">Anything else we should know?</div>
             <%= f.text_area :notes, rows: 4,
                   placeholder: "e.g. Audience has never used Playverto before, keep tone warm, not corporate.",
                   style: light_textarea_style,
                   onfocus: "this.style.borderColor='#615BF5'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+            <div class="wizard-mobile-hint">
+              <p class="wizard-mobile-hint-lead">Anything else we should bake in?</p>
+              <p class="wizard-mobile-hint-body">Tone, must-asks, things to avoid, audience quirks. Skip if there's nothing extra.</p>
+            </div>
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-top:4px;padding:12px 14px;border-radius:12px;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);">
               <%= f.check_box :show_results_comparison,
                     { checked: false,

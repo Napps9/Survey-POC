@@ -2077,14 +2077,385 @@
 /* ═══════════════════════════════════════════════════════════════════════
    RESPONSIVE — phones (≤767px).
 
-   Strategy: same design language as desktop, just stacked and sized down
-   where 850px physically can't fit. No mobile-only UI patterns. Modals
-   stay centred. Buttons keep their labels. The 3-button player footer
-   stays intact. Typography, colours, illustrations all preserved.
+   Mobile layout follows the lego.playverto.com pattern:
+     • Thin progress bar flush to the top
+     • Optional full-width hero image with rounded bottom corners
+     • Dark navy content area: coloured eyebrow → white title → subtitle
+       → answer widget
+     • Choice-grid cards flip to a white background with 2-col image tiles
+     • Sticky two-button bottom bar (Back + Next)
+   Desktop layout above is unchanged.
    ═══════════════════════════════════════════════════════════════════════ */
+
+/* Wizard mobile hint blocks (hidden on desktop) */
+.wizard-mobile-hint     { display: none; }
+.wizard-mobile-eyebrow  { display: none; }
+
 @media (max-width: 767px) {
 
-  /* ── .split-card consumers: stack the two panes; height from content ── */
+  /* ── Universal touch + form ergonomics ── */
+  textarea,
+  input[type="text"],
+  input[type="email"],
+  input[type="number"] { font-size: 16px; }
+  .pick-item, .choice-card, .rotate-action-btn { min-height: 44px; }
+  .pick-item { padding: 12px 14px; }
+  .rating-star { font-size: 36px; padding: 4px; }
+  .rating-stars { gap: 6px; }
+  .slider-track { width: 100%; }
+  .slider-thumb { width: 56px; height: 56px; }
+
+  /* ═════════════════════════════════════════════════════════════════
+     PLAYER (`/play/:token`) — lego.playverto.com mobile pattern
+     ═════════════════════════════════════════════════════════════════ */
+
+  /* iOS Safari toolbar fix */
+  .preview-overlay { height: 100dvh; }
+
+  /* Thin top progress bar driven by player_controller.js#_update */
+  .preview-overlay::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    height: 3px;
+    width: var(--player-progress, 0%);
+    background: #FF1E6F;
+    transition: width 0.3s ease;
+    z-index: 70;
+  }
+
+  .preview-nav {
+    padding: 0 14px;
+    height: 44px;
+    border-bottom: none;
+    background: #1C2034;
+  }
+  .preview-nav-title {
+    font-size: 11px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 50vw;
+  }
+
+  .preview-body {
+    padding: 0;
+    align-items: stretch;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: #1C2034;
+  }
+  .preview-card { width: 100%; max-width: 100%; }
+
+  /* Player split-card: dark navy column on mobile */
+  .preview-overlay .split-card {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 100%;
+    margin: 0;
+    background: #1C2034;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: hidden;
+  }
+
+  /* No-image cards: small illustration above the title, no dark hero strip */
+  .preview-overlay .split-card .split-left {
+    width: 100%;
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    background: transparent;
+    padding: 20px 20px 0;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .preview-overlay .split-card .panel-progress,
+  .preview-overlay .split-card .panel-tagline { display: none; }
+  .preview-overlay .split-card .split-left-illustration {
+    flex: 0 0 auto;
+    width: 96px; height: 96px;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Image cards: full-width hero strip with rounded bottom corners */
+  .preview-overlay .split-card:has(.split-left-img) .split-left {
+    position: relative;
+    height: 36vh;
+    min-height: 220px;
+    max-height: 40vh;
+    padding: 0;
+    border-radius: 0 0 18px 18px;
+    overflow: hidden;
+  }
+  .preview-overlay .split-card:has(.split-left-img) .split-left-illustration { display: none; }
+  .preview-overlay .split-card:has(.split-left-img) .split-left-img,
+  .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
+    border-radius: 0 0 18px 18px;
+  }
+
+  /* Player right pane: dark navy stack, white text */
+  .preview-overlay .split-card .split-right {
+    width: 100%;
+    flex: 1 1 auto;
+    padding: 22px 22px 24px;
+    background: transparent;
+    color: #fff;
+    text-align: center;
+    justify-content: flex-start;
+    gap: 14px;
+  }
+  .preview-overlay .q-eyebrow  { color: #01EACB; font-size: 12px; letter-spacing: 0.14em; }
+  .preview-overlay .q-title    { color: #fff; font-size: 24px; line-height: 1.25; }
+  .preview-overlay .q-subtitle { color: rgba(255,255,255,0.6); font-size: 14px; }
+
+  /* On dark navy, picker rows need a light contrast background */
+  .preview-overlay .choice-list,
+  .preview-overlay .pick-list { gap: 10px; }
+  .preview-overlay .choice-list-item,
+  .preview-overlay .pick-item {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    color: #fff;
+  }
+  .preview-overlay .choice-list-label,
+  .preview-overlay .pick-text { color: #fff; }
+  .preview-overlay .pick-item[data-selected="true"],
+  .preview-overlay .choice-list-item[data-selected="true"] {
+    background: rgba(1,234,203,0.12);
+    border-color: rgba(1,234,203,0.6);
+  }
+  .preview-overlay .freeform-textarea {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #fff;
+  }
+  .preview-overlay .freeform-textarea::placeholder { color: rgba(255,255,255,0.35); }
+  .preview-overlay .freeform-counter { color: rgba(255,255,255,0.4); }
+
+  /* Choice-grid cards: white background, 2-col image tiles */
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .split-card,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .split-card {
+    background: #fff;
+  }
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .split-right,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .split-right {
+    background: #fff;
+    color: #1C2034;
+  }
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .q-eyebrow,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .q-eyebrow {
+    color: #FF1E6F;
+  }
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .q-title,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .q-title {
+    color: #1C2034;
+  }
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .q-subtitle,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .q-subtitle {
+    color: rgba(0,0,0,0.55);
+  }
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-card,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card {
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    border: 3px solid transparent;
+  }
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-card[data-selected="true"],
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card[data-selected="true"] {
+    border-color: #FF1E6F;
+  }
+  /* Default grid (non-image-tile contexts) still collapses 3→2 for readability */
+  .choice-grid-3  { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .choice-grid-3 .choice-card { height: 76px; }
+  .choice-label   { font-size: 12px; padding: 4px 6px; }
+
+  /* Sticky two-button bottom bar (Back + Next), full-width pills */
+  .preview-overlay .preview-footer {
+    height: auto;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    gap: 12px;
+    background: #1C2034;
+    border-top: none;
+  }
+  .preview-overlay .preview-progress-text { display: none; }
+  .preview-overlay .preview-btn {
+    flex: 1 1 0;
+    min-height: 52px;
+    padding: 14px 20px;
+    min-width: 0;
+    font-size: 15px;
+    border-radius: 14px;
+  }
+  .preview-overlay .preview-btn-back {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.75);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .preview-overlay .preview-btn-back.invisible {
+    visibility: visible;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .preview-overlay .preview-btn-next,
+  .preview-overlay .preview-btn-return {
+    background: #01EACB;
+    color: #1C2034;
+  }
+  .preview-overlay .preview-btn-finish {
+    background: #FF1E6F;
+    color: #fff;
+  }
+
+  .preview-thankyou       { padding: 28px 20px; }
+  .preview-thankyou-emoji { font-size: 52px; }
+  .preview-thankyou-title { font-size: 32px; }
+  .preview-thankyou-sub   { font-size: 14px; max-width: 100%; }
+
+  /* ═════════════════════════════════════════════════════════════════
+     CREATE WIZARD (`/surveys/new`) — same mobile pattern
+     ═════════════════════════════════════════════════════════════════ */
+
+  /* Top progress bar on the wizard's outer generating container */
+  [data-controller~="generating"] {
+    position: relative;
+  }
+  [data-controller~="generating"]::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    height: 3px;
+    width: var(--wizard-progress, 0%);
+    background: #FF1E6F;
+    transition: width 0.3s ease;
+    z-index: 70;
+  }
+
+  /* Hide the rich left-pane guidance; show the inline hint instead */
+  [data-create-wizard-target] .split-left { display: none; }
+  [data-create-wizard-target] .split-card {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    background: #1C2034;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  [data-create-wizard-target] .split-right {
+    width: 100%;
+    flex: 0 0 auto;
+    padding: 28px 22px 24px;
+    background: transparent;
+    color: #fff;
+    text-align: center;
+    justify-content: flex-start;
+    gap: 14px;
+  }
+  /* Override the wizard's inline-styled black title to white */
+  [data-create-wizard-target] .q-eyebrow,
+  [data-create-wizard-target] .wizard-mobile-eyebrow {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  [data-create-wizard-target] .q-title,
+  [data-create-wizard-target] .split-right > div[style*="color:#1C2034"] {
+    color: #fff !important;
+    text-align: center;
+  }
+  [data-create-wizard-target] .q-subtitle,
+  [data-create-wizard-target] .split-right > p {
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+  }
+  /* Wizard inputs: dark theme to match the navy background */
+  [data-create-wizard-target] .split-right input[type="text"],
+  [data-create-wizard-target] .split-right textarea {
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: #fff !important;
+    text-align: left;
+  }
+  [data-create-wizard-target] .split-right input[type="text"]::placeholder,
+  [data-create-wizard-target] .split-right textarea::placeholder {
+    color: rgba(255,255,255,0.35) !important;
+  }
+
+  /* Inline mobile hint block (replaces the hidden left-pane guidance) */
+  .wizard-mobile-hint {
+    display: block;
+    text-align: center;
+    margin-top: 6px;
+    padding: 0 4px;
+  }
+  .wizard-mobile-hint-lead {
+    font-family: "Alata", sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.92);
+    margin: 0 0 6px;
+  }
+  .wizard-mobile-hint-body {
+    font-family: "ABeeZee", sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.55);
+    margin: 0;
+  }
+
+  /* Wizard footer — same two-button pill bar as the player */
+  [data-controller~="create-wizard"] .preview-footer {
+    height: auto;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    gap: 12px;
+    background: #1C2034;
+    border-top: none;
+  }
+  [data-controller~="create-wizard"] .preview-progress-text { display: none; }
+  [data-controller~="create-wizard"] .preview-btn {
+    flex: 1 1 0;
+    min-height: 52px;
+    padding: 14px 20px;
+    min-width: 0;
+    font-size: 15px;
+    border-radius: 14px;
+  }
+  [data-controller~="create-wizard"] .preview-btn-back {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.75);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  [data-controller~="create-wizard"] .preview-btn-back.invisible {
+    visibility: visible;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  [data-controller~="create-wizard"] .preview-btn-next {
+    background: #01EACB;
+    color: #1C2034;
+  }
+  [data-controller~="create-wizard"] .preview-btn-finish {
+    background: #FF1E6F;
+    color: #fff;
+  }
+
+  /* ═════════════════════════════════════════════════════════════════
+     OTHER .split-card surfaces (editor, preview): stacked column
+     ═════════════════════════════════════════════════════════════════ */
   .split-card {
     flex-direction: column;
     width: 100%;
@@ -2109,81 +2480,12 @@
     padding: 22px 20px 26px;
     justify-content: flex-start;
   }
-  /* Keep .split-left's internal flex-column / centring from the base CSS
-     (so progress bar absolute-positions, tagline absolute-positions, and
-     illustration centres) — do NOT override flex-direction, align-items,
-     justify-content, or background here. */
-
-  /* ── Typography ── */
   .q-title    { font-size: 22px; line-height: 1.3; }
   .q-subtitle { font-size: 13px; line-height: 1.45; }
 
-  /* ── Inputs: 16px stops iOS auto-zoom on focus ── */
-  textarea,
-  input[type="text"],
-  input[type="email"] { font-size: 16px; }
-
-  /* ── Touch targets ≥ 44px ── */
-  .pick-item, .choice-card, .rotate-action-btn { min-height: 44px; }
-  .pick-item { padding: 12px 14px; }
-  .choice-card { min-height: 84px; }
-  .rating-star { font-size: 36px; padding: 4px; }
-  .rating-stars { gap: 6px; }
-
-  /* ── Slider: full-width track, larger thumb for fingertip accuracy ── */
-  .slider-track { width: 100%; }
-  .slider-thumb { width: 56px; height: 56px; }
-
-  /* ── Grid card types: 3-col → 2-col on phones for tile readability ── */
-  .choice-grid    { gap: 8px; }
-  .choice-grid-3  { grid-template-columns: repeat(2, 1fr); }
-  .choice-grid-3 .choice-card { height: 76px; }
-  .choice-label   { font-size: 12px; padding: 4px 6px; }
-
-  /* ─────────────────────────────────────────────────────────────────
-     PLAYER CHROME — same 3-button footer + same nav, just sized down.
-     ───────────────────────────────────────────────────────────────── */
-
-  .preview-overlay { height: 100dvh; }   /* iOS Safari toolbar fix */
-  .preview-nav     { padding: 0 14px; height: 48px; }
-  .preview-nav-title {
-    font-size: 11px;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    max-width: 50vw;
-  }
-  .preview-body {
-    padding: 0;
-    align-items: stretch;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .preview-card { width: 100%; max-width: 100%; }
-  .preview-footer {
-    height: auto;
-    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-    gap: 8px;
-  }
-  .preview-btn {
-    min-height: 44px;
-    min-width: 0;
-    padding: 10px 14px;
-    font-size: 13px;
-    flex: 1 1 0;
-  }
-  .preview-progress-text {
-    font-size: 11px;
-    min-width: 0;
-    flex: 0 0 auto;
-    padding: 0 4px;
-  }
-  .preview-thankyou       { padding: 28px 20px; }
-  .preview-thankyou-emoji { font-size: 52px; }
-  .preview-thankyou-title { font-size: 32px; }
-  .preview-thankyou-sub   { font-size: 14px; max-width: 100%; }
-
-  /* ─────────────────────────────────────────────────────────────────
-     FLOATING UI — same centred modals, just narrower with safe-area.
-     ───────────────────────────────────────────────────────────────── */
+  /* ═════════════════════════════════════════════════════════════════
+     FLOATING UI — same centred modals, just narrower with safe-area
+     ═════════════════════════════════════════════════════════════════ */
   .media-modal-backdrop,
   .command-palette-backdrop,
   .all-types-overlay {
@@ -2202,8 +2504,6 @@
   .all-types-grid {
     -webkit-overflow-scrolling: touch;
   }
-
-  /* Popovers and toasts: constrain to viewport, respect safe area */
   .bottom-bar-user-popover {
     right: 12px;
     max-width: calc(100vw - 24px);
