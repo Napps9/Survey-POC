@@ -2073,3 +2073,108 @@
 
 /* Pad page content so the bar doesn't sit over it */
 .has-bottom-bar { padding-top: 72px; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RESPONSIVE — phones (≤767px). Player experience is the priority; editor
+   and dashboard collapse to sensible single-column layouts. Desktop styles
+   above are left untouched.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* ── Player + editor split-card: stack to single column, edge-to-edge ── */
+  .split-card {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: calc(100vh - 134px);
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .split-left {
+    width: 100%;
+    flex: 0 0 auto;
+    min-height: 140px;
+    max-height: 30vh;
+  }
+  .split-right {
+    width: 100%;
+    flex: 1 1 auto;
+    padding: 20px 18px 24px;
+  }
+  .panel-tagline { top: 22px; font-size: 12px; }
+  .q-title       { font-size: 20px; line-height: 1.3; }
+  .q-subtitle    { font-size: 13px; }
+
+  /* ── Player preview overlay ── */
+  .preview-nav    { padding: 0 14px; height: 48px; }
+  .preview-nav-title {
+    font-size: 11px; letter-spacing: 0.08em;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 50vw;
+  }
+  .preview-body {
+    padding: 0;
+    align-items: stretch;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .preview-card { width: 100%; max-width: 100%; }
+  .preview-footer {
+    height: auto;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+    gap: 10px;
+    background: rgba(28,32,52,0.95);
+    backdrop-filter: blur(10px);
+  }
+  .preview-btn {
+    min-height: 44px;
+    min-width: 0;
+    padding: 12px 18px;
+    flex: 1 1 0;
+    font-size: 14px;
+  }
+  .preview-progress-text { min-width: 0; flex: 0 0 auto; font-size: 11px; }
+  .preview-thankyou       { padding: 28px 20px; }
+  .preview-thankyou-emoji { font-size: 52px; }
+  .preview-thankyou-title { font-size: 32px; }
+  .preview-thankyou-sub   { font-size: 14px; max-width: 100%; }
+
+  /* ── Touch targets ≥ 44px for interactive card widgets ── */
+  .pick-item, .choice-card, .rotate-action-btn { min-height: 44px; }
+  .pick-item { padding: 12px 14px; }
+  .choice-card { min-height: 84px; }
+  .rating-star { font-size: 36px; padding: 4px; }
+  .rating-stars { gap: 6px; }
+
+  /* ── Slider: full width, larger thumb for thumb taps ── */
+  .slider-track { width: 100%; }
+  .slider-thumb { width: 56px; height: 56px; }
+
+  /* ── Textarea / open-ended: 16px font prevents iOS auto-zoom ── */
+  .split-right textarea,
+  .split-right input[type="text"],
+  .split-right input[type="email"] { font-size: 16px; }
+
+  /* ── Bottom bar (dashboard chrome): tighten for phones ── */
+  .bottom-bar { padding: 0 8px; gap: 4px; }
+  .bottom-bar-centre { gap: 4px; flex-wrap: wrap; }
+  .bottom-bar-chip { padding: 6px 10px; font-size: 12px; }
+  .bottom-bar-user-name { display: none; }
+  .has-bottom-bar { padding-top: 64px; }
+}
+
+/* ── Queued-submit pill: shown on the thank-you screen when the offline
+   service worker has queued a response for later sync. ── */
+.preview-queued-pill {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 6px 12px;
+  border-radius: 100px;
+  background: rgba(255,204,0,0.14);
+  color: #FFCC00;
+  border: 1px solid rgba(255,204,0,0.35);
+  font-family: "ABeeZee", sans-serif;
+  font-size: 12px;
+}

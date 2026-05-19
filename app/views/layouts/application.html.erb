@@ -10,7 +10,7 @@
   <body class="bg-slate text-smoke font-sans min-h-screen <%= 'has-bottom-bar' if Current.user %>">
     <% unless Current.user %>
       <header class="border-b border-smoke/10">
-        <div class="max-w-3xl mx-auto px-5 py-5 flex items-center justify-between">
+        <div class="max-w-3xl mx-auto px-4 sm:px-5 md:px-6 py-5 flex items-center justify-between">
           <%= link_to root_path, class: "flex items-center gap-2 group" do %>
             <%= image_tag "playverto.svg", alt: "Playverto", class: "h-8 w-auto" %>
           <% end %>
@@ -19,7 +19,7 @@
       </header>
     <% end %>
 
-    <main class="<%= 'max-w-3xl mx-auto px-5 py-10' unless Current.user %>">
+    <main class="<%= 'max-w-3xl mx-auto px-4 sm:px-5 md:px-6 py-8 md:py-10' unless Current.user %>">
       <%= yield %>
     </main>
 

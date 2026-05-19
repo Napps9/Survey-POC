@@ -1,12 +1,15 @@
 <title><%= content_for(:title) || "Playverto Verto Studio" %></title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1C2034">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <%= csrf_meta_tags %>
 <%= csp_meta_tag %>
 
 <%= yield :head %>
 
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="<%= pwa_manifest_path %>">
 <%= favicon_link_tag "favicon.svg", type: "image/svg+xml" %>
 <%= favicon_link_tag "favicon.svg", rel: "apple-touch-icon", type: "image/svg+xml" %>
 <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
