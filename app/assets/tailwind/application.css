@@ -2075,38 +2075,102 @@
 .has-bottom-bar { padding-top: 72px; }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   RESPONSIVE — phones (≤767px). Player uses native mobile patterns:
-   full-bleed hero on image cards, inline illustration on no-image cards,
-   sticky CTA bar (primary right-aligned, Back as ghost icon), progress
-   moves into the nav, modals become bottom sheets, popovers full-width.
+   RESPONSIVE — phones (≤767px).
+
+   Strategy:
+     • Generic .split-card (editor, create wizard) gets a simple stacked
+       column layout — left panel above, right panel below, both at full
+       width, content flows naturally. No clever tricks.
+     • Player-specific patterns (full-bleed hero, sticky CTA, progress in
+       nav, etc.) live under `.preview-overlay ...` so they don't bleed
+       into the editor/wizard.
+     • Floating UI (modals, popovers, toasts) becomes mobile-friendly
+       (bottom sheets, full-width) globally.
    Desktop layout above is unchanged.
    ═══════════════════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
 
-  /* ── Player overlay: dvh keeps the footer above iOS Safari toolbar ── */
-  .preview-overlay { height: 100dvh; }
-
-  /* ── Split-card: card fills the body; image cards get full-bleed hero ── */
+  /* ── Generic split-card: stacked column, full width, auto height ── */
   .split-card {
-    position: relative;
     flex-direction: column;
     width: 100%;
     max-width: 100%;
-    height: 100%;
+    height: auto;
     min-height: 0;
     margin: 0;
+    border-radius: 12px;
+  }
+  .split-left,
+  .split-right {
+    width: 100%;
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+  .split-left  { padding: 18px 18px 16px; }
+  .split-right { padding: 18px 18px 22px; }
+  .panel-progress {
+    position: static;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  .panel-tagline {
+    position: static;
+    text-align: left;
+    margin: 4px 0 8px;
+    font-size: 11px;
+  }
+  .split-left-illustration {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 8px 0;
+  }
+
+  /* ── Typography ── */
+  .q-title    { font-size: 22px; line-height: 1.25; }
+  .q-subtitle { font-size: 13px; line-height: 1.45; }
+
+  /* ── Textarea / inputs: 16px stops iOS auto-zoom on focus ── */
+  textarea,
+  input[type="text"],
+  input[type="email"] { font-size: 16px; }
+
+  /* ── Touch targets ≥ 44px on interactive widgets ── */
+  .pick-item, .choice-card, .rotate-action-btn { min-height: 44px; }
+  .pick-item { padding: 12px 14px; }
+  .choice-card { min-height: 84px; }
+  .rating-star { font-size: 36px; padding: 4px; }
+  .rating-stars { gap: 6px; }
+
+  /* ── Slider: full width, larger thumb ── */
+  .slider-track { width: 100%; }
+  .slider-thumb { width: 56px; height: 56px; }
+
+  /* ── Grid card types: 3-col → 2-col on phones ── */
+  .choice-grid    { gap: 8px; }
+  .choice-grid-3  { grid-template-columns: repeat(2, 1fr); }
+  .choice-grid-3 .choice-card { height: 76px; }
+  .choice-label   { font-size: 12px; padding: 4px 6px; }
+
+  /* ─────────────────────────────────────────────────────────────────
+     PLAYER OVERLAY — mobile-native patterns scoped to the player.
+     ───────────────────────────────────────────────────────────────── */
+
+  /* dvh keeps the footer above iOS Safari toolbar */
+  .preview-overlay { height: 100dvh; }
+
+  /* Inside the player, split-card fills the body */
+  .preview-overlay .split-card {
+    position: relative;
+    height: 100%;
     border-radius: 0;
     box-shadow: none;
     overflow: hidden;
   }
 
-  /* Default split-left on mobile (no image present) — small dark hero strip
-     across the top of the card, like a sheet's header. */
-  .split-left {
-    width: 100%;
-    flex: 0 0 auto;
-    min-height: 0;
-    max-height: none;
+  /* Player no-image cards: small dark hero strip with illustration + tagline */
+  .preview-overlay .split-left {
     background: #2E3564;
     padding: 14px 18px 12px;
     flex-direction: row;
@@ -2114,51 +2178,41 @@
     justify-content: flex-start;
     gap: 12px;
   }
-  .split-left-illustration {
-    flex: 0 0 auto;
+  .preview-overlay .split-left-illustration {
     width: 48px; height: 48px;
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
   }
-  .panel-tagline {
-    position: static;
-    text-align: left;
-    margin: 0;
+  .preview-overlay .panel-tagline {
     font-size: 11px;
     color: rgba(255,255,255,0.6);
     letter-spacing: 0.06em;
+    margin: 0;
   }
-  .panel-progress { display: none; }   /* moved to the nav (::after below) */
+  .preview-overlay .panel-progress { display: none; }   /* moved to nav ::after */
 
-  /* split-right on mobile: white card, packed-at-top content */
-  .split-right {
-    width: 100%;
+  .preview-overlay .split-right {
     flex: 1 1 auto;
     padding: 18px 18px 20px;
     justify-content: flex-start;
     gap: 14px;
   }
 
-  /* Pattern 1: image cards get full-bleed hero with a glass-card overlay */
-  .split-card:has(.split-left-img) {
+  /* Player image cards: full-bleed hero with overlaid question card */
+  .preview-overlay .split-card:has(.split-left-img) {
     background: #1C2034;
   }
-  .split-card:has(.split-left-img) .split-left {
-    position: absolute;
-    inset: 0;
+  .preview-overlay .split-card:has(.split-left-img) .split-left {
+    position: absolute; inset: 0;
     z-index: 0;
     max-height: none;
     padding: 0;
   }
-  .split-card:has(.split-left-img) .split-left-img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+  .preview-overlay .split-card:has(.split-left-img) .split-left-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
   }
-  .split-card:has(.split-left-img) .split-left-overlay {
-    position: absolute;
-    inset: 0;
+  .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
+    position: absolute; inset: 0;
     background: linear-gradient(
       to bottom,
       rgba(28,32,52,0.15) 0%,
@@ -2166,9 +2220,9 @@
       rgba(28,32,52,0.95) 80%
     );
   }
-  .split-card:has(.split-left-img) .split-left-illustration { display: none; }
-  .split-card:has(.split-left-img) .panel-tagline { display: none; }
-  .split-card:has(.split-left-img) .split-right {
+  .preview-overlay .split-card:has(.split-left-img) .split-left-illustration { display: none; }
+  .preview-overlay .split-card:has(.split-left-img) .panel-tagline { display: none; }
+  .preview-overlay .split-card:has(.split-left-img) .split-right {
     position: relative;
     z-index: 1;
     margin-top: auto;
@@ -2176,14 +2230,10 @@
     color: #fff;
     padding: 60px 20px 24px;
   }
-  .split-card:has(.split-left-img) .q-title    { color: #fff; }
-  .split-card:has(.split-left-img) .q-subtitle { color: rgba(255,255,255,0.78); }
+  .preview-overlay .split-card:has(.split-left-img) .q-title    { color: #fff; }
+  .preview-overlay .split-card:has(.split-left-img) .q-subtitle { color: rgba(255,255,255,0.78); }
 
-  /* ── Typography sizes ── */
-  .q-title    { font-size: 22px; line-height: 1.25; }
-  .q-subtitle { font-size: 13px; line-height: 1.45; }
-
-  /* ── Preview nav: thinner, with progress line under it ── */
+  /* Player nav with progress line under it */
   .preview-nav {
     position: relative;
     padding: 0 14px;
@@ -2212,7 +2262,7 @@
   }
   .preview-card { width: 100%; max-width: 100%; height: 100%; }
 
-  /* Pattern 3: sticky CTA bar — Next big and primary, Back ghost icon */
+  /* Player sticky CTA bar: Next primary, Back ghost icon */
   .preview-footer {
     height: auto;
     padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
@@ -2232,7 +2282,7 @@
     flex: 0 0 44px;
     min-width: 44px;
     padding: 0;
-    font-size: 0;             /* hide "Back" text; aria-label preserves SR name */
+    font-size: 0;
     border-radius: 12px;
     position: relative;
   }
@@ -2253,36 +2303,14 @@
     flex: 1 1 auto;
     padding: 12px 18px;
   }
-  .preview-progress-text { display: none; }  /* progress is in nav::after */
+  .preview-progress-text { display: none; }
 
   .preview-thankyou       { padding: 28px 20px; }
   .preview-thankyou-emoji { font-size: 52px; }
   .preview-thankyou-title { font-size: 32px; }
   .preview-thankyou-sub   { font-size: 14px; max-width: 100%; }
 
-  /* ── Touch targets ≥ 44px ── */
-  .pick-item, .choice-card, .rotate-action-btn { min-height: 44px; }
-  .pick-item { padding: 12px 14px; }
-  .choice-card { min-height: 84px; }
-  .rating-star { font-size: 36px; padding: 4px; }
-  .rating-stars { gap: 6px; }
-
-  /* Pattern 10: grid cards collapse 3-col → 2-col */
-  .choice-grid    { gap: 8px; }
-  .choice-grid-3  { grid-template-columns: repeat(2, 1fr); }
-  .choice-grid-3 .choice-card { height: 76px; }
-  .choice-label   { font-size: 12px; padding: 4px 6px; }
-
-  /* ── Slider: full width, larger thumb ── */
-  .slider-track { width: 100%; }
-  .slider-thumb { width: 56px; height: 56px; }
-
-  /* ── Textarea / inputs: 16px stops iOS auto-zoom on focus ── */
-  .split-right textarea,
-  .split-right input[type="text"],
-  .split-right input[type="email"] { font-size: 16px; }
-
-  /* Pattern 5: results comparison becomes a bottom sheet */
+  /* Player results comparison: bottom sheet */
   [data-player-target="comparison"] {
     position: fixed !important;
     left: 0; right: 0; bottom: 0;
@@ -2315,7 +2343,10 @@
     margin: 0 auto 14px;
   }
 
-  /* Pattern 6: editor modals become bottom sheets on mobile */
+  /* ─────────────────────────────────────────────────────────────────
+     FLOATING UI — modals as bottom sheets, popovers/toasts full-width.
+     Applied globally so editor + dashboard benefit too.
+     ───────────────────────────────────────────────────────────────── */
   .media-modal-backdrop,
   .command-palette-backdrop,
   .all-types-overlay {
@@ -2348,11 +2379,9 @@
   .all-types-grid {
     -webkit-overflow-scrolling: touch;
   }
-  /* Tile grids inside palette/all-types: collapse to one column for readability */
   .command-palette-tiles { grid-template-columns: 1fr; }
   .all-types-grid        { grid-template-columns: 1fr; }
 
-  /* Pattern 8: viewport-aware popovers and toasts */
   .bottom-bar-user-popover {
     position: fixed;
     top: auto;
@@ -2369,7 +2398,7 @@
   }
   .toast-bar.show { transform: translateY(0); }
 
-  /* Editor FAB: smaller so it doesn't crowd the full-bleed hero */
+  /* Editor FAB: smaller so it doesn't crowd the hero on cards with images */
   .add-media-fab {
     bottom: 12px;
     padding: 7px 12px;
@@ -2384,7 +2413,7 @@
   .has-bottom-bar { padding-top: 64px; }
 }
 
-/* Pattern 7: touch-only — show controls that desktop reveals on :hover */
+/* Touch-only — show controls that desktop reveals on :hover */
 @media (hover: none) and (pointer: coarse) {
   .pick-item-delete { opacity: 1; }
 }
