@@ -35,6 +35,7 @@ export default class extends Controller {
     const sessionToken = (typeof crypto !== "undefined" && crypto.randomUUID)
       ? crypto.randomUUID()
       : Math.random().toString(36).slice(2)
+    let queued = false
     try {
       const res = await fetch(this.submitUrlValue, {
         method: "POST",
@@ -42,8 +43,14 @@ export default class extends Controller {
         body: JSON.stringify({ session_token: sessionToken, answers: this._answers })
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    } catch (_) { /* show thankyou regardless */ }
-    this._showThankyou()
+      const data = await res.clone().json().catch(() => null)
+      queued = !!(data && data.queued)
+    } catch (_) {
+      // No SW running and offline — answers are lost. Still show thank-you
+      // so the player completes; flag as queued to set expectations.
+      queued = !navigator.onLine
+    }
+    this._showThankyou(queued)
   }
 
   _capture(idx) {
@@ -97,13 +104,19 @@ export default class extends Controller {
     }
   }
 
-  _showThankyou() {
+  _showThankyou(queued = false) {
     this.cardTargets.forEach(c => c.classList.remove("active"))
     this.thankyouTarget.classList.add("active")
     this.backBtnTarget.classList.add("hidden")
     this.nextBtnTarget.classList.add("hidden")
     this.finishBtnTarget.classList.add("hidden")
     this.progressTarget.textContent = ""
+    if (queued && this.hasThankyouMainTarget && !this.thankyouMainTarget.querySelector(".preview-queued-pill")) {
+      const pill = document.createElement("div")
+      pill.className = "preview-queued-pill"
+      pill.textContent = "Saved — will sync when you're back online"
+      this.thankyouMainTarget.appendChild(pill)
+    }
   }
 
   async showComparison() {
