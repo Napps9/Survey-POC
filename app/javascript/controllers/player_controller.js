@@ -278,7 +278,6 @@ export default class extends Controller {
     const idx   = this.currentValue
     this.cardTargets.forEach((c, i) => c.classList.toggle("active", i === idx))
     this.progressTarget.textContent = `Card ${idx + 1} of ${total}`
-    this.element.style.setProperty("--player-progress", `${Math.round(((idx + 1) / total) * 100)}%`)
     this.backBtnTarget.classList.remove("hidden")
     this.backBtnTarget.classList.toggle("invisible", idx === 0)
     const isLast = idx === total - 1
