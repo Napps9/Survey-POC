@@ -2075,87 +2075,306 @@
 .has-bottom-bar { padding-top: 72px; }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   RESPONSIVE — phones (≤767px). Player experience is the priority; editor
-   and dashboard collapse to sensible single-column layouts. Desktop styles
-   above are left untouched.
+   RESPONSIVE — phones (≤767px). Player uses native mobile patterns:
+   full-bleed hero on image cards, inline illustration on no-image cards,
+   sticky CTA bar (primary right-aligned, Back as ghost icon), progress
+   moves into the nav, modals become bottom sheets, popovers full-width.
+   Desktop layout above is unchanged.
    ═══════════════════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
 
-  /* ── Player + editor split-card: stack to single column, edge-to-edge ── */
+  /* ── Player overlay: dvh keeps the footer above iOS Safari toolbar ── */
+  .preview-overlay { height: 100dvh; }
+
+  /* ── Split-card: card fills the body; image cards get full-bleed hero ── */
   .split-card {
+    position: relative;
     flex-direction: column;
     width: 100%;
     max-width: 100%;
-    height: auto;
-    min-height: calc(100vh - 134px);
+    height: 100%;
+    min-height: 0;
     margin: 0;
     border-radius: 0;
     box-shadow: none;
+    overflow: hidden;
   }
+
+  /* Default split-left on mobile (no image present) — small dark hero strip
+     across the top of the card, like a sheet's header. */
   .split-left {
     width: 100%;
     flex: 0 0 auto;
-    min-height: 140px;
-    max-height: 30vh;
+    min-height: 0;
+    max-height: none;
+    background: #2E3564;
+    padding: 14px 18px 12px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
   }
+  .split-left-illustration {
+    flex: 0 0 auto;
+    width: 48px; height: 48px;
+    margin: 0;
+    padding: 0;
+  }
+  .panel-tagline {
+    position: static;
+    text-align: left;
+    margin: 0;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.06em;
+  }
+  .panel-progress { display: none; }   /* moved to the nav (::after below) */
+
+  /* split-right on mobile: white card, packed-at-top content */
   .split-right {
     width: 100%;
     flex: 1 1 auto;
-    padding: 20px 18px 24px;
+    padding: 18px 18px 20px;
+    justify-content: flex-start;
+    gap: 14px;
   }
-  .panel-tagline { top: 22px; font-size: 12px; }
-  .q-title       { font-size: 20px; line-height: 1.3; }
-  .q-subtitle    { font-size: 13px; }
 
-  /* ── Player preview overlay ── */
-  .preview-nav    { padding: 0 14px; height: 48px; }
+  /* Pattern 1: image cards get full-bleed hero with a glass-card overlay */
+  .split-card:has(.split-left-img) {
+    background: #1C2034;
+  }
+  .split-card:has(.split-left-img) .split-left {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    max-height: none;
+    padding: 0;
+  }
+  .split-card:has(.split-left-img) .split-left-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .split-card:has(.split-left-img) .split-left-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(28,32,52,0.15) 0%,
+      rgba(28,32,52,0.55) 40%,
+      rgba(28,32,52,0.95) 80%
+    );
+  }
+  .split-card:has(.split-left-img) .split-left-illustration { display: none; }
+  .split-card:has(.split-left-img) .panel-tagline { display: none; }
+  .split-card:has(.split-left-img) .split-right {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    background: transparent;
+    color: #fff;
+    padding: 60px 20px 24px;
+  }
+  .split-card:has(.split-left-img) .q-title    { color: #fff; }
+  .split-card:has(.split-left-img) .q-subtitle { color: rgba(255,255,255,0.78); }
+
+  /* ── Typography sizes ── */
+  .q-title    { font-size: 22px; line-height: 1.25; }
+  .q-subtitle { font-size: 13px; line-height: 1.45; }
+
+  /* ── Preview nav: thinner, with progress line under it ── */
+  .preview-nav {
+    position: relative;
+    padding: 0 14px;
+    height: 48px;
+  }
+  .preview-nav::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: 0;
+    height: 3px;
+    width: var(--player-progress, 0%);
+    background: #01EACB;
+    transition: width 0.3s ease;
+  }
   .preview-nav-title {
     font-size: 11px; letter-spacing: 0.08em;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     max-width: 50vw;
   }
+
   .preview-body {
     padding: 0;
     align-items: stretch;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
-  .preview-card { width: 100%; max-width: 100%; }
+  .preview-card { width: 100%; max-width: 100%; height: 100%; }
+
+  /* Pattern 3: sticky CTA bar — Next big and primary, Back ghost icon */
   .preview-footer {
     height: auto;
-    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
     gap: 10px;
+    justify-content: flex-end;
     background: rgba(28,32,52,0.95);
     backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.06);
   }
   .preview-btn {
-    min-height: 44px;
+    min-height: 48px;
     min-width: 0;
-    padding: 12px 18px;
-    flex: 1 1 0;
-    font-size: 14px;
+    font-size: 15px;
+    border-radius: 14px;
   }
-  .preview-progress-text { min-width: 0; flex: 0 0 auto; font-size: 11px; }
+  .preview-btn-back {
+    flex: 0 0 44px;
+    min-width: 44px;
+    padding: 0;
+    font-size: 0;             /* hide "Back" text; aria-label preserves SR name */
+    border-radius: 12px;
+    position: relative;
+  }
+  .preview-btn-back::before {
+    content: "‹";
+    font-size: 28px;
+    line-height: 1;
+    color: rgba(255,255,255,0.7);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .preview-btn-next,
+  .preview-btn-finish,
+  .preview-btn-return {
+    flex: 1 1 auto;
+    padding: 12px 18px;
+  }
+  .preview-progress-text { display: none; }  /* progress is in nav::after */
+
   .preview-thankyou       { padding: 28px 20px; }
   .preview-thankyou-emoji { font-size: 52px; }
   .preview-thankyou-title { font-size: 32px; }
   .preview-thankyou-sub   { font-size: 14px; max-width: 100%; }
 
-  /* ── Touch targets ≥ 44px for interactive card widgets ── */
+  /* ── Touch targets ≥ 44px ── */
   .pick-item, .choice-card, .rotate-action-btn { min-height: 44px; }
   .pick-item { padding: 12px 14px; }
   .choice-card { min-height: 84px; }
   .rating-star { font-size: 36px; padding: 4px; }
   .rating-stars { gap: 6px; }
 
-  /* ── Slider: full width, larger thumb for thumb taps ── */
+  /* Pattern 10: grid cards collapse 3-col → 2-col */
+  .choice-grid    { gap: 8px; }
+  .choice-grid-3  { grid-template-columns: repeat(2, 1fr); }
+  .choice-grid-3 .choice-card { height: 76px; }
+  .choice-label   { font-size: 12px; padding: 4px 6px; }
+
+  /* ── Slider: full width, larger thumb ── */
   .slider-track { width: 100%; }
   .slider-thumb { width: 56px; height: 56px; }
 
-  /* ── Textarea / open-ended: 16px font prevents iOS auto-zoom ── */
+  /* ── Textarea / inputs: 16px stops iOS auto-zoom on focus ── */
   .split-right textarea,
   .split-right input[type="text"],
   .split-right input[type="email"] { font-size: 16px; }
+
+  /* Pattern 5: results comparison becomes a bottom sheet */
+  [data-player-target="comparison"] {
+    position: fixed !important;
+    left: 0; right: 0; bottom: 0;
+    top: auto;
+    width: 100%;
+    max-width: 100%;
+    max-height: 88dvh;
+    margin: 0;
+    padding: 22px 16px calc(20px + env(safe-area-inset-bottom)) !important;
+    background: #1C2034;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -12px 32px rgba(0,0,0,0.4);
+    transform: translateY(0);
+    transition: transform 0.25s ease;
+    z-index: 65;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  [data-player-target="comparison"].hidden {
+    display: block !important;
+    transform: translateY(100%);
+    pointer-events: none;
+  }
+  [data-player-target="comparison"]::before {
+    content: "";
+    display: block;
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 2px;
+    margin: 0 auto 14px;
+  }
+
+  /* Pattern 6: editor modals become bottom sheets on mobile */
+  .media-modal-backdrop,
+  .command-palette-backdrop,
+  .all-types-overlay {
+    padding: 0;
+    align-items: flex-end;
+    justify-content: stretch;
+  }
+  .media-modal,
+  .command-palette,
+  .all-types-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 88dvh;
+    border-radius: 18px 18px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .media-modal::before,
+  .command-palette::before,
+  .all-types-modal::before {
+    content: "";
+    display: block;
+    width: 36px; height: 4px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 2px;
+    margin: 8px auto 0;
+    flex-shrink: 0;
+  }
+  .media-modal-body,
+  .command-palette-scroll,
+  .all-types-grid {
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Tile grids inside palette/all-types: collapse to one column for readability */
+  .command-palette-tiles { grid-template-columns: 1fr; }
+  .all-types-grid        { grid-template-columns: 1fr; }
+
+  /* Pattern 8: viewport-aware popovers and toasts */
+  .bottom-bar-user-popover {
+    position: fixed;
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom) + 12px);
+    left: 12px; right: 12px;
+    max-width: calc(100vw - 24px);
+  }
+  .toast-bar {
+    left: 12px; right: 12px;
+    bottom: calc(env(safe-area-inset-bottom) + 12px);
+    transform: translateY(14px);
+    border-radius: 14px;
+    text-align: center;
+  }
+  .toast-bar.show { transform: translateY(0); }
+
+  /* Editor FAB: smaller so it doesn't crowd the full-bleed hero */
+  .add-media-fab {
+    bottom: 12px;
+    padding: 7px 12px;
+    font-size: 11px;
+  }
 
   /* ── Bottom bar (dashboard chrome): tighten for phones ── */
   .bottom-bar { padding: 0 8px; gap: 4px; }
@@ -2163,6 +2382,11 @@
   .bottom-bar-chip { padding: 6px 10px; font-size: 12px; }
   .bottom-bar-user-name { display: none; }
   .has-bottom-bar { padding-top: 64px; }
+}
+
+/* Pattern 7: touch-only — show controls that desktop reveals on :hover */
+@media (hover: none) and (pointer: coarse) {
+  .pick-item-delete { opacity: 1; }
 }
 
 /* ── Queued-submit pill: shown on the thank-you screen when the offline

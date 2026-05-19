@@ -3,7 +3,7 @@
   <head>
     <%= render "layouts/head" %>
   </head>
-  <body style="height:100vh;overflow:hidden;background:#272D4A;color:#F7F7F7;font-family:'ABeeZee',sans-serif;">
+  <body style="height:100dvh;min-height:100vh;overflow:hidden;background:#272D4A;color:#F7F7F7;font-family:'ABeeZee',sans-serif;">
     <% if Current.user %>
       <div data-controller="command-palette">
         <%= render "shared/bottom_bar" %>
