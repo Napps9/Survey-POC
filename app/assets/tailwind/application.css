@@ -2145,28 +2145,27 @@
   }
   .preview-card { width: 100%; max-width: 100%; }
 
-  /* Player split-card: dark navy column on mobile */
-  .preview-overlay .split-card {
+  /* Anchor the height chain — preview-card.active fills the body so
+     descendants can flex/distribute on a defined height. Without this,
+     grid-auto-rows: 1fr inside has no parent height to share. */
+  .preview-overlay .preview-card.active {
+    display: flex;
     flex-direction: column;
+    height: calc(100dvh - 44px); /* viewport minus nav */
     width: 100%;
     max-width: 100%;
-    height: auto;
-    min-height: 100%;
-    margin: 0;
-    background: #1C2034;
-    border-radius: 0;
-    box-shadow: none;
-    overflow: hidden;
+    min-height: 0;
   }
 
-  /* Player split-card: white background everywhere — matches desktop's
-     right pane. Dark navy is reserved for the nav and footer chrome. */
+  /* Player split-card: white background — matches desktop's right pane.
+     Fills its parent (.preview-card.active) so the white extends from
+     the nav to the fixed footer with no gap. */
   .preview-overlay .split-card {
+    flex: 1 1 auto;
     flex-direction: column;
     width: 100%;
     max-width: 100%;
-    height: auto;
-    min-height: 100%;
+    min-height: 0;
     margin: 0;
     background: #fff;
     border-radius: 0;
@@ -2204,6 +2203,7 @@
   .preview-overlay .split-card .split-right {
     width: 100%;
     flex: 1 1 auto;
+    min-height: 0;
     padding: 30px 24px calc(96px + env(safe-area-inset-bottom));
     background: #fff;
     color: #1C2034;
