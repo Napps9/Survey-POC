@@ -2251,25 +2251,59 @@
     background: rgba(255,30,111,0.08);
     border-color: #FF1E6F;
   }
+  .preview-overlay .freeform-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+  }
   .preview-overlay .freeform-textarea {
     background: rgba(0,0,0,0.03);
     border: 1px solid rgba(0,0,0,0.08);
     color: #1C2034;
     border-radius: 14px;
+    min-height: 140px;
+    max-height: 32vh;
+    padding: 14px;
+    width: 100%;
+    resize: none;
   }
   .preview-overlay .freeform-textarea::placeholder { color: rgba(0,0,0,0.35); }
-  .preview-overlay .freeform-counter { color: rgba(0,0,0,0.4); }
+  .preview-overlay .freeform-counter {
+    position: static;
+    align-self: flex-end;
+    background: transparent;
+    padding: 0;
+    color: rgba(0,0,0,0.4);
+    font-size: 11px;
+  }
 
-  /* Choice-grid cards: 2-col image tiles, same white card */
+  /* Choice-grid cards: tiles distribute the remaining vertical height
+     so 4, 6, or 8 options all fit without scrolling */
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .split-right,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .split-right {
+    min-height: 0;
+  }
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2 {
+    flex: 1 1 auto;
+    display: flex;
+    min-height: 0;
+  }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    grid-auto-rows: minmax(0, 1fr);
+    gap: 12px;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
   }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-card,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card {
-    height: auto;
-    aspect-ratio: 1 / 1;
+    height: 100%;
+    min-height: 80px;
+    aspect-ratio: auto;
     border-radius: 14px;
     border: 3px solid transparent;
   }
