@@ -3,9 +3,6 @@ class AllianceInvitesController < ApplicationController
   before_action :require_creator_org!
   before_action :require_admin!
 
-  def new
-  end
-
   def create
     invite = current_organisation.invites.create!(
       email_address: "link-#{SecureRandom.hex(8)}@partner.invite",

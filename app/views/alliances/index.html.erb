@@ -27,10 +27,9 @@
             </p>
           </div>
 
-          <%= link_to new_alliance_invite_path,
-                style: "flex-shrink:0;background:#FF1E6F;border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;text-decoration:none;white-space:nowrap;box-shadow:0 8px 24px rgba(255,30,111,0.28);" do %>
-            Generate join link <span style="opacity:0.7;">→</span>
-          <% end %>
+          <%= button_to "Generate join link →", alliance_invites_path, method: :post,
+                style: "flex-shrink:0;background:#FF1E6F;border:none;border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(255,30,111,0.28);cursor:pointer;",
+                form: { style: "margin:0;flex-shrink:0;" } %>
         </div>
 
         <%# ── Top-line stats ── %>
@@ -87,8 +86,9 @@
           <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto 18px;line-height:1.5;">
             Invite an organisation to join your alliance — they'll be able to distribute your Vertos through their own share links.
           </div>
-          <%= link_to "Generate join link →", new_alliance_invite_path,
-                style: "display:inline-block;background:#FF1E6F;border-radius:100px;padding:10px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
+          <%= button_to "Generate join link →", alliance_invites_path, method: :post,
+                style: "background:#FF1E6F;border:none;border-radius:100px;padding:10px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);cursor:pointer;",
+                form: { style: "margin:0;display:inline-block;" } %>
         </div>
       <% else %>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;">

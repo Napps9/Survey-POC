@@ -44,7 +44,7 @@ Rails.application.routes.draw do
 
   # Alliances (partner orgs)
   resources :alliances, only: [:index, :show, :destroy]
-  resources :alliance_invites, only: [:new, :create]
+  resources :alliance_invites, only: [:create]
 
   # Partner-side dashboard
   get "alliance_vertos",     to: "alliance_vertos#index", as: :alliance_vertos

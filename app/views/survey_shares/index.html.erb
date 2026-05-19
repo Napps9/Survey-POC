@@ -17,7 +17,9 @@
 
       <% if @alliances.empty? %>
         <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:12px;padding:32px 24px;text-align:center;color:rgba(255,255,255,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);">
-          You don't have any partners yet. <%= link_to "Invite one →", new_alliance_invite_path, style: "color:#01EACB;text-decoration:none;" %>
+          You don't have any partners yet. <%= button_to "Invite one →", alliance_invites_path, method: :post,
+                style: "background:none;border:none;padding:0;color:#01EACB;font-family:inherit;font-size:inherit;cursor:pointer;",
+                form: { style: "display:inline;margin:0;" } %>
         </div>
       <% else %>
         <% shared_alliance_ids = @shares.map(&:alliance_id) %>

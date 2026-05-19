@@ -287,8 +287,9 @@
               Generate per-partner links. Responses are attributed to that partner; they'll see their own results plus the aggregate.
             </div>
             <% if active_alliances.empty? %>
-              <%= link_to "Invite a partner →", new_alliance_invite_path,
-                    style: "display:inline-block;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:10px;padding:7px 14px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
+              <%= button_to "Invite a partner →", alliance_invites_path, method: :post,
+                    style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:10px;padding:7px 14px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;",
+                    form: { style: "margin:0;display:inline-block;" } %>
             <% elsif available_allies.empty? %>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);">All partners already have a link.</span>
             <% else %>
