@@ -2196,11 +2196,12 @@
     border-radius: 0 0 18px 18px;
   }
 
-  /* Player right pane: dark navy stack, white text */
+  /* Player right pane: dark navy stack, white text — leave room for the
+     fixed footer so content doesn't sit behind it */
   .preview-overlay .split-card .split-right {
     width: 100%;
     flex: 1 1 auto;
-    padding: 22px 22px 24px;
+    padding: 22px 22px calc(96px + env(safe-area-inset-bottom));
     background: transparent;
     color: #fff;
     text-align: center;
@@ -2279,13 +2280,17 @@
   .choice-grid-3 .choice-card { height: 76px; }
   .choice-label   { font-size: 12px; padding: 4px 6px; }
 
-  /* Sticky two-button bottom bar (Back + Next), full-width pills */
+  /* Sticky two-button bottom bar (Back + Next), full-width pills —
+     fixed to the viewport bottom so it always sits above safe area */
   .preview-overlay .preview-footer {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
     height: auto;
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
     gap: 12px;
     background: #1C2034;
-    border-top: none;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    z-index: 50;
   }
   .preview-overlay .preview-progress-text { display: none; }
   .preview-overlay .preview-btn {
@@ -2363,6 +2368,14 @@
     justify-content: flex-start;
     gap: 14px;
   }
+  /* Push the wizard's card-stage content above the fixed bottom footer */
+  [data-controller~="create-wizard"] > div:first-of-type,
+  [data-create-wizard-target] {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+  [data-controller~="generating"] {
+    min-height: 100dvh;
+  }
   /* Override the wizard's inline-styled black title to white */
   [data-create-wizard-target] .q-eyebrow,
   [data-create-wizard-target] .wizard-mobile-eyebrow {
@@ -2417,13 +2430,16 @@
     margin: 0;
   }
 
-  /* Wizard footer — same two-button pill bar as the player */
+  /* Wizard footer — same two-button pill bar as the player, fixed bottom */
   [data-controller~="create-wizard"] .preview-footer {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
     height: auto;
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
     gap: 12px;
     background: #1C2034;
-    border-top: none;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    z-index: 50;
   }
   [data-controller~="create-wizard"] .preview-progress-text { display: none; }
   [data-controller~="create-wizard"] .preview-btn {
