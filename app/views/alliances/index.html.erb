@@ -83,12 +83,9 @@
       <% if @alliances.empty? %>
         <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:60px 24px;text-align:center;">
           <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;margin-bottom:8px;">No partners yet</div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto 18px;line-height:1.5;">
-            Invite an organisation to join your alliance — they'll be able to distribute your Vertos through their own share links.
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto;line-height:1.5;">
+            Use <span style="color:#FF1E6F;">Generate join link</span> above to invite an organisation — they'll be able to distribute your Vertos through their own share links.
           </div>
-          <%= button_to "Generate join link →", alliance_invites_path, method: :post,
-                style: "background:#FF1E6F;border:none;border-radius:100px;padding:10px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);cursor:pointer;",
-                form: { style: "margin:0;display:inline-block;" } %>
         </div>
       <% else %>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;">
