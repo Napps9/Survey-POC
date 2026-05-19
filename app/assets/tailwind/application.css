@@ -1816,6 +1816,14 @@
   border: 1px solid rgba(255,255,255,0.1);
 }
 .preview-btn-back:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.preview-btn-edit {
+  background: rgba(1,234,203,0.10); color: #01EACB;
+  border: 1px solid rgba(1,234,203,0.35);
+}
+.preview-btn-edit:hover {
+  background: rgba(1,234,203,0.18);
+  border-color: rgba(1,234,203,0.55);
+}
 .preview-btn-next,
 .preview-btn-finish,
 .preview-btn-return { background: #01EACB; color: #1C2034; }
