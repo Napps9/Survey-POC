@@ -865,19 +865,18 @@
 }
 .gen-hero-theme {
   font-family: "ABeeZee", sans-serif;
-  font-size: calc(clamp(20px, 2.6vw, 32px) * var(--hero-fit, 1));
+  font-size: calc(clamp(20px, 2.6vw, 34px) * var(--hero-fit, 1));
   font-weight: 400;
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: -0.4px;
   color: #fff;
   margin-bottom: 12px;
-  /* Reserve a consistent block so messages of different lengths
-     occupy the same vertical area regardless of input length. */
-  min-height: 2.6em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-wrap: balance;
+  /* One line per phrase — the controller shrinks the font to fit. */
+  min-height: 1.5em;
+  white-space: nowrap;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .gen-hero-theme em { color: #01EACB; font-style: normal; }
 

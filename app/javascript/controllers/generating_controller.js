@@ -76,15 +76,16 @@ export default class extends Controller {
   _setHero(html) {
     const el = this.heroThemeTarget
     el.innerHTML = html
-    const len = (el.textContent || "").length
-    // Tuned around expected message lengths (~80–220 chars).
-    // Shorter copy → bigger text; longer copy → smaller text.
-    let fit
-    if (len <= 100)       fit = 1.00
-    else if (len <= 140)  fit = 0.90
-    else if (len <= 180)  fit = 0.82
-    else                  fit = 0.74
+    // Keep the phrase on a single line: shrink the font until it fits the
+    // available width (falls back to ellipsis at the minimum scale).
+    const avail = el.parentElement?.clientWidth || el.clientWidth || 680
+    let fit = 1
+    let guard = 0
     el.style.setProperty("--hero-fit", fit)
+    while (el.scrollWidth > avail && fit > 0.5 && guard++ < 24) {
+      fit -= 0.04
+      el.style.setProperty("--hero-fit", fit)
+    }
   }
 
   // One concise phrase per step, reactive to the user's topic + audience.
