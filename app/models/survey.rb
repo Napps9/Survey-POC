@@ -18,4 +18,25 @@ class Survey < ApplicationRecord
   def published?
     publish_token.present?
   end
+
+  # A "responder" is anyone who answered at least one question (not just those
+  # who submitted). Reads the preloaded :responses association in Ruby so the
+  # dashboard's includes(:responses) avoids per-card queries.
+  def responders
+    responses.to_a.select do |r|
+      r.answers.is_a?(Hash) && r.answers.values.any? { |a| a.is_a?(Hash) && a["value"].present? }
+    end
+  end
+
+  def responders_count
+    responders.size
+  end
+
+  # Of the responders, the percentage who completed (submitted) the Verto.
+  # nil when there are no responders yet.
+  def completion_rate
+    rs = responders
+    return nil if rs.empty?
+    (rs.count { |r| r.status == "completed" } * 100.0 / rs.size).round
+  end
 end

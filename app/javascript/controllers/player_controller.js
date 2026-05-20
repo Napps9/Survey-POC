@@ -4,6 +4,7 @@ export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta"]
   static values  = {
+    progressUrl: { type: String, default: "" },
     submitUrl: String,
     resultsUrl: { type: String, default: "" },
     showComparison: { type: Boolean, default: false },
@@ -11,11 +12,16 @@ export default class extends Controller {
   }
 
   _answers = {}
+  _registered = false
 
-  connect() { this._update() }
+  connect() {
+    this._sessionToken = this._ensureToken()
+    this._update()
+  }
 
   next() {
     this._capture(this.currentValue)
+    this._saveProgress()
     if (this.currentValue < this.cardTargets.length - 1) {
       this.currentValue++
       this._update()
@@ -24,6 +30,7 @@ export default class extends Controller {
 
   back() {
     this._capture(this.currentValue)
+    this._saveProgress()
     if (this.currentValue > 0) {
       this.currentValue--
       this._update()
@@ -32,15 +39,12 @@ export default class extends Controller {
 
   async finish() {
     this._capture(this.currentValue)
-    const sessionToken = (typeof crypto !== "undefined" && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : Math.random().toString(36).slice(2)
     let queued = false
     try {
       const res = await fetch(this.submitUrlValue, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_token: sessionToken, answers: this._answers })
+        body: JSON.stringify({ session_token: this._sessionToken, answers: this._answers })
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.clone().json().catch(() => null)
@@ -51,6 +55,44 @@ export default class extends Controller {
       queued = !navigator.onLine
     }
     this._showThankyou(queued)
+  }
+
+  // A stable per-session token: persisted so a refresh reuses the same
+  // response row rather than creating a duplicate.
+  _ensureToken() {
+    const newToken = () =>
+      (typeof crypto !== "undefined" && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2)
+    const key = `verto_session_${this.submitUrlValue}`
+    try {
+      let t = sessionStorage.getItem(key)
+      if (!t) { t = newToken(); sessionStorage.setItem(key, t) }
+      return t
+    } catch (_) {
+      return newToken()
+    }
+  }
+
+  // Register this session as a responder once it has ≥1 real answer, so people
+  // who answer something then leave are still counted. Fire once on success.
+  async _saveProgress() {
+    if (this._registered || !this.progressUrlValue) return
+    const hasAnswer = Object.values(this._answers).some(a => a && this._isAnswered(a.value))
+    if (!hasAnswer) return
+    try {
+      const res = await fetch(this.progressUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_token: this._sessionToken, answers: this._answers })
+      })
+      if (res.ok) this._registered = true
+    } catch (_) { /* retry on the next navigation */ }
+  }
+
+  _isAnswered(value) {
+    if (Array.isArray(value)) return value.length > 0
+    return value !== null && value !== undefined && value !== ""
   }
 
   _capture(idx) {

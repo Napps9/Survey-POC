@@ -3,7 +3,7 @@ class PlayerController < ApplicationController
   layout "fullscreen"
   skip_before_action :require_authentication
   skip_before_action :set_current_organisation
-  protect_from_forgery with: :null_session, only: :submit
+  protect_from_forgery with: :null_session, only: [:submit, :progress]
 
   before_action :load_survey_and_share
 
@@ -12,17 +12,38 @@ class PlayerController < ApplicationController
     return render plain: "This Verto is no longer available.", status: :gone if @survey.deleted?
   end
 
+  # Partial save while the player is mid-survey, so we can count people who
+  # answered at least one question even if they never reach Submit. Idempotent
+  # per session_token (a refresh reuses the token) and never downgrades a
+  # response that has already been completed.
+  def progress
+    return render json: { ok: false }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    data  = JSON.parse(request.body.read)
+    token = data["session_token"].presence || SecureRandom.uuid
+    resp  = Response.find_or_initialize_by(session_token: token)
+    resp.survey       ||= @survey
+    resp.survey_share ||= @survey_share
+    resp.answers = data["answers"] || {}
+    # NB: the status column defaults to "completed", so a freshly initialized
+    # record already reads "completed" — only preserve it for rows already saved
+    # as completed (a late progress ping after submit), otherwise mark "started".
+    resp.status  = "started" unless resp.persisted? && resp.status == "completed"
+    resp.save!
+    render json: { ok: true, session_token: token }
+  rescue => e
+    render json: { ok: false, error: e.message }, status: :unprocessable_entity
+  end
+
   def submit
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
-    data = JSON.parse(request.body.read)
-    Response.create!(
-      survey:        @survey,
-      survey_share:  @survey_share,
-      session_token: data["session_token"] || SecureRandom.uuid,
-      answers:       data["answers"] || {},
-      status:        "completed"
-    )
+    data  = JSON.parse(request.body.read)
+    token = data["session_token"].presence || SecureRandom.uuid
+    resp  = Response.find_or_initialize_by(session_token: token)
+    resp.survey       ||= @survey
+    resp.survey_share ||= @survey_share
+    resp.update!(answers: data["answers"] || {}, status: "completed")
     render json: { ok: true }
   rescue => e
     render json: { ok: false, error: e.message }, status: :unprocessable_entity

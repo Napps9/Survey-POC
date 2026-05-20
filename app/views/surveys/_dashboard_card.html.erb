@@ -1,8 +1,10 @@
 <%
   archived    = local_assigns[:archived] == true
   published   = survey.publish_token.present? && !archived
-  resp_count  = survey.responses.length
+  resp_count  = survey.responses.to_a.count { |r| r.status == "completed" }
   q_count     = Array(survey.cards).count { |c| c["type"].to_s != "welcome_card" }
+  responders  = published ? survey.responders_count : 0
+  completion  = published ? survey.completion_rate  : nil
 
   if archived
     accent_bg     = "rgba(255,255,255,0.05)"
@@ -66,16 +68,33 @@
     <% end %>
   </div>
 
-  <div style="display:flex;align-items:center;gap:0;border-top:1px solid rgba(255,255,255,0.05);margin:0 16px;padding:10px 0;">
-    <div style="flex:1;display:flex;align-items:baseline;gap:5px;">
-      <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:<%= resp_count > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;line-height:1;"><%= resp_count %></span>
-      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">response<%= resp_count == 1 ? "" : "s" %></span>
+  <% if published %>
+    <div style="display:flex;align-items:center;border-top:1px solid rgba(255,255,255,0.05);margin:0 16px;padding:10px 0;">
+      <div style="flex:1;display:flex;align-items:baseline;gap:5px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:<%= responders > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;line-height:1;"><%= responders %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">responder<%= responders == 1 ? "" : "s" %></span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:5px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:<%= completion.nil? ? 'rgba(255,255,255,0.2)' : '#01EACB' %>;line-height:1;"><%= completion.nil? ? "—" : "#{completion}%" %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">completion</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:5px;margin-left:14px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:rgba(255,255,255,0.4);line-height:1;"><%= q_count %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);">question<%= q_count == 1 ? "" : "s" %></span>
+      </div>
     </div>
-    <div style="display:flex;align-items:baseline;gap:5px;">
-      <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:rgba(255,255,255,0.4);line-height:1;"><%= q_count %></span>
-      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);">question<%= q_count == 1 ? "" : "s" %></span>
+  <% else %>
+    <div style="display:flex;align-items:center;gap:0;border-top:1px solid rgba(255,255,255,0.05);margin:0 16px;padding:10px 0;">
+      <div style="flex:1;display:flex;align-items:baseline;gap:5px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:<%= resp_count > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;line-height:1;"><%= resp_count %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">response<%= resp_count == 1 ? "" : "s" %></span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:5px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:rgba(255,255,255,0.4);line-height:1;"><%= q_count %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);">question<%= q_count == 1 ? "" : "s" %></span>
+      </div>
     </div>
-  </div>
+  <% end %>
 
   <% if archived %>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 14px;">

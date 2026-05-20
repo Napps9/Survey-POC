@@ -7,6 +7,7 @@
 <div class="preview-overlay flex flex-col"
      style="height:100vh;"
      data-controller="player"
+     data-player-progress-url-value="<%= progress_survey_url(@survey.publish_token) %>"
      data-player-submit-url-value="<%= submit_survey_url(@survey.publish_token) %>"
      data-player-results-url-value="<%= @survey.show_results_comparison? ? player_results_url(@survey.publish_token) : '' %>"
      data-player-show-comparison-value="<%= @survey.show_results_comparison? %>">

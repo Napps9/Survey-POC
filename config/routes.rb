@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   # Public player (no auth)
   get  "play/:token",        to: "player#show",   as: :play_survey
+  post "play/:token/progress", to: "player#progress", as: :progress_survey
   post "play/:token/submit", to: "player#submit", as: :submit_survey
   get  "play/:token/results", to: "player#results", as: :player_results
 
