@@ -1802,10 +1802,27 @@
   gap: 20px; text-align: center; padding: 40px;
 }
 .preview-thankyou.active { display: flex; }
+/* Opaque card so the thank-you (and comparison) never clash with a brand
+   background image. Fixed dark surface keeps the light text/wordmark legible
+   regardless of the Verto's palette. */
+.preview-thankyou-card {
+  background: #1C2034;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  padding: 44px 44px 40px;
+  max-width: 520px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
 .preview-thankyou-emoji { font-size: 60px; line-height: 1; }
 .preview-thankyou-title {
   font-family: "Alata", sans-serif; font-size: 44px;
-  color: var(--brand-text, #fff); letter-spacing: -0.5px;
+  color: #fff; letter-spacing: -0.5px;
 }
 .preview-thankyou-sub {
   font-family: "ABeeZee", sans-serif; font-size: 16px;
@@ -2374,6 +2391,7 @@
   }
 
   .preview-thankyou       { padding: 28px 20px; }
+  .preview-thankyou-card  { padding: 32px 22px; }
   .preview-thankyou-emoji { font-size: 52px; }
   .preview-thankyou-title { font-size: 32px; }
   .preview-thankyou-sub   { font-size: 14px; max-width: 100%; }
