@@ -52,6 +52,21 @@ module ApplicationHelper
     }.map { |k, v| "#{k}:#{v}" }.join(";")
   end
 
+  # Full backdrop style for a Verto's canvas wrappers (player overlay, preview
+  # overlay, editor card feed): the brand-colour variables plus, when set, a
+  # --brand-bg-image with a top/bottom scrim so the nav/footer text stays
+  # legible over the image. Spread into the wrapper's inline `style`.
+  def verto_backdrop_style_attr(survey)
+    parts = []
+    palette = brand_palette_style_attr(survey.brand_palette)
+    parts << palette if palette.present?
+    if survey.background_image.present?
+      url = survey.background_image.to_s.gsub(/["\r\n]/, "")
+      parts << %(--brand-bg-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.12) 28%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.45)), url("#{url}"))
+    end
+    parts.join(";")
+  end
+
   # Interaction illustration shown in the left (dark) panel of each split-card.
   # Explains HOW to interact with the question type using a simple visual.
   def interaction_illustration(type)

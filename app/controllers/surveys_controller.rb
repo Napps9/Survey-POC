@@ -79,6 +79,7 @@ class SurveysController < ApplicationController
       attrs[:results_summary_response_count] = nil
     end
     attrs[:brand_palette] = BrandPalette.sanitize(payload["brand_palette"]).presence if payload.key?("brand_palette")
+    attrs[:background_image] = Survey.sanitize_background_image(payload["background_image"]) if payload.key?("background_image")
 
     survey.update!(attrs)
 

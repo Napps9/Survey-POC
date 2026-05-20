@@ -1763,7 +1763,10 @@
    ══════════════════════════════════════════════════════════════════ */
 .preview-overlay {
   position: fixed; inset: 0; z-index: 60;
-  background: var(--brand-bg, #1C2034);
+  background-color: var(--brand-bg, #1C2034);
+  background-image: var(--brand-bg-image, none);
+  background-size: cover;
+  background-position: center;
   flex-direction: column;
 }
 .preview-nav {

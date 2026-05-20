@@ -7,12 +7,15 @@ export default class extends Controller {
   static targets = [
     "backdrop", "modal", "tab", "pane",
     "fileInput", "dropzone",
-    "libraryItem", "applyBtn", "clearBtn"
+    "libraryItem", "applyBtn", "clearBtn",
+    "bgThumb", "bgRemoveBtn"
   ]
+  static values = { url: String }
 
   connect() {
     this._activeCard = null
     this._pendingUrl = null
+    this._mode = "card"
     this._escListener = (e) => { if (e.key === "Escape") this.close() }
   }
 
@@ -23,6 +26,7 @@ export default class extends Controller {
     const card    = trigger?.closest("[data-survey-editor-target='card']")
                  || trigger?.closest(".survey-card-wrap")
     if (!card) return
+    this._mode = "card"
     this._activeCard = card
     this._pendingUrl = null
     this._setApplyEnabled(false)
@@ -31,6 +35,19 @@ export default class extends Controller {
     const currentUrl = card.dataset.cardImage || ""
     this.clearBtnTarget.hidden = !currentUrl
 
+    this.backdropTarget.hidden = false
+    document.addEventListener("keydown", this._escListener)
+  }
+
+  // Opens the same modal but targets the Verto's backdrop instead of a card.
+  openBackground(event) {
+    event?.preventDefault()
+    this._mode = "background"
+    this._activeCard = null
+    this._pendingUrl = null
+    this._setApplyEnabled(false)
+    this._switchTabKey("upload")
+    this.clearBtnTarget.hidden = !this._currentBg()
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
   }
@@ -97,17 +114,75 @@ export default class extends Controller {
 
   // ── Apply / clear ──────────────────────────────────────
   applyImage() {
-    if (!this._activeCard || !this._pendingUrl) return
+    if (!this._pendingUrl) return
+    if (this._mode === "background") {
+      this._setVertoBackground(this._pendingUrl)
+      this.close()
+      return
+    }
+    if (!this._activeCard) return
     this._setCardImage(this._activeCard, this._pendingUrl)
     this._notifyDirty()
     this.close()
   }
 
   clearImage() {
+    if (this._mode === "background") {
+      this._setVertoBackground("")
+      this.close()
+      return
+    }
     if (!this._activeCard) return
     this._setCardImage(this._activeCard, "")
     this._notifyDirty()
     this.close()
+  }
+
+  // Panel "Remove" button — clears the Verto backdrop without opening the modal.
+  removeBackground(event) {
+    event?.preventDefault()
+    this._setVertoBackground("")
+  }
+
+  _currentBg() {
+    if (!this.hasBgThumbTarget) return ""
+    const bg = this.bgThumbTarget.style.backgroundImage
+    return bg && bg !== "none" ? bg : ""
+  }
+
+  _setVertoBackground(url) {
+    // Thumbnail + Remove button in the panel
+    if (this.hasBgThumbTarget) {
+      this.bgThumbTarget.style.backgroundImage = url ? `url('${url.replace(/'/g, "\\'")}')` : ""
+    }
+    if (this.hasBgRemoveBtnTarget) this.bgRemoveBtnTarget.hidden = !url
+
+    // Live-apply to every canvas wrapper (editor feed + preview overlay)
+    const value = url
+      ? `linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.12) 28%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.45)), url("${url.replace(/"/g, "")}")`
+      : ""
+    document.querySelectorAll('[data-brand-palette-target="preview"]').forEach((el) => {
+      if (value) el.style.setProperty("--brand-bg-image", value)
+      else el.style.removeProperty("--brand-bg-image")
+    })
+
+    this._saveBackground(url)
+  }
+
+  async _saveBackground(url) {
+    if (!this.hasUrlValue) return
+    try {
+      await fetch(this.urlValue, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || "",
+        },
+        body: JSON.stringify({ background_image: url || null }),
+      })
+    } catch (_e) {
+      // best-effort; the editor stays usable even if the save fails
+    }
   }
 
   _setCardImage(card, url) {

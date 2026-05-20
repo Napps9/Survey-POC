@@ -21,6 +21,18 @@ class Survey < ApplicationRecord
     BrandPalette.resolve(brand_palette)
   end
 
+  # Accept only an uploaded data-image URL or an app-rooted image asset path,
+  # so the value is safe to drop into an inline `style` attribute. Anything
+  # else (or blank) clears the background.
+  DATA_IMAGE_URL  = %r{\Adata:image/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+\z}
+  ASSET_IMAGE_URL = %r{\A/[\w\-./]+\.(?:png|jpe?g|webp|svg|gif)\z}i
+
+  def self.sanitize_background_image(value)
+    v = value.to_s.strip
+    return nil if v.blank?
+    (v.match?(DATA_IMAGE_URL) || v.match?(ASSET_IMAGE_URL)) ? v : nil
+  end
+
   def archive!
     update!(deleted_at: Time.current)
   end

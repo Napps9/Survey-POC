@@ -17,6 +17,7 @@
      data-controller="type-panel preview-verto survey-editor media-picker publish-panel brand-palette"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
+     data-media-picker-url-value="<%= survey_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"
      data-survey-editor-description-value="<%= @survey.description %>"
      data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#close">
@@ -54,7 +55,7 @@
           surrounding editor chrome stays Playverto. %>
       <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5"
            data-brand-palette-target="preview"
-           style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;<%= brand_palette_style_attr(@survey.brand_palette) %>">
+           style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;background-color:var(--brand-bg,#272D4A);background-image:var(--brand-bg-image,none);background-size:cover;background-position:center;<%= verto_backdrop_style_attr(@survey) %>">
 
         <% cards.each_with_index do |card, idx| %>
           <%
@@ -267,6 +268,24 @@
           <% end %>
           <div data-brand-palette-target="status"
                style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:2px;"></div>
+
+          <%# Background image — fills the backdrop behind the whole Verto. %>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;">Background image</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin:3px 0 10px;line-height:1.45;">Optional — sits behind every card, over the background colour.</div>
+            <div style="display:flex;align-items:center;gap:11px;">
+              <div data-media-picker-target="bgThumb"
+                   style="width:54px;height:54px;border-radius:9px;flex-shrink:0;background-color:rgba(255,255,255,0.06);background-size:cover;background-position:center;border:1px solid rgba(255,255,255,0.12);<%= "background-image:url('#{@survey.background_image.to_s.gsub(/['\"]/, '')}');".html_safe if @survey.background_image.present? %>"></div>
+              <button type="button"
+                      data-action="click->media-picker#openBackground"
+                      style="flex:1;padding:9px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Choose image</button>
+              <button type="button"
+                      data-media-picker-target="bgRemoveBtn"
+                      data-action="click->media-picker#removeBackground"
+                      <%= "hidden" unless @survey.background_image.present? %>
+                      style="padding:9px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Remove</button>
+            </div>
+          </div>
         </div>
 
         <%# Publish status / link %>
@@ -383,7 +402,7 @@
   <div class="preview-overlay hidden"
        data-preview-verto-target="overlay"
        data-brand-palette-target="preview"
-       style="<%= brand_palette_style_attr(@survey.brand_palette) %>">
+       style="<%= verto_backdrop_style_attr(@survey) %>">
 
     <%# Nav — respondents see the org's brand here, not Playverto's %>
     <nav class="preview-nav">
