@@ -612,6 +612,10 @@ export default class extends Controller {
 
     card.dataset.cardType = type
 
+    // The "Other" block applies to question types only.
+    const otherBlock = card.querySelector(".other-block")
+    if (otherBlock) otherBlock.hidden = (type === "welcome_card")
+
     if (card === this.activeCardEl) {
       const num = card.dataset.cardNum
       this.panelCardNameTarget.textContent = `Card ${num} · ${meta.badge}`

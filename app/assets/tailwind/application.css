@@ -700,6 +700,32 @@
 }
 .freeform-counter.over { color: var(--color-red); font-weight: 600; }
 
+/* ── "Other" free-text option (all question types) ── */
+.other-block { margin-top: 14px; }
+.other-edit-toggle {
+  display: flex; align-items: center; gap: 8px;
+  font-family: "ABeeZee", sans-serif; font-size: 13px;
+  color: rgba(0,0,0,0.55); margin-bottom: 8px; cursor: pointer;
+}
+.other-edit-toggle input { accent-color: #FF1E6F; cursor: pointer; }
+.other-cta-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 100px;
+  background: transparent; border: 1px dashed rgba(0,0,0,0.2);
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(0,0,0,0.55);
+  cursor: pointer; transition: all 0.15s;
+}
+.other-cta-btn:hover:not(:disabled) { border-color: #FF1E6F; color: #FF1E6F; }
+.other-cta-btn.is-active { background: rgba(255,30,111,0.1); border-style: solid; border-color: #FF1E6F; color: #FF1E6F; }
+.other-cta-btn:disabled { opacity: 0.6; cursor: default; }
+.other-panel { margin-top: 10px; }
+/* While "Other" is active, dim the normal answer to signal it's overridden. */
+.split-card.other-active .mt-2 { opacity: 0.4; pointer-events: none; }
+
+/* Player-overlay variants (light card on dark bg) */
+.preview-overlay .other-cta-btn { border-color: rgba(0,0,0,0.18); color: rgba(0,0,0,0.55); }
+.preview-overlay .other-cta-btn.is-active { background: rgba(255,30,111,0.12); border-color: #FF1E6F; color: #FF1E6F; }
+
 /* ── Editor chrome (per-card row above split-card) ─ */
 .edit-chrome {
   display: flex; align-items: center; justify-content: space-between;

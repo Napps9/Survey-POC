@@ -98,9 +98,14 @@ export default class extends Controller {
   _capture(idx) {
     const card = this.cardTargets[idx]
     if (!card) return
-    const type   = card.dataset.cardType
-    const value  = this._read(card, type)
-    this._answers[String(idx)] = { type, value }
+    const type  = card.dataset.cardType
+    const value = this._read(card, type)
+    // "Other" is a standalone answer: if the respondent typed free text it
+    // replaces any normal selection for this card.
+    const other = card.querySelector("[data-other-input]")?.value.trim()
+    this._answers[String(idx)] = other
+      ? { type, value: null, other }
+      : { type, value }
   }
 
   _read(card, type) {

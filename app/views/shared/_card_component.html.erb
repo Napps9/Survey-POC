@@ -208,4 +208,31 @@
       <%# Welcome card — no interactive component %>
     <% end %>
   </div>
+
+  <%# "Other" free-text — a standalone answer the creator can toggle per card.
+      Rendered for every question type (not welcome). In the editor it's always
+      present (hidden on welcome) so the toggle survives a type switch. %>
+  <% if editable || (is_q && card["allow_other"]) %>
+    <div class="other-block" data-controller="other"<%= ' hidden'.html_safe if (editable && type == "welcome_card") %>>
+      <% if editable %>
+        <label class="other-edit-toggle">
+          <input type="checkbox" data-action="change->survey-editor#toggleOther" <%= "checked" if card["allow_other"] %>>
+          <span>Allow “Other” free-text answer</span>
+        </label>
+      <% end %>
+      <div class="other-cta-wrap" data-other-target="wrap"<%= ' hidden'.html_safe unless card["allow_other"] %>>
+        <button type="button" class="other-cta-btn" data-other-target="btn"
+                data-action="click->other#toggle"<%= ' disabled'.html_safe if editable %>>＋ Other</button>
+        <div class="other-panel" data-other-target="panel" hidden
+             data-controller="freeform" data-freeform-max-value="200">
+          <textarea class="freeform-textarea other-textarea"
+                    placeholder="Tell us in your own words…"
+                    data-other-input
+                    data-freeform-target="input"
+                    data-action="input->freeform#update"></textarea>
+          <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

@@ -127,6 +127,16 @@ export default class extends Controller {
     this.markDirty()
   }
 
+  toggleOther(event) {
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    if (!card) return
+    const on = event.currentTarget.checked
+    card.dataset.cardAllowOther = on ? "true" : "false"
+    const wrap = card.querySelector(".other-cta-wrap")
+    if (wrap) wrap.hidden = !on
+    this.markDirty()
+  }
+
   markDirty() {
     this.flash("Unsaved changes", "text-light-yellow")
     clearTimeout(this._saveTimer)
@@ -143,6 +153,7 @@ export default class extends Controller {
       if (desc) out.description = desc
       const image = card.dataset.cardImage
       if (image) out.image = image
+      if (card.dataset.cardAllowOther === "true") out.allow_other = true
       const opts = []
       if (['multiple_choice', 'select_many', 'yes_no'].includes(type))
         card.querySelectorAll('.pick-text').forEach(el => opts.push(el.textContent.trim()))

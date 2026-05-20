@@ -69,6 +69,7 @@
                data-card-type="<%= type %>"
                data-card-num="<%= idx + 1 %>"
                data-card-image="<%= card['image'].to_s %>"
+               data-card-allow-other="<%= card['allow_other'] ? 'true' : 'false' %>"
                data-card-options="<%= Array(card['options']).to_json %>"
                data-action="click->type-panel#selectCard">
 
