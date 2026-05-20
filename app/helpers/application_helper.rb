@@ -30,6 +30,28 @@ module ApplicationHelper
     end
   end
 
+  # Inline `style` value that sets the Verto-experience brand variables for a
+  # given palette. Spread onto a wrapper element (player overlay, preview
+  # overlay, editor card feed) so the brand colours are scoped to the Verto and
+  # never leak into the Playverto platform chrome. Returns "" for the default
+  # palette so un-branded Vertos fall back to the current Playverto look.
+  def brand_palette_style_attr(palette)
+    return "" if BrandPalette.default?(palette)
+
+    r = BrandPalette.resolve(palette)
+    {
+      "--brand-primary"      => r["primary"],
+      "--brand-cta"          => r["cta"],
+      "--brand-bg"           => r["bg"],
+      "--brand-cta-text"     => r["cta_text"],
+      "--brand-cta-hover"    => r["cta_hover"],
+      "--brand-text"         => r["text"],
+      "--brand-surface"      => r["surface"],
+      "--brand-surface-2"    => r["surface_2"],
+      "--brand-primary-soft" => r["primary_soft"]
+    }.map { |k, v| "#{k}:#{v}" }.join(";")
+  end
+
   # Interaction illustration shown in the left (dark) panel of each split-card.
   # Explains HOW to interact with the question type using a simple visual.
   def interaction_illustration(type)
@@ -44,9 +66,9 @@ module ApplicationHelper
           <div style="display:flex;align-items:center;gap:8px;#{w}">
             <span style="font-size:16px;opacity:0.5;">←</span>
             <div style="position:relative;flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.15);">
-              <div style="position:absolute;width:40%;height:100%;border-radius:3px;background:#01EACB;"></div>
+              <div style="position:absolute;width:40%;height:100%;border-radius:3px;background:var(--brand-primary,#01EACB);"></div>
               <div style="position:absolute;left:38%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
-                <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 5H1m6 0H9M5 3V1m0 8V7" stroke="#01EACB" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 5H1m6 0H9M5 3V1m0 8V7" stroke-width="1.5" stroke-linecap="round" style="stroke:var(--brand-primary,#01EACB)"/></svg>
               </div>
             </div>
             <span style="font-size:16px;opacity:0.5;">→</span>
@@ -68,8 +90,8 @@ module ApplicationHelper
     when "multiple_choice"
       items = [["◉", "Option A", true], ["○", "Option B", false], ["○", "Option C", false]]
       rows = items.map { |dot, label, sel|
-        bg = sel ? "background:rgba(1,234,203,0.15);" : ""
-        clr = sel ? "color:#01EACB;" : "color:rgba(255,255,255,0.7);"
+        bg = sel ? "background:var(--brand-primary-soft,rgba(1,234,203,0.15));" : ""
+        clr = sel ? "color:var(--brand-primary,#01EACB);" : "color:rgba(255,255,255,0.7);"
         "<div style=\"display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;#{bg}\">" \
         "<span style=\"font-size:14px;#{clr}\">#{dot}</span>" \
         "<span style=\"font-size:12px;#{clr}#{c}\">#{label}</span></div>"
@@ -84,8 +106,8 @@ module ApplicationHelper
     when "select_many"
       items = [["☑", "Option A", true], ["☑", "Option B", true], ["☐", "Option C", false]]
       rows = items.map { |dot, label, sel|
-        bg = sel ? "background:rgba(1,234,203,0.12);" : ""
-        clr = sel ? "color:#01EACB;" : "color:rgba(255,255,255,0.6);"
+        bg = sel ? "background:var(--brand-primary-soft,rgba(1,234,203,0.12));" : ""
+        clr = sel ? "color:var(--brand-primary,#01EACB);" : "color:rgba(255,255,255,0.6);"
         "<div style=\"display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;#{bg}\">" \
         "<span style=\"font-size:14px;#{clr}\">#{dot}</span>" \
         "<span style=\"font-size:12px;#{clr}#{c}\">#{label}</span></div>"
@@ -101,7 +123,7 @@ module ApplicationHelper
       <<~HTML
         <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:12px;">
           <div style="display:flex;gap:12px;width:100%;">
-            <div style="flex:1;padding:10px;border-radius:12px;background:#01EACB;text-align:center;#{c};font-size:13px;color:white;">Yes</div>
+            <div style="flex:1;padding:10px;border-radius:12px;background:var(--brand-primary,#01EACB);text-align:center;#{c};font-size:13px;color:white;">Yes</div>
             <div style="flex:1;padding:10px;border-radius:12px;background:rgba(255,255,255,0.08);text-align:center;#{c};font-size:13px;color:rgba(255,255,255,0.5);">No</div>
           </div>
           <div style="#{d}">Tap to choose one</div>
@@ -113,8 +135,8 @@ module ApplicationHelper
       cells = ["A","B","C","D"].map.with_index { |l, i|
         bg = %w[#d4edda #d1ecf1 #fff3cd #f8d7da][i]
         sel = i.zero? || (multi && i == 1)
-        ring = sel ? "outline:2px solid #01EACB;outline-offset:-2px;" : ""
-        tick = sel ? "<div style=\"position:absolute;top:3px;right:4px;color:#01EACB;font-size:10px;font-weight:700;\">✓</div>" : ""
+        ring = sel ? "outline:2px solid var(--brand-primary,#01EACB);outline-offset:-2px;" : ""
+        tick = sel ? "<div style=\"position:absolute;top:3px;right:4px;color:var(--brand-primary,#01EACB);font-size:10px;font-weight:700;\">✓</div>" : ""
         "<div style=\"position:relative;height:44px;border-radius:8px;background:#{bg};display:flex;align-items:center;justify-content:center;#{ring}\">" \
         "<span style=\"font-size:11px;color:rgba(0,0,0,0.55);font-family:'Alata',sans-serif;\">#{l}</span>#{tick}</div>"
       }.join
@@ -138,7 +160,7 @@ module ApplicationHelper
           </div>
           <div style="display:flex;justify-content:space-between;width:90%;font-size:11px;">
             <span style="color:#e05555;#{c}">← No</span>
-            <span style="color:#01EACB;#{c}">Yes →</span>
+            <span style="color:var(--brand-primary,#01EACB);#{c}">Yes →</span>
           </div>
           <div style="#{d}">Swipe cards left or right</div>
         </div>
@@ -149,7 +171,7 @@ module ApplicationHelper
         <div style="width:80%;display:flex;flex-direction:column;align-items:center;gap:10px;">
           <div style="width:100%;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;background:rgba(255,255,255,0.04);">
             <div style="font-size:11px;color:rgba(255,255,255,0.3);font-family:'ABeeZee',sans-serif;">Type your answer…</div>
-            <div style="height:2px;width:6px;background:#01EACB;margin-top:6px;border-radius:2px;animation:blink 1s step-end infinite;"></div>
+            <div style="height:2px;width:6px;background:var(--brand-primary,#01EACB);margin-top:6px;border-radius:2px;animation:blink 1s step-end infinite;"></div>
           </div>
           <div style="#{d}">Tap and type your response</div>
         </div>

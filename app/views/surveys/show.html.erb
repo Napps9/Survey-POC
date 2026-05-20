@@ -14,8 +14,9 @@
 <script id="card-types" type="application/json"><%= CardTypes.to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker publish-panel"
+     data-controller="type-panel preview-verto survey-editor media-picker publish-panel brand-palette"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
+     data-brand-palette-url-value="<%= survey_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"
      data-survey-editor-description-value="<%= @survey.description %>"
      data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#close">
@@ -48,9 +49,12 @@
         <div class="brief-q-count"><%= total_q %> questions</div>
       </div>
 
-      <%# Cards feed — stacked, full-width split-cards %>
+      <%# Cards feed — stacked, full-width split-cards. The Verto's brand
+          palette is scoped here so the cards render in brand colours while the
+          surrounding editor chrome stays Playverto. %>
       <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5"
-           style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;">
+           data-brand-palette-target="preview"
+           style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;<%= brand_palette_style_attr(@survey.brand_palette) %>">
 
         <% cards.each_with_index do |card, idx| %>
           <%
@@ -234,6 +238,37 @@
         <button type="button" class="publish-block-btn"
                 data-action="click->preview-verto#open">▶ Preview Verto</button>
 
+        <%# Brand colours — edits THIS Verto's palette (not other Vertos). %>
+        <div class="publish-block">
+          <div class="publish-block-title">Brand colours</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:12px;line-height:1.45;">
+            Applied to this Verto's cards, preview and player. Changes here don't affect your other Vertos.
+          </div>
+          <% pal = @survey.brand_palette %>
+          <% [["primary", "Primary", "Headings &amp; accents"],
+              ["cta",     "Buttons (CTA)", "Next / Submit buttons"],
+              ["bg",      "Background", "The canvas behind cards"]].each do |role, label, desc| %>
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px;">
+              <input type="color" value="<%= pal[role] %>"
+                     data-brand-palette-target="colorInput" data-brand-role="<%= role %>"
+                     data-action="input->brand-palette#onColor"
+                     aria-label="<%= label %> colour"
+                     style="width:36px;height:36px;border:none;border-radius:9px;background:none;cursor:pointer;padding:0;flex-shrink:0;" />
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;"><%= label.html_safe %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);"><%= desc.html_safe %></div>
+              </div>
+              <input type="text" value="<%= pal[role] %>"
+                     data-brand-palette-target="hexInput" data-brand-role="<%= role %>"
+                     data-action="input->brand-palette#onHex"
+                     maxlength="7" spellcheck="false"
+                     style="width:86px;padding:7px 9px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;text-transform:uppercase;" />
+            </div>
+          <% end %>
+          <div data-brand-palette-target="status"
+               style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:2px;"></div>
+        </div>
+
         <%# Publish status / link %>
         <div class="publish-block">
           <div class="publish-block-title">Status</div>
@@ -346,7 +381,9 @@
 
   <%# ── Preview Verto overlay ── %>
   <div class="preview-overlay hidden"
-       data-preview-verto-target="overlay">
+       data-preview-verto-target="overlay"
+       data-brand-palette-target="preview"
+       style="<%= brand_palette_style_attr(@survey.brand_palette) %>">
 
     <%# Nav — respondents see the org's brand here, not Playverto's %>
     <nav class="preview-nav">

@@ -5,7 +5,7 @@
   prev_q  = 0
 %>
 <div class="preview-overlay flex flex-col"
-     style="height:100vh;"
+     style="height:100vh;<%= brand_palette_style_attr(@survey.brand_palette) %>"
      data-controller="player"
      data-player-progress-url-value="<%= progress_survey_url(@survey.publish_token) %>"
      data-player-submit-url-value="<%= submit_survey_url(@survey.publish_token) %>"
@@ -46,7 +46,7 @@
           <button type="button"
                   data-player-target="compareBtn"
                   data-action="click->player#showComparison"
-                  style="margin-top:22px;padding:11px 22px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
+                  style="margin-top:22px;padding:11px 22px;border-radius:100px;background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
             See your results compared to others →
           </button>
         <% end %>

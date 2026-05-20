@@ -28,6 +28,7 @@ class SurveysController < ApplicationController
     key_insight  = params[:key_insight].to_s.strip
     notes        = params[:notes].to_s.strip
     show_compare = ActiveModel::Type::Boolean.new.cast(params[:show_results_comparison])
+    palette      = BrandPalette.sanitize(params[:brand_palette])
 
     if theme.empty? || audience_age.empty? || key_insight.empty?
       flash.now[:alert] = "Tell us what your Verto's about, who's answering, and what you want to learn — those three are required."
@@ -48,8 +49,12 @@ class SurveysController < ApplicationController
       audience_age: result["audience_age"].presence || audience_age,
       key_insight:  result["key_insight"].presence || key_insight,
       cards:        result["cards"],
-      show_results_comparison: show_compare
+      show_results_comparison: show_compare,
+      brand_palette: palette.presence
     )
+
+    # Remember the palette as the company default so the next Verto inherits it.
+    Current.organisation.update(default_brand_palette: palette) if palette.present?
 
     redirect_to survey_path(@survey)
   rescue => e
@@ -62,13 +67,20 @@ class SurveysController < ApplicationController
     survey = Current.organisation.surveys.kept.find(params[:id])
     payload = JSON.parse(request.body.read)
 
-    survey.update!(
-      title:                          payload["title"],
-      description:                    payload["description"],
-      cards:                          payload["cards"],
-      results_summary:                nil,
-      results_summary_response_count: nil
-    )
+    # Only touch the attributes present in the payload, so the brand-colour
+    # PATCH (which sends just `brand_palette`) doesn't wipe title/cards, and the
+    # editor autosave (title/description/cards) doesn't touch the palette.
+    attrs = {}
+    attrs[:title]       = payload["title"]       if payload.key?("title")
+    attrs[:description] = payload["description"] if payload.key?("description")
+    if payload.key?("cards")
+      attrs[:cards]                          = payload["cards"]
+      attrs[:results_summary]                = nil
+      attrs[:results_summary_response_count] = nil
+    end
+    attrs[:brand_palette] = BrandPalette.sanitize(payload["brand_palette"]).presence if payload.key?("brand_palette")
+
+    survey.update!(attrs)
 
     render json: { ok: true, id: survey.id, updated_at: survey.updated_at }
   rescue => e

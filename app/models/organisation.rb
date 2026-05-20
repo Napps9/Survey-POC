@@ -17,6 +17,12 @@ class Organisation < ApplicationRecord
 
   enum :kind, { creator: "creator", partner: "partner" }
 
+  # The company's default Verto palette — pre-fills each new Verto's colour
+  # step. Falls back to the Playverto default when never set.
+  def brand_palette
+    read_attribute(:default_brand_palette).presence || BrandPalette::DEFAULT
+  end
+
   def self.generate_unique_slug(name)
     base = name.to_s.downcase.gsub(/[^a-z0-9]+/, "-").delete_prefix("-").delete_suffix("-")
     base = "org" if base.blank?

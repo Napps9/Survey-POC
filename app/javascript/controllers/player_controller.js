@@ -221,7 +221,7 @@ export default class extends Controller {
     wrap.appendChild(prompt)
 
     const yourPill = document.createElement("div")
-    yourPill.style.cssText = "display:inline-block;padding:4px 10px;border-radius:100px;background:rgba(1,234,203,0.15);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size:11px;margin-bottom:10px;"
+    yourPill.style.cssText = "display:inline-block;padding:4px 10px;border-radius:100px;background:var(--brand-primary-soft,rgba(1,234,203,0.15));color:var(--brand-primary,#01EACB);font-family:'ABeeZee',sans-serif;font-size:11px;margin-bottom:10px;"
     yourPill.textContent = `Your answer: ${this._formatMine(mine, row)}`
     wrap.appendChild(yourPill)
 
@@ -300,7 +300,7 @@ export default class extends Controller {
     row.style.cssText = "display:flex;align-items:center;gap:8px;"
 
     const lbl = document.createElement("span")
-    lbl.style.cssText = `font-family:'ABeeZee',sans-serif;font-size:11px;color:${isMine ? "#01EACB" : "rgba(255,255,255,0.7)"};min-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`
+    lbl.style.cssText = `font-family:'ABeeZee',sans-serif;font-size:11px;color:${isMine ? "var(--brand-primary,#01EACB)" : "rgba(255,255,255,0.7)"};min-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`
     lbl.title = label
     lbl.textContent = (isMine ? "● " : "") + label
     row.appendChild(lbl)
@@ -308,7 +308,7 @@ export default class extends Controller {
     const track = document.createElement("div")
     track.style.cssText = "flex:1;height:7px;border-radius:4px;background:rgba(255,255,255,0.06);overflow:hidden;"
     const fill = document.createElement("div")
-    fill.style.cssText = `height:100%;border-radius:4px;background:${isMine ? "#01EACB" : "rgba(255,255,255,0.35)"};width:${pct}%;`
+    fill.style.cssText = `height:100%;border-radius:4px;background:${isMine ? "var(--brand-primary,#01EACB)" : "rgba(255,255,255,0.35)"};width:${pct}%;`
     track.appendChild(fill)
     row.appendChild(track)
 

@@ -11,6 +11,16 @@ class Survey < ApplicationRecord
     deleted_at.present?
   end
 
+  # This Verto's own palette (the three user-set roles). Legacy Vertos with no
+  # palette fall back to the Playverto default so they render unchanged.
+  def brand_palette
+    read_attribute(:brand_palette).presence || BrandPalette::DEFAULT
+  end
+
+  def resolved_brand_palette
+    BrandPalette.resolve(brand_palette)
+  end
+
   def archive!
     update!(deleted_at: Time.current)
   end
