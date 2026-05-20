@@ -60,14 +60,14 @@ export default class extends Controller {
       this._done(this.step3Target)
       this._active(this.step4Target)
       // Stage 3 — design rules applied
-      this._setHero(this._stage3Message(this._age, this._insight))
+      this._setHero(this._stage3Message(this._theme, this._age))
       this.heroAgeTarget.textContent = ""
     }, STEP3_DONE_MS)
 
     setTimeout(() => {
       // Still waiting — soften the message
       this._setHero(this._stage4Message())
-      this.heroAgeTarget.textContent = "Every question crafted. Putting the final touches on…"
+      this.heroAgeTarget.textContent = ""
     }, STEP4_HINT_MS)
   }
 
@@ -80,50 +80,36 @@ export default class extends Controller {
     // Tuned around expected message lengths (~80–220 chars).
     // Shorter copy → bigger text; longer copy → smaller text.
     let fit
-    if (len <= 60)        fit = 1.25
-    else if (len <= 100)  fit = 1.10
-    else if (len <= 140)  fit = 1.00
-    else if (len <= 180)  fit = 0.88
-    else if (len <= 220)  fit = 0.78
-    else                  fit = 0.70
+    if (len <= 100)       fit = 1.00
+    else if (len <= 140)  fit = 0.90
+    else if (len <= 180)  fit = 0.82
+    else                  fit = 0.74
     el.style.setProperty("--hero-fit", fit)
   }
 
-  // Each message reflects the user's actual input without just repeating it
+  // One concise phrase per step, reactive to the user's topic + audience.
+  _audience(age) { return age ? `${age} year olds` : "your audience" }
+
+  _topic(theme) {
+    const t = String(theme ?? "").trim()
+    const clipped = t.length > 48 ? `${t.slice(0, 47).trimEnd()}…` : t
+    return this._esc(clipped)
+  }
+
   _stage1Message(theme, age) {
-    const audience = age ? `${age} year olds` : "your audience"
-    const messages = [
-      `We're writing questions that reveal what <em>${audience}</em> genuinely think about ${this._esc(theme)}`,
-      `Crafting 10–15 questions designed to surface the honest story behind <em>${this._esc(theme)}</em>`,
-      `Every question is being built to get <em>${audience}</em> thinking — not just answering`,
-    ]
-    return messages[Math.floor(Math.random() * messages.length)]
+    return `Writing questions on <em>${this._topic(theme)}</em> for ${this._audience(age)}`
   }
 
   _stage2Message(theme, age) {
-    const audience = age ? `${age} year olds` : "your audience"
-    const messages = [
-      `Choosing the formats that'll keep <em>${audience}</em> engaged — sliders, swipe cards, image grids and more`,
-      `Matching each question about <em>${this._esc(theme)}</em> to the format that gets the most honest response`,
-      `Mixing question types so the Verto stays fresh from card 1 to the last — no two consecutive formats are the same`,
-    ]
-    return messages[Math.floor(Math.random() * messages.length)]
+    return `Choosing formats that keep <em>${this._audience(age)}</em> engaged`
   }
 
-  _stage3Message(age, insight) {
-    const audience = age ? `${age} year olds` : "respondents"
-    const messages = [
-      `Applying Playverto design rules — question length, option counts, and flow variety all tuned for <em>${audience}</em>`,
-      insight
-        ? `Making sure every card pushes toward uncovering <em>"${this._esc(insight)}"</em> without leading the answer`
-        : `Balancing question order so momentum builds — and the most important insight lands at the right moment`,
-      `Checking that no two identical formats appear back-to-back and every answer choice fits neatly on screen`,
-    ]
-    return messages[Math.floor(Math.random() * messages.length)]
+  _stage3Message(theme, age) {
+    return `Tuning your <em>${this._topic(theme)}</em> Verto for ${this._audience(age)}`
   }
 
   _stage4Message() {
-    return `Almost there — reviewing the full flow one last time`
+    return `Almost there — adding the final touches`
   }
 
   _done(el) {
