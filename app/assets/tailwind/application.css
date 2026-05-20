@@ -83,15 +83,41 @@
   align-items: center;
   justify-content: center;
 }
-/* 2×3 placeholder grid shown on the left panel */
-/* Interaction illustration in the left panel */
-.split-left-illustration {
+/* Editor empty-state prompting the creator to add an image (design) to the
+   card's left panel — replaces the old how-to illustration. */
+.split-left-design-prompt {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1;
-  padding: 16px;
-  margin-top: 16px;
+  gap: 8px;
+  width: 74%;
+  padding: 26px 24px;
+  background: transparent;
+  border: 1.5px dashed color-mix(in srgb, var(--brand-text, #ffffff) 30%, transparent);
+  border-radius: 18px;
+  color: var(--brand-text, #ffffff);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.split-left-design-prompt:hover {
+  background: color-mix(in srgb, var(--brand-text, #ffffff) 8%, transparent);
+  border-color: color-mix(in srgb, var(--brand-text, #ffffff) 55%, transparent);
+}
+.split-left-design-prompt-icon {
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--brand-text, #ffffff) 45%, transparent);
+  font-size: 22px; line-height: 1;
+}
+.split-left-design-prompt-title {
+  font-family: "Alata", sans-serif; font-size: 15px; letter-spacing: 0.02em;
+}
+.split-left-design-prompt-sub {
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
+  opacity: 0.6; line-height: 1.4; max-width: 200px;
 }
 
 .split-left-grid {
@@ -2225,8 +2251,7 @@
     overflow: hidden;
     background: var(--brand-surface-2, #2E3564);
   }
-  .preview-overlay .split-card:has(.split-left-img) .panel-progress,
-  .preview-overlay .split-card:has(.split-left-img) .split-left-illustration { display: none; }
+  .preview-overlay .split-card:has(.split-left-img) .panel-progress { display: none; }
   .preview-overlay .split-card:has(.split-left-img) .split-left-img,
   .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
     border-radius: 0 0 18px 18px;

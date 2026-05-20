@@ -23,21 +23,24 @@
     <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
   </div>
 
-  <%# In edit mode the illustration container always renders so the
-      type-panel can swap its contents when the answer type changes;
-      in read-only modes it's only shown when there's no media image. %>
-  <% if editable || !has_img %>
-    <div class="split-left-illustration"<%= " data-card-illustration".html_safe if editable %>>
-      <%= interaction_illustration(card["type"].to_s) %>
-    </div>
-  <% end %>
-
+  <%# Editor: prompt the creator to add design (an image). No how-to
+      illustration is shown for any card type, in any mode. %>
   <% if editable %>
-    <button type="button" class="add-media-fab"
-            data-action="click->media-picker#open"
-            title="Add an image to this card">
-      <span class="add-media-fab-plus">＋</span>
-      <span>Add media</span>
-    </button>
+    <% if has_img %>
+      <button type="button" class="add-media-fab"
+              data-action="click->media-picker#open"
+              title="Change this card's image">
+        <span class="add-media-fab-plus">＋</span>
+        <span>Change media</span>
+      </button>
+    <% else %>
+      <button type="button" class="split-left-design-prompt"
+              data-action="click->media-picker#open"
+              title="Add an image to this card">
+        <span class="split-left-design-prompt-icon">＋</span>
+        <span class="split-left-design-prompt-title">Add design</span>
+        <span class="split-left-design-prompt-sub">Add an image to bring this card to life</span>
+      </button>
+    <% end %>
   <% end %>
 </div>

@@ -131,7 +131,7 @@ export default class extends Controller {
       if (!splitCard) return
 
       const clone = splitCard.cloneNode(true)
-      this._stripEditorChrome(clone, editorCard)
+      this._stripEditorChrome(clone)
 
       const previewCard = previewCards[i]
       previewCard.innerHTML = ""
@@ -139,32 +139,24 @@ export default class extends Controller {
     })
   }
 
-  _stripEditorChrome(clone, editorCard) {
+  _stripEditorChrome(clone) {
     // 1. Remove editor-only chrome elements outright.
     clone.querySelectorAll(
-      ".pick-item-delete, .tap-card-delete, .pick-add-btn, .tap-add-btn, .add-media-fab"
+      ".pick-item-delete, .tap-card-delete, .pick-add-btn, .tap-add-btn, .add-media-fab, .split-left-design-prompt"
     ).forEach(el => el.remove())
 
-    // 2. Hide illustration when the card has an image — preview shows
-    //    image OR illustration, not both (see _split_left.html.erb).
-    const hasImage = (editorCard.dataset.cardImage || "").trim().length > 0
-    if (hasImage) {
-      clone.querySelectorAll(".split-left-illustration").forEach(el => el.remove())
-    }
-
-    // 3. Strip contenteditable from everything so preview is read-only.
+    // 2. Strip contenteditable from everything so preview is read-only.
     clone.querySelectorAll("[contenteditable]").forEach(el =>
       el.removeAttribute("contenteditable")
     )
 
-    // 4. Drop editor-only marker attributes.
-    clone.querySelectorAll("[data-card-component], [data-card-illustration], [data-card-media]").forEach(el => {
+    // 3. Drop editor-only marker attributes.
+    clone.querySelectorAll("[data-card-component], [data-card-media]").forEach(el => {
       el.removeAttribute("data-card-component")
-      el.removeAttribute("data-card-illustration")
       el.removeAttribute("data-card-media")
     })
 
-    // 5. Strip the "card-editor" Stimulus controller binding — only
+    // 4. Strip the "card-editor" Stimulus controller binding — only
     //    "picker" / "tap-stack" should survive on the preview clone.
     clone.querySelectorAll("[data-controller]").forEach(el => {
       const cleaned = el.getAttribute("data-controller")
@@ -172,7 +164,7 @@ export default class extends Controller {
       el.setAttribute("data-controller", cleaned)
     })
 
-    // 6. Reset interactive state so each open() starts clean.
+    // 5. Reset interactive state so each open() starts clean.
     clone.querySelectorAll('[data-picker-target="item"]').forEach(el => {
       el.setAttribute("data-selected", "false")
       el.classList.remove("selected", "active")
@@ -185,7 +177,7 @@ export default class extends Controller {
       if (bg) el.style.background = bg
     })
 
-    // 7. Drop the editor's active-card outline class if present.
+    // 6. Drop the editor's active-card outline class if present.
     clone.classList.remove("selected")
   }
 }
