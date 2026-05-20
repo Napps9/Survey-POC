@@ -126,17 +126,6 @@
   z-index: 2;
 }
 .panel-progress-fill { height: 100%; background: white; border-radius: 8px; }
-.panel-tagline {
-  position: absolute;
-  top: 32px; left: 0; right: 0;
-  text-align: center;
-  font-family: "Alata", sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.65);
-  letter-spacing: 0.05em;
-  z-index: 2;
-}
 
 .split-right {
   width: 425px;                 /* equal half of 850 */
@@ -2192,7 +2181,6 @@
     background: #2E3564;
   }
   .preview-overlay .split-card:has(.split-left-img) .panel-progress,
-  .preview-overlay .split-card:has(.split-left-img) .panel-tagline,
   .preview-overlay .split-card:has(.split-left-img) .split-left-illustration { display: none; }
   .preview-overlay .split-card:has(.split-left-img) .split-left-img,
   .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
