@@ -1517,6 +1517,55 @@
 .all-type-opt { cursor: pointer; }
 @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 
+/* LIVE-edit warning modal — shown when editing a published Verto */
+.live-warning-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(10,12,20,0.78);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 32px;
+  animation: fadeIn 0.18s ease-out;
+}
+.live-warning-overlay.hidden { display: none; }
+.live-warning-modal {
+  width: min(440px, 100%);
+  background: #2A2D3A;
+  border: 1px solid rgba(255,30,111,0.35);
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+  padding: 26px 28px;
+  font-family: 'ABeeZee', sans-serif;
+}
+.live-warning-head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.live-warning-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #FF1E6F; box-shadow: 0 0 10px rgba(255,30,111,0.7); flex-shrink: 0;
+}
+.live-warning-head strong {
+  color: #FF1E6F; font-weight: 600; letter-spacing: 0.04em;
+  font-family: 'Alata', sans-serif; text-transform: uppercase; font-size: var(--text-sm);
+}
+.live-warning-close {
+  margin-left: auto; background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.75);
+  width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+  font-size: 12px; transition: all 0.15s;
+}
+.live-warning-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.live-warning-body {
+  font-size: var(--text-base); color: rgba(255,255,255,0.82);
+  line-height: 1.5; margin-bottom: 22px;
+}
+.live-warning-foot { display: flex; justify-content: flex-end; }
+.live-warning-btn {
+  background: #FF1E6F; color: #fff; border: none; border-radius: 10px;
+  padding: 10px 22px; font-family: 'ABeeZee', sans-serif;
+  font-size: var(--text-base); cursor: pointer; transition: filter 0.15s;
+}
+.live-warning-btn:hover { filter: brightness(1.08); }
+
 /* Publish & share panel — drops into the right column in place of the
    answer-type picker. Reuses .type-panel chrome for visual consistency. */
 .publish-panel-back {
