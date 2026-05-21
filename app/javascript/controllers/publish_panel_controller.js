@@ -1,18 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Toggles the right-hand column between the answer-type picker and the
-// publish & share panel. The bottom-bar "Publish & share" CTA opens this
-// view; the back button inside returns to the answer-type view.
+// Toggles the right-hand column between the answer-type picker, the design
+// panel (colours / background / logo) and the publish & share panel. The
+// bottom-bar CTAs open the design and publish views; the back button inside
+// each returns to the answer-type view.
 export default class extends Controller {
-  static targets = ["typeView", "publishView"]
+  static targets = ["typeView", "publishView", "designView"]
 
-  open() {
-    this.typeViewTarget.classList.add("hidden")
-    this.publishViewTarget.classList.remove("hidden")
-  }
+  open() { this._show("publishView") }
+  openDesign() { this._show("designView") }
+  close() { this._show("typeView") }
 
-  close() {
-    this.publishViewTarget.classList.add("hidden")
-    this.typeViewTarget.classList.remove("hidden")
+  _show(which) {
+    this.typeViewTarget.classList.toggle("hidden", which !== "typeView")
+    this.publishViewTarget.classList.toggle("hidden", which !== "publishView")
+    this.designViewTarget.classList.toggle("hidden", which !== "designView")
   }
 }

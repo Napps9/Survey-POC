@@ -125,6 +125,11 @@
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <button type="button"
+                  style="padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
+                  onmouseover="this.style.background='rgba(255,255,255,0.12)'"
+                  onmouseout="this.style.background='rgba(255,255,255,0.07)'"
+                  data-action="click->publish-panel#openDesign">Design</button>
+          <button type="button"
                   style="padding:10px 26px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
                   onmouseover="this.style.background='#00C4AB'"
                   onmouseout="this.style.background='#01EACB'"
@@ -253,55 +258,6 @@
         <button type="button" class="publish-block-btn"
                 data-action="click->preview-verto#open">▶ Preview Verto</button>
 
-        <%# Brand colours — edits THIS Verto's palette (not other Vertos). %>
-        <div class="publish-block">
-          <div class="publish-block-title">Brand colours</div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:12px;line-height:1.45;">
-            Applied to this Verto's cards, preview and player. Changes here don't affect your other Vertos.
-          </div>
-          <% pal = @survey.brand_palette %>
-          <% [["primary", "Primary", "Headings &amp; accents"],
-              ["cta",     "Buttons (CTA)", "Next / Submit buttons"],
-              ["bg",      "Background", "The canvas behind cards"]].each do |role, label, desc| %>
-            <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px;">
-              <input type="color" value="<%= pal[role] %>"
-                     data-brand-palette-target="colorInput" data-brand-role="<%= role %>"
-                     data-action="input->brand-palette#onColor"
-                     aria-label="<%= label %> colour"
-                     style="width:36px;height:36px;border:none;border-radius:9px;background:none;cursor:pointer;padding:0;flex-shrink:0;" />
-              <div style="flex:1;min-width:0;">
-                <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;"><%= label.html_safe %></div>
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);"><%= desc.html_safe %></div>
-              </div>
-              <input type="text" value="<%= pal[role] %>"
-                     data-brand-palette-target="hexInput" data-brand-role="<%= role %>"
-                     data-action="input->brand-palette#onHex"
-                     maxlength="7" spellcheck="false"
-                     style="width:86px;padding:7px 9px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;text-transform:uppercase;" />
-            </div>
-          <% end %>
-          <div data-brand-palette-target="status"
-               style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:2px;"></div>
-
-          <%# Background image — fills the backdrop behind the whole Verto. %>
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
-            <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;">Background image</div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin:3px 0 10px;line-height:1.45;">Optional — sits behind every card, over the background colour.</div>
-            <div style="display:flex;align-items:center;gap:11px;">
-              <div data-media-picker-target="bgThumb"
-                   style="width:54px;height:54px;border-radius:9px;flex-shrink:0;background-color:rgba(255,255,255,0.06);background-size:cover;background-position:center;border:1px solid rgba(255,255,255,0.12);<%= "background-image:url('#{@survey.background_image.to_s.gsub(/['\"]/, '')}');".html_safe if @survey.background_image.present? %>"></div>
-              <button type="button"
-                      data-action="click->media-picker#openBackground"
-                      style="flex:1;padding:9px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Choose image</button>
-              <button type="button"
-                      data-media-picker-target="bgRemoveBtn"
-                      data-action="click->media-picker#removeBackground"
-                      <%= "hidden" unless @survey.background_image.present? %>
-                      style="padding:9px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Remove</button>
-            </div>
-          </div>
-        </div>
-
         <%# Publish status / link %>
         <div class="publish-block">
           <div class="publish-block-title">Status</div>
@@ -401,6 +357,114 @@
       </div><%# /publish-panel-body %>
 
     </div><%# /publish panel %>
+
+    <%# ── Design panel: colours, background and logo (toggles in place of the answer-type panel) ── %>
+    <div class="type-panel hidden" data-publish-panel-target="designView">
+
+      <div class="type-panel-top">
+        <button type="button" class="publish-panel-back"
+                data-action="click->publish-panel#close">← Answer type</button>
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;margin-top:8px;">
+          Design
+        </div>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#fff;line-height:1.3;">
+          Colours, background and logo for this Verto.
+        </div>
+      </div>
+
+      <div class="publish-panel-body">
+
+        <%# Brand colours — edits THIS Verto's palette (not other Vertos). %>
+        <div class="publish-block">
+          <div class="publish-block-title">Brand colours</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:12px;line-height:1.45;">
+            Applied to this Verto's cards, preview and player. Changes here don't affect your other Vertos.
+          </div>
+          <% pal = @survey.brand_palette %>
+          <% [["primary", "Primary", "Headings &amp; accents"],
+              ["cta",     "Buttons (CTA)", "Next / Submit buttons"],
+              ["bg",      "Background", "The canvas behind cards"]].each do |role, label, desc| %>
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px;">
+              <input type="color" value="<%= pal[role] %>"
+                     data-brand-palette-target="colorInput" data-brand-role="<%= role %>"
+                     data-action="input->brand-palette#onColor"
+                     aria-label="<%= label %> colour"
+                     style="width:36px;height:36px;border:none;border-radius:9px;background:none;cursor:pointer;padding:0;flex-shrink:0;" />
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;"><%= label.html_safe %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);"><%= desc.html_safe %></div>
+              </div>
+              <input type="text" value="<%= pal[role] %>"
+                     data-brand-palette-target="hexInput" data-brand-role="<%= role %>"
+                     data-action="input->brand-palette#onHex"
+                     maxlength="7" spellcheck="false"
+                     style="width:86px;padding:7px 9px;border-radius:9px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;text-transform:uppercase;" />
+            </div>
+          <% end %>
+          <div data-brand-palette-target="status"
+               style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:2px;"></div>
+
+          <%# Background image — fills the backdrop behind the whole Verto. %>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;">Background image</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin:3px 0 10px;line-height:1.45;">Optional — sits behind every card, over the background colour.</div>
+            <div style="display:flex;align-items:center;gap:11px;">
+              <div data-media-picker-target="bgThumb"
+                   style="width:54px;height:54px;border-radius:9px;flex-shrink:0;background-color:rgba(255,255,255,0.06);background-size:cover;background-position:center;border:1px solid rgba(255,255,255,0.12);<%= "background-image:url('#{@survey.background_image.to_s.gsub(/['\"]/, '')}');".html_safe if @survey.background_image.present? %>"></div>
+              <button type="button"
+                      data-action="click->media-picker#openBackground"
+                      style="flex:1;padding:9px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Choose image</button>
+              <button type="button"
+                      data-media-picker-target="bgRemoveBtn"
+                      data-action="click->media-picker#removeBackground"
+                      <%= "hidden" unless @survey.background_image.present? %>
+                      style="padding:9px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <%# Logo — the organisation's logo, shown across all its Vertos. %>
+        <div class="publish-block" data-controller="logo-uploader"
+             data-logo-uploader-url-value="<%= organisation_path(current_organisation) %>"
+             data-logo-uploader-fallback-value="<%= image_path('playverto.svg') %>">
+          <div class="publish-block-title">Logo</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:12px;line-height:1.45;">
+            Shown at the top of every Verto preview and shared play link. Applies across your organisation.
+          </div>
+          <div style="display:flex;align-items:center;gap:11px;">
+            <div data-logo-uploader-target="preview"
+                 style="height:48px;min-width:90px;display:flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);flex-shrink:0;">
+              <%= brand_logo_tag current_organisation, style: "height:30px;width:auto;max-width:150px;" %>
+            </div>
+            <% if current_membership&.admin? %>
+              <button type="button" class="publish-block-btn" style="flex:1;"
+                      data-action="click->logo-uploader#choose">Upload logo</button>
+              <button type="button"
+                      data-logo-uploader-target="removeBtn"
+                      data-action="click->logo-uploader#remove"
+                      <%= "hidden" unless current_organisation.logo.attached? %>
+                      style="padding:9px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Remove</button>
+              <input type="file" hidden accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                     data-logo-uploader-target="input"
+                     data-action="change->logo-uploader#upload" />
+            <% end %>
+          </div>
+          <% if current_membership&.admin? %>
+            <div data-logo-uploader-target="status"
+                 style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:8px;"></div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:2px;">
+              PNG, JPG, SVG or WebP · transparent backgrounds work best.
+            </div>
+          <% else %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);margin-top:8px;">
+              Ask an organisation admin to change the logo.
+            </div>
+          <% end %>
+        </div>
+
+      </div><%# /design panel body %>
+
+    </div><%# /design panel %>
 
     </div><%# /right column %>
 

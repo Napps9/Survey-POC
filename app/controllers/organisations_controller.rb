@@ -19,13 +19,26 @@ class OrganisationsController < ApplicationController
     attrs = params.require(:organisation).permit(:name, :logo, :remove_logo)
     remove = ActiveModel::Type::Boolean.new.cast(attrs.delete(:remove_logo))
     @organisation.logo.purge if remove
+    ok = @organisation.update(attrs)
+    error = @organisation.errors.full_messages.to_sentence.presence || "Could not update organisation."
 
-    if @organisation.update(attrs)
-      redirect_to organisation_memberships_path(@organisation),
-                  notice: remove ? "Logo removed." : "Brand updated."
-    else
-      redirect_to organisation_memberships_path(@organisation),
-                  alert: @organisation.errors.full_messages.to_sentence.presence || "Could not update organisation."
+    respond_to do |format|
+      format.html do
+        if ok
+          redirect_to organisation_memberships_path(@organisation),
+                      notice: remove ? "Logo removed." : "Brand updated."
+        else
+          redirect_to organisation_memberships_path(@organisation), alert: error
+        end
+      end
+      format.json do
+        if ok
+          logo_url = @organisation.logo.attached? ? helpers.rails_blob_path(@organisation.logo, only_path: true) : nil
+          render json: { ok: true, logo_url: logo_url }
+        else
+          render json: { ok: false, error: error }, status: :unprocessable_entity
+        end
+      end
     end
   end
 end
