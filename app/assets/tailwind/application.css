@@ -167,7 +167,17 @@
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
-  cursor: ns-resize;
+  cursor: pointer;
+  outline: none;
+}
+.nps-slider[data-nps-slider-axis-value="vertical"]   { cursor: ns-resize; }
+.nps-slider[data-nps-slider-axis-value="horizontal"] { cursor: ew-resize; }
+.nps-slider:focus-visible { box-shadow: 0 0 0 3px var(--brand-primary-soft, rgba(1,234,203,0.4)); border-radius: 18px; }
+/* The draggable handle that makes the asset read + work as a slider. */
+.nps-thumb {
+  transition: transform 0.18s cubic-bezier(.34,1.2,.64,1);
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+  cursor: grab;
 }
 .nps-slider-tooltip {
   font-family: "Alata", sans-serif;
@@ -211,14 +221,20 @@
 .nps-svg .nps-state { opacity: 0; transition: opacity 0.28s ease; }
 .nps-svg .nps-state.is-active { opacity: 1; }
 
-/* Continuous "fill" mode: the liquid rect (clipped to a themed vessel) scales
-   vertically from the bottom by --nps-fill, so it rises smoothly as you drag.
+/* Continuous "fill": the liquid rect (clipped to a themed vessel) scales by
+   --nps-fill along the slider axis, so it rises/grows as you drag.
    transform-box:fill-box makes the scale origin the rect's own bbox. */
 .nps-svg .nps-liquid {
   transform-box: fill-box;
+  transition: transform 0.22s cubic-bezier(.34,1.2,.64,1);
+}
+.nps-svg .nps-liquid[data-axis="vertical"] {
   transform-origin: 50% 100%;
   transform: scaleY(var(--nps-fill, 0.5));
-  transition: transform 0.22s cubic-bezier(.34,1.2,.64,1);
+}
+.nps-svg .nps-liquid[data-axis="horizontal"] {
+  transform-origin: 0% 50%;
+  transform: scaleX(var(--nps-fill, 0.5));
 }
 .nps-slider-labels { width: 100%; }
 .nps-slider-labels .slider-label-text.is-active {

@@ -1,20 +1,23 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The themed slider on the RIGHT (e.g. a thermometer) is the drag control.
-// Dragging it vertically (top = best) sets the value, fills the control asset,
-// AND drives the reactive asset on the LEFT (e.g. a sun face) so its expression
-// and colour track the slider. Records the chosen index for answer capture.
+// The themed asset on the RIGHT is the slider. Dragging along its axis
+// (vertical: up = best, horizontal: right = best) moves a visible handle
+// (.nps-thumb), fills the asset (--nps-fill), snaps to the nearest labelled
+// stop, records the index, and drives the reactive asset on the LEFT.
 export default class extends Controller {
   static targets = ["label", "tooltip"]
-  static values  = { steps: Number, index: { type: Number, default: -1 } }
+  static values  = { steps: Number, index: { type: Number, default: -1 }, axis: { type: String, default: "vertical" } }
 
   connect() {
     this._onMove = (e) => this._drag(e)
     this._onUp   = () => this._end()
+    this.inset   = 26
 
-    // Right control asset (inside this controller) + left reactive asset.
-    this.control       = this.element.querySelector(".nps-visual")
-    this.controlStates = Array.from(this.element.querySelectorAll(".nps-state"))
+    this.control = this.element.querySelector(".nps-control")
+    this.svg     = this.control && this.control.querySelector(".nps-svg")
+    this.thumb   = this.control && this.control.querySelector(".nps-thumb")
+    this.vb      = this._viewBox(this.svg)
+
     const card = this.element.closest(".split-card")
     this.reaction       = card ? card.querySelector(".split-left .nps-visual") : null
     this.reactionStates = this.reaction ? Array.from(this.reaction.querySelectorAll(".nps-state")) : []
@@ -26,10 +29,21 @@ export default class extends Controller {
   start(event) {
     if (event.target.isContentEditable) return
     event.preventDefault()
+    this.element.focus()
     this.dragging = true
     this._fromEvent(event)
     window.addEventListener("pointermove", this._onMove)
     window.addEventListener("pointerup",   this._onUp, { once: true })
+  }
+
+  key(event) {
+    const up   = ["ArrowUp", "ArrowRight"].includes(event.key)
+    const down = ["ArrowDown", "ArrowLeft"].includes(event.key)
+    if (!up && !down) return
+    event.preventDefault()
+    const n = Math.max(2, this.stepsValue)
+    this.indexValue = Math.max(0, Math.min(n - 1, this.indexValue + (up ? 1 : -1)))
+    this._render(this.indexValue, this._ratioFor(this.indexValue))
   }
 
   _drag(event) { if (this.dragging) this._fromEvent(event) }
@@ -41,12 +55,14 @@ export default class extends Controller {
   }
 
   _fromEvent(event) {
-    const rect  = (this.control || this.element).getBoundingClientRect()
-    const ratio = Math.max(0, Math.min(1, (rect.bottom - event.clientY) / rect.height))
-    const n     = Math.max(2, this.stepsValue)
-    const idx   = Math.round(ratio * (n - 1))
-    this.indexValue = idx
-    this._render(idx, ratio) // fill follows the pointer while dragging
+    const rect = (this.control || this.element).getBoundingClientRect()
+    const ratio = this.axisValue === "horizontal"
+      ? (event.clientX - rect.left) / rect.width
+      : (rect.bottom - event.clientY) / rect.height
+    const r = Math.max(0, Math.min(1, ratio))
+    const n = Math.max(2, this.stepsValue)
+    this.indexValue = Math.round(r * (n - 1))
+    this._render(this.indexValue, r) // fill/handle follow the pointer while dragging
   }
 
   _ratioFor(idx) {
@@ -54,19 +70,35 @@ export default class extends Controller {
   }
 
   _render(idx, ratio) {
-    this._drive(this.control, this.controlStates, ratio)
+    this._drive(this.control, [], ratio)
+    this._positionThumb(ratio)
     this._drive(this.reaction, this.reactionStates, ratio)
-    this.element.dataset.npsValue = idx
 
+    this.element.dataset.npsValue = idx
+    const lbl = this.labelTargets[idx]
+    const text = lbl ? lbl.textContent.trim() : `${idx}`
     this.labelTargets.forEach((l, i) => l.classList.toggle("is-active", i === idx))
-    if (this.hasTooltipTarget) {
-      const lbl = this.labelTargets[idx]
-      this.tooltipTarget.textContent = lbl ? lbl.textContent.trim() : `${idx}`
-    }
+    if (this.hasTooltipTarget) this.tooltipTarget.textContent = text
+    this.element.setAttribute("aria-valuenow", idx)
+    this.element.setAttribute("aria-valuetext", text)
   }
 
-  // Drive one stage: continuous fill + sentiment hue, and (states mode) the
-  // active expression mapped from the ratio onto however many states it has.
+  _positionThumb(ratio) {
+    if (!this.thumb) return
+    const [minx, miny, w, h] = this.vb
+    let x, y
+    if (this.axisValue === "horizontal") {
+      y = miny + h / 2
+      x = minx + this.inset + ratio * (w - 2 * this.inset)
+    } else {
+      x = minx + w / 2
+      y = (miny + h - this.inset) - ratio * (h - 2 * this.inset)
+    }
+    this.thumb.style.transform = `translate(${x}px, ${y}px)`
+  }
+
+  // fill (--nps-fill, scaled per data-axis in CSS) + sentiment hue, and (states
+  // mode) the active expression mapped from the ratio.
   _drive(stage, states, ratio) {
     if (!stage) return
     stage.style.setProperty("--nps-fill", ratio.toFixed(3))
@@ -76,5 +108,11 @@ export default class extends Controller {
       const s = Math.max(0, Math.min(n - 1, Math.round(ratio * (n - 1))))
       states.forEach((g, i) => g.classList.toggle("is-active", i === s))
     }
+  }
+
+  _viewBox(svg) {
+    const raw = svg && svg.getAttribute("viewBox")
+    const p = raw ? raw.split(/[\s,]+/).map(Number) : [0, 0, 200, 200]
+    return p.length === 4 && p.every(Number.isFinite) ? p : [0, 0, 200, 200]
   }
 }

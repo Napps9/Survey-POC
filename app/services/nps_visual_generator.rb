@@ -1,73 +1,84 @@
 require "anthropic"
 
-# Generates the themed reactive visual for an NPS card: the asset that doubles
-# as the slider on the right of the card. Kept as its OWN Claude call (not part
-# of emit_survey) so the SVGs don't blow the survey-generation token budget.
-#
-# Output is normalised + sanitized into the shape NpsHelper#nps_visual_spec
-# expects. Two modes:
-#   "fill"   — a vessel (clip/back/front + liquid_color) whose liquid rises
-#   "states" — up to 5 cross-faded SVG expressions
+# Generates the two themed assets for an NPS card, in its OWN Claude call (not
+# part of emit_survey, so the SVGs don't blow the survey-generation budget):
+#   control  — the RIGHT asset that works AS A SLIDER (a draggable handle moves
+#              along an axis; optional liquid fill). e.g. a thermometer.
+#   reaction — the LEFT asset that reacts to the value (states or fill). e.g. a sun.
+# Output is normalised + sanitised into the shape NpsHelper expects.
 class NpsVisualGenerator
   MODEL      = "claude-sonnet-4-6"
-  MAX_TOKENS = 6000
+  MAX_TOKENS = 8000
+
+  CONTROL_PROPS = {
+    axis:       { type: "string", enum: %w[vertical horizontal], description: "Drag axis: vertical for vessels (thermometer/cup), horizontal for a track+thumb." },
+    viewbox:    { type: "string", description: "Square viewBox, e.g. '0 0 200 200'." },
+    defs:       { type: "string", description: "Optional <defs> inner content." },
+    fill_clip:  { type: "string", description: "Optional: the region that fills (vessel interior or track groove); the app scales the liquid within it by the value." },
+    fill_color: { type: "string", description: "Fill colour. Prefer 'hsl(var(--nps-hue,140) 80% 50%)' to tween red→green, or a fixed on-theme colour." },
+    back:       { type: "string", description: "SVG behind the fill (track/vessel body)." },
+    front:      { type: "string", description: "SVG outline/details on top (use fill=\"none\" for outlines, ticks)." },
+    thumb:      { type: "string", description: "The DRAGGABLE HANDLE, authored around origin (0,0), <=~44px. The app translates it along the axis. REQUIRED so it works as a slider." }
+  }.freeze
+
+  REACTION_PROPS = {
+    mode:         { type: "string", enum: %w[states fill], description: "states = up to 5 cross-faded expressions; fill = a vessel that fills." },
+    viewbox:      { type: "string", description: "Square viewBox." },
+    defs:         { type: "string" },
+    states:       { type: "array", minItems: 3, maxItems: 5,
+                    description: "states mode: ordered low→high (5 preferred).",
+                    items: { type: "object", properties: { label: { type: "string" }, svg: { type: "string" } }, required: %w[svg] } },
+    clip:         { type: "string", description: "fill mode: vessel interior shape." },
+    back:         { type: "string" },
+    front:        { type: "string" },
+    liquid_color: { type: "string" }
+  }.freeze
 
   TOOL = {
     name: "emit_nps_visual",
-    description: "Emit a themed, reactive SVG asset that doubles as the NPS slider control.",
+    description: "Emit a themed slider control (right) + a reactive asset (left) for an NPS card.",
     input_schema: {
       type: "object",
       properties: {
-        subject: { type: "string", description: "Short metaphor name, e.g. 'thermometer', 'coffee cup', 'plant', 'battery'." },
-        mode:    { type: "string", enum: %w[fill states],
-                   description: "fill = a container whose liquid rises with the rating (preferred for vessels/gauges). states = 5 cross-faded expressions (for faces/characters)." },
-        viewbox: { type: "string", description: "Square SVG viewBox, e.g. '0 0 200 200'." },
-        defs:    { type: "string", description: "Optional inner <defs> content (gradients). No clipPath needed for the liquid." },
-        liquid_color: { type: "string", description: "fill mode: liquid colour. Prefer 'hsl(var(--nps-hue,140) 80% 50%)' to tween red→green, or a fixed on-theme colour." },
-        clip:    { type: "string", description: "fill mode: the vessel INTERIOR shape(s) the liquid fills (e.g. <rect/> + <circle/>, or a <path/>)." },
-        back:    { type: "string", description: "fill mode: SVG drawn BEHIND the liquid (optional)." },
-        front:   { type: "string", description: "fill mode: vessel outline + details drawn ON TOP (use fill=\"none\" for outlines)." },
-        states:  { type: "array", minItems: 3, maxItems: 5,
-                   description: "states mode: ordered low→high (5 preferred). Each svg is a layered <g> body.",
-                   items: { type: "object",
-                            properties: { label: { type: "string" }, svg: { type: "string" } },
-                            required: %w[svg] } }
+        subject:  { type: "string", description: "Short theme tag, e.g. 'weather', 'coffee', 'fitness'." },
+        control:  { type: "object", description: "RIGHT: the asset that works AS A SLIDER (draggable handle).", properties: CONTROL_PROPS, required: %w[axis viewbox thumb] },
+        reaction: { type: "object", description: "LEFT: the asset that reacts to the slider value.", properties: REACTION_PROPS, required: %w[mode viewbox] }
       },
-      required: %w[subject mode viewbox]
+      required: %w[control reaction]
     }
   }.freeze
 
   SYSTEM = <<~PROMPT.freeze
-    You design ONE small, iconic SVG asset that doubles as the answer control for
-    a Verto "NPS / reactive scale" question. The respondent drags the asset and it
-    reacts live. Make it fit the survey's THEME, AUDIENCE and TONE.
+    You design TWO small, iconic SVG assets for a Verto "NPS / reactive scale"
+    question, themed to the survey's THEME, AUDIENCE and TONE.
 
-    Choose ONE mode:
-    • "fill" (preferred for vessels/gauges): a container whose liquid rises as the
-      rating increases. Supply:
-        - clip:  the vessel INTERIOR shape (liquid is clipped to this).
-        - back:  anything drawn behind the liquid (optional).
-        - front: the vessel outline + details drawn on top, so the liquid shows
-                 through (draw outlines with fill="none").
-        - liquid_color: prefer "hsl(var(--nps-hue,140) 80% 50%)" so the colour
-          tweens red→green with sentiment; or a fixed on-theme colour.
-      The app adds and scales the liquid itself from your clip — you only supply
-      clip/back/front/liquid_color. Ideas: thermometer, coffee cup, water glass,
-      battery, fuel gauge, beaker, watering can, rocket fuel.
-    • "states" (for faces/characters): supply 5 ordered SVG <g> bodies (low→high)
-      that the app cross-fades. Use fill="hsl(var(--nps-hue,60) 82% 58%)" for mood
-      colour so it tweens.
+    1) control — the RIGHT-hand asset. It MUST work as a slider: it has a visible
+       DRAGGABLE HANDLE (`thumb`) that the respondent moves along an axis to set the
+       value. NEVER a static expression-only icon.
+       - axis: "vertical" for vessels you fill bottom→top (thermometer, cup, beaker,
+         battery, rocket), "horizontal" for a track the handle slides left→right.
+       - fill_clip + fill_color (optional): the app scales a liquid within fill_clip
+         by the value, so the vessel fills as you drag. Prefer
+         "hsl(var(--nps-hue,140) 80% 50%)" so it tweens, or a fixed on-theme colour.
+       - back / front: the vessel/track skin (outlines with fill="none").
+       - thumb: the handle, authored around the origin (0,0), <=~44px. The app
+         translates it along the axis. Make it clearly a grabbable handle/marker.
+
+    2) reaction — the LEFT-hand asset that REACTS to the value (no drag). Either
+       "states" (up to 5 ordered low→high expressions the app cross-fades — e.g. a
+       sun whose face goes sad→happy; use fill="hsl(var(--nps-hue,60) 82% 58%)" so it
+       tweens), or "fill" (a vessel that fills like the control).
 
     Rules:
-    - Square viewBox, default "0 0 200 200". Simple, iconic, centred; each SVG
-      piece under ~1.5KB.
-    - You MAY use brand colours via var(--brand-primary), var(--brand-cta),
-      var(--brand-text), and hsl(var(--nps-hue) ...) for sentiment.
-    - Use ONLY these tags: g, path, circle, ellipse, rect, line, polyline,
-      polygon, defs, linearGradient, radialGradient, stop, clipPath, use, title.
-      Use ONLY presentation attributes (fill, stroke, d, transform, …).
-    - NO <script>, <foreignObject>, <image>, <style>, event handlers (on*),
-      external URLs, or href to anything but a local "#id".
+    - Square viewBox, default "0 0 200 200". Simple, iconic, centred; each SVG piece
+      under ~1.5KB.
+    - Brand colours allowed via var(--brand-primary), var(--brand-cta),
+      var(--brand-text); hsl(var(--nps-hue) …) for sentiment.
+    - Use ONLY these tags: g, path, circle, ellipse, rect, line, polyline, polygon,
+      defs, linearGradient, radialGradient, stop, clipPath, use, title. Presentation
+      attributes only.
+    - NO <script>, <foreignObject>, <image>, <style>, event handlers (on*), external
+      URLs, or href to anything but a local "#id".
     Output via the emit_nps_visual tool.
   PROMPT
 
@@ -87,8 +98,9 @@ class NpsVisualGenerator
       The NPS question is: "#{question}"
       Scale labels (low → high): #{Array(options).join(' · ').presence || '0 … 10'}
 
-      Design the reactive asset for THIS question. Pick the mode and metaphor that
-      best fit the theme, audience and tone. Output via the emit_nps_visual tool.
+      Design the control (right slider) + reaction (left) for THIS question, themed
+      to fit. The control MUST have a draggable handle and work as a slider. Output
+      via the emit_nps_visual tool.
     MSG
 
     response = @client.messages.create(
@@ -106,34 +118,41 @@ class NpsVisualGenerator
     normalize(deep_stringify(input_of(block)))
   end
 
-  # Sanitize + shape the raw tool input into a stored nps_visual spec. Public so
-  # it can be unit-tested without an API call.
+  # Sanitise + shape the raw tool input into a stored nps_visual ({control, reaction}).
+  # Public so it can be unit-tested without an API call.
   def normalize(input)
-    mode = input["mode"].to_s == "states" ? "states" : "fill"
-    base = {
-      "subject" => input["subject"].to_s,
-      "mode"    => mode,
-      "viewbox" => input["viewbox"].to_s.presence || "0 0 200 200",
-      "defs"    => SvgSanitizer.clean(input["defs"].to_s)
-    }
-
-    if mode == "fill"
-      base.merge(
-        "liquid_color" => input["liquid_color"].to_s,
-        "clip"         => SvgSanitizer.clean(input["clip"].to_s),
-        "back"         => SvgSanitizer.clean(input["back"].to_s),
-        "front"        => SvgSanitizer.clean(input["front"].to_s)
-      )
-    else
-      base.merge(
-        "states" => Array(input["states"]).first(5).map do |s|
-          { "label" => s["label"].to_s, "svg" => SvgSanitizer.clean(s["svg"].to_s) }
-        end
-      )
-    end
+    { "subject"  => input["subject"].to_s,
+      "control"  => normalize_control(input["control"]),
+      "reaction" => normalize_reaction(input["reaction"]) }
   end
 
   private
+
+  def normalize_control(c)
+    c = {} unless c.is_a?(Hash)
+    {
+      "axis"       => (c["axis"] == "horizontal" ? "horizontal" : "vertical"),
+      "viewbox"    => c["viewbox"].to_s.presence || "0 0 200 200",
+      "defs"       => SvgSanitizer.clean(c["defs"].to_s),
+      "fill_clip"  => SvgSanitizer.clean(c["fill_clip"].to_s),
+      "fill_color" => c["fill_color"].to_s,
+      "back"       => SvgSanitizer.clean(c["back"].to_s),
+      "front"      => SvgSanitizer.clean(c["front"].to_s),
+      "thumb"      => SvgSanitizer.clean(c["thumb"].to_s)
+    }
+  end
+
+  def normalize_reaction(r)
+    r = {} unless r.is_a?(Hash)
+    mode = r["mode"].to_s == "fill" ? "fill" : "states"
+    base = { "mode" => mode, "viewbox" => r["viewbox"].to_s.presence || "0 0 200 200", "defs" => SvgSanitizer.clean(r["defs"].to_s) }
+    if mode == "fill"
+      base.merge("clip" => SvgSanitizer.clean(r["clip"].to_s), "back" => SvgSanitizer.clean(r["back"].to_s),
+                 "front" => SvgSanitizer.clean(r["front"].to_s), "liquid_color" => r["liquid_color"].to_s)
+    else
+      base.merge("states" => Array(r["states"]).first(5).map { |s| { "label" => s["label"].to_s, "svg" => SvgSanitizer.clean(s["svg"].to_s) } })
+    end
+  end
 
   def tool_use?(block)
     type = block.respond_to?(:type) ? block.type : block[:type] || block["type"]
