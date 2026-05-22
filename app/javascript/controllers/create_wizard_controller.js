@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { t } from "lib/i18n"
 
 export default class extends Controller {
   static targets = ["card", "back", "next", "finish", "counter"]
@@ -53,7 +54,7 @@ export default class extends Controller {
     this.element.style.setProperty("--wizard-progress", `${Math.round(((idx + 1) / total) * 100)}%`)
 
     if (this.hasCounterTarget) {
-      this.counterTarget.textContent = `Step ${idx + 1} of ${total}`
+      this.counterTarget.textContent = t("js.wizard.step_counter", { n: idx + 1, total })
     }
     if (this.hasBackTarget) {
       this.backTarget.classList.toggle("invisible", idx === 0)

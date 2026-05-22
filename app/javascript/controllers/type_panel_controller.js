@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { t } from "lib/i18n"
 
 // Read the canonical card-type metadata that the editor view emits as a
 // JSON blob (sourced from config/card_types.yml). Called from connect()
@@ -110,11 +111,11 @@ function esc(s) {
 
 // Bucket a 0–100 compatibility score into a short, plain-English fit tier.
 function fitTier(score) {
-  if (score >= 100) return "Best fit"
-  if (score >= 80)  return "Strong alternative"
-  if (score >= 60)  return "Solid alternative"
-  if (score >= 40)  return "Workable"
-  return "Use sparingly"
+  if (score >= 100) return t("js.editor.fit_best")
+  if (score >= 80)  return t("js.editor.fit_strong")
+  if (score >= 60)  return t("js.editor.fit_solid")
+  if (score >= 40)  return t("js.editor.fit_workable")
+  return t("js.editor.fit_sparingly")
 }
 
 // HTML builders for the right-side interactive component on each card
@@ -299,8 +300,8 @@ export default class extends Controller {
     this.pendingType = cardType
 
     const meta = this.typeMeta[cardType]
-    this.panelCardNameTarget.textContent = `Card ${cardNum} · ${meta?.badge || cardType}`
-    this.panelHintTarget.textContent     = "Choose an answer format below."
+    this.panelCardNameTarget.textContent = t("js.editor.card_n", { n: cardNum, type: meta?.badge || cardType })
+    this.panelHintTarget.textContent     = t("js.editor.choose_format")
 
     this.panelEmptyTarget.style.display  = "none"
     this.typeListTarget.style.display    = "flex"
@@ -318,7 +319,7 @@ export default class extends Controller {
   applyType() {
     if (!this.activeCardEl || !this.pendingType) return
     this._applyToCard(this.activeCardEl, this.pendingType)
-    this._toast(`Answer type updated to ${this.typeMeta[this.pendingType]?.badge || this.pendingType}`)
+    this._toast(t("js.editor.type_updated", { type: this.typeMeta[this.pendingType]?.badge || this.pendingType }))
     this.dispatch("changed")
   }
 
@@ -346,7 +347,7 @@ export default class extends Controller {
     if (!this.activeCardEl || !type) return
     this.pendingType = type
     this._applyToCard(this.activeCardEl, type)
-    this._toast(`Answer type updated to ${this.typeMeta[type]?.badge || type}`)
+    this._toast(t("js.editor.type_updated", { type: this.typeMeta[type]?.badge || type }))
     this.dispatch("changed")
     this.closeAllTypes()
   }
@@ -405,7 +406,7 @@ export default class extends Controller {
       const badge = document.createElement("div")
       badge.className = "type-opt-score"
       if (type === cardType) {
-        badge.textContent = "Current"
+        badge.textContent = t("js.editor.current")
         badge.setAttribute("data-primary", "true")
       } else {
         badge.textContent = fitTier(entry.score)
@@ -446,10 +447,10 @@ export default class extends Controller {
       const badge = document.createElement("div")
       badge.className = "type-opt-score"
       if (type === cardType) {
-        badge.textContent = "Current"
+        badge.textContent = t("js.editor.current")
         badge.setAttribute("data-primary", "true")
       } else {
-        badge.textContent = score > 0 ? fitTier(score) : "Off-brief"
+        badge.textContent = score > 0 ? fitTier(score) : t("js.editor.off_brief")
       }
       const row = opt.querySelector(".type-opt-row > div[style]")
       if (row) row.parentElement.appendChild(badge)
@@ -488,7 +489,7 @@ export default class extends Controller {
 
     if (card === this.activeCardEl) {
       const num = card.dataset.cardNum
-      this.panelCardNameTarget.textContent = `Card ${num} · ${meta.badge}`
+      this.panelCardNameTarget.textContent = t("js.editor.card_n", { n: num, type: meta.badge })
       this._renderCompatibleTypes(type)
       this.pendingType = type
     }
@@ -505,7 +506,7 @@ export default class extends Controller {
   _updateCount() {
     if (!this.hasCardCountTarget) return
     const n = this.cardTargets.length
-    this.cardCountTarget.textContent = `${n} card${n !== 1 ? "s" : ""}`
+    this.cardCountTarget.textContent = t("js.editor.cards_count", { n })
   }
 
   _toast(msg) {
