@@ -110,8 +110,13 @@ class SurveysController < ApplicationController
   end
 
   def results
-    @responses  = @survey.responses.where(status: "completed").order(created_at: :desc)
-    @total      = @responses.count
+    base            = @survey.responses.where(status: "completed").order(created_at: :desc)
+    @overall_total  = base.count
+    @segments       = result_segments(base)
+    @active_segment = @segments.find { |s| s[:id] == params[:segment] } || @segments.first
+
+    @responses  = @active_segment[:scope]
+    @total      = @active_segment[:count]
     @aggregated = aggregate_results(Array(@survey.cards), @responses)
     render :results, layout: "fullscreen"
   end
@@ -168,5 +173,27 @@ class SurveysController < ApplicationController
 
   def set_survey_including_archived
     @survey = Current.organisation.surveys.find(params[:id])
+  end
+
+  # Response segments for the results filter: always "Overall", plus a
+  # "Direct link" and one entry per partner share when this Verto is shared.
+  # Each entry is { id:, label:, scope:, count: }.
+  def result_segments(base)
+    segments = [ { id: "overall", label: "Overall", scope: base, count: base.count } ]
+
+    shares = @survey.survey_shares.includes(alliance: :partner_organisation).order(:created_at)
+    return segments if shares.empty?
+
+    direct = base.where(survey_share_id: nil)
+    if (direct_count = direct.count).positive?
+      segments << { id: "direct", label: "Direct link", scope: direct, count: direct_count }
+    end
+
+    shares.each do |share|
+      scope = base.where(survey_share_id: share.id)
+      segments << { id: "share_#{share.id}", label: share.display_name, scope: scope, count: scope.count }
+    end
+
+    segments
   end
 end

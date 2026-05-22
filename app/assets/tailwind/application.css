@@ -1081,6 +1081,64 @@
   100% { background-position: 200% 0; }
 }
 
+/* ── Results page: brand-palette generating state + segment pills ── */
+
+/* Brand-only shimmer (Playverto palette, no off-brand rainbow) */
+.gen-shimmer--brand {
+  background: linear-gradient(90deg,#01EACB,#0CA7FF,#615BF5,#FF1E6F,#FFFA77,#01EACB);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  animation: gen-shimmer-shift 6s linear infinite;
+}
+
+/* AI summary card while it streams */
+.summary-card { position: relative; overflow: hidden; transition: border-color .3s ease; }
+.summary-rainbow {
+  position: absolute; left: 0; right: 0; top: 0;
+  height: 3px; opacity: 0; pointer-events: none;
+  background: linear-gradient(90deg,#01EACB,#0CA7FF,#615BF5,#FF1E6F,#FFFA77,#01EACB);
+  background-size: 200% 100%;
+  animation: gen-rainbow-sweep 3s linear infinite;
+  transition: opacity .3s ease;
+}
+.summary-card.is-generating .summary-rainbow { opacity: 1; }
+.summary-card.is-generating {
+  border-color: rgba(1,234,203,0.45);
+  animation: summary-glow 1.9s ease-in-out infinite;
+}
+@keyframes summary-glow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(1,234,203,0.0); }
+  50%     { box-shadow: 0 0 22px 0 rgba(1,234,203,0.18); }
+}
+
+/* Subtle ambient orbs on the data-dense results page */
+.results-orbs .gen-orb   { opacity: 0.10; }
+.results-orbs .gen-orb-4 { opacity: 0.08; }
+
+/* Segment filter pills */
+.seg-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 14px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.6); text-decoration: none; white-space: nowrap;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.seg-pill:hover { color: #fff; border-color: rgba(255,255,255,0.28); }
+.seg-pill[aria-current="true"] {
+  background: rgba(1,234,203,0.12);
+  border-color: rgba(1,234,203,0.5);
+  color: #01EACB;
+}
+.seg-pill-count {
+  font-family: "Alata", sans-serif; font-size: var(--text-2xs);
+  color: rgba(255,255,255,0.35); font-variant-numeric: tabular-nums;
+}
+.seg-pill[aria-current="true"] .seg-pill-count { color: rgba(1,234,203,0.7); }
+
 /* Mini-card "build" preview — three phone hints fanning in */
 .gen-card-stack {
   position: relative;

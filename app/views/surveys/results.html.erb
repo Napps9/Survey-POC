@@ -26,10 +26,18 @@
 %>
 
 <%# Full-viewport app-shell — body stays overflow:hidden from fullscreen layout %>
-<div style="height:100%;background:#1C2034;display:flex;overflow:hidden;">
+<div style="height:100%;background:#1C2034;display:flex;overflow:hidden;position:relative;">
+
+  <%# Subtle on-brand ambient orbs behind everything %>
+  <div class="gen-orbs results-orbs" aria-hidden="true">
+    <div class="gen-orb gen-orb-1"></div>
+    <div class="gen-orb gen-orb-2"></div>
+    <div class="gen-orb gen-orb-3"></div>
+    <div class="gen-orb gen-orb-4"></div>
+  </div>
 
   <%# ── Middle: top-bar + scrollable content ── %>
-  <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;position:relative;z-index:1;">
 
     <%# Top bar %>
     <div style="height:54px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;padding:0 24px;gap:12px;background:#1C2034;">
@@ -46,28 +54,12 @@
     <div style="flex:1;overflow-y:auto;padding:24px 24px 48px;">
       <div style="max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:14px;">
 
-        <%# Stats strip %>
-        <div style="display:flex;align-items:center;gap:16px;padding:2px 0 6px;">
-          <div style="display:flex;align-items:baseline;gap:5px;">
-            <span style="font-family:'Alata',sans-serif;font-size:34px;color:#01EACB;line-height:1;"><%= @total %></span>
-            <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);">response<%= @total == 1 ? "" : "s" %></span>
-          </div>
-          <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
-          <% if @survey.published_at %>
-            <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);">Published <%= @survey.published_at.strftime("%b %-d, %Y") %></span>
-          <% end %>
-          <div style="margin-left:auto;">
-            <%= link_to play_survey_url(@survey.publish_token),
-                  style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);text-decoration:none;",
-                  target: "_blank" do %>↗ Play link<% end %>
-          </div>
-        </div>
-
-        <%# ── Ask Verto summary card ── %>
-        <div style="border-radius:14px;background:rgba(1,234,203,0.05);border:1px solid rgba(1,234,203,0.18);padding:18px 22px;">
+        <%# ── Ask Verto summary card (brand-coloured generating state) ── %>
+        <div id="av-card" class="summary-card" style="border-radius:14px;background:rgba(1,234,203,0.05);border:1px solid rgba(1,234,203,0.18);padding:18px 22px;">
+          <div class="summary-rainbow"></div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
             <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;">Ask Verto</span>
-            <span id="av-thinking" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);margin-left:2px;">Analysing responses…</span>
+            <span id="av-thinking" class="gen-shimmer--brand" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);margin-left:2px;">Analysing responses…</span>
           </div>
           <div id="av-text"
                style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.65);line-height:1.8;white-space:pre-wrap;min-height:18px;"></div>
@@ -75,8 +67,11 @@
 
         <script>
           (function() {
+            const card    = document.getElementById("av-card")
             const textEl  = document.getElementById("av-text")
             const thinkEl = document.getElementById("av-thinking")
+            card.classList.add("is-generating")
+            const stop = () => { card.classList.remove("is-generating"); thinkEl.style.display = "none" }
             fetch(<%= survey_results_summary_path(@survey).to_json.html_safe %>)
               .then(r => {
                 if (!r.ok) throw new Error()
@@ -85,8 +80,8 @@
                 let started  = false
                 function pump() {
                   return reader.read().then(({ done, value }) => {
-                    if (done) { thinkEl.style.display = "none"; return }
-                    if (!started) { started = true; thinkEl.style.display = "none" }
+                    if (done) { stop(); return }
+                    if (!started) { started = true; stop() }
                     textEl.textContent += dec.decode(value, { stream: true })
                     return pump()
                   })
@@ -94,12 +89,48 @@
                 return pump()
               })
               .catch(() => {
-                thinkEl.style.display = "none"
+                stop()
                 textEl.textContent = "Insights unavailable right now."
                 textEl.style.color = "rgba(255,255,255,0.2)"
               })
           })()
         </script>
+
+        <%# ── Filterable feed: stats + segment pills + per-question cards ── %>
+        <%= turbo_frame_tag "results-feed" do %>
+
+          <%# Stats strip %>
+          <div style="display:flex;align-items:center;gap:16px;padding:2px 0 6px;">
+            <div style="display:flex;align-items:baseline;gap:5px;">
+              <span style="font-family:'Alata',sans-serif;font-size:34px;color:#01EACB;line-height:1;"><%= @total %></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);">response<%= @total == 1 ? "" : "s" %></span>
+            </div>
+            <% if @active_segment && @active_segment[:id] != "overall" %>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);">of <%= @overall_total %> overall</span>
+            <% end %>
+            <div style="width:1px;height:20px;background:rgba(255,255,255,0.1);"></div>
+            <% if @survey.published_at %>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);">Published <%= @survey.published_at.strftime("%b %-d, %Y") %></span>
+            <% end %>
+            <div style="margin-left:auto;">
+              <%= link_to play_survey_url(@survey.publish_token),
+                    style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);text-decoration:none;",
+                    target: "_blank" do %>↗ Play link<% end %>
+            </div>
+          </div>
+
+          <%# Segment filter pills — only when this Verto has partner segments %>
+          <% if @segments.size > 1 %>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 0 10px;">
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-right:2px;">View</span>
+              <% @segments.each do |seg| %>
+                <%= link_to survey_results_path(@survey, segment: seg[:id]),
+                      class: "seg-pill", aria: { current: (seg[:id] == @active_segment[:id]).to_s } do %>
+                  <%= seg[:label] %><span class="seg-pill-count"><%= seg[:count] %></span>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
 
         <%# ── Per-question cards ── %>
         <% @aggregated.each_with_index do |result, idx| %>
@@ -251,7 +282,9 @@
               </div><%# end right panel %>
             </div><%# end grid %>
           </div><%# end s-card %>
-        <% end %>
+        <% end %><%# end per-question cards loop %>
+
+        <% end %><%# end results-feed turbo-frame %>
 
       </div>
     </div><%# end scrollable feed %>
@@ -259,7 +292,7 @@
   </div><%# end middle column %>
 
   <%# ── Chat panel ── %>
-  <div style="width:320px;flex-shrink:0;border-left:1px solid rgba(255,255,255,0.07);background:#161B2E;display:flex;flex-direction:column;overflow:hidden;"
+  <div style="width:320px;flex-shrink:0;border-left:1px solid rgba(255,255,255,0.07);background:#161B2E;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1;"
        data-controller="results-chat"
        data-results-chat-url-value="<%= survey_chat_path(@survey) %>"
        data-results-chat-theme-value="<%= @survey.theme.to_s.gsub('"', '&quot;') %>">
