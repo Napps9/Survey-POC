@@ -110,6 +110,13 @@ class SurveyGenerator
     9. Answer length — Keep each answer choice up to 20 characters in a
        select-one list. For grids, weigh option count against legibility.
 
+    10. "How often" questions — When a question begins with "How often",
+        default to range as the answer type. "How often" questions must never
+        exceed 5 options. If the question genuinely requires more than 5
+        options, fall back to the next best type in this order:
+        rating → multiple_choice → select_one_grid. Do NOT use a grid or
+        list type with more than 5 options for a "How often" question.
+
     Output via the emit_survey tool. Choose card types thoughtfully — the
     Verto answer type definitions below tell you when each is the right fit.
 
@@ -167,7 +174,7 @@ class SurveyGenerator
 
     When relevant historical Playverto questions are provided in the brief,
     use them to inform wording style and answer-type selection. Do NOT copy
-    them verbatim — adapt to the brief's audience and insight. The 9 design
+    them verbatim — adapt to the brief's audience and insight. The 10 design
     rules above always override any pattern from the historical examples.
   PROMPT
 
