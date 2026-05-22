@@ -123,8 +123,9 @@
                      ["01", "About your Verto",       "#FF1E6F"],
                      ["02", "Who's answering",         "#01EACB"],
                      ["03", "What you want to learn",  "#0CA7FF"],
-                     ["04", "Brand colours",           "#FFFA77"],
-                     ["05", "Context (optional)",      "#615BF5"],
+                     ["04", "Languages",               "#01EACB"],
+                     ["05", "Brand colours",           "#FFFA77"],
+                     ["06", "Context (optional)",      "#615BF5"],
                    ].each do |num, label, accent| %>
                   <div style="display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
                     <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= accent %>;letter-spacing:0.08em;font-weight:700;"><%= num %></span>
@@ -262,7 +263,51 @@
         </div>
       </section>
 
-      <%# ── Card 5 · Brand colours ── %>
+      <%# ── Card 5 · Languages ── %>
+      <section class="preview-card" data-create-wizard-target="card"
+               data-controller="language-picker">
+        <div class="split-card">
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:83%;"></div></div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#01EACB;">Step 04 · Languages</div>
+              <div style="<%= instr_lead %>">Reach everyone in their own language.</div>
+              <div style="<%= instr_body %>">We'll write the Verto in your primary language, then craft an equally good version in each other language. Every version asks the same questions, so results stay aligned.</div>
+              <div style="<%= ex_label_style %>margin-top:8px;"><span data-language-picker-target="summary"></span></div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#01EACB;">Step 04 · Languages</div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;">Which languages should this Verto speak?</div>
+
+            <label style="display:flex;flex-direction:column;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);">
+              Primary language
+              <select name="default_locale"
+                      data-language-picker-target="primary"
+                      data-action="change->language-picker#syncPrimary"
+                      style="<%= light_input_style %>">
+                <% SupportedLocales.all.each do |loc| %>
+                  <option value="<%= loc.code %>" <%= "selected" if loc.code == I18n.locale.to_s %>><%= loc.flag %> <%= loc.native_name %></option>
+                <% end %>
+              </select>
+            </label>
+
+            <div style="display:flex;flex-wrap:wrap;gap:8px;max-height:210px;overflow:auto;padding:2px;">
+              <% SupportedLocales.all.each do |loc| %>
+                <label class="lang-chip">
+                  <input type="checkbox" name="locales[]" value="<%= loc.code %>"
+                         data-language-picker-target="option"
+                         data-action="change->language-picker#toggle"
+                         <%= "checked" if loc.code == I18n.locale.to_s %> />
+                  <span><%= loc.flag %> <%= loc.native_name %></span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Card 6 · Brand colours ── %>
       <%
         org_pal = current_organisation.brand_palette
         brand_roles = [
@@ -275,9 +320,9 @@
                data-controller="brand-palette">
         <div class="split-card">
           <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:88%;"></div></div>
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:91%;"></div></div>
             <div style="<%= left_pad_style %>gap:14px;">
-              <div style="<%= eyebrow_style %>color:#FFFA77;">Step 04 · Brand colours</div>
+              <div style="<%= eyebrow_style %>color:#FFFA77;">Step 05 · Brand colours</div>
               <div style="<%= instr_lead %>">Make it feel like you.</div>
               <div style="<%= instr_body %>">This is how your Verto looks to everyone who plays it. You can fine-tune any time from the editor.</div>
 
@@ -300,7 +345,7 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FFFA77;">Step 04 · Brand colours</div>
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FFFA77;">Step 05 · Brand colours</div>
             <div class="q-title" style="font-size:28px;line-height:1.2;">Choose your brand colours.</div>
             <p class="q-subtitle" style="margin:0;">Pick three. They'll apply across this Verto's experience.</p>
             <div style="display:flex;flex-direction:column;gap:12px;margin-top:2px;">
@@ -334,7 +379,7 @@
             <div class="panel-progress"><div class="panel-progress-fill" style="width:100%;"></div></div>
             <div style="<%= left_pad_style %>">
               <div style="display:flex;align-items:center;gap:10px;">
-                <div style="<%= eyebrow_style %>color:#615BF5;">Step 05 · Context</div>
+                <div style="<%= eyebrow_style %>color:#615BF5;">Step 06 · Context</div>
                 <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#615BF5;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(97,91,245,0.14);border:1px solid rgba(97,91,245,0.3);">Optional</span>
               </div>
               <div style="<%= instr_lead %>">Anything else we should bake in?</div>
@@ -354,7 +399,7 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#615BF5;">Step 05 · Context · Optional</div>
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#615BF5;">Step 06 · Context · Optional</div>
             <div class="q-title" style="font-size:28px;line-height:1.2;">Anything else we should know?</div>
             <%= f.text_area :notes, rows: 4,
                   placeholder: "e.g. Audience has never used Playverto before, keep tone warm, not corporate.",

@@ -2331,6 +2331,18 @@
    Reused in the top bar, the unauthenticated header and the
    player nav. Anchored with logical properties for RTL.
    ───────────────────────────────────────────────────────── */
+/* Language multi-select chips in the Verto creation wizard (light panel). */
+.lang-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; border-radius: 100px;
+  border: 1px solid rgba(0,0,0,0.12); background: #fafbfc; color: #1C2034;
+  font-family: "ABeeZee", sans-serif; font-size: 13px;
+  cursor: pointer; user-select: none; transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.lang-chip input { position: absolute; opacity: 0; width: 0; height: 0; }
+.lang-chip:hover { border-color: rgba(0,0,0,0.28); }
+.lang-chip:has(input:checked) { background: rgba(1,234,203,0.14); border-color: #01EACB; color: #0a7d6e; font-weight: 600; }
+
 .lang-switcher-fixed { position: fixed; top: 14px; inset-inline-end: 16px; z-index: 60; }
 .lang-switcher { position: relative; display: inline-flex; }
 .lang-switcher-btn {
