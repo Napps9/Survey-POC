@@ -22,16 +22,7 @@ class NpsVisualGenerator
   }.freeze
 
   REACTION_PROPS = {
-    mode:         { type: "string", enum: %w[states fill], description: "states = up to 5 cross-faded expressions; fill = a vessel that fills." },
-    viewbox:      { type: "string", description: "Square viewBox." },
-    defs:         { type: "string" },
-    states:       { type: "array", minItems: 3, maxItems: 5,
-                    description: "states mode: ordered low→high (5 preferred).",
-                    items: { type: "object", properties: { label: { type: "string" }, svg: { type: "string" } }, required: %w[svg] } },
-    clip:         { type: "string", description: "fill mode: vessel interior shape." },
-    back:         { type: "string" },
-    front:        { type: "string" },
-    liquid_color: { type: "string" }
+    accent: { type: "string", description: "A small themed SVG flourish drawn AROUND/BEHIND the face the app renders (the app draws a head circle r~54 at 100,100 in a 0 0 200 200 viewBox, eyes, and a mouth that morphs sad→happy in sentiment colour). e.g. sun rays, a leaf pair, steam wisps, animal ears, a hat. Keep it small, behind/around the face, ≤~0.8KB, bake its own colours, allowlisted SVG only." }
   }.freeze
 
   TOOL = {
@@ -42,7 +33,7 @@ class NpsVisualGenerator
       properties: {
         subject:  { type: "string", description: "Short theme tag, e.g. 'weather', 'coffee', 'fitness'." },
         control:  { type: "object", description: "RIGHT: the asset that works AS A SLIDER (draggable handle).", properties: CONTROL_PROPS, required: %w[axis viewbox thumb] },
-        reaction: { type: "object", description: "LEFT: the asset that reacts to the slider value.", properties: REACTION_PROPS, required: %w[mode viewbox] }
+        reaction: { type: "object", description: "LEFT: a themed accent around an app-drawn reacting face.", properties: REACTION_PROPS, required: %w[accent] }
       },
       required: %w[control reaction]
     }
@@ -64,10 +55,12 @@ class NpsVisualGenerator
        - thumb: the handle, authored around the origin (0,0), <=~44px. The app
          translates it along the axis. Make it clearly a grabbable handle/marker.
 
-    2) reaction — the LEFT-hand asset that REACTS to the value (no drag). Either
-       "states" (up to 5 ordered low→high expressions the app cross-fades — e.g. a
-       sun whose face goes sad→happy; use fill="hsl(var(--nps-hue,60) 82% 58%)" so it
-       tweens), or "fill" (a vessel that fills like the control).
+    2) reaction — the LEFT-hand asset. The app draws a consistent FACE itself (a head
+       circle r~54 at 100,100 in a 0 0 200 200 viewBox, big eyes, and a mouth that
+       morphs sad→happy, coloured by sentiment). You ONLY provide `accent`: a small
+       themed SVG flourish drawn around/behind that face — e.g. sun rays, a leaf pair,
+       steam wisps, animal ears, a hat. Keep it small and peripheral (don't cover the
+       face), bake its own colours. Do NOT draw the face/eyes/mouth yourself.
 
     Rules:
     - Square viewBox, default "0 0 200 200". Simple, iconic, centred; each SVG piece
@@ -144,14 +137,7 @@ class NpsVisualGenerator
 
   def normalize_reaction(r)
     r = {} unless r.is_a?(Hash)
-    mode = r["mode"].to_s == "fill" ? "fill" : "states"
-    base = { "mode" => mode, "viewbox" => r["viewbox"].to_s.presence || "0 0 200 200", "defs" => SvgSanitizer.clean(r["defs"].to_s) }
-    if mode == "fill"
-      base.merge("clip" => SvgSanitizer.clean(r["clip"].to_s), "back" => SvgSanitizer.clean(r["back"].to_s),
-                 "front" => SvgSanitizer.clean(r["front"].to_s), "liquid_color" => r["liquid_color"].to_s)
-    else
-      base.merge("states" => Array(r["states"]).first(5).map { |s| { "label" => s["label"].to_s, "svg" => SvgSanitizer.clean(s["svg"].to_s) } })
-    end
+    { "accent" => SvgSanitizer.clean(r["accent"].to_s) }
   end
 
   def tool_use?(block)

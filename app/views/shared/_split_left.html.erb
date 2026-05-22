@@ -14,9 +14,9 @@
 
 <div class="split-left">
   <% if nps_card?(card) %>
-    <%# NPS: the LEFT panel is the reactive asset (e.g. a sun face) that reacts
-        to the slider on the right. %>
-    <%= render_nps_stage(nps_reaction_spec(card)) %>
+    <%# NPS: the LEFT panel is a face the app draws (eyes + morphing mouth +
+        sentiment colour) framed by a themed accent; it reacts to the slider. %>
+    <%= render_nps_reaction(nps_reaction_spec(card)) %>
   <% elsif has_img %>
     <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
          style="background-image:url('<%= card["image"] %>');"></div>

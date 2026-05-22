@@ -52,58 +52,38 @@ module NpsHelper
                 data: { axis: axis }, style: "--nps-hue:60;--nps-fill:0.5;")
   end
 
-  # ---------- LEFT: the reactive asset (states or fill) ----------
+  # ---------- LEFT: a fixed face template; Claude only supplies a themed accent ----------
+
+  # The mouth morphs frown -> smile across the value range (sized for an r=54 head).
+  NPS_MOUTHS = [
+    "M76 130 Q100 110 124 130",  # frown
+    "M76 127 Q100 119 124 127",  # slight frown
+    "M78 124 L122 124",          # flat
+    "M76 122 Q100 138 124 122",  # smile
+    "M74 119 Q100 150 126 119"   # big smile
+  ].freeze
 
   def nps_reaction_spec(card)
-    nv  = card["nps_visual"]
-    raw = nv.is_a?(Hash) ? (nv["reaction"] || (nv["mode"] && !nv["control"] ? nv : nil)) : nil
-    resolve_nps_reaction(raw, nps_fallback_reaction)
+    nv     = card["nps_visual"]
+    accent = (nv.is_a?(Hash) && nv["reaction"].is_a?(Hash)) ? nv["reaction"]["accent"].to_s : ""
+    accent = SvgSanitizer.clean(accent)
+    { "accent" => accent.presence || nps_fallback_reaction["accent"] }
   end
 
-  def resolve_nps_reaction(raw, fallback)
-    usable = raw.is_a?(Hash) &&
-             (raw["mode"] == "fill" ? raw["clip"].present? : Array(raw["states"]).any?)
-    spec = usable ? raw : fallback
-    mode = spec["mode"] == "fill" ? "fill" : "states"
-    base = {
-      "mode"    => mode,
-      "viewbox" => spec["viewbox"].presence || "0 0 200 200",
-      "defs"    => SvgSanitizer.clean(spec["defs"].to_s)
-    }
-    if mode == "fill"
-      base.merge(
-        "back"         => SvgSanitizer.clean(spec["back"].to_s),
-        "clip"         => SvgSanitizer.clean(spec["clip"].to_s),
-        "front"        => SvgSanitizer.clean(spec["front"].to_s),
-        "liquid_color" => nps_safe_color(spec["liquid_color"])
-      )
-    else
-      base.merge(
-        "states" => Array(spec["states"]).first(NPS_STATES).map do |s|
-          { "label" => s["label"].to_s, "svg" => SvgSanitizer.clean(s["svg"].to_s) }
-        end
-      )
-    end
-  end
-
-  def render_nps_stage(spec)
-    vb = ERB::Util.h(spec["viewbox"])
-    inner =
-      if spec["mode"] == "fill"
-        cid = "nps-clip-#{SecureRandom.hex(4)}"
-        %(<defs>#{spec["defs"]}<clipPath id="#{cid}">#{spec["clip"]}</clipPath></defs>#{spec["back"]}) +
-          %(<g clip-path="url(##{cid})"><rect class="nps-liquid" data-axis="vertical" x="0" y="0" ) +
-          %(width="100%" height="100%" fill="#{ERB::Util.h(spec["liquid_color"])}"></rect></g>#{spec["front"]})
-      else
-        states  = spec["states"]
-        initial = states.length / 2
-        %(<defs>#{spec["defs"]}</defs>) +
-          states.each_with_index.map do |st, i|
-            %(<g class="nps-state#{i == initial ? ' is-active' : ''}" data-state="#{i}">#{st["svg"]}</g>)
-          end.join
-      end
-    svg = %(<svg class="nps-svg" viewBox="#{vb}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">#{inner}</svg>)
-    content_tag(:div, svg.html_safe, class: "nps-visual", style: "--nps-hue:60;--nps-fill:0.5;")
+  # The app draws a consistent face (head + eyes + a mouth that morphs sad->happy,
+  # coloured by --nps-hue). The themed `accent` is drawn behind it. The controller
+  # toggles the active mouth (.nps-state) and sets --nps-hue from the slider.
+  def render_nps_reaction(spec)
+    initial = NPS_MOUTHS.length / 2
+    base = spec["accent"].to_s +
+           %(<circle cx="100" cy="100" r="54" fill="hsl(var(--nps-hue,60) 85% 58%)"/>) +
+           %(<circle cx="82" cy="92" r="7.5" fill="#1b2440"/><circle cx="118" cy="92" r="7.5" fill="#1b2440"/>)
+    mouths = NPS_MOUTHS.each_with_index.map do |d, i|
+      %(<g class="nps-state#{i == initial ? ' is-active' : ''}" data-state="#{i}">) +
+        %(<path d="#{d}" fill="none" stroke="#1b2440" stroke-width="6" stroke-linecap="round"/></g>)
+    end.join
+    svg = %(<svg class="nps-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">#{base}#{mouths}</svg>)
+    content_tag(:div, svg.html_safe, class: "nps-visual", style: "--nps-hue:60;")
   end
 
   # ---------- shared ----------
@@ -141,23 +121,11 @@ module NpsHelper
     }
   end
 
-  # Built-in reaction: a sun whose face goes frown->smile, colour via --nps-hue.
+  # Built-in accent: a ring of sun rays around the face (tweens with --nps-hue).
   def nps_fallback_reaction
-    mouths = [
-      "M74 132 Q100 110 126 132", "M74 129 Q100 120 126 129", "M76 126 L124 126",
-      "M74 124 Q100 142 126 124", "M72 121 Q100 153 128 121"
-    ]
-    labels = %w[Awful Poor Okay Good Great]
     rays = (0...8).map do |i|
-      %(<line x1="100" y1="36" x2="100" y2="20" stroke="hsl(var(--nps-hue,60) 85% 56%)" stroke-width="7" stroke-linecap="round" transform="rotate(#{i * 45} 100 100)"/>)
+      %(<line x1="100" y1="34" x2="100" y2="18" stroke="hsl(var(--nps-hue,60) 85% 56%)" stroke-width="7" stroke-linecap="round" transform="rotate(#{i * 45} 100 100)"/>)
     end.join
-    states = mouths.each_with_index.map do |d, i|
-      svg = rays +
-            %(<circle cx="100" cy="100" r="52" fill="hsl(var(--nps-hue,60) 85% 58%)"/>) +
-            %(<circle cx="83" cy="92" r="7" fill="#1b2440"/><circle cx="117" cy="92" r="7" fill="#1b2440"/>) +
-            %(<path d="#{d}" fill="none" stroke="#1b2440" stroke-width="6" stroke-linecap="round"/>)
-      { "label" => labels[i], "svg" => svg }
-    end
-    { "mode" => "states", "viewbox" => "0 0 200 200", "defs" => "", "states" => states }
+    { "accent" => rays }
   end
 end
