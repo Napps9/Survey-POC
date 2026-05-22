@@ -133,6 +133,11 @@ export default class extends Controller {
         return active >= 0 ? active : null
       }
 
+      case "nps": {
+        const v = card.querySelector(".nps-slider")?.dataset.npsValue
+        return (v !== undefined && v !== "") ? Number(v) : null
+      }
+
       case "rating": {
         const count = Array.from(card.querySelectorAll(".rating-star.active")).length
         return count > 0 ? count : null
@@ -234,7 +239,7 @@ export default class extends Controller {
   _formatMine(mine, row) {
     if (mine === null || mine === undefined || mine === "") return "—"
     if (Array.isArray(mine)) return mine.length ? mine.join(", ") : "—"
-    if (row.type === "range" && Array.isArray(row.options)) {
+    if ((row.type === "range" || row.type === "nps") && Array.isArray(row.options)) {
       return row.options[mine] || `Step ${Number(mine) + 1}`
     }
     if (row.type === "rating") return `${mine} ★`
@@ -251,7 +256,7 @@ export default class extends Controller {
     const counts = row.counts || {}
     let entries = []
 
-    if (row.type === "range" && Array.isArray(row.options)) {
+    if ((row.type === "range" || row.type === "nps") && Array.isArray(row.options)) {
       entries = row.options.map((label, i) => [label, counts[i] || counts[String(i)] || 0, i])
     } else if (row.type === "rating") {
       const max = Math.max(5, ...Object.keys(counts).map(k => parseInt(k) || 0))
@@ -286,7 +291,7 @@ export default class extends Controller {
   _isMineMatch(mine, key, row) {
     if (mine === null || mine === undefined) return false
     if (Array.isArray(mine)) return mine.map(String).includes(String(key))
-    if (row.type === "range") return Number(mine) === Number(key)
+    if (row.type === "range" || row.type === "nps") return Number(mine) === Number(key)
     if (row.type === "rating") return Number(mine) === Number(key)
     if (row.type === "tap_card" && typeof mine === "object" && typeof key === "string") {
       const [label, choice] = key.split(":")

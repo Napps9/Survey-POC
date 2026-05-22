@@ -17,7 +17,7 @@ class QuestionCorpus
     "pickMany"    => "select_many",
     "range"       => "range",
     "rating"      => "rating",
-    "netPromoter" => "rating",
+    "netPromoter" => "nps",
     "priority"    => "select_one_grid",
     "tap"         => "tap_card",
     "tapCard"     => "tap_card",

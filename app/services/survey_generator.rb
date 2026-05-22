@@ -13,6 +13,7 @@ class SurveyGenerator
     tap_card
     range
     rating
+    nps
     yes_no
     open_ended
   ].freeze
@@ -55,6 +56,7 @@ class SurveyGenerator
                   - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any "Other"
                   - tap_card: 3 to 5 cards
                   - range / rating: 3 to 5 points, never more than 5
+                  - nps: 4 to 11 points (default 5-7), each label <= 20 chars
                 DESC
               }
             },
@@ -75,6 +77,9 @@ class SurveyGenerator
       total including any "Other".
     - tap_card: 3 to 5 cards - never fewer than 3, never more than 5.
     - range / rating: 3 to 5 points; never more than 5.
+    - nps: a likelihood/sentiment scale with a reacting themed visual. 4 to 11
+      points (default 5-7); each option label <= 20 chars. This is the only
+      scale allowed more than 5 points.
     - Question text: 50-70 chars target, 100 hard max. Any description below the
       question SHARES that same 100-char budget (text + description <= 100).
     - "How often" questions: default to range with <= 5 options. If more are
@@ -99,7 +104,8 @@ class SurveyGenerator
        as 5 questions.
 
     3. Answer-type variety — Never place more than 2 of the same answer type in
-       a row in the flow.
+       a row in the flow. Treat range, rating and nps as one "scale" family —
+       avoid more than 2 of those sliders in a row.
 
     4. Welcome cards — At most ONE welcome_card, and only for cold/new audiences
        (briefly stating the Verto's purpose). Omit it for captive audiences or
@@ -149,10 +155,13 @@ class SurveyGenerator
     - rating (Verto "Rating"): icon-based scale (stars by default, but icons
       can be customised). Use for "how good was X" questions. Can also stand
       in for range when iconography matters more than animation.
-    - nps (use type "rating" with appropriate options): Verto's NPS is a
-      0–10 drag scale, also customisable to 4- or 5-point. Labels can be
-      numbers, agreement, or emotion. Pick rating with a wider option count
-      when you want NPS-style.
+    - nps (Verto "NPS / Reactive scale"): a likelihood/sentiment slider where
+      the answer control itself is a themed visual that reacts and fills as the
+      respondent drags it (e.g. a thermometer, cup, gauge, or expressive
+      character chosen to fit the brief's theme, audience and tone). Use for
+      likelihood-to-recommend, satisfaction, mood or temperature checks. 4–11
+      points (default 5–7); labels can be numbers, words or emotions. Prefer
+      this over rating when an engaging, on-theme reaction adds value.
     - yes_no: simple gating only. Use sparingly — a select_one_grid with
       two visual options is often richer.
     - open_ended (Verto "Freeform"): text input, can be voice-recorded too.
@@ -174,7 +183,7 @@ class SurveyGenerator
     [ ] 10 to 15 questions (welcome cards excluded); at most 1 welcome card
     [ ] No more than 2 of the same answer type in a row
     [ ] Lists 3-5 options (each <= 20 chars); grids EVEN and 4-10; tap_card 3-5;
-        range/rating <= 5
+        range/rating <= 5; nps 4-11
     [ ] Every question's text plus its description <= 100 chars
     [ ] "How often" -> range with <= 5 options
     [ ] theme, audience_age and key_insight echoed back unchanged

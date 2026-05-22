@@ -26,7 +26,7 @@ module AggregatesSurveyResults
         counts = {}
         vals.each { |obj| obj.each { |l, d| (counts[l] ||= { "yes" => 0, "no" => 0 })[d] += 1 } if obj.is_a?(Hash) }
         base.merge(total: vals.size + other_count, counts:)
-      when "range"
+      when "range", "nps"
         counts = Hash.new(0).tap { |h| vals.each { |v| h[v.to_i] += 1 } }
         base.merge(total: vals.size + other_count, counts:)
       when "rating"

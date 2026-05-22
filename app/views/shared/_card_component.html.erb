@@ -169,7 +169,25 @@
         </div>
         <div class="slider-labels">
           <% labels.each do |opt| %>
-            <span class="slider-label-text" <%= ce_attr %>><%= opt %></span>
+            <span class="slider-label-text" data-slider-target="label" <%= ce_attr %>><%= opt %></span>
+          <% end %>
+        </div>
+      </div>
+
+    <% when "nps" %>
+      <%# The themed asset IS the slider: drag it directly to fill / react. %>
+      <% labels = Array(card["options"]) %>
+      <% labels = %w[0 1 2 3 4 5 6 7 8 9 10] if labels.empty? %>
+      <% n = [labels.size, 2].max %>
+      <div class="nps-slider"
+           data-controller="nps-slider"
+           data-nps-slider-steps-value="<%= n %>"
+           data-action="pointerdown->nps-slider#start">
+        <div class="nps-slider-tooltip" data-nps-slider-target="tooltip"></div>
+        <%= render_nps_stage(nps_control_spec(card)) %>
+        <div class="slider-labels nps-slider-labels">
+          <% labels.each do |opt| %>
+            <span class="slider-label-text" data-nps-slider-target="label" <%= ce_attr %>><%= opt %></span>
           <% end %>
         </div>
       </div>

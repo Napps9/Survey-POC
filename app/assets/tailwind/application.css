@@ -153,6 +153,79 @@
 }
 .panel-progress-fill { height: 100%; background: white; border-radius: 8px; }
 
+/* NPS: the themed asset IS the interactive control (right panel). Dragging it
+   vertically (nps_slider_controller) drives --nps-fill (liquid level) and
+   --nps-hue (red->green sentiment). */
+.nps-slider {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 4px 0 2px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: ns-resize;
+}
+.nps-slider-tooltip {
+  font-family: "Alata", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--brand-cta-text, #1C2034);
+  background: var(--brand-primary, #01EACB);
+  padding: 4px 14px;
+  border-radius: 100px;
+  min-height: 22px;
+}
+.nps-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* RIGHT control asset: inline inside the slider, fixed box. */
+.nps-slider .nps-visual {
+  position: relative;
+  width: 210px;
+  height: 230px;
+}
+.nps-slider .nps-svg {
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* the whole .nps-slider is the drag surface */
+}
+/* LEFT reactive asset: fills the left panel like other card visuals. */
+.split-left .nps-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.split-left .nps-svg {
+  width: 72%;
+  height: 72%;
+  max-width: 340px;
+  max-height: 340px;
+}
+.nps-svg { overflow: visible; }
+.nps-svg .nps-state { opacity: 0; transition: opacity 0.28s ease; }
+.nps-svg .nps-state.is-active { opacity: 1; }
+
+/* Continuous "fill" mode: the liquid rect (clipped to a themed vessel) scales
+   vertically from the bottom by --nps-fill, so it rises smoothly as you drag.
+   transform-box:fill-box makes the scale origin the rect's own bbox. */
+.nps-svg .nps-liquid {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scaleY(var(--nps-fill, 0.5));
+  transition: transform 0.22s cubic-bezier(.34,1.2,.64,1);
+}
+.nps-slider-labels { width: 100%; }
+.nps-slider-labels .slider-label-text.is-active {
+  color: var(--brand-primary, #01EACB);
+  font-weight: 700;
+}
+
 .split-right {
   width: 425px;                 /* equal half of 850 */
   flex: 0 0 425px;

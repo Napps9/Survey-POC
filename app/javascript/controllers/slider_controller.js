@@ -54,7 +54,7 @@ export default class extends Controller {
 
     if (this.hasTooltipTextTarget) {
       const label = this.labelTargets[this.indexValue]
-      const text  = label ? (label.querySelector("[data-role='option']")?.textContent.trim() || "") : ""
+      const text  = label ? (label.querySelector("[data-role='option']")?.textContent.trim() || label.textContent.trim() || "") : ""
       this.tooltipTextTarget.textContent = text || `Step ${this.indexValue + 1}`
     }
   }

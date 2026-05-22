@@ -13,7 +13,11 @@
 %>
 
 <div class="split-left">
-  <% if has_img %>
+  <% if nps_card?(card) %>
+    <%# NPS: the LEFT panel is the reactive asset (e.g. a sun face) that reacts
+        to the slider on the right. %>
+    <%= render_nps_stage(nps_reaction_spec(card)) %>
+  <% elsif has_img %>
     <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
          style="background-image:url('<%= card["image"] %>');"></div>
     <div class="split-left-overlay"<%= " data-card-media".html_safe if editable %>></div>
@@ -24,8 +28,9 @@
   </div>
 
   <%# Editor: prompt the creator to add design (an image). No how-to
-      illustration is shown for any card type, in any mode. %>
-  <% if editable %>
+      illustration is shown for any card type, in any mode. NPS uses generated
+      reactive visuals instead of a picked image. %>
+  <% if editable && !nps_card?(card) %>
     <% if has_img %>
       <button type="button" class="add-media-fab"
               data-action="click->media-picker#open"

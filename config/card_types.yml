@@ -29,6 +29,16 @@ rating:
   picker_icon:  "★"
   pickable:     true
 
+nps:
+  badge:        "NPS"
+  badge_css:    "sb-range"
+  panel_label:  "DRAG TO RATE"
+  eyebrow:      "Drag to rate"
+  picker_name:  "NPS / Reactive scale"
+  picker_desc:  "Themed scale with a reacting visual"
+  picker_icon:  "📈"
+  pickable:     true
+
 multiple_choice:
   badge:        "PICK ONE"
   badge_css:    "sb-range"

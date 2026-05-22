@@ -6,12 +6,13 @@ const TYPE_BOUNDS = {
   select_many:      { min: 3, max: 5 },
   rating:           { min: 3, max: 5 },
   range:            { min: 3, max: 5 },
+  nps:              { min: 4, max: 11 },
   select_one_grid:  { min: 2, max: 10, even: true },
   select_many_grid: { min: 2, max: 10, even: true }
 }
 const COUNTABLE = new Set([
   "multiple_choice", "select_many", "select_one_grid", "select_many_grid",
-  "tap_card", "range", "rating", "yes_no", "open_ended"
+  "tap_card", "range", "rating", "nps", "yes_no", "open_ended"
 ])
 const TEXT_TARGET = 70
 const TEXT_HARD_MAX = 100
@@ -159,13 +160,18 @@ export default class extends Controller {
         card.querySelectorAll('.pick-text').forEach(el => opts.push(el.textContent.trim()))
       else if (['select_one_grid', 'select_many_grid'].includes(type))
         card.querySelectorAll('.choice-label').forEach(el => opts.push(el.textContent.trim()))
-      else if (type === 'range')
+      else if (type === 'range' || type === 'nps')
         card.querySelectorAll('.slider-label-text').forEach(el => opts.push(el.textContent.trim()))
       else if (type === 'rating')
         card.querySelectorAll('.rating-label').forEach(el => opts.push(el.textContent.trim()))
       else if (type === 'tap_card')
         card.querySelectorAll('.rotate-card span[contenteditable]').forEach(el => opts.push(el.textContent.trim()))
       if (opts.length) out.options = opts.filter(Boolean)
+      // NPS keeps its generated visual spec on a data attribute so the editor
+      // autosave round-trips it instead of dropping it.
+      if (type === 'nps' && card.dataset.cardNpsVisual) {
+        try { out.nps_visual = JSON.parse(card.dataset.cardNpsVisual) } catch (_) { /* keep prior */ }
+      }
       return out
     })
     return {
