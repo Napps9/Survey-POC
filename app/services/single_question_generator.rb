@@ -91,11 +91,14 @@ class SingleQuestionGenerator
       And do NOT reuse a type from the last 2 cards (#{recent_types.join(", ").presence || "none"}).
     RULES
 
+    tool = TOOL.deep_dup
+    tool[:input_schema][:properties][:type][:enum] = SurveyGenerator.generatable_types
+
     response = @client.messages.create(
       model:       MODEL,
       max_tokens:  MAX_TOKENS,
       system:      SurveyGenerator::SYSTEM,
-      tools:       [ TOOL ],
+      tools:       [ tool ],
       tool_choice: { type: "tool", name: "emit_question" },
       messages:    [ { role: "user", content: user_message } ]
     )

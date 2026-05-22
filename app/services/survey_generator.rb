@@ -18,6 +18,11 @@ class SurveyGenerator
     open_ended
   ].freeze
 
+  # Card types the generator may emit — respects feature flags (e.g. nps).
+  def self.generatable_types
+    CARD_TYPES.select { |t| CardTypes.enabled?(t) }
+  end
+
   TOOL = {
     name: "emit_survey",
     description: "Emit a structured survey that strictly follows the survey design rules.",
@@ -235,11 +240,14 @@ class SurveyGenerator
       emit_survey tool.
     REMINDER
 
+    tool = TOOL.deep_dup
+    tool[:input_schema][:properties][:cards][:items][:properties][:type][:enum] = self.class.generatable_types
+
     response = @client.messages.create(
       model: MODEL,
       max_tokens: MAX_TOKENS,
       system: SYSTEM,
-      tools: [TOOL],
+      tools: [tool],
       tool_choice: { type: "tool", name: "emit_survey" },
       messages: [{ role: "user", content: user_message }]
     )
