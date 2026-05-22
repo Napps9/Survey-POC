@@ -7,6 +7,7 @@ export default class extends Controller {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
     resultsUrl: { type: String, default: "" },
+    locale: { type: String, default: "" },
     showComparison: { type: Boolean, default: false },
     current: { type: Number, default: 0 }
   }
@@ -44,7 +45,7 @@ export default class extends Controller {
       const res = await fetch(this.submitUrlValue, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_token: this._sessionToken, answers: this._answers })
+        body: JSON.stringify({ session_token: this._sessionToken, answers: this._answers, locale: this.localeValue })
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.clone().json().catch(() => null)
@@ -84,7 +85,7 @@ export default class extends Controller {
       const res = await fetch(this.progressUrlValue, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_token: this._sessionToken, answers: this._answers })
+        body: JSON.stringify({ session_token: this._sessionToken, answers: this._answers, locale: this.localeValue })
       })
       if (res.ok) this._registered = true
     } catch (_) { /* retry on the next navigation */ }
@@ -108,24 +109,30 @@ export default class extends Controller {
       : { type, value }
   }
 
+  // The canonical (primary-language) label an option element answers as.
+  _canonicalOf(el) {
+    if (!el) return null
+    const c = el.dataset.canonical
+    if (c !== undefined && c !== "") return c
+    return el.querySelector(".pick-text, .choice-label")?.textContent.trim() ?? null
+  }
+
   _read(card, type) {
     switch (type) {
+      // Choice answers store the CANONICAL (primary-language) option label, so
+      // results aggregate across languages regardless of the displayed text.
       case "multiple_choice":
       case "yes_no":
-        return card.querySelector('[data-selected="true"] .pick-text')
-                   ?.textContent.trim() ?? null
+      case "select_one_grid":
+        return this._canonicalOf(
+          card.querySelector('[data-picker-target="item"][data-selected="true"]')
+        )
 
       case "select_many":
-        return Array.from(card.querySelectorAll('[data-selected="true"] .pick-text'))
-                    .map(e => e.textContent.trim())
-
-      case "select_one_grid":
-        return card.querySelector('[data-selected="true"] .choice-label')
-                   ?.textContent.trim() ?? null
-
       case "select_many_grid":
-        return Array.from(card.querySelectorAll('[data-selected="true"] .choice-label'))
-                    .map(e => e.textContent.trim())
+        return Array.from(card.querySelectorAll('[data-picker-target="item"][data-selected="true"]'))
+                    .map(el => this._canonicalOf(el))
+                    .filter(v => v !== null)
 
       case "range": {
         const dots   = Array.from(card.querySelectorAll(".s-dot"))

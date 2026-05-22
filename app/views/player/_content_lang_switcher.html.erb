@@ -1,0 +1,32 @@
+<%# Lets a respondent switch the Verto's CONTENT language (the questions),
+    distinct from the platform UI switcher. Links reload with ?lang= so the
+    server re-renders the cards in that language. Only shown when the Verto
+    exists in more than one language. %>
+<% if @survey.multilingual? %>
+  <% current = SupportedLocales.find(@display_locale) %>
+  <div class="lang-switcher" data-controller="locale-switcher">
+    <button type="button" class="lang-switcher-btn"
+            data-action="click->locale-switcher#toggle" aria-haspopup="true"
+            aria-label="<%= t("locale_switcher.label") %>">
+      <span class="lang-switcher-flag"><%= current&.flag %></span>
+      <span class="lang-switcher-code"><%= @display_locale.to_s.upcase %></span>
+      <svg class="lang-switcher-caret" width="10" height="6" viewBox="0 0 10 6" fill="none">
+        <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="lang-switcher-popover" data-locale-switcher-target="popover" hidden>
+      <div class="lang-switcher-popover-head"><%= t("locale_switcher.heading") %></div>
+      <% @survey.verto_locales.each do |code| %>
+        <% loc = SupportedLocales.find(code) %>
+        <a class="lang-switcher-item<%= ' is-active' if code == @display_locale.to_s %>"
+           href="?lang=<%= code %>">
+          <span class="lang-switcher-item-flag"><%= loc&.flag %></span>
+          <span class="lang-switcher-item-name"><%= loc&.native_name %></span>
+          <% if code == @display_locale.to_s %><span class="lang-switcher-item-tick">✓</span><% end %>
+        </a>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <span style="width:22px;"></span><%# balance the logo width so title stays centred %>
+<% end %>

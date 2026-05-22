@@ -11,6 +11,38 @@ class Survey < ApplicationRecord
     deleted_at.present?
   end
 
+  # Languages this Verto exists in, primary (default_locale) first. Legacy
+  # Vertos with no `locales` set fall back to just their primary language.
+  def verto_locales
+    ([default_locale] + SupportedLocales.sanitize_list(read_attribute(:locales), fallback: [])).uniq
+  end
+
+  # Translation languages — everything except the primary.
+  def secondary_locales
+    verto_locales - [default_locale]
+  end
+
+  def multilingual?
+    verto_locales.size > 1
+  end
+
+  # Returns a copy of `cards` with `translated` (an array, aligned per-card, of
+  # { "text", "description", "options" }) merged into each card's i18n[locale].
+  # Structural fields are untouched, so positional answer alignment is preserved.
+  def self.merge_card_translations(cards, locale, translated)
+    Array(cards).each_with_index.map do |card, i|
+      t = translated[i]
+      next card unless t.is_a?(Hash)
+
+      entry = {
+        "text"        => t["text"].to_s,
+        "description" => t["description"].presence,
+        "options"     => Array(t["options"])
+      }.compact
+      card.merge("i18n" => (card["i18n"] || {}).merge(locale.to_s => entry))
+    end
+  end
+
   # This Verto's own palette (the three user-set roles). Legacy Vertos with no
   # palette fall back to the Playverto default so they render unchanged.
   def brand_palette

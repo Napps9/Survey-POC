@@ -6,17 +6,19 @@
 %>
 <div class="preview-overlay flex flex-col"
      style="height:100vh;<%= verto_backdrop_style_attr(@survey) %>"
+     dir="<%= SupportedLocales.dir(@display_locale) %>"
      data-controller="player"
      data-player-progress-url-value="<%= progress_survey_url(@survey.publish_token) %>"
      data-player-submit-url-value="<%= submit_survey_url(@survey.publish_token) %>"
      data-player-results-url-value="<%= @survey.show_results_comparison? ? player_results_url(@survey.publish_token) : '' %>"
+     data-player-locale-value="<%= @display_locale %>"
      data-player-show-comparison-value="<%= @survey.show_results_comparison? %>">
 
   <nav class="preview-nav">
     <%# Respondents see the publishing org's logo, not Playverto's. %>
     <%= brand_logo_tag @survey.organisation, style: "height:24px;width:auto;max-width:160px;flex-shrink:0;" %>
     <span class="preview-nav-title"><%= @survey.theme %></span>
-    <span style="width:22px;"></span><%# balance the logo width so title stays centred %>
+    <%= render "player/content_lang_switcher" %>
   </nav>
 
   <div class="preview-body">
@@ -32,7 +34,8 @@
            data-player-target="card"
            data-card-index="<%= idx %>"
            data-card-type="<%= type %>">
-        <%= render "player/play_card", card: card, progress: prog %>
+        <%= render "player/play_card", card: card, progress: prog,
+              locale: @display_locale, default_locale: @survey.default_locale %>
       </div>
     <% end %>
 

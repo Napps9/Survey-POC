@@ -21,6 +21,16 @@
   # Picker-style lists carry an extra card-editor controller in :editor
   # mode so the per-card "delete option" / "add option" actions resolve.
   picker_controllers = editable ? "picker card-editor" : "picker"
+
+  # Language: `display` holds the text/options for the locale being shown
+  # (falls back to primary); `canon` holds the PRIMARY option labels, which is
+  # what answers are stored against so results align across languages. The
+  # editor always renders the primary card; the player passes the chosen locale.
+  locale         ||= nil
+  default_locale ||= SupportedLocales::DEFAULT
+  display          = localized_card(card, locale, default_locale)
+  canon            = Array(card["options"])
+  display_locale   = (locale.presence || I18n.locale).to_s
 %>
 
 <div class="split-right">
@@ -29,16 +39,16 @@
     <div class="q-eyebrow"><%= eyebrow %></div>
   <% end %>
 
-  <div class="q-title" <%= ce_attr %>><%= card["text"] %></div>
+  <div class="q-title" <%= ce_attr %>><%= display["text"] %></div>
 
-  <% if card["description"].present? %>
-    <div class="q-subtitle" <%= ce_attr %>><%= card["description"] %></div>
+  <% if display["description"].present? %>
+    <div class="q-subtitle" <%= ce_attr %>><%= display["description"] %></div>
   <% end %>
 
   <div class="mt-2"<%= " data-card-component".html_safe if editable %>>
     <% case type
        when "multiple_choice", "select_many" %>
-      <% items = Array(card["options"]) %>
+      <% items = Array(display["options"]) %>
       <% multi = (type == "select_many") %>
       <ul class="choice-list"
           data-controller="<%= picker_controllers %>"
@@ -47,6 +57,7 @@
           <li class="choice-list-item pick-item"
               data-picker-target="item"
               data-action="click->picker#pick"
+              data-canonical="<%= canon[i] %>"
               data-selected="false">
             <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
@@ -70,20 +81,21 @@
       <ul class="choice-list"
           data-controller="picker"
           data-picker-mode-value="single">
-        <% [["Yes", 1], ["No", 4]].each do |label, bg| %>
+        <% [["Yes", 1], ["No", 4]].each do |canon_label, bg| %>
           <li class="choice-list-item pick-item"
               data-picker-target="item"
               data-action="click->picker#pick"
+              data-canonical="<%= canon_label %>"
               data-selected="false">
             <div class="choice-list-tile choice-bg-<%= bg %>"></div>
-            <span class="pick-text choice-list-label" <%= ce_attr %>><%= label %></span>
+            <span class="pick-text choice-list-label" <%= ce_attr %>><%= t("card.#{canon_label.downcase}", locale: display_locale, default: canon_label) %></span>
             <span class="choice-list-tick pick-dot">✓</span>
           </li>
         <% end %>
       </ul>
 
     <% when "select_one_grid", "select_many_grid" %>
-      <% opts = Array(card["options"]) %>
+      <% opts = Array(display["options"]) %>
       <% cols = opts.size >= 5 ? 3 : 2 %>
       <% multi = (type == "select_many_grid") %>
       <ul class="choice-grid choice-grid-<%= cols %>"
@@ -93,6 +105,7 @@
           <li class="choice-card"
               data-picker-target="item"
               data-action="click->picker#pick"
+              data-canonical="<%= canon[i] %>"
               data-selected="false">
             <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>"></div>
             <div class="choice-overlay"></div>
@@ -106,11 +119,12 @@
       <div class="rotate-wrap"
            data-controller="<%= editable ? 'tap-stack card-editor' : 'tap-stack' %>">
         <div class="rotate-card-stack">
-          <% Array(card["options"]).each_with_index do |opt, i| %>
+          <% Array(display["options"]).each_with_index do |opt, i| %>
             <% bg_a = ['#d4edda','#d1ecf1','#fff3cd','#f8d7da','#e2d9f3'][i % 5] %>
             <% bg_b = ['#a8d5b5','#9fd5df','#ffd88a','#f5a8b0','#c3aee8'][i % 5] %>
             <div class="rotate-card"
                  data-tap-stack-target="card"
+                 data-canonical="<%= canon[i] %>"
                  style="background:linear-gradient(135deg,<%= bg_a %>,<%= bg_b %>);">
               <span <%= ce_attr %>
                     style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;"><%= opt %></span>
@@ -146,7 +160,7 @@
       </div>
 
     <% when "range" %>
-      <% labels = Array(card["options"]) %>
+      <% labels = Array(display["options"]) %>
       <% n = [labels.size, 2].max %>
       <div class="slider-wrap"
            data-controller="slider"
@@ -176,7 +190,7 @@
 
     <% when "nps" %>
       <%# The themed asset on the right IS the slider — drag the handle. %>
-      <% labels = Array(card["options"]) %>
+      <% labels = Array(display["options"]) %>
       <% labels = %w[0 1 2 3 4 5 6 7 8 9 10] if labels.empty? %>
       <% n = [labels.size, 2].max %>
       <% ctrl = nps_control_spec(card) %>
@@ -197,7 +211,7 @@
       </div>
 
     <% when "rating" %>
-      <% labels    = Array(card["options"]) %>
+      <% labels    = Array(display["options"]) %>
       <% first_lbl = labels.first || "Poor" %>
       <% last_lbl  = labels.last  || "Excellent" %>
       <div class="rating-wrap" data-controller="rating">

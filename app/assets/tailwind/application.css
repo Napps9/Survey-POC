@@ -2373,6 +2373,7 @@
   cursor: pointer; text-align: start;
   transition: background 0.12s;
 }
+.lang-switcher-item { text-decoration: none; }
 .lang-switcher-item:hover { background: rgba(255,255,255,0.06); }
 .lang-switcher-item.is-active { background: rgba(1,234,203,0.1); color: #fff; }
 .lang-switcher-item-flag { font-size: 16px; line-height: 1; flex-shrink: 0; }

@@ -10,6 +10,7 @@ class PlayerController < ApplicationController
   def show
     return render plain: "Survey not found", status: :not_found unless @survey
     return render plain: "This Verto is no longer available.", status: :gone if @survey.deleted?
+    @display_locale = resolve_play_locale
   end
 
   # Partial save while the player is mid-survey, so we can count people who
@@ -25,6 +26,7 @@ class PlayerController < ApplicationController
     resp.survey       ||= @survey
     resp.survey_share ||= @survey_share
     resp.answers = data["answers"] || {}
+    resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     # NB: the status column defaults to "completed", so a freshly initialized
     # record already reads "completed" — only preserve it for rows already saved
     # as completed (a late progress ping after submit), otherwise mark "started".
@@ -43,7 +45,9 @@ class PlayerController < ApplicationController
     resp  = Response.find_or_initialize_by(session_token: token)
     resp.survey       ||= @survey
     resp.survey_share ||= @survey_share
-    resp.update!(answers: data["answers"] || {}, status: "completed")
+    attrs = { answers: data["answers"] || {}, status: "completed" }
+    attrs[:locale] = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
+    resp.update!(attrs)
     render json: { ok: true }
   rescue => e
     render json: { ok: false, error: e.message }, status: :unprocessable_entity
@@ -72,6 +76,15 @@ class PlayerController < ApplicationController
   end
 
   private
+
+  # The Verto content language to render: an explicit ?lang=, else the
+  # respondent's UI locale if the Verto has it, else the Verto's primary.
+  def resolve_play_locale
+    available = @survey.verto_locales
+    [params[:lang], Current.locale, @survey.default_locale]
+      .compact.map(&:to_s)
+      .find { |l| available.include?(l) } || @survey.default_locale
+  end
 
   def load_survey_and_share
     token = params[:token]

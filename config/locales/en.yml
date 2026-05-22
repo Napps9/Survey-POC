@@ -7,3 +7,6 @@ en:
     heading: "Language"
   layout:
     studio_tagline: "Verto Studio"
+  card:
+    "yes": "Yes"
+    "no": "No"

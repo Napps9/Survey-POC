@@ -47,7 +47,7 @@ class SingleQuestionGenerator
 
   # Returns a single card hash (string keys), e.g.:
   #   { "type" => "select_one_grid", "text" => "...", "options" => [...] }
-  def call(theme:, audience_age:, key_insight:, existing_cards: [])
+  def call(theme:, audience_age:, key_insight:, existing_cards: [], locale: SupportedLocales::DEFAULT)
     # Types used in the last 2 cards — avoid consecutive repetition
     recent_types = Array(existing_cards).last(2).map { |c| c["type"].to_s }.compact.uniq
     last_type    = Array(existing_cards).last&.dig("type").to_s
@@ -90,6 +90,12 @@ class SingleQuestionGenerator
       #{SurveyGenerator::CARD_RULES}
       And do NOT reuse a type from the last 2 cards (#{recent_types.join(", ").presence || "none"}).
     RULES
+
+    unless locale.to_s == SupportedLocales::DEFAULT
+      lang = SupportedLocales.find(locale)
+      name = lang ? "#{lang.english_name} (#{lang.native_name})" : locale.to_s
+      user_message << "\nLANGUAGE: Write the question text, any description and ALL option labels in #{name}. Do not use English.\n"
+    end
 
     tool = TOOL.deep_dup
     tool[:input_schema][:properties][:type][:enum] = SurveyGenerator.generatable_types

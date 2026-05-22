@@ -30,6 +30,13 @@ class SurveysController < ApplicationController
     show_compare = ActiveModel::Type::Boolean.new.cast(params[:show_results_comparison])
     palette      = BrandPalette.sanitize(params[:brand_palette])
 
+    # Languages this Verto is built in. The primary (default_locale) is the
+    # generation source and the canonical language answers align against; the
+    # rest are translated from it.
+    locales        = SupportedLocales.sanitize_list(params[:locales], fallback: [Current.locale.to_s])
+    default_locale = SupportedLocales.coerce(params[:default_locale].presence || locales.first)
+    locales        = ([default_locale] + locales).uniq
+
     if theme.empty? || audience_age.empty? || key_insight.empty?
       flash.now[:alert] = "Tell us what your Verto's about, who's answering, and what you want to learn — those three are required."
       return render :new, status: :unprocessable_entity
@@ -39,7 +46,8 @@ class SurveysController < ApplicationController
       theme: theme,
       audience_age: audience_age,
       key_insight: key_insight,
-      notes: notes
+      notes: notes,
+      locale: default_locale
     )
 
     @survey = Current.organisation.surveys.create!(
@@ -50,13 +58,16 @@ class SurveysController < ApplicationController
       key_insight:  result["key_insight"].presence || key_insight,
       cards:        result["cards"],
       show_results_comparison: show_compare,
-      brand_palette: palette.presence
+      brand_palette: palette.presence,
+      default_locale: default_locale,
+      locales:        locales
     )
 
     # Remember the palette as the company default so the next Verto inherits it.
     Current.organisation.update(default_brand_palette: palette) if palette.present?
 
     attach_nps_visuals!(@survey, notes: notes)
+    translate_survey!(@survey)
 
     redirect_to survey_path(@survey)
   rescue => e
@@ -132,9 +143,11 @@ class SurveysController < ApplicationController
       theme:          survey.theme,
       audience_age:   survey.audience_age,
       key_insight:    survey.key_insight,
-      existing_cards: Array(survey.cards)
+      existing_cards: Array(survey.cards),
+      locale:         survey.default_locale
     )
     card = attach_nps_visual(card, survey)
+    card = translate_card!(card, survey)
 
     html = render_card_html(survey, card)
     render json: { ok: true, html: html }
@@ -160,6 +173,37 @@ class SurveysController < ApplicationController
 
   def set_survey
     @survey = Current.organisation.surveys.kept.find(params[:id])
+  end
+
+  # Translate the survey's primary cards into each secondary language and store
+  # the result in each card's i18n map. Per-language failures are non-fatal —
+  # that language simply falls back to the primary text until re-translated.
+  def translate_survey!(survey)
+    return unless survey.secondary_locales.any?
+
+    cards  = Array(survey.cards)
+    source = survey.default_locale
+    survey.secondary_locales.each do |loc|
+      translated = SurveyTranslator.new.call(cards: cards, target_locale: loc, source_locale: source)
+      cards = Survey.merge_card_translations(cards, loc, translated)
+    rescue => e
+      Rails.logger.error("[SurveyTranslator] #{loc}: #{e.class}: #{e.message}")
+    end
+    survey.update!(cards: cards)
+  end
+
+  # Translate a single freshly-generated card into the Verto's secondary
+  # languages, returning the card with its i18n map populated.
+  def translate_card!(card, survey)
+    return card unless survey.secondary_locales.any?
+
+    survey.secondary_locales.each do |loc|
+      translated = SurveyTranslator.new.call(cards: [card], target_locale: loc, source_locale: survey.default_locale)
+      card = Survey.merge_card_translations([card], loc, translated).first
+    rescue => e
+      Rails.logger.error("[SurveyTranslator card] #{loc}: #{e.class}: #{e.message}")
+    end
+    card
   end
 
   # For NPS cards, generate the themed reactive visual in a separate Claude call

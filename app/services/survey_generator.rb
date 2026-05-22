@@ -198,7 +198,7 @@ class SurveyGenerator
     @client = Anthropic::Client.new(api_key: api_key)
   end
 
-  def call(theme:, audience_age:, key_insight:, notes: nil)
+  def call(theme:, audience_age:, key_insight:, notes: nil, locale: SupportedLocales::DEFAULT)
     brief = [theme, audience_age, key_insight, notes].compact.join(" ")
     examples = QuestionCorpus.search(brief, limit: 8, min_overlap: 2)
     Rails.logger.info("[corpus] matched #{examples.size} of #{QuestionCorpus.all.size}: " +
@@ -240,6 +240,8 @@ class SurveyGenerator
       emit_survey tool.
     REMINDER
 
+    user_message << language_instruction(locale)
+
     tool = TOOL.deep_dup
     tool[:input_schema][:properties][:cards][:items][:properties][:type][:enum] = self.class.generatable_types
 
@@ -259,6 +261,22 @@ class SurveyGenerator
   end
 
   private
+
+  # When the primary language isn't English, instruct the model to write the
+  # whole Verto in that language (respondent-facing text + every option label).
+  def language_instruction(locale)
+    return "" if locale.to_s == SupportedLocales::DEFAULT
+
+    lang = SupportedLocales.find(locale)
+    name = lang ? "#{lang.english_name} (#{lang.native_name})" : locale.to_s
+    <<~LANG
+
+      LANGUAGE: Write the ENTIRE Verto — title, description, every question's
+      text and description, and ALL answer option labels — in #{name}. Do not
+      use English for any respondent-facing text. Keep the same design rules and
+      length limits.
+    LANG
+  end
 
   def tool_use?(block)
     type = block.respond_to?(:type) ? block.type : block[:type] || block["type"]

@@ -18,7 +18,11 @@ export default class extends Controller {
     const dir = event.currentTarget.dataset.tapStackDirection || "right"
     const top = this.cardTargets[this.position]
     if (!top) return
-    const label = top.querySelector("span")?.textContent?.trim() || `Card ${this.position + 1}`
+    // Key by the canonical (primary-language) label so tap results aggregate
+    // across languages; fall back to the visible text for legacy markup.
+    const label = top.dataset.canonical?.trim()
+                  || top.querySelector("span")?.textContent?.trim()
+                  || `Card ${this.position + 1}`
     this.swipeResults[label] = dir === "right" ? "yes" : "no"
     this.element.dataset.swipeResults = JSON.stringify(this.swipeResults)
     const tx = dir === "left" ? "-120%" : dir === "right" ? "120%" : "0"
