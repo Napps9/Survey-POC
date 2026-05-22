@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_20_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_22_000003) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -91,6 +91,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_000003) do
   create_table "responses", force: :cascade do |t|
     t.json "answers", default: {}, null: false
     t.datetime "created_at", null: false
+    t.string "locale"
     t.string "session_token", null: false
     t.string "status", default: "completed", null: false
     t.integer "survey_id", null: false
@@ -129,9 +130,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_000003) do
     t.json "brand_palette"
     t.json "cards"
     t.datetime "created_at", null: false
+    t.string "default_locale", default: "en", null: false
     t.datetime "deleted_at"
     t.text "description"
     t.text "key_insight"
+    t.json "locales"
     t.integer "organisation_id", null: false
     t.string "publish_token"
     t.datetime "published_at"
@@ -151,6 +154,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_000003) do
     t.string "email_address", null: false
     t.string "name", default: "", null: false
     t.string "password_digest", null: false
+    t.string "preferred_locale"
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end

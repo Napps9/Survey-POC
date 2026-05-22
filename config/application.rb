@@ -38,5 +38,15 @@ module SurveyPoc
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # Internationalization. Available locales come from the language registry
+    # (config/supported_locales.yml) — read directly here rather than via the
+    # autoloaded SupportedLocales constant, which isn't available during boot.
+    # Missing UI translations fall back to English.
+    config.i18n.available_locales =
+      YAML.load_file(File.expand_path("supported_locales.yml", __dir__))
+          .fetch("locales").map { |l| l.fetch("code").to_sym }
+    config.i18n.default_locale = :en
+    config.i18n.fallbacks = true
   end
 end

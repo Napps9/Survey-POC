@@ -1,0 +1,28 @@
+<%# Platform UI language CTA — a flag button + popover of every supported
+    language. Posts to /locale and returns to the current page. Reusable in the
+    top bar, the unauthenticated header, and the player nav. No locals needed. %>
+<% current = SupportedLocales.find(I18n.locale) || SupportedLocales.find(SupportedLocales::DEFAULT) %>
+<div class="lang-switcher" data-controller="locale-switcher">
+  <button type="button" class="lang-switcher-btn"
+          data-action="click->locale-switcher#toggle"
+          aria-haspopup="true" aria-label="<%= t("locale_switcher.label", default: "Change language") %>">
+    <span class="lang-switcher-flag"><%= current.flag %></span>
+    <span class="lang-switcher-code"><%= current.code.upcase %></span>
+    <svg class="lang-switcher-caret" width="10" height="6" viewBox="0 0 10 6" fill="none">
+      <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <div class="lang-switcher-popover" data-locale-switcher-target="popover" hidden>
+    <div class="lang-switcher-popover-head"><%= t("locale_switcher.heading", default: "Language") %></div>
+    <% SupportedLocales.all.each do |loc| %>
+      <%= button_to locale_path(locale: loc.code), method: :post,
+            class: "lang-switcher-item#{' is-active' if loc.code == I18n.locale.to_s}",
+            form: { style: "margin:0;" } do %>
+        <span class="lang-switcher-item-flag"><%= loc.flag %></span>
+        <span class="lang-switcher-item-name"><%= loc.native_name %></span>
+        <% if loc.code == I18n.locale.to_s %><span class="lang-switcher-item-tick">✓</span><% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -13,6 +13,9 @@ Rails.application.routes.draw do
   # Org switcher
   post "switch_organisation", to: "organisations#switch", as: :switch_organisation
 
+  # UI language switcher (works on public pages too)
+  post "locale", to: "locales#update", as: :locale
+
   # Org management (admin only)
   resources :organisations, only: [:edit, :update] do
     resources :memberships, only: [:index, :destroy]

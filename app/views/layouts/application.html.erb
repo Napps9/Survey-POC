@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="<%= I18n.locale %>" dir="<%= SupportedLocales.dir(I18n.locale) %>">
   <head>
     <%= render "layouts/head" %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,10 @@
           <%= link_to root_path, class: "flex items-center gap-2 group" do %>
             <%= image_tag "playverto.svg", alt: "Playverto", class: "h-8 w-auto" %>
           <% end %>
-          <span class="display text-xs tracking-widest text-smoke/50">Verto Studio</span>
+          <div class="flex items-center gap-4">
+            <%= render "shared/locale_switcher" %>
+            <span class="display text-xs tracking-widest text-smoke/50"><%= t("layout.studio_tagline", default: "Verto Studio") %></span>
+          </div>
         </div>
       </header>
     <% end %>

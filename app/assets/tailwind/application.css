@@ -2326,6 +2326,59 @@
 .bottom-bar-right { justify-content: flex-end; }
 .bottom-bar-centre { display: flex; align-items: center; gap: 8px; }
 
+/* ─────────────────────────────────────────────────────────
+   LANGUAGE SWITCHER (platform UI language CTA)
+   Reused in the top bar, the unauthenticated header and the
+   player nav. Anchored with logical properties for RTL.
+   ───────────────────────────────────────────────────────── */
+.lang-switcher-fixed { position: fixed; top: 14px; inset-inline-end: 16px; z-index: 60; }
+.lang-switcher { position: relative; display: inline-flex; }
+.lang-switcher-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 11px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.78);
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-md);
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.lang-switcher-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.lang-switcher-flag { font-size: 15px; line-height: 1; }
+.lang-switcher-code { font-family: "Alata", sans-serif; font-size: var(--text-sm); letter-spacing: 0.04em; }
+.lang-switcher-caret { opacity: 0.5; flex-shrink: 0; }
+
+.lang-switcher-popover {
+  position: absolute; top: calc(100% + 8px); inset-inline-end: 0;
+  min-width: 220px; max-height: 340px; overflow-y: auto;
+  background: #1C2034;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  display: flex; flex-direction: column; gap: 2px;
+  z-index: 60;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent;
+}
+.lang-switcher-popover[hidden] { display: none; }
+.lang-switcher-popover-head {
+  font-family: "Alata", sans-serif; font-size: var(--text-2xs);
+  color: rgba(255,255,255,0.35); letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 4px 8px 6px;
+}
+.lang-switcher-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 8px 10px; border-radius: 8px; border: 0;
+  background: transparent; color: rgba(255,255,255,0.82);
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-md);
+  cursor: pointer; text-align: start;
+  transition: background 0.12s;
+}
+.lang-switcher-item:hover { background: rgba(255,255,255,0.06); }
+.lang-switcher-item.is-active { background: rgba(1,234,203,0.1); color: #fff; }
+.lang-switcher-item-flag { font-size: 16px; line-height: 1; flex-shrink: 0; }
+.lang-switcher-item-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lang-switcher-item-tick { color: #01EACB; flex-shrink: 0; }
+
 .bottom-bar-logo {
   display: flex; align-items: center; gap: 6px;
   padding: 6px 10px; border-radius: 100px;
