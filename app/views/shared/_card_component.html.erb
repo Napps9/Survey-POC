@@ -78,7 +78,7 @@
           <li class="pick-add-btn"
               data-action="click->card-editor#addPickOption"
               data-card-editor-add>
-            <span>＋</span> Add option
+            <span>＋</span> <%= t("card.add_option") %>
           </li>
         <% end %>
       </ul>
@@ -142,9 +142,9 @@
           <% end %>
         </div>
         <div class="swipe-indicator">
-          <span style="color:#D80027;font-weight:700">← No</span>
-          <span class="mx-3">drag card to answer</span>
-          <span style="color:var(--brand-primary,#01EACB);font-weight:700">Yes →</span>
+          <span style="color:#D80027;font-weight:700"><%= t("card.swipe_no") %></span>
+          <span class="mx-3"><%= t("card.swipe_hint") %></span>
+          <span style="color:var(--brand-primary,#01EACB);font-weight:700"><%= t("card.swipe_yes") %></span>
         </div>
         <div class="rotate-actions">
           <button type="button" class="rotate-action-btn rotate-action-no"
@@ -157,11 +157,11 @@
         <div class="text-xs text-black/40 flex items-center gap-3">
           <span data-tap-stack-target="counter"></span>
           <button type="button" class="hover:text-green-500"
-                  data-action="click->tap-stack#reset">↺ Reset</button>
+                  data-action="click->tap-stack#reset">↺ <%= t("card.reset") %></button>
         </div>
         <% if editable %>
           <button type="button" class="tap-add-btn"
-                  data-action="click->card-editor#addTapOption">＋ Add statement</button>
+                  data-action="click->card-editor#addTapOption">＋ <%= t("card.add_statement") %></button>
         <% end %>
       </div>
 
@@ -240,10 +240,10 @@
            data-controller="freeform"
            data-freeform-max-value="200">
         <textarea class="freeform-textarea"
-                  placeholder="Type answer…"
+                  placeholder="<%= t("card.answer_placeholder") %>"
                   data-freeform-target="input"
                   data-action="input->freeform#update"></textarea>
-        <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
+        <div class="freeform-counter" data-freeform-target="counter">0/200 <%= t("card.characters") %></div>
       </div>
 
     <% when "welcome_card" %>
@@ -259,20 +259,20 @@
       <% if editable %>
         <label class="other-edit-toggle">
           <input type="checkbox" data-action="change->survey-editor#toggleOther" <%= "checked" if card["allow_other"] %>>
-          <span>Allow “Other” free-text answer</span>
+          <span><%= t("card.allow_other") %></span>
         </label>
       <% end %>
       <div class="other-cta-wrap" data-other-target="wrap"<%= ' hidden'.html_safe unless card["allow_other"] %>>
         <button type="button" class="other-cta-btn" data-other-target="btn"
-                data-action="click->other#toggle"<%= ' disabled'.html_safe if editable %>>＋ Other</button>
+                data-action="click->other#toggle"<%= ' disabled'.html_safe if editable %>>＋ <%= t("card.other") %></button>
         <div class="other-panel" data-other-target="panel" hidden
              data-controller="freeform" data-freeform-max-value="200">
           <textarea class="freeform-textarea other-textarea"
-                    placeholder="Tell us in your own words…"
+                    placeholder="<%= t("card.other_placeholder") %>"
                     data-other-input
                     data-freeform-target="input"
                     data-action="input->freeform#update"></textarea>
-          <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
+          <div class="freeform-counter" data-freeform-target="counter">0/200 <%= t("card.characters") %></div>
         </div>
       </div>
     </div>

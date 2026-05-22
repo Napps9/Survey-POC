@@ -34,17 +34,17 @@
     <% if has_img %>
       <button type="button" class="add-media-fab"
               data-action="click->media-picker#open"
-              title="Change this card's image">
+              title="<%= t("editor.change_media_title") %>">
         <span class="add-media-fab-plus">＋</span>
-        <span>Change media</span>
+        <span><%= t("editor.change_media") %></span>
       </button>
     <% else %>
       <button type="button" class="split-left-design-prompt"
               data-action="click->media-picker#open"
-              title="Add an image to this card">
+              title="<%= t("editor.add_design_title") %>">
         <span class="split-left-design-prompt-icon">＋</span>
-        <span class="split-left-design-prompt-title">Add design</span>
-        <span class="split-left-design-prompt-sub">Add an image to bring this card to life</span>
+        <span class="split-left-design-prompt-title"><%= t("editor.add_design") %></span>
+        <span class="split-left-design-prompt-sub"><%= t("editor.add_design_sub") %></span>
       </button>
     <% end %>
   <% end %>

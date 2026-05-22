@@ -44,17 +44,16 @@
           <div class="live-warning-modal">
             <div class="live-warning-head">
               <span class="live-warning-dot"></span>
-              <strong>LIVE</strong>
+              <strong><%= t("editor.live") %></strong>
               <button type="button" class="live-warning-close"
                       data-action="click->live-warning#dismiss" aria-label="Close">✕</button>
             </div>
             <div class="live-warning-body">
-              Editing questions while this Verto is collecting responses will affect
-              data quality. Answers before and after the edit won't be directly comparable.
+              <%= t("editor.live_warning") %>
             </div>
             <div class="live-warning-foot">
               <button type="button" class="live-warning-btn"
-                      data-action="click->live-warning#dismiss">Got it</button>
+                      data-action="click->live-warning#dismiss"><%= t("editor.got_it") %></button>
             </div>
           </div>
         </div>
@@ -128,7 +127,7 @@
           <button type="button"
                   class="aq-trigger-btn"
                   data-action="click->add-question#open">
-            ＋ Add question
+            ＋ <%= t("editor.add_question") %>
           </button>
         </div>
 
@@ -139,8 +138,8 @@
       <div class="finalize-bar">
         <div style="font-size: var(--text-md);color:rgba(255,255,255,0.65);display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
           <span>
-            <strong style="color:#fff;" data-type-panel-target="cardCount"><%= cards.size %> cards</strong>
-            &nbsp;·&nbsp; Estimated ~<%= est_min %> min<%= est_min != 1 ? "s" : "" %>
+            <strong style="color:#fff;" data-type-panel-target="cardCount"><%= t("editor.cards", count: cards.size) %></strong>
+            &nbsp;·&nbsp; <%= t("editor.estimated", count: est_min) %>
             &nbsp;·&nbsp; <span data-survey-editor-target="status" style="font-size: var(--text-sm);"></span>
           </span>
         </div>
@@ -149,12 +148,12 @@
                   style="padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
                   onmouseover="this.style.background='rgba(255,255,255,0.12)'"
                   onmouseout="this.style.background='rgba(255,255,255,0.07)'"
-                  data-action="click->publish-panel#openDesign">Design</button>
+                  data-action="click->publish-panel#openDesign"><%= t("editor.design") %></button>
           <button type="button"
                   style="padding:10px 26px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
                   onmouseover="this.style.background='#00C4AB'"
                   onmouseout="this.style.background='#01EACB'"
-                  data-action="click->publish-panel#open">Publish &amp; share →</button>
+                  data-action="click->publish-panel#open"><%= t("editor.publish_share") %></button>
         </div>
       </div>
 
@@ -166,18 +165,18 @@
 
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
-          Answer Type
+          <%= t("editor.answer_type") %>
         </div>
         <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF1E6F;line-height:1.3;min-height:18px;"
-             data-type-panel-target="panelCardName">Select a card to change its type</div>
+             data-type-panel-target="panelCardName"><%= t("editor.select_card") %></div>
         <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;"
-             data-type-panel-target="panelHint">Click any card on the left.</div>
+             data-type-panel-target="panelHint"><%= t("editor.click_any") %></div>
       </div>
 
       <div class="type-panel-empty" data-type-panel-target="panelEmpty">
         <div style="font-size:28px;opacity:0.25;">↖</div>
         <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:240px;">
-          Select a question card to switch its answer format
+          <%= t("editor.select_card_long") %>
         </div>
       </div>
 
@@ -210,12 +209,12 @@
                 style="width:100%;padding:10px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
                 onmouseover="this.style.background='#00C4AB'"
                 onmouseout="this.style.background='#01EACB'"
-                data-action="click->type-panel#applyType">Apply to this card</button>
+                data-action="click->type-panel#applyType"><%= t("editor.apply_to_card") %></button>
         <button type="button"
                 style="width:100%;padding:8px;border-radius:16px;background:transparent;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all 0.15s;"
                 onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.35)'"
                 onmouseout="this.style.color='rgba(255,255,255,0.65)';this.style.borderColor='rgba(255,255,255,0.15)'"
-                data-action="click->type-panel#openAllTypes">See all question types</button>
+                data-action="click->type-panel#openAllTypes"><%= t("editor.see_all_types") %></button>
       </div>
 
       <%# ── All question types modal ── %>
@@ -226,10 +225,10 @@
           <div class="all-types-header">
             <div>
               <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:4px;">
-                All Question Types
+                <%= t("editor.all_types") %>
               </div>
               <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xl);color:#fff;line-height:1.3;">
-                Ranked by fit for <span data-type-panel-target="modalCardName" style="color:#FF1E6F;">this card</span>
+                <%= t("editor.ranked_for") %> <span data-type-panel-target="modalCardName" style="color:#FF1E6F;"><%= t("editor.this_card") %></span>
               </div>
             </div>
             <button type="button" class="all-types-close"
