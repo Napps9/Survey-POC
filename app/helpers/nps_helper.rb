@@ -52,16 +52,7 @@ module NpsHelper
                 data: { axis: axis }, style: "--nps-hue:60;--nps-fill:0.5;")
   end
 
-  # ---------- LEFT: a fixed face template; Claude only supplies a themed accent ----------
-
-  # The mouth morphs frown -> smile across the value range (sized for an r=54 head).
-  NPS_MOUTHS = [
-    "M76 130 Q100 110 124 130",  # frown
-    "M76 127 Q100 119 124 127",  # slight frown
-    "M78 124 L122 124",          # flat
-    "M76 122 Q100 138 124 122",  # smile
-    "M74 119 Q100 150 126 119"   # big smile
-  ].freeze
+  # ---------- LEFT: a fixed expressive face template; Claude only supplies a themed accent ----------
 
   def nps_reaction_spec(card)
     nv     = card["nps_visual"]
@@ -70,20 +61,55 @@ module NpsHelper
     { "accent" => accent.presence || nps_fallback_reaction["accent"] }
   end
 
-  # The app draws a consistent face (head + eyes + a mouth that morphs sad->happy,
-  # coloured by --nps-hue). The themed `accent` is drawn behind it. The controller
-  # toggles the active mouth (.nps-state) and sets --nps-hue from the slider.
+  # The app draws a glossy character face (à la the source Lottie sun): a
+  # sentiment-coloured sphere with a sheen, thick curved brows, white eyes with
+  # pupils, and a mouth that morphs frown -> open toothy grin. The themed `accent`
+  # (e.g. rays) sits behind it. The controller toggles the active expression
+  # (.nps-state) and sets --nps-hue from the slider.
   def render_nps_reaction(spec)
-    initial = NPS_MOUTHS.length / 2
-    base = spec["accent"].to_s +
-           %(<circle cx="100" cy="100" r="54" fill="hsl(var(--nps-hue,60) 85% 58%)"/>) +
-           %(<circle cx="82" cy="92" r="7.5" fill="#1b2440"/><circle cx="118" cy="92" r="7.5" fill="#1b2440"/>)
-    mouths = NPS_MOUTHS.each_with_index.map do |d, i|
-      %(<g class="nps-state#{i == initial ? ' is-active' : ''}" data-state="#{i}">) +
-        %(<path d="#{d}" fill="none" stroke="#1b2440" stroke-width="6" stroke-linecap="round"/></g>)
+    hid     = "npssheen-#{SecureRandom.hex(4)}"
+    layers  = nps_face_layers
+    initial = layers.length / 2
+    base =
+      %(<defs><radialGradient id="#{hid}" cx="38%" cy="30%" r="68%">) +
+      %(<stop offset="0" stop-color="rgba(255,255,255,0.55)"/>) +
+      %(<stop offset="62%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs>) +
+      spec["accent"].to_s +
+      %(<circle cx="100" cy="100" r="54" fill="hsl(var(--nps-hue,60) 85% 55%)"/>) +
+      %(<circle cx="100" cy="100" r="54" fill="url(##{hid})"/>) +
+      %(<ellipse cx="127" cy="84" rx="11" ry="24" fill="rgba(255,255,255,0.30)" transform="rotate(20 127 84)"/>) +
+      %(<ellipse cx="85" cy="93" rx="14" ry="16.5" fill="#ffffff"/><ellipse cx="115" cy="93" rx="14" ry="16.5" fill="#ffffff"/>) +
+      %(<circle cx="87" cy="90" r="6.5" fill="#1a1a1a"/><circle cx="113" cy="90" r="6.5" fill="#1a1a1a"/>)
+    states = layers.each_with_index.map do |inner, i|
+      %(<g class="nps-state#{i == initial ? ' is-active' : ''}" data-state="#{i}">#{inner}</g>)
     end.join
-    svg = %(<svg class="nps-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">#{base}#{mouths}</svg>)
+    svg = %(<svg class="nps-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">#{base}#{states}</svg>)
     content_tag(:div, svg.html_safe, class: "nps-visual", style: "--nps-hue:60;")
+  end
+
+  # Five expressions (low->high): thick brows + cheeks + mouth, the top one an
+  # open toothy grin.
+  def nps_face_layers
+    brows = [
+      %(<path d="M66 74 L93 87"/><path d="M134 74 L107 87"/>),
+      %(<path d="M67 84 Q80 79 93 83"/><path d="M133 84 Q120 79 107 83"/>),
+      %(<path d="M68 81 Q80 78 93 81"/><path d="M132 81 Q120 78 107 81"/>),
+      %(<path d="M66 83 Q80 71 94 78"/><path d="M134 83 Q120 71 106 78"/>),
+      %(<path d="M63 81 Q82 63 99 75"/><path d="M137 81 Q118 63 101 75"/>)
+    ].map { |b| %(<g fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">#{b}</g>) }
+    mouths = [
+      %(<path d="M76 137 Q100 114 124 137" fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round"/>),
+      %(<path d="M80 131 Q100 123 120 131" fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round"/>),
+      %(<path d="M82 127 L118 127" fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round"/>),
+      %(<path d="M76 125 Q100 145 124 125" fill="none" stroke="#1a1a1a" stroke-width="7" stroke-linecap="round"/>),
+      %(<path d="M70 117 Q100 129 130 117 Q124 152 100 154 Q76 152 70 117 Z" fill="#ffffff" stroke="#1a1a1a" stroke-width="4.5" stroke-linejoin="round"/>) +
+        %(<path d="M74 121 Q100 131 126 121" fill="none" stroke="#1a1a1a" stroke-width="3"/>) +
+        %(<g stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"><line x1="100" y1="122" x2="100" y2="153"/><line x1="87" y1="121" x2="84" y2="150"/><line x1="113" y1="121" x2="116" y2="150"/></g>)
+    ]
+    cheeks = ["", "", "",
+      %(<circle cx="64" cy="120" r="8" fill="rgba(255,110,120,0.30)"/><circle cx="136" cy="120" r="8" fill="rgba(255,110,120,0.30)"/>),
+      %(<circle cx="62" cy="120" r="9" fill="rgba(255,110,120,0.45)"/><circle cx="138" cy="120" r="9" fill="rgba(255,110,120,0.45)"/>)]
+    (0..4).map { |i| cheeks[i] + brows[i] + mouths[i] }
   end
 
   # ---------- shared ----------
@@ -121,10 +147,11 @@ module NpsHelper
     }
   end
 
-  # Built-in accent: a ring of sun rays around the face (tweens with --nps-hue).
+  # Built-in accent: a ring of triangular, two-tone sun rays behind the face.
   def nps_fallback_reaction
-    rays = (0...8).map do |i|
-      %(<line x1="100" y1="34" x2="100" y2="18" stroke="hsl(var(--nps-hue,60) 85% 56%)" stroke-width="7" stroke-linecap="round" transform="rotate(#{i * 45} 100 100)"/>)
+    rays = (0...12).map do |i|
+      c = i.even? ? "#FBC02D" : "#F59E0B"
+      %(<path d="M100 6 L112 50 L88 50 Z" fill="#{c}" transform="rotate(#{i * 30} 100 100)"/>)
     end.join
     { "accent" => rays }
   end
