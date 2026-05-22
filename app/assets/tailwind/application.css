@@ -826,10 +826,10 @@
 
 /* ── Rotate / Swipe ─────────────────────────────── */
 .rotate-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-.rotate-card-stack { position: relative; width: 240px; height: 170px; margin: 0 auto; }
+.rotate-card-stack { position: relative; width: 310px; height: 215px; margin: 0 auto; }
 .rotate-card {
   position: absolute;
-  width: 220px; height: 150px;
+  width: 290px; height: 195px;
   left: 10px; top: 10px;
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.15);
