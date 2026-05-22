@@ -21,13 +21,114 @@ const QUESTIONS_MIN = 10
 const QUESTIONS_MAX = 15
 
 export default class extends Controller {
-  static targets = ["card", "summary", "saveButton", "status"]
-  static values  = { url: String, title: String, description: String }
+  static targets = ["card", "summary", "saveButton", "status", "tab", "feed"]
+  static values  = {
+    url: String, title: String, description: String,
+    defaultLocale: { type: String, default: "en" },
+    locales: { type: Array, default: [] },
+    rtlLocales: { type: Array, default: [] }
+  }
 
   _saveTimer = null
 
   connect() {
+    this._activeLocale = this.defaultLocaleValue
+    this._seedStore()
     this.refreshAll()
+  }
+
+  // ── Language tabs ──────────────────────────────────────
+  // The DOM shows one locale at a time; per-card, per-locale text lives in
+  // _store (keyed by the card element so add/delete/reorder stay consistent).
+  // Structural edits are locked to the primary tab (CSS hides their controls
+  // under .editing-translation), so translations only ever change text.
+
+  switchLocale(event) {
+    const locale = event.currentTarget.dataset.locale
+    if (!locale || locale === this._activeLocale) return
+    this._captureLocale(this._activeLocale)
+    this._activeLocale = locale
+    this._applyLocale(locale)
+    if (this.hasTabTarget) {
+      this.tabTargets.forEach(t => t.classList.toggle("is-active", t.dataset.locale === locale))
+    }
+    this.element.classList.toggle("editing-translation", locale !== this.defaultLocaleValue)
+    if (this.hasFeedTarget) {
+      this.feedTarget.setAttribute("dir", this.rtlLocalesValue.includes(locale) ? "rtl" : "ltr")
+    }
+  }
+
+  _seedStore() {
+    this._store = new Map()
+    let data = []
+    try { data = JSON.parse(document.getElementById("survey-cards-i18n")?.textContent || "[]") } catch (_) {}
+    const primary = this.defaultLocaleValue
+    this.cardTargets.forEach((el, i) => {
+      const c = data[i] || {}
+      const entry = {}
+      entry[primary] = this._normContent(c)
+      const i18n = c.i18n || {}
+      Object.keys(i18n).forEach(loc => { entry[loc] = this._normContent(i18n[loc]) })
+      this._store.set(el, entry)
+    })
+  }
+
+  _normContent(c) {
+    c = c || {}
+    return {
+      text: c.text || "",
+      description: c.description || "",
+      options: Array.isArray(c.options) ? c.options.slice() : []
+    }
+  }
+
+  // Option-label elements for a card, by type — the same nodes serialize reads.
+  _optionEls(cardEl) {
+    const sel = {
+      multiple_choice: ".pick-text", select_many: ".pick-text", yes_no: ".pick-text",
+      select_one_grid: ".choice-label", select_many_grid: ".choice-label",
+      range: ".slider-label-text", nps: ".slider-label-text",
+      rating: ".rating-label",
+      tap_card: ".rotate-card span[contenteditable]"
+    }[cardEl.dataset.cardType]
+    return sel ? Array.from(cardEl.querySelectorAll(sel)) : []
+  }
+
+  _readCard(cardEl) {
+    return {
+      text: cardEl.querySelector(".q-title, .activity-title")?.textContent.trim() || "",
+      description: cardEl.querySelector(".q-subtitle, .activity-desc")?.textContent.trim() || "",
+      options: this._optionEls(cardEl).map(el => el.textContent.trim())
+    }
+  }
+
+  _writeCard(cardEl, content, fallback) {
+    content = content || {}; fallback = fallback || {}
+    const titleEl = cardEl.querySelector(".q-title, .activity-title")
+    if (titleEl) titleEl.textContent = content.text || fallback.text || titleEl.textContent
+    const descEl = cardEl.querySelector(".q-subtitle, .activity-desc")
+    if (descEl) descEl.textContent = content.description || fallback.description || ""
+    const opts = content.options || [], fopts = fallback.options || []
+    this._optionEls(cardEl).forEach((el, k) => {
+      el.textContent = (opts[k] && opts[k].trim()) || fopts[k] || el.textContent
+    })
+    this.refreshCard(cardEl)
+  }
+
+  _captureLocale(locale) {
+    this.cardTargets.forEach(el => {
+      const entry = this._store.get(el) || {}
+      entry[locale] = this._readCard(el)
+      this._store.set(el, entry)
+    })
+  }
+
+  _applyLocale(locale) {
+    const primary = this.defaultLocaleValue
+    this.cardTargets.forEach(el => {
+      const entry = this._store.get(el) || {}
+      this._writeCard(el, entry[locale], entry[primary])
+    })
   }
 
   refreshAll() {
@@ -145,40 +246,54 @@ export default class extends Controller {
   }
 
   serialize() {
-    const cardEls = Array.from(this.element.querySelectorAll('[data-type-panel-target="card"]'))
-    const cards = cardEls.map(card => {
-      const type = card.dataset.cardType
-      const out  = { type }
-      out.text = card.querySelector('.q-title, .activity-title')?.textContent.trim() || ""
-      const desc = card.querySelector('.q-subtitle, .activity-desc')?.textContent.trim()
-      if (desc) out.description = desc
+    // Sync whatever language is on screen, then build each card from the store:
+    // top-level fields are the PRIMARY language; every other language goes under
+    // i18n with options normalised to the primary's count/order (alignment).
+    this._captureLocale(this._activeLocale)
+    const primary   = this.defaultLocaleValue
+    const secondary = this.localesValue.filter(l => l !== primary)
+
+    const cards = this.cardTargets.map(card => {
+      const type  = card.dataset.cardType
+      const out   = { type }
+      const entry = this._store.get(card) || {}
+      const prim  = entry[primary] || this._readCard(card)
+
+      out.text = (prim.text || "").trim()
+      if (prim.description && prim.description.trim()) out.description = prim.description.trim()
+
       const image = card.dataset.cardImage
       if (image) out.image = image
       if (card.dataset.cardAllowOther === "true") out.allow_other = true
-      const opts = []
-      if (['multiple_choice', 'select_many', 'yes_no'].includes(type))
-        card.querySelectorAll('.pick-text').forEach(el => opts.push(el.textContent.trim()))
-      else if (['select_one_grid', 'select_many_grid'].includes(type))
-        card.querySelectorAll('.choice-label').forEach(el => opts.push(el.textContent.trim()))
-      else if (type === 'range' || type === 'nps')
-        card.querySelectorAll('.slider-label-text').forEach(el => opts.push(el.textContent.trim()))
-      else if (type === 'rating')
-        card.querySelectorAll('.rating-label').forEach(el => opts.push(el.textContent.trim()))
-      else if (type === 'tap_card')
-        card.querySelectorAll('.rotate-card span[contenteditable]').forEach(el => opts.push(el.textContent.trim()))
-      if (opts.length) out.options = opts.filter(Boolean)
+
+      const primOpts = (prim.options || []).map(o => (o || "").trim()).filter(Boolean)
+      if (primOpts.length) out.options = primOpts
+
       // NPS keeps its generated visual spec on a data attribute so the editor
       // autosave round-trips it instead of dropping it.
       if (type === 'nps' && card.dataset.cardNpsVisual) {
         try { out.nps_visual = JSON.parse(card.dataset.cardNpsVisual) } catch (_) { /* keep prior */ }
       }
+
+      const i18n = {}
+      secondary.forEach(loc => {
+        const t = entry[loc]
+        if (!t) return
+        const tEntry = {}
+        if ((t.text || "").trim()) tEntry.text = t.text.trim()
+        if ((t.description || "").trim()) tEntry.description = t.description.trim()
+        if (primOpts.length) {
+          const topts = t.options || []
+          tEntry.options = primOpts.map((p, k) => ((topts[k] || "").trim()) || p)
+        }
+        if (Object.keys(tEntry).length) i18n[loc] = tEntry
+      })
+      if (Object.keys(i18n).length) out.i18n = i18n
+
       return out
     })
-    return {
-      title:       this.titleValue,
-      description: this.descriptionValue,
-      cards
-    }
+
+    return { title: this.titleValue, description: this.descriptionValue, cards }
   }
 
   async save(event) {

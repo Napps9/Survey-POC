@@ -12,6 +12,9 @@
     type_panel_controller at boot. Same data drives the Ruby helpers
     above. %>
 <script id="card-types" type="application/json"><%= CardTypes.to_json.html_safe %></script>
+<%# Full cards incl. per-language i18n — the editor's language tabs swap text
+    from here without a server round-trip. %>
+<script id="survey-cards-i18n" type="application/json"><%= Array(@survey.cards).to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
      data-controller="type-panel preview-verto survey-editor media-picker publish-panel brand-palette add-question"
@@ -22,6 +25,9 @@
      data-add-question-render-url-value="<%= render_survey_card_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"
      data-survey-editor-description-value="<%= @survey.description %>"
+     data-survey-editor-default-locale-value="<%= @survey.default_locale %>"
+     data-survey-editor-locales-value="<%= @survey.verto_locales.to_json %>"
+     data-survey-editor-rtl-locales-value="<%= SupportedLocales.all.select(&:rtl?).map(&:code).to_json %>"
      data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#close">
 
 
@@ -54,6 +60,26 @@
         </div>
       <% end %>
 
+      <%# Language tabs — switch which language the cards are shown/edited in.
+          Structural edits (type, add/remove option, delete) are locked to the
+          primary tab so every language stays aligned. %>
+      <% if @survey.multilingual? %>
+        <div class="lang-tabs">
+          <% @survey.verto_locales.each do |code| %>
+            <% loc = SupportedLocales.find(code) %>
+            <button type="button"
+                    class="lang-tab<%= ' is-active' if code == @survey.default_locale %>"
+                    data-survey-editor-target="tab"
+                    data-locale="<%= code %>"
+                    data-action="click->survey-editor#switchLocale">
+              <span class="lang-tab-flag"><%= loc&.flag %></span>
+              <span><%= loc&.native_name %></span>
+              <% if code == @survey.default_locale %><span class="lang-tab-primary">primary</span><% end %>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+
       <%# Brief strip %>
       <div class="brief-strip">
         <span style="color:rgba(255,255,255,0.85);font-weight:600;"><%= @survey.theme %></span>
@@ -72,6 +98,7 @@
       <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5"
            data-brand-palette-target="preview"
            data-add-question-target="cardsFeed"
+           data-survey-editor-target="feed"
            style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;background-color:var(--brand-bg,#272D4A);background-image:var(--brand-bg-image,none);background-size:cover;background-position:center;<%= verto_backdrop_style_attr(@survey) %>">
 
         <% cards.each_with_index do |card, idx| %>
