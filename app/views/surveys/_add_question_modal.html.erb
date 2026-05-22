@@ -1,0 +1,154 @@
+<%# Add Question modal — triggered by the "Add question" button in the cards feed.
+    The controller (add-question) is scoped to the root editor div in show.html.erb. %>
+
+<div class="aq-modal-backdrop"
+     data-add-question-target="backdrop"
+     data-action="click->add-question#backdropClick"
+     hidden>
+
+  <div class="aq-modal" data-add-question-target="modal">
+
+    <%# ── Modal header (shared across all steps) ── %>
+    <div class="media-modal-head">
+      <div class="media-modal-title" data-add-question-target="modalTitle">Add new question</div>
+      <button type="button" class="media-modal-close"
+              data-action="click->add-question#close"
+              aria-label="Close">✕</button>
+    </div>
+
+    <%# ════════════════════════════════════════════
+        STEP 1 — Choice: Generate vs Start from Blank
+        ════════════════════════════════════════════ %>
+    <div data-add-question-target="stepChoice">
+      <div class="aq-modal-body">
+        <div class="aq-choice-grid">
+
+          <button type="button"
+                  class="aq-choice-card"
+                  data-action="click->add-question#chooseGenerate">
+            <div class="aq-choice-icon">✨</div>
+            <div class="aq-choice-name">Generate new question</div>
+            <div class="aq-choice-desc">
+              AI creates a question tailored to your survey's brief and existing questions
+            </div>
+          </button>
+
+          <button type="button"
+                  class="aq-choice-card"
+                  data-action="click->add-question#chooseBlank">
+            <div class="aq-choice-icon">✏</div>
+            <div class="aq-choice-name">Start from blank</div>
+            <div class="aq-choice-desc">
+              Pick a question type and fill in the details yourself
+            </div>
+          </button>
+
+        </div>
+
+        <%# Error message shown if generation fails %>
+        <div data-add-question-target="errorMsg"
+             style="display:none;color:#FF1E6F;font-size: var(--text-sm);text-align:center;padding:8px 0;">
+        </div>
+      </div>
+    </div>
+
+    <%# ════════════════════════════════════════════
+        STEP: Generating — loading state
+        ════════════════════════════════════════════ %>
+    <div data-add-question-target="stepGenerating" hidden>
+      <div class="aq-modal-body aq-loading-body">
+        <div class="aq-spinner"></div>
+        <div class="aq-loading-text">Generating a question…</div>
+        <div class="aq-loading-sub">Claude is crafting a question that fits your brief</div>
+      </div>
+    </div>
+
+    <%# ════════════════════════════════════════════
+        STEP B-1 — Pick question type
+        ════════════════════════════════════════════ %>
+    <div data-add-question-target="stepPickType" hidden>
+      <div class="aq-modal-body">
+        <div class="aq-type-grid">
+          <% CardTypes.pickable.each do |key, t| %>
+            <button type="button"
+                    class="aq-type-tile"
+                    data-type="<%= key %>"
+                    data-add-question-target="typeTile"
+                    data-action="click->add-question#selectType">
+              <div class="aq-type-tile-preview">
+                <%= mini_preview_html({ "type" => key, "options" => [] }) %>
+              </div>
+              <div class="aq-type-tile-icon"><%= t["picker_icon"] %></div>
+              <div class="aq-type-tile-name"><%= t["picker_name"] %></div>
+              <div class="aq-type-tile-desc"><%= t["picker_desc"] %></div>
+            </button>
+          <% end %>
+        </div>
+      </div>
+      <div class="media-modal-foot">
+        <button type="button" class="media-btn-ghost"
+                data-action="click->add-question#backToChoice">← Back</button>
+      </div>
+    </div>
+
+    <%# ════════════════════════════════════════════
+        STEP B-2 — Fill in question details
+        ════════════════════════════════════════════ %>
+    <div data-add-question-target="stepDetails" hidden>
+      <div class="aq-modal-body">
+
+        <%# Selected type badge %>
+        <div class="aq-selected-type" data-add-question-target="selectedTypeDisplay"></div>
+
+        <%# Question text %>
+        <div class="aq-field-group">
+          <label class="aq-field-label">Question text</label>
+          <input type="text"
+                 class="aq-text-input"
+                 placeholder="Enter question here"
+                 maxlength="100"
+                 autocomplete="off"
+                 data-add-question-target="questionText"
+                 data-action="input->add-question#onTextInput" />
+          <div class="aq-char-hint" data-add-question-target="charCount">0 / 100</div>
+        </div>
+
+        <%# Options list (shown for choice types) %>
+        <div data-add-question-target="optionsArea" hidden>
+          <div class="aq-field-label aq-options-label">Answer options</div>
+          <div class="aq-options-list" data-add-question-target="optionsList"></div>
+        </div>
+
+        <%# Scale labels (shown for range / rating types) %>
+        <div data-add-question-target="labelsArea" hidden>
+          <div class="aq-field-label" style="margin-bottom:8px;">Scale labels</div>
+          <div class="aq-labels-row">
+            <div class="aq-field-group" style="flex:1;">
+              <label class="aq-field-label-sm">Low end</label>
+              <input type="text" class="aq-text-input"
+                     data-add-question-target="minLabel"
+                     autocomplete="off" />
+            </div>
+            <div class="aq-field-group" style="flex:1;">
+              <label class="aq-field-label-sm">High end</label>
+              <input type="text" class="aq-text-input"
+                     data-add-question-target="maxLabel"
+                     autocomplete="off" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="media-modal-foot">
+        <button type="button" class="media-btn-ghost"
+                data-action="click->add-question#backToPickType">← Back</button>
+        <button type="button" class="media-btn-primary"
+                data-add-question-target="addBtn"
+                data-action="click->add-question#addToSurvey"
+                disabled>Add to survey →</button>
+      </div>
+    </div>
+
+  </div><%# /aq-modal %>
+</div><%# /aq-modal-backdrop %>

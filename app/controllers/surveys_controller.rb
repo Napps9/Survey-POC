@@ -116,10 +116,54 @@ class SurveysController < ApplicationController
     render :results, layout: "fullscreen"
   end
 
+  # POST /surveys/:id/generate_card
+  # Generates a single new question card using Claude, renders its HTML partial.
+  def generate_card
+    survey = Current.organisation.surveys.kept.find(params[:id])
+
+    card = SingleQuestionGenerator.new.call(
+      theme:          survey.theme,
+      audience_age:   survey.audience_age,
+      key_insight:    survey.key_insight,
+      existing_cards: Array(survey.cards)
+    )
+
+    html = render_card_html(survey, card)
+    render json: { ok: true, html: html }
+  rescue => e
+    Rails.logger.error("[SurveysController#generate_card] #{e.class}: #{e.message}")
+    render json: { ok: false, error: e.message }, status: :unprocessable_entity
+  end
+
+  # POST /surveys/:id/render_card
+  # Renders the HTML partial for a given card JSON (used by "Start from Blank" flow).
+  def render_card
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    card   = JSON.parse(request.body.read)
+
+    html = render_card_html(survey, card)
+    render json: { ok: true, html: html }
+  rescue => e
+    Rails.logger.error("[SurveysController#render_card] #{e.class}: #{e.message}")
+    render json: { ok: false, error: e.message }, status: :unprocessable_entity
+  end
+
   private
 
   def set_survey
     @survey = Current.organisation.surveys.kept.find(params[:id])
+  end
+
+  def render_card_html(survey, card)
+    existing = Array(survey.cards)
+    idx      = existing.size
+    total_q  = existing.count { |c| c["type"] != "welcome_card" } +
+               (card["type"] != "welcome_card" ? 1 : 0)
+    q_idx    = card["type"] != "welcome_card" ? total_q : 0
+    render_to_string(
+      partial: "surveys/card_row",
+      locals:  { card: card, idx: idx, q_idx: q_idx, total_q: total_q }
+    )
   end
 
   def set_survey_including_archived

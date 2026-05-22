@@ -35,6 +35,8 @@ Rails.application.routes.draw do
   post "surveys/:id/publish",         to: "surveys#publish",  as: :publish_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results
+  post "surveys/:id/generate_card",   to: "surveys#generate_card", as: :generate_survey_card
+  post "surveys/:id/render_card",     to: "surveys#render_card",   as: :render_survey_card
   get  "surveys/:id/results/summary", to: "survey_summaries#show",  as: :survey_results_summary
   post "surveys/:survey_id/chat",     to: "survey_chats#create",    as: :survey_chat
   get  "surveys/:survey_id/shares", to: "survey_shares#index",  as: :survey_shares

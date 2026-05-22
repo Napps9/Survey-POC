@@ -14,10 +14,12 @@
 <script id="card-types" type="application/json"><%= CardTypes.to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker publish-panel brand-palette"
+     data-controller="type-panel preview-verto survey-editor media-picker publish-panel brand-palette add-question"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
      data-media-picker-url-value="<%= survey_path(@survey) %>"
+     data-add-question-generate-url-value="<%= generate_survey_card_path(@survey) %>"
+     data-add-question-render-url-value="<%= render_survey_card_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"
      data-survey-editor-description-value="<%= @survey.description %>"
      data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#close">
@@ -69,47 +71,26 @@
           surrounding editor chrome stays Playverto. %>
       <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5"
            data-brand-palette-target="preview"
+           data-add-question-target="cardsFeed"
            style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;background-color:var(--brand-bg,#272D4A);background-image:var(--brand-bg-image,none);background-size:cover;background-position:center;<%= verto_backdrop_style_attr(@survey) %>">
 
         <% cards.each_with_index do |card, idx| %>
           <%
-            type     = card["type"].to_s
-            meta     = card_type_meta(type)
-            is_q     = type != "welcome_card"
-            q_idx   += 1 if is_q
-            progress = total_q > 0 ? ((q_idx.to_f / total_q) * 100).round : 5
-            progress = 5 if !is_q
-            eyebrow  = CardTypes.eyebrow(type).presence || type.tr('_', ' ')
+            type   = card["type"].to_s
+            is_q   = type != "welcome_card"
+            q_idx += 1 if is_q
           %>
-
-          <div class="survey-card-wrap"
-               data-type-panel-target="card"
-               data-survey-editor-target="card"
-               data-card-type="<%= type %>"
-               data-card-num="<%= idx + 1 %>"
-               data-card-image="<%= card['image'].to_s %>"
-               data-card-allow-other="<%= card['allow_other'] ? 'true' : 'false' %>"
-               data-card-options="<%= Array(card['options']).to_json %>"
-               data-action="click->type-panel#selectCard">
-
-            <%# Chrome row above card %>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
-              <span class="s-badge <%= meta[:badge_css] %>"><%= meta[:badge] %></span>
-              <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.3);">Card <%= idx + 1 %></span>
-              <button type="button"
-                      style="margin-left:auto;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.25);font-size: var(--text-2xl);padding:2px 6px;border-radius:4px;line-height:1;transition:color 0.2s;"
-                      onmouseover="this.style.color='rgba(255,100,100,0.8)'"
-                      onmouseout="this.style.color='rgba(255,255,255,0.25)'"
-                      data-action="click->type-panel#deleteCard">×</button>
-            </div>
-
-            <%# Horizontal split-card %>
-            <div class="split-card">
-              <%= render "shared/split_left",     card: card, progress: progress, mode: :editor %>
-              <%= render "shared/card_component", card: card, mode: :editor %>
-            </div><%# /split-card %>
-          </div><%# /survey-card-wrap %>
+          <%= render "surveys/card_row", card: card, idx: idx, q_idx: q_idx, total_q: total_q %>
         <% end %>
+
+        <%# "Add question" button — sits at bottom of the cards feed %>
+        <div style="display:flex;justify-content:center;padding:4px 0 8px;">
+          <button type="button"
+                  class="aq-trigger-btn"
+                  data-action="click->add-question#open">
+            ＋ Add question
+          </button>
+        </div>
 
       </div><%# /cards feed %>
 
@@ -560,5 +541,6 @@
   </div><%# /preview-overlay %>
 
   <%= render "surveys/media_modal" %>
+  <%= render "surveys/add_question_modal" %>
 
 </div><%# /editor %>
