@@ -14,6 +14,9 @@
   mode    ||= :preview
   editable = (mode == :editor)
   type     = card["type"].to_s
+  # When the nps feature flag is off, render any existing nps card as a plain
+  # range slider so the NPS reactive UI never shows on the branch.
+  render_type = (type == "nps" && !CardTypes.enabled?("nps")) ? "range" : type
   eyebrow  = CardTypes.eyebrow(type).presence || type.tr("_", " ")
   is_q     = type != "welcome_card"
   ce_attr  = editable ? "contenteditable=\"true\"".html_safe : "".html_safe
@@ -46,7 +49,7 @@
   <% end %>
 
   <div class="mt-2"<%= " data-card-component".html_safe if editable %>>
-    <% case type
+    <% case render_type
        when "multiple_choice", "select_many" %>
       <% items = Array(display["options"]) %>
       <% multi = (type == "select_many") %>
