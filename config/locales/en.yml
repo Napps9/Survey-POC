@@ -52,6 +52,11 @@ en:
     confirm_new_password: "Confirm new password"
     repeat_new_password: "Repeat new password"
     set_submit: "Save new password"
+  results:
+    title: "Results"
+    editor: "← Editor"
+    ask_verto: "Ask Verto"
+    analysing: "Analysing responses…"
   player:
     thank_you_title: "Thank you!"
     thank_you_sub: "Your responses have been recorded."

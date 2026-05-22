@@ -41,10 +41,10 @@
 
     <%# Top bar %>
     <div style="height:54px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;padding:0 24px;gap:12px;background:#1C2034;">
-      <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Results</span>
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("results.title") %></span>
       <span style="color:rgba(255,255,255,0.15);">·</span>
       <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;"><%= @survey.theme %></span>
-      <%= link_to "← Editor", survey_path(@survey),
+      <%= link_to t("results.editor"), survey_path(@survey),
             style: "flex-shrink:0;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);text-decoration:none;padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);transition:all 0.15s;",
             onmouseover: "this.style.color='white';this.style.borderColor='rgba(255,255,255,0.3)'",
             onmouseout:  "this.style.color='rgba(255,255,255,0.4)';this.style.borderColor='rgba(255,255,255,0.1)'" %>
@@ -58,8 +58,8 @@
         <div id="av-card" class="summary-card" style="border-radius:14px;background:rgba(1,234,203,0.05);border:1px solid rgba(1,234,203,0.18);padding:18px 22px;">
           <div class="summary-rainbow"></div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;">Ask Verto</span>
-            <span id="av-thinking" class="gen-shimmer--brand" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);margin-left:2px;">Analysing responses…</span>
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;"><%= t("results.ask_verto") %></span>
+            <span id="av-thinking" class="gen-shimmer--brand" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);margin-left:2px;"><%= t("results.analysing") %></span>
           </div>
           <div id="av-text"
                style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.65);line-height:1.8;white-space:pre-wrap;min-height:18px;"></div>
