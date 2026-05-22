@@ -39,22 +39,22 @@ class SurveyGenerator
               type: { type: "string", enum: CARD_TYPES },
               text: {
                 type: "string",
-                description: "Question or card text. Target 50-70 chars; never exceed 100. Description below counts toward this budget."
+                description: "Question or card text. Target 50-70 chars; 100 hard max. Any description SHARES this budget (text + description <= 100)."
               },
               description: {
                 type: "string",
-                description: "Optional sub-text shown under the question. Counts toward the 100-char budget."
+                description: "Optional sub-text under the question. SHARES the question's 100-char budget (text + description <= 100)."
               },
               options: {
                 type: "array",
                 items: { type: "string", description: "Each option <= 20 chars in select-one lists." },
                 description: <<~DESC
                   Required for: multiple_choice, select_many, select_one_grid, select_many_grid,
-                  tap_card, range, rating. Bounds:
-                  - tap_card: 3 to 5
-                  - multiple_choice / select_many: 3 to 5
-                  - select_one_grid / select_many_grid: even count, max 10 including any "Other"
-                  - range / rating: 3 to 5 points
+                  tap_card, range, rating. Bounds (per the design rules):
+                  - multiple_choice / select_many: 3 to 5 options, each <= 20 chars
+                  - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any "Other"
+                  - tap_card: 3 to 5 cards
+                  - range / rating: 3 to 5 points, never more than 5
                 DESC
               }
             },
@@ -66,56 +66,48 @@ class SurveyGenerator
     }
   }.freeze
 
+  # Per-card design rules that apply to a single question card. Shared by the
+  # full-survey SYSTEM prompt and SingleQuestionGenerator so the two creation
+  # paths can't drift apart.
+  CARD_RULES = <<~RULES.freeze
+    - List types (multiple_choice / select_many): 3 to 5 options, each <= 20 chars.
+    - Grids (select_one_grid / select_many_grid): EVEN option count, 4 to 10
+      total including any "Other".
+    - tap_card: 3 to 5 cards - never fewer than 3, never more than 5.
+    - range / rating: 3 to 5 points; never more than 5.
+    - Question text: 50-70 chars target, 100 hard max. Any description below the
+      question SHARES that same 100-char budget (text + description <= 100).
+    - "How often" questions: default to range with <= 5 options. If more are
+      genuinely required, fall back rating -> multiple_choice -> select_one_grid;
+      never exceed 5 options for a "How often" question.
+  RULES
+
   SYSTEM = <<~PROMPT.freeze
     You are a Verto designer. Given a brief, produce a Verto experience that
     strictly follows the rules below. Deviate only when the brief explicitly
     requires it, and in that case keep the deviation minimal. Echo the user's
     theme, audience_age, and key_insight into the output unchanged.
 
-    Do's and Don'ts:
+    Do's and Don'ts (deviate only when the brief explicitly requires it, and
+    keep any deviation minimal):
 
-    1. Length — Target 10 to 15 questions. Fewer questions is not necessarily
-       easier or faster. Do NOT exceed 15 questions. Welcome cards do not
-       count toward the question total.
+    1. Length — Target 10 to 15 questions; never exceed 15. Fewer questions is
+       not automatically better. Welcome cards do not count toward the total.
 
     2. Question definition — A "question" is anything the user must read and
-       respond to with a choice. A range counts as 1 question. A tap_card with 5
-       cards counts as 5 questions.
-       - Do NOT include more than 2 of the same answer type in a row in the flow
-         (rare exceptions allowed).
-       - tap_card must have 3 to 5 cards. Never fewer than 3, never more than 5.
+       respond to. A range counts as 1 question. A tap_card with 5 cards counts
+       as 5 questions.
 
-    3. Welcome cards — Include ONE welcome_card only for cold/new audiences,
-       briefly stating the Verto's purpose. Do NOT include a welcome_card for
-       captive audiences or events where introduction is unnecessary. Maximum 1
-       welcome card.
+    3. Answer-type variety — Never place more than 2 of the same answer type in
+       a row in the flow.
 
-    4. Answer diversity — No flow may contain more than two of the same answer
-       type consecutively. Exceptions allowed only when the brief demands it.
+    4. Welcome cards — At most ONE welcome_card, and only for cold/new audiences
+       (briefly stating the Verto's purpose). Omit it for captive audiences or
+       events where an introduction is unnecessary.
 
-    5. Number of answer choices — Provide 3 to 5 choices per question. Do NOT
-       exceed 5 for range/rating except in specific cases.
+    5. Per-card rules — every question card must satisfy:
 
-    6. Grid format (select_one_grid / select_many_grid) — Use an EVEN number of
-       answer choices for visual balance. Total options including any "Other"
-       must not exceed 10.
-
-    7. Question length — Keep question text between 50 and 70 characters. Up to
-       100 characters is allowed only when the answer type genuinely requires
-       it. Never exceed 100 without strong reason.
-
-    8. Descriptions below questions — A description below a question counts
-       toward the same character budget. Do NOT exceed limits.
-
-    9. Answer length — Keep each answer choice up to 20 characters in a
-       select-one list. For grids, weigh option count against legibility.
-
-    10. "How often" questions — When a question begins with "How often",
-        default to range as the answer type. "How often" questions must never
-        exceed 5 options. If the question genuinely requires more than 5
-        options, fall back to the next best type in this order:
-        rating → multiple_choice → select_one_grid. Do NOT use a grid or
-        list type with more than 5 options for a "How often" question.
+    #{CARD_RULES}
 
     Output via the emit_survey tool. Choose card types thoughtfully — the
     Verto answer type definitions below tell you when each is the right fit.
@@ -174,8 +166,18 @@ class SurveyGenerator
 
     When relevant historical Playverto questions are provided in the brief,
     use them to inform wording style and answer-type selection. Do NOT copy
-    them verbatim — adapt to the brief's audience and insight. The 10 design
+    them verbatim — adapt to the brief's audience and insight. The design
     rules above always override any pattern from the historical examples.
+
+    Self-check before emitting — re-read your draft and fix any rule violation
+    (unless the brief explicitly requires the exception):
+    [ ] 10 to 15 questions (welcome cards excluded); at most 1 welcome card
+    [ ] No more than 2 of the same answer type in a row
+    [ ] Lists 3-5 options (each <= 20 chars); grids EVEN and 4-10; tap_card 3-5;
+        range/rating <= 5
+    [ ] Every question's text plus its description <= 100 chars
+    [ ] "How often" -> range with <= 5 options
+    [ ] theme, audience_age and key_insight echoed back unchanged
   PROMPT
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))

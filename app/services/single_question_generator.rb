@@ -19,7 +19,7 @@ class SingleQuestionGenerator
         },
         text: {
           type: "string",
-          description: "Question text. Target 50-70 chars; max 100."
+          description: "Question text. Target 50-70 chars; 100 hard max (text + any description <= 100)."
         },
         description: {
           type: "string",
@@ -30,9 +30,10 @@ class SingleQuestionGenerator
           items: { type: "string" },
           description: <<~DESC
             Required for: multiple_choice, select_many, select_one_grid,
-            select_many_grid, tap_card, range, rating. Follow the same
-            bounds as the full survey: tap_card 3-5; list types 3-5;
-            grids even count up to 10; range/rating 3-5 points.
+            select_many_grid, tap_card, range, rating. Bounds (per the design
+            rules): list types 3-5 options (each <= 20 chars); grids EVEN and
+            4-10 including any "Other"; tap_card 3-5; range/rating 3-5, never
+            more than 5.
           DESC
         }
       },
@@ -81,6 +82,14 @@ class SingleQuestionGenerator
         user_message << %(- "#{e[:question]}" [#{e[:primary_type]}]\n)
       end
     end
+
+    user_message << <<~RULES
+
+      Per-card design rules this new card must follow (deviate only if the
+      brief truly requires it):
+      #{SurveyGenerator::CARD_RULES}
+      And do NOT reuse a type from the last 2 cards (#{recent_types.join(", ").presence || "none"}).
+    RULES
 
     response = @client.messages.create(
       model:       MODEL,
