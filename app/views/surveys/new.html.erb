@@ -19,7 +19,7 @@
       <%= link_to root_path do %>
         <%= image_tag "playverto.svg", alt: "Playverto", class: "h-7 w-auto" %>
       <% end %>
-      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.45);">Create Verto</span>
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.45);"><%= t("wizard.create_verto") %></span>
       <span></span>
     </nav>
 
@@ -28,7 +28,7 @@
 
       <div class="gen-shimmer"
            style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">
-        Building your Verto
+        <%= t("wizard.building") %>
       </div>
 
       <div class="text-center" style="max-width:min(1040px,92vw);">
@@ -40,17 +40,17 @@
       <div class="flex gap-2.5 flex-wrap justify-center">
         <div class="gen-pill">
           <div class="gen-pill-dot" style="background:#01EACB;"></div>
-          <span class="gen-pill-label">Audience</span>
+          <span class="gen-pill-label"><%= t("wizard.pill_audience") %></span>
           <span data-generating-target="pillAudience"></span>
         </div>
         <div class="gen-pill">
           <div class="gen-pill-dot" style="background:#FF1E6F;"></div>
-          <span class="gen-pill-label">Tone</span>
-          <span>Conversational</span>
+          <span class="gen-pill-label"><%= t("wizard.pill_tone") %></span>
+          <span><%= t("wizard.pill_tone_value") %></span>
         </div>
         <div class="gen-pill">
           <div class="gen-pill-dot" style="background:#0CA7FF;"></div>
-          <span class="gen-pill-label">Cards</span>
+          <span class="gen-pill-label"><%= t("wizard.pill_cards") %></span>
           <span>10–15</span>
         </div>
       </div>
@@ -60,19 +60,19 @@
       <div class="gen-steps-row">
         <div class="gen-step" data-state="done" data-generating-target="step1">
           <div class="step-dot">✓</div>
-          <span>Brief read</span>
+          <span><%= t("wizard.gen_brief_read") %></span>
         </div>
         <div class="gen-step" data-state="active" data-generating-target="step2">
           <div class="step-dot"></div>
-          <span>Writing questions</span>
+          <span><%= t("wizard.gen_writing") %></span>
         </div>
         <div class="gen-step" data-state="pending" data-generating-target="step3">
           <div class="step-dot"></div>
-          <span>Picking formats</span>
+          <span><%= t("wizard.gen_formats") %></span>
         </div>
         <div class="gen-step" data-state="pending" data-generating-target="step4">
           <div class="step-dot"></div>
-          <span>Applying design</span>
+          <span><%= t("wizard.gen_design") %></span>
         </div>
       </div>
 
@@ -116,30 +116,23 @@
           <div class="split-left">
             <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
             <div style="<%= left_pad_style %>">
-              <div style="<%= eyebrow_style %>color:#01EACB;">What's coming up</div>
-              <div style="<%= instr_lead %>">A few quick steps and we'll draft your Verto.</div>
+              <div style="<%= eyebrow_style %>color:#01EACB;"><%= t("wizard.welcome_eyebrow") %></div>
+              <div style="<%= instr_lead %>"><%= t("wizard.welcome_lead") %></div>
               <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
-                <% [
-                     ["01", "About your Verto",       "#FF1E6F"],
-                     ["02", "Who's answering",         "#01EACB"],
-                     ["03", "What you want to learn",  "#0CA7FF"],
-                     ["04", "Languages",               "#01EACB"],
-                     ["05", "Brand colours",           "#FFFA77"],
-                     ["06", "Context (optional)",      "#615BF5"],
-                   ].each do |num, label, accent| %>
+                <% [ "#FF1E6F", "#01EACB", "#0CA7FF", "#01EACB", "#FFFA77", "#615BF5" ].each_with_index do |accent, i| %>
                   <div style="display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
-                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= accent %>;letter-spacing:0.08em;font-weight:700;"><%= num %></span>
-                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.75);"><%= label %></span>
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= accent %>;letter-spacing:0.08em;font-weight:700;"><%= format('%02d', i + 1) %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.75);"><%= t("wizard.welcome_steps")[i] %></span>
                   </div>
                 <% end %>
               </div>
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
-            <div class="q-eyebrow" style="color:#01EACB;">New Verto</div>
-            <div style="font-family:'Alata',sans-serif;font-size:30px;line-height:1.15;color:#1C2034;">Let's build your Verto.</div>
-            <p class="q-subtitle" style="margin:0;">We'll turn your brief into a Verto that follows the Playverto rules.</p>
-            <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.4);margin:0;">Press <strong style="color:rgba(0,0,0,0.6);">Next</strong> when you're ready.</p>
+            <div class="q-eyebrow" style="color:#01EACB;"><%= t("wizard.welcome_badge") %></div>
+            <div style="font-family:'Alata',sans-serif;font-size:30px;line-height:1.15;color:#1C2034;"><%= t("wizard.welcome_title") %></div>
+            <p class="q-subtitle" style="margin:0;"><%= t("wizard.welcome_sub") %></p>
+            <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.4);margin:0;"><%= t("wizard.welcome_ready_html") %></p>
           </div>
         </div>
       </section>
@@ -150,13 +143,13 @@
           <div class="split-left">
             <div class="panel-progress"><div class="panel-progress-fill" style="width:25%;"></div></div>
             <div style="<%= left_pad_style %>">
-              <div style="<%= eyebrow_style %>color:#FF1E6F;">Step 01 · About your Verto</div>
-              <div style="<%= instr_lead %>">The single overarching topic.</div>
-              <div style="<%= instr_body %>">Keep it broad — you'll narrow the angle in the next steps. One or two words is usually plenty.</div>
+              <div style="<%= eyebrow_style %>color:#FF1E6F;"><%= t("wizard.s1_eyebrow") %></div>
+              <div style="<%= instr_lead %>"><%= t("wizard.s1_lead") %></div>
+              <div style="<%= instr_body %>"><%= t("wizard.s1_body") %></div>
               <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
-                <div style="<%= ex_label_style %>">Examples</div>
+                <div style="<%= ex_label_style %>"><%= t("wizard.examples") %></div>
                 <div style="display:flex;flex-direction:column;gap:6px;">
-                  <% [ "Climate action", "Refugee education", "Food security" ].each do |ex| %>
+                  <% t("wizard.s1_examples").each do |ex| %>
                     <div style="<%= ex_item_style %>"><%= ex %></div>
                   <% end %>
                 </div>
@@ -164,18 +157,18 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FF1E6F;">Step 01 · About your Verto</div>
-            <div class="q-title" style="font-size:28px;line-height:1.2;">What's your Verto about?</div>
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FF1E6F;"><%= t("wizard.s1_eyebrow") %></div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s1_title") %></div>
             <%= f.text_field :theme,
                   required: true,
                   data: { required: "true" },
-                  placeholder: "e.g. Youth wellbeing",
+                  placeholder: t("wizard.s1_placeholder"),
                   style: light_input_style,
                   onfocus: "this.style.borderColor='#FF1E6F'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
             <div class="wizard-mobile-hint">
-              <p class="wizard-mobile-hint-lead">The single overarching topic.</p>
-              <p class="wizard-mobile-hint-body">Keep it broad — you'll narrow the angle in the next steps.</p>
+              <p class="wizard-mobile-hint-lead"><%= t("wizard.s1_lead") %></p>
+              <p class="wizard-mobile-hint-body"><%= t("wizard.s1_hint_body") %></p>
             </div>
           </div>
         </div>
@@ -187,17 +180,13 @@
           <div class="split-left">
             <div class="panel-progress"><div class="panel-progress-fill" style="width:50%;"></div></div>
             <div style="<%= left_pad_style %>">
-              <div style="<%= eyebrow_style %>color:#01EACB;">Step 02 · Who's answering</div>
-              <div style="<%= instr_lead %>">Be specific.</div>
-              <div style="<%= instr_body %>">Lifestyle, role, region, language — anything that shapes how this group thinks. The more concrete, the better the questions we can write.</div>
+              <div style="<%= eyebrow_style %>color:#01EACB;"><%= t("wizard.s2_eyebrow") %></div>
+              <div style="<%= instr_lead %>"><%= t("wizard.s2_lead") %></div>
+              <div style="<%= instr_body %>"><%= t("wizard.s2_body") %></div>
               <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
-                <div style="<%= ex_label_style %>">Examples</div>
+                <div style="<%= ex_label_style %>"><%= t("wizard.examples") %></div>
                 <div style="display:flex;flex-direction:column;gap:6px;">
-                  <% [
-                       "18–24 university students in Kenya",
-                       "35–55 frontline community-health workers",
-                       "Parents of school-age kids in rural NSW",
-                     ].each do |ex| %>
+                  <% t("wizard.s2_examples").each do |ex| %>
                     <div style="<%= ex_item_style %>"><%= ex %></div>
                   <% end %>
                 </div>
@@ -205,18 +194,18 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#01EACB;">Step 02 · Who's answering</div>
-            <div class="q-title" style="font-size:28px;line-height:1.2;">Who's answering — and what age are they?</div>
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#01EACB;"><%= t("wizard.s2_eyebrow") %></div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s2_title") %></div>
             <%= f.text_field :audience_age,
                   required: true,
                   data: { required: "true" },
-                  placeholder: "e.g. 18–24 university students in Kenya",
+                  placeholder: t("wizard.s2_placeholder"),
                   style: light_input_style,
                   onfocus: "this.style.borderColor='#01EACB'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
             <div class="wizard-mobile-hint">
-              <p class="wizard-mobile-hint-lead">Be specific.</p>
-              <p class="wizard-mobile-hint-body">Lifestyle, role, region, language — anything that shapes how this group thinks.</p>
+              <p class="wizard-mobile-hint-lead"><%= t("wizard.s2_lead") %></p>
+              <p class="wizard-mobile-hint-body"><%= t("wizard.s2_hint_body") %></p>
             </div>
           </div>
         </div>
@@ -228,17 +217,13 @@
           <div class="split-left">
             <div class="panel-progress"><div class="panel-progress-fill" style="width:75%;"></div></div>
             <div style="<%= left_pad_style %>">
-              <div style="<%= eyebrow_style %>color:#0CA7FF;">Step 03 · The learning goal</div>
-              <div style="<%= instr_lead %>">The insight that would change a decision.</div>
-              <div style="<%= instr_body %>">Skip the things you already know. Aim for the one thing that, if you learned it, would shift what you do next.</div>
+              <div style="<%= eyebrow_style %>color:#0CA7FF;"><%= t("wizard.s3_eyebrow") %></div>
+              <div style="<%= instr_lead %>"><%= t("wizard.s3_lead") %></div>
+              <div style="<%= instr_body %>"><%= t("wizard.s3_body") %></div>
               <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
-                <div style="<%= ex_label_style %>">Examples</div>
+                <div style="<%= ex_label_style %>"><%= t("wizard.examples") %></div>
                 <div style="display:flex;flex-direction:column;gap:6px;">
-                  <% [
-                       "Why do volunteers drop off after month three?",
-                       "What's stopping people from accessing our food bank?",
-                       "Does our youth programme actually shift confidence — and where exactly?",
-                     ].each do |ex| %>
+                  <% t("wizard.s3_examples").each do |ex| %>
                     <div style="<%= ex_item_style %>"><%= ex %></div>
                   <% end %>
                 </div>
@@ -246,18 +231,18 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#0CA7FF;">Step 03 · The learning goal</div>
-            <div class="q-title" style="font-size:28px;line-height:1.2;">What do you want to learn from them?</div>
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#0CA7FF;"><%= t("wizard.s3_eyebrow") %></div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s3_title") %></div>
             <%= f.text_area :key_insight, rows: 4,
                   required: true,
                   data: { required: "true" },
-                  placeholder: "e.g. Why do volunteers drop off after month three?",
+                  placeholder: t("wizard.s3_placeholder"),
                   style: light_textarea_style,
                   onfocus: "this.style.borderColor='#0CA7FF'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
             <div class="wizard-mobile-hint">
-              <p class="wizard-mobile-hint-lead">The insight that would change a decision.</p>
-              <p class="wizard-mobile-hint-body">Skip what you already know — aim for the one thing that would shift what you do next.</p>
+              <p class="wizard-mobile-hint-lead"><%= t("wizard.s3_lead") %></p>
+              <p class="wizard-mobile-hint-body"><%= t("wizard.s3_hint_body") %></p>
             </div>
           </div>
         </div>
@@ -270,18 +255,18 @@
           <div class="split-left">
             <div class="panel-progress"><div class="panel-progress-fill" style="width:83%;"></div></div>
             <div style="<%= left_pad_style %>">
-              <div style="<%= eyebrow_style %>color:#01EACB;">Step 04 · Languages</div>
-              <div style="<%= instr_lead %>">Reach everyone in their own language.</div>
-              <div style="<%= instr_body %>">We'll write the Verto in your primary language, then craft an equally good version in each other language. Every version asks the same questions, so results stay aligned.</div>
+              <div style="<%= eyebrow_style %>color:#01EACB;"><%= t("wizard.s4_eyebrow") %></div>
+              <div style="<%= instr_lead %>"><%= t("wizard.s4_lead") %></div>
+              <div style="<%= instr_body %>"><%= t("wizard.s4_body") %></div>
               <div style="<%= ex_label_style %>margin-top:8px;"><span data-language-picker-target="summary"></span></div>
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#01EACB;">Step 04 · Languages</div>
-            <div class="q-title" style="font-size:28px;line-height:1.2;">Which languages should this Verto speak?</div>
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#01EACB;"><%= t("wizard.s4_eyebrow") %></div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s4_title") %></div>
 
             <label style="display:flex;flex-direction:column;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);">
-              Primary language
+              <%= t("wizard.s4_primary_label") %>
               <select name="default_locale"
                       data-language-picker-target="primary"
                       data-action="change->language-picker#syncPrimary"
@@ -311,9 +296,9 @@
       <%
         org_pal = current_organisation.brand_palette
         brand_roles = [
-          ["primary", "Primary",       "Headings &amp; accents"],
-          ["cta",     "Buttons (CTA)", "Next / Submit buttons"],
-          ["bg",      "Background",    "The canvas behind cards"]
+          ["primary", t("wizard.brand_primary"), t("wizard.brand_primary_desc")],
+          ["cta",     t("wizard.brand_cta"),     t("wizard.brand_cta_desc")],
+          ["bg",      t("wizard.brand_bg"),      t("wizard.brand_bg_desc")]
         ]
       %>
       <section class="preview-card" data-create-wizard-target="card"
@@ -322,32 +307,32 @@
           <div class="split-left">
             <div class="panel-progress"><div class="panel-progress-fill" style="width:91%;"></div></div>
             <div style="<%= left_pad_style %>gap:14px;">
-              <div style="<%= eyebrow_style %>color:#FFFA77;">Step 05 · Brand colours</div>
-              <div style="<%= instr_lead %>">Make it feel like you.</div>
-              <div style="<%= instr_body %>">This is how your Verto looks to everyone who plays it. You can fine-tune any time from the editor.</div>
+              <div style="<%= eyebrow_style %>color:#FFFA77;"><%= t("wizard.s5_eyebrow") %></div>
+              <div style="<%= instr_lead %>"><%= t("wizard.s5_lead") %></div>
+              <div style="<%= instr_body %>"><%= t("wizard.s5_body") %></div>
 
               <%# Live mock — updates as colours are picked. Uses brand vars so
                   it falls back to Playverto's look for the default palette. %>
               <div data-brand-palette-target="preview"
                    style="margin-top:4px;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:11px;background:var(--brand-bg,#1C2034);box-shadow:0 10px 30px rgba(0,0,0,0.28);">
-                <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--brand-primary,#01EACB);">Live preview</div>
+                <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--brand-primary,#01EACB);"><%= t("wizard.s5_live_preview") %></div>
                 <div style="background:#fff;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:8px;">
-                  <div style="font-family:'Alata',sans-serif;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--brand-primary,#01EACB);">Quick poll</div>
-                  <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;line-height:1.3;">How are you finding it?</div>
+                  <div style="font-family:'Alata',sans-serif;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--brand-primary,#01EACB);"><%= t("wizard.s5_quick_poll") %></div>
+                  <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;line-height:1.3;"><%= t("wizard.s5_mock_q") %></div>
                   <div style="display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:8px;background:var(--brand-primary-soft,rgba(1,234,203,0.12));">
                     <span style="width:14px;height:14px;border-radius:50%;background:var(--brand-primary,#01EACB);flex-shrink:0;"></span>
-                    <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:#111;">Loving it</span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:#111;"><%= t("wizard.s5_mock_opt") %></span>
                   </div>
                 </div>
                 <button type="button" tabindex="-1"
-                        style="background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);border:none;border-radius:100px;padding:9px;font-family:'ABeeZee',sans-serif;font-size:13px;cursor:default;">Next →</button>
+                        style="background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);border:none;border-radius:100px;padding:9px;font-family:'ABeeZee',sans-serif;font-size:13px;cursor:default;"><%= t("wizard.next") %></button>
               </div>
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FFFA77;">Step 05 · Brand colours</div>
-            <div class="q-title" style="font-size:28px;line-height:1.2;">Choose your brand colours.</div>
-            <p class="q-subtitle" style="margin:0;">Pick three. They'll apply across this Verto's experience.</p>
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FFFA77;"><%= t("wizard.s5_eyebrow") %></div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s5_title") %></div>
+            <p class="q-subtitle" style="margin:0;"><%= t("wizard.s5_sub") %></p>
             <div style="display:flex;flex-direction:column;gap:12px;margin-top:2px;">
               <% brand_roles.each do |role, label, desc| %>
                 <div style="display:flex;align-items:center;gap:12px;">
@@ -379,19 +364,15 @@
             <div class="panel-progress"><div class="panel-progress-fill" style="width:100%;"></div></div>
             <div style="<%= left_pad_style %>">
               <div style="display:flex;align-items:center;gap:10px;">
-                <div style="<%= eyebrow_style %>color:#615BF5;">Step 06 · Context</div>
-                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#615BF5;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(97,91,245,0.14);border:1px solid rgba(97,91,245,0.3);">Optional</span>
+                <div style="<%= eyebrow_style %>color:#615BF5;"><%= t("wizard.s6_eyebrow") %></div>
+                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#615BF5;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(97,91,245,0.14);border:1px solid rgba(97,91,245,0.3);"><%= t("wizard.optional") %></span>
               </div>
-              <div style="<%= instr_lead %>">Anything else we should bake in?</div>
-              <div style="<%= instr_body %>">Tone, must-asks, things to avoid, audience quirks. Skip if there's nothing extra.</div>
+              <div style="<%= instr_lead %>"><%= t("wizard.s6_lead") %></div>
+              <div style="<%= instr_body %>"><%= t("wizard.s6_body") %></div>
               <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
-                <div style="<%= ex_label_style %>">Examples</div>
+                <div style="<%= ex_label_style %>"><%= t("wizard.examples") %></div>
                 <div style="display:flex;flex-direction:column;gap:6px;">
-                  <% [
-                       "Must include a question about funding routes and barriers to grants.",
-                       "Avoid jargon — many respondents speak English as a second language.",
-                       "Keep tone warm, not corporate.",
-                     ].each do |ex| %>
+                  <% t("wizard.s6_examples").each do |ex| %>
                     <div style="<%= ex_item_style %>"><%= ex %></div>
                   <% end %>
                 </div>
@@ -399,16 +380,16 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#615BF5;">Step 06 · Context · Optional</div>
-            <div class="q-title" style="font-size:28px;line-height:1.2;">Anything else we should know?</div>
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#615BF5;"><%= t("wizard.s6_eyebrow") %> · <%= t("wizard.optional") %></div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s6_title") %></div>
             <%= f.text_area :notes, rows: 4,
-                  placeholder: "e.g. Audience has never used Playverto before, keep tone warm, not corporate.",
+                  placeholder: t("wizard.s6_placeholder"),
                   style: light_textarea_style,
                   onfocus: "this.style.borderColor='#615BF5'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
             <div class="wizard-mobile-hint">
-              <p class="wizard-mobile-hint-lead">Anything else we should bake in?</p>
-              <p class="wizard-mobile-hint-body">Tone, must-asks, things to avoid, audience quirks. Skip if there's nothing extra.</p>
+              <p class="wizard-mobile-hint-lead"><%= t("wizard.s6_lead") %></p>
+              <p class="wizard-mobile-hint-body"><%= t("wizard.s6_body") %></p>
             </div>
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-top:4px;padding:12px 14px;border-radius:12px;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.06);">
               <%= f.check_box :show_results_comparison,
@@ -417,10 +398,10 @@
                     "1", "0" %>
               <span>
                 <span style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);color:#1C2034;letter-spacing:0.02em;">
-                  Let respondents compare their answers
+                  <%= t("wizard.s6_compare_label") %>
                 </span>
                 <span style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.5);margin-top:2px;line-height:1.4;">
-                  Show a CTA on the thank-you page that reveals how their answers stack up against everyone else's.
+                  <%= t("wizard.s6_compare_desc") %>
                 </span>
               </span>
             </label>
@@ -434,17 +415,17 @@
     <div class="preview-footer">
       <button type="button" class="preview-btn preview-btn-back invisible"
               data-create-wizard-target="back"
-              data-action="click->create-wizard#back">← Back</button>
+              data-action="click->create-wizard#back"><%= t("wizard.back") %></button>
 
-      <span class="preview-progress-text" data-create-wizard-target="counter">Step 1 of 6</span>
+      <span class="preview-progress-text" data-create-wizard-target="counter"><%= t("wizard.step_counter", n: 1, total: 7) %></span>
 
       <button type="button" class="preview-btn preview-btn-next"
               data-create-wizard-target="next"
-              data-action="click->create-wizard#next">Next →</button>
+              data-action="click->create-wizard#next"><%= t("wizard.next") %></button>
 
-      <%= f.submit "Generate Verto →",
+      <%= f.submit t("wizard.generate"),
             class: "preview-btn preview-btn-finish hidden",
-            data: { create_wizard_target: "finish", turbo_submits_with: "Generating…" } %>
+            data: { create_wizard_target: "finish", turbo_submits_with: t("wizard.generating") } %>
     </div>
 
   <% end %>
