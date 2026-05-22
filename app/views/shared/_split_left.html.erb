@@ -13,7 +13,7 @@
 %>
 
 <div class="split-left">
-  <% if nps_card?(card) %>
+  <% if nps_card?(card) && CardTypes.enabled?("nps") %>
     <%# NPS: the LEFT panel is a face the app draws (eyes + morphing mouth +
         sentiment colour) framed by a themed accent; it reacts to the slider. %>
     <%= render_nps_reaction(nps_reaction_spec(card)) %>

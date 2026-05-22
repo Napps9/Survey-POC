@@ -134,8 +134,15 @@ export default class extends Controller {
       }
 
       case "nps": {
-        const v = card.querySelector(".nps-slider")?.dataset.npsValue
-        return (v !== undefined && v !== "") ? Number(v) : null
+        const el = card.querySelector(".nps-slider")
+        if (el) {
+          const v = el.dataset.npsValue
+          return (v !== undefined && v !== "") ? Number(v) : null
+        }
+        // Feature flag off: the card is rendered as a plain range slider.
+        const dots   = Array.from(card.querySelectorAll(".s-dot"))
+        const active = dots.findIndex(d => d.classList.contains("active"))
+        return active >= 0 ? active : null
       }
 
       case "rating": {
