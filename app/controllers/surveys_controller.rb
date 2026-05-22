@@ -33,9 +33,9 @@ class SurveysController < ApplicationController
     # Languages this Verto is built in. The primary (default_locale) is the
     # generation source and the canonical language answers align against; the
     # rest are translated from it.
-    locales        = SupportedLocales.sanitize_list(params[:locales], fallback: [Current.locale.to_s])
+    locales        = SupportedLocales.sanitize_list(params[:locales], fallback: [ Current.locale.to_s ])
     default_locale = SupportedLocales.coerce(params[:default_locale].presence || locales.first)
-    locales        = ([default_locale] + locales).uniq
+    locales        = ([ default_locale ] + locales).uniq
 
     if theme.empty? || audience_age.empty? || key_insight.empty?
       flash.now[:alert] = "Tell us what your Verto's about, who's answering, and what you want to learn — those three are required."
@@ -198,8 +198,8 @@ class SurveysController < ApplicationController
     return card unless survey.secondary_locales.any?
 
     survey.secondary_locales.each do |loc|
-      translated = SurveyTranslator.new.call(cards: [card], target_locale: loc, source_locale: survey.default_locale)
-      card = Survey.merge_card_translations([card], loc, translated).first
+      translated = SurveyTranslator.new.call(cards: [ card ], target_locale: loc, source_locale: survey.default_locale)
+      card = Survey.merge_card_translations([ card ], loc, translated).first
     rescue => e
       Rails.logger.error("[SurveyTranslator card] #{loc}: #{e.class}: #{e.message}")
     end

@@ -3,7 +3,7 @@ class PlayerController < ApplicationController
   layout "fullscreen"
   skip_before_action :require_authentication
   skip_before_action :set_current_organisation
-  protect_from_forgery with: :null_session, only: [:submit, :progress]
+  protect_from_forgery with: :null_session, only: [ :submit, :progress ]
 
   before_action :load_survey_and_share
 
@@ -81,7 +81,7 @@ class PlayerController < ApplicationController
   # respondent's UI locale if the Verto has it, else the Verto's primary.
   def resolve_play_locale
     available = @survey.verto_locales
-    [params[:lang], Current.locale, @survey.default_locale]
+    [ params[:lang], Current.locale, @survey.default_locale ]
       .compact.map(&:to_s)
       .find { |l| available.include?(l) } || @survey.default_locale
   end

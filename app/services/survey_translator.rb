@@ -81,9 +81,9 @@ class SurveyTranslator
       model: MODEL,
       max_tokens: MAX_TOKENS,
       system: SYSTEM,
-      tools: [TOOL],
+      tools: [ TOOL ],
       tool_choice: { type: "tool", name: "emit_translation" },
-      messages: [{ role: "user", content: user_message(source, source_locale, target) }]
+      messages: [ { role: "user", content: user_message(source, source_locale, target) } ]
     )
 
     block = Array(response.content).find { |b| tool_use?(b) }

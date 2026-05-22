@@ -5,7 +5,7 @@ namespace :i18n do
        "Usage: bin/rails i18n:translate          (all missing locales) " \
        "       bin/rails i18n:translate[es,fr]   (only these) " \
        "       FORCE=1 bin/rails i18n:translate   (overwrite existing files)"
-  task :translate, [:only] => :environment do |_t, args|
+  task :translate, [ :only ] => :environment do |_t, args|
     require "anthropic"
 
     source_path = Rails.root.join("config/locales/en.yml")
@@ -14,7 +14,7 @@ namespace :i18n do
     only = (args[:only] || ENV["ONLY"]).to_s.split(/[,\s]+/).reject(&:blank?)
     force = ENV["FORCE"].present?
 
-    targets = SupportedLocales.codes - ["en"]
+    targets = SupportedLocales.codes - [ "en" ]
     targets &= only if only.any?
 
     client = Anthropic::Client.new(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
@@ -44,12 +44,12 @@ namespace :i18n do
             (e.g. "Verto", "Playverto") untranslated.
           - Keep it natural and concise for UI use.
         SYS
-        messages: [{
+        messages: [ {
           role: "user",
           content: "Target language: #{loc&.english_name} (#{loc&.native_name}).\n" \
                    "Translate these strings and return a JSON object of key => translation:\n\n" \
                    "#{JSON.pretty_generate(flat)}"
-        }]
+        } ]
       )
 
       text = Array(response.content).map { |b| b.respond_to?(:text) ? b.text : b["text"] }.join
@@ -66,7 +66,7 @@ end
 # Flatten a nested hash to { "a.b.c" => "value" } (string leaves only).
 def flatten_strings(hash, prefix = nil)
   hash.each_with_object({}) do |(k, v), acc|
-    key = [prefix, k].compact.join(".")
+    key = [ prefix, k ].compact.join(".")
     if v.is_a?(Hash)
       acc.merge!(flatten_strings(v, key))
     else

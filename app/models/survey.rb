@@ -14,12 +14,12 @@ class Survey < ApplicationRecord
   # Languages this Verto exists in, primary (default_locale) first. Legacy
   # Vertos with no `locales` set fall back to just their primary language.
   def verto_locales
-    ([default_locale] + SupportedLocales.sanitize_list(read_attribute(:locales), fallback: [])).uniq
+    ([ default_locale ] + SupportedLocales.sanitize_list(read_attribute(:locales), fallback: [])).uniq
   end
 
   # Translation languages — everything except the primary.
   def secondary_locales
-    verto_locales - [default_locale]
+    verto_locales - [ default_locale ]
   end
 
   def multilingual?

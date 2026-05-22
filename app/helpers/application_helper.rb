@@ -95,7 +95,7 @@ module ApplicationHelper
 
     html = case type
     when "range"
-      dots = (0..4).map { |i| "<div class=\"mini-s-dot#{i.between?(1,2) ? ' active' : ''}\"></div>" }.join
+      dots = (0..4).map { |i| "<div class=\"mini-s-dot#{i.between?(1, 2) ? ' active' : ''}\"></div>" }.join
       "<div class=\"mini-tooltip\">Neutral</div>" \
       "<div class=\"mini-slider-track\">#{dots}" \
       "<div class=\"mini-s-thumb\"><div class=\"mini-s-line\"></div><div class=\"mini-s-line\"></div><div class=\"mini-s-line\"></div></div>" \
@@ -106,7 +106,7 @@ module ApplicationHelper
       "<div class=\"mini-rating-stars\">#{stars}</div>"
 
     when "multiple_choice", "select_many", "yes_no"
-      items = type == "yes_no" ? %w[Yes No] : (opts.empty? ? ["Option A", "Option B", "Option C"] : opts.first(3))
+      items = type == "yes_no" ? %w[Yes No] : (opts.empty? ? [ "Option A", "Option B", "Option C" ] : opts.first(3))
       rows  = items.map.with_index { |o, i|
         sel = i == 0 ? " selected" : ""
         "<div class=\"mini-pick-item#{sel}\"><span class=\"mini-p-dot#{sel}\"></span>#{h(o.truncate(18))}</div>"

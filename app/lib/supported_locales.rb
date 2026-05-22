@@ -45,7 +45,7 @@ module SupportedLocales
     def rtl?(code)        = find(code)&.rtl? || false
 
     # Keep only supported codes, de-duplicated, preserving caller order.
-    def sanitize_list(codes_in, fallback: [DEFAULT])
+    def sanitize_list(codes_in, fallback: [ DEFAULT ])
       list = Array(codes_in).map(&:to_s).select { |c| supported?(c) }.uniq
       list.presence || fallback
     end

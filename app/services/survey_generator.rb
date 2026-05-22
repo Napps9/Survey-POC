@@ -199,7 +199,7 @@ class SurveyGenerator
   end
 
   def call(theme:, audience_age:, key_insight:, notes: nil, locale: SupportedLocales::DEFAULT)
-    brief = [theme, audience_age, key_insight, notes].compact.join(" ")
+    brief = [ theme, audience_age, key_insight, notes ].compact.join(" ")
     examples = QuestionCorpus.search(brief, limit: 8, min_overlap: 2)
     Rails.logger.info("[corpus] matched #{examples.size} of #{QuestionCorpus.all.size}: " +
                       examples.first(5).map { |e| e[:question].truncate(60) }.join(" | "))
@@ -249,9 +249,9 @@ class SurveyGenerator
       model: MODEL,
       max_tokens: MAX_TOKENS,
       system: SYSTEM,
-      tools: [tool],
+      tools: [ tool ],
       tool_choice: { type: "tool", name: "emit_survey" },
-      messages: [{ role: "user", content: user_message }]
+      messages: [ { role: "user", content: user_message } ]
     )
 
     block = Array(response.content).find { |b| tool_use?(b) }
