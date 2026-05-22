@@ -60,27 +60,9 @@
         </div>
       <% end %>
 
-      <%# Language tabs — switch which language the cards are shown/edited in.
-          Structural edits (type, add/remove option, delete) are locked to the
-          primary tab so every language stays aligned. %>
-      <% if @survey.multilingual? %>
-        <div class="lang-tabs">
-          <% @survey.verto_locales.each do |code| %>
-            <% loc = SupportedLocales.find(code) %>
-            <button type="button"
-                    class="lang-tab<%= ' is-active' if code == @survey.default_locale %>"
-                    data-survey-editor-target="tab"
-                    data-locale="<%= code %>"
-                    data-action="click->survey-editor#switchLocale">
-              <span class="lang-tab-flag"><%= loc&.flag %></span>
-              <span><%= loc&.native_name %></span>
-              <% if code == @survey.default_locale %><span class="lang-tab-primary">primary</span><% end %>
-            </button>
-          <% end %>
-        </div>
-      <% end %>
-
-      <%# Brief strip %>
+      <%# Brief strip — also hosts the compact language switcher (right side) so
+          the cards keep full height. Switching swaps the cards' language in
+          place; structural edits stay locked to the primary language. %>
       <div class="brief-strip">
         <span style="color:rgba(255,255,255,0.85);font-weight:600;"><%= @survey.theme %></span>
         <span style="color:rgba(255,255,255,0.3);">·</span>
@@ -89,7 +71,37 @@
         <span style="color:rgba(255,255,255,0.55);font-size: var(--text-base);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:340px;">
           <%= @survey.key_insight %>
         </span>
-        <div class="brief-q-count"><%= total_q %> questions</div>
+        <div class="brief-q-count"><%= total_q %> <%= t("editor.questions") %></div>
+
+        <% if @survey.multilingual? %>
+          <% cur = SupportedLocales.find(@survey.default_locale) %>
+          <div class="lang-dd" data-controller="locale-switcher">
+            <button type="button" class="lang-dd-btn"
+                    data-action="click->locale-switcher#toggle" aria-haspopup="true"
+                    aria-label="<%= t("locale_switcher.label") %>">
+              <span class="lang-dd-flag" data-survey-editor-target="localeFlag"><%= cur&.flag %></span>
+              <span data-survey-editor-target="localeCode"><%= @survey.default_locale.upcase %></span>
+              <svg class="lang-switcher-caret" width="10" height="6" viewBox="0 0 10 6" fill="none">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="lang-dd-popover" data-locale-switcher-target="popover" hidden>
+              <% @survey.verto_locales.each do |code| %>
+                <% loc = SupportedLocales.find(code) %>
+                <button type="button"
+                        class="lang-dd-item<%= ' is-active' if code == @survey.default_locale %>"
+                        data-survey-editor-target="tab"
+                        data-locale="<%= code %>" data-flag="<%= loc&.flag %>" data-code="<%= code.upcase %>"
+                        data-action="click->survey-editor#switchLocale click->locale-switcher#close">
+                  <span class="lang-dd-item-flag"><%= loc&.flag %></span>
+                  <span class="lang-dd-item-name"><%= loc&.native_name %></span>
+                  <% if code == @survey.default_locale %><span class="lang-tab-primary"><%= t("editor.primary") %></span><% end %>
+                  <span class="lang-dd-item-tick">✓</span>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
       </div>
 
       <%# Cards feed — stacked, full-width split-cards. The Verto's brand
@@ -107,7 +119,8 @@
             is_q   = type != "welcome_card"
             q_idx += 1 if is_q
           %>
-          <%= render "surveys/card_row", card: card, idx: idx, q_idx: q_idx, total_q: total_q %>
+          <%= render "surveys/card_row", card: card, idx: idx, q_idx: q_idx, total_q: total_q,
+                default_locale: @survey.default_locale %>
         <% end %>
 
         <%# "Add question" button — sits at bottom of the cards feed %>
@@ -517,7 +530,8 @@
         <div class="preview-card" data-preview-verto-target="card">
           <%= render "surveys/preview_card",
                 card: pcard,
-                progress: pprogress %>
+                progress: pprogress,
+                default_locale: @survey.default_locale %>
         </div>
       <% end %>
 

@@ -24,6 +24,9 @@ en:
     create: "Create"
     members: "Members"
     sign_out: "Sign out"
+  editor:
+    questions: "questions"
+    primary: "primary"
   dashboard:
     welcome_back: "Welcome back"
     heading_html: 'Your <span style="color:#01EACB;">Vertos</span>'

@@ -1,7 +1,8 @@
 <%# Preview-mode card. Reuses the same renderers as the editor / player,
     just with mode: :preview so the chrome (contenteditable, delete /
     add-option buttons, "Add media" FAB) is omitted. %>
+<% default_locale ||= SupportedLocales::DEFAULT %>
 <div class="split-card">
   <%= render "shared/split_left",     card: card, progress: progress, mode: :preview %>
-  <%= render "shared/card_component", card: card, mode: :preview %>
+  <%= render "shared/card_component", card: card, mode: :preview, default_locale: default_locale %>
 </div>

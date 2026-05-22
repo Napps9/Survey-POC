@@ -21,6 +21,9 @@ ar:
     create: "إنشاء"
     members: "الأعضاء"
     sign_out: "تسجيل الخروج"
+  editor:
+    questions: "أسئلة"
+    primary: "الأساسية"
   dashboard:
     welcome_back: "مرحبًا بعودتك"
     heading_html: '<span style="color:#01EACB;">فيرتوهاتك</span>'

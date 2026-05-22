@@ -1,4 +1,5 @@
 <%
+  default_locale ||= SupportedLocales::DEFAULT
   type     = card["type"].to_s
   meta     = card_type_meta(type)
   is_q     = type != "welcome_card"
@@ -31,6 +32,6 @@
   <%# Horizontal split-card %>
   <div class="split-card">
     <%= render "shared/split_left",     card: card, progress: progress, mode: :editor %>
-    <%= render "shared/card_component", card: card, mode: :editor %>
+    <%= render "shared/card_component", card: card, mode: :editor, default_locale: default_locale %>
   </div><%# /split-card %>
 </div><%# /survey-card-wrap %>

@@ -253,7 +253,7 @@ class SurveysController < ApplicationController
     q_idx    = card["type"] != "welcome_card" ? total_q : 0
     render_to_string(
       partial: "surveys/card_row",
-      locals:  { card: card, idx: idx, q_idx: q_idx, total_q: total_q }
+      locals:  { card: card, idx: idx, q_idx: q_idx, total_q: total_q, default_locale: survey.default_locale }
     )
   end
 

@@ -33,7 +33,10 @@
   default_locale ||= SupportedLocales::DEFAULT
   display          = localized_card(card, locale, default_locale)
   canon            = Array(card["options"])
-  display_locale   = (locale.presence || I18n.locale).to_s
+  # Card CONTENT follows the card's own language (the passed locale, else the
+  # Verto's primary) — never the platform/UI locale, so a card never mixes
+  # languages (e.g. an English question with Spanish Yes/No).
+  display_locale   = (locale.presence || default_locale).to_s
 %>
 
 <div class="split-right">

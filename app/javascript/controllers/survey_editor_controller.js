@@ -21,7 +21,7 @@ const QUESTIONS_MIN = 10
 const QUESTIONS_MAX = 15
 
 export default class extends Controller {
-  static targets = ["card", "summary", "saveButton", "status", "tab", "feed"]
+  static targets = ["card", "summary", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode"]
   static values  = {
     url: String, title: String, description: String,
     defaultLocale: { type: String, default: "en" },
@@ -52,6 +52,10 @@ export default class extends Controller {
     if (this.hasTabTarget) {
       this.tabTargets.forEach(t => t.classList.toggle("is-active", t.dataset.locale === locale))
     }
+    // Reflect the choice in the compact dropdown button.
+    const btn = event.currentTarget
+    if (this.hasLocaleFlagTarget && btn.dataset.flag) this.localeFlagTarget.textContent = btn.dataset.flag
+    if (this.hasLocaleCodeTarget && btn.dataset.code) this.localeCodeTarget.textContent = btn.dataset.code
     this.element.classList.toggle("editing-translation", locale !== this.defaultLocaleValue)
     if (this.hasFeedTarget) {
       this.feedTarget.setAttribute("dir", this.rtlLocalesValue.includes(locale) ? "rtl" : "ltr")
