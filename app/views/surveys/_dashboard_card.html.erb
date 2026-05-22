@@ -13,7 +13,7 @@
     top_bar       = "rgba(255,255,255,0.08)"
     badge_bg      = "rgba(255,255,255,0.08)"
     badge_color   = "rgba(255,255,255,0.5)"
-    badge_text    = "Archived"
+    badge_text    = t("dashboard_card.badge_archived")
   elsif published
     accent_bg     = "rgba(255,255,255,0.03)"
     border        = "rgba(255,30,111,0.22)"
@@ -21,7 +21,7 @@
     top_bar       = "linear-gradient(90deg,#FF1E6F,#01EACB)"
     badge_bg      = "#FF1E6F"
     badge_color   = "#fff"
-    badge_text    = "Live"
+    badge_text    = t("dashboard_card.badge_live")
   else
     accent_bg     = "rgba(255,255,255,0.03)"
     border        = "rgba(255,255,255,0.07)"
@@ -29,13 +29,12 @@
     top_bar       = "linear-gradient(90deg,#0CA7FF,#615BF5)"
     badge_bg      = "rgba(12,167,255,0.18)"
     badge_color   = "#0CA7FF"
-    badge_text    = "Draft"
+    badge_text    = t("dashboard_card.badge_draft")
   end
 
-  edit_warning = published ?
-    "“#{survey.theme.presence || survey.title.presence || 'This Verto'}” is live. Editing questions while it's collecting responses will affect data quality — answers from before and after the edit won't be directly comparable. Continue?" : nil
-
-  delete_warning = "Delete “#{survey.theme.presence || survey.title.presence || 'this Verto'}”? You can't get a Verto back from being deleted. Responders' link will stop working — existing results stay in your Archived list."
+  verto_name   = survey.theme.presence || survey.title.presence || t("dashboard_card.fallback_name")
+  edit_warning = published ? t("dashboard_card.edit_warning", title: verto_name) : nil
+  delete_warning = t("dashboard_card.delete_warning", title: verto_name)
 %>
 
 <div style="border-radius:18px;background:<%= accent_bg %>;border:1px solid <%= border %>;display:flex;flex-direction:column;overflow:hidden;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;<%= 'opacity:0.78;' if archived %>"
@@ -50,7 +49,7 @@
     </span>
     <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);">
       <% if archived && survey.deleted_at %>
-        Deleted <%= survey.deleted_at.strftime("%-d %b %Y") %>
+        <%= t("dashboard_card.deleted_on", date: survey.deleted_at.strftime("%-d %b %Y")) %>
       <% else %>
         <%= survey.updated_at.strftime("%-d %b %Y") %>
       <% end %>
@@ -59,7 +58,7 @@
 
   <div style="padding:12px 16px 14px;flex:1;">
     <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;line-height:1.25;margin-bottom:4px;">
-      <%= survey.theme.presence&.truncate(48) || survey.title.presence&.truncate(48) || "Untitled" %>
+      <%= survey.theme.presence&.truncate(48) || survey.title.presence&.truncate(48) || t("dashboard_card.untitled") %>
     </div>
     <% if survey.title.present? && survey.title != survey.theme %>
       <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);line-height:1.4;">
@@ -72,50 +71,50 @@
     <div style="display:flex;align-items:center;border-top:1px solid rgba(255,255,255,0.05);margin:0 16px;padding:10px 0;">
       <div style="flex:1;display:flex;align-items:baseline;gap:5px;">
         <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:<%= responders > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;line-height:1;"><%= responders %></span>
-        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">responder<%= responders == 1 ? "" : "s" %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);"><%= t("dashboard_card.responders", count: responders) %></span>
       </div>
       <div style="display:flex;align-items:baseline;gap:5px;">
         <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:<%= completion.nil? ? 'rgba(255,255,255,0.2)' : '#01EACB' %>;line-height:1;"><%= completion.nil? ? "—" : "#{completion}%" %></span>
-        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">completion</span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);"><%= t("dashboard_card.completion") %></span>
       </div>
       <div style="display:flex;align-items:baseline;gap:5px;margin-left:14px;">
         <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:rgba(255,255,255,0.4);line-height:1;"><%= q_count %></span>
-        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);">question<%= q_count == 1 ? "" : "s" %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);"><%= t("dashboard_card.questions", count: q_count) %></span>
       </div>
     </div>
   <% else %>
     <div style="display:flex;align-items:center;gap:0;border-top:1px solid rgba(255,255,255,0.05);margin:0 16px;padding:10px 0;">
       <div style="flex:1;display:flex;align-items:baseline;gap:5px;">
         <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:<%= resp_count > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;line-height:1;"><%= resp_count %></span>
-        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">response<%= resp_count == 1 ? "" : "s" %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);"><%= t("dashboard_card.responses", count: resp_count) %></span>
       </div>
       <div style="display:flex;align-items:baseline;gap:5px;">
         <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:rgba(255,255,255,0.4);line-height:1;"><%= q_count %></span>
-        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);">question<%= q_count == 1 ? "" : "s" %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);"><%= t("dashboard_card.questions", count: q_count) %></span>
       </div>
     </div>
   <% end %>
 
   <% if archived %>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 14px;">
-      <%= link_to "View results →", survey_results_path(survey),
+      <%= link_to t("dashboard_card.view_results"), survey_results_path(survey),
             style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
     </div>
   <% else %>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 12px;">
-      <%= link_to "Edit Verto", survey_path(survey),
+      <%= link_to t("dashboard_card.edit"), survey_path(survey),
             data: { turbo_confirm: edit_warning },
             style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
             onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
             onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
 
       <% if published %>
-        <%= link_to "Results →", survey_results_path(survey),
+        <%= link_to t("dashboard_card.results"), survey_results_path(survey),
               style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,30,111,0.14);border:1px solid rgba(255,30,111,0.32);color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
               onmouseover: "this.style.background='rgba(255,30,111,0.22)'",
               onmouseout:  "this.style.background='rgba(255,30,111,0.14)'" %>
       <% else %>
-        <%= button_to "Publish →", publish_survey_path(survey),
+        <%= button_to t("dashboard_card.publish"), publish_survey_path(survey),
               method: :post,
               style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(1,234,203,0.14);border:1px solid rgba(1,234,203,0.32);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;transition:all 0.15s;",
               form: { style: "flex:1;display:flex;" },
@@ -126,7 +125,7 @@
 
     <% if current_membership&.admin? %>
       <div style="padding:0 16px 12px;display:flex;justify-content:flex-end;">
-        <%= button_to "Delete", survey_path(survey), method: :delete,
+        <%= button_to t("dashboard_card.delete"), survey_path(survey), method: :delete,
               data: { turbo_confirm: delete_warning },
               form: { style: "margin:0;" },
               style: "background:none;border:none;padding:4px 8px;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;text-decoration:underline;text-underline-offset:3px;" %>

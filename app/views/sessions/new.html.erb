@@ -1,11 +1,11 @@
-<% content_for :title, "Sign In — Playverto" %>
+<% content_for :title, t("auth.title_sign_in") %>
 
 <div style="min-height:100vh;background:#272D4A;display:flex;align-items:center;justify-content:center;padding:24px;">
   <div style="width:100%;max-width:400px;">
     <div style="text-align:center;margin-bottom:40px;">
       <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
-      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;">Sign in to Playverto</h1>
-      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);margin:0;">New here? <%= link_to "Create an account", new_registration_path, style: "color:#01EACB;text-decoration:none;" %></p>
+      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;"><%= t("auth.sign_in_title") %></h1>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);margin:0;"><%= t("auth.sign_in_new_here") %> <%= link_to t("auth.sign_in_create"), new_registration_path, style: "color:#01EACB;text-decoration:none;" %></p>
     </div>
 
     <% if alert = flash[:alert] %>
@@ -22,7 +22,7 @@
 
     <%= form_with url: session_url do |form| %>
       <div style="margin-bottom:20px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email address</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("auth.email") %></label>
         <%= form.email_field :email_address,
               required: true, autofocus: true, autocomplete: "username",
               placeholder: "you@example.com", value: params[:email_address],
@@ -31,8 +31,8 @@
 
       <div style="margin-bottom:12px;">
         <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;">
-          <label style="font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);text-transform:uppercase;">Password</label>
-          <%= link_to "Forgot password?", new_password_path, class: "auth-link", style: "font-size: var(--text-base);" %>
+          <label style="font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);text-transform:uppercase;"><%= t("auth.password") %></label>
+          <%= link_to t("auth.forgot_password"), new_password_path, class: "auth-link", style: "font-size: var(--text-base);" %>
         </div>
         <div class="password-field" data-controller="password-visibility">
           <%= form.password_field :password,
@@ -42,13 +42,13 @@
                 data: { password_visibility_target: "input" } %>
           <button type="button" class="password-field__toggle"
                   data-action="password-visibility#toggle"
-                  data-password-visibility-target="button">Show</button>
+                  data-password-visibility-target="button"><%= t("auth.show") %></button>
         </div>
       </div>
 
       <div style="margin-bottom:32px;"></div>
 
-      <%= form.submit "Sign in →",
+      <%= form.submit t("auth.sign_in_submit"),
             style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
     <% end %>
   </div>

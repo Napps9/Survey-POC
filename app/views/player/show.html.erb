@@ -42,21 +42,21 @@
     <div class="preview-thankyou" data-player-target="thankyou">
       <div data-player-target="thankyouMain" class="preview-thankyou-card">
         <div class="preview-thankyou-emoji">🎉</div>
-        <div class="preview-thankyou-title">Thank you!</div>
-        <div class="preview-thankyou-sub">Your responses have been recorded.</div>
+        <div class="preview-thankyou-title"><%= t("player.thank_you_title") %></div>
+        <div class="preview-thankyou-sub"><%= t("player.thank_you_sub") %></div>
 
         <% if @survey.show_results_comparison? %>
           <button type="button"
                   data-player-target="compareBtn"
                   data-action="click->player#showComparison"
                   style="margin-top:22px;padding:11px 22px;border-radius:100px;background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
-            See your results compared to others →
+            <%= t("player.compare_cta") %>
           </button>
         <% end %>
 
         <%# "Powered by" appears once, followed by the Playverto wordmark image. %>
         <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;opacity:0.55;">
-          <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#fff;">Powered by</span>
+          <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#fff;"><%= t("player.powered_by") %></span>
           <%= image_tag "playverto.svg", alt: "", style: "height:14px;width:auto;" %>
         </div>
       </div>
@@ -65,7 +65,7 @@
         <div data-player-target="comparison" class="hidden"
              style="width:100%;max-width:640px;margin:0 auto;padding:24px 22px 28px;overflow-y:auto;max-height:calc(100vh - 120px);background:#1C2034;border:1px solid rgba(255,255,255,0.08);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);">
           <div style="text-align:center;margin-bottom:18px;">
-            <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;">Your answers vs everyone</div>
+            <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.comparison_title") %></div>
             <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"
                  data-player-target="comparisonMeta"></div>
           </div>
@@ -74,7 +74,7 @@
             <button type="button"
                     data-action="click->player#hideComparison"
                     style="padding:9px 18px;border-radius:100px;background:transparent;color:#fff;font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
-              ← Back
+              <%= t("player.back") %>
             </button>
           </div>
         </div>
@@ -86,13 +86,13 @@
     <button class="preview-btn preview-btn-back invisible"
             data-player-target="backBtn"
             data-action="click->player#back"
-            aria-label="Back">← Back</button>
+            aria-label="Back"><%= t("player.back") %></button>
     <span class="preview-progress-text" data-player-target="progress"></span>
     <button class="preview-btn preview-btn-next"
             data-player-target="nextBtn"
-            data-action="click->player#next">Next →</button>
+            data-action="click->player#next"><%= t("player.next") %></button>
     <button class="preview-btn preview-btn-finish hidden"
             data-player-target="finishBtn"
-            data-action="click->player#finish">Submit ✓</button>
+            data-action="click->player#finish"><%= t("player.submit") %></button>
   </div>
 </div>
