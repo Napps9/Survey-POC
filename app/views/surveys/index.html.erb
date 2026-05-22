@@ -25,24 +25,24 @@
       <div style="position:relative;z-index:1;max-width:1100px;margin:0 auto;text-align:center;">
         <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;">
           <span style="width:8px;height:8px;border-radius:50%;background:#01EACB;box-shadow:0 0 12px rgba(1,234,203,0.7);"></span>
-          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;">Welcome back</span>
+          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("dashboard.welcome_back") %></span>
         </div>
-        <h1 style="font-family:'Alata',sans-serif;font-size:clamp(40px,5vw,56px);line-height:1.05;margin:0 0 14px;letter-spacing:-0.01em;">
-          <span style="color:#fff;">Your </span><span style="color:#01EACB;">Vertos</span>
+        <h1 style="font-family:'Alata',sans-serif;font-size:clamp(40px,5vw,56px);line-height:1.05;margin:0 0 14px;letter-spacing:-0.01em;color:#fff;">
+          <%= t("dashboard.heading_html") %>
         </h1>
         <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.5);margin:0 auto 34px;max-width:540px;line-height:1.55;">
-          Spin up Vertos, share them with your alliance, and watch the insights roll in.
+          <%= t("dashboard.subtitle") %>
         </p>
 
         <%# Stats — centred in page %>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;max-width:880px;margin:0 auto;">
           <%
             stats = [
-              { value: @surveys.size.to_s,         label: "Verto#{"s" if @surveys.size != 1}",            accent: "#01EACB", grad: "linear-gradient(135deg,rgba(1,234,203,0.18),rgba(1,234,203,0.04))" },
-              { value: published.size.to_s,        label: "Live",                                          accent: "#FF1E6F", grad: "linear-gradient(135deg,rgba(255,30,111,0.18),rgba(255,30,111,0.04))" },
-              { value: drafts.size.to_s,           label: "Draft#{"s" if drafts.size != 1}",               accent: "#0CA7FF", grad: "linear-gradient(135deg,rgba(12,167,255,0.18),rgba(12,167,255,0.04))" },
-              { value: @total_responses.to_s,      label: "Response#{"s" if @total_responses != 1}",       accent: "#615BF5", grad: "linear-gradient(135deg,rgba(97,91,245,0.18),rgba(97,91,245,0.04))" },
-              { value: completion_rate ? "#{completion_rate}%" : "—", label: "Completion",                  accent: "#FFFA77", grad: "linear-gradient(135deg,rgba(255,250,119,0.18),rgba(255,250,119,0.04))" },
+              { value: @surveys.size.to_s,         label: "Vertos",                       accent: "#01EACB", grad: "linear-gradient(135deg,rgba(1,234,203,0.18),rgba(1,234,203,0.04))" },
+              { value: published.size.to_s,        label: t("dashboard.stat_live"),        accent: "#FF1E6F", grad: "linear-gradient(135deg,rgba(255,30,111,0.18),rgba(255,30,111,0.04))" },
+              { value: drafts.size.to_s,           label: t("dashboard.stat_drafts"),      accent: "#0CA7FF", grad: "linear-gradient(135deg,rgba(12,167,255,0.18),rgba(12,167,255,0.04))" },
+              { value: @total_responses.to_s,      label: t("dashboard.stat_responses"),   accent: "#615BF5", grad: "linear-gradient(135deg,rgba(97,91,245,0.18),rgba(97,91,245,0.04))" },
+              { value: completion_rate ? "#{completion_rate}%" : "—", label: t("dashboard.stat_completion"), accent: "#FFFA77", grad: "linear-gradient(135deg,rgba(255,250,119,0.18),rgba(255,250,119,0.04))" },
             ]
           %>
           <% stats.each do |s| %>
@@ -57,7 +57,7 @@
           <div style="margin-top:28px;">
             <%= link_to new_survey_path,
                   style: "display:inline-flex;align-items:center;gap:8px;background:#01EACB;border-radius:100px;padding:12px 24px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;text-decoration:none;box-shadow:0 10px 28px rgba(1,234,203,0.25);" do %>
-              <span style="font-size:18px;line-height:1;">+</span> Create a new Verto
+              <span style="font-size:18px;line-height:1;">+</span> <%= t("dashboard.create_new") %>
             <% end %>
           </div>
         <% end %>
@@ -74,12 +74,12 @@
       <% if @surveys.empty? && archived.empty? %>
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 32px;text-align:center;gap:20px;">
           <div>
-            <div style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#fff;margin-bottom:8px;">No Vertos yet</div>
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#fff;margin-bottom:8px;"><%= t("dashboard.empty_title") %></div>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:320px;line-height:1.6;">
-              Create your first Verto and start collecting insights from your audience.
+              <%= t("dashboard.empty_body") %>
             </div>
           </div>
-          <%= link_to "Create your first Verto →", new_survey_path,
+          <%= link_to t("dashboard.empty_cta"), new_survey_path,
                 style: "padding:12px 26px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
         </div>
 
@@ -90,7 +90,7 @@
           <div style="margin-bottom:32px;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
               <span style="width:6px;height:6px;border-radius:50%;background:#FF1E6F;box-shadow:0 0 10px rgba(255,30,111,0.7);"></span>
-              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);letter-spacing:0.12em;text-transform:uppercase;">Live</span>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);letter-spacing:0.12em;text-transform:uppercase;"><%= t("dashboard.section_live") %></span>
               <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);"><%= published.size %></span>
             </div>
@@ -107,7 +107,7 @@
           <div style="margin-bottom:32px;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
               <span style="width:6px;height:6px;border-radius:50%;background:#0CA7FF;box-shadow:0 0 10px rgba(12,167,255,0.6);"></span>
-              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);letter-spacing:0.12em;text-transform:uppercase;">Drafts</span>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);letter-spacing:0.12em;text-transform:uppercase;"><%= t("dashboard.section_drafts") %></span>
               <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);"><%= drafts.size %></span>
             </div>
@@ -124,7 +124,7 @@
           <div>
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
               <span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.3);"></span>
-              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);letter-spacing:0.12em;text-transform:uppercase;">Archived</span>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);letter-spacing:0.12em;text-transform:uppercase;"><%= t("dashboard.section_archived") %></span>
               <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);"><%= archived.size %></span>
             </div>

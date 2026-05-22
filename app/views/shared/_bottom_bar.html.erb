@@ -25,24 +25,24 @@
     <% if show_partners %>
       <a href="<%= alliances_path %>" class="bottom-bar-chip" data-active="<%= active_partners %>">
         <span class="bottom-bar-chip-dot" style="background:#FF1E6F;"></span>
-        Partners
+        <%= t("nav.partners") %>
       </a>
     <% elsif show_shared %>
       <a href="<%= alliance_vertos_path %>" class="bottom-bar-chip" data-active="<%= active_shared %>">
         <span class="bottom-bar-chip-dot" style="background:#FF1E6F;"></span>
-        Shared Vertos
+        <%= t("nav.shared_vertos") %>
       </a>
     <% end %>
 
     <a href="<%= root_path %>" class="bottom-bar-chip" data-active="<%= active_results %>">
       <span class="bottom-bar-chip-dot" style="background:#01EACB;"></span>
-      My Vertos
+      <%= t("nav.my_vertos") %>
     </a>
 
     <% if show_create %>
       <a href="<%= new_survey_path %>" class="bottom-bar-chip" data-active="<%= active_create %>">
         <span class="bottom-bar-chip-dot" style="background:#0CA7FF;"></span>
-        Create
+        <%= t("nav.create") %>
       </a>
     <% end %>
   </div>
@@ -75,11 +75,11 @@
 
           <% if mem&.admin? %>
             <div style="height:1px;background:rgba(255,255,255,0.06);margin:6px 4px;"></div>
-            <%= link_to "Members", organisation_memberships_path(org), class: "bottom-bar-user-item" %>
+            <%= link_to t("nav.members"), organisation_memberships_path(org), class: "bottom-bar-user-item" %>
           <% end %>
 
           <div style="height:1px;background:rgba(255,255,255,0.06);margin:6px 4px;"></div>
-          <%= button_to "Sign out", session_path, method: :delete,
+          <%= button_to t("nav.sign_out"), session_path, method: :delete,
                 class: "bottom-bar-user-item",
                 form: { style: "margin:0;" } %>
         </div>

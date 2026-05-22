@@ -1,0 +1,7 @@
+<%# Exposes the JS-facing translations (the `js` namespace) to the browser as
+    window.I18N, resolved for the current locale with English fallback so a
+    missing key still renders. Read via lib/i18n.js `t()`. %>
+<% js_strings = I18n.t("js", locale: :en, default: {}).deep_merge(I18n.t("js", default: {}).is_a?(Hash) ? I18n.t("js", default: {}) : {}) %>
+<%= javascript_tag nonce: true do %>
+  window.I18N = <%= js_strings.to_json.html_safe %>;
+<% end %>

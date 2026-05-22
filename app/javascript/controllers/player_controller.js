@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { t } from "lib/i18n"
 
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
@@ -173,7 +174,7 @@ export default class extends Controller {
     if (queued && this.hasThankyouMainTarget && !this.thankyouMainTarget.querySelector(".preview-queued-pill")) {
       const pill = document.createElement("div")
       pill.className = "preview-queued-pill"
-      pill.textContent = "Saved — will sync when you're back online"
+      pill.textContent = t("player.queued")
       this.thankyouMainTarget.appendChild(pill)
     }
   }
@@ -182,7 +183,7 @@ export default class extends Controller {
     if (!this.showComparisonValue || !this.resultsUrlValue) return
     if (this.hasCompareBtnTarget) {
       this.compareBtnTarget.disabled = true
-      this.compareBtnTarget.textContent = "Loading…"
+      this.compareBtnTarget.textContent = t("player.compare_loading")
     }
     try {
       const res  = await fetch(this.resultsUrlValue, { headers: { "Accept": "application/json" } })
@@ -194,7 +195,7 @@ export default class extends Controller {
     } catch (e) {
       if (this.hasCompareBtnTarget) {
         this.compareBtnTarget.disabled = false
-        this.compareBtnTarget.textContent = "Couldn't load — try again"
+        this.compareBtnTarget.textContent = t("player.compare_error")
       }
     }
   }
@@ -204,7 +205,7 @@ export default class extends Controller {
     if (this.hasThankyouMainTarget) this.thankyouMainTarget.classList.remove("hidden")
     if (this.hasCompareBtnTarget) {
       this.compareBtnTarget.disabled = false
-      this.compareBtnTarget.textContent = "See your results compared to others →"
+      this.compareBtnTarget.textContent = t("player.compare_cta")
     }
   }
 
@@ -336,7 +337,7 @@ export default class extends Controller {
     const total = this.cardTargets.length
     const idx   = this.currentValue
     this.cardTargets.forEach((c, i) => c.classList.toggle("active", i === idx))
-    this.progressTarget.textContent = `Card ${idx + 1} of ${total}`
+    this.progressTarget.textContent = t("player.progress", { n: idx + 1, total })
     this.element.style.setProperty("--player-progress", `${Math.round(((idx + 1) / total) * 100)}%`)
     this.backBtnTarget.classList.remove("hidden")
     this.backBtnTarget.classList.toggle("invisible", idx === 0)

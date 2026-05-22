@@ -10,3 +10,32 @@ en:
   card:
     "yes": "Yes"
     "no": "No"
+  js:
+    player:
+      progress: "Card %{n} of %{total}"
+      queued: "Saved — will sync when you're back online"
+      compare_cta: "See your results compared to others →"
+      compare_loading: "Loading…"
+      compare_error: "Couldn't load — try again"
+  nav:
+    partners: "Partners"
+    shared_vertos: "Shared Vertos"
+    my_vertos: "My Vertos"
+    create: "Create"
+    members: "Members"
+    sign_out: "Sign out"
+  dashboard:
+    welcome_back: "Welcome back"
+    heading_html: 'Your <span style="color:#01EACB;">Vertos</span>'
+    subtitle: "Spin up Vertos, share them with your alliance, and watch the insights roll in."
+    create_new: "Create a new Verto"
+    stat_live: "Live"
+    stat_drafts: "Drafts"
+    stat_responses: "Responses"
+    stat_completion: "Completion"
+    empty_title: "No Vertos yet"
+    empty_body: "Create your first Verto and start collecting insights from your audience."
+    empty_cta: "Create your first Verto →"
+    section_live: "Live"
+    section_drafts: "Drafts"
+    section_archived: "Archived"

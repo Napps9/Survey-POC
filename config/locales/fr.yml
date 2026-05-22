@@ -1,0 +1,38 @@
+fr:
+  locale_switcher:
+    label: "Changer de langue"
+    heading: "Langue"
+  layout:
+    studio_tagline: "Verto Studio"
+  card:
+    "yes": "Oui"
+    "no": "Non"
+  js:
+    player:
+      progress: "Carte %{n} sur %{total}"
+      queued: "Enregistré — se synchronisera dès votre retour en ligne"
+      compare_cta: "Voyez vos résultats comparés aux autres →"
+      compare_loading: "Chargement…"
+      compare_error: "Échec du chargement — réessayez"
+  nav:
+    partners: "Partenaires"
+    shared_vertos: "Vertos partagés"
+    my_vertos: "Mes Vertos"
+    create: "Créer"
+    members: "Membres"
+    sign_out: "Se déconnecter"
+  dashboard:
+    welcome_back: "Bon retour"
+    heading_html: 'Vos <span style="color:#01EACB;">Vertos</span>'
+    subtitle: "Lancez des Vertos, partagez-les avec votre alliance et regardez les résultats arriver."
+    create_new: "Créer un nouveau Verto"
+    stat_live: "En ligne"
+    stat_drafts: "Brouillons"
+    stat_responses: "Réponses"
+    stat_completion: "Achèvement"
+    empty_title: "Aucun Verto pour l'instant"
+    empty_body: "Créez votre premier Verto et commencez à recueillir les avis de votre audience."
+    empty_cta: "Créez votre premier Verto →"
+    section_live: "En ligne"
+    section_drafts: "Brouillons"
+    section_archived: "Archivés"

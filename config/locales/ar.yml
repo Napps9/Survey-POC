@@ -1,0 +1,38 @@
+ar:
+  locale_switcher:
+    label: "تغيير اللغة"
+    heading: "اللغة"
+  layout:
+    studio_tagline: "استوديو فيرتو"
+  card:
+    "yes": "نعم"
+    "no": "لا"
+  js:
+    player:
+      progress: "البطاقة %{n} من %{total}"
+      queued: "تم الحفظ — ستتم المزامنة عند عودتك للاتصال"
+      compare_cta: "شاهد نتائجك مقارنة بالآخرين ←"
+      compare_loading: "جارٍ التحميل…"
+      compare_error: "تعذّر التحميل — أعد المحاولة"
+  nav:
+    partners: "الشركاء"
+    shared_vertos: "فيرتوهات مشتركة"
+    my_vertos: "فيرتوهاتي"
+    create: "إنشاء"
+    members: "الأعضاء"
+    sign_out: "تسجيل الخروج"
+  dashboard:
+    welcome_back: "مرحبًا بعودتك"
+    heading_html: '<span style="color:#01EACB;">فيرتوهاتك</span>'
+    subtitle: "أنشئ فيرتوهات، وشاركها مع تحالفك، وشاهد الرؤى تتدفق."
+    create_new: "إنشاء فيرتو جديد"
+    stat_live: "مباشر"
+    stat_drafts: "مسودات"
+    stat_responses: "الردود"
+    stat_completion: "الإكمال"
+    empty_title: "لا توجد فيرتوهات بعد"
+    empty_body: "أنشئ أول فيرتو لك وابدأ في جمع الرؤى من جمهورك."
+    empty_cta: "أنشئ أول فيرتو لك ←"
+    section_live: "مباشر"
+    section_drafts: "مسودات"
+    section_archived: "المؤرشفة"
