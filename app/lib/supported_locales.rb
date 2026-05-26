@@ -13,11 +13,20 @@ module SupportedLocales
   class << self
     # All locales in registry order (includes ones marked enabled: false so
     # existing data referencing them still validates via supported?/coerce).
+    # Memoized but invalidated when the YAML file's mtime changes, so dev
+    # edits to config/supported_locales.yml are picked up without a server
+    # restart (Rails autoload only watches .rb files).
     def all
-      @all ||= load_file.map do |h|
-        attrs = h.symbolize_keys.slice(:code, :english_name, :native_name, :flag, :dir, :enabled)
-        Locale.new(**attrs)
+      current_mtime = yaml_path.mtime
+      if @all.nil? || @all_mtime != current_mtime
+        @all = load_file.map do |h|
+          attrs = h.symbolize_keys.slice(:code, :english_name, :native_name, :flag, :dir, :enabled)
+          Locale.new(**attrs)
+        end
+        @enabled = @codes = @symbols = @index = nil
+        @all_mtime = current_mtime
       end
+      @all
     end
 
     # Locales that should appear in UI pickers (chrome flag switcher, Verto
@@ -68,8 +77,12 @@ module SupportedLocales
       @index ||= all.index_by(&:code)
     end
 
+    def yaml_path
+      Rails.root.join("config/supported_locales.yml")
+    end
+
     def load_file
-      YAML.load_file(Rails.root.join("config/supported_locales.yml")).fetch("locales")
+      YAML.load_file(yaml_path).fetch("locales")
     end
   end
 end
