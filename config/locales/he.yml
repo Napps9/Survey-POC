@@ -1,0 +1,241 @@
+---
+he:
+  locale_switcher:
+    label: שנה שפה
+    heading: שפה
+  layout:
+    studio_tagline: Verto Studio
+  card:
+    'yes': כן
+    'no': לא
+    add_option: הוסף אפשרות
+    add_statement: הוסף משפט
+    swipe_no: "← לא"
+    swipe_hint: גרור את הכרטיס כדי לענות
+    swipe_yes: כן →
+    reset: אפס
+    answer_placeholder: הקלד תשובה…
+    characters: תווים
+    allow_other: אפשר תשובה חופשית מסוג ״אחר״
+    other: אחר
+    other_placeholder: ספר לנו במילים שלך…
+  auth:
+    show: הצג
+    email: כתובת אימייל
+    password: סיסמה
+    password_hint: לפחות 12 תווים
+    title_sign_in: התחברות — Playverto
+    sign_in_title: התחבר ל-Playverto
+    sign_in_new_here: חדש כאן?
+    sign_in_create: צור חשבון
+    forgot_password: שכחת סיסמה?
+    sign_in_submit: התחבר →
+    title_signup: יצירת חשבון — Playverto
+    signup_title: צור את החשבון שלך
+    signup_have_one: כבר יש לך חשבון?
+    signup_sign_in: התחבר
+    name: שמך
+    org_name: שם הארגון
+    confirm_password: אשר סיסמה
+    signup_submit: צור חשבון →
+    title_reset: איפוס סיסמה — Playverto
+    forgot_title: שכחת את הסיסמה?
+    forgot_sub: הזן את האימייל שלך ונשלח לך קישור לאיפוס.
+    forgot_submit: שלח הוראות איפוס במייל
+    back_to_sign_in: "← חזרה להתחברות"
+    title_set: הגדר סיסמה חדשה — Playverto
+    set_title: הגדר סיסמה חדשה
+    set_sub: בחר משהו שרק אתה יכול לנחש.
+    new_password: סיסמה חדשה
+    confirm_new_password: אשר סיסמה חדשה
+    repeat_new_password: חזור על הסיסמה החדשה
+    set_submit: שמור סיסמה חדשה
+  results:
+    title: תוצאות
+    editor: "← עורך"
+    ask_verto: שאל את Verto
+    analysing: מנתח תגובות…
+  player:
+    thank_you_title: תודה רבה!
+    thank_you_sub: תגובותיך נשמרו.
+    compare_cta: ראה את התוצאות שלך לעומת אחרים →
+    powered_by: מופעל על ידי
+    comparison_title: התשובות שלך מול כולם
+    back: "← חזרה"
+    next: הבא →
+    submit: שלח ✓
+  js:
+    player:
+      progress: כרטיס %{n} מתוך %{total}
+      queued: נשמר — יסונכרן כשתחזור לאינטרנט
+      compare_cta: ראה את התוצאות שלך לעומת אחרים →
+      compare_loading: טוען…
+      compare_error: לא ניתן לטעון — נסה שוב
+    editor:
+      delete_card_confirm: למחוק את הכרטיס הזה?
+      unsaved: שינויים שלא נשמרו
+      saving: שומר…
+      saved: נשמר %{time}
+      save_failed: 'השמירה נכשלה: %{msg}'
+      card_n: כרטיס %{n} · %{type}
+      choose_format: בחר פורמט תשובה למטה.
+      type_updated: סוג התשובה עודכן ל-%{type}
+      current: נוכחי
+      off_brief: חורג מהבריף
+      cards_count: "%{n} כרטיסים"
+      fit_best: התאמה מיטבית
+      fit_strong: חלופה חזקה
+      fit_solid: חלופה טובה
+      fit_workable: ישים
+      fit_sparingly: השתמש במשורה
+    wizard:
+      step_counter: שלב %{n} מתוך %{total}
+  nav:
+    partners: שותפים
+    shared_vertos: Vertos משותפים
+    my_vertos: ה-Vertos שלי
+    create: צור
+    members: חברים
+    sign_out: התנתק
+  editor:
+    questions: שאלות
+    primary: ראשי
+    change_media: שנה מדיה
+    change_media_title: שנה את תמונת הכרטיס
+    add_design: הוסף עיצוב
+    add_design_title: הוסף תמונה לכרטיס זה
+    add_design_sub: הוסף תמונה כדי להחיות את הכרטיס
+    live: פעיל
+    live_warning: עריכת שאלות בזמן ש-Verto זה אוסף תגובות תפגע באיכות הנתונים. תשובות לפני העריכה ואחריה לא יהיו ניתנות להשוואה ישירה.
+    got_it: הבנתי
+    add_question: הוסף שאלה
+    cards:
+      one: כרטיס %{count}
+      other: "%{count} כרטיסים"
+    estimated:
+      one: משוער ~%{count} דקה
+      other: משוער ~%{count} דקות
+    design: עיצוב
+    publish_share: פרסם ושתף →
+    answer_type: סוג תשובה
+    select_card: בחר כרטיס כדי לשנות את סוגו
+    click_any: לחץ על כרטיס כלשהו משמאל.
+    select_card_long: בחר כרטיס שאלה כדי לשנות את פורמט התשובה
+    apply_to_card: החל על כרטיס זה
+    see_all_types: ראה את כל סוגי השאלות
+    all_types: כל סוגי השאלות
+    ranked_for: מדורג לפי התאמה עבור
+    this_card: כרטיס זה
+  dashboard_card:
+    badge_archived: בארכיון
+    badge_live: פעיל
+    badge_draft: טיוטה
+    fallback_name: Verto זה
+    deleted_on: נמחק %{date}
+    untitled: ללא כותרת
+    completion: השלמה
+    responders:
+      one: משיב
+      other: משיבים
+    responses:
+      one: תגובה
+      other: תגובות
+    questions:
+      one: שאלה
+      other: שאלות
+    view_results: צפה בתוצאות →
+    edit: ערוך Verto
+    results: תוצאות →
+    publish: פרסם →
+    delete: מחק
+    edit_warning: "״%{title}״ פעיל. עריכת שאלות בזמן איסוף תגובות תפגע באיכות הנתונים — תשובות לפני ואחרי העריכה לא יהיו ניתנות להשוואה ישירה. להמשיך?"
+    delete_warning: למחוק את ״%{title}״? לא ניתן לשחזר Verto לאחר המחיקה. קישור המשיבים יפסיק לעבוד — התוצאות הקיימות יישארו ברשימת הארכיון שלך.
+  dashboard:
+    welcome_back: ברוך שובך
+    heading_html: ה-<span style="color:#01EACB;">Vertos</span> שלך
+    subtitle: הפעל Vertos, שתף אותם עם הברית שלך, וצפה בתובנות מצטברות.
+    create_new: צור Verto חדש
+    stat_live: פעיל
+    stat_drafts: טיוטות
+    stat_responses: תגובות
+    stat_completion: השלמה
+    empty_title: אין Vertos עדיין
+    empty_body: צור את ה-Verto הראשון שלך והתחל לאסוף תובנות מהקהל שלך.
+    empty_cta: צור את ה-Verto הראשון שלך →
+    section_live: פעיל
+    section_drafts: טיוטות
+    section_archived: ארכיון
+  wizard:
+    create_verto: צור Verto
+    building: בונה את ה-Verto שלך
+    pill_audience: קהל
+    pill_tone: טון
+    pill_tone_value: שיחתי
+    pill_cards: כרטיסים
+    gen_brief_read: קריאת בריף
+    gen_writing: כותב שאלות
+    gen_formats: בוחר פורמטים
+    gen_design: מחיל עיצוב
+    welcome_eyebrow: מה צפוי
+    welcome_lead: כמה שלבים קצרים וניצור את ה-Verto שלך.
+    welcome_steps: '["על ה-Verto שלך", "מי עונה", "מה תרצה ללמוד", "שפות", "צבעי מותג", "הקשר (אופציונלי)"]'
+    welcome_badge: Verto חדש
+    welcome_title: בואו נבנה את ה-Verto שלך.
+    welcome_sub: נהפוך את הבריף שלך ל-Verto שפועל לפי חוקי Playverto.
+    welcome_ready_html: לחץ על <strong style="color:rgba(0,0,0,0.6);">הבא</strong> כשאתה מוכן.
+    examples: דוגמאות
+    s1_eyebrow: שלב 01 · על ה-Verto שלך
+    s1_lead: הנושא הכולל והמרכזי.
+    s1_body: שמור על רוחב — תצמצם את הזווית בשלבים הבאים. מילה או שתיים בדרך כלל מספיקות.
+    s1_examples: '["פעולה למען האקלים", "חינוך פליטים", "ביטחון תזונתי"]'
+    s1_title: על מה ה-Verto שלך?
+    s1_placeholder: לדוג׳ רווחת הנוער
+    s1_hint_body: שמור על רוחב — תצמצם את הזווית בשלבים הבאים.
+    s2_eyebrow: שלב 02 · מי עונה
+    s2_lead: היה ספציפי.
+    s2_body: אורח חיים, תפקיד, אזור, שפה — כל מה שמשפיע על אופן החשיבה של הקבוצה. ככל שתהיה ספציפי יותר, כך נוכל לכתוב שאלות טובות יותר.
+    s2_examples: '["סטודנטים בני 18–24 בקניה", "עובדי בריאות קהילתיים בני 35–55", "הורים לילדים בגיל בית ספר באזורים כפריים בNSW"]'
+    s2_title: מי עונה — ומה גילם?
+    s2_placeholder: לדוג׳ סטודנטים בני 18–24 בקניה
+    s2_hint_body: אורח חיים, תפקיד, אזור, שפה — כל מה שמשפיע על אופן החשיבה של הקבוצה.
+    s3_eyebrow: שלב 03 · מטרת הלמידה
+    s3_lead: התובנה שתשנה החלטה.
+    s3_body: דלג על מה שכבר ידוע לך. כוון לדבר אחד שאם תלמד אותו, ישנה את הצעד הבא שלך.
+    s3_examples: '["מדוע מתנדבים עוזבים אחרי חודש שלישי?", "מה מונע מאנשים לגשת לבנק המזון שלנו?", "האם תכנית הנוער שלנו באמת מגבירה ביטחון עצמי — והיכן בדיוק?"]'
+    s3_title: מה תרצה ללמוד מהם?
+    s3_placeholder: לדוג׳ מדוע מתנדבים עוזבים אחרי חודש שלישי?
+    s3_hint_body: דלג על מה שכבר ידוע לך — כוון לדבר אחד שישנה את הצעד הבא שלך.
+    s4_eyebrow: שלב 04 · שפות
+    s4_lead: הגע לכולם בשפה שלהם.
+    s4_body: נכתוב את ה-Verto בשפה הראשית שלך, ואז ניצור גרסה שווה ערך בכל שפה אחרת. כל גרסה שואלת את אותן שאלות, כך שהתוצאות נשארות מיושרות.
+    s4_title: באילו שפות ה-Verto הזה ידבר?
+    s4_primary_label: שפה ראשית
+    s5_eyebrow: שלב 05 · צבעי מותג
+    s5_lead: תן לו להרגיש כמוך.
+    s5_body: כך ה-Verto שלך נראה לכל מי שמשחק בו. תוכל לכוונן בכל עת מהעורך.
+    s5_live_preview: תצוגה מקדימה חיה
+    s5_quick_poll: סקר מהיר
+    s5_mock_q: איך נראה לך?
+    s5_mock_opt: מאוד אוהב
+    s5_title: בחר את צבעי המותג שלך.
+    s5_sub: בחר שלושה. הם יחולו על כל חווית ה-Verto הזה.
+    brand_primary: ראשי
+    brand_primary_desc: כותרות ואקסנטים
+    brand_cta: כפתורים (CTA)
+    brand_cta_desc: כפתורי הבא / שלח
+    brand_bg: רקע
+    brand_bg_desc: הקנבס מאחורי הכרטיסים
+    s6_eyebrow: שלב 06 · הקשר
+    optional: אופציונלי
+    s6_lead: עוד משהו שכדאי לשלב?
+    s6_body: טון, שאלות חובה, דברים להימנע מהם, מאפיינים מיוחדים של הקהל. דלג אם אין תוספות.
+    s6_examples: '["חובה לכלול שאלה על מסלולי מימון ומחסומים למענקים.", "הימנע מז׳רגון — רבים מהמשיבים מדברים אנגלית כשפה שנייה.", "שמור על טון חם, לא תאגידי."]'
+    s6_title: יש עוד משהו שכדאי שנדע?
+    s6_placeholder: לדוג׳ הקהל מעולם לא השתמש ב-Playverto, שמור על טון חם, לא תאגידי.
+    s6_compare_label: אפשר למשיבים להשוות את תשובותיהם
+    s6_compare_desc: הצג CTA בדף התודה שמראה כיצד התשובות שלהם מתמקמות לעומת כולם.
+    back: "← חזרה"
+    next: הבא →
+    generate: צור Verto →
+    generating: מייצר…
+    step_counter: שלב %{n} מתוך %{total}

@@ -1,0 +1,241 @@
+---
+ja:
+  locale_switcher:
+    label: 言語を変更
+    heading: 言語
+  layout:
+    studio_tagline: Verto Studio
+  card:
+    'yes': はい
+    'no': いいえ
+    add_option: 選択肢を追加
+    add_statement: ステートメントを追加
+    swipe_no: "← いいえ"
+    swipe_hint: カードをドラッグして回答
+    swipe_yes: はい →
+    reset: リセット
+    answer_placeholder: 回答を入力…
+    characters: 文字数
+    allow_other: "「その他」の自由記述回答を許可"
+    other: その他
+    other_placeholder: ご自身の言葉でお聞かせください…
+  auth:
+    show: 表示
+    email: メールアドレス
+    password: パスワード
+    password_hint: 12文字以上
+    title_sign_in: ログイン — Playverto
+    sign_in_title: Playvertoにログイン
+    sign_in_new_here: 初めての方ですか？
+    sign_in_create: アカウントを作成
+    forgot_password: パスワードをお忘れですか？
+    sign_in_submit: ログイン →
+    title_signup: アカウント作成 — Playverto
+    signup_title: アカウントを作成
+    signup_have_one: すでにお持ちですか？
+    signup_sign_in: ログイン
+    name: お名前
+    org_name: 組織名
+    confirm_password: パスワードを確認
+    signup_submit: アカウントを作成 →
+    title_reset: パスワードのリセット — Playverto
+    forgot_title: パスワードをお忘れですか？
+    forgot_sub: メールアドレスを入力してください。リセットリンクをお送りします。
+    forgot_submit: リセット手順をメールで送信
+    back_to_sign_in: "← ログインに戻る"
+    title_set: 新しいパスワードの設定 — Playverto
+    set_title: 新しいパスワードを設定
+    set_sub: あなただけが推測できるものを選んでください。
+    new_password: 新しいパスワード
+    confirm_new_password: 新しいパスワードを確認
+    repeat_new_password: 新しいパスワードを再入力
+    set_submit: 新しいパスワードを保存
+  results:
+    title: 結果
+    editor: "← エディター"
+    ask_verto: Vertoに聞く
+    analysing: 回答を分析中…
+  player:
+    thank_you_title: ありがとうございました！
+    thank_you_sub: 回答が記録されました。
+    compare_cta: 他の人との結果を比較する →
+    powered_by: Powered by
+    comparison_title: あなたの回答 vs 全員
+    back: "← 戻る"
+    next: 次へ →
+    submit: 送信 ✓
+  js:
+    player:
+      progress: "%{total}枚中 %{n}枚目"
+      queued: 保存済み — オンラインに戻ったときに同期されます
+      compare_cta: 他の人との結果を比較する →
+      compare_loading: 読み込み中…
+      compare_error: 読み込めませんでした — もう一度お試しください
+    editor:
+      delete_card_confirm: このカードを削除しますか？
+      unsaved: 未保存の変更
+      saving: 保存中…
+      saved: "%{time}に保存済み"
+      save_failed: '保存失敗: %{msg}'
+      card_n: カード %{n} · %{type}
+      choose_format: 以下から回答形式を選択してください。
+      type_updated: 回答タイプが %{type} に更新されました
+      current: 現在
+      off_brief: ブリーフ外
+      cards_count: "%{n}枚のカード"
+      fit_best: 最適
+      fit_strong: 有力な代替
+      fit_solid: 安定した代替
+      fit_workable: 使用可能
+      fit_sparingly: 慎重に使用
+    wizard:
+      step_counter: "%{total}ステップ中 %{n}"
+  nav:
+    partners: パートナー
+    shared_vertos: 共有Vertos
+    my_vertos: マイVertos
+    create: 作成
+    members: メンバー
+    sign_out: ログアウト
+  editor:
+    questions: 質問
+    primary: プライマリ
+    change_media: メディアを変更
+    change_media_title: このカードの画像を変更
+    add_design: デザインを追加
+    add_design_title: このカードに画像を追加
+    add_design_sub: 画像を追加してカードを魅力的に
+    live: ライブ
+    live_warning: このVertoが回答を収集中に質問を編集すると、データの品質に影響します。編集前後の回答は直接比較できません。
+    got_it: 了解
+    add_question: 質問を追加
+    cards:
+      one: "%{count}枚のカード"
+      other: "%{count}枚のカード"
+    estimated:
+      one: 推定 約%{count}分
+      other: 推定 約%{count}分
+    design: デザイン
+    publish_share: 公開・共有 →
+    answer_type: 回答タイプ
+    select_card: タイプを変更するカードを選択
+    click_any: 左のカードをクリックしてください。
+    select_card_long: 質問カードを選択して回答形式を切り替え
+    apply_to_card: このカードに適用
+    see_all_types: すべての質問タイプを見る
+    all_types: すべての質問タイプ
+    ranked_for: 適合度でランク付け：
+    this_card: このカード
+  dashboard_card:
+    badge_archived: アーカイブ済み
+    badge_live: ライブ
+    badge_draft: 下書き
+    fallback_name: このVerto
+    deleted_on: "%{date}に削除"
+    untitled: タイトルなし
+    completion: 完了率
+    responders:
+      one: 人の回答者
+      other: 人の回答者
+    responses:
+      one: 件の回答
+      other: 件の回答
+    questions:
+      one: 問
+      other: 問
+    view_results: 結果を見る →
+    edit: Vertoを編集
+    results: 結果 →
+    publish: 公開 →
+    delete: 削除
+    edit_warning: "「%{title}」はライブ中です。回答収集中に質問を編集するとデータの品質に影響します — 編集前後の回答は直接比較できません。続けますか？"
+    delete_warning: "「%{title}」を削除しますか？削除したVertoは元に戻せません。回答者のリンクは機能しなくなりますが、既存の結果はアーカイブリストに残ります。"
+  dashboard:
+    welcome_back: おかえりなさい
+    heading_html: あなたの<span style="color:#01EACB;">Vertos</span>
+    subtitle: Vertosを作成し、アライアンスと共有して、インサイトを集めましょう。
+    create_new: 新しいVertoを作成
+    stat_live: ライブ
+    stat_drafts: 下書き
+    stat_responses: 回答数
+    stat_completion: 完了率
+    empty_title: Vertosがありません
+    empty_body: 最初のVertoを作成して、オーディエンスからインサイトを収集しましょう。
+    empty_cta: 最初のVertoを作成 →
+    section_live: ライブ
+    section_drafts: 下書き
+    section_archived: アーカイブ済み
+  wizard:
+    create_verto: Vertoを作成
+    building: Vertoを作成中
+    pill_audience: オーディエンス
+    pill_tone: トーン
+    pill_tone_value: 会話調
+    pill_cards: カード
+    gen_brief_read: ブリーフを読む
+    gen_writing: 質問を作成中
+    gen_formats: 形式を選択中
+    gen_design: デザインを適用中
+    welcome_eyebrow: これから行うこと
+    welcome_lead: いくつかの簡単なステップでVertoの下書きを作成します。
+    welcome_steps: '["Vertoについて", "回答者について", "学びたいこと", "言語", "ブランドカラー", "コンテキスト（任意）"]'
+    welcome_badge: 新しいVerto
+    welcome_title: Vertoを作りましょう。
+    welcome_sub: ブリーフをPlayvertoのルールに沿ったVertoに変換します。
+    welcome_ready_html: 準備ができたら<strong style="color:rgba(0,0,0,0.6);">次へ</strong>を押してください。
+    examples: 例
+    s1_eyebrow: ステップ01 · Vertoについて
+    s1_lead: 大きなテーマを一つ。
+    s1_body: 広く設定してください — 次のステップで角度を絞ります。通常、1〜2語で十分です。
+    s1_examples: '["気候変動対策", "難民教育", "食料安全保障"]'
+    s1_title: Vertoのテーマは何ですか？
+    s1_placeholder: 例：若者のウェルビーイング
+    s1_hint_body: 広く設定してください — 次のステップで角度を絞ります。
+    s2_eyebrow: ステップ02 · 回答者について
+    s2_lead: 具体的に記述してください。
+    s2_body: ライフスタイル、役割、地域、言語など、このグループの思考に影響するものすべて。具体的であればあるほど、より良い質問が作れます。
+    s2_examples: '["ケニアの18〜24歳の大学生", "35〜55歳の地域保健従事者", "ニューサウスウェールズ州農村部の学齢期の子を持つ親"]'
+    s2_title: 誰が回答しますか — 年齢は？
+    s2_placeholder: 例：ケニアの18〜24歳の大学生
+    s2_hint_body: ライフスタイル、役割、地域、言語など、このグループの思考に影響するものすべて。
+    s3_eyebrow: ステップ03 · 学習目標
+    s3_lead: 意思決定を変えるインサイト。
+    s3_body: すでに知っていることはスキップしてください。学んだときに次の行動が変わる、その一つのことを目指してください。
+    s3_examples: '["ボランティアが3ヶ月後に辞めてしまうのはなぜか？", "フードバンクの利用を妨げているものは何か？", "若者向けプログラムは実際に自信を高めているか — どこで？"]'
+    s3_title: 何を学びたいですか？
+    s3_placeholder: 例：ボランティアが3ヶ月後に辞めてしまうのはなぜか？
+    s3_hint_body: すでに知っていることはスキップして — 次の行動が変わる一つのことを目指してください。
+    s4_eyebrow: ステップ04 · 言語
+    s4_lead: 全員に母語でリーチ。
+    s4_body: まずプライマリ言語でVertoを作成し、その後各言語で同等のバージョンを作成します。すべてのバージョンで同じ質問をするため、結果は統一されます。
+    s4_title: このVertoで使用する言語を選んでください。
+    s4_primary_label: プライマリ言語
+    s5_eyebrow: ステップ05 · ブランドカラー
+    s5_lead: あなたらしさを表現。
+    s5_body: プレイするすべての人に表示されるVertoの外観です。エディターからいつでも微調整できます。
+    s5_live_preview: ライブプレビュー
+    s5_quick_poll: クイックポール
+    s5_mock_q: いかがですか？
+    s5_mock_opt: 気に入っています
+    s5_title: ブランドカラーを選んでください。
+    s5_sub: 3色選んでください。このVertoのすべての体験に適用されます。
+    brand_primary: プライマリ
+    brand_primary_desc: 見出しとアクセント
+    brand_cta: ボタン（CTA）
+    brand_cta_desc: 次へ / 送信ボタン
+    brand_bg: 背景
+    brand_bg_desc: カードの背景
+    s6_eyebrow: ステップ06 · コンテキスト
+    optional: 任意
+    s6_lead: 他に盛り込むべきことはありますか？
+    s6_body: トーン、必須の質問、避けるべきこと、オーディエンスの特性など。特になければスキップしてください。
+    s6_examples: '["資金調達ルートと助成金の障壁に関する質問を必ず含めること。", "専門用語を避ける — 英語を第二言語とする回答者が多い。", "温かみのあるトーンで、企業的にならないように。"]'
+    s6_title: 他に知っておくべきことはありますか？
+    s6_placeholder: 例：オーディエンスはPlayvertoを初めて使用します。温かみのある、企業的でないトーンで。
+    s6_compare_label: 回答者が自分の回答を比較できるようにする
+    s6_compare_desc: お礼ページにCTAを表示し、自分の回答が全員の回答とどう違うかを確認できるようにします。
+    back: "← 戻る"
+    next: 次へ →
+    generate: Vertoを生成 →
+    generating: 生成中…
+    step_counter: "%{total}ステップ中 %{n}"

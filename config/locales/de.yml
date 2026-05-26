@@ -1,0 +1,241 @@
+---
+de:
+  locale_switcher:
+    label: Sprache ändern
+    heading: Sprache
+  layout:
+    studio_tagline: Verto Studio
+  card:
+    'yes': Ja
+    'no': Nein
+    add_option: Option hinzufügen
+    add_statement: Aussage hinzufügen
+    swipe_no: "← Nein"
+    swipe_hint: Karte ziehen, um zu antworten
+    swipe_yes: Ja →
+    reset: Zurücksetzen
+    answer_placeholder: Antwort eingeben…
+    characters: Zeichen
+    allow_other: "„Andere“-Freitextantwort erlauben"
+    other: Andere
+    other_placeholder: Sag es uns in eigenen Worten…
+  auth:
+    show: Anzeigen
+    email: E-Mail-Adresse
+    password: Passwort
+    password_hint: Mindestens 12 Zeichen
+    title_sign_in: Anmelden — Playverto
+    sign_in_title: Bei Playverto anmelden
+    sign_in_new_here: Neu hier?
+    sign_in_create: Konto erstellen
+    forgot_password: Passwort vergessen?
+    sign_in_submit: Anmelden →
+    title_signup: Konto erstellen — Playverto
+    signup_title: Erstelle dein Konto
+    signup_have_one: Schon ein Konto?
+    signup_sign_in: Anmelden
+    name: Dein Name
+    org_name: Name der Organisation
+    confirm_password: Passwort bestätigen
+    signup_submit: Konto erstellen →
+    title_reset: Passwort zurücksetzen — Playverto
+    forgot_title: Passwort vergessen?
+    forgot_sub: Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen.
+    forgot_submit: Anleitung zum Zurücksetzen senden
+    back_to_sign_in: "← Zurück zur Anmeldung"
+    title_set: Neues Passwort festlegen — Playverto
+    set_title: Neues Passwort festlegen
+    set_sub: Wähle etwas, das nur du erraten würdest.
+    new_password: Neues Passwort
+    confirm_new_password: Neues Passwort bestätigen
+    repeat_new_password: Neues Passwort wiederholen
+    set_submit: Neues Passwort speichern
+  results:
+    title: Ergebnisse
+    editor: "← Editor"
+    ask_verto: Verto fragen
+    analysing: Antworten werden analysiert…
+  player:
+    thank_you_title: Vielen Dank!
+    thank_you_sub: Deine Antworten wurden gespeichert.
+    compare_cta: Vergleiche deine Ergebnisse mit anderen →
+    powered_by: Bereitgestellt von
+    comparison_title: Deine Antworten vs. alle anderen
+    back: "← Zurück"
+    next: Weiter →
+    submit: Absenden ✓
+  js:
+    player:
+      progress: Karte %{n} von %{total}
+      queued: Gespeichert — wird synchronisiert, sobald du wieder online bist
+      compare_cta: Vergleiche deine Ergebnisse mit anderen →
+      compare_loading: Wird geladen…
+      compare_error: Laden fehlgeschlagen — bitte erneut versuchen
+    editor:
+      delete_card_confirm: Diese Karte löschen?
+      unsaved: Ungespeicherte Änderungen
+      saving: Wird gespeichert…
+      saved: Gespeichert %{time}
+      save_failed: 'Speichern fehlgeschlagen: %{msg}'
+      card_n: Karte %{n} · %{type}
+      choose_format: Wähle unten ein Antwortformat.
+      type_updated: Antworttyp aktualisiert auf %{type}
+      current: Aktuell
+      off_brief: Nicht im Briefing
+      cards_count: "%{n} Karten"
+      fit_best: Beste Wahl
+      fit_strong: Starke Alternative
+      fit_solid: Solide Alternative
+      fit_workable: Brauchbar
+      fit_sparingly: Sparsam verwenden
+    wizard:
+      step_counter: Schritt %{n} von %{total}
+  nav:
+    partners: Partner
+    shared_vertos: Geteilte Vertos
+    my_vertos: Meine Vertos
+    create: Erstellen
+    members: Mitglieder
+    sign_out: Abmelden
+  editor:
+    questions: Fragen
+    primary: primär
+    change_media: Medien ändern
+    change_media_title: Bild dieser Karte ändern
+    add_design: Design hinzufügen
+    add_design_title: Bild zu dieser Karte hinzufügen
+    add_design_sub: Füge ein Bild hinzu, um diese Karte zum Leben zu erwecken
+    live: LIVE
+    live_warning: Das Bearbeiten von Fragen, während dieses Verto Antworten sammelt, beeinträchtigt die Datenqualität. Antworten vor und nach der Bearbeitung sind nicht direkt vergleichbar.
+    got_it: Verstanden
+    add_question: Frage hinzufügen
+    cards:
+      one: "%{count} Karte"
+      other: "%{count} Karten"
+    estimated:
+      one: Geschätzt ~%{count} Min.
+      other: Geschätzt ~%{count} Min.
+    design: Design
+    publish_share: Veröffentlichen & teilen →
+    answer_type: Antworttyp
+    select_card: Wähle eine Karte aus, um den Typ zu ändern
+    click_any: Klicke auf eine beliebige Karte links.
+    select_card_long: Wähle eine Fragenkarte, um das Antwortformat zu ändern
+    apply_to_card: Auf diese Karte anwenden
+    see_all_types: Alle Fragetypen anzeigen
+    all_types: Alle Fragetypen
+    ranked_for: Sortiert nach Eignung für
+    this_card: diese Karte
+  dashboard_card:
+    badge_archived: Archiviert
+    badge_live: Live
+    badge_draft: Entwurf
+    fallback_name: dieses Verto
+    deleted_on: Gelöscht am %{date}
+    untitled: Ohne Titel
+    completion: Abschlussquote
+    responders:
+      one: Teilnehmer:in
+      other: Teilnehmende
+    responses:
+      one: Antwort
+      other: Antworten
+    questions:
+      one: Frage
+      other: Fragen
+    view_results: Ergebnisse ansehen →
+    edit: Verto bearbeiten
+    results: Ergebnisse →
+    publish: Veröffentlichen →
+    delete: Löschen
+    edit_warning: "„%{title}“ ist live. Das Bearbeiten von Fragen, während Antworten gesammelt werden, beeinträchtigt die Datenqualität — Antworten von vor und nach der Bearbeitung sind nicht direkt vergleichbar. Fortfahren?"
+    delete_warning: "„%{title}“ löschen? Ein gelöschtes Verto lässt sich nicht wiederherstellen. Der Link für Teilnehmende funktioniert nicht mehr — bestehende Ergebnisse bleiben in deiner Archiv-Liste."
+  dashboard:
+    welcome_back: Willkommen zurück
+    heading_html: Deine <span style="color:#01EACB;">Vertos</span>
+    subtitle: Erstelle Vertos, teile sie mit deiner Allianz und sieh dabei zu, wie die Erkenntnisse hereinströmen.
+    create_new: Neues Verto erstellen
+    stat_live: Live
+    stat_drafts: Entwürfe
+    stat_responses: Antworten
+    stat_completion: Abschlussquote
+    empty_title: Noch keine Vertos
+    empty_body: Erstelle dein erstes Verto und beginne, Erkenntnisse von deinem Publikum zu sammeln.
+    empty_cta: Erstelle dein erstes Verto →
+    section_live: Live
+    section_drafts: Entwürfe
+    section_archived: Archiviert
+  wizard:
+    create_verto: Verto erstellen
+    building: Dein Verto wird erstellt
+    pill_audience: Zielgruppe
+    pill_tone: Tonalität
+    pill_tone_value: Locker
+    pill_cards: Karten
+    gen_brief_read: Briefing wird gelesen
+    gen_writing: Fragen werden geschrieben
+    gen_formats: Formate werden gewählt
+    gen_design: Design wird angewendet
+    welcome_eyebrow: Was dich erwartet
+    welcome_lead: Ein paar kurze Schritte und wir entwerfen dein Verto.
+    welcome_steps: '["Über dein Verto", "Wer antwortet", "Was du erfahren möchtest", "Sprachen", "Markenfarben", "Kontext (optional)"]'
+    welcome_badge: Neues Verto
+    welcome_title: Lass uns dein Verto erstellen.
+    welcome_sub: Wir verwandeln dein Briefing in ein Verto, das den Playverto-Regeln folgt.
+    welcome_ready_html: Klicke auf <strong style="color:rgba(0,0,0,0.6);">Weiter</strong>, wenn du bereit bist.
+    examples: Beispiele
+    s1_eyebrow: Schritt 01 · Über dein Verto
+    s1_lead: Das eine übergeordnete Thema.
+    s1_body: Halte es breit — den Fokus schärfst du in den nächsten Schritten. Ein oder zwei Wörter reichen meist aus.
+    s1_examples: '["Klimaschutz", "Bildung für Geflüchtete", "Ernährungssicherheit"]'
+    s1_title: Worum geht es in deinem Verto?
+    s1_placeholder: z. B. Wohlbefinden von Jugendlichen
+    s1_hint_body: Halte es breit — den Fokus schärfst du in den nächsten Schritten.
+    s2_eyebrow: Schritt 02 · Wer antwortet
+    s2_lead: Sei konkret.
+    s2_body: Lebensstil, Rolle, Region, Sprache — alles, was die Sichtweise dieser Gruppe prägt. Je konkreter, desto besser können wir die Fragen schreiben.
+    s2_examples: '["18–24-jährige Studierende in Kenia", "35–55-jährige Mitarbeitende im Gesundheitswesen vor Ort", "Eltern schulpflichtiger Kinder im ländlichen NSW"]'
+    s2_title: Wer antwortet — und wie alt sind diese Personen?
+    s2_placeholder: z. B. 18–24-jährige Studierende in Kenia
+    s2_hint_body: Lebensstil, Rolle, Region, Sprache — alles, was die Sichtweise dieser Gruppe prägt.
+    s3_eyebrow: Schritt 03 · Das Lernziel
+    s3_lead: Die Erkenntnis, die eine Entscheidung verändern würde.
+    s3_body: Überspringe, was du bereits weißt. Ziel ist das eine, das — würdest du es erfahren — dein nächstes Vorgehen verändern würde.
+    s3_examples: '["Warum springen Freiwillige nach dem dritten Monat ab?", "Was hält Menschen davon ab, unsere Tafel zu nutzen?", "Stärkt unser Jugendprogramm tatsächlich das Selbstvertrauen — und wo genau?"]'
+    s3_title: Was möchtest du von ihnen lernen?
+    s3_placeholder: z. B. Warum springen Freiwillige nach dem dritten Monat ab?
+    s3_hint_body: Überspringe, was du bereits weißt — finde das eine, das dein nächstes Vorgehen verändern würde.
+    s4_eyebrow: Schritt 04 · Sprachen
+    s4_lead: Erreiche alle in ihrer eigenen Sprache.
+    s4_body: Wir schreiben das Verto in deiner Hauptsprache und erstellen anschließend eine ebenso gute Version in jeder weiteren Sprache. Jede Version stellt dieselben Fragen, sodass die Ergebnisse vergleichbar bleiben.
+    s4_title: Welche Sprachen soll dieses Verto sprechen?
+    s4_primary_label: Hauptsprache
+    s5_eyebrow: Schritt 05 · Markenfarben
+    s5_lead: Lass es nach dir aussehen.
+    s5_body: So sieht dein Verto für alle aus, die es spielen. Du kannst es jederzeit im Editor feinjustieren.
+    s5_live_preview: Live-Vorschau
+    s5_quick_poll: Kurzumfrage
+    s5_mock_q: Wie gefällt es dir?
+    s5_mock_opt: Liebe es
+    s5_title: Wähle deine Markenfarben.
+    s5_sub: Wähle drei. Sie werden im gesamten Verto-Erlebnis angewendet.
+    brand_primary: Primär
+    brand_primary_desc: Überschriften & Akzente
+    brand_cta: Buttons (CTA)
+    brand_cta_desc: Weiter- / Absenden-Buttons
+    brand_bg: Hintergrund
+    brand_bg_desc: Die Fläche hinter den Karten
+    s6_eyebrow: Schritt 06 · Kontext
+    optional: Optional
+    s6_lead: Sollen wir noch etwas berücksichtigen?
+    s6_body: Tonalität, Pflichtfragen, zu vermeidende Themen, Besonderheiten der Zielgruppe. Überspringe es, wenn nichts weiter nötig ist.
+    s6_examples: '["Muss eine Frage zu Finanzierungswegen und Hürden bei Förderungen enthalten.", "Vermeide Fachjargon — viele Teilnehmende sprechen Englisch als Zweitsprache.", "Halte den Ton warm, nicht förmlich."]'
+    s6_title: Sollten wir sonst noch etwas wissen?
+    s6_placeholder: z. B. Zielgruppe hat Playverto noch nie genutzt, halte den Ton warm und nicht förmlich.
+    s6_compare_label: Teilnehmenden erlauben, ihre Antworten zu vergleichen
+    s6_compare_desc: Zeige auf der Dankesseite einen CTA an, der zeigt, wie ihre Antworten im Vergleich zu allen anderen abschneiden.
+    back: "← Zurück"
+    next: Weiter →
+    generate: Verto generieren →
+    generating: Wird generiert…
+    step_counter: Schritt %{n} von %{total}
