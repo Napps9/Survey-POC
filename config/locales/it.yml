@@ -1,13 +1,13 @@
 ---
-ar:
+it:
   locale_switcher:
-    label: تغيير اللغة
-    heading: اللغة
+    label: locale_switcher.label
+    heading: locale_switcher.heading
   layout:
-    studio_tagline: استوديو فيرتو
+    studio_tagline: layout.studio_tagline
   card:
-    'yes': نعم
-    'no': لا
+    'yes': card.yes
+    'no': card.no
     add_option: card.add_option
     add_statement: card.add_statement
     swipe_no: card.swipe_no
@@ -66,11 +66,11 @@ ar:
     submit: player.submit
   js:
     player:
-      progress: البطاقة %{n} من %{total}
-      queued: تم الحفظ — ستتم المزامنة عند عودتك للاتصال
-      compare_cta: شاهد نتائجك مقارنة بالآخرين ←
-      compare_loading: جارٍ التحميل…
-      compare_error: تعذّر التحميل — أعد المحاولة
+      progress: js.player.progress
+      queued: js.player.queued
+      compare_cta: js.player.compare_cta
+      compare_loading: js.player.compare_loading
+      compare_error: js.player.compare_error
     editor:
       delete_card_confirm: js.editor.delete_card_confirm
       unsaved: js.editor.unsaved
@@ -91,15 +91,15 @@ ar:
     wizard:
       step_counter: js.wizard.step_counter
   nav:
-    partners: الشركاء
-    shared_vertos: فيرتوهات مشتركة
-    my_vertos: فيرتوهاتي
-    create: إنشاء
-    members: الأعضاء
-    sign_out: تسجيل الخروج
+    partners: nav.partners
+    shared_vertos: nav.shared_vertos
+    my_vertos: nav.my_vertos
+    create: nav.create
+    members: nav.members
+    sign_out: nav.sign_out
   editor:
-    questions: أسئلة
-    primary: الأساسية
+    questions: editor.questions
+    primary: editor.primary
     change_media: editor.change_media
     change_media_title: editor.change_media_title
     add_design: editor.add_design
@@ -151,20 +151,20 @@ ar:
     edit_warning: dashboard_card.edit_warning
     delete_warning: dashboard_card.delete_warning
   dashboard:
-    welcome_back: مرحبًا بعودتك
-    heading_html: <span style="color:#01EACB;">فيرتوهاتك</span>
-    subtitle: أنشئ فيرتوهات، وشاركها مع تحالفك، وشاهد الرؤى تتدفق.
-    create_new: إنشاء فيرتو جديد
-    stat_live: مباشر
-    stat_drafts: مسودات
-    stat_responses: الردود
-    stat_completion: الإكمال
-    empty_title: لا توجد فيرتوهات بعد
-    empty_body: أنشئ أول فيرتو لك وابدأ في جمع الرؤى من جمهورك.
-    empty_cta: أنشئ أول فيرتو لك ←
-    section_live: مباشر
-    section_drafts: مسودات
-    section_archived: المؤرشفة
+    welcome_back: dashboard.welcome_back
+    heading_html: dashboard.heading_html
+    subtitle: dashboard.subtitle
+    create_new: dashboard.create_new
+    stat_live: dashboard.stat_live
+    stat_drafts: dashboard.stat_drafts
+    stat_responses: dashboard.stat_responses
+    stat_completion: dashboard.stat_completion
+    empty_title: dashboard.empty_title
+    empty_body: dashboard.empty_body
+    empty_cta: dashboard.empty_cta
+    section_live: dashboard.section_live
+    section_drafts: dashboard.section_drafts
+    section_archived: dashboard.section_archived
   wizard:
     create_verto: wizard.create_verto
     building: wizard.building

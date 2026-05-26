@@ -1,41 +1,241 @@
+---
 fr:
   locale_switcher:
-    label: "Changer de langue"
-    heading: "Langue"
+    label: Changer de langue
+    heading: Langue
   layout:
-    studio_tagline: "Verto Studio"
+    studio_tagline: Verto Studio
   card:
-    "yes": "Oui"
-    "no": "Non"
+    'yes': Oui
+    'no': Non
+    add_option: Ajouter une option
+    add_statement: Ajouter une affirmation
+    swipe_no: "← Non"
+    swipe_hint: glissez la carte pour répondre
+    swipe_yes: Oui →
+    reset: Réinitialiser
+    answer_placeholder: Saisissez votre réponse…
+    characters: Caractères
+    allow_other: Autoriser une réponse libre « Autre »
+    other: Autre
+    other_placeholder: Dites-le avec vos propres mots…
+  auth:
+    show: Afficher
+    email: Adresse e-mail
+    password: Mot de passe
+    password_hint: Au moins 12 caractères
+    title_sign_in: Connexion — Playverto
+    sign_in_title: Se connecter à Playverto
+    sign_in_new_here: Première fois ?
+    sign_in_create: Créer un compte
+    forgot_password: Mot de passe oublié ?
+    sign_in_submit: Se connecter →
+    title_signup: Créer un compte — Playverto
+    signup_title: Créez votre compte
+    signup_have_one: Déjà un compte ?
+    signup_sign_in: Se connecter
+    name: Votre nom
+    org_name: Nom de l'organisation
+    confirm_password: Confirmer le mot de passe
+    signup_submit: Créer un compte →
+    title_reset: Réinitialiser le mot de passe — Playverto
+    forgot_title: Mot de passe oublié ?
+    forgot_sub: Saisissez votre e-mail et nous vous enverrons un lien de réinitialisation.
+    forgot_submit: Envoyer les instructions
+    back_to_sign_in: "← Retour à la connexion"
+    title_set: Définir un nouveau mot de passe — Playverto
+    set_title: Définir un nouveau mot de passe
+    set_sub: Choisissez quelque chose que vous seul pouvez deviner.
+    new_password: Nouveau mot de passe
+    confirm_new_password: Confirmer le nouveau mot de passe
+    repeat_new_password: Répéter le nouveau mot de passe
+    set_submit: Enregistrer le nouveau mot de passe
+  results:
+    title: Résultats
+    editor: "← Éditeur"
+    ask_verto: Demander à Verto
+    analysing: Analyse des réponses…
+  player:
+    thank_you_title: Merci !
+    thank_you_sub: Vos réponses ont bien été enregistrées.
+    compare_cta: Comparez vos résultats avec les autres →
+    powered_by: Propulsé par
+    comparison_title: Vos réponses vs tout le monde
+    back: "← Retour"
+    next: Suivant →
+    submit: Envoyer ✓
   js:
     player:
-      progress: "Carte %{n} sur %{total}"
-      queued: "Enregistré — se synchronisera dès votre retour en ligne"
-      compare_cta: "Voyez vos résultats comparés aux autres →"
-      compare_loading: "Chargement…"
-      compare_error: "Échec du chargement — réessayez"
+      progress: Carte %{n} sur %{total}
+      queued: Enregistré — se synchronisera dès votre retour en ligne
+      compare_cta: Voyez vos résultats comparés aux autres →
+      compare_loading: Chargement…
+      compare_error: Échec du chargement — réessayez
+    editor:
+      delete_card_confirm: Supprimer cette carte ?
+      unsaved: Modifications non enregistrées
+      saving: Enregistrement…
+      saved: Enregistré %{time}
+      save_failed: 'Échec de l''enregistrement : %{msg}'
+      card_n: Carte %{n} · %{type}
+      choose_format: Choisissez un format de réponse ci-dessous.
+      type_updated: 'Type de réponse mis à jour : %{type}'
+      current: Actuel
+      off_brief: Hors brief
+      cards_count: "%{n} cartes"
+      fit_best: Meilleur choix
+      fit_strong: Bonne alternative
+      fit_solid: Alternative solide
+      fit_workable: Acceptable
+      fit_sparingly: À utiliser avec parcimonie
+    wizard:
+      step_counter: Étape %{n} sur %{total}
   nav:
-    partners: "Partenaires"
-    shared_vertos: "Vertos partagés"
-    my_vertos: "Mes Vertos"
-    create: "Créer"
-    members: "Membres"
-    sign_out: "Se déconnecter"
+    partners: Partenaires
+    shared_vertos: Vertos partagés
+    my_vertos: Mes Vertos
+    create: Créer
+    members: Membres
+    sign_out: Se déconnecter
   editor:
-    questions: "questions"
-    primary: "principale"
+    questions: questions
+    primary: principale
+    change_media: Changer le média
+    change_media_title: Modifier l'image de cette carte
+    add_design: Ajouter un design
+    add_design_title: Ajouter une image à cette carte
+    add_design_sub: Ajoutez une image pour donner vie à cette carte
+    live: EN LIGNE
+    live_warning: Modifier les questions pendant que ce Verto collecte des réponses affectera la qualité des données. Les réponses avant et après la modification ne seront pas directement comparables.
+    got_it: Compris
+    add_question: Ajouter une question
+    cards:
+      one: "%{count} carte"
+      other: "%{count} cartes"
+    estimated:
+      one: Estimé ~%{count} min
+      other: Estimé ~%{count} mins
+    design: Design
+    publish_share: Publier & partager →
+    answer_type: Type de réponse
+    select_card: Sélectionnez une carte pour changer son type
+    click_any: Cliquez sur n'importe quelle carte à gauche.
+    select_card_long: Sélectionnez une carte de question pour changer son format de réponse
+    apply_to_card: Appliquer à cette carte
+    see_all_types: Voir tous les types de questions
+    all_types: Tous les types de questions
+    ranked_for: Classé par pertinence pour
+    this_card: cette carte
+  dashboard_card:
+    badge_archived: Archivé
+    badge_live: En ligne
+    badge_draft: Brouillon
+    fallback_name: ce Verto
+    deleted_on: Supprimé le %{date}
+    untitled: Sans titre
+    completion: complétion
+    responders:
+      one: répondant
+      other: répondants
+    responses:
+      one: réponse
+      other: réponses
+    questions:
+      one: question
+      other: questions
+    view_results: Voir les résultats →
+    edit: Modifier le Verto
+    results: Résultats →
+    publish: Publier →
+    delete: Supprimer
+    edit_warning: "« %{title} » est en ligne. Modifier les questions pendant la collecte de réponses affectera la qualité des données — les réponses avant et après la modification ne seront pas directement comparables. Continuer ?"
+    delete_warning: Supprimer « %{title} » ? La suppression est définitive. Le lien des répondants cessera de fonctionner — les résultats existants resteront dans votre liste Archivés.
   dashboard:
-    welcome_back: "Bon retour"
-    heading_html: 'Vos <span style="color:#01EACB;">Vertos</span>'
-    subtitle: "Lancez des Vertos, partagez-les avec votre alliance et regardez les résultats arriver."
-    create_new: "Créer un nouveau Verto"
-    stat_live: "En ligne"
-    stat_drafts: "Brouillons"
-    stat_responses: "Réponses"
-    stat_completion: "Achèvement"
-    empty_title: "Aucun Verto pour l'instant"
-    empty_body: "Créez votre premier Verto et commencez à recueillir les avis de votre audience."
-    empty_cta: "Créez votre premier Verto →"
-    section_live: "En ligne"
-    section_drafts: "Brouillons"
-    section_archived: "Archivés"
+    welcome_back: Bon retour
+    heading_html: Vos <span style="color:#01EACB;">Vertos</span>
+    subtitle: Lancez des Vertos, partagez-les avec votre alliance et regardez les résultats arriver.
+    create_new: Créer un nouveau Verto
+    stat_live: En ligne
+    stat_drafts: Brouillons
+    stat_responses: Réponses
+    stat_completion: Achèvement
+    empty_title: Aucun Verto pour l'instant
+    empty_body: Créez votre premier Verto et commencez à recueillir les avis de votre audience.
+    empty_cta: Créez votre premier Verto →
+    section_live: En ligne
+    section_drafts: Brouillons
+    section_archived: Archivés
+  wizard:
+    create_verto: Créer un Verto
+    building: Création de votre Verto
+    pill_audience: Audience
+    pill_tone: Ton
+    pill_tone_value: Conversationnel
+    pill_cards: Cartes
+    gen_brief_read: Lecture du brief
+    gen_writing: Rédaction des questions
+    gen_formats: Sélection des formats
+    gen_design: Application du design
+    welcome_eyebrow: Ce qui vous attend
+    welcome_lead: Quelques étapes rapides et nous rédigerons votre Verto.
+    welcome_steps: '["À propos de votre Verto", "Qui répond", "Ce que vous souhaitez apprendre", "Langues", "Couleurs de marque", "Contexte (facultatif)"]'
+    welcome_badge: Nouveau Verto
+    welcome_title: Créons votre Verto.
+    welcome_sub: Nous transformerons votre brief en un Verto respectant les règles de Playverto.
+    welcome_ready_html: Appuyez sur <strong style="color:rgba(0,0,0,0.6);">Suivant</strong> quand vous êtes prêt.
+    examples: Exemples
+    s1_eyebrow: Étape 01 · À propos de votre Verto
+    s1_lead: Le grand thème central.
+    s1_body: Restez large — vous affinerez l'angle aux étapes suivantes. Un ou deux mots suffisent généralement.
+    s1_examples: '["Action climatique", "Éducation des réfugiés", "Sécurité alimentaire"]'
+    s1_title: Quel est le sujet de votre Verto ?
+    s1_placeholder: ex. Bien-être des jeunes
+    s1_hint_body: Restez large — vous affinerez l'angle aux étapes suivantes.
+    s2_eyebrow: Étape 02 · Qui répond
+    s2_lead: Soyez précis.
+    s2_body: Mode de vie, rôle, région, langue — tout ce qui influence la façon de penser de ce groupe. Plus c'est concret, meilleures seront les questions.
+    s2_examples: '["Étudiants de 18 à 24 ans au Kenya", "Agents de santé communautaire de première ligne, 35–55 ans", "Parents d''enfants scolarisés en Nouvelle-Galles du Sud rurale"]'
+    s2_title: Qui répond — et quel âge a-t-il ?
+    s2_placeholder: ex. Étudiants de 18 à 24 ans au Kenya
+    s2_hint_body: Mode de vie, rôle, région, langue — tout ce qui influence la façon de penser de ce groupe.
+    s3_eyebrow: Étape 03 · L'objectif d'apprentissage
+    s3_lead: L'insight qui changerait une décision.
+    s3_body: Ignorez ce que vous savez déjà. Visez la seule chose qui, si vous la découvriez, changerait votre prochaine action.
+    s3_examples: '["Pourquoi les bénévoles abandonnent-ils après trois mois ?", "Qu''est-ce qui empêche les gens d''accéder à notre banque alimentaire ?", "Notre programme jeunesse renforce-t-il vraiment la confiance — et où exactement ?"]'
+    s3_title: Que souhaitez-vous apprendre d'eux ?
+    s3_placeholder: ex. Pourquoi les bénévoles abandonnent-ils après trois mois ?
+    s3_hint_body: Ignorez ce que vous savez déjà — visez la seule chose qui changerait votre prochaine action.
+    s4_eyebrow: Étape 04 · Langues
+    s4_lead: Atteignez tout le monde dans sa propre langue.
+    s4_body: Nous rédigerons le Verto dans votre langue principale, puis une version tout aussi soignée dans chaque autre langue. Chaque version pose les mêmes questions, les résultats restent donc cohérents.
+    s4_title: Dans quelles langues ce Verto doit-il s'exprimer ?
+    s4_primary_label: Langue principale
+    s5_eyebrow: Étape 05 · Couleurs de marque
+    s5_lead: Faites-le vôtre.
+    s5_body: C'est ainsi que votre Verto apparaît à tous ceux qui y participent. Vous pouvez l'ajuster à tout moment depuis l'éditeur.
+    s5_live_preview: Aperçu en direct
+    s5_quick_poll: Sondage rapide
+    s5_mock_q: Comment vous en sortez-vous ?
+    s5_mock_opt: J'adore
+    s5_title: Choisissez vos couleurs de marque.
+    s5_sub: Choisissez-en trois. Elles s'appliqueront à l'ensemble de l'expérience de ce Verto.
+    brand_primary: Principale
+    brand_primary_desc: Titres & accents
+    brand_cta: Boutons (CTA)
+    brand_cta_desc: Boutons Suivant / Envoyer
+    brand_bg: Arrière-plan
+    brand_bg_desc: Le fond derrière les cartes
+    s6_eyebrow: Étape 06 · Contexte
+    optional: Facultatif
+    s6_lead: Autre chose à intégrer ?
+    s6_body: Ton, questions incontournables, sujets à éviter, particularités du public. Ignorez si rien de plus.
+    s6_examples: '["Inclure obligatoirement une question sur les sources de financement et les obstacles aux subventions.", "Éviter le jargon — de nombreux répondants parlent anglais comme deuxième langue.", "Garder un ton chaleureux, pas corporate."]'
+    s6_title: Autre chose que nous devrions savoir ?
+    s6_placeholder: ex. Le public n'a jamais utilisé Playverto, garder un ton chaleureux, pas corporate.
+    s6_compare_label: Permettre aux répondants de comparer leurs réponses
+    s6_compare_desc: Afficher un CTA sur la page de remerciement révélant comment leurs réponses se comparent à celles des autres.
+    back: "← Retour"
+    next: Suivant →
+    generate: Générer le Verto →
+    generating: Génération…
+    step_counter: Étape %{n} sur %{total}
