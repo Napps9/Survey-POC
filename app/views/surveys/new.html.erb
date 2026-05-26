@@ -271,14 +271,14 @@
                       data-language-picker-target="primary"
                       data-action="change->language-picker#syncPrimary"
                       style="<%= light_input_style %>">
-                <% SupportedLocales.all.each do |loc| %>
+                <% SupportedLocales.enabled.each do |loc| %>
                   <option value="<%= loc.code %>" <%= "selected" if loc.code == I18n.locale.to_s %>><%= loc.flag %> <%= loc.native_name %></option>
                 <% end %>
               </select>
             </label>
 
             <div style="display:flex;flex-wrap:wrap;gap:8px;max-height:210px;overflow:auto;padding:2px;">
-              <% SupportedLocales.all.each do |loc| %>
+              <% SupportedLocales.enabled.each do |loc| %>
                 <label class="lang-chip">
                   <input type="checkbox" name="locales[]" value="<%= loc.code %>"
                          data-language-picker-target="option"

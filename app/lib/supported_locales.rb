@@ -2,17 +2,29 @@
 # rest of the app. Single source of truth for every language the product runs in
 # (platform UI + Verto content). See the YAML for field docs.
 module SupportedLocales
-  Locale = Struct.new(:code, :english_name, :native_name, :flag, :dir, keyword_init: true) do
-    def rtl? = dir.to_s == "rtl"
-    def ltr? = !rtl?
+  Locale = Struct.new(:code, :english_name, :native_name, :flag, :dir, :enabled, keyword_init: true) do
+    def rtl?     = dir.to_s == "rtl"
+    def ltr?     = !rtl?
+    def enabled? = enabled != false
   end
 
   DEFAULT = "en".freeze
 
   class << self
-    # All locales in registry order.
+    # All locales in registry order (includes ones marked enabled: false so
+    # existing data referencing them still validates via supported?/coerce).
     def all
-      @all ||= load_file.map { |h| Locale.new(**h.symbolize_keys.slice(:code, :english_name, :native_name, :flag, :dir)) }
+      @all ||= load_file.map do |h|
+        attrs = h.symbolize_keys.slice(:code, :english_name, :native_name, :flag, :dir, :enabled)
+        Locale.new(**attrs)
+      end
+    end
+
+    # Locales that should appear in UI pickers (chrome flag switcher, Verto
+    # creation wizard, etc). Excludes anything with enabled: false in the
+    # registry — typically languages whose UI translations are not ready.
+    def enabled
+      @enabled ||= all.select(&:enabled?)
     end
 
     # ["en", "es", ...] as strings, in registry order.
