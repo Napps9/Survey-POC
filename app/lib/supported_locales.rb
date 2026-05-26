@@ -25,6 +25,14 @@ module SupportedLocales
       @symbols ||= codes.map(&:to_sym)
     end
 
+    # Locales whose platform UI is actually translated — file exists and
+    # covers every key in en.yml. English is always included. Use this for
+    # the UI language picker so users never pick a locale that just falls
+    # back to English. Verto content pickers should keep using `all`.
+    def ui_ready
+      @ui_ready ||= all.select { |loc| ui_ready_codes.include?(loc.code) }
+    end
+
     def find(code)
       index[code.to_s]
     end
@@ -58,6 +66,32 @@ module SupportedLocales
 
     def load_file
       YAML.load_file(Rails.root.join("config/supported_locales.yml")).fetch("locales")
+    end
+
+    def ui_ready_codes
+      @ui_ready_codes ||= begin
+        en_keys = locale_keys(DEFAULT) || []
+        codes.select do |code|
+          next true if code == DEFAULT
+          keys = locale_keys(code)
+          keys && (en_keys - keys).empty?
+        end.to_set
+      end
+    end
+
+    def locale_keys(code)
+      path = Rails.root.join("config/locales/#{code}.yml")
+      return nil unless path.exist?
+      data = YAML.load_file(path)
+      root = data.is_a?(Hash) ? data[code] : nil
+      root.is_a?(Hash) ? flatten_keys(root) : nil
+    end
+
+    def flatten_keys(hash, prefix = nil)
+      hash.flat_map do |k, v|
+        key = [ prefix, k ].compact.join(".")
+        v.is_a?(Hash) ? flatten_keys(v, key) : [ key ]
+      end
     end
   end
 end

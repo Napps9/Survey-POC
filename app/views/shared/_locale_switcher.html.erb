@@ -15,7 +15,7 @@
 
   <div class="lang-switcher-popover" data-locale-switcher-target="popover" hidden>
     <div class="lang-switcher-popover-head"><%= t("locale_switcher.heading", default: "Language") %></div>
-    <% SupportedLocales.all.each do |loc| %>
+    <% SupportedLocales.ui_ready.each do |loc| %>
       <%= button_to locale_path(locale: loc.code), method: :post,
             class: "lang-switcher-item#{' is-active' if loc.code == I18n.locale.to_s}",
             form: { style: "margin:0;" } do %>
