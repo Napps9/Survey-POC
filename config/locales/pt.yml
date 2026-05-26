@@ -1,241 +1,241 @@
 ---
 pt:
   locale_switcher:
-    label: locale_switcher.label
-    heading: locale_switcher.heading
+    label: Alterar idioma
+    heading: Idioma
   layout:
-    studio_tagline: layout.studio_tagline
+    studio_tagline: Verto Studio
   card:
-    'yes': card.yes
-    'no': card.no
-    add_option: card.add_option
-    add_statement: card.add_statement
-    swipe_no: card.swipe_no
-    swipe_hint: card.swipe_hint
-    swipe_yes: card.swipe_yes
-    reset: card.reset
-    answer_placeholder: card.answer_placeholder
-    characters: card.characters
-    allow_other: card.allow_other
-    other: card.other
-    other_placeholder: card.other_placeholder
+    'yes': Sim
+    'no': Não
+    add_option: Adicionar opção
+    add_statement: Adicionar afirmação
+    swipe_no: "← Não"
+    swipe_hint: arraste o cartão para responder
+    swipe_yes: Sim →
+    reset: Repor
+    answer_placeholder: Escreva a resposta…
+    characters: Caracteres
+    allow_other: Permitir resposta livre “Outro”
+    other: Outro
+    other_placeholder: Diga-nos pelas suas próprias palavras…
   auth:
-    show: auth.show
-    email: auth.email
-    password: auth.password
-    password_hint: auth.password_hint
-    title_sign_in: auth.title_sign_in
-    sign_in_title: auth.sign_in_title
-    sign_in_new_here: auth.sign_in_new_here
-    sign_in_create: auth.sign_in_create
-    forgot_password: auth.forgot_password
-    sign_in_submit: auth.sign_in_submit
-    title_signup: auth.title_signup
-    signup_title: auth.signup_title
-    signup_have_one: auth.signup_have_one
-    signup_sign_in: auth.signup_sign_in
-    name: auth.name
-    org_name: auth.org_name
-    confirm_password: auth.confirm_password
-    signup_submit: auth.signup_submit
-    title_reset: auth.title_reset
-    forgot_title: auth.forgot_title
-    forgot_sub: auth.forgot_sub
-    forgot_submit: auth.forgot_submit
-    back_to_sign_in: auth.back_to_sign_in
-    title_set: auth.title_set
-    set_title: auth.set_title
-    set_sub: auth.set_sub
-    new_password: auth.new_password
-    confirm_new_password: auth.confirm_new_password
-    repeat_new_password: auth.repeat_new_password
-    set_submit: auth.set_submit
+    show: Mostrar
+    email: Endereço de e-mail
+    password: Palavra-passe
+    password_hint: Pelo menos 12 caracteres
+    title_sign_in: Iniciar sessão — Playverto
+    sign_in_title: Iniciar sessão no Playverto
+    sign_in_new_here: Novo por aqui?
+    sign_in_create: Criar uma conta
+    forgot_password: Esqueceu-se da palavra-passe?
+    sign_in_submit: Iniciar sessão →
+    title_signup: Criar conta — Playverto
+    signup_title: Crie a sua conta
+    signup_have_one: Já tem uma?
+    signup_sign_in: Iniciar sessão
+    name: O seu nome
+    org_name: Nome da organização
+    confirm_password: Confirmar palavra-passe
+    signup_submit: Criar conta →
+    title_reset: Redefinir palavra-passe — Playverto
+    forgot_title: Esqueceu-se da palavra-passe?
+    forgot_sub: Introduza o seu e-mail e enviaremos um link de redefinição.
+    forgot_submit: Enviar instruções por e-mail
+    back_to_sign_in: "← Voltar ao início de sessão"
+    title_set: Definir nova palavra-passe — Playverto
+    set_title: Defina uma nova palavra-passe
+    set_sub: Escolha algo que só você adivinharia.
+    new_password: Nova palavra-passe
+    confirm_new_password: Confirmar nova palavra-passe
+    repeat_new_password: Repetir nova palavra-passe
+    set_submit: Guardar nova palavra-passe
   results:
-    title: results.title
-    editor: results.editor
-    ask_verto: results.ask_verto
-    analysing: results.analysing
+    title: Resultados
+    editor: "← Editor"
+    ask_verto: Perguntar ao Verto
+    analysing: A analisar respostas…
   player:
-    thank_you_title: player.thank_you_title
-    thank_you_sub: player.thank_you_sub
-    compare_cta: player.compare_cta
-    powered_by: player.powered_by
-    comparison_title: player.comparison_title
-    back: player.back
-    next: player.next
-    submit: player.submit
+    thank_you_title: Obrigado!
+    thank_you_sub: As suas respostas foram registadas.
+    compare_cta: Veja os seus resultados comparados com os outros →
+    powered_by: Desenvolvido por
+    comparison_title: As suas respostas vs todos
+    back: "← Voltar"
+    next: Seguinte →
+    submit: Submeter ✓
   js:
     player:
-      progress: js.player.progress
-      queued: js.player.queued
-      compare_cta: js.player.compare_cta
-      compare_loading: js.player.compare_loading
-      compare_error: js.player.compare_error
+      progress: Cartão %{n} de %{total}
+      queued: Guardado — será sincronizado quando voltar a estar online
+      compare_cta: Veja os seus resultados comparados com os outros →
+      compare_loading: A carregar…
+      compare_error: Não foi possível carregar — tente novamente
     editor:
-      delete_card_confirm: js.editor.delete_card_confirm
-      unsaved: js.editor.unsaved
-      saving: js.editor.saving
-      saved: js.editor.saved
-      save_failed: js.editor.save_failed
-      card_n: js.editor.card_n
-      choose_format: js.editor.choose_format
-      type_updated: js.editor.type_updated
-      current: js.editor.current
-      off_brief: js.editor.off_brief
-      cards_count: js.editor.cards_count
-      fit_best: js.editor.fit_best
-      fit_strong: js.editor.fit_strong
-      fit_solid: js.editor.fit_solid
-      fit_workable: js.editor.fit_workable
-      fit_sparingly: js.editor.fit_sparingly
+      delete_card_confirm: Eliminar este cartão?
+      unsaved: Alterações não guardadas
+      saving: A guardar…
+      saved: Guardado %{time}
+      save_failed: 'Falha ao guardar: %{msg}'
+      card_n: Cartão %{n} · %{type}
+      choose_format: Escolha um formato de resposta abaixo.
+      type_updated: Tipo de resposta atualizado para %{type}
+      current: Atual
+      off_brief: Fora do briefing
+      cards_count: "%{n} cartões"
+      fit_best: Melhor escolha
+      fit_strong: Alternativa forte
+      fit_solid: Alternativa sólida
+      fit_workable: Viável
+      fit_sparingly: Usar com moderação
     wizard:
-      step_counter: js.wizard.step_counter
+      step_counter: Passo %{n} de %{total}
   nav:
-    partners: nav.partners
-    shared_vertos: nav.shared_vertos
-    my_vertos: nav.my_vertos
-    create: nav.create
-    members: nav.members
-    sign_out: nav.sign_out
+    partners: Parceiros
+    shared_vertos: Vertos partilhados
+    my_vertos: Os meus Vertos
+    create: Criar
+    members: Membros
+    sign_out: Terminar sessão
   editor:
-    questions: editor.questions
-    primary: editor.primary
-    change_media: editor.change_media
-    change_media_title: editor.change_media_title
-    add_design: editor.add_design
-    add_design_title: editor.add_design_title
-    add_design_sub: editor.add_design_sub
-    live: editor.live
-    live_warning: editor.live_warning
-    got_it: editor.got_it
-    add_question: editor.add_question
+    questions: perguntas
+    primary: principal
+    change_media: Alterar média
+    change_media_title: Alterar a imagem deste cartão
+    add_design: Adicionar design
+    add_design_title: Adicionar uma imagem a este cartão
+    add_design_sub: Adicione uma imagem para dar vida a este cartão
+    live: AO VIVO
+    live_warning: Editar perguntas enquanto este Verto está a recolher respostas afetará a qualidade dos dados. As respostas antes e depois da edição não serão diretamente comparáveis.
+    got_it: Entendido
+    add_question: Adicionar pergunta
     cards:
-      one: editor.cards.one
-      other: editor.cards.other
+      one: "%{count} cartão"
+      other: "%{count} cartões"
     estimated:
-      one: editor.estimated.one
-      other: editor.estimated.other
-    design: editor.design
-    publish_share: editor.publish_share
-    answer_type: editor.answer_type
-    select_card: editor.select_card
-    click_any: editor.click_any
-    select_card_long: editor.select_card_long
-    apply_to_card: editor.apply_to_card
-    see_all_types: editor.see_all_types
-    all_types: editor.all_types
-    ranked_for: editor.ranked_for
-    this_card: editor.this_card
+      one: Estimado ~%{count} min
+      other: Estimado ~%{count} mins
+    design: Design
+    publish_share: Publicar e partilhar →
+    answer_type: Tipo de resposta
+    select_card: Selecione um cartão para alterar o seu tipo
+    click_any: Clique em qualquer cartão à esquerda.
+    select_card_long: Selecione um cartão de pergunta para mudar o formato da resposta
+    apply_to_card: Aplicar a este cartão
+    see_all_types: Ver todos os tipos de pergunta
+    all_types: Todos os tipos de pergunta
+    ranked_for: Ordenado por adequação para
+    this_card: este cartão
   dashboard_card:
-    badge_archived: dashboard_card.badge_archived
-    badge_live: dashboard_card.badge_live
-    badge_draft: dashboard_card.badge_draft
-    fallback_name: dashboard_card.fallback_name
-    deleted_on: dashboard_card.deleted_on
-    untitled: dashboard_card.untitled
-    completion: dashboard_card.completion
+    badge_archived: Arquivado
+    badge_live: Ao vivo
+    badge_draft: Rascunho
+    fallback_name: este Verto
+    deleted_on: Eliminado a %{date}
+    untitled: Sem título
+    completion: conclusão
     responders:
-      one: dashboard_card.responders.one
-      other: dashboard_card.responders.other
+      one: respondente
+      other: respondentes
     responses:
-      one: dashboard_card.responses.one
-      other: dashboard_card.responses.other
+      one: resposta
+      other: respostas
     questions:
-      one: dashboard_card.questions.one
-      other: dashboard_card.questions.other
-    view_results: dashboard_card.view_results
-    edit: dashboard_card.edit
-    results: dashboard_card.results
-    publish: dashboard_card.publish
-    delete: dashboard_card.delete
-    edit_warning: dashboard_card.edit_warning
-    delete_warning: dashboard_card.delete_warning
+      one: pergunta
+      other: perguntas
+    view_results: Ver resultados →
+    edit: Editar Verto
+    results: Resultados →
+    publish: Publicar →
+    delete: Eliminar
+    edit_warning: "“%{title}” está ao vivo. Editar perguntas enquanto está a recolher respostas afetará a qualidade dos dados — as respostas antes e depois da edição não serão diretamente comparáveis. Continuar?"
+    delete_warning: Eliminar “%{title}”? Não é possível recuperar um Verto após eliminação. O link dos respondentes deixará de funcionar — os resultados existentes permanecem na sua lista de Arquivados.
   dashboard:
-    welcome_back: dashboard.welcome_back
-    heading_html: dashboard.heading_html
-    subtitle: dashboard.subtitle
-    create_new: dashboard.create_new
-    stat_live: dashboard.stat_live
-    stat_drafts: dashboard.stat_drafts
-    stat_responses: dashboard.stat_responses
-    stat_completion: dashboard.stat_completion
-    empty_title: dashboard.empty_title
-    empty_body: dashboard.empty_body
-    empty_cta: dashboard.empty_cta
-    section_live: dashboard.section_live
-    section_drafts: dashboard.section_drafts
-    section_archived: dashboard.section_archived
+    welcome_back: Bem-vindo de volta
+    heading_html: Os seus <span style="color:#01EACB;">Vertos</span>
+    subtitle: Crie Vertos, partilhe-os com a sua aliança e veja os insights chegarem.
+    create_new: Criar um novo Verto
+    stat_live: Ao vivo
+    stat_drafts: Rascunhos
+    stat_responses: Respostas
+    stat_completion: Conclusão
+    empty_title: Ainda sem Vertos
+    empty_body: Crie o seu primeiro Verto e comece a recolher insights do seu público.
+    empty_cta: Criar o seu primeiro Verto →
+    section_live: Ao vivo
+    section_drafts: Rascunhos
+    section_archived: Arquivados
   wizard:
-    create_verto: wizard.create_verto
-    building: wizard.building
-    pill_audience: wizard.pill_audience
-    pill_tone: wizard.pill_tone
-    pill_tone_value: wizard.pill_tone_value
-    pill_cards: wizard.pill_cards
-    gen_brief_read: wizard.gen_brief_read
-    gen_writing: wizard.gen_writing
-    gen_formats: wizard.gen_formats
-    gen_design: wizard.gen_design
-    welcome_eyebrow: wizard.welcome_eyebrow
-    welcome_lead: wizard.welcome_lead
-    welcome_steps: wizard.welcome_steps
-    welcome_badge: wizard.welcome_badge
-    welcome_title: wizard.welcome_title
-    welcome_sub: wizard.welcome_sub
-    welcome_ready_html: wizard.welcome_ready_html
-    examples: wizard.examples
-    s1_eyebrow: wizard.s1_eyebrow
-    s1_lead: wizard.s1_lead
-    s1_body: wizard.s1_body
-    s1_examples: wizard.s1_examples
-    s1_title: wizard.s1_title
-    s1_placeholder: wizard.s1_placeholder
-    s1_hint_body: wizard.s1_hint_body
-    s2_eyebrow: wizard.s2_eyebrow
-    s2_lead: wizard.s2_lead
-    s2_body: wizard.s2_body
-    s2_examples: wizard.s2_examples
-    s2_title: wizard.s2_title
-    s2_placeholder: wizard.s2_placeholder
-    s2_hint_body: wizard.s2_hint_body
-    s3_eyebrow: wizard.s3_eyebrow
-    s3_lead: wizard.s3_lead
-    s3_body: wizard.s3_body
-    s3_examples: wizard.s3_examples
-    s3_title: wizard.s3_title
-    s3_placeholder: wizard.s3_placeholder
-    s3_hint_body: wizard.s3_hint_body
-    s4_eyebrow: wizard.s4_eyebrow
-    s4_lead: wizard.s4_lead
-    s4_body: wizard.s4_body
-    s4_title: wizard.s4_title
-    s4_primary_label: wizard.s4_primary_label
-    s5_eyebrow: wizard.s5_eyebrow
-    s5_lead: wizard.s5_lead
-    s5_body: wizard.s5_body
-    s5_live_preview: wizard.s5_live_preview
-    s5_quick_poll: wizard.s5_quick_poll
-    s5_mock_q: wizard.s5_mock_q
-    s5_mock_opt: wizard.s5_mock_opt
-    s5_title: wizard.s5_title
-    s5_sub: wizard.s5_sub
-    brand_primary: wizard.brand_primary
-    brand_primary_desc: wizard.brand_primary_desc
-    brand_cta: wizard.brand_cta
-    brand_cta_desc: wizard.brand_cta_desc
-    brand_bg: wizard.brand_bg
-    brand_bg_desc: wizard.brand_bg_desc
-    s6_eyebrow: wizard.s6_eyebrow
-    optional: wizard.optional
-    s6_lead: wizard.s6_lead
-    s6_body: wizard.s6_body
-    s6_examples: wizard.s6_examples
-    s6_title: wizard.s6_title
-    s6_placeholder: wizard.s6_placeholder
-    s6_compare_label: wizard.s6_compare_label
-    s6_compare_desc: wizard.s6_compare_desc
-    back: wizard.back
-    next: wizard.next
-    generate: wizard.generate
-    generating: wizard.generating
-    step_counter: wizard.step_counter
+    create_verto: Criar Verto
+    building: A construir o seu Verto
+    pill_audience: Público
+    pill_tone: Tom
+    pill_tone_value: Conversacional
+    pill_cards: Cartões
+    gen_brief_read: A ler o briefing
+    gen_writing: A escrever perguntas
+    gen_formats: A escolher formatos
+    gen_design: A aplicar design
+    welcome_eyebrow: O que vem a seguir
+    welcome_lead: Alguns passos rápidos e iremos elaborar o seu Verto.
+    welcome_steps: '["Sobre o seu Verto", "Quem vai responder", "O que quer aprender", "Idiomas", "Cores da marca", "Contexto (opcional)"]'
+    welcome_badge: Novo Verto
+    welcome_title: Vamos construir o seu Verto.
+    welcome_sub: Transformaremos o seu briefing num Verto que segue as regras do Playverto.
+    welcome_ready_html: Pressione <strong style="color:rgba(0,0,0,0.6);">Seguinte</strong> quando estiver pronto.
+    examples: Exemplos
+    s1_eyebrow: Passo 01 · Sobre o seu Verto
+    s1_lead: O tema único e abrangente.
+    s1_body: Mantenha-o amplo — irá restringir a abordagem nos passos seguintes. Uma ou duas palavras costumam ser suficientes.
+    s1_examples: '["Ação climática", "Educação de refugiados", "Segurança alimentar"]'
+    s1_title: De que trata o seu Verto?
+    s1_placeholder: 'ex.: Bem-estar juvenil'
+    s1_hint_body: Mantenha-o amplo — irá restringir a abordagem nos passos seguintes.
+    s2_eyebrow: Passo 02 · Quem vai responder
+    s2_lead: Seja específico.
+    s2_body: Estilo de vida, função, região, idioma — qualquer coisa que molde a forma como este grupo pensa. Quanto mais concreto, melhores serão as perguntas que podemos escrever.
+    s2_examples: '["Estudantes universitários de 18–24 anos no Quénia", "Profissionais de saúde comunitária de primeira linha entre 35 e 55 anos", "Pais de crianças em idade escolar no interior de NSW"]'
+    s2_title: Quem vai responder — e qual a sua idade?
+    s2_placeholder: 'ex.: Estudantes universitários de 18–24 anos no Quénia'
+    s2_hint_body: Estilo de vida, função, região, idioma — qualquer coisa que molde a forma como este grupo pensa.
+    s3_eyebrow: Passo 03 · O objetivo de aprendizagem
+    s3_lead: O insight que mudaria uma decisão.
+    s3_body: Salte aquilo que já sabe. Procure aquela única coisa que, se aprendesse, mudaria o que faz a seguir.
+    s3_examples: '["Porque é que os voluntários desistem após o terceiro mês?", "O que está a impedir as pessoas de aceder ao nosso banco alimentar?", "O nosso programa juvenil aumenta realmente a confiança — e onde exatamente?"]'
+    s3_title: O que quer aprender com eles?
+    s3_placeholder: 'ex.: Porque é que os voluntários desistem após o terceiro mês?'
+    s3_hint_body: Salte o que já sabe — procure aquela única coisa que mudaria o que faz a seguir.
+    s4_eyebrow: Passo 04 · Idiomas
+    s4_lead: Alcance todos no seu próprio idioma.
+    s4_body: Escreveremos o Verto no seu idioma principal e, em seguida, elaboraremos uma versão igualmente boa em cada um dos outros idiomas. Todas as versões fazem as mesmas perguntas, para que os resultados permaneçam alinhados.
+    s4_title: Que idiomas deve este Verto falar?
+    s4_primary_label: Idioma principal
+    s5_eyebrow: Passo 05 · Cores da marca
+    s5_lead: Faça com que pareça seu.
+    s5_body: É assim que o seu Verto aparece a todos os que o jogarem. Pode afiná-lo a qualquer momento no editor.
+    s5_live_preview: Pré-visualização ao vivo
+    s5_quick_poll: Sondagem rápida
+    s5_mock_q: Como o está a achar?
+    s5_mock_opt: A adorar
+    s5_title: Escolha as cores da sua marca.
+    s5_sub: Escolha três. Serão aplicadas em toda a experiência deste Verto.
+    brand_primary: Principal
+    brand_primary_desc: Títulos e destaques
+    brand_cta: Botões (CTA)
+    brand_cta_desc: Botões Seguinte / Submeter
+    brand_bg: Fundo
+    brand_bg_desc: A tela por trás dos cartões
+    s6_eyebrow: Passo 06 · Contexto
+    optional: Opcional
+    s6_lead: Algo mais que devamos incluir?
+    s6_body: Tom, perguntas obrigatórias, coisas a evitar, peculiaridades do público. Salte se não houver nada extra.
+    s6_examples: '["Deve incluir uma pergunta sobre fontes de financiamento e barreiras a subsídios.", "Evite jargão — muitos respondentes falam inglês como segunda língua.", "Mantenha um tom caloroso, não corporativo."]'
+    s6_title: Algo mais que devamos saber?
+    s6_placeholder: 'ex.: O público nunca usou o Playverto antes, mantenha um tom caloroso, não corporativo.'
+    s6_compare_label: Permitir que os respondentes comparem as suas respostas
+    s6_compare_desc: Mostrar um CTA na página de agradecimento que revela como as respostas se comparam com as de todos os outros.
+    back: "← Voltar"
+    next: Seguinte →
+    generate: Gerar Verto →
+    generating: A gerar…
+    step_counter: Passo %{n} de %{total}
