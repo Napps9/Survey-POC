@@ -193,9 +193,11 @@
       </div>
 
     <% when "nps" %>
-      <%# 5-step NPS slider. Drag along the vertical SVG track; each step
-          dispatches `nps:valueChanged` which the left-panel lottie-player
-          listens for. Labels are editable. %>
+      <%# 5-step NPS slider. Drag along the vertical pill; each step dispatches
+          `nps:valueChanged` which the left-panel lottie-player listens for.
+          Labels sit in a vertical column to the LEFT of the slider, aligned
+          with each step position (`column-reverse` so source-order index 0
+          is at the bottom). Labels are editable. %>
       <% labels = Array(display["options"]) %>
       <% labels = %w[1 2 3 4 5] if labels.empty? %>
       <% labels = labels.first(NpsHelper::NPS_STEPS) %>
@@ -207,12 +209,13 @@
            data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
            tabindex="0" role="slider"
            aria-valuemin="1" aria-valuemax="<%= NpsHelper::NPS_STEPS %>">
-        <div class="nps-slider-tooltip" data-nps-slider-target="tooltip"></div>
-        <%= render_nps_control %>
-        <div class="slider-labels nps-slider-labels">
-          <% labels.each do |opt| %>
-            <span class="slider-label-text" data-nps-slider-target="label" <%= ce_attr %>><%= opt %></span>
-          <% end %>
+        <div class="nps-slider-stage">
+          <div class="slider-labels nps-slider-labels">
+            <% labels.each do |opt| %>
+              <span class="slider-label-text" data-nps-slider-target="label" <%= ce_attr %>><%= opt %></span>
+            <% end %>
+          </div>
+          <%= render_nps_control %>
         </div>
       </div>
 

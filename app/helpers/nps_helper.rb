@@ -10,16 +10,12 @@ module NpsHelper
     card["type"].to_s == "nps"
   end
 
-  # Asset URLs for the 5 Lotties + slider background. Files live under
-  # `app/assets/lottie/<theme>/` which Sprockets treats as an asset path root,
-  # so files resolve at `/assets/<theme>/<file>` (the "lottie" prefix is
-  # implicit in the path root). Using asset_path so digested URLs work in prod.
+  # Asset URLs for the 5 Lotties. Files live under `app/assets/lottie/<theme>/`
+  # which Sprockets treats as an asset path root, so files resolve at
+  # `/assets/<theme>/<file>` (the "lottie" prefix is implicit in the path root).
+  # Using asset_path so digested URLs work in prod.
   def nps_lottie_urls
     (1..NPS_STEPS).map { |i| asset_path("#{NPS_THEME}/#{i}.json") }
-  end
-
-  def nps_slider_bg_url
-    asset_path("#{NPS_THEME}/slider.svg")
   end
 
   # LEFT panel: a div that the lottie-player Stimulus controller mounts into.
@@ -37,11 +33,13 @@ module NpsHelper
     end
   end
 
-  # RIGHT panel: a vertical slider track with the dev-baked SVG as the visual.
-  # `.nps-thumb` is the draggable handle positioned by the slider controller.
+  # RIGHT panel: a vertical pill slider. The pill outline and clipping come
+  # from CSS on `.nps-control`; `.nps-track-fill` rises from the bottom up to
+  # the thumb position as the value increases (driven by --nps-fill set by the
+  # slider controller); `.nps-thumb` is the draggable handle.
   def render_nps_control
     content_tag :div, class: "nps-control", data: { axis: "vertical" } do
-      concat image_tag(nps_slider_bg_url, class: "nps-track-bg", alt: "")
+      concat content_tag(:div, "", class: "nps-track-fill")
       concat content_tag(:div, "", class: "nps-thumb")
     end
   end

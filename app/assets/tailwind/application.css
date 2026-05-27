@@ -153,9 +153,9 @@
 }
 .panel-progress-fill { height: 100%; background: white; border-radius: 8px; }
 
-/* NPS: vertical slider on the right (track is a baked-in SVG), reactive
-   Lottie animation on the left. The slider dispatches `nps:valueChanged`
-   on each step, which the lottie-player controller listens for. */
+/* NPS: vertical 5-step pill slider on the right, reactive Lottie animation
+   on the left. The slider dispatches `nps:valueChanged` on each step, which
+   the lottie-player controller listens for. */
 .nps-slider {
   position: relative;
   display: flex;
@@ -174,22 +174,34 @@
 .nps-slider[data-nps-slider-axis-value="horizontal"] { cursor: ew-resize; }
 .nps-slider:focus-visible { box-shadow: 0 0 0 3px var(--brand-primary-soft, rgba(1,234,203,0.4)); border-radius: 18px; }
 
-/* RIGHT panel: the slider track. The SVG fills .nps-control; .nps-thumb is
-   positioned absolutely and animated via top/left by the controller. */
+/* Labels-beside-slider stage. Labels in a vertical column, slider on the
+   right; gap keeps them visually attached. */
+.nps-slider-stage {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 14px;
+}
+
+/* RIGHT panel: the slider track. Pill shape via border + border-radius;
+   overflow:hidden clips the rising fill to the pill interior. */
 .nps-control {
   position: relative;
   width: 80px;
   height: 320px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 4px solid #1a1a1a;
+  border-radius: 40px;
+  background: rgba(255,255,255,0.6);
+  overflow: hidden;
 }
-.nps-track-bg {
+.nps-track-fill {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--nps-fill, 0) * 100%);
+  background: var(--brand-primary, #01EACB);
+  transition: height 0.22s cubic-bezier(.34,1.2,.64,1);
   pointer-events: none;
 }
 .nps-thumb {
@@ -203,16 +215,6 @@
   transform: translate(-50%, -50%);
   transition: top 0.18s cubic-bezier(.34,1.2,.64,1), left 0.18s cubic-bezier(.34,1.2,.64,1);
   cursor: grab;
-}
-.nps-slider-tooltip {
-  font-family: "Alata", sans-serif;
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  color: var(--brand-cta-text, #1C2034);
-  background: var(--brand-primary, #01EACB);
-  padding: 4px 14px;
-  border-radius: 100px;
-  min-height: 22px;
 }
 
 /* LEFT panel: the Lottie mount. lottie-web injects an <svg> into the
@@ -236,7 +238,25 @@
   height: 100% !important;
 }
 
-.nps-slider-labels { width: 100%; }
+/* Labels: vertical column, top label = highest value. column-reverse keeps
+   source order (1..5) but flips the visual stack so source-index 0 sits at
+   the bottom, aligning with the slider's bottom step. Each label takes an
+   equal 1/N share of the column height (flex:1) and centres its text
+   vertically — so the label centres land at 10%, 30%, 50%, 70%, 90% of
+   the column for 5 steps, exactly where the inset thumb travels. */
+.nps-slider-labels {
+  display: flex;
+  flex-direction: column-reverse;
+  height: 320px;
+  min-width: 110px;
+}
+.nps-slider-labels .slider-label-text {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+}
 .nps-slider-labels .slider-label-text.is-active {
   color: var(--brand-primary, #01EACB);
   font-weight: 700;
