@@ -289,7 +289,7 @@ en:
     delete_warning: "Delete “%{title}”? You can't get a Verto back from being deleted. Responders' link will stop working — existing results stay in your Archived list."
   dashboard:
     welcome_back: "Welcome back"
-    heading_html: 'Your <span style="color:#01EACB;">Vertos</span>'
+    heading_html: 'My <span style="color:#01EACB;">Verto''s</span>'
     subtitle: "Spin up Vertos, share them with your alliance, and watch the insights roll in."
     create_new: "Create a new Verto"
     stat_live: "Live"
