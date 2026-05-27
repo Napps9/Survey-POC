@@ -1,5 +1,12 @@
 <% content_for :head do %>
-  <style>body { overflow: auto !important; height: auto !important; }</style>
+  <style>
+    body { overflow: auto !important; height: auto !important; }
+    .is-selecting .dashboard-card__select { display: flex !important; }
+    .is-selecting .dashboard-card:has(input[data-bulk-select-target="checkbox"]:checked) {
+      border-color: #01EACB !important;
+      box-shadow: 0 0 0 1px #01EACB inset;
+    }
+  </style>
 <% end %>
 <%
   published = @surveys.select { |s| s.publish_token.present? }
@@ -88,13 +95,34 @@
 
       <% else %>
 
+        <%
+          is_admin    = current_membership&.admin?
+          select_lbl  = t("dashboard_card.select")
+          cancel_lbl  = t("dashboard_card.cancel")
+          selected_t  = t("dashboard_card.bulk_selected", count: 0).sub("0", "{count}")
+        %>
+
         <%# ── Live section ── %>
         <% if published.any? %>
-          <div style="margin-bottom:32px;">
+          <% archive_confirm_live = t("dashboard_card.bulk_archive_confirm", count: 0).sub("0", "{count}") %>
+          <div data-controller="bulk-select"
+               data-bulk-select-action-url-value="<%= bulk_archive_surveys_path %>"
+               data-bulk-select-confirm-template-value="<%= archive_confirm_live %>"
+               data-bulk-select-selected-template-value="<%= selected_t %>"
+               data-bulk-select-select-label-value="<%= select_lbl %>"
+               data-bulk-select-done-label-value="<%= cancel_lbl %>"
+               style="margin-bottom:32px;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
               <span style="width:6px;height:6px;border-radius:50%;background:#FF1E6F;box-shadow:0 0 10px rgba(255,30,111,0.7);"></span>
               <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);letter-spacing:0.12em;text-transform:uppercase;"><%= t("dashboard.section_live") %></span>
               <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+              <% if is_admin %>
+                <button type="button"
+                        data-bulk-select-target="toggle"
+                        data-action="bulk-select#toggle"
+                        style="background:none;border:none;padding:0;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;"><%= select_lbl %></button>
+                <span style="color:rgba(255,255,255,0.15);">|</span>
+              <% end %>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);"><%= published.size %></span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
@@ -102,16 +130,41 @@
                 <%= render "surveys/dashboard_card", survey: survey %>
               <% end %>
             </div>
+            <% if is_admin %>
+              <div data-bulk-select-target="bar" hidden
+                   style="margin-top:14px;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:rgba(255,30,111,0.08);border:1px solid rgba(255,30,111,0.28);">
+                <span data-bulk-select-target="count" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);"></span>
+                <div style="flex:1;"></div>
+                <button type="button" data-action="bulk-select#cancel"
+                        style="background:none;border:none;padding:6px 10px;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;"><%= cancel_lbl %></button>
+                <button type="button" data-action="bulk-select#submit"
+                        style="background:#FF1E6F;border:none;border-radius:100px;padding:8px 18px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.04em;cursor:pointer;"><%= t("dashboard_card.delete") %></button>
+              </div>
+            <% end %>
           </div>
         <% end %>
 
         <%# ── Drafts section ── %>
         <% if drafts.any? %>
-          <div style="margin-bottom:32px;">
+          <% archive_confirm_draft = t("dashboard_card.bulk_archive_confirm", count: 0).sub("0", "{count}") %>
+          <div data-controller="bulk-select"
+               data-bulk-select-action-url-value="<%= bulk_archive_surveys_path %>"
+               data-bulk-select-confirm-template-value="<%= archive_confirm_draft %>"
+               data-bulk-select-selected-template-value="<%= selected_t %>"
+               data-bulk-select-select-label-value="<%= select_lbl %>"
+               data-bulk-select-done-label-value="<%= cancel_lbl %>"
+               style="margin-bottom:32px;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
               <span style="width:6px;height:6px;border-radius:50%;background:#0CA7FF;box-shadow:0 0 10px rgba(12,167,255,0.6);"></span>
               <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);letter-spacing:0.12em;text-transform:uppercase;"><%= t("dashboard.section_drafts") %></span>
               <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+              <% if is_admin %>
+                <button type="button"
+                        data-bulk-select-target="toggle"
+                        data-action="bulk-select#toggle"
+                        style="background:none;border:none;padding:0;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;"><%= select_lbl %></button>
+                <span style="color:rgba(255,255,255,0.15);">|</span>
+              <% end %>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);"><%= drafts.size %></span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
@@ -119,16 +172,40 @@
                 <%= render "surveys/dashboard_card", survey: survey %>
               <% end %>
             </div>
+            <% if is_admin %>
+              <div data-bulk-select-target="bar" hidden
+                   style="margin-top:14px;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:rgba(12,167,255,0.08);border:1px solid rgba(12,167,255,0.28);">
+                <span data-bulk-select-target="count" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);"></span>
+                <div style="flex:1;"></div>
+                <button type="button" data-action="bulk-select#cancel"
+                        style="background:none;border:none;padding:6px 10px;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;"><%= cancel_lbl %></button>
+                <button type="button" data-action="bulk-select#submit"
+                        style="background:#0CA7FF;border:none;border-radius:100px;padding:8px 18px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.04em;cursor:pointer;"><%= t("dashboard_card.delete") %></button>
+              </div>
+            <% end %>
           </div>
         <% end %>
 
         <%# ── Archived section ── %>
         <% if archived.any? %>
-          <div>
+          <% destroy_confirm = t("dashboard_card.bulk_destroy_confirm", count: 0).sub("0", "{count}") %>
+          <div data-controller="bulk-select"
+               data-bulk-select-action-url-value="<%= bulk_destroy_surveys_path %>"
+               data-bulk-select-confirm-template-value="<%= destroy_confirm %>"
+               data-bulk-select-selected-template-value="<%= selected_t %>"
+               data-bulk-select-select-label-value="<%= select_lbl %>"
+               data-bulk-select-done-label-value="<%= cancel_lbl %>">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
               <span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.3);"></span>
               <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);letter-spacing:0.12em;text-transform:uppercase;"><%= t("dashboard.section_archived") %></span>
               <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+              <% if is_admin %>
+                <button type="button"
+                        data-bulk-select-target="toggle"
+                        data-action="bulk-select#toggle"
+                        style="background:none;border:none;padding:0;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;"><%= select_lbl %></button>
+                <span style="color:rgba(255,255,255,0.15);">|</span>
+              <% end %>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);"><%= archived.size %></span>
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
@@ -136,6 +213,17 @@
                 <%= render "surveys/dashboard_card", survey: survey, archived: true %>
               <% end %>
             </div>
+            <% if is_admin %>
+              <div data-bulk-select-target="bar" hidden
+                   style="margin-top:14px;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:rgba(216,0,39,0.10);border:1px solid rgba(216,0,39,0.32);">
+                <span data-bulk-select-target="count" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);"></span>
+                <div style="flex:1;"></div>
+                <button type="button" data-action="bulk-select#cancel"
+                        style="background:none;border:none;padding:6px 10px;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;"><%= cancel_lbl %></button>
+                <button type="button" data-action="bulk-select#submit"
+                        style="background:#D80027;border:none;border-radius:100px;padding:8px 18px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.04em;cursor:pointer;"><%= t("dashboard_card.delete_forever") %></button>
+              </div>
+            <% end %>
           </div>
         <% end %>
 

@@ -285,8 +285,21 @@ en:
     results: "Results →"
     publish: "Publish →"
     delete: "Delete"
+    delete_forever: "Delete forever"
     edit_warning: "“%{title}” is live. Editing questions while it's collecting responses will affect data quality — answers from before and after the edit won't be directly comparable. Continue?"
     delete_warning: "Delete “%{title}”? You can't get a Verto back from being deleted. Responders' link will stop working — existing results stay in your Archived list."
+    delete_forever_warning: "Permanently delete “%{title}”? All responses, shares, and data will be erased. This cannot be undone."
+    select: "Select"
+    cancel: "Cancel"
+    bulk_selected:
+      one: "%{count} selected"
+      other: "%{count} selected"
+    bulk_archive_confirm:
+      one: "Delete %{count} Verto? Responders' link will stop working — results stay in your Archived list."
+      other: "Delete %{count} Vertos? Responders' links will stop working — results stay in your Archived list."
+    bulk_destroy_confirm:
+      one: "Permanently delete %{count} Verto? All responses and data will be erased. This cannot be undone."
+      other: "Permanently delete %{count} Vertos? All responses and data will be erased. This cannot be undone."
   dashboard:
     welcome_back: "Welcome back"
     heading_html: 'My <span style="color:#01EACB;">Verto''s</span>'

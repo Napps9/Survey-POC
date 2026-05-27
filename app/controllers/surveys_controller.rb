@@ -2,7 +2,7 @@ class SurveysController < ApplicationController
   include AggregatesSurveyResults
   layout "fullscreen", only: [ :show, :new ]
 
-  before_action :require_admin!,       only: [ :destroy ]
+  before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
   before_action :set_survey,           only: [ :show, :publish, :update_settings ]
   before_action :set_survey_including_archived, only: [ :results ]
 
@@ -118,6 +118,37 @@ class SurveysController < ApplicationController
     survey = Current.organisation.surveys.kept.find(params[:id])
     survey.archive!
     redirect_to root_path, notice: "“#{survey.theme.presence || survey.title.presence || 'Verto'}” deleted. Responders' link no longer works; results stay in your Archived list."
+  end
+
+  def destroy_forever
+    survey = Current.organisation.surveys.archived.find(params[:id])
+    name   = survey.theme.presence || survey.title.presence || "Verto"
+    Survey.transaction { survey.destroy! }
+    redirect_to root_path, notice: "“#{name}” permanently deleted. All responses and data have been erased."
+  end
+
+  def bulk_archive
+    ids   = Array(params[:ids]).map(&:to_i).reject(&:zero?)
+    count = 0
+    Survey.transaction do
+      Current.organisation.surveys.kept.where(id: ids).find_each do |s|
+        s.archive!
+        count += 1
+      end
+    end
+    redirect_to root_path, notice: "#{count} #{'Verto'.pluralize(count)} deleted. Responders' links no longer work; results stay in your Archived list."
+  end
+
+  def bulk_destroy
+    ids   = Array(params[:ids]).map(&:to_i).reject(&:zero?)
+    count = 0
+    Survey.transaction do
+      Current.organisation.surveys.where(id: ids).find_each do |s|
+        s.destroy!
+        count += 1
+      end
+    end
+    redirect_to root_path, notice: "#{count} #{'Verto'.pluralize(count)} permanently deleted. All responses and data have been erased."
   end
 
   def results
