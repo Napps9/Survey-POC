@@ -1,9 +1,9 @@
 module ApplicationHelper
   # Returns a view of `card` with text/description/options in `locale`, falling
   # back per-field to the primary (default_locale) content. Structural fields
-  # (type, nps_visual, image, allow_other, option count/order) are
-  # language-neutral and preserved. Used by the player/preview to display a
-  # chosen language; the editor renders the primary card directly.
+  # (type, image, allow_other, option count/order) are language-neutral and
+  # preserved. Used by the player/preview to display a chosen language; the
+  # editor renders the primary card directly.
   def localized_card(card, locale, default_locale = SupportedLocales::DEFAULT)
     return card if locale.blank? || locale.to_s == default_locale.to_s
 

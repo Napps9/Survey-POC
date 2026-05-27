@@ -1,29 +1,27 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The themed asset on the RIGHT is the slider. Dragging along its axis
-// (vertical: up = best, horizontal: right = best) moves a visible handle
-// (.nps-thumb), fills the asset (--nps-fill), snaps to the nearest labelled
-// stop, records the index, and drives the reactive asset on the LEFT.
+// Vertical 5-step slider on the right panel. The track is a static SVG image
+// (.nps-track-bg) under .nps-control; .nps-thumb is the draggable handle.
+// On every step landing the controller dispatches `nps:valueChanged` with
+// the 1-indexed value, which the left-panel lottie-player controller listens
+// for to swap and play the matching Lottie animation.
 export default class extends Controller {
   static targets = ["label", "tooltip"]
-  static values  = { steps: Number, index: { type: Number, default: -1 }, axis: { type: String, default: "vertical" } }
+  static values  = {
+    steps: { type: Number, default: 5 },
+    index: { type: Number, default: -1 },
+    axis:  { type: String, default: "vertical" }
+  }
 
   connect() {
     this._onMove = (e) => this._drag(e)
     this._onUp   = () => this._end()
-    this.inset   = 26
 
     this.control = this.element.querySelector(".nps-control")
-    this.svg     = this.control && this.control.querySelector(".nps-svg")
     this.thumb   = this.control && this.control.querySelector(".nps-thumb")
-    this.vb      = this._viewBox(this.svg)
 
-    const card = this.element.closest(".split-card")
-    this.reaction       = card ? card.querySelector(".split-left .nps-visual") : null
-    this.reactionStates = this.reaction ? Array.from(this.reaction.querySelectorAll(".nps-state")) : []
-
-    if (this.indexValue < 0) this.indexValue = Math.floor((this.stepsValue - 1) / 2)
-    this._render(this.indexValue, this._ratioFor(this.indexValue))
+    if (this.indexValue < 0) this.indexValue = 0
+    this._render(this.indexValue, { emit: true })
   }
 
   start(event) {
@@ -42,8 +40,9 @@ export default class extends Controller {
     if (!up && !down) return
     event.preventDefault()
     const n = Math.max(2, this.stepsValue)
+    const prev = this.indexValue
     this.indexValue = Math.max(0, Math.min(n - 1, this.indexValue + (up ? 1 : -1)))
-    this._render(this.indexValue, this._ratioFor(this.indexValue))
+    this._render(this.indexValue, { emit: this.indexValue !== prev })
   }
 
   _drag(event) { if (this.dragging) this._fromEvent(event) }
@@ -51,7 +50,7 @@ export default class extends Controller {
   _end() {
     this.dragging = false
     window.removeEventListener("pointermove", this._onMove)
-    this._render(this.indexValue, this._ratioFor(this.indexValue)) // settle to the stop
+    this._render(this.indexValue, { emit: false }) // settle to the stop
   }
 
   _fromEvent(event) {
@@ -61,58 +60,43 @@ export default class extends Controller {
       : (rect.bottom - event.clientY) / rect.height
     const r = Math.max(0, Math.min(1, ratio))
     const n = Math.max(2, this.stepsValue)
-    this.indexValue = Math.round(r * (n - 1))
-    this._render(this.indexValue, r) // fill/handle follow the pointer while dragging
+    const idx = Math.round(r * (n - 1))
+    const changed = idx !== this.indexValue
+    this.indexValue = idx
+    this._render(idx, { emit: changed })
+  }
+
+  _render(idx, { emit }) {
+    this._positionThumb(this._ratioFor(idx))
+
+    const value = idx + 1 // 1-indexed for display + events
+    this.element.dataset.npsValue = value
+    const lbl  = this.labelTargets[idx]
+    const text = lbl ? lbl.textContent.trim() : `${value}`
+    this.labelTargets.forEach((l, i) => l.classList.toggle("is-active", i === idx))
+    if (this.hasTooltipTarget) this.tooltipTarget.textContent = text
+    this.element.setAttribute("aria-valuenow", value)
+    this.element.setAttribute("aria-valuetext", text)
+
+    if (emit) {
+      document.dispatchEvent(new CustomEvent("nps:valueChanged", {
+        detail: { value, index: idx, text }
+      }))
+    }
   }
 
   _ratioFor(idx) {
     return this.stepsValue > 1 ? idx / (this.stepsValue - 1) : 0
   }
 
-  _render(idx, ratio) {
-    this._drive(this.control, [], ratio)
-    this._positionThumb(ratio)
-    this._drive(this.reaction, this.reactionStates, ratio)
-
-    this.element.dataset.npsValue = idx
-    const lbl = this.labelTargets[idx]
-    const text = lbl ? lbl.textContent.trim() : `${idx}`
-    this.labelTargets.forEach((l, i) => l.classList.toggle("is-active", i === idx))
-    if (this.hasTooltipTarget) this.tooltipTarget.textContent = text
-    this.element.setAttribute("aria-valuenow", idx)
-    this.element.setAttribute("aria-valuetext", text)
-  }
-
   _positionThumb(ratio) {
     if (!this.thumb) return
-    const [minx, miny, w, h] = this.vb
-    let x, y
     if (this.axisValue === "horizontal") {
-      y = miny + h / 2
-      x = minx + this.inset + ratio * (w - 2 * this.inset)
+      this.thumb.style.left = `${ratio * 100}%`
+      this.thumb.style.top  = "50%"
     } else {
-      x = minx + w / 2
-      y = (miny + h - this.inset) - ratio * (h - 2 * this.inset)
+      this.thumb.style.left = "50%"
+      this.thumb.style.top  = `${(1 - ratio) * 100}%`
     }
-    this.thumb.style.transform = `translate(${x}px, ${y}px)`
-  }
-
-  // fill (--nps-fill, scaled per data-axis in CSS) + sentiment hue, and (states
-  // mode) the active expression mapped from the ratio.
-  _drive(stage, states, ratio) {
-    if (!stage) return
-    stage.style.setProperty("--nps-fill", ratio.toFixed(3))
-    stage.style.setProperty("--nps-hue", (ratio * 120).toFixed(1))
-    const n = states.length
-    if (n) {
-      const s = Math.max(0, Math.min(n - 1, Math.round(ratio * (n - 1))))
-      states.forEach((g, i) => g.classList.toggle("is-active", i === s))
-    }
-  }
-
-  _viewBox(svg) {
-    const raw = svg && svg.getAttribute("viewBox")
-    const p = raw ? raw.split(/[\s,]+/).map(Number) : [0, 0, 200, 200]
-    return p.length === 4 && p.every(Number.isFinite) ? p : [0, 0, 200, 200]
   }
 }

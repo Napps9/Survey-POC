@@ -66,7 +66,6 @@ class SurveysController < ApplicationController
     # Remember the palette as the company default so the next Verto inherits it.
     Current.organisation.update(default_brand_palette: palette) if palette.present?
 
-    attach_nps_visuals!(@survey, notes: notes)
     translate_survey!(@survey)
 
     redirect_to survey_path(@survey)
@@ -146,7 +145,6 @@ class SurveysController < ApplicationController
       existing_cards: Array(survey.cards),
       locale:         survey.default_locale
     )
-    card = attach_nps_visual(card, survey)
     card = translate_card!(card, survey)
 
     html = render_card_html(survey, card)
@@ -204,45 +202,6 @@ class SurveysController < ApplicationController
       Rails.logger.error("[SurveyTranslator card] #{loc}: #{e.class}: #{e.message}")
     end
     card
-  end
-
-  # For NPS cards, generate the themed reactive visual in a separate Claude call
-  # and store it on the card. Failures are non-fatal — the built-in fallback
-  # renders instead.
-  def attach_nps_visuals!(survey, notes: nil)
-    cards   = Array(survey.cards)
-    changed = false
-    cards.each do |card|
-      next unless card["type"].to_s == "nps" && card["nps_visual"].blank?
-      visual = generate_nps_visual(card, survey, notes: notes)
-      if visual
-        card["nps_visual"] = visual
-        changed = true
-      end
-    end
-    survey.update!(cards: cards) if changed
-  end
-
-  def attach_nps_visual(card, survey, notes: nil)
-    return card unless card["type"].to_s == "nps" && card["nps_visual"].blank?
-    visual = generate_nps_visual(card, survey, notes: notes)
-    card["nps_visual"] = visual if visual
-    card
-  end
-
-  def generate_nps_visual(card, survey, notes: nil)
-    NpsVisualGenerator.new.call(
-      theme:         survey.theme,
-      audience_age:  survey.audience_age,
-      key_insight:   survey.key_insight,
-      notes:         notes,
-      brand_palette: survey.brand_palette,
-      question:      card["text"],
-      options:       Array(card["options"])
-    )
-  rescue => e
-    Rails.logger.error("[NpsVisualGenerator] #{e.class}: #{e.message}")
-    nil
   end
 
   def render_card_html(survey, card)
