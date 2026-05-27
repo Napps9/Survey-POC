@@ -227,6 +227,18 @@
   align-items: center;
   justify-content: center;
 }
+/* When a card has been switched to NPS in the editor, the .nps-lottie wrapper
+   is injected on top of whatever the .split-left was rendering before (a
+   background image, the "add design" prompt, the "change media" button).
+   Hide that pre-existing chrome while the Lottie is mounted so it doesn't
+   show through. The Lottie itself sits absolute/inset:0 on z-index 1; the
+   progress bar (z-index 2) stays on top, like every other card type. */
+.split-left:has(.nps-lottie) > .split-left-img,
+.split-left:has(.nps-lottie) > .split-left-overlay,
+.split-left:has(.nps-lottie) > .split-left-design-prompt,
+.split-left:has(.nps-lottie) > .add-media-fab {
+  display: none;
+}
 .nps-lottie-mount {
   width: 88%;
   height: 88%;

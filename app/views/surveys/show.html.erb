@@ -12,6 +12,10 @@
     type_panel_controller at boot. Same data drives the Ruby helpers
     above. %>
 <script id="card-types" type="application/json"><%= CardTypes.to_json.html_safe %></script>
+<%# Lottie animation URLs for the NPS reactive scale, read by
+    type_panel_controller when a card is switched to nps so the left-panel
+    lottie-player can mount with the right asset paths. %>
+<script id="nps-lottie-urls" type="application/json"><%= nps_lottie_urls.to_json.html_safe %></script>
 <%# Full cards incl. per-language i18n — the editor's language tabs swap text
     from here without a server round-trip. %>
 <script id="survey-cards-i18n" type="application/json"><%= Array(@survey.cards).to_json.html_safe %></script>

@@ -28,10 +28,11 @@
     <div class="panel-progress-fill" style="width:<%= progress %>%;"></div>
   </div>
 
-  <%# Editor: prompt the creator to add design (an image). No how-to
-      illustration is shown for any card type, in any mode. NPS uses generated
-      reactive visuals instead of a picked image. %>
-  <% if editable && !nps_card?(card) %>
+  <%# Editor: prompt the creator to add design (an image). The button stays in
+      the DOM for every editor-mode card — including NPS — so type-switching
+      in the editor (e.g. range → NPS → range) finds it ready to reappear.
+      CSS hides it while a Lottie is mounted (.split-left:has(.nps-lottie) …). %>
+  <% if editable %>
     <% if has_img %>
       <button type="button" class="add-media-fab"
               data-action="click->media-picker#open"

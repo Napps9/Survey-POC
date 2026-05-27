@@ -60,19 +60,29 @@ const COMPATIBILITY = {
   ],
   range: [
     { type: "range",            score: 100, note: "Best at capturing strength of feeling — gives you a clean distribution to read insight from." },
+    { type: "nps",              score: 90,  note: "Same 5-point opinion scale, but the reactive Lottie character makes the answer feel rewarding — use when an engaging visual lifts response quality." },
     { type: "rating",           score: 85,  note: "Similar shape, but stars are more familiar and a touch less expressive." },
     { type: "tap_card",         score: 50,  note: "Trades the scale for a yes/no per statement — more engaging, less granular." },
     { type: "yes_no",           score: 30,  note: "Strips the scale to two answers — most data goes with it. Only use if the binary is the insight." },
   ],
   rating: [
     { type: "rating",           score: 100, note: "Star scale is instantly understood and gives a comparable score across questions." },
+    { type: "nps",              score: 88,  note: "Same 5-point feel with a reactive Lottie character — picks up where stars feel generic." },
     { type: "range",            score: 85,  note: "More expressive scale with custom endpoints — better when the spectrum isn't generic 'good/bad'." },
     { type: "tap_card",         score: 50,  note: "Loses the scale, but more engaging if you want a quick gut take across several items." },
     { type: "select_one_grid",  score: 35,  note: "Flattens the scale into discrete labelled tiles — loses the smoothness people respond to in stars." },
   ],
+  nps: [
+    { type: "nps",              score: 100, note: "Reactive 5-point scale with a Lottie character that responds to the answer — most engaging for opinion / satisfaction questions." },
+    { type: "rating",           score: 80,  note: "Star scale is the familiar baseline — switch if the reactive character feels off-tone for the audience." },
+    { type: "range",            score: 75,  note: "Same 5-point opinion scale without the reactive visual — switch if you want a quieter, classic feel." },
+    { type: "tap_card",         score: 45,  note: "Replace the scale with a quick gut yes/no across several statements — only if you have multiple to test." },
+    { type: "yes_no",           score: 30,  note: "Collapses the scale to two answers — most signal goes with it. Only use if the binary is the insight." },
+  ],
   yes_no: [
     { type: "yes_no",           score: 100, note: "Crisp signal when you genuinely need a binary — easy to read and easy to answer." },
     { type: "select_one_grid",  score: 75,  note: "Adds nuance with a few defined visual options — better when 'yes/no' is hiding the real answer." },
+    { type: "nps",              score: 55,  note: "Adds a 5-point scale with a reactive character — better when degree matters and you want an engaging visual." },
     { type: "range",            score: 45,  note: "Captures the strength of the yes or no — useful when degree matters more than the answer." },
     { type: "tap_card",         score: 35,  note: "Run a quick yes/no across several statements at once — only swap if you have multiple to test." },
   ],
@@ -88,6 +98,7 @@ const COMPATIBILITY = {
 
 const DEFAULT_OPTIONS = {
   range:            ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
+  nps:              ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
   rating:           ["Poor", "Fair", "Good", "Great", "Excellent"],
   multiple_choice:  ["Option A", "Option B", "Option C"],
   select_many:      ["Option A", "Option B", "Option C", "Option D"],
@@ -98,6 +109,9 @@ const DEFAULT_OPTIONS = {
   open_ended:       [],
   welcome_card:     [],
 }
+
+// 5 is hardcoded server-side too (NpsHelper::NPS_STEPS). Keep in sync.
+const NPS_STEPS = 5
 
 const SWIPE_FILLS = [
   ["#d4edda","#a8d5b5"], ["#d1ecf1","#9fd5df"], ["#fff3cd","#ffd88a"],
@@ -165,6 +179,8 @@ const COMPONENTS = {
 
   range: (opts) => sliderHtml(opts),
 
+  nps: (opts) => npsHtml(opts),
+
   rating: (opts) => {
     const labels = opts.length >= 2 ? opts : ["Poor", "Fair", "Good", "Great", "Excellent"]
     const first  = labels[0] || "Poor"
@@ -230,6 +246,33 @@ function gridHtml(opts, mode) {
           <div class="choice-label" contenteditable="true">${esc(o)}</div>
         </li>`).join("")}
     </ul>`
+}
+
+// Mirror of nps_helper.rb's render_nps_control + the `when "nps"` block of
+// _card_component.html.erb. NPS is fixed at 5 steps, so we pad/truncate the
+// labels to exactly NPS_STEPS; if the source card had fewer than 5 (e.g.
+// switching from yes_no), the whole label set is replaced with the default
+// sentiment scale rather than mixing two sources.
+function npsHtml(opts) {
+  const labels = opts.length === NPS_STEPS ? opts : DEFAULT_OPTIONS.nps
+  return `
+    <div class="nps-slider"
+         data-controller="nps-slider"
+         data-nps-slider-steps-value="${NPS_STEPS}"
+         data-nps-slider-axis-value="vertical"
+         data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
+         tabindex="0" role="slider"
+         aria-valuemin="1" aria-valuemax="${NPS_STEPS}">
+      <div class="nps-slider-stage">
+        <div class="slider-labels nps-slider-labels">
+          ${labels.map(o => `<span class="slider-label-text" data-nps-slider-target="label" contenteditable="true">${esc(o)}</span>`).join("")}
+        </div>
+        <div class="nps-control" data-axis="vertical">
+          <div class="nps-track-fill"></div>
+          <div class="nps-thumb"></div>
+        </div>
+      </div>
+    </div>`
 }
 
 function sliderHtml(opts) {
@@ -466,6 +509,8 @@ export default class extends Controller {
     const meta = this.typeMeta[type]
     if (!meta) return
 
+    const wasType = card.dataset.cardType
+
     // 1. Update badge + eyebrow
     const badge = card.querySelector(".s-badge")
     if (badge) { badge.textContent = meta.badge; badge.className = `s-badge ${meta.css}` }
@@ -473,7 +518,7 @@ export default class extends Controller {
     const eyebrow = card.querySelector(".q-eyebrow")
     if (eyebrow) eyebrow.textContent = meta.eyebrow
 
-    // 2. Swap the interactive component HTML
+    // 2. Swap the interactive component HTML on the RIGHT panel
     const slot = card.querySelector("[data-card-component]")
     if (slot) {
       const opts = this._optionsFor(card, type)
@@ -487,12 +532,67 @@ export default class extends Controller {
     const otherBlock = card.querySelector(".other-block")
     if (otherBlock) otherBlock.hidden = (type === "welcome_card")
 
+    // 3. Swap LEFT panel when entering or leaving NPS — NPS needs a
+    //    Lottie player mount that other types don't, and other types
+    //    need the design-prompt / image chrome that NPS suppresses.
+    if (type === "nps" && wasType !== "nps") {
+      this._mountNpsLottie(card)
+    } else if (wasType === "nps" && type !== "nps") {
+      this._unmountNpsLottie(card)
+    }
+
     if (card === this.activeCardEl) {
       const num = card.dataset.cardNum
       this.panelCardNameTarget.textContent = t("editor.card_n", { n: num, type: meta.badge })
       this._renderCompatibleTypes(type)
       this.pendingType = type
     }
+  }
+
+  // ── NPS left-panel mount/unmount ─────────────────────────
+  // The Lottie URLs blob is rendered once per page (see show.html.erb) so
+  // we can mount the lottie-player without going back to the server when a
+  // card is switched to NPS. CSS (`.split-left:has(.nps-lottie) > …`)
+  // handles hiding the image / design-prompt chrome while the Lottie
+  // is mounted.
+
+  get _npsLottieUrls() {
+    if (this.__npsLottieUrls) return this.__npsLottieUrls
+    try {
+      const raw = document.getElementById("nps-lottie-urls")?.textContent || "[]"
+      this.__npsLottieUrls = JSON.parse(raw)
+    } catch (_) {
+      this.__npsLottieUrls = []
+    }
+    return this.__npsLottieUrls
+  }
+
+  _mountNpsLottie(card) {
+    const left = card.querySelector(".split-left")
+    if (!left || left.querySelector(".nps-lottie")) return
+    const urls = this._npsLottieUrls
+    if (!urls.length) return
+
+    const wrap = document.createElement("div")
+    wrap.className = "nps-lottie"
+    wrap.dataset.controller = "lottie-player"
+    wrap.dataset.lottiePlayerUrlsValue = JSON.stringify(urls)
+    wrap.dataset.lottiePlayerCurrentValue = "1"
+
+    const mount = document.createElement("div")
+    mount.className = "nps-lottie-mount"
+    mount.dataset.lottiePlayerTarget = "mount"
+    wrap.appendChild(mount)
+
+    // Position above .panel-progress so the Lottie sits behind the progress
+    // bar exactly like the server-rendered version does.
+    left.insertBefore(wrap, left.firstChild)
+  }
+
+  _unmountNpsLottie(card) {
+    const left = card.querySelector(".split-left")
+    const wrap = left && left.querySelector(".nps-lottie")
+    if (wrap) wrap.remove() // lottie-player controller's disconnect() destroys the lottie instance
   }
 
   _optionsFor(card, type) {
