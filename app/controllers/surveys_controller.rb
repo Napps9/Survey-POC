@@ -72,7 +72,7 @@ class SurveysController < ApplicationController
     redirect_to survey_path(@survey)
   rescue => e
     Rails.logger.error("[SurveyGenerator] #{e.class}: #{e.message}")
-    flash.now[:alert] = "We couldn't generate your Verto. Try again in a moment."
+    flash.now[:alert] = "We couldn't generate your Verto — #{friendly_generate_error(e)}"
     render :new, status: :unprocessable_entity
   end
 
@@ -173,6 +173,26 @@ class SurveysController < ApplicationController
 
   def set_survey
     @survey = Current.organisation.surveys.kept.find(params[:id])
+  end
+
+  # Turn an exception from the generate pipeline into something the operator
+  # can act on. For Anthropic API errors we surface the upstream message
+  # (e.g. "credit balance too low", "rate limit") rather than the generic
+  # "try again" line, which sent us in circles diagnosing the bug.
+  def friendly_generate_error(e)
+    api_msg = anthropic_api_message(e)
+    return api_msg if api_msg.present?
+
+    msg = e.message.to_s.strip
+    msg = msg.first(200) + "…" if msg.length > 200
+    msg.presence || "#{e.class.name.split('::').last}. Check the server logs."
+  end
+
+  def anthropic_api_message(e)
+    return nil unless defined?(Anthropic::Errors::APIError) && e.is_a?(Anthropic::Errors::APIError)
+    body = e.respond_to?(:body) ? e.body : nil
+    return nil unless body.is_a?(Hash)
+    body.dig(:error, :message) || body.dig("error", "message")
   end
 
   # Translate the survey's primary cards into each secondary language and store
