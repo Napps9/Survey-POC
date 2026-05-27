@@ -1,0 +1,226 @@
+<% content_for :title, "#{@alliance.name} — Alliances" %>
+<% content_for :head do %>
+  <style>body { overflow: auto !important; height: auto !important; }</style>
+<% end %>
+
+<% is_admin = current_membership&.admin? %>
+
+<div style="display:flex;min-height:100vh;background:#1C2034;">
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+
+    <%# ── Hero ── %>
+    <div style="position:relative;overflow:hidden;padding:36px 36px 32px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
+      <div class="gen-orbs" style="opacity:0.25;">
+        <div class="gen-orb gen-orb-2"></div>
+        <div class="gen-orb gen-orb-3"></div>
+      </div>
+
+      <div style="position:relative;z-index:1;">
+        <%= link_to alliances_path,
+              style: "display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);text-decoration:none;margin-bottom:18px;" do %>
+          <span style="opacity:0.7;">←</span> All alliances
+        <% end %>
+
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#FF1E6F;box-shadow:0 0 12px rgba(255,30,111,0.7);"></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;">Alliance · You run this</span>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:<%= @alliance.active? ? 'rgba(1,234,203,0.15)' : 'rgba(255,255,255,0.08)' %>;color:<%= @alliance.active? ? '#01EACB' : 'rgba(255,255,255,0.5)' %>;">
+                <%= @alliance.status.capitalize %>
+              </span>
+            </div>
+            <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 6px;"><%= @alliance.name %></h1>
+            <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
+              Started <%= @alliance.created_at.to_date.to_fs(:long) rescue @alliance.created_at.to_date %>
+            </p>
+          </div>
+
+          <% if is_admin %>
+            <div style="display:flex;gap:10px;">
+              <%= button_to "Generate join link →", alliance_alliance_invites_path(@alliance), method: :post,
+                    style: "background:#FF1E6F;border:none;border-radius:100px;padding:10px 20px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;cursor:pointer;",
+                    form: { style: "margin:0;" } %>
+              <%= button_to "Delete", alliance_path(@alliance), method: :delete,
+                    data: { turbo_confirm: "Delete #{@alliance.name}? All share links for this alliance will stop working." },
+                    form: { style: "margin:0;" },
+                    style: "background:none;border:1px solid rgba(255,255,255,0.15);border-radius:100px;padding:9px 18px;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <%# ── Body ── %>
+    <div style="flex:1;padding:32px 36px 60px;">
+
+      <% if flash[:notice] %>
+        <div style="background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:notice] %></div>
+      <% end %>
+      <% if flash[:alert] %>
+        <div style="background:rgba(216,0,39,0.1);border:1px solid rgba(216,0,39,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#FF6B83;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:alert] %></div>
+      <% end %>
+
+      <% if params[:new_invite_token].present? %>
+        <% new_url = invite_url(params[:new_invite_token]) %>
+        <div style="background:#161B2E;border:1px solid rgba(255,30,111,0.3);border-radius:14px;padding:18px 20px;margin-bottom:24px;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#FF1E6F;letter-spacing:0.05em;margin-bottom:4px;">New join link</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);margin-bottom:12px;">Anyone with this link can join <%= @alliance.name %> as a partner. Expires in 14 days.</div>
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;">
+            <input type="text" readonly id="new-partner-link" value="<%= new_url %>"
+                   style="flex:1;background:transparent;border:none;color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;" />
+            <button type="button"
+                    onclick="navigator.clipboard.writeText(document.getElementById('new-partner-link').value).then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
+                    style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size: var(--text-base);cursor:pointer;">Copy</button>
+          </div>
+        </div>
+      <% end %>
+
+      <%# ── Members ── %>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Partners</span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @memberships.size %></span>
+      </div>
+
+      <% if @memberships.empty? %>
+        <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:36px 24px;text-align:center;margin-bottom:32px;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;">No partners yet</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto;line-height:1.5;">
+            Use <span style="color:#FF1E6F;">Generate join link</span> above to invite partner organisations.
+          </div>
+        </div>
+      <% else %>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:32px;">
+          <% @memberships.each do |m| %>
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px;">
+              <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#FF1E6F,#615BF5);display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;flex-shrink:0;">
+                <%= m.organisation.name.first.upcase %>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= m.organisation.name %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);">Joined <%= m.created_at.to_date.to_fs(:long) rescue m.created_at.to_date %></div>
+              </div>
+              <% if is_admin %>
+                <%= button_to "×", alliance_alliance_membership_path(@alliance, m), method: :delete,
+                      data: { turbo_confirm: "Remove #{m.organisation.name} from #{@alliance.name}? Their share links will stop working." },
+                      form: { style: "margin:0;" },
+                      style: "background:none;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:3px 9px;color:rgba(255,255,255,0.5);font-family:'Alata',sans-serif;font-size: var(--text-md);cursor:pointer;line-height:1;" %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%# ── Vertos in this alliance ── %>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Vertos in alliance</span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @alliance_vertos.size %></span>
+      </div>
+
+      <% if @alliance_vertos.empty? %>
+        <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:36px 24px;text-align:center;margin-bottom:32px;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;">No Vertos shared yet</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto;line-height:1.5;">
+            Add a published Verto below and a unique share link will be generated for each partner.
+          </div>
+        </div>
+      <% else %>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px;">
+          <% @alliance_vertos.each do |av| %>
+            <% s = av.survey %>
+            <% shares = @shares_by_verto[av.id] || [] %>
+            <% verto_responses = shares.sum { |sh| @response_counts_by_share[sh.id] || 0 } %>
+            <% verto_completed = shares.sum { |sh| @completed_counts_by_share[sh.id] || 0 } %>
+            <% verto_rate = verto_responses.positive? ? ((verto_completed.to_f / verto_responses) * 100).round : nil %>
+            <% s_archived = s.deleted? %>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
+              <div style="height:3px;background:<%= s_archived ? 'rgba(255,255,255,0.1)' : 'linear-gradient(90deg,#01EACB,#FF1E6F)' %>;"></div>
+              <div style="padding:16px 20px 12px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">
+                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:<%= s_archived ? 'rgba(255,255,255,0.08)' : (s.published? ? '#01EACB' : 'rgba(255,255,255,0.08)') %>;color:<%= s_archived ? 'rgba(255,255,255,0.5)' : (s.published? ? '#1C2034' : 'rgba(255,255,255,0.5)') %>;">
+                    <%= s_archived ? "Archived" : (s.published? ? "Live" : "Draft") %>
+                  </span>
+                  <% if is_admin %>
+                    <%= button_to "Remove", alliance_alliance_verto_path(@alliance, av), method: :delete,
+                          data: { turbo_confirm: "Remove this Verto from #{@alliance.name}? All partner share links for it will stop working." },
+                          form: { style: "margin:0;" },
+                          style: "background:none;border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:5px 10px;color:rgba(255,255,255,0.5);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;" %>
+                  <% end %>
+                </div>
+                <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;line-height:1.25;margin-bottom:8px;">
+                  <%= s.theme.presence&.truncate(60) || s.title.presence&.truncate(60) || "Untitled Verto" %>
+                </div>
+                <div style="display:flex;gap:18px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);">
+                  <span><strong style="font-family:'Alata',sans-serif;color:#FF1E6F;"><%= verto_rate ? "#{verto_rate}%" : "—" %></strong> completion</span>
+                  <span><strong style="font-family:'Alata',sans-serif;color:#01EACB;"><%= verto_responses %></strong> responses</span>
+                  <span><strong style="font-family:'Alata',sans-serif;color:#615BF5;"><%= shares.size %></strong> partner link<%= shares.size == 1 ? "" : "s" %></span>
+                </div>
+              </div>
+              <% if shares.any? %>
+                <div style="border-top:1px solid rgba(255,255,255,0.05);padding:12px 20px;display:flex;flex-direction:column;gap:8px;">
+                  <% shares.sort_by { |sh| sh.partner_organisation.name }.each do |share| %>
+                    <% url = play_survey_url(share.share_token) %>
+                    <% sh_resp = @response_counts_by_share[share.id] || 0 %>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#FF1E6F,#615BF5);display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size: var(--text-xs);color:#fff;flex-shrink:0;">
+                        <%= share.partner_organisation.name.first.upcase %>
+                      </div>
+                      <span style="flex-shrink:0;font-family:'Alata',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.78);width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= share.partner_organisation.name %></span>
+                      <input type="text" readonly value="<%= url %>"
+                             id="share-link-<%= share.id %>"
+                             onclick="this.select()"
+                             style="flex:1;min-width:0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 8px;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);outline:none;" />
+                      <button type="button"
+                              onclick="navigator.clipboard.writeText(document.getElementById('share-link-<%= share.id %>').value).then(()=>{this.textContent='✓';setTimeout(()=>{this.textContent='Copy'},1500)})"
+                              style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;flex-shrink:0;">Copy</button>
+                      <span style="flex-shrink:0;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);width:60px;text-align:right;"><%= sh_resp %> resp.</span>
+                    </div>
+                  <% end %>
+                </div>
+              <% else %>
+                <div style="border-top:1px solid rgba(255,255,255,0.05);padding:12px 20px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);">
+                  Add a partner to the alliance to generate share links.
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%# ── Add a Verto ── %>
+      <% if is_admin %>
+        <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px 22px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#0CA7FF;"></span>
+            <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;">Add to alliance</span>
+          </div>
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:4px;">Add another Verto</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin-bottom:14px;">
+            Pick a published Verto. We'll generate a unique share link for every partner in the alliance.
+          </div>
+
+          <% if @available_surveys.empty? %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);padding:14px 0;">
+              No more published Vertos to add. <%= link_to "Create a new Verto →", new_survey_path, style: "color:#01EACB;text-decoration:none;" %>
+            </div>
+          <% else %>
+            <%= form_with url: alliance_alliance_vertos_path(@alliance), method: :post, local: true,
+                  html: { style: "display:flex;gap:10px;flex-wrap:wrap;align-items:center;" } do |f| %>
+              <%= f.select :survey_id,
+                    @available_surveys.map { |s| [ [ s.theme.presence, s.title.presence ].compact.uniq.first(2).join(" — ").truncate(72), s.id ] },
+                    {},
+                    style: "flex:1;min-width:240px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;" %>
+              <button type="submit"
+                      style="background:#01EACB;border:none;border-radius:100px;padding:11px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;cursor:pointer;">
+                Add Verto →
+              </button>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>

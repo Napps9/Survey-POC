@@ -323,55 +323,48 @@
           <% end %>
         </div>
 
-        <%# Partner share links (available even before publish — share tokens are
-            independent of the public publish_token). %>
-        <% if current_organisation&.creator? && current_membership&.admin? %>
-          <% partner_shares    = @survey.survey_shares.includes(alliance: :partner_organisation).order(:created_at) %>
-          <% active_alliances  = current_organisation.alliances.active.includes(:partner_organisation) %>
-          <% shared_ally_ids   = partner_shares.map(&:alliance_id).compact %>
-          <% available_allies  = active_alliances.reject { |a| shared_ally_ids.include?(a.id) } %>
+        <%# Alliance share — add this Verto to an alliance and generate
+            per-partner links. Each row in the alliance produces a unique token. %>
+        <% if current_membership&.admin? %>
+          <% all_alliances   = current_organisation.alliances.order(:name) %>
+          <% shared_in       = AllianceVerto.where(survey_id: @survey.id, alliance_id: all_alliances.map(&:id)).pluck(:alliance_id).to_set %>
+          <% available_allys = all_alliances.reject { |a| shared_in.include?(a.id) } %>
+          <% in_alliances    = all_alliances.select { |a| shared_in.include?(a.id) } %>
           <div class="publish-block">
-            <div class="publish-block-title">Partner share links</div>
+            <div class="publish-block-title">Share with an alliance</div>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:10px;line-height:1.45;">
-              Generate per-partner links. Responses are attributed to that partner; they'll see their own results plus the aggregate.
+              Add this Verto to an alliance. Each partner in the alliance gets their own unique share link, and you'll see each one's responses separately.
             </div>
-            <% if active_alliances.empty? %>
-              <%= button_to "Invite a partner →", alliance_invites_path, method: :post,
-                    style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:10px;padding:7px 14px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;",
-                    form: { style: "margin:0;display:inline-block;" } %>
-            <% elsif available_allies.empty? %>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);">All partners already have a link.</span>
+            <% if all_alliances.empty? %>
+              <%= link_to "Create an alliance →", new_alliance_path,
+                    style: "display:inline-block;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:10px;padding:7px 14px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
+            <% elsif available_allys.empty? %>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);">Already in every alliance you run.</span>
             <% else %>
-              <%= form_with url: create_survey_share_path(@survey), method: :post,
+              <%= form_with url: alliance_alliance_vertos_path(available_allys.first), method: :post,
                     data: { turbo: false },
+                    html: { id: "add-to-alliance-form" },
                     style: "display:flex;flex-direction:column;gap:8px;margin:0;" do |f| %>
-                <%= f.select :alliance_id,
-                      available_allies.map { |a| [a.partner_organisation.name, a.id] },
-                      { include_blank: "Select partner…" },
-                      style: "background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px;color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);" %>
-                <%= f.submit "Generate link →",
+                <%= hidden_field_tag :survey_id, @survey.id %>
+                <select name="alliance_picker"
+                        onchange="document.getElementById('add-to-alliance-form').action = '/alliances/' + this.value + '/alliance_vertos'"
+                        style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px;color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);">
+                  <% available_allys.each do |a| %>
+                    <option value="<%= a.id %>" style="background:#1C2034;color:#fff;"><%= a.name %></option>
+                  <% end %>
+                </select>
+                <%= f.submit "Add to alliance →",
                       style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:10px;padding:8px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;" %>
               <% end %>
             <% end %>
-            <% if partner_shares.any? %>
+            <% if in_alliances.any? %>
               <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
-                <% partner_shares.each do |share| %>
-                  <% url = play_survey_url(share.share_token) %>
-                  <div style="display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:9px 11px;">
-                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.78);"><%= share.display_name %></span>
-                    <input type="text" readonly value="<%= url %>"
-                           id="share-url-<%= share.id %>"
-                           style="width:100%;background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 8px;color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
-                    <div style="display:flex;gap:6px;">
-                      <button type="button"
-                              onclick="navigator.clipboard.writeText(document.getElementById('share-url-<%= share.id %>').value).then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},1500)})"
-                              style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;">Copy</button>
-                      <%= button_to "Revoke", survey_share_path(@survey, share), method: :delete,
-                            data: { turbo_confirm: "Revoke this partner link?" },
-                            form: { style: "display:inline;flex:1;margin:0;" },
-                            style: "width:100%;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.5);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;" %>
-                    </div>
-                  </div>
+                <% in_alliances.each do |a| %>
+                  <%= link_to alliance_path(a),
+                        style: "display:flex;align-items:center;justify-content:space-between;gap:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:9px 11px;text-decoration:none;" do %>
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.78);"><%= a.name %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.5);">Manage →</span>
+                  <% end %>
                 <% end %>
               </div>
             <% end %>

@@ -3,13 +3,11 @@
   mem  = current_membership
   user = Current.user
 
-  show_partners   = org&.creator? && mem&.admin?
-  show_shared     = org && !org.creator?
-  show_create     = org&.creator?
-
-  recent_surveys  = org ? org.surveys.kept.recent.limit(5) : []
-  partner_orgs    = show_partners ? org.partner_organisations.limit(8) : []
-  org_members     = (mem&.admin? && org) ? org.memberships.includes(:user).limit(8) : []
+  recent_surveys = org ? org.surveys.kept.recent.limit(5) : []
+  owned_alliances    = org ? org.alliances.order(created_at: :desc).limit(4) : []
+  member_alliances   = org ? org.member_alliances.order("alliances.created_at desc").limit(4) : []
+  visible_alliances  = (owned_alliances.to_a + member_alliances.to_a).uniq.first(8)
+  org_members        = (mem&.admin? && org) ? org.memberships.includes(:user).limit(8) : []
 %>
 <div class="command-palette-backdrop"
      data-command-palette-target="backdrop"
@@ -45,7 +43,7 @@
         My Vertos
       </a>
 
-      <% if show_create %>
+      <% if org %>
         <a href="<%= new_survey_path %>"
            class="command-palette-tile"
            style="--tile-accent:#FF1E6F;"
@@ -57,9 +55,7 @@
           </svg>
           Create Verto
         </a>
-      <% end %>
 
-      <% if show_partners %>
         <a href="<%= alliances_path %>"
            class="command-palette-tile"
            style="--tile-accent:#0CA7FF;"
@@ -70,18 +66,7 @@
             <circle cx="10" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/>
             <path d="M1.5 13c0.5-2 1.8-3 3.5-3M13.5 13c-0.5-2-1.8-3-3.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
           </svg>
-          Partners
-        </a>
-      <% elsif show_shared %>
-        <a href="<%= alliance_vertos_path %>"
-           class="command-palette-tile"
-           style="--tile-accent:#0CA7FF;"
-           data-command-palette-target="item"
-           data-search-text="shared vertos partners">
-          <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
-            <path d="M7.5 1l6 3v4.5c0 3-2.5 5-6 5.5C4 13.5 1.5 11.5 1.5 8.5V4l6-3z" stroke="currentColor" stroke-width="1.3" fill="none"/>
-          </svg>
-          Shared Vertos
+          Alliances
         </a>
       <% end %>
     </div>
@@ -111,31 +96,33 @@
         </div>
       <% end %>
 
-      <% if show_partners %>
-        <div class="command-palette-section" data-section="partners">
+      <% if visible_alliances.any? %>
+        <div class="command-palette-section" data-section="alliances">
           <div class="command-palette-section-title">
             <span class="command-palette-section-dot" style="background:#0CA7FF;"></span>
-            Partners
+            Alliances
           </div>
           <a href="<%= alliances_path %>"
              class="command-palette-item"
              data-command-palette-target="item"
-             data-search-text="all partners alliances">
+             data-search-text="all alliances partners">
             <svg class="command-palette-item-icon" viewBox="0 0 15 15" fill="none">
               <path d="M7.5 4v7M4 7.5h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
             </svg>
-            View all partners
+            View all alliances
           </a>
-          <% partner_orgs.each do |p| %>
-            <a href="<%= alliances_path %>"
+          <% visible_alliances.each do |a| %>
+            <a href="<%= alliance_path(a) %>"
                class="command-palette-item"
                data-command-palette-target="item"
-               data-search-text="<%= p.name.downcase %>">
+               data-search-text="<%= a.name.downcase %>">
               <svg class="command-palette-item-icon" viewBox="0 0 15 15" fill="none">
-                <circle cx="7.5" cy="6" r="2.5" stroke="currentColor" stroke-width="1.3"/>
-                <path d="M2 13c0.5-2.5 2.5-4 5.5-4s5 1.5 5.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                <circle cx="5" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+                <circle cx="10" cy="6" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M1.5 13c0.5-2 1.8-3 3.5-3M13.5 13c-0.5-2-1.8-3-3.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
               </svg>
-              <%= p.name %>
+              <%= a.name %>
+              <% if a.organisation_id != org.id %><span class="command-palette-item-meta">Member</span><% end %>
             </a>
           <% end %>
         </div>

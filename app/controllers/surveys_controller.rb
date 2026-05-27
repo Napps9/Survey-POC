@@ -2,7 +2,6 @@ class SurveysController < ApplicationController
   include AggregatesSurveyResults
   layout "fullscreen", only: [ :show, :new ]
 
-  before_action :require_creator_org!
   before_action :require_admin!,       only: [ :destroy ]
   before_action :set_survey,           only: [ :show, :publish, :update_settings ]
   before_action :set_survey_including_archived, only: [ :results ]
@@ -247,7 +246,9 @@ class SurveysController < ApplicationController
   def result_segments(base)
     segments = [ { id: "overall", label: "Overall", scope: base, count: base.count } ]
 
-    shares = @survey.survey_shares.includes(alliance: :partner_organisation).order(:created_at)
+    shares = @survey.survey_shares
+                    .includes(:partner_organisation, alliance_verto: :alliance)
+                    .order(:created_at)
     return segments if shares.empty?
 
     direct = base.where(survey_share_id: nil)
@@ -257,7 +258,9 @@ class SurveysController < ApplicationController
 
     shares.each do |share|
       scope = base.where(survey_share_id: share.id)
-      segments << { id: "share_#{share.id}", label: share.display_name, scope: scope, count: scope.count }
+      alliance_name = share.alliance_verto&.alliance&.name
+      label = alliance_name ? "#{share.display_name} · #{alliance_name}" : share.display_name
+      segments << { id: "share_#{share.id}", label: label, scope: scope, count: scope.count }
     end
 
     segments

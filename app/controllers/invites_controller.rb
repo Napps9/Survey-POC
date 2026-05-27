@@ -89,6 +89,11 @@ class InvitesController < ApplicationController
   end
 
   def accept_partner_invite
+    alliance = @invite.alliance
+    unless alliance
+      return redirect_to new_session_path, alert: "This invite is no longer valid."
+    end
+
     email         = (@invite.addressed_email || params[:email_address].to_s.strip.downcase)
     existing_user = email.present? ? User.find_by(email_address: email) : nil
     admin_org     = existing_user && existing_user.memberships.admin.first&.organisation
@@ -99,12 +104,16 @@ class InvitesController < ApplicationController
         flash.now[:alert] = "Enter your existing Playverto password to link your organisation."
         return render :show, status: :unprocessable_entity
       end
+      if admin_org.id == alliance.organisation_id
+        flash.now[:alert] = "You can't join an alliance you created."
+        return render :show, status: :unprocessable_entity
+      end
       ActiveRecord::Base.transaction do
-        link_partner_org(admin_org)
+        join_alliance(admin_org, alliance)
         @invite.update!(accepted_at: Time.current)
         start_new_session_for existing_user
       end
-      redirect_to root_path, notice: "#{admin_org.name} is now a partner of #{@invite.organisation.name}."
+      redirect_to alliance_path(alliance), notice: "#{admin_org.name} joined #{alliance.name}."
     else
       name     = params[:name].to_s.strip
       org_name = params[:organisation_name].to_s.strip.presence || "#{name}'s organisation"
@@ -128,23 +137,23 @@ class InvitesController < ApplicationController
         user = existing_user || User.create!(name: name, email_address: email, password: password)
         partner_org = Organisation.create!(
           name: org_name,
-          slug: Organisation.generate_unique_slug(org_name),
-          kind: "partner"
+          slug: Organisation.generate_unique_slug(org_name)
         )
         partner_org.memberships.create!(user: user, role: "admin")
-        link_partner_org(partner_org)
+        join_alliance(partner_org, alliance)
         @invite.update!(accepted_at: Time.current)
         start_new_session_for user
       end
-      redirect_to root_path, notice: "Welcome! You're now a partner of #{@invite.organisation.name}."
+      redirect_to alliance_path(alliance), notice: "Welcome to #{alliance.name}!"
     end
   end
 
-  def link_partner_org(partner_org)
-    Alliance.find_or_create_by!(
-      organisation: @invite.organisation,
-      partner_organisation: partner_org
-    ) { |a| a.status = "active" }
+  def join_alliance(partner_org, alliance)
+    AllianceMembership.find_or_create_by!(
+      alliance: alliance,
+      organisation: partner_org
+    ) { |m| m.status = "active" }
+    AllianceShareSync.ensure_shares_for(alliance: alliance)
   end
 
   def load_invite

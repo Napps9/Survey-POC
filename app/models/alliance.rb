@@ -1,16 +1,18 @@
 class Alliance < ApplicationRecord
   belongs_to :organisation
-  belongs_to :partner_organisation, class_name: "Organisation"
-  has_many :survey_shares, dependent: :destroy
+  has_many :alliance_memberships, dependent: :destroy
+  has_many :member_organisations, through: :alliance_memberships, source: :organisation
+  has_many :alliance_vertos, dependent: :destroy
+  has_many :surveys, through: :alliance_vertos
+  has_many :survey_shares, through: :alliance_vertos
+  has_many :invites, dependent: :nullify
 
   enum :status, { active: "active", pending: "pending", revoked: "revoked" }
 
-  validate :different_organisations
+  validates :name, presence: true, length: { maximum: 80 },
+                   uniqueness: { scope: :organisation_id, case_sensitive: false }
 
-  private
-
-  def different_organisations
-    return unless organisation_id && partner_organisation_id
-    errors.add(:partner_organisation, "cannot be the same as the organisation") if organisation_id == partner_organisation_id
+  def active_memberships
+    alliance_memberships.active
   end
 end

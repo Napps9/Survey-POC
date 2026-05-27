@@ -5,17 +5,10 @@ class Organisation < ApplicationRecord
   has_many :invites, dependent: :destroy
 
   has_many :alliances, dependent: :destroy
-  has_many :partner_organisations, through: :alliances
-  has_many :alliance_memberships,
-           class_name: "Alliance",
-           foreign_key: :partner_organisation_id,
-           dependent: :destroy,
-           inverse_of: :partner_organisation
-  has_many :parent_organisations, through: :alliance_memberships, source: :organisation
+  has_many :alliance_memberships, dependent: :destroy
+  has_many :member_alliances, through: :alliance_memberships, source: :alliance
 
   has_one_attached :logo
-
-  enum :kind, { creator: "creator", partner: "partner" }
 
   # The company's default Verto palette — pre-fills each new Verto's colour
   # step. Falls back to the Playverto default when never set.

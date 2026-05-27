@@ -1,0 +1,42 @@
+<% content_for :title, "New alliance — Playverto" %>
+<% content_for :head do %>
+  <style>body { overflow: auto !important; height: auto !important; }</style>
+<% end %>
+
+<div style="min-height:100vh;background:#1C2034;display:flex;align-items:center;justify-content:center;padding:24px;">
+  <div style="width:100%;max-width:480px;">
+
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#FF1E6F;box-shadow:0 0 12px rgba(255,30,111,0.7);"></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;">New alliance</span>
+      </div>
+      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#fff;margin:0 0 6px;">Name your alliance</h1>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.45);margin:0;">
+        Give the group a clear name so partners know what they're joining.
+      </p>
+    </div>
+
+    <% if flash[:alert] %>
+      <div style="background:rgba(216,0,39,0.1);border:1px solid rgba(216,0,39,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#FF6B83;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:alert] %></div>
+    <% end %>
+
+    <%= form_with model: @alliance, url: alliances_path, local: true do |f| %>
+      <div style="margin-bottom:24px;">
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Alliance name</label>
+        <%= f.text_field :name,
+              required: true, autofocus: true, maxlength: 80,
+              placeholder: "e.g. Pilot Partners",
+              class: "form-input" %>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <%= link_to "Cancel", alliances_path,
+              style: "flex:0 0 auto;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 22px;color:rgba(255,255,255,0.7);font-family:'Alata',sans-serif;font-size: var(--text-md);text-decoration:none;text-align:center;" %>
+        <%= f.submit "Create alliance →",
+              style: "flex:1;background:#FF1E6F;border:none;border-radius:8px;padding:14px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.05em;cursor:pointer;" %>
+      </div>
+    <% end %>
+
+  </div>
+</div>

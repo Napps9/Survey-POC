@@ -3,14 +3,9 @@
   org  = current_organisation
   mem  = current_membership
 
-  show_partners  = org&.creator? && mem&.admin?
-  show_shared    = org && !org.creator?
-  show_create    = org&.creator?
-
-  active_partners = show_partners && (path.start_with?("/alliances") || path.start_with?("/alliance_invites"))
-  active_shared   = show_shared   && path.start_with?("/alliance_vertos")
-  active_results  = path == "/"
-  active_create   = show_create && path == new_survey_path
+  active_alliances = org && path.start_with?("/alliances")
+  active_results   = path == "/"
+  active_create    = org && path == new_survey_path
 %>
 <nav class="bottom-bar" aria-label="Primary">
   <div class="bottom-bar-left">
@@ -22,15 +17,10 @@
   </div>
 
   <div class="bottom-bar-centre">
-    <% if show_partners %>
-      <a href="<%= alliances_path %>" class="bottom-bar-chip" data-active="<%= active_partners %>">
+    <% if org %>
+      <a href="<%= alliances_path %>" class="bottom-bar-chip" data-active="<%= active_alliances %>">
         <span class="bottom-bar-chip-dot" style="background:#FF1E6F;"></span>
         <%= t("nav.partners") %>
-      </a>
-    <% elsif show_shared %>
-      <a href="<%= alliance_vertos_path %>" class="bottom-bar-chip" data-active="<%= active_shared %>">
-        <span class="bottom-bar-chip-dot" style="background:#FF1E6F;"></span>
-        <%= t("nav.shared_vertos") %>
       </a>
     <% end %>
 
@@ -39,7 +29,7 @@
       <%= t("nav.my_vertos") %>
     </a>
 
-    <% if show_create %>
+    <% if org %>
       <a href="<%= new_survey_path %>" class="bottom-bar-chip" data-active="<%= active_create %>">
         <span class="bottom-bar-chip-dot" style="background:#0CA7FF;"></span>
         <%= t("nav.create") %>

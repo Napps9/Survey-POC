@@ -1,8 +1,11 @@
 class Invite < ApplicationRecord
   belongs_to :organisation
   belongs_to :invited_by, class_name: "User"
+  belongs_to :alliance, optional: true
 
   enum :kind, { member: "member", partner: "partner" }
+
+  validates :alliance, presence: true, if: :partner?
 
   before_create { self.token = SecureRandom.urlsafe_base64(24) }
 
