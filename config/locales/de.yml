@@ -178,7 +178,13 @@ de:
     gen_design: Design wird angewendet
     welcome_eyebrow: Was dich erwartet
     welcome_lead: Ein paar kurze Schritte und wir entwerfen dein Verto.
-    welcome_steps: '["Über dein Verto", "Wer antwortet", "Was du erfahren möchtest", "Sprachen", "Markenfarben", "Kontext (optional)"]'
+    welcome_steps:
+    - Über dein Verto
+    - Wer antwortet
+    - Was du erfahren möchtest
+    - Sprachen
+    - Markenfarben
+    - Kontext (optional)
     welcome_badge: Neues Verto
     welcome_title: Lass uns dein Verto erstellen.
     welcome_sub: Wir verwandeln dein Briefing in ein Verto, das den Playverto-Regeln folgt.
@@ -187,21 +193,30 @@ de:
     s1_eyebrow: Schritt 01 · Über dein Verto
     s1_lead: Das eine übergeordnete Thema.
     s1_body: Halte es breit — den Fokus schärfst du in den nächsten Schritten. Ein oder zwei Wörter reichen meist aus.
-    s1_examples: '["Klimaschutz", "Bildung für Geflüchtete", "Ernährungssicherheit"]'
+    s1_examples:
+    - Klimaschutz
+    - Bildung für Geflüchtete
+    - Ernährungssicherheit
     s1_title: Worum geht es in deinem Verto?
     s1_placeholder: z. B. Wohlbefinden von Jugendlichen
     s1_hint_body: Halte es breit — den Fokus schärfst du in den nächsten Schritten.
     s2_eyebrow: Schritt 02 · Wer antwortet
     s2_lead: Sei konkret.
     s2_body: Lebensstil, Rolle, Region, Sprache — alles, was die Sichtweise dieser Gruppe prägt. Je konkreter, desto besser können wir die Fragen schreiben.
-    s2_examples: '["18–24-jährige Studierende in Kenia", "35–55-jährige Mitarbeitende im Gesundheitswesen vor Ort", "Eltern schulpflichtiger Kinder im ländlichen NSW"]'
+    s2_examples:
+    - 18–24-jährige Studierende in Kenia
+    - 35–55-jährige Mitarbeitende im Gesundheitswesen vor Ort
+    - Eltern schulpflichtiger Kinder im ländlichen NSW
     s2_title: Wer antwortet — und wie alt sind diese Personen?
     s2_placeholder: z. B. 18–24-jährige Studierende in Kenia
     s2_hint_body: Lebensstil, Rolle, Region, Sprache — alles, was die Sichtweise dieser Gruppe prägt.
     s3_eyebrow: Schritt 03 · Das Lernziel
     s3_lead: Die Erkenntnis, die eine Entscheidung verändern würde.
     s3_body: Überspringe, was du bereits weißt. Ziel ist das eine, das — würdest du es erfahren — dein nächstes Vorgehen verändern würde.
-    s3_examples: '["Warum springen Freiwillige nach dem dritten Monat ab?", "Was hält Menschen davon ab, unsere Tafel zu nutzen?", "Stärkt unser Jugendprogramm tatsächlich das Selbstvertrauen — und wo genau?"]'
+    s3_examples:
+    - Warum springen Freiwillige nach dem dritten Monat ab?
+    - Was hält Menschen davon ab, unsere Tafel zu nutzen?
+    - Stärkt unser Jugendprogramm tatsächlich das Selbstvertrauen — und wo genau?
     s3_title: Was möchtest du von ihnen lernen?
     s3_placeholder: z. B. Warum springen Freiwillige nach dem dritten Monat ab?
     s3_hint_body: Überspringe, was du bereits weißt — finde das eine, das dein nächstes Vorgehen verändern würde.
@@ -229,7 +244,10 @@ de:
     optional: Optional
     s6_lead: Sollen wir noch etwas berücksichtigen?
     s6_body: Tonalität, Pflichtfragen, zu vermeidende Themen, Besonderheiten der Zielgruppe. Überspringe es, wenn nichts weiter nötig ist.
-    s6_examples: '["Muss eine Frage zu Finanzierungswegen und Hürden bei Förderungen enthalten.", "Vermeide Fachjargon — viele Teilnehmende sprechen Englisch als Zweitsprache.", "Halte den Ton warm, nicht förmlich."]'
+    s6_examples:
+    - Muss eine Frage zu Finanzierungswegen und Hürden bei Förderungen enthalten.
+    - Vermeide Fachjargon — viele Teilnehmende sprechen Englisch als Zweitsprache.
+    - Halte den Ton warm, nicht förmlich.
     s6_title: Sollten wir sonst noch etwas wissen?
     s6_placeholder: z. B. Zielgruppe hat Playverto noch nie genutzt, halte den Ton warm und nicht förmlich.
     s6_compare_label: Teilnehmenden erlauben, ihre Antworten zu vergleichen

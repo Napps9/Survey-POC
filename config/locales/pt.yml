@@ -178,7 +178,13 @@ pt:
     gen_design: A aplicar design
     welcome_eyebrow: O que vem a seguir
     welcome_lead: Alguns passos rápidos e iremos elaborar o seu Verto.
-    welcome_steps: '["Sobre o seu Verto", "Quem vai responder", "O que quer aprender", "Idiomas", "Cores da marca", "Contexto (opcional)"]'
+    welcome_steps:
+    - Sobre o seu Verto
+    - Quem vai responder
+    - O que quer aprender
+    - Idiomas
+    - Cores da marca
+    - Contexto (opcional)
     welcome_badge: Novo Verto
     welcome_title: Vamos construir o seu Verto.
     welcome_sub: Transformaremos o seu briefing num Verto que segue as regras do Playverto.
@@ -187,21 +193,30 @@ pt:
     s1_eyebrow: Passo 01 · Sobre o seu Verto
     s1_lead: O tema único e abrangente.
     s1_body: Mantenha-o amplo — irá restringir a abordagem nos passos seguintes. Uma ou duas palavras costumam ser suficientes.
-    s1_examples: '["Ação climática", "Educação de refugiados", "Segurança alimentar"]'
+    s1_examples:
+    - Ação climática
+    - Educação de refugiados
+    - Segurança alimentar
     s1_title: De que trata o seu Verto?
     s1_placeholder: 'ex.: Bem-estar juvenil'
     s1_hint_body: Mantenha-o amplo — irá restringir a abordagem nos passos seguintes.
     s2_eyebrow: Passo 02 · Quem vai responder
     s2_lead: Seja específico.
     s2_body: Estilo de vida, função, região, idioma — qualquer coisa que molde a forma como este grupo pensa. Quanto mais concreto, melhores serão as perguntas que podemos escrever.
-    s2_examples: '["Estudantes universitários de 18–24 anos no Quénia", "Profissionais de saúde comunitária de primeira linha entre 35 e 55 anos", "Pais de crianças em idade escolar no interior de NSW"]'
+    s2_examples:
+    - Estudantes universitários de 18–24 anos no Quénia
+    - Profissionais de saúde comunitária de primeira linha entre 35 e 55 anos
+    - Pais de crianças em idade escolar no interior de NSW
     s2_title: Quem vai responder — e qual a sua idade?
     s2_placeholder: 'ex.: Estudantes universitários de 18–24 anos no Quénia'
     s2_hint_body: Estilo de vida, função, região, idioma — qualquer coisa que molde a forma como este grupo pensa.
     s3_eyebrow: Passo 03 · O objetivo de aprendizagem
     s3_lead: O insight que mudaria uma decisão.
     s3_body: Salte aquilo que já sabe. Procure aquela única coisa que, se aprendesse, mudaria o que faz a seguir.
-    s3_examples: '["Porque é que os voluntários desistem após o terceiro mês?", "O que está a impedir as pessoas de aceder ao nosso banco alimentar?", "O nosso programa juvenil aumenta realmente a confiança — e onde exatamente?"]'
+    s3_examples:
+    - Porque é que os voluntários desistem após o terceiro mês?
+    - O que está a impedir as pessoas de aceder ao nosso banco alimentar?
+    - O nosso programa juvenil aumenta realmente a confiança — e onde exatamente?
     s3_title: O que quer aprender com eles?
     s3_placeholder: 'ex.: Porque é que os voluntários desistem após o terceiro mês?'
     s3_hint_body: Salte o que já sabe — procure aquela única coisa que mudaria o que faz a seguir.
@@ -229,7 +244,10 @@ pt:
     optional: Opcional
     s6_lead: Algo mais que devamos incluir?
     s6_body: Tom, perguntas obrigatórias, coisas a evitar, peculiaridades do público. Salte se não houver nada extra.
-    s6_examples: '["Deve incluir uma pergunta sobre fontes de financiamento e barreiras a subsídios.", "Evite jargão — muitos respondentes falam inglês como segunda língua.", "Mantenha um tom caloroso, não corporativo."]'
+    s6_examples:
+    - Deve incluir uma pergunta sobre fontes de financiamento e barreiras a subsídios.
+    - Evite jargão — muitos respondentes falam inglês como segunda língua.
+    - Mantenha um tom caloroso, não corporativo.
     s6_title: Algo mais que devamos saber?
     s6_placeholder: 'ex.: O público nunca usou o Playverto antes, mantenha um tom caloroso, não corporativo.'
     s6_compare_label: Permitir que os respondentes comparem as suas respostas

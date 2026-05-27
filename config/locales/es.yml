@@ -178,7 +178,13 @@ es:
     gen_design: Aplicando diseño
     welcome_eyebrow: Lo que viene
     welcome_lead: Unos pasos rápidos y crearemos el borrador de tu Verto.
-    welcome_steps: '["Sobre tu Verto", "Quién responde", "Qué quieres aprender", "Idiomas", "Colores de marca", "Contexto (opcional)"]'
+    welcome_steps:
+    - Sobre tu Verto
+    - Quién responde
+    - Qué quieres aprender
+    - Idiomas
+    - Colores de marca
+    - Contexto (opcional)
     welcome_badge: Nuevo Verto
     welcome_title: Creemos tu Verto.
     welcome_sub: Convertiremos tu brief en un Verto que sigue las reglas de Playverto.
@@ -187,21 +193,30 @@ es:
     s1_eyebrow: Paso 01 · Sobre tu Verto
     s1_lead: El tema principal y general.
     s1_body: Mantenlo amplio — afinarás el enfoque en los siguientes pasos. Una o dos palabras suele ser suficiente.
-    s1_examples: '["Acción climática", "Educación para refugiados", "Seguridad alimentaria"]'
+    s1_examples:
+    - Acción climática
+    - Educación para refugiados
+    - Seguridad alimentaria
     s1_title: "¿De qué trata tu Verto?"
     s1_placeholder: p. ej. Bienestar juvenil
     s1_hint_body: Mantenlo amplio — afinarás el enfoque en los siguientes pasos.
     s2_eyebrow: Paso 02 · Quién responde
     s2_lead: Sé específico.
     s2_body: Estilo de vida, rol, región, idioma — todo lo que influya en cómo piensa este grupo. Cuanto más concreto, mejores preguntas podremos escribir.
-    s2_examples: '["Universitarios de 18 a 24 años en Kenia", "Trabajadores de salud comunitaria de primera línea de 35 a 55 años", "Padres de niños en edad escolar en zonas rurales de NSW"]'
+    s2_examples:
+    - Universitarios de 18 a 24 años en Kenia
+    - Trabajadores de salud comunitaria de primera línea de 35 a 55 años
+    - Padres de niños en edad escolar en zonas rurales de NSW
     s2_title: "¿Quién responde y qué edad tiene?"
     s2_placeholder: p. ej. Universitarios de 18 a 24 años en Kenia
     s2_hint_body: Estilo de vida, rol, región, idioma — todo lo que influya en cómo piensa este grupo.
     s3_eyebrow: Paso 03 · El objetivo de aprendizaje
     s3_lead: La información que cambiaría una decisión.
     s3_body: Omite lo que ya sabes. Apunta a esa única cosa que, si la aprendieras, cambiaría lo que harías a continuación.
-    s3_examples: '["¿Por qué los voluntarios abandonan después del tercer mes?", "¿Qué impide que la gente acceda a nuestro banco de alimentos?", "¿Nuestro programa juvenil realmente aumenta la confianza — y en qué aspectos exactamente?"]'
+    s3_examples:
+    - "¿Por qué los voluntarios abandonan después del tercer mes?"
+    - "¿Qué impide que la gente acceda a nuestro banco de alimentos?"
+    - "¿Nuestro programa juvenil realmente aumenta la confianza — y en qué aspectos exactamente?"
     s3_title: "¿Qué quieres aprender de ellos?"
     s3_placeholder: p. ej. ¿Por qué los voluntarios abandonan después del tercer mes?
     s3_hint_body: Omite lo que ya sabes — apunta a esa única cosa que cambiaría lo que harías a continuación.
@@ -229,7 +244,10 @@ es:
     optional: Opcional
     s6_lead: "¿Algo más que debamos tener en cuenta?"
     s6_body: Tono, preguntas obligatorias, temas a evitar, particularidades de la audiencia. Omítelo si no hay nada extra.
-    s6_examples: '["Debe incluir una pregunta sobre vías de financiación y barreras para obtener subvenciones.", "Evitar tecnicismos — muchos encuestados hablan inglés como segundo idioma.", "Mantener un tono cálido, no corporativo."]'
+    s6_examples:
+    - Debe incluir una pregunta sobre vías de financiación y barreras para obtener subvenciones.
+    - Evitar tecnicismos — muchos encuestados hablan inglés como segundo idioma.
+    - Mantener un tono cálido, no corporativo.
     s6_title: "¿Algo más que debamos saber?"
     s6_placeholder: p. ej. La audiencia nunca ha usado Playverto antes, mantener un tono cálido, no corporativo.
     s6_compare_label: Permitir que los participantes comparen sus respuestas

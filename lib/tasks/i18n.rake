@@ -142,23 +142,40 @@ namespace :i18n do
   end
 end
 
-# Flatten a nested hash to { "a.b.c" => "value" } (string leaves only).
+# Flatten a nested hash to { "a.b.c" => "value" } (string leaves only). Array
+# leaves are flattened too — each element becomes "a.b.c[0]", "a.b.c[1]", … so
+# array-typed translations (e.g. example lists) round-trip back to arrays
+# instead of being stringified.
 def flatten_strings(hash, prefix = nil)
   hash.each_with_object({}) do |(k, v), acc|
     key = [ prefix, k ].compact.join(".")
-    if v.is_a?(Hash)
+    case v
+    when Hash
       acc.merge!(flatten_strings(v, key))
+    when Array
+      v.each_with_index { |item, i| acc["#{key}[#{i}]"] = item.to_s }
     else
       acc[key] = v.to_s
     end
   end
 end
 
-# Rebuild a nested hash from { "a.b.c" => "value" }.
+# Rebuild a nested hash from { "a.b.c" => "value" }. Keys ending in "[N]" are
+# rebuilt as arrays (companion to flatten_strings's array handling).
+ARRAY_KEY = /\A(.+)\[(\d+)\]\z/
+
 def unflatten(flat)
   flat.each_with_object({}) do |(dotted, value), root|
-    keys = dotted.split(".")
-    leaf = keys[0..-2].reduce(root) { |h, k| h[k] ||= {} }
-    leaf[keys.last] = value
+    if (m = dotted.match(ARRAY_KEY))
+      base, idx = m[1], m[2].to_i
+      keys = base.split(".")
+      leaf = keys[0..-2].reduce(root) { |h, k| h[k] ||= {} }
+      leaf[keys.last] ||= []
+      leaf[keys.last][idx] = value
+    else
+      keys = dotted.split(".")
+      leaf = keys[0..-2].reduce(root) { |h, k| h[k] ||= {} }
+      leaf[keys.last] = value
+    end
   end
 end

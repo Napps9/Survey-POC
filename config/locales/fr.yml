@@ -178,7 +178,13 @@ fr:
     gen_design: Application du design
     welcome_eyebrow: Ce qui vous attend
     welcome_lead: Quelques étapes rapides et nous rédigerons votre Verto.
-    welcome_steps: '["À propos de votre Verto", "Qui répond", "Ce que vous souhaitez apprendre", "Langues", "Couleurs de marque", "Contexte (facultatif)"]'
+    welcome_steps:
+    - À propos de votre Verto
+    - Qui répond
+    - Ce que vous souhaitez apprendre
+    - Langues
+    - Couleurs de marque
+    - Contexte (facultatif)
     welcome_badge: Nouveau Verto
     welcome_title: Créons votre Verto.
     welcome_sub: Nous transformerons votre brief en un Verto respectant les règles de Playverto.
@@ -187,21 +193,30 @@ fr:
     s1_eyebrow: Étape 01 · À propos de votre Verto
     s1_lead: Le grand thème central.
     s1_body: Restez large — vous affinerez l'angle aux étapes suivantes. Un ou deux mots suffisent généralement.
-    s1_examples: '["Action climatique", "Éducation des réfugiés", "Sécurité alimentaire"]'
+    s1_examples:
+    - Action climatique
+    - Éducation des réfugiés
+    - Sécurité alimentaire
     s1_title: Quel est le sujet de votre Verto ?
     s1_placeholder: ex. Bien-être des jeunes
     s1_hint_body: Restez large — vous affinerez l'angle aux étapes suivantes.
     s2_eyebrow: Étape 02 · Qui répond
     s2_lead: Soyez précis.
     s2_body: Mode de vie, rôle, région, langue — tout ce qui influence la façon de penser de ce groupe. Plus c'est concret, meilleures seront les questions.
-    s2_examples: '["Étudiants de 18 à 24 ans au Kenya", "Agents de santé communautaire de première ligne, 35–55 ans", "Parents d''enfants scolarisés en Nouvelle-Galles du Sud rurale"]'
+    s2_examples:
+    - Étudiants de 18 à 24 ans au Kenya
+    - Agents de santé communautaire de première ligne, 35–55 ans
+    - Parents d'enfants scolarisés en Nouvelle-Galles du Sud rurale
     s2_title: Qui répond — et quel âge a-t-il ?
     s2_placeholder: ex. Étudiants de 18 à 24 ans au Kenya
     s2_hint_body: Mode de vie, rôle, région, langue — tout ce qui influence la façon de penser de ce groupe.
     s3_eyebrow: Étape 03 · L'objectif d'apprentissage
     s3_lead: L'insight qui changerait une décision.
     s3_body: Ignorez ce que vous savez déjà. Visez la seule chose qui, si vous la découvriez, changerait votre prochaine action.
-    s3_examples: '["Pourquoi les bénévoles abandonnent-ils après trois mois ?", "Qu''est-ce qui empêche les gens d''accéder à notre banque alimentaire ?", "Notre programme jeunesse renforce-t-il vraiment la confiance — et où exactement ?"]'
+    s3_examples:
+    - Pourquoi les bénévoles abandonnent-ils après trois mois ?
+    - Qu'est-ce qui empêche les gens d'accéder à notre banque alimentaire ?
+    - Notre programme jeunesse renforce-t-il vraiment la confiance — et où exactement ?
     s3_title: Que souhaitez-vous apprendre d'eux ?
     s3_placeholder: ex. Pourquoi les bénévoles abandonnent-ils après trois mois ?
     s3_hint_body: Ignorez ce que vous savez déjà — visez la seule chose qui changerait votre prochaine action.
@@ -229,7 +244,10 @@ fr:
     optional: Facultatif
     s6_lead: Autre chose à intégrer ?
     s6_body: Ton, questions incontournables, sujets à éviter, particularités du public. Ignorez si rien de plus.
-    s6_examples: '["Inclure obligatoirement une question sur les sources de financement et les obstacles aux subventions.", "Éviter le jargon — de nombreux répondants parlent anglais comme deuxième langue.", "Garder un ton chaleureux, pas corporate."]'
+    s6_examples:
+    - Inclure obligatoirement une question sur les sources de financement et les obstacles aux subventions.
+    - Éviter le jargon — de nombreux répondants parlent anglais comme deuxième langue.
+    - Garder un ton chaleureux, pas corporate.
     s6_title: Autre chose que nous devrions savoir ?
     s6_placeholder: ex. Le public n'a jamais utilisé Playverto, garder un ton chaleureux, pas corporate.
     s6_compare_label: Permettre aux répondants de comparer leurs réponses
