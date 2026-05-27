@@ -52,6 +52,8 @@ class InvitesController < ApplicationController
     if @invite.partner?
       if Current.user && params[:join_as_organisation_id].present?
         accept_partner_invite_as_signed_in
+      elsif params[:mode] == "sign_in"
+        sign_in_for_partner_invite
       else
         accept_partner_invite
       end
@@ -92,6 +94,28 @@ class InvitesController < ApplicationController
     end
 
     redirect_to root_path, notice: "Welcome to #{@invite.organisation.name}!"
+  end
+
+  # Unauthenticated existing-account holder enters email + password. We sign
+  # them in and bounce back to GET /invites/:token, where the signed-in
+  # picker takes over.
+  def sign_in_for_partner_invite
+    email    = params[:email_address].to_s.strip.downcase
+    password = params[:password].to_s
+
+    if email.blank? || password.blank?
+      flash.now[:alert] = "Enter your email and password to sign in."
+      return render :show, status: :unprocessable_entity
+    end
+
+    user = User.authenticate_by(email_address: email, password: password)
+    unless user
+      flash.now[:alert] = "Couldn't find an account with that email and password."
+      return render :show, status: :unprocessable_entity
+    end
+
+    start_new_session_for user
+    redirect_to invite_path(@invite.token)
   end
 
   # Signed-in user joins the alliance with one of their existing admin orgs.

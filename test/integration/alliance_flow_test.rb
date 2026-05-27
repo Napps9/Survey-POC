@@ -304,6 +304,80 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     refute_match "Pick which organisation joins", response.body
   end
 
+  test "existing not-signed-in user can sign in via the invite page" do
+    # Existing partner user + org, but not currently signed in
+    partner_admin = User.create!(name: "Returning", email_address: "ret-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    partner_org = Organisation.create!(name: "Returning Co", slug: "ret-#{SecureRandom.hex(2)}")
+    partner_org.memberships.create!(user: partner_admin, role: "admin")
+
+    a = @oa.alliances.create!(name: "Sign-In Test Group")
+    invite = @oa.invites.create!(
+      email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
+      role: "admin", kind: "partner",
+      alliance: a, invited_by: @admin,
+      expires_at: 14.days.from_now
+    )
+
+    # Sign out of the setup session
+    delete session_path
+
+    # GET shows the signup form with a "Sign in instead" toggle
+    get invite_path(invite.token)
+    assert_response :success
+    assert_match "Sign in instead", response.body
+    assert_match "invite-signin-form", response.body
+    assert_match "Sign in to join", response.body
+
+    # POST with mode=sign_in → authenticates, redirects to GET show
+    post accept_invite_path(invite.token), params: {
+      mode: "sign_in",
+      email_address: partner_admin.email_address,
+      password: "verylongpassword"
+    }
+    assert_redirected_to invite_path(invite.token)
+    follow_redirect!
+    assert_response :success
+    assert_match "Signed in as", response.body, "should now show signed-in picker"
+    assert_match "Returning Co", response.body
+    refute_match "Confirm password", response.body
+
+    # Invite not consumed yet — only consumed when org actually joins
+    refute invite.reload.accepted?
+
+    # Click join
+    post accept_invite_path(invite.token), params: { join_as_organisation_id: partner_org.id }
+    assert_redirected_to alliance_path(a)
+    assert a.alliance_memberships.exists?(organisation: partner_org)
+    assert invite.reload.accepted?
+  end
+
+  test "sign-in with wrong password shows error and stays on sign-in form" do
+    user = User.create!(name: "X", email_address: "wrong-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    org = Organisation.create!(name: "X", slug: "wx-#{SecureRandom.hex(2)}")
+    org.memberships.create!(user: user, role: "admin")
+
+    a = @oa.alliances.create!(name: "Wrong-PW Test")
+    invite = @oa.invites.create!(
+      email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
+      role: "admin", kind: "partner",
+      alliance: a, invited_by: @admin,
+      expires_at: 14.days.from_now
+    )
+
+    delete session_path
+
+    post accept_invite_path(invite.token), params: {
+      mode: "sign_in",
+      email_address: user.email_address,
+      password: "wrongpassword"
+    }
+    assert_response :unprocessable_entity
+    assert_match "find an account", response.body, "error message should be shown"
+    # Sign-in form is the visible one after the failure; signup form is hidden
+    assert_match "id=\"invite-signup-form\" hidden", response.body, "signup form should be hidden"
+    refute_match "id=\"invite-signin-form\" hidden", response.body, "sign-in form must stay open"
+  end
+
   private
 
   def sign_in(user)

@@ -116,59 +116,110 @@
         </div>
 
       <% else %>
-        <%# ─── Not signed in: existing signup / sign-in-with-existing-account form ─── %>
-        <%= form_with url: accept_invite_path(@invite.token), method: :post do |f| %>
+        <%# ─── Not signed in: signup form by default, with toggle to sign-in ─── %>
+        <% sign_in_default = (params[:mode] == "sign_in") && @invite.partner? %>
 
-          <div style="margin-bottom:18px;">
-            <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Your name</label>
-            <%= f.text_field :name,
-                  required: true, autofocus: true, autocomplete: "name",
-                  placeholder: "Jane Smith", value: params[:name],
-                  class: "form-input" %>
-          </div>
+        <div id="invite-signup-form" <%= "hidden" if sign_in_default %>>
+          <%= form_with url: accept_invite_path(@invite.token), method: :post do |f| %>
 
-          <% if @invite.partner? && (@invite.addressed_email.blank? || !User.exists?(email_address: @invite.addressed_email)) %>
             <div style="margin-bottom:18px;">
-              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Your organisation name</label>
-              <%= f.text_field :organisation_name,
-                    required: true, placeholder: "Acme Partners",
-                    value: params[:organisation_name], class: "form-input" %>
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Your name</label>
+              <%= f.text_field :name,
+                    required: true, autofocus: !sign_in_default, autocomplete: "name",
+                    placeholder: "Jane Smith", value: params[:name],
+                    class: "form-input" %>
             </div>
+
+            <% if @invite.partner? && (@invite.addressed_email.blank? || !User.exists?(email_address: @invite.addressed_email)) %>
+              <div style="margin-bottom:18px;">
+                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Your organisation name</label>
+                <%= f.text_field :organisation_name,
+                      required: true, placeholder: "Acme Partners",
+                      value: params[:organisation_name], class: "form-input" %>
+              </div>
+            <% end %>
+
+            <div style="margin-bottom:18px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email</label>
+              <% if @invite.addressed_email.present? %>
+                <div style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size: var(--text-xl);box-sizing:border-box;">
+                  <%= @invite.addressed_email %>
+                </div>
+              <% else %>
+                <%= f.email_field :email_address,
+                      required: true, autocomplete: "email",
+                      placeholder: "you@example.com", value: params[:email_address],
+                      class: "form-input" %>
+              <% end %>
+            </div>
+
+            <div style="margin-bottom:18px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Password</label>
+              <%= f.password_field :password,
+                    required: true, autocomplete: "new-password",
+                    placeholder: "At least 12 characters", maxlength: 72, minlength: 12,
+                    class: "form-input" %>
+            </div>
+
+            <div style="margin-bottom:24px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Confirm password</label>
+              <%= f.password_field :password_confirmation,
+                    required: true, autocomplete: "new-password",
+                    placeholder: "••••••••••••", maxlength: 72,
+                    class: "form-input" %>
+            </div>
+
+            <%= f.submit "Accept invite →",
+                  style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
+
           <% end %>
 
-          <div style="margin-bottom:18px;">
-            <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email</label>
-            <% if @invite.addressed_email.present? %>
-              <div style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size: var(--text-xl);box-sizing:border-box;">
-                <%= @invite.addressed_email %>
+          <% if @invite.partner? %>
+            <div style="margin-top:18px;text-align:center;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
+              Already have a Playverto account?
+              <button type="button"
+                      onclick="document.getElementById('invite-signup-form').hidden=true;document.getElementById('invite-signin-form').hidden=false;document.querySelector('#invite-signin-form input[type=email]').focus();"
+                      style="background:none;border:none;color:#01EACB;font-family:inherit;font-size:inherit;text-decoration:underline;cursor:pointer;padding:0;">
+                Sign in instead
+              </button>
+            </div>
+          <% end %>
+        </div>
+
+        <% if @invite.partner? %>
+          <div id="invite-signin-form" <%= "hidden" unless sign_in_default %>>
+            <%= form_with url: accept_invite_path(@invite.token), method: :post do |f| %>
+              <%= hidden_field_tag :mode, "sign_in" %>
+
+              <div style="margin-bottom:18px;">
+                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email</label>
+                <%= f.email_field :email_address,
+                      required: true, autofocus: sign_in_default, autocomplete: "email",
+                      placeholder: "you@example.com", value: params[:email_address],
+                      class: "form-input" %>
               </div>
-            <% else %>
-              <%= f.email_field :email_address,
-                    required: true, autocomplete: "email",
-                    placeholder: "you@example.com", value: params[:email_address],
-                    class: "form-input" %>
+
+              <div style="margin-bottom:24px;">
+                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Password</label>
+                <%= f.password_field :password,
+                      required: true, autocomplete: "current-password",
+                      placeholder: "Your Playverto password", maxlength: 72,
+                      class: "form-input" %>
+              </div>
+
+              <%= f.submit "Sign in to join →",
+                    style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
             <% end %>
+
+            <div style="margin-top:18px;text-align:center;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
+              New to Playverto?
+              <button type="button"
+                      onclick="document.getElementById('invite-signin-form').hidden=true;document.getElementById('invite-signup-form').hidden=false;document.querySelector('#invite-signup-form input[name=name]').focus();"
+                      style="background:none;border:none;color:#01EACB;font-family:inherit;font-size:inherit;text-decoration:underline;cursor:pointer;padding:0;">
+                Create a new account
+              </button>
+            </div>
           </div>
-
-          <div style="margin-bottom:18px;">
-            <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Password</label>
-            <%= f.password_field :password,
-                  required: true, autocomplete: "new-password",
-                  placeholder: "At least 12 characters", maxlength: 72, minlength: 12,
-                  class: "form-input" %>
-          </div>
-
-          <div style="margin-bottom:32px;">
-            <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Confirm password</label>
-            <%= f.password_field :password_confirmation,
-                  required: true, autocomplete: "new-password",
-                  placeholder: "••••••••••••", maxlength: 72,
-                  class: "form-input" %>
-          </div>
-
-          <%= f.submit "Accept invite →",
-                style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
-
         <% end %>
 
       <% end %>
