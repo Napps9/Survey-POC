@@ -1,0 +1,394 @@
+---
+sw:
+  locale_switcher:
+    label: Badilisha lugha
+    heading: Lugha
+  layout:
+    studio_tagline: Verto Studio
+  card:
+    'yes': Ndiyo
+    'no': Hapana
+    add_option: Ongeza chaguo
+    add_statement: Ongeza kauli
+    swipe_no: "← Hapana"
+    swipe_hint: buruta kadi ili kujibu
+    swipe_yes: Ndiyo →
+    reset: Weka upya
+    answer_placeholder: Andika jibu…
+    characters: Herufi
+    allow_other: Ruhusu jibu huru la "Nyingine"
+    other: Nyingine
+    other_placeholder: Tuambie kwa maneno yako mwenyewe…
+  auth:
+    show: Onyesha
+    email: Anwani ya barua pepe
+    password: Nenosiri
+    password_hint: Angalau herufi 12
+    title_sign_in: Ingia — Playverto
+    sign_in_title: Ingia kwenye Playverto
+    sign_in_new_here: Mgeni hapa?
+    sign_in_create: Fungua akaunti
+    forgot_password: Umesahau nenosiri?
+    sign_in_submit: Ingia →
+    title_signup: Fungua akaunti — Playverto
+    signup_title: Fungua akaunti yako
+    signup_have_one: Tayari una akaunti?
+    signup_sign_in: Ingia
+    name: Jina lako
+    org_name: Jina la shirika
+    confirm_password: Thibitisha nenosiri
+    signup_submit: Fungua akaunti →
+    title_reset: Weka upya nenosiri — Playverto
+    forgot_title: Umesahau nenosiri lako?
+    forgot_sub: Weka barua pepe yako na tutakutumia kiungo cha kuweka upya.
+    forgot_submit: Tuma maagizo ya kuweka upya
+    back_to_sign_in: "← Rudi kwenye kuingia"
+    title_set: Weka nenosiri jipya — Playverto
+    set_title: Weka nenosiri jipya
+    set_sub: Chagua kitu ambacho wewe pekee unaweza kukibashiri.
+    new_password: Nenosiri jipya
+    confirm_new_password: Thibitisha nenosiri jipya
+    repeat_new_password: Rudia nenosiri jipya
+    set_submit: Hifadhi nenosiri jipya
+  results:
+    title: Matokeo
+    editor: "← Mhariri"
+    ask_verto: Muulize Verto
+    analysing: Inachambua majibu…
+  player:
+    thank_you_title: Asante!
+    thank_you_sub: Majibu yako yamehifadhiwa.
+    compare_cta: Ona matokeo yako yakilinganishwa na wengine →
+    powered_by: Inaendeshwa na
+    comparison_title: Majibu yako dhidi ya kila mtu
+    back: "← Rudi"
+    next: Endelea →
+    submit: Wasilisha ✓
+  js:
+    player:
+      progress: Kadi %{n} kati ya %{total}
+      queued: Imehifadhiwa — itasawazishwa utakaporejea mtandaoni
+      compare_cta: Ona matokeo yako yakilinganishwa na wengine →
+      compare_loading: Inapakia…
+      compare_error: Imeshindwa kupakia — jaribu tena
+    editor:
+      delete_card_confirm: Futa kadi hii?
+      unsaved: Mabadiliko hayajahifadhiwa
+      saving: Inahifadhi…
+      saved: Imehifadhiwa %{time}
+      save_failed: 'Kuhifadhi kumeshindikana: %{msg}'
+      card_n: Kadi %{n} · %{type}
+      choose_format: Chagua muundo wa jibu hapa chini.
+      type_updated: Aina ya jibu imebadilishwa kuwa %{type}
+      current: Sasa
+      off_brief: Nje ya muhtasari
+      cards_count: Kadi %{n}
+      fit_best: Inafaa zaidi
+      fit_strong: Mbadala imara
+      fit_solid: Mbadala thabiti
+      fit_workable: Inaweza kutumika
+      fit_sparingly: Tumia kwa uangalifu
+    wizard:
+      step_counter: Hatua %{n} kati ya %{total}
+  nav:
+    partners: Washirika
+    shared_vertos: Vertos Zilizoshirikishwa
+    my_vertos: Vertos Zangu
+    create: Unda
+    members: Wanachama
+    sign_out: Toka
+  alliances:
+    title: Ushirikiano — Playverto
+    index_eyebrow: Ushirikiano wako
+    index_heading: Ushirikiano
+    index_subtitle: Panga mashirika washirika katika ushirikiano wenye majina. Ongeza Vertos na kila mshirika atapata kiungo chake cha kushiriki.
+    new_button: "+ Ushirikiano mpya"
+    owned_section: Ushirikiano unaouendesha
+    owned_empty_title: Hakuna ushirikiano bado
+    owned_empty_admin_html: Bofya <span style="color:#FF1E6F;">+ Ushirikiano mpya</span> hapo juu ili kuanzisha kikundi, kisha alika mashirika washirika na ongeza Vertos.
+    owned_empty_member: Muombe msimamizi wako aanzishe ushirikiano.
+    started_on: Ulianza %{date}
+    partners_count:
+      one: mshirika
+      other: washirika
+    vertos_count:
+      one: verto
+      other: vertos
+    open: Fungua →
+    member_section: Ushirikiano ambao wewe ni mwanachama
+    member_empty_title: Hujaalikwa kwenye ushirikiano wowote
+    member_empty_body: Wakati shirika lingine litakapokualika kwenye mojawapo ya ushirikiano wao, utaonekana hapa.
+    member_run_by: Unaendeshwa na %{org}
+    status:
+      active: Hai
+      pending: Inasubiri
+      revoked: Imebatilishwa
+    new_title: Ushirikiano mpya — Playverto
+    new_eyebrow: Ushirikiano mpya
+    new_heading: Taja ushirikiano wako
+    new_sub: Upe kikundi jina wazi ili washirika wajue wanachojiunga nacho.
+    name_label: Jina la ushirikiano
+    name_placeholder: 'mfano: Washirika wa Majaribio'
+    cancel: Ghairi
+    create_submit: Unda ushirikiano →
+    show_title: "%{name} — Ushirikiano"
+    back_to_all: Ushirikiano wote
+    creator_eyebrow: Ushirikiano · Wewe unauendesha
+    partner_eyebrow: Ushirikiano · Mwanachama
+    generate_link: Tengeneza kiungo cha kujiunga →
+    delete: Futa
+    delete_confirm: Futa %{name}? Viungo vyote vya kushiriki vya ushirikiano huu vitaacha kufanya kazi.
+    new_link_heading: Kiungo kipya cha kujiunga
+    new_link_body: Yeyote mwenye kiungo hiki anaweza kujiunga na %{alliance} kama mshirika. Kinaisha baada ya siku 14.
+    copy: Nakili
+    copied: Imenakiliwa!
+    partners_section: Washirika
+    no_partners_title: Hakuna washirika bado
+    no_partners_body_html: Tumia <span style="color:#FF1E6F;">Tengeneza kiungo cha kujiunga</span> hapo juu kualika mashirika washirika.
+    joined_on: Alijiunga %{date}
+    remove_member_confirm: Ondoa %{org} kutoka %{alliance}? Viungo vyao vya kushiriki vitaacha kufanya kazi.
+    vertos_section: Vertos katika ushirikiano
+    no_vertos_title: Hakuna Vertos zilizoshirikishwa bado
+    no_vertos_body: Ongeza Verto iliyochapishwa hapa chini na kiungo cha kipekee cha kushiriki kitatengenezwa kwa kila mshirika.
+    remove: Ondoa
+    remove_verto_confirm: Ondoa Verto hii kutoka %{alliance}? Viungo vyote vya kushiriki vya washirika vitaacha kufanya kazi.
+    completion_label: ukamilishaji
+    responses:
+      one: jibu
+      other: majibu
+    partner_links_count:
+      one: kiungo cha mshirika
+      other: viungo vya washirika
+    no_shares_yet: Ongeza mshirika kwenye ushirikiano ili kutengeneza viungo vya kushiriki.
+    responses_short: "%{n} maj."
+    add_section: Ongeza kwenye ushirikiano
+    add_heading: Ongeza Verto nyingine
+    add_body: Chagua Verto iliyochapishwa. Tutatengeneza kiungo cha kipekee cha kushiriki kwa kila mshirika katika ushirikiano.
+    no_more_vertos: Hakuna Vertos zaidi zilizochapishwa za kuongeza.
+    create_new_verto: Unda Verto mpya →
+    add_submit: Ongeza Verto →
+    partners_in_alliance: Washirika katika ushirikiano
+    including_you: Wewe ukijumuishwa
+    shared_vertos_short: Vertos Zilizoshirikishwa
+    available_to_distribute: Zinapatikana kwako kusambaza
+    other_partners: Washirika wengine
+    only_partner: Wewe ndiye mshirika pekee katika ushirikiano huu kwa sasa.
+    your_vertos_section: Vertos ulizoshirikishwa
+    partner_no_vertos_title: Hakuna Vertos bado
+    partner_no_vertos_body: Wakati %{org} ataongeza Verto kwenye ushirikiano huu, utaona kiungo chako cha kipekee cha kushiriki hapa.
+    from_org: Kutoka %{org}
+    your_link: Kiungo chako
+    results_link: Matokeo →
+  alliance_verto:
+    title: "%{title} — Verto Iliyoshirikishwa"
+    from_org_alliance: Kutoka %{org} · %{alliance}
+    share_link: Kiungo cha kushiriki
+    mine_label: kutoka kiungo chako
+    aggregate_label: katika %{alliance}
+    card_n: Kadi %{n}
+    my_results: Matokeo yangu
+    aggregate: Jumla
+    comparison: Ulinganishaji
+    comparison_sub: wewe dhidi ya wote
+    no_data: Hakuna data
+    n_answered: "%{n} wamejibu"
+    avg: wast. %{n}
+  invites:
+    title: Kubali mwaliko — Playverto
+    already_used_title: Mwaliko tayari umetumika
+    already_used_body_html: Kiungo hiki cha mwaliko tayari kimekubaliwa. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Ingia</a>
+    expired_title: Mwaliko umekwisha
+    expired_body: Kiungo hiki kina zaidi ya siku 7. Muombe msimamizi wako akutumie kipya.
+    invited_to_join: Umealikwa kujiunga na
+    alliance_by: ushirikiano wa %{org}
+    as_role: kama %{role}
+    addressed_for: "· kwa %{email}"
+    signed_in_as: Umeingia kama %{name}
+    join_with: Jiunge na
+    pick_org: Chagua shirika litakalojiunga
+    join_submit: Jiunge na %{alliance} →
+    already_in_alliance: 'Tayari katika ushirikiano huu: %{orgs}'
+    you_run_this: Wewe unaendesha ushirikiano huu — tembelea badala yake.
+    already_member_singular: "%{orgs} tayari yuko katika ushirikiano huu."
+    already_member_plural: "%{orgs} tayari wako katika ushirikiano huu."
+    no_admin_org: Huna shirika la msimamizi linaloweza kujiunga na ushirikiano huu.
+    open_alliance: Fungua %{alliance} →
+    sign_out_link: Toka na utumie akaunti tofauti
+    sign_out_confirm: Toka kwenye akaunti yako ya sasa?
+    already_have_account: Tayari una akaunti ya Playverto?
+    sign_in_instead: Ingia badala yake
+    new_to_playverto: Mgeni Playverto?
+    create_new_account: Fungua akaunti mpya
+    sign_in_email_label: Barua pepe
+    sign_in_email_placeholder: wewe@mfano.com
+    sign_in_password_label: Nenosiri
+    sign_in_password_placeholder: Nenosiri lako la Playverto
+    sign_in_submit: Ingia ili ujiunge →
+    your_name_label: Jina lako
+    your_name_placeholder: Jane Smith
+    your_org_name_label: Jina la shirika lako
+    your_org_name_placeholder: Acme Partners
+    password_label: Nenosiri
+    password_placeholder: Angalau herufi 12
+    confirm_password_label: Thibitisha nenosiri
+    accept_submit: Kubali mwaliko →
+  editor:
+    questions: maswali
+    primary: msingi
+    change_media: Badilisha media
+    change_media_title: Badilisha picha ya kadi hii
+    add_design: Ongeza muundo
+    add_design_title: Ongeza picha kwenye kadi hii
+    add_design_sub: Ongeza picha ili kuipa kadi hii uhai
+    live: HAI
+    live_warning: Kuhariri maswali wakati Verto hii inakusanya majibu kutaathiri ubora wa data. Majibu ya kabla na baada ya uhariri hayatalinganishwa moja kwa moja.
+    got_it: Nimeelewa
+    add_question: Ongeza swali
+    cards:
+      one: Kadi %{count}
+      other: Kadi %{count}
+    estimated:
+      one: Inakadiriwa ~dakika %{count}
+      other: Inakadiriwa ~dakika %{count}
+    design: Muundo
+    publish_share: Chapisha na shiriki →
+    answer_type: Aina ya Jibu
+    select_card: Chagua kadi ili kubadilisha aina yake
+    click_any: Bofya kadi yoyote upande wa kushoto.
+    select_card_long: Chagua kadi ya swali ili kubadilisha muundo wa jibu
+    apply_to_card: Tumia kwa kadi hii
+    see_all_types: Ona aina zote za maswali
+    all_types: Aina Zote za Maswali
+    ranked_for: Imepangwa kwa ufaafu kwa
+    this_card: kadi hii
+  dashboard_card:
+    badge_archived: Imehifadhiwa
+    badge_live: Hai
+    badge_draft: Rasimu
+    fallback_name: Verto hii
+    deleted_on: Imefutwa %{date}
+    untitled: Bila kichwa
+    completion: ukamilishaji
+    responders:
+      one: mjibu
+      other: wajibu
+    responses:
+      one: jibu
+      other: majibu
+    questions:
+      one: swali
+      other: maswali
+    view_results: Ona matokeo →
+    edit: Hariri Verto
+    results: Matokeo →
+    publish: Chapisha →
+    delete: Futa
+    edit_warning: '"%{title}" iko hai. Kuhariri maswali wakati inakusanya majibu kutaathiri ubora wa data — majibu ya kabla na baada ya uhariri hayatalinganishwa moja kwa moja. Endelea?'
+    delete_warning: Futa "%{title}"? Huwezi kuirudisha Verto baada ya kufutwa. Kiungo cha wajibu kitaacha kufanya kazi — matokeo yaliyopo yatabaki katika orodha yako ya Yaliyohifadhiwa.
+  dashboard:
+    welcome_back: Karibu tena
+    heading_html: <span style="color:#01EACB;">Vertos</span> Zako
+    subtitle: Anzisha Vertos, zishiriki na ushirikiano wako, na utazame maarifa yakimiminika.
+    create_new: Unda Verto mpya
+    stat_live: Hai
+    stat_drafts: Rasimu
+    stat_responses: Majibu
+    stat_completion: Ukamilishaji
+    empty_title: Hakuna Vertos bado
+    empty_body: Unda Verto yako ya kwanza na uanze kukusanya maarifa kutoka kwa hadhira yako.
+    empty_cta: Unda Verto yako ya kwanza →
+    section_live: Hai
+    section_drafts: Rasimu
+    section_archived: Yaliyohifadhiwa
+  wizard:
+    create_verto: Unda Verto
+    building: Tunajenga Verto yako
+    pill_audience: Hadhira
+    pill_tone: Toni
+    pill_tone_value: Ya mazungumzo
+    pill_cards: Kadi
+    gen_brief_read: Kusoma muhtasari
+    gen_writing: Kuandika maswali
+    gen_formats: Kuchagua miundo
+    gen_design: Kutumia muundo
+    welcome_eyebrow: Kinachofuata
+    welcome_lead: Hatua chache za haraka na tutaandaa rasimu ya Verto yako.
+    welcome_steps:
+    - Kuhusu Verto yako
+    - Nani anajibu
+    - Unachotaka kujifunza
+    - Lugha
+    - Rangi za chapa
+    - Muktadha (hiari)
+    welcome_badge: Verto Mpya
+    welcome_title: Hebu tujenge Verto yako.
+    welcome_sub: Tutageuza muhtasari wako kuwa Verto inayofuata sheria za Playverto.
+    welcome_ready_html: Bonyeza <strong style="color:rgba(0,0,0,0.6);">Endelea</strong> ukiwa tayari.
+    examples: Mifano
+    s1_eyebrow: Hatua 01 · Kuhusu Verto yako
+    s1_lead: Mada kuu moja inayofunika yote.
+    s1_body: Iweke pana — utabana mtazamo katika hatua zinazofuata. Neno moja au mawili kwa kawaida yanatosha.
+    s1_examples:
+    - Hatua za kukabili tabianchi
+    - Elimu kwa wakimbizi
+    - Usalama wa chakula
+    s1_title: Verto yako inahusu nini?
+    s1_placeholder: 'mfano: Ustawi wa vijana'
+    s1_hint_body: Iweke pana — utabana mtazamo katika hatua zinazofuata.
+    s2_eyebrow: Hatua 02 · Nani anajibu
+    s2_lead: Kuwa wazi.
+    s2_body: Mtindo wa maisha, jukumu, eneo, lugha — chochote kinachounda jinsi kundi hili linavyofikiri. Kadri unavyokuwa wazi zaidi, ndivyo tunavyoweza kuandika maswali bora.
+    s2_examples:
+    - Wanafunzi wa chuo wenye umri wa miaka 18–24 nchini Kenya
+    - Wahudumu wa afya wa jamii wenye umri wa miaka 35–55
+    - Wazazi wa watoto wa umri wa shule mashambani NSW
+    s2_title: Nani anajibu — na wana umri gani?
+    s2_placeholder: 'mfano: Wanafunzi wa chuo wenye umri wa miaka 18–24 nchini Kenya'
+    s2_hint_body: Mtindo wa maisha, jukumu, eneo, lugha — chochote kinachounda jinsi kundi hili linavyofikiri.
+    s3_eyebrow: Hatua 03 · Lengo la kujifunza
+    s3_lead: Maarifa ambayo yangebadilisha uamuzi.
+    s3_body: Ruka vitu unavyojua tayari. Lenga jambo moja ambalo, ukijifunza, lingebadilisha unachofanya baadaye.
+    s3_examples:
+    - Kwa nini wajitoleaji wanaacha baada ya mwezi wa tatu?
+    - Nini kinazuia watu kufikia benki yetu ya chakula?
+    - Je, programu yetu ya vijana inabadilisha kweli imani — na hasa wapi?
+    s3_title: Unataka kujifunza nini kutoka kwao?
+    s3_placeholder: 'mfano: Kwa nini wajitoleaji wanaacha baada ya mwezi wa tatu?'
+    s3_hint_body: Ruka unachojua tayari — lenga jambo moja ambalo lingebadilisha unachofanya baadaye.
+    s4_eyebrow: Hatua 04 · Lugha
+    s4_lead: Fika kwa kila mtu kwa lugha yake.
+    s4_body: Tutaandika Verto kwa lugha yako ya msingi, kisha tutatengeneza toleo bora sawa kwa kila lugha nyingine. Kila toleo huuliza maswali yale yale, hivyo matokeo yanabaki yamelinganishwa.
+    s4_title: Verto hii izungumze lugha zipi?
+    s4_primary_label: Lugha ya msingi
+    s5_eyebrow: Hatua 05 · Rangi za chapa
+    s5_lead: Ifanye iwe na hisia za wewe.
+    s5_body: Hivi ndivyo Verto yako inavyoonekana kwa kila mtu anayeicheza. Unaweza kuibadilisha wakati wowote kutoka kwa mhariri.
+    s5_live_preview: Onyesho la awali la moja kwa moja
+    s5_quick_poll: Kura ya haraka
+    s5_mock_q: Unaipataje?
+    s5_mock_opt: Naipenda
+    s5_title: Chagua rangi za chapa yako.
+    s5_sub: Chagua tatu. Zitatumika katika uzoefu wote wa Verto hii.
+    brand_primary: Msingi
+    brand_primary_desc: Vichwa na lafudhi
+    brand_cta: Vifungo (CTA)
+    brand_cta_desc: Vifungo vya Endelea / Wasilisha
+    brand_bg: Mandharinyuma
+    brand_bg_desc: Turubai nyuma ya kadi
+    s6_eyebrow: Hatua 06 · Muktadha
+    optional: Hiari
+    s6_lead: Kuna kingine tunachotakiwa kuongeza?
+    s6_body: Toni, mambo yanayopaswa kuulizwa, mambo ya kuepuka, tabia za hadhira. Ruka ikiwa hakuna chochote zaidi.
+    s6_examples:
+    - Lazima ujumuishe swali kuhusu njia za ufadhili na vikwazo vya ruzuku.
+    - Epuka maneno magumu — wajibu wengi huzungumza Kiingereza kama lugha ya pili.
+    - Weka toni ya joto, si ya kishirika.
+    s6_title: Kuna kingine tunachopaswa kujua?
+    s6_placeholder: 'mfano: Hadhira haijawahi kutumia Playverto, weka toni ya joto, si ya kishirika.'
+    s6_compare_label: Ruhusu wajibu walinganishe majibu yao
+    s6_compare_desc: Onyesha CTA kwenye ukurasa wa shukrani inayoonyesha jinsi majibu yao yanavyolinganishwa na ya wengine.
+    back: "← Rudi"
+    next: Endelea →
+    generate: Tengeneza Verto →
+    generating: Inatengeneza…
+    step_counter: Hatua %{n} kati ya %{total}
