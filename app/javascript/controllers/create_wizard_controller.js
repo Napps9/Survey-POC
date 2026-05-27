@@ -54,7 +54,7 @@ export default class extends Controller {
     this.element.style.setProperty("--wizard-progress", `${Math.round(((idx + 1) / total) * 100)}%`)
 
     if (this.hasCounterTarget) {
-      this.counterTarget.textContent = t("js.wizard.step_counter", { n: idx + 1, total })
+      this.counterTarget.textContent = t("wizard.step_counter", { n: idx + 1, total })
     }
     if (this.hasBackTarget) {
       this.backTarget.classList.toggle("invisible", idx === 0)

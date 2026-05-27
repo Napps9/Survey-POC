@@ -228,7 +228,7 @@ export default class extends Controller {
   deleteCard(event) {
     event.preventDefault()
     const card = event.currentTarget.closest("[data-survey-editor-target='card']")
-    if (!confirm(t("js.editor.delete_card_confirm"))) return
+    if (!confirm(t("editor.delete_card_confirm"))) return
     card.remove()
     this.refreshAll()
     this.markDirty()
@@ -245,7 +245,7 @@ export default class extends Controller {
   }
 
   markDirty() {
-    this.flash(t("js.editor.unsaved"), "text-light-yellow")
+    this.flash(t("editor.unsaved"), "text-light-yellow")
     clearTimeout(this._saveTimer)
     this._saveTimer = setTimeout(() => this._doSave(), 1500)
   }
@@ -304,7 +304,7 @@ export default class extends Controller {
   async save(event) {
     event?.preventDefault()
     if (this.hasSaveButtonTarget) this.saveButtonTarget.disabled = true
-    this.flash(t("js.editor.saving"), "text-smoke/60")
+    this.flash(t("editor.saving"), "text-smoke/60")
     clearTimeout(this._saveTimer)
     await this._doSave()
     if (this.hasSaveButtonTarget) this.saveButtonTarget.disabled = false
@@ -325,9 +325,9 @@ export default class extends Controller {
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = await res.json()
-      this.flash(t("js.editor.saved", { time: new Date(json.updated_at).toLocaleTimeString() }), "text-aquamarine")
+      this.flash(t("editor.saved", { time: new Date(json.updated_at).toLocaleTimeString() }), "text-aquamarine")
     } catch (err) {
-      this.flash(t("js.editor.save_failed", { msg: err.message }), "text-hot-pink")
+      this.flash(t("editor.save_failed", { msg: err.message }), "text-hot-pink")
     }
   }
 
