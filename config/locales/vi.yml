@@ -1,0 +1,394 @@
+---
+vi:
+  locale_switcher:
+    label: Đổi ngôn ngữ
+    heading: Ngôn ngữ
+  layout:
+    studio_tagline: Verto Studio
+  card:
+    'yes': Có
+    'no': Không
+    add_option: Thêm tùy chọn
+    add_statement: Thêm phát biểu
+    swipe_no: "← Không"
+    swipe_hint: kéo thẻ để trả lời
+    swipe_yes: Có →
+    reset: Đặt lại
+    answer_placeholder: Nhập câu trả lời…
+    characters: Ký tự
+    allow_other: Cho phép câu trả lời tự do "Khác"
+    other: Khác
+    other_placeholder: Hãy chia sẻ bằng lời của bạn…
+  auth:
+    show: Hiện
+    email: Địa chỉ email
+    password: Mật khẩu
+    password_hint: Ít nhất 12 ký tự
+    title_sign_in: Đăng nhập — Playverto
+    sign_in_title: Đăng nhập vào Playverto
+    sign_in_new_here: Mới đến đây?
+    sign_in_create: Tạo tài khoản
+    forgot_password: Quên mật khẩu?
+    sign_in_submit: Đăng nhập →
+    title_signup: Tạo tài khoản — Playverto
+    signup_title: Tạo tài khoản của bạn
+    signup_have_one: Đã có tài khoản?
+    signup_sign_in: Đăng nhập
+    name: Tên của bạn
+    org_name: Tên tổ chức
+    confirm_password: Xác nhận mật khẩu
+    signup_submit: Tạo tài khoản →
+    title_reset: Đặt lại mật khẩu — Playverto
+    forgot_title: Quên mật khẩu?
+    forgot_sub: Nhập email của bạn và chúng tôi sẽ gửi liên kết đặt lại.
+    forgot_submit: Gửi hướng dẫn đặt lại qua email
+    back_to_sign_in: "← Quay lại đăng nhập"
+    title_set: Đặt mật khẩu mới — Playverto
+    set_title: Đặt mật khẩu mới
+    set_sub: Chọn thứ chỉ bạn mới đoán được.
+    new_password: Mật khẩu mới
+    confirm_new_password: Xác nhận mật khẩu mới
+    repeat_new_password: Nhập lại mật khẩu mới
+    set_submit: Lưu mật khẩu mới
+  results:
+    title: Kết quả
+    editor: "← Trình chỉnh sửa"
+    ask_verto: Hỏi Verto
+    analysing: Đang phân tích phản hồi…
+  player:
+    thank_you_title: Cảm ơn bạn!
+    thank_you_sub: Câu trả lời của bạn đã được ghi nhận.
+    compare_cta: Xem kết quả của bạn so với người khác →
+    powered_by: Được cung cấp bởi
+    comparison_title: Câu trả lời của bạn so với mọi người
+    back: "← Quay lại"
+    next: Tiếp →
+    submit: Gửi ✓
+  js:
+    player:
+      progress: Thẻ %{n} / %{total}
+      queued: Đã lưu — sẽ đồng bộ khi bạn trực tuyến trở lại
+      compare_cta: Xem kết quả của bạn so với người khác →
+      compare_loading: Đang tải…
+      compare_error: Không tải được — thử lại
+    editor:
+      delete_card_confirm: Xóa thẻ này?
+      unsaved: Thay đổi chưa lưu
+      saving: Đang lưu…
+      saved: Đã lưu %{time}
+      save_failed: 'Lưu thất bại: %{msg}'
+      card_n: Thẻ %{n} · %{type}
+      choose_format: Chọn định dạng câu trả lời bên dưới.
+      type_updated: Đã cập nhật loại câu trả lời thành %{type}
+      current: Hiện tại
+      off_brief: Lệch hướng
+      cards_count: "%{n} thẻ"
+      fit_best: Phù hợp nhất
+      fit_strong: Lựa chọn thay thế mạnh
+      fit_solid: Lựa chọn thay thế vững
+      fit_workable: Có thể dùng được
+      fit_sparingly: Dùng hạn chế
+    wizard:
+      step_counter: Bước %{n} / %{total}
+  nav:
+    partners: Đối tác
+    shared_vertos: Vertos được chia sẻ
+    my_vertos: Vertos của tôi
+    create: Tạo
+    members: Thành viên
+    sign_out: Đăng xuất
+  alliances:
+    title: Liên minh — Playverto
+    index_eyebrow: Liên minh của bạn
+    index_heading: Liên minh
+    index_subtitle: Nhóm các tổ chức đối tác thành các liên minh có tên. Thêm Vertos và mỗi đối tác sẽ có liên kết chia sẻ riêng.
+    new_button: "+ Liên minh mới"
+    owned_section: Liên minh bạn quản lý
+    owned_empty_title: Chưa có liên minh nào
+    owned_empty_admin_html: Nhấp <span style="color:#FF1E6F;">+ Liên minh mới</span> ở trên để bắt đầu nhóm, sau đó mời các tổ chức đối tác và thêm Vertos.
+    owned_empty_member: Hãy đề nghị quản trị viên của bạn tạo một liên minh.
+    started_on: Bắt đầu %{date}
+    partners_count:
+      one: đối tác
+      other: đối tác
+    vertos_count:
+      one: verto
+      other: vertos
+    open: Mở →
+    member_section: Liên minh bạn là thành viên
+    member_empty_title: Bạn chưa được mời vào liên minh nào
+    member_empty_body: Khi một tổ chức khác mời bạn vào một trong các liên minh của họ, nó sẽ xuất hiện ở đây.
+    member_run_by: Quản lý bởi %{org}
+    status:
+      active: Đang hoạt động
+      pending: Đang chờ
+      revoked: Đã thu hồi
+    new_title: Liên minh mới — Playverto
+    new_eyebrow: Liên minh mới
+    new_heading: Đặt tên cho liên minh của bạn
+    new_sub: Đặt một cái tên rõ ràng để các đối tác biết họ đang tham gia gì.
+    name_label: Tên liên minh
+    name_placeholder: 'ví dụ: Đối tác Thử nghiệm'
+    cancel: Hủy
+    create_submit: Tạo liên minh →
+    show_title: "%{name} — Liên minh"
+    back_to_all: Tất cả liên minh
+    creator_eyebrow: Liên minh · Bạn quản lý
+    partner_eyebrow: Liên minh · Thành viên
+    generate_link: Tạo liên kết tham gia →
+    delete: Xóa
+    delete_confirm: Xóa %{name}? Tất cả liên kết chia sẻ cho liên minh này sẽ ngừng hoạt động.
+    new_link_heading: Liên kết tham gia mới
+    new_link_body: Bất kỳ ai có liên kết này đều có thể tham gia %{alliance} với tư cách đối tác. Hết hạn sau 14 ngày.
+    copy: Sao chép
+    copied: Đã sao chép!
+    partners_section: Đối tác
+    no_partners_title: Chưa có đối tác nào
+    no_partners_body_html: Sử dụng <span style="color:#FF1E6F;">Tạo liên kết tham gia</span> ở trên để mời các tổ chức đối tác.
+    joined_on: Tham gia %{date}
+    remove_member_confirm: Xóa %{org} khỏi %{alliance}? Liên kết chia sẻ của họ sẽ ngừng hoạt động.
+    vertos_section: Vertos trong liên minh
+    no_vertos_title: Chưa có Verto nào được chia sẻ
+    no_vertos_body: Thêm một Verto đã xuất bản bên dưới và một liên kết chia sẻ duy nhất sẽ được tạo cho mỗi đối tác.
+    remove: Xóa
+    remove_verto_confirm: Xóa Verto này khỏi %{alliance}? Tất cả liên kết chia sẻ của đối tác cho nó sẽ ngừng hoạt động.
+    completion_label: hoàn thành
+    responses:
+      one: phản hồi
+      other: phản hồi
+    partner_links_count:
+      one: liên kết đối tác
+      other: liên kết đối tác
+    no_shares_yet: Thêm đối tác vào liên minh để tạo liên kết chia sẻ.
+    responses_short: "%{n} ph.hồi"
+    add_section: Thêm vào liên minh
+    add_heading: Thêm một Verto khác
+    add_body: Chọn một Verto đã xuất bản. Chúng tôi sẽ tạo một liên kết chia sẻ duy nhất cho mỗi đối tác trong liên minh.
+    no_more_vertos: Không còn Verto đã xuất bản nào để thêm.
+    create_new_verto: Tạo Verto mới →
+    add_submit: Thêm Verto →
+    partners_in_alliance: Đối tác trong liên minh
+    including_you: Bao gồm bạn
+    shared_vertos_short: Vertos được chia sẻ
+    available_to_distribute: Sẵn có để bạn phân phối
+    other_partners: Các đối tác khác
+    only_partner: Hiện tại bạn là đối tác duy nhất trong liên minh này.
+    your_vertos_section: Vertos được chia sẻ với bạn
+    partner_no_vertos_title: Chưa có Verto nào
+    partner_no_vertos_body: Khi %{org} thêm một Verto vào liên minh này, bạn sẽ thấy liên kết chia sẻ duy nhất của mình ở đây.
+    from_org: Từ %{org}
+    your_link: Liên kết của bạn
+    results_link: Kết quả →
+  alliance_verto:
+    title: "%{title} — Verto được chia sẻ"
+    from_org_alliance: Từ %{org} · %{alliance}
+    share_link: Liên kết chia sẻ
+    mine_label: từ liên kết của bạn
+    aggregate_label: trên toàn %{alliance}
+    card_n: Thẻ %{n}
+    my_results: Kết quả của tôi
+    aggregate: Tổng hợp
+    comparison: So sánh
+    comparison_sub: bạn so với tất cả
+    no_data: Không có dữ liệu
+    n_answered: "%{n} đã trả lời"
+    avg: TB %{n}
+  invites:
+    title: Chấp nhận lời mời — Playverto
+    already_used_title: Lời mời đã được sử dụng
+    already_used_body_html: Liên kết mời này đã được chấp nhận. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Đăng nhập</a>
+    expired_title: Lời mời đã hết hạn
+    expired_body: Liên kết này đã hơn 7 ngày. Hãy đề nghị quản trị viên của bạn gửi lại.
+    invited_to_join: Bạn đã được mời tham gia
+    alliance_by: một liên minh bởi %{org}
+    as_role: với vai trò %{role}
+    addressed_for: "· cho %{email}"
+    signed_in_as: Đã đăng nhập với tên %{name}
+    join_with: Tham gia với
+    pick_org: Chọn tổ chức nào sẽ tham gia
+    join_submit: Tham gia %{alliance} →
+    already_in_alliance: 'Đã ở trong liên minh này: %{orgs}'
+    you_run_this: Bạn quản lý liên minh này — hãy ghé thăm thay vì tham gia.
+    already_member_singular: "%{orgs} đã ở trong liên minh này."
+    already_member_plural: "%{orgs} đã ở trong liên minh này."
+    no_admin_org: Bạn không có tổ chức quản trị nào có thể tham gia liên minh này.
+    open_alliance: Mở %{alliance} →
+    sign_out_link: Đăng xuất và sử dụng tài khoản khác
+    sign_out_confirm: Đăng xuất khỏi tài khoản hiện tại?
+    already_have_account: Đã có tài khoản Playverto?
+    sign_in_instead: Đăng nhập thay thế
+    new_to_playverto: Mới biết đến Playverto?
+    create_new_account: Tạo tài khoản mới
+    sign_in_email_label: Email
+    sign_in_email_placeholder: ban@example.com
+    sign_in_password_label: Mật khẩu
+    sign_in_password_placeholder: Mật khẩu Playverto của bạn
+    sign_in_submit: Đăng nhập để tham gia →
+    your_name_label: Tên của bạn
+    your_name_placeholder: Nguyễn Văn A
+    your_org_name_label: Tên tổ chức của bạn
+    your_org_name_placeholder: Acme Partners
+    password_label: Mật khẩu
+    password_placeholder: Ít nhất 12 ký tự
+    confirm_password_label: Xác nhận mật khẩu
+    accept_submit: Chấp nhận lời mời →
+  editor:
+    questions: câu hỏi
+    primary: chính
+    change_media: Đổi hình ảnh
+    change_media_title: Đổi hình ảnh của thẻ này
+    add_design: Thêm thiết kế
+    add_design_title: Thêm hình ảnh vào thẻ này
+    add_design_sub: Thêm hình ảnh để thẻ này sống động hơn
+    live: TRỰC TIẾP
+    live_warning: Việc chỉnh sửa câu hỏi trong khi Verto này đang thu thập phản hồi sẽ ảnh hưởng đến chất lượng dữ liệu. Câu trả lời trước và sau khi chỉnh sửa sẽ không so sánh trực tiếp được.
+    got_it: Đã hiểu
+    add_question: Thêm câu hỏi
+    cards:
+      one: "%{count} thẻ"
+      other: "%{count} thẻ"
+    estimated:
+      one: Ước tính ~%{count} phút
+      other: Ước tính ~%{count} phút
+    design: Thiết kế
+    publish_share: Xuất bản & chia sẻ →
+    answer_type: Loại câu trả lời
+    select_card: Chọn một thẻ để thay đổi loại của nó
+    click_any: Nhấp vào bất kỳ thẻ nào bên trái.
+    select_card_long: Chọn một thẻ câu hỏi để chuyển định dạng câu trả lời
+    apply_to_card: Áp dụng cho thẻ này
+    see_all_types: Xem tất cả loại câu hỏi
+    all_types: Tất cả loại câu hỏi
+    ranked_for: Xếp theo độ phù hợp cho
+    this_card: thẻ này
+  dashboard_card:
+    badge_archived: Đã lưu trữ
+    badge_live: Trực tiếp
+    badge_draft: Bản nháp
+    fallback_name: Verto này
+    deleted_on: Đã xóa %{date}
+    untitled: Chưa đặt tên
+    completion: hoàn thành
+    responders:
+      one: người phản hồi
+      other: người phản hồi
+    responses:
+      one: phản hồi
+      other: phản hồi
+    questions:
+      one: câu hỏi
+      other: câu hỏi
+    view_results: Xem kết quả →
+    edit: Chỉnh sửa Verto
+    results: Kết quả →
+    publish: Xuất bản →
+    delete: Xóa
+    edit_warning: '"%{title}" đang trực tiếp. Việc chỉnh sửa câu hỏi khi đang thu thập phản hồi sẽ ảnh hưởng đến chất lượng dữ liệu — câu trả lời trước và sau khi chỉnh sửa sẽ không so sánh trực tiếp được. Tiếp tục?'
+    delete_warning: Xóa "%{title}"? Bạn không thể khôi phục một Verto đã bị xóa. Liên kết của người phản hồi sẽ ngừng hoạt động — kết quả hiện có vẫn ở trong danh sách Lưu trữ của bạn.
+  dashboard:
+    welcome_back: Chào mừng trở lại
+    heading_html: <span style="color:#01EACB;">Vertos</span> của bạn
+    subtitle: Khởi tạo Vertos, chia sẻ với liên minh của bạn và theo dõi các thông tin chi tiết đổ về.
+    create_new: Tạo Verto mới
+    stat_live: Trực tiếp
+    stat_drafts: Bản nháp
+    stat_responses: Phản hồi
+    stat_completion: Hoàn thành
+    empty_title: Chưa có Verto nào
+    empty_body: Tạo Verto đầu tiên và bắt đầu thu thập thông tin chi tiết từ khán giả của bạn.
+    empty_cta: Tạo Verto đầu tiên của bạn →
+    section_live: Trực tiếp
+    section_drafts: Bản nháp
+    section_archived: Đã lưu trữ
+  wizard:
+    create_verto: Tạo Verto
+    building: Đang xây dựng Verto của bạn
+    pill_audience: Đối tượng
+    pill_tone: Giọng điệu
+    pill_tone_value: Trò chuyện
+    pill_cards: Thẻ
+    gen_brief_read: Đọc bản tóm tắt
+    gen_writing: Đang viết câu hỏi
+    gen_formats: Đang chọn định dạng
+    gen_design: Đang áp dụng thiết kế
+    welcome_eyebrow: Những gì sắp tới
+    welcome_lead: Một vài bước nhanh và chúng tôi sẽ phác thảo Verto của bạn.
+    welcome_steps:
+    - Về Verto của bạn
+    - Ai đang trả lời
+    - Bạn muốn tìm hiểu gì
+    - Ngôn ngữ
+    - Màu sắc thương hiệu
+    - Bối cảnh (tùy chọn)
+    welcome_badge: Verto mới
+    welcome_title: Hãy cùng xây dựng Verto của bạn.
+    welcome_sub: Chúng tôi sẽ biến bản tóm tắt của bạn thành một Verto tuân theo các quy tắc của Playverto.
+    welcome_ready_html: Nhấn <strong style="color:rgba(0,0,0,0.6);">Tiếp</strong> khi bạn đã sẵn sàng.
+    examples: Ví dụ
+    s1_eyebrow: Bước 01 · Về Verto của bạn
+    s1_lead: Một chủ đề bao quát duy nhất.
+    s1_body: Giữ nó rộng — bạn sẽ thu hẹp góc nhìn ở các bước tiếp theo. Một hoặc hai từ thường là đủ.
+    s1_examples:
+    - Hành động vì khí hậu
+    - Giáo dục cho người tị nạn
+    - An ninh lương thực
+    s1_title: Verto của bạn nói về gì?
+    s1_placeholder: 'ví dụ: Sức khỏe thanh thiếu niên'
+    s1_hint_body: Giữ nó rộng — bạn sẽ thu hẹp góc nhìn ở các bước tiếp theo.
+    s2_eyebrow: Bước 02 · Ai đang trả lời
+    s2_lead: Hãy cụ thể.
+    s2_body: Phong cách sống, vai trò, khu vực, ngôn ngữ — bất cứ điều gì định hình cách nhóm này suy nghĩ. Càng cụ thể, chúng tôi càng viết được câu hỏi tốt hơn.
+    s2_examples:
+    - Sinh viên đại học 18–24 tuổi tại Kenya
+    - Nhân viên y tế cộng đồng tuyến đầu 35–55 tuổi
+    - Phụ huynh có con đi học ở vùng nông thôn NSW
+    s2_title: Ai đang trả lời — và họ ở độ tuổi nào?
+    s2_placeholder: 'ví dụ: Sinh viên đại học 18–24 tuổi tại Kenya'
+    s2_hint_body: Phong cách sống, vai trò, khu vực, ngôn ngữ — bất cứ điều gì định hình cách nhóm này suy nghĩ.
+    s3_eyebrow: Bước 03 · Mục tiêu học hỏi
+    s3_lead: Thông tin chi tiết có thể thay đổi một quyết định.
+    s3_body: Bỏ qua những điều bạn đã biết. Hướng tới điều duy nhất mà nếu biết được sẽ thay đổi việc bạn làm tiếp theo.
+    s3_examples:
+    - Tại sao tình nguyện viên bỏ cuộc sau tháng thứ ba?
+    - Điều gì ngăn cản mọi người tiếp cận ngân hàng thực phẩm của chúng tôi?
+    - Chương trình thanh niên của chúng tôi có thực sự thay đổi sự tự tin không — và ở đâu chính xác?
+    s3_title: Bạn muốn tìm hiểu gì từ họ?
+    s3_placeholder: 'ví dụ: Tại sao tình nguyện viên bỏ cuộc sau tháng thứ ba?'
+    s3_hint_body: Bỏ qua những gì bạn đã biết — hướng tới điều duy nhất sẽ thay đổi việc bạn làm tiếp theo.
+    s4_eyebrow: Bước 04 · Ngôn ngữ
+    s4_lead: Tiếp cận mọi người bằng ngôn ngữ của họ.
+    s4_body: Chúng tôi sẽ viết Verto bằng ngôn ngữ chính của bạn, sau đó tạo ra phiên bản chất lượng tương đương cho mỗi ngôn ngữ khác. Mọi phiên bản đều hỏi cùng câu hỏi, nên kết quả vẫn nhất quán.
+    s4_title: Verto này nên dùng những ngôn ngữ nào?
+    s4_primary_label: Ngôn ngữ chính
+    s5_eyebrow: Bước 05 · Màu sắc thương hiệu
+    s5_lead: Khiến nó mang phong cách của bạn.
+    s5_body: Đây là cách Verto của bạn hiển thị với mọi người chơi. Bạn có thể tinh chỉnh bất cứ lúc nào từ trình chỉnh sửa.
+    s5_live_preview: Xem trước trực tiếp
+    s5_quick_poll: Khảo sát nhanh
+    s5_mock_q: Bạn thấy nó thế nào?
+    s5_mock_opt: Rất thích
+    s5_title: Chọn màu sắc thương hiệu của bạn.
+    s5_sub: Chọn ba màu. Chúng sẽ được áp dụng xuyên suốt trải nghiệm của Verto này.
+    brand_primary: Chính
+    brand_primary_desc: Tiêu đề & điểm nhấn
+    brand_cta: Nút (CTA)
+    brand_cta_desc: Nút Tiếp / Gửi
+    brand_bg: Nền
+    brand_bg_desc: Khung nền phía sau các thẻ
+    s6_eyebrow: Bước 06 · Bối cảnh
+    optional: Tùy chọn
+    s6_lead: Còn gì khác chúng tôi nên đưa vào không?
+    s6_body: Giọng điệu, câu hỏi bắt buộc, điều cần tránh, đặc điểm khán giả. Bỏ qua nếu không có gì thêm.
+    s6_examples:
+    - Phải bao gồm câu hỏi về các kênh tài trợ và rào cản đối với các khoản tài trợ.
+    - Tránh dùng thuật ngữ chuyên ngành — nhiều người trả lời nói tiếng Anh như ngôn ngữ thứ hai.
+    - Giữ giọng điệu ấm áp, không quá doanh nghiệp.
+    s6_title: Còn gì khác chúng tôi nên biết?
+    s6_placeholder: 'ví dụ: Khán giả chưa từng dùng Playverto, giữ giọng điệu ấm áp, không quá doanh nghiệp.'
+    s6_compare_label: Cho phép người trả lời so sánh câu trả lời của họ
+    s6_compare_desc: Hiển thị CTA trên trang cảm ơn để cho thấy câu trả lời của họ so sánh thế nào với mọi người khác.
+    back: "← Quay lại"
+    next: Tiếp →
+    generate: Tạo Verto →
+    generating: Đang tạo…
+    step_counter: Bước %{n} / %{total}
