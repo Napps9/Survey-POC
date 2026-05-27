@@ -7,7 +7,7 @@ const TYPE_BOUNDS = {
   select_many:      { min: 3, max: 5 },
   rating:           { min: 3, max: 5 },
   range:            { min: 3, max: 5 },
-  nps:              { min: 4, max: 11 },
+  nps:              { min: 5, max: 5 },
   select_one_grid:  { min: 2, max: 10, even: true },
   select_many_grid: { min: 2, max: 10, even: true }
 }

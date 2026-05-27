@@ -13,7 +13,7 @@
 %>
 
 <div class="split-left">
-  <% if nps_card?(card) && CardTypes.enabled?("nps") %>
+  <% if nps_card?(card) %>
     <%# NPS: the LEFT panel plays a Lottie animation that swaps to match the
         slider value (1–5). The lottie-player controller listens for the
         `nps:valueChanged` event dispatched by the slider on the right. %>

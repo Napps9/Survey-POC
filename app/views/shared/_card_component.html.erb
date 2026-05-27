@@ -14,9 +14,7 @@
   mode    ||= :preview
   editable = (mode == :editor)
   type     = card["type"].to_s
-  # When the nps feature flag is off, render any existing nps card as a plain
-  # range slider so the NPS reactive UI never shows on the branch.
-  render_type = (type == "nps" && !CardTypes.enabled?("nps")) ? "range" : type
+  render_type = type
   eyebrow  = CardTypes.eyebrow(type).presence || type.tr("_", " ")
   is_q     = type != "welcome_card"
   ce_attr  = editable ? "contenteditable=\"true\"".html_safe : "".html_safe

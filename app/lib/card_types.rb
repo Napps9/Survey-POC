@@ -31,7 +31,7 @@ module CardTypes
 
   # Types gated behind a feature flag: hidden from the picker and the AI
   # generator unless their env flag is enabled. Lets the code ship dormant.
-  FLAGGED = { "nps" => "NPS_REACTIVE_ENABLED" }.freeze
+  FLAGGED = {}.freeze
 
   # Whether a card type is currently available. Non-flagged types are always on;
   # flagged types require their env flag (default off).
@@ -43,7 +43,7 @@ module CardTypes
 
   # Types that should appear in the in-editor answer-type picker.
   def pickable
-    DATA.select { |key, attrs| attrs["pickable"] && enabled?(key) }
+    DATA.select { |_key, attrs| attrs["pickable"] }
   end
 
   # JSON blob emitted into the editor page so the JS controller has the
