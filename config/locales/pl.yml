@@ -1,0 +1,394 @@
+---
+pl:
+  locale_switcher:
+    label: Zmień język
+    heading: Język
+  layout:
+    studio_tagline: Verto Studio
+  card:
+    'yes': Tak
+    'no': Nie
+    add_option: Dodaj opcję
+    add_statement: Dodaj stwierdzenie
+    swipe_no: "← Nie"
+    swipe_hint: przeciągnij kartę, aby odpowiedzieć
+    swipe_yes: Tak →
+    reset: Resetuj
+    answer_placeholder: Wpisz odpowiedź…
+    characters: Znaki
+    allow_other: Zezwól na odpowiedź „Inne” w formie tekstu
+    other: Inne
+    other_placeholder: Powiedz nam własnymi słowami…
+  auth:
+    show: Pokaż
+    email: Adres e-mail
+    password: Hasło
+    password_hint: Co najmniej 12 znaków
+    title_sign_in: Zaloguj się — Playverto
+    sign_in_title: Zaloguj się do Playverto
+    sign_in_new_here: Jesteś tu nowy?
+    sign_in_create: Załóż konto
+    forgot_password: Nie pamiętasz hasła?
+    sign_in_submit: Zaloguj się →
+    title_signup: Załóż konto — Playverto
+    signup_title: Załóż konto
+    signup_have_one: Masz już konto?
+    signup_sign_in: Zaloguj się
+    name: Twoje imię
+    org_name: Nazwa organizacji
+    confirm_password: Potwierdź hasło
+    signup_submit: Załóż konto →
+    title_reset: Resetuj hasło — Playverto
+    forgot_title: Nie pamiętasz hasła?
+    forgot_sub: Wpisz swój e-mail, a wyślemy link do resetu.
+    forgot_submit: Wyślij instrukcje resetowania
+    back_to_sign_in: "← Powrót do logowania"
+    title_set: Ustaw nowe hasło — Playverto
+    set_title: Ustaw nowe hasło
+    set_sub: Wybierz coś, co tylko Ty odgadniesz.
+    new_password: Nowe hasło
+    confirm_new_password: Potwierdź nowe hasło
+    repeat_new_password: Powtórz nowe hasło
+    set_submit: Zapisz nowe hasło
+  results:
+    title: Wyniki
+    editor: "← Edytor"
+    ask_verto: Zapytaj Verto
+    analysing: Analizowanie odpowiedzi…
+  player:
+    thank_you_title: Dziękujemy!
+    thank_you_sub: Twoje odpowiedzi zostały zapisane.
+    compare_cta: Zobacz, jak Twoje wyniki wypadają na tle innych →
+    powered_by: Działa dzięki
+    comparison_title: Twoje odpowiedzi vs wszyscy
+    back: "← Wstecz"
+    next: Dalej →
+    submit: Wyślij ✓
+  js:
+    player:
+      progress: Karta %{n} z %{total}
+      queued: Zapisano — zsynchronizujemy, gdy wrócisz online
+      compare_cta: Zobacz, jak Twoje wyniki wypadają na tle innych →
+      compare_loading: Ładowanie…
+      compare_error: Nie udało się załadować — spróbuj ponownie
+    editor:
+      delete_card_confirm: Usunąć tę kartę?
+      unsaved: Niezapisane zmiany
+      saving: Zapisywanie…
+      saved: Zapisano %{time}
+      save_failed: 'Zapis nie powiódł się: %{msg}'
+      card_n: Karta %{n} · %{type}
+      choose_format: Wybierz format odpowiedzi poniżej.
+      type_updated: Typ odpowiedzi zmieniono na %{type}
+      current: Bieżący
+      off_brief: Poza zakresem
+      cards_count: "%{n} kart"
+      fit_best: Najlepsze dopasowanie
+      fit_strong: Mocna alternatywa
+      fit_solid: Solidna alternatywa
+      fit_workable: Do przyjęcia
+      fit_sparingly: Używaj oszczędnie
+    wizard:
+      step_counter: Krok %{n} z %{total}
+  nav:
+    partners: Partnerzy
+    shared_vertos: Udostępnione Verto
+    my_vertos: Moje Verto
+    create: Utwórz
+    members: Członkowie
+    sign_out: Wyloguj się
+  alliances:
+    title: Sojusze — Playverto
+    index_eyebrow: Twoje sojusze
+    index_heading: Sojusze
+    index_subtitle: Grupuj organizacje partnerskie w nazwane sojusze. Dodawaj Verto, a każdy partner otrzyma własny link do udostępniania.
+    new_button: "+ Nowy sojusz"
+    owned_section: Sojusze, którymi zarządzasz
+    owned_empty_title: Brak sojuszy
+    owned_empty_admin_html: Kliknij <span style="color:#FF1E6F;">+ Nowy sojusz</span> powyżej, aby utworzyć grupę, a następnie zaproś organizacje partnerskie i dodaj Verto.
+    owned_empty_member: Poproś administratora o utworzenie sojuszu.
+    started_on: Rozpoczęto %{date}
+    partners_count:
+      one: partner
+      other: partnerów
+    vertos_count:
+      one: verto
+      other: verto
+    open: Otwórz →
+    member_section: Sojusze, których jesteś członkiem
+    member_empty_title: Nie zaproszono Cię do żadnego sojuszu
+    member_empty_body: Gdy inna organizacja zaprosi Cię do swojego sojuszu, pojawi się on tutaj.
+    member_run_by: Prowadzony przez %{org}
+    status:
+      active: Aktywny
+      pending: Oczekujący
+      revoked: Cofnięty
+    new_title: Nowy sojusz — Playverto
+    new_eyebrow: Nowy sojusz
+    new_heading: Nazwij swój sojusz
+    new_sub: Nadaj grupie jasną nazwę, aby partnerzy wiedzieli, do czego dołączają.
+    name_label: Nazwa sojuszu
+    name_placeholder: np. Pilot Partners
+    cancel: Anuluj
+    create_submit: Utwórz sojusz →
+    show_title: "%{name} — Sojusze"
+    back_to_all: Wszystkie sojusze
+    creator_eyebrow: Sojusz · Ty go prowadzisz
+    partner_eyebrow: Sojusz · Członek
+    generate_link: Wygeneruj link dołączenia →
+    delete: Usuń
+    delete_confirm: Usunąć %{name}? Wszystkie linki udostępniania tego sojuszu przestaną działać.
+    new_link_heading: Nowy link dołączenia
+    new_link_body: Każdy, kto ma ten link, może dołączyć do %{alliance} jako partner. Wygasa za 14 dni.
+    copy: Kopiuj
+    copied: Skopiowano!
+    partners_section: Partnerzy
+    no_partners_title: Brak partnerów
+    no_partners_body_html: Użyj <span style="color:#FF1E6F;">Wygeneruj link dołączenia</span> powyżej, aby zaprosić organizacje partnerskie.
+    joined_on: Dołączono %{date}
+    remove_member_confirm: Usunąć %{org} z %{alliance}? Ich linki udostępniania przestaną działać.
+    vertos_section: Verto w sojuszu
+    no_vertos_title: Nie udostępniono jeszcze żadnego Verto
+    no_vertos_body: Dodaj opublikowane Verto poniżej, a dla każdego partnera zostanie wygenerowany unikalny link udostępniania.
+    remove: Usuń
+    remove_verto_confirm: Usunąć to Verto z %{alliance}? Wszystkie partnerskie linki udostępniania przestaną działać.
+    completion_label: ukończenie
+    responses:
+      one: odpowiedź
+      other: odpowiedzi
+    partner_links_count:
+      one: link partnerski
+      other: linki partnerskie
+    no_shares_yet: Dodaj partnera do sojuszu, aby wygenerować linki udostępniania.
+    responses_short: "%{n} odp."
+    add_section: Dodaj do sojuszu
+    add_heading: Dodaj kolejne Verto
+    add_body: Wybierz opublikowane Verto. Wygenerujemy unikalny link udostępniania dla każdego partnera w sojuszu.
+    no_more_vertos: Brak kolejnych opublikowanych Verto do dodania.
+    create_new_verto: Utwórz nowe Verto →
+    add_submit: Dodaj Verto →
+    partners_in_alliance: Partnerzy w sojuszu
+    including_you: Łącznie z Tobą
+    shared_vertos_short: Udostępnione Verto
+    available_to_distribute: Dostępne do dystrybucji
+    other_partners: Inni partnerzy
+    only_partner: Jesteś na razie jedynym partnerem w tym sojuszu.
+    your_vertos_section: Verto udostępnione Tobie
+    partner_no_vertos_title: Brak Verto
+    partner_no_vertos_body: Gdy %{org} doda Verto do tego sojuszu, zobaczysz tutaj swój unikalny link udostępniania.
+    from_org: Od %{org}
+    your_link: Twój link
+    results_link: Wyniki →
+  alliance_verto:
+    title: "%{title} — Udostępnione Verto"
+    from_org_alliance: Od %{org} · %{alliance}
+    share_link: Link udostępniania
+    mine_label: z Twojego linku
+    aggregate_label: w obrębie %{alliance}
+    card_n: Karta %{n}
+    my_results: Moje wyniki
+    aggregate: Suma
+    comparison: Porównanie
+    comparison_sub: Ty vs wszyscy
+    no_data: Brak danych
+    n_answered: "%{n} odpowiedziało"
+    avg: śr. %{n}
+  invites:
+    title: Zaakceptuj zaproszenie — Playverto
+    already_used_title: Zaproszenie już wykorzystane
+    already_used_body_html: Ten link z zaproszeniem został już zaakceptowany. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Zaloguj się</a>
+    expired_title: Zaproszenie wygasło
+    expired_body: Ten link ma więcej niż 7 dni. Poproś administratora o przesłanie nowego.
+    invited_to_join: Zaproszono Cię do dołączenia do
+    alliance_by: sojuszu prowadzonego przez %{org}
+    as_role: jako %{role}
+    addressed_for: "· dla %{email}"
+    signed_in_as: Zalogowano jako %{name}
+    join_with: Dołącz jako
+    pick_org: Wybierz, która organizacja dołączy
+    join_submit: Dołącz do %{alliance} →
+    already_in_alliance: 'Już w tym sojuszu: %{orgs}'
+    you_run_this: Prowadzisz ten sojusz — odwiedź go zamiast tego.
+    already_member_singular: "%{orgs} jest już w tym sojuszu."
+    already_member_plural: "%{orgs} są już w tym sojuszu."
+    no_admin_org: Nie masz organizacji administratorskiej, która mogłaby dołączyć do tego sojuszu.
+    open_alliance: Otwórz %{alliance} →
+    sign_out_link: Wyloguj się i użyj innego konta
+    sign_out_confirm: Wylogować się z bieżącego konta?
+    already_have_account: Masz już konto Playverto?
+    sign_in_instead: Zaloguj się
+    new_to_playverto: Nowy w Playverto?
+    create_new_account: Utwórz nowe konto
+    sign_in_email_label: E-mail
+    sign_in_email_placeholder: ty@przykład.com
+    sign_in_password_label: Hasło
+    sign_in_password_placeholder: Twoje hasło Playverto
+    sign_in_submit: Zaloguj się, aby dołączyć →
+    your_name_label: Twoje imię
+    your_name_placeholder: Jan Kowalski
+    your_org_name_label: Nazwa Twojej organizacji
+    your_org_name_placeholder: Acme Partners
+    password_label: Hasło
+    password_placeholder: Co najmniej 12 znaków
+    confirm_password_label: Potwierdź hasło
+    accept_submit: Zaakceptuj zaproszenie →
+  editor:
+    questions: pytań
+    primary: główny
+    change_media: Zmień multimedia
+    change_media_title: Zmień obraz tej karty
+    add_design: Dodaj projekt
+    add_design_title: Dodaj obraz do tej karty
+    add_design_sub: Dodaj obraz, aby ożywić tę kartę
+    live: NA ŻYWO
+    live_warning: Edytowanie pytań, gdy to Verto zbiera odpowiedzi, wpłynie na jakość danych. Odpowiedzi przed i po edycji nie będą bezpośrednio porównywalne.
+    got_it: Rozumiem
+    add_question: Dodaj pytanie
+    cards:
+      one: "%{count} karta"
+      other: "%{count} kart"
+    estimated:
+      one: Szacowany czas ~%{count} min
+      other: Szacowany czas ~%{count} min
+    design: Projekt
+    publish_share: Opublikuj i udostępnij →
+    answer_type: Typ odpowiedzi
+    select_card: Wybierz kartę, aby zmienić jej typ
+    click_any: Kliknij dowolną kartę po lewej.
+    select_card_long: Wybierz kartę z pytaniem, aby zmienić format odpowiedzi
+    apply_to_card: Zastosuj do tej karty
+    see_all_types: Zobacz wszystkie typy pytań
+    all_types: Wszystkie typy pytań
+    ranked_for: Uszeregowane według dopasowania do
+    this_card: tej karty
+  dashboard_card:
+    badge_archived: Zarchiwizowane
+    badge_live: Na żywo
+    badge_draft: Wersja robocza
+    fallback_name: to Verto
+    deleted_on: Usunięto %{date}
+    untitled: Bez tytułu
+    completion: ukończenie
+    responders:
+      one: respondent
+      other: respondentów
+    responses:
+      one: odpowiedź
+      other: odpowiedzi
+    questions:
+      one: pytanie
+      other: pytań
+    view_results: Zobacz wyniki →
+    edit: Edytuj Verto
+    results: Wyniki →
+    publish: Opublikuj →
+    delete: Usuń
+    edit_warning: "„%{title}” jest aktywne. Edytowanie pytań podczas zbierania odpowiedzi wpłynie na jakość danych — odpowiedzi sprzed i po edycji nie będą bezpośrednio porównywalne. Kontynuować?"
+    delete_warning: Usunąć „%{title}”? Usuniętego Verto nie da się odzyskać. Link dla respondentów przestanie działać — istniejące wyniki pozostaną na liście Zarchiwizowane.
+  dashboard:
+    welcome_back: Witaj ponownie
+    heading_html: Twoje <span style="color:#01EACB;">Verto</span>
+    subtitle: Twórz Verto, udostępniaj je swojemu sojuszowi i obserwuj napływające wnioski.
+    create_new: Utwórz nowe Verto
+    stat_live: Na żywo
+    stat_drafts: Wersje robocze
+    stat_responses: Odpowiedzi
+    stat_completion: Ukończenie
+    empty_title: Brak Verto
+    empty_body: Utwórz swoje pierwsze Verto i zacznij zbierać wnioski od swojej publiczności.
+    empty_cta: Utwórz swoje pierwsze Verto →
+    section_live: Na żywo
+    section_drafts: Wersje robocze
+    section_archived: Zarchiwizowane
+  wizard:
+    create_verto: Utwórz Verto
+    building: Tworzymy Twoje Verto
+    pill_audience: Odbiorcy
+    pill_tone: Ton
+    pill_tone_value: Konwersacyjny
+    pill_cards: Karty
+    gen_brief_read: Czytanie briefu
+    gen_writing: Pisanie pytań
+    gen_formats: Wybieranie formatów
+    gen_design: Stosowanie projektu
+    welcome_eyebrow: Co Cię czeka
+    welcome_lead: Kilka szybkich kroków i przygotujemy szkic Twojego Verto.
+    welcome_steps:
+    - O Twoim Verto
+    - Kto odpowiada
+    - Czego chcesz się dowiedzieć
+    - Języki
+    - Kolory marki
+    - Kontekst (opcjonalnie)
+    welcome_badge: Nowe Verto
+    welcome_title: Stwórzmy Twoje Verto.
+    welcome_sub: Zamienimy Twój brief w Verto zgodne z zasadami Playverto.
+    welcome_ready_html: Naciśnij <strong style="color:rgba(0,0,0,0.6);">Dalej</strong>, gdy będziesz gotowy.
+    examples: Przykłady
+    s1_eyebrow: Krok 01 · O Twoim Verto
+    s1_lead: Jeden nadrzędny temat.
+    s1_body: Niech będzie szeroki — kąt zawęzisz w kolejnych krokach. Zwykle wystarczy jedno lub dwa słowa.
+    s1_examples:
+    - Działania klimatyczne
+    - Edukacja uchodźców
+    - Bezpieczeństwo żywnościowe
+    s1_title: O czym jest Twoje Verto?
+    s1_placeholder: np. Dobrostan młodzieży
+    s1_hint_body: Niech będzie szeroki — kąt zawęzisz w kolejnych krokach.
+    s2_eyebrow: Krok 02 · Kto odpowiada
+    s2_lead: Bądź konkretny.
+    s2_body: Styl życia, rola, region, język — wszystko, co kształtuje sposób myślenia tej grupy. Im bardziej konkretnie, tym lepsze pytania możemy ułożyć.
+    s2_examples:
+    - Studenci w wieku 18–24 lat w Kenii
+    - Pracownicy zdrowia środowiskowego w wieku 35–55 lat
+    - Rodzice dzieci w wieku szkolnym z wiejskich obszarów NSW
+    s2_title: Kto odpowiada — i w jakim jest wieku?
+    s2_placeholder: np. Studenci w wieku 18–24 lat w Kenii
+    s2_hint_body: Styl życia, rola, region, język — wszystko, co kształtuje sposób myślenia tej grupy.
+    s3_eyebrow: Krok 03 · Cel poznawczy
+    s3_lead: Wniosek, który zmieniłby decyzję.
+    s3_body: Pomiń to, co już wiesz. Skup się na tej jednej rzeczy, która — gdybyś się o niej dowiedział — zmieniłaby Twoje następne kroki.
+    s3_examples:
+    - Dlaczego wolontariusze rezygnują po trzecim miesiącu?
+    - Co powstrzymuje ludzi przed korzystaniem z naszego banku żywności?
+    - Czy nasz program dla młodzieży faktycznie zwiększa pewność siebie — i w jakich obszarach?
+    s3_title: Czego chcesz się od nich dowiedzieć?
+    s3_placeholder: np. Dlaczego wolontariusze rezygnują po trzecim miesiącu?
+    s3_hint_body: Pomiń to, co już wiesz — skup się na tej jednej rzeczy, która zmieniłaby Twoje następne kroki.
+    s4_eyebrow: Krok 04 · Języki
+    s4_lead: Dotrzyj do każdego w jego języku.
+    s4_body: Napiszemy Verto w Twoim głównym języku, a następnie przygotujemy równie dobrą wersję w każdym innym języku. Każda wersja zadaje te same pytania, więc wyniki pozostają spójne.
+    s4_title: W jakich językach ma mówić to Verto?
+    s4_primary_label: Język główny
+    s5_eyebrow: Krok 05 · Kolory marki
+    s5_lead: Spraw, by wyglądało jak Ty.
+    s5_body: Tak Twoje Verto wygląda dla każdego, kto je wypełnia. Możesz dostroić ustawienia w dowolnym momencie w edytorze.
+    s5_live_preview: Podgląd na żywo
+    s5_quick_poll: Szybka ankieta
+    s5_mock_q: Jak Ci się podoba?
+    s5_mock_opt: Uwielbiam
+    s5_title: Wybierz kolory swojej marki.
+    s5_sub: Wybierz trzy. Będą stosowane w całym tym Verto.
+    brand_primary: Główny
+    brand_primary_desc: Nagłówki i akcenty
+    brand_cta: Przyciski (CTA)
+    brand_cta_desc: Przyciski Dalej / Wyślij
+    brand_bg: Tło
+    brand_bg_desc: Powierzchnia za kartami
+    s6_eyebrow: Krok 06 · Kontekst
+    optional: Opcjonalne
+    s6_lead: Coś jeszcze, co powinniśmy uwzględnić?
+    s6_body: Ton, pytania obowiązkowe, rzeczy do uniknięcia, specyfika odbiorców. Pomiń, jeśli nie ma nic dodatkowego.
+    s6_examples:
+    - Musi zawierać pytanie o ścieżki finansowania i bariery w uzyskaniu grantów.
+    - Unikaj żargonu — wielu respondentów mówi po angielsku jako drugim języku.
+    - Utrzymaj ciepły ton, nie korporacyjny.
+    s6_title: Coś jeszcze, o czym powinniśmy wiedzieć?
+    s6_placeholder: np. Odbiorcy nigdy wcześniej nie korzystali z Playverto, utrzymaj ciepły ton, nie korporacyjny.
+    s6_compare_label: Pozwól respondentom porównywać swoje odpowiedzi
+    s6_compare_desc: Pokaż CTA na stronie podziękowania, które ujawnia, jak ich odpowiedzi wypadają na tle innych.
+    back: "← Wstecz"
+    next: Dalej →
+    generate: Wygeneruj Verto →
+    generating: Generowanie…
+    step_counter: Krok %{n} z %{total}

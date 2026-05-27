@@ -97,6 +97,141 @@ uk:
     create: Створити
     members: Учасники
     sign_out: Вийти
+  alliances:
+    title: Альянси — Playverto
+    index_eyebrow: Ваші альянси
+    index_heading: Альянси
+    index_subtitle: Об'єднуйте партнерські організації в іменовані альянси. Додавайте Verto, і кожен партнер отримає власне посилання для поширення.
+    new_button: "+ Новий альянс"
+    owned_section: Альянси, якими ви керуєте
+    owned_empty_title: Альянсів поки немає
+    owned_empty_admin_html: Натисніть <span style="color:#FF1E6F;">+ Новий альянс</span> вище, щоб створити групу, а потім запросіть партнерські організації та додайте Verto.
+    owned_empty_member: Попросіть адміністратора створити альянс.
+    started_on: Створено %{date}
+    partners_count:
+      one: партнер
+      other: партнерів
+    vertos_count:
+      one: verto
+      other: verto
+    open: Відкрити →
+    member_section: Альянси, учасником яких ви є
+    member_empty_title: Вас не запрошували до жодного альянсу
+    member_empty_body: Коли інша організація запросить вас до свого альянсу, він з'явиться тут.
+    member_run_by: Керує %{org}
+    status:
+      active: Активний
+      pending: Очікує
+      revoked: Відкликано
+    new_title: Новий альянс — Playverto
+    new_eyebrow: Новий альянс
+    new_heading: Назвіть ваш альянс
+    new_sub: Дайте групі зрозумілу назву, щоб партнери знали, до чого приєднуються.
+    name_label: Назва альянсу
+    name_placeholder: напр. Пілотні партнери
+    cancel: Скасувати
+    create_submit: Створити альянс →
+    show_title: "%{name} — Альянси"
+    back_to_all: Усі альянси
+    creator_eyebrow: Альянс · Ви керуєте
+    partner_eyebrow: Альянс · Учасник
+    generate_link: Створити посилання для приєднання →
+    delete: Видалити
+    delete_confirm: Видалити %{name}? Усі посилання для поширення цього альянсу перестануть працювати.
+    new_link_heading: Нове посилання для приєднання
+    new_link_body: Будь-хто з цим посиланням може приєднатися до %{alliance} як партнер. Термін дії — 14 днів.
+    copy: Копіювати
+    copied: Скопійовано!
+    partners_section: Партнери
+    no_partners_title: Партнерів поки немає
+    no_partners_body_html: Використайте <span style="color:#FF1E6F;">Створити посилання для приєднання</span> вище, щоб запросити партнерські організації.
+    joined_on: Приєднався %{date}
+    remove_member_confirm: Видалити %{org} з %{alliance}? Їхні посилання для поширення перестануть працювати.
+    vertos_section: Verto в альянсі
+    no_vertos_title: Verto ще не поширено
+    no_vertos_body: Додайте опублікований Verto нижче, і для кожного партнера буде створено унікальне посилання для поширення.
+    remove: Видалити
+    remove_verto_confirm: Видалити цей Verto з %{alliance}? Усі партнерські посилання для нього перестануть працювати.
+    completion_label: завершення
+    responses:
+      one: відповідь
+      other: відповідей
+    partner_links_count:
+      one: партнерське посилання
+      other: партнерських посилань
+    no_shares_yet: Додайте партнера до альянсу, щоб створити посилання для поширення.
+    responses_short: "%{n} відп."
+    add_section: Додати до альянсу
+    add_heading: Додати ще один Verto
+    add_body: Виберіть опублікований Verto. Ми створимо унікальне посилання для поширення для кожного партнера в альянсі.
+    no_more_vertos: Більше немає опублікованих Verto для додавання.
+    create_new_verto: Створити новий Verto →
+    add_submit: Додати Verto →
+    partners_in_alliance: Партнери в альянсі
+    including_you: Включно з вами
+    shared_vertos_short: Спільні Verto
+    available_to_distribute: Доступні для поширення
+    other_partners: Інші партнери
+    only_partner: Наразі ви єдиний партнер у цьому альянсі.
+    your_vertos_section: Verto, поширені з вами
+    partner_no_vertos_title: Verto поки немає
+    partner_no_vertos_body: Коли %{org} додасть Verto до цього альянсу, ви побачите тут своє унікальне посилання для поширення.
+    from_org: Від %{org}
+    your_link: Ваше посилання
+    results_link: Результати →
+  alliance_verto:
+    title: "%{title} — Спільний Verto"
+    from_org_alliance: Від %{org} · %{alliance}
+    share_link: Посилання для поширення
+    mine_label: з вашого посилання
+    aggregate_label: по всьому %{alliance}
+    card_n: Картка %{n}
+    my_results: Мої результати
+    aggregate: Загалом
+    comparison: Порівняння
+    comparison_sub: ви проти всіх
+    no_data: Немає даних
+    n_answered: "%{n} відповіли"
+    avg: сер. %{n}
+  invites:
+    title: Прийняти запрошення — Playverto
+    already_used_title: Запрошення вже використано
+    already_used_body_html: Це посилання-запрошення вже прийнято. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Увійти</a>
+    expired_title: Термін запрошення минув
+    expired_body: Цьому посиланню понад 7 днів. Попросіть адміністратора надіслати нове.
+    invited_to_join: Вас запросили приєднатися до
+    alliance_by: альянсу від %{org}
+    as_role: як %{role}
+    addressed_for: "· для %{email}"
+    signed_in_as: Ви увійшли як %{name}
+    join_with: Приєднатися як
+    pick_org: Виберіть, яка організація приєднується
+    join_submit: Приєднатися до %{alliance} →
+    already_in_alliance: 'Уже в цьому альянсі: %{orgs}'
+    you_run_this: Ви керуєте цим альянсом — перейдіть до нього.
+    already_member_singular: "%{orgs} вже в цьому альянсі."
+    already_member_plural: "%{orgs} вже в цьому альянсі."
+    no_admin_org: У вас немає організації-адміністратора, яка може приєднатися до цього альянсу.
+    open_alliance: Відкрити %{alliance} →
+    sign_out_link: Вийти й використати інший обліковий запис
+    sign_out_confirm: Вийти з поточного облікового запису?
+    already_have_account: Уже маєте обліковий запис Playverto?
+    sign_in_instead: Увійти натомість
+    new_to_playverto: Новачок у Playverto?
+    create_new_account: Створити новий обліковий запис
+    sign_in_email_label: Електронна пошта
+    sign_in_email_placeholder: you@example.com
+    sign_in_password_label: Пароль
+    sign_in_password_placeholder: Ваш пароль Playverto
+    sign_in_submit: Увійти, щоб приєднатися →
+    your_name_label: Ваше ім'я
+    your_name_placeholder: Іван Петренко
+    your_org_name_label: Назва вашої організації
+    your_org_name_placeholder: Acme Partners
+    password_label: Пароль
+    password_placeholder: Щонайменше 12 символів
+    confirm_password_label: Підтвердьте пароль
+    accept_submit: Прийняти запрошення →
   editor:
     questions: питання
     primary: основний

@@ -1,4 +1,4 @@
-<% content_for :title, "#{@alliance.name} — Alliances" %>
+<% content_for :title, t("alliances.show_title", name: @alliance.name) %>
 <% content_for :head do %>
   <style>body { overflow: auto !important; height: auto !important; }</style>
 <% end %>
@@ -16,16 +16,16 @@
       <div style="position:relative;z-index:1;">
         <%= link_to alliances_path,
               style: "display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);text-decoration:none;margin-bottom:18px;" do %>
-          <span style="opacity:0.7;">←</span> All alliances
+          <span style="opacity:0.7;">←</span> <%= t("alliances.back_to_all") %>
         <% end %>
 
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
           <span style="width:8px;height:8px;border-radius:50%;background:#01EACB;box-shadow:0 0 12px rgba(1,234,203,0.7);"></span>
-          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;">Alliance · Member</span>
+          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("alliances.partner_eyebrow") %></span>
         </div>
         <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 6px;"><%= @alliance.name %></h1>
         <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
-          Run by <%= @alliance.organisation.name %>
+          <%= t("alliances.member_run_by", org: @alliance.organisation.name) %>
         </p>
 
         <%# ── Top-line stats ── %>
@@ -33,18 +33,18 @@
           <div style="background:rgba(22,27,46,0.85);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:18px 20px;backdrop-filter:blur(8px);">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
               <span style="width:6px;height:6px;border-radius:50%;background:#FF1E6F;"></span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;">Partners in alliance</span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.partners_in_alliance") %></span>
             </div>
             <div style="font-family:'Alata',sans-serif;font-size:34px;color:#FF1E6F;line-height:1;margin-bottom:4px;"><%= @total_partner_count %></div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);line-height:1.4;">Including you</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);line-height:1.4;"><%= t("alliances.including_you") %></div>
           </div>
           <div style="background:rgba(22,27,46,0.85);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:18px 20px;backdrop-filter:blur(8px);">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
               <span style="width:6px;height:6px;border-radius:50%;background:#01EACB;"></span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;">Shared Vertos</span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.shared_vertos_short") %></span>
             </div>
             <div style="font-family:'Alata',sans-serif;font-size:34px;color:#01EACB;line-height:1;margin-bottom:4px;"><%= @alliance_vertos.size %></div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);line-height:1.4;">Available for you to distribute</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);line-height:1.4;"><%= t("alliances.available_to_distribute") %></div>
           </div>
         </div>
       </div>
@@ -55,14 +55,14 @@
 
       <%# ── Other members ── %>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Other partners</span>
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.other_partners") %></span>
         <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
         <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @other_members.size %></span>
       </div>
 
       <% if @other_members.empty? %>
         <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:24px;text-align:center;margin-bottom:32px;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);">
-          You're the only partner in this alliance for now.
+          <%= t("alliances.only_partner") %>
         </div>
       <% else %>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:32px;">
@@ -79,16 +79,16 @@
 
       <%# ── Your Vertos ── %>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Vertos shared with you</span>
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.your_vertos_section") %></span>
         <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
         <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @alliance_vertos.size %></span>
       </div>
 
       <% if @alliance_vertos.empty? %>
         <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:36px 24px;text-align:center;">
-          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;">No Vertos yet</div>
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("alliances.partner_no_vertos_title") %></div>
           <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto;line-height:1.5;">
-            When <%= @alliance.organisation.name %> adds a Verto to this alliance, you'll see your unique share link here.
+            <%= t("alliances.partner_no_vertos_body", org: @alliance.organisation.name) %>
           </div>
         </div>
       <% else %>
@@ -100,9 +100,9 @@
             <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
               <div style="height:3px;background:linear-gradient(90deg,#01EACB,#FF1E6F);"></div>
               <div style="padding:18px 22px 14px;">
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);margin-bottom:4px;">From <%= s.organisation.name %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);margin-bottom:4px;"><%= t("alliances.from_org", org: s.organisation.name) %></div>
                 <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;line-height:1.25;margin-bottom:4px;">
-                  <%= s.title.presence || s.theme.presence || "Untitled Verto" %>
+                  <%= s.title.presence || s.theme.presence || t("dashboard_card.untitled") %>
                 </div>
                 <% if s.description.present? %>
                   <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);line-height:1.4;"><%= s.description.truncate(140) %></div>
@@ -111,15 +111,17 @@
 
               <% if share && url %>
                 <div style="border-top:1px solid rgba(255,255,255,0.05);padding:12px 22px;display:flex;align-items:center;gap:10px;">
-                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;flex-shrink:0;">Your link</span>
+                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;flex-shrink:0;"><%= t("alliances.your_link") %></span>
                   <input type="text" readonly value="<%= url %>"
                          id="alliance-share-link-<%= share.id %>"
                          onclick="this.select()"
                          style="flex:1;min-width:0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:6px 10px;color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);outline:none;" />
                   <button type="button"
-                          onclick="navigator.clipboard.writeText(document.getElementById('alliance-share-link-<%= share.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy'},1500)})"
-                          style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 12px;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;flex-shrink:0;">Copy</button>
-                  <%= link_to "Results →", alliance_alliance_verto_path(@alliance, av),
+                          data-copy-label="<%= t("alliances.copy") %>"
+                          data-copied-label="<%= t("alliances.copied") %>"
+                          onclick="navigator.clipboard.writeText(document.getElementById('alliance-share-link-<%= share.id %>').value).then(()=>{this.textContent=this.dataset.copiedLabel;setTimeout(()=>{this.textContent=this.dataset.copyLabel},1500)})"
+                          style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 12px;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;flex-shrink:0;"><%= t("alliances.copy") %></button>
+                  <%= link_to t("alliances.results_link"), alliance_alliance_verto_path(@alliance, av),
                         style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:6px;padding:6px 12px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);text-decoration:none;flex-shrink:0;" %>
                 </div>
               <% end %>

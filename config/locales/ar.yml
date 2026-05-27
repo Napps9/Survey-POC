@@ -1,41 +1,394 @@
+---
 ar:
   locale_switcher:
-    label: "تغيير اللغة"
-    heading: "اللغة"
+    label: تغيير اللغة
+    heading: اللغة
   layout:
-    studio_tagline: "استوديو فيرتو"
+    studio_tagline: استوديو فيرتو
   card:
-    "yes": "نعم"
-    "no": "لا"
+    'yes': نعم
+    'no': لا
+    add_option: إضافة خيار
+    add_statement: إضافة عبارة
+    swipe_no: "← لا"
+    swipe_hint: اسحب البطاقة للإجابة
+    swipe_yes: نعم ←
+    reset: إعادة تعيين
+    answer_placeholder: اكتب الإجابة…
+    characters: الأحرف
+    allow_other: السماح بإجابة "أخرى" بنص حر
+    other: أخرى
+    other_placeholder: أخبرنا بكلماتك الخاصة…
+  auth:
+    show: إظهار
+    email: البريد الإلكتروني
+    password: كلمة المرور
+    password_hint: 12 حرفًا على الأقل
+    title_sign_in: تسجيل الدخول — Playverto
+    sign_in_title: تسجيل الدخول إلى Playverto
+    sign_in_new_here: جديد هنا؟
+    sign_in_create: إنشاء حساب
+    forgot_password: هل نسيت كلمة المرور؟
+    sign_in_submit: تسجيل الدخول ←
+    title_signup: إنشاء حساب — Playverto
+    signup_title: أنشئ حسابك
+    signup_have_one: لديك حساب بالفعل؟
+    signup_sign_in: تسجيل الدخول
+    name: اسمك
+    org_name: اسم المؤسسة
+    confirm_password: تأكيد كلمة المرور
+    signup_submit: إنشاء حساب ←
+    title_reset: إعادة تعيين كلمة المرور — Playverto
+    forgot_title: هل نسيت كلمة المرور؟
+    forgot_sub: أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.
+    forgot_submit: إرسال تعليمات إعادة التعيين
+    back_to_sign_in: "← العودة إلى تسجيل الدخول"
+    title_set: تعيين كلمة مرور جديدة — Playverto
+    set_title: تعيين كلمة مرور جديدة
+    set_sub: اختر شيئًا لا يمكن لأحد سواك تخمينه.
+    new_password: كلمة المرور الجديدة
+    confirm_new_password: تأكيد كلمة المرور الجديدة
+    repeat_new_password: أعد إدخال كلمة المرور الجديدة
+    set_submit: حفظ كلمة المرور الجديدة
+  results:
+    title: النتائج
+    editor: "← المحرر"
+    ask_verto: اسأل Verto
+    analysing: جارٍ تحليل الإجابات…
+  player:
+    thank_you_title: شكرًا لك!
+    thank_you_sub: تم تسجيل إجاباتك.
+    compare_cta: شاهد نتائجك مقارنةً بالآخرين ←
+    powered_by: مدعوم من
+    comparison_title: إجاباتك مقابل الجميع
+    back: "← رجوع"
+    next: التالي ←
+    submit: إرسال ✓
   js:
     player:
-      progress: "البطاقة %{n} من %{total}"
-      queued: "تم الحفظ — ستتم المزامنة عند عودتك للاتصال"
-      compare_cta: "شاهد نتائجك مقارنة بالآخرين ←"
-      compare_loading: "جارٍ التحميل…"
-      compare_error: "تعذّر التحميل — أعد المحاولة"
+      progress: البطاقة %{n} من %{total}
+      queued: تم الحفظ — ستتم المزامنة عند عودتك للاتصال
+      compare_cta: شاهد نتائجك مقارنة بالآخرين ←
+      compare_loading: جارٍ التحميل…
+      compare_error: تعذّر التحميل — أعد المحاولة
+    editor:
+      delete_card_confirm: حذف هذه البطاقة؟
+      unsaved: تغييرات غير محفوظة
+      saving: جارٍ الحفظ…
+      saved: تم الحفظ %{time}
+      save_failed: 'فشل الحفظ: %{msg}'
+      card_n: البطاقة %{n} · %{type}
+      choose_format: اختر صيغة الإجابة أدناه.
+      type_updated: تم تحديث نوع الإجابة إلى %{type}
+      current: الحالي
+      off_brief: خارج النطاق
+      cards_count: "%{n} بطاقة"
+      fit_best: الأنسب
+      fit_strong: بديل قوي
+      fit_solid: بديل جيد
+      fit_workable: صالح للاستخدام
+      fit_sparingly: استخدم باعتدال
+    wizard:
+      step_counter: الخطوة %{n} من %{total}
   nav:
-    partners: "الشركاء"
-    shared_vertos: "فيرتوهات مشتركة"
-    my_vertos: "فيرتوهاتي"
-    create: "إنشاء"
-    members: "الأعضاء"
-    sign_out: "تسجيل الخروج"
+    partners: الشركاء
+    shared_vertos: فيرتوهات مشتركة
+    my_vertos: فيرتوهاتي
+    create: إنشاء
+    members: الأعضاء
+    sign_out: تسجيل الخروج
+  alliances:
+    title: التحالفات — Playverto
+    index_eyebrow: تحالفاتك
+    index_heading: التحالفات
+    index_subtitle: اجمع المؤسسات الشريكة في تحالفات مُسماة. أضف Vertos ويحصل كل شريك على رابط مشاركة خاص به.
+    new_button: "+ تحالف جديد"
+    owned_section: التحالفات التي تديرها
+    owned_empty_title: لا توجد تحالفات بعد
+    owned_empty_admin_html: انقر فوق <span style="color:#FF1E6F;">+ تحالف جديد</span> أعلاه لبدء مجموعة، ثم ادعُ المؤسسات الشريكة وأضف Vertos.
+    owned_empty_member: اطلب من المسؤول لديك إنشاء تحالف.
+    started_on: بدأ في %{date}
+    partners_count:
+      one: شريك
+      other: شركاء
+    vertos_count:
+      one: verto
+      other: vertos
+    open: فتح ←
+    member_section: التحالفات التي أنت عضو فيها
+    member_empty_title: لم تتم دعوتك إلى أي تحالفات
+    member_empty_body: عندما تدعوك مؤسسة أخرى إلى أحد تحالفاتها، ستظهر هنا.
+    member_run_by: تديره %{org}
+    status:
+      active: نشط
+      pending: قيد الانتظار
+      revoked: ملغى
+    new_title: تحالف جديد — Playverto
+    new_eyebrow: تحالف جديد
+    new_heading: اختر اسمًا لتحالفك
+    new_sub: امنح المجموعة اسمًا واضحًا حتى يعرف الشركاء ما الذي ينضمون إليه.
+    name_label: اسم التحالف
+    name_placeholder: 'مثال: الشركاء التجريبيون'
+    cancel: إلغاء
+    create_submit: إنشاء التحالف ←
+    show_title: "%{name} — التحالفات"
+    back_to_all: جميع التحالفات
+    creator_eyebrow: تحالف · أنت تديره
+    partner_eyebrow: تحالف · عضو
+    generate_link: إنشاء رابط الانضمام ←
+    delete: حذف
+    delete_confirm: حذف %{name}؟ ستتوقف جميع روابط المشاركة لهذا التحالف عن العمل.
+    new_link_heading: رابط انضمام جديد
+    new_link_body: يمكن لأي شخص لديه هذا الرابط الانضمام إلى %{alliance} كشريك. تنتهي صلاحيته خلال 14 يومًا.
+    copy: نسخ
+    copied: تم النسخ!
+    partners_section: الشركاء
+    no_partners_title: لا يوجد شركاء بعد
+    no_partners_body_html: استخدم <span style="color:#FF1E6F;">إنشاء رابط الانضمام</span> أعلاه لدعوة المؤسسات الشريكة.
+    joined_on: انضم في %{date}
+    remove_member_confirm: إزالة %{org} من %{alliance}؟ ستتوقف روابط المشاركة الخاصة بهم عن العمل.
+    vertos_section: Vertos في التحالف
+    no_vertos_title: لم تتم مشاركة Vertos بعد
+    no_vertos_body: أضف Verto منشورًا أدناه وسيتم إنشاء رابط مشاركة فريد لكل شريك.
+    remove: إزالة
+    remove_verto_confirm: إزالة هذا الـ Verto من %{alliance}؟ ستتوقف جميع روابط مشاركة الشركاء الخاصة به عن العمل.
+    completion_label: الإكمال
+    responses:
+      one: إجابة
+      other: إجابات
+    partner_links_count:
+      one: رابط شريك
+      other: روابط شركاء
+    no_shares_yet: أضف شريكًا إلى التحالف لإنشاء روابط المشاركة.
+    responses_short: "%{n} إجابة"
+    add_section: إضافة إلى التحالف
+    add_heading: أضف Verto آخر
+    add_body: اختر Verto منشورًا. سننشئ رابط مشاركة فريدًا لكل شريك في التحالف.
+    no_more_vertos: لا توجد المزيد من Vertos المنشورة لإضافتها.
+    create_new_verto: إنشاء Verto جديد ←
+    add_submit: إضافة Verto ←
+    partners_in_alliance: الشركاء في التحالف
+    including_you: بمن فيهم أنت
+    shared_vertos_short: Vertos المشتركة
+    available_to_distribute: متاح لك للتوزيع
+    other_partners: شركاء آخرون
+    only_partner: أنت الشريك الوحيد في هذا التحالف حتى الآن.
+    your_vertos_section: Vertos التي تمت مشاركتها معك
+    partner_no_vertos_title: لا توجد Vertos بعد
+    partner_no_vertos_body: عندما تضيف %{org} Verto إلى هذا التحالف، سترى رابط المشاركة الفريد الخاص بك هنا.
+    from_org: من %{org}
+    your_link: رابطك
+    results_link: النتائج ←
+  alliance_verto:
+    title: "%{title} — Verto مشترك"
+    from_org_alliance: من %{org} · %{alliance}
+    share_link: رابط المشاركة
+    mine_label: من رابطك
+    aggregate_label: عبر %{alliance}
+    card_n: البطاقة %{n}
+    my_results: نتائجي
+    aggregate: الإجمالي
+    comparison: المقارنة
+    comparison_sub: أنت مقابل الجميع
+    no_data: لا توجد بيانات
+    n_answered: "%{n} أجابوا"
+    avg: المتوسط %{n}
+  invites:
+    title: قبول الدعوة — Playverto
+    already_used_title: تم استخدام الدعوة بالفعل
+    already_used_body_html: تم قبول رابط الدعوة هذا بالفعل. <a href="%{href}" style="color:#01EACB;text-decoration:none;">تسجيل الدخول</a>
+    expired_title: انتهت صلاحية الدعوة
+    expired_body: مضى على هذا الرابط أكثر من 7 أيام. اطلب من المسؤول لديك إرسال رابط جديد.
+    invited_to_join: تمت دعوتك للانضمام إلى
+    alliance_by: تحالف من قِبل %{org}
+    as_role: بصفتك %{role}
+    addressed_for: "· لـ %{email}"
+    signed_in_as: مُسجَّل الدخول باسم %{name}
+    join_with: الانضمام باستخدام
+    pick_org: اختر المؤسسة التي ستنضم
+    join_submit: الانضمام إلى %{alliance} ←
+    already_in_alliance: 'موجود بالفعل في هذا التحالف: %{orgs}'
+    you_run_this: أنت تدير هذا التحالف — قم بزيارته بدلاً من ذلك.
+    already_member_singular: "%{orgs} موجود بالفعل في هذا التحالف."
+    already_member_plural: "%{orgs} موجودون بالفعل في هذا التحالف."
+    no_admin_org: ليس لديك مؤسسة بصلاحيات المسؤول يمكنها الانضمام إلى هذا التحالف.
+    open_alliance: فتح %{alliance} ←
+    sign_out_link: تسجيل الخروج واستخدام حساب آخر
+    sign_out_confirm: هل تريد تسجيل الخروج من حسابك الحالي؟
+    already_have_account: هل لديك حساب Playverto بالفعل؟
+    sign_in_instead: تسجيل الدخول بدلاً من ذلك
+    new_to_playverto: جديد على Playverto؟
+    create_new_account: إنشاء حساب جديد
+    sign_in_email_label: البريد الإلكتروني
+    sign_in_email_placeholder: you@example.com
+    sign_in_password_label: كلمة المرور
+    sign_in_password_placeholder: كلمة مرور Playverto الخاصة بك
+    sign_in_submit: سجّل الدخول للانضمام ←
+    your_name_label: اسمك
+    your_name_placeholder: جين سميث
+    your_org_name_label: اسم مؤسستك
+    your_org_name_placeholder: شركاء أكمي
+    password_label: كلمة المرور
+    password_placeholder: 12 حرفًا على الأقل
+    confirm_password_label: تأكيد كلمة المرور
+    accept_submit: قبول الدعوة ←
   editor:
-    questions: "أسئلة"
-    primary: "الأساسية"
+    questions: أسئلة
+    primary: الأساسية
+    change_media: تغيير الوسائط
+    change_media_title: تغيير صورة هذه البطاقة
+    add_design: إضافة تصميم
+    add_design_title: إضافة صورة إلى هذه البطاقة
+    add_design_sub: أضف صورة لإضفاء الحيوية على هذه البطاقة
+    live: مباشر
+    live_warning: تعديل الأسئلة أثناء جمع هذا الـ Verto للإجابات سيؤثر على جودة البيانات. الإجابات قبل وبعد التعديل لن تكون قابلة للمقارنة المباشرة.
+    got_it: فهمت
+    add_question: إضافة سؤال
+    cards:
+      one: "%{count} بطاقة"
+      other: "%{count} بطاقات"
+    estimated:
+      one: المدة المقدرة ~%{count} دقيقة
+      other: المدة المقدرة ~%{count} دقائق
+    design: التصميم
+    publish_share: نشر ومشاركة ←
+    answer_type: نوع الإجابة
+    select_card: اختر بطاقة لتغيير نوعها
+    click_any: انقر على أي بطاقة على اليسار.
+    select_card_long: اختر بطاقة سؤال لتبديل صيغة الإجابة الخاصة بها
+    apply_to_card: تطبيق على هذه البطاقة
+    see_all_types: عرض جميع أنواع الأسئلة
+    all_types: جميع أنواع الأسئلة
+    ranked_for: مرتبة حسب الملاءمة لـ
+    this_card: هذه البطاقة
+  dashboard_card:
+    badge_archived: مؤرشف
+    badge_live: مباشر
+    badge_draft: مسودة
+    fallback_name: هذا الـ Verto
+    deleted_on: حُذف في %{date}
+    untitled: بدون عنوان
+    completion: الإكمال
+    responders:
+      one: مجيب
+      other: مجيبون
+    responses:
+      one: إجابة
+      other: إجابات
+    questions:
+      one: سؤال
+      other: أسئلة
+    view_results: عرض النتائج ←
+    edit: تعديل Verto
+    results: النتائج ←
+    publish: نشر ←
+    delete: حذف
+    edit_warning: '"%{title}" مباشر الآن. تعديل الأسئلة أثناء جمعه للإجابات سيؤثر على جودة البيانات — الإجابات قبل وبعد التعديل لن تكون قابلة للمقارنة المباشرة. هل تريد المتابعة؟'
+    delete_warning: حذف "%{title}"؟ لا يمكن استعادة Verto بعد حذفه. سيتوقف رابط المجيبين عن العمل — وتبقى النتائج الموجودة في قائمة الأرشيف.
   dashboard:
-    welcome_back: "مرحبًا بعودتك"
-    heading_html: '<span style="color:#01EACB;">فيرتوهاتك</span>'
-    subtitle: "أنشئ فيرتوهات، وشاركها مع تحالفك، وشاهد الرؤى تتدفق."
-    create_new: "إنشاء فيرتو جديد"
-    stat_live: "مباشر"
-    stat_drafts: "مسودات"
-    stat_responses: "الردود"
-    stat_completion: "الإكمال"
-    empty_title: "لا توجد فيرتوهات بعد"
-    empty_body: "أنشئ أول فيرتو لك وابدأ في جمع الرؤى من جمهورك."
-    empty_cta: "أنشئ أول فيرتو لك ←"
-    section_live: "مباشر"
-    section_drafts: "مسودات"
-    section_archived: "المؤرشفة"
+    welcome_back: مرحبًا بعودتك
+    heading_html: <span style="color:#01EACB;">فيرتوهاتك</span>
+    subtitle: أنشئ فيرتوهات، وشاركها مع تحالفك، وشاهد الرؤى تتدفق.
+    create_new: إنشاء فيرتو جديد
+    stat_live: مباشر
+    stat_drafts: مسودات
+    stat_responses: الردود
+    stat_completion: الإكمال
+    empty_title: لا توجد فيرتوهات بعد
+    empty_body: أنشئ أول فيرتو لك وابدأ في جمع الرؤى من جمهورك.
+    empty_cta: أنشئ أول فيرتو لك ←
+    section_live: مباشر
+    section_drafts: مسودات
+    section_archived: المؤرشفة
+  wizard:
+    create_verto: إنشاء Verto
+    building: جارٍ بناء Verto الخاص بك
+    pill_audience: الجمهور
+    pill_tone: النبرة
+    pill_tone_value: حوارية
+    pill_cards: البطاقات
+    gen_brief_read: قراءة الموجز
+    gen_writing: صياغة الأسئلة
+    gen_formats: اختيار الصيغ
+    gen_design: تطبيق التصميم
+    welcome_eyebrow: ما القادم
+    welcome_lead: بضع خطوات سريعة وسنُعِدّ مسودة Verto الخاص بك.
+    welcome_steps:
+    - عن Verto الخاص بك
+    - من سيُجيب
+    - ما الذي تريد معرفته
+    - اللغات
+    - ألوان العلامة التجارية
+    - السياق (اختياري)
+    welcome_badge: Verto جديد
+    welcome_title: لنبني Verto الخاص بك.
+    welcome_sub: سنحوّل موجزك إلى Verto يتبع قواعد Playverto.
+    welcome_ready_html: اضغط <strong style="color:rgba(0,0,0,0.6);">التالي</strong> عندما تكون مستعدًا.
+    examples: أمثلة
+    s1_eyebrow: الخطوة 01 · عن Verto الخاص بك
+    s1_lead: الموضوع الشامل الواحد.
+    s1_body: اجعله عامًا — ستضيق الزاوية في الخطوات التالية. كلمة أو كلمتان عادةً ما يكفيان.
+    s1_examples:
+    - العمل المناخي
+    - تعليم اللاجئين
+    - الأمن الغذائي
+    s1_title: عن ماذا يدور Verto الخاص بك؟
+    s1_placeholder: 'مثال: رفاهية الشباب'
+    s1_hint_body: اجعله عامًا — ستضيق الزاوية في الخطوات التالية.
+    s2_eyebrow: الخطوة 02 · من سيُجيب
+    s2_lead: كن محددًا.
+    s2_body: نمط الحياة، الدور، المنطقة، اللغة — أي شيء يشكّل طريقة تفكير هذه المجموعة. كلما كان أكثر تحديدًا، كانت الأسئلة التي يمكننا كتابتها أفضل.
+    s2_examples:
+    - طلاب جامعيون بين 18 و24 عامًا في كينيا
+    - عاملو الصحة المجتمعية في الخطوط الأمامية بين 35 و55 عامًا
+    - آباء أطفال في سن المدرسة في ريف نيو ساوث ويلز
+    s2_title: من سيُجيب — وما هي أعمارهم؟
+    s2_placeholder: 'مثال: طلاب جامعيون بين 18 و24 عامًا في كينيا'
+    s2_hint_body: نمط الحياة، الدور، المنطقة، اللغة — أي شيء يشكّل طريقة تفكير هذه المجموعة.
+    s3_eyebrow: الخطوة 03 · هدف التعلّم
+    s3_lead: الفكرة التي قد تُغيّر قرارًا.
+    s3_body: تجاوز ما تعرفه بالفعل. اسعَ إلى الشيء الواحد الذي إذا تعلمته، سيُغير ما ستفعله بعد ذلك.
+    s3_examples:
+    - لماذا يتسرب المتطوعون بعد الشهر الثالث؟
+    - ما الذي يمنع الناس من الوصول إلى بنك الطعام لدينا؟
+    - هل برنامج الشباب لدينا يُغيّر الثقة فعليًا — وأين بالضبط؟
+    s3_title: ما الذي تريد أن تتعلمه منهم؟
+    s3_placeholder: 'مثال: لماذا يتسرب المتطوعون بعد الشهر الثالث؟'
+    s3_hint_body: تجاوز ما تعرفه بالفعل — اسعَ إلى الشيء الواحد الذي سيُغير ما ستفعله بعد ذلك.
+    s4_eyebrow: الخطوة 04 · اللغات
+    s4_lead: صل إلى الجميع بلغتهم الخاصة.
+    s4_body: سنكتب Verto بلغتك الأساسية، ثم نُعِدّ نسخة بنفس الجودة بكل لغة أخرى. كل نسخة تطرح نفس الأسئلة، لذا تبقى النتائج متسقة.
+    s4_title: ما اللغات التي ينبغي أن يتحدث بها هذا الـ Verto؟
+    s4_primary_label: اللغة الأساسية
+    s5_eyebrow: الخطوة 05 · ألوان العلامة التجارية
+    s5_lead: اجعله يُشبهك.
+    s5_body: هكذا سيبدو Verto الخاص بك لكل من يلعبه. يمكنك تعديله في أي وقت من المحرر.
+    s5_live_preview: معاينة مباشرة
+    s5_quick_poll: استطلاع سريع
+    s5_mock_q: كيف تجده؟
+    s5_mock_opt: أحبه
+    s5_title: اختر ألوان علامتك التجارية.
+    s5_sub: اختر ثلاثة ألوان. ستُطبَّق عبر تجربة هذا الـ Verto.
+    brand_primary: أساسي
+    brand_primary_desc: العناوين واللمسات
+    brand_cta: الأزرار (CTA)
+    brand_cta_desc: أزرار التالي / الإرسال
+    brand_bg: الخلفية
+    brand_bg_desc: اللوحة خلف البطاقات
+    s6_eyebrow: الخطوة 06 · السياق
+    optional: اختياري
+    s6_lead: هل هناك أي شيء آخر ينبغي أن ندمجه؟
+    s6_body: النبرة، الأسئلة الضرورية، الأشياء التي يجب تجنبها، خصوصيات الجمهور. تخطَّ إن لم يكن هناك شيء إضافي.
+    s6_examples:
+    - يجب تضمين سؤال عن مسارات التمويل والعقبات أمام المنح.
+    - تجنب المصطلحات المتخصصة — كثير من المجيبين يتحدثون الإنجليزية كلغة ثانية.
+    - حافظ على نبرة دافئة، وليست رسمية.
+    s6_title: هل هناك أي شيء آخر يجب أن نعرفه؟
+    s6_placeholder: 'مثال: الجمهور لم يستخدم Playverto من قبل، حافظ على نبرة دافئة، وليست رسمية.'
+    s6_compare_label: السماح للمجيبين بمقارنة إجاباتهم
+    s6_compare_desc: أظهِر دعوة للإجراء على صفحة الشكر تكشف كيف تقارن إجاباتهم بإجابات الآخرين.
+    back: "← رجوع"
+    next: التالي ←
+    generate: إنشاء Verto ←
+    generating: جارٍ الإنشاء…
+    step_counter: الخطوة %{n} من %{total}

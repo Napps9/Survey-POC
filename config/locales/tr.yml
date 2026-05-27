@@ -1,0 +1,394 @@
+---
+tr:
+  locale_switcher:
+    label: Dili değiştir
+    heading: Dil
+  layout:
+    studio_tagline: Verto Studio
+  card:
+    'yes': Evet
+    'no': Hayır
+    add_option: Seçenek ekle
+    add_statement: İfade ekle
+    swipe_no: "← Hayır"
+    swipe_hint: cevaplamak için kartı sürükleyin
+    swipe_yes: Evet →
+    reset: Sıfırla
+    answer_placeholder: Cevabı yazın…
+    characters: Karakter
+    allow_other: '"Diğer" serbest metin yanıtına izin ver'
+    other: Diğer
+    other_placeholder: Kendi sözcüklerinizle anlatın…
+  auth:
+    show: Göster
+    email: E-posta adresi
+    password: Şifre
+    password_hint: En az 12 karakter
+    title_sign_in: Giriş yap — Playverto
+    sign_in_title: Playverto'ya giriş yap
+    sign_in_new_here: Yeni misin?
+    sign_in_create: Hesap oluştur
+    forgot_password: Şifrenizi mi unuttunuz?
+    sign_in_submit: Giriş yap →
+    title_signup: Hesap oluştur — Playverto
+    signup_title: Hesabınızı oluşturun
+    signup_have_one: Zaten hesabınız var mı?
+    signup_sign_in: Giriş yap
+    name: Adınız
+    org_name: Kuruluş adı
+    confirm_password: Şifreyi onayla
+    signup_submit: Hesap oluştur →
+    title_reset: Şifreyi sıfırla — Playverto
+    forgot_title: Şifrenizi mi unuttunuz?
+    forgot_sub: E-postanızı girin, size bir sıfırlama bağlantısı gönderelim.
+    forgot_submit: Sıfırlama talimatlarını e-postayla gönder
+    back_to_sign_in: "← Girişe dön"
+    title_set: Yeni şifre belirle — Playverto
+    set_title: Yeni bir şifre belirleyin
+    set_sub: Yalnızca sizin tahmin edebileceğiniz bir şey seçin.
+    new_password: Yeni şifre
+    confirm_new_password: Yeni şifreyi onayla
+    repeat_new_password: Yeni şifreyi tekrar girin
+    set_submit: Yeni şifreyi kaydet
+  results:
+    title: Sonuçlar
+    editor: "← Editör"
+    ask_verto: Verto'ya sor
+    analysing: Yanıtlar analiz ediliyor…
+  player:
+    thank_you_title: Teşekkürler!
+    thank_you_sub: Yanıtlarınız kaydedildi.
+    compare_cta: Sonuçlarınızı diğerleriyle karşılaştırın →
+    powered_by: Destekleyen
+    comparison_title: Yanıtlarınız vs herkes
+    back: "← Geri"
+    next: İleri →
+    submit: Gönder ✓
+  js:
+    player:
+      progress: "%{total} karttan %{n}. kart"
+      queued: Kaydedildi — çevrimiçi olduğunuzda eşitlenecek
+      compare_cta: Sonuçlarınızı diğerleriyle karşılaştırın →
+      compare_loading: Yükleniyor…
+      compare_error: Yüklenemedi — tekrar deneyin
+    editor:
+      delete_card_confirm: Bu kart silinsin mi?
+      unsaved: Kaydedilmemiş değişiklikler
+      saving: Kaydediliyor…
+      saved: "%{time} kaydedildi"
+      save_failed: 'Kaydetme başarısız: %{msg}'
+      card_n: Kart %{n} · %{type}
+      choose_format: Aşağıdan bir yanıt formatı seçin.
+      type_updated: Yanıt türü %{type} olarak güncellendi
+      current: Mevcut
+      off_brief: Briefin dışında
+      cards_count: "%{n} kart"
+      fit_best: En uygun
+      fit_strong: Güçlü alternatif
+      fit_solid: Sağlam alternatif
+      fit_workable: Kullanılabilir
+      fit_sparingly: Az kullanın
+    wizard:
+      step_counter: Adım %{n} / %{total}
+  nav:
+    partners: Ortaklar
+    shared_vertos: Paylaşılan Verto'lar
+    my_vertos: Verto'larım
+    create: Oluştur
+    members: Üyeler
+    sign_out: Çıkış yap
+  alliances:
+    title: İttifaklar — Playverto
+    index_eyebrow: İttifaklarınız
+    index_heading: İttifaklar
+    index_subtitle: Ortak kuruluşları adlandırılmış ittifaklarda gruplandırın. Verto ekleyin ve her ortak kendi paylaşım bağlantısını alsın.
+    new_button: "+ Yeni ittifak"
+    owned_section: Yönettiğiniz ittifaklar
+    owned_empty_title: Henüz ittifak yok
+    owned_empty_admin_html: Bir grup başlatmak için yukarıdaki <span style="color:#FF1E6F;">+ Yeni ittifak</span> bağlantısına tıklayın, ardından ortak kuruluşları davet edin ve Verto ekleyin.
+    owned_empty_member: Yöneticinizden bir ittifak oluşturmasını isteyin.
+    started_on: "%{date} tarihinde başladı"
+    partners_count:
+      one: ortak
+      other: ortak
+    vertos_count:
+      one: verto
+      other: verto
+    open: Aç →
+    member_section: Üyesi olduğunuz ittifaklar
+    member_empty_title: Henüz hiçbir ittifaka davet edilmediniz
+    member_empty_body: Başka bir kuruluş sizi bir ittifaklarına davet ettiğinde burada görünecek.
+    member_run_by: "%{org} tarafından yönetiliyor"
+    status:
+      active: Aktif
+      pending: Beklemede
+      revoked: İptal edildi
+    new_title: Yeni ittifak — Playverto
+    new_eyebrow: Yeni ittifak
+    new_heading: İttifakınıza bir ad verin
+    new_sub: Ortakların neye katıldıklarını bilmeleri için gruba net bir ad verin.
+    name_label: İttifak adı
+    name_placeholder: örn. Pilot Ortaklar
+    cancel: İptal
+    create_submit: İttifak oluştur →
+    show_title: "%{name} — İttifaklar"
+    back_to_all: Tüm ittifaklar
+    creator_eyebrow: İttifak · Bunu siz yönetiyorsunuz
+    partner_eyebrow: İttifak · Üye
+    generate_link: Katılım bağlantısı oluştur →
+    delete: Sil
+    delete_confirm: "%{name} silinsin mi? Bu ittifak için tüm paylaşım bağlantıları çalışmayı durduracak."
+    new_link_heading: Yeni katılım bağlantısı
+    new_link_body: Bu bağlantıya sahip olan herkes %{alliance} ittifakına ortak olarak katılabilir. 14 gün içinde süresi dolar.
+    copy: Kopyala
+    copied: Kopyalandı!
+    partners_section: Ortaklar
+    no_partners_title: Henüz ortak yok
+    no_partners_body_html: Ortak kuruluşları davet etmek için yukarıdaki <span style="color:#FF1E6F;">Katılım bağlantısı oluştur</span> seçeneğini kullanın.
+    joined_on: "%{date} tarihinde katıldı"
+    remove_member_confirm: "%{org}, %{alliance} ittifakından çıkarılsın mı? Paylaşım bağlantıları çalışmayı durduracak."
+    vertos_section: İttifaktaki Verto'lar
+    no_vertos_title: Henüz paylaşılmış Verto yok
+    no_vertos_body: Aşağıya yayınlanmış bir Verto ekleyin; her ortak için benzersiz bir paylaşım bağlantısı oluşturulacak.
+    remove: Kaldır
+    remove_verto_confirm: Bu Verto %{alliance} ittifakından kaldırılsın mı? Buna ait tüm ortak paylaşım bağlantıları çalışmayı durduracak.
+    completion_label: tamamlanma
+    responses:
+      one: yanıt
+      other: yanıt
+    partner_links_count:
+      one: ortak bağlantısı
+      other: ortak bağlantısı
+    no_shares_yet: Paylaşım bağlantıları oluşturmak için ittifaka bir ortak ekleyin.
+    responses_short: "%{n} yanıt"
+    add_section: İttifaka ekle
+    add_heading: Başka bir Verto ekle
+    add_body: Yayınlanmış bir Verto seçin. İttifaktaki her ortak için benzersiz bir paylaşım bağlantısı oluşturacağız.
+    no_more_vertos: Eklenecek başka yayınlanmış Verto yok.
+    create_new_verto: Yeni bir Verto oluştur →
+    add_submit: Verto ekle →
+    partners_in_alliance: İttifaktaki ortaklar
+    including_you: Sizinle birlikte
+    shared_vertos_short: Paylaşılan Verto'lar
+    available_to_distribute: Dağıtmanız için mevcut
+    other_partners: Diğer ortaklar
+    only_partner: Şu an bu ittifaktaki tek ortak sizsiniz.
+    your_vertos_section: Sizinle paylaşılan Verto'lar
+    partner_no_vertos_title: Henüz Verto yok
+    partner_no_vertos_body: "%{org} bu ittifaka bir Verto eklediğinde benzersiz paylaşım bağlantınızı burada göreceksiniz."
+    from_org: "%{org} tarafından"
+    your_link: Bağlantınız
+    results_link: Sonuçlar →
+  alliance_verto:
+    title: "%{title} — Paylaşılan Verto"
+    from_org_alliance: "%{org} · %{alliance} tarafından"
+    share_link: Paylaşım bağlantısı
+    mine_label: bağlantınızdan
+    aggregate_label: "%{alliance} genelinde"
+    card_n: Kart %{n}
+    my_results: Sonuçlarım
+    aggregate: Toplam
+    comparison: Karşılaştırma
+    comparison_sub: siz vs tümü
+    no_data: Veri yok
+    n_answered: "%{n} yanıtlandı"
+    avg: ort %{n}
+  invites:
+    title: Daveti kabul et — Playverto
+    already_used_title: Davet zaten kullanıldı
+    already_used_body_html: Bu davet bağlantısı zaten kabul edilmiş. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Giriş yap</a>
+    expired_title: Davetin süresi doldu
+    expired_body: Bu bağlantı 7 günden eski. Yöneticinizden yeni bir tane göndermesini isteyin.
+    invited_to_join: 'Katılmaya davet edildiniz:'
+    alliance_by: "%{org} tarafından bir ittifak"
+    as_role: "%{role} olarak"
+    addressed_for: "· %{email} için"
+    signed_in_as: "%{name} olarak giriş yapıldı"
+    join_with: Şununla katıl
+    pick_org: Hangi kuruluşun katılacağını seçin
+    join_submit: "%{alliance} ittifakına katıl →"
+    already_in_alliance: 'Bu ittifakta zaten var: %{orgs}'
+    you_run_this: Bu ittifakı siz yönetiyorsunuz — bunun yerine ziyaret edin.
+    already_member_singular: "%{orgs} zaten bu ittifakta."
+    already_member_plural: "%{orgs} zaten bu ittifakta."
+    no_admin_org: Bu ittifaka katılabilecek bir yönetici kuruluşunuz yok.
+    open_alliance: "%{alliance} ittifakını aç →"
+    sign_out_link: Çıkış yap ve farklı bir hesap kullan
+    sign_out_confirm: Mevcut hesabınızdan çıkış yapılsın mı?
+    already_have_account: Zaten bir Playverto hesabınız var mı?
+    sign_in_instead: Bunun yerine giriş yap
+    new_to_playverto: Playverto'da yeni misiniz?
+    create_new_account: Yeni bir hesap oluştur
+    sign_in_email_label: E-posta
+    sign_in_email_placeholder: siz@ornek.com
+    sign_in_password_label: Şifre
+    sign_in_password_placeholder: Playverto şifreniz
+    sign_in_submit: Katılmak için giriş yap →
+    your_name_label: Adınız
+    your_name_placeholder: Ayşe Yılmaz
+    your_org_name_label: Kuruluş adınız
+    your_org_name_placeholder: Acme Partners
+    password_label: Şifre
+    password_placeholder: En az 12 karakter
+    confirm_password_label: Şifreyi onayla
+    accept_submit: Daveti kabul et →
+  editor:
+    questions: sorular
+    primary: birincil
+    change_media: Medyayı değiştir
+    change_media_title: Bu kartın resmini değiştir
+    add_design: Tasarım ekle
+    add_design_title: Bu karta bir resim ekle
+    add_design_sub: Bu karta hayat vermek için bir resim ekleyin
+    live: CANLI
+    live_warning: Bu Verto yanıt toplarken soruları düzenlemek veri kalitesini etkileyecektir. Düzenlemeden önceki ve sonraki yanıtlar doğrudan karşılaştırılamaz.
+    got_it: Anladım
+    add_question: Soru ekle
+    cards:
+      one: "%{count} kart"
+      other: "%{count} kart"
+    estimated:
+      one: Tahmini ~%{count} dk
+      other: Tahmini ~%{count} dk
+    design: Tasarım
+    publish_share: Yayınla ve paylaş →
+    answer_type: Yanıt Türü
+    select_card: Türünü değiştirmek için bir kart seçin
+    click_any: Soldaki herhangi bir karta tıklayın.
+    select_card_long: Yanıt formatını değiştirmek için bir soru kartı seçin
+    apply_to_card: Bu karta uygula
+    see_all_types: Tüm soru türlerini gör
+    all_types: Tüm Soru Türleri
+    ranked_for: 'Şuna uygunluğa göre sıralandı:'
+    this_card: bu kart
+  dashboard_card:
+    badge_archived: Arşivlendi
+    badge_live: Canlı
+    badge_draft: Taslak
+    fallback_name: bu Verto
+    deleted_on: "%{date} tarihinde silindi"
+    untitled: Başlıksız
+    completion: tamamlanma
+    responders:
+      one: yanıtlayıcı
+      other: yanıtlayıcı
+    responses:
+      one: yanıt
+      other: yanıt
+    questions:
+      one: soru
+      other: soru
+    view_results: Sonuçları görüntüle →
+    edit: Verto'yu düzenle
+    results: Sonuçlar →
+    publish: Yayınla →
+    delete: Sil
+    edit_warning: '"%{title}" canlı. Yanıt toplarken soruları düzenlemek veri kalitesini etkileyecektir — düzenlemeden önceki ve sonraki yanıtlar doğrudan karşılaştırılamaz. Devam edilsin mi?'
+    delete_warning: '"%{title}" silinsin mi? Silinen bir Verto''yu geri alamazsınız. Yanıtlayıcıların bağlantısı çalışmayı durduracak — mevcut sonuçlar Arşivlenenler listenizde kalır.'
+  dashboard:
+    welcome_back: Tekrar hoş geldiniz
+    heading_html: <span style="color:#01EACB;">Verto'larınız</span>
+    subtitle: Verto'lar oluşturun, ittifakınızla paylaşın ve içgörülerin akmasını izleyin.
+    create_new: Yeni bir Verto oluştur
+    stat_live: Canlı
+    stat_drafts: Taslaklar
+    stat_responses: Yanıtlar
+    stat_completion: Tamamlanma
+    empty_title: Henüz Verto yok
+    empty_body: İlk Verto'nuzu oluşturun ve hedef kitlenizden içgörüler toplamaya başlayın.
+    empty_cta: İlk Verto'nuzu oluşturun →
+    section_live: Canlı
+    section_drafts: Taslaklar
+    section_archived: Arşivlenenler
+  wizard:
+    create_verto: Verto Oluştur
+    building: Verto'nuz oluşturuluyor
+    pill_audience: Hedef Kitle
+    pill_tone: Ton
+    pill_tone_value: Sohbete dayalı
+    pill_cards: Kartlar
+    gen_brief_read: Brief okunuyor
+    gen_writing: Sorular yazılıyor
+    gen_formats: Formatlar seçiliyor
+    gen_design: Tasarım uygulanıyor
+    welcome_eyebrow: Sıradakiler
+    welcome_lead: Birkaç hızlı adım ve Verto'nuzun taslağını hazırlayacağız.
+    welcome_steps:
+    - Verto'nuz hakkında
+    - Kimler yanıtlıyor
+    - Ne öğrenmek istiyorsunuz
+    - Diller
+    - Marka renkleri
+    - Bağlam (isteğe bağlı)
+    welcome_badge: Yeni Verto
+    welcome_title: Verto'nuzu oluşturalım.
+    welcome_sub: Brief'inizi Playverto kurallarına uygun bir Verto'ya dönüştüreceğiz.
+    welcome_ready_html: Hazır olduğunuzda <strong style="color:rgba(0,0,0,0.6);">İleri</strong>'ye basın.
+    examples: Örnekler
+    s1_eyebrow: Adım 01 · Verto'nuz hakkında
+    s1_lead: Tek bir kapsayıcı konu.
+    s1_body: Geniş tutun — sonraki adımlarda odağı daraltacaksınız. Genellikle bir veya iki kelime yeterlidir.
+    s1_examples:
+    - İklim eylemi
+    - Mülteci eğitimi
+    - Gıda güvenliği
+    s1_title: Verto'nuz ne hakkında?
+    s1_placeholder: örn. Gençlerin esenliği
+    s1_hint_body: Geniş tutun — sonraki adımlarda odağı daraltacaksınız.
+    s2_eyebrow: Adım 02 · Kimler yanıtlıyor
+    s2_lead: Spesifik olun.
+    s2_body: Yaşam tarzı, rol, bölge, dil — bu grubun düşünme şeklini etkileyen her şey. Ne kadar somut olursa, o kadar iyi sorular yazabiliriz.
+    s2_examples:
+    - Kenya'da 18–24 yaş üniversite öğrencileri
+    - 35–55 yaş arası saha topluluk sağlığı çalışanları
+    - Kırsal NSW'de okul çağında çocuğu olan ebeveynler
+    s2_title: Kimler yanıtlıyor — ve yaşları nedir?
+    s2_placeholder: örn. Kenya'da 18–24 yaş üniversite öğrencileri
+    s2_hint_body: Yaşam tarzı, rol, bölge, dil — bu grubun düşünme şeklini etkileyen her şey.
+    s3_eyebrow: Adım 03 · Öğrenme hedefi
+    s3_lead: Bir kararı değiştirebilecek içgörü.
+    s3_body: Zaten bildiklerinizi atlayın. Öğrendiğinizde sonraki adımınızı değiştirecek tek şeyi hedefleyin.
+    s3_examples:
+    - Gönüllüler neden üçüncü aydan sonra ayrılıyor?
+    - İnsanların gıda bankamıza erişmesini ne engelliyor?
+    - Gençlik programımız özgüveni gerçekten artırıyor mu — ve tam olarak nerede?
+    s3_title: Onlardan ne öğrenmek istiyorsunuz?
+    s3_placeholder: örn. Gönüllüler neden üçüncü aydan sonra ayrılıyor?
+    s3_hint_body: Bildiklerinizi atlayın — sonraki adımınızı değiştirecek tek şeyi hedefleyin.
+    s4_eyebrow: Adım 04 · Diller
+    s4_lead: Herkese kendi dilinde ulaşın.
+    s4_body: Verto'yu birincil dilinizde yazacağız, ardından diğer her dilde aynı kalitede bir sürüm hazırlayacağız. Her sürüm aynı soruları sorar, böylece sonuçlar tutarlı kalır.
+    s4_title: Bu Verto hangi dilleri konuşmalı?
+    s4_primary_label: Birincil dil
+    s5_eyebrow: Adım 05 · Marka renkleri
+    s5_lead: Size özgü hissettirin.
+    s5_body: Verto'nuz, oynayan herkese böyle görünür. Editörden istediğiniz zaman ince ayar yapabilirsiniz.
+    s5_live_preview: Canlı önizleme
+    s5_quick_poll: Hızlı anket
+    s5_mock_q: Nasıl buluyorsunuz?
+    s5_mock_opt: Bayılıyorum
+    s5_title: Marka renklerinizi seçin.
+    s5_sub: Üç tane seçin. Bu Verto'nun tüm deneyiminde uygulanacaklar.
+    brand_primary: Birincil
+    brand_primary_desc: Başlıklar ve vurgular
+    brand_cta: Düğmeler (CTA)
+    brand_cta_desc: İleri / Gönder düğmeleri
+    brand_bg: Arka plan
+    brand_bg_desc: Kartların arkasındaki tuval
+    s6_eyebrow: Adım 06 · Bağlam
+    optional: İsteğe bağlı
+    s6_lead: Eklememiz gereken başka bir şey var mı?
+    s6_body: Ton, mutlaka sorulması gerekenler, kaçınılacak konular, hedef kitle özellikleri. Ekstra bir şey yoksa atlayın.
+    s6_examples:
+    - Mutlaka finansman yolları ve hibe önündeki engellerle ilgili bir soru içermeli.
+    - Jargondan kaçının — birçok yanıtlayıcı İngilizceyi ikinci dil olarak konuşuyor.
+    - Tonu sıcak tutun, kurumsal değil.
+    s6_title: Bilmemiz gereken başka bir şey var mı?
+    s6_placeholder: örn. Hedef kitle daha önce Playverto kullanmadı, tonu sıcak tutun, kurumsal değil.
+    s6_compare_label: Yanıtlayıcıların cevaplarını karşılaştırmasına izin ver
+    s6_compare_desc: Teşekkür sayfasında, cevaplarının diğerleriyle nasıl kıyaslandığını gösteren bir CTA görüntüleyin.
+    back: "← Geri"
+    next: İleri →
+    generate: Verto Oluştur →
+    generating: Oluşturuluyor…
+    step_counter: Adım %{n} / %{total}

@@ -1,0 +1,394 @@
+---
+id:
+  locale_switcher:
+    label: Ubah bahasa
+    heading: Bahasa
+  layout:
+    studio_tagline: Verto Studio
+  card:
+    'yes': Ya
+    'no': Tidak
+    add_option: Tambah opsi
+    add_statement: Tambah pernyataan
+    swipe_no: "← Tidak"
+    swipe_hint: seret kartu untuk menjawab
+    swipe_yes: Ya →
+    reset: Atur ulang
+    answer_placeholder: Ketik jawaban…
+    characters: Karakter
+    allow_other: Izinkan jawaban teks bebas "Lainnya"
+    other: Lainnya
+    other_placeholder: Beri tahu kami dengan kata-kata Anda sendiri…
+  auth:
+    show: Tampilkan
+    email: Alamat email
+    password: Kata sandi
+    password_hint: Minimal 12 karakter
+    title_sign_in: Masuk — Playverto
+    sign_in_title: Masuk ke Playverto
+    sign_in_new_here: Baru di sini?
+    sign_in_create: Buat akun
+    forgot_password: Lupa kata sandi?
+    sign_in_submit: Masuk →
+    title_signup: Buat akun — Playverto
+    signup_title: Buat akun Anda
+    signup_have_one: Sudah punya akun?
+    signup_sign_in: Masuk
+    name: Nama Anda
+    org_name: Nama organisasi
+    confirm_password: Konfirmasi kata sandi
+    signup_submit: Buat akun →
+    title_reset: Atur ulang kata sandi — Playverto
+    forgot_title: Lupa kata sandi Anda?
+    forgot_sub: Masukkan email Anda dan kami akan mengirim tautan atur ulang.
+    forgot_submit: Kirim instruksi atur ulang via email
+    back_to_sign_in: "← Kembali ke halaman masuk"
+    title_set: Atur kata sandi baru — Playverto
+    set_title: Atur kata sandi baru
+    set_sub: Pilih sesuatu yang hanya Anda yang bisa menebaknya.
+    new_password: Kata sandi baru
+    confirm_new_password: Konfirmasi kata sandi baru
+    repeat_new_password: Ulangi kata sandi baru
+    set_submit: Simpan kata sandi baru
+  results:
+    title: Hasil
+    editor: "← Editor"
+    ask_verto: Tanya Verto
+    analysing: Menganalisis tanggapan…
+  player:
+    thank_you_title: Terima kasih!
+    thank_you_sub: Tanggapan Anda telah dicatat.
+    compare_cta: Lihat hasil Anda dibandingkan dengan yang lain →
+    powered_by: Didukung oleh
+    comparison_title: Jawaban Anda vs semua orang
+    back: "← Kembali"
+    next: Lanjut →
+    submit: Kirim ✓
+  js:
+    player:
+      progress: Kartu %{n} dari %{total}
+      queued: Tersimpan — akan disinkronkan saat Anda kembali online
+      compare_cta: Lihat hasil Anda dibandingkan dengan yang lain →
+      compare_loading: Memuat…
+      compare_error: Gagal memuat — coba lagi
+    editor:
+      delete_card_confirm: Hapus kartu ini?
+      unsaved: Perubahan belum disimpan
+      saving: Menyimpan…
+      saved: Tersimpan %{time}
+      save_failed: 'Gagal menyimpan: %{msg}'
+      card_n: Kartu %{n} · %{type}
+      choose_format: Pilih format jawaban di bawah ini.
+      type_updated: Tipe jawaban diperbarui menjadi %{type}
+      current: Saat ini
+      off_brief: Di luar brief
+      cards_count: "%{n} kartu"
+      fit_best: Paling cocok
+      fit_strong: Alternatif kuat
+      fit_solid: Alternatif solid
+      fit_workable: Bisa digunakan
+      fit_sparingly: Gunakan secukupnya
+    wizard:
+      step_counter: Langkah %{n} dari %{total}
+  nav:
+    partners: Mitra
+    shared_vertos: Verto Dibagikan
+    my_vertos: Verto Saya
+    create: Buat
+    members: Anggota
+    sign_out: Keluar
+  alliances:
+    title: Aliansi — Playverto
+    index_eyebrow: Aliansi Anda
+    index_heading: Aliansi
+    index_subtitle: Kelompokkan organisasi mitra ke dalam aliansi yang diberi nama. Tambahkan Verto dan setiap mitra akan mendapatkan tautan berbaginya sendiri.
+    new_button: "+ Aliansi baru"
+    owned_section: Aliansi yang Anda kelola
+    owned_empty_title: Belum ada aliansi
+    owned_empty_admin_html: Klik <span style="color:#FF1E6F;">+ Aliansi baru</span> di atas untuk memulai grup, lalu undang organisasi mitra dan tambahkan Verto.
+    owned_empty_member: Mintalah admin Anda untuk membuat aliansi.
+    started_on: Dimulai %{date}
+    partners_count:
+      one: mitra
+      other: mitra
+    vertos_count:
+      one: verto
+      other: verto
+    open: Buka →
+    member_section: Aliansi di mana Anda menjadi anggota
+    member_empty_title: Anda belum diundang ke aliansi mana pun
+    member_empty_body: Saat organisasi lain mengundang Anda ke salah satu aliansinya, akan muncul di sini.
+    member_run_by: Dikelola oleh %{org}
+    status:
+      active: Aktif
+      pending: Tertunda
+      revoked: Dicabut
+    new_title: Aliansi baru — Playverto
+    new_eyebrow: Aliansi baru
+    new_heading: Beri nama aliansi Anda
+    new_sub: Berikan nama yang jelas untuk grup agar mitra tahu apa yang mereka ikuti.
+    name_label: Nama aliansi
+    name_placeholder: misal Mitra Pilot
+    cancel: Batal
+    create_submit: Buat aliansi →
+    show_title: "%{name} — Aliansi"
+    back_to_all: Semua aliansi
+    creator_eyebrow: Aliansi · Anda mengelola ini
+    partner_eyebrow: Aliansi · Anggota
+    generate_link: Buat tautan bergabung →
+    delete: Hapus
+    delete_confirm: Hapus %{name}? Semua tautan berbagi untuk aliansi ini akan berhenti berfungsi.
+    new_link_heading: Tautan bergabung baru
+    new_link_body: Siapa pun dengan tautan ini dapat bergabung dengan %{alliance} sebagai mitra. Kedaluwarsa dalam 14 hari.
+    copy: Salin
+    copied: Tersalin!
+    partners_section: Mitra
+    no_partners_title: Belum ada mitra
+    no_partners_body_html: Gunakan <span style="color:#FF1E6F;">Buat tautan bergabung</span> di atas untuk mengundang organisasi mitra.
+    joined_on: Bergabung %{date}
+    remove_member_confirm: Hapus %{org} dari %{alliance}? Tautan berbagi mereka akan berhenti berfungsi.
+    vertos_section: Verto dalam aliansi
+    no_vertos_title: Belum ada Verto yang dibagikan
+    no_vertos_body: Tambahkan Verto yang telah dipublikasikan di bawah ini dan tautan berbagi unik akan dibuat untuk setiap mitra.
+    remove: Hapus
+    remove_verto_confirm: Hapus Verto ini dari %{alliance}? Semua tautan berbagi mitra untuk itu akan berhenti berfungsi.
+    completion_label: penyelesaian
+    responses:
+      one: tanggapan
+      other: tanggapan
+    partner_links_count:
+      one: tautan mitra
+      other: tautan mitra
+    no_shares_yet: Tambahkan mitra ke aliansi untuk membuat tautan berbagi.
+    responses_short: "%{n} tanggapan"
+    add_section: Tambahkan ke aliansi
+    add_heading: Tambahkan Verto lain
+    add_body: Pilih Verto yang telah dipublikasikan. Kami akan membuat tautan berbagi unik untuk setiap mitra dalam aliansi.
+    no_more_vertos: Tidak ada lagi Verto yang dipublikasikan untuk ditambahkan.
+    create_new_verto: Buat Verto baru →
+    add_submit: Tambahkan Verto →
+    partners_in_alliance: Mitra dalam aliansi
+    including_you: Termasuk Anda
+    shared_vertos_short: Verto Dibagikan
+    available_to_distribute: Tersedia untuk Anda distribusikan
+    other_partners: Mitra lain
+    only_partner: Untuk saat ini Anda satu-satunya mitra dalam aliansi ini.
+    your_vertos_section: Verto yang dibagikan dengan Anda
+    partner_no_vertos_title: Belum ada Verto
+    partner_no_vertos_body: Saat %{org} menambahkan Verto ke aliansi ini, Anda akan melihat tautan berbagi unik Anda di sini.
+    from_org: Dari %{org}
+    your_link: Tautan Anda
+    results_link: Hasil →
+  alliance_verto:
+    title: "%{title} — Verto Dibagikan"
+    from_org_alliance: Dari %{org} · %{alliance}
+    share_link: Tautan berbagi
+    mine_label: dari tautan Anda
+    aggregate_label: di seluruh %{alliance}
+    card_n: Kartu %{n}
+    my_results: Hasil saya
+    aggregate: Agregat
+    comparison: Perbandingan
+    comparison_sub: Anda vs semua
+    no_data: Tidak ada data
+    n_answered: "%{n} menjawab"
+    avg: rata-rata %{n}
+  invites:
+    title: Terima undangan — Playverto
+    already_used_title: Undangan sudah digunakan
+    already_used_body_html: Tautan undangan ini sudah diterima. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Masuk</a>
+    expired_title: Undangan kedaluwarsa
+    expired_body: Tautan ini sudah berumur lebih dari 7 hari. Mintalah admin Anda untuk mengirim yang baru.
+    invited_to_join: Anda diundang untuk bergabung
+    alliance_by: aliansi oleh %{org}
+    as_role: sebagai %{role}
+    addressed_for: "· untuk %{email}"
+    signed_in_as: Masuk sebagai %{name}
+    join_with: Bergabung dengan
+    pick_org: Pilih organisasi mana yang bergabung
+    join_submit: Bergabung dengan %{alliance} →
+    already_in_alliance: 'Sudah dalam aliansi ini: %{orgs}'
+    you_run_this: Anda mengelola aliansi ini — kunjungi saja.
+    already_member_singular: "%{orgs} sudah ada dalam aliansi ini."
+    already_member_plural: "%{orgs} sudah ada dalam aliansi ini."
+    no_admin_org: Anda tidak memiliki organisasi admin yang dapat bergabung dengan aliansi ini.
+    open_alliance: Buka %{alliance} →
+    sign_out_link: Keluar dan gunakan akun lain
+    sign_out_confirm: Keluar dari akun Anda saat ini?
+    already_have_account: Sudah punya akun Playverto?
+    sign_in_instead: Masuk saja
+    new_to_playverto: Baru di Playverto?
+    create_new_account: Buat akun baru
+    sign_in_email_label: Email
+    sign_in_email_placeholder: anda@contoh.com
+    sign_in_password_label: Kata sandi
+    sign_in_password_placeholder: Kata sandi Playverto Anda
+    sign_in_submit: Masuk untuk bergabung →
+    your_name_label: Nama Anda
+    your_name_placeholder: Jane Smith
+    your_org_name_label: Nama organisasi Anda
+    your_org_name_placeholder: Acme Partners
+    password_label: Kata sandi
+    password_placeholder: Minimal 12 karakter
+    confirm_password_label: Konfirmasi kata sandi
+    accept_submit: Terima undangan →
+  editor:
+    questions: pertanyaan
+    primary: utama
+    change_media: Ubah media
+    change_media_title: Ubah gambar kartu ini
+    add_design: Tambah desain
+    add_design_title: Tambahkan gambar ke kartu ini
+    add_design_sub: Tambahkan gambar untuk menghidupkan kartu ini
+    live: LIVE
+    live_warning: Mengedit pertanyaan saat Verto ini sedang mengumpulkan tanggapan akan memengaruhi kualitas data. Jawaban sebelum dan sesudah pengeditan tidak dapat dibandingkan langsung.
+    got_it: Mengerti
+    add_question: Tambah pertanyaan
+    cards:
+      one: "%{count} kartu"
+      other: "%{count} kartu"
+    estimated:
+      one: Perkiraan ~%{count} mnt
+      other: Perkiraan ~%{count} mnt
+    design: Desain
+    publish_share: Publikasikan & bagikan →
+    answer_type: Tipe Jawaban
+    select_card: Pilih kartu untuk mengubah tipenya
+    click_any: Klik kartu mana pun di sebelah kiri.
+    select_card_long: Pilih kartu pertanyaan untuk mengganti format jawabannya
+    apply_to_card: Terapkan ke kartu ini
+    see_all_types: Lihat semua tipe pertanyaan
+    all_types: Semua Tipe Pertanyaan
+    ranked_for: Diurutkan berdasarkan kecocokan untuk
+    this_card: kartu ini
+  dashboard_card:
+    badge_archived: Diarsipkan
+    badge_live: Live
+    badge_draft: Draf
+    fallback_name: Verto ini
+    deleted_on: Dihapus %{date}
+    untitled: Tanpa judul
+    completion: penyelesaian
+    responders:
+      one: responden
+      other: responden
+    responses:
+      one: tanggapan
+      other: tanggapan
+    questions:
+      one: pertanyaan
+      other: pertanyaan
+    view_results: Lihat hasil →
+    edit: Edit Verto
+    results: Hasil →
+    publish: Publikasikan →
+    delete: Hapus
+    edit_warning: '"%{title}" sedang live. Mengedit pertanyaan saat sedang mengumpulkan tanggapan akan memengaruhi kualitas data — jawaban sebelum dan sesudah pengeditan tidak dapat dibandingkan langsung. Lanjutkan?'
+    delete_warning: Hapus "%{title}"? Verto yang dihapus tidak bisa dikembalikan. Tautan responden akan berhenti berfungsi — hasil yang ada akan tetap di daftar Diarsipkan Anda.
+  dashboard:
+    welcome_back: Selamat datang kembali
+    heading_html: <span style="color:#01EACB;">Verto</span> Anda
+    subtitle: Buat Verto, bagikan ke aliansi Anda, dan saksikan wawasan mengalir masuk.
+    create_new: Buat Verto baru
+    stat_live: Live
+    stat_drafts: Draf
+    stat_responses: Tanggapan
+    stat_completion: Penyelesaian
+    empty_title: Belum ada Verto
+    empty_body: Buat Verto pertama Anda dan mulai kumpulkan wawasan dari audiens Anda.
+    empty_cta: Buat Verto pertama Anda →
+    section_live: Live
+    section_drafts: Draf
+    section_archived: Diarsipkan
+  wizard:
+    create_verto: Buat Verto
+    building: Membangun Verto Anda
+    pill_audience: Audiens
+    pill_tone: Nada
+    pill_tone_value: Percakapan
+    pill_cards: Kartu
+    gen_brief_read: Membaca brief
+    gen_writing: Menulis pertanyaan
+    gen_formats: Memilih format
+    gen_design: Menerapkan desain
+    welcome_eyebrow: Apa yang akan datang
+    welcome_lead: Beberapa langkah cepat dan kami akan menyusun Verto Anda.
+    welcome_steps:
+    - Tentang Verto Anda
+    - Siapa yang menjawab
+    - Apa yang ingin Anda pelajari
+    - Bahasa
+    - Warna merek
+    - Konteks (opsional)
+    welcome_badge: Verto Baru
+    welcome_title: Mari bangun Verto Anda.
+    welcome_sub: Kami akan mengubah brief Anda menjadi Verto yang mengikuti aturan Playverto.
+    welcome_ready_html: Tekan <strong style="color:rgba(0,0,0,0.6);">Lanjut</strong> saat Anda siap.
+    examples: Contoh
+    s1_eyebrow: Langkah 01 · Tentang Verto Anda
+    s1_lead: Satu topik utama yang menyeluruh.
+    s1_body: Buat luas — Anda akan mempersempit sudut pandang di langkah berikutnya. Satu atau dua kata biasanya sudah cukup.
+    s1_examples:
+    - Aksi iklim
+    - Pendidikan pengungsi
+    - Ketahanan pangan
+    s1_title: Tentang apa Verto Anda?
+    s1_placeholder: misal Kesejahteraan remaja
+    s1_hint_body: Buat luas — Anda akan mempersempit sudut pandang di langkah berikutnya.
+    s2_eyebrow: Langkah 02 · Siapa yang menjawab
+    s2_lead: Jelaskan secara spesifik.
+    s2_body: Gaya hidup, peran, wilayah, bahasa — apa pun yang membentuk cara berpikir kelompok ini. Semakin konkret, semakin baik pertanyaan yang dapat kami tulis.
+    s2_examples:
+    - Mahasiswa 18–24 tahun di Kenya
+    - Petugas kesehatan komunitas garis depan usia 35–55
+    - Orang tua anak usia sekolah di pedesaan NSW
+    s2_title: Siapa yang menjawab — dan berapa usia mereka?
+    s2_placeholder: misal Mahasiswa 18–24 tahun di Kenya
+    s2_hint_body: Gaya hidup, peran, wilayah, bahasa — apa pun yang membentuk cara berpikir kelompok ini.
+    s3_eyebrow: Langkah 03 · Tujuan pembelajaran
+    s3_lead: Wawasan yang akan mengubah suatu keputusan.
+    s3_body: Lewati hal-hal yang sudah Anda ketahui. Targetkan satu hal yang, jika Anda mempelajarinya, akan mengubah langkah Anda selanjutnya.
+    s3_examples:
+    - Mengapa relawan berhenti setelah bulan ketiga?
+    - Apa yang menghalangi orang mengakses bank pangan kami?
+    - Apakah program remaja kami benar-benar meningkatkan kepercayaan diri — dan di bagian mana tepatnya?
+    s3_title: Apa yang ingin Anda pelajari dari mereka?
+    s3_placeholder: misal Mengapa relawan berhenti setelah bulan ketiga?
+    s3_hint_body: Lewati apa yang sudah Anda ketahui — targetkan satu hal yang akan mengubah langkah Anda selanjutnya.
+    s4_eyebrow: Langkah 04 · Bahasa
+    s4_lead: Jangkau semua orang dalam bahasa mereka sendiri.
+    s4_body: Kami akan menulis Verto dalam bahasa utama Anda, lalu membuat versi yang sama bagusnya dalam setiap bahasa lain. Setiap versi mengajukan pertanyaan yang sama, sehingga hasilnya tetap selaras.
+    s4_title: Dalam bahasa apa Verto ini harus berbicara?
+    s4_primary_label: Bahasa utama
+    s5_eyebrow: Langkah 05 · Warna merek
+    s5_lead: Buat agar terasa seperti Anda.
+    s5_body: Begitulah tampilan Verto Anda bagi semua orang yang memainkannya. Anda dapat menyesuaikannya kapan saja dari editor.
+    s5_live_preview: Pratinjau langsung
+    s5_quick_poll: Polling cepat
+    s5_mock_q: Bagaimana menurut Anda?
+    s5_mock_opt: Suka sekali
+    s5_title: Pilih warna merek Anda.
+    s5_sub: Pilih tiga. Akan diterapkan di seluruh pengalaman Verto ini.
+    brand_primary: Utama
+    brand_primary_desc: Judul & aksen
+    brand_cta: Tombol (CTA)
+    brand_cta_desc: Tombol Lanjut / Kirim
+    brand_bg: Latar belakang
+    brand_bg_desc: Kanvas di belakang kartu
+    s6_eyebrow: Langkah 06 · Konteks
+    optional: Opsional
+    s6_lead: Apa lagi yang harus kami sertakan?
+    s6_body: Nada, hal-hal yang harus ditanyakan, hal-hal yang harus dihindari, keunikan audiens. Lewati jika tidak ada tambahan.
+    s6_examples:
+    - Harus menyertakan pertanyaan tentang jalur pendanaan dan hambatan untuk hibah.
+    - Hindari jargon — banyak responden berbicara bahasa Inggris sebagai bahasa kedua.
+    - Pertahankan nada yang hangat, bukan korporat.
+    s6_title: Apa lagi yang harus kami ketahui?
+    s6_placeholder: misal Audiens belum pernah menggunakan Playverto sebelumnya, pertahankan nada hangat, bukan korporat.
+    s6_compare_label: Izinkan responden membandingkan jawaban mereka
+    s6_compare_desc: Tampilkan CTA di halaman terima kasih yang menunjukkan bagaimana jawaban mereka dibandingkan dengan jawaban orang lain.
+    back: "← Kembali"
+    next: Lanjut →
+    generate: Buat Verto →
+    generating: Membuat…
+    step_counter: Langkah %{n} dari %{total}

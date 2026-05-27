@@ -97,6 +97,141 @@ it:
     create: Crea
     members: Membri
     sign_out: Esci
+  alliances:
+    title: Alleanze — Playverto
+    index_eyebrow: Le tue alleanze
+    index_heading: Alleanze
+    index_subtitle: Raggruppa le organizzazioni partner in alleanze con un nome. Aggiungi Verto e ogni partner riceverà il proprio link di condivisione.
+    new_button: "+ Nuova alleanza"
+    owned_section: Alleanze che gestisci
+    owned_empty_title: Nessuna alleanza ancora
+    owned_empty_admin_html: Clicca su <span style="color:#FF1E6F;">+ Nuova alleanza</span> qui sopra per avviare un gruppo, poi invita le organizzazioni partner e aggiungi Verto.
+    owned_empty_member: Chiedi al tuo amministratore di creare un'alleanza.
+    started_on: Iniziata il %{date}
+    partners_count:
+      one: partner
+      other: partner
+    vertos_count:
+      one: verto
+      other: verto
+    open: Apri →
+    member_section: Alleanze di cui sei membro
+    member_empty_title: Non sei stato invitato a nessuna alleanza
+    member_empty_body: Quando un'altra organizzazione ti inviterà a una delle sue alleanze, apparirà qui.
+    member_run_by: Gestita da %{org}
+    status:
+      active: Attiva
+      pending: In attesa
+      revoked: Revocata
+    new_title: Nuova alleanza — Playverto
+    new_eyebrow: Nuova alleanza
+    new_heading: Dai un nome alla tua alleanza
+    new_sub: Dai al gruppo un nome chiaro così i partner sapranno a cosa si stanno unendo.
+    name_label: Nome dell'alleanza
+    name_placeholder: es. Partner Pilota
+    cancel: Annulla
+    create_submit: Crea alleanza →
+    show_title: "%{name} — Alleanze"
+    back_to_all: Tutte le alleanze
+    creator_eyebrow: Alleanza · La gestisci tu
+    partner_eyebrow: Alleanza · Membro
+    generate_link: Genera link di adesione →
+    delete: Elimina
+    delete_confirm: Eliminare %{name}? Tutti i link di condivisione di questa alleanza smetteranno di funzionare.
+    new_link_heading: Nuovo link di adesione
+    new_link_body: Chiunque abbia questo link può unirsi a %{alliance} come partner. Scade tra 14 giorni.
+    copy: Copia
+    copied: Copiato!
+    partners_section: Partner
+    no_partners_title: Nessun partner ancora
+    no_partners_body_html: Usa <span style="color:#FF1E6F;">Genera link di adesione</span> qui sopra per invitare le organizzazioni partner.
+    joined_on: Iscritto il %{date}
+    remove_member_confirm: Rimuovere %{org} da %{alliance}? I suoi link di condivisione smetteranno di funzionare.
+    vertos_section: Verto nell'alleanza
+    no_vertos_title: Nessun Verto ancora condiviso
+    no_vertos_body: Aggiungi un Verto pubblicato qui sotto e verrà generato un link di condivisione unico per ciascun partner.
+    remove: Rimuovi
+    remove_verto_confirm: Rimuovere questo Verto da %{alliance}? Tutti i link di condivisione partner per esso smetteranno di funzionare.
+    completion_label: completamento
+    responses:
+      one: risposta
+      other: risposte
+    partner_links_count:
+      one: link partner
+      other: link partner
+    no_shares_yet: Aggiungi un partner all'alleanza per generare link di condivisione.
+    responses_short: "%{n} risp."
+    add_section: Aggiungi all'alleanza
+    add_heading: Aggiungi un altro Verto
+    add_body: Scegli un Verto pubblicato. Genereremo un link di condivisione unico per ogni partner dell'alleanza.
+    no_more_vertos: Nessun altro Verto pubblicato da aggiungere.
+    create_new_verto: Crea un nuovo Verto →
+    add_submit: Aggiungi Verto →
+    partners_in_alliance: Partner nell'alleanza
+    including_you: Inclusi tu
+    shared_vertos_short: Verto condivisi
+    available_to_distribute: Disponibili da distribuire
+    other_partners: Altri partner
+    only_partner: Per ora sei l'unico partner di questa alleanza.
+    your_vertos_section: Verto condivisi con te
+    partner_no_vertos_title: Nessun Verto ancora
+    partner_no_vertos_body: Quando %{org} aggiungerà un Verto a questa alleanza, vedrai qui il tuo link di condivisione unico.
+    from_org: Da %{org}
+    your_link: Il tuo link
+    results_link: Risultati →
+  alliance_verto:
+    title: "%{title} — Verto condiviso"
+    from_org_alliance: Da %{org} · %{alliance}
+    share_link: Link di condivisione
+    mine_label: dal tuo link
+    aggregate_label: in %{alliance}
+    card_n: Carta %{n}
+    my_results: I miei risultati
+    aggregate: Aggregato
+    comparison: Confronto
+    comparison_sub: tu vs tutti
+    no_data: Nessun dato
+    n_answered: "%{n} risposte"
+    avg: media %{n}
+  invites:
+    title: Accetta invito — Playverto
+    already_used_title: Invito già utilizzato
+    already_used_body_html: Questo link di invito è già stato accettato. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Accedi</a>
+    expired_title: Invito scaduto
+    expired_body: Questo link ha più di 7 giorni. Chiedi al tuo amministratore di inviarne uno nuovo.
+    invited_to_join: Sei stato invitato a unirti a
+    alliance_by: un'alleanza di %{org}
+    as_role: come %{role}
+    addressed_for: "· per %{email}"
+    signed_in_as: Connesso come %{name}
+    join_with: Unisciti con
+    pick_org: Scegli quale organizzazione aderisce
+    join_submit: Unisciti a %{alliance} →
+    already_in_alliance: 'Già nell''alleanza: %{orgs}'
+    you_run_this: Gestisci tu questa alleanza — visitala invece.
+    already_member_singular: "%{orgs} è già in questa alleanza."
+    already_member_plural: "%{orgs} sono già in questa alleanza."
+    no_admin_org: Non hai un'organizzazione amministrativa che possa unirsi a questa alleanza.
+    open_alliance: Apri %{alliance} →
+    sign_out_link: Disconnettiti e usa un altro account
+    sign_out_confirm: Disconnettersi dall'account attuale?
+    already_have_account: Hai già un account Playverto?
+    sign_in_instead: Accedi invece
+    new_to_playverto: Nuovo su Playverto?
+    create_new_account: Crea un nuovo account
+    sign_in_email_label: Email
+    sign_in_email_placeholder: tu@esempio.com
+    sign_in_password_label: Password
+    sign_in_password_placeholder: La tua password Playverto
+    sign_in_submit: Accedi per unirti →
+    your_name_label: Il tuo nome
+    your_name_placeholder: Mario Rossi
+    your_org_name_label: Nome della tua organizzazione
+    your_org_name_placeholder: Acme Partners
+    password_label: Password
+    password_placeholder: Almeno 12 caratteri
+    confirm_password_label: Conferma password
+    accept_submit: Accetta invito →
   editor:
     questions: domande
     primary: principale

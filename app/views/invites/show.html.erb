@@ -1,4 +1,4 @@
-<% content_for :title, "Accept invite — Playverto" %>
+<% content_for :title, t("invites.title") %>
 
 <div style="min-height:100vh;background:#272D4A;display:flex;align-items:center;justify-content:center;padding:24px;">
   <div style="width:100%;max-width:480px;">
@@ -6,22 +6,18 @@
     <div style="text-align:center;margin-bottom:36px;">
       <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
       <% if @invite.accepted? %>
-        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#F7F7F7;margin:0 0 8px;">Invite already used</h1>
+        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#F7F7F7;margin:0 0 8px;"><%= t("invites.already_used_title") %></h1>
         <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
-          This invite link has already been accepted. <%= link_to "Sign in", new_session_path, style: "color:#01EACB;text-decoration:none;" %>
+          <%= t("invites.already_used_body_html", href: new_session_path).html_safe %>
         </p>
       <% elsif @invite.expired? %>
-        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#F7F7F7;margin:0 0 8px;">Invite expired</h1>
+        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#F7F7F7;margin:0 0 8px;"><%= t("invites.expired_title") %></h1>
         <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
-          This link is more than 7 days old. Ask your admin to send a new one.
+          <%= t("invites.expired_body") %>
         </p>
       <% else %>
         <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);margin-bottom:8px;">
-          <% if @invite.partner? %>
-            You've been invited to join
-          <% else %>
-            You've been invited to join
-          <% end %>
+          <%= t("invites.invited_to_join") %>
         </div>
         <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;letter-spacing:0.04em;margin:0 0 4px;">
           <% if @invite.partner? && @invite.alliance %>
@@ -32,12 +28,12 @@
         </h1>
         <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.3);">
           <% if @invite.partner? %>
-            an alliance by <span style="color:rgba(255,255,255,0.55);"><%= @invite.organisation.name %></span>
+            <%= t("invites.alliance_by", org: @invite.organisation.name) %>
           <% else %>
-            as a <span style="color:rgba(255,255,255,0.55);"><%= @invite.role %></span>
+            <%= t("invites.as_role", role: @invite.role) %>
           <% end %>
           <% if @invite.addressed_email.present? %>
-            · for <span style="color:rgba(255,255,255,0.55);"><%= @invite.addressed_email %></span>
+            <%= t("invites.addressed_for", email: @invite.addressed_email) %>
           <% end %>
         </div>
       <% end %>
@@ -54,7 +50,7 @@
       <% if @signed_in_user && @invite.partner? %>
         <%# ─── Signed-in flow: pick which existing org joins ─── %>
         <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.55);margin-bottom:18px;text-align:center;">
-          Signed in as <span style="color:rgba(255,255,255,0.85);"><%= @signed_in_user.name.presence || @signed_in_user.email_address %></span>
+          <%= t("invites.signed_in_as", name: (@signed_in_user.name.presence || @signed_in_user.email_address)) %>
         </div>
 
         <% if @joinable_orgs.any? %>
@@ -62,13 +58,12 @@
             <div style="margin-bottom:18px;">
               <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">
                 <% if @joinable_orgs.size == 1 %>
-                  Join with
+                  <%= t("invites.join_with") %>
                 <% else %>
-                  Pick which organisation joins
+                  <%= t("invites.pick_org") %>
                 <% end %>
               </label>
               <% if @joinable_orgs.size == 1 %>
-                <%# Single eligible org — just show it as a static label %>
                 <%= hidden_field_tag :join_as_organisation_id, @joinable_orgs.first.id %>
                 <div style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-xl);box-sizing:border-box;">
                   <%= @joinable_orgs.first.name %>
@@ -81,38 +76,40 @@
               <% end %>
             </div>
 
-            <%= f.submit "Join #{@invite.alliance.name} →",
+            <%= f.submit t("invites.join_submit", alliance: @invite.alliance.name),
                   style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
           <% end %>
 
           <% if @already_member_orgs.any? %>
             <div style="margin-top:18px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);text-align:center;">
-              Already in this alliance: <%= @already_member_orgs.map(&:name).join(", ") %>
+              <%= t("invites.already_in_alliance", orgs: @already_member_orgs.map(&:name).join(", ")) %>
             </div>
           <% end %>
         <% else %>
-          <%# No joinable orgs — all already in, or user only admins the creator %>
           <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);line-height:1.5;text-align:center;">
             <% if @creator_admin_orgs.any? %>
-              You run this alliance — visit it instead.
+              <%= t("invites.you_run_this") %>
             <% elsif @already_member_orgs.any? %>
-              <%= @already_member_orgs.map(&:name).join(", ") %>
-              <%= @already_member_orgs.size == 1 ? "is" : "are" %> already in this alliance.
+              <% if @already_member_orgs.size == 1 %>
+                <%= t("invites.already_member_singular", orgs: @already_member_orgs.first.name) %>
+              <% else %>
+                <%= t("invites.already_member_plural", orgs: @already_member_orgs.map(&:name).join(", ")) %>
+              <% end %>
             <% else %>
-              You don't have an admin organisation that can join this alliance.
+              <%= t("invites.no_admin_org") %>
             <% end %>
           </div>
           <% if (@creator_admin_orgs + @already_member_orgs).any? && @invite.alliance %>
-            <%= link_to "Open #{@invite.alliance.name} →", alliance_path(@invite.alliance),
+            <%= link_to t("invites.open_alliance", alliance: @invite.alliance.name), alliance_path(@invite.alliance),
                   style: "display:block;text-align:center;margin-top:18px;color:#01EACB;font-family:'Alata',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
           <% end %>
         <% end %>
 
         <div style="margin-top:24px;text-align:center;">
-          <%= button_to "Sign out and use a different account", session_path, method: :delete,
+          <%= button_to t("invites.sign_out_link"), session_path, method: :delete,
                 style: "background:none;border:none;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:underline;cursor:pointer;padding:0;",
                 form: { style: "margin:0;" },
-                data: { turbo_confirm: "Sign out of your current account?" } %>
+                data: { turbo_confirm: t("invites.sign_out_confirm") } %>
         </div>
 
       <% else %>
@@ -123,24 +120,24 @@
           <%= form_with url: accept_invite_path(@invite.token), method: :post do |f| %>
 
             <div style="margin-bottom:18px;">
-              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Your name</label>
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("invites.your_name_label") %></label>
               <%= f.text_field :name,
                     required: true, autofocus: !sign_in_default, autocomplete: "name",
-                    placeholder: "Jane Smith", value: params[:name],
+                    placeholder: t("invites.your_name_placeholder"), value: params[:name],
                     class: "form-input" %>
             </div>
 
             <% if @invite.partner? && (@invite.addressed_email.blank? || !User.exists?(email_address: @invite.addressed_email)) %>
               <div style="margin-bottom:18px;">
-                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Your organisation name</label>
+                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("invites.your_org_name_label") %></label>
                 <%= f.text_field :organisation_name,
-                      required: true, placeholder: "Acme Partners",
+                      required: true, placeholder: t("invites.your_org_name_placeholder"),
                       value: params[:organisation_name], class: "form-input" %>
               </div>
             <% end %>
 
             <div style="margin-bottom:18px;">
-              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email</label>
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("invites.sign_in_email_label") %></label>
               <% if @invite.addressed_email.present? %>
                 <div style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size: var(--text-xl);box-sizing:border-box;">
                   <%= @invite.addressed_email %>
@@ -148,39 +145,39 @@
               <% else %>
                 <%= f.email_field :email_address,
                       required: true, autocomplete: "email",
-                      placeholder: "you@example.com", value: params[:email_address],
+                      placeholder: t("invites.sign_in_email_placeholder"), value: params[:email_address],
                       class: "form-input" %>
               <% end %>
             </div>
 
             <div style="margin-bottom:18px;">
-              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Password</label>
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("invites.password_label") %></label>
               <%= f.password_field :password,
                     required: true, autocomplete: "new-password",
-                    placeholder: "At least 12 characters", maxlength: 72, minlength: 12,
+                    placeholder: t("invites.password_placeholder"), maxlength: 72, minlength: 12,
                     class: "form-input" %>
             </div>
 
             <div style="margin-bottom:24px;">
-              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Confirm password</label>
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("invites.confirm_password_label") %></label>
               <%= f.password_field :password_confirmation,
                     required: true, autocomplete: "new-password",
                     placeholder: "••••••••••••", maxlength: 72,
                     class: "form-input" %>
             </div>
 
-            <%= f.submit "Accept invite →",
+            <%= f.submit t("invites.accept_submit"),
                   style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
 
           <% end %>
 
           <% if @invite.partner? %>
             <div style="margin-top:18px;text-align:center;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
-              Already have a Playverto account?
+              <%= t("invites.already_have_account") %>
               <button type="button"
                       onclick="document.getElementById('invite-signup-form').hidden=true;document.getElementById('invite-signin-form').hidden=false;document.querySelector('#invite-signin-form input[type=email]').focus();"
                       style="background:none;border:none;color:#01EACB;font-family:inherit;font-size:inherit;text-decoration:underline;cursor:pointer;padding:0;">
-                Sign in instead
+                <%= t("invites.sign_in_instead") %>
               </button>
             </div>
           <% end %>
@@ -192,31 +189,31 @@
               <%= hidden_field_tag :mode, "sign_in" %>
 
               <div style="margin-bottom:18px;">
-                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email</label>
+                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("invites.sign_in_email_label") %></label>
                 <%= f.email_field :email_address,
                       required: true, autofocus: sign_in_default, autocomplete: "email",
-                      placeholder: "you@example.com", value: params[:email_address],
+                      placeholder: t("invites.sign_in_email_placeholder"), value: params[:email_address],
                       class: "form-input" %>
               </div>
 
               <div style="margin-bottom:24px;">
-                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Password</label>
+                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("invites.sign_in_password_label") %></label>
                 <%= f.password_field :password,
                       required: true, autocomplete: "current-password",
-                      placeholder: "Your Playverto password", maxlength: 72,
+                      placeholder: t("invites.sign_in_password_placeholder"), maxlength: 72,
                       class: "form-input" %>
               </div>
 
-              <%= f.submit "Sign in to join →",
+              <%= f.submit t("invites.sign_in_submit"),
                     style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
             <% end %>
 
             <div style="margin-top:18px;text-align:center;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
-              New to Playverto?
+              <%= t("invites.new_to_playverto") %>
               <button type="button"
                       onclick="document.getElementById('invite-signin-form').hidden=true;document.getElementById('invite-signup-form').hidden=false;document.querySelector('#invite-signup-form input[name=name]').focus();"
                       style="background:none;border:none;color:#01EACB;font-family:inherit;font-size:inherit;text-decoration:underline;cursor:pointer;padding:0;">
-                Create a new account
+                <%= t("invites.create_new_account") %>
               </button>
             </div>
           </div>

@@ -97,6 +97,141 @@ he:
     create: צור
     members: חברים
     sign_out: התנתק
+  alliances:
+    title: בריתות — Playverto
+    index_eyebrow: הבריתות שלך
+    index_heading: בריתות
+    index_subtitle: קבצו ארגונים שותפים לבריתות עם שם משלהן. הוסיפו Vertos וכל שותף יקבל קישור שיתוף משלו.
+    new_button: "+ ברית חדשה"
+    owned_section: בריתות שאתם מנהלים
+    owned_empty_title: אין עדיין בריתות
+    owned_empty_admin_html: לחצו על <span style="color:#FF1E6F;">+ ברית חדשה</span> למעלה כדי להתחיל קבוצה, ואז הזמינו ארגונים שותפים והוסיפו Vertos.
+    owned_empty_member: בקשו מהמנהל שלכם ליצור ברית.
+    started_on: החלה ב-%{date}
+    partners_count:
+      one: שותף
+      other: שותפים
+    vertos_count:
+      one: verto
+      other: vertos
+    open: פתח ←
+    member_section: בריתות שאתם חברים בהן
+    member_empty_title: לא הוזמנתם לאף ברית
+    member_empty_body: כאשר ארגון אחר יזמין אתכם לאחת הבריתות שלו, היא תופיע כאן.
+    member_run_by: מנוהלת על ידי %{org}
+    status:
+      active: פעילה
+      pending: ממתינה
+      revoked: בוטלה
+    new_title: ברית חדשה — Playverto
+    new_eyebrow: ברית חדשה
+    new_heading: תנו שם לברית
+    new_sub: תנו לקבוצה שם ברור כדי שהשותפים יבינו למה הם מצטרפים.
+    name_label: שם הברית
+    name_placeholder: 'לדוגמה: שותפי פיילוט'
+    cancel: ביטול
+    create_submit: צרו ברית ←
+    show_title: "%{name} — בריתות"
+    back_to_all: כל הבריתות
+    creator_eyebrow: ברית · אתם מנהלים זאת
+    partner_eyebrow: ברית · חבר
+    generate_link: צרו קישור הצטרפות ←
+    delete: מחק
+    delete_confirm: למחוק את %{name}? כל קישורי השיתוף לברית זו יפסיקו לעבוד.
+    new_link_heading: קישור הצטרפות חדש
+    new_link_body: כל מי שיש לו קישור זה יכול להצטרף ל-%{alliance} כשותף. תוקף ל-14 ימים.
+    copy: העתק
+    copied: הועתק!
+    partners_section: שותפים
+    no_partners_title: אין עדיין שותפים
+    no_partners_body_html: השתמשו ב-<span style="color:#FF1E6F;">צרו קישור הצטרפות</span> למעלה כדי להזמין ארגונים שותפים.
+    joined_on: הצטרף ב-%{date}
+    remove_member_confirm: להסיר את %{org} מ-%{alliance}? קישורי השיתוף שלהם יפסיקו לעבוד.
+    vertos_section: Vertos בברית
+    no_vertos_title: לא שותפו עדיין Vertos
+    no_vertos_body: הוסיפו Verto שפורסם למטה וייווצר קישור שיתוף ייחודי לכל שותף.
+    remove: הסר
+    remove_verto_confirm: להסיר את ה-Verto הזה מ-%{alliance}? כל קישורי השיתוף של השותפים עבורו יפסיקו לעבוד.
+    completion_label: השלמה
+    responses:
+      one: תגובה
+      other: תגובות
+    partner_links_count:
+      one: קישור שותף
+      other: קישורי שותפים
+    no_shares_yet: הוסיפו שותף לברית כדי ליצור קישורי שיתוף.
+    responses_short: "%{n} תגובות"
+    add_section: הוספה לברית
+    add_heading: הוסיפו Verto נוסף
+    add_body: בחרו Verto שפורסם. ניצור קישור שיתוף ייחודי לכל שותף בברית.
+    no_more_vertos: אין יותר Vertos שפורסמו להוספה.
+    create_new_verto: צרו Verto חדש ←
+    add_submit: הוסיפו Verto ←
+    partners_in_alliance: שותפים בברית
+    including_you: כולל אתכם
+    shared_vertos_short: Vertos משותפים
+    available_to_distribute: זמינים להפצה על ידכם
+    other_partners: שותפים אחרים
+    only_partner: אתם השותף היחיד בברית זו כרגע.
+    your_vertos_section: Vertos ששותפו איתכם
+    partner_no_vertos_title: אין עדיין Vertos
+    partner_no_vertos_body: כאשר %{org} יוסיף Verto לברית זו, תראו כאן את קישור השיתוף הייחודי שלכם.
+    from_org: מאת %{org}
+    your_link: הקישור שלכם
+    results_link: תוצאות ←
+  alliance_verto:
+    title: "%{title} — Verto משותף"
+    from_org_alliance: מאת %{org} · %{alliance}
+    share_link: קישור שיתוף
+    mine_label: מהקישור שלכם
+    aggregate_label: בכל %{alliance}
+    card_n: כרטיס %{n}
+    my_results: התוצאות שלי
+    aggregate: מצטבר
+    comparison: השוואה
+    comparison_sub: אתם מול כולם
+    no_data: אין נתונים
+    n_answered: "%{n} ענו"
+    avg: ממוצע %{n}
+  invites:
+    title: קבלת הזמנה — Playverto
+    already_used_title: ההזמנה כבר נוצלה
+    already_used_body_html: קישור ההזמנה כבר התקבל. <a href="%{href}" style="color:#01EACB;text-decoration:none;">היכנסו</a>
+    expired_title: ההזמנה פגה
+    expired_body: הקישור הזה ישן ביותר מ-7 ימים. בקשו מהמנהל שלכם לשלוח חדש.
+    invited_to_join: הוזמנתם להצטרף
+    alliance_by: לברית של %{org}
+    as_role: בתפקיד %{role}
+    addressed_for: "· עבור %{email}"
+    signed_in_as: מחוברים בתור %{name}
+    join_with: הצטרפו עם
+    pick_org: בחרו איזה ארגון מצטרף
+    join_submit: הצטרפו ל-%{alliance} ←
+    already_in_alliance: 'כבר בברית זו: %{orgs}'
+    you_run_this: אתם מנהלים ברית זו — בקרו בה במקום זאת.
+    already_member_singular: "%{orgs} כבר נמצא בברית זו."
+    already_member_plural: "%{orgs} כבר נמצאים בברית זו."
+    no_admin_org: אין לכם ארגון מנהל שיכול להצטרף לברית זו.
+    open_alliance: פתחו את %{alliance} ←
+    sign_out_link: התנתקו והשתמשו בחשבון אחר
+    sign_out_confirm: להתנתק מהחשבון הנוכחי?
+    already_have_account: כבר יש לכם חשבון Playverto?
+    sign_in_instead: היכנסו במקום זאת
+    new_to_playverto: חדשים ב-Playverto?
+    create_new_account: צרו חשבון חדש
+    sign_in_email_label: אימייל
+    sign_in_email_placeholder: you@example.com
+    sign_in_password_label: סיסמה
+    sign_in_password_placeholder: הסיסמה שלכם ב-Playverto
+    sign_in_submit: היכנסו כדי להצטרף ←
+    your_name_label: השם שלכם
+    your_name_placeholder: ישראל ישראלי
+    your_org_name_label: שם הארגון שלכם
+    your_org_name_placeholder: Acme Partners
+    password_label: סיסמה
+    password_placeholder: לפחות 12 תווים
+    confirm_password_label: אישור סיסמה
+    accept_submit: קבלו את ההזמנה ←
   editor:
     questions: שאלות
     primary: ראשי

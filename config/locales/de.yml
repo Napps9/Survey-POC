@@ -97,6 +97,141 @@ de:
     create: Erstellen
     members: Mitglieder
     sign_out: Abmelden
+  alliances:
+    title: Allianzen — Playverto
+    index_eyebrow: Ihre Allianzen
+    index_heading: Allianzen
+    index_subtitle: Fassen Sie Partnerorganisationen in benannten Allianzen zusammen. Fügen Sie Vertos hinzu und jeder Partner erhält seinen eigenen Freigabelink.
+    new_button: "+ Neue Allianz"
+    owned_section: Von Ihnen geführte Allianzen
+    owned_empty_title: Noch keine Allianzen
+    owned_empty_admin_html: Klicken Sie oben auf <span style="color:#FF1E6F;">+ Neue Allianz</span>, um eine Gruppe zu starten, laden Sie dann Partnerorganisationen ein und fügen Sie Vertos hinzu.
+    owned_empty_member: Bitten Sie Ihren Administrator, eine Allianz zu erstellen.
+    started_on: Gestartet am %{date}
+    partners_count:
+      one: Partner
+      other: Partner
+    vertos_count:
+      one: Verto
+      other: Vertos
+    open: Öffnen →
+    member_section: Allianzen, in denen Sie Mitglied sind
+    member_empty_title: Sie wurden zu keinen Allianzen eingeladen
+    member_empty_body: Wenn eine andere Organisation Sie zu einer ihrer Allianzen einlädt, erscheint sie hier.
+    member_run_by: Geführt von %{org}
+    status:
+      active: Aktiv
+      pending: Ausstehend
+      revoked: Widerrufen
+    new_title: Neue Allianz — Playverto
+    new_eyebrow: Neue Allianz
+    new_heading: Benennen Sie Ihre Allianz
+    new_sub: Geben Sie der Gruppe einen klaren Namen, damit die Partner wissen, wem sie beitreten.
+    name_label: Name der Allianz
+    name_placeholder: z. B. Pilotpartner
+    cancel: Abbrechen
+    create_submit: Allianz erstellen →
+    show_title: "%{name} — Allianzen"
+    back_to_all: Alle Allianzen
+    creator_eyebrow: Allianz · Von Ihnen geführt
+    partner_eyebrow: Allianz · Mitglied
+    generate_link: Beitrittslink erstellen →
+    delete: Löschen
+    delete_confirm: "%{name} löschen? Alle Freigabelinks für diese Allianz werden ungültig."
+    new_link_heading: Neuer Beitrittslink
+    new_link_body: Jeder mit diesem Link kann %{alliance} als Partner beitreten. Läuft in 14 Tagen ab.
+    copy: Kopieren
+    copied: Kopiert!
+    partners_section: Partner
+    no_partners_title: Noch keine Partner
+    no_partners_body_html: Verwenden Sie oben <span style="color:#FF1E6F;">Beitrittslink erstellen</span>, um Partnerorganisationen einzuladen.
+    joined_on: Beigetreten am %{date}
+    remove_member_confirm: "%{org} aus %{alliance} entfernen? Ihre Freigabelinks werden ungültig."
+    vertos_section: Vertos in der Allianz
+    no_vertos_title: Noch keine Vertos geteilt
+    no_vertos_body: Fügen Sie unten ein veröffentlichtes Verto hinzu, und für jeden Partner wird ein eindeutiger Freigabelink erstellt.
+    remove: Entfernen
+    remove_verto_confirm: Dieses Verto aus %{alliance} entfernen? Alle zugehörigen Partner-Freigabelinks werden ungültig.
+    completion_label: Abschluss
+    responses:
+      one: Antwort
+      other: Antworten
+    partner_links_count:
+      one: Partnerlink
+      other: Partnerlinks
+    no_shares_yet: Fügen Sie der Allianz einen Partner hinzu, um Freigabelinks zu erstellen.
+    responses_short: "%{n} Antw."
+    add_section: Zur Allianz hinzufügen
+    add_heading: Weiteres Verto hinzufügen
+    add_body: Wählen Sie ein veröffentlichtes Verto. Wir erstellen einen eindeutigen Freigabelink für jeden Partner in der Allianz.
+    no_more_vertos: Keine weiteren veröffentlichten Vertos zum Hinzufügen.
+    create_new_verto: Neues Verto erstellen →
+    add_submit: Verto hinzufügen →
+    partners_in_alliance: Partner in der Allianz
+    including_you: Inklusive Ihnen
+    shared_vertos_short: Geteilte Vertos
+    available_to_distribute: Verfügbar zur Verteilung
+    other_partners: Andere Partner
+    only_partner: Sie sind derzeit der einzige Partner in dieser Allianz.
+    your_vertos_section: Mit Ihnen geteilte Vertos
+    partner_no_vertos_title: Noch keine Vertos
+    partner_no_vertos_body: Sobald %{org} dieser Allianz ein Verto hinzufügt, sehen Sie hier Ihren eindeutigen Freigabelink.
+    from_org: Von %{org}
+    your_link: Ihr Link
+    results_link: Ergebnisse →
+  alliance_verto:
+    title: "%{title} — Geteiltes Verto"
+    from_org_alliance: Von %{org} · %{alliance}
+    share_link: Freigabelink
+    mine_label: über Ihren Link
+    aggregate_label: in %{alliance}
+    card_n: Karte %{n}
+    my_results: Meine Ergebnisse
+    aggregate: Gesamtwerte
+    comparison: Vergleich
+    comparison_sub: Sie vs. alle
+    no_data: Keine Daten
+    n_answered: "%{n} beantwortet"
+    avg: Ø %{n}
+  invites:
+    title: Einladung annehmen — Playverto
+    already_used_title: Einladung bereits verwendet
+    already_used_body_html: Dieser Einladungslink wurde bereits angenommen. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Anmelden</a>
+    expired_title: Einladung abgelaufen
+    expired_body: Dieser Link ist älter als 7 Tage. Bitten Sie Ihren Administrator, einen neuen zu senden.
+    invited_to_join: Sie wurden eingeladen, beizutreten
+    alliance_by: einer Allianz von %{org}
+    as_role: als %{role}
+    addressed_for: "· für %{email}"
+    signed_in_as: Angemeldet als %{name}
+    join_with: Beitreten mit
+    pick_org: Wählen Sie, welche Organisation beitritt
+    join_submit: "%{alliance} beitreten →"
+    already_in_alliance: 'Bereits in dieser Allianz: %{orgs}'
+    you_run_this: Sie führen diese Allianz — besuchen Sie sie stattdessen.
+    already_member_singular: "%{orgs} ist bereits in dieser Allianz."
+    already_member_plural: "%{orgs} sind bereits in dieser Allianz."
+    no_admin_org: Sie haben keine Administrator-Organisation, die dieser Allianz beitreten kann.
+    open_alliance: "%{alliance} öffnen →"
+    sign_out_link: Abmelden und ein anderes Konto verwenden
+    sign_out_confirm: Vom aktuellen Konto abmelden?
+    already_have_account: Haben Sie bereits ein Playverto-Konto?
+    sign_in_instead: Stattdessen anmelden
+    new_to_playverto: Neu bei Playverto?
+    create_new_account: Neues Konto erstellen
+    sign_in_email_label: E-Mail
+    sign_in_email_placeholder: sie@beispiel.de
+    sign_in_password_label: Passwort
+    sign_in_password_placeholder: Ihr Playverto-Passwort
+    sign_in_submit: Anmelden und beitreten →
+    your_name_label: Ihr Name
+    your_name_placeholder: Max Mustermann
+    your_org_name_label: Name Ihrer Organisation
+    your_org_name_placeholder: Acme Partner
+    password_label: Passwort
+    password_placeholder: Mindestens 12 Zeichen
+    confirm_password_label: Passwort bestätigen
+    accept_submit: Einladung annehmen →
   editor:
     questions: Fragen
     primary: primär

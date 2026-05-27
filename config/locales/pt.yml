@@ -97,6 +97,141 @@ pt:
     create: Criar
     members: Membros
     sign_out: Terminar sessão
+  alliances:
+    title: Alianças — Playverto
+    index_eyebrow: As suas alianças
+    index_heading: Alianças
+    index_subtitle: Agrupe organizações parceiras em alianças nomeadas. Adicione Vertos e cada parceiro recebe o seu próprio link de partilha.
+    new_button: "+ Nova aliança"
+    owned_section: Alianças que gere
+    owned_empty_title: Ainda não há alianças
+    owned_empty_admin_html: Clique em <span style="color:#FF1E6F;">+ Nova aliança</span> acima para iniciar um grupo, depois convide organizações parceiras e adicione Vertos.
+    owned_empty_member: Peça ao seu administrador para criar uma aliança.
+    started_on: Iniciada em %{date}
+    partners_count:
+      one: parceiro
+      other: parceiros
+    vertos_count:
+      one: verto
+      other: vertos
+    open: Abrir →
+    member_section: Alianças das quais é membro
+    member_empty_title: Não foi convidado para nenhuma aliança
+    member_empty_body: Quando outra organização o convidar para uma das suas alianças, ela aparecerá aqui.
+    member_run_by: Gerida por %{org}
+    status:
+      active: Ativa
+      pending: Pendente
+      revoked: Revogada
+    new_title: Nova aliança — Playverto
+    new_eyebrow: Nova aliança
+    new_heading: Nomeie a sua aliança
+    new_sub: Dê ao grupo um nome claro para que os parceiros saibam ao que estão a aderir.
+    name_label: Nome da aliança
+    name_placeholder: ex. Parceiros Piloto
+    cancel: Cancelar
+    create_submit: Criar aliança →
+    show_title: "%{name} — Alianças"
+    back_to_all: Todas as alianças
+    creator_eyebrow: Aliança · Gerida por si
+    partner_eyebrow: Aliança · Membro
+    generate_link: Gerar link de adesão →
+    delete: Eliminar
+    delete_confirm: Eliminar %{name}? Todos os links de partilha desta aliança deixarão de funcionar.
+    new_link_heading: Novo link de adesão
+    new_link_body: Qualquer pessoa com este link pode aderir a %{alliance} como parceiro. Expira em 14 dias.
+    copy: Copiar
+    copied: Copiado!
+    partners_section: Parceiros
+    no_partners_title: Ainda sem parceiros
+    no_partners_body_html: Use <span style="color:#FF1E6F;">Gerar link de adesão</span> acima para convidar organizações parceiras.
+    joined_on: Aderiu em %{date}
+    remove_member_confirm: Remover %{org} de %{alliance}? Os seus links de partilha deixarão de funcionar.
+    vertos_section: Vertos na aliança
+    no_vertos_title: Ainda não há Vertos partilhados
+    no_vertos_body: Adicione um Verto publicado abaixo e será gerado um link de partilha único para cada parceiro.
+    remove: Remover
+    remove_verto_confirm: Remover este Verto de %{alliance}? Todos os links de partilha dos parceiros para este Verto deixarão de funcionar.
+    completion_label: conclusão
+    responses:
+      one: resposta
+      other: respostas
+    partner_links_count:
+      one: link de parceiro
+      other: links de parceiros
+    no_shares_yet: Adicione um parceiro à aliança para gerar links de partilha.
+    responses_short: "%{n} resp."
+    add_section: Adicionar à aliança
+    add_heading: Adicionar outro Verto
+    add_body: Escolha um Verto publicado. Geraremos um link de partilha único para cada parceiro da aliança.
+    no_more_vertos: Não há mais Vertos publicados para adicionar.
+    create_new_verto: Criar um novo Verto →
+    add_submit: Adicionar Verto →
+    partners_in_alliance: Parceiros na aliança
+    including_you: Incluindo-o
+    shared_vertos_short: Vertos partilhados
+    available_to_distribute: Disponível para distribuir
+    other_partners: Outros parceiros
+    only_partner: De momento, é o único parceiro nesta aliança.
+    your_vertos_section: Vertos partilhados consigo
+    partner_no_vertos_title: Ainda não há Vertos
+    partner_no_vertos_body: Quando %{org} adicionar um Verto a esta aliança, verá aqui o seu link de partilha único.
+    from_org: De %{org}
+    your_link: O seu link
+    results_link: Resultados →
+  alliance_verto:
+    title: "%{title} — Verto partilhado"
+    from_org_alliance: De %{org} · %{alliance}
+    share_link: Link de partilha
+    mine_label: do seu link
+    aggregate_label: em toda a %{alliance}
+    card_n: Cartão %{n}
+    my_results: Os meus resultados
+    aggregate: Agregado
+    comparison: Comparação
+    comparison_sub: você vs todos
+    no_data: Sem dados
+    n_answered: "%{n} respondidos"
+    avg: méd. %{n}
+  invites:
+    title: Aceitar convite — Playverto
+    already_used_title: Convite já utilizado
+    already_used_body_html: Este link de convite já foi aceite. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Iniciar sessão</a>
+    expired_title: Convite expirado
+    expired_body: Este link tem mais de 7 dias. Peça ao seu administrador para enviar um novo.
+    invited_to_join: Foi convidado para aderir a
+    alliance_by: uma aliança de %{org}
+    as_role: como %{role}
+    addressed_for: "· para %{email}"
+    signed_in_as: Sessão iniciada como %{name}
+    join_with: Aderir com
+    pick_org: Escolha qual organização adere
+    join_submit: Aderir a %{alliance} →
+    already_in_alliance: 'Já estão nesta aliança: %{orgs}'
+    you_run_this: Esta aliança é gerida por si — visite-a em vez disso.
+    already_member_singular: "%{orgs} já está nesta aliança."
+    already_member_plural: "%{orgs} já estão nesta aliança."
+    no_admin_org: Não tem uma organização de administrador que possa aderir a esta aliança.
+    open_alliance: Abrir %{alliance} →
+    sign_out_link: Terminar sessão e usar uma conta diferente
+    sign_out_confirm: Terminar sessão da sua conta atual?
+    already_have_account: Já tem uma conta Playverto?
+    sign_in_instead: Iniciar sessão em vez disso
+    new_to_playverto: Novo no Playverto?
+    create_new_account: Criar uma nova conta
+    sign_in_email_label: E-mail
+    sign_in_email_placeholder: voce@exemplo.com
+    sign_in_password_label: Palavra-passe
+    sign_in_password_placeholder: A sua palavra-passe Playverto
+    sign_in_submit: Iniciar sessão para aderir →
+    your_name_label: O seu nome
+    your_name_placeholder: João Silva
+    your_org_name_label: Nome da sua organização
+    your_org_name_placeholder: Acme Parceiros
+    password_label: Palavra-passe
+    password_placeholder: Pelo menos 12 caracteres
+    confirm_password_label: Confirmar palavra-passe
+    accept_submit: Aceitar convite →
   editor:
     questions: perguntas
     primary: principal

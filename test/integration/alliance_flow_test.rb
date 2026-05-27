@@ -101,7 +101,7 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
 
     get alliances_path
     assert_response :success
-    assert_match "Alliances you're a member of", response.body
+    assert_match(/Alliances you('|&#39;)re a member of/, response.body)
     assert_match "Trial", response.body
 
     get alliance_path(a)

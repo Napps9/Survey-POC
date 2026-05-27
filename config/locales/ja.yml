@@ -97,6 +97,141 @@ ja:
     create: 作成
     members: メンバー
     sign_out: ログアウト
+  alliances:
+    title: アライアンス — Playverto
+    index_eyebrow: あなたのアライアンス
+    index_heading: アライアンス
+    index_subtitle: パートナー組織を名前付きのアライアンスにまとめましょう。Verto を追加すると、各パートナーに専用の共有リンクが発行されます。
+    new_button: "+ 新しいアライアンス"
+    owned_section: あなたが運営するアライアンス
+    owned_empty_title: アライアンスはまだありません
+    owned_empty_admin_html: 上部の <span style="color:#FF1E6F;">+ 新しいアライアンス</span> をクリックしてグループを作成し、パートナー組織を招待して Verto を追加してください。
+    owned_empty_member: 管理者にアライアンスの作成を依頼してください。
+    started_on: 開始日 %{date}
+    partners_count:
+      one: パートナー
+      other: パートナー
+    vertos_count:
+      one: Verto
+      other: Verto
+    open: 開く →
+    member_section: 参加中のアライアンス
+    member_empty_title: アライアンスへの招待はまだありません
+    member_empty_body: 他の組織からアライアンスに招待されると、ここに表示されます。
+    member_run_by: '運営: %{org}'
+    status:
+      active: 有効
+      pending: 保留中
+      revoked: 取り消し済み
+    new_title: 新しいアライアンス — Playverto
+    new_eyebrow: 新しいアライアンス
+    new_heading: アライアンスに名前を付ける
+    new_sub: パートナーが参加先を理解できるよう、わかりやすい名前を付けてください。
+    name_label: アライアンス名
+    name_placeholder: '例: パイロットパートナー'
+    cancel: キャンセル
+    create_submit: アライアンスを作成 →
+    show_title: "%{name} — アライアンス"
+    back_to_all: すべてのアライアンス
+    creator_eyebrow: アライアンス · あなたが運営
+    partner_eyebrow: アライアンス · メンバー
+    generate_link: 参加リンクを生成 →
+    delete: 削除
+    delete_confirm: "%{name} を削除しますか?このアライアンスのすべての共有リンクが無効になります。"
+    new_link_heading: 新しい参加リンク
+    new_link_body: このリンクを持つ人は、パートナーとして %{alliance} に参加できます。14 日後に期限切れになります。
+    copy: コピー
+    copied: コピーしました!
+    partners_section: パートナー
+    no_partners_title: パートナーはまだいません
+    no_partners_body_html: 上部の <span style="color:#FF1E6F;">参加リンクを生成</span> を使ってパートナー組織を招待してください。
+    joined_on: 参加日 %{date}
+    remove_member_confirm: "%{org} を %{alliance} から削除しますか?共有リンクは無効になります。"
+    vertos_section: アライアンス内の Verto
+    no_vertos_title: 共有された Verto はまだありません
+    no_vertos_body: 以下から公開済みの Verto を追加すると、各パートナーに固有の共有リンクが生成されます。
+    remove: 削除
+    remove_verto_confirm: この Verto を %{alliance} から削除しますか?すべてのパートナー共有リンクが無効になります。
+    completion_label: 完了率
+    responses:
+      one: 回答
+      other: 回答
+    partner_links_count:
+      one: パートナーリンク
+      other: パートナーリンク
+    no_shares_yet: 共有リンクを生成するには、アライアンスにパートナーを追加してください。
+    responses_short: "%{n} 件"
+    add_section: アライアンスに追加
+    add_heading: 別の Verto を追加
+    add_body: 公開済みの Verto を選択してください。アライアンス内のすべてのパートナーに固有の共有リンクを生成します。
+    no_more_vertos: 追加できる公開済み Verto はもうありません。
+    create_new_verto: 新しい Verto を作成 →
+    add_submit: Verto を追加 →
+    partners_in_alliance: アライアンス内のパートナー
+    including_you: あなたを含む
+    shared_vertos_short: 共有された Verto
+    available_to_distribute: 配布可能
+    other_partners: その他のパートナー
+    only_partner: 現在、このアライアンスのパートナーはあなただけです。
+    your_vertos_section: あなたに共有された Verto
+    partner_no_vertos_title: Verto はまだありません
+    partner_no_vertos_body: "%{org} がこのアライアンスに Verto を追加すると、あなた専用の共有リンクがここに表示されます。"
+    from_org: "%{org} より"
+    your_link: あなたのリンク
+    results_link: 結果 →
+  alliance_verto:
+    title: "%{title} — 共有された Verto"
+    from_org_alliance: "%{org} より · %{alliance}"
+    share_link: 共有リンク
+    mine_label: あなたのリンクから
+    aggregate_label: "%{alliance} 全体"
+    card_n: カード %{n}
+    my_results: 自分の結果
+    aggregate: 集計
+    comparison: 比較
+    comparison_sub: あなた vs 全体
+    no_data: データなし
+    n_answered: "%{n} 件回答"
+    avg: 平均 %{n}
+  invites:
+    title: 招待を承認 — Playverto
+    already_used_title: この招待は使用済みです
+    already_used_body_html: この招待リンクはすでに承認されています。<a href="%{href}" style="color:#01EACB;text-decoration:none;">サインイン</a>
+    expired_title: 招待の有効期限切れ
+    expired_body: このリンクは 7 日以上前のものです。管理者に新しい招待を依頼してください。
+    invited_to_join: 参加への招待が届いています
+    alliance_by: "%{org} のアライアンス"
+    as_role: "%{role} として"
+    addressed_for: "· %{email} 宛"
+    signed_in_as: "%{name} としてサインイン中"
+    join_with: 参加する組織
+    pick_org: 参加する組織を選択
+    join_submit: "%{alliance} に参加 →"
+    already_in_alliance: '既にこのアライアンスに参加中: %{orgs}'
+    you_run_this: あなたはこのアライアンスを運営しています — 直接アクセスしてください。
+    already_member_singular: "%{orgs} は既にこのアライアンスに参加しています。"
+    already_member_plural: "%{orgs} は既にこのアライアンスに参加しています。"
+    no_admin_org: このアライアンスに参加できる管理者組織がありません。
+    open_alliance: "%{alliance} を開く →"
+    sign_out_link: サインアウトして別のアカウントを使用
+    sign_out_confirm: 現在のアカウントからサインアウトしますか?
+    already_have_account: Playverto アカウントをお持ちですか?
+    sign_in_instead: サインインする
+    new_to_playverto: Playverto は初めてですか?
+    create_new_account: 新しいアカウントを作成
+    sign_in_email_label: メールアドレス
+    sign_in_email_placeholder: you@example.com
+    sign_in_password_label: パスワード
+    sign_in_password_placeholder: Playverto のパスワード
+    sign_in_submit: サインインして参加 →
+    your_name_label: お名前
+    your_name_placeholder: 山田 太郎
+    your_org_name_label: 組織名
+    your_org_name_placeholder: Acme Partners
+    password_label: パスワード
+    password_placeholder: 12 文字以上
+    confirm_password_label: パスワード(確認)
+    accept_submit: 招待を承認 →
   editor:
     questions: 質問
     primary: プライマリ

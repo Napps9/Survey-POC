@@ -1,0 +1,394 @@
+---
+ko:
+  locale_switcher:
+    label: 언어 변경
+    heading: 언어
+  layout:
+    studio_tagline: Verto 스튜디오
+  card:
+    'yes': 예
+    'no': 아니요
+    add_option: 옵션 추가
+    add_statement: 문장 추가
+    swipe_no: "← 아니요"
+    swipe_hint: 카드를 끌어 답변하세요
+    swipe_yes: 예 →
+    reset: 초기화
+    answer_placeholder: 답변 입력…
+    characters: 글자 수
+    allow_other: '"기타" 자유 입력 답변 허용'
+    other: 기타
+    other_placeholder: 직접 입력해 주세요…
+  auth:
+    show: 표시
+    email: 이메일 주소
+    password: 비밀번호
+    password_hint: 최소 12자 이상
+    title_sign_in: 로그인 — Playverto
+    sign_in_title: Playverto에 로그인
+    sign_in_new_here: 처음이신가요?
+    sign_in_create: 계정 만들기
+    forgot_password: 비밀번호를 잊으셨나요?
+    sign_in_submit: 로그인 →
+    title_signup: 계정 만들기 — Playverto
+    signup_title: 계정 만들기
+    signup_have_one: 이미 계정이 있으신가요?
+    signup_sign_in: 로그인
+    name: 이름
+    org_name: 조직명
+    confirm_password: 비밀번호 확인
+    signup_submit: 계정 만들기 →
+    title_reset: 비밀번호 재설정 — Playverto
+    forgot_title: 비밀번호를 잊으셨나요?
+    forgot_sub: 이메일을 입력하시면 재설정 링크를 보내드립니다.
+    forgot_submit: 재설정 안내 이메일 보내기
+    back_to_sign_in: "← 로그인으로 돌아가기"
+    title_set: 새 비밀번호 설정 — Playverto
+    set_title: 새 비밀번호 설정
+    set_sub: 본인만 알 수 있는 것으로 설정하세요.
+    new_password: 새 비밀번호
+    confirm_new_password: 새 비밀번호 확인
+    repeat_new_password: 새 비밀번호 재입력
+    set_submit: 새 비밀번호 저장
+  results:
+    title: 결과
+    editor: "← 편집기"
+    ask_verto: Verto에게 묻기
+    analysing: 응답 분석 중…
+  player:
+    thank_you_title: 감사합니다!
+    thank_you_sub: 응답이 기록되었습니다.
+    compare_cta: 다른 사람들과 비교한 결과 보기 →
+    powered_by: 제공
+    comparison_title: 내 답변 vs 전체
+    back: "← 뒤로"
+    next: 다음 →
+    submit: 제출 ✓
+  js:
+    player:
+      progress: "%{total}장 중 %{n}번째 카드"
+      queued: 저장됨 — 온라인이 되면 동기화됩니다
+      compare_cta: 다른 사람들과 비교한 결과 보기 →
+      compare_loading: 불러오는 중…
+      compare_error: 불러올 수 없습니다 — 다시 시도하세요
+    editor:
+      delete_card_confirm: 이 카드를 삭제하시겠습니까?
+      unsaved: 저장되지 않은 변경사항
+      saving: 저장 중…
+      saved: "%{time}에 저장됨"
+      save_failed: '저장 실패: %{msg}'
+      card_n: 카드 %{n} · %{type}
+      choose_format: 아래에서 답변 형식을 선택하세요.
+      type_updated: 답변 유형이 %{type}(으)로 업데이트되었습니다
+      current: 현재
+      off_brief: 브리프에서 벗어남
+      cards_count: 카드 %{n}장
+      fit_best: 가장 적합
+      fit_strong: 강력한 대안
+      fit_solid: 확실한 대안
+      fit_workable: 사용 가능
+      fit_sparingly: 제한적으로 사용
+    wizard:
+      step_counter: "%{total}단계 중 %{n}단계"
+  nav:
+    partners: 파트너
+    shared_vertos: 공유된 Verto
+    my_vertos: 내 Verto
+    create: 만들기
+    members: 멤버
+    sign_out: 로그아웃
+  alliances:
+    title: 얼라이언스 — Playverto
+    index_eyebrow: 내 얼라이언스
+    index_heading: 얼라이언스
+    index_subtitle: 파트너 조직을 이름이 있는 얼라이언스로 그룹화하세요. Verto를 추가하면 각 파트너가 고유한 공유 링크를 받습니다.
+    new_button: "+ 새 얼라이언스"
+    owned_section: 내가 운영하는 얼라이언스
+    owned_empty_title: 아직 얼라이언스가 없습니다
+    owned_empty_admin_html: 위의 <span style="color:#FF1E6F;">+ 새 얼라이언스</span>를 클릭해 그룹을 만들고, 파트너 조직을 초대한 뒤 Verto를 추가하세요.
+    owned_empty_member: 관리자에게 얼라이언스 생성을 요청하세요.
+    started_on: "%{date}에 시작"
+    partners_count:
+      one: 파트너
+      other: 파트너
+    vertos_count:
+      one: verto
+      other: verto
+    open: 열기 →
+    member_section: 내가 멤버인 얼라이언스
+    member_empty_title: 초대받은 얼라이언스가 없습니다
+    member_empty_body: 다른 조직이 자신들의 얼라이언스에 초대하면 여기에 표시됩니다.
+    member_run_by: "%{org} 운영"
+    status:
+      active: 활성
+      pending: 대기 중
+      revoked: 취소됨
+    new_title: 새 얼라이언스 — Playverto
+    new_eyebrow: 새 얼라이언스
+    new_heading: 얼라이언스 이름 짓기
+    new_sub: 파트너들이 무엇에 참여하는지 알 수 있도록 명확한 이름을 지어주세요.
+    name_label: 얼라이언스 이름
+    name_placeholder: '예: 파일럿 파트너'
+    cancel: 취소
+    create_submit: 얼라이언스 만들기 →
+    show_title: "%{name} — 얼라이언스"
+    back_to_all: 모든 얼라이언스
+    creator_eyebrow: 얼라이언스 · 운영자
+    partner_eyebrow: 얼라이언스 · 멤버
+    generate_link: 참여 링크 생성 →
+    delete: 삭제
+    delete_confirm: "%{name}을(를) 삭제하시겠습니까? 이 얼라이언스의 모든 공유 링크가 작동을 멈춥니다."
+    new_link_heading: 새 참여 링크
+    new_link_body: 이 링크가 있는 사람은 누구나 %{alliance}에 파트너로 참여할 수 있습니다. 14일 후 만료됩니다.
+    copy: 복사
+    copied: 복사됨!
+    partners_section: 파트너
+    no_partners_title: 아직 파트너가 없습니다
+    no_partners_body_html: 위의 <span style="color:#FF1E6F;">참여 링크 생성</span>을 사용해 파트너 조직을 초대하세요.
+    joined_on: "%{date}에 참여"
+    remove_member_confirm: "%{alliance}에서 %{org}을(를) 제거하시겠습니까? 그들의 공유 링크가 작동을 멈춥니다."
+    vertos_section: 얼라이언스의 Verto
+    no_vertos_title: 아직 공유된 Verto가 없습니다
+    no_vertos_body: 아래에서 게시된 Verto를 추가하면 각 파트너마다 고유한 공유 링크가 생성됩니다.
+    remove: 제거
+    remove_verto_confirm: "%{alliance}에서 이 Verto를 제거하시겠습니까? 관련된 모든 파트너 공유 링크가 작동을 멈춥니다."
+    completion_label: 완료율
+    responses:
+      one: 응답
+      other: 응답
+    partner_links_count:
+      one: 파트너 링크
+      other: 파트너 링크
+    no_shares_yet: 공유 링크를 생성하려면 얼라이언스에 파트너를 추가하세요.
+    responses_short: 응답 %{n}개
+    add_section: 얼라이언스에 추가
+    add_heading: 다른 Verto 추가
+    add_body: 게시된 Verto를 선택하세요. 얼라이언스의 모든 파트너에 대해 고유한 공유 링크가 생성됩니다.
+    no_more_vertos: 추가할 수 있는 게시된 Verto가 더 없습니다.
+    create_new_verto: 새 Verto 만들기 →
+    add_submit: Verto 추가 →
+    partners_in_alliance: 얼라이언스의 파트너
+    including_you: 본인 포함
+    shared_vertos_short: 공유된 Verto
+    available_to_distribute: 배포 가능
+    other_partners: 다른 파트너
+    only_partner: 현재 이 얼라이언스의 유일한 파트너입니다.
+    your_vertos_section: 나에게 공유된 Verto
+    partner_no_vertos_title: 아직 Verto가 없습니다
+    partner_no_vertos_body: "%{org}이(가) 이 얼라이언스에 Verto를 추가하면 여기에 고유한 공유 링크가 표시됩니다."
+    from_org: "%{org} 제공"
+    your_link: 내 링크
+    results_link: 결과 →
+  alliance_verto:
+    title: "%{title} — 공유된 Verto"
+    from_org_alliance: "%{org} 제공 · %{alliance}"
+    share_link: 공유 링크
+    mine_label: 내 링크에서
+    aggregate_label: "%{alliance} 전체"
+    card_n: 카드 %{n}
+    my_results: 내 결과
+    aggregate: 전체 집계
+    comparison: 비교
+    comparison_sub: 나 vs 전체
+    no_data: 데이터 없음
+    n_answered: "%{n}명 응답"
+    avg: 평균 %{n}
+  invites:
+    title: 초대 수락 — Playverto
+    already_used_title: 이미 사용된 초대
+    already_used_body_html: 이 초대 링크는 이미 수락되었습니다. <a href="%{href}" style="color:#01EACB;text-decoration:none;">로그인</a>
+    expired_title: 초대 만료됨
+    expired_body: 이 링크는 7일이 지났습니다. 관리자에게 새 링크를 요청하세요.
+    invited_to_join: 초대를 받았습니다
+    alliance_by: "%{org}의 얼라이언스"
+    as_role: "%{role}(으)로"
+    addressed_for: "· %{email} 대상"
+    signed_in_as: "%{name}(으)로 로그인됨"
+    join_with: 참여 조직
+    pick_org: 참여할 조직을 선택하세요
+    join_submit: "%{alliance} 참여 →"
+    already_in_alliance: '이미 이 얼라이언스에 있음: %{orgs}'
+    you_run_this: 이 얼라이언스를 운영 중입니다 — 대신 방문하세요.
+    already_member_singular: "%{orgs}은(는) 이미 이 얼라이언스에 있습니다."
+    already_member_plural: "%{orgs}은(는) 이미 이 얼라이언스에 있습니다."
+    no_admin_org: 이 얼라이언스에 참여할 수 있는 관리자 조직이 없습니다.
+    open_alliance: "%{alliance} 열기 →"
+    sign_out_link: 로그아웃 후 다른 계정 사용
+    sign_out_confirm: 현재 계정에서 로그아웃하시겠습니까?
+    already_have_account: 이미 Playverto 계정이 있으신가요?
+    sign_in_instead: 로그인하기
+    new_to_playverto: Playverto가 처음이신가요?
+    create_new_account: 새 계정 만들기
+    sign_in_email_label: 이메일
+    sign_in_email_placeholder: you@example.com
+    sign_in_password_label: 비밀번호
+    sign_in_password_placeholder: Playverto 비밀번호
+    sign_in_submit: 로그인하여 참여 →
+    your_name_label: 이름
+    your_name_placeholder: 홍길동
+    your_org_name_label: 조직명
+    your_org_name_placeholder: Acme Partners
+    password_label: 비밀번호
+    password_placeholder: 최소 12자 이상
+    confirm_password_label: 비밀번호 확인
+    accept_submit: 초대 수락 →
+  editor:
+    questions: 질문
+    primary: 기본
+    change_media: 미디어 변경
+    change_media_title: 이 카드의 이미지 변경
+    add_design: 디자인 추가
+    add_design_title: 이 카드에 이미지 추가
+    add_design_sub: 이미지를 추가해 카드에 생동감을 더하세요
+    live: 라이브
+    live_warning: 이 Verto가 응답을 수집하는 동안 질문을 편집하면 데이터 품질에 영향을 미칩니다. 편집 전후의 답변은 직접 비교할 수 없습니다.
+    got_it: 확인
+    add_question: 질문 추가
+    cards:
+      one: 카드 %{count}장
+      other: 카드 %{count}장
+    estimated:
+      one: 예상 약 %{count}분
+      other: 예상 약 %{count}분
+    design: 디자인
+    publish_share: 게시 및 공유 →
+    answer_type: 답변 유형
+    select_card: 카드를 선택해 유형을 변경하세요
+    click_any: 왼쪽의 카드를 클릭하세요.
+    select_card_long: 답변 형식을 변경할 질문 카드를 선택하세요
+    apply_to_card: 이 카드에 적용
+    see_all_types: 모든 질문 유형 보기
+    all_types: 모든 질문 유형
+    ranked_for: 적합도 순위
+    this_card: 이 카드
+  dashboard_card:
+    badge_archived: 보관됨
+    badge_live: 라이브
+    badge_draft: 초안
+    fallback_name: 이 Verto
+    deleted_on: "%{date}에 삭제됨"
+    untitled: 제목 없음
+    completion: 완료율
+    responders:
+      one: 응답자
+      other: 응답자
+    responses:
+      one: 응답
+      other: 응답
+    questions:
+      one: 질문
+      other: 질문
+    view_results: 결과 보기 →
+    edit: Verto 편집
+    results: 결과 →
+    publish: 게시 →
+    delete: 삭제
+    edit_warning: '"%{title}"은(는) 라이브 상태입니다. 응답을 수집하는 동안 질문을 편집하면 데이터 품질에 영향을 미칩니다 — 편집 전후의 답변은 직접 비교할 수 없습니다. 계속하시겠습니까?'
+    delete_warning: '"%{title}"을(를) 삭제하시겠습니까? 삭제된 Verto는 복구할 수 없습니다. 응답자의 링크는 작동을 멈추지만, 기존 결과는 보관함 목록에 남습니다.'
+  dashboard:
+    welcome_back: 다시 오신 것을 환영합니다
+    heading_html: 내 <span style="color:#01EACB;">Verto</span>
+    subtitle: Verto를 만들어 얼라이언스와 공유하고, 들어오는 인사이트를 확인하세요.
+    create_new: 새 Verto 만들기
+    stat_live: 라이브
+    stat_drafts: 초안
+    stat_responses: 응답
+    stat_completion: 완료율
+    empty_title: 아직 Verto가 없습니다
+    empty_body: 첫 Verto를 만들고 청중으로부터 인사이트를 수집해 보세요.
+    empty_cta: 첫 Verto 만들기 →
+    section_live: 라이브
+    section_drafts: 초안
+    section_archived: 보관됨
+  wizard:
+    create_verto: Verto 만들기
+    building: Verto 생성 중
+    pill_audience: 청중
+    pill_tone: 톤
+    pill_tone_value: 대화체
+    pill_cards: 카드
+    gen_brief_read: 브리프 읽는 중
+    gen_writing: 질문 작성 중
+    gen_formats: 형식 선택 중
+    gen_design: 디자인 적용 중
+    welcome_eyebrow: 다음에 진행될 단계
+    welcome_lead: 몇 가지 간단한 단계만 거치면 Verto 초안을 작성해 드립니다.
+    welcome_steps:
+    - Verto 소개
+    - 응답자
+    - 알고 싶은 것
+    - 언어
+    - 브랜드 색상
+    - 맥락 (선택)
+    welcome_badge: 새 Verto
+    welcome_title: Verto를 만들어 봅시다.
+    welcome_sub: 브리프를 Playverto의 원칙을 따르는 Verto로 만들어 드립니다.
+    welcome_ready_html: 준비되시면 <strong style="color:rgba(0,0,0,0.6);">다음</strong>을 누르세요.
+    examples: 예시
+    s1_eyebrow: 1단계 · Verto 소개
+    s1_lead: 하나의 큰 주제.
+    s1_body: 폭넓게 정해 주세요 — 다음 단계에서 구체화합니다. 보통 한두 단어면 충분합니다.
+    s1_examples:
+    - 기후 행동
+    - 난민 교육
+    - 식량 안보
+    s1_title: Verto의 주제는 무엇인가요?
+    s1_placeholder: '예: 청소년 웰빙'
+    s1_hint_body: 폭넓게 정해 주세요 — 다음 단계에서 구체화합니다.
+    s2_eyebrow: 2단계 · 응답자
+    s2_lead: 구체적으로 적어주세요.
+    s2_body: 라이프스타일, 역할, 지역, 언어 — 이 그룹의 사고방식에 영향을 주는 모든 것. 구체적일수록 더 좋은 질문을 작성할 수 있습니다.
+    s2_examples:
+    - 케냐의 18–24세 대학생
+    - 35–55세 현장 지역사회 보건 인력
+    - NSW 시골 지역의 학령기 자녀를 둔 부모
+    s2_title: 누가 응답하나요 — 그리고 그들의 나이는요?
+    s2_placeholder: '예: 케냐의 18–24세 대학생'
+    s2_hint_body: 라이프스타일, 역할, 지역, 언어 — 이 그룹의 사고방식에 영향을 주는 모든 것.
+    s3_eyebrow: 3단계 · 학습 목표
+    s3_lead: 의사결정을 바꿀 인사이트.
+    s3_body: 이미 알고 있는 것은 건너뛰세요. 알게 되면 다음 행동을 바꿀 단 한 가지를 목표로 하세요.
+    s3_examples:
+    - 왜 자원봉사자들이 3개월 후에 그만두나요?
+    - 사람들이 푸드뱅크 이용을 가로막는 요인은 무엇인가요?
+    - 우리의 청소년 프로그램이 정말로 자신감을 변화시키나요 — 그리고 정확히 어디서요?
+    s3_title: 그들로부터 무엇을 배우고 싶으신가요?
+    s3_placeholder: '예: 왜 자원봉사자들이 3개월 후에 그만두나요?'
+    s3_hint_body: 이미 알고 있는 것은 건너뛰세요 — 다음 행동을 바꿀 단 한 가지를 목표로 하세요.
+    s4_eyebrow: 4단계 · 언어
+    s4_lead: 모두에게 그들의 언어로 다가가세요.
+    s4_body: 주 언어로 Verto를 작성한 다음, 다른 각 언어로 동등한 품질의 버전을 만듭니다. 모든 버전이 같은 질문을 하므로 결과가 일관됩니다.
+    s4_title: 이 Verto는 어떤 언어로 말해야 하나요?
+    s4_primary_label: 주 언어
+    s5_eyebrow: 5단계 · 브랜드 색상
+    s5_lead: 당신만의 느낌으로.
+    s5_body: Verto를 사용하는 모든 사람에게 보이는 모습입니다. 편집기에서 언제든 미세 조정할 수 있습니다.
+    s5_live_preview: 실시간 미리보기
+    s5_quick_poll: 빠른 설문
+    s5_mock_q: 느낌이 어떠신가요?
+    s5_mock_opt: 마음에 들어요
+    s5_title: 브랜드 색상을 선택하세요.
+    s5_sub: 세 가지를 골라 주세요. 이 Verto 경험 전반에 적용됩니다.
+    brand_primary: 기본
+    brand_primary_desc: 제목 및 강조
+    brand_cta: 버튼 (CTA)
+    brand_cta_desc: 다음 / 제출 버튼
+    brand_bg: 배경
+    brand_bg_desc: 카드 뒤의 캔버스
+    s6_eyebrow: 6단계 · 맥락
+    optional: 선택
+    s6_lead: 추가로 반영할 사항이 있나요?
+    s6_body: 톤, 꼭 물어야 할 것, 피해야 할 것, 청중의 특성. 추가 사항이 없다면 건너뛰세요.
+    s6_examples:
+    - 펀딩 경로와 보조금 장벽에 대한 질문을 반드시 포함해 주세요.
+    - 전문 용어 사용 자제 — 많은 응답자가 영어를 제2언어로 사용합니다.
+    - 기업적이지 않고 따뜻한 톤을 유지하세요.
+    s6_title: 또 알아야 할 것이 있나요?
+    s6_placeholder: '예: 청중이 Playverto를 처음 사용함, 기업적이지 않고 따뜻한 톤 유지.'
+    s6_compare_label: 응답자가 자신의 답변을 비교할 수 있도록 허용
+    s6_compare_desc: 감사 페이지에 자신의 답변이 다른 사람들과 어떻게 비교되는지 보여주는 CTA를 표시합니다.
+    back: "← 뒤로"
+    next: 다음 →
+    generate: Verto 생성 →
+    generating: 생성 중…
+    step_counter: "%{total}단계 중 %{n}단계"

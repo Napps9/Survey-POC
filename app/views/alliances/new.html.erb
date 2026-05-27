@@ -1,4 +1,4 @@
-<% content_for :title, "New alliance — Playverto" %>
+<% content_for :title, t("alliances.new_title") %>
 <% content_for :head do %>
   <style>body { overflow: auto !important; height: auto !important; }</style>
 <% end %>
@@ -9,11 +9,11 @@
     <div style="text-align:center;margin-bottom:32px;">
       <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;">
         <span style="width:8px;height:8px;border-radius:50%;background:#FF1E6F;box-shadow:0 0 12px rgba(255,30,111,0.7);"></span>
-        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;">New alliance</span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("alliances.new_eyebrow") %></span>
       </div>
-      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#fff;margin:0 0 6px;">Name your alliance</h1>
+      <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#fff;margin:0 0 6px;"><%= t("alliances.new_heading") %></h1>
       <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.45);margin:0;">
-        Give the group a clear name so partners know what they're joining.
+        <%= t("alliances.new_sub") %>
       </p>
     </div>
 
@@ -23,17 +23,17 @@
 
     <%= form_with model: @alliance, url: alliances_path, local: true do |f| %>
       <div style="margin-bottom:24px;">
-        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Alliance name</label>
+        <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("alliances.name_label") %></label>
         <%= f.text_field :name,
               required: true, autofocus: true, maxlength: 80,
-              placeholder: "e.g. Pilot Partners",
+              placeholder: t("alliances.name_placeholder"),
               class: "form-input" %>
       </div>
 
       <div style="display:flex;gap:10px;">
-        <%= link_to "Cancel", alliances_path,
+        <%= link_to t("alliances.cancel"), alliances_path,
               style: "flex:0 0 auto;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 22px;color:rgba(255,255,255,0.7);font-family:'Alata',sans-serif;font-size: var(--text-md);text-decoration:none;text-align:center;" %>
-        <%= f.submit "Create alliance →",
+        <%= f.submit t("alliances.create_submit"),
               style: "flex:1;background:#FF1E6F;border:none;border-radius:8px;padding:14px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.05em;cursor:pointer;" %>
       </div>
     <% end %>

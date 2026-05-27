@@ -97,6 +97,141 @@ fr:
     create: Créer
     members: Membres
     sign_out: Se déconnecter
+  alliances:
+    title: Alliances — Playverto
+    index_eyebrow: Vos alliances
+    index_heading: Alliances
+    index_subtitle: Regroupez vos organisations partenaires dans des alliances nommées. Ajoutez des Vertos et chaque partenaire reçoit son propre lien de partage.
+    new_button: "+ Nouvelle alliance"
+    owned_section: Alliances que vous gérez
+    owned_empty_title: Aucune alliance pour le moment
+    owned_empty_admin_html: Cliquez sur <span style="color:#FF1E6F;">+ Nouvelle alliance</span> ci-dessus pour créer un groupe, puis invitez des organisations partenaires et ajoutez des Vertos.
+    owned_empty_member: Demandez à votre administrateur de créer une alliance.
+    started_on: Démarrée le %{date}
+    partners_count:
+      one: partenaire
+      other: partenaires
+    vertos_count:
+      one: verto
+      other: vertos
+    open: Ouvrir →
+    member_section: Alliances dont vous êtes membre
+    member_empty_title: Vous n'avez été invité à aucune alliance
+    member_empty_body: Lorsqu'une autre organisation vous invitera à l'une de ses alliances, elle apparaîtra ici.
+    member_run_by: Gérée par %{org}
+    status:
+      active: Active
+      pending: En attente
+      revoked: Révoquée
+    new_title: Nouvelle alliance — Playverto
+    new_eyebrow: Nouvelle alliance
+    new_heading: Nommez votre alliance
+    new_sub: Donnez au groupe un nom clair pour que les partenaires sachent ce qu'ils rejoignent.
+    name_label: Nom de l'alliance
+    name_placeholder: ex. Partenaires pilotes
+    cancel: Annuler
+    create_submit: Créer l'alliance →
+    show_title: "%{name} — Alliances"
+    back_to_all: Toutes les alliances
+    creator_eyebrow: Alliance · Vous la gérez
+    partner_eyebrow: Alliance · Membre
+    generate_link: Générer un lien d'invitation →
+    delete: Supprimer
+    delete_confirm: Supprimer %{name} ? Tous les liens de partage de cette alliance cesseront de fonctionner.
+    new_link_heading: Nouveau lien d'invitation
+    new_link_body: Toute personne disposant de ce lien peut rejoindre %{alliance} en tant que partenaire. Expire dans 14 jours.
+    copy: Copier
+    copied: Copié !
+    partners_section: Partenaires
+    no_partners_title: Aucun partenaire pour le moment
+    no_partners_body_html: Utilisez <span style="color:#FF1E6F;">Générer un lien d'invitation</span> ci-dessus pour inviter des organisations partenaires.
+    joined_on: Rejoint le %{date}
+    remove_member_confirm: Retirer %{org} de %{alliance} ? Leurs liens de partage cesseront de fonctionner.
+    vertos_section: Vertos dans l'alliance
+    no_vertos_title: Aucun Verto partagé pour le moment
+    no_vertos_body: Ajoutez un Verto publié ci-dessous et un lien de partage unique sera généré pour chaque partenaire.
+    remove: Retirer
+    remove_verto_confirm: Retirer ce Verto de %{alliance} ? Tous les liens de partage partenaires associés cesseront de fonctionner.
+    completion_label: complétion
+    responses:
+      one: réponse
+      other: réponses
+    partner_links_count:
+      one: lien partenaire
+      other: liens partenaires
+    no_shares_yet: Ajoutez un partenaire à l'alliance pour générer des liens de partage.
+    responses_short: "%{n} rép."
+    add_section: Ajouter à l'alliance
+    add_heading: Ajouter un autre Verto
+    add_body: Choisissez un Verto publié. Nous générerons un lien de partage unique pour chaque partenaire de l'alliance.
+    no_more_vertos: Aucun autre Verto publié à ajouter.
+    create_new_verto: Créer un nouveau Verto →
+    add_submit: Ajouter le Verto →
+    partners_in_alliance: Partenaires de l'alliance
+    including_you: Vous inclus
+    shared_vertos_short: Vertos partagés
+    available_to_distribute: Disponible pour distribution
+    other_partners: Autres partenaires
+    only_partner: Vous êtes pour l'instant le seul partenaire de cette alliance.
+    your_vertos_section: Vertos partagés avec vous
+    partner_no_vertos_title: Aucun Verto pour le moment
+    partner_no_vertos_body: Lorsque %{org} ajoutera un Verto à cette alliance, vous verrez votre lien de partage unique ici.
+    from_org: De %{org}
+    your_link: Votre lien
+    results_link: Résultats →
+  alliance_verto:
+    title: "%{title} — Verto partagé"
+    from_org_alliance: De %{org} · %{alliance}
+    share_link: Lien de partage
+    mine_label: depuis votre lien
+    aggregate_label: dans l'ensemble de %{alliance}
+    card_n: Carte %{n}
+    my_results: Mes résultats
+    aggregate: Global
+    comparison: Comparaison
+    comparison_sub: vous vs tous
+    no_data: Aucune donnée
+    n_answered: "%{n} réponses"
+    avg: moy. %{n}
+  invites:
+    title: Accepter l'invitation — Playverto
+    already_used_title: Invitation déjà utilisée
+    already_used_body_html: Ce lien d'invitation a déjà été accepté. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Se connecter</a>
+    expired_title: Invitation expirée
+    expired_body: Ce lien a plus de 7 jours. Demandez à votre administrateur d'en envoyer un nouveau.
+    invited_to_join: Vous avez été invité à rejoindre
+    alliance_by: une alliance de %{org}
+    as_role: en tant que %{role}
+    addressed_for: "· pour %{email}"
+    signed_in_as: Connecté en tant que %{name}
+    join_with: Rejoindre avec
+    pick_org: Choisissez quelle organisation rejoint
+    join_submit: Rejoindre %{alliance} →
+    already_in_alliance: 'Déjà dans cette alliance : %{orgs}'
+    you_run_this: Vous gérez cette alliance — accédez-y plutôt.
+    already_member_singular: "%{orgs} fait déjà partie de cette alliance."
+    already_member_plural: "%{orgs} font déjà partie de cette alliance."
+    no_admin_org: Vous n'avez pas d'organisation administrée pouvant rejoindre cette alliance.
+    open_alliance: Ouvrir %{alliance} →
+    sign_out_link: Se déconnecter et utiliser un autre compte
+    sign_out_confirm: Se déconnecter du compte actuel ?
+    already_have_account: Vous avez déjà un compte Playverto ?
+    sign_in_instead: Se connecter à la place
+    new_to_playverto: Nouveau sur Playverto ?
+    create_new_account: Créer un nouveau compte
+    sign_in_email_label: E-mail
+    sign_in_email_placeholder: vous@exemple.com
+    sign_in_password_label: Mot de passe
+    sign_in_password_placeholder: Votre mot de passe Playverto
+    sign_in_submit: Se connecter pour rejoindre →
+    your_name_label: Votre nom
+    your_name_placeholder: Jeanne Dupont
+    your_org_name_label: Nom de votre organisation
+    your_org_name_placeholder: Acme Partenaires
+    password_label: Mot de passe
+    password_placeholder: Au moins 12 caractères
+    confirm_password_label: Confirmer le mot de passe
+    accept_submit: Accepter l'invitation →
   editor:
     questions: questions
     primary: principale

@@ -1,0 +1,394 @@
+---
+nl:
+  locale_switcher:
+    label: Taal wijzigen
+    heading: Taal
+  layout:
+    studio_tagline: Verto Studio
+  card:
+    'yes': Ja
+    'no': Nee
+    add_option: Optie toevoegen
+    add_statement: Stelling toevoegen
+    swipe_no: "← Nee"
+    swipe_hint: sleep de kaart om te antwoorden
+    swipe_yes: Ja →
+    reset: Resetten
+    answer_placeholder: Typ je antwoord…
+    characters: Tekens
+    allow_other: Sta een vrij tekstantwoord “Anders” toe
+    other: Anders
+    other_placeholder: Vertel het in je eigen woorden…
+  auth:
+    show: Tonen
+    email: E-mailadres
+    password: Wachtwoord
+    password_hint: Minimaal 12 tekens
+    title_sign_in: Inloggen — Playverto
+    sign_in_title: Inloggen bij Playverto
+    sign_in_new_here: Nieuw hier?
+    sign_in_create: Account aanmaken
+    forgot_password: Wachtwoord vergeten?
+    sign_in_submit: Inloggen →
+    title_signup: Account aanmaken — Playverto
+    signup_title: Maak je account aan
+    signup_have_one: Heb je er al een?
+    signup_sign_in: Inloggen
+    name: Je naam
+    org_name: Naam organisatie
+    confirm_password: Bevestig wachtwoord
+    signup_submit: Account aanmaken →
+    title_reset: Wachtwoord opnieuw instellen — Playverto
+    forgot_title: Wachtwoord vergeten?
+    forgot_sub: Voer je e-mailadres in en we sturen je een resetlink.
+    forgot_submit: Resetinstructies e-mailen
+    back_to_sign_in: "← Terug naar inloggen"
+    title_set: Nieuw wachtwoord instellen — Playverto
+    set_title: Stel een nieuw wachtwoord in
+    set_sub: Kies iets dat alleen jij zou raden.
+    new_password: Nieuw wachtwoord
+    confirm_new_password: Bevestig nieuw wachtwoord
+    repeat_new_password: Herhaal nieuw wachtwoord
+    set_submit: Nieuw wachtwoord opslaan
+  results:
+    title: Resultaten
+    editor: "← Editor"
+    ask_verto: Vraag het Verto
+    analysing: Antwoorden analyseren…
+  player:
+    thank_you_title: Bedankt!
+    thank_you_sub: Je antwoorden zijn vastgelegd.
+    compare_cta: Bekijk je resultaten ten opzichte van anderen →
+    powered_by: Mogelijk gemaakt door
+    comparison_title: Jouw antwoorden vs iedereen
+    back: "← Terug"
+    next: Volgende →
+    submit: Verzenden ✓
+  js:
+    player:
+      progress: Kaart %{n} van %{total}
+      queued: Opgeslagen — wordt gesynchroniseerd zodra je weer online bent
+      compare_cta: Bekijk je resultaten ten opzichte van anderen →
+      compare_loading: Laden…
+      compare_error: Kon niet laden — probeer opnieuw
+    editor:
+      delete_card_confirm: Deze kaart verwijderen?
+      unsaved: Niet-opgeslagen wijzigingen
+      saving: Opslaan…
+      saved: Opgeslagen %{time}
+      save_failed: 'Opslaan mislukt: %{msg}'
+      card_n: Kaart %{n} · %{type}
+      choose_format: Kies hieronder een antwoordformaat.
+      type_updated: Antwoordtype bijgewerkt naar %{type}
+      current: Huidig
+      off_brief: Buiten de briefing
+      cards_count: "%{n} kaarten"
+      fit_best: Beste match
+      fit_strong: Sterk alternatief
+      fit_solid: Solide alternatief
+      fit_workable: Werkbaar
+      fit_sparingly: Spaarzaam gebruiken
+    wizard:
+      step_counter: Stap %{n} van %{total}
+  nav:
+    partners: Partners
+    shared_vertos: Gedeelde Vertos
+    my_vertos: Mijn Vertos
+    create: Aanmaken
+    members: Leden
+    sign_out: Uitloggen
+  alliances:
+    title: Allianties — Playverto
+    index_eyebrow: Jouw allianties
+    index_heading: Allianties
+    index_subtitle: Groepeer partnerorganisaties in benoemde allianties. Voeg Vertos toe en elke partner krijgt een eigen deellink.
+    new_button: "+ Nieuwe alliantie"
+    owned_section: Allianties die jij beheert
+    owned_empty_title: Nog geen allianties
+    owned_empty_admin_html: Klik hierboven op <span style="color:#FF1E6F;">+ Nieuwe alliantie</span> om een groep te starten, nodig vervolgens partnerorganisaties uit en voeg Vertos toe.
+    owned_empty_member: Vraag je beheerder om een alliantie aan te maken.
+    started_on: Gestart %{date}
+    partners_count:
+      one: partner
+      other: partners
+    vertos_count:
+      one: verto
+      other: vertos
+    open: Openen →
+    member_section: Allianties waarvan je lid bent
+    member_empty_title: Je bent niet uitgenodigd voor allianties
+    member_empty_body: Als een andere organisatie je uitnodigt voor een van hun allianties, verschijnt dat hier.
+    member_run_by: Beheerd door %{org}
+    status:
+      active: Actief
+      pending: In afwachting
+      revoked: Ingetrokken
+    new_title: Nieuwe alliantie — Playverto
+    new_eyebrow: Nieuwe alliantie
+    new_heading: Geef je alliantie een naam
+    new_sub: Geef de groep een duidelijke naam zodat partners weten waaraan ze deelnemen.
+    name_label: Naam alliantie
+    name_placeholder: bijv. Pilot Partners
+    cancel: Annuleren
+    create_submit: Alliantie aanmaken →
+    show_title: "%{name} — Allianties"
+    back_to_all: Alle allianties
+    creator_eyebrow: Alliantie · Jij beheert deze
+    partner_eyebrow: Alliantie · Lid
+    generate_link: Deelnamelink genereren →
+    delete: Verwijderen
+    delete_confirm: "%{name} verwijderen? Alle deellinks voor deze alliantie zullen niet meer werken."
+    new_link_heading: Nieuwe deelnamelink
+    new_link_body: Iedereen met deze link kan zich aansluiten bij %{alliance} als partner. Verloopt over 14 dagen.
+    copy: Kopiëren
+    copied: Gekopieerd!
+    partners_section: Partners
+    no_partners_title: Nog geen partners
+    no_partners_body_html: Gebruik hierboven <span style="color:#FF1E6F;">Deelnamelink genereren</span> om partnerorganisaties uit te nodigen.
+    joined_on: Aangesloten op %{date}
+    remove_member_confirm: "%{org} verwijderen uit %{alliance}? Hun deellinks zullen niet meer werken."
+    vertos_section: Vertos in alliantie
+    no_vertos_title: Nog geen Vertos gedeeld
+    no_vertos_body: Voeg hieronder een gepubliceerde Verto toe; voor elke partner wordt een unieke deellink gegenereerd.
+    remove: Verwijderen
+    remove_verto_confirm: Deze Verto verwijderen uit %{alliance}? Alle bijbehorende deellinks van partners zullen niet meer werken.
+    completion_label: voltooiing
+    responses:
+      one: reactie
+      other: reacties
+    partner_links_count:
+      one: partnerlink
+      other: partnerlinks
+    no_shares_yet: Voeg een partner toe aan de alliantie om deellinks te genereren.
+    responses_short: "%{n} react."
+    add_section: Toevoegen aan alliantie
+    add_heading: Nog een Verto toevoegen
+    add_body: Kies een gepubliceerde Verto. We genereren een unieke deellink voor elke partner in de alliantie.
+    no_more_vertos: Geen gepubliceerde Vertos meer om toe te voegen.
+    create_new_verto: Nieuwe Verto aanmaken →
+    add_submit: Verto toevoegen →
+    partners_in_alliance: Partners in alliantie
+    including_you: Jij inbegrepen
+    shared_vertos_short: Gedeelde Vertos
+    available_to_distribute: Beschikbaar om te verspreiden
+    other_partners: Andere partners
+    only_partner: Je bent voorlopig de enige partner in deze alliantie.
+    your_vertos_section: Vertos die met jou zijn gedeeld
+    partner_no_vertos_title: Nog geen Vertos
+    partner_no_vertos_body: Wanneer %{org} een Verto toevoegt aan deze alliantie, zie je hier je unieke deellink.
+    from_org: Van %{org}
+    your_link: Jouw link
+    results_link: Resultaten →
+  alliance_verto:
+    title: "%{title} — Gedeelde Verto"
+    from_org_alliance: Van %{org} · %{alliance}
+    share_link: Deellink
+    mine_label: via jouw link
+    aggregate_label: over heel %{alliance}
+    card_n: Kaart %{n}
+    my_results: Mijn resultaten
+    aggregate: Totaal
+    comparison: Vergelijking
+    comparison_sub: jij vs iedereen
+    no_data: Geen gegevens
+    n_answered: "%{n} beantwoord"
+    avg: gem. %{n}
+  invites:
+    title: Uitnodiging accepteren — Playverto
+    already_used_title: Uitnodiging al gebruikt
+    already_used_body_html: Deze uitnodigingslink is al geaccepteerd. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Inloggen</a>
+    expired_title: Uitnodiging verlopen
+    expired_body: Deze link is ouder dan 7 dagen. Vraag je beheerder om een nieuwe te sturen.
+    invited_to_join: Je bent uitgenodigd om deel te nemen aan
+    alliance_by: een alliantie van %{org}
+    as_role: als %{role}
+    addressed_for: "· voor %{email}"
+    signed_in_as: Ingelogd als %{name}
+    join_with: Deelnemen met
+    pick_org: Kies welke organisatie deelneemt
+    join_submit: Deelnemen aan %{alliance} →
+    already_in_alliance: 'Al in deze alliantie: %{orgs}'
+    you_run_this: Jij beheert deze alliantie — bezoek hem in plaats daarvan.
+    already_member_singular: "%{orgs} zit al in deze alliantie."
+    already_member_plural: "%{orgs} zitten al in deze alliantie."
+    no_admin_org: Je hebt geen beheerorganisatie die zich bij deze alliantie kan aansluiten.
+    open_alliance: "%{alliance} openen →"
+    sign_out_link: Uitloggen en een ander account gebruiken
+    sign_out_confirm: Uitloggen bij je huidige account?
+    already_have_account: Heb je al een Playverto-account?
+    sign_in_instead: Log in plaats daarvan in
+    new_to_playverto: Nieuw bij Playverto?
+    create_new_account: Maak een nieuw account aan
+    sign_in_email_label: E-mail
+    sign_in_email_placeholder: jij@voorbeeld.nl
+    sign_in_password_label: Wachtwoord
+    sign_in_password_placeholder: Je Playverto-wachtwoord
+    sign_in_submit: Inloggen om deel te nemen →
+    your_name_label: Je naam
+    your_name_placeholder: Jan Janssen
+    your_org_name_label: Naam van je organisatie
+    your_org_name_placeholder: Acme Partners
+    password_label: Wachtwoord
+    password_placeholder: Minimaal 12 tekens
+    confirm_password_label: Bevestig wachtwoord
+    accept_submit: Uitnodiging accepteren →
+  editor:
+    questions: vragen
+    primary: primair
+    change_media: Media wijzigen
+    change_media_title: De afbeelding van deze kaart wijzigen
+    add_design: Ontwerp toevoegen
+    add_design_title: Een afbeelding aan deze kaart toevoegen
+    add_design_sub: Voeg een afbeelding toe om deze kaart tot leven te brengen
+    live: LIVE
+    live_warning: Het bewerken van vragen terwijl deze Verto reacties verzamelt, heeft invloed op de datakwaliteit. Antwoorden van vóór en na de bewerking zijn niet rechtstreeks vergelijkbaar.
+    got_it: Begrepen
+    add_question: Vraag toevoegen
+    cards:
+      one: "%{count} kaart"
+      other: "%{count} kaarten"
+    estimated:
+      one: Geschat ~%{count} min
+      other: Geschat ~%{count} min
+    design: Ontwerp
+    publish_share: Publiceren & delen →
+    answer_type: Antwoordtype
+    select_card: Selecteer een kaart om het type te wijzigen
+    click_any: Klik op een kaart links.
+    select_card_long: Selecteer een vraagkaart om het antwoordformaat te wijzigen
+    apply_to_card: Toepassen op deze kaart
+    see_all_types: Bekijk alle vraagtypen
+    all_types: Alle vraagtypen
+    ranked_for: Gerangschikt op geschiktheid voor
+    this_card: deze kaart
+  dashboard_card:
+    badge_archived: Gearchiveerd
+    badge_live: Live
+    badge_draft: Concept
+    fallback_name: deze Verto
+    deleted_on: Verwijderd %{date}
+    untitled: Naamloos
+    completion: voltooiing
+    responders:
+      one: respondent
+      other: respondenten
+    responses:
+      one: reactie
+      other: reacties
+    questions:
+      one: vraag
+      other: vragen
+    view_results: Resultaten bekijken →
+    edit: Verto bewerken
+    results: Resultaten →
+    publish: Publiceren →
+    delete: Verwijderen
+    edit_warning: "“%{title}” is live. Het bewerken van vragen terwijl er reacties worden verzameld, heeft invloed op de datakwaliteit — antwoorden van vóór en na de bewerking zijn niet rechtstreeks vergelijkbaar. Doorgaan?"
+    delete_warning: "“%{title}” verwijderen? Een verwijderde Verto kun je niet terughalen. De link voor respondenten werkt niet meer — bestaande resultaten blijven in je Archief staan."
+  dashboard:
+    welcome_back: Welkom terug
+    heading_html: Jouw <span style="color:#01EACB;">Vertos</span>
+    subtitle: Start Vertos op, deel ze met je alliantie en zie de inzichten binnenstromen.
+    create_new: Een nieuwe Verto aanmaken
+    stat_live: Live
+    stat_drafts: Concepten
+    stat_responses: Reacties
+    stat_completion: Voltooiing
+    empty_title: Nog geen Vertos
+    empty_body: Maak je eerste Verto en begin met het verzamelen van inzichten uit je publiek.
+    empty_cta: Maak je eerste Verto →
+    section_live: Live
+    section_drafts: Concepten
+    section_archived: Gearchiveerd
+  wizard:
+    create_verto: Verto aanmaken
+    building: Je Verto wordt opgebouwd
+    pill_audience: Doelgroep
+    pill_tone: Toon
+    pill_tone_value: Conversationeel
+    pill_cards: Kaarten
+    gen_brief_read: Briefing lezen
+    gen_writing: Vragen schrijven
+    gen_formats: Formaten kiezen
+    gen_design: Ontwerp toepassen
+    welcome_eyebrow: Wat komt er
+    welcome_lead: Een paar snelle stappen en we maken een concept van je Verto.
+    welcome_steps:
+    - Over je Verto
+    - Wie er antwoordt
+    - Wat je wilt leren
+    - Talen
+    - Merkkleuren
+    - Context (optioneel)
+    welcome_badge: Nieuwe Verto
+    welcome_title: Laten we je Verto bouwen.
+    welcome_sub: We zetten je briefing om in een Verto die de Playverto-regels volgt.
+    welcome_ready_html: Druk op <strong style="color:rgba(0,0,0,0.6);">Volgende</strong> wanneer je klaar bent.
+    examples: Voorbeelden
+    s1_eyebrow: Stap 01 · Over je Verto
+    s1_lead: Het enige overkoepelende onderwerp.
+    s1_body: Houd het breed — je verfijnt de invalshoek in de volgende stappen. Eén of twee woorden is meestal genoeg.
+    s1_examples:
+    - Klimaatactie
+    - Onderwijs voor vluchtelingen
+    - Voedselzekerheid
+    s1_title: Waar gaat je Verto over?
+    s1_placeholder: bijv. Welzijn van jongeren
+    s1_hint_body: Houd het breed — je verfijnt de invalshoek in de volgende stappen.
+    s2_eyebrow: Stap 02 · Wie er antwoordt
+    s2_lead: Wees specifiek.
+    s2_body: Levensstijl, functie, regio, taal — alles wat invloed heeft op hoe deze groep denkt. Hoe concreter, hoe beter de vragen die we kunnen schrijven.
+    s2_examples:
+    - 18–24 jaar, universiteitsstudenten in Kenia
+    - 35–55 jaar, eerstelijns gezondheidsmedewerkers
+    - Ouders van schoolgaande kinderen op het platteland van NSW
+    s2_title: Wie antwoordt er — en welke leeftijd hebben ze?
+    s2_placeholder: bijv. 18–24 jaar, universiteitsstudenten in Kenia
+    s2_hint_body: Levensstijl, functie, regio, taal — alles wat invloed heeft op hoe deze groep denkt.
+    s3_eyebrow: Stap 03 · Het leerdoel
+    s3_lead: Het inzicht dat een beslissing zou veranderen.
+    s3_body: Sla over wat je al weet. Mik op het ene ding dat, als je het zou leren, je vervolgstappen zou veranderen.
+    s3_examples:
+    - Waarom haken vrijwilligers af na maand drie?
+    - Wat weerhoudt mensen ervan onze voedselbank te gebruiken?
+    - Vergroot ons jongerenprogramma echt het zelfvertrouwen — en waar precies?
+    s3_title: Wat wil je van hen leren?
+    s3_placeholder: bijv. Waarom haken vrijwilligers af na maand drie?
+    s3_hint_body: Sla over wat je al weet — mik op het ene ding dat je vervolgstappen zou veranderen.
+    s4_eyebrow: Stap 04 · Talen
+    s4_lead: Bereik iedereen in zijn eigen taal.
+    s4_body: We schrijven de Verto in je primaire taal en maken vervolgens een even goede versie in elke andere taal. Elke versie stelt dezelfde vragen, zodat resultaten vergelijkbaar blijven.
+    s4_title: Welke talen moet deze Verto spreken?
+    s4_primary_label: Primaire taal
+    s5_eyebrow: Stap 05 · Merkkleuren
+    s5_lead: Maak het echt van jou.
+    s5_body: Zo ziet je Verto eruit voor iedereen die hem speelt. Je kunt het op elk moment in de editor bijstellen.
+    s5_live_preview: Live voorbeeld
+    s5_quick_poll: Snelle peiling
+    s5_mock_q: Hoe vind je het?
+    s5_mock_opt: Geweldig
+    s5_title: Kies je merkkleuren.
+    s5_sub: Kies er drie. Ze worden toegepast op de hele Verto-ervaring.
+    brand_primary: Primair
+    brand_primary_desc: Koppen & accenten
+    brand_cta: Knoppen (CTA)
+    brand_cta_desc: Volgende-/Verzenden-knoppen
+    brand_bg: Achtergrond
+    brand_bg_desc: Het canvas achter de kaarten
+    s6_eyebrow: Stap 06 · Context
+    optional: Optioneel
+    s6_lead: Nog iets dat we moeten meenemen?
+    s6_body: Toon, must-asks, dingen om te vermijden, eigenaardigheden van het publiek. Sla over als er niets extra's is.
+    s6_examples:
+    - Moet een vraag bevatten over financieringsroutes en obstakels voor subsidies.
+    - Vermijd jargon — veel respondenten spreken Engels als tweede taal.
+    - Houd de toon warm, niet zakelijk.
+    s6_title: Is er nog iets dat we moeten weten?
+    s6_placeholder: bijv. Het publiek heeft Playverto nog nooit gebruikt; houd de toon warm, niet zakelijk.
+    s6_compare_label: Laat respondenten hun antwoorden vergelijken
+    s6_compare_desc: Toon een CTA op de bedankpagina die laat zien hoe hun antwoorden zich verhouden tot die van anderen.
+    back: "← Terug"
+    next: Volgende →
+    generate: Verto genereren →
+    generating: Bezig met genereren…
+    step_counter: Stap %{n} van %{total}

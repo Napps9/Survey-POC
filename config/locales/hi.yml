@@ -1,258 +1,394 @@
+---
 hi:
   locale_switcher:
-    label: "भाषा बदलें"
-    heading: "भाषा"
+    label: भाषा बदलें
+    heading: भाषा
   layout:
-    studio_tagline: "Verto Studio"
+    studio_tagline: Verto Studio
   card:
-    "yes": "हाँ"
-    "no": "नहीं"
-    add_option: "विकल्प जोड़ें"
-    add_statement: "कथन जोड़ें"
+    'yes': हाँ
+    'no': नहीं
+    add_option: विकल्प जोड़ें
+    add_statement: कथन जोड़ें
     swipe_no: "← नहीं"
-    swipe_hint: "उत्तर देने के लिए कार्ड खींचें"
-    swipe_yes: "हाँ →"
-    reset: "रीसेट करें"
-    answer_placeholder: "उत्तर लिखें…"
-    characters: "वर्ण"
+    swipe_hint: उत्तर देने के लिए कार्ड खींचें
+    swipe_yes: हाँ →
+    reset: रीसेट करें
+    answer_placeholder: उत्तर लिखें…
+    characters: वर्ण
     allow_other: "“अन्य” मुक्त-पाठ उत्तर की अनुमति दें"
-    other: "अन्य"
-    other_placeholder: "अपने शब्दों में बताएं…"
+    other: अन्य
+    other_placeholder: अपने शब्दों में बताएं…
   auth:
-    show: "दिखाएं"
-    email: "ईमेल पता"
-    password: "पासवर्ड"
-    password_hint: "कम से कम 12 वर्ण"
-    title_sign_in: "साइन इन — Playverto"
-    sign_in_title: "Playverto में साइन इन करें"
-    sign_in_new_here: "यहां नए हैं?"
-    sign_in_create: "खाता बनाएं"
-    forgot_password: "पासवर्ड भूल गए?"
-    sign_in_submit: "साइन इन करें →"
-    title_signup: "खाता बनाएं — Playverto"
-    signup_title: "अपना खाता बनाएं"
-    signup_have_one: "पहले से खाता है?"
-    signup_sign_in: "साइन इन करें"
-    name: "आपका नाम"
-    org_name: "संगठन का नाम"
-    confirm_password: "पासवर्ड की पुष्टि करें"
-    signup_submit: "खाता बनाएं →"
-    title_reset: "पासवर्ड रीसेट करें — Playverto"
-    forgot_title: "अपना पासवर्ड भूल गए?"
-    forgot_sub: "अपना ईमेल दर्ज करें और हम एक रीसेट लिंक भेजेंगे।"
-    forgot_submit: "रीसेट निर्देश ईमेल करें"
+    show: दिखाएं
+    email: ईमेल पता
+    password: पासवर्ड
+    password_hint: कम से कम 12 वर्ण
+    title_sign_in: साइन इन — Playverto
+    sign_in_title: Playverto में साइन इन करें
+    sign_in_new_here: यहां नए हैं?
+    sign_in_create: खाता बनाएं
+    forgot_password: पासवर्ड भूल गए?
+    sign_in_submit: साइन इन करें →
+    title_signup: खाता बनाएं — Playverto
+    signup_title: अपना खाता बनाएं
+    signup_have_one: पहले से खाता है?
+    signup_sign_in: साइन इन करें
+    name: आपका नाम
+    org_name: संगठन का नाम
+    confirm_password: पासवर्ड की पुष्टि करें
+    signup_submit: खाता बनाएं →
+    title_reset: पासवर्ड रीसेट करें — Playverto
+    forgot_title: अपना पासवर्ड भूल गए?
+    forgot_sub: अपना ईमेल दर्ज करें और हम एक रीसेट लिंक भेजेंगे।
+    forgot_submit: रीसेट निर्देश ईमेल करें
     back_to_sign_in: "← साइन इन पर वापस जाएं"
-    title_set: "नया पासवर्ड सेट करें — Playverto"
-    set_title: "एक नया पासवर्ड सेट करें"
-    set_sub: "कुछ ऐसा चुनें जिसका अनुमान केवल आप ही लगा सकें।"
-    new_password: "नया पासवर्ड"
-    confirm_new_password: "नए पासवर्ड की पुष्टि करें"
-    repeat_new_password: "नया पासवर्ड दोहराएं"
-    set_submit: "नया पासवर्ड सहेजें"
+    title_set: नया पासवर्ड सेट करें — Playverto
+    set_title: एक नया पासवर्ड सेट करें
+    set_sub: कुछ ऐसा चुनें जिसका अनुमान केवल आप ही लगा सकें।
+    new_password: नया पासवर्ड
+    confirm_new_password: नए पासवर्ड की पुष्टि करें
+    repeat_new_password: नया पासवर्ड दोहराएं
+    set_submit: नया पासवर्ड सहेजें
   results:
-    title: "परिणाम"
+    title: परिणाम
     editor: "← संपादक"
-    ask_verto: "Verto से पूछें"
-    analysing: "उत्तरों का विश्लेषण किया जा रहा है…"
+    ask_verto: Verto से पूछें
+    analysing: उत्तरों का विश्लेषण किया जा रहा है…
   player:
-    thank_you_title: "धन्यवाद!"
-    thank_you_sub: "आपके उत्तर दर्ज कर लिए गए हैं।"
-    compare_cta: "अपने परिणामों की दूसरों से तुलना देखें →"
-    powered_by: "द्वारा संचालित"
-    comparison_title: "आपके उत्तर बनाम सभी"
+    thank_you_title: धन्यवाद!
+    thank_you_sub: आपके उत्तर दर्ज कर लिए गए हैं।
+    compare_cta: अपने परिणामों की दूसरों से तुलना देखें →
+    powered_by: द्वारा संचालित
+    comparison_title: आपके उत्तर बनाम सभी
     back: "← वापस"
-    next: "आगे →"
-    submit: "जमा करें ✓"
+    next: आगे →
+    submit: जमा करें ✓
   js:
     player:
-      progress: "कार्ड %{n} / %{total}"
-      queued: "सहेजा गया — ऑनलाइन होने पर सिंक होगा"
-      compare_cta: "अपने परिणामों की दूसरों से तुलना देखें →"
-      compare_loading: "लोड हो रहा है…"
-      compare_error: "लोड नहीं हो सका — पुनः प्रयास करें"
+      progress: कार्ड %{n} / %{total}
+      queued: सहेजा गया — ऑनलाइन होने पर सिंक होगा
+      compare_cta: अपने परिणामों की दूसरों से तुलना देखें →
+      compare_loading: लोड हो रहा है…
+      compare_error: लोड नहीं हो सका — पुनः प्रयास करें
     editor:
-      delete_card_confirm: "इस कार्ड को हटाएं?"
-      unsaved: "असहेजे परिवर्तन"
-      saving: "सहेजा जा रहा है…"
+      delete_card_confirm: इस कार्ड को हटाएं?
+      unsaved: असहेजे परिवर्तन
+      saving: सहेजा जा रहा है…
       saved: "%{time} पर सहेजा गया"
-      save_failed: "सहेजना विफल: %{msg}"
-      card_n: "कार्ड %{n} · %{type}"
-      choose_format: "नीचे एक उत्तर प्रारूप चुनें।"
-      type_updated: "उत्तर प्रकार %{type} में बदला गया"
-      current: "वर्तमान"
-      off_brief: "ब्रीफ़ से बाहर"
+      save_failed: 'सहेजना विफल: %{msg}'
+      card_n: कार्ड %{n} · %{type}
+      choose_format: नीचे एक उत्तर प्रारूप चुनें।
+      type_updated: उत्तर प्रकार %{type} में बदला गया
+      current: वर्तमान
+      off_brief: ब्रीफ़ से बाहर
       cards_count: "%{n} कार्ड"
-      fit_best: "सर्वोत्तम मेल"
-      fit_strong: "मजबूत विकल्प"
-      fit_solid: "ठोस विकल्प"
-      fit_workable: "उपयोगी"
-      fit_sparingly: "कम उपयोग करें"
+      fit_best: सर्वोत्तम मेल
+      fit_strong: मजबूत विकल्प
+      fit_solid: ठोस विकल्प
+      fit_workable: उपयोगी
+      fit_sparingly: कम उपयोग करें
     wizard:
-      step_counter: "चरण %{n} / %{total}"
+      step_counter: चरण %{n} / %{total}
   nav:
-    partners: "साझेदार"
-    shared_vertos: "साझा किए गए Verto"
-    my_vertos: "मेरे Verto"
-    create: "बनाएं"
-    members: "सदस्य"
-    sign_out: "साइन आउट"
+    partners: साझेदार
+    shared_vertos: साझा किए गए Verto
+    my_vertos: मेरे Verto
+    create: बनाएं
+    members: सदस्य
+    sign_out: साइन आउट
+  alliances:
+    title: गठबंधन — Playverto
+    index_eyebrow: आपके गठबंधन
+    index_heading: गठबंधन
+    index_subtitle: साझेदार संगठनों को नामित गठबंधनों में समूहित करें। Vertos जोड़ें और प्रत्येक साझेदार को अपना खुद का शेयर लिंक मिलेगा।
+    new_button: "+ नया गठबंधन"
+    owned_section: आपके द्वारा चलाए जाने वाले गठबंधन
+    owned_empty_title: अभी तक कोई गठबंधन नहीं
+    owned_empty_admin_html: समूह शुरू करने के लिए ऊपर <span style="color:#FF1E6F;">+ नया गठबंधन</span> पर क्लिक करें, फिर साझेदार संगठनों को आमंत्रित करें और Vertos जोड़ें।
+    owned_empty_member: अपने एडमिन से गठबंधन बनाने के लिए कहें।
+    started_on: "%{date} को शुरू हुआ"
+    partners_count:
+      one: साझेदार
+      other: साझेदार
+    vertos_count:
+      one: verto
+      other: vertos
+    open: खोलें →
+    member_section: वे गठबंधन जिनके आप सदस्य हैं
+    member_empty_title: आपको किसी गठबंधन में आमंत्रित नहीं किया गया है
+    member_empty_body: जब कोई अन्य संगठन आपको अपने किसी गठबंधन में आमंत्रित करेगा, तो वह यहाँ दिखाई देगा।
+    member_run_by: "%{org} द्वारा संचालित"
+    status:
+      active: सक्रिय
+      pending: लंबित
+      revoked: रद्द किया गया
+    new_title: नया गठबंधन — Playverto
+    new_eyebrow: नया गठबंधन
+    new_heading: अपने गठबंधन को नाम दें
+    new_sub: समूह को एक स्पष्ट नाम दें ताकि साझेदारों को पता चले कि वे किसमें शामिल हो रहे हैं।
+    name_label: गठबंधन का नाम
+    name_placeholder: उदा. Pilot Partners
+    cancel: रद्द करें
+    create_submit: गठबंधन बनाएं →
+    show_title: "%{name} — गठबंधन"
+    back_to_all: सभी गठबंधन
+    creator_eyebrow: गठबंधन · आप इसे चलाते हैं
+    partner_eyebrow: गठबंधन · सदस्य
+    generate_link: जॉइन लिंक बनाएं →
+    delete: हटाएं
+    delete_confirm: "%{name} को हटाएं? इस गठबंधन के सभी शेयर लिंक काम करना बंद कर देंगे।"
+    new_link_heading: नया जॉइन लिंक
+    new_link_body: इस लिंक वाला कोई भी व्यक्ति %{alliance} में साझेदार के रूप में शामिल हो सकता है। 14 दिनों में समाप्त हो जाएगा।
+    copy: कॉपी करें
+    copied: कॉपी किया गया!
+    partners_section: साझेदार
+    no_partners_title: अभी तक कोई साझेदार नहीं
+    no_partners_body_html: साझेदार संगठनों को आमंत्रित करने के लिए ऊपर <span style="color:#FF1E6F;">जॉइन लिंक बनाएं</span> का उपयोग करें।
+    joined_on: "%{date} को शामिल हुए"
+    remove_member_confirm: "%{org} को %{alliance} से हटाएं? उनके शेयर लिंक काम करना बंद कर देंगे।"
+    vertos_section: गठबंधन में Vertos
+    no_vertos_title: अभी तक कोई Verto साझा नहीं किया गया
+    no_vertos_body: नीचे एक प्रकाशित Verto जोड़ें और प्रत्येक साझेदार के लिए एक अनूठा शेयर लिंक उत्पन्न होगा।
+    remove: हटाएं
+    remove_verto_confirm: इस Verto को %{alliance} से हटाएं? इसके लिए सभी साझेदार शेयर लिंक काम करना बंद कर देंगे।
+    completion_label: पूर्णता
+    responses:
+      one: प्रतिक्रिया
+      other: प्रतिक्रियाएं
+    partner_links_count:
+      one: साझेदार लिंक
+      other: साझेदार लिंक
+    no_shares_yet: शेयर लिंक बनाने के लिए गठबंधन में एक साझेदार जोड़ें।
+    responses_short: "%{n} प्रत."
+    add_section: गठबंधन में जोड़ें
+    add_heading: एक और Verto जोड़ें
+    add_body: एक प्रकाशित Verto चुनें। हम गठबंधन के हर साझेदार के लिए एक अनूठा शेयर लिंक बनाएंगे।
+    no_more_vertos: जोड़ने के लिए और कोई प्रकाशित Vertos नहीं हैं।
+    create_new_verto: नया Verto बनाएं →
+    add_submit: Verto जोड़ें →
+    partners_in_alliance: गठबंधन में साझेदार
+    including_you: आप सहित
+    shared_vertos_short: साझा Vertos
+    available_to_distribute: आपके वितरण के लिए उपलब्ध
+    other_partners: अन्य साझेदार
+    only_partner: फिलहाल आप इस गठबंधन में एकमात्र साझेदार हैं।
+    your_vertos_section: आपके साथ साझा किए गए Vertos
+    partner_no_vertos_title: अभी तक कोई Vertos नहीं
+    partner_no_vertos_body: जब %{org} इस गठबंधन में कोई Verto जोड़ेगा, तो आप यहाँ अपना अनूठा शेयर लिंक देखेंगे।
+    from_org: "%{org} की ओर से"
+    your_link: आपका लिंक
+    results_link: परिणाम →
+  alliance_verto:
+    title: "%{title} — साझा किया गया Verto"
+    from_org_alliance: "%{org} की ओर से · %{alliance}"
+    share_link: शेयर लिंक
+    mine_label: आपके लिंक से
+    aggregate_label: "%{alliance} में सभी"
+    card_n: कार्ड %{n}
+    my_results: मेरे परिणाम
+    aggregate: समग्र
+    comparison: तुलना
+    comparison_sub: आप बनाम सभी
+    no_data: कोई डेटा नहीं
+    n_answered: "%{n} ने उत्तर दिया"
+    avg: औसत %{n}
+  invites:
+    title: आमंत्रण स्वीकार करें — Playverto
+    already_used_title: आमंत्रण पहले ही उपयोग किया जा चुका है
+    already_used_body_html: यह आमंत्रण लिंक पहले ही स्वीकार किया जा चुका है। <a href="%{href}" style="color:#01EACB;text-decoration:none;">साइन इन करें</a>
+    expired_title: आमंत्रण समाप्त हो गया
+    expired_body: यह लिंक 7 दिनों से अधिक पुराना है। अपने एडमिन से नया भेजने के लिए कहें।
+    invited_to_join: आपको शामिल होने के लिए आमंत्रित किया गया है
+    alliance_by: "%{org} द्वारा एक गठबंधन"
+    as_role: "%{role} के रूप में"
+    addressed_for: "· %{email} के लिए"
+    signed_in_as: "%{name} के रूप में साइन इन किया गया"
+    join_with: इसके साथ शामिल हों
+    pick_org: चुनें कि कौन सा संगठन शामिल होगा
+    join_submit: "%{alliance} में शामिल हों →"
+    already_in_alliance: 'पहले से ही इस गठबंधन में: %{orgs}'
+    you_run_this: आप इस गठबंधन को चलाते हैं — इसके बजाय इस पर जाएं।
+    already_member_singular: "%{orgs} पहले से ही इस गठबंधन में है।"
+    already_member_plural: "%{orgs} पहले से ही इस गठबंधन में हैं।"
+    no_admin_org: आपके पास कोई एडमिन संगठन नहीं है जो इस गठबंधन में शामिल हो सके।
+    open_alliance: "%{alliance} खोलें →"
+    sign_out_link: साइन आउट करें और एक अलग खाते का उपयोग करें
+    sign_out_confirm: अपने वर्तमान खाते से साइन आउट करें?
+    already_have_account: क्या आपके पास पहले से Playverto खाता है?
+    sign_in_instead: इसके बजाय साइन इन करें
+    new_to_playverto: Playverto पर नए हैं?
+    create_new_account: नया खाता बनाएं
+    sign_in_email_label: ईमेल
+    sign_in_email_placeholder: you@example.com
+    sign_in_password_label: पासवर्ड
+    sign_in_password_placeholder: आपका Playverto पासवर्ड
+    sign_in_submit: शामिल होने के लिए साइन इन करें →
+    your_name_label: आपका नाम
+    your_name_placeholder: जेन स्मिथ
+    your_org_name_label: आपके संगठन का नाम
+    your_org_name_placeholder: Acme Partners
+    password_label: पासवर्ड
+    password_placeholder: कम से कम 12 वर्ण
+    confirm_password_label: पासवर्ड की पुष्टि करें
+    accept_submit: आमंत्रण स्वीकार करें →
   editor:
-    questions: "प्रश्न"
-    primary: "प्राथमिक"
-    change_media: "मीडिया बदलें"
-    change_media_title: "इस कार्ड की छवि बदलें"
-    add_design: "डिज़ाइन जोड़ें"
-    add_design_title: "इस कार्ड में एक छवि जोड़ें"
-    add_design_sub: "इस कार्ड को जीवंत बनाने के लिए एक छवि जोड़ें"
-    live: "लाइव"
-    live_warning: "जब यह Verto उत्तर एकत्र कर रहा हो तब प्रश्न संपादित करने से डेटा गुणवत्ता प्रभावित होगी। संपादन से पहले और बाद के उत्तर सीधे तुलनीय नहीं होंगे।"
-    got_it: "समझ गया"
-    add_question: "प्रश्न जोड़ें"
+    questions: प्रश्न
+    primary: प्राथमिक
+    change_media: मीडिया बदलें
+    change_media_title: इस कार्ड की छवि बदलें
+    add_design: डिज़ाइन जोड़ें
+    add_design_title: इस कार्ड में एक छवि जोड़ें
+    add_design_sub: इस कार्ड को जीवंत बनाने के लिए एक छवि जोड़ें
+    live: लाइव
+    live_warning: जब यह Verto उत्तर एकत्र कर रहा हो तब प्रश्न संपादित करने से डेटा गुणवत्ता प्रभावित होगी। संपादन से पहले और बाद के उत्तर सीधे तुलनीय नहीं होंगे।
+    got_it: समझ गया
+    add_question: प्रश्न जोड़ें
     cards:
       one: "%{count} कार्ड"
       other: "%{count} कार्ड"
     estimated:
-      one: "अनुमानित ~%{count} मिनट"
-      other: "अनुमानित ~%{count} मिनट"
-    design: "डिज़ाइन"
-    publish_share: "प्रकाशित करें और साझा करें →"
-    answer_type: "उत्तर प्रकार"
-    select_card: "प्रकार बदलने के लिए एक कार्ड चुनें"
-    click_any: "बाईं ओर किसी भी कार्ड पर क्लिक करें।"
-    select_card_long: "उत्तर प्रारूप बदलने के लिए एक प्रश्न कार्ड चुनें"
-    apply_to_card: "इस कार्ड पर लागू करें"
-    see_all_types: "सभी प्रश्न प्रकार देखें"
-    all_types: "सभी प्रश्न प्रकार"
-    ranked_for: "उपयुक्तता अनुसार क्रमित"
-    this_card: "यह कार्ड"
+      one: अनुमानित ~%{count} मिनट
+      other: अनुमानित ~%{count} मिनट
+    design: डिज़ाइन
+    publish_share: प्रकाशित करें और साझा करें →
+    answer_type: उत्तर प्रकार
+    select_card: प्रकार बदलने के लिए एक कार्ड चुनें
+    click_any: बाईं ओर किसी भी कार्ड पर क्लिक करें।
+    select_card_long: उत्तर प्रारूप बदलने के लिए एक प्रश्न कार्ड चुनें
+    apply_to_card: इस कार्ड पर लागू करें
+    see_all_types: सभी प्रश्न प्रकार देखें
+    all_types: सभी प्रश्न प्रकार
+    ranked_for: उपयुक्तता अनुसार क्रमित
+    this_card: यह कार्ड
   dashboard_card:
-    badge_archived: "संग्रहीत"
-    badge_live: "लाइव"
-    badge_draft: "ड्राफ़्ट"
-    fallback_name: "यह Verto"
+    badge_archived: संग्रहीत
+    badge_live: लाइव
+    badge_draft: ड्राफ़्ट
+    fallback_name: यह Verto
     deleted_on: "%{date} को हटाया गया"
-    untitled: "बिना शीर्षक"
-    completion: "पूर्णता"
+    untitled: बिना शीर्षक
+    completion: पूर्णता
     responders:
-      one: "उत्तरदाता"
-      other: "उत्तरदाता"
+      one: उत्तरदाता
+      other: उत्तरदाता
     responses:
-      one: "उत्तर"
-      other: "उत्तर"
+      one: उत्तर
+      other: उत्तर
     questions:
-      one: "प्रश्न"
-      other: "प्रश्न"
-    view_results: "परिणाम देखें →"
-    edit: "Verto संपादित करें"
-    results: "परिणाम →"
-    publish: "प्रकाशित करें →"
-    delete: "हटाएं"
+      one: प्रश्न
+      other: प्रश्न
+    view_results: परिणाम देखें →
+    edit: Verto संपादित करें
+    results: परिणाम →
+    publish: प्रकाशित करें →
+    delete: हटाएं
     edit_warning: "“%{title}” लाइव है। उत्तर एकत्र करते समय प्रश्न संपादित करने से डेटा गुणवत्ता प्रभावित होगी — संपादन से पहले और बाद के उत्तर सीधे तुलनीय नहीं होंगे। जारी रखें?"
     delete_warning: "“%{title}” को हटाएं? हटाए जाने के बाद Verto वापस नहीं मिल सकता। उत्तरदाताओं का लिंक काम करना बंद कर देगा — मौजूदा परिणाम आपकी संग्रहीत सूची में रहेंगे।"
   dashboard:
-    welcome_back: "वापसी पर स्वागत है"
-    heading_html: 'आपके <span style="color:#01EACB;">Verto</span>'
-    subtitle: "Verto बनाएं, उन्हें अपने गठबंधन के साथ साझा करें, और अंतर्दृष्टि आते देखें।"
-    create_new: "नया Verto बनाएं"
-    stat_live: "लाइव"
-    stat_drafts: "ड्राफ़्ट"
-    stat_responses: "उत्तर"
-    stat_completion: "पूर्णता"
-    empty_title: "अभी तक कोई Verto नहीं"
-    empty_body: "अपना पहला Verto बनाएं और अपने दर्शकों से अंतर्दृष्टि एकत्र करना शुरू करें।"
-    empty_cta: "अपना पहला Verto बनाएं →"
-    section_live: "लाइव"
-    section_drafts: "ड्राफ़्ट"
-    section_archived: "संग्रहीत"
+    welcome_back: वापसी पर स्वागत है
+    heading_html: आपके <span style="color:#01EACB;">Verto</span>
+    subtitle: Verto बनाएं, उन्हें अपने गठबंधन के साथ साझा करें, और अंतर्दृष्टि आते देखें।
+    create_new: नया Verto बनाएं
+    stat_live: लाइव
+    stat_drafts: ड्राफ़्ट
+    stat_responses: उत्तर
+    stat_completion: पूर्णता
+    empty_title: अभी तक कोई Verto नहीं
+    empty_body: अपना पहला Verto बनाएं और अपने दर्शकों से अंतर्दृष्टि एकत्र करना शुरू करें।
+    empty_cta: अपना पहला Verto बनाएं →
+    section_live: लाइव
+    section_drafts: ड्राफ़्ट
+    section_archived: संग्रहीत
   wizard:
-    create_verto: "Verto बनाएं"
-    building: "आपका Verto बनाया जा रहा है"
-    pill_audience: "दर्शक"
-    pill_tone: "स्वर"
-    pill_tone_value: "संवादात्मक"
-    pill_cards: "कार्ड"
-    gen_brief_read: "ब्रीफ़ पढ़ा गया"
-    gen_writing: "प्रश्न लिखे जा रहे हैं"
-    gen_formats: "प्रारूप चुने जा रहे हैं"
-    gen_design: "डिज़ाइन लागू किया जा रहा है"
-    welcome_eyebrow: "आगे क्या है"
-    welcome_lead: "कुछ त्वरित चरण और हम आपका Verto तैयार कर देंगे।"
+    create_verto: Verto बनाएं
+    building: आपका Verto बनाया जा रहा है
+    pill_audience: दर्शक
+    pill_tone: स्वर
+    pill_tone_value: संवादात्मक
+    pill_cards: कार्ड
+    gen_brief_read: ब्रीफ़ पढ़ा गया
+    gen_writing: प्रश्न लिखे जा रहे हैं
+    gen_formats: प्रारूप चुने जा रहे हैं
+    gen_design: डिज़ाइन लागू किया जा रहा है
+    welcome_eyebrow: आगे क्या है
+    welcome_lead: कुछ त्वरित चरण और हम आपका Verto तैयार कर देंगे।
     welcome_steps:
-      - "आपके Verto के बारे में"
-      - "कौन उत्तर दे रहा है"
-      - "आप क्या जानना चाहते हैं"
-      - "भाषाएं"
-      - "ब्रांड रंग"
-      - "संदर्भ (वैकल्पिक)"
-    welcome_badge: "नया Verto"
-    welcome_title: "चलिए आपका Verto बनाते हैं।"
-    welcome_sub: "हम आपके ब्रीफ़ को एक ऐसे Verto में बदल देंगे जो Playverto के नियमों का पालन करता है।"
-    welcome_ready_html: "तैयार होने पर <strong style=\"color:rgba(0,0,0,0.6);\">आगे</strong> दबाएं।"
-    examples: "उदाहरण"
-    s1_eyebrow: "चरण 01 · आपके Verto के बारे में"
-    s1_lead: "एकमात्र व्यापक विषय।"
-    s1_body: "इसे व्यापक रखें — आप अगले चरणों में दृष्टिकोण को संकीर्ण करेंगे। एक या दो शब्द आमतौर पर पर्याप्त होते हैं।"
+    - आपके Verto के बारे में
+    - कौन उत्तर दे रहा है
+    - आप क्या जानना चाहते हैं
+    - भाषाएं
+    - ब्रांड रंग
+    - संदर्भ (वैकल्पिक)
+    welcome_badge: नया Verto
+    welcome_title: चलिए आपका Verto बनाते हैं।
+    welcome_sub: हम आपके ब्रीफ़ को एक ऐसे Verto में बदल देंगे जो Playverto के नियमों का पालन करता है।
+    welcome_ready_html: तैयार होने पर <strong style="color:rgba(0,0,0,0.6);">आगे</strong> दबाएं।
+    examples: उदाहरण
+    s1_eyebrow: चरण 01 · आपके Verto के बारे में
+    s1_lead: एकमात्र व्यापक विषय।
+    s1_body: इसे व्यापक रखें — आप अगले चरणों में दृष्टिकोण को संकीर्ण करेंगे। एक या दो शब्द आमतौर पर पर्याप्त होते हैं।
     s1_examples:
-      - "जलवायु कार्रवाई"
-      - "शरणार्थी शिक्षा"
-      - "खाद्य सुरक्षा"
-    s1_title: "आपका Verto किस बारे में है?"
-    s1_placeholder: "उदा. युवा कल्याण"
-    s1_hint_body: "इसे व्यापक रखें — आप अगले चरणों में दृष्टिकोण को संकीर्ण करेंगे।"
-    s2_eyebrow: "चरण 02 · कौन उत्तर दे रहा है"
-    s2_lead: "विशिष्ट रहें।"
-    s2_body: "जीवनशैली, भूमिका, क्षेत्र, भाषा — कुछ भी जो यह आकार देता है कि यह समूह कैसे सोचता है। जितना ठोस, उतने बेहतर प्रश्न हम लिख सकते हैं।"
+    - जलवायु कार्रवाई
+    - शरणार्थी शिक्षा
+    - खाद्य सुरक्षा
+    s1_title: आपका Verto किस बारे में है?
+    s1_placeholder: उदा. युवा कल्याण
+    s1_hint_body: इसे व्यापक रखें — आप अगले चरणों में दृष्टिकोण को संकीर्ण करेंगे।
+    s2_eyebrow: चरण 02 · कौन उत्तर दे रहा है
+    s2_lead: विशिष्ट रहें।
+    s2_body: जीवनशैली, भूमिका, क्षेत्र, भाषा — कुछ भी जो यह आकार देता है कि यह समूह कैसे सोचता है। जितना ठोस, उतने बेहतर प्रश्न हम लिख सकते हैं।
     s2_examples:
-      - "केन्या में 18–24 विश्वविद्यालय के छात्र"
-      - "35–55 अग्रिम-पंक्ति सामुदायिक-स्वास्थ्य कार्यकर्ता"
-      - "ग्रामीण NSW में स्कूली बच्चों के माता-पिता"
-    s2_title: "कौन उत्तर दे रहा है — और उनकी उम्र क्या है?"
-    s2_placeholder: "उदा. केन्या में 18–24 विश्वविद्यालय के छात्र"
-    s2_hint_body: "जीवनशैली, भूमिका, क्षेत्र, भाषा — कुछ भी जो यह आकार देता है कि यह समूह कैसे सोचता है।"
-    s3_eyebrow: "चरण 03 · सीखने का लक्ष्य"
-    s3_lead: "वह अंतर्दृष्टि जो किसी निर्णय को बदल दे।"
-    s3_body: "जो आप पहले से जानते हैं उसे छोड़ दें। उस एक चीज़ का लक्ष्य रखें जो, यदि आप सीख लें, तो आपका अगला कदम बदल दे।"
+    - केन्या में 18–24 विश्वविद्यालय के छात्र
+    - 35–55 अग्रिम-पंक्ति सामुदायिक-स्वास्थ्य कार्यकर्ता
+    - ग्रामीण NSW में स्कूली बच्चों के माता-पिता
+    s2_title: कौन उत्तर दे रहा है — और उनकी उम्र क्या है?
+    s2_placeholder: उदा. केन्या में 18–24 विश्वविद्यालय के छात्र
+    s2_hint_body: जीवनशैली, भूमिका, क्षेत्र, भाषा — कुछ भी जो यह आकार देता है कि यह समूह कैसे सोचता है।
+    s3_eyebrow: चरण 03 · सीखने का लक्ष्य
+    s3_lead: वह अंतर्दृष्टि जो किसी निर्णय को बदल दे।
+    s3_body: जो आप पहले से जानते हैं उसे छोड़ दें। उस एक चीज़ का लक्ष्य रखें जो, यदि आप सीख लें, तो आपका अगला कदम बदल दे।
     s3_examples:
-      - "स्वयंसेवक तीसरे महीने के बाद क्यों छोड़ देते हैं?"
-      - "लोगों को हमारे फूड बैंक तक पहुंचने से क्या रोक रहा है?"
-      - "क्या हमारा युवा कार्यक्रम वास्तव में आत्मविश्वास बढ़ाता है — और कहां ठीक-ठीक?"
-    s3_title: "आप उनसे क्या जानना चाहते हैं?"
-    s3_placeholder: "उदा. स्वयंसेवक तीसरे महीने के बाद क्यों छोड़ देते हैं?"
-    s3_hint_body: "जो आप पहले से जानते हैं उसे छोड़ दें — उस एक चीज़ का लक्ष्य रखें जो आपका अगला कदम बदल दे।"
-    s4_eyebrow: "चरण 04 · भाषाएं"
-    s4_lead: "हर किसी तक उनकी अपनी भाषा में पहुंचें।"
-    s4_body: "हम आपका Verto आपकी प्राथमिक भाषा में लिखेंगे, फिर हर दूसरी भाषा में उतना ही अच्छा संस्करण तैयार करेंगे। हर संस्करण समान प्रश्न पूछता है, इसलिए परिणाम संरेखित रहते हैं।"
-    s4_title: "यह Verto कौन-सी भाषाएं बोले?"
-    s4_primary_label: "प्राथमिक भाषा"
-    s5_eyebrow: "चरण 05 · ब्रांड रंग"
-    s5_lead: "इसे अपने जैसा महसूस कराएं।"
-    s5_body: "यह वैसा है जैसा आपका Verto हर उस व्यक्ति को दिखता है जो इसे खेलता है। आप इसे संपादक से कभी भी ठीक कर सकते हैं।"
-    s5_live_preview: "लाइव पूर्वावलोकन"
-    s5_quick_poll: "त्वरित पोल"
-    s5_mock_q: "आपको यह कैसा लग रहा है?"
-    s5_mock_opt: "बहुत पसंद आया"
-    s5_title: "अपने ब्रांड रंग चुनें।"
-    s5_sub: "तीन चुनें। ये इस Verto के अनुभव में लागू होंगे।"
-    brand_primary: "प्राथमिक"
-    brand_primary_desc: "शीर्षक और एक्सेंट"
-    brand_cta: "बटन (CTA)"
-    brand_cta_desc: "आगे / जमा करें बटन"
-    brand_bg: "पृष्ठभूमि"
-    brand_bg_desc: "कार्ड के पीछे का कैनवास"
-    s6_eyebrow: "चरण 06 · संदर्भ"
-    optional: "वैकल्पिक"
-    s6_lead: "और कुछ जो हमें शामिल करना चाहिए?"
-    s6_body: "स्वर, अनिवार्य प्रश्न, बचने योग्य बातें, दर्शकों की विशेषताएं। यदि कुछ अतिरिक्त नहीं है तो छोड़ दें।"
+    - स्वयंसेवक तीसरे महीने के बाद क्यों छोड़ देते हैं?
+    - लोगों को हमारे फूड बैंक तक पहुंचने से क्या रोक रहा है?
+    - क्या हमारा युवा कार्यक्रम वास्तव में आत्मविश्वास बढ़ाता है — और कहां ठीक-ठीक?
+    s3_title: आप उनसे क्या जानना चाहते हैं?
+    s3_placeholder: उदा. स्वयंसेवक तीसरे महीने के बाद क्यों छोड़ देते हैं?
+    s3_hint_body: जो आप पहले से जानते हैं उसे छोड़ दें — उस एक चीज़ का लक्ष्य रखें जो आपका अगला कदम बदल दे।
+    s4_eyebrow: चरण 04 · भाषाएं
+    s4_lead: हर किसी तक उनकी अपनी भाषा में पहुंचें।
+    s4_body: हम आपका Verto आपकी प्राथमिक भाषा में लिखेंगे, फिर हर दूसरी भाषा में उतना ही अच्छा संस्करण तैयार करेंगे। हर संस्करण समान प्रश्न पूछता है, इसलिए परिणाम संरेखित रहते हैं।
+    s4_title: यह Verto कौन-सी भाषाएं बोले?
+    s4_primary_label: प्राथमिक भाषा
+    s5_eyebrow: चरण 05 · ब्रांड रंग
+    s5_lead: इसे अपने जैसा महसूस कराएं।
+    s5_body: यह वैसा है जैसा आपका Verto हर उस व्यक्ति को दिखता है जो इसे खेलता है। आप इसे संपादक से कभी भी ठीक कर सकते हैं।
+    s5_live_preview: लाइव पूर्वावलोकन
+    s5_quick_poll: त्वरित पोल
+    s5_mock_q: आपको यह कैसा लग रहा है?
+    s5_mock_opt: बहुत पसंद आया
+    s5_title: अपने ब्रांड रंग चुनें।
+    s5_sub: तीन चुनें। ये इस Verto के अनुभव में लागू होंगे।
+    brand_primary: प्राथमिक
+    brand_primary_desc: शीर्षक और एक्सेंट
+    brand_cta: बटन (CTA)
+    brand_cta_desc: आगे / जमा करें बटन
+    brand_bg: पृष्ठभूमि
+    brand_bg_desc: कार्ड के पीछे का कैनवास
+    s6_eyebrow: चरण 06 · संदर्भ
+    optional: वैकल्पिक
+    s6_lead: और कुछ जो हमें शामिल करना चाहिए?
+    s6_body: स्वर, अनिवार्य प्रश्न, बचने योग्य बातें, दर्शकों की विशेषताएं। यदि कुछ अतिरिक्त नहीं है तो छोड़ दें।
     s6_examples:
-      - "वित्तपोषण मार्गों और अनुदान की बाधाओं के बारे में एक प्रश्न अवश्य शामिल करें।"
-      - "शब्दजाल से बचें — कई उत्तरदाता अंग्रेज़ी दूसरी भाषा के रूप में बोलते हैं।"
-      - "स्वर को गर्मजोशी भरा रखें, कॉर्पोरेट नहीं।"
-    s6_title: "और कुछ जो हमें जानना चाहिए?"
-    s6_placeholder: "उदा. दर्शकों ने पहले कभी Playverto का उपयोग नहीं किया है, स्वर को गर्मजोशी भरा रखें, कॉर्पोरेट नहीं।"
-    s6_compare_label: "उत्तरदाताओं को अपने उत्तरों की तुलना करने दें"
-    s6_compare_desc: "धन्यवाद पृष्ठ पर एक CTA दिखाएं जो बताता है कि उनके उत्तर बाकी सभी की तुलना में कैसे हैं।"
+    - वित्तपोषण मार्गों और अनुदान की बाधाओं के बारे में एक प्रश्न अवश्य शामिल करें।
+    - शब्दजाल से बचें — कई उत्तरदाता अंग्रेज़ी दूसरी भाषा के रूप में बोलते हैं।
+    - स्वर को गर्मजोशी भरा रखें, कॉर्पोरेट नहीं।
+    s6_title: और कुछ जो हमें जानना चाहिए?
+    s6_placeholder: उदा. दर्शकों ने पहले कभी Playverto का उपयोग नहीं किया है, स्वर को गर्मजोशी भरा रखें, कॉर्पोरेट नहीं।
+    s6_compare_label: उत्तरदाताओं को अपने उत्तरों की तुलना करने दें
+    s6_compare_desc: धन्यवाद पृष्ठ पर एक CTA दिखाएं जो बताता है कि उनके उत्तर बाकी सभी की तुलना में कैसे हैं।
     back: "← वापस"
-    next: "आगे →"
-    generate: "Verto बनाएं →"
-    generating: "बनाया जा रहा है…"
-    step_counter: "चरण %{n} / %{total}"
+    next: आगे →
+    generate: Verto बनाएं →
+    generating: बनाया जा रहा है…
+    step_counter: चरण %{n} / %{total}
