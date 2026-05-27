@@ -153,9 +153,9 @@
 }
 .panel-progress-fill { height: 100%; background: white; border-radius: 8px; }
 
-/* NPS: the themed asset IS the interactive control (right panel). Dragging it
-   vertically (nps_slider_controller) drives --nps-fill (liquid level) and
-   --nps-hue (red->green sentiment). */
+/* NPS: vertical slider on the right (track is a baked-in SVG), reactive
+   Lottie animation on the left. The slider dispatches `nps:valueChanged`
+   on each step, which the lottie-player controller listens for. */
 .nps-slider {
   position: relative;
   display: flex;
@@ -173,10 +173,35 @@
 .nps-slider[data-nps-slider-axis-value="vertical"]   { cursor: ns-resize; }
 .nps-slider[data-nps-slider-axis-value="horizontal"] { cursor: ew-resize; }
 .nps-slider:focus-visible { box-shadow: 0 0 0 3px var(--brand-primary-soft, rgba(1,234,203,0.4)); border-radius: 18px; }
-/* The draggable handle that makes the asset read + work as a slider. */
+
+/* RIGHT panel: the slider track. The SVG fills .nps-control; .nps-thumb is
+   positioned absolutely and animated via top/left by the controller. */
+.nps-control {
+  position: relative;
+  width: 80px;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nps-track-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
 .nps-thumb {
-  transition: transform 0.18s cubic-bezier(.34,1.2,.64,1);
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand-primary, #01EACB);
+  border: 4px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transform: translate(-50%, -50%);
+  transition: top 0.18s cubic-bezier(.34,1.2,.64,1), left 0.18s cubic-bezier(.34,1.2,.64,1);
   cursor: grab;
 }
 .nps-slider-tooltip {
@@ -189,53 +214,28 @@
   border-radius: 100px;
   min-height: 22px;
 }
-.nps-visual {
+
+/* LEFT panel: the Lottie mount. lottie-web injects an <svg> into the
+   .nps-lottie-mount child; the wrapper fills the left panel. */
+.nps-lottie {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-/* RIGHT control asset: inline inside the slider, fixed box. */
-.nps-slider .nps-visual {
-  position: relative;
-  width: 210px;
-  height: 230px;
+.nps-lottie-mount {
+  width: 88%;
+  height: 88%;
+  max-width: 380px;
+  max-height: 380px;
 }
-.nps-slider .nps-svg {
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* the whole .nps-slider is the drag surface */
+.nps-lottie-mount svg {
+  width: 100% !important;
+  height: 100% !important;
 }
-/* LEFT reactive asset: fills the left panel like other card visuals. */
-.split-left .nps-visual {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-.split-left .nps-svg {
-  width: 72%;
-  height: 72%;
-  max-width: 340px;
-  max-height: 340px;
-}
-.nps-svg { overflow: visible; }
-.nps-svg .nps-state { opacity: 0; transition: opacity 0.28s ease; }
-.nps-svg .nps-state.is-active { opacity: 1; }
 
-/* Continuous "fill": the liquid rect (clipped to a themed vessel) scales by
-   --nps-fill along the slider axis, so it rises/grows as you drag.
-   transform-box:fill-box makes the scale origin the rect's own bbox. */
-.nps-svg .nps-liquid {
-  transform-box: fill-box;
-  transition: transform 0.22s cubic-bezier(.34,1.2,.64,1);
-}
-.nps-svg .nps-liquid[data-axis="vertical"] {
-  transform-origin: 50% 100%;
-  transform: scaleY(var(--nps-fill, 0.5));
-}
-.nps-svg .nps-liquid[data-axis="horizontal"] {
-  transform-origin: 0% 50%;
-  transform: scaleX(var(--nps-fill, 0.5));
-}
 .nps-slider-labels { width: 100%; }
 .nps-slider-labels .slider-label-text.is-active {
   color: var(--brand-primary, #01EACB);

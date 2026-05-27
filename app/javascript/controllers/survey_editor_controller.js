@@ -274,12 +274,6 @@ export default class extends Controller {
       const primOpts = (prim.options || []).map(o => (o || "").trim()).filter(Boolean)
       if (primOpts.length) out.options = primOpts
 
-      // NPS keeps its generated visual spec on a data attribute so the editor
-      // autosave round-trips it instead of dropping it.
-      if (type === 'nps' && card.dataset.cardNpsVisual) {
-        try { out.nps_visual = JSON.parse(card.dataset.cardNpsVisual) } catch (_) { /* keep prior */ }
-      }
-
       const i18n = {}
       secondary.forEach(loc => {
         const t = entry[loc]

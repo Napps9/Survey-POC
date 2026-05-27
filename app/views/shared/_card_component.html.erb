@@ -195,20 +195,22 @@
       </div>
 
     <% when "nps" %>
-      <%# The themed asset on the right IS the slider — drag the handle. %>
+      <%# 5-step NPS slider. Drag along the vertical SVG track; each step
+          dispatches `nps:valueChanged` which the left-panel lottie-player
+          listens for. Labels are editable. %>
       <% labels = Array(display["options"]) %>
-      <% labels = %w[0 1 2 3 4 5 6 7 8 9 10] if labels.empty? %>
-      <% n = [labels.size, 2].max %>
-      <% ctrl = nps_control_spec(card) %>
+      <% labels = %w[1 2 3 4 5] if labels.empty? %>
+      <% labels = labels.first(NpsHelper::NPS_STEPS) %>
+      <% labels += (labels.size + 1..NpsHelper::NPS_STEPS).map(&:to_s) if labels.size < NpsHelper::NPS_STEPS %>
       <div class="nps-slider"
            data-controller="nps-slider"
-           data-nps-slider-steps-value="<%= n %>"
-           data-nps-slider-axis-value="<%= ctrl["axis"] %>"
+           data-nps-slider-steps-value="<%= NpsHelper::NPS_STEPS %>"
+           data-nps-slider-axis-value="vertical"
            data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
            tabindex="0" role="slider"
-           aria-valuemin="0" aria-valuemax="<%= n - 1 %>">
+           aria-valuemin="1" aria-valuemax="<%= NpsHelper::NPS_STEPS %>">
         <div class="nps-slider-tooltip" data-nps-slider-target="tooltip"></div>
-        <%= render_nps_control(ctrl) %>
+        <%= render_nps_control %>
         <div class="slider-labels nps-slider-labels">
           <% labels.each do |opt| %>
             <span class="slider-label-text" data-nps-slider-target="label" <%= ce_attr %>><%= opt %></span>

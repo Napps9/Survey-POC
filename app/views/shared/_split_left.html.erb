@@ -14,9 +14,10 @@
 
 <div class="split-left">
   <% if nps_card?(card) && CardTypes.enabled?("nps") %>
-    <%# NPS: the LEFT panel is a face the app draws (eyes + morphing mouth +
-        sentiment colour) framed by a themed accent; it reacts to the slider. %>
-    <%= render_nps_reaction(nps_reaction_spec(card)) %>
+    <%# NPS: the LEFT panel plays a Lottie animation that swaps to match the
+        slider value (1–5). The lottie-player controller listens for the
+        `nps:valueChanged` event dispatched by the slider on the right. %>
+    <%= render_nps_reaction(initial_value: 1) %>
   <% elsif has_img %>
     <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
          style="background-image:url('<%= card["image"] %>');"></div>
