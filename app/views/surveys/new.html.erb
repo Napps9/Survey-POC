@@ -89,9 +89,9 @@
   <% end %>
 
   <%= form_with url: generate_survey_path, method: :post,
+        html: { style: "display:flex;flex-direction:column;flex:1;min-height:0;" },
         data: { controller: "create-wizard",
-                action: "submit->generating#show" },
-        style: "display:flex;flex-direction:column;flex:1;min-height:0;" do |f| %>
+                action: "submit->generating#show" } do |f| %>
 
     <%
       # Light-theme styles for inputs inside the white card right-panel
