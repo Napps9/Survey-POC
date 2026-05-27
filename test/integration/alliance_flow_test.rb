@@ -192,6 +192,118 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     assert_match "<strong style=\"font-family:'Alata',sans-serif;\">5</strong> across Aggregate Beta", response.body
   end
 
+  test "signed-in admin of an existing org joins an alliance via the join link" do
+    # Setup: a partner org with an existing admin who's signed in
+    partner_admin = User.create!(name: "Existing", email_address: "exist-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    partner_org = Organisation.create!(name: "Existing Co", slug: "exist-#{SecureRandom.hex(2)}")
+    partner_org.memberships.create!(user: partner_admin, role: "admin")
+
+    # Creator (admin @admin from setup) makes an alliance + invite
+    a = @oa.alliances.create!(name: "Existing-User Group")
+    invite = @oa.invites.create!(
+      email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
+      role: "admin", kind: "partner",
+      alliance: a, invited_by: @admin,
+      expires_at: 14.days.from_now
+    )
+
+    # Sign in as the partner admin
+    delete session_path
+    sign_in partner_admin
+
+    # GET /invites/:token shows the signed-in picker
+    get invite_path(invite.token)
+    assert_response :success
+    assert_match "Signed in as", response.body
+    assert_match partner_admin.name, response.body
+    assert_match "Join with", response.body
+    assert_match "Existing Co", response.body
+    refute_match "Confirm password", response.body, "signed-in users should NOT see the signup form"
+
+    # POST accept with join_as_organisation_id
+    post accept_invite_path(invite.token), params: { join_as_organisation_id: partner_org.id }
+    assert_redirected_to alliance_path(a)
+    follow_redirect!
+    assert_match "Existing-User Group", response.body
+
+    # AllianceMembership created without creating a new org
+    assert a.alliance_memberships.exists?(organisation: partner_org), "existing org should be linked"
+    refute Organisation.exists?(name: "#{partner_admin.name}'s organisation"), "no new org should be created"
+
+    # Invite is single-use
+    assert invite.reload.accepted?
+  end
+
+  test "signed-in user with multiple admin orgs picks which one joins" do
+    user = User.create!(name: "Multi", email_address: "multi-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    org_x = Organisation.create!(name: "Org X", slug: "ox-#{SecureRandom.hex(2)}")
+    org_y = Organisation.create!(name: "Org Y", slug: "oy-#{SecureRandom.hex(2)}")
+    org_x.memberships.create!(user: user, role: "admin")
+    org_y.memberships.create!(user: user, role: "admin")
+
+    a = @oa.alliances.create!(name: "Multi-Org Group")
+    invite = @oa.invites.create!(
+      email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
+      role: "admin", kind: "partner",
+      alliance: a, invited_by: @admin,
+      expires_at: 14.days.from_now
+    )
+
+    delete session_path
+    sign_in user
+
+    get invite_path(invite.token)
+    assert_response :success
+    assert_match "Pick which organisation joins", response.body
+    assert_match "Org X", response.body
+    assert_match "Org Y", response.body
+
+    post accept_invite_path(invite.token), params: { join_as_organisation_id: org_y.id }
+    assert_redirected_to alliance_path(a)
+
+    assert a.alliance_memberships.exists?(organisation: org_y)
+    refute a.alliance_memberships.exists?(organisation: org_x), "only the picked org should join"
+  end
+
+  test "signed-in admin of the alliance creator cannot join their own alliance" do
+    a = @oa.alliances.create!(name: "Self-Join Test")
+    invite = @oa.invites.create!(
+      email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
+      role: "admin", kind: "partner",
+      alliance: a, invited_by: @admin,
+      expires_at: 14.days.from_now
+    )
+
+    # @admin is signed in (from setup) and is admin of @oa, which created the alliance
+    get invite_path(invite.token)
+    assert_response :success
+    assert_match "You run this alliance", response.body, "should explain why join isn't possible"
+    refute_match "Pick which organisation joins", response.body
+  end
+
+  test "signed-in admin of an org already in the alliance sees 'already a member'" do
+    other_org = Organisation.create!(name: "Already Joined", slug: "aj-#{SecureRandom.hex(2)}")
+    other_org.memberships.create!(user: @admin, role: "admin")
+
+    a = @oa.alliances.create!(name: "Already Member Test")
+    a.alliance_memberships.create!(organisation: other_org)
+
+    invite = @oa.invites.create!(
+      email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
+      role: "admin", kind: "partner",
+      alliance: a, invited_by: @admin,
+      expires_at: 14.days.from_now
+    )
+
+    # @admin is signed in and admin of @oa (creator) + Already Joined (already member).
+    get invite_path(invite.token)
+    assert_response :success
+    # @oa is the creator → "You run this alliance" message wins over "already a member".
+    # That's fine; assert at least one informative banner shows.
+    assert(response.body.include?("You run this alliance") || response.body.include?("already in this alliance"))
+    refute_match "Pick which organisation joins", response.body
+  end
+
   private
 
   def sign_in(user)

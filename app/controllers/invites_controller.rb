@@ -5,6 +5,8 @@ class InvitesController < ApplicationController
 
   before_action :require_admin!, only: [:new, :create]
   before_action :load_invite,    only: [:show, :accept]
+  before_action :resume_session_if_possible, only: [:show, :accept]
+  before_action :load_join_options, only: [:show, :accept]
 
   def new
   end
@@ -48,7 +50,11 @@ class InvitesController < ApplicationController
     end
 
     if @invite.partner?
-      accept_partner_invite
+      if Current.user && params[:join_as_organisation_id].present?
+        accept_partner_invite_as_signed_in
+      else
+        accept_partner_invite
+      end
     else
       accept_member_invite
     end
@@ -86,6 +92,38 @@ class InvitesController < ApplicationController
     end
 
     redirect_to root_path, notice: "Welcome to #{@invite.organisation.name}!"
+  end
+
+  # Signed-in user joins the alliance with one of their existing admin orgs.
+  # No password reconfirmation — the active session already authenticates them.
+  def accept_partner_invite_as_signed_in
+    alliance = @invite.alliance
+    unless alliance
+      return redirect_to new_session_path, alert: "This invite is no longer valid."
+    end
+
+    org_id     = params[:join_as_organisation_id].to_i
+    membership = Current.user.memberships.admin.find_by(organisation_id: org_id)
+    unless membership
+      flash.now[:alert] = "Pick one of your organisations to join with."
+      return render :show, status: :unprocessable_entity
+    end
+
+    org = membership.organisation
+    if org.id == alliance.organisation_id
+      flash.now[:alert] = "You can't join an alliance you created."
+      return render :show, status: :unprocessable_entity
+    end
+    if alliance.alliance_memberships.exists?(organisation_id: org.id)
+      return redirect_to alliance_path(alliance), notice: "#{org.name} is already a member of #{alliance.name}."
+    end
+
+    ActiveRecord::Base.transaction do
+      join_alliance(org, alliance)
+      @invite.update!(accepted_at: Time.current)
+    end
+
+    redirect_to alliance_path(alliance), notice: "#{org.name} joined #{alliance.name}."
   end
 
   def accept_partner_invite
@@ -154,6 +192,29 @@ class InvitesController < ApplicationController
       organisation: partner_org
     ) { |m| m.status = "active" }
     AllianceShareSync.ensure_shares_for(alliance: alliance)
+  end
+
+  # Populates Current.user if there's a valid session cookie. Used by the
+  # invite-acceptance pages so signed-in users can join with an existing org
+  # instead of being asked to re-enter credentials.
+  def resume_session_if_possible
+    resume_session
+  end
+
+  # For the partner-invite show/accept actions, surface which of the
+  # signed-in user's admin orgs could join this alliance.
+  def load_join_options
+    @signed_in_user = Current.user
+    return unless @signed_in_user && @invite&.partner?
+
+    alliance = @invite.alliance
+    return unless alliance
+
+    member_org_ids = alliance.alliance_memberships.pluck(:organisation_id)
+    admin_orgs = @signed_in_user.memberships.admin.includes(:organisation).map(&:organisation)
+    @joinable_orgs       = admin_orgs.reject { |o| o.id == alliance.organisation_id || member_org_ids.include?(o.id) }
+    @already_member_orgs = admin_orgs.select { |o| member_org_ids.include?(o.id) }
+    @creator_admin_orgs  = admin_orgs.select { |o| o.id == alliance.organisation_id }
   end
 
   def load_invite
