@@ -71,8 +71,8 @@ class SurveysController < ApplicationController
 
     redirect_to survey_path(@survey)
   rescue => e
-    Rails.logger.error("[SurveyGenerator] #{e.class}: #{e.message}")
-    flash.now[:alert] = "We couldn't generate your Verto. Try again in a moment."
+    Rails.logger.error("[SurveyGenerator] #{e.full_message}")
+    flash.now[:alert] = "We couldn't generate your Verto: #{e.class}: #{e.message}"
     render :new, status: :unprocessable_entity
   end
 
