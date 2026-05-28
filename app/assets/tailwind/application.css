@@ -2743,17 +2743,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* iOS Safari toolbar fix */
   .preview-overlay { height: 100dvh; }
 
-  /* Thin top progress bar driven by player_controller.js#_update */
-  .preview-overlay::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0;
-    height: 3px;
-    width: var(--player-progress, 0%);
-    background: #FF1E6F;
-    transition: width 0.3s ease;
-    z-index: 70;
-  }
+  /* In-card .panel-progress now drives the mobile progress indicator —
+     matches the desktop pattern (white bar at the top of the card body),
+     replacing the earlier viewport-top 3px pink line that ran above it. */
 
   .preview-nav {
     padding: 0 14px;
@@ -2864,9 +2856,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
     border-radius: 999px;
   }
 
-  /* No-image cards: hide the .split-left entirely so the white card
-     sits flush under the magenta progress bar. */
-  .preview-overlay .split-card .split-left { display: none; }
+  /* .split-card is positioned so .panel-progress (display:contents on
+     no-hero cards routes it up to here) has a positioned ancestor. */
+  .preview-overlay .split-card { position: relative; }
+
+  /* No-hero cards: .split-left is display:contents so its child
+     .panel-progress still renders (absolutely positioned against
+     .split-card) without the .split-left box taking layout space.
+     Hero/NPS variants override below with explicit height + position. */
+  .preview-overlay .split-card .split-left { display: contents; }
 
   /* Image cards OR NPS cards: full-width hero strip with rounded bottom
      corners. NPS shows its slider-reactive Lottie in the strip; other
@@ -2922,8 +2920,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
     font-family: "ABeeZee", sans-serif;
     line-height: 1.25;
   }
-  .preview-overlay .split-card:has(.split-left-img) .panel-progress,
-  .preview-overlay .split-card:has(.nps-lottie)     .panel-progress { display: none; }
+  /* Panel progress bar visible on every mobile card — matches the
+     desktop pattern (dark translucent track + white fill). */
+  .preview-overlay .split-card .panel-progress {
+    top: 10px; left: 14px; right: 14px;
+    height: 6px;
+    background: rgba(0,0,0,0.35);
+  }
+  .preview-overlay .split-card .panel-progress-fill {
+    background: #fff;
+  }
   .preview-overlay .split-card:has(.split-left-img) .split-left-img,
   .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
     border-radius: 0 0 18px 18px;
