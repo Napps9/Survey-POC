@@ -2759,7 +2759,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
     padding: 0 14px;
     height: 44px;
     border-bottom: none;
-    background: #1C2034;
+    /* Use the Verto's brand background colour (set on .preview-overlay
+       via brand_palette_style_attr). Falls back to the dark navy when
+       no palette is set. */
+    background: var(--brand-bg, #1C2034);
   }
   .preview-nav-title {
     font-size: 11px;
