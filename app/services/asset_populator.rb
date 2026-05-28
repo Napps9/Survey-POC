@@ -87,14 +87,20 @@ class AssetPopulator
     candidates = Array(self.class.manifest["backgrounds"])
     return nil if candidates.empty?
 
-    query = survey_query_tags
-    scored = candidates.map { |a| [ score(a, query), a ] }
+    query  = survey_query_tags
+    # Prefer theme-matching backgrounds. Without this filter the age/mood
+    # bonuses on sport.jpg ([teen, young-adult] + [playful, energetic])
+    # eclipse a clean theme hit on nature.jpg for a Climate Verto.
+    themed = candidates.select { |a| theme_match?(a, query) }
+    pool   = themed.presence || candidates
+
+    scored = pool.map { |a| [ score(a, query), a ] }
     top    = scored.max_by { |s, _| s }
     chosen =
       if top && top[0] > 0
         top[1]
       else
-        candidates[rand_for("bg").rand(candidates.size)]
+        pool[rand_for("bg").rand(pool.size)]
       end
     helpers.asset_path("#{BACKGROUND_DIR}/#{chosen['file']}")
   end
@@ -118,9 +124,14 @@ class AssetPopulator
   end
 
   def tier1_themed_path(card, idx, used, type)
+    query = survey_query_tags.merge(keywords: card_keywords(card))
+
+    # Require BOTH a card-type fit AND a thematic connection (theme keyword
+    # OR card-keyword overlap). Without the theme/keyword gate, sports-people
+    # art would happily land on a Climate Verto purely on age/mood scoring.
     type_matching = Array(self.class.manifest["left_panel"]).select do |a|
       types = Array(a["card_types"])
-      types.empty? || types.include?(type)
+      (types.empty? || types.include?(type)) && theme_match?(a, query)
     end
     return nil if type_matching.empty?
 
@@ -129,7 +140,6 @@ class AssetPopulator
     unused = type_matching.reject { |a| used.include?(asset_url(LEFT_PANEL_DIR, a["file"])) }
     pool   = unused.presence || type_matching
 
-    query  = survey_query_tags.merge(keywords: card_keywords(card))
     scored = pool.map { |a| [ score(a, query), a ] }
                  .select { |s, _| s >= TIER1_MIN_SCORE }
     return nil if scored.empty?
@@ -188,6 +198,17 @@ class AssetPopulator
 
   def asset_url(dir, file)
     helpers.asset_path("#{dir}/#{file}")
+  end
+
+  # True when an asset has at least one theme keyword or card keyword in
+  # common with the query — i.e. there's a real thematic connection rather
+  # than an accidental age/mood/style overlap. Used to gate Tier-1 and the
+  # background picker so off-theme assets aren't picked on bonuses alone.
+  def theme_match?(asset, query)
+    asset_themes   = Array(asset["themes"]).map { |t| t.to_s.downcase }
+    asset_keywords = Array(asset["keywords"]).map { |k| k.to_s.downcase }
+    (asset_themes & Array(query[:themes]).to_a).any? ||
+      (asset_keywords & Array(query[:keywords]).to_a).any?
   end
 
   # Score one manifest asset against a query hash.

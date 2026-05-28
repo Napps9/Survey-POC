@@ -95,6 +95,31 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_nil s.cards[0]["image"]
   end
 
+  test "climate theme picks the nature background, not sport, despite age/mood bonuses" do
+    s = make_survey(theme: "Climate", audience_age: "15-20",
+                    cards: [ { "type" => "open_ended", "text" => "Thoughts?" } ])
+
+    AssetPopulator.new(s).populate!
+
+    s.reload
+    assert_match %r{verto-library/backgrounds/nature(?:-[a-f0-9]+)?\.jpg}i, s.background_image,
+      "Climate theme must pick nature.jpg over sport.jpg, got #{s.background_image.inspect}"
+    refute_match %r{/backgrounds/sport[-.]}i, s.background_image
+  end
+
+  test "climate theme skips sports-people Tier-1 art on cards (no thematic connection)" do
+    s = make_survey(theme: "Climate", audience_age: "15-20",
+                    cards: [ { "type" => "multiple_choice", "text" => "How worried are you?",
+                               "options" => %w[Very Somewhat NotAtAll] } ])
+
+    AssetPopulator.new(s).populate!
+
+    s.reload
+    img = s.cards[0]["image"].to_s
+    refute_includes img, "verto-library/left-panel/sports-people",
+      "off-theme sports-people art must not land on a Climate card"
+  end
+
   test "tap_card option_images are unique within a card" do
     s = make_survey(theme: "Climate action", audience_age: "all",
                     cards: [ { "type" => "tap_card", "text" => "Agree?",
