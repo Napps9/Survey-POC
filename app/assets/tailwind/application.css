@@ -2870,10 +2870,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
 
   /* Player right pane on white — matches desktop colours. Content is
-     vertically + horizontally centered. The advance chip (when present)
-     is absolute-positioned at the bottom so it doesn't shift the centred
-     content above it; .split-right widens its padding-bottom when a chip
-     is in the DOM so the content can't slip beneath. */
+     horizontally centred and stacks top-down so the controls fill the
+     available height the way they did before vertical centring was
+     attempted (which left big empty gaps above/below). The advance
+     chip (when present) is absolute-positioned at the bottom so it
+     doesn't push content; .split-right widens its padding-bottom when
+     a chip is in the DOM so the controls can't slip beneath. */
   .preview-overlay .split-card .split-right {
     width: 100%;
     flex: 1 1 auto;
@@ -2883,8 +2885,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
     color: #1C2034;
     text-align: center;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
+    justify-content: flex-start;
+    gap: 14px;
     overflow: hidden;
     position: relative;
   }
