@@ -54,9 +54,9 @@ class Survey < ApplicationRecord
     BrandPalette.resolve(brand_palette)
   end
 
-  # Per-card-type default illustration shipped in app/assets/images/. Used as
-  # the small icon on the results page (surveys/results.html.erb) and as
-  # AssetPopulator's Tier-3 fallback when no themed/per-type asset fits.
+  # Per-card-type illustration shipped in app/assets/images/. Used as the
+  # small icon on the results page (surveys/results.html.erb). NOT used as
+  # card hero art — AssetPopulator pulls from verto-library/ only.
   TYPE_ICON_SVGS = {
     "welcome_card"     => "WelcomeEnding.svg",
     "multiple_choice"  => "select.svg",

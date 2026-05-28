@@ -1,13 +1,21 @@
-# Pre-populates a Verto's `background_image` and each card's `image` from
-# the curated verto-library, using a three-tier hierarchy:
+# Pre-populates a Verto's `background_image`, each card's left-panel `image`,
+# and (for tap_card cards) each statement's `option_images` from the curated
+# verto-library, using a two-tier hierarchy for the left-panel image:
 #
 #   Tier 1 — Themed match from manifest.left_panel that scores above
 #            TIER1_MIN_SCORE against the survey's theme + audience and the
 #            card's text + options.
-#   Tier 2 — Card-type-specific art (select_art / range_art / swipe_cards),
-#            picked deterministically from the seed for variety.
-#   Tier 3 — The portrait SVG already mapped per type in
-#            Survey::TYPE_ICON_SVGS.
+#   Tier 2 — Card-type-family art (select_art for the select/grid family,
+#            range_art for range/rating/nps). NOT used for tap_card: those
+#            get their imagery on the statement cards themselves via
+#            `option_images`, not on the left panel.
+#   (No SVG fallback — leave the card image blank rather than reach into
+#    the design-system SVGs at app/assets/images/.)
+#
+# tap_card statement imagery: every tap_card gets a parallel `option_images`
+# array drawn from manifest.swipe_cards, one image per entry in `options`,
+# no repeats within a card and preferring assets not already used elsewhere
+# in the survey.
 #
 # Background uses manifest.backgrounds with the same scoring. If every entry
 # scores zero the seed selects one round-robin so the editor never opens
@@ -53,12 +61,22 @@ class AssetPopulator
   end
 
   def populate!
-    used = Set.new
+    used       = Set.new   # left_panel + select_art + range_art picks
+    swipe_used = Set.new   # swipe_cards picks across the whole survey
+
     @survey.background_image = pick_background_path
+
     cards = Array(@survey.cards).each_with_index.map do |card, idx|
-      img = pick_card_image_path(card, idx, used)
-      img ? card.merge("image" => img) : card
+      new_card = card.dup
+      if (img = pick_card_image_path(card, idx, used))
+        new_card["image"] = img
+      end
+      if card["type"].to_s == "tap_card"
+        new_card["option_images"] = pick_tap_card_option_images(card, idx, swipe_used)
+      end
+      new_card
     end
+
     @survey.cards = cards
     @survey.save!
   end
@@ -81,7 +99,8 @@ class AssetPopulator
     helpers.asset_path("#{BACKGROUND_DIR}/#{chosen['file']}")
   end
 
-  # Three-tier picker. Returns an asset_path string or nil.
+  # Two-tier picker for the card's left-panel image. Returns an
+  # asset_path string or nil (blank panel — same as Start-from-Blank).
   def pick_card_image_path(card, idx, used)
     type = card["type"].to_s
 
@@ -95,16 +114,20 @@ class AssetPopulator
       return path
     end
 
-    tier3_svg_path(type)
+    nil
   end
 
   def tier1_themed_path(card, idx, used, type)
-    pool = Array(self.class.manifest["left_panel"]).select do |a|
+    type_matching = Array(self.class.manifest["left_panel"]).select do |a|
       types = Array(a["card_types"])
-      (types.empty? || types.include?(type)) &&
-        !used.include?(asset_url(LEFT_PANEL_DIR, a["file"]))
+      types.empty? || types.include?(type)
     end
-    return nil if pool.empty?
+    return nil if type_matching.empty?
+
+    # Prefer unused assets but allow repeats once the type-matching pool
+    # is exhausted — better to repeat a themed image than leave it blank.
+    unused = type_matching.reject { |a| used.include?(asset_url(LEFT_PANEL_DIR, a["file"])) }
+    pool   = unused.presence || type_matching
 
     query  = survey_query_tags.merge(keywords: card_keywords(card))
     scored = pool.map { |a| [ score(a, query), a ] }
@@ -123,9 +146,12 @@ class AssetPopulator
         [ self.class.manifest["select_art"], SELECT_ART_DIR ]
       elsif SCALE_TYPES.include?(type)
         [ self.class.manifest["range_art"], RANGE_ART_DIR ]
-      elsif type == "tap_card"
-        [ self.class.manifest["swipe_cards"], SWIPE_CARDS_DIR ]
       end
+    # tap_card deliberately omitted: swipe-cards/ assets are for the
+    # statement cards themselves (populated via option_images), not the
+    # tap_card's left panel.
+    return nil if bucket.nil?
+
     pool = Array(bucket)
     return nil if pool.empty?
 
@@ -136,9 +162,28 @@ class AssetPopulator
     asset_url(dir, chosen["file"])
   end
 
-  def tier3_svg_path(type)
-    svg = Survey::TYPE_ICON_SVGS[type]
-    svg ? helpers.asset_path(svg) : nil
+  # Picks one image per option for a tap_card, drawn from manifest.swipe_cards.
+  # Prefers assets not yet used elsewhere in the survey; no repeats within a
+  # single card. Pool of 11 vs typical 3-5 statements means repeats rarely
+  # bite, but we degrade gracefully if a survey has many tap_cards.
+  def pick_tap_card_option_images(card, card_idx, swipe_used)
+    options = Array(card["options"])
+    pool    = Array(self.class.manifest["swipe_cards"])
+    return [] if options.empty? || pool.empty?
+
+    rng = rand_for("tap-#{card_idx}")
+
+    unused, used_elsewhere = pool.partition do |a|
+      !swipe_used.include?(asset_url(SWIPE_CARDS_DIR, a["file"]))
+    end
+    ordered = unused.shuffle(random: rng) + used_elsewhere.shuffle(random: rng)
+    # Pool smaller than options? cycle until we have enough.
+    ordered *= ((options.size.to_f / ordered.size).ceil) if ordered.size < options.size
+
+    picks = ordered.first(options.size)
+    urls  = picks.map { |a| asset_url(SWIPE_CARDS_DIR, a["file"]) }
+    urls.each { |u| swipe_used << u }
+    urls
   end
 
   def asset_url(dir, file)

@@ -24,7 +24,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "background_image must pass Survey.sanitize_background_image"
   end
 
-  test "populate! gives every card an image" do
+  test "populate! gives every non-tap_card card an image and every tap_card option_images" do
     cards = [
       { "type" => "welcome_card",    "text" => "Welcome" },
       { "type" => "multiple_choice", "text" => "Pick one", "options" => [ "A", "B" ] },
@@ -40,7 +40,15 @@ class AssetPopulatorTest < ActiveSupport::TestCase
 
     s.reload
     s.cards.each_with_index do |c, i|
-      assert c["image"].present?, "card #{i} (#{c['type']}) has no image"
+      if c["type"] == "tap_card"
+        assert_equal Array(c["options"]).size, Array(c["option_images"]).size,
+          "tap_card #{i} option_images count must match options count"
+        c["option_images"].each do |u|
+          assert_includes u, "verto-library/swipe-cards/"
+        end
+      else
+        assert c["image"].present?, "card #{i} (#{c['type']}) has no image"
+      end
     end
   end
 
@@ -56,7 +64,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "expected Tier-1 themed match, got #{s.cards[0]['image'].inspect}"
   end
 
-  test "non-themed survey falls through to type-art for tap_card / range / select" do
+  test "non-themed survey falls through to type-art for range / select; tap_card left panel stays blank" do
     s = make_survey(theme: "Climate action", audience_age: "all",
                     cards: [
                       { "type" => "tap_card",        "text" => "Agree?", "options" => %w[a b c] },
@@ -67,19 +75,37 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     AssetPopulator.new(s).populate!
 
     s.reload
-    assert_includes s.cards[0]["image"], "verto-library/swipe-cards/"
+    # tap_card left panel intentionally blank — statement imagery does the work
+    assert_nil s.cards[0]["image"], "tap_card left panel must NOT pull from swipe-cards/"
+    assert_equal 3, Array(s.cards[0]["option_images"]).size
+    s.cards[0]["option_images"].each { |u| assert_includes u, "verto-library/swipe-cards/" }
     assert_includes s.cards[1]["image"], "verto-library/range-art/"
     assert_includes s.cards[2]["image"], "verto-library/select-art/"
   end
 
-  test "open_ended with no themed match falls back to Tier-3 SVG" do
+  test "card with no Tier-1/Tier-2 match gets no image (no SVG fallback)" do
+    # open_ended has no type-family bucket, and "Climate action" theme has no
+    # themed left-panel art, so the card image must be nil — never an SVG path.
     s = make_survey(theme: "Climate action", audience_age: "all",
                     cards: [ { "type" => "open_ended", "text" => "Anything to add?" } ])
 
     AssetPopulator.new(s).populate!
 
     s.reload
-    assert_match %r{textbox(?:-[a-f0-9]+)?\.svg}, s.cards[0]["image"]
+    assert_nil s.cards[0]["image"]
+  end
+
+  test "tap_card option_images are unique within a card" do
+    s = make_survey(theme: "Climate action", audience_age: "all",
+                    cards: [ { "type" => "tap_card", "text" => "Agree?",
+                               "options" => %w[a b c d e] } ])
+
+    AssetPopulator.new(s).populate!
+
+    s.reload
+    imgs = Array(s.cards[0]["option_images"])
+    assert_equal 5, imgs.size
+    assert_equal imgs.size, imgs.uniq.size, "option_images must be unique within a card"
   end
 
   test "same seed produces identical picks" do
@@ -102,8 +128,10 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     AssetPopulator.new(s1, seed: "seed-A").populate!
     AssetPopulator.new(s2, seed: "seed-B").populate!
 
-    refute_equal s1.reload.cards.map { |c| c["image"] }, s2.reload.cards.map { |c| c["image"] },
-      "two different seeds should usually pick different swipe-card art across 6 cards"
+    s1_opts = s1.reload.cards.flat_map { |c| Array(c["option_images"]) }
+    s2_opts = s2.reload.cards.flat_map { |c| Array(c["option_images"]) }
+    refute_equal s1_opts, s2_opts,
+      "two different seeds should usually pick different swipe-card art across 18 statements"
   end
 
   test "no duplicate left-panel pictures across cards (within Tier 1 pool)" do

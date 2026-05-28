@@ -15,6 +15,7 @@
      data-card-image="<%= card['image'].to_s %>"
      data-card-allow-other="<%= card['allow_other'] ? 'true' : 'false' %>"
      data-card-options="<%= Array(card['options']).to_json %>"
+     data-card-option-images="<%= Array(card['option_images']).to_json %>"
      data-action="click->type-panel#selectCard">
 
   <%# Chrome row above card %>

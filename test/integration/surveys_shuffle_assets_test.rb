@@ -27,7 +27,13 @@ class SurveysShuffleAssetsTest < ActionDispatch::IntegrationTest
 
     s.reload
     assert s.background_image.present?, "shuffle should set a background"
-    s.cards.each_with_index { |c, i| assert c["image"].present?, "card #{i} should have an image" }
+    s.cards.each_with_index do |c, i|
+      if c["type"] == "tap_card"
+        assert Array(c["option_images"]).any?, "tap_card #{i} should have option_images"
+      else
+        assert c["image"].present?, "card #{i} (#{c['type']}) should have an image"
+      end
+    end
   end
 
   test "editor renders a Shuffle button" do

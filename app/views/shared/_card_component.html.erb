@@ -120,18 +120,23 @@
       </ul>
 
     <% when "tap_card" %>
+      <% option_images = Array(card["option_images"]) %>
       <div class="rotate-wrap"
            data-controller="<%= editable ? 'tap-stack card-editor' : 'tap-stack' %>">
         <div class="rotate-card-stack">
           <% Array(display["options"]).each_with_index do |opt, i| %>
+            <% img = option_images[i] %>
             <% bg_a = ['#d4edda','#d1ecf1','#fff3cd','#f8d7da','#e2d9f3'][i % 5] %>
             <% bg_b = ['#a8d5b5','#9fd5df','#ffd88a','#f5a8b0','#c3aee8'][i % 5] %>
+            <% bg_style = img.present? ?
+                 "background:#fff url('#{img}') center/cover no-repeat;" :
+                 "background:linear-gradient(135deg,#{bg_a},#{bg_b});" %>
             <div class="rotate-card"
                  data-tap-stack-target="card"
                  data-canonical="<%= canon[i] %>"
-                 style="background:linear-gradient(135deg,<%= bg_a %>,<%= bg_b %>);">
+                 style="<%= bg_style %>">
               <span <%= ce_attr %>
-                    style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;"><%= opt %></span>
+                    style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;<%= 'background:rgba(255,255,255,0.92);padding:8px 16px;border-radius:999px;box-shadow:0 1px 3px rgba(0,0,0,0.08);max-width:80%;' if img.present? %>"><%= opt %></span>
               <% if editable %>
                 <button type="button" class="tap-card-delete"
                         data-action="click->card-editor#deleteOption">×</button>

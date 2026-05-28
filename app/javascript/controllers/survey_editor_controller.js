@@ -274,6 +274,17 @@ export default class extends Controller {
       const primOpts = (prim.options || []).map(o => (o || "").trim()).filter(Boolean)
       if (primOpts.length) out.options = primOpts
 
+      // tap_card statement backgrounds (populated by AssetPopulator). Carry
+      // them through autosave so editing other fields doesn't wipe the art.
+      if (type === "tap_card") {
+        try {
+          const optImgs = JSON.parse(card.dataset.cardOptionImages || "[]")
+          if (Array.isArray(optImgs) && optImgs.length) {
+            out.option_images = optImgs.slice(0, primOpts.length)
+          }
+        } catch (_) { /* ignore malformed */ }
+      }
+
       const i18n = {}
       secondary.forEach(loc => {
         const t = entry[loc]
