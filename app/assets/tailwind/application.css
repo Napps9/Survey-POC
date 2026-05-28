@@ -2702,12 +2702,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
    _showThankyou() can still toggle the hidden buttons safely. */
 .preview-overlay .preview-footer { display: none !important; }
 
-/* Inline advance chip. Brand CTA colour, full-width inside the card,
-   pinned to the bottom of .split-right so it sits at thumb height
-   on mobile and below the controls on desktop. */
+/* Inline advance chip. Absolute-positioned so vertical centering of
+   the question content above isn't shifted by the chip's height. */
 .player-advance-chip {
-  margin-top: auto;
-  align-self: stretch;
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
   min-height: 52px;
   padding: 14px 20px;
   border: none;
@@ -2848,13 +2849,19 @@ body.generating-overlay-active .bottom-bar { display: none; }
     border-width: 3px;
   }
   .preview-overlay .nps-slider { gap: 8px; }
-  .preview-overlay .nps-slider-stage { gap: 10px; }
+  .preview-overlay .nps-slider-stage { gap: 12px; }
   .preview-overlay .nps-slider-labels {
     /* match the shrunk .nps-control height so labels align with steps */
     height: 200px;
-    min-width: 88px;
+    min-width: 110px;
   }
-  .preview-overlay .nps-slider-labels .slider-label-text { font-size: 11px; }
+  /* Label text sized to read in line with the rest of the platform's body
+     copy — the 11px sized version felt too small next to the 26px q-title. */
+  .preview-overlay .nps-slider-labels .slider-label-text {
+    font-size: 14px;
+    font-family: "ABeeZee", sans-serif;
+    line-height: 1.25;
+  }
   .preview-overlay .split-card:has(.split-left-img) .panel-progress,
   .preview-overlay .split-card:has(.nps-lottie)     .panel-progress { display: none; }
   .preview-overlay .split-card:has(.split-left-img) .split-left-img,
@@ -2862,8 +2869,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
     border-radius: 0 0 18px 18px;
   }
 
-  /* Player right pane on white — matches desktop colours. Bottom padding
-     accommodates the iOS home indicator (footer is hidden on mobile). */
+  /* Player right pane on white — matches desktop colours. Content is
+     vertically + horizontally centered. The advance chip (when present)
+     is absolute-positioned at the bottom so it doesn't shift the centred
+     content above it; .split-right widens its padding-bottom when a chip
+     is in the DOM so the content can't slip beneath. */
   .preview-overlay .split-card .split-right {
     width: 100%;
     flex: 1 1 auto;
@@ -2872,9 +2882,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
     background: #fff;
     color: #1C2034;
     text-align: center;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
     gap: 12px;
     overflow: hidden;
+    position: relative;
+  }
+  .preview-overlay .split-card:has(.player-advance-chip) .split-right {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
   .preview-overlay .q-eyebrow {
     color: #FF1E6F;
