@@ -58,8 +58,9 @@ en:
     ask_verto: "Ask Verto"
     analysing: "Analysing responses…"
   player:
-    thank_you_title: "Thank you!"
+    thank_you_title: "Thanks for taking part!"
     thank_you_sub: "Your responses have been recorded."
+    thank_you_from: "from %{org}"
     compare_cta: "See your results compared to others →"
     powered_by: "Powered by"
     comparison_title: "Your answers vs everyone"

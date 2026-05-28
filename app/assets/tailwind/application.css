@@ -2763,7 +2763,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
        via brand_palette_style_attr). Falls back to the dark navy when
        no palette is set. */
     background: var(--brand-bg, #1C2034);
+    /* Mobile player runs nav-less — the org logo lives on the thank-you
+       screen instead, so respondents see a cleaner card with maximum
+       vertical real estate for the question. */
+    display: none;
   }
+  /* Without the nav, .preview-card.active needs to fill the full
+     viewport (no longer subtracting 44px). */
+  .preview-overlay .preview-card.active { height: 100dvh; }
   .preview-nav-title {
     font-size: 11px;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

@@ -59,7 +59,7 @@ class SurveyGenerator
                   tap_card, range, rating. Bounds (per the design rules):
                   - multiple_choice / select_many: 3 to 5 options, each <= 20 chars
                   - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any "Other"
-                  - tap_card: 3 to 5 cards
+                  - tap_card: EXACTLY 3 cards (negative / neutral / positive sentiments)
                   - range / rating: 3 to 5 points, never more than 5
                   - nps: EXACTLY 5 points, each label <= 20 chars
                 DESC
@@ -80,7 +80,12 @@ class SurveyGenerator
     - List types (multiple_choice / select_many): 3 to 5 options, each <= 20 chars.
     - Grids (select_one_grid / select_many_grid): EVEN option count, 4 to 10
       total including any "Other".
-    - tap_card: 3 to 5 cards - never fewer than 3, never more than 5.
+    - tap_card: EXACTLY 3 cards. The three statements MUST represent a
+      NEGATIVE, a NEUTRAL and a POSITIVE sentiment on the question's
+      topic, in that order (index 0 = negative, 1 = neutral, 2 = positive).
+      Each statement is its own swipe card; the respondent swipes yes/no
+      on each, and the combination reveals their sentiment.
+      Keep each statement <= 30 characters.
     - range / rating: 3 to 5 points; never more than 5.
     - nps: a likelihood/sentiment scale with a reacting themed visual.
       EXACTLY 5 points; each option label <= 20 chars.
@@ -104,8 +109,8 @@ class SurveyGenerator
        not automatically better. Welcome cards do not count toward the total.
 
     2. Question definition — A "question" is anything the user must read and
-       respond to. A range counts as 1 question. A tap_card with 5 cards counts
-       as 5 questions.
+       respond to. A range counts as 1 question. A tap_card with its 3
+       statements (negative/neutral/positive) counts as 3 questions.
 
     3. Answer-type variety — Never place more than 2 of the same answer type in
        a row in the flow. Treat range, rating and nps as one "scale" family —
@@ -148,11 +153,12 @@ class SurveyGenerator
     - select_many (Verto "Select Many — image list"): same image-list
       layout, multi-pick. Use ONLY when select_many_grid won't fit (long
       labels or more than 10 options).
-    - tap_card (Verto "Tap"): a sequence of cards, each card is its own
-      mini-question with 2–3 quick choices. Best when you want lots of data
-      points fast across related concepts (e.g. quick reactions to a series
-      of statements or images). Aim for 3–5 cards; per Verto rules tap_card
-      "options" should reflect ~3 cards' worth of distinct concepts.
+    - tap_card (Verto "Tap"): a swipe stack of EXACTLY 3 statements about
+      the question's topic. The three statements MUST express a NEGATIVE,
+      NEUTRAL and POSITIVE sentiment on the topic, in that order. The
+      respondent swipes yes/no on each; the combination reveals their
+      stance. Each statement <= 30 characters. Best when you want quick
+      gut reactions to a single subject from three angles.
     - range (Verto "Range"): playful 5-point sliding scale for emotion or
       agree/disagree. Five custom icons animate as the player drags. Use for
       mood, satisfaction, agreement — anything qualitative-scaled.
@@ -185,7 +191,7 @@ class SurveyGenerator
     (unless the brief explicitly requires the exception):
     [ ] 10 to 15 questions (welcome cards excluded); at most 1 welcome card
     [ ] No more than 2 of the same answer type in a row
-    [ ] Lists 3-5 options (each <= 20 chars); grids EVEN and 4-10; tap_card 3-5;
+    [ ] Lists 3-5 options (each <= 20 chars); grids EVEN and 4-10; tap_card EXACTLY 3 (neg/neutral/pos);
         range/rating <= 5; nps EXACTLY 5
     [ ] Every question's text plus its description <= 100 chars
     [ ] "How often" -> range with <= 5 options
@@ -230,7 +236,7 @@ class SurveyGenerator
         multi-pick to select_many_grid; only fall back to multiple_choice /
         select_many when option labels are over ~14 chars or the question
         needs more than 10 options
-      - tap_card 3-5 options · grids even count, ≤10
+      - tap_card EXACTLY 3 (neg/neutral/pos) options · grids even count, ≤10
       - question text 50-70 chars target, never exceed 100
       - option text ≤ 14 chars when using a grid; ≤ 20 chars in a text list
       - include a welcome_card only if the audience is cold/new

@@ -41,9 +41,15 @@
 
     <div class="preview-thankyou" data-player-target="thankyou">
       <div data-player-target="thankyouMain" class="preview-thankyou-card">
-        <div class="preview-thankyou-emoji">🎉</div>
+        <%# Publishing org's logo sits prominently at the top of the
+            thank-you card — the player nav is hidden on mobile, so this
+            is the only place the brand is shown. %>
+        <%= brand_logo_tag @survey.organisation, style: "height:44px;width:auto;max-width:60%;margin:0 auto 18px;display:block;" %>
+
         <div class="preview-thankyou-title"><%= t("player.thank_you_title") %></div>
-        <div class="preview-thankyou-sub"><%= t("player.thank_you_sub") %></div>
+        <div class="preview-thankyou-sub">
+          <%= t("player.thank_you_from", org: @survey.organisation.name) %>
+        </div>
 
         <% if @survey.show_results_comparison? %>
           <button type="button"
@@ -54,10 +60,10 @@
           </button>
         <% end %>
 
-        <%# "Powered by" appears once, followed by the Playverto wordmark image. %>
-        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;opacity:0.55;">
-          <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:#fff;"><%= t("player.powered_by") %></span>
-          <%= image_tag "playverto.svg", alt: "", style: "height:14px;width:auto;" %>
+        <%# Small "Powered by Playverto" wordmark at the bottom. %>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;opacity:0.45;">
+          <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:#fff;"><%= t("player.powered_by") %></span>
+          <%= image_tag "playverto.svg", alt: "", style: "height:12px;width:auto;" %>
         </div>
       </div>
 
