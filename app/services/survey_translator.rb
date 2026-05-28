@@ -77,20 +77,38 @@ class SurveyTranslator
     target = SupportedLocales.find(target_locale)
     raise ArgumentError, "Unsupported locale: #{target_locale}" unless target
 
+    # Cache lookup: cards we've already translated with the same source
+    # content for this target skip Claude entirely.
+    cached = TranslationCache.lookup_many(source, source_locale: source_locale, target_locale: target_locale)
+    misses = source.each_with_index.reject { |_, i| cached[i] }
+    return cached if misses.empty?
+
+    miss_cards   = misses.map(&:first)
+    miss_indices = misses.map(&:last)
+
     response = @client.messages.create(
       model: MODEL,
       max_tokens: MAX_TOKENS,
       system: SYSTEM,
       tools: [ TOOL ],
       tool_choice: { type: "tool", name: "emit_translation" },
-      messages: [ { role: "user", content: user_message(source, source_locale, target) } ]
+      messages: [ { role: "user", content: user_message(miss_cards, source_locale, target) } ]
     )
 
     block = Array(response.content).find { |b| tool_use?(b) }
     raise "Model did not return a tool_use block" unless block
 
-    translated = Array(deep_stringify(input_of(block))["cards"])
-    align(source, translated)
+    translated_misses = align(miss_cards, Array(deep_stringify(input_of(block))["cards"]))
+
+    # Write each miss back to the cache so the next call hits it.
+    miss_cards.zip(translated_misses).each do |card, translation|
+      TranslationCache.write(card, source_locale: source_locale, target_locale: target_locale, translation: translation)
+    end
+
+    # Merge cache hits + fresh translations into the source-aligned shape.
+    result = cached.dup
+    miss_indices.each_with_index { |orig_idx, i| result[orig_idx] = translated_misses[i] }
+    result
   end
 
   private

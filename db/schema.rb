@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_27_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_28_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -169,6 +169,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_27_000001) do
     t.index ["deleted_at"], name: "index_surveys_on_deleted_at"
     t.index ["organisation_id"], name: "index_surveys_on_organisation_id"
     t.index ["publish_token"], name: "index_surveys_on_publish_token", unique: true
+  end
+
+  create_table "translation_cache", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "source_hash", null: false
+    t.string "source_locale", null: false
+    t.string "target_locale", null: false
+    t.json "translation", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_hash", "source_locale", "target_locale"], name: "idx_translation_cache_lookup", unique: true
   end
 
   create_table "users", force: :cascade do |t|
