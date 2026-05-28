@@ -64,6 +64,7 @@ pt:
     back: "← Voltar"
     next: Seguinte →
     submit: Submeter ✓
+    thank_you_from: from %{org}
   js:
     player:
       progress: Cartão %{n} de %{total}
@@ -261,6 +262,9 @@ pt:
     all_types: Todos os tipos de pergunta
     ranked_for: Ordenado por adequação para
     this_card: este cartão
+    shuffle: Shuffle
+    shuffle_title: Re-pick imagery from the verto library
+    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
   dashboard_card:
     badge_archived: Arquivado
     badge_live: Ao vivo
@@ -405,3 +409,20 @@ pt:
     generate: Gerar Verto →
     generating: A gerar…
     step_counter: Passo %{n} de %{total}
+    section_how_to_start: How to start
+    section_brand_colours: Brand colours
+    s7_eyebrow: Step 07 · Final touch
+    s7_lead: Open in a finished-looking Verto, or a blank canvas.
+    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
+    s7_perks_label: What populate gets you
+    s7_perks:
+    - A theme-matched survey backdrop
+    - Imagery on every card, including swipe cards
+    - Shuffle in the editor until it feels right
+    s7_title: How would you like to start?
+    s7_sub: You can still change anything in the editor.
+    s7_recommended: Recommended
+    s7_populate_label: Populate content
+    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
+    s7_blank_label: Start from blank
+    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
