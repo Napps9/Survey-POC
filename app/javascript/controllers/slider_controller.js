@@ -27,6 +27,7 @@ export default class extends Controller {
   onUp() {
     this.dragging = false
     window.removeEventListener("pointermove", this._onMove)
+    this.dispatch("settle", { detail: { index: this.indexValue } })
   }
 
   updateFromEvent(event) {

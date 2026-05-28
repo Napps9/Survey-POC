@@ -11,6 +11,7 @@ export default class extends Controller {
     event.stopPropagation()
     this.indexValue = parseInt(event.currentTarget.dataset.ratingIndex, 10)
     this._render()
+    this.dispatch("pick", { detail: { index: this.indexValue } })
   }
 
   hover(event) {

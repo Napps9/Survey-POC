@@ -33,6 +33,9 @@ export default class extends Controller {
     top.style.opacity    = "0"
     this.position += 1
     setTimeout(() => this.layout(), 50)
+    if (this.position >= this.cardTargets.length) {
+      this.dispatch("complete", { detail: { results: this.swipeResults } })
+    }
   }
 
   reset(event) {

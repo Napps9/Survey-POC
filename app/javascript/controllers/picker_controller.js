@@ -22,6 +22,8 @@ export default class extends Controller {
     } else {
       this.itemTargets.forEach((el) => this.setSelected(el, el === item))
     }
+    // Bubbles up to the player controller for auto-advance.
+    this.dispatch("pick", { detail: { mode: this.modeValue } })
   }
 
   setSelected(item, on) {

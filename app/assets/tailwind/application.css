@@ -2694,6 +2694,33 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .wizard-mobile-hint     { display: none; }
 .wizard-mobile-eyebrow  { display: none; }
 
+/* Player: footer hidden everywhere. Single-pick answers auto-advance on
+   selection; sliders/NPS/rating debounce for 600ms after the last
+   interaction; tap_card advances when the stack empties. Card types
+   without a single "selected" signal (welcome, multi-select, open-ended)
+   render a .player-advance-chip inline. The footer DOM is kept so
+   _showThankyou() can still toggle the hidden buttons safely. */
+.preview-overlay .preview-footer { display: none !important; }
+
+/* Inline advance chip. Brand CTA colour, full-width inside the card,
+   pinned to the bottom of .split-right so it sits at thumb height
+   on mobile and below the controls on desktop. */
+.player-advance-chip {
+  margin-top: auto;
+  align-self: stretch;
+  min-height: 52px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 14px;
+  background: var(--brand-cta, #01EACB);
+  color: var(--brand-cta-text, #1C2034);
+  font-family: "Alata", sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.player-advance-chip:active { transform: scale(0.98); }
+
 @media (max-width: 767px) {
 
   /* ── Universal touch + form ergonomics ── */
@@ -2797,6 +2824,37 @@ body.generating-overlay-active .bottom-bar { display: none; }
     overflow: hidden;
     background: var(--brand-surface-2, #2E3564);
   }
+  /* NPS hero strip is shorter so the vertical slider fits beneath the
+     question text in the remaining viewport. */
+  .preview-overlay .split-card:has(.nps-lottie) .split-left {
+    height: 28vh;
+    min-height: 180px;
+    max-height: 30vh;
+  }
+
+  /* NPS slider on mobile: shrink the vertical track + thumb so the whole
+     control (with all 5 labels) fits between the question and the bottom
+     of the card on a real-world Safari viewport (~390×664 with the URL
+     bar in view). */
+  .preview-overlay .nps-control {
+    width: 56px;
+    height: 200px;
+    border-width: 3px;
+    border-radius: 28px;
+  }
+  .preview-overlay .nps-thumb {
+    width: 28px;
+    height: 28px;
+    border-width: 3px;
+  }
+  .preview-overlay .nps-slider { gap: 8px; }
+  .preview-overlay .nps-slider-stage { gap: 10px; }
+  .preview-overlay .nps-slider-labels {
+    /* match the shrunk .nps-control height so labels align with steps */
+    height: 200px;
+    min-width: 88px;
+  }
+  .preview-overlay .nps-slider-labels .slider-label-text { font-size: 11px; }
   .preview-overlay .split-card:has(.split-left-img) .panel-progress,
   .preview-overlay .split-card:has(.nps-lottie)     .panel-progress { display: none; }
   .preview-overlay .split-card:has(.split-left-img) .split-left-img,
@@ -2804,17 +2862,19 @@ body.generating-overlay-active .bottom-bar { display: none; }
     border-radius: 0 0 18px 18px;
   }
 
-  /* Player right pane on white — matches desktop colours */
+  /* Player right pane on white — matches desktop colours. Bottom padding
+     accommodates the iOS home indicator (footer is hidden on mobile). */
   .preview-overlay .split-card .split-right {
     width: 100%;
     flex: 1 1 auto;
     min-height: 0;
-    padding: 30px 24px calc(96px + env(safe-area-inset-bottom));
+    padding: 22px 24px calc(20px + env(safe-area-inset-bottom));
     background: #fff;
     color: #1C2034;
     text-align: center;
     justify-content: flex-start;
-    gap: 14px;
+    gap: 12px;
+    overflow: hidden;
   }
   .preview-overlay .q-eyebrow {
     color: #FF1E6F;
@@ -2921,18 +2981,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .choice-grid-3 .choice-card { height: 76px; }
   .choice-label   { font-size: 12px; padding: 4px 6px; }
 
-  /* Sticky two-button bottom bar (Back + Next), full-width pills —
-     fixed to the viewport bottom so it always sits above safe area */
-  .preview-overlay .preview-footer {
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    height: auto;
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-    gap: 12px;
-    background: #1C2034;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    z-index: 50;
-  }
+  /* Mobile-specific player tweaks live here — the footer-hide and
+     advance-chip styles are now global (search "Player: footer hidden"). */
   .preview-overlay .preview-progress-text { display: none; }
   .preview-overlay .preview-btn {
     flex: 1 1 0;

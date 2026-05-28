@@ -19,6 +19,22 @@ export default class extends Controller {
   connect() {
     this._sessionToken = this._ensureToken()
     this._update()
+    this._wireAutoAdvance()
+  }
+
+  disconnect() {
+    document.removeEventListener("nps:valueChanged", this._onNpsChanged)
+    clearTimeout(this._advanceTimer)
+  }
+
+  // Called by inline "Done" / "Begin" / "Submit" chips on cards that don't
+  // have a single selection signal (multi-select, open-ended, welcome).
+  advance() {
+    if (this.currentValue >= this.cardTargets.length - 1) {
+      this.finish()
+    } else {
+      this.next()
+    }
   }
 
   next() {
@@ -28,6 +44,34 @@ export default class extends Controller {
       this.currentValue++
       this._update()
     }
+  }
+
+  // Wires auto-advance for all question types that have a clear "selected"
+  // signal. Sliders/NPS/rating debounce for 600ms after the last interaction
+  // so users can tweak; single-select advances instantly; tap_card waits a
+  // beat after the final swipe for the animation to land.
+  _wireAutoAdvance() {
+    this._advanceTimer = null
+    this.element.addEventListener("picker:pick", (e) => {
+      // multi-select gets a "Done" chip — no auto-advance
+      if (e.detail?.mode === "multi") return
+      this._scheduleAdvance(0)
+    })
+    this.element.addEventListener("rating:pick",       () => this._scheduleAdvance(600))
+    this.element.addEventListener("slider:settle",     () => this._scheduleAdvance(600))
+    this.element.addEventListener("tap-stack:complete", () => this._scheduleAdvance(400))
+    this._onNpsChanged = () => this._scheduleAdvance(600)
+    document.addEventListener("nps:valueChanged", this._onNpsChanged)
+  }
+
+  _scheduleAdvance(delay) {
+    clearTimeout(this._advanceTimer)
+    const fromCard = this.currentValue
+    this._advanceTimer = setTimeout(() => {
+      // User already moved on (e.g. by tapping a chip) — drop this advance.
+      if (fromCard !== this.currentValue) return
+      this.advance()
+    }, delay)
   }
 
   back() {

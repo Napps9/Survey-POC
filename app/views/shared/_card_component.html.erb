@@ -285,4 +285,23 @@
       </div>
     </div>
   <% end %>
+
+  <%# Player-mode advance chip. Auto-advancing types (single-pick, sliders,
+      tap_card, NPS) don't need it — they advance on the selection event.
+      The remaining types (welcome, multi-select, open-ended) get a chip
+      that the user taps to confirm and move on. The chip text reads
+      "Begin" on welcome and "Continue" elsewhere. %>
+  <%
+    chip_label =
+      if    type == "welcome_card"                       then t("card.begin",    default: "Tap to begin")
+      elsif %w[select_many select_many_grid].include?(type) || type == "open_ended" then t("card.continue", default: "Continue →")
+      else nil
+      end
+  %>
+  <% if mode == :player && chip_label %>
+    <button type="button" class="player-advance-chip"
+            data-action="click->player#advance">
+      <%= chip_label %>
+    </button>
+  <% end %>
 </div>
