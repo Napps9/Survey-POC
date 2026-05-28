@@ -2884,10 +2884,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
     background: #fff;
     color: #1C2034;
     text-align: center;
-    /* align-items default (stretch) so .choice-list and other flex
-       children fill the card width — earlier `align-items: center`
-       compressed them to content width which felt smaller. */
-    justify-content: flex-start;
+    /* justify-content centres the content group vertically; align-items
+       stays at the default `stretch` so .choice-list, the freeform-wrap
+       and other flex children fill the card width at their natural
+       height. Headings centre horizontally via text-align. */
+    justify-content: center;
     gap: 14px;
     overflow: hidden;
     position: relative;
