@@ -2808,16 +2808,53 @@ body.generating-overlay-active .bottom-bar { display: none; }
     box-shadow: none;
     overflow: hidden;
   }
+  /* Full-colour mobile background: the image fills .split-card; the
+     question heading and the choice/control widgets carry their own
+     white backgrounds so the readable content floats above the image. */
   .preview-overlay[style*="--mobile-card-bg"] .split-card {
-    background:
-      linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)),
-      var(--mobile-card-bg) center/cover no-repeat;
+    background: var(--mobile-card-bg) center/cover no-repeat;
   }
-  /* The right pane (where text/controls live) needs to be transparent so
-     the image + scrim layered on .split-card show through; without this
-     its white background would mask everything. */
   .preview-overlay[style*="--mobile-card-bg"] .split-card .split-right {
     background: transparent;
+  }
+  /* Question heading group lives on its own white panel so eyebrow,
+     title and subtitle stay legible together over any image. */
+  .preview-overlay[style*="--mobile-card-bg"] .q-header {
+    background: #fff;
+    border-radius: 18px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  /* Choice list items / pickable cards / NPS control / textarea / tap
+     statements need solid white backgrounds when a photo sits behind
+     the card — the default player mobile theme tints them rgba(0,0,0,0.03)
+     for a subtle alternating-row effect, but that goes transparent on
+     a photo. Override to opaque white + a soft shadow so each widget
+     reads cleanly. */
+  .preview-overlay[style*="--mobile-card-bg"] .choice-list-item,
+  .preview-overlay[style*="--mobile-card-bg"] .pick-item,
+  .preview-overlay[style*="--mobile-card-bg"] .choice-card,
+  .preview-overlay[style*="--mobile-card-bg"] .nps-control,
+  .preview-overlay[style*="--mobile-card-bg"] .freeform-wrap,
+  .preview-overlay[style*="--mobile-card-bg"] .freeform-textarea,
+  .preview-overlay[style*="--mobile-card-bg"] .rotate-card {
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+  }
+  .preview-overlay[style*="--mobile-card-bg"] .choice-list-item[data-selected="true"],
+  .preview-overlay[style*="--mobile-card-bg"] .pick-item[data-selected="true"] {
+    background: var(--brand-primary-soft, rgba(255,30,111,0.08));
+  }
+  /* NPS labels are bare text — give them a soft white pill so they read
+     in front of the photo without overpowering the slider beside them. */
+  .preview-overlay[style*="--mobile-card-bg"] .nps-slider-labels .slider-label-text {
+    background: rgba(255,255,255,0.86);
+    padding: 2px 8px;
+    border-radius: 999px;
   }
 
   /* No-image cards: hide the .split-left entirely so the white card

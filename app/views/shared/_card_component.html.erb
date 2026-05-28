@@ -39,15 +39,20 @@
 
 <div class="split-right">
 
-  <% if is_q %>
-    <div class="q-eyebrow"><%= eyebrow %></div>
-  <% end %>
+  <%# Question heading group — wrapped so the player mobile theme can drop
+      a single white panel behind the eyebrow + title + subtitle when a
+      themed mobile background is in play. %>
+  <div class="q-header">
+    <% if is_q %>
+      <div class="q-eyebrow"><%= eyebrow %></div>
+    <% end %>
 
-  <div class="q-title" <%= ce_attr %>><%= display["text"] %></div>
+    <div class="q-title" <%= ce_attr %>><%= display["text"] %></div>
 
-  <% if display["description"].present? %>
-    <div class="q-subtitle" <%= ce_attr %>><%= display["description"] %></div>
-  <% end %>
+    <% if display["description"].present? %>
+      <div class="q-subtitle" <%= ce_attr %>><%= display["description"] %></div>
+    <% end %>
+  </div>
 
   <div class="mt-2"<%= " data-card-component".html_safe if editable %>>
     <% case render_type
