@@ -64,7 +64,7 @@ uk:
     back: "← Назад"
     next: Далі →
     submit: Надіслати ✓
-    thank_you_from: from %{org}
+    thank_you_from: від %{org}
   js:
     player:
       progress: Картка %{n} з %{total}
@@ -262,9 +262,9 @@ uk:
     all_types: Усі типи питань
     ranked_for: Ранжовано за відповідністю для
     this_card: цієї картки
-    shuffle: Shuffle
-    shuffle_title: Re-pick imagery from the verto library
-    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
+    shuffle: Перемішати
+    shuffle_title: Вибрати нові зображення з бібліотеки Verto
+    shuffle_confirm: Перемішати зображення? Поточні фотографії буде замінено на нову добірку з бібліотеки.
   dashboard_card:
     badge_archived: В архіві
     badge_live: Активний
@@ -409,20 +409,20 @@ uk:
     generate: Згенерувати Verto →
     generating: Генерація…
     step_counter: Крок %{n} з %{total}
-    section_how_to_start: How to start
-    section_brand_colours: Brand colours
-    s7_eyebrow: Step 07 · Final touch
-    s7_lead: Open in a finished-looking Verto, or a blank canvas.
-    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
-    s7_perks_label: What populate gets you
+    section_how_to_start: Як розпочати
+    section_brand_colours: Кольори бренду
+    s7_eyebrow: Крок 07 · Фінальний штрих
+    s7_lead: Відкрийте готовий Verto або чистий аркуш.
+    s7_body: Ми підбираємо фон і зображення для кожної картки з нашої кураторської бібліотеки — відповідно до вашої теми, аудиторії та запитання на кожній картці.
+    s7_perks_label: Що дає наповнення контентом
     s7_perks:
-    - A theme-matched survey backdrop
-    - Imagery on every card, including swipe cards
-    - Shuffle in the editor until it feels right
-    s7_title: How would you like to start?
-    s7_sub: You can still change anything in the editor.
-    s7_recommended: Recommended
-    s7_populate_label: Populate content
-    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
-    s7_blank_label: Start from blank
-    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
+    - Фон, підібраний під тему
+    - Зображення на кожній картці, включно з картками свайпу
+    - Перемішуйте в редакторі, доки результат вас не влаштує
+    s7_title: Як ви хочете розпочати?
+    s7_sub: Будь-що можна змінити в редакторі.
+    s7_recommended: Рекомендовано
+    s7_populate_label: Наповнити контентом
+    s7_populate_desc: Відкрийте редактор із фоном і зображенням на кожній картці, підібраними під ваш бриф.
+    s7_blank_label: Почати з нуля
+    s7_blank_desc: Відкрийте редактор без зображень і самостійно оберіть кожну картинку.

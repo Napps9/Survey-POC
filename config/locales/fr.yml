@@ -64,7 +64,7 @@ fr:
     back: "← Retour"
     next: Suivant →
     submit: Envoyer ✓
-    thank_you_from: from %{org}
+    thank_you_from: de la part de %{org}
   js:
     player:
       progress: Carte %{n} sur %{total}
@@ -262,9 +262,9 @@ fr:
     all_types: Tous les types de questions
     ranked_for: Classé par pertinence pour
     this_card: cette carte
-    shuffle: Shuffle
-    shuffle_title: Re-pick imagery from the verto library
-    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
+    shuffle: Mélanger
+    shuffle_title: Piocher de nouvelles images depuis la bibliothèque Verto
+    shuffle_confirm: Mélanger les images ? Vos images actuelles seront remplacées par une nouvelle sélection depuis la bibliothèque.
   dashboard_card:
     badge_archived: Archivé
     badge_live: En ligne
@@ -409,20 +409,20 @@ fr:
     generate: Générer le Verto →
     generating: Génération…
     step_counter: Étape %{n} sur %{total}
-    section_how_to_start: How to start
-    section_brand_colours: Brand colours
-    s7_eyebrow: Step 07 · Final touch
-    s7_lead: Open in a finished-looking Verto, or a blank canvas.
-    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
-    s7_perks_label: What populate gets you
+    section_how_to_start: Comment démarrer
+    section_brand_colours: Couleurs de marque
+    s7_eyebrow: Étape 07 · Touche finale
+    s7_lead: Ouvrir dans un Verto prêt à l'emploi ou sur une toile vierge.
+    s7_body: Nous sélectionnons un arrière-plan et des images par carte depuis notre bibliothèque curatée — en accord avec votre thème, votre audience et la question de chaque carte.
+    s7_perks_label: Les avantages du remplissage automatique
     s7_perks:
-    - A theme-matched survey backdrop
-    - Imagery on every card, including swipe cards
-    - Shuffle in the editor until it feels right
-    s7_title: How would you like to start?
-    s7_sub: You can still change anything in the editor.
-    s7_recommended: Recommended
-    s7_populate_label: Populate content
-    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
-    s7_blank_label: Start from blank
-    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
+    - Un arrière-plan assorti au thème de votre sondage
+    - Une image sur chaque carte, y compris les cartes à glisser
+    - Mélangez dans l'éditeur jusqu'à trouver le rendu idéal
+    s7_title: Comment souhaitez-vous démarrer ?
+    s7_sub: Vous pourrez tout modifier dans l'éditeur.
+    s7_recommended: Recommandé
+    s7_populate_label: Remplir le contenu
+    s7_populate_desc: Ouvrir l'éditeur avec un arrière-plan et une image sur chaque carte, adaptés à votre brief.
+    s7_blank_label: Partir de zéro
+    s7_blank_desc: Ouvrir l'éditeur sans aucune image pour choisir chaque visuel vous-même.

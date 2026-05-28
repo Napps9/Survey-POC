@@ -64,7 +64,7 @@ ko:
     back: "← 뒤로"
     next: 다음 →
     submit: 제출 ✓
-    thank_you_from: from %{org}
+    thank_you_from: "%{org} 제공"
   js:
     player:
       progress: "%{total}장 중 %{n}번째 카드"
@@ -262,9 +262,9 @@ ko:
     all_types: 모든 질문 유형
     ranked_for: 적합도 순위
     this_card: 이 카드
-    shuffle: Shuffle
-    shuffle_title: Re-pick imagery from the verto library
-    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
+    shuffle: 셔플
+    shuffle_title: Verto 라이브러리에서 이미지를 다시 선택합니다
+    shuffle_confirm: 이미지를 섞을까요? 현재 사진이 라이브러리에서 새로 선택한 사진으로 교체됩니다.
   dashboard_card:
     badge_archived: 보관됨
     badge_live: 라이브
@@ -409,20 +409,20 @@ ko:
     generate: Verto 생성 →
     generating: 생성 중…
     step_counter: "%{total}단계 중 %{n}단계"
-    section_how_to_start: How to start
-    section_brand_colours: Brand colours
-    s7_eyebrow: Step 07 · Final touch
-    s7_lead: Open in a finished-looking Verto, or a blank canvas.
-    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
-    s7_perks_label: What populate gets you
+    section_how_to_start: 시작 방법
+    section_brand_colours: 브랜드 색상
+    s7_eyebrow: Step 07 · 마무리
+    s7_lead: 완성된 Verto로 시작하거나, 빈 캔버스로 시작하세요.
+    s7_body: 테마, 대상 및 각 카드의 질문에 맞춰 엄선된 라이브러리에서 배경과 카드별 이미지를 선택해 드립니다.
+    s7_perks_label: 콘텐츠 채우기의 장점
     s7_perks:
-    - A theme-matched survey backdrop
-    - Imagery on every card, including swipe cards
-    - Shuffle in the editor until it feels right
-    s7_title: How would you like to start?
-    s7_sub: You can still change anything in the editor.
-    s7_recommended: Recommended
-    s7_populate_label: Populate content
-    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
-    s7_blank_label: Start from blank
-    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
+    - 테마에 맞는 설문 배경
+    - 스와이프 카드를 포함한 모든 카드에 이미지 적용
+    - 마음에 들 때까지 에디터에서 셔플 가능
+    s7_title: 어떻게 시작하시겠어요?
+    s7_sub: 에디터에서 언제든지 수정할 수 있습니다.
+    s7_recommended: 추천
+    s7_populate_label: 콘텐츠 채우기
+    s7_populate_desc: 작성하신 내용에 맞게 배경과 카드마다 이미지가 채워진 상태로 에디터를 엽니다.
+    s7_blank_label: 빈 화면으로 시작
+    s7_blank_desc: 이미지 없이 에디터를 열어 모든 사진을 직접 선택할 수 있습니다.

@@ -64,7 +64,7 @@ nl:
     back: "← Terug"
     next: Volgende →
     submit: Verzenden ✓
-    thank_you_from: from %{org}
+    thank_you_from: van %{org}
   js:
     player:
       progress: Kaart %{n} van %{total}
@@ -262,9 +262,9 @@ nl:
     all_types: Alle vraagtypen
     ranked_for: Gerangschikt op geschiktheid voor
     this_card: deze kaart
-    shuffle: Shuffle
-    shuffle_title: Re-pick imagery from the verto library
-    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
+    shuffle: Vernieuwen
+    shuffle_title: Kies nieuwe afbeeldingen uit de Verto-bibliotheek
+    shuffle_confirm: Afbeeldingen vernieuwen? Je huidige afbeeldingen worden vervangen door een nieuwe selectie uit de bibliotheek.
   dashboard_card:
     badge_archived: Gearchiveerd
     badge_live: Live
@@ -409,20 +409,20 @@ nl:
     generate: Verto genereren →
     generating: Bezig met genereren…
     step_counter: Stap %{n} van %{total}
-    section_how_to_start: How to start
-    section_brand_colours: Brand colours
-    s7_eyebrow: Step 07 · Final touch
-    s7_lead: Open in a finished-looking Verto, or a blank canvas.
-    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
-    s7_perks_label: What populate gets you
+    section_how_to_start: Hoe wil je beginnen
+    section_brand_colours: Merkkleuren
+    s7_eyebrow: Stap 07 · Laatste touch
+    s7_lead: Open in een kant-en-klare Verto of een leeg canvas.
+    s7_body: We kiezen een achtergrond en afbeeldingen per kaart uit onze samengestelde bibliotheek — afgestemd op jouw thema, doelgroep en de vraag op elke kaart.
+    s7_perks_label: Wat 'inhoud invullen' je oplevert
     s7_perks:
-    - A theme-matched survey backdrop
-    - Imagery on every card, including swipe cards
-    - Shuffle in the editor until it feels right
-    s7_title: How would you like to start?
-    s7_sub: You can still change anything in the editor.
-    s7_recommended: Recommended
-    s7_populate_label: Populate content
-    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
-    s7_blank_label: Start from blank
-    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
+    - Een achtergrond die bij je thema past
+    - Afbeeldingen op elke kaart, inclusief swipe-kaarten
+    - Vernieuwen in de editor totdat het goed voelt
+    s7_title: Hoe wil je beginnen?
+    s7_sub: Je kunt achteraf alles nog aanpassen in de editor.
+    s7_recommended: Aanbevolen
+    s7_populate_label: Inhoud invullen
+    s7_populate_desc: Open de editor met een achtergrond en een afbeelding op elke kaart, afgestemd op jouw briefing.
+    s7_blank_label: Blanco beginnen
+    s7_blank_desc: Open de editor zonder afbeeldingen, zodat je zelf elke foto kunt kiezen.

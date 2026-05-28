@@ -64,7 +64,7 @@ vi:
     back: "← Quay lại"
     next: Tiếp →
     submit: Gửi ✓
-    thank_you_from: from %{org}
+    thank_you_from: từ %{org}
   js:
     player:
       progress: Thẻ %{n} / %{total}
@@ -262,9 +262,9 @@ vi:
     all_types: Tất cả loại câu hỏi
     ranked_for: Xếp theo độ phù hợp cho
     this_card: thẻ này
-    shuffle: Shuffle
-    shuffle_title: Re-pick imagery from the verto library
-    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
+    shuffle: Xáo trộn
+    shuffle_title: Chọn lại hình ảnh từ thư viện Verto
+    shuffle_confirm: Xáo trộn hình ảnh? Các hình ảnh hiện tại của bạn sẽ được thay thế bằng bộ ảnh mới từ thư viện.
   dashboard_card:
     badge_archived: Đã lưu trữ
     badge_live: Trực tiếp
@@ -409,20 +409,20 @@ vi:
     generate: Tạo Verto →
     generating: Đang tạo…
     step_counter: Bước %{n} / %{total}
-    section_how_to_start: How to start
-    section_brand_colours: Brand colours
-    s7_eyebrow: Step 07 · Final touch
-    s7_lead: Open in a finished-looking Verto, or a blank canvas.
-    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
-    s7_perks_label: What populate gets you
+    section_how_to_start: Cách bắt đầu
+    section_brand_colours: Màu thương hiệu
+    s7_eyebrow: Bước 07 · Hoàn thiện
+    s7_lead: Mở với giao diện Verto hoàn chỉnh hoặc một trang trắng tuỳ ý.
+    s7_body: Chúng tôi chọn hình nền và hình ảnh cho từng thẻ từ thư viện được tuyển chọn — phù hợp với chủ đề, đối tượng và câu hỏi trên mỗi thẻ của bạn.
+    s7_perks_label: Lợi ích của tính năng điền nội dung
     s7_perks:
-    - A theme-matched survey backdrop
-    - Imagery on every card, including swipe cards
-    - Shuffle in the editor until it feels right
-    s7_title: How would you like to start?
-    s7_sub: You can still change anything in the editor.
-    s7_recommended: Recommended
-    s7_populate_label: Populate content
-    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
-    s7_blank_label: Start from blank
-    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
+    - Hình nền khớp với chủ đề của bạn
+    - Hình ảnh trên mỗi thẻ, bao gồm cả thẻ vuốt
+    - Xáo trộn trong trình chỉnh sửa cho đến khi ưng ý
+    s7_title: Bạn muốn bắt đầu như thế nào?
+    s7_sub: Bạn vẫn có thể thay đổi bất kỳ nội dung nào trong trình chỉnh sửa.
+    s7_recommended: Được đề xuất
+    s7_populate_label: Điền nội dung
+    s7_populate_desc: Mở trình chỉnh sửa với hình nền và hình ảnh trên mỗi thẻ, phù hợp với thông tin bạn đã cung cấp.
+    s7_blank_label: Bắt đầu từ trang trắng
+    s7_blank_desc: Mở trình chỉnh sửa không có hình ảnh để bạn tự chọn từng hình theo ý muốn.

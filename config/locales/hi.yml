@@ -64,7 +64,7 @@ hi:
     back: "← वापस"
     next: आगे →
     submit: जमा करें ✓
-    thank_you_from: from %{org}
+    thank_you_from: "%{org} की ओर से"
   js:
     player:
       progress: कार्ड %{n} / %{total}
@@ -262,9 +262,9 @@ hi:
     all_types: सभी प्रश्न प्रकार
     ranked_for: उपयुक्तता अनुसार क्रमित
     this_card: यह कार्ड
-    shuffle: Shuffle
-    shuffle_title: Re-pick imagery from the verto library
-    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
+    shuffle: शफ़ल करें
+    shuffle_title: Verto लाइब्रेरी से नई इमेजरी चुनें
+    shuffle_confirm: इमेजरी शफ़ल करें? आपकी मौजूदा तस्वीरें लाइब्रेरी से नई चुनी गई तस्वीरों से बदल दी जाएंगी।
   dashboard_card:
     badge_archived: संग्रहीत
     badge_live: लाइव
@@ -409,20 +409,20 @@ hi:
     generate: Verto बनाएं →
     generating: बनाया जा रहा है…
     step_counter: चरण %{n} / %{total}
-    section_how_to_start: How to start
-    section_brand_colours: Brand colours
-    s7_eyebrow: Step 07 · Final touch
-    s7_lead: Open in a finished-looking Verto, or a blank canvas.
-    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
-    s7_perks_label: What populate gets you
+    section_how_to_start: शुरू कैसे करें
+    section_brand_colours: ब्रांड रंग
+    s7_eyebrow: चरण 07 · अंतिम स्पर्श
+    s7_lead: तैयार दिखने वाले Verto में खोलें, या एक खाली कैनवास से शुरू करें।
+    s7_body: हम अपनी क्यूरेटेड लाइब्रेरी से एक बैकड्रॉप और प्रत्येक कार्ड के लिए इमेजरी चुनते हैं — जो आपकी थीम, दर्शकों और हर कार्ड के प्रश्न से मेल खाती है।
+    s7_perks_label: पॉप्युलेट से आपको क्या मिलता है
     s7_perks:
-    - A theme-matched survey backdrop
-    - Imagery on every card, including swipe cards
-    - Shuffle in the editor until it feels right
-    s7_title: How would you like to start?
-    s7_sub: You can still change anything in the editor.
-    s7_recommended: Recommended
-    s7_populate_label: Populate content
-    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
-    s7_blank_label: Start from blank
-    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
+    - थीम से मेल खाता सर्वे बैकड्रॉप
+    - स्वाइप कार्ड सहित हर कार्ड पर इमेजरी
+    - सही लगने तक एडिटर में शफ़ल करें
+    s7_title: आप कैसे शुरू करना चाहेंगे?
+    s7_sub: आप एडिटर में कभी भी कुछ भी बदल सकते हैं।
+    s7_recommended: अनुशंसित
+    s7_populate_label: कॉन्टेंट पॉप्युलेट करें
+    s7_populate_desc: आपके ब्रीफ़ से मेल खाते बैकड्रॉप और हर कार्ड पर तस्वीर के साथ एडिटर खोलें।
+    s7_blank_label: खाली से शुरू करें
+    s7_blank_desc: बिना किसी इमेजरी के एडिटर खोलें, ताकि आप हर तस्वीर खुद चुन सकें।

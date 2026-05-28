@@ -64,7 +64,7 @@ ja:
     back: "← 戻る"
     next: 次へ →
     submit: 送信 ✓
-    thank_you_from: from %{org}
+    thank_you_from: "%{org} より"
   js:
     player:
       progress: "%{total}枚中 %{n}枚目"
@@ -262,9 +262,9 @@ ja:
     all_types: すべての質問タイプ
     ranked_for: 適合度でランク付け：
     this_card: このカード
-    shuffle: Shuffle
-    shuffle_title: Re-pick imagery from the verto library
-    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
+    shuffle: シャッフル
+    shuffle_title: Vertoライブラリから画像を再選択
+    shuffle_confirm: 画像をシャッフルしますか？現在の画像はライブラリから新たに選ばれた画像に置き換えられます。
   dashboard_card:
     badge_archived: アーカイブ済み
     badge_live: ライブ
@@ -409,20 +409,20 @@ ja:
     generate: Vertoを生成 →
     generating: 生成中…
     step_counter: "%{total}ステップ中 %{n}"
-    section_how_to_start: How to start
-    section_brand_colours: Brand colours
-    s7_eyebrow: Step 07 · Final touch
-    s7_lead: Open in a finished-looking Verto, or a blank canvas.
-    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
-    s7_perks_label: What populate gets you
+    section_how_to_start: 開始方法
+    section_brand_colours: ブランドカラー
+    s7_eyebrow: ステップ 07 · 最終仕上げ
+    s7_lead: 完成した Verto として開くか、白紙のキャンバスとして開くかを選べます。
+    s7_body: テーマ・対象者・各カードの質問に合わせて、厳選ライブラリから背景画像とカードごとの画像を自動で選択します。
+    s7_perks_label: 自動入力でできること
     s7_perks:
-    - A theme-matched survey backdrop
-    - Imagery on every card, including swipe cards
-    - Shuffle in the editor until it feels right
-    s7_title: How would you like to start?
-    s7_sub: You can still change anything in the editor.
-    s7_recommended: Recommended
-    s7_populate_label: Populate content
-    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
-    s7_blank_label: Start from blank
-    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
+    - テーマに合ったアンケート背景
+    - スワイプカードを含む全カードへの画像挿入
+    - エディターでしっくりくるまでシャッフル可能
+    s7_title: どのように開始しますか？
+    s7_sub: エディターでいつでも変更できます。
+    s7_recommended: おすすめ
+    s7_populate_label: コンテンツを自動入力
+    s7_populate_desc: 入力内容に合わせた背景と各カードの画像を設定した状態でエディターを開きます。
+    s7_blank_label: 白紙から始める
+    s7_blank_desc: 画像なしの状態でエディターを開き、すべての画像を自分で選択できます。

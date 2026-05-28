@@ -64,7 +64,7 @@ ar:
     back: "← رجوع"
     next: التالي ←
     submit: إرسال ✓
-    thank_you_from: from %{org}
+    thank_you_from: من %{org}
   js:
     player:
       progress: البطاقة %{n} من %{total}
@@ -262,9 +262,9 @@ ar:
     all_types: جميع أنواع الأسئلة
     ranked_for: مرتبة حسب الملاءمة لـ
     this_card: هذه البطاقة
-    shuffle: Shuffle
-    shuffle_title: Re-pick imagery from the verto library
-    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
+    shuffle: خلط
+    shuffle_title: إعادة اختيار الصور من مكتبة Verto
+    shuffle_confirm: هل تريد خلط الصور؟ سيتم استبدال صورك الحالية باختيار جديد من المكتبة.
   dashboard_card:
     badge_archived: مؤرشف
     badge_live: مباشر
@@ -409,20 +409,20 @@ ar:
     generate: إنشاء Verto ←
     generating: جارٍ الإنشاء…
     step_counter: الخطوة %{n} من %{total}
-    section_how_to_start: How to start
-    section_brand_colours: Brand colours
-    s7_eyebrow: Step 07 · Final touch
-    s7_lead: Open in a finished-looking Verto, or a blank canvas.
-    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
-    s7_perks_label: What populate gets you
+    section_how_to_start: كيفية البدء
+    section_brand_colours: ألوان العلامة التجارية
+    s7_eyebrow: الخطوة 07 · اللمسة الأخيرة
+    s7_lead: افتح في Verto جاهز للعرض، أو ابدأ بلوحة فارغة.
+    s7_body: نختار خلفية وصورًا لكل بطاقة من مكتبتنا المنتقاة — متوافقة مع موضوعك وجمهورك والسؤال في كل بطاقة.
+    s7_perks_label: ما الذي تحصل عليه مع التعبئة التلقائية
     s7_perks:
-    - A theme-matched survey backdrop
-    - Imagery on every card, including swipe cards
-    - Shuffle in the editor until it feels right
-    s7_title: How would you like to start?
-    s7_sub: You can still change anything in the editor.
-    s7_recommended: Recommended
-    s7_populate_label: Populate content
-    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
-    s7_blank_label: Start from blank
-    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
+    - خلفية استطلاع متوافقة مع الموضوع
+    - صورة على كل بطاقة، بما فيها بطاقات السحب
+    - اخلط الصور في المحرر حتى تجد ما يناسبك
+    s7_title: كيف تود البدء؟
+    s7_sub: يمكنك تغيير أي شيء لاحقًا في المحرر.
+    s7_recommended: موصى به
+    s7_populate_label: تعبئة المحتوى
+    s7_populate_desc: افتح المحرر بخلفية وصورة على كل بطاقة، متوافقة مع متطلباتك.
+    s7_blank_label: ابدأ من الصفر
+    s7_blank_desc: افتح المحرر بدون صور لتتمكن من اختيار كل صورة بنفسك.

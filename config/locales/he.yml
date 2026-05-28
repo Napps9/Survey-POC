@@ -64,7 +64,7 @@ he:
     back: "← חזרה"
     next: הבא →
     submit: שלח ✓
-    thank_you_from: from %{org}
+    thank_you_from: מאת %{org}
   js:
     player:
       progress: כרטיס %{n} מתוך %{total}
@@ -262,9 +262,9 @@ he:
     all_types: כל סוגי השאלות
     ranked_for: מדורג לפי התאמה עבור
     this_card: כרטיס זה
-    shuffle: Shuffle
-    shuffle_title: Re-pick imagery from the verto library
-    shuffle_confirm: Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library.
+    shuffle: ערבב
+    shuffle_title: בחר מחדש תמונות מספריית verto
+    shuffle_confirm: לערבב תמונות? התמונות הנוכחיות שלך יוחלפו בבחירה חדשה מהספרייה.
   dashboard_card:
     badge_archived: בארכיון
     badge_live: פעיל
@@ -409,20 +409,20 @@ he:
     generate: צור Verto →
     generating: מייצר…
     step_counter: שלב %{n} מתוך %{total}
-    section_how_to_start: How to start
-    section_brand_colours: Brand colours
-    s7_eyebrow: Step 07 · Final touch
-    s7_lead: Open in a finished-looking Verto, or a blank canvas.
-    s7_body: We pick a backdrop and per-card imagery from our curated library — matched to your theme, audience and the question on each card.
-    s7_perks_label: What populate gets you
+    section_how_to_start: איך להתחיל
+    section_brand_colours: צבעי המותג
+    s7_eyebrow: שלב 07 · מגע אחרון
+    s7_lead: פתח בVerto מוכן למראה, או בלוח ריק.
+    s7_body: אנחנו בוחרים רקע ותמונות לכל כרטיס מהספרייה המאצורה שלנו — מותאמים לנושא, לקהל ולשאלה בכל כרטיס.
+    s7_perks_label: מה מקבלים עם מילוי תוכן
     s7_perks:
-    - A theme-matched survey backdrop
-    - Imagery on every card, including swipe cards
-    - Shuffle in the editor until it feels right
-    s7_title: How would you like to start?
-    s7_sub: You can still change anything in the editor.
-    s7_recommended: Recommended
-    s7_populate_label: Populate content
-    s7_populate_desc: Open the editor with a backdrop and a picture on every card, matched to your brief.
-    s7_blank_label: Start from blank
-    s7_blank_desc: Open the editor with no imagery so you can choose every picture yourself.
+    - רקע לסקר המותאם לנושא
+    - תמונה בכל כרטיס, כולל כרטיסי החלקה
+    - ערבוב בעורך עד שמרגיש נכון
+    s7_title: איך תרצה להתחיל?
+    s7_sub: תמיד אפשר לשנות הכל בעורך.
+    s7_recommended: מומלץ
+    s7_populate_label: מלא תוכן
+    s7_populate_desc: פתח את העורך עם רקע ותמונה בכל כרטיס, מותאמים לבריף שלך.
+    s7_blank_label: התחל מאפס
+    s7_blank_desc: פתח את העורך ללא תמונות כדי שתוכל לבחור כל תמונה בעצמך.
