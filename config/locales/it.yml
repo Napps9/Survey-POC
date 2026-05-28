@@ -285,6 +285,19 @@ it:
     delete: Elimina
     edit_warning: "“%{title}” è live. Modificare le domande mentre raccoglie risposte influirà sulla qualità dei dati — le risposte prima e dopo la modifica non saranno direttamente confrontabili. Continuare?"
     delete_warning: Eliminare “%{title}”? Non puoi recuperare un Verto dopo l'eliminazione. Il link per i risponditori smetterà di funzionare — i risultati esistenti restano nella tua lista Archiviati.
+    delete_forever: Elimina per sempre
+    delete_forever_warning: Eliminare permanentemente "%{title}"? Tutte le risposte, condivisioni e dati verranno cancellati. Questa azione non può essere annullata.
+    select: Seleziona
+    cancel: Annulla
+    bulk_selected:
+      one: "%{count} selezionato"
+      other: "%{count} selezionati"
+    bulk_archive_confirm:
+      one: Eliminare %{count} Verto? Il link dei rispondenti non funzionerà più — i risultati rimarranno nel tuo elenco Archiviati.
+      other: Eliminare %{count} Vertos? I link dei rispondenti non funzioneranno più — i risultati rimarranno nel tuo elenco Archiviati.
+    bulk_destroy_confirm:
+      one: Eliminare permanentemente %{count} Verto? Tutte le risposte e i dati verranno cancellati. Questa azione non può essere annullata.
+      other: Eliminare permanentemente %{count} Vertos? Tutte le risposte e i dati verranno cancellati. Questa azione non può essere annullata.
   dashboard:
     welcome_back: Bentornato
     heading_html: I tuoi <span style="color:#01EACB;">Vertos</span>

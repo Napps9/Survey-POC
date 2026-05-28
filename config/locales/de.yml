@@ -285,6 +285,19 @@ de:
     delete: Löschen
     edit_warning: "„%{title}“ ist live. Das Bearbeiten von Fragen, während Antworten gesammelt werden, beeinträchtigt die Datenqualität — Antworten von vor und nach der Bearbeitung sind nicht direkt vergleichbar. Fortfahren?"
     delete_warning: "„%{title}“ löschen? Ein gelöschtes Verto lässt sich nicht wiederherstellen. Der Link für Teilnehmende funktioniert nicht mehr — bestehende Ergebnisse bleiben in deiner Archiv-Liste."
+    delete_forever: Dauerhaft löschen
+    delete_forever_warning: '"%{title}" dauerhaft löschen? Alle Antworten, Freigaben und Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden.'
+    select: Auswählen
+    cancel: Abbrechen
+    bulk_selected:
+      one: "%{count} ausgewählt"
+      other: "%{count} ausgewählt"
+    bulk_archive_confirm:
+      one: "%{count} Verto löschen? Der Link für Responder wird nicht mehr funktionieren – Ergebnisse bleiben in Ihrer Archivliste."
+      other: "%{count} Vertos löschen? Die Links für Responder werden nicht mehr funktionieren – Ergebnisse bleiben in Ihrer Archivliste."
+    bulk_destroy_confirm:
+      one: "%{count} Verto dauerhaft löschen? Alle Antworten und Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden."
+      other: "%{count} Vertos dauerhaft löschen? Alle Antworten und Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden."
   dashboard:
     welcome_back: Willkommen zurück
     heading_html: Deine <span style="color:#01EACB;">Vertos</span>

@@ -285,6 +285,19 @@ es:
     delete: Eliminar
     edit_warning: "«%{title}» está en vivo. Editar preguntas mientras recopila respuestas afectará la calidad de los datos — las respuestas anteriores y posteriores a la edición no serán directamente comparables. ¿Continuar?"
     delete_warning: "¿Eliminar «%{title}»? No podrás recuperar un Verto eliminado. El enlace de los participantes dejará de funcionar — los resultados existentes permanecerán en tu lista de archivados."
+    delete_forever: Eliminar permanentemente
+    delete_forever_warning: ¿Eliminar permanentemente "%{title}"? Todas las respuestas, comparticiones y datos se borrarán. Esta acción no se puede deshacer.
+    select: Seleccionar
+    cancel: Cancelar
+    bulk_selected:
+      one: "%{count} seleccionado"
+      other: "%{count} seleccionados"
+    bulk_archive_confirm:
+      one: "¿Eliminar %{count} Verto? El enlace de los respondedores dejará de funcionar — los resultados permanecerán en tu lista de Archivados."
+      other: "¿Eliminar %{count} Vertos? Los enlaces de los respondedores dejarán de funcionar — los resultados permanecerán en tu lista de Archivados."
+    bulk_destroy_confirm:
+      one: "¿Eliminar permanentemente %{count} Verto? Todas las respuestas y datos se borrarán. Esta acción no se puede deshacer."
+      other: "¿Eliminar permanentemente %{count} Vertos? Todas las respuestas y datos se borrarán. Esta acción no se puede deshacer."
   dashboard:
     welcome_back: Bienvenido de nuevo
     heading_html: Tus <span style="color:#01EACB;">Vertos</span>

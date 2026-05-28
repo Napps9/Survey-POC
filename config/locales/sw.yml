@@ -285,6 +285,19 @@ sw:
     delete: Futa
     edit_warning: '"%{title}" iko hai. Kuhariri maswali wakati inakusanya majibu kutaathiri ubora wa data — majibu ya kabla na baada ya uhariri hayatalinganishwa moja kwa moja. Endelea?'
     delete_warning: Futa "%{title}"? Huwezi kuirudisha Verto baada ya kufutwa. Kiungo cha wajibu kitaacha kufanya kazi — matokeo yaliyopo yatabaki katika orodha yako ya Yaliyohifadhiwa.
+    delete_forever: Futa milele
+    delete_forever_warning: Futa milele "%{title}"? Majibu yote, upabuni, na data itafutwa. Hii haiwezi kutenduliwa.
+    select: Chagua
+    cancel: Ghairi
+    bulk_selected:
+      one: "%{count} kilichochaguliwa"
+      other: "%{count} vilichochaguliwa"
+    bulk_archive_confirm:
+      one: Futa %{count} Verto? Kiungo cha watakaojiojibu kitaacha kufanya kazi — matokeo yanabaki kwenye orodha yako ya Kumbukumbu.
+      other: Futa %{count} Vertos? Viungo vya watakaojiojibu vitaacha kufanya kazi — matokeo yanabaki kwenye orodha yako ya Kumbukumbu.
+    bulk_destroy_confirm:
+      one: Futa milele %{count} Verto? Majibu yote na data itafutwa. Hii haiwezi kutenduliwa.
+      other: Futa milele %{count} Vertos? Majibu yote na data itafutwa. Hii haiwezi kutenduliwa.
   dashboard:
     welcome_back: Karibu tena
     heading_html: <span style="color:#01EACB;">Vertos</span> Zako

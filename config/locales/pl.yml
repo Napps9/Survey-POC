@@ -285,6 +285,19 @@ pl:
     delete: Usuń
     edit_warning: "„%{title}” jest aktywne. Edytowanie pytań podczas zbierania odpowiedzi wpłynie na jakość danych — odpowiedzi sprzed i po edycji nie będą bezpośrednio porównywalne. Kontynuować?"
     delete_warning: Usunąć „%{title}”? Usuniętego Verto nie da się odzyskać. Link dla respondentów przestanie działać — istniejące wyniki pozostaną na liście Zarchiwizowane.
+    delete_forever: Usuń na zawsze
+    delete_forever_warning: Trwale usunąć "%{title}"? Wszystkie odpowiedzi, udziały i dane zostaną usunięte. Tej operacji nie można cofnąć.
+    select: Wybierz
+    cancel: Anuluj
+    bulk_selected:
+      one: "%{count} wybrany"
+      other: "%{count} wybranych"
+    bulk_archive_confirm:
+      one: Usunąć %{count} Verto? Link dla respondentów przestanie działać — wyniki pozostaną na liście Zarchiwizowane.
+      other: Usunąć %{count} Verto? Linki dla respondentów przestaną działać — wyniki pozostaną na liście Zarchiwizowane.
+    bulk_destroy_confirm:
+      one: Trwale usunąć %{count} Verto? Wszystkie odpowiedzi i dane zostaną usunięte. Tej operacji nie można cofnąć.
+      other: Trwale usunąć %{count} Verto? Wszystkie odpowiedzi i dane zostaną usunięte. Tej operacji nie można cofnąć.
   dashboard:
     welcome_back: Witaj ponownie
     heading_html: Twoje <span style="color:#01EACB;">Verto</span>

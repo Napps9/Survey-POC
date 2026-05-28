@@ -285,6 +285,19 @@ pt:
     delete: Eliminar
     edit_warning: "“%{title}” está ao vivo. Editar perguntas enquanto está a recolher respostas afetará a qualidade dos dados — as respostas antes e depois da edição não serão diretamente comparáveis. Continuar?"
     delete_warning: Eliminar “%{title}”? Não é possível recuperar um Verto após eliminação. O link dos respondentes deixará de funcionar — os resultados existentes permanecem na sua lista de Arquivados.
+    delete_forever: Deletar permanentemente
+    delete_forever_warning: Deletar permanentemente "%{title}"? Todas as respostas, compartilhamentos e dados serão apagados. Isso não pode ser desfeito.
+    select: Selecionar
+    cancel: Cancelar
+    bulk_selected:
+      one: "%{count} selecionado"
+      other: "%{count} selecionados"
+    bulk_archive_confirm:
+      one: Deletar %{count} Verto? O link dos respondentes deixará de funcionar — os resultados permanecerão em sua lista Arquivados.
+      other: Deletar %{count} Vertos? Os links dos respondentes deixarão de funcionar — os resultados permanecerão em sua lista Arquivados.
+    bulk_destroy_confirm:
+      one: Deletar permanentemente %{count} Verto? Todas as respostas e dados serão apagados. Isso não pode ser desfeito.
+      other: Deletar permanentemente %{count} Vertos? Todas as respostas e dados serão apagados. Isso não pode ser desfeito.
   dashboard:
     welcome_back: Bem-vindo de volta
     heading_html: Os seus <span style="color:#01EACB;">Vertos</span>

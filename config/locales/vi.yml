@@ -285,6 +285,19 @@ vi:
     delete: Xóa
     edit_warning: '"%{title}" đang trực tiếp. Việc chỉnh sửa câu hỏi khi đang thu thập phản hồi sẽ ảnh hưởng đến chất lượng dữ liệu — câu trả lời trước và sau khi chỉnh sửa sẽ không so sánh trực tiếp được. Tiếp tục?'
     delete_warning: Xóa "%{title}"? Bạn không thể khôi phục một Verto đã bị xóa. Liên kết của người phản hồi sẽ ngừng hoạt động — kết quả hiện có vẫn ở trong danh sách Lưu trữ của bạn.
+    delete_forever: Xóa vĩnh viễn
+    delete_forever_warning: Xóa vĩnh viễn "%{title}"? Tất cả các phản hồi, chia sẻ và dữ liệu sẽ bị xóa. Không thể hoàn tác hành động này.
+    select: Chọn
+    cancel: Hủy
+    bulk_selected:
+      one: "%{count} được chọn"
+      other: "%{count} được chọn"
+    bulk_archive_confirm:
+      one: Xóa %{count} Verto? Liên kết của người trả lời sẽ không hoạt động — kết quả vẫn nằm trong danh sách Lưu trữ của bạn.
+      other: Xóa %{count} Vertos? Liên kết của người trả lời sẽ không hoạt động — kết quả vẫn nằm trong danh sách Lưu trữ của bạn.
+    bulk_destroy_confirm:
+      one: Xóa vĩnh viễn %{count} Verto? Tất cả các phản hồi và dữ liệu sẽ bị xóa. Không thể hoàn tác hành động này.
+      other: Xóa vĩnh viễn %{count} Vertos? Tất cả các phản hồi và dữ liệu sẽ bị xóa. Không thể hoàn tác hành động này.
   dashboard:
     welcome_back: Chào mừng trở lại
     heading_html: <span style="color:#01EACB;">Vertos</span> của bạn

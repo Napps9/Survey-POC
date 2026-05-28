@@ -285,6 +285,19 @@ tr:
     delete: Sil
     edit_warning: '"%{title}" canlı. Yanıt toplarken soruları düzenlemek veri kalitesini etkileyecektir — düzenlemeden önceki ve sonraki yanıtlar doğrudan karşılaştırılamaz. Devam edilsin mi?'
     delete_warning: '"%{title}" silinsin mi? Silinen bir Verto''yu geri alamazsınız. Yanıtlayıcıların bağlantısı çalışmayı durduracak — mevcut sonuçlar Arşivlenenler listenizde kalır.'
+    delete_forever: Kalıcı olarak sil
+    delete_forever_warning: '"%{title}" kalıcı olarak silinsin? Tüm yanıtlar, paylaşımlar ve veriler silinecek. Bu işlem geri alınamaz.'
+    select: Seç
+    cancel: İptal et
+    bulk_selected:
+      one: "%{count} seçildi"
+      other: "%{count} seçildi"
+    bulk_archive_confirm:
+      one: "%{count} Verto silinsin? Yanıtlayıcıların bağlantısı çalışmayı durduracak — sonuçlar Arşivlenmiş listenizde kalacak."
+      other: "%{count} Verto silinsin? Yanıtlayıcıların bağlantıları çalışmayı durduracak — sonuçlar Arşivlenmiş listenizde kalacak."
+    bulk_destroy_confirm:
+      one: "%{count} Verto kalıcı olarak silinsin? Tüm yanıtlar ve veriler silinecek. Bu işlem geri alınamaz."
+      other: "%{count} Verto kalıcı olarak silinsin? Tüm yanıtlar ve veriler silinecek. Bu işlem geri alınamaz."
   dashboard:
     welcome_back: Tekrar hoş geldiniz
     heading_html: <span style="color:#01EACB;">Verto'larınız</span>

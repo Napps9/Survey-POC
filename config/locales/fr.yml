@@ -285,6 +285,19 @@ fr:
     delete: Supprimer
     edit_warning: "« %{title} » est en ligne. Modifier les questions pendant la collecte de réponses affectera la qualité des données — les réponses avant et après la modification ne seront pas directement comparables. Continuer ?"
     delete_warning: Supprimer « %{title} » ? La suppression est définitive. Le lien des répondants cessera de fonctionner — les résultats existants resteront dans votre liste Archivés.
+    delete_forever: Supprimer définitivement
+    delete_forever_warning: Supprimer définitivement "%{title}" ? Toutes les réponses, partages et données seront effacés. Cette action est irréversible.
+    select: Sélectionner
+    cancel: Annuler
+    bulk_selected:
+      one: "%{count} sélectionné"
+      other: "%{count} sélectionnés"
+    bulk_archive_confirm:
+      one: Supprimer %{count} Verto ? Le lien des répondants ne fonctionnera plus — les résultats resteront dans votre liste Archivés.
+      other: Supprimer %{count} Vertos ? Les liens des répondants ne fonctionneront plus — les résultats resteront dans votre liste Archivés.
+    bulk_destroy_confirm:
+      one: Supprimer définitivement %{count} Verto ? Toutes les réponses et données seront effacées. Cette action est irréversible.
+      other: Supprimer définitivement %{count} Vertos ? Toutes les réponses et données seront effacées. Cette action est irréversible.
   dashboard:
     welcome_back: Bon retour
     heading_html: Vos <span style="color:#01EACB;">Vertos</span>

@@ -285,6 +285,19 @@ ja:
     delete: 削除
     edit_warning: "「%{title}」はライブ中です。回答収集中に質問を編集するとデータの品質に影響します — 編集前後の回答は直接比較できません。続けますか？"
     delete_warning: "「%{title}」を削除しますか？削除したVertoは元に戻せません。回答者のリンクは機能しなくなりますが、既存の結果はアーカイブリストに残ります。"
+    delete_forever: 永遠に削除
+    delete_forever_warning: '"%{title}"を永遠に削除しますか？すべての回答、共有、データが消去されます。この操作は取り消せません。'
+    select: 選択
+    cancel: キャンセル
+    bulk_selected:
+      one: "%{count}件選択"
+      other: "%{count}件選択"
+    bulk_archive_confirm:
+      one: "%{count}個のVertoを削除しますか？回答者のリンクは機能しなくなります。結果はアーカイブ済みリストに残ります。"
+      other: "%{count}個のVertosを削除しますか？回答者のリンクは機能しなくなります。結果はアーカイブ済みリストに残ります。"
+    bulk_destroy_confirm:
+      one: "%{count}個のVertoを永遠に削除しますか？すべての回答とデータが消去されます。この操作は取り消せません。"
+      other: "%{count}個のVertosを永遠に削除しますか？すべての回答とデータが消去されます。この操作は取り消せません。"
   dashboard:
     welcome_back: おかえりなさい
     heading_html: あなたの<span style="color:#01EACB;">Vertos</span>

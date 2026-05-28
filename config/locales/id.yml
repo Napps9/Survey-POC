@@ -285,6 +285,19 @@ id:
     delete: Hapus
     edit_warning: '"%{title}" sedang live. Mengedit pertanyaan saat sedang mengumpulkan tanggapan akan memengaruhi kualitas data — jawaban sebelum dan sesudah pengeditan tidak dapat dibandingkan langsung. Lanjutkan?'
     delete_warning: Hapus "%{title}"? Verto yang dihapus tidak bisa dikembalikan. Tautan responden akan berhenti berfungsi — hasil yang ada akan tetap di daftar Diarsipkan Anda.
+    delete_forever: Hapus selamanya
+    delete_forever_warning: Hapus "%{title}" secara permanen? Semua respons, berbagi, dan data akan dihapus. Tindakan ini tidak dapat dibatalkan.
+    select: Pilih
+    cancel: Batal
+    bulk_selected:
+      one: "%{count} dipilih"
+      other: "%{count} dipilih"
+    bulk_archive_confirm:
+      one: Hapus %{count} Verto? Tautan responden akan berhenti bekerja — hasil tetap berada di daftar Arsip Anda.
+      other: Hapus %{count} Vertos? Tautan responden akan berhenti bekerja — hasil tetap berada di daftar Arsip Anda.
+    bulk_destroy_confirm:
+      one: Hapus %{count} Verto secara permanen? Semua respons dan data akan dihapus. Tindakan ini tidak dapat dibatalkan.
+      other: Hapus %{count} Vertos secara permanen? Semua respons dan data akan dihapus. Tindakan ini tidak dapat dibatalkan.
   dashboard:
     welcome_back: Selamat datang kembali
     heading_html: <span style="color:#01EACB;">Verto</span> Anda

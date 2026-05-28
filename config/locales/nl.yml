@@ -285,6 +285,19 @@ nl:
     delete: Verwijderen
     edit_warning: "“%{title}” is live. Het bewerken van vragen terwijl er reacties worden verzameld, heeft invloed op de datakwaliteit — antwoorden van vóór en na de bewerking zijn niet rechtstreeks vergelijkbaar. Doorgaan?"
     delete_warning: "“%{title}” verwijderen? Een verwijderde Verto kun je niet terughalen. De link voor respondenten werkt niet meer — bestaande resultaten blijven in je Archief staan."
+    delete_forever: Voor altijd verwijderen
+    delete_forever_warning: Permanent "%{title}" verwijderen? Alle reacties, delingen en gegevens worden gewist. Dit kan niet ongedaan worden gemaakt.
+    select: Selecteren
+    cancel: Annuleren
+    bulk_selected:
+      one: "%{count} geselecteerd"
+      other: "%{count} geselecteerd"
+    bulk_archive_confirm:
+      one: "%{count} Verto verwijderen? De link voor respondenten werkt niet meer — resultaten blijven in uw gearchiveerde lijst."
+      other: "%{count} Vertos verwijderen? De links voor respondenten werken niet meer — resultaten blijven in uw gearchiveerde lijst."
+    bulk_destroy_confirm:
+      one: "%{count} Verto permanent verwijderen? Alle reacties en gegevens worden gewist. Dit kan niet ongedaan worden gemaakt."
+      other: "%{count} Vertos permanent verwijderen? Alle reacties en gegevens worden gewist. Dit kan niet ongedaan worden gemaakt."
   dashboard:
     welcome_back: Welkom terug
     heading_html: Jouw <span style="color:#01EACB;">Vertos</span>
