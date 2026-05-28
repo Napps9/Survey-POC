@@ -42,16 +42,38 @@ export default class extends Controller {
     const stack = this.element.querySelector(".rotate-card-stack")
     if (!stack) return
     const n = stack.querySelectorAll(".rotate-card").length
-    const [a, b] = SWIPE_FILLS[n % SWIPE_FILLS.length]
+
+    // If this card was populated (option_images is non-empty), match the
+    // populated look on the new statement by picking an unused swipe-card
+    // URL. Otherwise fall back to the colourful gradient.
+    const cardRow  = this.element.closest('[data-survey-editor-target="card"]')
+    const existing = this._readOptionImages(cardRow)
+    const newImage = existing.length > 0 ? this._pickSwipeUrl(existing) : null
+
     const card = document.createElement("div")
     card.className = "rotate-card"
     card.dataset.tapStackTarget = "card"
-    card.style.background = `linear-gradient(135deg,${a},${b})`
+    if (newImage) {
+      card.style.background = `#fff url('${newImage}') center/cover no-repeat`
+    } else {
+      const [a, b] = SWIPE_FILLS[n % SWIPE_FILLS.length]
+      card.style.background = `linear-gradient(135deg,${a},${b})`
+    }
+    const textStyle = newImage
+      ? "font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;background:rgba(255,255,255,0.92);padding:8px 16px;border-radius:999px;box-shadow:0 1px 3px rgba(0,0,0,0.08);max-width:80%;"
+      : "font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;"
     card.innerHTML = `
-      <span contenteditable="true" style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;">New statement</span>
+      <span contenteditable="true" style="${textStyle}">New statement</span>
       <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption">×</button>
     `
     stack.appendChild(card)
+
+    // Persist the new URL onto the card row so autosave's serialiser includes
+    // it (survey_editor reads cardOptionImages from this dataset).
+    if (newImage && cardRow) {
+      cardRow.dataset.cardOptionImages = JSON.stringify(existing.concat([newImage]))
+    }
+
     this.dispatch("changed")
     // Notify tap-stack controller to re-layout
     const tapStack = this.element.querySelector("[data-controller~='tap-stack']") || this.element
@@ -64,5 +86,24 @@ export default class extends Controller {
       window.getSelection()?.removeAllRanges()
       window.getSelection()?.addRange(range)
     }
+  }
+
+  _readOptionImages(cardRow) {
+    if (!cardRow) return []
+    try {
+      const v = JSON.parse(cardRow.dataset.cardOptionImages || "[]")
+      return Array.isArray(v) ? v : []
+    } catch (_) { return [] }
+  }
+
+  _pickSwipeUrl(existing) {
+    const editor = this.element.closest("[data-swipe-card-urls]")
+    if (!editor) return null
+    let pool = []
+    try { pool = JSON.parse(editor.dataset.swipeCardUrls || "[]") } catch (_) { return null }
+    if (!Array.isArray(pool) || pool.length === 0) return null
+    const unused = pool.filter(u => !existing.includes(u))
+    const choices = unused.length > 0 ? unused : pool  // exhausted → allow repeats
+    return choices[Math.floor(Math.random() * choices.length)]
   }
 }

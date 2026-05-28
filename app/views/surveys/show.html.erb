@@ -32,6 +32,7 @@
      data-survey-editor-default-locale-value="<%= @survey.default_locale %>"
      data-survey-editor-locales-value="<%= @survey.verto_locales.to_json %>"
      data-survey-editor-rtl-locales-value="<%= SupportedLocales.all.select(&:rtl?).map(&:code).to_json %>"
+     data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
      data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#close">
 
 

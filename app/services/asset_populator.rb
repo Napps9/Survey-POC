@@ -53,6 +53,17 @@ class AssetPopulator
       @manifest      = nil
       @manifest_mtime = nil
     end
+
+    # Full list of swipe-card asset URLs (resolved through Sprockets so the
+    # paths are fingerprinted). Used by the editor when a user adds a new
+    # statement to a tap_card whose option_images were already populated —
+    # the client picks an unused URL from this list.
+    def swipe_card_urls
+      helpers = ActionController::Base.helpers
+      Array(manifest["swipe_cards"]).map do |a|
+        helpers.asset_path("#{SWIPE_CARDS_DIR}/#{a['file']}")
+      end
+    end
   end
 
   def initialize(survey, seed: nil)
