@@ -95,6 +95,17 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_nil s.cards[0]["image"]
   end
 
+  test "food theme expands through cluster to match nature background" do
+    s = make_survey(theme: "healthy sustainable food", audience_age: "18-30",
+                    cards: [ { "type" => "open_ended", "text" => "Thoughts?" } ])
+
+    AssetPopulator.new(s).populate!
+
+    s.reload
+    assert_match %r{verto-library/backgrounds/nature(?:-[a-f0-9]+)?\.jpg}i, s.background_image,
+      "food theme must pull in nature via the theme_clusters expansion, got #{s.background_image.inspect}"
+  end
+
   test "climate theme picks the nature background, not sport, despite age/mood bonuses" do
     s = make_survey(theme: "Climate", audience_age: "15-20",
                     cards: [ { "type" => "open_ended", "text" => "Thoughts?" } ])

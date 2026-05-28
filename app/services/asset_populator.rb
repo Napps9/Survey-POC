@@ -83,7 +83,22 @@ class AssetPopulator
     # Helpers below mirror the instance-level versions so callers outside
     # the populator don't need an instance just to compute these.
     def theme_keywords(theme)
-      theme.to_s.downcase.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
+      raw = theme.to_s.downcase.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
+      expand_themes(raw)
+    end
+
+    # Expand a list of theme keywords through manifest.theme_clusters so
+    # conceptually-related themes pull each other in. A "food" survey
+    # picks up `nature` / `sustainability` / `healthy` from the same
+    # cluster, so a nature-themed background still scores for a food
+    # Verto. Clusters are bidirectional.
+    def expand_themes(themes)
+      clusters = Array(manifest["theme_clusters"]).map { |c| Array(c).map { |s| s.to_s.downcase } }
+      expanded = themes.dup
+      clusters.each do |cluster|
+        expanded.concat(cluster) if (themes & cluster).any?
+      end
+      expanded.uniq
     end
 
     def age_buckets(audience_age)
