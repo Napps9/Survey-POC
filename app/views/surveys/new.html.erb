@@ -290,76 +290,11 @@
         </div>
       </section>
 
-      <%# ── Card 6 · Brand colours ── %>
-      <%
-        org_pal = current_organisation.brand_palette
-        brand_roles = [
-          ["primary", t("wizard.brand_primary"), t("wizard.brand_primary_desc")],
-          ["cta",     t("wizard.brand_cta"),     t("wizard.brand_cta_desc")],
-          ["bg",      t("wizard.brand_bg"),      t("wizard.brand_bg_desc")]
-        ]
-      %>
-      <section class="preview-card" data-create-wizard-target="card"
-               data-controller="brand-palette">
-        <div class="split-card">
-          <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:91%;"></div></div>
-            <div style="<%= left_pad_style %>gap:14px;">
-              <div style="<%= eyebrow_style %>color:#FFFA77;"><%= t("wizard.s5_eyebrow") %></div>
-              <div style="<%= instr_lead %>"><%= t("wizard.s5_lead") %></div>
-              <div style="<%= instr_body %>"><%= t("wizard.s5_body") %></div>
-
-              <%# Live mock — updates as colours are picked. Uses brand vars so
-                  it falls back to Playverto's look for the default palette. %>
-              <div data-brand-palette-target="preview"
-                   style="margin-top:4px;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:11px;background:var(--brand-bg,#1C2034);box-shadow:0 10px 30px rgba(0,0,0,0.28);">
-                <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--brand-primary,#01EACB);"><%= t("wizard.s5_live_preview") %></div>
-                <div style="background:#fff;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:8px;">
-                  <div style="font-family:'Alata',sans-serif;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--brand-primary,#01EACB);"><%= t("wizard.s5_quick_poll") %></div>
-                  <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;line-height:1.3;"><%= t("wizard.s5_mock_q") %></div>
-                  <div style="display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:8px;background:var(--brand-primary-soft,rgba(1,234,203,0.12));">
-                    <span style="width:14px;height:14px;border-radius:50%;background:var(--brand-primary,#01EACB);flex-shrink:0;"></span>
-                    <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:#111;"><%= t("wizard.s5_mock_opt") %></span>
-                  </div>
-                </div>
-                <button type="button" tabindex="-1"
-                        style="background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);border:none;border-radius:100px;padding:9px;font-family:'ABeeZee',sans-serif;font-size:13px;cursor:default;"><%= t("wizard.next") %></button>
-              </div>
-            </div>
-          </div>
-          <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FFFA77;"><%= t("wizard.s5_eyebrow") %></div>
-            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s5_title") %></div>
-            <p class="q-subtitle" style="margin:0;"><%= t("wizard.s5_sub") %></p>
-            <div style="display:flex;flex-direction:column;gap:12px;margin-top:2px;">
-              <% brand_roles.each do |role, label, desc| %>
-                <div style="display:flex;align-items:center;gap:12px;">
-                  <input type="color" name="brand_palette[<%= role %>]" value="<%= org_pal[role] %>"
-                         data-brand-palette-target="colorInput" data-brand-role="<%= role %>"
-                         data-action="input->brand-palette#onColor"
-                         aria-label="<%= label %> colour"
-                         style="width:42px;height:42px;border:1px solid rgba(0,0,0,0.12);border-radius:10px;background:none;cursor:pointer;padding:0;flex-shrink:0;" />
-                  <div style="flex:1;min-width:0;">
-                    <div style="font-family:'Alata',sans-serif;font-size:15px;color:#1C2034;line-height:1.2;"><%= label.html_safe %></div>
-                    <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(0,0,0,0.45);"><%= desc.html_safe %></div>
-                  </div>
-                  <input type="text" value="<%= org_pal[role] %>"
-                         data-brand-palette-target="hexInput" data-brand-role="<%= role %>"
-                         data-action="input->brand-palette#onHex"
-                         maxlength="7" spellcheck="false"
-                         style="width:92px;background:#fafbfc;border:1px solid rgba(0,0,0,0.12);border-radius:10px;padding:10px;color:#000;font-family:'ABeeZee',sans-serif;font-size:14px;outline:none;text-transform:uppercase;" />
-                </div>
-              <% end %>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <%# ── Card 6 · Q04 Notes (optional) ── %>
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
           <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:95%;"></div></div>
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:86%;"></div></div>
             <div style="<%= left_pad_style %>">
               <div style="display:flex;align-items:center;gap:10px;">
                 <div style="<%= eyebrow_style %>color:#615BF5;"><%= t("wizard.s6_eyebrow") %></div>
@@ -407,52 +342,97 @@
         </div>
       </section>
 
-      <%# ── Card 7 · Populate Content vs Start from Blank ── %>
-      <section class="preview-card" data-create-wizard-target="card">
+      <%# ── Card 7 · Final touches: Brand colours + Populate vs Blank ── %>
+      <%
+        org_pal = current_organisation.brand_palette
+        brand_roles = [
+          ["primary", t("wizard.brand_primary"), t("wizard.brand_primary_desc")],
+          ["cta",     t("wizard.brand_cta"),     t("wizard.brand_cta_desc")],
+          ["bg",      t("wizard.brand_bg"),      t("wizard.brand_bg_desc")]
+        ]
+        section_label_style = "font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(0,0,0,0.42);font-weight:700;"
+      %>
+      <section class="preview-card" data-create-wizard-target="card"
+               data-controller="brand-palette">
         <div class="split-card">
           <div class="split-left">
             <div class="panel-progress"><div class="panel-progress-fill" style="width:100%;"></div></div>
-            <div style="<%= left_pad_style %>">
-              <div style="<%= eyebrow_style %>color:#FF1E6F;"><%= t("wizard.s7_eyebrow") %></div>
-              <div style="<%= instr_lead %>"><%= t("wizard.s7_lead") %></div>
-              <div style="<%= instr_body %>"><%= t("wizard.s7_body") %></div>
-              <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
-                <div style="<%= ex_label_style %>"><%= t("wizard.s7_perks_label") %></div>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <% t("wizard.s7_perks").each do |ex| %>
-                    <div style="<%= ex_item_style %>"><%= ex %></div>
-                  <% end %>
+            <div style="<%= left_pad_style %>gap:14px;">
+              <div style="<%= eyebrow_style %>color:#FFFA77;"><%= t("wizard.s5_eyebrow") %></div>
+              <div style="<%= instr_lead %>"><%= t("wizard.s5_lead") %></div>
+              <div style="<%= instr_body %>"><%= t("wizard.s5_body") %></div>
+
+              <%# Live mock — updates as colours are picked. Uses brand vars so
+                  it falls back to Playverto's look for the default palette. %>
+              <div data-brand-palette-target="preview"
+                   style="margin-top:4px;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:11px;background:var(--brand-bg,#1C2034);box-shadow:0 10px 30px rgba(0,0,0,0.28);">
+                <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--brand-primary,#01EACB);"><%= t("wizard.s5_live_preview") %></div>
+                <div style="background:#fff;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:8px;">
+                  <div style="font-family:'Alata',sans-serif;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--brand-primary,#01EACB);"><%= t("wizard.s5_quick_poll") %></div>
+                  <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;line-height:1.3;"><%= t("wizard.s5_mock_q") %></div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:8px;background:var(--brand-primary-soft,rgba(1,234,203,0.12));">
+                    <span style="width:14px;height:14px;border-radius:50%;background:var(--brand-primary,#01EACB);flex-shrink:0;"></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:#111;"><%= t("wizard.s5_mock_opt") %></span>
+                  </div>
                 </div>
+                <button type="button" tabindex="-1"
+                        style="background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);border:none;border-radius:100px;padding:9px;font-family:'ABeeZee',sans-serif;font-size:13px;cursor:default;"><%= t("wizard.next") %></button>
               </div>
             </div>
           </div>
-          <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
-            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FF1E6F;"><%= t("wizard.s7_eyebrow") %></div>
-            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s7_title") %></div>
-            <p class="q-subtitle" style="margin:0;"><%= t("wizard.s7_sub") %></p>
+          <div class="split-right" style="justify-content:center;gap:12px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FFFA77;"><%= t("wizard.s5_eyebrow") %></div>
+            <div class="q-title" style="font-size:24px;line-height:1.2;"><%= t("wizard.s5_title") %></div>
 
-            <div style="display:flex;flex-direction:column;gap:10px;margin-top:2px;">
-              <% [
-                ["1", t("wizard.s7_populate_label"), t("wizard.s7_populate_desc"), t("wizard.s7_recommended")],
-                ["0", t("wizard.s7_blank_label"),    t("wizard.s7_blank_desc"),    nil]
-              ].each_with_index do |(val, label, desc, badge), i| %>
-                <% selected = (i == 0) %>
-                <label class="populate-choice" style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:14px 16px;border-radius:14px;background:<%= selected ? 'rgba(255,30,111,0.04)' : '#fafbfc' %>;border:2px solid <%= selected ? '#FF1E6F' : 'rgba(0,0,0,0.08)' %>;transition:border-color 0.15s,background 0.15s;">
-                  <input type="radio" name="populate_content" value="<%= val %>"
-                         <%= "checked" if selected %>
-                         style="margin-top:3px;width:18px;height:18px;accent-color:#FF1E6F;cursor:pointer;flex-shrink:0;"
-                         onchange="this.closest('.preview-card').querySelectorAll('.populate-choice').forEach(el=>{el.style.borderColor='rgba(0,0,0,0.08)';el.style.background='#fafbfc';});this.closest('.populate-choice').style.borderColor='#FF1E6F';this.closest('.populate-choice').style.background='rgba(255,30,111,0.04)';" />
-                  <span style="flex:1;">
-                    <span style="display:flex;align-items:center;gap:8px;">
-                      <span style="font-family:'Alata',sans-serif;font-size: var(--text-lg);color:#1C2034;letter-spacing:0.02em;"><%= label %></span>
+            <%# Section: How to start? — two side-by-side choice cards %>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="<%= section_label_style %>"><%= t("wizard.section_how_to_start") %></div>
+              <div style="display:flex;gap:8px;">
+                <% [
+                  ["1", t("wizard.s7_populate_label"), t("wizard.s7_populate_desc"), t("wizard.s7_recommended")],
+                  ["0", t("wizard.s7_blank_label"),    t("wizard.s7_blank_desc"),    nil]
+                ].each_with_index do |(val, label, desc, badge), i| %>
+                  <% selected = (i == 0) %>
+                  <label class="populate-choice" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;cursor:pointer;padding:11px 12px;border-radius:12px;background:<%= selected ? 'rgba(255,30,111,0.04)' : '#fafbfc' %>;border:2px solid <%= selected ? '#FF1E6F' : 'rgba(0,0,0,0.08)' %>;transition:border-color 0.15s,background 0.15s;">
+                    <input type="radio" name="populate_content" value="<%= val %>"
+                           <%= "checked" if selected %>
+                           style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
+                           onchange="this.closest('.preview-card').querySelectorAll('.populate-choice').forEach(el=>{el.style.borderColor='rgba(0,0,0,0.08)';el.style.background='#fafbfc';});this.closest('.populate-choice').style.borderColor='#FF1E6F';this.closest('.populate-choice').style.background='rgba(255,30,111,0.04)';" />
+                    <span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                      <span style="font-family:'Alata',sans-serif;font-size:14px;color:#1C2034;letter-spacing:0.02em;line-height:1.2;"><%= label %></span>
                       <% if badge %>
-                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#FF1E6F;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.25);"><%= badge %></span>
+                        <span style="font-family:'Alata',sans-serif;font-size:9px;color:#FF1E6F;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;padding:1px 6px;border-radius:100px;background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.25);"><%= badge %></span>
                       <% end %>
                     </span>
-                    <span style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);margin-top:4px;line-height:1.45;"><%= desc %></span>
-                  </span>
-                </label>
-              <% end %>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.55);line-height:1.4;"><%= desc %></span>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+
+            <%# Section: Brand colours %>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="<%= section_label_style %>"><%= t("wizard.section_brand_colours") %></div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <% brand_roles.each do |role, label, desc| %>
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <input type="color" name="brand_palette[<%= role %>]" value="<%= org_pal[role] %>"
+                           data-brand-palette-target="colorInput" data-brand-role="<%= role %>"
+                           data-action="input->brand-palette#onColor"
+                           aria-label="<%= label %> colour"
+                           style="width:34px;height:34px;border:1px solid rgba(0,0,0,0.12);border-radius:8px;background:none;cursor:pointer;padding:0;flex-shrink:0;" />
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-family:'Alata',sans-serif;font-size:13px;color:#1C2034;line-height:1.2;"><%= label.html_safe %></div>
+                      <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.45);line-height:1.3;"><%= desc.html_safe %></div>
+                    </div>
+                    <input type="text" value="<%= org_pal[role] %>"
+                           data-brand-palette-target="hexInput" data-brand-role="<%= role %>"
+                           data-action="input->brand-palette#onHex"
+                           maxlength="7" spellcheck="false"
+                           style="width:78px;background:#fafbfc;border:1px solid rgba(0,0,0,0.12);border-radius:8px;padding:7px 8px;color:#000;font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;text-transform:uppercase;" />
+                  </div>
+                <% end %>
+              </div>
             </div>
           </div>
         </div>
@@ -466,7 +446,7 @@
               data-create-wizard-target="back"
               data-action="click->create-wizard#back"><%= t("wizard.back") %></button>
 
-      <span class="preview-progress-text" data-create-wizard-target="counter"><%= t("wizard.step_counter", n: 1, total: 8) %></span>
+      <span class="preview-progress-text" data-create-wizard-target="counter"><%= t("wizard.step_counter", n: 1, total: 7) %></span>
 
       <button type="button" class="preview-btn preview-btn-next"
               data-create-wizard-target="next"
