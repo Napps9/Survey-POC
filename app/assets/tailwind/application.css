@@ -2780,8 +2780,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
      sits flush under the magenta progress bar. */
   .preview-overlay .split-card .split-left { display: none; }
 
-  /* Image cards: full-width hero strip with rounded bottom corners */
-  .preview-overlay .split-card:has(.split-left-img) .split-left {
+  /* Image cards OR NPS cards: full-width hero strip with rounded bottom
+     corners. NPS shows its slider-reactive Lottie in the strip; other
+     cards show their card["image"]. */
+  .preview-overlay .split-card:has(.split-left-img) .split-left,
+  .preview-overlay .split-card:has(.nps-lottie)     .split-left {
     display: block;
     position: relative;
     width: 100%;
@@ -2794,7 +2797,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
     overflow: hidden;
     background: var(--brand-surface-2, #2E3564);
   }
-  .preview-overlay .split-card:has(.split-left-img) .panel-progress { display: none; }
+  .preview-overlay .split-card:has(.split-left-img) .panel-progress,
+  .preview-overlay .split-card:has(.nps-lottie)     .panel-progress { display: none; }
   .preview-overlay .split-card:has(.split-left-img) .split-left-img,
   .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
     border-radius: 0 0 18px 18px;
