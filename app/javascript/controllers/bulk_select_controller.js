@@ -6,6 +6,12 @@ import { Controller } from "@hotwired/stimulus"
 // `actionUrlValue` with an `ids[]` payload — the controller action archives
 // or hard-destroys based on which URL was wired up.
 //
+// In select mode, the entire card body becomes the click target — single-
+// clicking anywhere on a card toggles its checkbox, and pressing-and-
+// dragging across multiple cards selects (or deselects) them in one sweep.
+// Native UI inside cards (Edit / Results / Delete links, the corner
+// checkbox label) keeps its own click behaviour.
+//
 // Usage:
 //   <div data-controller="bulk-select"
 //        data-bulk-select-action-url-value="/surveys/bulk_archive"
@@ -35,6 +41,16 @@ export default class extends Controller {
   connect() {
     this.element.classList.remove("is-selecting")
     if (this.hasBarTarget) this.barTarget.hidden = true
+    this._onPointerDown = this.onPointerDown.bind(this)
+    this._onPointerMove = this.onPointerMove.bind(this)
+    this._onPointerUp   = this.onPointerUp.bind(this)
+    this.element.addEventListener("pointerdown", this._onPointerDown)
+  }
+
+  disconnect() {
+    this.element.removeEventListener("pointerdown", this._onPointerDown)
+    document.removeEventListener("pointermove", this._onPointerMove)
+    document.removeEventListener("pointerup",   this._onPointerUp)
   }
 
   toggle(event) {
@@ -101,6 +117,58 @@ export default class extends Controller {
 
     document.body.appendChild(form)
     form.submit()
+  }
+
+  // Drag-to-multi-select. In select mode, pressing on a card and dragging
+  // across others toggles each card the cursor passes over. The drag mode
+  // (select vs. deselect) is locked to the OPPOSITE of the first card's
+  // initial checked state, so dragging from an unchecked card selects a
+  // range and dragging from a checked one deselects it.
+  onPointerDown(event) {
+    if (!this.element.classList.contains("is-selecting")) return
+    if (event.pointerType === "mouse" && event.button !== 0) return
+    // Native UI inside cards (edit / results / delete links, the checkbox
+    // label itself) keeps its own click behaviour.
+    if (event.target.closest("a, button, input, label")) return
+
+    const card = event.target.closest(".dashboard-card")
+    if (!card) return
+    const cb = this._checkboxFor(card)
+    if (!cb) return
+
+    this._dragMode  = cb.checked ? "deselect" : "select"
+    cb.checked      = this._dragMode === "select"
+    this._lastCard  = card
+    this.update()
+
+    document.addEventListener("pointermove", this._onPointerMove)
+    document.addEventListener("pointerup",   this._onPointerUp, { once: true })
+    event.preventDefault()
+  }
+
+  onPointerMove(event) {
+    if (!this._dragMode) return
+    const el   = document.elementFromPoint(event.clientX, event.clientY)
+    const card = el?.closest(".dashboard-card")
+    if (!card || card === this._lastCard) return
+    const cb = this._checkboxFor(card)
+    if (!cb) return
+    const want = this._dragMode === "select"
+    if (cb.checked !== want) {
+      cb.checked = want
+      this.update()
+    }
+    this._lastCard = card
+  }
+
+  onPointerUp() {
+    this._dragMode = null
+    this._lastCard = null
+    document.removeEventListener("pointermove", this._onPointerMove)
+  }
+
+  _checkboxFor(card) {
+    return card.querySelector('[data-bulk-select-target~="checkbox"]')
   }
 
   checkedIds() {
