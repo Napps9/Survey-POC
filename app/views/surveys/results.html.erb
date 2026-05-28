@@ -1,5 +1,4 @@
 <%
-  svg_for = Survey::TYPE_ICON_SVGS
   left_bg_for = {
     "welcome_card"     => "linear-gradient(150deg,#0d3d22 0%,#051408 100%)",
     "multiple_choice"  => "linear-gradient(150deg,#1a1550 0%,#0a0833 100%)",
@@ -127,7 +126,6 @@
              card_data = result[:card]
              total_ans = result[:total]
              card_meta = card_type_meta(type)
-             svg_file  = svg_for[type] || "select.svg"
              left_bg   = left_bg_for[type] || "linear-gradient(150deg,#0d3d22 0%,#051408 100%)" %>
 
           <div class="s-card" style="cursor:default;overflow:visible;">
@@ -143,7 +141,6 @@
             <div style="display:grid;grid-template-columns:120px 1fr;min-height:0;">
 
               <div style="background:<%= left_bg %>;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 8px;gap:6px;border-bottom-left-radius:14px;">
-                <%= image_tag svg_file, style:"width:48px;height:48px;object-fit:contain;opacity:0.75;filter:brightness(0) invert(1);" %>
                 <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.3);text-align:center;line-height:1.4;"><%= card_meta[:q_label].downcase.capitalize %></span>
               </div>
 

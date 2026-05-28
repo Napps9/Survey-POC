@@ -22,12 +22,13 @@ left card panel is 425 × 680 px).
 | `left-panel/` | Themed per-card art | `card["image"]` (Tier 1, theme-matched) |
 | `select-art/` | Generic art for the `multiple_choice` / `select_*_grid` / `yes_no` family | `card["image"]` (Tier 2) |
 | `range-art/` | Generic art for `range` / `rating` / `nps` | `card["image"]` (Tier 2) |
-| `swipe-cards/` | Art for `tap_card` (swipe stack) | `card["image"]` (Tier 2) |
+| `swipe-cards/` | Backgrounds for individual swipe statements on a `tap_card` | `card["option_images"][i]` |
 
 When no entry in `manifest.left_panel` clears the score threshold, the
-populator falls through to the matching Tier-2 folder. When the manifest
-section is empty too, it falls back to the per-type SVG in
-`Survey::TYPE_ICON_SVGS` (Tier 3).
+populator falls through to the matching Tier-2 folder (`select-art/`
+or `range-art/`). For `tap_card`, the left panel stays blank — the
+statement backgrounds from `swipe-cards/` carry the visual weight.
+When no asset fits, the card image is simply left empty.
 
 ## Adding a new asset
 
