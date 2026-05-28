@@ -1,0 +1,181 @@
+# Asset manifest for AssetPopulator (app/services/asset_populator.rb).
+#
+# Adding a new asset:
+#   1. Drop the file into the matching sub-folder under verto-library/.
+#   2. Add a YAML entry below with at least `file:` (filename only, no path).
+#   3. The matcher reads this at request time, so no precompile needed in dev.
+#
+# Vocabularies (kept small on purpose — see plan):
+#   themes:     open list (sport, fitness, community, social, climate,
+#               environment, outdoors, nature, travel, brand, work,
+#               health, education, food, family, lifestyle, ...)
+#   age:        kids | teen | young-adult | adult | senior | all
+#   mood:       playful | energetic | festive | calm | serious | warm
+#   style:      photo | illustrated | vector | vibrant | minimal | warm
+#   card_types: any of the keys in config/card_types.yml
+#   keywords:   per-asset keywords matched against card text + options
+#               (heavier weight than themes; use for subject-specific picks)
+
+backgrounds:
+  - file: landscape.jpg
+    themes: [outdoors, nature, travel, hiking, exploration]
+    mood: [calm, warm]
+    style: [photo]
+  - file: nature.jpg
+    themes: [climate, environment, sustainability, conservation, nature, outdoors]
+    mood: [calm]
+    style: [photo]
+  - file: people.jpg
+    themes: [community, social, work, brand, education, family, lifestyle, team]
+    age: [all]
+    mood: [warm]
+    style: [photo]
+  - file: sport.jpg
+    themes: [sport, fitness, competition, health, athletics, training, exercise]
+    age: [teen, young-adult, adult]
+    mood: [energetic, playful]
+    style: [photo]
+
+# Themed per-card art. Currently only sports/people imagery exists; new
+# themes (climate, education, food, ...) are added simply by dropping files
+# into left-panel/ and listing them here.
+left_panel:
+  - file: sports-people-desktop-1.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+    card_types: [welcome_card, multiple_choice, select_many, yes_no, open_ended, rating, nps, range]
+    keywords: [team, training, game, match, athlete, fan, fitness, exercise, run, gym, sport]
+  - file: sports-people-desktop-2.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+    card_types: [welcome_card, multiple_choice, select_many, yes_no, open_ended, rating, nps, range]
+    keywords: [team, training, game, match, athlete, fan, fitness, exercise, run, gym, sport]
+  - file: sports-people-desktop-3.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+    card_types: [welcome_card, multiple_choice, select_many, yes_no, open_ended, rating, nps, range]
+    keywords: [team, training, game, match, athlete, fan, fitness, exercise, run, gym, sport]
+  - file: sports-people-desktop-4.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+    card_types: [welcome_card, multiple_choice, select_many, yes_no, open_ended, rating, nps, range]
+    keywords: [team, training, game, match, athlete, fan, fitness, exercise, run, gym, sport]
+  - file: sports-people-desktop-5.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+    card_types: [welcome_card, multiple_choice, select_many, yes_no, open_ended, rating, nps, range]
+    keywords: [team, training, game, match, athlete, fan, fitness, exercise, run, gym, sport]
+
+# Tier-2 fallback: card-type-specific art used when no themed left_panel
+# entry scores above threshold. These are generic enough to fit any theme.
+select_art:
+  - file: select-icon-1.jpg
+    card_types: [multiple_choice, select_many, select_one_grid, select_many_grid, yes_no]
+    mood: [playful]
+    style: [vibrant]
+  - file: select-icon-2.jpg
+    card_types: [multiple_choice, select_many, select_one_grid, select_many_grid, yes_no]
+    mood: [playful]
+    style: [vibrant]
+  - file: select-icon-3.jpg
+    card_types: [multiple_choice, select_many, select_one_grid, select_many_grid, yes_no]
+    mood: [playful]
+    style: [vibrant]
+  - file: select-icon-4.jpg
+    card_types: [multiple_choice, select_many, select_one_grid, select_many_grid, yes_no]
+    mood: [playful]
+    style: [vibrant]
+  - file: select-icon-5.jpg
+    card_types: [multiple_choice, select_many, select_one_grid, select_many_grid, yes_no]
+    mood: [playful]
+    style: [vibrant]
+  - file: select-icon-6.jpg
+    card_types: [multiple_choice, select_many, select_one_grid, select_many_grid, yes_no]
+    mood: [playful]
+    style: [vibrant]
+  - file: select-icon-7.jpg
+    card_types: [multiple_choice, select_many, select_one_grid, select_many_grid, yes_no]
+    mood: [playful]
+    style: [vibrant]
+  - file: select-icon-8.jpg
+    card_types: [multiple_choice, select_many, select_one_grid, select_many_grid, yes_no]
+    mood: [playful]
+    style: [vibrant]
+
+range_art:
+  - file: range-bg-1.jpg
+    card_types: [range, rating, nps]
+    mood: [playful]
+    style: [vibrant]
+  - file: range-bg-2.jpg
+    card_types: [range, rating, nps]
+    mood: [playful]
+    style: [vibrant]
+  - file: range-bg-3.jpg
+    card_types: [range, rating, nps]
+    mood: [playful]
+    style: [vibrant]
+  - file: range-bg-4.jpg
+    card_types: [range, rating, nps]
+    mood: [playful]
+    style: [vibrant]
+  - file: range-bg-5.jpg
+    card_types: [range, rating, nps]
+    mood: [playful]
+    style: [vibrant]
+
+swipe_cards:
+  - file: tap-card-photo-1.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [photo]
+  - file: tap-card-photo-2.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [photo]
+  - file: tap-card-photo-3.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [photo]
+  - file: tap-card-photo-4.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [photo]
+  - file: tap-card-photo-5.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [photo]
+  - file: tap-card-vector-1.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [illustrated, vector]
+  - file: tap-card-vector-2.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [illustrated, vector]
+  - file: tap-card-vector-3.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [illustrated, vector]
+  - file: tap-card-vector-4.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [illustrated, vector]
+  - file: tap-card-vector-5.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [illustrated, vector]
+  - file: tap-card-vector-6.jpg
+    card_types: [tap_card]
+    mood: [playful]
+    style: [illustrated, vector]

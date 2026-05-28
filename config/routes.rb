@@ -37,6 +37,7 @@ Rails.application.routes.draw do
   post "surveys/generate",            to: "surveys#generate", as: :generate_survey
   post "surveys/:id/publish",         to: "surveys#publish",  as: :publish_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
+  post "surveys/:id/shuffle_assets",  to: "surveys#shuffle_assets",  as: :shuffle_survey_assets
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results
   post "surveys/:id/generate_card",   to: "surveys#generate_card", as: :generate_survey_card
   post "surveys/:id/render_card",     to: "surveys#render_card",   as: :render_survey_card

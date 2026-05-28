@@ -361,7 +361,7 @@
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
           <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:100%;"></div></div>
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:95%;"></div></div>
             <div style="<%= left_pad_style %>">
               <div style="display:flex;align-items:center;gap:10px;">
                 <div style="<%= eyebrow_style %>color:#615BF5;"><%= t("wizard.s6_eyebrow") %></div>
@@ -409,6 +409,57 @@
         </div>
       </section>
 
+      <%# ── Card 7 · Populate Content vs Start from Blank ── %>
+      <section class="preview-card" data-create-wizard-target="card">
+        <div class="split-card">
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:100%;"></div></div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#FF1E6F;"><%= t("wizard.s7_eyebrow") %></div>
+              <div style="<%= instr_lead %>"><%= t("wizard.s7_lead") %></div>
+              <div style="<%= instr_body %>"><%= t("wizard.s7_body") %></div>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+                <div style="<%= ex_label_style %>"><%= t("wizard.s7_perks_label") %></div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <% t("wizard.s7_perks").each do |ex| %>
+                    <div style="<%= ex_item_style %>"><%= ex %></div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FF1E6F;"><%= t("wizard.s7_eyebrow") %></div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s7_title") %></div>
+            <p class="q-subtitle" style="margin:0;"><%= t("wizard.s7_sub") %></p>
+
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:2px;">
+              <% [
+                ["1", t("wizard.s7_populate_label"), t("wizard.s7_populate_desc"), t("wizard.s7_recommended")],
+                ["0", t("wizard.s7_blank_label"),    t("wizard.s7_blank_desc"),    nil]
+              ].each_with_index do |(val, label, desc, badge), i| %>
+                <% selected = (i == 0) %>
+                <label class="populate-choice" style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:14px 16px;border-radius:14px;background:<%= selected ? 'rgba(255,30,111,0.04)' : '#fafbfc' %>;border:2px solid <%= selected ? '#FF1E6F' : 'rgba(0,0,0,0.08)' %>;transition:border-color 0.15s,background 0.15s;">
+                  <input type="radio" name="populate_content" value="<%= val %>"
+                         <%= "checked" if selected %>
+                         style="margin-top:3px;width:18px;height:18px;accent-color:#FF1E6F;cursor:pointer;flex-shrink:0;"
+                         onchange="this.closest('.preview-card').querySelectorAll('.populate-choice').forEach(el=>{el.style.borderColor='rgba(0,0,0,0.08)';el.style.background='#fafbfc';});this.closest('.populate-choice').style.borderColor='#FF1E6F';this.closest('.populate-choice').style.background='rgba(255,30,111,0.04)';" />
+                  <span style="flex:1;">
+                    <span style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-family:'Alata',sans-serif;font-size: var(--text-lg);color:#1C2034;letter-spacing:0.02em;"><%= label %></span>
+                      <% if badge %>
+                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#FF1E6F;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.25);"><%= badge %></span>
+                      <% end %>
+                    </span>
+                    <span style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);margin-top:4px;line-height:1.45;"><%= desc %></span>
+                  </span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
 
     <%# Footer %>
@@ -417,7 +468,7 @@
               data-create-wizard-target="back"
               data-action="click->create-wizard#back"><%= t("wizard.back") %></button>
 
-      <span class="preview-progress-text" data-create-wizard-target="counter"><%= t("wizard.step_counter", n: 1, total: 7) %></span>
+      <span class="preview-progress-text" data-create-wizard-target="counter"><%= t("wizard.step_counter", n: 1, total: 8) %></span>
 
       <button type="button" class="preview-btn preview-btn-next"
               data-create-wizard-target="next"

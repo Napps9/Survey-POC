@@ -67,6 +67,14 @@ class SurveysController < ApplicationController
 
     translate_survey!(@survey)
 
+    if ActiveModel::Type::Boolean.new.cast(params[:populate_content])
+      begin
+        AssetPopulator.new(@survey).populate!
+      rescue => e
+        Rails.logger.error("[AssetPopulator] #{e.class}: #{e.message}")
+      end
+    end
+
     redirect_to survey_path(@survey)
   rescue => e
     Rails.logger.error("[SurveyGenerator] #{e.class}: #{e.message}")
@@ -112,6 +120,15 @@ class SurveysController < ApplicationController
     show_compare = ActiveModel::Type::Boolean.new.cast(params[:show_results_comparison])
     @survey.update!(show_results_comparison: show_compare)
     redirect_to survey_path(@survey)
+  end
+
+  def shuffle_assets
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    AssetPopulator.new(survey, seed: SecureRandom.hex(4)).populate!
+    redirect_to survey_path(survey)
+  rescue => e
+    Rails.logger.error("[SurveysController#shuffle_assets] #{e.class}: #{e.message}")
+    redirect_to survey_path(survey), alert: "Couldn't shuffle assets — #{e.message}"
   end
 
   def destroy
