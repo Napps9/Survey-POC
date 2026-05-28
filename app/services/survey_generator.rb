@@ -261,7 +261,23 @@ class SurveyGenerator
     block = Array(response.content).find { |b| tool_use?(b) }
     raise "Model did not return a tool_use block" unless block
 
-    deep_stringify(input_of(block))
+    payload = deep_stringify(input_of(block))
+    enforce_tap_card_three_statements!(payload)
+    payload
+  end
+
+  # Belt-and-braces post-generation guard for the "tap_card MUST be exactly
+  # 3 statements (neg/neutral/pos)" rule. The system prompt asks Claude for
+  # this directly, but Claude occasionally deviates with 4-5 statements;
+  # trimming to the first 3 keeps the rule strict without losing the
+  # ordering Claude already produced (the prompt asks for neg → neutral →
+  # positive in index order).
+  def enforce_tap_card_three_statements!(payload)
+    Array(payload["cards"]).each do |card|
+      next unless card["type"].to_s == "tap_card"
+      opts = Array(card["options"])
+      card["options"] = opts.first(3) if opts.size > 3
+    end
   end
 
   private
