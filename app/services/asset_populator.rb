@@ -29,6 +29,7 @@ class AssetPopulator
   SELECT_ART_DIR      = "verto-library/select-art".freeze
   RANGE_ART_DIR       = "verto-library/range-art".freeze
   SWIPE_CARDS_DIR     = "verto-library/swipe-cards".freeze
+  MOBILE_BG_DIR       = "verto-library/mobile-backgrounds".freeze
 
   TIER1_MIN_SCORE     = 5
   SELECT_TYPES        = %w[multiple_choice select_many select_one_grid select_many_grid yes_no].freeze
@@ -52,6 +53,46 @@ class AssetPopulator
     def reset_manifest_cache!
       @manifest      = nil
       @manifest_mtime = nil
+    end
+
+    # Picks a mobile card background URL for a survey by theme matching
+    # against manifest.mobile_backgrounds. Used by the player view to
+    # tint the card body on mobile with a brand-appropriate image
+    # (rendered behind a white scrim so the question text stays readable).
+    # Returns nil if no themed match exists — the white card body stays
+    # plain in that case.
+    def mobile_bg_url_for(survey)
+      candidates = Array(manifest["mobile_backgrounds"])
+      return nil if candidates.empty?
+
+      query  = { themes: theme_keywords(survey.theme), age: age_buckets(survey.audience_age) }
+      themed = candidates.select do |a|
+        asset_themes = Array(a["themes"]).map { |t| t.to_s.downcase }
+        (asset_themes & query[:themes]).any?
+      end
+      return nil if themed.empty?
+
+      # Stable per-survey choice; same Verto always lands on the same
+      # picture so re-rendering doesn't flicker.
+      chosen = themed[Random.new("mbg-#{survey.id}".hash).rand(themed.size)]
+      ActionController::Base.helpers.asset_path("#{MOBILE_BG_DIR}/#{chosen['file']}")
+    end
+
+    # Helpers below mirror the instance-level versions so callers outside
+    # the populator don't need an instance just to compute these.
+    def theme_keywords(theme)
+      theme.to_s.downcase.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
+    end
+
+    def age_buckets(audience_age)
+      s = audience_age.to_s.downcase
+      buckets = []
+      buckets << "kids"        if s.match?(/\bkids?\b|\bchildren\b|\b(?:5|6|7|8|9|10|11)\b|primary[- ]school/)
+      buckets << "teen"        if s.match?(/\bteen|\b1[2-7]\b|high[- ]school|secondary[- ]school/)
+      buckets << "young-adult" if s.match?(/\b(?:18|19|20|21|22|23|24)\b|18.?24|18.?29|young|university|student|gen ?z/)
+      buckets << "adult"       if s.match?(/\b(?:25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54)\b|25.?34|35.?44|45.?54|adults?|parents?|professionals?|workers?/)
+      buckets << "senior"      if s.match?(/\b(?:55|56|57|58|59|60|65|70|75|80)\b|55\+|seniors?|elderly|retired/)
+      buckets.empty? ? [ "all" ] : buckets
     end
 
     # Full list of swipe-card asset URLs (resolved through Sprockets so the
@@ -256,27 +297,15 @@ class AssetPopulator
 
   def survey_query_tags
     {
-      themes: theme_keywords(@survey.theme),
-      age:    age_buckets(@survey.audience_age),
+      themes: self.class.theme_keywords(@survey.theme),
+      age:    self.class.age_buckets(@survey.audience_age),
       mood:   %w[playful energetic festive warm calm],
       style:  []
     }
   end
 
-  def theme_keywords(theme)
-    theme.to_s.downcase.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
-  end
-
-  def age_buckets(audience_age)
-    s = audience_age.to_s.downcase
-    buckets = []
-    buckets << "kids"        if s.match?(/\bkids?\b|\bchildren\b|\b(?:5|6|7|8|9|10|11)\b|primary[- ]school/)
-    buckets << "teen"        if s.match?(/\bteen|\b1[2-7]\b|high[- ]school|secondary[- ]school/)
-    buckets << "young-adult" if s.match?(/\b(?:18|19|20|21|22|23|24)\b|18.?24|18.?29|young|university|student|gen ?z/)
-    buckets << "adult"       if s.match?(/\b(?:25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54)\b|25.?34|35.?44|45.?54|adults?|parents?|professionals?|workers?/)
-    buckets << "senior"      if s.match?(/\b(?:55|56|57|58|59|60|65|70|75|80)\b|55\+|seniors?|elderly|retired/)
-    buckets.empty? ? [ "all" ] : buckets
-  end
+  # theme_keywords / age_buckets are class methods now (see top of file);
+  # the instance code calls self.class so there's one source of truth.
 
   def card_keywords(card)
     text = [

@@ -2791,9 +2791,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
     min-height: 0;
   }
 
-  /* Player split-card: white background — matches desktop's right pane.
-     Fills its parent (.preview-card.active) so the white extends from
-     the nav to the fixed footer with no gap. */
+  /* Player split-card: white background by default. When the Verto's
+     theme matches a mobile-backgrounds asset, AssetPopulator sets
+     --mobile-card-bg on .preview-overlay; the rule below paints it on
+     .split-card behind a heavy white scrim so the question and option
+     text stay AA-readable on any image. */
   .preview-overlay .split-card {
     flex: 1 1 auto;
     flex-direction: column;
@@ -2805,6 +2807,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
     border-radius: 0;
     box-shadow: none;
     overflow: hidden;
+  }
+  .preview-overlay[style*="--mobile-card-bg"] .split-card {
+    background:
+      linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)),
+      var(--mobile-card-bg) center/cover no-repeat;
+  }
+  /* The right pane (where text/controls live) needs to be transparent so
+     the image + scrim layered on .split-card show through; without this
+     its white background would mask everything. */
+  .preview-overlay[style*="--mobile-card-bg"] .split-card .split-right {
+    background: transparent;
   }
 
   /* No-image cards: hide the .split-left entirely so the white card

@@ -134,6 +134,33 @@ range_art:
     mood: [playful]
     style: [vibrant]
 
+mobile_backgrounds:
+  - file: sports-people-mobile-1.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+  - file: sports-people-mobile-2.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+  - file: sports-people-mobile-3.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+  - file: sports-people-mobile-4.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+  - file: sports-people-mobile-5.jpg
+    themes: [sport, fitness, community, athletics, training]
+    age: [young-adult, adult]
+    mood: [energetic]
+    style: [photo]
+
 swipe_cards:
   - file: tap-card-photo-1.jpg
     card_types: [tap_card]

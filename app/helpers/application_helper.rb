@@ -85,6 +85,12 @@ module ApplicationHelper
       url = survey.background_image.to_s.gsub(/["\r\n]/, "")
       parts << %(--brand-bg-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.12) 28%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.45)), url("#{url}"))
     end
+    # Mobile-only per-card backdrop: a themed image picked from
+    # verto-library/mobile-backgrounds/, applied behind a heavy white
+    # scrim by the @media (max-width:767px) CSS on .split-card.
+    if (mb = AssetPopulator.mobile_bg_url_for(survey)).present?
+      parts << %(--mobile-card-bg: url("#{mb}"))
+    end
     parts.join(";")
   end
 
