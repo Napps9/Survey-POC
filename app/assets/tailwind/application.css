@@ -828,8 +828,8 @@
 }
 .choice-list-item:hover { background: rgba(0,0,0,0.025); }
 .choice-list-item[data-selected="true"] {
-  background: var(--brand-primary-soft, rgba(1,234,203,0.06));
-  border-color: var(--brand-primary, var(--color-green-500));
+  background: var(--brand-primary-soft, rgba(255,30,111,0.06));
+  border-color: var(--brand-primary, #FF1E6F);
 }
 .choice-list-tile {
   position: relative;
@@ -2702,6 +2702,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
    _showThankyou() can still toggle the hidden buttons safely. */
 .preview-overlay .preview-footer { display: none !important; }
 
+/* Tailwind v4 only compiles class names it can find as literal tokens in
+   source files; classList.add("hidden") at runtime escapes that scan,
+   so the player_controller's hide/show logic for the thank-you ↔ compare
+   view stops working. Define the class explicitly so JS toggles do too. */
+.hidden { display: none !important; }
+
 /* Inline advance chip. Absolute-positioned so vertical centering of
    the question content above isn't shifted by the chip's height. */
 .player-advance-chip {
@@ -2784,7 +2790,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-card.active {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 44px); /* viewport minus nav */
+    /* Nav is hidden on mobile (see .preview-nav rule above), so the card
+       fills the full viewport — leaving the calc(100dvh - 44px) here would
+       expose a dark band at the bottom. */
+    height: 100dvh;
     width: 100%;
     max-width: 100%;
     min-height: 0;
@@ -2999,8 +3008,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .pick-text { color: #1C2034; }
   .preview-overlay .pick-item[data-selected="true"],
   .preview-overlay .choice-list-item[data-selected="true"] {
-    background: rgba(255,30,111,0.08);
-    border-color: #FF1E6F;
+    background: var(--brand-primary-soft, rgba(255,30,111,0.08));
+    border-color: var(--brand-primary, #FF1E6F);
   }
   .preview-overlay .freeform-wrap {
     display: flex;

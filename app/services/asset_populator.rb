@@ -70,11 +70,13 @@ class AssetPopulator
         asset_themes = Array(a["themes"]).map { |t| t.to_s.downcase }
         (asset_themes & query[:themes]).any?
       end
-      return nil if themed.empty?
+      # No themed match? Fall back to a random pick from the whole pool so
+      # the card body still gets a mobile background instead of going blank.
+      pool = themed.presence || candidates
 
       # Stable per-survey choice; same Verto always lands on the same
       # picture so re-rendering doesn't flicker.
-      chosen = themed[Random.new("mbg-#{survey.id}".hash).rand(themed.size)]
+      chosen = pool[Random.new("mbg-#{survey.id}".hash).rand(pool.size)]
       ActionController::Base.helpers.asset_path("#{MOBILE_BG_DIR}/#{chosen['file']}")
     end
 

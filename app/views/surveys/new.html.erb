@@ -13,17 +13,9 @@
       <div class="gen-orb gen-orb-4"></div>
     </div>
 
-    <%# Nav %>
-    <nav style="height:54px;background:rgba(28,32,52,0.6);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;position:relative;z-index:1;"
-         class="flex items-center justify-between px-9">
-      <%= link_to root_path do %>
-        <%= image_tag "playverto.svg", alt: "Playverto", class: "h-7 w-auto" %>
-      <% end %>
-      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.45);"><%= t("wizard.create_verto") %></span>
-      <span></span>
-    </nav>
-
-    <%# Body %>
+    <%# Body — the playverto-logo + "Create a Verto" header was removed so
+        the loading screen is full-bleed; the "BUILDING YOUR VERTO" shimmer
+        below carries the brand cue. %>
     <div class="gen-stage flex-1 flex flex-col items-center justify-center gap-8 px-16 py-10">
 
       <div class="gen-shimmer"
