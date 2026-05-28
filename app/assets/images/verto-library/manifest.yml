@@ -19,16 +19,65 @@
 # Theme clusters — a query theme is expanded through any cluster it appears
 # in before scoring against assets. So a "food" survey also matches assets
 # tagged `nature`, `sustainability`, etc.; a "fitness" survey matches assets
-# tagged `sport`, `training`, `community`, etc. Clusters are bidirectional —
-# every member of a cluster pulls in every other member.
+# tagged `sport`, `training`, `community`, etc. Clusters are bidirectional
+# (every member pulls every other member in) AND deliberately overlapping
+# on bridge concepts like `health`, `community`, `lifestyle`, `social` so
+# cross-topic surveys still resolve to a sensible visual anchor.
+#
+# Mapping principle: every cluster should include at least one of the four
+# canonical background themes (nature, landscape, people, sport) or a
+# sports-people themed term, so the matcher can always pick an asset.
 theme_clusters:
-  - [food, nutrition, cooking, eating, diet, healthy, wellness, wellbeing, nature, climate, environment, sustainability, sustainable, organic, agriculture, outdoors, conservation]
-  - [sport, sports, fitness, athletics, athletes, training, exercise, gym, health, community, team, competition]
-  - [brand, retail, marketing, lifestyle, advertising, social, consumer, shopping]
-  - [education, students, learning, school, university, academic, study]
-  - [work, employment, professional, workplace, career, jobs, employer, employee]
-  - [travel, holiday, vacation, tourism, exploration, hiking, outdoors, nature, adventure]
-  - [climate, environment, sustainability, sustainable, conservation, nature, outdoors, planet, green]
+  # Food, nutrition & diet → nature anchor
+  - [food, foods, nutrition, nutritional, cooking, eating, eats, meal, meals, lunch, dinner, breakfast, snack, snacks, snacking, diet, dietary, recipe, recipes, restaurant, restaurants, cuisine, organic, vegan, vegetarian, plant-based, agriculture, farming, gardening, ingredient, ingredients, produce, vegetable, vegetables, fruit, fruits, dairy, meat, healthy, health, wellness, wellbeing, nature, sustainability, sustainable, conservation]
+
+  # Health, wellbeing & mental health → sport + people anchors (overlaps via "health" and "lifestyle")
+  - [health, healthcare, medical, medicine, medication, doctor, doctors, gp, hospital, hospitals, clinic, patient, patients, mental, anxiety, depression, stress, mindfulness, meditation, therapy, counselling, sleep, sleeping, wellness, wellbeing, fitness, lifestyle, illness, disease, recovery, prevention, healthcare]
+
+  # Sport, fitness & athletic activity → sport anchor
+  - [sport, sports, sporting, fitness, athletic, athletics, athlete, athletes, training, train, exercise, exercising, workout, workouts, gym, gyms, runner, runners, running, jog, jogging, swim, swimming, swimmer, cycle, cycling, cyclist, bike, biking, bicycle, football, soccer, basketball, tennis, golf, hockey, rugby, cricket, baseball, yoga, pilates, team, teams, teamwork, competition, competitive, league, leagues, tournament, game, games, match, matches, marathon, recreation, leisure, active, activity, performance, coach, coaches, coaching, health, community]
+
+  # Climate, environment & sustainability → nature anchor
+  - [climate, environment, environmental, sustainability, sustainable, conservation, nature, natural, outdoor, outdoors, planet, planetary, ecology, ecological, eco, biodiversity, wildlife, pollution, recycling, renewable, carbon, emissions, energy, water, ocean, oceans, forest, forests, trees, wilderness, green, gardening, farming]
+
+  # Travel, tourism & adventure → landscape anchor
+  - [travel, traveling, travelling, traveller, travellers, holiday, holidays, vacation, vacations, tourism, tourist, tourists, hiking, hike, hiker, adventure, adventures, adventurer, exploration, explorer, explore, explores, journey, journeys, trip, trips, destination, destinations, beach, beaches, mountain, mountains, scenic, sights, sightseeing, backpacking, camping, nature, outdoors, road-trip]
+
+  # Brand, marketing, retail & consumer → people anchor (overlaps via lifestyle/social)
+  - [brand, brands, branding, retail, retailer, retailers, shopping, shop, shops, store, stores, ecommerce, commerce, marketing, advertising, advert, adverts, ads, campaign, campaigns, consumer, consumers, customer, customers, buyer, buyers, audience, lifestyle, fashion, beauty, luxury, social, trend, trends, influencer, influencers, media, packaging, product, products]
+
+  # Work, career & employment → people anchor
+  - [work, working, workplace, workforce, employment, employed, employer, employers, employee, employees, hr, recruiter, recruiters, recruiting, recruitment, hiring, talent, professional, professionals, career, careers, job, jobs, role, roles, manager, managers, management, leadership, leader, leaders, business, businesses, corporate, office, offices, remote, hybrid, salary, salaries, productivity, colleagues, colleague, lifestyle, community]
+
+  # Education, learning & school → people anchor
+  - [education, educational, students, student, learner, learners, learning, school, schools, university, universities, college, colleges, academic, academia, study, studies, studying, teacher, teachers, teaching, professor, classroom, classrooms, curriculum, knowledge, course, courses, lesson, lessons, tuition, schooling, pupil, pupils, graduate, graduates, exam, exams, sport, community]
+
+  # Community, society & civic → people anchor
+  - [community, communities, society, societies, social, neighbour, neighbours, neighbor, neighbors, neighbourhood, neighborhood, civic, public, volunteer, volunteers, volunteering, charity, charities, nonprofit, nonprofits, ngo, ngos, citizen, citizens, resident, residents, residential, group, groups, club, clubs, belonging, support, diversity, inclusion, inclusive, equality, equity, family, families, lifestyle]
+
+  # Family, relationships & parenting → people anchor
+  - [family, families, familial, parent, parents, parenting, child, children, childhood, kid, kids, baby, babies, toddler, toddlers, teen, teens, teenager, teenagers, generation, generations, household, households, mum, mom, mother, mothers, dad, father, fathers, sibling, siblings, grandparent, grandparents, grandchildren, relatives, relationship, relationships, marriage, partner, partners, friendship, friend, friends, community, social, lifestyle]
+
+  # Lifestyle, leisure, entertainment & culture → people anchor (broad bucket)
+  - [lifestyle, leisure, culture, cultural, entertainment, fun, music, musician, musicians, concert, concerts, film, films, movie, movies, cinema, tv, television, streaming, gaming, gamers, gamer, game, games, video, videos, podcast, podcasts, book, books, reader, readers, reading, art, arts, theatre, theater, performance, performances, show, shows, festival, festivals, hobby, hobbies, recreation, fashion, beauty, food, dining, social]
+
+  # Money, finance & cost of living → people anchor (no dedicated asset; leans on lifestyle/work)
+  - [money, finance, financial, finances, banking, bank, banks, savings, save, saving, budget, budgeting, debt, loan, loans, investment, investing, investor, investors, retirement, pension, pensions, insurance, mortgage, mortgages, wealth, income, incomes, earnings, currency, cost, costs, bills, expense, expenses, spending, spend, taxes, tax, work, lifestyle]
+
+  # Technology, digital & online → people anchor (people using tech)
+  - [tech, technology, technological, technologies, digital, online, internet, web, website, app, apps, software, hardware, ai, artificial, computing, computer, computers, device, devices, mobile, phone, phones, smartphone, smartphones, gadget, gadgets, smart, innovation, innovations, data, cybersecurity, cyber, social-media, work, lifestyle]
+
+  # Transport, mobility & commuting → landscape/people overlap
+  - [transport, transportation, mobility, commute, commuting, commuter, commuters, car, cars, vehicle, vehicles, bike, bikes, bicycle, bicycles, scooter, scooters, bus, buses, train, trains, tram, trams, taxi, taxis, ride-share, public-transport, traffic, road, roads, driving, driver, drivers, journey, journeys, travel, outdoors]
+
+  # Housing, home & urban living → people/lifestyle anchor
+  - [housing, house, houses, home, homes, homeowner, homeowners, renter, renters, living, household, households, apartment, apartments, flat, flats, rent, renting, mortgage, neighbourhood, neighborhood, residence, residences, residential, urban, rural, suburban, suburbia, city, cities, town, towns, district, districts, community, lifestyle]
+
+  # Politics, government & policy → people/community anchor
+  - [politics, political, politician, politicians, government, governments, civic, public, policy, policies, voting, vote, voter, voters, election, elections, democracy, democratic, parliament, congress, society, social, citizen, citizens, debate, debates, issue, issues, campaign, campaigns, community]
+
+  # Sustainability bridge (climate-specific cluster — overlaps food + climate)
+  - [climate, environment, sustainability, sustainable, conservation, nature, outdoors, planet, green, carbon, emissions, recycling, renewable, ecology, organic, agriculture, farming, food, energy]
 
 backgrounds:
   - file: landscape.jpg
