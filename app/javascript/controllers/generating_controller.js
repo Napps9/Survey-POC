@@ -43,6 +43,7 @@ export default class extends Controller {
 
     this.overlayTarget.classList.remove("hidden")
     this.overlayTarget.classList.add("flex")
+    document.body.classList.add("generating-overlay-active")
 
     this._runSteps()
   }

@@ -1185,18 +1185,6 @@
   100% { background-position: 300% 50%; }
 }
 
-/* Rainbow progress bar at bottom of overlay */
-.gen-rainbow-bar {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  height: 4px;
-  background: linear-gradient(
-    90deg,
-    #00e5ff, #00e676, #a8ff56, #ffcc00,
-    #ff6b35, #FF1E6F, #615BF5, #00e5ff
-  );
-  background-size: 200% 100%;
-  animation: gen-rainbow-sweep 3s linear infinite;
-}
 @keyframes gen-rainbow-sweep {
   0%   { background-position: 0% 0; }
   100% { background-position: 200% 0; }
@@ -2352,6 +2340,7 @@
   padding: 0 16px;
   font-family: "ABeeZee", sans-serif;
 }
+body.generating-overlay-active .bottom-bar { display: none; }
 .bottom-bar-left, .bottom-bar-right {
   display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
 }
