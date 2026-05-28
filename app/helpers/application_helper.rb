@@ -29,12 +29,17 @@ module ApplicationHelper
     { badge: m["badge"], badge_css: m["badge_css"], q_label: m["panel_label"] }
   end
 
-  # Filenames present in app/assets/images/verto-library/. Picked up at request
-  # time so dropping a new file in the folder requires no rebuild.
+  # Relative paths (from verto-library/) of every image asset under the
+  # library — the loose drop-in files at the root plus everything in the
+  # curated sub-folders (backgrounds/, left-panel/, mobile-backgrounds/,
+  # select-art/, range-art/, swipe-cards/). Walked at request time so a
+  # newly committed file appears in the media picker on the next reload.
   def verto_library_images
     dir = Rails.root.join("app/assets/images/verto-library")
     return [] unless Dir.exist?(dir)
-    Dir.children(dir).select { |f| f =~ /\.(jpe?g|png|webp|svg)\z/i }.sort
+    Pathname.glob(dir.join("**/*.{jpg,jpeg,png,webp,svg}"))
+      .map { |p| p.relative_path_from(dir).to_s }
+      .sort
   end
 
   # Renders the organisation's uploaded logo if present, otherwise falls back

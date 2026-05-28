@@ -2700,7 +2700,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
    without a single "selected" signal (welcome, multi-select, open-ended)
    render a .player-advance-chip inline. The footer DOM is kept so
    _showThankyou() can still toggle the hidden buttons safely. */
-.preview-overlay .preview-footer { display: none !important; }
+/* The player runs nav-less and auto-advances, so the footer is hidden;
+   the editor's preview overlay shares the .preview-overlay class but
+   still needs its Back / Next / Edit / Finish buttons, so exempt it
+   via the data attribute the preview_verto controller writes. */
+.preview-overlay:not([data-preview-verto-target="overlay"]) .preview-footer { display: none !important; }
 
 /* Tailwind v4 only compiles class names it can find as literal tokens in
    source files; classList.add("hidden") at runtime escapes that scan,
