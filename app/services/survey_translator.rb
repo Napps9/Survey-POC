@@ -10,7 +10,9 @@ require "anthropic"
 #   { "text" => ..., "description" => ..., "options" => [...] }
 # which the caller merges into each card's i18n[locale].
 class SurveyTranslator
-  MODEL      = "claude-sonnet-4-6"
+  include AnthropicHelpers
+
+  MODEL      = ClaudeModels::FAST
   MAX_TOKENS = 4096
 
   TOOL = {
@@ -94,6 +96,7 @@ class SurveyTranslator
       tool_choice: { type: "tool", name: "emit_translation" },
       messages: [ { role: "user", content: user_message(miss_cards, source_locale, target) } ]
     )
+    log_usage("SurveyTranslator", response.usage, model: MODEL)
 
     block = Array(response.content).find { |b| tool_use?(b) }
     raise "Model did not return a tool_use block" unless block
@@ -151,21 +154,5 @@ class SurveyTranslator
     end
   end
 
-  def tool_use?(block)
-    type = block.respond_to?(:type) ? block.type : block[:type] || block["type"]
-    type.to_s == "tool_use"
-  end
-
-  def input_of(block)
-    raw = block.respond_to?(:input) ? block.input : (block[:input] || block["input"])
-    raw.respond_to?(:to_h) ? raw.to_h : raw
-  end
-
-  def deep_stringify(obj)
-    case obj
-    when Hash  then obj.each_with_object({}) { |(k, v), h| h[k.to_s] = deep_stringify(v) }
-    when Array then obj.map { |v| deep_stringify(v) }
-    else obj
-    end
-  end
+  # tool_use?, input_of, deep_stringify come from AnthropicHelpers.
 end

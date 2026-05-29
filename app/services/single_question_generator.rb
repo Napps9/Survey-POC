@@ -3,7 +3,9 @@ require "anthropic"
 # Generates a single new question card that complements an existing survey.
 # Reuses SurveyGenerator's system prompt, CARD_TYPES, and QuestionCorpus.
 class SingleQuestionGenerator
-  MODEL      = "claude-sonnet-4-6"
+  include AnthropicHelpers
+
+  MODEL      = ClaudeModels::FAST
   MAX_TOKENS = 512
 
   TOOL = {
@@ -99,6 +101,10 @@ class SingleQuestionGenerator
 
     tool = TOOL.deep_dup
     tool[:input_schema][:properties][:type][:enum] = SurveyGenerator.generatable_types
+    # Cache the static prefix (tool schema + the shared SurveyGenerator::SYSTEM).
+    # This fires on every "add a question", so cache reads within the 5-min TTL
+    # are the highest-ROI saving. Stays cacheable on Haiku (same ~2048 min).
+    tool[:cache_control] = { type: "ephemeral" }
 
     response = @client.messages.create(
       model:       MODEL,
@@ -108,6 +114,7 @@ class SingleQuestionGenerator
       tool_choice: { type: "tool", name: "emit_question" },
       messages:    [ { role: "user", content: user_message } ]
     )
+    log_usage("SingleQuestionGenerator", response.usage, model: MODEL)
 
     block = Array(response.content).find { |b| tool_use?(b) }
     raise "Model did not return a tool_use block" unless block
@@ -117,21 +124,5 @@ class SingleQuestionGenerator
 
   private
 
-  def tool_use?(block)
-    type = block.respond_to?(:type) ? block.type : block[:type] || block["type"]
-    type.to_s == "tool_use"
-  end
-
-  def input_of(block)
-    raw = block.respond_to?(:input) ? block.input : (block[:input] || block["input"])
-    raw.respond_to?(:to_h) ? raw.to_h : raw
-  end
-
-  def deep_stringify(obj)
-    case obj
-    when Hash  then obj.each_with_object({}) { |(k, v), h| h[k.to_s] = deep_stringify(v) }
-    when Array then obj.map { |v| deep_stringify(v) }
-    else obj
-    end
-  end
+  # tool_use?, input_of, deep_stringify come from AnthropicHelpers.
 end

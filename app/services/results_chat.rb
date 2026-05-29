@@ -1,5 +1,7 @@
 class ResultsChat
-  MODEL      = "claude-sonnet-4-6"
+  include AnthropicHelpers
+
+  MODEL      = ClaudeModels::FAST
   MAX_TOKENS = 1024
 
   SYSTEM = <<~PROMPT.freeze
@@ -17,21 +19,38 @@ class ResultsChat
   end
 
   def call(survey:, aggregated:, total:, messages:, &block)
-    system_prompt = SYSTEM + "\n\n" + build_context(survey, aggregated, total)
+    # Split the system prompt so the stable prefix (instructions + the full
+    # results dataset) is one cached block and only the per-turn messages vary.
+    # In a multi-turn chat every follow-up then reads that prefix from cache
+    # (~0.1x input) instead of re-billing the entire dataset each message.
+    system_blocks = [
+      { type: "text", text: SYSTEM },
+      { type: "text", text: build_context(survey, aggregated, total),
+        cache_control: { type: "ephemeral" } }
+    ]
 
     stream = @client.messages.stream_raw(
       model:      MODEL,
       max_tokens: MAX_TOKENS,
-      system:     system_prompt,
+      system:     system_blocks,
       messages:   messages
     )
 
+    usage = nil
+    final_output = nil
     stream.each do |raw_event|
-      next unless raw_event.respond_to?(:type) && raw_event.type == :content_block_delta
-      delta = raw_event.delta
-      next unless delta.respond_to?(:type) && delta.type == :text_delta
-      yield delta.text if delta.text
+      type = raw_event.type if raw_event.respond_to?(:type)
+      case type
+      when :message_start
+        usage = raw_event.message.usage
+      when :message_delta
+        final_output = raw_event.usage.output_tokens if raw_event.respond_to?(:usage) && raw_event.usage
+      when :content_block_delta
+        delta = raw_event.delta
+        yield delta.text if delta.respond_to?(:type) && delta.type == :text_delta && delta.text
+      end
     end
+    log_usage("ResultsChat", usage, model: MODEL, output_tokens: final_output)
   end
 
   private

@@ -1,7 +1,9 @@
 require "anthropic"
 
 class SurveyGenerator
-  MODEL = "claude-sonnet-4-6"
+  include AnthropicHelpers
+
+  MODEL = ClaudeModels::DEFAULT
   MAX_TOKENS = 4096
 
   CARD_TYPES = %w[
@@ -248,6 +250,10 @@ class SurveyGenerator
 
     tool = TOOL.deep_dup
     tool[:input_schema][:properties][:cards][:items][:properties][:type][:enum] = self.class.generatable_types
+    # Cache the static prefix (tools render before system, so a marker on the
+    # last tool caches the tool schema + SYSTEM together). The enum is
+    # deterministic, so the cached prefix bytes are stable across calls.
+    tool[:cache_control] = { type: "ephemeral" }
 
     response = @client.messages.create(
       model: MODEL,
@@ -257,6 +263,7 @@ class SurveyGenerator
       tool_choice: { type: "tool", name: "emit_survey" },
       messages: [ { role: "user", content: user_message } ]
     )
+    log_usage("SurveyGenerator", response.usage, model: MODEL)
 
     block = Array(response.content).find { |b| tool_use?(b) }
     raise "Model did not return a tool_use block" unless block
@@ -298,21 +305,5 @@ class SurveyGenerator
     LANG
   end
 
-  def tool_use?(block)
-    type = block.respond_to?(:type) ? block.type : block[:type] || block["type"]
-    type.to_s == "tool_use"
-  end
-
-  def input_of(block)
-    raw = block.respond_to?(:input) ? block.input : (block[:input] || block["input"])
-    raw.respond_to?(:to_h) ? raw.to_h : raw
-  end
-
-  def deep_stringify(obj)
-    case obj
-    when Hash  then obj.each_with_object({}) { |(k, v), h| h[k.to_s] = deep_stringify(v) }
-    when Array then obj.map { |v| deep_stringify(v) }
-    else obj
-    end
-  end
+  # tool_use?, input_of, deep_stringify come from AnthropicHelpers.
 end

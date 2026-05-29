@@ -10,7 +10,9 @@ require "anthropic"
 # ones. The Anthropic SDK reads the PDF natively via a base64 `document`
 # content block, so no PDF-parsing gem is required.
 class PdfQuestionImporter
-  MODEL      = "claude-sonnet-4-6"
+  include AnthropicHelpers
+
+  MODEL      = ClaudeModels::DEFAULT
   MAX_TOKENS = 8192
 
   # Types that never carry a free-form options list. yes_no's two options are
@@ -130,6 +132,8 @@ class PdfQuestionImporter
       ]
     )
 
+    log_usage("PdfQuestionImporter", response.usage, model: MODEL)
+
     block = Array(response.content).find { |b| tool_use?(b) }
     raise "Model did not return a tool_use block" unless block
 
@@ -163,21 +167,5 @@ class PdfQuestionImporter
     end
   end
 
-  def tool_use?(block)
-    type = block.respond_to?(:type) ? block.type : block[:type] || block["type"]
-    type.to_s == "tool_use"
-  end
-
-  def input_of(block)
-    raw = block.respond_to?(:input) ? block.input : (block[:input] || block["input"])
-    raw.respond_to?(:to_h) ? raw.to_h : raw
-  end
-
-  def deep_stringify(obj)
-    case obj
-    when Hash  then obj.each_with_object({}) { |(k, v), h| h[k.to_s] = deep_stringify(v) }
-    when Array then obj.map { |v| deep_stringify(v) }
-    else obj
-    end
-  end
+  # tool_use?, input_of, deep_stringify come from AnthropicHelpers.
 end

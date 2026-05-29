@@ -1,5 +1,7 @@
 class ResultsSummariser
-  MODEL      = "claude-sonnet-4-6"
+  include AnthropicHelpers
+
+  MODEL      = ClaudeModels::FAST
   MAX_TOKENS = 1024
 
   SYSTEM = <<~PROMPT.freeze
@@ -28,12 +30,23 @@ class ResultsSummariser
       messages:   [{ role: "user", content: prompt }]
     )
 
+    # message_start carries input/cache token counts; the final output_tokens
+    # arrives later on message_delta.
+    usage = nil
+    final_output = nil
     stream.each do |raw_event|
-      next unless raw_event.respond_to?(:type) && raw_event.type == :content_block_delta
-      delta = raw_event.delta
-      next unless delta.respond_to?(:type) && delta.type == :text_delta
-      yield delta.text if delta.text
+      type = raw_event.type if raw_event.respond_to?(:type)
+      case type
+      when :message_start
+        usage = raw_event.message.usage
+      when :message_delta
+        final_output = raw_event.usage.output_tokens if raw_event.respond_to?(:usage) && raw_event.usage
+      when :content_block_delta
+        delta = raw_event.delta
+        yield delta.text if delta.respond_to?(:type) && delta.type == :text_delta && delta.text
+      end
     end
+    log_usage("ResultsSummariser", usage, model: MODEL, output_tokens: final_output)
   end
 
   private

@@ -20,13 +20,19 @@ class SurveyTranslatorCacheTest < ActiveSupport::TestCase
 
     def create(model:, max_tokens:, system:, tools:, tool_choice:, messages:)
       @calls += 1
-      Struct.new(:content).new([
-        Struct.new(:type, :input).new(:tool_use, {
-          cards: [
-            { text: "TRANSLATED", description: "", options: [ "A_T", "B_T" ] }
-          ]
-        })
-      ])
+      Struct.new(:content, :usage).new(
+        [
+          Struct.new(:type, :input).new(:tool_use, {
+            cards: [
+              { text: "TRANSLATED", description: "", options: [ "A_T", "B_T" ] }
+            ]
+          })
+        ],
+        # Mirror the real response shape so usage logging has fields to read.
+        Struct.new(:input_tokens, :output_tokens,
+                   :cache_creation_input_tokens, :cache_read_input_tokens)
+              .new(100, 20, 0, 0)
+      )
     end
   end
 
