@@ -27,13 +27,14 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
-      # Active Record Encryption (encrypts stored Google tokens) — see .env.example
+      # Active Record Encryption (encrypts stored Google tokens) — see .env.example.
+      # Render auto-generates stable values; no manual key handling needed.
       - key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
-        sync: false
+        generateValue: true
       - key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
-        sync: false
+        generateValue: true
       - key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
-        sync: false
+        generateValue: true
       - key: APP_HOST
         sync: false
       - key: APP_PROTOCOL
