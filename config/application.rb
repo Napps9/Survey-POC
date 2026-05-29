@@ -48,5 +48,20 @@ module SurveyPoc
           .fetch("locales").map { |l| l.fetch("code").to_sym }
     config.i18n.default_locale = :en
     config.i18n.fallbacks = true
+
+    # Active Record Encryption — protects the per-user Google OAuth tokens
+    # (User#google_refresh_token / #google_access_token). Set here (not in an
+    # initializer) because the framework reads this config before
+    # config/initializers run. Production must supply real, persistent keys via
+    # ENV; dev/test use disposable keys so the feature works without setup.
+    if (primary = ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]).present?
+      config.active_record.encryption.primary_key         = primary
+      config.active_record.encryption.deterministic_key   = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
+      config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
+    elsif !Rails.env.production?
+      config.active_record.encryption.primary_key         = "dev_only_ar_encryption_primary_key_0000000001"
+      config.active_record.encryption.deterministic_key   = "dev_only_ar_encryption_deterministic_key_00002"
+      config.active_record.encryption.key_derivation_salt = "dev_only_ar_encryption_key_derivation_salt_003"
+    end
   end
 end

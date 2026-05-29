@@ -1,4 +1,10 @@
 module ApplicationHelper
+  # Whether the "Connect to Google Sheets" results export is available (OAuth
+  # client configured). Used to hide the button when it can't work.
+  def google_sheets_configured?
+    GoogleOauthService.configured?
+  end
+
   # Returns a view of `card` with text/description/options in `locale`, falling
   # back per-field to the primary (default_locale) content. Structural fields
   # (type, image, allow_other, option count/order) are language-neutral and

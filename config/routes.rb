@@ -10,6 +10,10 @@ Rails.application.routes.draw do
   resources :passwords,     param: :token, only: [:new, :create, :edit, :update]
   resources :registrations, only: [:new, :create]
 
+  # Google Sheets export OAuth (callback is a GET — Google redirects via browser)
+  get "google/connect",  to: "google_auth#connect",  as: :google_connect
+  get "google/callback", to: "google_auth#callback", as: :google_callback
+
   # Org switcher
   post "switch_organisation", to: "organisations#switch", as: :switch_organisation
 
@@ -39,6 +43,8 @@ Rails.application.routes.draw do
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
   post "surveys/:id/shuffle_assets",  to: "surveys#shuffle_assets",  as: :shuffle_survey_assets
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results
+  get  "surveys/:survey_id/results/export",       to: "results_exports#show",         as: :survey_results_export
+  post "surveys/:survey_id/results/google_sheet", to: "google_sheets_exports#create", as: :survey_google_sheet
   post "surveys/:id/generate_card",   to: "surveys#generate_card", as: :generate_survey_card
   post "surveys/:id/render_card",     to: "surveys#render_card",   as: :render_survey_card
   get  "surveys/:id/results/summary", to: "survey_summaries#show",  as: :survey_results_summary

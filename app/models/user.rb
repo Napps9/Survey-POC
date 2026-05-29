@@ -11,6 +11,26 @@ class User < ApplicationRecord
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
+  # Google OAuth tokens for the "Connect to Google Sheets" results export.
+  # Encrypted at rest — they grant write access to the user's Drive files.
+  encrypts :google_refresh_token
+  encrypts :google_access_token
+
+  def google_connected?
+    google_refresh_token.present?
+  end
+
+  # Wipe stored Google credentials (e.g. after the refresh token is revoked).
+  def disconnect_google!
+    update!(
+      google_refresh_token:    nil,
+      google_access_token:     nil,
+      google_token_expires_at: nil,
+      google_email:            nil,
+      google_connected_at:     nil
+    )
+  end
+
   # Powers PasswordsController + PasswordsMailer. The salt fragment in the
   # block invalidates outstanding reset links the moment a password is
   # changed, so a leaked old link can't be reused.

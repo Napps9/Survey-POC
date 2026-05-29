@@ -22,6 +22,18 @@ services:
         sync: false
       - key: SECRET_KEY_BASE
         generateValue: true
+      # Google Sheets export (per-user OAuth) — see .env.example
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      # Active Record Encryption (encrypts stored Google tokens) — see .env.example
+      - key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+        sync: false
+      - key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+        sync: false
+      - key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+        sync: false
       - key: APP_HOST
         sync: false
       - key: APP_PROTOCOL

@@ -35,6 +35,10 @@ gem "bootsnap", require: false
 # Anthropic Claude SDK
 gem "anthropic", "~> 1.40"
 gem "csv"
+
+# Google Sheets export (per-user OAuth)
+gem "googleauth"             # Signet OAuth2: authorize URL, code exchange, token refresh
+gem "google-apis-sheets_v4"  # create spreadsheet + write values (Drive API not needed)
 # Load .env in development
 gem "dotenv-rails", groups: [:development, :test]
 

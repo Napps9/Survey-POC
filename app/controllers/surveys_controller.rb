@@ -1,5 +1,6 @@
 class SurveysController < ApplicationController
   include AggregatesSurveyResults
+  include ResolvesResultSegments
   layout "fullscreen", only: [ :show, :new ]
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
@@ -169,10 +170,8 @@ class SurveysController < ApplicationController
   end
 
   def results
-    base            = @survey.responses.where(status: "completed").order(created_at: :desc)
+    base, @segments, @active_segment = resolve_result_segments(@survey, params[:segment])
     @overall_total  = base.count
-    @segments       = result_segments(base)
-    @active_segment = @segments.find { |s| s[:id] == params[:segment] } || @segments.first
 
     @responses  = @active_segment[:scope]
     @total      = @active_segment[:count]
@@ -286,31 +285,5 @@ class SurveysController < ApplicationController
 
   def set_survey_including_archived
     @survey = Current.organisation.surveys.find(params[:id])
-  end
-
-  # Response segments for the results filter: always "Overall", plus a
-  # "Direct link" and one entry per partner share when this Verto is shared.
-  # Each entry is { id:, label:, scope:, count: }.
-  def result_segments(base)
-    segments = [ { id: "overall", label: "Overall", scope: base, count: base.count } ]
-
-    shares = @survey.survey_shares
-                    .includes(:partner_organisation, alliance_verto: :alliance)
-                    .order(:created_at)
-    return segments if shares.empty?
-
-    direct = base.where(survey_share_id: nil)
-    if (direct_count = direct.count).positive?
-      segments << { id: "direct", label: "Direct link", scope: direct, count: direct_count }
-    end
-
-    shares.each do |share|
-      scope = base.where(survey_share_id: share.id)
-      alliance_name = share.alliance_verto&.alliance&.name
-      label = alliance_name ? "#{share.display_name} · #{alliance_name}" : share.display_name
-      segments << { id: "share_#{share.id}", label: label, scope: scope, count: scope.count }
-    end
-
-    segments
   end
 end
