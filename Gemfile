@@ -33,7 +33,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 
 # Anthropic Claude SDK
-gem "anthropic", "~> 1.40"
+gem "anthropic", "~> 1.44"
 gem "csv"
 
 # Google Sheets export (per-user OAuth)
