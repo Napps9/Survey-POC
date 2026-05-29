@@ -78,7 +78,7 @@
     </div>
   <% end %>
 
-  <%= form_with url: generate_survey_path, method: :post,
+  <%= form_with url: generate_survey_path, method: :post, multipart: true,
         html: { style: "display:flex;flex-direction:column;flex:1;min-height:0;" },
         data: { controller: "create-wizard",
                 action: "submit->generating#show" } do |f| %>
@@ -159,6 +159,33 @@
             <div class="wizard-mobile-hint">
               <p class="wizard-mobile-hint-lead"><%= t("wizard.s1_lead") %></p>
               <p class="wizard-mobile-hint-body"><%= t("wizard.s1_hint_body") %></p>
+            </div>
+
+            <%# ── Alternative entry point: import prewritten questions from a PDF.
+                A dedicated submit button posts the file to import_pdf (via
+                formaction), skipping the AI-brief steps with formnovalidate. ── %>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:2px;">
+              <div style="flex:1;height:1px;background:rgba(0,0,0,0.1);"></div>
+              <span style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(0,0,0,0.4);"><%= t("wizard.import_or") %></span>
+              <div style="flex:1;height:1px;background:rgba(0,0,0,0.1);"></div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:12px;background:#fafbfc;border:1px dashed rgba(0,0,0,0.18);">
+              <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);margin:0;line-height:1.45;"><%= t("wizard.import_hint") %></p>
+
+              <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;position:relative;">
+                <span style="font-family:'Alata',sans-serif;font-size:13px;color:#1C2034;padding:9px 14px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,0.14);white-space:nowrap;"><%= t("wizard.import_choose") %></span>
+                <span data-pdf-filename style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= t("wizard.import_no_file") %></span>
+                <%= f.file_field :pdf, accept: "application/pdf",
+                      style: "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;",
+                      onchange: "this.closest('label').querySelector('[data-pdf-filename]').textContent = this.files[0] ? this.files[0].name : '#{j t('wizard.import_no_file')}'" %>
+              </label>
+
+              <%= f.submit t("wizard.import_pdf"),
+                    formaction: import_pdf_survey_path,
+                    formnovalidate: true,
+                    data: { generating_import: "", turbo_submits_with: t("wizard.importing") },
+                    style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
             </div>
           </div>
         </div>

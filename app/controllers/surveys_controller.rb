@@ -3,6 +3,8 @@ class SurveysController < ApplicationController
   include ResolvesResultSegments
   layout "fullscreen", only: [ :show, :new ]
 
+  MAX_PDF_BYTES = 10.megabytes
+
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
   before_action :set_survey,           only: [ :show, :publish, :update_settings ]
   before_action :set_survey_including_archived, only: [ :results ]
@@ -81,6 +83,52 @@ class SurveysController < ApplicationController
     Rails.logger.error("[SurveyGenerator] #{e.class}: #{e.message}")
     flash.now[:alert] = "We couldn't generate your Verto — #{friendly_generate_error(e)}"
     render :new, status: :unprocessable_entity
+  end
+
+  # POST /surveys/import_pdf
+  # Creates a Verto from a user's prewritten questions in an uploaded PDF,
+  # auto-assigning each question its best-fitting card type, then opens the editor.
+  def import_pdf
+    pdf = params[:pdf]
+
+    unless pdf.respond_to?(:read) && pdf.content_type == "application/pdf"
+      return import_pdf_error("Please choose a PDF file to import.")
+    end
+    if pdf.size > MAX_PDF_BYTES
+      return import_pdf_error("That PDF is too large — please keep it under #{MAX_PDF_BYTES / 1.megabyte}MB.")
+    end
+
+    palette        = BrandPalette.sanitize(params[:brand_palette])
+    locales        = SupportedLocales.sanitize_list(params[:locales], fallback: [ Current.locale.to_s ])
+    default_locale = SupportedLocales.coerce(params[:default_locale].presence || locales.first)
+    locales        = ([ default_locale ] + locales).uniq
+
+    data   = Base64.strict_encode64(pdf.read)
+    result = PdfQuestionImporter.new.call(pdf_data: data, locale: default_locale)
+    cards  = Array(result["cards"])
+
+    return import_pdf_error("We couldn't find any questions in that PDF — try a different file.") if cards.empty?
+
+    @survey = Current.organisation.surveys.create!(
+      title:         result["title"].presence || "Imported Verto",
+      description:   result["description"],
+      theme:         params[:theme].presence,
+      audience_age:  params[:audience_age].presence,
+      key_insight:   params[:key_insight].presence,
+      cards:         cards,
+      brand_palette: palette.presence,
+      default_locale: default_locale,
+      locales:        locales
+    )
+
+    Current.organisation.update(default_brand_palette: palette) if palette.present?
+
+    translate_survey!(@survey)
+
+    redirect_to survey_path(@survey)
+  rescue => e
+    Rails.logger.error("[PdfQuestionImporter] #{e.class}: #{e.message}")
+    import_pdf_error("We couldn't import your PDF — #{friendly_generate_error(e)}")
   end
 
   def update
@@ -217,6 +265,14 @@ class SurveysController < ApplicationController
 
   def set_survey
     @survey = Current.organisation.surveys.kept.find(params[:id])
+  end
+
+  # Re-render the wizard with an error. `import_pdf` isn't covered by the
+  # class-level `layout "fullscreen", only: [:show, :new]` (which keys on the
+  # action name), so the layout is set explicitly here.
+  def import_pdf_error(message)
+    flash.now[:alert] = message
+    render :new, layout: "fullscreen", status: :unprocessable_entity
   end
 
   # Turn an exception from the generate pipeline into something the operator

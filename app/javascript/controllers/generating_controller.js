@@ -14,6 +14,22 @@ export default class extends Controller {
     // On a submit event, event.target IS the form that was submitted.
     // Fall back to a DOM lookup so a manual call (no event) still works.
     const form = event?.target?.closest?.("form") || this.element.querySelector("form")
+
+    // "Import from PDF" path: a dedicated submit button posts the chosen file
+    // to import_pdf and skips the brief gate. It's the first submit in the
+    // form, so a stray Enter keypress targets it too — only proceed when a
+    // file is actually attached, otherwise let the user keep filling the brief.
+    if (event?.submitter?.hasAttribute?.("data-generating-import")) {
+      const file = form?.querySelector('input[name="pdf"]')
+      if (!file?.files?.length) {
+        event?.preventDefault()
+        this._shakeSubmit(event.submitter)
+        return
+      }
+      this._showImport()
+      return
+    }
+
     const rawTheme   = form?.querySelector('[name="theme"]')?.value.trim()        || ""
     const rawAge     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
     const rawInsight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
@@ -39,6 +55,24 @@ export default class extends Controller {
 
     // Stage 1 message — echo theme back as a forward-looking statement
     this._setHero(this._stage1Message(theme, age))
+    this.heroAgeTarget.textContent = ""
+
+    this.overlayTarget.classList.remove("hidden")
+    this.overlayTarget.classList.add("flex")
+    document.body.classList.add("generating-overlay-active")
+
+    this._runSteps()
+  }
+
+  // Import-from-PDF has no theme/age/insight to echo, so show a generic
+  // progress message and reuse the same step cadence.
+  _showImport() {
+    this._theme = ""
+    this._age = ""
+    this._insight = ""
+    if (this.hasPillAudienceTarget) this.pillAudienceTarget.textContent = ""
+    if (this.hasInsightTextTarget) this.insightTextTarget.textContent = ""
+    this._setHero("Reading your PDF and matching question types")
     this.heroAgeTarget.textContent = ""
 
     this.overlayTarget.classList.remove("hidden")
@@ -129,8 +163,11 @@ export default class extends Controller {
                             .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
   }
 
-  _shakeSubmit(form) {
-    const btn = form?.querySelector('input[type="submit"], button[type="submit"]')
+  // Accepts either the form (finds its submit button) or a submit button directly.
+  _shakeSubmit(el) {
+    const btn = el?.matches?.('input[type="submit"], button[type="submit"]')
+      ? el
+      : el?.querySelector?.('input[type="submit"], button[type="submit"]')
     if (!btn) return
     btn.classList.remove("is-shaking")
     void btn.offsetWidth // restart the CSS animation
