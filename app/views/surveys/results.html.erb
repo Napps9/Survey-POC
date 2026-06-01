@@ -180,6 +180,12 @@
             <div class="s-card-header" style="padding:9px 14px;gap:10px;">
               <span class="s-badge <%= card_meta[:badge_css] %>"><%= card_meta[:badge] %></span>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);">Card <%= idx + 1 %></span>
+              <% if card_data["common_question_id"].present? %>
+                <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:100px;background:rgba(97,91,245,0.18);color:#9d97ff;font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;"
+                      title="<%= t('common_questions.badge_tooltip', default: 'From a Common Questions set') %>">
+                  <%= t("common_questions.badge", default: "Common") %>
+                </span>
+              <% end %>
               <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:<%= total_ans > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;">
                 <%= total_ans %> answer<%= total_ans == 1 ? "" : "s" %>
               </span>
