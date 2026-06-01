@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_29_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -68,6 +68,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_000001) do
     t.datetime "updated_at", null: false
     t.index ["organisation_id", "name"], name: "index_alliances_on_organisation_id_and_name", unique: true
     t.index ["organisation_id"], name: "index_alliances_on_organisation_id"
+  end
+
+  create_table "common_question_sets", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "default_locale", default: "en", null: false
+    t.datetime "deleted_at"
+    t.text "key_insight"
+    t.string "name", null: false
+    t.integer "organisation_id", null: false
+    t.string "theme"
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_common_question_sets_on_deleted_at"
+    t.index ["organisation_id"], name: "index_common_question_sets_on_organisation_id"
+  end
+
+  create_table "common_questions", force: :cascade do |t|
+    t.boolean "allow_other", default: false, null: false
+    t.string "card_type", null: false
+    t.integer "common_question_set_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.json "options"
+    t.integer "position", null: false
+    t.text "text", null: false
+    t.datetime "updated_at", null: false
+    t.index ["common_question_set_id", "position"], name: "index_common_questions_on_common_question_set_id_and_position"
+    t.index ["common_question_set_id"], name: "index_common_questions_on_common_question_set_id"
   end
 
   create_table "invites", force: :cascade do |t|
@@ -203,6 +230,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_000001) do
   add_foreign_key "alliance_vertos", "alliances"
   add_foreign_key "alliance_vertos", "surveys"
   add_foreign_key "alliances", "organisations"
+  add_foreign_key "common_question_sets", "organisations"
+  add_foreign_key "common_questions", "common_question_sets"
   add_foreign_key "invites", "alliances"
   add_foreign_key "invites", "organisations"
   add_foreign_key "invites", "users", column: "invited_by_id"

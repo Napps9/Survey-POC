@@ -8,6 +8,8 @@ class Organisation < ApplicationRecord
   has_many :alliance_memberships, dependent: :destroy
   has_many :member_alliances, through: :alliance_memberships, source: :alliance
 
+  has_many :common_question_sets, dependent: :destroy
+
   has_one_attached :logo
 
   # The company's default Verto palette — pre-fills each new Verto's colour
