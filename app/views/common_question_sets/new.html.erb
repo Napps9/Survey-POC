@@ -1,39 +1,4 @@
-<div data-controller="generating" style="height:100%;display:flex;flex-direction:column;background:#1C2034;">
-
-  <%# ── Generating overlay — hidden until form submits ── %>
-  <div class="fixed inset-0 z-50 hidden flex-col overflow-hidden"
-       style="background:#1C2034;"
-       data-generating-target="overlay">
-    <div class="gen-orbs">
-      <div class="gen-orb gen-orb-1"></div>
-      <div class="gen-orb gen-orb-2"></div>
-      <div class="gen-orb gen-orb-3"></div>
-      <div class="gen-orb gen-orb-4"></div>
-    </div>
-    <div class="gen-stage flex-1 flex flex-col items-center justify-center gap-8 px-16 py-10">
-      <div class="gen-shimmer"
-           style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">
-        <%= t("common_questions.building", default: "Drafting your set") %>
-      </div>
-      <div class="text-center" style="max-width:min(1040px,92vw);">
-        <div class="gen-hero-theme" data-generating-target="heroTheme"></div>
-        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xl);color:rgba(255,255,255,0.38);letter-spacing:-0.2px;line-height:1.5;margin-top:6px;"
-             data-generating-target="heroAge"></div>
-      </div>
-      <div class="gen-insight" data-generating-target="insightText"></div>
-      <div class="gen-steps-row">
-        <div class="gen-step" data-state="done" data-generating-target="step1">
-          <div class="step-dot">✓</div><span><%= t("common_questions.gen_brief", default: "Brief read") %></span>
-        </div>
-        <div class="gen-step" data-state="active" data-generating-target="step2">
-          <div class="step-dot"></div><span><%= t("common_questions.gen_writing", default: "Drafting questions") %></span>
-        </div>
-        <div class="gen-step" data-state="pending" data-generating-target="step3">
-          <div class="step-dot"></div><span><%= t("common_questions.gen_types", default: "Picking answer types") %></span>
-        </div>
-      </div>
-    </div>
-  </div>
+<div style="height:100%;display:flex;flex-direction:column;background:#1C2034;">
 
   <%# ── Wizard form ── %>
   <% if flash[:alert] %>
@@ -44,8 +9,7 @@
 
   <%= form_with url: common_question_sets_path, method: :post,
         html: { style: "display:flex;flex-direction:column;flex:1;min-height:0;" },
-        data: { controller: "create-wizard",
-                action: "submit->generating#show" } do |f| %>
+        data: { controller: "create-wizard" } do |f| %>
 
     <%
       light_input_style    = "width:100%;background:#fafbfc;border:1px solid rgba(0,0,0,0.12);border-radius:12px;padding:14px 18px;color:#000;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;"
