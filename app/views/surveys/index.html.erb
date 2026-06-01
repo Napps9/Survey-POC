@@ -20,10 +20,8 @@
 <div style="display:flex;min-height:100vh;background:#1C2034;">
   <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
 
-    <%= render "shared/dashboard_tabs", active: :vertos %>
-
     <%# ── Hero ── %>
-    <div style="position:relative;overflow:hidden;padding:48px 36px 40px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
+    <div style="position:relative;overflow:hidden;padding:32px 36px 40px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
       <div class="gen-orbs" style="opacity:0.28;">
         <div class="gen-orb gen-orb-2"></div>
         <div class="gen-orb gen-orb-3"></div>
@@ -31,6 +29,9 @@
       </div>
 
       <div style="position:relative;z-index:1;">
+        <div style="display:flex;justify-content:center;margin-bottom:28px;">
+          <%= render "shared/dashboard_tabs", active: :vertos %>
+        </div>
         <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:24px;">
           <div style="min-width:0;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">

@@ -1,6 +1,5 @@
-<%# Pill toggle that switches between the My Vertos dashboard and the Common
-    Questions area. Pass `active:` as either :vertos or :common. Sits at the
-    top of both `surveys/index.html.erb` and `common_question_sets/index.html.erb`. %>
+<%# Pill toggle between My Vertos and Common Questions. Pass active: as
+    either :vertos or :common. Sits inside each area's hero. %>
 <%
   vertos_active = active == :vertos
   common_active = active == :common
@@ -8,17 +7,15 @@
   on_pill   = "background:#fff;color:#1C2034;border:1px solid #fff;box-shadow:0 8px 22px rgba(255,255,255,0.10);"
   off_pill  = "background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.10);"
 %>
-<div style="display:flex;justify-content:center;padding:18px 36px 0;background:#1C2034;">
-  <div style="display:inline-flex;gap:8px;padding:6px;border-radius:100px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.06);">
-    <%= link_to root_path,
-          style: "#{base_pill}#{vertos_active ? on_pill : off_pill}" do %>
-      <span style="width:7px;height:7px;border-radius:50%;background:<%= vertos_active ? '#01EACB' : 'rgba(1,234,203,0.55)' %>;<%= 'box-shadow:0 0 10px rgba(1,234,203,0.7);' if vertos_active %>"></span>
-      <%= t("dashboard.tab_vertos", default: "Vertos") %>
-    <% end %>
-    <%= link_to common_question_sets_path,
-          style: "#{base_pill}#{common_active ? on_pill : off_pill}" do %>
-      <span style="width:7px;height:7px;border-radius:50%;background:<%= common_active ? '#615BF5' : 'rgba(97,91,245,0.55)' %>;<%= 'box-shadow:0 0 10px rgba(97,91,245,0.7);' if common_active %>"></span>
-      <%= t("dashboard.tab_common", default: "Common Questions") %>
-    <% end %>
-  </div>
+<div style="display:inline-flex;gap:8px;padding:6px;border-radius:100px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.06);">
+  <%= link_to root_path,
+        style: "#{base_pill}#{vertos_active ? on_pill : off_pill}" do %>
+    <span style="width:7px;height:7px;border-radius:50%;background:<%= vertos_active ? '#01EACB' : 'rgba(1,234,203,0.55)' %>;<%= 'box-shadow:0 0 10px rgba(1,234,203,0.7);' if vertos_active %>"></span>
+    <%= t("dashboard.tab_vertos", default: "Vertos") %>
+  <% end %>
+  <%= link_to common_question_sets_path,
+        style: "#{base_pill}#{common_active ? on_pill : off_pill}" do %>
+    <span style="width:7px;height:7px;border-radius:50%;background:<%= common_active ? '#615BF5' : 'rgba(97,91,245,0.55)' %>;<%= 'box-shadow:0 0 10px rgba(97,91,245,0.7);' if common_active %>"></span>
+    <%= t("dashboard.tab_common", default: "Common Questions") %>
+  <% end %>
 </div>

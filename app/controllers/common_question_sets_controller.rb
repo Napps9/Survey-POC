@@ -1,11 +1,19 @@
 class CommonQuestionSetsController < ApplicationController
-  layout "fullscreen", only: [ :new, :show, :results ]
+  layout "fullscreen", only: [ :index, :new, :show, :results ]
 
   before_action :set_set, only: [ :show, :update, :destroy, :results, :add_question, :update_question, :destroy_question ]
 
   def index
     @kept_sets     = Current.organisation.common_question_sets.kept.recent.includes(:common_questions)
     @archived_sets = Current.organisation.common_question_sets.archived.recent.includes(:common_questions)
+
+    @total_questions = @kept_sets.sum { |s| s.common_questions.size }
+    set_ids = @kept_sets.map(&:id)
+    attached_surveys = Current.organisation.surveys.kept.includes(:responses).select do |s|
+      Array(s.cards).any? { |c| c.is_a?(Hash) && set_ids.include?(c["common_question_set_id"]) }
+    end
+    @vertos_using_count = attached_surveys.size
+    @cq_response_count  = attached_surveys.sum { |s| s.responses.size }
   end
 
   def new
