@@ -44,12 +44,15 @@ class SurveysController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
+    common_cards = resolve_common_cards(params[:common_question_set_ids])
+
     result = SurveyGenerator.new.call(
       theme: theme,
       audience_age: audience_age,
       key_insight: key_insight,
       notes: notes,
-      locale: default_locale
+      locale: default_locale,
+      common_cards: common_cards
     )
 
     @survey = Current.organisation.surveys.create!(
@@ -108,6 +111,10 @@ class SurveysController < ApplicationController
     cards  = Array(result["cards"])
 
     return import_pdf_error("We couldn't find any questions in that PDF — try a different file.") if cards.empty?
+
+    # PDF defines the structure for the imported deck, so common cards are
+    # appended at the end rather than woven by the LLM.
+    cards += resolve_common_cards(params[:common_question_set_ids])
 
     @survey = Current.organisation.surveys.create!(
       title:         result["title"].presence || "Imported Verto",
@@ -265,6 +272,18 @@ class SurveysController < ApplicationController
 
   def set_survey
     @survey = Current.organisation.surveys.kept.find(params[:id])
+  end
+
+  # Snapshot the questions inside each attached Common Question Set into
+  # Verto-card hashes. Each card carries common_question_id + set_id so
+  # cross-Verto results aggregation can cluster answers by question identity.
+  def resolve_common_cards(ids_param)
+    ids = Array(ids_param).map(&:to_i).reject(&:zero?)
+    return [] if ids.empty?
+    sets = Current.organisation.common_question_sets.kept
+                   .where(id: ids)
+                   .includes(:common_questions)
+    sets.flat_map(&:common_questions).map(&:to_card)
   end
 
   # Re-render the wizard with an error. `import_pdf` isn't covered by the

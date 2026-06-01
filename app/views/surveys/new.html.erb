@@ -261,6 +261,33 @@
               <p class="wizard-mobile-hint-lead"><%= t("wizard.s3_lead") %></p>
               <p class="wizard-mobile-hint-body"><%= t("wizard.s3_hint_body") %></p>
             </div>
+
+            <%# ── Attach Common Question sets (optional). Each ticked set's
+                snapshot questions get woven into the generated Verto by the
+                SurveyGenerator at contextually appropriate positions. ── %>
+            <% common_sets = current_organisation.common_question_sets.kept.order(:name).includes(:common_questions) %>
+            <% if common_sets.any? %>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+                <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(0,0,0,0.5);font-weight:700;">
+                  <%= t("wizard.attach_common_label", default: "Common Questions (optional)") %>
+                </div>
+                <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(0,0,0,0.55);margin:0;line-height:1.5;">
+                  <%= t("wizard.attach_common_hint", default: "Tick reusable sets and we'll weave their questions into your Verto.") %>
+                </p>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                  <% common_sets.each do |set| %>
+                    <label style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:100px;background:#fafbfc;border:1.5px solid rgba(0,0,0,0.1);cursor:pointer;font-family:'ABeeZee',sans-serif;font-size:13px;color:#1C2034;"
+                           onclick="if(event.target.tagName!=='INPUT'){const cb=this.querySelector('input');cb.checked=!cb.checked;cb.dispatchEvent(new Event('change',{bubbles:true}));}"
+                           onchange="const checked=this.querySelector('input').checked;this.style.background=checked?'rgba(97,91,245,0.08)':'#fafbfc';this.style.borderColor=checked?'#615BF5':'rgba(0,0,0,0.1)';">
+                      <input type="checkbox" name="common_question_set_ids[]" value="<%= set.id %>"
+                             style="margin:0;accent-color:#615BF5;" />
+                      <span><%= set.name %></span>
+                      <span style="color:rgba(0,0,0,0.4);font-size:11px;"><%= set.common_questions.size %></span>
+                    </label>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
           </div>
         </div>
       </section>
