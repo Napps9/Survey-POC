@@ -9,6 +9,13 @@ require "anthropic"
 # Returns an array (aligned to the input cards) of:
 #   { "text" => ..., "description" => ..., "options" => [...] }
 # which the caller merges into each card's i18n[locale].
+#
+# Common Question cards are deliberately NOT skipped — a French Verto must
+# present its common cards in French alongside the rest of the deck. The
+# verbatim guarantee on Common Questions applies to the SOURCE language only
+# (enforced by SurveyGenerator#reconcile_common_cards!); per-locale i18n
+# entries are normal translations cached via TranslationCache for reuse
+# across every Verto that attaches the same set into the same locale.
 class SurveyTranslator
   include AnthropicHelpers
 

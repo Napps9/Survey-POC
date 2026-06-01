@@ -70,6 +70,27 @@ class SurveyTranslatorCacheTest < ActiveSupport::TestCase
     assert_equal 2, TranslationCache.count
   end
 
+  test "common-question cards are translated like any other card (not skipped)" do
+    # Guard against a regression where someone might be tempted to skip cards
+    # carrying a common_question_id. They must be translated so the player
+    # presents them in the Verto's language alongside everything else; the
+    # SOURCE-language verbatim guarantee is enforced separately in
+    # SurveyGenerator#reconcile_common_cards! (the Ruby reconcile step),
+    # not by side-stepping translation.
+    fake = FakeClient.new
+    translator = SurveyTranslator.new(api_key: "x")
+    translator.instance_variable_set(:@client, fake)
+
+    common_card = { "type" => "rating", "text" => "How safe?",
+                    "description" => "", "options" => [ "1", "2", "3", "4", "5" ],
+                    "common_question_id" => 42, "common_question_set_id" => 7 }
+
+    out = translator.call(cards: [ common_card ], target_locale: "fr", source_locale: "en")
+    assert_equal 1, fake.calls, "common card must be sent to the API like any other"
+    assert_equal 1, out.size
+    assert_equal "TRANSLATED", out[0]["text"]
+  end
+
   test "mixed batch only sends cache misses to the API" do
     fake = FakeClient.new
     translator = SurveyTranslator.new(api_key: "x")
