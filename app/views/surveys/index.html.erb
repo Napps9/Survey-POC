@@ -47,7 +47,7 @@
           </div>
 
           <% if @surveys.any? %>
-            <%= link_to create_chooser_path,
+            <%= link_to new_survey_path,
                   style: "flex-shrink:0;display:inline-flex;align-items:center;gap:8px;background:#01EACB;border:none;border-radius:100px;padding:12px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(1,234,203,0.28);text-decoration:none;" do %>
               <span style="font-size:18px;line-height:1;">+</span> <%= t("dashboard.create_new") %>
             <% end %>
@@ -92,7 +92,7 @@
               <%= t("dashboard.empty_body") %>
             </div>
           </div>
-          <%= link_to t("dashboard.empty_cta"), create_chooser_path,
+          <%= link_to t("dashboard.empty_cta"), new_survey_path,
                 style: "padding:12px 26px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
         </div>
 

@@ -37,7 +37,6 @@ Rails.application.routes.draw do
 
   # App
   root "surveys#index"
-  get  "create", to: "creates#show", as: :create_chooser
   get  "surveys/new",                 to: "surveys#new",     as: :new_survey
   post "surveys/generate",            to: "surveys#generate", as: :generate_survey
   post "surveys/import_pdf",          to: "surveys#import_pdf", as: :import_pdf_survey
