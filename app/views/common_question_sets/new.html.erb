@@ -42,8 +42,7 @@
     </div>
   <% end %>
 
-  <%= form_with url: common_question_sets_path, method: :post, model: @set,
-        scope: nil,
+  <%= form_with url: common_question_sets_path, method: :post,
         html: { style: "display:flex;flex-direction:column;flex:1;min-height:0;" },
         data: { controller: "create-wizard",
                 action: "submit->generating#show" } do |f| %>
@@ -96,14 +95,14 @@
 
             <div>
               <div style="<%= section_label_style %>margin-bottom:6px;"><%= t("common_questions.label_name", default: "Set name") %></div>
-              <%= f.text_field :name,
+              <%= text_field_tag :name, @set.name,
                     data: { required: "true" },
                     placeholder: t("common_questions.placeholder_name", default: "e.g. Wellbeing Baseline"),
                     style: light_input_style %>
             </div>
             <div>
               <div style="<%= section_label_style %>margin-bottom:6px;"><%= t("common_questions.label_theme", default: "Theme") %></div>
-              <%= f.text_field :theme,
+              <%= text_field_tag :theme, @set.theme,
                     placeholder: t("common_questions.placeholder_theme", default: "e.g. Wellbeing"),
                     style: light_input_style %>
             </div>
@@ -125,7 +124,7 @@
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
             <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#0CA7FF;"><%= t("common_questions.s2_eyebrow", default: "Step 03 · Insight") %></div>
             <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("common_questions.s2_title", default: "What do you want to learn?") %></div>
-            <%= f.text_area :key_insight, rows: 4,
+            <%= text_area_tag :key_insight, @set.key_insight, rows: 4,
                   placeholder: t("common_questions.placeholder_insight", default: "e.g. How safe and supported do people feel right now?"),
                   style: light_textarea_style %>
           </div>
@@ -149,9 +148,8 @@
 
             <div style="display:flex;flex-direction:column;gap:6px;">
               <div style="<%= section_label_style %>"><%= t("common_questions.label_language", default: "Set language") %></div>
-              <%= f.select :default_locale,
-                    SupportedLocales.ui_ready.map { |l| [ "#{l.flag} #{l.native_name}", l.code ] },
-                    {},
+              <%= select_tag :default_locale,
+                    options_for_select(SupportedLocales.ui_ready.map { |l| [ "#{l.flag} #{l.native_name}", l.code ] }, @set.default_locale),
                     style: "#{light_input_style}padding:12px 16px;appearance:auto;" %>
             </div>
 
@@ -169,7 +167,7 @@
                     <input type="radio" name="start_mode" value="<%= val %>"
                            <%= "checked" if selected %>
                            style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
-                           onchange="this.closest('.preview-card').querySelectorAll('.populate-choice').forEach(el=>{el.style.borderColor='rgba(0,0,0,0.08)';el.style.background='#fafbfc';});this.closest('.populate-choice').style.borderColor='#615BF5';this.closest('.populate-choice').style.background='rgba(97,91,245,0.05)';var form=this.closest('form');var submit=form.querySelector('[data-create-wizard-target=finish]');if(submit){submit.formAction = this.value === 'generate' ? '<%= j generate_common_question_sets_path %>' : '<%= j common_question_sets_path %>';submit.textContent = this.value === 'generate' ? '<%= j t('common_questions.cta_generate', default: 'Generate questions →') %>' : '<%= j t('common_questions.cta_blank', default: 'Create empty set →') %>';}" />
+                           onchange="this.closest('.preview-card').querySelectorAll('.populate-choice').forEach(el=>{el.style.borderColor='rgba(0,0,0,0.08)';el.style.background='#fafbfc';});this.closest('.populate-choice').style.borderColor='#615BF5';this.closest('.populate-choice').style.background='rgba(97,91,245,0.05)';var form=this.closest('form');var submit=form.querySelector('[data-create-wizard-target=finish]');if(submit){submit.formAction = this.value === 'generate' ? '<%= j generate_common_question_sets_path %>' : '<%= j common_question_sets_path %>';var label = this.value === 'generate' ? '<%= j t('common_questions.cta_generate', default: 'Generate questions →') %>' : '<%= j t('common_questions.cta_blank', default: 'Create empty set →') %>';if(submit.tagName==='BUTTON'){submit.textContent=label;}else{submit.value=label;}}" />
                     <span style="font-family:'Alata',sans-serif;font-size:14px;color:#1C2034;letter-spacing:0.02em;line-height:1.2;"><%= label %></span>
                     <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.55);line-height:1.4;"><%= desc %></span>
                   </label>
