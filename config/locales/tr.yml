@@ -58,13 +58,13 @@ tr:
   player:
     thank_you_title: Teşekkürler!
     thank_you_sub: Yanıtlarınız kaydedildi.
+    thank_you_from: "%{org} tarafından"
     compare_cta: Sonuçlarınızı diğerleriyle karşılaştırın →
     powered_by: Destekleyen
     comparison_title: Yanıtlarınız vs herkes
     back: "← Geri"
     next: İleri →
     submit: Gönder ✓
-    thank_you_from: "%{org} tarafından"
   js:
     player:
       progress: "%{total} karttan %{n}. kart"
@@ -252,6 +252,9 @@ tr:
       one: Tahmini ~%{count} dk
       other: Tahmini ~%{count} dk
     design: Tasarım
+    shuffle: Karıştır
+    shuffle_title: Verto kütüphanesinden yeni görseller seç
+    shuffle_confirm: Görseller karıştırılsın mı? Mevcut resimleriniz kütüphaneden yapılan yeni bir seçimle değiştirilecek.
     publish_share: Yayınla ve paylaş →
     answer_type: Yanıt Türü
     select_card: Türünü değiştirmek için bir kart seçin
@@ -262,9 +265,6 @@ tr:
     all_types: Tüm Soru Türleri
     ranked_for: 'Şuna uygunluğa göre sıralandı:'
     this_card: bu kart
-    shuffle: Karıştır
-    shuffle_title: Verto kütüphanesinden yeni görseller seç
-    shuffle_confirm: Görseller karıştırılsın mı? Mevcut resimleriniz kütüphaneden yapılan yeni bir seçimle değiştirilecek.
   dashboard_card:
     badge_archived: Arşivlendi
     badge_live: Canlı
@@ -287,9 +287,9 @@ tr:
     results: Sonuçlar →
     publish: Yayınla →
     delete: Sil
+    delete_forever: Kalıcı olarak sil
     edit_warning: '"%{title}" canlı. Yanıt toplarken soruları düzenlemek veri kalitesini etkileyecektir — düzenlemeden önceki ve sonraki yanıtlar doğrudan karşılaştırılamaz. Devam edilsin mi?'
     delete_warning: '"%{title}" silinsin mi? Silinen bir Verto''yu geri alamazsınız. Yanıtlayıcıların bağlantısı çalışmayı durduracak — mevcut sonuçlar Arşivlenenler listenizde kalır.'
-    delete_forever: Kalıcı olarak sil
     delete_forever_warning: '"%{title}" kalıcı olarak silinsin? Tüm yanıtlar, paylaşımlar ve veriler silinecek. Bu işlem geri alınamaz.'
     select: Seç
     cancel: İptal et
@@ -386,6 +386,8 @@ tr:
     s5_mock_opt: Bayılıyorum
     s5_title: Marka renklerinizi seçin.
     s5_sub: Üç tane seçin. Bu Verto'nun tüm deneyiminde uygulanacaklar.
+    section_how_to_start: Nasıl başlanır
+    section_brand_colours: Marka renkleri
     brand_primary: Birincil
     brand_primary_desc: Başlıklar ve vurgular
     brand_cta: Düğmeler (CTA)
@@ -404,13 +406,6 @@ tr:
     s6_placeholder: örn. Hedef kitle daha önce Playverto kullanmadı, tonu sıcak tutun, kurumsal değil.
     s6_compare_label: Yanıtlayıcıların cevaplarını karşılaştırmasına izin ver
     s6_compare_desc: Teşekkür sayfasında, cevaplarının diğerleriyle nasıl kıyaslandığını gösteren bir CTA görüntüleyin.
-    back: "← Geri"
-    next: İleri →
-    generate: Verto Oluştur →
-    generating: Oluşturuluyor…
-    step_counter: Adım %{n} / %{total}
-    section_how_to_start: Nasıl başlanır
-    section_brand_colours: Marka renkleri
     s7_eyebrow: Adım 07 · Son dokunuş
     s7_lead: Hazır görünümlü bir Verto veya boş bir tuval ile açın.
     s7_body: Temanıza, hedef kitlenize ve her karttaki soruya uygun olarak özenle seçilmiş kütüphanemizden bir arka plan ve kart başına görsel seçiyoruz.
@@ -426,3 +421,14 @@ tr:
     s7_populate_desc: Editörü bir arka plan ve brifınıza uygun her kartta bir görselle açın.
     s7_blank_label: Boştan başla
     s7_blank_desc: Her görseli kendiniz seçebilmek için editörü görsel olmadan açın.
+    back: "← Geri"
+    next: İleri →
+    generate: Verto Oluştur →
+    generating: Oluşturuluyor…
+    import_or: veya
+    import_hint: Sorularınız zaten yazılı mı? Bir PDF yükleyin, her birini en uygun yanıt türüyle eşleştirelim.
+    import_choose: PDF seçin
+    import_no_file: Dosya seçilmedi
+    import_pdf: PDF'den içe aktar →
+    importing: PDF'iniz okunuyor…
+    step_counter: Adım %{n} / %{total}

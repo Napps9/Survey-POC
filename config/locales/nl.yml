@@ -58,13 +58,13 @@ nl:
   player:
     thank_you_title: Bedankt!
     thank_you_sub: Je antwoorden zijn vastgelegd.
+    thank_you_from: van %{org}
     compare_cta: Bekijk je resultaten ten opzichte van anderen →
     powered_by: Mogelijk gemaakt door
     comparison_title: Jouw antwoorden vs iedereen
     back: "← Terug"
     next: Volgende →
     submit: Verzenden ✓
-    thank_you_from: van %{org}
   js:
     player:
       progress: Kaart %{n} van %{total}
@@ -252,6 +252,9 @@ nl:
       one: Geschat ~%{count} min
       other: Geschat ~%{count} min
     design: Ontwerp
+    shuffle: Vernieuwen
+    shuffle_title: Kies nieuwe afbeeldingen uit de Verto-bibliotheek
+    shuffle_confirm: Afbeeldingen vernieuwen? Je huidige afbeeldingen worden vervangen door een nieuwe selectie uit de bibliotheek.
     publish_share: Publiceren & delen →
     answer_type: Antwoordtype
     select_card: Selecteer een kaart om het type te wijzigen
@@ -262,9 +265,6 @@ nl:
     all_types: Alle vraagtypen
     ranked_for: Gerangschikt op geschiktheid voor
     this_card: deze kaart
-    shuffle: Vernieuwen
-    shuffle_title: Kies nieuwe afbeeldingen uit de Verto-bibliotheek
-    shuffle_confirm: Afbeeldingen vernieuwen? Je huidige afbeeldingen worden vervangen door een nieuwe selectie uit de bibliotheek.
   dashboard_card:
     badge_archived: Gearchiveerd
     badge_live: Live
@@ -287,9 +287,9 @@ nl:
     results: Resultaten →
     publish: Publiceren →
     delete: Verwijderen
+    delete_forever: Voor altijd verwijderen
     edit_warning: "“%{title}” is live. Het bewerken van vragen terwijl er reacties worden verzameld, heeft invloed op de datakwaliteit — antwoorden van vóór en na de bewerking zijn niet rechtstreeks vergelijkbaar. Doorgaan?"
     delete_warning: "“%{title}” verwijderen? Een verwijderde Verto kun je niet terughalen. De link voor respondenten werkt niet meer — bestaande resultaten blijven in je Archief staan."
-    delete_forever: Voor altijd verwijderen
     delete_forever_warning: Permanent "%{title}" verwijderen? Alle reacties, delingen en gegevens worden gewist. Dit kan niet ongedaan worden gemaakt.
     select: Selecteren
     cancel: Annuleren
@@ -386,6 +386,8 @@ nl:
     s5_mock_opt: Geweldig
     s5_title: Kies je merkkleuren.
     s5_sub: Kies er drie. Ze worden toegepast op de hele Verto-ervaring.
+    section_how_to_start: Hoe wil je beginnen
+    section_brand_colours: Merkkleuren
     brand_primary: Primair
     brand_primary_desc: Koppen & accenten
     brand_cta: Knoppen (CTA)
@@ -404,13 +406,6 @@ nl:
     s6_placeholder: bijv. Het publiek heeft Playverto nog nooit gebruikt; houd de toon warm, niet zakelijk.
     s6_compare_label: Laat respondenten hun antwoorden vergelijken
     s6_compare_desc: Toon een CTA op de bedankpagina die laat zien hoe hun antwoorden zich verhouden tot die van anderen.
-    back: "← Terug"
-    next: Volgende →
-    generate: Verto genereren →
-    generating: Bezig met genereren…
-    step_counter: Stap %{n} van %{total}
-    section_how_to_start: Hoe wil je beginnen
-    section_brand_colours: Merkkleuren
     s7_eyebrow: Stap 07 · Laatste touch
     s7_lead: Open in een kant-en-klare Verto of een leeg canvas.
     s7_body: We kiezen een achtergrond en afbeeldingen per kaart uit onze samengestelde bibliotheek — afgestemd op jouw thema, doelgroep en de vraag op elke kaart.
@@ -426,3 +421,14 @@ nl:
     s7_populate_desc: Open de editor met een achtergrond en een afbeelding op elke kaart, afgestemd op jouw briefing.
     s7_blank_label: Blanco beginnen
     s7_blank_desc: Open de editor zonder afbeeldingen, zodat je zelf elke foto kunt kiezen.
+    back: "← Terug"
+    next: Volgende →
+    generate: Verto genereren →
+    generating: Bezig met genereren…
+    import_or: of
+    import_hint: Heb je je vragen al opgeschreven? Upload een PDF en wij koppelen elke vraag aan het beste antwoordtype.
+    import_choose: PDF kiezen
+    import_no_file: Geen bestand gekozen
+    import_pdf: Importeren uit PDF →
+    importing: Je PDF wordt gelezen…
+    step_counter: Stap %{n} van %{total}

@@ -25,10 +25,15 @@ module SupportedLocales
       @symbols ||= codes.map(&:to_sym)
     end
 
-    # Locales whose platform UI is actually translated — file exists and
-    # covers every key in en.yml. English is always included. Use this for
-    # the UI language picker so users never pick a locale that just falls
-    # back to English. Verto content pickers should keep using `all`.
+    # Locales whose platform UI is translated enough to show in the picker:
+    # file exists, parses, and covers ≥ COVERAGE_THRESHOLD of en.yml's keys.
+    # English is always included. Anything still missing falls back to en.yml
+    # via Rails I18n at render time, so a feature that adds a couple of new
+    # keys without translating them leaves the locale visible (with a few
+    # English words) instead of removing it from the switcher entirely.
+    # Verto content pickers should keep using `all`.
+    COVERAGE_THRESHOLD = 0.80
+
     def ui_ready
       @ui_ready ||= all.select { |loc| ui_ready_codes.include?(loc.code) }
     end
@@ -71,10 +76,11 @@ module SupportedLocales
     def ui_ready_codes
       @ui_ready_codes ||= begin
         en_keys = locale_keys(DEFAULT) || []
+        min_coverage = (en_keys.size * COVERAGE_THRESHOLD).ceil
         codes.select do |code|
           next true if code == DEFAULT
           keys = locale_keys(code)
-          keys && (en_keys - keys).empty?
+          keys && (en_keys & keys).size >= min_coverage
         end.to_set
       end
     end

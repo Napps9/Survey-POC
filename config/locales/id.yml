@@ -58,13 +58,13 @@ id:
   player:
     thank_you_title: Terima kasih!
     thank_you_sub: Tanggapan Anda telah dicatat.
+    thank_you_from: dari %{org}
     compare_cta: Lihat hasil Anda dibandingkan dengan yang lain →
     powered_by: Didukung oleh
     comparison_title: Jawaban Anda vs semua orang
     back: "← Kembali"
     next: Lanjut →
     submit: Kirim ✓
-    thank_you_from: dari %{org}
   js:
     player:
       progress: Kartu %{n} dari %{total}
@@ -252,6 +252,9 @@ id:
       one: Perkiraan ~%{count} mnt
       other: Perkiraan ~%{count} mnt
     design: Desain
+    shuffle: Acak
+    shuffle_title: Pilih ulang gambar dari pustaka verto
+    shuffle_confirm: Acak gambar? Gambar Anda saat ini akan diganti dengan pilihan baru dari pustaka.
     publish_share: Publikasikan & bagikan →
     answer_type: Tipe Jawaban
     select_card: Pilih kartu untuk mengubah tipenya
@@ -262,9 +265,6 @@ id:
     all_types: Semua Tipe Pertanyaan
     ranked_for: Diurutkan berdasarkan kecocokan untuk
     this_card: kartu ini
-    shuffle: Acak
-    shuffle_title: Pilih ulang gambar dari pustaka verto
-    shuffle_confirm: Acak gambar? Gambar Anda saat ini akan diganti dengan pilihan baru dari pustaka.
   dashboard_card:
     badge_archived: Diarsipkan
     badge_live: Live
@@ -287,9 +287,9 @@ id:
     results: Hasil →
     publish: Publikasikan →
     delete: Hapus
+    delete_forever: Hapus selamanya
     edit_warning: '"%{title}" sedang live. Mengedit pertanyaan saat sedang mengumpulkan tanggapan akan memengaruhi kualitas data — jawaban sebelum dan sesudah pengeditan tidak dapat dibandingkan langsung. Lanjutkan?'
     delete_warning: Hapus "%{title}"? Verto yang dihapus tidak bisa dikembalikan. Tautan responden akan berhenti berfungsi — hasil yang ada akan tetap di daftar Diarsipkan Anda.
-    delete_forever: Hapus selamanya
     delete_forever_warning: Hapus "%{title}" secara permanen? Semua respons, berbagi, dan data akan dihapus. Tindakan ini tidak dapat dibatalkan.
     select: Pilih
     cancel: Batal
@@ -386,6 +386,8 @@ id:
     s5_mock_opt: Suka sekali
     s5_title: Pilih warna merek Anda.
     s5_sub: Pilih tiga. Akan diterapkan di seluruh pengalaman Verto ini.
+    section_how_to_start: Cara memulai
+    section_brand_colours: Warna merek
     brand_primary: Utama
     brand_primary_desc: Judul & aksen
     brand_cta: Tombol (CTA)
@@ -404,13 +406,6 @@ id:
     s6_placeholder: misal Audiens belum pernah menggunakan Playverto sebelumnya, pertahankan nada hangat, bukan korporat.
     s6_compare_label: Izinkan responden membandingkan jawaban mereka
     s6_compare_desc: Tampilkan CTA di halaman terima kasih yang menunjukkan bagaimana jawaban mereka dibandingkan dengan jawaban orang lain.
-    back: "← Kembali"
-    next: Lanjut →
-    generate: Buat Verto →
-    generating: Membuat…
-    step_counter: Langkah %{n} dari %{total}
-    section_how_to_start: Cara memulai
-    section_brand_colours: Warna merek
     s7_eyebrow: Langkah 07 · Sentuhan akhir
     s7_lead: Buka dalam tampilan Verto yang sudah jadi, atau kanvas kosong.
     s7_body: Kami memilih latar belakang dan gambar per kartu dari pustaka kurasi kami — disesuaikan dengan tema, audiens, dan pertanyaan di setiap kartu.
@@ -426,3 +421,14 @@ id:
     s7_populate_desc: Buka editor dengan latar belakang dan gambar di setiap kartu, disesuaikan dengan brief Anda.
     s7_blank_label: Mulai dari kosong
     s7_blank_desc: Buka editor tanpa gambar agar Anda dapat memilih setiap gambar sendiri.
+    back: "← Kembali"
+    next: Lanjut →
+    generate: Buat Verto →
+    generating: Membuat…
+    import_or: atau
+    import_hint: Sudah punya pertanyaan yang tertulis? Unggah PDF dan kami akan mencocokkan setiap pertanyaan dengan tipe jawaban terbaik.
+    import_choose: Pilih PDF
+    import_no_file: Tidak ada file yang dipilih
+    import_pdf: Impor dari PDF →
+    importing: Membaca PDF Anda…
+    step_counter: Langkah %{n} dari %{total}

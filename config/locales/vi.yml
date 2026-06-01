@@ -58,13 +58,13 @@ vi:
   player:
     thank_you_title: Cảm ơn bạn!
     thank_you_sub: Câu trả lời của bạn đã được ghi nhận.
+    thank_you_from: từ %{org}
     compare_cta: Xem kết quả của bạn so với người khác →
     powered_by: Được cung cấp bởi
     comparison_title: Câu trả lời của bạn so với mọi người
     back: "← Quay lại"
     next: Tiếp →
     submit: Gửi ✓
-    thank_you_from: từ %{org}
   js:
     player:
       progress: Thẻ %{n} / %{total}
@@ -252,6 +252,9 @@ vi:
       one: Ước tính ~%{count} phút
       other: Ước tính ~%{count} phút
     design: Thiết kế
+    shuffle: Xáo trộn
+    shuffle_title: Chọn lại hình ảnh từ thư viện Verto
+    shuffle_confirm: Xáo trộn hình ảnh? Các hình ảnh hiện tại của bạn sẽ được thay thế bằng bộ ảnh mới từ thư viện.
     publish_share: Xuất bản & chia sẻ →
     answer_type: Loại câu trả lời
     select_card: Chọn một thẻ để thay đổi loại của nó
@@ -262,9 +265,6 @@ vi:
     all_types: Tất cả loại câu hỏi
     ranked_for: Xếp theo độ phù hợp cho
     this_card: thẻ này
-    shuffle: Xáo trộn
-    shuffle_title: Chọn lại hình ảnh từ thư viện Verto
-    shuffle_confirm: Xáo trộn hình ảnh? Các hình ảnh hiện tại của bạn sẽ được thay thế bằng bộ ảnh mới từ thư viện.
   dashboard_card:
     badge_archived: Đã lưu trữ
     badge_live: Trực tiếp
@@ -287,9 +287,9 @@ vi:
     results: Kết quả →
     publish: Xuất bản →
     delete: Xóa
+    delete_forever: Xóa vĩnh viễn
     edit_warning: '"%{title}" đang trực tiếp. Việc chỉnh sửa câu hỏi khi đang thu thập phản hồi sẽ ảnh hưởng đến chất lượng dữ liệu — câu trả lời trước và sau khi chỉnh sửa sẽ không so sánh trực tiếp được. Tiếp tục?'
     delete_warning: Xóa "%{title}"? Bạn không thể khôi phục một Verto đã bị xóa. Liên kết của người phản hồi sẽ ngừng hoạt động — kết quả hiện có vẫn ở trong danh sách Lưu trữ của bạn.
-    delete_forever: Xóa vĩnh viễn
     delete_forever_warning: Xóa vĩnh viễn "%{title}"? Tất cả các phản hồi, chia sẻ và dữ liệu sẽ bị xóa. Không thể hoàn tác hành động này.
     select: Chọn
     cancel: Hủy
@@ -386,6 +386,8 @@ vi:
     s5_mock_opt: Rất thích
     s5_title: Chọn màu sắc thương hiệu của bạn.
     s5_sub: Chọn ba màu. Chúng sẽ được áp dụng xuyên suốt trải nghiệm của Verto này.
+    section_how_to_start: Cách bắt đầu
+    section_brand_colours: Màu thương hiệu
     brand_primary: Chính
     brand_primary_desc: Tiêu đề & điểm nhấn
     brand_cta: Nút (CTA)
@@ -404,13 +406,6 @@ vi:
     s6_placeholder: 'ví dụ: Khán giả chưa từng dùng Playverto, giữ giọng điệu ấm áp, không quá doanh nghiệp.'
     s6_compare_label: Cho phép người trả lời so sánh câu trả lời của họ
     s6_compare_desc: Hiển thị CTA trên trang cảm ơn để cho thấy câu trả lời của họ so sánh thế nào với mọi người khác.
-    back: "← Quay lại"
-    next: Tiếp →
-    generate: Tạo Verto →
-    generating: Đang tạo…
-    step_counter: Bước %{n} / %{total}
-    section_how_to_start: Cách bắt đầu
-    section_brand_colours: Màu thương hiệu
     s7_eyebrow: Bước 07 · Hoàn thiện
     s7_lead: Mở với giao diện Verto hoàn chỉnh hoặc một trang trắng tuỳ ý.
     s7_body: Chúng tôi chọn hình nền và hình ảnh cho từng thẻ từ thư viện được tuyển chọn — phù hợp với chủ đề, đối tượng và câu hỏi trên mỗi thẻ của bạn.
@@ -426,3 +421,14 @@ vi:
     s7_populate_desc: Mở trình chỉnh sửa với hình nền và hình ảnh trên mỗi thẻ, phù hợp với thông tin bạn đã cung cấp.
     s7_blank_label: Bắt đầu từ trang trắng
     s7_blank_desc: Mở trình chỉnh sửa không có hình ảnh để bạn tự chọn từng hình theo ý muốn.
+    back: "← Quay lại"
+    next: Tiếp →
+    generate: Tạo Verto →
+    generating: Đang tạo…
+    import_or: hoặc
+    import_hint: Bạn đã viết sẵn câu hỏi? Hãy tải lên tệp PDF và chúng tôi sẽ ghép từng câu hỏi với loại câu trả lời phù hợp nhất.
+    import_choose: Chọn PDF
+    import_no_file: Chưa chọn tệp
+    import_pdf: Nhập từ PDF →
+    importing: Đang đọc PDF của bạn…
+    step_counter: Bước %{n} / %{total}

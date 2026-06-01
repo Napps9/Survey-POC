@@ -58,13 +58,13 @@ sw:
   player:
     thank_you_title: Asante!
     thank_you_sub: Majibu yako yamehifadhiwa.
+    thank_you_from: kutoka %{org}
     compare_cta: Ona matokeo yako yakilinganishwa na wengine →
     powered_by: Inaendeshwa na
     comparison_title: Majibu yako dhidi ya kila mtu
     back: "← Rudi"
     next: Endelea →
     submit: Wasilisha ✓
-    thank_you_from: kutoka %{org}
   js:
     player:
       progress: Kadi %{n} kati ya %{total}
@@ -252,6 +252,9 @@ sw:
       one: Inakadiriwa ~dakika %{count}
       other: Inakadiriwa ~dakika %{count}
     design: Muundo
+    shuffle: Changanya
+    shuffle_title: Chagua upya picha kutoka maktaba ya verto
+    shuffle_confirm: Changanya picha? Picha zako za sasa zitabadilishwa na chaguo jipya kutoka maktabani.
     publish_share: Chapisha na shiriki →
     answer_type: Aina ya Jibu
     select_card: Chagua kadi ili kubadilisha aina yake
@@ -262,9 +265,6 @@ sw:
     all_types: Aina Zote za Maswali
     ranked_for: Imepangwa kwa ufaafu kwa
     this_card: kadi hii
-    shuffle: Changanya
-    shuffle_title: Chagua upya picha kutoka maktaba ya verto
-    shuffle_confirm: Changanya picha? Picha zako za sasa zitabadilishwa na chaguo jipya kutoka maktabani.
   dashboard_card:
     badge_archived: Imehifadhiwa
     badge_live: Hai
@@ -287,9 +287,9 @@ sw:
     results: Matokeo →
     publish: Chapisha →
     delete: Futa
+    delete_forever: Futa milele
     edit_warning: '"%{title}" iko hai. Kuhariri maswali wakati inakusanya majibu kutaathiri ubora wa data — majibu ya kabla na baada ya uhariri hayatalinganishwa moja kwa moja. Endelea?'
     delete_warning: Futa "%{title}"? Huwezi kuirudisha Verto baada ya kufutwa. Kiungo cha wajibu kitaacha kufanya kazi — matokeo yaliyopo yatabaki katika orodha yako ya Yaliyohifadhiwa.
-    delete_forever: Futa milele
     delete_forever_warning: Futa milele "%{title}"? Majibu yote, upabuni, na data itafutwa. Hii haiwezi kutenduliwa.
     select: Chagua
     cancel: Ghairi
@@ -386,6 +386,8 @@ sw:
     s5_mock_opt: Naipenda
     s5_title: Chagua rangi za chapa yako.
     s5_sub: Chagua tatu. Zitatumika katika uzoefu wote wa Verto hii.
+    section_how_to_start: Jinsi ya kuanza
+    section_brand_colours: Rangi za chapa
     brand_primary: Msingi
     brand_primary_desc: Vichwa na lafudhi
     brand_cta: Vifungo (CTA)
@@ -404,13 +406,6 @@ sw:
     s6_placeholder: 'mfano: Hadhira haijawahi kutumia Playverto, weka toni ya joto, si ya kishirika.'
     s6_compare_label: Ruhusu wajibu walinganishe majibu yao
     s6_compare_desc: Onyesha CTA kwenye ukurasa wa shukrani inayoonyesha jinsi majibu yao yanavyolinganishwa na ya wengine.
-    back: "← Rudi"
-    next: Endelea →
-    generate: Tengeneza Verto →
-    generating: Inatengeneza…
-    step_counter: Hatua %{n} kati ya %{total}
-    section_how_to_start: Jinsi ya kuanza
-    section_brand_colours: Rangi za chapa
     s7_eyebrow: Hatua ya 07 · Mguso wa mwisho
     s7_lead: Fungua katika Verto iliyokamilika, au turubai tupu.
     s7_body: Tunachagua mandhari na picha za kila kadi kutoka maktaba yetu iliyopangwa — zinazolingana na mandhari yako, hadhira na swali kwenye kila kadi.
@@ -426,3 +421,14 @@ sw:
     s7_populate_desc: Fungua kihariri kikiwa na mandhari na picha kwenye kila kadi, zinazolingana na maelezo yako.
     s7_blank_label: Anza kutoka mwanzo
     s7_blank_desc: Fungua kihariri bila picha ili uweze kuchagua kila picha mwenyewe.
+    back: "← Rudi"
+    next: Endelea →
+    generate: Tengeneza Verto →
+    generating: Inatengeneza…
+    import_or: au
+    import_hint: Tayari una maswali yako yameandikwa? Pakia PDF na tutalinganisha kila moja na aina bora ya jibu.
+    import_choose: Chagua PDF
+    import_no_file: Hakuna faili iliyochaguliwa
+    import_pdf: Leta kutoka PDF →
+    importing: Inasoma PDF yako…
+    step_counter: Hatua %{n} kati ya %{total}

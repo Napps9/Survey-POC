@@ -58,13 +58,13 @@ he:
   player:
     thank_you_title: תודה רבה!
     thank_you_sub: תגובותיך נשמרו.
+    thank_you_from: מאת %{org}
     compare_cta: ראה את התוצאות שלך לעומת אחרים →
     powered_by: מופעל על ידי
     comparison_title: התשובות שלך מול כולם
     back: "← חזרה"
     next: הבא →
     submit: שלח ✓
-    thank_you_from: מאת %{org}
   js:
     player:
       progress: כרטיס %{n} מתוך %{total}
@@ -252,6 +252,9 @@ he:
       one: משוער ~%{count} דקה
       other: משוער ~%{count} דקות
     design: עיצוב
+    shuffle: ערבב
+    shuffle_title: בחר מחדש תמונות מספריית verto
+    shuffle_confirm: לערבב תמונות? התמונות הנוכחיות שלך יוחלפו בבחירה חדשה מהספרייה.
     publish_share: פרסם ושתף →
     answer_type: סוג תשובה
     select_card: בחר כרטיס כדי לשנות את סוגו
@@ -262,9 +265,6 @@ he:
     all_types: כל סוגי השאלות
     ranked_for: מדורג לפי התאמה עבור
     this_card: כרטיס זה
-    shuffle: ערבב
-    shuffle_title: בחר מחדש תמונות מספריית verto
-    shuffle_confirm: לערבב תמונות? התמונות הנוכחיות שלך יוחלפו בבחירה חדשה מהספרייה.
   dashboard_card:
     badge_archived: בארכיון
     badge_live: פעיל
@@ -287,9 +287,9 @@ he:
     results: תוצאות →
     publish: פרסם →
     delete: מחק
+    delete_forever: מחיקה קבועה
     edit_warning: "״%{title}״ פעיל. עריכת שאלות בזמן איסוף תגובות תפגע באיכות הנתונים — תשובות לפני ואחרי העריכה לא יהיו ניתנות להשוואה ישירה. להמשיך?"
     delete_warning: למחוק את ״%{title}״? לא ניתן לשחזר Verto לאחר המחיקה. קישור המשיבים יפסיק לעבוד — התוצאות הקיימות יישארו ברשימת הארכיון שלך.
-    delete_forever: מחיקה קבועה
     delete_forever_warning: למחוק את "%{title}" באופן קבוע? כל התגובות, השיתופים והנתונים יימחקו. לא ניתן לבטל פעולה זו.
     select: בחר
     cancel: ביטול
@@ -386,6 +386,8 @@ he:
     s5_mock_opt: מאוד אוהב
     s5_title: בחר את צבעי המותג שלך.
     s5_sub: בחר שלושה. הם יחולו על כל חווית ה-Verto הזה.
+    section_how_to_start: איך להתחיל
+    section_brand_colours: צבעי המותג
     brand_primary: ראשי
     brand_primary_desc: כותרות ואקסנטים
     brand_cta: כפתורים (CTA)
@@ -404,13 +406,6 @@ he:
     s6_placeholder: לדוג׳ הקהל מעולם לא השתמש ב-Playverto, שמור על טון חם, לא תאגידי.
     s6_compare_label: אפשר למשיבים להשוות את תשובותיהם
     s6_compare_desc: הצג CTA בדף התודה שמראה כיצד התשובות שלהם מתמקמות לעומת כולם.
-    back: "← חזרה"
-    next: הבא →
-    generate: צור Verto →
-    generating: מייצר…
-    step_counter: שלב %{n} מתוך %{total}
-    section_how_to_start: איך להתחיל
-    section_brand_colours: צבעי המותג
     s7_eyebrow: שלב 07 · מגע אחרון
     s7_lead: פתח בVerto מוכן למראה, או בלוח ריק.
     s7_body: אנחנו בוחרים רקע ותמונות לכל כרטיס מהספרייה המאצורה שלנו — מותאמים לנושא, לקהל ולשאלה בכל כרטיס.
@@ -426,3 +421,14 @@ he:
     s7_populate_desc: פתח את העורך עם רקע ותמונה בכל כרטיס, מותאמים לבריף שלך.
     s7_blank_label: התחל מאפס
     s7_blank_desc: פתח את העורך ללא תמונות כדי שתוכל לבחור כל תמונה בעצמך.
+    back: "← חזרה"
+    next: הבא →
+    generate: צור Verto →
+    generating: מייצר…
+    import_or: או
+    import_hint: כבר כתבת את השאלות שלך? העלה קובץ PDF ואנחנו נתאים לכל אחת את סוג התשובה המתאים ביותר.
+    import_choose: בחר PDF
+    import_no_file: לא נבחר קובץ
+    import_pdf: ייבא מ-PDF →
+    importing: קורא את ה-PDF שלך…
+    step_counter: שלב %{n} מתוך %{total}

@@ -58,13 +58,13 @@ ko:
   player:
     thank_you_title: 감사합니다!
     thank_you_sub: 응답이 기록되었습니다.
+    thank_you_from: "%{org} 제공"
     compare_cta: 다른 사람들과 비교한 결과 보기 →
     powered_by: 제공
     comparison_title: 내 답변 vs 전체
     back: "← 뒤로"
     next: 다음 →
     submit: 제출 ✓
-    thank_you_from: "%{org} 제공"
   js:
     player:
       progress: "%{total}장 중 %{n}번째 카드"
@@ -252,6 +252,9 @@ ko:
       one: 예상 약 %{count}분
       other: 예상 약 %{count}분
     design: 디자인
+    shuffle: 셔플
+    shuffle_title: Verto 라이브러리에서 이미지를 다시 선택합니다
+    shuffle_confirm: 이미지를 섞을까요? 현재 사진이 라이브러리에서 새로 선택한 사진으로 교체됩니다.
     publish_share: 게시 및 공유 →
     answer_type: 답변 유형
     select_card: 카드를 선택해 유형을 변경하세요
@@ -262,9 +265,6 @@ ko:
     all_types: 모든 질문 유형
     ranked_for: 적합도 순위
     this_card: 이 카드
-    shuffle: 셔플
-    shuffle_title: Verto 라이브러리에서 이미지를 다시 선택합니다
-    shuffle_confirm: 이미지를 섞을까요? 현재 사진이 라이브러리에서 새로 선택한 사진으로 교체됩니다.
   dashboard_card:
     badge_archived: 보관됨
     badge_live: 라이브
@@ -287,9 +287,9 @@ ko:
     results: 결과 →
     publish: 게시 →
     delete: 삭제
+    delete_forever: 영구 삭제
     edit_warning: '"%{title}"은(는) 라이브 상태입니다. 응답을 수집하는 동안 질문을 편집하면 데이터 품질에 영향을 미칩니다 — 편집 전후의 답변은 직접 비교할 수 없습니다. 계속하시겠습니까?'
     delete_warning: '"%{title}"을(를) 삭제하시겠습니까? 삭제된 Verto는 복구할 수 없습니다. 응답자의 링크는 작동을 멈추지만, 기존 결과는 보관함 목록에 남습니다.'
-    delete_forever: 영구 삭제
     delete_forever_warning: '"%{title}"을(를) 영구 삭제하시겠습니까? 모든 응답, 공유 및 데이터가 삭제됩니다. 이 작업은 취소할 수 없습니다.'
     select: 선택
     cancel: 취소
@@ -386,6 +386,8 @@ ko:
     s5_mock_opt: 마음에 들어요
     s5_title: 브랜드 색상을 선택하세요.
     s5_sub: 세 가지를 골라 주세요. 이 Verto 경험 전반에 적용됩니다.
+    section_how_to_start: 시작 방법
+    section_brand_colours: 브랜드 색상
     brand_primary: 기본
     brand_primary_desc: 제목 및 강조
     brand_cta: 버튼 (CTA)
@@ -404,13 +406,6 @@ ko:
     s6_placeholder: '예: 청중이 Playverto를 처음 사용함, 기업적이지 않고 따뜻한 톤 유지.'
     s6_compare_label: 응답자가 자신의 답변을 비교할 수 있도록 허용
     s6_compare_desc: 감사 페이지에 자신의 답변이 다른 사람들과 어떻게 비교되는지 보여주는 CTA를 표시합니다.
-    back: "← 뒤로"
-    next: 다음 →
-    generate: Verto 생성 →
-    generating: 생성 중…
-    step_counter: "%{total}단계 중 %{n}단계"
-    section_how_to_start: 시작 방법
-    section_brand_colours: 브랜드 색상
     s7_eyebrow: Step 07 · 마무리
     s7_lead: 완성된 Verto로 시작하거나, 빈 캔버스로 시작하세요.
     s7_body: 테마, 대상 및 각 카드의 질문에 맞춰 엄선된 라이브러리에서 배경과 카드별 이미지를 선택해 드립니다.
@@ -426,3 +421,14 @@ ko:
     s7_populate_desc: 작성하신 내용에 맞게 배경과 카드마다 이미지가 채워진 상태로 에디터를 엽니다.
     s7_blank_label: 빈 화면으로 시작
     s7_blank_desc: 이미지 없이 에디터를 열어 모든 사진을 직접 선택할 수 있습니다.
+    back: "← 뒤로"
+    next: 다음 →
+    generate: Verto 생성 →
+    generating: 생성 중…
+    import_or: 또는
+    import_hint: 이미 작성된 질문이 있나요? PDF를 업로드하면 각 질문에 가장 적합한 답변 유형을 매칭해 드립니다.
+    import_choose: PDF 선택
+    import_no_file: 선택된 파일 없음
+    import_pdf: PDF에서 가져오기 →
+    importing: PDF를 읽는 중…
+    step_counter: "%{total}단계 중 %{n}단계"

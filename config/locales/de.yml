@@ -58,13 +58,13 @@ de:
   player:
     thank_you_title: Vielen Dank!
     thank_you_sub: Deine Antworten wurden gespeichert.
+    thank_you_from: von %{org}
     compare_cta: Vergleiche deine Ergebnisse mit anderen →
     powered_by: Bereitgestellt von
     comparison_title: Deine Antworten vs. alle anderen
     back: "← Zurück"
     next: Weiter →
     submit: Absenden ✓
-    thank_you_from: von %{org}
   js:
     player:
       progress: Karte %{n} von %{total}
@@ -252,6 +252,9 @@ de:
       one: Geschätzt ~%{count} Min.
       other: Geschätzt ~%{count} Min.
     design: Design
+    shuffle: Neu mischen
+    shuffle_title: Neue Bilder aus der Verto-Bibliothek auswählen
+    shuffle_confirm: Bilder neu mischen? Ihre aktuellen Bilder werden durch eine neue Auswahl aus der Bibliothek ersetzt.
     publish_share: Veröffentlichen & teilen →
     answer_type: Antworttyp
     select_card: Wähle eine Karte aus, um den Typ zu ändern
@@ -262,9 +265,6 @@ de:
     all_types: Alle Fragetypen
     ranked_for: Sortiert nach Eignung für
     this_card: diese Karte
-    shuffle: Neu mischen
-    shuffle_title: Neue Bilder aus der Verto-Bibliothek auswählen
-    shuffle_confirm: Bilder neu mischen? Ihre aktuellen Bilder werden durch eine neue Auswahl aus der Bibliothek ersetzt.
   dashboard_card:
     badge_archived: Archiviert
     badge_live: Live
@@ -287,9 +287,9 @@ de:
     results: Ergebnisse →
     publish: Veröffentlichen →
     delete: Löschen
+    delete_forever: Dauerhaft löschen
     edit_warning: "„%{title}“ ist live. Das Bearbeiten von Fragen, während Antworten gesammelt werden, beeinträchtigt die Datenqualität — Antworten von vor und nach der Bearbeitung sind nicht direkt vergleichbar. Fortfahren?"
     delete_warning: "„%{title}“ löschen? Ein gelöschtes Verto lässt sich nicht wiederherstellen. Der Link für Teilnehmende funktioniert nicht mehr — bestehende Ergebnisse bleiben in deiner Archiv-Liste."
-    delete_forever: Dauerhaft löschen
     delete_forever_warning: '"%{title}" dauerhaft löschen? Alle Antworten, Freigaben und Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden.'
     select: Auswählen
     cancel: Abbrechen
@@ -386,6 +386,8 @@ de:
     s5_mock_opt: Liebe es
     s5_title: Wähle deine Markenfarben.
     s5_sub: Wähle drei. Sie werden im gesamten Verto-Erlebnis angewendet.
+    section_how_to_start: Wie möchten Sie beginnen?
+    section_brand_colours: Markenfarben
     brand_primary: Primär
     brand_primary_desc: Überschriften & Akzente
     brand_cta: Buttons (CTA)
@@ -404,13 +406,6 @@ de:
     s6_placeholder: z. B. Zielgruppe hat Playverto noch nie genutzt, halte den Ton warm und nicht förmlich.
     s6_compare_label: Teilnehmenden erlauben, ihre Antworten zu vergleichen
     s6_compare_desc: Zeige auf der Dankesseite einen CTA an, der zeigt, wie ihre Antworten im Vergleich zu allen anderen abschneiden.
-    back: "← Zurück"
-    next: Weiter →
-    generate: Verto generieren →
-    generating: Wird generiert…
-    step_counter: Schritt %{n} von %{total}
-    section_how_to_start: Wie möchten Sie beginnen?
-    section_brand_colours: Markenfarben
     s7_eyebrow: Schritt 07 · Letzter Schliff
     s7_lead: Öffnen Sie ein fertig gestaltetes Verto oder eine leere Leinwand.
     s7_body: Wir wählen ein Hintergrundbild und Kartenbilder aus unserer kuratierten Bibliothek – passend zu Ihrem Thema, Ihrer Zielgruppe und der Frage auf jeder Karte.
@@ -426,3 +421,14 @@ de:
     s7_populate_desc: Öffnen Sie den Editor mit einem Hintergrundbild und einem Bild auf jeder Karte – abgestimmt auf Ihr Briefing.
     s7_blank_label: Leer starten
     s7_blank_desc: Öffnen Sie den Editor ohne Bilder und wählen Sie jedes Bild selbst aus.
+    back: "← Zurück"
+    next: Weiter →
+    generate: Verto generieren →
+    generating: Wird generiert…
+    import_or: oder
+    import_hint: Hast du deine Fragen bereits aufgeschrieben? Lade ein PDF hoch und wir ordnen jeder Frage den passenden Antworttyp zu.
+    import_choose: PDF auswählen
+    import_no_file: Keine Datei ausgewählt
+    import_pdf: Aus PDF importieren →
+    importing: PDF wird gelesen…
+    step_counter: Schritt %{n} von %{total}

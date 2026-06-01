@@ -58,13 +58,13 @@ ja:
   player:
     thank_you_title: ありがとうございました！
     thank_you_sub: 回答が記録されました。
+    thank_you_from: "%{org} より"
     compare_cta: 他の人との結果を比較する →
     powered_by: Powered by
     comparison_title: あなたの回答 vs 全員
     back: "← 戻る"
     next: 次へ →
     submit: 送信 ✓
-    thank_you_from: "%{org} より"
   js:
     player:
       progress: "%{total}枚中 %{n}枚目"
@@ -252,6 +252,9 @@ ja:
       one: 推定 約%{count}分
       other: 推定 約%{count}分
     design: デザイン
+    shuffle: シャッフル
+    shuffle_title: Vertoライブラリから画像を再選択
+    shuffle_confirm: 画像をシャッフルしますか？現在の画像はライブラリから新たに選ばれた画像に置き換えられます。
     publish_share: 公開・共有 →
     answer_type: 回答タイプ
     select_card: タイプを変更するカードを選択
@@ -262,9 +265,6 @@ ja:
     all_types: すべての質問タイプ
     ranked_for: 適合度でランク付け：
     this_card: このカード
-    shuffle: シャッフル
-    shuffle_title: Vertoライブラリから画像を再選択
-    shuffle_confirm: 画像をシャッフルしますか？現在の画像はライブラリから新たに選ばれた画像に置き換えられます。
   dashboard_card:
     badge_archived: アーカイブ済み
     badge_live: ライブ
@@ -287,9 +287,9 @@ ja:
     results: 結果 →
     publish: 公開 →
     delete: 削除
+    delete_forever: 永遠に削除
     edit_warning: "「%{title}」はライブ中です。回答収集中に質問を編集するとデータの品質に影響します — 編集前後の回答は直接比較できません。続けますか？"
     delete_warning: "「%{title}」を削除しますか？削除したVertoは元に戻せません。回答者のリンクは機能しなくなりますが、既存の結果はアーカイブリストに残ります。"
-    delete_forever: 永遠に削除
     delete_forever_warning: '"%{title}"を永遠に削除しますか？すべての回答、共有、データが消去されます。この操作は取り消せません。'
     select: 選択
     cancel: キャンセル
@@ -386,6 +386,8 @@ ja:
     s5_mock_opt: 気に入っています
     s5_title: ブランドカラーを選んでください。
     s5_sub: 3色選んでください。このVertoのすべての体験に適用されます。
+    section_how_to_start: 開始方法
+    section_brand_colours: ブランドカラー
     brand_primary: プライマリ
     brand_primary_desc: 見出しとアクセント
     brand_cta: ボタン（CTA）
@@ -404,13 +406,6 @@ ja:
     s6_placeholder: 例：オーディエンスはPlayvertoを初めて使用します。温かみのある、企業的でないトーンで。
     s6_compare_label: 回答者が自分の回答を比較できるようにする
     s6_compare_desc: お礼ページにCTAを表示し、自分の回答が全員の回答とどう違うかを確認できるようにします。
-    back: "← 戻る"
-    next: 次へ →
-    generate: Vertoを生成 →
-    generating: 生成中…
-    step_counter: "%{total}ステップ中 %{n}"
-    section_how_to_start: 開始方法
-    section_brand_colours: ブランドカラー
     s7_eyebrow: ステップ 07 · 最終仕上げ
     s7_lead: 完成した Verto として開くか、白紙のキャンバスとして開くかを選べます。
     s7_body: テーマ・対象者・各カードの質問に合わせて、厳選ライブラリから背景画像とカードごとの画像を自動で選択します。
@@ -426,3 +421,14 @@ ja:
     s7_populate_desc: 入力内容に合わせた背景と各カードの画像を設定した状態でエディターを開きます。
     s7_blank_label: 白紙から始める
     s7_blank_desc: 画像なしの状態でエディターを開き、すべての画像を自分で選択できます。
+    back: "← 戻る"
+    next: 次へ →
+    generate: Vertoを生成 →
+    generating: 生成中…
+    import_or: または
+    import_hint: 質問はすでに書き出してありますか？PDFをアップロードすれば、各質問に最適な回答形式を自動でマッチングします。
+    import_choose: PDFを選択
+    import_no_file: ファイルが選択されていません
+    import_pdf: PDFからインポート →
+    importing: PDFを読み込んでいます…
+    step_counter: "%{total}ステップ中 %{n}"

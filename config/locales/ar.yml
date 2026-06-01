@@ -58,13 +58,13 @@ ar:
   player:
     thank_you_title: شكرًا لك!
     thank_you_sub: تم تسجيل إجاباتك.
+    thank_you_from: من %{org}
     compare_cta: شاهد نتائجك مقارنةً بالآخرين ←
     powered_by: مدعوم من
     comparison_title: إجاباتك مقابل الجميع
     back: "← رجوع"
     next: التالي ←
     submit: إرسال ✓
-    thank_you_from: من %{org}
   js:
     player:
       progress: البطاقة %{n} من %{total}
@@ -252,6 +252,9 @@ ar:
       one: المدة المقدرة ~%{count} دقيقة
       other: المدة المقدرة ~%{count} دقائق
     design: التصميم
+    shuffle: خلط
+    shuffle_title: إعادة اختيار الصور من مكتبة Verto
+    shuffle_confirm: هل تريد خلط الصور؟ سيتم استبدال صورك الحالية باختيار جديد من المكتبة.
     publish_share: نشر ومشاركة ←
     answer_type: نوع الإجابة
     select_card: اختر بطاقة لتغيير نوعها
@@ -262,9 +265,6 @@ ar:
     all_types: جميع أنواع الأسئلة
     ranked_for: مرتبة حسب الملاءمة لـ
     this_card: هذه البطاقة
-    shuffle: خلط
-    shuffle_title: إعادة اختيار الصور من مكتبة Verto
-    shuffle_confirm: هل تريد خلط الصور؟ سيتم استبدال صورك الحالية باختيار جديد من المكتبة.
   dashboard_card:
     badge_archived: مؤرشف
     badge_live: مباشر
@@ -287,9 +287,9 @@ ar:
     results: النتائج ←
     publish: نشر ←
     delete: حذف
+    delete_forever: حذف نهائياً
     edit_warning: '"%{title}" مباشر الآن. تعديل الأسئلة أثناء جمعه للإجابات سيؤثر على جودة البيانات — الإجابات قبل وبعد التعديل لن تكون قابلة للمقارنة المباشرة. هل تريد المتابعة؟'
     delete_warning: حذف "%{title}"؟ لا يمكن استعادة Verto بعد حذفه. سيتوقف رابط المجيبين عن العمل — وتبقى النتائج الموجودة في قائمة الأرشيف.
-    delete_forever: حذف نهائياً
     delete_forever_warning: هل تريد حذف "%{title}" بشكل دائم؟ سيتم حذف جميع الإجابات والمشاركات والبيانات. لا يمكن التراجع عن هذا.
     select: تحديد
     cancel: إلغاء
@@ -386,6 +386,8 @@ ar:
     s5_mock_opt: أحبه
     s5_title: اختر ألوان علامتك التجارية.
     s5_sub: اختر ثلاثة ألوان. ستُطبَّق عبر تجربة هذا الـ Verto.
+    section_how_to_start: كيفية البدء
+    section_brand_colours: ألوان العلامة التجارية
     brand_primary: أساسي
     brand_primary_desc: العناوين واللمسات
     brand_cta: الأزرار (CTA)
@@ -404,13 +406,6 @@ ar:
     s6_placeholder: 'مثال: الجمهور لم يستخدم Playverto من قبل، حافظ على نبرة دافئة، وليست رسمية.'
     s6_compare_label: السماح للمجيبين بمقارنة إجاباتهم
     s6_compare_desc: أظهِر دعوة للإجراء على صفحة الشكر تكشف كيف تقارن إجاباتهم بإجابات الآخرين.
-    back: "← رجوع"
-    next: التالي ←
-    generate: إنشاء Verto ←
-    generating: جارٍ الإنشاء…
-    step_counter: الخطوة %{n} من %{total}
-    section_how_to_start: كيفية البدء
-    section_brand_colours: ألوان العلامة التجارية
     s7_eyebrow: الخطوة 07 · اللمسة الأخيرة
     s7_lead: افتح في Verto جاهز للعرض، أو ابدأ بلوحة فارغة.
     s7_body: نختار خلفية وصورًا لكل بطاقة من مكتبتنا المنتقاة — متوافقة مع موضوعك وجمهورك والسؤال في كل بطاقة.
@@ -426,3 +421,14 @@ ar:
     s7_populate_desc: افتح المحرر بخلفية وصورة على كل بطاقة، متوافقة مع متطلباتك.
     s7_blank_label: ابدأ من الصفر
     s7_blank_desc: افتح المحرر بدون صور لتتمكن من اختيار كل صورة بنفسك.
+    back: "← رجوع"
+    next: التالي ←
+    generate: إنشاء Verto ←
+    generating: جارٍ الإنشاء…
+    import_or: أو
+    import_hint: هل لديك أسئلتك مكتوبة بالفعل؟ قم بتحميل ملف PDF وسنطابق كل سؤال مع أنسب نوع إجابة.
+    import_choose: اختر ملف PDF
+    import_no_file: لم يتم اختيار ملف
+    import_pdf: استيراد من PDF ←
+    importing: جارٍ قراءة ملف PDF الخاص بك…
+    step_counter: الخطوة %{n} من %{total}

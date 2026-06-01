@@ -58,13 +58,13 @@ es:
   player:
     thank_you_title: "¡Gracias!"
     thank_you_sub: Tus respuestas han sido registradas.
+    thank_you_from: de %{org}
     compare_cta: Compara tus resultados con los demás →
     powered_by: Desarrollado por
     comparison_title: Tus respuestas vs todos
     back: "← Atrás"
     next: Siguiente →
     submit: Enviar ✓
-    thank_you_from: de %{org}
   js:
     player:
       progress: Tarjeta %{n} de %{total}
@@ -252,6 +252,9 @@ es:
       one: Duración estimada ~%{count} min
       other: Duración estimada ~%{count} mins
     design: Diseño
+    shuffle: Mezclar
+    shuffle_title: Seleccionar nuevas imágenes de la biblioteca de Verto
+    shuffle_confirm: "¿Mezclar imágenes? Tus imágenes actuales serán reemplazadas por una nueva selección de la biblioteca."
     publish_share: Publicar y compartir →
     answer_type: Tipo de respuesta
     select_card: Selecciona una tarjeta para cambiar su tipo
@@ -262,9 +265,6 @@ es:
     all_types: Todos los tipos de pregunta
     ranked_for: Clasificado por idoneidad para
     this_card: esta tarjeta
-    shuffle: Mezclar
-    shuffle_title: Seleccionar nuevas imágenes de la biblioteca de Verto
-    shuffle_confirm: "¿Mezclar imágenes? Tus imágenes actuales serán reemplazadas por una nueva selección de la biblioteca."
   dashboard_card:
     badge_archived: Archivado
     badge_live: En vivo
@@ -287,9 +287,9 @@ es:
     results: Resultados →
     publish: Publicar →
     delete: Eliminar
+    delete_forever: Eliminar permanentemente
     edit_warning: "«%{title}» está en vivo. Editar preguntas mientras recopila respuestas afectará la calidad de los datos — las respuestas anteriores y posteriores a la edición no serán directamente comparables. ¿Continuar?"
     delete_warning: "¿Eliminar «%{title}»? No podrás recuperar un Verto eliminado. El enlace de los participantes dejará de funcionar — los resultados existentes permanecerán en tu lista de archivados."
-    delete_forever: Eliminar permanentemente
     delete_forever_warning: ¿Eliminar permanentemente "%{title}"? Todas las respuestas, comparticiones y datos se borrarán. Esta acción no se puede deshacer.
     select: Seleccionar
     cancel: Cancelar
@@ -386,6 +386,8 @@ es:
     s5_mock_opt: Me encanta
     s5_title: Elige los colores de tu marca.
     s5_sub: Elige tres. Se aplicarán en toda la experiencia de este Verto.
+    section_how_to_start: Cómo empezar
+    section_brand_colours: Colores de marca
     brand_primary: Principal
     brand_primary_desc: Títulos y acentos
     brand_cta: Botones (CTA)
@@ -404,13 +406,6 @@ es:
     s6_placeholder: p. ej. La audiencia nunca ha usado Playverto antes, mantener un tono cálido, no corporativo.
     s6_compare_label: Permitir que los participantes comparen sus respuestas
     s6_compare_desc: Muestra un CTA en la página de agradecimiento que revela cómo sus respuestas se comparan con las de todos los demás.
-    back: "← Atrás"
-    next: Siguiente →
-    generate: Generar Verto →
-    generating: Generando…
-    step_counter: Paso %{n} de %{total}
-    section_how_to_start: Cómo empezar
-    section_brand_colours: Colores de marca
     s7_eyebrow: Paso 07 · Toque final
     s7_lead: Ábrelo con un Verto terminado o con un lienzo en blanco.
     s7_body: Seleccionamos un fondo e imágenes para cada tarjeta desde nuestra biblioteca curada, adaptadas a tu temática, audiencia y la pregunta de cada tarjeta.
@@ -426,3 +421,14 @@ es:
     s7_populate_desc: Abre el editor con un fondo y una imagen en cada tarjeta, adaptados a tu briefing.
     s7_blank_label: Empezar desde cero
     s7_blank_desc: Abre el editor sin imágenes para que puedas elegir cada imagen tú mismo.
+    back: "← Atrás"
+    next: Siguiente →
+    generate: Generar Verto →
+    generating: Generando…
+    import_or: o
+    import_hint: "¿Ya tienes tus preguntas escritas? Sube un PDF y emparejaremos cada una con el mejor tipo de respuesta."
+    import_choose: Elegir PDF
+    import_no_file: Ningún archivo seleccionado
+    import_pdf: Importar desde PDF →
+    importing: Leyendo tu PDF…
+    step_counter: Paso %{n} de %{total}

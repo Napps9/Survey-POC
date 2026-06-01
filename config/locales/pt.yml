@@ -58,13 +58,13 @@ pt:
   player:
     thank_you_title: Obrigado!
     thank_you_sub: As suas respostas foram registadas.
+    thank_you_from: de %{org}
     compare_cta: Veja os seus resultados comparados com os outros →
     powered_by: Desenvolvido por
     comparison_title: As suas respostas vs todos
     back: "← Voltar"
     next: Seguinte →
     submit: Submeter ✓
-    thank_you_from: de %{org}
   js:
     player:
       progress: Cartão %{n} de %{total}
@@ -252,6 +252,9 @@ pt:
       one: Estimado ~%{count} min
       other: Estimado ~%{count} mins
     design: Design
+    shuffle: Embaralhar
+    shuffle_title: Escolher novas imagens da biblioteca Verto
+    shuffle_confirm: Embaralhar imagens? As suas imagens atuais serão substituídas por uma nova seleção da biblioteca.
     publish_share: Publicar e partilhar →
     answer_type: Tipo de resposta
     select_card: Selecione um cartão para alterar o seu tipo
@@ -262,9 +265,6 @@ pt:
     all_types: Todos os tipos de pergunta
     ranked_for: Ordenado por adequação para
     this_card: este cartão
-    shuffle: Embaralhar
-    shuffle_title: Escolher novas imagens da biblioteca Verto
-    shuffle_confirm: Embaralhar imagens? As suas imagens atuais serão substituídas por uma nova seleção da biblioteca.
   dashboard_card:
     badge_archived: Arquivado
     badge_live: Ao vivo
@@ -287,9 +287,9 @@ pt:
     results: Resultados →
     publish: Publicar →
     delete: Eliminar
+    delete_forever: Deletar permanentemente
     edit_warning: "“%{title}” está ao vivo. Editar perguntas enquanto está a recolher respostas afetará a qualidade dos dados — as respostas antes e depois da edição não serão diretamente comparáveis. Continuar?"
     delete_warning: Eliminar “%{title}”? Não é possível recuperar um Verto após eliminação. O link dos respondentes deixará de funcionar — os resultados existentes permanecem na sua lista de Arquivados.
-    delete_forever: Deletar permanentemente
     delete_forever_warning: Deletar permanentemente "%{title}"? Todas as respostas, compartilhamentos e dados serão apagados. Isso não pode ser desfeito.
     select: Selecionar
     cancel: Cancelar
@@ -386,6 +386,8 @@ pt:
     s5_mock_opt: A adorar
     s5_title: Escolha as cores da sua marca.
     s5_sub: Escolha três. Serão aplicadas em toda a experiência deste Verto.
+    section_how_to_start: Como começar
+    section_brand_colours: Cores da marca
     brand_primary: Principal
     brand_primary_desc: Títulos e destaques
     brand_cta: Botões (CTA)
@@ -404,13 +406,6 @@ pt:
     s6_placeholder: 'ex.: O público nunca usou o Playverto antes, mantenha um tom caloroso, não corporativo.'
     s6_compare_label: Permitir que os respondentes comparem as suas respostas
     s6_compare_desc: Mostrar um CTA na página de agradecimento que revela como as respostas se comparam com as de todos os outros.
-    back: "← Voltar"
-    next: Seguinte →
-    generate: Gerar Verto →
-    generating: A gerar…
-    step_counter: Passo %{n} de %{total}
-    section_how_to_start: Como começar
-    section_brand_colours: Cores da marca
     s7_eyebrow: Passo 07 · Toque final
     s7_lead: Abra num Verto com visual acabado ou numa tela em branco.
     s7_body: Escolhemos um fundo e imagens para cada cartão a partir da nossa biblioteca curada — combinadas com o seu tema, público e a pergunta em cada cartão.
@@ -426,3 +421,14 @@ pt:
     s7_populate_desc: Abra o editor com um fundo e uma imagem em cada cartão, adaptados ao seu briefing.
     s7_blank_label: Começar do zero
     s7_blank_desc: Abra o editor sem imagens para poder escolher cada imagem você mesmo.
+    back: "← Voltar"
+    next: Seguinte →
+    generate: Gerar Verto →
+    generating: A gerar…
+    import_or: ou
+    import_hint: Já tem as suas perguntas escritas? Carregue um PDF e nós associamos cada uma ao melhor tipo de resposta.
+    import_choose: Escolher PDF
+    import_no_file: Nenhum ficheiro selecionado
+    import_pdf: Importar de PDF →
+    importing: A ler o seu PDF…
+    step_counter: Passo %{n} de %{total}
