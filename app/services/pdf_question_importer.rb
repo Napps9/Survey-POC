@@ -15,10 +15,6 @@ class PdfQuestionImporter
   MODEL      = ClaudeModels::DEFAULT
   MAX_TOKENS = 8192
 
-  # Types that never carry a free-form options list. yes_no's two options are
-  # implicit; welcome_card/open_ended take no options at all.
-  TYPES_WITHOUT_OPTIONS = %w[welcome_card open_ended yes_no].freeze
-
   TOOL = {
     name: "emit_survey",
     description: "Emit the questions extracted from the PDF, each mapped to the best-fitting Verto answer type.",
@@ -138,33 +134,8 @@ class PdfQuestionImporter
     raise "Model did not return a tool_use block" unless block
 
     payload = deep_stringify(input_of(block))
-    payload["cards"] = normalize_cards(payload["cards"])
+    payload["cards"] = QuestionTypeClassifier.new.normalize_cards(payload["cards"])
     payload
-  end
-
-  private
-
-  # Keep only well-formed cards of a generatable type, clean their options, and
-  # enforce the structural caps the editor/player rely on. Anything malformed is
-  # dropped rather than rendered broken.
-  def normalize_cards(cards)
-    allowed = SurveyGenerator.generatable_types
-    Array(cards).filter_map do |card|
-      next unless card.is_a?(Hash)
-      type = card["type"].to_s
-      text = card["text"].to_s.strip
-      next if !allowed.include?(type) || text.empty?
-
-      out = { "type" => type, "text" => text }
-      out["description"] = card["description"].to_s.strip if card["description"].to_s.strip.present?
-
-      options = Array(card["options"]).map { |o| o.to_s.strip }.reject(&:empty?)
-      options = options.first(3) if type == "tap_card"
-      out["options"] = options unless TYPES_WITHOUT_OPTIONS.include?(type) || options.empty?
-
-      out["allow_other"] = true if card["allow_other"] == true
-      out
-    end
   end
 
   # tool_use?, input_of, deep_stringify come from AnthropicHelpers.
