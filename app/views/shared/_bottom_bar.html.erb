@@ -5,7 +5,7 @@
 
   active_alliances = org && path.start_with?("/alliances")
   active_results   = path == "/"
-  active_create    = org && path == new_survey_path
+  active_create    = org && (path == new_survey_path || path == create_chooser_path)
 %>
 <nav class="bottom-bar" aria-label="Primary">
   <div class="bottom-bar-left">
@@ -30,7 +30,7 @@
     </a>
 
     <% if org %>
-      <a href="<%= new_survey_path %>" class="bottom-bar-chip" data-active="<%= active_create %>">
+      <a href="<%= create_chooser_path %>" class="bottom-bar-chip" data-active="<%= active_create %>">
         <span class="bottom-bar-chip-dot" style="background:#0CA7FF;"></span>
         <%= t("nav.create") %>
       </a>

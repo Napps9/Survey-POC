@@ -37,6 +37,7 @@ Rails.application.routes.draw do
 
   # App
   root "surveys#index"
+  get  "create", to: "creates#show", as: :create_chooser
   get  "surveys/new",                 to: "surveys#new",     as: :new_survey
   post "surveys/generate",            to: "surveys#generate", as: :generate_survey
   post "surveys/import_pdf",          to: "surveys#import_pdf", as: :import_pdf_survey
@@ -54,6 +55,19 @@ Rails.application.routes.draw do
   delete "surveys/bulk_destroy",        to: "surveys#bulk_destroy",        as: :bulk_destroy_surveys
   delete "surveys/:id/destroy_forever", to: "surveys#destroy_forever",     as: :destroy_forever_survey
   resources :surveys, only: [:show, :update, :destroy]
+
+  # Common Questions — reusable sets attached to many Vertos
+  resources :common_question_sets, path: "common-question-sets" do
+    collection do
+      post :generate
+    end
+    member do
+      get  :results
+      post :add_question
+      patch  "questions/:question_id", to: "common_question_sets#update_question", as: :update_question
+      delete "questions/:question_id", to: "common_question_sets#destroy_question", as: :destroy_question
+    end
+  end
 
   # Alliances — named groups of orgs
   resources :alliances, except: [:edit, :update] do
