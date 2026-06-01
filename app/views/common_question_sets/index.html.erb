@@ -1,0 +1,77 @@
+<% content_for :head do %>
+  <style>body { overflow:auto !important; height:auto !important; }</style>
+<% end %>
+
+<div style="min-height:100vh;background:#1C2034;padding:48px 36px 80px;">
+  <div style="max-width:1080px;margin:0 auto;">
+
+    <% if flash[:notice] %>
+      <div style="margin-bottom:16px;padding:11px 16px;border-radius:10px;background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:notice] %></div>
+    <% end %>
+
+    <div style="display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#615BF5;box-shadow:0 0 12px rgba(97,91,245,0.7);"></span>
+          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;">
+            <%= t("common_questions.index_eyebrow", default: "Common Questions") %>
+          </span>
+        </div>
+        <h1 style="font-family:'Alata',sans-serif;font-size:34px;color:#fff;line-height:1.15;margin:0 0 8px;"><%= t("common_questions.index_heading", default: "Reusable question sets") %></h1>
+        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.45);margin:0;max-width:540px;line-height:1.55;">
+          <%= t("common_questions.index_subtitle", default: "Build a battery once, attach it to many Vertos, and roll up the answers across every Verto that used it.") %>
+        </p>
+      </div>
+      <%= link_to new_common_question_set_path,
+            style: "display:inline-flex;align-items:center;gap:8px;background:#615BF5;border:none;border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;text-decoration:none;box-shadow:0 8px 24px rgba(97,91,245,0.28);" do %>
+        <span style="font-size:18px;line-height:1;">+</span> <%= t("common_questions.create_new", default: "Create a set") %>
+      <% end %>
+    </div>
+
+    <% if @kept_sets.empty? && @archived_sets.empty? %>
+      <div style="padding:80px 30px;text-align:center;border-radius:18px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.12);color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;">
+        <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;margin-bottom:8px;">
+          <%= t("common_questions.empty_title", default: "Build your first reusable set") %>
+        </div>
+        <p style="max-width:380px;margin:0 auto 20px;line-height:1.5;">
+          <%= t("common_questions.empty_body", default: "A Common Questions set is a small battery you can attach to many Vertos. Answers from every attached Verto roll up into one cross-cutting view.") %>
+        </p>
+        <%= link_to t("common_questions.empty_cta", default: "Start a set"), new_common_question_set_path,
+              style: "padding:12px 26px;border-radius:100px;background:#615BF5;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;display:inline-block;" %>
+      </div>
+    <% else %>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
+        <% @kept_sets.each do |set| %>
+          <%= link_to common_question_set_path(set),
+                style: "display:flex;flex-direction:column;gap:10px;padding:20px 18px;border-radius:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);text-decoration:none;color:#fff;" do %>
+            <div style="font-family:'Alata',sans-serif;font-size:18px;color:#fff;line-height:1.2;"><%= set.name %></div>
+            <% if set.theme.present? %>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);"><%= set.theme %></div>
+            <% end %>
+            <div style="display:flex;gap:14px;margin-top:auto;font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.45);letter-spacing:0.08em;text-transform:uppercase;">
+              <span><%= pluralize(set.common_questions.size, t("common_questions.question_word", default: "question")) %></span>
+              <span><%= SupportedLocales.native_name(set.default_locale) || set.default_locale %></span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @archived_sets.any? %>
+        <details style="margin-top:32px;">
+          <summary style="cursor:pointer;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.45);">
+            <%= t("common_questions.archived_title", default: "Deleted sets") %> (<%= @archived_sets.size %>)
+          </summary>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:14px;">
+            <% @archived_sets.each do |set| %>
+              <div style="padding:16px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);">
+                <div style="font-family:'Alata',sans-serif;font-size:14px;color:rgba(255,255,255,0.8);"><%= set.name %></div>
+                <div><%= pluralize(set.common_questions.size, "question") %> · <%= time_ago_in_words(set.deleted_at) %> ago</div>
+              </div>
+            <% end %>
+          </div>
+        </details>
+      <% end %>
+    <% end %>
+
+  </div>
+</div>

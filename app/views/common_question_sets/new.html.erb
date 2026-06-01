@@ -1,0 +1,204 @@
+<div data-controller="generating" style="height:100%;display:flex;flex-direction:column;background:#1C2034;">
+
+  <%# ── Generating overlay — hidden until form submits ── %>
+  <div class="fixed inset-0 z-50 hidden flex-col overflow-hidden"
+       style="background:#1C2034;"
+       data-generating-target="overlay">
+    <div class="gen-orbs">
+      <div class="gen-orb gen-orb-1"></div>
+      <div class="gen-orb gen-orb-2"></div>
+      <div class="gen-orb gen-orb-3"></div>
+      <div class="gen-orb gen-orb-4"></div>
+    </div>
+    <div class="gen-stage flex-1 flex flex-col items-center justify-center gap-8 px-16 py-10">
+      <div class="gen-shimmer"
+           style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">
+        <%= t("common_questions.building", default: "Drafting your set") %>
+      </div>
+      <div class="text-center" style="max-width:min(1040px,92vw);">
+        <div class="gen-hero-theme" data-generating-target="heroTheme"></div>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xl);color:rgba(255,255,255,0.38);letter-spacing:-0.2px;line-height:1.5;margin-top:6px;"
+             data-generating-target="heroAge"></div>
+      </div>
+      <div class="gen-insight" data-generating-target="insightText"></div>
+      <div class="gen-steps-row">
+        <div class="gen-step" data-state="done" data-generating-target="step1">
+          <div class="step-dot">✓</div><span><%= t("common_questions.gen_brief", default: "Brief read") %></span>
+        </div>
+        <div class="gen-step" data-state="active" data-generating-target="step2">
+          <div class="step-dot"></div><span><%= t("common_questions.gen_writing", default: "Drafting questions") %></span>
+        </div>
+        <div class="gen-step" data-state="pending" data-generating-target="step3">
+          <div class="step-dot"></div><span><%= t("common_questions.gen_types", default: "Picking answer types") %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ── Wizard form ── %>
+  <% if flash[:alert] %>
+    <div style="margin:16px 24px 0;padding:12px 16px;border-radius:12px;background:rgba(255,30,111,0.1);color:#FF1E6F;border:1px solid rgba(255,30,111,0.3);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
+
+  <%= form_with url: common_question_sets_path, method: :post, model: @set,
+        scope: nil,
+        html: { style: "display:flex;flex-direction:column;flex:1;min-height:0;" },
+        data: { controller: "create-wizard",
+                action: "submit->generating#show" } do |f| %>
+
+    <%
+      light_input_style    = "width:100%;background:#fafbfc;border:1px solid rgba(0,0,0,0.12);border-radius:12px;padding:14px 18px;color:#000;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;"
+      light_textarea_style = "#{light_input_style};resize:vertical;line-height:1.55;"
+      left_pad_style  = "position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:80px 36px 48px;gap:18px;text-align:left;"
+      eyebrow_style   = "font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.16em;text-transform:uppercase;font-weight:700;"
+      instr_lead      = "font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;line-height:1.3;letter-spacing:-0.01em;"
+      instr_body      = "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);line-height:1.55;"
+      section_label_style = "font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(0,0,0,0.5);font-weight:700;"
+    %>
+
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px;overflow:auto;min-height:0;">
+
+      <%# ── Card 1 · Welcome ── %>
+      <section class="preview-card active" data-create-wizard-target="card">
+        <div class="split-card">
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#615BF5;"><%= t("common_questions.welcome_eyebrow", default: "Common Questions") %></div>
+              <div style="<%= instr_lead %>"><%= t("common_questions.welcome_lead", default: "Build once, reuse forever.") %></div>
+              <div style="<%= instr_body %>"><%= t("common_questions.welcome_body", default: "A Common Questions set is a small battery of 4–6 questions you can drop into many Vertos. We'll roll up the answers across every Verto that uses this set so you see one cross-cutting view.") %></div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
+            <div class="q-eyebrow" style="color:#615BF5;"><%= t("common_questions.welcome_badge", default: "Step 1 of 4") %></div>
+            <div style="font-family:'Alata',sans-serif;font-size:30px;line-height:1.15;color:#1C2034;"><%= t("common_questions.welcome_title", default: "Let's draft your set.") %></div>
+            <p class="q-subtitle" style="margin:0;"><%= t("common_questions.welcome_sub", default: "Four quick steps. You can edit any question afterwards.") %></p>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Card 2 · Name + Theme ── %>
+      <section class="preview-card" data-create-wizard-target="card">
+        <div class="split-card">
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:30%;"></div></div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#FF1E6F;"><%= t("common_questions.s1_eyebrow", default: "Step 02 · Label") %></div>
+              <div style="<%= instr_lead %>"><%= t("common_questions.s1_lead", default: "Name the set and tell us its theme.") %></div>
+              <div style="<%= instr_body %>"><%= t("common_questions.s1_body", default: "The name shows up in the Verto wizard's attach dropdown. The theme guides drafting if you let us generate.") %></div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FF1E6F;"><%= t("common_questions.s1_eyebrow", default: "Step 02 · Label") %></div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("common_questions.s1_title", default: "Give your set a name and theme.") %></div>
+
+            <div>
+              <div style="<%= section_label_style %>margin-bottom:6px;"><%= t("common_questions.label_name", default: "Set name") %></div>
+              <%= f.text_field :name,
+                    data: { required: "true" },
+                    placeholder: t("common_questions.placeholder_name", default: "e.g. Wellbeing Baseline"),
+                    style: light_input_style %>
+            </div>
+            <div>
+              <div style="<%= section_label_style %>margin-bottom:6px;"><%= t("common_questions.label_theme", default: "Theme") %></div>
+              <%= f.text_field :theme,
+                    placeholder: t("common_questions.placeholder_theme", default: "e.g. Wellbeing"),
+                    style: light_input_style %>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Card 3 · Key insight ── %>
+      <section class="preview-card" data-create-wizard-target="card">
+        <div class="split-card">
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:55%;"></div></div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#0CA7FF;"><%= t("common_questions.s2_eyebrow", default: "Step 03 · Insight") %></div>
+              <div style="<%= instr_lead %>"><%= t("common_questions.s2_lead", default: "What do you want every attached Verto to learn?") %></div>
+              <div style="<%= instr_body %>"><%= t("common_questions.s2_body", default: "Frame the cross-cutting signal you're hoping to track over time. We'll draft questions that map back to this insight in any Verto.") %></div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#0CA7FF;"><%= t("common_questions.s2_eyebrow", default: "Step 03 · Insight") %></div>
+            <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("common_questions.s2_title", default: "What do you want to learn?") %></div>
+            <%= f.text_area :key_insight, rows: 4,
+                  placeholder: t("common_questions.placeholder_insight", default: "e.g. How safe and supported do people feel right now?"),
+                  style: light_textarea_style %>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Card 4 · Language + start mode ── %>
+      <section class="preview-card" data-create-wizard-target="card">
+        <div class="split-card">
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:85%;"></div></div>
+            <div style="<%= left_pad_style %>">
+              <div style="<%= eyebrow_style %>color:#FFFA77;"><%= t("common_questions.s3_eyebrow", default: "Step 04 · Final touches") %></div>
+              <div style="<%= instr_lead %>"><%= t("common_questions.s3_lead", default: "Language and how to start.") %></div>
+              <div style="<%= instr_body %>"><%= t("common_questions.s3_body", default: "Your questions are stored in this language. Each Verto translates them to its own languages on attach.") %></div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FFFA77;"><%= t("common_questions.s3_eyebrow", default: "Step 04 · Final touches") %></div>
+            <div class="q-title" style="font-size:24px;line-height:1.2;"><%= t("common_questions.s3_title", default: "Last bit before we draft.") %></div>
+
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="<%= section_label_style %>"><%= t("common_questions.label_language", default: "Set language") %></div>
+              <%= f.select :default_locale,
+                    SupportedLocales.ui_ready.map { |l| [ "#{l.flag} #{l.native_name}", l.code ] },
+                    {},
+                    style: "#{light_input_style}padding:12px 16px;appearance:auto;" %>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+              <div style="<%= section_label_style %>"><%= t("common_questions.label_start", default: "How to start") %></div>
+              <div style="display:flex;gap:8px;">
+                <% [
+                  [ "blank",    t("common_questions.start_blank_label",    default: "Start blank"),
+                                t("common_questions.start_blank_desc",     default: "Add each question yourself; we'll pick the best answer type for each as you save.") ],
+                  [ "generate", t("common_questions.start_generate_label", default: "Generate"),
+                                t("common_questions.start_generate_desc",  default: "We draft 4–6 questions from your theme and key insight. You can edit them after.") ]
+                ].each_with_index do |(val, label, desc), i| %>
+                  <% selected = (i == 0) %>
+                  <label class="populate-choice" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;cursor:pointer;padding:11px 12px;border-radius:12px;background:<%= selected ? 'rgba(97,91,245,0.05)' : '#fafbfc' %>;border:2px solid <%= selected ? '#615BF5' : 'rgba(0,0,0,0.08)' %>;transition:border-color 0.15s,background 0.15s;">
+                    <input type="radio" name="start_mode" value="<%= val %>"
+                           <%= "checked" if selected %>
+                           style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
+                           onchange="this.closest('.preview-card').querySelectorAll('.populate-choice').forEach(el=>{el.style.borderColor='rgba(0,0,0,0.08)';el.style.background='#fafbfc';});this.closest('.populate-choice').style.borderColor='#615BF5';this.closest('.populate-choice').style.background='rgba(97,91,245,0.05)';var form=this.closest('form');var submit=form.querySelector('[data-create-wizard-target=finish]');if(submit){submit.formAction = this.value === 'generate' ? '<%= j generate_common_question_sets_path %>' : '<%= j common_question_sets_path %>';submit.textContent = this.value === 'generate' ? '<%= j t('common_questions.cta_generate', default: 'Generate questions →') %>' : '<%= j t('common_questions.cta_blank', default: 'Create empty set →') %>';}" />
+                    <span style="font-family:'Alata',sans-serif;font-size:14px;color:#1C2034;letter-spacing:0.02em;line-height:1.2;"><%= label %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.55);line-height:1.4;"><%= desc %></span>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <%# Footer %>
+    <div class="preview-footer">
+      <button type="button" class="preview-btn preview-btn-back invisible"
+              data-create-wizard-target="back"
+              data-action="click->create-wizard#back"><%= t("wizard.back") %></button>
+
+      <span class="preview-progress-text" data-create-wizard-target="counter"><%= t("wizard.step_counter", n: 1, total: 4) %></span>
+
+      <button type="button" class="preview-btn preview-btn-next"
+              data-create-wizard-target="next"
+              data-action="click->create-wizard#next"><%= t("wizard.next") %></button>
+
+      <%# Default action is blank-create; the radio's onchange swaps it to generate when chosen. %>
+      <%= f.submit t("common_questions.cta_blank", default: "Create empty set →"),
+            class: "preview-btn preview-btn-finish hidden",
+            data: { create_wizard_target: "finish", turbo_submits_with: t("common_questions.creating", default: "Creating…") } %>
+    </div>
+
+  <% end %>
+</div>

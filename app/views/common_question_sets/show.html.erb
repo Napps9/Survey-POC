@@ -1,0 +1,127 @@
+<% content_for :head do %>
+  <style>body { overflow:auto !important; height:auto !important; }</style>
+<% end %>
+
+<div style="min-height:100vh;background:#1C2034;padding:36px 36px 80px;">
+
+  <% if flash[:notice] %>
+    <div style="max-width:980px;margin:0 auto 16px;padding:11px 16px;border-radius:10px;background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:notice] %></div>
+  <% end %>
+  <% if flash[:alert] %>
+    <div style="max-width:980px;margin:0 auto 16px;padding:11px 16px;border-radius:10px;background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.3);color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:alert] %></div>
+  <% end %>
+
+  <div style="max-width:980px;margin:0 auto;">
+
+    <%# ── Header ── %>
+    <div style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px;">
+      <div style="min-width:0;flex:1;">
+        <%= link_to common_question_sets_path, style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);text-decoration:none;" do %>
+          ← <%= t("common_questions.back_to_list", default: "All Common Question sets") %>
+        <% end %>
+        <h1 style="font-family:'Alata',sans-serif;font-size:34px;color:#fff;line-height:1.15;margin:8px 0 6px;"><%= @set.name %></h1>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);">
+          <% if @set.theme.present? %><span><%= t("common_questions.theme_label", default: "Theme") %>: <span style="color:#fff;"><%= @set.theme %></span></span><% end %>
+          <span><%= t("common_questions.language_label", default: "Language") %>: <span style="color:#fff;"><%= SupportedLocales.native_name(@set.default_locale) || @set.default_locale %></span></span>
+          <span><%= pluralize(@set.common_questions.size, t("common_questions.question_word", default: "question")) %></span>
+          <span><%= pluralize(@affected_surveys.size, t("common_questions.verto_word", default: "Verto")) %> using</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
+        <%= link_to results_common_question_set_path(@set),
+              style: "padding:9px 16px;border-radius:100px;background:rgba(97,91,245,0.18);color:#fff;border:1px solid rgba(97,91,245,0.4);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:none;" do %>
+          <%= t("common_questions.view_results", default: "Aggregated results →") %>
+        <% end %>
+        <%= button_to common_question_set_path(@set), method: :delete,
+              data: { turbo_confirm: t("common_questions.delete_confirm", default: "Delete this set? Existing Vertos keep their snapshot.") },
+              form: { style: "margin:0;" },
+              style: "padding:9px 16px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.18);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;" do %>
+          <%= t("common_questions.delete", default: "Delete") %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @set.key_insight.present? %>
+      <div style="padding:14px 18px;border-radius:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);margin-bottom:24px;">
+        <div style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:4px;"><%= t("common_questions.key_insight_label", default: "Key insight") %></div>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.85);line-height:1.5;"><%= @set.key_insight %></div>
+      </div>
+    <% end %>
+
+    <%# ── Questions list ── %>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+      <% @set.common_questions.each_with_index do |q, i| %>
+        <div style="display:flex;gap:14px;padding:16px 18px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(97,91,245,0.18);color:#615BF5;display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size:14px;font-weight:700;"><%= format('%02d', i + 1) %></div>
+
+          <%= form_with url: update_question_common_question_set_path(@set, question_id: q.id), method: :patch,
+                html: { style: "flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;" } do %>
+            <textarea name="text" rows="2"
+                      style="width:100%;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;resize:vertical;line-height:1.5;"><%= q.text %></textarea>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <%# Card-type override picker — defaults to current type. Pre-existing
+                  CardTypes.pickable list (excludes welcome_card). %>
+              <select name="card_type"
+                      style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;">
+                <% CardTypes.pickable.each do |type, meta| %>
+                  <option value="<%= type %>" <%= "selected" if type == q.card_type %>><%= meta["picker_name"] %></option>
+                <% end %>
+              </select>
+              <% if q.options.present? %>
+                <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);"><%= q.options.size %> options</span>
+              <% end %>
+              <button type="submit"
+                      style="margin-left:auto;padding:6px 14px;border-radius:100px;background:#01EACB;color:#1C2034;border:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;">
+                <%= t("common_questions.save", default: "Save") %>
+              </button>
+            </div>
+          <% end %>
+
+          <%= button_to destroy_question_common_question_set_path(@set, question_id: q.id), method: :delete,
+                data: { turbo_confirm: t("common_questions.delete_question_confirm", default: "Delete this question?") },
+                form: { style: "margin:0;align-self:flex-start;" },
+                style: "background:transparent;color:rgba(255,255,255,0.4);border:none;font-size:18px;cursor:pointer;line-height:1;padding:4px 8px;",
+                title: t("common_questions.delete_question", default: "Delete question") do %>×<% end %>
+        </div>
+      <% end %>
+
+      <% if @set.common_questions.empty? %>
+        <div style="padding:30px 24px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.12);text-align:center;color:rgba(255,255,255,0.5);font-family:'ABeeZee',sans-serif;">
+          <%= t("common_questions.empty_questions", default: "No questions yet. Add your first one below.") %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ── Add question form ── %>
+    <%= form_with url: add_question_common_question_set_path(@set), method: :post,
+          html: { style: "display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;" } do %>
+      <textarea name="text" rows="2"
+                placeholder="<%= t('common_questions.add_placeholder', default: 'Type a new question — we\'ll pick the best answer type.') %>"
+                style="flex:1;min-width:240px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px 14px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;resize:vertical;line-height:1.5;"></textarea>
+      <button type="submit"
+              style="padding:12px 22px;border-radius:100px;background:#615BF5;color:#fff;border:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;align-self:flex-start;">
+        <%= t("common_questions.add_question", default: "Add question") %>
+      </button>
+    <% end %>
+
+    <%# ── Affected Vertos ── %>
+    <% if @affected_surveys.any? %>
+      <div style="padding:18px 20px;border-radius:14px;background:rgba(12,167,255,0.06);border:1px solid rgba(12,167,255,0.18);">
+        <div style="font-family:'Alata',sans-serif;font-size:11px;color:#0CA7FF;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:8px;"><%= t("common_questions.affected_label", default: "Already attached to") %></div>
+        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin:0 0 12px;line-height:1.5;">
+          <%= t("common_questions.affected_body", default: "Editing this set won't change wording in these existing Vertos — they keep the snapshot they were generated with. New Vertos will use the latest version.") %>
+        </p>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <% @affected_surveys.each do |s| %>
+            <%= link_to survey_path(s),
+                  style: "display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:none;" do %>
+              <span><%= s.title.presence || s.theme.presence || "Untitled Verto" %></span>
+              <span style="color:rgba(255,255,255,0.4);font-size: var(--text-2xs);"><%= s.publish_token.present? ? "Live" : "Draft" %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+  </div>
+</div>
