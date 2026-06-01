@@ -65,6 +65,10 @@ class SurveyGenerator
                   - range / rating: 3 to 5 points, never more than 5
                   - nps: EXACTLY 5 points, each label <= 20 chars
                 DESC
+              },
+              id: {
+                type: "integer",
+                description: "Echo back the id of a Common Question card supplied in the brief. Set only on those cards; leave unset on any new card you write."
               }
             },
             required: %w[type text]
@@ -204,11 +208,13 @@ class SurveyGenerator
     @client = Anthropic::Client.new(api_key: api_key)
   end
 
-  def call(theme:, audience_age:, key_insight:, notes: nil, locale: SupportedLocales::DEFAULT)
+  def call(theme:, audience_age:, key_insight:, notes: nil, locale: SupportedLocales::DEFAULT, common_cards: [])
     brief = [ theme, audience_age, key_insight, notes ].compact.join(" ")
     examples = QuestionCorpus.search(brief, limit: 8, min_overlap: 2)
     Rails.logger.info("[corpus] matched #{examples.size} of #{QuestionCorpus.all.size}: " +
                       examples.first(5).map { |e| e[:question].truncate(60) }.join(" | "))
+
+    common_cards = Array(common_cards).select { |c| c.is_a?(Hash) && c["common_question_id"] }
 
     user_message = +<<~MSG
       Theme: #{theme}
@@ -247,6 +253,7 @@ class SurveyGenerator
     REMINDER
 
     user_message << language_instruction(locale)
+    user_message << common_cards_instruction(common_cards)
 
     tool = TOOL.deep_dup
     tool[:input_schema][:properties][:cards][:items][:properties][:type][:enum] = self.class.generatable_types
@@ -270,6 +277,7 @@ class SurveyGenerator
 
     payload = deep_stringify(input_of(block))
     enforce_tap_card_three_statements!(payload)
+    reconcile_common_cards!(payload, common_cards)
     payload
   end
 
@@ -287,7 +295,78 @@ class SurveyGenerator
     end
   end
 
+  # Belt-and-braces verbatim guarantee for Common Question cards. The model
+  # is told to echo each common card's id back in `id` and leave its text /
+  # type / options untouched, but we don't trust it. Walk the emitted cards:
+  # for any with a known id, overwrite its mutable fields with the master
+  # snapshot so the wording is byte-identical to what the user authored.
+  # Append any expected ids the model omitted, and strip stray `id` fields
+  # from non-common cards.
+  def reconcile_common_cards!(payload, common_cards)
+    return if common_cards.empty?
+
+    expected_by_id = common_cards.index_by { |c| c["common_question_id"] }
+    seen_ids       = []
+
+    Array(payload["cards"]).each do |card|
+      id = card["id"]
+      master = expected_by_id[id]
+      if master
+        card["text"]                    = master["text"]
+        card["type"]                    = master["type"]
+        card["options"]                 = master["options"]                 if master["options"]
+        card["description"]             = master["description"]             if master["description"]
+        card["allow_other"]             = master["allow_other"]             if master.key?("allow_other")
+        card["common_question_id"]      = master["common_question_id"]
+        card["common_question_set_id"]  = master["common_question_set_id"]
+        seen_ids << id
+      end
+      card.delete("id")
+    end
+
+    missing = expected_by_id.keys - seen_ids
+    missing.each do |id|
+      payload["cards"] << expected_by_id[id].dup.tap { |c| c.delete("id") }
+    end
+  end
+
   private
+
+  # System-prompt-equivalent instructions for weaving Common Question cards
+  # into the deck. Lives in the user message rather than the cached SYSTEM
+  # so prompt caching survives selection changes.
+  def common_cards_instruction(common_cards)
+    return "" if common_cards.empty?
+
+    cards_for_prompt = common_cards.map do |c|
+      {
+        id:      c["common_question_id"],
+        type:    c["type"],
+        text:    c["text"],
+        options: c["options"]
+      }.compact
+    end
+
+    <<~MSG
+
+      COMMON QUESTIONS — VERBATIM INSERTION (#{common_cards.size} card#{'s' if common_cards.size != 1})
+      The user has attached the reusable cards below. You MUST include EVERY one
+      in your emitted `cards` array. For each, echo back the supplied `id` so we
+      can identify it. Do NOT change `text`, `type`, `options` or `description`
+      on any of these cards — they are authored content and must read verbatim.
+
+      Place each one at the most contextually appropriate position in the deck —
+      can be at the start, middle, or end, surrounded by your generated cards
+      where the topic fits naturally. The Rules of the Game still apply to the
+      ENTIRE integrated deck (10-15 questions total, no more than 2 of the same
+      answer type in a row including common cards, etc.) — choose and order
+      your own generated cards so the integrated flow satisfies them.
+
+      COMMON CARDS:
+      #{JSON.pretty_generate(cards_for_prompt)}
+    MSG
+  end
+
 
   # When the primary language isn't English, instruct the model to write the
   # whole Verto in that language (respondent-facing text + every option label).
