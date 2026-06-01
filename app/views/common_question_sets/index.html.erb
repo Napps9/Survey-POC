@@ -2,7 +2,9 @@
   <style>body { overflow:auto !important; height:auto !important; }</style>
 <% end %>
 
-<div style="min-height:100vh;background:#1C2034;padding:48px 36px 80px;">
+<div style="min-height:100vh;background:#1C2034;">
+  <%= render "shared/dashboard_tabs", active: :common %>
+  <div style="padding:30px 36px 80px;">
   <div style="max-width:1080px;margin:0 auto;">
 
     <% if flash[:notice] %>
@@ -73,5 +75,6 @@
       <% end %>
     <% end %>
 
+  </div>
   </div>
 </div>

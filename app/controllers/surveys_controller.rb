@@ -14,7 +14,6 @@ class SurveysController < ApplicationController
     @surveys          = kept_surveys
     @archived_surveys = Current.organisation.surveys.archived.includes(:responses).order(deleted_at: :desc)
     @total_responses  = Current.organisation.surveys.kept.joins(:responses).count
-    @common_sets      = Current.organisation.common_question_sets.kept.recent.includes(:common_questions)
     render :index, layout: "fullscreen"
   end
 

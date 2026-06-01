@@ -20,6 +20,8 @@
 <div style="display:flex;min-height:100vh;background:#1C2034;">
   <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
 
+    <%= render "shared/dashboard_tabs", active: :vertos %>
+
     <%# ── Hero ── %>
     <div style="position:relative;overflow:hidden;padding:48px 36px 40px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
       <div class="gen-orbs" style="opacity:0.28;">
@@ -183,54 +185,6 @@
                         style="background:#0CA7FF;border:none;border-radius:100px;padding:8px 18px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.04em;cursor:pointer;"><%= t("dashboard_card.delete") %></button>
               </div>
             <% end %>
-          </div>
-        <% end %>
-
-        <%# ── Common Questions section ── %>
-        <% if @common_sets&.any? %>
-          <div style="margin-bottom:32px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-              <span style="width:6px;height:6px;border-radius:50%;background:#615BF5;box-shadow:0 0 10px rgba(97,91,245,0.7);"></span>
-              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);letter-spacing:0.12em;text-transform:uppercase;"><%= t("dashboard.section_common_questions", default: "Common Questions") %></span>
-              <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
-              <%= link_to t("dashboard.common_questions_view_all", default: "Manage all"), common_question_sets_path,
-                    style: "font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;" %>
-              <span style="color:rgba(255,255,255,0.15);">|</span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);"><%= @common_sets.size %></span>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
-              <% @common_sets.each do |set| %>
-                <div style="display:flex;flex-direction:column;gap:10px;padding:18px 18px 14px;border-radius:14px;background:linear-gradient(135deg,rgba(97,91,245,0.10),rgba(97,91,245,0.02));border:1px solid rgba(97,91,245,0.22);">
-                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-                    <div style="min-width:0;flex:1;">
-                      <div style="font-family:'Alata',sans-serif;font-size:18px;color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;"><%= set.name %></div>
-                      <% if set.theme.present? %>
-                        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= set.theme %></div>
-                      <% end %>
-                    </div>
-                    <span style="flex-shrink:0;font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#9d97ff;padding:3px 9px;border-radius:100px;background:rgba(97,91,245,0.18);border:1px solid rgba(97,91,245,0.32);">
-                      <%= pluralize(set.common_questions.size, "Q") %>
-                    </span>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:10px;font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.08em;text-transform:uppercase;">
-                    <span><%= SupportedLocales.flag(set.default_locale) %> <%= set.default_locale.upcase %></span>
-                  </div>
-                  <div style="display:flex;gap:8px;margin-top:auto;">
-                    <%= link_to t("dashboard.common_manage", default: "Manage"), common_question_set_path(set),
-                          style: "flex:1;text-align:center;padding:8px 12px;border-radius:100px;background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.12);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:none;" %>
-                    <%= link_to t("dashboard.common_results", default: "Results →"), results_common_question_set_path(set),
-                          style: "flex:1;text-align:center;padding:8px 12px;border-radius:100px;background:#615BF5;color:#fff;border:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:none;" %>
-                  </div>
-                </div>
-              <% end %>
-
-              <%# Create-a-set tile %>
-              <%= link_to new_common_question_set_path,
-                    style: "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px;border-radius:14px;background:rgba(255,255,255,0.02);border:1px dashed rgba(97,91,245,0.32);color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:none;min-height:140px;" do %>
-                <span style="font-size:24px;line-height:1;color:#615BF5;">+</span>
-                <%= t("dashboard.common_create", default: "Create a set") %>
-              <% end %>
-            </div>
           </div>
         <% end %>
 
