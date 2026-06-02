@@ -42,19 +42,28 @@
 
       <%# Library pane %>
       <div data-media-picker-target="pane" data-pane="library" hidden>
-        <% imgs = verto_library_images %>
-        <% if imgs.any? %>
-          <div class="media-library-grid">
-            <% imgs.each do |fname| %>
-              <% url = asset_path("verto-library/#{fname}") %>
-              <button type="button"
-                      class="media-library-item"
-                      title="<%= fname %>"
-                      style="background-image:url('<%= url %>');"
-                      data-url="<%= url %>"
-                      data-media-picker-target="libraryItem"
-                      data-action="click->media-picker#pickLibraryItem"
-                      aria-selected="false"></button>
+        <% groups = verto_library_images %>
+        <% if groups.any? %>
+          <div class="media-library-sections">
+            <% groups.each do |folder, files| %>
+              <section class="media-library-section">
+                <h4 class="media-library-section-label">
+                  <%= folder.presence&.tr("-", " ")&.capitalize || "Library" %>
+                </h4>
+                <div class="media-library-grid">
+                  <% files.each do |rel| %>
+                    <% url = asset_path("verto-library/#{rel}") %>
+                    <button type="button"
+                            class="media-library-item"
+                            title="<%= rel %>"
+                            style="background-image:url('<%= url %>');"
+                            data-url="<%= url %>"
+                            data-media-picker-target="libraryItem"
+                            data-action="click->media-picker#pickLibraryItem"
+                            aria-selected="false"></button>
+                  <% end %>
+                </div>
+              </section>
             <% end %>
           </div>
         <% else %>
