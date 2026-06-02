@@ -74,19 +74,19 @@ class ResultsChat
 
       case type
       when "multiple_choice", "yes_no", "select_one_grid", "select_many", "select_many_grid"
-        grand = [result[:counts].values.sum.to_f, 1.0].max
+        grand = [ result[:counts].values.sum.to_f, 1.0 ].max
         result[:counts].sort_by { |_, v| -v }.each do |label, count|
           lines << "  #{label}: #{count} (#{((count / grand) * 100).round}%)"
         end
       when "tap_card"
         result[:counts].each do |label, dirs|
           yes_c = dirs["yes"].to_i; no_c = dirs["no"].to_i
-          tot   = [(yes_c + no_c).to_f, 1.0].max
+          tot   = [ (yes_c + no_c).to_f, 1.0 ].max
           lines << "  \"#{label}\" → Yes #{yes_c} (#{((yes_c / tot) * 100).round}%), No #{no_c} (#{((no_c / tot) * 100).round}%)"
         end
       when "range"
         labels = Array(card["options"])
-        grand  = [result[:counts].values.sum.to_f, 1.0].max
+        grand  = [ result[:counts].values.sum.to_f, 1.0 ].max
         result[:counts].sort.each do |step, count|
           lines << "  #{labels[step] || "Step #{step + 1}"}: #{count} (#{((count / grand) * 100).round}%)"
         end

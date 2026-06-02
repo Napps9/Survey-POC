@@ -2,7 +2,7 @@ class CommonQuestion < ApplicationRecord
   belongs_to :common_question_set, inverse_of: :common_questions
 
   validates :text,      presence: true
-  validates :card_type, presence: true, inclusion: { in: -> (_) { SurveyGenerator::CARD_TYPES } }
+  validates :card_type, presence: true, inclusion: { in: ->(_) { SurveyGenerator::CARD_TYPES } }
   validates :position,  presence: true
 
   before_validation :assign_position, on: :create

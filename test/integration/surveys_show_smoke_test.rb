@@ -5,7 +5,7 @@ class SurveysShowSmokeTest < ActionDispatch::IntegrationTest
     user = User.create!(name: "U", email_address: "u-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
     org  = Organisation.create!(name: "O", slug: "o-#{SecureRandom.hex(2)}")
     org.memberships.create!(user: user, role: "admin")
-    s = org.surveys.create!(title: "Smoke", theme: "Smoke", audience_age: "all", key_insight: "x", default_locale: "en", locales: ["en"], cards: [{"type"=>"welcome_card","title"=>"hi"}])
+    s = org.surveys.create!(title: "Smoke", theme: "Smoke", audience_age: "all", key_insight: "x", default_locale: "en", locales: [ "en" ], cards: [ { "type"=>"welcome_card", "title"=>"hi" } ])
 
     post session_path, params: { email_address: user.email_address, password: "verylongpassword" }
     follow_redirect! if response.redirect?
@@ -21,7 +21,7 @@ class SurveysShowSmokeTest < ActionDispatch::IntegrationTest
     org  = Organisation.create!(name: "O", slug: "o2-#{SecureRandom.hex(2)}")
     org.memberships.create!(user: user, role: "admin")
     org.alliances.create!(name: "Pilot")
-    s = org.surveys.create!(title: "Smoke", theme: "Smoke", audience_age: "all", key_insight: "x", default_locale: "en", locales: ["en"], cards: [])
+    s = org.surveys.create!(title: "Smoke", theme: "Smoke", audience_age: "all", key_insight: "x", default_locale: "en", locales: [ "en" ], cards: [])
 
     post session_path, params: { email_address: user.email_address, password: "verylongpassword" }
     follow_redirect! if response.redirect?

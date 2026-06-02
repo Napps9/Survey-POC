@@ -43,7 +43,7 @@ class QuestionCorpus
         overlap = (row[:tokens] & tokens).size
         next nil if overlap < min_overlap
         score = overlap * 2.0 + Math.log10(row[:total_viewings] + 1)
-        [score, row]
+        [ score, row ]
       end.compact
 
       scored.sort_by { |score, _| -score }.first(limit).map { |_, r| r }
