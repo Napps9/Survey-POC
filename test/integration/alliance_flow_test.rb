@@ -60,8 +60,8 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     # Create + publish a Verto, then add to alliance
     survey = @oa.surveys.create!(
       title: "Pilot Verto", theme: "Pilot Theme", audience_age: "18-35",
-      key_insight: "x", default_locale: "en", locales: ["en"],
-      cards: [{"type"=>"welcome_card","title"=>"hi"},{"type"=>"single_choice","title"=>"Q","options"=>[{"label"=>"Yes"},{"label"=>"No"}]}],
+      key_insight: "x", default_locale: "en", locales: [ "en" ],
+      cards: [ { "type"=>"welcome_card", "title"=>"hi" }, { "type"=>"single_choice", "title"=>"Q", "options"=>[ { "label"=>"Yes" }, { "label"=>"No" } ] } ],
       publish_token: SecureRandom.urlsafe_base64(18),
       published_at: Time.current
     )
@@ -88,8 +88,8 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
 
     survey = @oa.surveys.create!(
       title: "Trial Verto", theme: "T", audience_age: "all",
-      key_insight: "x", default_locale: "en", locales: ["en"],
-      cards: [{"type"=>"single_choice","title"=>"Q","options"=>[{"label"=>"A"},{"label"=>"B"}]}],
+      key_insight: "x", default_locale: "en", locales: [ "en" ],
+      cards: [ { "type"=>"single_choice", "title"=>"Q", "options"=>[ { "label"=>"A" }, { "label"=>"B" } ] } ],
       publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current
     )
     a.alliance_vertos.create!(survey: survey)
@@ -154,8 +154,8 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
 
     survey = @oa.surveys.create!(
       title: "Cross-Test", theme: "X", audience_age: "all",
-      key_insight: "x", default_locale: "en", locales: ["en"],
-      cards: [{"type"=>"single_choice","title"=>"Q","options"=>[{"label"=>"A"},{"label"=>"B"}]}],
+      key_insight: "x", default_locale: "en", locales: [ "en" ],
+      cards: [ { "type"=>"single_choice", "title"=>"Q", "options"=>[ { "label"=>"A" }, { "label"=>"B" } ] } ],
       publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current
     )
 
@@ -173,8 +173,8 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     a2_share = a2.survey_shares.first
 
     # 2 responses through a1, 5 through a2
-    2.times { survey.responses.create!(session_token: SecureRandom.urlsafe_base64(16), survey_share: a1_share, status: "completed", answers: {"0"=>{"value"=>"A"}}) }
-    5.times { survey.responses.create!(session_token: SecureRandom.urlsafe_base64(16), survey_share: a2_share, status: "completed", answers: {"0"=>{"value"=>"B"}}) }
+    2.times { survey.responses.create!(session_token: SecureRandom.urlsafe_base64(16), survey_share: a1_share, status: "completed", answers: { "0"=>{ "value"=>"A" } }) }
+    5.times { survey.responses.create!(session_token: SecureRandom.urlsafe_base64(16), survey_share: a2_share, status: "completed", answers: { "0"=>{ "value"=>"B" } }) }
 
     delete session_path
     sign_in partner_admin

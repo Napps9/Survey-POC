@@ -1,12 +1,12 @@
 class InvitesController < ApplicationController
-  skip_before_action :require_authentication, only: [:show, :accept]
-  skip_before_action :set_current_organisation, only: [:show, :accept]
+  skip_before_action :require_authentication, only: [ :show, :accept ]
+  skip_before_action :set_current_organisation, only: [ :show, :accept ]
   layout "fullscreen"
 
-  before_action :require_admin!, only: [:new, :create]
-  before_action :load_invite,    only: [:show, :accept]
-  before_action :resume_session_if_possible, only: [:show, :accept]
-  before_action :load_join_options, only: [:show, :accept]
+  before_action :require_admin!, only: [ :new, :create ]
+  before_action :load_invite,    only: [ :show, :accept ]
+  before_action :resume_session_if_possible, only: [ :show, :accept ]
+  before_action :load_join_options, only: [ :show, :accept ]
 
   def new
   end

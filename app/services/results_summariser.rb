@@ -27,7 +27,7 @@ class ResultsSummariser
       model:      MODEL,
       max_tokens: MAX_TOKENS,
       system:     SYSTEM,
-      messages:   [{ role: "user", content: prompt }]
+      messages:   [ { role: "user", content: prompt } ]
     )
 
     # message_start carries input/cache token counts; the final output_tokens

@@ -52,7 +52,7 @@ module BrandPalette
 
   def rgb(hex)
     h = hex.to_s.delete_prefix("#")
-    [h[0, 2], h[2, 2], h[4, 2]].map { |c| c.to_i(16) }
+    [ h[0, 2], h[2, 2], h[4, 2] ].map { |c| c.to_i(16) }
   end
 
   def to_hex(triplet)

@@ -1,6 +1,6 @@
 class OrganisationsController < ApplicationController
   layout "fullscreen"
-  before_action :require_admin!, only: [:edit, :update]
+  before_action :require_admin!, only: [ :edit, :update ]
 
   def switch
     organisation_id = params[:organisation_id].to_i

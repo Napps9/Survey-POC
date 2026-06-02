@@ -5,7 +5,7 @@ gem "rails", "~> 8.1.3"
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 # SQLite for development/test; PostgreSQL in production
-gem "sqlite3", ">= 1.4", group: [:development, :test]
+gem "sqlite3", ">= 1.4", group: [ :development, :test ]
 gem "pg", "~> 1.5",      group: :production
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
@@ -40,7 +40,7 @@ gem "csv"
 gem "googleauth"             # Signet OAuth2: authorize URL, code exchange, token refresh
 gem "google-apis-sheets_v4"  # create spreadsheet + write values (Drive API not needed)
 # Load .env in development
-gem "dotenv-rails", groups: [:development, :test]
+gem "dotenv-rails", groups: [ :development, :test ]
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
@@ -60,4 +60,3 @@ group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
 end
-
