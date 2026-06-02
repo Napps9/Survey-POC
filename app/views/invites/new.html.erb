@@ -15,7 +15,8 @@
         </div>
       <% end %>
 
-      <%= form_with url: organisation_invites_path(current_organisation), method: :post do |f| %>
+      <%= form_with url: organisation_invites_path(current_organisation),
+                    method: :post, data: { turbo: false } do |f| %>
 
         <div style="margin-bottom:20px;">
           <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Email address</label>
