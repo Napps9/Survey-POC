@@ -425,6 +425,15 @@
   color: rgba(255,255,255,0.4);
   font-size: 13px;
 }
+.media-library-sections { display: flex; flex-direction: column; gap: 22px; }
+.media-library-section-label {
+  font-family: "Alata", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin: 0 0 10px;
+}
 .media-modal-foot {
   display: flex; justify-content: flex-end; gap: 10px;
   padding: 14px 22px;

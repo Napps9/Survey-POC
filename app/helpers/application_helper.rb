@@ -35,12 +35,32 @@ module ApplicationHelper
     { badge: m["badge"], badge_css: m["badge_css"], q_label: m["panel_label"] }
   end
 
-  # Filenames present in app/assets/images/verto-library/. Picked up at request
-  # time so dropping a new file in the folder requires no rebuild.
+  # Images present under app/assets/images/verto-library/, grouped by
+  # sub-folder (`backgrounds`, `left-panel`, `select-art`, `range-art`,
+  # `swipe-cards`, `mobile-backgrounds`, ...). Each value is an array of
+  # paths relative to verto-library/ (e.g. `backgrounds/landscape.jpg`),
+  # ready to feed into `asset_path("verto-library/#{rel}")`. Files dropped
+  # directly into verto-library/ are grouped under the empty-string key.
+  # Picked up at request time so dropping a new file requires no rebuild.
   def verto_library_images
     dir = Rails.root.join("app/assets/images/verto-library")
-    return [] unless Dir.exist?(dir)
-    Dir.children(dir).select { |f| f =~ /\.(jpe?g|png|webp|svg)\z/i }.sort
+    return {} unless Dir.exist?(dir)
+
+    image_ext = /\.(jpe?g|png|webp|svg)\z/i
+    grouped   = Hash.new { |h, k| h[k] = [] }
+
+    Dir.children(dir).sort.each do |entry|
+      full = dir.join(entry)
+      if File.directory?(full)
+        Dir.children(full).select { |f| f =~ image_ext }.sort.each do |fname|
+          grouped[entry] << "#{entry}/#{fname}"
+        end
+      elsif entry =~ image_ext
+        grouped[""] << entry
+      end
+    end
+
+    grouped.reject { |_, files| files.empty? }
   end
 
   # Renders the organisation's uploaded logo if present, otherwise falls back
