@@ -8,9 +8,10 @@ export default class extends Controller {
     "backdrop", "modal", "tab", "pane",
     "fileInput", "dropzone",
     "libraryItem", "applyBtn", "clearBtn",
-    "bgThumb", "bgRemoveBtn"
+    "bgThumb", "bgRemoveBtn",
+    "recommendedSection", "recommendedLabel", "recommendedGrid"
   ]
-  static values = { url: String }
+  static values = { url: String, backgroundRecommended: Array }
 
   connect() {
     this._activeCard = null
@@ -35,6 +36,8 @@ export default class extends Controller {
     const currentUrl = card.dataset.cardImage || ""
     this.clearBtnTarget.hidden = !currentUrl
 
+    this._renderRecommended(this._parseUrls(card.dataset.cardRecommendedImages), "Recommended for this card")
+
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
   }
@@ -48,6 +51,7 @@ export default class extends Controller {
     this._setApplyEnabled(false)
     this._switchTabKey("upload")
     this.clearBtnTarget.hidden = !this._currentBg()
+    this._renderRecommended(this.hasBackgroundRecommendedValue ? this.backgroundRecommendedValue : [], "Recommended backgrounds")
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
   }
@@ -59,6 +63,7 @@ export default class extends Controller {
     this._setApplyEnabled(false)
     this.libraryItemTargets.forEach(i => i.setAttribute("aria-selected", "false"))
     if (this.hasFileInputTarget) this.fileInputTarget.value = ""
+    this._renderRecommended([], "")
     document.removeEventListener("keydown", this._escListener)
   }
 
@@ -219,5 +224,44 @@ export default class extends Controller {
 
   _setApplyEnabled(enabled) {
     this.applyBtnTarget.disabled = !enabled
+  }
+
+  _parseUrls(raw) {
+    if (!raw) return []
+    try {
+      const arr = JSON.parse(raw)
+      return Array.isArray(arr) ? arr.filter(u => typeof u === "string" && u.length) : []
+    } catch (_e) {
+      return []
+    }
+  }
+
+  // Populates (or hides) the "Recommended" section at the top of the
+  // Library tab. Cloned thumbnails reuse the existing libraryItem target +
+  // pickLibraryItem action so selection works identically to the
+  // server-rendered items below.
+  _renderRecommended(urls, label) {
+    if (!this.hasRecommendedSectionTarget || !this.hasRecommendedGridTarget) return
+    this.recommendedGridTarget.replaceChildren()
+    if (!urls.length) {
+      this.recommendedSectionTarget.hidden = true
+      return
+    }
+    if (this.hasRecommendedLabelTarget) this.recommendedLabelTarget.textContent = label
+    const frag = document.createDocumentFragment()
+    for (const url of urls) {
+      const btn = document.createElement("button")
+      btn.type = "button"
+      btn.className = "media-library-item"
+      btn.title = url
+      btn.style.backgroundImage = `url('${url.replace(/'/g, "\\'")}')`
+      btn.dataset.url = url
+      btn.dataset.mediaPickerTarget = "libraryItem"
+      btn.dataset.action = "click->media-picker#pickLibraryItem"
+      btn.setAttribute("aria-selected", "false")
+      frag.appendChild(btn)
+    }
+    this.recommendedGridTarget.appendChild(frag)
+    this.recommendedSectionTarget.hidden = false
   }
 }

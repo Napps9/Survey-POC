@@ -122,6 +122,21 @@ class AssetPopulator
         helpers.asset_path("#{SWIPE_CARDS_DIR}/#{a['file']}")
       end
     end
+
+    # Top-N curated assets for the picker's "Recommended" section, ranked by
+    # the same scoring used by populate!. Empty array when nothing scores
+    # above zero so the picker can hide the section instead of misleading.
+    #
+    #   recommended_paths(survey, context: :background)
+    #   recommended_paths(survey, context: :card, card: cards_hash)
+    def recommended_paths(survey, context:, card: nil, limit: 8)
+      pop = new(survey)
+      case context
+      when :background then pop.send(:background_recommendations, limit)
+      when :card       then pop.send(:card_recommendations, card, limit)
+      else                  []
+      end
+    end
   end
 
   def initialize(survey, seed: nil)
@@ -339,5 +354,50 @@ class AssetPopulator
 
   def helpers
     @helpers ||= ActionController::Base.helpers
+  end
+
+  # Top-N background asset_paths for the picker's "Recommended" section.
+  def background_recommendations(limit)
+    rank_pool(self.class.manifest["backgrounds"], BACKGROUND_DIR, survey_query_tags, limit)
+  end
+
+  # Top-N card asset_paths blending theme-matched left-panel art and the
+  # card-type-family pool (select/range/swipe), so both Tier-1 themed picks
+  # and Tier-2 type-fit picks show up in one ranked list.
+  def card_recommendations(card, limit)
+    return [] if card.blank?
+    type  = card["type"].to_s
+    query = survey_query_tags.merge(keywords: card_keywords(card))
+
+    scored = []
+    Array(self.class.manifest["left_panel"]).each do |a|
+      types = Array(a["card_types"])
+      next unless types.empty? || types.include?(type)
+      scored << [ score(a, query), asset_url(LEFT_PANEL_DIR, a["file"]) ]
+    end
+
+    family_bucket, family_dir = type_family_pool(type)
+    Array(family_bucket).each do |a|
+      scored << [ score(a, query), asset_url(family_dir, a["file"]) ]
+    end
+
+    scored.reject! { |s, _| s <= 0 }
+    scored.sort_by! { |s, _| -s }
+    scored.first(limit).map(&:last)
+  end
+
+  def type_family_pool(type)
+    if SELECT_TYPES.include?(type) then [ self.class.manifest["select_art"],  SELECT_ART_DIR ]
+    elsif SCALE_TYPES.include?(type) then [ self.class.manifest["range_art"], RANGE_ART_DIR ]
+    elsif type == "tap_card"        then [ self.class.manifest["swipe_cards"], SWIPE_CARDS_DIR ]
+    else [ nil, nil ]
+    end
+  end
+
+  def rank_pool(pool, dir, query, limit)
+    scored = Array(pool).map { |a| [ score(a, query), asset_url(dir, a["file"]) ] }
+    scored.reject! { |s, _| s <= 0 }
+    scored.sort_by! { |s, _| -s }
+    scored.first(limit).map(&:last)
   end
 end

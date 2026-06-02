@@ -45,6 +45,13 @@
         <% groups = verto_library_images %>
         <% if groups.any? %>
           <div class="media-library-sections">
+            <section class="media-library-section"
+                     data-media-picker-target="recommendedSection" hidden>
+              <h4 class="media-library-section-label"
+                  data-media-picker-target="recommendedLabel">Recommended</h4>
+              <div class="media-library-grid"
+                   data-media-picker-target="recommendedGrid"></div>
+            </section>
             <% groups.each do |folder, files| %>
               <section class="media-library-section">
                 <h4 class="media-library-section-label">
