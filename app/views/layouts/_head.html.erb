@@ -21,6 +21,11 @@
 <link rel="manifest" href="<%= pwa_manifest_path %>">
 <%= favicon_link_tag "favicon.svg", type: "image/svg+xml" %>
 <%= favicon_link_tag "favicon.svg", rel: "apple-touch-icon", type: "image/svg+xml" %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Alata&display=swap"
+      media="all">
 <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
 <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 <%= render "layouts/i18n_js" %>
