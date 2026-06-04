@@ -1,0 +1,78 @@
+services:
+  - type: web
+    name: survey-poc-staging
+    runtime: ruby
+    plan: starter
+    region: oregon
+    branch: staging
+    autoDeploy: true
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec rails db:prepare && bundle exec rails db:seed && bundle exec rails server -e production -p $PORT"
+    healthCheckPath: /up
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: RACK_ENV
+        value: production
+      - key: RAILS_LOG_TO_STDOUT
+        value: "1"
+      - key: RAILS_SERVE_STATIC_FILES
+        value: "1"
+      - key: WEB_CONCURRENCY
+        value: "1"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SECRET_KEY_BASE
+        generateValue: true
+      # Google Sheets export (per-user OAuth) — same OAuth client as prod;
+      # add the staging /google/callback URL to the existing OAuth client in
+      # Google Cloud Console.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      # Active Record Encryption (encrypts stored Google tokens).
+      # Render auto-generates stable values per environment — DO NOT copy
+      # prod's values here; isolation between envs is the point.
+      - key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+        generateValue: true
+      - key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+        generateValue: true
+      - key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+        generateValue: true
+      - key: APP_HOST
+        sync: false
+      - key: APP_PROTOCOL
+        value: https
+      - key: MAIL_FROM
+        sync: false
+      - key: MAIL_REPLY_TO
+        sync: false
+      # SMTP — point at a Mailtrap sandbox so reset/invite mails never reach
+      # real inboxes. Free Mailtrap tier covers 100 emails/mo.
+      - key: SMTP_ADDRESS
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_AUTHENTICATION
+        value: plain
+      - key: SMTP_STARTTLS
+        value: "true"
+      - key: SMTP_TLS
+        value: "false"
+      # Turns on the demo block in db/seeds.rb (idempotent).
+      - key: SEED_DEMO
+        value: "1"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: survey-poc-staging-db
+          property: connectionString
+
+databases:
+  - name: survey-poc-staging-db
+    plan: starter
+    region: oregon

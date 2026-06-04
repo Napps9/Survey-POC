@@ -41,5 +41,60 @@ Notes:
   Disk or switch to Postgres before storing data.
 - `config/environments/production.rb` allows `*.onrender.com` hosts.
 
+## Staging environment
+
+A parallel staging environment runs from the `staging` branch via
+`render.staging.yaml`. Same code, separate Render service + Postgres DB,
+separate secrets. Cost: $0 (free Starter tier on both services).
+
+**One-time setup**
+
+1. Push `render.staging.yaml` and these seed changes to `main`, then branch:
+   ```bash
+   git checkout -b staging && git push -u origin staging
+   ```
+2. In Render: **New → Blueprint**, point at this repo, choose branch
+   `staging` and blueprint file `render.staging.yaml`.
+3. When Render prompts for secrets, set:
+   - `ANTHROPIC_API_KEY` — same value as prod (shares rate limit)
+   - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — same as prod
+   - `APP_HOST` — e.g. `survey-poc-staging.onrender.com` (visible after
+     first deploy; redeploy after setting)
+   - `MAIL_FROM`, `MAIL_REPLY_TO` — anything; mail is sandboxed
+   - `SMTP_ADDRESS` / `SMTP_USERNAME` / `SMTP_PASSWORD` — from a Mailtrap
+     sandbox inbox (mailtrap.io, free tier: 100 emails/mo)
+   - **Do not set** `SECRET_KEY_BASE` or `ACTIVE_RECORD_ENCRYPTION_*` —
+     Render generates fresh values per env; reusing prod's would defeat
+     isolation.
+4. In Google Cloud Console, add this redirect URI to the existing OAuth
+   client: `https://<staging-host>/google/callback`. Same client ID/secret
+   keep working; users will need to reconnect Google in staging (encrypted
+   refresh tokens are env-scoped).
+
+**Day-to-day**
+
+```bash
+git checkout staging
+git merge --ff-only feature/my-change   # or rebase a feature branch in
+git push origin staging                 # auto-deploys to staging
+# ...QA the staging URL...
+git checkout main && git merge staging  # promote to prod
+git push origin main
+```
+
+Staging is seeded with `SEED_DEMO=1` on every deploy:
+
+- Demo org: `Demo Co`
+- Demo login: `demo@playverto.com` / `demopass123456` (admin)
+- One published demo Verto with a clickable `/play/<token>` link
+
+**Caveats**
+
+- Both services cold-start after 15 min idle (~30 s first request).
+- Mailtrap free tier caps at 100 emails/mo — exceed it and mail silently
+  fails.
+- Anthropic + Google OAuth quotas are shared with prod; fine for QA, not
+  for sustained automated load.
+
 ## Out of scope (deliberate)
 Persistence, auth, taking the survey, response storage, sharing links.
