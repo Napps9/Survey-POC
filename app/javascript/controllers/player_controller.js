@@ -48,14 +48,15 @@ export default class extends Controller {
 
   // Wires auto-advance for all question types that have a clear "selected"
   // signal. Sliders/NPS/rating debounce for 600ms after the last interaction
-  // so users can tweak; single-select advances instantly; tap_card waits a
+  // so users can tweak; single-select waits 800ms so respondents have a
+  // window to change their mind after the first tap; tap_card waits a
   // beat after the final swipe for the animation to land.
   _wireAutoAdvance() {
     this._advanceTimer = null
     this.element.addEventListener("picker:pick", (e) => {
       // multi-select gets a "Done" chip — no auto-advance
       if (e.detail?.mode === "multi") return
-      this._scheduleAdvance(0)
+      this._scheduleAdvance(800)
     })
     this.element.addEventListener("rating:pick",       () => this._scheduleAdvance(600))
     this.element.addEventListener("slider:settle",     () => this._scheduleAdvance(600))
