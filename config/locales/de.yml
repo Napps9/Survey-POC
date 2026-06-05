@@ -92,7 +92,7 @@ de:
     wizard:
       step_counter: Schritt %{n} von %{total}
   nav:
-    partners: Partner
+    partners: Allianzen
     shared_vertos: Geteilte Vertos
     my_vertos: Meine Vertos
     create: Erstellen

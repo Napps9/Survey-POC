@@ -94,7 +94,7 @@ en:
     wizard:
       step_counter: "Step %{n} of %{total}"
   nav:
-    partners: "Partners"
+    partners: "Alliances"
     shared_vertos: "Shared Vertos"
     my_vertos: "My Vertos"
     create: "Create"

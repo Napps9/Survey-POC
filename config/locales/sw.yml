@@ -92,7 +92,7 @@ sw:
     wizard:
       step_counter: Hatua %{n} kati ya %{total}
   nav:
-    partners: Washirika
+    partners: Ushirikiano
     shared_vertos: Vertos Zilizoshirikishwa
     my_vertos: Vertos Zangu
     create: Unda

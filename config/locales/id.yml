@@ -92,7 +92,7 @@ id:
     wizard:
       step_counter: Langkah %{n} dari %{total}
   nav:
-    partners: Mitra
+    partners: Aliansi
     shared_vertos: Verto Dibagikan
     my_vertos: Verto Saya
     create: Buat

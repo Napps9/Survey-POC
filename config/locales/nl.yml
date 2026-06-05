@@ -92,7 +92,7 @@ nl:
     wizard:
       step_counter: Stap %{n} van %{total}
   nav:
-    partners: Partners
+    partners: Allianties
     shared_vertos: Gedeelde Vertos
     my_vertos: Mijn Vertos
     create: Aanmaken

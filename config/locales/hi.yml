@@ -92,7 +92,7 @@ hi:
     wizard:
       step_counter: चरण %{n} / %{total}
   nav:
-    partners: साझेदार
+    partners: गठबंधन
     shared_vertos: साझा किए गए Verto
     my_vertos: मेरे Verto
     create: बनाएं

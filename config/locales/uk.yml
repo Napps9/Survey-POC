@@ -92,7 +92,7 @@ uk:
     wizard:
       step_counter: Крок %{n} з %{total}
   nav:
-    partners: Партнери
+    partners: Альянси
     shared_vertos: Спільні Vertos
     my_vertos: Мої Vertos
     create: Створити

@@ -92,7 +92,7 @@ ar:
     wizard:
       step_counter: الخطوة %{n} من %{total}
   nav:
-    partners: الشركاء
+    partners: التحالفات
     shared_vertos: فيرتوهات مشتركة
     my_vertos: فيرتوهاتي
     create: إنشاء

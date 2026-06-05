@@ -92,7 +92,7 @@ he:
     wizard:
       step_counter: שלב %{n} מתוך %{total}
   nav:
-    partners: שותפים
+    partners: בריתות
     shared_vertos: Vertos משותפים
     my_vertos: ה-Vertos שלי
     create: צור
