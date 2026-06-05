@@ -92,7 +92,7 @@ ru:
     wizard:
       step_counter: Шаг %{n} из %{total}
   nav:
-    partners: Альянсы
+    alliances: Альянсы
     shared_vertos: Общие Vertos
     my_vertos: Мои Vertos
     create: Создать

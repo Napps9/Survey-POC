@@ -92,7 +92,7 @@ ja:
     wizard:
       step_counter: "%{total}ステップ中 %{n}"
   nav:
-    partners: アライアンス
+    alliances: アライアンス
     shared_vertos: 共有Vertos
     my_vertos: マイVertos
     create: 作成

@@ -92,7 +92,7 @@ tr:
     wizard:
       step_counter: Adım %{n} / %{total}
   nav:
-    partners: İttifaklar
+    alliances: İttifaklar
     shared_vertos: Paylaşılan Verto'lar
     my_vertos: Verto'larım
     create: Oluştur

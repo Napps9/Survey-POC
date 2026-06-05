@@ -92,7 +92,7 @@ vi:
     wizard:
       step_counter: Bước %{n} / %{total}
   nav:
-    partners: Liên minh
+    alliances: Liên minh
     shared_vertos: Vertos được chia sẻ
     my_vertos: Vertos của tôi
     create: Tạo

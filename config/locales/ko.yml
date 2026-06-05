@@ -92,7 +92,7 @@ ko:
     wizard:
       step_counter: "%{total}단계 중 %{n}단계"
   nav:
-    partners: 얼라이언스
+    alliances: 얼라이언스
     shared_vertos: 공유된 Verto
     my_vertos: 내 Verto
     create: 만들기

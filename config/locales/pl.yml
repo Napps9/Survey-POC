@@ -92,7 +92,7 @@ pl:
     wizard:
       step_counter: Krok %{n} z %{total}
   nav:
-    partners: Sojusze
+    alliances: Sojusze
     shared_vertos: Udostępnione Verto
     my_vertos: Moje Verto
     create: Utwórz
