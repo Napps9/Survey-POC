@@ -114,6 +114,40 @@
         </div>
       <% end %>
 
+      <%# ── Add a Verto ── (above the list so the primary action is in
+          immediate view rather than buried beneath an empty/long Vertos
+          section) %>
+      <% if is_admin %>
+        <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px 22px;margin-bottom:32px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#0CA7FF;"></span>
+            <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.add_section") %></span>
+          </div>
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:4px;"><%= t("alliances.add_heading") %></div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin-bottom:14px;">
+            <%= t("alliances.add_body") %>
+          </div>
+
+          <% if @available_surveys.empty? %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);padding:14px 0;">
+              <%= t("alliances.no_more_vertos") %> <%= link_to t("alliances.create_new_verto"), new_survey_path, style: "color:#01EACB;text-decoration:none;" %>
+            </div>
+          <% else %>
+            <%= form_with url: alliance_alliance_vertos_path(@alliance), method: :post, local: true,
+                  html: { style: "display:flex;gap:10px;flex-wrap:wrap;align-items:center;" } do |f| %>
+              <%= f.select :survey_id,
+                    @available_surveys.map { |s| [ [ s.theme.presence, s.title.presence ].compact.uniq.first(2).join(" — ").truncate(72), s.id ] },
+                    {},
+                    style: "flex:1;min-width:240px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;" %>
+              <button type="submit"
+                      style="background:#01EACB;border:none;border-radius:100px;padding:11px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;cursor:pointer;">
+                <%= t("alliances.add_submit") %>
+              </button>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+
       <%# ── Vertos in this alliance ── %>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
         <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.vertos_section") %></span>
@@ -188,38 +222,6 @@
                 </div>
               <% end %>
             </div>
-          <% end %>
-        </div>
-      <% end %>
-
-      <%# ── Add a Verto ── %>
-      <% if is_admin %>
-        <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px 22px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-            <span style="width:6px;height:6px;border-radius:50%;background:#0CA7FF;"></span>
-            <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.add_section") %></span>
-          </div>
-          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:4px;"><%= t("alliances.add_heading") %></div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin-bottom:14px;">
-            <%= t("alliances.add_body") %>
-          </div>
-
-          <% if @available_surveys.empty? %>
-            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);padding:14px 0;">
-              <%= t("alliances.no_more_vertos") %> <%= link_to t("alliances.create_new_verto"), new_survey_path, style: "color:#01EACB;text-decoration:none;" %>
-            </div>
-          <% else %>
-            <%= form_with url: alliance_alliance_vertos_path(@alliance), method: :post, local: true,
-                  html: { style: "display:flex;gap:10px;flex-wrap:wrap;align-items:center;" } do |f| %>
-              <%= f.select :survey_id,
-                    @available_surveys.map { |s| [ [ s.theme.presence, s.title.presence ].compact.uniq.first(2).join(" — ").truncate(72), s.id ] },
-                    {},
-                    style: "flex:1;min-width:240px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;" %>
-              <button type="submit"
-                      style="background:#01EACB;border:none;border-radius:100px;padding:11px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;cursor:pointer;">
-                <%= t("alliances.add_submit") %>
-              </button>
-            <% end %>
           <% end %>
         </div>
       <% end %>
