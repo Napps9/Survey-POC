@@ -2702,13 +2702,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .wizard-mobile-hint     { display: none; }
 .wizard-mobile-eyebrow  { display: none; }
 
-/* Player: footer hidden everywhere. Single-pick answers auto-advance on
-   selection; sliders/NPS/rating debounce for 600ms after the last
-   interaction; tap_card advances when the stack empties. Card types
-   without a single "selected" signal (welcome, multi-select, open-ended)
-   render a .player-advance-chip inline. The footer DOM is kept so
-   _showThankyou() can still toggle the hidden buttons safely. */
-.preview-overlay .preview-footer { display: none !important; }
+/* Player footer (Back / Next / Finish) is visible for every card —
+   respondents pace themselves explicitly, no auto-advance. The
+   inline .player-advance-chip is still rendered on welcome ("Tap to
+   begin") and on cards without a single "selected" signal (multi-select,
+   open-ended) as a convenient inline confirm. The editor preview keeps
+   its footer hidden (preview-verto is read-only navigation). */
+.preview-overlay[data-preview-verto-target="overlay"] .preview-footer { display: none !important; }
 
 /* Tailwind v4 only compiles class names it can find as literal tokens in
    source files; classList.add("hidden") at runtime escapes that scan,

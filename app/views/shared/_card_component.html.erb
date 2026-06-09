@@ -291,11 +291,11 @@
     </div>
   <% end %>
 
-  <%# Player-mode advance chip. Auto-advancing types (single-pick, sliders,
-      tap_card, NPS) don't need it — they advance on the selection event.
-      The remaining types (welcome, multi-select, open-ended) get a chip
-      that the user taps to confirm and move on. The chip text reads
-      "Begin" on welcome and "Continue" elsewhere. %>
+  <%# Player-mode advance chip. The footer Back/Next buttons drive navigation
+      for every card now, but welcome cards still surface a prominent
+      "Tap to begin" CTA and multi-select / open-ended cards still offer
+      an inline "Continue" near the answer area as a convenient alternative
+      to the footer Next button. %>
   <%
     chip_label =
       if    type == "welcome_card"                       then t("card.begin",    default: "Tap to begin")
