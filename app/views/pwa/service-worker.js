@@ -10,7 +10,10 @@
 // Drain queue on Background Sync where supported; opportunistically on any
 // fetch event and on explicit page messages elsewhere (iOS Safari fallback).
 
-const CACHE_VERSION = "playverto-v1"
+// Bump on any player JS/CSS/HTML behaviour change so existing respondents
+// don't keep getting the stale-while-revalidate copy. The activate handler
+// below deletes every cache that doesn't start with the current version.
+const CACHE_VERSION = "playverto-v2"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
