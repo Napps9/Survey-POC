@@ -291,22 +291,4 @@
     </div>
   <% end %>
 
-  <%# Player-mode advance chip. The footer Back/Next buttons drive navigation
-      for every card now, but welcome cards still surface a prominent
-      "Tap to begin" CTA and multi-select / open-ended cards still offer
-      an inline "Continue" near the answer area as a convenient alternative
-      to the footer Next button. %>
-  <%
-    chip_label =
-      if    type == "welcome_card"                       then t("card.begin",    default: "Tap to begin")
-      elsif %w[select_many select_many_grid].include?(type) || type == "open_ended" then t("card.continue", default: "Continue →")
-      else nil
-      end
-  %>
-  <% if mode == :player && chip_label %>
-    <button type="button" class="player-advance-chip"
-            data-action="click->player#advance">
-      <%= chip_label %>
-    </button>
-  <% end %>
 </div>

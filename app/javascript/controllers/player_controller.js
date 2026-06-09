@@ -21,16 +21,6 @@ export default class extends Controller {
     this._update()
   }
 
-  // Called by inline "Begin" / "Continue" chips on welcome, multi-select,
-  // and open-ended cards. Same effect as tapping Next in the footer.
-  advance() {
-    if (this.currentValue >= this.cardTargets.length - 1) {
-      this.finish()
-    } else {
-      this.next()
-    }
-  }
-
   next() {
     this._capture(this.currentValue)
     this._saveProgress()

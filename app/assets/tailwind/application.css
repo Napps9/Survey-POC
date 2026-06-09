@@ -2702,12 +2702,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .wizard-mobile-hint     { display: none; }
 .wizard-mobile-eyebrow  { display: none; }
 
-/* Player footer (Back / Next / Finish) is visible for every card —
-   respondents pace themselves explicitly, no auto-advance. The
-   inline .player-advance-chip is still rendered on welcome ("Tap to
-   begin") and on cards without a single "selected" signal (multi-select,
-   open-ended) as a convenient inline confirm. The editor preview keeps
-   its footer hidden (preview-verto is read-only navigation). */
+/* Player footer (Back / Next / Finish) is the sole navigation for every
+   card — respondents pace themselves explicitly, no auto-advance. The
+   editor preview keeps its footer hidden (preview-verto is read-only). */
 .preview-overlay[data-preview-verto-target="overlay"] .preview-footer { display: none !important; }
 
 /* Tailwind v4 only compiles class names it can find as literal tokens in
@@ -2715,30 +2712,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
    so the player_controller's hide/show logic for the thank-you ↔ compare
    view stops working. Define the class explicitly so JS toggles do too. */
 .hidden { display: none !important; }
-
-/* Inline advance chip. Absolute-positioned so vertical centering of
-   the question content above isn't shifted by the chip's height.
-   Centered horizontally with auto width so it reads as a button, not
-   a bottom bar — max-width keeps long labels from spanning the card. */
-.player-advance-chip {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: calc(20px + env(safe-area-inset-bottom));
-  min-height: 48px;
-  max-width: calc(100% - 48px);
-  padding: 12px 32px;
-  border: none;
-  border-radius: 100px;
-  background: var(--brand-cta, #01EACB);
-  color: var(--brand-cta-text, #1C2034);
-  font-family: "Alata", sans-serif;
-  font-size: 15px;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.player-advance-chip:active { transform: translateX(-50%) scale(0.98); }
 
 @media (max-width: 767px) {
 
@@ -2979,9 +2952,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
     gap: 14px;
     overflow: hidden;
     position: relative;
-  }
-  .preview-overlay .split-card:has(.player-advance-chip) .split-right {
-    padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
   .preview-overlay .q-eyebrow {
     color: #FF1E6F;
