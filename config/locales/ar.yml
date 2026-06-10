@@ -56,6 +56,8 @@ ar:
     ask_verto: اسأل Verto
     analysing: جارٍ تحليل الإجابات…
   player:
+    preview_banner: "وضع المعاينة — لن يتم حفظ الإجابات"
+    exit_preview: "إنهاء المعاينة"
     thank_you_title: شكرًا لك!
     thank_you_sub: تم تسجيل إجاباتك.
     thank_you_from: من %{org}
@@ -266,6 +268,7 @@ ar:
     ranked_for: مرتبة حسب الملاءمة لـ
     this_card: هذه البطاقة
   dashboard_card:
+    preview: "معاينة"
     badge_archived: مؤرشف
     badge_live: مباشر
     badge_draft: مسودة

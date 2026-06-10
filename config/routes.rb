@@ -41,6 +41,7 @@ Rails.application.routes.draw do
   post "surveys/generate",            to: "surveys#generate", as: :generate_survey
   post "surveys/import_pdf",          to: "surveys#import_pdf", as: :import_pdf_survey
   post "surveys/:id/publish",         to: "surveys#publish",  as: :publish_survey
+  get  "surveys/:id/preview",         to: "surveys#preview",  as: :preview_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
   post "surveys/:id/shuffle_assets",  to: "surveys#shuffle_assets",  as: :shuffle_survey_assets
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results

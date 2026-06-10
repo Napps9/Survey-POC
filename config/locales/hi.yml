@@ -56,6 +56,8 @@ hi:
     ask_verto: Verto से पूछें
     analysing: उत्तरों का विश्लेषण किया जा रहा है…
   player:
+    preview_banner: "पूर्वावलोकन मोड — जवाब सहेजे नहीं जाएँगे"
+    exit_preview: "पूर्वावलोकन से बाहर निकलें"
     thank_you_title: धन्यवाद!
     thank_you_sub: आपके उत्तर दर्ज कर लिए गए हैं।
     thank_you_from: "%{org} की ओर से"
@@ -266,6 +268,7 @@ hi:
     ranked_for: उपयुक्तता अनुसार क्रमित
     this_card: यह कार्ड
   dashboard_card:
+    preview: "पूर्वावलोकन"
     badge_archived: संग्रहीत
     badge_live: लाइव
     badge_draft: ड्राफ़्ट

@@ -56,6 +56,8 @@ uk:
     ask_verto: Запитати Verto
     analysing: Аналіз відповідей…
   player:
+    preview_banner: "Режим попереднього перегляду — відповіді не зберігаються"
+    exit_preview: "Вийти з перегляду"
     thank_you_title: Дякуємо!
     thank_you_sub: Ваші відповіді збережено.
     thank_you_from: від %{org}
@@ -266,6 +268,7 @@ uk:
     ranked_for: Ранжовано за відповідністю для
     this_card: цієї картки
   dashboard_card:
+    preview: "Попередній перегляд"
     badge_archived: В архіві
     badge_live: Активний
     badge_draft: Чернетка

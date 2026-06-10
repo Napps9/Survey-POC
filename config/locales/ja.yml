@@ -56,6 +56,8 @@ ja:
     ask_verto: Vertoに聞く
     analysing: 回答を分析中…
   player:
+    preview_banner: "プレビューモード — 回答は保存されません"
+    exit_preview: "プレビューを終了"
     thank_you_title: ありがとうございました！
     thank_you_sub: 回答が記録されました。
     thank_you_from: "%{org} より"
@@ -266,6 +268,7 @@ ja:
     ranked_for: 適合度でランク付け：
     this_card: このカード
   dashboard_card:
+    preview: "プレビュー"
     badge_archived: アーカイブ済み
     badge_live: ライブ
     badge_draft: 下書き

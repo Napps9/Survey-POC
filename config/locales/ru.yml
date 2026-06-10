@@ -56,6 +56,8 @@ ru:
     ask_verto: Спросить Verto
     analysing: Анализ ответов…
   player:
+    preview_banner: "Режим предпросмотра — ответы не сохраняются"
+    exit_preview: "Выйти из предпросмотра"
     thank_you_title: Спасибо!
     thank_you_sub: Ваши ответы сохранены.
     thank_you_from: от %{org}
@@ -266,6 +268,7 @@ ru:
     ranked_for: Отсортировано по подходящести для
     this_card: этой карточки
   dashboard_card:
+    preview: "Предпросмотр"
     badge_archived: В архиве
     badge_live: Активен
     badge_draft: Черновик

@@ -27,6 +27,12 @@ class Survey < ApplicationRecord
     verto_locales.size > 1
   end
 
+  # The Verto content language to render for a viewer: the first preferred
+  # candidate the Verto exists in, else its primary language.
+  def display_locale_for(*preferred)
+    preferred.flatten.compact.map(&:to_s).find { |l| verto_locales.include?(l) } || default_locale
+  end
+
   # Returns a copy of `cards` with `translated` (an array, aligned per-card, of
   # { "text", "description", "options" }) merged into each card's i18n[locale].
   # Structural fields are untouched, so positional answer alignment is preserved.

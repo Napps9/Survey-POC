@@ -6,7 +6,7 @@ class SurveysController < ApplicationController
   MAX_PDF_BYTES = 10.megabytes
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
-  before_action :set_survey,           only: [ :show, :publish, :update_settings ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :update_settings ]
   before_action :set_survey_including_archived, only: [ :results ]
 
   def index
@@ -22,6 +22,17 @@ class SurveysController < ApplicationController
 
   def show
     render :show
+  end
+
+  # GET /surveys/:id/preview
+  # Step through the Verto exactly as a respondent will see it. Renders the
+  # player with its recording endpoints disabled, so nothing is ever saved —
+  # and unlike the public /play link it also works for unpublished drafts.
+  def preview
+    @preview    = true
+    @chromeless = true
+    @display_locale = @survey.display_locale_for(params[:lang], Current.locale)
+    render "player/show", layout: "fullscreen"
   end
 
   def generate

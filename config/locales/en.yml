@@ -58,6 +58,8 @@ en:
     ask_verto: "Ask Verto"
     analysing: "Analysing responses…"
   player:
+    preview_banner: "Preview mode — responses aren't saved"
+    exit_preview: "Exit preview"
     thank_you_title: "Thanks for taking part!"
     thank_you_sub: "Your responses have been recorded."
     thank_you_from: "from %{org}"
@@ -268,6 +270,7 @@ en:
     ranked_for: "Ranked by fit for"
     this_card: "this card"
   dashboard_card:
+    preview: "Preview"
     badge_archived: "Archived"
     badge_live: "Live"
     badge_draft: "Draft"

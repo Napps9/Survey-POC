@@ -56,6 +56,8 @@ nl:
     ask_verto: Vraag het Verto
     analysing: Antwoorden analyseren…
   player:
+    preview_banner: "Voorbeeldmodus — antwoorden worden niet opgeslagen"
+    exit_preview: "Voorbeeld sluiten"
     thank_you_title: Bedankt!
     thank_you_sub: Je antwoorden zijn vastgelegd.
     thank_you_from: van %{org}
@@ -266,6 +268,7 @@ nl:
     ranked_for: Gerangschikt op geschiktheid voor
     this_card: deze kaart
   dashboard_card:
+    preview: "Voorbeeld"
     badge_archived: Gearchiveerd
     badge_live: Live
     badge_draft: Concept

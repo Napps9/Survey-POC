@@ -56,6 +56,8 @@ pt:
     ask_verto: Perguntar ao Verto
     analysing: A analisar respostas…
   player:
+    preview_banner: "Modo de pré-visualização — as respostas não são guardadas"
+    exit_preview: "Sair da pré-visualização"
     thank_you_title: Obrigado!
     thank_you_sub: As suas respostas foram registadas.
     thank_you_from: de %{org}
@@ -266,6 +268,7 @@ pt:
     ranked_for: Ordenado por adequação para
     this_card: este cartão
   dashboard_card:
+    preview: "Pré-visualizar"
     badge_archived: Arquivado
     badge_live: Ao vivo
     badge_draft: Rascunho

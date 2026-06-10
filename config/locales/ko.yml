@@ -56,6 +56,8 @@ ko:
     ask_verto: Verto에게 묻기
     analysing: 응답 분석 중…
   player:
+    preview_banner: "미리보기 모드 — 응답은 저장되지 않습니다"
+    exit_preview: "미리보기 종료"
     thank_you_title: 감사합니다!
     thank_you_sub: 응답이 기록되었습니다.
     thank_you_from: "%{org} 제공"
@@ -266,6 +268,7 @@ ko:
     ranked_for: 적합도 순위
     this_card: 이 카드
   dashboard_card:
+    preview: "미리보기"
     badge_archived: 보관됨
     badge_live: 라이브
     badge_draft: 초안
