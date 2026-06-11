@@ -9,7 +9,7 @@ services:
     # Brakeman, importmap audit) are green on GitHub.
     autoDeployTrigger: checksPass
     buildCommand: "./bin/render-build.sh"
-    startCommand: "bundle exec rails db:prepare && bundle exec rails db:seed && bundle exec rails server -e production -p $PORT"
+    startCommand: "bundle exec rails db:prepare && bundle exec rails server -e production -p $PORT"
     healthCheckPath: /up
     envVars:
       - key: RAILS_ENV
