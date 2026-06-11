@@ -56,6 +56,12 @@ sw:
     ask_verto: Muulize Verto
     analysing: Inachambua majibu…
   player:
+    region_notice_linked: "Verto hii hukusanya data za kanda — unajibu kama %{region}. Ukimaliza utaona jinsi kanda nyingine zilivyojibu."
+    region_notice_pick: "Verto hii hukusanya data za kanda — ukimaliza utaona jinsi kanda nyingine zilivyojibu. Kanda yako:"
+    region_prefer_not: "Sipendelei kusema"
+    see_regions: "Ona jinsi kanda zilivyojibu"
+    regions_title: "Majibu kutoka duniani kote"
+    region_compare_hint: "Gusa kanda hapa chini ili kuilinganisha na majibu yako"
     preview_banner: "Hali ya kuhakiki — majibu hayahifadhiwi"
     exit_preview: "Funga hakiki"
     thank_you_title: Asante!
@@ -69,6 +75,12 @@ sw:
     submit: Wasilisha ✓
   js:
     player:
+      region_optout: "Usishiriki kanda yangu"
+      region_optin: "Shiriki kanda yangu"
+      region_meta: "Majibu %{count} yalishiriki kanda"
+      region_answered: "%{count} wamejibu"
+      region_compare: "Linganisha →"
+      region_empty: "Hakuna majibu ya kanda bado — lako linaweza kuwa la kwanza!"
       progress: Kadi %{n} kati ya %{total}
       queued: Imehifadhiwa — itasawazishwa utakaporejea mtandaoni
       compare_cta: Ona matokeo yako yakilinganishwa na wengine →

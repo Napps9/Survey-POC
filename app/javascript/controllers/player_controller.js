@@ -3,11 +3,16 @@ import { t } from "lib/i18n"
 
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
-                    "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta"]
+                    "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta",
+                    "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
+                    "regionDetail", "regionDetailTitle", "regionDetailList"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
     resultsUrl: { type: String, default: "" },
+    regionsUrl: { type: String, default: "" },
+    regionCountry: { type: String, default: "" },
+    regionLabel: { type: String, default: "" },
     locale: { type: String, default: "" },
     showComparison: { type: Boolean, default: false },
     current: { type: Number, default: 0 }
@@ -15,6 +20,8 @@ export default class extends Controller {
 
   _answers = {}
   _registered = false
+  _regionOptOut = false
+  _regionsData = null
 
   connect() {
     this._sessionToken = this._ensureToken()
@@ -39,6 +46,44 @@ export default class extends Controller {
     }
   }
 
+  // Region choice travels with every save. The opt-out flag is explicit so
+  // the server clears a link-borne region too — consent always wins.
+  _payload() {
+    const payload = { session_token: this._sessionToken, answers: this._answers, locale: this.localeValue }
+    payload.region_opt_out = this._regionOptOut
+    if (!this._regionOptOut && this.regionCountryValue) {
+      payload.region_country = this.regionCountryValue
+      payload.region_label   = this.regionLabelValue
+    }
+    return payload
+  }
+
+  // Base-link respondents pick their region from the Verto's tags ("" = prefer
+  // not to say). Option values are "CC|label".
+  setRegion(e) {
+    const v   = e.target.value || ""
+    const sep = v.indexOf("|")
+    this.regionCountryValue = sep >= 0 ? v.slice(0, sep) : v
+    this.regionLabelValue   = sep >= 0 ? v.slice(sep + 1) : ""
+    this._regionOptOut = v === ""
+    this._resaveRegion()
+  }
+
+  // Link-borne region: the notice bar's opt-out toggle.
+  toggleRegionOptOut(e) {
+    this._regionOptOut = !this._regionOptOut
+    e.target.textContent = t(this._regionOptOut ? "player.region_optin" : "player.region_optout")
+    this._resaveRegion()
+  }
+
+  // If progress already registered this session, push the new region consent
+  // state immediately rather than waiting for the next navigation.
+  _resaveRegion() {
+    if (!this._registered) return
+    this._registered = false
+    this._saveProgress()
+  }
+
   async finish() {
     this._capture(this.currentValue)
     // Owner preview runs without a submit endpoint — nothing is recorded,
@@ -49,7 +94,7 @@ export default class extends Controller {
       const res = await fetch(this.submitUrlValue, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_token: this._sessionToken, answers: this._answers, locale: this.localeValue })
+        body: JSON.stringify(this._payload())
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.clone().json().catch(() => null)
@@ -89,7 +134,7 @@ export default class extends Controller {
       const res = await fetch(this.progressUrlValue, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_token: this._sessionToken, answers: this._answers, locale: this.localeValue })
+        body: JSON.stringify(this._payload())
       })
       if (res.ok) this._registered = true
     } catch (_) { /* retry on the next navigation */ }
@@ -217,6 +262,115 @@ export default class extends Controller {
       this.compareBtnTarget.disabled = false
       this.compareBtnTarget.textContent = t("player.compare_cta")
     }
+  }
+
+  // ── Regions map: where answers came from, per-region comparison ──
+
+  async showRegions() {
+    if (!this.regionsUrlValue || !this.hasRegionsPanelTarget) return
+    this.thankyouMainTarget.classList.add("hidden")
+    if (this.hasComparisonTarget) this.comparisonTarget.classList.add("hidden")
+    this.regionsPanelTarget.classList.remove("hidden")
+    if (this._regionsData) return
+    this.regionsMetaTarget.textContent = t("player.compare_loading")
+    try {
+      const res  = await fetch(this.regionsUrlValue, { headers: { "Accept": "application/json" } })
+      const data = await res.json()
+      if (!data.ok) throw new Error(data.error || "Failed to load regions")
+      this._regionsData = data
+      this._renderRegions(data)
+    } catch (_) {
+      this.regionsMetaTarget.textContent = t("player.compare_error")
+    }
+  }
+
+  // Back button: detail view returns to the map, the map closes the panel.
+  hideRegions() {
+    if (this.hasRegionDetailTarget && !this.regionDetailTarget.classList.contains("hidden")) {
+      this.regionDetailTarget.classList.add("hidden")
+      this.regionsMainTarget.classList.remove("hidden")
+      return
+    }
+    this.regionsPanelTarget.classList.add("hidden")
+    this.thankyouMainTarget.classList.remove("hidden")
+  }
+
+  _renderRegions(data) {
+    const regions = data.regions || []
+    this.regionsMetaTarget.textContent = t("player.region_meta", { count: data.total_tagged || 0 })
+
+    // Choropleth: tint each country by its share of region-tagged responses.
+    // Some countries are <g> groups — inline fill must land on the paths to
+    // beat the stylesheet's base fill.
+    const byCountry = {}
+    regions.forEach(r => { byCountry[r.country] = (byCountry[r.country] || 0) + r.responders })
+    const max = Math.max(1, ...Object.values(byCountry))
+    const svg = this.regionsPanelTarget.querySelector(".world-map")
+    if (svg) Object.entries(byCountry).forEach(([cc, n]) => {
+      const el = svg.querySelector(`#${cc.toLowerCase()}`)
+      if (!el) return
+      const alpha = 0.18 + 0.72 * (n / max)
+      const paths = el.tagName.toLowerCase() === "g" ? el.querySelectorAll("path") : [el]
+      paths.forEach(p => { p.style.fill = `rgba(1,234,203,${alpha.toFixed(2)})` })
+      const tip = document.createElementNS("http://www.w3.org/2000/svg", "title")
+      tip.textContent = `${regions.find(r => r.country === cc)?.country_name || cc}: ${n}`
+      el.appendChild(tip)
+      el.style.cursor = "pointer"
+      el.addEventListener("click", () => this._highlightCountry(cc))
+    })
+
+    const list = this.regionsListTarget
+    list.innerHTML = ""
+    if (regions.length === 0) {
+      const empty = document.createElement("div")
+      empty.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);text-align:center;padding:10px;"
+      empty.textContent = t("player.region_empty")
+      list.appendChild(empty)
+      return
+    }
+    regions.forEach(region => {
+      const row = document.createElement("button")
+      row.type = "button"
+      row.className = "region-row"
+      row.dataset.country = region.country
+      const name = document.createElement("span")
+      name.style.cssText = "flex:1;text-align:start;font-family:'ABeeZee',sans-serif;font-size:13px;color:#fff;"
+      name.textContent = region.label ? `${region.country_name} · ${region.label}` : region.country_name
+      const count = document.createElement("span")
+      count.style.cssText = "font-family:'Alata',sans-serif;font-size:12px;color:#01EACB;"
+      count.textContent = t("player.region_answered", { count: region.responders })
+      const arrow = document.createElement("span")
+      arrow.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);"
+      arrow.textContent = t("player.region_compare")
+      row.append(name, count, arrow)
+      row.addEventListener("click", () => this._showRegionDetail(region))
+      list.appendChild(row)
+    })
+  }
+
+  _highlightCountry(cc) {
+    this.regionsListTarget.querySelectorAll(".region-row").forEach(row => {
+      row.classList.toggle("active-country", row.dataset.country === cc)
+    })
+    const first = this.regionsListTarget.querySelector(`.region-row[data-country="${cc}"]`)
+    if (first) first.scrollIntoView({ behavior: "smooth", block: "nearest" })
+  }
+
+  // Region vs you: reuses the comparison row renderer, so each question shows
+  // the region's distribution with this respondent's own answer highlighted.
+  _showRegionDetail(region) {
+    this.regionsMainTarget.classList.add("hidden")
+    this.regionDetailTarget.classList.remove("hidden")
+    const name = region.label ? `${region.country_name} · ${region.label}` : region.country_name
+    this.regionDetailTitleTarget.textContent =
+      `${name} — ${t("player.region_answered", { count: region.responders })}`
+    const list = this.regionDetailListTarget
+    list.innerHTML = ""
+    ;(region.results || []).forEach(row => {
+      if (row.type === "welcome_card") return
+      const mine = this._answers[String(row.index)]?.value
+      list.appendChild(this._buildRow(row, mine))
+    })
   }
 
   _renderComparison(data) {

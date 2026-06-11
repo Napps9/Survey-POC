@@ -56,6 +56,12 @@ nl:
     ask_verto: Vraag het Verto
     analysing: Antwoorden analyseren…
   player:
+    region_notice_linked: "Deze Verto verzamelt regionale gegevens — je antwoordt als %{region}. Na afloop zie je hoe andere regio's hebben geantwoord."
+    region_notice_pick: "Deze Verto verzamelt regionale gegevens — na afloop zie je hoe andere regio's hebben geantwoord. Jouw regio:"
+    region_prefer_not: "Zeg ik liever niet"
+    see_regions: "Bekijk antwoorden per regio"
+    regions_title: "Antwoorden van over de hele wereld"
+    region_compare_hint: "Tik hieronder op een regio om die met jouw antwoorden te vergelijken"
     preview_banner: "Voorbeeldmodus — antwoorden worden niet opgeslagen"
     exit_preview: "Voorbeeld sluiten"
     thank_you_title: Bedankt!
@@ -69,6 +75,12 @@ nl:
     submit: Verzenden ✓
   js:
     player:
+      region_optout: "Mijn regio niet delen"
+      region_optin: "Mijn regio delen"
+      region_meta: "%{count} antwoorden met een regio"
+      region_answered: "%{count} geantwoord"
+      region_compare: "Vergelijk →"
+      region_empty: "Nog geen regionale antwoorden — die van jou kan de eerste zijn!"
       progress: Kaart %{n} van %{total}
       queued: Opgeslagen — wordt gesynchroniseerd zodra je weer online bent
       compare_cta: Bekijk je resultaten ten opzichte van anderen →

@@ -91,6 +91,53 @@
           })()
         </script>
 
+        <%# ── Regions map — where responses came from (region-tagged Vertos) ── %>
+        <% region_segments = @segments.select { |s| s[:id].to_s.start_with?("region_") } %>
+        <% if region_segments.any? %>
+          <%
+            # cc → { count:, url:, name: }: counts summed across a country's
+            # sub-regions; clicking a country opens its first region segment.
+            map_data = {}
+            @survey.survey_region_links.order(:created_at).each do |link|
+              seg = region_segments.find { |s| s[:id] == "region_#{link.id}" }
+              next unless seg
+              cc = link.country_code.downcase
+              map_data[cc] ||= { count: 0, url: survey_results_path(@survey, segment: seg[:id]), name: link.country_name }
+              map_data[cc][:count] += seg[:count]
+            end
+          %>
+          <div style="margin:0 0 14px;padding:14px 14px 10px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 Regions</span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a country to filter results to its region</span>
+            </div>
+            <div style="max-width:640px;margin:0 auto;">
+              <%= render "shared/world_map" %>
+            </div>
+          </div>
+          <script type="application/json" id="results-region-map-data"><%= map_data.to_json.html_safe %></script>
+          <script>
+            (() => {
+              const data = JSON.parse(document.getElementById("results-region-map-data").textContent)
+              const svg  = document.querySelector(".world-map")
+              if (!svg) return
+              const max = Math.max(1, ...Object.values(data).map(d => d.count))
+              Object.entries(data).forEach(([cc, d]) => {
+                const el = svg.querySelector("#" + cc)
+                if (!el) return
+                const alpha = d.count === 0 ? 0.14 : 0.18 + 0.72 * (d.count / max)
+                const paths = el.tagName.toLowerCase() === "g" ? el.querySelectorAll("path") : [el]
+                paths.forEach(p => p.style.fill = `rgba(1,234,203,${alpha.toFixed(2)})`)
+                const tip = document.createElementNS("http://www.w3.org/2000/svg", "title")
+                tip.textContent = `${d.name}: ${d.count}`
+                el.appendChild(tip)
+                el.style.cursor = "pointer"
+                el.addEventListener("click", () => { window.location = d.url })
+              })
+            })()
+          </script>
+        <% end %>
+
         <%# ── Filterable feed: stats + segment pills + per-question cards ── %>
         <%= turbo_frame_tag "results-feed" do %>
 

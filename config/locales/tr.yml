@@ -56,6 +56,12 @@ tr:
     ask_verto: Verto'ya sor
     analysing: Yanıtlar analiz ediliyor…
   player:
+    region_notice_linked: "Bu Verto bölgesel veri topluyor — %{region} olarak yanıtlıyorsunuz. Bitirdiğinizde diğer bölgelerin yanıtlarını görebilirsiniz."
+    region_notice_pick: "Bu Verto bölgesel veri topluyor — bitirdiğinizde diğer bölgelerin yanıtlarını görebilirsiniz. Bölgeniz:"
+    region_prefer_not: "Belirtmek istemiyorum"
+    see_regions: "Bölgelerin yanıtlarını gör"
+    regions_title: "Dünyanın dört bir yanından yanıtlar"
+    region_compare_hint: "Yanıtlarınızla karşılaştırmak için aşağıdan bir bölgeye dokunun"
     preview_banner: "Önizleme modu — yanıtlar kaydedilmez"
     exit_preview: "Önizlemeden çık"
     thank_you_title: Teşekkürler!
@@ -69,6 +75,12 @@ tr:
     submit: Gönder ✓
   js:
     player:
+      region_optout: "Bölgemi paylaşma"
+      region_optin: "Bölgemi paylaş"
+      region_meta: "%{count} yanıt bölge paylaştı"
+      region_answered: "%{count} yanıtladı"
+      region_compare: "Karşılaştır →"
+      region_empty: "Henüz bölgesel yanıt yok — ilki sizinki olabilir!"
       progress: "%{total} karttan %{n}. kart"
       queued: Kaydedildi — çevrimiçi olduğunuzda eşitlenecek
       compare_cta: Sonuçlarınızı diğerleriyle karşılaştırın →

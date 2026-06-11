@@ -3327,3 +3327,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "ABeeZee", sans-serif;
   font-size: 12px;
 }
+
+/* ── Region tags: world map + region list (player regions view & results) ── */
+.world-map { width: 100%; height: auto; display: block; }
+.world-map path { fill: rgba(255,255,255,0.10); transition: fill 0.2s; }
+.region-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.region-row:hover { border-color: rgba(1,234,203,0.4); background: rgba(1,234,203,0.06); }
+.region-row.active-country { border-color: #01EACB; background: rgba(1,234,203,0.08); }

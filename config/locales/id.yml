@@ -56,6 +56,12 @@ id:
     ask_verto: Tanya Verto
     analysing: Menganalisis tanggapan…
   player:
+    region_notice_linked: "Verto ini mengumpulkan data regional — kamu menjawab sebagai %{region}. Setelah selesai kamu bisa melihat jawaban region lain."
+    region_notice_pick: "Verto ini mengumpulkan data regional — setelah selesai kamu bisa melihat jawaban region lain. Region kamu:"
+    region_prefer_not: "Lebih baik tidak memberi tahu"
+    see_regions: "Lihat jawaban tiap region"
+    regions_title: "Jawaban dari seluruh dunia"
+    region_compare_hint: "Ketuk sebuah region di bawah untuk membandingkan dengan jawabanmu"
     preview_banner: "Mode pratinjau — jawaban tidak disimpan"
     exit_preview: "Keluar dari pratinjau"
     thank_you_title: Terima kasih!
@@ -69,6 +75,12 @@ id:
     submit: Kirim ✓
   js:
     player:
+      region_optout: "Jangan bagikan region saya"
+      region_optin: "Bagikan region saya"
+      region_meta: "%{count} jawaban menyertakan region"
+      region_answered: "%{count} menjawab"
+      region_compare: "Bandingkan →"
+      region_empty: "Belum ada jawaban regional — jawabanmu mungkin yang pertama!"
       progress: Kartu %{n} dari %{total}
       queued: Tersimpan — akan disinkronkan saat Anda kembali online
       compare_cta: Lihat hasil Anda dibandingkan dengan yang lain →

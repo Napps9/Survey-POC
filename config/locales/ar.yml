@@ -56,6 +56,12 @@ ar:
     ask_verto: اسأل Verto
     analysing: جارٍ تحليل الإجابات…
   player:
+    region_notice_linked: "يجمع هذا الـVerto بيانات إقليمية — أنت تجيب بصفتك من %{region}. عند الانتهاء يمكنك رؤية إجابات المناطق الأخرى."
+    region_notice_pick: "يجمع هذا الـVerto بيانات إقليمية — عند الانتهاء يمكنك رؤية إجابات المناطق الأخرى. منطقتك:"
+    region_prefer_not: "أفضّل عدم التحديد"
+    see_regions: "شاهد إجابات المناطق"
+    regions_title: "إجابات من حول العالم"
+    region_compare_hint: "اختر منطقة أدناه لمقارنتها بإجاباتك"
     preview_banner: "وضع المعاينة — لن يتم حفظ الإجابات"
     exit_preview: "إنهاء المعاينة"
     thank_you_title: شكرًا لك!
@@ -69,6 +75,12 @@ ar:
     submit: إرسال ✓
   js:
     player:
+      region_optout: "عدم مشاركة منطقتي"
+      region_optin: "مشاركة منطقتي"
+      region_meta: "%{count} إجابة شاركت منطقتها"
+      region_answered: "%{count} أجابوا"
+      region_compare: "قارن ←"
+      region_empty: "لا توجد إجابات إقليمية بعد — قد تكون إجابتك الأولى!"
       progress: البطاقة %{n} من %{total}
       queued: تم الحفظ — ستتم المزامنة عند عودتك للاتصال
       compare_cta: شاهد نتائجك مقارنة بالآخرين ←

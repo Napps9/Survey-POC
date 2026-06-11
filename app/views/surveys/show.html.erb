@@ -332,6 +332,57 @@
           <% end %>
         </div>
 
+        <%# Region tags — one link per region; responses carry the region so
+            respondents and the results screen can compare across the map. %>
+        <% region_links = @survey.survey_region_links.order(:created_at) %>
+        <div class="publish-block">
+          <div class="publish-block-title">Region tags</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:10px;line-height:1.45;">
+            Tag this Verto with regions and share one link per region. Responses are
+            grouped by region (consent-based, no precise location), and everyone can
+            compare answers across regions on a world map.
+          </div>
+
+          <% region_links.each do |link| %>
+            <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:rgba(255,255,255,0.03);">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:#fff;">🌍 <%= link.display_name %></span>
+                <%= button_to "✕", survey_region_link_path(@survey, link.id), method: :delete,
+                      data: { turbo_confirm: "Remove the “#{link.display_name}” region link? Its URL will stop working; existing responses keep their region." },
+                      form: { style: "margin:0;" },
+                      style: "background:none;border:none;padding:2px 6px;color:rgba(255,255,255,0.4);font-size: var(--text-base);cursor:pointer;" %>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <input type="text" readonly id="region-url-<%= link.id %>"
+                       value="<%= play_survey_url(link.token) %>"
+                       style="flex:1;min-width:0;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);outline:none;" />
+                <button type="button"
+                        onclick="navigator.clipboard.writeText(document.getElementById('region-url-<%= link.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})"
+                        style="padding:6px 12px;border-radius:8px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy</button>
+              </div>
+            </div>
+          <% end %>
+
+          <%= form_with url: survey_region_links_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <select name="country_code" required
+                      style="width:100%;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;">
+                <option value="" style="color:#1C2034;">Choose a country…</option>
+                <% WorldRegions.options.each do |name, code| %>
+                  <option value="<%= code %>" style="color:#1C2034;"><%= name %></option>
+                <% end %>
+              </select>
+              <input type="text" name="label" maxlength="60"
+                     placeholder="Sub-region (optional) — e.g. Yorkshire"
+                     style="width:100%;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              <button type="submit"
+                      style="width:100%;padding:8px;border-radius:10px;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">
+                Add region link →
+              </button>
+            </div>
+          <% end %>
+        </div>
+
         <%# Alliance share — add this Verto to an alliance and generate
             per-partner links. Each row in the alliance produces a unique token. %>
         <% if current_membership&.admin? %>

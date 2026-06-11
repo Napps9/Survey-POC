@@ -56,6 +56,12 @@ ko:
     ask_verto: Verto에게 묻기
     analysing: 응답 분석 중…
   player:
+    region_notice_linked: "이 Verto는 지역 데이터를 수집합니다 — %{region}(으)로 응답 중입니다. 완료하면 다른 지역의 응답을 볼 수 있어요."
+    region_notice_pick: "이 Verto는 지역 데이터를 수집합니다 — 완료하면 다른 지역의 응답을 볼 수 있어요. 내 지역:"
+    region_prefer_not: "밝히지 않음"
+    see_regions: "지역별 응답 보기"
+    regions_title: "전 세계의 응답"
+    region_compare_hint: "아래 지역을 누르면 내 응답과 비교할 수 있어요"
     preview_banner: "미리보기 모드 — 응답은 저장되지 않습니다"
     exit_preview: "미리보기 종료"
     thank_you_title: 감사합니다!
@@ -69,6 +75,12 @@ ko:
     submit: 제출 ✓
   js:
     player:
+      region_optout: "내 지역 공유 안 함"
+      region_optin: "내 지역 공유"
+      region_meta: "%{count}개의 응답이 지역을 공유했어요"
+      region_answered: "%{count}명 응답"
+      region_compare: "비교 →"
+      region_empty: "아직 지역 응답이 없어요 — 첫 번째가 되어 보세요!"
       progress: "%{total}장 중 %{n}번째 카드"
       queued: 저장됨 — 온라인이 되면 동기화됩니다
       compare_cta: 다른 사람들과 비교한 결과 보기 →

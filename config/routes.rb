@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   post "play/:token/progress", to: "player#progress", as: :progress_survey
   post "play/:token/submit", to: "player#submit", as: :submit_survey
   get  "play/:token/results", to: "player#results", as: :player_results
+  get  "play/:token/regions", to: "player#regions", as: :player_regions
 
   # Auth
   resource  :session,       only: [ :new, :create, :destroy ]
@@ -43,6 +44,8 @@ Rails.application.routes.draw do
   post "surveys/:id/publish",         to: "surveys#publish",  as: :publish_survey
   get  "surveys/:id/preview",         to: "surveys#preview",  as: :preview_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
+  post   "surveys/:id/region_links",          to: "survey_region_links#create",  as: :survey_region_links
+  delete "surveys/:id/region_links/:link_id", to: "survey_region_links#destroy", as: :survey_region_link
   post "surveys/:id/shuffle_assets",  to: "surveys#shuffle_assets",  as: :shuffle_survey_assets
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results
   get  "surveys/:survey_id/results/export",       to: "results_exports#show",         as: :survey_results_export

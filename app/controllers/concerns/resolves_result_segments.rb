@@ -4,7 +4,8 @@ module ResolvesResultSegments
   private
 
   # Response segments for the results filter: always "Overall", plus a
-  # "Direct link" and one entry per partner share when this Verto is shared.
+  # "Direct link" and one entry per partner share when this Verto is shared,
+  # plus one entry per region tag when this Verto is region-tagged.
   # Each entry is { id:, label:, scope:, count: }. Shared by the results screen
   # and the CSV / Google Sheets exports so they all scope responses identically.
   def result_segments(survey, base)
@@ -13,18 +14,26 @@ module ResolvesResultSegments
     shares = survey.survey_shares
                    .includes(:partner_organisation, alliance_verto: :alliance)
                    .order(:created_at)
-    return segments if shares.empty?
 
-    direct = base.where(survey_share_id: nil)
-    if (direct_count = direct.count).positive?
-      segments << { id: "direct", label: "Direct link", scope: direct, count: direct_count }
+    if shares.any?
+      direct = base.where(survey_share_id: nil)
+      if (direct_count = direct.count).positive?
+        segments << { id: "direct", label: "Direct link", scope: direct, count: direct_count }
+      end
+
+      shares.each do |share|
+        scope = base.where(survey_share_id: share.id)
+        alliance_name = share.alliance_verto&.alliance&.name
+        label = alliance_name ? "#{share.display_name} · #{alliance_name}" : share.display_name
+        segments << { id: "share_#{share.id}", label: label, scope: scope, count: scope.count }
+      end
     end
 
-    shares.each do |share|
-      scope = base.where(survey_share_id: share.id)
-      alliance_name = share.alliance_verto&.alliance&.name
-      label = alliance_name ? "#{share.display_name} · #{alliance_name}" : share.display_name
-      segments << { id: "share_#{share.id}", label: label, scope: scope, count: scope.count }
+    # Scoped by the region itself (country + label), not the link id, so two
+    # links pointing at the same region would aggregate together.
+    survey.survey_region_links.order(:created_at).each do |link|
+      scope = base.where(region_country: link.country_code, region_label: link.label)
+      segments << { id: "region_#{link.id}", label: "🌍 #{link.display_name}", scope: scope, count: scope.count }
     end
 
     segments

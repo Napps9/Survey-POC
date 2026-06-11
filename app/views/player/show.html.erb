@@ -7,12 +7,20 @@
   # Owner preview (from the dashboard): the exact respondent experience but
   # with blank recording endpoints, so stepping through never creates a
   # Response. Drafts have no publish_token, so their URLs must stay blank too.
+  # Live visitors keep the token they arrived with (publish, share or region
+  # link), so progress/submit resolve the same attribution context.
   preview_mode    = @preview == true
-  play_token      = @survey.publish_token
+  play_token      = params[:token].presence || @survey.publish_token
   progress_url    = preview_mode ? "" : progress_survey_url(play_token)
   submit_url      = preview_mode ? "" : submit_survey_url(play_token)
   results_url     = @survey.show_results_comparison? && play_token.present? ? player_results_url(play_token) : ""
   show_comparison = @survey.show_results_comparison? && results_url.present?
+
+  # Region tags: the consent bar shows whenever this Verto is region-tagged;
+  # the post-finish map needs a reachable token (drafts in preview have none).
+  region_links = @survey.survey_region_links.order(:created_at).to_a
+  has_regions  = region_links.any?
+  regions_url  = has_regions && play_token.present? ? player_regions_url(play_token) : ""
 %>
 <div class="preview-overlay flex flex-col"
      style="height:100vh;<%= verto_backdrop_style_attr(@survey) %>"
@@ -21,6 +29,9 @@
      data-player-progress-url-value="<%= progress_url %>"
      data-player-submit-url-value="<%= submit_url %>"
      data-player-results-url-value="<%= results_url %>"
+     data-player-regions-url-value="<%= regions_url %>"
+     data-player-region-country-value="<%= @region_link&.country_code %>"
+     data-player-region-label-value="<%= @region_link&.label %>"
      data-player-locale-value="<%= @display_locale %>"
      data-player-show-comparison-value="<%= show_comparison %>">
 
@@ -31,6 +42,36 @@
       </span>
       <%= link_to t("player.exit_preview"), root_path,
             style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:rgba(255,255,255,0.85);text-decoration:underline;text-underline-offset:3px;" %>
+    </div>
+  <% end %>
+
+  <% if has_regions %>
+    <%# Regional-data heads-up: respondents always see that this Verto captures
+        coarse region data and can decline (or self-pick on the base link). %>
+    <div style="flex-shrink:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 14px;padding:7px 14px;background:rgba(12,167,255,0.10);border-bottom:1px solid rgba(12,167,255,0.25);">
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:#7CC9FF;">
+        🌍
+        <% if @region_link %>
+          <%= t("player.region_notice_linked", region: @region_link.display_name) %>
+        <% else %>
+          <%= t("player.region_notice_pick") %>
+        <% end %>
+      </span>
+      <% if @region_link %>
+        <button type="button"
+                data-action="click->player#toggleRegionOptOut"
+                style="background:none;border:none;cursor:pointer;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:rgba(255,255,255,0.7);text-decoration:underline;text-underline-offset:3px;padding:0;">
+          <%= t("js.player.region_optout") %>
+        </button>
+      <% else %>
+        <select data-action="change->player#setRegion"
+                style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);padding:3px 8px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff;outline:none;cursor:pointer;">
+          <option value=""><%= t("player.region_prefer_not") %></option>
+          <% region_links.each do |link| %>
+            <option value="<%= link.country_code %>|<%= link.label %>"><%= link.display_name %></option>
+          <% end %>
+        </select>
+      <% end %>
     </div>
   <% end %>
 
@@ -80,12 +121,58 @@
           </button>
         <% end %>
 
+        <% if regions_url.present? %>
+          <button type="button"
+                  data-player-target="regionsBtn"
+                  data-action="click->player#showRegions"
+                  style="display:block;margin:<%= show_comparison ? '10px' : '22px' %> auto 0;padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);cursor:pointer;">
+            🌍 <%= t("player.see_regions") %>
+          </button>
+        <% end %>
+
         <%# Small "Powered by Playverto" wordmark at the bottom. %>
         <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;opacity:0.45;">
           <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:#fff;"><%= t("player.powered_by") %></span>
           <%= image_tag "playverto.svg", alt: "", style: "height:12px;width:auto;" %>
         </div>
       </div>
+
+      <% if regions_url.present? %>
+        <%# Post-finish regions view: world map of where answers came from,
+            then per-region comparison against this respondent's answers. %>
+        <div data-player-target="regionsPanel" class="hidden"
+             style="width:100%;max-width:760px;margin:0 auto;padding:24px 22px 28px;overflow-y:auto;max-height:calc(100vh - 120px);background:#1C2034;border:1px solid rgba(255,255,255,0.08);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);">
+          <div style="text-align:center;margin-bottom:14px;">
+            <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.regions_title") %></div>
+            <div data-player-target="regionsMeta"
+                 style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"></div>
+          </div>
+
+          <div data-player-target="regionsMain">
+            <div style="border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:12px;">
+              <%= render "shared/world_map" %>
+            </div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.45);text-align:center;margin-top:8px;">
+              <%= t("player.region_compare_hint") %>
+            </div>
+            <div data-player-target="regionsList" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;"></div>
+          </div>
+
+          <div data-player-target="regionDetail" class="hidden">
+            <div data-player-target="regionDetailTitle"
+                 style="font-family:'Alata',sans-serif;font-size:16px;color:#01EACB;margin-bottom:12px;text-align:center;"></div>
+            <div data-player-target="regionDetailList" style="display:flex;flex-direction:column;gap:14px;"></div>
+          </div>
+
+          <div style="display:flex;justify-content:center;margin-top:18px;">
+            <button type="button"
+                    data-action="click->player#hideRegions"
+                    style="padding:9px 18px;border-radius:100px;background:transparent;color:#fff;font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
+              <%= t("player.back") %>
+            </button>
+          </div>
+        </div>
+      <% end %>
 
       <% if show_comparison %>
         <div data-player-target="comparison" class="hidden"

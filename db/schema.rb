@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_11_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -140,13 +140,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_000001) do
     t.json "answers", default: {}, null: false
     t.datetime "created_at", null: false
     t.string "locale"
+    t.string "region_country"
+    t.string "region_label"
     t.string "session_token", null: false
     t.string "status", default: "completed", null: false
     t.integer "survey_id", null: false
+    t.integer "survey_region_link_id"
     t.integer "survey_share_id"
     t.datetime "updated_at", null: false
     t.index ["session_token"], name: "index_responses_on_session_token", unique: true
     t.index ["survey_id"], name: "index_responses_on_survey_id"
+    t.index ["survey_region_link_id"], name: "index_responses_on_survey_region_link_id"
     t.index ["survey_share_id"], name: "index_responses_on_survey_share_id"
   end
 
@@ -157,6 +161,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_000001) do
     t.string "user_agent"
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "survey_region_links", force: :cascade do |t|
+    t.string "country_code", null: false
+    t.datetime "created_at", null: false
+    t.string "label"
+    t.integer "survey_id", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_id", "country_code", "label"], name: "idx_region_links_unique_region", unique: true
+    t.index ["survey_id"], name: "index_survey_region_links_on_survey_id"
+    t.index ["token"], name: "index_survey_region_links_on_token", unique: true
   end
 
   create_table "survey_shares", force: :cascade do |t|

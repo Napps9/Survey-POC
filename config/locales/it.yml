@@ -56,6 +56,12 @@ it:
     ask_verto: Chiedi a Verto
     analysing: Analisi delle risposte…
   player:
+    region_notice_linked: "Questo Verto raccoglie dati regionali — stai rispondendo come %{region}. Alla fine potrai vedere come hanno risposto le altre regioni."
+    region_notice_pick: "Questo Verto raccoglie dati regionali — alla fine potrai vedere come hanno risposto le altre regioni. La tua regione:"
+    region_prefer_not: "Preferisco non dirlo"
+    see_regions: "Vedi le risposte delle regioni"
+    regions_title: "Risposte da tutto il mondo"
+    region_compare_hint: "Tocca una regione qui sotto per confrontarla con le tue risposte"
     preview_banner: "Modalità anteprima — le risposte non vengono salvate"
     exit_preview: "Esci dall'anteprima"
     thank_you_title: Grazie!
@@ -69,6 +75,12 @@ it:
     submit: Invia ✓
   js:
     player:
+      region_optout: "Non condividere la mia regione"
+      region_optin: "Condividi la mia regione"
+      region_meta: "%{count} risposte con una regione"
+      region_answered: "%{count} hanno risposto"
+      region_compare: "Confronta →"
+      region_empty: "Ancora nessuna risposta regionale — la tua potrebbe essere la prima!"
       progress: Carta %{n} di %{total}
       queued: Salvato — verrà sincronizzato quando sarai di nuovo online
       compare_cta: Confronta i tuoi risultati con gli altri →

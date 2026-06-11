@@ -58,6 +58,12 @@ en:
     ask_verto: "Ask Verto"
     analysing: "Analysing responses…"
   player:
+    region_notice_linked: "This Verto collects regional data — you're answering as %{region}. When you finish you can see how other regions answered."
+    region_notice_pick: "This Verto collects regional data — when you finish you can see how other regions answered. Your region:"
+    region_prefer_not: "Prefer not to say"
+    see_regions: "See how regions answered"
+    regions_title: "Answers around the world"
+    region_compare_hint: "Tap a region below to compare it with your answers"
     preview_banner: "Preview mode — responses aren't saved"
     exit_preview: "Exit preview"
     thank_you_title: "Thanks for taking part!"
@@ -71,6 +77,12 @@ en:
     submit: "Submit ✓"
   js:
     player:
+      region_optout: "Don't share my region"
+      region_optin: "Share my region"
+      region_meta: "%{count} answers shared a region"
+      region_answered: "%{count} answered"
+      region_compare: "Compare →"
+      region_empty: "No regional answers yet — yours might be the first!"
       progress: "Card %{n} of %{total}"
       queued: "Saved — will sync when you're back online"
       compare_cta: "See your results compared to others →"

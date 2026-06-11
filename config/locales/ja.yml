@@ -56,6 +56,12 @@ ja:
     ask_verto: Vertoに聞く
     analysing: 回答を分析中…
   player:
+    region_notice_linked: "このVertoは地域データを収集します — %{region} として回答しています。完了後、他の地域の回答を見られます。"
+    region_notice_pick: "このVertoは地域データを収集します — 完了後、他の地域の回答を見られます。あなたの地域:"
+    region_prefer_not: "回答しない"
+    see_regions: "地域ごとの回答を見る"
+    regions_title: "世界中からの回答"
+    region_compare_hint: "下の地域をタップすると自分の回答と比較できます"
     preview_banner: "プレビューモード — 回答は保存されません"
     exit_preview: "プレビューを終了"
     thank_you_title: ありがとうございました！
@@ -69,6 +75,12 @@ ja:
     submit: 送信 ✓
   js:
     player:
+      region_optout: "地域を共有しない"
+      region_optin: "地域を共有する"
+      region_meta: "%{count} 件の回答が地域を共有"
+      region_answered: "%{count} 件の回答"
+      region_compare: "比較 →"
+      region_empty: "まだ地域の回答がありません — あなたが最初かもしれません！"
       progress: "%{total}枚中 %{n}枚目"
       queued: 保存済み — オンラインに戻ったときに同期されます
       compare_cta: 他の人との結果を比較する →

@@ -56,6 +56,12 @@ vi:
     ask_verto: Hỏi Verto
     analysing: Đang phân tích phản hồi…
   player:
+    region_notice_linked: "Verto này thu thập dữ liệu theo khu vực — bạn đang trả lời với tư cách %{region}. Khi hoàn thành, bạn có thể xem các khu vực khác đã trả lời thế nào."
+    region_notice_pick: "Verto này thu thập dữ liệu theo khu vực — khi hoàn thành, bạn có thể xem các khu vực khác đã trả lời thế nào. Khu vực của bạn:"
+    region_prefer_not: "Không muốn tiết lộ"
+    see_regions: "Xem câu trả lời theo khu vực"
+    regions_title: "Câu trả lời từ khắp thế giới"
+    region_compare_hint: "Chạm vào một khu vực bên dưới để so sánh với câu trả lời của bạn"
     preview_banner: "Chế độ xem trước — câu trả lời không được lưu"
     exit_preview: "Thoát xem trước"
     thank_you_title: Cảm ơn bạn!
@@ -69,6 +75,12 @@ vi:
     submit: Gửi ✓
   js:
     player:
+      region_optout: "Không chia sẻ khu vực của tôi"
+      region_optin: "Chia sẻ khu vực của tôi"
+      region_meta: "%{count} câu trả lời có khu vực"
+      region_answered: "%{count} đã trả lời"
+      region_compare: "So sánh →"
+      region_empty: "Chưa có câu trả lời theo khu vực — của bạn có thể là đầu tiên!"
       progress: Thẻ %{n} / %{total}
       queued: Đã lưu — sẽ đồng bộ khi bạn trực tuyến trở lại
       compare_cta: Xem kết quả của bạn so với người khác →
