@@ -3339,3 +3339,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .region-row:hover { border-color: rgba(1,234,203,0.4); background: rgba(1,234,203,0.06); }
 .region-row.active-country { border-color: #01EACB; background: rgba(1,234,203,0.08); }
+
+/* Wizard "advanced" disclosure (Region settings) — compact summary pill */
+.wizard-advanced summary { list-style: none; }
+.wizard-advanced summary::-webkit-details-marker { display: none; }
+.wizard-advanced-chev { display: inline-block; transition: transform 0.15s; }
+.wizard-advanced[open] .wizard-advanced-chev { transform: rotate(180deg); }

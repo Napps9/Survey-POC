@@ -4,7 +4,7 @@ import { Controller } from "@hotwired/stimulus"
 // hidden inputs (region_tags[][country_code] / region_tags[][label]) submit
 // with the create form. The editor's publish panel manages them afterwards.
 export default class extends Controller {
-  static targets = ["country", "label", "list"]
+  static targets = ["country", "label", "list", "count"]
 
   add(e) {
     e.preventDefault()
@@ -17,6 +17,16 @@ export default class extends Controller {
       this.listTarget.appendChild(this._chip(key, code, name, label))
     }
     this.labelTarget.value = ""
+    this._refreshCount()
+  }
+
+  // Chip total shown on the collapsed "Region settings" CTA, so picked
+  // regions stay visible even when the disclosure is closed.
+  _refreshCount() {
+    if (!this.hasCountTarget) return
+    const n = this.listTarget.children.length
+    this.countTarget.textContent = n
+    this.countTarget.style.display = n ? "inline-flex" : "none"
   }
 
   _chip(key, code, name, label) {
@@ -32,7 +42,7 @@ export default class extends Controller {
     remove.setAttribute("aria-label", "Remove")
     remove.textContent = "✕"
     remove.style.cssText = "background:none;border:none;cursor:pointer;color:rgba(0,0,0,0.45);font-size:12px;padding:0;line-height:1;"
-    remove.addEventListener("click", () => chip.remove())
+    remove.addEventListener("click", () => { chip.remove(); this._refreshCount() })
 
     const country = document.createElement("input")
     country.type = "hidden"; country.name = "region_tags[][country_code]"; country.value = code
