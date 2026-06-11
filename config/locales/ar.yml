@@ -20,6 +20,10 @@ ar:
     other: أخرى
     other_placeholder: أخبرنا بكلماتك الخاصة…
   auth:
+    social_continue: "المتابعة عبر %{provider}"
+    social_divider: "أو"
+    social_failed: "تعذّر إكمال تسجيل الدخول عبر %{provider} — حاول مرة أخرى."
+    social_no_email: "لم يُشارك %{provider} بريدك الإلكتروني — سجّل عبر البريد الإلكتروني بدلاً من ذلك."
     show: إظهار
     email: البريد الإلكتروني
     password: كلمة المرور

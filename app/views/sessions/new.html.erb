@@ -20,6 +20,8 @@
       </div>
     <% end %>
 
+    <%= render "sessions/social_buttons" %>
+
     <%= form_with url: session_url do |form| %>
       <div style="margin-bottom:20px;">
         <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("auth.email") %></label>

@@ -31,6 +31,20 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+      # Social sign-in (Google reuses the client above) — see .env.example.
+      # Buttons only appear once the values are set.
+      - key: MICROSOFT_CLIENT_ID
+        sync: false
+      - key: MICROSOFT_CLIENT_SECRET
+        sync: false
+      - key: APPLE_CLIENT_ID
+        sync: false
+      - key: APPLE_TEAM_ID
+        sync: false
+      - key: APPLE_KEY_ID
+        sync: false
+      - key: APPLE_PRIVATE_KEY
+        sync: false
       # Active Record Encryption (encrypts stored Google tokens) — see .env.example.
       # Render auto-generates stable values; no manual key handling needed.
       - key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY

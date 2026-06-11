@@ -20,6 +20,10 @@ ja:
     other: その他
     other_placeholder: ご自身の言葉でお聞かせください…
   auth:
+    social_continue: "%{provider} で続行"
+    social_divider: "または"
+    social_failed: "%{provider} でのサインインが完了しませんでした — もう一度お試しください。"
+    social_no_email: "%{provider} からメールアドレスが共有されませんでした — メールアドレスで登録してください。"
     show: 表示
     email: メールアドレス
     password: パスワード

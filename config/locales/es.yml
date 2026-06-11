@@ -20,6 +20,10 @@ es:
     other: Otro
     other_placeholder: Cuéntanos con tus propias palabras…
   auth:
+    social_continue: "Continuar con %{provider}"
+    social_divider: "o"
+    social_failed: "El inicio de sesión con %{provider} no se completó — inténtalo de nuevo."
+    social_no_email: "%{provider} no compartió tu correo electrónico — regístrate con tu correo."
     show: Mostrar
     email: Correo electrónico
     password: Contraseña

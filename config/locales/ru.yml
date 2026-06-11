@@ -20,6 +20,10 @@ ru:
     other: Другое
     other_placeholder: Напишите своими словами…
   auth:
+    social_continue: "Продолжить с %{provider}"
+    social_divider: "или"
+    social_failed: "Вход через %{provider} не был завершён — попробуйте ещё раз."
+    social_no_email: "%{provider} не передал адрес электронной почты — зарегистрируйтесь по электронной почте."
     show: Показать
     email: Адрес электронной почты
     password: Пароль

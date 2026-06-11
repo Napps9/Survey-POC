@@ -20,6 +20,10 @@ nl:
     other: Anders
     other_placeholder: Vertel het in je eigen woorden…
   auth:
+    social_continue: "Doorgaan met %{provider}"
+    social_divider: "of"
+    social_failed: "Inloggen met %{provider} is niet gelukt — probeer het opnieuw."
+    social_no_email: "%{provider} heeft geen e-mailadres gedeeld — registreer je met e-mail."
     show: Tonen
     email: E-mailadres
     password: Wachtwoord

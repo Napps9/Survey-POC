@@ -20,6 +20,10 @@ vi:
     other: Khác
     other_placeholder: Hãy chia sẻ bằng lời của bạn…
   auth:
+    social_continue: "Tiếp tục với %{provider}"
+    social_divider: "hoặc"
+    social_failed: "Đăng nhập bằng %{provider} chưa hoàn tất — vui lòng thử lại."
+    social_no_email: "%{provider} không chia sẻ địa chỉ email — hãy đăng ký bằng email."
     show: Hiện
     email: Địa chỉ email
     password: Mật khẩu

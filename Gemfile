@@ -39,6 +39,15 @@ gem "csv"
 # Google Sheets export (per-user OAuth)
 gem "googleauth"             # Signet OAuth2: authorize URL, code exchange, token refresh
 gem "google-apis-sheets_v4"  # create spreadsheet + write values (Drive API not needed)
+
+# Social sign-in (Google / Apple / Microsoft). Each provider activates only
+# when its credentials are present in the environment — see .env.example.
+gem "omniauth", "~> 2.1"
+gem "omniauth-rails_csrf_protection" # request phase must be a CSRF-protected POST
+gem "omniauth-google-oauth2"
+gem "omniauth-apple"
+gem "omniauth-entra-id"              # Microsoft (Entra ID work/school + personal)
+
 # Load .env in development
 gem "dotenv-rails", groups: [ :development, :test ]
 

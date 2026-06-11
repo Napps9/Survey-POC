@@ -20,6 +20,10 @@ id:
     other: Lainnya
     other_placeholder: Beri tahu kami dengan kata-kata Anda sendiri…
   auth:
+    social_continue: "Lanjutkan dengan %{provider}"
+    social_divider: "atau"
+    social_failed: "Masuk dengan %{provider} tidak selesai — silakan coba lagi."
+    social_no_email: "%{provider} tidak membagikan alamat email — daftar dengan email saja."
     show: Tampilkan
     email: Alamat email
     password: Kata sandi

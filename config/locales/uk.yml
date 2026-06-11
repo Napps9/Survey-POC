@@ -20,6 +20,10 @@ uk:
     other: Інше
     other_placeholder: Розкажіть своїми словами…
   auth:
+    social_continue: "Продовжити з %{provider}"
+    social_divider: "або"
+    social_failed: "Вхід через %{provider} не завершено — спробуйте ще раз."
+    social_no_email: "%{provider} не надав адресу електронної пошти — зареєструйтеся через електронну пошту."
     show: Показати
     email: Електронна адреса
     password: Пароль

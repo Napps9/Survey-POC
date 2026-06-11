@@ -11,6 +11,11 @@ Rails.application.routes.draw do
   resources :passwords,     param: :token, only: [ :new, :create, :edit, :update ]
   resources :registrations, only: [ :new, :create ]
 
+  # Social sign-in (OmniAuth). GET for Google/Microsoft callbacks; Apple
+  # posts its callback (form_post). /auth/:provider itself is middleware.
+  match "auth/:provider/callback", to: "oauth_sessions#create", via: [ :get, :post ], as: :oauth_callback
+  get   "auth/failure",            to: "oauth_sessions#failure"
+
   # Google Sheets export OAuth (callback is a GET — Google redirects via browser)
   get "google/connect",  to: "google_auth#connect",  as: :google_connect
   get "google/callback", to: "google_auth#callback", as: :google_callback

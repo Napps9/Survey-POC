@@ -20,6 +20,10 @@ pl:
     other: Inne
     other_placeholder: Powiedz nam własnymi słowami…
   auth:
+    social_continue: "Kontynuuj przez %{provider}"
+    social_divider: "lub"
+    social_failed: "Logowanie przez %{provider} nie powiodło się — spróbuj ponownie."
+    social_no_email: "%{provider} nie udostępnił adresu e-mail — zarejestruj się przez e-mail."
     show: Pokaż
     email: Adres e-mail
     password: Hasło

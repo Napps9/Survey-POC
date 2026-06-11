@@ -20,6 +20,10 @@ tr:
     other: Diğer
     other_placeholder: Kendi sözcüklerinizle anlatın…
   auth:
+    social_continue: "%{provider} ile devam et"
+    social_divider: "veya"
+    social_failed: "%{provider} ile giriş tamamlanamadı — lütfen tekrar deneyin."
+    social_no_email: "%{provider} bir e-posta adresi paylaşmadı — bunun yerine e-posta ile kaydolun."
     show: Göster
     email: E-posta adresi
     password: Şifre

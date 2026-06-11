@@ -22,6 +22,10 @@ en:
     other: "Other"
     other_placeholder: "Tell us in your own words…"
   auth:
+    social_continue: "Continue with %{provider}"
+    social_divider: "or"
+    social_failed: "Sign-in with %{provider} didn't complete — please try again."
+    social_no_email: "%{provider} didn't share an email address for your account — sign up with email instead."
     show: "Show"
     email: "Email address"
     password: "Password"

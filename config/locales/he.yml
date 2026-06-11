@@ -20,6 +20,10 @@ he:
     other: אחר
     other_placeholder: ספר לנו במילים שלך…
   auth:
+    social_continue: "המשך עם %{provider}"
+    social_divider: "או"
+    social_failed: "הכניסה עם %{provider} לא הושלמה — נסו שוב."
+    social_no_email: "%{provider} לא שיתף כתובת אימייל — הירשמו עם אימייל במקום."
     show: הצג
     email: כתובת אימייל
     password: סיסמה

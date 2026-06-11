@@ -20,6 +20,10 @@ sw:
     other: Nyingine
     other_placeholder: Tuambie kwa maneno yako mwenyewe…
   auth:
+    social_continue: "Endelea na %{provider}"
+    social_divider: "au"
+    social_failed: "Kuingia kwa %{provider} hakukukamilika — tafadhali jaribu tena."
+    social_no_email: "%{provider} haikushiriki barua pepe — jisajili kwa barua pepe."
     show: Onyesha
     email: Anwani ya barua pepe
     password: Nenosiri

@@ -20,6 +20,10 @@ hi:
     other: अन्य
     other_placeholder: अपने शब्दों में बताएं…
   auth:
+    social_continue: "%{provider} के साथ जारी रखें"
+    social_divider: "या"
+    social_failed: "%{provider} से साइन-इन पूरा नहीं हुआ — कृपया फिर से कोशिश करें।"
+    social_no_email: "%{provider} ने ईमेल पता साझा नहीं किया — ईमेल से साइन अप करें।"
     show: दिखाएं
     email: ईमेल पता
     password: पासवर्ड

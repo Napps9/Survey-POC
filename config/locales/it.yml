@@ -20,6 +20,10 @@ it:
     other: Altro
     other_placeholder: Raccontacelo con parole tue…
   auth:
+    social_continue: "Continua con %{provider}"
+    social_divider: "oppure"
+    social_failed: "L'accesso con %{provider} non è andato a buon fine — riprova."
+    social_no_email: "%{provider} non ha condiviso un indirizzo email — registrati con l'email."
     show: Mostra
     email: Indirizzo email
     password: Password
