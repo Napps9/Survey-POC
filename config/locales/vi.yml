@@ -56,6 +56,8 @@ vi:
     ask_verto: Hỏi Verto
     analysing: Đang phân tích phản hồi…
   player:
+    preview_banner: "Chế độ xem trước — câu trả lời không được lưu"
+    exit_preview: "Thoát xem trước"
     thank_you_title: Cảm ơn bạn!
     thank_you_sub: Câu trả lời của bạn đã được ghi nhận.
     thank_you_from: từ %{org}
@@ -266,6 +268,7 @@ vi:
     ranked_for: Xếp theo độ phù hợp cho
     this_card: thẻ này
   dashboard_card:
+    preview: "Xem trước"
     badge_archived: Đã lưu trữ
     badge_live: Trực tiếp
     badge_draft: Bản nháp

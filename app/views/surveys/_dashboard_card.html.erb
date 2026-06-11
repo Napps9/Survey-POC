@@ -149,19 +149,24 @@
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 12px;">
       <%= link_to t("dashboard_card.edit"), survey_path(survey),
             data: { turbo_confirm: edit_warning },
-            style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
+            style: "flex:1;text-align:center;padding:9px 8px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
+            onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
+            onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
+
+      <%= link_to "▶ #{t("dashboard_card.preview")}", preview_survey_path(survey),
+            style: "flex:1;text-align:center;padding:9px 8px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
             onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
             onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
 
       <% if published %>
         <%= link_to t("dashboard_card.results"), survey_results_path(survey),
-              style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,30,111,0.14);border:1px solid rgba(255,30,111,0.32);color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
+              style: "flex:1;text-align:center;padding:9px 8px;border-radius:10px;background:rgba(255,30,111,0.14);border:1px solid rgba(255,30,111,0.32);color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
               onmouseover: "this.style.background='rgba(255,30,111,0.22)'",
               onmouseout:  "this.style.background='rgba(255,30,111,0.14)'" %>
       <% else %>
         <%= button_to t("dashboard_card.publish"), publish_survey_path(survey),
               method: :post,
-              style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(1,234,203,0.14);border:1px solid rgba(1,234,203,0.32);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;transition:all 0.15s;",
+              style: "flex:1;text-align:center;padding:9px 8px;border-radius:10px;background:rgba(1,234,203,0.14);border:1px solid rgba(1,234,203,0.32);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;transition:all 0.15s;",
               form: { style: "flex:1;display:flex;" },
               onmouseover: "this.style.background='rgba(1,234,203,0.22)'",
               onmouseout:  "this.style.background='rgba(1,234,203,0.14)'" %>

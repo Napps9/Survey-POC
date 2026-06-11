@@ -4,7 +4,9 @@
     <%= render "layouts/head" %>
   </head>
   <body style="height:100dvh;min-height:100vh;overflow:hidden;background:#272D4A;color:#F7F7F7;font-family:'ABeeZee',sans-serif;">
-    <% if Current.user %>
+    <%# @chromeless pages (e.g. the owner's Verto preview) render bare even
+        when signed in, so they replicate exactly what a respondent sees. %>
+    <% if Current.user && !@chromeless %>
       <div data-controller="command-palette">
         <%= render "shared/bottom_bar" %>
         <%= render "shared/command_palette" %>
@@ -15,7 +17,7 @@
     <% else %>
       <%# Unauthenticated chrome-less pages (login, register, password). The
           player has its own content-language switcher in its nav. %>
-      <% unless controller_name == "player" %>
+      <% unless controller_name == "player" || @chromeless %>
         <div class="lang-switcher-fixed"><%= render "shared/locale_switcher" %></div>
       <% end %>
       <%= yield %>

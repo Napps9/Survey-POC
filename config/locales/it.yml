@@ -56,6 +56,8 @@ it:
     ask_verto: Chiedi a Verto
     analysing: Analisi delle risposte…
   player:
+    preview_banner: "Modalità anteprima — le risposte non vengono salvate"
+    exit_preview: "Esci dall'anteprima"
     thank_you_title: Grazie!
     thank_you_sub: Le tue risposte sono state registrate.
     thank_you_from: da %{org}
@@ -266,6 +268,7 @@ it:
     ranked_for: Classificati per adattabilità a
     this_card: questa carta
   dashboard_card:
+    preview: "Anteprima"
     badge_archived: Archiviato
     badge_live: Live
     badge_draft: Bozza

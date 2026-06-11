@@ -41,6 +41,9 @@ export default class extends Controller {
 
   async finish() {
     this._capture(this.currentValue)
+    // Owner preview runs without a submit endpoint — nothing is recorded,
+    // just show the thank-you screen.
+    if (!this.submitUrlValue) return this._showThankyou(false)
     let queued = false
     try {
       const res = await fetch(this.submitUrlValue, {

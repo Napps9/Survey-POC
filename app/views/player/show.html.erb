@@ -3,16 +3,36 @@
   cards   = Array(@survey.cards)
   total_q = cards.count { |c| c["type"] != "welcome_card" }
   prev_q  = 0
+
+  # Owner preview (from the dashboard): the exact respondent experience but
+  # with blank recording endpoints, so stepping through never creates a
+  # Response. Drafts have no publish_token, so their URLs must stay blank too.
+  preview_mode    = @preview == true
+  play_token      = @survey.publish_token
+  progress_url    = preview_mode ? "" : progress_survey_url(play_token)
+  submit_url      = preview_mode ? "" : submit_survey_url(play_token)
+  results_url     = @survey.show_results_comparison? && play_token.present? ? player_results_url(play_token) : ""
+  show_comparison = @survey.show_results_comparison? && results_url.present?
 %>
 <div class="preview-overlay flex flex-col"
      style="height:100vh;<%= verto_backdrop_style_attr(@survey) %>"
      dir="<%= SupportedLocales.dir(@display_locale) %>"
      data-controller="player"
-     data-player-progress-url-value="<%= progress_survey_url(@survey.publish_token) %>"
-     data-player-submit-url-value="<%= submit_survey_url(@survey.publish_token) %>"
-     data-player-results-url-value="<%= @survey.show_results_comparison? ? player_results_url(@survey.publish_token) : '' %>"
+     data-player-progress-url-value="<%= progress_url %>"
+     data-player-submit-url-value="<%= submit_url %>"
+     data-player-results-url-value="<%= results_url %>"
      data-player-locale-value="<%= @display_locale %>"
-     data-player-show-comparison-value="<%= @survey.show_results_comparison? %>">
+     data-player-show-comparison-value="<%= show_comparison %>">
+
+  <% if preview_mode %>
+    <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 14px;background:rgba(1,234,203,0.1);border-bottom:1px solid rgba(1,234,203,0.25);">
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:#01EACB;">
+        ▶ <%= t("player.preview_banner") %>
+      </span>
+      <%= link_to t("player.exit_preview"), root_path,
+            style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:rgba(255,255,255,0.85);text-decoration:underline;text-underline-offset:3px;" %>
+    </div>
+  <% end %>
 
   <nav class="preview-nav">
     <%# Respondents see the publishing org's logo, not Playverto's. %>
@@ -51,7 +71,7 @@
           <%= t("player.thank_you_from", org: @survey.organisation.name) %>
         </div>
 
-        <% if @survey.show_results_comparison? %>
+        <% if show_comparison %>
           <button type="button"
                   data-player-target="compareBtn"
                   data-action="click->player#showComparison"
@@ -67,7 +87,7 @@
         </div>
       </div>
 
-      <% if @survey.show_results_comparison? %>
+      <% if show_comparison %>
         <div data-player-target="comparison" class="hidden"
              style="width:100%;max-width:640px;margin:0 auto;padding:24px 22px 28px;overflow-y:auto;max-height:calc(100vh - 120px);background:#1C2034;border:1px solid rgba(255,255,255,0.08);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);">
           <div style="text-align:center;margin-bottom:18px;">

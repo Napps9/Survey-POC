@@ -80,10 +80,7 @@ class PlayerController < ApplicationController
   # The Verto content language to render: an explicit ?lang=, else the
   # respondent's UI locale if the Verto has it, else the Verto's primary.
   def resolve_play_locale
-    available = @survey.verto_locales
-    [ params[:lang], Current.locale, @survey.default_locale ]
-      .compact.map(&:to_s)
-      .find { |l| available.include?(l) } || @survey.default_locale
+    @survey.display_locale_for(params[:lang], Current.locale)
   end
 
   def load_survey_and_share

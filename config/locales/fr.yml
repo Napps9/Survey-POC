@@ -56,6 +56,8 @@ fr:
     ask_verto: Demander à Verto
     analysing: Analyse des réponses…
   player:
+    preview_banner: "Mode aperçu — les réponses ne sont pas enregistrées"
+    exit_preview: "Quitter l'aperçu"
     thank_you_title: Merci !
     thank_you_sub: Vos réponses ont bien été enregistrées.
     thank_you_from: de la part de %{org}
@@ -266,6 +268,7 @@ fr:
     ranked_for: Classé par pertinence pour
     this_card: cette carte
   dashboard_card:
+    preview: "Aperçu"
     badge_archived: Archivé
     badge_live: En ligne
     badge_draft: Brouillon
