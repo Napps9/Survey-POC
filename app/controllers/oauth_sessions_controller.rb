@@ -1,9 +1,6 @@
 class OauthSessionsController < ApplicationController
   allow_unauthenticated_access
   skip_before_action :set_current_organisation
-  # Apple's callback is a cross-site POST (form_post) and carries no Rails
-  # CSRF token; the OmniAuth strategy has already validated the response.
-  skip_forgery_protection only: :create
 
   def create
     auth = request.env["omniauth.auth"]
@@ -30,13 +27,13 @@ class OauthSessionsController < ApplicationController
   class MissingEmail < StandardError; end
 
   # Identity (provider+uid) is the canonical key. A new identity links to an
-  # existing account when the provider-asserted email matches (Google sends
-  # email_verified; Apple only relays verified addresses; Entra ID emails are
-  # org-asserted — acceptable for this POC, revisit before wider GA).
-  # Otherwise it's a brand-new sign-up: user + their own workspace org.
+  # existing account when the emails match — only honoured when Google
+  # asserts the address is verified, so a spoofed address can't take over an
+  # account. Otherwise it's a brand-new sign-up: user + their own workspace.
   def locate_or_create_user!(auth)
     identity = Identity.find_or_initialize_by(provider: auth.provider.to_s, uid: auth.uid.to_s)
     email    = auth.info&.email.to_s.strip.downcase.presence
+    email    = nil if auth.extra&.raw_info&.email_verified == false
 
     user = identity.user
     user ||= User.find_by(email_address: email) if email

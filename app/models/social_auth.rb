@@ -1,13 +1,12 @@
 # Social sign-in registry. A provider is live only when every credential it
-# needs is present in the environment, so each one can be rolled out
-# independently (the auth pages and the OmniAuth initializer both read this).
+# needs is present in the environment (the auth pages and the OmniAuth
+# initializer both read this). Google-only for now — adding a provider means
+# a strategy gem, an entry here, an initializer block and a button icon.
 module SocialAuth
   Provider = Struct.new(:key, :label, :env_keys)
 
   PROVIDERS = [
-    Provider.new(:google_oauth2, "Google",    %w[GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET]),
-    Provider.new(:entra_id,      "Microsoft", %w[MICROSOFT_CLIENT_ID MICROSOFT_CLIENT_SECRET]),
-    Provider.new(:apple,         "Apple",     %w[APPLE_CLIENT_ID APPLE_TEAM_ID APPLE_KEY_ID APPLE_PRIVATE_KEY])
+    Provider.new(:google_oauth2, "Google", %w[GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET])
   ].freeze
 
   def self.enabled
