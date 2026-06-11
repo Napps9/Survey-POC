@@ -3,9 +3,32 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [ Main, main ]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run tests
+        env:
+          RAILS_ENV: test
+          # The suite stubs every Anthropic client (no real API calls), but the
+          # service constructors ENV.fetch the key, so a placeholder must exist.
+          ANTHROPIC_API_KEY: ci-stub-key-no-real-calls
+        run: |
+          bin/rails db:test:prepare
+          bin/rails test
+
   scan_ruby:
     runs-on: ubuntu-latest
 
