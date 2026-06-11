@@ -11,3 +11,12 @@ end
 
 OmniAuth.config.allowed_request_methods = [ :post ]
 OmniAuth.config.silence_get_warning = true
+
+# Pin the callback host so the redirect_uri Google receives is always the
+# canonical https URL, independent of the scheme Render's proxy forwards —
+# the usual cause of redirect_uri_mismatch in production. Mirrors the host
+# resolution in mailer.rb. Left unset in dev/test, where OmniAuth derives
+# http://localhost from the request.
+if (host = ENV["APP_HOST"].presence || ENV["RENDER_EXTERNAL_HOSTNAME"].presence)
+  OmniAuth.config.full_host = "#{ENV.fetch('APP_PROTOCOL', 'https')}://#{host}"
+end
