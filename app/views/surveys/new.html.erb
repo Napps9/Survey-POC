@@ -262,6 +262,37 @@
               </div>
             <% end %>
 
+            <%# ── Region tags (optional): tag the new Verto with regions up
+                front. Each tag mints its own share URL once created — they're
+                managed afterwards in the editor's publish panel. ── %>
+            <div data-controller="region-tags" style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+              <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(0,0,0,0.5);font-weight:700;">
+                <%= t("wizard.region_tags_label", default: "Region tags (optional)") %>
+              </div>
+              <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(0,0,0,0.55);margin:0;line-height:1.5;">
+                <%= t("wizard.region_tags_hint", default: "Tag your Verto with regions — each one gets its own share link, and players can compare answers across regions on a world map.") %>
+              </p>
+              <div data-region-tags-target="list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <select data-region-tags-target="country"
+                        style="<%= light_input_style %>flex:2;min-width:170px;width:auto;padding:10px 14px;font-size: var(--text-sm);">
+                  <option value=""><%= t("wizard.region_tags_country", default: "Choose a country…") %></option>
+                  <% WorldRegions.options.each do |name, code| %>
+                    <option value="<%= code %>" data-name="<%= name %>"><%= name %></option>
+                  <% end %>
+                </select>
+                <input type="text" maxlength="60"
+                       data-region-tags-target="label"
+                       data-action="keydown.enter->region-tags#add"
+                       placeholder="<%= t("wizard.region_tags_sublabel", default: "Sub-region (optional) — e.g. Yorkshire") %>"
+                       style="<%= light_input_style %>flex:2;min-width:170px;width:auto;padding:10px 14px;font-size: var(--text-sm);" />
+                <button type="button" data-action="click->region-tags#add"
+                        style="background:#1C2034;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">
+                  + <%= t("wizard.region_tags_add", default: "Add") %>
+                </button>
+              </div>
+            </div>
+
             <%# ── Alternative entry point: import prewritten questions from a PDF.
                 A dedicated submit button posts the file to import_pdf (via
                 formaction), skipping the AI-brief steps with formnovalidate. ── %>

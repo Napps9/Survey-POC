@@ -136,6 +136,37 @@ class RegionTagsTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  test "creation wizard region tags are minted with the new Verto" do
+    org  = create_org_and_sign_in("wizard")
+    fake = Object.new
+    def fake.call(**)
+      { "title" => "T", "description" => "d", "theme" => "T",
+        "audience_age" => "a", "key_insight" => "k", "cards" => CARDS.map(&:dup) }
+    end
+
+    # minitest 6 ships without minitest/mock, so stub SurveyGenerator.new by hand.
+    SurveyGenerator.define_singleton_method(:new) { |*| fake }
+    begin
+      post generate_survey_path, params: {
+        theme: "T", audience_age: "a", key_insight: "k", show_results_comparison: "0",
+        region_tags: [
+          { country_code: "GB", label: "Yorkshire" },
+          { country_code: "GB", label: "Yorkshire" }, # duplicate — skipped
+          { country_code: "ZZ", label: "" },          # invalid — skipped
+          { country_code: "FR", label: "" }
+        ]
+      }
+    ensure
+      SurveyGenerator.singleton_class.remove_method(:new)
+    end
+
+    survey = org.surveys.order(:id).last
+    assert_redirected_to survey_path(survey)
+    tags = survey.survey_region_links.map { |l| [ l.country_code, l.label ] }.sort_by(&:first)
+    assert_equal [ [ "FR", nil ], [ "GB", "Yorkshire" ] ], tags
+    assert survey.survey_region_links.all? { |l| l.token.present? }
+  end
+
   test "creator results show region segments and the world map" do
     org  = create_org_and_sign_in("results")
     s    = create_survey(org)

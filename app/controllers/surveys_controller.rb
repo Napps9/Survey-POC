@@ -82,6 +82,8 @@ class SurveysController < ApplicationController
     # Remember the palette as the company default so the next Verto inherits it.
     Current.organisation.update(default_brand_palette: palette) if palette.present?
 
+    create_region_links(@survey, params[:region_tags])
+
     translate_survey!(@survey)
 
     if ActiveModel::Type::Boolean.new.cast(params[:populate_content])
@@ -140,6 +142,8 @@ class SurveysController < ApplicationController
     )
 
     Current.organisation.update(default_brand_palette: palette) if palette.present?
+
+    create_region_links(@survey, params[:region_tags])
 
     translate_survey!(@survey)
 
@@ -283,6 +287,18 @@ class SurveysController < ApplicationController
 
   def set_survey
     @survey = Current.organisation.surveys.kept.find(params[:id])
+  end
+
+  # Region tags picked in the creation wizard: [{ country_code:, label: }, …].
+  # Invalid or duplicate entries are skipped silently — tags are managed (and
+  # visible) in the editor's publish panel right after creation.
+  def create_region_links(survey, tags_param)
+    Array(tags_param).each do |tag|
+      survey.survey_region_links.create(
+        country_code: tag[:country_code],
+        label:        tag[:label].to_s.strip.presence
+      )
+    end
   end
 
   # Snapshot the questions inside each attached Common Question Set into
