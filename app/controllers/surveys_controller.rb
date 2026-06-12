@@ -244,6 +244,9 @@ class SurveysController < ApplicationController
     if params.key?(:ask_region)
       attrs[:ask_region] = ActiveModel::Type::Boolean.new.cast(params[:ask_region])
     end
+    if params.key?(:compare_note)
+      attrs[:compare_note] = params[:compare_note].to_s.strip.first(160).presence
+    end
     @survey.update!(attrs) if attrs.any?
     redirect_to survey_path(@survey)
   end

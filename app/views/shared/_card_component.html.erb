@@ -270,7 +270,9 @@
       <% end %>
 
     <% when "welcome_card" %>
-      <%# Welcome card — no interactive component %>
+      <%# Welcome card — in the player it hosts the intake (compare promise +
+          region picker), moved here from the old top banners. %>
+      <% if mode == :player %><%= render "player/welcome_intake" %><% end %>
     <% end %>
   </div>
 

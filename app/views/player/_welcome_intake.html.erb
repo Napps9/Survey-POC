@@ -1,0 +1,53 @@
+<%# Intake shown on the welcome card (player only): the compare-results
+    promise and the regional-data notice + picker — both used to be top
+    banners. @survey / @region_link come from the player controller. %>
+<%
+  show_compare = @survey.show_results_comparison?
+  region_links = @survey.survey_region_links.order(:created_at).to_a
+  has_regions  = region_links.any? || @survey.ask_region?
+%>
+<% if show_compare || has_regions %>
+  <div class="welcome-intake">
+    <% if show_compare %>
+      <div class="welcome-intake-compare">🏁 <%= @survey.compare_note_text %></div>
+    <% end %>
+
+    <% if has_regions %>
+      <div class="welcome-intake-region">
+        <div class="welcome-intake-region-note">
+          🌍
+          <% if @region_link %>
+            <%= t("player.region_notice_linked", region: @region_link.display_name) %>
+          <% else %>
+            <%= t("player.region_notice_pick") %>
+          <% end %>
+        </div>
+        <% if @region_link %>
+          <button type="button" class="welcome-intake-link"
+                  data-action="click->player#toggleRegionOptOut">
+            <%= t("js.player.region_optout") %>
+          </button>
+        <% elsif @survey.ask_region? %>
+          <div class="welcome-intake-fields">
+            <select class="welcome-intake-select" data-action="change->player#setRegionCountry">
+              <option value=""><%= t("player.region_country_prompt") %></option>
+              <% WorldRegions.options.each do |name, code| %>
+                <option value="<%= code %>"><%= name %></option>
+              <% end %>
+            </select>
+            <input type="text" maxlength="60" class="welcome-intake-input"
+                   data-action="change->player#setRegionArea"
+                   placeholder="<%= t("player.region_area_placeholder") %>" />
+          </div>
+        <% else %>
+          <select class="welcome-intake-select" data-action="change->player#setRegion">
+            <option value=""><%= t("player.region_prefer_not") %></option>
+            <% region_links.each do |link| %>
+              <option value="<%= link.country_code %>|<%= link.label %>"><%= link.display_name %></option>
+            <% end %>
+          </select>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

@@ -81,6 +81,12 @@ class Survey < ApplicationRecord
     publish_token.present?
   end
 
+  # The compare-results promise shown on the welcome card. Falls back to the
+  # default copy when the creator hasn't customised it.
+  def compare_note_text
+    compare_note.presence || I18n.t("player.compare_promise")
+  end
+
   # A "responder" is anyone who answered at least one question (not just those
   # who submitted). Reads the preloaded :responses association in Ruby so the
   # dashboard's includes(:responses) avoids per-card queries.

@@ -214,13 +214,33 @@ class RegionTagsTest < ActionDispatch::IntegrationTest
     assert_match 'id="world-map"', response.body
   end
 
-  test "compare promise banner shows at the start when comparison is on" do
+  test "compare promise shows on the welcome card when comparison is on" do
     org = create_org_and_sign_in("promise")
     s   = create_survey(org)
     s.update!(show_results_comparison: true)
 
     get play_survey_path(s.publish_token)
     assert_response :success
+    assert_match "welcome-intake-compare", response.body
     assert_match "Finish to see how your answers compare", response.body
+  end
+
+  test "the compare promise is editable, and the top banners are gone" do
+    org = create_org_and_sign_in("editnote")
+    s   = create_survey(org)
+    s.survey_region_links.create!(country_code: "GB", label: "Yorkshire")
+    s.update!(show_results_comparison: true)
+
+    post survey_settings_path(s), params: { show_results_comparison: "1", compare_note: "Stick around for the big reveal!" }
+    assert_redirected_to survey_path(s)
+    assert_equal "Stick around for the big reveal!", s.reload.compare_note
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    # the custom promise + region picker render on the welcome card…
+    assert_match "Stick around for the big reveal!", response.body
+    assert_match "welcome-intake", response.body
+    # …and no longer as top banners
+    refute_match "Regional-data heads-up", response.body
   end
 end

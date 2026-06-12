@@ -46,58 +46,9 @@
     </div>
   <% end %>
 
-  <% if has_regions %>
-    <%# Regional-data heads-up: respondents always see that this Verto captures
-        coarse region data and can decline (or self-pick on the base link). %>
-    <div style="flex-shrink:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 14px;padding:7px 14px;background:rgba(12,167,255,0.10);border-bottom:1px solid rgba(12,167,255,0.25);">
-      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:#7CC9FF;">
-        🌍
-        <% if @region_link %>
-          <%= t("player.region_notice_linked", region: @region_link.display_name) %>
-        <% else %>
-          <%= t("player.region_notice_pick") %>
-        <% end %>
-      </span>
-      <% if @region_link %>
-        <button type="button"
-                data-action="click->player#toggleRegionOptOut"
-                style="background:none;border:none;cursor:pointer;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:rgba(255,255,255,0.7);text-decoration:underline;text-underline-offset:3px;padding:0;">
-          <%= t("js.player.region_optout") %>
-        </button>
-      <% elsif @survey.ask_region? %>
-        <%# Ask-players mode: any country + an optional free-text area, so a
-            single link scales to hundreds of regions. %>
-        <select data-action="change->player#setRegionCountry"
-                style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);padding:3px 8px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff;outline:none;cursor:pointer;max-width:180px;">
-          <option value=""><%= t("player.region_country_prompt") %></option>
-          <% WorldRegions.options.each do |name, code| %>
-            <option value="<%= code %>"><%= name %></option>
-          <% end %>
-        </select>
-        <input type="text" maxlength="60"
-               data-action="change->player#setRegionArea"
-               placeholder="<%= t("player.region_area_placeholder") %>"
-               style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);padding:3px 8px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff;outline:none;width:150px;" />
-      <% else %>
-        <select data-action="change->player#setRegion"
-                style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);padding:3px 8px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff;outline:none;cursor:pointer;">
-          <option value=""><%= t("player.region_prefer_not") %></option>
-          <% region_links.each do |link| %>
-            <option value="<%= link.country_code %>|<%= link.label %>"><%= link.display_name %></option>
-          <% end %>
-        </select>
-      <% end %>
-    </div>
-  <% end %>
-
-  <% if show_comparison %>
-    <%# Promise the comparison payoff up front — an incentive to finish. %>
-    <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 14px;background:rgba(255,30,111,0.08);border-bottom:1px solid rgba(255,30,111,0.22);">
-      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:#FF8FB6;">
-        🏁 <%= t("player.compare_promise") %>
-      </span>
-    </div>
-  <% end %>
+  <%# The regional-data notice/picker and the compare-results promise used to
+      be top banners; they now live on the welcome card (player/welcome_intake)
+      to free up screen space. %>
 
   <%# No top nav bar — the Verto's logo/title used to live here, but removing
       it gives the card more screen. The org's brand still shows on the
