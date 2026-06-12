@@ -33,7 +33,9 @@ module ResolvesResultSegments
     # link-minted regions and ask-players self-declared ones. Ordered by
     # volume and capped, so a Verto with hundreds of regions doesn't explode
     # the filter row. Ids hash the region key — stable across requests.
-    region_counts = base.where.not(region_country: nil)
+    # reorder(nil) drops base's `ORDER BY created_at`: Postgres rejects an
+    # ORDER BY column that isn't in the GROUP BY (SQLite quietly allows it).
+    region_counts = base.reorder(nil).where.not(region_country: nil)
                         .group(:region_country, :region_label).count
     region_counts.sort_by { |_, count| -count }.first(REGION_SEGMENT_CAP).each do |(country, label), count|
       name    = WorldRegions.name_for(country)
