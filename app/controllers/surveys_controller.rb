@@ -200,6 +200,9 @@ class SurveysController < ApplicationController
 
   def update
     survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.published?
+      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    end
     payload = JSON.parse(request.body.read)
 
     # Only touch the attributes present in the payload, so the brand-colour
@@ -247,6 +250,9 @@ class SurveysController < ApplicationController
 
   def shuffle_assets
     survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.published?
+      return redirect_to survey_path(survey), alert: "This Verto is live — editing is locked."
+    end
     AssetPopulator.new(survey, seed: SecureRandom.hex(4)).populate!
     redirect_to survey_path(survey)
   rescue => e
@@ -305,6 +311,9 @@ class SurveysController < ApplicationController
   # Generates a single new question card using Claude, renders its HTML partial.
   def generate_card
     survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.published?
+      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    end
 
     card = SingleQuestionGenerator.new.call(
       theme:          survey.theme,
@@ -326,6 +335,9 @@ class SurveysController < ApplicationController
   # Renders the HTML partial for a given card JSON (used by "Start from Blank" flow).
   def render_card
     survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.published?
+      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    end
     card   = JSON.parse(request.body.read)
 
     html = render_card_html(survey, card)

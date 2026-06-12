@@ -266,6 +266,9 @@ ko:
     confirm_password_label: 비밀번호 확인
     accept_submit: 초대 수락 →
   editor:
+    live_locked_bar: "이 Verto는 라이브 중 — 데이터 품질 보호를 위해 질문이 잠겨 있어요."
+    live_results: "결과 보기 →"
+    publish_confirm: "이 Verto를 게시할까요? 라이브가 되면 질문이 잠겨 수정할 수 없어요 — 모든 내용이 원하는 대로인지 확인하세요."
     questions: 질문
     primary: 기본
     change_media: 미디어 변경
@@ -274,7 +277,7 @@ ko:
     add_design_title: 이 카드에 이미지 추가
     add_design_sub: 이미지를 추가해 카드에 생동감을 더하세요
     live: 라이브
-    live_warning: 이 Verto가 응답을 수집하는 동안 질문을 편집하면 데이터 품질에 영향을 미칩니다. 편집 전후의 답변은 직접 비교할 수 없습니다.
+    live_warning: "이 Verto는 라이브 중이라 질문이 잠겨 있어요 — 모든 응답자가 정확히 같은 Verto에 답해 결과를 비교할 수 있게 유지돼요. 수정이 필요하면 새 Verto를 만드세요."
     got_it: 확인
     add_question: 질문 추가
     cards:
@@ -298,6 +301,7 @@ ko:
     ranked_for: 적합도 순위
     this_card: 이 카드
   dashboard_card:
+    publish_warning: "“%{title}”을(를) 게시할까요? 라이브가 되면 질문이 잠겨 수정할 수 없어요 — 모든 내용이 원하는 대로인지 확인하세요."
     preview: "미리보기"
     badge_archived: 보관됨
     badge_live: 라이브

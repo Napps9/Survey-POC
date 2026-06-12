@@ -266,6 +266,9 @@ ja:
     confirm_password_label: パスワード(確認)
     accept_submit: 招待を承認 →
   editor:
+    live_locked_bar: "このVertoは公開中 — データ品質を守るため質問はロックされています。"
+    live_results: "結果を見る →"
+    publish_confirm: "このVertoを公開しますか？公開後は質問がロックされ編集できません — すべてが望みどおりか確認してください。"
     questions: 質問
     primary: プライマリ
     change_media: メディアを変更
@@ -274,7 +277,7 @@ ja:
     add_design_title: このカードに画像を追加
     add_design_sub: 画像を追加してカードを魅力的に
     live: ライブ
-    live_warning: このVertoが回答を収集中に質問を編集すると、データの品質に影響します。編集前後の回答は直接比較できません。
+    live_warning: "このVertoは公開中のため、質問はロックされています — 全員がまったく同じVertoに回答するので、結果の比較可能性が保たれます。変更が必要なら、新しいVertoを作成してください。"
     got_it: 了解
     add_question: 質問を追加
     cards:
@@ -298,6 +301,7 @@ ja:
     ranked_for: 適合度でランク付け：
     this_card: このカード
   dashboard_card:
+    publish_warning: "「%{title}」を公開しますか？公開後は質問がロックされ編集できません — すべてが望みどおりか確認してください。"
     preview: "プレビュー"
     badge_archived: アーカイブ済み
     badge_live: ライブ

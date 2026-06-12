@@ -266,6 +266,9 @@ vi:
     confirm_password_label: Xác nhận mật khẩu
     accept_submit: Chấp nhận lời mời →
   editor:
+    live_locked_bar: "Verto này đang hoạt động — câu hỏi bị khóa để bảo vệ chất lượng dữ liệu."
+    live_results: "Xem kết quả →"
+    publish_confirm: "Đăng Verto này? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     questions: câu hỏi
     primary: chính
     change_media: Đổi hình ảnh
@@ -274,7 +277,7 @@ vi:
     add_design_title: Thêm hình ảnh vào thẻ này
     add_design_sub: Thêm hình ảnh để thẻ này sống động hơn
     live: TRỰC TIẾP
-    live_warning: Việc chỉnh sửa câu hỏi trong khi Verto này đang thu thập phản hồi sẽ ảnh hưởng đến chất lượng dữ liệu. Câu trả lời trước và sau khi chỉnh sửa sẽ không so sánh trực tiếp được.
+    live_warning: "Verto này đang hoạt động nên các câu hỏi đã bị khóa — mọi người trả lời đúng cùng một Verto, giúp kết quả luôn so sánh được. Cần thay đổi? Hãy tạo Verto mới."
     got_it: Đã hiểu
     add_question: Thêm câu hỏi
     cards:
@@ -298,6 +301,7 @@ vi:
     ranked_for: Xếp theo độ phù hợp cho
     this_card: thẻ này
   dashboard_card:
+    publish_warning: "Đăng “%{title}”? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     preview: "Xem trước"
     badge_archived: Đã lưu trữ
     badge_live: Trực tiếp

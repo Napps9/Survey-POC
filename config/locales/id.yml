@@ -266,6 +266,9 @@ id:
     confirm_password_label: Konfirmasi kata sandi
     accept_submit: Terima undangan →
   editor:
+    live_locked_bar: "Verto ini live — pertanyaan terkunci untuk menjaga kualitas data."
+    live_results: "Lihat hasil →"
+    publish_confirm: "Terbitkan Verto ini? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."
     questions: pertanyaan
     primary: utama
     change_media: Ubah media
@@ -274,7 +277,7 @@ id:
     add_design_title: Tambahkan gambar ke kartu ini
     add_design_sub: Tambahkan gambar untuk menghidupkan kartu ini
     live: LIVE
-    live_warning: Mengedit pertanyaan saat Verto ini sedang mengumpulkan tanggapan akan memengaruhi kualitas data. Jawaban sebelum dan sesudah pengeditan tidak dapat dibandingkan langsung.
+    live_warning: "Verto ini sedang live, jadi pertanyaannya terkunci — setiap responden menjawab Verto yang persis sama, sehingga hasilmu tetap sebanding. Perlu perubahan? Buat Verto baru."
     got_it: Mengerti
     add_question: Tambah pertanyaan
     cards:
@@ -298,6 +301,7 @@ id:
     ranked_for: Diurutkan berdasarkan kecocokan untuk
     this_card: kartu ini
   dashboard_card:
+    publish_warning: "Terbitkan “%{title}”? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."
     preview: "Pratinjau"
     badge_archived: Diarsipkan
     badge_live: Live

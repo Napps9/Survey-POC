@@ -58,6 +58,9 @@
               <%= t("editor.live_warning") %>
             </div>
             <div class="live-warning-foot">
+              <%= link_to t("editor.live_results"), survey_results_path(@survey),
+                    class: "live-warning-btn",
+                    style: "text-decoration:none;display:inline-block;background:transparent;border:1px solid rgba(255,255,255,0.25);color:#fff;" %>
               <button type="button" class="live-warning-btn"
                       data-action="click->live-warning#dismiss"><%= t("editor.got_it") %></button>
             </div>
@@ -109,10 +112,24 @@
         <% end %>
       </div>
 
+      <% live_locked = @survey.publish_token.present? %>
+
+      <% if live_locked %>
+        <%# Live = read-only: a slim lock bar, and the feed below is inert.
+            The server rejects every content mutation regardless. %>
+        <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 14px;background:rgba(255,30,111,0.1);border-bottom:1px solid rgba(255,30,111,0.3);">
+          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#FF8FB6;">
+            🔒 <%= t("editor.live_locked_bar") %>
+          </span>
+          <%= link_to t("editor.live_results"), survey_results_path(@survey),
+                style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#fff;text-decoration:underline;text-underline-offset:3px;" %>
+        </div>
+      <% end %>
+
       <%# Cards feed — stacked, full-width split-cards. The Verto's brand
           palette is scoped here so the cards render in brand colours while the
           surrounding editor chrome stays Playverto. %>
-      <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5"
+      <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 <%= 'editor-feed-locked' if live_locked %>"
            data-brand-palette-target="preview"
            data-add-question-target="cardsFeed"
            data-survey-editor-target="feed"
@@ -129,13 +146,15 @@
         <% end %>
 
         <%# "Add question" button — sits at bottom of the cards feed %>
-        <div style="display:flex;justify-content:center;padding:4px 0 8px;">
-          <button type="button"
-                  class="aq-trigger-btn"
-                  data-action="click->add-question#open">
-            ＋ <%= t("editor.add_question") %>
-          </button>
-        </div>
+        <% unless live_locked %>
+          <div style="display:flex;justify-content:center;padding:4px 0 8px;">
+            <button type="button"
+                    class="aq-trigger-btn"
+                    data-action="click->add-question#open">
+              ＋ <%= t("editor.add_question") %>
+            </button>
+          </div>
+        <% end %>
 
       </div><%# /cards feed %>
 
@@ -150,18 +169,20 @@
           </span>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
-          <%= button_to t("editor.shuffle"), shuffle_survey_assets_path(@survey),
-                method: :post,
-                form: { data: { turbo_confirm: t("editor.shuffle_confirm") } },
-                title: t("editor.shuffle_title"),
-                style: "padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;",
-                onmouseover: "this.style.background='rgba(255,255,255,0.12)'",
-                onmouseout:  "this.style.background='rgba(255,255,255,0.07)'" %>
-          <button type="button"
-                  style="padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
-                  onmouseover="this.style.background='rgba(255,255,255,0.12)'"
-                  onmouseout="this.style.background='rgba(255,255,255,0.07)'"
-                  data-action="click->publish-panel#openDesign"><%= t("editor.design") %></button>
+          <% unless live_locked %>
+            <%= button_to t("editor.shuffle"), shuffle_survey_assets_path(@survey),
+                  method: :post,
+                  form: { data: { turbo_confirm: t("editor.shuffle_confirm") } },
+                  title: t("editor.shuffle_title"),
+                  style: "padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;",
+                  onmouseover: "this.style.background='rgba(255,255,255,0.12)'",
+                  onmouseout:  "this.style.background='rgba(255,255,255,0.07)'" %>
+            <button type="button"
+                    style="padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.12)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.07)'"
+                    data-action="click->publish-panel#openDesign"><%= t("editor.design") %></button>
+          <% end %>
           <button type="button"
                   style="padding:10px 26px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
                   onmouseover="this.style.background='#00C4AB'"
@@ -312,7 +333,7 @@
             <%= button_to "Publish Verto →", publish_survey_path(@survey),
                   method: :post,
                   style: "width:100%;padding:10px;border-radius:12px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;",
-                  form: { style: "margin:0;" } %>
+                  form: { style: "margin:0;", data: { turbo_confirm: t("editor.publish_confirm") } } %>
           <% end %>
         </div>
 

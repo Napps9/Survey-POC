@@ -33,7 +33,7 @@
   end
 
   verto_name   = survey.theme.presence || survey.title.presence || t("dashboard_card.fallback_name")
-  edit_warning = published ? t("dashboard_card.edit_warning", title: verto_name) : nil
+  publish_warning = t("dashboard_card.publish_warning", title: verto_name)
   delete_warning = t("dashboard_card.delete_warning", title: verto_name)
   delete_forever_warning = t("dashboard_card.delete_forever_warning", title: verto_name)
 
@@ -148,7 +148,6 @@
   <% else %>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 0;">
       <%= link_to t("dashboard_card.edit"), survey_path(survey),
-            data: { turbo_confirm: edit_warning },
             style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;white-space:nowrap;",
             onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
             onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
@@ -162,7 +161,7 @@
         <%= button_to t("dashboard_card.publish"), publish_survey_path(survey),
               method: :post,
               style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(1,234,203,0.14);border:1px solid rgba(1,234,203,0.32);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;transition:all 0.15s;white-space:nowrap;",
-              form: { style: "flex:1;display:flex;" },
+              form: { style: "flex:1;display:flex;", data: { turbo_confirm: publish_warning } },
               onmouseover: "this.style.background='rgba(1,234,203,0.22)'",
               onmouseout:  "this.style.background='rgba(1,234,203,0.14)'" %>
       <% end %>

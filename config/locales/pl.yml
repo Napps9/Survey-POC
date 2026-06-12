@@ -266,6 +266,9 @@ pl:
     confirm_password_label: Potwierdź hasło
     accept_submit: Zaakceptuj zaproszenie →
   editor:
+    live_locked_bar: "To Verto jest na żywo — pytania są zablokowane, by chronić jakość danych."
+    live_results: "Zobacz wyniki →"
+    publish_confirm: "Opublikować to Verto? Po publikacji pytania zostaną zablokowane i nie będzie można ich edytować — upewnij się, że wszystko wygląda dokładnie tak, jak chcesz."
     questions: pytań
     primary: główny
     change_media: Zmień multimedia
@@ -274,7 +277,7 @@ pl:
     add_design_title: Dodaj obraz do tej karty
     add_design_sub: Dodaj obraz, aby ożywić tę kartę
     live: NA ŻYWO
-    live_warning: Edytowanie pytań, gdy to Verto zbiera odpowiedzi, wpłynie na jakość danych. Odpowiedzi przed i po edycji nie będą bezpośrednio porównywalne.
+    live_warning: "To Verto jest na żywo, więc jego pytania są zablokowane — każdy respondent odpowiada na dokładnie to samo Verto, dzięki czemu wyniki pozostają porównywalne. Potrzebujesz zmian? Utwórz nowe Verto."
     got_it: Rozumiem
     add_question: Dodaj pytanie
     cards:
@@ -298,6 +301,7 @@ pl:
     ranked_for: Uszeregowane według dopasowania do
     this_card: tej karty
   dashboard_card:
+    publish_warning: "Opublikować „%{title}”? Po publikacji pytania zostaną zablokowane i nie będzie można ich edytować — upewnij się, że wszystko wygląda dokładnie tak, jak chcesz."
     preview: "Podgląd"
     badge_archived: Zarchiwizowane
     badge_live: Na żywo

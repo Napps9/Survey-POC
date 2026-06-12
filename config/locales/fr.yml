@@ -266,6 +266,9 @@ fr:
     confirm_password_label: Confirmer le mot de passe
     accept_submit: Accepter l'invitation →
   editor:
+    live_locked_bar: "Ce Verto est en ligne — les questions sont verrouillées pour protéger la qualité des données."
+    live_results: "Voir les résultats →"
+    publish_confirm: "Publier ce Verto ? Une fois en ligne, ses questions sont verrouillées et ne peuvent plus être modifiées — vérifiez que tout est exactement comme vous le voulez."
     questions: questions
     primary: principale
     change_media: Changer le média
@@ -274,7 +277,7 @@ fr:
     add_design_title: Ajouter une image à cette carte
     add_design_sub: Ajoutez une image pour donner vie à cette carte
     live: EN LIGNE
-    live_warning: Modifier les questions pendant que ce Verto collecte des réponses affectera la qualité des données. Les réponses avant et après la modification ne seront pas directement comparables.
+    live_warning: "Ce Verto est en ligne, ses questions sont donc verrouillées — chaque répondant répond exactement au même Verto, ce qui garde vos résultats comparables. Besoin de changements ? Créez un nouveau Verto."
     got_it: Compris
     add_question: Ajouter une question
     cards:
@@ -298,6 +301,7 @@ fr:
     ranked_for: Classé par pertinence pour
     this_card: cette carte
   dashboard_card:
+    publish_warning: "Publier « %{title} » ? Une fois en ligne, ses questions sont verrouillées et ne peuvent plus être modifiées — vérifiez que tout est exactement comme vous le voulez."
     preview: "Aperçu"
     badge_archived: Archivé
     badge_live: En ligne

@@ -266,6 +266,9 @@ de:
     confirm_password_label: Passwort bestätigen
     accept_submit: Einladung annehmen →
   editor:
+    live_locked_bar: "Dieses Verto ist live — die Fragen sind gesperrt, um die Datenqualität zu schützen."
+    live_results: "Ergebnisse ansehen →"
+    publish_confirm: "Dieses Verto veröffentlichen? Sobald es live ist, sind die Fragen gesperrt und können nicht bearbeitet werden — prüfe, ob alles genau so ist, wie du es willst."
     questions: Fragen
     primary: primär
     change_media: Medien ändern
@@ -274,7 +277,7 @@ de:
     add_design_title: Bild zu dieser Karte hinzufügen
     add_design_sub: Füge ein Bild hinzu, um diese Karte zum Leben zu erwecken
     live: LIVE
-    live_warning: Das Bearbeiten von Fragen, während dieses Verto Antworten sammelt, beeinträchtigt die Datenqualität. Antworten vor und nach der Bearbeitung sind nicht direkt vergleichbar.
+    live_warning: "Dieses Verto ist live, daher sind seine Fragen gesperrt — alle Befragten beantworten exakt dasselbe Verto, was deine Ergebnisse vergleichbar hält. Änderungen nötig? Erstelle ein neues Verto."
     got_it: Verstanden
     add_question: Frage hinzufügen
     cards:
@@ -298,6 +301,7 @@ de:
     ranked_for: Sortiert nach Eignung für
     this_card: diese Karte
   dashboard_card:
+    publish_warning: "„%{title}“ veröffentlichen? Sobald es live ist, sind die Fragen gesperrt und können nicht bearbeitet werden — prüfe, ob alles genau so ist, wie du es willst."
     preview: "Vorschau"
     badge_archived: Archiviert
     badge_live: Live

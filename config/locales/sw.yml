@@ -266,6 +266,9 @@ sw:
     confirm_password_label: Thibitisha nenosiri
     accept_submit: Kubali mwaliko →
   editor:
+    live_locked_bar: "Verto hii iko hewani — maswali yamefungwa kulinda ubora wa data."
+    live_results: "Ona matokeo →"
+    publish_confirm: "Chapisha Verto hii? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     questions: maswali
     primary: msingi
     change_media: Badilisha media
@@ -274,7 +277,7 @@ sw:
     add_design_title: Ongeza picha kwenye kadi hii
     add_design_sub: Ongeza picha ili kuipa kadi hii uhai
     live: HAI
-    live_warning: Kuhariri maswali wakati Verto hii inakusanya majibu kutaathiri ubora wa data. Majibu ya kabla na baada ya uhariri hayatalinganishwa moja kwa moja.
+    live_warning: "Verto hii iko hewani, kwa hivyo maswali yake yamefungwa — kila mjibu anajibu Verto ile ile kabisa, hivyo matokeo yako yanabaki kulinganishwa. Unahitaji mabadiliko? Unda Verto mpya."
     got_it: Nimeelewa
     add_question: Ongeza swali
     cards:
@@ -298,6 +301,7 @@ sw:
     ranked_for: Imepangwa kwa ufaafu kwa
     this_card: kadi hii
   dashboard_card:
+    publish_warning: "Chapisha “%{title}”? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     preview: "Hakiki"
     badge_archived: Imehifadhiwa
     badge_live: Hai

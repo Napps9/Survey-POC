@@ -268,6 +268,9 @@ en:
     confirm_password_label: "Confirm password"
     accept_submit: "Accept invite →"
   editor:
+    live_locked_bar: "This Verto is live — questions are locked to protect data quality."
+    live_results: "View results →"
+    publish_confirm: "Publish this Verto? Once it's live, its questions are locked and can't be edited — make sure everything reads exactly as you want."
     questions: "questions"
     primary: "primary"
     change_media: "Change media"
@@ -276,7 +279,7 @@ en:
     add_design_title: "Add an image to this card"
     add_design_sub: "Add an image to bring this card to life"
     live: "LIVE"
-    live_warning: "Editing questions while this Verto is collecting responses will affect data quality. Answers before and after the edit won't be directly comparable."
+    live_warning: "This Verto is live, so its questions are locked — every responder answers exactly the same Verto, which keeps your results comparable. Need changes? Create a new Verto."
     got_it: "Got it"
     add_question: "Add question"
     cards:
@@ -300,6 +303,7 @@ en:
     ranked_for: "Ranked by fit for"
     this_card: "this card"
   dashboard_card:
+    publish_warning: "Publish “%{title}”? Once live, its questions are locked and can't be edited — make sure everything reads exactly as you want."
     preview: "Preview"
     badge_archived: "Archived"
     badge_live: "Live"

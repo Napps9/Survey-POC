@@ -266,6 +266,9 @@ nl:
     confirm_password_label: Bevestig wachtwoord
     accept_submit: Uitnodiging accepteren →
   editor:
+    live_locked_bar: "Deze Verto is live — vragen zijn vergrendeld om de datakwaliteit te beschermen."
+    live_results: "Bekijk resultaten →"
+    publish_confirm: "Deze Verto publiceren? Zodra hij live is, zijn de vragen vergrendeld en niet meer te bewerken — controleer of alles precies klopt."
     questions: vragen
     primary: primair
     change_media: Media wijzigen
@@ -274,7 +277,7 @@ nl:
     add_design_title: Een afbeelding aan deze kaart toevoegen
     add_design_sub: Voeg een afbeelding toe om deze kaart tot leven te brengen
     live: LIVE
-    live_warning: Het bewerken van vragen terwijl deze Verto reacties verzamelt, heeft invloed op de datakwaliteit. Antwoorden van vóór en na de bewerking zijn niet rechtstreeks vergelijkbaar.
+    live_warning: "Deze Verto is live, dus de vragen zijn vergrendeld — iedereen beantwoordt exact dezelfde Verto, zodat je resultaten vergelijkbaar blijven. Wijzigingen nodig? Maak een nieuwe Verto."
     got_it: Begrepen
     add_question: Vraag toevoegen
     cards:
@@ -298,6 +301,7 @@ nl:
     ranked_for: Gerangschikt op geschiktheid voor
     this_card: deze kaart
   dashboard_card:
+    publish_warning: "“%{title}” publiceren? Zodra hij live is, zijn de vragen vergrendeld en niet meer te bewerken — controleer of alles precies klopt."
     preview: "Voorbeeld"
     badge_archived: Gearchiveerd
     badge_live: Live

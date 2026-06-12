@@ -266,6 +266,9 @@ es:
     confirm_password_label: Confirmar contraseña
     accept_submit: Aceptar invitación →
   editor:
+    live_locked_bar: "Este Verto está en vivo — las preguntas están bloqueadas para proteger la calidad de los datos."
+    live_results: "Ver resultados →"
+    publish_confirm: "¿Publicar este Verto? Una vez en vivo, sus preguntas quedan bloqueadas y no se pueden editar — asegúrate de que todo esté exactamente como quieres."
     questions: preguntas
     primary: principal
     change_media: Cambiar imagen
@@ -274,7 +277,7 @@ es:
     add_design_title: Agregar una imagen a esta tarjeta
     add_design_sub: Añade una imagen para darle vida a esta tarjeta
     live: EN VIVO
-    live_warning: Editar preguntas mientras este Verto está recopilando respuestas afectará la calidad de los datos. Las respuestas anteriores y posteriores a la edición no serán directamente comparables.
+    live_warning: "Este Verto está en vivo, así que sus preguntas están bloqueadas: cada persona responde exactamente el mismo Verto, lo que mantiene tus resultados comparables. ¿Necesitas cambios? Crea un Verto nuevo."
     got_it: Entendido
     add_question: Agregar pregunta
     cards:
@@ -298,6 +301,7 @@ es:
     ranked_for: Clasificado por idoneidad para
     this_card: esta tarjeta
   dashboard_card:
+    publish_warning: "¿Publicar “%{title}”? Una vez en vivo, sus preguntas quedan bloqueadas y no se pueden editar — asegúrate de que todo esté exactamente como quieres."
     preview: "Vista previa"
     badge_archived: Archivado
     badge_live: En vivo

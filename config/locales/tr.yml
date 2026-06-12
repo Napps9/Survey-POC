@@ -266,6 +266,9 @@ tr:
     confirm_password_label: Şifreyi onayla
     accept_submit: Daveti kabul et →
   editor:
+    live_locked_bar: "Bu Verto yayında — veri kalitesini korumak için sorular kilitli."
+    live_results: "Sonuçları gör →"
+    publish_confirm: "Bu Verto yayınlansın mı? Yayına girdikten sonra soruları kilitlenir ve düzenlenemez — her şeyin tam istediğin gibi olduğundan emin ol."
     questions: sorular
     primary: birincil
     change_media: Medyayı değiştir
@@ -274,7 +277,7 @@ tr:
     add_design_title: Bu karta bir resim ekle
     add_design_sub: Bu karta hayat vermek için bir resim ekleyin
     live: CANLI
-    live_warning: Bu Verto yanıt toplarken soruları düzenlemek veri kalitesini etkileyecektir. Düzenlemeden önceki ve sonraki yanıtlar doğrudan karşılaştırılamaz.
+    live_warning: "Bu Verto yayında, bu yüzden soruları kilitli — herkes tam olarak aynı Verto'yu yanıtlar, böylece sonuçların karşılaştırılabilir kalır. Değişiklik mi gerekiyor? Yeni bir Verto oluştur."
     got_it: Anladım
     add_question: Soru ekle
     cards:
@@ -298,6 +301,7 @@ tr:
     ranked_for: 'Şuna uygunluğa göre sıralandı:'
     this_card: bu kart
   dashboard_card:
+    publish_warning: "“%{title}” yayınlansın mı? Yayına girdikten sonra soruları kilitlenir ve düzenlenemez — her şeyin tam istediğin gibi olduğundan emin ol."
     preview: "Önizleme"
     badge_archived: Arşivlendi
     badge_live: Canlı
