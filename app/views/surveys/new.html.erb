@@ -80,8 +80,8 @@
 
   <%= form_with url: generate_survey_path, method: :post, multipart: true,
         html: { style: "display:flex;flex-direction:column;flex:1;min-height:0;" },
-        data: { controller: "create-wizard",
-                action: "submit->generating#show" } do |f| %>
+        data: { controller: "create-wizard demographics-gate",
+                action: "submit->demographics-gate#check submit->generating#show keydown.esc@window->demographics-gate#closeOnEsc" } do |f| %>
 
     <%
       # Light-theme styles for inputs inside the white card right-panel
@@ -345,42 +345,61 @@
             </div>
 
             <%# ── Region settings: lives with languages — both describe WHERE
-                and HOW the Verto reaches people. Collapsed by default; the
-                count badge keeps picked regions visible when closed. ── %>
-            <details class="wizard-advanced" data-controller="region-tags"
-                     style="border:1.5px solid rgba(0,0,0,0.1);border-radius:12px;background:#fafbfc;overflow:hidden;">
-              <summary style="display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.6);font-weight:700;">
+                and HOW the Verto reaches people. Opens in a full-screen modal
+                so the picker is roomy; the count badge keeps picked regions
+                visible on the trigger. ── %>
+            <div data-controller="region-tags" data-action="keydown.esc@window->region-tags#closeOnEsc">
+              <button type="button" data-action="click->region-tags#open"
+                      style="display:flex;align-items:center;gap:8px;width:100%;padding:11px 14px;border-radius:12px;background:#fafbfc;border:1.5px solid rgba(0,0,0,0.1);cursor:pointer;font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.6);font-weight:700;">
                 🌍 <%= t("wizard.region_tags_label", default: "Region settings (optional)") %>
                 <span data-region-tags-target="count"
                       style="display:none;min-width:18px;height:18px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0;align-items:center;justify-content:center;padding:0 5px;"></span>
-                <span class="wizard-advanced-chev" style="margin-left:auto;font-size:9px;color:rgba(0,0,0,0.4);">▼</span>
-              </summary>
+                <span style="margin-left:auto;font-size:11px;color:rgba(0,0,0,0.4);">＋</span>
+              </button>
 
-              <div style="display:flex;flex-direction:column;gap:8px;padding:10px 14px 14px;border-top:1px solid rgba(0,0,0,0.06);">
-                <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(0,0,0,0.55);margin:0;line-height:1.5;">
-                  <%= t("wizard.region_tags_hint", default: "Tag your Verto with regions — each one gets its own share link, and players can compare answers across regions on a world map.") %>
-                </p>
-                <div data-region-tags-target="list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                  <select data-region-tags-target="country"
-                          style="<%= light_input_style %>flex:2;min-width:170px;width:auto;padding:10px 14px;font-size: var(--text-sm);">
-                    <option value=""><%= t("wizard.region_tags_country", default: "Choose a country…") %></option>
-                    <% WorldRegions.options.each do |name, code| %>
-                      <option value="<%= code %>" data-name="<%= name %>"><%= name %></option>
-                    <% end %>
-                  </select>
-                  <input type="text" maxlength="60"
-                         data-region-tags-target="label"
-                         data-action="keydown.enter->region-tags#add"
-                         placeholder="<%= t("wizard.region_tags_sublabel", default: "Sub-region (optional) — e.g. Yorkshire") %>"
-                         style="<%= light_input_style %>flex:2;min-width:170px;width:auto;padding:10px 14px;font-size: var(--text-sm);" />
-                  <button type="button" data-action="click->region-tags#add"
-                          style="background:#1C2034;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">
-                    + <%= t("wizard.region_tags_add", default: "Add") %>
-                  </button>
+              <div data-region-tags-target="modal" class="app-modal hidden"
+                   data-action="click->region-tags#backdropClose">
+                <div class="app-modal__backdrop"></div>
+                <div class="app-modal__panel" style="max-width:520px;">
+                  <div style="display:flex;align-items:center;gap:10px;padding:18px 22px 12px;">
+                    <span style="font-size:20px;">🌍</span>
+                    <div style="flex:1;">
+                      <div style="font-family:'Alata',sans-serif;font-size:17px;color:#1C2034;"><%= t("wizard.region_tags_modal_title", default: "Region settings") %></div>
+                    </div>
+                    <button type="button" data-action="click->region-tags#close" aria-label="Close"
+                            style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(0,0,0,0.4);line-height:1;padding:2px;">✕</button>
+                  </div>
+                  <div style="padding:0 22px 22px;display:flex;flex-direction:column;gap:12px;">
+                    <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(0,0,0,0.6);margin:0;line-height:1.55;">
+                      <%= t("wizard.region_tags_hint", default: "Tag your Verto with regions — each one gets its own share link, and players can compare answers across regions on a world map.") %>
+                    </p>
+                    <div data-region-tags-target="list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                      <select data-region-tags-target="country"
+                              style="<%= light_input_style %>flex:1;min-width:160px;width:auto;padding:11px 14px;font-size: var(--text-sm);">
+                        <option value=""><%= t("wizard.region_tags_country", default: "Choose a country…") %></option>
+                        <% WorldRegions.options.each do |name, code| %>
+                          <option value="<%= code %>" data-name="<%= name %>"><%= name %></option>
+                        <% end %>
+                      </select>
+                      <input type="text" maxlength="60"
+                             data-region-tags-target="label"
+                             data-action="keydown.enter->region-tags#add"
+                             placeholder="<%= t("wizard.region_tags_sublabel", default: "Sub-region (optional) — e.g. Yorkshire") %>"
+                             style="<%= light_input_style %>flex:1;min-width:160px;width:auto;padding:11px 14px;font-size: var(--text-sm);" />
+                      <button type="button" data-action="click->region-tags#add"
+                              style="background:#1C2034;color:#fff;border:none;border-radius:10px;padding:11px 18px;font-family:'Alata',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;">
+                        + <%= t("wizard.region_tags_add", default: "Add") %>
+                      </button>
+                    </div>
+                    <button type="button" data-action="click->region-tags#close"
+                            style="align-self:flex-end;margin-top:4px;background:#01EACB;color:#1C2034;border:none;border-radius:100px;padding:10px 24px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.03em;cursor:pointer;">
+                      <%= t("wizard.region_tags_done", default: "Done") %>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </details>
+            </div>
           </div>
         </div>
       </section>
@@ -530,16 +549,6 @@
               </div>
             </div>
 
-            <%# ── Set demographic questions notice — appended automatically to
-                every Verto; the creator is told here, at the moment of
-                creation. ── %>
-            <div style="display:flex;gap:10px;padding:11px 13px;border-radius:12px;background:rgba(12,167,255,0.07);border:1px solid rgba(12,167,255,0.3);">
-              <span style="font-size:15px;line-height:1.3;flex-shrink:0;">📊</span>
-              <p style="font-family:'ABeeZee',sans-serif;font-size:11.5px;color:rgba(0,0,0,0.65);margin:0;line-height:1.5;">
-                <%= t("wizard.demographics_note") %>
-              </p>
-            </div>
-
             <%# ── Alternative entry point: import prewritten questions from a
                 PDF. Lives on the final step so the brief above is filled in
                 first; posts straight to import_pdf (formnovalidate skips the
@@ -588,6 +597,45 @@
       <%= f.submit t("wizard.generate"),
             class: "preview-btn preview-btn-finish hidden",
             data: { create_wizard_target: "finish", turbo_submits_with: t("wizard.generating") } %>
+    </div>
+
+    <%# ── One-time demographic-questions explainer, shown the first time a
+        creator hits Generate (see demographics_gate_controller). ── %>
+    <div data-demographics-gate-target="modal" class="app-modal hidden">
+      <div class="app-modal__backdrop"></div>
+      <div class="app-modal__panel" style="max-width:480px;">
+        <div style="padding:26px 26px 0;text-align:center;">
+          <div style="font-size:34px;line-height:1;margin-bottom:10px;">📊</div>
+          <div style="font-family:'Alata',sans-serif;font-size:20px;color:#1C2034;line-height:1.25;margin-bottom:8px;">
+            <%= t("wizard.demographics_modal_title", default: "Every Verto ends with 3 quick questions") %>
+          </div>
+          <p style="font-family:'ABeeZee',sans-serif;font-size:13.5px;color:rgba(0,0,0,0.6);margin:0;line-height:1.6;">
+            <%= t("wizard.demographics_note") %>
+          </p>
+        </div>
+        <div style="padding:18px 26px 0;display:flex;flex-direction:column;gap:8px;">
+          <% [
+               ["🎂", t("wizard.demographics_q1", default: "When were you born?")],
+               ["📍", t("wizard.demographics_q2", default: "Where do you live? (country or city)")],
+               ["👤", t("wizard.demographics_q3", default: "Gender (Male / Female / Prefer not to say)")]
+             ].each do |emoji, label| %>
+            <div style="display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:12px;background:#f4f6f9;border:1px solid rgba(0,0,0,0.06);">
+              <span style="font-size:16px;flex-shrink:0;"><%= emoji %></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size:13.5px;color:#1C2034;"><%= label %></span>
+            </div>
+          <% end %>
+        </div>
+        <div style="padding:20px 26px 24px;display:flex;flex-direction:column;gap:10px;">
+          <button type="button" data-action="click->demographics-gate#confirm"
+                  style="width:100%;padding:14px;border-radius:12px;background:#01EACB;color:#1C2034;border:none;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.03em;cursor:pointer;">
+            <%= t("wizard.demographics_confirm", default: "Got it — generate my Verto →") %>
+          </button>
+          <button type="button" data-action="click->demographics-gate#dismiss"
+                  style="width:100%;padding:10px;border-radius:12px;background:transparent;color:rgba(0,0,0,0.45);border:none;font-family:'ABeeZee',sans-serif;font-size:13px;cursor:pointer;">
+            <%= t("wizard.demographics_back", default: "Not yet — take me back") %>
+          </button>
+        </div>
+      </div>
     </div>
 
   <% end %>

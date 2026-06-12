@@ -4,7 +4,29 @@ import { Controller } from "@hotwired/stimulus"
 // hidden inputs (region_tags[][country_code] / region_tags[][label]) submit
 // with the create form. The editor's publish panel manages them afterwards.
 export default class extends Controller {
-  static targets = ["country", "label", "list", "count"]
+  static targets = ["country", "label", "list", "count", "modal"]
+
+  // The picker opens in a full-screen modal so it's roomy and unclipped by
+  // the wizard card. Chips live inside the modal but within the form, so
+  // their hidden inputs still submit when it's closed.
+  open() {
+    this.modalTarget.classList.remove("hidden")
+    document.body.style.overflow = "hidden"
+    this.countryTarget.focus({ preventScroll: true })
+  }
+
+  close() {
+    this.modalTarget.classList.add("hidden")
+    document.body.style.overflow = ""
+  }
+
+  backdropClose(e) {
+    if (e.target === e.currentTarget) this.close()
+  }
+
+  closeOnEsc(e) {
+    if (!this.modalTarget.classList.contains("hidden")) this.close()
+  }
 
   add(e) {
     e.preventDefault()

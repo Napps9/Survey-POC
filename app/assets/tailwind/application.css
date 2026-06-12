@@ -3351,3 +3351,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .cq-set summary::-webkit-details-marker { display: none; }
 .cq-set .cq-chev { display: inline-block; transition: transform 0.15s; }
 .cq-set[open] .cq-chev { transform: rotate(180deg); }
+
+/* Shared centered modal (wizard region picker, demographics explainer) */
+.app-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.app-modal.hidden { display: none; }
+.app-modal__backdrop { position: absolute; inset: 0; background: rgba(8,10,22,0.74); backdrop-filter: blur(4px); }
+.app-modal__panel {
+  position: relative; z-index: 1; width: 100%; max-width: 460px;
+  background: #fff; border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  max-height: calc(100vh - 48px); overflow-y: auto;
+}
