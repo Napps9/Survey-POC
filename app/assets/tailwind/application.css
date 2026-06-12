@@ -3345,3 +3345,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .wizard-advanced summary::-webkit-details-marker { display: none; }
 .wizard-advanced-chev { display: inline-block; transition: transform 0.15s; }
 .wizard-advanced[open] .wizard-advanced-chev { transform: rotate(180deg); }
+
+/* Wizard Common Questions picker — collapsible set groups */
+.cq-set summary { list-style: none; }
+.cq-set summary::-webkit-details-marker { display: none; }
+.cq-set .cq-chev { display: inline-block; transition: transform 0.15s; }
+.cq-set[open] .cq-chev { transform: rotate(180deg); }

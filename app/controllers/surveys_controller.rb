@@ -9,6 +9,8 @@ class SurveysController < ApplicationController
   before_action :set_survey,           only: [ :show, :preview, :publish, :update_settings ]
   before_action :set_survey_including_archived, only: [ :results ]
 
+  helper_method :accessible_common_question_sets
+
   def index
     kept_surveys = Current.organisation.surveys.kept.includes(:responses).order(updated_at: :desc)
     @surveys          = kept_surveys
@@ -55,7 +57,7 @@ class SurveysController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    common_cards = resolve_common_cards(params[:common_question_set_ids])
+    common_cards = resolve_common_cards(params[:common_question_ids])
 
     result = SurveyGenerator.new.call(
       theme: theme,
@@ -127,7 +129,7 @@ class SurveysController < ApplicationController
 
     # PDF defines the structure for the imported deck, so common cards are
     # appended at the end rather than woven by the LLM.
-    cards += resolve_common_cards(params[:common_question_set_ids])
+    cards += resolve_common_cards(params[:common_question_ids])
 
     @survey = Current.organisation.surveys.create!(
       title:         result["title"].presence || "Imported Verto",
@@ -301,16 +303,42 @@ class SurveysController < ApplicationController
     end
   end
 
-  # Snapshot the questions inside each attached Common Question Set into
-  # Verto-card hashes. Each card carries common_question_id + set_id so
-  # cross-Verto results aggregation can cluster answers by question identity.
+  # Snapshot the SELECTED Common Questions into Verto-card hashes. Takes
+  # individual question ids (the wizard lets creators pick questions, not just
+  # whole sets) and only honours ids belonging to a set this org may use —
+  # so a partner can't splice in questions from a set not shared with them.
+  # Each card carries common_question_id + set_id so cross-Verto results
+  # aggregation can cluster answers by question identity.
   def resolve_common_cards(ids_param)
     ids = Array(ids_param).map(&:to_i).reject(&:zero?)
     return [] if ids.empty?
-    sets = Current.organisation.common_question_sets.kept
-                   .where(id: ids)
-                   .includes(:common_questions)
-    sets.flat_map(&:common_questions).map(&:to_card)
+    accessible_ids = accessible_common_question_sets.map(&:id)
+    CommonQuestion.where(id: ids, common_question_set_id: accessible_ids)
+                  .order(:common_question_set_id, :position)
+                  .map(&:to_card)
+  end
+
+  # Common Question sets the current org may attach to a Verto: its own kept
+  # sets, plus any kept set shared into a Collective Impact alliance it's an
+  # active member of. Own sets come first; shared sets keep their owning org
+  # so the wizard can label provenance. Used by both the wizard and the
+  # resolve above, so the picker and the authorization can't drift apart.
+  def accessible_common_question_sets
+    own = Current.organisation.common_question_sets.kept
+                  .includes(:common_questions).order(:name).to_a
+
+    alliance_ids = Current.organisation.member_alliances
+                     .where(alliance_memberships: { status: "active" }).pluck(:id)
+    shared = if alliance_ids.any?
+      set_ids = AllianceCommonQuestionSet.where(alliance_id: alliance_ids).pluck(:common_question_set_id)
+      CommonQuestionSet.kept.where(id: set_ids)
+                       .where.not(organisation_id: Current.organisation.id)
+                       .includes(:common_questions, :organisation).order(:name).to_a
+    else
+      []
+    end
+
+    own + shared
   end
 
   # Re-render the wizard with an error. `import_pdf` isn't covered by the

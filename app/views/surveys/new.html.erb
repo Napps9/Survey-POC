@@ -235,30 +235,51 @@
               <p class="wizard-mobile-hint-body"><%= t("wizard.s3_hint_body") %></p>
             </div>
 
-            <%# ── Attach Common Question sets (optional). Each ticked set's
-                snapshot questions get woven into the generated Verto by the
-                SurveyGenerator at contextually appropriate positions. ── %>
-            <% common_sets = current_organisation.common_question_sets.kept.order(:name).includes(:common_questions) %>
-            <% if common_sets.any? %>
-              <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+            <%# ── Attach Common Questions (optional). Pick individual
+                questions from your own sets and any shared with you through a
+                Collective Impact alliance; ticked questions are woven into the
+                generated Verto. Each set is a collapsible group with a
+                "select all" toggle. ── %>
+            <% accessible_sets = accessible_common_question_sets %>
+            <% if accessible_sets.any? %>
+              <div data-controller="common-questions" style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
                 <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(0,0,0,0.5);font-weight:700;">
                   <%= t("wizard.attach_common_label", default: "Common Questions (optional)") %>
                 </div>
                 <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(0,0,0,0.55);margin:0;line-height:1.5;">
-                  <%= t("wizard.attach_common_hint", default: "Tick reusable sets and we'll weave their questions into your Verto.") %>
+                  <%= t("wizard.attach_common_hint", default: "Tick individual questions — from your own sets or any shared with you — and we'll weave them into your Verto.") %>
                 </p>
-                <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                  <% common_sets.each do |set| %>
-                    <label style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:100px;background:#fafbfc;border:1.5px solid rgba(0,0,0,0.1);cursor:pointer;font-family:'ABeeZee',sans-serif;font-size:13px;color:#1C2034;"
-                           onclick="if(event.target.tagName!=='INPUT'){const cb=this.querySelector('input');cb.checked=!cb.checked;cb.dispatchEvent(new Event('change',{bubbles:true}));}"
-                           onchange="const checked=this.querySelector('input').checked;this.style.background=checked?'rgba(97,91,245,0.08)':'#fafbfc';this.style.borderColor=checked?'#615BF5':'rgba(0,0,0,0.1)';">
-                      <input type="checkbox" name="common_question_set_ids[]" value="<%= set.id %>"
-                             style="margin:0;accent-color:#615BF5;" />
-                      <span><%= set.name %></span>
-                      <span style="color:rgba(0,0,0,0.4);font-size:11px;"><%= set.common_questions.size %></span>
-                    </label>
-                  <% end %>
-                </div>
+
+                <% accessible_sets.each do |set| %>
+                  <% shared = set.organisation_id != current_organisation.id %>
+                  <details class="cq-set" style="border:1.5px solid rgba(0,0,0,0.1);border-radius:12px;background:#fafbfc;overflow:hidden;">
+                    <summary style="display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;">
+                      <span style="font-family:'ABeeZee',sans-serif;font-size:13px;color:#1C2034;">🔖 <%= set.name %></span>
+                      <% if shared %>
+                        <span style="font-family:'ABeeZee',sans-serif;font-size:10px;letter-spacing:0.04em;text-transform:uppercase;color:#615BF5;background:rgba(97,91,245,0.1);border:1px solid rgba(97,91,245,0.3);border-radius:100px;padding:2px 8px;"><%= t("wizard.attach_common_shared_by", org: set.organisation.name, default: "Shared by %{org}") %></span>
+                      <% end %>
+                      <span data-cq-count style="margin-left:auto;font-family:'Alata',sans-serif;font-size:11px;color:rgba(0,0,0,0.45);">0/<%= set.common_questions.size %></span>
+                      <span class="cq-chev" style="font-size:9px;color:rgba(0,0,0,0.4);">▼</span>
+                    </summary>
+                    <div style="padding:6px 14px 12px;display:flex;flex-direction:column;gap:2px;border-top:1px solid rgba(0,0,0,0.06);">
+                      <label style="display:flex;align-items:center;gap:8px;padding:7px 8px;cursor:pointer;">
+                        <input type="checkbox" data-cq-all data-action="change->common-questions#toggleSet"
+                               style="margin:0;accent-color:#615BF5;" />
+                        <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:#615BF5;"><%= t("wizard.attach_common_all", default: "Select all") %></span>
+                      </label>
+                      <% set.common_questions.each do |q| %>
+                        <label style="display:flex;align-items:flex-start;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;"
+                               onmouseover="this.style.background='rgba(97,91,245,0.05)'" onmouseout="this.style.background='transparent'">
+                          <input type="checkbox" name="common_question_ids[]" value="<%= q.id %>"
+                                 data-action="change->common-questions#update"
+                                 style="margin-top:2px;accent-color:#615BF5;" />
+                          <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size:13px;color:#1C2034;line-height:1.4;"><%= q.text %></span>
+                          <span style="flex-shrink:0;font-family:'ABeeZee',sans-serif;font-size:10px;letter-spacing:0.04em;text-transform:uppercase;color:rgba(0,0,0,0.4);background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);border-radius:100px;padding:2px 8px;"><%= q.card_type.humanize %></span>
+                        </label>
+                      <% end %>
+                    </div>
+                  </details>
+                <% end %>
               </div>
             <% end %>
 
