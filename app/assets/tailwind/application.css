@@ -3374,10 +3374,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .device-tablet .split-card { width: 100%; height: 600px; }
 
 .device-mobile .survey-card-wrap {
-  max-width: 400px; margin-inline: auto;
+  max-width: 400px; width: 100%; margin-inline: auto;
   border: 8px solid #0e1020; border-radius: 34px; box-shadow: 0 16px 40px rgba(0,0,0,0.4);
   overflow: hidden; background: #0e1020; padding: 0;
+  /* overflow:hidden gives a flex item an automatic minimum size of ZERO, so
+     the feed column was shrinking every bezel to a sliver (~36px with many
+     cards). Pin it so each phone frame keeps its content height. */
+  flex-shrink: 0;
 }
+/* Hero strip: round the bottom like the real mobile player and keep the
+   image clipped to it. */
+.device-mobile .split-left { border-radius: 0 0 18px 18px; overflow: hidden; position: relative; }
+.device-mobile .split-right { background: #fff; }
 .device-mobile .split-card {
   flex-direction: column; width: 100%; height: auto; min-height: 580px;
   border-radius: 26px; margin: 0;
