@@ -453,8 +453,8 @@ fr:
     s7_recommended: Recommandé
     s7_populate_label: Remplir le contenu
     s7_populate_desc: Ouvrir l'éditeur avec un arrière-plan et une image sur chaque carte, adaptés à votre brief.
-    s7_blank_label: Partir de zéro
-    s7_blank_desc: Ouvrir l'éditeur sans aucune image pour choisir chaque visuel vous-même.
+    s7_blank_label: "Nouveau départ"
+    s7_blank_desc: "Ouvrez un éditeur vierge et ajoutez vos propres images, carte par carte."
     back: "← Retour"
     next: Suivant →
     generate: Générer le Verto →

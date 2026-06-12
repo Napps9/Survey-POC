@@ -453,8 +453,8 @@ pt:
     s7_recommended: Recomendado
     s7_populate_label: Preencher conteúdo
     s7_populate_desc: Abra o editor com um fundo e uma imagem em cada cartão, adaptados ao seu briefing.
-    s7_blank_label: Começar do zero
-    s7_blank_desc: Abra o editor sem imagens para poder escolher cada imagem você mesmo.
+    s7_blank_label: "Começar de novo"
+    s7_blank_desc: "Abra um editor limpo e adicione as suas próprias imagens, cartão a cartão."
     back: "← Voltar"
     next: Seguinte →
     generate: Gerar Verto →

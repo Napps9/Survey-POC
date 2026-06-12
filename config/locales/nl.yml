@@ -453,8 +453,8 @@ nl:
     s7_recommended: Aanbevolen
     s7_populate_label: Inhoud invullen
     s7_populate_desc: Open de editor met een achtergrond en een afbeelding op elke kaart, afgestemd op jouw briefing.
-    s7_blank_label: Blanco beginnen
-    s7_blank_desc: Open de editor zonder afbeeldingen, zodat je zelf elke foto kunt kiezen.
+    s7_blank_label: "Opnieuw beginnen"
+    s7_blank_desc: "Open een schone editor en voeg je eigen beelden toe, kaart voor kaart."
     back: "← Terug"
     next: Volgende →
     generate: Verto genereren →

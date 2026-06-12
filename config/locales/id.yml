@@ -453,8 +453,8 @@ id:
     s7_recommended: Direkomendasikan
     s7_populate_label: Isi konten otomatis
     s7_populate_desc: Buka editor dengan latar belakang dan gambar di setiap kartu, disesuaikan dengan brief Anda.
-    s7_blank_label: Mulai dari kosong
-    s7_blank_desc: Buka editor tanpa gambar agar Anda dapat memilih setiap gambar sendiri.
+    s7_blank_label: "Mulai baru"
+    s7_blank_desc: "Buka editor kosong dan tambahkan gambarmu sendiri, kartu demi kartu."
     back: "← Kembali"
     next: Lanjut →
     generate: Buat Verto →

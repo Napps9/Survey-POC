@@ -453,8 +453,8 @@ vi:
     s7_recommended: Được đề xuất
     s7_populate_label: Điền nội dung
     s7_populate_desc: Mở trình chỉnh sửa với hình nền và hình ảnh trên mỗi thẻ, phù hợp với thông tin bạn đã cung cấp.
-    s7_blank_label: Bắt đầu từ trang trắng
-    s7_blank_desc: Mở trình chỉnh sửa không có hình ảnh để bạn tự chọn từng hình theo ý muốn.
+    s7_blank_label: "Bắt đầu mới"
+    s7_blank_desc: "Mở trình chỉnh sửa trống và thêm hình ảnh của riêng bạn, từng thẻ một."
     back: "← Quay lại"
     next: Tiếp →
     generate: Tạo Verto →

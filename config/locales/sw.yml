@@ -453,8 +453,8 @@ sw:
     s7_recommended: Inayopendekezwa
     s7_populate_label: Jaza maudhui
     s7_populate_desc: Fungua kihariri kikiwa na mandhari na picha kwenye kila kadi, zinazolingana na maelezo yako.
-    s7_blank_label: Anza kutoka mwanzo
-    s7_blank_desc: Fungua kihariri bila picha ili uweze kuchagua kila picha mwenyewe.
+    s7_blank_label: "Anza upya"
+    s7_blank_desc: "Fungua kihariri safi na uongeze picha zako mwenyewe, kadi baada ya kadi."
     back: "← Rudi"
     next: Endelea →
     generate: Tengeneza Verto →

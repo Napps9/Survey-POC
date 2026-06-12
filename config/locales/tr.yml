@@ -453,8 +453,8 @@ tr:
     s7_recommended: Önerilen
     s7_populate_label: İçeriği doldur
     s7_populate_desc: Editörü bir arka plan ve brifınıza uygun her kartta bir görselle açın.
-    s7_blank_label: Boştan başla
-    s7_blank_desc: Her görseli kendiniz seçebilmek için editörü görsel olmadan açın.
+    s7_blank_label: "Yeniden başla"
+    s7_blank_desc: "Temiz bir düzenleyici açın ve kendi görsellerinizi kart kart ekleyin."
     back: "← Geri"
     next: İleri →
     generate: Verto Oluştur →

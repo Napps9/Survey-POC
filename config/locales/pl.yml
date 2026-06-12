@@ -453,8 +453,8 @@ pl:
     s7_recommended: Zalecane
     s7_populate_label: Wypełnij treść
     s7_populate_desc: Otwórz edytor z tłem i zdjęciem na każdej karcie, dopasowanymi do Twojego briefu.
-    s7_blank_label: Zacznij od zera
-    s7_blank_desc: Otwórz edytor bez obrazów i samodzielnie dobierz każde zdjęcie.
+    s7_blank_label: "Zacznij od nowa"
+    s7_blank_desc: "Otwórz czysty edytor i dodawaj własne obrazy, karta po karcie."
     back: "← Wstecz"
     next: Dalej →
     generate: Wygeneruj Verto →

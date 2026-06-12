@@ -453,8 +453,8 @@ it:
     s7_recommended: Consigliato
     s7_populate_label: Popola i contenuti
     s7_populate_desc: Apri l'editor con uno sfondo e un'immagine su ogni scheda, abbinati al tuo brief.
-    s7_blank_label: Inizia da zero
-    s7_blank_desc: Apri l'editor senza immagini e scegli tu stesso ogni foto.
+    s7_blank_label: "Ricomincia"
+    s7_blank_desc: "Apri un editor pulito e aggiungi le tue immagini, carta per carta."
     back: "← Indietro"
     next: Avanti →
     generate: Genera Verto →

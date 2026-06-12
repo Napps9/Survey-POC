@@ -453,8 +453,8 @@ de:
     s7_recommended: Empfohlen
     s7_populate_label: Inhalte befüllen
     s7_populate_desc: Öffnen Sie den Editor mit einem Hintergrundbild und einem Bild auf jeder Karte – abgestimmt auf Ihr Briefing.
-    s7_blank_label: Leer starten
-    s7_blank_desc: Öffnen Sie den Editor ohne Bilder und wählen Sie jedes Bild selbst aus.
+    s7_blank_label: "Neu starten"
+    s7_blank_desc: "Öffne einen leeren Editor und füge deine eigenen Bilder Karte für Karte hinzu."
     back: "← Zurück"
     next: Weiter →
     generate: Verto generieren →

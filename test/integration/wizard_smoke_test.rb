@@ -14,9 +14,9 @@ class WizardSmokeTest < ActionDispatch::IntegrationTest
     assert_match "Final touches", response.body
     assert_match "How to start", response.body
     assert_match "Brand colours", response.body
-    # Populate choice labels (unchanged)
+    # Populate choice labels
     assert_match "Populate content", response.body
-    assert_match "Start from blank", response.body
+    assert_match "Start from New", response.body
     # The hidden form field
     assert_match 'name="populate_content" value="1"', response.body
     assert_match 'name="populate_content" value="0"', response.body

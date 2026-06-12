@@ -453,8 +453,8 @@ ja:
     s7_recommended: おすすめ
     s7_populate_label: コンテンツを自動入力
     s7_populate_desc: 入力内容に合わせた背景と各カードの画像を設定した状態でエディターを開きます。
-    s7_blank_label: 白紙から始める
-    s7_blank_desc: 画像なしの状態でエディターを開き、すべての画像を自分で選択できます。
+    s7_blank_label: "新規で始める"
+    s7_blank_desc: "まっさらなエディタを開いて、カードごとに自分の画像を追加します。"
     back: "← 戻る"
     next: 次へ →
     generate: Vertoを生成 →
