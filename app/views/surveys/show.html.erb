@@ -637,12 +637,10 @@
        style="<%= verto_backdrop_style_attr(@survey) %>">
 
     <%# Nav — respondents see the org's brand here, not Playverto's %>
-    <nav class="preview-nav">
-      <%= brand_logo_tag current_organisation, style: "height:24px;width:auto;max-width:160px;flex-shrink:0;" %>
-      <span class="preview-nav-title">Preview Verto</span>
-      <button type="button" class="preview-close-btn"
-              data-action="click->preview-verto#close">✕ Close</button>
-    </nav>
+    <%# No logo/title bar — just a floating Close, so the preview card gets
+        the full screen (matches the real player, which has no top nav). %>
+    <button type="button" class="preview-close-btn preview-close-float"
+            data-action="click->preview-verto#close">✕ Close</button>
 
     <%# Card display area %>
     <div class="preview-body">

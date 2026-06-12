@@ -2802,57 +2802,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
     box-shadow: none;
     overflow: hidden;
   }
-  /* Full-colour mobile background — ONLY for cards without their own image.
-     A card with a split-left image already shows it as a hero strip up top;
-     painting the themed --mobile-card-bg behind it too produced two stacked
-     images (the "torn"/double look). NPS cards have their Lottie hero, so
-     they're excluded as well. Imageless cards get the themed bg + white
-     scrim panels so text floats readably above the image. */
-  .preview-overlay[style*="--mobile-card-bg"] .split-card:not(:has(.split-left-img)):not(:has(.nps-lottie)) {
-    background: var(--mobile-card-bg) center/cover no-repeat;
-  }
-  .preview-overlay[style*="--mobile-card-bg"] .split-card:not(:has(.split-left-img)):not(:has(.nps-lottie)) .split-right {
-    background: transparent;
-  }
-  /* Question heading group lives on its own white panel so eyebrow,
-     title and subtitle stay legible together over any image. */
-  .preview-overlay[style*="--mobile-card-bg"] .q-header {
-    background: #fff;
-    border-radius: 18px;
-    padding: 16px 18px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-  }
-  /* Choice list items / pickable cards / NPS control / textarea / tap
-     statements need solid white backgrounds when a photo sits behind
-     the card — the default player mobile theme tints them rgba(0,0,0,0.03)
-     for a subtle alternating-row effect, but that goes transparent on
-     a photo. Override to opaque white + a soft shadow so each widget
-     reads cleanly. */
-  .preview-overlay[style*="--mobile-card-bg"] .choice-list-item,
-  .preview-overlay[style*="--mobile-card-bg"] .pick-item,
-  .preview-overlay[style*="--mobile-card-bg"] .choice-card,
-  .preview-overlay[style*="--mobile-card-bg"] .nps-control,
-  .preview-overlay[style*="--mobile-card-bg"] .freeform-wrap,
-  .preview-overlay[style*="--mobile-card-bg"] .freeform-textarea,
-  .preview-overlay[style*="--mobile-card-bg"] .rotate-card {
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.10);
-  }
-  .preview-overlay[style*="--mobile-card-bg"] .choice-list-item[data-selected="true"],
-  .preview-overlay[style*="--mobile-card-bg"] .pick-item[data-selected="true"] {
-    background: var(--brand-primary-soft, rgba(255,30,111,0.08));
-  }
-  /* NPS labels are bare text — give them a soft white pill so they read
-     in front of the photo without overpowering the slider beside them. */
-  .preview-overlay[style*="--mobile-card-bg"] .nps-slider-labels .slider-label-text {
-    background: rgba(255,255,255,0.86);
-    padding: 2px 8px;
-    border-radius: 999px;
-  }
+  /* The themed mobile background (--mobile-card-bg) is intentionally NOT
+     painted on mobile: a card already shows its own left-hand image as a
+     hero strip, and layering a second themed photo behind it looked messy.
+     Mobile cards therefore use the left-hand image only, over a white card
+     (imageless cards are simply white). */
 
   /* .split-card is positioned so .panel-progress (display:contents on
      no-hero cards routes it up to here) has a positioned ancestor. */
@@ -3433,4 +3387,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .device-mobile .split-right {
   width: 100%; flex: 1 1 auto; padding: 24px 22px; justify-content: flex-start;
+}
+
+/* Player: slim language switcher bar (replaces the old logo+title nav).
+   Only rendered for multilingual Vertos; shown on all screen sizes. */
+.player-lang-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 14px 0;
+}
+
+/* Floating Close for the editor's inline Preview overlay (no nav bar). */
+.preview-close-float {
+  position: absolute; top: 12px; right: 14px; z-index: 10;
 }

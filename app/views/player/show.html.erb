@@ -99,12 +99,15 @@
     </div>
   <% end %>
 
-  <nav class="preview-nav">
-    <%# Respondents see the publishing org's logo, not Playverto's. %>
-    <%= brand_logo_tag @survey.organisation, style: "height:24px;width:auto;max-width:160px;flex-shrink:0;" %>
-    <span class="preview-nav-title"><%= @survey.theme %></span>
-    <%= render "player/content_lang_switcher" %>
-  </nav>
+  <%# No top nav bar — the Verto's logo/title used to live here, but removing
+      it gives the card more screen. The org's brand still shows on the
+      thank-you screen. A slim language switcher stays for multilingual
+      Vertos so respondents can still change the content language. %>
+  <% if @survey.multilingual? %>
+    <div class="player-lang-bar">
+      <%= render "player/content_lang_switcher" %>
+    </div>
+  <% end %>
 
   <div class="preview-body">
     <% cards.each_with_index do |card, idx| %>
