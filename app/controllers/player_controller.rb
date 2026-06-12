@@ -72,7 +72,7 @@ class PlayerController < ApplicationController
   def regions
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
-    unless @survey.survey_region_links.exists?
+    unless @survey.survey_region_links.exists? || @survey.ask_region?
       return render json: { ok: false, error: "Regions not enabled" }, status: :forbidden
     end
 
@@ -110,23 +110,35 @@ class PlayerController < ApplicationController
   end
 
   # Region tagging is consent-based and coarse: the region comes from the
-  # link the respondent arrived through, or their explicit pick from this
-  # Verto's region tags — never inferred location. An opt-out in the payload
-  # always wins, and unmatched/absent values leave the response untagged.
+  # link the respondent arrived through, or their explicit pick — never
+  # inferred location. An opt-out in the payload always wins. Self-declared
+  # values are honoured when they match one of the Verto's region tags, or —
+  # in ask-players mode — any valid country plus a short free-text area.
   def apply_region(resp, data)
-    link =
-      if data["region_opt_out"]
-        nil
-      elsif @region_link
-        @region_link
-      else
-        country = data["region_country"].to_s.upcase.presence
-        label   = data["region_label"].to_s.strip.presence
-        country && @survey.survey_region_links.find_by(country_code: country, label: label)
-      end
-    resp.survey_region_link = link
-    resp.region_country     = link&.country_code
-    resp.region_label       = link&.label
+    country = data["region_country"].to_s.upcase.presence
+    label   = data["region_label"].to_s.strip.first(60).presence
+
+    if data["region_opt_out"]
+      link = nil
+    elsif @region_link
+      link = @region_link
+    else
+      link = country && @survey.survey_region_links.find_by(country_code: country, label: label)
+    end
+
+    if link
+      resp.survey_region_link = link
+      resp.region_country     = link.country_code
+      resp.region_label       = link.label
+    elsif !data["region_opt_out"] && @survey.ask_region? && country && WorldRegions.valid?(country)
+      resp.survey_region_link = nil
+      resp.region_country     = country
+      resp.region_label       = label
+    else
+      resp.survey_region_link = nil
+      resp.region_country     = nil
+      resp.region_label       = nil
+    end
   end
 
   # The Verto content language to render: an explicit ?lang=, else the

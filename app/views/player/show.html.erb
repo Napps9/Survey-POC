@@ -16,10 +16,11 @@
   results_url     = @survey.show_results_comparison? && play_token.present? ? player_results_url(play_token) : ""
   show_comparison = @survey.show_results_comparison? && results_url.present?
 
-  # Region tags: the consent bar shows whenever this Verto is region-tagged;
-  # the post-finish map needs a reachable token (drafts in preview have none).
+  # Region tags: the consent bar shows whenever this Verto captures regions —
+  # via per-region links or ask-players mode. The post-finish map needs a
+  # reachable token (drafts in preview have none).
   region_links = @survey.survey_region_links.order(:created_at).to_a
-  has_regions  = region_links.any?
+  has_regions  = region_links.any? || @survey.ask_region?
   regions_url  = has_regions && play_token.present? ? player_regions_url(play_token) : ""
 %>
 <div class="preview-overlay flex flex-col"
@@ -63,6 +64,20 @@
                 style="background:none;border:none;cursor:pointer;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:rgba(255,255,255,0.7);text-decoration:underline;text-underline-offset:3px;padding:0;">
           <%= t("js.player.region_optout") %>
         </button>
+      <% elsif @survey.ask_region? %>
+        <%# Ask-players mode: any country + an optional free-text area, so a
+            single link scales to hundreds of regions. %>
+        <select data-action="change->player#setRegionCountry"
+                style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);padding:3px 8px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff;outline:none;cursor:pointer;max-width:180px;">
+          <option value=""><%= t("player.region_country_prompt") %></option>
+          <% WorldRegions.options.each do |name, code| %>
+            <option value="<%= code %>"><%= name %></option>
+          <% end %>
+        </select>
+        <input type="text" maxlength="60"
+               data-action="change->player#setRegionArea"
+               placeholder="<%= t("player.region_area_placeholder") %>"
+               style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);padding:3px 8px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff;outline:none;width:150px;" />
       <% else %>
         <select data-action="change->player#setRegion"
                 style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);padding:3px 8px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#fff;outline:none;cursor:pointer;">
@@ -72,6 +87,15 @@
           <% end %>
         </select>
       <% end %>
+    </div>
+  <% end %>
+
+  <% if show_comparison %>
+    <%# Promise the comparison payoff up front — an incentive to finish. %>
+    <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 14px;background:rgba(255,30,111,0.08);border-bottom:1px solid rgba(255,30,111,0.22);">
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:#FF8FB6;">
+        🏁 <%= t("player.compare_promise") %>
+      </span>
     </div>
   <% end %>
 

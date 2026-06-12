@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_11_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_11_000004) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -211,6 +211,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_000003) do
   end
 
   create_table "surveys", force: :cascade do |t|
+    t.boolean "ask_region", default: false, null: false
     t.string "audience_age"
     t.text "background_image"
     t.json "brand_palette"

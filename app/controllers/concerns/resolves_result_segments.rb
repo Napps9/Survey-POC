@@ -29,15 +29,28 @@ module ResolvesResultSegments
       end
     end
 
-    # Scoped by the region itself (country + label), not the link id, so two
-    # links pointing at the same region would aggregate together.
-    survey.survey_region_links.order(:created_at).each do |link|
-      scope = base.where(region_country: link.country_code, region_label: link.label)
-      segments << { id: "region_#{link.id}", label: "🌍 #{link.display_name}", scope: scope, count: scope.count }
+    # Region segments come from the responses themselves, so they cover both
+    # link-minted regions and ask-players self-declared ones. Ordered by
+    # volume and capped, so a Verto with hundreds of regions doesn't explode
+    # the filter row. Ids hash the region key — stable across requests.
+    region_counts = base.where.not(region_country: nil)
+                        .group(:region_country, :region_label).count
+    region_counts.sort_by { |_, count| -count }.first(REGION_SEGMENT_CAP).each do |(country, label), count|
+      name    = WorldRegions.name_for(country)
+      display = label.present? ? "#{name} · #{label}" : name
+      segments << {
+        id:      "region_#{Digest::MD5.hexdigest("#{country}|#{label}").first(10)}",
+        label:   "🌍 #{display}",
+        country: country,
+        scope:   base.where(region_country: country, region_label: label),
+        count:   count
+      }
     end
 
     segments
   end
+
+  REGION_SEGMENT_CAP = 30
 
   # The completed-response base scope, plus the segments and the active segment
   # selected by params[:segment]. Returns [base, segments, active_segment].

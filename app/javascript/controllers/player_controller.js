@@ -69,6 +69,18 @@ export default class extends Controller {
     this._resaveRegion()
   }
 
+  // Ask-players mode: country and free-text area arrive separately.
+  setRegionCountry(e) {
+    this.regionCountryValue = e.target.value || ""
+    this._regionOptOut = false
+    this._resaveRegion()
+  }
+
+  setRegionArea(e) {
+    this.regionLabelValue = e.target.value.trim()
+    this._resaveRegion()
+  }
+
   // Link-borne region: the notice bar's opt-out toggle.
   toggleRegionOptOut(e) {
     this._regionOptOut = !this._regionOptOut
@@ -211,8 +223,10 @@ export default class extends Controller {
         try { return JSON.parse(wrap?.dataset.swipeResults || "null") } catch { return null }
       }
 
-      case "open_ended":
-        return card.querySelector("textarea")?.value?.trim() || null
+      case "open_ended": {
+        const el = card.querySelector("textarea, input[type='date']")
+        return el?.value?.trim() || null
+      }
 
       default:
         return null

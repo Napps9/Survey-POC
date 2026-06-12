@@ -60,6 +60,9 @@ id:
     ask_verto: Tanya Verto
     analysing: Menganalisis tanggapan…
   player:
+    compare_promise: "Selesaikan untuk melihat perbandingan jawabanmu dengan semua orang."
+    region_country_prompt: "Pilih negaramu…"
+    region_area_placeholder: "Wilayahmu (opsional)"
     region_notice_linked: "Verto ini mengumpulkan data regional — kamu menjawab sebagai %{region}. Setelah selesai kamu bisa melihat jawaban region lain."
     region_notice_pick: "Verto ini mengumpulkan data regional — setelah selesai kamu bisa melihat jawaban region lain. Region kamu:"
     region_prefer_not: "Lebih baik tidak memberi tahu"

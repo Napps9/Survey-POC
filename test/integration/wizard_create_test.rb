@@ -64,4 +64,53 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "3 set demographic questions", response.body
   end
+
+  test "common questions alone create a Verto without AI generation" do
+    set = @org.common_question_sets.create!(name: "Core")
+    q   = set.common_questions.create!(text: "How confident are you?", card_type: "range")
+
+    boom = Object.new
+    def boom.call(**) = raise("SurveyGenerator must not be called")
+    SurveyGenerator.define_singleton_method(:new) { |*| boom }
+    begin
+      post generate_survey_path, params: {
+        verto_name: "Commons only", theme: "T", audience_age: "a",
+        show_results_comparison: "0", common_question_ids: [ q.id ]
+      }
+    ensure
+      SurveyGenerator.singleton_class.remove_method(:new)
+    end
+
+    survey = @org.surveys.order(:id).last
+    assert_redirected_to survey_path(survey)
+    assert_equal "Commons only", survey.title
+    types = survey.cards.map { |c| c["type"] }
+    assert_equal "welcome_card", types.first
+    assert(survey.cards.any? { |c| c["common_question_id"] == q.id })
+    assert survey.cards.last["demographic"], "demographic tail still appended"
+  end
+
+  test "neither a learning goal nor common questions is rejected" do
+    assert_no_difference -> { @org.surveys.count } do
+      post generate_survey_path, params: {
+        verto_name: "N", theme: "T", audience_age: "a", show_results_comparison: "0"
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_match "Common Questions", response.body
+  end
+
+  test "the birth demographic renders as a date picker in the player" do
+    with_fake_generator do
+      post generate_survey_path, params: {
+        verto_name: "N", theme: "T", audience_age: "a", key_insight: "k", show_results_comparison: "0"
+      }
+    end
+    survey = @org.surveys.order(:id).last
+    survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    get play_survey_path(survey.publish_token)
+    assert_response :success
+    assert_match 'type="date"', response.body
+  end
 end

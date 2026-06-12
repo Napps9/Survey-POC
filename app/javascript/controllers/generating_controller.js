@@ -33,10 +33,12 @@ export default class extends Controller {
     const rawTheme   = form?.querySelector('[name="theme"]')?.value.trim()        || ""
     const rawAge     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
     const rawInsight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
+    const hasCommon  = !!form?.querySelector("input[name='common_question_ids[]']:checked")
 
-    // Required-field gate. Cancel the submit and shake the CTA so the
-    // user gets a playful "nope" instead of a server-side flash bounce.
-    if (!rawTheme || !rawAge || !rawInsight) {
+    // Required-field gate. The learning goal is an or/and with Common
+    // Questions — either one unlocks generation. Cancel the submit and shake
+    // the CTA so the user gets a playful "nope" instead of a server bounce.
+    if (!rawTheme || !rawAge || (!rawInsight && !hasCommon)) {
       event?.preventDefault()
       this._shakeSubmit(form)
       return

@@ -5,6 +5,29 @@ import { Controller } from "@hotwired/stimulus"
 // individual question boxes and updates the "selected/total" count shown in
 // the summary, so a collapsed set still tells you how much you've picked.
 export default class extends Controller {
+  static targets = ["modal", "totalCount"]
+
+  // The picker opens in a full-screen modal (like Region settings); the
+  // trigger button carries a badge with the total picked, and the checked
+  // boxes stay in the form so they submit when the modal is closed.
+  open() {
+    this.modalTarget.classList.remove("hidden")
+    document.body.style.overflow = "hidden"
+  }
+
+  close() {
+    this.modalTarget.classList.add("hidden")
+    document.body.style.overflow = ""
+  }
+
+  backdropClose(e) {
+    if (e.target === e.currentTarget) this.close()
+  }
+
+  closeOnEsc() {
+    if (this.hasModalTarget && !this.modalTarget.classList.contains("hidden")) this.close()
+  }
+
   // "Select all" toggled — match every question box in this set.
   toggleSet(e) {
     const set = e.target.closest(".cq-set")
@@ -33,5 +56,14 @@ export default class extends Controller {
     }
     const count = set.querySelector("[data-cq-count]")
     if (count) count.textContent = `${checked}/${boxes.length}`
+
+    this._refreshTotal()
+  }
+
+  _refreshTotal() {
+    if (!this.hasTotalCountTarget) return
+    const n = this.element.querySelectorAll("input[name='common_question_ids[]']:checked").length
+    this.totalCountTarget.textContent = n
+    this.totalCountTarget.style.display = n ? "inline-flex" : "none"
   }
 }

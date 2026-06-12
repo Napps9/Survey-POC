@@ -5,8 +5,8 @@
 # so they're identifiable downstream and never appended twice.
 module DemographicQuestions
   CARDS = [
-    { "type" => "open_ended", "text" => "When were you born?",
-      "description" => "Just the year is fine.", "demographic" => true },
+    { "type" => "open_ended", "input" => "date", "text" => "When were you born?",
+      "demographic" => true },
     { "type" => "open_ended", "text" => "Where do you live?",
       "description" => "Country or city.", "demographic" => true },
     { "type" => "multiple_choice", "text" => "Gender",

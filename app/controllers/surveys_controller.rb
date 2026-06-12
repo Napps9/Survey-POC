@@ -52,21 +52,41 @@ class SurveysController < ApplicationController
     default_locale = SupportedLocales.coerce(params[:default_locale].presence || locales.first)
     locales        = ([ default_locale ] + locales).uniq
 
-    if theme.empty? || audience_age.empty? || key_insight.empty?
-      flash.now[:alert] = "Tell us what your Verto's about, who's answering, and what you want to learn — those three are required."
+    if theme.empty? || audience_age.empty?
+      flash.now[:alert] = "Tell us what your Verto's about and who's answering — those are required."
       return render :new, status: :unprocessable_entity
     end
 
     common_cards = resolve_common_cards(params[:common_question_ids])
 
-    result = SurveyGenerator.new.call(
-      theme: theme,
-      audience_age: audience_age,
-      key_insight: key_insight,
-      notes: notes,
-      locale: default_locale,
-      common_cards: common_cards
-    )
+    # The learning goal and Common Questions are an or/and: a key insight
+    # drives AI generation, picked Common Questions can ride along — and a
+    # deck of ONLY Common Questions skips generation entirely.
+    if key_insight.empty? && common_cards.empty?
+      flash.now[:alert] = "Add what you want to learn, or pick some Common Questions — one of the two is required."
+      return render :new, status: :unprocessable_entity
+    end
+
+    if key_insight.empty?
+      verto_name = params[:verto_name].to_s.strip
+      result = {
+        "title" => verto_name.presence || theme,
+        "description" => nil,
+        "theme" => theme,
+        "audience_age" => audience_age,
+        "key_insight" => nil,
+        "cards" => [ { "type" => "welcome_card", "title" => verto_name.presence || theme, "text" => theme } ] + common_cards
+      }
+    else
+      result = SurveyGenerator.new.call(
+        theme: theme,
+        audience_age: audience_age,
+        key_insight: key_insight,
+        notes: notes,
+        locale: default_locale,
+        common_cards: common_cards
+      )
+    end
 
     @survey = Current.organisation.surveys.create!(
       title:        params[:verto_name].to_s.strip.presence || result["title"],
@@ -76,6 +96,7 @@ class SurveysController < ApplicationController
       key_insight:  result["key_insight"].presence || key_insight,
       cards:        DemographicQuestions.append_to(result["cards"]),
       show_results_comparison: show_compare,
+      ask_region:   ActiveModel::Type::Boolean.new.cast(params[:ask_region]) || false,
       brand_palette: palette.presence,
       default_locale: default_locale,
       locales:        locales
@@ -137,6 +158,7 @@ class SurveysController < ApplicationController
       "default_locale" => default_locale,
       "locales"        => locales,
       "common_question_ids" => Array(params[:common_question_ids]),
+      "ask_region"     => ActiveModel::Type::Boolean.new.cast(params[:ask_region]) || false,
       "region_tags"    => Array(params[:region_tags]).map { |t| { "country_code" => t[:country_code].to_s, "label" => t[:label].to_s } }
     }
 
@@ -210,9 +232,16 @@ class SurveysController < ApplicationController
     redirect_to survey_path(@survey)
   end
 
+  # Settings forms each post the one field they own — only touch what's sent.
   def update_settings
-    show_compare = ActiveModel::Type::Boolean.new.cast(params[:show_results_comparison])
-    @survey.update!(show_results_comparison: show_compare)
+    attrs = {}
+    if params.key?(:show_results_comparison)
+      attrs[:show_results_comparison] = ActiveModel::Type::Boolean.new.cast(params[:show_results_comparison])
+    end
+    if params.key?(:ask_region)
+      attrs[:ask_region] = ActiveModel::Type::Boolean.new.cast(params[:ask_region])
+    end
+    @survey.update!(attrs) if attrs.any?
     redirect_to survey_path(@survey)
   end
 
@@ -339,6 +368,7 @@ class SurveysController < ApplicationController
       audience_age:   payload["audience_age"].presence,
       key_insight:    payload["key_insight"].presence,
       cards:          cards,
+      ask_region:     payload["ask_region"] == true,
       brand_palette:  payload["brand_palette"].presence,
       default_locale: payload["default_locale"],
       locales:        payload["locales"]

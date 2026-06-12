@@ -60,6 +60,9 @@ he:
     ask_verto: שאל את Verto
     analysing: מנתח תגובות…
   player:
+    compare_promise: "סיימו כדי לראות איך התשובות שלכם בהשוואה לכולם."
+    region_country_prompt: "בחרו את המדינה שלכם…"
+    region_area_placeholder: "האזור שלכם (לא חובה)"
     region_notice_linked: "ורטו זה אוסף נתונים אזוריים — אתם עונים בתור %{region}. בסיום תוכלו לראות איך ענו אזורים אחרים."
     region_notice_pick: "ורטו זה אוסף נתונים אזוריים — בסיום תוכלו לראות איך ענו אזורים אחרים. האזור שלכם:"
     region_prefer_not: "מעדיפים לא לציין"

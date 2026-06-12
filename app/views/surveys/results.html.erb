@@ -97,12 +97,13 @@
           <%
             # cc → { count:, url:, name: }: counts summed across a country's
             # sub-regions; clicking a country opens its first region segment.
+            # Built from the segments themselves so links-mode and ask-players
+            # regions render identically.
             map_data = {}
-            @survey.survey_region_links.order(:created_at).each do |link|
-              seg = region_segments.find { |s| s[:id] == "region_#{link.id}" }
-              next unless seg
-              cc = link.country_code.downcase
-              map_data[cc] ||= { count: 0, url: survey_results_path(@survey, segment: seg[:id]), name: link.country_name }
+            region_segments.each do |seg|
+              next if seg[:country].blank?
+              cc = seg[:country].downcase
+              map_data[cc] ||= { count: 0, url: survey_results_path(@survey, segment: seg[:id]), name: WorldRegions.name_for(seg[:country]) }
               map_data[cc][:count] += seg[:count]
             end
           %>

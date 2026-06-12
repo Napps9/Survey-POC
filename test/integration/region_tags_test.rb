@@ -180,8 +180,47 @@ class RegionTagsTest < ActionDispatch::IntegrationTest
     assert_match 'id="world-map"', response.body
     assert_match "United Kingdom · Yorkshire", response.body
 
-    get survey_results_path(s, segment: "region_#{link.id}")
+    segment_id = "region_#{Digest::MD5.hexdigest('GB|Yorkshire').first(10)}"
+    get survey_results_path(s, segment: segment_id)
     assert_response :success
     assert_match "of 1 overall", response.body
+  end
+
+  test "ask-players mode stores any valid self-declared region" do
+    org = create_org_and_sign_in("askmode")
+    s   = create_survey(org)
+    s.update!(ask_region: true)
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_match "Choose your country", response.body
+    assert_match "Your area (optional)", response.body
+
+    json_post submit_survey_path(s.publish_token),
+              { session_token: "ask-#{SecureRandom.hex(4)}", region_country: "ke", region_label: "  Nairobi West  ",
+                answers: { "1" => { "type" => "yes_no", "value" => "Yes" } } }
+    resp = s.responses.reload.last
+    assert_equal [ "KE", "Nairobi West", nil ], [ resp.region_country, resp.region_label, resp.survey_region_link_id ]
+
+    # invalid country is rejected even in ask mode
+    json_post submit_survey_path(s.publish_token),
+              { session_token: "askbad-#{SecureRandom.hex(4)}", region_country: "ZZ", region_label: "Atlantis",
+                answers: { "1" => { "type" => "yes_no", "value" => "No" } } }
+    assert_nil s.responses.reload.last.region_country
+
+    # self-declared regions surface in results segments and the map
+    get survey_results_path(s)
+    assert_match "Kenya · Nairobi West", response.body
+    assert_match 'id="world-map"', response.body
+  end
+
+  test "compare promise banner shows at the start when comparison is on" do
+    org = create_org_and_sign_in("promise")
+    s   = create_survey(org)
+    s.update!(show_results_comparison: true)
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_match "Finish to see how your answers compare", response.body
   end
 end

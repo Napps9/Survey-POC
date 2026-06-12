@@ -62,6 +62,9 @@ en:
     ask_verto: "Ask Verto"
     analysing: "Analysing responses…"
   player:
+    compare_promise: "Finish to see how your answers compare with everyone else's."
+    region_country_prompt: "Choose your country…"
+    region_area_placeholder: "Your area (optional)"
     region_notice_linked: "This Verto collects regional data — you're answering as %{region}. When you finish you can see how other regions answered."
     region_notice_pick: "This Verto collects regional data — when you finish you can see how other regions answered. Your region:"
     region_prefer_not: "Prefer not to say"

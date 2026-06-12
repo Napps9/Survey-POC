@@ -338,10 +338,21 @@
         <div class="publish-block">
           <div class="publish-block-title">Region tags</div>
           <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:10px;line-height:1.45;">
-            Tag this Verto with regions and share one link per region. Responses are
-            grouped by region (consent-based, no precise location), and everyone can
-            compare answers across regions on a world map.
+            Group responses by region (consent-based, no precise location) and let
+            everyone compare answers across regions on a world map.
           </div>
+
+          <%# Ask-players mode — scales to any number of regions with one link. %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0 0 12px;" do %>
+            <input type="hidden" name="ask_region" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="ask_region" value="1"
+                     <%= "checked" if @survey.ask_region? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Ask players where they are — one link, they pick their country and type their area. Best when you have many regions.</span>
+            </label>
+          <% end %>
 
           <% region_links.each do |link| %>
             <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:rgba(255,255,255,0.03);">

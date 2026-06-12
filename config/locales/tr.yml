@@ -60,6 +60,9 @@ tr:
     ask_verto: Verto'ya sor
     analysing: Yanıtlar analiz ediliyor…
   player:
+    compare_promise: "Bitir ve yanıtlarının herkesle nasıl karşılaştırıldığını gör."
+    region_country_prompt: "Ülkeni seç…"
+    region_area_placeholder: "Bölgen (isteğe bağlı)"
     region_notice_linked: "Bu Verto bölgesel veri topluyor — %{region} olarak yanıtlıyorsunuz. Bitirdiğinizde diğer bölgelerin yanıtlarını görebilirsiniz."
     region_notice_pick: "Bu Verto bölgesel veri topluyor — bitirdiğinizde diğer bölgelerin yanıtlarını görebilirsiniz. Bölgeniz:"
     region_prefer_not: "Belirtmek istemiyorum"

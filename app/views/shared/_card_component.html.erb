@@ -249,15 +249,25 @@
       </div>
 
     <% when "open_ended" %>
-      <div class="freeform-wrap"
-           data-controller="freeform"
-           data-freeform-max-value="200">
-        <textarea class="freeform-textarea"
-                  placeholder="<%= t("card.answer_placeholder") %>"
-                  data-freeform-target="input"
-                  data-action="input->freeform#update"></textarea>
-        <div class="freeform-counter" data-freeform-target="counter">0/200 <%= t("card.characters") %></div>
-      </div>
+      <% if card["input"] == "date" %>
+        <%# Date-flavoured open question (e.g. the "When were you born?"
+            demographic) — a native picker instead of free text. %>
+        <div class="freeform-wrap">
+          <input type="date" class="freeform-date"
+                 max="<%= Date.current.iso8601 %>"
+                 aria-label="<%= card["text"] %>" />
+        </div>
+      <% else %>
+        <div class="freeform-wrap"
+             data-controller="freeform"
+             data-freeform-max-value="200">
+          <textarea class="freeform-textarea"
+                    placeholder="<%= t("card.answer_placeholder") %>"
+                    data-freeform-target="input"
+                    data-action="input->freeform#update"></textarea>
+          <div class="freeform-counter" data-freeform-target="counter">0/200 <%= t("card.characters") %></div>
+        </div>
+      <% end %>
 
     <% when "welcome_card" %>
       <%# Welcome card — no interactive component %>

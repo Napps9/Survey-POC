@@ -60,6 +60,9 @@ pt:
     ask_verto: Perguntar ao Verto
     analysing: A analisar respostas…
   player:
+    compare_promise: "Termine para ver como as suas respostas se comparam com as dos outros."
+    region_country_prompt: "Escolha o seu país…"
+    region_area_placeholder: "A sua zona (opcional)"
     region_notice_linked: "Este Verto recolhe dados regionais — está a responder como %{region}. No final poderá ver como responderam outras regiões."
     region_notice_pick: "Este Verto recolhe dados regionais — no final poderá ver como responderam outras regiões. A sua região:"
     region_prefer_not: "Prefiro não dizer"

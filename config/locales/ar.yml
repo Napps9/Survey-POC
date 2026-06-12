@@ -60,6 +60,9 @@ ar:
     ask_verto: اسأل Verto
     analysing: جارٍ تحليل الإجابات…
   player:
+    compare_promise: "أكمل لترى كيف تُقارن إجاباتك بإجابات الآخرين."
+    region_country_prompt: "اختر بلدك…"
+    region_area_placeholder: "منطقتك (اختياري)"
     region_notice_linked: "يجمع هذا الـVerto بيانات إقليمية — أنت تجيب بصفتك من %{region}. عند الانتهاء يمكنك رؤية إجابات المناطق الأخرى."
     region_notice_pick: "يجمع هذا الـVerto بيانات إقليمية — عند الانتهاء يمكنك رؤية إجابات المناطق الأخرى. منطقتك:"
     region_prefer_not: "أفضّل عدم التحديد"

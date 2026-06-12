@@ -60,6 +60,9 @@ nl:
     ask_verto: Vraag het Verto
     analysing: Antwoorden analyseren…
   player:
+    compare_promise: "Maak het af om te zien hoe jouw antwoorden zich verhouden tot die van anderen."
+    region_country_prompt: "Kies je land…"
+    region_area_placeholder: "Jouw regio (optioneel)"
     region_notice_linked: "Deze Verto verzamelt regionale gegevens — je antwoordt als %{region}. Na afloop zie je hoe andere regio's hebben geantwoord."
     region_notice_pick: "Deze Verto verzamelt regionale gegevens — na afloop zie je hoe andere regio's hebben geantwoord. Jouw regio:"
     region_prefer_not: "Zeg ik liever niet"

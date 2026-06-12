@@ -60,6 +60,9 @@ ja:
     ask_verto: Vertoに聞く
     analysing: 回答を分析中…
   player:
+    compare_promise: "最後まで答えると、自分の回答をみんなと比べられます。"
+    region_country_prompt: "国を選んでください…"
+    region_area_placeholder: "お住まいの地域（任意）"
     region_notice_linked: "このVertoは地域データを収集します — %{region} として回答しています。完了後、他の地域の回答を見られます。"
     region_notice_pick: "このVertoは地域データを収集します — 完了後、他の地域の回答を見られます。あなたの地域:"
     region_prefer_not: "回答しない"
