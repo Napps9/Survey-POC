@@ -110,16 +110,27 @@ vi:
     wizard:
       step_counter: Bước %{n} / %{total}
   nav:
-    alliances: Liên minh
+    alliances: "Tác động tập thể"
     shared_vertos: Vertos được chia sẻ
     my_vertos: Vertos của tôi
     create: Tạo
     members: Thành viên
     sign_out: Đăng xuất
   alliances:
-    title: Liên minh — Playverto
+    cq_section: "Câu hỏi chung"
+    cq_add_body: "Chọn một bộ câu hỏi của bạn — mọi đối tác trong liên minh này đều có thể xem các câu hỏi của nó."
+    cq_add_submit: "Chia sẻ bộ →"
+    cq_no_more: "Không còn bộ câu hỏi nào để chia sẻ."
+    cq_create_new: "Tạo bộ mới →"
+    cq_empty_title: "Chưa có Câu hỏi chung nào được chia sẻ"
+    cq_empty_body: "Chia sẻ một bộ câu hỏi ở trên và mọi đối tác sẽ thấy các câu hỏi của nó."
+    cq_remove_confirm: "Gỡ “%{name}” khỏi liên minh này? Đối tác sẽ không còn thấy các câu hỏi của nó."
+    cq_partner_section: "Câu hỏi chung được chia sẻ với bạn"
+    cq_partner_empty_title: "Chưa có Câu hỏi chung"
+    cq_partner_empty_body: "Khi %{org} chia sẻ một bộ câu hỏi, các câu hỏi sẽ xuất hiện ở đây."
+    title: "Tác động tập thể — Playverto"
     index_eyebrow: Liên minh của bạn
-    index_heading: Liên minh
+    index_heading: "Tác động tập thể"
     index_subtitle: Nhóm các tổ chức đối tác thành các liên minh có tên. Thêm Vertos và mỗi đối tác sẽ có liên kết chia sẻ riêng.
     new_button: "+ Liên minh mới"
     owned_section: Liên minh bạn quản lý
@@ -150,7 +161,7 @@ vi:
     name_placeholder: 'ví dụ: Đối tác Thử nghiệm'
     cancel: Hủy
     create_submit: Tạo liên minh →
-    show_title: "%{name} — Liên minh"
+    show_title: "%{name} — Tác động tập thể"
     back_to_all: Tất cả liên minh
     creator_eyebrow: Liên minh · Bạn quản lý
     partner_eyebrow: Liên minh · Thành viên

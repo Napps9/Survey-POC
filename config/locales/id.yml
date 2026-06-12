@@ -110,16 +110,27 @@ id:
     wizard:
       step_counter: Langkah %{n} dari %{total}
   nav:
-    alliances: Aliansi
+    alliances: "Dampak Kolektif"
     shared_vertos: Verto Dibagikan
     my_vertos: Verto Saya
     create: Buat
     members: Anggota
     sign_out: Keluar
   alliances:
-    title: Aliansi — Playverto
+    cq_section: "Pertanyaan Bersama"
+    cq_add_body: "Pilih salah satu set pertanyaanmu — setiap mitra di aliansi ini dapat melihat pertanyaannya."
+    cq_add_submit: "Bagikan set →"
+    cq_no_more: "Tidak ada lagi set pertanyaan untuk dibagikan."
+    cq_create_new: "Buat set →"
+    cq_empty_title: "Belum ada Pertanyaan Bersama yang dibagikan"
+    cq_empty_body: "Bagikan set pertanyaan di atas dan setiap mitra akan melihat pertanyaannya."
+    cq_remove_confirm: "Hapus “%{name}” dari aliansi ini? Mitra tidak akan lagi melihat pertanyaannya."
+    cq_partner_section: "Pertanyaan Bersama yang dibagikan denganmu"
+    cq_partner_empty_title: "Belum ada Pertanyaan Bersama"
+    cq_partner_empty_body: "Saat %{org} membagikan set pertanyaan, pertanyaannya akan muncul di sini."
+    title: "Dampak Kolektif — Playverto"
     index_eyebrow: Aliansi Anda
-    index_heading: Aliansi
+    index_heading: "Dampak Kolektif"
     index_subtitle: Kelompokkan organisasi mitra ke dalam aliansi yang diberi nama. Tambahkan Verto dan setiap mitra akan mendapatkan tautan berbaginya sendiri.
     new_button: "+ Aliansi baru"
     owned_section: Aliansi yang Anda kelola
@@ -150,7 +161,7 @@ id:
     name_placeholder: misal Mitra Pilot
     cancel: Batal
     create_submit: Buat aliansi →
-    show_title: "%{name} — Aliansi"
+    show_title: "%{name} — Dampak Kolektif"
     back_to_all: Semua aliansi
     creator_eyebrow: Aliansi · Anda mengelola ini
     partner_eyebrow: Aliansi · Anggota

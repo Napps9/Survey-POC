@@ -110,16 +110,27 @@ ru:
     wizard:
       step_counter: Шаг %{n} из %{total}
   nav:
-    alliances: Альянсы
+    alliances: "Коллективное влияние"
     shared_vertos: Общие Vertos
     my_vertos: Мои Vertos
     create: Создать
     members: Участники
     sign_out: Выйти
   alliances:
-    title: Альянсы — Playverto
+    cq_section: "Общие вопросы"
+    cq_add_body: "Выберите один из ваших наборов вопросов — каждый партнёр этого альянса увидит его вопросы."
+    cq_add_submit: "Поделиться набором →"
+    cq_no_more: "Больше нет наборов вопросов для совместного доступа."
+    cq_create_new: "Создать набор →"
+    cq_empty_title: "Общие вопросы пока не опубликованы"
+    cq_empty_body: "Поделитесь набором вопросов выше, и каждый партнёр увидит его вопросы."
+    cq_remove_confirm: "Убрать «%{name}» из этого альянса? Партнёры больше не увидят его вопросы."
+    cq_partner_section: "Общие вопросы, доступные вам"
+    cq_partner_empty_title: "Общих вопросов пока нет"
+    cq_partner_empty_body: "Когда %{org} поделится набором вопросов, его вопросы появятся здесь."
+    title: "Коллективное влияние — Playverto"
     index_eyebrow: Ваши альянсы
-    index_heading: Альянсы
+    index_heading: "Коллективное влияние"
     index_subtitle: Объединяйте партнёрские организации в именованные альянсы. Добавляйте Verto, и каждый партнёр получит свою ссылку для распространения.
     new_button: "+ Новый альянс"
     owned_section: Альянсы, которыми вы управляете
@@ -150,7 +161,7 @@ ru:
     name_placeholder: напр. Пилотные партнёры
     cancel: Отмена
     create_submit: Создать альянс →
-    show_title: "%{name} — Альянсы"
+    show_title: "%{name} — Коллективное влияние"
     back_to_all: Все альянсы
     creator_eyebrow: Альянс · Вы управляете
     partner_eyebrow: Альянс · Участник

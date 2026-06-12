@@ -110,16 +110,27 @@ he:
     wizard:
       step_counter: שלב %{n} מתוך %{total}
   nav:
-    alliances: בריתות
+    alliances: "השפעה משותפת"
     shared_vertos: Vertos משותפים
     my_vertos: ה-Vertos שלי
     create: צור
     members: חברים
     sign_out: התנתק
   alliances:
-    title: בריתות — Playverto
+    cq_section: "שאלות משותפות"
+    cq_add_body: "בחרו אחת מערכות השאלות שלכם — כל שותף בברית הזו יוכל לראות את השאלות שלה."
+    cq_add_submit: "שיתוף ערכה ←"
+    cq_no_more: "אין עוד ערכות שאלות לשיתוף."
+    cq_create_new: "יצירת ערכה ←"
+    cq_empty_title: "עוד לא שותפו שאלות משותפות"
+    cq_empty_body: "שתפו ערכת שאלות למעלה וכל השותפים יראו את השאלות שלה."
+    cq_remove_confirm: "להסיר את “%{name}” מהברית הזו? השותפים לא יראו עוד את השאלות שלה."
+    cq_partner_section: "שאלות משותפות ששותפו איתכם"
+    cq_partner_empty_title: "אין עדיין שאלות משותפות"
+    cq_partner_empty_body: "כאשר %{org} ישתף ערכת שאלות, השאלות שלה יופיעו כאן."
+    title: "השפעה משותפת — Playverto"
     index_eyebrow: הבריתות שלך
-    index_heading: בריתות
+    index_heading: "השפעה משותפת"
     index_subtitle: קבצו ארגונים שותפים לבריתות עם שם משלהן. הוסיפו Vertos וכל שותף יקבל קישור שיתוף משלו.
     new_button: "+ ברית חדשה"
     owned_section: בריתות שאתם מנהלים
@@ -150,7 +161,7 @@ he:
     name_placeholder: 'לדוגמה: שותפי פיילוט'
     cancel: ביטול
     create_submit: צרו ברית ←
-    show_title: "%{name} — בריתות"
+    show_title: "%{name} — השפעה משותפת"
     back_to_all: כל הבריתות
     creator_eyebrow: ברית · אתם מנהלים זאת
     partner_eyebrow: ברית · חבר

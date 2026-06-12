@@ -101,6 +101,11 @@ class AlliancesController < ApplicationController
                            .where.not(id: @alliance_vertos.map(&:survey_id))
                            .where.not(publish_token: nil)
                            .order(updated_at: :desc)
+
+    @alliance_sets  = shared_question_sets
+    @available_sets = current_organisation.common_question_sets.kept
+                        .where.not(id: @alliance_sets.map(&:common_question_set_id))
+                        .order(:name)
   end
 
   def load_partner_show_data
@@ -114,5 +119,16 @@ class AlliancesController < ApplicationController
     @my_shares_by_verto = @alliance.survey_shares
                             .where(partner_organisation_id: current_organisation.id)
                             .index_by(&:alliance_verto_id)
+
+    @alliance_sets = shared_question_sets
+  end
+
+  # Question sets shared into this alliance, skipping any the owner has since
+  # archived — partners shouldn't keep seeing a deleted set's questions.
+  def shared_question_sets
+    @alliance.alliance_common_question_sets
+             .includes(common_question_set: :common_questions)
+             .order(:created_at)
+             .select { |acs| acs.common_question_set.deleted_at.nil? }
   end
 end

@@ -110,16 +110,27 @@ sw:
     wizard:
       step_counter: Hatua %{n} kati ya %{total}
   nav:
-    alliances: Ushirikiano
+    alliances: "Athari ya Pamoja"
     shared_vertos: Vertos Zilizoshirikishwa
     my_vertos: Vertos Zangu
     create: Unda
     members: Wanachama
     sign_out: Toka
   alliances:
-    title: Ushirikiano — Playverto
+    cq_section: "Maswali ya Pamoja"
+    cq_add_body: "Chagua seti yako ya maswali — kila mshirika katika muungano huu ataona maswali yake."
+    cq_add_submit: "Shiriki seti →"
+    cq_no_more: "Hakuna seti zaidi za maswali za kushiriki."
+    cq_create_new: "Unda seti →"
+    cq_empty_title: "Hakuna Maswali ya Pamoja yaliyoshirikiwa bado"
+    cq_empty_body: "Shiriki seti ya maswali hapo juu na kila mshirika ataona maswali yake."
+    cq_remove_confirm: "Ondoa “%{name}” kutoka muungano huu? Washirika hawataona tena maswali yake."
+    cq_partner_section: "Maswali ya Pamoja yaliyoshirikiwa nawe"
+    cq_partner_empty_title: "Hakuna Maswali ya Pamoja bado"
+    cq_partner_empty_body: "%{org} akishiriki seti ya maswali, maswali yake yataonekana hapa."
+    title: "Athari ya Pamoja — Playverto"
     index_eyebrow: Ushirikiano wako
-    index_heading: Ushirikiano
+    index_heading: "Athari ya Pamoja"
     index_subtitle: Panga mashirika washirika katika ushirikiano wenye majina. Ongeza Vertos na kila mshirika atapata kiungo chake cha kushiriki.
     new_button: "+ Ushirikiano mpya"
     owned_section: Ushirikiano unaouendesha
@@ -150,7 +161,7 @@ sw:
     name_placeholder: 'mfano: Washirika wa Majaribio'
     cancel: Ghairi
     create_submit: Unda ushirikiano →
-    show_title: "%{name} — Ushirikiano"
+    show_title: "%{name} — Athari ya Pamoja"
     back_to_all: Ushirikiano wote
     creator_eyebrow: Ushirikiano · Wewe unauendesha
     partner_eyebrow: Ushirikiano · Mwanachama

@@ -226,6 +226,69 @@
         </div>
       <% end %>
 
+      <%# ── Common Questions shared with this alliance ── %>
+      <div style="display:flex;align-items:center;gap:10px;margin:32px 0 14px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.cq_section") %></span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @alliance_sets.size %></span>
+      </div>
+
+      <% if is_admin %>
+        <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px 22px;margin-bottom:18px;">
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin-bottom:12px;">
+            <%= t("alliances.cq_add_body") %>
+          </div>
+          <% if @available_sets.empty? %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);">
+              <%= t("alliances.cq_no_more") %> <%= link_to t("alliances.cq_create_new"), new_common_question_set_path, style: "color:#615BF5;text-decoration:none;" %>
+            </div>
+          <% else %>
+            <%= form_with url: alliance_alliance_common_question_sets_path(@alliance), method: :post, local: true,
+                  html: { style: "display:flex;gap:10px;flex-wrap:wrap;align-items:center;" } do |f| %>
+              <%= f.select :common_question_set_id,
+                    @available_sets.map { |s| [ "#{s.name} (#{s.common_questions.size})".truncate(72), s.id ] },
+                    {},
+                    style: "flex:1;min-width:240px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;" %>
+              <button type="submit"
+                      style="background:#615BF5;border:none;border-radius:100px;padding:11px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;cursor:pointer;">
+                <%= t("alliances.cq_add_submit") %>
+              </button>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @alliance_sets.empty? %>
+        <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:30px 24px;text-align:center;margin-bottom:32px;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("alliances.cq_empty_title") %></div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:380px;margin:0 auto;line-height:1.5;">
+            <%= t("alliances.cq_empty_body") %>
+          </div>
+        </div>
+      <% else %>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+          <% @alliance_sets.each do |acs| %>
+            <% set = acs.common_question_set %>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(97,91,245,0.25);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:200px;">
+                <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;"><%= set.name %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);">
+                  <%= set.common_questions.size %> <%= t("dashboard_card.questions", count: set.common_questions.size) %>
+                </div>
+              </div>
+              <%= link_to t("alliances.open"), common_question_set_path(set),
+                    style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#615BF5;text-decoration:none;" %>
+              <% if is_admin %>
+                <%= button_to t("alliances.remove"), alliance_alliance_common_question_set_path(@alliance, acs), method: :delete,
+                      data: { turbo_confirm: t("alliances.cq_remove_confirm", name: set.name) },
+                      form: { style: "margin:0;" },
+                      style: "background:none;border:none;padding:4px 8px;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;text-decoration:underline;text-underline-offset:3px;" %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
     </div>
   </div>
 </div>

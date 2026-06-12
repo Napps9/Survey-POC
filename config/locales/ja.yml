@@ -110,16 +110,27 @@ ja:
     wizard:
       step_counter: "%{total}ステップ中 %{n}"
   nav:
-    alliances: アライアンス
+    alliances: "コレクティブ・インパクト"
     shared_vertos: 共有Vertos
     my_vertos: マイVertos
     create: 作成
     members: メンバー
     sign_out: ログアウト
   alliances:
-    title: アライアンス — Playverto
+    cq_section: "共通の質問"
+    cq_add_body: "質問セットを選ぶと、このアライアンスのすべてのパートナーがその質問を見られます。"
+    cq_add_submit: "セットを共有 →"
+    cq_no_more: "共有できる質問セットはもうありません。"
+    cq_create_new: "セットを作成 →"
+    cq_empty_title: "共有された共通の質問はまだありません"
+    cq_empty_body: "上で質問セットを共有すると、すべてのパートナーがその質問を見られます。"
+    cq_remove_confirm: "「%{name}」をこのアライアンスから削除しますか？パートナーはその質問を見られなくなります。"
+    cq_partner_section: "あなたと共有された共通の質問"
+    cq_partner_empty_title: "共通の質問はまだありません"
+    cq_partner_empty_body: "%{org} が質問セットを共有すると、その質問がここに表示されます。"
+    title: "コレクティブ・インパクト — Playverto"
     index_eyebrow: あなたのアライアンス
-    index_heading: アライアンス
+    index_heading: "コレクティブ・インパクト"
     index_subtitle: パートナー組織を名前付きのアライアンスにまとめましょう。Verto を追加すると、各パートナーに専用の共有リンクが発行されます。
     new_button: "+ 新しいアライアンス"
     owned_section: あなたが運営するアライアンス
@@ -150,7 +161,7 @@ ja:
     name_placeholder: '例: パイロットパートナー'
     cancel: キャンセル
     create_submit: アライアンスを作成 →
-    show_title: "%{name} — アライアンス"
+    show_title: "%{name} — コレクティブ・インパクト"
     back_to_all: すべてのアライアンス
     creator_eyebrow: アライアンス · あなたが運営
     partner_eyebrow: アライアンス · メンバー

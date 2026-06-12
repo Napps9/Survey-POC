@@ -110,16 +110,27 @@ ar:
     wizard:
       step_counter: الخطوة %{n} من %{total}
   nav:
-    alliances: التحالفات
+    alliances: "الأثر الجماعي"
     shared_vertos: فيرتوهات مشتركة
     my_vertos: فيرتوهاتي
     create: إنشاء
     members: الأعضاء
     sign_out: تسجيل الخروج
   alliances:
-    title: التحالفات — Playverto
+    cq_section: "الأسئلة المشتركة"
+    cq_add_body: "اختر إحدى مجموعات أسئلتك — يمكن لكل شريك في هذا التحالف رؤية أسئلتها."
+    cq_add_submit: "مشاركة المجموعة ←"
+    cq_no_more: "لا توجد مجموعات أسئلة أخرى للمشاركة."
+    cq_create_new: "إنشاء مجموعة ←"
+    cq_empty_title: "لم تتم مشاركة أسئلة مشتركة بعد"
+    cq_empty_body: "شارك مجموعة أسئلة أعلاه وسيراها كل الشركاء."
+    cq_remove_confirm: "إزالة «%{name}» من هذا التحالف؟ لن يرى الشركاء أسئلتها بعد الآن."
+    cq_partner_section: "الأسئلة المشتركة معك"
+    cq_partner_empty_title: "لا توجد أسئلة مشتركة بعد"
+    cq_partner_empty_body: "عندما يشارك %{org} مجموعة أسئلة، ستظهر أسئلتها هنا."
+    title: "الأثر الجماعي — Playverto"
     index_eyebrow: تحالفاتك
-    index_heading: التحالفات
+    index_heading: "الأثر الجماعي"
     index_subtitle: اجمع المؤسسات الشريكة في تحالفات مُسماة. أضف Vertos ويحصل كل شريك على رابط مشاركة خاص به.
     new_button: "+ تحالف جديد"
     owned_section: التحالفات التي تديرها
@@ -150,7 +161,7 @@ ar:
     name_placeholder: 'مثال: الشركاء التجريبيون'
     cancel: إلغاء
     create_submit: إنشاء التحالف ←
-    show_title: "%{name} — التحالفات"
+    show_title: "%{name} — الأثر الجماعي"
     back_to_all: جميع التحالفات
     creator_eyebrow: تحالف · أنت تديره
     partner_eyebrow: تحالف · عضو

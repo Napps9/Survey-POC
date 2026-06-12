@@ -110,16 +110,27 @@ pt:
     wizard:
       step_counter: Passo %{n} de %{total}
   nav:
-    alliances: Alianças
+    alliances: "Impacto Coletivo"
     shared_vertos: Vertos partilhados
     my_vertos: Os meus Vertos
     create: Criar
     members: Membros
     sign_out: Terminar sessão
   alliances:
-    title: Alianças — Playverto
+    cq_section: "Perguntas comuns"
+    cq_add_body: "Escolha um dos seus conjuntos de perguntas — todos os parceiros desta aliança poderão ver as suas perguntas."
+    cq_add_submit: "Partilhar conjunto →"
+    cq_no_more: "Não há mais conjuntos de perguntas para partilhar."
+    cq_create_new: "Criar um conjunto →"
+    cq_empty_title: "Ainda não foram partilhadas perguntas comuns"
+    cq_empty_body: "Partilhe um conjunto de perguntas acima e todos os parceiros verão as suas perguntas."
+    cq_remove_confirm: "Remover “%{name}” desta aliança? Os parceiros deixarão de ver as suas perguntas."
+    cq_partner_section: "Perguntas comuns partilhadas consigo"
+    cq_partner_empty_title: "Ainda sem perguntas comuns"
+    cq_partner_empty_body: "Quando %{org} partilhar um conjunto de perguntas, as suas perguntas aparecerão aqui."
+    title: "Impacto Coletivo — Playverto"
     index_eyebrow: As suas alianças
-    index_heading: Alianças
+    index_heading: "Impacto Coletivo"
     index_subtitle: Agrupe organizações parceiras em alianças nomeadas. Adicione Vertos e cada parceiro recebe o seu próprio link de partilha.
     new_button: "+ Nova aliança"
     owned_section: Alianças que gere
@@ -150,7 +161,7 @@ pt:
     name_placeholder: ex. Parceiros Piloto
     cancel: Cancelar
     create_submit: Criar aliança →
-    show_title: "%{name} — Alianças"
+    show_title: "%{name} — Impacto Coletivo"
     back_to_all: Todas as alianças
     creator_eyebrow: Aliança · Gerida por si
     partner_eyebrow: Aliança · Membro

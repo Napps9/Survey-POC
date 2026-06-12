@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_11_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_11_000003) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -37,6 +37,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_000002) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "alliance_common_question_sets", force: :cascade do |t|
+    t.integer "alliance_id", null: false
+    t.integer "common_question_set_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["alliance_id", "common_question_set_id"], name: "idx_alliance_cq_sets_unique", unique: true
+    t.index ["alliance_id"], name: "index_alliance_common_question_sets_on_alliance_id"
   end
 
   create_table "alliance_memberships", force: :cascade do |t|

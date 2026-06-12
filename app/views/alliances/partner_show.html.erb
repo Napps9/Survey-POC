@@ -130,6 +130,48 @@
         </div>
       <% end %>
 
+      <%# ── Common Questions the owner has shared with this alliance —
+          read-only: partners see the questions asked across the alliance. %>
+      <div style="display:flex;align-items:center;gap:10px;margin:32px 0 14px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.cq_partner_section") %></span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @alliance_sets.size %></span>
+      </div>
+
+      <% if @alliance_sets.empty? %>
+        <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:30px 24px;text-align:center;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("alliances.cq_partner_empty_title") %></div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:380px;margin:0 auto;line-height:1.5;">
+            <%= t("alliances.cq_partner_empty_body", org: @alliance.organisation.name) %>
+          </div>
+        </div>
+      <% else %>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <% @alliance_sets.each do |acs| %>
+            <% set = acs.common_question_set %>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(97,91,245,0.25);border-radius:16px;overflow:hidden;">
+              <div style="height:3px;background:linear-gradient(90deg,#615BF5,#0CA7FF);"></div>
+              <div style="padding:16px 20px 6px;">
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);margin-bottom:4px;"><%= t("alliances.from_org", org: @alliance.organisation.name) %></div>
+                <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;line-height:1.25;"><%= set.name %></div>
+                <% if set.key_insight.present? %>
+                  <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);line-height:1.4;margin-top:4px;"><%= set.key_insight.truncate(140) %></div>
+                <% end %>
+              </div>
+              <div style="padding:8px 20px 16px;display:flex;flex-direction:column;gap:8px;">
+                <% set.common_questions.each do |q| %>
+                  <div style="display:flex;align-items:baseline;gap:10px;padding:9px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(97,91,245,0.9);flex-shrink:0;"><%= "%02d" % q.position %></span>
+                    <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.85);line-height:1.45;"><%= q.text %></span>
+                    <span style="flex-shrink:0;font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:3px 9px;"><%= q.card_type.humanize %></span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
     </div>
   </div>
 </div>

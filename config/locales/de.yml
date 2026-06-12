@@ -110,16 +110,27 @@ de:
     wizard:
       step_counter: Schritt %{n} von %{total}
   nav:
-    alliances: Allianzen
+    alliances: "Kollektive Wirkung"
     shared_vertos: Geteilte Vertos
     my_vertos: Meine Vertos
     create: Erstellen
     members: Mitglieder
     sign_out: Abmelden
   alliances:
-    title: Allianzen — Playverto
+    cq_section: "Gemeinsame Fragen"
+    cq_add_body: "Wähle eines deiner Fragensets — jeder Partner in dieser Allianz kann seine Fragen sehen."
+    cq_add_submit: "Set teilen →"
+    cq_no_more: "Keine weiteren Fragensets zum Teilen."
+    cq_create_new: "Set erstellen →"
+    cq_empty_title: "Noch keine gemeinsamen Fragen geteilt"
+    cq_empty_body: "Teile oben ein Fragenset und jeder Partner sieht seine Fragen."
+    cq_remove_confirm: "„%{name}“ aus dieser Allianz entfernen? Partner sehen die Fragen dann nicht mehr."
+    cq_partner_section: "Mit dir geteilte gemeinsame Fragen"
+    cq_partner_empty_title: "Noch keine gemeinsamen Fragen"
+    cq_partner_empty_body: "Wenn %{org} ein Fragenset teilt, erscheinen die Fragen hier."
+    title: "Kollektive Wirkung — Playverto"
     index_eyebrow: Ihre Allianzen
-    index_heading: Allianzen
+    index_heading: "Kollektive Wirkung"
     index_subtitle: Fassen Sie Partnerorganisationen in benannten Allianzen zusammen. Fügen Sie Vertos hinzu und jeder Partner erhält seinen eigenen Freigabelink.
     new_button: "+ Neue Allianz"
     owned_section: Von Ihnen geführte Allianzen
@@ -150,7 +161,7 @@ de:
     name_placeholder: z. B. Pilotpartner
     cancel: Abbrechen
     create_submit: Allianz erstellen →
-    show_title: "%{name} — Allianzen"
+    show_title: "%{name} — Kollektive Wirkung"
     back_to_all: Alle Allianzen
     creator_eyebrow: Allianz · Von Ihnen geführt
     partner_eyebrow: Allianz · Mitglied

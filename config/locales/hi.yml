@@ -110,16 +110,27 @@ hi:
     wizard:
       step_counter: चरण %{n} / %{total}
   nav:
-    alliances: गठबंधन
+    alliances: "सामूहिक प्रभाव"
     shared_vertos: साझा किए गए Verto
     my_vertos: मेरे Verto
     create: बनाएं
     members: सदस्य
     sign_out: साइन आउट
   alliances:
-    title: गठबंधन — Playverto
+    cq_section: "साझा प्रश्न"
+    cq_add_body: "अपने प्रश्न सेट में से एक चुनें — इस गठबंधन का हर साथी इसके प्रश्न देख सकेगा।"
+    cq_add_submit: "सेट साझा करें →"
+    cq_no_more: "साझा करने के लिए और प्रश्न सेट नहीं हैं।"
+    cq_create_new: "सेट बनाएँ →"
+    cq_empty_title: "अभी तक कोई साझा प्रश्न साझा नहीं किए गए"
+    cq_empty_body: "ऊपर एक प्रश्न सेट साझा करें और हर साथी उसके प्रश्न देखेगा।"
+    cq_remove_confirm: "“%{name}” को इस गठबंधन से हटाएँ? साथी अब इसके प्रश्न नहीं देख पाएँगे।"
+    cq_partner_section: "आपके साथ साझा किए गए साझा प्रश्न"
+    cq_partner_empty_title: "अभी कोई साझा प्रश्न नहीं"
+    cq_partner_empty_body: "जब %{org} कोई प्रश्न सेट साझा करेगा, तो उसके प्रश्न यहाँ दिखेंगे।"
+    title: "सामूहिक प्रभाव — Playverto"
     index_eyebrow: आपके गठबंधन
-    index_heading: गठबंधन
+    index_heading: "सामूहिक प्रभाव"
     index_subtitle: साझेदार संगठनों को नामित गठबंधनों में समूहित करें। Vertos जोड़ें और प्रत्येक साझेदार को अपना खुद का शेयर लिंक मिलेगा।
     new_button: "+ नया गठबंधन"
     owned_section: आपके द्वारा चलाए जाने वाले गठबंधन
@@ -150,7 +161,7 @@ hi:
     name_placeholder: उदा. Pilot Partners
     cancel: रद्द करें
     create_submit: गठबंधन बनाएं →
-    show_title: "%{name} — गठबंधन"
+    show_title: "%{name} — सामूहिक प्रभाव"
     back_to_all: सभी गठबंधन
     creator_eyebrow: गठबंधन · आप इसे चलाते हैं
     partner_eyebrow: गठबंधन · सदस्य

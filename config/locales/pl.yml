@@ -110,16 +110,27 @@ pl:
     wizard:
       step_counter: Krok %{n} z %{total}
   nav:
-    alliances: Sojusze
+    alliances: "Wspólny wpływ"
     shared_vertos: Udostępnione Verto
     my_vertos: Moje Verto
     create: Utwórz
     members: Członkowie
     sign_out: Wyloguj się
   alliances:
-    title: Sojusze — Playverto
+    cq_section: "Wspólne pytania"
+    cq_add_body: "Wybierz jeden ze swoich zestawów pytań — każdy partner w tym sojuszu zobaczy jego pytania."
+    cq_add_submit: "Udostępnij zestaw →"
+    cq_no_more: "Nie ma więcej zestawów pytań do udostępnienia."
+    cq_create_new: "Utwórz zestaw →"
+    cq_empty_title: "Nie udostępniono jeszcze wspólnych pytań"
+    cq_empty_body: "Udostępnij zestaw pytań powyżej, a każdy partner zobaczy jego pytania."
+    cq_remove_confirm: "Usunąć „%{name}” z tego sojuszu? Partnerzy nie będą już widzieć jego pytań."
+    cq_partner_section: "Wspólne pytania udostępnione tobie"
+    cq_partner_empty_title: "Brak wspólnych pytań"
+    cq_partner_empty_body: "Gdy %{org} udostępni zestaw pytań, jego pytania pojawią się tutaj."
+    title: "Wspólny wpływ — Playverto"
     index_eyebrow: Twoje sojusze
-    index_heading: Sojusze
+    index_heading: "Wspólny wpływ"
     index_subtitle: Grupuj organizacje partnerskie w nazwane sojusze. Dodawaj Verto, a każdy partner otrzyma własny link do udostępniania.
     new_button: "+ Nowy sojusz"
     owned_section: Sojusze, którymi zarządzasz
@@ -150,7 +161,7 @@ pl:
     name_placeholder: np. Pilot Partners
     cancel: Anuluj
     create_submit: Utwórz sojusz →
-    show_title: "%{name} — Sojusze"
+    show_title: "%{name} — Wspólny wpływ"
     back_to_all: Wszystkie sojusze
     creator_eyebrow: Sojusz · Ty go prowadzisz
     partner_eyebrow: Sojusz · Członek

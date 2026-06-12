@@ -110,16 +110,27 @@ tr:
     wizard:
       step_counter: Adım %{n} / %{total}
   nav:
-    alliances: İttifaklar
+    alliances: "Kolektif Etki"
     shared_vertos: Paylaşılan Verto'lar
     my_vertos: Verto'larım
     create: Oluştur
     members: Üyeler
     sign_out: Çıkış yap
   alliances:
-    title: İttifaklar — Playverto
+    cq_section: "Ortak Sorular"
+    cq_add_body: "Soru setlerinden birini seç — bu ittifaktaki her ortak sorularını görebilir."
+    cq_add_submit: "Seti paylaş →"
+    cq_no_more: "Paylaşılacak başka soru seti yok."
+    cq_create_new: "Set oluştur →"
+    cq_empty_title: "Henüz ortak soru paylaşılmadı"
+    cq_empty_body: "Yukarıda bir soru seti paylaş, her ortak sorularını görsün."
+    cq_remove_confirm: "“%{name}” bu ittifaktan kaldırılsın mı? Ortaklar artık sorularını göremeyecek."
+    cq_partner_section: "Seninle paylaşılan ortak sorular"
+    cq_partner_empty_title: "Henüz ortak soru yok"
+    cq_partner_empty_body: "%{org} bir soru seti paylaştığında soruları burada görünecek."
+    title: "Kolektif Etki — Playverto"
     index_eyebrow: İttifaklarınız
-    index_heading: İttifaklar
+    index_heading: "Kolektif Etki"
     index_subtitle: Ortak kuruluşları adlandırılmış ittifaklarda gruplandırın. Verto ekleyin ve her ortak kendi paylaşım bağlantısını alsın.
     new_button: "+ Yeni ittifak"
     owned_section: Yönettiğiniz ittifaklar
@@ -150,7 +161,7 @@ tr:
     name_placeholder: örn. Pilot Ortaklar
     cancel: İptal
     create_submit: İttifak oluştur →
-    show_title: "%{name} — İttifaklar"
+    show_title: "%{name} — Kolektif Etki"
     back_to_all: Tüm ittifaklar
     creator_eyebrow: İttifak · Bunu siz yönetiyorsunuz
     partner_eyebrow: İttifak · Üye

@@ -80,6 +80,7 @@ Rails.application.routes.draw do
   resources :alliances, except: [ :edit, :update ] do
     resources :alliance_invites,     only: [ :create ]
     resources :alliance_vertos,      only: [ :create, :destroy, :show ]
+    resources :alliance_common_question_sets, only: [ :create, :destroy ]
     resources :alliance_memberships, only: [ :destroy ]
   end
 end

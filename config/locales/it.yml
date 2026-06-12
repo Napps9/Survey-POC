@@ -110,16 +110,27 @@ it:
     wizard:
       step_counter: Passo %{n} di %{total}
   nav:
-    alliances: Alleanze
+    alliances: "Impatto Collettivo"
     shared_vertos: Vertos condivisi
     my_vertos: I miei Vertos
     create: Crea
     members: Membri
     sign_out: Esci
   alliances:
-    title: Alleanze — Playverto
+    cq_section: "Domande comuni"
+    cq_add_body: "Scegli uno dei tuoi set di domande — ogni partner di questa alleanza potrà vederne le domande."
+    cq_add_submit: "Condividi set →"
+    cq_no_more: "Nessun altro set di domande da condividere."
+    cq_create_new: "Crea un set →"
+    cq_empty_title: "Nessuna domanda comune condivisa finora"
+    cq_empty_body: "Condividi un set di domande qui sopra e ogni partner ne vedrà le domande."
+    cq_remove_confirm: "Rimuovere “%{name}” da questa alleanza? I partner non vedranno più le sue domande."
+    cq_partner_section: "Domande comuni condivise con te"
+    cq_partner_empty_title: "Ancora nessuna domanda comune"
+    cq_partner_empty_body: "Quando %{org} condividerà un set di domande, le sue domande appariranno qui."
+    title: "Impatto Collettivo — Playverto"
     index_eyebrow: Le tue alleanze
-    index_heading: Alleanze
+    index_heading: "Impatto Collettivo"
     index_subtitle: Raggruppa le organizzazioni partner in alleanze con un nome. Aggiungi Verto e ogni partner riceverà il proprio link di condivisione.
     new_button: "+ Nuova alleanza"
     owned_section: Alleanze che gestisci
@@ -150,7 +161,7 @@ it:
     name_placeholder: es. Partner Pilota
     cancel: Annulla
     create_submit: Crea alleanza →
-    show_title: "%{name} — Alleanze"
+    show_title: "%{name} — Impatto Collettivo"
     back_to_all: Tutte le alleanze
     creator_eyebrow: Alleanza · La gestisci tu
     partner_eyebrow: Alleanza · Membro

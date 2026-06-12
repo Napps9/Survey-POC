@@ -110,16 +110,27 @@ fr:
     wizard:
       step_counter: Étape %{n} sur %{total}
   nav:
-    alliances: Alliances
+    alliances: "Impact collectif"
     shared_vertos: Vertos partagés
     my_vertos: Mes Vertos
     create: Créer
     members: Membres
     sign_out: Se déconnecter
   alliances:
-    title: Alliances — Playverto
+    cq_section: "Questions communes"
+    cq_add_body: "Choisissez un de vos jeux de questions — chaque partenaire de cette alliance pourra voir ses questions."
+    cq_add_submit: "Partager le jeu →"
+    cq_no_more: "Plus aucun jeu de questions à partager."
+    cq_create_new: "Créer un jeu →"
+    cq_empty_title: "Aucune question commune partagée pour l'instant"
+    cq_empty_body: "Partagez un jeu de questions ci-dessus et chaque partenaire verra ses questions."
+    cq_remove_confirm: "Retirer « %{name} » de cette alliance ? Les partenaires ne verront plus ses questions."
+    cq_partner_section: "Questions communes partagées avec vous"
+    cq_partner_empty_title: "Pas encore de questions communes"
+    cq_partner_empty_body: "Quand %{org} partagera un jeu de questions, ses questions apparaîtront ici."
+    title: "Impact collectif — Playverto"
     index_eyebrow: Vos alliances
-    index_heading: Alliances
+    index_heading: "Impact collectif"
     index_subtitle: Regroupez vos organisations partenaires dans des alliances nommées. Ajoutez des Vertos et chaque partenaire reçoit son propre lien de partage.
     new_button: "+ Nouvelle alliance"
     owned_section: Alliances que vous gérez
@@ -150,7 +161,7 @@ fr:
     name_placeholder: ex. Partenaires pilotes
     cancel: Annuler
     create_submit: Créer l'alliance →
-    show_title: "%{name} — Alliances"
+    show_title: "%{name} — Impact collectif"
     back_to_all: Toutes les alliances
     creator_eyebrow: Alliance · Vous la gérez
     partner_eyebrow: Alliance · Membre

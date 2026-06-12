@@ -5,6 +5,8 @@ class Alliance < ApplicationRecord
   has_many :alliance_vertos, dependent: :destroy
   has_many :surveys, through: :alliance_vertos
   has_many :survey_shares, through: :alliance_vertos
+  has_many :alliance_common_question_sets, dependent: :destroy
+  has_many :common_question_sets, through: :alliance_common_question_sets
   has_many :invites, dependent: :nullify
 
   enum :status, { active: "active", pending: "pending", revoked: "revoked" }

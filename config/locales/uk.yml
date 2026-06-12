@@ -110,16 +110,27 @@ uk:
     wizard:
       step_counter: Крок %{n} з %{total}
   nav:
-    alliances: Альянси
+    alliances: "Колективний вплив"
     shared_vertos: Спільні Vertos
     my_vertos: Мої Vertos
     create: Створити
     members: Учасники
     sign_out: Вийти
   alliances:
-    title: Альянси — Playverto
+    cq_section: "Спільні питання"
+    cq_add_body: "Виберіть один із ваших наборів питань — кожен партнер цього альянсу бачитиме його питання."
+    cq_add_submit: "Поділитися набором →"
+    cq_no_more: "Більше немає наборів питань для спільного доступу."
+    cq_create_new: "Створити набір →"
+    cq_empty_title: "Спільні питання ще не опубліковано"
+    cq_empty_body: "Поділіться набором питань вище, і кожен партнер побачить його питання."
+    cq_remove_confirm: "Прибрати «%{name}» з цього альянсу? Партнери більше не бачитимуть його питань."
+    cq_partner_section: "Спільні питання, доступні вам"
+    cq_partner_empty_title: "Спільних питань ще немає"
+    cq_partner_empty_body: "Коли %{org} поділиться набором питань, його питання з'являться тут."
+    title: "Колективний вплив — Playverto"
     index_eyebrow: Ваші альянси
-    index_heading: Альянси
+    index_heading: "Колективний вплив"
     index_subtitle: Об'єднуйте партнерські організації в іменовані альянси. Додавайте Verto, і кожен партнер отримає власне посилання для поширення.
     new_button: "+ Новий альянс"
     owned_section: Альянси, якими ви керуєте
@@ -150,7 +161,7 @@ uk:
     name_placeholder: напр. Пілотні партнери
     cancel: Скасувати
     create_submit: Створити альянс →
-    show_title: "%{name} — Альянси"
+    show_title: "%{name} — Колективний вплив"
     back_to_all: Усі альянси
     creator_eyebrow: Альянс · Ви керуєте
     partner_eyebrow: Альянс · Учасник

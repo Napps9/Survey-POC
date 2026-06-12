@@ -110,16 +110,27 @@ ko:
     wizard:
       step_counter: "%{total}단계 중 %{n}단계"
   nav:
-    alliances: 얼라이언스
+    alliances: "컬렉티브 임팩트"
     shared_vertos: 공유된 Verto
     my_vertos: 내 Verto
     create: 만들기
     members: 멤버
     sign_out: 로그아웃
   alliances:
-    title: 얼라이언스 — Playverto
+    cq_section: "공통 질문"
+    cq_add_body: "질문 세트를 선택하면 이 얼라이언스의 모든 파트너가 그 질문을 볼 수 있어요."
+    cq_add_submit: "세트 공유 →"
+    cq_no_more: "공유할 질문 세트가 더 없어요."
+    cq_create_new: "세트 만들기 →"
+    cq_empty_title: "아직 공유된 공통 질문이 없어요"
+    cq_empty_body: "위에서 질문 세트를 공유하면 모든 파트너가 그 질문을 보게 돼요."
+    cq_remove_confirm: "“%{name}”을(를) 이 얼라이언스에서 제거할까요? 파트너는 더 이상 질문을 볼 수 없어요."
+    cq_partner_section: "나와 공유된 공통 질문"
+    cq_partner_empty_title: "아직 공통 질문이 없어요"
+    cq_partner_empty_body: "%{org}이(가) 질문 세트를 공유하면 그 질문이 여기에 표시돼요."
+    title: "컬렉티브 임팩트 — Playverto"
     index_eyebrow: 내 얼라이언스
-    index_heading: 얼라이언스
+    index_heading: "컬렉티브 임팩트"
     index_subtitle: 파트너 조직을 이름이 있는 얼라이언스로 그룹화하세요. Verto를 추가하면 각 파트너가 고유한 공유 링크를 받습니다.
     new_button: "+ 새 얼라이언스"
     owned_section: 내가 운영하는 얼라이언스
@@ -150,7 +161,7 @@ ko:
     name_placeholder: '예: 파일럿 파트너'
     cancel: 취소
     create_submit: 얼라이언스 만들기 →
-    show_title: "%{name} — 얼라이언스"
+    show_title: "%{name} — 컬렉티브 임팩트"
     back_to_all: 모든 얼라이언스
     creator_eyebrow: 얼라이언스 · 운영자
     partner_eyebrow: 얼라이언스 · 멤버

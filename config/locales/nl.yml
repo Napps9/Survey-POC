@@ -110,16 +110,27 @@ nl:
     wizard:
       step_counter: Stap %{n} van %{total}
   nav:
-    alliances: Allianties
+    alliances: "Collectieve Impact"
     shared_vertos: Gedeelde Vertos
     my_vertos: Mijn Vertos
     create: Aanmaken
     members: Leden
     sign_out: Uitloggen
   alliances:
-    title: Allianties — Playverto
+    cq_section: "Gemeenschappelijke vragen"
+    cq_add_body: "Kies een van je vragensets — elke partner in deze alliantie kan de vragen zien."
+    cq_add_submit: "Set delen →"
+    cq_no_more: "Geen vragensets meer om te delen."
+    cq_create_new: "Set maken →"
+    cq_empty_title: "Nog geen gemeenschappelijke vragen gedeeld"
+    cq_empty_body: "Deel hierboven een vragenset en elke partner ziet de vragen."
+    cq_remove_confirm: "“%{name}” uit deze alliantie verwijderen? Partners zien de vragen dan niet meer."
+    cq_partner_section: "Gemeenschappelijke vragen met jou gedeeld"
+    cq_partner_empty_title: "Nog geen gemeenschappelijke vragen"
+    cq_partner_empty_body: "Wanneer %{org} een vragenset deelt, verschijnen de vragen hier."
+    title: "Collectieve Impact — Playverto"
     index_eyebrow: Jouw allianties
-    index_heading: Allianties
+    index_heading: "Collectieve Impact"
     index_subtitle: Groepeer partnerorganisaties in benoemde allianties. Voeg Vertos toe en elke partner krijgt een eigen deellink.
     new_button: "+ Nieuwe alliantie"
     owned_section: Allianties die jij beheert
@@ -150,7 +161,7 @@ nl:
     name_placeholder: bijv. Pilot Partners
     cancel: Annuleren
     create_submit: Alliantie aanmaken →
-    show_title: "%{name} — Allianties"
+    show_title: "%{name} — Collectieve Impact"
     back_to_all: Alle allianties
     creator_eyebrow: Alliantie · Jij beheert deze
     partner_eyebrow: Alliantie · Lid
