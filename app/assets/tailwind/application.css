@@ -2751,9 +2751,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
        vertical real estate for the question. */
     display: none;
   }
-  /* Without the nav, .preview-card.active needs to fill the full
-     viewport (no longer subtracting 44px). */
-  .preview-overlay .preview-card.active { height: 100dvh; }
+  /* The active card fills the body (see the fuller rule below), not the
+     viewport — top chrome like the region consent bar or compare promise
+     must push it down rather than be overlapped. */
+  .preview-overlay .preview-card.active { height: auto; }
   .preview-nav-title {
     font-size: 11px;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -2766,22 +2767,22 @@ body.generating-overlay-active .bottom-bar { display: none; }
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     background: #1C2034;
+    flex: 1 1 auto;
+    min-height: 0;
   }
   .preview-card { width: 100%; max-width: 100%; }
 
-  /* Anchor the height chain — preview-card.active fills the body so
-     descendants can flex/distribute on a defined height. Without this,
-     grid-auto-rows: 1fr inside has no parent height to share. */
+  /* Anchor the height chain — preview-card.active fills the BODY, not the whole
+     viewport, so any chrome stacked above it (the region consent bar, the
+     compare-results promise) is accounted for. Pinning 100dvh here made the
+     card taller than its container: it overflowed and the next card bled
+     through — the torn / double-image look on mobile. */
   .preview-overlay .preview-card.active {
     display: flex;
     flex-direction: column;
-    /* Nav is hidden on mobile (see .preview-nav rule above), so the card
-       fills the full viewport — leaving the calc(100dvh - 44px) here would
-       expose a dark band at the bottom. */
-    height: 100dvh;
+    min-height: 100%;
     width: 100%;
     max-width: 100%;
-    min-height: 0;
   }
 
   /* Player split-card: white background by default. When the Verto's
@@ -2801,13 +2802,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
     box-shadow: none;
     overflow: hidden;
   }
-  /* Full-colour mobile background: the image fills .split-card; the
-     question heading and the choice/control widgets carry their own
-     white backgrounds so the readable content floats above the image. */
-  .preview-overlay[style*="--mobile-card-bg"] .split-card {
+  /* Full-colour mobile background — ONLY for cards without their own image.
+     A card with a split-left image already shows it as a hero strip up top;
+     painting the themed --mobile-card-bg behind it too produced two stacked
+     images (the "torn"/double look). NPS cards have their Lottie hero, so
+     they're excluded as well. Imageless cards get the themed bg + white
+     scrim panels so text floats readably above the image. */
+  .preview-overlay[style*="--mobile-card-bg"] .split-card:not(:has(.split-left-img)):not(:has(.nps-lottie)) {
     background: var(--mobile-card-bg) center/cover no-repeat;
   }
-  .preview-overlay[style*="--mobile-card-bg"] .split-card .split-right {
+  .preview-overlay[style*="--mobile-card-bg"] .split-card:not(:has(.split-left-img)):not(:has(.nps-lottie)) .split-right {
     background: transparent;
   }
   /* Question heading group lives on its own white panel so eyebrow,
