@@ -3376,3 +3376,57 @@ body.generating-overlay-active .bottom-bar { display: none; }
 /* Live Vertos are read-only: the cards feed goes inert (server enforces too) */
 .editor-feed-locked { pointer-events: none; user-select: none; }
 .editor-feed-locked .card-row, .editor-feed-locked .split-card { opacity: 0.88; }
+
+/* ── Question-type ⓘ info button (answer-type panel + all-types grid) ── */
+.type-opt-info {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.6); font-size: 13px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; padding: 0;
+}
+.type-opt-info:hover { background: rgba(255,30,111,0.18); border-color: #FF1E6F; color: #fff; }
+
+/* ── Clearer per-card delete button (cards feed chrome row) ── */
+.card-delete-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 11px; border-radius: 100px;
+  background: rgba(255,30,111,0.1); border: 1px solid rgba(255,30,111,0.3);
+  color: #FF8FB6; font-family: "ABeeZee", sans-serif; font-size: 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.card-delete-btn:hover { background: rgba(255,30,111,0.85); border-color: #FF1E6F; color: #fff; }
+
+/* ── Device preview toggle ── */
+.device-toggle {
+  display: inline-flex; gap: 2px; margin-left: 10px; padding: 3px;
+  border-radius: 100px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+}
+.device-toggle-btn {
+  width: 30px; height: 24px; border-radius: 100px; border: none; cursor: pointer;
+  background: transparent; color: rgba(255,255,255,0.45); font-size: 13px; line-height: 1;
+  display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
+.device-toggle-btn:hover { color: rgba(255,255,255,0.8); }
+.device-toggle-btn.is-active { background: #01EACB; color: #1C2034; }
+
+/* ── Device frames: reframe the editor cards at phone / tablet width. The
+   cards remain fully editable; only their layout changes. ── */
+.device-tablet .survey-card-wrap { max-width: 720px; margin-inline: auto; }
+.device-tablet .split-card { width: 100%; height: 600px; }
+
+.device-mobile .survey-card-wrap {
+  max-width: 400px; margin-inline: auto;
+  border: 8px solid #0e1020; border-radius: 34px; box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  overflow: hidden; background: #0e1020; padding: 0;
+}
+.device-mobile .split-card {
+  flex-direction: column; width: 100%; height: auto; min-height: 580px;
+  border-radius: 26px; margin: 0;
+}
+.device-mobile .split-left {
+  width: 100%; flex: 0 0 auto; min-height: 190px; max-height: 240px;
+}
+.device-mobile .split-right {
+  width: 100%; flex: 1 1 auto; padding: 24px 22px; justify-content: flex-start;
+}

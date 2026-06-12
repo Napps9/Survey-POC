@@ -41,7 +41,7 @@
   <div class="flex-1 overflow-hidden" style="display:grid;grid-template-columns:1fr 444px;">
 
     <%# ── LEFT: Cards column ── %>
-    <div class="flex flex-col overflow-hidden">
+    <div class="flex flex-col overflow-hidden" data-controller="device-frame">
 
       <% if @survey.publish_token.present? %>
         <div class="live-warning-overlay"
@@ -80,6 +80,22 @@
           <%= @survey.key_insight %>
         </span>
         <div class="brief-q-count"><%= total_q %> <%= t("editor.questions") %></div>
+
+        <%# Device preview toggle — reframes the cards at phone / tablet width
+            so creators see (and still edit) the responsive layout. %>
+        <div class="device-toggle" role="group" aria-label="<%= t('editor.device_label', default: 'Preview size') %>">
+          <% [
+               [ "desktop", "🖥", t("editor.device_desktop", default: "Desktop") ],
+               [ "tablet",  "▭",  t("editor.device_tablet",  default: "Tablet")  ],
+               [ "mobile",  "▯",  t("editor.device_mobile",  default: "Mobile")  ]
+             ].each do |device, icon, label| %>
+            <button type="button" class="device-toggle-btn<%= ' is-active' if device == 'desktop' %>"
+                    data-device-frame-target="btn" data-device="<%= device %>"
+                    data-action="click->device-frame#set" title="<%= label %>" aria-label="<%= label %>">
+              <span aria-hidden="true"><%= icon %></span>
+            </button>
+          <% end %>
+        </div>
 
         <% if @survey.multilingual? %>
           <% cur = SupportedLocales.find(@survey.default_locale) %>
@@ -129,10 +145,11 @@
       <%# Cards feed — stacked, full-width split-cards. The Verto's brand
           palette is scoped here so the cards render in brand colours while the
           surrounding editor chrome stays Playverto. %>
-      <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 <%= 'editor-feed-locked' if live_locked %>"
+      <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 device-desktop <%= 'editor-feed-locked' if live_locked %>"
            data-brand-palette-target="preview"
            data-add-question-target="cardsFeed"
            data-survey-editor-target="feed"
+           data-device-frame-target="feed"
            style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;background-color:var(--brand-bg,#272D4A);background-image:var(--brand-bg-image,none);background-size:cover;background-position:center;<%= verto_backdrop_style_attr(@survey) %>">
 
         <% cards.each_with_index do |card, idx| %>
@@ -195,7 +212,8 @@
 
     <%# ── RIGHT: Answer type panel + Publish panel (toggled) ── %>
     <div class="right-column">
-    <div class="type-panel" data-publish-panel-target="typeView">
+    <div class="type-panel" data-publish-panel-target="typeView"
+         data-controller="type-info" data-action="keydown.esc@window->type-info#closeOnEsc">
 
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
@@ -231,6 +249,10 @@
                   <div class="type-opt-name"><%= t["picker_name"] %></div>
                   <div class="type-opt-desc"><%= t["picker_desc"] %></div>
                 </div>
+                <button type="button" class="type-opt-info" aria-label="<%= t["picker_name"] %> — what's this?"
+                        data-type-icon="<%= t["picker_icon"] %>" data-type-name="<%= t["picker_name"] %>"
+                        data-type-explainer="<%= t["explainer"] %>"
+                        data-action="click->type-info#open">ⓘ</button>
                 <div class="type-opt-radio"></div>
               </div>
             </div>
@@ -283,9 +305,32 @@
                     <div class="type-opt-name"><%= t["picker_name"] %></div>
                     <div class="type-opt-desc"><%= t["picker_desc"] %></div>
                   </div>
+                  <button type="button" class="type-opt-info" aria-label="<%= t["picker_name"] %> — what's this?"
+                          data-type-icon="<%= t["picker_icon"] %>" data-type-name="<%= t["picker_name"] %>"
+                          data-type-explainer="<%= t["explainer"] %>"
+                          data-action="click->type-info#open">ⓘ</button>
                 </div>
               </div>
             <% end %>
+          </div>
+        </div>
+      </div>
+
+      <%# ── Question-type explainer modal (the ⓘ on each type) ── %>
+      <div class="app-modal hidden" data-type-info-target="modal"
+           data-action="click->type-info#backdrop">
+        <div class="app-modal__backdrop"></div>
+        <div class="app-modal__panel" style="max-width:400px;background:#1C2034;border:1px solid rgba(255,255,255,0.1);">
+          <div style="padding:22px 24px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+              <span data-type-info-target="icon"
+                    style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:rgba(255,30,111,0.12);border:1px solid rgba(255,30,111,0.3);font-size:18px;color:#FF1E6F;flex-shrink:0;"></span>
+              <div style="flex:1;font-family:'Alata',sans-serif;font-size:18px;color:#fff;" data-type-info-target="name"></div>
+              <button type="button" data-action="click->type-info#close" aria-label="Close"
+                      style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(255,255,255,0.4);line-height:1;padding:2px;">✕</button>
+            </div>
+            <p data-type-info-target="body"
+               style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.7);line-height:1.65;margin:0;"></p>
           </div>
         </div>
       </div>

@@ -399,6 +399,7 @@ export default class extends Controller {
     event.stopPropagation()
     const card = event.currentTarget.closest("[data-type-panel-target='card']")
     if (!card) return
+    if (!window.confirm(t("editor.delete_card_confirm"))) return
     card.remove()
     if (card === this.activeCardEl) {
       this.activeCardEl = null

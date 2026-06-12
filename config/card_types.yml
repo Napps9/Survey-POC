@@ -16,6 +16,7 @@ range:
   eyebrow:      "Drag the slider"
   picker_name:  "Range / Slider"
   picker_desc:  "Drag along a scale"
+  explainer:    "A slider respondents drag along a labelled scale. Best for intensity or agreement where the two ends define a spectrum — e.g. 'Not at all' to 'Completely'."
   picker_icon:  "↔"
   pickable:     true
 
@@ -26,6 +27,7 @@ rating:
   eyebrow:      "Tap to rate"
   picker_name:  "Rating"
   picker_desc:  "Slider with star rating"
+  explainer:    "A 1–5 star tap. Instantly understood and gives a comparable score across questions — ideal for quality or satisfaction."
   picker_icon:  "★"
   pickable:     true
 
@@ -36,6 +38,7 @@ nps:
   eyebrow:      "Drag to rate"
   picker_name:  "NPS / Reactive scale"
   picker_desc:  "Themed scale with a reacting visual"
+  explainer:    "A 5-point scale with a character that reacts as they answer. Use when an engaging visual lifts response quality on a likelihood or sentiment question."
   picker_icon:  "📈"
   pickable:     true
 
@@ -46,6 +49,7 @@ multiple_choice:
   eyebrow:      "Choose one"
   picker_name:  "Image List — One"
   picker_desc:  "Single choice, image left of each option"
+  explainer:    "A single-pick list with an image beside each option. Best for one-of-several choices where a picture aids recognition."
   picker_icon:  "◉"
   pickable:     true
 
@@ -56,6 +60,7 @@ select_many:
   eyebrow:      "Choose all that apply"
   picker_name:  "Image List — Many"
   picker_desc:  "Multi-choice, image left of each option"
+  explainer:    "A multi-pick list with an image beside each option. Use when respondents can choose more than one answer."
   picker_icon:  "☑"
   pickable:     true
 
@@ -66,6 +71,7 @@ yes_no:
   eyebrow:      "Choose one"
   picker_name:  "Yes / No"
   picker_desc:  "Simple two-option choice"
+  explainer:    "A simple two-option choice. Best for a clear binary — use sparingly so the Verto doesn't feel like a checklist."
   picker_icon:  "⇌"
   pickable:     true
 
@@ -76,6 +82,7 @@ select_one_grid:
   eyebrow:      "Choose one"
   picker_name:  "Image Grid — One"
   picker_desc:  "Photo grid, single pick"
+  explainer:    "A photo grid where respondents pick one tile. Great for visual, single-choice questions with strong imagery."
   picker_icon:  "▣"
   pickable:     true
 
@@ -86,6 +93,7 @@ select_many_grid:
   eyebrow:      "Choose all that apply"
   picker_name:  "Image Grid — Many"
   picker_desc:  "Photo grid, multi-pick"
+  explainer:    "A photo grid where respondents pick several tiles. Great for visual, multi-choice questions with strong imagery."
   picker_icon:  "⊞"
   pickable:     true
 
@@ -96,6 +104,7 @@ tap_card:
   eyebrow:      "Swipe to respond"
   picker_name:  "Swipe Cards"
   picker_desc:  "Swipe to agree / disagree"
+  explainer:    "A small deck respondents swipe to agree or disagree with, one statement at a time. Engaging for a quick gut take across a few related items."
   picker_icon:  "⇄"
   pickable:     true
 
@@ -106,6 +115,7 @@ open_ended:
   eyebrow:      "Type your answer"
   picker_name:  "Open Text"
   picker_desc:  "Free-form written answer"
+  explainer:    "A free-text box for answers in their own words. Use for qualitative 'why' or 'tell us…' questions — richer, but harder to compare at scale."
   picker_icon:  "✏"
   pickable:     true
 
@@ -116,5 +126,6 @@ welcome_card:
   eyebrow:      ""
   picker_name:  "Welcome Card"
   picker_desc:  "Intro — no answer required"
+  explainer:    "An intro screen shown first, with no answer required. Sets the scene and invites people in."
   picker_icon:  "👋"
   pickable:     true

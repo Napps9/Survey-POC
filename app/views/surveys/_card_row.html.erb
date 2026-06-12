@@ -23,11 +23,16 @@
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
     <span class="s-badge <%= meta[:badge_css] %>"><%= meta[:badge] %></span>
     <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.3);">Card <%= idx + 1 %></span>
-    <button type="button"
-            style="margin-left:auto;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.25);font-size: var(--text-2xl);padding:2px 6px;border-radius:4px;line-height:1;transition:color 0.2s;"
-            onmouseover="this.style.color='rgba(255,100,100,0.8)'"
-            onmouseout="this.style.color='rgba(255,255,255,0.25)'"
-            data-action="click->type-panel#deleteCard">×</button>
+    <% unless type == "welcome_card" %>
+      <button type="button" class="card-delete-btn" style="margin-left:auto;"
+              title="<%= t('editor.delete_card_title', default: 'Delete this question card') %>"
+              data-action="click->type-panel#deleteCard">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
+          <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a1 1 0 01-1 1H7a1 1 0 01-1-1V6h12z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span><%= t("editor.delete_card", default: "Delete card") %></span>
+      </button>
+    <% end %>
   </div>
 
   <%# Horizontal split-card %>
