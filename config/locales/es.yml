@@ -348,6 +348,7 @@ es:
     section_drafts: Borradores
     section_archived: Archivados
   wizard:
+    demographics_note: "Cada Verto termina con 3 preguntas demográficas fijas: año de nacimiento, lugar de residencia y género. Verto las añade automáticamente: mantienen la recogida de datos consistente y construyen un colectivo de investigación en toda la plataforma."
     create_verto: Crear Verto
     building: Creando tu Verto
     pill_audience: Audiencia
@@ -383,8 +384,8 @@ es:
     s1_placeholder: p. ej. Bienestar juvenil
     s1_hint_body: Mantenlo amplio — afinarás el enfoque en los siguientes pasos.
     s2_eyebrow: Paso 02 · Quién responde
-    s2_lead: Sé específico.
-    s2_body: Estilo de vida, rol, región, idioma — todo lo que influya en cómo piensa este grupo. Cuanto más concreto, mejores preguntas podremos escribir.
+    s2_lead: "Primero la edad, luego el lugar y el contexto."
+    s2_body: "Empieza con el rango de edad y añade dónde están y qué hacen. «Enfermeras de 25–40 en Manchester» supera a «adultos»: edad, lugar, rol, idioma y estilo de vida afinan las preguntas que escribimos."
     s2_examples:
     - Universitarios de 18 a 24 años en Kenia
     - Trabajadores de salud comunitaria de primera línea de 35 a 55 años

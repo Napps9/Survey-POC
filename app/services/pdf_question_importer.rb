@@ -30,7 +30,10 @@ class PdfQuestionImporter
             type: "object",
             properties: {
               type: { type: "string", enum: SurveyGenerator::CARD_TYPES, description: "The best-fitting answer type for this question." },
-              text: { type: "string", description: "The question text, kept close to the PDF wording. Target 50-70 chars; 100 hard max (text + any description <= 100)." },
+              original_text: { type: "string", description: "The question text EXACTLY as written in the PDF, unmodified." },
+              compliant: { type: "boolean", description: "true when original_text already satisfies every per-card rule verbatim (length caps, single idea, neutral wording). false when it needed rewriting." },
+              issue: { type: "string", description: "Only when compliant is false: one short sentence naming the rule it breaks (e.g. 'Over the 100-character cap' or 'Asks two things at once')." },
+              text: { type: "string", description: "The rule-compliant question text. When compliant is true this is identical to original_text. When false, it is the optimised rewrite: same intent, shorter and sharper. Target 50-70 chars; 100 hard max (text + any description <= 100)." },
               description: { type: "string", description: "Optional sub-text under the question. Shares the question's 100-char budget." },
               options: {
                 type: "array",
@@ -49,7 +52,7 @@ class PdfQuestionImporter
               },
               allow_other: { type: "boolean", description: "Set true only if the question explicitly offers a free-text 'Other'." }
             },
-            required: %w[type text]
+            required: %w[type text original_text compliant]
           }
         }
       },
@@ -63,11 +66,17 @@ class PdfQuestionImporter
 
     1. Extract EVERY question in the PDF, in the order they appear. Do not
        invent new questions, do not drop any, and do not merge or split them.
-       Keep each question's wording essentially as written (you may tidy
-       obvious typos or trailing punctuation, and trim to fit the length cap).
-    2. For each question, choose the SINGLE best-fitting Verto answer type from
+       Record each question's wording EXACTLY as written in `original_text`.
+    2. Judge whether the original wording already satisfies every per-card
+       rule below (length caps, one idea per question, neutral phrasing).
+       - If it does: set `compliant: true` and `text` = `original_text`.
+       - If it does not: set `compliant: false`, name the broken rule in one
+         short sentence in `issue`, and write the optimised rewrite in `text`
+         — same intent, shorter and sharper, fully rule-compliant. The user
+         chooses between the two; never silently rewrite a compliant question.
+    3. For each question, choose the SINGLE best-fitting Verto answer type from
        the catalogue below, following the per-card rules.
-    3. Supply that type's options. If the PDF lists answer options for the
+    4. Supply that type's options. If the PDF lists answer options for the
        question, use them (mapped to the type's bounds). If the chosen type
        needs options and the PDF gives none, generate sensible, mutually-
        exclusive options that satisfy the rules.

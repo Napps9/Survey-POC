@@ -348,6 +348,7 @@ tr:
     section_drafts: Taslaklar
     section_archived: Arşivlenenler
   wizard:
+    demographics_note: "Her Verto, 3 sabit demografik soruyla biter — doğum yılı, yaşadığın yer ve cinsiyet. Verto bunları otomatik ekler: veri toplamayı tutarlı kılar ve tüm platformda bir araştırma kolektifi büyütür."
     create_verto: Verto Oluştur
     building: Verto'nuz oluşturuluyor
     pill_audience: Hedef Kitle
@@ -383,8 +384,8 @@ tr:
     s1_placeholder: örn. Gençlerin esenliği
     s1_hint_body: Geniş tutun — sonraki adımlarda odağı daraltacaksınız.
     s2_eyebrow: Adım 02 · Kimler yanıtlıyor
-    s2_lead: Spesifik olun.
-    s2_body: Yaşam tarzı, rol, bölge, dil — bu grubun düşünme şeklini etkileyen her şey. Ne kadar somut olursa, o kadar iyi sorular yazabiliriz.
+    s2_lead: "Önce yaş — sonra yer ve bağlam."
+    s2_body: "Yaş aralığıyla başla, sonra nerede olduklarını ve ne yaptıklarını ekle. 'Manchester'da 25–40 yaş hemşireler', 'yetişkinler'den iyidir — yaş, yer, rol, dil ve yaşam tarzı yazdığımız soruları keskinleştirir."
     s2_examples:
     - Kenya'da 18–24 yaş üniversite öğrencileri
     - 35–55 yaş arası saha topluluk sağlığı çalışanları

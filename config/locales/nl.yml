@@ -348,6 +348,7 @@ nl:
     section_drafts: Concepten
     section_archived: Gearchiveerd
   wizard:
+    demographics_note: "Elke Verto eindigt met 3 vaste demografische vragen — geboortejaar, woonplaats en gender. Verto voegt ze automatisch toe: ze houden dataverzameling consistent en bouwen een onderzoekscollectief over het hele platform."
     create_verto: Verto aanmaken
     building: Je Verto wordt opgebouwd
     pill_audience: Doelgroep
@@ -383,8 +384,8 @@ nl:
     s1_placeholder: bijv. Welzijn van jongeren
     s1_hint_body: Houd het breed — je verfijnt de invalshoek in de volgende stappen.
     s2_eyebrow: Stap 02 · Wie er antwoordt
-    s2_lead: Wees specifiek.
-    s2_body: Levensstijl, functie, regio, taal — alles wat invloed heeft op hoe deze groep denkt. Hoe concreter, hoe beter de vragen die we kunnen schrijven.
+    s2_lead: "Eerst leeftijd — dan plek en context."
+    s2_body: "Begin met de leeftijdsgroep en voeg toe waar ze zijn en wat ze doen. '25–40-jarige verpleegkundigen in Manchester' verslaat 'volwassenen' — leeftijd, plek, rol, taal en leefstijl maken onze vragen scherper."
     s2_examples:
     - 18–24 jaar, universiteitsstudenten in Kenia
     - 35–55 jaar, eerstelijns gezondheidsmedewerkers

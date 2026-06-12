@@ -69,12 +69,12 @@ class SurveysController < ApplicationController
     )
 
     @survey = Current.organisation.surveys.create!(
-      title:        result["title"],
+      title:        params[:verto_name].to_s.strip.presence || result["title"],
       description:  result["description"],
       theme:        result["theme"].presence || theme,
       audience_age: result["audience_age"].presence || audience_age,
       key_insight:  result["key_insight"].presence || key_insight,
-      cards:        result["cards"],
+      cards:        DemographicQuestions.append_to(result["cards"]),
       show_results_comparison: show_compare,
       brand_palette: palette.presence,
       default_locale: default_locale,
@@ -127,32 +127,53 @@ class SurveysController < ApplicationController
 
     return import_pdf_error("We couldn't find any questions in that PDF — try a different file.") if cards.empty?
 
-    # PDF defines the structure for the imported deck, so common cards are
-    # appended at the end rather than woven by the LLM.
-    cards += resolve_common_cards(params[:common_question_ids])
+    payload = {
+      "result"         => result,
+      "verto_name"     => params[:verto_name].to_s.strip,
+      "theme"          => params[:theme].to_s,
+      "audience_age"   => params[:audience_age].to_s,
+      "key_insight"    => params[:key_insight].to_s,
+      "brand_palette"  => palette,
+      "default_locale" => default_locale,
+      "locales"        => locales,
+      "common_question_ids" => Array(params[:common_question_ids]),
+      "region_tags"    => Array(params[:region_tags]).map { |t| { "country_code" => t[:country_code].to_s, "label" => t[:label].to_s } }
+    }
 
-    @survey = Current.organisation.surveys.create!(
-      title:         result["title"].presence || "Imported Verto",
-      description:   result["description"],
-      theme:         params[:theme].presence,
-      audience_age:  params[:audience_age].presence,
-      key_insight:   params[:key_insight].presence,
-      cards:         cards,
-      brand_palette: palette.presence,
-      default_locale: default_locale,
-      locales:        locales
-    )
+    # Questions that don't fit Verto's design rules pause the import: the
+    # creator reviews their wording next to Verto's optimised version and
+    # decides. Fully compliant decks go straight to the editor as before.
+    flagged = cards.select { |c| c["compliant"] == false }
+    if flagged.any?
+      @import_payload = self.class.import_verifier.generate(payload)
+      @import_cards   = cards
+      @flagged_count  = flagged.size
+      return render :import_review, layout: "fullscreen"
+    end
 
-    Current.organisation.update(default_brand_palette: palette) if palette.present?
-
-    create_region_links(@survey, params[:region_tags])
-
-    translate_survey!(@survey)
+    @survey = create_imported_survey!(payload, variant: "verbatim")
 
     redirect_to survey_path(@survey)
   rescue => e
     Rails.logger.error("[PdfQuestionImporter] #{e.class}: #{e.message}")
     import_pdf_error("We couldn't import your PDF — #{friendly_generate_error(e)}")
+  end
+
+  # POST /surveys/finalize_import
+  # Second leg of a PDF import whose questions didn't all meet Verto's design
+  # rules: the creator chose either their original wording or Verto's
+  # optimised version. The pending import travels as a signed blob, so the
+  # cards can't be tampered with between the two requests.
+  def finalize_import
+    payload = self.class.import_verifier.verified(params[:payload].to_s)
+    return redirect_to new_survey_path, alert: "That import session expired — please upload the PDF again." unless payload
+
+    variant = params[:variant] == "optimised" ? "optimised" : "verbatim"
+    @survey = create_imported_survey!(payload, variant: variant)
+    redirect_to survey_path(@survey)
+  rescue => e
+    Rails.logger.error("[SurveysController#finalize_import] #{e.class}: #{e.message}")
+    redirect_to new_survey_path, alert: "We couldn't finish the import — #{friendly_generate_error(e)}"
   end
 
   def update
@@ -291,14 +312,52 @@ class SurveysController < ApplicationController
     @survey = Current.organisation.surveys.kept.find(params[:id])
   end
 
+  def self.import_verifier
+    Rails.application.message_verifier(:pdf_import)
+  end
+
+  # Builds the Verto from a pending-import payload (the hash assembled in
+  # import_pdf). variant "verbatim" restores each question's original PDF
+  # wording; "optimised" keeps Verto's rule-compliant rewrite. Common cards,
+  # the demographic tail, region tags and translation all happen here so both
+  # the straight-through and the reviewed path create identical structures.
+  def create_imported_survey!(payload, variant:)
+    result = payload["result"]
+    cards  = Array(result["cards"]).map do |c|
+      card = c.except("compliant", "issue", "original_text")
+      card["text"] = c["original_text"] if variant == "verbatim" && c["original_text"].present?
+      card
+    end
+
+    cards += resolve_common_cards(payload["common_question_ids"])
+    cards  = DemographicQuestions.append_to(cards)
+
+    survey = Current.organisation.surveys.create!(
+      title:          payload["verto_name"].presence || result["title"].presence || "Imported Verto",
+      description:    result["description"],
+      theme:          payload["theme"].presence,
+      audience_age:   payload["audience_age"].presence,
+      key_insight:    payload["key_insight"].presence,
+      cards:          cards,
+      brand_palette:  payload["brand_palette"].presence,
+      default_locale: payload["default_locale"],
+      locales:        payload["locales"]
+    )
+
+    Current.organisation.update(default_brand_palette: payload["brand_palette"]) if payload["brand_palette"].present?
+    create_region_links(survey, payload["region_tags"])
+    translate_survey!(survey)
+    survey
+  end
+
   # Region tags picked in the creation wizard: [{ country_code:, label: }, …].
   # Invalid or duplicate entries are skipped silently — tags are managed (and
   # visible) in the editor's publish panel right after creation.
   def create_region_links(survey, tags_param)
     Array(tags_param).each do |tag|
       survey.survey_region_links.create(
-        country_code: tag[:country_code],
-        label:        tag[:label].to_s.strip.presence
+        country_code: tag[:country_code] || tag["country_code"],
+        label:        (tag[:label] || tag["label"]).to_s.strip.presence
       )
     end
   end

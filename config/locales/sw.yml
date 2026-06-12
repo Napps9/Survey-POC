@@ -348,6 +348,7 @@ sw:
     section_drafts: Rasimu
     section_archived: Yaliyohifadhiwa
   wizard:
+    demographics_note: "Kila Verto huishia na maswali 3 ya kidemografia yaliyowekwa — mwaka wa kuzaliwa, unakoishi, na jinsia. Verto huyaongeza yenyewe: huweka ukusanyaji wa data sawasawa na hujenga jumuiya ya utafiti katika jukwaa lote."
     create_verto: Unda Verto
     building: Tunajenga Verto yako
     pill_audience: Hadhira
@@ -383,8 +384,8 @@ sw:
     s1_placeholder: 'mfano: Ustawi wa vijana'
     s1_hint_body: Iweke pana — utabana mtazamo katika hatua zinazofuata.
     s2_eyebrow: Hatua 02 · Nani anajibu
-    s2_lead: Kuwa wazi.
-    s2_body: Mtindo wa maisha, jukumu, eneo, lugha — chochote kinachounda jinsi kundi hili linavyofikiri. Kadri unavyokuwa wazi zaidi, ndivyo tunavyoweza kuandika maswali bora.
+    s2_lead: "Umri kwanza — kisha mahali na muktadha."
+    s2_body: "Anza na kikundi cha umri, kisha ongeza wako wapi na wanafanya nini. 'Wauguzi wa 25–40 Manchester' ni bora kuliko 'watu wazima' — umri, mahali, jukumu, lugha na mtindo wa maisha hunoa maswali tunayoandika."
     s2_examples:
     - Wanafunzi wa chuo wenye umri wa miaka 18–24 nchini Kenya
     - Wahudumu wa afya wa jamii wenye umri wa miaka 35–55

@@ -348,6 +348,7 @@ pl:
     section_drafts: Wersje robocze
     section_archived: Zarchiwizowane
   wizard:
+    demographics_note: "Każde Verto kończy się 3 stałymi pytaniami demograficznymi — rok urodzenia, miejsce zamieszkania i płeć. Verto dodaje je automatycznie: ujednolicają zbieranie danych i budują kolektyw badawczy w całej platformie."
     create_verto: Utwórz Verto
     building: Tworzymy Twoje Verto
     pill_audience: Odbiorcy
@@ -383,8 +384,8 @@ pl:
     s1_placeholder: np. Dobrostan młodzieży
     s1_hint_body: Niech będzie szeroki — kąt zawęzisz w kolejnych krokach.
     s2_eyebrow: Krok 02 · Kto odpowiada
-    s2_lead: Bądź konkretny.
-    s2_body: Styl życia, rola, region, język — wszystko, co kształtuje sposób myślenia tej grupy. Im bardziej konkretnie, tym lepsze pytania możemy ułożyć.
+    s2_lead: "Najpierw wiek — potem miejsce i kontekst."
+    s2_body: "Zacznij od przedziału wiekowego, potem dodaj, gdzie są i czym się zajmują. „Pielęgniarki 25–40 z Manchesteru” bije „dorosłych” — wiek, miejsce, rola, język i styl życia wyostrzają pytania, które piszemy."
     s2_examples:
     - Studenci w wieku 18–24 lat w Kenii
     - Pracownicy zdrowia środowiskowego w wieku 35–55 lat

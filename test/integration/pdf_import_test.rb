@@ -47,8 +47,66 @@ class PdfImportTest < ActionDispatch::IntegrationTest
     survey = @org.surveys.order(:created_at).last
     assert_redirected_to survey_path(survey)
     assert_equal "Imported", survey.title
-    assert_equal 2, Array(survey.cards).size
+    # 2 imported questions + the 3 set demographic questions appended to every Verto
+    assert_equal 5, Array(survey.cards).size
     assert_equal "select_one_grid", survey.cards.first["type"]
+    demographics = survey.cards.select { |c| c["demographic"] }
+    assert_equal [ "When were you born?", "Where do you live?", "Gender" ], demographics.map { |c| c["text"] }
+    assert_equal demographics, survey.cards.last(3), "demographics must sit at the end"
+  end
+
+  test "non-compliant questions pause the import on a review screen" do
+    cards = [
+      { "type" => "open_ended", "text" => "What would make you stay?", "original_text" => "What would make you stay?", "compliant" => true },
+      { "type" => "open_ended", "text" => "How could the programme improve?",
+        "original_text" => "Thinking about everything you have experienced in the programme so far this year, in what ways do you feel it could be improved and why?",
+        "compliant" => false, "issue" => "Over the 100-character cap." }
+    ]
+
+    stub_importer({ "title" => "Imported", "cards" => cards }) do
+      assert_no_difference -> { @org.surveys.count } do
+        post import_pdf_survey_path, params: { pdf: pdf_upload, default_locale: "en", locales: [ "en" ], verto_name: "Programme Review" }
+      end
+    end
+    assert_response :success
+    assert_match "don't meet Verto's guidelines", response.body
+    assert_match "Thinking about everything you have experienced", response.body
+    assert_match "How could the programme improve?", response.body
+    assert_match "Optimise with Verto", response.body
+    assert_match "Keep my wording", response.body
+  end
+
+  test "finalize keeps verbatim wording or takes the optimised version" do
+    cards = [
+      { "type" => "open_ended", "text" => "Short version?", "original_text" => "The very long original wording of this question?", "compliant" => false, "issue" => "Too long." }
+    ]
+    payload = {
+      "result" => { "title" => "Imported", "cards" => cards },
+      "verto_name" => "Named on import", "theme" => "", "audience_age" => "", "key_insight" => "",
+      "brand_palette" => nil, "default_locale" => "en", "locales" => [ "en" ],
+      "common_question_ids" => [], "region_tags" => [ { "country_code" => "GB", "label" => "" } ]
+    }
+    signed = SurveysController.import_verifier.generate(payload)
+
+    post finalize_import_survey_path, params: { payload: signed, variant: "verbatim" }
+    verbatim = @org.surveys.order(:id).last
+    assert_redirected_to survey_path(verbatim)
+    assert_equal "The very long original wording of this question?", verbatim.cards.first["text"]
+    assert_equal "Named on import", verbatim.title
+    assert verbatim.cards.last["demographic"], "demographic tail appended on finalize"
+    assert_equal [ "GB" ], verbatim.survey_region_links.pluck(:country_code), "region tags applied on finalize"
+    refute verbatim.cards.first.key?("compliant"), "review-only fields are stripped from stored cards"
+
+    post finalize_import_survey_path, params: { payload: signed, variant: "optimised" }
+    optimised = @org.surveys.order(:id).last
+    assert_equal "Short version?", optimised.cards.first["text"]
+  end
+
+  test "a tampered finalize payload is rejected" do
+    assert_no_difference -> { @org.surveys.count } do
+      post finalize_import_survey_path, params: { payload: "garbage", variant: "verbatim" }
+    end
+    assert_redirected_to new_survey_path
   end
 
   test "a non-PDF upload re-renders the wizard with an error and creates nothing" do

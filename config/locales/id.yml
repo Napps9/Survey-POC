@@ -348,6 +348,7 @@ id:
     section_drafts: Draf
     section_archived: Diarsipkan
   wizard:
+    demographics_note: "Setiap Verto diakhiri 3 pertanyaan demografi tetap — tahun lahir, tempat tinggal, dan gender. Verto menambahkannya otomatis: menjaga pengumpulan data tetap konsisten dan membangun kolektif riset di seluruh platform."
     create_verto: Buat Verto
     building: Membangun Verto Anda
     pill_audience: Audiens
@@ -383,8 +384,8 @@ id:
     s1_placeholder: misal Kesejahteraan remaja
     s1_hint_body: Buat luas — Anda akan mempersempit sudut pandang di langkah berikutnya.
     s2_eyebrow: Langkah 02 · Siapa yang menjawab
-    s2_lead: Jelaskan secara spesifik.
-    s2_body: Gaya hidup, peran, wilayah, bahasa — apa pun yang membentuk cara berpikir kelompok ini. Semakin konkret, semakin baik pertanyaan yang dapat kami tulis.
+    s2_lead: "Usia dulu — lalu tempat dan konteks."
+    s2_body: "Mulai dari rentang usia, lalu tambahkan di mana mereka dan apa yang mereka lakukan. 'Perawat 25–40 di Manchester' lebih baik daripada 'orang dewasa' — usia, tempat, peran, bahasa, dan gaya hidup mempertajam pertanyaan yang kami tulis."
     s2_examples:
     - Mahasiswa 18–24 tahun di Kenya
     - Petugas kesehatan komunitas garis depan usia 35–55

@@ -350,6 +350,7 @@ en:
     section_drafts: "Drafts"
     section_archived: "Archived"
   wizard:
+    demographics_note: "Every Verto ends with 3 set demographic questions — when you were born, where you live, and gender. Verto adds them automatically: they keep data collection consistent and grow a research collective across the whole platform."
     create_verto: "Create Verto"
     building: "Building your Verto"
     pill_audience: "Audience"
@@ -385,8 +386,8 @@ en:
     s1_placeholder: "e.g. Youth wellbeing"
     s1_hint_body: "Keep it broad — you'll narrow the angle in the next steps."
     s2_eyebrow: "Step 02 · Who's answering"
-    s2_lead: "Be specific."
-    s2_body: "Lifestyle, role, region, language — anything that shapes how this group thinks. The more concrete, the better the questions we can write."
+    s2_lead: "Ages first — then place and context."
+    s2_body: "Start with their age range, then add where they are and what they do. '25–40 nurses in Manchester' beats 'adults' — age, place, role, language and lifestyle all sharpen the questions we write."
     s2_examples:
       - "18–24 university students in Kenya"
       - "35–55 frontline community-health workers"

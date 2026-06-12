@@ -348,6 +348,7 @@ vi:
     section_drafts: Bản nháp
     section_archived: Đã lưu trữ
   wizard:
+    demographics_note: "Mỗi Verto kết thúc bằng 3 câu hỏi nhân khẩu học cố định — năm sinh, nơi sống và giới tính. Verto tự động thêm chúng: giữ việc thu thập dữ liệu nhất quán và xây dựng một tập thể nghiên cứu trên toàn nền tảng."
     create_verto: Tạo Verto
     building: Đang xây dựng Verto của bạn
     pill_audience: Đối tượng
@@ -383,8 +384,8 @@ vi:
     s1_placeholder: 'ví dụ: Sức khỏe thanh thiếu niên'
     s1_hint_body: Giữ nó rộng — bạn sẽ thu hẹp góc nhìn ở các bước tiếp theo.
     s2_eyebrow: Bước 02 · Ai đang trả lời
-    s2_lead: Hãy cụ thể.
-    s2_body: Phong cách sống, vai trò, khu vực, ngôn ngữ — bất cứ điều gì định hình cách nhóm này suy nghĩ. Càng cụ thể, chúng tôi càng viết được câu hỏi tốt hơn.
+    s2_lead: "Tuổi trước — rồi đến nơi chốn và bối cảnh."
+    s2_body: "Bắt đầu với độ tuổi, rồi thêm họ ở đâu và làm gì. 'Y tá 25–40 ở Manchester' tốt hơn 'người lớn' — tuổi, nơi ở, vai trò, ngôn ngữ và lối sống giúp câu hỏi sắc bén hơn."
     s2_examples:
     - Sinh viên đại học 18–24 tuổi tại Kenya
     - Nhân viên y tế cộng đồng tuyến đầu 35–55 tuổi

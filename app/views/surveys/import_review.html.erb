@@ -1,0 +1,79 @@
+<% content_for :title, "Review your import — Playverto" %>
+<%# Shown when an imported PDF contains questions that don't meet Verto's
+    design rules. The creator picks: keep their wording verbatim, or take
+    Verto's optimised version. Editor-facing — English-only, like the editor. %>
+<div style="min-height:100vh;background:#272D4A;padding:48px 24px;">
+  <div style="max-width:760px;margin:0 auto;">
+
+    <div style="margin-bottom:28px;">
+      <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#FFFA77;margin-bottom:8px;">Import review</div>
+      <h1 style="font-family:'Alata',sans-serif;font-size:30px;color:#F7F7F7;margin:0 0 10px;line-height:1.2;">
+        <%= @flagged_count %> of <%= @import_cards.size %> questions don't meet Verto's guidelines
+      </h1>
+      <p style="font-family:'ABeeZee',sans-serif;font-size:15px;color:rgba(255,255,255,0.6);margin:0;line-height:1.55;">
+        Your questions were imported exactly as written. Based on Verto's rules — short questions,
+        tight option lists, one idea per card — we can optimise the flagged ones to improve
+        completion rates and reduce survey fatigue, increasing data quality. Compare each pair
+        below, then choose how to continue. You can still edit everything afterwards.
+      </p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:30px;">
+      <% @import_cards.each_with_index do |card, idx| %>
+        <% flagged = card["compliant"] == false %>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid <%= flagged ? 'rgba(255,250,119,0.35)' : 'rgba(255,255,255,0.08)' %>;border-radius:14px;padding:16px 18px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-family:'Alata',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">Q<%= idx + 1 %></span>
+            <span style="font-family:'ABeeZee',sans-serif;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:2px 8px;"><%= card["type"].to_s.humanize %></span>
+            <% if flagged %>
+              <span style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#FFFA77;background:rgba(255,250,119,0.1);border:1px solid rgba(255,250,119,0.3);border-radius:100px;padding:2px 8px;">Needs optimising</span>
+            <% else %>
+              <span style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#01EACB;background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:100px;padding:2px 8px;">Kept as uploaded</span>
+            <% end %>
+          </div>
+
+          <% if flagged %>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;">
+                <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:4px;">Your wording</div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.85);line-height:1.5;"><%= card["original_text"].presence || card["text"] %></div>
+              </div>
+              <div style="border:1px solid rgba(1,234,203,0.3);border-radius:10px;padding:10px 14px;background:rgba(1,234,203,0.05);">
+                <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#01EACB;margin-bottom:4px;">Verto's optimised version</div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#fff;line-height:1.5;"><%= card["text"] %></div>
+              </div>
+              <% if card["issue"].present? %>
+                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,250,119,0.8);line-height:1.45;">⚠ <%= card["issue"] %></div>
+              <% end %>
+            </div>
+          <% else %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.85);line-height:1.5;"><%= card["text"] %></div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <%= form_with url: finalize_import_survey_path, method: :post, local: true, html: { style: "flex:1;min-width:240px;margin:0;" } do %>
+        <input type="hidden" name="payload" value="<%= @import_payload %>" />
+        <input type="hidden" name="variant" value="optimised" />
+        <button type="submit"
+                style="width:100%;padding:14px;border-radius:12px;background:#01EACB;color:#1C2034;border:none;font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.03em;cursor:pointer;">
+          Optimise with Verto →
+        </button>
+      <% end %>
+      <%= form_with url: finalize_import_survey_path, method: :post, local: true, html: { style: "flex:1;min-width:240px;margin:0;" } do %>
+        <input type="hidden" name="payload" value="<%= @import_payload %>" />
+        <input type="hidden" name="variant" value="verbatim" />
+        <button type="submit"
+                style="width:100%;padding:14px;border-radius:12px;background:transparent;color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.25);font-family:'Alata',sans-serif;font-size:15px;letter-spacing:0.03em;cursor:pointer;">
+          Keep my wording exactly as uploaded
+        </button>
+      <% end %>
+    </div>
+    <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);margin-top:14px;text-align:center;">
+      Either way, your Verto opens in the editor next — nothing is published yet.
+    </p>
+
+  </div>
+</div>

@@ -348,6 +348,7 @@ de:
     section_drafts: Entwürfe
     section_archived: Archiviert
   wizard:
+    demographics_note: "Jedes Verto endet mit 3 festen demografischen Fragen — Geburtsjahr, Wohnort und Geschlecht. Verto fügt sie automatisch hinzu: Sie halten die Datenerhebung konsistent und bauen ein Forschungskollektiv über die ganze Plattform auf."
     create_verto: Verto erstellen
     building: Dein Verto wird erstellt
     pill_audience: Zielgruppe
@@ -383,8 +384,8 @@ de:
     s1_placeholder: z. B. Wohlbefinden von Jugendlichen
     s1_hint_body: Halte es breit — den Fokus schärfst du in den nächsten Schritten.
     s2_eyebrow: Schritt 02 · Wer antwortet
-    s2_lead: Sei konkret.
-    s2_body: Lebensstil, Rolle, Region, Sprache — alles, was die Sichtweise dieser Gruppe prägt. Je konkreter, desto besser können wir die Fragen schreiben.
+    s2_lead: "Erst das Alter — dann Ort und Kontext."
+    s2_body: "Beginne mit der Altersspanne, dann ergänze, wo sie sind und was sie tun. „25–40-jährige Pflegekräfte in Manchester“ schlägt „Erwachsene“ — Alter, Ort, Rolle, Sprache und Lebensstil machen unsere Fragen schärfer."
     s2_examples:
     - 18–24-jährige Studierende in Kenia
     - 35–55-jährige Mitarbeitende im Gesundheitswesen vor Ort
