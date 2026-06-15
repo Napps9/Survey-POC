@@ -23,6 +23,13 @@
 threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
 threads threads_count, threads_count
 
+# Number of worker processes. Without an explicit `workers` line Puma 8 ignores
+# WEB_CONCURRENCY and starts its own default — two workers on the 512MB Render
+# instance, which doubles memory and gets the process OOM-killed (the cause of
+# the production 502s). Honour the env var so production runs the single worker
+# it's configured for; unset (local dev/test) stays in single mode.
+workers Integer(ENV.fetch("WEB_CONCURRENCY", 0))
+
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 port ENV.fetch("PORT", 3000)
 

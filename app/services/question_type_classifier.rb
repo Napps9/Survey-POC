@@ -98,7 +98,7 @@ class QuestionTypeClassifier
   PROMPT
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
-    @client = Anthropic::Client.new(api_key: api_key)
+    @client = build_anthropic_client(api_key)
   end
 
   # questions: Array<String>. Returns Array<Hash> aligned 1:1 with input,

@@ -44,7 +44,7 @@ class SingleQuestionGenerator
   }.freeze
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
-    @client = Anthropic::Client.new(api_key: api_key)
+    @client = build_anthropic_client(api_key)
   end
 
   # Returns a single card hash (string keys), e.g.:
