@@ -114,7 +114,7 @@ class PdfQuestionImporter
   PROMPT
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
-    @client = Anthropic::Client.new(api_key: api_key)
+    @client = build_anthropic_client(api_key)
   end
 
   # pdf_data: the uploaded PDF as a base64-encoded string.

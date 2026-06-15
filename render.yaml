@@ -22,8 +22,21 @@ services:
         value: "1"
       - key: WEB_CONCURRENCY
         value: "1"
+      # Cap glibc malloc arenas (default is 8 x CPU). Ruby's threaded server
+      # otherwise fragments memory across many arenas and RSS creeps up until
+      # the 512MB starter instance is OOM-killed and Render returns 502s.
+      - key: MALLOC_ARENA_MAX
+        value: "2"
       - key: ANTHROPIC_API_KEY
         sync: false
+      # How long any single Claude call may hold a request thread, and how many
+      # times it retries, before failing fast. Bounds thread occupancy so a slow
+      # Anthropic API can't tie up every Puma thread and 502 the whole app.
+      # Code defaults live in AnthropicHelpers; set here to make them tunable.
+      - key: ANTHROPIC_TIMEOUT_SECONDS
+        value: "120"
+      - key: ANTHROPIC_MAX_RETRIES
+        value: "1"
       - key: SECRET_KEY_BASE
         generateValue: true
       # Google OAuth client — used by both "Continue with Google" sign-in and

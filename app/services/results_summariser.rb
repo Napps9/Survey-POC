@@ -15,7 +15,7 @@ class ResultsSummariser
   PROMPT
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
-    @client = Anthropic::Client.new(api_key: api_key)
+    @client = build_anthropic_client(api_key)
   end
 
   def call(survey:, aggregated:, total:, &block)
