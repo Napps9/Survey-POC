@@ -3373,22 +3373,28 @@ body.generating-overlay-active .bottom-bar { display: none; }
 /* ── Device frames: reframe the editor cards at phone / tablet width. The
    cards remain fully editable; only their layout changes. ── */
 .device-tablet .survey-card-wrap {
-  max-width: 700px; width: 100%; margin-inline: auto;
-  border: 14px solid #0e1020; border-radius: 26px; box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  max-width: 720px; width: 100%; margin-inline: auto;
+  border: 14px solid #0e1020; border-radius: 28px; box-shadow: 0 16px 40px rgba(0,0,0,0.4);
   overflow: hidden; background: #0e1020; padding: 0;
   /* same flex-shrink:0 as mobile — overflow:hidden otherwise collapses the
      framed card to a sliver inside the flex feed column. */
   flex-shrink: 0;
 }
-.device-tablet .split-card { width: 100%; height: 560px; border-radius: 14px; margin: 0; }
-/* The desktop split panels are a fixed 425px each (850px total) — they'd
-   overflow the narrower tablet frame and clip the question. Make them share
-   the frame 50/50 and allow text to wrap. */
-.device-tablet .split-left {
-  width: 50%; flex: 1 1 50%; min-width: 0;
-  border-radius: 14px 0 0 14px; overflow: hidden;
+/* Tablet mirrors the mobile stack — hero image on top, question below — just
+   at a larger scale (wider frame, taller hero, roomier padding). The desktop
+   side-by-side split would clip inside the narrower frame. */
+.device-tablet .split-card {
+  flex-direction: column; width: 100%; height: auto; min-height: 760px;
+  border-radius: 16px; margin: 0;
 }
-.device-tablet .split-right { width: 50%; flex: 1 1 50%; min-width: 0; padding: 28px 26px; }
+.device-tablet .split-left {
+  width: 100%; flex: 0 0 auto; min-height: 320px; max-height: 400px;
+  border-radius: 0 0 18px 18px; overflow: hidden; position: relative;
+}
+.device-tablet .split-right {
+  width: 100%; flex: 1 1 auto; padding: 32px 40px;
+  justify-content: flex-start; background: #fff;
+}
 
 .device-mobile .survey-card-wrap {
   max-width: 400px; width: 100%; margin-inline: auto;
