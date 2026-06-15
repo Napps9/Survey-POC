@@ -458,8 +458,14 @@ export default class extends Controller {
       const radio = opt.querySelector(".type-opt-radio")
       if (radio) radio.before(badge)
 
-      const descEl = opt.querySelector(".type-opt-desc")
-      if (descEl && entry.note) descEl.textContent = entry.note
+      // The contextual note is the explainer now — it surfaces in the ⓘ
+      // modal (the panel card itself stays compact, desc is hidden via CSS).
+      if (entry.note) {
+        const descEl = opt.querySelector(".type-opt-desc")
+        if (descEl) descEl.textContent = entry.note
+        const infoEl = opt.querySelector(".type-opt-info")
+        if (infoEl) infoEl.dataset.typeExplainer = entry.note
+      }
     })
   }
 
@@ -499,9 +505,13 @@ export default class extends Controller {
       const row = opt.querySelector(".type-opt-row > div[style]")
       if (row) row.parentElement.appendChild(badge)
 
-      const descEl = opt.querySelector(".type-opt-desc")
       const note = noteFor(type)
-      if (descEl && note) descEl.textContent = note
+      if (note) {
+        const descEl = opt.querySelector(".type-opt-desc")
+        if (descEl) descEl.textContent = note
+        const infoEl = opt.querySelector(".type-opt-info")
+        if (infoEl) infoEl.dataset.typeExplainer = note
+      }
     })
   }
 

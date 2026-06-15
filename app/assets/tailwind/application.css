@@ -1789,7 +1789,9 @@
   display: flex; align-items: center; gap: 8px;
 }
 .type-opt-name  { font-family: "Alata", sans-serif; font-size: 14px; color: #fff; margin-bottom: 2px; }
-.type-opt-desc  { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.45; }
+/* The type's description now lives behind the ⓘ icon's modal, so the panel
+   cards stay compact — name + medal + badge + info only. */
+.type-opt-desc  { display: none; }
 .type-opt-radio {
   width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
   border: 1.5px solid rgba(255,255,255,0.18);
@@ -3347,13 +3349,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
 /* ── Clearer per-card delete button (cards feed chrome row) ── */
 .card-delete-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 11px; border-radius: 100px;
-  background: rgba(255,30,111,0.1); border: 1px solid rgba(255,30,111,0.3);
-  color: #FF8FB6; font-family: "ABeeZee", sans-serif; font-size: 12px;
-  cursor: pointer; transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 14px; border-radius: 100px;
+  background: rgba(255,30,111,0.16); border: 1.5px solid #FF1E6F;
+  color: #FF1E6F; font-family: "ABeeZee", sans-serif; font-size: 12.5px;
+  letter-spacing: 0.02em; cursor: pointer; transition: all 0.15s;
 }
-.card-delete-btn:hover { background: rgba(255,30,111,0.85); border-color: #FF1E6F; color: #fff; }
+.card-delete-btn:hover { background: #FF1E6F; border-color: #FF1E6F; color: #fff; box-shadow: 0 2px 12px rgba(255,30,111,0.45); }
 
 /* ── Device preview toggle ── */
 .device-toggle {
@@ -3370,8 +3372,23 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
 /* ── Device frames: reframe the editor cards at phone / tablet width. The
    cards remain fully editable; only their layout changes. ── */
-.device-tablet .survey-card-wrap { max-width: 720px; margin-inline: auto; }
-.device-tablet .split-card { width: 100%; height: 600px; }
+.device-tablet .survey-card-wrap {
+  max-width: 700px; width: 100%; margin-inline: auto;
+  border: 14px solid #0e1020; border-radius: 26px; box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  overflow: hidden; background: #0e1020; padding: 0;
+  /* same flex-shrink:0 as mobile — overflow:hidden otherwise collapses the
+     framed card to a sliver inside the flex feed column. */
+  flex-shrink: 0;
+}
+.device-tablet .split-card { width: 100%; height: 560px; border-radius: 14px; margin: 0; }
+/* The desktop split panels are a fixed 425px each (850px total) — they'd
+   overflow the narrower tablet frame and clip the question. Make them share
+   the frame 50/50 and allow text to wrap. */
+.device-tablet .split-left {
+  width: 50%; flex: 1 1 50%; min-width: 0;
+  border-radius: 14px 0 0 14px; overflow: hidden;
+}
+.device-tablet .split-right { width: 50%; flex: 1 1 50%; min-width: 0; padding: 28px 26px; }
 
 .device-mobile .survey-card-wrap {
   max-width: 400px; width: 100%; margin-inline: auto;
