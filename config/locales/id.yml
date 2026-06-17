@@ -76,6 +76,8 @@ id:
     thank_you_from: dari %{org}
     compare_cta: Lihat hasil Anda dibandingkan dengan yang lain →
     powered_by: Didukung oleh
+    share: "Bagikan"
+    visit_website: "Kunjungi situs web"
     comparison_title: Jawaban Anda vs semua orang
     back: "← Kembali"
     next: Lanjut →

@@ -76,6 +76,8 @@ ar:
     thank_you_from: من %{org}
     compare_cta: شاهد نتائجك مقارنةً بالآخرين ←
     powered_by: مدعوم من
+    share: "مشاركة"
+    visit_website: "زيارة الموقع"
     comparison_title: إجاباتك مقابل الجميع
     back: "← رجوع"
     next: التالي ←

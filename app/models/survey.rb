@@ -87,6 +87,33 @@ class Survey < ApplicationRecord
     compare_note.presence || I18n.t("player.compare_promise")
   end
 
+  # Thank-you screen copy shown after Finish. Both fall back to the default
+  # localized copy when the creator hasn't set their own.
+  def thankyou_title_text
+    thankyou_title.presence || I18n.t("player.thank_you_title")
+  end
+
+  def thankyou_body_text
+    thankyou_body.presence || I18n.t("player.thank_you_from", org: organisation.name)
+  end
+
+  def forward_url?
+    forward_url.present?
+  end
+
+  # Coerce a creator-entered website into a safe http(s) URL for the
+  # forward-to-website CTA on the thank-you screen. Adds a scheme when missing;
+  # returns nil for blank or non-http(s) input so the CTA simply doesn't show.
+  def self.sanitize_forward_url(value)
+    v = value.to_s.strip
+    return nil if v.blank?
+    v = "https://#{v}" unless v.match?(%r{\Ahttps?://}i)
+    uri = URI.parse(v)
+    (uri.is_a?(URI::HTTP) && uri.host.present?) ? v : nil
+  rescue URI::InvalidURIError
+    nil
+  end
+
   # A "responder" is anyone who answered at least one question (not just those
   # who submitted). Reads the preloaded :responses association in Ruby so the
   # dashboard's includes(:responses) avoids per-card queries.

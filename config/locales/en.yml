@@ -78,6 +78,8 @@ en:
     thank_you_from: "from %{org}"
     compare_cta: "See your results compared to others →"
     powered_by: "Powered by"
+    share: "Share"
+    visit_website: "Visit website"
     comparison_title: "Your answers vs everyone"
     back: "← Back"
     next: "Next →"

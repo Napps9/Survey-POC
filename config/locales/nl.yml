@@ -76,6 +76,8 @@ nl:
     thank_you_from: van %{org}
     compare_cta: Bekijk je resultaten ten opzichte van anderen →
     powered_by: Mogelijk gemaakt door
+    share: "Delen"
+    visit_website: "Website bezoeken"
     comparison_title: Jouw antwoorden vs iedereen
     back: "← Terug"
     next: Volgende →

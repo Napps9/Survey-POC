@@ -76,6 +76,8 @@ ko:
     thank_you_from: "%{org} 제공"
     compare_cta: 다른 사람들과 비교한 결과 보기 →
     powered_by: 제공
+    share: "공유"
+    visit_website: "웹사이트 방문"
     comparison_title: 내 답변 vs 전체
     back: "← 뒤로"
     next: 다음 →

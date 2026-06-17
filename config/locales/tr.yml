@@ -76,6 +76,8 @@ tr:
     thank_you_from: "%{org} tarafından"
     compare_cta: Sonuçlarınızı diğerleriyle karşılaştırın →
     powered_by: Destekleyen
+    share: "Paylaş"
+    visit_website: "Web sitesini ziyaret et"
     comparison_title: Yanıtlarınız vs herkes
     back: "← Geri"
     next: İleri →

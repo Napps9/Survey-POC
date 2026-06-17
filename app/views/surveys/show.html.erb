@@ -446,6 +446,41 @@
           <% end %>
         </div>
 
+        <%# Thank-you screen — custom title/message shown after Finish, plus an
+            optional link forwarding respondents to the org's website. All three
+            fields post to update_settings, which only writes the keys it's sent. %>
+        <div class="publish-block">
+          <div class="publish-block-title">Thank-you screen</div>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Title</div>
+                <input type="text" name="thankyou_title" maxlength="80"
+                       value="<%= @survey.thankyou_title %>"
+                       placeholder="<%= t('player.thank_you_title') %>"
+                       onchange="this.form.requestSubmit()"
+                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              </div>
+              <div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Message</div>
+                <textarea name="thankyou_body" maxlength="400" rows="2"
+                          placeholder="Your responses have been recorded."
+                          onchange="this.form.requestSubmit()"
+                          style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.thankyou_body %></textarea>
+              </div>
+              <div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Send respondents to your website when they finish (optional)</div>
+                <input type="url" name="forward_url" inputmode="url"
+                       value="<%= @survey.forward_url %>"
+                       placeholder="https://your-organisation.org"
+                       onchange="this.form.requestSubmit()"
+                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);margin-top:5px;">Respondents also get a Share button to pass the Verto on.</div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
         <%# Region tags — one link per region; responses carry the region so
             respondents and the results screen can compare across the map. %>
         <% region_links = @survey.survey_region_links.order(:created_at) %>
@@ -719,9 +754,16 @@
       <div class="preview-thankyou" data-preview-verto-target="thankyou">
         <div class="preview-thankyou-card">
           <div class="preview-thankyou-emoji">🎉</div>
-          <div class="preview-thankyou-title">Thank you!</div>
+          <div class="preview-thankyou-title"><%= @survey.thankyou_title.presence || t("player.thank_you_title") %></div>
           <div class="preview-thankyou-sub">
-            Your responses have been recorded.<br>Thanks for completing this Verto.
+            <%= @survey.thankyou_body.presence || "Your responses have been recorded." %>
+          </div>
+          <%# Non-interactive preview of the respondent's thank-you actions. %>
+          <div style="margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <% if @survey.forward_url? %>
+              <span style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);"><%= t("player.visit_website") %></span>
+            <% end %>
+            <span style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);"><%= t("player.share") %></span>
           </div>
           <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0.55;">
             <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.6);">Powered by</span>

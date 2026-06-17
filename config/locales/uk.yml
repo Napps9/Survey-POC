@@ -76,6 +76,8 @@ uk:
     thank_you_from: від %{org}
     compare_cta: Порівняйте свої результати з іншими →
     powered_by: Працює на
+    share: "Поділитися"
+    visit_website: "Перейти на сайт"
     comparison_title: Ваші відповіді проти всіх
     back: "← Назад"
     next: Далі →

@@ -247,6 +247,15 @@ class SurveysController < ApplicationController
     if params.key?(:compare_note)
       attrs[:compare_note] = params[:compare_note].to_s.strip.first(160).presence
     end
+    if params.key?(:thankyou_title)
+      attrs[:thankyou_title] = params[:thankyou_title].to_s.strip.first(80).presence
+    end
+    if params.key?(:thankyou_body)
+      attrs[:thankyou_body] = params[:thankyou_body].to_s.strip.first(400).presence
+    end
+    if params.key?(:forward_url)
+      attrs[:forward_url] = Survey.sanitize_forward_url(params[:forward_url])
+    end
     @survey.update!(attrs) if attrs.any?
     redirect_to survey_path(@survey)
   end

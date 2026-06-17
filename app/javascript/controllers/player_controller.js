@@ -5,7 +5,7 @@ export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta",
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
-                    "regionDetail", "regionDetailTitle", "regionDetailList"]
+                    "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
@@ -14,6 +14,7 @@ export default class extends Controller {
     regionCountry: { type: String, default: "" },
     regionLabel: { type: String, default: "" },
     locale: { type: String, default: "" },
+    shareUrl: { type: String, default: "" },
     showComparison: { type: Boolean, default: false },
     current: { type: Number, default: 0 }
   }
@@ -117,6 +118,32 @@ export default class extends Controller {
       queued = !navigator.onLine
     }
     this._showThankyou(queued)
+  }
+
+  // Share the public play link so respondents can pass the Verto on. Uses the
+  // native share sheet where available (mobile), falling back to copying the
+  // link to the clipboard with a brief ✓ on the button (desktop).
+  async share() {
+    const url = this.shareUrlValue || window.location.href
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: document.title, url })
+      } catch (_) {
+        // Sheet dismissed or failed — nothing more to do.
+      }
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(url)
+      if (this.hasShareBtnTarget) {
+        const btn = this.shareBtnTarget
+        const original = btn.textContent
+        btn.textContent = "✓"
+        setTimeout(() => { btn.textContent = original }, 1800)
+      }
+    } catch (_) {
+      window.prompt("", url)
+    }
   }
 
   // A stable per-session token: persisted so a refresh reuses the same

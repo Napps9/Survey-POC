@@ -15,6 +15,9 @@
   submit_url      = preview_mode ? "" : submit_survey_url(play_token)
   results_url     = @survey.show_results_comparison? && play_token.present? ? player_results_url(play_token) : ""
   show_comparison = @survey.show_results_comparison? && results_url.present?
+  # The public play link respondents can pass on via the Share button on the
+  # thank-you screen. Blank in owner preview (and for token-less drafts).
+  share_url       = preview_mode || play_token.blank? ? "" : play_survey_url(play_token)
 
   # Region tags: the consent bar shows whenever this Verto captures regions —
   # via per-region links or ask-players mode. The post-finish map needs a
@@ -34,6 +37,7 @@
      data-player-region-country-value="<%= @region_link&.country_code %>"
      data-player-region-label-value="<%= @region_link&.label %>"
      data-player-locale-value="<%= @display_locale %>"
+     data-player-share-url-value="<%= share_url %>"
      data-player-show-comparison-value="<%= show_comparison %>">
 
   <% if preview_mode %>
@@ -90,28 +94,46 @@
             is the only place the brand is shown. %>
         <%= brand_logo_tag @survey.organisation, style: "height:44px;width:auto;max-width:60%;margin:0 auto 18px;display:block;" %>
 
-        <div class="preview-thankyou-title"><%= t("player.thank_you_title") %></div>
+        <div class="preview-thankyou-title"><%= @survey.thankyou_title_text %></div>
         <div class="preview-thankyou-sub">
-          <%= t("player.thank_you_from", org: @survey.organisation.name) %>
+          <%= safe_join(@survey.thankyou_body_text.split("\n"), tag.br) %>
         </div>
 
-        <% if show_comparison %>
-          <button type="button"
-                  data-player-target="compareBtn"
-                  data-action="click->player#showComparison"
-                  style="margin-top:22px;padding:11px 22px;border-radius:100px;background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
-            <%= t("player.compare_cta") %>
-          </button>
-        <% end %>
+        <%# Thank-you actions: compare (brand CTA) then the outline secondaries —
+            forward-to-website, share, and regions. %>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:22px;width:100%;">
+          <% if show_comparison %>
+            <button type="button"
+                    data-player-target="compareBtn"
+                    data-action="click->player#showComparison"
+                    style="padding:11px 22px;border-radius:100px;background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
+              <%= t("player.compare_cta") %>
+            </button>
+          <% end %>
 
-        <% if regions_url.present? %>
+          <% if @survey.forward_url? %>
+            <a href="<%= @survey.forward_url %>" target="_blank" rel="noopener"
+               style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);text-decoration:none;cursor:pointer;">
+              <%= t("player.visit_website") %> →
+            </a>
+          <% end %>
+
           <button type="button"
-                  data-player-target="regionsBtn"
-                  data-action="click->player#showRegions"
-                  style="display:block;margin:<%= show_comparison ? '10px' : '22px' %> auto 0;padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);cursor:pointer;">
-            🌍 <%= t("player.see_regions") %>
+                  data-player-target="shareBtn"
+                  data-action="click->player#share"
+                  style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);cursor:pointer;">
+            <%= t("player.share") %>
           </button>
-        <% end %>
+
+          <% if regions_url.present? %>
+            <button type="button"
+                    data-player-target="regionsBtn"
+                    data-action="click->player#showRegions"
+                    style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);cursor:pointer;">
+              🌍 <%= t("player.see_regions") %>
+            </button>
+          <% end %>
+        </div>
 
         <%# Small "Powered by Playverto" wordmark at the bottom. %>
         <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;opacity:0.45;">

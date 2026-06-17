@@ -76,6 +76,8 @@ de:
     thank_you_from: von %{org}
     compare_cta: Vergleiche deine Ergebnisse mit anderen →
     powered_by: Bereitgestellt von
+    share: "Teilen"
+    visit_website: "Website besuchen"
     comparison_title: Deine Antworten vs. alle anderen
     back: "← Zurück"
     next: Weiter →

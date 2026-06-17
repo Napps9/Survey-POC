@@ -76,6 +76,8 @@ hi:
     thank_you_from: "%{org} की ओर से"
     compare_cta: अपने परिणामों की दूसरों से तुलना देखें →
     powered_by: द्वारा संचालित
+    share: "साझा करें"
+    visit_website: "वेबसाइट देखें"
     comparison_title: आपके उत्तर बनाम सभी
     back: "← वापस"
     next: आगे →

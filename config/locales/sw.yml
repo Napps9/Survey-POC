@@ -76,6 +76,8 @@ sw:
     thank_you_from: kutoka %{org}
     compare_cta: Ona matokeo yako yakilinganishwa na wengine →
     powered_by: Inaendeshwa na
+    share: "Shiriki"
+    visit_website: "Tembelea tovuti"
     comparison_title: Majibu yako dhidi ya kila mtu
     back: "← Rudi"
     next: Endelea →

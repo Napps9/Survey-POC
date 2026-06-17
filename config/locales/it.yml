@@ -76,6 +76,8 @@ it:
     thank_you_from: da %{org}
     compare_cta: Confronta i tuoi risultati con gli altri →
     powered_by: Powered by
+    share: "Condividi"
+    visit_website: "Visita il sito web"
     comparison_title: Le tue risposte vs tutti
     back: "← Indietro"
     next: Avanti →
