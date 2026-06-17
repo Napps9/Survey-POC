@@ -184,6 +184,21 @@
             &nbsp;·&nbsp; <%= t("editor.estimated", count: est_min) %>
             &nbsp;·&nbsp; <span data-survey-editor-target="status" style="font-size: var(--text-sm);"></span>
           </span>
+
+          <%# Rules-of-the-Game overall score — click to see how the whole Verto
+              measures up and what to fix. Filled in by survey_editor_controller. %>
+          <div style="position:relative;">
+            <button type="button" class="verto-score" data-survey-editor-target="vertoScore"
+                    aria-expanded="false"
+                    title="<%= t('editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
+                    data-action="click->survey-editor#toggleVertoAnalysis">
+              <span class="rule-dot"></span>
+              <span class="verto-score-label"><%= t("editor.rules.score_label", default: "Verto score") %></span>
+              <span class="verto-score-num" data-role="verto-score-num">–</span>
+              <span class="verto-score-word" data-role="verto-score-word"></span>
+            </button>
+            <div class="verto-analysis" data-survey-editor-target="vertoAnalysis" hidden></div>
+          </div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <% unless live_locked %>

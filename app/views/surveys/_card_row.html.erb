@@ -19,11 +19,21 @@
      data-card-recommended-images="<%= AssetPopulator.recommended_paths(@survey, context: :card, card: card).to_json %>"
      data-action="click->type-panel#selectCard">
 
-  <%# Chrome row above card %>
+  <%# Chrome row above card — type badge, card number, the Rules-of-the-Game
+      traffic light, and delete. The light + analysis panel are filled in and
+      toggled by survey_editor_controller. %>
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
     <span class="s-badge <%= meta[:badge_css] %>"><%= meta[:badge] %></span>
     <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.3);">Card <%= idx + 1 %></span>
     <% unless type == "welcome_card" %>
+      <button type="button" class="card-light" data-role="card-light" hidden
+              aria-expanded="false"
+              title="<%= t('editor.rules.card_aria', default: 'How this card scores against the Rules of the Game') %>"
+              data-action="click->survey-editor#toggleCardAnalysis">
+        <span class="rule-dot"></span>
+        <span class="card-light-word" data-role="card-light-word"></span>
+        <span class="card-light-score" data-role="card-light-score"></span>
+      </button>
       <button type="button" class="card-delete-btn" style="margin-left:auto;"
               title="<%= t('editor.delete_card_title', default: 'Delete this question card') %>"
               data-action="click->type-panel#deleteCard">
@@ -34,6 +44,12 @@
       </button>
     <% end %>
   </div>
+
+  <%# Rules-of-the-Game analysis for this card — populated + toggled by
+      survey_editor_controller when the traffic light is clicked. %>
+  <% unless type == "welcome_card" %>
+    <div class="card-analysis" data-role="card-analysis" hidden></div>
+  <% end %>
 
   <%# Horizontal split-card %>
   <div class="split-card">

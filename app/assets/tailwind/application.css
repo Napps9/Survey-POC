@@ -1700,6 +1700,111 @@
   border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;
 }
 
+/* ══════════════════════════════════════════════════
+   RULES OF THE GAME — editor traffic-light analysis
+   Red = against the rules, amber = partly aligned, green = spot on.
+   Reuses the brand palette: aquamarine / light-yellow / hot-pink.
+══════════════════════════════════════════════════ */
+
+/* Shared status dot — used by the card light, the Verto score pill, and
+   every checklist row. Colour comes from an .is-green/.is-yellow/.is-red/
+   .is-info modifier on the dot's own row or pill. */
+.rule-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: rgba(255,255,255,0.3); flex-shrink: 0;
+}
+.is-green  .rule-dot { background: #01EACB; }
+.is-yellow .rule-dot { background: #FFFA77; }
+.is-red    .rule-dot { background: #FF1E6F; }
+.is-info   .rule-dot { background: rgba(255,255,255,0.45); }
+
+/* Per-card traffic light (in the chrome row above each card). */
+.card-light {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px 3px 8px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  font-family: "ABeeZee", sans-serif; font-size: 11px;
+  color: rgba(255,255,255,0.85); cursor: pointer; line-height: 1.4;
+  transition: background 0.15s, border-color 0.15s;
+}
+.card-light:hover     { background: rgba(255,255,255,0.1); }
+.card-light.is-green  { border-color: rgba(1,234,203,0.4);   background: rgba(1,234,203,0.1); }
+.card-light.is-yellow { border-color: rgba(255,250,119,0.4); background: rgba(255,250,119,0.1); }
+.card-light.is-red    { border-color: rgba(255,30,111,0.4);  background: rgba(255,30,111,0.12); }
+.card-light-word  { font-weight: 600; }
+.card-light-score {
+  font-family: "Alata", sans-serif; font-size: 10px;
+  color: rgba(255,255,255,0.55);
+  border-left: 1px solid rgba(255,255,255,0.18); padding-left: 6px;
+}
+
+/* The per-card checklist, shown below the chrome row when the light is tapped. */
+.card-analysis {
+  margin: 0 4px 8px; padding: 12px 14px; border-radius: 12px;
+  background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Overall Verto score (in the finalize bar) + its pop-up checklist. */
+.verto-score {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 12px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.05);
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
+  color: rgba(255,255,255,0.9); cursor: pointer; line-height: 1.4;
+  transition: background 0.15s, border-color 0.15s;
+}
+.verto-score:hover     { background: rgba(255,255,255,0.1); }
+.verto-score.is-green  { border-color: rgba(1,234,203,0.45);  background: rgba(1,234,203,0.12); }
+.verto-score.is-yellow { border-color: rgba(255,250,119,0.45); background: rgba(255,250,119,0.12); }
+.verto-score.is-red    { border-color: rgba(255,30,111,0.45);  background: rgba(255,30,111,0.14); }
+.verto-score-label { color: rgba(255,255,255,0.6); }
+.verto-score-num   { font-family: "Alata", sans-serif; font-size: 13px; font-weight: 700; }
+.verto-score-word  { font-weight: 600; }
+.verto-score.is-green  .verto-score-num { color: #01EACB; }
+.verto-score.is-yellow .verto-score-num { color: #FFFA77; }
+.verto-score.is-red    .verto-score-num { color: #FF8FB6; }
+
+.verto-analysis {
+  position: absolute; bottom: calc(100% + 10px); left: 0;
+  width: 340px; max-width: 80vw; z-index: 50;
+  padding: 14px 16px; border-radius: 14px;
+  background: #1C2034; border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+}
+.verto-analysis::after {
+  content: ""; position: absolute; top: 100%; left: 24px;
+  border: 7px solid transparent; border-top-color: #1C2034;
+}
+
+/* Shared checklist internals (card panel + Verto pop-up). */
+.rule-panel-title {
+  font-family: "Alata", sans-serif; font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); margin-bottom: 9px;
+}
+.rule-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rule-check { display: flex; align-items: flex-start; gap: 9px; }
+.rule-check .rule-dot { margin-top: 5px; }
+.rule-text {
+  font-family: "ABeeZee", sans-serif; font-size: 12.5px;
+  line-height: 1.45; color: rgba(255,255,255,0.82);
+}
+.rule-tally {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 11px; padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.rule-tally-label {
+  font-family: "Alata", sans-serif; font-size: 10px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4);
+}
+.rule-tally-item {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.7);
+}
+
 /* Right column hosts both the answer-type picker and the publish & share
    panel — only one is visible at a time, toggled by publish-panel controller. */
 .right-column {

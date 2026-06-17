@@ -1,28 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
-
-const TYPE_BOUNDS = {
-  tap_card:         { min: 3, max: 5 },
-  multiple_choice:  { min: 3, max: 5 },
-  select_many:      { min: 3, max: 5 },
-  rating:           { min: 3, max: 5 },
-  range:            { min: 3, max: 5 },
-  nps:              { min: 5, max: 5 },
-  select_one_grid:  { min: 2, max: 10, even: true },
-  select_many_grid: { min: 2, max: 10, even: true }
-}
-const COUNTABLE = new Set([
-  "multiple_choice", "select_many", "select_one_grid", "select_many_grid",
-  "tap_card", "range", "rating", "nps", "yes_no", "open_ended"
-])
-const TEXT_TARGET = 70
-const TEXT_HARD_MAX = 100
-const OPTION_HARD_MAX = 20
-const QUESTIONS_MIN = 10
-const QUESTIONS_MAX = 15
+import { analyzeCard, analyzeVerto } from "lib/verto_rules"
 
 export default class extends Controller {
-  static targets = ["card", "summary", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode"]
+  static targets = ["card", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode", "vertoScore", "vertoAnalysis"]
   static values  = {
     url: String, title: String, description: String,
     defaultLocale: { type: String, default: "en" },
@@ -61,6 +42,7 @@ export default class extends Controller {
     if (this.hasFeedTarget) {
       this.feedTarget.setAttribute("dir", this.rtlLocalesValue.includes(locale) ? "rtl" : "ltr")
     }
+    this.refreshAll()
   }
 
   _seedStore() {
@@ -136,92 +118,107 @@ export default class extends Controller {
     })
   }
 
+  // ── Rules of the Game — the live traffic-light analysis ──────────────────
+  // Repaint every card's light plus the overall Verto score. Cheap enough
+  // (~16 cards) to run wholesale on structural changes and locale switches.
   refreshAll() {
     this.cardTargets.forEach(c => this.refreshCard(c))
-    this.refreshSummary()
+    this.refreshScore()
+  }
+
+  // The card object the analyzer scores: the text/options currently on screen
+  // (so the score reflects the locale being edited) plus the Other toggle,
+  // which counts toward a grid's even/≤10 rule.
+  _cardData(cardEl) {
+    const c = this._readCard(cardEl)
+    return {
+      type: cardEl.dataset.cardType,
+      text: c.text,
+      description: c.description,
+      options: c.options,
+      allowOther: cardEl.dataset.cardAllowOther === "true"
+    }
   }
 
   refreshCard(card) {
-    const type = card.dataset.cardType
-    const textEl = card.querySelector("[data-role='text']")
-    if (textEl) this.setCharWarning(textEl, TEXT_HARD_MAX, TEXT_TARGET)
+    const light = card.querySelector("[data-role='card-light']")
+    if (!light) return // welcome cards aren't questions, so they aren't scored
+    this._paintCardLight(card, analyzeCard(this._cardData(card)))
+  }
 
-    const descEl = card.querySelector("[data-role='description']")
-    if (descEl) this.setCharWarning(descEl, TEXT_HARD_MAX, TEXT_TARGET)
+  _paintCardLight(card, result) {
+    const light = card.querySelector("[data-role='card-light']")
+    if (!light || !result) return
+    light.hidden = false
+    light.className = `card-light is-${result.rating}`
+    light.setAttribute("title", t("editor.rules.card_aria"))
+    const word = light.querySelector("[data-role='card-light-word']")
+    const score = light.querySelector("[data-role='card-light-score']")
+    if (word) word.textContent = this._ratingWord(result.rating)
+    if (score) score.textContent = result.score
+    const panel = card.querySelector("[data-role='card-analysis']")
+    if (panel) panel.innerHTML = this._panelHtml(t("editor.rules.title"), result.checks)
+  }
 
-    card.querySelectorAll("[data-role='option']").forEach(o =>
-      this.setCharWarning(o, OPTION_HARD_MAX, OPTION_HARD_MAX)
-    )
-
-    const bounds = TYPE_BOUNDS[type]
-    if (bounds) {
-      const optionEls = card.querySelectorAll("[data-role='option-row']")
-      const count = optionEls.length
-      const addBtn = card.querySelector("[data-action*='addOption']")
-      const removeBtns = card.querySelectorAll("[data-action*='removeOption']")
-      if (addBtn) addBtn.disabled = count >= bounds.max
-      removeBtns.forEach(b => b.disabled = count <= bounds.min)
-
-      const status = card.querySelector("[data-role='option-status']")
-      if (status) {
-        const messages = []
-        messages.push(`${count} of ${bounds.min}-${bounds.max}`)
-        if (bounds.even && count % 2 !== 0) messages.push("must be even")
-        const ok = count >= bounds.min && count <= bounds.max && (!bounds.even || count % 2 === 0)
-        status.textContent = messages.join(" · ")
-        status.className = "text-xs " + (ok ? "text-smoke/50" : "text-hot-pink font-medium")
-      }
+  refreshScore() {
+    if (!this.hasVertoScoreTarget) return
+    const result = analyzeVerto(this.cardTargets.map(el => this._cardData(el)))
+    const el = this.vertoScoreTarget
+    el.className = `verto-score is-${result.rating}`
+    const num  = el.querySelector("[data-role='verto-score-num']")
+    const word = el.querySelector("[data-role='verto-score-word']")
+    if (num)  num.textContent  = result.score
+    if (word) word.textContent = this._ratingWord(result.rating)
+    if (this.hasVertoAnalysisTarget) {
+      this.vertoAnalysisTarget.innerHTML =
+        this._panelHtml(t("editor.rules.title"), result.checks, this._tallyHtml(result.tally))
     }
   }
 
-  refreshSummary() {
-    if (!this.hasSummaryTarget) return
-    const questionCount = this.cardTargets.filter(c => COUNTABLE.has(c.dataset.cardType)).length
-    const ok = questionCount >= QUESTIONS_MIN && questionCount <= QUESTIONS_MAX
-    this.summaryTarget.textContent = `${questionCount} Q (${QUESTIONS_MIN}-${QUESTIONS_MAX})`
-    this.summaryTarget.className = "display text-sm tracking-widest " + (ok ? "text-aquamarine" : "text-hot-pink")
+  _panelHtml(title, checks, footer) {
+    const rows = checks.map(c => (
+      `<li class="rule-check is-${c.rating}"><span class="rule-dot"></span>` +
+      `<span class="rule-text">${this._esc(c.text)}</span></li>`
+    )).join("")
+    return `<div class="rule-panel-title">${this._esc(title)}</div>` +
+           `<ul class="rule-list">${rows}</ul>${footer || ""}`
   }
 
-  setCharWarning(el, hardMax, target) {
-    const len = (el.textContent || "").length
-    el.dataset.len = len
-    let color = "border-transparent"
-    if (len > hardMax) color = "border-hot-pink"
-    else if (len > target) color = "border-light-yellow"
-    el.classList.remove("border-transparent", "border-hot-pink", "border-light-yellow")
-    el.classList.add(color)
+  _tallyHtml(tally) {
+    return `<div class="rule-tally"><span class="rule-tally-label">${this._esc(t("editor.rules.cards_label"))}</span>` +
+      ["green", "yellow", "red"].map(r =>
+        `<span class="rule-tally-item is-${r}"><span class="rule-dot"></span>${tally[r]}</span>`
+      ).join("") + `</div>`
+  }
 
-    const counter = el.parentElement.querySelector("[data-role='char-counter']")
-    if (counter) {
-      counter.textContent = `${len}/${hardMax}`
-      counter.className = "text-xs " + (len > hardMax ? "text-hot-pink font-medium" : len > target ? "text-light-yellow" : "text-smoke/40")
-    }
+  _ratingWord(rating) {
+    return t(`editor.rules.rating_${rating}`)
+  }
+
+  _esc(s) {
+    return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+  }
+
+  toggleCardAnalysis(event) {
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    const panel = card?.querySelector("[data-role='card-analysis']")
+    if (!panel) return
+    const open = panel.hidden
+    panel.hidden = !open
+    event.currentTarget.setAttribute("aria-expanded", String(open))
+  }
+
+  toggleVertoAnalysis(event) {
+    if (!this.hasVertoAnalysisTarget) return
+    const open = this.vertoAnalysisTarget.hidden
+    this.vertoAnalysisTarget.hidden = !open
+    event.currentTarget.setAttribute("aria-expanded", String(open))
   }
 
   edit(event) {
     const card = event.currentTarget.closest("[data-survey-editor-target='card']")
     if (card) this.refreshCard(card)
-    this.markDirty()
-  }
-
-  addOption(event) {
-    event.preventDefault()
-    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
-    const list = card.querySelector("[data-role='option-list']")
-    const template = card.querySelector("[data-role='option-template']")
-    if (!list || !template) return
-    const node = template.content.firstElementChild.cloneNode(true)
-    list.appendChild(node)
-    this.refreshCard(card)
-    this.markDirty()
-    node.querySelector("[data-role='option']")?.focus()
-  }
-
-  removeOption(event) {
-    event.preventDefault()
-    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
-    event.currentTarget.closest("[data-role='option-row']").remove()
-    this.refreshCard(card)
     this.markDirty()
   }
 
@@ -241,10 +238,16 @@ export default class extends Controller {
     card.dataset.cardAllowOther = on ? "true" : "false"
     const wrap = card.querySelector(".other-cta-wrap")
     if (wrap) wrap.hidden = !on
+    this.refreshCard(card)
     this.markDirty()
   }
 
   markDirty() {
+    // Repaint the card being edited (or everything on a structural change) and
+    // the overall score, so the lights track edits as they're typed.
+    const active = document.activeElement?.closest?.("[data-survey-editor-target='card']")
+    if (active) { this.refreshCard(active); this.refreshScore() } else { this.refreshAll() }
+
     this.flash(t("editor.unsaved"), "text-light-yellow")
     clearTimeout(this._saveTimer)
     this._saveTimer = setTimeout(() => this._doSave(), 1500)
