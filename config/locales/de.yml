@@ -80,6 +80,10 @@ de:
     share: "Teilen"
     visit_website: "Website besuchen"
     required_hint: "Bitte beantworte diese Frage, um fortzufahren."
+    consent_title: "Bevor du beginnst"
+    consent_agree: "Zustimmen & fortfahren"
+    consent_decline: "Ich stimme nicht zu"
+    consent_declined: "Kein Problem — du kannst diese Seite schließen."
     comparison_title: Deine Antworten vs. alle anderen
     back: "← Zurück"
     next: Weiter →

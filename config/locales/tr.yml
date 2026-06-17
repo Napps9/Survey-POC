@@ -80,6 +80,10 @@ tr:
     share: "Paylaş"
     visit_website: "Web sitesini ziyaret et"
     required_hint: "Devam etmek için lütfen bu soruyu yanıtlayın."
+    consent_title: "Başlamadan önce"
+    consent_agree: "Kabul et ve devam et"
+    consent_decline: "Kabul etmiyorum"
+    consent_declined: "Sorun değil — bu sayfayı kapatabilirsiniz."
     comparison_title: Yanıtlarınız vs herkes
     back: "← Geri"
     next: İleri →

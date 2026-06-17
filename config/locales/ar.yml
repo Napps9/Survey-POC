@@ -80,6 +80,10 @@ ar:
     share: "مشاركة"
     visit_website: "زيارة الموقع"
     required_hint: "يرجى الإجابة على هذا السؤال للمتابعة."
+    consent_title: "قبل أن تبدأ"
+    consent_agree: "أوافق وأتابع"
+    consent_decline: "لا أوافق"
+    consent_declined: "لا مشكلة — يمكنك إغلاق هذه الصفحة."
     comparison_title: إجاباتك مقابل الجميع
     back: "← رجوع"
     next: التالي ←

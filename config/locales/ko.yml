@@ -80,6 +80,10 @@ ko:
     share: "공유"
     visit_website: "웹사이트 방문"
     required_hint: "계속하려면 이 질문에 답해 주세요."
+    consent_title: "시작하기 전에"
+    consent_agree: "동의하고 계속하기"
+    consent_decline: "동의하지 않음"
+    consent_declined: "괜찮습니다 — 이 페이지를 닫으셔도 됩니다."
     comparison_title: 내 답변 vs 전체
     back: "← 뒤로"
     next: 다음 →

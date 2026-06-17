@@ -80,6 +80,10 @@ hi:
     share: "साझा करें"
     visit_website: "वेबसाइट देखें"
     required_hint: "जारी रखने के लिए कृपया इस प्रश्न का उत्तर दें।"
+    consent_title: "शुरू करने से पहले"
+    consent_agree: "सहमत हैं और जारी रखें"
+    consent_decline: "मैं सहमत नहीं हूँ"
+    consent_declined: "कोई बात नहीं — आप इस पृष्ठ को बंद कर सकते हैं।"
     comparison_title: आपके उत्तर बनाम सभी
     back: "← वापस"
     next: आगे →

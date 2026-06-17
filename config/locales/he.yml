@@ -80,6 +80,10 @@ he:
     share: "שיתוף"
     visit_website: "מעבר לאתר"
     required_hint: "נא לענות על שאלה זו כדי להמשיך."
+    consent_title: "לפני שמתחילים"
+    consent_agree: "מסכים/ה וממשיך/ה"
+    consent_decline: "אינני מסכים/ה"
+    consent_declined: "אין בעיה — אפשר לסגור את הדף."
     comparison_title: התשובות שלך מול כולם
     back: "← חזרה"
     next: הבא →

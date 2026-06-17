@@ -80,6 +80,10 @@ sw:
     share: "Shiriki"
     visit_website: "Tembelea tovuti"
     required_hint: "Tafadhali jibu swali hili ili kuendelea."
+    consent_title: "Kabla ya kuanza"
+    consent_agree: "Kubali na uendelee"
+    consent_decline: "Sikubali"
+    consent_declined: "Hakuna shida — unaweza kufunga ukurasa huu."
     comparison_title: Majibu yako dhidi ya kila mtu
     back: "← Rudi"
     next: Endelea →

@@ -101,6 +101,11 @@ class Survey < ApplicationRecord
     forward_url.present?
   end
 
+  # When set, respondents must agree to this text before the first card.
+  def consent_required?
+    consent_text.present?
+  end
+
   # Coerce a creator-entered website into a safe http(s) URL for the
   # forward-to-website CTA on the thank-you screen. Adds a scheme when missing;
   # returns nil for blank or non-http(s) input so the CTA simply doesn't show.

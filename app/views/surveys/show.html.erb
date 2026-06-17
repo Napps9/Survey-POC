@@ -446,6 +446,21 @@
           <% end %>
         </div>
 
+        <%# Consent gate — when set, respondents must agree to this text before
+            the first card. Blank = no consent step. %>
+        <div class="publish-block">
+          <div class="publish-block-title">Consent gate</div>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:8px;line-height:1.45;">
+              Shown before the first card with an “Agree to continue” button. Leave blank for no consent step.
+            </div>
+            <textarea name="consent_text" maxlength="2000" rows="4"
+                      placeholder="e.g. By taking part you agree that your anonymous answers may be used for research."
+                      onchange="this.form.requestSubmit()"
+                      style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.consent_text %></textarea>
+          <% end %>
+        </div>
+
         <%# Thank-you screen — custom title/message shown after Finish, plus an
             optional link forwarding respondents to the org's website. All three
             fields post to update_settings, which only writes the keys it's sent. %>

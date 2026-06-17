@@ -80,6 +80,10 @@ uk:
     share: "Поділитися"
     visit_website: "Перейти на сайт"
     required_hint: "Будь ласка, дайте відповідь на це питання, щоб продовжити."
+    consent_title: "Перш ніж почати"
+    consent_agree: "Погоджуюсь і продовжити"
+    consent_decline: "Я не погоджуюсь"
+    consent_declined: "Нічого страшного — ви можете закрити цю сторінку."
     comparison_title: Ваші відповіді проти всіх
     back: "← Назад"
     next: Далі →

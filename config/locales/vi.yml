@@ -80,6 +80,10 @@ vi:
     share: "Chia sẻ"
     visit_website: "Truy cập trang web"
     required_hint: "Vui lòng trả lời câu hỏi này để tiếp tục."
+    consent_title: "Trước khi bắt đầu"
+    consent_agree: "Đồng ý & tiếp tục"
+    consent_decline: "Tôi không đồng ý"
+    consent_declined: "Không sao — bạn có thể đóng trang này."
     comparison_title: Câu trả lời của bạn so với mọi người
     back: "← Quay lại"
     next: Tiếp →

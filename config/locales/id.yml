@@ -80,6 +80,10 @@ id:
     share: "Bagikan"
     visit_website: "Kunjungi situs web"
     required_hint: "Harap jawab pertanyaan ini untuk melanjutkan."
+    consent_title: "Sebelum mulai"
+    consent_agree: "Setuju & lanjutkan"
+    consent_decline: "Saya tidak setuju"
+    consent_declined: "Tidak masalah — Anda bisa menutup halaman ini."
     comparison_title: Jawaban Anda vs semua orang
     back: "← Kembali"
     next: Lanjut →

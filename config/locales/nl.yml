@@ -80,6 +80,10 @@ nl:
     share: "Delen"
     visit_website: "Website bezoeken"
     required_hint: "Beantwoord deze vraag om door te gaan."
+    consent_title: "Voordat je begint"
+    consent_agree: "Akkoord & doorgaan"
+    consent_decline: "Ik ga niet akkoord"
+    consent_declined: "Geen probleem — je kunt deze pagina sluiten."
     comparison_title: Jouw antwoorden vs iedereen
     back: "← Terug"
     next: Volgende →

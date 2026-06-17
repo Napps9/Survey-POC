@@ -5,7 +5,8 @@ export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta",
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
-                    "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint"]
+                    "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
+                    "consent", "consentMain", "consentDeclined"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
@@ -27,6 +28,17 @@ export default class extends Controller {
   connect() {
     this._sessionToken = this._ensureToken()
     this._update()
+  }
+
+  // Consent gate: agreeing dismisses the overlay and reveals the player;
+  // declining swaps in a polite end-state and keeps the gate up.
+  agreeConsent() {
+    if (this.hasConsentTarget) this.consentTarget.classList.add("hidden")
+  }
+
+  declineConsent() {
+    if (this.hasConsentMainTarget) this.consentMainTarget.classList.add("hidden")
+    if (this.hasConsentDeclinedTarget) this.consentDeclinedTarget.classList.remove("hidden")
   }
 
   next() {

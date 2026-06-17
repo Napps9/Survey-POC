@@ -80,6 +80,10 @@ ru:
     share: "Поделиться"
     visit_website: "Перейти на сайт"
     required_hint: "Пожалуйста, ответьте на этот вопрос, чтобы продолжить."
+    consent_title: "Прежде чем начать"
+    consent_agree: "Согласен и продолжить"
+    consent_decline: "Я не согласен"
+    consent_declined: "Ничего страшного — вы можете закрыть эту страницу."
     comparison_title: Ваши ответы vs все остальные
     back: "← Назад"
     next: Далее →

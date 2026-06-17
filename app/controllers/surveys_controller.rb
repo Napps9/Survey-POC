@@ -256,6 +256,9 @@ class SurveysController < ApplicationController
     if params.key?(:forward_url)
       attrs[:forward_url] = Survey.sanitize_forward_url(params[:forward_url])
     end
+    if params.key?(:consent_text)
+      attrs[:consent_text] = params[:consent_text].to_s.strip.first(2000).presence
+    end
     @survey.update!(attrs) if attrs.any?
     redirect_to survey_path(@survey)
   end

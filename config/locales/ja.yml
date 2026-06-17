@@ -80,6 +80,10 @@ ja:
     share: "シェア"
     visit_website: "ウェブサイトを見る"
     required_hint: "続けるにはこの質問に回答してください。"
+    consent_title: "始める前に"
+    consent_agree: "同意して続ける"
+    consent_decline: "同意しません"
+    consent_declined: "問題ありません — このページを閉じてください。"
     comparison_title: あなたの回答 vs 全員
     back: "← 戻る"
     next: 次へ →

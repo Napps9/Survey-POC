@@ -220,4 +220,24 @@
             data-player-target="finishBtn"
             data-action="click->player#finish"><%= t("player.submit") %></button>
   </div>
+
+  <%# Consent gate — covers the player until the respondent agrees. Rendered
+      only when the creator has set consent text. %>
+  <% if @survey.consent_required? %>
+    <div class="player-consent" data-player-target="consent">
+      <div class="player-consent-card" data-player-target="consentMain">
+        <div class="player-consent-title"><%= t("player.consent_title") %></div>
+        <div class="player-consent-body"><%= safe_join(@survey.consent_text.split("\n"), tag.br) %></div>
+        <div class="player-consent-actions">
+          <button type="button" class="player-consent-agree"
+                  data-action="click->player#agreeConsent"><%= t("player.consent_agree") %></button>
+          <button type="button" class="player-consent-decline"
+                  data-action="click->player#declineConsent"><%= t("player.consent_decline") %></button>
+        </div>
+      </div>
+      <div class="player-consent-card hidden" data-player-target="consentDeclined">
+        <div class="player-consent-body" style="text-align:center;"><%= t("player.consent_declined") %></div>
+      </div>
+    </div>
+  <% end %>
 </div>
