@@ -141,6 +141,11 @@ pl:
         variety_run: "%{type} pojawia się %{n}× z rzędu — przeplataj innym typem odpowiedzi."
         welcome_many: "Użyj najwyżej jednej karty powitalnej (teraz %{n})."
         static_tip: "Długie Verto — rozważ przerwę w połowie, by utrzymać energię."
+        board_heading: "Co działa, a co poprawić"
+        board_hint: "Pogrupowane według sygnalizacji — dotknij karty, aby do niej przejść."
+        whole_verto: "Cały Verto"
+        card_n: "Karta %{n}"
+        section_empty: "Nic tutaj."
     wizard:
       step_counter: Krok %{n} z %{total}
   nav:

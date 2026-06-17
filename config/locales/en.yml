@@ -143,6 +143,11 @@ en:
         variety_run: "%{type} appears %{n}× in a row — mix in another answer type."
         welcome_many: "Use at most one welcome card (now %{n})."
         static_tip: "Long Verto — consider a midway break to keep energy up."
+        board_heading: "What's working and what to fix"
+        board_hint: "Grouped by traffic light — tap a card to jump to it."
+        whole_verto: "Whole Verto"
+        card_n: "Card %{n}"
+        section_empty: "Nothing here."
     wizard:
       step_counter: "Step %{n} of %{total}"
   nav:

@@ -141,6 +141,11 @@ sw:
         variety_run: "%{type} inajitokeza mara %{n}× mfululizo — changanya na aina nyingine ya jibu."
         welcome_many: "Tumia kadi moja tu ya karibu (sasa %{n})."
         static_tip: "Verto refu — fikiria mapumziko ya katikati kudumisha ari."
+        board_heading: "Kinachofaa na cha kurekebisha"
+        board_hint: "Imepangwa kwa taa za barabarani — gusa kadi ili kuiendea."
+        whole_verto: "Verto nzima"
+        card_n: "Kadi %{n}"
+        section_empty: "Hakuna kitu hapa."
     wizard:
       step_counter: Hatua %{n} kati ya %{total}
   nav:

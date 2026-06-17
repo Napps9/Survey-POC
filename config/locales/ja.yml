@@ -141,6 +141,11 @@ ja:
         variety_run: "%{type}が%{n}回連続しています — 別の回答タイプを挟みましょう。"
         welcome_many: "ウェルカムカードは1枚までにしましょう（現在%{n}）。"
         static_tip: "長いVerto — 集中力を保つため中盤に休憩を検討しましょう。"
+        board_heading: "良い点と修正すべき点"
+        board_hint: "信号でグループ分け — カードをタップで移動します。"
+        whole_verto: "Verto全体"
+        card_n: "カード%{n}"
+        section_empty: "ここには何もありません。"
     wizard:
       step_counter: "%{total}ステップ中 %{n}"
   nav:

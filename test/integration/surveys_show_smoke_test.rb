@@ -50,9 +50,12 @@ class SurveysShowSmokeTest < ActionDispatch::IntegrationTest
 
     get survey_path(s)
     assert_response :success
-    # Overall Verto score pill in the finalize bar.
-    assert_select ".verto-score[data-survey-editor-target='vertoScore']"
+    # The overall Verto score now lives as a tab in the right-hand panel; the
+    # tab carries the live score, and clicking it opens the breakdown board.
+    assert_select ".right-tabs .verto-score[data-survey-editor-target='vertoScore']"
     assert_match "Verto score", response.body
+    # The score-breakdown panel (filled in client-side) and its empty board.
+    assert_select ".type-panel[data-publish-panel-target='scoreView'] .score-board[data-survey-editor-target='scoreBoard']"
     # The question card carries a traffic light + an analysis container.
     assert_select "[data-role='card-light']", 1
     assert_select "[data-role='card-analysis']", 1

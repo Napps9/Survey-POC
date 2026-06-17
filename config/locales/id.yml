@@ -141,6 +141,11 @@ id:
         variety_run: "%{type} muncul %{n}× berturut-turut — selingi dengan tipe jawaban lain."
         welcome_many: "Gunakan paling banyak satu kartu sambutan (sekarang %{n})."
         static_tip: "Verto panjang — pertimbangkan jeda di tengah agar tetap bersemangat."
+        board_heading: "Apa yang sudah baik dan apa yang perlu diperbaiki"
+        board_hint: "Dikelompokkan berdasarkan lampu lalu lintas — ketuk kartu untuk membukanya."
+        whole_verto: "Seluruh Verto"
+        card_n: "Kartu %{n}"
+        section_empty: "Tidak ada apa-apa di sini."
     wizard:
       step_counter: Langkah %{n} dari %{total}
   nav:

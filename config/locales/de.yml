@@ -141,6 +141,11 @@ de:
         variety_run: "%{type} kommt %{n}× hintereinander vor — wechsle den Antworttyp."
         welcome_many: "Höchstens eine Willkommenskarte verwenden (jetzt %{n})."
         static_tip: "Langes Verto — erwäge eine Pause in der Mitte, um die Energie zu halten."
+        board_heading: "Was passt und was zu verbessern ist"
+        board_hint: "Nach Ampel gruppiert — tippe auf eine Karte, um zu ihr zu springen."
+        whole_verto: "Ganzer Verto"
+        card_n: "Karte %{n}"
+        section_empty: "Nichts hier."
     wizard:
       step_counter: Schritt %{n} von %{total}
   nav:

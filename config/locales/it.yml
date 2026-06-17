@@ -141,6 +141,11 @@ it:
         variety_run: "%{type} appare %{n}× di fila — alterna con un altro tipo di risposta."
         welcome_many: "Usa al massimo una scheda di benvenuto (ora %{n})."
         static_tip: "Verto lungo — valuta una pausa a metà per mantenere l'energia."
+        board_heading: "Cosa funziona e cosa correggere"
+        board_hint: "Raggruppato per semaforo — tocca una carta per raggiungerla."
+        whole_verto: "Verto intero"
+        card_n: "Carta %{n}"
+        section_empty: "Niente qui."
     wizard:
       step_counter: Passo %{n} di %{total}
   nav:

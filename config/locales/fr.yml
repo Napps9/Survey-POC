@@ -141,6 +141,11 @@ fr:
         variety_run: "%{type} apparaît %{n}× de suite — alternez avec un autre type de réponse."
         welcome_many: "Utilisez au plus une carte de bienvenue (actuellement %{n})."
         static_tip: "Verto long — pensez à une pause à mi-parcours pour garder le rythme."
+        board_heading: "Ce qui va et ce qu'il faut corriger"
+        board_hint: "Regroupé par feu tricolore — touchez une carte pour y accéder."
+        whole_verto: "Verto entier"
+        card_n: "Carte %{n}"
+        section_empty: "Rien ici."
     wizard:
       step_counter: Étape %{n} sur %{total}
   nav:

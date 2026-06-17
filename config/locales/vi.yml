@@ -141,6 +141,11 @@ vi:
         variety_run: "%{type} xuất hiện %{n}× liên tiếp — xen kẽ loại đáp án khác."
         welcome_many: "Dùng tối đa một thẻ chào mừng (hiện %{n})."
         static_tip: "Verto dài — cân nhắc một quãng nghỉ giữa chừng để giữ năng lượng."
+        board_heading: "Điều gì ổn và điều gì cần sửa"
+        board_hint: "Nhóm theo đèn giao thông — chạm vào một thẻ để chuyển đến."
+        whole_verto: "Toàn bộ Verto"
+        card_n: "Thẻ %{n}"
+        section_empty: "Không có gì ở đây."
     wizard:
       step_counter: Bước %{n} / %{total}
   nav:

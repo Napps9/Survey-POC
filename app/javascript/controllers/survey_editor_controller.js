@@ -1,9 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
-import { analyzeCard, analyzeVerto } from "lib/verto_rules"
+import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
 
 export default class extends Controller {
-  static targets = ["card", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode", "vertoScore", "vertoAnalysis"]
+  static targets = ["card", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode", "vertoScore", "scoreBoard"]
   static values  = {
     url: String, title: String, description: String,
     defaultLocale: { type: String, default: "en" },
@@ -162,17 +162,82 @@ export default class extends Controller {
 
   refreshScore() {
     if (!this.hasVertoScoreTarget) return
-    const result = analyzeVerto(this.cardTargets.map(el => this._cardData(el)))
+    const cardData = this.cardTargets.map(el => this._cardData(el))
+    const result = analyzeVerto(cardData)
+
+    // Paint the score tab. Use classList (not className) so the tab's own
+    // classes — right-tab, verto-score, is-active — survive the repaint.
     const el = this.vertoScoreTarget
-    el.className = `verto-score is-${result.rating}`
+    el.classList.remove("is-green", "is-yellow", "is-red")
+    el.classList.add(`is-${result.rating}`)
     const num  = el.querySelector("[data-role='verto-score-num']")
     const word = el.querySelector("[data-role='verto-score-word']")
     if (num)  num.textContent  = result.score
     if (word) word.textContent = this._ratingWord(result.rating)
-    if (this.hasVertoAnalysisTarget) {
-      this.vertoAnalysisTarget.innerHTML =
-        this._panelHtml(t("editor.rules.title"), result.checks, this._tallyHtml(result.tally))
+
+    if (this.hasScoreBoardTarget) this._renderScoreBoard(result, cardData)
+  }
+
+  // Group every result into the red / amber / green sections of the score tab.
+  // Whole-Verto checks ride along under a "Whole Verto" label; each card lands
+  // in its own section carrying the checks that still need work.
+  _renderScoreBoard(verto, cardData) {
+    const board = { red: [], yellow: [], green: [] }
+    // INFO is a non-scoring tip — surface it among the "could improve" items.
+    const bucket = (rating) => board[rating === "info" ? "yellow" : rating]
+
+    verto.checks.forEach(c => bucket(c.rating).push({ verto: true, text: c.text }))
+
+    this.cardTargets.forEach((cardEl, i) => {
+      const result = analyzeCard(cardData[i])
+      if (!result) return // welcome cards aren't questions, so they aren't scored
+      bucket(result.rating).push({
+        verto: false,
+        num: cardEl.dataset.cardNum,
+        type: cardData[i].type,
+        fixes: result.checks.filter(c => c.rating !== "green").map(c => c.text)
+      })
+    })
+
+    this.scoreBoardTarget.innerHTML = ["red", "yellow", "green"]
+      .map(rating => this._sectionHtml(rating, board[rating])).join("")
+  }
+
+  _sectionHtml(rating, items) {
+    const head =
+      `<div class="score-section-head"><span class="rule-dot"></span>` +
+      `<span>${this._esc(this._ratingWord(rating))}</span>` +
+      `<span class="score-count">${items.length}</span></div>`
+    const body = items.length
+      ? `<div class="score-rows">${items.map(it => this._scoreRowHtml(it)).join("")}</div>`
+      : `<div class="score-empty">${this._esc(t("editor.rules.section_empty"))}</div>`
+    return `<div class="score-section is-${rating}">${head}${body}</div>`
+  }
+
+  _scoreRowHtml(it) {
+    if (it.verto) {
+      return `<div class="score-row score-row-verto">` +
+        `<div class="score-row-card">${this._esc(t("editor.rules.whole_verto"))}</div>` +
+        `<div class="score-fix">${this._esc(it.text)}</div></div>`
     }
+    const label = this._esc(`${t("editor.rules.card_n", { n: it.num })} · ${typeLabel(it.type)}`)
+    const fixes = it.fixes.map(f => `<div class="score-fix">${this._esc(f)}</div>`).join("")
+    return `<button type="button" class="score-row" data-card-num="${this._esc(it.num)}" ` +
+      `data-action="click->survey-editor#jumpToCard">` +
+      `<div class="score-row-card">${label}</div>${fixes}</button>`
+  }
+
+  // Scroll the feed to a card named in the score board and pulse it, so the
+  // creator can go straight from "what to fix" to the card itself.
+  jumpToCard(event) {
+    const num = event.currentTarget.dataset.cardNum
+    const card = this.cardTargets.find(c => c.dataset.cardNum === num)
+    if (!card) return
+    card.scrollIntoView({ behavior: "smooth", block: "center" })
+    card.classList.remove("card-flash")
+    void card.offsetWidth // restart the animation if the card was just pulsed
+    card.classList.add("card-flash")
+    setTimeout(() => card.classList.remove("card-flash"), 1300)
   }
 
   _panelHtml(title, checks, footer) {
@@ -182,13 +247,6 @@ export default class extends Controller {
     )).join("")
     return `<div class="rule-panel-title">${this._esc(title)}</div>` +
            `<ul class="rule-list">${rows}</ul>${footer || ""}`
-  }
-
-  _tallyHtml(tally) {
-    return `<div class="rule-tally"><span class="rule-tally-label">${this._esc(t("editor.rules.cards_label"))}</span>` +
-      ["green", "yellow", "red"].map(r =>
-        `<span class="rule-tally-item is-${r}"><span class="rule-dot"></span>${tally[r]}</span>`
-      ).join("") + `</div>`
   }
 
   _ratingWord(rating) {
@@ -206,13 +264,6 @@ export default class extends Controller {
     if (!panel) return
     const open = panel.hidden
     panel.hidden = !open
-    event.currentTarget.setAttribute("aria-expanded", String(open))
-  }
-
-  toggleVertoAnalysis(event) {
-    if (!this.hasVertoAnalysisTarget) return
-    const open = this.vertoAnalysisTarget.hidden
-    this.vertoAnalysisTarget.hidden = !open
     event.currentTarget.setAttribute("aria-expanded", String(open))
   }
 

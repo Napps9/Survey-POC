@@ -49,7 +49,7 @@ const TYPE_LABEL = {
 }
 
 const isQuestion = (c) => (c && c.type ? c.type : "") !== "welcome_card"
-const typeLabel = (ty) => TYPE_LABEL[ty] || (ty || "").replace(/_/g, " ")
+export const typeLabel = (ty) => TYPE_LABEL[ty] || (ty || "").replace(/_/g, " ")
 const cleanOptions = (c) => (Array.isArray(c.options) ? c.options : [])
   .map((o) => (o || "").toString().trim()).filter(Boolean)
 const check = (id, rating, text) => ({ id, rating, text })

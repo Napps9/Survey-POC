@@ -141,6 +141,11 @@ ko:
         variety_run: "%{type}이(가) %{n}회 연속 나와요 — 다른 답변 유형을 섞으세요."
         welcome_many: "환영 카드는 최대 한 개만 사용하세요 (현재 %{n})."
         static_tip: "긴 Verto — 집중력 유지를 위해 중간 휴식을 고려하세요."
+        board_heading: "잘된 점과 고칠 점"
+        board_hint: "신호등별로 분류 — 카드를 탭하면 해당 카드로 이동합니다."
+        whole_verto: "전체 Verto"
+        card_n: "카드 %{n}"
+        section_empty: "여기에는 없습니다."
     wizard:
       step_counter: "%{total}단계 중 %{n}단계"
   nav:

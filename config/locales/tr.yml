@@ -141,6 +141,11 @@ tr:
         variety_run: "%{type} arka arkaya %{n}× görünüyor — başka bir yanıt türüyle değiştirin."
         welcome_many: "En fazla bir karşılama kartı kullanın (şu an %{n})."
         static_tip: "Uzun Verto — enerjiyi korumak için ortada bir mola düşünün."
+        board_heading: "Neyin iyi olduğu ve neyin düzeltileceği"
+        board_hint: "Trafik ışığına göre gruplandı — gitmek için bir karta dokunun."
+        whole_verto: "Tüm Verto"
+        card_n: "Kart %{n}"
+        section_empty: "Burada bir şey yok."
     wizard:
       step_counter: Adım %{n} / %{total}
   nav:

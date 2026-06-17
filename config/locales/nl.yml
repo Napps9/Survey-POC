@@ -141,6 +141,11 @@ nl:
         variety_run: "%{type} verschijnt %{n}× achter elkaar — wissel af met een ander antwoordtype."
         welcome_many: "Gebruik hooguit één welkomstkaart (nu %{n})."
         static_tip: "Lang Verto — overweeg een pauze halverwege om de energie hoog te houden."
+        board_heading: "Wat goed is en wat beter kan"
+        board_hint: "Gegroepeerd per stoplicht — tik op een kaart om ernaartoe te gaan."
+        whole_verto: "Hele Verto"
+        card_n: "Kaart %{n}"
+        section_empty: "Niets hier."
     wizard:
       step_counter: Stap %{n} van %{total}
   nav:

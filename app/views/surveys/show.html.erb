@@ -184,21 +184,6 @@
             &nbsp;·&nbsp; <%= t("editor.estimated", count: est_min) %>
             &nbsp;·&nbsp; <span data-survey-editor-target="status" style="font-size: var(--text-sm);"></span>
           </span>
-
-          <%# Rules-of-the-Game overall score — click to see how the whole Verto
-              measures up and what to fix. Filled in by survey_editor_controller. %>
-          <div style="position:relative;">
-            <button type="button" class="verto-score" data-survey-editor-target="vertoScore"
-                    aria-expanded="false"
-                    title="<%= t('editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
-                    data-action="click->survey-editor#toggleVertoAnalysis">
-              <span class="rule-dot"></span>
-              <span class="verto-score-label"><%= t("editor.rules.score_label", default: "Verto score") %></span>
-              <span class="verto-score-num" data-role="verto-score-num">–</span>
-              <span class="verto-score-word" data-role="verto-score-word"></span>
-            </button>
-            <div class="verto-analysis" data-survey-editor-target="vertoAnalysis" hidden></div>
-          </div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <% unless live_locked %>
@@ -227,6 +212,25 @@
 
     <%# ── RIGHT: Answer type panel + Publish panel (toggled) ── %>
     <div class="right-column">
+
+    <%# Right-column tabs — Answer type ⇆ Verto score. The score tab carries the
+        live Rules-of-the-Game number/word (filled by survey_editor_controller);
+        clicking it opens the colour-grouped breakdown. The publish-panel
+        controller hides this strip while the Publish/Design overlays are open. %>
+    <div class="right-tabs" data-publish-panel-target="tabs">
+      <button type="button" class="right-tab is-active" data-publish-panel-target="typeTab"
+              data-action="click->publish-panel#showType"><%= t("editor.answer_type") %></button>
+      <button type="button" class="right-tab verto-score" data-survey-editor-target="vertoScore"
+              data-publish-panel-target="scoreTab"
+              aria-label="<%= t('js.editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
+              data-action="click->publish-panel#showScore">
+        <span class="rule-dot"></span>
+        <span class="verto-score-label"><%= t("js.editor.rules.score_label", default: "Verto score") %></span>
+        <span class="verto-score-num" data-role="verto-score-num">–</span>
+        <span class="verto-score-word" data-role="verto-score-word"></span>
+      </button>
+    </div>
+
     <div class="type-panel" data-publish-panel-target="typeView"
          data-controller="type-info" data-action="keydown.esc@window->type-info#closeOnEsc">
 
@@ -351,6 +355,24 @@
       </div>
 
     </div><%# /type panel %>
+
+    <%# ── Verto-score breakdown — the Rules-of-the-Game results grouped by
+        traffic light (red → amber → green), each row carrying what to change.
+        Filled in by survey_editor_controller#refreshScore. ── %>
+    <div class="type-panel hidden" data-publish-panel-target="scoreView">
+      <div class="type-panel-top">
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
+          <%= t("js.editor.rules.title", default: "Rules of the Game") %>
+        </div>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#fff;line-height:1.3;">
+          <%= t("js.editor.rules.board_heading", default: "What's working and what to fix") %>
+        </div>
+        <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;">
+          <%= t("js.editor.rules.board_hint", default: "Grouped by traffic light — tap a card to jump to it.") %>
+        </div>
+      </div>
+      <div class="score-board" data-survey-editor-target="scoreBoard"></div>
+    </div><%# /score panel %>
 
     <%# ── Publish & share panel (toggles in place of the answer-type panel) ── %>
     <div class="type-panel publish-panel hidden" data-publish-panel-target="publishView">
