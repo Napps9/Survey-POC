@@ -110,6 +110,37 @@ ko:
       fit_solid: 확실한 대안
       fit_workable: 사용 가능
       fit_sparingly: 제한적으로 사용
+      rules:
+        title: "게임의 규칙"
+        score_label: "Verto 점수"
+        cards_label: "카드"
+        card_aria: "이 카드가 게임의 규칙에 얼마나 부합하는지"
+        verto_aria: "이 Verto가 게임의 규칙에 얼마나 부합하는지"
+        rating_green: "완벽해요"
+        rating_yellow: "개선 가능"
+        rating_red: "보완 필요"
+        rating_info: "팁"
+        length_ok: "질문 길이가 적절합니다 (%{min}–%{max}자)."
+        length_short: "조금 짧아요 — %{min}–%{max}자를 목표로 하세요 (현재 %{n})."
+        length_long: "길어지고 있어요 — %{min}–%{max}자가 가장 좋아요 (현재 %{n})."
+        length_over: "너무 길어요 — 질문과 설명을 %{max}자 이내로 (현재 %{n})."
+        length_empty: "질문을 추가하세요."
+        count_ok: "답변 %{n}개 — 이상적인 %{min}–%{max} 범위입니다."
+        count_few: "답변이 %{n}개뿐 — %{min}–%{max}를 목표로 하세요."
+        count_many: "답변 %{n}개 — %{max}개 이하로 줄이세요."
+        count_even: "타일 %{n}개 — 균형 잡힌 그리드를 위해 짝수로 (기타 칸 포함)."
+        count_exact_ok: "%{n}점 척도 — 딱 좋아요."
+        count_exact: "정확히 %{exact}점을 사용하세요 (현재 %{n})."
+        option_ok: "답변 라벨이 짧고 읽기 쉬워요 (%{max}자 이하)."
+        option_long: "“%{opt}”을(를) %{max}자 이하로 줄이세요."
+        qcount_ok: "질문 %{n}개 — 이상적인 %{min}–%{max} 범위입니다."
+        qcount_few: "질문 %{n}개 — 몇 개만 더하면 이상적인 %{min}–%{max}에 도달해요."
+        qcount_min: "질문 %{n}개 — 최소 %{min}개를 목표로 하세요."
+        qcount_many: "질문 %{n}개 — 피로를 막기 위해 %{max}개 이하로 줄이세요."
+        variety_ok: "다양성이 좋아요 — 같은 답변 유형이 너무 자주 반복되지 않아요."
+        variety_run: "%{type}이(가) %{n}회 연속 나와요 — 다른 답변 유형을 섞으세요."
+        welcome_many: "환영 카드는 최대 한 개만 사용하세요 (현재 %{n})."
+        static_tip: "긴 Verto — 집중력 유지를 위해 중간 휴식을 고려하세요."
     wizard:
       step_counter: "%{total}단계 중 %{n}단계"
   nav:

@@ -110,6 +110,37 @@ pt:
       fit_solid: Alternativa sólida
       fit_workable: Viável
       fit_sparingly: Usar com moderação
+      rules:
+        title: "Regras do jogo"
+        score_label: "Pontuação do Verto"
+        cards_label: "Cartões"
+        card_aria: "Como este cartão pontua nas Regras do jogo"
+        verto_aria: "Como este Verto pontua nas Regras do jogo"
+        rating_green: "Perfeito"
+        rating_yellow: "Pode melhorar"
+        rating_red: "Precisa de trabalho"
+        rating_info: "Dica"
+        length_ok: "O comprimento da pergunta está ideal (%{min}–%{max} caracteres)."
+        length_short: "Um pouco curta — mire %{min}–%{max} caracteres (agora %{n})."
+        length_long: "Está ficando longa — %{min}–%{max} é o ideal (agora %{n})."
+        length_over: "Longa demais — mantenha a pergunta e a descrição em %{max} caracteres (agora %{n})."
+        length_empty: "Adicione uma pergunta."
+        count_ok: "%{n} respostas — dentro do ideal %{min}–%{max}."
+        count_few: "Apenas %{n} respostas — mire %{min}–%{max}."
+        count_many: "%{n} respostas — reduza para %{max} ou menos."
+        count_even: "%{n} blocos — use um número par para uma grade equilibrada (a caixa Outro conta)."
+        count_exact_ok: "Escala de %{n} pontos — perfeita."
+        count_exact: "Use exatamente %{exact} pontos (agora %{n})."
+        option_ok: "Os rótulos das respostas são curtos e legíveis (≤ %{max} caracteres)."
+        option_long: "Encurte “%{opt}” para %{max} caracteres ou menos."
+        qcount_ok: "%{n} perguntas — na faixa ideal %{min}–%{max}."
+        qcount_few: "%{n} perguntas — mais algumas alcançam o ideal %{min}–%{max}."
+        qcount_min: "%{n} perguntas — mire pelo menos %{min}."
+        qcount_many: "%{n} perguntas — reduza para %{max} ou menos para evitar a fadiga."
+        variety_ok: "Boa variedade — nenhum tipo de resposta se repete demais."
+        variety_run: "%{type} aparece %{n}× seguidas — alterne com outro tipo de resposta."
+        welcome_many: "Use no máximo um cartão de boas-vindas (agora %{n})."
+        static_tip: "Verto longo — considere uma pausa no meio para manter a energia."
     wizard:
       step_counter: Passo %{n} de %{total}
   nav:

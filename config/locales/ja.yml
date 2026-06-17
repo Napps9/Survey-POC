@@ -110,6 +110,37 @@ ja:
       fit_solid: 安定した代替
       fit_workable: 使用可能
       fit_sparingly: 慎重に使用
+      rules:
+        title: "ゲームのルール"
+        score_label: "Vertoスコア"
+        cards_label: "カード"
+        card_aria: "このカードがゲームのルールにどれだけ沿っているか"
+        verto_aria: "このVertoがゲームのルールにどれだけ沿っているか"
+        rating_green: "完璧"
+        rating_yellow: "改善の余地あり"
+        rating_red: "要改善"
+        rating_info: "ヒント"
+        length_ok: "質問の長さは理想的です（%{min}〜%{max}文字）。"
+        length_short: "少し短めです — %{min}〜%{max}文字を目指しましょう（現在%{n}）。"
+        length_long: "長くなっています — %{min}〜%{max}が最適です（現在%{n}）。"
+        length_over: "長すぎます — 質問と説明を%{max}文字以内に（現在%{n}）。"
+        length_empty: "質問を追加してください。"
+        count_ok: "%{n}個の回答 — 理想の%{min}〜%{max}の範囲内です。"
+        count_few: "回答が%{n}個のみ — %{min}〜%{max}を目指しましょう。"
+        count_many: "%{n}個の回答 — %{max}個以下に減らしましょう。"
+        count_even: "%{n}個のタイル — バランスの良いグリッドには偶数を（「その他」欄も含みます）。"
+        count_exact_ok: "%{n}段階スケール — ちょうど良いです。"
+        count_exact: "ちょうど%{exact}段階にしてください（現在%{n}）。"
+        option_ok: "回答ラベルは短く読みやすいです（%{max}文字以下）。"
+        option_long: "「%{opt}」を%{max}文字以下に短くしてください。"
+        qcount_ok: "%{n}問 — 理想の%{min}〜%{max}の範囲です。"
+        qcount_few: "%{n}問 — あと数問で理想の%{min}〜%{max}に届きます。"
+        qcount_min: "%{n}問 — 少なくとも%{min}問を目指しましょう。"
+        qcount_many: "%{n}問 — 疲労を避けるため%{max}問以下に減らしましょう。"
+        variety_ok: "良いバラエティです — 同じ回答タイプが多すぎません。"
+        variety_run: "%{type}が%{n}回連続しています — 別の回答タイプを挟みましょう。"
+        welcome_many: "ウェルカムカードは1枚までにしましょう（現在%{n}）。"
+        static_tip: "長いVerto — 集中力を保つため中盤に休憩を検討しましょう。"
     wizard:
       step_counter: "%{total}ステップ中 %{n}"
   nav:

@@ -110,6 +110,37 @@ fr:
       fit_solid: Alternative solide
       fit_workable: Acceptable
       fit_sparingly: À utiliser avec parcimonie
+      rules:
+        title: "Règles du jeu"
+        score_label: "Score du Verto"
+        cards_label: "Cartes"
+        card_aria: "Comment cette carte respecte les Règles du jeu"
+        verto_aria: "Comment ce Verto respecte les Règles du jeu"
+        rating_green: "Parfait"
+        rating_yellow: "À améliorer"
+        rating_red: "À retravailler"
+        rating_info: "Astuce"
+        length_ok: "La longueur de la question est idéale (%{min}–%{max} caractères)."
+        length_short: "Un peu courte — visez %{min}–%{max} caractères (actuellement %{n})."
+        length_long: "Ça s'allonge — %{min}–%{max} est l'idéal (actuellement %{n})."
+        length_over: "Trop longue — gardez la question et sa description sous %{max} caractères (actuellement %{n})."
+        length_empty: "Ajoutez une question."
+        count_ok: "%{n} réponses — dans l'idéal %{min}–%{max}."
+        count_few: "Seulement %{n} réponses — visez %{min}–%{max}."
+        count_many: "%{n} réponses — réduisez à %{max} ou moins."
+        count_even: "%{n} tuiles — utilisez un nombre pair pour une grille équilibrée (la case Autre compte)."
+        count_exact_ok: "Échelle à %{n} points — parfait."
+        count_exact: "Utilisez exactement %{exact} points (actuellement %{n})."
+        option_ok: "Les libellés de réponse sont courts et lisibles (≤ %{max} caractères)."
+        option_long: "Raccourcissez « %{opt} » à %{max} caractères ou moins."
+        qcount_ok: "%{n} questions — dans la plage idéale %{min}–%{max}."
+        qcount_few: "%{n} questions — quelques-unes de plus atteignent l'idéal %{min}–%{max}."
+        qcount_min: "%{n} questions — visez au moins %{min}."
+        qcount_many: "%{n} questions — réduisez à %{max} ou moins pour éviter la lassitude."
+        variety_ok: "Bonne variété — aucun type de réponse ne se répète trop."
+        variety_run: "%{type} apparaît %{n}× de suite — alternez avec un autre type de réponse."
+        welcome_many: "Utilisez au plus une carte de bienvenue (actuellement %{n})."
+        static_tip: "Verto long — pensez à une pause à mi-parcours pour garder le rythme."
     wizard:
       step_counter: Étape %{n} sur %{total}
   nav:

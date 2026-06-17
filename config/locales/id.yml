@@ -110,6 +110,37 @@ id:
       fit_solid: Alternatif solid
       fit_workable: Bisa digunakan
       fit_sparingly: Gunakan secukupnya
+      rules:
+        title: "Aturan Main"
+        score_label: "Skor Verto"
+        cards_label: "Kartu"
+        card_aria: "Seberapa sesuai kartu ini dengan Aturan Main"
+        verto_aria: "Seberapa sesuai Verto ini dengan Aturan Main"
+        rating_green: "Tepat sasaran"
+        rating_yellow: "Bisa lebih baik"
+        rating_red: "Perlu diperbaiki"
+        rating_info: "Tips"
+        length_ok: "Panjang pertanyaan sudah ideal (%{min}–%{max} karakter)."
+        length_short: "Agak pendek — targetkan %{min}–%{max} karakter (sekarang %{n})."
+        length_long: "Mulai panjang — %{min}–%{max} paling pas (sekarang %{n})."
+        length_over: "Terlalu panjang — jaga pertanyaan plus deskripsi di %{max} karakter (sekarang %{n})."
+        length_empty: "Tambahkan pertanyaan."
+        count_ok: "%{n} jawaban — dalam rentang ideal %{min}–%{max}."
+        count_few: "Hanya %{n} jawaban — targetkan %{min}–%{max}."
+        count_many: "%{n} jawaban — kurangi jadi %{max} atau kurang."
+        count_even: "%{n} ubin — gunakan jumlah genap agar kisi seimbang (kotak Lainnya ikut dihitung)."
+        count_exact_ok: "Skala %{n} poin — pas sekali."
+        count_exact: "Gunakan tepat %{exact} poin (sekarang %{n})."
+        option_ok: "Label jawaban singkat dan mudah dibaca (≤ %{max} karakter)."
+        option_long: "Persingkat “%{opt}” menjadi %{max} karakter atau kurang."
+        qcount_ok: "%{n} pertanyaan — dalam rentang ideal %{min}–%{max}."
+        qcount_few: "%{n} pertanyaan — beberapa lagi mencapai ideal %{min}–%{max}."
+        qcount_min: "%{n} pertanyaan — targetkan setidaknya %{min}."
+        qcount_many: "%{n} pertanyaan — kurangi jadi %{max} atau kurang agar tidak melelahkan."
+        variety_ok: "Variasi bagus — tidak ada tipe jawaban yang terlalu sering berulang."
+        variety_run: "%{type} muncul %{n}× berturut-turut — selingi dengan tipe jawaban lain."
+        welcome_many: "Gunakan paling banyak satu kartu sambutan (sekarang %{n})."
+        static_tip: "Verto panjang — pertimbangkan jeda di tengah agar tetap bersemangat."
     wizard:
       step_counter: Langkah %{n} dari %{total}
   nav:

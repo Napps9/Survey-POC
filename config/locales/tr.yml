@@ -110,6 +110,37 @@ tr:
       fit_solid: Sağlam alternatif
       fit_workable: Kullanılabilir
       fit_sparingly: Az kullanın
+      rules:
+        title: "Oyunun Kuralları"
+        score_label: "Verto puanı"
+        cards_label: "Kartlar"
+        card_aria: "Bu kartın Oyunun Kuralları'na göre durumu"
+        verto_aria: "Bu Verto'nun Oyunun Kuralları'na göre durumu"
+        rating_green: "Tam isabet"
+        rating_yellow: "Geliştirilebilir"
+        rating_red: "Üzerinde çalışın"
+        rating_info: "İpucu"
+        length_ok: "Soru uzunluğu ideal (%{min}–%{max} karakter)."
+        length_short: "Biraz kısa — %{min}–%{max} karakter hedefleyin (şu an %{n})."
+        length_long: "Uzuyor — %{min}–%{max} idealdir (şu an %{n})."
+        length_over: "Çok uzun — soru ve açıklamayı %{max} karakterde tutun (şu an %{n})."
+        length_empty: "Bir soru ekleyin."
+        count_ok: "%{n} yanıt — ideal aralıkta %{min}–%{max}."
+        count_few: "Yalnızca %{n} yanıt — %{min}–%{max} hedefleyin."
+        count_many: "%{n} yanıt — %{max} veya daha aza indirin."
+        count_even: "%{n} kutu — dengeli bir ızgara için çift sayı kullanın (Diğer kutusu dahil)."
+        count_exact_ok: "%{n} puanlık ölçek — tam kıvamında."
+        count_exact: "Tam olarak %{exact} puan kullanın (şu an %{n})."
+        option_ok: "Yanıt etiketleri kısa ve okunaklı (≤ %{max} karakter)."
+        option_long: "“%{opt}” ifadesini %{max} karaktere veya altına indirin."
+        qcount_ok: "%{n} soru — ideal aralıkta %{min}–%{max}."
+        qcount_few: "%{n} soru — birkaç tane daha ideal %{min}–%{max} aralığına ulaşır."
+        qcount_min: "%{n} soru — en az %{min} hedefleyin."
+        qcount_many: "%{n} soru — yorgunluğu önlemek için %{max} veya daha aza indirin."
+        variety_ok: "İyi çeşitlilik — hiçbir yanıt türü çok sık tekrarlanmıyor."
+        variety_run: "%{type} arka arkaya %{n}× görünüyor — başka bir yanıt türüyle değiştirin."
+        welcome_many: "En fazla bir karşılama kartı kullanın (şu an %{n})."
+        static_tip: "Uzun Verto — enerjiyi korumak için ortada bir mola düşünün."
     wizard:
       step_counter: Adım %{n} / %{total}
   nav:

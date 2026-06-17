@@ -110,6 +110,37 @@ it:
       fit_solid: Alternativa valida
       fit_workable: Utilizzabile
       fit_sparingly: Usa con parsimonia
+      rules:
+        title: "Regole del gioco"
+        score_label: "Punteggio del Verto"
+        cards_label: "Schede"
+        card_aria: "Come questa scheda rispetta le Regole del gioco"
+        verto_aria: "Come questo Verto rispetta le Regole del gioco"
+        rating_green: "Perfetto"
+        rating_yellow: "Migliorabile"
+        rating_red: "Da rivedere"
+        rating_info: "Suggerimento"
+        length_ok: "La lunghezza della domanda è ideale (%{min}–%{max} caratteri)."
+        length_short: "Un po' corta — punta a %{min}–%{max} caratteri (ora %{n})."
+        length_long: "Si sta allungando — %{min}–%{max} è l'ideale (ora %{n})."
+        length_over: "Troppo lunga — mantieni domanda e descrizione entro %{max} caratteri (ora %{n})."
+        length_empty: "Aggiungi una domanda."
+        count_ok: "%{n} risposte — nell'intervallo ideale %{min}–%{max}."
+        count_few: "Solo %{n} risposte — punta a %{min}–%{max}."
+        count_many: "%{n} risposte — riduci a %{max} o meno."
+        count_even: "%{n} caselle — usa un numero pari per una griglia equilibrata (la casella Altro conta)."
+        count_exact_ok: "Scala a %{n} punti — perfetta."
+        count_exact: "Usa esattamente %{exact} punti (ora %{n})."
+        option_ok: "Le etichette delle risposte sono brevi e leggibili (≤ %{max} caratteri)."
+        option_long: "Accorcia “%{opt}” a %{max} caratteri o meno."
+        qcount_ok: "%{n} domande — nell'intervallo ideale %{min}–%{max}."
+        qcount_few: "%{n} domande — un paio in più raggiungono l'ideale %{min}–%{max}."
+        qcount_min: "%{n} domande — punta ad almeno %{min}."
+        qcount_many: "%{n} domande — riduci a %{max} o meno per evitare la stanchezza."
+        variety_ok: "Buona varietà — nessun tipo di risposta si ripete troppo."
+        variety_run: "%{type} appare %{n}× di fila — alterna con un altro tipo di risposta."
+        welcome_many: "Usa al massimo una scheda di benvenuto (ora %{n})."
+        static_tip: "Verto lungo — valuta una pausa a metà per mantenere l'energia."
     wizard:
       step_counter: Passo %{n} di %{total}
   nav:

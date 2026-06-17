@@ -110,6 +110,37 @@ pl:
       fit_solid: Solidna alternatywa
       fit_workable: Do przyjęcia
       fit_sparingly: Używaj oszczędnie
+      rules:
+        title: "Zasady gry"
+        score_label: "Wynik Verto"
+        cards_label: "Karty"
+        card_aria: "Jak ta karta wypada według Zasad gry"
+        verto_aria: "Jak to Verto wypada według Zasad gry"
+        rating_green: "Idealnie"
+        rating_yellow: "Można poprawić"
+        rating_red: "Do poprawy"
+        rating_info: "Wskazówka"
+        length_ok: "Długość pytania jest optymalna (%{min}–%{max} znaków)."
+        length_short: "Trochę za krótkie — celuj w %{min}–%{max} znaków (teraz %{n})."
+        length_long: "Robi się długie — %{min}–%{max} jest idealne (teraz %{n})."
+        length_over: "Za długie — utrzymaj pytanie wraz z opisem do %{max} znaków (teraz %{n})."
+        length_empty: "Dodaj pytanie."
+        count_ok: "%{n} odpowiedzi — w idealnym zakresie %{min}–%{max}."
+        count_few: "Tylko %{n} odpowiedzi — celuj w %{min}–%{max}."
+        count_many: "%{n} odpowiedzi — ogranicz do %{max} lub mniej."
+        count_even: "%{n} kafelków — użyj parzystej liczby dla zrównoważonej siatki (pole Inne też się liczy)."
+        count_exact_ok: "Skala %{n}-punktowa — w sam raz."
+        count_exact: "Użyj dokładnie %{exact} punktów (teraz %{n})."
+        option_ok: "Etykiety odpowiedzi są krótkie i czytelne (≤ %{max} znaków)."
+        option_long: "Skróć „%{opt}” do %{max} znaków lub mniej."
+        qcount_ok: "%{n} pytań — w idealnym zakresie %{min}–%{max}."
+        qcount_few: "%{n} pytań — jeszcze kilka osiągnie idealne %{min}–%{max}."
+        qcount_min: "%{n} pytań — celuj w co najmniej %{min}."
+        qcount_many: "%{n} pytań — ogranicz do %{max} lub mniej, aby uniknąć zmęczenia."
+        variety_ok: "Dobra różnorodność — żaden typ odpowiedzi nie powtarza się zbyt często."
+        variety_run: "%{type} pojawia się %{n}× z rzędu — przeplataj innym typem odpowiedzi."
+        welcome_many: "Użyj najwyżej jednej karty powitalnej (teraz %{n})."
+        static_tip: "Długie Verto — rozważ przerwę w połowie, by utrzymać energię."
     wizard:
       step_counter: Krok %{n} z %{total}
   nav:

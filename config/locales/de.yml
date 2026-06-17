@@ -110,6 +110,37 @@ de:
       fit_solid: Solide Alternative
       fit_workable: Brauchbar
       fit_sparingly: Sparsam verwenden
+      rules:
+        title: "Spielregeln"
+        score_label: "Verto-Punktzahl"
+        cards_label: "Karten"
+        card_aria: "Wie diese Karte die Spielregeln erfüllt"
+        verto_aria: "Wie dieses Verto die Spielregeln erfüllt"
+        rating_green: "Perfekt"
+        rating_yellow: "Verbesserbar"
+        rating_red: "Überarbeiten"
+        rating_info: "Tipp"
+        length_ok: "Fragenlänge ist optimal (%{min}–%{max} Zeichen)."
+        length_short: "Etwas kurz — ziele auf %{min}–%{max} Zeichen (jetzt %{n})."
+        length_long: "Wird lang — %{min}–%{max} ist ideal (jetzt %{n})."
+        length_over: "Zu lang — halte Frage plus Beschreibung unter %{max} Zeichen (jetzt %{n})."
+        length_empty: "Füge eine Frage hinzu."
+        count_ok: "%{n} Antworten — im idealen Bereich %{min}–%{max}."
+        count_few: "Nur %{n} Antworten — ziele auf %{min}–%{max}."
+        count_many: "%{n} Antworten — auf %{max} oder weniger reduzieren."
+        count_even: "%{n} Kacheln — nutze eine gerade Anzahl für ein ausgewogenes Raster (das Feld „Sonstiges“ zählt mit)."
+        count_exact_ok: "%{n}-Punkte-Skala — genau richtig."
+        count_exact: "Nutze genau %{exact} Punkte (jetzt %{n})."
+        option_ok: "Antwortlabels sind kurz und gut lesbar (≤ %{max} Zeichen)."
+        option_long: "Kürze „%{opt}“ auf %{max} Zeichen oder weniger."
+        qcount_ok: "%{n} Fragen — im idealen Bereich %{min}–%{max}."
+        qcount_few: "%{n} Fragen — ein paar mehr erreichen das Ideal %{min}–%{max}."
+        qcount_min: "%{n} Fragen — ziele auf mindestens %{min}."
+        qcount_many: "%{n} Fragen — auf %{max} oder weniger reduzieren, um Ermüdung zu vermeiden."
+        variety_ok: "Gute Abwechslung — kein Antworttyp wiederholt sich zu oft."
+        variety_run: "%{type} kommt %{n}× hintereinander vor — wechsle den Antworttyp."
+        welcome_many: "Höchstens eine Willkommenskarte verwenden (jetzt %{n})."
+        static_tip: "Langes Verto — erwäge eine Pause in der Mitte, um die Energie zu halten."
     wizard:
       step_counter: Schritt %{n} von %{total}
   nav:

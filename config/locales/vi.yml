@@ -110,6 +110,37 @@ vi:
       fit_solid: Lựa chọn thay thế vững
       fit_workable: Có thể dùng được
       fit_sparingly: Dùng hạn chế
+      rules:
+        title: "Luật chơi"
+        score_label: "Điểm Verto"
+        cards_label: "Thẻ"
+        card_aria: "Mức độ thẻ này đạt Luật chơi"
+        verto_aria: "Mức độ Verto này đạt Luật chơi"
+        rating_green: "Chuẩn chỉnh"
+        rating_yellow: "Có thể cải thiện"
+        rating_red: "Cần chỉnh"
+        rating_info: "Mẹo"
+        length_ok: "Độ dài câu hỏi lý tưởng (%{min}–%{max} ký tự)."
+        length_short: "Hơi ngắn — hãy nhắm %{min}–%{max} ký tự (hiện %{n})."
+        length_long: "Đang dài — %{min}–%{max} là lý tưởng (hiện %{n})."
+        length_over: "Quá dài — giữ câu hỏi kèm mô tả trong %{max} ký tự (hiện %{n})."
+        length_empty: "Thêm một câu hỏi."
+        count_ok: "%{n} đáp án — trong khoảng lý tưởng %{min}–%{max}."
+        count_few: "Chỉ %{n} đáp án — hãy nhắm %{min}–%{max}."
+        count_many: "%{n} đáp án — giảm còn %{max} hoặc ít hơn."
+        count_even: "%{n} ô — dùng số chẵn để lưới cân đối (tính cả ô Khác)."
+        count_exact_ok: "Thang %{n} điểm — vừa khéo."
+        count_exact: "Dùng đúng %{exact} điểm (hiện %{n})."
+        option_ok: "Nhãn đáp án ngắn gọn, dễ đọc (≤ %{max} ký tự)."
+        option_long: "Rút gọn “%{opt}” còn %{max} ký tự hoặc ít hơn."
+        qcount_ok: "%{n} câu hỏi — trong khoảng lý tưởng %{min}–%{max}."
+        qcount_few: "%{n} câu hỏi — thêm vài câu nữa là đạt mức lý tưởng %{min}–%{max}."
+        qcount_min: "%{n} câu hỏi — hãy nhắm ít nhất %{min}."
+        qcount_many: "%{n} câu hỏi — giảm còn %{max} hoặc ít hơn để tránh mệt mỏi."
+        variety_ok: "Đa dạng tốt — không loại đáp án nào lặp lại quá nhiều."
+        variety_run: "%{type} xuất hiện %{n}× liên tiếp — xen kẽ loại đáp án khác."
+        welcome_many: "Dùng tối đa một thẻ chào mừng (hiện %{n})."
+        static_tip: "Verto dài — cân nhắc một quãng nghỉ giữa chừng để giữ năng lượng."
     wizard:
       step_counter: Bước %{n} / %{total}
   nav:

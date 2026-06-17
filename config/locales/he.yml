@@ -110,6 +110,37 @@ he:
       fit_solid: חלופה טובה
       fit_workable: ישים
       fit_sparingly: השתמש במשורה
+      rules:
+        title: "חוקי המשחק"
+        score_label: "ציון Verto"
+        cards_label: "כרטיסים"
+        card_aria: "עד כמה הכרטיס הזה עומד בחוקי המשחק"
+        verto_aria: "עד כמה ה-Verto הזה עומד בחוקי המשחק"
+        rating_green: "מושלם"
+        rating_yellow: "אפשר לשפר"
+        rating_red: "דורש עבודה"
+        rating_info: "טיפ"
+        length_ok: "אורך השאלה אידיאלי (%{min}–%{max} תווים)."
+        length_short: "קצת קצר — כוון ל-%{min}–%{max} תווים (כעת %{n})."
+        length_long: "מתארך — %{min}–%{max} הוא האידיאלי (כעת %{n})."
+        length_over: "ארוך מדי — שמור על השאלה והתיאור עד %{max} תווים (כעת %{n})."
+        length_empty: "הוסף שאלה."
+        count_ok: "%{n} תשובות — בטווח האידיאלי %{min}–%{max}."
+        count_few: "רק %{n} תשובות — כוון ל-%{min}–%{max}."
+        count_many: "%{n} תשובות — צמצם ל-%{max} או פחות."
+        count_even: "%{n} משבצות — השתמש במספר זוגי לרשת מאוזנת (תיבת «אחר» נספרת)."
+        count_exact_ok: "סולם של %{n} נקודות — בדיוק כמו שצריך."
+        count_exact: "השתמש בדיוק ב-%{exact} נקודות (כעת %{n})."
+        option_ok: "תוויות התשובות קצרות וקריאות (≤ %{max} תווים)."
+        option_long: "קצר את «%{opt}» ל-%{max} תווים או פחות."
+        qcount_ok: "%{n} שאלות — בטווח האידיאלי %{min}–%{max}."
+        qcount_few: "%{n} שאלות — עוד כמה יגיעו לאידיאלי %{min}–%{max}."
+        qcount_min: "%{n} שאלות — כוון ל-%{min} לפחות."
+        qcount_many: "%{n} שאלות — צמצם ל-%{max} או פחות כדי למנוע עייפות."
+        variety_ok: "מגוון טוב — אף סוג תשובה לא חוזר יותר מדי."
+        variety_run: "%{type} מופיע %{n}× ברצף — שלב סוג תשובה אחר."
+        welcome_many: "השתמש בכרטיס פתיחה אחד לכל היותר (כעת %{n})."
+        static_tip: "Verto ארוך — שקול הפסקה באמצע כדי לשמור על האנרגיה."
     wizard:
       step_counter: שלב %{n} מתוך %{total}
   nav:

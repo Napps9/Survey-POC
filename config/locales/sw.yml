@@ -110,6 +110,37 @@ sw:
       fit_solid: Mbadala thabiti
       fit_workable: Inaweza kutumika
       fit_sparingly: Tumia kwa uangalifu
+      rules:
+        title: "Kanuni za Mchezo"
+        score_label: "Alama ya Verto"
+        cards_label: "Kadi"
+        card_aria: "Jinsi kadi hii inavyofikia Kanuni za Mchezo"
+        verto_aria: "Jinsi Verto hii inavyofikia Kanuni za Mchezo"
+        rating_green: "Sahihi kabisa"
+        rating_yellow: "Inaweza kuboreshwa"
+        rating_red: "Inahitaji kazi"
+        rating_info: "Kidokezo"
+        length_ok: "Urefu wa swali uko sawa (herufi %{min}–%{max})."
+        length_short: "Fupi kidogo — lenga herufi %{min}–%{max} (sasa %{n})."
+        length_long: "Linakuwa refu — %{min}–%{max} ndio bora (sasa %{n})."
+        length_over: "Refu mno — weka swali pamoja na maelezo ndani ya herufi %{max} (sasa %{n})."
+        length_empty: "Ongeza swali."
+        count_ok: "Majibu %{n} — ndani ya kiwango bora %{min}–%{max}."
+        count_few: "Majibu %{n} tu — lenga %{min}–%{max}."
+        count_many: "Majibu %{n} — punguza hadi %{max} au chini."
+        count_even: "Vigae %{n} — tumia idadi shufwa kwa gridi iliyosawazishwa (kisanduku cha Nyingine kinahesabiwa)."
+        count_exact_ok: "Kipimo cha pointi %{n} — sawa kabisa."
+        count_exact: "Tumia pointi %{exact} haswa (sasa %{n})."
+        option_ok: "Lebo za majibu ni fupi na zinasomeka (≤ herufi %{max})."
+        option_long: "Fupisha “%{opt}” hadi herufi %{max} au chini."
+        qcount_ok: "Maswali %{n} — katika kiwango bora %{min}–%{max}."
+        qcount_few: "Maswali %{n} — machache zaidi yatafikia kiwango bora %{min}–%{max}."
+        qcount_min: "Maswali %{n} — lenga angalau %{min}."
+        qcount_many: "Maswali %{n} — punguza hadi %{max} au chini ili kuepuka uchovu."
+        variety_ok: "Aina nzuri — hakuna aina ya jibu inayojirudia mno."
+        variety_run: "%{type} inajitokeza mara %{n}× mfululizo — changanya na aina nyingine ya jibu."
+        welcome_many: "Tumia kadi moja tu ya karibu (sasa %{n})."
+        static_tip: "Verto refu — fikiria mapumziko ya katikati kudumisha ari."
     wizard:
       step_counter: Hatua %{n} kati ya %{total}
   nav:

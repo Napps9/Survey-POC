@@ -110,6 +110,37 @@ nl:
       fit_solid: Solide alternatief
       fit_workable: Werkbaar
       fit_sparingly: Spaarzaam gebruiken
+      rules:
+        title: "Spelregels"
+        score_label: "Verto-score"
+        cards_label: "Kaarten"
+        card_aria: "Hoe deze kaart scoort op de Spelregels"
+        verto_aria: "Hoe dit Verto scoort op de Spelregels"
+        rating_green: "Helemaal goed"
+        rating_yellow: "Kan beter"
+        rating_red: "Werk aan de winkel"
+        rating_info: "Tip"
+        length_ok: "Vraaglengte is ideaal (%{min}–%{max} tekens)."
+        length_short: "Iets te kort — mik op %{min}–%{max} tekens (nu %{n})."
+        length_long: "Wordt lang — %{min}–%{max} is ideaal (nu %{n})."
+        length_over: "Te lang — houd vraag plus beschrijving onder %{max} tekens (nu %{n})."
+        length_empty: "Voeg een vraag toe."
+        count_ok: "%{n} antwoorden — binnen het ideale %{min}–%{max}."
+        count_few: "Slechts %{n} antwoorden — mik op %{min}–%{max}."
+        count_many: "%{n} antwoorden — beperk tot %{max} of minder."
+        count_even: "%{n} tegels — gebruik een even aantal voor een gebalanceerd raster (het vak Overig telt mee)."
+        count_exact_ok: "Schaal van %{n} punten — precies goed."
+        count_exact: "Gebruik precies %{exact} punten (nu %{n})."
+        option_ok: "Antwoordlabels zijn kort en leesbaar (≤ %{max} tekens)."
+        option_long: "Kort “%{opt}” in tot %{max} tekens of minder."
+        qcount_ok: "%{n} vragen — in het ideale bereik %{min}–%{max}."
+        qcount_few: "%{n} vragen — een paar meer haalt het ideale %{min}–%{max}."
+        qcount_min: "%{n} vragen — mik op minstens %{min}."
+        qcount_many: "%{n} vragen — beperk tot %{max} of minder om vermoeidheid te voorkomen."
+        variety_ok: "Goede afwisseling — geen antwoordtype herhaalt te vaak."
+        variety_run: "%{type} verschijnt %{n}× achter elkaar — wissel af met een ander antwoordtype."
+        welcome_many: "Gebruik hooguit één welkomstkaart (nu %{n})."
+        static_tip: "Lang Verto — overweeg een pauze halverwege om de energie hoog te houden."
     wizard:
       step_counter: Stap %{n} van %{total}
   nav:

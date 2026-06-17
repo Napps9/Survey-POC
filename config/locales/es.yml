@@ -110,6 +110,37 @@ es:
       fit_solid: Buena alternativa
       fit_workable: Viable
       fit_sparingly: Usar con moderación
+      rules:
+        title: "Reglas del juego"
+        score_label: "Puntuación del Verto"
+        cards_label: "Tarjetas"
+        card_aria: "Cómo puntúa esta tarjeta según las Reglas del juego"
+        verto_aria: "Cómo puntúa este Verto según las Reglas del juego"
+        rating_green: "Perfecto"
+        rating_yellow: "Mejorable"
+        rating_red: "Necesita trabajo"
+        rating_info: "Consejo"
+        length_ok: "La longitud de la pregunta es ideal (%{min}–%{max} caracteres)."
+        length_short: "Un poco corta — apunta a %{min}–%{max} caracteres (ahora %{n})."
+        length_long: "Se está alargando — %{min}–%{max} es lo ideal (ahora %{n})."
+        length_over: "Demasiado larga — mantén la pregunta y su descripción en %{max} caracteres (ahora %{n})."
+        length_empty: "Añade una pregunta."
+        count_ok: "%{n} respuestas — dentro del ideal %{min}–%{max}."
+        count_few: "Solo %{n} respuestas — apunta a %{min}–%{max}."
+        count_many: "%{n} respuestas — reduce a %{max} o menos."
+        count_even: "%{n} casillas — usa un número par para una cuadrícula equilibrada (la casilla Otro cuenta)."
+        count_exact_ok: "Escala de %{n} puntos — perfecta."
+        count_exact: "Usa exactamente %{exact} puntos (ahora %{n})."
+        option_ok: "Las etiquetas de respuesta son cortas y legibles (≤ %{max} caracteres)."
+        option_long: "Acorta “%{opt}” a %{max} caracteres o menos."
+        qcount_ok: "%{n} preguntas — en el rango ideal %{min}–%{max}."
+        qcount_few: "%{n} preguntas — un par más alcanza el ideal %{min}–%{max}."
+        qcount_min: "%{n} preguntas — apunta al menos a %{min}."
+        qcount_many: "%{n} preguntas — reduce a %{max} o menos para evitar la fatiga."
+        variety_ok: "Buena variedad — ningún tipo de respuesta se repite demasiado."
+        variety_run: "%{type} aparece %{n}× seguidas — alterna con otro tipo de respuesta."
+        welcome_many: "Usa como máximo una tarjeta de bienvenida (ahora %{n})."
+        static_tip: "Verto largo — considera una pausa intermedia para mantener la energía."
     wizard:
       step_counter: Paso %{n} de %{total}
   nav:
