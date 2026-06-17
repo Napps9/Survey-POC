@@ -1722,16 +1722,16 @@
 .card-light {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 3px 10px 3px 8px; border-radius: 100px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  background: #1E2235; /* opaque — sits over the card backdrop, so no bleed-through */
   font-family: "ABeeZee", sans-serif; font-size: 11px;
-  color: rgba(255,255,255,0.85); cursor: pointer; line-height: 1.4;
-  transition: background 0.15s, border-color 0.15s;
+  color: rgba(255,255,255,0.92); cursor: pointer; line-height: 1.4;
+  transition: filter 0.15s, border-color 0.15s;
 }
-.card-light:hover     { background: rgba(255,255,255,0.1); }
-.card-light.is-green  { border-color: rgba(1,234,203,0.4);   background: rgba(1,234,203,0.1); }
-.card-light.is-yellow { border-color: rgba(255,250,119,0.4); background: rgba(255,250,119,0.1); }
-.card-light.is-red    { border-color: rgba(255,30,111,0.4);  background: rgba(255,30,111,0.12); }
+.card-light:hover     { filter: brightness(1.25); }
+.card-light.is-green  { border-color: rgba(1,234,203,0.6);   background: #0F302D; }
+.card-light.is-yellow { border-color: rgba(255,250,119,0.55); background: #2E2A12; }
+.card-light.is-red    { border-color: rgba(255,30,111,0.6);  background: #321826; }
 .card-light-word  { font-weight: 600; }
 .card-light-score {
   font-family: "Alata", sans-serif; font-size: 10px;
@@ -3502,7 +3502,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .card-delete-btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 6px 14px; border-radius: 100px;
-  background: rgba(255,30,111,0.16); border: 1.5px solid #FF1E6F;
+  background: #341A27; border: 1.5px solid #FF1E6F; /* opaque, not see-through */
   color: #FF1E6F; font-family: "ABeeZee", sans-serif; font-size: 12.5px;
   letter-spacing: 0.02em; cursor: pointer; transition: all 0.15s;
 }
