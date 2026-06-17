@@ -511,7 +511,7 @@ export default class extends Controller {
 
   _buildDistribution(row, mine) {
     const container = document.createElement("div")
-    container.style.cssText = "display:flex;flex-direction:column;gap:6px;"
+    container.style.cssText = "display:flex;flex-direction:column;gap:14px;"
 
     const counts = row.counts || {}
     let entries = []
@@ -534,7 +534,11 @@ export default class extends Controller {
         entries.push([`${label} — No`,  no,  `${label}:no`,  sum])
       })
     } else {
-      entries = Object.entries(counts).map(([label, n]) => [label, n, label])
+      // Unordered options (multiple choice, yes/no, …) read best as a ranked
+      // chart — most popular first.
+      entries = Object.entries(counts)
+        .map(([label, n]) => [label, n, label])
+        .sort((a, b) => b[1] - a[1])
     }
 
     if (entries.length === 0) return null
@@ -562,25 +566,37 @@ export default class extends Controller {
 
   _buildBar(label, count, pct, isMine) {
     const row = document.createElement("div")
-    row.style.cssText = "display:flex;align-items:center;gap:8px;"
+    row.style.cssText = "display:flex;flex-direction:column;gap:5px;"
+
+    // Header: full label (the respondent's choice is dotted + brand-coloured),
+    // a prominent percentage, and the raw count.
+    const head = document.createElement("div")
+    head.style.cssText = "display:flex;align-items:baseline;gap:8px;"
 
     const lbl = document.createElement("span")
-    lbl.style.cssText = `font-family:'ABeeZee',sans-serif;font-size:11px;color:${isMine ? "var(--brand-primary,#01EACB)" : "rgba(255,255,255,0.7)"};min-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`
-    lbl.title = label
+    lbl.style.cssText = `flex:1;min-width:0;font-family:'ABeeZee',sans-serif;font-size:12px;line-height:1.35;color:${isMine ? "var(--brand-primary,#01EACB)" : "rgba(255,255,255,0.82)"};`
     lbl.textContent = (isMine ? "● " : "") + label
-    row.appendChild(lbl)
-
-    const track = document.createElement("div")
-    track.style.cssText = "flex:1;height:7px;border-radius:4px;background:rgba(255,255,255,0.06);overflow:hidden;"
-    const fill = document.createElement("div")
-    fill.style.cssText = `height:100%;border-radius:4px;background:${isMine ? "var(--brand-primary,#01EACB)" : "rgba(255,255,255,0.35)"};width:${pct}%;`
-    track.appendChild(fill)
-    row.appendChild(track)
+    head.appendChild(lbl)
 
     const pctEl = document.createElement("span")
-    pctEl.style.cssText = "font-family:'Alata',sans-serif;font-size:10px;color:rgba(255,255,255,0.5);min-width:46px;text-align:right;"
-    pctEl.textContent = `${count} (${pct}%)`
-    row.appendChild(pctEl)
+    pctEl.style.cssText = "flex-shrink:0;font-family:'Alata',sans-serif;font-size:14px;color:#fff;"
+    pctEl.textContent = `${pct}%`
+    head.appendChild(pctEl)
+
+    const countEl = document.createElement("span")
+    countEl.style.cssText = "flex-shrink:0;min-width:22px;text-align:right;font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);"
+    countEl.textContent = count
+    head.appendChild(countEl)
+    row.appendChild(head)
+
+    // Thicker track with a fill that animates up from zero on render.
+    const track = document.createElement("div")
+    track.style.cssText = "height:10px;border-radius:5px;background:rgba(255,255,255,0.07);overflow:hidden;"
+    const fill = document.createElement("div")
+    fill.style.cssText = `height:100%;border-radius:5px;width:0;transition:width 0.7s cubic-bezier(0.16,1,0.3,1);background:${isMine ? "var(--brand-primary,#01EACB)" : "rgba(255,255,255,0.3)"};`
+    track.appendChild(fill)
+    row.appendChild(track)
+    requestAnimationFrame(() => { fill.style.width = `${pct}%` })
 
     return row
   }
