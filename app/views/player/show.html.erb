@@ -50,10 +50,15 @@
       be top banners; they now live on the welcome card (player/welcome_intake)
       to free up screen space. %>
 
-  <%# No top nav bar — the Verto's logo/title used to live here, but removing
-      it gives the card more screen. The org's brand still shows on the
-      thank-you screen. A slim language switcher stays for multilingual
-      Vertos so respondents can still change the content language. %>
+  <%# Client brand: the publishing org's logo, centered at the top. No title bar
+      (the old nav was dropped for space) — this restores just the logo, kept
+      slim so the card still gets the screen. %>
+  <div class="player-brandbar">
+    <%= brand_logo_tag @survey.organisation, style: "height:28px;width:auto;max-width:150px;display:block;" %>
+  </div>
+
+  <%# Slim content-language switcher for multilingual Vertos, so respondents can
+      still change the content language. %>
   <% if @survey.multilingual? %>
     <div class="player-lang-bar">
       <%= render "player/content_lang_switcher" %>
