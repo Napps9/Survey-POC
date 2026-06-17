@@ -17,6 +17,7 @@ hi:
     answer_placeholder: उत्तर लिखें…
     characters: वर्ण
     allow_other: "“अन्य” मुक्त-पाठ उत्तर की अनुमति दें"
+    required: "अनिवार्य प्रश्न"
     other: अन्य
     other_placeholder: अपने शब्दों में बताएं…
   auth:
@@ -78,6 +79,7 @@ hi:
     powered_by: द्वारा संचालित
     share: "साझा करें"
     visit_website: "वेबसाइट देखें"
+    required_hint: "जारी रखने के लिए कृपया इस प्रश्न का उत्तर दें।"
     comparison_title: आपके उत्तर बनाम सभी
     back: "← वापस"
     next: आगे →

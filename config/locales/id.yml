@@ -17,6 +17,7 @@ id:
     answer_placeholder: Ketik jawaban…
     characters: Karakter
     allow_other: Izinkan jawaban teks bebas "Lainnya"
+    required: "Pertanyaan wajib"
     other: Lainnya
     other_placeholder: Beri tahu kami dengan kata-kata Anda sendiri…
   auth:
@@ -78,6 +79,7 @@ id:
     powered_by: Didukung oleh
     share: "Bagikan"
     visit_website: "Kunjungi situs web"
+    required_hint: "Harap jawab pertanyaan ini untuk melanjutkan."
     comparison_title: Jawaban Anda vs semua orang
     back: "← Kembali"
     next: Lanjut →

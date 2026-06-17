@@ -293,6 +293,15 @@ export default class extends Controller {
     this.markDirty()
   }
 
+  // Required is a pure data flag (no card-light effect), so just record it on
+  // the wrap and autosave; serialize() carries it into the card JSON.
+  toggleRequired(event) {
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    if (!card) return
+    card.dataset.cardRequired = event.currentTarget.checked ? "true" : "false"
+    this.markDirty()
+  }
+
   markDirty() {
     // Repaint the card being edited (or everything on a structural change) and
     // the overall score, so the lights track edits as they're typed.
@@ -324,6 +333,7 @@ export default class extends Controller {
       const image = card.dataset.cardImage
       if (image) out.image = image
       if (card.dataset.cardAllowOther === "true") out.allow_other = true
+      if (card.dataset.cardRequired === "true") out.required = true
 
       const primOpts = (prim.options || []).map(o => (o || "").trim()).filter(Boolean)
       if (primOpts.length) out.options = primOpts

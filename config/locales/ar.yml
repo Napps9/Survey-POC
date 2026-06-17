@@ -17,6 +17,7 @@ ar:
     answer_placeholder: اكتب الإجابة…
     characters: الأحرف
     allow_other: السماح بإجابة "أخرى" بنص حر
+    required: "سؤال إلزامي"
     other: أخرى
     other_placeholder: أخبرنا بكلماتك الخاصة…
   auth:
@@ -78,6 +79,7 @@ ar:
     powered_by: مدعوم من
     share: "مشاركة"
     visit_website: "زيارة الموقع"
+    required_hint: "يرجى الإجابة على هذا السؤال للمتابعة."
     comparison_title: إجاباتك مقابل الجميع
     back: "← رجوع"
     next: التالي ←

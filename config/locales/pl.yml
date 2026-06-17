@@ -17,6 +17,7 @@ pl:
     answer_placeholder: Wpisz odpowiedź…
     characters: Znaki
     allow_other: Zezwól na odpowiedź „Inne” w formie tekstu
+    required: "Pytanie obowiązkowe"
     other: Inne
     other_placeholder: Powiedz nam własnymi słowami…
   auth:
@@ -78,6 +79,7 @@ pl:
     powered_by: Działa dzięki
     share: "Udostępnij"
     visit_website: "Odwiedź stronę"
+    required_hint: "Odpowiedz na to pytanie, aby kontynuować."
     comparison_title: Twoje odpowiedzi vs wszyscy
     back: "← Wstecz"
     next: Dalej →

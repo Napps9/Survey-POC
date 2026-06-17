@@ -17,6 +17,7 @@ nl:
     answer_placeholder: Typ je antwoord…
     characters: Tekens
     allow_other: Sta een vrij tekstantwoord “Anders” toe
+    required: "Verplichte vraag"
     other: Anders
     other_placeholder: Vertel het in je eigen woorden…
   auth:
@@ -78,6 +79,7 @@ nl:
     powered_by: Mogelijk gemaakt door
     share: "Delen"
     visit_website: "Website bezoeken"
+    required_hint: "Beantwoord deze vraag om door te gaan."
     comparison_title: Jouw antwoorden vs iedereen
     back: "← Terug"
     next: Volgende →

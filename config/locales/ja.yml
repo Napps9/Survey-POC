@@ -17,6 +17,7 @@ ja:
     answer_placeholder: 回答を入力…
     characters: 文字数
     allow_other: "「その他」の自由記述回答を許可"
+    required: "必須の質問"
     other: その他
     other_placeholder: ご自身の言葉でお聞かせください…
   auth:
@@ -78,6 +79,7 @@ ja:
     powered_by: Powered by
     share: "シェア"
     visit_website: "ウェブサイトを見る"
+    required_hint: "続けるにはこの質問に回答してください。"
     comparison_title: あなたの回答 vs 全員
     back: "← 戻る"
     next: 次へ →

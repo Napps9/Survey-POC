@@ -17,6 +17,7 @@ de:
     answer_placeholder: Antwort eingeben…
     characters: Zeichen
     allow_other: "„Andere“-Freitextantwort erlauben"
+    required: "Pflichtfrage"
     other: Andere
     other_placeholder: Sag es uns in eigenen Worten…
   auth:
@@ -78,6 +79,7 @@ de:
     powered_by: Bereitgestellt von
     share: "Teilen"
     visit_website: "Website besuchen"
+    required_hint: "Bitte beantworte diese Frage, um fortzufahren."
     comparison_title: Deine Antworten vs. alle anderen
     back: "← Zurück"
     next: Weiter →

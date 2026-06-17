@@ -17,6 +17,7 @@ uk:
     answer_placeholder: Введіть відповідь…
     characters: Символи
     allow_other: Дозволити вільну відповідь «Інше»
+    required: "Обов'язкове питання"
     other: Інше
     other_placeholder: Розкажіть своїми словами…
   auth:
@@ -78,6 +79,7 @@ uk:
     powered_by: Працює на
     share: "Поділитися"
     visit_website: "Перейти на сайт"
+    required_hint: "Будь ласка, дайте відповідь на це питання, щоб продовжити."
     comparison_title: Ваші відповіді проти всіх
     back: "← Назад"
     next: Далі →

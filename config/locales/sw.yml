@@ -17,6 +17,7 @@ sw:
     answer_placeholder: Andika jibu…
     characters: Herufi
     allow_other: Ruhusu jibu huru la "Nyingine"
+    required: "Swali la lazima"
     other: Nyingine
     other_placeholder: Tuambie kwa maneno yako mwenyewe…
   auth:
@@ -78,6 +79,7 @@ sw:
     powered_by: Inaendeshwa na
     share: "Shiriki"
     visit_website: "Tembelea tovuti"
+    required_hint: "Tafadhali jibu swali hili ili kuendelea."
     comparison_title: Majibu yako dhidi ya kila mtu
     back: "← Rudi"
     next: Endelea →

@@ -14,6 +14,7 @@
      data-card-num="<%= idx + 1 %>"
      data-card-image="<%= card['image'].to_s %>"
      data-card-allow-other="<%= card['allow_other'] ? 'true' : 'false' %>"
+     data-card-required="<%= card['required'] ? 'true' : 'false' %>"
      data-card-options="<%= Array(card['options']).to_json %>"
      data-card-option-images="<%= Array(card['option_images']).to_json %>"
      data-card-recommended-images="<%= AssetPopulator.recommended_paths(@survey, context: :card, card: card).to_json %>"

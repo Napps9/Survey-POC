@@ -17,6 +17,7 @@ vi:
     answer_placeholder: Nhập câu trả lời…
     characters: Ký tự
     allow_other: Cho phép câu trả lời tự do "Khác"
+    required: "Câu hỏi bắt buộc"
     other: Khác
     other_placeholder: Hãy chia sẻ bằng lời của bạn…
   auth:
@@ -78,6 +79,7 @@ vi:
     powered_by: Được cung cấp bởi
     share: "Chia sẻ"
     visit_website: "Truy cập trang web"
+    required_hint: "Vui lòng trả lời câu hỏi này để tiếp tục."
     comparison_title: Câu trả lời của bạn so với mọi người
     back: "← Quay lại"
     next: Tiếp →

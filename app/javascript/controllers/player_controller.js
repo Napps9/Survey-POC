@@ -5,7 +5,7 @@ export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta",
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
-                    "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn"]
+                    "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
@@ -31,6 +31,7 @@ export default class extends Controller {
 
   next() {
     this._capture(this.currentValue)
+    if (!this._requireGuard(this.currentValue)) return
     this._saveProgress()
     if (this.currentValue < this.cardTargets.length - 1) {
       this.currentValue++
@@ -99,6 +100,7 @@ export default class extends Controller {
 
   async finish() {
     this._capture(this.currentValue)
+    if (!this._requireGuard(this.currentValue)) return
     // Owner preview runs without a submit endpoint — nothing is recorded,
     // just show the thank-you screen.
     if (!this.submitUrlValue) return this._showThankyou(false)
@@ -182,6 +184,39 @@ export default class extends Controller {
   _isAnswered(value) {
     if (Array.isArray(value)) return value.length > 0
     return value !== null && value !== undefined && value !== ""
+  }
+
+  // Whether the card at `idx` has a usable answer (a value, or free-text Other).
+  _isCardAnswered(idx) {
+    const a = this._answers[String(idx)]
+    if (!a) return false
+    if (a.other && a.other.trim()) return true
+    return this._isAnswered(a.value)
+  }
+
+  // Required gate: a card marked data-card-required must be answered before the
+  // player advances past it. Returns true when it's safe to proceed.
+  _requireGuard(idx) {
+    const card = this.cardTargets[idx]
+    if (!card || card.dataset.cardRequired !== "true" || this._isCardAnswered(idx)) {
+      this._clearRequiredHint()
+      return true
+    }
+    this._showRequiredHint(card)
+    return false
+  }
+
+  _showRequiredHint(card) {
+    if (this.hasRequiredHintTarget) this.requiredHintTarget.classList.remove("hidden")
+    if (card) {
+      card.classList.remove("card-shake")
+      void card.offsetWidth // reflow so the shake restarts on a repeated tap
+      card.classList.add("card-shake")
+    }
+  }
+
+  _clearRequiredHint() {
+    if (this.hasRequiredHintTarget) this.requiredHintTarget.classList.add("hidden")
   }
 
   _capture(idx) {
@@ -539,6 +574,7 @@ export default class extends Controller {
   }
 
   _update() {
+    this._clearRequiredHint()
     const total = this.cardTargets.length
     const idx   = this.currentValue
     this.cardTargets.forEach((c, i) => c.classList.toggle("active", i === idx))

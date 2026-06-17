@@ -2446,6 +2446,22 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   color: rgba(255,255,255,0.45); max-width: 380px; line-height: 1.6;
 }
 
+/* Inline nudge shown above the footer when a required question is unanswered. */
+.preview-required-hint {
+  flex-shrink: 0; display: block;
+  text-align: center; padding: 8px 16px 0;
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #FFC24B;
+}
+.preview-required-hint.hidden { display: none; }
+
+/* Brief shake to draw the eye to the unanswered card. */
+@keyframes card-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.preview-card.card-shake { animation: card-shake 0.4s ease; }
+
 .preview-footer {
   flex-shrink: 0; height: 80px;
   display: flex; align-items: center; justify-content: center;

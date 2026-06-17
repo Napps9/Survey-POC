@@ -17,6 +17,7 @@ tr:
     answer_placeholder: Cevabı yazın…
     characters: Karakter
     allow_other: '"Diğer" serbest metin yanıtına izin ver'
+    required: "Zorunlu soru"
     other: Diğer
     other_placeholder: Kendi sözcüklerinizle anlatın…
   auth:
@@ -78,6 +79,7 @@ tr:
     powered_by: Destekleyen
     share: "Paylaş"
     visit_website: "Web sitesini ziyaret et"
+    required_hint: "Devam etmek için lütfen bu soruyu yanıtlayın."
     comparison_title: Yanıtlarınız vs herkes
     back: "← Geri"
     next: İleri →

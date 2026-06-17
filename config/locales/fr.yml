@@ -17,6 +17,7 @@ fr:
     answer_placeholder: Saisissez votre réponse…
     characters: Caractères
     allow_other: Autoriser une réponse libre « Autre »
+    required: "Question obligatoire"
     other: Autre
     other_placeholder: Dites-le avec vos propres mots…
   auth:
@@ -78,6 +79,7 @@ fr:
     powered_by: Propulsé par
     share: "Partager"
     visit_website: "Visiter le site web"
+    required_hint: "Veuillez répondre à cette question pour continuer."
     comparison_title: Vos réponses vs tout le monde
     back: "← Retour"
     next: Suivant →

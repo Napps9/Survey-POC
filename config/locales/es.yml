@@ -17,6 +17,7 @@ es:
     answer_placeholder: Escribe tu respuesta…
     characters: Caracteres
     allow_other: Permitir respuesta libre «Otro»
+    required: "Pregunta obligatoria"
     other: Otro
     other_placeholder: Cuéntanos con tus propias palabras…
   auth:
@@ -78,6 +79,7 @@ es:
     powered_by: Desarrollado por
     share: "Compartir"
     visit_website: "Visitar el sitio web"
+    required_hint: "Responde esta pregunta para continuar."
     comparison_title: Tus respuestas vs todos
     back: "← Atrás"
     next: Siguiente →

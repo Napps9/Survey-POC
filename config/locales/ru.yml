@@ -17,6 +17,7 @@ ru:
     answer_placeholder: Введите ответ…
     characters: Символы
     allow_other: Разрешить свободный ответ «Другое»
+    required: "Обязательный вопрос"
     other: Другое
     other_placeholder: Напишите своими словами…
   auth:
@@ -78,6 +79,7 @@ ru:
     powered_by: На базе
     share: "Поделиться"
     visit_website: "Перейти на сайт"
+    required_hint: "Пожалуйста, ответьте на этот вопрос, чтобы продолжить."
     comparison_title: Ваши ответы vs все остальные
     back: "← Назад"
     next: Далее →

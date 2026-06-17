@@ -81,7 +81,8 @@
       <div class="preview-card"
            data-player-target="card"
            data-card-index="<%= idx %>"
-           data-card-type="<%= type %>">
+           data-card-type="<%= type %>"
+           data-card-required="<%= (is_q && card['required']) ? 'true' : 'false' %>">
         <%= render "player/play_card", card: card, progress: prog,
               locale: @display_locale, default_locale: @survey.default_locale %>
       </div>
@@ -198,6 +199,12 @@
         </div>
       <% end %>
     </div>
+  </div>
+
+  <%# Shown when the respondent tries to advance past a required, unanswered
+      question; cleared as soon as they move on. %>
+  <div class="preview-required-hint hidden" data-player-target="requiredHint">
+    <%= t("player.required_hint") %>
   </div>
 
   <div class="preview-footer">

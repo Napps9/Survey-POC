@@ -19,6 +19,7 @@ en:
     answer_placeholder: "Type answer…"
     characters: "Characters"
     allow_other: "Allow “Other” free-text answer"
+    required: "Required question"
     other: "Other"
     other_placeholder: "Tell us in your own words…"
   auth:
@@ -80,6 +81,7 @@ en:
     powered_by: "Powered by"
     share: "Share"
     visit_website: "Visit website"
+    required_hint: "Please answer this question to continue."
     comparison_title: "Your answers vs everyone"
     back: "← Back"
     next: "Next →"

@@ -17,6 +17,7 @@ he:
     answer_placeholder: הקלד תשובה…
     characters: תווים
     allow_other: אפשר תשובה חופשית מסוג ״אחר״
+    required: "שאלת חובה"
     other: אחר
     other_placeholder: ספר לנו במילים שלך…
   auth:
@@ -78,6 +79,7 @@ he:
     powered_by: מופעל על ידי
     share: "שיתוף"
     visit_website: "מעבר לאתר"
+    required_hint: "נא לענות על שאלה זו כדי להמשיך."
     comparison_title: התשובות שלך מול כולם
     back: "← חזרה"
     next: הבא →
