@@ -36,9 +36,15 @@ gem "bootsnap", require: false
 gem "anthropic", "~> 1.40"
 gem "csv"
 
+# AI results report → PDF download + Google Doc
+gem "kramdown"               # Markdown → HTML for the report body
+gem "wicked_pdf"             # HTML → PDF for the downloadable report
+gem "wkhtmltopdf-binary"     # bundles the wkhtmltopdf binary (no system install)
+
 # Google Sheets export (per-user OAuth)
 gem "googleauth"             # Signet OAuth2: authorize URL, code exchange, token refresh
 gem "google-apis-sheets_v4"  # create spreadsheet + write values (Drive API not needed)
+gem "google-apis-drive_v3"   # create the AI report as a Google Doc in the user's Drive
 
 # Social sign-in with Google. Activates only when GOOGLE_CLIENT_ID/SECRET are
 # present in the environment — see .env.example.

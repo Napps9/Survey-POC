@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_17_150138) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_18_132731) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -228,6 +228,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_17_150138) do
     t.integer "organisation_id", null: false
     t.string "publish_token"
     t.datetime "published_at"
+    t.text "results_report"
+    t.integer "results_report_response_count"
     t.text "results_summary"
     t.integer "results_summary_response_count"
     t.boolean "show_results_comparison", default: false, null: false

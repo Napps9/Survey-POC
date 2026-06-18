@@ -55,6 +55,8 @@ Rails.application.routes.draw do
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results
   get  "surveys/:survey_id/results/export",       to: "results_exports#show",         as: :survey_results_export
   post "surveys/:survey_id/results/google_sheet", to: "google_sheets_exports#create", as: :survey_google_sheet
+  get  "surveys/:survey_id/results/report",       to: "results_reports#show",         as: :survey_results_report
+  post "surveys/:survey_id/results/google_drive", to: "google_drive_exports#create",  as: :survey_google_drive
   post "surveys/:id/generate_card",   to: "surveys#generate_card", as: :generate_survey_card
   post "surveys/:id/render_card",     to: "surveys#render_card",   as: :render_survey_card
   get  "surveys/:id/results/summary", to: "survey_summaries#show",  as: :survey_results_summary

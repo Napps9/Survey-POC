@@ -192,6 +192,37 @@
                         onmouseover: "this.style.background='rgba(1,234,203,0.2)'", onmouseout: "this.style.background='rgba(1,234,203,0.12)'" %>
                 <% end %>
               <% end %>
+
+              <%# ── AI Report: generate → preview, download PDF, save to Google Drive ── %>
+              <div data-controller="report-export"
+                   data-report-export-report-url-value="<%= survey_results_report_path(@survey, format: :json) %>"
+                   data-report-export-drive-url-value="<%= survey_google_drive_path(@survey) %>"
+                   style="display:inline-flex;">
+                <button type="button" data-action="click->report-export#open"
+                        style="cursor:pointer;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#1C2034;background:#01EACB;border:none;padding:5px 14px;border-radius:8px;white-space:nowrap;font-weight:600;">✨ AI Report</button>
+
+                <div class="report-modal hidden" data-report-export-target="modal" data-action="click->report-export#backdrop">
+                  <div class="report-modal-card" data-action="click->report-export#stop">
+                    <div class="report-modal-head">
+                      <span>✨ AI Report</span>
+                      <button type="button" class="report-modal-x" data-action="click->report-export#close" aria-label="Close">✕</button>
+                    </div>
+                    <div class="report-modal-body">
+                      <div data-report-export-target="status" class="report-modal-status"></div>
+                      <div data-report-export-target="body" class="report-doc"></div>
+                    </div>
+                    <div class="report-modal-foot">
+                      <a href="<%= survey_results_report_path(@survey, format: :pdf) %>" data-turbo="false"
+                         class="report-foot-btn report-foot-primary">⤓ Download PDF</a>
+                      <% if google_sheets_configured? %>
+                        <button type="button" class="report-foot-btn" data-action="click->report-export#saveDrive" data-report-export-target="driveBtn">Save to Google Drive</button>
+                        <span class="report-foot-status" data-report-export-target="driveStatus"></span>
+                      <% end %>
+                      <button type="button" class="report-foot-btn report-foot-close" data-action="click->report-export#close" style="margin-left:auto;">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
