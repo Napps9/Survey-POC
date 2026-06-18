@@ -277,6 +277,7 @@
   width: 425px;                 /* equal half of 850 */
   flex: 0 0 425px;
   padding: 36px 32px;
+  position: relative;           /* anchors the welcome-card logo overlay */
   display: flex;
   flex-direction: column;
   justify-content: center;      /* vertical centring */
@@ -2396,9 +2397,9 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 }
 .preview-close-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
 
-/* Creator's logo, centred at the top of the welcome card's left panel
-   (shared/_split_left). Only rendered when a logo is actually uploaded. */
-.split-left-logo {
+/* Creator's logo, centred at the top of the welcome card's right (content)
+   panel (shared/_card_component). Only rendered when a logo is uploaded. */
+.split-right-logo {
   position: absolute; top: 22px; inset-inline: 0; z-index: 2;
   display: flex; justify-content: center; align-items: center;
 }

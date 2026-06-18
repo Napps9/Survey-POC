@@ -39,6 +39,14 @@
 
 <div class="split-right">
 
+  <%# Creator's logo, centred at the top of the right (content) panel on the
+      welcome card — player only, and only when a logo is actually uploaded. %>
+  <% if mode == :player && type == "welcome_card" && @survey&.organisation&.logo&.attached? %>
+    <div class="split-right-logo">
+      <%= brand_logo_tag @survey.organisation, style: "height:34px;width:auto;max-width:60%;display:block;" %>
+    </div>
+  <% end %>
+
   <%# Question heading group — wrapped so the player mobile theme can drop
       a single white panel behind the eyebrow + title + subtitle when a
       themed mobile background is in play. %>
