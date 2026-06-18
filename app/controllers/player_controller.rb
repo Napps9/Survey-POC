@@ -5,6 +5,17 @@ class PlayerController < ApplicationController
   skip_before_action :set_current_organisation
   protect_from_forgery with: :null_session, only: [ :submit, :progress ]
 
+  # Public, unauthenticated write endpoints — cap per-IP request rate so one
+  # source can't flood responses (results poisoning / storage abuse). Limits are
+  # deliberately high: a real respondent sends one submit and a handful of
+  # progress pings, but many respondents can legitimately share one public IP
+  # (event/venue Wi‑Fi behind NAT), so these only stop pathological floods.
+  # Raise them if you run large single-IP events. No-op in test (null cache).
+  rate_limit to: 60, within: 1.minute, only: :submit,
+             with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
+  rate_limit to: 300, within: 1.minute, only: :progress,
+             with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
+
   before_action :load_survey_and_share
 
   def show
@@ -35,7 +46,8 @@ class PlayerController < ApplicationController
     resp.save!
     render json: { ok: true, session_token: token }
   rescue => e
-    render json: { ok: false, error: e.message }, status: :unprocessable_entity
+    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Something went wrong saving your response." }, status: :unprocessable_entity
   end
 
   def submit
@@ -52,7 +64,8 @@ class PlayerController < ApplicationController
     resp.update!(attrs)
     render json: { ok: true }
   rescue => e
-    render json: { ok: false, error: e.message }, status: :unprocessable_entity
+    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Something went wrong saving your response." }, status: :unprocessable_entity
   end
 
   def results
