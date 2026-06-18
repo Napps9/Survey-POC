@@ -53,8 +53,12 @@ module GeneratesResultsReport
   # it for the dark results theme.
   def results_report_body_html(markdown)
     # kramdown's default parser covers the report's Markdown (## / ### headings,
-    # bullet lists, bold) — no GFM-only features are used.
-    Kramdown::Document.new(markdown.to_s).to_html.html_safe
+    # bullet lists, bold) — no GFM-only features are used. The markdown is
+    # model-generated and can fold in respondent free-text, so we sanitize the
+    # rendered HTML rather than trusting it as raw (the sanitizer keeps the
+    # report's formatting tags and drops scripts / event handlers).
+    html = Kramdown::Document.new(markdown.to_s).to_html
+    ActionController::Base.helpers.sanitize(html)
   end
 
   # A self-contained, light-themed HTML document — used for both the PDF

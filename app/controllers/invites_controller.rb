@@ -68,32 +68,51 @@ class InvitesController < ApplicationController
   private
 
   def accept_member_invite
-    name     = params[:name].to_s.strip
-    password = params[:password]
-    confirm  = params[:password_confirmation]
+    existing_user = User.find_by(email_address: @invite.email_address)
 
-    if name.blank?
-      flash.now[:alert] = "Name is required."
-      return render :show, status: :unprocessable_entity
-    end
-    if password != confirm
-      flash.now[:alert] = "Passwords do not match."
-      return render :show, status: :unprocessable_entity
+    # Joining an *existing* account to the org must be authorised by its owner:
+    # either they're already signed in as that user, or they enter its password.
+    # Without this, anyone holding the invite link could be signed in as the
+    # account matching the invite email (which the inviting admin chooses) — a
+    # straightforward account takeover. New invitees set their password here as
+    # they create the account.
+    if existing_user
+      unless Current.user == existing_user || authenticate_invitee(existing_user)
+        flash.now[:alert] = "An account already exists for #{@invite.email_address}. Enter its password to join #{@invite.organisation.name}."
+        return render :show, status: :unprocessable_entity
+      end
+      user = existing_user
+    else
+      name     = params[:name].to_s.strip
+      password = params[:password]
+      confirm  = params[:password_confirmation]
+
+      if name.blank?
+        flash.now[:alert] = "Name is required."
+        return render :show, status: :unprocessable_entity
+      end
+      if password.blank? || password != confirm
+        flash.now[:alert] = "Passwords are required and must match."
+        return render :show, status: :unprocessable_entity
+      end
+      user = User.create!(name: name, email_address: @invite.email_address, password: password)
     end
 
     ActiveRecord::Base.transaction do
-      user = User.find_by(email_address: @invite.email_address) ||
-             User.create!(name: name, email_address: @invite.email_address, password: password)
-
       unless @invite.organisation.memberships.exists?(user: user)
         @invite.organisation.memberships.create!(user: user, role: @invite.role)
       end
-
       @invite.update!(accepted_at: Time.current)
-      start_new_session_for user
     end
 
+    start_new_session_for(user) unless Current.user == user
     redirect_to root_path, notice: "Welcome to #{@invite.organisation.name}!"
+  end
+
+  # True when the accept form carries the existing account's correct password.
+  def authenticate_invitee(user)
+    password = params[:password].to_s
+    password.present? && user.authenticate(password)
   end
 
   # Unauthenticated existing-account holder enters email + password. We sign

@@ -13,6 +13,12 @@ class ResultsExport
   SUMMARY_HEADER  = [ "Card #", "Card type", "Question", "Answer option", "Count", "Percentage", "Total answers" ].freeze
   CHOICE_TYPES    = %w[multiple_choice yes_no select_one_grid select_many select_many_grid].freeze
 
+  # Spreadsheet formula-injection guard: Excel/Sheets treat a cell beginning
+  # with one of these as a formula, so a respondent's free-text answer like
+  # `=HYPERLINK(...)` would execute when the owner opens the export (and would
+  # auto-evaluate in the Google Sheet). Such strings are prefixed with a quote.
+  FORMULA_TRIGGERS = [ "=", "+", "-", "@", "\t", "\r" ].freeze
+
   def initialize(survey:, responses:, aggregated:)
     @survey     = survey
     @responses  = responses
@@ -31,7 +37,7 @@ class ResultsExport
         response.locale
       ] + question_cards.map { |card, idx| format_answer(card, answers[idx.to_s]) }
     end
-    rows
+    sanitize_cells(rows)
   end
 
   # [header, *one row per answer option] built from the aggregated results.
@@ -48,7 +54,7 @@ class ResultsExport
         rows << [ number, type, question, label, count, pct, total ]
       end
     end
-    rows
+    sanitize_cells(rows)
   end
 
   private
@@ -161,5 +167,16 @@ class ResultsExport
   def pct(count, grand)
     return 0.0 unless grand.to_f.positive?
     ((count.to_f / grand) * 100).round(1)
+  end
+
+  def sanitize_cells(rows)
+    rows.map { |row| row.map { |cell| csv_safe(cell) } }
+  end
+
+  # Neutralize a single cell against spreadsheet formula injection (see
+  # FORMULA_TRIGGERS). Non-strings (counts, ids, percentages) pass through.
+  def csv_safe(value)
+    return value unless value.is_a?(String)
+    value.start_with?(*FORMULA_TRIGGERS) ? "'#{value}" : value
   end
 end
