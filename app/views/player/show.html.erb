@@ -71,19 +71,28 @@
       <div class="preview-card"
            data-player-target="card"
            data-card-type="consent_card">
-        <div class="play-consent-card">
-          <div data-player-target="consentMain">
-            <div class="play-consent-title"><%= t("player.consent_title") %></div>
-            <div class="play-consent-body"><%= safe_join(@survey.consent_text.split("\n"), tag.br) %></div>
-            <div class="play-consent-actions">
-              <button type="button" class="play-consent-agree"
-                      data-action="click->player#agreeConsent"><%= t("player.consent_agree") %></button>
-              <button type="button" class="play-consent-decline"
-                      data-action="click->player#declineConsent"><%= t("player.consent_decline") %></button>
-            </div>
+        <%# Rendered as the standard split-card so consent is in keeping with the
+            question-card design (empty branded left panel + content on the right). %>
+        <div class="split-card">
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
           </div>
-          <div class="play-consent-declined hidden" data-player-target="consentDeclined">
-            <%= t("player.consent_declined") %>
+          <div class="split-right">
+            <div data-player-target="consentMain" class="play-consent-main">
+              <div class="q-header">
+                <div class="q-title"><%= t("player.consent_title") %></div>
+              </div>
+              <div class="play-consent-body"><%= safe_join(@survey.consent_text.split("\n"), tag.br) %></div>
+              <div class="play-consent-actions">
+                <button type="button" class="play-consent-agree"
+                        data-action="click->player#agreeConsent"><%= t("player.consent_agree") %></button>
+                <button type="button" class="play-consent-decline"
+                        data-action="click->player#declineConsent"><%= t("player.consent_decline") %></button>
+              </div>
+            </div>
+            <div class="play-consent-declined hidden" data-player-target="consentDeclined">
+              <%= t("player.consent_declined") %>
+            </div>
           </div>
         </div>
       </div>

@@ -25,7 +25,7 @@ class PlayerShowSmokeTest < ActionDispatch::IntegrationTest
 
     assert_select ".preview-nav", false
     # No logo uploaded → nothing shown (never the Playverto fallback here).
-    assert_select ".play-welcome-logo", false
+    assert_select ".split-left-logo", false
 
     # The cards feed and the thank-you screen still render.
     assert_select ".preview-card[data-card-type='welcome_card']"
@@ -40,6 +40,6 @@ class PlayerShowSmokeTest < ActionDispatch::IntegrationTest
 
     get play_survey_path(survey.publish_token)
     assert_response :success
-    assert_select ".play-welcome-logo img", 1
+    assert_select ".split-left .split-left-logo img", 1
   end
 end

@@ -3,14 +3,6 @@
     respondent's chosen content language (falls back to the Verto's primary). %>
 <% locale ||= nil %>
 <% default_locale ||= SupportedLocales::DEFAULT %>
-<%# The creator's logo sits top-centre on the welcome card — only when one is
-    actually uploaded (no Playverto fallback here, so a client Verto never shows
-    our wordmark). %>
-<% if card["type"] == "welcome_card" && @survey&.organisation&.logo&.attached? %>
-  <div class="play-welcome-logo">
-    <%= brand_logo_tag @survey.organisation, style: "height:36px;width:auto;max-width:190px;display:block;" %>
-  </div>
-<% end %>
 <div class="split-card">
   <%= render "shared/split_left",     card: card, progress: progress, mode: :player %>
   <%= render "shared/card_component", card: card, mode: :player,

@@ -13,6 +13,14 @@
 %>
 
 <div class="split-left">
+  <%# Creator's logo, centred at the top of the left panel on the welcome card —
+      player only, and only when a logo is actually uploaded. %>
+  <% if mode == :player && card["type"] == "welcome_card" && @survey&.organisation&.logo&.attached? %>
+    <div class="split-left-logo">
+      <%= brand_logo_tag @survey.organisation, style: "height:34px;width:auto;max-width:62%;display:block;" %>
+    </div>
+  <% end %>
+
   <% if nps_card?(card) %>
     <%# NPS: the LEFT panel plays a Lottie animation that swaps to match the
         slider value (1–5). The lottie-player controller listens for the

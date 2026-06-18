@@ -2396,11 +2396,11 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 }
 .preview-close-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
 
-/* Creator's logo, centred above the welcome card (player/_play_card). Only
-   rendered when a logo is actually uploaded. */
-.play-welcome-logo {
+/* Creator's logo, centred at the top of the welcome card's left panel
+   (shared/_split_left). Only rendered when a logo is actually uploaded. */
+.split-left-logo {
+  position: absolute; top: 22px; inset-inline: 0; z-index: 2;
   display: flex; justify-content: center; align-items: center;
-  margin: 0 0 16px;
 }
 
 .preview-body {
@@ -2460,23 +2460,16 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 }
 .preview-card.card-shake { animation: card-shake 0.4s ease; }
 
-/* Consent card — the first card in the deck (player/show). A clean panel
-   matching the card content surface, with the consent text + agree / decline. */
-.play-consent-card {
-  background: #fff; border-radius: 28px;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.18);
-  padding: 40px 36px; max-width: 560px; width: 100%; margin: 0 auto;
-  max-height: calc(100vh - 170px); overflow-y: auto;
-}
-.play-consent-title {
-  font-family: "Alata", sans-serif; font-size: 24px; color: #1C2034;
-  text-align: center; margin-bottom: 16px;
-}
+/* Consent rendered inside the standard split-card (player/show) so it matches
+   the question-card design. The content lives in .split-right (which centres,
+   so the title inherits the .q-title look); the body reads left-aligned. */
+.play-consent-main { display: flex; flex-direction: column; gap: 16px; min-height: 0; }
 .play-consent-body {
-  font-family: "ABeeZee", sans-serif; font-size: 15px; line-height: 1.65;
-  color: rgba(28,32,52,0.78);
+  font-family: "ABeeZee", sans-serif; font-size: 14px; line-height: 1.6;
+  color: rgba(28,32,52,0.78); text-align: left;
+  max-height: 300px; overflow-y: auto;
 }
-.play-consent-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 26px; }
+.play-consent-actions { display: flex; flex-direction: column; gap: 10px; }
 .play-consent-agree {
   padding: 13px 22px; border-radius: 100px; border: none; cursor: pointer;
   background: var(--brand-cta,#01EACB); color: var(--brand-cta-text,#1C2034);
