@@ -48,6 +48,25 @@ class ResultsReportsTest < ActionDispatch::IntegrationTest
     assert_match "Cached", JSON.parse(response.body)["body_html"]
   end
 
+  test "stream generates, streams the markdown, and caches it" do
+    yielder = ->(survey:, aggregated:, total:, &blk) { blk&.call(MD); MD }
+    stub_method(ResultsReportGenerator, :call, yielder) do
+      get survey_results_report_stream_path(@survey)
+    end
+    assert_response :success
+    assert_match "Executive summary", response.body
+    assert_equal MD, @survey.reload.results_report
+  end
+
+  test "stream replays the cached report without regenerating" do
+    @survey.update!(results_report: "## Cached\n\nReused.", results_report_response_count: 1)
+    stub_method(ResultsReportGenerator, :call, ->(**) { raise "should not regenerate" }) do
+      get survey_results_report_stream_path(@survey)
+    end
+    assert_response :success
+    assert_match "Cached", response.body
+  end
+
   test "results page shows the AI Report button" do
     @survey.update!(publish_token: SecureRandom.hex(8), published_at: Time.current)
     get survey_results_path(@survey)

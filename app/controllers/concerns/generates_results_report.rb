@@ -26,6 +26,29 @@ module GeneratesResultsReport
     markdown
   end
 
+  # Streams the report markdown chunk-by-chunk (yielding to the block) while
+  # generating, caching the full text on completion. Replays the cache in one
+  # write when it's still fresh. Mirrors the insights-summary streaming.
+  def stream_results_report(survey)
+    responses = survey.responses.where(status: "completed")
+    total     = responses.count
+
+    if survey.results_report.present? && survey.results_report_response_count == total
+      yield survey.results_report
+      return
+    end
+
+    aggregated = aggregate_results(Array(survey.cards), responses.order(created_at: :desc))
+    full       = +""
+    ResultsReportGenerator.call(survey: survey, aggregated: aggregated, total: total) do |chunk|
+      full << chunk
+      yield chunk
+    end
+    if full.present?
+      survey.update_columns(results_report: full, results_report_response_count: total)
+    end
+  end
+
   # Just the report body (Markdown → HTML) for the on-page preview, which styles
   # it for the dark results theme.
   def results_report_body_html(markdown)

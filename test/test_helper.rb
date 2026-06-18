@@ -10,9 +10,9 @@ class ActiveSupport::TestCase
   # Object#stub, which this minitest version doesn't ship. `return_value` may be
   # a plain value or a callable (invoked with the call args).
   def stub_method(object, name, return_value = nil)
-    impl     = return_value.respond_to?(:call) ? return_value : ->(*_a, **_k) { return_value }
+    impl     = return_value.respond_to?(:call) ? return_value : ->(*_a, **_k, &_b) { return_value }
     original = object.method(name)
-    object.define_singleton_method(name) { |*args, **kw| impl.call(*args, **kw) }
+    object.define_singleton_method(name) { |*args, **kw, &blk| impl.call(*args, **kw, &blk) }
     yield
   ensure
     object.singleton_class.send(:remove_method, name)

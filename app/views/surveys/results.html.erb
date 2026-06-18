@@ -195,7 +195,7 @@
 
               <%# ── AI Report: generate → preview, download PDF, save to Google Drive ── %>
               <div data-controller="report-export"
-                   data-report-export-report-url-value="<%= survey_results_report_path(@survey, format: :json) %>"
+                   data-report-export-stream-url-value="<%= survey_results_report_stream_path(@survey) %>"
                    data-report-export-drive-url-value="<%= survey_google_drive_path(@survey) %>"
                    style="display:inline-flex;">
                 <button type="button" data-action="click->report-export#open"
