@@ -1,12 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
+import { haptic } from "lib/haptics"
 
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta",
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
-                    "consent", "consentMain", "consentDeclined"]
+                    "consentMain", "consentDeclined"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
@@ -30,10 +31,11 @@ export default class extends Controller {
     this._update()
   }
 
-  // Consent gate: agreeing dismisses the overlay and reveals the player;
-  // declining swaps in a polite end-state and keeps the gate up.
+  // Consent card (the first card): agreeing advances into the deck; declining
+  // swaps in a polite end-state and leaves the respondent on the gate.
   agreeConsent() {
-    if (this.hasConsentTarget) this.consentTarget.classList.add("hidden")
+    haptic()
+    this.next()
   }
 
   declineConsent() {
@@ -46,6 +48,7 @@ export default class extends Controller {
     if (!this._requireGuard(this.currentValue)) return
     this._saveProgress()
     if (this.currentValue < this.cardTargets.length - 1) {
+      haptic()
       this.currentValue++
       this._update()
     }
@@ -113,6 +116,7 @@ export default class extends Controller {
   async finish() {
     this._capture(this.currentValue)
     if (!this._requireGuard(this.currentValue)) return
+    haptic([10, 30, 10]) // a little "done" buzz on completion
     // Owner preview runs without a submit endpoint — nothing is recorded,
     // just show the thank-you screen.
     if (!this.submitUrlValue) return this._showThankyou(false)
@@ -200,7 +204,9 @@ export default class extends Controller {
 
   // Whether the card at `idx` has a usable answer (a value, or free-text Other).
   _isCardAnswered(idx) {
-    const a = this._answers[String(idx)]
+    const key = this.cardTargets[idx]?.dataset.cardIndex
+    if (key === undefined || key === "") return true // non-answer cards never block
+    const a = this._answers[key]
     if (!a) return false
     if (a.other && a.other.trim()) return true
     return this._isAnswered(a.value)
@@ -231,15 +237,20 @@ export default class extends Controller {
     if (this.hasRequiredHintTarget) this.requiredHintTarget.classList.add("hidden")
   }
 
+  // Answers are keyed by the card's position in @survey.cards (data-card-index),
+  // NOT its position among the card targets — the consent card carries no index
+  // and is skipped, so prepending it never shifts the answer keys.
   _capture(idx) {
     const card = this.cardTargets[idx]
     if (!card) return
+    const key = card.dataset.cardIndex
+    if (key === undefined || key === "") return
     const type  = card.dataset.cardType
     const value = this._read(card, type)
     // "Other" is a standalone answer: if the respondent typed free text it
     // replaces any normal selection for this card.
     const other = card.querySelector("[data-other-input]")?.value.trim()
-    this._answers[String(idx)] = other
+    this._answers[key] = other
       ? { type, value: null, other }
       : { type, value }
   }
@@ -603,14 +614,33 @@ export default class extends Controller {
 
   _update() {
     this._clearRequiredHint()
-    const total = this.cardTargets.length
+    const cards = this.cardTargets
     const idx   = this.currentValue
-    this.cardTargets.forEach((c, i) => c.classList.toggle("active", i === idx))
-    this.progressTarget.textContent = t("player.progress", { n: idx + 1, total })
-    this.element.style.setProperty("--player-progress", `${Math.round(((idx + 1) / total) * 100)}%`)
+    cards.forEach((c, i) => c.classList.toggle("active", i === idx))
+
+    const hasConsent = cards[0]?.dataset.cardType === "consent_card"
+    const onConsent  = cards[idx]?.dataset.cardType === "consent_card"
+
+    if (onConsent) {
+      // The consent gate drives itself (Agree / decline) — hide the deck nav.
+      this.progressTarget.textContent = ""
+      this.element.style.setProperty("--player-progress", "0%")
+      this.backBtnTarget.classList.add("invisible")
+      this.nextBtnTarget.classList.add("hidden")
+      this.finishBtnTarget.classList.add("hidden")
+      return
+    }
+
+    // Keep the consent card out of the progress the respondent sees.
+    const offset = hasConsent ? 1 : 0
+    const total  = cards.length - offset
+    const n      = idx + 1 - offset
+    this.progressTarget.textContent = t("player.progress", { n, total })
+    this.element.style.setProperty("--player-progress", `${Math.round((n / total) * 100)}%`)
     this.backBtnTarget.classList.remove("hidden")
-    this.backBtnTarget.classList.toggle("invisible", idx === 0)
-    const isLast = idx === total - 1
+    // Don't allow stepping back onto the consent gate once agreed.
+    this.backBtnTarget.classList.toggle("invisible", idx === offset)
+    const isLast = idx === cards.length - 1
     this.nextBtnTarget.classList.toggle("hidden", isLast)
     this.finishBtnTarget.classList.toggle("hidden", !isLast)
   }

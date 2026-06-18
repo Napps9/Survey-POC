@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { haptic } from "lib/haptics"
 
 // Tap-to-select for pick-list rows, choice-grid cards, etc.
 //
@@ -22,6 +23,7 @@ export default class extends Controller {
     } else {
       this.itemTargets.forEach((el) => this.setSelected(el, el === item))
     }
+    haptic()
     this.dispatch("pick", { detail: { mode: this.modeValue } })
   }
 

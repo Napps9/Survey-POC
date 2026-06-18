@@ -17,19 +17,29 @@ class PlayerShowSmokeTest < ActionDispatch::IntegrationTest
     survey
   end
 
-  test "player renders the client logo centered at the top, with no title bar" do
+  test "no top nav bar, and no welcome logo when none is uploaded" do
     survey = published_survey
 
     get play_survey_path(survey.publish_token)
     assert_response :success
 
-    # The publishing org's logo sits in a slim, centered brand bar at the top —
-    # the old top nav (.preview-nav) is gone, so the card keeps the screen.
-    assert_select ".player-brandbar img", 1
     assert_select ".preview-nav", false
+    # No logo uploaded → nothing shown (never the Playverto fallback here).
+    assert_select ".play-welcome-logo", false
 
     # The cards feed and the thank-you screen still render.
     assert_select ".preview-card[data-card-type='welcome_card']"
     assert_select "[data-player-target='thankyou'] .preview-thankyou-card"
+  end
+
+  test "welcome card shows the creator's logo, centred, when one is uploaded" do
+    survey = published_survey
+    survey.organisation.logo.attach(
+      io: StringIO.new("\x89PNG\r\n\x1a\n"), filename: "logo.png", content_type: "image/png"
+    )
+
+    get play_survey_path(survey.publish_token)
+    assert_response :success
+    assert_select ".play-welcome-logo img", 1
   end
 end

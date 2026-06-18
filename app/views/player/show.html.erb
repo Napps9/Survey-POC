@@ -52,14 +52,8 @@
 
   <%# The regional-data notice/picker and the compare-results promise used to
       be top banners; they now live on the welcome card (player/welcome_intake)
-      to free up screen space. %>
-
-  <%# Client brand: the publishing org's logo, centered at the top. No title bar
-      (the old nav was dropped for space) — this restores just the logo, kept
-      slim so the card still gets the screen. %>
-  <div class="player-brandbar">
-    <%= brand_logo_tag @survey.organisation, style: "height:28px;width:auto;max-width:150px;display:block;" %>
-  </div>
+      to free up screen space. The publishing org's logo (when uploaded) sits at
+      the top of the welcome card itself — see player/_play_card. %>
 
   <%# Slim content-language switcher for multilingual Vertos, so respondents can
       still change the content language. %>
@@ -70,6 +64,31 @@
   <% end %>
 
   <div class="preview-body">
+    <%# Consent gate as the first card in the deck (reuses the creator's consent
+        text). It carries NO data-card-index, so it's never captured as an answer
+        and never shifts the answer keys, which align to the @survey.cards index. %>
+    <% if @survey.consent_required? %>
+      <div class="preview-card"
+           data-player-target="card"
+           data-card-type="consent_card">
+        <div class="play-consent-card">
+          <div data-player-target="consentMain">
+            <div class="play-consent-title"><%= t("player.consent_title") %></div>
+            <div class="play-consent-body"><%= safe_join(@survey.consent_text.split("\n"), tag.br) %></div>
+            <div class="play-consent-actions">
+              <button type="button" class="play-consent-agree"
+                      data-action="click->player#agreeConsent"><%= t("player.consent_agree") %></button>
+              <button type="button" class="play-consent-decline"
+                      data-action="click->player#declineConsent"><%= t("player.consent_decline") %></button>
+            </div>
+          </div>
+          <div class="play-consent-declined hidden" data-player-target="consentDeclined">
+            <%= t("player.consent_declined") %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <% cards.each_with_index do |card, idx| %>
       <%
         type  = card["type"].to_s
@@ -221,23 +240,4 @@
             data-action="click->player#finish"><%= t("player.submit") %></button>
   </div>
 
-  <%# Consent gate — covers the player until the respondent agrees. Rendered
-      only when the creator has set consent text. %>
-  <% if @survey.consent_required? %>
-    <div class="player-consent" data-player-target="consent">
-      <div class="player-consent-card" data-player-target="consentMain">
-        <div class="player-consent-title"><%= t("player.consent_title") %></div>
-        <div class="player-consent-body"><%= safe_join(@survey.consent_text.split("\n"), tag.br) %></div>
-        <div class="player-consent-actions">
-          <button type="button" class="player-consent-agree"
-                  data-action="click->player#agreeConsent"><%= t("player.consent_agree") %></button>
-          <button type="button" class="player-consent-decline"
-                  data-action="click->player#declineConsent"><%= t("player.consent_decline") %></button>
-        </div>
-      </div>
-      <div class="player-consent-card hidden" data-player-target="consentDeclined">
-        <div class="player-consent-body" style="text-align:center;"><%= t("player.consent_declined") %></div>
-      </div>
-    </div>
-  <% end %>
 </div>

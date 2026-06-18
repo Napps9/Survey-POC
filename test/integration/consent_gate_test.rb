@@ -37,22 +37,26 @@ class ConsentGateTest < ActionDispatch::IntegrationTest
     assert_not s.consent_required?
   end
 
-  test "player shows the consent gate when consent text is set" do
+  test "consent shows as the first card when consent text is set" do
     s = published_survey(consent: "You agree your anonymous answers may be used for research.")
 
     get play_survey_path(s.publish_token)
     assert_response :success
-    assert_select "[data-player-target='consent']"
-    assert_select ".player-consent-body", /anonymous answers/
+    # It's a real card in the deck, with agree/decline actions.
+    assert_select ".preview-card[data-card-type='consent_card']"
+    assert_select ".play-consent-body", /anonymous answers/
     assert_select "button[data-action='click->player#agreeConsent']"
     assert_select "button[data-action='click->player#declineConsent']"
+    # Critically it carries NO data-card-index, so it never shifts answer keys
+    # (which align to the @survey.cards index).
+    assert_select ".preview-card[data-card-type='consent_card'][data-card-index]", false
   end
 
-  test "player has no consent gate when consent text is blank" do
+  test "no consent card when consent text is blank" do
     s = published_survey(consent: nil)
 
     get play_survey_path(s.publish_token)
     assert_response :success
-    assert_select "[data-player-target='consent']", false
+    assert_select ".preview-card[data-card-type='consent_card']", false
   end
 end
