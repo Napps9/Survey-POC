@@ -9,7 +9,9 @@
 
   <%= form_with url: common_question_sets_path, method: :post,
         html: { style: "display:flex;flex-direction:column;flex:1;min-height:0;" },
-        data: { controller: "create-wizard" } do |f| %>
+        data: { controller: "create-wizard choice-cards",
+                choice_cards_selected_border_value: "#615BF5",
+                choice_cards_selected_bg_value: "rgba(97,91,245,0.05)" } do |f| %>
 
     <%
       light_input_style    = "width:100%;background:#fafbfc;border:1px solid rgba(0,0,0,0.12);border-radius:12px;padding:14px 18px;color:#000;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;"
@@ -127,11 +129,13 @@
                                 t("common_questions.start_generate_desc",  default: "We draft 4–6 questions from your theme and key insight. You can edit them after.") ]
                 ].each_with_index do |(val, label, desc), i| %>
                   <% selected = (i == 0) %>
-                  <label class="populate-choice" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;cursor:pointer;padding:11px 12px;border-radius:12px;background:<%= selected ? 'rgba(97,91,245,0.05)' : '#fafbfc' %>;border:2px solid <%= selected ? '#615BF5' : 'rgba(0,0,0,0.08)' %>;transition:border-color 0.15s,background 0.15s;">
+                  <label class="populate-choice" data-choice-cards-target="choice" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;cursor:pointer;padding:11px 12px;border-radius:12px;background:<%= selected ? 'rgba(97,91,245,0.05)' : '#fafbfc' %>;border:2px solid <%= selected ? '#615BF5' : 'rgba(0,0,0,0.08)' %>;transition:border-color 0.15s,background 0.15s;">
                     <input type="radio" name="start_mode" value="<%= val %>"
                            <%= "checked" if selected %>
-                           style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
-                           onchange="this.closest('.preview-card').querySelectorAll('.populate-choice').forEach(el=>{el.style.borderColor='rgba(0,0,0,0.08)';el.style.background='#fafbfc';});this.closest('.populate-choice').style.borderColor='#615BF5';this.closest('.populate-choice').style.background='rgba(97,91,245,0.05)';var form=this.closest('form');var submit=form.querySelector('[data-create-wizard-target=finish]');if(submit){submit.formAction = this.value === 'generate' ? '<%= j generate_common_question_sets_path %>' : '<%= j common_question_sets_path %>';var label = this.value === 'generate' ? '<%= j t('common_questions.cta_generate', default: 'Generate questions →') %>' : '<%= j t('common_questions.cta_blank', default: 'Create empty set →') %>';if(submit.tagName==='BUTTON'){submit.textContent=label;}else{submit.value=label;}}" />
+                           data-action="change->choice-cards#select"
+                           data-formaction="<%= val == 'generate' ? generate_common_question_sets_path : common_question_sets_path %>"
+                           data-label="<%= val == 'generate' ? t('common_questions.cta_generate', default: 'Generate questions →') : t('common_questions.cta_blank', default: 'Create empty set →') %>"
+                           style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />
                     <span style="font-family:'Alata',sans-serif;font-size:14px;color:#1C2034;letter-spacing:0.02em;line-height:1.2;"><%= label %></span>
                     <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.55);line-height:1.4;"><%= desc %></span>
                   </label>
@@ -159,7 +163,7 @@
       <%# Default action is blank-create; the radio's onchange swaps it to generate when chosen. %>
       <%= f.submit t("common_questions.cta_blank", default: "Create empty set →"),
             class: "preview-btn preview-btn-finish hidden",
-            data: { create_wizard_target: "finish", turbo_submits_with: t("common_questions.creating", default: "Creating…") } %>
+            data: { create_wizard_target: "finish", choice_cards_target: "submit", turbo_submits_with: t("common_questions.creating", default: "Creating…") } %>
     </div>
 
   <% end %>

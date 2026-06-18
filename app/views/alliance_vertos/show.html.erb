@@ -96,9 +96,13 @@
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-xs);letter-spacing:0.08em;color:rgba(255,255,255,0.4);text-transform:uppercase;flex-shrink:0;"><%= t("alliance_verto.share_link") %></div>
         <span style="flex:1;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.6);word-break:break-all;"><%= url %></span>
         <button type="button"
-                data-copy-label="<%= t("alliances.copy") %>"
-                data-copied-label="<%= t("alliances.copied") %>"
-                onclick="navigator.clipboard.writeText('<%= url %>').then(()=>{this.textContent=this.dataset.copiedLabel;this.style.color='#01EACB';setTimeout(()=>{this.textContent=this.dataset.copyLabel;this.style.color=''},1500)})"
+                data-controller="clipboard"
+                data-clipboard-text-value="<%= url %>"
+                data-clipboard-label-value="<%= t("alliances.copy") %>"
+                data-clipboard-copied-label-value="<%= t("alliances.copied") %>"
+                data-clipboard-copied-color-value="#01EACB"
+                data-clipboard-restore-value="1500"
+                data-action="clipboard#copy"
                 style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size: var(--text-sm);cursor:pointer;flex-shrink:0;"><%= t("alliances.copy") %></button>
       </div>
 

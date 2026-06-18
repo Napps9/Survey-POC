@@ -192,18 +192,21 @@
                   form: { data: { turbo_confirm: t("editor.shuffle_confirm") } },
                   title: t("editor.shuffle_title"),
                   style: "padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;",
-                  onmouseover: "this.style.background='rgba(255,255,255,0.12)'",
-                  onmouseout:  "this.style.background='rgba(255,255,255,0.07)'" %>
+                  data: { controller: "hover",
+                          hover_over_value: { background: "rgba(255,255,255,0.12)" }.to_json,
+                          hover_out_value: { background: "rgba(255,255,255,0.07)" }.to_json } %>
             <button type="button"
                     style="padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
-                    onmouseover="this.style.background='rgba(255,255,255,0.12)'"
-                    onmouseout="this.style.background='rgba(255,255,255,0.07)'"
+                    data-controller="hover"
+                    data-hover-over-value='{"background":"rgba(255,255,255,0.12)"}'
+                    data-hover-out-value='{"background":"rgba(255,255,255,0.07)"}'
                     data-action="click->publish-panel#openDesign"><%= t("editor.design") %></button>
           <% end %>
           <button type="button"
                   style="padding:10px 26px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
-                  onmouseover="this.style.background='#00C4AB'"
-                  onmouseout="this.style.background='#01EACB'"
+                  data-controller="hover"
+                  data-hover-over-value='{"background":"#00C4AB"}'
+                  data-hover-out-value='{"background":"#01EACB"}'
                   data-action="click->publish-panel#open"><%= t("editor.publish_share") %></button>
         </div>
       </div>
@@ -282,13 +285,15 @@
       <div class="type-panel-footer" style="display:none;" data-type-panel-target="panelFooter">
         <button type="button"
                 style="width:100%;padding:10px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
-                onmouseover="this.style.background='#00C4AB'"
-                onmouseout="this.style.background='#01EACB'"
+                data-controller="hover"
+                data-hover-over-value='{"background":"#00C4AB"}'
+                data-hover-out-value='{"background":"#01EACB"}'
                 data-action="click->type-panel#applyType"><%= t("editor.apply_to_card") %></button>
         <button type="button"
                 style="width:100%;padding:8px;border-radius:16px;background:transparent;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all 0.15s;"
-                onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.35)'"
-                onmouseout="this.style.color='rgba(255,255,255,0.65)';this.style.borderColor='rgba(255,255,255,0.15)'"
+                data-controller="hover"
+                data-hover-over-value='{"color":"#fff","borderColor":"rgba(255,255,255,0.35)"}'
+                data-hover-out-value='{"color":"rgba(255,255,255,0.65)","borderColor":"rgba(255,255,255,0.15)"}'
                 data-action="click->type-panel#openAllTypes"><%= t("editor.see_all_types") %></button>
       </div>
 
@@ -405,7 +410,11 @@
                    style="width:100%;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
             <div style="display:flex;gap:8px;margin-top:8px;">
               <button type="button"
-                      onclick="navigator.clipboard.writeText(document.getElementById('publish-url-<%= @survey.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',2000)})"
+                      data-controller="clipboard"
+                      data-clipboard-text-value="<%= play_survey_url(@survey.publish_token) %>"
+                      data-clipboard-label-value="Copy link"
+                      data-clipboard-copied-label-value="Copied!"
+                      data-action="clipboard#copy"
                       style="flex:1;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy link</button>
               <%= link_to "View Results →", survey_results_path(@survey),
                     style: "flex:1;text-align:center;padding:8px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
@@ -423,12 +432,12 @@
         <div class="publish-block">
           <div class="publish-block-title">Respondent view</div>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true,
-                style: "margin:0;" do %>
+                style: "margin:0;", data: { controller: "autosubmit" } do %>
             <input type="hidden" name="show_results_comparison" value="0" />
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
               <input type="checkbox" name="show_results_comparison" value="1"
                      <%= "checked" if @survey.show_results_comparison? %>
-                     onchange="this.form.requestSubmit()"
+                     data-action="change->autosubmit#submit"
                      style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
               <span>Show results comparison to respondents after they finish.</span>
             </label>
@@ -439,7 +448,7 @@
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Promise shown on the welcome card:</div>
                 <input type="text" name="compare_note" maxlength="160"
                        value="<%= @survey.compare_note_text %>"
-                       onchange="this.form.requestSubmit()"
+                       data-action="change->autosubmit#submit"
                        style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
               </div>
             <% end %>
@@ -450,13 +459,13 @@
             the first card. Blank = no consent step. %>
         <div class="publish-block">
           <div class="publish-block-title">Consent gate</div>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;", data: { controller: "autosubmit" } do %>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:8px;line-height:1.45;">
               Shown before the first card with an “Agree to continue” button. Leave blank for no consent step.
             </div>
             <textarea name="consent_text" maxlength="2000" rows="4"
                       placeholder="e.g. By taking part you agree that your anonymous answers may be used for research."
-                      onchange="this.form.requestSubmit()"
+                      data-action="change->autosubmit#submit"
                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.consent_text %></textarea>
           <% end %>
         </div>
@@ -466,21 +475,21 @@
             fields post to update_settings, which only writes the keys it's sent. %>
         <div class="publish-block">
           <div class="publish-block-title">Thank-you screen</div>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;", data: { controller: "autosubmit" } do %>
             <div style="display:flex;flex-direction:column;gap:12px;">
               <div>
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Title</div>
                 <input type="text" name="thankyou_title" maxlength="80"
                        value="<%= @survey.thankyou_title %>"
                        placeholder="<%= t('player.thank_you_title') %>"
-                       onchange="this.form.requestSubmit()"
+                       data-action="change->autosubmit#submit"
                        style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
               </div>
               <div>
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Message</div>
                 <textarea name="thankyou_body" maxlength="400" rows="2"
                           placeholder="Your responses have been recorded."
-                          onchange="this.form.requestSubmit()"
+                          data-action="change->autosubmit#submit"
                           style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.thankyou_body %></textarea>
               </div>
               <div>
@@ -488,7 +497,7 @@
                 <input type="url" name="forward_url" inputmode="url"
                        value="<%= @survey.forward_url %>"
                        placeholder="https://your-organisation.org"
-                       onchange="this.form.requestSubmit()"
+                       data-action="change->autosubmit#submit"
                        style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);margin-top:5px;">Respondents also get a Share button to pass the Verto on.</div>
               </div>
@@ -507,12 +516,12 @@
           </div>
 
           <%# Ask-players mode — scales to any number of regions with one link. %>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0 0 12px;" do %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0 0 12px;", data: { controller: "autosubmit" } do %>
             <input type="hidden" name="ask_region" value="0" />
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
               <input type="checkbox" name="ask_region" value="1"
                      <%= "checked" if @survey.ask_region? %>
-                     onchange="this.form.requestSubmit()"
+                     data-action="change->autosubmit#submit"
                      style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
               <span>Ask players where they are — one link, they pick their country and type their area. Best when you have many regions.</span>
             </label>
@@ -532,7 +541,11 @@
                        value="<%= play_survey_url(link.token) %>"
                        style="flex:1;min-width:0;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);outline:none;" />
                 <button type="button"
-                        onclick="navigator.clipboard.writeText(document.getElementById('region-url-<%= link.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})"
+                        data-controller="clipboard"
+                        data-clipboard-text-value="<%= play_survey_url(link.token) %>"
+                        data-clipboard-label-value="Copy"
+                        data-clipboard-copied-label-value="Copied!"
+                        data-action="clipboard#copy"
                         style="padding:6px 12px;border-radius:8px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy</button>
               </div>
             </div>
@@ -577,12 +590,13 @@
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);">Already in every alliance you run.</span>
             <% else %>
               <%= form_with url: alliance_alliance_vertos_path(available_allys.first), method: :post,
-                    data: { turbo: false },
+                    data: { turbo: false, controller: "form-action-select",
+                            form_action_select_template_value: "/alliances/:id/alliance_vertos" },
                     html: { id: "add-to-alliance-form" },
                     style: "display:flex;flex-direction:column;gap:8px;margin:0;" do |f| %>
                 <%= hidden_field_tag :survey_id, @survey.id %>
                 <select name="alliance_picker"
-                        onchange="document.getElementById('add-to-alliance-form').action = '/alliances/' + this.value + '/alliance_vertos'"
+                        data-action="change->form-action-select#update"
                         style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px;color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);">
                   <% available_allys.each do |a| %>
                     <option value="<%= a.id %>" style="background:#1C2034;color:#fff;"><%= a.name %></option>

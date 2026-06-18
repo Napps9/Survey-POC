@@ -374,8 +374,8 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_match "find an account", response.body, "error message should be shown"
     # Sign-in form is the visible one after the failure; signup form is hidden
-    assert_match "id=\"invite-signup-form\" hidden", response.body, "signup form should be hidden"
-    refute_match "id=\"invite-signin-form\" hidden", response.body, "sign-in form must stay open"
+    assert_match(/id="invite-signup-form"[^>]*\shidden/, response.body, "signup form should be hidden")
+    refute_match(/id="invite-signin-form"[^>]*\shidden/, response.body, "sign-in form must stay open")
   end
 
   private

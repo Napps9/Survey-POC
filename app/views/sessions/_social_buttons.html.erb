@@ -12,11 +12,11 @@
   <div style="display:flex;flex-direction:column;gap:10px;">
     <% providers.each do |p| %>
       <%= button_to "/auth/#{p.key}",
-            data: { turbo: false },
+            data: { turbo: false, controller: "hover",
+                    hover_over_value: { background: "rgba(255,255,255,0.12)" }.to_json,
+                    hover_out_value: { background: "rgba(255,255,255,0.06)" }.to_json },
             form: { style: "margin:0;" },
-            style: "width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);color:#F7F7F7;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;",
-            onmouseover: "this.style.background='rgba(255,255,255,0.12)'",
-            onmouseout:  "this.style.background='rgba(255,255,255,0.06)'" do %>
+            style: "width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);color:#F7F7F7;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;" do %>
         <%= icons[p.key].html_safe %>
         <span><%= t("auth.social_continue", provider: p.label) %></span>
       <% end %>
