@@ -208,7 +208,7 @@ class SurveyGenerator
     @client = build_anthropic_client(api_key)
   end
 
-  def call(theme:, audience_age:, key_insight:, notes: nil, locale: SupportedLocales::DEFAULT, common_cards: [])
+  def call(theme:, audience_age:, key_insight:, notes: nil, locale: SupportedLocales::DEFAULT, common_cards: [], quiz: false)
     brief = [ theme, audience_age, key_insight, notes ].compact.join(" ")
     examples = QuestionCorpus.search(brief, limit: 8, min_overlap: 2)
     Rails.logger.info("[corpus] matched #{examples.size} of #{QuestionCorpus.all.size}: " +
@@ -254,9 +254,11 @@ class SurveyGenerator
 
     user_message << language_instruction(locale)
     user_message << common_cards_instruction(common_cards)
+    user_message << quiz_instruction if quiz
 
     tool = TOOL.deep_dup
     tool[:input_schema][:properties][:cards][:items][:properties][:type][:enum] = self.class.generatable_types
+    inject_quiz_schema!(tool) if quiz
     # Cache the static prefix (tools render before system, so a marker on the
     # last tool caches the tool schema + SYSTEM together). The enum is
     # deterministic, so the cached prefix bytes are stable across calls.
@@ -278,6 +280,59 @@ class SurveyGenerator
     payload = deep_stringify(input_of(block))
     enforce_tap_card_three_statements!(payload)
     reconcile_common_cards!(payload, common_cards)
+    normalize_quiz_correct!(payload) if quiz
+    payload
+  end
+
+  # Add the quiz fields to the emit_survey schema so the model can mark correct
+  # answers + explanations. Only the standard quiz types are gradable by the
+  # generator; scales/tap_card stay as ordinary measurement questions (a creator
+  # can still grade those by hand in the editor).
+  def inject_quiz_schema!(tool)
+    props = tool[:input_schema][:properties][:cards][:items][:properties]
+    props[:correct] = {
+      type: "array",
+      items: { type: "string" },
+      description: "QUIZ ONLY. The correct option label(s): one label for " \
+                   "multiple_choice / yes_no / select_one_grid; all correct labels for " \
+                   "select_many / select_many_grid; one or more acceptable answers for " \
+                   "open_ended. OMIT for ungraded questions and for range, nps, rating, " \
+                   "tap_card and welcome_card."
+    }
+    props[:explanation] = {
+      type: "string",
+      description: "QUIZ ONLY. One short sentence explaining the correct answer, shown " \
+                   "to the player after they answer. Set only on graded cards."
+    }
+  end
+
+  # Trust nothing: coerce the model's `correct` into the stored shape and drop
+  # it unless it genuinely matches the card's options (so a stray or malformed
+  # value just leaves the question ungraded rather than always-wrong).
+  def normalize_quiz_correct!(payload)
+    Array(payload["cards"]).each do |card|
+      raw  = Array(card["correct"]).map { |x| x.to_s.strip }.reject(&:empty?)
+      opts = Array(card["options"])
+      norm =
+        case card["type"].to_s
+        when "multiple_choice", "select_one_grid"
+          raw.find { |r| opts.include?(r) }
+        when "yes_no"
+          raw.filter_map { |r| r.casecmp?("yes") ? "Yes" : (r.casecmp?("no") ? "No" : nil) }.first
+        when "select_many", "select_many_grid"
+          (opts & raw).presence
+        when "open_ended"
+          raw.presence
+        end
+
+      if norm.nil? || (norm.respond_to?(:empty?) && norm.empty?)
+        card.delete("correct")
+        card.delete("explanation")
+      else
+        card["correct"] = norm
+        card.delete("explanation") if card["explanation"].to_s.strip.empty?
+      end
+    end
     payload
   end
 
@@ -382,6 +437,22 @@ class SurveyGenerator
       use English for any respondent-facing text. Keep the same design rules and
       length limits.
     LANG
+  end
+
+  # Quiz-mode addendum (user message, so prompt caching survives the toggle).
+  # Asks the model to write questions that HAVE a right answer and mark it.
+  def quiz_instruction
+    <<~QUIZ
+
+      QUIZ MODE — this Verto is a quiz. Favour questions that have a definite
+      correct answer (facts, knowledge checks). For multiple_choice, yes_no,
+      select_one_grid, select_many, select_many_grid and open_ended questions,
+      set `correct` to the right answer(s) — exact option label(s), or one or
+      more acceptable text answers for open_ended — and `explanation` to one
+      short sentence. Leave range, nps, rating and tap_card UNGRADED (omit
+      `correct`). A few ungraded opinion/measurement questions are fine where
+      they fit naturally.
+    QUIZ
   end
 
   # tool_use?, input_of, deep_stringify come from AnthropicHelpers.

@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   get  "play/:token",        to: "player#show",   as: :play_survey
   post "play/:token/progress", to: "player#progress", as: :progress_survey
   post "play/:token/submit", to: "player#submit", as: :submit_survey
+  post "play/:token/grade", to: "player#grade", as: :grade_survey
+  get  "play/:token/quiz_state", to: "player#quiz_state", as: :quiz_state_survey
+  get  "play/:token/scores", to: "player#scores", as: :player_scores
   get  "play/:token/results", to: "player#results", as: :player_results
   get  "play/:token/regions", to: "player#regions", as: :player_regions
 

@@ -20,6 +20,15 @@ tr:
     required: "Zorunlu soru"
     other: Diğer
     other_placeholder: Kendi sözcüklerinizle anlatın…
+    mark_correct: "Doğru cevabı işaretle"
+    correct_pick_hint: "Oyuncuların doğru olmak için seçmesi gereken seçenek(ler)e dokunun."
+    correct_tap_hint: "Her ifade için doğru kaydırmayı belirleyin."
+    correct_scale_hint: "Doğru sayılan değeri seçin."
+    accepted_answers: "Kabul edilen cevaplar"
+    accepted_answers_hint: "Her satıra bir tane — herhangi bir eşleşme (büyük/küçük harf duyarsız) doğrudur."
+    explanation: "Açıklama"
+    explanation_placeholder: "Oyuncu cevapladıktan sonra gösterilir — örn. bunun neden doğru olduğu."
+    correct_badge: "Doğru"
   auth:
     social_continue: "%{provider} ile devam et"
     social_divider: "veya"
@@ -88,6 +97,8 @@ tr:
     back: "← Geri"
     next: İleri →
     submit: Gönder ✓
+    quiz_compare_cta: "Nasıl karşılaştırıldığını gör →"
+    quiz_compare_title: "Nasıl karşılaştırılıyorsunuz"
   js:
     player:
       region_optout: "Bölgemi paylaşma"
@@ -101,6 +112,16 @@ tr:
       compare_cta: Sonuçlarınızı diğerleriyle karşılaştırın →
       compare_loading: Yükleniyor…
       compare_error: Yüklenemedi — tekrar deneyin
+      quiz_score: "Puan %{score}/%{max}"
+      quiz_correct: "Doğru!"
+      quiz_wrong: "Tam değil"
+      quiz_answer: "Doğru cevap:"
+      quiz_check: "Cevabı kontrol et"
+      quiz_result_label: "Puanınız"
+      quiz_compare_meta: "%{score}/%{max} aldınız — oyuncuların %{beat}%'inden daha iyi · ortalama %{avg}"
+      quiz_compare_empty: "Bitiren ilk kişi olun — henüz karşılaştırma yok."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "Herkesin soru soru nasıl yaptığı"
     editor:
       delete_card_confirm: Bu kart silinsin mi?
       unsaved: Kaydedilmemiş değişiklikler
@@ -488,6 +509,8 @@ tr:
     s6_placeholder: örn. Hedef kitle daha önce Playverto kullanmadı, tonu sıcak tutun, kurumsal değil.
     s6_compare_label: Yanıtlayıcıların cevaplarını karşılaştırmasına izin ver
     s6_compare_desc: Teşekkür sayfasında, cevaplarının diğerleriyle nasıl kıyaslandığını gösteren bir CTA görüntüleyin.
+    quiz_label: "Bunu bir teste dönüştür"
+    quiz_desc: "Cevapları doğru veya yanlış olarak işaretleyin, oyunculara puanlarını gösterin ve başkalarıyla karşılaştırmalarına izin verin. Doğru cevapları oluşturduktan sonra siz belirlersiniz."
     s7_eyebrow: Adım 07 · Son dokunuş
     s7_lead: Hazır görünümlü bir Verto veya boş bir tuval ile açın.
     s7_body: Temanıza, hedef kitlenize ve her karttaki soruya uygun olarak özenle seçilmiş kütüphanemizden bir arka plan ve kart başına görsel seçiyoruz.

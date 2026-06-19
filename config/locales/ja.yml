@@ -20,6 +20,15 @@ ja:
     required: "必須の質問"
     other: その他
     other_placeholder: ご自身の言葉でお聞かせください…
+    mark_correct: "正解をマークする"
+    correct_pick_hint: "プレイヤーが正解するために選ぶべき選択肢をタップしてください。"
+    correct_tap_hint: "各ステートメントに正しいスワイプを設定してください。"
+    correct_scale_hint: "正解とみなす値を選んでください。"
+    accepted_answers: "許容される回答"
+    accepted_answers_hint: "1行に1つ — いずれかに一致すれば（大文字小文字を区別せず）正解です。"
+    explanation: "解説"
+    explanation_placeholder: "プレイヤーの回答後に表示されます — 例：なぜこれが正しいか。"
+    correct_badge: "正解"
   auth:
     social_continue: "%{provider} で続行"
     social_divider: "または"
@@ -88,6 +97,8 @@ ja:
     back: "← 戻る"
     next: 次へ →
     submit: 送信 ✓
+    quiz_compare_cta: "あなたの順位を見る →"
+    quiz_compare_title: "あなたの順位"
   js:
     player:
       region_optout: "地域を共有しない"
@@ -101,6 +112,16 @@ ja:
       compare_cta: 他の人との結果を比較する →
       compare_loading: 読み込み中…
       compare_error: 読み込めませんでした — もう一度お試しください
+      quiz_score: "スコア %{score}/%{max}"
+      quiz_correct: "正解！"
+      quiz_wrong: "惜しい"
+      quiz_answer: "正解:"
+      quiz_check: "回答を確認"
+      quiz_result_label: "あなたのスコア"
+      quiz_compare_meta: "あなたのスコアは %{score}/%{max} — プレイヤーの %{beat}% より上 · 平均 %{avg}"
+      quiz_compare_empty: "最初の完了者になりましょう — まだ比較がありません。"
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "みんなの結果を質問ごとに"
     editor:
       delete_card_confirm: このカードを削除しますか？
       unsaved: 未保存の変更
@@ -488,6 +509,8 @@ ja:
     s6_placeholder: 例：オーディエンスはPlayvertoを初めて使用します。温かみのある、企業的でないトーンで。
     s6_compare_label: 回答者が自分の回答を比較できるようにする
     s6_compare_desc: お礼ページにCTAを表示し、自分の回答が全員の回答とどう違うかを確認できるようにします。
+    quiz_label: "これをクイズにする"
+    quiz_desc: "回答を正解か不正解かでマークし、プレイヤーにスコアを表示して、他の人と比較できるようにします。正解は生成後に設定します。"
     s7_eyebrow: ステップ 07 · 最終仕上げ
     s7_lead: 完成した Verto として開くか、白紙のキャンバスとして開くかを選べます。
     s7_body: テーマ・対象者・各カードの質問に合わせて、厳選ライブラリから背景画像とカードごとの画像を自動で選択します。

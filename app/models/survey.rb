@@ -73,6 +73,17 @@ class Survey < ApplicationRecord
     (v.match?(DATA_IMAGE_URL) || v.match?(ASSET_IMAGE_URL)) ? v : nil
   end
 
+  # Quiz: the card indices that are graded (carry a correct answer). Empty for a
+  # non-quiz Verto, or a quiz whose questions are all still measurement-only.
+  def graded_card_indices
+    return [] unless quiz?
+    QuizGrading.graded_indices(cards)
+  end
+
+  def quiz_question_count
+    graded_card_indices.size
+  end
+
   def archive!
     update!(deleted_at: Time.current)
   end

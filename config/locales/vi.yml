@@ -20,6 +20,15 @@ vi:
     required: "Câu hỏi bắt buộc"
     other: Khác
     other_placeholder: Hãy chia sẻ bằng lời của bạn…
+    mark_correct: "Đánh dấu câu trả lời đúng"
+    correct_pick_hint: "Chạm vào (các) tùy chọn mà người chơi phải chọn để đúng."
+    correct_tap_hint: "Đặt kiểu vuốt đúng cho mỗi phát biểu."
+    correct_scale_hint: "Chọn giá trị được tính là đúng."
+    accepted_answers: "Câu trả lời được chấp nhận"
+    accepted_answers_hint: "Mỗi dòng một câu — bất kỳ kết quả khớp nào (không phân biệt hoa thường) đều đúng."
+    explanation: "Giải thích"
+    explanation_placeholder: "Hiển thị sau khi người chơi trả lời — ví dụ tại sao điều này đúng."
+    correct_badge: "Đúng"
   auth:
     social_continue: "Tiếp tục với %{provider}"
     social_divider: "hoặc"
@@ -88,6 +97,8 @@ vi:
     back: "← Quay lại"
     next: Tiếp →
     submit: Gửi ✓
+    quiz_compare_cta: "Xem bạn so sánh thế nào →"
+    quiz_compare_title: "Bạn so sánh thế nào"
   js:
     player:
       region_optout: "Không chia sẻ khu vực của tôi"
@@ -101,6 +112,16 @@ vi:
       compare_cta: Xem kết quả của bạn so với người khác →
       compare_loading: Đang tải…
       compare_error: Không tải được — thử lại
+      quiz_score: "Điểm %{score}/%{max}"
+      quiz_correct: "Chính xác!"
+      quiz_wrong: "Chưa đúng lắm"
+      quiz_answer: "Câu trả lời đúng:"
+      quiz_check: "Kiểm tra câu trả lời"
+      quiz_result_label: "Bạn đạt"
+      quiz_compare_meta: "Bạn đạt %{score}/%{max} — tốt hơn %{beat}% người chơi · trung bình %{avg}"
+      quiz_compare_empty: "Hãy là người đầu tiên hoàn thành — chưa có so sánh."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "Mọi người đã làm thế nào, theo từng câu hỏi"
     editor:
       delete_card_confirm: Xóa thẻ này?
       unsaved: Thay đổi chưa lưu
@@ -488,6 +509,8 @@ vi:
     s6_placeholder: 'ví dụ: Khán giả chưa từng dùng Playverto, giữ giọng điệu ấm áp, không quá doanh nghiệp.'
     s6_compare_label: Cho phép người trả lời so sánh câu trả lời của họ
     s6_compare_desc: Hiển thị CTA trên trang cảm ơn để cho thấy câu trả lời của họ so sánh thế nào với mọi người khác.
+    quiz_label: "Biến thành câu đố"
+    quiz_desc: "Đánh dấu câu trả lời đúng hoặc sai, cho người chơi thấy điểm của họ, và để họ so sánh với người khác. Bạn đặt câu trả lời đúng sau khi tạo."
     s7_eyebrow: Bước 07 · Hoàn thiện
     s7_lead: Mở với giao diện Verto hoàn chỉnh hoặc một trang trắng tuỳ ý.
     s7_body: Chúng tôi chọn hình nền và hình ảnh cho từng thẻ từ thư viện được tuyển chọn — phù hợp với chủ đề, đối tượng và câu hỏi trên mỗi thẻ của bạn.

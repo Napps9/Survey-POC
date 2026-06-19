@@ -19,6 +19,17 @@
   is_q     = type != "welcome_card"
   ce_attr  = editable ? "contenteditable=\"true\"".html_safe : "".html_safe
 
+  # Quiz: in the editor, a quiz Verto lets the creator mark each question's
+  # correct answer. `quiz` may arrive as a local (a freshly added card has no
+  # @survey yet); otherwise fall back to the survey flag. Controls are hidden on
+  # translation tabs by CSS, so a correct answer is only ever set in the primary
+  # language it's stored against.
+  quiz_on      = local_assigns.key?(:quiz) ? local_assigns[:quiz] : @survey&.quiz?
+  quiz_mode    = editable && is_q && !!quiz_on
+  correct_vals = Array(card["correct"]).map(&:to_s)
+  correct_map  = card["correct"].is_a?(Hash) ? card["correct"] : {}
+  mark_correct = ->(label) { correct_vals.include?(label.to_s) }
+
   # Picker-style lists carry an extra card-editor controller in :editor
   # mode so the per-card "delete option" / "add option" actions resolve.
   picker_controllers = editable ? "picker card-editor" : "picker"
@@ -75,10 +86,15 @@
               data-picker-target="item"
               data-action="click->picker#pick"
               data-canonical="<%= canon[i] %>"
+              data-correct="<%= mark_correct.call(canon[i]) %>"
               data-selected="false">
             <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
             <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
+            <% if quiz_mode %>
+              <button type="button" class="mark-correct" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
+                      data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
+            <% end %>
             <% if editable %>
               <button type="button" class="pick-item-delete"
                       data-action="click->card-editor#deleteOption">×</button>
@@ -103,10 +119,15 @@
               data-picker-target="item"
               data-action="click->picker#pick"
               data-canonical="<%= canon_label %>"
+              data-correct="<%= mark_correct.call(canon_label) %>"
               data-selected="false">
             <div class="choice-list-tile choice-bg-<%= bg %>"></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= t("card.#{canon_label.downcase}", locale: display_locale, default: canon_label) %></span>
             <span class="choice-list-tick pick-dot">✓</span>
+            <% if quiz_mode %>
+              <button type="button" class="mark-correct" data-picker-mode="single"
+                      data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
+            <% end %>
           </li>
         <% end %>
       </ul>
@@ -123,11 +144,16 @@
               data-picker-target="item"
               data-action="click->picker#pick"
               data-canonical="<%= canon[i] %>"
+              data-correct="<%= mark_correct.call(canon[i]) %>"
               data-selected="false">
             <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>"></div>
             <div class="choice-overlay"></div>
             <div class="choice-tick">✓</div>
             <div class="choice-label" <%= ce_attr %>><%= opt %></div>
+            <% if quiz_mode %>
+              <button type="button" class="mark-correct mark-correct-grid" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
+                      data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
+            <% end %>
           </li>
         <% end %>
       </ul>
@@ -283,6 +309,64 @@
       <% if mode == :player %><%= render "player/welcome_intake" %><% end %>
     <% end %>
   </div>
+
+  <%# Quiz: the correct-answer controls for this card. List/grid/yes-no mark the
+      correct option(s) inline (above); here we cover swipe directions, scale /
+      rating / open-text answers, and the per-card explanation. Hidden on
+      translation tabs (CSS), so answers are only set in the primary language. %>
+  <% if quiz_mode %>
+    <div class="quiz-correct-block" data-quiz-block>
+      <div class="quiz-correct-title"><span class="quiz-correct-star">★</span> <%= t("card.mark_correct") %></div>
+      <div class="quiz-correct-hint">
+        <%= t(case type
+              when "open_ended"          then "card.accepted_answers_hint"
+              when "range", "nps", "rating" then "card.correct_scale_hint"
+              when "tap_card"            then "card.correct_tap_hint"
+              else "card.correct_pick_hint" end) %>
+      </div>
+
+      <% case type
+         when "tap_card" %>
+        <% Array(display["options"]).each_with_index do |opt, i| %>
+          <% dir = correct_map[canon[i]].to_s %>
+          <div class="quiz-tap-row" data-statement="<%= canon[i] %>" data-correct-dir="<%= dir %>">
+            <span class="quiz-tap-label"><%= opt %></span>
+            <button type="button" class="quiz-tap-btn no<%= ' is-on' if dir == 'no' %>"
+                    data-dir="no" data-action="click->survey-editor#toggleTapCorrect">✕</button>
+            <button type="button" class="quiz-tap-btn yes<%= ' is-on' if dir == 'yes' %>"
+                    data-dir="yes" data-action="click->survey-editor#toggleTapCorrect">✓</button>
+          </div>
+        <% end %>
+
+      <% when "range", "nps" %>
+        <% scale_labels = Array(display["options"]).presence || %w[1 2 3 4 5] %>
+        <select class="quiz-correct-select" data-quiz-correct data-action="change->survey-editor#markDirty">
+          <option value="">—</option>
+          <% scale_labels.each_with_index do |lbl, i| %>
+            <% val = (type == "nps" ? i + 1 : i) %>
+            <option value="<%= val %>" <%= "selected" if card["correct"].to_s == val.to_s %>><%= lbl %></option>
+          <% end %>
+        </select>
+
+      <% when "rating" %>
+        <select class="quiz-correct-select" data-quiz-correct data-action="change->survey-editor#markDirty">
+          <option value="">—</option>
+          <% (1..5).each do |n| %>
+            <option value="<%= n %>" <%= "selected" if card["correct"].to_s == n.to_s %>><%= n %> ★</option>
+          <% end %>
+        </select>
+
+      <% when "open_ended" %>
+        <textarea class="quiz-correct-textarea" data-quiz-accepted rows="2"
+                  data-action="input->survey-editor#markDirty"
+                  placeholder="<%= t('card.accepted_answers') %>"><%= Array(card["correct"]).join("\n") %></textarea>
+      <% end %>
+
+      <textarea class="quiz-correct-textarea quiz-explanation" data-quiz-explanation rows="2"
+                data-action="input->survey-editor#markDirty"
+                placeholder="<%= t('card.explanation_placeholder') %>"><%= card["explanation"] %></textarea>
+    </div>
+  <% end %>
 
   <%# "Other" free-text — a standalone answer the creator can toggle per card.
       Rendered for every question type (not welcome). In the editor it's always

@@ -20,6 +20,15 @@ nl:
     required: "Verplichte vraag"
     other: Anders
     other_placeholder: Vertel het in je eigen woorden…
+    mark_correct: "Markeer het juiste antwoord"
+    correct_pick_hint: "Tik op de optie(s) die spelers moeten kiezen om goed te zijn."
+    correct_tap_hint: "Stel de juiste swipe in voor elke stelling."
+    correct_scale_hint: "Kies de waarde die als juist telt."
+    accepted_answers: "Geaccepteerde antwoorden"
+    accepted_answers_hint: "Eén per regel — elke overeenkomst (niet hoofdlettergevoelig) is goed."
+    explanation: "Uitleg"
+    explanation_placeholder: "Wordt getoond nadat de speler heeft geantwoord — bijv. waarom dit juist is."
+    correct_badge: "Juist"
   auth:
     social_continue: "Doorgaan met %{provider}"
     social_divider: "of"
@@ -88,6 +97,8 @@ nl:
     back: "← Terug"
     next: Volgende →
     submit: Verzenden ✓
+    quiz_compare_cta: "Bekijk hoe jij je verhoudt →"
+    quiz_compare_title: "Hoe jij je verhoudt"
   js:
     player:
       region_optout: "Mijn regio niet delen"
@@ -101,6 +112,16 @@ nl:
       compare_cta: Bekijk je resultaten ten opzichte van anderen →
       compare_loading: Laden…
       compare_error: Kon niet laden — probeer opnieuw
+      quiz_score: "Score %{score}/%{max}"
+      quiz_correct: "Juist!"
+      quiz_wrong: "Net niet"
+      quiz_answer: "Juiste antwoord:"
+      quiz_check: "Antwoord controleren"
+      quiz_result_label: "Je scoorde"
+      quiz_compare_meta: "Je scoorde %{score}/%{max} — beter dan %{beat}% van de spelers · gemiddeld %{avg}"
+      quiz_compare_empty: "Wees de eerste die klaar is — nog geen vergelijking."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "Hoe iedereen het deed, vraag voor vraag"
     editor:
       delete_card_confirm: Deze kaart verwijderen?
       unsaved: Niet-opgeslagen wijzigingen
@@ -488,6 +509,8 @@ nl:
     s6_placeholder: bijv. Het publiek heeft Playverto nog nooit gebruikt; houd de toon warm, niet zakelijk.
     s6_compare_label: Laat respondenten hun antwoorden vergelijken
     s6_compare_desc: Toon een CTA op de bedankpagina die laat zien hoe hun antwoorden zich verhouden tot die van anderen.
+    quiz_label: "Maak hier een quiz van"
+    quiz_desc: "Markeer antwoorden goed of fout, toon spelers hun score en laat ze zich met anderen vergelijken. Je stelt de juiste antwoorden in na het genereren."
     s7_eyebrow: Stap 07 · Laatste touch
     s7_lead: Open in een kant-en-klare Verto of een leeg canvas.
     s7_body: We kiezen een achtergrond en afbeeldingen per kaart uit onze samengestelde bibliotheek — afgestemd op jouw thema, doelgroep en de vraag op elke kaart.

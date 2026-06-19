@@ -20,6 +20,15 @@ ko:
     required: "필수 질문"
     other: 기타
     other_placeholder: 직접 입력해 주세요…
+    mark_correct: "정답 표시하기"
+    correct_pick_hint: "플레이어가 맞히려면 선택해야 하는 옵션을 탭하세요."
+    correct_tap_hint: "각 문장에 대한 올바른 스와이프를 설정하세요."
+    correct_scale_hint: "정답으로 인정할 값을 선택하세요."
+    accepted_answers: "허용되는 답변"
+    accepted_answers_hint: "한 줄에 하나씩 — 대소문자 구분 없이 하나라도 일치하면 정답입니다."
+    explanation: "설명"
+    explanation_placeholder: "플레이어가 답한 후 표시됩니다 — 예: 왜 이것이 정답인지."
+    correct_badge: "정답"
   auth:
     social_continue: "%{provider}로 계속하기"
     social_divider: "또는"
@@ -88,6 +97,8 @@ ko:
     back: "← 뒤로"
     next: 다음 →
     submit: 제출 ✓
+    quiz_compare_cta: "내 비교 결과 보기 →"
+    quiz_compare_title: "내 비교 결과"
   js:
     player:
       region_optout: "내 지역 공유 안 함"
@@ -101,6 +112,16 @@ ko:
       compare_cta: 다른 사람들과 비교한 결과 보기 →
       compare_loading: 불러오는 중…
       compare_error: 불러올 수 없습니다 — 다시 시도하세요
+      quiz_score: "점수 %{score}/%{max}"
+      quiz_correct: "정답!"
+      quiz_wrong: "아쉬워요"
+      quiz_answer: "정답:"
+      quiz_check: "답 확인"
+      quiz_result_label: "내 점수"
+      quiz_compare_meta: "%{score}/%{max}점을 받았어요 — 플레이어의 %{beat}%보다 높아요 · 평균 %{avg}"
+      quiz_compare_empty: "가장 먼저 완료해 보세요 — 아직 비교가 없어요."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "모두가 문제별로 어떻게 했는지"
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       unsaved: 저장되지 않은 변경사항
@@ -488,6 +509,8 @@ ko:
     s6_placeholder: '예: 청중이 Playverto를 처음 사용함, 기업적이지 않고 따뜻한 톤 유지.'
     s6_compare_label: 응답자가 자신의 답변을 비교할 수 있도록 허용
     s6_compare_desc: 감사 페이지에 자신의 답변이 다른 사람들과 어떻게 비교되는지 보여주는 CTA를 표시합니다.
+    quiz_label: "퀴즈로 만들기"
+    quiz_desc: "답변을 정답 또는 오답으로 표시하고, 플레이어에게 점수를 보여주며, 다른 사람들과 비교할 수 있게 합니다. 정답은 생성 후에 설정합니다."
     s7_eyebrow: Step 07 · 마무리
     s7_lead: 완성된 Verto로 시작하거나, 빈 캔버스로 시작하세요.
     s7_body: 테마, 대상 및 각 카드의 질문에 맞춰 엄선된 라이브러리에서 배경과 카드별 이미지를 선택해 드립니다.

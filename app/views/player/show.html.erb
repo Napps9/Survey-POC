@@ -25,6 +25,18 @@
   region_links = @survey.survey_region_links.order(:created_at).to_a
   has_regions  = region_links.any? || @survey.ask_region?
   regions_url  = has_regions && play_token.present? ? player_regions_url(play_token) : ""
+
+  # Quiz mode: each graded card is scored server-side as the player advances.
+  # The grade/state endpoints need a reachable token, so they're blank in owner
+  # preview (and for token-less drafts) — preview instead grades client-side
+  # from correct answers embedded only on the owner's preview page. The scores
+  # ("how you compare") endpoint is a read and likewise needs a live token.
+  quiz_mode      = @survey.quiz?
+  live_quiz      = quiz_mode && !preview_mode && play_token.present?
+  grade_url      = live_quiz ? grade_survey_url(play_token) : ""
+  quiz_state_url = live_quiz ? quiz_state_survey_url(play_token) : ""
+  scores_url     = live_quiz ? player_scores_url(play_token) : ""
+  graded_set     = quiz_mode ? @survey.graded_card_indices.to_set : Set.new
 %>
 <div class="preview-overlay flex flex-col"
      style="height:100vh;<%= verto_backdrop_style_attr(@survey) %>"
@@ -38,7 +50,11 @@
      data-player-region-label-value="<%= @region_link&.label %>"
      data-player-locale-value="<%= @display_locale %>"
      data-player-share-url-value="<%= share_url %>"
-     data-player-show-comparison-value="<%= show_comparison %>">
+     data-player-show-comparison-value="<%= show_comparison %>"
+     data-player-quiz-value="<%= quiz_mode %>"
+     data-player-grade-url-value="<%= grade_url %>"
+     data-player-quiz-state-url-value="<%= quiz_state_url %>"
+     data-player-scores-url-value="<%= scores_url %>">
 
   <% if preview_mode %>
     <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 14px;background:rgba(1,234,203,0.1);border-bottom:1px solid rgba(1,234,203,0.25);">
@@ -100,16 +116,22 @@
 
     <% cards.each_with_index do |card, idx| %>
       <%
-        type  = card["type"].to_s
-        is_q  = type != "welcome_card"
+        type   = card["type"].to_s
+        is_q   = type != "welcome_card"
+        graded = graded_set.include?(idx)
         prev_q += 1 if is_q
-        prog  = total_q > 0 ? ((prev_q.to_f / total_q) * 100).round : 5
-        prog  = 5 unless is_q
+        prog   = total_q > 0 ? ((prev_q.to_f / total_q) * 100).round : 5
+        prog   = 5 unless is_q
       %>
+      <%# A graded card carries only a boolean flag in the live player — never
+          its correct answer (that's revealed by the server after answering).
+          In owner preview the answer rides along so the reveal works offline. %>
       <div class="preview-card"
            data-player-target="card"
            data-card-index="<%= idx %>"
            data-card-type="<%= type %>"
+           data-card-graded="<%= graded %>"
+           <% if preview_mode && graded %>data-card-correct="<%= QuizGrading.correct_display(card).to_json %>" data-card-explanation="<%= card['explanation'] %>"<% end %>
            data-card-required="<%= (is_q && card['required']) ? 'true' : 'false' %>">
         <%= render "player/play_card", card: card, progress: prog,
               locale: @display_locale, default_locale: @survey.default_locale %>
@@ -128,9 +150,24 @@
           <%= safe_join(@survey.thankyou_body_text.split("\n"), tag.br) %>
         </div>
 
+        <%# Quiz final score — filled in by the player on finish (live: from the
+            submit response; preview: from client-side grading). %>
+        <% if quiz_mode %>
+          <div class="quiz-result-card hidden" data-player-target="quizScore"></div>
+        <% end %>
+
         <%# Thank-you actions: compare (brand CTA) then the outline secondaries —
             forward-to-website, share, and regions. %>
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:22px;width:100%;">
+          <% if quiz_mode && scores_url.present? %>
+            <button type="button"
+                    data-player-target="scoresBtn"
+                    data-action="click->player#showScores"
+                    style="padding:11px 22px;border-radius:100px;background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
+              <%= t("player.quiz_compare_cta") %>
+            </button>
+          <% end %>
+
           <% if show_comparison %>
             <button type="button"
                     data-player-target="compareBtn"
@@ -208,6 +245,27 @@
         </div>
       <% end %>
 
+      <%# Quiz: "how you compare" — your score against everyone's distribution,
+          plus a per-question correct-rate. Filled by player#showScores. %>
+      <% if quiz_mode && scores_url.present? %>
+        <div data-player-target="scoresPanel" class="hidden"
+             style="width:100%;max-width:640px;margin:0 auto;padding:24px 22px 28px;overflow-y:auto;max-height:calc(100vh - 120px);background:#1C2034;border:1px solid rgba(255,255,255,0.08);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);">
+          <div style="text-align:center;margin-bottom:18px;">
+            <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.quiz_compare_title") %></div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"
+                 data-player-target="scoresMeta"></div>
+          </div>
+          <div data-player-target="scoresList" style="display:flex;flex-direction:column;gap:14px;"></div>
+          <div style="display:flex;justify-content:center;margin-top:18px;">
+            <button type="button"
+                    data-action="click->player#hideScores"
+                    style="padding:9px 18px;border-radius:100px;background:transparent;color:#fff;font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
+              <%= t("player.back") %>
+            </button>
+          </div>
+        </div>
+      <% end %>
+
       <% if show_comparison %>
         <div data-player-target="comparison" class="hidden"
              style="width:100%;max-width:640px;margin:0 auto;padding:24px 22px 28px;overflow-y:auto;max-height:calc(100vh - 120px);background:#1C2034;border:1px solid rgba(255,255,255,0.08);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);">
@@ -241,6 +299,8 @@
             data-action="click->player#back"
             aria-label="Back"><%= t("player.back") %></button>
     <span class="preview-progress-text" data-player-target="progress"></span>
+    <%# Quiz running score — shown only on a quiz, updated after each graded card. %>
+    <span class="quiz-score-chip hidden" data-player-target="scoreChip" aria-live="polite"></span>
     <button class="preview-btn preview-btn-next"
             data-player-target="nextBtn"
             data-action="click->player#next"><%= t("player.next") %></button>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_19_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_19_120002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -218,8 +218,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_120001) do
     t.json "answers", default: {}, null: false
     t.datetime "created_at", null: false
     t.string "locale"
+    t.integer "quiz_max"
     t.string "region_country"
     t.string "region_label"
+    t.integer "score"
     t.string "session_token", null: false
     t.string "status", default: "completed", null: false
     t.integer "survey_id", null: false
@@ -285,6 +287,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_120001) do
     t.integer "organisation_id", null: false
     t.string "publish_token"
     t.datetime "published_at"
+    t.boolean "quiz", default: false, null: false
     t.text "results_report"
     t.integer "results_report_response_count"
     t.text "results_summary"

@@ -8,7 +8,8 @@ export default class extends Controller {
     url: String, title: String, description: String,
     defaultLocale: { type: String, default: "en" },
     locales: { type: Array, default: [] },
-    rtlLocales: { type: Array, default: [] }
+    rtlLocales: { type: Array, default: [] },
+    quiz: { type: Boolean, default: false }
   }
 
   _saveTimer = null
@@ -349,6 +350,17 @@ export default class extends Controller {
         } catch (_) { /* ignore malformed */ }
       }
 
+      // Quiz: a card with a marked correct answer carries `correct` (+ optional
+      // `explanation`); leaving it unmarked keeps the card as a measurement Q.
+      if (this.quizValue) {
+        const correct = this._readCorrect(card, type)
+        if (this._hasCorrect(correct)) {
+          out.correct = correct
+          const expl = card.querySelector("[data-quiz-explanation]")?.value?.trim()
+          if (expl) out.explanation = expl
+        }
+      }
+
       const i18n = {}
       secondary.forEach(loc => {
         const t = entry[loc]
@@ -368,6 +380,77 @@ export default class extends Controller {
     })
 
     return { title: this.titleValue, description: this.descriptionValue, cards }
+  }
+
+  // ── Quiz: correct-answer marking ─────────────────────────────────────────
+
+  _hasCorrect(c) {
+    if (c === null || c === undefined || c === "") return false
+    if (Array.isArray(c)) return c.length > 0
+    if (typeof c === "object") return Object.keys(c).length > 0
+    return true
+  }
+
+  // The marked correct answer for a card, in the shape QuizGrading expects.
+  _readCorrect(card, type) {
+    const labelOf = item => {
+      if (type === "yes_no") return (item.dataset.canonical || "").trim()
+      const lbl = item.querySelector(".pick-text, .choice-label")
+      return (lbl?.textContent.trim()) || (item.dataset.canonical || "").trim()
+    }
+    switch (type) {
+      case "multiple_choice": case "yes_no": case "select_one_grid": {
+        const el = card.querySelector('[data-picker-target="item"][data-correct="true"]')
+        return el ? labelOf(el) : null
+      }
+      case "select_many": case "select_many_grid":
+        return Array.from(card.querySelectorAll('[data-picker-target="item"][data-correct="true"]'))
+                    .map(labelOf).filter(Boolean)
+      case "tap_card": {
+        const map = {}
+        card.querySelectorAll(".quiz-tap-row").forEach(row => {
+          const dir = row.dataset.correctDir
+          if (dir === "yes" || dir === "no") map[(row.dataset.statement || "").trim()] = dir
+        })
+        return map
+      }
+      case "range": case "nps": case "rating": {
+        const v = card.querySelector("[data-quiz-correct]")?.value
+        return (v === undefined || v === null || v === "") ? null : Number(v)
+      }
+      case "open_ended": {
+        const ta = card.querySelector("[data-quiz-accepted]")
+        return ta ? ta.value.split("\n").map(s => s.trim()).filter(Boolean) : null
+      }
+      default: return null
+    }
+  }
+
+  // Mark / unmark an option as correct. Single-choice acts like a radio.
+  toggleCorrect(event) {
+    event.stopPropagation()
+    const btn  = event.currentTarget
+    const item = btn.closest('[data-picker-target="item"]')
+    if (!item) return
+    const turnOn = item.dataset.correct !== "true"
+    if (btn.dataset.pickerMode === "single") {
+      item.closest(".choice-list, .choice-grid")
+          ?.querySelectorAll('[data-picker-target="item"]')
+          .forEach(el => { el.dataset.correct = "false" })
+    }
+    item.dataset.correct = turnOn ? "true" : "false"
+    this.markDirty()
+  }
+
+  // Set / clear the correct swipe direction for one tap_card statement.
+  toggleTapCorrect(event) {
+    event.stopPropagation()
+    const btn = event.currentTarget
+    const row = btn.closest(".quiz-tap-row")
+    if (!row) return
+    row.dataset.correctDir = (row.dataset.correctDir === btn.dataset.dir) ? "" : btn.dataset.dir
+    row.querySelectorAll(".quiz-tap-btn").forEach(b => b.classList.toggle("is-on", b.dataset.dir === row.dataset.correctDir))
+    this.markDirty()
   }
 
   async save(event) {

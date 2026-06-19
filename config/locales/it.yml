@@ -20,6 +20,15 @@ it:
     required: "Domanda obbligatoria"
     other: Altro
     other_placeholder: Raccontacelo con parole tue…
+    mark_correct: "Indica la risposta corretta"
+    correct_pick_hint: "Tocca le opzioni che i giocatori devono scegliere per indovinare."
+    correct_tap_hint: "Imposta lo swipe corretto per ogni affermazione."
+    correct_scale_hint: "Scegli il valore che conta come corretto."
+    accepted_answers: "Risposte accettate"
+    accepted_answers_hint: "Una per riga — qualsiasi corrispondenza (senza distinzione tra maiuscole e minuscole) è corretta."
+    explanation: "Spiegazione"
+    explanation_placeholder: "Mostrata dopo la risposta del giocatore — es. perché è corretta."
+    correct_badge: "Corretta"
   auth:
     social_continue: "Continua con %{provider}"
     social_divider: "oppure"
@@ -88,6 +97,8 @@ it:
     back: "← Indietro"
     next: Avanti →
     submit: Invia ✓
+    quiz_compare_cta: "Scopri come ti confronti →"
+    quiz_compare_title: "Come ti confronti"
   js:
     player:
       region_optout: "Non condividere la mia regione"
@@ -101,6 +112,16 @@ it:
       compare_cta: Confronta i tuoi risultati con gli altri →
       compare_loading: Caricamento…
       compare_error: Caricamento non riuscito — riprova
+      quiz_score: "Punteggio %{score}/%{max}"
+      quiz_correct: "Corretto!"
+      quiz_wrong: "Non proprio"
+      quiz_answer: "Risposta corretta:"
+      quiz_check: "Verifica risposta"
+      quiz_result_label: "Hai totalizzato"
+      quiz_compare_meta: "Hai totalizzato %{score}/%{max} — meglio del %{beat}% dei giocatori · media %{avg}"
+      quiz_compare_empty: "Sii il primo a finire — ancora nessun confronto."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "Come hanno fatto tutti, domanda per domanda"
     editor:
       delete_card_confirm: Eliminare questa carta?
       unsaved: Modifiche non salvate
@@ -488,6 +509,8 @@ it:
     s6_placeholder: es. Il pubblico non ha mai usato Playverto prima, mantieni un tono caldo, non aziendale.
     s6_compare_label: Consenti ai rispondenti di confrontare le loro risposte
     s6_compare_desc: Mostra una CTA nella pagina di ringraziamento che rivela come le loro risposte si confrontano con quelle degli altri.
+    quiz_label: "Rendilo un quiz"
+    quiz_desc: "Segna le risposte come giuste o sbagliate, mostra ai giocatori il loro punteggio e lascia che si confrontino con gli altri. Imposti le risposte corrette dopo la generazione."
     s7_eyebrow: Passo 07 · Tocco finale
     s7_lead: Apri con un Verto già rifinito oppure su una tela bianca.
     s7_body: Selezioniamo uno sfondo e le immagini per ogni scheda dalla nostra libreria curata — abbinate al tuo tema, al pubblico e alla domanda su ogni scheda.

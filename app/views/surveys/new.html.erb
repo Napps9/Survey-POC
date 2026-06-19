@@ -494,6 +494,24 @@
                 </span>
               </span>
             </label>
+
+            <%# Quiz mode — graded answers, a score, and a "how you compare". The
+                generator seeds correct answers for the standard quiz types; the
+                creator tunes them (and adds any others) in the editor. %>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-top:4px;padding:12px 14px;border-radius:12px;background:rgba(97,91,245,0.05);border:1px solid rgba(97,91,245,0.18);">
+              <%= f.check_box :quiz,
+                    { checked: false,
+                      style: "margin-top:2px;width:16px;height:16px;accent-color:#615BF5;cursor:pointer;flex-shrink:0;" },
+                    "1", "0" %>
+              <span>
+                <span style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);color:#1C2034;letter-spacing:0.02em;">
+                  <%= t("wizard.quiz_label") %>
+                </span>
+                <span style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.5);margin-top:2px;line-height:1.4;">
+                  <%= t("wizard.quiz_desc") %>
+                </span>
+              </span>
+            </label>
           </div>
         </div>
       </section>

@@ -20,6 +20,15 @@ fr:
     required: "Question obligatoire"
     other: Autre
     other_placeholder: Dites-le avec vos propres mots…
+    mark_correct: "Indiquer la bonne réponse"
+    correct_pick_hint: "Touchez la ou les options que les joueurs doivent choisir pour avoir raison."
+    correct_tap_hint: "Définissez le bon glissement pour chaque affirmation."
+    correct_scale_hint: "Choisissez la valeur considérée comme correcte."
+    accepted_answers: "Réponses acceptées"
+    accepted_answers_hint: "Une par ligne — toute correspondance (insensible à la casse) est correcte."
+    explanation: "Explication"
+    explanation_placeholder: "Affiché après la réponse du joueur — p. ex. pourquoi c'est correct."
+    correct_badge: "Correct"
   auth:
     social_continue: "Continuer avec %{provider}"
     social_divider: "ou"
@@ -88,6 +97,8 @@ fr:
     back: "← Retour"
     next: Suivant →
     submit: Envoyer ✓
+    quiz_compare_cta: "Voyez comment vous vous situez →"
+    quiz_compare_title: "Comment vous vous situez"
   js:
     player:
       region_optout: "Ne pas partager ma région"
@@ -101,6 +112,16 @@ fr:
       compare_cta: Voyez vos résultats comparés aux autres →
       compare_loading: Chargement…
       compare_error: Échec du chargement — réessayez
+      quiz_score: "Score %{score}/%{max}"
+      quiz_correct: "Correct !"
+      quiz_wrong: "Pas tout à fait"
+      quiz_answer: "Bonne réponse :"
+      quiz_check: "Vérifier la réponse"
+      quiz_result_label: "Vous avez obtenu"
+      quiz_compare_meta: "Vous avez obtenu %{score}/%{max} — mieux que %{beat}% des joueurs · moyenne %{avg}"
+      quiz_compare_empty: "Soyez le premier à terminer — aucune comparaison pour l'instant."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "Comment chacun s'en est sorti, question par question"
     editor:
       delete_card_confirm: Supprimer cette carte ?
       unsaved: Modifications non enregistrées
@@ -488,6 +509,8 @@ fr:
     s6_placeholder: ex. Le public n'a jamais utilisé Playverto, garder un ton chaleureux, pas corporate.
     s6_compare_label: Permettre aux répondants de comparer leurs réponses
     s6_compare_desc: Afficher un CTA sur la page de remerciement révélant comment leurs réponses se comparent à celles des autres.
+    quiz_label: "Transformer ceci en quiz"
+    quiz_desc: "Marquez les réponses comme justes ou fausses, montrez aux joueurs leur score et laissez-les se comparer aux autres. Vous définissez les bonnes réponses après la génération."
     s7_eyebrow: Étape 07 · Touche finale
     s7_lead: Ouvrir dans un Verto prêt à l'emploi ou sur une toile vierge.
     s7_body: Nous sélectionnons un arrière-plan et des images par carte depuis notre bibliothèque curatée — en accord avec votre thème, votre audience et la question de chaque carte.

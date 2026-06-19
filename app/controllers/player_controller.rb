@@ -13,7 +13,7 @@ class PlayerController < ApplicationController
   # Raise them if you run large single-IP events. No-op in test (null cache).
   rate_limit to: 60, within: 1.minute, only: :submit,
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
-  rate_limit to: 300, within: 1.minute, only: :progress,
+  rate_limit to: 300, within: 1.minute, only: [ :progress, :grade ],
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
 
   before_action :load_survey_and_share
@@ -37,12 +37,15 @@ class PlayerController < ApplicationController
     resp.survey       ||= @survey
     resp.survey_share ||= @survey_share
     apply_region(resp, data)
-    resp.answers = data["answers"] || {}
+    # Quiz answers are immutable once committed — fold the incoming payload over
+    # what's already stored so an already-answered graded card can't be changed.
+    resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     # NB: the status column defaults to "completed", so a freshly initialized
     # record already reads "completed" — only preserve it for rows already saved
     # as completed (a late progress ping after submit), otherwise mark "started".
     resp.status  = "started" unless resp.persisted? && resp.status == "completed"
+    apply_quiz_score(resp)
     resp.save!
     render json: { ok: true, session_token: token }
   rescue => e
@@ -59,13 +62,116 @@ class PlayerController < ApplicationController
     resp.survey       ||= @survey
     resp.survey_share ||= @survey_share
     apply_region(resp, data)
-    attrs = { answers: data["answers"] || {}, status: "completed" }
-    attrs[:locale] = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
-    resp.update!(attrs)
-    render json: { ok: true }
+    resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    resp.status  = "completed"
+    resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
+    apply_quiz_score(resp)
+    resp.save!
+    payload = { ok: true }
+    payload.merge!(score: resp.score, max: resp.quiz_max) if @survey.quiz?
+    render json: payload
   rescue => e
     Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
     render json: { ok: false, error: "Something went wrong saving your response." }, status: :unprocessable_entity
+  end
+
+  # Quiz: record + grade one card as the player advances, returning that card's
+  # verdict so the player can reveal it. Doubles as the progress save for quizzes
+  # (it records the whole payload, immutably for already-answered graded cards).
+  # The correct answer is only ever revealed for a card the session has actually
+  # committed an answer to — so it can't be peeked before answering.
+  def grade
+    return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "Not a quiz" }, status: :forbidden unless @survey.quiz?
+
+    data  = JSON.parse(request.body.read)
+    token = data["session_token"].presence || SecureRandom.uuid
+    idx   = data["card_index"].to_i
+    resp  = Response.find_or_initialize_by(session_token: token)
+    resp.survey       ||= @survey
+    resp.survey_share ||= @survey_share
+    apply_region(resp, data)
+    resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
+    resp.status  = "started" unless resp.persisted? && resp.status == "completed"
+    apply_quiz_score(resp)
+    resp.save!
+
+    base = { ok: true, session_token: token, score: resp.score, max: resp.quiz_max }
+    card = Array(@survey.cards)[idx]
+    stored = resp.answers[idx.to_s]
+    if card && QuizGrading.graded?(card) && answered?(stored)
+      render json: base.merge(
+        graded: true,
+        correct: QuizGrading.correct?(card, stored["value"]),
+        correct_answer: QuizGrading.correct_display(card),
+        explanation: card["explanation"].to_s
+      )
+    else
+      # Measurement card, unknown index, or no committed answer yet — record
+      # only, reveal nothing.
+      render json: base.merge(graded: false)
+    end
+  rescue => e
+    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Something went wrong scoring your answer." }, status: :unprocessable_entity
+  end
+
+  # Quiz: the session's already-committed graded cards, so a reload re-locks and
+  # re-reveals them (refresh-proof no-redo). Resolved by the client's session
+  # token; these answers are already committed, so revealing them is safe.
+  def quiz_state
+    return render json: { ok: false }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: true, quiz: false } unless @survey.quiz?
+
+    token = params[:session_token].to_s
+    resp  = token.present? ? @survey.responses.find_by(session_token: token) : nil
+    answered = {}
+    if resp
+      Array(@survey.cards).each_with_index do |card, idx|
+        next unless QuizGrading.graded?(card)
+        ans = (resp.answers || {})[idx.to_s]
+        next unless answered?(ans)
+        answered[idx.to_s] = {
+          value:          ans["value"],
+          correct:        QuizGrading.correct?(card, ans["value"]),
+          correct_answer: QuizGrading.correct_display(card),
+          explanation:    card["explanation"].to_s
+        }
+      end
+    end
+    render json: { ok: true, quiz: true, score: resp&.score,
+                   max: resp&.quiz_max || QuizGrading.graded_indices(@survey.cards).size,
+                   answered: answered }
+  end
+
+  # Quiz: anonymous score distribution across completed responses, so a player
+  # can see how they did versus everyone else (no identities — a histogram and
+  # per-question correct-rate).
+  def scores
+    return render json: { ok: false }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "Not a quiz" }, status: :forbidden unless @survey.quiz?
+
+    completed = @survey.responses.where(status: "completed").where.not(score: nil).to_a
+    values    = completed.map(&:score)
+    max       = QuizGrading.graded_indices(@survey.cards).size
+    total     = values.size
+    avg       = total.positive? ? (values.sum.to_f / total).round(1) : 0.0
+    dist      = Hash.new(0).tap { |h| values.each { |s| h[s] += 1 } }
+
+    per_question = Array(@survey.cards).each_with_index.filter_map do |card, idx|
+      next unless QuizGrading.graded?(card)
+      n = completed.count { |r| QuizGrading.correct?(card, (r.answers || {})[idx.to_s]&.dig("value")) }
+      { index: idx, prompt: card["text"], correct: n,
+        pct: total.positive? ? (n * 100.0 / total).round : 0 }
+    end
+
+    render json: { ok: true, total:, max:, average: avg,
+                   distribution: (0..max).map { |s| { score: s, count: dist[s] } },
+                   per_question: }
   end
 
   def results
@@ -106,6 +212,46 @@ class PlayerController < ApplicationController
   end
 
   private
+
+  # The answers already persisted for a response (empty for a brand-new row).
+  def stored_answers(resp)
+    resp.persisted? && resp.answers.is_a?(Hash) ? resp.answers : {}
+  end
+
+  # Anti-cheat for quizzes: a graded card that already holds a committed answer
+  # is locked — its stored value always wins over anything in the new payload.
+  # Non-graded (measurement) cards and not-yet-answered cards take the incoming
+  # value as normal. Non-quiz Vertos merge nothing (incoming wins outright).
+  def locked_merge(stored, incoming)
+    incoming = incoming.is_a?(Hash) ? incoming : {}
+    return incoming unless @survey.quiz?
+    stored = stored.is_a?(Hash) ? stored : {}
+    merged = incoming.dup
+    Array(@survey.cards).each_with_index do |card, idx|
+      next unless QuizGrading.graded?(card)
+      key = idx.to_s
+      merged[key] = stored[key] if answered?(stored[key])
+    end
+    merged
+  end
+
+  # Whether an answer hash holds a real response (a value, or free-text Other).
+  def answered?(ans)
+    return false unless ans.is_a?(Hash)
+    return true if ans["other"].to_s.strip != ""
+    v = ans["value"]
+    return v.any? if v.is_a?(Array)
+    !(v.nil? || (v.is_a?(String) && v.strip.empty?))
+  end
+
+  # Cache the server-computed score on quiz responses so "how you compare" is a
+  # cheap read; a no-op for non-quiz Vertos.
+  def apply_quiz_score(resp)
+    return unless @survey.quiz?
+    result = QuizGrading.score(@survey.cards, resp.answers)
+    resp.score    = result[:score]
+    resp.quiz_max = result[:max]
+  end
 
   # The flat row shape the player JS renders comparisons from.
   def aggregate_rows(responses)

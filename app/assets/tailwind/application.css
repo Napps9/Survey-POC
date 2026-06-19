@@ -3721,3 +3721,136 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "ABeeZee", sans-serif; font-size: 12.5px; color: rgba(0,0,0,0.5);
   text-decoration: underline; text-underline-offset: 3px;
 }
+
+/* ── Quiz mode ─────────────────────────────────────────────────────────────
+   A quiz Verto scores graded answers. The running score sits in the footer,
+   each graded card reveals right/wrong in place (then locks), and the
+   thank-you screen shows the final score + a "how you compare" panel. */
+
+/* Running score chip in the player footer. */
+.quiz-score-chip {
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.04em;
+  color: var(--brand-cta-text, #1C2034);
+  background: var(--brand-cta, #01EACB);
+  padding: 5px 12px; border-radius: 100px; white-space: nowrap;
+}
+
+/* Per-card reveal banner, shown in the white content panel after answering. */
+.quiz-reveal {
+  margin-top: 14px; padding: 12px 14px; border-radius: 12px;
+  border: 1px solid transparent; animation: quiz-reveal-in 0.28s ease both;
+}
+.quiz-reveal.is-correct { background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.35); }
+.quiz-reveal.is-wrong   { background: rgba(216,0,39,0.07);   border-color: rgba(216,0,39,0.30); }
+.quiz-reveal-head {
+  font-family: "Alata", sans-serif; font-size: 14px; letter-spacing: 0.02em;
+}
+.quiz-reveal.is-correct .quiz-reveal-head { color: #0B8A5E; }
+.quiz-reveal.is-wrong   .quiz-reveal-head { color: #C0001F; }
+.quiz-reveal-answer {
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034;
+  margin-top: 5px;
+}
+.quiz-reveal-expl {
+  font-family: "ABeeZee", sans-serif; font-size: 12.5px; line-height: 1.5;
+  color: rgba(0,0,0,0.6); margin-top: 6px;
+}
+@keyframes quiz-reveal-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Locked, revealed card — answer widgets stop responding to input. */
+.preview-card.quiz-locked .choice-list,
+.preview-card.quiz-locked .choice-grid,
+.preview-card.quiz-locked .rotate-wrap,
+.preview-card.quiz-locked .slider-wrap,
+.preview-card.quiz-locked .nps-slider,
+.preview-card.quiz-locked .rating-wrap,
+.preview-card.quiz-locked .freeform-wrap { pointer-events: none; }
+
+/* Correct / incorrect option tinting on list + grid choices. */
+.pick-item.opt-correct, .pick-item.opt-wrong,
+.choice-card.opt-correct, .choice-card.opt-wrong { position: relative; }
+.pick-item.opt-correct, .choice-card.opt-correct {
+  outline: 2px solid #10B981; outline-offset: 1px; border-radius: 14px;
+}
+.pick-item.opt-wrong, .choice-card.opt-wrong {
+  outline: 2px solid #D80027; outline-offset: 1px; border-radius: 14px; opacity: 0.85;
+}
+.pick-item.opt-correct::after, .choice-card.opt-correct::after { content: "✓"; }
+.pick-item.opt-wrong::after,   .choice-card.opt-wrong::after   { content: "✗"; }
+.pick-item.opt-correct::after, .pick-item.opt-wrong::after,
+.choice-card.opt-correct::after, .choice-card.opt-wrong::after {
+  position: absolute; top: 6px; right: 8px; z-index: 3;
+  font-family: "Alata", sans-serif; font-size: 13px; line-height: 1;
+}
+.pick-item.opt-correct::after, .choice-card.opt-correct::after { color: #10B981; }
+.pick-item.opt-wrong::after,   .choice-card.opt-wrong::after   { color: #D80027; }
+
+/* Final score card on the thank-you screen. */
+.quiz-result-card {
+  margin: 18px auto 4px; padding: 18px 22px; border-radius: 18px;
+  background: var(--brand-primary-soft, rgba(1,234,203,0.12));
+  border: 1px solid var(--brand-primary, rgba(1,234,203,0.4));
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.quiz-result-label {
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--brand-primary, #01EACB);
+}
+.quiz-result-score {
+  font-family: "Alata", sans-serif; font-size: 40px; line-height: 1.1; color: #fff;
+}
+.quiz-result-max { font-size: 22px; color: rgba(255,255,255,0.55); }
+.quiz-result-pct { font-family: "ABeeZee", sans-serif; font-size: 14px; color: rgba(255,255,255,0.7); }
+
+/* ── Quiz: editor correct-answer controls ──────────────────────────────────
+   Shown on quiz Vertos in the editor's white content panel. Hidden on
+   translation tabs, so a correct answer is only set in the primary language. */
+
+.editing-translation .mark-correct,
+.editing-translation .quiz-correct-block { display: none; }
+
+/* Per-option "mark correct" toggle on list + grid choices. */
+.mark-correct {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.2); background: #fff; color: rgba(0,0,0,0.25);
+  font-size: 12px; line-height: 1; cursor: pointer; transition: all 0.12s;
+}
+.mark-correct:hover { border-color: #10B981; color: #10B981; }
+.mark-correct-grid { position: absolute; top: 7px; left: 7px; z-index: 4; }
+.pick-item[data-correct="true"] .mark-correct,
+.choice-card[data-correct="true"] .mark-correct {
+  background: #10B981; border-color: #10B981; color: #fff;
+}
+.pick-item[data-correct="true"] { outline: 2px solid rgba(16,185,129,0.55); outline-offset: 1px; border-radius: 14px; }
+.choice-card[data-correct="true"] { outline: 2px solid #10B981; outline-offset: 1px; }
+
+/* The correct-answer block (swipe directions, scale/open answers, explanation). */
+.quiz-correct-block {
+  margin-top: 12px; padding: 12px 14px; border-radius: 14px;
+  background: rgba(97,91,245,0.05); border: 1px dashed rgba(97,91,245,0.35);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.quiz-correct-title {
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.04em;
+  color: #4A45C4; display: flex; align-items: center; gap: 6px;
+}
+.quiz-correct-star { color: #FFCC00; }
+.quiz-correct-hint { font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(0,0,0,0.5); line-height: 1.4; }
+.quiz-correct-select, .quiz-correct-textarea {
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034;
+  background: #fff; border: 1.5px solid rgba(0,0,0,0.14); border-radius: 10px;
+  padding: 8px 10px; outline: none; width: 100%; box-sizing: border-box;
+}
+.quiz-correct-select:focus, .quiz-correct-textarea:focus { border-color: #615BF5; }
+.quiz-correct-textarea { resize: vertical; line-height: 1.45; }
+
+/* Per-statement correct-swipe rows for tap_card. */
+.quiz-tap-row { display: flex; align-items: center; gap: 8px; }
+.quiz-tap-label { flex: 1; min-width: 0; font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034; }
+.quiz-tap-btn {
+  flex-shrink: 0; width: 30px; height: 26px; border-radius: 8px;
+  border: 1.5px solid rgba(0,0,0,0.16); background: #fff; cursor: pointer;
+  font-size: 12px; line-height: 1; color: rgba(0,0,0,0.4); transition: all 0.12s;
+}
+.quiz-tap-btn.yes.is-on { background: #10B981; border-color: #10B981; color: #fff; }
+.quiz-tap-btn.no.is-on  { background: #D80027; border-color: #D80027; color: #fff; }

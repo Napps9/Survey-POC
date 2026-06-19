@@ -20,6 +20,15 @@ id:
     required: "Pertanyaan wajib"
     other: Lainnya
     other_placeholder: Beri tahu kami dengan kata-kata Anda sendiri…
+    mark_correct: "Tandai jawaban yang benar"
+    correct_pick_hint: "Ketuk opsi yang harus dipilih pemain agar benar."
+    correct_tap_hint: "Atur geseran yang benar untuk setiap pernyataan."
+    correct_scale_hint: "Pilih nilai yang dianggap benar."
+    accepted_answers: "Jawaban yang diterima"
+    accepted_answers_hint: "Satu per baris — kecocokan apa pun (tanpa peka huruf besar-kecil) dianggap benar."
+    explanation: "Penjelasan"
+    explanation_placeholder: "Ditampilkan setelah pemain menjawab — mis. mengapa ini benar."
+    correct_badge: "Benar"
   auth:
     social_continue: "Lanjutkan dengan %{provider}"
     social_divider: "atau"
@@ -88,6 +97,8 @@ id:
     back: "← Kembali"
     next: Lanjut →
     submit: Kirim ✓
+    quiz_compare_cta: "Lihat perbandinganmu →"
+    quiz_compare_title: "Perbandinganmu"
   js:
     player:
       region_optout: "Jangan bagikan region saya"
@@ -101,6 +112,16 @@ id:
       compare_cta: Lihat hasil Anda dibandingkan dengan yang lain →
       compare_loading: Memuat…
       compare_error: Gagal memuat — coba lagi
+      quiz_score: "Skor %{score}/%{max}"
+      quiz_correct: "Benar!"
+      quiz_wrong: "Belum tepat"
+      quiz_answer: "Jawaban yang benar:"
+      quiz_check: "Periksa jawaban"
+      quiz_result_label: "Skormu"
+      quiz_compare_meta: "Skormu %{score}/%{max} — lebih baik dari %{beat}% pemain · rata-rata %{avg}"
+      quiz_compare_empty: "Jadilah yang pertama menyelesaikan — belum ada perbandingan."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "Bagaimana semua orang menjawab, pertanyaan demi pertanyaan"
     editor:
       delete_card_confirm: Hapus kartu ini?
       unsaved: Perubahan belum disimpan
@@ -488,6 +509,8 @@ id:
     s6_placeholder: misal Audiens belum pernah menggunakan Playverto sebelumnya, pertahankan nada hangat, bukan korporat.
     s6_compare_label: Izinkan responden membandingkan jawaban mereka
     s6_compare_desc: Tampilkan CTA di halaman terima kasih yang menunjukkan bagaimana jawaban mereka dibandingkan dengan jawaban orang lain.
+    quiz_label: "Jadikan ini kuis"
+    quiz_desc: "Tandai jawaban benar atau salah, tampilkan skor kepada pemain, dan biarkan mereka membandingkan dengan yang lain. Anda menetapkan jawaban yang benar setelah membuat."
     s7_eyebrow: Langkah 07 · Sentuhan akhir
     s7_lead: Buka dalam tampilan Verto yang sudah jadi, atau kanvas kosong.
     s7_body: Kami memilih latar belakang dan gambar per kartu dari pustaka kurasi kami — disesuaikan dengan tema, audiens, dan pertanyaan di setiap kartu.

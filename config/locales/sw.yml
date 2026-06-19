@@ -20,6 +20,15 @@ sw:
     required: "Swali la lazima"
     other: Nyingine
     other_placeholder: Tuambie kwa maneno yako mwenyewe…
+    mark_correct: "Weka jibu sahihi"
+    correct_pick_hint: "Gusa chaguo ambalo wachezaji lazima walichague ili wawe sahihi."
+    correct_tap_hint: "Weka uteleshaji sahihi kwa kila kauli."
+    correct_scale_hint: "Chagua thamani inayohesabiwa kuwa sahihi."
+    accepted_answers: "Majibu yanayokubaliwa"
+    accepted_answers_hint: "Moja kwa kila mstari — kufanana kwoyote (bila kujali herufi kubwa/ndogo) ni sahihi."
+    explanation: "Maelezo"
+    explanation_placeholder: "Yanaonyeshwa baada ya mchezaji kujibu — k.m. kwa nini hili ni sahihi."
+    correct_badge: "Sahihi"
   auth:
     social_continue: "Endelea na %{provider}"
     social_divider: "au"
@@ -88,6 +97,8 @@ sw:
     back: "← Rudi"
     next: Endelea →
     submit: Wasilisha ✓
+    quiz_compare_cta: "Ona jinsi unavyolinganishwa →"
+    quiz_compare_title: "Jinsi unavyolinganishwa"
   js:
     player:
       region_optout: "Usishiriki kanda yangu"
@@ -101,6 +112,16 @@ sw:
       compare_cta: Ona matokeo yako yakilinganishwa na wengine →
       compare_loading: Inapakia…
       compare_error: Imeshindwa kupakia — jaribu tena
+      quiz_score: "Alama %{score}/%{max}"
+      quiz_correct: "Sahihi!"
+      quiz_wrong: "Sio sahihi kabisa"
+      quiz_answer: "Jibu sahihi:"
+      quiz_check: "Angalia jibu"
+      quiz_result_label: "Ulipata alama"
+      quiz_compare_meta: "Ulipata %{score}/%{max} — bora kuliko %{beat}% ya wachezaji · wastani %{avg}"
+      quiz_compare_empty: "Kuwa wa kwanza kumaliza — hakuna ulinganisho bado."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "Jinsi kila mtu alivyofanya, swali kwa swali"
     editor:
       delete_card_confirm: Futa kadi hii?
       unsaved: Mabadiliko hayajahifadhiwa
@@ -488,6 +509,8 @@ sw:
     s6_placeholder: 'mfano: Hadhira haijawahi kutumia Playverto, weka toni ya joto, si ya kishirika.'
     s6_compare_label: Ruhusu wajibu walinganishe majibu yao
     s6_compare_desc: Onyesha CTA kwenye ukurasa wa shukrani inayoonyesha jinsi majibu yao yanavyolinganishwa na ya wengine.
+    quiz_label: "Ifanye hii kuwa jaribio"
+    quiz_desc: "Weka majibu sahihi au yasiyo sahihi, waonyeshe wachezaji alama zao, na uwaruhusu walinganishe na wengine. Unaweka majibu sahihi baada ya kutengeneza."
     s7_eyebrow: Hatua ya 07 · Mguso wa mwisho
     s7_lead: Fungua katika Verto iliyokamilika, au turubai tupu.
     s7_body: Tunachagua mandhari na picha za kila kadi kutoka maktaba yetu iliyopangwa — zinazolingana na mandhari yako, hadhira na swali kwenye kila kadi.

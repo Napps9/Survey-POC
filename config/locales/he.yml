@@ -20,6 +20,15 @@ he:
     required: "שאלת חובה"
     other: אחר
     other_placeholder: ספר לנו במילים שלך…
+    mark_correct: "סמן את התשובה הנכונה"
+    correct_pick_hint: "הקש על האפשרות/אפשרויות שעל השחקנים לבחור כדי לצדוק."
+    correct_tap_hint: "הגדר את ההחלקה הנכונה לכל היגד."
+    correct_scale_hint: "בחר את הערך שנחשב נכון."
+    accepted_answers: "תשובות מתקבלות"
+    accepted_answers_hint: "אחת בכל שורה — כל התאמה (ללא תלות באותיות גדולות/קטנות) נכונה."
+    explanation: "הסבר"
+    explanation_placeholder: "מוצג לאחר שהשחקן עונה — למשל מדוע זה נכון."
+    correct_badge: "נכון"
   auth:
     social_continue: "המשך עם %{provider}"
     social_divider: "או"
@@ -88,6 +97,8 @@ he:
     back: "← חזרה"
     next: הבא →
     submit: שלח ✓
+    quiz_compare_cta: "ראה איך אתה משתווה →"
+    quiz_compare_title: "איך אתה משתווה"
   js:
     player:
       region_optout: "לא לשתף את האזור שלי"
@@ -101,6 +112,16 @@ he:
       compare_cta: ראה את התוצאות שלך לעומת אחרים →
       compare_loading: טוען…
       compare_error: לא ניתן לטעון — נסה שוב
+      quiz_score: "ניקוד %{score}/%{max}"
+      quiz_correct: "נכון!"
+      quiz_wrong: "לא בדיוק"
+      quiz_answer: "התשובה הנכונה:"
+      quiz_check: "בדוק תשובה"
+      quiz_result_label: "הניקוד שלך"
+      quiz_compare_meta: "צברת %{score}/%{max} — טוב יותר מ-%{beat}% מהשחקנים · ממוצע %{avg}"
+      quiz_compare_empty: "היה הראשון לסיים — אין עדיין השוואה."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "איך כולם הסתדרו, שאלה אחר שאלה"
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
       unsaved: שינויים שלא נשמרו
@@ -488,6 +509,8 @@ he:
     s6_placeholder: לדוג׳ הקהל מעולם לא השתמש ב-Playverto, שמור על טון חם, לא תאגידי.
     s6_compare_label: אפשר למשיבים להשוות את תשובותיהם
     s6_compare_desc: הצג CTA בדף התודה שמראה כיצד התשובות שלהם מתמקמות לעומת כולם.
+    quiz_label: "הפוך זאת לחידון"
+    quiz_desc: "סמן תשובות כנכונות או שגויות, הצג לשחקנים את הניקוד שלהם, ואפשר להם להשתוות לאחרים. אתה מגדיר את התשובות הנכונות לאחר היצירה."
     s7_eyebrow: שלב 07 · מגע אחרון
     s7_lead: פתח בVerto מוכן למראה, או בלוח ריק.
     s7_body: אנחנו בוחרים רקע ותמונות לכל כרטיס מהספרייה המאצורה שלנו — מותאמים לנושא, לקהל ולשאלה בכל כרטיס.

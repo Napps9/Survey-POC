@@ -20,6 +20,15 @@ es:
     required: "Pregunta obligatoria"
     other: Otro
     other_placeholder: Cuéntanos con tus propias palabras…
+    mark_correct: "Marca la respuesta correcta"
+    correct_pick_hint: "Toca la opción u opciones que los jugadores deben elegir para acertar."
+    correct_tap_hint: "Define el deslizamiento correcto para cada afirmación."
+    correct_scale_hint: "Elige el valor que cuenta como correcto."
+    accepted_answers: "Respuestas aceptadas"
+    accepted_answers_hint: "Una por línea — cualquier coincidencia (sin distinguir mayúsculas) es correcta."
+    explanation: "Explicación"
+    explanation_placeholder: "Se muestra después de que el jugador responde — p. ej. por qué es correcto."
+    correct_badge: "Correcto"
   auth:
     social_continue: "Continuar con %{provider}"
     social_divider: "o"
@@ -88,6 +97,8 @@ es:
     back: "← Atrás"
     next: Siguiente →
     submit: Enviar ✓
+    quiz_compare_cta: "Mira cómo te comparas →"
+    quiz_compare_title: "Cómo te comparas"
   js:
     player:
       region_optout: "No compartir mi región"
@@ -101,6 +112,16 @@ es:
       compare_cta: Ve tus resultados comparados con los demás →
       compare_loading: Cargando…
       compare_error: No se pudo cargar — inténtalo de nuevo
+      quiz_score: "Puntuación %{score}/%{max}"
+      quiz_correct: "¡Correcto!"
+      quiz_wrong: "No del todo"
+      quiz_answer: "Respuesta correcta:"
+      quiz_check: "Comprobar respuesta"
+      quiz_result_label: "Tu puntuación"
+      quiz_compare_meta: "Obtuviste %{score}/%{max} — mejor que el %{beat}% de los jugadores · promedio %{avg}"
+      quiz_compare_empty: "Sé el primero en terminar — aún no hay comparación."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "Cómo le fue a cada uno, pregunta por pregunta"
     editor:
       delete_card_confirm: "¿Eliminar esta tarjeta?"
       unsaved: Cambios sin guardar
@@ -488,6 +509,8 @@ es:
     s6_placeholder: p. ej. La audiencia nunca ha usado Playverto antes, mantener un tono cálido, no corporativo.
     s6_compare_label: Permitir que los participantes comparen sus respuestas
     s6_compare_desc: Muestra un CTA en la página de agradecimiento que revela cómo sus respuestas se comparan con las de todos los demás.
+    quiz_label: "Convertir esto en un cuestionario"
+    quiz_desc: "Marca las respuestas como correctas o incorrectas, muestra a los jugadores su puntuación y deja que se comparen con otros. Tú defines las respuestas correctas después de generar."
     s7_eyebrow: Paso 07 · Toque final
     s7_lead: Ábrelo con un Verto terminado o con un lienzo en blanco.
     s7_body: Seleccionamos un fondo e imágenes para cada tarjeta desde nuestra biblioteca curada, adaptadas a tu temática, audiencia y la pregunta de cada tarjeta.

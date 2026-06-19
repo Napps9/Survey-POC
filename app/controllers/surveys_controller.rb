@@ -43,6 +43,7 @@ class SurveysController < ApplicationController
     key_insight  = params[:key_insight].to_s.strip
     notes        = params[:notes].to_s.strip
     show_compare = ActiveModel::Type::Boolean.new.cast(params[:show_results_comparison])
+    quiz         = ActiveModel::Type::Boolean.new.cast(params[:quiz]) || false
     palette      = BrandPalette.sanitize(params[:brand_palette])
 
     # Languages this Verto is built in. The primary (default_locale) is the
@@ -84,7 +85,8 @@ class SurveysController < ApplicationController
         key_insight: key_insight,
         notes: notes,
         locale: default_locale,
-        common_cards: common_cards
+        common_cards: common_cards,
+        quiz: quiz
       )
     end
 
@@ -96,6 +98,7 @@ class SurveysController < ApplicationController
       key_insight:  result["key_insight"].presence || key_insight,
       cards:        DemographicQuestions.append_to(result["cards"]),
       show_results_comparison: show_compare,
+      quiz:         quiz,
       ask_region:   ActiveModel::Type::Boolean.new.cast(params[:ask_region]) || false,
       brand_palette: palette.presence,
       default_locale: default_locale,
@@ -240,6 +243,9 @@ class SurveysController < ApplicationController
     attrs = {}
     if params.key?(:show_results_comparison)
       attrs[:show_results_comparison] = ActiveModel::Type::Boolean.new.cast(params[:show_results_comparison])
+    end
+    if params.key?(:quiz)
+      attrs[:quiz] = ActiveModel::Type::Boolean.new.cast(params[:quiz])
     end
     if params.key?(:ask_region)
       attrs[:ask_region] = ActiveModel::Type::Boolean.new.cast(params[:ask_region])
@@ -525,7 +531,8 @@ class SurveysController < ApplicationController
     render_to_string(
       partial: "surveys/card_row",
       formats: [ :html ],
-      locals:  { card: card, idx: idx, q_idx: q_idx, total_q: total_q, default_locale: survey.default_locale }
+      locals:  { card: card, idx: idx, q_idx: q_idx, total_q: total_q,
+                 default_locale: survey.default_locale, quiz: survey.quiz? }
     )
   end
 

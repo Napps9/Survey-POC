@@ -33,6 +33,7 @@
      data-survey-editor-default-locale-value="<%= @survey.default_locale %>"
      data-survey-editor-locales-value="<%= @survey.verto_locales.to_json %>"
      data-survey-editor-rtl-locales-value="<%= SupportedLocales.all.select(&:rtl?).map(&:code).to_json %>"
+     data-survey-editor-quiz-value="<%= @survey.quiz? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
      data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#close">
 
@@ -159,7 +160,7 @@
             q_idx += 1 if is_q
           %>
           <%= render "surveys/card_row", card: card, idx: idx, q_idx: q_idx, total_q: total_q,
-                default_locale: @survey.default_locale %>
+                default_locale: @survey.default_locale, quiz: @survey.quiz? %>
         <% end %>
 
         <%# "Add question" button — sits at bottom of the cards feed %>
@@ -441,6 +442,28 @@
                        value="<%= @survey.compare_note_text %>"
                        onchange="this.form.requestSubmit()"
                        style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+
+        <%# Quiz mode — score answers right/wrong, show a score, and let players
+            compare. Toggling reloads the editor so each question card gains its
+            correct-answer controls. %>
+        <div class="publish-block">
+          <div class="publish-block-title">Quiz mode</div>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="quiz" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="quiz" value="1"
+                     <%= "checked" if @survey.quiz? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#615BF5;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Score answers as right or wrong and show players their score. Each question card gains a “correct answer” control.</span>
+            </label>
+            <% if @survey.quiz? %>
+              <div style="margin-top:8px;padding-left:24px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);line-height:1.45;">
+                <%= @survey.quiz_question_count %> of <%= total_q %> questions graded — mark the correct answer on each card.
               </div>
             <% end %>
           <% end %>

@@ -20,6 +20,15 @@ ar:
     required: "سؤال إلزامي"
     other: أخرى
     other_placeholder: أخبرنا بكلماتك الخاصة…
+    mark_correct: "حدِّد الإجابة الصحيحة"
+    correct_pick_hint: "اضغط على الخيار/الخيارات التي يجب على اللاعبين اختيارها ليكونوا على صواب."
+    correct_tap_hint: "حدِّد السحب الصحيح لكل عبارة."
+    correct_scale_hint: "اختر القيمة التي تُحتسب صحيحة."
+    accepted_answers: "الإجابات المقبولة"
+    accepted_answers_hint: "واحدة في كل سطر — أي تطابق (بغضّ النظر عن حالة الأحرف) يُعد صحيحًا."
+    explanation: "التوضيح"
+    explanation_placeholder: "يظهر بعد إجابة اللاعب — مثلًا لماذا هذا صحيح."
+    correct_badge: "صحيح"
   auth:
     social_continue: "المتابعة عبر %{provider}"
     social_divider: "أو"
@@ -88,6 +97,8 @@ ar:
     back: "← رجوع"
     next: التالي ←
     submit: إرسال ✓
+    quiz_compare_cta: "شاهد كيف تقارن →"
+    quiz_compare_title: "كيف تقارن"
   js:
     player:
       region_optout: "عدم مشاركة منطقتي"
@@ -101,6 +112,16 @@ ar:
       compare_cta: شاهد نتائجك مقارنة بالآخرين ←
       compare_loading: جارٍ التحميل…
       compare_error: تعذّر التحميل — أعد المحاولة
+      quiz_score: "النتيجة %{score}/%{max}"
+      quiz_correct: "صحيح!"
+      quiz_wrong: "ليس تمامًا"
+      quiz_answer: "الإجابة الصحيحة:"
+      quiz_check: "تحقّق من الإجابة"
+      quiz_result_label: "نتيجتك"
+      quiz_compare_meta: "حصلت على %{score}/%{max} — أفضل من %{beat}% من اللاعبين · المتوسط %{avg}"
+      quiz_compare_empty: "كن أول من ينهي — لا توجد مقارنة بعد."
+      quiz_score_bucket: "%{score}/%{max}"
+      quiz_per_question: "كيف أبلى الجميع، سؤالًا بسؤال"
     editor:
       delete_card_confirm: حذف هذه البطاقة؟
       unsaved: تغييرات غير محفوظة
@@ -488,6 +509,8 @@ ar:
     s6_placeholder: 'مثال: الجمهور لم يستخدم Playverto من قبل، حافظ على نبرة دافئة، وليست رسمية.'
     s6_compare_label: السماح للمجيبين بمقارنة إجاباتهم
     s6_compare_desc: أظهِر دعوة للإجراء على صفحة الشكر تكشف كيف تقارن إجاباتهم بإجابات الآخرين.
+    quiz_label: "اجعل هذا اختبارًا"
+    quiz_desc: "ضع علامة على الإجابات بأنها صحيحة أو خاطئة، وأظهِر للاعبين نتيجتهم، ودعهم يقارنون أنفسهم بالآخرين. أنت تحدِّد الإجابات الصحيحة بعد التوليد."
     s7_eyebrow: الخطوة 07 · اللمسة الأخيرة
     s7_lead: افتح في Verto جاهز للعرض، أو ابدأ بلوحة فارغة.
     s7_body: نختار خلفية وصورًا لكل بطاقة من مكتبتنا المنتقاة — متوافقة مع موضوعك وجمهورك والسؤال في كل بطاقة.

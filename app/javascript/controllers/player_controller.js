@@ -7,7 +7,8 @@ export default class extends Controller {
                     "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta",
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
-                    "consentMain", "consentDeclined"]
+                    "consentMain", "consentDeclined",
+                    "scoreChip", "quizScore", "scoresBtn", "scoresPanel", "scoresList", "scoresMeta"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
@@ -18,6 +19,10 @@ export default class extends Controller {
     locale: { type: String, default: "" },
     shareUrl: { type: String, default: "" },
     showComparison: { type: Boolean, default: false },
+    quiz: { type: Boolean, default: false },
+    gradeUrl: { type: String, default: "" },
+    quizStateUrl: { type: String, default: "" },
+    scoresUrl: { type: String, default: "" },
     current: { type: Number, default: 0 }
   }
 
@@ -26,9 +31,19 @@ export default class extends Controller {
   _regionOptOut = false
   _regionsData = null
 
+  // Quiz state: which card indices have been answered+revealed (so they can't
+  // be redone), and the running score.
+  _revealed = new Set()
+  _quizScore = 0
+  _quizMax = 0
+  _scoresData = null
+
   connect() {
     this._sessionToken = this._ensureToken()
+    this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
+    this._finishLabel = this.hasFinishBtnTarget ? this.finishBtnTarget.textContent : ""
     this._update()
+    if (this.quizValue) this._initQuiz()
   }
 
   // Consent card (the first card): agreeing advances into the deck; declining
@@ -44,6 +59,14 @@ export default class extends Controller {
   }
 
   next() {
+    // Quiz: a graded card reveals right/wrong on the first Next, and only
+    // advances on the second — so the player always sees how they did.
+    if (this._needsReveal(this.currentValue)) {
+      this._capture(this.currentValue)
+      if (!this._requireGuard(this.currentValue)) return
+      this._gradeCurrent()
+      return
+    }
     this._capture(this.currentValue)
     if (!this._requireGuard(this.currentValue)) return
     this._saveProgress()
@@ -114,6 +137,14 @@ export default class extends Controller {
   }
 
   async finish() {
+    // Quiz: if the last card is graded and unrevealed, reveal it first; the
+    // player presses Finish again to actually submit.
+    if (this._needsReveal(this.currentValue)) {
+      this._capture(this.currentValue)
+      if (!this._requireGuard(this.currentValue)) return
+      await this._gradeCurrent()
+      return
+    }
     this._capture(this.currentValue)
     if (!this._requireGuard(this.currentValue)) return
     haptic([10, 30, 10]) // a little "done" buzz on completion
@@ -130,6 +161,11 @@ export default class extends Controller {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.clone().json().catch(() => null)
       queued = !!(data && data.queued)
+      // Trust the server's final score over the running client tally.
+      if (this.quizValue && data && typeof data.score === "number") {
+        this._quizScore = data.score
+        if (typeof data.max === "number") this._quizMax = data.max
+      }
     } catch (_) {
       // No SW running and offline — answers are lost. Still show thank-you
       // so the player completes; flag as queued to set expectations.
@@ -331,6 +367,7 @@ export default class extends Controller {
       pill.textContent = t("player.queued")
       this.thankyouMainTarget.appendChild(pill)
     }
+    if (this.quizValue) this._renderQuizScore()
   }
 
   async showComparison() {
@@ -643,5 +680,266 @@ export default class extends Controller {
     const isLast = idx === cards.length - 1
     this.nextBtnTarget.classList.toggle("hidden", isLast)
     this.finishBtnTarget.classList.toggle("hidden", !isLast)
+    if (this.quizValue) this._labelQuizNav()
+  }
+
+  // ── Quiz: per-card grading, reveal, lock, running score ──────────────────
+
+  async _initQuiz() {
+    this._quizMax = this.cardTargets.filter(c => c.dataset.cardGraded === "true").length
+    this._renderScoreChip()
+
+    // Refresh-proof no-redo: re-lock and re-reveal cards this session already
+    // committed, server-side (owner preview has no endpoint and starts fresh).
+    if (!this.quizStateUrlValue) return
+    try {
+      const url = `${this.quizStateUrlValue}?session_token=${encodeURIComponent(this._sessionToken)}`
+      const res  = await fetch(url, { headers: { "Accept": "application/json" } })
+      const data = await res.json()
+      if (!data || !data.ok || !data.quiz) return
+      if (typeof data.max === "number") this._quizMax = data.max
+      Object.entries(data.answered || {}).forEach(([key, info]) => {
+        const card = this.cardTargets.find(c => c.dataset.cardIndex === key)
+        if (!card) return
+        this._answers[key] = { type: card.dataset.cardType, value: info.value }
+        this._applyValue(card, card.dataset.cardType, info.value)
+        this._revealCard(card, { correct: info.correct, correctAnswer: info.correct_answer,
+                                 explanation: info.explanation, mine: info.value })
+        this._revealed.add(this.cardTargets.indexOf(card))
+      })
+      if (typeof data.score === "number") this._quizScore = data.score
+      this._renderScoreChip()
+      this._update()
+    } catch (_) { /* a fresh start is fine if state can't load */ }
+  }
+
+  // A card that still needs its quiz reveal before the player can move on.
+  _needsReveal(idx) {
+    const card = this.cardTargets[idx]
+    return this.quizValue && card?.dataset.cardGraded === "true" && !this._revealed.has(idx)
+  }
+
+  async _gradeCurrent() {
+    const idx  = this.currentValue
+    const card = this.cardTargets[idx]
+    const key  = card.dataset.cardIndex
+    this._revealed.add(idx) // lock now so a double-tap can't re-submit
+    card.classList.add("quiz-locking")
+
+    const result = this.gradeUrlValue
+      ? await this._gradeRemote(key)         // live: server is authoritative
+      : this._gradeLocal(card)               // owner preview: embedded answers
+    card.classList.remove("quiz-locking")
+    if (!result) { this._revealed.delete(idx); return } // couldn't grade — allow a retry
+
+    if (typeof result.score === "number") this._quizScore = result.score
+    else if (result.correct) this._quizScore++
+    if (typeof result.max === "number") this._quizMax = result.max
+
+    this._revealCard(card, result)
+    this._renderScoreChip()
+    this._update()
+    haptic(result.correct ? [12, 24, 12] : 30)
+  }
+
+  async _gradeRemote(key) {
+    try {
+      const res = await fetch(this.gradeUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...this._payload(), card_index: Number(key) })
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+      if (!data.ok || !data.graded) return null
+      return { correct: data.correct, correctAnswer: data.correct_answer,
+               explanation: data.explanation, score: data.score, max: data.max,
+               mine: this._answers[key]?.value }
+    } catch (_) { return null }
+  }
+
+  _gradeLocal(card) {
+    let correct
+    try { correct = JSON.parse(card.dataset.cardCorrect || "null") } catch (_) { correct = null }
+    if (correct === null || correct === undefined || correct === "" ||
+        (Array.isArray(correct) && correct.length === 0)) return null
+    const value = this._answers[card.dataset.cardIndex]?.value
+    return { correct: this._matchCorrect(card.dataset.cardType, value, correct),
+             correctAnswer: correct, explanation: card.dataset.cardExplanation || "", mine: value }
+  }
+
+  // Client mirror of QuizGrading#correct? — used ONLY for owner preview, where
+  // the correct answers are embedded on the page. Live grading is server-side.
+  _matchCorrect(type, value, correct) {
+    const norm  = v => String(v ?? "").trim()
+    const normT = v => norm(v).toLowerCase().replace(/\s+/g, " ")
+    switch (type) {
+      case "multiple_choice": case "yes_no": case "select_one_grid":
+        return norm(value) === norm(correct)
+      case "select_many": case "select_many_grid": {
+        const a = new Set((Array.isArray(value) ? value : []).map(norm).filter(Boolean))
+        const b = new Set((Array.isArray(correct) ? correct : []).map(norm).filter(Boolean))
+        return a.size === b.size && [ ...a ].every(x => b.has(x))
+      }
+      case "tap_card": {
+        if (typeof value !== "object" || !value || typeof correct !== "object" || !correct) return false
+        const keys = Object.keys(correct).filter(k => correct[k] === "yes" || correct[k] === "no")
+        return keys.length > 0 && keys.every(k => value[k] === correct[k])
+      }
+      case "range": case "nps": case "rating":
+        if (value === null || value === undefined || value === "") return false
+        return Number(value) === Number(correct)
+      case "open_ended": {
+        if (!norm(value)) return false
+        return (Array.isArray(correct) ? correct : [ correct ]).map(normT).filter(Boolean).includes(normT(value))
+      }
+      default: return false
+    }
+  }
+
+  _revealCard(card, { correct, correctAnswer, explanation, mine }) {
+    card.classList.add("quiz-locked", correct ? "quiz-correct" : "quiz-wrong")
+    this._lockInputs(card)
+    this._tintOptions(card, correctAnswer, mine)
+
+    const host = card.querySelector(".split-right") || card
+    let banner = host.querySelector(".quiz-reveal")
+    if (!banner) {
+      banner = document.createElement("div")
+      banner.className = "quiz-reveal"
+      host.appendChild(banner)
+    }
+    banner.classList.toggle("is-correct", !!correct)
+    banner.classList.toggle("is-wrong", !correct)
+    const parts = [
+      `<div class="quiz-reveal-head">${correct ? "✓" : "✗"} ${this._esc(correct ? t("player.quiz_correct") : t("player.quiz_wrong"))}</div>`
+    ]
+    if (!correct) {
+      parts.push(`<div class="quiz-reveal-answer">${this._esc(t("player.quiz_answer"))} ${this._esc(this._formatCorrect(card.dataset.cardType, correctAnswer))}</div>`)
+    }
+    if (explanation) parts.push(`<div class="quiz-reveal-expl">${this._esc(explanation)}</div>`)
+    banner.innerHTML = parts.join("")
+  }
+
+  // Tint the correct option(s) green and the player's wrong pick(s) red — for
+  // the list/grid/yes-no types whose options carry a canonical label.
+  _tintOptions(card, correctAnswer, mine) {
+    const items = Array.from(card.querySelectorAll('[data-picker-target="item"]'))
+    if (!items.length) return
+    const toSet = v => new Set((Array.isArray(v) ? v : [ v ]).map(x => String(x ?? "").trim()).filter(Boolean))
+    const right = toSet(correctAnswer), picked = toSet(mine)
+    items.forEach(el => {
+      const canon = (el.dataset.canonical || "").trim()
+      if (right.has(canon)) el.classList.add("opt-correct")
+      else if (picked.has(canon)) el.classList.add("opt-wrong")
+    })
+  }
+
+  // Restore the player's recorded selection when rehydrating a locked card on
+  // reload (choice/grid/open/rating); other widgets rely on the reveal banner.
+  _applyValue(card, type, value) {
+    if (value === null || value === undefined) return
+    if ([ "multiple_choice", "yes_no", "select_one_grid", "select_many", "select_many_grid" ].includes(type)) {
+      const set = new Set((Array.isArray(value) ? value : [ value ]).map(v => String(v ?? "").trim()))
+      card.querySelectorAll('[data-picker-target="item"]').forEach(el => {
+        if (set.has((el.dataset.canonical || "").trim())) el.dataset.selected = "true"
+      })
+    } else if (type === "open_ended") {
+      const ta = card.querySelector("textarea"); if (ta) ta.value = value
+    } else if (type === "rating") {
+      card.querySelectorAll(".rating-star").forEach((s, i) => {
+        const on = i < Number(value); s.classList.toggle("active", on); s.textContent = on ? "★" : "☆"
+      })
+    }
+  }
+
+  _lockInputs(card) {
+    card.querySelectorAll(".choice-list, .choice-grid, .rotate-wrap, .slider-wrap, .nps-slider, .rating-wrap, .freeform-wrap, .other-block")
+        .forEach(el => { el.style.pointerEvents = "none" })
+    card.querySelectorAll("textarea, input, button[data-other-target='btn']").forEach(el => { el.disabled = true })
+  }
+
+  _formatCorrect(type, c) {
+    if (Array.isArray(c)) return c.join(", ")
+    if (c && typeof c === "object") return Object.entries(c).map(([ k, v ]) => `${k}: ${v}`).join(", ")
+    if (type === "rating") return `${c} ★`
+    return String(c ?? "")
+  }
+
+  _renderScoreChip() {
+    if (!this.hasScoreChipTarget || !this.quizValue || this._quizMax <= 0) return
+    this.scoreChipTarget.classList.remove("hidden")
+    this.scoreChipTarget.textContent = t("player.quiz_score", { score: this._quizScore, max: this._quizMax })
+  }
+
+  _labelQuizNav() {
+    const pending = this._needsReveal(this.currentValue)
+    if (this.hasNextBtnTarget)   this.nextBtnTarget.textContent   = pending ? t("player.quiz_check") : this._nextLabel
+    if (this.hasFinishBtnTarget) this.finishBtnTarget.textContent = pending ? t("player.quiz_check") : this._finishLabel
+  }
+
+  _renderQuizScore() {
+    if (!this.hasQuizScoreTarget || this._quizMax <= 0) return
+    const pct = Math.round((this._quizScore / this._quizMax) * 100)
+    this.quizScoreTarget.classList.remove("hidden")
+    this.quizScoreTarget.innerHTML =
+      `<div class="quiz-result-label">${this._esc(t("player.quiz_result_label"))}</div>` +
+      `<div class="quiz-result-score">${this._quizScore}<span class="quiz-result-max">/${this._quizMax}</span></div>` +
+      `<div class="quiz-result-pct">${pct}%</div>`
+  }
+
+  // ── Quiz: how you compare (anonymous score distribution) ─────────────────
+
+  async showScores() {
+    if (!this.scoresUrlValue || !this.hasScoresPanelTarget) return
+    this.thankyouMainTarget.classList.add("hidden")
+    if (this.hasComparisonTarget) this.comparisonTarget.classList.add("hidden")
+    this.scoresPanelTarget.classList.remove("hidden")
+    if (this._scoresData) return this._renderScores(this._scoresData)
+    this.scoresMetaTarget.textContent = t("player.compare_loading")
+    try {
+      const res  = await fetch(this.scoresUrlValue, { headers: { "Accept": "application/json" } })
+      const data = await res.json()
+      if (!data.ok) throw new Error(data.error || "Failed")
+      this._scoresData = data
+      this._renderScores(data)
+    } catch (_) {
+      this.scoresMetaTarget.textContent = t("player.compare_error")
+    }
+  }
+
+  hideScores() {
+    if (this.hasScoresPanelTarget) this.scoresPanelTarget.classList.add("hidden")
+    if (this.hasThankyouMainTarget) this.thankyouMainTarget.classList.remove("hidden")
+  }
+
+  _renderScores(data) {
+    const total = data.total || 0
+    const mine  = this._quizScore
+    const below = (data.distribution || []).filter(d => d.score < mine).reduce((s, d) => s + d.count, 0)
+    const beat  = total > 0 ? Math.round((below / total) * 100) : 0
+    this.scoresMetaTarget.textContent = total > 0
+      ? t("player.quiz_compare_meta", { score: mine, max: data.max, beat, avg: data.average })
+      : t("player.quiz_compare_empty")
+
+    const list = this.scoresListTarget
+    list.innerHTML = ""
+    ;(data.distribution || []).forEach(d => {
+      const pct = total > 0 ? Math.round((d.count / total) * 100) : 0
+      list.appendChild(this._buildBar(t("player.quiz_score_bucket", { score: d.score, max: data.max }),
+                                      d.count, pct, d.score === mine))
+    })
+    if ((data.per_question || []).length) {
+      const head = document.createElement("div")
+      head.style.cssText = "font-family:'Alata',sans-serif;font-size:13px;color:#fff;margin:8px 0 -4px;"
+      head.textContent = t("player.quiz_per_question")
+      list.appendChild(head)
+      data.per_question.forEach(q => list.appendChild(this._buildBar(q.prompt || `#${q.index + 1}`, q.correct, q.pct, false)))
+    }
+  }
+
+  _esc(s) {
+    return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;")
   }
 }
