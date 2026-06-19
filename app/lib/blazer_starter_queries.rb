@@ -210,6 +210,47 @@ module BlazerStarterQueries
           AND (r.answers -> (card.ord - 1)::text) IS NOT NULL
         ORDER BY r.id, position
       SQL
+    },
+
+    # ── Retention: do creators keep creating? ──────────────────────────────
+    {
+      name: "Usage — Verto-creator retention (weekly cohorts)",
+      description: "Weekly retention of Verto-creating organisations. Each row is the week an org first " \
+                   "created a Verto; week_0 is that cohort's size, and week_1..6 count how many of the " \
+                   "cohort created another Verto that many weeks later. Org-level — Vertos aren't " \
+                   "attributed to individual users. Excludes internal orgs.",
+      statement: <<~SQL
+        WITH creator_weeks AS (
+          SELECT s.organisation_id AS org_id,
+                 date_trunc('week', s.created_at)::date AS active_week
+          FROM surveys s
+          JOIN organisations o ON o.id = s.organisation_id
+          WHERE s.deleted_at IS NULL AND NOT o.internal
+          GROUP BY 1, 2
+        ),
+        cohort AS (
+          SELECT org_id, MIN(active_week) AS cohort_week
+          FROM creator_weeks
+          GROUP BY org_id
+        ),
+        activity AS (
+          SELECT c.cohort_week, cw.org_id,
+                 ((cw.active_week - c.cohort_week) / 7)::int AS weeks_since
+          FROM cohort c
+          JOIN creator_weeks cw ON cw.org_id = c.org_id
+        )
+        SELECT cohort_week,
+               COUNT(DISTINCT org_id) FILTER (WHERE weeks_since = 0) AS week_0,
+               COUNT(DISTINCT org_id) FILTER (WHERE weeks_since = 1) AS week_1,
+               COUNT(DISTINCT org_id) FILTER (WHERE weeks_since = 2) AS week_2,
+               COUNT(DISTINCT org_id) FILTER (WHERE weeks_since = 3) AS week_3,
+               COUNT(DISTINCT org_id) FILTER (WHERE weeks_since = 4) AS week_4,
+               COUNT(DISTINCT org_id) FILTER (WHERE weeks_since = 5) AS week_5,
+               COUNT(DISTINCT org_id) FILTER (WHERE weeks_since = 6) AS week_6
+        FROM activity
+        GROUP BY cohort_week
+        ORDER BY cohort_week
+      SQL
     }
   ].freeze
 

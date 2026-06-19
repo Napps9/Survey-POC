@@ -44,6 +44,14 @@ class BlazerStarterQueriesTest < ActiveSupport::TestCase
     assert_includes answers[:statement], "r.answers", "must read the players' answers"
   end
 
+  test "creator-retention query builds weekly cohorts from first-Verto activity" do
+    retention = BlazerStarterQueries::DEFINITIONS.find { |d| d[:name].include?("retention") }
+    assert retention, "expected a creator-retention starter query"
+    assert_includes retention[:statement], "cohort_week"
+    assert_includes retention[:statement], "MIN(active_week)", "cohort = first active week"
+    assert_includes retention[:statement], "weeks_since"
+  end
+
   test "resync! refreshes an out-of-date query back to the canonical SQL" do
     BlazerStarterQueries.create_missing!
     query = Blazer::Query.find_by!(name: BlazerStarterQueries::DEFINITIONS.first[:name])
