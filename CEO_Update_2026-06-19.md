@@ -1,6 +1,6 @@
 # Playverto — Platform Update for the CEO
 
-**Period:** Past two weeks (5–19 June 2026; active development 11–19 June)
+**Period:** Past two weeks (5–19 June 2026)
 **Product:** Playverto — the *Verto* survey platform (creators build Vertos; the public plays them at a shareable link)
 
 ---
@@ -9,7 +9,7 @@
 
 In the last two weeks we shipped **four new headline capabilities** — interactive Quizzes, AI-written results reports, a survey-quality "coach," and an internal analytics suite — while also **closing a serious security hole, hardening the platform, and ending the out-of-memory crashes** that were causing production errors. Alongside this, the respondent and creator experiences were substantially polished, especially on mobile.
 
-Throughput for the period: **52 distinct updates, ~11,200 lines of change across 158 files, over 9 active days.**
+Throughput for the period: **66 updates across 10 active days, ~11,600 lines of change over 165 files.**
 
 ---
 
@@ -25,6 +25,7 @@ Throughput for the period: **52 distinct updates, ~11,200 lines of change across
 
 ## 2. A better experience for respondents (the people who *play* a Verto)
 
+- **Respondent-controlled navigation** — Replaced the old auto-advance with explicit **Back/Next buttons**, giving people control to review and change answers. Shipped to existing live Vertos automatically.
 - **Mobile & tablet redesign** — Rebuilt the player layout for phones and tablets (fixed broken/overflowing layouts, cleaner image handling, added **haptic feedback** and improved legibility). The respondent experience is where drop-off happens, so this directly protects completion rates.
 - **Consent gate** — Editable consent text with an **"Agree to continue" step before the first question** — important for data-protection compliance.
 - **Required questions** — Creators can mark questions as required, and the player now enforces it.
@@ -33,9 +34,10 @@ Throughput for the period: **52 distinct updates, ~11,200 lines of change across
 
 ## 3. A smoother experience for creators (the people who *build* a Verto)
 
+- **Redesigned dashboard** — Verto tiles now have a **cover-image hero** and a one-tap **Preview** action, making the creator's home screen more visual and usable.
 - **Reworked creation wizard** — Clearer audience-targeting step, regional targeting, a guided naming step, and the ability to **import questions directly from a PDF** brief.
 - **In-editor device previews** — Creators can preview their Verto framed as a phone or tablet, with clearer question-type guidance and controls.
-- **Collaboration ("Collective Impact")** — Renamed Alliances to **Collective Impact** and enabled organisations to **share a common set of questions** across a group — supporting multi-org/benchmarking use cases.
+- **Collaboration ("Collective Impact")** — Evolved the group-collaboration area from *Partners* → *Alliances* → **Collective Impact**, and enabled organisations to **share a common set of questions** across a group — supporting multi-org/benchmarking use cases.
 - **Publish safeguards** — Once a Verto is live it becomes **read-only**, and creators are warned before publishing — protecting the integrity of data already being collected.
 
 ## 4. Onboarding
@@ -47,6 +49,7 @@ Throughput for the period: **52 distinct updates, ~11,200 lines of change across
 - **Closed an account-takeover vulnerability** in the invite flow, removed a hard-coded seed credential, and applied a broad security-hardening pass.
 - **Platform hardening** — Added an enforcing Content-Security-Policy, request **rate limiting**, stricter logo-upload validation, and stopped raw error details from ever reaching end users.
 - **Ended the production crashes** — Eliminated the out-of-memory errors (502s) that were taking pages down under load, and fixed a results-page failure and several mobile layout bugs.
+- **Safer deploys** — Production now only deploys after all automated checks pass, so a broken change can't reach customers.
 
 ---
 
