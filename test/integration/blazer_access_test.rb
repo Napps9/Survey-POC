@@ -58,6 +58,36 @@ class BlazerAccessIntegrationTest < ActionDispatch::IntegrationTest
     ENV["BLAZER_STAFF_EMAILS"] = "staff@vertonow.com"
     sign_in @staff
     get "/blazer"
-    assert_includes 200..399, response.status
+    assert_response :success
+  end
+
+  test "a staff user with no organisation can still reach Blazer" do
+    # Real VertoNow staff generally aren't members of any customer org. Blazer
+    # skips the app's organisation filter, so a membership must not be required.
+    ENV["BLAZER_STAFF_EMAILS"] = "solo@vertonow.com"
+    solo = User.create!(name: "Solo", email_address: "solo@vertonow.com", password: "verylongpassword")
+    sign_in solo
+    get "/blazer"
+    assert_response :success
+  end
+
+  test "Blazer responses allow the 'unsafe-eval' its Vue UI needs; the rest of the app stays strict" do
+    # Blazer's client-side Vue app evaluates its {{ }} templates via new Function(),
+    # which the browser blocks without 'unsafe-eval' in script-src — leaving staff a
+    # blank page. config/initializers/blazer.rb widens script-src for Blazer only.
+    ENV["BLAZER_STAFF_EMAILS"] = "staff@vertonow.com"
+    sign_in @staff
+
+    get "/blazer"
+    assert_response :success
+    assert_includes response.headers["Content-Security-Policy"].to_s, "'unsafe-eval'",
+                    "Blazer's Vue UI is blocked (blank page) without 'unsafe-eval' in its CSP"
+
+    # Use an explicit app path: root_path is ambiguous here (the mounted Blazer
+    # engine also defines one) and would resolve back to Blazer.
+    get "/"
+    assert_response :success
+    assert_not_includes response.headers["Content-Security-Policy"].to_s, "'unsafe-eval'",
+                        "the app-wide CSP must stay strict outside Blazer"
   end
 end
