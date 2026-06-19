@@ -572,6 +572,10 @@ class SurveysController < ApplicationController
   # rendered in place at that position (the optimise flow), so its card number
   # and progress match where it already sits.
   def render_card_html(survey, card, idx: nil)
+    # The card_row partial (and its children) read @survey — e.g. for the
+    # "recommended for this card" images. generate_card / render_card don't go
+    # through set_survey, so make sure it's set or those renders 500 on nil.
+    @survey ||= survey
     existing = Array(survey.cards)
     if idx
       total_q = existing.count { |c| c["type"] != "welcome_card" }

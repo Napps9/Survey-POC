@@ -55,6 +55,9 @@ export default class extends Controller {
 
   open(event) {
     event?.preventDefault()
+    // Remember which card the CTA sits under, so the new question is inserted
+    // right after it (rather than always at the end of the deck).
+    this._insertAfterSlot = event?.currentTarget?.closest(".card-slot") || null
     this._showStep("stepChoice")
     this._clearError()
     this.backdropTarget.hidden = false
@@ -336,21 +339,29 @@ export default class extends Controller {
     const feed = this.cardsFeedTarget
     if (!feed) return
 
-    // Parse the returned HTML into a document fragment
+    // The server returns a bare .survey-card-wrap. Wrap it in a slot carrying
+    // its own "Add question" CTA (cloned from an existing one) so the new card
+    // behaves like every other — reorderable and insert-after-able.
     const tmp = document.createElement("div")
-    tmp.innerHTML = html
+    tmp.innerHTML = (html || "").trim()
+    const card = tmp.firstElementChild
+    if (!card) return
 
-    // The "Add question" trigger button wrapper is always the last child of the feed
-    const trigger = feed.querySelector(".aq-trigger-btn")?.closest("div")
-    if (trigger) {
-      feed.insertBefore(tmp.firstElementChild, trigger)
+    const slot = document.createElement("div")
+    slot.className = "card-slot"
+    slot.appendChild(card)
+    const insertRow = feed.querySelector(".aq-insert-row")
+    if (insertRow) slot.appendChild(insertRow.cloneNode(true))
+
+    // Insert after the card whose CTA was clicked, else append to the end.
+    const anchor = this._insertAfterSlot
+    if (anchor && anchor.parentNode === feed) {
+      anchor.after(slot)
     } else {
-      feed.appendChild(tmp.firstElementChild)
+      feed.appendChild(slot)
     }
 
-    // Scroll the new card into view
-    const wraps = feed.querySelectorAll(".survey-card-wrap")
-    wraps[wraps.length - 1]?.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    card.scrollIntoView({ behavior: "smooth", block: "nearest" })
   }
 
   _notifyEditor() {

@@ -5,6 +5,7 @@
   is_q     = type != "welcome_card"
   progress = total_q > 0 && is_q ? ((q_idx.to_f / total_q) * 100).round : 5
   eyebrow  = CardTypes.eyebrow(type).presence || type.tr('_', ' ')
+  live     = @survey&.published?
 %>
 
 <div class="survey-card-wrap"
@@ -25,7 +26,7 @@
       toggled by survey_editor_controller. %>
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
     <span class="s-badge <%= meta[:badge_css] %>"><%= meta[:badge] %></span>
-    <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.3);">Card <%= idx + 1 %></span>
+    <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.3);" data-role="card-number">Card <%= idx + 1 %></span>
     <% unless type == "welcome_card" %>
       <button type="button" class="card-light" data-role="card-light" hidden
               aria-expanded="false"
@@ -35,7 +36,24 @@
         <span class="card-light-word" data-role="card-light-word"></span>
         <span class="card-light-score" data-role="card-light-score"></span>
       </button>
-      <button type="button" class="card-delete-btn" style="margin-left:auto;"
+
+      <%# Reorder controls — move this question up/down in the deck. The move
+          swaps the card with its neighbour in the DOM; autosave persists the
+          new order (the serialiser reads cards in document order). %>
+      <% unless live %>
+        <div class="card-reorder" style="margin-left:auto;">
+          <button type="button" class="card-move-btn" data-role="move-up"
+                  title="<%= t('editor.move_up', default: 'Move question up') %>"
+                  aria-label="<%= t('editor.move_up', default: 'Move question up') %>"
+                  data-action="click->survey-editor#moveCardUp">▲</button>
+          <button type="button" class="card-move-btn" data-role="move-down"
+                  title="<%= t('editor.move_down', default: 'Move question down') %>"
+                  aria-label="<%= t('editor.move_down', default: 'Move question down') %>"
+                  data-action="click->survey-editor#moveCardDown">▼</button>
+        </div>
+      <% end %>
+
+      <button type="button" class="card-delete-btn" style="<%= 'margin-left:auto;' if live %>"
               title="<%= t('editor.delete_card_title', default: 'Delete this question card') %>"
               data-action="click->type-panel#deleteCard">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">

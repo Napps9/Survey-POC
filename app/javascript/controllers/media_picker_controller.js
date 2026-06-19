@@ -31,7 +31,9 @@ export default class extends Controller {
     this._activeCard = card
     this._pendingUrl = null
     this._setApplyEnabled(false)
-    this._switchTabKey("upload")
+    // Open on the Verto Library so the curated designs are visible straight
+    // away — uploading your own image is one click away on the other tab.
+    this._switchTabKey("library")
 
     const currentUrl = card.dataset.cardImage || ""
     this.clearBtnTarget.hidden = !currentUrl
@@ -49,7 +51,7 @@ export default class extends Controller {
     this._activeCard = null
     this._pendingUrl = null
     this._setApplyEnabled(false)
-    this._switchTabKey("upload")
+    this._switchTabKey("library")
     this.clearBtnTarget.hidden = !this._currentBg()
     this._renderRecommended(this.hasBackgroundRecommendedValue ? this.backgroundRecommendedValue : [], "Recommended backgrounds")
     this.backdropTarget.hidden = false

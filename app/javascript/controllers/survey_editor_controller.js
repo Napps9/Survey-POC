@@ -125,8 +125,85 @@ export default class extends Controller {
   // Repaint every card's light plus the overall Verto score. Cheap enough
   // (~16 cards) to run wholesale on structural changes and locale switches.
   refreshAll() {
+    this.renumberCards()
     this.cardTargets.forEach(c => this.refreshCard(c))
     this.refreshScore()
+  }
+
+  // ── Reorder ──────────────────────────────────────────────────────────────
+  // Move a question up/down by swapping its slot with the neighbouring one. The
+  // welcome card stays pinned first. No server call needed: autosave serialises
+  // cards in document order, so reordering the DOM reorders the saved deck.
+
+  moveCardUp(event) {
+    event.stopPropagation()
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    const slot = card?.closest(".card-slot")
+    const prevSlot = slot?.previousElementSibling
+    const prevCard = prevSlot?.querySelector("[data-survey-editor-target='card']")
+    if (!slot || !prevSlot || !prevCard || prevCard.dataset.cardType === "welcome_card") return
+    prevSlot.before(slot)
+    this._afterReorder(card)
+  }
+
+  moveCardDown(event) {
+    event.stopPropagation()
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    const slot = card?.closest(".card-slot")
+    const nextSlot = slot?.nextElementSibling
+    if (!slot || !nextSlot || !nextSlot.classList.contains("card-slot")) return
+    nextSlot.after(slot)
+    this._afterReorder(card)
+  }
+
+  _afterReorder(card) {
+    this.renumberCards()
+    this.markDirty() // repaints the score + schedules the autosave that persists order
+    card.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    card.classList.remove("card-flash")
+    void card.offsetWidth // restart the pulse so the move reads as a move
+    card.classList.add("card-flash")
+    setTimeout(() => card.classList.remove("card-flash"), 1300)
+  }
+
+  // Re-stamp each card's number, progress bar and reorder-button state after a
+  // structural change (insert / delete / reorder), so the "Card N" labels and
+  // the data-card-num the score board jumps by stay consistent with the DOM.
+  renumberCards() {
+    const cards  = this.cardTargets
+    const totalQ = cards.filter(c => c.dataset.cardType !== "welcome_card").length
+    let qIdx = 0
+    cards.forEach((card, i) => {
+      const num = i + 1
+      card.dataset.cardNum = String(num)
+      const numEl = card.querySelector("[data-role='card-number']")
+      if (numEl) numEl.textContent = `Card ${num}`
+
+      const isQ = card.dataset.cardType !== "welcome_card"
+      if (isQ) qIdx++
+      const pct  = isQ && totalQ > 0 ? Math.round((qIdx / totalQ) * 100) : 5
+      const fill = card.querySelector(".panel-progress-fill")
+      if (fill) fill.style.width = `${pct}%`
+    })
+    this._updateMoveButtonStates(cards)
+  }
+
+  // Disable "up" on the first movable card (and any card sitting just below the
+  // welcome card) and "down" on the last, so the boundaries are obvious.
+  _updateMoveButtonStates(cards) {
+    cards.forEach(card => {
+      const slot = card.closest(".card-slot")
+      const up   = card.querySelector("[data-role='move-up']")
+      const down = card.querySelector("[data-role='move-down']")
+      if (up) {
+        const prevCard = slot?.previousElementSibling?.querySelector("[data-survey-editor-target='card']")
+        up.disabled = !prevCard || prevCard.dataset.cardType === "welcome_card"
+      }
+      if (down) {
+        const nextSlot = slot?.nextElementSibling
+        down.disabled = !nextSlot || !nextSlot.classList.contains("card-slot")
+      }
+    })
   }
 
   // The card object the analyzer scores: the text/options currently on screen

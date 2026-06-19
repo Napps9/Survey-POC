@@ -400,7 +400,9 @@ export default class extends Controller {
     const card = event.currentTarget.closest("[data-type-panel-target='card']")
     if (!card) return
     if (!window.confirm(t("editor.delete_card_confirm"))) return
-    card.remove()
+    // Remove the whole slot (card + its "Add question" CTA), falling back to the
+    // bare card for any context that doesn't use slots.
+    ;(card.closest(".card-slot") || card).remove()
     if (card === this.activeCardEl) {
       this.activeCardEl = null
       this.panelEmptyTarget.style.display  = ""

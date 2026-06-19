@@ -358,11 +358,13 @@
 
       <% when "open_ended" %>
         <textarea class="quiz-correct-textarea" data-quiz-accepted rows="2"
+                  data-controller="autogrow"
                   data-action="input->survey-editor#markDirty"
                   placeholder="<%= t('card.accepted_answers') %>"><%= Array(card["correct"]).join("\n") %></textarea>
       <% end %>
 
       <textarea class="quiz-correct-textarea quiz-explanation" data-quiz-explanation rows="2"
+                data-controller="autogrow"
                 data-action="input->survey-editor#markDirty"
                 placeholder="<%= t('card.explanation_placeholder') %>"><%= card["explanation"] %></textarea>
     </div>
