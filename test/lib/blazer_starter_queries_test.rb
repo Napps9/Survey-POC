@@ -33,6 +33,17 @@ class BlazerStarterQueriesTest < ActiveSupport::TestCase
     assert_equal "SELECT 42", query.reload.statement
   end
 
+  test "content queries expose per-Verto questions and answers via a {verto_id} picker" do
+    names = BlazerStarterQueries::DEFINITIONS.map { |d| d[:name] }
+    assert_includes names, "Content — Questions in a Verto"
+    assert_includes names, "Content — Answers in a Verto"
+
+    answers = BlazerStarterQueries::DEFINITIONS.find { |d| d[:name] == "Content — Answers in a Verto" }
+    assert_includes answers[:statement], "{verto_id}"
+    assert_includes answers[:statement], "json_array_elements", "must unpack the cards JSON array"
+    assert_includes answers[:statement], "r.answers", "must read the players' answers"
+  end
+
   test "resync! refreshes an out-of-date query back to the canonical SQL" do
     BlazerStarterQueries.create_missing!
     query = Blazer::Query.find_by!(name: BlazerStarterQueries::DEFINITIONS.first[:name])

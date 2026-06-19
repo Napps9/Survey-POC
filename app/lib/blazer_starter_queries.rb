@@ -172,6 +172,44 @@ module BlazerStarterQueries
         GROUP BY o.name, s.title
         ORDER BY completed_responses DESC
       SQL
+    },
+
+    # ── Content: the actual questions creators wrote and answers players gave ──
+    {
+      name: "Content — Questions in a Verto",
+      description: "Every card/question in one Verto, in order. Choose a Verto with the {verto_id} dropdown.",
+      statement: <<~SQL
+        SELECT card.ord - 1           AS position,
+               card.elem ->> 'type'   AS type,
+               card.elem ->> 'text'   AS question,
+               card.elem -> 'options' AS options
+        FROM surveys s
+        JOIN organisations o ON o.id = s.organisation_id
+        CROSS JOIN LATERAL json_array_elements(s.cards) WITH ORDINALITY AS card(elem, ord)
+        WHERE s.id = {verto_id} AND NOT o.internal
+        ORDER BY position
+      SQL
+    },
+    {
+      name: "Content — Answers in a Verto",
+      description: "Each player's answer paired with its question, for one Verto. Choose a Verto with the {verto_id} dropdown. Multi-select answers show as a JSON list; free-text shows under answer/other.",
+      statement: <<~SQL
+        SELECT r.id                            AS response_id,
+               r.status,
+               COALESCE(r.region_country, '')  AS country,
+               r.locale,
+               card.ord - 1                    AS position,
+               card.elem ->> 'text'            AS question,
+               (r.answers -> (card.ord - 1)::text) ->> 'value' AS answer,
+               (r.answers -> (card.ord - 1)::text) ->> 'other' AS other
+        FROM responses r
+        JOIN surveys s       ON s.id = r.survey_id
+        JOIN organisations o ON o.id = s.organisation_id
+        CROSS JOIN LATERAL json_array_elements(s.cards) WITH ORDINALITY AS card(elem, ord)
+        WHERE s.id = {verto_id} AND NOT o.internal
+          AND (r.answers -> (card.ord - 1)::text) IS NOT NULL
+        ORDER BY r.id, position
+      SQL
     }
   ].freeze
 
