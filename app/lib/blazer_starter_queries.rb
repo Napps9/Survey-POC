@@ -251,6 +251,34 @@ module BlazerStarterQueries
         GROUP BY cohort_week
         ORDER BY cohort_week
       SQL
+    },
+
+    {
+      name: "Content — Verto results (questions & answers)",
+      description: "Every question in a Verto with the breakdown of answers given (answer -> how many " \
+                   "responses), in order — questions and answers in one view. Choose a Verto with the " \
+                   "{verto_id} dropdown. Unanswered questions show responses = 0; multi-select answers " \
+                   "appear as a JSON list; free-text 'other' is merged in. Excludes internal orgs.",
+      statement: <<~SQL
+        SELECT card.ord - 1         AS position,
+               card.elem ->> 'type' AS type,
+               card.elem ->> 'text' AS question,
+               a.answer,
+               COUNT(a.answer)      AS responses
+        FROM surveys s
+        JOIN organisations o ON o.id = s.organisation_id
+        CROSS JOIN LATERAL json_array_elements(s.cards) WITH ORDINALITY AS card(elem, ord)
+        LEFT JOIN LATERAL (
+          SELECT COALESCE(NULLIF((r.answers -> (card.ord - 1)::text) ->> 'value', ''),
+                          (r.answers -> (card.ord - 1)::text) ->> 'other') AS answer
+          FROM responses r
+          WHERE r.survey_id = s.id
+            AND (r.answers -> (card.ord - 1)::text) IS NOT NULL
+        ) a ON true
+        WHERE s.id = {verto_id} AND NOT o.internal
+        GROUP BY position, type, question, a.answer
+        ORDER BY position, responses DESC, a.answer
+      SQL
     }
   ].freeze
 

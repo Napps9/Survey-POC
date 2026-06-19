@@ -52,6 +52,15 @@ class BlazerStarterQueriesTest < ActiveSupport::TestCase
     assert_includes retention[:statement], "weeks_since"
   end
 
+  test "results query combines questions and answers in one view" do
+    results = BlazerStarterQueries::DEFINITIONS.find { |d| d[:name] == "Content — Verto results (questions & answers)" }
+    assert results, "expected a combined questions+answers results query"
+    assert_includes results[:statement], "{verto_id}"
+    assert_includes results[:statement], "json_array_elements", "must unpack the questions"
+    assert_includes results[:statement], "r.answers", "must read the answers"
+    assert_includes results[:statement], "internal", "must exclude internal orgs"
+  end
+
   test "resync! refreshes an out-of-date query back to the canonical SQL" do
     BlazerStarterQueries.create_missing!
     query = Blazer::Query.find_by!(name: BlazerStarterQueries::DEFINITIONS.first[:name])
