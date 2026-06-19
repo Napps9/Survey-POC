@@ -27,3 +27,6 @@ if admin_password
 else
   puts "Seeded: org=#{org.name}. Set SEED_ADMIN_PASSWORD to also seed an admin user."
 end
+
+# Internal BI: starter Blazer queries for VertoNow staff (idempotent).
+load Rails.root.join("db/seeds/blazer_starter_queries.rb")

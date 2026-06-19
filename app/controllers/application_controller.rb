@@ -7,6 +7,14 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # Resolves the acting user for the mounted Blazer engine, whose controllers
+  # inherit from this class (and skip its auth filters). Named by `user_method`
+  # in config/blazer.yml so Blazer can attribute audits/queries; nothing in the
+  # app itself calls it. Access is gated separately in config/routes.rb.
+  def current_blazer_staff
+    BlazerAccess.user_for(request)
+  end
+
   # Wrap the request in the resolved UI locale. Runs after authentication /
   # organisation filters, so Current.user is available when present.
   def switch_locale(&action)

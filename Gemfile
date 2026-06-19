@@ -46,6 +46,11 @@ gem "googleauth"             # Signet OAuth2: authorize URL, code exchange, toke
 gem "google-apis-sheets_v4"  # create spreadsheet + write values (Drive API not needed)
 gem "google-apis-drive_v3"   # create the AI report as a Google Doc in the user's Drive
 
+# Internal BI: read-only SQL dashboards over the app DB for VertoNow staff.
+# Mounted at /blazer, gated to a staff-email allowlist (see config/routes.rb
+# and app/lib/blazer_access.rb). Runs against Postgres in prod.
+gem "blazer", "~> 3.4"
+
 # Social sign-in with Google. Activates only when GOOGLE_CLIENT_ID/SECRET are
 # present in the environment — see .env.example.
 gem "omniauth", "~> 2.1"

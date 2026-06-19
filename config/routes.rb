@@ -40,6 +40,15 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest"       => "rails/pwa#manifest",       as: :pwa_manifest
 
+  # Internal BI — read-only SQL dashboards over the whole app DB, for VertoNow
+  # staff only. The constraint resolves the signed-in user from the session
+  # cookie and checks the BLAZER_STAFF_EMAILS allowlist (deny-by-default), so a
+  # non-staff or anonymous request never matches and 404s — the engine isn't
+  # even reached. See app/lib/blazer_access.rb.
+  constraints(->(request) { BlazerAccess.staff_request?(request) }) do
+    mount Blazer::Engine, at: "/blazer"
+  end
+
   # App
   root "surveys#index"
   get  "surveys/new",                 to: "surveys#new",     as: :new_survey
