@@ -139,6 +139,9 @@ ar:
       fit_solid: بديل جيد
       fit_workable: صالح للاستخدام
       fit_sparingly: استخدم باعتدال
+      optimise: "تحسين"
+      optimising: "جارٍ التحسين…"
+      optimise_failed: "تعذّر التحسين: %{msg}"
       rules:
         title: "قواعد اللعبة"
         score_label: "نتيجة Verto"

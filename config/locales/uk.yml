@@ -139,6 +139,9 @@ uk:
       fit_solid: Хороша альтернатива
       fit_workable: Прийнятний варіант
       fit_sparingly: Використовувати обережно
+      optimise: "Оптимізувати"
+      optimising: "Оптимізація…"
+      optimise_failed: "Не вдалося оптимізувати: %{msg}"
       rules:
         title: "Правила гри"
         score_label: "Оцінка Verto"

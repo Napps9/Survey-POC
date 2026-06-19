@@ -139,6 +139,9 @@ sw:
       fit_solid: Mbadala thabiti
       fit_workable: Inaweza kutumika
       fit_sparingly: Tumia kwa uangalifu
+      optimise: "Boresha"
+      optimising: "Inaboresha…"
+      optimise_failed: "Imeshindwa kuboresha: %{msg}"
       rules:
         title: "Kanuni za Mchezo"
         score_label: "Alama ya Verto"

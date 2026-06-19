@@ -139,6 +139,9 @@ he:
       fit_solid: חלופה טובה
       fit_workable: ישים
       fit_sparingly: השתמש במשורה
+      optimise: "מטב"
+      optimising: "ממטב…"
+      optimise_failed: "לא ניתן למטב: %{msg}"
       rules:
         title: "חוקי המשחק"
         score_label: "ציון Verto"

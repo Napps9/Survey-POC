@@ -352,6 +352,51 @@ class SurveysController < ApplicationController
     render json: { ok: false, error: e.message }, status: :unprocessable_entity
   end
 
+  # POST /surveys/:id/optimise_card
+  # AI-rewrite ONE flagged card so it satisfies the Rules of the Game, fixing the
+  # editor-listed issues while keeping the answer type and intent. Returns the
+  # optimised card JSON + its rendered editor partial, so the editor can swap it
+  # in place and the traffic light turns green.
+  def optimise_card
+    @survey = survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.published?
+      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    end
+    body = JSON.parse(request.body.read)
+    card = body["card"].is_a?(Hash) ? body["card"] : {}
+    return render json: { ok: false, error: "No card to optimise." }, status: :unprocessable_entity if card["type"].blank?
+
+    optimised = CardOptimiser.new.call(
+      card:         card,
+      issues:       body["issues"],
+      theme:        survey.theme,
+      audience_age: survey.audience_age,
+      key_insight:  survey.key_insight,
+      locale:       survey.default_locale
+    )
+
+    # Keep the card's structural fields; take the improved wording/options. Drop
+    # the now-stale per-language translations and re-translate from the new
+    # primary so every language stays aligned.
+    new_options = Array(optimised["options"]).map { |o| o.to_s.strip }.reject(&:blank?)
+    merged = card.merge(
+      "type"        => optimised["type"],
+      "text"        => optimised["text"].to_s.presence || card["text"],
+      "description" => optimised["description"].to_s.presence,
+      "options"     => new_options.presence || card["options"]
+    ).except("i18n").compact
+    if merged["type"] == "tap_card" && merged["option_images"].present?
+      merged["option_images"] = Array(merged["option_images"]).first(Array(merged["options"]).size)
+    end
+    merged = translate_card!(merged, survey)
+
+    html = render_card_html(survey, merged, idx: body["index"].to_i)
+    render json: { ok: true, card: merged, html: html }
+  rescue => e
+    Rails.logger.error("[SurveysController#optimise_card] #{e.class}: #{e.message}")
+    render json: { ok: false, error: friendly_generate_error(e) }, status: :unprocessable_entity
+  end
+
   # POST /surveys/:id/render_card
   # Renders the HTML partial for a given card JSON (used by "Start from Blank" flow).
   def render_card
@@ -522,12 +567,21 @@ class SurveysController < ApplicationController
     card
   end
 
-  def render_card_html(survey, card)
+  # Renders a card's editor partial. With no `idx` the card is treated as a new
+  # one appended to the deck (the add-question flow); with an explicit `idx` it's
+  # rendered in place at that position (the optimise flow), so its card number
+  # and progress match where it already sits.
+  def render_card_html(survey, card, idx: nil)
     existing = Array(survey.cards)
-    idx      = existing.size
-    total_q  = existing.count { |c| c["type"] != "welcome_card" } +
-               (card["type"] != "welcome_card" ? 1 : 0)
-    q_idx    = card["type"] != "welcome_card" ? total_q : 0
+    if idx
+      total_q = existing.count { |c| c["type"] != "welcome_card" }
+      q_idx   = existing.first(idx + 1).count { |c| c["type"] != "welcome_card" }
+    else
+      idx     = existing.size
+      total_q = existing.count { |c| c["type"] != "welcome_card" } +
+                (card["type"] != "welcome_card" ? 1 : 0)
+      q_idx   = card["type"] != "welcome_card" ? total_q : 0
+    end
     render_to_string(
       partial: "surveys/card_row",
       formats: [ :html ],

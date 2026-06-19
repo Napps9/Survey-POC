@@ -139,6 +139,9 @@ vi:
       fit_solid: Lựa chọn thay thế vững
       fit_workable: Có thể dùng được
       fit_sparingly: Dùng hạn chế
+      optimise: "Tối ưu hóa"
+      optimising: "Đang tối ưu hóa…"
+      optimise_failed: "Không thể tối ưu hóa: %{msg}"
       rules:
         title: "Luật chơi"
         score_label: "Điểm Verto"

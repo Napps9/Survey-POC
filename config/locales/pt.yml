@@ -139,6 +139,9 @@ pt:
       fit_solid: Alternativa sólida
       fit_workable: Viável
       fit_sparingly: Usar com moderação
+      optimise: "Otimizar"
+      optimising: "Otimizando…"
+      optimise_failed: "Não foi possível otimizar: %{msg}"
       rules:
         title: "Regras do jogo"
         score_label: "Pontuação do Verto"

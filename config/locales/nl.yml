@@ -139,6 +139,9 @@ nl:
       fit_solid: Solide alternatief
       fit_workable: Werkbaar
       fit_sparingly: Spaarzaam gebruiken
+      optimise: "Optimaliseren"
+      optimising: "Optimaliseren…"
+      optimise_failed: "Optimaliseren mislukt: %{msg}"
       rules:
         title: "Spelregels"
         score_label: "Verto-score"

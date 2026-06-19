@@ -139,6 +139,9 @@ ko:
       fit_solid: 확실한 대안
       fit_workable: 사용 가능
       fit_sparingly: 제한적으로 사용
+      optimise: "최적화"
+      optimising: "최적화 중…"
+      optimise_failed: "최적화할 수 없습니다: %{msg}"
       rules:
         title: "게임의 규칙"
         score_label: "Verto 점수"

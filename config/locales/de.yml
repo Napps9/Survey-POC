@@ -139,6 +139,9 @@ de:
       fit_solid: Solide Alternative
       fit_workable: Brauchbar
       fit_sparingly: Sparsam verwenden
+      optimise: "Optimieren"
+      optimising: "Optimieren…"
+      optimise_failed: "Optimierung fehlgeschlagen: %{msg}"
       rules:
         title: "Spielregeln"
         score_label: "Verto-Punktzahl"

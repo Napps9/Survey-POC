@@ -139,6 +139,9 @@ id:
       fit_solid: Alternatif solid
       fit_workable: Bisa digunakan
       fit_sparingly: Gunakan secukupnya
+      optimise: "Optimalkan"
+      optimising: "Mengoptimalkan…"
+      optimise_failed: "Tidak dapat mengoptimalkan: %{msg}"
       rules:
         title: "Aturan Main"
         score_label: "Skor Verto"

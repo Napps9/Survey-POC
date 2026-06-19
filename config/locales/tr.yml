@@ -139,6 +139,9 @@ tr:
       fit_solid: Sağlam alternatif
       fit_workable: Kullanılabilir
       fit_sparingly: Az kullanın
+      optimise: "İyileştir"
+      optimising: "İyileştiriliyor…"
+      optimise_failed: "İyileştirilemedi: %{msg}"
       rules:
         title: "Oyunun Kuralları"
         score_label: "Verto puanı"

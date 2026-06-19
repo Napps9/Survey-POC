@@ -139,6 +139,9 @@ hi:
       fit_solid: ठोस विकल्प
       fit_workable: उपयोगी
       fit_sparingly: कम उपयोग करें
+      optimise: "अनुकूलित करें"
+      optimising: "अनुकूलित किया जा रहा है…"
+      optimise_failed: "अनुकूलित नहीं किया जा सका: %{msg}"
       rules:
         title: "खेल के नियम"
         score_label: "Verto स्कोर"

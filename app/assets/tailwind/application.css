@@ -1807,6 +1807,30 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   color: rgba(255,255,255,0.32); padding: 2px 2px 4px;
 }
 
+/* A flagged card row in the score board: the clickable jump area plus an
+   "Optimise" AI CTA that fixes the listed issues in place. */
+.score-row-actionable { gap: 8px; }
+.score-row-actionable:hover { background: rgba(255,255,255,0.06); }
+.score-row-main {
+  display: flex; flex-direction: column; gap: 5px; width: 100%;
+  background: none; border: none; padding: 0; margin: 0;
+  text-align: left; cursor: pointer; font: inherit;
+}
+.score-optimise-btn {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 100px; cursor: pointer;
+  background: rgba(1,234,203,0.12); border: 1px solid rgba(1,234,203,0.4);
+  color: var(--brand-primary, #01EACB);
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.03em;
+  transition: background 0.14s;
+}
+.score-optimise-btn:hover { background: rgba(1,234,203,0.22); }
+.score-optimise-btn:disabled { opacity: 0.55; cursor: default; }
+
+/* The card being optimised pulses while the AI rewrite is in flight. */
+.card-optimising { animation: cardOptimising 1.1s ease-in-out infinite; }
+@keyframes cardOptimising { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
 /* Shared checklist internals (card panel + Verto pop-up). */
 .rule-panel-title {
   font-family: "Alata", sans-serif; font-size: 10px;

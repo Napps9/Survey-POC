@@ -6,10 +6,12 @@ export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode", "vertoScore", "scoreBoard"]
   static values  = {
     url: String, title: String, description: String,
+    optimiseUrl: { type: String, default: "" },
     defaultLocale: { type: String, default: "en" },
     locales: { type: Array, default: [] },
     rtlLocales: { type: Array, default: [] },
-    quiz: { type: Boolean, default: false }
+    quiz: { type: Boolean, default: false },
+    live: { type: Boolean, default: false }
   }
 
   _saveTimer = null
@@ -223,9 +225,88 @@ export default class extends Controller {
     }
     const label = this._esc(`${t("editor.rules.card_n", { n: it.num })} · ${typeLabel(it.type)}`)
     const fixes = it.fixes.map(f => `<div class="score-fix">${this._esc(f)}</div>`).join("")
-    return `<button type="button" class="score-row" data-card-num="${this._esc(it.num)}" ` +
+    const jump = `<button type="button" class="score-row-main" data-card-num="${this._esc(it.num)}" ` +
       `data-action="click->survey-editor#jumpToCard">` +
       `<div class="score-row-card">${label}</div>${fixes}</button>`
+    // "Optimise" — an AI fix for the listed issues. Only on cards that have
+    // fixes, and never while the Verto is live (editing is locked).
+    const optimise = (it.fixes.length && this.optimiseUrlValue && !this.liveValue)
+      ? `<button type="button" class="score-optimise-btn" data-card-num="${this._esc(it.num)}" ` +
+        `data-issues="${this._esc(JSON.stringify(it.fixes))}" ` +
+        `data-action="click->survey-editor#optimiseCard">✨ ${this._esc(t("editor.optimise"))}</button>`
+      : ""
+    return `<div class="score-row score-row-actionable">${jump}${optimise}</div>`
+  }
+
+  // AI-fix the issues on one card: send its current content + the flagged
+  // issues, swap in the optimised version the server renders, and re-score.
+  async optimiseCard(event) {
+    event.stopPropagation()
+    const btn  = event.currentTarget
+    const num  = btn.dataset.cardNum
+    const card = this.cardTargets.find(c => c.dataset.cardNum === num)
+    if (!card || !this.optimiseUrlValue) return
+
+    let issues = []
+    try { issues = JSON.parse(btn.dataset.issues || "[]") } catch (_) { /* none */ }
+
+    btn.disabled = true
+    const original = btn.textContent
+    btn.textContent = t("editor.optimising")
+    card.classList.add("card-optimising")
+
+    try {
+      const res = await fetch(this.optimiseUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": this._csrf() },
+        body: JSON.stringify({
+          index:  this.cardTargets.indexOf(card),
+          issues: issues,
+          card:   { type: card.dataset.cardType, ...this._readCard(card) }
+        })
+      })
+      const json = await res.json()
+      if (!json.ok) throw new Error(json.error || "Optimise failed")
+      this._replaceCard(card, json.html, json.card)
+    } catch (err) {
+      card.classList.remove("card-optimising")
+      btn.disabled = false
+      btn.textContent = original
+      this.flash(t("editor.optimise_failed", { msg: err.message }), "text-hot-pink")
+    }
+  }
+
+  // Replace a card element with freshly rendered HTML and reseed its store entry
+  // (so language tabs + autosave keep its translations), then re-score + save.
+  _replaceCard(oldEl, html, cardJson) {
+    const tmp = document.createElement("div")
+    tmp.innerHTML = (html || "").trim()
+    const newEl = tmp.firstElementChild
+    if (!newEl) return
+
+    oldEl.replaceWith(newEl)
+
+    this._store.delete(oldEl)
+    const entry = {}
+    entry[this.defaultLocaleValue] = this._normContent(cardJson)
+    const i18n = cardJson.i18n || {}
+    Object.keys(i18n).forEach(loc => { entry[loc] = this._normContent(i18n[loc]) })
+    this._store.set(newEl, entry)
+    // If a translation tab is active, show that language on the swapped-in card.
+    if (this._activeLocale !== this.defaultLocaleValue) {
+      this._writeCard(newEl, entry[this._activeLocale], entry[this.defaultLocaleValue])
+    }
+
+    this.refreshCard(newEl)
+    this.refreshScore()
+    this.markDirty()
+    newEl.classList.remove("card-optimising")
+    newEl.classList.add("card-flash")
+    setTimeout(() => newEl.classList.remove("card-flash"), 1300)
+  }
+
+  _csrf() {
+    return document.querySelector('meta[name="csrf-token"]')?.content || ""
   }
 
   // Scroll the feed to a card named in the score board and pulse it, so the

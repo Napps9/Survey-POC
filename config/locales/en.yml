@@ -141,6 +141,9 @@ en:
       fit_solid: "Solid alternative"
       fit_workable: "Workable"
       fit_sparingly: "Use sparingly"
+      optimise: "Optimise"
+      optimising: "Optimising…"
+      optimise_failed: "Couldn't optimise: %{msg}"
       rules:
         title: "Rules of the Game"
         score_label: "Verto score"

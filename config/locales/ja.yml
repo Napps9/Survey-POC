@@ -139,6 +139,9 @@ ja:
       fit_solid: 安定した代替
       fit_workable: 使用可能
       fit_sparingly: 慎重に使用
+      optimise: "最適化"
+      optimising: "最適化中…"
+      optimise_failed: "最適化できませんでした: %{msg}"
       rules:
         title: "ゲームのルール"
         score_label: "Vertoスコア"

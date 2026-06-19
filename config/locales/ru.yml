@@ -139,6 +139,9 @@ ru:
       fit_solid: Подходящая альтернатива
       fit_workable: Приемлемо
       fit_sparingly: Использовать редко
+      optimise: "Оптимизировать"
+      optimising: "Оптимизация…"
+      optimise_failed: "Не удалось оптимизировать: %{msg}"
       rules:
         title: "Правила игры"
         score_label: "Оценка Verto"
