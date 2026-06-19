@@ -269,9 +269,13 @@ export default class extends Controller {
       if (!json.ok) throw new Error(json.error || "Optimise failed")
       this._replaceCard(card, json.html, json.card)
     } catch (err) {
+      // Surface the failure where the click happened — a silent no-move reads
+      // like a broken button — and keep the detail in the status flash.
       card.classList.remove("card-optimising")
       btn.disabled = false
       btn.textContent = original
+      btn.classList.add("is-error")
+      setTimeout(() => btn.classList.remove("is-error"), 2600)
       this.flash(t("editor.optimise_failed", { msg: err.message }), "text-hot-pink")
     }
   }

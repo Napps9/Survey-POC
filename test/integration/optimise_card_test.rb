@@ -52,6 +52,26 @@ class OptimiseCardTest < ActionDispatch::IntegrationTest
     assert_match 'data-card-num="2"', body["html"], "renders in place at its existing position"
   end
 
+  test "optimise renders a rating card in place without crashing" do
+    s = @org.surveys.create!(title: "T", theme: "Sport", audience_age: "under 25", key_insight: "tastes",
+      default_locale: "en", locales: [ "en" ],
+      cards: [ { "type" => "welcome_card", "title" => "hi" },
+               { "type" => "rating", "text" => "Rate it", "options" => %w[Poor Excellent] } ])
+    optimised = { "type" => "rating",
+                  "text" => "How would you rate the political neutrality of the Olympics?",
+                  "options" => %w[Poor Fair Good Great Excellent] }
+    with_fake_optimiser(optimised) do
+      json_post optimise_survey_card_path(s),
+                index: 1, issues: [ "A little short — aim for 50-70 characters (now 7)." ],
+                card: { "type" => "rating", "text" => "Rate it", "options" => %w[Poor Excellent] }
+    end
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert body["ok"]
+    assert_equal "rating", body["card"]["type"]
+    assert_match "political neutrality", body["html"]
+  end
+
   test "optimising a live Verto is locked" do
     s = survey(published: true)
     with_fake_optimiser({ "type" => "multiple_choice", "text" => "x", "options" => %w[a b c] }) do

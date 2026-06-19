@@ -1830,6 +1830,9 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 }
 .score-optimise-btn:hover { background: rgba(1,234,203,0.22); }
 .score-optimise-btn:disabled { opacity: 0.55; cursor: default; }
+.score-optimise-btn.is-error {
+  background: rgba(255,30,111,0.18); border-color: rgba(255,30,111,0.55); color: #FF8FB6;
+}
 
 /* The card being optimised pulses while the AI rewrite is in flight. */
 .card-optimising { animation: cardOptimising 1.1s ease-in-out infinite; }

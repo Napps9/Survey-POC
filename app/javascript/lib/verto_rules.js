@@ -93,6 +93,10 @@ function lengthCheck(card) {
 function countCheck(card, rule) {
   const isGrid = card.type === "select_one_grid" || card.type === "select_many_grid"
   let n = cleanOptions(card).length
+  // Rating is a fixed 5-point star scale — its two labels are just the end
+  // captions ("Poor" … "Excellent"), not the answer count. Score it as the
+  // 5 points it always renders, so it isn't perpetually flagged "only 2".
+  if (card.type === "rating") n = 5
   if (isGrid && card.allowOther) n += 1 // rule 7: the Other box counts
 
   if (rule.exact != null) {
