@@ -154,23 +154,23 @@
               <%= t("wizard.s1_name_label", default: "Verto name") %>
               <%= f.text_field :verto_name,
                     required: true,
-                    data: { required: "true" },
+                    data: { required: "true", controller: "hover", hover_on_value: "focus",
+                            hover_over_value: { borderColor: "#FF1E6F" }.to_json,
+                            hover_out_value: { borderColor: "rgba(0,0,0,0.12)" }.to_json },
                     maxlength: 80,
                     placeholder: t("wizard.s1_name_placeholder", default: "e.g. Youth Wellbeing Check-in 2026"),
-                    style: light_input_style,
-                    onfocus: "this.style.borderColor='#FF1E6F'",
-                    onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+                    style: light_input_style %>
             </label>
 
             <label style="display:flex;flex-direction:column;gap:6px;font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.5);font-weight:700;">
               <%= t("wizard.s1_theme_label", default: "Theme") %>
               <%= f.text_field :theme,
                     required: true,
-                    data: { required: "true" },
+                    data: { required: "true", controller: "hover", hover_on_value: "focus",
+                            hover_over_value: { borderColor: "#FF1E6F" }.to_json,
+                            hover_out_value: { borderColor: "rgba(0,0,0,0.12)" }.to_json },
                     placeholder: t("wizard.s1_placeholder"),
-                    style: light_input_style,
-                    onfocus: "this.style.borderColor='#FF1E6F'",
-                    onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+                    style: light_input_style %>
             </label>
             <div class="wizard-mobile-hint">
               <p class="wizard-mobile-hint-lead"><%= t("wizard.s1_lead") %></p>
@@ -204,11 +204,11 @@
             <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s2_title") %></div>
             <%= f.text_field :audience_age,
                   required: true,
-                  data: { required: "true" },
+                  data: { required: "true", controller: "hover", hover_on_value: "focus",
+                          hover_over_value: { borderColor: "#01EACB" }.to_json,
+                          hover_out_value: { borderColor: "rgba(0,0,0,0.12)" }.to_json },
                   placeholder: t("wizard.s2_placeholder"),
-                  style: light_input_style,
-                  onfocus: "this.style.borderColor='#01EACB'",
-                  onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+                  style: light_input_style %>
             <div class="wizard-mobile-hint">
               <p class="wizard-mobile-hint-lead"><%= t("wizard.s2_lead") %></p>
               <p class="wizard-mobile-hint-body"><%= t("wizard.s2_hint_body") %></p>
@@ -242,8 +242,9 @@
             <%= f.text_area :key_insight, rows: 4,
                   placeholder: t("wizard.s3_placeholder"),
                   style: light_textarea_style,
-                  onfocus: "this.style.borderColor='#0CA7FF'",
-                  onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+                  data: { controller: "hover", hover_on_value: "focus",
+                          hover_over_value: { borderColor: "#0CA7FF" }.to_json,
+                          hover_out_value: { borderColor: "rgba(0,0,0,0.12)" }.to_json } %>
             <div class="wizard-mobile-hint">
               <p class="wizard-mobile-hint-lead"><%= t("wizard.s3_lead") %></p>
               <p class="wizard-mobile-hint-body"><%= t("wizard.s3_hint_body") %></p>
@@ -302,7 +303,9 @@
                             </label>
                             <% set.common_questions.each do |q| %>
                               <label style="display:flex;align-items:flex-start;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;"
-                                     onmouseover="this.style.background='rgba(97,91,245,0.05)'" onmouseout="this.style.background='transparent'">
+                                     data-controller="hover"
+                                     data-hover-over-value='{"background":"rgba(97,91,245,0.05)"}'
+                                     data-hover-out-value='{"background":"transparent"}'>
                                 <input type="checkbox" name="common_question_ids[]" value="<%= q.id %>"
                                        data-action="change->common-questions#update"
                                        style="margin-top:2px;accent-color:#615BF5;" />
@@ -474,8 +477,9 @@
             <%= f.text_area :notes, rows: 4,
                   placeholder: t("wizard.s6_placeholder"),
                   style: light_textarea_style,
-                  onfocus: "this.style.borderColor='#615BF5'",
-                  onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+                  data: { controller: "hover", hover_on_value: "focus",
+                          hover_over_value: { borderColor: "#615BF5" }.to_json,
+                          hover_out_value: { borderColor: "rgba(0,0,0,0.12)" }.to_json } %>
             <div class="wizard-mobile-hint">
               <p class="wizard-mobile-hint-lead"><%= t("wizard.s6_lead") %></p>
               <p class="wizard-mobile-hint-body"><%= t("wizard.s6_body") %></p>
@@ -561,17 +565,20 @@
             <%# Section: How to start? — two side-by-side choice cards %>
             <div style="display:flex;flex-direction:column;gap:6px;">
               <div style="<%= section_label_style %>"><%= t("wizard.section_how_to_start") %></div>
-              <div style="display:flex;gap:8px;">
+              <div style="display:flex;gap:8px;"
+                   data-controller="choice-cards"
+                   data-choice-cards-selected-border-value="#FF1E6F"
+                   data-choice-cards-selected-bg-value="rgba(255,30,111,0.04)">
                 <% [
                   ["1", t("wizard.s7_populate_label"), t("wizard.s7_populate_desc"), t("wizard.s7_recommended")],
                   ["0", t("wizard.s7_blank_label"),    t("wizard.s7_blank_desc"),    nil]
                 ].each_with_index do |(val, label, desc, badge), i| %>
                   <% selected = (i == 0) %>
-                  <label class="populate-choice" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;cursor:pointer;padding:11px 12px;border-radius:12px;background:<%= selected ? 'rgba(255,30,111,0.04)' : '#fafbfc' %>;border:2px solid <%= selected ? '#FF1E6F' : 'rgba(0,0,0,0.08)' %>;transition:border-color 0.15s,background 0.15s;">
+                  <label class="populate-choice" data-choice-cards-target="choice" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;cursor:pointer;padding:11px 12px;border-radius:12px;background:<%= selected ? 'rgba(255,30,111,0.04)' : '#fafbfc' %>;border:2px solid <%= selected ? '#FF1E6F' : 'rgba(0,0,0,0.08)' %>;transition:border-color 0.15s,background 0.15s;">
                     <input type="radio" name="populate_content" value="<%= val %>"
                            <%= "checked" if selected %>
-                           style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
-                           onchange="this.closest('.preview-card').querySelectorAll('.populate-choice').forEach(el=>{el.style.borderColor='rgba(0,0,0,0.08)';el.style.background='#fafbfc';});this.closest('.populate-choice').style.borderColor='#FF1E6F';this.closest('.populate-choice').style.background='rgba(255,30,111,0.04)';" />
+                           data-action="change->choice-cards#select"
+                           style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />
                     <span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                       <span style="font-family:'Alata',sans-serif;font-size:14px;color:#1C2034;letter-spacing:0.02em;line-height:1.2;"><%= label %></span>
                       <% if badge %>
@@ -622,12 +629,14 @@
             <div style="display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:12px;background:#fafbfc;border:1px dashed rgba(0,0,0,0.18);">
               <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);margin:0;line-height:1.45;"><%= t("wizard.import_hint") %></p>
 
-              <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;position:relative;">
+              <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;position:relative;"
+                     data-controller="file-input"
+                     data-file-input-empty-value="<%= t('wizard.import_no_file') %>">
                 <span style="font-family:'Alata',sans-serif;font-size:13px;color:#1C2034;padding:9px 14px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,0.14);white-space:nowrap;"><%= t("wizard.import_choose") %></span>
-                <span data-pdf-filename style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= t("wizard.import_no_file") %></span>
+                <span data-pdf-filename data-file-input-target="name" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= t("wizard.import_no_file") %></span>
                 <%= f.file_field :pdf, accept: "application/pdf",
                       style: "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;",
-                      onchange: "this.closest('label').querySelector('[data-pdf-filename]').textContent = this.files[0] ? this.files[0].name : '#{j t('wizard.import_no_file')}'" %>
+                      data: { action: "change->file-input#show" } %>
               </label>
 
               <%= f.submit t("wizard.import_pdf"),

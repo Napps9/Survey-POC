@@ -66,13 +66,17 @@
         <div style="background:#161B2E;border:1px solid rgba(255,30,111,0.3);border-radius:14px;padding:18px 20px;margin-bottom:24px;">
           <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#FF1E6F;letter-spacing:0.05em;margin-bottom:4px;"><%= t("alliances.new_link_heading") %></div>
           <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);margin-bottom:12px;"><%= t("alliances.new_link_body", alliance: @alliance.name) %></div>
-          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;">
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;"
+               data-controller="clipboard"
+               data-clipboard-label-value="<%= t("alliances.copy") %>"
+               data-clipboard-copied-label-value="<%= t("alliances.copied") %>"
+               data-clipboard-copied-color-value="#01EACB"
+               data-clipboard-restore-value="1500">
             <input type="text" readonly id="new-partner-link" value="<%= new_url %>"
+                   data-clipboard-target="source"
                    style="flex:1;background:transparent;border:none;color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;" />
             <button type="button"
-                    data-copy-label="<%= t("alliances.copy") %>"
-                    data-copied-label="<%= t("alliances.copied") %>"
-                    onclick="navigator.clipboard.writeText(document.getElementById('new-partner-link').value).then(()=>{this.textContent=this.dataset.copiedLabel;this.style.color='#01EACB';setTimeout(()=>{this.textContent=this.dataset.copyLabel;this.style.color=''},1500)})"
+                    data-action="clipboard#copy"
                     style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size: var(--text-base);cursor:pointer;"><%= t("alliances.copy") %></button>
           </div>
         </div>
@@ -199,18 +203,22 @@
                   <% shares.sort_by { |sh| sh.partner_organisation.name }.each do |share| %>
                     <% url = play_survey_url(share.share_token) %>
                     <% sh_resp = @response_counts_by_share[share.id] || 0 %>
-                    <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="display:flex;align-items:center;gap:10px;"
+                         data-controller="clipboard"
+                         data-clipboard-label-value="<%= t("alliances.copy") %>"
+                         data-clipboard-copied-label-value="✓"
+                         data-clipboard-restore-value="1500">
                       <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#FF1E6F,#615BF5);display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size: var(--text-xs);color:#fff;flex-shrink:0;">
                         <%= share.partner_organisation.name.first.upcase %>
                       </div>
                       <span style="flex-shrink:0;font-family:'Alata',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.78);width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= share.partner_organisation.name %></span>
                       <input type="text" readonly value="<%= url %>"
                              id="share-link-<%= share.id %>"
-                             onclick="this.select()"
+                             data-controller="select-all" data-action="click->select-all#select"
+                             data-clipboard-target="source"
                              style="flex:1;min-width:0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:5px 8px;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);outline:none;" />
                       <button type="button"
-                              data-copy-label="<%= t("alliances.copy") %>"
-                              onclick="navigator.clipboard.writeText(document.getElementById('share-link-<%= share.id %>').value).then(()=>{this.textContent='✓';setTimeout(()=>{this.textContent=this.dataset.copyLabel},1500)})"
+                              data-action="clipboard#copy"
                               style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:5px 10px;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;flex-shrink:0;"><%= t("alliances.copy") %></button>
                       <span style="flex-shrink:0;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);width:60px;text-align:right;"><%= t("alliances.responses_short", n: sh_resp) %></span>
                     </div>

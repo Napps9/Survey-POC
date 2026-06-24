@@ -102,7 +102,11 @@
                   <%= invite.role %>
                 </span>
                 <button type="button"
-                        onclick="navigator.clipboard.writeText('<%= invite_url(invite.token) %>').then(()=>{this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy link'},2000)})"
+                        data-controller="clipboard"
+                        data-clipboard-text-value="<%= invite_url(invite.token) %>"
+                        data-clipboard-label-value="Copy link"
+                        data-clipboard-copied-label-value="Copied!"
+                        data-action="clipboard#copy"
                         style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:7px;padding:5px 12px;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;white-space:nowrap;">
                   Copy link
                 </button>

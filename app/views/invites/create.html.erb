@@ -24,7 +24,12 @@
           <%= invite_url %>
         </span>
         <button type="button"
-                onclick="navigator.clipboard.writeText('<%= invite_url %>').then(()=>{this.textContent='Copied!';this.style.color='#01EACB';setTimeout(()=>{this.textContent='Copy';this.style.color=''},2000)})"
+                data-controller="clipboard"
+                data-clipboard-text-value="<%= invite_url %>"
+                data-clipboard-label-value="Copy"
+                data-clipboard-copied-label-value="Copied!"
+                data-clipboard-copied-color-value="#01EACB"
+                data-action="clipboard#copy"
                 style="flex-shrink:0;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:7px;padding:7px 14px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.04em;cursor:pointer;white-space:nowrap;">
           Copy
         </button>

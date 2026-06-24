@@ -1,7 +1,7 @@
 <% content_for :title, t("invites.title") %>
 
 <div style="min-height:100vh;background:#272D4A;display:flex;align-items:center;justify-content:center;padding:24px;">
-  <div style="width:100%;max-width:480px;">
+  <div style="width:100%;max-width:480px;" data-controller="invite-form">
 
     <div style="text-align:center;margin-bottom:36px;">
       <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
@@ -116,7 +116,7 @@
         <%# ─── Not signed in: signup form by default, with toggle to sign-in ─── %>
         <% sign_in_default = (params[:mode] == "sign_in") && @invite.partner? %>
 
-        <div id="invite-signup-form" <%= "hidden" if sign_in_default %>>
+        <div id="invite-signup-form" data-invite-form-target="signup" <%= "hidden" if sign_in_default %>>
           <%= form_with url: accept_invite_path(@invite.token), method: :post do |f| %>
 
             <div style="margin-bottom:18px;">
@@ -175,7 +175,7 @@
             <div style="margin-top:18px;text-align:center;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
               <%= t("invites.already_have_account") %>
               <button type="button"
-                      onclick="document.getElementById('invite-signup-form').hidden=true;document.getElementById('invite-signin-form').hidden=false;document.querySelector('#invite-signin-form input[type=email]').focus();"
+                      data-action="invite-form#showSignin"
                       style="background:none;border:none;color:#01EACB;font-family:inherit;font-size:inherit;text-decoration:underline;cursor:pointer;padding:0;">
                 <%= t("invites.sign_in_instead") %>
               </button>
@@ -184,7 +184,7 @@
         </div>
 
         <% if @invite.partner? %>
-          <div id="invite-signin-form" <%= "hidden" unless sign_in_default %>>
+          <div id="invite-signin-form" data-invite-form-target="signin" <%= "hidden" unless sign_in_default %>>
             <%= form_with url: accept_invite_path(@invite.token), method: :post do |f| %>
               <%= hidden_field_tag :mode, "sign_in" %>
 
@@ -211,7 +211,7 @@
             <div style="margin-top:18px;text-align:center;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
               <%= t("invites.new_to_playverto") %>
               <button type="button"
-                      onclick="document.getElementById('invite-signin-form').hidden=true;document.getElementById('invite-signup-form').hidden=false;document.querySelector('#invite-signup-form input[name=name]').focus();"
+                      data-action="invite-form#showSignup"
                       style="background:none;border:none;color:#01EACB;font-family:inherit;font-size:inherit;text-decoration:underline;cursor:pointer;padding:0;">
                 <%= t("invites.create_new_account") %>
               </button>
