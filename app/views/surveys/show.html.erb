@@ -18,7 +18,7 @@
 <script id="nps-lottie-urls" type="application/json"><%= nps_lottie_urls.to_json.html_safe %></script>
 <%# Full cards incl. per-language i18n — the editor's language tabs swap text
     from here without a server round-trip. %>
-<script id="survey-cards-i18n" type="application/json"><%= Array(@survey.cards).to_json.html_safe %></script>
+<script id="survey-cards-i18n" type="application/json"><%= editor_cards_i18n(@survey.cards).to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
      data-controller="type-panel preview-verto survey-editor media-picker publish-panel brand-palette add-question"

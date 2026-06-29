@@ -5,10 +5,12 @@ if [ -z "${LD_PRELOAD+x}" ] && [ -f /usr/lib/*/libjemalloc.so.2 ]; then
   export LD_PRELOAD="$(echo /usr/lib/*/libjemalloc.so.2)"
 fi
 
-# Migrate/create database on every container start when DATABASE_URL is set
+# Migrate/create database on every container start when DATABASE_URL is set.
+# Note: db:seed is intentionally NOT run on boot — it matches the previous
+# native-runtime start command (db:prepare only). Seeds are create-only/
+# idempotent; run `rails db:seed` manually for the initial setup.
 if [ -n "${DATABASE_URL}" ]; then
   bundle exec rails db:prepare
-  bundle exec rails db:seed
 fi
 
 exec "${@}"

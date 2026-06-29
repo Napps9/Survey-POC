@@ -12,9 +12,9 @@ class SurveysController < ApplicationController
   helper_method :accessible_common_question_sets
 
   def index
-    kept_surveys = Current.organisation.surveys.kept.includes(:responses).order(updated_at: :desc)
+    kept_surveys = Current.organisation.surveys.kept.without_report_text.includes(:responses).order(updated_at: :desc)
     @surveys          = kept_surveys
-    @archived_surveys = Current.organisation.surveys.archived.includes(:responses).order(deleted_at: :desc)
+    @archived_surveys = Current.organisation.surveys.archived.without_report_text.includes(:responses).order(deleted_at: :desc)
     @total_responses  = Current.organisation.surveys.kept.joins(:responses).count
     render :index, layout: "fullscreen"
   end
@@ -416,7 +416,7 @@ class SurveysController < ApplicationController
   private
 
   def set_survey
-    @survey = Current.organisation.surveys.kept.find(params[:id])
+    @survey = Current.organisation.surveys.kept.without_report_text.find(params[:id])
   end
 
   def self.import_verifier

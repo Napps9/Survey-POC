@@ -5,6 +5,34 @@ module ApplicationHelper
     GoogleOauthService.configured?
   end
 
+  # Minimal per-card, per-locale projection for the editor's inline
+  # `#survey-cards-i18n` island. The language-tab JS (survey_editor_controller
+  # _seedStore/_normContent) only reads text/description/options per locale, so
+  # we deliberately omit image / option_images (multi-MB base64 data URLs) and
+  # all structural fields. Without this, every uploaded image was serialised an
+  # extra time into the inline <script> on each editor load — pure dead weight,
+  # since the cards are already rendered once and carry their image on a data
+  # attribute for autosave. Keeps the island to just the translatable text.
+  def editor_cards_i18n(cards)
+    Array(cards).map { |card| slim_card_i18n(card) }
+  end
+
+  def slim_card_i18n(card)
+    card = card || {}
+    out = {
+      "text"        => card["text"],
+      "description" => card["description"],
+      "options"     => card["options"]
+    }
+    if card["i18n"].is_a?(Hash)
+      out["i18n"] = card["i18n"].transform_values do |tr|
+        tr = tr || {}
+        { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"] }.compact
+      end
+    end
+    out.compact
+  end
+
   # Returns a view of `card` with text/description/options in `locale`, falling
   # back per-field to the primary (default_locale) content. Structural fields
   # (type, image, allow_other, option count/order) are language-neutral and

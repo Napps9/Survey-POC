@@ -308,14 +308,16 @@ class PlayerController < ApplicationController
 
   def load_survey_and_share
     token = params[:token]
+    # without_report_text: the player never reads the large AI summary/report
+    # columns, so skip loading them into the row on every public play request.
     if (share = SurveyShare.find_by(share_token: token))
       @survey_share = share
-      @survey = share.survey
+      @survey = Survey.without_report_text.find_by(id: share.survey_id)
     elsif (region_link = SurveyRegionLink.find_by(token: token))
       @region_link = region_link
-      @survey = region_link.survey
+      @survey = Survey.without_report_text.find_by(id: region_link.survey_id)
     else
-      @survey = Survey.find_by(publish_token: token)
+      @survey = Survey.without_report_text.find_by(publish_token: token)
     end
   end
 end

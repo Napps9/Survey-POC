@@ -1,15 +1,19 @@
 services:
   - type: web
     name: survey-poc
-    runtime: ruby
+    # Docker runtime so the process runs under jemalloc (installed in the
+    # Dockerfile and enabled by bin/docker-entrypoint) instead of glibc malloc —
+    # ~10-25% lower RSS and less fragmentation on the 512MB instance, with no
+    # behaviour change. The entrypoint runs db:prepare on boot; the Dockerfile's
+    # CMD (rails server) binds to $PORT via config/puma.rb. libvips is also
+    # available here for Active Storage image variants.
+    runtime: docker
     plan: starter
     region: oregon
     branch: Main
     # Deploy automatically only once the commit's CI checks (tests, RuboCop,
     # Brakeman, importmap audit) are green on GitHub.
     autoDeployTrigger: checksPass
-    buildCommand: "./bin/render-build.sh"
-    startCommand: "bundle exec rails db:prepare && bundle exec rails server -e production -p $PORT"
     healthCheckPath: /up
     envVars:
       - key: RAILS_ENV
@@ -25,8 +29,22 @@ services:
       # Cap glibc malloc arenas (default is 8 x CPU). Ruby's threaded server
       # otherwise fragments memory across many arenas and RSS creeps up until
       # the 512MB starter instance is OOM-killed and Render returns 502s.
+      # Harmless under jemalloc (it ignores this), kept as a safety net.
       - key: MALLOC_ARENA_MAX
         value: "2"
+      # Conservative Ruby GC tuning for a memory-constrained instance: grow the
+      # heap slowly and trigger GC sooner on malloc growth, trading a little CPU
+      # for lower peak RSS. Negligible latency impact at this QPS.
+      - key: RUBY_GC_HEAP_GROWTH_FACTOR
+        value: "1.1"
+      - key: RUBY_GC_MALLOC_LIMIT
+        value: "16777216"
+      - key: RUBY_GC_MALLOC_LIMIT_MAX
+        value: "33554432"
+      - key: RUBY_GC_OLDMALLOC_LIMIT
+        value: "16777216"
+      - key: RUBY_GC_OLDMALLOC_LIMIT_MAX
+        value: "33554432"
       - key: ANTHROPIC_API_KEY
         sync: false
       # How long any single Claude call may hold a request thread, and how many

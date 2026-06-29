@@ -9,6 +9,14 @@ class Survey < ApplicationRecord
   scope :kept,     -> { where(deleted_at: nil) }
   scope :archived, -> { where.not(deleted_at: nil) }
 
+  # Large AI-generated TEXT columns only needed on the results path. Omit them
+  # everywhere else (editor, dashboard, player, preview) so multi-KB blobs
+  # aren't loaded into every row for nothing — a pure baseline memory saving.
+  # A record loaded this way must not write these columns (they're absent);
+  # the results path and surveys#update load the full row.
+  HEAVY_REPORT_COLUMNS = %w[results_summary results_report].freeze
+  scope :without_report_text, -> { select(column_names - HEAVY_REPORT_COLUMNS) }
+
   def deleted?
     deleted_at.present?
   end

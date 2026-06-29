@@ -33,6 +33,27 @@ workers Integer(ENV.fetch("WEB_CONCURRENCY", 0))
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 port ENV.fetch("PORT", 3000)
 
+# Restart a worker before it OOM-kills the instance and Render 502s the whole
+# app. `before_fork` only fires in clustered mode (workers >= 1), so this is a
+# no-op in local dev/test single mode and only arms in production. Restart the
+# largest worker when total RSS crosses ~85% of the 512MB box, checked every
+# 20s. A restart drops in-flight requests on that one worker — a brief blip —
+# so the ceiling is set high enough to fire only as a last resort.
+before_fork do
+  begin
+    require "puma_worker_killer"
+    PumaWorkerKiller.config do |config|
+      config.ram               = Integer(ENV.fetch("PWK_RAM_MB", 512))
+      config.frequency         = 20
+      config.percent_usage     = 0.85
+      config.rolling_restart_frequency = false
+    end
+    PumaWorkerKiller.start
+  rescue LoadError
+    # gem not present (e.g. non-production bundle) — skip the safety net.
+  end
+end
+
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
 
