@@ -12,7 +12,7 @@ export default class extends Controller {
     "recommendedSection", "recommendedLabel", "recommendedGrid",
     "searchInput", "searchSection", "searchStatus", "searchGrid"
   ]
-  static values = { url: String, pexsearchUrl: String, backgroundRecommended: Array }
+  static values = { url: String, pexsearchUrl: String, theme: String, backgroundRecommended: Array }
 
   // Uploaded images are normalised before they're stored: capped in source
   // size, downscaled to a max edge, and re-encoded to a compact format. Raw
@@ -49,6 +49,7 @@ export default class extends Controller {
     this.clearBtnTarget.hidden = !currentUrl
 
     this._renderRecommended(this._parseUrls(card.dataset.cardRecommendedImages), "Recommended for this card")
+    this._seedSearch()
 
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
@@ -64,6 +65,7 @@ export default class extends Controller {
     this._switchTabKey("library")
     this.clearBtnTarget.hidden = !this._currentBg()
     this._renderRecommended(this.hasBackgroundRecommendedValue ? this.backgroundRecommendedValue : [], "Recommended backgrounds")
+    this._seedSearch()
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
   }
@@ -207,6 +209,18 @@ export default class extends Controller {
   // behaves exactly like a curated thumbnail.
   searchKeydown(event) {
     if (event.key === "Enter") { event.preventDefault(); this._runSearch() }
+  }
+
+  // Pre-fill the search with the Verto theme and run it on open, so the picker
+  // surfaces on-theme stock photos immediately instead of waiting for the
+  // editor to type. The editor can refine the query at any time.
+  _seedSearch() {
+    if (!this.hasSearchInputTarget || !this.hasPexsearchUrlValue) return
+    if (this.searchInputTarget.value.trim()) return
+    const seed = (this.hasThemeValue ? this.themeValue : "").trim()
+    if (!seed) return
+    this.searchInputTarget.value = seed
+    this._runSearch()
   }
 
   searchPexels() {

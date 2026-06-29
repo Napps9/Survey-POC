@@ -26,6 +26,7 @@
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
      data-media-picker-url-value="<%= survey_path(@survey) %>"
      data-media-picker-pexsearch-url-value="<%= pexels_search_survey_path(@survey) %>"
+     data-media-picker-theme-value="<%= @survey.theme %>"
      data-media-picker-background-recommended-value="<%= AssetPopulator.recommended_paths(@survey, context: :background).to_json %>"
      data-add-question-generate-url-value="<%= generate_survey_card_path(@survey) %>"
      data-add-question-render-url-value="<%= render_survey_card_path(@survey) %>"
