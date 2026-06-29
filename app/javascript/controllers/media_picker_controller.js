@@ -9,9 +9,10 @@ export default class extends Controller {
     "fileInput", "dropzone", "uploadError",
     "libraryItem", "applyBtn", "clearBtn",
     "bgThumb", "bgRemoveBtn",
-    "recommendedSection", "recommendedLabel", "recommendedGrid"
+    "recommendedSection", "recommendedLabel", "recommendedGrid",
+    "searchInput", "searchSection", "searchStatus", "searchGrid"
   ]
-  static values = { url: String, backgroundRecommended: Array }
+  static values = { url: String, pexsearchUrl: String, backgroundRecommended: Array }
 
   // Uploaded images are normalised before they're stored: capped in source
   // size, downscaled to a max edge, and re-encoded to a compact format. Raw
@@ -76,6 +77,7 @@ export default class extends Controller {
     if (this.hasFileInputTarget) this.fileInputTarget.value = ""
     this._clearUploadError()
     this._renderRecommended([], "")
+    this._clearSearch()
     document.removeEventListener("keydown", this._escListener)
   }
 
@@ -196,6 +198,81 @@ export default class extends Controller {
     item.setAttribute("aria-selected", "true")
     this._pendingUrl = item.dataset.url
     this._setApplyEnabled(true)
+  }
+
+  // ── Pexels search ──────────────────────────────────────
+  // Debounced as the editor types; Enter searches immediately. Results are
+  // fetched at the ratio of the slot being filled (this._mode → context) and
+  // reuse the libraryItem target + pickLibraryItem action, so selecting one
+  // behaves exactly like a curated thumbnail.
+  searchKeydown(event) {
+    if (event.key === "Enter") { event.preventDefault(); this._runSearch() }
+  }
+
+  searchPexels() {
+    clearTimeout(this._searchTimer)
+    this._searchTimer = setTimeout(() => this._runSearch(), 350)
+  }
+
+  async _runSearch() {
+    if (!this.hasPexsearchUrlValue || !this.hasSearchGridTarget) return
+    const q = (this.hasSearchInputTarget ? this.searchInputTarget.value : "").trim()
+    if (!q) { this._clearSearch(); return }
+
+    const context = this._mode === "background" ? "background" : "card"
+    this._showSearchStatus("Searching…")
+    this.searchGridTarget.replaceChildren()
+
+    const token = (this._searchToken = (this._searchToken || 0) + 1)
+    try {
+      const url = `${this.pexsearchUrlValue}?q=${encodeURIComponent(q)}&context=${context}`
+      const resp = await fetch(url, { headers: { "Accept": "application/json" } })
+      const data = await resp.json()
+      if (token !== this._searchToken) return // a newer search superseded this one
+
+      const images = Array.isArray(data.images) ? data.images : []
+      if (data.error === "search_unavailable") {
+        this._showSearchStatus("Stock-photo search isn’t configured.")
+        return
+      }
+      if (!images.length) {
+        this._showSearchStatus(data.error ? "Couldn’t reach the photo service." : "No photos found.")
+        return
+      }
+      this._showSearchStatus("")
+      const frag = document.createDocumentFragment()
+      for (const img of images) {
+        if (!img || !img.url) continue
+        const btn = document.createElement("button")
+        btn.type = "button"
+        btn.className = "media-library-item"
+        btn.title = img.photographer ? `Photo by ${img.photographer}` : (img.alt || "")
+        const thumb = img.thumb || img.url
+        btn.style.backgroundImage = `url('${String(thumb).replace(/'/g, "\\'")}')`
+        btn.dataset.url = img.url
+        btn.dataset.mediaPickerTarget = "libraryItem"
+        btn.dataset.action = "click->media-picker#pickLibraryItem"
+        btn.setAttribute("aria-selected", "false")
+        frag.appendChild(btn)
+      }
+      this.searchGridTarget.appendChild(frag)
+    } catch (_e) {
+      if (token === this._searchToken) this._showSearchStatus("Couldn’t reach the photo service.")
+    }
+  }
+
+  _showSearchStatus(text) {
+    if (this.hasSearchSectionTarget) this.searchSectionTarget.hidden = false
+    if (this.hasSearchStatusTarget) this.searchStatusTarget.textContent = text || ""
+  }
+
+  _clearSearch() {
+    clearTimeout(this._searchTimer)
+    this._searchToken = (this._searchToken || 0) + 1 // invalidate in-flight results
+    if (this.hasSearchInputTarget) this.searchInputTarget.value = ""
+    if (this.hasSearchGridTarget) this.searchGridTarget.replaceChildren()
+    if (this.hasSearchStatusTarget) this.searchStatusTarget.textContent = ""
+    if (this.hasSearchSectionTarget) this.searchSectionTarget.hidden = true
   }
 
   // ── Apply / clear ──────────────────────────────────────

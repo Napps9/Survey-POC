@@ -1,5 +1,15 @@
 # Verto Image Library
 
+> **Pexels is now the primary image source.** When a `PEXELS` (or
+> `PEXELS_API_KEY`) env var is set, both the AssetPopulator and the editor
+> media picker pull from the [Pexels API](https://www.pexels.com/api/), choosing
+> the crop that fits each slot's ratio (`src.portrait` for card left panels,
+> `src.landscape` for backgrounds and tap-card statements). The curated assets
+> below are the **fallback** used whenever Pexels is unconfigured (dev/test/CI)
+> or a search returns nothing — so the matching logic and folders here still
+> matter. The picker also gained a live "Stock photos" search box on the Verto
+> Library tab.
+
 Curated imagery that powers two things:
 
 1. **Add media → Verto Library** in the editor. Anything in this folder (or

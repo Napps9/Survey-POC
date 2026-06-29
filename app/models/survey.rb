@@ -74,8 +74,12 @@ class Survey < ApplicationRecord
   # else (or blank) clears the background.
   DATA_IMAGE_URL  = %r{\Adata:image/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+\z}
   ASSET_IMAGE_URL = %r{\A/[\w\-./]+\.(?:png|jpe?g|webp|svg|gif)\z}i
+  # Pexels CDN URLs (host-whitelisted) so editor-picked and auto-populated
+  # stock photos survive the sanitizer. No quotes/parens, so it stays safe to
+  # interpolate into an inline `url('…')` style.
+  PEXELS_IMAGE_URL = %r{\Ahttps://images\.pexels\.com/[\w\-./]+\.(?:png|jpe?g|webp)(?:\?[\w%\-=&.+]*)?\z}i
 
-  # Cap on a stored base64 background. The client downscales uploads to ~1600px
+  # Cap on a stored base64 image. The client downscales uploads to ~1600px
   # WebP/JPEG (typically well under 1MB), so this is a defense-in-depth backstop
   # against an oversized blob slipping through: those inline data URLs are
   # re-materialised on every editor/preview/player render and were the main
@@ -83,12 +87,35 @@ class Survey < ApplicationRecord
   # downscaled image; reject anything larger rather than persist it.
   MAX_BACKGROUND_DATA_URL_BYTES = 3_000_000
 
-  def self.sanitize_background_image(value)
+  # A single image value (background, card image, or one option_image): an
+  # uploaded data-URL (size-capped), an app-rooted asset path, or a Pexels CDN
+  # URL — anything else (or blank) returns nil.
+  def self.sanitize_image_url(value)
     v = value.to_s.strip
     return nil if v.blank?
     return v if v.match?(ASSET_IMAGE_URL)
+    return v if v.match?(PEXELS_IMAGE_URL)
     return v if v.match?(DATA_IMAGE_URL) && v.bytesize <= MAX_BACKGROUND_DATA_URL_BYTES
     nil
+  end
+
+  def self.sanitize_background_image(value)
+    sanitize_image_url(value)
+  end
+
+  # Scrub the `image` and `option_images` on each card through sanitize_image_url
+  # before persisting an editor PATCH, so a remote URL can only reach the inline
+  # styles if it's a recognised, CSS-safe form. Other card fields are untouched.
+  def self.sanitize_cards_images!(cards)
+    Array(cards).map do |card|
+      next card unless card.is_a?(Hash)
+      c = card.dup
+      c["image"] = sanitize_image_url(c["image"]) if c.key?("image")
+      if c.key?("option_images")
+        c["option_images"] = Array(c["option_images"]).map { |u| sanitize_image_url(u) }
+      end
+      c
+    end
   end
 
   # Quiz: the card indices that are graded (carry a correct answer). Empty for a

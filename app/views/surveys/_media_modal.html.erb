@@ -46,6 +46,24 @@
 
       <%# Library pane %>
       <div data-media-picker-target="pane" data-pane="library" hidden>
+        <%# Pexels stock-photo search. Results render at the ratio of the slot
+            being filled (portrait for cards, landscape for the background). %>
+        <div class="media-search">
+          <input type="search"
+                 class="media-search-input"
+                 placeholder="Search stock photos…"
+                 data-media-picker-target="searchInput"
+                 data-action="input->media-picker#searchPexels keydown->media-picker#searchKeydown" />
+        </div>
+        <section class="media-library-section"
+                 data-media-picker-target="searchSection" hidden>
+          <h4 class="media-library-section-label">Stock photos</h4>
+          <div class="media-library-status"
+               data-media-picker-target="searchStatus"></div>
+          <div class="media-library-grid"
+               data-media-picker-target="searchGrid"></div>
+        </section>
+
         <% groups = verto_library_images %>
         <% if groups.any? %>
           <div class="media-library-sections">

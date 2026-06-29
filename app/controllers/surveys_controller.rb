@@ -222,7 +222,7 @@ class SurveysController < ApplicationController
     attrs[:title]       = payload["title"]       if payload.key?("title")
     attrs[:description] = payload["description"] if payload.key?("description")
     if payload.key?("cards")
-      attrs[:cards]                          = payload["cards"]
+      attrs[:cards]                          = Survey.sanitize_cards_images!(payload["cards"])
       attrs[:results_summary]                = nil
       attrs[:results_summary_response_count] = nil
     end
@@ -235,6 +235,35 @@ class SurveysController < ApplicationController
   rescue => e
     Rails.logger.error("[SurveysController#update] #{e.class}: #{e.message}")
     render json: { ok: false, error: e.message }, status: :unprocessable_entity
+  end
+
+  # On-demand Pexels search for the editor media picker. `context` selects the
+  # aspect ratio: "background" → landscape, anything else → portrait card art.
+  def pexels_search
+    Current.organisation.surveys.kept.find(params[:id]) # org-scope / 404 guard
+    query   = params[:q].to_s.strip
+    context = params[:context].to_s == "background" ? :background : :card
+
+    return render json: { images: [] } if query.blank?
+    unless PexelsClient.configured?
+      return render json: { images: [], error: "search_unavailable" }
+    end
+
+    orientation = PexelsClient::ORIENTATION_FOR[context]
+    photos = PexelsClient.new.search(query: query, orientation: orientation, per_page: 24)
+    images = photos.map do |p|
+      {
+        id:           p["id"],
+        url:          PexelsClient.url_for(p, context),
+        thumb:        (p["src"] || {})["tiny"],
+        photographer: p["photographer"],
+        alt:          p["alt"]
+      }
+    end
+    render json: { images: images }
+  rescue => e
+    Rails.logger.error("[SurveysController#pexels_search] #{e.class}: #{e.message}")
+    render json: { images: [], error: "search_failed" }, status: :bad_gateway
   end
 
   def publish

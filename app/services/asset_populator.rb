@@ -142,6 +142,10 @@ class AssetPopulator
   def initialize(survey, seed: nil)
     @survey = survey
     @seed   = seed || survey.id
+    # Memoises Pexels search results per (query, orientation) so a populate!
+    # run makes at most one API call per distinct query — keeps us well inside
+    # the rate limit even for a long Verto.
+    @pexels_cache = {}
   end
 
   def populate!
@@ -168,6 +172,12 @@ class AssetPopulator
   private
 
   def pick_background_path
+    # Pexels primary: a themed landscape backdrop. Falls back to the curated
+    # backgrounds/ assets when Pexels is unconfigured or returns nothing.
+    if (url = pexels_background_url)
+      return url
+    end
+
     candidates = Array(self.class.manifest["backgrounds"])
     return nil if candidates.empty?
 
@@ -219,6 +229,13 @@ class AssetPopulator
     end
     return nil if type_matching.empty?
 
+    # Eligibility decided by the curated themed match above (so tap_card and
+    # off-theme cards stay blank exactly as before); the image itself comes
+    # from Pexels when configured, keyed to this card's text + theme.
+    if (url = pexels_card_url(card, idx, used))
+      return url
+    end
+
     # Prefer unused assets but allow repeats once the type-matching pool
     # is exhausted — better to repeat a themed image than leave it blank.
     unused = type_matching.reject { |a| used.include?(asset_url(LEFT_PANEL_DIR, a["file"])) }
@@ -234,7 +251,7 @@ class AssetPopulator
     asset_url(LEFT_PANEL_DIR, chosen["file"])
   end
 
-  def tier2_type_art_path(_card, idx, used, type)
+  def tier2_type_art_path(card, idx, used, type)
     bucket, dir =
       if SELECT_TYPES.include?(type)
         [ self.class.manifest["select_art"], SELECT_ART_DIR ]
@@ -245,6 +262,12 @@ class AssetPopulator
     # statement cards themselves (populated via option_images), not the
     # tap_card's left panel.
     return nil if bucket.nil?
+
+    # Same eligibility (this card type takes a left-panel image), Pexels source
+    # when configured — a themed portrait beats the generic type-art icons.
+    if (url = pexels_card_url(card, idx, used))
+      return url
+    end
 
     pool = Array(bucket)
     return nil if pool.empty?
@@ -262,8 +285,16 @@ class AssetPopulator
   # bite, but we degrade gracefully if a survey has many tap_cards.
   def pick_tap_card_option_images(card, card_idx, swipe_used)
     options = Array(card["options"])
-    pool    = Array(self.class.manifest["swipe_cards"])
-    return [] if options.empty? || pool.empty?
+    return [] if options.empty?
+
+    # Pexels primary: one themed landscape per statement. Falls back to the
+    # curated swipe-cards/ pool when Pexels is unconfigured or returns nothing.
+    if (urls = pexels_swipe_urls(card, card_idx, options.size, swipe_used))
+      return urls
+    end
+
+    pool = Array(self.class.manifest["swipe_cards"])
+    return [] if pool.empty?
 
     rng = rand_for("tap-#{card_idx}")
 
@@ -278,6 +309,70 @@ class AssetPopulator
     urls  = picks.map { |a| asset_url(SWIPE_CARDS_DIR, a["file"]) }
     urls.each { |u| swipe_used << u }
     urls
+  end
+
+  # ── Pexels source ───────────────────────────────────────────────────────
+  # All four picks above try Pexels first via these helpers; each returns nil
+  # (or [] for swipe) so the curated fallback runs when Pexels is unconfigured
+  # or a query comes back empty.
+
+  # Memoised per (query, orientation): at most one API call per distinct query
+  # for the whole populate! run.
+  def pexels_photos(query, context)
+    return [] unless PexelsClient.configured?
+    orientation = PexelsClient::ORIENTATION_FOR[context]
+    @pexels_cache[[ query, orientation ]] ||=
+      PexelsClient.new.search(query: query, orientation: orientation, per_page: 30)
+  end
+
+  def pexels_background_url
+    photos = pexels_photos(background_query, :background)
+    return nil if photos.empty?
+    chosen = photos[rand_for("bg").rand(photos.size)]
+    PexelsClient.url_for(chosen, :background)
+  end
+
+  # A distinct portrait for one card's left panel. Seeded order keeps same-seed
+  # runs identical; the shared `used` set stops two cards landing on the same
+  # photo (mirrors the curated de-dup).
+  def pexels_card_url(card, idx, used)
+    photos = pexels_photos(card_query(card), :card)
+    return nil if photos.empty?
+    ordered = photos.shuffle(random: rand_for("px-#{idx}"))
+    chosen  = ordered.find { |p| !used.include?(PexelsClient.url_for(p, :card)) } || ordered.first
+    PexelsClient.url_for(chosen, :card)
+  end
+
+  # One landscape per tap_card statement, unique within the card and preferring
+  # photos not used by another tap_card. Returns nil to trigger the fallback.
+  def pexels_swipe_urls(card, card_idx, count, swipe_used)
+    return nil unless PexelsClient.configured?
+    urls = pexels_photos(card_query(card), :swipe).map { |p| PexelsClient.url_for(p, :swipe) }.compact.uniq
+    return nil if urls.empty?
+
+    rng = rand_for("pxtap-#{card_idx}")
+    fresh, used_elsewhere = urls.partition { |u| !swipe_used.include?(u) }
+    ordered = fresh.shuffle(random: rng) + used_elsewhere.shuffle(random: rng)
+    ordered *= ((count.to_f / ordered.size).ceil) if ordered.size < count
+
+    picks = ordered.first(count)
+    picks.each { |u| swipe_used << u }
+    picks
+  end
+
+  # Search-query builders reuse the same theme/keyword signals the curated
+  # scorer uses, so Pexels picks track the survey the same way.
+  def theme_query_terms
+    @survey.theme.to_s.downcase.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
+  end
+
+  def background_query
+    theme_query_terms.first(3).join(" ").presence || "abstract background"
+  end
+
+  def card_query(card)
+    terms = (card_keywords(card).first(3) + theme_query_terms.first(2)).uniq
+    terms.join(" ").presence || @survey.theme.to_s.strip.presence || "abstract"
   end
 
   def asset_url(dir, file)

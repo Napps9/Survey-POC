@@ -426,6 +426,24 @@
   font-size: 13px;
 }
 .media-library-sections { display: flex; flex-direction: column; gap: 22px; }
+.media-search { margin: 0 0 18px; }
+.media-search-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #272D4A;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 14px;
+}
+.media-search-input::placeholder { color: rgba(255,255,255,0.4); }
+.media-search-input:focus { outline: none; border-color: rgba(1,234,203,0.6); }
+.media-library-status {
+  color: rgba(255,255,255,0.45);
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+.media-library-status:empty { display: none; }
 .media-library-section-label {
   font-family: "Alata", sans-serif;
   font-size: 11px;

@@ -181,4 +181,77 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_equal tier1_imgs.size, tier1_imgs.uniq.size,
       "Tier-1 picks must be unique: #{tier1_imgs.inspect}"
   end
+
+  # ── Pexels source (primary when configured) ──────────────────────────────
+
+  PEXELS_PHOTOS = (1..6).map do |i|
+    {
+      "id" => i, "photographer" => "P#{i}", "alt" => "alt#{i}",
+      "src" => {
+        "original"  => "https://images.pexels.com/photos/#{i}/p.jpg",
+        "landscape" => "https://images.pexels.com/photos/#{i}/p.jpg?w=1200&h=627&fit=crop",
+        "portrait"  => "https://images.pexels.com/photos/#{i}/p.jpg?w=800&h=1200&fit=crop",
+        "tiny"      => "https://images.pexels.com/photos/#{i}/p.jpg?w=280&h=200&fit=crop"
+      }
+    }
+  end.freeze
+
+  def with_pexels(photos = PEXELS_PHOTOS)
+    fake = Object.new
+    fake.define_singleton_method(:search) { |**_kw| photos }
+    stub_method(PexelsClient, :configured?, true) do
+      stub_method(PexelsClient, :new, fake) { yield }
+    end
+  end
+
+  test "when Pexels is configured it sources the background and card images" do
+    s = make_survey(theme: "Mountains", audience_age: "18-24",
+                    cards: [ { "type" => "multiple_choice", "text" => "Favourite peak?", "options" => %w[Alps Andes] } ])
+
+    with_pexels { AssetPopulator.new(s).populate! }
+
+    s.reload
+    assert_match %r{\Ahttps://images\.pexels\.com/.+w=1200&h=627}, s.background_image
+    assert Survey.sanitize_background_image(s.background_image),
+      "Pexels background must pass the sanitizer"
+    assert_match %r{\Ahttps://images\.pexels\.com/.+w=800&h=1200}, s.cards[0]["image"],
+      "card left panel must get a Pexels portrait crop"
+  end
+
+  test "tap_card option_images come from Pexels (landscape) and stay unique; left panel blank" do
+    s = make_survey(theme: "Mountains", audience_age: "all",
+                    cards: [ { "type" => "tap_card", "text" => "Swipe", "options" => %w[a b c d] } ])
+
+    with_pexels { AssetPopulator.new(s).populate! }
+
+    s.reload
+    imgs = Array(s.cards[0]["option_images"])
+    assert_equal 4, imgs.size
+    assert_equal imgs.size, imgs.uniq.size, "option_images must be unique within a card"
+    imgs.each { |u| assert_match %r{\Ahttps://images\.pexels\.com/.+w=1200&h=627}, u }
+    assert_nil s.cards[0]["image"], "tap_card left panel stays blank with Pexels too"
+  end
+
+  test "same seed is deterministic with Pexels" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "options" => %w[a b] } ] * 4
+    s1 = make_survey(theme: "Mountains", audience_age: "18-24", cards: cards.deep_dup)
+    s2 = make_survey(theme: "Mountains", audience_age: "18-24", cards: cards.deep_dup)
+
+    with_pexels { AssetPopulator.new(s1, seed: "fixed").populate! }
+    with_pexels { AssetPopulator.new(s2, seed: "fixed").populate! }
+
+    assert_equal s1.reload.background_image, s2.reload.background_image
+    assert_equal s1.cards.map { |c| c["image"] }, s2.cards.map { |c| c["image"] }
+  end
+
+  test "falls back to the curated library when Pexels returns nothing" do
+    s = make_survey(theme: "Football fans", audience_age: "18-24",
+                    cards: [ { "type" => "multiple_choice", "text" => "Favourite team?", "options" => %w[Arsenal Chelsea] } ])
+
+    with_pexels([]) { AssetPopulator.new(s).populate! }
+
+    s.reload
+    assert_match %r{/assets/verto-library/backgrounds/}, s.background_image
+    assert_includes s.cards[0]["image"], "verto-library/"
+  end
 end
