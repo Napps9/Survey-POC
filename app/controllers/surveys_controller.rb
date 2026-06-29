@@ -119,13 +119,9 @@ class SurveysController < ApplicationController
 
     translate_survey!(@survey)
 
-    if ActiveModel::Type::Boolean.new.cast(params[:populate_content])
-      begin
-        AssetPopulator.new(@survey).populate!
-      rescue => e
-        Rails.logger.error("[AssetPopulator] #{e.class}: #{e.message}")
-      end
-    end
+    # Every new Verto comes pre-populated with imagery (background + card art)
+    # so the editor never opens blank; creators can swap or clear any image.
+    auto_populate_assets!(@survey)
 
     redirect_to survey_path(@survey)
   rescue => e
@@ -491,7 +487,16 @@ class SurveysController < ApplicationController
     Current.organisation.update(default_brand_palette: payload["brand_palette"]) if payload["brand_palette"].present?
     create_region_links(survey, payload["region_tags"])
     translate_survey!(survey)
+    auto_populate_assets!(survey)
     survey
+  end
+
+  # Pre-populate a freshly created Verto's imagery. Best-effort: a populator
+  # failure (e.g. a transient Pexels issue) must never block Verto creation.
+  def auto_populate_assets!(survey)
+    AssetPopulator.new(survey).populate!
+  rescue => e
+    Rails.logger.error("[AssetPopulator] #{e.class}: #{e.message}")
   end
 
   # Region tags picked in the creation wizard: [{ country_code:, label: }, …].

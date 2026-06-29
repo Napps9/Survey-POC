@@ -1,7 +1,7 @@
 require "test_helper"
 
 class WizardSmokeTest < ActionDispatch::IntegrationTest
-  test "/surveys/new renders the combined Final-touches step with populate radios + brand picker" do
+  test "/surveys/new renders the combined Final-touches step with brand picker" do
     user = User.create!(name: "U", email_address: "ws-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
     org  = Organisation.create!(name: "O", slug: "ws-#{SecureRandom.hex(2)}")
     org.memberships.create!(user: user, role: "admin")
@@ -12,14 +12,11 @@ class WizardSmokeTest < ActionDispatch::IntegrationTest
     assert_response :success
     # Combined-step copy and section headers
     assert_match "Final touches", response.body
-    assert_match "How to start", response.body
     assert_match "Brand colours", response.body
-    # Populate choice labels
-    assert_match "Populate content", response.body
-    assert_match "Start from New", response.body
-    # The hidden form field
-    assert_match 'name="populate_content" value="1"', response.body
-    assert_match 'name="populate_content" value="0"', response.body
+    # The "How to start? Populate / Blank" choice was removed: every new Verto
+    # is auto-populated with imagery on create.
+    refute_match "How to start", response.body
+    refute_match 'name="populate_content"', response.body
     # Brand-palette inputs live on the same card
     assert_match 'name="brand_palette[primary]"', response.body
     assert_match 'name="brand_palette[cta]"', response.body

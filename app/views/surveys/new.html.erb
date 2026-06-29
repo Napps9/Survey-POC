@@ -558,31 +558,9 @@
             <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FFFA77;"><%= t("wizard.s5_eyebrow") %></div>
             <div class="q-title" style="font-size:24px;line-height:1.2;"><%= t("wizard.s5_title") %></div>
 
-            <%# Section: How to start? — two side-by-side choice cards %>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <div style="<%= section_label_style %>"><%= t("wizard.section_how_to_start") %></div>
-              <div style="display:flex;gap:8px;">
-                <% [
-                  ["1", t("wizard.s7_populate_label"), t("wizard.s7_populate_desc"), t("wizard.s7_recommended")],
-                  ["0", t("wizard.s7_blank_label"),    t("wizard.s7_blank_desc"),    nil]
-                ].each_with_index do |(val, label, desc, badge), i| %>
-                  <% selected = (i == 0) %>
-                  <label class="populate-choice" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;cursor:pointer;padding:11px 12px;border-radius:12px;background:<%= selected ? 'rgba(255,30,111,0.04)' : '#fafbfc' %>;border:2px solid <%= selected ? '#FF1E6F' : 'rgba(0,0,0,0.08)' %>;transition:border-color 0.15s,background 0.15s;">
-                    <input type="radio" name="populate_content" value="<%= val %>"
-                           <%= "checked" if selected %>
-                           style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
-                           onchange="this.closest('.preview-card').querySelectorAll('.populate-choice').forEach(el=>{el.style.borderColor='rgba(0,0,0,0.08)';el.style.background='#fafbfc';});this.closest('.populate-choice').style.borderColor='#FF1E6F';this.closest('.populate-choice').style.background='rgba(255,30,111,0.04)';" />
-                    <span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                      <span style="font-family:'Alata',sans-serif;font-size:14px;color:#1C2034;letter-spacing:0.02em;line-height:1.2;"><%= label %></span>
-                      <% if badge %>
-                        <span style="font-family:'Alata',sans-serif;font-size:9px;color:#FF1E6F;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;padding:1px 6px;border-radius:100px;background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.25);"><%= badge %></span>
-                      <% end %>
-                    </span>
-                    <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.55);line-height:1.4;"><%= desc %></span>
-                  </label>
-                <% end %>
-              </div>
-            </div>
+            <%# Every new Verto is now auto-populated with imagery on create, so
+                the former "How to start? Populate / Blank" choice was removed —
+                creators swap or clear any image in the editor afterwards. %>
 
             <%# Section: Brand colours %>
             <div style="display:flex;flex-direction:column;gap:6px;">
