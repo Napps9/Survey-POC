@@ -131,14 +131,18 @@ module ApplicationHelper
   # overlay, editor card feed): the brand-colour variables plus, when set, a
   # --brand-bg-image with a top/bottom scrim so the nav/footer text stays
   # legible over the image. Spread into the wrapper's inline `style`.
-  def verto_backdrop_style_attr(survey)
+  #
+  # `image:` lets the editor opt out of inlining the (potentially multi-MB
+  # base64) --brand-bg-image here and instead define it ONCE on a shared
+  # ancestor (see verto_brand_bg_image_var) — both the feed and the preview
+  # overlay then inherit the var, so the data URL isn't materialised per-wrapper.
+  # The palette + mobile vars stay scoped to the wrapper (the surrounding editor
+  # chrome must NOT inherit brand colours), so those are always emitted.
+  def verto_backdrop_style_attr(survey, image: true)
     parts = []
     palette = brand_palette_style_attr(survey.brand_palette)
     parts << palette if palette.present?
-    if survey.background_image.present?
-      url = survey.background_image.to_s.gsub(/["\r\n]/, "")
-      parts << %(--brand-bg-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.12) 28%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.45)), url("#{url}"))
-    end
+    parts << verto_brand_bg_image_var(survey) if image && survey.background_image.present?
     # Mobile-only per-card backdrop: a themed image picked from
     # verto-library/mobile-backgrounds/, applied behind a heavy white
     # scrim by the @media (max-width:767px) CSS on .split-card.
@@ -146,6 +150,16 @@ module ApplicationHelper
       parts << %(--mobile-card-bg: url("#{mb}"))
     end
     parts.join(";")
+  end
+
+  # Just the --brand-bg-image custom property (scrim gradient + the background
+  # data URL), for defining once on a shared ancestor. Returns "" when no
+  # background is set. Custom properties inherit, so wrappers that paint
+  # `background-image: var(--brand-bg-image)` pick it up without re-inlining it.
+  def verto_brand_bg_image_var(survey)
+    return "" if survey.background_image.blank?
+    url = survey.background_image.to_s.gsub(/["\r\n]/, "")
+    %(--brand-bg-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.12) 28%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.45)), url("#{url}"))
   end
 
   def mini_preview_html(card)

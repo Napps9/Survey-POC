@@ -37,7 +37,12 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.published? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#close">
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#close"
+     <%# Define the (potentially large) background data URL ONCE here; the card
+         feed and preview overlay below inherit --brand-bg-image rather than
+         each inlining the full data URL. Palette vars stay scoped to those
+         wrappers so the editor chrome keeps Playverto's colours. %>
+     style="<%= verto_brand_bg_image_var(@survey) %>">
 
 
   <%# Main grid: cards feed | type panel %>
@@ -153,7 +158,7 @@
            data-add-question-target="cardsFeed"
            data-survey-editor-target="feed"
            data-device-frame-target="feed"
-           style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;background-color:var(--brand-bg,#272D4A);background-image:var(--brand-bg-image,none);background-size:cover;background-position:center;<%= verto_backdrop_style_attr(@survey) %>">
+           style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;background-color:var(--brand-bg,#272D4A);background-image:var(--brand-bg-image,none);background-size:cover;background-position:center;<%= verto_backdrop_style_attr(@survey, image: false) %>">
 
         <%# Each card lives in a .card-slot together with the "Add question" CTA
             that follows it — so creators can insert a question after any card,
@@ -757,7 +762,7 @@
   <div class="preview-overlay hidden"
        data-preview-verto-target="overlay"
        data-brand-palette-target="preview"
-       style="<%= verto_backdrop_style_attr(@survey) %>">
+       style="<%= verto_backdrop_style_attr(@survey, image: false) %>">
 
     <%# Nav — respondents see the org's brand here, not Playverto's %>
     <%# No logo/title bar — just a floating Close, so the preview card gets
@@ -768,25 +773,15 @@
     <%# Card display area %>
     <div class="preview-body">
 
-      <%# One preview-card div per survey card — only the active one is shown %>
-      <%
-        prev_q_idx = 0
-        prev_total = cards.count { |c| c["type"] != "welcome_card" }
-      %>
-      <% cards.each_with_index do |pcard, pidx| %>
-        <%
-          ptype    = pcard["type"].to_s
-          p_is_q   = ptype != "welcome_card"
-          prev_q_idx += 1 if p_is_q
-          pprogress = prev_total > 0 ? ((prev_q_idx.to_f / prev_total) * 100).round : 5
-          pprogress = 5 unless p_is_q
-        %>
-        <div class="preview-card" data-preview-verto-target="card">
-          <%= render "surveys/preview_card",
-                card: pcard,
-                progress: pprogress,
-                default_locale: @survey.default_locale %>
-        </div>
+      <%# One empty preview-card wrapper per survey card. The content is built
+          on first "Preview" click by preview_verto_controller#_syncPreviewCards,
+          which clones each editor .split-card into the matching wrapper (the
+          editor markup is the source of truth). We render the wrappers — not
+          their content — so the card count (and Stimulus card targets) are
+          present synchronously, while the heavy card markup (incl. any uploaded
+          image data URLs) is NOT duplicated into the page on load. %>
+      <% cards.each do |_pcard| %>
+        <div class="preview-card" data-preview-verto-target="card"></div>
       <% end %>
 
       <%# Thank you screen — shown after Finish. "Powered by" is mentioned
