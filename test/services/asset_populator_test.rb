@@ -218,6 +218,25 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "card left panel must get a Pexels portrait crop"
   end
 
+  test "Pexels fills card art for themes the curated library doesn't cover" do
+    # "Food and Sustainability" has no themed left-panel asset, so without
+    # Pexels the welcome + open_ended cards would be blank. With Pexels every
+    # non-tap_card gets a portrait, regardless of curated coverage.
+    s = make_survey(theme: "Food and Sustainability", audience_age: "under 10's",
+                    cards: [
+                      { "type" => "welcome_card", "text" => "Hey!" },
+                      { "type" => "open_ended",   "text" => "What did you eat today?" }
+                    ])
+
+    with_pexels { AssetPopulator.new(s).populate! }
+
+    s.reload
+    s.cards.each_with_index do |c, i|
+      assert_match %r{\Ahttps://images\.pexels\.com/.+w=800&h=1200}, c["image"].to_s,
+        "card #{i} (#{c['type']}) should get a Pexels portrait"
+    end
+  end
+
   test "tap_card option_images come from Pexels (landscape) and stay unique; left panel blank" do
     s = make_survey(theme: "Mountains", audience_age: "all",
                     cards: [ { "type" => "tap_card", "text" => "Swipe", "options" => %w[a b c d] } ])

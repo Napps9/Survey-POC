@@ -199,10 +199,21 @@ class AssetPopulator
     helpers.asset_path("#{BACKGROUND_DIR}/#{chosen['file']}")
   end
 
-  # Two-tier picker for the card's left-panel image. Returns an
-  # asset_path string or nil (blank panel — same as Start-from-Blank).
+  # Picker for the card's left-panel image. Returns an asset_path/URL string or
+  # nil (blank panel — same as Start-from-Blank).
+  #
+  # tap_card keeps its left panel blank — statement imagery rides on
+  # option_images. For every other card type, Pexels (when configured) is the
+  # primary source so coverage isn't limited to the themes the curated library
+  # happens to hold; the curated two-tier logic is the fallback.
   def pick_card_image_path(card, idx, used)
     type = card["type"].to_s
+    return nil if type == "tap_card"
+
+    if PexelsClient.configured? && (url = pexels_card_url(card, idx, used))
+      used << url
+      return url
+    end
 
     if (path = tier1_themed_path(card, idx, used, type))
       used << path
@@ -229,13 +240,6 @@ class AssetPopulator
     end
     return nil if type_matching.empty?
 
-    # Eligibility decided by the curated themed match above (so tap_card and
-    # off-theme cards stay blank exactly as before); the image itself comes
-    # from Pexels when configured, keyed to this card's text + theme.
-    if (url = pexels_card_url(card, idx, used))
-      return url
-    end
-
     # Prefer unused assets but allow repeats once the type-matching pool
     # is exhausted — better to repeat a themed image than leave it blank.
     unused = type_matching.reject { |a| used.include?(asset_url(LEFT_PANEL_DIR, a["file"])) }
@@ -251,7 +255,7 @@ class AssetPopulator
     asset_url(LEFT_PANEL_DIR, chosen["file"])
   end
 
-  def tier2_type_art_path(card, idx, used, type)
+  def tier2_type_art_path(_card, idx, used, type)
     bucket, dir =
       if SELECT_TYPES.include?(type)
         [ self.class.manifest["select_art"], SELECT_ART_DIR ]
@@ -262,12 +266,6 @@ class AssetPopulator
     # statement cards themselves (populated via option_images), not the
     # tap_card's left panel.
     return nil if bucket.nil?
-
-    # Same eligibility (this card type takes a left-panel image), Pexels source
-    # when configured — a themed portrait beats the generic type-art icons.
-    if (url = pexels_card_url(card, idx, used))
-      return url
-    end
 
     pool = Array(bucket)
     return nil if pool.empty?
