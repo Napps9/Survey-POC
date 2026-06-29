@@ -63,8 +63,15 @@ gem "omniauth-google-oauth2"
 # Load .env in development
 gem "dotenv-rails", groups: [ :development, :test ]
 
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+# Active Storage on S3-compatible object storage (Cloudflare R2 in production —
+# see config/storage.yml). require:false; Active Storage loads it lazily when
+# the S3 service is selected via ACTIVE_STORAGE_SERVICE.
+gem "aws-sdk-s3", "~> 1", require: false
+
+# Active Storage image variants via libvips (installed in the Dockerfile).
+# Used for responsive background variants; also lets us set the variant
+# processor explicitly so Active Storage stops warning about it.
+gem "image_processing", "~> 1.2"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

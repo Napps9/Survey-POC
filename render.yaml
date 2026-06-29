@@ -45,6 +45,23 @@ services:
         value: "16777216"
       - key: RUBY_GC_OLDMALLOC_LIMIT_MAX
         value: "33554432"
+      # Uploaded images (Verto backgrounds). Set ACTIVE_STORAGE_SERVICE=cloudflare
+      # plus the R2_* secrets below to store them in Cloudflare R2 (durable +
+      # zero egress). Left unset, uploads stay on the local disk (ephemeral on
+      # Render) — so set these before relying on uploaded backgrounds in prod.
+      # The R2 bucket also needs a CORS rule allowing the app origin (for the
+      # direct-upload stage). Endpoint looks like
+      # https://<account-id>.r2.cloudflarestorage.com
+      - key: ACTIVE_STORAGE_SERVICE
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_ENDPOINT
+        sync: false
+      - key: R2_BUCKET
+        sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
       # How long any single Claude call may hold a request thread, and how many

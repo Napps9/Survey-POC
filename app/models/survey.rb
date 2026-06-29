@@ -5,6 +5,15 @@ class Survey < ApplicationRecord
   has_many :survey_region_links, dependent: :destroy
   has_many :alliance_vertos, dependent: :destroy
 
+  # The Verto backdrop image, stored in object storage (durable, off the DB row
+  # and out of the rendered HTML — unlike the legacy base64 background_image,
+  # which is still accepted for not-yet-migrated Vertos). background_image holds
+  # the URL to render; this owns the underlying blob for lifecycle/cleanup.
+  has_one_attached :background_file
+
+  BACKGROUND_CONTENT_TYPES = %w[image/png image/jpeg image/webp image/gif].freeze
+  BACKGROUND_MAX_BYTES     = 8.megabytes
+
   scope :recent,   -> { order(updated_at: :desc) }
   scope :kept,     -> { where(deleted_at: nil) }
   scope :archived, -> { where.not(deleted_at: nil) }
@@ -72,8 +81,11 @@ class Survey < ApplicationRecord
   # Accept only an uploaded data-image URL or an app-rooted image asset path,
   # so the value is safe to drop into an inline `style` attribute. Anything
   # else (or blank) clears the background.
-  DATA_IMAGE_URL  = %r{\Adata:image/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+\z}
-  ASSET_IMAGE_URL = %r{\A/[\w\-./]+\.(?:png|jpe?g|webp|svg|gif)\z}i
+  DATA_IMAGE_URL     = %r{\Adata:image/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+\z}
+  ASSET_IMAGE_URL    = %r{\A/[\w\-./]+\.(?:png|jpe?g|webp|svg|gif)\z}i
+  # An Active Storage blob URL (same-origin redirect path) — what the background
+  # upload endpoint stores once an image is in object storage.
+  BLOB_IMAGE_URL     = %r{\A/rails/active_storage/[^\s"']+\z}
 
   # Cap on a stored base64 background. The client downscales uploads to ~1600px
   # WebP/JPEG (typically well under 1MB), so this is a defense-in-depth backstop
@@ -86,7 +98,7 @@ class Survey < ApplicationRecord
   def self.sanitize_background_image(value)
     v = value.to_s.strip
     return nil if v.blank?
-    return v if v.match?(ASSET_IMAGE_URL)
+    return v if v.match?(ASSET_IMAGE_URL) || v.match?(BLOB_IMAGE_URL)
     return v if v.match?(DATA_IMAGE_URL) && v.bytesize <= MAX_BACKGROUND_DATA_URL_BYTES
     nil
   end

@@ -13,6 +13,11 @@ class SurveyTest < ActiveSupport::TestCase
     assert_equal url, Survey.sanitize_background_image(url)
   end
 
+  test "accepts an Active Storage blob URL" do
+    url = "/rails/active_storage/blobs/redirect/eyJfcmFpbHMi--abc123/background.webp"
+    assert_equal url, Survey.sanitize_background_image(url)
+  end
+
   test "rejects an oversized base64 data-image URL" do
     blob = "A" * (Survey::MAX_BACKGROUND_DATA_URL_BYTES + 1)
     url  = "data:image/jpeg;base64,#{blob}"

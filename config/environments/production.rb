@@ -36,8 +36,14 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
   # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Uploaded files: defaults to the local disk (ephemeral on Render) and stays
+  # there until ACTIVE_STORAGE_SERVICE is set — e.g. "cloudflare" for R2 (durable
+  # object storage). Gating it this way keeps deploys safe before R2 is wired.
+  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "local").to_sym
+  # We downscale images client-side, so variants are only for responsive crops;
+  # set the processor explicitly (libvips is in the Docker image) to stop the
+  # "image_processing gem required" boot/runtime warning.
+  config.active_storage.variant_processor = :vips
 
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil

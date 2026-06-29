@@ -227,7 +227,7 @@ class SurveysController < ApplicationController
       attrs[:results_summary_response_count] = nil
     end
     attrs[:brand_palette] = BrandPalette.sanitize(payload["brand_palette"]).presence if payload.key?("brand_palette")
-    attrs[:background_image] = Survey.sanitize_background_image(payload["background_image"]) if payload.key?("background_image")
+    attrs[:background_image] = resolve_background_image(survey, payload["background_image"]) if payload.key?("background_image")
 
     survey.update!(attrs)
 
@@ -424,6 +424,68 @@ class SurveysController < ApplicationController
 
   def set_survey
     @survey = Current.organisation.surveys.kept.without_report_text.find(params[:id])
+  end
+
+  # Resolve an incoming background_image value into what we persist on the row.
+  # A base64 data URL (an uploaded image) is offloaded to object storage via
+  # Active Storage and replaced with its blob URL, so the row/HTML never carry
+  # the bytes. Asset paths / already-stored blob URLs pass through the sanitiser;
+  # a blank value clears the background and purges any attached blob. Falls back
+  # to keeping the data URL (sanitised + size-capped) if the offload fails, so a
+  # save never silently drops the user's background.
+  def resolve_background_image(survey, value)
+    v = value.to_s.strip
+
+    if v.blank?
+      survey.background_file.purge_later if survey.background_file.attached?
+      return nil
+    end
+
+    if v.match?(Survey::DATA_IMAGE_URL)
+      # Only offload to object storage when it's durable. On the default local
+      # disk in production (ephemeral on Render) we keep the base64 in Postgres
+      # so backgrounds survive redeploys — offloading there would lose them.
+      if background_offload_enabled?
+        begin
+          attachable = decode_data_url(v)
+          if attachable
+            survey.background_file.attach(attachable)
+            return rails_blob_path(survey.background_file, only_path: true)
+          end
+        rescue => e
+          Rails.logger.error("[SurveysController#resolve_background_image] #{e.class}: #{e.message}")
+        end
+      end
+      # Offload disabled or failed — keep the (capped) data URL so the background
+      # still shows and stays durable in the row.
+      return Survey.sanitize_background_image(v)
+    end
+
+    # Asset path or an existing blob URL: switching away from an uploaded image
+    # means the old blob is now unreferenced, so drop it.
+    survey.background_file.purge_later if survey.background_file.attached?
+    Survey.sanitize_background_image(v)
+  end
+
+  # Whether to offload uploaded backgrounds to object storage. Always in
+  # dev/test; in production only once a durable service is configured (i.e. not
+  # the ephemeral local disk), so a misconfigured prod never loses uploads.
+  def background_offload_enabled?
+    return true unless Rails.env.production?
+    Rails.application.config.active_storage.service != :local
+  end
+
+  # Turn a `data:image/...;base64,...` string into an Active Storage attachable.
+  def decode_data_url(data_url)
+    m = data_url.match(%r{\Adata:(image/[\w.+-]+);base64,(.+)\z}m)
+    return nil unless m
+    content_type = m[1]
+    return nil unless Survey::BACKGROUND_CONTENT_TYPES.include?(content_type)
+
+    bytes = Base64.decode64(m[2])
+    return nil if bytes.bytesize > Survey::BACKGROUND_MAX_BYTES
+    ext = content_type.split("/").last.sub("jpeg", "jpg").sub("svg+xml", "svg")
+    { io: StringIO.new(bytes), filename: "background.#{ext}", content_type: content_type }
   end
 
   def self.import_verifier
