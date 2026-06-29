@@ -80,4 +80,19 @@ module GeneratesResultsReport
     base = (survey.theme.presence || survey.title.presence || "verto").parameterize.presence || "verto"
     "#{base}-report.#{ext}"
   end
+
+  # Serialize wkhtmltopdf renders process-wide. Each call spawns a wkhtmltopdf
+  # native process that transiently uses ~100-200MB; two running at once can
+  # OOM the 512MB instance (and 502 the whole app). Downloading a report is
+  # rare and takes only a few seconds, so we serialize (a concurrent request
+  # waits) rather than reject — the UX is unchanged and peak memory is capped
+  # at a single render. The cached markdown means the expensive AI step never
+  # runs inside this lock.
+  PDF_RENDER_LOCK = Mutex.new
+
+  def render_report_pdf(html, **opts)
+    PDF_RENDER_LOCK.synchronize do
+      WickedPdf.new.pdf_from_string(html, **opts)
+    end
+  end
 end

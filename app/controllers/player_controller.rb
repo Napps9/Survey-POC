@@ -15,6 +15,11 @@ class PlayerController < ApplicationController
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   rate_limit to: 300, within: 1.minute, only: [ :progress, :grade ],
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
+  # Public read endpoints that aggregate over the whole response set — cap them
+  # too, so they can't be hammered as a memory-amplification vector. Generous:
+  # a respondent hits each once after finishing.
+  rate_limit to: 120, within: 1.minute, only: [ :results, :scores, :regions ],
+             with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
 
   before_action :load_survey_and_share
 
@@ -155,18 +160,31 @@ class PlayerController < ApplicationController
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
     return render json: { ok: false, error: "Not a quiz" }, status: :forbidden unless @survey.quiz?
 
-    completed = @survey.responses.where(status: "completed").where.not(score: nil).to_a
-    values    = completed.map(&:score)
-    max       = QuizGrading.graded_indices(@survey.cards).size
-    total     = values.size
-    avg       = total.positive? ? (values.sum.to_f / total).round(1) : 0.0
-    dist      = Hash.new(0).tap { |h| values.each { |s| h[s] += 1 } }
+    max    = QuizGrading.graded_indices(@survey.cards).size
+    graded = Array(@survey.cards).each_with_index.select { |card, _idx| QuizGrading.graded?(card) }
 
-    per_question = Array(@survey.cards).each_with_index.filter_map do |card, idx|
-      next unless QuizGrading.graded?(card)
-      n = completed.count { |r| QuizGrading.correct?(card, (r.answers || {})[idx.to_s]&.dig("value")) }
-      { index: idx, prompt: card["text"], correct: n,
-        pct: total.positive? ? (n * 100.0 / total).round : 0 }
+    # One batched pass: score histogram, total/average, and per-question correct
+    # counts together — instead of loading every scored response into memory and
+    # re-scanning the set once per graded card.
+    dist        = Hash.new(0)
+    correct_by  = Hash.new(0)
+    total       = 0
+    score_sum   = 0
+    @survey.responses.where(status: "completed").where.not(score: nil)
+      .select(:id, :score, :answers).find_each(batch_size: 500) do |r|
+        total     += 1
+        score_sum += r.score
+        dist[r.score] += 1
+        answers = r.answers || {}
+        graded.each do |card, idx|
+          correct_by[idx] += 1 if QuizGrading.correct?(card, answers[idx.to_s]&.dig("value"))
+        end
+      end
+    avg = total.positive? ? (score_sum.to_f / total).round(1) : 0.0
+
+    per_question = graded.map do |card, idx|
+      { index: idx, prompt: card["text"], correct: correct_by[idx],
+        pct: total.positive? ? (correct_by[idx] * 100.0 / total).round : 0 }
     end
 
     render json: { ok: true, total:, max:, average: avg,
@@ -195,7 +213,10 @@ class PlayerController < ApplicationController
       return render json: { ok: false, error: "Regions not enabled" }, status: :forbidden
     end
 
+    # Only the columns the region grouping + per-region aggregation read, so
+    # rows aren't loaded with their full set of columns.
     tagged = @survey.responses.where(status: "completed").where.not(region_country: nil)
+                    .select(:id, :region_country, :region_label, :answers)
     groups = tagged.group_by(&:region_key)
     rows = groups.map do |key, rs|
       sample = rs.first

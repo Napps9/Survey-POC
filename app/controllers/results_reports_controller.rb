@@ -13,7 +13,7 @@ class ResultsReportsController < ApplicationController
         render json: { ok: true, body_html: results_report_body_html(markdown) }
       end
       format.pdf do
-        pdf = WickedPdf.new.pdf_from_string(
+        pdf = render_report_pdf(
           results_report_document(survey, markdown),
           page_size: "A4",
           margin:    { top: 14, bottom: 16, left: 14, right: 14 }
