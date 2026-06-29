@@ -12,10 +12,17 @@ class SurveysController < ApplicationController
   helper_method :accessible_common_question_sets
 
   def index
-    kept_surveys = Current.organisation.surveys.kept.without_report_text.includes(:responses).order(updated_at: :desc)
-    @surveys          = kept_surveys
-    @archived_surveys = Current.organisation.surveys.archived.without_report_text.includes(:responses).order(deleted_at: :desc)
-    @total_responses  = Current.organisation.surveys.kept.joins(:responses).count
+    @surveys          = Current.organisation.surveys.kept.without_report_text.order(updated_at: :desc).to_a
+    @archived_surveys = Current.organisation.surveys.archived.without_report_text.order(deleted_at: :desc).to_a
+
+    # Per-survey response tallies as grouped SQL counts (a few queries total),
+    # instead of eager-loading every response's answers JSON and counting in
+    # Ruby per card — the cause of the multi-second index ActiveRecord time.
+    ids = (@surveys + @archived_surveys).map(&:id)
+    @completed_counts           = Response.where(survey_id: ids, status: "completed").group(:survey_id).count
+    @responder_counts           = Response.where(survey_id: ids, answered: true).group(:survey_id).count
+    @responder_completed_counts = Response.where(survey_id: ids, answered: true, status: "completed").group(:survey_id).count
+    @total_responses            = Response.where(survey_id: @surveys.map(&:id)).count
     render :index, layout: "fullscreen"
   end
 

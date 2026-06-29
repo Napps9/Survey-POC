@@ -1,10 +1,16 @@
 <%
   archived    = local_assigns[:archived] == true
   published   = survey.publish_token.present? && !archived
-  resp_count  = survey.responses.to_a.count { |r| r.status == "completed" }
+  # Counts come from the controller's grouped queries (no responses loaded). Fall
+  # back to the cheap SQL methods if a card is ever rendered outside the index.
+  resp_count  = (@completed_counts || {})[survey.id] || survey.responses.where(status: "completed").count
   q_count     = Array(survey.cards).count { |c| c["type"].to_s != "welcome_card" }
-  responders  = published ? survey.responders_count : 0
-  completion  = published ? survey.completion_rate  : nil
+  responders  = published ? ((@responder_counts || {})[survey.id] || survey.responders_count) : 0
+  completion  =
+    if published && responders.to_i.positive?
+      done = (@responder_completed_counts || {})[survey.id] || survey.responses.where(answered: true, status: "completed").count
+      (done * 100.0 / responders).round
+    end
 
   if archived
     accent_bg     = "rgba(255,255,255,0.05)"
