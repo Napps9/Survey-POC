@@ -538,5 +538,6 @@ sw:
     import_choose: Chagua PDF
     import_no_file: Hakuna faili iliyochaguliwa
     import_pdf: Leta kutoka PDF →
+    import_toggle: "Una maswali yako kwenye PDF? Yalete badala yake →"
     importing: Inasoma PDF yako…
     step_counter: Hatua %{n} kati ya %{total}

@@ -538,5 +538,6 @@ id:
     import_choose: Pilih PDF
     import_no_file: Tidak ada file yang dipilih
     import_pdf: Impor dari PDF →
+    import_toggle: "Sudah punya pertanyaan dalam PDF? Impor saja →"
     importing: Membaca PDF Anda…
     step_counter: Langkah %{n} dari %{total}

@@ -538,5 +538,6 @@ nl:
     import_choose: PDF kiezen
     import_no_file: Geen bestand gekozen
     import_pdf: Importeren uit PDF →
+    import_toggle: "Heb je je vragen al in een PDF? Importeer ze in plaats daarvan →"
     importing: Je PDF wordt gelezen…
     step_counter: Stap %{n} van %{total}

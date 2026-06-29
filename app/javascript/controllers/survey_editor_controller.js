@@ -15,11 +15,54 @@ export default class extends Controller {
   }
 
   _saveTimer = null
+  _dirty = false
 
   connect() {
     this._activeLocale = this.defaultLocaleValue
     this._seedStore()
     this.refreshAll()
+
+    // Safety net for the 1.5s autosave debounce: if the page is hidden or
+    // navigated away while an edit is still pending, flush it immediately so the
+    // draft on the server never lags behind what's on screen (the cause of
+    // "edits not saved" / draft-vs-preview drift). pagehide covers bfcache and
+    // mobile; visibilitychange covers tab-switch/app-background.
+    this._flushHandler = () => this.flushSave()
+    window.addEventListener("pagehide", this._flushHandler)
+    window.addEventListener("beforeunload", this._flushHandler)
+    document.addEventListener("visibilitychange", this._visibilityHandler = () => {
+      if (document.visibilityState === "hidden") this.flushSave()
+    })
+  }
+
+  disconnect() {
+    window.removeEventListener("pagehide", this._flushHandler)
+    window.removeEventListener("beforeunload", this._flushHandler)
+    document.removeEventListener("visibilitychange", this._visibilityHandler)
+  }
+
+  // Best-effort synchronous-ish flush of a pending autosave. Uses fetch with
+  // keepalive so the request survives the page unload (sendBeacon can't send a
+  // PATCH with a CSRF header). No-op when nothing is pending or the Verto is
+  // live (the server rejects edits to a published Verto anyway).
+  flushSave() {
+    if (!this._dirty || this.liveValue) return
+    if (!this.hasUrlValue || !this.urlValue) return
+    clearTimeout(this._saveTimer)
+    this._dirty = false
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+      fetch(this.urlValue, {
+        method: "PATCH",
+        keepalive: true,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": csrfToken
+        },
+        body: JSON.stringify(this.serialize())
+      })
+    } catch (_) { /* unload path — nothing more we can do */ }
   }
 
   // ── Language tabs ──────────────────────────────────────
@@ -472,6 +515,7 @@ export default class extends Controller {
     if (active) { this.refreshCard(active); this.refreshScore() } else { this.refreshAll() }
 
     this.flash(t("editor.unsaved"), "text-light-yellow")
+    this._dirty = true
     clearTimeout(this._saveTimer)
     this._saveTimer = setTimeout(() => this._doSave(), 1500)
   }
@@ -639,6 +683,7 @@ export default class extends Controller {
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = await res.json()
+      this._dirty = false
       this.flash(t("editor.saved", { time: new Date(json.updated_at).toLocaleTimeString() }), "text-aquamarine")
     } catch (err) {
       this.flash(t("editor.save_failed", { msg: err.message }), "text-hot-pink")

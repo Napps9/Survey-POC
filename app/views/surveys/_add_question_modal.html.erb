@@ -140,13 +140,17 @@
 
       </div>
 
+      <%# Inline validation/error for this step (e.g. empty question text). %>
+      <div data-add-question-target="detailsError"
+           style="display:none;color:#FF1E6F;font-size: var(--text-sm);padding:0 20px 4px;">
+      </div>
+
       <div class="media-modal-foot">
         <button type="button" class="media-btn-ghost"
                 data-action="click->add-question#backToPickType">← Back</button>
         <button type="button" class="media-btn-primary"
                 data-add-question-target="addBtn"
-                data-action="click->add-question#addToSurvey"
-                disabled>Add to survey →</button>
+                data-action="click->add-question#addToSurvey">Add to survey →</button>
       </div>
     </div>
 

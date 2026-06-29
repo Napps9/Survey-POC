@@ -405,12 +405,18 @@
               <%= link_to "View Results →", survey_results_path(@survey),
                     style: "flex:1;text-align:center;padding:8px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
             </div>
+            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+              Anyone with this link can respond — no Play Verto account or sign-in required.
+            </div>
           <% else %>
             <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);margin-bottom:10px;">Draft — not yet published</div>
             <%= button_to "Publish Verto →", publish_survey_path(@survey),
                   method: :post,
                   style: "width:100%;padding:10px;border-radius:12px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;",
                   form: { style: "margin:0;", data: { turbo_confirm: t("editor.publish_confirm") } } %>
+            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+              Publishing gives you a public link to share. Respondents just open it and answer — no Play Verto account needed.
+            </div>
           <% end %>
         </div>
 

@@ -349,7 +349,7 @@ class SurveysController < ApplicationController
     render json: { ok: true, html: html }
   rescue => e
     Rails.logger.error("[SurveysController#generate_card] #{e.class}: #{e.message}")
-    render json: { ok: false, error: e.message }, status: :unprocessable_entity
+    render json: { ok: false, error: friendly_generate_error(e) }, status: :unprocessable_entity
   end
 
   # POST /surveys/:id/optimise_card

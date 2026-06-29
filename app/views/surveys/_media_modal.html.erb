@@ -33,11 +33,15 @@
                data-action="dragover->media-picker#dragover dragleave->media-picker#dragleave drop->media-picker#drop">
           <div class="media-upload-zone-icon">⬆</div>
           <div>Click to choose an image, or drag &amp; drop</div>
-          <div class="media-upload-hint">PNG, JPG, WebP or SVG</div>
+          <div class="media-upload-hint">PNG, JPG, WebP or SVG — large images are resized automatically</div>
           <input type="file" accept="image/*" hidden
                  data-media-picker-target="fileInput"
                  data-action="change->media-picker#fileChosen" />
         </label>
+        <div class="media-upload-error"
+             data-media-picker-target="uploadError"
+             style="margin-top:10px;color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size:13px;line-height:1.4;"
+             hidden></div>
       </div>
 
       <%# Library pane %>

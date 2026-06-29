@@ -36,6 +36,7 @@ export default class extends Controller {
     "addBtn",
     "cardsFeed",
     "errorMsg",
+    "detailsError",
   ]
 
   static values = {
@@ -125,7 +126,10 @@ export default class extends Controller {
     this.charCountTarget.textContent = `${len} / 100`
     const color = len > 100 ? "#FF1E6F" : len > 70 ? "#FFFA77" : "rgba(255,255,255,0.35)"
     this.charCountTarget.style.color = color
-    this.addBtnTarget.disabled = len === 0
+    // Clear the "enter a question" hint once they start typing. The button stays
+    // enabled throughout — validation happens on click (see addToSurvey) so a
+    // disabled-with-no-explanation button never reads as "Add doesn't work".
+    if (len > 0) this._clearDetailsError()
   }
 
   addOption(event) {
@@ -145,7 +149,12 @@ export default class extends Controller {
   addToSurvey(event) {
     event.preventDefault()
     const card = this._collectCard()
-    if (!card) return
+    if (!card) {
+      this._showDetailsError("Enter a question first, then add it to the survey.")
+      this.questionTextTarget?.focus()
+      return
+    }
+    this._clearDetailsError()
     this.addBtnTarget.disabled = true
     this.addBtnTarget.textContent = "Adding…"
     this._renderAndInsert(card)
@@ -251,10 +260,23 @@ export default class extends Controller {
     this.questionTextTarget.value = ""
     this.charCountTarget.textContent = "0 / 100"
     this.charCountTarget.style.color  = "rgba(255,255,255,0.35)"
-    this.addBtnTarget.disabled        = true
+    this.addBtnTarget.disabled        = false
     this.addBtnTarget.textContent     = "Add to survey →"
+    this._clearDetailsError()
 
     this._showStep("stepDetails")
+  }
+
+  _showDetailsError(msg) {
+    if (!this.hasDetailsErrorTarget) return
+    this.detailsErrorTarget.textContent = msg
+    this.detailsErrorTarget.style.display = "block"
+  }
+
+  _clearDetailsError() {
+    if (!this.hasDetailsErrorTarget) return
+    this.detailsErrorTarget.textContent = ""
+    this.detailsErrorTarget.style.display = "none"
   }
 
   _buildOptionsUI(type) {

@@ -538,5 +538,6 @@ vi:
     import_choose: Chọn PDF
     import_no_file: Chưa chọn tệp
     import_pdf: Nhập từ PDF →
+    import_toggle: "Đã có câu hỏi trong PDF? Nhập chúng thay thế →"
     importing: Đang đọc PDF của bạn…
     step_counter: Bước %{n} / %{total}

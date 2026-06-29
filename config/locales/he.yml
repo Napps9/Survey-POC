@@ -538,5 +538,6 @@ he:
     import_choose: בחר PDF
     import_no_file: לא נבחר קובץ
     import_pdf: ייבא מ-PDF →
+    import_toggle: "כבר יש לך את השאלות בקובץ PDF? ייבא אותן במקום ←"
     importing: קורא את ה-PDF שלך…
     step_counter: שלב %{n} מתוך %{total}

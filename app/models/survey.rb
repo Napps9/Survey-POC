@@ -67,10 +67,20 @@ class Survey < ApplicationRecord
   DATA_IMAGE_URL  = %r{\Adata:image/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+\z}
   ASSET_IMAGE_URL = %r{\A/[\w\-./]+\.(?:png|jpe?g|webp|svg|gif)\z}i
 
+  # Cap on a stored base64 background. The client downscales uploads to ~1600px
+  # WebP/JPEG (typically well under 1MB), so this is a defense-in-depth backstop
+  # against an oversized blob slipping through: those inline data URLs are
+  # re-materialised on every editor/preview/player render and were the main
+  # memory driver behind the production 502s. Generous headroom over a normal
+  # downscaled image; reject anything larger rather than persist it.
+  MAX_BACKGROUND_DATA_URL_BYTES = 3_000_000
+
   def self.sanitize_background_image(value)
     v = value.to_s.strip
     return nil if v.blank?
-    (v.match?(DATA_IMAGE_URL) || v.match?(ASSET_IMAGE_URL)) ? v : nil
+    return v if v.match?(ASSET_IMAGE_URL)
+    return v if v.match?(DATA_IMAGE_URL) && v.bytesize <= MAX_BACKGROUND_DATA_URL_BYTES
+    nil
   end
 
   # Quiz: the card indices that are graded (carry a correct answer). Empty for a

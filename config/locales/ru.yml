@@ -538,5 +538,6 @@ ru:
     import_choose: Выбрать PDF
     import_no_file: Файл не выбран
     import_pdf: Импортировать из PDF →
+    import_toggle: "Уже есть вопросы в PDF? Импортируйте их вместо этого →"
     importing: Читаем ваш PDF…
     step_counter: Шаг %{n} из %{total}

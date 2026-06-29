@@ -538,5 +538,6 @@ ko:
     import_choose: PDF 선택
     import_no_file: 선택된 파일 없음
     import_pdf: PDF에서 가져오기 →
+    import_toggle: "질문이 이미 PDF에 있나요? 대신 가져오기 →"
     importing: PDF를 읽는 중…
     step_counter: "%{total}단계 중 %{n}단계"

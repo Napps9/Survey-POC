@@ -538,5 +538,6 @@ fr:
     import_choose: Choisir un PDF
     import_no_file: Aucun fichier sélectionné
     import_pdf: Importer depuis un PDF →
+    import_toggle: "Vous avez déjà vos questions dans un PDF ? Importez-les plutôt →"
     importing: Lecture de votre PDF…
     step_counter: Étape %{n} sur %{total}

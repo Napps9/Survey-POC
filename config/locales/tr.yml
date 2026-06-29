@@ -538,5 +538,6 @@ tr:
     import_choose: PDF seçin
     import_no_file: Dosya seçilmedi
     import_pdf: PDF'den içe aktar →
+    import_toggle: "Sorularınız zaten PDF'de mi? Bunun yerine içe aktarın →"
     importing: PDF'iniz okunuyor…
     step_counter: Adım %{n} / %{total}

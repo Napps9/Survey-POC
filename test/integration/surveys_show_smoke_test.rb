@@ -14,6 +14,24 @@ class SurveysShowSmokeTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "Share with an alliance", response.body
     assert_match "Create an alliance →", response.body, "empty-alliances state should prompt to create one"
+    # Draft share guidance: publishing yields a public link, no respondent account needed.
+    assert_match "no Play Verto account needed", response.body
+  end
+
+  test "surveys#show on a published Verto states respondents need no account" do
+    user = User.create!(name: "U", email_address: "u4-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    org  = Organisation.create!(name: "O", slug: "o4-#{SecureRandom.hex(2)}")
+    org.memberships.create!(user: user, role: "admin")
+    s = org.surveys.create!(title: "Live", theme: "Smoke", audience_age: "all", key_insight: "x",
+      default_locale: "en", locales: [ "en" ], cards: [ { "type"=>"welcome_card", "title"=>"hi" } ],
+      publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    post session_path, params: { email_address: user.email_address, password: "verylongpassword" }
+    follow_redirect! if response.redirect?
+
+    get survey_path(s)
+    assert_response :success
+    assert_match "no Play Verto account or sign-in required", response.body
   end
 
   test "surveys#show 'Add to alliance' block lists available alliances" do

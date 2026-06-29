@@ -609,33 +609,34 @@
               </div>
             </div>
 
-            <%# ── Alternative entry point: import prewritten questions from a
-                PDF. Lives on the final step so the brief above is filled in
-                first; posts straight to import_pdf (formnovalidate skips the
-                generate-only required fields). ── %>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <div style="flex:1;height:1px;background:rgba(0,0,0,0.1);"></div>
-              <span style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(0,0,0,0.4);"><%= t("wizard.import_or") %></span>
-              <div style="flex:1;height:1px;background:rgba(0,0,0,0.1);"></div>
-            </div>
+            <%# ── Optional alternative entry point: import prewritten questions
+                from a PDF. Collapsed behind a disclosure so it reads as a clear
+                alternative, not a required step — the brief above + Generate is
+                the primary path. Posts straight to import_pdf (formnovalidate
+                skips the generate-only required fields). ── %>
+            <details class="import-pdf-disclosure" style="margin-top:2px;">
+              <summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.5);text-decoration:underline;text-underline-offset:3px;">
+                <%= t("wizard.import_toggle") %>
+              </summary>
 
-            <div style="display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:12px;background:#fafbfc;border:1px dashed rgba(0,0,0,0.18);">
-              <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);margin:0;line-height:1.45;"><%= t("wizard.import_hint") %></p>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;padding:12px 14px;border-radius:12px;background:#fafbfc;border:1px dashed rgba(0,0,0,0.18);">
+                <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);margin:0;line-height:1.45;"><%= t("wizard.import_hint") %></p>
 
-              <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;position:relative;">
-                <span style="font-family:'Alata',sans-serif;font-size:13px;color:#1C2034;padding:9px 14px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,0.14);white-space:nowrap;"><%= t("wizard.import_choose") %></span>
-                <span data-pdf-filename style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= t("wizard.import_no_file") %></span>
-                <%= f.file_field :pdf, accept: "application/pdf",
-                      style: "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;",
-                      onchange: "this.closest('label').querySelector('[data-pdf-filename]').textContent = this.files[0] ? this.files[0].name : '#{j t('wizard.import_no_file')}'" %>
-              </label>
+                <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;position:relative;">
+                  <span style="font-family:'Alata',sans-serif;font-size:13px;color:#1C2034;padding:9px 14px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,0.14);white-space:nowrap;"><%= t("wizard.import_choose") %></span>
+                  <span data-pdf-filename style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= t("wizard.import_no_file") %></span>
+                  <%= f.file_field :pdf, accept: "application/pdf",
+                        style: "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;",
+                        onchange: "this.closest('label').querySelector('[data-pdf-filename]').textContent = this.files[0] ? this.files[0].name : '#{j t('wizard.import_no_file')}'" %>
+                </label>
 
-              <%= f.submit t("wizard.import_pdf"),
-                    formaction: import_pdf_survey_path,
-                    formnovalidate: true,
-                    data: { generating_import: "", turbo_submits_with: t("wizard.importing") },
-                    style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
-            </div>
+                <%= f.submit t("wizard.import_pdf"),
+                      formaction: import_pdf_survey_path,
+                      formnovalidate: true,
+                      data: { generating_import: "", turbo_submits_with: t("wizard.importing") },
+                      style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
+              </div>
+            </details>
           </div>
         </div>
       </section>

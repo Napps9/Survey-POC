@@ -538,5 +538,6 @@ ja:
     import_choose: PDFを選択
     import_no_file: ファイルが選択されていません
     import_pdf: PDFからインポート →
+    import_toggle: "質問をPDFでお持ちですか？代わりにインポート →"
     importing: PDFを読み込んでいます…
     step_counter: "%{total}ステップ中 %{n}"

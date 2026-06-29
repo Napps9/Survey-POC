@@ -26,5 +26,11 @@ class WizardSmokeTest < ActionDispatch::IntegrationTest
     assert_match 'name="brand_palette[bg]"', response.body
     # Wizard reduced from 8 → 7 cards
     assert_match "Step 1 of 7", response.body
+    # PDF import is an optional, collapsed alternative (not a mandatory step):
+    # it lives inside a <details> disclosure, and the Generate finish button is
+    # still present as the primary path.
+    assert_match "import-pdf-disclosure", response.body
+    assert_match "Generate Verto", response.body
+    assert_match "Import them instead", response.body
   end
 end

@@ -538,5 +538,6 @@ uk:
     import_choose: Вибрати PDF
     import_no_file: Файл не вибрано
     import_pdf: Імпортувати з PDF →
+    import_toggle: "Уже маєте запитання у PDF? Імпортуйте їх натомість →"
     importing: Читаємо ваш PDF…
     step_counter: Крок %{n} з %{total}

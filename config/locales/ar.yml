@@ -538,5 +538,6 @@ ar:
     import_choose: اختر ملف PDF
     import_no_file: لم يتم اختيار ملف
     import_pdf: استيراد من PDF ←
+    import_toggle: "هل لديك أسئلتك في ملف PDF؟ استوردها بدلاً من ذلك ←"
     importing: جارٍ قراءة ملف PDF الخاص بك…
     step_counter: الخطوة %{n} من %{total}
