@@ -13,15 +13,16 @@ class PexelsClientTest < ActiveSupport::TestCase
     }
   }.freeze
 
-  test "url_for picks the slot-appropriate crop" do
-    assert_equal PHOTO["src"]["landscape"], PexelsClient.url_for(PHOTO, :background)
-    assert_equal PHOTO["src"]["portrait"],  PexelsClient.url_for(PHOTO, :card)
-    assert_equal PHOTO["src"]["landscape"], PexelsClient.url_for(PHOTO, :swipe)
+  test "url_for builds an exact crop per slot from the original" do
+    base = PHOTO["src"]["original"]
+    assert_equal "#{base}?auto=compress&cs=tinysrgb&fit=crop&w=1920&h=1080", PexelsClient.url_for(PHOTO, :background)
+    assert_equal "#{base}?auto=compress&cs=tinysrgb&fit=crop&w=720&h=1280",  PexelsClient.url_for(PHOTO, :card)
+    assert_equal "#{base}?auto=compress&cs=tinysrgb&fit=crop&w=800&h=800",   PexelsClient.url_for(PHOTO, :swipe)
   end
 
-  test "url_for falls back to original when the crop is missing" do
-    photo = { "src" => { "original" => "https://images.pexels.com/photos/1/o.jpg" } }
-    assert_equal "https://images.pexels.com/photos/1/o.jpg", PexelsClient.url_for(photo, :card)
+  test "url_for falls back to a pre-baked size when there's no original" do
+    photo = { "src" => { "large" => "https://images.pexels.com/photos/1/l.jpg" } }
+    assert_equal "https://images.pexels.com/photos/1/l.jpg", PexelsClient.url_for(photo, :card)
   end
 
   test "configured? reads either env var" do

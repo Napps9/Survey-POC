@@ -211,11 +211,11 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     with_pexels { AssetPopulator.new(s).populate! }
 
     s.reload
-    assert_match %r{\Ahttps://images\.pexels\.com/.+w=1200&h=627}, s.background_image
+    assert_match %r{\Ahttps://images\.pexels\.com/.+w=1920&h=1080}, s.background_image
     assert Survey.sanitize_background_image(s.background_image),
       "Pexels background must pass the sanitizer"
-    assert_match %r{\Ahttps://images\.pexels\.com/.+w=800&h=1200}, s.cards[0]["image"],
-      "card left panel must get a Pexels portrait crop"
+    assert_match %r{\Ahttps://images\.pexels\.com/.+w=720&h=1280}, s.cards[0]["image"],
+      "card left panel must get a 9:16 portrait crop"
   end
 
   test "Pexels fills card art for themes the curated library doesn't cover" do
@@ -232,7 +232,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
 
     s.reload
     s.cards.each_with_index do |c, i|
-      assert_match %r{\Ahttps://images\.pexels\.com/.+w=800&h=1200}, c["image"].to_s,
+      assert_match %r{\Ahttps://images\.pexels\.com/.+w=720&h=1280}, c["image"].to_s,
         "card #{i} (#{c['type']}) should get a Pexels portrait"
     end
   end
@@ -247,7 +247,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     imgs = Array(s.cards[0]["option_images"])
     assert_equal 4, imgs.size
     assert_equal imgs.size, imgs.uniq.size, "option_images must be unique within a card"
-    imgs.each { |u| assert_match %r{\Ahttps://images\.pexels\.com/.+w=1200&h=627}, u }
+    imgs.each { |u| assert_match %r{\Ahttps://images\.pexels\.com/.+w=800&h=800}, u }
     assert_nil s.cards[0]["image"], "tap_card left panel stays blank with Pexels too"
   end
 

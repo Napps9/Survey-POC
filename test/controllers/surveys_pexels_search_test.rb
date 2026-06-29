@@ -23,13 +23,12 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
   PHOTO = {
     "id" => 7, "photographer" => "Jane", "alt" => "peak",
     "src" => {
-      "landscape" => "https://images.pexels.com/photos/7/p.jpg?w=1200&h=627&fit=crop",
-      "portrait"  => "https://images.pexels.com/photos/7/p.jpg?w=800&h=1200&fit=crop",
-      "tiny"      => "https://images.pexels.com/photos/7/p.jpg?w=280&h=200&fit=crop"
+      "original" => "https://images.pexels.com/photos/7/p.jpg",
+      "tiny"     => "https://images.pexels.com/photos/7/p.jpg?w=280&h=200&fit=crop"
     }
   }.freeze
 
-  test "returns landscape URLs for background context" do
+  test "returns landscape-cropped URLs for background context" do
     stub_method(PexelsClient, :configured?, true) do
       stub_method(PexelsClient, :new, fake_client([ PHOTO ])) do
         get pexels_search_survey_path(@survey), params: { q: "alps", context: "background" }
@@ -37,18 +36,18 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
     end
     assert_response :success
     body = JSON.parse(response.body)
-    assert_equal PHOTO["src"]["landscape"], body["images"].first["url"]
-    assert_equal PHOTO["src"]["tiny"],      body["images"].first["thumb"]
+    assert_match %r{w=1920&h=1080}, body["images"].first["url"]
+    assert_equal PHOTO["src"]["tiny"], body["images"].first["thumb"]
   end
 
-  test "returns portrait URLs for card context" do
+  test "returns portrait-cropped URLs for card context" do
     stub_method(PexelsClient, :configured?, true) do
       stub_method(PexelsClient, :new, fake_client([ PHOTO ])) do
         get pexels_search_survey_path(@survey), params: { q: "alps", context: "card" }
       end
     end
     body = JSON.parse(response.body)
-    assert_equal PHOTO["src"]["portrait"], body["images"].first["url"]
+    assert_match %r{w=720&h=1280}, body["images"].first["url"]
   end
 
   test "blank query returns empty list without calling Pexels" do

@@ -24,9 +24,18 @@ class PexelsClient
   ENDPOINT       = "https://api.pexels.com/v1/search".freeze
   TIMEOUT_SECS   = 6
 
-  # context → which orientation to search for and which src crop to store.
-  ORIENTATION_FOR = { background: "landscape", card: "portrait", swipe: "landscape" }.freeze
-  SRC_FOR         = { background: "landscape", card: "portrait", swipe: "landscape" }.freeze
+  # context → which orientation to bias the search toward.
+  ORIENTATION_FOR = { background: "landscape", card: "portrait", swipe: "square" }.freeze
+
+  # context → exact [width, height] crop, matching the Verto asset spec:
+  #   card  — left-panel "Main Asset", 9:16 portrait (720×1280)
+  #   swipe — tap-card statement, square (800×800)
+  #   background — full-bleed landscape backdrop (1920×1080)
+  # We build the crop from the photo's base URL using Pexels' image-CDN params
+  # (the same mechanism behind their fixed `src` sizes) so the ratio is exact
+  # for the slot rather than whatever pre-baked size is closest.
+  CROP_FOR = { background: [ 1920, 1080 ], card: [ 720, 1280 ], swipe: [ 800, 800 ] }.freeze
+  DEFAULT_CROP = [ 800, 1200 ].freeze
 
   class << self
     def api_key
@@ -37,12 +46,16 @@ class PexelsClient
       api_key.present?
     end
 
-    # The slot-appropriate, pre-cropped image URL for a Pexels photo hash.
-    # Falls back to the original if the expected crop is missing.
+    # The slot-appropriate, exactly-cropped image URL for a Pexels photo hash.
     def url_for(photo, context)
-      src = photo["src"] || {}
-      key = SRC_FOR[context.to_sym] || "large"
-      src[key].presence || src["original"]
+      src  = photo["src"] || {}
+      base = src["original"].presence
+      # No base URL to crop from — fall back to a pre-baked size.
+      return (src["large"].presence || src.values.find(&:present?)) unless base
+
+      w, h = CROP_FOR[context.to_sym] || DEFAULT_CROP
+      sep  = base.include?("?") ? "&" : "?"
+      "#{base}#{sep}auto=compress&cs=tinysrgb&fit=crop&w=#{w}&h=#{h}"
     end
   end
 
