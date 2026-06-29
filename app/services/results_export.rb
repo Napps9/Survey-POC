@@ -26,23 +26,42 @@ class ResultsExport
   end
 
   # [header, *one row per response]. Question columns skip welcome cards.
+  # Materialised form for the Google Sheets writer (needs the full array for its
+  # batch API); the CSV download streams via each_row instead.
   def response_rows
-    rows = [ RESPONSE_HEADER + question_cards.map { |card, _idx| question_text(card) } ]
-    @responses.each do |response|
-      answers = response.answers.is_a?(Hash) ? response.answers : {}
-      rows << [
-        response.id,
-        response.created_at&.strftime("%Y-%m-%d %H:%M"),
-        source_label(response),
-        response.locale
-      ] + question_cards.map { |card, idx| format_answer(card, answers[idx.to_s]) }
-    end
-    sanitize_cells(rows)
+    [].tap { |rows| each_response_row { |row| rows << row } }
   end
 
   # [header, *one row per answer option] built from the aggregated results.
   def summary_rows
-    rows = [ SUMMARY_HEADER ]
+    [].tap { |rows| each_summary_row { |row| rows << row } }
+  end
+
+  # Streaming entry point for the CSV download: yields one already-sanitized
+  # row at a time so the controller never holds the whole table (or the whole
+  # generated CSV string) in memory. For raw responses this pulls the DB rows
+  # in batches via find_each rather than loading them all at once.
+  def each_row(summary:, &block)
+    summary ? each_summary_row(&block) : each_response_row(&block)
+  end
+
+  private
+
+  def each_response_row
+    yield csv_safe_row(RESPONSE_HEADER + question_cards.map { |card, _idx| question_text(card) })
+    each_export_response do |response|
+      answers = response.answers.is_a?(Hash) ? response.answers : {}
+      yield csv_safe_row([
+        response.id,
+        response.created_at&.strftime("%Y-%m-%d %H:%M"),
+        source_label(response),
+        response.locale
+      ] + question_cards.map { |card, idx| format_answer(card, answers[idx.to_s]) })
+    end
+  end
+
+  def each_summary_row
+    yield csv_safe_row(SUMMARY_HEADER)
     @aggregated.each_with_index do |result, idx|
       type = result[:type].to_s
       next if type == "welcome_card"
@@ -51,13 +70,23 @@ class ResultsExport
       question = question_text(result[:card])
       total    = result[:total].to_i
       summary_option_rows(result, type).each do |label, count, pct|
-        rows << [ number, type, question, label, count, pct, total ]
+        yield csv_safe_row([ number, type, question, label, count, pct, total ])
       end
     end
-    sanitize_cells(rows)
   end
 
-  private
+  # Iterate the response set without loading it all at once. For an AR relation,
+  # batch through find_each selecting only the columns the export reads; for an
+  # in-memory array (e.g. tests), iterate directly.
+  def each_export_response(&block)
+    if @responses.respond_to?(:find_each)
+      @responses.reorder(nil)
+        .select(:id, :created_at, :locale, :survey_share_id, :answers)
+        .find_each(batch_size: 500, &block)
+    else
+      @responses.each(&block)
+    end
+  end
 
   # [card, original_index] for every non-welcome card, so answers (keyed by the
   # original card index) still line up after welcome cards are dropped.
@@ -169,8 +198,8 @@ class ResultsExport
     ((count.to_f / grand) * 100).round(1)
   end
 
-  def sanitize_cells(rows)
-    rows.map { |row| row.map { |cell| csv_safe(cell) } }
+  def csv_safe_row(row)
+    row.map { |cell| csv_safe(cell) }
   end
 
   # Neutralize a single cell against spreadsheet formula injection (see
