@@ -160,8 +160,17 @@ class AssetPopulator
     cards = Array(@survey.cards).each_with_index.map do |card, idx|
       new_card = card.dup
       begin
-        if (img = pick_card_image_path(card, idx, used))
-          new_card["image"] = img
+        if (picked = pick_card_image_path(card, idx, used))
+          new_card["image"] = picked["image"]
+          # Photographer credit travels with the image (Pexels picks only;
+          # curated assets carry none, so clear any stale credit).
+          if picked["image_credit"].present?
+            new_card["image_credit"]     = picked["image_credit"]
+            new_card["image_credit_url"] = picked["image_credit_url"]
+          else
+            new_card.delete("image_credit")
+            new_card.delete("image_credit_url")
+          end
         end
         if card["type"].to_s == "tap_card"
           new_card["option_images"] = pick_tap_card_option_images(card, idx, swipe_used)
@@ -222,23 +231,31 @@ class AssetPopulator
   # option_images. For every other card type, Pexels (when configured) is the
   # primary source so coverage isn't limited to the themes the curated library
   # happens to hold; the curated two-tier logic is the fallback.
+  #
+  # Returns a hash { "image" => url, "image_credit" => name?, "image_credit_url"
+  # => url? } or nil. Only Pexels picks carry a credit.
   def pick_card_image_path(card, idx, used)
     type = card["type"].to_s
     return nil if type == "tap_card"
 
-    if PexelsClient.configured? && (url = pexels_card_url(card, idx, used))
+    if PexelsClient.configured? && (photo = pexels_card_photo(card, idx, used))
+      url = PexelsClient.url_for(photo, :card)
       used << url
-      return url
+      return {
+        "image"            => url,
+        "image_credit"     => photo["photographer"].to_s.strip.presence,
+        "image_credit_url" => photo["photographer_url"].to_s.strip.presence
+      }
     end
 
     if (path = tier1_themed_path(card, idx, used, type))
       used << path
-      return path
+      return { "image" => path }
     end
 
     if (path = tier2_type_art_path(card, idx, used, type))
       used << path
-      return path
+      return { "image" => path }
     end
 
     nil
@@ -349,15 +366,15 @@ class AssetPopulator
     PexelsClient.url_for(chosen, :background)
   end
 
-  # A distinct portrait for one card's left panel. Seeded order keeps same-seed
+  # The chosen Pexels photo for one card's left panel (so the caller can read
+  # both its crop URL and photographer credit). Seeded order keeps same-seed
   # runs identical; the shared `used` set stops two cards landing on the same
   # photo (mirrors the curated de-dup).
-  def pexels_card_url(card, idx, used)
+  def pexels_card_photo(card, idx, used)
     photos = pexels_photos(card_query(card), :card)
     return nil if photos.empty?
     ordered = photos.shuffle(random: rand_for("px-#{idx}"))
-    chosen  = ordered.find { |p| !used.include?(PexelsClient.url_for(p, :card)) } || ordered.first
-    PexelsClient.url_for(chosen, :card)
+    ordered.find { |p| !used.include?(PexelsClient.url_for(p, :card)) } || ordered.first
   end
 
   # One landscape per tap_card statement, unique within the card and preferring

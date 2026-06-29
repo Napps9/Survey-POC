@@ -78,6 +78,10 @@ class Survey < ApplicationRecord
   # stock photos survive the sanitizer. No quotes/parens, so it stays safe to
   # interpolate into an inline `url('…')` style.
   PEXELS_IMAGE_URL = %r{\Ahttps://images\.pexels\.com/[\w\-./]+\.(?:png|jpe?g|webp)(?:\?[\w%\-=&.+]*)?\z}i
+  # Photographer-credit link target: a pexels.com page (the photographer's
+  # profile). Doubles as the "link back to Pexels" the API guidelines ask for.
+  PEXELS_CREDIT_URL = %r{\Ahttps://(?:www\.)?pexels\.com/[\w@\-./?=&%]*\z}i
+  MAX_CREDIT_NAME   = 80
 
   # Cap on a stored base64 image. The client downscales uploads to ~1600px
   # WebP/JPEG (typically well under 1MB), so this is a defense-in-depth backstop
@@ -103,9 +107,18 @@ class Survey < ApplicationRecord
     sanitize_image_url(value)
   end
 
-  # Scrub the `image` and `option_images` on each card through sanitize_image_url
-  # before persisting an editor PATCH, so a remote URL can only reach the inline
-  # styles if it's a recognised, CSS-safe form. Other card fields are untouched.
+  # A photographer-credit link — only a pexels.com URL is allowed (rendered as
+  # an href), anything else returns nil so the name shows without a link.
+  def self.sanitize_credit_url(value)
+    v = value.to_s.strip
+    v.match?(PEXELS_CREDIT_URL) ? v : nil
+  end
+
+  # Scrub the `image`/`option_images` and the photographer-credit fields on each
+  # card before persisting an editor PATCH, so a remote URL can only reach the
+  # inline styles if it's a recognised, CSS-safe form and the credit link can
+  # only point at Pexels. Other card fields are untouched. When a card has no
+  # image, any orphaned credit is dropped.
   def self.sanitize_cards_images!(cards)
     Array(cards).map do |card|
       next card unless card.is_a?(Hash)
@@ -113,6 +126,18 @@ class Survey < ApplicationRecord
       c["image"] = sanitize_image_url(c["image"]) if c.key?("image")
       if c.key?("option_images")
         c["option_images"] = Array(c["option_images"]).map { |u| sanitize_image_url(u) }
+      end
+
+      if c.key?("image_credit") || c.key?("image_credit_url")
+        if c["image"].present?
+          c["image_credit"]     = c["image_credit"].to_s.strip.first(MAX_CREDIT_NAME).presence
+          c["image_credit_url"] = sanitize_credit_url(c["image_credit_url"])
+          c.delete("image_credit_url") if c["image_credit"].blank?
+          c.delete("image_credit")     if c["image_credit"].blank?
+        else
+          c.delete("image_credit")
+          c.delete("image_credit_url")
+        end
       end
       c
     end

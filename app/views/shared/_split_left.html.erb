@@ -22,6 +22,17 @@
     <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
          style="background-image:url('<%= card["image"] %>');"></div>
     <div class="split-left-overlay"<%= " data-card-media".html_safe if editable %>></div>
+    <%# Subtle photographer credit (Pexels picks). Doubles as the link back to
+        Pexels the API guidelines ask for. %>
+    <% if card["image_credit"].present? %>
+      <div class="split-left-credit"<%= " data-card-media".html_safe if editable %>>
+        <% if card["image_credit_url"].present? %>
+          <a href="<%= card["image_credit_url"] %>" target="_blank" rel="noopener nofollow">Photo by <%= card["image_credit"] %></a>
+        <% else %>
+          Photo by <%= card["image_credit"] %>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
 
   <div class="panel-progress">

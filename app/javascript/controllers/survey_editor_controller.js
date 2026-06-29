@@ -538,7 +538,15 @@ export default class extends Controller {
       if (prim.description && prim.description.trim()) out.description = prim.description.trim()
 
       const image = card.dataset.cardImage
-      if (image) out.image = image
+      if (image) {
+        out.image = image
+        // Carry the photographer credit through autosave so editing other
+        // fields doesn't wipe it (the editor rebuilds cards from the DOM).
+        const credit    = card.dataset.cardImageCredit
+        const creditUrl = card.dataset.cardImageCreditUrl
+        if (credit) out.image_credit = credit
+        if (creditUrl) out.image_credit_url = creditUrl
+      }
       if (card.dataset.cardAllowOther === "true") out.allow_other = true
       if (card.dataset.cardRequired === "true") out.required = true
 

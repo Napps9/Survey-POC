@@ -21,7 +21,7 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
   end
 
   PHOTO = {
-    "id" => 7, "photographer" => "Jane", "alt" => "peak",
+    "id" => 7, "photographer" => "Jane", "photographer_url" => "https://www.pexels.com/@jane", "alt" => "peak",
     "src" => {
       "original" => "https://images.pexels.com/photos/7/p.jpg",
       "tiny"     => "https://images.pexels.com/photos/7/p.jpg?w=280&h=200&fit=crop"
@@ -47,7 +47,10 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
       end
     end
     body = JSON.parse(response.body)
-    assert_match %r{w=720&h=1280}, body["images"].first["url"]
+    img  = body["images"].first
+    assert_match %r{w=720&h=1280}, img["url"]
+    assert_equal "Jane", img["photographer"]
+    assert_equal "https://www.pexels.com/@jane", img["photographer_url"]
   end
 
   test "blank query returns empty list without calling Pexels" do

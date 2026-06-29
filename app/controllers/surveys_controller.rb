@@ -249,11 +249,12 @@ class SurveysController < ApplicationController
     photos = PexelsClient.new.search(query: query, orientation: orientation, per_page: 24)
     images = photos.map do |p|
       {
-        id:           p["id"],
-        url:          PexelsClient.url_for(p, context),
-        thumb:        (p["src"] || {})["tiny"],
-        photographer: p["photographer"],
-        alt:          p["alt"]
+        id:               p["id"],
+        url:              PexelsClient.url_for(p, context),
+        thumb:            (p["src"] || {})["tiny"],
+        photographer:     p["photographer"],
+        photographer_url: p["photographer_url"],
+        alt:              p["alt"]
       }
     end
     render json: { images: images }

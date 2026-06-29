@@ -38,4 +38,34 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil out[1]["image"]
     assert_equal [ PEXELS_URL, nil ], out[2]["option_images"]
   end
+
+  test "sanitize_credit_url accepts pexels.com profile links and rejects others" do
+    assert_equal "https://www.pexels.com/@jane", Survey.sanitize_credit_url("https://www.pexels.com/@jane")
+    assert_equal "https://pexels.com/@jane",     Survey.sanitize_credit_url("https://pexels.com/@jane")
+    assert_nil Survey.sanitize_credit_url("https://evil.example.com/@jane")
+    assert_nil Survey.sanitize_credit_url("javascript:alert(1)")
+    assert_nil Survey.sanitize_credit_url(nil)
+  end
+
+  test "sanitize_cards_images! keeps a valid credit, drops a bad link, and clears orphans" do
+    cards = [
+      { "type" => "multiple_choice", "text" => "Q", "image" => PEXELS_URL,
+        "image_credit" => "Jane Doe", "image_credit_url" => "https://www.pexels.com/@jane" },
+      { "type" => "multiple_choice", "text" => "Q", "image" => PEXELS_URL,
+        "image_credit" => "Jane Doe", "image_credit_url" => "https://evil.example.com/@jane" },
+      { "type" => "multiple_choice", "text" => "Q", "image" => "https://evil.example.com/x.jpg",
+        "image_credit" => "Orphan", "image_credit_url" => "https://www.pexels.com/@x" }
+    ]
+    out = Survey.sanitize_cards_images!(cards)
+
+    assert_equal "Jane Doe", out[0]["image_credit"]
+    assert_equal "https://www.pexels.com/@jane", out[0]["image_credit_url"]
+
+    assert_equal "Jane Doe", out[1]["image_credit"]
+    assert_nil out[1]["image_credit_url"], "non-Pexels credit link is dropped (name still shows)"
+
+    assert_nil out[2]["image"]
+    assert_nil out[2]["image_credit"], "credit is cleared when the image is rejected"
+    assert_nil out[2]["image_credit_url"]
+  end
 end

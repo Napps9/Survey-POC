@@ -116,6 +116,9 @@ export default class extends Controller {
 
   _readFile(file) {
     this._clearUploadError()
+    // Uploaded images carry no photographer credit.
+    this._pendingCredit = ""
+    this._pendingCreditUrl = ""
     if (!file.type.startsWith("image/")) {
       this._showUploadError("That doesn't look like an image file.")
       return
@@ -199,6 +202,10 @@ export default class extends Controller {
     this.libraryItemTargets.forEach(i => i.setAttribute("aria-selected", "false"))
     item.setAttribute("aria-selected", "true")
     this._pendingUrl = item.dataset.url
+    // Pexels results carry a photographer credit; curated/recommended tiles
+    // don't (these stay empty so the credit is cleared on apply).
+    this._pendingCredit    = item.dataset.credit || ""
+    this._pendingCreditUrl = item.dataset.creditUrl || ""
     this._setApplyEnabled(true)
   }
 
@@ -264,6 +271,8 @@ export default class extends Controller {
         const thumb = img.thumb || img.url
         btn.style.backgroundImage = `url('${String(thumb).replace(/'/g, "\\'")}')`
         btn.dataset.url = img.url
+        if (img.photographer) btn.dataset.credit = img.photographer
+        if (img.photographer_url) btn.dataset.creditUrl = img.photographer_url
         btn.dataset.mediaPickerTarget = "libraryItem"
         btn.dataset.action = "click->media-picker#pickLibraryItem"
         btn.setAttribute("aria-selected", "false")
@@ -298,7 +307,7 @@ export default class extends Controller {
       return
     }
     if (!this._activeCard) return
-    this._setCardImage(this._activeCard, this._pendingUrl)
+    this._setCardImage(this._activeCard, this._pendingUrl, this._pendingCredit, this._pendingCreditUrl)
     this._notifyDirty()
     this.close()
   }
@@ -372,8 +381,10 @@ export default class extends Controller {
     if (editor && typeof editor.flash === "function") editor.flash(msg, "text-hot-pink")
   }
 
-  _setCardImage(card, url) {
+  _setCardImage(card, url, credit = "", creditUrl = "") {
     card.dataset.cardImage = url || ""
+    card.dataset.cardImageCredit = url ? (credit || "") : ""
+    card.dataset.cardImageCreditUrl = url ? (creditUrl || "") : ""
     const left = card.querySelector(".split-left")
     if (!left) return
     let imgEl = left.querySelector(".split-left-img[data-card-media]")
@@ -392,9 +403,33 @@ export default class extends Controller {
         ovEl.dataset.cardMedia = "true"
         imgEl.after(ovEl)
       }
+      this._renderCardCredit(left, ovEl, credit, creditUrl)
     } else {
       imgEl?.remove()
       ovEl?.remove()
+      left.querySelector(".split-left-credit[data-card-media]")?.remove()
+    }
+  }
+
+  // Add/update/remove the subtle photographer credit on a card's left panel.
+  _renderCardCredit(left, afterEl, credit, creditUrl) {
+    let el = left.querySelector(".split-left-credit[data-card-media]")
+    if (!credit) { el?.remove(); return }
+    if (!el) {
+      el = document.createElement("div")
+      el.className = "split-left-credit"
+      el.dataset.cardMedia = "true"
+      ;(afterEl || left.firstChild)?.after(el)
+    }
+    if (creditUrl) {
+      const a = document.createElement("a")
+      a.href = creditUrl
+      a.target = "_blank"
+      a.rel = "noopener nofollow"
+      a.textContent = `Photo by ${credit}`
+      el.replaceChildren(a)
+    } else {
+      el.textContent = `Photo by ${credit}`
     }
   }
 

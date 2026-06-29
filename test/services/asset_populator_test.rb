@@ -186,7 +186,9 @@ class AssetPopulatorTest < ActiveSupport::TestCase
 
   PEXELS_PHOTOS = (1..6).map do |i|
     {
-      "id" => i, "photographer" => "P#{i}", "alt" => "alt#{i}",
+      "id" => i, "photographer" => "Photographer #{i}",
+      "photographer_url" => "https://www.pexels.com/@photographer-#{i}",
+      "alt" => "alt#{i}",
       "src" => {
         "original"  => "https://images.pexels.com/photos/#{i}/p.jpg",
         "landscape" => "https://images.pexels.com/photos/#{i}/p.jpg?w=1200&h=627&fit=crop",
@@ -216,6 +218,21 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "Pexels background must pass the sanitizer"
     assert_match %r{\Ahttps://images\.pexels\.com/.+w=720&h=1280}, s.cards[0]["image"],
       "card left panel must get a 9:16 portrait crop"
+    assert_match %r{\APhotographer \d\z}, s.cards[0]["image_credit"].to_s,
+      "card must carry the photographer credit"
+    assert_match %r{\Ahttps://www\.pexels\.com/@}, s.cards[0]["image_credit_url"].to_s,
+      "card must carry the photographer link"
+  end
+
+  test "curated fallback picks carry no photographer credit" do
+    s = make_survey(theme: "Football fans", audience_age: "18-24",
+                    cards: [ { "type" => "multiple_choice", "text" => "Favourite team?", "options" => %w[Arsenal Chelsea] } ])
+
+    with_pexels([]) { AssetPopulator.new(s).populate! }
+
+    s.reload
+    assert_includes s.cards[0]["image"].to_s, "verto-library/"
+    assert_nil s.cards[0]["image_credit"], "curated art has no credit"
   end
 
   test "Pexels fills card art for themes the curated library doesn't cover" do
