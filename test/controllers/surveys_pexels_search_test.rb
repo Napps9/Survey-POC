@@ -65,4 +65,12 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
     assert_equal [], body["images"]
     assert_equal "search_unavailable", body["error"]
   end
+
+  test "CSP allows Pexels images so picked/populated photos can render" do
+    get survey_path(@survey)
+    assert_response :success
+    csp = response.headers["Content-Security-Policy"].to_s
+    assert_includes csp, "images.pexels.com",
+      "img-src must allow images.pexels.com or Pexels photos are blocked by the browser"
+  end
 end

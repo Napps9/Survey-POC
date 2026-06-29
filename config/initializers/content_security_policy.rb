@@ -31,8 +31,9 @@ Rails.application.configure do
     policy.font_src   :self, :data, "https://fonts.gstatic.com"
 
     # App assets + Active Storage logos (self), survey background data: URLs,
-    # and Clarity's tracking pixels.
-    policy.img_src    :self, :data, "https://*.clarity.ms"
+    # Pexels stock photos (editor media picker + auto-populated Verto imagery,
+    # served from the Pexels image CDN), and Clarity's tracking pixels.
+    policy.img_src    :self, :data, "https://images.pexels.com", "https://*.clarity.ms"
 
     # XHR/fetch: same-origin app endpoints plus Clarity's upload endpoints.
     policy.connect_src :self, "https://*.clarity.ms", "https://c.bing.com"
