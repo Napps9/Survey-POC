@@ -719,14 +719,23 @@
 /* ── Card slot: a card plus the "Add question" CTA beneath it ── */
 .card-slot { display: flex; flex-direction: column; gap: 10px; }
 .aq-insert-row { display: flex; justify-content: center; }
-/* Subtler than the old single bottom button — one sits under every card, so it
-   stays quiet until you hover the card it would add after. */
+/* One sits under every card. Solid teal so it's always easy to spot as the
+   primary "add another question" action. */
 .aq-insert-btn {
-  padding: 6px 16px; font-size: var(--text-base);
-  opacity: 0.55; transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+  padding: 8px 18px; font-size: var(--text-base); font-weight: 600;
+  opacity: 1;
+  background: #01EACB;
+  border-color: #01EACB;
+  color: #04221E;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
-.card-slot:hover .aq-insert-btn,
-.aq-insert-btn:focus-visible { opacity: 1; }
+.aq-insert-btn:hover {
+  background: #18F0D4;
+  border-color: #18F0D4;
+  color: #04221E;
+  box-shadow: 0 2px 10px rgba(1,234,203,0.35);
+  transform: translateY(-1px);
+}
 
 /* Reorder controls in the per-card chrome row. */
 .card-reorder { display: inline-flex; gap: 4px; align-items: center; }
@@ -2491,12 +2500,14 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   color: var(--brand-text, rgba(255,255,255,0.45)); letter-spacing: 0.12em; text-transform: uppercase;
 }
 .preview-close-btn {
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px; padding: 5px 14px; cursor: pointer;
-  font-family: "ABeeZee",sans-serif; font-size: 12px;
-  color: rgba(255,255,255,0.5); transition: all 0.15s;
+  /* Dark translucent pill so it stays legible over any brand colour or photo. */
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 100px; padding: 7px 16px; cursor: pointer;
+  font-family: "ABeeZee",sans-serif; font-size: 13px;
+  color: #fff; transition: all 0.15s;
 }
-.preview-close-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.preview-close-btn:hover { background: rgba(20,23,38,0.82); border-color: rgba(255,255,255,0.4); }
 
 /* Creator's logo, centred at the top of the welcome card's right (content)
    panel (shared/_card_component). Only rendered when a logo is uploaded. */
@@ -3059,10 +3070,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .wizard-mobile-hint     { display: none; }
 .wizard-mobile-eyebrow  { display: none; }
 
-/* Player footer (Back / Next / Finish) is the sole navigation for every
-   card — respondents pace themselves explicitly, no auto-advance. The
-   editor preview keeps its footer hidden (preview-verto is read-only). */
-.preview-overlay[data-preview-verto-target="overlay"] .preview-footer { display: none !important; }
+/* The editor preview shows its footer (Back / Next / Edit / progress) so the
+   creator can page through the cards and jump back into the editor — the
+   preview_verto controller drives which buttons show per card. */
 
 /* Tailwind v4 only compiles class names it can find as literal tokens in
    source files; classList.add("hidden") at runtime escapes that scan,
