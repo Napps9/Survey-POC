@@ -152,21 +152,37 @@ class AssetPopulator
     used       = Set.new   # left_panel + select_art + range_art picks
     swipe_used = Set.new   # swipe_cards picks across the whole survey
 
-    @survey.background_image = pick_background_path
+    @survey.background_image = safe_pick { pick_background_path }
 
+    # Per-card rescue: one card's image pick failing (e.g. a transient Pexels
+    # hiccup) must not abort the whole run and discard the background + every
+    # other card's art. A failed card just keeps whatever it already had.
     cards = Array(@survey.cards).each_with_index.map do |card, idx|
       new_card = card.dup
-      if (img = pick_card_image_path(card, idx, used))
-        new_card["image"] = img
-      end
-      if card["type"].to_s == "tap_card"
-        new_card["option_images"] = pick_tap_card_option_images(card, idx, swipe_used)
+      begin
+        if (img = pick_card_image_path(card, idx, used))
+          new_card["image"] = img
+        end
+        if card["type"].to_s == "tap_card"
+          new_card["option_images"] = pick_tap_card_option_images(card, idx, swipe_used)
+        end
+      rescue => e
+        Rails.logger.error("[AssetPopulator] card #{idx} (#{card['type']}): #{e.class}: #{e.message}")
       end
       new_card
     end
 
     @survey.cards = cards
     @survey.save!
+  end
+
+  # Run a pick that may reach Pexels; on any error log and return nil so the
+  # caller falls back to "no image" rather than aborting populate!.
+  def safe_pick
+    yield
+  rescue => e
+    Rails.logger.error("[AssetPopulator] #{e.class}: #{e.message}")
+    nil
   end
 
   private
@@ -319,8 +335,11 @@ class AssetPopulator
   def pexels_photos(query, context)
     return [] unless PexelsClient.configured?
     orientation = PexelsClient::ORIENTATION_FOR[context]
-    @pexels_cache[[ query, orientation ]] ||=
-      PexelsClient.new.search(query: query, orientation: orientation, per_page: 30)
+    @pexels_cache[[ query, orientation ]] ||= begin
+      results = PexelsClient.new.search(query: query, orientation: orientation, per_page: 30)
+      Rails.logger.info("[AssetPopulator] pexels #{context} q=#{query.inspect} -> #{results.size} result(s)")
+      results
+    end
   end
 
   def pexels_background_url
