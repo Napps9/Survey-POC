@@ -10,9 +10,10 @@ fr:
     'no': Non
     add_option: Ajouter une option
     add_statement: Ajouter une affirmation
-    swipe_no: "← Non"
+    swipe_no: "Non"
+    swipe_unsure: "Unsure"
     swipe_hint: glissez la carte pour répondre
-    swipe_yes: Oui →
+    swipe_yes: Oui
     reset: Réinitialiser
     answer_placeholder: Saisissez votre réponse…
     characters: Caractères

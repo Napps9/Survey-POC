@@ -10,9 +10,10 @@ sw:
     'no': Hapana
     add_option: Ongeza chaguo
     add_statement: Ongeza kauli
-    swipe_no: "← Hapana"
+    swipe_no: "Hapana"
+    swipe_unsure: "Unsure"
     swipe_hint: buruta kadi ili kujibu
-    swipe_yes: Ndiyo →
+    swipe_yes: Ndiyo
     reset: Weka upya
     answer_placeholder: Andika jibu…
     characters: Herufi

@@ -10,9 +10,10 @@ he:
     'no': לא
     add_option: הוסף אפשרות
     add_statement: הוסף משפט
-    swipe_no: "← לא"
+    swipe_no: "לא"
+    swipe_unsure: "Unsure"
     swipe_hint: גרור את הכרטיס כדי לענות
-    swipe_yes: כן →
+    swipe_yes: כן
     reset: אפס
     answer_placeholder: הקלד תשובה…
     characters: תווים

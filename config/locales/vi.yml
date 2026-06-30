@@ -10,9 +10,10 @@ vi:
     'no': Không
     add_option: Thêm tùy chọn
     add_statement: Thêm phát biểu
-    swipe_no: "← Không"
+    swipe_no: "Không"
+    swipe_unsure: "Unsure"
     swipe_hint: kéo thẻ để trả lời
-    swipe_yes: Có →
+    swipe_yes: Có
     reset: Đặt lại
     answer_placeholder: Nhập câu trả lời…
     characters: Ký tự

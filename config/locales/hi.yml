@@ -10,9 +10,10 @@ hi:
     'no': नहीं
     add_option: विकल्प जोड़ें
     add_statement: कथन जोड़ें
-    swipe_no: "← नहीं"
+    swipe_no: "नहीं"
+    swipe_unsure: "Unsure"
     swipe_hint: उत्तर देने के लिए कार्ड खींचें
-    swipe_yes: हाँ →
+    swipe_yes: हाँ
     reset: रीसेट करें
     answer_placeholder: उत्तर लिखें…
     characters: वर्ण

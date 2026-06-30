@@ -10,9 +10,10 @@ ar:
     'no': لا
     add_option: إضافة خيار
     add_statement: إضافة عبارة
-    swipe_no: "← لا"
+    swipe_no: "لا"
+    swipe_unsure: "Unsure"
     swipe_hint: اسحب البطاقة للإجابة
-    swipe_yes: نعم ←
+    swipe_yes: نعم
     reset: إعادة تعيين
     answer_placeholder: اكتب الإجابة…
     characters: الأحرف

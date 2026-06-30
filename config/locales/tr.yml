@@ -10,9 +10,10 @@ tr:
     'no': Hayır
     add_option: Seçenek ekle
     add_statement: İfade ekle
-    swipe_no: "← Hayır"
+    swipe_no: "Hayır"
+    swipe_unsure: "Unsure"
     swipe_hint: cevaplamak için kartı sürükleyin
-    swipe_yes: Evet →
+    swipe_yes: Evet
     reset: Sıfırla
     answer_placeholder: Cevabı yazın…
     characters: Karakter

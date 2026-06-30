@@ -577,9 +577,11 @@ export default class extends Controller {
       return container
     } else if (row.type === "tap_card") {
       Object.entries(counts).forEach(([label, yn]) => {
-        const yes = (yn && yn.yes) || 0, no = (yn && yn.no) || 0, sum = yes + no || 1
-        entries.push([`${label} — Yes`, yes, `${label}:yes`, sum])
-        entries.push([`${label} — No`,  no,  `${label}:no`,  sum])
+        const yes = (yn && yn.yes) || 0, no = (yn && yn.no) || 0, unsure = (yn && yn.unsure) || 0
+        const sum = yes + no + unsure || 1
+        entries.push([`${label} — Yes`,    yes,    `${label}:yes`,    sum])
+        entries.push([`${label} — Unsure`, unsure, `${label}:unsure`, sum])
+        entries.push([`${label} — No`,     no,     `${label}:no`,     sum])
       })
     } else {
       // Unordered options (multiple choice, yes/no, …) read best as a ranked

@@ -23,7 +23,7 @@ export default class extends Controller {
     const label = top.dataset.canonical?.trim()
                   || top.querySelector("span")?.textContent?.trim()
                   || `Card ${this.position + 1}`
-    this.swipeResults[label] = dir === "right" ? "yes" : "no"
+    this.swipeResults[label] = dir === "right" ? "yes" : dir === "up" ? "unsure" : "no"
     this.element.dataset.swipeResults = JSON.stringify(this.swipeResults)
     const tx = dir === "left" ? "-120%" : dir === "right" ? "120%" : "0"
     const ty = dir === "up"   ? "-120%" : "0"

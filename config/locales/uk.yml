@@ -10,9 +10,10 @@ uk:
     'no': Ні
     add_option: Додати варіант
     add_statement: Додати твердження
-    swipe_no: "← Ні"
+    swipe_no: "Ні"
+    swipe_unsure: "Unsure"
     swipe_hint: перетягніть картку, щоб відповісти
-    swipe_yes: Так →
+    swipe_yes: Так
     reset: Скинути
     answer_placeholder: Введіть відповідь…
     characters: Символи

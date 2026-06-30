@@ -174,10 +174,13 @@ class ResultsExport
       counts.keys.sort_by(&:to_i).map { |k| [ k.to_s, counts[k].to_i, pct(counts[k].to_i, grand) ] } + other_rows(result)
     when "tap_card"
       counts.flat_map do |label, dirs|
-        yes_c = dirs.is_a?(Hash) ? dirs["yes"].to_i : 0
-        no_c  = dirs.is_a?(Hash) ? dirs["no"].to_i  : 0
-        tot   = yes_c + no_c
-        [ [ "#{label} — Yes", yes_c, pct(yes_c, tot) ], [ "#{label} — No", no_c, pct(no_c, tot) ] ]
+        yes_c = dirs.is_a?(Hash) ? dirs["yes"].to_i    : 0
+        no_c  = dirs.is_a?(Hash) ? dirs["no"].to_i     : 0
+        uns_c = dirs.is_a?(Hash) ? dirs["unsure"].to_i : 0
+        tot   = yes_c + no_c + uns_c
+        [ [ "#{label} — Yes", yes_c, pct(yes_c, tot) ],
+          [ "#{label} — Unsure", uns_c, pct(uns_c, tot) ],
+          [ "#{label} — No", no_c, pct(no_c, tot) ] ]
       end + other_rows(result)
     when "open_ended"
       [ [ "(free-text responses)", Array(result[:texts]).size, nil ] ] + other_rows(result)

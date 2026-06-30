@@ -10,9 +10,10 @@ id:
     'no': Tidak
     add_option: Tambah opsi
     add_statement: Tambah pernyataan
-    swipe_no: "← Tidak"
+    swipe_no: "Tidak"
+    swipe_unsure: "Unsure"
     swipe_hint: seret kartu untuk menjawab
-    swipe_yes: Ya →
+    swipe_yes: Ya
     reset: Atur ulang
     answer_placeholder: Ketik jawaban…
     characters: Karakter

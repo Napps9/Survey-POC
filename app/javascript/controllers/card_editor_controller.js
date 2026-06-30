@@ -58,7 +58,7 @@ export default class extends Controller {
       : `linear-gradient(135deg,${SWIPE_FILLS[n % SWIPE_FILLS.length].join(",")})`
     card.innerHTML = `
       <div class="rotate-card-media" style="background:${mediaBg}"></div>
-      <div class="rotate-card-caption"><span contenteditable="true">New statement</span></div>
+      <div class="rotate-card-statement"><span contenteditable="true">New statement</span></div>
       <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption">×</button>
     `
     stack.appendChild(card)

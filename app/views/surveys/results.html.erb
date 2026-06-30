@@ -344,23 +344,31 @@
                 <% elsif type == "tap_card" %>
                   <div style="display:flex;flex-direction:column;gap:8px;">
                     <% result[:counts].each do |label, dirs| %>
-                      <% yes_c = dirs["yes"].to_i; no_c = dirs["no"].to_i; tot = [(yes_c + no_c).to_f, 1.0].max %>
+                      <% yes_c = dirs["yes"].to_i; no_c = dirs["no"].to_i; unsure_c = dirs["unsure"].to_i %>
+                      <% tot = [(yes_c + no_c + unsure_c).to_f, 1.0].max %>
+                      <% yes_pct = ((yes_c / tot) * 100).round; no_pct = ((no_c / tot) * 100).round; uns_pct = ((unsure_c / tot) * 100).round %>
                       <div>
                         <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.45);margin-bottom:3px;"><%= label.truncate(55) %></div>
                         <div style="display:flex;height:18px;border-radius:5px;overflow:hidden;">
-                          <div style="background:#01EACB;width:<%= ((yes_c / tot) * 100).round %>%;display:flex;align-items:center;justify-content:center;">
-                            <% if ((yes_c / tot) * 100).round > 15 %>
-                              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#1C2034;"><%= ((yes_c / tot) * 100).round %>% Yes</span>
+                          <div style="background:#01EACB;width:<%= yes_pct %>%;display:flex;align-items:center;justify-content:center;">
+                            <% if yes_pct > 15 %>
+                              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#1C2034;"><%= yes_pct %>% Yes</span>
+                            <% end %>
+                          </div>
+                          <div style="background:#F5A623;width:<%= uns_pct %>%;display:flex;align-items:center;justify-content:center;">
+                            <% if uns_pct > 15 %>
+                              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#1C2034;"><%= uns_pct %>% Unsure</span>
                             <% end %>
                           </div>
                           <div style="background:#D80027;flex:1;display:flex;align-items:center;justify-content:center;">
-                            <% if ((no_c / tot) * 100).round > 15 %>
-                              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:white;"><%= ((no_c / tot) * 100).round %>% No</span>
+                            <% if no_pct > 15 %>
+                              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:white;"><%= no_pct %>% No</span>
                             <% end %>
                           </div>
                         </div>
-                        <div style="display:flex;justify-content:space-between;margin-top:2px;">
+                        <div style="display:flex;justify-content:space-between;margin-top:2px;gap:8px;">
                           <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#01EACB;">Yes · <%= yes_c %></span>
+                          <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#C77F12;">Unsure · <%= unsure_c %></span>
                           <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#D80027;">No · <%= no_c %></span>
                         </div>
                       </div>

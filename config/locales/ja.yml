@@ -10,9 +10,10 @@ ja:
     'no': いいえ
     add_option: 選択肢を追加
     add_statement: ステートメントを追加
-    swipe_no: "← いいえ"
+    swipe_no: "いいえ"
+    swipe_unsure: "Unsure"
     swipe_hint: カードをドラッグして回答
-    swipe_yes: はい →
+    swipe_yes: はい
     reset: リセット
     answer_placeholder: 回答を入力…
     characters: 文字数

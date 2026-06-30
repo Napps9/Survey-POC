@@ -77,10 +77,19 @@ class AggregatesSurveyResultsTest < ActiveSupport::TestCase
     assert_equal 2, row[:total]
   end
 
-  test "tap_card tallies yes/no per statement" do
+  test "tap_card tallies yes/no/unsure per statement" do
     row = @agg.run(CARDS, sample_responses)[4]
-    assert_equal({ "yes" => 1, "no" => 1 }, row[:counts]["Statement 1"])
+    assert_equal({ "yes" => 1, "no" => 1, "unsure" => 0 }, row[:counts]["Statement 1"])
     assert_equal 2, row[:total]
+  end
+
+  test "tap_card counts the unsure direction" do
+    responses = [
+      resp({ "4" => { "value" => { "Statement 1" => "unsure" } } }),
+      resp({ "4" => { "value" => { "Statement 1" => "yes" } } })
+    ]
+    row = @agg.run(CARDS, responses)[4]
+    assert_equal({ "yes" => 1, "no" => 0, "unsure" => 1 }, row[:counts]["Statement 1"])
   end
 
   test "open_ended keeps non-blank texts but totals all answers" do

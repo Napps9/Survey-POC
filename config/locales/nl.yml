@@ -10,9 +10,10 @@ nl:
     'no': Nee
     add_option: Optie toevoegen
     add_statement: Stelling toevoegen
-    swipe_no: "← Nee"
+    swipe_no: "Nee"
+    swipe_unsure: "Unsure"
     swipe_hint: sleep de kaart om te antwoorden
-    swipe_yes: Ja →
+    swipe_yes: Ja
     reset: Resetten
     answer_placeholder: Typ je antwoord…
     characters: Tekens

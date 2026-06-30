@@ -68,8 +68,8 @@ module AggregatesSurveyResults
         value.each do |label, dir|
           # st[:counts] has a 0 default (for the scalar types), so guard on
           # is_a?(Hash) rather than ||= when nesting per-label yes/no tallies.
-          st[:counts][label] = { "yes" => 0, "no" => 0 } unless st[:counts][label].is_a?(Hash)
-          st[:counts][label][dir] += 1
+          st[:counts][label] = { "yes" => 0, "no" => 0, "unsure" => 0 } unless st[:counts][label].is_a?(Hash)
+          st[:counts][label][dir.to_s] += 1 if st[:counts][label].key?(dir.to_s)
         end
       end
     when "range", "nps"

@@ -80,9 +80,9 @@ class ResultsChat
         end
       when "tap_card"
         result[:counts].each do |label, dirs|
-          yes_c = dirs["yes"].to_i; no_c = dirs["no"].to_i
-          tot   = [ (yes_c + no_c).to_f, 1.0 ].max
-          lines << "  \"#{label}\" → Yes #{yes_c} (#{((yes_c / tot) * 100).round}%), No #{no_c} (#{((no_c / tot) * 100).round}%)"
+          yes_c = dirs["yes"].to_i; no_c = dirs["no"].to_i; uns_c = dirs["unsure"].to_i
+          tot   = [ (yes_c + no_c + uns_c).to_f, 1.0 ].max
+          lines << "  \"#{label}\" → Yes #{yes_c} (#{((yes_c / tot) * 100).round}%), Unsure #{uns_c} (#{((uns_c / tot) * 100).round}%), No #{no_c} (#{((no_c / tot) * 100).round}%)"
         end
       when "range"
         labels = Array(card["options"])

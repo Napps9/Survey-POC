@@ -10,9 +10,10 @@ ru:
     'no': Нет
     add_option: Добавить вариант
     add_statement: Добавить утверждение
-    swipe_no: "← Нет"
+    swipe_no: "Нет"
+    swipe_unsure: "Unsure"
     swipe_hint: перетащите карточку, чтобы ответить
-    swipe_yes: Да →
+    swipe_yes: Да
     reset: Сбросить
     answer_placeholder: Введите ответ…
     characters: Символы

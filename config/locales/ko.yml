@@ -10,9 +10,10 @@ ko:
     'no': 아니요
     add_option: 옵션 추가
     add_statement: 문장 추가
-    swipe_no: "← 아니요"
+    swipe_no: "아니요"
+    swipe_unsure: "Unsure"
     swipe_hint: 카드를 끌어 답변하세요
-    swipe_yes: 예 →
+    swipe_yes: 예
     reset: 초기화
     answer_placeholder: 답변 입력…
     characters: 글자 수
