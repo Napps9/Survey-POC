@@ -229,13 +229,11 @@
     <% when "range" %>
       <% labels = Array(display["options"]) %>
       <% n = [labels.size, 2].max %>
+      <% thumb_img = display["image"].presence %>
       <div class="slider-wrap"
            data-controller="slider"
            data-slider-steps-value="<%= n %>">
         <div class="slider-track-wrap">
-          <div class="slider-tooltip" data-slider-target="tooltip" style="left:50%;">
-            <span class="slider-tooltip-text" data-slider-target="tooltipText"></span>
-          </div>
           <div class="slider-track"
                data-slider-target="track"
                data-action="pointerdown->slider#start">
@@ -244,7 +242,11 @@
                    style="left:<%= (i.to_f / (n - 1) * 100).round(2) %>%"></div>
             <% end %>
             <div class="slider-thumb" data-slider-target="thumb" style="left:50%;">
-              <div class="s-line"></div><div class="s-line"></div><div class="s-line"></div>
+              <% if thumb_img %>
+                <div class="slider-thumb-img" style="background-image:url('<%= thumb_img %>');"></div>
+              <% else %>
+                <div class="s-line"></div><div class="s-line"></div><div class="s-line"></div>
+              <% end %>
             </div>
           </div>
         </div>

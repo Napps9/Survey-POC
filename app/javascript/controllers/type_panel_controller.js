@@ -285,9 +285,6 @@ function sliderHtml(opts) {
   return `
     <div class="slider-wrap" data-controller="slider" data-slider-steps-value="${n}">
       <div class="slider-track-wrap">
-        <div class="slider-tooltip" data-slider-target="tooltip" style="left:50%;">
-          <span class="slider-tooltip-text" data-slider-target="tooltipText"></span>
-        </div>
         <div class="slider-track" data-slider-target="track"
              data-action="pointerdown->slider#start">
           ${dots}

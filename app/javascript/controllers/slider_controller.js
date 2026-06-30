@@ -1,8 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Verto slider: horizontal track with N dots, draggable thumb, floating
-// tooltip. Snaps to nearest step on release; tooltip text comes from the
-// `label` target at the matching index.
+// Verto slider: horizontal track with N dots, draggable thumb. Snaps to the
+// nearest step on release.
 //
 // It also drives the left-panel reaction animation on Range cards: each step
 // change dispatches `verto:scaleValue` with a 1–5 value (the slider's 3–5
@@ -11,7 +10,7 @@ import { Controller } from "@hotwired/stimulus"
 const REACTION_FRAMES = 5
 
 export default class extends Controller {
-  static targets = ["track", "thumb", "tooltip", "tooltipText", "dot", "label"]
+  static targets = ["track", "thumb", "dot", "label"]
   static values  = { steps: Number, index: { type: Number, default: 0 } }
 
   connect() {
@@ -65,17 +64,10 @@ export default class extends Controller {
     const ratio = this.indexValue / (n - 1)
     const pct   = `${(ratio * 100).toFixed(2)}%`
 
-    if (this.hasThumbTarget)   this.thumbTarget.style.left   = pct
-    if (this.hasTooltipTarget) this.tooltipTarget.style.left = pct
+    if (this.hasThumbTarget) this.thumbTarget.style.left = pct
 
     this.dotTargets.forEach((dot, i) =>
       dot.classList.toggle("active", i === this.indexValue)
     )
-
-    if (this.hasTooltipTextTarget) {
-      const label = this.labelTargets[this.indexValue]
-      const text  = label ? (label.querySelector("[data-role='option']")?.textContent.trim() || label.textContent.trim() || "") : ""
-      this.tooltipTextTarget.textContent = text || `Step ${this.indexValue + 1}`
-    }
   }
 }

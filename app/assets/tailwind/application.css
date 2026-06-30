@@ -823,12 +823,12 @@
 }
 
 /* ── Slider ─────────────────────────────────────── */
-.slider-wrap { display: flex; flex-direction: column; gap: 10px; padding-top: 30px; }
-.slider-track-wrap { position: relative; padding: 18px 0 6px; }
+.slider-wrap { display: flex; flex-direction: column; gap: 14px; padding-top: 30px; }
+.slider-track-wrap { position: relative; padding: 26px 0 10px; }
 .slider-track {
-  height: 5px;
+  height: 8px;
   background: linear-gradient(90deg, #d0e8ff 0%, #01EACB 43%, #ffd88a 100%);
-  border-radius: 3px;
+  border-radius: 4px;
   position: relative;
   cursor: pointer;
   display: flex; align-items: center;
@@ -836,7 +836,7 @@
 }
 .s-dot {
   position: absolute;
-  width: 14px; height: 14px;
+  width: 16px; height: 16px;
   border-radius: 50%;
   background: white;
   border: 2px solid rgba(0,0,0,0.1);
@@ -849,42 +849,28 @@
 }
 .slider-thumb {
   position: absolute; top: 50%;
-  width: 52px; height: 52px;
-  background: white;
+  width: 68px; height: 68px;
+  background: var(--brand-primary, var(--color-green-500));
   border-radius: 50%;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
   display: flex; align-items: center; justify-content: center;
-  gap: 4px;
+  gap: 5px;
   transform: translate(-50%, -50%);
   cursor: grab;
   user-select: none;
   z-index: 5;
+  overflow: hidden;
 }
-.s-line { width: 2px; height: 8px; background: rgba(0,0,0,0.25); border-radius: 1px; }
-.slider-tooltip {
-  position: absolute; bottom: calc(100% + 14px);
-  padding: 6px 12px;
-  background: var(--brand-primary, var(--color-green-500));
-  border-radius: 8px;
-  white-space: nowrap;
-  transform: translateX(-50%);
-  transition: left 0.18s cubic-bezier(.4,0,.2,1);
-  z-index: 10;
-}
-.slider-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%; left: 50%; transform: translateX(-50%);
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-top: 8px solid var(--brand-primary, var(--color-green-500));
-}
-.slider-tooltip-text {
-  font-family: "Alata", sans-serif;
-  font-size: 12px; font-weight: 600; color: white;
+/* Grip lines sit on the brand-coloured thumb, so they read in white. */
+.s-line { width: 2px; height: 11px; background: rgba(255,255,255,0.8); border-radius: 1px; }
+/* Optional creator-supplied thumb image fills the whole icon. */
+.slider-thumb-img {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  border-radius: 50%;
 }
 .slider-labels { display: flex; justify-content: space-between; padding: 0 4px; margin-top: 6px; }
-.slider-label-text { font-size: 11px; color: rgba(0,0,0,0.4); flex: 1; text-align: center; outline: none; }
+.slider-label-text { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75); flex: 1; text-align: center; outline: none; }
 .slider-label-text:first-child { text-align: left; }
 .slider-label-text:last-child { text-align: right; }
 
@@ -1764,10 +1750,9 @@
 .phone-bottom .choice-grid-3 .choice-card-bg { height: 44px; }
 .phone-bottom .choice-label { font-size: 10px; padding: 2px 4px; margin-top: 4px; }
 
-.phone-bottom .slider-wrap { gap: 6px; padding-top: 16px; }
-.phone-bottom .slider-thumb { width: 38px; height: 38px; }
-.phone-bottom .slider-tooltip { font-size: 10px; padding: 3px 8px; }
-.phone-bottom .slider-label-text { font-size: 9px; }
+.phone-bottom .slider-wrap { gap: 8px; padding-top: 18px; }
+.phone-bottom .slider-thumb { width: 50px; height: 50px; }
+.phone-bottom .slider-label-text { font-size: 11px; }
 
 .phone-bottom .freeform-wrap { padding: 8px; }
 .phone-bottom .freeform-textarea { font-size: 12px; min-height: 70px; }
@@ -3190,7 +3175,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .rating-star { font-size: 36px; padding: 4px; }
   .rating-stars { gap: 6px; }
   .slider-track { width: 100%; }
-  .slider-thumb { width: 56px; height: 56px; }
+  .slider-thumb { width: 72px; height: 72px; }
 
   /* ═════════════════════════════════════════════════════════════════
      PLAYER (`/play/:token`) — lego.playverto.com mobile pattern
