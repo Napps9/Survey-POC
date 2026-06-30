@@ -39,6 +39,24 @@ class AssetPopulator
     do don't are is be how what when where why
   ].to_set.freeze
 
+  # Filler specific to *question* text — interrogatives, second-person address,
+  # auxiliaries and generic survey verbs — that name no visual subject. Removed
+  # (on top of STOP_WORDS) when building the image-search query so what's left
+  # is what the question is actually about ("which laptop brand would you
+  # prefer?" → "laptop brand"), not the survey scaffolding around it.
+  QUESTION_FILLER     = %w[
+    which would could should will shall can may might must
+    was were been being has have had does did done
+    you your yours we our ours us they them their i me my mine
+    like likes liked love loves want wants need needs prefer prefers
+    think thinks feel feels choose chooses choosing select selecting pick picks
+    rate rank tell describe say said please
+    most least more less much many any some all none every each other else
+    favourite favorite best worst good bad better
+    often usually generally overall about really very just quite
+    agree disagree
+  ].to_set.freeze
+
   class << self
     def manifest
       @manifest_mtime ||= nil
@@ -470,7 +488,10 @@ class AssetPopulator
   end
 
   def card_query(card)
-    terms = (card_keywords(card).first(3) + theme_query_terms.first(2)).uniq
+    # Weight the question above the survey theme: up to three subject terms
+    # drawn from the question, anchored by a single dominant theme term. (Was
+    # an even 3-and-2 split that let the theme dilute the question's subject.)
+    terms = (card_keywords(card).first(3) + theme_query_terms.first(1)).uniq
     terms.join(" ").presence || @survey.theme.to_s.strip.presence || "abstract"
   end
 
@@ -533,13 +554,22 @@ class AssetPopulator
   # theme_keywords / age_buckets are class methods now (see top of file);
   # the instance code calls self.class so there's one source of truth.
 
+  # Salient words from a card, question-first: the question text leads (it
+  # names the subject), then description and options fill in behind it. Filler
+  # (STOP_WORDS + QUESTION_FILLER) and tokens under three letters are dropped,
+  # so what survives is what the card is visually about. De-duped, first
+  # occurrence wins — which is why the query's first(3) keeps the question's
+  # own subject ahead of words that only appear among the options.
   def card_keywords(card)
-    text = [
-      card["text"],
-      card["description"],
-      *Array(card["options"])
-    ].compact.join(" ").downcase
-    text.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
+    question = salient_words(card["text"])
+    rest     = salient_words([ card["description"], *Array(card["options"]) ].compact.join(" "))
+    (question + rest).uniq
+  end
+
+  def salient_words(text)
+    text.to_s.downcase.scan(/[a-z]+/).reject do |w|
+      w.length < 3 || STOP_WORDS.include?(w) || QUESTION_FILLER.include?(w)
+    end
   end
 
   def rand_for(slot)

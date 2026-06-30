@@ -863,12 +863,6 @@
 }
 /* Grip lines sit on the brand-coloured thumb, so they read in white. */
 .s-line { width: 2px; height: 11px; background: rgba(255,255,255,0.8); border-radius: 1px; }
-/* Optional creator-supplied thumb image fills the whole icon. */
-.slider-thumb-img {
-  position: absolute; inset: 0;
-  background-size: cover; background-position: center;
-  border-radius: 50%;
-}
 .slider-labels { display: flex; justify-content: space-between; padding: 0 4px; margin-top: 6px; }
 .slider-label-text { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75); flex: 1; text-align: center; outline: none; }
 .slider-label-text:first-child { text-align: left; }

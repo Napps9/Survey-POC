@@ -185,6 +185,39 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "Tier-1 picks must be unique: #{tier1_imgs.inspect}"
   end
 
+  # ── Question-aware image query ────────────────────────────────────────────
+
+  test "card query keeps the question's subject and drops survey filler" do
+    s = make_survey(theme: "Retail", audience_age: "all",
+                    cards: [ { "type" => "multiple_choice",
+                               "text" => "Which laptop brand would you prefer?",
+                               "options" => %w[Apple Dell] } ])
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+
+    assert_includes q, "laptop"
+    assert_includes q, "brand"
+    %w[which would you prefer].each { |w| refute_includes q, w, "#{w.inspect} is filler" }
+  end
+
+  test "card query leads with the question subject, not the survey theme" do
+    s = make_survey(theme: "Climate action", audience_age: "all",
+                    cards: [ { "type" => "open_ended", "text" => "How was your coffee this morning?" } ])
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+
+    assert_includes q, "coffee"
+    assert_includes q, "morning"
+    assert_operator q.index("coffee"), :<, (q.index("climate") || q.size),
+      "the question's subject must come before the theme term"
+  end
+
+  test "card query falls back to the theme when the question is all filler" do
+    s = make_survey(theme: "Travel", audience_age: "all",
+                    cards: [ { "type" => "multiple_choice", "text" => "Which would you prefer?" } ])
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0])
+
+    assert_includes q, "travel", "an all-filler question should fall back to the theme"
+  end
+
   # ── Pexels source (primary when configured) ──────────────────────────────
 
   PEXELS_PHOTOS = (1..6).map do |i|
