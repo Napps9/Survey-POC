@@ -253,29 +253,30 @@
       </div>
 
     <% when "nps" %>
-      <%# 5-step NPS slider — a plain vertical pill scale (the reactive Lottie
-          now lives on the Range type, not here). Labels sit in a vertical
-          column to the LEFT of the slider, aligned with each step position
-          (`column-reverse` so source-order index 0 is at the bottom). Labels
-          are editable. %>
-      <% labels = Array(display["options"]) %>
-      <% labels = %w[1 2 3 4 5] if labels.empty? %>
-      <% labels = labels.first(NpsHelper::NPS_STEPS) %>
-      <% labels += (labels.size + 1..NpsHelper::NPS_STEPS).map(&:to_s) if labels.size < NpsHelper::NPS_STEPS %>
+      <%# NPS — a vertical "liquid container" the respondent drags to fill to
+          their number. Defaults to the classic 0–10 (the reactive Lottie now
+          lives on Range). Labels are editable and drive the step count, so a
+          creator can keep 0–10, use a shorter 4/5-point scale, or swap in an
+          agree/emotion range. The container silhouette is themed per Verto
+          (nps_container_shape). column-reverse stacks index 0 at the bottom,
+          matching the fill rising from the bottom. The stored answer is the
+          0-indexed position. %>
+      <% labels = Array(display["options"]).presence || nps_default_labels %>
+      <% n = [labels.size, 2].max %>
       <div class="nps-slider"
            data-controller="nps-slider"
-           data-nps-slider-steps-value="<%= NpsHelper::NPS_STEPS %>"
+           data-nps-slider-steps-value="<%= n %>"
            data-nps-slider-axis-value="vertical"
            data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
            tabindex="0" role="slider"
-           aria-valuemin="1" aria-valuemax="<%= NpsHelper::NPS_STEPS %>">
+           aria-valuemin="0" aria-valuemax="<%= n - 1 %>">
         <div class="nps-slider-stage">
           <div class="slider-labels nps-slider-labels">
             <% labels.each do |opt| %>
               <span class="slider-label-text" data-nps-slider-target="label" <%= ce_attr %>><%= opt %></span>
             <% end %>
           </div>
-          <%= render_nps_control %>
+          <%= render_nps_control(shape: nps_container_shape(@survey), steps: n) %>
         </div>
       </div>
 
@@ -358,12 +359,12 @@
         <% end %>
 
       <% when "range", "nps" %>
-        <% scale_labels = Array(display["options"]).presence || %w[1 2 3 4 5] %>
+        <%# Both store the 0-indexed scale position, so grade against the index. %>
+        <% scale_labels = Array(display["options"]).presence || (type == "nps" ? nps_default_labels : %w[1 2 3 4 5]) %>
         <select class="quiz-correct-select" data-quiz-correct data-action="change->survey-editor#markDirty">
           <option value="">—</option>
           <% scale_labels.each_with_index do |lbl, i| %>
-            <% val = (type == "nps" ? i + 1 : i) %>
-            <option value="<%= val %>" <%= "selected" if card["correct"].to_s == val.to_s %>><%= lbl %></option>
+            <option value="<%= i %>" <%= "selected" if card["correct"].to_s == i.to_s %>><%= lbl %></option>
           <% end %>
         </select>
 

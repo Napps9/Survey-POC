@@ -197,47 +197,97 @@
 .nps-slider[data-nps-slider-axis-value="horizontal"] { cursor: ew-resize; }
 .nps-slider:focus-visible { box-shadow: 0 0 0 3px var(--brand-primary-soft, rgba(1,234,203,0.4)); border-radius: 18px; }
 
-/* Labels-beside-slider stage. Labels in a vertical column, slider on the
-   right; gap keeps them visually attached. */
+/* Labels-beside-container stage, centred in the card. Labels in a vertical
+   column, the liquid container to the right; gap keeps them attached. */
 .nps-slider-stage {
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: 14px;
+  justify-content: center;
+  gap: 16px;
 }
 
-/* RIGHT panel: the slider track. Pill shape via border + border-radius;
-   overflow:hidden clips the rising fill to the pill interior. */
+/* RIGHT panel: the "liquid container". .nps-control is the positioning box;
+   .nps-shape is the themed silhouette that holds the outline + clips the
+   rising fill; .nps-thumb sits OVER it (outside the clip) and shows the
+   current value. */
 .nps-control {
   position: relative;
-  width: 80px;
+  width: 84px;
   height: 320px;
-  border: 4px solid #1a1a1a;
-  border-radius: 40px;
-  background: rgba(255,255,255,0.6);
+  flex: 0 0 auto;
+}
+.nps-shape {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.05);
+  border: 3px solid #1a1a1a;
+  border-radius: 999px;
   overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
 }
 .nps-track-fill {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  left: 0; right: 0; bottom: 0;
   height: calc(var(--nps-fill, 0) * 100%);
-  background: var(--brand-primary, #01EACB);
+  background: linear-gradient(180deg, var(--brand-primary, #01EACB), rgba(1,234,203,0.6));
   transition: height 0.22s cubic-bezier(.34,1.2,.64,1);
   pointer-events: none;
 }
+.nps-ticks {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column-reverse; justify-content: space-between;
+  padding: 14px 0;
+  pointer-events: none;
+}
+.nps-tick {
+  width: 26%;
+  height: 2px;
+  margin-left: 12%;
+  background: rgba(0,0,0,0.16);
+  border-radius: 2px;
+}
 .nps-thumb {
   position: absolute;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--brand-primary, #01EACB);
-  border: 4px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  left: 50%;
+  min-width: 38px;
+  height: 32px;
+  padding: 0 9px;
   transform: translate(-50%, -50%);
-  transition: top 0.18s cubic-bezier(.34,1.2,.64,1), left 0.18s cubic-bezier(.34,1.2,.64,1);
+  border-radius: 999px;
+  background: #fff;
+  border: 3px solid var(--brand-primary, #01EACB);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Alata", sans-serif; font-size: 14px; font-weight: 700;
+  color: var(--brand-primary, #01EACB);
+  white-space: nowrap;
   cursor: grab;
+  z-index: 3;
+  transition: top 0.18s cubic-bezier(.34,1.2,.64,1);
+}
+
+/* Themed container silhouettes — chosen deterministically per Verto theme. */
+.nps-shape-pill  .nps-shape { border-radius: 999px; }
+.nps-shape-tube  .nps-control { width: 60px; }
+.nps-shape-tube  .nps-shape { border-radius: 999px; }
+.nps-shape-glass .nps-shape {
+  clip-path: polygon(8% 0, 92% 0, 80% 100%, 20% 100%);
+  border: none;
+  border-radius: 0;
+  background: rgba(0,0,0,0.07);
+  box-shadow: none;
+}
+.nps-shape-popsicle .nps-control { width: 92px; }
+.nps-shape-popsicle .nps-shape { border-radius: 28px; }
+.nps-shape-popsicle .nps-control::after {
+  content: "";
+  position: absolute;
+  left: 50%; bottom: -30px;
+  transform: translateX(-50%);
+  width: 12px; height: 38px;
+  border-radius: 0 0 6px 6px;
+  background: #d8c29c;
 }
 
 /* LEFT panel: the Lottie mount. lottie-web injects an <svg> into the
@@ -276,16 +326,16 @@
 }
 
 /* Labels: vertical column, top label = highest value. column-reverse keeps
-   source order (1..5) but flips the visual stack so source-index 0 sits at
-   the bottom, aligning with the slider's bottom step. Each label takes an
+   source order (0..N) but flips the visual stack so source-index 0 sits at
+   the bottom, aligning with the container's bottom step. Each label takes an
    equal 1/N share of the column height (flex:1) and centres its text
-   vertically — so the label centres land at 10%, 30%, 50%, 70%, 90% of
-   the column for 5 steps, exactly where the inset thumb travels. */
+   vertically — so the label centres land exactly where the inset thumb
+   travels. */
 .nps-slider-labels {
   display: flex;
   flex-direction: column-reverse;
   height: 320px;
-  min-width: 110px;
+  min-width: 48px;
 }
 .nps-slider-labels .slider-label-text {
   flex: 1 0 0;
@@ -3328,34 +3378,25 @@ body.generating-overlay-active .bottom-bar { display: none; }
     max-height: 30vh;
   }
 
-  /* NPS slider on mobile: shrink the vertical track + thumb so the whole
-     control (with all 5 labels) fits between the question and the bottom
-     of the card on a real-world Safari viewport (~390×664 with the URL
-     bar in view). */
-  .preview-overlay .nps-control {
-    width: 56px;
-    height: 200px;
-    border-width: 3px;
-    border-radius: 28px;
+  /* NPS on mobile: drop the media "header" panel entirely and give the liquid
+     container the whole card, centred; shrink it to fit a phone viewport. */
+  .preview-overlay .split-card:has(.nps-slider) .split-left { display: none; }
+  .preview-overlay .split-card:has(.nps-slider) .split-right {
+    flex: 1 1 auto;
+    height: auto;
   }
-  .preview-overlay .nps-thumb {
-    width: 28px;
-    height: 28px;
-    border-width: 3px;
-  }
+  .preview-overlay .nps-control { height: 232px; }
   .preview-overlay .nps-slider { gap: 8px; }
   .preview-overlay .nps-slider-stage { gap: 12px; }
   .preview-overlay .nps-slider-labels {
     /* match the shrunk .nps-control height so labels align with steps */
-    height: 200px;
-    min-width: 110px;
+    height: 232px;
+    min-width: 44px;
   }
-  /* Label text sized to read in line with the rest of the platform's body
-     copy — the 11px sized version felt too small next to the 26px q-title. */
   .preview-overlay .nps-slider-labels .slider-label-text {
-    font-size: 14px;
+    font-size: 13px;
     font-family: "ABeeZee", sans-serif;
-    line-height: 1.25;
+    line-height: 1.2;
   }
   /* Panel progress bar visible on every mobile card — matches the
      desktop pattern (dark translucent track + white fill). */

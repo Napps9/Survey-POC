@@ -51,6 +51,22 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "⚽", rating_icon(themed(theme: "Football fans"))[:on]
   end
 
+  # nps_container_shape themes the NPS liquid-container silhouette per Verto.
+  test "nps container shape is a known shape, stable per theme, and varies by theme" do
+    %w[Space Food Climate].each do |t|
+      assert_includes ApplicationHelper::NPS_CONTAINER_SHAPES, nps_container_shape(themed(theme: t))
+    end
+    assert_equal nps_container_shape(themed(theme: "Mountains")), nps_container_shape(themed(theme: "Mountains"))
+    shapes = %w[Space Food Climate Music Travel Sport Fashion Coffee Gaming Health]
+             .map { |t| nps_container_shape(themed(theme: t)) }.uniq
+    assert_operator shapes.size, :>, 1, "expected NPS container shapes to vary across themes"
+  end
+
+  test "nps container shape falls back for a blank or nil theme" do
+    assert_equal ApplicationHelper::NPS_CONTAINER_SHAPES.first, nps_container_shape(themed(theme: ""))
+    assert_equal ApplicationHelper::NPS_CONTAINER_SHAPES.first, nps_container_shape(nil)
+  end
+
   test "singularised matching means plurals and variants hit without being listed" do
     # "rockets"/"fans"/"dogs" aren't in the keyword lists; singularising both
     # sides makes them match anyway.

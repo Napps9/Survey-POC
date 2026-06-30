@@ -305,8 +305,9 @@
                     <% end %>
                   </div>
 
-                <% elsif type == "range" %>
-                  <% labels = Array(card_data["options"]); n = [labels.size, 2].max; grand = [result[:counts].values.sum.to_f, 1.0].max %>
+                <% elsif %w[range nps].include?(type) %>
+                  <% labels = Array(card_data["options"]).presence || (type == "nps" ? (0..10).map(&:to_s) : []) %>
+                  <% n = [labels.size, 2].max; grand = [result[:counts].values.sum.to_f, 1.0].max %>
                   <div style="display:flex;flex-direction:column;gap:5px;">
                     <% n.times do |i| %>
                       <% count = result[:counts][i].to_i; label = labels[i] || "Step #{i + 1}"; pct = ((count / grand) * 100).round %>

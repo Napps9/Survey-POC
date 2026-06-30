@@ -98,7 +98,7 @@ const COMPATIBILITY = {
 
 const DEFAULT_OPTIONS = {
   range:            ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
-  nps:              ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
+  nps:              ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
   rating:           ["Poor", "Fair", "Good", "Great", "Excellent"],
   multiple_choice:  ["Option A", "Option B", "Option C"],
   select_many:      ["Option A", "Option B", "Option C", "Option D"],
@@ -110,8 +110,10 @@ const DEFAULT_OPTIONS = {
   welcome_card:     [],
 }
 
-// 5 is hardcoded server-side too (NpsHelper::NPS_STEPS). Keep in sync.
-const NPS_STEPS = 5
+// Default NPS label count (0–10). Server-side too (NpsHelper::NPS_STEPS).
+// The actual step count follows the label count, so a 4/5-point or agree
+// scale works too. Keep in sync.
+const NPS_STEPS = 11
 
 const SWIPE_FILLS = [
   ["#d4edda","#a8d5b5"], ["#d1ecf1","#9fd5df"], ["#fff3cd","#ffd88a"],
@@ -179,9 +181,10 @@ const COMPONENTS = {
 
   range: (opts) => sliderHtml(opts),
 
-  nps: (opts) => npsHtml(opts),
+  nps: (opts, ctx = {}) => npsHtml(opts, ctx.npsShape),
 
-  rating: (opts, icon = { on: "★", off: "☆", kind: "star" }) => {
+  rating: (opts, ctx = {}) => {
+    const icon = ctx.ratingIcon || { on: "★", off: "☆", kind: "star" }
     const labels = opts.length >= 2 ? opts : ["Poor", "Fair", "Good", "Great", "Excellent"]
     const first  = labels[0] || "Poor"
     const last   = labels[labels.length - 1] || "Excellent"
@@ -252,27 +255,31 @@ function gridHtml(opts, mode) {
 }
 
 // Mirror of nps_helper.rb's render_nps_control + the `when "nps"` block of
-// _card_component.html.erb. NPS is fixed at 5 steps, so we pad/truncate the
-// labels to exactly NPS_STEPS; if the source card had fewer than 5 (e.g.
-// switching from yes_no), the whole label set is replaced with the default
-// sentiment scale rather than mixing two sources.
-function npsHtml(opts) {
-  const labels = opts.length === NPS_STEPS ? opts : DEFAULT_OPTIONS.nps
+// _card_component.html.erb. The vertical "liquid container": the step count
+// follows the labels (≥2); a card with no usable labels falls back to the
+// default 0–10. The container silhouette is themed per Verto (shape).
+function npsHtml(opts, shape) {
+  const labels = opts.length >= 2 ? opts : DEFAULT_OPTIONS.nps
+  const n = Math.max(labels.length, 2)
+  const ticks = Array.from({ length: n }, () => `<div class="nps-tick"></div>`).join("")
   return `
     <div class="nps-slider"
          data-controller="nps-slider"
-         data-nps-slider-steps-value="${NPS_STEPS}"
+         data-nps-slider-steps-value="${n}"
          data-nps-slider-axis-value="vertical"
          data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
          tabindex="0" role="slider"
-         aria-valuemin="1" aria-valuemax="${NPS_STEPS}">
+         aria-valuemin="0" aria-valuemax="${n - 1}">
       <div class="nps-slider-stage">
         <div class="slider-labels nps-slider-labels">
           ${labels.map(o => `<span class="slider-label-text" data-nps-slider-target="label" contenteditable="true">${esc(o)}</span>`).join("")}
         </div>
-        <div class="nps-control" data-axis="vertical">
-          <div class="nps-track-fill"></div>
-          <div class="nps-thumb"></div>
+        <div class="nps-control nps-shape-${shape || "pill"}" data-axis="vertical">
+          <div class="nps-shape">
+            <div class="nps-track-fill"></div>
+            <div class="nps-ticks">${ticks}</div>
+          </div>
+          <div class="nps-thumb"><span class="nps-thumb-val"></span></div>
         </div>
       </div>
     </div>`
@@ -337,6 +344,13 @@ export default class extends Controller {
       off:  d.ratingIconOff  || "☆",
       kind: d.ratingIconKind || "star"
     }
+  }
+
+  // Verto-themed NPS container silhouette, resolved server-side
+  // (ApplicationHelper#nps_container_shape) and exposed on the editor root.
+  // Falls back to the plain pill.
+  _npsShape() {
+    return this.element.dataset.npsShape || "pill"
   }
 
   selectCard(event) {
@@ -549,7 +563,7 @@ export default class extends Controller {
     if (slot) {
       const opts = this._optionsFor(card, type)
       const builder = COMPONENTS[type] || (() => "")
-      slot.innerHTML = builder(opts, this._ratingIcon())
+      slot.innerHTML = builder(opts, { ratingIcon: this._ratingIcon(), npsShape: this._npsShape() })
     }
 
     card.dataset.cardType = type

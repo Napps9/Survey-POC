@@ -55,6 +55,21 @@ module ApplicationHelper
 
   STAR_RATING_ICON = { on: "★", off: "☆", kind: "star" }.freeze
 
+  # The NPS "liquid container" silhouette, themed per Verto so the scale leans
+  # into brand alignment (a glass, a test-tube/thermometer, a popsicle, or the
+  # plain pill). Deterministic from the theme (stable across processes via a
+  # digest, not String#hash) so a given Verto always gets the same container.
+  # Maps to a CSS class `nps-shape-<name>`.
+  NPS_CONTAINER_SHAPES = %w[pill glass tube popsicle].freeze
+
+  def nps_container_shape(survey)
+    theme = survey&.theme.to_s.strip.downcase
+    return NPS_CONTAINER_SHAPES.first if theme.empty?
+
+    idx = Integer(Digest::SHA256.hexdigest(theme)[0, 8], 16) % NPS_CONTAINER_SHAPES.size
+    NPS_CONTAINER_SHAPES[idx]
+  end
+
   def rating_icon(survey)
     signal = %i[theme title key_insight]
              .filter_map { |m| survey.public_send(m) if survey.respond_to?(m) }
