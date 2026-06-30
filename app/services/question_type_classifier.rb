@@ -75,9 +75,10 @@ class QuestionTypeClassifier
     - "Choose all that apply" / multi-pick -> select_many_grid by default; fall
       back to select_many for long labels or more than 10 options.
     - A 1-5 quality/satisfaction rating ("How would you rate...") -> rating.
-    - An emotion/agreement/"how often" scale -> range (<= 5 points).
-    - Likelihood-to-recommend or a 0-10 / reactive sentiment scale -> nps
-      (EXACTLY 5 points).
+    - An emotion/agreement/"how often" scale, or any scale where an engaging
+      reactive animation adds value -> range (<= 5 points).
+    - Likelihood-to-recommend / NPS or a plain 0-10 sentiment scale -> nps
+      (EXACTLY 5 points, a plain vertical slider).
     - A single topic probed from three angles (or an explicit
       negative/neutral/positive set) -> tap_card (EXACTLY 3 statements, in
       negative -> neutral -> positive order, each <= 30 chars).

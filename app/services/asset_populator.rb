@@ -262,7 +262,9 @@ class AssetPopulator
   # first (used to mix media); it falls back to a photo when no video is found.
   def pick_card_image_path(card, idx, used, prefer_video: false)
     type = card["type"].to_s
-    return nil if type == "tap_card"
+    # tap_card's imagery rides on its statement cards; range shows the reactive
+    # Lottie animation on its left panel — neither takes a left-panel still.
+    return nil if type == "tap_card" || type == "range"
 
     if PexelsClient.configured?
       if prefer_video && (vid = pexels_card_video(card, idx, used))

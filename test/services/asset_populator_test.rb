@@ -24,7 +24,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "background_image must pass Survey.sanitize_background_image"
   end
 
-  test "populate! gives every non-tap_card card an image and every tap_card option_images" do
+  test "populate! gives image-bearing cards an image; tap_card option_images; range stays blank" do
     cards = [
       { "type" => "welcome_card",    "text" => "Welcome" },
       { "type" => "multiple_choice", "text" => "Pick one", "options" => [ "A", "B" ] },
@@ -40,12 +40,14 @@ class AssetPopulatorTest < ActiveSupport::TestCase
 
     s.reload
     s.cards.each_with_index do |c, i|
-      if c["type"] == "tap_card"
+      case c["type"]
+      when "tap_card"
         assert_equal Array(c["options"]).size, Array(c["option_images"]).size,
           "tap_card #{i} option_images count must match options count"
-        c["option_images"].each do |u|
-          assert_includes u, "verto-library/swipe-cards/"
-        end
+        c["option_images"].each { |u| assert_includes u, "verto-library/swipe-cards/" }
+      when "range"
+        # Range shows the reactive Lottie on its left panel — no still image.
+        assert_nil c["image"], "range card must not get a left-panel still"
       else
         assert c["image"].present?, "card #{i} (#{c['type']}) has no image"
       end
@@ -64,7 +66,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "expected Tier-1 themed match, got #{s.cards[0]['image'].inspect}"
   end
 
-  test "non-themed survey falls through to type-art for range / select; tap_card left panel stays blank" do
+  test "non-themed survey: tap_card + range left panels stay blank; select falls through to type-art" do
     s = make_survey(theme: "Climate action", audience_age: "all",
                     cards: [
                       { "type" => "tap_card",        "text" => "Agree?", "options" => %w[a b c] },
@@ -79,7 +81,8 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_nil s.cards[0]["image"], "tap_card left panel must NOT pull from swipe-cards/"
     assert_equal 3, Array(s.cards[0]["option_images"]).size
     s.cards[0]["option_images"].each { |u| assert_includes u, "verto-library/swipe-cards/" }
-    assert_includes s.cards[1]["image"], "verto-library/range-art/"
+    # range shows the reactive Lottie, so it carries no still image
+    assert_nil s.cards[1]["image"]
     assert_includes s.cards[2]["image"], "verto-library/select-art/"
   end
 

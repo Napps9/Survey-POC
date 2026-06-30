@@ -59,31 +59,31 @@ const COMPATIBILITY = {
     { type: "select_one_grid",  score: 40,  note: "Removes the playful swipe mechanic — only swap if the question really is a single static choice." },
   ],
   range: [
-    { type: "range",            score: 100, note: "Best at capturing strength of feeling — gives you a clean distribution to read insight from." },
-    { type: "nps",              score: 90,  note: "Same 5-point opinion scale, but the reactive Lottie character makes the answer feel rewarding — use when an engaging visual lifts response quality." },
+    { type: "range",            score: 100, note: "Best at capturing strength of feeling, and the reactive animated character makes answering feel rewarding — a clean distribution plus an engaging visual." },
+    { type: "nps",              score: 90,  note: "Same 5-point opinion scale on a compact vertical slider — switch for a quieter, classic feel without the animation." },
     { type: "rating",           score: 85,  note: "Similar shape, but stars are more familiar and a touch less expressive." },
     { type: "tap_card",         score: 50,  note: "Trades the scale for a yes/no per statement — more engaging, less granular." },
     { type: "yes_no",           score: 30,  note: "Strips the scale to two answers — most data goes with it. Only use if the binary is the insight." },
   ],
   rating: [
     { type: "rating",           score: 100, note: "Star scale is instantly understood and gives a comparable score across questions." },
-    { type: "nps",              score: 88,  note: "Same 5-point feel with a reactive Lottie character — picks up where stars feel generic." },
-    { type: "range",            score: 85,  note: "More expressive scale with custom endpoints — better when the spectrum isn't generic 'good/bad'." },
+    { type: "nps",              score: 80,  note: "Same 5-point feel on a compact vertical slider — picks up where stars feel generic." },
+    { type: "range",            score: 88,  note: "More expressive scale with custom endpoints and a reactive animated character — better when the spectrum isn't generic 'good/bad'." },
     { type: "tap_card",         score: 50,  note: "Loses the scale, but more engaging if you want a quick gut take across several items." },
     { type: "select_one_grid",  score: 35,  note: "Flattens the scale into discrete labelled tiles — loses the smoothness people respond to in stars." },
   ],
   nps: [
-    { type: "nps",              score: 100, note: "Reactive 5-point scale with a Lottie character that responds to the answer — most engaging for opinion / satisfaction questions." },
-    { type: "rating",           score: 80,  note: "Star scale is the familiar baseline — switch if the reactive character feels off-tone for the audience." },
-    { type: "range",            score: 75,  note: "Same 5-point opinion scale without the reactive visual — switch if you want a quieter, classic feel." },
+    { type: "nps",              score: 100, note: "Compact 5-point vertical scale — clean and familiar for opinion / satisfaction questions." },
+    { type: "range",            score: 88,  note: "Same 5-point opinion scale with a reactive animated character — switch when an engaging visual lifts response quality." },
+    { type: "rating",           score: 80,  note: "Star scale is the familiar baseline — switch if a horizontal star rating fits the audience better." },
     { type: "tap_card",         score: 45,  note: "Replace the scale with a quick gut yes/no across several statements — only if you have multiple to test." },
     { type: "yes_no",           score: 30,  note: "Collapses the scale to two answers — most signal goes with it. Only use if the binary is the insight." },
   ],
   yes_no: [
     { type: "yes_no",           score: 100, note: "Crisp signal when you genuinely need a binary — easy to read and easy to answer." },
     { type: "select_one_grid",  score: 75,  note: "Adds nuance with a few defined visual options — better when 'yes/no' is hiding the real answer." },
-    { type: "nps",              score: 55,  note: "Adds a 5-point scale with a reactive character — better when degree matters and you want an engaging visual." },
-    { type: "range",            score: 45,  note: "Captures the strength of the yes or no — useful when degree matters more than the answer." },
+    { type: "range",            score: 55,  note: "Adds a 5-point scale with a reactive animated character — better when degree matters and you want an engaging visual." },
+    { type: "nps",              score: 45,  note: "Adds a compact 5-point vertical scale — better when degree matters more than the binary." },
     { type: "tap_card",         score: 35,  note: "Run a quick yes/no across several statements at once — only swap if you have multiple to test." },
   ],
   open_ended: [
@@ -545,12 +545,12 @@ export default class extends Controller {
     const otherBlock = card.querySelector(".other-block")
     if (otherBlock) otherBlock.hidden = (type === "welcome_card")
 
-    // 3. Swap LEFT panel when entering or leaving NPS — NPS needs a
-    //    Lottie player mount that other types don't, and other types
-    //    need the design-prompt / image chrome that NPS suppresses.
-    if (type === "nps" && wasType !== "nps") {
+    // 3. Swap LEFT panel when entering or leaving Range — Range shows the
+    //    reactive Lottie that other types don't, and other types need the
+    //    design-prompt / image chrome that the Lottie suppresses.
+    if (type === "range" && wasType !== "range") {
       this._mountNpsLottie(card)
-    } else if (wasType === "nps" && type !== "nps") {
+    } else if (wasType === "range" && type !== "range") {
       this._unmountNpsLottie(card)
     }
 

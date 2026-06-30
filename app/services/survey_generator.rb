@@ -165,18 +165,19 @@ class SurveyGenerator
       respondent swipes yes/no on each; the combination reveals their
       stance. Each statement <= 30 characters. Best when you want quick
       gut reactions to a single subject from three angles.
-    - range (Verto "Range"): playful 5-point sliding scale for emotion or
-      agree/disagree. Five custom icons animate as the player drags. Use for
-      mood, satisfaction, agreement — anything qualitative-scaled.
+    - range (Verto "Range"): playful 3-5 point sliding scale for emotion or
+      agree/disagree, where the left panel plays a reactive Lottie animation
+      matched to the slider position — an engaging on-theme reaction. Use for
+      mood, satisfaction, agreement — anything qualitative-scaled; prefer this
+      when an engaging visual lifts response quality.
     - rating (Verto "Rating"): icon-based scale (stars by default, but icons
       can be customised). Use for "how good was X" questions. Can also stand
-      in for range when iconography matters more than animation.
-    - nps (Verto "NPS / Reactive scale"): a likelihood/sentiment 5-point
-      slider where the left panel plays a Lottie animation matched to the
-      slider position. Use for likelihood-to-recommend, satisfaction, mood or
-      temperature checks. EXACTLY 5 points; labels can be numbers, words or
-      emotions. Prefer this over rating when an engaging on-theme reaction
-      adds value.
+      in for range when familiar iconography matters more than the animation.
+    - nps (Verto "NPS"): a likelihood/sentiment 5-point vertical slider (a
+      plain scale, no reaction animation). Use for likelihood-to-recommend,
+      satisfaction, mood or temperature checks. EXACTLY 5 points; labels can
+      be numbers, words or emotions. Prefer range when an engaging on-theme
+      reaction adds value.
     - yes_no: simple gating only. Use sparingly — a select_one_grid with
       two visual options is often richer.
     - open_ended (Verto "Freeform"): text input, can be voice-recorded too.

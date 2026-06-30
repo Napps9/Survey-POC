@@ -3,6 +3,13 @@ import { Controller } from "@hotwired/stimulus"
 // Verto slider: horizontal track with N dots, draggable thumb, floating
 // tooltip. Snaps to nearest step on release; tooltip text comes from the
 // `label` target at the matching index.
+//
+// It also drives the left-panel reaction animation on Range cards: each step
+// change dispatches `verto:scaleValue` with a 1–5 value (the slider's 3–5
+// steps mapped proportionally onto the 5 animation frames), which the
+// lottie-player controller listens for.
+const REACTION_FRAMES = 5
+
 export default class extends Controller {
   static targets = ["track", "thumb", "tooltip", "tooltipText", "dot", "label"]
   static values  = { steps: Number, index: { type: Number, default: 0 } }
@@ -12,6 +19,7 @@ export default class extends Controller {
     this._onUp   = this.onUp.bind(this)
     this.indexValue = Math.floor((this.stepsValue - 1) / 2)
     this.render()
+    this._dispatchScaleValue() // sync the reaction animation to the start position
   }
 
   start(event) {
@@ -38,7 +46,18 @@ export default class extends Controller {
     if (idx !== this.indexValue) {
       this.indexValue = idx
       this.render()
+      this._dispatchScaleValue()
     }
+  }
+
+  // Map the current step (0…n-1) onto a 1…5 frame and broadcast it for the
+  // reaction animation. Global document event, matching the player's
+  // one-card-on-screen model.
+  _dispatchScaleValue() {
+    const n     = Math.max(2, this.stepsValue)
+    const ratio = n > 1 ? this.indexValue / (n - 1) : 0
+    const value = Math.round(ratio * (REACTION_FRAMES - 1)) + 1
+    document.dispatchEvent(new CustomEvent("verto:scaleValue", { detail: { value } }))
   }
 
   render() {
