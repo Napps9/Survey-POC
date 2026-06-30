@@ -83,4 +83,22 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal({ on: "★", off: "☆", kind: "star" }, rating_icon(nil))
     assert_equal "star", rating_icon(themed(theme: "Quarterly NPS pulse"))[:kind]
   end
+
+  # nps_tile_shape themes the NPS 0–10 tile silhouette per Verto.
+  test "nps tile shape is a known shape, stable per theme, and varies by theme" do
+    %w[Space Food Climate].each do |t|
+      assert_includes ApplicationHelper::NPS_TILE_SHAPES, nps_tile_shape(themed(theme: t))
+    end
+    # Deterministic: same theme → same shape across calls.
+    assert_equal nps_tile_shape(themed(theme: "Mountains")), nps_tile_shape(themed(theme: "Mountains"))
+    # Varies by theme: a spread of themes lands on more than one shape.
+    shapes = %w[Space Food Climate Music Travel Sport Fashion Coffee Gaming Health]
+             .map { |t| nps_tile_shape(themed(theme: t)) }.uniq
+    assert_operator shapes.size, :>, 1, "expected NPS shapes to vary across themes"
+  end
+
+  test "nps tile shape falls back for a blank or nil theme" do
+    assert_equal ApplicationHelper::NPS_TILE_SHAPES.first, nps_tile_shape(themed(theme: ""))
+    assert_equal ApplicationHelper::NPS_TILE_SHAPES.first, nps_tile_shape(nil)
+  end
 end

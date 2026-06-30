@@ -1,21 +1,25 @@
 module NpsHelper
-  # 5-step NPS scale (1-5). Each value has a corresponding Lottie animation
-  # on the left panel; the right panel is a vertical slider sitting on top of
-  # a static SVG background. The slider dispatches `nps:valueChanged` events
-  # which the lottie-player controller listens for to swap animations.
-  NPS_STEPS = 5
-  NPS_THEME = "baseball".freeze  # single global theme for v1; future theme picker swaps this
+  # NPS is the classic 0–10 likelihood scale: 11 stops rendered as a centred
+  # row of tappable number tiles (see the `nps` block in
+  # shared/_card_component). The stored answer is the number itself (0–10).
+  NPS_STEPS = 11
+
+  # The reactive Lottie animation (now used by the RANGE card, not NPS) has 5
+  # frames; the range slider maps its position proportionally onto these. Kept
+  # separate from NPS_STEPS so the two scales move independently.
+  NPS_FRAMES = 5
+  NPS_THEME  = "baseball".freeze # single global theme for v1; future theme picker swaps this
 
   def nps_card?(card)
     card["type"].to_s == "nps"
   end
 
-  # Asset URLs for the 5 Lotties. Files live under `app/assets/lottie/<theme>/`
-  # which Sprockets treats as an asset path root, so files resolve at
-  # `/assets/<theme>/<file>` (the "lottie" prefix is implicit in the path root).
-  # Using asset_path so digested URLs work in prod.
+  # Asset URLs for the 5 reaction Lotties. Files live under
+  # `app/assets/lottie/<theme>/` which Sprockets treats as an asset path root,
+  # so files resolve at `/assets/<theme>/<file>`. Using asset_path so digested
+  # URLs work in prod.
   def nps_lottie_urls
-    (1..NPS_STEPS).map { |i| asset_path("#{NPS_THEME}/#{i}.json") }
+    (1..NPS_FRAMES).map { |i| asset_path("#{NPS_THEME}/#{i}.json") }
   end
 
   # LEFT panel: a div that the lottie-player Stimulus controller mounts into.
@@ -30,17 +34,6 @@ module NpsHelper
                 } do
       content_tag(:div, "", class: "nps-lottie-mount",
                   data: { "lottie-player-target" => "mount" })
-    end
-  end
-
-  # RIGHT panel: a vertical pill slider. The pill outline and clipping come
-  # from CSS on `.nps-control`; `.nps-track-fill` rises from the bottom up to
-  # the thumb position as the value increases (driven by --nps-fill set by the
-  # slider controller); `.nps-thumb` is the draggable handle.
-  def render_nps_control
-    content_tag :div, class: "nps-control", data: { axis: "vertical" } do
-      concat content_tag(:div, "", class: "nps-track-fill")
-      concat content_tag(:div, "", class: "nps-thumb")
     end
   end
 end

@@ -323,15 +323,10 @@ export default class extends Controller {
       }
 
       case "nps": {
-        const el = card.querySelector(".nps-slider")
-        if (el) {
-          const v = el.dataset.npsValue
-          return (v !== undefined && v !== "") ? Number(v) : null
-        }
-        // Feature flag off: the card is rendered as a plain range slider.
-        const dots   = Array.from(card.querySelectorAll(".s-dot"))
-        const active = dots.findIndex(d => d.classList.contains("active"))
-        return active >= 0 ? active : null
+        // 0–10 tile scale; the answer is the chosen number (null until tapped).
+        const el = card.querySelector(".nps-scale")
+        const v  = el && el.dataset.npsValue
+        return (v !== undefined && v !== null && v !== "") ? Number(v) : null
       }
 
       case "rating": {
@@ -547,7 +542,8 @@ export default class extends Controller {
   _formatMine(mine, row) {
     if (mine === null || mine === undefined || mine === "") return "—"
     if (Array.isArray(mine)) return mine.length ? mine.join(", ") : "—"
-    if ((row.type === "range" || row.type === "nps") && Array.isArray(row.options)) {
+    if (row.type === "nps") return String(mine) // 0–10, the number is the label
+    if (row.type === "range" && Array.isArray(row.options)) {
       return row.options[mine] || `Step ${Number(mine) + 1}`
     }
     if (row.type === "rating") return `${mine} ★`
@@ -564,7 +560,11 @@ export default class extends Controller {
     const counts = row.counts || {}
     let entries = []
 
-    if ((row.type === "range" || row.type === "nps") && Array.isArray(row.options)) {
+    if (row.type === "nps") {
+      // Fixed 0–10 distribution regardless of the card's (caption) options.
+      entries = Array.from({ length: 11 }, (_, i) =>
+        [String(i), counts[i] || counts[String(i)] || 0, i])
+    } else if (row.type === "range" && Array.isArray(row.options)) {
       entries = row.options.map((label, i) => [label, counts[i] || counts[String(i)] || 0, i])
     } else if (row.type === "rating") {
       const max = Math.max(5, ...Object.keys(counts).map(k => parseInt(k) || 0))
@@ -856,7 +856,7 @@ export default class extends Controller {
   }
 
   _lockInputs(card) {
-    card.querySelectorAll(".choice-list, .choice-grid, .rotate-wrap, .slider-wrap, .nps-slider, .rating-wrap, .freeform-wrap, .other-block")
+    card.querySelectorAll(".choice-list, .choice-grid, .rotate-wrap, .slider-wrap, .nps-scale, .rating-wrap, .freeform-wrap, .other-block")
         .forEach(el => { el.style.pointerEvents = "none" })
     card.querySelectorAll("textarea, input, button[data-other-target='btn']").forEach(el => { el.disabled = true })
   }

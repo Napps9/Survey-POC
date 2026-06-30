@@ -98,7 +98,7 @@ const COMPATIBILITY = {
 
 const DEFAULT_OPTIONS = {
   range:            ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
-  nps:              ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
+  nps:              ["Not likely", "Very likely"],
   rating:           ["Poor", "Fair", "Good", "Great", "Excellent"],
   multiple_choice:  ["Option A", "Option B", "Option C"],
   select_many:      ["Option A", "Option B", "Option C", "Option D"],
@@ -110,8 +110,9 @@ const DEFAULT_OPTIONS = {
   welcome_card:     [],
 }
 
-// 5 is hardcoded server-side too (NpsHelper::NPS_STEPS). Keep in sync.
-const NPS_STEPS = 5
+// 11 is hardcoded server-side too (NpsHelper::NPS_STEPS — the 0–10 scale).
+// Keep in sync.
+const NPS_STEPS = 11
 
 const SWIPE_FILLS = [
   ["#d4edda","#a8d5b5"], ["#d1ecf1","#9fd5df"], ["#fff3cd","#ffd88a"],
@@ -179,9 +180,10 @@ const COMPONENTS = {
 
   range: (opts) => sliderHtml(opts),
 
-  nps: (opts) => npsHtml(opts),
+  nps: (opts, ctx = {}) => npsHtml(opts, ctx.npsShape),
 
-  rating: (opts, icon = { on: "★", off: "☆", kind: "star" }) => {
+  rating: (opts, ctx = {}) => {
+    const icon = ctx.ratingIcon || { on: "★", off: "☆", kind: "star" }
     const labels = opts.length >= 2 ? opts : ["Poor", "Fair", "Good", "Great", "Excellent"]
     const first  = labels[0] || "Poor"
     const last   = labels[labels.length - 1] || "Excellent"
@@ -252,28 +254,26 @@ function gridHtml(opts, mode) {
 }
 
 // Mirror of nps_helper.rb's render_nps_control + the `when "nps"` block of
-// _card_component.html.erb. NPS is fixed at 5 steps, so we pad/truncate the
-// labels to exactly NPS_STEPS; if the source card had fewer than 5 (e.g.
-// switching from yes_no), the whole label set is replaced with the default
-// sentiment scale rather than mixing two sources.
-function npsHtml(opts) {
-  const labels = opts.length === NPS_STEPS ? opts : DEFAULT_OPTIONS.nps
+// _card_component.html.erb. NPS is the fixed 0–10 tile scale; the two
+// editable end captions come from the card's first/last option labels (kept
+// as `.slider-label-text` so the editor serialises them as the options).
+function npsHtml(opts, shape) {
+  const left  = opts[0] || DEFAULT_OPTIONS.nps[0]
+  const right = (opts.length > 1 ? opts[opts.length - 1] : "") || DEFAULT_OPTIONS.nps[1]
+  const tiles = Array.from({ length: NPS_STEPS }, (_, i) =>
+    `<span class="nps-tile" data-nps-slider-target="label">${i}</span>`).join("")
   return `
-    <div class="nps-slider"
+    <div class="nps-scale nps-shape-${shape || "squircle"}"
          data-controller="nps-slider"
          data-nps-slider-steps-value="${NPS_STEPS}"
-         data-nps-slider-axis-value="vertical"
+         data-nps-slider-axis-value="horizontal"
          data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
          tabindex="0" role="slider"
-         aria-valuemin="1" aria-valuemax="${NPS_STEPS}">
-      <div class="nps-slider-stage">
-        <div class="slider-labels nps-slider-labels">
-          ${labels.map(o => `<span class="slider-label-text" data-nps-slider-target="label" contenteditable="true">${esc(o)}</span>`).join("")}
-        </div>
-        <div class="nps-control" data-axis="vertical">
-          <div class="nps-track-fill"></div>
-          <div class="nps-thumb"></div>
-        </div>
+         aria-valuemin="0" aria-valuemax="${NPS_STEPS - 1}">
+      <div class="nps-scale-row">${tiles}</div>
+      <div class="nps-scale-ends">
+        <span class="nps-end slider-label-text" contenteditable="true">${esc(left)}</span>
+        <span class="nps-end slider-label-text" contenteditable="true">${esc(right)}</span>
       </div>
     </div>`
 }
@@ -337,6 +337,12 @@ export default class extends Controller {
       off:  d.ratingIconOff  || "☆",
       kind: d.ratingIconKind || "star"
     }
+  }
+
+  // Verto-themed NPS tile shape, resolved server-side (ApplicationHelper#
+  // nps_tile_shape) and exposed on the editor root. Falls back to a squircle.
+  _npsShape() {
+    return this.element.dataset.npsShape || "squircle"
   }
 
   selectCard(event) {
@@ -549,7 +555,7 @@ export default class extends Controller {
     if (slot) {
       const opts = this._optionsFor(card, type)
       const builder = COMPONENTS[type] || (() => "")
-      slot.innerHTML = builder(opts, this._ratingIcon())
+      slot.innerHTML = builder(opts, { ratingIcon: this._ratingIcon(), npsShape: this._npsShape() })
     }
 
     card.dataset.cardType = type

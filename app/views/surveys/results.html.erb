@@ -320,6 +320,27 @@
                     <% end %>
                   </div>
 
+                <% elsif type == "nps" %>
+                  <% counts = result[:counts]; grand = [counts.values.sum.to_f, 1.0].max %>
+                  <% promoters = (9..10).sum { |k| counts[k].to_i }; detractors = (0..6).sum { |k| counts[k].to_i } %>
+                  <% nps_score = ((promoters - detractors) / grand * 100).round %>
+                  <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#01EACB;line-height:1;"><%= nps_score %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.4);">NPS · <%= promoters %> promoter<%= "s" unless promoters == 1 %> − <%= detractors %> detractor<%= "s" unless detractors == 1 %></span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <% 11.times do |i| %>
+                      <% count = counts[i].to_i; pct = ((count / grand) * 100).round %>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:#111;min-width:22px;text-align:right;"><%= i %></span>
+                        <div style="flex:1;height:7px;border-radius:4px;background:rgba(1,234,203,0.1);overflow:hidden;">
+                          <div style="height:100%;border-radius:4px;background:<%= i <= 6 ? '#E5573F' : (i <= 8 ? '#F5A623' : '#2BB673') %>;width:<%= pct %>%;"></div>
+                        </div>
+                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.4);min-width:42px;text-align:right;"><%= count %> (<%= pct %>%)</span>
+                      </div>
+                    <% end %>
+                  </div>
+
                 <% elsif type == "rating" %>
                   <% avg = result[:avg]; grand = [result[:counts].values.sum.to_f, 1.0].max %>
                   <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
