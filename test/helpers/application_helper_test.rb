@@ -40,25 +40,47 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   # rating_icon themes the rating answer-type icon to the Verto.
-  Struct.new("ThemedSurvey", :theme) unless defined?(Struct::ThemedSurvey)
-  def survey_with_theme(theme) = Struct::ThemedSurvey.new(theme)
+  Struct.new("ThemedSurvey", :theme, :title, :key_insight) unless defined?(Struct::ThemedSurvey)
+  def themed(theme: nil, title: nil, key_insight: nil)
+    Struct::ThemedSurvey.new(theme, title, key_insight)
+  end
 
   test "themed Vertos rate in a matching emoji" do
-    assert_equal({ on: "🚀", off: "🚀", kind: "emoji" }, rating_icon(survey_with_theme("How women under 35 think about space")))
-    assert_equal "emoji", rating_icon(survey_with_theme("Food and nutrition"))[:kind]
-    assert_equal "🍔", rating_icon(survey_with_theme("Food and nutrition"))[:on]
-    assert_equal "⚽", rating_icon(survey_with_theme("Football fans"))[:on]
+    assert_equal({ on: "🚀", off: "🚀", kind: "emoji" }, rating_icon(themed(theme: "space")))
+    assert_equal "🍔", rating_icon(themed(theme: "Food and nutrition"))[:on]
+    assert_equal "⚽", rating_icon(themed(theme: "Football fans"))[:on]
+  end
+
+  test "singularised matching means plurals and variants hit without being listed" do
+    # "rockets"/"fans"/"dogs" aren't in the keyword lists; singularising both
+    # sides makes them match anyway.
+    assert_equal "🚀", rating_icon(themed(theme: "All about rockets"))[:on]
+    assert_equal "⚽", rating_icon(themed(theme: "Football fans"))[:on]
+    assert_equal "🐾", rating_icon(themed(theme: "Dogs and cats"))[:on]
+  end
+
+  test "draws on the title and key_insight, not just the theme" do
+    # A terse/unmatched theme still resolves via the descriptive title.
+    icon = rating_icon(themed(theme: "Q2 pulse", title: "How fans feel about the football season"))
+    assert_equal "⚽", icon[:on]
+  end
+
+  test "the dominant subject wins when several themes appear" do
+    # "space" appears twice (theme + insight), "food" once — rocket wins.
+    icon = rating_icon(themed(theme: "Space exploration",
+                              key_insight: "what food astronauts want in space"))
+    assert_equal "🚀", icon[:on]
   end
 
   test "matches whole words, not substrings" do
     # "start" contains "star" but must not trigger the space rocket; it has no
     # themed match, so it falls back to the classic star.
-    assert_equal "star", rating_icon(survey_with_theme("Startup founders"))[:kind]
+    assert_equal "star", rating_icon(themed(theme: "Startup founders"))[:kind]
   end
 
   test "untyped or unmatched Vertos keep the classic star" do
-    assert_equal({ on: "★", off: "☆", kind: "star" }, rating_icon(survey_with_theme("")))
+    assert_equal({ on: "★", off: "☆", kind: "star" }, rating_icon(themed(theme: "")))
     assert_equal({ on: "★", off: "☆", kind: "star" }, rating_icon(nil))
-    assert_equal "star", rating_icon(survey_with_theme("Quarterly NPS pulse"))[:kind]
+    assert_equal "star", rating_icon(themed(theme: "Quarterly NPS pulse"))[:kind]
   end
 end
