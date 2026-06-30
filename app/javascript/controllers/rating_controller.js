@@ -28,7 +28,11 @@ export default class extends Controller {
     this.starTargets.forEach((star, i) => {
       const active = i <= upTo
       star.classList.toggle("active", active)
-      star.textContent = active ? "★" : "☆"
+      // Themed icon glyphs ride on each star (star kind swaps ★/☆; emoji
+      // kinds keep the same glyph and let CSS dim the inactive ones).
+      const on  = star.dataset.ratingOn  || "★"
+      const off = star.dataset.ratingOff || "☆"
+      star.textContent = active ? on : off
     })
   }
 }

@@ -181,18 +181,20 @@ const COMPONENTS = {
 
   nps: (opts) => npsHtml(opts),
 
-  rating: (opts) => {
+  rating: (opts, icon = { on: "★", off: "☆", kind: "star" }) => {
     const labels = opts.length >= 2 ? opts : ["Poor", "Fair", "Good", "Great", "Excellent"]
     const first  = labels[0] || "Poor"
     const last   = labels[labels.length - 1] || "Excellent"
     return `
-      <div class="rating-wrap" data-controller="rating">
+      <div class="rating-wrap rating-kind-${icon.kind}" data-controller="rating">
         <div class="rating-stars">
           ${[0,1,2,3,4].map(i => `
             <span class="rating-star"
                   data-rating-target="star"
                   data-rating-index="${i}"
-                  data-action="click->rating#pick mouseover->rating#hover mouseout->rating#unhover">☆</span>
+                  data-rating-on="${icon.on}"
+                  data-rating-off="${icon.off}"
+                  data-action="click->rating#pick mouseover->rating#hover mouseout->rating#unhover">${icon.off}</span>
           `).join("")}
         </div>
         <div class="rating-labels">
@@ -322,6 +324,19 @@ export default class extends Controller {
       this._typeMeta = loadTypeMeta()
     }
     return this._typeMeta
+  }
+
+  // Verto-themed rating icon, resolved server-side (one source of truth in
+  // ApplicationHelper#rating_icon) and exposed on the editor root. Falls back
+  // to the classic star so a card switched to "rating" before the attributes
+  // exist still renders.
+  _ratingIcon() {
+    const d = this.element.dataset
+    return {
+      on:   d.ratingIconOn   || "★",
+      off:  d.ratingIconOff  || "☆",
+      kind: d.ratingIconKind || "star"
+    }
   }
 
   selectCard(event) {
@@ -534,7 +549,7 @@ export default class extends Controller {
     if (slot) {
       const opts = this._optionsFor(card, type)
       const builder = COMPONENTS[type] || (() => "")
-      slot.innerHTML = builder(opts)
+      slot.innerHTML = builder(opts, this._ratingIcon())
     }
 
     card.dataset.cardType = type

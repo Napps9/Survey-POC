@@ -5,6 +5,52 @@ module ApplicationHelper
     GoogleOauthService.configured?
   end
 
+  # Rating answer-type icon, themed to the Verto. The classic star is the
+  # default; a Verto whose theme matches one of these keyword groups rates in
+  # an icon that fits its subject — a "space" Verto in rockets, a "food" Verto
+  # in burgers, and so on. The match is whole-word against the theme text.
+  #
+  # The ★/☆ star is a monochrome glyph coloured by CSS (grey → gold). Emoji
+  # ignore CSS `color`, so they instead render full-colour when active and
+  # dim/greyscale when not — hence the `kind` the views/JS switch on.
+  RATING_ICON_THEMES = [
+    [ %w[space rocket rockets astronaut galaxy cosmos cosmic planet planets orbit moon mars stars], "🚀" ],
+    [ %w[football soccer], "⚽" ],
+    [ %w[basketball nba], "🏀" ],
+    [ %w[sport sports fitness gym workout athlete athletes training exercise running], "💪" ],
+    [ %w[food eat eating meal meals restaurant restaurants cuisine snack snacks dinner lunch cooking recipe recipes], "🍔" ],
+    [ %w[coffee cafe cafes barista], "☕" ],
+    [ %w[nature climate environment environmental eco sustainability sustainable green earth recycling], "🌍" ],
+    [ %w[plant plants garden gardening flower flowers bloom growth], "🌱" ],
+    [ %w[health wellness wellbeing medical mental healthcare], "❤️" ],
+    [ %w[love dating relationship relationships romance valentine wedding], "❤️" ],
+    [ %w[music song songs concert concerts band audio festival playlist], "🎵" ],
+    [ %w[money finance financial budget invest investing bank banking salary savings economy], "💰" ],
+    [ %w[travel holiday holidays vacation trip trips flight flights tourism adventure destination], "✈️" ],
+    [ %w[game gaming gamer gamers esports arcade], "🎮" ],
+    [ %w[movie movies film films cinema tv television streaming], "🎬" ],
+    [ %w[book books reading library education school schools learning study student students teaching], "📚" ],
+    [ %w[pet pets dog dogs cat cats animal animals wildlife], "🐾" ],
+    [ %w[car cars auto vehicle vehicles driving motor automotive], "🚗" ],
+    [ %w[tech technology software app apps digital computer coding data], "💻" ],
+    [ %w[fashion style clothing beauty makeup outfit], "👗" ],
+    [ %w[water ocean sea beach surf marine], "🌊" ],
+    [ %w[party celebration festive birthday], "🎉" ],
+    [ %w[work career job jobs business office professional workplace], "💼" ]
+  ].freeze
+
+  STAR_RATING_ICON = { on: "★", off: "☆", kind: "star" }.freeze
+
+  def rating_icon(survey)
+    words = survey&.theme.to_s.downcase.scan(/[a-z]+/)
+    return STAR_RATING_ICON if words.empty?
+
+    RATING_ICON_THEMES.each do |keywords, glyph|
+      return { on: glyph, off: glyph, kind: "emoji" } if (words & keywords).any?
+    end
+    STAR_RATING_ICON
+  end
+
   # Minimal per-card, per-locale projection for the editor's inline
   # `#survey-cards-i18n` island. The language-tab JS (survey_editor_controller
   # _seedStore/_normContent) only reads text/description/options per locale, so

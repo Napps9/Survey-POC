@@ -38,4 +38,27 @@ class ApplicationHelperTest < ActionView::TestCase
     refute out.first.key?("correct")
     refute_includes out.to_json, "AAAA", "base64 image data must not reach the island"
   end
+
+  # rating_icon themes the rating answer-type icon to the Verto.
+  Struct.new("ThemedSurvey", :theme) unless defined?(Struct::ThemedSurvey)
+  def survey_with_theme(theme) = Struct::ThemedSurvey.new(theme)
+
+  test "themed Vertos rate in a matching emoji" do
+    assert_equal({ on: "🚀", off: "🚀", kind: "emoji" }, rating_icon(survey_with_theme("How women under 35 think about space")))
+    assert_equal "emoji", rating_icon(survey_with_theme("Food and nutrition"))[:kind]
+    assert_equal "🍔", rating_icon(survey_with_theme("Food and nutrition"))[:on]
+    assert_equal "⚽", rating_icon(survey_with_theme("Football fans"))[:on]
+  end
+
+  test "matches whole words, not substrings" do
+    # "start" contains "star" but must not trigger the space rocket; it has no
+    # themed match, so it falls back to the classic star.
+    assert_equal "star", rating_icon(survey_with_theme("Startup founders"))[:kind]
+  end
+
+  test "untyped or unmatched Vertos keep the classic star" do
+    assert_equal({ on: "★", off: "☆", kind: "star" }, rating_icon(survey_with_theme("")))
+    assert_equal({ on: "★", off: "☆", kind: "star" }, rating_icon(nil))
+    assert_equal "star", rating_icon(survey_with_theme("Quarterly NPS pulse"))[:kind]
+  end
 end

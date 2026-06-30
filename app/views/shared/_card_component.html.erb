@@ -283,13 +283,16 @@
       <% labels    = Array(display["options"]) %>
       <% first_lbl = labels.first || "Poor" %>
       <% last_lbl  = labels.last  || "Excellent" %>
-      <div class="rating-wrap" data-controller="rating">
+      <% icon      = rating_icon(@survey) %>
+      <div class="rating-wrap rating-kind-<%= icon[:kind] %>" data-controller="rating">
         <div class="rating-stars">
           <% 5.times do |i| %>
             <span class="rating-star"
                   data-rating-target="star"
                   data-rating-index="<%= i %>"
-                  data-action="click->rating#pick mouseover->rating#hover mouseout->rating#unhover">☆</span>
+                  data-rating-on="<%= icon[:on] %>"
+                  data-rating-off="<%= icon[:off] %>"
+                  data-action="click->rating#pick mouseover->rating#hover mouseout->rating#unhover"><%= icon[:off] %></span>
           <% end %>
         </div>
         <div class="rating-labels">
