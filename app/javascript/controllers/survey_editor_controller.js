@@ -537,11 +537,18 @@ export default class extends Controller {
       out.text = (prim.text || "").trim()
       if (prim.description && prim.description.trim()) out.description = prim.description.trim()
 
+      // A card's left panel holds a video OR a photo. Carry whichever it is —
+      // plus the creator credit — through autosave, since the editor rebuilds
+      // cards from the DOM and would otherwise drop these.
+      const video = card.dataset.cardVideo
       const image = card.dataset.cardImage
-      if (image) {
+      if (video) {
+        out.video = video
+        if (card.dataset.cardVideoPoster) out.video_poster = card.dataset.cardVideoPoster
+      } else if (image) {
         out.image = image
-        // Carry the photographer credit through autosave so editing other
-        // fields doesn't wipe it (the editor rebuilds cards from the DOM).
+      }
+      if (video || image) {
         const credit    = card.dataset.cardImageCredit
         const creditUrl = card.dataset.cardImageCreditUrl
         if (credit) out.image_credit = credit

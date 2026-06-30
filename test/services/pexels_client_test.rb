@@ -40,6 +40,39 @@ class PexelsClientTest < ActiveSupport::TestCase
     end
   end
 
+  VIDEO = {
+    "id" => 9, "image" => "https://images.pexels.com/videos/9/poster.jpeg",
+    "user" => { "name" => "Sam Reel", "url" => "https://www.pexels.com/@sam" },
+    "video_files" => [
+      { "file_type" => "video/mp4", "width" => 426,  "link" => "https://videos.pexels.com/video-files/9/tiny.mp4" },
+      { "file_type" => "video/mp4", "width" => 720,  "link" => "https://videos.pexels.com/video-files/9/hd.mp4" },
+      { "file_type" => "video/mp4", "width" => 3840, "link" => "https://videos.pexels.com/video-files/9/uhd.mp4" }
+    ]
+  }.freeze
+
+  test "video_file_url picks the smallest mp4 at least 720px, never 4K" do
+    assert_equal "https://videos.pexels.com/video-files/9/hd.mp4", PexelsClient.video_file_url(VIDEO)
+  end
+
+  test "video_file_url returns nil when there is no usable mp4" do
+    assert_nil PexelsClient.video_file_url({ "video_files" => [ { "file_type" => "video/webm", "width" => 720, "link" => "x" } ] })
+    assert_nil PexelsClient.video_file_url({})
+  end
+
+  test "video_poster and video_credit read the expected fields" do
+    assert_equal "https://images.pexels.com/videos/9/poster.jpeg", PexelsClient.video_poster(VIDEO)
+    assert_equal({ "name" => "Sam Reel", "url" => "https://www.pexels.com/@sam" }, PexelsClient.video_credit(VIDEO))
+  end
+
+  test "search_videos returns the videos array from the API body" do
+    client = PexelsClient.new(api_key: "x")
+    stub_method(client, :get_json, ->(_url, _params) { { "videos" => [ VIDEO ] } }) do
+      vids = client.search_videos(query: "mountains", orientation: "portrait")
+      assert_equal 1, vids.size
+      assert_equal 9, vids.first["id"]
+    end
+  end
+
   test "search returns [] with no key, blank query, or on error" do
     assert_equal [], PexelsClient.new(api_key: nil).search(query: "x")
     assert_equal [], PexelsClient.new(api_key: "x").search(query: "  ")

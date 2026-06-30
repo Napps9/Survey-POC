@@ -39,6 +39,35 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_equal [ PEXELS_URL, nil ], out[2]["option_images"]
   end
 
+  VIDEO_URL  = "https://videos.pexels.com/video-files/123/hd.mp4"
+  POSTER_URL = "https://images.pexels.com/videos/123/poster.jpeg?auto=compress"
+
+  test "sanitize_video_url accepts the Pexels video CDN and rejects others" do
+    assert_equal VIDEO_URL, Survey.sanitize_video_url(VIDEO_URL)
+    assert_equal "#{VIDEO_URL}?fps=30", Survey.sanitize_video_url("#{VIDEO_URL}?fps=30")
+    assert_nil Survey.sanitize_video_url("https://evil.example.com/x.mp4")
+    assert_nil Survey.sanitize_video_url("https://videos.pexels.com/x.exe")
+    assert_nil Survey.sanitize_video_url(nil)
+  end
+
+  test "sanitize_cards_images! keeps a valid video + poster + credit" do
+    cards = [
+      { "type" => "multiple_choice", "text" => "Q", "video" => VIDEO_URL, "video_poster" => POSTER_URL,
+        "image_credit" => "Sam Reel", "image_credit_url" => "https://www.pexels.com/@sam" },
+      { "type" => "multiple_choice", "text" => "Q", "video" => "https://evil.example.com/x.mp4",
+        "video_poster" => POSTER_URL, "image_credit" => "Orphan", "image_credit_url" => "https://www.pexels.com/@x" }
+    ]
+    out = Survey.sanitize_cards_images!(cards)
+
+    assert_equal VIDEO_URL, out[0]["video"]
+    assert_equal POSTER_URL, out[0]["video_poster"]
+    assert_equal "Sam Reel", out[0]["image_credit"]
+
+    assert_nil out[1]["video"], "non-Pexels video host is rejected"
+    assert_nil out[1]["video_poster"], "poster dropped when its video is rejected"
+    assert_nil out[1]["image_credit"], "credit cleared when there's no image or video"
+  end
+
   test "sanitize_credit_url accepts pexels.com profile links and rejects others" do
     assert_equal "https://www.pexels.com/@jane", Survey.sanitize_credit_url("https://www.pexels.com/@jane")
     assert_equal "https://pexels.com/@jane",     Survey.sanitize_credit_url("https://pexels.com/@jane")

@@ -74,5 +74,9 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
     csp = response.headers["Content-Security-Policy"].to_s
     assert_includes csp, "images.pexels.com",
       "img-src must allow images.pexels.com or Pexels photos are blocked by the browser"
+    assert_includes csp, "media-src",
+      "a media-src directive is needed for card videos"
+    assert_includes csp, "videos.pexels.com",
+      "media-src must allow videos.pexels.com or Pexels videos are blocked by the browser"
   end
 end

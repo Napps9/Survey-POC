@@ -22,7 +22,13 @@ require "uri"
 # key is set, so dev/test/CI don't need the var and never hit the network.
 class PexelsClient
   ENDPOINT       = "https://api.pexels.com/v1/search".freeze
+  VIDEO_ENDPOINT = "https://api.pexels.com/videos/search".freeze
   TIMEOUT_SECS   = 6
+
+  # Storage/bandwidth-smart video selection: prefer the smallest mp4 at least
+  # this wide (enough for the portrait card), and never a 4K monster.
+  VIDEO_MIN_WIDTH = 700
+  VIDEO_MAX_WIDTH = 1920
 
   # context → which orientation to bias the search toward.
   ORIENTATION_FOR = { background: "landscape", card: "portrait", swipe: "square" }.freeze
@@ -57,6 +63,29 @@ class PexelsClient
       sep  = base.include?("?") ? "&" : "?"
       "#{base}#{sep}auto=compress&cs=tinysrgb&fit=crop&w=#{w}&h=#{h}"
     end
+
+    # Pick a streamable mp4 URL from a Pexels video hash — the smallest file
+    # that's still sharp enough for the card, capped well below 4K so we never
+    # stream a huge file. Returns nil if the video has no usable mp4.
+    def video_file_url(video)
+      files = Array(video["video_files"]).select do |f|
+        f["file_type"].to_s == "video/mp4" && f["link"].present?
+      end.sort_by { |f| f["width"].to_i }
+      return nil if files.empty?
+
+      capped = files.reject { |f| f["width"].to_i > VIDEO_MAX_WIDTH }.presence || files
+      (capped.find { |f| f["width"].to_i >= VIDEO_MIN_WIDTH } || capped.last)["link"]
+    end
+
+    def video_poster(video)
+      video["image"].presence
+    end
+
+    # Videographer credit ({ name, url }) — same shape the photo credit uses.
+    def video_credit(video)
+      user = video["user"] || {}
+      { "name" => user["name"].to_s.strip.presence, "url" => user["url"].to_s.strip.presence }
+    end
   end
 
   def initialize(api_key: self.class.api_key)
@@ -75,6 +104,22 @@ class PexelsClient
 
     body = get_json(ENDPOINT, params)
     Array(body && body["photos"])
+  rescue => e
+    Rails.logger.error("[PexelsClient] #{e.class}: #{e.message}")
+    []
+  end
+
+  # Returns the parsed `videos` array (possibly empty). Same graceful contract
+  # as #search — never raises.
+  def search_videos(query:, orientation: nil, per_page: 15, page: 1)
+    q = query.to_s.strip
+    return [] if q.blank? || @api_key.blank?
+
+    params = { query: q, per_page: per_page.clamp(1, 80), page: [ page.to_i, 1 ].max }
+    params[:orientation] = orientation if orientation.present?
+
+    body = get_json(VIDEO_ENDPOINT, params)
+    Array(body && body["videos"])
   rescue => e
     Rails.logger.error("[PexelsClient] #{e.class}: #{e.message}")
     []

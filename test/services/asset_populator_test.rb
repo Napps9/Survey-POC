@@ -198,9 +198,23 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     }
   end.freeze
 
-  def with_pexels(photos = PEXELS_PHOTOS)
+  PEXELS_VIDEOS = (1..6).map do |i|
+    {
+      "id" => 100 + i,
+      "image" => "https://images.pexels.com/videos/#{100 + i}/poster.jpeg",
+      "user" => { "name" => "Filmmaker #{i}", "url" => "https://www.pexels.com/@filmmaker-#{i}" },
+      "video_files" => [
+        { "file_type" => "video/mp4", "width" => 540,  "link" => "https://videos.pexels.com/video-files/#{100 + i}/sd.mp4" },
+        { "file_type" => "video/mp4", "width" => 720,  "link" => "https://videos.pexels.com/video-files/#{100 + i}/hd.mp4" },
+        { "file_type" => "video/mp4", "width" => 2160, "link" => "https://videos.pexels.com/video-files/#{100 + i}/uhd.mp4" }
+      ]
+    }
+  end.freeze
+
+  def with_pexels(photos = PEXELS_PHOTOS, videos = [])
     fake = Object.new
     fake.define_singleton_method(:search) { |**_kw| photos }
+    fake.define_singleton_method(:search_videos) { |**_kw| videos }
     stub_method(PexelsClient, :configured?, true) do
       stub_method(PexelsClient, :new, fake) { yield }
     end
@@ -222,6 +236,31 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "card must carry the photographer credit"
     assert_match %r{\Ahttps://www\.pexels\.com/@}, s.cards[0]["image_credit_url"].to_s,
       "card must carry the photographer link"
+  end
+
+  test "mixes video into card art as a 1-in-3 accent, never adjacent" do
+    cards = (1..6).map { |i| { "type" => "multiple_choice", "text" => "Q#{i}", "options" => %w[a b] } }
+    s = make_survey(theme: "Mountains", audience_age: "18-24", cards: cards)
+
+    with_pexels(PEXELS_PHOTOS, PEXELS_VIDEOS) { AssetPopulator.new(s).populate! }
+
+    s.reload
+    media = s.cards.map { |c| c["video"].present? ? :video : (c["image"].present? ? :photo : :none) }
+    # 6 eligible cards → the 3rd and 6th prefer video: P P V P P V
+    assert_equal [ :photo, :photo, :video, :photo, :photo, :video ], media
+
+    vid = s.cards[2]
+    assert_match %r{\Ahttps://videos\.pexels\.com/.+\.mp4\z}, vid["video"]
+    assert_includes vid["video"], "/hd.mp4", "picks the ~720p file, not the 4K one"
+    assert_match %r{\Ahttps://images\.pexels\.com/}, vid["video_poster"]
+    assert_nil vid["image"], "a video card carries no still image"
+    assert_match %r{\AFilmmaker \d\z}, vid["image_credit"].to_s
+    assert_match %r{\Ahttps://www\.pexels\.com/@}, vid["image_credit_url"].to_s
+
+    # No two videos adjacent (the Rules-of-the-Game variety principle).
+    s.cards.each_cons(2) do |a, b|
+      refute(a["video"].present? && b["video"].present?, "videos must never sit adjacent")
+    end
   end
 
   test "curated fallback picks carry no photographer credit" do

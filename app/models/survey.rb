@@ -82,6 +82,9 @@ class Survey < ApplicationRecord
   # profile). Doubles as the "link back to Pexels" the API guidelines ask for.
   PEXELS_CREDIT_URL = %r{\Ahttps://(?:www\.)?pexels\.com/[\w@\-./?=&%]*\z}i
   MAX_CREDIT_NAME   = 80
+  # Pexels video CDN (host-whitelisted) — the streamable mp4 for a card's
+  # left-panel video. Posters are images.pexels.com URLs (sanitize_image_url).
+  PEXELS_VIDEO_URL  = %r{\Ahttps://videos\.pexels\.com/[\w\-./]+\.mp4(?:\?[\w%\-=&.+]*)?\z}i
 
   # Cap on a stored base64 image. The client downscales uploads to ~1600px
   # WebP/JPEG (typically well under 1MB), so this is a defense-in-depth backstop
@@ -107,6 +110,12 @@ class Survey < ApplicationRecord
     sanitize_image_url(value)
   end
 
+  # A card left-panel video URL — only the Pexels video CDN is allowed.
+  def self.sanitize_video_url(value)
+    v = value.to_s.strip
+    v.match?(PEXELS_VIDEO_URL) ? v : nil
+  end
+
   # A photographer-credit link — only a pexels.com URL is allowed (rendered as
   # an href), anything else returns nil so the name shows without a link.
   def self.sanitize_credit_url(value)
@@ -128,8 +137,19 @@ class Survey < ApplicationRecord
         c["option_images"] = Array(c["option_images"]).map { |u| sanitize_image_url(u) }
       end
 
+      # A card's left panel holds a photo OR a video. Scrub both; a poster only
+      # makes sense alongside a video.
+      if c.key?("video")
+        c["video"] = sanitize_video_url(c["video"])
+        c.delete("video") if c["video"].blank?
+      end
+      if c.key?("video_poster")
+        c["video_poster"] = sanitize_image_url(c["video_poster"])
+        c.delete("video_poster") if c["video"].blank? || c["video_poster"].blank?
+      end
+
       if c.key?("image_credit") || c.key?("image_credit_url")
-        if c["image"].present?
+        if c["image"].present? || c["video"].present?
           c["image_credit"]     = c["image_credit"].to_s.strip.first(MAX_CREDIT_NAME).presence
           c["image_credit_url"] = sanitize_credit_url(c["image_credit_url"])
           c.delete("image_credit_url") if c["image_credit"].blank?

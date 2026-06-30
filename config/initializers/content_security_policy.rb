@@ -35,6 +35,11 @@ Rails.application.configure do
     # served from the Pexels image CDN), and Clarity's tracking pixels.
     policy.img_src    :self, :data, "https://images.pexels.com", "https://*.clarity.ms"
 
+    # Pexels stock videos stream from the Pexels video CDN (autoplaying card
+    # art). Without this the browser blocks the <video>, like img_src did for
+    # photos. If clips ever come from another host, add it here.
+    policy.media_src  :self, "https://videos.pexels.com"
+
     # XHR/fetch: same-origin app endpoints plus Clarity's upload endpoints.
     policy.connect_src :self, "https://*.clarity.ms", "https://c.bing.com"
 

@@ -145,7 +145,8 @@ class AssetPopulator
     # Memoises Pexels search results per (query, orientation) so a populate!
     # run makes at most one API call per distinct query — keeps us well inside
     # the rate limit even for a long Verto.
-    @pexels_cache = {}
+    @pexels_cache       = {}
+    @pexels_video_cache = {}
   end
 
   def populate!
@@ -157,20 +158,19 @@ class AssetPopulator
     # Per-card rescue: one card's image pick failing (e.g. a transient Pexels
     # hiccup) must not abort the whole run and discard the background + every
     # other card's art. A failed card just keeps whatever it already had.
+    #
+    # media_idx counts cards that actually receive left-panel media, so we can
+    # mix in video as a periodic accent: every 3rd such card prefers a video,
+    # which (per the Rules of the Game variety principle) keeps videos from
+    # ever sitting adjacent and caps photo runs at two — reducing fatigue.
+    media_idx = 0
     cards = Array(@survey.cards).each_with_index.map do |card, idx|
       new_card = card.dup
       begin
-        if (picked = pick_card_image_path(card, idx, used))
-          new_card["image"] = picked["image"]
-          # Photographer credit travels with the image (Pexels picks only;
-          # curated assets carry none, so clear any stale credit).
-          if picked["image_credit"].present?
-            new_card["image_credit"]     = picked["image_credit"]
-            new_card["image_credit_url"] = picked["image_credit_url"]
-          else
-            new_card.delete("image_credit")
-            new_card.delete("image_credit_url")
-          end
+        prefer_video = (media_idx % 3 == 2)
+        if (picked = pick_card_image_path(card, idx, used, prefer_video: prefer_video))
+          apply_card_media(new_card, picked)
+          media_idx += 1
         end
         if card["type"].to_s == "tap_card"
           new_card["option_images"] = pick_tap_card_option_images(card, idx, swipe_used)
@@ -192,6 +192,30 @@ class AssetPopulator
   rescue => e
     Rails.logger.error("[AssetPopulator] #{e.class}: #{e.message}")
     nil
+  end
+
+  # Apply a media pick hash onto a card. A card holds EITHER a photo (`image`)
+  # OR a video (`video` + `video_poster`) in its left panel — set one and clear
+  # the other so a re-populate/shuffle can switch a card between the two. The
+  # credit fields are shared (the renderer labels them "Photo by"/"Video by").
+  def apply_card_media(card, picked)
+    if picked["video"].present?
+      card["video"]        = picked["video"]
+      card["video_poster"] = picked["video_poster"]
+      card.delete("image")
+    else
+      card["image"] = picked["image"]
+      card.delete("video")
+      card.delete("video_poster")
+    end
+
+    if picked["image_credit"].present?
+      card["image_credit"]     = picked["image_credit"]
+      card["image_credit_url"] = picked["image_credit_url"]
+    else
+      card.delete("image_credit")
+      card.delete("image_credit_url")
+    end
   end
 
   private
@@ -232,20 +256,27 @@ class AssetPopulator
   # primary source so coverage isn't limited to the themes the curated library
   # happens to hold; the curated two-tier logic is the fallback.
   #
-  # Returns a hash { "image" => url, "image_credit" => name?, "image_credit_url"
-  # => url? } or nil. Only Pexels picks carry a credit.
-  def pick_card_image_path(card, idx, used)
+  # Returns a media hash — a photo { "image", "image_credit", "image_credit_url" }
+  # or a video { "video", "video_poster", "image_credit", "image_credit_url" } —
+  # or nil. Only Pexels picks carry a credit. `prefer_video` asks for a video
+  # first (used to mix media); it falls back to a photo when no video is found.
+  def pick_card_image_path(card, idx, used, prefer_video: false)
     type = card["type"].to_s
     return nil if type == "tap_card"
 
-    if PexelsClient.configured? && (photo = pexels_card_photo(card, idx, used))
-      url = PexelsClient.url_for(photo, :card)
-      used << url
-      return {
-        "image"            => url,
-        "image_credit"     => photo["photographer"].to_s.strip.presence,
-        "image_credit_url" => photo["photographer_url"].to_s.strip.presence
-      }
+    if PexelsClient.configured?
+      if prefer_video && (vid = pexels_card_video(card, idx, used))
+        return vid
+      end
+      if (photo = pexels_card_photo(card, idx, used))
+        url = PexelsClient.url_for(photo, :card)
+        used << url
+        return {
+          "image"            => url,
+          "image_credit"     => photo["photographer"].to_s.strip.presence,
+          "image_credit_url" => photo["photographer_url"].to_s.strip.presence
+        }
+      end
     end
 
     if (path = tier1_themed_path(card, idx, used, type))
@@ -375,6 +406,38 @@ class AssetPopulator
     return nil if photos.empty?
     ordered = photos.shuffle(random: rand_for("px-#{idx}"))
     ordered.find { |p| !used.include?(PexelsClient.url_for(p, :card)) } || ordered.first
+  end
+
+  # A portrait video for one card's left panel, returned as a media hash. Picks
+  # a small streamable mp4 + its poster, and the videographer credit. nil when
+  # no usable video is found (caller falls back to a photo).
+  def pexels_card_video(card, idx, used)
+    videos = pexels_videos(card_query(card))
+    return nil if videos.empty?
+
+    ordered = videos.shuffle(random: rand_for("pxv-#{idx}"))
+    chosen  = ordered.find { |v| (u = PexelsClient.video_file_url(v)) && !used.include?(u) }
+    url     = chosen && PexelsClient.video_file_url(chosen)
+    return nil unless url
+
+    used << url
+    credit = PexelsClient.video_credit(chosen)
+    {
+      "video"            => url,
+      "video_poster"     => PexelsClient.video_poster(chosen),
+      "image_credit"     => credit["name"],
+      "image_credit_url" => credit["url"]
+    }
+  end
+
+  # Memoised portrait video search (one API call per distinct query per run).
+  def pexels_videos(query)
+    return [] unless PexelsClient.configured?
+    @pexels_video_cache[query] ||= begin
+      results = PexelsClient.new.search_videos(query: query, orientation: "portrait", per_page: 15)
+      Rails.logger.info("[AssetPopulator] pexels video q=#{query.inspect} -> #{results.size} result(s)")
+      results
+    end
   end
 
   # One landscape per tap_card statement, unique within the card and preferring

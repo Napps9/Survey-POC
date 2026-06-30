@@ -7,9 +7,12 @@
       mode     — :editor, :preview, or :player (default: :preview)
 %>
 <%
-  mode    ||= :preview
-  editable = (mode == :editor)
-  has_img  = card["image"].present?
+  mode      ||= :preview
+  editable   = (mode == :editor)
+  has_video  = card["video"].present?
+  has_img    = card["image"].present?
+  has_media  = has_video || has_img
+  credit_word = has_video ? "Video by" : "Photo by"
 %>
 
 <div class="split-left">
@@ -18,18 +21,30 @@
         slider value (1–5). The lottie-player controller listens for the
         `nps:valueChanged` event dispatched by the slider on the right. %>
     <%= render_nps_reaction(initial_value: 1) %>
-  <% elsif has_img %>
-    <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
-         style="background-image:url('<%= card["image"] %>');"></div>
+  <% elsif has_media %>
+    <% if has_video %>
+      <%# Autoplaying, looped, muted card video. preload="none" + poster keeps
+          off-screen cards at zero bytes; the autoplay-video controller plays
+          only while the card is on screen and pauses otherwise. %>
+      <video class="split-left-video"<%= " data-card-media".html_safe if editable %>
+             muted loop playsinline autoplay preload="none"
+             data-controller="autoplay-video"
+             <% if card["video_poster"].present? %>poster="<%= card["video_poster"] %>"<% end %>>
+        <source src="<%= card["video"] %>" type="video/mp4">
+      </video>
+    <% else %>
+      <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
+           style="background-image:url('<%= card["image"] %>');"></div>
+    <% end %>
     <div class="split-left-overlay"<%= " data-card-media".html_safe if editable %>></div>
-    <%# Subtle photographer credit (Pexels picks). Doubles as the link back to
+    <%# Subtle creator credit (Pexels picks). Doubles as the link back to
         Pexels the API guidelines ask for. %>
     <% if card["image_credit"].present? %>
       <div class="split-left-credit"<%= " data-card-media".html_safe if editable %>>
         <% if card["image_credit_url"].present? %>
-          <a href="<%= card["image_credit_url"] %>" target="_blank" rel="noopener nofollow">Photo by <%= card["image_credit"] %></a>
+          <a href="<%= card["image_credit_url"] %>" target="_blank" rel="noopener nofollow"><%= credit_word %> <%= card["image_credit"] %></a>
         <% else %>
-          Photo by <%= card["image_credit"] %>
+          <%= credit_word %> <%= card["image_credit"] %>
         <% end %>
       </div>
     <% end %>
@@ -44,7 +59,7 @@
       in the editor (e.g. range → NPS → range) finds it ready to reappear.
       CSS hides it while a Lottie is mounted (.split-left:has(.nps-lottie) …). %>
   <% if editable %>
-    <% if has_img %>
+    <% if has_media %>
       <button type="button" class="add-media-fab"
               data-action="click->media-picker#open"
               title="<%= t("editor.change_media_title") %>">

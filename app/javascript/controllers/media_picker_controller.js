@@ -45,7 +45,7 @@ export default class extends Controller {
     // away — uploading your own image is one click away on the other tab.
     this._switchTabKey("library")
 
-    const currentUrl = card.dataset.cardImage || ""
+    const currentUrl = card.dataset.cardImage || card.dataset.cardVideo || ""
     this.clearBtnTarget.hidden = !currentUrl
 
     this._renderRecommended(this._parseUrls(card.dataset.cardRecommendedImages), "Recommended for this card")
@@ -385,8 +385,12 @@ export default class extends Controller {
     card.dataset.cardImage = url || ""
     card.dataset.cardImageCredit = url ? (credit || "") : ""
     card.dataset.cardImageCreditUrl = url ? (creditUrl || "") : ""
+    // Picking/clearing a photo replaces any auto-populated video on this card.
+    card.dataset.cardVideo = ""
+    card.dataset.cardVideoPoster = ""
     const left = card.querySelector(".split-left")
     if (!left) return
+    left.querySelector(".split-left-video[data-card-media]")?.remove()
     let imgEl = left.querySelector(".split-left-img[data-card-media]")
     let ovEl  = left.querySelector(".split-left-overlay[data-card-media]")
     if (url) {
