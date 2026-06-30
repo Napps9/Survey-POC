@@ -823,36 +823,35 @@
 }
 
 /* ── Slider ─────────────────────────────────────── */
-.slider-wrap { display: flex; flex-direction: column; gap: 14px; padding-top: 30px; }
-.slider-track-wrap { position: relative; padding: 26px 0 10px; }
+.slider-wrap { display: flex; flex-direction: column; gap: 14px; padding-top: 12px; }
+.slider-track-wrap { position: relative; padding: 8px 0; }
 .slider-track {
-  height: 8px;
+  height: 48px;
   background: linear-gradient(90deg, #d0e8ff 0%, #01EACB 43%, #ffd88a 100%);
-  border-radius: 4px;
+  border-radius: 999px;
   position: relative;
   cursor: pointer;
   display: flex; align-items: center;
   touch-action: none;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.12);
 }
 .s-dot {
   position: absolute;
-  width: 16px; height: 16px;
+  width: 14px; height: 14px;
   border-radius: 50%;
-  background: white;
-  border: 2px solid rgba(0,0,0,0.1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
   top: 50%; transform: translate(-50%, -50%);
 }
-.s-dot.active {
-  border-color: var(--brand-primary, var(--color-green-500));
-  box-shadow: 0 0 0 6px var(--brand-primary-soft, rgba(1,234,203,0.1));
-}
+.s-dot.active { background: white; }
+/* The thumb rides on the thick pill track — sized to pop just proud of it. */
 .slider-thumb {
   position: absolute; top: 50%;
-  width: 68px; height: 68px;
+  width: 56px; height: 56px;
   background: var(--brand-primary, var(--color-green-500));
   border-radius: 50%;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+  border: 3px solid white;
   display: flex; align-items: center; justify-content: center;
   gap: 5px;
   transform: translate(-50%, -50%);
@@ -1744,8 +1743,9 @@
 .phone-bottom .choice-grid-3 .choice-card-bg { height: 44px; }
 .phone-bottom .choice-label { font-size: 10px; padding: 2px 4px; margin-top: 4px; }
 
-.phone-bottom .slider-wrap { gap: 8px; padding-top: 18px; }
-.phone-bottom .slider-thumb { width: 50px; height: 50px; }
+.phone-bottom .slider-wrap { gap: 8px; padding-top: 8px; }
+.phone-bottom .slider-track { height: 38px; }
+.phone-bottom .slider-thumb { width: 44px; height: 44px; }
 .phone-bottom .slider-label-text { font-size: 11px; }
 
 .phone-bottom .freeform-wrap { padding: 8px; }
@@ -3168,8 +3168,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .pick-item { padding: 12px 14px; }
   .rating-star { font-size: 36px; padding: 4px; }
   .rating-stars { gap: 6px; }
-  .slider-track { width: 100%; }
-  .slider-thumb { width: 72px; height: 72px; }
+  .slider-track { width: 100%; height: 44px; }
+  .slider-thumb { width: 52px; height: 52px; }
 
   /* ═════════════════════════════════════════════════════════════════
      PLAYER (`/play/:token`) — lego.playverto.com mobile pattern
