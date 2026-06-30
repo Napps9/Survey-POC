@@ -179,76 +179,66 @@
 /* NPS: vertical 5-step pill slider on the right, reactive Lottie animation
    on the left. The slider dispatches `nps:valueChanged` on each step, which
    the lottie-player controller listens for. */
-/* NPS 0–10 scale: a centred horizontal row of number tiles. Tap (or drag
-   across) to pick; the chosen tile fills with brand primary. The tile
-   "container" silhouette is themed per Verto (.nps-shape-*). */
-.nps-scale {
+.nps-slider {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
-  padding: 8px 0;
+  padding: 4px 0 2px;
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
   cursor: pointer;
   outline: none;
 }
-.nps-scale:focus-visible { box-shadow: 0 0 0 3px var(--brand-primary-soft, rgba(1,234,203,0.4)); border-radius: 18px; }
-.nps-scale-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-}
-.nps-tile {
-  flex: 1 1 0;
-  min-width: 0;
-  max-width: 46px;
-  aspect-ratio: 1 / 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: "Alata", sans-serif;
-  font-size: clamp(11px, 2.6vw, 16px);
-  font-weight: 600;
-  color: rgba(0,0,0,0.6);
-  background: rgba(0,0,0,0.05);
-  border: 2px solid rgba(0,0,0,0.12);
-  transition: background 0.12s, color 0.12s, transform 0.12s, border-color 0.12s;
-}
-.nps-tile.is-active {
-  background: var(--brand-primary, #01EACB);
-  border-color: var(--brand-primary, #01EACB);
-  color: #fff;
-  transform: scale(1.12);
-}
-.nps-scale-ends {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 2px;
-}
-.nps-end {
-  font-family: "ABeeZee", sans-serif;
-  font-size: 12px;
-  color: rgba(0,0,0,0.55);
-  outline: none;
-  max-width: 45%;
-}
-.nps-end:first-child  { text-align: left; }
-.nps-end:last-child   { text-align: right; }
+.nps-slider[data-nps-slider-axis-value="vertical"]   { cursor: ns-resize; }
+.nps-slider[data-nps-slider-axis-value="horizontal"] { cursor: ew-resize; }
+.nps-slider:focus-visible { box-shadow: 0 0 0 3px var(--brand-primary-soft, rgba(1,234,203,0.4)); border-radius: 18px; }
 
-/* Themed container silhouettes — picked deterministically per Verto theme.
-   Clipped shapes (hex/ticket) cut the border, so they read as a filled
-   silhouette; the rounded shapes keep their outline. */
-.nps-shape-circle   .nps-tile { border-radius: 50%; }
-.nps-shape-squircle .nps-tile { border-radius: 30%; }
-.nps-shape-hex      .nps-tile { clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
-.nps-shape-blob     .nps-tile { border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%; }
-.nps-shape-ticket   .nps-tile { clip-path: polygon(0 12%, 12% 0, 88% 0, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0 88%); }
+/* Labels-beside-slider stage. Labels in a vertical column, slider on the
+   right; gap keeps them visually attached. */
+.nps-slider-stage {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 14px;
+}
+
+/* RIGHT panel: the slider track. Pill shape via border + border-radius;
+   overflow:hidden clips the rising fill to the pill interior. */
+.nps-control {
+  position: relative;
+  width: 80px;
+  height: 320px;
+  border: 4px solid #1a1a1a;
+  border-radius: 40px;
+  background: rgba(255,255,255,0.6);
+  overflow: hidden;
+}
+.nps-track-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--nps-fill, 0) * 100%);
+  background: var(--brand-primary, #01EACB);
+  transition: height 0.22s cubic-bezier(.34,1.2,.64,1);
+  pointer-events: none;
+}
+.nps-thumb {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand-primary, #01EACB);
+  border: 4px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transform: translate(-50%, -50%);
+  transition: top 0.18s cubic-bezier(.34,1.2,.64,1), left 0.18s cubic-bezier(.34,1.2,.64,1);
+  cursor: grab;
+}
 
 /* LEFT panel: the Lottie mount. lottie-web injects an <svg> into the
    .nps-lottie-mount child; the wrapper fills the left panel. */
@@ -283,6 +273,30 @@
 .nps-lottie-mount svg {
   width: 100% !important;
   height: 100% !important;
+}
+
+/* Labels: vertical column, top label = highest value. column-reverse keeps
+   source order (1..5) but flips the visual stack so source-index 0 sits at
+   the bottom, aligning with the slider's bottom step. Each label takes an
+   equal 1/N share of the column height (flex:1) and centres its text
+   vertically — so the label centres land at 10%, 30%, 50%, 70%, 90% of
+   the column for 5 steps, exactly where the inset thumb travels. */
+.nps-slider-labels {
+  display: flex;
+  flex-direction: column-reverse;
+  height: 320px;
+  min-width: 110px;
+}
+.nps-slider-labels .slider-label-text {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+}
+.nps-slider-labels .slider-label-text.is-active {
+  color: var(--brand-primary, #01EACB);
+  font-weight: 700;
 }
 
 .split-right {
@@ -3314,17 +3328,35 @@ body.generating-overlay-active .bottom-bar { display: none; }
     max-height: 30vh;
   }
 
-  /* NPS on mobile: drop the media "header" panel entirely and give the 0–10
-     tile scale the whole card, centred — the scale is self-contained and
-     reads better full-width on a phone. */
-  .preview-overlay .split-card:has(.nps-scale) .split-left { display: none; }
-  .preview-overlay .split-card:has(.nps-scale) .split-right {
-    flex: 1 1 auto;
-    height: auto;
+  /* NPS slider on mobile: shrink the vertical track + thumb so the whole
+     control (with all 5 labels) fits between the question and the bottom
+     of the card on a real-world Safari viewport (~390×664 with the URL
+     bar in view). */
+  .preview-overlay .nps-control {
+    width: 56px;
+    height: 200px;
+    border-width: 3px;
+    border-radius: 28px;
   }
-  .preview-overlay .nps-scale { gap: 10px; }
-  .preview-overlay .nps-scale-row { gap: 4px; }
-  .preview-overlay .nps-end { font-size: 12px; }
+  .preview-overlay .nps-thumb {
+    width: 28px;
+    height: 28px;
+    border-width: 3px;
+  }
+  .preview-overlay .nps-slider { gap: 8px; }
+  .preview-overlay .nps-slider-stage { gap: 12px; }
+  .preview-overlay .nps-slider-labels {
+    /* match the shrunk .nps-control height so labels align with steps */
+    height: 200px;
+    min-width: 110px;
+  }
+  /* Label text sized to read in line with the rest of the platform's body
+     copy — the 11px sized version felt too small next to the 26px q-title. */
+  .preview-overlay .nps-slider-labels .slider-label-text {
+    font-size: 14px;
+    font-family: "ABeeZee", sans-serif;
+    line-height: 1.25;
+  }
   /* Panel progress bar visible on every mobile card — matches the
      desktop pattern (dark translucent track + white fill). */
   .preview-overlay .split-card .panel-progress {
@@ -3959,7 +3991,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .preview-card.quiz-locked .choice-grid,
 .preview-card.quiz-locked .rotate-wrap,
 .preview-card.quiz-locked .slider-wrap,
-.preview-card.quiz-locked .nps-scale,
+.preview-card.quiz-locked .nps-slider,
 .preview-card.quiz-locked .rating-wrap,
 .preview-card.quiz-locked .freeform-wrap { pointer-events: none; }
 

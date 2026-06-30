@@ -55,21 +55,6 @@ module ApplicationHelper
 
   STAR_RATING_ICON = { on: "★", off: "☆", kind: "star" }.freeze
 
-  # The NPS 0–10 number tiles sit in a "container" whose silhouette is chosen
-  # per Verto, so the scale feels native to each one rather than a generic row
-  # of squares. The pick is deterministic from the theme (stable across
-  # processes/deploys via a digest, not String#hash), so a given Verto always
-  # gets the same shape. Maps to a CSS class `nps-shape-<name>`.
-  NPS_TILE_SHAPES = %w[circle squircle hex blob ticket].freeze
-
-  def nps_tile_shape(survey)
-    theme = survey&.theme.to_s.strip.downcase
-    return NPS_TILE_SHAPES.first if theme.empty?
-
-    idx = Integer(Digest::SHA256.hexdigest(theme)[0, 8], 16) % NPS_TILE_SHAPES.size
-    NPS_TILE_SHAPES[idx]
-  end
-
   def rating_icon(survey)
     signal = %i[theme title key_insight]
              .filter_map { |m| survey.public_send(m) if survey.respond_to?(m) }
