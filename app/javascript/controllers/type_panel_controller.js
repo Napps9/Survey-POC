@@ -240,9 +240,10 @@ function gridHtml(opts, mode) {
       ${opts.map((o,i) => `
         <li class="choice-card" data-picker-target="item"
             data-action="click->picker#pick" data-selected="false">
-          <div class="choice-card-bg choice-bg-${(i % 6) + 1}"></div>
-          <div class="choice-overlay"></div>
-          <div class="choice-tick">✓</div>
+          <div class="choice-card-bg choice-bg-${(i % 6) + 1}">
+            <div class="choice-overlay"></div>
+            <div class="choice-tick">✓</div>
+          </div>
           <div class="choice-label" contenteditable="true">${esc(o)}</div>
         </li>`).join("")}
     </ul>`

@@ -146,14 +146,15 @@
               data-canonical="<%= canon[i] %>"
               data-correct="<%= mark_correct.call(canon[i]) %>"
               data-selected="false">
-            <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>"></div>
-            <div class="choice-overlay"></div>
-            <div class="choice-tick">✓</div>
+            <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>">
+              <div class="choice-overlay"></div>
+              <div class="choice-tick">✓</div>
+              <% if quiz_mode %>
+                <button type="button" class="mark-correct mark-correct-grid" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
+                        data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
+              <% end %>
+            </div>
             <div class="choice-label" <%= ce_attr %>><%= opt %></div>
-            <% if quiz_mode %>
-              <button type="button" class="mark-correct mark-correct-grid" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
-                      data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
-            <% end %>
           </li>
         <% end %>
       </ul>

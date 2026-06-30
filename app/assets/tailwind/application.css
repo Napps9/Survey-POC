@@ -963,19 +963,29 @@
 .choice-grid-3  { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .choice-card {
   position: relative;
-  height: 100px;
+  display: flex;
+  flex-direction: column;
   border-radius: 14px;
-  overflow: hidden;
   cursor: pointer;
   transition: transform 0.15s;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   outline: 0 solid var(--brand-primary, var(--color-green-500));
-  outline-offset: 0;
+  outline-offset: 2px;
 }
-.choice-grid-3 .choice-card { height: 84px; }
 .choice-card:hover { transform: scale(1.02); }
 .choice-card[data-selected="true"] { outline-width: 3px; }
-.choice-card-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+/* The coloured/image tile. The label now sits BELOW it (see .choice-label) so
+   text never overlaps the artwork. flex:1 lets the tile fill taller cells
+   (mobile stretches the grid), height pins it in the fixed desktop layout. */
+.choice-card-bg {
+  position: relative;
+  flex: 1 1 auto;
+  height: 74px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  background-size: cover; background-position: center;
+}
+.choice-grid-3 .choice-card-bg { height: 58px; }
 .choice-bg-1 { background: linear-gradient(135deg, #d4edda, #a8d5b5); }
 .choice-bg-2 { background: linear-gradient(135deg, #d1ecf1, #9fd5df); }
 .choice-bg-3 { background: linear-gradient(135deg, #fff3cd, #ffd88a); }
@@ -984,10 +994,11 @@
 .choice-bg-6 { background: linear-gradient(135deg, #d0e8ff, #9fcfff); }
 .choice-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(transparent 45%, rgba(0,0,0,0.4));
+  background: transparent;
+  transition: background 0.15s;
 }
 .choice-card[data-selected="true"] .choice-overlay {
-  background: linear-gradient(transparent 45%, rgba(0,100,40,0.35));
+  background: rgba(0,100,40,0.28);
 }
 .choice-tick {
   display: none;
@@ -1002,14 +1013,14 @@
 }
 .choice-card[data-selected="true"] .choice-tick { display: flex; }
 .choice-label {
-  position: absolute; bottom: 8px; left: 0; right: 0;
+  margin-top: 7px;
   text-align: center;
   font-family: "Alata", sans-serif;
   font-size: 12px;
   font-weight: 600;
-  color: white;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-  padding: 0 8px;
+  color: #1C2034;
+  line-height: 1.2;
+  padding: 0 2px;
   outline: none;
 }
 
@@ -1691,9 +1702,9 @@
 .phone-bottom .choice-list-tile { width: 40px; height: 40px; border-radius: 8px; }
 
 .phone-bottom .choice-grid { gap: 6px; }
-.phone-bottom .choice-card { height: 64px; border-radius: 10px; }
-.phone-bottom .choice-grid-3 .choice-card { height: 52px; }
-.phone-bottom .choice-label { font-size: 10px; padding: 3px 6px; }
+.phone-bottom .choice-card-bg { height: 56px; border-radius: 10px; }
+.phone-bottom .choice-grid-3 .choice-card-bg { height: 44px; }
+.phone-bottom .choice-label { font-size: 10px; padding: 2px 4px; margin-top: 4px; }
 
 .phone-bottom .slider-wrap { gap: 6px; padding-top: 16px; }
 .phone-bottom .slider-thumb { width: 38px; height: 38px; }
@@ -3408,8 +3419,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
   /* Default grid (non-image-tile contexts) still collapses 3→2 for readability */
   .choice-grid-3  { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .choice-grid-3 .choice-card { height: 76px; }
-  .choice-label   { font-size: 12px; padding: 4px 6px; }
+  .choice-grid-3 .choice-card-bg { height: 60px; }
+  .choice-label   { font-size: 12px; padding: 2px 4px; }
 
   /* Mobile-specific player tweaks live here — the footer-hide and
      advance-chip styles are now global (search "Player: footer hidden"). */
