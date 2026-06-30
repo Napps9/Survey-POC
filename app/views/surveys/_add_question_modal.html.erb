@@ -19,7 +19,7 @@
     <%# ════════════════════════════════════════════
         STEP 1 — Choice: Generate vs Start from Blank
         ════════════════════════════════════════════ %>
-    <div data-add-question-target="stepChoice">
+    <div class="aq-step" data-add-question-target="stepChoice">
       <div class="aq-modal-body">
         <div class="aq-choice-grid">
 
@@ -55,7 +55,7 @@
     <%# ════════════════════════════════════════════
         STEP: Generating — loading state
         ════════════════════════════════════════════ %>
-    <div data-add-question-target="stepGenerating" hidden>
+    <div class="aq-step" data-add-question-target="stepGenerating" hidden>
       <div class="aq-modal-body aq-loading-body">
         <div class="aq-spinner"></div>
         <div class="aq-loading-text">Generating a question…</div>
@@ -66,7 +66,7 @@
     <%# ════════════════════════════════════════════
         STEP B-1 — Pick question type
         ════════════════════════════════════════════ %>
-    <div data-add-question-target="stepPickType" hidden>
+    <div class="aq-step" data-add-question-target="stepPickType" hidden>
       <div class="aq-modal-body">
         <div class="aq-type-grid">
           <% CardTypes.pickable.each do |key, t| %>
@@ -94,7 +94,7 @@
     <%# ════════════════════════════════════════════
         STEP B-2 — Fill in question details
         ════════════════════════════════════════════ %>
-    <div data-add-question-target="stepDetails" hidden>
+    <div class="aq-step" data-add-question-target="stepDetails" hidden>
       <div class="aq-modal-body">
 
         <%# Selected type badge %>

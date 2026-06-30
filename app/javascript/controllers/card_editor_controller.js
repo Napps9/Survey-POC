@@ -53,17 +53,12 @@ export default class extends Controller {
     const card = document.createElement("div")
     card.className = "rotate-card"
     card.dataset.tapStackTarget = "card"
-    if (newImage) {
-      card.style.background = `#fff url('${newImage}') center/cover no-repeat`
-    } else {
-      const [a, b] = SWIPE_FILLS[n % SWIPE_FILLS.length]
-      card.style.background = `linear-gradient(135deg,${a},${b})`
-    }
-    const textStyle = newImage
-      ? "font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;background:rgba(255,255,255,0.92);padding:8px 16px;border-radius:999px;box-shadow:0 1px 3px rgba(0,0,0,0.08);max-width:80%;"
-      : "font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;"
+    const mediaBg = newImage
+      ? `#fff url('${newImage}') center/cover no-repeat`
+      : `linear-gradient(135deg,${SWIPE_FILLS[n % SWIPE_FILLS.length].join(",")})`
     card.innerHTML = `
-      <span contenteditable="true" style="${textStyle}">New statement</span>
+      <div class="rotate-card-media" style="background:${mediaBg}"></div>
+      <div class="rotate-card-caption"><span contenteditable="true">New statement</span></div>
       <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption">×</button>
     `
     stack.appendChild(card)
