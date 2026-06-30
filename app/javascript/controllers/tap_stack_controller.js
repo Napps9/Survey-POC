@@ -5,7 +5,7 @@ import { Controller } from "@hotwired/stimulus"
 // On click, the top card animates off-screen in that direction and the
 // next card surfaces.
 export default class extends Controller {
-  static targets = ["card", "counter"]
+  static targets = ["card", "counter", "dots"]
 
   connect() {
     this.position = 0
@@ -53,6 +53,7 @@ export default class extends Controller {
 
   layout() {
     const total = this.cardTargets.length
+    this._syncDots(total)
     this.cardTargets.forEach((card, i) => {
       const offset = i - this.position
       if (offset < 0) {
@@ -73,5 +74,22 @@ export default class extends Controller {
     if (this.hasCounterTarget) {
       this.counterTarget.textContent = `${Math.min(this.position + 1, total)} / ${total}`
     }
+  }
+
+  // One dot per card; dots before the current position read as "done", the
+  // current one is "active", the rest are upcoming — a remaining-cards gauge.
+  _syncDots(total) {
+    if (!this.hasDotsTarget) return
+    const box = this.dotsTarget
+    while (box.children.length < total) {
+      const d = document.createElement("span")
+      d.className = "rotate-dot"
+      box.appendChild(d)
+    }
+    while (box.children.length > total) box.lastElementChild.remove()
+    Array.from(box.children).forEach((dot, i) => {
+      dot.classList.toggle("done", i < this.position)
+      dot.classList.toggle("active", i === this.position)
+    })
   }
 }

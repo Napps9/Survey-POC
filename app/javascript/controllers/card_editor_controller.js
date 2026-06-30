@@ -9,7 +9,12 @@ export default class extends Controller {
   deleteOption(event) {
     event.stopPropagation()
     const item = event.currentTarget.closest(".pick-item, .rotate-card")
-    if (item) { item.remove(); this.dispatch("changed") }
+    if (!item) return
+    const wasTapCard = item.classList.contains("rotate-card")
+    item.remove()
+    this.dispatch("changed")
+    // Re-layout the stack so the remaining-cards dots update.
+    if (wasTapCard) this.element.dispatchEvent(new Event("tap-stack:reset"))
   }
 
   addPickOption() {

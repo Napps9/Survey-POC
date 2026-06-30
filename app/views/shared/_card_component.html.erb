@@ -162,7 +162,8 @@
     <% when "tap_card" %>
       <% option_images = Array(card["option_images"]) %>
       <div class="rotate-wrap"
-           data-controller="<%= editable ? 'tap-stack card-editor' : 'tap-stack' %>">
+           data-controller="<%= editable ? 'tap-stack card-editor' : 'tap-stack' %>"
+           data-action="tap-stack:reset->tap-stack#reset">
         <div class="rotate-card-stack">
           <% Array(display["options"]).each_with_index do |opt, i| %>
             <% img = option_images[i] %>
@@ -183,36 +184,40 @@
               <% end %>
             </div>
           <% end %>
+
+          <%# Controls live INSIDE the card: three responses (No swipe-left,
+              Unsure swipe-up off the top, Yes swipe-right) over a bottom scrim,
+              and the remaining-cards dots. The controller builds the dots. %>
+          <div class="rotate-card-controls">
+            <div class="rotate-actions rotate-actions-3">
+              <div class="rotate-action">
+                <button type="button" class="rotate-action-btn rotate-action-no"
+                        data-action="click->tap-stack#pick"
+                        data-tap-stack-direction="left"
+                        aria-label="<%= t("card.swipe_no") %>">👎</button>
+                <span class="rotate-action-label"><%= t("card.swipe_no") %></span>
+              </div>
+              <div class="rotate-action">
+                <button type="button" class="rotate-action-btn rotate-action-unsure"
+                        data-action="click->tap-stack#pick"
+                        data-tap-stack-direction="up"
+                        aria-label="<%= t("card.swipe_unsure", default: "Unsure") %>">☝</button>
+                <span class="rotate-action-label"><%= t("card.swipe_unsure", default: "Unsure") %></span>
+              </div>
+              <div class="rotate-action">
+                <button type="button" class="rotate-action-btn rotate-action-yes"
+                        data-action="click->tap-stack#pick"
+                        data-tap-stack-direction="right"
+                        aria-label="<%= t("card.swipe_yes") %>">👍</button>
+                <span class="rotate-action-label"><%= t("card.swipe_yes") %></span>
+              </div>
+            </div>
+            <div class="rotate-dots" data-tap-stack-target="dots"></div>
+          </div>
         </div>
-        <div class="swipe-indicator"><%= t("card.swipe_hint") %></div>
-        <%# Three responses: No (swipe left), Unsure (swipe up — flies off the
-            top), Yes (swipe right). %>
-        <div class="rotate-actions rotate-actions-3">
-          <div class="rotate-action">
-            <button type="button" class="rotate-action-btn rotate-action-no"
-                    data-action="click->tap-stack#pick"
-                    data-tap-stack-direction="left"
-                    aria-label="<%= t("card.swipe_no") %>">👎</button>
-            <span class="rotate-action-label"><%= t("card.swipe_no") %></span>
-          </div>
-          <div class="rotate-action">
-            <button type="button" class="rotate-action-btn rotate-action-unsure"
-                    data-action="click->tap-stack#pick"
-                    data-tap-stack-direction="up"
-                    aria-label="<%= t("card.swipe_unsure", default: "Unsure") %>">☝</button>
-            <span class="rotate-action-label"><%= t("card.swipe_unsure", default: "Unsure") %></span>
-          </div>
-          <div class="rotate-action">
-            <button type="button" class="rotate-action-btn rotate-action-yes"
-                    data-action="click->tap-stack#pick"
-                    data-tap-stack-direction="right"
-                    aria-label="<%= t("card.swipe_yes") %>">👍</button>
-            <span class="rotate-action-label"><%= t("card.swipe_yes") %></span>
-          </div>
-        </div>
-        <div class="text-xs text-black/40 flex items-center gap-3">
-          <span data-tap-stack-target="counter"></span>
-          <button type="button" class="hover:text-green-500"
+
+        <div class="rotate-reset-row">
+          <button type="button" class="rotate-reset-btn"
                   data-action="click->tap-stack#reset">↺ <%= t("card.reset") %></button>
         </div>
         <% if editable %>
