@@ -46,9 +46,21 @@
 
       <%# Library pane %>
       <div data-media-picker-target="pane" data-pane="library" hidden>
-        <%# Pexels stock-photo search. Results render at the ratio of the slot
-            being filled (portrait for cards, landscape for the background). %>
+        <%# Pexels stock search. Results render at the ratio of the slot being
+            filled (portrait for cards, landscape for the background). The
+            Photos/Videos toggle is hidden for the background (videos can't be
+            a Verto backdrop). %>
         <div class="media-search">
+          <div class="media-search-toggle" data-media-picker-target="mediaToggle" role="tablist">
+            <button type="button" class="media-search-toggle-btn is-active"
+                    role="tab" aria-selected="true" data-media="photos"
+                    data-media-picker-target="mediaTab"
+                    data-action="click->media-picker#switchMedia">Photos</button>
+            <button type="button" class="media-search-toggle-btn"
+                    role="tab" aria-selected="false" data-media="videos"
+                    data-media-picker-target="mediaTab"
+                    data-action="click->media-picker#switchMedia">Videos</button>
+          </div>
           <input type="search"
                  class="media-search-input"
                  placeholder="Search stock photos…"

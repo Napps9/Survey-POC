@@ -14,9 +14,10 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
     )
   end
 
-  def fake_client(photos)
+  def fake_client(photos, videos = [])
     fake = Object.new
     fake.define_singleton_method(:search) { |**_kw| photos }
+    fake.define_singleton_method(:search_videos) { |**_kw| videos }
     fake
   end
 
@@ -26,6 +27,14 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
       "original" => "https://images.pexels.com/photos/7/p.jpg",
       "tiny"     => "https://images.pexels.com/photos/7/p.jpg?w=280&h=200&fit=crop"
     }
+  }.freeze
+
+  VIDEO = {
+    "id" => 88, "image" => "https://images.pexels.com/videos/88/poster.jpeg",
+    "user" => { "name" => "Sam Reel", "url" => "https://www.pexels.com/@sam" },
+    "video_files" => [
+      { "file_type" => "video/mp4", "width" => 720, "link" => "https://videos.pexels.com/video-files/88/hd.mp4" }
+    ]
   }.freeze
 
   test "returns landscape-cropped URLs for background context" do
@@ -51,6 +60,21 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
     assert_match %r{w=720&h=1280}, img["url"]
     assert_equal "Jane", img["photographer"]
     assert_equal "https://www.pexels.com/@jane", img["photographer_url"]
+  end
+
+  test "media=videos returns video items with the streamable mp4 + poster + credit" do
+    stub_method(PexelsClient, :configured?, true) do
+      stub_method(PexelsClient, :new, fake_client([], [ VIDEO ])) do
+        get pexels_search_survey_path(@survey), params: { q: "running", context: "card", media: "videos" }
+      end
+    end
+    assert_response :success
+    item = JSON.parse(response.body)["images"].first
+    assert_equal "video", item["type"]
+    assert_equal "https://videos.pexels.com/video-files/88/hd.mp4", item["video"]
+    assert_equal "https://images.pexels.com/videos/88/poster.jpeg", item["poster"]
+    assert_equal "Sam Reel", item["photographer"]
+    assert_equal "https://www.pexels.com/@sam", item["photographer_url"]
   end
 
   test "blank query returns empty list without calling Pexels" do

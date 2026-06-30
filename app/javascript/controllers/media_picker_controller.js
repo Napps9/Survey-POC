@@ -10,7 +10,8 @@ export default class extends Controller {
     "libraryItem", "applyBtn", "clearBtn",
     "bgThumb", "bgRemoveBtn",
     "recommendedSection", "recommendedLabel", "recommendedGrid",
-    "searchInput", "searchSection", "searchStatus", "searchGrid"
+    "searchInput", "searchSection", "searchStatus", "searchGrid",
+    "mediaToggle", "mediaTab"
   ]
   static values = { url: String, pexsearchUrl: String, theme: String, backgroundRecommended: Array }
 
@@ -26,7 +27,9 @@ export default class extends Controller {
   connect() {
     this._activeCard = null
     this._pendingUrl = null
+    this._pendingVideo = null
     this._mode = "card"
+    this._searchMedia = "photos"
     this._escListener = (e) => { if (e.key === "Escape") this.close() }
   }
 
@@ -40,10 +43,13 @@ export default class extends Controller {
     this._mode = "card"
     this._activeCard = card
     this._pendingUrl = null
+    this._pendingVideo = null
     this._setApplyEnabled(false)
     // Open on the Verto Library so the curated designs are visible straight
     // away — uploading your own image is one click away on the other tab.
     this._switchTabKey("library")
+    this._setMedia("photos")            // cards can be photo or video
+    this._showMediaToggle(true)
 
     const currentUrl = card.dataset.cardImage || card.dataset.cardVideo || ""
     this.clearBtnTarget.hidden = !currentUrl
@@ -61,8 +67,12 @@ export default class extends Controller {
     this._mode = "background"
     this._activeCard = null
     this._pendingUrl = null
+    this._pendingVideo = null
     this._setApplyEnabled(false)
     this._switchTabKey("library")
+    // Backgrounds are photos only — a video can't be a Verto backdrop.
+    this._setMedia("photos")
+    this._showMediaToggle(false)
     this.clearBtnTarget.hidden = !this._currentBg()
     this._renderRecommended(this.hasBackgroundRecommendedValue ? this.backgroundRecommendedValue : [], "Recommended backgrounds")
     this._seedSearch()
@@ -74,6 +84,7 @@ export default class extends Controller {
     this.backdropTarget.hidden = true
     this._activeCard = null
     this._pendingUrl = null
+    this._pendingVideo = null
     this._setApplyEnabled(false)
     this.libraryItemTargets.forEach(i => i.setAttribute("aria-selected", "false"))
     if (this.hasFileInputTarget) this.fileInputTarget.value = ""
@@ -201,9 +212,15 @@ export default class extends Controller {
     const item = event.currentTarget
     this.libraryItemTargets.forEach(i => i.setAttribute("aria-selected", "false"))
     item.setAttribute("aria-selected", "true")
-    this._pendingUrl = item.dataset.url
-    // Pexels results carry a photographer credit; curated/recommended tiles
-    // don't (these stay empty so the credit is cleared on apply).
+    if (item.dataset.video) {
+      this._pendingVideo = { video: item.dataset.video, poster: item.dataset.poster || "" }
+      this._pendingUrl = null
+    } else {
+      this._pendingUrl = item.dataset.url
+      this._pendingVideo = null
+    }
+    // Pexels results carry a creator credit; curated/recommended tiles don't
+    // (these stay empty so the credit is cleared on apply).
     this._pendingCredit    = item.dataset.credit || ""
     this._pendingCreditUrl = item.dataset.creditUrl || ""
     this._setApplyEnabled(true)
@@ -216,6 +233,32 @@ export default class extends Controller {
   // behaves exactly like a curated thumbnail.
   searchKeydown(event) {
     if (event.key === "Enter") { event.preventDefault(); this._runSearch() }
+  }
+
+  // Photos ↔ Videos toggle. Re-runs the current query against the chosen
+  // media type.
+  switchMedia(event) {
+    this._setMedia(event.currentTarget.dataset.media)
+    this._runSearch()
+  }
+
+  _setMedia(media) {
+    this._searchMedia = media === "videos" ? "videos" : "photos"
+    if (this.hasMediaTabTarget) {
+      this.mediaTabTargets.forEach(t => {
+        const on = t.dataset.media === this._searchMedia
+        t.classList.toggle("is-active", on)
+        t.setAttribute("aria-selected", on ? "true" : "false")
+      })
+    }
+    if (this.hasSearchInputTarget) {
+      this.searchInputTarget.placeholder = this._searchMedia === "videos"
+        ? "Search stock videos…" : "Search stock photos…"
+    }
+  }
+
+  _showMediaToggle(show) {
+    if (this.hasMediaToggleTarget) this.mediaToggleTarget.hidden = !show
   }
 
   // Pre-fill the search with the Verto theme and run it on open, so the picker
@@ -241,38 +284,47 @@ export default class extends Controller {
     if (!q) { this._clearSearch(); return }
 
     const context = this._mode === "background" ? "background" : "card"
+    const media   = this._searchMedia
+    const noun    = media === "videos" ? "videos" : "photos"
     this._showSearchStatus("Searching…")
     this.searchGridTarget.replaceChildren()
 
     const token = (this._searchToken = (this._searchToken || 0) + 1)
     try {
-      const url = `${this.pexsearchUrlValue}?q=${encodeURIComponent(q)}&context=${context}`
+      const url = `${this.pexsearchUrlValue}?q=${encodeURIComponent(q)}&context=${context}&media=${media}`
       const resp = await fetch(url, { headers: { "Accept": "application/json" } })
       const data = await resp.json()
       if (token !== this._searchToken) return // a newer search superseded this one
 
-      const images = Array.isArray(data.images) ? data.images : []
+      const items = Array.isArray(data.images) ? data.images : []
       if (data.error === "search_unavailable") {
-        this._showSearchStatus("Stock-photo search isn’t configured.")
+        this._showSearchStatus("Stock search isn’t configured.")
         return
       }
-      if (!images.length) {
-        this._showSearchStatus(data.error ? "Couldn’t reach the photo service." : "No photos found.")
+      if (!items.length) {
+        this._showSearchStatus(data.error ? "Couldn’t reach the stock service." : `No ${noun} found.`)
         return
       }
       this._showSearchStatus("")
       const frag = document.createDocumentFragment()
-      for (const img of images) {
-        if (!img || !img.url) continue
+      for (const item of items) {
+        const isVideo = item && item.type === "video"
+        if (!item || (!item.url && !item.video)) continue
         const btn = document.createElement("button")
         btn.type = "button"
-        btn.className = "media-library-item"
-        btn.title = img.photographer ? `Photo by ${img.photographer}` : (img.alt || "")
-        const thumb = img.thumb || img.url
-        btn.style.backgroundImage = `url('${String(thumb).replace(/'/g, "\\'")}')`
-        btn.dataset.url = img.url
-        if (img.photographer) btn.dataset.credit = img.photographer
-        if (img.photographer_url) btn.dataset.creditUrl = img.photographer_url
+        btn.className = isVideo ? "media-library-item is-video" : "media-library-item"
+        const verb = isVideo ? "Video" : "Photo"
+        btn.title = item.photographer ? `${verb} by ${item.photographer}` : (item.alt || "")
+        const thumb = item.thumb || item.poster || item.url
+        if (thumb) btn.style.backgroundImage = `url('${String(thumb).replace(/'/g, "\\'")}')`
+        if (isVideo) {
+          btn.dataset.video = item.video
+          if (item.poster) btn.dataset.poster = item.poster
+        } else {
+          btn.dataset.url = item.url
+        }
+        if (item.photographer) btn.dataset.credit = item.photographer
+        if (item.photographer_url) btn.dataset.creditUrl = item.photographer_url
         btn.dataset.mediaPickerTarget = "libraryItem"
         btn.dataset.action = "click->media-picker#pickLibraryItem"
         btn.setAttribute("aria-selected", "false")
@@ -280,7 +332,7 @@ export default class extends Controller {
       }
       this.searchGridTarget.appendChild(frag)
     } catch (_e) {
-      if (token === this._searchToken) this._showSearchStatus("Couldn’t reach the photo service.")
+      if (token === this._searchToken) this._showSearchStatus("Couldn’t reach the stock service.")
     }
   }
 
@@ -300,14 +352,19 @@ export default class extends Controller {
 
   // ── Apply / clear ──────────────────────────────────────
   applyImage() {
-    if (!this._pendingUrl) return
+    if (!this._pendingUrl && !this._pendingVideo) return
     if (this._mode === "background") {
-      this._setVertoBackground(this._pendingUrl)
-      this.close()
+      // Backgrounds are photos only (the video toggle is hidden here).
+      if (this._pendingUrl) { this._setVertoBackground(this._pendingUrl); this.close() }
       return
     }
     if (!this._activeCard) return
-    this._setCardImage(this._activeCard, this._pendingUrl, this._pendingCredit, this._pendingCreditUrl)
+    if (this._pendingVideo) {
+      this._setCardVideo(this._activeCard, this._pendingVideo.video, this._pendingVideo.poster,
+        this._pendingCredit, this._pendingCreditUrl)
+    } else {
+      this._setCardImage(this._activeCard, this._pendingUrl, this._pendingCredit, this._pendingCreditUrl)
+    }
     this._notifyDirty()
     this.close()
   }
@@ -415,8 +472,49 @@ export default class extends Controller {
     }
   }
 
-  // Add/update/remove the subtle photographer credit on a card's left panel.
-  _renderCardCredit(left, afterEl, credit, creditUrl) {
+  // Swap a card's left panel to an autoplaying video, mirroring the server
+  // render (the autoplay-video controller handles play/pause + lazy loading).
+  _setCardVideo(card, video, poster, credit = "", creditUrl = "") {
+    card.dataset.cardVideo = video || ""
+    card.dataset.cardVideoPoster = poster || ""
+    card.dataset.cardImage = ""
+    card.dataset.cardImageCredit = video ? (credit || "") : ""
+    card.dataset.cardImageCreditUrl = video ? (creditUrl || "") : ""
+    const left = card.querySelector(".split-left")
+    if (!left) return
+    left.querySelector(".split-left-img[data-card-media]")?.remove()
+    left.querySelector(".split-left-video[data-card-media]")?.remove()
+    if (!video) {
+      left.querySelector(".split-left-overlay[data-card-media]")?.remove()
+      left.querySelector(".split-left-credit[data-card-media]")?.remove()
+      return
+    }
+    const vid = document.createElement("video")
+    vid.className = "split-left-video"
+    vid.dataset.cardMedia = "true"
+    vid.muted = true; vid.loop = true; vid.autoplay = true
+    vid.setAttribute("playsinline", "")
+    vid.preload = "none"
+    if (poster) vid.poster = poster
+    vid.dataset.controller = "autoplay-video"
+    const source = document.createElement("source")
+    source.src = video
+    source.type = "video/mp4"
+    vid.appendChild(source)
+    left.prepend(vid)
+
+    let ovEl = left.querySelector(".split-left-overlay[data-card-media]")
+    if (!ovEl) {
+      ovEl = document.createElement("div")
+      ovEl.className = "split-left-overlay"
+      ovEl.dataset.cardMedia = "true"
+      vid.after(ovEl)
+    }
+    this._renderCardCredit(left, ovEl, credit, creditUrl, "Video")
+  }
+
+  // Add/update/remove the subtle creator credit on a card's left panel.
+  _renderCardCredit(left, afterEl, credit, creditUrl, verb = "Photo") {
     let el = left.querySelector(".split-left-credit[data-card-media]")
     if (!credit) { el?.remove(); return }
     if (!el) {
@@ -425,15 +523,16 @@ export default class extends Controller {
       el.dataset.cardMedia = "true"
       ;(afterEl || left.firstChild)?.after(el)
     }
+    const label = `${verb} by ${credit}`
     if (creditUrl) {
       const a = document.createElement("a")
       a.href = creditUrl
       a.target = "_blank"
       a.rel = "noopener nofollow"
-      a.textContent = `Photo by ${credit}`
+      a.textContent = label
       el.replaceChildren(a)
     } else {
-      el.textContent = `Photo by ${credit}`
+      el.textContent = label
     }
   }
 

@@ -234,7 +234,10 @@ class SurveysController < ApplicationController
   end
 
   # On-demand Pexels search for the editor media picker. `context` selects the
-  # aspect ratio: "background" → landscape, anything else → portrait card art.
+  # aspect ratio ("background" → landscape, else portrait card art); `media`
+  # selects photos (default) or videos. Returns a uniform `images` array whose
+  # items are tagged type:"photo" (carry `url`) or type:"video" (carry `video`
+  # + `poster`).
   def pexels_search
     Current.organisation.surveys.kept.find(params[:id]) # org-scope / 404 guard
     query   = params[:q].to_s.strip
@@ -246,17 +249,12 @@ class SurveysController < ApplicationController
     end
 
     orientation = PexelsClient::ORIENTATION_FOR[context]
-    photos = PexelsClient.new.search(query: query, orientation: orientation, per_page: 24)
-    images = photos.map do |p|
-      {
-        id:               p["id"],
-        url:              PexelsClient.url_for(p, context),
-        thumb:            (p["src"] || {})["tiny"],
-        photographer:     p["photographer"],
-        photographer_url: p["photographer_url"],
-        alt:              p["alt"]
-      }
-    end
+    images =
+      if params[:media].to_s == "videos"
+        pexels_video_results(query, orientation)
+      else
+        pexels_photo_results(query, orientation, context)
+      end
     render json: { images: images }
   rescue => e
     Rails.logger.error("[SurveysController#pexels_search] #{e.class}: #{e.message}")
@@ -447,6 +445,38 @@ class SurveysController < ApplicationController
   end
 
   private
+
+  def pexels_photo_results(query, orientation, context)
+    PexelsClient.new.search(query: query, orientation: orientation, per_page: 24).map do |p|
+      {
+        id:               p["id"],
+        type:             "photo",
+        url:              PexelsClient.url_for(p, context),
+        thumb:            (p["src"] || {})["tiny"],
+        photographer:     p["photographer"],
+        photographer_url: p["photographer_url"],
+        alt:              p["alt"]
+      }
+    end
+  end
+
+  def pexels_video_results(query, orientation)
+    PexelsClient.new.search_videos(query: query, orientation: orientation, per_page: 24).filter_map do |v|
+      url = PexelsClient.video_file_url(v)
+      next unless url
+      credit = PexelsClient.video_credit(v)
+      poster = PexelsClient.video_poster(v)
+      {
+        id:               v["id"],
+        type:             "video",
+        video:            url,
+        poster:           poster,
+        thumb:            poster,
+        photographer:     credit["name"],
+        photographer_url: credit["url"]
+      }
+    end
+  end
 
   def set_survey
     @survey = Current.organisation.surveys.kept.without_report_text.find(params[:id])
