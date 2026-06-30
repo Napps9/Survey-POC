@@ -13,6 +13,7 @@ export default class extends Controller {
     this.indexValue = parseInt(event.currentTarget.dataset.ratingIndex, 10)
     this._render()
     haptic()
+    this._burst(event.currentTarget)
     this.dispatch("pick", { detail: { index: this.indexValue } })
   }
 
@@ -34,5 +35,46 @@ export default class extends Controller {
       const off = star.dataset.ratingOff || "☆"
       star.textContent = active ? on : off
     })
+  }
+
+  // Confetti: when a rating is picked the tapped icon "explodes" into a burst
+  // of little copies of itself that fly out and fade. The pieces use the
+  // card's own icon (★ or the themed emoji), so it always matches the Verto.
+  _burst(originStar) {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
+    const stars = this.element.querySelector(".rating-stars")
+    if (!stars || !originStar) return
+
+    originStar.classList.remove("pop")
+    void originStar.offsetWidth // restart the pop animation if re-tapped
+    originStar.classList.add("pop")
+
+    const glyph = originStar.dataset.ratingOn || originStar.textContent || "★"
+    const sRect = originStar.getBoundingClientRect()
+    const cRect = stars.getBoundingClientRect()
+    const cx = sRect.left - cRect.left + sRect.width / 2
+    const cy = sRect.top - cRect.top + sRect.height / 2
+
+    const layer = document.createElement("div")
+    layer.className = "rating-burst"
+    const pieces = 14
+    for (let i = 0; i < pieces; i++) {
+      const angle = (Math.PI * 2 * i) / pieces + (Math.random() - 0.5) * 0.6
+      const dist  = 38 + Math.random() * 52
+      const p = document.createElement("span")
+      p.className = "rating-burst-piece"
+      p.textContent = glyph
+      p.style.left = `${cx}px`
+      p.style.top  = `${cy}px`
+      // Fly radially, then a touch of gravity pulls the end point down.
+      p.style.setProperty("--tx", `${Math.cos(angle) * dist}px`)
+      p.style.setProperty("--ty", `${Math.sin(angle) * dist + 22}px`)
+      p.style.setProperty("--r",  `${(Math.random() * 2 - 1) * 240}deg`)
+      p.style.setProperty("--s",  (0.5 + Math.random() * 0.6).toFixed(2))
+      p.style.setProperty("--d",  `${560 + Math.random() * 360}ms`)
+      layer.appendChild(p)
+    }
+    stars.appendChild(layer)
+    setTimeout(() => layer.remove(), 1100)
   }
 }

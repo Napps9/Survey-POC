@@ -2464,7 +2464,7 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 
 /* ── Rating component ────────────────────────────── */
 .rating-wrap   { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 20px; }
-.rating-stars  { display: flex; gap: 8px; }
+.rating-stars  { display: flex; gap: 8px; position: relative; }
 .rating-star {
   font-size: 40px;
   cursor: pointer;
@@ -2484,6 +2484,38 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   transition: opacity 0.12s, filter 0.12s, transform 0.12s;
 }
 .rating-kind-emoji .rating-star.active { filter: none; opacity: 1; }
+
+/* Confetti burst when a rating is picked — little copies of the icon fly out
+   from the tapped star and fade (skipped under prefers-reduced-motion in JS). */
+.rating-star.pop { animation: rating-pop 0.34s cubic-bezier(.2,.7,.3,1.4); }
+@keyframes rating-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+.rating-burst {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 20;
+}
+.rating-burst-piece {
+  position: absolute;
+  font-size: 22px;
+  line-height: 1;
+  color: #FFCC00;
+  will-change: transform, opacity;
+  animation: rating-confetti var(--d, 700ms) cubic-bezier(.15,.6,.4,1) forwards;
+}
+@keyframes rating-confetti {
+  0%   { transform: translate(-50%, -50%) scale(0.5) rotate(0deg); opacity: 1; }
+  15%  { opacity: 1; }
+  100% {
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty)))
+               scale(var(--s, 1)) rotate(var(--r, 180deg));
+    opacity: 0;
+  }
+}
 .rating-labels {
   display: flex; justify-content: space-between;
   width: 100%; padding: 0 4px;
