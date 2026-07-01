@@ -1,9 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 
-// NPS "liquid container": a vertical container (.nps-shape) that fills from the
-// bottom as the respondent taps/holds and drags up or down. .nps-track-fill
-// grows via --nps-fill; .nps-thumb is the draggable handle and shows the
-// current label. The chosen value is the 0-indexed scale position, stored on
+// NPS "liquid container": an SVG vessel (.nps-vessel) whose liquid fills from
+// the bottom as the respondent taps/holds and drags up or down. The .nps-liquid
+// group rises via --nps-fill (set on .nps-control); .nps-thumb is the draggable
+// handle and shows the current label. The chosen value is the 0-indexed scale
+// position, stored on
 // `data-nps-value` for the player to read. NPS starts UNANSWERED — the
 // container is empty and the thumb rests at the bottom until the first drag.
 //

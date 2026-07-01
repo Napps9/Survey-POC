@@ -207,45 +207,51 @@
   gap: 16px;
 }
 
-/* RIGHT panel: the "liquid container". .nps-control is the positioning box;
-   .nps-shape is the themed silhouette that holds the outline + clips the
-   rising fill; .nps-thumb sits OVER it (outside the clip) and shows the
-   current value. */
+/* RIGHT panel: the SVG "liquid container". .nps-control is the positioning
+   box; its width follows the vessel's aspect ratio (--nps-aspect, set inline
+   per shape) so each vessel keeps its true proportions at any height. The
+   <svg.nps-vessel> fills it; .nps-thumb sits OVER it and shows the value. */
 .nps-control {
   position: relative;
-  width: 84px;
+  width: auto;
   height: 320px;
+  aspect-ratio: var(--nps-aspect, 84 / 340);
   flex: 0 0 auto;
 }
-.nps-shape {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.05);
-  border: 3px solid #1a1a1a;
-  border-radius: 999px;
-  overflow: hidden;
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+.nps-vessel {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
-.nps-track-fill {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: calc(var(--nps-fill, 0) * 100%);
-  background: linear-gradient(180deg, var(--brand-primary, #01EACB), rgba(1,234,203,0.6));
-  transition: height 0.22s cubic-bezier(.34,1.2,.64,1);
-  pointer-events: none;
+/* The liquid group rises as --nps-fill (0..1, set by nps_slider_controller)
+   grows: at fill 0 it's translated fully below the vessel (empty); at fill 1
+   its surface reaches the brim (full). Waves + bubbles animate inside it, so
+   they only ever show within the fluid. */
+.nps-liquid {
+  transform: translateY(calc((1 - var(--nps-fill, 0)) * 306px));
+  transition: transform 0.24s cubic-bezier(.34,1.1,.64,1);
 }
-.nps-ticks {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column-reverse; justify-content: space-between;
-  padding: 14px 0;
-  pointer-events: none;
+.nps-wave  { animation: nps-wave 2.3s linear infinite; }
+.nps-wave2 { animation: nps-wave 3.5s linear infinite reverse; opacity: .5; }
+.nps-surface { animation: nps-bob 2.8s ease-in-out infinite; }
+.nps-bub {
+  animation: nps-rise var(--dur, 2.4s) ease-in infinite;
+  animation-delay: var(--d, 0s);
 }
-.nps-tick {
-  width: 26%;
-  height: 2px;
-  margin-left: 12%;
-  background: rgba(0,0,0,0.16);
-  border-radius: 2px;
+@keyframes nps-wave { from { transform: translateX(0); } to { transform: translateX(-65px); } }
+@keyframes nps-bob  { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
+@keyframes nps-rise {
+  0%   { transform: translate(0, 0) scale(.4); opacity: 0; }
+  12%  { opacity: .85; }
+  50%  { transform: translate(var(--sway, 0), calc(var(--rise, -120px) * .5)) scale(1); }
+  82%  { opacity: .7; }
+  100% { transform: translate(0, var(--rise, -120px)) scale(1.08); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nps-liquid { transition: none; }
+  .nps-wave, .nps-wave2, .nps-surface, .nps-bub { animation: none; }
+  .nps-bub { opacity: .55; }
 }
 .nps-thumb {
   position: absolute;
@@ -265,91 +271,6 @@
   cursor: grab;
   z-index: 3;
   transition: top 0.18s cubic-bezier(.34,1.2,.64,1);
-}
-
-/* Themed container silhouettes — chosen deterministically per Verto theme.
-   The shape class sits ON .nps-control, so per-container tweaks (width, the
-   popsicle stick) use a COMPOUND selector; the inner .nps-shape rules use a
-   descendant selector. */
-.nps-shape-pill .nps-shape { border-radius: 999px; }
-
-/* Test-tube: narrower, deep-rounded bottom. */
-.nps-control.nps-shape-tube { width: 56px; }
-.nps-shape-tube .nps-shape { border-radius: 28px 28px 999px 999px; }
-
-/* Tapered drinking glass. */
-.nps-shape-glass .nps-shape {
-  clip-path: polygon(6% 0, 94% 0, 78% 100%, 22% 100%);
-  border: none;
-  border-radius: 0;
-  background: rgba(0,0,0,0.08);
-  box-shadow: inset 0 -6px 10px rgba(0,0,0,0.05);
-}
-
-/* Popsicle: rounded bar on a stick. */
-.nps-control.nps-shape-popsicle { width: 96px; }
-.nps-shape-popsicle .nps-shape { border-radius: 26px; }
-.nps-control.nps-shape-popsicle::after {
-  content: "";
-  position: absolute;
-  left: 50%; bottom: -32px;
-  transform: translateX(-50%);
-  width: 14px; height: 40px;
-  border-radius: 0 0 7px 7px;
-  background: #c9a678;
-}
-
-/* Water bottle: narrow neck, shouldered body (clipped, so no drawn outline). */
-.nps-shape-bottle .nps-shape {
-  clip-path: polygon(38% 0, 62% 0, 62% 12%, 90% 22%, 90% 100%, 10% 100%, 10% 22%, 38% 12%);
-  border: none; border-radius: 0;
-  background: rgba(0,0,0,0.07);
-  box-shadow: none;
-}
-
-/* Conical flask (Erlenmeyer): narrow neck widening to a flat base. */
-.nps-shape-flask .nps-shape {
-  clip-path: polygon(40% 0, 60% 0, 60% 32%, 92% 100%, 8% 100%, 40% 32%);
-  border: none; border-radius: 0;
-  background: rgba(0,0,0,0.07);
-  box-shadow: none;
-}
-
-/* Mug: rounded body with a handle on the right. */
-.nps-control.nps-shape-mug { width: 88px; }
-.nps-shape-mug .nps-shape { border-radius: 10px 10px 22px 22px; }
-.nps-control.nps-shape-mug::after {
-  content: "";
-  position: absolute;
-  right: -20px; top: 28%;
-  width: 24px; height: 42%;
-  border: 6px solid #1a1a1a; border-left: none;
-  border-radius: 0 18px 18px 0;
-}
-
-/* Jar: wide short body with a lid band on top. */
-.nps-control.nps-shape-jar { width: 94px; }
-.nps-shape-jar .nps-shape { border-radius: 8px 8px 26px 26px; }
-.nps-control.nps-shape-jar::before {
-  content: "";
-  position: absolute;
-  top: -10px; left: 14%; right: 14%;
-  height: 16px;
-  border-radius: 6px;
-  background: #1a1a1a;
-}
-
-/* Can: cylinder with flattened, elliptical top and bottom. */
-.nps-control.nps-shape-can { width: 78px; }
-.nps-shape-can .nps-shape { border-radius: 42px / 16px; }
-
-/* Beaker: straight-sided lab beaker with a small pour spout at the top. */
-.nps-control.nps-shape-beaker { width: 84px; }
-.nps-shape-beaker .nps-shape {
-  clip-path: polygon(0 10%, 78% 10%, 86% 0, 100% 5%, 100% 100%, 0 100%);
-  border: none; border-radius: 0;
-  background: rgba(0,0,0,0.07);
-  box-shadow: none;
 }
 
 /* LEFT panel: the Lottie mount. lottie-web injects an <svg> into the
