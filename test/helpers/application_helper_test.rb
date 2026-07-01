@@ -63,14 +63,23 @@ class ApplicationHelperTest < ActionView::TestCase
   end
 
   test "nps container shape picks a fitting vessel for themed subjects" do
-    assert_equal "rocket",  nps_container_shape(themed(theme: "What under 10s think about space"))
-    assert_equal "flask",   nps_container_shape(themed(theme: "Science and research"))
-    assert_equal "mug",     nps_container_shape(themed(theme: "Coffee habits"))
-    assert_equal "jar",     nps_container_shape(themed(theme: "Food and nutrition"))
-    assert_equal "bottle",  nps_container_shape(themed(theme: "Climate and the environment"))
-    assert_equal "battery", nps_container_shape(themed(theme: "Renewable energy"))
-    assert_equal "can",     nps_container_shape(themed(theme: "Soda and fizzy drinks"))
-    assert_equal "lightbulb", nps_container_shape(themed(theme: "Innovation and ideas"))
+    assert_equal "tube",   nps_container_shape(themed(theme: "What under 10s think about space"))
+    assert_equal "flask",  nps_container_shape(themed(theme: "Science and research"))
+    assert_equal "flask",  nps_container_shape(themed(theme: "Members insights"))
+    assert_equal "mug",    nps_container_shape(themed(theme: "Coffee habits"))
+    assert_equal "jar",    nps_container_shape(themed(theme: "Food and nutrition"))
+    assert_equal "bottle", nps_container_shape(themed(theme: "Climate and the environment"))
+    assert_equal "bottle", nps_container_shape(themed(theme: "Renewable energy"))
+    assert_equal "can",    nps_container_shape(themed(theme: "Soda and fizzy drinks"))
+  end
+
+  test "every mapped shape is a real vessel silhouette (no distorting objects)" do
+    ApplicationHelper::NPS_SHAPE_THEMES.each do |_kw, shape|
+      assert_includes ApplicationHelper::NPS_CONTAINER_SHAPES, shape
+    end
+    %w[lightbulb rocket battery].each do |gone|
+      refute_includes ApplicationHelper::NPS_CONTAINER_SHAPES, gone
+    end
   end
 
   test "nps container shape falls back for a blank or nil theme" do

@@ -64,18 +64,21 @@ module ApplicationHelper
   # singularised match, like rating_icon). Anything without a subject match
   # falls back to a stable shape from a digest of the theme, so every Verto is
   # still consistent and the fuller set stays in rotation.
+  # Only genuine VESSEL silhouettes — they read correctly at the tall, narrow
+  # NPS container aspect. (Object shapes like a lightbulb/rocket/battery stretch
+  # into unrecognisable blobs when squeezed into that ratio, so they're out.)
   NPS_CONTAINER_SHAPES = %w[
-    pill glass tube popsicle bottle flask mug jar can rocket lightbulb battery beaker
+    pill glass tube popsicle bottle flask mug jar can beaker
   ].freeze
 
   # Ordered — the first group with a keyword hit wins, so put the more specific
-  # subjects before the broader ones.
+  # subjects before the broader ones. Every target is a real container.
   NPS_SHAPE_THEMES = [
-    [ %w[space rocket astronaut galaxy planet cosmos cosmic orbit moon mars spacecraft launch], "rocket" ],
+    [ %w[space rocket astronaut galaxy planet cosmos cosmic orbit moon mars spacecraft launch], "tube" ],
     [ %w[chemistry chemical molecule reaction], "beaker" ],
     [ %w[science lab laboratory research experiment biology physics medical health wellness], "flask" ],
-    [ %w[idea innovation creativity inspiration insight brainstorm], "lightbulb" ],
-    [ %w[energy power electric electricity battery charge charging ev renewable solar], "battery" ],
+    [ %w[idea innovation creativity inspiration insight brainstorm discovery], "flask" ],
+    [ %w[energy power electric electricity charge charging renewable solar], "bottle" ],
     [ %w[coffee cafe tea beverage barista espresso latte], "mug" ],
     [ %w[soda cola beer fizzy lager cider], "can" ],
     [ %w[food nutrition meal cooking recipe kitchen jam honey pickle], "jar" ],
