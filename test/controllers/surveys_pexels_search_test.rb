@@ -92,6 +92,27 @@ class SurveysPexelsSearchTest < ActionDispatch::IntegrationTest
     assert_equal "search_unavailable", body["error"]
   end
 
+  test "a fully unsafe query is blocked, not searched" do
+    stub_method(PexelsClient, :configured?, true) do
+      stub_method(PexelsClient, :new, fake_client([ PHOTO ])) do
+        get pexels_search_survey_path(@survey), params: { q: "nude naked", context: "card" }
+      end
+    end
+    body = JSON.parse(response.body)
+    assert_equal "search_blocked", body["error"]
+    assert_empty body["images"]
+  end
+
+  test "results whose description isn't PG are dropped" do
+    unsafe = PHOTO.merge("id" => 9, "alt" => "a naked model posing")
+    stub_method(PexelsClient, :configured?, true) do
+      stub_method(PexelsClient, :new, fake_client([ unsafe ])) do
+        get pexels_search_survey_path(@survey), params: { q: "beach", context: "card" }
+      end
+    end
+    assert_empty JSON.parse(response.body)["images"]
+  end
+
   test "CSP allows Pexels images so picked/populated photos can render" do
     get survey_path(@survey)
     assert_response :success

@@ -301,6 +301,10 @@ export default class extends Controller {
         this._showSearchStatus("Stock search isn’t configured.")
         return
       }
+      if (data.error === "search_blocked") {
+        this._showSearchStatus("Try different words — that search isn’t age-appropriate for this Verto.")
+        return
+      }
       if (!items.length) {
         this._showSearchStatus(data.error ? "Couldn’t reach the stock service." : `No ${noun} found.`)
         return

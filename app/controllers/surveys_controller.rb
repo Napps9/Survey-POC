@@ -255,21 +255,27 @@ class SurveysController < ApplicationController
   # items are tagged type:"photo" (carry `url`) or type:"video" (carry `video`
   # + `poster`).
   def pexels_search
-    Current.organisation.surveys.kept.find(params[:id]) # org-scope / 404 guard
-    query   = params[:q].to_s.strip
+    survey  = Current.organisation.surveys.kept.find(params[:id]) # org-scope / 404 guard
+    raw     = params[:q].to_s.strip
     context = params[:context].to_s == "background" ? :background : :card
 
-    return render json: { images: [] } if query.blank?
+    return render json: { images: [] } if raw.blank?
     unless PexelsClient.configured?
       return render json: { images: [], error: "search_unavailable" }
     end
 
+    # Keep results PG + age-appropriate to this Verto: scrub the search terms,
+    # and (below) drop any result whose description isn't safe.
+    age   = AssetPopulator.age_buckets(survey.audience_age)
+    query = ContentSafety.scrub_query(raw, age)
+    return render json: { images: [], error: "search_blocked" } if query.blank?
+
     orientation = PexelsClient::ORIENTATION_FOR[context]
     images =
       if params[:media].to_s == "videos"
-        pexels_video_results(query, orientation)
+        pexels_video_results(query, orientation, age)
       else
-        pexels_photo_results(query, orientation, context)
+        pexels_photo_results(query, orientation, context, age)
       end
     render json: { images: images }
   rescue => e
@@ -462,8 +468,10 @@ class SurveysController < ApplicationController
 
   private
 
-  def pexels_photo_results(query, orientation, context)
-    PexelsClient.new.search(query: query, orientation: orientation, per_page: 24).map do |p|
+  def pexels_photo_results(query, orientation, context, age = [])
+    PexelsClient.new.search(query: query, orientation: orientation, per_page: 24)
+      .select { |p| ContentSafety.safe?(p["alt"], age) }
+      .map do |p|
       {
         id:               p["id"],
         type:             "photo",
@@ -476,8 +484,10 @@ class SurveysController < ApplicationController
     end
   end
 
-  def pexels_video_results(query, orientation)
-    PexelsClient.new.search_videos(query: query, orientation: orientation, per_page: 24).filter_map do |v|
+  def pexels_video_results(query, orientation, age = [])
+    PexelsClient.new.search_videos(query: query, orientation: orientation, per_page: 24)
+      .select { |v| ContentSafety.safe?(v["url"], age) }
+      .filter_map do |v|
       url = PexelsClient.video_file_url(v)
       next unless url
       credit = PexelsClient.video_credit(v)

@@ -355,6 +355,29 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_equal s1.cards.map { |c| c["image"] }, s2.cards.map { |c| c["image"] }
   end
 
+  test "Pexels images whose description isn't PG are dropped (content safety)" do
+    s = make_survey(theme: "Nightlife", audience_age: "all",
+                    cards: [ { "type" => "multiple_choice", "text" => "Favourite venue?", "options" => %w[A B] } ])
+    unsafe = [ {
+      "id" => 99, "photographer" => "P", "photographer_url" => "https://www.pexels.com/@p",
+      "alt" => "a topless model posing",
+      "src" => {
+        "original"  => "https://images.pexels.com/photos/99/p.jpg",
+        "portrait"  => "https://images.pexels.com/photos/99/p.jpg?w=800&h=1200&fit=crop",
+        "landscape" => "https://images.pexels.com/photos/99/p.jpg?w=1200&h=627&fit=crop",
+        "tiny"      => "https://images.pexels.com/photos/99/p.jpg?w=280&h=200&fit=crop"
+      }
+    } ]
+
+    with_pexels(unsafe) { AssetPopulator.new(s).populate! }
+
+    s.reload
+    # The only Pexels result was not PG, so it must never land on the card;
+    # the populator falls back to curated art (or blank) instead.
+    refute_includes s.cards[0]["image"].to_s, "images.pexels.com",
+      "an unsafe Pexels photo must not be used"
+  end
+
   test "falls back to the curated library when Pexels returns nothing" do
     s = make_survey(theme: "Football fans", audience_age: "18-24",
                     cards: [ { "type" => "multiple_choice", "text" => "Favourite team?", "options" => %w[Arsenal Chelsea] } ])

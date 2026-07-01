@@ -405,6 +405,8 @@ class AssetPopulator
     orientation = PexelsClient::ORIENTATION_FOR[context]
     @pexels_cache[[ query, orientation ]] ||= begin
       results = PexelsClient.new.search(query: query, orientation: orientation, per_page: 30)
+      # Drop anything whose description isn't PG / age-appropriate for this Verto.
+      results = results.select { |p| ContentSafety.safe?(p["alt"], safety_age_buckets) }
       Rails.logger.info("[AssetPopulator] pexels #{context} q=#{query.inspect} -> #{results.size} result(s)")
       results
     end
@@ -455,6 +457,8 @@ class AssetPopulator
     return [] unless PexelsClient.configured?
     @pexels_video_cache[query] ||= begin
       results = PexelsClient.new.search_videos(query: query, orientation: "portrait", per_page: 15)
+      # Videos carry no alt text; the page-URL slug is the best signal we have.
+      results = results.select { |v| ContentSafety.safe?(v["url"], safety_age_buckets) }
       Rails.logger.info("[AssetPopulator] pexels video q=#{query.inspect} -> #{results.size} result(s)")
       results
     end
@@ -483,8 +487,15 @@ class AssetPopulator
     @survey.theme.to_s.downcase.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
   end
 
+  # Age buckets for the Verto's audience, driving the content-safety blocklist
+  # (kids/teen get the stricter list). Memoised for the run.
+  def safety_age_buckets
+    @safety_age_buckets ||= self.class.age_buckets(@survey.audience_age)
+  end
+
   def background_query
-    theme_query_terms.first(3).join(" ").presence || "abstract background"
+    raw = theme_query_terms.first(3).join(" ").presence || "abstract background"
+    ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract background"
   end
 
   def card_query(card)
@@ -492,7 +503,8 @@ class AssetPopulator
     # drawn from the question, anchored by a single dominant theme term. (Was
     # an even 3-and-2 split that let the theme dilute the question's subject.)
     terms = (card_keywords(card).first(3) + theme_query_terms.first(1)).uniq
-    terms.join(" ").presence || @survey.theme.to_s.strip.presence || "abstract"
+    raw   = terms.join(" ").presence || @survey.theme.to_s.strip.presence || "abstract"
+    ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract"
   end
 
   def asset_url(dir, file)
