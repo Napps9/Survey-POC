@@ -47,9 +47,10 @@ class PdfImportTest < ActionDispatch::IntegrationTest
     survey = @org.surveys.order(:created_at).last
     assert_redirected_to survey_path(survey)
     assert_equal "Imported", survey.title
-    # 2 imported questions + the 3 set demographic questions appended to every Verto
-    assert_equal 5, Array(survey.cards).size
-    assert_equal "select_one_grid", survey.cards.first["type"]
+    # 1 welcome card + 2 imported questions + the 3 set demographic questions
+    assert_equal 6, Array(survey.cards).size
+    assert_equal "welcome_card", survey.cards.first["type"]
+    assert_equal "select_one_grid", survey.cards[1]["type"]
     demographics = survey.cards.select { |c| c["demographic"] }
     assert_equal [ "When were you born?", "Where do you live?", "Gender" ], demographics.map { |c| c["text"] }
     assert_equal demographics, survey.cards.last(3), "demographics must sit at the end"
@@ -91,15 +92,17 @@ class PdfImportTest < ActionDispatch::IntegrationTest
     post finalize_import_survey_path, params: { payload: signed, variant: "verbatim" }
     verbatim = @org.surveys.order(:id).last
     assert_redirected_to survey_path(verbatim)
-    assert_equal "The very long original wording of this question?", verbatim.cards.first["text"]
+    assert_equal "welcome_card", verbatim.cards.first["type"], "every imported Verto opens with a welcome card"
+    imported = verbatim.cards.find { |c| c["type"] == "open_ended" }
+    assert_equal "The very long original wording of this question?", imported["text"]
     assert_equal "Named on import", verbatim.title
     assert verbatim.cards.last["demographic"], "demographic tail appended on finalize"
     assert_equal [ "GB" ], verbatim.survey_region_links.pluck(:country_code), "region tags applied on finalize"
-    refute verbatim.cards.first.key?("compliant"), "review-only fields are stripped from stored cards"
+    refute imported.key?("compliant"), "review-only fields are stripped from stored cards"
 
     post finalize_import_survey_path, params: { payload: signed, variant: "optimised" }
     optimised = @org.surveys.order(:id).last
-    assert_equal "Short version?", optimised.cards.first["text"]
+    assert_equal "Short version?", optimised.cards.find { |c| c["type"] == "open_ended" }["text"]
   end
 
   test "a tampered finalize payload is rejected" do

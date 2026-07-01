@@ -579,6 +579,16 @@ class SurveysController < ApplicationController
       card
     end
 
+    # Every Verto opens with a welcome card — imports (PDF / Google Forms) carry
+    # only questions, so prepend one built from the brief when it's missing.
+    unless cards.any? { |c| c["type"].to_s == "welcome_card" }
+      cards.unshift({
+        "type"  => "welcome_card",
+        "title" => payload["verto_name"].presence || result["title"].presence || payload["theme"].presence || "Welcome",
+        "text"  => result["description"].presence || payload["theme"].presence
+      }.compact)
+    end
+
     cards += resolve_common_cards(payload["common_question_ids"])
     cards  = DemographicQuestions.append_to(cards)
 

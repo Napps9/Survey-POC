@@ -126,9 +126,8 @@ class SurveyGenerator
        a row in the flow. Treat range, rating and nps as one "scale" family —
        avoid more than 2 of those sliders in a row.
 
-    4. Welcome cards — At most ONE welcome_card, and only for cold/new audiences
-       (briefly stating the Verto's purpose). Omit it for captive audiences or
-       events where an introduction is unnecessary.
+    4. Welcome cards — ALWAYS begin with exactly ONE welcome_card that briefly
+       sets the scene (states the Verto's purpose). Keep it short and warm.
 
     5. Per-card rules — every question card must satisfy:
 
@@ -200,7 +199,7 @@ class SurveyGenerator
 
     Self-check before emitting — re-read your draft and fix any rule violation
     (unless the brief explicitly requires the exception):
-    [ ] 10 to 15 questions (welcome cards excluded); at most 1 welcome card
+    [ ] 10 to 15 questions (welcome cards excluded); starts with exactly 1 welcome card
     [ ] No more than 2 of the same answer type in a row
     [ ] Lists 3-5 options (each <= 20 chars); grids EVEN and 4-10; tap_card EXACTLY 3 (neg/neutral/pos);
         range/rating <= 5; nps EXACTLY 5
@@ -252,7 +251,7 @@ class SurveyGenerator
       - tap_card EXACTLY 3 (neg/neutral/pos) options · grids even count, ≤10
       - question text 50-70 chars target, never exceed 100
       - option text ≤ 14 chars when using a grid; ≤ 20 chars in a text list
-      - include a welcome_card only if the audience is cold/new
+      - ALWAYS start with exactly one welcome_card that sets the scene
       Echo theme, audience_age, key_insight unchanged. Output via the
       emit_survey tool.
     REMINDER
@@ -284,6 +283,7 @@ class SurveyGenerator
 
     payload = deep_stringify(input_of(block))
     enforce_tap_card_three_statements!(payload)
+    ensure_welcome_card!(payload)
     reconcile_common_cards!(payload, common_cards)
     normalize_quiz_correct!(payload) if quiz
     payload
@@ -338,6 +338,22 @@ class SurveyGenerator
         card.delete("explanation") if card["explanation"].to_s.strip.empty?
       end
     end
+    payload
+  end
+
+  # Every Verto opens with a welcome card. The model is asked to include one,
+  # but it sometimes omits it for captive audiences — so guarantee it here by
+  # prepending a simple one built from the brief when none is present.
+  def ensure_welcome_card!(payload)
+    cards = Array(payload["cards"])
+    return payload if cards.any? { |c| c["type"].to_s == "welcome_card" }
+
+    welcome = {
+      "type"  => "welcome_card",
+      "title" => payload["title"].to_s.strip.presence || payload["theme"].to_s.strip.presence || "Welcome",
+      "text"  => payload["description"].to_s.strip.presence || payload["theme"].to_s.strip.presence
+    }.compact
+    payload["cards"] = [ welcome ] + cards
     payload
   end
 
