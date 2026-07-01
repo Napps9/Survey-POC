@@ -64,16 +64,24 @@ module ApplicationHelper
   # singularised match, like rating_icon). Anything without a subject match
   # falls back to a stable shape from a digest of the theme, so every Verto is
   # still consistent and the fuller set stays in rotation.
-  NPS_CONTAINER_SHAPES = %w[pill glass tube popsicle bottle flask mug jar].freeze
+  NPS_CONTAINER_SHAPES = %w[
+    pill glass tube popsicle bottle flask mug jar can rocket lightbulb battery beaker
+  ].freeze
 
+  # Ordered — the first group with a keyword hit wins, so put the more specific
+  # subjects before the broader ones.
   NPS_SHAPE_THEMES = [
-    [ %w[space rocket astronaut galaxy planet cosmos cosmic orbit moon mars spacecraft], "tube" ],
-    [ %w[science lab laboratory research experiment chemistry biology physics medical health wellness], "flask" ],
-    [ %w[coffee cafe tea drink beverage barista espresso], "mug" ],
+    [ %w[space rocket astronaut galaxy planet cosmos cosmic orbit moon mars spacecraft launch], "rocket" ],
+    [ %w[chemistry chemical molecule reaction], "beaker" ],
+    [ %w[science lab laboratory research experiment biology physics medical health wellness], "flask" ],
+    [ %w[idea innovation creativity inspiration insight brainstorm], "lightbulb" ],
+    [ %w[energy power electric electricity battery charge charging ev renewable solar], "battery" ],
+    [ %w[coffee cafe tea beverage barista espresso latte], "mug" ],
+    [ %w[soda cola beer fizzy lager cider], "can" ],
     [ %w[food nutrition meal cooking recipe kitchen jam honey pickle], "jar" ],
     [ %w[water ocean sea river lake climate environment environmental sustainability eco nature fitness sport gym], "bottle" ],
-    [ %w[ice summer treat dessert sweet popsicle lolly], "popsicle" ],
-    [ %w[juice smoothie cocktail party celebration festival], "glass" ]
+    [ %w[ice summer treat dessert sweet lolly], "popsicle" ],
+    [ %w[juice smoothie cocktail wine party celebration festival], "glass" ]
   ].map { |keywords, shape| [ keywords.map { |w| w.singularize }.to_set, shape ] }.freeze
 
   def nps_container_shape(survey)
