@@ -56,15 +56,33 @@ module ApplicationHelper
   STAR_RATING_ICON = { on: "★", off: "☆", kind: "star" }.freeze
 
   # The NPS "liquid container" silhouette, themed per Verto so the scale leans
-  # into brand alignment (a glass, a test-tube/thermometer, a popsicle, or the
-  # plain pill). Deterministic from the theme (stable across processes via a
-  # digest, not String#hash) so a given Verto always gets the same container.
-  # Maps to a CSS class `nps-shape-<name>`.
-  NPS_CONTAINER_SHAPES = %w[pill glass tube popsicle].freeze
+  # into brand alignment. Maps to a CSS class `nps-shape-<name>`.
+  #
+  # Resolution (see #nps_container_shape): a themed subject picks a FITTING
+  # vessel first — a science Verto fills a conical flask, a coffee Verto a mug,
+  # a space Verto a capsule (tube), a food Verto a jar, and so on (whole-word,
+  # singularised match, like rating_icon). Anything without a subject match
+  # falls back to a stable shape from a digest of the theme, so every Verto is
+  # still consistent and the fuller set stays in rotation.
+  NPS_CONTAINER_SHAPES = %w[pill glass tube popsicle bottle flask mug jar].freeze
+
+  NPS_SHAPE_THEMES = [
+    [ %w[space rocket astronaut galaxy planet cosmos cosmic orbit moon mars spacecraft], "tube" ],
+    [ %w[science lab laboratory research experiment chemistry biology physics medical health wellness], "flask" ],
+    [ %w[coffee cafe tea drink beverage barista espresso], "mug" ],
+    [ %w[food nutrition meal cooking recipe kitchen jam honey pickle], "jar" ],
+    [ %w[water ocean sea river lake climate environment environmental sustainability eco nature fitness sport gym], "bottle" ],
+    [ %w[ice summer treat dessert sweet popsicle lolly], "popsicle" ],
+    [ %w[juice smoothie cocktail party celebration festival], "glass" ]
+  ].map { |keywords, shape| [ keywords.map { |w| w.singularize }.to_set, shape ] }.freeze
 
   def nps_container_shape(survey)
     theme = survey&.theme.to_s.strip.downcase
     return NPS_CONTAINER_SHAPES.first if theme.empty?
+
+    words = theme.scan(/[a-z]+/).map { |w| w.singularize }.to_set
+    match = NPS_SHAPE_THEMES.find { |keywords, _| (words & keywords).any? }
+    return match[1] if match
 
     idx = Integer(Digest::SHA256.hexdigest(theme)[0, 8], 16) % NPS_CONTAINER_SHAPES.size
     NPS_CONTAINER_SHAPES[idx]

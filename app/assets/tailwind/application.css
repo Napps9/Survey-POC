@@ -299,6 +299,46 @@
   background: #c9a678;
 }
 
+/* Water bottle: narrow neck, shouldered body (clipped, so no drawn outline). */
+.nps-shape-bottle .nps-shape {
+  clip-path: polygon(38% 0, 62% 0, 62% 12%, 90% 22%, 90% 100%, 10% 100%, 10% 22%, 38% 12%);
+  border: none; border-radius: 0;
+  background: rgba(0,0,0,0.07);
+  box-shadow: none;
+}
+
+/* Conical flask (Erlenmeyer): narrow neck widening to a flat base. */
+.nps-shape-flask .nps-shape {
+  clip-path: polygon(40% 0, 60% 0, 60% 32%, 92% 100%, 8% 100%, 40% 32%);
+  border: none; border-radius: 0;
+  background: rgba(0,0,0,0.07);
+  box-shadow: none;
+}
+
+/* Mug: rounded body with a handle on the right. */
+.nps-control.nps-shape-mug { width: 88px; }
+.nps-shape-mug .nps-shape { border-radius: 10px 10px 22px 22px; }
+.nps-control.nps-shape-mug::after {
+  content: "";
+  position: absolute;
+  right: -20px; top: 28%;
+  width: 24px; height: 42%;
+  border: 6px solid #1a1a1a; border-left: none;
+  border-radius: 0 18px 18px 0;
+}
+
+/* Jar: wide short body with a lid band on top. */
+.nps-control.nps-shape-jar { width: 94px; }
+.nps-shape-jar .nps-shape { border-radius: 8px 8px 26px 26px; }
+.nps-control.nps-shape-jar::before {
+  content: "";
+  position: absolute;
+  top: -10px; left: 14%; right: 14%;
+  height: 16px;
+  border-radius: 6px;
+  background: #1a1a1a;
+}
+
 /* LEFT panel: the Lottie mount. lottie-web injects an <svg> into the
    .nps-lottie-mount child; the wrapper fills the left panel. */
 .nps-lottie {
