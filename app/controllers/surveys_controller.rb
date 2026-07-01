@@ -254,6 +254,33 @@ class SurveysController < ApplicationController
   # selects photos (default) or videos. Returns a uniform `images` array whose
   # items are tagged type:"photo" (carry `url`) or type:"video" (carry `video`
   # + `poster`).
+  # POST /surveys/:id/moderate_image
+  # Content-safety gate for a creator UPLOAD (a base64 data URL from the media
+  # picker). Pexels picks are filtered by query/description; uploads can't be,
+  # so the picker calls this once before applying an uploaded image. Returns
+  # { ok: true } to allow, { ok: false, reason: } to block.
+  def moderate_image
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    image  = params[:image].to_s
+
+    return render json: { ok: true } unless ImageModerator.configured?
+    if image.blank? || !image.start_with?("data:image/")
+      return render json: { ok: false, reason: "That doesn't look like an image." }
+    end
+
+    verdict = ImageModerator.new.call(data_url: image, audience_age: survey.audience_age)
+    if verdict[:safe]
+      render json: { ok: true }
+    else
+      render json: { ok: false, reason: verdict[:reason].presence || "That image isn't PG or age-appropriate for this Verto." }
+    end
+  rescue ActiveRecord::RecordNotFound
+    raise # let it 404 rather than read as "couldn't check"
+  rescue => e
+    Rails.logger.error("[SurveysController#moderate_image] #{e.class}: #{e.message}")
+    render json: { ok: false, reason: "We couldn't check that image — please try again." }, status: :bad_gateway
+  end
+
   def pexels_search
     survey  = Current.organisation.surveys.kept.find(params[:id]) # org-scope / 404 guard
     raw     = params[:q].to_s.strip

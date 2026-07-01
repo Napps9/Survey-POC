@@ -13,7 +13,7 @@ export default class extends Controller {
     "searchInput", "searchSection", "searchStatus", "searchGrid",
     "mediaToggle", "mediaTab"
   ]
-  static values = { url: String, pexsearchUrl: String, theme: String, backgroundRecommended: Array }
+  static values = { url: String, pexsearchUrl: String, moderateUrl: String, theme: String, backgroundRecommended: Array }
 
   // Uploaded images are normalised before they're stored: capped in source
   // size, downscaled to a max edge, and re-encoded to a compact format. Raw
@@ -355,8 +355,16 @@ export default class extends Controller {
   }
 
   // ── Apply / clear ──────────────────────────────────────
-  applyImage() {
+  async applyImage() {
     if (!this._pendingUrl && !this._pendingVideo) return
+
+    // Uploaded images (data URLs) can't be word-filtered like Pexels picks, so
+    // they get a PG / age-appropriateness check before they're ever applied.
+    if (this._pendingUrl && this._pendingUrl.startsWith("data:")) {
+      const ok = await this._moderateUpload(this._pendingUrl)
+      if (!ok) return // reason already shown on the upload pane
+    }
+
     if (this._mode === "background") {
       // Backgrounds are photos only (the video toggle is hidden here).
       if (this._pendingUrl) { this._setVertoBackground(this._pendingUrl); this.close() }
@@ -371,6 +379,35 @@ export default class extends Controller {
     }
     this._notifyDirty()
     this.close()
+  }
+
+  // POST the uploaded image for a content-safety verdict. Returns true to
+  // allow. Fails safe: with no endpoint wired we don't block; a call that
+  // errors or comes back unsafe blocks the upload with a message.
+  async _moderateUpload(dataUrl) {
+    if (!this.hasModerateUrlValue) return true
+    this._clearUploadError()
+    this._setApplyEnabled(false)
+    try {
+      const res = await fetch(this.moderateUrlValue, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+        },
+        body: JSON.stringify({ image: dataUrl })
+      })
+      const data = await res.json().catch(() => ({}))
+      if (data.ok) return true
+      this._showUploadError(data.reason || "That image can’t be used — it isn’t PG or age-appropriate for this Verto.")
+      return false
+    } catch (_) {
+      this._showUploadError("We couldn’t check that image — please try again.")
+      return false
+    } finally {
+      this._setApplyEnabled(true)
+    }
   }
 
   clearImage() {
