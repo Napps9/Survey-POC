@@ -1094,12 +1094,12 @@
 .prioritise-list { touch-action: pan-y; }
 .prioritise-item { cursor: grab; user-select: none; -webkit-user-select: none; }
 .prioritise-item .choice-list-label { cursor: grab; }
+/* The dragged row follows the finger via an inline transform, so only the
+   lift chrome lives here (no transform — it would fight the inline one). */
 .prioritise-item.is-dragging {
   cursor: grabbing;
-  opacity: 0.92;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.2);
   border-color: var(--brand-primary, #615BF5);
-  transform: scale(1.01);
 }
 .prioritise-rank {
   flex-shrink: 0;

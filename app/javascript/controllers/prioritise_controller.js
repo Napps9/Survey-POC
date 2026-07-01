@@ -1,10 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Drag-to-rank list. Respondents drag rows into an order of priority (top =
-// highest). Pointer-based so it works on touch and mouse. Reorders the DOM
-// live and renumbers the rank badges; the player reads the row order at
-// capture time. In the player the initial order is shuffled once, so the
-// authored order isn't a systematic default.
+// highest). Pointer-based (touch + mouse) and FLUID: the dragged row follows
+// the finger 1:1 while the other rows SLIDE to open a gap, and the drop
+// animates into place. The DOM is only reordered once — invisibly — on
+// release, so nothing ever snaps. In the player the initial order is shuffled
+// once so the authored order isn't a systematic default.
 export default class extends Controller {
   static targets = ["item", "rank"]
   static values  = { shuffle: { type: Boolean, default: false } }
@@ -23,8 +24,24 @@ export default class extends Controller {
     const item = event.currentTarget
     event.preventDefault()
 
-    this.dragEl = item
+    this.items       = this.itemTargets
+    this.dragEl      = item
+    this.startIndex  = this.items.indexOf(item)
+    this.targetIndex = this.startIndex
+    this.startY      = event.clientY
+    this.maxIndex    = this.items.length - 1
+    this._finished   = false
+
+    // Row step = the distance between consecutive rows (height + gap). Assumes
+    // similar-height rows, which the list is.
+    const rects = this.items.map((el) => el.getBoundingClientRect())
+    this.step = rects.length > 1
+      ? Math.abs(rects[1].top - rects[0].top)
+      : (rects[0]?.height || 56) + 8
+
     item.classList.add("is-dragging")
+    item.style.transition = "none" // follow the finger 1:1
+    item.style.zIndex = "10"
     try { item.setPointerCapture(event.pointerId) } catch (_) { /* older browsers */ }
 
     this._onMove = (e) => this._move(e)
@@ -35,33 +52,78 @@ export default class extends Controller {
 
   _move(event) {
     if (!this.dragEl) return
-    const y = event.clientY
-    const others = this.itemTargets.filter((i) => i !== this.dragEl)
-    const before = others.find((o) => {
-      const r = o.getBoundingClientRect()
-      return y < r.top + r.height / 2
-    })
-    if (before) {
-      this.element.insertBefore(this.dragEl, before)
-    } else {
-      const addBtn = this.element.querySelector(".pick-add-btn")
-      addBtn ? this.element.insertBefore(this.dragEl, addBtn) : this.element.appendChild(this.dragEl)
+    const dy = event.clientY - this.startY
+    this.dragEl.style.transform = `translateY(${dy}px) scale(1.02)`
+
+    let idx = this.startIndex + Math.round(dy / this.step)
+    idx = Math.max(0, Math.min(this.maxIndex, idx))
+    if (idx !== this.targetIndex) {
+      this.targetIndex = idx
+      this._reflowGap()
     }
-    this._renumber()
+  }
+
+  // Slide the non-dragged rows to open a gap at targetIndex.
+  _reflowGap() {
+    this.items.forEach((el, i) => {
+      if (el === this.dragEl) return
+      el.style.transition = "transform 0.18s cubic-bezier(.2,.7,.3,1)"
+      let shift = 0
+      if (this.targetIndex > this.startIndex && i > this.startIndex && i <= this.targetIndex) {
+        shift = -this.step
+      } else if (this.targetIndex < this.startIndex && i >= this.targetIndex && i < this.startIndex) {
+        shift = this.step
+      }
+      el.style.transform = shift ? `translateY(${shift}px)` : ""
+    })
+    this._renumberVisual()
   }
 
   _end() {
     window.removeEventListener("pointermove", this._onMove)
-    if (this.dragEl) this.dragEl.classList.remove("is-dragging")
-    this.dragEl = null
-    this._renumber()
-    this.element.dataset.prioritiseTouched = "true"
-    this.dispatch("changed") // editor: mark dirty
+    const drag = this.dragEl
+    if (!drag) return
+    this.dragEl = null // stop further moves
+
+    // Animate the row into its resting slot, then commit the DOM order (which
+    // matches what's on screen, so clearing transforms causes no jump).
+    const restY = (this.targetIndex - this.startIndex) * this.step
+    drag.style.transition = "transform 0.18s cubic-bezier(.2,.7,.3,1)"
+    drag.style.transform  = `translateY(${restY}px)`
+
+    const finish = () => {
+      if (this._finished) return
+      this._finished = true
+      drag.removeEventListener("transitionend", finish)
+
+      const order  = this.items.filter((el) => el !== drag)
+      order.splice(Math.min(this.targetIndex, order.length), 0, drag)
+      const addBtn = this.element.querySelector(".pick-add-btn")
+      order.forEach((el) => (addBtn ? this.element.insertBefore(el, addBtn) : this.element.appendChild(el)))
+
+      this.items.forEach((el) => { el.style.transition = ""; el.style.transform = ""; el.style.zIndex = "" })
+      drag.classList.remove("is-dragging")
+      this._renumber()
+      this.element.dataset.prioritiseTouched = "true"
+      this.dispatch("changed") // editor: mark dirty
+    }
+    drag.addEventListener("transitionend", finish, { once: true })
+    setTimeout(finish, 240) // fallback when the transform doesn't change
   }
 
   _renumber() {
     this.itemTargets.forEach((item, i) => {
       const badge = item.querySelector(".prioritise-rank")
+      if (badge) badge.textContent = String(i + 1)
+    })
+  }
+
+  // Renumber to reflect the live (gapped) visual order during a drag.
+  _renumberVisual() {
+    const order = this.items.filter((el) => el !== this.dragEl)
+    order.splice(Math.min(this.targetIndex, order.length), 0, this.dragEl)
+    order.forEach((el, i) => {
+      const badge = el.querySelector(".prioritise-rank")
       if (badge) badge.textContent = String(i + 1)
     })
   }
