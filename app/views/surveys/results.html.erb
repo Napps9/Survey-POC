@@ -305,6 +305,26 @@
                     <% end %>
                   </div>
 
+                <% elsif type == "prioritise" %>
+                  <%# counts[label] = sum of ranks; mean position = sum / total.
+                      Lower mean = higher priority, so sort ascending. %>
+                  <% counts = result[:counts]; total = [result[:total].to_i, 1].max %>
+                  <% ranked = counts.map { |label, sum| [label, sum.to_f / total] }.sort_by { |_, mean| mean } %>
+                  <% n = [ranked.size, 1].max %>
+                  <div style="display:flex;flex-direction:column;gap:5px;">
+                    <% ranked.each_with_index do |(label, mean), i| %>
+                      <% pct = (((n - mean + 1) / n.to_f) * 100).clamp(0, 100).round %>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:#01EACB;min-width:18px;text-align:right;"><%= i + 1 %></span>
+                        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#111;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<%= label %>"><%= label.truncate(24) %></span>
+                        <div style="flex:1;height:7px;border-radius:4px;background:rgba(97,91,245,0.1);overflow:hidden;">
+                          <div style="height:100%;border-radius:4px;background:#615BF5;width:<%= pct %>%;"></div>
+                        </div>
+                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.4);min-width:52px;text-align:right;">avg <%= mean.round(1) %></span>
+                      </div>
+                    <% end %>
+                  </div>
+
                 <% elsif %w[range nps].include?(type) %>
                   <% labels = Array(card_data["options"]).presence || (type == "nps" ? (0..10).map(&:to_s) : []) %>
                   <% n = [labels.size, 2].max; grand = [result[:counts].values.sum.to_f, 1.0].max %>

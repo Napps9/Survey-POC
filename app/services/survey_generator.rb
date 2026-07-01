@@ -12,6 +12,7 @@ class SurveyGenerator
     select_many
     select_one_grid
     select_many_grid
+    prioritise
     tap_card
     range
     rating
@@ -58,9 +59,10 @@ class SurveyGenerator
                 items: { type: "string", description: "Each option <= 20 chars in select-one lists." },
                 description: <<~DESC
                   Required for: multiple_choice, select_many, select_one_grid, select_many_grid,
-                  tap_card, range, rating. Bounds (per the design rules):
+                  prioritise, tap_card, range, rating. Bounds (per the design rules):
                   - multiple_choice / select_many: 3 to 5 options, each <= 20 chars
                   - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any "Other"
+                  - prioritise: 3 to 6 options (about 5 ideal), each <= 24 chars
                   - tap_card: EXACTLY 3 cards (negative / neutral / positive sentiments)
                   - range / rating: 3 to 5 points, never more than 5
                   - nps: EXACTLY 5 points, each label <= 20 chars
@@ -86,6 +88,8 @@ class SurveyGenerator
     - List types (multiple_choice / select_many): 3 to 5 options, each <= 20 chars.
     - Grids (select_one_grid / select_many_grid): EVEN option count, 4 to 10
       total including any "Other".
+    - prioritise: 3 to 6 options (about 5 ideal), each <= 24 chars. Use when
+      the ORDER of preference matters (rank these highest to lowest).
     - tap_card: EXACTLY 3 cards. The three statements MUST represent a
       NEGATIVE, a NEUTRAL and a POSITIVE sentiment on the question's
       topic, in that order (index 0 = negative, 1 = neutral, 2 = positive).
@@ -182,11 +186,11 @@ class SurveyGenerator
       two visual options is often richer.
     - open_ended (Verto "Freeform"): text input, can be voice-recorded too.
       Use sparingly to capture authentic qualitative voice.
-    - select_one_grid as "Prioritise" surrogate: Verto's Prioritise lets
-      players drag-rank ~5 items. We don't have a dedicated type — use
-      select_one_grid with 4–6 options and phrase the question as ranking
-      ("In what order would you…"). Prefer this over a flat select for
-      explicit priority questions.
+    - prioritise (Verto "Prioritise"): a list respondents drag into an order
+      of priority — highest to lowest (or most-to-least agree/liked). Use for
+      explicit ranking questions ("In what order…", "Rank these…") where the
+      ORDER of preference is the insight, not just which options are picked.
+      3 to 6 options, about 5 ideal.
     - welcome_card: not a question; flow control per the rules.
 
     When relevant historical Playverto questions are provided in the brief,

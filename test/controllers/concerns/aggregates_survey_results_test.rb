@@ -22,7 +22,8 @@ class AggregatesSurveyResultsTest < ActiveSupport::TestCase
     { "type" => "range",           "text" => "Range" }, # 3
     { "type" => "tap_card",        "text" => "Tap" }, # 4
     { "type" => "open_ended",      "text" => "Say" }, # 5
-    { "type" => "welcome_card",    "title" => "Hi" } # 6 (else branch)
+    { "type" => "welcome_card",    "title" => "Hi" }, # 6 (else branch)
+    { "type" => "prioritise",      "text" => "Rank", "options" => %w[A B C] } # 7
   ].freeze
 
   def sample_responses
@@ -45,6 +46,17 @@ class AggregatesSurveyResultsTest < ActiveSupport::TestCase
       }),
       resp({ "0" => { "value" => "B" } })
     ]
+  end
+
+  test "prioritise banks each option's rank and totals responders" do
+    responses = [
+      resp({ "7" => { "value" => %w[A B C] } }), # A=1 B=2 C=3
+      resp({ "7" => { "value" => %w[B A C] } })  # B=1 A=2 C=3
+    ]
+    row = @agg.run(CARDS, responses)[7]
+    assert_equal 2, row[:total]
+    # sum of ranks: A=1+2=3, B=2+1=3, C=3+3=6 → mean A=B=1.5, C=3.0
+    assert_equal({ "A" => 3, "B" => 3, "C" => 6 }, row[:counts].to_h)
   end
 
   test "multiple_choice tallies counts, Other, and total" do

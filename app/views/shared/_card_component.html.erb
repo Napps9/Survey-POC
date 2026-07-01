@@ -110,6 +110,40 @@
         <% end %>
       </ul>
 
+    <% when "prioritise" %>
+      <%# Drag-to-rank list: respondents arrange the options top (highest
+          priority) to bottom. The stored answer is the ordered list of
+          canonical labels. Reuses the pick-item list chrome (edit/add/delete)
+          but a `prioritise` controller handles reordering; in the player the
+          initial order is shuffled so the authored order isn't a default bias. %>
+      <% items = Array(display["options"]) %>
+      <ul class="choice-list prioritise-list"
+          data-controller="<%= editable ? 'prioritise card-editor' : 'prioritise' %>"
+          <%= 'data-prioritise-shuffle-value="true"'.html_safe if mode == :player %>>
+        <% items.each_with_index do |opt, i| %>
+          <li class="choice-list-item pick-item prioritise-item"
+              data-prioritise-target="item"
+              data-canonical="<%= canon[i] %>"
+              data-action="pointerdown->prioritise#start">
+            <span class="prioritise-rank" data-prioritise-target="rank"><%= i + 1 %></span>
+            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"></div>
+            <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
+            <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
+            <% if editable %>
+              <button type="button" class="pick-item-delete"
+                      data-action="click->card-editor#deleteOption">×</button>
+            <% end %>
+          </li>
+        <% end %>
+        <% if editable %>
+          <li class="pick-add-btn"
+              data-action="click->card-editor#addPickOption"
+              data-card-editor-add>
+            <span>＋</span> <%= t("card.add_option") %>
+          </li>
+        <% end %>
+      </ul>
+
     <% when "yes_no" %>
       <ul class="choice-list"
           data-controller="picker"

@@ -52,6 +52,15 @@ module FormatsResultsDigest
           lines << "  #{label}: #{count} (#{pct}%)"
         end
 
+      when "prioritise"
+        # counts[label] = sum of ranks; mean position = sum / total. Lower mean
+        # = higher priority, so list the ranked order for the AI summariser.
+        total = [ result[:total].to_i, 1 ].max
+        lines << "  Ranked by priority (#{result[:total]} responses, lower avg = higher):"
+        result[:counts].map { |label, sum| [ label, sum.to_f / total ] }
+                       .sort_by { |_l, mean| mean }
+                       .each_with_index { |(label, mean), i| lines << "  #{i + 1}. #{label} (avg #{mean.round(2)})" }
+
       when "rating"
         lines << "  Average: #{result[:avg]} / 5 (#{result[:total]} responses)"
         result[:counts].sort.each do |star, count|

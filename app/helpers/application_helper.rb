@@ -291,6 +291,13 @@ module ApplicationHelper
       }.join
       "<div class=\"mini-pick-list\">#{rows}</div>"
 
+    when "prioritise"
+      items = opts.empty? ? [ "Option A", "Option B", "Option C" ] : opts.first(3)
+      rows  = items.map.with_index { |o, i|
+        "<div class=\"mini-pick-item\"><span class=\"mini-p-dot selected\" style=\"display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff\">#{i + 1}</span>#{h(o.truncate(16))}</div>"
+      }.join
+      "<div class=\"mini-pick-list\">#{rows}</div>"
+
     when "select_one_grid", "select_many_grid"
       n    = opts.size
       cols = n >= 5 ? " cols-3" : ""

@@ -1090,6 +1090,37 @@
 .choice-list-label { flex: 1; }
 .choice-list-tick { margin-left: auto; }
 
+/* ── Prioritise (drag-to-rank list) ───────────────── */
+.prioritise-list { touch-action: pan-y; }
+.prioritise-item { cursor: grab; user-select: none; -webkit-user-select: none; }
+.prioritise-item .choice-list-label { cursor: grab; }
+.prioritise-item.is-dragging {
+  cursor: grabbing;
+  opacity: 0.92;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+  border-color: var(--brand-primary, #615BF5);
+  transform: scale(1.01);
+}
+.prioritise-rank {
+  flex-shrink: 0;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--brand-primary, #615BF5);
+  color: #fff;
+  font-family: "Alata", sans-serif; font-size: 13px; font-weight: 700;
+  line-height: 1;
+}
+.prioritise-grip {
+  margin-left: auto;
+  color: rgba(0,0,0,0.28);
+  font-size: 16px; letter-spacing: -3px;
+  writing-mode: vertical-rl;
+  cursor: grab;
+  padding: 0 2px;
+}
+.phone-bottom .prioritise-rank { width: 20px; height: 20px; font-size: 11px; }
+
 /* ── MCQ grid ───────────────────────────────────── */
 .choice-grid    { display: grid; gap: 10px; }
 .choice-grid-2  { grid-template-columns: 1fr 1fr; }

@@ -39,6 +39,12 @@ const COMPATIBILITY = {
     { type: "select_many",      score: 75,  note: "Image list, multi-pick — small tile left of each option. Fall back to this when labels are long or there are too many options to grid neatly." },
     { type: "select_one_grid",  score: 70,  note: "Same visual grid but constrained to a single pick — switch when one decisive answer matters more than breadth." },
     { type: "multiple_choice",  score: 60,  note: "Image list, single pick — same tile-left layout, sharpest read but most reductive option here." },
+    { type: "prioritise",       score: 65,  note: "Same options, but respondents drag them into an order of priority — richer data (the ORDER of preference), not just which they picked." },
+  ],
+  prioritise: [
+    { type: "prioritise",       score: 100, note: "Drag-to-rank list — respondents order the options highest to lowest, so you learn the order of preference. Best with about five options." },
+    { type: "select_many",      score: 65,  note: "Same list without the ordering — switch if you only need which options they'd pick, not the order." },
+    { type: "select_one_grid",  score: 45,  note: "Collapses the ranking to a single visual pick — only if one decisive answer matters more than the order." },
   ],
   select_one_grid: [
     { type: "select_one_grid",  score: 100, note: "Visual single-pick — best when imagery or colour does the talking and you want a fast, gut response." },
@@ -102,6 +108,7 @@ const DEFAULT_OPTIONS = {
   rating:           ["Poor", "Fair", "Good", "Great", "Excellent"],
   multiple_choice:  ["Option A", "Option B", "Option C"],
   select_many:      ["Option A", "Option B", "Option C", "Option D"],
+  prioritise:       ["Option A", "Option B", "Option C", "Option D", "Option E"],
   yes_no:           ["Yes", "No"],
   select_one_grid:  ["A", "B", "C", "D"],
   select_many_grid: ["A", "B", "C", "D"],
@@ -138,6 +145,7 @@ function fitTier(score) {
 const COMPONENTS = {
   multiple_choice: (opts) => choiceListHtml(opts, "single"),
   select_many:     (opts) => choiceListHtml(opts, "multi"),
+  prioritise:      (opts) => prioritiseHtml(opts),
 
   yes_no: () => `
     <ul class="choice-list" data-controller="picker" data-picker-mode-value="single">
@@ -216,6 +224,24 @@ const COMPONENTS = {
     </div>`,
 
   welcome_card: () => "",
+}
+
+function prioritiseHtml(opts) {
+  return `
+    <ul class="choice-list prioritise-list" data-controller="prioritise card-editor">
+      ${opts.map((o, i) => `
+        <li class="choice-list-item pick-item prioritise-item" data-prioritise-target="item"
+            data-action="pointerdown->prioritise#start">
+          <span class="prioritise-rank" data-prioritise-target="rank">${i + 1}</span>
+          <div class="choice-list-tile choice-bg-${(i % 6) + 1}"></div>
+          <span class="pick-text choice-list-label" contenteditable="true">${esc(o)}</span>
+          <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
+          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
+        </li>`).join("")}
+      <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
+        <span>＋</span> Add option
+      </li>
+    </ul>`
 }
 
 function choiceListHtml(opts, mode) {

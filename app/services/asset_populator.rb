@@ -32,7 +32,7 @@ class AssetPopulator
   MOBILE_BG_DIR       = "verto-library/mobile-backgrounds".freeze
 
   TIER1_MIN_SCORE     = 5
-  SELECT_TYPES        = %w[multiple_choice select_many select_one_grid select_many_grid yes_no].freeze
+  SELECT_TYPES        = %w[multiple_choice select_many select_one_grid select_many_grid yes_no prioritise].freeze
   SCALE_TYPES         = %w[range rating nps].freeze
   STOP_WORDS          = %w[
     the a an and or of for in on at to with from your our their this that

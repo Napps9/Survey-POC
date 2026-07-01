@@ -172,6 +172,13 @@ class ResultsExport
     when "nps"
       grand = counts.values.sum
       counts.keys.sort_by(&:to_i).map { |k| [ k.to_s, counts[k].to_i, pct(counts[k].to_i, grand) ] } + other_rows(result)
+    when "prioritise"
+      # counts[label] = sum of ranks; mean position = sum / total (lower = higher
+      # priority). Export the ranked order with each option's average position.
+      total = [ result[:total].to_i, 1 ].max
+      counts.map { |label, sum| [ label.to_s, sum.to_f / total ] }
+            .sort_by { |_l, mean| mean }
+            .each_with_index.map { |(label, mean), i| [ "#{i + 1}. #{label}", "avg #{mean.round(2)}", nil ] }
     when "tap_card"
       counts.flat_map do |label, dirs|
         yes_c = dirs.is_a?(Hash) ? dirs["yes"].to_i    : 0

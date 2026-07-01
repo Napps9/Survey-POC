@@ -316,6 +316,16 @@ export default class extends Controller {
                     .map(el => this._canonicalOf(el))
                     .filter(v => v !== null)
 
+      case "prioritise": {
+        // The ordered canonical labels, top (highest priority) → bottom. Only
+        // counts once the respondent has arranged the list.
+        const list = card.querySelector(".prioritise-list")
+        if (!list || list.dataset.prioritiseTouched !== "true") return null
+        return Array.from(list.querySelectorAll(".prioritise-item"))
+                    .map(el => this._canonicalOf(el))
+                    .filter(v => v !== null)
+      }
+
       case "range": {
         const dots   = Array.from(card.querySelectorAll(".s-dot"))
         const active = dots.findIndex(d => d.classList.contains("active"))
@@ -546,6 +556,7 @@ export default class extends Controller {
 
   _formatMine(mine, row) {
     if (mine === null || mine === undefined || mine === "") return "—"
+    if (row.type === "prioritise" && Array.isArray(mine)) return mine.length ? mine.join(" › ") : "—"
     if (Array.isArray(mine)) return mine.length ? mine.join(", ") : "—"
     if ((row.type === "range" || row.type === "nps") && Array.isArray(row.options)) {
       return row.options[mine] || `Step ${Number(mine) + 1}`
@@ -574,6 +585,19 @@ export default class extends Controller {
       note.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;"
       note.textContent = `${row.total || 0} open-ended response${row.total === 1 ? "" : "s"} total`
       container.appendChild(note)
+      return container
+    } else if (row.type === "prioritise") {
+      // counts[label] = sum of ranks across responders; lower mean = higher
+      // priority. Show the aggregate order with each option's average position.
+      const total = row.total || 1
+      const ranked = Object.entries(counts)
+        .map(([label, sumRank]) => ({ label, mean: sumRank / total }))
+        .sort((a, b) => a.mean - b.mean)
+      const n = ranked.length || 1
+      ranked.forEach(({ label, mean }, i) => {
+        const pct = Math.round(Math.max(0, Math.min(1, (n - mean + 1) / n)) * 100)
+        container.appendChild(this._buildBar(`${i + 1}. ${label}`, `avg ${mean.toFixed(1)}`, pct, false))
+      })
       return container
     } else if (row.type === "tap_card") {
       Object.entries(counts).forEach(([label, yn]) => {
@@ -856,7 +880,7 @@ export default class extends Controller {
   }
 
   _lockInputs(card) {
-    card.querySelectorAll(".choice-list, .choice-grid, .rotate-wrap, .slider-wrap, .nps-slider, .rating-wrap, .freeform-wrap, .other-block")
+    card.querySelectorAll(".choice-list, .choice-grid, .rotate-wrap, .slider-wrap, .nps-slider, .prioritise-list, .rating-wrap, .freeform-wrap, .other-block")
         .forEach(el => { el.style.pointerEvents = "none" })
     card.querySelectorAll("textarea, input, button[data-other-target='btn']").forEach(el => { el.disabled = true })
   }

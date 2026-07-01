@@ -64,6 +64,17 @@ select_many:
   picker_icon:  "☑"
   pickable:     true
 
+prioritise:
+  badge:        "PRIORITISE"
+  badge_css:    "sb-rank"
+  panel_label:  "DRAG INTO ORDER"
+  eyebrow:      "Click and drag to arrange in order of priority"
+  picker_name:  "Prioritise"
+  picker_desc:  "Drag to rank in order"
+  explainer:    "A list respondents drag into an order of priority (highest to lowest). Richer than select one/many — you learn the ORDER of preference, not just the picks. Best with about 5 options so analysis can surface a clear top three."
+  picker_icon:  "≡"
+  pickable:     true
+
 yes_no:
   badge:        "YES / NO"
   badge_css:    "sb-range"

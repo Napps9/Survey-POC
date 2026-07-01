@@ -119,6 +119,7 @@ export default class extends Controller {
   _optionEls(cardEl) {
     const sel = {
       multiple_choice: ".pick-text", select_many: ".pick-text", yes_no: ".pick-text",
+      prioritise: ".choice-list-label",
       select_one_grid: ".choice-label", select_many_grid: ".choice-label",
       range: ".slider-label-text", nps: ".slider-label-text",
       rating: ".rating-label",

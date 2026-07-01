@@ -63,6 +63,11 @@ module AggregatesSurveyResults
       st[:counts][value.to_s] += 1
     when "select_many", "select_many_grid"
       Array(value).each { |v| st[:counts][v.to_s] += 1 }
+    when "prioritise"
+      # value is the ordered list, highest priority first. Bank each option's
+      # 1-based rank so we can average positions later (lower mean = higher
+      # priority).
+      Array(value).each_with_index { |label, i| st[:counts][label.to_s] += (i + 1) }
     when "tap_card"
       if value.is_a?(Hash)
         value.each do |label, dir|
@@ -94,6 +99,10 @@ module AggregatesSurveyResults
       base.merge(total: st[:value_count] + other_count, counts:)
     when "tap_card"
       base.merge(total: st[:value_count] + other_count, counts: st[:counts])
+    when "prioritise"
+      # counts[label] = sum of ranks; total = responders, so mean rank =
+      # counts[label] / total. Lower mean = higher priority.
+      base.merge(total: st[:value_count], counts: st[:counts])
     when "range", "nps"
       base.merge(total: st[:value_count] + other_count, counts: st[:counts])
     when "rating"
