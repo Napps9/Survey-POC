@@ -541,4 +541,9 @@ tr:
     import_pdf: PDF'den içe aktar →
     import_toggle: "Sorularınız zaten PDF'de mi? Bunun yerine içe aktarın →"
     importing: PDF'iniz okunuyor…
+    import_gform_heading: "Or import from a Google Form"
+    import_gform_url_placeholder: "Paste your Google Form edit link"
+    import_gform_submit: "Import from Google Forms →"
+    import_gform_connect: "Connect Google to import a Form →"
+    importing_gform: "Reading your Google Form…"
     step_counter: Adım %{n} / %{total}

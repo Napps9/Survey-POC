@@ -541,4 +541,9 @@ vi:
     import_pdf: Nhập từ PDF →
     import_toggle: "Đã có câu hỏi trong PDF? Nhập chúng thay thế →"
     importing: Đang đọc PDF của bạn…
+    import_gform_heading: "Or import from a Google Form"
+    import_gform_url_placeholder: "Paste your Google Form edit link"
+    import_gform_submit: "Import from Google Forms →"
+    import_gform_connect: "Connect Google to import a Form →"
+    importing_gform: "Reading your Google Form…"
     step_counter: Bước %{n} / %{total}

@@ -541,4 +541,9 @@ ja:
     import_pdf: PDFからインポート →
     import_toggle: "質問をPDFでお持ちですか？代わりにインポート →"
     importing: PDFを読み込んでいます…
+    import_gform_heading: "Or import from a Google Form"
+    import_gform_url_placeholder: "Paste your Google Form edit link"
+    import_gform_submit: "Import from Google Forms →"
+    import_gform_connect: "Connect Google to import a Form →"
+    importing_gform: "Reading your Google Form…"
     step_counter: "%{total}ステップ中 %{n}"

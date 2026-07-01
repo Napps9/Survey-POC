@@ -541,4 +541,9 @@ ko:
     import_pdf: PDF에서 가져오기 →
     import_toggle: "질문이 이미 PDF에 있나요? 대신 가져오기 →"
     importing: PDF를 읽는 중…
+    import_gform_heading: "Or import from a Google Form"
+    import_gform_url_placeholder: "Paste your Google Form edit link"
+    import_gform_submit: "Import from Google Forms →"
+    import_gform_connect: "Connect Google to import a Form →"
+    importing_gform: "Reading your Google Form…"
     step_counter: "%{total}단계 중 %{n}단계"

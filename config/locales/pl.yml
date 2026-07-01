@@ -541,4 +541,9 @@ pl:
     import_pdf: Importuj z PDF →
     import_toggle: "Masz już pytania w pliku PDF? Zaimportuj je zamiast tego →"
     importing: Wczytywanie pliku PDF…
+    import_gform_heading: "Or import from a Google Form"
+    import_gform_url_placeholder: "Paste your Google Form edit link"
+    import_gform_submit: "Import from Google Forms →"
+    import_gform_connect: "Connect Google to import a Form →"
+    importing_gform: "Reading your Google Form…"
     step_counter: Krok %{n} z %{total}

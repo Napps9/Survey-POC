@@ -143,30 +143,14 @@ class SurveysController < ApplicationController
       return import_pdf_error("That PDF is too large — please keep it under #{MAX_PDF_BYTES / 1.megabyte}MB.")
     end
 
-    palette        = BrandPalette.sanitize(params[:brand_palette])
-    locales        = SupportedLocales.sanitize_list(params[:locales], fallback: [ Current.locale.to_s ])
-    default_locale = SupportedLocales.coerce(params[:default_locale].presence || locales.first)
-    locales        = ([ default_locale ] + locales).uniq
-
-    data   = Base64.strict_encode64(pdf.read)
-    result = PdfQuestionImporter.new.call(pdf_data: data, locale: default_locale)
-    cards  = Array(result["cards"])
+    default_locale = wizard_default_locale
+    data    = Base64.strict_encode64(pdf.read)
+    result  = PdfQuestionImporter.new.call(pdf_data: data, locale: default_locale)
+    cards   = Array(result["cards"])
 
     return import_pdf_error("We couldn't find any questions in that PDF — try a different file.") if cards.empty?
 
-    payload = {
-      "result"         => result,
-      "verto_name"     => params[:verto_name].to_s.strip,
-      "theme"          => params[:theme].to_s,
-      "audience_age"   => params[:audience_age].to_s,
-      "key_insight"    => params[:key_insight].to_s,
-      "brand_palette"  => palette,
-      "default_locale" => default_locale,
-      "locales"        => locales,
-      "common_question_ids" => Array(params[:common_question_ids]),
-      "ask_region"     => ActiveModel::Type::Boolean.new.cast(params[:ask_region]) || false,
-      "region_tags"    => Array(params[:region_tags]).map { |t| { "country_code" => t[:country_code].to_s, "label" => t[:label].to_s } }
-    }
+    payload = wizard_import_payload(result)
 
     # Questions that don't fit Verto's design rules pause the import: the
     # creator reviews their wording next to Verto's optimised version and
@@ -202,6 +186,38 @@ class SurveysController < ApplicationController
   rescue => e
     Rails.logger.error("[SurveysController#finalize_import] #{e.class}: #{e.message}")
     redirect_to new_survey_path, alert: "We couldn't finish the import — #{friendly_generate_error(e)}"
+  end
+
+  # POST /surveys/import_google_form
+  # Creates a Verto from an existing Google Form: fetches the form via the
+  # Forms API with the user's OAuth token, maps each question to its
+  # best-fitting Verto card type (verbatim), and opens the editor — where the
+  # per-card "Optimise" turns them into rule-compliant Verto questions.
+  def import_google_form
+    return import_pdf_error("Google isn't set up on this server.") unless GoogleOauthService.configured?
+    return redirect_to google_connect_path(return_to: "import") unless Current.user&.google_connected?
+
+    form_id = GoogleFormsClient.extract_form_id(params[:google_form_url])
+    if form_id.blank?
+      return import_pdf_error("Paste your Google Form's edit link, e.g. https://docs.google.com/forms/d/…/edit")
+    end
+
+    token  = GoogleOauthService.client_for(Current.user).access_token
+    form   = GoogleFormsClient.new(token).fetch(form_id)
+    result = GoogleFormsImporter.call(form)
+
+    return import_pdf_error("We couldn't find any questions in that form.") if Array(result["cards"]).empty?
+
+    @survey = create_imported_survey!(wizard_import_payload(result), variant: "verbatim")
+    redirect_to survey_path(@survey)
+  rescue GoogleOauthService::NotConnected, GoogleFormsClient::NotAuthorized
+    # Connected before Forms access was added (or token revoked) — reconnect.
+    redirect_to google_connect_path(return_to: "import")
+  rescue GoogleFormsClient::Error => e
+    import_pdf_error(e.message)
+  rescue => e
+    Rails.logger.error("[SurveysController#import_google_form] #{e.class}: #{e.message}")
+    import_pdf_error("We couldn't import that Google Form — #{friendly_generate_error(e)}")
   end
 
   def update
@@ -491,6 +507,33 @@ class SurveysController < ApplicationController
   # wording; "optimised" keeps Verto's rule-compliant rewrite. Common cards,
   # the demographic tail, region tags and translation all happen here so both
   # the straight-through and the reviewed path create identical structures.
+  # Primary locale chosen in the wizard (used by the PDF importer's AI call).
+  def wizard_default_locale
+    locales = SupportedLocales.sanitize_list(params[:locales], fallback: [ Current.locale.to_s ])
+    SupportedLocales.coerce(params[:default_locale].presence || locales.first)
+  end
+
+  # Shared import payload built from the wizard form fields — used by both the
+  # PDF and Google Forms import paths so they can't drift.
+  def wizard_import_payload(result)
+    default_locale = wizard_default_locale
+    locales        = ([ default_locale ] + SupportedLocales.sanitize_list(params[:locales], fallback: [ Current.locale.to_s ])).uniq
+
+    {
+      "result"              => result,
+      "verto_name"          => params[:verto_name].to_s.strip,
+      "theme"               => params[:theme].to_s,
+      "audience_age"        => params[:audience_age].to_s,
+      "key_insight"         => params[:key_insight].to_s,
+      "brand_palette"       => BrandPalette.sanitize(params[:brand_palette]),
+      "default_locale"      => default_locale,
+      "locales"             => locales,
+      "common_question_ids" => Array(params[:common_question_ids]),
+      "ask_region"          => ActiveModel::Type::Boolean.new.cast(params[:ask_region]) || false,
+      "region_tags"         => Array(params[:region_tags]).map { |t| { "country_code" => t[:country_code].to_s, "label" => t[:label].to_s } }
+    }
+  end
+
   def create_imported_survey!(payload, variant:)
     result = payload["result"]
     cards  = Array(result["cards"]).map do |c|

@@ -6,8 +6,16 @@ class GoogleOauthService
   AUTH_URI  = "https://accounts.google.com/o/oauth2/auth".freeze
   TOKEN_URI = "https://oauth2.googleapis.com/token".freeze
   # drive.file = per-file access to files the app creates — narrow scope, does
-  # NOT expose the user's other Drive files. Enough to create + write a sheet.
-  SCOPE     = "https://www.googleapis.com/auth/drive.file".freeze
+  # NOT expose the user's other Drive files (enough to create + write a sheet).
+  # forms.body.readonly = read-only access to a form's structure, for importing
+  # a Google Form into a Verto. Both are requested together so one connection
+  # covers export + import; users connected before this was added re-consent
+  # once (a Forms API call 403s until they do, which we handle by sending them
+  # back through connect).
+  SCOPE     = [
+    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/forms.body.readonly"
+  ].join(" ").freeze
 
   # Raised when the user has no usable refresh token (never connected, or revoked).
   class NotConnected < StandardError; end

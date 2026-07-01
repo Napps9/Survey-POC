@@ -541,4 +541,9 @@ he:
     import_pdf: ייבא מ-PDF →
     import_toggle: "כבר יש לך את השאלות בקובץ PDF? ייבא אותן במקום ←"
     importing: קורא את ה-PDF שלך…
+    import_gform_heading: "Or import from a Google Form"
+    import_gform_url_placeholder: "Paste your Google Form edit link"
+    import_gform_submit: "Import from Google Forms →"
+    import_gform_connect: "Connect Google to import a Form →"
+    importing_gform: "Reading your Google Form…"
     step_counter: שלב %{n} מתוך %{total}

@@ -57,6 +57,7 @@ Rails.application.routes.draw do
   get  "surveys/new",                 to: "surveys#new",     as: :new_survey
   post "surveys/generate",            to: "surveys#generate", as: :generate_survey
   post "surveys/import_pdf",          to: "surveys#import_pdf", as: :import_pdf_survey
+  post "surveys/import_google_form",  to: "surveys#import_google_form", as: :import_google_form_survey
   post "surveys/finalize_import",     to: "surveys#finalize_import", as: :finalize_import_survey
   post "surveys/:id/publish",         to: "surveys#publish",  as: :publish_survey
   get  "surveys/:id/preview",         to: "surveys#preview",  as: :preview_survey

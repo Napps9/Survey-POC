@@ -11,20 +11,20 @@ class GoogleAuthController < ApplicationController
 
     state = SecureRandom.urlsafe_base64(24)
     session[:google_oauth_state]  = state
-    session[:google_oauth_return] = { "survey_id" => params[:survey_id], "segment" => params[:segment] }
+    session[:google_oauth_return] = {
+      "survey_id" => params[:survey_id], "segment" => params[:segment], "to" => params[:return_to]
+    }
 
     redirect_to GoogleOauthService.authorization_url(redirect_uri: google_callback_url, state: state),
                 allow_other_host: true
   end
 
   def callback
-    ret       = session.delete(:google_oauth_return) || {}
-    expected  = session.delete(:google_oauth_state)
-    survey_id = ret["survey_id"]
-    segment   = ret["segment"]
+    ret      = session.delete(:google_oauth_return) || {}
+    expected = session.delete(:google_oauth_state)
 
     if params[:error].present? || expected.blank? || params[:state] != expected
-      return redirect_to results_or_root(survey_id, segment, google_error: 1)
+      return redirect_to return_target(ret, google_error: 1)
     end
 
     tokens = GoogleOauthService.exchange_code!(code: params[:code], redirect_uri: google_callback_url)
@@ -39,13 +39,20 @@ class GoogleAuthController < ApplicationController
     attrs[:google_refresh_token] = tokens[:refresh_token] if tokens[:refresh_token].present?
     Current.user.update!(attrs)
 
-    redirect_to results_or_root(survey_id, segment, google_connected: 1)
+    redirect_to return_target(ret, google_connected: 1)
   rescue => e
     Rails.logger.error("[GoogleAuthController] #{e.class}: #{e.message}")
-    redirect_to results_or_root(ret["survey_id"], ret["segment"], google_error: 1)
+    redirect_to return_target(ret, google_error: 1)
   end
 
   private
+
+  # Where the connect flow drops back to: the Verto-import wizard when it was
+  # started from there, otherwise the results page (Sheets export) or root.
+  def return_target(ret, **flags)
+    return new_survey_path(**flags) if ret["to"] == "import"
+    results_or_root(ret["survey_id"], ret["segment"], **flags)
+  end
 
   def results_or_root(survey_id, segment, **flags)
     return root_path if survey_id.blank?

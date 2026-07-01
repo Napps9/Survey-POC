@@ -541,4 +541,9 @@ nl:
     import_pdf: Importeren uit PDF →
     import_toggle: "Heb je je vragen al in een PDF? Importeer ze in plaats daarvan →"
     importing: Je PDF wordt gelezen…
+    import_gform_heading: "Or import from a Google Form"
+    import_gform_url_placeholder: "Paste your Google Form edit link"
+    import_gform_submit: "Import from Google Forms →"
+    import_gform_connect: "Connect Google to import a Form →"
+    importing_gform: "Reading your Google Form…"
     step_counter: Stap %{n} van %{total}

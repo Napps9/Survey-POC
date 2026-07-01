@@ -541,4 +541,9 @@ hi:
     import_pdf: PDF से आयात करें →
     import_toggle: "क्या आपके प्रश्न पहले से PDF में हैं? इसके बजाय उन्हें आयात करें →"
     importing: आपकी PDF पढ़ी जा रही है…
+    import_gform_heading: "Or import from a Google Form"
+    import_gform_url_placeholder: "Paste your Google Form edit link"
+    import_gform_submit: "Import from Google Forms →"
+    import_gform_connect: "Connect Google to import a Form →"
+    importing_gform: "Reading your Google Form…"
     step_counter: चरण %{n} / %{total}
