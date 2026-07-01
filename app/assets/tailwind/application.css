@@ -2815,6 +2815,14 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 .preview-card { display: none; width: 845px; max-width: 100%; }
 .preview-card.active { display: block; }
 
+/* Create-wizard cards grow with their content (the auto-growing name/theme/
+   audience/insight fields) instead of clipping at the fixed editor/player card
+   height. Keeps the spacious look via a min-height, then expands as needed. */
+.preview-card[data-create-wizard-target] .split-card {
+  height: auto;
+  min-height: 660px;
+}
+
 .preview-thankyou {
   display: none; flex-direction: column;
   align-items: center; justify-content: center;

@@ -87,6 +87,8 @@
       # Light-theme styles for inputs inside the white card right-panel
       light_input_style    = "width:100%;background:#fafbfc;border:1px solid rgba(0,0,0,0.12);border-radius:12px;padding:14px 18px;color:#000;font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);outline:none;box-sizing:border-box;"
       light_textarea_style = "#{light_input_style};resize:vertical;line-height:1.55;"
+      # A one-line field that wraps + grows (auto-growing textarea styled like an input).
+      light_singleline_style = "#{light_input_style}line-height:1.4;overflow:hidden;resize:none;"
 
       # Dark-theme styles for the instructions/examples left panel
       left_pad_style  = "position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:80px 36px 48px;gap:18px;text-align:left;"
@@ -152,23 +154,24 @@
 
             <label style="display:flex;flex-direction:column;gap:6px;font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.5);font-weight:700;">
               <%= t("wizard.s1_name_label", default: "Verto name") %>
-              <%= f.text_field :verto_name,
+              <%= f.text_area :verto_name, rows: 1,
                     required: true,
-                    data: { required: "true" },
+                    data: { required: "true", controller: "autogrow", "autogrow-single-value": "true" },
                     maxlength: 80,
                     placeholder: t("wizard.s1_name_placeholder", default: "e.g. Youth Wellbeing Check-in 2026"),
-                    style: light_input_style,
+                    style: light_singleline_style,
                     onfocus: "this.style.borderColor='#FF1E6F'",
                     onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
             </label>
 
             <label style="display:flex;flex-direction:column;gap:6px;font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.5);font-weight:700;">
               <%= t("wizard.s1_theme_label", default: "Theme") %>
-              <%= f.text_field :theme,
+              <%= f.text_area :theme, rows: 1,
                     required: true,
-                    data: { required: "true" },
+                    data: { required: "true", controller: "autogrow", "autogrow-single-value": "true" },
+                    maxlength: 120,
                     placeholder: t("wizard.s1_placeholder"),
-                    style: light_input_style,
+                    style: light_singleline_style,
                     onfocus: "this.style.borderColor='#FF1E6F'",
                     onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
             </label>
@@ -202,11 +205,12 @@
           <div class="split-right" style="justify-content:center;gap:16px;text-align:left;">
             <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#01EACB;"><%= t("wizard.s2_eyebrow") %></div>
             <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s2_title") %></div>
-            <%= f.text_field :audience_age,
+            <%= f.text_area :audience_age, rows: 1,
                   required: true,
-                  data: { required: "true" },
+                  data: { required: "true", controller: "autogrow", "autogrow-single-value": "true" },
+                  maxlength: 160,
                   placeholder: t("wizard.s2_placeholder"),
-                  style: light_input_style,
+                  style: light_singleline_style,
                   onfocus: "this.style.borderColor='#01EACB'",
                   onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
             <div class="wizard-mobile-hint">
@@ -240,6 +244,7 @@
             <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#0CA7FF;"><%= t("wizard.s3_eyebrow") %></div>
             <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s3_title") %></div>
             <%= f.text_area :key_insight, rows: 4,
+                  data: { controller: "autogrow" },
                   placeholder: t("wizard.s3_placeholder"),
                   style: light_textarea_style,
                   onfocus: "this.style.borderColor='#0CA7FF'",
@@ -472,6 +477,7 @@
             <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#615BF5;"><%= t("wizard.s6_eyebrow") %> · <%= t("wizard.optional") %></div>
             <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s6_title") %></div>
             <%= f.text_area :notes, rows: 4,
+                  data: { controller: "autogrow" },
                   placeholder: t("wizard.s6_placeholder"),
                   style: light_textarea_style,
                   onfocus: "this.style.borderColor='#615BF5'",

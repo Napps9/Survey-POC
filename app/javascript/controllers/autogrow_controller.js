@@ -9,6 +9,10 @@ import { Controller } from "@hotwired/stimulus"
 // never force a height while hidden — that would stick at 0 — and we re-grow as
 // soon as the field becomes visible, so saved content isn't shown clipped.
 export default class extends Controller {
+  // single: a one-line field (name/theme/audience) that should still WRAP and
+  // grow instead of scrolling sideways — so hard newlines aren't allowed.
+  static values = { single: { type: Boolean, default: false } }
+
   connect() {
     const el = this.element
     el.style.overflowY = "hidden"
@@ -17,6 +21,15 @@ export default class extends Controller {
     this._grow  = this._grow.bind(this)
     el.addEventListener("input", this._grow)
     el.addEventListener("focus", this._grow)
+
+    if (this.singleValue) {
+      // Keep it one logical line: block Enter and strip any pasted newlines,
+      // while still letting the text soft-wrap onto extra rows and grow.
+      this._onKey = (e) => { if (e.key === "Enter") e.preventDefault() }
+      this._strip = () => { if (el.value.includes("\n")) el.value = el.value.replace(/\s*\n\s*/g, " ") }
+      el.addEventListener("keydown", this._onKey)
+      el.addEventListener("input", this._strip)
+    }
 
     if ("IntersectionObserver" in window) {
       this._io = new IntersectionObserver((entries) => {
@@ -33,6 +46,8 @@ export default class extends Controller {
   disconnect() {
     this.element.removeEventListener("input", this._grow)
     this.element.removeEventListener("focus", this._grow)
+    if (this._onKey) this.element.removeEventListener("keydown", this._onKey)
+    if (this._strip) this.element.removeEventListener("input", this._strip)
     this._io?.disconnect()
   }
 
