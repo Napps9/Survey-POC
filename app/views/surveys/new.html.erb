@@ -125,6 +125,29 @@
             <div style="font-family:'Alata',sans-serif;font-size:30px;line-height:1.15;color:#1C2034;"><%= t("wizard.welcome_title") %></div>
             <p class="q-subtitle" style="margin:0;"><%= t("wizard.welcome_sub") %></p>
             <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.4);margin:0;"><%= t("wizard.welcome_ready_html") %></p>
+
+            <%# ── Optional alternative start: import an existing Google Form.
+                Surfaced on the very first card so it's a discoverable shortcut,
+                not something buried behind the whole brief. The brief-and-Next
+                flow above stays the primary path; this posts straight to
+                import_google_form (formnovalidate skips the generate-only
+                required fields). PDF import still lives on the final card. ── %>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;padding:12px 14px;border-radius:12px;background:#fafbfc;border:1px dashed rgba(0,0,0,0.18);">
+              <p style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.7);margin:0;"><%= t("wizard.import_gform_heading") %></p>
+              <% if Current.user&.google_connected? %>
+                <input type="url" name="google_form_url"
+                       placeholder="<%= t('wizard.import_gform_url_placeholder') %>"
+                       style="font-family:'ABeeZee',sans-serif;font-size:13px;padding:9px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.16);background:#fff;width:100%;box-sizing:border-box;" />
+                <%= f.submit t("wizard.import_gform_submit"),
+                      formaction: import_google_form_survey_path,
+                      formnovalidate: true,
+                      data: { generating_import: "", turbo_submits_with: t("wizard.importing_gform") },
+                      style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
+              <% else %>
+                <%= link_to t("wizard.import_gform_connect"), google_connect_path(return_to: "import"),
+                      style: "align-self:flex-start;text-decoration:none;background:#fff;color:#1C2034;border:1px solid rgba(0,0,0,0.16);border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;" %>
+              <% end %>
+            </div>
           </div>
         </div>
       </section>
@@ -619,24 +642,6 @@
                       formnovalidate: true,
                       data: { generating_import: "", turbo_submits_with: t("wizard.importing") },
                       style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
-
-                <%# ── Google Forms import ── %>
-                <div style="border-top:1px dashed rgba(0,0,0,0.14);margin-top:4px;padding-top:12px;display:flex;flex-direction:column;gap:10px;">
-                  <p style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.7);margin:0;"><%= t("wizard.import_gform_heading") %></p>
-                  <% if Current.user&.google_connected? %>
-                    <input type="url" name="google_form_url"
-                           placeholder="<%= t('wizard.import_gform_url_placeholder') %>"
-                           style="font-family:'ABeeZee',sans-serif;font-size:13px;padding:9px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.16);background:#fff;width:100%;box-sizing:border-box;" />
-                    <%= f.submit t("wizard.import_gform_submit"),
-                          formaction: import_google_form_survey_path,
-                          formnovalidate: true,
-                          data: { generating_import: "", turbo_submits_with: t("wizard.importing_gform") },
-                          style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
-                  <% else %>
-                    <%= link_to t("wizard.import_gform_connect"), google_connect_path(return_to: "import"),
-                          style: "align-self:flex-start;text-decoration:none;background:#fff;color:#1C2034;border:1px solid rgba(0,0,0,0.16);border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;" %>
-                  <% end %>
-                </div>
               </div>
             </details>
           </div>
