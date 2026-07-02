@@ -13,6 +13,7 @@
   play_token      = params[:token].presence || @survey.publish_token
   progress_url    = preview_mode ? "" : progress_survey_url(play_token)
   submit_url      = preview_mode ? "" : submit_survey_url(play_token)
+  consent_url     = preview_mode ? "" : consent_survey_url(play_token)
   results_url     = @survey.show_results_comparison? && play_token.present? ? player_results_url(play_token) : ""
   show_comparison = @survey.show_results_comparison? && results_url.present?
   # The public play link respondents can pass on via the Share button on the
@@ -44,6 +45,7 @@
      data-controller="player"
      data-player-progress-url-value="<%= progress_url %>"
      data-player-submit-url-value="<%= submit_url %>"
+     data-player-consent-url-value="<%= consent_url %>"
      data-player-results-url-value="<%= results_url %>"
      data-player-regions-url-value="<%= regions_url %>"
      data-player-region-country-value="<%= @region_link&.country_code %>"

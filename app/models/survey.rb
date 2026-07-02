@@ -220,6 +220,33 @@ class Survey < ApplicationRecord
     nil
   end
 
+  def slug?
+    slug.present?
+  end
+
+  # Coerce creator input into a URL-safe slug for the optional vanity
+  # /play/:slug link — lowercase, non-alphanumeric runs collapsed to a single
+  # hyphen, leading/trailing hyphens trimmed, capped so the URL stays
+  # reasonable. Blank input (or input with no alphanumerics) returns nil,
+  # same "blank clears the setting" convention as consent_text.
+  MAX_SLUG_LENGTH = 60
+  def self.normalize_slug(value)
+    slug = value.to_s.downcase.gsub(/[^a-z0-9]+/, "-").delete_prefix("-").delete_suffix("-")
+    slug.first(MAX_SLUG_LENGTH).delete_suffix("-").presence
+  end
+
+  # True when `value` is already in use anywhere in the /play/:token
+  # namespace — this Verto's own publish_token, another Verto's slug or
+  # publish_token, or a share/region link token — so a creator-chosen slug
+  # can never make PlayerController#load_survey_and_share resolve ambiguously.
+  def self.slug_taken?(value, excluding_id: nil)
+    return false if value.blank?
+    Survey.where.not(id: excluding_id).exists?(slug: value) ||
+      Survey.where.not(id: excluding_id).exists?(publish_token: value) ||
+      SurveyShare.exists?(share_token: value) ||
+      SurveyRegionLink.exists?(token: value)
+  end
+
   # A "responder" is anyone who answered at least one question (not just those
   # who submitted). Counted in SQL off the denormalised `answered` flag, so this
   # never loads response rows / answers JSON (the dashboard computes these once

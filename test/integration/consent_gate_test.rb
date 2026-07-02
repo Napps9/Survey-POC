@@ -1,6 +1,7 @@
 require "test_helper"
 
 class ConsentGateTest < ActionDispatch::IntegrationTest
+  include ActiveSupport::Testing::TimeHelpers
   CARDS = [
     { "type" => "welcome_card", "title" => "hi" },
     { "type" => "yes_no", "text" => "Q", "options" => [ "Yes", "No" ] }
@@ -58,5 +59,58 @@ class ConsentGateTest < ActionDispatch::IntegrationTest
     get play_survey_path(s.publish_token)
     assert_response :success
     assert_select ".preview-card[data-card-type='consent_card']", false
+  end
+
+  def json_post(path, payload)
+    post path, params: payload.to_json, headers: { "Content-Type" => "application/json" }
+    JSON.parse(response.body)
+  end
+
+  test "consent endpoint records agreement with a timestamp and a snapshot of the wording" do
+    s = published_survey(consent: "You agree your anonymous answers may be used for research.")
+
+    body = json_post consent_survey_path(s.publish_token), session_token: "consent-1", agreed: true
+    assert_response :success
+    assert body["ok"]
+
+    resp = Response.find_by!(session_token: "consent-1")
+    assert_not_nil resp.consent_agreed_at
+    assert_nil resp.consent_declined_at
+    assert_equal s.consent_text, resp.consent_text_snapshot
+    # A consent-only ping (no answers yet) must not read as a completed
+    # response — the schema column defaults to "completed", which would
+    # otherwise corrupt completion-rate stats for someone who agreed then left.
+    assert_equal "started", resp.status
+  end
+
+  test "consent endpoint records a decline separately from an agreement" do
+    s = published_survey(consent: "Agree to continue.")
+
+    body = json_post consent_survey_path(s.publish_token), session_token: "consent-2", agreed: false
+    assert_response :success
+    assert body["ok"]
+
+    resp = Response.find_by!(session_token: "consent-2")
+    assert_nil resp.consent_agreed_at
+    assert_not_nil resp.consent_declined_at
+    assert_equal s.consent_text, resp.consent_text_snapshot
+  end
+
+  test "consent endpoint never overwrites an already-recorded event" do
+    s = published_survey(consent: "Original wording.")
+
+    json_post consent_survey_path(s.publish_token), session_token: "consent-3", agreed: true
+    first_timestamp = Response.find_by!(session_token: "consent-3").consent_agreed_at
+
+    s.update!(consent_text: "Edited wording, after the fact.")
+    travel 1.hour do
+      json_post consent_survey_path(s.publish_token), session_token: "consent-3", agreed: true
+    end
+
+    resp = Response.find_by!(session_token: "consent-3")
+    assert_equal first_timestamp.to_i, resp.consent_agreed_at.to_i
+    # The snapshot from the moment of the FIRST agreement survives, not the
+    # since-edited text — that's the whole point of snapshotting.
+    assert_equal "Original wording.", resp.consent_text_snapshot
   end
 end

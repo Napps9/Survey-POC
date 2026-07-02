@@ -432,6 +432,42 @@
           <% end %>
         </div>
 
+        <%# Custom link — an optional, memorable alternative to the opaque
+            publish_token above; both resolve the same Verto
+            (PlayerController#load_survey_and_share). Only meaningful once
+            published, same gate the token itself is under. %>
+        <% if @survey.publish_token.present? %>
+          <div class="publish-block">
+            <div class="publish-block-title">Custom link</div>
+            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);white-space:nowrap;"><%= root_url %>play/</span>
+                <input type="text" name="slug" maxlength="60"
+                       value="<%= @survey.slug %>"
+                       placeholder="summer-feedback-2026"
+                       onchange="this.form.requestSubmit()"
+                       style="flex:1;min-width:0;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              </div>
+            <% end %>
+            <% if params[:slug_error] == "taken" %>
+              <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#F87171;">That link is already taken — try another.</div>
+            <% end %>
+            <% if @survey.slug? %>
+              <input type="text" readonly
+                     id="custom-url-<%= @survey.id %>"
+                     value="<%= play_survey_url(@survey.slug) %>"
+                     style="width:100%;margin-top:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              <button type="button"
+                      onclick="navigator.clipboard.writeText(document.getElementById('custom-url-<%= @survey.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',2000)})"
+                      style="width:100%;margin-top:8px;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy link</button>
+            <% else %>
+              <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+                Optional — set a memorable link alongside the one above. Both work.
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
         <%# Results comparison toggle %>
         <div class="publish-block">
           <div class="publish-block-title">Respondent view</div>

@@ -345,8 +345,26 @@ class SurveysController < ApplicationController
     if params.key?(:consent_text)
       attrs[:consent_text] = params[:consent_text].to_s.strip.first(2000).presence
     end
+
+    # The custom link shares the /play/:token namespace with publish_token and
+    # every share/region token (PlayerController#load_survey_and_share), so an
+    # unavailable slug is rejected rather than silently overwriting/colliding
+    # with something else — surfaced back to the panel via a query param since
+    # this form (like its siblings) is a plain redirect, not a fetch call.
+    slug_taken = false
+    if params.key?(:slug)
+      desired = Survey.normalize_slug(params[:slug])
+      if desired.blank?
+        attrs[:slug] = nil
+      elsif Survey.slug_taken?(desired, excluding_id: @survey.id)
+        slug_taken = true
+      else
+        attrs[:slug] = desired
+      end
+    end
+
     @survey.update!(attrs) if attrs.any?
-    redirect_to survey_path(@survey)
+    redirect_to survey_path(@survey, slug_error: (slug_taken ? "taken" : nil))
   end
 
   def shuffle_assets

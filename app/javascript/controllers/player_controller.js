@@ -12,6 +12,7 @@ export default class extends Controller {
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
+    consentUrl: { type: String, default: "" },
     resultsUrl: { type: String, default: "" },
     regionsUrl: { type: String, default: "" },
     regionCountry: { type: String, default: "" },
@@ -47,15 +48,29 @@ export default class extends Controller {
   }
 
   // Consent card (the first card): agreeing advances into the deck; declining
-  // swaps in a polite end-state and leaves the respondent on the gate.
+  // swaps in a polite end-state and leaves the respondent on the gate. Both
+  // record the event server-side for the audit trail — fire-and-forget, same
+  // best-effort philosophy as _saveProgress(), so a network blip never blocks
+  // the respondent's tap.
   agreeConsent() {
     haptic()
+    this._recordConsent(true)
     this.next()
   }
 
   declineConsent() {
+    this._recordConsent(false)
     if (this.hasConsentMainTarget) this.consentMainTarget.classList.add("hidden")
     if (this.hasConsentDeclinedTarget) this.consentDeclinedTarget.classList.remove("hidden")
+  }
+
+  _recordConsent(agreed) {
+    if (!this.consentUrlValue) return
+    fetch(this.consentUrlValue, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_token: this._sessionToken, agreed })
+    }).catch(() => { /* best-effort — nothing to retry from here */ })
   }
 
   next() {

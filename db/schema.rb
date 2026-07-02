@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_29_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_02_130001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -217,6 +217,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_120000) do
   create_table "responses", force: :cascade do |t|
     t.boolean "answered", default: false, null: false
     t.json "answers", default: {}, null: false
+    t.datetime "consent_agreed_at"
+    t.datetime "consent_declined_at"
+    t.text "consent_text_snapshot"
     t.datetime "created_at", null: false
     t.string "locale"
     t.integer "quiz_max"
@@ -295,6 +298,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_120000) do
     t.text "results_summary"
     t.integer "results_summary_response_count"
     t.boolean "show_results_comparison", default: false, null: false
+    t.string "slug"
     t.text "thankyou_body"
     t.string "thankyou_title"
     t.string "theme"
@@ -303,6 +307,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_120000) do
     t.index ["deleted_at"], name: "index_surveys_on_deleted_at"
     t.index ["organisation_id"], name: "index_surveys_on_organisation_id"
     t.index ["publish_token"], name: "index_surveys_on_publish_token", unique: true
+    t.index ["slug"], name: "index_surveys_on_slug", unique: true
   end
 
   create_table "translation_cache", force: :cascade do |t|

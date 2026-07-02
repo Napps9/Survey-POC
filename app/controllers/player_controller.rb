@@ -38,18 +38,13 @@ class PlayerController < ApplicationController
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
-    resp  = Response.find_or_initialize_by(session_token: token)
-    resp.survey       ||= @survey
-    resp.survey_share ||= @survey_share
+    resp  = find_or_init_response(token)
     apply_region(resp, data)
     # Quiz answers are immutable once committed — fold the incoming payload over
     # what's already stored so an already-answered graded card can't be changed.
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
-    # NB: the status column defaults to "completed", so a freshly initialized
-    # record already reads "completed" — only preserve it for rows already saved
-    # as completed (a late progress ping after submit), otherwise mark "started".
-    resp.status  = "started" unless resp.persisted? && resp.status == "completed"
+    mark_started_unless_completed(resp)
     apply_quiz_score(resp)
     resp.save!
     render json: { ok: true, session_token: token }
@@ -63,9 +58,7 @@ class PlayerController < ApplicationController
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
-    resp  = Response.find_or_initialize_by(session_token: token)
-    resp.survey       ||= @survey
-    resp.survey_share ||= @survey_share
+    resp  = find_or_init_response(token)
     apply_region(resp, data)
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     resp.status  = "completed"
@@ -78,6 +71,34 @@ class PlayerController < ApplicationController
   rescue => e
     Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
     render json: { ok: false, error: "Something went wrong saving your response." }, status: :unprocessable_entity
+  end
+
+  # Records the consent gate's agree/decline event, so there's an audit trail
+  # of who consented and to what wording — previously agreeConsent()/
+  # declineConsent() were pure client-side UI with nothing persisted. The
+  # first event for a session wins (a retry/replay never overwrites an
+  # already-recorded timestamp), and the snapshot ties the record to the exact
+  # consent_text shown at that moment, immune to the creator editing it later.
+  def consent
+    return render json: { ok: false }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+
+    data  = JSON.parse(request.body.read)
+    token = data["session_token"].presence || SecureRandom.uuid
+    resp  = find_or_init_response(token)
+    mark_started_unless_completed(resp)
+    if data["agreed"]
+      resp.consent_agreed_at ||= Time.current
+      resp.consent_text_snapshot ||= @survey.consent_text
+    else
+      resp.consent_declined_at ||= Time.current
+      resp.consent_text_snapshot ||= @survey.consent_text
+    end
+    resp.save!
+    render json: { ok: true }
+  rescue => e
+    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Something went wrong recording your response." }, status: :unprocessable_entity
   end
 
   # Quiz: record + grade one card as the player advances, returning that card's
@@ -93,13 +114,11 @@ class PlayerController < ApplicationController
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
     idx   = data["card_index"].to_i
-    resp  = Response.find_or_initialize_by(session_token: token)
-    resp.survey       ||= @survey
-    resp.survey_share ||= @survey_share
+    resp  = find_or_init_response(token)
     apply_region(resp, data)
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
-    resp.status  = "started" unless resp.persisted? && resp.status == "completed"
+    mark_started_unless_completed(resp)
     apply_quiz_score(resp)
     resp.save!
 
@@ -234,6 +253,23 @@ class PlayerController < ApplicationController
 
   private
 
+  # Finds (or starts) this session's response row and attaches it to the
+  # current survey/share — the shared first step of every write action.
+  def find_or_init_response(token)
+    resp = Response.find_or_initialize_by(session_token: token)
+    resp.survey       ||= @survey
+    resp.survey_share ||= @survey_share
+    resp
+  end
+
+  # NB: the status column defaults to "completed", so a freshly initialized
+  # record already reads "completed" — only preserve it for rows already saved
+  # as completed (e.g. a late progress ping after submit), otherwise mark
+  # "started".
+  def mark_started_unless_completed(resp)
+    resp.status = "started" unless resp.persisted? && resp.status == "completed"
+  end
+
   # The answers already persisted for a response (empty for a brand-new row).
   def stored_answers(resp)
     resp.persisted? && resp.answers.is_a?(Hash) ? resp.answers : {}
@@ -338,7 +374,13 @@ class PlayerController < ApplicationController
       @region_link = region_link
       @survey = Survey.without_report_text.find_by(id: region_link.survey_id)
     else
-      @survey = Survey.without_report_text.find_by(publish_token: token)
+      # publish_token is the default opaque link; slug is the creator's
+      # optional custom/vanity alternative — either resolves the same survey.
+      # The slug lookup requires publish_token to be set too, so a slug never
+      # makes an unpublished/draft survey reachable — it aliases the same
+      # "is this Verto actually published" boundary the token itself enforces.
+      @survey = Survey.without_report_text.find_by(publish_token: token) ||
+                Survey.without_report_text.where.not(publish_token: nil).find_by(slug: token)
     end
   end
 end
