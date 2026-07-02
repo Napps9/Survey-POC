@@ -1050,7 +1050,7 @@
   width: 42%; height: 42%;
   max-width: 34px; max-height: 34px;
   fill: currentColor;
-  color: rgba(0,0,0,0.6);
+  color: var(--brand-primary, rgba(0,0,0,0.6));
   flex-shrink: 0;
 }
 .choice-bg-1 { background: linear-gradient(135deg, #d4edda, #a8d5b5); }
