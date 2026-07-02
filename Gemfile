@@ -36,7 +36,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 
 # Anthropic Claude SDK
-gem "anthropic", "~> 1.40"
+gem "anthropic", "~> 1.55"
 gem "csv"
 
 # AI results report → PDF download + Google Doc
