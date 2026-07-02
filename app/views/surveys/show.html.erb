@@ -401,9 +401,12 @@
         <button type="button" class="publish-block-btn"
                 data-action="click->preview-verto#open">▶ Preview Verto</button>
 
-        <%# Publish status / link %>
-        <div class="publish-block">
-          <div class="publish-block-title">Status</div>
+        <%# Publish status / link — open by default; every other block below
+            collapses into an accordion so the panel doesn't open as a wall
+            of settings (config/locales untouched: this panel isn't
+            internationalized, see the Thank-you screen comment below). %>
+        <details class="publish-block" open>
+          <summary class="publish-block-title">Status <span class="pub-chev">⌄</span></summary>
           <% if @survey.publish_token.present? %>
             <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#01EACB;margin-bottom:8px;">✓ Published</div>
             <input type="text" readonly
@@ -430,15 +433,15 @@
               Publishing gives you a public link to share. Respondents just open it and answer — no Play Verto account needed.
             </div>
           <% end %>
-        </div>
+        </details>
 
         <%# Custom link — an optional, memorable alternative to the opaque
             publish_token above; both resolve the same Verto
             (PlayerController#load_survey_and_share). Only meaningful once
             published, same gate the token itself is under. %>
         <% if @survey.publish_token.present? %>
-          <div class="publish-block">
-            <div class="publish-block-title">Custom link</div>
+          <details class="publish-block">
+            <summary class="publish-block-title">Custom link <span class="pub-chev">⌄</span></summary>
             <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
               <div style="display:flex;align-items:center;gap:6px;">
                 <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);white-space:nowrap;"><%= root_url %>play/</span>
@@ -465,12 +468,12 @@
                 Optional — set a memorable link alongside the one above. Both work.
               </div>
             <% end %>
-          </div>
+          </details>
         <% end %>
 
         <%# Results comparison toggle %>
-        <div class="publish-block">
-          <div class="publish-block-title">Respondent view</div>
+        <details class="publish-block">
+          <summary class="publish-block-title">Respondent view <span class="pub-chev">⌄</span></summary>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true,
                 style: "margin:0;" do %>
             <input type="hidden" name="show_results_comparison" value="0" />
@@ -493,13 +496,13 @@
               </div>
             <% end %>
           <% end %>
-        </div>
+        </details>
 
         <%# Quiz mode — score answers right/wrong, show a score, and let players
             compare. Toggling reloads the editor so each question card gains its
             correct-answer controls. %>
-        <div class="publish-block">
-          <div class="publish-block-title">Quiz mode</div>
+        <details class="publish-block">
+          <summary class="publish-block-title">Quiz mode <span class="pub-chev">⌄</span></summary>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
             <input type="hidden" name="quiz" value="0" />
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
@@ -515,12 +518,12 @@
               </div>
             <% end %>
           <% end %>
-        </div>
+        </details>
 
         <%# Consent gate — when set, respondents must agree to this text before
             the first card. Blank = no consent step. %>
-        <div class="publish-block">
-          <div class="publish-block-title">Consent gate</div>
+        <details class="publish-block">
+          <summary class="publish-block-title">Consent gate <span class="pub-chev">⌄</span></summary>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:8px;line-height:1.45;">
               Shown before the first card with an “Agree to continue” button. Leave blank for no consent step.
@@ -531,13 +534,13 @@
                       onchange="this.form.requestSubmit()"
                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.consent_text %></textarea>
           <% end %>
-        </div>
+        </details>
 
         <%# Thank-you screen — custom title/message shown after Finish, plus an
             optional link forwarding respondents to the org's website. All three
             fields post to update_settings, which only writes the keys it's sent. %>
-        <div class="publish-block">
-          <div class="publish-block-title">Thank-you screen</div>
+        <details class="publish-block">
+          <summary class="publish-block-title">Thank-you screen <span class="pub-chev">⌄</span></summary>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
             <div style="display:flex;flex-direction:column;gap:12px;">
               <div>
@@ -567,13 +570,13 @@
               </div>
             </div>
           <% end %>
-        </div>
+        </details>
 
         <%# Region tags — one link per region; responses carry the region so
             respondents and the results screen can compare across the map. %>
         <% region_links = @survey.survey_region_links.order(:created_at) %>
-        <div class="publish-block">
-          <div class="publish-block-title">Region tags</div>
+        <details class="publish-block">
+          <summary class="publish-block-title">Region tags <span class="pub-chev">⌄</span></summary>
           <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:10px;line-height:1.45;">
             Group responses by region (consent-based, no precise location) and let
             everyone compare answers across regions on a world map.
@@ -629,7 +632,7 @@
               </button>
             </div>
           <% end %>
-        </div>
+        </details>
 
         <%# Alliance share — add this Verto to an alliance and generate
             per-partner links. Each row in the alliance produces a unique token. %>
@@ -638,8 +641,8 @@
           <% shared_in       = AllianceVerto.where(survey_id: @survey.id, alliance_id: all_alliances.map(&:id)).pluck(:alliance_id).to_set %>
           <% available_allys = all_alliances.reject { |a| shared_in.include?(a.id) } %>
           <% in_alliances    = all_alliances.select { |a| shared_in.include?(a.id) } %>
-          <div class="publish-block">
-            <div class="publish-block-title">Share with an alliance</div>
+          <details class="publish-block">
+            <summary class="publish-block-title">Share with an alliance <span class="pub-chev">⌄</span></summary>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:10px;line-height:1.45;">
               Add this Verto to an alliance. Each partner in the alliance gets their own unique share link, and you'll see each one's responses separately.
             </div>
@@ -676,7 +679,7 @@
                 <% end %>
               </div>
             <% end %>
-          </div>
+          </details>
         <% end %>
 
       </div><%# /publish-panel-body %>

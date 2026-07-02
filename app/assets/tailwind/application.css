@@ -2399,6 +2399,26 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   color: rgba(255,255,255,0.5);
   margin-bottom: 8px;
 }
+/* Each publish-block is a <details> so the panel opens short — only Status
+   is expanded by default — matching the disclosure pattern already used for
+   .cq-set / .wizard-advanced elsewhere in the editor. */
+summary.publish-block-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style: none;
+  margin-bottom: 0;
+}
+summary.publish-block-title::-webkit-details-marker { display: none; }
+.publish-block[open] > summary.publish-block-title { margin-bottom: 8px; }
+.pub-chev {
+  display: inline-block;
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  transition: transform 0.15s;
+}
+.publish-block[open] .pub-chev { transform: rotate(180deg); }
 .publish-block-btn {
   width: 100%;
   padding: 10px;
