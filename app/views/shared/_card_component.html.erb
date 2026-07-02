@@ -88,7 +88,7 @@
               data-canonical="<%= canon[i] %>"
               data-correct="<%= mark_correct.call(canon[i]) %>"
               data-selected="false">
-            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"></div>
+            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"><%= OptionIconLibrary.svg_for(canon[i]) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
             <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
             <% if quiz_mode %>
@@ -181,6 +181,7 @@
               data-correct="<%= mark_correct.call(canon[i]) %>"
               data-selected="false">
             <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>">
+              <%= OptionIconLibrary.svg_for(canon[i]) %>
               <div class="choice-overlay"></div>
               <div class="choice-tick">✓</div>
               <% if quiz_mode %>

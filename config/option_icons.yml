@@ -1,0 +1,110 @@
+# Per-option icon catalogue, consumed by app/lib/option_icon_library.rb.
+#
+# Each entry maps a curated SVG under app/assets/images/option-icons/ to the
+# option label(s) it should render for. Matching is EXACT (after normalising
+# case/punctuation/whitespace) against `keywords` — deliberately conservative
+# so an option's text never picks up a surprising or wrong icon. Keep each
+# keyword phrase unambiguous: prefer the full compound phrase ("golf ball")
+# over a bare generic word ("ball") that could collide with a future icon.
+#
+# Adding a new icon: drop the SVG into app/assets/images/option-icons/
+# (kebab-case filename) and add an entry below with `file:` + `keywords:`.
+# This file is loaded once at boot (OptionIconLibrary::DATA) — restart the
+# dev server to pick up changes, same as config/card_types.yml.
+
+- file: archery.svg
+  keywords: [archery]
+- file: baseball-bat.svg
+  keywords: [baseball bat]
+- file: baseball-cap.svg
+  keywords: [baseball cap]
+- file: baseball.svg
+  keywords: [baseball]
+- file: basketball-court.svg
+  keywords: [basketball court]
+- file: basketball-hoop.svg
+  keywords: [basketball hoop]
+- file: basketball-jersey.svg
+  keywords: [basketball jersey]
+- file: basketball.svg
+  keywords: [basketball]
+- file: bowling-ball.svg
+  keywords: [bowling ball]
+- file: bowling-pin.svg
+  keywords: [bowling pin]
+- file: boxing-gloves.svg
+  keywords: [boxing gloves, boxing glove]
+- file: canoe.svg
+  keywords: [canoe]
+- file: chess.svg
+  keywords: [chess]
+- file: cricket-bat.svg
+  keywords: [cricket bat]
+- file: dartboard.svg
+  keywords: [dartboard, dart board]
+- file: finish-line.svg
+  keywords: [finish line]
+- file: flag.svg
+  keywords: [flag]
+- file: football-field.svg
+  keywords: [football field, soccer field]
+- file: football-goal.svg
+  keywords: [football goal, soccer goal]
+- file: football-jersey.svg
+  keywords: [football jersey, soccer jersey]
+- file: football.svg
+  keywords: [football, soccer, soccer ball]
+- file: galaxy.svg
+  keywords: [galaxy, space]
+- file: golf-ball.svg
+  keywords: [golf ball]
+- file: kettlebell.svg
+  keywords: [kettlebell]
+- file: medal.svg
+  keywords: [medal]
+- file: ping-pong.svg
+  keywords: [ping pong, table tennis]
+- file: podium.svg
+  keywords: [podium]
+- file: pool-ball.svg
+  keywords: [pool ball, billiard ball]
+- file: punching-bag.svg
+  keywords: [punching bag]
+- file: punching-ball.svg
+  keywords: [punching ball, speed bag]
+- file: rugby-ball.svg
+  keywords: [rugby ball]
+- file: rugby-helmet.svg
+  keywords: [rugby helmet]
+- file: shuttlecock.svg
+  keywords: [shuttlecock, badminton shuttle]
+- file: skateboard.svg
+  keywords: [skateboard]
+- file: sport-bag.svg
+  keywords: [sport bag, gym bag, duffel bag]
+- file: start-line.svg
+  keywords: [start line]
+- file: stopwatch.svg
+  keywords: [stopwatch, timer]
+- file: surfboard.svg
+  keywords: [surfboard]
+- file: swimming-cap.svg
+  keywords: [swimming cap]
+- file: swimming-suit.svg
+  keywords: [swimming suit, swimsuit]
+- file: tennis-ball.svg
+  keywords: [tennis ball]
+- file: tennis-racket.svg
+  keywords: [tennis racket, tennis racquet]
+- file: trophy.svg
+  keywords: [trophy]
+- file: volleyball-net.svg
+  keywords: [volleyball net]
+- file: volleyball.svg
+  keywords: [volleyball]
+- file: water-bottle.svg
+  keywords: [water bottle]
+- file: weightlifting.svg
+  keywords: [weightlifting, weight lifting]
+- file: whistle.svg
+  keywords: [whistle]

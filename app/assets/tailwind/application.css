@@ -973,6 +973,7 @@
 }
 .choice-list-tile {
   position: relative;
+  display: flex; align-items: center; justify-content: center;
   width: 56px; height: 56px;
   border-radius: 10px;
   flex-shrink: 0;
@@ -1033,6 +1034,7 @@
    (mobile stretches the grid), height pins it in the fixed desktop layout. */
 .choice-card-bg {
   position: relative;
+  display: flex; align-items: center; justify-content: center;
   flex: 1 1 auto;
   height: 74px;
   border-radius: 14px;
@@ -1041,6 +1043,16 @@
   background-size: cover; background-position: center;
 }
 .choice-grid-3 .choice-card-bg { height: 58px; }
+/* Per-option icon (OptionIconLibrary) — sits centred on top of the
+   choice-bg-N gradient, sized as a share of the tile so it auto-scales at
+   the .choice-grid-3 / .phone-bottom breakpoints with no extra rules. */
+.choice-icon-svg {
+  width: 42%; height: 42%;
+  max-width: 34px; max-height: 34px;
+  fill: currentColor;
+  color: rgba(0,0,0,0.6);
+  flex-shrink: 0;
+}
 .choice-bg-1 { background: linear-gradient(135deg, #d4edda, #a8d5b5); }
 .choice-bg-2 { background: linear-gradient(135deg, #d1ecf1, #9fd5df); }
 .choice-bg-3 { background: linear-gradient(135deg, #fff3cd, #ffd88a); }
