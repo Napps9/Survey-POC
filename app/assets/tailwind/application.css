@@ -210,7 +210,8 @@
 /* RIGHT panel: the SVG "liquid container". .nps-control is the positioning
    box; its width follows the vessel's aspect ratio (--nps-aspect, set inline
    per shape) so each vessel keeps its true proportions at any height. The
-   <svg.nps-vessel> fills it; .nps-thumb sits OVER it and shows the value. */
+   <svg.nps-vessel> fills it — the rising/falling liquid is the only drag
+   feedback, nothing else overlays the vessel. */
 .nps-control {
   position: relative;
   width: auto;
@@ -253,21 +254,6 @@
   .nps-wave, .nps-wave2, .nps-surface, .nps-bub { animation: none; }
   .nps-bub { opacity: .55; }
 }
-.nps-thumb {
-  position: absolute;
-  left: 50%;
-  width: 26px;
-  height: 26px;
-  transform: translate(-50%, -50%);
-  border-radius: 999px;
-  background: #fff;
-  border: 3px solid var(--brand-primary, #01EACB);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-  cursor: grab;
-  z-index: 3;
-  transition: top 0.18s cubic-bezier(.34,1.2,.64,1);
-}
-
 /* LEFT panel: the Lottie mount. lottie-web injects an <svg> into the
    .nps-lottie-mount child; the wrapper fills the left panel. */
 .nps-lottie {

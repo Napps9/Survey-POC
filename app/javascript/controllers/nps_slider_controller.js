@@ -2,11 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 
 // NPS "liquid container": an SVG vessel (.nps-vessel) whose liquid fills from
 // the bottom as the respondent taps/holds and drags up or down. The .nps-liquid
-// group rises via --nps-fill (set on .nps-control); .nps-thumb is a plain
-// positional marker (no text — the static label list already shows the
-// current selection). The chosen value is the 0-indexed scale position, stored on
-// `data-nps-value` for the player to read. NPS starts UNANSWERED — the
-// container is empty and the thumb rests at the bottom until the first drag.
+// group rises via --nps-fill (set on .nps-control) — that rise/fall IS the
+// drag feedback, so nothing else is overlaid on the vessel; the static label
+// list shows the current selection (highlighted). The chosen value is the
+// 0-indexed scale position, stored on `data-nps-value` for the player to
+// read. NPS starts UNANSWERED — the container is empty until the first drag.
 //
 // Steps follow the label count (0–10 by default, but a 4/5-point or agree
 // scale works too). Still emits `nps:valueChanged` (0-indexed value + 1..N
@@ -25,14 +25,9 @@ export default class extends Controller {
     this._onMove = (e) => this._drag(e)
     this._onUp   = () => this._end()
 
-    this.control  = this.element.querySelector(".nps-control")
-    this.thumb    = this.element.querySelector(".nps-thumb")
+    this.control = this.element.querySelector(".nps-control")
 
-    if (this.indexValue >= 0) {
-      this._render(this.indexValue, { emit: false })
-    } else {
-      this._positionThumb(0) // resting at the bottom, unanswered
-    }
+    if (this.indexValue >= 0) this._render(this.indexValue, { emit: false })
   }
 
   start(event) {
@@ -80,7 +75,6 @@ export default class extends Controller {
 
   _render(idx, { emit }) {
     const ratio = this._ratioFor(idx)
-    this._positionThumb(ratio)
     if (this.control) this.control.style.setProperty("--nps-fill", ratio.toFixed(3))
 
     const value = idx // 0-indexed: the answer IS the scale position (0..N-1)
@@ -102,20 +96,5 @@ export default class extends Controller {
 
   _ratioFor(idx) {
     return this.stepsValue > 1 ? idx / (this.stepsValue - 1) : 0
-  }
-
-  // Thumb is inset by half a step on each end so its centre matches the
-  // CENTRES of the labels (which take an equal 1/N share of the column).
-  _positionThumb(ratio) {
-    if (!this.thumb) return
-    const inset  = 100 / (2 * Math.max(2, this.stepsValue))
-    const travel = 100 - 2 * inset
-    if (this.axisValue === "horizontal") {
-      this.thumb.style.left = `${inset + ratio * travel}%`
-      this.thumb.style.top  = "50%"
-    } else {
-      this.thumb.style.left = "50%"
-      this.thumb.style.top  = `${inset + (1 - ratio) * travel}%`
-    }
   }
 }

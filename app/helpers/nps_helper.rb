@@ -50,10 +50,10 @@ module NpsHelper
   # grey "empty" fill, the rising teal liquid (surface waves + bubbles rising
   # up through it), and the black outline stroke on top, plus any extras (jar
   # lid, mug handle, popsicle stick). The liquid level follows --nps-fill (0..1,
-  # set by nps_slider_controller) by translating the `.nps-liquid` group. The
-  # HTML `.nps-thumb` sits OVER the SVG as a plain positional marker for the
-  # current value — the static label list to the left already shows which
-  # value is selected (highlighted), so the thumb carries no text of its own.
+  # set by nps_slider_controller) by translating the `.nps-liquid` group — that
+  # rising/falling motion IS the drag feedback, so nothing else sits over the
+  # vessel; the static label list to the left shows which value is selected
+  # (highlighted).
   #
   # Each entry: w (viewBox width), cx/hw (bubble column centre + half-spread),
   # kind (extra: jar lid / mug handle / popsicle stick), path (the open-topped
@@ -77,7 +77,6 @@ module NpsHelper
                 style: "--nps-aspect: #{v[:w]} / 340",
                 data: { axis: "vertical" } do
       concat nps_vessel_svg(shape, v)
-      concat content_tag(:div, "", class: "nps-thumb")
     end
   end
 
