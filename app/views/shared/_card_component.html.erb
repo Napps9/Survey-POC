@@ -347,11 +347,15 @@
         </div>
       <% elsif card["input"] == "month" %>
         <%# Month-flavoured open question (the "When were you born?" demographic)
-            — month + year only, no day, via the native month picker. %>
+            — month + year only, no day, via the native month picker. The
+            browser's own placeholder segments vary by OS/locale (some render
+            as plain dashes), so an explicit "MM / YYYY" caption makes the
+            expected format unambiguous everywhere. %>
         <div class="freeform-wrap">
           <input type="month" class="freeform-date"
                  max="<%= Date.current.strftime("%Y-%m") %>"
                  aria-label="<%= card["text"] %>" />
+          <div class="freeform-date-hint">MM / YYYY</div>
         </div>
       <% else %>
         <div class="freeform-wrap"

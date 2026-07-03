@@ -3891,6 +3891,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
   outline: none; box-sizing: border-box;
 }
 .freeform-date:focus { border-color: #01EACB; }
+.freeform-date-hint {
+  width: 100%; max-width: 280px; margin: 8px auto 0; display: block;
+  text-align: center;
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.05em;
+  color: rgba(0,0,0,0.4);
+}
 
 /* Live Vertos are read-only: the cards feed goes inert (server enforces too) */
 .editor-feed-locked { pointer-events: none; user-select: none; }

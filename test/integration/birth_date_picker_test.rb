@@ -19,6 +19,9 @@ class BirthDatePickerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "input.freeform-date[type='month']"
     assert_select "textarea.freeform-textarea", false
+    # The native picker's own placeholder segments vary by browser/OS, so an
+    # explicit caption makes the expected format unambiguous everywhere.
+    assert_select ".freeform-date-hint", text: "MM / YYYY"
   end
 
   test "an open_ended card with input: date still renders the full date picker (unrelated to birth date)" do
