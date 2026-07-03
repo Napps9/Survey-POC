@@ -2,9 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 
 // NPS "liquid container": an SVG vessel (.nps-vessel) whose liquid fills from
 // the bottom as the respondent taps/holds and drags up or down. The .nps-liquid
-// group rises via --nps-fill (set on .nps-control); .nps-thumb is the draggable
-// handle and shows the current label. The chosen value is the 0-indexed scale
-// position, stored on
+// group rises via --nps-fill (set on .nps-control); .nps-thumb is a plain
+// positional marker (no text — the static label list already shows the
+// current selection). The chosen value is the 0-indexed scale position, stored on
 // `data-nps-value` for the player to read. NPS starts UNANSWERED — the
 // container is empty and the thumb rests at the bottom until the first drag.
 //
@@ -27,7 +27,6 @@ export default class extends Controller {
 
     this.control  = this.element.querySelector(".nps-control")
     this.thumb    = this.element.querySelector(".nps-thumb")
-    this.thumbVal = this.thumb && this.thumb.querySelector(".nps-thumb-val")
 
     if (this.indexValue >= 0) {
       this._render(this.indexValue, { emit: false })
@@ -88,7 +87,6 @@ export default class extends Controller {
     this.element.dataset.npsValue = value
     const lbl  = this.labelTargets[idx]
     const text = lbl ? lbl.textContent.trim() : `${value}`
-    if (this.thumbVal) this.thumbVal.textContent = text
     this.labelTargets.forEach((l, i) => l.classList.toggle("is-active", i === idx))
     this.element.setAttribute("aria-valuenow", value)
     this.element.setAttribute("aria-valuetext", text)

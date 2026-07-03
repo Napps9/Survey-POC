@@ -256,18 +256,13 @@
 .nps-thumb {
   position: absolute;
   left: 50%;
-  min-width: 38px;
-  height: 32px;
-  padding: 0 9px;
+  width: 26px;
+  height: 26px;
   transform: translate(-50%, -50%);
   border-radius: 999px;
   background: #fff;
   border: 3px solid var(--brand-primary, #01EACB);
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-  display: flex; align-items: center; justify-content: center;
-  font-family: "Alata", sans-serif; font-size: 14px; font-weight: 700;
-  color: var(--brand-primary, #01EACB);
-  white-space: nowrap;
   cursor: grab;
   z-index: 3;
   transition: top 0.18s cubic-bezier(.34,1.2,.64,1);
