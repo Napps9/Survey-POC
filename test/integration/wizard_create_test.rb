@@ -111,6 +111,7 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
 
     get play_survey_path(survey.publish_token)
     assert_response :success
-    assert_match 'type="month"', response.body
+    assert_match 'class="freeform-month"', response.body
+    assert_match 'class="freeform-year"', response.body
   end
 end

@@ -8,7 +8,7 @@ class BirthDatePickerTest < ActionDispatch::IntegrationTest
                         publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
   end
 
-  test "an open_ended card with input: month renders the native month picker" do
+  test "an open_ended card with input: month renders two numeric month/year fields" do
     s = published_survey([
       { "type" => "welcome_card", "title" => "hi" },
       { "type" => "open_ended", "input" => "month", "text" => "When were you born?",
@@ -17,10 +17,13 @@ class BirthDatePickerTest < ActionDispatch::IntegrationTest
 
     get play_survey_path(s.publish_token)
     assert_response :success
-    assert_select "input.freeform-date[type='month']"
+    # Plain numeric fields, not a native <input type="month"> — that control's
+    # inline segments are browser/OS-rendered and can spell the month out in
+    # English (e.g. "May"), which isn't universal across the app's locales.
+    assert_select "input.freeform-month[placeholder='02']"
+    assert_select "input.freeform-year[placeholder='1995']"
+    assert_select "input[type='month']", false
     assert_select "textarea.freeform-textarea", false
-    # The native picker's own placeholder segments vary by browser/OS, so an
-    # explicit caption makes the expected format unambiguous everywhere.
     assert_select ".freeform-date-hint", text: "MM / YYYY"
   end
 

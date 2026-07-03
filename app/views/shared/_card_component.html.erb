@@ -347,14 +347,23 @@
         </div>
       <% elsif card["input"] == "month" %>
         <%# Month-flavoured open question (the "When were you born?" demographic)
-            — month + year only, no day, via the native month picker. The
-            browser's own placeholder segments vary by OS/locale (some render
-            as plain dashes), so an explicit "MM / YYYY" caption makes the
-            expected format unambiguous everywhere. %>
+            — month + year only, no day. Two plain numeric fields rather than a
+            native <input type="month">: that control's inline segments are
+            rendered by the browser/OS and can show a spelled-out month name
+            (e.g. "May") instead of digits, which isn't universal across the
+            app's 19 locales. Two digit-only fields read the same everywhere. %>
         <div class="freeform-wrap">
-          <input type="month" class="freeform-date"
-                 max="<%= Date.current.strftime("%Y-%m") %>"
-                 aria-label="<%= card["text"] %>" />
+          <div class="freeform-monthyear" data-controller="month-year">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2"
+                   class="freeform-month" placeholder="02"
+                   aria-label="<%= card["text"] %> — month"
+                   data-month-year-target="month" />
+            <span class="freeform-monthyear-sep">/</span>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4"
+                   class="freeform-year" placeholder="1995"
+                   aria-label="<%= card["text"] %> — year"
+                   data-month-year-target="year" />
+          </div>
           <div class="freeform-date-hint">MM / YYYY</div>
         </div>
       <% else %>

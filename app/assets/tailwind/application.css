@@ -3898,6 +3898,23 @@ body.generating-overlay-active .bottom-bar { display: none; }
   color: rgba(0,0,0,0.4);
 }
 
+/* Month+year demographic — two plain numeric fields instead of a native
+   <input type="month"> (see _card_component.html.erb for why). */
+.freeform-monthyear {
+  width: 100%; max-width: 280px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.freeform-month, .freeform-year {
+  padding: 14px 0; border-radius: 14px; text-align: center;
+  background: #f4f6f9; border: 1.5px solid rgba(0,0,0,0.1);
+  font-family: "ABeeZee", sans-serif; font-size: 16px; color: #1C2034;
+  outline: none; box-sizing: border-box;
+}
+.freeform-month { width: 64px; }
+.freeform-year { width: 92px; }
+.freeform-month:focus, .freeform-year:focus { border-color: #01EACB; }
+.freeform-monthyear-sep { font-family: "Alata", sans-serif; font-size: 18px; color: rgba(0,0,0,0.3); }
+
 /* Live Vertos are read-only: the cards feed goes inert (server enforces too) */
 .editor-feed-locked { pointer-events: none; user-select: none; }
 .editor-feed-locked .card-row, .editor-feed-locked .split-card { opacity: 0.88; }

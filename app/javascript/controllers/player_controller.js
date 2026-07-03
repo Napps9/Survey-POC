@@ -370,6 +370,15 @@ export default class extends Controller {
       }
 
       case "open_ended": {
+        // Month+year demographic: two plain numeric fields, not a native
+        // <input type="month"> (see _card_component.html.erb) — combine them
+        // into the same "YYYY-MM" shape a native month input would have given.
+        const month = card.querySelector(".freeform-month")
+        if (month) {
+          const year = card.querySelector(".freeform-year")
+          const m = month.value.trim(), y = year?.value.trim()
+          return (m && y && y.length === 4) ? `${y}-${m.padStart(2, "0")}` : null
+        }
         const el = card.querySelector("textarea, input[type='date']")
         return el?.value?.trim() || null
       }
@@ -886,7 +895,16 @@ export default class extends Controller {
         if (set.has((el.dataset.canonical || "").trim())) el.dataset.selected = "true"
       })
     } else if (type === "open_ended") {
-      const ta = card.querySelector("textarea"); if (ta) ta.value = value
+      const month = card.querySelector(".freeform-month")
+      if (month) {
+        const m = /^(\d{4})-(\d{2})$/.exec(String(value))
+        if (m) {
+          month.value = m[2]
+          const year = card.querySelector(".freeform-year"); if (year) year.value = m[1]
+        }
+        return
+      }
+      const el = card.querySelector("textarea, input[type='date']"); if (el) el.value = value
     } else if (type === "rating") {
       card.querySelectorAll(".rating-star").forEach((s, i) => {
         const on = i < Number(value); s.classList.toggle("active", on); s.textContent = on ? "★" : "☆"
