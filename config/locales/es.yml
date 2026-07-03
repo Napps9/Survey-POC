@@ -162,6 +162,7 @@ es:
         count_few: "Solo %{n} respuestas — apunta a %{min}–%{max}."
         count_many: "%{n} respuestas — reduce a %{max} o menos."
         count_even: "%{n} casillas — usa un número par para una cuadrícula equilibrada (la casilla Otro cuenta)."
+        count_odd: "%{n} puntos — usa un número impar para tener un punto medio realmente neutral."
         count_exact_ok: "Escala de %{n} puntos — perfecta."
         count_exact: "Usa exactamente %{exact} puntos (ahora %{n})."
         option_ok: "Las etiquetas de respuesta son cortas y legibles (≤ %{max} caracteres)."

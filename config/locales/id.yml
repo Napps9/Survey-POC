@@ -162,6 +162,7 @@ id:
         count_few: "Hanya %{n} jawaban — targetkan %{min}–%{max}."
         count_many: "%{n} jawaban — kurangi jadi %{max} atau kurang."
         count_even: "%{n} ubin — gunakan jumlah genap agar kisi seimbang (kotak Lainnya ikut dihitung)."
+        count_odd: "%{n} poin — gunakan jumlah ganjil agar ada titik tengah netral yang sesungguhnya."
         count_exact_ok: "Skala %{n} poin — pas sekali."
         count_exact: "Gunakan tepat %{exact} poin (sekarang %{n})."
         option_ok: "Label jawaban singkat dan mudah dibaca (≤ %{max} karakter)."

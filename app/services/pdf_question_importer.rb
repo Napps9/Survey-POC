@@ -46,7 +46,9 @@ class PdfQuestionImporter
                   - multiple_choice / select_many: 3 to 5 options, each <= 20 chars
                   - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any "Other"
                   - tap_card: EXACTLY 3 cards (negative / neutral / positive sentiments)
-                  - range / rating: 3 to 5 points, never more than 5
+                  - range: ODD count only (3 or 5, never 4) with a genuinely
+                    neutral middle label
+                  - rating: 3 to 5 points, never more than 5
                   - nps: EXACTLY 5 points, each label <= 20 chars
                 DESC
               },
@@ -92,7 +94,8 @@ class PdfQuestionImporter
     - "Choose all that apply" / multi-pick → select_many_grid by default; fall
       back to select_many for long labels or more than 10 options.
     - A 1-5 quality/satisfaction rating ("How would you rate…") → rating.
-    - An emotion/agreement/"how often" scale → range (<= 5 points).
+    - An emotion/agreement/"how often" scale → range (odd count, 3 or 5
+      points, with a genuine neutral middle).
     - Likelihood-to-recommend or a 0-10 / reactive sentiment scale → nps
       (EXACTLY 5 points).
     - A single topic probed from three angles (or an explicit

@@ -162,6 +162,7 @@ ko:
         count_few: "답변이 %{n}개뿐 — %{min}–%{max}를 목표로 하세요."
         count_many: "답변 %{n}개 — %{max}개 이하로 줄이세요."
         count_even: "타일 %{n}개 — 균형 잡힌 그리드를 위해 짝수로 (기타 칸 포함)."
+        count_odd: "포인트 %{n}개 — 진짜 중립적인 중간 지점을 위해 홀수를 사용하세요."
         count_exact_ok: "%{n}점 척도 — 딱 좋아요."
         count_exact: "정확히 %{exact}점을 사용하세요 (현재 %{n})."
         option_ok: "답변 라벨이 짧고 읽기 쉬워요 (%{max}자 이하)."

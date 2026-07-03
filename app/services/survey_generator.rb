@@ -64,7 +64,9 @@ class SurveyGenerator
                   - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any "Other"
                   - prioritise: 3 to 6 options (about 5 ideal), each <= 24 chars
                   - tap_card: EXACTLY 3 cards (negative / neutral / positive sentiments)
-                  - range / rating: 3 to 5 points, never more than 5
+                  - range: ODD count only (3 or 5, never 4) with a genuinely
+                    neutral middle label
+                  - rating: 3 to 5 points, never more than 5
                   - nps: EXACTLY 5 points, each label <= 20 chars
                 DESC
               },
@@ -96,14 +98,20 @@ class SurveyGenerator
       Each statement is its own swipe card; the respondent swipes yes/no
       on each, and the combination reveals their sentiment.
       Keep each statement <= 30 characters.
-    - range / rating: 3 to 5 points; never more than 5.
+    - range: an ODD count — 3 or 5 points, never an even count like 4 — so
+      the scale always has a true centre point. That centre point's label
+      must be genuinely neutral (e.g. "Neutral" / "Unsure" / "Neither agree
+      nor disagree"), never leaning positive or negative. The slider starts
+      resting on that neutral centre by default.
+    - rating: 3 to 5 points; never more than 5.
     - nps: a likelihood/sentiment scale with a reacting themed visual.
       EXACTLY 5 points; each option label <= 20 chars.
     - Question text: 50-70 chars target, 100 hard max. Any description below the
       question SHARES that same 100-char budget (text + description <= 100).
-    - "How often" questions: default to range with <= 5 options. If more are
-      genuinely required, fall back rating -> multiple_choice -> select_one_grid;
-      never exceed 5 options for a "How often" question.
+    - "How often" questions: default to range with an odd count (3 or 5) and
+      a neutral middle. If more are genuinely required, fall back rating ->
+      multiple_choice -> select_one_grid; never exceed 5 options for a
+      "How often" question.
   RULES
 
   SYSTEM = <<~PROMPT.freeze
@@ -168,11 +176,13 @@ class SurveyGenerator
       respondent swipes yes/no on each; the combination reveals their
       stance. Each statement <= 30 characters. Best when you want quick
       gut reactions to a single subject from three angles.
-    - range (Verto "Range"): playful 3-5 point sliding scale for emotion or
-      agree/disagree, where the left panel plays a reactive Lottie animation
-      matched to the slider position — an engaging on-theme reaction. Use for
-      mood, satisfaction, agreement — anything qualitative-scaled; prefer this
-      when an engaging visual lifts response quality.
+    - range (Verto "Range"): playful ODD-count (3 or 5) sliding scale for
+      emotion or agree/disagree, ALWAYS with a genuinely neutral middle
+      label — never an even count with no true centre. The left panel plays
+      a reactive Lottie animation matched to the slider position — an
+      engaging on-theme reaction. Use for mood, satisfaction, agreement —
+      anything qualitative-scaled; prefer this when an engaging visual lifts
+      response quality.
     - rating (Verto "Rating"): icon-based scale (stars by default, but icons
       can be customised). Use for "how good was X" questions. Can also stand
       in for range when familiar iconography matters more than the animation.
@@ -202,9 +212,9 @@ class SurveyGenerator
     [ ] 10 to 15 questions (welcome cards excluded); starts with exactly 1 welcome card
     [ ] No more than 2 of the same answer type in a row
     [ ] Lists 3-5 options (each <= 20 chars); grids EVEN and 4-10; tap_card EXACTLY 3 (neg/neutral/pos);
-        range/rating <= 5; nps EXACTLY 5
+        range ODD (3 or 5) with a genuine neutral middle label; rating <= 5; nps EXACTLY 5
     [ ] Every question's text plus its description <= 100 chars
-    [ ] "How often" -> range with <= 5 options
+    [ ] "How often" -> range with an odd count (3 or 5) and a neutral middle
     [ ] theme, audience_age and key_insight echoed back unchanged
   PROMPT
 

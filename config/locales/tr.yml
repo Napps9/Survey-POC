@@ -162,6 +162,7 @@ tr:
         count_few: "Yalnızca %{n} yanıt — %{min}–%{max} hedefleyin."
         count_many: "%{n} yanıt — %{max} veya daha aza indirin."
         count_even: "%{n} kutu — dengeli bir ızgara için çift sayı kullanın (Diğer kutusu dahil)."
+        count_odd: "%{n} nokta — gerçek bir nötr orta nokta olması için tek sayı kullanın."
         count_exact_ok: "%{n} puanlık ölçek — tam kıvamında."
         count_exact: "Tam olarak %{exact} puan kullanın (şu an %{n})."
         option_ok: "Yanıt etiketleri kısa ve okunaklı (≤ %{max} karakter)."

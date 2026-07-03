@@ -162,6 +162,7 @@ sw:
         count_few: "Majibu %{n} tu — lenga %{min}–%{max}."
         count_many: "Majibu %{n} — punguza hadi %{max} au chini."
         count_even: "Vigae %{n} — tumia idadi shufwa kwa gridi iliyosawazishwa (kisanduku cha Nyingine kinahesabiwa)."
+        count_odd: "Pointi %{n} — tumia idadi isiyo shufwa ili kuwe na kati cha kweli kisichoegemea upande wowote."
         count_exact_ok: "Kipimo cha pointi %{n} — sawa kabisa."
         count_exact: "Tumia pointi %{exact} haswa (sasa %{n})."
         option_ok: "Lebo za majibu ni fupi na zinasomeka (≤ herufi %{max})."

@@ -162,6 +162,7 @@ fr:
         count_few: "Seulement %{n} réponses — visez %{min}–%{max}."
         count_many: "%{n} réponses — réduisez à %{max} ou moins."
         count_even: "%{n} tuiles — utilisez un nombre pair pour une grille équilibrée (la case Autre compte)."
+        count_odd: "%{n} points — utilisez un nombre impair pour avoir un véritable point médian neutre."
         count_exact_ok: "Échelle à %{n} points — parfait."
         count_exact: "Utilisez exactement %{exact} points (actuellement %{n})."
         option_ok: "Les libellés de réponse sont courts et lisibles (≤ %{max} caractères)."

@@ -162,6 +162,7 @@ vi:
         count_few: "Chỉ %{n} đáp án — hãy nhắm %{min}–%{max}."
         count_many: "%{n} đáp án — giảm còn %{max} hoặc ít hơn."
         count_even: "%{n} ô — dùng số chẵn để lưới cân đối (tính cả ô Khác)."
+        count_odd: "%{n} điểm — dùng số lẻ để có một điểm giữa trung lập thực sự."
         count_exact_ok: "Thang %{n} điểm — vừa khéo."
         count_exact: "Dùng đúng %{exact} điểm (hiện %{n})."
         option_ok: "Nhãn đáp án ngắn gọn, dễ đọc (≤ %{max} ký tự)."

@@ -162,6 +162,7 @@ pt:
         count_few: "Apenas %{n} respostas — mire %{min}–%{max}."
         count_many: "%{n} respostas — reduza para %{max} ou menos."
         count_even: "%{n} blocos — use um número par para uma grade equilibrada (a caixa Outro conta)."
+        count_odd: "%{n} pontos — use um número ímpar para ter um ponto central realmente neutro."
         count_exact_ok: "Escala de %{n} pontos — perfeita."
         count_exact: "Use exatamente %{exact} pontos (agora %{n})."
         option_ok: "Os rótulos das respostas são curtos e legíveis (≤ %{max} caracteres)."

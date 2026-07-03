@@ -162,6 +162,7 @@ it:
         count_few: "Solo %{n} risposte — punta a %{min}–%{max}."
         count_many: "%{n} risposte — riduci a %{max} o meno."
         count_even: "%{n} caselle — usa un numero pari per una griglia equilibrata (la casella Altro conta)."
+        count_odd: "%{n} punti — usa un numero dispari per avere un vero punto centrale neutro."
         count_exact_ok: "Scala a %{n} punti — perfetta."
         count_exact: "Usa esattamente %{exact} punti (ora %{n})."
         option_ok: "Le etichette delle risposte sono brevi e leggibili (≤ %{max} caratteri)."

@@ -16,11 +16,13 @@ export const INFO = "info" // a non-scoring tip (e.g. "consider a midway break")
 // ── Thresholds, straight from the Rules of the Game ──────────────────────
 // Per-card answer-count rule, by card type. {min,max} is the green range;
 // `even` grids must have an even count (the doc counts the "Other" box);
-// `exact` pins a fixed count. Types absent here carry no count rule.
+// `odd` (range) must have an odd count so the slider always has a true
+// centre step to rest a genuinely neutral option on; `exact` pins a fixed
+// count. Types absent here carry no count rule.
 const COUNT_RULES = {
   multiple_choice:  { min: 3, max: 5 },                  // rule 6
   select_many:      { min: 3, max: 5 },                  // rule 6
-  range:            { min: 3, max: 5 },                  // rule 6
+  range:            { min: 3, max: 5, odd: true },       // rule 6
   rating:           { min: 3, max: 5 },                  // rule 6
   tap_card:         { min: 3, max: 5 },                  // rule 2 (3–5 cards)
   select_one_grid:  { min: 4, max: 10, even: true },     // rule 7
@@ -105,10 +107,11 @@ function countCheck(card, rule) {
       : check("count", YELLOW, t("editor.rules.count_exact", { n, exact: rule.exact }))
   }
 
-  const { min, max, even } = rule
+  const { min, max, even, odd } = rule
   if (n < min) return check("count", n >= min - 1 ? YELLOW : RED, t("editor.rules.count_few", { n, min, max }))
   if (n > max) return check("count", n <= max + 1 ? YELLOW : RED, t("editor.rules.count_many", { n, max }))
   if (even && n % 2 !== 0) return check("count", YELLOW, t("editor.rules.count_even", { n }))
+  if (odd && n % 2 === 0) return check("count", YELLOW, t("editor.rules.count_odd", { n }))
   return check("count", GREEN, t("editor.rules.count_ok", { n, min, max }))
 }
 

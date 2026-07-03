@@ -162,6 +162,7 @@ nl:
         count_few: "Slechts %{n} antwoorden — mik op %{min}–%{max}."
         count_many: "%{n} antwoorden — beperk tot %{max} of minder."
         count_even: "%{n} tegels — gebruik een even aantal voor een gebalanceerd raster (het vak Overig telt mee)."
+        count_odd: "%{n} punten — gebruik een oneven aantal zodat er een echt neutraal middelpunt is."
         count_exact_ok: "Schaal van %{n} punten — precies goed."
         count_exact: "Gebruik precies %{exact} punten (nu %{n})."
         option_ok: "Antwoordlabels zijn kort en leesbaar (≤ %{max} tekens)."

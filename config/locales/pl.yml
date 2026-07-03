@@ -162,6 +162,7 @@ pl:
         count_few: "Tylko %{n} odpowiedzi — celuj w %{min}–%{max}."
         count_many: "%{n} odpowiedzi — ogranicz do %{max} lub mniej."
         count_even: "%{n} kafelków — użyj parzystej liczby dla zrównoważonej siatki (pole Inne też się liczy)."
+        count_odd: "%{n} punktów — użyj nieparzystej liczby, aby mieć prawdziwy neutralny środek."
         count_exact_ok: "Skala %{n}-punktowa — w sam raz."
         count_exact: "Użyj dokładnie %{exact} punktów (teraz %{n})."
         option_ok: "Etykiety odpowiedzi są krótkie i czytelne (≤ %{max} znaków)."

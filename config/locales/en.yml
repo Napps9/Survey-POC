@@ -164,6 +164,7 @@ en:
         count_few: "Only %{n} answers — aim for %{min}–%{max}."
         count_many: "%{n} answers — trim to %{max} or fewer."
         count_even: "%{n} tiles — use an even number for a balanced grid (the Other box counts)."
+        count_odd: "%{n} points — use an odd number so there's a true neutral middle."
         count_exact_ok: "%{n}-point scale — just right."
         count_exact: "Use exactly %{exact} points (now %{n})."
         option_ok: "Answer labels are short and scannable (≤ %{max} characters)."

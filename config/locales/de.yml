@@ -162,6 +162,7 @@ de:
         count_few: "Nur %{n} Antworten — ziele auf %{min}–%{max}."
         count_many: "%{n} Antworten — auf %{max} oder weniger reduzieren."
         count_even: "%{n} Kacheln — nutze eine gerade Anzahl für ein ausgewogenes Raster (das Feld „Sonstiges“ zählt mit)."
+        count_odd: "%{n} Punkte — nutze eine ungerade Anzahl, damit es eine echte neutrale Mitte gibt."
         count_exact_ok: "%{n}-Punkte-Skala — genau richtig."
         count_exact: "Nutze genau %{exact} Punkte (jetzt %{n})."
         option_ok: "Antwortlabels sind kurz und gut lesbar (≤ %{max} Zeichen)."
