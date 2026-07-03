@@ -100,7 +100,7 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
     assert_match "Common Questions", response.body
   end
 
-  test "the birth demographic renders as a date picker in the player" do
+  test "the birth demographic renders as a month+year picker in the player" do
     with_fake_generator do
       post generate_survey_path, params: {
         verto_name: "N", theme: "T", audience_age: "a", key_insight: "k", show_results_comparison: "0"
@@ -111,6 +111,6 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
 
     get play_survey_path(survey.publish_token)
     assert_response :success
-    assert_match 'type="date"', response.body
+    assert_match 'type="month"', response.body
   end
 end

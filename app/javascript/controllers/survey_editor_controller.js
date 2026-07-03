@@ -558,6 +558,13 @@ export default class extends Controller {
       if (card.dataset.cardAllowOther === "true") out.allow_other = true
       if (card.dataset.cardRequired === "true") out.required = true
 
+      // Structural flags the DOM never re-derives — an open_ended input
+      // flavour (e.g. the birth-date "month" picker) and the demographic
+      // marker — so autosave doesn't silently strip them the first time an
+      // otherwise-unrelated field on the card is edited.
+      if (card.dataset.cardInput) out.input = card.dataset.cardInput
+      if (card.dataset.cardDemographic === "true") out.demographic = true
+
       const primOpts = (prim.options || []).map(o => (o || "").trim()).filter(Boolean)
       if (primOpts.length) out.options = primOpts
 
