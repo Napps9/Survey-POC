@@ -114,6 +114,7 @@ sw:
       quiz_wrong: "Sio sahihi kabisa"
       quiz_answer: "Jibu sahihi:"
       quiz_check: "Angalia jibu"
+      quiz_grading: "Inakagua…"
       quiz_result_label: "Ulipata alama"
       quiz_compare_meta: "Ulipata %{score}/%{max} — bora kuliko %{beat}% ya wachezaji · wastani %{avg}"
       quiz_compare_empty: "Kuwa wa kwanza kumaliza — hakuna ulinganisho bado."

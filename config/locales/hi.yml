@@ -114,6 +114,7 @@ hi:
       quiz_wrong: "बिल्कुल नहीं"
       quiz_answer: "सही उत्तर:"
       quiz_check: "उत्तर जाँचें"
+      quiz_grading: "जाँचा जा रहा है…"
       quiz_result_label: "आपका स्कोर"
       quiz_compare_meta: "आपने %{score}/%{max} स्कोर किया — %{beat}% खिलाड़ियों से बेहतर · औसत %{avg}"
       quiz_compare_empty: "पूरा करने वाले पहले व्यक्ति बनें — अभी कोई तुलना नहीं।"

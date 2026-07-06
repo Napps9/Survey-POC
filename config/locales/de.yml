@@ -114,6 +114,7 @@ de:
       quiz_wrong: "Nicht ganz"
       quiz_answer: "Richtige Antwort:"
       quiz_check: "Antwort prüfen"
+      quiz_grading: "Wird bewertet…"
       quiz_result_label: "Dein Ergebnis"
       quiz_compare_meta: "Du hast %{score}/%{max} erreicht — besser als %{beat}% der Spieler · Durchschnitt %{avg}"
       quiz_compare_empty: "Sei der Erste, der fertig wird — noch kein Vergleich."

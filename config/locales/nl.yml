@@ -114,6 +114,7 @@ nl:
       quiz_wrong: "Net niet"
       quiz_answer: "Juiste antwoord:"
       quiz_check: "Antwoord controleren"
+      quiz_grading: "Beoordelen…"
       quiz_result_label: "Je scoorde"
       quiz_compare_meta: "Je scoorde %{score}/%{max} — beter dan %{beat}% van de spelers · gemiddeld %{avg}"
       quiz_compare_empty: "Wees de eerste die klaar is — nog geen vergelijking."

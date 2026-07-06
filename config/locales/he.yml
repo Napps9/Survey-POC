@@ -114,6 +114,7 @@ he:
       quiz_wrong: "לא בדיוק"
       quiz_answer: "התשובה הנכונה:"
       quiz_check: "בדוק תשובה"
+      quiz_grading: "בודק…"
       quiz_result_label: "הניקוד שלך"
       quiz_compare_meta: "צברת %{score}/%{max} — טוב יותר מ-%{beat}% מהשחקנים · ממוצע %{avg}"
       quiz_compare_empty: "היה הראשון לסיים — אין עדיין השוואה."

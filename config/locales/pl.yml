@@ -114,6 +114,7 @@ pl:
       quiz_wrong: "Niezupełnie"
       quiz_answer: "Poprawna odpowiedź:"
       quiz_check: "Sprawdź odpowiedź"
+      quiz_grading: "Ocenianie…"
       quiz_result_label: "Twój wynik to"
       quiz_compare_meta: "Twój wynik to %{score}/%{max} — lepszy niż %{beat}% graczy · średnia %{avg}"
       quiz_compare_empty: "Bądź pierwszy, który ukończy — brak jeszcze porównania."

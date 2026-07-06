@@ -114,6 +114,7 @@ uk:
       quiz_wrong: "Не зовсім"
       quiz_answer: "Правильна відповідь:"
       quiz_check: "Перевірити відповідь"
+      quiz_grading: "Перевірка…"
       quiz_result_label: "Ви набрали"
       quiz_compare_meta: "Ви набрали %{score}/%{max} — краще за %{beat}% гравців · у середньому %{avg}"
       quiz_compare_empty: "Будьте першим, хто завершить — порівняння ще немає."

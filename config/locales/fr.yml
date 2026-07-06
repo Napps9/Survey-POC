@@ -114,6 +114,7 @@ fr:
       quiz_wrong: "Pas tout à fait"
       quiz_answer: "Bonne réponse :"
       quiz_check: "Vérifier la réponse"
+      quiz_grading: "Évaluation en cours…"
       quiz_result_label: "Vous avez obtenu"
       quiz_compare_meta: "Vous avez obtenu %{score}/%{max} — mieux que %{beat}% des joueurs · moyenne %{avg}"
       quiz_compare_empty: "Soyez le premier à terminer — aucune comparaison pour l'instant."

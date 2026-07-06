@@ -114,6 +114,7 @@ id:
       quiz_wrong: "Belum tepat"
       quiz_answer: "Jawaban yang benar:"
       quiz_check: "Periksa jawaban"
+      quiz_grading: "Menilai…"
       quiz_result_label: "Skormu"
       quiz_compare_meta: "Skormu %{score}/%{max} — lebih baik dari %{beat}% pemain · rata-rata %{avg}"
       quiz_compare_empty: "Jadilah yang pertama menyelesaikan — belum ada perbandingan."

@@ -114,6 +114,7 @@ ru:
       quiz_wrong: "Не совсем"
       quiz_answer: "Правильный ответ:"
       quiz_check: "Проверить ответ"
+      quiz_grading: "Проверка…"
       quiz_result_label: "Ваш результат"
       quiz_compare_meta: "Вы набрали %{score}/%{max} — лучше, чем %{beat}% игроков · в среднем %{avg}"
       quiz_compare_empty: "Будьте первым, кто завершит — сравнения пока нет."

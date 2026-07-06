@@ -114,6 +114,7 @@ vi:
       quiz_wrong: "Chưa đúng lắm"
       quiz_answer: "Câu trả lời đúng:"
       quiz_check: "Kiểm tra câu trả lời"
+      quiz_grading: "Đang chấm điểm…"
       quiz_result_label: "Bạn đạt"
       quiz_compare_meta: "Bạn đạt %{score}/%{max} — tốt hơn %{beat}% người chơi · trung bình %{avg}"
       quiz_compare_empty: "Hãy là người đầu tiên hoàn thành — chưa có so sánh."

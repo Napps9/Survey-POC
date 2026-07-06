@@ -114,6 +114,7 @@ ar:
       quiz_wrong: "ليس تمامًا"
       quiz_answer: "الإجابة الصحيحة:"
       quiz_check: "تحقّق من الإجابة"
+      quiz_grading: "جارٍ التقييم…"
       quiz_result_label: "نتيجتك"
       quiz_compare_meta: "حصلت على %{score}/%{max} — أفضل من %{beat}% من اللاعبين · المتوسط %{avg}"
       quiz_compare_empty: "كن أول من ينهي — لا توجد مقارنة بعد."

@@ -25,6 +25,15 @@ class QuizPlayerTest < ActionDispatch::IntegrationTest
     JSON.parse(response.body)
   end
 
+  def with_fake_grader(correct)
+    fake = Object.new
+    fake.define_singleton_method(:call) { |**_kw| correct }
+    QuizAnswerGrader.define_singleton_method(:new) { |*| fake }
+    yield
+  ensure
+    QuizAnswerGrader.singleton_class.remove_method(:new)
+  end
+
   test "grade returns a per-card verdict, the correct answer and the running score" do
     s = quiz_survey
     body = json_post grade_survey_path(s.publish_token),
@@ -136,6 +145,51 @@ class QuizPlayerTest < ActionDispatch::IntegrationTest
     # even picked one. Every option renders data-correct="false" outside the
     # editor, so this checks the specific leaking value, not the attribute.
     refute_match('data-correct="true"', response.body)
+  end
+
+  test "grade uses AI to judge a near-miss open_ended answer as correct and normalizes it" do
+    s = quiz_survey
+    body = with_fake_grader(true) do
+      json_post grade_survey_path(s.publish_token),
+                session_token: "near", card_index: 3,
+                answers: { "3" => { "type" => "open_ended", "value" => "it is four" } }
+    end
+    assert body["graded"]
+    assert body["correct"], "the AI judged this a genuine match"
+    stored = s.responses.find_by(session_token: "near").answers["3"]["value"]
+    assert_equal "4", stored, "normalized to the accepted wording so later recomputation is a free exact match"
+  end
+
+  test "grade only asks the AI once — a repeat call reuses the locked verdict" do
+    s = quiz_survey
+    with_fake_grader(true) do
+      json_post grade_survey_path(s.publish_token),
+                session_token: "once", card_index: 3,
+                answers: { "3" => { "type" => "open_ended", "value" => "it is four" } }
+    end
+
+    # A second grade call for the same (now-locked) card must NOT ask again —
+    # this fake would flip the verdict to wrong if it were ever invoked.
+    body = with_fake_grader(false) do
+      json_post grade_survey_path(s.publish_token),
+                session_token: "once", card_index: 3,
+                answers: { "3" => { "type" => "open_ended", "value" => "it is four" } }
+    end
+    assert body["correct"], "the original AI-confirmed verdict must stand"
+  end
+
+  test "an AI grading failure leaves the exact-match verdict standing, never 500s" do
+    s = quiz_survey
+    boom = Object.new
+    boom.define_singleton_method(:call) { |**_kw| raise "network down" }
+    QuizAnswerGrader.define_singleton_method(:new) { |*| boom }
+    body = json_post grade_survey_path(s.publish_token),
+                     session_token: "err", card_index: 3,
+                     answers: { "3" => { "type" => "open_ended", "value" => "it is four" } }
+    assert_response :success
+    refute body["correct"], "falls back to the plain exact-match verdict"
+  ensure
+    QuizAnswerGrader.singleton_class.remove_method(:new)
   end
 
   test "grade and scores are forbidden for a non-quiz Verto" do

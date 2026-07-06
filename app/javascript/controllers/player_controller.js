@@ -733,11 +733,13 @@ export default class extends Controller {
     const key  = card.dataset.cardIndex
     this._revealed.add(idx) // lock now so a double-tap can't re-submit
     card.classList.add("quiz-locking")
+    this._setGradingBusy(true)
 
     const result = this.gradeUrlValue
       ? await this._gradeRemote(key)         // live: server is authoritative
       : this._gradeLocal(card)               // owner preview: embedded answers
     card.classList.remove("quiz-locking")
+    this._setGradingBusy(false)
     if (!result) { this._revealed.delete(idx); return } // couldn't grade — allow a retry
 
     if (typeof result.score === "number") this._quizScore = result.score
@@ -748,6 +750,18 @@ export default class extends Controller {
     this._renderScoreChip()
     this._update()
     haptic(result.correct ? [12, 24, 12] : 30)
+  }
+
+  // Disables Next/Submit and swaps its label while the server checks the
+  // answer — a free-text quiz answer can take a couple of seconds now that a
+  // close-but-not-exact wording gets an AI judgment call (see
+  // QuizAnswerGrader), not just an instant exact-match. Guards against a
+  // confused double-tap mid-request.
+  _setGradingBusy(busy) {
+    const label = busy ? t("player.quiz_grading") : t("player.quiz_check")
+    ;[ this.hasNextBtnTarget && this.nextBtnTarget, this.hasFinishBtnTarget && this.finishBtnTarget ]
+      .filter(Boolean)
+      .forEach(btn => { btn.textContent = label; btn.dataset.disabled = busy ? "true" : "false" })
   }
 
   async _gradeRemote(key) {

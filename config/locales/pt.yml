@@ -114,6 +114,7 @@ pt:
       quiz_wrong: "Quase"
       quiz_answer: "Resposta correta:"
       quiz_check: "Verificar resposta"
+      quiz_grading: "A avaliar…"
       quiz_result_label: "A sua pontuação"
       quiz_compare_meta: "Pontuou %{score}/%{max} — melhor do que %{beat}% dos jogadores · média %{avg}"
       quiz_compare_empty: "Seja o primeiro a terminar — ainda sem comparação."

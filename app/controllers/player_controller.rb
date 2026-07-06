@@ -119,7 +119,9 @@ class PlayerController < ApplicationController
     token = data["session_token"].presence || SecureRandom.uuid
     idx   = data["card_index"].to_i
     resp  = find_or_init_response(token)
+    first_time = !answered?(stored_answers(resp)[idx.to_s])
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    ai_normalize_open_ended_answer!(resp, idx) if first_time
     sync_region_from_answers!(resp)
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     mark_started_unless_completed(resp)
@@ -327,6 +329,38 @@ class PlayerController < ApplicationController
     v = ans["value"]
     return v.any? if v.is_a?(Array)
     !(v.nil? || (v.is_a?(String) && v.strip.empty?))
+  end
+
+  # Free-text quiz answers rarely match an accepted answer verbatim ("make the
+  # laws" vs. the accepted "make laws") — the very first time an open_ended
+  # graded card is answered, ask Claude whether a near-miss is a genuine
+  # semantic match and, if so, rewrite the stored value to the accepted
+  # wording. Every later recomputation of this answer (apply_quiz_score, the
+  # scores endpoint, a resave from a chatty client) is then a plain, free
+  # exact-match check via QuizGrading — nothing re-asks the AI for the same
+  # answer twice. Called from #grade only when the caller has confirmed this
+  # card had no committed answer before this request.
+  def ai_normalize_open_ended_answer!(resp, idx)
+    card = Array(@survey.cards)[idx]
+    return unless card && card["type"].to_s == "open_ended" && QuizGrading.graded?(card)
+
+    key   = idx.to_s
+    entry = resp.answers[key]
+    return unless entry.is_a?(Hash)
+    value = entry["value"]
+    return if value.to_s.strip.empty?
+    return if QuizGrading.correct?(card, value) # already an exact match — nothing to do
+
+    accepted = Array(card["correct"]).map(&:to_s).reject(&:empty?)
+    return if accepted.empty?
+    return unless QuizAnswerGrader.new.call(question: card["text"].to_s, accepted_answers: accepted, answer: value.to_s)
+
+    # Reassign the whole hash (rather than mutate the nested entry in place)
+    # so ActiveRecord's dirty-tracking on the JSON column reliably sees it.
+    resp.answers = resp.answers.merge(key => entry.merge("value" => accepted.first))
+  rescue => e
+    Rails.logger.error("[PlayerController#grade] AI answer grading failed: #{e.class}: #{e.message}")
+    # Best-effort: the respondent keeps the exact-match verdict.
   end
 
   # Cache the server-computed score on quiz responses so "how you compare" is a

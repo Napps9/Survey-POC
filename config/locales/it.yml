@@ -114,6 +114,7 @@ it:
       quiz_wrong: "Non proprio"
       quiz_answer: "Risposta corretta:"
       quiz_check: "Verifica risposta"
+      quiz_grading: "Valutazione in corso…"
       quiz_result_label: "Hai totalizzato"
       quiz_compare_meta: "Hai totalizzato %{score}/%{max} — meglio del %{beat}% dei giocatori · media %{avg}"
       quiz_compare_empty: "Sii il primo a finire — ancora nessun confronto."

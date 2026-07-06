@@ -114,6 +114,7 @@ ja:
       quiz_wrong: "惜しい"
       quiz_answer: "正解:"
       quiz_check: "回答を確認"
+      quiz_grading: "採点中…"
       quiz_result_label: "あなたのスコア"
       quiz_compare_meta: "あなたのスコアは %{score}/%{max} — プレイヤーの %{beat}% より上 · 平均 %{avg}"
       quiz_compare_empty: "最初の完了者になりましょう — まだ比較がありません。"

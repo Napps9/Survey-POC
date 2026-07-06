@@ -114,6 +114,7 @@ ko:
       quiz_wrong: "아쉬워요"
       quiz_answer: "정답:"
       quiz_check: "답 확인"
+      quiz_grading: "채점 중…"
       quiz_result_label: "내 점수"
       quiz_compare_meta: "%{score}/%{max}점을 받았어요 — 플레이어의 %{beat}%보다 높아요 · 평균 %{avg}"
       quiz_compare_empty: "가장 먼저 완료해 보세요 — 아직 비교가 없어요."

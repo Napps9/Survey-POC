@@ -114,6 +114,7 @@ tr:
       quiz_wrong: "Tam değil"
       quiz_answer: "Doğru cevap:"
       quiz_check: "Cevabı kontrol et"
+      quiz_grading: "Değerlendiriliyor…"
       quiz_result_label: "Puanınız"
       quiz_compare_meta: "%{score}/%{max} aldınız — oyuncuların %{beat}%'inden daha iyi · ortalama %{avg}"
       quiz_compare_empty: "Bitiren ilk kişi olun — henüz karşılaştırma yok."
