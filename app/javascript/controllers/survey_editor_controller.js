@@ -2,6 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
 import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
 
+// Card types with no answer captured — mirrors CardTypes::NON_QUESTION_TYPES
+// (app/lib/card_types.rb). welcome_card additionally stays pinned first (see
+// moveCardUp / _updateMoveButtonStates), which token_checkpoint does not.
+const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
+
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode", "vertoScore", "scoreBoard"]
   static values  = {
@@ -11,6 +16,7 @@ export default class extends Controller {
     locales: { type: Array, default: [] },
     rtlLocales: { type: Array, default: [] },
     quiz: { type: Boolean, default: false },
+    tokenisation: { type: Boolean, default: false },
     live: { type: Boolean, default: false }
   }
 
@@ -215,7 +221,7 @@ export default class extends Controller {
   // the data-card-num the score board jumps by stay consistent with the DOM.
   renumberCards() {
     const cards  = this.cardTargets
-    const totalQ = cards.filter(c => c.dataset.cardType !== "welcome_card").length
+    const totalQ = cards.filter(c => !NON_QUESTION_TYPES.includes(c.dataset.cardType)).length
     let qIdx = 0
     cards.forEach((card, i) => {
       const num = i + 1
@@ -223,7 +229,7 @@ export default class extends Controller {
       const numEl = card.querySelector("[data-role='card-number']")
       if (numEl) numEl.textContent = `Card ${num}`
 
-      const isQ = card.dataset.cardType !== "welcome_card"
+      const isQ = !NON_QUESTION_TYPES.includes(card.dataset.cardType)
       if (isQ) qIdx++
       const pct  = isQ && totalQ > 0 ? Math.round((qIdx / totalQ) * 100) : 5
       const fill = card.querySelector(".panel-progress-fill")
@@ -590,6 +596,15 @@ export default class extends Controller {
         }
       }
 
+      // Tokenisation: choice/tap_card carry per-option/per-direction `tokens`;
+      // scale/open/prioritise carry a flat `token_award`. Leaving every amount
+      // at 0 keeps the card unawarded (TokenGrading.awarding? stays false).
+      if (this.tokenisationValue) {
+        const { tokens, token_award } = this._readTokens(card, type)
+        if (tokens && Object.keys(tokens).length) out.tokens = tokens
+        if (token_award && Object.keys(token_award).length) out.token_award = token_award
+      }
+
       const i18n = {}
       secondary.forEach(loc => {
         const t = entry[loc]
@@ -652,6 +667,60 @@ export default class extends Controller {
         return ta ? ta.value.split("\n").map(s => s.trim()).filter(Boolean) : null
       }
       default: return null
+    }
+  }
+
+  // ── Tokenisation: per-option / per-card token-amount marking ─────────────
+
+  // Every non-zero token-amount input inside `container`, as {token_id => n}.
+  _tokenAmounts(container) {
+    const out = {}
+    container.querySelectorAll(".token-amount-input").forEach(input => {
+      const id = input.dataset.tokenId
+      const n  = parseInt(input.value, 10)
+      if (id && n) out[id] = n
+    })
+    return out
+  }
+
+  // This card's token config, in the shape TokenGrading expects: `tokens` for
+  // choice/tap_card (keyed by canonical option/statement), `token_award` for
+  // the flat-award types.
+  _readTokens(card, type) {
+    switch (type) {
+      case "multiple_choice": case "select_many": case "yes_no":
+      case "select_one_grid": case "select_many_grid": {
+        const tokens = {}
+        card.querySelectorAll('[data-picker-target="item"]').forEach(item => {
+          const label  = (item.dataset.canonical || "").trim()
+          const inputs = item.querySelector(".token-inputs")
+          if (!label || !inputs) return
+          const amt = this._tokenAmounts(inputs)
+          if (Object.keys(amt).length) tokens[label] = amt
+        })
+        return { tokens }
+      }
+      case "tap_card": {
+        const tokens = {}
+        card.querySelectorAll(".token-tap-row").forEach(row => {
+          const statement = (row.dataset.statement || "").trim()
+          if (!statement) return
+          const dirs = {}
+          row.querySelectorAll(".token-inputs").forEach(dirBlock => {
+            const dir = dirBlock.dataset.direction
+            const amt = this._tokenAmounts(dirBlock)
+            if (dir && Object.keys(amt).length) dirs[dir] = amt
+          })
+          if (Object.keys(dirs).length) tokens[statement] = dirs
+        })
+        return { tokens }
+      }
+      case "range": case "nps": case "rating": case "open_ended": case "prioritise": {
+        const row = card.querySelector(".token-award-row")
+        return { token_award: row ? this._tokenAmounts(row) : {} }
+      }
+      default:
+        return {}
     }
   }
 

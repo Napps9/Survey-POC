@@ -30,6 +30,9 @@ vi:
     explanation: "Giải thích"
     explanation_placeholder: "Hiển thị sau khi người chơi trả lời — ví dụ tại sao điều này đúng."
     correct_badge: "Đúng"
+    token_award_title: "Điểm"
+    token_award_hint: "Chỉ cần trả lời là được cộng điểm"
+    token_checkpoint_placeholder: "Hiển thị số điểm người chơi đã thu thập được cho đến nay."
   auth:
     social_continue: "Tiếp tục với %{provider}"
     social_divider: "hoặc"
@@ -98,6 +101,7 @@ vi:
     submit: Gửi ✓
     quiz_compare_cta: "Xem bạn so sánh thế nào →"
     quiz_compare_title: "Bạn so sánh thế nào"
+    tokens_welcome_note: "Bạn sẽ nhận điểm khi trả lời mỗi câu hỏi — bạn không thể quay lại và đổi câu trả lời để nhận thêm điểm."
   js:
     player:
       region_meta: "%{count} câu trả lời có khu vực"
@@ -120,6 +124,7 @@ vi:
       quiz_compare_empty: "Hãy là người đầu tiên hoàn thành — chưa có so sánh."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Mọi người đã làm thế nào, theo từng câu hỏi"
+      tokens_result_label: "Bạn đã thu thập"
     editor:
       delete_card_confirm: Xóa thẻ này?
       unsaved: Thay đổi chưa lưu

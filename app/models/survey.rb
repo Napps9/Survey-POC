@@ -173,6 +173,42 @@ class Survey < ApplicationRecord
     graded_card_indices.size
   end
 
+  # Tokenisation: the card indices that award at least one token. Empty for a
+  # non-tokenised Verto, or one whose cards are all still unawarded.
+  def token_awarding_indices
+    return [] unless tokenisation_enabled?
+    TokenGrading.awarding_indices(cards)
+  end
+
+  def token_awarding_count
+    token_awarding_indices.size
+  end
+
+  # This Verto's defined token type ids, e.g. ["gold", "coal"].
+  def token_type_ids
+    Array(token_types).map { |t| t["id"] }.compact
+  end
+
+  MAX_TOKEN_TYPES  = 8
+  MAX_TOKEN_NAME   = 40
+  MAX_TOKEN_ICON   = 8
+
+  # Coerce creator-submitted token type definitions into a safe, bounded
+  # array of {"id", "name", "icon"} before persisting: caps the count, trims
+  # name/icon length, drops entries with no name, and assigns a stable id to
+  # any entry that doesn't already have one (a fresh row from the editor) —
+  # so cards that already reference an id by name change never break.
+  def self.sanitize_token_types(value)
+    Array(value).filter_map do |entry|
+      next unless entry.is_a?(Hash)
+      name = entry["name"].to_s.strip.first(MAX_TOKEN_NAME)
+      next if name.blank?
+      id   = entry["id"].to_s.strip.presence || SecureRandom.hex(4)
+      icon = entry["icon"].to_s.strip.first(MAX_TOKEN_ICON).presence || "⭐"
+      { "id" => id, "name" => name, "icon" => icon }
+    end.first(MAX_TOKEN_TYPES)
+  end
+
   def archive!
     update!(deleted_at: Time.current)
   end

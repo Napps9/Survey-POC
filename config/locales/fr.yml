@@ -30,6 +30,9 @@ fr:
     explanation: "Explication"
     explanation_placeholder: "Affiché après la réponse du joueur — p. ex. pourquoi c'est correct."
     correct_badge: "Correct"
+    token_award_title: "Points"
+    token_award_hint: "Attribués juste pour avoir répondu"
+    token_checkpoint_placeholder: "Affiche les points qu'un joueur a collectés jusqu'à présent."
   auth:
     social_continue: "Continuer avec %{provider}"
     social_divider: "ou"
@@ -98,6 +101,7 @@ fr:
     submit: Envoyer ✓
     quiz_compare_cta: "Voyez comment vous vous situez →"
     quiz_compare_title: "Comment vous vous situez"
+    tokens_welcome_note: "Vous gagnerez des points à chaque question — vous ne pouvez pas revenir en arrière et modifier une réponse pour en gagner plus."
   js:
     player:
       region_meta: "%{count} réponses avec une région"
@@ -120,6 +124,7 @@ fr:
       quiz_compare_empty: "Soyez le premier à terminer — aucune comparaison pour l'instant."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Comment chacun s'en est sorti, question par question"
+      tokens_result_label: "Vous avez collecté"
     editor:
       delete_card_confirm: Supprimer cette carte ?
       unsaved: Modifications non enregistrées

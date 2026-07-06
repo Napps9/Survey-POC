@@ -1,6 +1,6 @@
 <%
   cards   = Array(@survey.cards)
-  total_q = cards.count { |c| c["type"] != "welcome_card" }
+  total_q = cards.count { |c| CardTypes.question?(c["type"]) }
   q_idx   = 0
   est_min = [(total_q * 30 / 60.0).ceil, 1].max
 
@@ -41,6 +41,8 @@
      data-survey-editor-locales-value="<%= @survey.verto_locales.to_json %>"
      data-survey-editor-rtl-locales-value="<%= SupportedLocales.all.select(&:rtl?).map(&:code).to_json %>"
      data-survey-editor-quiz-value="<%= @survey.quiz? %>"
+     data-survey-editor-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
+     data-survey-editor-token-types-value="<%= @survey.token_types.to_json %>"
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.published? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
@@ -173,11 +175,12 @@
         <% cards.each_with_index do |card, idx| %>
           <%
             type   = card["type"].to_s
-            is_q   = type != "welcome_card"
+            is_q   = CardTypes.question?(type)
             q_idx += 1 if is_q
           %>
           <%= render "surveys/card_slot", card: card, idx: idx, q_idx: q_idx, total_q: total_q,
-                default_locale: @survey.default_locale, quiz: @survey.quiz? %>
+                default_locale: @survey.default_locale, quiz: @survey.quiz?,
+                tokenisation: @survey.tokenisation_enabled? %>
         <% end %>
 
       </div><%# /cards feed %>
@@ -259,7 +262,7 @@
       </div>
 
       <div class="type-list" style="display:none;" data-type-panel-target="typeList">
-        <% CardTypes.pickable.each do |key, t| %>
+        <% CardTypes.pickable_for(@survey).each do |key, t| %>
           <div class="type-opt-wrap">
             <div class="type-opt-rank"></div>
             <div class="type-opt"
@@ -317,7 +320,7 @@
                     data-action="click->type-panel#closeAllTypes">✕</button>
           </div>
           <div class="all-types-grid" data-type-panel-target="allTypesList">
-            <% CardTypes.pickable.each do |key, t| %>
+            <% CardTypes.pickable_for(@survey).each do |key, t| %>
               <div class="type-opt all-type-opt"
                    data-type="<%= key %>"
                    data-type-panel-target="allTypeOpt"
@@ -515,6 +518,62 @@
             <% if @survey.quiz? %>
               <div style="margin-top:8px;padding-left:24px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);line-height:1.45;">
                 <%= @survey.quiz_question_count %> of <%= total_q %> questions graded — mark the correct answer on each card.
+              </div>
+            <% end %>
+          <% end %>
+        </details>
+
+        <%# Tokenisation — creators define one or more token types (e.g. Gold
+            Coins, Coal) and assign amounts to cards/answers below; players see
+            a running total as they answer, a final total, and — only if
+            "Show results comparison" above is also on — how their total
+            compares with everyone else's. %>
+        <details class="publish-block" data-controller="token-types">
+          <summary class="publish-block-title">Tokenisation <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="tokenisation_enabled" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="tokenisation_enabled" value="1"
+                     <%= "checked" if @survey.tokenisation_enabled? %>
+                     data-action="change->token-types#save"
+                     style="width:14px;height:14px;accent-color:#615BF5;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Let players earn points as they answer. Each question card gains token-amount controls, and players see a running total, a final total, and — only if “Show results comparison” above is also on — how their total compares with everyone else's.</span>
+            </label>
+
+            <input type="hidden" name="token_types" value="<%= @survey.token_types.to_json %>" data-token-types-target="field" />
+
+            <% if @survey.tokenisation_enabled? %>
+              <div style="margin-top:10px;padding-left:24px;">
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:6px;">
+                  <%= @survey.token_awarding_count %> of <%= total_q %> cards award points — set amounts on each card.
+                </div>
+
+                <div data-token-types-target="list" style="display:flex;flex-direction:column;gap:6px;">
+                  <% @survey.token_types.each do |tt| %>
+                    <div class="token-type-row" data-token-types-target="row" data-token-id="<%= tt['id'] %>"
+                         style="display:flex;gap:6px;align-items:center;">
+                      <input type="text" data-token-types-target="icon" maxlength="8" value="<%= tt['icon'] %>"
+                             style="width:40px;text-align:center;padding:7px 4px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size: var(--text-md);outline:none;" />
+                      <input type="text" data-token-types-target="name" maxlength="40" value="<%= tt['name'] %>"
+                             placeholder="e.g. Gold Coins"
+                             style="flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                      <button type="button" data-action="click->token-types#removeRow"
+                              style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);cursor:pointer;">×</button>
+                    </div>
+                  <% end %>
+                </div>
+
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                  <button type="button" data-action="click->token-types#addRow"
+                          <%= "disabled" if @survey.token_types.size >= Survey::MAX_TOKEN_TYPES %>
+                          style="padding:6px 12px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px dashed rgba(255,255,255,0.25);cursor:pointer;">
+                    ＋ Add token type
+                  </button>
+                  <button type="button" data-action="click->token-types#save"
+                          style="padding:6px 14px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:none;cursor:pointer;">
+                    Save token types
+                  </button>
+                </div>
               </div>
             <% end %>
           <% end %>

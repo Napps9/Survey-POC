@@ -16,7 +16,7 @@
   type     = card["type"].to_s
   render_type = type
   eyebrow  = CardTypes.eyebrow(type).presence || type.tr("_", " ")
-  is_q     = type != "welcome_card"
+  is_q     = CardTypes.question?(type)
   ce_attr  = editable ? "contenteditable=\"true\"".html_safe : "".html_safe
 
   # Quiz: in the editor, a quiz Verto lets the creator mark each question's
@@ -33,6 +33,16 @@
   # gating it here means the correct answer never sits in the player's HTML
   # at all (not just hidden by CSS), whether marked correct or not.
   mark_correct = ->(label) { editable && correct_vals.include?(label.to_s) }
+
+  # Tokenisation: same "local wins, else the survey flag" precedent as quiz,
+  # so a freshly added card (no @survey yet) still renders its token controls.
+  # `token_types` is this Verto's defined types; `tokens_map`/`token_award` are
+  # this card's stored per-option / flat award config.
+  tokens_on   = local_assigns.key?(:tokenisation) ? local_assigns[:tokenisation] : @survey&.tokenisation_enabled?
+  token_mode  = editable && is_q && !!tokens_on
+  token_types = @survey&.token_types || []
+  tokens_map  = card["tokens"].is_a?(Hash) ? card["tokens"] : {}
+  token_award = card["token_award"].is_a?(Hash) ? card["token_award"] : {}
 
   # Picker-style lists carry an extra card-editor controller in :editor
   # mode so the per-card "delete option" / "add option" actions resolve.
@@ -98,6 +108,16 @@
             <% if quiz_mode %>
               <button type="button" class="mark-correct" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
                       data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
+            <% end %>
+            <% if token_mode %>
+              <div class="token-inputs">
+                <% token_types.each do |tt| %>
+                  <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
+                         value="<%= tokens_map.dig(canon[i], tt['id']) || 0 %>"
+                         title="<%= tt['name'] %>"
+                         data-action="input->survey-editor#markDirty" />
+                <% end %>
+              </div>
             <% end %>
             <% if editable %>
               <button type="button" class="pick-item-delete"
@@ -166,6 +186,16 @@
               <button type="button" class="mark-correct" data-picker-mode="single"
                       data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
             <% end %>
+            <% if token_mode %>
+              <div class="token-inputs">
+                <% token_types.each do |tt| %>
+                  <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
+                         value="<%= tokens_map.dig(canon_label, tt['id']) || 0 %>"
+                         title="<%= tt['name'] %>"
+                         data-action="input->survey-editor#markDirty" />
+                <% end %>
+              </div>
+            <% end %>
           </li>
         <% end %>
       </ul>
@@ -194,6 +224,16 @@
               <% end %>
             </div>
             <div class="choice-label" <%= ce_attr %>><%= opt %></div>
+            <% if token_mode %>
+              <div class="token-inputs">
+                <% token_types.each do |tt| %>
+                  <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
+                         value="<%= tokens_map.dig(canon[i], tt['id']) || 0 %>"
+                         title="<%= tt['name'] %>"
+                         data-action="input->survey-editor#markDirty" />
+                <% end %>
+              </div>
+            <% end %>
           </li>
         <% end %>
       </ul>
@@ -419,6 +459,17 @@
       <%# Welcome card — in the player it hosts the intake (compare promise +
           region picker), moved here from the old top banners. %>
       <% if mode == :player %><%= render "player/welcome_intake" %><% end %>
+
+    <% when "token_checkpoint" %>
+      <%# Points Checkpoint — a milestone screen revealing points collected so
+          far. No answer is captured; player_controller.js fills this in
+          client-side (from the cards already answered) the moment this card
+          becomes active. %>
+      <% if mode == :player %>
+        <div class="token-checkpoint-body" data-player-target="tokenCheckpointBody"></div>
+      <% else %>
+        <div class="token-checkpoint-placeholder"><%= t("card.token_checkpoint_placeholder") %></div>
+      <% end %>
     <% end %>
   </div>
 
@@ -482,11 +533,51 @@
     </div>
   <% end %>
 
+  <%# Tokenisation: for types with no single inline "answer" to key a token
+      amount off (tap_card's per-statement/per-direction awards, and the flat
+      awards on scale/open/prioritise cards) — list/grid/yes-no get their
+      inline per-option inputs above instead. Hidden on translation tabs
+      (CSS), so amounts are only ever set in the primary language. %>
+  <% if token_mode && (type == "tap_card" || TokenGrading::FLAT.include?(type)) %>
+    <div class="token-award-block" data-token-block>
+      <div class="token-award-title"><span>🪙</span> <%= t("card.token_award_title") %></div>
+
+      <% if type == "tap_card" %>
+        <% Array(display["options"]).each_with_index do |opt, i| %>
+          <div class="token-tap-row" data-statement="<%= canon[i] %>">
+            <span class="token-award-label"><%= opt %></span>
+            <% %w[yes unsure no].each do |dir| %>
+              <div class="token-inputs" data-direction="<%= dir %>">
+                <% token_types.each do |tt| %>
+                  <input type="number" class="token-amount-input"
+                         data-token-statement="<%= canon[i] %>" data-token-direction="<%= dir %>" data-token-id="<%= tt['id'] %>"
+                         value="<%= tokens_map.dig(canon[i], dir, tt['id']) || 0 %>"
+                         title="<%= "#{tt['name']} — #{dir}" %>"
+                         data-action="input->survey-editor#markDirty" />
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="token-award-row">
+          <span class="token-award-label"><%= t("card.token_award_hint") %></span>
+          <% token_types.each do |tt| %>
+            <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
+                   value="<%= token_award[tt['id']] || 0 %>"
+                   title="<%= tt['name'] %>"
+                   data-action="input->survey-editor#markDirty" />
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
   <%# "Other" free-text — a standalone answer the creator can toggle per card.
       Rendered for every question type (not welcome). In the editor it's always
       present (hidden on welcome) so the toggle survives a type switch. %>
   <% if editable || (is_q && card["allow_other"]) %>
-    <div class="other-block" data-controller="other"<%= ' hidden'.html_safe if (editable && type == "welcome_card") %>>
+    <div class="other-block" data-controller="other"<%= ' hidden'.html_safe if (editable && !is_q) %>>
       <% if editable %>
         <label class="other-edit-toggle">
           <input type="checkbox" data-action="change->survey-editor#toggleOther" <%= "checked" if card["allow_other"] %>>

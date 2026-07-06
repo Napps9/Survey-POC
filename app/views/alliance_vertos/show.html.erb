@@ -115,12 +115,12 @@
       <%# Card-by-card: Verto preview + side-by-side results %>
       <div style="display:flex;flex-direction:column;gap:20px;">
         <%
-          total_q = cards.count { |c| c["type"] != "welcome_card" }
+          total_q = cards.count { |c| CardTypes.question?(c["type"]) }
           q_idx = 0
         %>
         <% cards.each_with_index do |card, idx| %>
           <%
-            is_q     = card["type"].to_s != "welcome_card"
+            is_q     = CardTypes.question?(card["type"])
             q_idx   += 1 if is_q
             progress = total_q > 0 ? ((q_idx.to_f / total_q) * 100).round : 5
             progress = 5 unless is_q

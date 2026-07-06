@@ -8,7 +8,8 @@ export default class extends Controller {
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
                     "consentMain", "consentDeclined",
-                    "scoreChip", "quizScore", "scoresBtn", "scoresPanel", "scoresList", "scoresMeta"]
+                    "scoreChip", "quizScore", "scoresBtn", "scoresPanel", "scoresList", "scoresMeta",
+                    "tokenScoreChip", "tokenScore"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
@@ -22,6 +23,8 @@ export default class extends Controller {
     gradeUrl: { type: String, default: "" },
     quizStateUrl: { type: String, default: "" },
     scoresUrl: { type: String, default: "" },
+    tokenisation: { type: Boolean, default: false },
+    tokenTypes: { type: Array, default: [] },
     current: { type: Number, default: 0 }
   }
 
@@ -36,12 +39,19 @@ export default class extends Controller {
   _quizMax = 0
   _scoresData = null
 
+  // Tokenisation state: which card indices have already contributed to the
+  // running total (so they can't be redone), and the running totals
+  // themselves, keyed by token type id.
+  _tokenLocked = new Set()
+  _tokenTotals = {}
+
   connect() {
     this._sessionToken = this._ensureToken()
     this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
     this._finishLabel = this.hasFinishBtnTarget ? this.finishBtnTarget.textContent : ""
     this._update()
     if (this.quizValue) this._initQuiz()
+    if (this.tokenisationValue) this._initTokens()
   }
 
   // Consent card (the first card): agreeing advances into the deck; declining
@@ -81,6 +91,7 @@ export default class extends Controller {
     }
     this._capture(this.currentValue)
     if (!this._requireGuard(this.currentValue)) return
+    this._applyTokenEarn(this.currentValue)
     this._saveProgress()
     if (this.currentValue < this.cardTargets.length - 1) {
       haptic()
@@ -113,6 +124,7 @@ export default class extends Controller {
     }
     this._capture(this.currentValue)
     if (!this._requireGuard(this.currentValue)) return
+    this._applyTokenEarn(this.currentValue)
     haptic([10, 30, 10]) // a little "done" buzz on completion
     // Owner preview runs without a submit endpoint — nothing is recorded,
     // just show the thank-you screen.
@@ -131,6 +143,10 @@ export default class extends Controller {
       if (this.quizValue && data && typeof data.score === "number") {
         this._quizScore = data.score
         if (typeof data.max === "number") this._quizMax = data.max
+      }
+      // Trust the server's final token totals over the running client tally.
+      if (this.tokenisationValue && data && data.token_totals && typeof data.token_totals === "object") {
+        this._tokenTotals = { ...this._tokenTotals, ...data.token_totals }
       }
     } catch (_) {
       // No SW running and offline — answers are lost. Still show thank-you
@@ -360,6 +376,7 @@ export default class extends Controller {
       this.thankyouMainTarget.appendChild(pill)
     }
     if (this.quizValue) this._renderQuizScore()
+    if (this.tokenisationValue) this._renderTokenScore()
   }
 
   async showComparison() {
@@ -495,7 +512,7 @@ export default class extends Controller {
     const list = this.regionDetailListTarget
     list.innerHTML = ""
     ;(region.results || []).forEach(row => {
-      if (row.type === "welcome_card") return
+      if (row.type === "welcome_card" || row.type === "token_checkpoint") return
       const mine = this._answers[String(row.index)]?.value
       list.appendChild(this._buildRow(row, mine))
     })
@@ -510,8 +527,13 @@ export default class extends Controller {
     const list = this.comparisonListTarget
     list.innerHTML = ""
     ;(data.results || []).forEach(row => {
-      if (row.type === "welcome_card") return
-      const mine = this._answers[String(row.index)]?.value
+      if (row.type === "welcome_card" || row.type === "token_checkpoint") return
+      // Tokenisation: synthetic rows appended by PlayerController#results
+      // (folding "compare your tokens" into this same panel) aren't keyed to
+      // a card index — "mine" is this session's own final total instead.
+      const mine = row.type === "token_total"
+        ? (this._tokenTotals[row.token_id] || 0)
+        : this._answers[String(row.index)]?.value
       list.appendChild(this._buildRow(row, mine))
     })
   }
@@ -567,6 +589,18 @@ export default class extends Controller {
       note.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;"
       note.textContent = `${row.total || 0} open-ended response${row.total === 1 ? "" : "s"} total`
       container.appendChild(note)
+      return container
+    } else if (row.type === "token_total") {
+      // Tokenisation compare row: counts is a histogram keyed by exact total
+      // amount (mirrors the quiz score distribution) — sort ascending and
+      // highlight this session's own bucket.
+      const amounts = Object.keys(counts).map(Number).sort((a, b) => a - b)
+      const grand = amounts.reduce((s, a) => s + (counts[a] || counts[String(a)] || 0), 0) || 1
+      amounts.forEach(amt => {
+        const count = counts[amt] || counts[String(amt)] || 0
+        const pct = Math.round((count / grand) * 100)
+        container.appendChild(this._buildBar(String(amt), count, pct, Number(mine) === amt))
+      })
       return container
     } else if (row.type === "prioritise") {
       // counts[label] = sum of ranks across responders; lower mean = higher
@@ -689,6 +723,7 @@ export default class extends Controller {
     this.nextBtnTarget.classList.toggle("hidden", isLast)
     this.finishBtnTarget.classList.toggle("hidden", !isLast)
     if (this.quizValue) this._labelQuizNav()
+    if (this.tokenisationValue) this._maybeRenderCheckpoint(idx)
   }
 
   // ── Quiz: per-card grading, reveal, lock, running score ──────────────────
@@ -982,6 +1017,120 @@ export default class extends Controller {
       list.appendChild(head)
       data.per_question.forEach(q => list.appendChild(this._buildBar(q.prompt || `#${q.index + 1}`, q.correct, q.pct, false)))
     }
+  }
+
+  // ── Tokenisation: running total, checkpoint card, final tally ────────────
+  // A card's token config is public (it's rendered straight into the page,
+  // unlike a quiz's hidden `correct` answer), so the running total is
+  // computed entirely client-side — no grade-style round trip needed. The
+  // server independently recomputes the authoritative total at
+  // progress/submit time (PlayerController#apply_token_totals), and finish()
+  // trusts that over this running tally, same as it does for quiz score.
+
+  _initTokens() {
+    this.tokenTypesValue.forEach(tt => { this._tokenTotals[tt.id] = 0 })
+    this._renderTokenChip()
+  }
+
+  // Apply the token award for card `idx` to the running total, once. Called
+  // right as the player advances past a card (Next/Finish) — going back to a
+  // card already applied here can't re-earn, since _lockInputs makes its
+  // widgets unresponsive and this method itself is idempotent per index.
+  _applyTokenEarn(idx) {
+    if (!this.tokenisationValue) return
+    const card = this.cardTargets[idx]
+    if (!card || card.dataset.cardAwardsTokens !== "true" || this._tokenLocked.has(idx)) return
+    this._tokenLocked.add(idx)
+
+    const key   = card.dataset.cardIndex
+    const value = this._answers[key]?.value
+    const earned = this._computeEarned(card, card.dataset.cardType, value)
+    Object.entries(earned).forEach(([id, amount]) => {
+      this._tokenTotals[id] = (this._tokenTotals[id] || 0) + amount
+    })
+
+    this._lockInputs(card)
+    this._renderTokenChip()
+  }
+
+  // Client mirror of TokenGrading.earned — the token amounts a stored answer
+  // value earns, as {token_id => amount}. `card.dataset.cardTokens` /
+  // `cardTokenAward` carry this card's public config (see player/show.html.erb).
+  _computeEarned(card, type, value) {
+    const CHOICE_ONE  = [ "multiple_choice", "yes_no", "select_one_grid" ]
+    const CHOICE_MANY = [ "select_many", "select_many_grid" ]
+    const FLAT        = [ "range", "nps", "rating", "open_ended", "prioritise" ]
+    const sumHashes = (hashes) => {
+      const out = {}
+      hashes.forEach(h => { if (h) Object.entries(h).forEach(([k, v]) => { out[k] = (out[k] || 0) + Number(v || 0) }) })
+      return out
+    }
+    const blank = (v) => v === null || v === undefined || v === "" || (Array.isArray(v) && v.length === 0)
+
+    if (CHOICE_ONE.includes(type)) {
+      const tokens = this._parseJSON(card.dataset.cardTokens, {})
+      return tokens[String(value ?? "").trim()] || {}
+    }
+    if (CHOICE_MANY.includes(type)) {
+      const tokens = this._parseJSON(card.dataset.cardTokens, {})
+      return sumHashes((Array.isArray(value) ? value : []).map(v => tokens[String(v).trim()]))
+    }
+    if (type === "tap_card") {
+      const tokens = this._parseJSON(card.dataset.cardTokens, {})
+      if (typeof value !== "object" || !value) return {}
+      return sumHashes(Object.entries(value).map(([statement, dir]) => tokens[statement]?.[dir]))
+    }
+    if (FLAT.includes(type)) {
+      if (blank(value)) return {}
+      return this._parseJSON(card.dataset.cardTokenAward, {})
+    }
+    return {}
+  }
+
+  _parseJSON(str, fallback) {
+    try {
+      const parsed = JSON.parse(str || "null")
+      return parsed === null || parsed === undefined ? fallback : parsed
+    } catch (_) {
+      return fallback
+    }
+  }
+
+  _renderTokenChip() {
+    if (!this.hasTokenScoreChipTarget || !this.tokenTypesValue.length) return
+    this.tokenScoreChipTarget.classList.remove("hidden")
+    this.tokenScoreChipTarget.innerHTML = this.tokenTypesValue.map(tt =>
+      `<span class="token-score-pill">${this._esc(tt.icon)} ${this._tokenTotals[tt.id] || 0}</span>`
+    ).join("")
+  }
+
+  // Points Checkpoint: when the active card is a checkpoint, fill in its
+  // (otherwise-empty) body with the running totals — this is the only card
+  // type whose content is entirely client-rendered.
+  _maybeRenderCheckpoint(idx) {
+    const card = this.cardTargets[idx]
+    if (!card || card.dataset.cardType !== "token_checkpoint") return
+    const body = card.querySelector(".token-checkpoint-body")
+    if (!body || !this.tokenTypesValue.length) return
+    body.innerHTML = this.tokenTypesValue.map(tt => `
+      <div class="token-checkpoint-row">
+        <span class="token-checkpoint-icon">${this._esc(tt.icon)}</span>
+        <span class="token-checkpoint-amount">${this._tokenTotals[tt.id] || 0}</span>
+        <span class="token-checkpoint-name">${this._esc(tt.name)}</span>
+      </div>`).join("")
+  }
+
+  _renderTokenScore() {
+    if (!this.hasTokenScoreTarget || !this.tokenTypesValue.length) return
+    this.tokenScoreTarget.classList.remove("hidden")
+    this.tokenScoreTarget.innerHTML =
+      `<div class="token-result-label">${this._esc(t("player.tokens_result_label"))}</div>` +
+      this.tokenTypesValue.map(tt => `
+        <div class="token-result-row">
+          <span class="token-result-icon">${this._esc(tt.icon)}</span>
+          <span class="token-result-amount">${this._tokenTotals[tt.id] || 0}</span>
+          <span class="token-result-name">${this._esc(tt.name)}</span>
+        </div>`).join("")
   }
 
   _esc(s) {

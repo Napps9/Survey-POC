@@ -1,7 +1,7 @@
 <% content_for :title, "#{@survey.theme} · Playverto" %>
 <%
   cards   = Array(@survey.cards)
-  total_q = cards.count { |c| c["type"] != "welcome_card" }
+  total_q = cards.count { |c| CardTypes.question?(c["type"]) }
   prev_q  = 0
 
   # Owner preview (from the dashboard): the exact respondent experience but
@@ -36,6 +36,13 @@
   quiz_state_url = live_quiz ? quiz_state_survey_url(play_token) : ""
   scores_url     = live_quiz ? player_scores_url(play_token) : ""
   graded_set     = quiz_mode ? @survey.graded_card_indices.to_set : Set.new
+
+  # Tokenisation: a card's token config is public (rendered straight into the
+  # page), so the running total is computed entirely client-side — no
+  # grade-style round trip needed. The server only recomputes the
+  # authoritative total at progress/submit time (PlayerController#apply_token_totals).
+  token_mode         = @survey.tokenisation_enabled?
+  token_awarding_set = token_mode ? @survey.token_awarding_indices.to_set : Set.new
 %>
 <div class="preview-overlay flex flex-col"
      style="height:100vh;<%= verto_backdrop_style_attr(@survey) %>"
@@ -52,7 +59,9 @@
      data-player-quiz-value="<%= quiz_mode %>"
      data-player-grade-url-value="<%= grade_url %>"
      data-player-quiz-state-url-value="<%= quiz_state_url %>"
-     data-player-scores-url-value="<%= scores_url %>">
+     data-player-scores-url-value="<%= scores_url %>"
+     data-player-tokenisation-value="<%= token_mode %>"
+     data-player-token-types-value="<%= @survey.token_types.to_json %>">
 
   <% if preview_mode %>
     <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 14px;background:rgba(1,234,203,0.1);border-bottom:1px solid rgba(1,234,203,0.25);">
@@ -114,22 +123,28 @@
 
     <% cards.each_with_index do |card, idx| %>
       <%
-        type   = card["type"].to_s
-        is_q   = type != "welcome_card"
-        graded = graded_set.include?(idx)
+        type    = card["type"].to_s
+        is_q    = CardTypes.question?(type)
+        graded  = graded_set.include?(idx)
+        awards_tokens = token_awarding_set.include?(idx)
         prev_q += 1 if is_q
         prog   = total_q > 0 ? ((prev_q.to_f / total_q) * 100).round : 5
         prog   = 5 unless is_q
       %>
       <%# A graded card carries only a boolean flag in the live player — never
           its correct answer (that's revealed by the server after answering).
-          In owner preview the answer rides along so the reveal works offline. %>
+          In owner preview the answer rides along so the reveal works offline.
+          A card's token config is NOT secret (unlike a quiz's correct answer)
+          — it's public config the creator set, so it rides along even live,
+          letting the player compute a running total client-side. %>
       <div class="preview-card"
            data-player-target="card"
            data-card-index="<%= idx %>"
            data-card-type="<%= type %>"
            data-card-graded="<%= graded %>"
            <% if preview_mode && graded %>data-card-correct="<%= QuizGrading.correct_display(card).to_json %>" data-card-explanation="<%= card['explanation'] %>"<% end %>
+           data-card-awards-tokens="<%= awards_tokens %>"
+           <% if awards_tokens %>data-card-tokens="<%= card['tokens'].to_json %>" data-card-token-award="<%= card['token_award'].to_json %>"<% end %>
            data-card-required="<%= (is_q && card['required']) ? 'true' : 'false' %>">
         <%= render "player/play_card", card: card, progress: prog,
               locale: @display_locale, default_locale: @survey.default_locale %>
@@ -152,6 +167,14 @@
             submit response; preview: from client-side grading). %>
         <% if quiz_mode %>
           <div class="quiz-result-card hidden" data-player-target="quizScore"></div>
+        <% end %>
+
+        <%# Tokenisation final totals — filled in by the player on finish (live:
+            from the submit response; preview/offline: from the running client
+            tally, since a card's token config is public, not secret like a
+            quiz's correct answer). %>
+        <% if token_mode %>
+          <div class="token-result-card hidden" data-player-target="tokenScore"></div>
         <% end %>
 
         <%# Thank-you actions: compare (brand CTA) then the outline secondaries —
@@ -299,6 +322,9 @@
     <span class="preview-progress-text" data-player-target="progress"></span>
     <%# Quiz running score — shown only on a quiz, updated after each graded card. %>
     <span class="quiz-score-chip hidden" data-player-target="scoreChip" aria-live="polite"></span>
+    <%# Tokenisation running total — shown only when tokenisation is on,
+        updated after each token-awarding card is answered. %>
+    <span class="token-score-chip hidden" data-player-target="tokenScoreChip" aria-live="polite"></span>
     <button class="preview-btn preview-btn-next"
             data-player-target="nextBtn"
             data-action="click->player#next"><%= t("player.next") %></button>

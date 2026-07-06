@@ -47,10 +47,13 @@ const TYPE_LABEL = {
   multiple_choice: "Pick one (list)", select_many: "Select many (list)",
   select_one_grid: "Pick one (grid)", select_many_grid: "Select many (grid)",
   tap_card: "Tap", range: "Range", rating: "Rating", nps: "NPS",
-  yes_no: "Yes / No", open_ended: "Freeform", welcome_card: "Welcome"
+  yes_no: "Yes / No", open_ended: "Freeform", welcome_card: "Welcome",
+  token_checkpoint: "Points Checkpoint"
 }
 
-const isQuestion = (c) => (c && c.type ? c.type : "") !== "welcome_card"
+// Mirrors CardTypes::NON_QUESTION_TYPES (app/lib/card_types.rb).
+const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
+const isQuestion = (c) => !NON_QUESTION_TYPES.includes(c && c.type ? c.type : "")
 export const typeLabel = (ty) => TYPE_LABEL[ty] || (ty || "").replace(/_/g, " ")
 const cleanOptions = (c) => (Array.isArray(c.options) ? c.options : [])
   .map((o) => (o || "").toString().trim()).filter(Boolean)

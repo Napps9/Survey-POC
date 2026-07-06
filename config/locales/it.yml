@@ -30,6 +30,9 @@ it:
     explanation: "Spiegazione"
     explanation_placeholder: "Mostrata dopo la risposta del giocatore — es. perché è corretta."
     correct_badge: "Corretta"
+    token_award_title: "Punti"
+    token_award_hint: "Assegnati solo per aver risposto"
+    token_checkpoint_placeholder: "Mostra i punti raccolti finora dal giocatore."
   auth:
     social_continue: "Continua con %{provider}"
     social_divider: "oppure"
@@ -98,6 +101,7 @@ it:
     submit: Invia ✓
     quiz_compare_cta: "Scopri come ti confronti →"
     quiz_compare_title: "Come ti confronti"
+    tokens_welcome_note: "Guadagnerai punti rispondendo a ogni domanda — non puoi tornare indietro e cambiare una risposta per guadagnarne altri."
   js:
     player:
       region_meta: "%{count} risposte con una regione"
@@ -120,6 +124,7 @@ it:
       quiz_compare_empty: "Sii il primo a finire — ancora nessun confronto."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Come hanno fatto tutti, domanda per domanda"
+      tokens_result_label: "Hai raccolto"
     editor:
       delete_card_confirm: Eliminare questa carta?
       unsaved: Modifiche non salvate

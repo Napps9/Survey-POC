@@ -7,7 +7,8 @@
 %>
 <div class="card-slot">
   <%= render "surveys/card_row", card: card, idx: idx, q_idx: q_idx, total_q: total_q,
-        default_locale: default_locale, quiz: local_assigns.fetch(:quiz, false) %>
+        default_locale: default_locale, quiz: local_assigns.fetch(:quiz, false),
+        tokenisation: local_assigns.fetch(:tokenisation, false) %>
 
   <% unless live %>
     <div class="aq-insert-row">

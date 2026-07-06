@@ -30,6 +30,9 @@ ko:
     explanation: "설명"
     explanation_placeholder: "플레이어가 답한 후 표시됩니다 — 예: 왜 이것이 정답인지."
     correct_badge: "정답"
+    token_award_title: "포인트"
+    token_award_hint: "답변만 해도 받을 수 있어요"
+    token_checkpoint_placeholder: "플레이어가 지금까지 모은 포인트를 보여줍니다."
   auth:
     social_continue: "%{provider}로 계속하기"
     social_divider: "또는"
@@ -98,6 +101,7 @@ ko:
     submit: 제출 ✓
     quiz_compare_cta: "내 비교 결과 보기 →"
     quiz_compare_title: "내 비교 결과"
+    tokens_welcome_note: "질문에 답할 때마다 포인트를 얻어요 — 답을 바꾸려고 되돌아갈 수는 없어요."
   js:
     player:
       region_meta: "%{count}개의 응답이 지역을 공유했어요"
@@ -120,6 +124,7 @@ ko:
       quiz_compare_empty: "가장 먼저 완료해 보세요 — 아직 비교가 없어요."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "모두가 문제별로 어떻게 했는지"
+      tokens_result_label: "모은 포인트"
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       unsaved: 저장되지 않은 변경사항

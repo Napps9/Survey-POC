@@ -324,6 +324,12 @@ class SurveysController < ApplicationController
     if params.key?(:quiz)
       attrs[:quiz] = ActiveModel::Type::Boolean.new.cast(params[:quiz])
     end
+    if params.key?(:tokenisation_enabled)
+      attrs[:tokenisation_enabled] = ActiveModel::Type::Boolean.new.cast(params[:tokenisation_enabled])
+    end
+    if params.key?(:token_types)
+      attrs[:token_types] = Survey.sanitize_token_types(JSON.parse(params[:token_types]))
+    end
     if params.key?(:compare_note)
       attrs[:compare_note] = params[:compare_note].to_s.strip.first(160).presence
     end
@@ -736,19 +742,20 @@ class SurveysController < ApplicationController
     @survey ||= survey
     existing = Array(survey.cards)
     if idx
-      total_q = existing.count { |c| c["type"] != "welcome_card" }
-      q_idx   = existing.first(idx + 1).count { |c| c["type"] != "welcome_card" }
+      total_q = existing.count { |c| CardTypes.question?(c["type"]) }
+      q_idx   = existing.first(idx + 1).count { |c| CardTypes.question?(c["type"]) }
     else
       idx     = existing.size
-      total_q = existing.count { |c| c["type"] != "welcome_card" } +
-                (card["type"] != "welcome_card" ? 1 : 0)
-      q_idx   = card["type"] != "welcome_card" ? total_q : 0
+      total_q = existing.count { |c| CardTypes.question?(c["type"]) } +
+                (CardTypes.question?(card["type"]) ? 1 : 0)
+      q_idx   = CardTypes.question?(card["type"]) ? total_q : 0
     end
     render_to_string(
       partial: "surveys/card_row",
       formats: [ :html ],
       locals:  { card: card, idx: idx, q_idx: q_idx, total_q: total_q,
-                 default_locale: survey.default_locale, quiz: survey.quiz? }
+                 default_locale: survey.default_locale, quiz: survey.quiz?,
+                 tokenisation: survey.tokenisation_enabled? }
     )
   end
 

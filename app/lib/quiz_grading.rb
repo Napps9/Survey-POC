@@ -25,7 +25,7 @@ module QuizGrading
   # Does this card define a correct answer (and so get graded + scored)?
   def graded?(card)
     return false unless card.is_a?(Hash)
-    return false if card["type"].to_s == "welcome_card"
+    return false unless CardTypes.question?(card["type"])
     correct_defined?(card["type"].to_s, card["correct"])
   end
 

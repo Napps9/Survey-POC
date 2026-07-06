@@ -64,7 +64,7 @@ class ResultsExport
     yield csv_safe_row(SUMMARY_HEADER)
     @aggregated.each_with_index do |result, idx|
       type = result[:type].to_s
-      next if type == "welcome_card"
+      next unless CardTypes.question?(type)
 
       number   = idx + 1
       question = question_text(result[:card])
@@ -92,7 +92,7 @@ class ResultsExport
   # original card index) still line up after welcome cards are dropped.
   def question_cards
     @question_cards ||= Array(@survey.cards).each_with_index.reject do |card, _idx|
-      card.is_a?(Hash) && card["type"].to_s == "welcome_card"
+      card.is_a?(Hash) && !CardTypes.question?(card["type"])
     end
   end
 

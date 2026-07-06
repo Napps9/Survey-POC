@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_06_130000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -230,6 +230,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120001) do
     t.string "status", default: "completed", null: false
     t.integer "survey_id", null: false
     t.integer "survey_share_id"
+    t.json "token_totals", default: {}, null: false
     t.datetime "updated_at", null: false
     t.index ["session_token"], name: "index_responses_on_session_token", unique: true
     t.index ["survey_id", "answered", "status"], name: "index_responses_on_survey_answered_status"
@@ -288,6 +289,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120001) do
     t.string "thankyou_title"
     t.string "theme"
     t.string "title"
+    t.json "token_types", default: [], null: false
+    t.boolean "tokenisation_enabled", default: false, null: false
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_surveys_on_deleted_at"
     t.index ["organisation_id"], name: "index_surveys_on_organisation_id"

@@ -46,6 +46,22 @@ module CardTypes
     DATA.select { |_key, attrs| attrs["pickable"] }
   end
 
+  # Card types with no answer captured — a "question" card is everything
+  # else. Both welcome_card and token_checkpoint are intro/milestone screens,
+  # never graded, scored, aggregated, or counted toward progress.
+  NON_QUESTION_TYPES = %w[welcome_card token_checkpoint].freeze
+
+  def question?(type)
+    !NON_QUESTION_TYPES.include?(type.to_s)
+  end
+
+  # The picker list for one Verto: Points Checkpoint only appears once
+  # tokenisation is on (it has nothing to show before then).
+  def pickable_for(survey)
+    return pickable if survey&.tokenisation_enabled?
+    pickable.reject { |key, _attrs| key == "token_checkpoint" }
+  end
+
   # JSON blob emitted into the editor page so the JS controller has the
   # same data without round-tripping the network. Keyed by type slug.
   def to_json

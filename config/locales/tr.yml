@@ -30,6 +30,9 @@ tr:
     explanation: "Açıklama"
     explanation_placeholder: "Oyuncu cevapladıktan sonra gösterilir — örn. bunun neden doğru olduğu."
     correct_badge: "Doğru"
+    token_award_title: "Puan"
+    token_award_hint: "Sadece cevap verdiğiniz için kazanılır"
+    token_checkpoint_placeholder: "Bir oyuncunun şimdiye kadar topladığı puanları gösterir."
   auth:
     social_continue: "%{provider} ile devam et"
     social_divider: "veya"
@@ -98,6 +101,7 @@ tr:
     submit: Gönder ✓
     quiz_compare_cta: "Nasıl karşılaştırıldığını gör →"
     quiz_compare_title: "Nasıl karşılaştırılıyorsunuz"
+    tokens_welcome_note: "Her soruyu cevapladıkça puan kazanacaksınız — daha fazla kazanmak için geri dönüp bir cevabı değiştiremezsiniz."
   js:
     player:
       region_meta: "%{count} yanıt bölge paylaştı"
@@ -120,6 +124,7 @@ tr:
       quiz_compare_empty: "Bitiren ilk kişi olun — henüz karşılaştırma yok."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Herkesin soru soru nasıl yaptığı"
+      tokens_result_label: "Topladığınız puan"
     editor:
       delete_card_confirm: Bu kart silinsin mi?
       unsaved: Kaydedilmemiş değişiklikler

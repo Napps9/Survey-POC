@@ -30,6 +30,9 @@ ja:
     explanation: "解説"
     explanation_placeholder: "プレイヤーの回答後に表示されます — 例：なぜこれが正しいか。"
     correct_badge: "正解"
+    token_award_title: "ポイント"
+    token_award_hint: "回答するだけで獲得できます"
+    token_checkpoint_placeholder: "プレイヤーがこれまでに集めたポイントを表示します。"
   auth:
     social_continue: "%{provider} で続行"
     social_divider: "または"
@@ -98,6 +101,7 @@ ja:
     submit: 送信 ✓
     quiz_compare_cta: "あなたの順位を見る →"
     quiz_compare_title: "あなたの順位"
+    tokens_welcome_note: "各質問に答えるとポイントがもらえます — 一度答えると後で戻って変更し、さらに獲得することはできません。"
   js:
     player:
       region_meta: "%{count} 件の回答が地域を共有"
@@ -120,6 +124,7 @@ ja:
       quiz_compare_empty: "最初の完了者になりましょう — まだ比較がありません。"
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "みんなの結果を質問ごとに"
+      tokens_result_label: "獲得ポイント"
     editor:
       delete_card_confirm: このカードを削除しますか？
       unsaved: 未保存の変更

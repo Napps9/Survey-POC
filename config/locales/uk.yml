@@ -30,6 +30,9 @@ uk:
     explanation: "Пояснення"
     explanation_placeholder: "Показується після відповіді гравця — напр. чому це правильно."
     correct_badge: "Правильно"
+    token_award_title: "Бали"
+    token_award_hint: "Нараховуються просто за відповідь"
+    token_checkpoint_placeholder: "Показує бали, які гравець зібрав на цей момент."
   auth:
     social_continue: "Продовжити з %{provider}"
     social_divider: "або"
@@ -98,6 +101,7 @@ uk:
     submit: Надіслати ✓
     quiz_compare_cta: "Подивіться, як ви порівнюєтесь →"
     quiz_compare_title: "Як ви порівнюєтесь"
+    tokens_welcome_note: "Ви отримуватимете бали за кожну відповідь — ви не можете повернутися і змінити відповідь, щоб отримати більше."
   js:
     player:
       region_meta: "%{count} відповідей із регіоном"
@@ -120,6 +124,7 @@ uk:
       quiz_compare_empty: "Будьте першим, хто завершить — порівняння ще немає."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Як упоралися всі, питання за питанням"
+      tokens_result_label: "Ви зібрали"
     editor:
       delete_card_confirm: Видалити цю картку?
       unsaved: Незбережені зміни

@@ -30,6 +30,9 @@ ru:
     explanation: "Пояснение"
     explanation_placeholder: "Показывается после ответа игрока — напр. почему этот ответ верный."
     correct_badge: "Верно"
+    token_award_title: "Баллы"
+    token_award_hint: "Начисляются просто за ответ"
+    token_checkpoint_placeholder: "Показывает баллы, которые игрок набрал на данный момент."
   auth:
     social_continue: "Продолжить с %{provider}"
     social_divider: "или"
@@ -98,6 +101,7 @@ ru:
     submit: Отправить ✓
     quiz_compare_cta: "Посмотрите, как вы справились →"
     quiz_compare_title: "Как вы справились"
+    tokens_welcome_note: "Вы будете получать баллы за каждый отвеченный вопрос — вы не можете вернуться и изменить ответ, чтобы получить больше."
   js:
     player:
       region_meta: "%{count} ответов с указанием региона"
@@ -120,6 +124,7 @@ ru:
       quiz_compare_empty: "Будьте первым, кто завершит — сравнения пока нет."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Как справились все, вопрос за вопросом"
+      tokens_result_label: "Вы собрали"
     editor:
       delete_card_confirm: Удалить эту карточку?
       unsaved: Несохранённые изменения

@@ -50,6 +50,7 @@ class PlayerController < ApplicationController
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     mark_started_unless_completed(resp)
     apply_quiz_score(resp)
+    apply_token_totals(resp)
     resp.save!
     render json: { ok: true, session_token: token }
   rescue => e
@@ -68,9 +69,11 @@ class PlayerController < ApplicationController
     resp.status  = "completed"
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     apply_quiz_score(resp)
+    apply_token_totals(resp)
     resp.save!
     payload = { ok: true }
     payload.merge!(score: resp.score, max: resp.quiz_max) if @survey.quiz?
+    payload.merge!(token_totals: resp.token_totals) if @survey.tokenisation_enabled?
     render json: payload
   rescue => e
     Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
@@ -126,9 +129,11 @@ class PlayerController < ApplicationController
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     mark_started_unless_completed(resp)
     apply_quiz_score(resp)
+    apply_token_totals(resp)
     resp.save!
 
     base = { ok: true, session_token: token, score: resp.score, max: resp.quiz_max }
+    base[:token_totals] = resp.token_totals if @survey.tokenisation_enabled?
     card = Array(@survey.cards)[idx]
     stored = resp.answers[idx.to_s]
     if card && QuizGrading.graded?(card) && answered?(stored)
@@ -226,7 +231,7 @@ class PlayerController < ApplicationController
 
     responses = @survey.responses.where(status: "completed")
     render json: { ok: true, total_responses: responses.count,
-                   results: aggregate_rows(responses) }
+                   results: aggregate_rows(responses) + token_comparison_rows(responses) }
   end
 
   # Per-region aggregates for the post-finish map view: one entry per region
@@ -305,17 +310,20 @@ class PlayerController < ApplicationController
     resp.persisted? && resp.answers.is_a?(Hash) ? resp.answers : {}
   end
 
-  # Anti-cheat for quizzes: a graded card that already holds a committed answer
-  # is locked — its stored value always wins over anything in the new payload.
-  # Non-graded (measurement) cards and not-yet-answered cards take the incoming
-  # value as normal. Non-quiz Vertos merge nothing (incoming wins outright).
+  # Anti-cheat for quizzes and tokenised Vertos: a graded or token-awarding
+  # card that already holds a committed answer is locked — its stored value
+  # always wins over anything in the new payload, so a respondent can't go
+  # back and change an answer to earn more tokens (or fix a wrong quiz
+  # answer). Non-graded, non-awarding (measurement) cards and not-yet-answered
+  # cards take the incoming value as normal. A plain Verto (neither quiz nor
+  # tokenised) merges nothing (incoming wins outright).
   def locked_merge(stored, incoming)
     incoming = incoming.is_a?(Hash) ? incoming : {}
-    return incoming unless @survey.quiz?
+    return incoming unless @survey.quiz? || @survey.tokenisation_enabled?
     stored = stored.is_a?(Hash) ? stored : {}
     merged = incoming.dup
     Array(@survey.cards).each_with_index do |card, idx|
-      next unless QuizGrading.graded?(card)
+      next unless QuizGrading.graded?(card) || TokenGrading.awarding?(card)
       key = idx.to_s
       merged[key] = stored[key] if answered?(stored[key])
     end
@@ -372,6 +380,15 @@ class PlayerController < ApplicationController
     resp.quiz_max = result[:max]
   end
 
+  # Cache the server-computed token totals on tokenised responses, recomputed
+  # from the (already locked_merge-protected) stored answers — never trusting
+  # anything the client claims its own running total is. A no-op for
+  # non-tokenised Vertos.
+  def apply_token_totals(resp)
+    return unless @survey.tokenisation_enabled?
+    resp.token_totals = TokenGrading.totals(@survey.cards, resp.answers, @survey.token_type_ids)
+  end
+
   # The flat row shape the player JS renders comparisons from.
   def aggregate_rows(responses)
     aggregate_results(Array(@survey.cards), responses).map.with_index do |row, idx|
@@ -383,6 +400,36 @@ class PlayerController < ApplicationController
         total:  row[:total],
         counts: row[:counts],
         avg:    row[:avg]
+      }
+    end
+  end
+
+  # Tokenisation: one synthetic row per token type, appended after the
+  # per-question rows — this is how "compare your tokens" folds into the
+  # existing results-comparison panel instead of a separate endpoint/panel.
+  # A histogram of each response's cached token_totals[id], the same shape
+  # `scores`' score histogram uses.
+  def token_comparison_rows(responses)
+    return [] unless @survey.tokenisation_enabled?
+    token_types = Array(@survey.token_types)
+    return [] if token_types.empty?
+
+    dist  = Hash.new { |h, k| h[k] = Hash.new(0) }
+    total = 0
+    responses.reorder(nil).select(:id, :token_totals).find_each(batch_size: 500) do |r|
+      total += 1
+      totals = r.token_totals || {}
+      token_types.each { |t| dist[t["id"]][totals[t["id"]].to_i] += 1 }
+    end
+
+    token_types.map do |t|
+      {
+        index:    "token:#{t['id']}",
+        type:     "token_total",
+        token_id: t["id"],
+        prompt:   [ t["icon"], t["name"] ].compact_blank.join(" "),
+        total:    total,
+        counts:   dist[t["id"]]
       }
     end
   end

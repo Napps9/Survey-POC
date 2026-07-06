@@ -30,6 +30,9 @@ id:
     explanation: "Penjelasan"
     explanation_placeholder: "Ditampilkan setelah pemain menjawab — mis. mengapa ini benar."
     correct_badge: "Benar"
+    token_award_title: "Poin"
+    token_award_hint: "Didapat hanya karena menjawab"
+    token_checkpoint_placeholder: "Menampilkan poin yang telah dikumpulkan pemain sejauh ini."
   auth:
     social_continue: "Lanjutkan dengan %{provider}"
     social_divider: "atau"
@@ -98,6 +101,7 @@ id:
     submit: Kirim ✓
     quiz_compare_cta: "Lihat perbandinganmu →"
     quiz_compare_title: "Perbandinganmu"
+    tokens_welcome_note: "Kamu akan mendapatkan poin setiap menjawab pertanyaan — kamu tidak bisa kembali dan mengubah jawaban untuk mendapatkan lebih banyak."
   js:
     player:
       region_meta: "%{count} jawaban menyertakan region"
@@ -120,6 +124,7 @@ id:
       quiz_compare_empty: "Jadilah yang pertama menyelesaikan — belum ada perbandingan."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Bagaimana semua orang menjawab, pertanyaan demi pertanyaan"
+      tokens_result_label: "Kamu mengumpulkan"
     editor:
       delete_card_confirm: Hapus kartu ini?
       unsaved: Perubahan belum disimpan

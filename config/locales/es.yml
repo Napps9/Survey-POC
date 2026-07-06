@@ -30,6 +30,9 @@ es:
     explanation: "Explicación"
     explanation_placeholder: "Se muestra después de que el jugador responde — p. ej. por qué es correcto."
     correct_badge: "Correcto"
+    token_award_title: "Puntos"
+    token_award_hint: "Se otorgan solo por responder"
+    token_checkpoint_placeholder: "Muestra los puntos que un jugador ha acumulado hasta ahora."
   auth:
     social_continue: "Continuar con %{provider}"
     social_divider: "o"
@@ -98,6 +101,7 @@ es:
     submit: Enviar ✓
     quiz_compare_cta: "Mira cómo te comparas →"
     quiz_compare_title: "Cómo te comparas"
+    tokens_welcome_note: "Ganarás puntos al responder cada pregunta — no puedes volver atrás y cambiar una respuesta para ganar más."
   js:
     player:
       region_meta: "%{count} respuestas compartieron su región"
@@ -120,6 +124,7 @@ es:
       quiz_compare_empty: "Sé el primero en terminar — aún no hay comparación."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Cómo le fue a cada uno, pregunta por pregunta"
+      tokens_result_label: "Has conseguido"
     editor:
       delete_card_confirm: "¿Eliminar esta tarjeta?"
       unsaved: Cambios sin guardar

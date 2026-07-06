@@ -69,7 +69,7 @@
     <div class="aq-step" data-add-question-target="stepPickType" hidden>
       <div class="aq-modal-body">
         <div class="aq-type-grid">
-          <% CardTypes.pickable.each do |key, t| %>
+          <% CardTypes.pickable_for(@survey).each do |key, t| %>
             <button type="button"
                     class="aq-type-tile"
                     data-type="<%= key %>"

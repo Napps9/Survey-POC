@@ -30,6 +30,9 @@ de:
     explanation: "Erklärung"
     explanation_placeholder: "Wird nach der Antwort des Spielers angezeigt — z. B. warum das richtig ist."
     correct_badge: "Richtig"
+    token_award_title: "Punkte"
+    token_award_hint: "Wird schon fürs Antworten vergeben"
+    token_checkpoint_placeholder: "Zeigt die Punkte, die ein Spieler bisher gesammelt hat."
   auth:
     social_continue: "Weiter mit %{provider}"
     social_divider: "oder"
@@ -98,6 +101,7 @@ de:
     submit: Absenden ✓
     quiz_compare_cta: "Sieh, wie du abschneidest →"
     quiz_compare_title: "Wie du abschneidest"
+    tokens_welcome_note: "Bei jeder Antwort sammelst du Punkte — du kannst nicht zurückgehen und eine Antwort ändern, um mehr zu bekommen."
   js:
     player:
       region_meta: "%{count} Antworten mit Region"
@@ -120,6 +124,7 @@ de:
       quiz_compare_empty: "Sei der Erste, der fertig wird — noch kein Vergleich."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Wie alle abgeschnitten haben, Frage für Frage"
+      tokens_result_label: "Du hast gesammelt"
     editor:
       delete_card_confirm: Diese Karte löschen?
       unsaved: Ungespeicherte Änderungen

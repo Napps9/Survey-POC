@@ -140,3 +140,14 @@ welcome_card:
   explainer:    "An intro screen shown first, with no answer required. Sets the scene and invites people in."
   picker_icon:  "👋"
   pickable:     true
+
+token_checkpoint:
+  badge:        "CHECKPOINT"
+  badge_css:    "sb-welcome"
+  panel_label:  ""
+  eyebrow:      ""
+  picker_name:  "Points Checkpoint"
+  picker_desc:  "Shows points earned so far — no answer required"
+  explainer:    "A milestone screen that reveals the points collected so far. Only available once Tokenisation is on — great for a long Verto, giving players a boost of momentum partway through."
+  picker_icon:  "🏆"
+  pickable:     true

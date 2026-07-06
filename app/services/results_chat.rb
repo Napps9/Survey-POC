@@ -68,7 +68,7 @@ class ResultsChat
     aggregated.each_with_index do |result, idx|
       type = result[:type]
       card = result[:card]
-      next if type == "welcome_card"
+      next unless CardTypes.question?(type)
 
       lines << "Q#{idx + 1} [#{type}]: #{card["text"]}"
 

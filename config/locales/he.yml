@@ -30,6 +30,9 @@ he:
     explanation: "הסבר"
     explanation_placeholder: "מוצג לאחר שהשחקן עונה — למשל מדוע זה נכון."
     correct_badge: "נכון"
+    token_award_title: "נקודות"
+    token_award_hint: "ניתנות רק על מענה"
+    token_checkpoint_placeholder: "מציג את הנקודות שהשחקן צבר עד כה."
   auth:
     social_continue: "המשך עם %{provider}"
     social_divider: "או"
@@ -98,6 +101,7 @@ he:
     submit: שלח ✓
     quiz_compare_cta: "ראה איך אתה משתווה →"
     quiz_compare_title: "איך אתה משתווה"
+    tokens_welcome_note: "תרוויח נקודות עם כל שאלה שתענה — לא תוכל לחזור אחורה ולשנות תשובה כדי להרוויח עוד."
   js:
     player:
       region_meta: "%{count} תשובות שיתפו אזור"
@@ -120,6 +124,7 @@ he:
       quiz_compare_empty: "היה הראשון לסיים — אין עדיין השוואה."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "איך כולם הסתדרו, שאלה אחר שאלה"
+      tokens_result_label: "צברת"
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
       unsaved: שינויים שלא נשמרו

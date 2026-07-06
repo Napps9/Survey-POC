@@ -4032,6 +4032,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
   padding: 8px 16px; max-width: 90%;
 }
 
+/* Tokenisation welcome note — tells respondents they'll earn points, and
+   previews the token types they can collect. */
+.welcome-intake-tokens { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.welcome-intake-tokens-note {
+  font-family: "ABeeZee", sans-serif; font-size: 13px; line-height: 1.4;
+  color: #B45309; background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.3); border-radius: 100px;
+  padding: 8px 16px; max-width: 90%;
+}
+.welcome-intake-token-types { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.welcome-token-type-pill {
+  font-family: "ABeeZee", sans-serif; font-size: 12px; color: #1C2034;
+  background: rgba(0,0,0,0.05); border-radius: 100px; padding: 4px 10px;
+}
+
 /* Satnav-style location search — the "Where do you live?" demographic
    question's answer widget. See location_search_controller.js. */
 .welcome-location-search { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
@@ -4150,12 +4165,56 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .quiz-result-max { font-size: 22px; color: rgba(255,255,255,0.55); }
 .quiz-result-pct { font-family: "ABeeZee", sans-serif; font-size: 14px; color: rgba(255,255,255,0.7); }
 
+/* ── Tokenisation: player runtime ───────────────────────────────────────────
+   A card's token config is public, so the running total, the checkpoint
+   card, and the final tally are all computed client-side; the server only
+   recomputes the authoritative total at progress/submit time. */
+
+/* Running total chip in the player footer, one pill per token type. */
+.token-score-chip { display: flex; gap: 6px; }
+.token-score-pill {
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.02em;
+  color: var(--brand-cta-text, #1C2034); background: var(--brand-cta, #01EACB);
+  padding: 5px 10px; border-radius: 100px; white-space: nowrap;
+}
+
+/* Final totals card on the thank-you screen — one row per token type. */
+.token-result-card {
+  margin: 18px auto 4px; padding: 16px 22px; border-radius: 18px;
+  background: rgba(245,158,11,0.10); border: 1px solid rgba(245,158,11,0.4);
+  display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+}
+.token-result-label {
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #F59E0B; text-align: center;
+}
+.token-result-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.token-result-icon { font-size: 22px; }
+.token-result-amount { font-family: "Alata", sans-serif; font-size: 26px; color: #fff; }
+.token-result-name { font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.7); }
+
+/* Points Checkpoint card body (player) — populated client-side. */
+.token-checkpoint-body { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.token-checkpoint-row {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border-radius: 14px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3);
+}
+.token-checkpoint-icon { font-size: 24px; }
+.token-checkpoint-amount { font-family: "Alata", sans-serif; font-size: 22px; color: #1C2034; }
+.token-checkpoint-name { font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(0,0,0,0.55); }
+.token-checkpoint-placeholder {
+  margin-top: 8px; font-family: "ABeeZee", sans-serif; font-size: 13px;
+  color: rgba(0,0,0,0.4); font-style: italic;
+}
+
 /* ── Quiz: editor correct-answer controls ──────────────────────────────────
    Shown on quiz Vertos in the editor's white content panel. Hidden on
    translation tabs, so a correct answer is only set in the primary language. */
 
 .editing-translation .mark-correct,
-.editing-translation .quiz-correct-block { display: none; }
+.editing-translation .quiz-correct-block,
+.editing-translation .token-inputs,
+.editing-translation .token-award-block { display: none; }
 
 /* Per-option "mark correct" toggle on list + grid choices. */
 .mark-correct {
@@ -4207,3 +4266,30 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .quiz-tap-btn.yes.is-on { background: #10B981; border-color: #10B981; color: #fff; }
 .quiz-tap-btn.no.is-on  { background: #D80027; border-color: #D80027; color: #fff; }
+
+/* Tokenisation: per-option token-amount inputs (list/grid/tap_card), and the
+   flat token-award block for scale/open/prioritise cards. Amber accent so it
+   reads distinctly from Quiz mode's purple "correct answer" controls. */
+.token-inputs { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.token-amount-input {
+  width: 40px; text-align: center; font-family: "ABeeZee", sans-serif; font-size: 12px;
+  color: #1C2034; background: #fff; border: 1.5px solid rgba(0,0,0,0.14);
+  border-radius: 8px; padding: 4px 2px; outline: none;
+}
+.token-amount-input:focus { border-color: #F59E0B; }
+
+.token-award-block {
+  margin-top: 12px; padding: 12px 14px; border-radius: 14px;
+  background: rgba(245,158,11,0.06); border: 1px dashed rgba(245,158,11,0.4);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.token-award-title {
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.04em;
+  color: #B45309; display: flex; align-items: center; gap: 6px;
+}
+.token-award-row { display: flex; align-items: center; gap: 8px; }
+.token-award-row .token-amount-input { width: 56px; }
+.token-award-label { flex: 1; min-width: 0; font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034; }
+
+.token-tap-row { display: flex; align-items: center; gap: 8px; }
+.token-tap-row .token-inputs { margin-left: auto; }

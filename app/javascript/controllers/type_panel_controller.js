@@ -1,6 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
 
+// Card types with no answer captured — mirrors CardTypes::NON_QUESTION_TYPES
+// (app/lib/card_types.rb) and verto_rules.js's isQuestion.
+const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
+
 // Read the canonical card-type metadata that the editor view emits as a
 // JSON blob (sourced from config/card_types.yml). Called from connect()
 // so each Turbo navigation re-reads the blob — otherwise the cache from
@@ -658,7 +662,7 @@ export default class extends Controller {
 
     // The "Other" block applies to question types only.
     const otherBlock = card.querySelector(".other-block")
-    if (otherBlock) otherBlock.hidden = (type === "welcome_card")
+    if (otherBlock) otherBlock.hidden = NON_QUESTION_TYPES.includes(type)
 
     // 3. Swap LEFT panel when entering or leaving Range — Range shows the
     //    reactive Lottie that other types don't, and other types need the

@@ -30,6 +30,9 @@ ar:
     explanation: "التوضيح"
     explanation_placeholder: "يظهر بعد إجابة اللاعب — مثلًا لماذا هذا صحيح."
     correct_badge: "صحيح"
+    token_award_title: "النقاط"
+    token_award_hint: "تُمنح لمجرد الإجابة"
+    token_checkpoint_placeholder: "يعرض النقاط التي جمعها اللاعب حتى الآن."
   auth:
     social_continue: "المتابعة عبر %{provider}"
     social_divider: "أو"
@@ -98,6 +101,7 @@ ar:
     submit: إرسال ✓
     quiz_compare_cta: "شاهد كيف تقارن →"
     quiz_compare_title: "كيف تقارن"
+    tokens_welcome_note: "ستكسب نقاطًا مع كل سؤال تجيب عنه — ولا يمكنك الرجوع لتغيير إجابة لكسب المزيد."
   js:
     player:
       region_meta: "%{count} إجابة شاركت منطقتها"
@@ -120,6 +124,7 @@ ar:
       quiz_compare_empty: "كن أول من ينهي — لا توجد مقارنة بعد."
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "كيف أبلى الجميع، سؤالًا بسؤال"
+      tokens_result_label: "جمعت"
     editor:
       delete_card_confirm: حذف هذه البطاقة؟
       unsaved: تغييرات غير محفوظة
