@@ -81,6 +81,9 @@ vi:
     see_regions: "Xem câu trả lời theo khu vực"
     regions_title: "Câu trả lời từ khắp thế giới"
     region_compare_hint: "Chạm vào một khu vực bên dưới để so sánh với câu trả lời của bạn"
+    region_zoom_in: "Phóng to"
+    region_zoom_out: "Thu nhỏ"
+    region_reset_view: "Đặt lại chế độ xem"
     preview_banner: "Chế độ xem trước — câu trả lời không được lưu"
     exit_preview: "Thoát xem trước"
     thank_you_title: Cảm ơn bạn!

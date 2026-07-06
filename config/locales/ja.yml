@@ -81,6 +81,9 @@ ja:
     see_regions: "地域ごとの回答を見る"
     regions_title: "世界中からの回答"
     region_compare_hint: "下の地域をタップすると自分の回答と比較できます"
+    region_zoom_in: "ズームイン"
+    region_zoom_out: "ズームアウト"
+    region_reset_view: "表示をリセット"
     preview_banner: "プレビューモード — 回答は保存されません"
     exit_preview: "プレビューを終了"
     thank_you_title: ありがとうございました！

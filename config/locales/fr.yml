@@ -81,6 +81,9 @@ fr:
     see_regions: "Voir les réponses par région"
     regions_title: "Réponses du monde entier"
     region_compare_hint: "Touchez une région ci-dessous pour la comparer à vos réponses"
+    region_zoom_in: "Zoomer"
+    region_zoom_out: "Dézoomer"
+    region_reset_view: "Réinitialiser la vue"
     preview_banner: "Mode aperçu — les réponses ne sont pas enregistrées"
     exit_preview: "Quitter l'aperçu"
     thank_you_title: Merci !

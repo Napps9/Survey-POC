@@ -81,6 +81,9 @@ he:
     see_regions: "איך ענו אזורים אחרים"
     regions_title: "תשובות מסביב לעולם"
     region_compare_hint: "בחרו אזור למטה כדי להשוות לתשובות שלכם"
+    region_zoom_in: "הגדלה"
+    region_zoom_out: "הקטנה"
+    region_reset_view: "איפוס תצוגה"
     preview_banner: "מצב תצוגה מקדימה — התשובות לא יישמרו"
     exit_preview: "יציאה מהתצוגה המקדימה"
     thank_you_title: תודה רבה!

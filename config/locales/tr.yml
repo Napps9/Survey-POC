@@ -81,6 +81,9 @@ tr:
     see_regions: "Bölgelerin yanıtlarını gör"
     regions_title: "Dünyanın dört bir yanından yanıtlar"
     region_compare_hint: "Yanıtlarınızla karşılaştırmak için aşağıdan bir bölgeye dokunun"
+    region_zoom_in: "Yakınlaştır"
+    region_zoom_out: "Uzaklaştır"
+    region_reset_view: "Görünümü sıfırla"
     preview_banner: "Önizleme modu — yanıtlar kaydedilmez"
     exit_preview: "Önizlemeden çık"
     thank_you_title: Teşekkürler!

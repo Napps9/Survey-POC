@@ -81,6 +81,9 @@ ar:
     see_regions: "شاهد إجابات المناطق"
     regions_title: "إجابات من حول العالم"
     region_compare_hint: "اختر منطقة أدناه لمقارنتها بإجاباتك"
+    region_zoom_in: "تكبير"
+    region_zoom_out: "تصغير"
+    region_reset_view: "إعادة ضبط العرض"
     preview_banner: "وضع المعاينة — لن يتم حفظ الإجابات"
     exit_preview: "إنهاء المعاينة"
     thank_you_title: شكرًا لك!

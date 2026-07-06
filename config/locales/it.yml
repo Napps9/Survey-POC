@@ -81,6 +81,9 @@ it:
     see_regions: "Vedi le risposte delle regioni"
     regions_title: "Risposte da tutto il mondo"
     region_compare_hint: "Tocca una regione qui sotto per confrontarla con le tue risposte"
+    region_zoom_in: "Ingrandisci"
+    region_zoom_out: "Rimpicciolisci"
+    region_reset_view: "Ripristina vista"
     preview_banner: "Modalità anteprima — le risposte non vengono salvate"
     exit_preview: "Esci dall'anteprima"
     thank_you_title: Grazie!

@@ -81,6 +81,9 @@ nl:
     see_regions: "Bekijk antwoorden per regio"
     regions_title: "Antwoorden van over de hele wereld"
     region_compare_hint: "Tik hieronder op een regio om die met jouw antwoorden te vergelijken"
+    region_zoom_in: "Inzoomen"
+    region_zoom_out: "Uitzoomen"
+    region_reset_view: "Weergave resetten"
     preview_banner: "Voorbeeldmodus — antwoorden worden niet opgeslagen"
     exit_preview: "Voorbeeld sluiten"
     thank_you_title: Bedankt!

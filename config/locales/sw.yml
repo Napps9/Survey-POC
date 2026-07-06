@@ -81,6 +81,9 @@ sw:
     see_regions: "Ona jinsi kanda zilivyojibu"
     regions_title: "Majibu kutoka duniani kote"
     region_compare_hint: "Gusa kanda hapa chini ili kuilinganisha na majibu yako"
+    region_zoom_in: "Kuza"
+    region_zoom_out: "Punguza"
+    region_reset_view: "Weka upya mwonekano"
     preview_banner: "Hali ya kuhakiki — majibu hayahifadhiwi"
     exit_preview: "Funga hakiki"
     thank_you_title: Asante!

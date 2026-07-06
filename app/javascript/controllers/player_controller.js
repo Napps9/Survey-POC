@@ -2,10 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
 import { haptic } from "lib/haptics"
 
+const MAP_MIN_SCALE = 1
+const MAP_MAX_SCALE = 8
+
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta",
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
+                    "regionsMapViewport", "regionsMapStage",
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
                     "consentMain", "consentDeclined",
                     "scoreChip", "quizScore", "scoresBtn", "scoresPanel", "scoresList", "scoresMeta",
@@ -32,6 +36,16 @@ export default class extends Controller {
   _registered = false
   _regionsData = null
 
+  // Regions map pan/zoom state — plain translate/scale, no external library.
+  _mapScale = 1
+  _mapX = 0
+  _mapY = 0
+  _mapPointers = new Map()
+  _mapDragMoved = false
+  _mapDragStart = { x: 0, y: 0 }
+  _mapPinchStartDist = 0
+  _mapPinchStartScale = 1
+
   // Quiz state: which card indices have been answered+revealed (so they can't
   // be redone), and the running score.
   _revealed = new Set()
@@ -52,6 +66,7 @@ export default class extends Controller {
     this._update()
     if (this.quizValue) this._initQuiz()
     if (this.tokenisationValue) this._initTokens()
+    if (this.hasRegionsMapViewportTarget) this._setupMapPanZoom()
   }
 
   // Consent card (the first card): agreeing advances into the deck; declining
@@ -416,6 +431,7 @@ export default class extends Controller {
     this.thankyouMainTarget.classList.add("hidden")
     if (this.hasComparisonTarget) this.comparisonTarget.classList.add("hidden")
     this.regionsPanelTarget.classList.remove("hidden")
+    this._resetMapView()
     if (this._regionsData) return
     this.regionsMetaTarget.textContent = t("player.compare_loading")
     try {
@@ -516,6 +532,137 @@ export default class extends Controller {
       const mine = this._answers[String(row.index)]?.value
       list.appendChild(this._buildRow(row, mine))
     })
+  }
+
+  // ── Regions map pan/zoom: plain translate+scale on the stage div, driven
+  // by Pointer Events (mouse drag, touch drag, two-finger pinch) and wheel.
+  // A "click" that lands right after a drag/pinch is swallowed at the
+  // capture phase so panning never mis-fires a country selection.
+
+  _setupMapPanZoom() {
+    const vp = this.regionsMapViewportTarget
+    vp.addEventListener("wheel", this._onMapWheel.bind(this), { passive: false })
+    vp.addEventListener("pointerdown", this._onMapPointerDown.bind(this))
+    vp.addEventListener("pointermove", this._onMapPointerMove.bind(this))
+    vp.addEventListener("pointerup", this._onMapPointerUp.bind(this))
+    vp.addEventListener("pointercancel", this._onMapPointerUp.bind(this))
+    vp.addEventListener("click", this._onMapClickCapture.bind(this), true)
+  }
+
+  _resetMapView() {
+    this._mapScale = 1
+    this._mapX = 0
+    this._mapY = 0
+    this._applyMapTransform()
+  }
+
+  resetMapView() {
+    if (!this.hasRegionsMapStageTarget) return
+    this.regionsMapStageTarget.classList.add("is-animating")
+    this._resetMapView()
+    setTimeout(() => this.regionsMapStageTarget.classList.remove("is-animating"), 260)
+  }
+
+  zoomInMap()  { this._zoomAroundViewportCenter(1.5) }
+  zoomOutMap() { this._zoomAroundViewportCenter(1 / 1.5) }
+
+  _zoomAroundViewportCenter(factor) {
+    if (!this.hasRegionsMapViewportTarget) return
+    const rect = this.regionsMapViewportTarget.getBoundingClientRect()
+    this.regionsMapStageTarget.classList.add("is-animating")
+    this._zoomAt(rect.width / 2, rect.height / 2, factor)
+    setTimeout(() => this.regionsMapStageTarget.classList.remove("is-animating"), 260)
+  }
+
+  // Keeps the point under (cx, cy) — in viewport-local pixels — visually
+  // fixed while the scale changes, the standard "zoom to point" transform.
+  _zoomAt(cx, cy, factor) {
+    const newScale = Math.min(MAP_MAX_SCALE, Math.max(MAP_MIN_SCALE, this._mapScale * factor))
+    if (newScale === this._mapScale) return
+    this._mapX = cx - (newScale / this._mapScale) * (cx - this._mapX)
+    this._mapY = cy - (newScale / this._mapScale) * (cy - this._mapY)
+    this._mapScale = newScale
+    this._applyMapTransform()
+  }
+
+  _applyMapTransform() {
+    if (!this.hasRegionsMapStageTarget) return
+    this.regionsMapStageTarget.style.transform =
+      `translate(${this._mapX}px, ${this._mapY}px) scale(${this._mapScale})`
+  }
+
+  _onMapWheel(e) {
+    e.preventDefault()
+    const rect = this.regionsMapViewportTarget.getBoundingClientRect()
+    const factor = Math.pow(1.0015, -e.deltaY)
+    this._zoomAt(e.clientX - rect.left, e.clientY - rect.top, factor)
+  }
+
+  _onMapPointerDown(e) {
+    // Let zoom-control buttons handle their own clicks — capturing the
+    // pointer here would retarget their mouseup/click to the viewport instead.
+    if (e.target.closest(".regions-zoom-btn")) return
+    this.regionsMapViewportTarget.setPointerCapture(e.pointerId)
+    this._mapPointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    this._mapDragMoved = false
+    this._mapDragStart = { x: e.clientX, y: e.clientY }
+    if (this._mapPointers.size === 2) {
+      const [a, b] = [...this._mapPointers.values()]
+      this._mapPinchStartDist = Math.hypot(a.x - b.x, a.y - b.y) || 1
+      this._mapPinchStartScale = this._mapScale
+    }
+    this.regionsMapViewportTarget.classList.add("is-dragging")
+  }
+
+  _onMapPointerMove(e) {
+    if (!this._mapPointers.has(e.pointerId)) return
+    const prev = this._mapPointers.get(e.pointerId)
+    this._mapPointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+    if (this._mapPointers.size === 2) {
+      const [a, b] = [...this._mapPointers.values()]
+      const rect = this.regionsMapViewportTarget.getBoundingClientRect()
+      const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1
+      const midX = (a.x + b.x) / 2 - rect.left
+      const midY = (a.y + b.y) / 2 - rect.top
+      const target = Math.min(MAP_MAX_SCALE, Math.max(MAP_MIN_SCALE,
+        this._mapPinchStartScale * (dist / this._mapPinchStartDist)))
+      this._mapX = midX - (target / this._mapScale) * (midX - this._mapX)
+      this._mapY = midY - (target / this._mapScale) * (midY - this._mapY)
+      this._mapScale = target
+      this._applyMapTransform()
+      this._mapDragMoved = true
+      return
+    }
+
+    this._mapX += e.clientX - prev.x
+    this._mapY += e.clientY - prev.y
+    if (Math.abs(e.clientX - this._mapDragStart.x) > 4 || Math.abs(e.clientY - this._mapDragStart.y) > 4) {
+      this._mapDragMoved = true
+    }
+    this._applyMapTransform()
+  }
+
+  _onMapPointerUp(e) {
+    this._mapPointers.delete(e.pointerId)
+    if (this._mapPointers.size === 0) {
+      this.regionsMapViewportTarget.classList.remove("is-dragging")
+    } else {
+      // Dropped from a pinch back to a single finger — resync the pan
+      // baseline so the remaining pointer doesn't jump on its next move.
+      const [remaining] = this._mapPointers.values()
+      this._mapDragStart = { x: remaining.x, y: remaining.y }
+    }
+  }
+
+  // Suppresses the ghost "click" a browser fires on pointerup after a
+  // drag/pinch, so panning the map never mis-selects the country underneath.
+  _onMapClickCapture(e) {
+    if (this._mapDragMoved) {
+      e.stopPropagation()
+      e.preventDefault()
+      this._mapDragMoved = false
+    }
   }
 
   _renderComparison(data) {

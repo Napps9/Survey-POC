@@ -230,38 +230,42 @@
       </div>
 
       <% if regions_url.present? %>
-        <%# Post-finish regions view: world map of where answers came from,
-            then per-region comparison against this respondent's answers. %>
-        <div data-player-target="regionsPanel" class="hidden"
-             style="width:100%;max-width:760px;margin:0 auto;padding:24px 22px 28px;overflow-y:auto;max-height:calc(100vh - 120px);background:#1C2034;border:1px solid rgba(255,255,255,0.08);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);">
-          <div style="text-align:center;margin-bottom:14px;">
-            <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.regions_title") %></div>
-            <div data-player-target="regionsMeta"
-                 style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"></div>
+        <%# Post-finish regions view: a full-screen, pannable/zoomable world map
+            of where answers came from, then per-region comparison against
+            this respondent's own answers. %>
+        <div data-player-target="regionsPanel" class="hidden regions-overlay">
+          <div class="regions-header">
+            <div>
+              <div class="regions-header-title"><%= t("player.regions_title") %></div>
+              <div data-player-target="regionsMeta" class="regions-header-meta"></div>
+            </div>
+            <button type="button" class="preview-close-btn" data-action="click->player#hideRegions">
+              <%= t("player.back") %>
+            </button>
           </div>
 
-          <div data-player-target="regionsMain">
-            <div style="border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:12px;">
-              <%= render "shared/world_map" %>
+          <div data-player-target="regionsMain" class="regions-main">
+            <div data-player-target="regionsMapViewport" class="regions-map-viewport">
+              <div data-player-target="regionsMapStage" class="regions-map-stage">
+                <%= render "shared/world_map" %>
+              </div>
+              <div class="regions-zoom-controls">
+                <button type="button" class="regions-zoom-btn" data-action="click->player#zoomInMap"
+                        aria-label="<%= t("player.region_zoom_in") %>">+</button>
+                <button type="button" class="regions-zoom-btn" data-action="click->player#zoomOutMap"
+                        aria-label="<%= t("player.region_zoom_out") %>">−</button>
+                <button type="button" class="regions-zoom-btn" data-action="click->player#resetMapView"
+                        aria-label="<%= t("player.region_reset_view") %>">⟲</button>
+              </div>
             </div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.45);text-align:center;margin-top:8px;">
-              <%= t("player.region_compare_hint") %>
-            </div>
-            <div data-player-target="regionsList" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;"></div>
+            <div class="regions-hint"><%= t("player.region_compare_hint") %></div>
+            <div data-player-target="regionsList" class="regions-list"></div>
           </div>
 
-          <div data-player-target="regionDetail" class="hidden">
+          <div data-player-target="regionDetail" class="hidden regions-detail">
             <div data-player-target="regionDetailTitle"
                  style="font-family:'Alata',sans-serif;font-size:16px;color:#01EACB;margin-bottom:12px;text-align:center;"></div>
             <div data-player-target="regionDetailList" style="display:flex;flex-direction:column;gap:14px;"></div>
-          </div>
-
-          <div style="display:flex;justify-content:center;margin-top:18px;">
-            <button type="button"
-                    data-action="click->player#hideRegions"
-                    style="padding:9px 18px;border-radius:100px;background:transparent;color:#fff;font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
-              <%= t("player.back") %>
-            </button>
           </div>
         </div>
       <% end %>

@@ -81,6 +81,9 @@ ru:
     see_regions: "Посмотреть ответы регионов"
     regions_title: "Ответы со всего мира"
     region_compare_hint: "Нажмите на регион ниже, чтобы сравнить его со своими ответами"
+    region_zoom_in: "Приблизить"
+    region_zoom_out: "Отдалить"
+    region_reset_view: "Сбросить вид"
     preview_banner: "Режим предпросмотра — ответы не сохраняются"
     exit_preview: "Выйти из предпросмотра"
     thank_you_title: Спасибо!

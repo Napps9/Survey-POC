@@ -81,6 +81,9 @@ pt:
     see_regions: "Ver como responderam as regiões"
     regions_title: "Respostas de todo o mundo"
     region_compare_hint: "Toque numa região abaixo para a comparar com as suas respostas"
+    region_zoom_in: "Aumentar zoom"
+    region_zoom_out: "Diminuir zoom"
+    region_reset_view: "Repor vista"
     preview_banner: "Modo de pré-visualização — as respostas não são guardadas"
     exit_preview: "Sair da pré-visualização"
     thank_you_title: Obrigado!

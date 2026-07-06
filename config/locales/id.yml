@@ -81,6 +81,9 @@ id:
     see_regions: "Lihat jawaban tiap region"
     regions_title: "Jawaban dari seluruh dunia"
     region_compare_hint: "Ketuk sebuah region di bawah untuk membandingkan dengan jawabanmu"
+    region_zoom_in: "Perbesar"
+    region_zoom_out: "Perkecil"
+    region_reset_view: "Atur ulang tampilan"
     preview_banner: "Mode pratinjau — jawaban tidak disimpan"
     exit_preview: "Keluar dari pratinjau"
     thank_you_title: Terima kasih!

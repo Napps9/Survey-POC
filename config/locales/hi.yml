@@ -81,6 +81,9 @@ hi:
     see_regions: "देखें क्षेत्रों ने कैसे जवाब दिया"
     regions_title: "दुनिया भर के जवाब"
     region_compare_hint: "अपने जवाबों से तुलना के लिए नीचे कोई क्षेत्र चुनें"
+    region_zoom_in: "ज़ूम इन"
+    region_zoom_out: "ज़ूम आउट"
+    region_reset_view: "दृश्य रीसेट करें"
     preview_banner: "पूर्वावलोकन मोड — जवाब सहेजे नहीं जाएँगे"
     exit_preview: "पूर्वावलोकन से बाहर निकलें"
     thank_you_title: धन्यवाद!
