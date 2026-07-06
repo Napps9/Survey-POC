@@ -109,14 +109,17 @@ class RegionTagsTest < ActionDispatch::IntegrationTest
     gb   = s.survey_region_links.create!(country_code: "GB", label: "Yorkshire")
     fr   = s.survey_region_links.create!(country_code: "FR", label: nil)
 
-    2.times do |i|
+    # Both regions meet MIN_REGION_SAMPLE_SIZE so neither is suppressed below.
+    5.times do |i|
       s.responses.create!(session_token: "gb-#{i}-#{SecureRandom.hex(3)}", status: "completed",
                           survey_region_link: gb, region_country: "GB", region_label: "Yorkshire",
                           answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
     end
-    s.responses.create!(session_token: "fr-#{SecureRandom.hex(3)}", status: "completed",
-                        survey_region_link: fr, region_country: "FR", region_label: nil,
-                        answers: { "1" => { "type" => "yes_no", "value" => "No" } })
+    5.times do |i|
+      s.responses.create!(session_token: "fr-#{i}-#{SecureRandom.hex(3)}", status: "completed",
+                          survey_region_link: fr, region_country: "FR", region_label: nil,
+                          answers: { "1" => { "type" => "yes_no", "value" => "No" } })
+    end
     s.responses.create!(session_token: "untagged-#{SecureRandom.hex(3)}", status: "completed",
                         answers: { "1" => { "type" => "yes_no", "value" => "No" } })
 
@@ -124,16 +127,46 @@ class RegionTagsTest < ActionDispatch::IntegrationTest
     assert_response :success
     data = JSON.parse(response.body)
     assert data["ok"]
-    assert_equal 3, data["total_tagged"]
+    assert_equal 10, data["total_tagged"]
     assert_equal 2, data["regions"].size
     top = data["regions"].first
-    assert_equal [ "GB", "Yorkshire", 2 ], [ top["country"], top["label"], top["responders"] ]
+    assert_equal [ "GB", "Yorkshire", 5 ], [ top["country"], top["label"], top["responders"] ]
     yes_no = top["results"].find { |r| r["type"] == "yes_no" }
-    assert_equal({ "Yes" => 2 }, yes_no["counts"])
+    assert_equal({ "Yes" => 5 }, yes_no["counts"])
 
     bare = create_survey(create_org_and_sign_in("agg2"))
     get player_regions_path(bare.publish_token)
     assert_response :forbidden
+  end
+
+  test "a region below the minimum sample size is suppressed from the map/list" do
+    org = create_org_and_sign_in("smallcell")
+    s   = create_survey(org)
+    gb  = s.survey_region_links.create!(country_code: "GB", label: "Yorkshire")
+    de  = s.survey_region_links.create!(country_code: "DE", label: nil)
+
+    5.times do |i|
+      s.responses.create!(session_token: "gb-#{i}-#{SecureRandom.hex(3)}", status: "completed",
+                          survey_region_link: gb, region_country: "GB", region_label: "Yorkshire",
+                          answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    end
+    # Below Response::MIN_REGION_SAMPLE_SIZE — must not appear anywhere.
+    2.times do |i|
+      s.responses.create!(session_token: "de-#{i}-#{SecureRandom.hex(3)}", status: "completed",
+                          survey_region_link: de, region_country: "DE", region_label: nil,
+                          answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    end
+
+    get player_regions_path(s.publish_token)
+    assert_response :success
+    data = JSON.parse(response.body)
+    assert_equal 7, data["total_tagged"] # raw count is unaffected — only the breakdown is suppressed
+    assert_equal [ "GB" ], data["regions"].map { |r| r["country"] }
+
+    get survey_results_path(s)
+    assert_response :success
+    assert_match "United Kingdom · Yorkshire", response.body
+    refute_match "Germany", response.body
   end
 
   test "creation wizard region tags are minted with the new Verto" do
@@ -171,9 +204,12 @@ class RegionTagsTest < ActionDispatch::IntegrationTest
     org  = create_org_and_sign_in("results")
     s    = create_survey(org)
     link = s.survey_region_links.create!(country_code: "GB", label: "Yorkshire")
-    s.responses.create!(session_token: "r-#{SecureRandom.hex(3)}", status: "completed",
-                        survey_region_link: link, region_country: "GB", region_label: "Yorkshire",
-                        answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    # 5 responses to clear Response::MIN_REGION_SAMPLE_SIZE's suppression floor.
+    5.times do |i|
+      s.responses.create!(session_token: "r-#{i}-#{SecureRandom.hex(3)}", status: "completed",
+                          survey_region_link: link, region_country: "GB", region_label: "Yorkshire",
+                          answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    end
 
     get survey_results_path(s)
     assert_response :success
@@ -183,7 +219,7 @@ class RegionTagsTest < ActionDispatch::IntegrationTest
     segment_id = "region_#{Digest::MD5.hexdigest('GB|Yorkshire').first(10)}"
     get survey_results_path(s, segment: segment_id)
     assert_response :success
-    assert_match "of 1 overall", response.body
+    assert_match "of 5 overall", response.body
   end
 
   test "ask-players mode stores any valid self-declared region" do
@@ -193,12 +229,18 @@ class RegionTagsTest < ActionDispatch::IntegrationTest
 
     get play_survey_path(s.publish_token)
     assert_response :success
-    assert_match "Choose your country", response.body
-    assert_match "Your area (optional)", response.body
+    # The satnav-style location search replaces the old country-select +
+    # free-text area — see NominatimClient / location_search_controller.js.
+    assert_match "Search for your city or region", response.body
+    assert_match "Search by OpenStreetMap", response.body
 
-    json_post submit_survey_path(s.publish_token),
-              { session_token: "ask-#{SecureRandom.hex(4)}", region_country: "ke", region_label: "  Nairobi West  ",
-                answers: { "1" => { "type" => "yes_no", "value" => "Yes" } } }
+    # The client resolves a search pick to country_code + label before
+    # submitting — this simulates that resolved payload directly.
+    5.times do |i|
+      json_post submit_survey_path(s.publish_token),
+                { session_token: "ask-#{i}-#{SecureRandom.hex(4)}", region_country: "ke", region_label: "Nairobi West",
+                  answers: { "1" => { "type" => "yes_no", "value" => "Yes" } } }
+    end
     resp = s.responses.reload.last
     assert_equal [ "KE", "Nairobi West", nil ], [ resp.region_country, resp.region_label, resp.survey_region_link_id ]
 

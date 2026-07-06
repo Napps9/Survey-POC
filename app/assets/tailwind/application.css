@@ -4050,6 +4050,38 @@ body.generating-overlay-active .bottom-bar { display: none; }
   text-decoration: underline; text-underline-offset: 3px;
 }
 
+/* Satnav-style location search (ask_region mode) — replaces the old country
+   select + free-text area. See location_search_controller.js. */
+.welcome-location-search { flex-direction: column; align-items: stretch; }
+.location-search-input-wrap { position: relative; }
+.location-search-results {
+  position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px; z-index: 20;
+  list-style: none; padding: 6px; max-height: 220px; overflow-y: auto;
+  background: #fff; border: 1.5px solid rgba(0,0,0,0.12); border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+.location-search-result {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  cursor: pointer; padding: 8px 10px; border-radius: 8px;
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034;
+}
+.location-search-result:hover, .location-search-result.is-active { background: rgba(1,234,203,0.12); }
+.location-search-selected {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034;
+  background: #f4f6f9; border: 1.5px solid rgba(0,0,0,0.12); border-radius: 10px;
+  padding: 9px 12px;
+}
+.location-search-change {
+  background: none; border: none; cursor: pointer; padding: 0; flex-shrink: 0;
+  font-family: "ABeeZee", sans-serif; font-size: 12.5px; color: rgba(0,0,0,0.5);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.location-search-credit {
+  font-family: "ABeeZee", sans-serif; font-size: 10.5px; color: rgba(0,0,0,0.35);
+  text-align: center; margin-top: 2px;
+}
+
 /* ── Quiz mode ─────────────────────────────────────────────────────────────
    A quiz Verto scores graded answers. The running score sits in the footer,
    each graded card reveals right/wrong in place (then locks), and the

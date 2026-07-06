@@ -124,15 +124,13 @@ export default class extends Controller {
     this._resaveRegion()
   }
 
-  // Ask-players mode: country and free-text area arrive separately.
-  setRegionCountry(e) {
-    this.regionCountryValue = e.target.value || ""
+  // Ask-players mode: a location-search pick (see location_search_controller)
+  // resolves to a country + city/region label in one event, unlike the old
+  // country-select + free-text-area pair this replaced.
+  setRegionFromSearch(e) {
+    this.regionCountryValue = e.detail.country || ""
+    this.regionLabelValue   = e.detail.label || ""
     this._regionOptOut = false
-    this._resaveRegion()
-  }
-
-  setRegionArea(e) {
-    this.regionLabelValue = e.target.value.trim()
     this._resaveRegion()
   }
 

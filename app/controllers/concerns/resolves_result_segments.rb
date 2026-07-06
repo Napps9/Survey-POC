@@ -35,8 +35,11 @@ module ResolvesResultSegments
     # the filter row. Ids hash the region key — stable across requests.
     # reorder(nil) drops base's `ORDER BY created_at`: Postgres rejects an
     # ORDER BY column that isn't in the GROUP BY (SQLite quietly allows it).
+    # Small-cell suppression: a region with fewer than MIN_REGION_SAMPLE_SIZE
+    # respondents never gets its own segment — see Response for why.
     region_counts = base.reorder(nil).where.not(region_country: nil)
                         .group(:region_country, :region_label).count
+                        .select { |_, count| count >= Response::MIN_REGION_SAMPLE_SIZE }
     region_counts.sort_by { |_, count| -count }.first(REGION_SEGMENT_CAP).each do |(country, label), count|
       name    = WorldRegions.name_for(country)
       display = label.present? ? "#{name} · #{label}" : name

@@ -72,11 +72,12 @@ vi:
     analysing: Đang phân tích phản hồi…
   player:
     compare_promise: "Hoàn thành để xem câu trả lời của bạn so với mọi người như thế nào."
-    region_country_prompt: "Chọn quốc gia của bạn…"
-    region_area_placeholder: "Khu vực của bạn (không bắt buộc)"
     region_notice_linked: "Verto này thu thập dữ liệu theo khu vực — bạn đang trả lời với tư cách %{region}. Khi hoàn thành, bạn có thể xem các khu vực khác đã trả lời thế nào."
-    region_notice_pick: "Verto này thu thập dữ liệu theo khu vực — khi hoàn thành, bạn có thể xem các khu vực khác đã trả lời thế nào. Khu vực của bạn:"
+    region_notice_pick: "Verto này thu thập dữ liệu theo khu vực — tìm kiếm vị trí sử dụng OpenStreetMap và chỉ lưu thành phố/khu vực/quốc gia của bạn, không bao giờ lưu địa chỉ chính xác. Khi hoàn thành, bạn có thể xem các khu vực khác đã trả lời thế nào."
     region_prefer_not: "Không muốn tiết lộ"
+    region_search_placeholder: "Tìm thành phố hoặc khu vực của bạn…"
+    region_search_change: "Thay đổi"
+    region_search_credit: "Tìm kiếm bởi OpenStreetMap"
     see_regions: "Xem câu trả lời theo khu vực"
     regions_title: "Câu trả lời từ khắp thế giới"
     region_compare_hint: "Chạm vào một khu vực bên dưới để so sánh với câu trả lời của bạn"

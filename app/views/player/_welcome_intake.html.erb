@@ -28,16 +28,30 @@
             <%= t("js.player.region_optout") %>
           </button>
         <% elsif @survey.ask_region? %>
-          <div class="welcome-intake-fields">
-            <select class="welcome-intake-select" data-action="change->player#setRegionCountry">
-              <option value=""><%= t("player.region_country_prompt") %></option>
-              <% WorldRegions.options.each do |name, code| %>
-                <option value="<%= code %>"><%= name %></option>
-              <% end %>
-            </select>
-            <input type="text" maxlength="60" class="welcome-intake-input"
-                   data-action="change->player#setRegionArea"
-                   placeholder="<%= t("player.region_area_placeholder") %>" />
+          <%# Satnav-style search-and-pick instead of a country select + free-
+              text area: resolving through OpenStreetMap Nominatim groups
+              location data reliably (structured city/region/country) instead
+              of by whatever a respondent happened to type. See
+              NominatimClient for the privacy note (never lat/long, never a
+              raw address — only the resolved city/region/country is kept). %>
+          <div class="welcome-intake-fields welcome-location-search"
+               data-controller="location-search"
+               data-location-search-url-value="<%= player_location_search_url(@survey.publish_token) %>"
+               data-action="location-search:picked->player#setRegionFromSearch">
+            <div class="location-search-input-wrap">
+              <input type="text" autocomplete="off" maxlength="80" class="welcome-intake-input"
+                     placeholder="<%= t("player.region_search_placeholder") %>"
+                     data-location-search-target="input"
+                     data-action="input->location-search#search keydown->location-search#keydown" />
+              <ul class="location-search-results" data-location-search-target="results" hidden></ul>
+            </div>
+            <div class="location-search-selected" data-location-search-target="selected" hidden>
+              <span data-location-search-target="selectedText"></span>
+              <button type="button" class="location-search-change" data-action="click->location-search#change">
+                <%= t("player.region_search_change") %>
+              </button>
+            </div>
+            <div class="location-search-credit"><%= t("player.region_search_credit") %></div>
           </div>
         <% else %>
           <select class="welcome-intake-select" data-action="change->player#setRegion">

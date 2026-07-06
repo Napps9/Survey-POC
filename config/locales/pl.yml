@@ -72,11 +72,12 @@ pl:
     analysing: Analizowanie odpowiedzi…
   player:
     compare_promise: "Dokończ, aby zobaczyć, jak twoje odpowiedzi wypadają na tle innych."
-    region_country_prompt: "Wybierz swój kraj…"
-    region_area_placeholder: "Twój region (opcjonalnie)"
     region_notice_linked: "To Verto zbiera dane regionalne — odpowiadasz jako %{region}. Po zakończeniu zobaczysz, jak odpowiedziały inne regiony."
-    region_notice_pick: "To Verto zbiera dane regionalne — po zakończeniu zobaczysz, jak odpowiedziały inne regiony. Twój region:"
+    region_notice_pick: "To Verto zbiera dane regionalne — wyszukiwanie lokalizacji korzysta z OpenStreetMap i zapisywane jest tylko miasto/region/kraj, nigdy dokładny adres. Po zakończeniu zobaczysz, jak odpowiedziały inne regiony."
     region_prefer_not: "Wolę nie podawać"
+    region_search_placeholder: "Wyszukaj swoje miasto lub region…"
+    region_search_change: "Zmień"
+    region_search_credit: "Wyszukiwanie dzięki OpenStreetMap"
     see_regions: "Zobacz odpowiedzi regionów"
     regions_title: "Odpowiedzi z całego świata"
     region_compare_hint: "Stuknij region poniżej, aby porównać go ze swoimi odpowiedziami"

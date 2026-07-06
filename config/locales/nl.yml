@@ -72,11 +72,12 @@ nl:
     analysing: Antwoorden analyseren…
   player:
     compare_promise: "Maak het af om te zien hoe jouw antwoorden zich verhouden tot die van anderen."
-    region_country_prompt: "Kies je land…"
-    region_area_placeholder: "Jouw regio (optioneel)"
     region_notice_linked: "Deze Verto verzamelt regionale gegevens — je antwoordt als %{region}. Na afloop zie je hoe andere regio's hebben geantwoord."
-    region_notice_pick: "Deze Verto verzamelt regionale gegevens — na afloop zie je hoe andere regio's hebben geantwoord. Jouw regio:"
+    region_notice_pick: "Deze Verto verzamelt regionale gegevens — de locatiezoekopdracht gebruikt OpenStreetMap en alleen je stad/regio/land wordt opgeslagen, nooit een precies adres. Na afloop zie je hoe andere regio's hebben geantwoord."
     region_prefer_not: "Zeg ik liever niet"
+    region_search_placeholder: "Zoek je stad of regio…"
+    region_search_change: "Wijzigen"
+    region_search_credit: "Zoeken via OpenStreetMap"
     see_regions: "Bekijk antwoorden per regio"
     regions_title: "Antwoorden van over de hele wereld"
     region_compare_hint: "Tik hieronder op een regio om die met jouw antwoorden te vergelijken"

@@ -72,11 +72,12 @@ es:
     analysing: Analizando respuestas…
   player:
     compare_promise: "Termina para ver cómo se comparan tus respuestas con las de los demás."
-    region_country_prompt: "Elige tu país…"
-    region_area_placeholder: "Tu zona (opcional)"
     region_notice_linked: "Este Verto recopila datos regionales: estás respondiendo como %{region}. Al terminar podrás ver cómo respondieron otras regiones."
-    region_notice_pick: "Este Verto recopila datos regionales: al terminar podrás ver cómo respondieron otras regiones. Tu región:"
+    region_notice_pick: "Este Verto recopila datos regionales: la búsqueda de ubicación usa OpenStreetMap y solo se guarda tu ciudad/región/país, nunca una dirección precisa. Al terminar podrás ver cómo respondieron otras regiones."
     region_prefer_not: "Prefiero no decirlo"
+    region_search_placeholder: "Busca tu ciudad o región…"
+    region_search_change: "Cambiar"
+    region_search_credit: "Búsqueda por OpenStreetMap"
     see_regions: "Ver cómo respondieron las regiones"
     regions_title: "Respuestas de todo el mundo"
     region_compare_hint: "Toca una región para compararla con tus respuestas"

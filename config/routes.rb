@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   get  "play/:token/scores", to: "player#scores", as: :player_scores
   get  "play/:token/results", to: "player#results", as: :player_results
   get  "play/:token/regions", to: "player#regions", as: :player_regions
+  get  "play/:token/location_search", to: "player#location_search", as: :player_location_search
 
   # Auth
   resource  :session,       only: [ :new, :create, :destroy ]

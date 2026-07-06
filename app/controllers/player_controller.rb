@@ -20,6 +20,10 @@ class PlayerController < ApplicationController
   # a respondent hits each once after finishing.
   rate_limit to: 120, within: 1.minute, only: [ :results, :scores, :regions ],
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
+  # A respondent's autocomplete keystrokes are debounced client-side, so a
+  # generous per-minute cap here only guards against a runaway client/bot.
+  rate_limit to: 30, within: 1.minute, only: :location_search,
+             with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
 
   before_action :load_survey_and_share
 
@@ -237,7 +241,10 @@ class PlayerController < ApplicationController
     tagged = @survey.responses.where(status: "completed").where.not(region_country: nil)
                     .select(:id, :region_country, :region_label, :answers)
     groups = tagged.group_by(&:region_key)
-    rows = groups.map do |key, rs|
+    # Small-cell suppression: a region with fewer than MIN_REGION_SAMPLE_SIZE
+    # respondents never appears on the map/list — see Response for why.
+    rows = groups.filter_map do |key, rs|
+      next if rs.size < Response::MIN_REGION_SAMPLE_SIZE
       sample = rs.first
       {
         id:           key,
@@ -249,6 +256,27 @@ class PlayerController < ApplicationController
       }
     end.sort_by { |r| -r[:responders] }
     render json: { ok: true, total_tagged: tagged.size, regions: rows }
+  end
+
+  # Satnav-style location search backing the welcome-card intake: forwards a
+  # partial place name to Nominatim and resolves each hit down to the same
+  # coarse country + area shape apply_region already accepts — never a precise
+  # address or coordinate (see NominatimClient's privacy note).
+  def location_search
+    return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
+
+    results = NominatimClient.search(query: params[:q].to_s).map do |place|
+      label = [ place[:city], place[:region] ].compact_blank.join(", ").first(60).presence
+      {
+        display_name: place[:display_name],
+        country_code: place[:country_code],
+        label: label
+      }
+    end
+    render json: { ok: true, results: results }
+  rescue => e
+    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Search failed" }, status: :bad_gateway
   end
 
   private

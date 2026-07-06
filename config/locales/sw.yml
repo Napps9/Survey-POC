@@ -72,11 +72,12 @@ sw:
     analysing: Inachambua majibu…
   player:
     compare_promise: "Maliza ili uone jinsi majibu yako yanavyolinganishwa na ya wengine."
-    region_country_prompt: "Chagua nchi yako…"
-    region_area_placeholder: "Eneo lako (hiari)"
     region_notice_linked: "Verto hii hukusanya data za kanda — unajibu kama %{region}. Ukimaliza utaona jinsi kanda nyingine zilivyojibu."
-    region_notice_pick: "Verto hii hukusanya data za kanda — ukimaliza utaona jinsi kanda nyingine zilivyojibu. Kanda yako:"
+    region_notice_pick: "Verto hii hukusanya data za kanda — utafutaji wa mahali hutumia OpenStreetMap na ni jiji/eneo/nchi yako pekee inayohifadhiwa, kamwe si anwani kamili. Ukimaliza utaona jinsi kanda nyingine zilivyojibu."
     region_prefer_not: "Sipendelei kusema"
+    region_search_placeholder: "Tafuta jiji au eneo lako…"
+    region_search_change: "Badilisha"
+    region_search_credit: "Utafutaji na OpenStreetMap"
     see_regions: "Ona jinsi kanda zilivyojibu"
     regions_title: "Majibu kutoka duniani kote"
     region_compare_hint: "Gusa kanda hapa chini ili kuilinganisha na majibu yako"
