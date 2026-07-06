@@ -72,9 +72,6 @@ tr:
     analysing: Yanıtlar analiz ediliyor…
   player:
     compare_promise: "Bitir ve yanıtlarının herkesle nasıl karşılaştırıldığını gör."
-    region_notice_linked: "Bu Verto bölgesel veri topluyor — %{region} olarak yanıtlıyorsunuz. Bitirdiğinizde diğer bölgelerin yanıtlarını görebilirsiniz."
-    region_notice_pick: "Bu Verto bölgesel veri topluyor — konum arama OpenStreetMap üzerinden yapılır ve yalnızca şehir/bölge/ülke kaydedilir, asla kesin adres kaydedilmez. Bitirdiğinizde diğer bölgelerin yanıtlarını görebilirsiniz."
-    region_prefer_not: "Belirtmek istemiyorum"
     region_search_placeholder: "Şehrinizi veya bölgenizi arayın…"
     region_search_change: "Değiştir"
     region_search_credit: "OpenStreetMap ile arama"
@@ -103,8 +100,6 @@ tr:
     quiz_compare_title: "Nasıl karşılaştırılıyorsunuz"
   js:
     player:
-      region_optout: "Bölgemi paylaşma"
-      region_optin: "Bölgemi paylaş"
       region_meta: "%{count} yanıt bölge paylaştı"
       region_answered: "%{count} yanıtladı"
       region_compare: "Karşılaştır →"

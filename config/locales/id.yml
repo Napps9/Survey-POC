@@ -72,9 +72,6 @@ id:
     analysing: Menganalisis tanggapan…
   player:
     compare_promise: "Selesaikan untuk melihat perbandingan jawabanmu dengan semua orang."
-    region_notice_linked: "Verto ini mengumpulkan data regional — kamu menjawab sebagai %{region}. Setelah selesai kamu bisa melihat jawaban region lain."
-    region_notice_pick: "Verto ini mengumpulkan data regional — pencarian lokasi menggunakan OpenStreetMap dan hanya kota/wilayah/negaramu yang disimpan, tidak pernah alamat pasti. Setelah selesai kamu bisa melihat jawaban region lain."
-    region_prefer_not: "Lebih baik tidak memberi tahu"
     region_search_placeholder: "Cari kota atau wilayahmu…"
     region_search_change: "Ubah"
     region_search_credit: "Pencarian oleh OpenStreetMap"
@@ -103,8 +100,6 @@ id:
     quiz_compare_title: "Perbandinganmu"
   js:
     player:
-      region_optout: "Jangan bagikan region saya"
-      region_optin: "Bagikan region saya"
       region_meta: "%{count} jawaban menyertakan region"
       region_answered: "%{count} menjawab"
       region_compare: "Bandingkan →"

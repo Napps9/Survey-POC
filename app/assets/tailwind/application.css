@@ -4016,9 +4016,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
   position: absolute; top: 12px; right: 14px; z-index: 10;
 }
 
-/* Welcome-card intake — compare promise + region picker (moved off the old
-   top banners). Renders in the welcome card's white split-right, below the
-   title, so it's styled light. */
+/* Welcome-card intake — the compare-results promise (moved off the old top
+   banner). Renders in the welcome card's white split-right, below the title,
+   so it's styled light. Region capture no longer lives here — it's the
+   "Where do you live?" demographic card (see the .location-search-* rules
+   below), which every Verto already asks. */
 .welcome-intake {
   display: flex; flex-direction: column; align-items: center; gap: 12px;
   margin-top: 16px; width: 100%;
@@ -4029,31 +4031,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
   border: 1px solid rgba(255,30,111,0.25); border-radius: 100px;
   padding: 8px 16px; max-width: 90%;
 }
-.welcome-intake-region {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  width: 100%; max-width: 340px;
-}
-.welcome-intake-region-note {
-  font-family: "ABeeZee", sans-serif; font-size: 12.5px; line-height: 1.45;
-  color: rgba(0,0,0,0.6);
-}
-.welcome-intake-fields { display: flex; gap: 8px; width: 100%; flex-wrap: wrap; justify-content: center; }
-.welcome-intake-select, .welcome-intake-input {
-  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034;
-  background: #f4f6f9; border: 1.5px solid rgba(0,0,0,0.12); border-radius: 10px;
-  padding: 9px 12px; outline: none; flex: 1 1 140px; min-width: 0;
-}
-.welcome-intake-select:focus, .welcome-intake-input:focus { border-color: #01EACB; }
-.welcome-intake-link {
-  background: none; border: none; cursor: pointer; padding: 0;
-  font-family: "ABeeZee", sans-serif; font-size: 12.5px; color: rgba(0,0,0,0.5);
-  text-decoration: underline; text-underline-offset: 3px;
-}
 
-/* Satnav-style location search (ask_region mode) — replaces the old country
-   select + free-text area. See location_search_controller.js. */
-.welcome-location-search { flex-direction: column; align-items: stretch; }
+/* Satnav-style location search — the "Where do you live?" demographic
+   question's answer widget. See location_search_controller.js. */
+.welcome-location-search { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
 .location-search-input-wrap { position: relative; }
+.location-search-field {
+  width: 100%; font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034;
+  background: #f4f6f9; border: 1.5px solid rgba(0,0,0,0.12); border-radius: 10px;
+  padding: 9px 12px; outline: none; box-sizing: border-box;
+}
+.location-search-field:focus { border-color: #01EACB; }
 .location-search-results {
   position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px; z-index: 20;
   list-style: none; padding: 6px; max-height: 220px; overflow-y: auto;

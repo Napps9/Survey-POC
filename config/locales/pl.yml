@@ -72,9 +72,6 @@ pl:
     analysing: Analizowanie odpowiedzi…
   player:
     compare_promise: "Dokończ, aby zobaczyć, jak twoje odpowiedzi wypadają na tle innych."
-    region_notice_linked: "To Verto zbiera dane regionalne — odpowiadasz jako %{region}. Po zakończeniu zobaczysz, jak odpowiedziały inne regiony."
-    region_notice_pick: "To Verto zbiera dane regionalne — wyszukiwanie lokalizacji korzysta z OpenStreetMap i zapisywane jest tylko miasto/region/kraj, nigdy dokładny adres. Po zakończeniu zobaczysz, jak odpowiedziały inne regiony."
-    region_prefer_not: "Wolę nie podawać"
     region_search_placeholder: "Wyszukaj swoje miasto lub region…"
     region_search_change: "Zmień"
     region_search_credit: "Wyszukiwanie dzięki OpenStreetMap"
@@ -103,8 +100,6 @@ pl:
     quiz_compare_title: "Jak wypadasz"
   js:
     player:
-      region_optout: "Nie udostępniaj mojego regionu"
-      region_optin: "Udostępnij mój region"
       region_meta: "%{count} odpowiedzi z regionem"
       region_answered: "%{count} odpowiedziało"
       region_compare: "Porównaj →"

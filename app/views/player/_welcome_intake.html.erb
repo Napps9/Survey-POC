@@ -1,67 +1,10 @@
 <%# Intake shown on the welcome card (player only): the compare-results
-    promise and the regional-data notice + picker — both used to be top
-    banners. @survey / @region_link come from the player controller. %>
-<%
-  show_compare = @survey.show_results_comparison?
-  region_links = @survey.survey_region_links.order(:created_at).to_a
-  has_regions  = region_links.any? || @survey.ask_region?
-%>
-<% if show_compare || has_regions %>
+    promise — used to be a top banner. Region capture no longer lives here;
+    it's the "Where do you live?" demographic card every Verto already asks
+    (see DemographicQuestions / _card_component.html.erb's "location" input
+    flavour). %>
+<% if @survey.show_results_comparison? %>
   <div class="welcome-intake">
-    <% if show_compare %>
-      <div class="welcome-intake-compare">🏁 <%= @survey.compare_note_text %></div>
-    <% end %>
-
-    <% if has_regions %>
-      <div class="welcome-intake-region">
-        <div class="welcome-intake-region-note">
-          🌍
-          <% if @region_link %>
-            <%= t("player.region_notice_linked", region: @region_link.display_name) %>
-          <% else %>
-            <%= t("player.region_notice_pick") %>
-          <% end %>
-        </div>
-        <% if @region_link %>
-          <button type="button" class="welcome-intake-link"
-                  data-action="click->player#toggleRegionOptOut">
-            <%= t("js.player.region_optout") %>
-          </button>
-        <% elsif @survey.ask_region? %>
-          <%# Satnav-style search-and-pick instead of a country select + free-
-              text area: resolving through OpenStreetMap Nominatim groups
-              location data reliably (structured city/region/country) instead
-              of by whatever a respondent happened to type. See
-              NominatimClient for the privacy note (never lat/long, never a
-              raw address — only the resolved city/region/country is kept). %>
-          <div class="welcome-intake-fields welcome-location-search"
-               data-controller="location-search"
-               data-location-search-url-value="<%= player_location_search_url(@survey.publish_token) %>"
-               data-action="location-search:picked->player#setRegionFromSearch">
-            <div class="location-search-input-wrap">
-              <input type="text" autocomplete="off" maxlength="80" class="welcome-intake-input"
-                     placeholder="<%= t("player.region_search_placeholder") %>"
-                     data-location-search-target="input"
-                     data-action="input->location-search#search keydown->location-search#keydown" />
-              <ul class="location-search-results" data-location-search-target="results" hidden></ul>
-            </div>
-            <div class="location-search-selected" data-location-search-target="selected" hidden>
-              <span data-location-search-target="selectedText"></span>
-              <button type="button" class="location-search-change" data-action="click->location-search#change">
-                <%= t("player.region_search_change") %>
-              </button>
-            </div>
-            <div class="location-search-credit"><%= t("player.region_search_credit") %></div>
-          </div>
-        <% else %>
-          <select class="welcome-intake-select" data-action="change->player#setRegion">
-            <option value=""><%= t("player.region_prefer_not") %></option>
-            <% region_links.each do |link| %>
-              <option value="<%= link.country_code %>|<%= link.label %>"><%= link.display_name %></option>
-            <% end %>
-          </select>
-        <% end %>
-      </div>
-    <% end %>
+    <div class="welcome-intake-compare">🏁 <%= @survey.compare_note_text %></div>
   </div>
 <% end %>

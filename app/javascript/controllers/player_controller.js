@@ -15,8 +15,6 @@ export default class extends Controller {
     consentUrl: { type: String, default: "" },
     resultsUrl: { type: String, default: "" },
     regionsUrl: { type: String, default: "" },
-    regionCountry: { type: String, default: "" },
-    regionLabel: { type: String, default: "" },
     locale: { type: String, default: "" },
     shareUrl: { type: String, default: "" },
     showComparison: { type: Boolean, default: false },
@@ -29,7 +27,6 @@ export default class extends Controller {
 
   _answers = {}
   _registered = false
-  _regionOptOut = false
   _regionsData = null
 
   // Quiz state: which card indices have been answered+revealed (so they can't
@@ -101,52 +98,8 @@ export default class extends Controller {
     }
   }
 
-  // Region choice travels with every save. The opt-out flag is explicit so
-  // the server clears a link-borne region too — consent always wins.
   _payload() {
-    const payload = { session_token: this._sessionToken, answers: this._answers, locale: this.localeValue }
-    payload.region_opt_out = this._regionOptOut
-    if (!this._regionOptOut && this.regionCountryValue) {
-      payload.region_country = this.regionCountryValue
-      payload.region_label   = this.regionLabelValue
-    }
-    return payload
-  }
-
-  // Base-link respondents pick their region from the Verto's tags ("" = prefer
-  // not to say). Option values are "CC|label".
-  setRegion(e) {
-    const v   = e.target.value || ""
-    const sep = v.indexOf("|")
-    this.regionCountryValue = sep >= 0 ? v.slice(0, sep) : v
-    this.regionLabelValue   = sep >= 0 ? v.slice(sep + 1) : ""
-    this._regionOptOut = v === ""
-    this._resaveRegion()
-  }
-
-  // Ask-players mode: a location-search pick (see location_search_controller)
-  // resolves to a country + city/region label in one event, unlike the old
-  // country-select + free-text-area pair this replaced.
-  setRegionFromSearch(e) {
-    this.regionCountryValue = e.detail.country || ""
-    this.regionLabelValue   = e.detail.label || ""
-    this._regionOptOut = false
-    this._resaveRegion()
-  }
-
-  // Link-borne region: the notice bar's opt-out toggle.
-  toggleRegionOptOut(e) {
-    this._regionOptOut = !this._regionOptOut
-    e.target.textContent = t(this._regionOptOut ? "player.region_optin" : "player.region_optout")
-    this._resaveRegion()
-  }
-
-  // If progress already registered this session, push the new region consent
-  // state immediately rather than waiting for the next navigation.
-  _resaveRegion() {
-    if (!this._registered) return
-    this._registered = false
-    this._saveProgress()
+    return { session_token: this._sessionToken, answers: this._answers, locale: this.localeValue }
   }
 
   async finish() {
@@ -368,6 +321,13 @@ export default class extends Controller {
       }
 
       case "open_ended": {
+        // Location demographic: a hidden input carries the resolved
+        // "CC|Label" the location-search widget picked (see
+        // location_search_controller.js) — this is the app's one universal
+        // source of region data (see PlayerController#sync_region_from_answers!).
+        const loc = card.querySelector(".location-search-value")
+        if (loc) return loc.value || null
+
         // Month+year demographic: two plain numeric fields, not a native
         // <input type="month"> (see _card_component.html.erb) — combine them
         // into the same "YYYY-MM" shape a native month input would have given.
@@ -893,6 +853,21 @@ export default class extends Controller {
         if (set.has((el.dataset.canonical || "").trim())) el.dataset.selected = "true"
       })
     } else if (type === "open_ended") {
+      const loc = card.querySelector(".location-search-value")
+      if (loc) {
+        loc.value = value
+        const sep = String(value).indexOf("|")
+        const label = sep >= 0 ? String(value).slice(sep + 1) : ""
+        if (label) {
+          const selected = card.querySelector(".location-search-selected")
+          const selectedText = card.querySelector('[data-location-search-target="selectedText"]')
+          const input = card.querySelector('[data-location-search-target="input"]')
+          if (selected) selected.hidden = false
+          if (selectedText) selectedText.textContent = label
+          if (input) input.hidden = true
+        }
+        return
+      }
       const month = card.querySelector(".freeform-month")
       if (month) {
         const m = /^(\d{4})-(\d{2})$/.exec(String(value))

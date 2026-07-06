@@ -7,8 +7,9 @@ module DemographicQuestions
   CARDS = [
     { "type" => "open_ended", "input" => "month", "text" => "When were you born?",
       "demographic" => true },
-    { "type" => "open_ended", "text" => "Where do you live?",
-      "description" => "Country or city.", "demographic" => true },
+    { "type" => "open_ended", "input" => "location", "text" => "Where do you live?",
+      "description" => "Powered by OpenStreetMap — helps build a map you can explore after finishing.",
+      "demographic" => true },
     { "type" => "multiple_choice", "text" => "Gender",
       "options" => [ "Male", "Female", "Prefer not to say" ], "demographic" => true }
   ].freeze

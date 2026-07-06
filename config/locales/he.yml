@@ -72,9 +72,6 @@ he:
     analysing: מנתח תגובות…
   player:
     compare_promise: "סיימו כדי לראות איך התשובות שלכם בהשוואה לכולם."
-    region_notice_linked: "ורטו זה אוסף נתונים אזוריים — אתם עונים בתור %{region}. בסיום תוכלו לראות איך ענו אזורים אחרים."
-    region_notice_pick: "ורטו זה אוסף נתונים אזוריים — חיפוש המיקום מתבצע דרך OpenStreetMap, ונשמרים רק העיר/האזור/המדינה שלכם, לעולם לא כתובת מדויקת. בסיום תוכלו לראות איך ענו אזורים אחרים."
-    region_prefer_not: "מעדיפים לא לציין"
     region_search_placeholder: "חפשו את העיר או האזור שלכם…"
     region_search_change: "שינוי"
     region_search_credit: "חיפוש באמצעות OpenStreetMap"
@@ -103,8 +100,6 @@ he:
     quiz_compare_title: "איך אתה משתווה"
   js:
     player:
-      region_optout: "לא לשתף את האזור שלי"
-      region_optin: "לשתף את האזור שלי"
       region_meta: "%{count} תשובות שיתפו אזור"
       region_answered: "%{count} ענו"
       region_compare: "השוואה ←"

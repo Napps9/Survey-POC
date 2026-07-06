@@ -6,7 +6,6 @@ class LocationSearchTest < ActionDispatch::IntegrationTest
     org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
                         default_locale: "en", locales: [ "en" ],
                         cards: [ { "type" => "welcome_card", "title" => "hi" } ],
-                        ask_region: true,
                         publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
   end
 

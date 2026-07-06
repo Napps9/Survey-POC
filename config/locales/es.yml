@@ -72,9 +72,6 @@ es:
     analysing: Analizando respuestas…
   player:
     compare_promise: "Termina para ver cómo se comparan tus respuestas con las de los demás."
-    region_notice_linked: "Este Verto recopila datos regionales: estás respondiendo como %{region}. Al terminar podrás ver cómo respondieron otras regiones."
-    region_notice_pick: "Este Verto recopila datos regionales: la búsqueda de ubicación usa OpenStreetMap y solo se guarda tu ciudad/región/país, nunca una dirección precisa. Al terminar podrás ver cómo respondieron otras regiones."
-    region_prefer_not: "Prefiero no decirlo"
     region_search_placeholder: "Busca tu ciudad o región…"
     region_search_change: "Cambiar"
     region_search_credit: "Búsqueda por OpenStreetMap"
@@ -103,8 +100,6 @@ es:
     quiz_compare_title: "Cómo te comparas"
   js:
     player:
-      region_optout: "No compartir mi región"
-      region_optin: "Compartir mi región"
       region_meta: "%{count} respuestas compartieron su región"
       region_answered: "%{count} respondieron"
       region_compare: "Comparar →"

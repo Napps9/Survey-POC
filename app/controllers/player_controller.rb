@@ -43,10 +43,10 @@ class PlayerController < ApplicationController
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
     resp  = find_or_init_response(token)
-    apply_region(resp, data)
     # Quiz answers are immutable once committed — fold the incoming payload over
     # what's already stored so an already-answered graded card can't be changed.
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    sync_region_from_answers!(resp)
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     mark_started_unless_completed(resp)
     apply_quiz_score(resp)
@@ -63,8 +63,8 @@ class PlayerController < ApplicationController
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
     resp  = find_or_init_response(token)
-    apply_region(resp, data)
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    sync_region_from_answers!(resp)
     resp.status  = "completed"
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     apply_quiz_score(resp)
@@ -119,8 +119,8 @@ class PlayerController < ApplicationController
     token = data["session_token"].presence || SecureRandom.uuid
     idx   = data["card_index"].to_i
     resp  = find_or_init_response(token)
-    apply_region(resp, data)
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    sync_region_from_answers!(resp)
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     mark_started_unless_completed(resp)
     apply_quiz_score(resp)
@@ -229,12 +229,12 @@ class PlayerController < ApplicationController
 
   # Per-region aggregates for the post-finish map view: one entry per region
   # (country + label) that has at least one completed, region-tagged response.
+  # Every Verto captures this via the "Where do you live?" demographic
+  # question, so there's no separate opt-in gate — an empty result set just
+  # renders the "no regional answers yet" copy.
   def regions
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
-    unless @survey.survey_region_links.exists? || @survey.ask_region?
-      return render json: { ok: false, error: "Regions not enabled" }, status: :forbidden
-    end
 
     # Only the columns the region grouping + per-region aggregation read, so
     # rows aren't loaded with their full set of columns.
@@ -353,35 +353,25 @@ class PlayerController < ApplicationController
     end
   end
 
-  # Region tagging is consent-based and coarse: the region comes from the
-  # link the respondent arrived through, or their explicit pick — never
-  # inferred location. An opt-out in the payload always wins. Self-declared
-  # values are honoured when they match one of the Verto's region tags, or —
-  # in ask-players mode — any valid country plus a short free-text area.
-  def apply_region(resp, data)
-    country = data["region_country"].to_s.upcase.presence
-    label   = data["region_label"].to_s.strip.first(60).presence
+  # Region data comes from one universal source: the "Where do you live?"
+  # demographic question (DemographicQuestions), a location-search card whose
+  # answer value is a plain "CC|Label" string — never inferred, never a
+  # precise address (see NominatimClient). Must run AFTER resp.answers is set,
+  # since it reads the freshly merged answer. An unanswered/invalid pick just
+  # leaves the response untagged, same as skipping any other optional card.
+  def sync_region_from_answers!(resp)
+    idx = Array(@survey.cards).find_index { |c| c.is_a?(Hash) && c["demographic"] && c["input"] == "location" }
+    value = idx && resp.answers.is_a?(Hash) ? resp.answers[idx.to_s]&.dig("value") : nil
+    sep = value.to_s.index("|")
+    country = sep ? value[0...sep].to_s.upcase.presence : nil
+    label   = sep ? value[(sep + 1)..].to_s.strip.first(60).presence : nil
 
-    if data["region_opt_out"]
-      link = nil
-    elsif @region_link
-      link = @region_link
+    if country && WorldRegions.valid?(country)
+      resp.region_country = country
+      resp.region_label   = label
     else
-      link = country && @survey.survey_region_links.find_by(country_code: country, label: label)
-    end
-
-    if link
-      resp.survey_region_link = link
-      resp.region_country     = link.country_code
-      resp.region_label       = link.label
-    elsif !data["region_opt_out"] && @survey.ask_region? && country && WorldRegions.valid?(country)
-      resp.survey_region_link = nil
-      resp.region_country     = country
-      resp.region_label       = label
-    else
-      resp.survey_region_link = nil
-      resp.region_country     = nil
-      resp.region_label       = nil
+      resp.region_country = nil
+      resp.region_label   = nil
     end
   end
 
@@ -398,9 +388,6 @@ class PlayerController < ApplicationController
     if (share = SurveyShare.find_by(share_token: token))
       @survey_share = share
       @survey = Survey.without_report_text.find_by(id: share.survey_id)
-    elsif (region_link = SurveyRegionLink.find_by(token: token))
-      @region_link = region_link
-      @survey = Survey.without_report_text.find_by(id: region_link.survey_id)
     else
       # publish_token is the default opaque link; slug is the creator's
       # optional custom/vanity alternative — either resolves the same survey.

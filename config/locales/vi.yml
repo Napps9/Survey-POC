@@ -72,9 +72,6 @@ vi:
     analysing: Đang phân tích phản hồi…
   player:
     compare_promise: "Hoàn thành để xem câu trả lời của bạn so với mọi người như thế nào."
-    region_notice_linked: "Verto này thu thập dữ liệu theo khu vực — bạn đang trả lời với tư cách %{region}. Khi hoàn thành, bạn có thể xem các khu vực khác đã trả lời thế nào."
-    region_notice_pick: "Verto này thu thập dữ liệu theo khu vực — tìm kiếm vị trí sử dụng OpenStreetMap và chỉ lưu thành phố/khu vực/quốc gia của bạn, không bao giờ lưu địa chỉ chính xác. Khi hoàn thành, bạn có thể xem các khu vực khác đã trả lời thế nào."
-    region_prefer_not: "Không muốn tiết lộ"
     region_search_placeholder: "Tìm thành phố hoặc khu vực của bạn…"
     region_search_change: "Thay đổi"
     region_search_credit: "Tìm kiếm bởi OpenStreetMap"
@@ -103,8 +100,6 @@ vi:
     quiz_compare_title: "Bạn so sánh thế nào"
   js:
     player:
-      region_optout: "Không chia sẻ khu vực của tôi"
-      region_optin: "Chia sẻ khu vực của tôi"
       region_meta: "%{count} câu trả lời có khu vực"
       region_answered: "%{count} đã trả lời"
       region_compare: "So sánh →"

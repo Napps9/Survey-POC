@@ -72,9 +72,6 @@ ar:
     analysing: جارٍ تحليل الإجابات…
   player:
     compare_promise: "أكمل لترى كيف تُقارن إجاباتك بإجابات الآخرين."
-    region_notice_linked: "يجمع هذا الـVerto بيانات إقليمية — أنت تجيب بصفتك من %{region}. عند الانتهاء يمكنك رؤية إجابات المناطق الأخرى."
-    region_notice_pick: "يجمع هذا الـVerto بيانات إقليمية — يتم البحث عن الموقع عبر OpenStreetMap، ويُحفظ فقط المدينة/المنطقة/البلد، ولا يُحفظ عنوان دقيق أبدًا. عند الانتهاء يمكنك رؤية إجابات المناطق الأخرى."
-    region_prefer_not: "أفضّل عدم التحديد"
     region_search_placeholder: "ابحث عن مدينتك أو منطقتك…"
     region_search_change: "تغيير"
     region_search_credit: "بحث بواسطة OpenStreetMap"
@@ -103,8 +100,6 @@ ar:
     quiz_compare_title: "كيف تقارن"
   js:
     player:
-      region_optout: "عدم مشاركة منطقتي"
-      region_optin: "مشاركة منطقتي"
       region_meta: "%{count} إجابة شاركت منطقتها"
       region_answered: "%{count} أجابوا"
       region_compare: "قارن ←"

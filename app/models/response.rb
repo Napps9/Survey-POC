@@ -1,7 +1,6 @@
 class Response < ApplicationRecord
   belongs_to :survey
   belongs_to :survey_share, optional: true
-  belongs_to :survey_region_link, optional: true
   validates :session_token, presence: true, uniqueness: true
 
   # Small-cell suppression for region groupings: any region/results view keyed
@@ -17,7 +16,7 @@ class Response < ApplicationRecord
   # add_answered_to_responses migration.
   before_save :sync_answered
 
-  # "GB|Yorkshire" — matches SurveyRegionLink#region_key for grouping.
+  # "GB|Yorkshire" — groups responses by self-declared region.
   def region_key
     region_country.present? ? "#{region_country}|#{region_label}" : nil
   end

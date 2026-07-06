@@ -72,9 +72,6 @@ uk:
     analysing: Аналіз відповідей…
   player:
     compare_promise: "Дійдіть до кінця, щоб порівняти свої відповіді з відповідями інших."
-    region_notice_linked: "Цей Verto збирає регіональні дані — ви відповідаєте як %{region}. Наприкінці ви побачите, як відповіли інші регіони."
-    region_notice_pick: "Цей Verto збирає регіональні дані — пошук місця розташування виконується через OpenStreetMap, зберігаються лише місто/регіон/країна, ніколи точна адреса. Наприкінці ви побачите, як відповіли інші регіони."
-    region_prefer_not: "Не хочу вказувати"
     region_search_placeholder: "Знайдіть своє місто або регіон…"
     region_search_change: "Змінити"
     region_search_credit: "Пошук від OpenStreetMap"
@@ -103,8 +100,6 @@ uk:
     quiz_compare_title: "Як ви порівнюєтесь"
   js:
     player:
-      region_optout: "Не ділитися моїм регіоном"
-      region_optin: "Поділитися моїм регіоном"
       region_meta: "%{count} відповідей із регіоном"
       region_answered: "%{count} відповіли"
       region_compare: "Порівняти →"

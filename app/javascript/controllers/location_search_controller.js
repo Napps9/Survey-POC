@@ -2,12 +2,13 @@ import { Controller } from "@hotwired/stimulus"
 
 // Satnav-style location search: debounced type-ahead against the server-side
 // Nominatim proxy (PlayerController#location_search / NominatimClient), used
-// by the "ask_region" welcome-card intake in place of a free-text area field.
-// Only ever hands the picked result's resolved country code + city/region
-// label up to player_controller via a dispatched event — never raw search
-// text, never coordinates (the server-side client never returns lat/lon).
+// by the "Where do you live?" demographic card in place of free text. A pick
+// is packed into the hidden value target as "CC|Label" — a plain string, read
+// generically like any other open_ended answer (see player_controller.js's
+// _read/_applyValue) — never raw search text, never coordinates (the
+// server-side client never returns lat/lon).
 export default class extends Controller {
-  static targets = ["input", "results", "selected", "selectedText"]
+  static targets = ["input", "results", "selected", "selectedText", "value"]
   static values  = { url: String }
 
   connect() {
@@ -87,7 +88,7 @@ export default class extends Controller {
     this.inputTarget.hidden = true
     if (this.hasSelectedTarget) this.selectedTarget.hidden = false
     if (this.hasSelectedTextTarget) this.selectedTextTarget.textContent = result.display_name
-    this.dispatch("picked", { detail: { country: result.country_code, label: result.label || "" } })
+    if (this.hasValueTarget) this.valueTarget.value = `${result.country_code}|${result.label || ""}`
   }
 
   _clearResults() {

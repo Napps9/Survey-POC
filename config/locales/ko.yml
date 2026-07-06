@@ -72,9 +72,6 @@ ko:
     analysing: 응답 분석 중…
   player:
     compare_promise: "끝까지 완료하면 내 답변을 다른 사람들과 비교해 볼 수 있어요."
-    region_notice_linked: "이 Verto는 지역 데이터를 수집합니다 — %{region}(으)로 응답 중입니다. 완료하면 다른 지역의 응답을 볼 수 있어요."
-    region_notice_pick: "이 Verto는 지역 데이터를 수집합니다 — 위치 검색은 OpenStreetMap을 통해 이루어지며, 저장되는 정보는 도시/지역/국가뿐이고 정확한 주소는 절대 저장되지 않습니다. 완료하면 다른 지역의 응답을 볼 수 있어요."
-    region_prefer_not: "밝히지 않음"
     region_search_placeholder: "도시 또는 지역을 검색하세요…"
     region_search_change: "변경"
     region_search_credit: "OpenStreetMap 제공 검색"
@@ -103,8 +100,6 @@ ko:
     quiz_compare_title: "내 비교 결과"
   js:
     player:
-      region_optout: "내 지역 공유 안 함"
-      region_optin: "내 지역 공유"
       region_meta: "%{count}개의 응답이 지역을 공유했어요"
       region_answered: "%{count}명 응답"
       region_compare: "비교 →"

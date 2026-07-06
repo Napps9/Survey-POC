@@ -7,8 +7,8 @@
   # Owner preview (from the dashboard): the exact respondent experience but
   # with blank recording endpoints, so stepping through never creates a
   # Response. Drafts have no publish_token, so their URLs must stay blank too.
-  # Live visitors keep the token they arrived with (publish, share or region
-  # link), so progress/submit resolve the same attribution context.
+  # Live visitors keep the token they arrived with (publish or share), so
+  # progress/submit resolve the same attribution context.
   preview_mode    = @preview == true
   play_token      = params[:token].presence || @survey.publish_token
   progress_url    = preview_mode ? "" : progress_survey_url(play_token)
@@ -20,12 +20,10 @@
   # thank-you screen. Blank in owner preview (and for token-less drafts).
   share_url       = preview_mode || play_token.blank? ? "" : play_survey_url(play_token)
 
-  # Region tags: the consent bar shows whenever this Verto captures regions —
-  # via per-region links or ask-players mode. The post-finish map needs a
+  # Every Verto captures region data via the "Where do you live?" demographic
+  # question, so the post-finish map is always available — it just needs a
   # reachable token (drafts in preview have none).
-  region_links = @survey.survey_region_links.order(:created_at).to_a
-  has_regions  = region_links.any? || @survey.ask_region?
-  regions_url  = has_regions && play_token.present? ? player_regions_url(play_token) : ""
+  regions_url = play_token.present? ? player_regions_url(play_token) : ""
 
   # Quiz mode: each graded card is scored server-side as the player advances.
   # The grade/state endpoints need a reachable token, so they're blank in owner
@@ -48,8 +46,6 @@
      data-player-consent-url-value="<%= consent_url %>"
      data-player-results-url-value="<%= results_url %>"
      data-player-regions-url-value="<%= regions_url %>"
-     data-player-region-country-value="<%= @region_link&.country_code %>"
-     data-player-region-label-value="<%= @region_link&.label %>"
      data-player-locale-value="<%= @display_locale %>"
      data-player-share-url-value="<%= share_url %>"
      data-player-show-comparison-value="<%= show_comparison %>"
@@ -68,10 +64,10 @@
     </div>
   <% end %>
 
-  <%# The regional-data notice/picker and the compare-results promise used to
-      be top banners; they now live on the welcome card (player/welcome_intake)
-      to free up screen space. The publishing org's logo (when uploaded) sits at
-      the top of the welcome card itself — see player/_play_card. %>
+  <%# The compare-results promise used to be a top banner; it now lives on the
+      welcome card (player/welcome_intake) to free up screen space. The
+      publishing org's logo (when uploaded) sits at the top of the welcome
+      card itself — see player/_play_card. %>
 
   <%# Slim content-language switcher for multilingual Vertos, so respondents can
       still change the content language. %>

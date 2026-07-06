@@ -75,12 +75,10 @@ class LiveVertoLockTest < ActionDispatch::IntegrationTest
     assert_match "locked and can&#39;t be edited", response.body, "dashboard publish needs the confirm too"
   end
 
-  test "live settings and distribution remain editable" do
-    post survey_settings_path(@live), params: { ask_region: "1" }
+  test "live settings remain editable" do
+    post survey_settings_path(@live), params: { show_results_comparison: "1", compare_note: "still editable" }
     assert_redirected_to survey_path(@live)
-    assert @live.reload.ask_region
-
-    post survey_region_links_path(@live), params: { country_code: "GB", label: "" }
-    assert_equal 1, @live.survey_region_links.count
+    assert @live.reload.show_results_comparison
+    assert_equal "still editable", @live.compare_note
   end
 end

@@ -366,6 +366,39 @@
           </div>
           <div class="freeform-date-hint">MM / YYYY</div>
         </div>
+      <% elsif card["input"] == "location" %>
+        <%# Location-flavoured open question (the "Where do you live?"
+            demographic) — satnav-style search-and-pick via OpenStreetMap
+            Nominatim instead of free text, so location data groups reliably
+            (structured city/region/country) instead of by whatever a
+            respondent happened to type. This is the ONE universal source of
+            a Verto's region data (see PlayerController#sync_region_from_answers!).
+            See NominatimClient for the privacy note (never lat/long, never a
+            raw address — only the resolved city/region/country is kept).
+            The answer itself is a plain "CC|Label" string, read generically
+            like any other open_ended card (see player_controller.js#_read). %>
+        <div class="freeform-wrap">
+          <div class="welcome-location-search" data-controller="location-search"
+               <% if @survey.publish_token.present? %>
+                 data-location-search-url-value="<%= player_location_search_url(@survey.publish_token) %>"
+               <% end %>>
+            <div class="location-search-input-wrap">
+              <input type="text" autocomplete="off" maxlength="80" class="location-search-field"
+                     placeholder="<%= t("player.region_search_placeholder") %>"
+                     data-location-search-target="input"
+                     data-action="input->location-search#search keydown->location-search#keydown" />
+              <ul class="location-search-results" data-location-search-target="results" hidden></ul>
+            </div>
+            <input type="hidden" class="location-search-value" data-location-search-target="value" />
+            <div class="location-search-selected" data-location-search-target="selected" hidden>
+              <span data-location-search-target="selectedText"></span>
+              <button type="button" class="location-search-change" data-action="click->location-search#change">
+                <%= t("player.region_search_change") %>
+              </button>
+            </div>
+            <div class="location-search-credit"><%= t("player.region_search_credit") %></div>
+          </div>
+        </div>
       <% else %>
         <div class="freeform-wrap"
              data-controller="freeform"

@@ -2,7 +2,6 @@ class Survey < ApplicationRecord
   belongs_to :organisation
   has_many :responses, dependent: :destroy
   has_many :survey_shares, dependent: :destroy
-  has_many :survey_region_links, dependent: :destroy
   has_many :alliance_vertos, dependent: :destroy
 
   scope :recent,   -> { order(updated_at: :desc) }
@@ -237,14 +236,13 @@ class Survey < ApplicationRecord
 
   # True when `value` is already in use anywhere in the /play/:token
   # namespace — this Verto's own publish_token, another Verto's slug or
-  # publish_token, or a share/region link token — so a creator-chosen slug
-  # can never make PlayerController#load_survey_and_share resolve ambiguously.
+  # publish_token, or a share token — so a creator-chosen slug can never
+  # make PlayerController#load_survey_and_share resolve ambiguously.
   def self.slug_taken?(value, excluding_id: nil)
     return false if value.blank?
     Survey.where.not(id: excluding_id).exists?(slug: value) ||
       Survey.where.not(id: excluding_id).exists?(publish_token: value) ||
-      SurveyShare.exists?(share_token: value) ||
-      SurveyRegionLink.exists?(token: value)
+      SurveyShare.exists?(share_token: value)
   end
 
   # A "responder" is anyone who answered at least one question (not just those

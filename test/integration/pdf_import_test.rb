@@ -85,7 +85,7 @@ class PdfImportTest < ActionDispatch::IntegrationTest
       "result" => { "title" => "Imported", "cards" => cards },
       "verto_name" => "Named on import", "theme" => "", "audience_age" => "", "key_insight" => "",
       "brand_palette" => nil, "default_locale" => "en", "locales" => [ "en" ],
-      "common_question_ids" => [], "region_tags" => [ { "country_code" => "GB", "label" => "" } ]
+      "common_question_ids" => []
     }
     signed = SurveysController.import_verifier.generate(payload)
 
@@ -97,7 +97,6 @@ class PdfImportTest < ActionDispatch::IntegrationTest
     assert_equal "The very long original wording of this question?", imported["text"]
     assert_equal "Named on import", verbatim.title
     assert verbatim.cards.last["demographic"], "demographic tail appended on finalize"
-    assert_equal [ "GB" ], verbatim.survey_region_links.pluck(:country_code), "region tags applied on finalize"
     refute imported.key?("compliant"), "review-only fields are stripped from stored cards"
 
     post finalize_import_survey_path, params: { payload: signed, variant: "optimised" }

@@ -72,9 +72,6 @@ ja:
     analysing: 回答を分析中…
   player:
     compare_promise: "最後まで答えると、自分の回答をみんなと比べられます。"
-    region_notice_linked: "このVertoは地域データを収集します — %{region} として回答しています。完了後、他の地域の回答を見られます。"
-    region_notice_pick: "このVertoは地域データを収集します — 場所の検索にはOpenStreetMapを使用し、保存されるのは市区町村/地域/国のみで、正確な住所は保存されません。完了後、他の地域の回答を見られます。"
-    region_prefer_not: "回答しない"
     region_search_placeholder: "都市または地域を検索…"
     region_search_change: "変更"
     region_search_credit: "OpenStreetMapによる検索"
@@ -103,8 +100,6 @@ ja:
     quiz_compare_title: "あなたの順位"
   js:
     player:
-      region_optout: "地域を共有しない"
-      region_optin: "地域を共有する"
       region_meta: "%{count} 件の回答が地域を共有"
       region_answered: "%{count} 件の回答"
       region_compare: "比較 →"

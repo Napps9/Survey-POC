@@ -106,7 +106,6 @@ class SurveysController < ApplicationController
       cards:        DemographicQuestions.append_to(result["cards"]),
       show_results_comparison: show_compare,
       quiz:         quiz,
-      ask_region:   ActiveModel::Type::Boolean.new.cast(params[:ask_region]) || false,
       brand_palette: palette.presence,
       default_locale: default_locale,
       locales:        locales
@@ -114,8 +113,6 @@ class SurveysController < ApplicationController
 
     # Remember the palette as the company default so the next Verto inherits it.
     Current.organisation.update(default_brand_palette: palette) if palette.present?
-
-    create_region_links(@survey, params[:region_tags])
 
     translate_survey!(@survey)
 
@@ -326,9 +323,6 @@ class SurveysController < ApplicationController
     end
     if params.key?(:quiz)
       attrs[:quiz] = ActiveModel::Type::Boolean.new.cast(params[:quiz])
-    end
-    if params.key?(:ask_region)
-      attrs[:ask_region] = ActiveModel::Type::Boolean.new.cast(params[:ask_region])
     end
     if params.key?(:compare_note)
       attrs[:compare_note] = params[:compare_note].to_s.strip.first(160).presence
@@ -583,9 +577,7 @@ class SurveysController < ApplicationController
       "brand_palette"       => BrandPalette.sanitize(params[:brand_palette]),
       "default_locale"      => default_locale,
       "locales"             => locales,
-      "common_question_ids" => Array(params[:common_question_ids]),
-      "ask_region"          => ActiveModel::Type::Boolean.new.cast(params[:ask_region]) || false,
-      "region_tags"         => Array(params[:region_tags]).map { |t| { "country_code" => t[:country_code].to_s, "label" => t[:label].to_s } }
+      "common_question_ids" => Array(params[:common_question_ids])
     }
   end
 
@@ -617,14 +609,12 @@ class SurveysController < ApplicationController
       audience_age:   payload["audience_age"].presence,
       key_insight:    payload["key_insight"].presence,
       cards:          cards,
-      ask_region:     payload["ask_region"] == true,
       brand_palette:  payload["brand_palette"].presence,
       default_locale: payload["default_locale"],
       locales:        payload["locales"]
     )
 
     Current.organisation.update(default_brand_palette: payload["brand_palette"]) if payload["brand_palette"].present?
-    create_region_links(survey, payload["region_tags"])
     translate_survey!(survey)
     auto_populate_assets!(survey)
     survey
@@ -636,18 +626,6 @@ class SurveysController < ApplicationController
     AssetPopulator.new(survey).populate!
   rescue => e
     Rails.logger.error("[AssetPopulator] #{e.class}: #{e.message}")
-  end
-
-  # Region tags picked in the creation wizard: [{ country_code:, label: }, …].
-  # Invalid or duplicate entries are skipped silently — tags are managed (and
-  # visible) in the editor's publish panel right after creation.
-  def create_region_links(survey, tags_param)
-    Array(tags_param).each do |tag|
-      survey.survey_region_links.create(
-        country_code: tag[:country_code] || tag["country_code"],
-        label:        (tag[:label] || tag["label"]).to_s.strip.presence
-      )
-    end
   end
 
   # Snapshot the SELECTED Common Questions into Verto-card hashes. Takes
