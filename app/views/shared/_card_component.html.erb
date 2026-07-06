@@ -28,7 +28,11 @@
   quiz_mode    = editable && is_q && !!quiz_on
   correct_vals = Array(card["correct"]).map(&:to_s)
   correct_map  = card["correct"].is_a?(Hash) ? card["correct"] : {}
-  mark_correct = ->(label) { correct_vals.include?(label.to_s) }
+  # Editor-only: the player's own reveal (player_controller.js#_tintOptions)
+  # tints options from the server's graded response, not this attribute — so
+  # gating it here means the correct answer never sits in the player's HTML
+  # at all (not just hidden by CSS), whether marked correct or not.
+  mark_correct = ->(label) { editable && correct_vals.include?(label.to_s) }
 
   # Picker-style lists carry an extra card-editor controller in :editor
   # mode so the per-card "delete option" / "add option" actions resolve.

@@ -4169,8 +4169,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .choice-card[data-correct="true"] .mark-correct {
   background: #10B981; border-color: #10B981; color: #fff;
 }
-.pick-item[data-correct="true"] { outline: 2px solid rgba(16,185,129,0.55); outline-offset: 1px; border-radius: 14px; }
-.choice-card[data-correct="true"] { outline: 2px solid #10B981; outline-offset: 1px; }
+/* Scoped to the editor's own card markup ([data-card-component], only
+   rendered when editable — see _card_component.html.erb) so this outline
+   never leaks the correct answer to a respondent: data-correct="true" is
+   set on every render of the card (editor, preview, and the live player),
+   not just the editor's. */
+[data-card-component] .pick-item[data-correct="true"] { outline: 2px solid rgba(16,185,129,0.55); outline-offset: 1px; border-radius: 14px; }
+[data-card-component] .choice-card[data-correct="true"] { outline: 2px solid #10B981; outline-offset: 1px; }
 
 /* The correct-answer block (swipe directions, scale/open answers, explanation). */
 .quiz-correct-block {

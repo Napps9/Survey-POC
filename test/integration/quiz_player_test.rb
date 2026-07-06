@@ -126,6 +126,18 @@ class QuizPlayerTest < ActionDispatch::IntegrationTest
     assert_equal 100, q1["pct"], "both got the capital right"
   end
 
+  test "the initial player page never reveals which option is correct" do
+    s = quiz_survey
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    # data-correct="true" is an editor-only marker (see _card_component.html.erb,
+    # mark_correct) — asserting it never renders "true" here guards against it
+    # (or its outline styling) leaking the answer before the respondent has
+    # even picked one. Every option renders data-correct="false" outside the
+    # editor, so this checks the specific leaking value, not the attribute.
+    refute_match('data-correct="true"', response.body)
+  end
+
   test "grade and scores are forbidden for a non-quiz Verto" do
     s = quiz_survey(quiz: false)
     json_post grade_survey_path(s.publish_token), session_token: "x", card_index: 1, answers: {}
