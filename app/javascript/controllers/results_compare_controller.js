@@ -18,7 +18,7 @@ const MAP_SELECTED_STROKE = "#ffffff"
 const SKIP_TYPES = new Set([ "welcome_card", "token_checkpoint" ])
 
 export default class extends Controller {
-  static targets = [ "panel", "meta", "picker", "body", "openBtn" ]
+  static targets = [ "stage", "panel", "meta", "picker", "body", "openBtn" ]
   static values  = { url: String }
 
   _data     = null
@@ -27,14 +27,39 @@ export default class extends Controller {
   _escHandler = null
   _mapData  = null
   _mapSvg   = null
+  _stagePlaceholder = null
 
+  // Compare mode moves the "stage" (map + panel) to <body> for full-screen
+  // room, and its interactive bits (close button, picker chips, card
+  // collapse toggles) are wired below with addEventListener rather than
+  // data-action. Two things drive this:
+  //  1. Stimulus target/action scope is DOM-proximity based to the
+  //     controller root — once the stage is a child of <body> instead of
+  //     this.element, anything inside it stops resolving as a target.
+  //  2. Moving `this.element` ITSELF (rather than a child) doesn't work —
+  //     confirmed by testing — because Stimulus treats the reparenting as
+  //     a disconnect+reconnect of the whole controller (removedNodes on the
+  //     old parent, addedNodes on the new one), which silently reverts any
+  //     manual DOM move performed inside a lifecycle method and duplicates
+  //     event listeners on reconnect. Caching plain element refs up front,
+  //     once, sidesteps both problems entirely.
   connect() {
+    this._stageEl  = this.stageTarget
+    this._panelEl  = this.panelTarget
+    this._metaEl   = this.metaTarget
+    this._pickerEl = this.pickerTarget
+    this._bodyEl   = this.bodyTarget
+    this._openBtnEl = this.openBtnTarget
+
+    this._panelEl.querySelector(".compare-close-btn").addEventListener("click", () => this.close())
+
     this._setupMap()
     this._loadPromise = this._loadData()
   }
 
   disconnect() {
     if (this._escHandler) document.removeEventListener("keydown", this._escHandler)
+    this._exitFullscreen()
   }
 
   async _loadData() {
@@ -56,7 +81,7 @@ export default class extends Controller {
   // country's tagged region segments together — the smallest unit the map
   // can represent, even when a country holds several distinct regions.
   _setupMap() {
-    this._mapSvg = this.element.querySelector(".world-map")
+    this._mapSvg = this._stageEl.querySelector(".world-map")
     const dataEl = document.getElementById("results-region-map-data")
     this._mapData = dataEl ? JSON.parse(dataEl.textContent) : {}
     if (!this._mapSvg) return
@@ -103,7 +128,7 @@ export default class extends Controller {
     })
   }
 
-  // ── Panel open/close ─────────────────────────────────────────────────────
+  // ── Panel open/close (full-screen) ──────────────────────────────────────
   async toggle() {
     if (this._isOpen) { this.close(); return }
     await this.open()
@@ -111,8 +136,13 @@ export default class extends Controller {
 
   async open() {
     this._isOpen = true
-    this.panelTarget.classList.remove("hidden")
-    this.openBtnTarget.classList.add("is-active")
+    this._panelEl.classList.remove("hidden")
+    this._openBtnEl.classList.add("is-active")
+
+    this._stagePlaceholder = document.createComment("compare-stage-placeholder")
+    this._stageEl.before(this._stagePlaceholder)
+    document.body.appendChild(this._stageEl)
+    this._stageEl.classList.add("is-fullscreen")
 
     if (!this._escHandler) {
       this._escHandler = (e) => { if (e.key === "Escape") this.close() }
@@ -120,11 +150,11 @@ export default class extends Controller {
     document.addEventListener("keydown", this._escHandler)
 
     if (!this._data) {
-      this.metaTarget.textContent = "Loading…"
+      this._metaEl.textContent = "Loading…"
       await this._loadPromise
     }
     if (!this._data) {
-      this.metaTarget.textContent = "Couldn't load comparison data."
+      this._metaEl.textContent = "Couldn't load comparison data."
       return
     }
 
@@ -134,13 +164,20 @@ export default class extends Controller {
 
   close() {
     this._isOpen = false
-    this.panelTarget.classList.add("hidden")
-    this.openBtnTarget.classList.remove("is-active")
+    this._panelEl.classList.add("hidden")
+    this._openBtnEl.classList.remove("is-active")
+    this._exitFullscreen()
     if (this._escHandler) document.removeEventListener("keydown", this._escHandler)
   }
 
-  toggleSegment(event) {
-    const id = event.currentTarget.dataset.segmentId
+  _exitFullscreen() {
+    if (!this._stagePlaceholder) return
+    this._stageEl.classList.remove("is-fullscreen")
+    this._stagePlaceholder.replaceWith(this._stageEl)
+    this._stagePlaceholder = null
+  }
+
+  _toggleSegment(id) {
     if (this._selected.has(id)) this._selected.delete(id); else this._selected.add(id)
     this._paintMap()
     this._renderPicker()
@@ -153,42 +190,56 @@ export default class extends Controller {
   }
 
   _renderPicker() {
-    this.metaTarget.textContent = `${this._selected.size} of ${this._data.segments.length} shown — click to add or remove`
-    this.pickerTarget.innerHTML = ""
+    this._metaEl.textContent = `${this._selected.size} of ${this._data.segments.length} shown — click to add or remove`
+    this._pickerEl.innerHTML = ""
     this._data.segments.forEach(seg => {
       const chip = document.createElement("button")
       chip.type = "button"
       chip.className = `compare-chip${this._selected.has(seg.id) ? " is-active" : ""}`
       chip.dataset.segmentId = seg.id
-      chip.dataset.action = "click->results-compare#toggleSegment"
       chip.innerHTML = `<span class="compare-chip-dot" style="background:${this._colorFor(seg.id)}"></span>` +
         `${esc(seg.label)} <span class="compare-chip-count">${seg.count}</span>`
-      this.pickerTarget.appendChild(chip)
+      chip.addEventListener("click", () => this._toggleSegment(seg.id))
+      this._pickerEl.appendChild(chip)
     })
   }
 
   _renderBody() {
     const selected = this._data.segments.filter(s => this._selected.has(s.id))
-    this.bodyTarget.innerHTML = ""
+    this._bodyEl.innerHTML = ""
     if (!selected.length) {
-      this.bodyTarget.innerHTML = `<div class="compare-empty">Pick at least one segment above (or click a region on the map) to compare.</div>`
+      this._bodyEl.innerHTML = `<div class="compare-empty">Pick at least one segment above (or click a region on the map) to compare.</div>`
       return
     }
     this._data.cards.forEach(card => {
       const el = this._buildCardComparison(card, selected)
-      if (el) this.bodyTarget.appendChild(el)
+      if (el) this._bodyEl.appendChild(el)
     })
   }
 
+  // Each card starts expanded with a chevron header that collapses it down
+  // to just the question text, so a long list of questions can be scanned
+  // quickly and expanded one at a time.
   _buildCardComparison(card, selected) {
     if (SKIP_TYPES.has(card.type)) return null
 
     const wrap = document.createElement("div")
     wrap.className = "compare-card"
-    wrap.innerHTML = `<div class="compare-card-eyebrow">Card ${card.index + 1}</div>` +
-      `<div class="compare-card-head">${esc(card.text || "")}</div>`
+
+    const head = document.createElement("button")
+    head.type = "button"
+    head.className = "compare-card-head"
+    head.innerHTML =
+      `<span class="compare-card-chevron">▾</span>` +
+      `<span class="compare-card-head-text">` +
+        `<span class="compare-card-eyebrow">Card ${card.index + 1}</span>` +
+        `<span class="compare-card-title">${esc(card.text || "")}</span>` +
+      `</span>`
+    head.addEventListener("click", () => wrap.classList.toggle("is-collapsed"))
+    wrap.appendChild(head)
 
     const body = document.createElement("div")
+    body.className = "compare-card-content"
 
     if (card.type === "open_ended") {
       selected.forEach(seg => {

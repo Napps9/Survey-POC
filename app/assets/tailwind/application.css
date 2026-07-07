@@ -3970,6 +3970,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
   border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 14px 34px rgba(0,0,0,0.4);
 }
 .compare-panel.hidden { display: none; }
+
+/* Compare mode: the "stage" (map + panel) goes full-screen for real room to
+   compare, rather than being squeezed into the results page's inline flow.
+   The controller moves THIS element (`.regions-box-body`, not the
+   `.regions-box` controller root above it) to <body> to get here — see
+   results_compare_controller.js#open for why it has to be this element. */
+.regions-box-body.is-fullscreen {
+  position: fixed; inset: 0; z-index: 9999; margin: 0;
+  background: #1C2034; padding: 20px 28px; align-items: stretch;
+}
+.regions-box-body.is-fullscreen .regions-map-col {
+  flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;
+}
+.regions-box-body.is-fullscreen .regions-map-col > div { max-width: 900px; width: 100%; margin: 0; }
+.regions-box-body.is-fullscreen .compare-panel { flex: 0 0 420px; width: 420px; max-height: none; }
 .compare-panel-head {
   flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
   gap: 10px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -4011,14 +4026,29 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
 .compare-card { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .compare-card:last-child { margin-bottom: 0; border-bottom: none; }
+
+/* Clickable header — collapses the card's bars/notes to just this row so a
+   long list of questions can be scanned quickly, then expanded one at a
+   time. */
+.compare-card-head {
+  display: flex; align-items: flex-start; gap: 8px; width: 100%; margin-bottom: 10px;
+  background: none; border: none; padding: 0; text-align: left; cursor: pointer;
+}
+.compare-card-chevron {
+  flex-shrink: 0; margin-top: 3px; font-size: 10px; color: rgba(255,255,255,0.4);
+  transition: transform 0.15s;
+}
+.compare-card.is-collapsed .compare-card-chevron { transform: rotate(-90deg); }
+.compare-card.is-collapsed .compare-card-head { margin-bottom: 0; }
+.compare-card-head-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .compare-card-eyebrow {
   font-family: "Alata", sans-serif; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(255,255,255,0.35); margin-bottom: 3px;
+  color: rgba(255,255,255,0.35);
 }
-.compare-card-head {
-  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #fff; font-weight: 500;
-  line-height: 1.4; margin-bottom: 10px;
+.compare-card-title {
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #fff; font-weight: 500; line-height: 1.4;
 }
+.compare-card.is-collapsed .compare-card-content { display: none; }
 
 .compare-option-group { margin-bottom: 10px; }
 .compare-option-group:last-child { margin-bottom: 0; }

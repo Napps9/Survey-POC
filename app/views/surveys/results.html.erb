@@ -123,10 +123,11 @@
 
             <%# ── Map stays visible & clickable at all times; the comparison
                 panel docks beside it (never over it, so nothing on the map
-                is ever hidden behind the panel) instead of taking over the
-                screen, so exploring never loses the map as a spatial
-                reference. ── %>
-            <div class="regions-box-body">
+                is ever hidden behind the panel). Compare mode takes this
+                whole stage (map + panel) full-screen for real room to
+                compare — see the controller for why it's this element (not
+                the controller root above) that gets moved to <body>. ── %>
+            <div class="regions-box-body" data-results-compare-target="stage">
               <div class="regions-map-col">
                 <%= render "shared/world_map" %>
               </div>
@@ -137,7 +138,7 @@
                     <div class="compare-panel-title">Compare regions</div>
                     <div class="compare-panel-meta" data-results-compare-target="meta">Loading…</div>
                   </div>
-                  <button type="button" class="compare-close-btn" data-action="click->results-compare#close" aria-label="Close">✕</button>
+                  <button type="button" class="compare-close-btn" aria-label="Close">✕</button>
                 </div>
                 <div class="compare-picker" data-results-compare-target="picker"></div>
                 <div class="compare-body" data-results-compare-target="body"></div>
