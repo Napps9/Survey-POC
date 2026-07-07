@@ -4292,6 +4292,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .editing-translation .token-inputs,
 .editing-translation .token-award-block { display: none; }
 
+/* These blocks live in the editor's Tokenomics/Quiz mode sidebar tabs now
+   (see type-panel controller's selectCard), not on the card — hide them
+   whenever they're still sitting in their originally-rendered position
+   inside the card (every card but the one currently open in the panel, and
+   even that one before it's first selected). Once JS relocates a block out
+   of .survey-card-wrap into the sidebar's .card-subview, this no longer
+   matches and it shows normally. */
+.survey-card-wrap .quiz-correct-block,
+.survey-card-wrap .token-award-block { display: none; }
+
 /* Per-option "mark correct" toggle on list + grid choices. */
 .mark-correct {
   flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
