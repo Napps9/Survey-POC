@@ -17,24 +17,11 @@ const MAP_SELECTED_STROKE = "#ffffff"
 
 const SKIP_TYPES = new Set([ "welcome_card", "token_checkpoint" ])
 
-// Real name → coordinate data for placing pins accurately within a zoomed
-// country, instead of an even spread that ignored real geography entirely
-// (e.g. Texas and New York landing at the same latitude). Bundled at
-// public/geo/region_coords.json — ~159k place names (admin-1 regions +
-// cities) merged from two public datasets; see public/geo/ATTRIBUTION.md
-// for sources/licenses. Fetched once, lazily, only when this controller's
-// regions box exists. Unrecognized location names (arbitrary respondent-
-// typed text the dataset doesn't cover) fall back to the even spread in
-// _positionPins — there's no way to place free text accurately without a
-// geocoding service, so this only upgrades the names it actually knows.
-const GEO_DATA_URL = "/geo/region_coords.json"
-
 export default class extends Controller {
   static targets = [ "stage", "panel", "meta", "picker", "body", "openBtn", "mapStage" ]
   static values  = { url: String }
 
   _data     = null
-  _geo      = null
   _selected = new Set()
   _isOpen   = false
   _escHandler = null
@@ -75,7 +62,6 @@ export default class extends Controller {
 
     this._setupMap()
     this._loadPromise = this._loadData()
-    this._loadGeoData()
 
     this._resizeHandler = () => this._positionPins()
     window.addEventListener("resize", this._resizeHandler)
@@ -88,21 +74,10 @@ export default class extends Controller {
     this._exitFullscreen()
   }
 
-  // Fetched independently of _loadData/_data (segments/aggregates) — this is
-  // a static reference dataset, not per-survey data. Re-positions any
-  // already-rendered pins once it arrives, in case they were placed with
-  // the even-spread fallback because this fetch hadn't resolved yet.
-  async _loadGeoData() {
-    try {
-      const res = await fetch(GEO_DATA_URL)
-      this._geo = await res.json()
-    } catch (_) {
-      this._geo = null
-      return
-    }
-    this._positionPins()
-  }
-
+  // Segments carry a server-resolved lat/lng for pin placement when
+  // available (see SurveysController#results_compare /
+  // NominatimGeocodeClient) alongside a per-country `bounds` map — both
+  // fetched here, no separate request needed.
   async _loadData() {
     try {
       const res = await fetch(this.urlValue, { headers: { "Accept": "application/json" } })
@@ -232,25 +207,22 @@ export default class extends Controller {
     this._zoomRaf = requestAnimationFrame(step)
   }
 
-  // Placement uses real coordinates for recognized location names (see
-  // GEO_DATA_URL); unrecognized free text falls back to an even split
-  // across the country's shape in _positionPins, since there's no way to
-  // place arbitrary respondent-typed text accurately without a geocoding
-  // service.
+  // Placement uses the coordinate the server resolved for this segment
+  // (see _geoFractionFor); falls back to an even split across the
+  // country's shape in _positionPins when unresolved.
   _renderPins(cc, regionIds) {
     this._clearPins()
     this._zoomedCountry = cc
     const orderedIds = this._data.segments.map(s => s.id).filter(id => regionIds.includes(id))
     this._pins = orderedIds.map((id, i) => {
       const seg = this._data.segments.find(s => s.id === id)
-      const regionName = this._regionNameFor(seg, cc)
       const pin = document.createElement("div")
       pin.className = "map-pin"
       pin.innerHTML =
         `<span class="map-pin-dot" style="background:${this._colorFor(id)}"></span>` +
-        `<span class="map-pin-label">${esc(regionName)}</span>`
+        `<span class="map-pin-label">${esc(this._regionNameFor(seg, cc))}</span>`
       this._mapStageEl.appendChild(pin)
-      return { el: pin, index: i, total: orderedIds.length, regionName }
+      return { el: pin, index: i, total: orderedIds.length, lat: seg.lat, lng: seg.lng }
     })
     this._positionPins()
   }
@@ -261,28 +233,20 @@ export default class extends Controller {
     this._zoomedCountry = null
   }
 
-  // regionName may be a single name ("Texas") or a "City, Region" pair (the
-  // shape NominatimClient's satnav-style location search stores when a
-  // respondent's search resolved both) — try each comma-separated part in
-  // turn, most specific (city) first, since the dataset indexes both
-  // cities and admin-1 regions under the same per-country name map.
-  _geoFractionFor(cc, regionName) {
-    if (!this._geo) return null
-    const bounds = this._geo.bounds[cc]
-    const places = this._geo.places[cc]
-    if (!bounds || !places) return null
-
+  // Uses the coordinate resolved server-side (see
+  // SurveysController#results_compare / NominatimGeocodeClient) against the
+  // country's real geographic bounds (CountryBoundingBoxes) when both are
+  // available; falls back to an even split across the country's shape
+  // otherwise — e.g. Nominatim had no match for this particular tag, or the
+  // country isn't in the (curated, ~170-country) bounds table.
+  _geoFractionFor(cc, lat, lng) {
+    const bounds = this._data.bounds?.[cc]
+    if (!bounds || lat == null || lng == null) return null
     const [ minLat, maxLat, minLng, maxLng ] = bounds
-    for (const part of regionName.split(",")) {
-      const loc = places[part.trim().toLowerCase()]
-      if (!loc) continue
-      const [ lat, lng ] = loc
-      return {
-        fracX: Math.min(1, Math.max(0, (lng - minLng) / (maxLng - minLng))),
-        fracY: Math.min(1, Math.max(0, (maxLat - lat) / (maxLat - minLat)))
-      }
+    return {
+      fracX: Math.min(1, Math.max(0, (lng - minLng) / (maxLng - minLng))),
+      fracY: Math.min(1, Math.max(0, (maxLat - lat) / (maxLat - minLat)))
     }
-    return null
   }
 
   _positionPins() {
@@ -292,8 +256,8 @@ export default class extends Controller {
     if (!countryEl || !ctm) return
     const bbox = this._boundsElFor(countryEl).getBBox()
     const stageRect = this._mapStageEl.getBoundingClientRect()
-    this._pins.forEach(({ el, index, total, regionName }) => {
-      const geo = this._geoFractionFor(this._zoomedCountry, regionName)
+    this._pins.forEach(({ el, index, total, lat, lng }) => {
+      const geo = this._geoFractionFor(this._zoomedCountry, lat, lng)
       const fracX = geo ? geo.fracX : (index + 1) / (total + 1)
       const fracY = geo ? geo.fracY : 0.5
       const pt = this._mapSvg.createSVGPoint()

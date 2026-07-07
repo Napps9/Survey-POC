@@ -433,12 +433,14 @@ class SurveysController < ApplicationController
   def results_compare
     _base, segments, = resolve_result_segments(@survey, nil)
     cards = Array(@survey.cards)
+    coords_by_id = geocode_compare_segments(segments)
 
     render json: {
       ok: true,
       cards: cards.map.with_index { |card, idx| { index: idx, type: card["type"], text: card["text"], options: card["options"] } },
-      segments: segments.map { |seg| seg.slice(:id, :label, :count) },
-      aggregates: segments.each_with_object({}) { |seg, acc| acc[seg[:id]] = aggregate_results(cards, seg[:scope]) }
+      segments: segments.map { |seg| seg.slice(:id, :label, :count).merge(coords_by_id[seg[:id]] || {}) },
+      aggregates: segments.each_with_object({}) { |seg, acc| acc[seg[:id]] = aggregate_results(cards, seg[:scope]) },
+      bounds: compare_country_bounds(segments)
     }
   end
 
@@ -528,6 +530,32 @@ class SurveysController < ApplicationController
   end
 
   private
+
+  # Geocoding is capped per request (not per survey) so a Verto with an
+  # unusually wide spread of tagged regions can't turn one page load into
+  # 20+ seconds of sequential Nominatim calls — results are cached for a
+  # month (see NominatimGeocodeClient), so this only ever bites the first
+  # viewer after new regions show up. Returns { segment_id => { lat:, lng: } }.
+  COMPARE_GEOCODE_CAP = 12
+
+  def geocode_compare_segments(segments)
+    geocodable = segments.select { |s| s[:country].present? && s[:region_label].present? }.first(COMPARE_GEOCODE_CAP)
+    geocodable.each_with_object({}) do |seg, acc|
+      coords = NominatimGeocodeClient.coordinates_for(query: seg[:region_label], country_code: seg[:country])
+      acc[seg[:id]] = { lat: coords[:lat], lng: coords[:lng] } if coords
+    end
+  end
+
+  # { country_code (lowercase) => [min_lat, max_lat, min_lng, max_lng] } for
+  # every distinct country among this survey's region segments — lets the
+  # results-compare map place a resolved coordinate proportionally within
+  # the country's own drawn shape.
+  def compare_country_bounds(segments)
+    segments.filter_map { |s| s[:country] }.uniq.each_with_object({}) do |cc, acc|
+      box = CountryBoundingBoxes.for(cc)
+      acc[cc.downcase] = box if box
+    end
+  end
 
   def pexels_photo_results(query, orientation, context, age = [])
     PexelsClient.new.search(query: query, orientation: orientation, per_page: 24)

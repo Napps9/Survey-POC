@@ -44,11 +44,12 @@ module ResolvesResultSegments
       name    = WorldRegions.name_for(country)
       display = label.present? ? "#{name} · #{label}" : name
       segments << {
-        id:      "region_#{Digest::MD5.hexdigest("#{country}|#{label}").first(10)}",
-        label:   "🌍 #{display}",
-        country: country,
-        scope:   base.where(region_country: country, region_label: label),
-        count:   count
+        id:           "region_#{Digest::MD5.hexdigest("#{country}|#{label}").first(10)}",
+        label:        "🌍 #{display}",
+        country:      country,
+        region_label: label,
+        scope:        base.where(region_country: country, region_label: label),
+        count:        count
       }
     end
 
