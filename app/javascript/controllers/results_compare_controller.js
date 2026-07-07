@@ -17,6 +17,38 @@ const MAP_SELECTED_STROKE = "#ffffff"
 
 const SKIP_TYPES = new Set([ "welcome_card", "token_checkpoint" ])
 
+// Real geographic bounding boxes (lat/lng) for the mainland shape of each
+// supported country, and real approximate coordinates for common tagged
+// locations within them. When BOTH are known for a pin, it's placed at its
+// true relative position within the country's shape instead of an even
+// spread — spreading pins evenly ignored real geography entirely (e.g.
+// Texas and New York landing at the same latitude). Unrecognized location
+// names (arbitrary respondent-typed text) still fall back to the even
+// spread in _positionPins — there's no way to place free text accurately
+// without a geocoding service, so this only upgrades the names we actually
+// know rather than guessing at ones we don't.
+const GEO_COUNTRY_BOUNDS = {
+  us: { minLat: 24.5,   maxLat: 49.4,   minLng: -125.0, maxLng: -66.9 },
+  gb: { minLat: 49.9,   maxLat: 60.85,  minLng: -8.65,  maxLng: 1.76 },
+  es: { minLat: 36.0,   maxLat: 43.79,  minLng: -9.3,   maxLng: 3.32 },
+  za: { minLat: -34.83, maxLat: -22.13, minLng: 16.45,  maxLng: 32.95 },
+  au: { minLat: -39.2,  maxLat: -10.7,  minLng: 113.15, maxLng: 153.6 }
+}
+const GEO_LOCATION_COORDS = {
+  "texas":              { lat: 31.0,   lng: -99.9 },
+  "new york":           { lat: 42.9,   lng: -75.5 },
+  "california":         { lat: 36.7,   lng: -119.4 },
+  "edinburgh":          { lat: 55.95,  lng: -3.19 },
+  "london":             { lat: 51.51,  lng: -0.13 },
+  "greater london":     { lat: 51.51,  lng: -0.13 },
+  "manchester":         { lat: 53.48,  lng: -2.24 },
+  "greater manchester": { lat: 53.48,  lng: -2.24 },
+  "madrid":             { lat: 40.42,  lng: -3.70 },
+  "western cape":       { lat: -33.2,  lng: 21.0 },
+  "gauteng":            { lat: -26.2,  lng: 28.05 },
+  "new south wales":    { lat: -32.5,  lng: 146.5 }
+}
+
 export default class extends Controller {
   static targets = [ "stage", "panel", "meta", "picker", "body", "openBtn", "mapStage" ]
   static values  = { url: String }
@@ -203,23 +235,25 @@ export default class extends Controller {
     this._zoomRaf = requestAnimationFrame(step)
   }
 
-  // Placement is an even split across the country's own shape, not a real
-  // coordinate — location labels are free text respondents typed, not
-  // geocoded points, so this is honest about what we actually know rather
-  // than faking a boundary or a precise position.
+  // Placement uses real coordinates for recognized location names (see
+  // GEO_LOCATION_COORDS); unrecognized free text falls back to an even
+  // split across the country's shape in _positionPins, since there's no
+  // way to place arbitrary respondent-typed text accurately without a
+  // geocoding service.
   _renderPins(cc, regionIds) {
     this._clearPins()
     this._zoomedCountry = cc
     const orderedIds = this._data.segments.map(s => s.id).filter(id => regionIds.includes(id))
     this._pins = orderedIds.map((id, i) => {
       const seg = this._data.segments.find(s => s.id === id)
+      const regionName = this._regionNameFor(seg, cc)
       const pin = document.createElement("div")
       pin.className = "map-pin"
       pin.innerHTML =
         `<span class="map-pin-dot" style="background:${this._colorFor(id)}"></span>` +
-        `<span class="map-pin-label">${esc(this._regionNameFor(seg, cc))}</span>`
+        `<span class="map-pin-label">${esc(regionName)}</span>`
       this._mapStageEl.appendChild(pin)
-      return { el: pin, index: i, total: orderedIds.length }
+      return { el: pin, index: i, total: orderedIds.length, regionName }
     })
     this._positionPins()
   }
@@ -230,6 +264,16 @@ export default class extends Controller {
     this._zoomedCountry = null
   }
 
+  _geoFractionFor(cc, regionName) {
+    const bounds = GEO_COUNTRY_BOUNDS[cc]
+    const loc = GEO_LOCATION_COORDS[regionName.trim().toLowerCase()]
+    if (!bounds || !loc) return null
+    return {
+      fracX: Math.min(1, Math.max(0, (loc.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng))),
+      fracY: Math.min(1, Math.max(0, (bounds.maxLat - loc.lat) / (bounds.maxLat - bounds.minLat)))
+    }
+  }
+
   _positionPins() {
     if (!this._pins.length || !this._zoomedCountry || !this._mapSvg) return
     const countryEl = this._mapSvg.querySelector("#" + this._zoomedCountry)
@@ -237,10 +281,13 @@ export default class extends Controller {
     if (!countryEl || !ctm) return
     const bbox = this._boundsElFor(countryEl).getBBox()
     const stageRect = this._mapStageEl.getBoundingClientRect()
-    this._pins.forEach(({ el, index, total }) => {
+    this._pins.forEach(({ el, index, total, regionName }) => {
+      const geo = this._geoFractionFor(this._zoomedCountry, regionName)
+      const fracX = geo ? geo.fracX : (index + 1) / (total + 1)
+      const fracY = geo ? geo.fracY : 0.5
       const pt = this._mapSvg.createSVGPoint()
-      pt.x = bbox.x + bbox.width * (index + 1) / (total + 1)
-      pt.y = bbox.y + bbox.height * 0.5
+      pt.x = bbox.x + bbox.width * fracX
+      pt.y = bbox.y + bbox.height * fracY
       const screen = pt.matrixTransform(ctm)
       el.style.left = `${screen.x - stageRect.left}px`
       el.style.top = `${screen.y - stageRect.top}px`
