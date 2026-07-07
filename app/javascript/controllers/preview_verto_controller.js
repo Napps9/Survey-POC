@@ -144,24 +144,30 @@ export default class extends Controller {
     //    token-award-block are the creator's Tokenomics/Quiz mode controls
     //    (relocated into the editor's sidebar tabs, or parked off-screen —
     //    either way still present in the editor DOM this clones from) and
-    //    must never reach a respondent-facing view.
+    //    must never reach a respondent-facing view. other-edit-toggle is the
+    //    "Allow other" / "Required" checkboxes shown only to the creator.
     clone.querySelectorAll(
       ".pick-item-delete, .tap-card-delete, .pick-add-btn, .tap-add-btn, .add-media-fab, " +
-      ".split-left-design-prompt, .quiz-correct-block, .token-award-block"
+      ".split-left-design-prompt, .quiz-correct-block, .token-award-block, .other-edit-toggle"
     ).forEach(el => el.remove())
 
-    // 2. Strip contenteditable from everything so preview is read-only.
+    // 2. The "+ Other" CTA is disabled in the editor itself (there the
+    //    checkbox above it does the toggling, not the button) — re-enable it
+    //    so a "Preview" respondent can actually open the free-text panel.
+    clone.querySelectorAll(".other-cta-btn").forEach(el => el.removeAttribute("disabled"))
+
+    // 3. Strip contenteditable from everything so preview is read-only.
     clone.querySelectorAll("[contenteditable]").forEach(el =>
       el.removeAttribute("contenteditable")
     )
 
-    // 3. Drop editor-only marker attributes.
+    // 4. Drop editor-only marker attributes.
     clone.querySelectorAll("[data-card-component], [data-card-media]").forEach(el => {
       el.removeAttribute("data-card-component")
       el.removeAttribute("data-card-media")
     })
 
-    // 4. Strip the "card-editor" Stimulus controller binding — only
+    // 5. Strip the "card-editor" Stimulus controller binding — only
     //    "picker" / "tap-stack" should survive on the preview clone.
     clone.querySelectorAll("[data-controller]").forEach(el => {
       const cleaned = el.getAttribute("data-controller")
@@ -169,7 +175,7 @@ export default class extends Controller {
       el.setAttribute("data-controller", cleaned)
     })
 
-    // 5. Reset interactive state so each open() starts clean.
+    // 6. Reset interactive state so each open() starts clean.
     clone.querySelectorAll('[data-picker-target="item"]').forEach(el => {
       el.setAttribute("data-selected", "false")
       el.classList.remove("selected", "active")
@@ -182,7 +188,7 @@ export default class extends Controller {
       if (bg) el.style.background = bg
     })
 
-    // 6. Drop the editor's active-card outline class if present.
+    // 7. Drop the editor's active-card outline class if present.
     clone.classList.remove("selected")
   }
 }
