@@ -140,9 +140,14 @@ export default class extends Controller {
   }
 
   _stripEditorChrome(clone) {
-    // 1. Remove editor-only chrome elements outright.
+    // 1. Remove editor-only chrome elements outright. quiz-correct-block /
+    //    token-award-block are the creator's Tokenomics/Quiz mode controls
+    //    (relocated into the editor's sidebar tabs, or parked off-screen —
+    //    either way still present in the editor DOM this clones from) and
+    //    must never reach a respondent-facing view.
     clone.querySelectorAll(
-      ".pick-item-delete, .tap-card-delete, .pick-add-btn, .tap-add-btn, .add-media-fab, .split-left-design-prompt"
+      ".pick-item-delete, .tap-card-delete, .pick-add-btn, .tap-add-btn, .add-media-fab, " +
+      ".split-left-design-prompt, .quiz-correct-block, .token-award-block"
     ).forEach(el => el.remove())
 
     // 2. Strip contenteditable from everything so preview is read-only.
