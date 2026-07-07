@@ -162,7 +162,7 @@ export default class extends Controller {
       const cc = [ ...countries ][0]
       const countryEl = this._mapSvg.querySelector("#" + cc)
       if (countryEl) {
-        const bbox = countryEl.getBBox()
+        const bbox = this._boundsElFor(countryEl).getBBox()
         const padX = Math.max(bbox.width * 0.4, 8)
         const padY = Math.max(bbox.height * 0.4, 8)
         this._zoomTo([ bbox.x - padX, bbox.y - padY, bbox.width + padX * 2, bbox.height + padY * 2 ])
@@ -173,6 +173,15 @@ export default class extends Controller {
 
     this._zoomTo(this._worldViewBox)
     this._clearPins()
+  }
+
+  // Multi-part countries (e.g. the US: mainland + Alaska + Hawaii + islands,
+  // all under one <g>) mark their primary landmass with a "mainland" class.
+  // Bounding the WHOLE group would span oceans of empty space between the
+  // parts and place pins in the gap rather than on land — bound just the
+  // mainland when there is one.
+  _boundsElFor(countryEl) {
+    return countryEl.querySelector(".mainland") || countryEl
   }
 
   _zoomTo(targetBox) {
@@ -226,7 +235,7 @@ export default class extends Controller {
     const countryEl = this._mapSvg.querySelector("#" + this._zoomedCountry)
     const ctm = this._mapSvg.getScreenCTM()
     if (!countryEl || !ctm) return
-    const bbox = countryEl.getBBox()
+    const bbox = this._boundsElFor(countryEl).getBBox()
     const stageRect = this._mapStageEl.getBoundingClientRect()
     this._pins.forEach(({ el, index, total }) => {
       const pt = this._mapSvg.createSVGPoint()
