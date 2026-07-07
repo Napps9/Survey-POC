@@ -62,17 +62,19 @@ class PdfQuestionImporterTest < ActiveSupport::TestCase
     assert_not result["cards"][1].key?("options"), "yes_no keeps no explicit options"
   end
 
-  test "trims tap_card options to exactly three" do
+  test "trims tap_card options to the 8-statement cap" do
     importer = importer_returning(
       "title" => "T",
       "cards" => [
-        { "type" => "tap_card", "text" => "React to remote work", "options" => %w[a b c d e] }
+        { "type" => "tap_card", "text" => "React to remote work", "options" => %w[a b c d e f g h i j] },
+        { "type" => "tap_card", "text" => "React to office work", "options" => %w[a b c d e] }
       ]
     )
 
     result = importer.call(pdf_data: "x")
 
-    assert_equal %w[a b c], result["cards"][0]["options"]
+    assert_equal %w[a b c d e f g h], result["cards"][0]["options"], "over the cap trims to the first 8"
+    assert_equal %w[a b c d e], result["cards"][1]["options"], "within the 5-8 band untouched"
   end
 
   test "returns no cards when the model emits none" do

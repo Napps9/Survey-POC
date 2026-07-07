@@ -6,6 +6,10 @@ class SurveyGenerator
   MODEL = ClaudeModels::DEFAULT
   MAX_TOKENS = 4096
 
+  # Rules of the Game §3 — a tap_card carries 5-8 swipe statements.
+  TAP_CARD_MIN_STATEMENTS = 5
+  TAP_CARD_MAX_STATEMENTS = 8
+
   CARD_TYPES = %w[
     welcome_card
     multiple_choice
@@ -39,9 +43,9 @@ class SurveyGenerator
         key_insight:  { type: "string", description: "Echo the user's key insight goal" },
         cards: {
           type: "array",
-          minItems: 10,
-          maxItems: 16,
-          description: "Ordered list. Question count (excluding welcome_card) must be 10-15.",
+          minItems: 12,
+          maxItems: 15,
+          description: "Ordered list. 12-15 cards TOTAL, including the single opening welcome_card.",
           items: {
             type: "object",
             properties: {
@@ -56,18 +60,20 @@ class SurveyGenerator
               },
               options: {
                 type: "array",
-                items: { type: "string", description: "Each option <= 20 chars in select-one lists." },
+                items: { type: "string", description: "Each option label within its type's character budget (see the design rules)." },
                 description: <<~DESC
                   Required for: multiple_choice, select_many, select_one_grid, select_many_grid,
-                  prioritise, tap_card, range, rating. Bounds (per the design rules):
-                  - multiple_choice / select_many: 3 to 5 options, each <= 20 chars
-                  - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any "Other"
-                  - prioritise: 3 to 6 options (about 5 ideal), each <= 24 chars
-                  - tap_card: EXACTLY 3 cards (negative / neutral / positive sentiments)
-                  - range: ODD count only (3 or 5, never 4) with a genuinely
+                  prioritise, tap_card, range, rating, nps. Bounds (per the design rules):
+                  - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 30 chars
+                  - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any
+                    "Other", each label <= 20 chars
+                  - prioritise: 4 or 5 options (4 ideal), each <= 30 chars
+                  - tap_card: 5 to 8 statements covering negative, neutral and positive
+                    sentiments in that order, each <= 40 chars
+                  - range: ODD count only (3 or 5, 5 ideal — never 4) with a genuinely
                     neutral middle label
-                  - rating: 3 to 5 points, never more than 5
-                  - nps: EXACTLY 5 points, each label <= 20 chars
+                  - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
+                  - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
                 DESC
               },
               id: {
@@ -87,25 +93,29 @@ class SurveyGenerator
   # full-survey SYSTEM prompt and SingleQuestionGenerator so the two creation
   # paths can't drift apart.
   CARD_RULES = <<~RULES.freeze
-    - List types (multiple_choice / select_many): 3 to 5 options, each <= 20 chars.
+    - List types (multiple_choice / select_many): an ODD count — 3 or 5
+      options, never an even count — each <= 30 chars.
     - Grids (select_one_grid / select_many_grid): EVEN option count, 4 to 10
-      total including any "Other".
-    - prioritise: 3 to 6 options (about 5 ideal), each <= 24 chars. Use when
+      total including any "Other", each label <= 20 chars. Tiles sit 2
+      across, so an even count keeps the grid balanced (2x2 up to ~3x4).
+    - prioritise: 4 or 5 options (4 ideal), each <= 30 chars. Use when
       the ORDER of preference matters (rank these highest to lowest).
-    - tap_card: EXACTLY 3 cards. The three statements MUST represent a
-      NEGATIVE, a NEUTRAL and a POSITIVE sentiment on the question's
-      topic, in that order (index 0 = negative, 1 = neutral, 2 = positive).
-      Each statement is its own swipe card; the respondent swipes yes/no
-      on each, and the combination reveals their sentiment.
-      Keep each statement <= 30 characters.
-    - range: an ODD count — 3 or 5 points, never an even count like 4 — so
-      the scale always has a true centre point. That centre point's label
-      must be genuinely neutral (e.g. "Neutral" / "Unsure" / "Neither agree
-      nor disagree"), never leaning positive or negative. The slider starts
-      resting on that neutral centre by default.
-    - rating: 3 to 5 points; never more than 5.
-    - nps: a likelihood/sentiment scale with a reacting themed visual.
-      EXACTLY 5 points; each option label <= 20 chars.
+    - tap_card: 5 to 8 statement cards. Together the statements MUST cover
+      a NEGATIVE, a NEUTRAL and a POSITIVE sentiment on the question's
+      topic, ordered negative -> neutral -> positive (negatives first,
+      positives last). Each statement is its own swipe card; the respondent
+      swipes yes/no on each, and the combination reveals their sentiment.
+      Keep each statement <= 40 characters.
+    - range: an ODD count — 3 or 5 points (5 ideal), never an even count
+      like 4 — so the scale always has a true centre point. That centre
+      point's label must be genuinely neutral (e.g. "Neutral" / "Unsure" /
+      "Neither agree nor disagree"), never leaning positive or negative.
+      The slider starts resting on that neutral centre by default.
+    - rating: 3 to 5 points (5 ideal — the visual is a 5-star row). Supply
+      ONE label per point, not just the two end captions.
+    - nps: the traditional 0-10 likelihood-to-recommend scale on a plain
+      vertical slider. EXACTLY 11 options: the numeric labels "0" through
+      "10" — no word labels.
     - Question text: 50-70 chars target, 100 hard max. Any description below the
       question SHARES that same 100-char budget (text + description <= 100).
     - "How often" questions: default to range with an odd count (3 or 5) and
@@ -123,16 +133,18 @@ class SurveyGenerator
     Do's and Don'ts (deviate only when the brief explicitly requires it, and
     keep any deviation minimal):
 
-    1. Length — Target 10 to 15 questions; never exceed 15. Fewer questions is
-       not automatically better. Welcome cards do not count toward the total.
+    1. Length — Target 12 to 15 cards TOTAL, including the single opening
+       welcome_card; never exceed 16. Fewer cards is not automatically
+       better — a Verto needs enough breadth to be useful.
 
     2. Question definition — A "question" is anything the user must read and
-       respond to. A range counts as 1 question. A tap_card with its 3
-       statements (negative/neutral/positive) counts as 3 questions.
+       respond to. A range counts as 1 question. A tap_card counts as one
+       card but as many questions as it has statements — so a 5-statement
+       tap_card is 5 questions. Keep that weight in mind when pacing.
 
     3. Answer-type variety — Never place more than 2 of the same answer type in
-       a row in the flow. Treat range, rating and nps as one "scale" family —
-       avoid more than 2 of those sliders in a row.
+       a row in the flow. Range, rating and nps are individual answer types
+       for this rule and may sit back to back.
 
     4. Welcome cards — ALWAYS begin with exactly ONE welcome_card that briefly
        sets the scene (states the Verto's purpose). Keep it short and warm.
@@ -150,14 +162,13 @@ class SurveyGenerator
     button list has been retired. Default to the grid; only fall back to
     multiple_choice or select_many (which render as an image LIST — a
     small coloured tile on the left of each row instead of a button) when
-    option labels are too long to fit a tile (over ~14 characters) or the
-    question genuinely needs more than 10 options.
+    option labels are too long to fit a tile (over ~14 characters).
 
     - select_one_grid (Verto "Pick One — image grid"): DEFAULT for single-
-      pick questions. 2×2 to 3×3 visual tiles, even option counts up to 10.
-      Each tile can carry an image, icon, or coloured swatch — far more
-      engaging than a plain list. Use this whenever options can be
-      represented visually or fit short labels.
+      pick questions. Visual tiles, 2 across (2×2 up to ~3×4), even option
+      counts up to 10. Each tile can carry an image, icon, or coloured
+      swatch — far more engaging than a plain list. Use this whenever
+      options can be represented visually or fit short labels.
     - select_many_grid (Verto "Select Many — image grid"): DEFAULT for
       multi-pick questions. Same visual tile grid, multi-select. Even option
       counts up to 10. Use this whenever multiple answers can apply and
@@ -165,32 +176,35 @@ class SurveyGenerator
     - multiple_choice (Verto "Pick One — image list"): vertical list,
       single pick, with a small coloured tile on the left of each option.
       Use as the fallback when labels are too long for a grid tile
-      (over ~14 chars) or the question needs more than 10 options. Up to
-      ~5 options is best. Can include an "Other".
+      (over ~14 chars). An ODD count — 3 or 5 options. Can include an
+      "Other".
     - select_many (Verto "Select Many — image list"): same image-list
       layout, multi-pick. Use ONLY when select_many_grid won't fit (long
-      labels or more than 10 options).
-    - tap_card (Verto "Tap"): a swipe stack of EXACTLY 3 statements about
-      the question's topic. The three statements MUST express a NEGATIVE,
-      NEUTRAL and POSITIVE sentiment on the topic, in that order. The
-      respondent swipes yes/no on each; the combination reveals their
-      stance. Each statement <= 30 characters. Best when you want quick
-      gut reactions to a single subject from three angles.
-    - range (Verto "Range"): playful ODD-count (3 or 5) sliding scale for
-      emotion or agree/disagree, ALWAYS with a genuinely neutral middle
-      label — never an even count with no true centre. The left panel plays
-      a reactive Lottie animation matched to the slider position — an
-      engaging on-theme reaction. Use for mood, satisfaction, agreement —
-      anything qualitative-scaled; prefer this when an engaging visual lifts
-      response quality.
+      labels). An ODD count — 3 or 5 options.
+    - tap_card (Verto "Tap"): a swipe stack of 5 to 8 statements about
+      the question's topic. Together the statements MUST express NEGATIVE,
+      NEUTRAL and POSITIVE sentiments on the topic, ordered negative ->
+      neutral -> positive. The respondent swipes yes/no on each; the
+      combination reveals their stance. Each statement <= 40 characters.
+      Best when you want quick gut reactions to a single subject from
+      several angles.
+    - range (Verto "Range"): playful ODD-count (3 or 5, 5 ideal) sliding
+      scale for emotion or agree/disagree, ALWAYS with a genuinely neutral
+      middle label — never an even count with no true centre. Lower and
+      negative to the left, positive to the right, starting neutral in the
+      middle. The left panel plays a reactive Lottie animation matched to
+      the slider position — an engaging on-theme reaction. Use for mood,
+      satisfaction, agreement — anything qualitative-scaled; prefer this
+      when an engaging visual lifts response quality.
     - rating (Verto "Rating"): icon-based scale (stars by default, but icons
-      can be customised). Use for "how good was X" questions. Can also stand
-      in for range when familiar iconography matters more than the animation.
-    - nps (Verto "NPS"): a likelihood/sentiment 5-point vertical slider (a
-      plain scale, no reaction animation). Use for likelihood-to-recommend,
-      satisfaction, mood or temperature checks. EXACTLY 5 points; labels can
-      be numbers, words or emotions. Prefer range when an engaging on-theme
-      reaction adds value.
+      can be customised). 3 to 5 points (5 ideal), ONE label per point. Use
+      for "how good was X" questions. Can also stand in for range when
+      familiar iconography matters more than the animation.
+    - nps (Verto "NPS"): the traditional 0-10 likelihood-to-recommend scale
+      on a plain vertical slider (no reaction animation). Use for
+      likelihood-to-recommend or a straightforward sentiment/temperature
+      check. EXACTLY 11 numeric labels, "0" through "10" — no word labels.
+      Prefer range when an engaging on-theme reaction adds value.
     - yes_no: simple gating only. Use sparingly — a select_one_grid with
       two visual options is often richer.
     - open_ended (Verto "Freeform"): text input, can be voice-recorded too.
@@ -199,7 +213,7 @@ class SurveyGenerator
       of priority — highest to lowest (or most-to-least agree/liked). Use for
       explicit ranking questions ("In what order…", "Rank these…") where the
       ORDER of preference is the insight, not just which options are picked.
-      3 to 6 options, about 5 ideal.
+      4 or 5 options, 4 ideal.
     - welcome_card: not a question; flow control per the rules.
 
     When relevant historical Playverto questions are provided in the brief,
@@ -209,10 +223,12 @@ class SurveyGenerator
 
     Self-check before emitting — re-read your draft and fix any rule violation
     (unless the brief explicitly requires the exception):
-    [ ] 10 to 15 questions (welcome cards excluded); starts with exactly 1 welcome card
+    [ ] 12 to 15 cards TOTAL (welcome card included); starts with exactly 1 welcome card
     [ ] No more than 2 of the same answer type in a row
-    [ ] Lists 3-5 options (each <= 20 chars); grids EVEN and 4-10; tap_card EXACTLY 3 (neg/neutral/pos);
-        range ODD (3 or 5) with a genuine neutral middle label; rating <= 5; nps EXACTLY 5
+    [ ] Lists ODD 3 or 5 options (each <= 30 chars); grids EVEN and 4-10 (each <= 20 chars);
+        prioritise 4-5 (4 ideal); tap_card 5-8 statements (neg -> neutral -> pos, each <= 40 chars);
+        range ODD (3 or 5) with a genuine neutral middle label; rating 3-5 with one label per
+        point; nps EXACTLY 11 numeric labels "0"-"10"
     [ ] Every question's text plus its description <= 100 chars
     [ ] "How often" -> range with an odd count (3 or 5) and a neutral middle
     [ ] theme, audience_age and key_insight echoed back unchanged
@@ -252,15 +268,15 @@ class SurveyGenerator
 
       Now design the Verto for THIS brief. Strictly follow the design rules
       from the system prompt:
-      - 10 to 15 questions total (welcome_card doesn't count)
+      - 12 to 15 cards total, including the single opening welcome_card
       - no more than 2 of the same answer type in a row
       - DEFAULT every single-pick question to select_one_grid and every
         multi-pick to select_many_grid; only fall back to multiple_choice /
-        select_many when option labels are over ~14 chars or the question
-        needs more than 10 options
-      - tap_card EXACTLY 3 (neg/neutral/pos) options · grids even count, ≤10
+        select_many when option labels are over ~14 chars
+      - tap_card 5-8 statements (neg -> neutral -> pos) · grids even count, ≤10
+      - lists ODD 3 or 5 options · prioritise 4-5 · nps exactly "0"-"10"
       - question text 50-70 chars target, never exceed 100
-      - option text ≤ 14 chars when using a grid; ≤ 20 chars in a text list
+      - option text ≤ 14 chars when using a grid; ≤ 30 chars in a text list
       - ALWAYS start with exactly one welcome_card that sets the scene
       Echo theme, audience_age, key_insight unchanged. Output via the
       emit_survey tool.
@@ -292,7 +308,7 @@ class SurveyGenerator
     raise "Model did not return a tool_use block" unless block
 
     payload = deep_stringify(input_of(block))
-    enforce_tap_card_three_statements!(payload)
+    enforce_tap_card_statement_bounds!(payload)
     ensure_welcome_card!(payload)
     reconcile_common_cards!(payload, common_cards)
     normalize_quiz_correct!(payload) if quiz
@@ -367,17 +383,17 @@ class SurveyGenerator
     payload
   end
 
-  # Belt-and-braces post-generation guard for the "tap_card MUST be exactly
-  # 3 statements (neg/neutral/pos)" rule. The system prompt asks Claude for
-  # this directly, but Claude occasionally deviates with 4-5 statements;
-  # trimming to the first 3 keeps the rule strict without losing the
-  # ordering Claude already produced (the prompt asks for neg → neutral →
-  # positive in index order).
-  def enforce_tap_card_three_statements!(payload)
+  # Belt-and-braces post-generation guard for the "tap_card must be 5-8
+  # statements" rule. The system prompt asks Claude for this directly, but
+  # Claude occasionally overshoots; trimming to the first 8 keeps the rule
+  # strict without losing the ordering Claude already produced (the prompt
+  # asks for negative → neutral → positive in index order). Short decks are
+  # left alone — padding would invent statements the model never wrote.
+  def enforce_tap_card_statement_bounds!(payload)
     Array(payload["cards"]).each do |card|
       next unless card["type"].to_s == "tap_card"
       opts = Array(card["options"])
-      card["options"] = opts.first(3) if opts.size > 3
+      card["options"] = opts.first(TAP_CARD_MAX_STATEMENTS) if opts.size > TAP_CARD_MAX_STATEMENTS
     end
   end
 
@@ -444,7 +460,7 @@ class SurveyGenerator
       Place each one at the most contextually appropriate position in the deck —
       can be at the start, middle, or end, surrounded by your generated cards
       where the topic fits naturally. The Rules of the Game still apply to the
-      ENTIRE integrated deck (10-15 questions total, no more than 2 of the same
+      ENTIRE integrated deck (12-15 cards total, no more than 2 of the same
       answer type in a row including common cards, etc.) — choose and order
       your own generated cards so the integrated flow satisfies them.
 

@@ -62,7 +62,7 @@ class OptimiseCardTest < ActionDispatch::IntegrationTest
                   "options" => %w[Poor Fair Good Great Excellent] }
     with_fake_optimiser(optimised) do
       json_post optimise_survey_card_path(s),
-                index: 1, issues: [ "A little short — aim for 50-70 characters (now 7)." ],
+                index: 1, issues: [ "Getting long — 50–70 is the sweet spot (now 112)." ],
                 card: { "type" => "rating", "text" => "Rate it", "options" => %w[Poor Excellent] }
     end
     assert_response :success

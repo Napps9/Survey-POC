@@ -15,11 +15,11 @@ const DEFAULT_OPTIONS = {
   range:            ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
   rating:           ["Poor", "Fair", "Good", "Great", "Excellent"],
   multiple_choice:  ["Option A", "Option B", "Option C"],
-  select_many:      ["Option A", "Option B", "Option C", "Option D"],
+  select_many:      ["Option A", "Option B", "Option C", "Option D", "Option E"],
   yes_no:           ["Yes", "No"],
   select_one_grid:  ["A", "B", "C", "D"],
   select_many_grid: ["A", "B", "C", "D"],
-  tap_card:         ["Statement 1", "Statement 2", "Statement 3"],
+  tap_card:         ["Statement 1", "Statement 2", "Statement 3", "Statement 4", "Statement 5"],
   open_ended:       [],
   welcome_card:     [],
 }

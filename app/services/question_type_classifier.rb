@@ -36,18 +36,21 @@ class QuestionTypeClassifier
               description: { type: "string", description: "Optional sub-text. Shares the 100-char budget with text." },
               options: {
                 type: "array",
-                items: { type: "string", description: "Each option <= 20 chars in select-one lists." },
+                items: { type: "string", description: "Each option label within its type's character budget (see the design rules)." },
                 description: <<~DESC
                   Required for: multiple_choice, select_many, select_one_grid,
-                  select_many_grid, tap_card, range, rating, nps. Generate
-                  sensible, mutually-exclusive options that satisfy the bounds:
-                  - multiple_choice / select_many: 3 to 5 options, each <= 20 chars
-                  - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any "Other"
-                  - tap_card: EXACTLY 3 cards (negative / neutral / positive sentiments)
-                  - range: ODD count only (3 or 5, never 4) with a genuinely
+                  select_many_grid, prioritise, tap_card, range, rating, nps.
+                  Generate sensible, mutually-exclusive options that satisfy the bounds:
+                  - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 30 chars
+                  - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any
+                    "Other", each label <= 20 chars
+                  - prioritise: 4 or 5 options (4 ideal), each <= 30 chars
+                  - tap_card: 5 to 8 statements covering negative, neutral and positive
+                    sentiments in that order, each <= 40 chars
+                  - range: ODD count only (3 or 5, 5 ideal — never 4) with a genuinely
                     neutral middle label
-                  - rating: 3 to 5 points, never more than 5
-                  - nps: EXACTLY 5 points, each label <= 20 chars
+                  - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
+                  - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
                 DESC
               },
               allow_other: { type: "boolean", description: "Set true only if the question explicitly invites a free-text 'Other'." }
@@ -72,19 +75,21 @@ class QuestionTypeClassifier
 
     Choosing the best-fitting type:
     - "Choose one" / single-pick -> select_one_grid by default; fall back to
-      multiple_choice when option labels are long (over ~14 chars) or there are
-      more than 10 options.
+      multiple_choice when option labels are long (over ~14 chars).
     - "Choose all that apply" / multi-pick -> select_many_grid by default; fall
-      back to select_many for long labels or more than 10 options.
-    - A 1-5 quality/satisfaction rating ("How would you rate...") -> rating.
+      back to select_many for long labels.
+    - An explicit ranking question ("In what order...", "Rank these...") ->
+      prioritise (4 or 5 options, 4 ideal).
+    - A 1-5 quality/satisfaction rating ("How would you rate...") -> rating
+      (one label per point).
     - An emotion/agreement/"how often" scale, or any scale where an engaging
       reactive animation adds value -> range (odd count, 3 or 5 points, with
       a genuine neutral middle).
     - Likelihood-to-recommend / NPS or a plain 0-10 sentiment scale -> nps
-      (EXACTLY 5 points, a plain vertical slider).
-    - A single topic probed from three angles (or an explicit
-      negative/neutral/positive set) -> tap_card (EXACTLY 3 statements, in
-      negative -> neutral -> positive order, each <= 30 chars).
+      (EXACTLY 11 numeric labels "0"-"10", a plain vertical slider).
+    - A single topic probed from several angles (or an explicit
+      negative/neutral/positive statement set) -> tap_card (5 to 8 statements,
+      in negative -> neutral -> positive order, each <= 40 chars).
     - A strict binary gate -> yes_no (use sparingly).
     - An open, qualitative "tell us..." / "why..." question with no fixed
       answers -> open_ended.
@@ -153,7 +158,7 @@ class QuestionTypeClassifier
       out["description"] = card["description"].to_s.strip if card["description"].to_s.strip.present?
 
       options = Array(card["options"]).map { |o| o.to_s.strip }.reject(&:empty?)
-      options = options.first(3) if type == "tap_card"
+      options = options.first(SurveyGenerator::TAP_CARD_MAX_STATEMENTS) if type == "tap_card"
       out["options"] = options unless TYPES_WITHOUT_OPTIONS.include?(type) || options.empty?
 
       out["allow_other"] = true if card["allow_other"] == true

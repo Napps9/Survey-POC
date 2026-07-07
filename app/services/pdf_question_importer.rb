@@ -37,19 +37,22 @@ class PdfQuestionImporter
               description: { type: "string", description: "Optional sub-text under the question. Shares the question's 100-char budget." },
               options: {
                 type: "array",
-                items: { type: "string", description: "Each option <= 20 chars in select-one lists." },
+                items: { type: "string", description: "Each option label within its type's character budget (see the design rules)." },
                 description: <<~DESC
                   Required for: multiple_choice, select_many, select_one_grid,
-                  select_many_grid, tap_card, range, rating, nps. Use the options
-                  written in the PDF when present; otherwise generate sensible,
+                  select_many_grid, prioritise, tap_card, range, rating, nps. Use the
+                  options written in the PDF when present; otherwise generate sensible,
                   mutually-exclusive options that satisfy the bounds:
-                  - multiple_choice / select_many: 3 to 5 options, each <= 20 chars
-                  - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any "Other"
-                  - tap_card: EXACTLY 3 cards (negative / neutral / positive sentiments)
-                  - range: ODD count only (3 or 5, never 4) with a genuinely
+                  - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 30 chars
+                  - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any
+                    "Other", each label <= 20 chars
+                  - prioritise: 4 or 5 options (4 ideal), each <= 30 chars
+                  - tap_card: 5 to 8 statements covering negative, neutral and positive
+                    sentiments in that order, each <= 40 chars
+                  - range: ODD count only (3 or 5, 5 ideal — never 4) with a genuinely
                     neutral middle label
-                  - rating: 3 to 5 points, never more than 5
-                  - nps: EXACTLY 5 points, each label <= 20 chars
+                  - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
+                  - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
                 DESC
               },
               allow_other: { type: "boolean", description: "Set true only if the question explicitly offers a free-text 'Other'." }
@@ -89,18 +92,20 @@ class PdfQuestionImporter
 
     Choosing the best-fitting type:
     - "Choose one" / single-pick → select_one_grid by default; fall back to
-      multiple_choice when option labels are long (over ~14 chars) or there are
-      more than 10 options.
+      multiple_choice when option labels are long (over ~14 chars).
     - "Choose all that apply" / multi-pick → select_many_grid by default; fall
-      back to select_many for long labels or more than 10 options.
-    - A 1-5 quality/satisfaction rating ("How would you rate…") → rating.
+      back to select_many for long labels.
+    - An explicit ranking question ("In what order…", "Rank these…") →
+      prioritise (4 or 5 options, 4 ideal).
+    - A 1-5 quality/satisfaction rating ("How would you rate…") → rating
+      (one label per point).
     - An emotion/agreement/"how often" scale → range (odd count, 3 or 5
       points, with a genuine neutral middle).
-    - Likelihood-to-recommend or a 0-10 / reactive sentiment scale → nps
-      (EXACTLY 5 points).
-    - A single topic probed from three angles (or an explicit
-      negative/neutral/positive set) → tap_card (EXACTLY 3 statements, in
-      negative → neutral → positive order, each <= 30 chars).
+    - Likelihood-to-recommend or a 0-10 sentiment/temperature scale → nps
+      (EXACTLY 11 numeric labels, "0" through "10").
+    - A single topic probed from several angles (or an explicit
+      negative/neutral/positive statement set) → tap_card (5 to 8 statements,
+      in negative → neutral → positive order, each <= 40 chars).
     - A strict binary gate → yes_no (use sparingly).
     - An open, qualitative "tell us…" / "why…" question with no fixed answers →
       open_ended.

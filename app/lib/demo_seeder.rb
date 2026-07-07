@@ -29,6 +29,10 @@ class DemoSeeder
   # few cards in, so the dashboard shows a realistic completion rate.
   COMPLETION_CHANCE = 0.88
 
+  # Rules of the Game — NPS is the traditional 0-10 scale (11 points, no
+  # word labels) on a plain vertical slider.
+  NPS_OPTIONS = (0..10).map(&:to_s).freeze
+
   OPEN_ENDED_ANSWERS = {
     "In one sentence, what's your biggest money goal this year?" => [
       "Build a proper emergency fund so one bad month doesn't wreck me.",
@@ -186,7 +190,7 @@ class DemoSeeder
       { "type" => "welcome_card", "text" => "Money Matters: how financially confident are you, really?",
         "description" => "5 minutes, fully anonymous — earn points as you go and see how you compare at the end." },
       { "type" => "multiple_choice", "text" => "What does \"APR\" stand for on a credit card or loan?",
-        "options" => [ "Annual Percentage Rate", "Applied Payment Rate", "Average Principal Repayment", "Annual Profit Return" ],
+        "options" => [ "Annual Percentage Rate", "Applied Payment Rate", "Average Principal Repayment", "Annual Profit Return", "Adjusted Payment Ratio" ],
         "correct" => "Annual Percentage Rate",
         "explanation" => "APR is the yearly cost of borrowing, including fees — the number to compare when shopping for credit.",
         "tokens" => { "Annual Percentage Rate" => { "coin" => 5 } } },
@@ -204,27 +208,31 @@ class DemoSeeder
         "options" => [ "Emergency savings", "Pay off debt", "Treat myself", "Invest it", "Help family", "Start a side hustle" ],
         "token_award_mode" => "completion", "token_award" => { "coin" => 4 } },
       { "type" => "tap_card", "text" => "Swipe each statement: true or false?",
-        "options" => [ "A retirement fund grows tax-free", "Renting is always wasted money", "Minimum card payments are a smart habit" ],
+        "options" => [ "Renting is always wasted money", "Minimum card payments are a smart habit", "Credit scores never change", "A retirement fund grows tax-free", "An emergency fund covers 3-6 months" ],
         "correct" => {
-          "A retirement fund grows tax-free" => "yes",
           "Renting is always wasted money" => "no",
-          "Minimum card payments are a smart habit" => "no"
+          "Minimum card payments are a smart habit" => "no",
+          "Credit scores never change" => "no",
+          "A retirement fund grows tax-free" => "yes",
+          "An emergency fund covers 3-6 months" => "yes"
         },
         "tokens" => {
-          "A retirement fund grows tax-free" => { "yes" => { "gem" => 3 } },
           "Renting is always wasted money" => { "no" => { "gem" => 3 } },
-          "Minimum card payments are a smart habit" => { "no" => { "gem" => 3 } }
+          "Minimum card payments are a smart habit" => { "no" => { "gem" => 3 } },
+          "Credit scores never change" => { "no" => { "gem" => 3 } },
+          "A retirement fund grows tax-free" => { "yes" => { "gem" => 3 } },
+          "An emergency fund covers 3-6 months" => { "yes" => { "gem" => 3 } }
         } },
       { "type" => "range", "text" => "How confident are you about reaching your financial goals?",
         "options" => [ "Not confident", "Slightly confident", "Moderately confident", "Very confident", "Extremely confident" ],
         "token_award" => { "coin" => 2 } },
       { "type" => "nps", "text" => "How likely are you to recommend a budgeting app to a friend?",
-        "options" => [ "Not likely", "Slightly likely", "Neutral", "Likely", "Extremely likely" ] },
+        "options" => NPS_OPTIONS },
       { "type" => "rating", "text" => "Rate how well you manage your money day to day.",
         "options" => [ "Poor", "Fair", "Good", "Great", "Excellent" ], "token_award" => { "gem" => 2 } },
+      { "type" => "open_ended", "text" => "In one sentence, what's your biggest money goal this year?" },
       { "type" => "prioritise", "text" => "Rank these financial goals in the order they matter to you.",
         "options" => [ "Buy a home", "Pay off debt", "Build an emergency fund", "Invest for retirement", "Travel" ] },
-      { "type" => "open_ended", "text" => "In one sentence, what's your biggest money goal this year?" },
       { "type" => "token_checkpoint", "text" => "Checkpoint — see your points so far!" }
     ])
 
@@ -259,9 +267,9 @@ class DemoSeeder
       { "type" => "rating", "text" => "Rate your overall satisfaction with your current job.",
         "options" => [ "Poor", "Fair", "Good", "Great", "Excellent" ] },
       { "type" => "nps", "text" => "How likely are you to recommend your employer to a friend?",
-        "options" => [ "Not likely", "Slightly likely", "Neutral", "Likely", "Extremely likely" ] },
+        "options" => NPS_OPTIONS },
       { "type" => "multiple_choice", "text" => "What matters most to you at work right now?",
-        "options" => [ "Fair pay", "Flexible hours", "Career growth", "Good management" ] },
+        "options" => [ "Fair pay", "Flexible hours", "Career growth", "Good management", "Purposeful work" ] },
       { "type" => "select_many", "text" => "Which of these benefits do you actually use?",
         "options" => [ "Health insurance", "Remote work", "Learning budget", "Gym membership", "Mental health support" ] },
       { "type" => "yes_no", "text" => "Do you feel comfortable raising concerns with your manager?" },
@@ -270,12 +278,12 @@ class DemoSeeder
       { "type" => "select_many_grid", "text" => "What would most improve your day-to-day at work?",
         "options" => [ "More autonomy", "Clearer goals", "Fewer meetings", "Better tools", "Recognition", "Work-life balance" ] },
       { "type" => "tap_card", "text" => "Swipe: does this describe your workplace?",
-        "options" => [ "My manager gives useful feedback", "I dread Mondays", "I'd recommend this team to a friend" ] },
+        "options" => [ "I dread Mondays", "Meetings eat most of my week", "My workload varies week to week", "My manager gives useful feedback", "I'd recommend this team to a friend" ] },
       { "type" => "range", "text" => "How manageable is your current workload?",
         "options" => [ "Way too much", "A bit much", "Just right", "A bit light", "Way too light" ] },
+      { "type" => "open_ended", "text" => "What's one thing you'd change about your team?" },
       { "type" => "prioritise", "text" => "Rank these in order of what would keep you here longer.",
-        "options" => [ "Higher pay", "More flexibility", "Better culture", "Growth opportunities", "Great teammates" ] },
-      { "type" => "open_ended", "text" => "What's one thing you'd change about your team?" }
+        "options" => [ "Higher pay", "More flexibility", "Better culture", "Growth opportunities", "Great teammates" ] }
     ])
 
     survey = Survey.create!(
@@ -305,11 +313,11 @@ class DemoSeeder
         "correct" => "Yes",
         "i18n" => { "es" => { "text" => "Verdadero o falso: se recomiendan de 7 a 9 horas de sueño para adultos." } } },
       { "type" => "multiple_choice", "text" => "Which of these best reduces exam stress, per research?",
-        "options" => [ "Regular exercise", "All-night cramming", "Skipping meals", "More caffeine" ],
+        "options" => [ "Regular exercise", "All-night cramming", "Skipping meals", "More caffeine", "Energy drinks" ],
         "correct" => "Regular exercise",
         "i18n" => { "es" => {
           "text" => "¿Cuál de estos reduce mejor el estrés de los exámenes, según estudios?",
-          "options" => [ "Ejercicio regular", "Estudiar toda la noche", "Saltarse comidas", "Más cafeína" ]
+          "options" => [ "Ejercicio regular", "Estudiar toda la noche", "Saltarse comidas", "Más cafeína", "Bebidas energéticas" ]
         } } },
       { "type" => "rating", "text" => "How would you rate your energy levels this semester?",
         "options" => [ "Poor", "Fair", "Good", "Great", "Excellent" ] },
@@ -318,20 +326,22 @@ class DemoSeeder
       { "type" => "select_many", "text" => "What's been getting in the way of a good night's sleep?",
         "options" => [ "Screen time", "Coursework stress", "Noise", "Late caffeine", "Irregular schedule" ] },
       { "type" => "tap_card", "text" => "Swipe true or false on each of these.",
-        "options" => [ "Skipping breakfast helps you focus", "Talking to someone helps with stress", "Alcohol improves sleep quality" ],
+        "options" => [ "Skipping breakfast helps you focus", "Alcohol improves sleep quality", "Cramming beats spaced revision", "Talking to someone helps with stress", "Short walks boost concentration" ],
         "correct" => {
           "Skipping breakfast helps you focus" => "no",
+          "Alcohol improves sleep quality" => "no",
+          "Cramming beats spaced revision" => "no",
           "Talking to someone helps with stress" => "yes",
-          "Alcohol improves sleep quality" => "no"
+          "Short walks boost concentration" => "yes"
         } },
       { "type" => "nps", "text" => "How likely are you to recommend your course to a friend?",
-        "options" => [ "Not likely", "Slightly likely", "Neutral", "Likely", "Extremely likely" ] },
+        "options" => NPS_OPTIONS },
       { "type" => "range", "text" => "How connected do you feel to other students?",
         "options" => [ "Not at all", "A little", "Somewhat", "Mostly", "Very connected" ] },
       { "type" => "select_many_grid", "text" => "Which support services have you used this year?",
         "options" => [ "Counselling", "Study skills", "Career advice", "Peer mentoring", "Financial aid", "Health clinic" ] },
-      { "type" => "yes_no", "text" => "Do you know how to access mental health support on campus?" },
-      { "type" => "open_ended", "text" => "What's one thing that would make campus life easier for you?" }
+      { "type" => "open_ended", "text" => "What's one thing that would make campus life easier for you?" },
+      { "type" => "yes_no", "text" => "Do you know how to access mental health support on campus?" }
     ])
 
     survey = Survey.create!(
@@ -356,19 +366,19 @@ class DemoSeeder
       { "type" => "select_one_grid", "text" => "How safe do you feel walking in your neighbourhood at night?",
         "options" => [ "Very unsafe", "A bit unsafe", "Neutral", "Fairly safe", "Very safe", "Extremely safe" ] },
       { "type" => "select_many", "text" => "Which of these would make your area feel safer?",
-        "options" => [ "Better lighting", "More patrols", "Community events", "Neighbourhood watch" ] },
+        "options" => [ "Better lighting", "More patrols", "Community events", "Neighbourhood watch", "Cleaner streets" ] },
       { "type" => "yes_no", "text" => "Do you know at least one neighbour by name?" },
       { "type" => "select_many_grid", "text" => "Which local services have you used this year?",
         "options" => [ "Community centre", "Local library", "Youth club", "Food bank", "Sports facility", "Health clinic" ] },
       { "type" => "tap_card", "text" => "Swipe: does this describe your street?",
-        "options" => [ "Neighbours look out for each other", "I feel like an outsider here", "I'd recommend living here" ] },
+        "options" => [ "I feel like an outsider here", "Speeding traffic worries me", "I know a few faces, not names", "Neighbours look out for each other", "I'd recommend living here" ] },
       { "type" => "range", "text" => "How strong is your sense of belonging in this community?",
         "options" => [ "Not at all", "A little", "Somewhat", "Mostly", "Very strong" ], "token_award" => { "star" => 3 } },
       { "type" => "rating", "text" => "Rate how well local leaders listen to residents.",
         "options" => [ "Poor", "Fair", "Good", "Great", "Excellent" ] },
+      { "type" => "open_ended", "text" => "What's one change that would make this a better place to live?" },
       { "type" => "prioritise", "text" => "Rank these community priorities in order of importance.",
         "options" => [ "Safety", "Green spaces", "Local jobs", "Youth activities", "Affordable housing" ] },
-      { "type" => "open_ended", "text" => "What's one change that would make this a better place to live?" },
       { "type" => "token_checkpoint", "text" => "Checkpoint — see your community stars so far!" }
     ])
 

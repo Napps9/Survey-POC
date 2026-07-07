@@ -11,7 +11,8 @@ module DemographicQuestions
       "description" => "Powered by OpenStreetMap — helps build a map you can explore after finishing.",
       "demographic" => true },
     { "type" => "multiple_choice", "text" => "Gender",
-      "options" => [ "Male", "Female", "Prefer not to say" ], "demographic" => true }
+      "options" => [ "Male", "Female", "Non-binary", "Other", "Prefer not to say" ],
+      "demographic" => true }
   ].freeze
 
   def self.cards

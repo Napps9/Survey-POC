@@ -56,7 +56,7 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
     tail = survey.cards.last(3)
     assert tail.all? { |c| c["demographic"] }, "last three cards must be the demographic tail"
     assert_equal [ "When were you born?", "Where do you live?", "Gender" ], tail.map { |c| c["text"] }
-    assert_equal [ "Male", "Female", "Prefer not to say" ], tail.last["options"]
+    assert_equal [ "Male", "Female", "Non-binary", "Other", "Prefer not to say" ], tail.last["options"]
   end
 
   test "the wizard tells the creator about the demographic tail" do

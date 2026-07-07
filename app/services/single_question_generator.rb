@@ -32,10 +32,13 @@ class SingleQuestionGenerator
           items: { type: "string" },
           description: <<~DESC
             Required for: multiple_choice, select_many, select_one_grid,
-            select_many_grid, tap_card, range, rating. Bounds (per the design
-            rules): list types 3-5 options (each <= 20 chars); grids EVEN and
-            4-10 including any "Other"; tap_card 3-5; range/rating 3-5, never
-            more than 5.
+            select_many_grid, prioritise, tap_card, range, rating, nps.
+            Bounds (per the design rules): list types ODD 3 or 5 options
+            (each <= 30 chars); grids EVEN and 4-10 including any "Other"
+            (each <= 20 chars); prioritise 4-5 (4 ideal, each <= 30 chars);
+            tap_card 5-8 statements (neg -> neutral -> pos, each <= 40
+            chars); range ODD 3 or 5 with a neutral middle; rating 3-5 with
+            one label per point; nps EXACTLY 11 numeric labels "0"-"10".
           DESC
         }
       },

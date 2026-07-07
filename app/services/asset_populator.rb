@@ -363,7 +363,7 @@ class AssetPopulator
 
   # Picks one image per option for a tap_card, drawn from manifest.swipe_cards.
   # Prefers assets not yet used elsewhere in the survey; no repeats within a
-  # single card. Pool of 11 vs typical 3-5 statements means repeats rarely
+  # single card. Pool of 11 vs typical 5-8 statements means repeats rarely
   # bite, but we degrade gracefully if a survey has many tap_cards.
   def pick_tap_card_option_images(card, card_idx, swipe_used)
     options = Array(card["options"])
