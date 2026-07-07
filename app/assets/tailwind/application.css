@@ -3958,10 +3958,32 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
 .regions-box-body { display: flex; gap: 14px; align-items: flex-start; }
 .regions-map-col { flex: 1 1 0%; min-width: 0; }
-.regions-map-col > div { max-width: 640px; margin: 0 auto; }
+.regions-map-stage { position: relative; max-width: 640px; margin: 0 auto; }
 
 .world-map .map-country { cursor: pointer; transition: filter 0.15s; }
 .world-map .map-country:hover { filter: brightness(1.35); }
+
+/* Labeled pin per tagged location when the map is zoomed into a single
+   country (all currently-compared segments share one country) — see
+   results_compare_controller.js#_updateMapZoom. Placement is an even split
+   across the country's shape, not a real coordinate (location labels are
+   free text respondents typed, not geocoded points), so a dot + label reads
+   honestly rather than pretending to a precision we don't have. */
+.map-pin {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  pointer-events: none; z-index: 3;
+}
+.map-pin-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.4);
+}
+.map-pin-label {
+  font-family: "ABeeZee", sans-serif; font-size: 12px; font-weight: 600; color: #fff;
+  background: rgba(10,12,24,0.88); padding: 3px 9px; border-radius: 100px;
+  white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+}
 
 .compare-panel {
   flex: 0 0 380px; width: 380px; max-height: 540px;
@@ -3983,7 +4005,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .regions-box-body.is-fullscreen .regions-map-col {
   flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;
 }
-.regions-box-body.is-fullscreen .regions-map-col > div { max-width: 900px; width: 100%; margin: 0; }
+.regions-box-body.is-fullscreen .regions-map-stage { max-width: 900px; width: 100%; margin: 0; }
 .regions-box-body.is-fullscreen .compare-panel { flex: 0 0 480px; width: 480px; max-height: none; }
 .compare-panel-head {
   flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;

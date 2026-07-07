@@ -129,7 +129,15 @@
                 the controller root above) that gets moved to <body>. ── %>
             <div class="regions-box-body" data-results-compare-target="stage">
               <div class="regions-map-col">
-                <%= render "shared/world_map" %>
+                <%# Positioned wrapper the controller zooms/pins against —
+                    when every selected segment is in one country, the map
+                    zooms to that country and drops a labeled pin per tagged
+                    location (approximate placement: locations are free-text
+                    labels, not real coordinates, so this is honest about
+                    what we actually know rather than faking a boundary). ── %>
+                <div class="regions-map-stage" data-results-compare-target="mapStage">
+                  <%= render "shared/world_map" %>
+                </div>
               </div>
 
               <div class="compare-panel hidden" data-results-compare-target="panel">

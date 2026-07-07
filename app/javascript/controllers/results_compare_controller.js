@@ -18,16 +18,22 @@ const MAP_SELECTED_STROKE = "#ffffff"
 const SKIP_TYPES = new Set([ "welcome_card", "token_checkpoint" ])
 
 export default class extends Controller {
-  static targets = [ "stage", "panel", "meta", "picker", "body", "openBtn" ]
+  static targets = [ "stage", "panel", "meta", "picker", "body", "openBtn", "mapStage" ]
   static values  = { url: String }
 
   _data     = null
   _selected = new Set()
   _isOpen   = false
   _escHandler = null
+  _resizeHandler = null
   _mapData  = null
   _mapSvg   = null
   _stagePlaceholder = null
+  _countryForSegment = {}
+  _worldViewBox = null
+  _zoomedCountry = null
+  _zoomRaf  = null
+  _pins     = []
 
   // Compare mode moves the "stage" (map + panel) to <body> for full-screen
   // room, and its interactive bits (close button, picker chips, card
@@ -44,21 +50,27 @@ export default class extends Controller {
   //     event listeners on reconnect. Caching plain element refs up front,
   //     once, sidesteps both problems entirely.
   connect() {
-    this._stageEl  = this.stageTarget
-    this._panelEl  = this.panelTarget
-    this._metaEl   = this.metaTarget
-    this._pickerEl = this.pickerTarget
-    this._bodyEl   = this.bodyTarget
-    this._openBtnEl = this.openBtnTarget
+    this._stageEl    = this.stageTarget
+    this._panelEl    = this.panelTarget
+    this._metaEl     = this.metaTarget
+    this._pickerEl   = this.pickerTarget
+    this._bodyEl     = this.bodyTarget
+    this._openBtnEl  = this.openBtnTarget
+    this._mapStageEl = this.mapStageTarget
 
     this._panelEl.querySelector(".compare-close-btn").addEventListener("click", () => this.close())
 
     this._setupMap()
     this._loadPromise = this._loadData()
+
+    this._resizeHandler = () => this._positionPins()
+    window.addEventListener("resize", this._resizeHandler)
   }
 
   disconnect() {
     if (this._escHandler) document.removeEventListener("keydown", this._escHandler)
+    if (this._resizeHandler) window.removeEventListener("resize", this._resizeHandler)
+    if (this._zoomRaf) cancelAnimationFrame(this._zoomRaf)
     this._exitFullscreen()
   }
 
@@ -86,6 +98,8 @@ export default class extends Controller {
     this._mapData = dataEl ? JSON.parse(dataEl.textContent) : {}
     if (!this._mapSvg) return
 
+    this._worldViewBox = this._mapSvg.getAttribute("viewBox").trim().split(/\s+/).map(Number)
+
     Object.entries(this._mapData).forEach(([ cc, d ]) => {
       const el = this._mapSvg.querySelector("#" + cc)
       if (!el || !d.segment_ids.length) return
@@ -94,6 +108,7 @@ export default class extends Controller {
       tip.textContent = `${d.name}: ${d.count}`
       el.appendChild(tip)
       el.addEventListener("click", () => this._toggleCountry(cc))
+      d.segment_ids.forEach(id => { this._countryForSegment[id] = cc })
     })
     this._paintMap()
   }
@@ -107,6 +122,7 @@ export default class extends Controller {
     if (this._isOpen && this._data) {
       this._renderPicker()
       this._renderBody()
+      this._updateMapZoom()
     }
   }
 
@@ -126,6 +142,105 @@ export default class extends Controller {
         p.style.filter = selected ? "drop-shadow(0 0 4px rgba(255,255,255,0.6))" : ""
       })
     })
+  }
+
+  // ── Map zoom: when every compared region shares one country, zoom in and
+  // drop a labeled pin per tagged location. Only active while the compare
+  // panel is open — otherwise the small inline map preview would zoom in on
+  // its own, before the user ever asked to compare anything. ─────────────
+  _updateMapZoom() {
+    if (!this._isOpen || !this._data) {
+      this._zoomTo(this._worldViewBox)
+      this._clearPins()
+      return
+    }
+
+    const regionIds = [ ...this._selected ].filter(id => id !== "overall")
+    const countries = new Set(regionIds.map(id => this._countryForSegment[id]).filter(Boolean))
+
+    if (countries.size === 1) {
+      const cc = [ ...countries ][0]
+      const countryEl = this._mapSvg.querySelector("#" + cc)
+      if (countryEl) {
+        const bbox = countryEl.getBBox()
+        const padX = Math.max(bbox.width * 0.4, 8)
+        const padY = Math.max(bbox.height * 0.4, 8)
+        this._zoomTo([ bbox.x - padX, bbox.y - padY, bbox.width + padX * 2, bbox.height + padY * 2 ])
+        this._renderPins(cc, regionIds.filter(id => this._countryForSegment[id] === cc))
+        return
+      }
+    }
+
+    this._zoomTo(this._worldViewBox)
+    this._clearPins()
+  }
+
+  _zoomTo(targetBox) {
+    if (!this._mapSvg) return
+    const from = this._mapSvg.viewBox.baseVal
+    const start = [ from.x, from.y, from.width, from.height ]
+    if (this._zoomRaf) cancelAnimationFrame(this._zoomRaf)
+
+    const duration = 380
+    const t0 = performance.now()
+    const step = (now) => {
+      const t = Math.min(1, (now - t0) / duration)
+      const eased = t < 0.5 ? 2 * t * t : 1 - ((-2 * t + 2) ** 2) / 2
+      const cur = start.map((v, i) => v + (targetBox[i] - v) * eased)
+      this._mapSvg.setAttribute("viewBox", cur.join(" "))
+      this._positionPins()
+      if (t < 1) this._zoomRaf = requestAnimationFrame(step)
+    }
+    this._zoomRaf = requestAnimationFrame(step)
+  }
+
+  // Placement is an even split across the country's own shape, not a real
+  // coordinate — location labels are free text respondents typed, not
+  // geocoded points, so this is honest about what we actually know rather
+  // than faking a boundary or a precise position.
+  _renderPins(cc, regionIds) {
+    this._clearPins()
+    this._zoomedCountry = cc
+    const orderedIds = this._data.segments.map(s => s.id).filter(id => regionIds.includes(id))
+    this._pins = orderedIds.map((id, i) => {
+      const seg = this._data.segments.find(s => s.id === id)
+      const pin = document.createElement("div")
+      pin.className = "map-pin"
+      pin.innerHTML =
+        `<span class="map-pin-dot" style="background:${this._colorFor(id)}"></span>` +
+        `<span class="map-pin-label">${esc(this._regionNameFor(seg, cc))}</span>`
+      this._mapStageEl.appendChild(pin)
+      return { el: pin, index: i, total: orderedIds.length }
+    })
+    this._positionPins()
+  }
+
+  _clearPins() {
+    this._pins.forEach(p => p.el.remove())
+    this._pins = []
+    this._zoomedCountry = null
+  }
+
+  _positionPins() {
+    if (!this._pins.length || !this._zoomedCountry || !this._mapSvg) return
+    const countryEl = this._mapSvg.querySelector("#" + this._zoomedCountry)
+    const ctm = this._mapSvg.getScreenCTM()
+    if (!countryEl || !ctm) return
+    const bbox = countryEl.getBBox()
+    const stageRect = this._mapStageEl.getBoundingClientRect()
+    this._pins.forEach(({ el, index, total }) => {
+      const pt = this._mapSvg.createSVGPoint()
+      pt.x = bbox.x + bbox.width * (index + 1) / (total + 1)
+      pt.y = bbox.y + bbox.height * 0.5
+      const screen = pt.matrixTransform(ctm)
+      el.style.left = `${screen.x - stageRect.left}px`
+      el.style.top = `${screen.y - stageRect.top}px`
+    })
+  }
+
+  _regionNameFor(seg, cc) {
+    const prefix = "🌍 " + (this._mapData[cc]?.name || "") + " · "
+    return seg.label.startsWith(prefix) ? seg.label.slice(prefix.length) : seg.label
   }
 
   // ── Panel open/close (full-screen) ──────────────────────────────────────
@@ -160,6 +275,7 @@ export default class extends Controller {
 
     this._renderPicker()
     this._renderBody()
+    this._updateMapZoom()
   }
 
   close() {
@@ -167,6 +283,7 @@ export default class extends Controller {
     this._panelEl.classList.add("hidden")
     this._openBtnEl.classList.remove("is-active")
     this._exitFullscreen()
+    this._updateMapZoom()
     if (this._escHandler) document.removeEventListener("keydown", this._escHandler)
   }
 
@@ -182,6 +299,7 @@ export default class extends Controller {
     this._paintMap()
     this._renderPicker()
     this._renderBody()
+    this._updateMapZoom()
   }
 
   _colorFor(id) {
