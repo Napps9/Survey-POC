@@ -1214,6 +1214,16 @@ export default class extends Controller {
     }
     const blank = (v) => v === null || v === undefined || v === "" || (Array.isArray(v) && v.length === 0)
 
+    // Choice-shaped cards can opt into a flat award for completing the
+    // question at all (mirrors TokenGrading.completion_award?), rather than
+    // per chosen option — behaves exactly like the FLAT branch below.
+    const completionAward = (CHOICE_ONE.includes(type) || CHOICE_MANY.includes(type)) &&
+      card.dataset.cardTokenAwardMode === "completion"
+    if (FLAT.includes(type) || completionAward) {
+      if (blank(value)) return {}
+      return this._parseJSON(card.dataset.cardTokenAward, {})
+    }
+
     if (CHOICE_ONE.includes(type)) {
       const tokens = this._parseJSON(card.dataset.cardTokens, {})
       return tokens[String(value ?? "").trim()] || {}
@@ -1226,10 +1236,6 @@ export default class extends Controller {
       const tokens = this._parseJSON(card.dataset.cardTokens, {})
       if (typeof value !== "object" || !value) return {}
       return sumHashes(Object.entries(value).map(([statement, dir]) => tokens[statement]?.[dir]))
-    }
-    if (FLAT.includes(type)) {
-      if (blank(value)) return {}
-      return this._parseJSON(card.dataset.cardTokenAward, {})
     }
     return {}
   }

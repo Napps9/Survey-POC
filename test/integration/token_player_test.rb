@@ -73,6 +73,18 @@ class TokenPlayerTest < ActionDispatch::IntegrationTest
     assert_equal({ "gold" => 5, "coal" => 0 }, body["token_totals"])
   end
 
+  test "a choice card set to completion mode awards a flat amount regardless of which option was picked" do
+    s = tokenised_survey(cards: CARDS + [
+      { "type" => "select_many", "text" => "Which worry you most?", "options" => %w[Unemployment Debt],
+        "token_award_mode" => "completion", "token_award" => { "gold" => 4 } }
+    ])
+    body = json_post submit_survey_path(s.publish_token),
+                     session_token: "flat",
+                     answers: { "4" => { "type" => "select_many", "value" => %w[Debt] } }
+    # 4 gold from the completion-mode card, nothing from the untouched cards.
+    assert_equal({ "gold" => 4, "coal" => 0 }, body["token_totals"])
+  end
+
   test "a card with no token config stays freely editable in a tokenised Verto" do
     s = tokenised_survey
     json_post progress_survey_path(s.publish_token),

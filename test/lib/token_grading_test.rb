@@ -27,6 +27,30 @@ class TokenGradingTest < ActiveSupport::TestCase
     end
   end
 
+  test "choice-shaped cards can opt into a flat award for completing the question" do
+    %w[multiple_choice yes_no select_one_grid select_many select_many_grid].each do |type|
+      c = card(type, "token_award_mode" => "completion", "token_award" => { "gold" => 4 })
+      assert TokenGrading.completion_award?(c)
+      assert TokenGrading.awarding?(c)
+      assert_equal({ "gold" => 4 }, TokenGrading.earned(c, "Blue"))
+      assert_equal({ "gold" => 4 }, TokenGrading.earned(c, %w[Red Blue]))
+      assert_equal({}, TokenGrading.earned(c, nil), "#{type}: no answer earns nothing even in completion mode")
+      assert_equal({}, TokenGrading.earned(c, []))
+    end
+
+    # Any stray per-option `tokens` left over from switching modes is ignored
+    # once token_award_mode is "completion" — token_award is authoritative.
+    mixed = card("multiple_choice",
+      "token_award_mode" => "completion",
+      "token_award" => { "gold" => 4 },
+      "tokens" => { "Blue" => { "gold" => 99 } })
+    assert_equal({ "gold" => 4 }, TokenGrading.earned(mixed, "Blue"))
+
+    # Without the mode flag, choice types keep their default per-option behavior.
+    refute TokenGrading.completion_award?(card("multiple_choice", "tokens" => { "Blue" => { "gold" => 5 } }))
+    refute TokenGrading.completion_award?(card("rating", "token_award_mode" => "completion", "token_award" => { "gold" => 4 }))
+  end
+
   test "multi-select sums the tokens for every chosen option" do
     c = card("select_many", "tokens" => { "Red" => { "gold" => 2 }, "Blue" => { "gold" => 3, "coal" => 1 } })
     assert_equal({ "gold" => 5, "coal" => 1 }, TokenGrading.earned(c, %w[Red Blue]))

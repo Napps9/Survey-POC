@@ -17,11 +17,17 @@
 #   select_many / select_many_grid             → same shape, summed across every chosen label
 #   tap_card                                    → { "<statement>" => { "yes"|"no"|"unsure" => {token_id => amount} } }, matched by the chosen swipe direction
 #   range / nps / rating / open_ended / prioritise → a flat `token_award` = {token_id => amount}, earned just for answering
+#
+# Choice-shaped cards (list/grid/yes-no) default to the per-option `tokens`
+# shape above, but can opt into a flat `token_award` instead — awarded just
+# for answering, regardless of which option was picked — by setting
+# `token_award_mode: "completion"` on the card. See completion_award?.
 module TokenGrading
   module_function
 
   CHOICE_ONE   = %w[multiple_choice yes_no select_one_grid].freeze
   CHOICE_MANY  = %w[select_many select_many_grid].freeze
+  CHOICE       = (CHOICE_ONE + CHOICE_MANY).freeze
   FLAT         = %w[range nps rating open_ended prioritise].freeze
   NON_QUESTION = %w[welcome_card token_checkpoint].freeze
 
@@ -38,10 +44,18 @@ module TokenGrading
     Array(cards).each_index.select { |i| awarding?(Array(cards)[i]) }
   end
 
+  # A choice-shaped card set to award a flat amount for completing the
+  # question at all, rather than per chosen option.
+  def completion_award?(card)
+    CHOICE.include?(card["type"].to_s) && card["token_award_mode"].to_s == "completion"
+  end
+
   # Tokens earned for one stored answer value, as {token_id => amount}.
   # Returns {} when the card doesn't award, or the value doesn't match.
   def earned(card, value)
     return {} unless card.is_a?(Hash)
+    return flat_earned(card, value) if FLAT.include?(card["type"].to_s) || completion_award?(card)
+
     tokens = card["tokens"]
     case card["type"].to_s
     when *CHOICE_ONE
@@ -52,9 +66,6 @@ module TokenGrading
     when "tap_card"
       return {} unless tokens.is_a?(Hash) && value.is_a?(Hash)
       sum_hashes(value.map { |statement, dir| tokens.dig(statement, dir.to_s) })
-    when *FLAT
-      return {} if blank_value?(value)
-      card["token_award"].is_a?(Hash) ? card["token_award"] : {}
     else
       {}
     end
@@ -77,7 +88,12 @@ module TokenGrading
   # ── internals ──────────────────────────────────────────────────────────────
 
   def config_for(card)
-    FLAT.include?(card["type"].to_s) ? card["token_award"] : card["tokens"]
+    (FLAT.include?(card["type"].to_s) || completion_award?(card)) ? card["token_award"] : card["tokens"]
+  end
+
+  def flat_earned(card, value)
+    return {} if blank_value?(value)
+    card["token_award"].is_a?(Hash) ? card["token_award"] : {}
   end
 
   def any_amount?(config)

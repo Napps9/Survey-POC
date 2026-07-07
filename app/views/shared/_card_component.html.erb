@@ -43,6 +43,9 @@
   token_types = @survey&.token_types || []
   tokens_map  = card["tokens"].is_a?(Hash) ? card["tokens"] : {}
   token_award = card["token_award"].is_a?(Hash) ? card["token_award"] : {}
+  # Choice-shaped cards default to a per-option award but can opt into a flat
+  # award for completing the question at all — see TokenGrading.completion_award?.
+  token_award_mode = card["token_award_mode"].to_s == "completion" ? "completion" : "per_answer"
 
   # Picker-style lists carry an extra card-editor controller in :editor
   # mode so the per-card "delete option" / "add option" actions resolve.
@@ -511,7 +514,7 @@
       — see type-panel controller's registerCard. Hidden on translation tabs
       (CSS), so amounts are only ever set in the primary language. %>
   <% if token_mode %>
-    <% choice_shaped = (TokenGrading::CHOICE_ONE + TokenGrading::CHOICE_MANY).include?(type) %>
+    <% choice_shaped = TokenGrading::CHOICE.include?(type) %>
     <% if type == "tap_card" || TokenGrading::FLAT.include?(type) || choice_shaped %>
       <div class="token-award-block" data-token-block>
         <div class="token-award-title"><span>🪙</span> <%= t("card.token_award_title") %></div>
@@ -535,19 +538,40 @@
           <% end %>
         <% elsif choice_shaped %>
           <% option_labels = type == "yes_no" ? [["Yes", 1], ["No", 4]].map { |label, _bg| [label, t("card.#{label.downcase}", locale: display_locale, default: label)] } : Array(display["options"]).each_with_index.map { |opt, i| [canon[i], opt] } %>
-          <% option_labels.each do |canon_label, shown_label| %>
-            <div class="token-award-row" data-canonical="<%= canon_label %>">
-              <span class="token-award-label"><%= shown_label %></span>
-              <div class="token-inputs">
-                <% token_types.each do |tt| %>
-                  <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
-                         value="<%= tokens_map.dig(canon_label, tt['id']) || 0 %>"
-                         title="<%= tt['name'] %>"
-                         data-action="input->survey-editor#markDirty" />
-                <% end %>
+          <div class="token-mode-toggle">
+            <button type="button" class="token-mode-btn<%= ' is-active' if token_award_mode == 'per_answer' %>"
+                    data-mode="per_answer" data-action="click->survey-editor#setTokenAwardMode">Per answer</button>
+            <button type="button" class="token-mode-btn<%= ' is-active' if token_award_mode == 'completion' %>"
+                    data-mode="completion" data-action="click->survey-editor#setTokenAwardMode">Completing the question</button>
+          </div>
+
+          <div data-token-mode-section="per_answer"<%= ' hidden'.html_safe unless token_award_mode == 'per_answer' %>>
+            <% option_labels.each do |canon_label, shown_label| %>
+              <div class="token-award-row" data-canonical="<%= canon_label %>">
+                <span class="token-award-label"><%= shown_label %></span>
+                <div class="token-inputs">
+                  <% token_types.each do |tt| %>
+                    <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
+                           value="<%= tokens_map.dig(canon_label, tt['id']) || 0 %>"
+                           title="<%= tt['name'] %>"
+                           data-action="input->survey-editor#markDirty" />
+                  <% end %>
+                </div>
               </div>
+            <% end %>
+          </div>
+
+          <div data-token-mode-section="completion"<%= ' hidden'.html_safe unless token_award_mode == 'completion' %>>
+            <div class="token-award-row">
+              <span class="token-award-label"><%= t("card.token_award_hint") %></span>
+              <% token_types.each do |tt| %>
+                <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
+                       value="<%= token_award[tt['id']] || 0 %>"
+                       title="<%= tt['name'] %>"
+                       data-action="input->survey-editor#markDirty" />
+              <% end %>
             </div>
-          <% end %>
+          </div>
         <% else %>
           <div class="token-award-row">
             <span class="token-award-label"><%= t("card.token_award_hint") %></span>

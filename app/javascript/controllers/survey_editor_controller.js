@@ -7,6 +7,11 @@ import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
 // moveCardUp / _updateMoveButtonStates), which token_checkpoint does not.
 const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
 
+// Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
+// These default to a per-option token award but can opt into a flat award for
+// completing the question at all (see setTokenAwardMode).
+const CHOICE_TYPES = [ "multiple_choice", "select_many", "yes_no", "select_one_grid", "select_many_grid" ]
+
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode", "vertoScore", "scoreBoard", "panelLight"]
   static values  = {
@@ -641,10 +646,14 @@ export default class extends Controller {
       // Tokenisation: choice/tap_card carry per-option/per-direction `tokens`;
       // scale/open/prioritise carry a flat `token_award`. Leaving every amount
       // at 0 keeps the card unawarded (TokenGrading.awarding? stays false).
+      // Choice-shaped cards can opt into a flat award too (token_award_mode).
       if (this.tokenisationValue) {
         const { tokens, token_award } = this._readTokens(card, type)
         if (tokens && Object.keys(tokens).length) out.tokens = tokens
         if (token_award && Object.keys(token_award).length) out.token_award = token_award
+        if (CHOICE_TYPES.includes(type) && this._tokenAwardMode(card) === "completion") {
+          out.token_award_mode = "completion"
+        }
       }
 
       const i18n = {}
@@ -738,15 +747,28 @@ export default class extends Controller {
   // This card's token config, in the shape TokenGrading expects: `tokens` for
   // choice/tap_card (keyed by canonical option/statement), `token_award` for
   // the flat-award types.
+  // Which award mode a choice-shaped card is currently set to — whichever
+  // [data-token-mode-section] is visible (toggled by setTokenAwardMode).
+  _tokenAwardMode(card) {
+    const completion = this._tokenScope(card).querySelector('[data-token-mode-section="completion"]')
+    return completion && !completion.hidden ? "completion" : "per_answer"
+  }
+
   _readTokens(card, type) {
     switch (type) {
       case "multiple_choice": case "select_many": case "yes_no":
       case "select_one_grid": case "select_many_grid": {
-        // One .token-award-row per option, relocated into the sidebar's
-        // Tokenomics tab (see _card_component.html.erb) — not inline on the
-        // option itself, so read via the token scope, not `card` directly.
+        // Relocated into the sidebar's Tokenomics tab (see
+        // _card_component.html.erb) — not inline on the option itself, so
+        // read via the token scope, not `card` directly.
+        const scope = this._tokenScope(card)
+        if (this._tokenAwardMode(card) === "completion") {
+          const row = scope.querySelector('[data-token-mode-section="completion"] .token-award-row')
+          return { token_award: row ? this._tokenAmounts(row) : {} }
+        }
+        // One .token-award-row per option.
         const tokens = {}
-        this._tokenScope(card).querySelectorAll(".token-award-row[data-canonical]").forEach(row => {
+        scope.querySelectorAll('[data-token-mode-section="per_answer"] .token-award-row[data-canonical]').forEach(row => {
           const label  = (row.dataset.canonical || "").trim()
           const inputs = row.querySelector(".token-inputs")
           if (!label || !inputs) return
@@ -803,6 +825,23 @@ export default class extends Controller {
     if (!row) return
     row.dataset.correctDir = (row.dataset.correctDir === btn.dataset.dir) ? "" : btn.dataset.dir
     row.querySelectorAll(".quiz-tap-btn").forEach(b => b.classList.toggle("is-on", b.dataset.dir === row.dataset.correctDir))
+    this.markDirty()
+  }
+
+  // Switch a choice-shaped card between awarding tokens per chosen option
+  // and a flat award just for completing the question (see
+  // TokenGrading.completion_award?). Both sections stay in the DOM (this
+  // just swaps which is visible) so switching back and forth never loses
+  // amounts already entered on either side.
+  setTokenAwardMode(event) {
+    const btn   = event.currentTarget
+    const mode  = btn.dataset.mode
+    const block = btn.closest(".token-award-block")
+    if (!block) return
+    block.querySelectorAll(".token-mode-btn").forEach(b => b.classList.toggle("is-active", b.dataset.mode === mode))
+    block.querySelectorAll("[data-token-mode-section]").forEach(sec => {
+      sec.hidden = sec.dataset.tokenModeSection !== mode
+    })
     this.markDirty()
   }
 
