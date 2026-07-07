@@ -7,7 +7,7 @@ class SurveysController < ApplicationController
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
   before_action :set_survey,           only: [ :show, :preview, :publish, :update_settings ]
-  before_action :set_survey_including_archived, only: [ :results ]
+  before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
 
@@ -424,6 +424,22 @@ class SurveysController < ApplicationController
     @total      = @active_segment[:count]
     @aggregated = aggregate_results(Array(@survey.cards), @responses)
     render :results, layout: "fullscreen"
+  end
+
+  # JSON for the full-screen "Compare" view: every segment's own aggregate
+  # breakdown in one payload, so switching which segments are shown happens
+  # client-side (no reload per toggle, unlike the single-segment `results`
+  # view above).
+  def results_compare
+    _base, segments, = resolve_result_segments(@survey, nil)
+    cards = Array(@survey.cards)
+
+    render json: {
+      ok: true,
+      cards: cards.map.with_index { |card, idx| { index: idx, type: card["type"], text: card["text"], options: card["options"] } },
+      segments: segments.map { |seg| seg.slice(:id, :label, :count) },
+      aggregates: segments.each_with_object({}) { |seg, acc| acc[seg[:id]] = aggregate_results(cards, seg[:scope]) }
+    }
   end
 
   # POST /surveys/:id/generate_card

@@ -3935,6 +3935,99 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .regions-detail { overflow-y: auto; padding: 20px 22px 24px; }
 
+/* ── Results page: full-screen multi-segment comparison ──────────────────
+   Compare Overall vs any combination of regions/shares side by side, rather
+   than the one-segment-at-a-time filter the page defaults to. */
+.compare-open-btn {
+  flex-shrink: 0; padding: 5px 14px; border-radius: 100px;
+  background: rgba(1,234,203,0.1); border: 1px solid rgba(1,234,203,0.35);
+  color: #01EACB; font-family: "ABeeZee", sans-serif; font-size: 12px;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.compare-open-btn:hover { background: rgba(1,234,203,0.18); }
+
+.compare-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #1C2034;
+  display: flex; flex-direction: column;
+}
+.compare-overlay.hidden { display: none; }
+.compare-header {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 18px 22px; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.compare-header-title { font-family: "Alata", sans-serif; font-size: 20px; color: #fff; letter-spacing: 0.02em; }
+.compare-header-meta { font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+.compare-close-btn {
+  flex-shrink: 0; padding: 7px 16px; border-radius: 100px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16);
+  color: rgba(255,255,255,0.75); font-family: "ABeeZee", sans-serif; font-size: 13px;
+  cursor: pointer; transition: all 0.15s;
+}
+.compare-close-btn:hover { color: #fff; border-color: rgba(255,255,255,0.32); }
+
+/* Segment legend/picker — doubles as the chart legend (colour dot = series
+   identity, per dataviz convention) and the toggle to include/exclude a
+   segment from the comparison. */
+.compare-picker {
+  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 16px 22px; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.compare-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 12px 6px 10px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.03);
+  font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.55);
+  cursor: pointer; transition: all 0.15s;
+}
+.compare-chip:hover { border-color: rgba(255,255,255,0.3); }
+.compare-chip.is-active { color: #fff; background: rgba(255,255,255,0.07); }
+.compare-chip-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.compare-chip-count { color: rgba(255,255,255,0.35); font-variant-numeric: tabular-nums; }
+
+.compare-body { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 22px 40px; }
+.compare-empty {
+  max-width: 420px; margin: 60px auto; text-align: center;
+  font-family: "ABeeZee", sans-serif; font-size: 14px; color: rgba(255,255,255,0.4); line-height: 1.6;
+}
+
+.compare-card {
+  max-width: 760px; margin: 0 auto 16px; padding: 16px 18px; border-radius: 14px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+}
+.compare-card-eyebrow {
+  font-family: "Alata", sans-serif; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); margin-bottom: 3px;
+}
+.compare-card-head {
+  font-family: "ABeeZee", sans-serif; font-size: 14px; color: #fff; font-weight: 500;
+  line-height: 1.4; margin-bottom: 12px;
+}
+
+.compare-option-group { margin-bottom: 12px; }
+.compare-option-group:last-child { margin-bottom: 0; }
+.compare-option-label {
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.7);
+  margin-bottom: 6px;
+}
+.compare-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.compare-bar-row:last-child { margin-bottom: 0; }
+.compare-bar-seg {
+  flex-shrink: 0; width: 168px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: "ABeeZee", sans-serif; font-size: 11px;
+}
+.compare-bar-track { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+.compare-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.compare-bar-pct {
+  flex-shrink: 0; width: 84px; text-align: right;
+  font-family: "Alata", sans-serif; font-size: 11px; color: rgba(255,255,255,0.55);
+  font-variant-numeric: tabular-nums;
+}
+.compare-freeform-note {
+  display: flex; align-items: center; gap: 8px; padding: 3px 0;
+  font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.4);
+}
+
 /* Wizard "advanced" disclosure (Region settings) — compact summary pill */
 .wizard-advanced summary { list-style: none; }
 .wizard-advanced summary::-webkit-details-marker { display: none; }

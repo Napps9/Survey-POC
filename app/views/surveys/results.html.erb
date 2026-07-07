@@ -107,13 +107,34 @@
               map_data[cc][:count] += seg[:count]
             end
           %>
-          <div style="margin:0 0 14px;padding:14px 14px 10px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+          <div style="margin:0 0 14px;padding:14px 14px 10px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);"
+               data-controller="results-compare"
+               data-results-compare-url-value="<%= survey_results_compare_path(@survey) %>">
             <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
               <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 Regions</span>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a country to filter results to its region</span>
+              <button type="button" class="compare-open-btn" style="margin-left:auto;"
+                      data-action="click->results-compare#open">⛶ Compare regions</button>
             </div>
             <div style="max-width:640px;margin:0 auto;">
               <%= render "shared/world_map" %>
+            </div>
+
+            <%# ── Full-screen comparison overlay — Overall vs any combination
+                of regions/shares, side by side. Data is fetched once (all
+                segments' aggregates in one payload) so toggling which
+                segments show is instant, no reload per pill like the filter
+                above. ── %>
+            <div class="compare-overlay hidden" data-results-compare-target="overlay">
+              <div class="compare-header">
+                <div>
+                  <div class="compare-header-title">Compare regions</div>
+                  <div class="compare-header-meta" data-results-compare-target="meta">Loading…</div>
+                </div>
+                <button type="button" class="compare-close-btn">✕ Close</button>
+              </div>
+              <div class="compare-picker" data-results-compare-target="picker"></div>
+              <div class="compare-body" data-results-compare-target="body"></div>
             </div>
           </div>
           <script type="application/json" id="results-region-map-data"><%= map_data.to_json.html_safe %></script>
