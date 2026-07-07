@@ -80,12 +80,33 @@ class DemoSeeder
 
       share_into_alliance!(@money_matters)
 
-      seed_responses!(@money_matters, count: 28, consent: true,
-        regions: [ [ "ZA", "Gauteng", 10 ], [ "GB", "Greater London", 9 ], [ "US", "California", 9 ] ])
-      seed_responses!(@workplace, count: 22,
-        regions: [ [ "US", "Texas", 8 ], [ "US", "New York", 7 ], [ "GB", "Greater Manchester", 7 ] ])
-      seed_responses!(@campus, count: 18,
-        regions: [ [ "GB", "London", 6 ], [ "ES", "Madrid", 6 ], [ "ZA", "Western Cape", 6 ] ],
+      # Each Verto below gets several countries (for the global map) *and* more
+      # than one region within at least two of those countries, so both the
+      # creator Results map and the player-facing region drill-down have real
+      # within-country breakdowns to explore, not just one dot per country.
+      # Only *completed* responses get tagged with a region (see
+      # seed_responses!), so every cluster here is sized well above
+      # Response::MIN_REGION_SAMPLE_SIZE (5) to comfortably clear it even
+      # after ~12% of a cluster don't finish — 8 raw survives that with room
+      # to spare, rather than sitting right on the suppression line.
+      seed_responses!(@money_matters, count: 41, consent: true,
+        regions: [
+          [ "ZA", "Gauteng", 8 ], [ "ZA", "Western Cape", 8 ],
+          [ "GB", "Greater London", 8 ], [ "GB", "Manchester", 8 ],
+          [ "US", "California", 9 ]
+        ])
+      seed_responses!(@workplace, count: 32,
+        regions: [
+          [ "US", "Texas", 8 ], [ "US", "New York", 8 ],
+          [ "GB", "Greater Manchester", 8 ],
+          [ "AU", "New South Wales", 8 ]
+        ])
+      seed_responses!(@campus, count: 32,
+        regions: [
+          [ "GB", "London", 8 ], [ "GB", "Edinburgh", 8 ],
+          [ "ES", "Madrid", 8 ],
+          [ "ZA", "Western Cape", 8 ]
+        ],
         locale_by_country: { "ES" => "es" })
       # @community_safety stays a draft with zero responses — nothing to seed there.
     end
@@ -390,7 +411,13 @@ class DemoSeeder
         answers: answers,
         score: quiz_result&.dig(:score), quiz_max: quiz_result&.dig(:max),
         token_totals: token_totals,
-        region_country: region[0], region_label: region[1], locale: locale,
+        # The location question sits near the end of the deck (a demographic
+        # tail card), so a "started" respondent who dropped off a few cards in
+        # never actually reached it — same as a real one wouldn't. Only tag a
+        # region when they got that far.
+        region_country: completed ? region[0] : nil,
+        region_label: completed ? region[1] : nil,
+        locale: locale,
         consent_agreed_at: (consent && completed) ? created_at : nil,
         consent_text_snapshot: (consent && completed) ? survey.consent_text : nil,
         created_at: created_at, updated_at: created_at
