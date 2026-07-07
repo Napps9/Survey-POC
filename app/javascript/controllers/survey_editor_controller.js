@@ -742,10 +742,13 @@ export default class extends Controller {
     switch (type) {
       case "multiple_choice": case "select_many": case "yes_no":
       case "select_one_grid": case "select_many_grid": {
+        // One .token-award-row per option, relocated into the sidebar's
+        // Tokenomics tab (see _card_component.html.erb) — not inline on the
+        // option itself, so read via the token scope, not `card` directly.
         const tokens = {}
-        card.querySelectorAll('[data-picker-target="item"]').forEach(item => {
-          const label  = (item.dataset.canonical || "").trim()
-          const inputs = item.querySelector(".token-inputs")
+        this._tokenScope(card).querySelectorAll(".token-award-row[data-canonical]").forEach(row => {
+          const label  = (row.dataset.canonical || "").trim()
+          const inputs = row.querySelector(".token-inputs")
           if (!label || !inputs) return
           const amt = this._tokenAmounts(inputs)
           if (Object.keys(amt).length) tokens[label] = amt

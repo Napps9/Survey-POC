@@ -109,16 +109,6 @@
               <button type="button" class="mark-correct" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
                       data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
             <% end %>
-            <% if token_mode %>
-              <div class="token-inputs">
-                <% token_types.each do |tt| %>
-                  <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
-                         value="<%= tokens_map.dig(canon[i], tt['id']) || 0 %>"
-                         title="<%= tt['name'] %>"
-                         data-action="input->survey-editor#markDirty" />
-                <% end %>
-              </div>
-            <% end %>
             <% if editable %>
               <button type="button" class="pick-item-delete"
                       data-action="click->card-editor#deleteOption">×</button>
@@ -186,16 +176,6 @@
               <button type="button" class="mark-correct" data-picker-mode="single"
                       data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
             <% end %>
-            <% if token_mode %>
-              <div class="token-inputs">
-                <% token_types.each do |tt| %>
-                  <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
-                         value="<%= tokens_map.dig(canon_label, tt['id']) || 0 %>"
-                         title="<%= tt['name'] %>"
-                         data-action="input->survey-editor#markDirty" />
-                <% end %>
-              </div>
-            <% end %>
           </li>
         <% end %>
       </ul>
@@ -224,16 +204,6 @@
               <% end %>
             </div>
             <div class="choice-label" <%= ce_attr %>><%= opt %></div>
-            <% if token_mode %>
-              <div class="token-inputs">
-                <% token_types.each do |tt| %>
-                  <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
-                         value="<%= tokens_map.dig(canon[i], tt['id']) || 0 %>"
-                         title="<%= tt['name'] %>"
-                         data-action="input->survey-editor#markDirty" />
-                <% end %>
-              </div>
-            <% end %>
           </li>
         <% end %>
       </ul>
@@ -535,42 +505,62 @@
 
   <%# Tokenisation: for types with no single inline "answer" to key a token
       amount off (tap_card's per-statement/per-direction awards, and the flat
-      awards on scale/open/prioritise cards) — list/grid/yes-no get their
-      inline per-option inputs above instead. Hidden on translation tabs
+      awards on scale/open/prioritise cards, and one row per option for
+      list/grid/yes-no). Rendered once per card (not inline per option) so
+      it relocates as a single unit into the editor's Tokenomics sidebar tab
+      — see type-panel controller's registerCard. Hidden on translation tabs
       (CSS), so amounts are only ever set in the primary language. %>
-  <% if token_mode && (type == "tap_card" || TokenGrading::FLAT.include?(type)) %>
-    <div class="token-award-block" data-token-block>
-      <div class="token-award-title"><span>🪙</span> <%= t("card.token_award_title") %></div>
+  <% if token_mode %>
+    <% choice_shaped = (TokenGrading::CHOICE_ONE + TokenGrading::CHOICE_MANY).include?(type) %>
+    <% if type == "tap_card" || TokenGrading::FLAT.include?(type) || choice_shaped %>
+      <div class="token-award-block" data-token-block>
+        <div class="token-award-title"><span>🪙</span> <%= t("card.token_award_title") %></div>
 
-      <% if type == "tap_card" %>
-        <% Array(display["options"]).each_with_index do |opt, i| %>
-          <div class="token-tap-row" data-statement="<%= canon[i] %>">
-            <span class="token-award-label"><%= opt %></span>
-            <% %w[yes unsure no].each do |dir| %>
-              <div class="token-inputs" data-direction="<%= dir %>">
+        <% if type == "tap_card" %>
+          <% Array(display["options"]).each_with_index do |opt, i| %>
+            <div class="token-tap-row" data-statement="<%= canon[i] %>">
+              <span class="token-award-label"><%= opt %></span>
+              <% %w[yes unsure no].each do |dir| %>
+                <div class="token-inputs" data-direction="<%= dir %>">
+                  <% token_types.each do |tt| %>
+                    <input type="number" class="token-amount-input"
+                           data-token-statement="<%= canon[i] %>" data-token-direction="<%= dir %>" data-token-id="<%= tt['id'] %>"
+                           value="<%= tokens_map.dig(canon[i], dir, tt['id']) || 0 %>"
+                           title="<%= "#{tt['name']} — #{dir}" %>"
+                           data-action="input->survey-editor#markDirty" />
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        <% elsif choice_shaped %>
+          <% option_labels = type == "yes_no" ? [["Yes", 1], ["No", 4]].map { |label, _bg| [label, t("card.#{label.downcase}", locale: display_locale, default: label)] } : Array(display["options"]).each_with_index.map { |opt, i| [canon[i], opt] } %>
+          <% option_labels.each do |canon_label, shown_label| %>
+            <div class="token-award-row" data-canonical="<%= canon_label %>">
+              <span class="token-award-label"><%= shown_label %></span>
+              <div class="token-inputs">
                 <% token_types.each do |tt| %>
-                  <input type="number" class="token-amount-input"
-                         data-token-statement="<%= canon[i] %>" data-token-direction="<%= dir %>" data-token-id="<%= tt['id'] %>"
-                         value="<%= tokens_map.dig(canon[i], dir, tt['id']) || 0 %>"
-                         title="<%= "#{tt['name']} — #{dir}" %>"
+                  <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
+                         value="<%= tokens_map.dig(canon_label, tt['id']) || 0 %>"
+                         title="<%= tt['name'] %>"
                          data-action="input->survey-editor#markDirty" />
                 <% end %>
               </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="token-award-row">
+            <span class="token-award-label"><%= t("card.token_award_hint") %></span>
+            <% token_types.each do |tt| %>
+              <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
+                     value="<%= token_award[tt['id']] || 0 %>"
+                     title="<%= tt['name'] %>"
+                     data-action="input->survey-editor#markDirty" />
             <% end %>
           </div>
         <% end %>
-      <% else %>
-        <div class="token-award-row">
-          <span class="token-award-label"><%= t("card.token_award_hint") %></span>
-          <% token_types.each do |tt| %>
-            <input type="number" class="token-amount-input" data-token-id="<%= tt['id'] %>"
-                   value="<%= token_award[tt['id']] || 0 %>"
-                   title="<%= tt['name'] %>"
-                   data-action="input->survey-editor#markDirty" />
-          <% end %>
-        </div>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
   <% end %>
 
   <%# "Other" free-text — a standalone answer the creator can toggle per card.

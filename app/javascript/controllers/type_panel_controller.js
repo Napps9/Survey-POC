@@ -405,7 +405,7 @@ export default class extends Controller {
     "card", "panelEmpty", "cardEditor", "typeList", "panelFooter",
     "panelCardName", "panelHint", "typeOpt", "toast", "toastMsg", "cardCount",
     "allTypesModal", "allTypesList", "allTypeOpt", "modalCardName",
-    "subtabs", "subtab", "subview", "tokenSlot", "tokenNote", "quizSlot"
+    "subtabs", "subtab", "subview", "tokenSlot", "quizSlot"
   ]
 
   static values = { quiz: Boolean, tokenisation: Boolean }
@@ -552,7 +552,6 @@ export default class extends Controller {
     const quizBlock  = showQuiz   ? this.quizBlockFor(card)  : null
     if (this.hasTokenSlotTarget && tokenBlock) this.tokenSlotTarget.appendChild(tokenBlock)
     if (this.hasQuizSlotTarget && quizBlock)   this.quizSlotTarget.appendChild(quizBlock)
-    if (this.hasTokenNoteTarget) this.tokenNoteTarget.hidden = !showTokens || !!tokenBlock
 
     const activeBtn = this.subtabTargets.find(b => b.classList.contains("is-active"))
     if (!activeBtn || activeBtn.hidden) this._showSubtab("type")
