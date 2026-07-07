@@ -1,0 +1,258 @@
+# How Vertos get their imagery
+
+*How Playverto picks images and visual content for a Verto — from the Pexels
+API and from the built-in Verto library.*
+
+*Reference document · reflects the live behaviour as implemented in the
+product. Companion to "Rules of the Game" (which covers question design;
+this covers visuals).*
+
+---
+
+## The short version
+
+1. **Pexels is the primary source.** When a Pexels API key is configured, the
+   background, card panels and Tap-card statement images are fetched live from
+   Pexels, matched to the Verto's theme and each card's subject.
+2. **The Verto library is the curated fallback.** When Pexels is not
+   configured (or a search returns nothing), a bundled, hand-tagged asset
+   library takes over, scored against the Verto's theme, audience age and each
+   card's wording.
+3. **Creators can override everything.** Every pick can be swapped in the
+   editor's media picker — from the library, a fresh Pexels search, or an
+   upload (which is AI-moderated before it lands).
+4. **Picks are stable, not random.** The same Verto always populates with the
+   same imagery. The editor's **Shuffle** button is the only thing that
+   re-rolls the picks (and it's disabled once a Verto is live).
+
+---
+
+## 1. What imagery a Verto carries
+
+| Slot | What it is |
+|---|---|
+| **Background** | One full-bleed backdrop behind the whole Verto. |
+| **Card panel** | One photo **or** one short muted video on each card's left panel (never both). Videos autoplay, looped, no sound. |
+| **Tap-card statements** | One square image per swipe statement. |
+| **Range card** | No stored image — the panel plays a reactive animation that changes with the slider (see §7). |
+| **Grid / list tiles** | No photos — small subject icons matched to each option's wording (see §7). |
+| **Mobile card backdrop** | A soft image behind the card body on phones, chosen per Verto so the mobile view never looks bare. |
+
+A card image from Pexels also carries its **photographer credit**, shown as a
+subtle "Photo by …" link on the card (required by the Pexels licence and good
+manners besides).
+
+## 2. When imagery is chosen
+
+Imagery is populated **automatically at creation** on every path — AI
+generation from a brief, PDF import, and Google Forms import. It happens
+immediately, as part of creating the Verto, and it is best-effort: if an image
+source hiccups, the Verto is still created (a card just stays blank rather
+than the whole thing failing).
+
+After that:
+
+- **Shuffle assets** (editor toolbar) re-rolls every automatic pick with a
+  fresh random seed — a one-click "show me a different look".
+- Editing a card never silently changes its imagery; only Shuffle or the
+  media picker do.
+- **Live Vertos are locked** — Shuffle is blocked once a Verto is published,
+  protecting what respondents see.
+
+## 3. How each pick is chosen
+
+### Background
+
+1. **Pexels first** — a landscape search built from the Verto's theme words
+   (cropped to 1920×1080).
+2. **Library fallback** — curated backgrounds, but only those that genuinely
+   match the theme are considered, then scored (see §4).
+3. **Never blank** — if nothing scores, a deterministic rotation through the
+   background pool guarantees the editor never opens on an empty backdrop.
+
+### Card panels (photo or video)
+
+- **Tap and Range cards are skipped** — Tap cards put their imagery on the
+  statements themselves; Range shows the reactive animation.
+- **Pexels first** — a portrait search (cropped 720×1280) built from the
+  card's own wording plus the theme.
+- **Video cadence** — every third card that receives media prefers a **video**
+  instead of a photo. This is the variety principle applied to media: videos
+  never sit on adjacent cards, and photo runs are capped at two.
+- **Library fallback, two tiers:**
+  - *Tier 1 — themed art.* An asset must fit the card type **and** share a
+    genuine thematic connection, and score above a minimum bar. Close enough
+    isn't enough — an off-theme asset can't win on general appeal alone.
+  - *Tier 2 — card-type art.* If nothing themed qualifies: choice-style art
+    for pick-one/pick-many/yes-no/prioritise cards, scale-style art for
+    range/rating/NPS cards.
+  - *Deliberately blank* if neither tier fits — a clean panel beats a wrong
+    image.
+
+### Tap-card statement images
+
+- **Pexels first** — one square image (800×800) per statement, no repeats
+  within the card, and statements on *different* Tap cards get different
+  images too.
+- **Library fallback** — a dedicated swipe-card pool; unused assets are
+  preferred, and the pool cycles gracefully if a card has more statements
+  than the pool has assets.
+
+### Videos (when the cadence picks one)
+
+Only mp4s in a sensible band are used — at least 700px wide (sharp on a
+card), never above 1920px (no 4K files on a phone connection). Each video
+gets a poster frame so the card looks right before playback starts.
+
+## 4. How matching and scoring work (the library brain)
+
+When the library is choosing, every candidate asset is scored against the
+Verto and the specific card:
+
+| Signal | Weight | Notes |
+|---|---|---|
+| Asset keyword found in the card's own text/options | **+4 each** | The heaviest — subject-specific pictures win. |
+| Theme keyword match | +3 each | From the Verto's stated theme. |
+| Audience age match | +2 (+1 if asset is tagged "all ages") | Age buckets: kids / teen / young-adult / adult / senior. |
+| Mood match | +2 | playful, energetic, calm, serious, warm… |
+| Style match | +1 | photo, illustrated, vibrant, minimal… |
+
+Two guard rails keep the scores honest:
+
+- **The theme gate.** An asset must share at least one theme or subject
+  keyword with the Verto before its age/mood/style bonuses count at all —
+  so a great sports photo can't win a climate Verto just because the
+  audience age matches.
+- **Theme clusters.** Related topics are grouped (food ↔ nutrition ↔
+  sustainability ↔ nature; work ↔ career ↔ office ↔ leadership; etc.), so a
+  "healthy eating" Verto still finds assets tagged "nature". Every cluster
+  anchors to at least one canonical visual family, so the matcher can always
+  resolve *something* sensible.
+
+**Determinism.** All "random" choices are seeded from the Verto's identity,
+slot by slot. The same Verto populates identically every time; two different
+Vertos with the same theme still get different-feeling picks. Shuffle swaps
+the seed — that's all it does.
+
+**No visual déjà vu.** An asset already used on one card is avoided on the
+next; repeats are allowed only once a pool is exhausted.
+
+## 5. The Verto library
+
+The bundled library lives at `app/assets/images/verto-library/`, indexed by a
+`manifest.yml` that the matcher reads live (no rebuild needed — drop a file
+in, add its entry, and it's immediately eligible).
+
+Categories:
+
+| Category | Used for |
+|---|---|
+| `backgrounds` | Full-bleed Verto backdrops |
+| `left_panel` | Tier-1 themed card panels |
+| `select_art` | Tier-2 art for choice-type cards |
+| `range_art` | Tier-2 art for scale-type cards (range/rating/NPS) |
+| `swipe_cards` | Tap-card statement images |
+| `mobile_backgrounds` | The soft mobile card backdrop |
+
+Each entry carries `file` plus optional tags: `themes`, `age`, `mood`,
+`style`, `card_types`, and `keywords` (the heavyweight, subject-specific
+matches). **To add an asset:** drop the file in the right folder, add a
+manifest entry, and tag it with the themes/keywords you want it found by —
+the more specific the keywords, the more precisely it will be picked.
+
+## 6. The Pexels integration
+
+- **What's searched.** Photo and video search on the official Pexels API,
+  with slot-appropriate orientation (landscape for backgrounds, portrait for
+  cards, square for swipe statements) and exact crops per slot so images fit
+  their frame precisely.
+- **Configuration.** One environment variable (`PEXELS_API_KEY`, or legacy
+  `PEXELS`). No key → the feature is simply off and the library takes over;
+  development, CI and tests never touch the network.
+- **Resilience.** Pexels calls never break Verto creation. Any API problem
+  quietly returns "no results" and the library fallback engages.
+- **Efficiency.** During a single population run, each distinct search query
+  hits the API at most once, however many cards share it.
+- **Credit.** Every applied Pexels photo/video stores the photographer's name
+  and profile link, rendered as the on-card credit. Applying a library image
+  or upload clears the credit (nothing to credit).
+
+## 7. What is *not* photo-driven
+
+- **Range cards** play a reactive animated character that responds to the
+  slider position (one global animation theme today; a per-theme picker is a
+  future step).
+- **NPS cards** render a procedurally drawn "vessel" that fills as the score
+  rises — generated on the fly and tinted with the Verto's brand colour, not
+  an image file.
+- **Grid and list options** get small subject icons via an exact-keyword
+  lookup against a bundled icon set. It's deliberately conservative: if an
+  option's wording doesn't clearly match an icon, the tile shows a clean
+  colour gradient instead of guessing.
+- **Brand palette** doesn't choose imagery, but tints the backdrop scrim,
+  overlays and the NPS vessel so photos and UI read as one design.
+
+## 8. Creator overrides in the editor
+
+The media picker (the "Add design" / "Change media" button on any card or the
+background) offers:
+
+- **Verto Library** — the curated tiles, always available.
+- **Recommended** — the same scoring engine's top suggestions for *this*
+  card, shown only when something genuinely scores.
+- **Pexels search** — live photo/video search (queries are safety-scrubbed;
+  results carry their credit automatically).
+- **Upload** — the creator's own image. Big files are downscaled and
+  recompressed in the browser first, then **AI-moderated** before they're
+  applied (see §9).
+
+New Tap-card statements added in the editor self-serve an image from the
+swipe pool, preferring ones the deck isn't already using — the same
+no-repeats rule the automatic pass follows.
+
+## 9. Safety gates
+
+Three independent layers keep imagery appropriate:
+
+1. **Search-word filtering (Pexels).** Queries are scrubbed of blocked terms
+   before they're sent, and any result whose description matches a blocked
+   term is dropped. Vertos aimed at younger audiences apply a stricter
+   additional list (alcohol, smoking, gambling and similar are filtered out
+   on top of the general list).
+2. **AI moderation (uploads).** Creator uploads are reviewed by an AI vision
+   check against the Verto's audience age before being applied — PG standards
+   for everyone, stricter for young audiences. If moderation can't verify an
+   image, the upload is blocked rather than waved through.
+3. **Storage rules.** A Verto can only persist imagery from trusted shapes:
+   bundled library assets, Pexels CDN URLs, or small inline uploads — and
+   video only from the Pexels video CDN. The player's security policy
+   likewise only allows images and media from those sources, so nothing
+   off-list can render even if it somehow got stored.
+
+## 10. Quick reference
+
+| Slot | Primary | Fallback | Creator override |
+|---|---|---|---|
+| Background | Pexels landscape (theme query) | Library `backgrounds` (theme-gated, never blank) | Library / Pexels / upload |
+| Card panel | Pexels portrait photo — every 3rd media card a video | Tier 1 themed → Tier 2 type art → blank | Library / Recommended / Pexels / upload |
+| Tap statements | Pexels square, unique per statement | `swipe_cards` pool, no repeats in a card | Per-statement pick in editor |
+| Range panel | Reactive animation (always) | — | — |
+| NPS control | Procedural vessel (always) | — | — |
+| Grid/list tiles | Keyword icon or gradient (always) | — | — |
+| Mobile backdrop | Library `mobile_backgrounds`, theme-matched | Random from the pool (never empty) | — |
+
+### Pointers into the code
+
+- `app/services/asset_populator.rb` — the population flow, scoring, tiers,
+  seeding and de-duplication; `app/assets/images/verto-library/manifest.yml`
+  — the library index and tagging vocabulary.
+- `app/services/pexels_client.rb` — Pexels API, orientations, crops, video
+  band; `app/services/content_safety.rb` — the search-word filter.
+- `app/services/image_moderator.rb` + `SurveysController#moderate_image` —
+  upload moderation; `Survey.sanitize_cards_images!` — the storage rules.
+- `app/javascript/controllers/media_picker_controller.js` — the editor's
+  picker; `SurveysController#pexels_search` / `#shuffle_assets` — its
+  endpoints.
+- `app/helpers/nps_helper.rb` + `lottie_player_controller.js` — the range
+  animation and NPS vessel; `app/lib/option_icon_library.rb` — grid/list
+  option icons.
