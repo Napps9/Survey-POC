@@ -8,7 +8,7 @@ import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
 const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
 
 export default class extends Controller {
-  static targets = ["card", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode", "vertoScore", "scoreBoard"]
+  static targets = ["card", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode", "vertoScore", "scoreBoard", "panelLight"]
   static values  = {
     url: String, title: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -272,22 +272,63 @@ export default class extends Controller {
 
   refreshCard(card) {
     const light = card.querySelector("[data-role='card-light']")
-    if (!light) return // welcome cards aren't questions, so they aren't scored
+    if (!light) {
+      // Not a scored question (welcome/token-checkpoint) — hide the pinned
+      // sidebar mirror if this is the card currently open in the panel.
+      if (this.hasPanelLightTarget && this._typePanelActiveCard() === card) this.panelLightTarget.hidden = true
+      return
+    }
     this._paintCardLight(card, analyzeCard(this._cardData(card)))
   }
 
   _paintCardLight(card, result) {
+    if (!result) return
     const light = card.querySelector("[data-role='card-light']")
-    if (!light || !result) return
+    if (light) this._applyLightVisuals(light, result)
+
+    // Mirror onto the pinned sidebar light so the score stays visible
+    // whichever sub-tab (Question type / Tokenomics / Quiz mode) is open.
+    if (this.hasPanelLightTarget && this._typePanelActiveCard() === card) {
+      this._applyLightVisuals(this.panelLightTarget, result)
+    }
+
+    const panel = card.querySelector("[data-role='card-analysis']")
+    if (panel) panel.innerHTML = this._panelHtml(t("editor.rules.title"), result.checks)
+  }
+
+  _applyLightVisuals(light, result) {
     light.hidden = false
-    light.className = `card-light is-${result.rating}`
+    // classList (not className) so each element's own base classes — plain
+    // .card-light inline, .card-light.panel-card-light pinned — survive.
+    light.classList.remove("is-green", "is-yellow", "is-red")
+    light.classList.add(`is-${result.rating}`)
     light.setAttribute("title", t("editor.rules.card_aria"))
     const word = light.querySelector("[data-role='card-light-word']")
     const score = light.querySelector("[data-role='card-light-score']")
     if (word) word.textContent = this._ratingWord(result.rating)
     if (score) score.textContent = result.score
-    const panel = card.querySelector("[data-role='card-analysis']")
-    if (panel) panel.innerHTML = this._panelHtml(t("editor.rules.title"), result.checks)
+  }
+
+  // The card currently open in the right-hand panel (type-panel controller),
+  // if any — shared root element, so we can reach across controllers.
+  _typePanelActiveCard() {
+    return this._typePanel()?.activeCardEl || null
+  }
+
+  _typePanel() {
+    return this.application.getControllerForElementAndIdentifier(this.element, "type-panel")
+  }
+
+  // Clicking the pinned sidebar light jumps to the card's own analysis
+  // breakdown in the feed (the pinned light has no room for the checklist).
+  togglePanelCardAnalysis(event) {
+    const card = this._typePanelActiveCard()
+    const panel = card?.querySelector("[data-role='card-analysis']")
+    if (!panel) return
+    const open = panel.hidden
+    panel.hidden = !open
+    event.currentTarget.setAttribute("aria-expanded", String(open))
+    if (open) card.scrollIntoView({ behavior: "smooth", block: "center" })
   }
 
   refreshScore() {
@@ -416,6 +457,7 @@ export default class extends Controller {
     if (!newEl) return
 
     oldEl.replaceWith(newEl)
+    this._typePanel()?.registerCard(newEl)
 
     this._store.delete(oldEl)
     const entry = {}
@@ -591,7 +633,7 @@ export default class extends Controller {
         const correct = this._readCorrect(card, type)
         if (this._hasCorrect(correct)) {
           out.correct = correct
-          const expl = card.querySelector("[data-quiz-explanation]")?.value?.trim()
+          const expl = this._quizScope(card).querySelector("[data-quiz-explanation]")?.value?.trim()
           if (expl) out.explanation = expl
         }
       }
@@ -635,6 +677,16 @@ export default class extends Controller {
     return true
   }
 
+  // Quiz-correct-block / token-award-block may currently be relocated into
+  // the sidebar's Tokenomics/Quiz mode sub-tabs (see type-panel controller's
+  // selectCard) rather than sitting inside `card` — look them up by the
+  // registry (element reference, location-independent) so reads/writes keep
+  // working wherever the block currently lives. Falls back to searching
+  // `card` itself for a block that was never relocated (e.g. no card has
+  // been selected in the panel yet).
+  _quizScope(card)  { return this._typePanel()?.quizBlockFor(card)  || card }
+  _tokenScope(card) { return this._typePanel()?.tokenBlockFor(card) || card }
+
   // The marked correct answer for a card, in the shape QuizGrading expects.
   _readCorrect(card, type) {
     const labelOf = item => {
@@ -652,18 +704,18 @@ export default class extends Controller {
                     .map(labelOf).filter(Boolean)
       case "tap_card": {
         const map = {}
-        card.querySelectorAll(".quiz-tap-row").forEach(row => {
+        this._quizScope(card).querySelectorAll(".quiz-tap-row").forEach(row => {
           const dir = row.dataset.correctDir
           if (dir === "yes" || dir === "no") map[(row.dataset.statement || "").trim()] = dir
         })
         return map
       }
       case "range": case "nps": case "rating": {
-        const v = card.querySelector("[data-quiz-correct]")?.value
+        const v = this._quizScope(card).querySelector("[data-quiz-correct]")?.value
         return (v === undefined || v === null || v === "") ? null : Number(v)
       }
       case "open_ended": {
-        const ta = card.querySelector("[data-quiz-accepted]")
+        const ta = this._quizScope(card).querySelector("[data-quiz-accepted]")
         return ta ? ta.value.split("\n").map(s => s.trim()).filter(Boolean) : null
       }
       default: return null
@@ -702,7 +754,7 @@ export default class extends Controller {
       }
       case "tap_card": {
         const tokens = {}
-        card.querySelectorAll(".token-tap-row").forEach(row => {
+        this._tokenScope(card).querySelectorAll(".token-tap-row").forEach(row => {
           const statement = (row.dataset.statement || "").trim()
           if (!statement) return
           const dirs = {}
@@ -716,7 +768,7 @@ export default class extends Controller {
         return { tokens }
       }
       case "range": case "nps": case "rating": case "open_ended": case "prioritise": {
-        const row = card.querySelector(".token-award-row")
+        const row = this._tokenScope(card).querySelector(".token-award-row")
         return { token_award: row ? this._tokenAmounts(row) : {} }
       }
       default:

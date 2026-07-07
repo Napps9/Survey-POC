@@ -2225,6 +2225,35 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   display: flex; flex-direction: column; gap: 6px;
 }
 
+/* Pinned per-card traffic light, above the sub-tabs — stays visible whichever
+   of Question type / Tokenomics / Quiz mode is open. */
+.panel-card-light { margin: 0 16px 12px; align-self: flex-start; }
+
+/* Per-card sub-tabs — Question type, plus Tokenomics / Quiz mode once this
+   Verto (and the selected card) supports them. Nested version of .right-tab. */
+.card-subtabs {
+  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 0 16px 12px;
+}
+.card-subtab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  font-family: "ABeeZee", sans-serif; font-size: 11px;
+  color: rgba(255,255,255,0.6); cursor: pointer; line-height: 1.4;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.card-subtab:hover { background: rgba(255,255,255,0.09); color: #fff; }
+.card-subtab.is-active { color: #fff; background: rgba(1,234,203,0.1); border-color: rgba(1,234,203,0.5); }
+
+.card-subview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.card-subview-slot:empty { display: none; }
+.card-subview-note {
+  padding: 14px 16px; font-family: "ABeeZee", sans-serif; font-size: 12px;
+  color: rgba(255,255,255,0.45); line-height: 1.5;
+}
+
 /* Each recommended type renders as: [rank rail] [tile]. The rail is a
    fixed-width column so the four medal/star emoji line up vertically and
    read as a 1st→4th ranked list down the panel. */
@@ -4343,4 +4372,27 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .token-award-label { flex: 1; min-width: 0; font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034; }
 
 .token-tap-row { display: flex; align-items: center; gap: 8px; }
+
+/* .quiz-correct-block / .token-award-block are normally styled for the card's
+   white content panel (above) — relocated into the dark right-hand sidebar's
+   Tokenomics/Quiz mode sub-tabs (see type-panel controller), they need a
+   dark-theme skin instead. */
+.card-subview .quiz-correct-block,
+.card-subview .token-award-block {
+  margin: 14px 16px; background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.14);
+}
+.card-subview .quiz-correct-title { color: #B7B3FF; }
+.card-subview .token-award-title  { color: #FBBF6B; }
+.card-subview .quiz-correct-hint,
+.card-subview .quiz-tap-label,
+.card-subview .token-award-label { color: rgba(255,255,255,0.6); }
+.card-subview .quiz-correct-select,
+.card-subview .quiz-correct-textarea,
+.card-subview .quiz-tap-btn,
+.card-subview .token-amount-input {
+  background: rgba(255,255,255,0.07); color: #fff; border-color: rgba(255,255,255,0.18);
+}
+.card-subview .quiz-correct-select:focus,
+.card-subview .quiz-correct-textarea:focus { border-color: #8B85FF; }
+.card-subview .token-amount-input:focus { border-color: #F59E0B; }
 .token-tap-row .token-inputs { margin-left: auto; }

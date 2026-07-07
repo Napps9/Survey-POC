@@ -402,10 +402,13 @@ function sliderHtml(opts) {
 
 export default class extends Controller {
   static targets = [
-    "card", "panelEmpty", "typeList", "panelFooter",
+    "card", "panelEmpty", "cardEditor", "typeList", "panelFooter",
     "panelCardName", "panelHint", "typeOpt", "toast", "toastMsg", "cardCount",
-    "allTypesModal", "allTypesList", "allTypeOpt", "modalCardName"
+    "allTypesModal", "allTypesList", "allTypeOpt", "modalCardName",
+    "subtabs", "subtab", "subview", "tokenSlot", "tokenNote", "quizSlot"
   ]
+
+  static values = { quiz: Boolean, tokenisation: Boolean }
 
   // Emoji shown next to each recommended type in the side panel — 1st-4th place.
   RANK_EMOJI = ["🥇", "🥈", "🥉", "⭐"]
@@ -413,6 +416,57 @@ export default class extends Controller {
 
   activeCardEl = null
   pendingType  = null
+
+  // Quiz/Tokenomics settings for a card live in the .quiz-correct-block /
+  // .token-award-block rendered inside it (see _card_component.html.erb) —
+  // registerCard() remembers where each card's blocks are by direct element
+  // reference (not by position/index, which reordering and deletes would
+  // invalidate) so selectCard can relocate the selected card's blocks into
+  // the sidebar's Tokenomics/Quiz mode sub-tabs regardless of where they
+  // currently sit in the DOM. survey_editor_controller reads/writes them
+  // through the same registry so autosave keeps working after relocation.
+  connect() {
+    this._quizBlocks  = new WeakMap()
+    this._tokenBlocks = new WeakMap()
+    this.cardTargets.forEach(c => this.registerCard(c))
+  }
+
+  registerCard(card) {
+    const quiz = card.querySelector(".quiz-correct-block")
+    if (quiz) this._quizBlocks.set(card, quiz)
+    const tokens = card.querySelector(".token-award-block")
+    if (tokens) this._tokenBlocks.set(card, tokens)
+  }
+
+  quizBlockFor(card)  { return this._quizBlocks?.get(card) }
+  tokenBlockFor(card) { return this._tokenBlocks?.get(card) }
+
+  // A hidden holding pen for the previously-active card's relocated blocks —
+  // they stay attached to the document (so their inputs/values and Stimulus
+  // bindings survive) without being visible anywhere until their card is
+  // selected again.
+  get _parkingLot() {
+    if (!this._parking) {
+      this._parking = document.createElement("div")
+      this._parking.hidden = true
+      this.element.appendChild(this._parking)
+    }
+    return this._parking
+  }
+
+  _parkSlotContents() {
+    if (this.hasTokenSlotTarget) this._parkingLot.append(...this.tokenSlotTarget.children)
+    if (this.hasQuizSlotTarget)  this._parkingLot.append(...this.quizSlotTarget.children)
+  }
+
+  showSubtab(event) {
+    this._showSubtab(event.currentTarget.dataset.subtab)
+  }
+
+  _showSubtab(name) {
+    this.subtabTargets.forEach(b => b.classList.toggle("is-active", b.dataset.subtab === name))
+    this.subviewTargets.forEach(v => { v.hidden = v.dataset.subtab !== name })
+  }
 
   // Lazy getter so the JSON blob is read from the current page's DOM on
   // first use, no matter when the module loaded. This avoids both Turbo
@@ -465,11 +519,43 @@ export default class extends Controller {
     this.panelCardNameTarget.textContent = t("editor.card_n", { n: cardNum, type: meta?.badge || cardType })
     this.panelHintTarget.textContent     = t("editor.choose_format")
 
-    this.panelEmptyTarget.style.display  = "none"
+    this.panelEmptyTarget.style.display = "none"
+    this.cardEditorTarget.style.display = "flex"
     this.typeListTarget.style.display    = "flex"
     this.panelFooterTarget.style.display = "flex"
 
     this._renderCompatibleTypes(cardType)
+    this._updateSubtabsFor(card, cardType)
+
+    // Paint the pinned sidebar traffic light immediately (it otherwise only
+    // repaints on the next markDirty/refreshAll cycle).
+    this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")?.refreshCard(card)
+  }
+
+  // Show/hide the Tokenomics and Quiz mode sub-tabs for the just-selected
+  // card, and relocate its quiz/token blocks (if any) into their slots. Only
+  // one card's blocks are ever out of their card at a time — the previously
+  // active card's blocks get parked (not lost — see _parkSlotContents).
+  _updateSubtabsFor(card, cardType) {
+    const isQ = !NON_QUESTION_TYPES.includes(cardType)
+    const showTokens = isQ && this.tokenisationValue
+    const showQuiz   = isQ && this.quizValue
+
+    const tokensBtn = this.subtabTargets.find(b => b.dataset.subtab === "tokens")
+    const quizBtn   = this.subtabTargets.find(b => b.dataset.subtab === "quiz")
+    if (tokensBtn) tokensBtn.hidden = !showTokens
+    if (quizBtn)   quizBtn.hidden   = !showQuiz
+    this.subtabsTarget.hidden = !(showTokens || showQuiz)
+
+    this._parkSlotContents()
+    const tokenBlock = showTokens ? this.tokenBlockFor(card) : null
+    const quizBlock  = showQuiz   ? this.quizBlockFor(card)  : null
+    if (this.hasTokenSlotTarget && tokenBlock) this.tokenSlotTarget.appendChild(tokenBlock)
+    if (this.hasQuizSlotTarget && quizBlock)   this.quizSlotTarget.appendChild(quizBlock)
+    if (this.hasTokenNoteTarget) this.tokenNoteTarget.hidden = !showTokens || !!tokenBlock
+
+    const activeBtn = this.subtabTargets.find(b => b.classList.contains("is-active"))
+    if (!activeBtn || activeBtn.hidden) this._showSubtab("type")
   }
 
   setType(event) {
@@ -525,8 +611,18 @@ export default class extends Controller {
     if (card === this.activeCardEl) {
       this.activeCardEl = null
       this.panelEmptyTarget.style.display  = ""
+      this.cardEditorTarget.style.display  = "none"
       this.typeListTarget.style.display    = "none"
       this.panelFooterTarget.style.display = "none"
+      // The deleted card's blocks (if relocated into the sidebar) go with it —
+      // there's no card left to save their data against.
+      this._parkSlotContents()
+      const tokensBtn = this.subtabTargets.find(b => b.dataset.subtab === "tokens")
+      const quizBtn   = this.subtabTargets.find(b => b.dataset.subtab === "quiz")
+      if (tokensBtn) tokensBtn.hidden = true
+      if (quizBtn)   quizBtn.hidden   = true
+      this.subtabsTarget.hidden = true
+      this._showSubtab("type")
     }
     this._updateCount()
     this.dispatch("changed")

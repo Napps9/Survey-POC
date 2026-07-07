@@ -43,6 +43,8 @@
      data-survey-editor-quiz-value="<%= @survey.quiz? %>"
      data-survey-editor-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-token-types-value="<%= @survey.token_types.to_json %>"
+     data-type-panel-quiz-value="<%= @survey.quiz? %>"
+     data-type-panel-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.published? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
@@ -261,45 +263,82 @@
         </div>
       </div>
 
-      <div class="type-list" style="display:none;" data-type-panel-target="typeList">
-        <% CardTypes.pickable_for(@survey).each do |key, t| %>
-          <div class="type-opt-wrap">
-            <div class="type-opt-rank"></div>
-            <div class="type-opt"
-                 data-type="<%= key %>"
-                 data-type-panel-target="typeOpt"
-                 data-action="click->type-panel#setType">
-              <div class="type-opt-preview">
-                <%= mini_preview_html({ "type" => key, "options" => [] }) %>
-              </div>
-              <div class="type-opt-row">
-                <div class="type-opt-icon"><%= t["picker_icon"] %></div>
-                <div style="flex:1;min-width:0;">
-                  <div class="type-opt-name"><%= t["picker_name"] %></div>
-                  <div class="type-opt-desc"><%= t["picker_desc"] %></div>
-                </div>
-                <button type="button" class="type-opt-info" aria-label="<%= t["picker_name"] %> — what's this?"
-                        data-type-icon="<%= t["picker_icon"] %>" data-type-name="<%= t["picker_name"] %>"
-                        data-type-explainer="<%= t["explainer"] %>"
-                        data-action="click->type-info#open">ⓘ</button>
-                <div class="type-opt-radio"></div>
-              </div>
-            </div>
-          </div>
-        <% end %>
-      </div>
+      <%# ── Per-card editor: pinned traffic light (visible whichever sub-tab is
+          open) + the Question type / Tokenomics / Quiz mode sub-tabs. The
+          Tokenomics/Quiz mode tabs only appear once this Verto has that
+          feature on AND the selected card is a question (see selectCard). ── %>
+      <div style="display:none;flex:1;min-height:0;flex-direction:column;" data-type-panel-target="cardEditor">
 
-      <div class="type-panel-footer" style="display:none;" data-type-panel-target="panelFooter">
-        <button type="button"
-                style="width:100%;padding:10px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
-                onmouseover="this.style.background='#00C4AB'"
-                onmouseout="this.style.background='#01EACB'"
-                data-action="click->type-panel#applyType"><%= t("editor.apply_to_card") %></button>
-        <button type="button"
-                style="width:100%;padding:8px;border-radius:16px;background:transparent;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all 0.15s;"
-                onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.35)'"
-                onmouseout="this.style.color='rgba(255,255,255,0.65)';this.style.borderColor='rgba(255,255,255,0.15)'"
-                data-action="click->type-panel#openAllTypes"><%= t("editor.see_all_types") %></button>
+        <button type="button" class="card-light panel-card-light" hidden
+                data-survey-editor-target="panelLight"
+                data-action="click->survey-editor#togglePanelCardAnalysis">
+          <span class="rule-dot"></span>
+          <span class="card-light-word" data-role="card-light-word"></span>
+          <span class="card-light-score" data-role="card-light-score"></span>
+        </button>
+
+        <div class="card-subtabs" data-type-panel-target="subtabs">
+          <button type="button" class="card-subtab is-active" data-type-panel-target="subtab"
+                  data-subtab="type" data-action="click->type-panel#showSubtab">Question type</button>
+          <button type="button" class="card-subtab" data-type-panel-target="subtab"
+                  data-subtab="tokens" hidden data-action="click->type-panel#showSubtab">Tokenomics</button>
+          <button type="button" class="card-subtab" data-type-panel-target="subtab"
+                  data-subtab="quiz" hidden data-action="click->type-panel#showSubtab">Quiz mode</button>
+        </div>
+
+        <div class="card-subview" data-type-panel-target="subview" data-subtab="type">
+          <div class="type-list" data-type-panel-target="typeList">
+            <% CardTypes.pickable_for(@survey).each do |key, t| %>
+              <div class="type-opt-wrap">
+                <div class="type-opt-rank"></div>
+                <div class="type-opt"
+                     data-type="<%= key %>"
+                     data-type-panel-target="typeOpt"
+                     data-action="click->type-panel#setType">
+                  <div class="type-opt-preview">
+                    <%= mini_preview_html({ "type" => key, "options" => [] }) %>
+                  </div>
+                  <div class="type-opt-row">
+                    <div class="type-opt-icon"><%= t["picker_icon"] %></div>
+                    <div style="flex:1;min-width:0;">
+                      <div class="type-opt-name"><%= t["picker_name"] %></div>
+                      <div class="type-opt-desc"><%= t["picker_desc"] %></div>
+                    </div>
+                    <button type="button" class="type-opt-info" aria-label="<%= t["picker_name"] %> — what's this?"
+                            data-type-icon="<%= t["picker_icon"] %>" data-type-name="<%= t["picker_name"] %>"
+                            data-type-explainer="<%= t["explainer"] %>"
+                            data-action="click->type-info#open">ⓘ</button>
+                    <div class="type-opt-radio"></div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="type-panel-footer" data-type-panel-target="panelFooter">
+            <button type="button"
+                    style="width:100%;padding:10px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
+                    onmouseover="this.style.background='#00C4AB'"
+                    onmouseout="this.style.background='#01EACB'"
+                    data-action="click->type-panel#applyType"><%= t("editor.apply_to_card") %></button>
+            <button type="button"
+                    style="width:100%;padding:8px;border-radius:16px;background:transparent;color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all 0.15s;"
+                    onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.35)'"
+                    onmouseout="this.style.color='rgba(255,255,255,0.65)';this.style.borderColor='rgba(255,255,255,0.15)'"
+                    data-action="click->type-panel#openAllTypes"><%= t("editor.see_all_types") %></button>
+          </div>
+        </div>
+
+        <div class="card-subview" hidden data-type-panel-target="subview" data-subtab="tokens">
+          <div class="card-subview-slot" data-type-panel-target="tokenSlot"></div>
+          <div class="card-subview-note" data-type-panel-target="tokenNote" hidden>
+            Set point values directly on each option in the card.
+          </div>
+        </div>
+
+        <div class="card-subview" hidden data-type-panel-target="subview" data-subtab="quiz">
+          <div class="card-subview-slot" data-type-panel-target="quizSlot"></div>
+        </div>
       </div>
 
       <%# ── All question types modal ── %>

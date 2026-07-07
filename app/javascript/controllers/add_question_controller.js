@@ -383,6 +383,14 @@ export default class extends Controller {
       feed.appendChild(slot)
     }
 
+    // Register this new card's quiz-correct-block / token-award-block (if
+    // rendered) so the sidebar's Tokenomics/Quiz mode sub-tabs can find them
+    // once it's selected — see type-panel controller's registerCard.
+    const editorController = this.application.getControllerForElementAndIdentifier(
+      this.element, "type-panel"
+    )
+    editorController?.registerCard(card)
+
     card.scrollIntoView({ behavior: "smooth", block: "nearest" })
   }
 
