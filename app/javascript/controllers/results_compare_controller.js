@@ -10,60 +10,122 @@ const PALETTE = [
   "#9085e9", "#e66767", "#d55181", "#d95926"
 ]
 const FALLBACK_COLOR = "rgba(255,255,255,0.4)"
+// White rather than the accent teal used for the density fill below — a
+// teal stroke on a teal-tinted country (high response count) would be
+// invisible against its own fill.
+const MAP_SELECTED_STROKE = "#ffffff"
 
 const SKIP_TYPES = new Set([ "welcome_card", "token_checkpoint" ])
 
 export default class extends Controller {
-  static targets = [ "overlay", "meta", "picker", "body" ]
+  static targets = [ "panel", "meta", "picker", "body", "openBtn" ]
   static values  = { url: String }
 
   _data     = null
   _selected = new Set()
+  _isOpen   = false
   _escHandler = null
+  _mapData  = null
+  _mapSvg   = null
 
-  // The results page nests this controller inside an ancestor that has its
-  // own z-index stacking context (for the AI insight sidebar layout), which
-  // traps a nested position:fixed overlay below the app's top/bottom nav
-  // bars no matter how high its own z-index goes. Move the overlay to be a
-  // direct child of <body> so it stacks as a top-level modal instead —
-  // capture plain element refs first since Stimulus's target/action scoping
-  // stops working once an element leaves this controller's DOM scope, which
-  // is also why the close button and picker chips below are wired with
-  // plain addEventListener rather than data-action.
   connect() {
-    this._overlayEl = this.overlayTarget
-    this._metaEl    = this.metaTarget
-    this._pickerEl  = this.pickerTarget
-    this._bodyEl    = this.bodyTarget
-    document.body.appendChild(this._overlayEl)
-
-    this._overlayEl.querySelector(".compare-close-btn").addEventListener("click", () => this.close())
+    this._setupMap()
+    this._loadPromise = this._loadData()
   }
 
   disconnect() {
-    this._overlayEl?.remove()
     if (this._escHandler) document.removeEventListener("keydown", this._escHandler)
   }
 
+  async _loadData() {
+    try {
+      const res = await fetch(this.urlValue, { headers: { "Accept": "application/json" } })
+      this._data = await res.json()
+    } catch (_) {
+      this._data = null
+      return
+    }
+    const overall = this._data.segments.find(s => s.id === "overall")
+    const regions = this._data.segments.filter(s => s.id.startsWith("region_")).slice(0, 3)
+    ;[ overall, ...regions ].filter(Boolean).forEach(s => this._selected.add(s.id))
+    this._paintMap()
+  }
+
+  // ── Map: click a region to toggle it into the comparison ────────────────
+  // The SVG only has country-level shapes, so a click toggles ALL of that
+  // country's tagged region segments together — the smallest unit the map
+  // can represent, even when a country holds several distinct regions.
+  _setupMap() {
+    this._mapSvg = this.element.querySelector(".world-map")
+    const dataEl = document.getElementById("results-region-map-data")
+    this._mapData = dataEl ? JSON.parse(dataEl.textContent) : {}
+    if (!this._mapSvg) return
+
+    Object.entries(this._mapData).forEach(([ cc, d ]) => {
+      const el = this._mapSvg.querySelector("#" + cc)
+      if (!el || !d.segment_ids.length) return
+      el.classList.add("map-country")
+      const tip = document.createElementNS("http://www.w3.org/2000/svg", "title")
+      tip.textContent = `${d.name}: ${d.count}`
+      el.appendChild(tip)
+      el.addEventListener("click", () => this._toggleCountry(cc))
+    })
+    this._paintMap()
+  }
+
+  _toggleCountry(cc) {
+    const ids = this._mapData[cc]?.segment_ids || []
+    if (!ids.length) return
+    const allSelected = ids.every(id => this._selected.has(id))
+    ids.forEach(id => allSelected ? this._selected.delete(id) : this._selected.add(id))
+    this._paintMap()
+    if (this._isOpen && this._data) {
+      this._renderPicker()
+      this._renderBody()
+    }
+  }
+
+  _paintMap() {
+    if (!this._mapSvg || !this._mapData) return
+    const max = Math.max(1, ...Object.values(this._mapData).map(d => d.count))
+    Object.entries(this._mapData).forEach(([ cc, d ]) => {
+      const el = this._mapSvg.querySelector("#" + cc)
+      if (!el) return
+      const paths = el.tagName.toLowerCase() === "g" ? el.querySelectorAll("path") : [ el ]
+      const alpha = d.count === 0 ? 0.14 : 0.18 + 0.72 * (d.count / max)
+      const selected = d.segment_ids.some(id => this._selected.has(id))
+      paths.forEach(p => {
+        p.style.fill = `rgba(1,234,203,${alpha.toFixed(2)})`
+        p.style.stroke = selected ? MAP_SELECTED_STROKE : ""
+        p.style.strokeWidth = selected ? "2.4" : ""
+        p.style.filter = selected ? "drop-shadow(0 0 4px rgba(255,255,255,0.6))" : ""
+      })
+    })
+  }
+
+  // ── Panel open/close ─────────────────────────────────────────────────────
+  async toggle() {
+    if (this._isOpen) { this.close(); return }
+    await this.open()
+  }
+
   async open() {
-    this._overlayEl.classList.remove("hidden")
+    this._isOpen = true
+    this.panelTarget.classList.remove("hidden")
+    this.openBtnTarget.classList.add("is-active")
+
     if (!this._escHandler) {
       this._escHandler = (e) => { if (e.key === "Escape") this.close() }
     }
     document.addEventListener("keydown", this._escHandler)
 
     if (!this._data) {
-      this._metaEl.textContent = "Loading…"
-      try {
-        const res = await fetch(this.urlValue, { headers: { "Accept": "application/json" } })
-        this._data = await res.json()
-      } catch (_) {
-        this._metaEl.textContent = "Couldn't load comparison data."
-        return
-      }
-      const overall = this._data.segments.find(s => s.id === "overall")
-      const regions = this._data.segments.filter(s => s.id.startsWith("region_")).slice(0, 3)
-      ;[ overall, ...regions ].filter(Boolean).forEach(s => this._selected.add(s.id))
+      this.metaTarget.textContent = "Loading…"
+      await this._loadPromise
+    }
+    if (!this._data) {
+      this.metaTarget.textContent = "Couldn't load comparison data."
+      return
     }
 
     this._renderPicker()
@@ -71,12 +133,16 @@ export default class extends Controller {
   }
 
   close() {
-    this._overlayEl.classList.add("hidden")
+    this._isOpen = false
+    this.panelTarget.classList.add("hidden")
+    this.openBtnTarget.classList.remove("is-active")
     if (this._escHandler) document.removeEventListener("keydown", this._escHandler)
   }
 
-  _toggleSegment(id) {
+  toggleSegment(event) {
+    const id = event.currentTarget.dataset.segmentId
     if (this._selected.has(id)) this._selected.delete(id); else this._selected.add(id)
+    this._paintMap()
     this._renderPicker()
     this._renderBody()
   }
@@ -87,30 +153,30 @@ export default class extends Controller {
   }
 
   _renderPicker() {
-    this._metaEl.textContent = `${this._selected.size} of ${this._data.segments.length} shown — click to add or remove`
-    this._pickerEl.innerHTML = ""
+    this.metaTarget.textContent = `${this._selected.size} of ${this._data.segments.length} shown — click to add or remove`
+    this.pickerTarget.innerHTML = ""
     this._data.segments.forEach(seg => {
       const chip = document.createElement("button")
       chip.type = "button"
       chip.className = `compare-chip${this._selected.has(seg.id) ? " is-active" : ""}`
       chip.dataset.segmentId = seg.id
+      chip.dataset.action = "click->results-compare#toggleSegment"
       chip.innerHTML = `<span class="compare-chip-dot" style="background:${this._colorFor(seg.id)}"></span>` +
         `${esc(seg.label)} <span class="compare-chip-count">${seg.count}</span>`
-      chip.addEventListener("click", () => this._toggleSegment(seg.id))
-      this._pickerEl.appendChild(chip)
+      this.pickerTarget.appendChild(chip)
     })
   }
 
   _renderBody() {
     const selected = this._data.segments.filter(s => this._selected.has(s.id))
-    this._bodyEl.innerHTML = ""
+    this.bodyTarget.innerHTML = ""
     if (!selected.length) {
-      this._bodyEl.innerHTML = `<div class="compare-empty">Pick at least one segment above to compare.</div>`
+      this.bodyTarget.innerHTML = `<div class="compare-empty">Pick at least one segment above (or click a region on the map) to compare.</div>`
       return
     }
     this._data.cards.forEach(card => {
       const el = this._buildCardComparison(card, selected)
-      if (el) this._bodyEl.appendChild(el)
+      if (el) this.bodyTarget.appendChild(el)
     })
   }
 
@@ -145,13 +211,17 @@ export default class extends Controller {
         selected.forEach(seg => {
           const agg = this._data.aggregates[seg.id][card.index]
           const { pct, detail } = this._valueFor(card.type, agg, key)
-          const row = document.createElement("div")
-          row.className = "compare-bar-row"
-          row.innerHTML =
-            `<span class="compare-bar-seg" style="color:${this._colorFor(seg.id)}" title="${esc(seg.label)}">${esc(seg.label)}</span>` +
-            `<div class="compare-bar-track"><div class="compare-bar-fill" style="width:${pct}%;background:${this._colorFor(seg.id)}"></div></div>` +
-            `<span class="compare-bar-pct">${detail}</span>`
-          group.appendChild(row)
+          const item = document.createElement("div")
+          item.className = "compare-bar-item"
+          item.innerHTML =
+            `<div class="compare-bar-item-head">` +
+              `<span class="compare-bar-item-label" style="color:${this._colorFor(seg.id)}" title="${esc(seg.label)}">` +
+                `<span class="compare-chip-dot" style="background:${this._colorFor(seg.id)}"></span>${esc(seg.label)}` +
+              `</span>` +
+              `<span class="compare-bar-item-pct">${detail}</span>` +
+            `</div>` +
+            `<div class="compare-bar-track"><div class="compare-bar-fill" style="width:${pct}%;background:${this._colorFor(seg.id)}"></div></div>`
+          group.appendChild(item)
         })
         body.appendChild(group)
       })

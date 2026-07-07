@@ -95,69 +95,56 @@
         <% region_segments = @segments.select { |s| s[:id].to_s.start_with?("region_") } %>
         <% if region_segments.any? %>
           <%
-            # cc → { count:, url:, name: }: counts summed across a country's
-            # sub-regions; clicking a country opens its first region segment.
-            # Built from the segments themselves so links-mode and ask-players
-            # regions render identically.
+            # cc → { count:, name:, segment_ids: [...] }: response counts
+            # summed across a country's sub-regions, plus every region
+            # segment id tagged to that country. The map only has
+            # country-level shapes, so a click toggles ALL of a country's
+            # region segments into the comparison panel together — the
+            # smallest clickable unit is a country, even when it holds
+            # several tagged regions (e.g. Edinburgh + London under "gb").
             map_data = {}
             region_segments.each do |seg|
               next if seg[:country].blank?
               cc = seg[:country].downcase
-              map_data[cc] ||= { count: 0, url: survey_results_path(@survey, segment: seg[:id]), name: WorldRegions.name_for(seg[:country]) }
+              map_data[cc] ||= { count: 0, name: WorldRegions.name_for(seg[:country]), segment_ids: [] }
               map_data[cc][:count] += seg[:count]
+              map_data[cc][:segment_ids] << seg[:id]
             end
           %>
-          <div style="margin:0 0 14px;padding:14px 14px 10px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);"
-               data-controller="results-compare"
+          <div class="regions-box" data-controller="results-compare"
                data-results-compare-url-value="<%= survey_results_compare_path(@survey) %>">
-            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+            <div class="regions-box-head">
               <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 Regions</span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a country to filter results to its region</span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a region on the map to compare it</span>
               <button type="button" class="compare-open-btn" style="margin-left:auto;"
-                      data-action="click->results-compare#open">⛶ Compare regions</button>
-            </div>
-            <div style="max-width:640px;margin:0 auto;">
-              <%= render "shared/world_map" %>
+                      data-results-compare-target="openBtn"
+                      data-action="click->results-compare#toggle">⛶ Compare regions</button>
             </div>
 
-            <%# ── Full-screen comparison overlay — Overall vs any combination
-                of regions/shares, side by side. Data is fetched once (all
-                segments' aggregates in one payload) so toggling which
-                segments show is instant, no reload per pill like the filter
-                above. ── %>
-            <div class="compare-overlay hidden" data-results-compare-target="overlay">
-              <div class="compare-header">
-                <div>
-                  <div class="compare-header-title">Compare regions</div>
-                  <div class="compare-header-meta" data-results-compare-target="meta">Loading…</div>
-                </div>
-                <button type="button" class="compare-close-btn">✕ Close</button>
+            <%# ── Map stays visible & clickable at all times; the comparison
+                panel docks beside it (never over it, so nothing on the map
+                is ever hidden behind the panel) instead of taking over the
+                screen, so exploring never loses the map as a spatial
+                reference. ── %>
+            <div class="regions-box-body">
+              <div class="regions-map-col">
+                <%= render "shared/world_map" %>
               </div>
-              <div class="compare-picker" data-results-compare-target="picker"></div>
-              <div class="compare-body" data-results-compare-target="body"></div>
+
+              <div class="compare-panel hidden" data-results-compare-target="panel">
+                <div class="compare-panel-head">
+                  <div>
+                    <div class="compare-panel-title">Compare regions</div>
+                    <div class="compare-panel-meta" data-results-compare-target="meta">Loading…</div>
+                  </div>
+                  <button type="button" class="compare-close-btn" data-action="click->results-compare#close" aria-label="Close">✕</button>
+                </div>
+                <div class="compare-picker" data-results-compare-target="picker"></div>
+                <div class="compare-body" data-results-compare-target="body"></div>
+              </div>
             </div>
           </div>
           <script type="application/json" id="results-region-map-data"><%= map_data.to_json.html_safe %></script>
-          <script>
-            (() => {
-              const data = JSON.parse(document.getElementById("results-region-map-data").textContent)
-              const svg  = document.querySelector(".world-map")
-              if (!svg) return
-              const max = Math.max(1, ...Object.values(data).map(d => d.count))
-              Object.entries(data).forEach(([cc, d]) => {
-                const el = svg.querySelector("#" + cc)
-                if (!el) return
-                const alpha = d.count === 0 ? 0.14 : 0.18 + 0.72 * (d.count / max)
-                const paths = el.tagName.toLowerCase() === "g" ? el.querySelectorAll("path") : [el]
-                paths.forEach(p => p.style.fill = `rgba(1,234,203,${alpha.toFixed(2)})`)
-                const tip = document.createElementNS("http://www.w3.org/2000/svg", "title")
-                tip.textContent = `${d.name}: ${d.count}`
-                el.appendChild(tip)
-                el.style.cursor = "pointer"
-                el.addEventListener("click", () => { window.location = d.url })
-              })
-            })()
-          </script>
         <% end %>
 
         <%# ── Filterable feed: stats + segment pills + per-question cards ── %>
