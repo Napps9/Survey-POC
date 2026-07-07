@@ -17,43 +17,24 @@ const MAP_SELECTED_STROKE = "#ffffff"
 
 const SKIP_TYPES = new Set([ "welcome_card", "token_checkpoint" ])
 
-// Real geographic bounding boxes (lat/lng) for the mainland shape of each
-// supported country, and real approximate coordinates for common tagged
-// locations within them. When BOTH are known for a pin, it's placed at its
-// true relative position within the country's shape instead of an even
-// spread — spreading pins evenly ignored real geography entirely (e.g.
-// Texas and New York landing at the same latitude). Unrecognized location
-// names (arbitrary respondent-typed text) still fall back to the even
-// spread in _positionPins — there's no way to place free text accurately
-// without a geocoding service, so this only upgrades the names we actually
-// know rather than guessing at ones we don't.
-const GEO_COUNTRY_BOUNDS = {
-  us: { minLat: 24.5,   maxLat: 49.4,   minLng: -125.0, maxLng: -66.9 },
-  gb: { minLat: 49.9,   maxLat: 60.85,  minLng: -8.65,  maxLng: 1.76 },
-  es: { minLat: 36.0,   maxLat: 43.79,  minLng: -9.3,   maxLng: 3.32 },
-  za: { minLat: -34.83, maxLat: -22.13, minLng: 16.45,  maxLng: 32.95 },
-  au: { minLat: -39.2,  maxLat: -10.7,  minLng: 113.15, maxLng: 153.6 }
-}
-const GEO_LOCATION_COORDS = {
-  "texas":              { lat: 31.0,   lng: -99.9 },
-  "new york":           { lat: 42.9,   lng: -75.5 },
-  "california":         { lat: 36.7,   lng: -119.4 },
-  "edinburgh":          { lat: 55.95,  lng: -3.19 },
-  "london":             { lat: 51.51,  lng: -0.13 },
-  "greater london":     { lat: 51.51,  lng: -0.13 },
-  "manchester":         { lat: 53.48,  lng: -2.24 },
-  "greater manchester": { lat: 53.48,  lng: -2.24 },
-  "madrid":             { lat: 40.42,  lng: -3.70 },
-  "western cape":       { lat: -33.2,  lng: 21.0 },
-  "gauteng":            { lat: -26.2,  lng: 28.05 },
-  "new south wales":    { lat: -32.5,  lng: 146.5 }
-}
+// Real name → coordinate data for placing pins accurately within a zoomed
+// country, instead of an even spread that ignored real geography entirely
+// (e.g. Texas and New York landing at the same latitude). Bundled at
+// public/geo/region_coords.json — ~159k place names (admin-1 regions +
+// cities) merged from two public datasets; see public/geo/ATTRIBUTION.md
+// for sources/licenses. Fetched once, lazily, only when this controller's
+// regions box exists. Unrecognized location names (arbitrary respondent-
+// typed text the dataset doesn't cover) fall back to the even spread in
+// _positionPins — there's no way to place free text accurately without a
+// geocoding service, so this only upgrades the names it actually knows.
+const GEO_DATA_URL = "/geo/region_coords.json"
 
 export default class extends Controller {
   static targets = [ "stage", "panel", "meta", "picker", "body", "openBtn", "mapStage" ]
   static values  = { url: String }
 
   _data     = null
+  _geo      = null
   _selected = new Set()
   _isOpen   = false
   _escHandler = null
@@ -94,6 +75,7 @@ export default class extends Controller {
 
     this._setupMap()
     this._loadPromise = this._loadData()
+    this._loadGeoData()
 
     this._resizeHandler = () => this._positionPins()
     window.addEventListener("resize", this._resizeHandler)
@@ -104,6 +86,21 @@ export default class extends Controller {
     if (this._resizeHandler) window.removeEventListener("resize", this._resizeHandler)
     if (this._zoomRaf) cancelAnimationFrame(this._zoomRaf)
     this._exitFullscreen()
+  }
+
+  // Fetched independently of _loadData/_data (segments/aggregates) — this is
+  // a static reference dataset, not per-survey data. Re-positions any
+  // already-rendered pins once it arrives, in case they were placed with
+  // the even-spread fallback because this fetch hadn't resolved yet.
+  async _loadGeoData() {
+    try {
+      const res = await fetch(GEO_DATA_URL)
+      this._geo = await res.json()
+    } catch (_) {
+      this._geo = null
+      return
+    }
+    this._positionPins()
   }
 
   async _loadData() {
@@ -236,10 +233,10 @@ export default class extends Controller {
   }
 
   // Placement uses real coordinates for recognized location names (see
-  // GEO_LOCATION_COORDS); unrecognized free text falls back to an even
-  // split across the country's shape in _positionPins, since there's no
-  // way to place arbitrary respondent-typed text accurately without a
-  // geocoding service.
+  // GEO_DATA_URL); unrecognized free text falls back to an even split
+  // across the country's shape in _positionPins, since there's no way to
+  // place arbitrary respondent-typed text accurately without a geocoding
+  // service.
   _renderPins(cc, regionIds) {
     this._clearPins()
     this._zoomedCountry = cc
@@ -264,14 +261,28 @@ export default class extends Controller {
     this._zoomedCountry = null
   }
 
+  // regionName may be a single name ("Texas") or a "City, Region" pair (the
+  // shape NominatimClient's satnav-style location search stores when a
+  // respondent's search resolved both) — try each comma-separated part in
+  // turn, most specific (city) first, since the dataset indexes both
+  // cities and admin-1 regions under the same per-country name map.
   _geoFractionFor(cc, regionName) {
-    const bounds = GEO_COUNTRY_BOUNDS[cc]
-    const loc = GEO_LOCATION_COORDS[regionName.trim().toLowerCase()]
-    if (!bounds || !loc) return null
-    return {
-      fracX: Math.min(1, Math.max(0, (loc.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng))),
-      fracY: Math.min(1, Math.max(0, (bounds.maxLat - loc.lat) / (bounds.maxLat - bounds.minLat)))
+    if (!this._geo) return null
+    const bounds = this._geo.bounds[cc]
+    const places = this._geo.places[cc]
+    if (!bounds || !places) return null
+
+    const [ minLat, maxLat, minLng, maxLng ] = bounds
+    for (const part of regionName.split(",")) {
+      const loc = places[part.trim().toLowerCase()]
+      if (!loc) continue
+      const [ lat, lng ] = loc
+      return {
+        fracX: Math.min(1, Math.max(0, (lng - minLng) / (maxLng - minLng))),
+        fracY: Math.min(1, Math.max(0, (maxLat - lat) / (maxLat - minLat)))
+      }
     }
+    return null
   }
 
   _positionPins() {

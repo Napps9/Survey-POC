@@ -4013,6 +4013,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .compare-panel-title { font-family: "Alata", sans-serif; font-size: 20px; color: #fff; letter-spacing: 0.02em; }
 .compare-panel-meta { font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+.compare-geo-credit {
+  flex-shrink: 0; padding: 6px 18px; font-family: "ABeeZee", sans-serif; font-size: 10px;
+  color: rgba(255,255,255,0.25); border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.compare-geo-credit a { color: rgba(255,255,255,0.4); }
+.compare-geo-credit a:hover { color: rgba(255,255,255,0.6); }
 .compare-close-btn {
   flex-shrink: 0; width: 32px; height: 32px; border-radius: 100px;
   display: flex; align-items: center; justify-content: center;
