@@ -3964,7 +3964,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .world-map .map-country:hover { filter: brightness(1.35); }
 
 .compare-panel {
-  flex: 0 0 340px; width: 340px; max-height: 540px;
+  flex: 0 0 380px; width: 380px; max-height: 540px;
   display: flex; flex-direction: column; overflow: hidden;
   border-radius: 14px; background: rgba(15,17,31,0.92);
   border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 14px 34px rgba(0,0,0,0.4);
@@ -3984,18 +3984,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
   flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;
 }
 .regions-box-body.is-fullscreen .regions-map-col > div { max-width: 900px; width: 100%; margin: 0; }
-.regions-box-body.is-fullscreen .compare-panel { flex: 0 0 420px; width: 420px; max-height: none; }
+.regions-box-body.is-fullscreen .compare-panel { flex: 0 0 480px; width: 480px; max-height: none; }
 .compare-panel-head {
   flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
-  gap: 10px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  gap: 10px; padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-.compare-panel-title { font-family: "Alata", sans-serif; font-size: 15px; color: #fff; letter-spacing: 0.02em; }
-.compare-panel-meta { font-family: "ABeeZee", sans-serif; font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.compare-panel-title { font-family: "Alata", sans-serif; font-size: 20px; color: #fff; letter-spacing: 0.02em; }
+.compare-panel-meta { font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 3px; }
 .compare-close-btn {
-  flex-shrink: 0; width: 26px; height: 26px; border-radius: 100px;
+  flex-shrink: 0; width: 32px; height: 32px; border-radius: 100px;
   display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16);
-  color: rgba(255,255,255,0.75); font-size: 12px; cursor: pointer; transition: all 0.15s;
+  color: rgba(255,255,255,0.75); font-size: 15px; cursor: pointer; transition: all 0.15s;
 }
 .compare-close-btn:hover { color: #fff; border-color: rgba(255,255,255,0.32); }
 
@@ -4003,81 +4003,81 @@ body.generating-overlay-active .bottom-bar { display: none; }
    identity, per dataviz convention) and the toggle to include/exclude a
    segment from the comparison. */
 .compare-picker {
-  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .compare-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 10px 5px 8px; border-radius: 100px;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 12px 6px 9px; border-radius: 100px;
   border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.03);
-  font-family: "ABeeZee", sans-serif; font-size: 11px; color: rgba(255,255,255,0.55);
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.55);
   cursor: pointer; transition: all 0.15s;
 }
 .compare-chip:hover { border-color: rgba(255,255,255,0.3); }
 .compare-chip.is-active { color: #fff; background: rgba(255,255,255,0.07); }
-.compare-chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.compare-chip-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 .compare-chip-count { color: rgba(255,255,255,0.35); font-variant-numeric: tabular-nums; }
 
-.compare-body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px 24px; }
+.compare-body { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 18px 26px; }
 .compare-empty {
   margin: 40px auto; text-align: center;
-  font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.6;
+  font-family: "ABeeZee", sans-serif; font-size: 14px; color: rgba(255,255,255,0.4); line-height: 1.6;
 }
 
-.compare-card { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.compare-card { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .compare-card:last-child { margin-bottom: 0; border-bottom: none; }
 
 /* Clickable header — collapses the card's bars/notes to just this row so a
    long list of questions can be scanned quickly, then expanded one at a
    time. */
 .compare-card-head {
-  display: flex; align-items: flex-start; gap: 8px; width: 100%; margin-bottom: 10px;
+  display: flex; align-items: flex-start; gap: 9px; width: 100%; margin-bottom: 12px;
   background: none; border: none; padding: 0; text-align: left; cursor: pointer;
 }
 .compare-card-chevron {
-  flex-shrink: 0; margin-top: 3px; font-size: 10px; color: rgba(255,255,255,0.4);
+  flex-shrink: 0; margin-top: 4px; font-size: 12px; color: rgba(255,255,255,0.4);
   transition: transform 0.15s;
 }
 .compare-card.is-collapsed .compare-card-chevron { transform: rotate(-90deg); }
 .compare-card.is-collapsed .compare-card-head { margin-bottom: 0; }
-.compare-card-head-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.compare-card-head-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .compare-card-eyebrow {
-  font-family: "Alata", sans-serif; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
   color: rgba(255,255,255,0.35);
 }
 .compare-card-title {
-  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #fff; font-weight: 500; line-height: 1.4;
+  font-family: "ABeeZee", sans-serif; font-size: 16px; color: #fff; font-weight: 500; line-height: 1.4;
 }
 .compare-card.is-collapsed .compare-card-content { display: none; }
 
-.compare-option-group { margin-bottom: 10px; }
+.compare-option-group { margin-bottom: 13px; }
 .compare-option-group:last-child { margin-bottom: 0; }
 .compare-option-label {
-  font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.7);
-  margin-bottom: 5px;
+  font-family: "ABeeZee", sans-serif; font-size: 14px; color: rgba(255,255,255,0.75);
+  margin-bottom: 6px;
 }
 
 /* Each segment's bar is its own stacked mini-row (label+pct above a
    full-width track) rather than a single wide row — a fixed side-label
-   column doesn't fit the panel's ~340px width. */
-.compare-bar-item { margin-bottom: 5px; }
+   column doesn't fit the panel's ~380px width. */
+.compare-bar-item { margin-bottom: 7px; }
 .compare-bar-item:last-child { margin-bottom: 0; }
-.compare-bar-item-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 2px; }
+.compare-bar-item-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
 .compare-bar-item-label {
-  display: flex; align-items: center; gap: 5px; min-width: 0;
-  font-family: "ABeeZee", sans-serif; font-size: 10.5px;
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+  font-family: "ABeeZee", sans-serif; font-size: 13px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .compare-bar-item-pct {
-  flex-shrink: 0; font-family: "Alata", sans-serif; font-size: 10.5px; color: rgba(255,255,255,0.55);
+  flex-shrink: 0; font-family: "Alata", sans-serif; font-size: 13px; color: rgba(255,255,255,0.6);
   font-variant-numeric: tabular-nums;
 }
-.compare-bar-track { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06); overflow: hidden; }
-.compare-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.compare-bar-track { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+.compare-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
 
 .compare-freeform-note {
-  display: flex; align-items: center; gap: 7px; padding: 2px 0;
-  font-family: "ABeeZee", sans-serif; font-size: 11px; color: rgba(255,255,255,0.4);
+  display: flex; align-items: center; gap: 8px; padding: 3px 0;
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.45);
 }
 
 /* Wizard "advanced" disclosure (Region settings) — compact summary pill */
