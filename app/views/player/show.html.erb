@@ -44,8 +44,16 @@
   token_mode         = @survey.tokenisation_enabled?
   token_awarding_set = token_mode ? @survey.token_awarding_indices.to_set : Set.new
 %>
+<%# No inline height here — `.preview-overlay`'s own CSS (position:fixed +
+    inset:0, backed by the JS-measured --app-100vh custom property on mobile)
+    handles sizing. A hardcoded "height:100vh;" here previously overrode that
+    CSS unconditionally (inline styles beat any class rule), which is the
+    classic mobile WebKit bug: 100vh locks to the viewport with the browser's
+    toolbar hidden, so on first paint (toolbar visible) the bottom of the
+    page — including the Next button — rendered below the visible fold with
+    no way to scroll to it. %>
 <div class="preview-overlay flex flex-col"
-     style="height:100vh;<%= verto_backdrop_style_attr(@survey) %>"
+     style="<%= verto_backdrop_style_attr(@survey) %>"
      dir="<%= SupportedLocales.dir(@display_locale) %>"
      data-controller="player"
      data-player-progress-url-value="<%= progress_url %>"

@@ -3326,9 +3326,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
      PLAYER (`/play/:token`) — lego.playverto.com mobile pattern
      ═════════════════════════════════════════════════════════════════ */
 
-  /* iOS Safari toolbar fix */
-  .preview-overlay { height: 100dvh; }
-  .regions-overlay { height: 100dvh; }
+  /* iOS Safari toolbar fix — `dvh` alone isn't reliable across every mobile
+     browser (some in-app browsers lock it to the wrong toolbar state on
+     first paint), so lib/viewport_height.js measures the real visible
+     height into --app-100vh; dvh is only the pre-JS fallback. */
+  .preview-overlay { height: var(--app-100vh, 100dvh); }
+  .regions-overlay { height: var(--app-100vh, 100dvh); }
 
   /* In-card .panel-progress now drives the mobile progress indicator —
      matches the desktop pattern (white bar at the top of the card body),
