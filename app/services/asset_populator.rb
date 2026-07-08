@@ -606,7 +606,7 @@ class AssetPopulator
   def card_query(card)
     base = clean_theme_terms.first(2)
     refine =
-      if SCAFFOLDING_TYPES.include?(card["type"].to_s)
+      if theme_only_card?(card)
         []
       else
         subject_terms(card_keywords(card), proper_nouns("#{card['text']} #{card['description']}"))
@@ -614,6 +614,14 @@ class AssetPopulator
     terms = (base + refine).uniq { |w| w.singularize }
     raw   = terms.join(" ").presence || clean_theme_terms.first(3).join(" ").presence || "abstract"
     ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract"
+  end
+
+  # Cards imaged from the Verto theme ONLY, ignoring their own copy: scaffolding
+  # (welcome/checkpoint) which have no subject, AND the demographic form fields
+  # (Gender/birth/location) whose copy names a sensitive subject that must not
+  # steer a stock-photo search (the "Gender" card pulling identity/edgy imagery).
+  def theme_only_card?(card)
+    SCAFFOLDING_TYPES.include?(card["type"].to_s) || card["demographic"].present?
   end
 
   def asset_url(dir, file)
@@ -709,10 +717,11 @@ class AssetPopulator
     4 * (tokens & card_words).size + 3 * (tokens & theme_words).size
   end
 
-  # The card's own subject words for scoring — empty for scaffolding cards, so
-  # they fall to the theme floor rather than scoring on their tone words.
+  # The card's own subject words for scoring — empty for theme-only cards
+  # (scaffolding + demographic form fields), so they fall to the theme floor
+  # rather than scoring a candidate on their own tone/sensitive terms.
   def card_relevance_words(card)
-    return [] if SCAFFOLDING_TYPES.include?(card["type"].to_s)
+    return [] if theme_only_card?(card)
     relevance_tokens("#{card['text']} #{card['description']} #{Array(card['options']).join(' ')}")
   end
 

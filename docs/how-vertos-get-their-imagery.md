@@ -80,7 +80,10 @@ After that:
   the search. **Welcome/checkpoint cards are theme-only** — they have no
   subject of their own, so their imagery follows the Verto theme. (This
   prevents a welcome card's "your voice matters…" copy pulling neutral Vertos
-  into activism stock.)
+  into activism stock.) **Demographic form fields** (Gender / birth / location
+  — the standard tail on every Verto) are theme-only for the same reason:
+  their copy names a sensitive subject that must not steer a stock-photo
+  search, so their image follows the Verto theme.
 - **Video cadence** — every third card that receives media prefers a **video**
   instead of a photo. This is the variety principle applied to media: videos
   never sit on adjacent cards, and photo runs are capped at two.
@@ -249,6 +252,15 @@ Four independent layers keep imagery appropriate:
    video only from the Pexels video CDN. The player's security policy
    likewise only allows images and media from those sources, so nothing
    off-list can render even if it somehow got stored.
+
+**Known limitation (young audiences).** The Pexels safety and neutrality
+layers read a photo's *description* (alt text), not its pixels — auto-picked
+Pexels images are not vision-moderated (only creator *uploads* are). So a
+visually mature image with clean alt text can still pass on an auto-pick. The
+theme-anchoring, relevance floor and (for the known cases) theme-only
+demographic cards remove the queries that surfaced such images, but the
+general gap remains. Proposed follow-up: vision-moderate auto-picks for
+kids/teen Vertos, or a curated-library-only mode for young audiences.
 
 ## 10. Quick reference
 

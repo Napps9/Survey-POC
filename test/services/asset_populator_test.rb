@@ -520,4 +520,44 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     %w[london north].each { |w| refute_includes q, w, "#{w.inspect} is geography, not a subject" }
     assert_includes q, "subjects"
   end
+
+  # A demographic form field (Gender/birth/location) is boilerplate appended to
+  # every Verto; its own copy names a sensitive subject that must not steer the
+  # image search (the "Gender" card pulling identity/edgy stock for an 11-16
+  # audience). Like scaffolding, it is theme-only.
+  GENDER_CARD = {
+    "type" => "multiple_choice", "text" => "Gender", "demographic" => true,
+    "options" => [ "Male", "Female", "Non-binary", "Other", "Prefer not to say" ]
+  }.freeze
+
+  test "a demographic card's query ignores its own copy and anchors to the theme" do
+    s = make_survey(theme: "Secondary School exclusions", audience_age: "11-16",
+                    cards: [ GENDER_CARD.dup ])
+
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+
+    %w[gender male female non binary].each do |w|
+      refute_includes q, w, "#{w.inspect} is a sensitive demographic term, not a depictable subject"
+    end
+    assert(q.any? { |t| %w[school schools exclusion exclusions secondary].include?(t) },
+      "a demographic card's image query must be anchored to the Verto theme")
+  end
+
+  test "a demographic card never takes an edgy identity photo for a young audience" do
+    s = make_survey(theme: "Secondary School exclusions", audience_age: "11-16",
+                    cards: [ GENDER_CARD.dup ])
+    # The edgy alt DELIBERATELY overlaps the card's identity terms — that
+    # overlap is exactly why the old code scored and applied it.
+    photos = [
+      pexels_photo(1, "Non-binary androgynous person in fishnet and harness fashion portrait"),
+      pexels_photo(2, "Children in a school classroom")
+    ]
+
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    img = s.reload.cards[0]["image"].to_s
+    refute_includes img, "/photos/1/", "the edgy identity photo must never be applied to a demographic card"
+    assert(img.include?("/photos/2/") || img.include?("verto-library/"),
+      "the demographic card gets a theme photo or a clean curated fallback, got #{img.inspect}")
+  end
 end
