@@ -28,20 +28,37 @@ class NominatimGeocodeClient
   CACHE_TTL     = 30.days
   MIN_INTERVAL  = 1.1 # seconds between uncached requests, under Nominatim's 1 req/sec cap
 
+  # Ask Nominatim to simplify the boundary geometry server-side before it
+  # ever reaches us — 0.01 degrees (~1km) is far more detail than a map
+  # zoomed to a single country needs, and keeps the response (and cache
+  # entry) small without us having to bundle or simplify anything ourselves.
+  POLYGON_THRESHOLD    = 0.01
+  # Safety cap on top of that: an unusually complex coastline could still
+  # slip through simplification with thousands of points. Past this we'd
+  # rather draw no outline than ship an oversized payload or a janky path —
+  # the pin alone (already returned) is still an honest fallback.
+  MAX_BOUNDARY_VERTICES = 1500
+
   class << self
-    # { lat:, lng: } or nil. `query` should already be a coarse, aggregate
-    # tag — e.g. "Austin, Texas" or "Western Cape" — never per-respondent data.
+    # { lat:, lng:, boundary: [[[lng, lat], ...], ...] } or nil. `query`
+    # should already be a coarse, aggregate tag — e.g. "Austin, Texas" or
+    # "Western Cape" — never per-respondent data. `boundary`, when present,
+    # is one or more simplified outer rings (no holes) in the tagged
+    # region's own administrative shape, for drawing a real outline on the
+    # results map instead of just a pin — omitted when Nominatim has no
+    # polygon for the match (e.g. it only resolved to a point).
     def coordinates_for(query:, country_code: nil)
       q = query.to_s.strip
       return nil if q.blank?
 
-      cache_key = "nominatim_geocode:v1:#{q.downcase}:#{country_code}"
+      cache_key = "nominatim_geocode:v2:#{q.downcase}:#{country_code}"
       Rails.cache.fetch(cache_key, expires_in: CACHE_TTL) do
         throttle!
-        params = { q: q, format: "jsonv2", limit: 1 }
+        params = { q: q, format: "jsonv2", limit: 1, polygon_geojson: 1, polygon_threshold: POLYGON_THRESHOLD }
         params[:countrycodes] = country_code.to_s.downcase if country_code.present?
         place = Array(get_json(ENDPOINT, params)).first
-        place ? { lat: place["lat"].to_f, lng: place["lon"].to_f } : nil
+        next nil unless place
+        { lat: place["lat"].to_f, lng: place["lon"].to_f, boundary: extract_boundary(place["geojson"]) }.compact
       end
     rescue => e
       Rails.logger.error("[NominatimGeocodeClient] #{e.class}: #{e.message}")
@@ -49,6 +66,20 @@ class NominatimGeocodeClient
     end
 
     private
+
+    # Outer rings only (no holes — irrelevant at the zoom level this draws
+    # at) as [lng, lat] pairs, or nil when there's no usable polygon.
+    def extract_boundary(geojson)
+      return nil unless geojson.is_a?(Hash)
+      rings = case geojson["type"]
+      when "Polygon"      then [ geojson["coordinates"].first ]
+      when "MultiPolygon" then geojson["coordinates"].map(&:first)
+      end
+      return nil if rings.blank?
+      rings = rings.compact.reject(&:blank?)
+      return nil if rings.blank? || rings.sum(&:size) > MAX_BOUNDARY_VERTICES
+      rings.map { |ring| ring.map { |lng, lat| [ lng.to_f, lat.to_f ] } }
+    end
 
     # In-process only — same acknowledged limitation as NominatimClient (see
     # its comment): no cross-worker/cross-process shared throttle here.

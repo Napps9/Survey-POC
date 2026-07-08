@@ -132,9 +132,9 @@
                 <%# Positioned wrapper the controller zooms/pins against —
                     when every selected segment is in one country, the map
                     zooms to that country and drops a labeled pin per tagged
-                    location (approximate placement: locations are free-text
-                    labels, not real coordinates, so this is honest about
-                    what we actually know rather than faking a boundary). ── %>
+                    location, with a real administrative outline drawn
+                    underneath when Nominatim resolved a boundary for it
+                    (falls back to pin-only otherwise). ── %>
                 <div class="regions-map-stage" data-results-compare-target="mapStage">
                   <%= render "shared/world_map" %>
                 </div>

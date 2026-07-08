@@ -34,6 +34,7 @@ export default class extends Controller {
   _zoomedCountry = null
   _zoomRaf  = null
   _pins     = []
+  _boundaryLayer = null
 
   // Compare mode moves the "stage" (map + panel) to <body> for full-screen
   // room, and its interactive bits (close button, picker chips, card
@@ -103,6 +104,16 @@ export default class extends Controller {
     if (!this._mapSvg) return
 
     this._worldViewBox = this._mapSvg.getAttribute("viewBox").trim().split(/\s+/).map(Number)
+
+    // Region outlines are drawn as native SVG paths in their own top-level
+    // group (not nested inside any country's <g>) so _paintMap's per-country
+    // `querySelectorAll("path")` recoloring never touches them, and so they
+    // pan/zoom for free with the map's own viewBox — no per-frame
+    // repositioning like the HTML-overlay pins need. pointer-events: none
+    // lets clicks fall through to the country shape underneath.
+    this._boundaryLayer = document.createElementNS("http://www.w3.org/2000/svg", "g")
+    this._boundaryLayer.setAttribute("class", "region-boundary-layer")
+    this._mapSvg.appendChild(this._boundaryLayer)
 
     Object.entries(this._mapData).forEach(([ cc, d ]) => {
       const el = this._mapSvg.querySelector("#" + cc)
@@ -214,6 +225,7 @@ export default class extends Controller {
     this._clearPins()
     this._zoomedCountry = cc
     const orderedIds = this._data.segments.map(s => s.id).filter(id => regionIds.includes(id))
+    orderedIds.forEach(id => this._renderBoundary(cc, id))
     this._pins = orderedIds.map((id, i) => {
       const seg = this._data.segments.find(s => s.id === id)
       const pin = document.createElement("div")
@@ -227,10 +239,42 @@ export default class extends Controller {
     this._positionPins()
   }
 
+  // Draws the region's real administrative outline when Nominatim resolved
+  // one (see NominatimGeocodeClient#extract_boundary) — each ring's real
+  // lat/lng vertices go through the same country-bbox-fraction mapping as
+  // pin placement (_geoFractionFor), just applied per-vertex instead of to
+  // a single point. Silently does nothing when this segment has no
+  // boundary — the pin drawn in _renderPins is still an honest fallback.
+  _renderBoundary(cc, id) {
+    const seg = this._data.segments.find(s => s.id === id)
+    if (!seg?.boundary?.length) return
+    const countryEl = this._mapSvg.querySelector("#" + cc)
+    if (!countryEl) return
+    const bbox = this._boundsElFor(countryEl).getBBox()
+
+    const d = seg.boundary.map(ring => {
+      const pts = ring.map(([ lng, lat ]) => {
+        const geo = this._geoFractionFor(cc, lat, lng)
+        if (!geo) return null
+        return `${(bbox.x + bbox.width * geo.fracX).toFixed(2)},${(bbox.y + bbox.height * geo.fracY).toFixed(2)}`
+      }).filter(Boolean)
+      return pts.length > 2 ? `M${pts.join("L")}Z` : ""
+    }).filter(Boolean).join(" ")
+    if (!d) return
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+    path.setAttribute("class", "region-boundary")
+    path.setAttribute("d", d)
+    path.style.fill = this._colorFor(id)
+    path.style.stroke = this._colorFor(id)
+    this._boundaryLayer.appendChild(path)
+  }
+
   _clearPins() {
     this._pins.forEach(p => p.el.remove())
     this._pins = []
     this._zoomedCountry = null
+    if (this._boundaryLayer) this._boundaryLayer.replaceChildren()
   }
 
   // Uses the coordinate resolved server-side (see

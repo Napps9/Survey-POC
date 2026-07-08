@@ -47,6 +47,22 @@ class ResultsCompareTest < ActionDispatch::IntegrationTest
     assert_equal [ 25.0, 49.5, -125.0, -66.96 ], data["bounds"]["us"]
   end
 
+  test "includes a resolved boundary outline for a region segment when Nominatim has one" do
+    org = create_org_and_sign_in("geo-boundary")
+    s   = create_survey(org)
+    seed_region(s, "US", "Austin, Texas", 5)
+
+    boundary = [ [ [ -97.8, 30.1 ], [ -97.6, 30.1 ], [ -97.6, 30.4 ], [ -97.8, 30.1 ] ] ]
+    stub_method(NominatimGeocodeClient, :coordinates_for, ->(**_kw) { { lat: 30.27, lng: -97.74, boundary: boundary } }) do
+      get survey_results_compare_path(s)
+    end
+    assert_response :success
+
+    data = JSON.parse(response.body)
+    region = data["segments"].find { |seg| seg["label"].include?("Austin, Texas") }
+    assert_equal boundary, region["boundary"]
+  end
+
   test "omits lat/lng when Nominatim can't resolve the tag, without breaking the response" do
     org = create_org_and_sign_in("geo-miss")
     s   = create_survey(org)

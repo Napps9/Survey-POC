@@ -549,7 +549,7 @@ class SurveysController < ApplicationController
       query = "#{seg[:region_label]}, #{WorldRegions.name_for(seg[:country])}"
       coords = NominatimGeocodeClient.coordinates_for(query: query, country_code: seg[:country])
       next unless coords && plausible_for_country?(coords, seg[:country])
-      acc[seg[:id]] = { lat: coords[:lat], lng: coords[:lng] }
+      acc[seg[:id]] = coords.slice(:lat, :lng, :boundary).compact
     end
   end
 
