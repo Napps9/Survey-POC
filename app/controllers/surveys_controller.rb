@@ -541,9 +541,29 @@ class SurveysController < ApplicationController
   def geocode_compare_segments(segments)
     geocodable = segments.select { |s| s[:country].present? && s[:region_label].present? }.first(COMPARE_GEOCODE_CAP)
     geocodable.each_with_object({}) do |seg, acc|
-      coords = NominatimGeocodeClient.coordinates_for(query: seg[:region_label], country_code: seg[:country])
-      acc[seg[:id]] = { lat: coords[:lat], lng: coords[:lng] } if coords
+      # Naming the country in the query text — on top of the countrycodes
+      # filter below — gives Nominatim's ranking better disambiguation for
+      # a short, common tag like "New York" that also names a real place
+      # elsewhere in the world (there's a village called exactly that in
+      # Lincolnshire, England).
+      query = "#{seg[:region_label]}, #{WorldRegions.name_for(seg[:country])}"
+      coords = NominatimGeocodeClient.coordinates_for(query: query, country_code: seg[:country])
+      next unless coords && plausible_for_country?(coords, seg[:country])
+      acc[seg[:id]] = { lat: coords[:lat], lng: coords[:lng] }
     end
+  end
+
+  # Discards a geocoded point that falls outside the tagged country's own
+  # bounds — protects against Nominatim matching a same-named place in the
+  # wrong country (e.g. there's a literal village called "New York" in
+  # Lincolnshire, England) despite the countrycodes hint, which would
+  # otherwise plot a confident-looking pin in a wildly wrong spot rather
+  # than falling back to the honest even-spread placement.
+  def plausible_for_country?(coords, country_code)
+    box = CountryBoundingBoxes.for(country_code)
+    return true unless box
+    min_lat, max_lat, min_lng, max_lng = box
+    coords[:lat].between?(min_lat, max_lat) && coords[:lng].between?(min_lng, max_lng)
   end
 
   # { country_code (lowercase) => [min_lat, max_lat, min_lng, max_lng] } for

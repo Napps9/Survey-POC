@@ -63,6 +63,25 @@ class ResultsCompareTest < ActionDispatch::IntegrationTest
     refute region.key?("lng")
   end
 
+  test "discards a geocoded point that falls outside the tagged country's bounds" do
+    org = create_org_and_sign_in("geo-wrong-country")
+    s   = create_survey(org)
+    seed_region(s, "US", "New York", 5)
+
+    # A real village called "New York" exists in Lincolnshire, England —
+    # simulates Nominatim matching that instead of the US tag despite the
+    # countrycodes hint.
+    stub_method(NominatimGeocodeClient, :coordinates_for, ->(**_kw) { { lat: 53.13, lng: -0.08 } }) do
+      get survey_results_compare_path(s)
+    end
+    assert_response :success
+
+    data = JSON.parse(response.body)
+    region = data["segments"].find { |seg| seg["label"].include?("New York") }
+    refute region.key?("lat")
+    refute region.key?("lng")
+  end
+
   test "the overall segment is never geocoded" do
     org = create_org_and_sign_in("geo-overall")
     s   = create_survey(org)
