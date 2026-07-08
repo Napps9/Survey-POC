@@ -9,6 +9,13 @@
 > or a search returns nothing — so the matching logic and folders here still
 > matter. The picker also gained a live "Stock photos" search box on the Verto
 > Library tab.
+>
+> Auto-population now **scores every Pexels result against the card and theme
+> and only applies ones that clear a relevance floor** (queries are anchored to
+> the Verto theme; welcome/checkpoint cards are theme-only; protest/activism
+> imagery is suppressed unless the theme invokes it). When nothing clears the
+> floor, the curated fallback below engages — so a loosely-matched stock photo
+> never lands on a card. See `docs/how-vertos-get-their-imagery.md`.
 
 Curated imagery that powers two things:
 

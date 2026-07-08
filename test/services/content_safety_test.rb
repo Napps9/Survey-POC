@@ -30,4 +30,56 @@ class ContentSafetyTest < ActiveSupport::TestCase
     assert ContentSafety.safe?(nil)
     assert ContentSafety.safe?("")
   end
+
+  # ── Brand-neutrality suppression (separate from the PG safety layer) ──────
+
+  test "charged? flags protest-visual imagery by word" do
+    assert ContentSafety.charged?("Crowd at a protest march")
+    assert ContentSafety.charged?("Activists' placards at a rally")
+    assert ContentSafety.charged?("Demonstrators picketing outside parliament square")
+    assert ContentSafety.charged?("Rioting in the street at night")
+  end
+
+  test "charged? flags named protest movements by phrase even when every word is benign" do
+    assert ContentSafety.charged?("Black Lives Matter mural on a wall")
+    assert ContentSafety.charged?("An Extinction Rebellion banner")
+    assert ContentSafety.charged?("Just Stop Oil supporters on the road")
+  end
+
+  test "charged? is not tripped by everyday scenes" do
+    assert ContentSafety.neutral?("Children in a school classroom")
+    assert ContentSafety.neutral?("Passengers boarding a red bus")
+    assert ContentSafety.neutral?("A doctor books an appointment with a patient")
+  end
+
+  # Pins the deliberate exclusions: ambiguous words stay out of the list.
+  test "charged? excludes ambiguous words by design" do
+    assert ContentSafety.neutral?("A football striker scores in a strike")
+    assert ContentSafety.neutral?("A police officer directing traffic")
+    assert ContentSafety.neutral?("A web banner with a flag campaign")
+  end
+
+  # Pins the product boundary: the abstract-political vocabulary is HELD OUT
+  # of v1 on purpose — suppressing these subjects is a product decision, not
+  # an engineering default. Widening the list must be a visible diff here.
+  test "charged? does not extend to abstract political vocabulary" do
+    assert ContentSafety.neutral?("Diversity and equality in the workplace")
+    assert ContentSafety.neutral?("A person votes at a polling station")
+    assert ContentSafety.neutral?("Scales of justice on a desk")
+    assert ContentSafety.neutral?("A feminism book on a shelf")
+  end
+
+  test "charged_theme? detects creator intent, including the activism topic words" do
+    assert ContentSafety.charged_theme?("Activism and social justice")
+    assert ContentSafety.charged_theme?("Attitudes to protest in the UK")
+    refute ContentSafety.charged_theme?("Schools in north London")
+    refute ContentSafety.charged_theme?("Consumer rights"),
+           "broad abstract words must not become an accidental off-switch"
+    refute ContentSafety.charged_theme?("Voting habits")
+  end
+
+  test "charged? treats blank text as neutral" do
+    refute ContentSafety.charged?(nil)
+    refute ContentSafety.charged?("")
+  end
 end

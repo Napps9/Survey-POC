@@ -74,8 +74,13 @@ After that:
 
 - **Tap and Range cards are skipped** — Tap cards put their imagery on the
   statements themselves; Range shows the reactive animation.
-- **Pexels first** — a portrait search (cropped 720×1280) built from the
-  card's own wording plus the theme.
+- **Pexels first** — a portrait search (cropped 720×1280). The search is
+  **anchored to the Verto's theme** (its subject), then refined with a card's
+  own concrete terms; a card's motivational or scaffolding copy never leads
+  the search. **Welcome/checkpoint cards are theme-only** — they have no
+  subject of their own, so their imagery follows the Verto theme. (This
+  prevents a welcome card's "your voice matters…" copy pulling neutral Vertos
+  into activism stock.)
 - **Video cadence** — every third card that receives media prefers a **video**
   instead of a photo. This is the variety principle applied to media: videos
   never sit on adjacent cards, and photo runs are capped at two.
@@ -173,6 +178,13 @@ the more specific the keywords, the more precisely it will be picked.
   quietly returns "no results" and the library fallback engages.
 - **Efficiency.** During a single population run, each distinct search query
   hits the API at most once, however many cards share it.
+- **Relevance floor.** An uncurated source gets *more* scrutiny, not less: a
+  returned photo is only auto-applied if its description actually shares
+  subject vocabulary with the card and theme (function words don't count). A
+  photo that clears nothing is discarded and the library fallback engages —
+  so a loosely-matched or off-topic stock photo never lands on a card. Known
+  limitation: a **lowercase minor place name** in card copy ("schools in
+  peckham") can still slip into a query; the relevance floor is the backstop.
 - **Credit.** Every applied Pexels photo/video stores the photographer's name
   and profile link, rendered as the on-card credit. Applying a library image
   or upload clears the credit (nothing to credit).
@@ -212,18 +224,27 @@ no-repeats rule the automatic pass follows.
 
 ## 9. Safety gates
 
-Three independent layers keep imagery appropriate:
+Four independent layers keep imagery appropriate:
 
 1. **Search-word filtering (Pexels).** Queries are scrubbed of blocked terms
    before they're sent, and any result whose description matches a blocked
    term is dropped. Vertos aimed at younger audiences apply a stricter
    additional list (alcohol, smoking, gambling and similar are filtered out
    on top of the general list).
-2. **AI moderation (uploads).** Creator uploads are reviewed by an AI vision
+2. **Brand-neutrality suppression (Pexels, auto-population only).** A *separate*
+   layer from PG safety: protest/activism imagery (marches, rallies, placards,
+   named protest movements) is dropped from auto-applied results, so a neutral
+   Verto never picks up charged stock — **unless the Verto's own theme invokes
+   that subject** (an "activism" Verto is allowed its protest imagery). This is
+   a deliberately narrow, protest-*visual* list; the broader political
+   vocabulary is intentionally left out (suppressing it would itself be an
+   editorial stance). It applies only to unsupervised auto-population — the
+   creator's own manual Pexels searches in the editor are untouched.
+3. **AI moderation (uploads).** Creator uploads are reviewed by an AI vision
    check against the Verto's audience age before being applied — PG standards
    for everyone, stricter for young audiences. If moderation can't verify an
    image, the upload is blocked rather than waved through.
-3. **Storage rules.** A Verto can only persist imagery from trusted shapes:
+4. **Storage rules.** A Verto can only persist imagery from trusted shapes:
    bundled library assets, Pexels CDN URLs, or small inline uploads — and
    video only from the Pexels video CDN. The player's security policy
    likewise only allows images and media from those sources, so nothing
@@ -234,7 +255,7 @@ Three independent layers keep imagery appropriate:
 | Slot | Primary | Fallback | Creator override |
 |---|---|---|---|
 | Background | Pexels landscape (theme query) | Library `backgrounds` (theme-gated, never blank) | Library / Pexels / upload |
-| Card panel | Pexels portrait photo — every 3rd media card a video | Tier 1 themed → Tier 2 type art → blank | Library / Recommended / Pexels / upload |
+| Card panel | Pexels portrait (theme-anchored query, must clear the relevance floor) — every 3rd media card a video | Tier 1 themed → Tier 2 type art → blank | Library / Recommended / Pexels / upload |
 | Tap statements | Pexels square, unique per statement | `swipe_cards` pool, no repeats in a card | Per-statement pick in editor |
 | Range panel | Reactive animation (always) | — | — |
 | NPS control | Procedural vessel (always) | — | — |

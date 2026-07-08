@@ -57,6 +57,44 @@ class AssetPopulator
     agree disagree
   ].to_set.freeze
 
+  # ── Query hygiene (Pexels auto-population only) ───────────────────────────
+  # Geography is CONTEXT, not the subject to depict: "schools in north London"
+  # must search "school", never the place. Stripped from both theme and card
+  # terms before a query is sent. (Editor manual search is untouched — the
+  # creator types deliberately.)
+  GEO_COMPASS = %w[
+    north south east west northern southern eastern western
+    northeast northwest southeast southwest central inner outer greater
+  ].to_set.freeze
+
+  # Geo nouns + a pragmatic net of major UK place names, so a lowercase theme
+  # ("schools in north london") still loses the location. KNOWN v1 LIMITATION:
+  # a lowercase MINOR place ("peckham") leaks through — same class of leak as
+  # the original bug, far rarer; the relevance floor is the backstop.
+  GEO_NOUNS = %w[
+    city cities town towns village villages borough boroughs county counties
+    district districts region regions area areas neighbourhood neighbourhoods
+    suburb suburbs postcode council countryside local nearby
+    uk britain british england english scotland scottish wales welsh
+    ireland irish europe european
+    london manchester birmingham leeds glasgow liverpool bristol sheffield
+    edinburgh cardiff belfast newcastle nottingham
+  ].to_set.freeze
+
+  # Boilerplate in Pexels video-page slugs that must never contribute to a
+  # relevance score.
+  SLUG_NOISE = %w[https http www com pexels video videos photo photos].to_set.freeze
+
+  # Card types with no depictable subject of their own — welcome/checkpoint
+  # scaffolding. Their imagery is anchored to the Verto theme only; their own
+  # copy (tone, not subject) is ignored. Mirrors CardTypes::NON_QUESTION_TYPES.
+  SCAFFOLDING_TYPES = CardTypes::NON_QUESTION_TYPES.to_set.freeze
+
+  # Relevance floors for an applied Pexels candidate (scored alt/slug against
+  # the sent query, library-parity weights: +4 card subject, +3 theme term).
+  CARD_RELEVANCE_FLOOR  = 4  # the photo must depict something the card names
+  THEME_RELEVANCE_FLOOR = 3  # backgrounds / cards with no subject of their own
+
   class << self
     def manifest
       @manifest_mtime ||= nil
@@ -405,15 +443,21 @@ class AssetPopulator
     orientation = PexelsClient::ORIENTATION_FOR[context]
     @pexels_cache[[ query, orientation ]] ||= begin
       results = PexelsClient.new.search(query: query, orientation: orientation, per_page: 30)
-      # Drop anything whose description isn't PG / age-appropriate for this Verto.
+      fetched = results.size
+      # 1. PG / age-appropriate for this Verto.
       results = results.select { |p| ContentSafety.safe?(p["alt"], safety_age_buckets) }
-      Rails.logger.info("[AssetPopulator] pexels #{context} q=#{query.inspect} -> #{results.size} result(s)")
+      safe = results.size
+      # 2. Brand-neutral, unless the theme itself invokes the charged subject.
+      results = results.select { |p| charged_theme? || ContentSafety.neutral?(p["alt"]) }
+      Rails.logger.info("[AssetPopulator] pexels #{context} q=#{query.inspect} -> " \
+                        "#{fetched} fetched / #{safe} safe / #{results.size} neutral")
       results
     end
   end
 
   def pexels_background_url
-    photos = pexels_photos(background_query, :background)
+    query  = background_query
+    photos = relevant(pexels_photos(query, :background), [], query_theme_words(query)) { |p| p["alt"] }
     return nil if photos.empty?
     chosen = photos[rand_for("bg").rand(photos.size)]
     PexelsClient.url_for(chosen, :background)
@@ -424,7 +468,8 @@ class AssetPopulator
   # runs identical; the shared `used` set stops two cards landing on the same
   # photo (mirrors the curated de-dup).
   def pexels_card_photo(card, idx, used)
-    photos = pexels_photos(card_query(card), :card)
+    query  = card_query(card)
+    photos = relevant(pexels_photos(query, :card), card_relevance_words(card), query_theme_words(query)) { |p| p["alt"] }
     return nil if photos.empty?
     ordered = photos.shuffle(random: rand_for("px-#{idx}"))
     ordered.find { |p| !used.include?(PexelsClient.url_for(p, :card)) } || ordered.first
@@ -434,7 +479,8 @@ class AssetPopulator
   # a small streamable mp4 + its poster, and the videographer credit. nil when
   # no usable video is found (caller falls back to a photo).
   def pexels_card_video(card, idx, used)
-    videos = pexels_videos(card_query(card))
+    query  = card_query(card)
+    videos = relevant(pexels_videos(query), card_relevance_words(card), query_theme_words(query)) { |v| v["url"] }
     return nil if videos.empty?
 
     ordered = videos.shuffle(random: rand_for("pxv-#{idx}"))
@@ -459,6 +505,7 @@ class AssetPopulator
       results = PexelsClient.new.search_videos(query: query, orientation: "portrait", per_page: 15)
       # Videos carry no alt text; the page-URL slug is the best signal we have.
       results = results.select { |v| ContentSafety.safe?(v["url"], safety_age_buckets) }
+      results = results.select { |v| charged_theme? || ContentSafety.neutral?(v["url"]) }
       Rails.logger.info("[AssetPopulator] pexels video q=#{query.inspect} -> #{results.size} result(s)")
       results
     end
@@ -468,7 +515,9 @@ class AssetPopulator
   # photos not used by another tap_card. Returns nil to trigger the fallback.
   def pexels_swipe_urls(card, card_idx, count, swipe_used)
     return nil unless PexelsClient.configured?
-    urls = pexels_photos(card_query(card), :swipe).map { |p| PexelsClient.url_for(p, :swipe) }.compact.uniq
+    query  = card_query(card)
+    photos = relevant(pexels_photos(query, :swipe), card_relevance_words(card), query_theme_words(query)) { |p| p["alt"] }
+    urls   = photos.map { |p| PexelsClient.url_for(p, :swipe) }.compact.uniq
     return nil if urls.empty?
 
     rng = rand_for("pxtap-#{card_idx}")
@@ -487,6 +536,45 @@ class AssetPopulator
     @survey.theme.to_s.downcase.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
   end
 
+  # Does this Verto's theme deliberately invoke the protest/activism topic?
+  # When it does, the neutrality suppression and charged-term query stripping
+  # switch off for the whole run — the creator's stated topic wins. Memoised.
+  def charged_theme?
+    return @charged_theme if defined?(@charged_theme)
+    @charged_theme = ContentSafety.charged_theme?(@survey.theme)
+  end
+
+  # Downcased tokens judged to be proper nouns in the ORIGINAL text — run
+  # BEFORE downcasing destroys the signal. A capitalised token that is NOT the
+  # first word of its sentence is a place/brand/name; ALL-CAPS acronyms count
+  # anywhere. Applied to CARD copy only (question/description), never the theme
+  # (themes are routinely title-cased, so mid-caps carry no signal there).
+  def proper_nouns(text)
+    names = Set.new
+    text.to_s.split(/[.?!:]+/).each do |sentence|
+      sentence.scan(/[A-Za-z][A-Za-z']*/).each_with_index do |tok, i|
+        names << tok.downcase if tok.match?(/\A[A-Z]{2,}\z/)
+        names << tok.downcase if i.positive? && tok.match?(/\A[A-Z][a-z]/)
+      end
+    end
+    names
+  end
+
+  # Terms fit to send to Pexels: no geography, no proper nouns, no charged
+  # terms (unless the theme itself invokes them). Query = SUBJECT, not CONTEXT.
+  def subject_terms(tokens, names = Set.new)
+    tokens.reject do |w|
+      GEO_COMPASS.include?(w) || GEO_NOUNS.include?(w) || names.include?(w) ||
+        (!charged_theme? && ContentSafety::CHARGED.include?(w))
+    end
+  end
+
+  # The theme's depictable subject terms — geography and charged words removed.
+  # The shared base for every card's query (background and cards alike).
+  def clean_theme_terms
+    @clean_theme_terms ||= subject_terms(theme_query_terms)
+  end
+
   # Age buckets for the Verto's audience, driving the content-safety blocklist
   # (kids/teen get the stricter list). Memoised for the run.
   def safety_age_buckets
@@ -494,16 +582,37 @@ class AssetPopulator
   end
 
   def background_query
-    raw = theme_query_terms.first(3).join(" ").presence || "abstract background"
+    # Backgrounds KEEP geography — a full-bleed skyline/landscape for the
+    # Verto's place is neutral and legitimate (a "London life" Verto's
+    # backdrop should be able to be London). Only charged terms are stripped
+    # (unless the theme invokes them). The screenshot confirmed the theme-only
+    # background was already correct; the bug was card copy, not the backdrop.
+    terms = theme_query_terms.reject { |w| !charged_theme? && ContentSafety::CHARGED.include?(w) }
+    raw   = terms.first(3).join(" ").presence || "abstract background"
     ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract background"
   end
 
+  # Theme-anchored: the BASE of every card query is the Verto theme's subject,
+  # so a card's own copy can never drag the search off-topic (the real bug —
+  # a welcome card's "your voice matters…" landing on protest stock).
+  #
+  # Scaffolding cards (welcome/checkpoint) have no subject of their own — they
+  # are theme-only, no per-word analysis. Ordinary question cards may REFINE
+  # the theme base with their own concrete terms, but only ones that survive
+  # the hygiene strips (geo, proper nouns, charged) — fail-closed: an unknown
+  # word is simply not added, never allowed to steer the query on its own.
+  # TODO(phase two): a real concrete-noun / depictable-subject extractor so a
+  # card like "How was the school canteen?" contributes "canteen".
   def card_query(card)
-    # Weight the question above the survey theme: up to three subject terms
-    # drawn from the question, anchored by a single dominant theme term. (Was
-    # an even 3-and-2 split that let the theme dilute the question's subject.)
-    terms = (card_keywords(card).first(3) + theme_query_terms.first(1)).uniq
-    raw   = terms.join(" ").presence || @survey.theme.to_s.strip.presence || "abstract"
+    base = clean_theme_terms.first(2)
+    refine =
+      if SCAFFOLDING_TYPES.include?(card["type"].to_s)
+        []
+      else
+        subject_terms(card_keywords(card), proper_nouns("#{card['text']} #{card['description']}"))
+      end
+    terms = (base + refine).uniq { |w| w.singularize }
+    raw   = terms.join(" ").presence || clean_theme_terms.first(3).join(" ").presence || "abstract"
     ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract"
   end
 
@@ -582,6 +691,47 @@ class AssetPopulator
     text.to_s.downcase.scan(/[a-z]+/).reject do |w|
       w.length < 3 || STOP_WORDS.include?(w) || QUESTION_FILLER.include?(w)
     end
+  end
+
+  # ── Pexels relevance floor ────────────────────────────────────────────────
+  # An uncurated source needs MORE scrutiny than the curated library, not less:
+  # a returned photo is only applied if its alt (or a video's page slug) shares
+  # real subject vocabulary with the card and theme. Function words can never
+  # score (salient_words drops STOP_WORDS + QUESTION_FILLER), and singularize
+  # matches "schools" to "school".
+  def relevance_tokens(text)
+    (salient_words(text) - SLUG_NOISE.to_a).map(&:singularize).uniq
+  end
+
+  # Library-parity weights: +4 per card-subject hit, +3 per theme-term hit.
+  def relevance_score(text, card_words, theme_words)
+    tokens = relevance_tokens(text)
+    4 * (tokens & card_words).size + 3 * (tokens & theme_words).size
+  end
+
+  # The card's own subject words for scoring — empty for scaffolding cards, so
+  # they fall to the theme floor rather than scoring on their tone words.
+  def card_relevance_words(card)
+    return [] if SCAFFOLDING_TYPES.include?(card["type"].to_s)
+    relevance_tokens("#{card['text']} #{card['description']} #{Array(card['options']).join(' ')}")
+  end
+
+  # Filter Pexels candidates to those clearing the relevance floor. Floor is
+  # per-context: a card with subject words must be depicted (4); a background
+  # or a scaffolding card is measured on theme terms only (3). Only when BOTH
+  # word-sets are empty (nothing to measure) is the floor bypassed — so a bare
+  # welcome card on a real theme is still theme-floor protected.
+  def relevant(items, card_words, theme_words, &text_for)
+    return items if card_words.empty? && theme_words.empty?
+    floor = card_words.any? ? CARD_RELEVANCE_FLOOR : THEME_RELEVANCE_FLOOR
+    items.select { |it| relevance_score(text_for.call(it), card_words, theme_words) >= floor }
+  end
+
+  # Theme-side scoring words = tokens of the query actually SENT (not the raw
+  # theme), so a place-only "London life" background — whose query keeps
+  # "london" — can be matched by a "London skyline" alt.
+  def query_theme_words(query)
+    relevance_tokens(query)
   end
 
   def rand_for(slot)

@@ -34,6 +34,43 @@ module ContentSafety
 
   YOUNG_BUCKETS = %w[kids teen].freeze
 
+  # ── Brand-neutrality suppression — NOT a safety list ─────────────────────
+  # These subjects are legal and often photogenic, but visually charged:
+  # protest/activism imagery must never be AUTO-applied to a Verto whose
+  # theme doesn't invoke it (a creator can still pick anything by hand in
+  # the editor). Kept deliberately to the protest-VISUAL core that caused
+  # the bug — crowds, placards, marches.
+  #
+  # HELD OUT on purpose, pending an explicit product decision (widening this
+  # list is an editorial call, not an engineering default — see the pinned
+  # "abstract political vocabulary" test): justice, equality, rights,
+  # discrimination, racism, antiracism, sexism, feminism, politics, vote,
+  # election, referendum, brexit, solidarity, revolution, resistance,
+  # unrest, "pride parade", "trade union", "far right", "far left",
+  # "me too movement".
+  #
+  # EXCLUDED for ambiguity (false positives outweigh the risk): police,
+  # policing, banner, flag, movement, campaign, strike, striker, megaphone.
+  CHARGED = %w[
+    protest protests protester protesters protestor protestors protesting
+    march marches marcher marchers
+    rally rallies riot riots rioting rioter rioters
+    demonstration demonstrations demonstrator demonstrators
+    placard placards picket pickets picketing
+  ].to_set.freeze
+
+  # Named protest movements whose individual words are benign ("black",
+  # "lives", "matter") — matched as downcased substrings.
+  CHARGED_PHRASES = [
+    "black lives matter", "extinction rebellion", "just stop oil"
+  ].freeze
+
+  # Extra words that signal deliberate creator intent in a THEME without
+  # themselves being suppressed from imagery: a theme saying "activism"
+  # should unlock protest photos even though "activism" never appears in
+  # protest alt text.
+  CHARGED_TOPIC = %w[activism activist activists].to_set.freeze
+
   module_function
 
   # The active blocklist for a set of age buckets (see AssetPopulator.age_buckets).
@@ -57,5 +94,24 @@ module ContentSafety
   def scrub_query(query, age_buckets = [])
     bl = blocklist(age_buckets)
     words(query).reject { |w| bl.include?(w) }.join(" ")
+  end
+
+  # True when the text (a Pexels `alt`, a video page slug, or a theme) names
+  # a charged protest-visual subject — by word or by movement phrase.
+  def charged?(text)
+    t = text.to_s.downcase
+    return true if CHARGED_PHRASES.any? { |phrase| t.include?(phrase) }
+    words(text).any? { |w| CHARGED.include?(w) }
+  end
+
+  def neutral?(text)
+    !charged?(text)
+  end
+
+  # Does this Verto's theme deliberately invoke the protest/activism topic?
+  # If so, the neutrality suppression (and charged-term query stripping) is
+  # switched off for the whole run — the creator's stated topic wins.
+  def charged_theme?(theme_text)
+    charged?(theme_text) || words(theme_text).any? { |w| CHARGED_TOPIC.include?(w) }
   end
 end

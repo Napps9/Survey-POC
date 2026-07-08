@@ -199,15 +199,16 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     %w[which would you prefer].each { |w| refute_includes q, w, "#{w.inspect} is filler" }
   end
 
-  test "card query leads with the question subject, not the survey theme" do
+  # Theme-anchoring (post-fix contract): the Verto theme is the BASE of every
+  # card query so a card's own copy can't drag the search off-topic; the
+  # card's concrete subject is still appended (refinement, not replacement).
+  test "card query is anchored to the theme and refined by the question subject" do
     s = make_survey(theme: "Climate action", audience_age: "all",
                     cards: [ { "type" => "open_ended", "text" => "How was your coffee this morning?" } ])
     q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
 
-    assert_includes q, "coffee"
-    assert_includes q, "morning"
-    assert_operator q.index("coffee"), :<, (q.index("climate") || q.size),
-      "the question's subject must come before the theme term"
+    assert_equal "climate", q.first, "the theme anchors (leads) the query"
+    assert_includes q, "coffee", "the question's concrete subject is still added"
   end
 
   test "card query falls back to the theme when the question is all filler" do
@@ -220,11 +221,14 @@ class AssetPopulatorTest < ActiveSupport::TestCase
 
   # ── Pexels source (primary when configured) ──────────────────────────────
 
+  # Shared fixture: the Pexels-primary tests below use the "Mountains" theme,
+  # so the alt names that subject — a relevant alt is now required to clear the
+  # relevance floor (an uncurated result must actually depict the subject).
   PEXELS_PHOTOS = (1..6).map do |i|
     {
       "id" => i, "photographer" => "Photographer #{i}",
       "photographer_url" => "https://www.pexels.com/@photographer-#{i}",
-      "alt" => "alt#{i}",
+      "alt" => "Snowy mountain peak and alpine landscape #{i}",
       "src" => {
         "original"  => "https://images.pexels.com/photos/#{i}/p.jpg",
         "landscape" => "https://images.pexels.com/photos/#{i}/p.jpg?w=1200&h=627&fit=crop",
@@ -237,6 +241,8 @@ class AssetPopulatorTest < ActiveSupport::TestCase
   PEXELS_VIDEOS = (1..6).map do |i|
     {
       "id" => 100 + i,
+      # The page-URL slug is a video's only relevance signal (no alt text).
+      "url" => "https://www.pexels.com/video/mountain-peak-alpine-timelapse-#{100 + i}/",
       "image" => "https://images.pexels.com/videos/#{100 + i}/poster.jpeg",
       "user" => { "name" => "Filmmaker #{i}", "url" => "https://www.pexels.com/@filmmaker-#{i}" },
       "video_files" => [
@@ -319,8 +325,9 @@ class AssetPopulatorTest < ActiveSupport::TestCase
                       { "type" => "welcome_card", "text" => "Hey!" },
                       { "type" => "open_ended",   "text" => "What did you eat today?" }
                     ])
+    food = (1..6).map { |i| pexels_photo(i, "Children eat fresh food at a table #{i}") }
 
-    with_pexels { AssetPopulator.new(s).populate! }
+    with_pexels(food) { AssetPopulator.new(s).populate! }
 
     s.reload
     s.cards.each_with_index do |c, i|
@@ -331,7 +338,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
 
   test "tap_card option_images come from Pexels (landscape) and stay unique; left panel blank" do
     s = make_survey(theme: "Mountains", audience_age: "all",
-                    cards: [ { "type" => "tap_card", "text" => "Swipe", "options" => %w[a b c d] } ])
+                    cards: [ { "type" => "tap_card", "text" => "Which mountain peak is best?", "options" => %w[a b c d] } ])
 
     with_pexels { AssetPopulator.new(s).populate! }
 
@@ -387,5 +394,130 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     s.reload
     assert_match %r{/assets/verto-library/backgrounds/}, s.background_image
     assert_includes s.cards[0]["image"], "verto-library/"
+  end
+
+  # ── Relevance + neutrality (theme-anchored queries, floor, suppression) ────
+
+  # A Pexels photo hash with a chosen alt (the only relevance signal Pexels
+  # gives us) and the full src Survey.sanitize_* expects.
+  def pexels_photo(id, alt)
+    {
+      "id" => id, "photographer" => "P#{id}",
+      "photographer_url" => "https://www.pexels.com/@p#{id}",
+      "alt" => alt,
+      "src" => {
+        "original"  => "https://images.pexels.com/photos/#{id}/p.jpg",
+        "landscape" => "https://images.pexels.com/photos/#{id}/p.jpg?w=1200&h=627&fit=crop",
+        "portrait"  => "https://images.pexels.com/photos/#{id}/p.jpg?w=800&h=1200&fit=crop",
+        "tiny"      => "https://images.pexels.com/photos/#{id}/p.jpg?w=280&h=200&fit=crop"
+      }
+    }
+  end
+
+  # The real bug: a welcome card's motivational copy dragged the query into
+  # activism stock. Uses the REAL alt strings of the applied series (Polina
+  # Tankilevitch, verified on Pexels) so the test reflects production, not a
+  # convenient invention.
+  PROTEST_ALT_WORD  = "Woman Protesting Through a Megaphone"                       # 'protesting' → suppression fires
+  PROTEST_ALT_FLOOR = "A Megaphone, a Chain and Two Cards with Anti-Racism Slogans" # only held-out/excluded words → floor does the work
+
+  test "a welcome card no longer drags the query into activism stock" do
+    s = make_survey(theme: "Secondary School exclusions", audience_age: "11-16",
+                    cards: [ {
+                      "type" => "welcome_card",
+                      "text" => "Your voice matters — let's talk about your school experience"
+                    } ])
+
+    # (a) the welcome-card query is theme-derived, carrying none of the card's
+    #     tone words.
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+    %w[voice matters talk experience].each do |w|
+      refute_includes q, w, "#{w.inspect} is card tone, not a depictable subject"
+    end
+    assert(q.any? { |t| %w[school schools exclusion exclusions secondary].include?(t) },
+      "the query must be anchored to the Verto theme")
+
+    # (b) + (c): with both real protest alts and a clean classroom in the pool,
+    #     the protest photos are never applied; the card gets the classroom.
+    photos = [
+      pexels_photo(1, PROTEST_ALT_WORD),
+      pexels_photo(2, PROTEST_ALT_FLOOR),
+      pexels_photo(3, "Children in a school classroom")
+    ]
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    img = s.reload.cards[0]["image"].to_s
+    refute_includes img, "/photos/1/", "the 'protesting' photo must never be applied"
+    refute_includes img, "/photos/2/", "the anti-racism-slogan photo must never be applied"
+    assert(img.include?("/photos/3/") || img.include?("verto-library/"),
+      "the card must get the classroom photo or a clean curated fallback, got #{img.inspect}")
+  end
+
+  test "card refinement still appends a concrete subject the theme lacks" do
+    s = make_survey(theme: "Coffee culture", audience_age: "all",
+                    cards: [ { "type" => "open_ended", "text" => "How often do you visit the gym?" } ])
+
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+
+    assert_equal "coffee", q.first, "the theme anchors (leads) the query"
+    assert_includes q, "gym", "a concrete card subject the theme lacks is still added"
+  end
+
+  test "a bare scaffolding card is protected by the theme floor, not the bypass" do
+    s = make_survey(theme: "Secondary School exclusions", audience_age: "11-16",
+                    cards: [ { "type" => "welcome_card", "text" => "Your voice matters — be honest" } ])
+
+    # Only off-theme candidates → nothing clears the theme floor → curated fallback.
+    off_theme = [ pexels_photo(7, "A plate of pasta on a wooden table"),
+                  pexels_photo(8, "A sports car on a race track") ]
+    with_pexels(off_theme) { AssetPopulator.new(s).populate! }
+
+    img = s.reload.cards[0]["image"].to_s
+    refute_includes img, "images.pexels.com",
+      "off-theme Pexels results must not reach a bare welcome card"
+  end
+
+  test "suppression drops protest imagery for a neutral theme" do
+    s = make_survey(theme: "Hospitals in Manchester", audience_age: "all",
+                    cards: [ { "type" => "multiple_choice", "text" => "How easy is it to book an appointment?", "options" => %w[Easy Hard] } ])
+    photos = [ pexels_photo(1, "Nurses rally outside a hospital"),
+               pexels_photo(2, "A doctor talks to a patient in a hospital") ]
+
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    img = s.reload.cards[0]["image"].to_s
+    refute_includes img, "/photos/1/", "the rally photo must be suppressed"
+  end
+
+  test "suppression is lifted when the theme itself invokes activism" do
+    s = make_survey(theme: "Activism and social justice", audience_age: "all",
+                    cards: [ { "type" => "multiple_choice", "text" => "How often do you attend a protest?", "options" => %w[Often Never] } ])
+    photos = [ pexels_photo(1, "A crowd at a protest march") ]
+
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    assert_includes s.reload.cards[0]["image"].to_s, "/photos/1/",
+      "an activism Verto is allowed its protest imagery"
+  end
+
+  test "a place-only theme still finds a neutral backdrop for its background" do
+    s = make_survey(theme: "London life", audience_age: "all",
+                    cards: [ { "type" => "multiple_choice", "text" => "Favourite way to spend a weekend?", "options" => %w[Parks Museums] } ])
+    photos = [ pexels_photo(1, "London skyline at dusk over the Thames") ]
+
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    assert_includes s.reload.background_image.to_s, "/photos/1/",
+      "a London skyline is a legitimate neutral backdrop for a London Verto"
+  end
+
+  test "card query strips geography and proper nouns from the card's own copy" do
+    s = make_survey(theme: "Local schools", audience_age: "11-16",
+                    cards: [ { "type" => "multiple_choice", "text" => "Which subjects do you enjoy most at school in north London?", "options" => %w[Maths Art] } ])
+
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+
+    %w[london north].each { |w| refute_includes q, w, "#{w.inspect} is geography, not a subject" }
+    assert_includes q, "subjects"
   end
 end
