@@ -268,6 +268,31 @@ export default class extends Controller {
     path.style.fill = this._colorFor(id)
     path.style.stroke = this._colorFor(id)
     this._boundaryLayer.appendChild(path)
+    this._boundaryLayer.setAttribute("clip-path", `url(#${this._countryClipId(cc, countryEl)})`)
+  }
+
+  // A hand-illustrated map's coastline is only an approximation of the real
+  // one — even correctly-resolved real administrative geometry can poke a
+  // few SVG units past it in spots (a real border area rendering right at
+  // the map's own imprecise edge). Clipping every region outline to the
+  // country's own drawn silhouette means a boundary can never visually spill
+  // into the ocean or a neighboring country, regardless of exactly how far
+  // the illustration and the real coordinates disagree at the coastline.
+  _countryClipId(cc, countryEl) {
+    const clipId = `region-clip-${cc}`
+    if (this._mapSvg.querySelector("#" + clipId)) return clipId
+    let defs = this._mapSvg.querySelector("defs")
+    if (!defs) {
+      defs = document.createElementNS("http://www.w3.org/2000/svg", "defs")
+      this._mapSvg.insertBefore(defs, this._mapSvg.firstChild)
+    }
+    const clipPath = document.createElementNS("http://www.w3.org/2000/svg", "clipPath")
+    clipPath.setAttribute("id", clipId)
+    const boundsEl = this._boundsElFor(countryEl)
+    const shapes = boundsEl.tagName.toLowerCase() === "path" ? [ boundsEl ] : boundsEl.querySelectorAll("path")
+    shapes.forEach(shape => clipPath.appendChild(shape.cloneNode(false)))
+    defs.appendChild(clipPath)
+    return clipId
   }
 
   _clearPins() {
