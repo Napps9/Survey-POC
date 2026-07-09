@@ -2,9 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 
 // Categorical palette (dataviz skill's validated 8-hue dark-mode set,
 // re-validated against this page's own dark surface #1C2034). Colour is
-// assigned by each segment's fixed position in the full segment list — not
-// by selection order — so a segment's colour never changes as others are
-// toggled in/out.
+// assigned by SELECTION order, not by a segment's fixed position in the
+// full segment list — a survey can have far more segments than the palette
+// has hues, and colouring by list position meant most selected segments
+// past the 8th ran permanently grey regardless of what was actually being
+// compared. Only currently-selected segments get a hue at all; toggling a
+// segment off frees its slot for the next thing selected, so a segment's
+// colour CAN shift as others are toggled — an acceptable trade for never
+// showing an active comparison in grey.
 const PALETTE = [
   "#3987e5", "#199e70", "#c98500", "#008300",
   "#9085e9", "#e66767", "#d55181", "#d95926"
@@ -403,7 +408,8 @@ export default class extends Controller {
   }
 
   _colorFor(id) {
-    const idx = this._data.segments.findIndex(s => s.id === id)
+    if (!this._selected.has(id)) return FALLBACK_COLOR
+    const idx = [ ...this._selected ].indexOf(id)
     return idx >= 0 && idx < PALETTE.length ? PALETTE[idx] : FALLBACK_COLOR
   }
 
