@@ -3961,7 +3961,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
 .regions-box-body { display: flex; gap: 14px; align-items: flex-start; }
 .regions-map-col { flex: 1 1 0%; min-width: 0; }
-.regions-map-stage { position: relative; max-width: 640px; margin: 0 auto; }
+.compare-map-stage { position: relative; max-width: 640px; margin: 0 auto; }
 
 .world-map .map-country { cursor: pointer; transition: filter 0.15s; }
 .world-map .map-country:hover { filter: brightness(1.35); }
@@ -4015,9 +4015,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
   background: #1C2034; padding: 20px 28px; align-items: stretch;
 }
 .regions-box-body.is-fullscreen .regions-map-col {
-  flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;
+  flex: 1; min-width: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; min-height: 0;
 }
-.regions-box-body.is-fullscreen .regions-map-stage { max-width: 900px; width: 100%; margin: 0; }
+.regions-box-body.is-fullscreen .compare-map-stage { max-width: 900px; width: 100%; margin: 0; }
 .regions-box-body.is-fullscreen .compare-panel { flex: 0 0 480px; width: 480px; max-height: none; }
 .compare-panel-head {
   flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
@@ -4041,10 +4042,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
 /* Segment legend/picker — doubles as the chart legend (colour dot = series
    identity, per dataviz convention) and the toggle to include/exclude a
-   segment from the comparison. */
+   segment from the comparison. Lives beside the map (not inside the answers
+   panel) so toggling regions never crowds out the question-by-question
+   comparison below — see .compare-picker-wrap. */
+.compare-picker-wrap {
+  width: 100%; max-width: 900px; margin: 14px auto 0;
+}
+.compare-picker-wrap.hidden { display: none; }
+.compare-picker-label {
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px;
+}
 .compare-picker {
-  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px;
-  padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-wrap: wrap; gap: 8px;
+  max-height: 160px; overflow-y: auto; padding: 2px 2px 4px;
 }
 .compare-chip {
   display: inline-flex; align-items: center; gap: 7px;

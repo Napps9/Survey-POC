@@ -135,8 +135,18 @@
                     location, with a real administrative outline drawn
                     underneath when Nominatim resolved a boundary for it
                     (falls back to pin-only otherwise). ── %>
-                <div class="regions-map-stage" data-results-compare-target="mapStage">
+                <div class="compare-map-stage" data-results-compare-target="mapStage">
                   <%= render "shared/world_map" %>
+                </div>
+
+                <%# The region picker lives beside the map (not inside the
+                    answers panel) so toggling regions in/out never crowds
+                    out the actual question-by-question comparison — a
+                    survey with many tagged regions could otherwise push the
+                    first answer several screens down. ── %>
+                <div class="compare-picker-wrap hidden" data-results-compare-target="pickerWrap">
+                  <div class="compare-picker-label">🌍 Regions — click to add or remove</div>
+                  <div class="compare-picker" data-results-compare-target="picker"></div>
                 </div>
               </div>
 
@@ -153,7 +163,6 @@
                     coordinates NominatimGeocodeClient resolves for pin
                     placement (see app/services/nominatim_geocode_client.rb). ── %>
                 <div class="compare-geo-credit">Location data: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></div>
-                <div class="compare-picker" data-results-compare-target="picker"></div>
                 <div class="compare-body" data-results-compare-target="body"></div>
               </div>
             </div>

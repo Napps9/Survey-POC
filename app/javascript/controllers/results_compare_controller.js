@@ -23,7 +23,7 @@ const MAP_SELECTED_STROKE = "#ffffff"
 const SKIP_TYPES = new Set([ "welcome_card", "token_checkpoint" ])
 
 export default class extends Controller {
-  static targets = [ "stage", "panel", "meta", "picker", "body", "openBtn", "mapStage" ]
+  static targets = [ "stage", "panel", "meta", "picker", "pickerWrap", "body", "openBtn", "mapStage" ]
   static values  = { url: String }
 
   _data     = null
@@ -56,13 +56,14 @@ export default class extends Controller {
   //     event listeners on reconnect. Caching plain element refs up front,
   //     once, sidesteps both problems entirely.
   connect() {
-    this._stageEl    = this.stageTarget
-    this._panelEl    = this.panelTarget
-    this._metaEl     = this.metaTarget
-    this._pickerEl   = this.pickerTarget
-    this._bodyEl     = this.bodyTarget
-    this._openBtnEl  = this.openBtnTarget
-    this._mapStageEl = this.mapStageTarget
+    this._stageEl      = this.stageTarget
+    this._panelEl      = this.panelTarget
+    this._metaEl       = this.metaTarget
+    this._pickerEl     = this.pickerTarget
+    this._pickerWrapEl = this.pickerWrapTarget
+    this._bodyEl       = this.bodyTarget
+    this._openBtnEl    = this.openBtnTarget
+    this._mapStageEl   = this.mapStageTarget
 
     this._panelEl.querySelector(".compare-close-btn").addEventListener("click", () => this.close())
 
@@ -357,6 +358,7 @@ export default class extends Controller {
   async open() {
     this._isOpen = true
     this._panelEl.classList.remove("hidden")
+    this._pickerWrapEl.classList.remove("hidden")
     this._openBtnEl.classList.add("is-active")
 
     this._stagePlaceholder = document.createComment("compare-stage-placeholder")
@@ -386,6 +388,7 @@ export default class extends Controller {
   close() {
     this._isOpen = false
     this._panelEl.classList.add("hidden")
+    this._pickerWrapEl.classList.add("hidden")
     this._openBtnEl.classList.remove("is-active")
     this._exitFullscreen()
     this._updateMapZoom()
