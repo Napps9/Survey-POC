@@ -128,42 +128,44 @@
                 compare — see the controller for why it's this element (not
                 the controller root above) that gets moved to <body>. ── %>
             <div class="regions-box-body" data-results-compare-target="stage">
-              <div class="regions-map-col">
-                <%# Positioned wrapper the controller zooms/pins against —
-                    when every selected segment is in one country, the map
-                    zooms to that country and drops a labeled pin per tagged
-                    location, with a real administrative outline drawn
-                    underneath when Nominatim resolved a boundary for it
-                    (falls back to pin-only otherwise). ── %>
-                <div class="compare-map-stage" data-results-compare-target="mapStage">
-                  <%= render "shared/world_map" %>
+              <div class="compare-stage-row">
+                <div class="regions-map-col">
+                  <%# Positioned wrapper the controller zooms/pins against —
+                      when every selected segment is in one country, the map
+                      zooms to that country and drops a labeled pin per tagged
+                      location, with a real administrative outline drawn
+                      underneath when Nominatim resolved a boundary for it
+                      (falls back to pin-only otherwise). ── %>
+                  <div class="compare-map-stage" data-results-compare-target="mapStage">
+                    <%= render "shared/world_map" %>
+                  </div>
                 </div>
 
-                <%# The region picker lives beside the map (not inside the
-                    answers panel) so toggling regions in/out never crowds
-                    out the actual question-by-question comparison — a
-                    survey with many tagged regions could otherwise push the
-                    first answer several screens down. ── %>
-                <div class="compare-picker-wrap hidden" data-results-compare-target="pickerWrap">
-                  <div class="compare-picker-label">🌍 Regions — click to add or remove</div>
-                  <div class="compare-picker" data-results-compare-target="picker"></div>
+                <div class="compare-panel hidden" data-results-compare-target="panel">
+                  <div class="compare-panel-head">
+                    <div>
+                      <div class="compare-panel-title">Compare regions</div>
+                      <div class="compare-panel-meta" data-results-compare-target="meta">Loading…</div>
+                    </div>
+                    <button type="button" class="compare-close-btn" aria-label="Close">✕</button>
+                  </div>
+                  <%# Nominatim/OSM usage policy requires a visible
+                      attribution near results it powers — here, the
+                      coordinates NominatimGeocodeClient resolves for pin
+                      placement (see app/services/nominatim_geocode_client.rb). ── %>
+                  <div class="compare-geo-credit">Location data: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></div>
+                  <div class="compare-body" data-results-compare-target="body"></div>
                 </div>
               </div>
 
-              <div class="compare-panel hidden" data-results-compare-target="panel">
-                <div class="compare-panel-head">
-                  <div>
-                    <div class="compare-panel-title">Compare regions</div>
-                    <div class="compare-panel-meta" data-results-compare-target="meta">Loading…</div>
-                  </div>
-                  <button type="button" class="compare-close-btn" aria-label="Close">✕</button>
-                </div>
-                <%# Nominatim/OSM usage policy requires a visible
-                    attribution near results it powers — here, the
-                    coordinates NominatimGeocodeClient resolves for pin
-                    placement (see app/services/nominatim_geocode_client.rb). ── %>
-                <div class="compare-geo-credit">Location data: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></div>
-                <div class="compare-body" data-results-compare-target="body"></div>
+              <%# A single horizontally-scrolling row along the bottom of the
+                  screen — not a wrapped grid beside the map — so picking
+                  regions never eats into the map's own space. Lives outside
+                  .compare-stage-row so it spans the full width, under both
+                  the map and the panel. ── %>
+              <div class="compare-picker-wrap hidden" data-results-compare-target="pickerWrap">
+                <div class="compare-picker-label">🌍 Regions — click to add or remove</div>
+                <div class="compare-picker" data-results-compare-target="picker"></div>
               </div>
             </div>
           </div>

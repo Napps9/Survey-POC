@@ -3959,7 +3959,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .compare-open-btn:hover { background: rgba(1,234,203,0.18); }
 .compare-open-btn.is-active { background: rgba(1,234,203,0.3); color: #fff; }
 
-.regions-box-body { display: flex; gap: 14px; align-items: flex-start; }
+/* .regions-box-body stacks the map+panel row above the region picker's
+   bottom bar; .compare-stage-row is what actually lays map+panel side by
+   side (kept distinct so the picker bar can span the full width below
+   both, not just sit under the map). */
+.regions-box-body { display: flex; flex-direction: column; }
+.compare-stage-row { display: flex; gap: 14px; align-items: flex-start; }
 .regions-map-col { flex: 1 1 0%; min-width: 0; }
 .compare-map-stage { position: relative; max-width: 640px; margin: 0 auto; }
 
@@ -4012,13 +4017,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
    results_compare_controller.js#open for why it has to be this element. */
 .regions-box-body.is-fullscreen {
   position: fixed; inset: 0; z-index: 9999; margin: 0;
-  background: #1C2034; padding: 20px 28px; align-items: stretch;
+  background: #1C2034; padding: 20px 28px 0;
 }
+.regions-box-body.is-fullscreen .compare-stage-row { flex: 1; min-height: 0; align-items: stretch; }
 .regions-box-body.is-fullscreen .regions-map-col {
-  flex: 1; min-width: 0; display: flex; flex-direction: column;
+  flex: 1; min-width: 0; display: flex;
   align-items: center; justify-content: center; min-height: 0;
 }
-.regions-box-body.is-fullscreen .compare-map-stage { max-width: 900px; width: 100%; margin: 0; }
+.regions-box-body.is-fullscreen .compare-map-stage { max-width: 1100px; width: 100%; margin: 0; }
 .regions-box-body.is-fullscreen .compare-panel { flex: 0 0 480px; width: 480px; max-height: none; }
 .compare-panel-head {
   flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
@@ -4042,11 +4048,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
 /* Segment legend/picker — doubles as the chart legend (colour dot = series
    identity, per dataviz convention) and the toggle to include/exclude a
-   segment from the comparison. Lives beside the map (not inside the answers
-   panel) so toggling regions never crowds out the question-by-question
-   comparison below — see .compare-picker-wrap. */
+   segment from the comparison. A single horizontally-scrolling row along
+   the bottom of the screen (not a wrapped grid) so picking regions never
+   eats into the map's own space — see .compare-picker-wrap. */
 .compare-picker-wrap {
-  width: 100%; max-width: 900px; margin: 14px auto 0;
+  flex-shrink: 0; width: 100%;
+  padding: 10px 0 18px; border-top: 1px solid rgba(255,255,255,0.06);
 }
 .compare-picker-wrap.hidden { display: none; }
 .compare-picker-label {
@@ -4054,10 +4061,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
   text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px;
 }
 .compare-picker {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  max-height: 160px; overflow-y: auto; padding: 2px 2px 4px;
+  display: flex; flex-wrap: nowrap; gap: 8px;
+  overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px;
 }
 .compare-chip {
+  flex-shrink: 0; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 7px;
   padding: 6px 12px 6px 9px; border-radius: 100px;
   border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.03);

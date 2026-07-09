@@ -444,14 +444,15 @@ export default class extends Controller {
     })
   }
 
-  // Each card starts expanded with a chevron header that collapses it down
-  // to just the question text, so a long list of questions can be scanned
-  // quickly and expanded one at a time.
+  // Each card starts collapsed to just its question text behind a chevron
+  // header — with the region picker no longer eating map space, the panel
+  // is the one place still tight on room, so a long list of questions stays
+  // scannable at a glance and expands one at a time on click.
   _buildCardComparison(card, selected) {
     if (SKIP_TYPES.has(card.type)) return null
 
     const wrap = document.createElement("div")
-    wrap.className = "compare-card"
+    wrap.className = "compare-card is-collapsed"
 
     const head = document.createElement("button")
     head.type = "button"
