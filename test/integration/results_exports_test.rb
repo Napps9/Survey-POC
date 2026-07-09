@@ -71,6 +71,23 @@ class ResultsExportsTest < ActionDispatch::IntegrationTest
     ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_CLIENT_SECRET"] = prev
   end
 
+  test "results include partial (started) responders, excluding those who answered nothing" do
+    # answered the question but never reached Submit — must now be counted
+    @survey.responses.create!(session_token: SecureRandom.uuid, status: "started", locale: "en",
+                              answers: { "0" => { "type" => "multiple_choice", "value" => "Green" } })
+    # opened but answered nothing — contributes to no question, so excluded
+    @survey.responses.create!(session_token: SecureRandom.uuid, status: "started", locale: "en", answers: {})
+
+    get survey_results_path(@survey)
+    assert_response :success
+    assert_match "Green", response.body, "a partial responder's answer should show in results"
+
+    get survey_results_export_path(@survey, kind: "responses")
+    parsed = CSV.parse(response.body.delete_prefix("﻿"), headers: true)
+    assert_equal 2, parsed.size, "the completed + the partial responder, but not the empty one"
+    assert_equal %w[Blue Green], parsed.map { |r| r["Colour?"] }.compact.sort
+  end
+
   private
 
   def sign_in(user)

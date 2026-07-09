@@ -58,10 +58,17 @@ module ResolvesResultSegments
 
   REGION_SEGMENT_CAP = 30
 
-  # The completed-response base scope, plus the segments and the active segment
-  # selected by params[:segment]. Returns [base, segments, active_segment].
+  # The base response scope, plus the segments and the active segment selected
+  # by params[:segment]. Returns [base, segments, active_segment].
+  #
+  # Base is every *responder* — anyone who answered at least one question, not
+  # only those who reached Submit — so the per-question results reflect all the
+  # data collected, including partial responses that stopped part-way. The
+  # aggregator counts each card off its own answers, so an unfinished response
+  # simply contributes to the questions it did reach. (Completion is still
+  # surfaced separately as the dashboard's completion rate.)
   def resolve_result_segments(survey, segment_param)
-    base     = survey.responses.where(status: "completed").order(created_at: :desc)
+    base     = survey.responses.where(answered: true).order(created_at: :desc)
     segments = result_segments(survey, base)
     active   = segments.find { |s| s[:id] == segment_param } || segments.first
     [ base, segments, active ]
