@@ -110,6 +110,24 @@ class LocationDemographicTest < ActionDispatch::IntegrationTest
     assert_equal [ "GB", "Yorkshire", 5 ], [ top["country"], top["label"], top["responders"] ]
   end
 
+  test "the regions endpoint counts partial responders, not only completers" do
+    org = create_org_and_sign_in("partial-region")
+    s   = create_survey(org)
+
+    # 5 region-tagged responders who answered but never submitted (started)
+    5.times do |i|
+      s.responses.create!(session_token: "gb-started-#{i}-#{SecureRandom.hex(3)}", status: "started",
+                          region_country: "GB", region_label: "Yorkshire",
+                          answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    end
+
+    get player_regions_path(s.publish_token)
+    data = JSON.parse(response.body)
+    assert data["ok"]
+    assert_equal [ "GB" ], data["regions"].map { |r| r["country"] }
+    assert_equal 5, data["regions"].first["responders"]
+  end
+
   test "creator results show region segments and the world map once responses accumulate" do
     org = create_org_and_sign_in("results")
     s   = create_survey(org)

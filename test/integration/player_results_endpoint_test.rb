@@ -42,6 +42,27 @@ class PlayerResultsEndpointTest < ActionDispatch::IntegrationTest
     assert_equal 1, row["counts"]["Red"]
   end
 
+  test "results include partial responders, not only submitted ones" do
+    s = comparison_survey
+
+    # submitted → completed
+    json_post submit_survey_path(s.publish_token),
+              session_token: SecureRandom.uuid,
+              answers: { "1" => { "type" => "multiple_choice", "value" => "Red" } }
+    # answered but never submitted → started, must still be counted
+    s.responses.create!(session_token: SecureRandom.uuid, status: "started",
+                        answers: { "1" => { "type" => "multiple_choice", "value" => "Blue" } })
+    # opened, answered nothing → excluded
+    s.responses.create!(session_token: SecureRandom.uuid, status: "started", answers: {})
+
+    get player_results_path(s.publish_token)
+    body = JSON.parse(response.body)
+    assert_equal 2, body["total_responses"]
+    row = body["results"].find { |r| r["type"] == "multiple_choice" }
+    assert_equal 1, row["counts"]["Red"]
+    assert_equal 1, row["counts"]["Blue"]
+  end
+
   test "results endpoint is forbidden when comparison is off" do
     org = Organisation.create!(name: "O", slug: "o-#{SecureRandom.hex(3)}")
     s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",

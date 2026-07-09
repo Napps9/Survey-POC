@@ -229,23 +229,28 @@ class PlayerController < ApplicationController
       return render json: { ok: false, error: "Comparison not enabled" }, status: :forbidden
     end
 
-    responses = @survey.responses.where(status: "completed")
+    # Every responder (answered ≥1 question), not only those who reached Submit —
+    # so a respondent compares against all the answers collected per question,
+    # matching the creator Results screen. Each row is tallied off its own
+    # answers, so partial responses just count toward the questions they reached.
+    responses = @survey.responses.where(answered: true)
     render json: { ok: true, total_responses: responses.count,
                    results: aggregate_rows(responses) + token_comparison_rows(responses) }
   end
 
   # Per-region aggregates for the post-finish map view: one entry per region
-  # (country + label) that has at least one completed, region-tagged response.
-  # Every Verto captures this via the "Where do you live?" demographic
-  # question, so there's no separate opt-in gate — an empty result set just
-  # renders the "no regional answers yet" copy.
+  # (country + label) that has at least one region-tagged responder. Every Verto
+  # captures this via the "Where do you live?" demographic question, so there's
+  # no separate opt-in gate — an empty result set just renders the "no regional
+  # answers yet" copy.
   def regions
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
 
-    # Only the columns the region grouping + per-region aggregation read, so
-    # rows aren't loaded with their full set of columns.
-    tagged = @survey.responses.where(status: "completed").where.not(region_country: nil)
+    # Every responder (answered ≥1 question), not only completers — consistent
+    # with the results comparison above. Only the columns the region grouping +
+    # per-region aggregation read, so rows aren't loaded with all their columns.
+    tagged = @survey.responses.where(answered: true).where.not(region_country: nil)
                     .select(:id, :region_country, :region_label, :answers)
     groups = tagged.group_by(&:region_key)
     # Small-cell suppression: a region with fewer than MIN_REGION_SAMPLE_SIZE
