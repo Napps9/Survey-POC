@@ -4195,9 +4195,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .freeform-month:focus, .freeform-year:focus { border-color: #01EACB; }
 .freeform-monthyear-sep { font-family: "Alata", sans-serif; font-size: 18px; color: rgba(0,0,0,0.3); }
 
-/* Live Vertos are read-only: the cards feed goes inert (server enforces too) */
-.editor-feed-locked { pointer-events: none; user-select: none; }
-.editor-feed-locked .card-row, .editor-feed-locked .split-card { opacity: 0.88; }
+/* Live Vertos are read-only: each card's own content goes inert (server
+   enforces too), but the feed container itself stays interactive — putting
+   pointer-events:none on the scrolling container (rather than the cards
+   inside it) would also swallow wheel/touch/scrollbar input on it, leaving
+   creators unable to even scroll through to review a locked Verto. */
+.editor-feed-locked { user-select: none; }
+.editor-feed-locked .survey-card-wrap { opacity: 0.88; pointer-events: none; }
 
 /* ── Question-type ⓘ info button (answer-type panel + all-types grid) ── */
 .type-opt-info {
