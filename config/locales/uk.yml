@@ -431,6 +431,7 @@ uk:
     stat_live: Активні
     stat_drafts: Чернетки
     stat_responses: Відповіді
+    stat_responders: "Респонденти"
     stat_completion: Завершення
     empty_title: Ще немає Vertos
     empty_body: Створіть свій перший Verto та починайте збирати інсайти від аудиторії.

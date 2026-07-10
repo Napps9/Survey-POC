@@ -431,6 +431,7 @@ sw:
     stat_live: Hai
     stat_drafts: Rasimu
     stat_responses: Majibu
+    stat_responders: "Wajibu"
     stat_completion: Ukamilishaji
     empty_title: Hakuna Vertos bado
     empty_body: Unda Verto yako ya kwanza na uanze kukusanya maarifa kutoka kwa hadhira yako.

@@ -431,6 +431,7 @@ he:
     stat_live: פעיל
     stat_drafts: טיוטות
     stat_responses: תגובות
+    stat_responders: "משיבים"
     stat_completion: השלמה
     empty_title: אין Vertos עדיין
     empty_body: צור את ה-Verto הראשון שלך והתחל לאסוף תובנות מהקהל שלך.

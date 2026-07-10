@@ -431,6 +431,7 @@ hi:
     stat_live: लाइव
     stat_drafts: ड्राफ़्ट
     stat_responses: उत्तर
+    stat_responders: "उत्तरदाता"
     stat_completion: पूर्णता
     empty_title: अभी तक कोई Verto नहीं
     empty_body: अपना पहला Verto बनाएं और अपने दर्शकों से अंतर्दृष्टि एकत्र करना शुरू करें।

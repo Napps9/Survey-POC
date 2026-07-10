@@ -431,6 +431,7 @@ it:
     stat_live: Live
     stat_drafts: Bozze
     stat_responses: Risposte
+    stat_responders: "Risponditori"
     stat_completion: Completamento
     empty_title: Ancora nessun Verto
     empty_body: Crea il tuo primo Verto e inizia a raccogliere intuizioni dal tuo pubblico.

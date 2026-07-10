@@ -431,6 +431,7 @@ ru:
     stat_live: Активных
     stat_drafts: Черновиков
     stat_responses: Ответов
+    stat_responders: "Участники"
     stat_completion: Завершение
     empty_title: Пока нет Vertos
     empty_body: Создайте свой первый Verto и начните собирать инсайты от аудитории.

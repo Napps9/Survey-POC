@@ -431,6 +431,7 @@ tr:
     stat_live: Canlı
     stat_drafts: Taslaklar
     stat_responses: Yanıtlar
+    stat_responders: "Yanıtlayıcılar"
     stat_completion: Tamamlanma
     empty_title: Henüz Verto yok
     empty_body: İlk Verto'nuzu oluşturun ve hedef kitlenizden içgörüler toplamaya başlayın.

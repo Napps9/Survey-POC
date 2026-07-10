@@ -433,6 +433,7 @@ en:
     stat_live: "Live"
     stat_drafts: "Drafts"
     stat_responses: "Responses"
+    stat_responders: "Responders"
     stat_completion: "Completion"
     empty_title: "No Vertos yet"
     empty_body: "Create your first Verto and start collecting insights from your audience."

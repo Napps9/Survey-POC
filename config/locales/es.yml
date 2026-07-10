@@ -431,6 +431,7 @@ es:
     stat_live: Activos
     stat_drafts: Borradores
     stat_responses: Respuestas
+    stat_responders: "Participantes"
     stat_completion: Finalización
     empty_title: Aún no hay Vertos
     empty_body: Crea tu primer Verto y empieza a recoger información de tu audiencia.

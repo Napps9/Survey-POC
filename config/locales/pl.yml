@@ -431,6 +431,7 @@ pl:
     stat_live: Na żywo
     stat_drafts: Wersje robocze
     stat_responses: Odpowiedzi
+    stat_responders: "Respondenci"
     stat_completion: Ukończenie
     empty_title: Brak Verto
     empty_body: Utwórz swoje pierwsze Verto i zacznij zbierać wnioski od swojej publiczności.

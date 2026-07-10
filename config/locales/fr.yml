@@ -431,6 +431,7 @@ fr:
     stat_live: En ligne
     stat_drafts: Brouillons
     stat_responses: Réponses
+    stat_responders: "Répondants"
     stat_completion: Achèvement
     empty_title: Aucun Verto pour l'instant
     empty_body: Créez votre premier Verto et commencez à recueillir les avis de votre audience.

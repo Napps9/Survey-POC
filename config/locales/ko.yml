@@ -431,6 +431,7 @@ ko:
     stat_live: 라이브
     stat_drafts: 초안
     stat_responses: 응답
+    stat_responders: "응답자"
     stat_completion: 완료율
     empty_title: 아직 Verto가 없습니다
     empty_body: 첫 Verto를 만들고 청중으로부터 인사이트를 수집해 보세요.

@@ -431,6 +431,7 @@ de:
     stat_live: Live
     stat_drafts: Entwürfe
     stat_responses: Antworten
+    stat_responders: "Teilnehmende"
     stat_completion: Abschlussquote
     empty_title: Noch keine Vertos
     empty_body: Erstelle dein erstes Verto und beginne, Erkenntnisse von deinem Publikum zu sammeln.

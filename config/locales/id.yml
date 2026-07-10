@@ -431,6 +431,7 @@ id:
     stat_live: Live
     stat_drafts: Draf
     stat_responses: Tanggapan
+    stat_responders: "Responden"
     stat_completion: Penyelesaian
     empty_title: Belum ada Verto
     empty_body: Buat Verto pertama Anda dan mulai kumpulkan wawasan dari audiens Anda.

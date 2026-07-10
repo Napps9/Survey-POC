@@ -22,7 +22,6 @@ class SurveysController < ApplicationController
     @completed_counts           = Response.where(survey_id: ids, status: "completed").group(:survey_id).count
     @responder_counts           = Response.where(survey_id: ids, answered: true).group(:survey_id).count
     @responder_completed_counts = Response.where(survey_id: ids, answered: true, status: "completed").group(:survey_id).count
-    @total_responses            = Response.where(survey_id: @surveys.map(&:id)).count
     render :index, layout: "fullscreen"
   end
 

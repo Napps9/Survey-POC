@@ -431,6 +431,7 @@ nl:
     stat_live: Live
     stat_drafts: Concepten
     stat_responses: Reacties
+    stat_responders: "Respondenten"
     stat_completion: Voltooiing
     empty_title: Nog geen Vertos
     empty_body: Maak je eerste Verto en begin met het verzamelen van inzichten uit je publiek.

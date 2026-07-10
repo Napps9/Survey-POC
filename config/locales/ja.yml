@@ -431,6 +431,7 @@ ja:
     stat_live: ライブ
     stat_drafts: 下書き
     stat_responses: 回答数
+    stat_responders: "回答者数"
     stat_completion: 完了率
     empty_title: Vertosがありません
     empty_body: 最初のVertoを作成して、オーディエンスからインサイトを収集しましょう。

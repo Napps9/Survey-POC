@@ -431,6 +431,7 @@ pt:
     stat_live: Ao vivo
     stat_drafts: Rascunhos
     stat_responses: Respostas
+    stat_responders: "Respondentes"
     stat_completion: Conclusão
     empty_title: Ainda sem Vertos
     empty_body: Crie o seu primeiro Verto e comece a recolher insights do seu público.

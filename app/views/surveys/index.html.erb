@@ -13,8 +13,13 @@
   drafts    = @surveys.reject { |s| s.publish_token.present? }
   archived  = @archived_surveys || []
 
-  total_responses_completed = Current.organisation.surveys.kept.joins(:responses).where(responses: { status: "completed" }).count rescue @total_responses
-  completion_rate = @total_responses.to_i.positive? ? ((total_responses_completed.to_f / @total_responses) * 100).round : nil
+  # Responder-based dashboard: count people who answered at least one question
+  # (not everyone who merely opened a Verto), and read completion as the share
+  # of those responders who finished — the same basis the Verto cards use, so
+  # the summary strip and the cards below always tell one consistent story.
+  total_responders     = @surveys.sum { |s| (@responder_counts || {})[s.id].to_i }
+  completed_responders = @surveys.sum { |s| (@responder_completed_counts || {})[s.id].to_i }
+  completion_rate      = total_responders.positive? ? ((completed_responders.to_f / total_responders) * 100).round : nil
 %>
 
 <div style="display:flex;min-height:100vh;background:#1C2034;">
@@ -70,7 +75,7 @@
             { value: @surveys.size.to_s,         label: "Vertos",                       accent: "#01EACB", grad: "linear-gradient(135deg,rgba(1,234,203,0.18),rgba(1,234,203,0.04))" },
             { value: published.size.to_s,        label: t("dashboard.stat_live"),        accent: "#FF1E6F", grad: "linear-gradient(135deg,rgba(255,30,111,0.18),rgba(255,30,111,0.04))" },
             { value: drafts.size.to_s,           label: t("dashboard.stat_drafts"),      accent: "#0CA7FF", grad: "linear-gradient(135deg,rgba(12,167,255,0.18),rgba(12,167,255,0.04))" },
-            { value: @total_responses.to_s,      label: t("dashboard.stat_responses"),   accent: "#615BF5", grad: "linear-gradient(135deg,rgba(97,91,245,0.18),rgba(97,91,245,0.04))" },
+            { value: total_responders.to_s,      label: t("dashboard.stat_responders"),  accent: "#615BF5", grad: "linear-gradient(135deg,rgba(97,91,245,0.18),rgba(97,91,245,0.04))" },
             { value: completion_rate ? "#{completion_rate}%" : "—", label: t("dashboard.stat_completion"), accent: "#FFFA77", grad: "linear-gradient(135deg,rgba(255,250,119,0.18),rgba(255,250,119,0.04))" },
           ]
         %>

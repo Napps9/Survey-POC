@@ -31,8 +31,11 @@ class DashboardCountsTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :success
     assert_match "DashTheme", response.body
-    # 3 responders, 2 completed → 67% completion.
+    # The summary strip is responder-based, matching the Verto cards: 3 responders
+    # (the empty "started" row is not a responder), 2 completed → 67% (not the
+    # old opens-based 2/4 = 50%), and the tile is now labelled "Responders".
     assert_match "67%", response.body
+    assert_match I18n.t("dashboard.stat_responders"), response.body
   end
 
   test "dashboard renders with no responses" do

@@ -431,6 +431,7 @@ vi:
     stat_live: Trực tiếp
     stat_drafts: Bản nháp
     stat_responses: Phản hồi
+    stat_responders: "Người phản hồi"
     stat_completion: Hoàn thành
     empty_title: Chưa có Verto nào
     empty_body: Tạo Verto đầu tiên và bắt đầu thu thập thông tin chi tiết từ khán giả của bạn.

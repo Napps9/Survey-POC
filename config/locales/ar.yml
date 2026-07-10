@@ -431,6 +431,7 @@ ar:
     stat_live: مباشر
     stat_drafts: مسودات
     stat_responses: الردود
+    stat_responders: "المجيبون"
     stat_completion: الإكمال
     empty_title: لا توجد فيرتوهات بعد
     empty_body: أنشئ أول فيرتو لك وابدأ في جمع الرؤى من جمهورك.
