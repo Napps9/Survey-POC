@@ -29,7 +29,15 @@ export default class extends Controller {
     scoresUrl: { type: String, default: "" },
     tokenisation: { type: Boolean, default: false },
     tokenTypes: { type: Array, default: [] },
-    current: { type: Number, default: 0 }
+    current: { type: Number, default: 0 },
+    // Form mode: same flow, but drop the game-like haptic buzz so it reads as a
+    // plain questionnaire (motion/swipe are stripped via CSS + tap_stack).
+    forms: { type: Boolean, default: false }
+  }
+
+  // Haptic feedback, suppressed in form mode.
+  _buzz(pattern) {
+    if (!this.formsValue) haptic(pattern)
   }
 
   _answers = {}
@@ -75,7 +83,7 @@ export default class extends Controller {
   // best-effort philosophy as _saveProgress(), so a network blip never blocks
   // the respondent's tap.
   agreeConsent() {
-    haptic()
+    this._buzz()
     this._recordConsent(true)
     this.next()
   }
@@ -109,7 +117,7 @@ export default class extends Controller {
     this._applyTokenEarn(this.currentValue)
     this._saveProgress()
     if (this.currentValue < this.cardTargets.length - 1) {
-      haptic()
+      this._buzz()
       this.currentValue++
       this._update()
     }
@@ -140,7 +148,7 @@ export default class extends Controller {
     this._capture(this.currentValue)
     if (!this._requireGuard(this.currentValue)) return
     this._applyTokenEarn(this.currentValue)
-    haptic([10, 30, 10]) // a little "done" buzz on completion
+    this._buzz([10, 30, 10]) // a little "done" buzz on completion
     // Owner preview runs without a submit endpoint — nothing is recorded,
     // just show the thank-you screen.
     if (!this.submitUrlValue) return this._showThankyou(false)
@@ -931,7 +939,7 @@ export default class extends Controller {
     this._revealCard(card, result)
     this._renderScoreChip()
     this._update()
-    haptic(result.correct ? [12, 24, 12] : 30)
+    this._buzz(result.correct ? [12, 24, 12] : 30)
   }
 
   // Disables Next/Submit and swaps its label while the server checks the

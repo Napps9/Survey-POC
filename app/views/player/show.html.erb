@@ -52,10 +52,11 @@
     toolbar hidden, so on first paint (toolbar visible) the bottom of the
     page — including the Next button — rendered below the visible fold with
     no way to scroll to it. %>
-<div class="preview-overlay flex flex-col"
+<div class="preview-overlay flex flex-col<%= " forms-mode" if @survey.forms_mode? %>"
      style="<%= verto_backdrop_style_attr(@survey) %>"
      dir="<%= SupportedLocales.dir(@display_locale) %>"
      data-controller="player"
+     data-player-forms-value="<%= @survey.forms_mode? %>"
      data-player-progress-url-value="<%= progress_url %>"
      data-player-submit-url-value="<%= submit_url %>"
      data-player-consent-url-value="<%= consent_url %>"

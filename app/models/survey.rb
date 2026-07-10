@@ -242,6 +242,20 @@ class Survey < ApplicationRecord
     consent_text.present?
   end
 
+  # How the player presents this Verto. "cards" is the default immersive,
+  # animated experience; "form" keeps the same one-question-at-a-time flow but
+  # strips the swipe gestures and game-like animation so it reads as a plain
+  # questionnaire (see the .forms-mode CSS layer and the player root class).
+  RENDER_MODES = %w[cards form].freeze
+
+  def self.normalize_render_mode(value)
+    RENDER_MODES.include?(value.to_s) ? value.to_s : "cards"
+  end
+
+  def forms_mode?
+    render_mode == "form"
+  end
+
   # Coerce a creator-entered website into a safe http(s) URL for the
   # forward-to-website CTA on the thank-you screen. Adds a scheme when missing;
   # returns nil for blank or non-http(s) input so the CTA simply doesn't show.

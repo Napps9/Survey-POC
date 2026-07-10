@@ -619,6 +619,23 @@
           <% end %>
         </details>
 
+        <%# Form mode — same one-question-at-a-time flow, but the swipe gestures
+            and game-like animation are stripped so it reads as a plain
+            questionnaire. Toggling reloads the editor/preview. %>
+        <details class="publish-block">
+          <summary class="publish-block-title">Form mode <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="render_mode" value="cards" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="render_mode" value="form"
+                     <%= "checked" if @survey.forms_mode? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#615BF5;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Show it as a plain questionnaire — respondents still answer one question at a time, but without the swipe and animation.</span>
+            </label>
+          <% end %>
+        </details>
+
         <%# Tokenisation — creators define one or more token types (e.g. Gold
             Coins, Coal) and assign amounts to cards/answers below; players see
             a running total as they answer, a final total, and — only if

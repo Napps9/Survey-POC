@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_10_112739) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -279,6 +279,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_130000) do
     t.string "publish_token"
     t.datetime "published_at"
     t.boolean "quiz", default: false, null: false
+    t.string "render_mode", default: "cards", null: false
     t.text "results_report"
     t.integer "results_report_response_count"
     t.text "results_summary"

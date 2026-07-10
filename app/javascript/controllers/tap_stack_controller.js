@@ -10,6 +10,10 @@ export default class extends Controller {
   connect() {
     this.position = 0
     this.swipeResults = {}
+    // In form mode the deck loses its swipe-off animation — the card just snaps
+    // to the next one — so it reads as a plain question, not a game (the answer
+    // is captured from the Yes/Unsure/No buttons either way).
+    this.formsMode = !!this.element.closest(".forms-mode")
     this.layout()
   }
 
@@ -28,7 +32,7 @@ export default class extends Controller {
     const tx = dir === "left" ? "-120%" : dir === "right" ? "120%" : "0"
     const ty = dir === "up"   ? "-120%" : "0"
     const rot = dir === "left" ? "-15deg" : dir === "right" ? "15deg" : "0deg"
-    top.style.transition = "transform 350ms ease, opacity 350ms ease"
+    top.style.transition = this.formsMode ? "none" : "transform 350ms ease, opacity 350ms ease"
     top.style.transform  = `translate(${tx}, ${ty}) rotate(${rot})`
     top.style.opacity    = "0"
     this.position += 1
@@ -62,7 +66,7 @@ export default class extends Controller {
         return
       }
       const visible = offset <= 2
-      card.style.transition = "transform 250ms ease, opacity 250ms ease"
+      card.style.transition = this.formsMode ? "none" : "transform 250ms ease, opacity 250ms ease"
       card.style.opacity    = visible ? "1" : "0"
       card.style.pointerEvents = offset === 0 ? "auto" : "none"
       card.style.zIndex     = String(total - offset)

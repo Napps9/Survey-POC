@@ -254,6 +254,23 @@
   .nps-wave, .nps-wave2, .nps-surface, .nps-bub { animation: none; }
   .nps-bub { opacity: .55; }
 }
+
+/* Form mode — the same one-question-at-a-time player with the swipe gestures
+   and ambient/game-like motion stripped, so a Verto reads as a plain
+   questionnaire (Survey#forms_mode? adds .forms-mode to the player root, see
+   player/show.html.erb). The swipe *gesture* is disabled in
+   tap_stack_controller.js; here we remove the ambient motion and swipe
+   affordances. Functional control feedback (sliders, pickers) is left intact. */
+.forms-mode .gen-orb { animation: none; }
+.forms-mode .nps-liquid { transition: none; }
+.forms-mode .nps-wave,
+.forms-mode .nps-wave2,
+.forms-mode .nps-surface,
+.forms-mode .nps-bub { animation: none; }
+.forms-mode .nps-bub { opacity: .55; }
+.forms-mode .audio-bar.animating { animation: none; }
+.forms-mode .rotate-card { transition: none; }
+.forms-mode .swipe-indicator { display: none; }
 /* LEFT panel: the Lottie mount. lottie-web injects an <svg> into the
    .nps-lottie-mount child; the wrapper fills the left panel. */
 .nps-lottie {
