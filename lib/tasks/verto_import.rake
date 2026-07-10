@@ -29,6 +29,29 @@ namespace :verto do
     puts "  login pw:  the value you set in IMPORT_PASSWORD"
   end
 
+  desc "Append/refresh a CSV export into the EXISTING imported Verto without " \
+       "rebuilding it — adds responses new to the export and updates ones already " \
+       "imported, leaving the account, Verto (and its /play link) and any organic " \
+       "responses untouched. No password needed. Honours IMPORT_ORG_SLUG / IMPORT_VERTO_SLUG. " \
+       "Usage: bin/rails 'verto:append_csv[db/seeds/unyo_sport_x_changemaking_2026.csv]'"
+  task :append_csv, [ :path ] => :environment do |_t, args|
+    path = args[:path] || ENV["CSV_PATH"]
+    abort "usage: bin/rails 'verto:append_csv[path/to/export.csv]'" if path.blank?
+    abort "CSV not found: #{path}" unless File.exist?(path)
+
+    importer = VertoCsvImporter.new(
+      csv_path:   path,
+      org_slug:   ENV.fetch("IMPORT_ORG_SLUG", VertoCsvImporter::DEFAULT_ORG_SLUG),
+      verto_slug: ENV.fetch("IMPORT_VERTO_SLUG", VertoCsvImporter::DEFAULT_VERTO_SLUG)
+    )
+    result = importer.append!
+
+    puts "── Verto CSV append complete ──"
+    puts "  added:     #{result[:added]} new responses"
+    puts "  updated:   #{result[:updated]} existing responses"
+    importer.summary_for(result[:survey]).each { |k, v| puts format("  %-10s %s", "#{k}:", v) }
+  end
+
   desc "Remove an imported Verto account (org + admin + Verto + responses). " \
        "Honours IMPORT_ORG_SLUG / IMPORT_ADMIN_EMAIL (defaults to the UNYO import)."
   task destroy_import: :environment do

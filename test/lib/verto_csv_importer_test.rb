@@ -5,8 +5,9 @@ require "test_helper"
 # `answers` hash the player/results code reads. Runs against a small fixture
 # carved from the real UNYO export (test/fixtures/files/verto_import_sample.csv).
 class VertoCsvImporterTest < ActiveSupport::TestCase
-  FIXTURE  = Rails.root.join("test/fixtures/files/verto_import_sample.csv").to_s
-  PASSWORD = "import-test-passphrase"
+  FIXTURE        = Rails.root.join("test/fixtures/files/verto_import_sample.csv").to_s
+  APPEND_FIXTURE = Rails.root.join("test/fixtures/files/verto_import_append.csv").to_s
+  PASSWORD       = "import-test-passphrase"
 
   def import!
     VertoCsvImporter.new(csv_path: FIXTURE, admin_password: PASSWORD,
@@ -132,5 +133,31 @@ class VertoCsvImporterTest < ActiveSupport::TestCase
     # don't split one answer across two look-alike buckets.
     assert_equal "I don’t regularly take part",
                  imp.send(:canonical, "I don't regularly take part", VertoCsvImporter::SPORT_TYPES)
+  end
+
+  test "append adds new responses and refreshes existing ones in the same account" do
+    survey    = import! # 5 responses
+    survey_id = survey.id
+    token     = survey.publish_token
+    org_id    = survey.organisation_id
+    assert_equal 5, survey.responses.count
+
+    result = VertoCsvImporter.new(csv_path: APPEND_FIXTURE, org_slug: "unyo-test",
+                                  admin_email: "admin@unyo.test", verto_slug: survey.slug).append!
+
+    assert_equal survey_id, result[:survey].id, "the same Verto is reused, not rebuilt"
+    assert_equal token, result[:survey].publish_token, "the /play link is preserved"
+    assert_equal org_id, result[:survey].organisation_id, "the account is preserved"
+    assert_equal 1, result[:added]
+    assert_equal 5, result[:updated]
+    assert_equal 6, result[:survey].responses.count
+    assert_equal 1, Organisation.where(slug: "unyo-test").count, "no duplicate org created"
+  end
+
+  test "append refuses when there is no account to append to yet" do
+    err = assert_raises(ArgumentError) do
+      VertoCsvImporter.new(csv_path: APPEND_FIXTURE, org_slug: "does-not-exist").append!
+    end
+    assert_match(/run the full import first/, err.message)
   end
 end

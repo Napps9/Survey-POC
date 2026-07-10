@@ -118,7 +118,7 @@ class VertoCsvImporter
     "the gambia" => "GM", "gambia" => "GM", "south african" => "ZA"
   }.freeze
 
-  def initialize(csv_path:, admin_password:,
+  def initialize(csv_path:, admin_password: nil,
                  org_name: DEFAULT_ORG_NAME, org_slug: DEFAULT_ORG_SLUG,
                  admin_email: DEFAULT_ADMIN_EMAIL, admin_name: nil,
                  title: DEFAULT_TITLE, verto_slug: DEFAULT_VERTO_SLUG)
@@ -146,9 +146,56 @@ class VertoCsvImporter
       org = create_organisation!
       create_admin!(org)
       survey = create_survey!(org, cards)
-      rows.each { |row| import_row!(survey, specs, row) }
+      rows.each do |row|
+        attrs = response_attributes(specs, row)
+        survey.responses.create!(attrs) if attrs
+      end
     end
     survey
+  end
+
+  # Upsert the CSV into an EXISTING account + Verto instead of rebuilding: adds
+  # responses that are new to this export and refreshes ones already imported,
+  # keyed on the deterministic "<slug>-<Viewing ID>" token. The org, admin,
+  # Verto (and its /play link) and any organically-collected responses (which
+  # carry random tokens) are left untouched. Returns { survey:, added:, updated: }.
+  def append!
+    rows  = CSV.read(@csv_path, headers: true, encoding: "bom|utf-8")
+    specs = build_specs
+    cards = specs.map { |s| s[:card] }
+
+    org = Organisation.find_by(slug: @org_slug)
+    raise ArgumentError, "No organisation '#{@org_slug}' to append to — run the full import first." unless org
+
+    survey = org.surveys.kept.find_by(slug: @verto_slug) || org.surveys.kept.order(:id).first
+    raise ArgumentError, "No Verto found in '#{@org_slug}' to append to." unless survey
+
+    # Answer keys are positional indices into the deck, so appending is only
+    # safe when the live Verto's questions still match the CSV's reconstructed
+    # deck — otherwise a full re-import is the right tool.
+    unless survey.cards == cards
+      raise ArgumentError, "The Verto's questions differ from the CSV's reconstructed deck — " \
+                           "appending would misalign answers. Re-run the full import instead."
+    end
+
+    added = 0
+    updated = 0
+    ActiveRecord::Base.transaction do
+      rows.each do |row|
+        attrs = response_attributes(specs, row)
+        next unless attrs
+
+        existing = survey.responses.find_by(session_token: attrs[:session_token])
+        if existing
+          existing.update!(attrs.except(:session_token, :created_at, :updated_at))
+          updated += 1
+        else
+          survey.responses.create!(attrs)
+          added += 1
+        end
+      end
+    end
+    { survey: survey, added: added, updated: updated }
   end
 
   # Removes the org this importer owns and its admin user (and, by dependent
@@ -211,9 +258,12 @@ class VertoCsvImporter
     survey
   end
 
-  def import_row!(survey, specs, row)
+  # Response attributes for one CSV row (nil when the row has no Viewing ID).
+  # Shared by the full import (create) and append (upsert) so both derive the
+  # same session token, answers, region, status and timestamp from a row.
+  def response_attributes(specs, row)
     token = row["Viewing ID"].to_s.strip
-    return if token.empty?
+    return nil if token.empty?
 
     answers = {}
     specs.each_with_index do |spec, idx|
@@ -227,14 +277,14 @@ class VertoCsvImporter
     country, label = region_from(answers)
     created = parse_created_at(row["Start date"], row["Start time"]) || Time.current
 
-    Response.create!(
-      survey: survey, session_token: "#{@org_slug}-#{token}",
-      status: (row["Completion percentage"].to_f >= 100.0 ? "completed" : "started"),
-      answers: answers,
+    {
+      session_token:  "#{@org_slug}-#{token}",
+      status:         (row["Completion percentage"].to_f >= 100.0 ? "completed" : "started"),
+      answers:        answers,
       region_country: country, region_label: label,
-      locale: row["Language"].to_s.strip.presence || "en",
-      created_at: created, updated_at: created
-    )
+      locale:         row["Language"].to_s.strip.presence || "en",
+      created_at:     created, updated_at: created
+    }
   end
 
   # ── card deck + per-row extractors ────────────────────────────────────────
