@@ -325,14 +325,14 @@ class VertoCsvImporter
     { card: { "type" => "multiple_choice", "text" => text, "options" => options }, col: col,
       get: ->(row, source) {
         v = row[source].to_s.strip
-        v.empty? ? nil : { "type" => "multiple_choice", "value" => v }
+        v.empty? ? nil : { "type" => "multiple_choice", "value" => canonical(v, options) }
       } }
   end
 
   def pick_many_spec(text, options, col)
     { card: { "type" => "select_many", "text" => text, "options" => options }, col: col,
       get: ->(row, source) {
-        atoms = split_atoms(row[source])
+        atoms = split_atoms(row[source]).map { |a| canonical(a, options) }
         atoms.empty? ? nil : { "type" => "select_many", "value" => atoms }
       } }
   end
@@ -378,10 +378,25 @@ class VertoCsvImporter
 
   # ── value coercion helpers ────────────────────────────────────────────────
 
+  # Unify apostrophe variants and surrounding whitespace. The export mixes
+  # curly (’) and straight (') apostrophes for the same label, so without this a
+  # value like "No, I don't take part in sport" wouldn't match the reconstructed
+  # "…don’t…" option — dropping the answer (scales) or splitting it into its own
+  # results bucket (choices).
+  def canon(text)
+    text.to_s.strip.tr("’‘", "''")
+  end
+
+  # The exact card-option label a raw value matches (modulo apostrophe/space),
+  # so stored answers line up with the card's options. Unknown values pass through.
+  def canonical(value, options)
+    options.find { |o| canon(o) == canon(value) } || value
+  end
+
   # Maps an ordered options list to a ->(text) { index } lookup (nil if absent).
   def indexer(options)
-    lut = options.each_with_index.to_h { |o, i| [ o, i ] }
-    ->(text) { lut[text.to_s.strip] }
+    lut = options.each_with_index.to_h { |o, i| [ canon(o), i ] }
+    ->(text) { lut[canon(text)] }
   end
 
   def range_entry(index)

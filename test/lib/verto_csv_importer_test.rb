@@ -120,4 +120,17 @@ class VertoCsvImporterTest < ActiveSupport::TestCase
     assert_equal 1, Organisation.where(slug: "unyo-test").count
     assert_equal count, second.responses.count
   end
+
+  test "apostrophe variants resolve to the canonical option (exports mix ’ and ')" do
+    imp   = VertoCsvImporter.new(csv_path: FIXTURE, admin_password: PASSWORD)
+    curly = VertoCsvImporter::HOPEFUL.index { |o| o.include?("take part in sport") }
+
+    # A scale value with a straight apostrophe still maps to its index — without
+    # this the answer would be silently dropped rather than counted.
+    assert_equal curly, imp.send(:indexer, VertoCsvImporter::HOPEFUL).call("No, I don't take part in sport")
+    # A choice value is normalised back to the card's exact label, so results
+    # don't split one answer across two look-alike buckets.
+    assert_equal "I don’t regularly take part",
+                 imp.send(:canonical, "I don't regularly take part", VertoCsvImporter::SPORT_TYPES)
+  end
 end
