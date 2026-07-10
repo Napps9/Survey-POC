@@ -1,0 +1,52 @@
+# Awareness / Intention / Agency — the competency taxonomy Playverto reads out
+# of the OECD "Education for Human Flourishing" framework (Acting in the world:
+# identify purpose, develop intent, act on it), plus the optional layer of
+# enabling Conditions that sit underneath sustained agency.
+#
+# Single source of truth for the generator tool schemas, the generator prompts,
+# the editor "Why" tab badges, and the JS (via Framework.to_json). Order is
+# significant — Awareness → Intention → Agency mirrors the activation sequence.
+# Labels/blurbs are English-only for now (like card_types.yml's `explainer`).
+competencies:
+  awareness:
+    label: "Awareness"
+    blurb: "What someone notices, feels or experiences about themselves or the world around them — where they stand today."
+    accent: "#01EACB"
+  intention:
+    label: "Intention"
+    blurb: "Readiness to be involved — what someone wants and how ready they feel to engage. Desire, not yet action."
+    accent: "#FFC24B"
+  agency:
+    label: "Agency"
+    blurb: "What someone feels capable of doing, and what they've actually done about it — who is really acting, or ready to."
+    accent: "#FF1E6F"
+
+# Enabling conditions that sit underneath sustained agency. Pairing an Agency
+# question with a Condition question turns "agency is low here" into "agency is
+# low here, and belonging looks like the reason" — what actually tells an impact
+# leader what to fix.
+conditions:
+  wellbeing:
+    label: "Wellbeing"
+    blurb: "Lived experience day to day — how someone's life actually feels. Read as experience, never as diagnosis or screening."
+    accent: "#8B9DFF"
+  belonging:
+    label: "Belonging"
+    blurb: "Sense of connection to people and place."
+    accent: "#8B9DFF"
+  perceived_support:
+    label: "Perceived support"
+    blurb: "Whether help feels available if it's needed."
+    accent: "#8B9DFF"
+  confidence_capability:
+    label: "Confidence & capability"
+    blurb: "Self-belief that one's own contribution counts."
+    accent: "#8B9DFF"
+  institutional_responsiveness:
+    label: "Institutional responsiveness"
+    blurb: "Whether the systems around someone seem to listen or act."
+    accent: "#8B9DFF"
+  safety_protection:
+    label: "Safety & protection"
+    blurb: "Whether taking part itself feels safe, in contexts where participation carries risk."
+    accent: "#8B9DFF"

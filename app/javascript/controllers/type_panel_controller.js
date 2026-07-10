@@ -26,6 +26,18 @@ function loadTypeMeta() {
   )
 }
 
+// Read the Awareness/Intention/Agency + enabling-condition metadata the editor
+// view emits as a JSON blob (sourced from config/competencies.yml via
+// Framework.to_json). Used to label the "Why" tab badges. Same re-read-on-
+// connect rationale as loadTypeMeta.
+function loadFramework() {
+  try {
+    return JSON.parse(document.getElementById("framework")?.textContent || "{}")
+  } catch (_) {
+    return {}
+  }
+}
+
 // Each entry's `note` is shown as the natural-language reason this type
 // works (or doesn't) for the selected card. The `score` only drives the
 // fit-tier badge ("Best fit" / "Strong alternative" / etc.).
@@ -405,7 +417,11 @@ export default class extends Controller {
     "card", "panelEmpty", "cardEditor", "typeList", "panelFooter",
     "panelCardName", "panelHint", "typeOpt", "toast", "toastMsg", "cardCount",
     "allTypesModal", "allTypesList", "allTypeOpt", "modalCardName",
-    "subtabs", "subtab", "subview", "tokenSlot", "quizSlot"
+    "subtabs", "subtab", "subview", "tokenSlot", "quizSlot",
+    "whyCardName", "whyEmpty", "whyBody", "whyNote", "whyFramework",
+    "whyCompetencyRow", "whyCompetencyBadge", "whyCompetencyBlurb",
+    "whyOutcomeRow", "whyOutcome",
+    "whyConditionRow", "whyConditionBadge", "whyConditionBlurb"
   ]
 
   static values = { quiz: Boolean, tokenisation: Boolean }
@@ -479,6 +495,15 @@ export default class extends Controller {
     return this._typeMeta
   }
 
+  // Awareness/Intention/Agency + condition metadata for the Why tab. Lazy +
+  // re-readable for the same cache-bleed reason as typeMeta.
+  get framework() {
+    if (!this._framework || !this._framework.competencies) {
+      this._framework = loadFramework()
+    }
+    return this._framework
+  }
+
   // Verto-themed rating icon, resolved server-side (one source of truth in
   // ApplicationHelper#rating_icon) and exposed on the editor root. Falls back
   // to the classic star so a card switched to "rating" before the attributes
@@ -526,6 +551,7 @@ export default class extends Controller {
 
     this._renderCompatibleTypes(cardType)
     this._updateSubtabsFor(card, cardType)
+    this._renderWhy(card, cardType, cardNum)
 
     // Paint the pinned sidebar traffic light immediately (it otherwise only
     // repaints on the next markDirty/refreshAll cycle).
@@ -555,6 +581,72 @@ export default class extends Controller {
 
     const activeBtn = this.subtabTargets.find(b => b.classList.contains("is-active"))
     if (!activeBtn || activeBtn.hidden) this._showSubtab("type")
+  }
+
+  // Populate the "Why" tab for the selected card: the competency it sits under,
+  // the plain-language outcome its answers generate, and any enabling condition
+  // it measures. Runs on every card select (whichever tab is visible) so
+  // switching to Why always reflects the current card.
+  _renderWhy(card, cardType, cardNum) {
+    if (!this.hasWhyBodyTarget) return
+
+    const fw      = this.framework || {}
+    const meta    = this.typeMeta[cardType]
+    const comp    = card.dataset.cardCompetency
+    const cond    = card.dataset.cardCondition
+    const outcome = card.dataset.cardOutcome
+    const isQ     = !NON_QUESTION_TYPES.includes(cardType)
+
+    if (this.hasWhyCardNameTarget) {
+      this.whyCardNameTarget.textContent = t("editor.card_n", { n: cardNum, type: meta?.badge || cardType })
+    }
+    if (this.hasWhyEmptyTarget) this.whyEmptyTarget.style.display = "none"
+    this.whyBodyTarget.hidden = false
+
+    const compMeta = comp ? fw.competencies?.[comp] : null
+    const condMeta = cond ? fw.conditions?.[cond] : null
+
+    if (this.hasWhyCompetencyRowTarget) {
+      if (compMeta) {
+        this._paintWhyBadge(this.whyCompetencyBadgeTarget, compMeta)
+        if (this.hasWhyCompetencyBlurbTarget) this.whyCompetencyBlurbTarget.textContent = compMeta.blurb || ""
+      }
+      this.whyCompetencyRowTarget.hidden = !compMeta
+    }
+
+    if (this.hasWhyOutcomeRowTarget) {
+      if (outcome && this.hasWhyOutcomeTarget) this.whyOutcomeTarget.textContent = outcome
+      this.whyOutcomeRowTarget.hidden = !outcome
+    }
+
+    if (this.hasWhyConditionRowTarget) {
+      if (condMeta) {
+        this._paintWhyBadge(this.whyConditionBadgeTarget, condMeta)
+        if (this.hasWhyConditionBlurbTarget) this.whyConditionBlurbTarget.textContent = condMeta.blurb || ""
+      }
+      this.whyConditionRowTarget.hidden = !condMeta
+    }
+
+    // A note for intro cards (nothing to measure) and for question cards that
+    // predate this feature (no Why data stored yet).
+    let note = ""
+    if (!isQ) note = t("editor.why_intro_card")
+    else if (!compMeta && !condMeta && !outcome) note = t("editor.why_unanalysed")
+    if (this.hasWhyNoteTarget) {
+      this.whyNoteTarget.textContent = note
+      this.whyNoteTarget.hidden = !note
+    }
+    if (this.hasWhyFrameworkTarget) this.whyFrameworkTarget.hidden = !isQ
+  }
+
+  // Colour a Why badge from its framework metadata (label + accent hex).
+  _paintWhyBadge(el, meta) {
+    if (!el) return
+    el.textContent = meta.label || ""
+    const accent = /^#[0-9a-fA-F]{6}$/.test(meta.accent || "") ? meta.accent : "#01EACB"
+    el.style.color = accent
+    el.style.borderColor = accent + "66"
+    el.style.background = accent + "1f"
   }
 
   setType(event) {

@@ -499,7 +499,10 @@ class SurveysController < ApplicationController
       "type"        => optimised["type"],
       "text"        => optimised["text"].to_s.presence || card["text"],
       "description" => optimised["description"].to_s.presence,
-      "options"     => new_options.presence || card["options"]
+      "options"     => new_options.presence || card["options"],
+      # Refresh the Why "outcome" line to match the rewrite; competency/condition
+      # ride along from the original card untouched.
+      "outcome"     => optimised["outcome"].to_s.presence || card["outcome"]
     ).except("i18n").compact
     if merged["type"] == "tap_card" && merged["option_images"].present?
       merged["option_images"] = Array(merged["option_images"]).first(Array(merged["options"]).size)

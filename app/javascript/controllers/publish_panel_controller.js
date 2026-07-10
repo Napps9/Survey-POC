@@ -10,8 +10,8 @@ import { Controller } from "@hotwired/stimulus"
 // hidden while an overlay is open.
 export default class extends Controller {
   static targets = [
-    "typeView", "scoreView", "publishView", "designView",
-    "tabs", "typeTab", "scoreTab"
+    "typeView", "scoreView", "whyView", "publishView", "designView",
+    "tabs", "typeTab", "scoreTab", "whyTab"
   ]
 
   open() { this._show("publishView") }
@@ -19,11 +19,13 @@ export default class extends Controller {
   close() { this._show("typeView") }
   showType() { this._show("typeView") }
   showScore() { this._show("scoreView") }
+  showWhy() { this._show("whyView") }
 
   _show(which) {
     const views = {
       typeView: this.hasTypeViewTarget ? this.typeViewTarget : null,
       scoreView: this.hasScoreViewTarget ? this.scoreViewTarget : null,
+      whyView: this.hasWhyViewTarget ? this.whyViewTarget : null,
       publishView: this.hasPublishViewTarget ? this.publishViewTarget : null,
       designView: this.hasDesignViewTarget ? this.designViewTarget : null
     }
@@ -31,11 +33,12 @@ export default class extends Controller {
       if (el) el.classList.toggle("hidden", name !== which)
     })
 
-    // The tab strip only belongs to the two peer views; the Publish/Design
+    // The tab strip belongs to the three peer views; the Publish/Design
     // overlays take over the whole column.
-    const tabbed = which === "typeView" || which === "scoreView"
+    const tabbed = which === "typeView" || which === "scoreView" || which === "whyView"
     if (this.hasTabsTarget) this.tabsTarget.classList.toggle("hidden", !tabbed)
     if (this.hasTypeTabTarget)  this.typeTabTarget.classList.toggle("is-active", which === "typeView")
     if (this.hasScoreTabTarget) this.scoreTabTarget.classList.toggle("is-active", which === "scoreView")
+    if (this.hasWhyTabTarget)   this.whyTabTarget.classList.toggle("is-active", which === "whyView")
   }
 }

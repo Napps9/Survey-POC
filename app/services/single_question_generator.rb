@@ -40,6 +40,24 @@ class SingleQuestionGenerator
             chars); range ODD 3 or 5 with a neutral middle; rating 3-5 with
             one label per point; nps EXACTLY 11 numeric labels "0"-"10".
           DESC
+        },
+        competency: {
+          type: "string",
+          enum: Framework::COMPETENCY_KEYS,
+          description: "OPTIONAL. The competency this question sits under: awareness, intention " \
+                       "or agency. OMIT for purely descriptive or demographic questions."
+        },
+        outcome: {
+          type: "string",
+          description: "One plain-language sentence stating the insight this question's answers " \
+                       "will give the creator. Always write one for a question card."
+        },
+        condition: {
+          type: "string",
+          enum: Framework::CONDITION_KEYS,
+          description: "OPTIONAL. Set only when the question probes an enabling condition under " \
+                       "agency (wellbeing, belonging, perceived_support, confidence_capability, " \
+                       "institutional_responsiveness, safety_protection)."
         }
       },
       required: %w[type text]
@@ -94,6 +112,9 @@ class SingleQuestionGenerator
       brief truly requires it):
       #{SurveyGenerator::CARD_RULES}
       And do NOT reuse a type from the last 2 cards (#{recent_types.join(", ").presence || "none"}).
+      Also give this card an `outcome` (one plain sentence naming the insight
+      its answers give the creator), and tag `competency` / `condition` where
+      they apply — see the Awareness/Intention/Agency guidance above.
     RULES
 
     unless locale.to_s == SupportedLocales::DEFAULT
@@ -122,7 +143,11 @@ class SingleQuestionGenerator
     block = Array(response.content).find { |b| tool_use?(b) }
     raise "Model did not return a tool_use block" unless block
 
-    deep_stringify(input_of(block))
+    card = deep_stringify(input_of(block))
+    # Trust nothing: drop a competency/condition that isn't a known Framework key.
+    card.delete("competency") unless Framework.competency?(card["competency"])
+    card.delete("condition")  unless Framework.condition?(card["condition"])
+    card
   end
 
   private

@@ -137,6 +137,8 @@ id:
       card_n: Kartu %{n} · %{type}
       choose_format: Pilih format jawaban di bawah ini.
       type_updated: Tipe jawaban diperbarui menjadi %{type}
+      why_intro_card: "This is an intro card — it doesn't capture an answer, so there's no insight to measure."
+      why_unanalysed: "This question hasn't been analysed yet. Regenerate or optimise it to add its Why."
       current: Saat ini
       off_brief: Di luar brief
       cards_count: "%{n} kartu"
@@ -375,6 +377,13 @@ id:
     all_types: Semua Tipe Pertanyaan
     ranked_for: Diurutkan berdasarkan kecocokan untuk
     this_card: kartu ini
+    why: "Why"
+    why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
+    why_empty: "Select a question card to see why it's worth asking."
+    why_competency_label: "Competency"
+    why_outcome_label: "The insight you'll get"
+    why_condition_label: "Enabling condition"
+    why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
   dashboard_card:
     publish_warning: "Terbitkan “%{title}”? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."
     preview: "Pratinjau"

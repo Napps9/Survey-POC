@@ -29,6 +29,12 @@ class CardOptimiser
           type: "array",
           items: { type: "string" },
           description: "Improved answer option labels obeying the per-type count + length bounds in the rules. Omit for types without options (yes_no, open_ended, welcome_card)."
+        },
+        outcome: {
+          type: "string",
+          description: "The card's `outcome` line (one plain sentence naming the insight its " \
+                       "answers give the creator), refreshed to match the rewritten wording. " \
+                       "Keep the same measurement intent; omit if the current one still fits."
         }
       },
       required: %w[text]
@@ -61,6 +67,10 @@ class CardOptimiser
       Text: #{card["text"]}
       #{"Description: #{card['description']}" if card['description'].present?}
       #{"Options: #{opts.join(' | ')}" if opts.any?}
+      #{"Current outcome (refresh to match your rewrite): #{card['outcome']}" if card['outcome'].present?}
+
+      Keep this question's competency/condition tagging as-is — only its wording,
+      options and `outcome` line may change.
 
       Issues to fix:
       #{issues.any? ? issues.map { |i| "- #{i}" }.join("\n") : '- Make it fully comply with the design rules.'}

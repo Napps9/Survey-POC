@@ -137,6 +137,8 @@ pt:
       card_n: Cartão %{n} · %{type}
       choose_format: Escolha um formato de resposta abaixo.
       type_updated: Tipo de resposta atualizado para %{type}
+      why_intro_card: "This is an intro card — it doesn't capture an answer, so there's no insight to measure."
+      why_unanalysed: "This question hasn't been analysed yet. Regenerate or optimise it to add its Why."
       current: Atual
       off_brief: Fora do briefing
       cards_count: "%{n} cartões"
@@ -375,6 +377,13 @@ pt:
     all_types: Todos os tipos de pergunta
     ranked_for: Ordenado por adequação para
     this_card: este cartão
+    why: "Why"
+    why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
+    why_empty: "Select a question card to see why it's worth asking."
+    why_competency_label: "Competency"
+    why_outcome_label: "The insight you'll get"
+    why_condition_label: "Enabling condition"
+    why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
   dashboard_card:
     publish_warning: "Publicar “%{title}”? Depois de ficar no ar, as perguntas ficam bloqueadas e não podem ser editadas — confirme que está tudo exatamente como quer."
     preview: "Pré-visualizar"

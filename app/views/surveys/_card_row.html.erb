@@ -25,6 +25,9 @@
      data-card-options="<%= Array(card['options']).to_json %>"
      data-card-option-images="<%= Array(card['option_images']).to_json %>"
      data-card-recommended-images="<%= AssetPopulator.recommended_paths(@survey, context: :card, card: card).to_json %>"
+     data-card-competency="<%= card['competency'].to_s %>"
+     data-card-outcome="<%= card['outcome'].to_s %>"
+     data-card-condition="<%= card['condition'].to_s %>"
      data-action="click->type-panel#selectCard">
 
   <%# Chrome row above card — type badge, card number, the Rules-of-the-Game

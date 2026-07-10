@@ -137,6 +137,8 @@ he:
       card_n: כרטיס %{n} · %{type}
       choose_format: בחר פורמט תשובה למטה.
       type_updated: סוג התשובה עודכן ל-%{type}
+      why_intro_card: "This is an intro card — it doesn't capture an answer, so there's no insight to measure."
+      why_unanalysed: "This question hasn't been analysed yet. Regenerate or optimise it to add its Why."
       current: נוכחי
       off_brief: חורג מהבריף
       cards_count: "%{n} כרטיסים"
@@ -375,6 +377,13 @@ he:
     all_types: כל סוגי השאלות
     ranked_for: מדורג לפי התאמה עבור
     this_card: כרטיס זה
+    why: "Why"
+    why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
+    why_empty: "Select a question card to see why it's worth asking."
+    why_competency_label: "Competency"
+    why_outcome_label: "The insight you'll get"
+    why_condition_label: "Enabling condition"
+    why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
   dashboard_card:
     publish_warning: "לפרסם את “%{title}”? לאחר הפרסום השאלות נעולות ולא ניתנות לעריכה — ודאו שהכול בדיוק כפי שאתם רוצים."
     preview: "תצוגה מקדימה"

@@ -79,6 +79,28 @@ class SurveyGenerator
               id: {
                 type: "integer",
                 description: "Echo back the id of a Common Question card supplied in the brief. Set only on those cards; leave unset on any new card you write."
+              },
+              competency: {
+                type: "string",
+                enum: Framework::COMPETENCY_KEYS,
+                description: "OPTIONAL. The Acting-in-the-world competency this question sits under: " \
+                             "awareness (what someone notices/feels/experiences), intention (readiness to " \
+                             "be involved — desire, not yet action), or agency (what they feel capable of " \
+                             "and have actually done). OMIT for purely descriptive or demographic questions."
+              },
+              outcome: {
+                type: "string",
+                description: "One plain-language sentence stating the insight this question's answers will " \
+                             "give the creator (e.g. 'Shows how connected young people feel to their " \
+                             "community right now'). Write one for EVERY question card. OMIT on welcome_card."
+              },
+              condition: {
+                type: "string",
+                enum: Framework::CONDITION_KEYS,
+                description: "OPTIONAL. Set only when the question probes an enabling condition that sits " \
+                             "underneath sustained agency: wellbeing (lived experience, not diagnosis), " \
+                             "belonging, perceived_support, confidence_capability, " \
+                             "institutional_responsiveness or safety_protection."
               }
             },
             required: %w[type text]
@@ -123,6 +145,36 @@ class SurveyGenerator
       multiple_choice -> select_one_grid; never exceed 5 options for a
       "How often" question.
   RULES
+
+  # Awareness / Intention / Agency guidance injected into the prompt, built from
+  # the Framework single source of truth so the wording can't drift from the
+  # tool-schema enums or the editor's "Why" tab badges.
+  FRAMEWORK_GUIDE = begin
+    comps = Framework.competencies.map { |k, v| "      - #{k} — #{v['blurb']}" }.join("\n")
+    conds = Framework.conditions.map   { |k, v| "      - #{k} — #{v['blurb']}" }.join("\n")
+    <<~GUIDE.freeze
+      6. Awareness, Intention & Agency (the "Why" behind each question) —
+         Playverto reads the OECD "Acting in the world" competency as a
+         sequence: Awareness -> Intention -> Agency -> Action. Making each
+         question legible along it is what lets a creator see WHERE engagement
+         breaks (the "activation gap"). For every card you emit:
+
+         - Write an `outcome`: one plain-language sentence naming the insight
+           the answers give the creator. Do this for EVERY question card (omit
+           only on the welcome_card).
+         - Where the question clearly sits under one competency, tag
+           `competency`:
+      #{comps}
+           Leave `competency` unset for purely descriptive or demographic
+           questions — not every good question is one of the three, and that's
+           fine.
+         - Where the question measures an enabling condition that sits
+           underneath sustained agency, also tag `condition`:
+      #{conds}
+           Phrase wellbeing questions as lived experience — how someone's day
+           actually feels — never as diagnosis or screening.
+    GUIDE
+  end
 
   SYSTEM = <<~PROMPT.freeze
     You are a Verto designer. Given a brief, produce a Verto experience that
@@ -216,6 +268,7 @@ class SurveyGenerator
       4 or 5 options, 4 ideal.
     - welcome_card: not a question; flow control per the rules.
 
+    #{FRAMEWORK_GUIDE}
     When relevant historical Playverto questions are provided in the brief,
     use them to inform wording style and answer-type selection. Do NOT copy
     them verbatim — adapt to the brief's audience and insight. The design
@@ -231,6 +284,7 @@ class SurveyGenerator
         point; nps EXACTLY 11 numeric labels "0"-"10"
     [ ] Every question's text plus its description <= 100 chars
     [ ] "How often" -> range with an odd count (3 or 5) and a neutral middle
+    [ ] Every question card has an `outcome`; competency/condition tagged where they apply
     [ ] theme, audience_age and key_insight echoed back unchanged
   PROMPT
 
@@ -312,7 +366,18 @@ class SurveyGenerator
     ensure_welcome_card!(payload)
     reconcile_common_cards!(payload, common_cards)
     normalize_quiz_correct!(payload) if quiz
+    normalize_framework!(payload)
     payload
+  end
+
+  # Trust nothing: drop any competency/condition the model invented that isn't a
+  # known Framework key, so a stray value never reaches the editor's Why badges.
+  # `outcome` is free-text and left as-is.
+  def normalize_framework!(payload)
+    Array(payload["cards"]).each do |card|
+      card.delete("competency") unless Framework.competency?(card["competency"])
+      card.delete("condition")  unless Framework.condition?(card["condition"])
+    end
   end
 
   # Add the quiz fields to the emit_survey schema so the model can mark correct

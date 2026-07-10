@@ -137,6 +137,8 @@ ja:
       card_n: カード %{n} · %{type}
       choose_format: 以下から回答形式を選択してください。
       type_updated: 回答タイプが %{type} に更新されました
+      why_intro_card: "This is an intro card — it doesn't capture an answer, so there's no insight to measure."
+      why_unanalysed: "This question hasn't been analysed yet. Regenerate or optimise it to add its Why."
       current: 現在
       off_brief: ブリーフ外
       cards_count: "%{n}枚のカード"
@@ -375,6 +377,13 @@ ja:
     all_types: すべての質問タイプ
     ranked_for: 適合度でランク付け：
     this_card: このカード
+    why: "Why"
+    why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
+    why_empty: "Select a question card to see why it's worth asking."
+    why_competency_label: "Competency"
+    why_outcome_label: "The insight you'll get"
+    why_condition_label: "Enabling condition"
+    why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
   dashboard_card:
     publish_warning: "「%{title}」を公開しますか？公開後は質問がロックされ編集できません — すべてが望みどおりか確認してください。"
     preview: "プレビュー"

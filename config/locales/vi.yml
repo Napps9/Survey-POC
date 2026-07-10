@@ -137,6 +137,8 @@ vi:
       card_n: Thẻ %{n} · %{type}
       choose_format: Chọn định dạng câu trả lời bên dưới.
       type_updated: Đã cập nhật loại câu trả lời thành %{type}
+      why_intro_card: "This is an intro card — it doesn't capture an answer, so there's no insight to measure."
+      why_unanalysed: "This question hasn't been analysed yet. Regenerate or optimise it to add its Why."
       current: Hiện tại
       off_brief: Lệch hướng
       cards_count: "%{n} thẻ"
@@ -375,6 +377,13 @@ vi:
     all_types: Tất cả loại câu hỏi
     ranked_for: Xếp theo độ phù hợp cho
     this_card: thẻ này
+    why: "Why"
+    why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
+    why_empty: "Select a question card to see why it's worth asking."
+    why_competency_label: "Competency"
+    why_outcome_label: "The insight you'll get"
+    why_condition_label: "Enabling condition"
+    why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
   dashboard_card:
     publish_warning: "Đăng “%{title}”? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     preview: "Xem trước"

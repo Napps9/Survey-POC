@@ -137,6 +137,8 @@ ko:
       card_n: 카드 %{n} · %{type}
       choose_format: 아래에서 답변 형식을 선택하세요.
       type_updated: 답변 유형이 %{type}(으)로 업데이트되었습니다
+      why_intro_card: "This is an intro card — it doesn't capture an answer, so there's no insight to measure."
+      why_unanalysed: "This question hasn't been analysed yet. Regenerate or optimise it to add its Why."
       current: 현재
       off_brief: 브리프에서 벗어남
       cards_count: 카드 %{n}장
@@ -375,6 +377,13 @@ ko:
     all_types: 모든 질문 유형
     ranked_for: 적합도 순위
     this_card: 이 카드
+    why: "Why"
+    why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
+    why_empty: "Select a question card to see why it's worth asking."
+    why_competency_label: "Competency"
+    why_outcome_label: "The insight you'll get"
+    why_condition_label: "Enabling condition"
+    why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
   dashboard_card:
     publish_warning: "“%{title}”을(를) 게시할까요? 라이브가 되면 질문이 잠겨 수정할 수 없어요 — 모든 내용이 원하는 대로인지 확인하세요."
     preview: "미리보기"

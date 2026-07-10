@@ -12,6 +12,10 @@
     type_panel_controller at boot. Same data drives the Ruby helpers
     above. %>
 <script id="card-types" type="application/json"><%= CardTypes.to_json.html_safe %></script>
+<%# Awareness/Intention/Agency + enabling-condition metadata, read by
+    type_panel_controller to label the "Why" tab badges. Single source of
+    truth is config/competencies.yml (see Framework). %>
+<script id="framework" type="application/json"><%= Framework.to_json.html_safe %></script>
 <%# Lottie animation URLs for the NPS reactive scale, read by
     type_panel_controller when a card is switched to nps so the left-panel
     lottie-player can mount with the right asset paths. %>
@@ -232,6 +236,8 @@
     <div class="right-tabs" data-publish-panel-target="tabs">
       <button type="button" class="right-tab is-active" data-publish-panel-target="typeTab"
               data-action="click->publish-panel#showType"><%= t("editor.answer_type") %></button>
+      <button type="button" class="right-tab" data-publish-panel-target="whyTab"
+              data-action="click->publish-panel#showWhy"><%= t("editor.why", default: "Why") %></button>
       <button type="button" class="right-tab verto-score" data-survey-editor-target="vertoScore"
               data-publish-panel-target="scoreTab"
               aria-label="<%= t('js.editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
@@ -401,6 +407,60 @@
       </div>
 
     </div><%# /type panel %>
+
+    <%# ── "Why" panel — why the selected question is worth asking: the
+        Awareness/Intention/Agency competency it sits under, the plain-language
+        insight its answers generate, and any enabling condition it measures.
+        Populated per selected card by type_panel_controller#selectCard. ── %>
+    <div class="type-panel hidden" data-publish-panel-target="whyView">
+      <div class="type-panel-top">
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
+          <%= t("editor.why", default: "Why") %>
+        </div>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF1E6F;line-height:1.3;min-height:18px;"
+             data-type-panel-target="whyCardName"><%= t("editor.select_card") %></div>
+        <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;">
+          <%= t("editor.why_intro", default: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you.") %>
+        </div>
+      </div>
+
+      <div class="type-panel-empty" data-type-panel-target="whyEmpty">
+        <div style="font-size:28px;opacity:0.25;">↖</div>
+        <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:240px;">
+          <%= t("editor.why_empty", default: "Select a question card to see why it's worth asking.") %>
+        </div>
+      </div>
+
+      <div class="why-body" data-type-panel-target="whyBody" hidden>
+
+        <%# Non-question / not-yet-analysed note %>
+        <div class="why-note" data-type-panel-target="whyNote" hidden></div>
+
+        <%# Competency %>
+        <div class="why-section" data-type-panel-target="whyCompetencyRow" hidden>
+          <div class="why-label"><%= t("editor.why_competency_label", default: "Competency") %></div>
+          <span class="why-badge" data-type-panel-target="whyCompetencyBadge"></span>
+          <div class="why-blurb" data-type-panel-target="whyCompetencyBlurb"></div>
+        </div>
+
+        <%# Outcome — the insight this question's answers generate %>
+        <div class="why-section" data-type-panel-target="whyOutcomeRow" hidden>
+          <div class="why-label"><%= t("editor.why_outcome_label", default: "The insight you'll get") %></div>
+          <div class="why-outcome" data-type-panel-target="whyOutcome"></div>
+        </div>
+
+        <%# Enabling condition %>
+        <div class="why-section" data-type-panel-target="whyConditionRow" hidden>
+          <div class="why-label"><%= t("editor.why_condition_label", default: "Enabling condition") %></div>
+          <span class="why-badge why-badge-condition" data-type-panel-target="whyConditionBadge"></span>
+          <div class="why-blurb" data-type-panel-target="whyConditionBlurb"></div>
+        </div>
+
+        <div class="why-framework" data-type-panel-target="whyFramework">
+          <%= t("editor.why_framework", default: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able.") %>
+        </div>
+      </div>
+    </div><%# /why panel %>
 
     <%# ── Verto-score breakdown — the Rules-of-the-Game results grouped by
         traffic light (red → amber → green), each row carrying what to change.

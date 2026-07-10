@@ -137,6 +137,8 @@ hi:
       card_n: कार्ड %{n} · %{type}
       choose_format: नीचे एक उत्तर प्रारूप चुनें।
       type_updated: उत्तर प्रकार %{type} में बदला गया
+      why_intro_card: "This is an intro card — it doesn't capture an answer, so there's no insight to measure."
+      why_unanalysed: "This question hasn't been analysed yet. Regenerate or optimise it to add its Why."
       current: वर्तमान
       off_brief: ब्रीफ़ से बाहर
       cards_count: "%{n} कार्ड"
@@ -375,6 +377,13 @@ hi:
     all_types: सभी प्रश्न प्रकार
     ranked_for: उपयुक्तता अनुसार क्रमित
     this_card: यह कार्ड
+    why: "Why"
+    why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
+    why_empty: "Select a question card to see why it's worth asking."
+    why_competency_label: "Competency"
+    why_outcome_label: "The insight you'll get"
+    why_condition_label: "Enabling condition"
+    why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
   dashboard_card:
     publish_warning: "“%{title}” प्रकाशित करें? लाइव होने के बाद इसके सवाल लॉक हो जाएँगे और संपादित नहीं हो सकेंगे — सुनिश्चित करें कि सब कुछ बिल्कुल वैसा ही है जैसा आप चाहते हैं।"
     preview: "पूर्वावलोकन"
