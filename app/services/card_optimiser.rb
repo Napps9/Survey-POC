@@ -79,8 +79,10 @@ class CardOptimiser
       #{SurveyGenerator::CARD_RULES}
 
       Keep option labels meaningful (never "Option A"). Preserve options that
-      already comply; add, trim or clarify only as the issues require. Output via
-      the emit_optimised_question tool.
+      already comply; add, trim or clarify only as the issues require. Keep any
+      wellbeing framing as lived experience (never diagnosis/screening) and use
+      stable wording that still compares if this Verto is re-run later. Output
+      via the emit_optimised_question tool.
     MSG
 
     unless locale.to_s == SupportedLocales::DEFAULT

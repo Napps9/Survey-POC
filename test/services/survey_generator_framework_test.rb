@@ -29,8 +29,18 @@ class SurveyGeneratorFrameworkTest < ActiveSupport::TestCase
   end
 
   test "SYSTEM prompt teaches Awareness/Intention/Agency from Framework" do
-    assert_includes SurveyGenerator::SYSTEM, "Awareness, Intention & Agency"
+    assert_includes SurveyGenerator::SYSTEM, "Design for Awareness, Intention & Agency"
     Framework::COMPETENCY_KEYS.each { |k| assert_includes SurveyGenerator::SYSTEM, k }
+  end
+
+  test "SYSTEM prompt directs the model to DESIGN the deck around the framework" do
+    sys = SurveyGenerator::SYSTEM
+    assert_includes sys, "Span the sequence", "designs across Awareness->Intention->Agency"
+    assert_includes sys, "Pair Agency with a Condition", "pairs agency with an enabling condition"
+    assert_includes sys, "Comparability over time", "phrases for repeat measurement"
+    # The self-check reinforces the same three design rules.
+    assert_includes sys, "paired with an enabling-condition question"
+    assert_includes sys, "re-run in 6-12 months"
   end
 
   test "normalize_framework! keeps valid tags and drops invalid ones" do

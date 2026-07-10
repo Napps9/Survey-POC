@@ -153,23 +153,41 @@ class SurveyGenerator
     comps = Framework.competencies.map { |k, v| "      - #{k} — #{v['blurb']}" }.join("\n")
     conds = Framework.conditions.map   { |k, v| "      - #{k} — #{v['blurb']}" }.join("\n")
     <<~GUIDE.freeze
-      6. Awareness, Intention & Agency (the "Why" behind each question) —
-         Playverto reads the OECD "Acting in the world" competency as a
-         sequence: Awareness -> Intention -> Agency -> Action. Making each
-         question legible along it is what lets a creator see WHERE engagement
-         breaks (the "activation gap"). For every card you emit:
+      6. Design for Awareness, Intention & Agency — Playverto reads the OECD
+         "Acting in the world" competency as a sequence: Awareness -> Intention
+         -> Agency -> Action. The point of a Verto is to reveal WHERE that
+         sequence breaks (the "activation gap": aware but not acting, or ready
+         but not able). So DESIGN the deck for it — don't just label whatever
+         you happen to write:
 
+         - Span the sequence. Where the theme supports it, include Awareness
+           AND Intention AND Agency questions, so readiness (intention) can be
+           read against real action (agency). Don't ship an all-Awareness deck
+           when the theme could support intention and agency — that hides the
+           gap. (Some themes are legitimately narrower; use judgement.)
+         - Pair Agency with a Condition. Whenever the deck includes an Agency
+           question, also include at least one enabling-condition question —
+           especially wellbeing or belonging — so low agency is explainable
+           ("agency is low here, and belonging looks like why"). Emotional
+           wellbeing is often the bridge between caring and acting.
+         - Comparability over time. Phrase questions with stable, repeatable
+           wording so the same set can be re-run in 6-12 months and still
+           compare — avoid one-off, date- or event-bound phrasing unless the
+           brief requires it.
+         - Legibility. Keep each question about ONE competency, so answers stay
+           comparable across questions and themes.
+
+         Then tag what you built:
          - Write an `outcome`: one plain-language sentence naming the insight
            the answers give the creator. Do this for EVERY question card (omit
            only on the welcome_card).
-         - Where the question clearly sits under one competency, tag
-           `competency`:
+         - Tag `competency` where the question clearly sits under one:
       #{comps}
            Leave `competency` unset for purely descriptive or demographic
            questions — not every good question is one of the three, and that's
            fine.
-         - Where the question measures an enabling condition that sits
-           underneath sustained agency, also tag `condition`:
+         - Tag `condition` where the question measures an enabling condition
+           that sits underneath sustained agency:
       #{conds}
            Phrase wellbeing questions as lived experience — how someone's day
            actually feels — never as diagnosis or screening.
@@ -285,6 +303,9 @@ class SurveyGenerator
     [ ] Every question's text plus its description <= 100 chars
     [ ] "How often" -> range with an odd count (3 or 5) and a neutral middle
     [ ] Every question card has an `outcome`; competency/condition tagged where they apply
+    [ ] The deck spans Awareness/Intention/Agency where the theme allows (not all one competency)
+    [ ] Any Agency question is paired with an enabling-condition question (esp. wellbeing/belonging)
+    [ ] Wording is stable enough to re-run in 6-12 months and still compare
     [ ] theme, audience_age and key_insight echoed back unchanged
   PROMPT
 
@@ -332,6 +353,11 @@ class SurveyGenerator
       - question text 50-70 chars target, never exceed 100
       - option text ≤ 14 chars when using a grid; ≤ 30 chars in a text list
       - ALWAYS start with exactly one welcome_card that sets the scene
+      - span Awareness -> Intention -> Agency where the theme allows (don't
+        make an all-Awareness deck), and pair any Agency question with a
+        wellbeing/belonging condition question so low agency is explainable
+      - phrase for repeat measurement — stable wording that still compares if
+        this Verto is re-run in 6-12 months
       Echo theme, audience_age, key_insight unchanged. Output via the
       emit_survey tool.
     REMINDER

@@ -90,11 +90,15 @@ class SingleQuestionGenerator
       Card types in order: #{type_summary.presence || "(none yet)"}
       Last card type: #{last_type.presence || "(none)"}
 
+      #{coverage_summary(existing_cards)}
+
       Generate exactly ONE new question that:
       - Fits the theme and audience
       - Does NOT use a type already used in the last 2 cards (#{recent_types.join(", ").presence || "none"})
       - Follows all survey design rules from the system prompt
       - Complements the existing questions without duplicating coverage
+      - Strengthens the Awareness/Intention/Agency coverage above — prefer a
+        question that fills a gap over more of what's already there
 
       Output via the emit_question tool.
     MSG
@@ -151,6 +155,32 @@ class SingleQuestionGenerator
   end
 
   private
+
+  # A short nudge describing which Awareness/Intention/Agency competencies and
+  # enabling conditions the existing deck already covers, so a single "add a
+  # question" strengthens framework coverage (fills a gap) rather than piling on
+  # more of the same. Reads the competency/condition tags now stored on cards
+  # (older decks with no tags just yield a "none yet" summary).
+  def coverage_summary(existing_cards)
+    comps = Array(existing_cards).filter_map { |c| c["competency"].to_s.presence }
+    conds = Array(existing_cards).filter_map { |c| c["condition"].to_s.presence }
+
+    comp_counts = Framework::COMPETENCY_KEYS
+                    .map { |k| "#{k}×#{comps.count(k)}" }.join(", ")
+    missing = Framework::COMPETENCY_KEYS.reject { |k| comps.include?(k) }
+
+    suggestions = []
+    if comps.include?("agency") && conds.empty?
+      suggestions << "the deck probes agency but has no enabling-condition question — " \
+                     "a wellbeing or belonging question would make low agency explainable"
+    end
+    suggestions << "no #{missing.join(' or ')} question yet — one would help reveal the activation gap" if missing.any?
+    suggestions << "otherwise deepen coverage where the theme most needs it" if suggestions.empty?
+
+    "Framework coverage so far — competencies: #{comp_counts}; conditions: " \
+    "#{conds.uniq.join(', ').presence || 'none'}. Prefer a question that fills a gap: " \
+    "#{suggestions.join('; ')}."
+  end
 
   # tool_use?, input_of, deep_stringify come from AnthropicHelpers.
 end
