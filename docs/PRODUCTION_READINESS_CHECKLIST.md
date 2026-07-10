@@ -1,7 +1,15 @@
 # Playverto — Production & Customer Readiness Checklist
 
 _Flat, actionable version of `PRODUCTION_READINESS_PLAN.md` + `TOOLING_AND_VENDORS.md`.
-Check items off as you go. IDs (P0-x / P1-x / P2-x / CT-x) map back to the plan._
+Check items off as you go. IDs (P0-x / P1-x / P2-x / CT-x) map back to the plan;
+CR-x items live in `CUSTOMER_READINESS.md`._
+
+## ✅ Shipped
+- [x] **Template gallery** (`/templates`) — CR-2 / CR-7. Six ready-made decks
+  (NPS, CSAT, onboarding, employee pulse, event feedback, product-market fit);
+  one click instantiates a full editable Verto with no AI call/cost. Entry points
+  on the dashboard hero + empty state; localised across all 19 locales. Suite +
+  RuboCop + Brakeman + importmap-audit green; on `Main`.
 
 ## Decisions to make first (they gate several choices)
 - [ ] **Are EU respondents/customers in scope?** → if yes: pick Sentry (EU region) over AppSignal, pin EU regions on Render/Postmark, prioritise the GDPR items.
@@ -98,7 +106,7 @@ Check items off as you go. IDs (P0-x / P1-x / P2-x / CT-x) map back to the plan.
 - [ ] **P2-3** Branded, localized 404/422/500 error pages
 - [ ] **P2-4** Accessibility audit of the player (ARIA/roles on JS controls, focus mgmt, contrast)
 - [ ] **P2-5** Add Capybara/system tests for the JS-heavy player + editor (currently zero)
-- [ ] **P2-6** Welcome email; one-click "create a sample Verto" for new orgs
+- [~] **P2-6** Welcome email (pending); ~~one-click "create a sample Verto" for new orgs~~ — partly addressed by the template gallery (a new org can spin up a real Verto in one click)
 - [ ] **P2-7** Migrate `json` → `jsonb` columns (off-peak table rewrite)
 - [ ] **P2-8** DB CHECK constraints on status/role/kind enums; add FK `on_delete:` to mirror `dependent:`
 - [ ] **P2-9** Staging env + documented rollback; tighten CSP (drop `unsafe-inline`); set `robots.txt` `Disallow: /play/` if surveys shouldn't be indexed

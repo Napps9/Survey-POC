@@ -43,10 +43,11 @@ The metric that matters: time-to-first-published-Verto. Reduce it.
 - [ ] **Guided first-run** for a brand-new org — the empty state exists
   (`dashboard.empty_*`), but turn it into a guided path: "Create your first Verto"
   with a one-click prompt example. (P2-6)
-- [ ] **Template gallery** — pre-built Vertos by use case (NPS, onboarding, event
-  feedback, product-market fit, employee pulse). Kills the blank-page problem and
-  showcases quality. You already have `common_question_sets` and a `QuestionCorpus`
-  to seed from.
+- [x] **Template gallery** — ✅ **Shipped** (`/templates`). Six ready-made decks
+  (NPS, CSAT, onboarding, employee pulse, event feedback, product-market fit);
+  picking one instantiates a full editable Verto instantly with no AI call/cost.
+  Entry points on the dashboard hero + empty state; chrome localised across all
+  19 locales.
 - [ ] **One-click "create a sample Verto"** so a new org isn't staring at zero. (P2-6)
 - [ ] **Progress/setup checklist** — "create a Verto → customize → publish → share →
   view results" with visible progress.
@@ -121,8 +122,8 @@ ticket.
 
 ## CR-7 · Product depth that closes deals (MEDIUM — differentiators)
 
-- [ ] **Template library** (also in CR-2) — the single highest-leverage content
-  investment; doubles as marketing and onboarding.
+- [x] **Template library** (also in CR-2) — ✅ **Shipped** as the `/templates`
+  gallery. Next: grow the set and add a preview before instantiation.
 - [ ] **Sharing & collaboration clarity** — make the Verto sharing/permissions model
   (and alliances, which are powerful but non-obvious) legible in the UI.
 - [ ] **Integrations beyond Google** — even a webhook-on-response or a Zapier/Make
