@@ -553,3 +553,15 @@ ar:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: الخطوة %{n} من %{total}
+  templates:
+    eyebrow: القوالب
+    heading_html: ابدأ من <span style="color:#615BF5;">قالب</span>
+    subtitle: اختر Verto جاهزًا وابدأ بجمع الإجابات في دقائق — كل قالب قابل للتعديل
+      بالكامل.
+    back: العودة إلى لوحة التحكم
+    use: استخدم هذا القالب
+    question_count: "%{n} أسئلة"
+    start_button: ابدأ من قالب
+    browse: تصفّح القوالب
+    not_found: هذا القالب غير متاح.
+    created: تم إنشاء «%{name}» من قالب — خصّصه وانشره عندما تكون جاهزًا.

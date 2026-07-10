@@ -1,0 +1,77 @@
+<% content_for :head do %>
+  <style>
+    body { overflow: auto !important; height: auto !important; }
+    .template-card { transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; }
+    .template-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.18) !important; }
+  </style>
+<% end %>
+
+<div style="display:flex;min-height:100vh;background:#1C2034;">
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+
+    <%# ── Hero ── %>
+    <div style="position:relative;overflow:hidden;padding:32px 36px 40px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
+      <div class="gen-orbs" style="opacity:0.28;">
+        <div class="gen-orb gen-orb-2"></div>
+        <div class="gen-orb gen-orb-3"></div>
+        <div class="gen-orb gen-orb-4"></div>
+      </div>
+
+      <div style="position:relative;z-index:1;">
+        <div style="margin-bottom:20px;">
+          <%= link_to root_path,
+                style: "display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);text-decoration:none;" do %>
+            <span style="font-size:16px;line-height:1;">←</span> <%= t("templates.back") %>
+          <% end %>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#615BF5;box-shadow:0 0 12px rgba(97,91,245,0.7);"></span>
+          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("templates.eyebrow") %></span>
+        </div>
+        <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 8px;">
+          <%= t("templates.heading_html").html_safe %>
+        </h1>
+        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.45);margin:0;max-width:520px;line-height:1.55;">
+          <%= t("templates.subtitle") %>
+        </p>
+      </div>
+    </div>
+
+    <%# ── Gallery ── %>
+    <div style="padding:32px 36px 64px;">
+      <% if flash[:alert] %>
+        <div style="background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#FF6F9C;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:alert] %></div>
+      <% end %>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+        <% @templates.each do |tpl| %>
+          <%
+            question_count = tpl[:cards].count { |c| CardTypes.question?(c["type"]) }
+            accent = tpl[:accent]
+          %>
+          <div class="template-card"
+               style="display:flex;flex-direction:column;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:24px;">
+            <div style="display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:14px;font-size:26px;line-height:1;margin-bottom:16px;background:<%= accent %>22;border:1px solid <%= accent %>55;">
+              <%= tpl[:emoji] %>
+            </div>
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:8px;line-height:1.2;">
+              <%= tpl[:name] %>
+            </div>
+            <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.55;margin:0 0 20px;flex:1;">
+              <%= tpl[:tagline] %>
+            </p>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);">
+                <%= t("templates.question_count", n: question_count) %>
+              </span>
+              <%= button_to survey_template_path(tpl[:id]),
+                    method: :post,
+                    style: "border:none;cursor:pointer;padding:10px 20px;border-radius:100px;background:#{accent};color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.03em;white-space:nowrap;" do %>
+                <%= t("templates.use") %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

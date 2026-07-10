@@ -553,3 +553,16 @@ tr:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Adım %{n} / %{total}
+  templates:
+    eyebrow: Şablonlar
+    heading_html: Bir <span style="color:#615BF5;">şablonla</span> başlayın
+    subtitle: Hazır bir Verto seçin ve dakikalar içinde yanıt toplamaya başlayın — her
+      şablon tamamen düzenlenebilir.
+    back: Panoya dön
+    use: Bu şablonu kullan
+    question_count: "%{n} soru"
+    start_button: Şablonla başla
+    browse: Şablonlara göz at
+    not_found: Bu şablon kullanılamıyor.
+    created: "“%{name}” bir şablondan oluşturuldu — özelleştirin ve hazır olduğunuzda
+      yayınlayın."

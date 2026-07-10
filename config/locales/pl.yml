@@ -553,3 +553,16 @@ pl:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Krok %{n} z %{total}
+  templates:
+    eyebrow: Szablony
+    heading_html: Zacznij od <span style="color:#615BF5;">szablonu</span>
+    subtitle: Wybierz gotowy Verto i zacznij zbierać odpowiedzi w kilka minut — każdy
+      szablon jest w pełni edytowalny.
+    back: Powrót do panelu
+    use: Użyj tego szablonu
+    question_count: 'Liczba pytań: %{n}'
+    start_button: Zacznij od szablonu
+    browse: Przeglądaj szablony
+    not_found: Ten szablon jest niedostępny.
+    created: Utworzono „%{name}” z szablonu — dostosuj go i opublikuj, gdy będziesz
+      gotowy.

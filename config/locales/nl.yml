@@ -553,3 +553,16 @@ nl:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Stap %{n} van %{total}
+  templates:
+    eyebrow: Sjablonen
+    heading_html: Begin met een <span style="color:#615BF5;">sjabloon</span>
+    subtitle: Kies een kant-en-klaar Verto en verzamel binnen enkele minuten antwoorden
+      — elk sjabloon is volledig aanpasbaar.
+    back: Terug naar dashboard
+    use: Dit sjabloon gebruiken
+    question_count: "%{n} vragen"
+    start_button: Begin met een sjabloon
+    browse: Sjablonen bekijken
+    not_found: Dat sjabloon is niet beschikbaar.
+    created: "“%{name}” aangemaakt vanuit een sjabloon — pas het aan en publiceer wanneer
+      je klaar bent."

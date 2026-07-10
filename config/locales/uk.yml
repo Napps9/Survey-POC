@@ -553,3 +553,16 @@ uk:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Крок %{n} з %{total}
+  templates:
+    eyebrow: Шаблони
+    heading_html: Почніть із <span style="color:#615BF5;">шаблону</span>
+    subtitle: Виберіть готовий Verto та почніть збирати відповіді за кілька хвилин —
+      кожен шаблон повністю редагується.
+    back: Назад до панелі
+    use: Використати шаблон
+    question_count: 'Запитань: %{n}'
+    start_button: Почати з шаблону
+    browse: Переглянути шаблони
+    not_found: Цей шаблон недоступний.
+    created: "«%{name}» створено з шаблону — налаштуйте та опублікуйте, коли будете
+      готові."

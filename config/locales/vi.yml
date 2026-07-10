@@ -553,3 +553,15 @@ vi:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Bước %{n} / %{total}
+  templates:
+    eyebrow: Mẫu
+    heading_html: Bắt đầu từ một <span style="color:#615BF5;">mẫu</span>
+    subtitle: Chọn một Verto có sẵn và bắt đầu thu thập câu trả lời trong vài phút —
+      mọi mẫu đều có thể chỉnh sửa hoàn toàn.
+    back: Quay lại bảng điều khiển
+    use: Dùng mẫu này
+    question_count: "%{n} câu hỏi"
+    start_button: Bắt đầu từ mẫu
+    browse: Xem các mẫu
+    not_found: Mẫu đó không khả dụng.
+    created: Đã tạo “%{name}” từ một mẫu — tùy chỉnh và xuất bản khi bạn sẵn sàng.

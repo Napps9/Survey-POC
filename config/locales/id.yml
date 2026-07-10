@@ -553,3 +553,15 @@ id:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Langkah %{n} dari %{total}
+  templates:
+    eyebrow: Templat
+    heading_html: Mulai dari <span style="color:#615BF5;">templat</span>
+    subtitle: Pilih Verto siap pakai dan mulai mengumpulkan jawaban dalam hitungan menit
+      — setiap templat sepenuhnya dapat diedit.
+    back: Kembali ke dasbor
+    use: Gunakan templat ini
+    question_count: "%{n} pertanyaan"
+    start_button: Mulai dari templat
+    browse: Jelajahi templat
+    not_found: Templat itu tidak tersedia.
+    created: Membuat “%{name}” dari templat — sesuaikan dan terbitkan saat Anda siap.

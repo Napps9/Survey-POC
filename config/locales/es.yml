@@ -553,3 +553,16 @@ es:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Paso %{n} de %{total}
+  templates:
+    eyebrow: Plantillas
+    heading_html: Empieza con una <span style="color:#615BF5;">plantilla</span>
+    subtitle: 'Elige un Verto listo para usar y empieza a recoger respuestas en minutos:
+      cada plantilla es totalmente editable.'
+    back: Volver al panel
+    use: Usar esta plantilla
+    question_count: "%{n} preguntas"
+    start_button: Empezar con una plantilla
+    browse: Ver plantillas
+    not_found: Esa plantilla no está disponible.
+    created: 'Creaste “%{name}” a partir de una plantilla: personalízala y publícala
+      cuando quieras.'

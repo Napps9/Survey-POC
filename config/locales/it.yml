@@ -553,3 +553,16 @@ it:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Passo %{n} di %{total}
+  templates:
+    eyebrow: Modelli
+    heading_html: Parti da un <span style="color:#615BF5;">modello</span>
+    subtitle: 'Scegli un Verto pronto all’uso e inizia a raccogliere risposte in pochi
+      minuti: ogni modello è completamente modificabile.'
+    back: Torna alla dashboard
+    use: Usa questo modello
+    question_count: "%{n} domande"
+    start_button: Parti da un modello
+    browse: Sfoglia i modelli
+    not_found: Questo modello non è disponibile.
+    created: 'Hai creato “%{name}” da un modello: personalizzalo e pubblicalo quando
+      vuoi.'

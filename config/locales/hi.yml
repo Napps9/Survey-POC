@@ -553,3 +553,16 @@ hi:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: चरण %{n} / %{total}
+  templates:
+    eyebrow: टेम्पलेट
+    heading_html: किसी <span style="color:#615BF5;">टेम्पलेट</span> से शुरू करें
+    subtitle: तैयार Verto चुनें और मिनटों में जवाब जुटाना शुरू करें — हर टेम्पलेट पूरी
+      तरह संपादन योग्य है।
+    back: डैशबोर्ड पर वापस जाएँ
+    use: यह टेम्पलेट इस्तेमाल करें
+    question_count: "%{n} सवाल"
+    start_button: टेम्पलेट से शुरू करें
+    browse: टेम्पलेट देखें
+    not_found: वह टेम्पलेट उपलब्ध नहीं है।
+    created: टेम्पलेट से “%{name}” बनाया — इसे अनुकूलित करें और तैयार होने पर प्रकाशित
+      करें।

@@ -553,3 +553,14 @@ ja:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: "%{total}ステップ中 %{n}"
+  templates:
+    eyebrow: テンプレート
+    heading_html: <span style="color:#615BF5;">テンプレート</span>から始める
+    subtitle: すぐ使えるVertoを選んで、数分で回答集めを開始できます。どのテンプレートも自由に編集できます。
+    back: ダッシュボードに戻る
+    use: このテンプレートを使う
+    question_count: 設問%{n}件
+    start_button: テンプレートから始める
+    browse: テンプレートを見る
+    not_found: そのテンプレートは利用できません。
+    created: テンプレートから「%{name}」を作成しました。編集して、準備ができたら公開しましょう。

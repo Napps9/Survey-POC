@@ -555,3 +555,16 @@ en:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: "Step %{n} of %{total}"
+  templates:
+    eyebrow: Templates
+    heading_html: Start from a <span style="color:#615BF5;">template</span>
+    subtitle: Pick a ready-made Verto and start collecting in minutes — every template
+      is fully editable.
+    back: Back to dashboard
+    use: Use this template
+    question_count: "%{n} questions"
+    start_button: Start from a template
+    browse: Browse templates
+    not_found: That template isn't available.
+    created: Started “%{name}” from a template — customise it and publish when you're
+      ready.

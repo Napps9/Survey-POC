@@ -553,3 +553,16 @@ fr:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Étape %{n} sur %{total}
+  templates:
+    eyebrow: Modèles
+    heading_html: Partez d’un <span style="color:#615BF5;">modèle</span>
+    subtitle: Choisissez un Verto prêt à l’emploi et commencez à collecter en quelques
+      minutes — chaque modèle est entièrement modifiable.
+    back: Retour au tableau de bord
+    use: Utiliser ce modèle
+    question_count: "%{n} questions"
+    start_button: Partir d’un modèle
+    browse: Voir les modèles
+    not_found: Ce modèle n’est pas disponible.
+    created: "« %{name} » créé à partir d’un modèle — personnalisez-le et publiez-le
+      quand vous êtes prêt."

@@ -56,6 +56,8 @@ Rails.application.routes.draw do
 
   # App
   root "surveys#index"
+  get  "templates",                   to: "templates#index",  as: :survey_templates
+  post "templates/:id",               to: "templates#create", as: :survey_template
   get  "surveys/new",                 to: "surveys#new",     as: :new_survey
   post "surveys/generate",            to: "surveys#generate", as: :generate_survey
   post "surveys/import_pdf",          to: "surveys#import_pdf", as: :import_pdf_survey

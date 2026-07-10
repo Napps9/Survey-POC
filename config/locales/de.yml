@@ -553,3 +553,16 @@ de:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: Schritt %{n} von %{total}
+  templates:
+    eyebrow: Vorlagen
+    heading_html: Mit einer <span style="color:#615BF5;">Vorlage</span> starten
+    subtitle: Wähle ein fertiges Verto und sammle in Minuten Antworten – jede Vorlage
+      ist voll bearbeitbar.
+    back: Zurück zum Dashboard
+    use: Diese Vorlage verwenden
+    question_count: "%{n} Fragen"
+    start_button: Mit einer Vorlage starten
+    browse: Vorlagen ansehen
+    not_found: Diese Vorlage ist nicht verfügbar.
+    created: "„%{name}“ aus einer Vorlage erstellt – passe es an und veröffentliche
+      es, wenn du bereit bist."

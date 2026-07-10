@@ -553,3 +553,15 @@ he:
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
     step_counter: שלב %{n} מתוך %{total}
+  templates:
+    eyebrow: תבניות
+    heading_html: התחילו מ<span style="color:#615BF5;">תבנית</span>
+    subtitle: בחרו Verto מוכן והתחילו לאסוף תשובות תוך דקות — כל תבנית ניתנת לעריכה
+      מלאה.
+    back: חזרה ללוח הבקרה
+    use: השתמשו בתבנית הזו
+    question_count: "%{n} שאלות"
+    start_button: התחילו מתבנית
+    browse: עיינו בתבניות
+    not_found: התבנית הזו אינה זמינה.
+    created: "“%{name}” נוצר מתבנית — התאימו ופרסמו כשתהיו מוכנים."
