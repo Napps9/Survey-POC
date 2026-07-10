@@ -59,4 +59,57 @@ class NominatimClientTest < ActiveSupport::TestCase
       assert_equal "AT", result[:country_code]
     end
   end
+
+  test "search hits the public Nominatim server when no LocationIQ key is set" do
+    seen_url = seen_params = nil
+    stub_method(NominatimClient, :get_json, ->(url, params) { seen_url = url; seen_params = params; [ PLACE ] }) do
+      NominatimClient.search(query: "austin-#{SecureRandom.hex(4)}")
+    end
+    assert_equal "https://nominatim.openstreetmap.org/search", seen_url
+    assert_equal "jsonv2", seen_params[:format]
+    assert_nil seen_params[:key]
+  end
+
+  test "search routes through LocationIQ with the key when LOCATIONIQ_API_KEY is set" do
+    seen_url = seen_params = nil
+    with_env("LOCATIONIQ_API_KEY" => "test-key", "LOCATIONIQ_REGION" => "eu1") do
+      stub_method(NominatimClient, :get_json, ->(url, params) { seen_url = url; seen_params = params; [ PLACE ] }) do
+        NominatimClient.search(query: "austin-#{SecureRandom.hex(4)}")
+      end
+    end
+    assert_equal "https://eu1.locationiq.com/v1/search", seen_url
+    assert_equal "json", seen_params[:format]
+    assert_equal "test-key", seen_params[:key]
+  end
+
+  test "an empty result is not cached, so a transient 403 never poisons a search term" do
+    with_memory_cache do
+      query = "somewhere-#{SecureRandom.hex(4)}"
+      calls = 0
+      stub_method(NominatimClient, :get_json, ->(_u, _p) { calls += 1; calls == 1 ? [] : [ PLACE ] }) do
+        assert_equal [], NominatimClient.search(query: query)  # first lookup fails (empty)
+        refute_empty NominatimClient.search(query: query)      # retries — not served a cached []
+        NominatimClient.search(query: query)                   # now served from cache
+      end
+      assert_equal 2, calls, "empty result must not be cached; the real hit should be"
+    end
+  end
+
+  private
+
+  def with_memory_cache
+    original = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    yield
+  ensure
+    Rails.cache = original
+  end
+
+  def with_env(vars)
+    original = ENV.slice(*vars.keys)
+    vars.each { |k, v| ENV[k] = v }
+    yield
+  ensure
+    vars.each_key { |k| original.key?(k) ? ENV[k] = original[k] : ENV.delete(k) }
+  end
 end

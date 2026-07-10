@@ -71,6 +71,15 @@ services:
         generateValue: true
       - key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
         generateValue: true
+      # Location search (the "Where do you live?" demographic). The public
+      # OpenStreetMap Nominatim server 403s server-side calls from datacenter
+      # IPs like Render's, so set a LocationIQ key (a hosted Nominatim that
+      # permits server-side use) to make the search work in production. Region
+      # defaults to us1; set eu1 for EU. See .env.example / NominatimClient.
+      - key: LOCATIONIQ_API_KEY
+        sync: false
+      - key: LOCATIONIQ_REGION
+        value: us1
       - key: APP_HOST
         sync: false
       - key: APP_PROTOCOL

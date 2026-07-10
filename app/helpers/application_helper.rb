@@ -99,6 +99,24 @@ module ApplicationHelper
     NPS_CONTAINER_SHAPES[idx]
   end
 
+  # Inline SVG for a tap-card (Swipe Cards) response button. The three
+  # responses used raw emoji (👍 / 👎 / ☝), but the "unsure" glyph (U+261D) has
+  # default TEXT presentation and renders as a monochrome/tofu box on many
+  # devices — so the deck looked like it had no icons. These SVGs use
+  # `currentColor`, so the per-response border colour (red / amber / green set
+  # on .rotate-action-* in application.css) tints them, and they render
+  # identically everywhere, matching the app's other inline-SVG icons.
+  TAP_RESPONSE_ICONS = {
+    "yes" => %(<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1z"/>),
+    "no"  => %(<path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v1c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/>),
+    "unsure" => %(<path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/>)
+  }.freeze
+
+  def tap_response_icon(kind)
+    path = TAP_RESPONSE_ICONS[kind.to_s] || TAP_RESPONSE_ICONS["unsure"]
+    %(<svg class="rotate-action-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">#{path}</svg>).html_safe
+  end
+
   def rating_icon(survey)
     signal = %i[theme title key_insight]
              .filter_map { |m| survey.public_send(m) if survey.respond_to?(m) }

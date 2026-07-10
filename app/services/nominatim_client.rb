@@ -14,16 +14,25 @@ require "uri"
 # ever enters this app's data model; storage stays exactly as coarse as the
 # existing self-declared country+area fields it replaces.
 #
-# Nominatim's usage policy (https://operations.osmfoundation.org/policies/nominatim/)
-# requires a small "Search by OpenStreetMap" / attribution credit near results
-# (see the welcome-intake view), and a custom User-Agent identifying the app.
-# Its absolute cap is 1 request/second for the whole calling app — the 3-char
-# minimum query length, day-long response cache and client-side debounce below
-# keep real-world call volume far under that for this app's current scale, but
-# there's no cross-process shared throttle here. A dedicated queue/limiter
-# would be the right next step if traffic grows enough to matter.
+# Provider: the public OpenStreetMap Nominatim server enforces a strict usage
+# policy and, in practice, returns HTTP 403 for server-side calls from cloud /
+# datacenter IPs — which is where this app runs. So when LOCATIONIQ_API_KEY is
+# set the client routes searches through LocationIQ instead: a hosted Nominatim
+# whose response shape is identical (so normalize/privacy below are unchanged)
+# but which permits server-side use. Without the key it falls back to the public
+# OSM server, keeping dev/test/CI key-free. Both instances serve OpenStreetMap
+# data, so the "Search by OpenStreetMap" attribution credit near the results
+# (see the welcome-intake view) stays accurate either way.
+#
+# A custom User-Agent identifies the app (required by both). The 3-char minimum
+# query length, day-long cache of successful lookups and client-side debounce
+# keep call volume low; there's no cross-process shared throttle here — a
+# dedicated queue/limiter would be the right next step if traffic grows enough
+# to matter.
 class NominatimClient
-  ENDPOINT     = "https://nominatim.openstreetmap.org/search".freeze
+  NOMINATIM_ENDPOINT  = "https://nominatim.openstreetmap.org/search".freeze
+  # LocationIQ mirrors Nominatim's /search API; region is us1 (default) or eu1.
+  LOCATIONIQ_ENDPOINT = "https://%<region>s.locationiq.com/v1/search".freeze
   TIMEOUT_SECS = 6
   MIN_QUERY_LEN = 3
   USER_AGENT   = "Playverto/1.0 (https://playverto.app; support@playverto.app)".freeze
@@ -36,18 +45,49 @@ class NominatimClient
       q = query.to_s.strip
       return [] if q.length < MIN_QUERY_LEN
 
-      cache_key = "nominatim_search:v1:#{q.downcase}:#{limit}"
-      Rails.cache.fetch(cache_key, expires_in: 1.day) do
-        params = { q: q, format: "jsonv2", addressdetails: 1, limit: limit.to_i.clamp(1, 10) }
-        body = get_json(ENDPOINT, params)
-        Array(body).filter_map { |place| normalize(place) }
-      end
+      cache_key = "geocode_search:v2:#{provider}:#{q.downcase}:#{limit}"
+      cached = Rails.cache.read(cache_key)
+      return cached if cached
+
+      body    = get_json(endpoint, request_params(q, limit))
+      results = Array(body).filter_map { |place| normalize(place) }
+      # Only cache a real hit — never let a transient outage or a 403 poison a
+      # search term with an empty list for a full day.
+      Rails.cache.write(cache_key, results, expires_in: 1.day) if results.any?
+      results
     rescue => e
       Rails.logger.error("[NominatimClient] #{e.class}: #{e.message}")
       []
     end
 
     private
+
+    # "locationiq" when a key is configured, else the public "nominatim" server.
+    def provider
+      ENV["LOCATIONIQ_API_KEY"].present? ? "locationiq" : "nominatim"
+    end
+
+    def endpoint
+      if provider == "locationiq"
+        format(LOCATIONIQ_ENDPOINT, region: ENV.fetch("LOCATIONIQ_REGION", "us1"))
+      else
+        NOMINATIM_ENDPOINT
+      end
+    end
+
+    # Both back ends accept the same core params; LocationIQ needs the key and
+    # its own `format=json` (vs Nominatim's `jsonv2`) — the response body is the
+    # same either way, so normalize below is untouched.
+    def request_params(q, limit)
+      params = { q: q, addressdetails: 1, limit: limit.to_i.clamp(1, 10) }
+      if provider == "locationiq"
+        params[:format] = "json"
+        params[:key]    = ENV["LOCATIONIQ_API_KEY"]
+      else
+        params[:format] = "jsonv2"
+      end
+      params
+    end
 
     # Resolve one Nominatim place into the coarse shape this app stores.
     # Deliberately does not read place["lat"] / place["lon"].
