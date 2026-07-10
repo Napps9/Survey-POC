@@ -11,6 +11,12 @@ CR-x items live in `CUSTOMER_READINESS.md`._
   on the dashboard hero + empty state; localised across all 19 locales. Suite +
   RuboCop + Brakeman + importmap-audit green; on `Main`.
 
+## Requested by clients
+- [ ] **Forms mode** — clients are asking for a traditional form-style survey
+  (classic multi-question form) as an alternative to the card-based Verto player.
+  Scope: a form renderer + an editor toggle; assess reuse of the existing card
+  data model so a Verto can render either as the player or as a plain form.
+
 ## Decisions to make first (they gate several choices)
 - [ ] **Are EU respondents/customers in scope?** → if yes: pick Sentry (EU region) over AppSignal, pin EU regions on Render/Postmark, prioritise the GDPR items.
 - [ ] **Pricing & packaging model** (subscription tier vs per-seat vs metered AI) → drives billing + quota design.
