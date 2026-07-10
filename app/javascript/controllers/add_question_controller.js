@@ -67,7 +67,10 @@ export default class extends Controller {
 
   close() {
     this.backdropTarget.hidden = true
-    this._selectedType = null
+    this._setSelectedType(null)
+    // Reset to the first step so a stale details view can never resurface
+    // without a fresh type pick when the modal is reopened.
+    this._showStep("stepChoice")
     document.removeEventListener("keydown", this._escListener)
   }
 
@@ -98,13 +101,24 @@ export default class extends Controller {
 
   selectType(event) {
     const type = event.currentTarget.dataset.type
-    this._selectedType = type
+    this._setSelectedType(type)
 
     // Highlight selected tile briefly, then advance
     this.typeTileTargets.forEach(t =>
       t.classList.toggle("selected", t.dataset.type === type)
     )
     setTimeout(() => this._goToDetails(type), 120)
+  }
+
+  // Persist the picked type in the DOM as well as on the instance. Stimulus
+  // controllers lose their instance state when they disconnect/reconnect (a
+  // Turbo cache restore, a re-scan of this root element), which would leave
+  // `_selectedType` null while the details step is still on screen — so
+  // "Add to survey" wrongly reported "Enter a question first". The data
+  // attribute survives a reconnect, so _collectCard can always recover it.
+  _setSelectedType(type) {
+    this._selectedType = type
+    if (this.hasStepDetailsTarget) this.stepDetailsTarget.dataset.selectedType = type || ""
   }
 
   backToChoice(event) {
@@ -320,7 +334,11 @@ export default class extends Controller {
   // ──────────────────────────────────────────────────────────
 
   _collectCard() {
-    const type = this._selectedType
+    // Fall back to the DOM-persisted type if the instance state was reset by a
+    // controller reconnect while the details step stayed open (see
+    // _setSelectedType).
+    const type = this._selectedType ||
+                 (this.hasStepDetailsTarget ? this.stepDetailsTarget.dataset.selectedType : "")
     if (!type) return null
 
     const text = this.questionTextTarget.value.trim()
