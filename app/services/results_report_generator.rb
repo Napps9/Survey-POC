@@ -9,6 +9,16 @@ class ResultsReportGenerator
   MODEL      = ClaudeModels::DEFAULT
   MAX_TOKENS = 3000
 
+  # The creator's requested report length → a hard output-token ceiling plus a
+  # word-budget instruction the prompt cites, so "generate a report" can't run
+  # to a dozen generic pages.
+  LENGTHS = {
+    "short"    => { max_tokens: 1200, words: "no more than about 400 words — roughly one page" },
+    "standard" => { max_tokens: 2500, words: "roughly 600–900 words" },
+    "detailed" => { max_tokens: 4000, words: "up to about 1,500 words" }
+  }.freeze
+  DEFAULT_LENGTH = "standard".freeze
+
   SYSTEM = <<~PROMPT.freeze
     You are an expert survey analyst writing a polished results report for the
     survey's creator and their stakeholders. Produce a clear, well-structured
@@ -31,7 +41,10 @@ class ResultsReportGenerator
     Rules: ground every claim in the figures provided; be specific and concrete;
     never invent data that isn't present; keep a professional, lightly warm tone.
     Use Markdown headings (##/###), bold and bullet lists — but no tables and no
-    code blocks.
+    code blocks. Honour the report brief at the top of the input: write for its
+    stated goal and audience, and stay within its requested length — a shorter,
+    sharper report beats a longer one. Under a tight length budget, compress the
+    question-by-question section rather than the summary or recommendations.
   PROMPT
 
   def self.call(...) = new.call(...)
@@ -40,15 +53,17 @@ class ResultsReportGenerator
     @client = build_anthropic_client(api_key)
   end
 
-  def call(survey:, aggregated:, total:, &block)
+  def call(survey:, aggregated:, total:, brief: {}, &block)
     return "Not enough responses yet to generate a report." if total.zero?
 
-    prompt = results_digest(survey, aggregated, total)
+    brief  = (brief || {}).transform_keys(&:to_s)
+    length = LENGTHS[brief["length"]] || LENGTHS[DEFAULT_LENGTH]
+    prompt = "#{brief_block(brief, length)}\n\n#{results_digest(survey, aggregated, total)}"
     full   = +""
 
     stream = @client.messages.stream_raw(
       model:      MODEL,
-      max_tokens: MAX_TOKENS,
+      max_tokens: length[:max_tokens],
       system:     SYSTEM,
       messages:   [ { role: "user", content: prompt } ]
     )
@@ -73,5 +88,18 @@ class ResultsReportGenerator
 
     log_usage("ResultsReportGenerator", usage, model: MODEL, output_tokens: final_output)
     full
+  end
+
+  private
+
+  # The creator-supplied brief, rendered ahead of the results digest. Length is
+  # always stated (falling back to the standard budget) so the model has an
+  # explicit word target even with an empty brief.
+  def brief_block(brief, length)
+    lines = [ "Report brief from the creator:" ]
+    lines << "- Goal of this report: #{brief["goal"]}"  if brief["goal"].present?
+    lines << "- Audience: #{brief["audience"]}"         if brief["audience"].present?
+    lines << "- Requested length: #{length[:words]}"
+    lines.join("\n")
   end
 end

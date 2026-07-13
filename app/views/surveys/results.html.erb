@@ -226,10 +226,17 @@
                 <% end %>
               <% end %>
 
-              <%# ── AI Report: generate → preview, download PDF, save to Google Drive ── %>
+              <%# ── AI Report: brief → generate → preview, edit in place, download
+                  PDF, save to Google Drive. First open shows a 3-question brief
+                  (goal / audience / length) that steers the AI away from a
+                  generic, over-long report; the answers persist on the Verto so
+                  regenerations reuse them. ── %>
               <div data-controller="report-export"
                    data-report-export-stream-url-value="<%= survey_results_report_stream_path(@survey) %>"
                    data-report-export-drive-url-value="<%= survey_google_drive_path(@survey) %>"
+                   data-report-export-save-url-value="<%= survey_results_report_path(@survey) %>"
+                   data-report-export-exists-value="<%= @survey.results_report.present? %>"
+                   data-report-export-brief-value="<%= @survey.results_report_brief.presence || "{}" %>"
                    style="display:inline-flex;">
                 <button type="button" data-action="click->report-export#open"
                         style="cursor:pointer;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#1C2034;background:#01EACB;border:none;padding:5px 14px;border-radius:8px;white-space:nowrap;font-weight:600;">✨ AI Report</button>
@@ -242,7 +249,35 @@
                     </div>
                     <div class="report-modal-body">
                       <div data-report-export-target="status" class="report-modal-status"></div>
+
+                      <%# Report brief — three questions that guide the AI. %>
+                      <div class="report-brief hidden" data-report-export-target="brief">
+                        <div class="report-brief-intro">Three quick questions so the report says what you need — nothing generic, no padding.</div>
+                        <label class="report-brief-field">
+                          What should this report achieve?
+                          <input type="text" data-report-export-target="goal"
+                                 placeholder="e.g. Show our funder the programme's impact on confidence" />
+                        </label>
+                        <label class="report-brief-field">
+                          Who will read it?
+                          <input type="text" data-report-export-target="audience"
+                                 placeholder="e.g. Board members with 5 minutes, not analysts" />
+                        </label>
+                        <label class="report-brief-field">
+                          How long should it be?
+                          <select data-report-export-target="length">
+                            <option value="short">Short — about a page</option>
+                            <option value="standard" selected>Standard — two to three pages</option>
+                            <option value="detailed">Detailed — full breakdown</option>
+                          </select>
+                        </label>
+                        <button type="button" class="report-foot-btn report-foot-primary" style="align-self:flex-start;"
+                                data-action="click->report-export#generate">✨ Generate report</button>
+                      </div>
+
                       <div data-report-export-target="body" class="report-doc"></div>
+                      <textarea class="report-editor hidden" data-report-export-target="editor"
+                                spellcheck="false" aria-label="Edit the report markdown"></textarea>
                     </div>
                     <div class="report-modal-foot">
                       <a href="<%= survey_results_report_path(@survey, format: :pdf) %>" data-turbo="false"
@@ -251,6 +286,9 @@
                         <button type="button" class="report-foot-btn" data-action="click->report-export#saveDrive" data-report-export-target="driveBtn">Save to Google Drive</button>
                         <span class="report-foot-status" data-report-export-target="driveStatus"></span>
                       <% end %>
+                      <button type="button" class="report-foot-btn hidden" data-action="click->report-export#edit" data-report-export-target="editBtn">✎ Edit</button>
+                      <button type="button" class="report-foot-btn hidden" data-action="click->report-export#save" data-report-export-target="saveBtn">✓ Save changes</button>
+                      <button type="button" class="report-foot-btn hidden" data-action="click->report-export#regenerate" data-report-export-target="regenBtn">↻ Regenerate</button>
                       <button type="button" class="report-foot-btn report-foot-close" data-action="click->report-export#close" style="margin-left:auto;">Close</button>
                     </div>
                   </div>

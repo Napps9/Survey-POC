@@ -49,7 +49,7 @@ class ResultsReportsTest < ActionDispatch::IntegrationTest
   end
 
   test "stream generates, streams the markdown, and caches it" do
-    yielder = ->(survey:, aggregated:, total:, &blk) { blk&.call(MD); MD }
+    yielder = ->(survey:, aggregated:, total:, brief: {}, &blk) { blk&.call(MD); MD }
     stub_method(ResultsReportGenerator, :call, yielder) do
       get survey_results_report_stream_path(@survey)
     end
@@ -73,6 +73,79 @@ class ResultsReportsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-controller='report-export']"
     assert_select "button[data-action='click->report-export#open']"
+    # The 3-question brief and the in-place markdown editor ship in the modal.
+    assert_select "[data-report-export-target='brief']"
+    assert_select "select[data-report-export-target='length']"
+    assert_select "textarea[data-report-export-target='editor']"
+  end
+
+  test "generate passes the creator's brief to the generator and persists it" do
+    captured = nil
+    grabber  = ->(survey:, aggregated:, total:, brief: {}, &blk) { captured = brief; blk&.call(MD); MD }
+    stub_method(ResultsReportGenerator, :call, grabber) do
+      get survey_results_report_stream_path(@survey,
+            regenerate: "1", goal: "Show funder impact", audience: "Board", length: "short")
+    end
+    assert_response :success
+    assert_equal({ "goal" => "Show funder impact", "audience" => "Board", "length" => "short" }, captured)
+    assert_equal "short", @survey.reload.results_report_brief_data["length"]
+  end
+
+  test "generate forces a regeneration even when the cache is fresh" do
+    @survey.update!(results_report: "## Cached\n\nStale take.", results_report_response_count: 1)
+    yielder = ->(survey:, aggregated:, total:, brief: {}, &blk) { blk&.call(MD); MD }
+    stub_method(ResultsReportGenerator, :call, yielder) do
+      get survey_results_report_stream_path(@survey, regenerate: "1", length: "standard")
+    end
+    assert_response :success
+    assert_match "Executive summary", response.body
+    assert_equal MD, @survey.reload.results_report, "explicit Generate must replace the cached report"
+    assert_nil @survey.results_report_edited_at
+  end
+
+  test "a count-triggered regeneration reuses the saved brief" do
+    @survey.update!(results_report: "## Old", results_report_response_count: 99, # stale count
+                    results_report_brief: { goal: "G", audience: "A", length: "detailed" }.to_json)
+    captured = nil
+    grabber  = ->(survey:, aggregated:, total:, brief: {}, &blk) { captured = brief; MD }
+    stub_method(ResultsReportGenerator, :call, grabber) do
+      get survey_results_report_path(@survey, format: :json)
+    end
+    assert_response :success
+    assert_equal "detailed", captured["length"], "regeneration must reuse the persisted brief"
+    assert_equal "G", captured["goal"]
+  end
+
+  test "saving an edit persists it and syncs the count so it isn't clobbered" do
+    # Report generated at count 0; a response has since arrived (count is 1),
+    # so without the count sync the next view would regenerate over the edit.
+    @survey.update!(results_report: "## AI draft", results_report_response_count: 0)
+
+    patch survey_results_report_path(@survey),
+          params: { markdown: "## My edit\n\nHand-tuned." }, as: :json
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert body["ok"]
+    assert_match "My edit", body["body_html"]
+
+    @survey.reload
+    assert_equal "## My edit\n\nHand-tuned.", @survey.results_report
+    assert_not_nil @survey.results_report_edited_at
+    assert_equal 1, @survey.results_report_response_count, "save must sync the count to the current total"
+
+    # The very next view must serve the edit — the generator must NOT run.
+    stub_method(ResultsReportGenerator, :call, ->(**) { raise "should not regenerate over an edit" }) do
+      get survey_results_report_path(@survey, format: :json)
+    end
+    assert_response :success
+    assert_match "My edit", JSON.parse(response.body)["body_html"]
+  end
+
+  test "saving a blank edit is rejected" do
+    @survey.update!(results_report: "## Keep me", results_report_response_count: 1)
+    patch survey_results_report_path(@survey), params: { markdown: "   " }, as: :json
+    assert_response :unprocessable_entity
+    assert_equal "## Keep me", @survey.reload.results_report
   end
 
   private

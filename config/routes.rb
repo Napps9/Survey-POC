@@ -74,6 +74,7 @@ Rails.application.routes.draw do
   get  "surveys/:survey_id/results/export",       to: "results_exports#show",         as: :survey_results_export
   post "surveys/:survey_id/results/google_sheet", to: "google_sheets_exports#create", as: :survey_google_sheet
   get  "surveys/:survey_id/results/report",       to: "results_reports#show",         as: :survey_results_report
+  patch "surveys/:survey_id/results/report",      to: "results_reports#update"
   get  "surveys/:survey_id/results/report/stream", to: "results_report_streams#show",  as: :survey_results_report_stream
   post "surveys/:survey_id/results/google_drive", to: "google_drive_exports#create",  as: :survey_google_drive
   post "surveys/:id/generate_card",   to: "surveys#generate_card", as: :generate_survey_card

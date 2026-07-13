@@ -2999,6 +2999,32 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .report-doc ul, .report-doc ol { margin: 0 0 12px; padding-left: 20px; }
 .report-doc li { margin: 0 0 5px; }
 .report-doc strong { color: #fff; }
+/* The 3-question report brief shown before generation. */
+.report-brief { display: flex; flex-direction: column; gap: 14px; padding: 4px 0 8px; }
+.report-brief.hidden { display: none; }
+.report-brief-intro { font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+.report-brief-field {
+  display: flex; flex-direction: column; gap: 6px;
+  font-family: "Alata", sans-serif; font-size: 13px; color: rgba(255,255,255,0.8);
+}
+.report-brief-field input, .report-brief-field select {
+  padding: 9px 12px; border-radius: 10px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+  color: #fff; font-family: "ABeeZee", sans-serif; font-size: 13px; outline: none;
+}
+.report-brief-field input:focus, .report-brief-field select:focus { border-color: rgba(1,234,203,0.5); }
+.report-brief-field input::placeholder { color: rgba(255,255,255,0.3); }
+/* In-place markdown editor, swapped for .report-doc while editing. */
+.report-editor {
+  width: 100%; min-height: 320px; resize: vertical;
+  padding: 12px 14px; border-radius: 10px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.85);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.55;
+  outline: none;
+}
+.report-editor.hidden { display: none; }
+.report-editor:focus { border-color: rgba(1,234,203,0.5); }
 .report-modal-foot {
   display: flex; align-items: center; gap: 10px;
   padding: 14px 20px; border-top: 1px solid rgba(255,255,255,0.08);

@@ -1,16 +1,24 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Generate + preview the AI results report in a modal, then download it as a PDF
-// or save it to Google Drive. The Drive round-trip mirrors sheets-export: open
-// the created file in a new tab, or bounce to the OAuth connect flow when the
-// server reports the user needs to (re)connect.
+// The AI results report modal: a 3-question brief (goal / audience / length)
+// steers generation, the markdown streams in live, and the finished report can
+// be edited in place (a markdown textarea — the stored format is markdown, and
+// the PDF/Drive exports render from it server-side) or regenerated with a new
+// brief. Download-as-PDF and save-to-Drive reuse the server-cached text, so
+// they always reflect a saved edit.
 export default class extends Controller {
-  static targets = ["modal", "status", "body", "driveBtn", "driveStatus"]
-  static values  = { streamUrl: String, driveUrl: String }
+  static targets = ["modal", "status", "body", "driveBtn", "driveStatus",
+                    "brief", "goal", "audience", "length",
+                    "editor", "editBtn", "saveBtn", "regenBtn"]
+  static values  = { streamUrl: String, driveUrl: String, saveUrl: String,
+                     exists: Boolean, brief: String }
 
   open() {
     if (this.hasModalTarget) this.modalTarget.classList.remove("hidden")
-    if (!this._loaded && !this._loading) this._load()
+    if (this._loaded || this._loading) return
+    // A Verto with a cached report replays it; a fresh one asks the brief first.
+    if (this.existsValue) this._load()
+    else this._showBrief()
   }
 
   close() {
@@ -23,14 +31,56 @@ export default class extends Controller {
 
   stop(event) { event.stopPropagation() }
 
+  // ── Brief → generate ─────────────────────────────────────────────────────
+
+  generate() {
+    const params = new URLSearchParams({ regenerate: "1" })
+    const goal     = this.hasGoalTarget     ? this.goalTarget.value.trim()     : ""
+    const audience = this.hasAudienceTarget ? this.audienceTarget.value.trim() : ""
+    const length   = this.hasLengthTarget   ? this.lengthTarget.value          : ""
+    if (goal)     params.set("goal", goal)
+    if (audience) params.set("audience", audience)
+    if (length)   params.set("length", length)
+    // Keep the local copy in step with what the server will persist, so a
+    // later Regenerate prefills the brief the creator actually used.
+    this.briefValue = JSON.stringify({ goal, audience, length })
+    this._hideBrief()
+    this._load(`${this.streamUrlValue}?${params}`)
+  }
+
+  regenerate() {
+    if (this._loading) return
+    this._loaded = false
+    this.bodyTarget.innerHTML = ""
+    this._exitEditMode()
+    this._setReportActions(false)
+    this._showBrief()
+  }
+
+  _showBrief() {
+    if (!this.hasBriefTarget) return
+    let saved = {}
+    try { saved = JSON.parse(this.briefValue || "{}") } catch (_) {}
+    if (this.hasGoalTarget     && saved.goal)     this.goalTarget.value     = saved.goal
+    if (this.hasAudienceTarget && saved.audience) this.audienceTarget.value = saved.audience
+    if (this.hasLengthTarget   && saved.length)   this.lengthTarget.value   = saved.length
+    this.briefTarget.classList.remove("hidden")
+  }
+
+  _hideBrief() {
+    if (this.hasBriefTarget) this.briefTarget.classList.add("hidden")
+  }
+
+  // ── Streamed generation ──────────────────────────────────────────────────
+
   // Stream the report markdown and render it live, so it types out as Claude
   // writes it (formatting appears as each heading/bullet arrives).
-  async _load() {
+  async _load(url = this.streamUrlValue) {
     this._loading = true
     this._setStatus("Generating your report…")
     this.bodyTarget.innerHTML = ""
     try {
-      const res = await fetch(this.streamUrlValue, { headers: { "Accept": "text/plain" } })
+      const res = await fetch(url, { headers: { "Accept": "text/plain" } })
       if (!res.ok || !res.body) throw new Error("stream failed")
 
       const reader = res.body.getReader()
@@ -44,12 +94,68 @@ export default class extends Controller {
         this.bodyTarget.innerHTML = this._mdToHtml(md)
       }
 
+      this._md     = md
       this._loaded = md.trim().length > 0
-      if (!this._loaded) this._setStatus("Couldn't generate the report.")
+      if (this._loaded) this._setReportActions(true)
+      else this._setStatus("Couldn't generate the report.")
     } catch (_) {
       this._setStatus("Couldn't generate the report.")
     }
     this._loading = false
+  }
+
+  // ── Edit in place ────────────────────────────────────────────────────────
+
+  edit() {
+    if (!this._loaded || !this.hasEditorTarget) return
+    this.editorTarget.value = this._md || ""
+    this.bodyTarget.classList.add("hidden")
+    this.editorTarget.classList.remove("hidden")
+    this.editBtnTarget.classList.add("hidden")
+    this.saveBtnTarget.classList.remove("hidden")
+    this.editorTarget.focus()
+  }
+
+  async save() {
+    if (this._saving) return
+    const markdown = this.editorTarget.value
+    if (!markdown.trim()) { this._setStatus("The report can't be empty."); return }
+    this._saving = true
+    this._setStatus("Saving…")
+    try {
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content
+      const res  = await fetch(this.saveUrlValue, {
+        method:  "PATCH",
+        headers: { "Accept": "application/json", "Content-Type": "application/json",
+                   ...(csrf ? { "X-CSRF-Token": csrf } : {}) },
+        body: JSON.stringify({ markdown })
+      })
+      const data = await res.json().catch(() => ({}))
+      if (data.ok) {
+        this._md = markdown
+        this.bodyTarget.innerHTML = data.body_html || this._mdToHtml(markdown)
+        this._exitEditMode()
+        this._setStatus("Saved ✓")
+      } else {
+        this._setStatus(data.error || "Couldn't save the report.")
+      }
+    } catch (_) {
+      this._setStatus("Couldn't save the report.")
+    }
+    this._saving = false
+  }
+
+  _exitEditMode() {
+    if (!this.hasEditorTarget) return
+    this.editorTarget.classList.add("hidden")
+    this.bodyTarget.classList.remove("hidden")
+    if (this.hasSaveBtnTarget) this.saveBtnTarget.classList.add("hidden")
+    if (this.hasEditBtnTarget && this._loaded) this.editBtnTarget.classList.remove("hidden")
+  }
+
+  _setReportActions(on) {
+    if (this.hasEditBtnTarget)  this.editBtnTarget.classList.toggle("hidden", !on)
+    if (this.hasRegenBtnTarget) this.regenBtnTarget.classList.toggle("hidden", !on)
   }
 
   // Minimal Markdown → HTML for the constrained report format (## / ### headings,

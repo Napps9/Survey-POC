@@ -58,6 +58,14 @@ class Survey < ApplicationRecord
     end
   end
 
+  # The creator's AI-report brief (goal / audience / length), stored as JSON
+  # text so count-triggered regenerations reuse it. Always returns a Hash.
+  def results_report_brief_data
+    JSON.parse(results_report_brief.presence || "{}")
+  rescue JSON::ParserError
+    {}
+  end
+
   # This Verto's own palette (the three user-set roles). Legacy Vertos with no
   # palette fall back to the Playverto default so they render unchanged.
   def brand_palette

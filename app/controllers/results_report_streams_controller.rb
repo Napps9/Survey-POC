@@ -12,7 +12,12 @@ class ResultsReportStreamsController < ApplicationController
     response.headers["X-Accel-Buffering"] = "no"
     response.headers["Cache-Control"]     = "no-cache"
 
-    stream_results_report(survey) { |chunk| response.stream.write(chunk) }
+    # The modal's explicit Generate click regenerates (never replays the
+    # cache) and carries the creator's report brief; a plain open replays.
+    force = params[:regenerate].present?
+    brief = force ? params.permit(:goal, :audience, :length).to_h.compact_blank : nil
+
+    stream_results_report(survey, brief: brief, force: force) { |chunk| response.stream.write(chunk) }
   rescue ActiveRecord::RecordNotFound
     raise # clean 404 before the stream is opened
   rescue => e

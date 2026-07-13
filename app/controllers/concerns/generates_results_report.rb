@@ -19,9 +19,11 @@ module GeneratesResultsReport
     end
 
     aggregated = aggregate_results(Array(survey.cards), responses.order(created_at: :desc))
-    markdown   = ResultsReportGenerator.call(survey: survey, aggregated: aggregated, total: total)
+    markdown   = ResultsReportGenerator.call(survey: survey, aggregated: aggregated, total: total,
+                                             brief: survey.results_report_brief_data)
     if markdown.present?
-      survey.update_columns(results_report: markdown, results_report_response_count: total)
+      survey.update_columns(results_report: markdown, results_report_response_count: total,
+                            results_report_edited_at: nil)
     end
     markdown
   end
@@ -29,23 +31,30 @@ module GeneratesResultsReport
   # Streams the report markdown chunk-by-chunk (yielding to the block) while
   # generating, caching the full text on completion. Replays the cache in one
   # write when it's still fresh. Mirrors the insights-summary streaming.
-  def stream_results_report(survey)
+  # `force: true` (the modal's explicit Generate click) skips the cache;
+  # `brief` is the creator's goal/audience/length answers, persisted so later
+  # regenerations — forced or count-triggered — reuse them.
+  def stream_results_report(survey, brief: nil, force: false)
     responses = survey.responses.where(status: "completed")
     total     = responses.count
 
-    if survey.results_report.present? && survey.results_report_response_count == total
+    if !force && survey.results_report.present? && survey.results_report_response_count == total
       yield survey.results_report
       return
     end
 
+    survey.update_columns(results_report_brief: brief.to_json) if brief.present?
+
     aggregated = aggregate_results(Array(survey.cards), responses.order(created_at: :desc))
     full       = +""
-    ResultsReportGenerator.call(survey: survey, aggregated: aggregated, total: total) do |chunk|
+    ResultsReportGenerator.call(survey: survey, aggregated: aggregated, total: total,
+                                brief: survey.results_report_brief_data) do |chunk|
       full << chunk
       yield chunk
     end
     if full.present?
-      survey.update_columns(results_report: full, results_report_response_count: total)
+      survey.update_columns(results_report: full, results_report_response_count: total,
+                            results_report_edited_at: nil)
     end
   end
 
