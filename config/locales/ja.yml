@@ -430,6 +430,9 @@ ja:
     create_new: 新しいVertoを作成
     import_google_form_button: フォームを作成
     import_google_form_modal_subtitle: 既存のGoogleフォームのリンクを貼り付けると、編集可能なVertoに変換します。
+    or_divider: または
+    start_from_scratch_button: ゼロから作成
+    creating_blank: 作成中…
     stat_live: ライブ
     stat_drafts: 下書き
     stat_responses: 回答数

@@ -430,6 +430,9 @@ vi:
     create_new: Tạo Verto mới
     import_google_form_button: Tạo biểu mẫu
     import_google_form_modal_subtitle: Dán liên kết đến một Google Form hiện có và chúng tôi sẽ biến nó thành một Verto có thể chỉnh sửa.
+    or_divider: hoặc
+    start_from_scratch_button: Bắt đầu từ đầu
+    creating_blank: Đang tạo…
     stat_live: Trực tiếp
     stat_drafts: Bản nháp
     stat_responses: Phản hồi

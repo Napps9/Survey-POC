@@ -216,6 +216,30 @@ class SurveysController < ApplicationController
     import_google_form_error("We couldn't import that Google Form — #{friendly_generate_error(e)}")
   end
 
+  # POST /surveys/create_blank
+  # The dashboard's "Create a Form" modal, other option: no AI brief, no
+  # import — an empty Verto (just the welcome card and the standard closing
+  # demographic questions every creation path adds) that opens straight in
+  # the editor for the creator to build card by card.
+  def create_blank
+    payload = {
+      "result"              => { "cards" => [] },
+      "verto_name"          => "Untitled Verto",
+      "theme"               => "",
+      "audience_age"        => "",
+      "key_insight"         => "",
+      "brand_palette"       => {},
+      "default_locale"      => Current.locale,
+      "locales"             => [ Current.locale.to_s ],
+      "common_question_ids" => []
+    }
+    @survey = create_imported_survey!(payload, variant: "verbatim")
+    redirect_to survey_path(@survey)
+  rescue => e
+    Rails.logger.error("[SurveysController#create_blank] #{e.class}: #{e.message}")
+    redirect_back fallback_location: root_path, allow_other_host: false, alert: "We couldn't create your Verto — #{friendly_generate_error(e)}"
+  end
+
   def update
     survey = Current.organisation.surveys.kept.find(params[:id])
     if survey.published?

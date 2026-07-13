@@ -430,6 +430,9 @@ tr:
     create_new: Yeni bir Verto oluştur
     import_google_form_button: Form oluştur
     import_google_form_modal_subtitle: Mevcut bir Google Form bağlantısını yapıştırın, onu düzenlenebilir bir Verto'ya dönüştürelim.
+    or_divider: veya
+    start_from_scratch_button: Sıfırdan başla
+    creating_blank: Oluşturuluyor…
     stat_live: Canlı
     stat_drafts: Taslaklar
     stat_responses: Yanıtlar

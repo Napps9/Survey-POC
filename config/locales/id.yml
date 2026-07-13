@@ -430,6 +430,9 @@ id:
     create_new: Buat Verto baru
     import_google_form_button: Buat Formulir
     import_google_form_modal_subtitle: Tempel tautan Google Form yang sudah ada dan kami akan mengubahnya menjadi Verto yang dapat diedit.
+    or_divider: atau
+    start_from_scratch_button: Mulai dari awal
+    creating_blank: Membuat…
     stat_live: Live
     stat_drafts: Draf
     stat_responses: Tanggapan

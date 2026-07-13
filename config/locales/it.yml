@@ -430,6 +430,9 @@ it:
     create_new: Crea un nuovo Verto
     import_google_form_button: Crea un modulo
     import_google_form_modal_subtitle: Incolla il link di un Google Form esistente e lo trasformeremo in un Verto modificabile.
+    or_divider: o
+    start_from_scratch_button: Inizia da zero
+    creating_blank: Creazione…
     stat_live: Live
     stat_drafts: Bozze
     stat_responses: Risposte

@@ -430,6 +430,9 @@ ar:
     create_new: إنشاء فيرتو جديد
     import_google_form_button: إنشاء نموذج
     import_google_form_modal_subtitle: الصق رابط نموذج Google موجود وسنحوّله إلى Verto قابل للتعديل.
+    or_divider: أو
+    start_from_scratch_button: البدء من الصفر
+    creating_blank: جارٍ الإنشاء…
     stat_live: مباشر
     stat_drafts: مسودات
     stat_responses: الردود

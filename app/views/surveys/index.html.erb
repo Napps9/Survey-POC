@@ -114,6 +114,17 @@
             <%= link_to t("wizard.import_gform_connect"), google_connect_path(return_to: "dashboard_import"),
                   style: "display:flex;justify-content:center;text-decoration:none;background:#01EACB;color:#1C2034;border:none;border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;" %>
           <% end %>
+
+          <div style="display:flex;align-items:center;gap:10px;margin:18px 0 14px;">
+            <div style="flex:1;height:1px;background:rgba(0,0,0,0.1);"></div>
+            <span style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.35);"><%= t("dashboard.or_divider") %></span>
+            <div style="flex:1;height:1px;background:rgba(0,0,0,0.1);"></div>
+          </div>
+
+          <%= button_to t("dashboard.start_from_scratch_button"), create_blank_survey_path,
+                method: :post,
+                data: { turbo_submits_with: t("dashboard.creating_blank") },
+                style: "width:100%;background:transparent;color:#1C2034;border:1px solid rgba(0,0,0,0.16);border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;cursor:pointer;" %>
         </div>
       </div>
     </div>

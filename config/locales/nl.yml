@@ -430,6 +430,9 @@ nl:
     create_new: Een nieuwe Verto aanmaken
     import_google_form_button: Een formulier maken
     import_google_form_modal_subtitle: Plak de link van een bestaand Google Form en we maken er een bewerkbare Verto van.
+    or_divider: of
+    start_from_scratch_button: Helemaal opnieuw beginnen
+    creating_blank: Bezig met maken…
     stat_live: Live
     stat_drafts: Concepten
     stat_responses: Reacties

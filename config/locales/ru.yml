@@ -430,6 +430,9 @@ ru:
     create_new: Создать новый Verto
     import_google_form_button: Создать форму
     import_google_form_modal_subtitle: Вставьте ссылку на существующую Google Form, и мы превратим её в редактируемый Verto.
+    or_divider: или
+    start_from_scratch_button: Начать с нуля
+    creating_blank: Создание…
     stat_live: Активных
     stat_drafts: Черновиков
     stat_responses: Ответов

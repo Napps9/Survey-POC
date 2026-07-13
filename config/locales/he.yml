@@ -430,6 +430,9 @@ he:
     create_new: צור Verto חדש
     import_google_form_button: יצירת טופס
     import_google_form_modal_subtitle: הדבק קישור לטופס Google קיים ונהפוך אותו ל-Verto הניתן לעריכה.
+    or_divider: או
+    start_from_scratch_button: התחל מאפס
+    creating_blank: יוצר…
     stat_live: פעיל
     stat_drafts: טיוטות
     stat_responses: תגובות
