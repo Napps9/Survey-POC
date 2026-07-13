@@ -433,6 +433,16 @@ sw:
     or_divider: au
     start_from_scratch_button: Anza kutoka mwanzo
     creating_blank: Inaunda…
+    create_button: "Unda"
+    create_menu_title: "Unataka kuunda nini?"
+    create_menu_impact: "Kipimo cha Athari"
+    create_menu_impact_desc: "Verto iliyoandaliwa na AI kutoka kwa muhtasari wako — mtiririko kamili wa kuongozwa."
+    create_menu_quiz: "Chemsha bongo"
+    create_menu_quiz_desc: "Majibu yanayopimwa na alama ambayo washiriki wanaweza kulinganisha."
+    create_menu_form: "Fomu"
+    create_menu_form_desc: "Hojaji rahisi — leta Fomu ya Google au anza upya."
+    create_menu_template: "Kiolezo"
+    create_menu_template_desc: "Anza na seti iliyo tayari."
     stat_live: Hai
     stat_drafts: Rasimu
     stat_responses: Majibu
@@ -463,8 +473,9 @@ sw:
     - Nani anajibu
     - Unachotaka kujifunza
     - Lugha
-    - Rangi za chapa
     - Muktadha (hiari)
+    - Rangi za chapa
+    - "Maswali yako mwenyewe (hiari)"
     welcome_badge: Verto Mpya
     welcome_title: Hebu tujenge Verto yako.
     welcome_sub: Tutageuza muhtasari wako kuwa Verto inayofuata sheria za Playverto.
@@ -567,6 +578,15 @@ sw:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Hatua ya 07 · Maswali yako"
+    s8_lead: "Je, maswali yako tayari?"
+    s8_body: "Yabandike, leta PDF, au vuta Fomu ya Google — tutalinganisha kila swali na aina bora ya jibu. Au ruka hatua hii na uache Verto ayaandike kutoka kwa muhtasari wako."
+    s8_title: "Una maswali yako mwenyewe?"
+    s8_hint: "Hiari kabisa — bonyeza Tengeneza na tutayaandika kutoka kwa muhtasari wako."
+    manual_questions_placeholder: "Bandika au andika maswali yako, moja kwa kila mstari…"
+    import_manual_submit: "Tumia maswali haya →"
+    importing_manual: "Tunasoma maswali yako…"
+    quiz_preset_badge: "Chemsha bongo"
     step_counter: Hatua %{n} kati ya %{total}
   templates:
     eyebrow: Violezo

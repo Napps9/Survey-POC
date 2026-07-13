@@ -26,6 +26,9 @@ class SurveysController < ApplicationController
   end
 
   def new
+    # The dashboard's Create menu pre-decides quiz mode (its "Quiz" tile links
+    # here with ?quiz=1); the wizard carries it through a hidden field.
+    @quiz_preset = ActiveModel::Type::Boolean.new.cast(params[:quiz]) || false
   end
 
   def show
@@ -75,14 +78,13 @@ class SurveysController < ApplicationController
     end
 
     if key_insight.empty?
-      verto_name = params[:verto_name].to_s.strip
       result = {
-        "title" => verto_name.presence || theme,
+        "title" => theme,
         "description" => nil,
         "theme" => theme,
         "audience_age" => audience_age,
         "key_insight" => nil,
-        "cards" => [ { "type" => "welcome_card", "title" => verto_name.presence || theme, "text" => theme } ] + common_cards
+        "cards" => [ { "type" => "welcome_card", "title" => theme, "text" => theme } ] + common_cards
       }
     else
       result = SurveyGenerator.new.call(
@@ -96,8 +98,10 @@ class SurveysController < ApplicationController
       )
     end
 
+    # No name is asked up front — the AI-written title from the generation is
+    # the Verto's name, renameable any time in the editor header.
     @survey = Current.organisation.surveys.create!(
-      title:        params[:verto_name].to_s.strip.presence || result["title"],
+      title:        result["title"],
       description:  result["description"],
       theme:        result["theme"].presence || theme,
       audience_age: result["audience_age"].presence || audience_age,
@@ -165,6 +169,43 @@ class SurveysController < ApplicationController
   rescue => e
     Rails.logger.error("[PdfQuestionImporter] #{e.class}: #{e.message}")
     import_pdf_error("We couldn't import your PDF — #{friendly_generate_error(e)}")
+  end
+
+  # POST /surveys/import_manual
+  # Creates a Verto from questions the creator typed or pasted into the
+  # wizard's final "Have your own questions?" step — the same pipeline as the
+  # PDF import (verbatim wording, best-fit card types, and the review screen
+  # when questions break the design rules).
+  MAX_MANUAL_CHARS = 20_000
+
+  def import_manual
+    text = params[:manual_questions].to_s.strip
+
+    return import_manual_error("Type or paste your questions first.") if text.blank?
+    if text.size > MAX_MANUAL_CHARS
+      return import_manual_error("That's a lot of text — please keep it under #{MAX_MANUAL_CHARS / 1_000}k characters.")
+    end
+
+    result = ManualQuestionImporter.new.call(text: text, locale: wizard_default_locale)
+    cards  = Array(result["cards"])
+
+    return import_manual_error("We couldn't find any questions in that text — try one question per line.") if cards.empty?
+
+    payload = wizard_import_payload(result)
+
+    flagged = cards.select { |c| c["compliant"] == false }
+    if flagged.any?
+      @import_payload = self.class.import_verifier.generate(payload)
+      @import_cards   = cards
+      @flagged_count  = flagged.size
+      return render :import_review, layout: "fullscreen"
+    end
+
+    @survey = create_imported_survey!(payload, variant: "verbatim")
+    redirect_to survey_path(@survey)
+  rescue => e
+    Rails.logger.error("[ManualQuestionImporter] #{e.class}: #{e.message}")
+    import_manual_error("We couldn't import your questions — #{friendly_generate_error(e)}")
   end
 
   # POST /surveys/finalize_import
@@ -772,6 +813,7 @@ class SurveysController < ApplicationController
     flash.now[:alert] = message
     render :new, layout: "fullscreen", status: :unprocessable_entity
   end
+  alias_method :import_manual_error, :import_pdf_error
 
   # Google Form import is reachable from both the wizard's Card 1 and the
   # dashboard's own "Create a Form" modal — send an error back to wherever the

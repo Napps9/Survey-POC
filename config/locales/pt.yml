@@ -433,6 +433,16 @@ pt:
     or_divider: ou
     start_from_scratch_button: Começar do zero
     creating_blank: A criar…
+    create_button: "Criar"
+    create_menu_title: "O que você quer criar?"
+    create_menu_impact: "Medição de impacto"
+    create_menu_impact_desc: "Um Verto redigido por IA a partir do seu brief — o fluxo guiado completo."
+    create_menu_quiz: "Quiz"
+    create_menu_quiz_desc: "Respostas avaliadas e uma pontuação que os participantes podem comparar."
+    create_menu_form: "Formulário"
+    create_menu_form_desc: "Um questionário simples — importe um Formulário Google ou comece do zero."
+    create_menu_template: "Modelo"
+    create_menu_template_desc: "Comece com um baralho pronto."
     stat_live: Ao vivo
     stat_drafts: Rascunhos
     stat_responses: Respostas
@@ -463,8 +473,9 @@ pt:
     - Quem vai responder
     - O que quer aprender
     - Idiomas
-    - Cores da marca
     - Contexto (opcional)
+    - Cores da marca
+    - "Suas próprias perguntas (opcional)"
     welcome_badge: Novo Verto
     welcome_title: Vamos construir o seu Verto.
     welcome_sub: Transformaremos o seu briefing num Verto que segue as regras do Playverto.
@@ -567,6 +578,15 @@ pt:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Etapa 07 · Suas perguntas"
+    s8_lead: "Já tem suas perguntas?"
+    s8_body: "Cole-as, importe um PDF ou traga um Formulário Google — atribuiremos a cada uma o melhor tipo de resposta. Ou pule esta etapa e deixe o Verto escrevê-las a partir do seu brief."
+    s8_title: "Tem suas próprias perguntas?"
+    s8_hint: "Totalmente opcional — clique em Gerar e as escreveremos a partir do seu brief."
+    manual_questions_placeholder: "Cole ou digite suas perguntas, uma por linha…"
+    import_manual_submit: "Usar estas perguntas →"
+    importing_manual: "Lendo suas perguntas…"
+    quiz_preset_badge: "Quiz"
     step_counter: Passo %{n} de %{total}
   templates:
     eyebrow: Modelos

@@ -433,6 +433,16 @@ hi:
     or_divider: या
     start_from_scratch_button: शुरुआत से करें
     creating_blank: बनाया जा रहा है…
+    create_button: "बनाएँ"
+    create_menu_title: "आप क्या बनाना चाहते हैं?"
+    create_menu_impact: "प्रभाव मापन"
+    create_menu_impact_desc: "आपके ब्रीफ़ से AI द्वारा तैयार Verto — पूरा गाइडेड फ़्लो।"
+    create_menu_quiz: "क्विज़"
+    create_menu_quiz_desc: "ग्रेड किए गए उत्तर और एक स्कोर जिसकी तुलना उत्तरदाता कर सकते हैं।"
+    create_menu_form: "फ़ॉर्म"
+    create_menu_form_desc: "सादा प्रश्नावली — Google फ़ॉर्म आयात करें या शून्य से शुरू करें।"
+    create_menu_template: "टेम्पलेट"
+    create_menu_template_desc: "तैयार डेक से शुरू करें।"
     stat_live: लाइव
     stat_drafts: ड्राफ़्ट
     stat_responses: उत्तर
@@ -463,8 +473,9 @@ hi:
     - कौन उत्तर दे रहा है
     - आप क्या जानना चाहते हैं
     - भाषाएं
-    - ब्रांड रंग
     - संदर्भ (वैकल्पिक)
+    - ब्रांड रंग
+    - "आपके अपने प्रश्न (वैकल्पिक)"
     welcome_badge: नया Verto
     welcome_title: चलिए आपका Verto बनाते हैं।
     welcome_sub: हम आपके ब्रीफ़ को एक ऐसे Verto में बदल देंगे जो Playverto के नियमों का पालन करता है।
@@ -567,6 +578,15 @@ hi:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "चरण 07 · आपके प्रश्न"
+    s8_lead: "क्या आपके प्रश्न तैयार हैं?"
+    s8_body: "उन्हें पेस्ट करें, PDF आयात करें या Google फ़ॉर्म लाएँ — हम हर प्रश्न को उसका सबसे उपयुक्त उत्तर प्रकार देंगे। या यह चरण छोड़ें और Verto को अपने ब्रीफ़ से प्रश्न लिखने दें।"
+    s8_title: "क्या आपके अपने प्रश्न हैं?"
+    s8_hint: "पूरी तरह वैकल्पिक — Generate दबाएँ और हम उन्हें आपके ब्रीफ़ से लिखेंगे।"
+    manual_questions_placeholder: "अपने प्रश्न पेस्ट करें या लिखें, प्रति पंक्ति एक…"
+    import_manual_submit: "इन प्रश्नों का उपयोग करें →"
+    importing_manual: "आपके प्रश्न पढ़े जा रहे हैं…"
+    quiz_preset_badge: "क्विज़"
     step_counter: चरण %{n} / %{total}
   templates:
     eyebrow: टेम्पलेट

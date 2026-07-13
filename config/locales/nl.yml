@@ -433,6 +433,16 @@ nl:
     or_divider: of
     start_from_scratch_button: Helemaal opnieuw beginnen
     creating_blank: Bezig met maken…
+    create_button: "Maken"
+    create_menu_title: "Wat wil je maken?"
+    create_menu_impact: "Impactmeting"
+    create_menu_impact_desc: "Een door AI opgesteld Verto op basis van je briefing — de volledige begeleide flow."
+    create_menu_quiz: "Quiz"
+    create_menu_quiz_desc: "Beoordeelde antwoorden en een score die respondenten kunnen vergelijken."
+    create_menu_form: "Formulier"
+    create_menu_form_desc: "Een eenvoudige vragenlijst — importeer een Google Formulier of begin blanco."
+    create_menu_template: "Sjabloon"
+    create_menu_template_desc: "Begin met een kant-en-klaar deck."
     stat_live: Live
     stat_drafts: Concepten
     stat_responses: Reacties
@@ -463,8 +473,9 @@ nl:
     - Wie er antwoordt
     - Wat je wilt leren
     - Talen
-    - Merkkleuren
     - Context (optioneel)
+    - Merkkleuren
+    - "Je eigen vragen (optioneel)"
     welcome_badge: Nieuwe Verto
     welcome_title: Laten we je Verto bouwen.
     welcome_sub: We zetten je briefing om in een Verto die de Playverto-regels volgt.
@@ -567,6 +578,15 @@ nl:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Stap 07 · Jouw vragen"
+    s8_lead: "Heb je je vragen al?"
+    s8_body: "Plak ze, importeer een PDF of haal een Google Formulier op — we koppelen elke vraag aan het beste antwoordtype. Of sla dit over en laat Verto ze schrijven op basis van je briefing."
+    s8_title: "Heb je eigen vragen?"
+    s8_hint: "Helemaal optioneel — klik op Genereren en wij schrijven ze op basis van je briefing."
+    manual_questions_placeholder: "Plak of typ je vragen, één per regel…"
+    import_manual_submit: "Deze vragen gebruiken →"
+    importing_manual: "Je vragen worden gelezen…"
+    quiz_preset_badge: "Quiz"
     step_counter: Stap %{n} van %{total}
   templates:
     eyebrow: Sjablonen

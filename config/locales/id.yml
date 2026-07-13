@@ -433,6 +433,16 @@ id:
     or_divider: atau
     start_from_scratch_button: Mulai dari awal
     creating_blank: Membuat…
+    create_button: "Buat"
+    create_menu_title: "Apa yang ingin kamu buat?"
+    create_menu_impact: "Pengukuran Dampak"
+    create_menu_impact_desc: "Verto yang dirancang AI dari brief kamu — alur terpandu lengkap."
+    create_menu_quiz: "Kuis"
+    create_menu_quiz_desc: "Jawaban dinilai dan skor yang bisa dibandingkan responden."
+    create_menu_form: "Formulir"
+    create_menu_form_desc: "Kuesioner sederhana — impor Google Form atau mulai dari nol."
+    create_menu_template: "Templat"
+    create_menu_template_desc: "Mulai dari dek siap pakai."
     stat_live: Live
     stat_drafts: Draf
     stat_responses: Tanggapan
@@ -463,8 +473,9 @@ id:
     - Siapa yang menjawab
     - Apa yang ingin Anda pelajari
     - Bahasa
-    - Warna merek
     - Konteks (opsional)
+    - Warna merek
+    - "Pertanyaanmu sendiri (opsional)"
     welcome_badge: Verto Baru
     welcome_title: Mari bangun Verto Anda.
     welcome_sub: Kami akan mengubah brief Anda menjadi Verto yang mengikuti aturan Playverto.
@@ -567,6 +578,15 @@ id:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Langkah 07 · Pertanyaanmu"
+    s8_lead: "Sudah punya pertanyaan?"
+    s8_body: "Tempel, impor PDF, atau tarik Google Form — kami cocokkan setiap pertanyaan dengan tipe jawaban terbaiknya. Atau lewati langkah ini dan biarkan Verto menulisnya dari brief kamu."
+    s8_title: "Punya pertanyaan sendiri?"
+    s8_hint: "Sepenuhnya opsional — tekan Generate dan kami tulis dari brief kamu."
+    manual_questions_placeholder: "Tempel atau ketik pertanyaanmu, satu per baris…"
+    import_manual_submit: "Gunakan pertanyaan ini →"
+    importing_manual: "Membaca pertanyaanmu…"
+    quiz_preset_badge: "Kuis"
     step_counter: Langkah %{n} dari %{total}
   templates:
     eyebrow: Templat

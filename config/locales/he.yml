@@ -433,6 +433,16 @@ he:
     or_divider: או
     start_from_scratch_button: התחל מאפס
     creating_blank: יוצר…
+    create_button: "יצירה"
+    create_menu_title: "מה תרצו ליצור?"
+    create_menu_impact: "מדידת השפעה"
+    create_menu_impact_desc: "‏Verto שמנוסח על ידי AI מהבריף שלכם — התהליך המודרך המלא."
+    create_menu_quiz: "חידון"
+    create_menu_quiz_desc: "תשובות מדורגות וציון שמשיבים יכולים להשוות."
+    create_menu_form: "טופס"
+    create_menu_form_desc: "שאלון פשוט — ייבאו טופס Google או התחילו מאפס."
+    create_menu_template: "תבנית"
+    create_menu_template_desc: "התחילו מחפיסה מוכנה."
     stat_live: פעיל
     stat_drafts: טיוטות
     stat_responses: תגובות
@@ -463,8 +473,9 @@ he:
     - מי עונה
     - מה תרצה ללמוד
     - שפות
-    - צבעי מותג
     - הקשר (אופציונלי)
+    - צבעי מותג
+    - "שאלות משלכם (אופציונלי)"
     welcome_badge: Verto חדש
     welcome_title: בואו נבנה את ה-Verto שלך.
     welcome_sub: נהפוך את הבריף שלך ל-Verto שפועל לפי חוקי Playverto.
@@ -567,6 +578,15 @@ he:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "שלב 07 · השאלות שלכם"
+    s8_lead: "השאלות כבר מוכנות?"
+    s8_body: "הדביקו אותן, ייבאו PDF או משכו טופס Google — נתאים לכל שאלה את סוג התשובה הטוב ביותר. או דלגו על השלב ותנו ל‑Verto לכתוב אותן מהבריף שלכם."
+    s8_title: "יש לכם שאלות משלכם?"
+    s8_hint: "אופציונלי לגמרי — לחצו על יצירה ואנחנו נכתוב אותן מהבריף שלכם."
+    manual_questions_placeholder: "הדביקו או הקלידו את השאלות, אחת בכל שורה…"
+    import_manual_submit: "להשתמש בשאלות האלה ←"
+    importing_manual: "קוראים את השאלות שלכם…"
+    quiz_preset_badge: "חידון"
     step_counter: שלב %{n} מתוך %{total}
   templates:
     eyebrow: תבניות

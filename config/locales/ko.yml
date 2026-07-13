@@ -433,6 +433,16 @@ ko:
     or_divider: 또는
     start_from_scratch_button: 처음부터 시작
     creating_blank: 생성 중…
+    create_button: "만들기"
+    create_menu_title: "무엇을 만들까요?"
+    create_menu_impact: "임팩트 측정"
+    create_menu_impact_desc: "브리프를 바탕으로 AI가 초안을 잡는 Verto — 전체 가이드 플로우."
+    create_menu_quiz: "퀴즈"
+    create_menu_quiz_desc: "채점되는 답변과 응답자끼리 비교할 수 있는 점수."
+    create_menu_form: "폼"
+    create_menu_form_desc: "간단한 설문지 — Google 폼을 가져오거나 처음부터 시작하세요."
+    create_menu_template: "템플릿"
+    create_menu_template_desc: "미리 만들어진 덱에서 시작하세요."
     stat_live: 라이브
     stat_drafts: 초안
     stat_responses: 응답
@@ -463,8 +473,9 @@ ko:
     - 응답자
     - 알고 싶은 것
     - 언어
-    - 브랜드 색상
     - 맥락 (선택)
+    - 브랜드 색상
+    - "직접 만든 질문 (선택)"
     welcome_badge: 새 Verto
     welcome_title: Verto를 만들어 봅시다.
     welcome_sub: 브리프를 Playverto의 원칙을 따르는 Verto로 만들어 드립니다.
@@ -567,6 +578,15 @@ ko:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "7단계 · 내 질문"
+    s8_lead: "질문이 이미 있나요?"
+    s8_body: "붙여넣거나, PDF를 가져오거나, Google 폼을 불러오세요 — 각 질문에 가장 알맞은 답변 유형을 매칭해 드립니다. 이 단계를 건너뛰고 브리프로부터 Verto가 작성하게 할 수도 있습니다."
+    s8_title: "직접 만든 질문이 있나요?"
+    s8_hint: "완전히 선택 사항입니다 — 생성을 누르면 브리프로부터 작성해 드립니다."
+    manual_questions_placeholder: "질문을 붙여넣거나 입력하세요. 한 줄에 하나씩…"
+    import_manual_submit: "이 질문 사용하기 →"
+    importing_manual: "질문을 읽는 중…"
+    quiz_preset_badge: "퀴즈"
     step_counter: "%{total}단계 중 %{n}단계"
   templates:
     eyebrow: 템플릿

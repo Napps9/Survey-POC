@@ -433,6 +433,16 @@ ru:
     or_divider: или
     start_from_scratch_button: Начать с нуля
     creating_blank: Создание…
+    create_button: "Создать"
+    create_menu_title: "Что вы хотите создать?"
+    create_menu_impact: "Оценка воздействия"
+    create_menu_impact_desc: "Verto, составленный ИИ по вашему брифу — полный пошаговый процесс."
+    create_menu_quiz: "Квиз"
+    create_menu_quiz_desc: "Оцениваемые ответы и результат, который участники могут сравнить."
+    create_menu_form: "Форма"
+    create_menu_form_desc: "Простой опросник — импортируйте Google Форму или начните с нуля."
+    create_menu_template: "Шаблон"
+    create_menu_template_desc: "Начните с готовой колоды."
     stat_live: Активных
     stat_drafts: Черновиков
     stat_responses: Ответов
@@ -463,8 +473,9 @@ ru:
     - Кто отвечает
     - Что вы хотите узнать
     - Языки
-    - Фирменные цвета
     - Контекст (необязательно)
+    - Фирменные цвета
+    - "Ваши собственные вопросы (необязательно)"
     welcome_badge: Новый Verto
     welcome_title: Давайте создадим ваш Verto.
     welcome_sub: Мы превратим ваш бриф в Verto по правилам Playverto.
@@ -567,6 +578,15 @@ ru:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Шаг 07 · Ваши вопросы"
+    s8_lead: "Вопросы уже готовы?"
+    s8_body: "Вставьте их, импортируйте PDF или подтяните Google Форму — каждому вопросу мы подберём лучший тип ответа. Или пропустите этот шаг, и Verto напишет их по вашему брифу."
+    s8_title: "Есть свои вопросы?"
+    s8_hint: "Совершенно необязательно — нажмите «Сгенерировать», и мы напишем их по вашему брифу."
+    manual_questions_placeholder: "Вставьте или введите вопросы, по одному в строке…"
+    import_manual_submit: "Использовать эти вопросы →"
+    importing_manual: "Читаем ваши вопросы…"
+    quiz_preset_badge: "Квиз"
     step_counter: Шаг %{n} из %{total}
   templates:
     eyebrow: Шаблоны

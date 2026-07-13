@@ -433,6 +433,16 @@ fr:
     or_divider: ou
     start_from_scratch_button: Partir de zéro
     creating_blank: Création…
+    create_button: "Créer"
+    create_menu_title: "Que voulez-vous créer ?"
+    create_menu_impact: "Mesure d'impact"
+    create_menu_impact_desc: "Un Verto rédigé par l'IA à partir de votre brief — le parcours guidé complet."
+    create_menu_quiz: "Quiz"
+    create_menu_quiz_desc: "Réponses notées et un score que les répondants peuvent comparer."
+    create_menu_form: "Formulaire"
+    create_menu_form_desc: "Un questionnaire simple — importez un formulaire Google ou partez de zéro."
+    create_menu_template: "Modèle"
+    create_menu_template_desc: "Partez d'un jeu de cartes prêt à l'emploi."
     stat_live: En ligne
     stat_drafts: Brouillons
     stat_responses: Réponses
@@ -463,8 +473,9 @@ fr:
     - Qui répond
     - Ce que vous souhaitez apprendre
     - Langues
-    - Couleurs de marque
     - Contexte (facultatif)
+    - Couleurs de marque
+    - "Vos propres questions (facultatif)"
     welcome_badge: Nouveau Verto
     welcome_title: Créons votre Verto.
     welcome_sub: Nous transformerons votre brief en un Verto respectant les règles de Playverto.
@@ -567,6 +578,15 @@ fr:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Étape 07 · Vos questions"
+    s8_lead: "Vous avez déjà vos questions ?"
+    s8_body: "Collez-les, importez un PDF ou récupérez un formulaire Google — nous associerons à chacune son meilleur type de réponse. Ou passez cette étape et laissez Verto les rédiger à partir de votre brief."
+    s8_title: "Vous avez vos propres questions ?"
+    s8_hint: "Totalement facultatif — appuyez sur Générer et nous les rédigerons à partir de votre brief."
+    manual_questions_placeholder: "Collez ou saisissez vos questions, une par ligne…"
+    import_manual_submit: "Utiliser ces questions →"
+    importing_manual: "Lecture de vos questions…"
+    quiz_preset_badge: "Quiz"
     step_counter: Étape %{n} sur %{total}
   templates:
     eyebrow: Modèles

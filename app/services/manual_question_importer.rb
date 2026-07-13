@@ -1,0 +1,156 @@
+require "anthropic"
+
+# Imports a user's prewritten questions typed or pasted into the wizard's
+# final "Have your own questions?" step, assigning each one the best-matching
+# Verto card type. The plain-text counterpart to PdfQuestionImporter: keeps
+# the user's wording verbatim, only chooses the answer type (plus sensible
+# options when the chosen type needs some), and flags rule-breaking questions
+# so the controller can pause on the same review screen as a PDF import.
+class ManualQuestionImporter
+  include AnthropicHelpers
+
+  MODEL      = ClaudeModels::DEFAULT
+  MAX_TOKENS = 8192
+
+  TOOL = {
+    name: "emit_survey",
+    description: "Emit the questions extracted from the pasted text, each mapped to the best-fitting Verto answer type.",
+    input_schema: {
+      type: "object",
+      properties: {
+        title:       { type: "string", description: "Short Verto title inferred from the questions (falls back to a generic title)." },
+        description: { type: "string", description: "Optional 1-2 sentence intro shown to respondents." },
+        cards: {
+          type: "array",
+          description: "One card per question found in the text, in the order written. Do not invent or drop questions.",
+          items: {
+            type: "object",
+            properties: {
+              type: { type: "string", enum: SurveyGenerator::CARD_TYPES, description: "The best-fitting answer type for this question." },
+              original_text: { type: "string", description: "The question text EXACTLY as the user wrote it, unmodified." },
+              compliant: { type: "boolean", description: "true when original_text already satisfies every per-card rule verbatim (length caps, single idea, neutral wording). false when it needed rewriting." },
+              issue: { type: "string", description: "Only when compliant is false: one short sentence naming the rule it breaks (e.g. 'Over the 100-character cap' or 'Asks two things at once')." },
+              text: { type: "string", description: "The rule-compliant question text. When compliant is true this is identical to original_text. When false, it is the optimised rewrite: same intent, shorter and sharper. Target 50-70 chars; 100 hard max (text + any description <= 100)." },
+              description: { type: "string", description: "Optional sub-text under the question. Shares the question's 100-char budget." },
+              options: {
+                type: "array",
+                items: { type: "string", description: "Each option label within its type's character budget (see the design rules)." },
+                description: <<~DESC
+                  Required for: multiple_choice, select_many, select_one_grid,
+                  select_many_grid, prioritise, tap_card, range, rating, nps. Use the
+                  options the user wrote when present; otherwise generate sensible,
+                  mutually-exclusive options that satisfy the bounds:
+                  - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 30 chars
+                  - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any
+                    "Other", each label <= 20 chars
+                  - prioritise: 4 or 5 options (4 ideal), each <= 30 chars
+                  - tap_card: 5 to 8 statements covering negative, neutral and positive
+                    sentiments in that order, each <= 40 chars
+                  - range: ODD count only (3 or 5, 5 ideal — never 4) with a genuinely
+                    neutral middle label
+                  - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
+                  - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
+                DESC
+              },
+              allow_other: { type: "boolean", description: "Set true only if the question explicitly offers a free-text 'Other'." }
+            },
+            required: %w[type text original_text compliant]
+          }
+        }
+      },
+      required: %w[title cards]
+    }
+  }.freeze
+
+  SYSTEM = <<~PROMPT.freeze
+    You convert a user's prewritten questionnaire (typed or pasted as plain
+    text — typically one question per line, sometimes with answer options
+    underneath) into a Verto. Your job is NOT to redesign their survey — it is to:
+
+    1. Extract EVERY question in the text, in the order they appear. Do not
+       invent new questions, do not drop any, and do not merge or split them.
+       Lines that are answer options belong to the question above them, not to
+       new questions. Record each question's wording EXACTLY as written in
+       `original_text`.
+    2. Judge whether the original wording already satisfies every per-card
+       rule below (length caps, one idea per question, neutral phrasing).
+       - If it does: set `compliant: true` and `text` = `original_text`.
+       - If it does not: set `compliant: false`, name the broken rule in one
+         short sentence in `issue`, and write the optimised rewrite in `text`
+         — same intent, shorter and sharper, fully rule-compliant. The user
+         chooses between the two; never silently rewrite a compliant question.
+    3. For each question, choose the SINGLE best-fitting Verto answer type from
+       the catalogue below, following the per-card rules.
+    4. Supply that type's options. If the user listed answer options for the
+       question, use them (mapped to the type's bounds). If the chosen type
+       needs options and the user gave none, generate sensible, mutually-
+       exclusive options that satisfy the rules.
+
+    Per-card rules (every card must satisfy these):
+
+    #{SurveyGenerator::CARD_RULES}
+
+    Choosing the best-fitting type:
+    - "Choose one" / single-pick → select_one_grid by default; fall back to
+      multiple_choice when option labels are long (over ~14 chars).
+    - "Choose all that apply" / multi-pick → select_many_grid by default; fall
+      back to select_many for long labels.
+    - An explicit ranking question ("In what order…", "Rank these…") →
+      prioritise (4 or 5 options, 4 ideal).
+    - A 1-5 quality/satisfaction rating ("How would you rate…") → rating
+      (one label per point).
+    - An emotion/agreement/"how often" scale → range (odd count, 3 or 5
+      points, with a genuine neutral middle).
+    - Likelihood-to-recommend or a 0-10 sentiment/temperature scale → nps
+      (EXACTLY 11 numeric labels, "0" through "10").
+    - A single topic probed from several angles (or an explicit
+      negative/neutral/positive statement set) → tap_card (5 to 8 statements,
+      in negative → neutral → positive order, each <= 40 chars).
+    - A strict binary gate → yes_no (use sparingly).
+    - An open, qualitative "tell us…" / "why…" question with no fixed answers →
+      open_ended.
+    - NEVER emit a welcome_card — the import contains only the user's questions.
+
+    When in doubt between a grid and a list, prefer the grid. When in doubt
+    between rating, range and nps, pick the one whose framing matches the
+    question (stars → rating; emotion/agreement slider → range;
+    likelihood/recommendation → nps).
+
+    Output via the emit_survey tool. Infer a short `title` (and an optional
+    `description`) from the questions' subject; if nothing obvious, use a
+    generic title like "Imported Verto".
+  PROMPT
+
+  def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
+    @client = build_anthropic_client(api_key)
+  end
+
+  # text: the creator's questions as plain text.
+  # Returns string-keyed { "title" => ..., "description" => ..., "cards" => [...] }.
+  def call(text:, locale: SupportedLocales::DEFAULT)
+    response = @client.messages.create(
+      model:       MODEL,
+      max_tokens:  MAX_TOKENS,
+      system:      [ { type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } } ],
+      tools:       [ TOOL ],
+      tool_choice: { type: "tool", name: "emit_survey" },
+      messages: [
+        {
+          role: "user",
+          content: "Extract every question from the questionnaire below and map each to its best-fitting Verto answer type.\n\n---\n\n#{text}"
+        }
+      ]
+    )
+
+    log_usage("ManualQuestionImporter", response.usage, model: MODEL)
+
+    block = Array(response.content).find { |b| tool_use?(b) }
+    raise "Model did not return a tool_use block" unless block
+
+    payload = deep_stringify(input_of(block))
+    payload["cards"] = QuestionTypeClassifier.new.normalize_cards(payload["cards"])
+    payload
+  end
+
+  # tool_use?, input_of, deep_stringify come from AnthropicHelpers.
+end

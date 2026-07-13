@@ -433,6 +433,16 @@ de:
     or_divider: oder
     start_from_scratch_button: Von vorne beginnen
     creating_blank: Wird erstellt…
+    create_button: "Erstellen"
+    create_menu_title: "Was möchtest du erstellen?"
+    create_menu_impact: "Wirkungsmessung"
+    create_menu_impact_desc: "Ein KI-entworfenes Verto aus deinem Briefing — der komplette geführte Ablauf."
+    create_menu_quiz: "Quiz"
+    create_menu_quiz_desc: "Bewertete Antworten und ein Punktestand zum Vergleichen."
+    create_menu_form: "Formular"
+    create_menu_form_desc: "Ein schlichter Fragebogen — importiere ein Google-Formular oder starte bei null."
+    create_menu_template: "Vorlage"
+    create_menu_template_desc: "Starte mit einem fertigen Deck."
     stat_live: Live
     stat_drafts: Entwürfe
     stat_responses: Antworten
@@ -463,8 +473,9 @@ de:
     - Wer antwortet
     - Was du erfahren möchtest
     - Sprachen
-    - Markenfarben
     - Kontext (optional)
+    - Markenfarben
+    - "Deine eigenen Fragen (optional)"
     welcome_badge: Neues Verto
     welcome_title: Lass uns dein Verto erstellen.
     welcome_sub: Wir verwandeln dein Briefing in ein Verto, das den Playverto-Regeln folgt.
@@ -567,6 +578,15 @@ de:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Schritt 07 · Deine Fragen"
+    s8_lead: "Hast du deine Fragen schon?"
+    s8_body: "Füge sie ein, importiere ein PDF oder hole ein Google-Formular — wir ordnen jeder Frage den besten Antworttyp zu. Oder überspringe diesen Schritt und lass Verto sie aus deinem Briefing schreiben."
+    s8_title: "Hast du eigene Fragen?"
+    s8_hint: "Völlig optional — klicke auf Generieren und wir schreiben sie aus deinem Briefing."
+    manual_questions_placeholder: "Füge deine Fragen ein oder tippe sie, eine pro Zeile…"
+    import_manual_submit: "Diese Fragen verwenden →"
+    importing_manual: "Deine Fragen werden gelesen…"
+    quiz_preset_badge: "Quiz"
     step_counter: Schritt %{n} von %{total}
   templates:
     eyebrow: Vorlagen

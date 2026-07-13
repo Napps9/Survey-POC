@@ -97,6 +97,12 @@
       instr_body      = "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);line-height:1.55;"
       ex_label_style  = "font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.14em;text-transform:uppercase;font-weight:700;"
       ex_item_style   = "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.78);padding:9px 14px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);line-height:1.4;"
+
+      # Quiz mode is decided on the dashboard's Create menu (its Quiz tile
+      # links here with ?quiz=1) and carried through a hidden field — also
+      # honoured on error re-renders of the POSTed form, where params[:quiz]
+      # echoes the hidden field back.
+      quiz_preset = @quiz_preset.nil? ? (ActiveModel::Type::Boolean.new.cast(params[:quiz]) || false) : @quiz_preset
     %>
 
     <%# Card stage %>
@@ -111,7 +117,7 @@
               <div style="<%= eyebrow_style %>color:#01EACB;"><%= t("wizard.welcome_eyebrow") %></div>
               <div style="<%= instr_lead %>"><%= t("wizard.welcome_lead") %></div>
               <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
-                <% [ "#FF1E6F", "#01EACB", "#0CA7FF", "#01EACB", "#FFFA77", "#615BF5" ].each_with_index do |accent, i| %>
+                <% [ "#FF1E6F", "#01EACB", "#0CA7FF", "#01EACB", "#615BF5", "#FFFA77", "#01EACB" ].each_with_index do |accent, i| %>
                   <div style="display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
                     <span style="font-family:'Alata',sans-serif;font-size: var(--text-xs);color:<%= accent %>;letter-spacing:0.08em;font-weight:700;"><%= format('%02d', i + 1) %></span>
                     <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.75);"><%= t("wizard.welcome_steps")[i] %></span>
@@ -121,33 +127,15 @@
             </div>
           </div>
           <div class="split-right" style="justify-content:center;gap:14px;text-align:left;">
-            <div class="q-eyebrow" style="color:#01EACB;"><%= t("wizard.welcome_badge") %></div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="q-eyebrow" style="color:#01EACB;margin:0;"><%= t("wizard.welcome_badge") %></div>
+              <% if quiz_preset %>
+                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#615BF5;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(97,91,245,0.12);border:1px solid rgba(97,91,245,0.3);"><%= t("wizard.quiz_preset_badge") %></span>
+              <% end %>
+            </div>
             <div style="font-family:'Alata',sans-serif;font-size:30px;line-height:1.15;color:#1C2034;"><%= t("wizard.welcome_title") %></div>
             <p class="q-subtitle" style="margin:0;"><%= t("wizard.welcome_sub") %></p>
             <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.4);margin:0;"><%= t("wizard.welcome_ready_html") %></p>
-
-            <%# ── Optional alternative start: import an existing Google Form.
-                Surfaced on the very first card so it's a discoverable shortcut,
-                not something buried behind the whole brief. The brief-and-Next
-                flow above stays the primary path; this posts straight to
-                import_google_form (formnovalidate skips the generate-only
-                required fields). PDF import still lives on the final card. ── %>
-            <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;padding:12px 14px;border-radius:12px;background:#fafbfc;border:1px dashed rgba(0,0,0,0.18);">
-              <p style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.7);margin:0;"><%= t("wizard.import_gform_heading") %></p>
-              <% if Current.user&.google_connected? %>
-                <input type="url" name="google_form_url"
-                       placeholder="<%= t('wizard.import_gform_url_placeholder') %>"
-                       style="font-family:'ABeeZee',sans-serif;font-size:13px;padding:9px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.16);background:#fff;width:100%;box-sizing:border-box;" />
-                <%= f.submit t("wizard.import_gform_submit"),
-                      formaction: import_google_form_survey_path,
-                      formnovalidate: true,
-                      data: { generating_import: "", turbo_submits_with: t("wizard.importing_gform") },
-                      style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
-              <% else %>
-                <%= link_to t("wizard.import_gform_connect"), google_connect_path(return_to: "import"),
-                      style: "align-self:flex-start;text-decoration:none;background:#fff;color:#1C2034;border:1px solid rgba(0,0,0,0.16);border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;" %>
-              <% end %>
-            </div>
           </div>
         </div>
       </section>
@@ -156,7 +144,7 @@
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
           <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:25%;"></div></div>
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:22%;"></div></div>
             <div style="<%= left_pad_style %>">
               <div style="<%= eyebrow_style %>color:#FF1E6F;"><%= t("wizard.s1_eyebrow") %></div>
               <div style="<%= instr_lead %>"><%= t("wizard.s1_lead") %></div>
@@ -175,18 +163,8 @@
             <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#FF1E6F;"><%= t("wizard.s1_eyebrow") %></div>
             <div class="q-title" style="font-size:28px;line-height:1.2;"><%= t("wizard.s1_title") %></div>
 
-            <label style="display:flex;flex-direction:column;gap:6px;font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.5);font-weight:700;">
-              <%= t("wizard.s1_name_label", default: "Verto name") %>
-              <%= f.text_area :verto_name, rows: 1,
-                    required: true,
-                    data: { required: "true", controller: "autogrow", "autogrow-single-value": "true" },
-                    maxlength: 80,
-                    placeholder: t("wizard.s1_name_placeholder", default: "e.g. Youth Wellbeing Check-in 2026"),
-                    style: light_singleline_style,
-                    onfocus: "this.style.borderColor='#FF1E6F'",
-                    onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
-            </label>
-
+            <%# No name field — the AI writes the Verto's title from this brief;
+                it's renameable any time in the editor header. %>
             <label style="display:flex;flex-direction:column;gap:6px;font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.5);font-weight:700;">
               <%= t("wizard.s1_theme_label", default: "Theme") %>
               <%= f.text_area :theme, rows: 1,
@@ -210,7 +188,7 @@
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
           <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:50%;"></div></div>
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:40%;"></div></div>
             <div style="<%= left_pad_style %>">
               <div style="<%= eyebrow_style %>color:#01EACB;"><%= t("wizard.s2_eyebrow") %></div>
               <div style="<%= instr_lead %>"><%= t("wizard.s2_lead") %></div>
@@ -248,7 +226,7 @@
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
           <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:75%;"></div></div>
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:55%;"></div></div>
             <div style="<%= left_pad_style %>">
               <div style="<%= eyebrow_style %>color:#0CA7FF;"><%= t("wizard.s3_eyebrow") %></div>
               <div style="<%= instr_lead %>"><%= t("wizard.s3_lead") %></div>
@@ -360,7 +338,7 @@
                data-controller="language-picker">
         <div class="split-card">
           <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:83%;"></div></div>
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:70%;"></div></div>
             <div style="<%= left_pad_style %>">
               <div style="<%= eyebrow_style %>color:#01EACB;"><%= t("wizard.s4_eyebrow") %></div>
               <div style="<%= instr_lead %>"><%= t("wizard.s4_lead") %></div>
@@ -404,7 +382,7 @@
       <section class="preview-card" data-create-wizard-target="card">
         <div class="split-card">
           <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:86%;"></div></div>
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:80%;"></div></div>
             <div style="<%= left_pad_style %>">
               <div style="display:flex;align-items:center;gap:10px;">
                 <div style="<%= eyebrow_style %>color:#615BF5;"><%= t("wizard.s6_eyebrow") %></div>
@@ -450,23 +428,10 @@
               </span>
             </label>
 
-            <%# Quiz mode — graded answers, a score, and a "how you compare". The
-                generator seeds correct answers for the standard quiz types; the
-                creator tunes them (and adds any others) in the editor. %>
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-top:4px;padding:12px 14px;border-radius:12px;background:rgba(97,91,245,0.05);border:1px solid rgba(97,91,245,0.18);">
-              <%= f.check_box :quiz,
-                    { checked: false,
-                      style: "margin-top:2px;width:16px;height:16px;accent-color:#615BF5;cursor:pointer;flex-shrink:0;" },
-                    "1", "0" %>
-              <span>
-                <span style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);color:#1C2034;letter-spacing:0.02em;">
-                  <%= t("wizard.quiz_label") %>
-                </span>
-                <span style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.5);margin-top:2px;line-height:1.4;">
-                  <%= t("wizard.quiz_desc") %>
-                </span>
-              </span>
-            </label>
+            <%# Quiz mode is chosen up front on the dashboard's Create menu
+                (not mid-wizard); the hidden field carries that choice through
+                to #generate. It stays re-toggleable in the editor afterwards. %>
+            <input type="hidden" name="quiz" value="<%= quiz_preset ? "1" : "0" %>" />
           </div>
         </div>
       </section>
@@ -485,7 +450,7 @@
                data-controller="brand-palette">
         <div class="split-card">
           <div class="split-left">
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:100%;"></div></div>
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:88%;"></div></div>
             <div style="<%= left_pad_style %>gap:14px;">
               <div style="<%= eyebrow_style %>color:#FFFA77;"><%= t("wizard.s5_eyebrow") %></div>
               <div style="<%= instr_lead %>"><%= t("wizard.s5_lead") %></div>
@@ -542,11 +507,48 @@
               </div>
             </div>
 
-            <%# ── Optional alternative entry point: import prewritten questions
-                from a PDF. Collapsed behind a disclosure so it reads as a clear
-                alternative, not a required step — the brief above + Generate is
-                the primary path. Posts straight to import_pdf (formnovalidate
-                skips the generate-only required fields). ── %>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Card 8 · Have your own questions? (optional) — the one place to
+          bring existing questions in, right before Generate: paste them,
+          import a PDF, or pull in a Google Form. Each door posts straight to
+          its import endpoint (formnovalidate skips the generate-only required
+          fields); the brief + Generate stays the primary path. ── %>
+      <section class="preview-card" data-create-wizard-target="card">
+        <div class="split-card">
+          <div class="split-left">
+            <div class="panel-progress"><div class="panel-progress-fill" style="width:100%;"></div></div>
+            <div style="<%= left_pad_style %>">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="<%= eyebrow_style %>color:#0CA7FF;"><%= t("wizard.s8_eyebrow") %></div>
+                <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:#0CA7FF;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:100px;background:rgba(12,167,255,0.14);border:1px solid rgba(12,167,255,0.3);"><%= t("wizard.optional") %></span>
+              </div>
+              <div style="<%= instr_lead %>"><%= t("wizard.s8_lead") %></div>
+              <div style="<%= instr_body %>"><%= t("wizard.s8_body") %></div>
+            </div>
+          </div>
+          <div class="split-right" style="justify-content:center;gap:12px;text-align:left;">
+            <div class="q-eyebrow wizard-mobile-eyebrow" style="color:#0CA7FF;"><%= t("wizard.s8_eyebrow") %> · <%= t("wizard.optional") %></div>
+            <div class="q-title" style="font-size:24px;line-height:1.2;"><%= t("wizard.s8_title") %></div>
+            <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.5);margin:0;line-height:1.5;"><%= t("wizard.s8_hint") %></p>
+
+            <%# Door 1 — paste/type them. %>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <%= f.text_area :manual_questions, rows: 5,
+                    placeholder: t("wizard.manual_questions_placeholder"),
+                    style: light_textarea_style,
+                    onfocus: "this.style.borderColor='#0CA7FF'",
+                    onblur:  "this.style.borderColor='rgba(0,0,0,0.12)'" %>
+              <%= f.submit t("wizard.import_manual_submit"),
+                    formaction: import_manual_survey_path,
+                    formnovalidate: true,
+                    data: { generating_import: "", turbo_submits_with: t("wizard.importing_manual") },
+                    style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
+            </div>
+
+            <%# Door 2 — a PDF. %>
             <details class="import-pdf-disclosure" style="margin-top:2px;">
               <summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.5);text-decoration:underline;text-underline-offset:3px;">
                 <%= t("wizard.import_toggle") %>
@@ -570,6 +572,29 @@
                       style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
               </div>
             </details>
+
+            <%# Door 3 — a Google Form. %>
+            <details style="margin-top:2px;">
+              <summary style="list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.5);text-decoration:underline;text-underline-offset:3px;">
+                <%= t("wizard.import_gform_heading") %>
+              </summary>
+
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;padding:12px 14px;border-radius:12px;background:#fafbfc;border:1px dashed rgba(0,0,0,0.18);">
+                <% if Current.user&.google_connected? %>
+                  <input type="url" name="google_form_url"
+                         placeholder="<%= t('wizard.import_gform_url_placeholder') %>"
+                         style="font-family:'ABeeZee',sans-serif;font-size:13px;padding:9px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.16);background:#fff;width:100%;box-sizing:border-box;" />
+                  <%= f.submit t("wizard.import_gform_submit"),
+                        formaction: import_google_form_survey_path,
+                        formnovalidate: true,
+                        data: { generating_import: "", turbo_submits_with: t("wizard.importing_gform") },
+                        style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
+                <% else %>
+                  <%= link_to t("wizard.import_gform_connect"), google_connect_path(return_to: "import"),
+                        style: "align-self:flex-start;text-decoration:none;background:#fff;color:#1C2034;border:1px solid rgba(0,0,0,0.16);border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;" %>
+                <% end %>
+              </div>
+            </details>
           </div>
         </div>
       </section>
@@ -582,7 +607,7 @@
               data-create-wizard-target="back"
               data-action="click->create-wizard#back"><%= t("wizard.back") %></button>
 
-      <span class="preview-progress-text" data-create-wizard-target="counter"><%= t("wizard.step_counter", n: 1, total: 7) %></span>
+      <span class="preview-progress-text" data-create-wizard-target="counter"><%= t("wizard.step_counter", n: 1, total: 8) %></span>
 
       <button type="button" class="preview-btn preview-btn-next"
               data-create-wizard-target="next"

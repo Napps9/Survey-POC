@@ -433,6 +433,16 @@ es:
     or_divider: o
     start_from_scratch_button: Empezar desde cero
     creating_blank: Creando…
+    create_button: "Crear"
+    create_menu_title: "¿Qué quieres crear?"
+    create_menu_impact: "Medición de impacto"
+    create_menu_impact_desc: "Un Verto redactado por IA a partir de tu brief — el flujo guiado completo."
+    create_menu_quiz: "Quiz"
+    create_menu_quiz_desc: "Respuestas calificadas y una puntuación que los participantes pueden comparar."
+    create_menu_form: "Formulario"
+    create_menu_form_desc: "Un cuestionario sencillo — importa un formulario de Google o empieza desde cero."
+    create_menu_template: "Plantilla"
+    create_menu_template_desc: "Empieza desde un mazo ya preparado."
     stat_live: Activos
     stat_drafts: Borradores
     stat_responses: Respuestas
@@ -463,8 +473,9 @@ es:
     - Quién responde
     - Qué quieres aprender
     - Idiomas
-    - Colores de marca
     - Contexto (opcional)
+    - Colores de marca
+    - "Tus propias preguntas (opcional)"
     welcome_badge: Nuevo Verto
     welcome_title: Creemos tu Verto.
     welcome_sub: Convertiremos tu brief en un Verto que sigue las reglas de Playverto.
@@ -567,6 +578,15 @@ es:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Paso 07 · Tus preguntas"
+    s8_lead: "¿Ya tienes tus preguntas?"
+    s8_body: "Pégalas, importa un PDF o trae un formulario de Google — asignaremos a cada una su mejor tipo de respuesta. O sáltate este paso y deja que Verto las escriba a partir de tu brief."
+    s8_title: "¿Tienes tus propias preguntas?"
+    s8_hint: "Totalmente opcional — pulsa Generar y las escribiremos a partir de tu brief."
+    manual_questions_placeholder: "Pega o escribe tus preguntas, una por línea…"
+    import_manual_submit: "Usar estas preguntas →"
+    importing_manual: "Leyendo tus preguntas…"
+    quiz_preset_badge: "Quiz"
     step_counter: Paso %{n} de %{total}
   templates:
     eyebrow: Plantillas

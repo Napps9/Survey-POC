@@ -433,6 +433,16 @@ pl:
     or_divider: lub
     start_from_scratch_button: Zacznij od zera
     creating_blank: Tworzenie…
+    create_button: "Utwórz"
+    create_menu_title: "Co chcesz utworzyć?"
+    create_menu_impact: "Pomiar wpływu"
+    create_menu_impact_desc: "Verto napisane przez AI na podstawie Twojego briefu — pełny proces z przewodnikiem."
+    create_menu_quiz: "Quiz"
+    create_menu_quiz_desc: "Oceniane odpowiedzi i wynik, który respondenci mogą porównać."
+    create_menu_form: "Formularz"
+    create_menu_form_desc: "Prosty kwestionariusz — zaimportuj Formularz Google lub zacznij od zera."
+    create_menu_template: "Szablon"
+    create_menu_template_desc: "Zacznij od gotowej talii."
     stat_live: Na żywo
     stat_drafts: Wersje robocze
     stat_responses: Odpowiedzi
@@ -463,8 +473,9 @@ pl:
     - Kto odpowiada
     - Czego chcesz się dowiedzieć
     - Języki
-    - Kolory marki
     - Kontekst (opcjonalnie)
+    - Kolory marki
+    - "Twoje własne pytania (opcjonalnie)"
     welcome_badge: Nowe Verto
     welcome_title: Stwórzmy Twoje Verto.
     welcome_sub: Zamienimy Twój brief w Verto zgodne z zasadami Playverto.
@@ -567,6 +578,15 @@ pl:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Krok 07 · Twoje pytania"
+    s8_lead: "Masz już swoje pytania?"
+    s8_body: "Wklej je, zaimportuj PDF lub pobierz Formularz Google — dopasujemy każdemu najlepszy typ odpowiedzi. Możesz też pominąć ten krok i pozwolić Verto napisać je na podstawie briefu."
+    s8_title: "Masz własne pytania?"
+    s8_hint: "Całkowicie opcjonalne — kliknij Generuj, a napiszemy je na podstawie briefu."
+    manual_questions_placeholder: "Wklej lub wpisz pytania, po jednym w wierszu…"
+    import_manual_submit: "Użyj tych pytań →"
+    importing_manual: "Czytamy Twoje pytania…"
+    quiz_preset_badge: "Quiz"
     step_counter: Krok %{n} z %{total}
   templates:
     eyebrow: Szablony

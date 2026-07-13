@@ -433,6 +433,16 @@ vi:
     or_divider: hoặc
     start_from_scratch_button: Bắt đầu từ đầu
     creating_blank: Đang tạo…
+    create_button: "Tạo"
+    create_menu_title: "Bạn muốn tạo gì?"
+    create_menu_impact: "Đo lường tác động"
+    create_menu_impact_desc: "Một Verto do AI soạn từ bản tóm tắt của bạn — quy trình hướng dẫn đầy đủ."
+    create_menu_quiz: "Quiz"
+    create_menu_quiz_desc: "Câu trả lời được chấm điểm và điểm số để người tham gia so sánh."
+    create_menu_form: "Biểu mẫu"
+    create_menu_form_desc: "Bảng câu hỏi đơn giản — nhập Google Form hoặc bắt đầu từ đầu."
+    create_menu_template: "Mẫu"
+    create_menu_template_desc: "Bắt đầu từ bộ thẻ có sẵn."
     stat_live: Trực tiếp
     stat_drafts: Bản nháp
     stat_responses: Phản hồi
@@ -463,8 +473,9 @@ vi:
     - Ai đang trả lời
     - Bạn muốn tìm hiểu gì
     - Ngôn ngữ
-    - Màu sắc thương hiệu
     - Bối cảnh (tùy chọn)
+    - Màu sắc thương hiệu
+    - "Câu hỏi riêng của bạn (tùy chọn)"
     welcome_badge: Verto mới
     welcome_title: Hãy cùng xây dựng Verto của bạn.
     welcome_sub: Chúng tôi sẽ biến bản tóm tắt của bạn thành một Verto tuân theo các quy tắc của Playverto.
@@ -567,6 +578,15 @@ vi:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Bước 07 · Câu hỏi của bạn"
+    s8_lead: "Bạn đã có sẵn câu hỏi?"
+    s8_body: "Dán vào, nhập PDF hoặc kéo Google Form về — chúng tôi sẽ ghép mỗi câu hỏi với kiểu trả lời phù hợp nhất. Hoặc bỏ qua bước này và để Verto viết từ bản tóm tắt của bạn."
+    s8_title: "Bạn có câu hỏi riêng?"
+    s8_hint: "Hoàn toàn tùy chọn — nhấn Tạo và chúng tôi sẽ viết từ bản tóm tắt của bạn."
+    manual_questions_placeholder: "Dán hoặc nhập câu hỏi, mỗi dòng một câu…"
+    import_manual_submit: "Dùng những câu hỏi này →"
+    importing_manual: "Đang đọc câu hỏi của bạn…"
+    quiz_preset_badge: "Quiz"
     step_counter: Bước %{n} / %{total}
   templates:
     eyebrow: Mẫu

@@ -433,6 +433,16 @@ uk:
     or_divider: або
     start_from_scratch_button: Почати з нуля
     creating_blank: Створення…
+    create_button: "Створити"
+    create_menu_title: "Що ви хочете створити?"
+    create_menu_impact: "Оцінка впливу"
+    create_menu_impact_desc: "Verto, складений ШІ за вашим брифом — повний покроковий процес."
+    create_menu_quiz: "Квіз"
+    create_menu_quiz_desc: "Оцінювані відповіді та результат, який учасники можуть порівняти."
+    create_menu_form: "Форма"
+    create_menu_form_desc: "Простий опитувальник — імпортуйте Google Форму або почніть з нуля."
+    create_menu_template: "Шаблон"
+    create_menu_template_desc: "Почніть із готової колоди."
     stat_live: Активні
     stat_drafts: Чернетки
     stat_responses: Відповіді
@@ -463,8 +473,9 @@ uk:
     - Хто відповідає
     - Що ви хочете дізнатися
     - Мови
-    - Фірмові кольори
     - Контекст (необов'язково)
+    - Фірмові кольори
+    - "Ваші власні запитання (необов'язково)"
     welcome_badge: Новий Verto
     welcome_title: Давайте побудуємо ваш Verto.
     welcome_sub: Ми перетворимо ваш бриф на Verto за правилами Playverto.
@@ -567,6 +578,15 @@ uk:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Крок 07 · Ваші запитання"
+    s8_lead: "Запитання вже готові?"
+    s8_body: "Вставте їх, імпортуйте PDF або підтягніть Google Форму — кожному запитанню ми доберемо найкращий тип відповіді. Або пропустіть цей крок, і Verto напише їх за вашим брифом."
+    s8_title: "Маєте власні запитання?"
+    s8_hint: "Цілком необов'язково — натисніть «Згенерувати», і ми напишемо їх за вашим брифом."
+    manual_questions_placeholder: "Вставте або введіть запитання, по одному в рядку…"
+    import_manual_submit: "Використати ці запитання →"
+    importing_manual: "Читаємо ваші запитання…"
+    quiz_preset_badge: "Квіз"
     step_counter: Крок %{n} з %{total}
   templates:
     eyebrow: Шаблони

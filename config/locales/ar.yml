@@ -433,6 +433,16 @@ ar:
     or_divider: أو
     start_from_scratch_button: البدء من الصفر
     creating_blank: جارٍ الإنشاء…
+    create_button: "إنشاء"
+    create_menu_title: "ماذا تريد أن تنشئ؟"
+    create_menu_impact: "قياس الأثر"
+    create_menu_impact_desc: "‏Verto تصيغه الذكاء الاصطناعي من موجزك — المسار الموجّه الكامل."
+    create_menu_quiz: "اختبار"
+    create_menu_quiz_desc: "إجابات مقيّمة ونتيجة يمكن للمشاركين مقارنتها."
+    create_menu_form: "نموذج"
+    create_menu_form_desc: "استبيان بسيط — استورد نموذج Google أو ابدأ من الصفر."
+    create_menu_template: "قالب"
+    create_menu_template_desc: "ابدأ من مجموعة جاهزة."
     stat_live: مباشر
     stat_drafts: مسودات
     stat_responses: الردود
@@ -463,8 +473,9 @@ ar:
     - من سيُجيب
     - ما الذي تريد معرفته
     - اللغات
-    - ألوان العلامة التجارية
     - السياق (اختياري)
+    - ألوان العلامة التجارية
+    - "أسئلتك الخاصة (اختياري)"
     welcome_badge: Verto جديد
     welcome_title: لنبني Verto الخاص بك.
     welcome_sub: سنحوّل موجزك إلى Verto يتبع قواعد Playverto.
@@ -567,6 +578,15 @@ ar:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "الخطوة 07 · أسئلتك"
+    s8_lead: "هل أسئلتك جاهزة؟"
+    s8_body: "ألصقها أو استورد PDF أو اجلب نموذج Google — وسنطابق كل سؤال مع أفضل نوع إجابة. أو تجاوز هذه الخطوة ودع Verto يكتبها من موجزك."
+    s8_title: "هل لديك أسئلتك الخاصة؟"
+    s8_hint: "اختياري تمامًا — اضغط «إنشاء» وسنكتبها من موجزك."
+    manual_questions_placeholder: "ألصق أسئلتك أو اكتبها، سؤالًا في كل سطر…"
+    import_manual_submit: "استخدام هذه الأسئلة ←"
+    importing_manual: "نقرأ أسئلتك…"
+    quiz_preset_badge: "اختبار"
     step_counter: الخطوة %{n} من %{total}
   templates:
     eyebrow: القوالب

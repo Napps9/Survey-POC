@@ -29,9 +29,9 @@
 
 <div style="display:flex;min-height:100vh;background:#1C2034;">
   <div style="flex:1;display:flex;flex-direction:column;min-width:0;"
-       data-controller="google-form-import"
-       data-google-form-import-reopen-value="<%= open_google_form_modal %>"
-       data-action="keydown.esc@window->google-form-import#closeOnEsc">
+       data-controller="create-menu"
+       data-create-menu-reopen-value="<%= open_google_form_modal %>"
+       data-action="keydown.esc@window->create-menu#closeOnEsc">
 
     <%# ── Hero ── %>
     <div style="position:relative;overflow:hidden;padding:32px 36px 40px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
@@ -61,36 +61,80 @@
 
           <% if @surveys.any? %>
             <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-              <%= link_to survey_templates_path,
-                    style: "display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;text-decoration:none;" do %>
-                <span style="font-size:16px;line-height:1;">▚</span> <%= t("templates.start_button") %>
-              <% end %>
-              <button type="button" data-action="click->google-form-import#open"
-                    style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;cursor:pointer;">
-                <span style="font-size:16px;line-height:1;">▤</span> <%= t("dashboard.import_google_form_button") %>
+              <button type="button" data-action="click->create-menu#open"
+                    style="display:inline-flex;align-items:center;gap:8px;background:#01EACB;border:none;border-radius:100px;padding:12px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(1,234,203,0.28);cursor:pointer;">
+                <span style="font-size:18px;line-height:1;">+</span> <%= t("dashboard.create_button") %>
               </button>
-              <%= link_to new_survey_path,
-                    style: "display:inline-flex;align-items:center;gap:8px;background:#01EACB;border:none;border-radius:100px;padding:12px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(1,234,203,0.28);text-decoration:none;" do %>
-                <span style="font-size:18px;line-height:1;">+</span> <%= t("dashboard.create_new") %>
-              <% end %>
             </div>
           <% end %>
         </div>
       </div>
     </div>
 
-    <%# ── "Create a Form" modal — its own peer flow next to "Start from a
-        template" and "+ Create a new Verto", not a detour into the generic
-        wizard. Posts straight to the existing import_google_form endpoint;
-        source=dashboard tells the controller to send errors (and a
-        Connect-Google round trip) back here instead of the wizard. ── %>
-    <div data-google-form-import-target="modal" class="app-modal hidden">
-      <div class="app-modal__backdrop" data-action="click->google-form-import#close"></div>
-      <div class="app-modal__panel" style="max-width:440px;">
-        <div style="padding:26px 26px 24px;">
+    <%# ── "+ Create" popup — the one place every creation flow starts. Level 1
+        is a chooser (Impact Measurement / Quiz / Form / Template); the Form
+        tile slides to level 2, the existing Google-Form import +
+        start-from-scratch flow. source=dashboard on the import form tells the
+        controller to send errors (and a Connect-Google round trip) back here,
+        where the reopen value lands straight in the Form panel. ── %>
+    <div data-create-menu-target="modal" class="app-modal hidden">
+      <div class="app-modal__backdrop" data-action="click->create-menu#close"></div>
+      <div class="app-modal__panel" style="max-width:460px;">
+
+        <%# Level 1 — what do you want to create? %>
+        <div data-create-menu-target="chooser" style="padding:26px 26px 24px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
+            <div style="font-family:'Alata',sans-serif;font-size:19px;color:#1C2034;line-height:1.25;"><%= t("dashboard.create_menu_title") %></div>
+            <button type="button" data-action="click->create-menu#close" aria-label="Close"
+                    style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(0,0,0,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <%
+              tile_style = "display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;border-radius:14px;background:#fafbfc;border:1.5px solid rgba(0,0,0,0.1);cursor:pointer;text-align:left;text-decoration:none;box-sizing:border-box;"
+              tile_name  = "font-family:'Alata',sans-serif;font-size:15px;color:#1C2034;line-height:1.2;"
+              tile_desc  = "font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(0,0,0,0.5);margin-top:2px;line-height:1.4;"
+              tile_icon  = "display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:11px;font-size:17px;flex-shrink:0;"
+            %>
+            <%= link_to new_survey_path, style: tile_style do %>
+              <span style="<%= tile_icon %>background:rgba(1,234,203,0.14);border:1px solid rgba(1,234,203,0.3);">📊</span>
+              <span style="flex:1;min-width:0;">
+                <span style="display:block;<%= tile_name %>"><%= t("dashboard.create_menu_impact") %></span>
+                <span style="display:block;<%= tile_desc %>"><%= t("dashboard.create_menu_impact_desc") %></span>
+              </span>
+            <% end %>
+            <%= link_to new_survey_path(quiz: 1), style: tile_style do %>
+              <span style="<%= tile_icon %>background:rgba(97,91,245,0.12);border:1px solid rgba(97,91,245,0.3);">🎯</span>
+              <span style="flex:1;min-width:0;">
+                <span style="display:block;<%= tile_name %>"><%= t("dashboard.create_menu_quiz") %></span>
+                <span style="display:block;<%= tile_desc %>"><%= t("dashboard.create_menu_quiz_desc") %></span>
+              </span>
+            <% end %>
+            <button type="button" data-action="click->create-menu#openForm" style="<%= tile_style %>">
+              <span style="<%= tile_icon %>background:rgba(12,167,255,0.12);border:1px solid rgba(12,167,255,0.3);">▤</span>
+              <span style="flex:1;min-width:0;">
+                <span style="display:block;<%= tile_name %>"><%= t("dashboard.create_menu_form") %></span>
+                <span style="display:block;<%= tile_desc %>"><%= t("dashboard.create_menu_form_desc") %></span>
+              </span>
+            </button>
+            <%= link_to survey_templates_path, style: tile_style do %>
+              <span style="<%= tile_icon %>background:rgba(255,250,119,0.16);border:1px solid rgba(255,250,119,0.4);">▚</span>
+              <span style="flex:1;min-width:0;">
+                <span style="display:block;<%= tile_name %>"><%= t("dashboard.create_menu_template") %></span>
+                <span style="display:block;<%= tile_desc %>"><%= t("dashboard.create_menu_template_desc") %></span>
+              </span>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Level 2 — the Form flow (Google import / start from scratch). %>
+        <div data-create-menu-target="formPanel" class="hidden" style="padding:26px 26px 24px;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
-            <div style="font-family:'Alata',sans-serif;font-size:19px;color:#1C2034;line-height:1.25;"><%= t("dashboard.import_google_form_button") %></div>
-            <button type="button" data-action="click->google-form-import#close" aria-label="Close"
+            <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+              <button type="button" data-action="click->create-menu#back" aria-label="Back"
+                      style="background:none;border:none;cursor:pointer;font-size:16px;color:rgba(0,0,0,0.45);line-height:1;padding:2px;flex-shrink:0;">←</button>
+              <div style="font-family:'Alata',sans-serif;font-size:19px;color:#1C2034;line-height:1.25;"><%= t("dashboard.create_menu_form") %></div>
+            </div>
+            <button type="button" data-action="click->create-menu#close" aria-label="Close"
                     style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(0,0,0,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
           </div>
           <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);line-height:1.5;margin:0 0 18px;"><%= t("dashboard.import_google_form_modal_subtitle") %></p>
@@ -104,7 +148,7 @@
               <input type="hidden" name="source" value="dashboard" />
               <input type="url" name="google_form_url" required
                      placeholder="<%= t('wizard.import_gform_url_placeholder') %>"
-                     data-google-form-import-target="urlInput"
+                     data-create-menu-target="urlInput"
                      style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);padding:12px 14px;border-radius:10px;border:1px solid rgba(0,0,0,0.16);background:#fafbfc;width:100%;box-sizing:border-box;margin-bottom:12px;" />
               <%= submit_tag t("wizard.import_gform_submit"),
                     data: { turbo_submits_with: t("wizard.importing_gform") },
@@ -126,6 +170,7 @@
                 data: { turbo_submits_with: t("dashboard.creating_blank") },
                 style: "width:100%;background:transparent;color:#1C2034;border:1px solid rgba(0,0,0,0.16);border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;cursor:pointer;" %>
         </div>
+
       </div>
     </div>
 
@@ -166,12 +211,8 @@
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;">
-            <%= link_to t("dashboard.empty_cta"), new_survey_path,
-                  style: "padding:12px 26px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
-            <%= link_to t("templates.browse"), survey_templates_path,
-                  style: "padding:12px 26px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
-            <button type="button" data-action="click->google-form-import#open"
-                  style="padding:12px 26px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;"><%= t("dashboard.import_google_form_button") %></button>
+            <button type="button" data-action="click->create-menu#open"
+                  style="padding:12px 26px;border-radius:100px;background:#01EACB;color:#1C2034;border:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;"><%= t("dashboard.empty_cta") %></button>
           </div>
         </div>
 

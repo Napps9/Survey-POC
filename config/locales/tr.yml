@@ -433,6 +433,16 @@ tr:
     or_divider: veya
     start_from_scratch_button: Sıfırdan başla
     creating_blank: Oluşturuluyor…
+    create_button: "Oluştur"
+    create_menu_title: "Ne oluşturmak istiyorsun?"
+    create_menu_impact: "Etki Ölçümü"
+    create_menu_impact_desc: "Brief'inden yapay zekânın taslağını çıkardığı bir Verto — eksiksiz rehberli akış."
+    create_menu_quiz: "Quiz"
+    create_menu_quiz_desc: "Puanlanan yanıtlar ve katılımcıların karşılaştırabileceği bir skor."
+    create_menu_form: "Form"
+    create_menu_form_desc: "Sade bir anket — bir Google Formu içe aktar ya da sıfırdan başla."
+    create_menu_template: "Şablon"
+    create_menu_template_desc: "Hazır bir desteyle başla."
     stat_live: Canlı
     stat_drafts: Taslaklar
     stat_responses: Yanıtlar
@@ -463,8 +473,9 @@ tr:
     - Kimler yanıtlıyor
     - Ne öğrenmek istiyorsunuz
     - Diller
-    - Marka renkleri
     - Bağlam (isteğe bağlı)
+    - Marka renkleri
+    - "Kendi soruların (isteğe bağlı)"
     welcome_badge: Yeni Verto
     welcome_title: Verto'nuzu oluşturalım.
     welcome_sub: Brief'inizi Playverto kurallarına uygun bir Verto'ya dönüştüreceğiz.
@@ -567,6 +578,15 @@ tr:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Adım 07 · Kendi soruların"
+    s8_lead: "Soruların hazır mı?"
+    s8_body: "Yapıştır, PDF içe aktar ya da bir Google Formu getir — her soruya en uygun yanıt türünü eşleştiririz. Ya da bu adımı atla, Verto soruları brief'inden yazsın."
+    s8_title: "Kendi soruların var mı?"
+    s8_hint: "Tamamen isteğe bağlı — Oluştur'a bas, soruları brief'inden biz yazalım."
+    manual_questions_placeholder: "Sorularını yapıştır ya da yaz, her satıra bir tane…"
+    import_manual_submit: "Bu soruları kullan →"
+    importing_manual: "Soruların okunuyor…"
+    quiz_preset_badge: "Quiz"
     step_counter: Adım %{n} / %{total}
   templates:
     eyebrow: Şablonlar

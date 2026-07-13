@@ -22,22 +22,11 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
     SurveyGenerator.singleton_class.remove_method(:new)
   end
 
-  test "the wizard asks for a Verto name and it becomes the title" do
+  test "the wizard asks for no name — the AI-written title names the Verto" do
     get new_survey_path
     assert_response :success
-    assert_match 'name="verto_name"', response.body
+    refute_match 'name="verto_name"', response.body, "the mandatory name field was removed"
 
-    with_fake_generator do
-      post generate_survey_path, params: {
-        verto_name: "Youth Wellbeing Check-in", theme: "T", audience_age: "a",
-        key_insight: "k", show_results_comparison: "0"
-      }
-    end
-    survey = @org.surveys.order(:id).last
-    assert_equal "Youth Wellbeing Check-in", survey.title
-  end
-
-  test "without a name the AI title is the fallback" do
     with_fake_generator do
       post generate_survey_path, params: {
         theme: "T", audience_age: "a", key_insight: "k", show_results_comparison: "0"
@@ -46,10 +35,32 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
     assert_equal "AI title", @org.surveys.order(:id).last.title
   end
 
+  test "the Create menu's quiz choice pre-sets the wizard's hidden quiz field" do
+    get new_survey_path(quiz: 1)
+    assert_response :success
+    assert_match 'name="quiz" value="1"', response.body
+    refute_match 'type="checkbox" name="quiz"', response.body, "quiz is decided up front, not a mid-wizard checkbox"
+
+    get new_survey_path
+    assert_match 'name="quiz" value="0"', response.body
+  end
+
+  test "the imports live together on the final card, not the first" do
+    get new_survey_path
+    assert_response :success
+    # All three own-questions doors point at their import endpoints…
+    assert_match 'name="manual_questions"', response.body
+    assert_match import_manual_survey_path, response.body
+    assert_match import_pdf_survey_path, response.body
+    # …and the Google-Form door sits with them (its connect link when Google
+    # isn't linked), not on the welcome card.
+    assert_match "Or import from a Google Form", response.body
+  end
+
   test "every generated Verto ends with the 3 set demographic questions" do
     with_fake_generator do
       post generate_survey_path, params: {
-        verto_name: "N", theme: "T", audience_age: "a", key_insight: "k", show_results_comparison: "0"
+        theme: "T", audience_age: "a", key_insight: "k", show_results_comparison: "0"
       }
     end
     survey = @org.surveys.order(:id).last
@@ -74,7 +85,7 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
     SurveyGenerator.define_singleton_method(:new) { |*| boom }
     begin
       post generate_survey_path, params: {
-        verto_name: "Commons only", theme: "T", audience_age: "a",
+        theme: "T", audience_age: "a",
         show_results_comparison: "0", common_question_ids: [ q.id ]
       }
     ensure
@@ -83,7 +94,7 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
 
     survey = @org.surveys.order(:id).last
     assert_redirected_to survey_path(survey)
-    assert_equal "Commons only", survey.title
+    assert_equal "T", survey.title, "with no AI generation the theme names the Verto"
     types = survey.cards.map { |c| c["type"] }
     assert_equal "welcome_card", types.first
     assert(survey.cards.any? { |c| c["common_question_id"] == q.id })
@@ -93,7 +104,7 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
   test "neither a learning goal nor common questions is rejected" do
     assert_no_difference -> { @org.surveys.count } do
       post generate_survey_path, params: {
-        verto_name: "N", theme: "T", audience_age: "a", show_results_comparison: "0"
+        theme: "T", audience_age: "a", show_results_comparison: "0"
       }
     end
     assert_response :unprocessable_entity
@@ -103,7 +114,7 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
   test "the birth demographic renders as a month+year picker in the player" do
     with_fake_generator do
       post generate_survey_path, params: {
-        verto_name: "N", theme: "T", audience_age: "a", key_insight: "k", show_results_comparison: "0"
+        theme: "T", audience_age: "a", key_insight: "k", show_results_comparison: "0"
       }
     end
     survey = @org.surveys.order(:id).last

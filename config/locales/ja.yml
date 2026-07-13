@@ -433,6 +433,16 @@ ja:
     or_divider: または
     start_from_scratch_button: ゼロから作成
     creating_blank: 作成中…
+    create_button: "作成"
+    create_menu_title: "何を作成しますか?"
+    create_menu_impact: "インパクト測定"
+    create_menu_impact_desc: "ブリーフからAIが下書きするVerto — フルガイド付きフロー。"
+    create_menu_quiz: "クイズ"
+    create_menu_quiz_desc: "採点付きの回答と、回答者が比較できるスコア。"
+    create_menu_form: "フォーム"
+    create_menu_form_desc: "シンプルなアンケート — Googleフォームをインポートするか、ゼロから作成。"
+    create_menu_template: "テンプレート"
+    create_menu_template_desc: "既製のデッキから始める。"
     stat_live: ライブ
     stat_drafts: 下書き
     stat_responses: 回答数
@@ -463,8 +473,9 @@ ja:
     - 回答者について
     - 学びたいこと
     - 言語
-    - ブランドカラー
     - コンテキスト（任意）
+    - ブランドカラー
+    - "自分の質問(任意)"
     welcome_badge: 新しいVerto
     welcome_title: Vertoを作りましょう。
     welcome_sub: ブリーフをPlayvertoのルールに沿ったVertoに変換します。
@@ -567,6 +578,15 @@ ja:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "ステップ07 · あなたの質問"
+    s8_lead: "質問はもうお手元に?"
+    s8_body: "貼り付け、PDFのインポート、Googleフォームの取り込みに対応 — 各質問に最適な回答タイプを割り当てます。このステップを飛ばして、ブリーフからVertoに書かせることもできます。"
+    s8_title: "自分の質問はありますか?"
+    s8_hint: "完全に任意です — 「生成」を押せばブリーフから作成します。"
+    manual_questions_placeholder: "質問を貼り付けるか入力してください(1行に1問)…"
+    import_manual_submit: "この質問を使う →"
+    importing_manual: "質問を読み取っています…"
+    quiz_preset_badge: "クイズ"
     step_counter: "%{total}ステップ中 %{n}"
   templates:
     eyebrow: テンプレート

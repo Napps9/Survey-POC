@@ -433,6 +433,16 @@ it:
     or_divider: o
     start_from_scratch_button: Inizia da zero
     creating_blank: Creazione…
+    create_button: "Crea"
+    create_menu_title: "Cosa vuoi creare?"
+    create_menu_impact: "Misurazione d'impatto"
+    create_menu_impact_desc: "Un Verto scritto dall'IA dal tuo brief — il percorso guidato completo."
+    create_menu_quiz: "Quiz"
+    create_menu_quiz_desc: "Risposte valutate e un punteggio che i partecipanti possono confrontare."
+    create_menu_form: "Modulo"
+    create_menu_form_desc: "Un questionario semplice — importa un modulo Google o parti da zero."
+    create_menu_template: "Modello"
+    create_menu_template_desc: "Parti da un mazzo già pronto."
     stat_live: Live
     stat_drafts: Bozze
     stat_responses: Risposte
@@ -463,8 +473,9 @@ it:
     - Chi risponde
     - Cosa vuoi scoprire
     - Lingue
-    - Colori del brand
     - Contesto (opzionale)
+    - Colori del brand
+    - "Le tue domande (facoltativo)"
     welcome_badge: Nuovo Verto
     welcome_title: Costruiamo il tuo Verto.
     welcome_sub: Trasformeremo il tuo brief in un Verto che segue le regole di Playverto.
@@ -567,6 +578,15 @@ it:
     import_gform_submit: "Import from Google Forms →"
     import_gform_connect: "Connect Google to import a Form →"
     importing_gform: "Reading your Google Form…"
+    s8_eyebrow: "Passo 07 · Le tue domande"
+    s8_lead: "Hai già le tue domande?"
+    s8_body: "Incollale, importa un PDF o recupera un modulo Google — abbineremo a ciascuna il tipo di risposta migliore. Oppure salta questo passo e lascia che Verto le scriva dal tuo brief."
+    s8_title: "Hai le tue domande?"
+    s8_hint: "Del tutto facoltativo — premi Genera e le scriveremo dal tuo brief."
+    manual_questions_placeholder: "Incolla o digita le tue domande, una per riga…"
+    import_manual_submit: "Usa queste domande →"
+    importing_manual: "Lettura delle tue domande…"
+    quiz_preset_badge: "Quiz"
     step_counter: Passo %{n} di %{total}
   templates:
     eyebrow: Modelli
