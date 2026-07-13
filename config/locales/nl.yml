@@ -190,33 +190,33 @@ nl:
     wizard:
       step_counter: Stap %{n} van %{total}
   nav:
-    alliances: "Collectieve Impact"
+    partnerships: "Partners"
     shared_vertos: Gedeelde Vertos
     my_vertos: Mijn Vertos
     create: Aanmaken
     members: Leden
     sign_out: Uitloggen
-  alliances:
+  partnerships:
     cq_section: "Gemeenschappelijke vragen"
-    cq_add_body: "Kies een van je vragensets — elke partner in deze alliantie kan de vragen zien."
+    cq_add_body: "Kies een van je vragensets — elke partner in dit partnerschap kan de vragen zien."
     cq_add_submit: "Set delen →"
     cq_no_more: "Geen vragensets meer om te delen."
     cq_create_new: "Set maken →"
     cq_empty_title: "Nog geen gemeenschappelijke vragen gedeeld"
     cq_empty_body: "Deel hierboven een vragenset en elke partner ziet de vragen."
-    cq_remove_confirm: "“%{name}” uit deze alliantie verwijderen? Partners zien de vragen dan niet meer."
+    cq_remove_confirm: "“%{name}” uit dit partnerschap verwijderen? Partners zien de vragen dan niet meer."
     cq_partner_section: "Gemeenschappelijke vragen met jou gedeeld"
     cq_partner_empty_title: "Nog geen gemeenschappelijke vragen"
     cq_partner_empty_body: "Wanneer %{org} een vragenset deelt, verschijnen de vragen hier."
-    title: "Collectieve Impact — Playverto"
-    index_eyebrow: Jouw allianties
-    index_heading: "Collectieve Impact"
-    index_subtitle: Groepeer partnerorganisaties in benoemde allianties. Voeg Vertos toe en elke partner krijgt een eigen deellink.
-    new_button: "+ Nieuwe alliantie"
-    owned_section: Allianties die jij beheert
-    owned_empty_title: Nog geen allianties
-    owned_empty_admin_html: Klik hierboven op <span style="color:#FF1E6F;">+ Nieuwe alliantie</span> om een groep te starten, nodig vervolgens partnerorganisaties uit en voeg Vertos toe.
-    owned_empty_member: Vraag je beheerder om een alliantie aan te maken.
+    title: "Partners — Playverto"
+    index_eyebrow: Jouw partnerschappen
+    index_heading: "Partners"
+    index_subtitle: Groepeer partnerorganisaties in benoemhet partnerschaps. Voeg Vertos toe en elke partner krijgt een eigen deellink.
+    new_button: "+ Nieuw partnerschap"
+    owned_section: Partnerschappen die jij beheert
+    owned_empty_title: Nog geen partnerschappen
+    owned_empty_admin_html: Klik hierboven op <span style="color:#FF1E6F;">+ Nieuw partnerschap</span> om een groep te starten, nodig vervolgens partnerorganisaties uit en voeg Vertos toe.
+    owned_empty_member: Vraag je beheerder om een partnerschap aan te maken.
     started_on: Gestart %{date}
     partners_count:
       one: partner
@@ -225,43 +225,43 @@ nl:
       one: verto
       other: vertos
     open: Openen →
-    member_section: Allianties waarvan je lid bent
-    member_empty_title: Je bent niet uitgenodigd voor allianties
-    member_empty_body: Als een andere organisatie je uitnodigt voor een van hun allianties, verschijnt dat hier.
+    member_section: Partnerschappen waarvan je lid bent
+    member_empty_title: Je bent niet uitgenodigd voor partnerschappen
+    member_empty_body: Als een andere organisatie je uitnodigt voor een van hun partnerschappen, verschijnt dat hier.
     member_run_by: Beheerd door %{org}
     status:
       active: Actief
       pending: In afwachting
       revoked: Ingetrokken
-    new_title: Nieuwe alliantie — Playverto
-    new_eyebrow: Nieuwe alliantie
-    new_heading: Geef je alliantie een naam
+    new_title: Nieuw partnerschap — Playverto
+    new_eyebrow: Nieuw partnerschap
+    new_heading: Geef je partnerschap een naam
     new_sub: Geef de groep een duidelijke naam zodat partners weten waaraan ze deelnemen.
-    name_label: Naam alliantie
+    name_label: Naam partnerschap
     name_placeholder: bijv. Pilot Partners
     cancel: Annuleren
-    create_submit: Alliantie aanmaken →
-    show_title: "%{name} — Collectieve Impact"
-    back_to_all: Alle allianties
-    creator_eyebrow: Alliantie · Jij beheert deze
-    partner_eyebrow: Alliantie · Lid
+    create_submit: Partnerschap aanmaken →
+    show_title: "%{name} — Partners"
+    back_to_all: Alle partnerschappen
+    creator_eyebrow: Partnerschap · Jij beheert dit
+    partner_eyebrow: Partnerschap · Lid
     generate_link: Deelnamelink genereren →
     delete: Verwijderen
-    delete_confirm: "%{name} verwijderen? Alle deellinks voor deze alliantie zullen niet meer werken."
+    delete_confirm: "%{name} verwijderen? Alle deellinks voor dit partnerschap zullen niet meer werken."
     new_link_heading: Nieuwe deelnamelink
-    new_link_body: Iedereen met deze link kan zich aansluiten bij %{alliance} als partner. Verloopt over 14 dagen.
+    new_link_body: Iedereen met deze link kan zich aansluiten bij %{partnership} als partner. Verloopt over 14 dagen.
     copy: Kopiëren
     copied: Gekopieerd!
     partners_section: Partners
     no_partners_title: Nog geen partners
     no_partners_body_html: Gebruik hierboven <span style="color:#FF1E6F;">Deelnamelink genereren</span> om partnerorganisaties uit te nodigen.
     joined_on: Aangesloten op %{date}
-    remove_member_confirm: "%{org} verwijderen uit %{alliance}? Hun deellinks zullen niet meer werken."
-    vertos_section: Vertos in alliantie
+    remove_member_confirm: "%{org} verwijderen uit %{partnership}? Hun deellinks zullen niet meer werken."
+    vertos_section: Vertos in partnerschap
     no_vertos_title: Nog geen Vertos gedeeld
     no_vertos_body: Voeg hieronder een gepubliceerde Verto toe; voor elke partner wordt een unieke deellink gegenereerd.
     remove: Verwijderen
-    remove_verto_confirm: Deze Verto verwijderen uit %{alliance}? Alle bijbehorende deellinks van partners zullen niet meer werken.
+    remove_verto_confirm: Deze Verto verwijderen uit %{partnership}? Alle bijbehorende deellinks van partners zullen niet meer werken.
     completion_label: voltooiing
     responses:
       one: reactie
@@ -269,32 +269,32 @@ nl:
     partner_links_count:
       one: partnerlink
       other: partnerlinks
-    no_shares_yet: Voeg een partner toe aan de alliantie om deellinks te genereren.
+    no_shares_yet: Voeg een partner toe aan het partnerschap om deellinks te genereren.
     responses_short: "%{n} react."
-    add_section: Toevoegen aan alliantie
+    add_section: Toevoegen aan partnerschap
     add_heading: Nog een Verto toevoegen
-    add_body: Kies een gepubliceerde Verto. We genereren een unieke deellink voor elke partner in de alliantie.
+    add_body: Kies een gepubliceerde Verto. We genereren een unieke deellink voor elke partner in het partnerschap.
     no_more_vertos: Geen gepubliceerde Vertos meer om toe te voegen.
     create_new_verto: Nieuwe Verto aanmaken →
     add_submit: Verto toevoegen →
-    partners_in_alliance: Partners in alliantie
+    partners_in_partnership: Partners in partnerschap
     including_you: Jij inbegrepen
     shared_vertos_short: Gedeelde Vertos
     available_to_distribute: Beschikbaar om te verspreiden
     other_partners: Andere partners
-    only_partner: Je bent voorlopig de enige partner in deze alliantie.
+    only_partner: Je bent voorlopig de enige partner in dit partnerschap.
     your_vertos_section: Vertos die met jou zijn gedeeld
     partner_no_vertos_title: Nog geen Vertos
-    partner_no_vertos_body: Wanneer %{org} een Verto toevoegt aan deze alliantie, zie je hier je unieke deellink.
+    partner_no_vertos_body: Wanneer %{org} een Verto toevoegt aan dit partnerschap, zie je hier je unieke deellink.
     from_org: Van %{org}
     your_link: Jouw link
     results_link: Resultaten →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Gedeelde Verto"
-    from_org_alliance: Van %{org} · %{alliance}
+    from_org_partnership: Van %{org} · %{partnership}
     share_link: Deellink
     mine_label: via jouw link
-    aggregate_label: over heel %{alliance}
+    aggregate_label: over heel %{partnership}
     card_n: Kaart %{n}
     my_results: Mijn resultaten
     aggregate: Totaal
@@ -310,19 +310,19 @@ nl:
     expired_title: Uitnodiging verlopen
     expired_body: Deze link is ouder dan 7 dagen. Vraag je beheerder om een nieuwe te sturen.
     invited_to_join: Je bent uitgenodigd om deel te nemen aan
-    alliance_by: een alliantie van %{org}
+    partnership_by: een partnerschap van %{org}
     as_role: als %{role}
     addressed_for: "· voor %{email}"
     signed_in_as: Ingelogd als %{name}
     join_with: Deelnemen met
     pick_org: Kies welke organisatie deelneemt
-    join_submit: Deelnemen aan %{alliance} →
-    already_in_alliance: 'Al in deze alliantie: %{orgs}'
-    you_run_this: Jij beheert deze alliantie — bezoek hem in plaats daarvan.
-    already_member_singular: "%{orgs} zit al in deze alliantie."
-    already_member_plural: "%{orgs} zitten al in deze alliantie."
-    no_admin_org: Je hebt geen beheerorganisatie die zich bij deze alliantie kan aansluiten.
-    open_alliance: "%{alliance} openen →"
+    join_submit: Deelnemen aan %{partnership} →
+    already_in_partnership: 'Al in dit partnerschap: %{orgs}'
+    you_run_this: Jij beheert dit partnerschap — bezoek het in plaats daarvan.
+    already_member_singular: "%{orgs} zit al in dit partnerschap."
+    already_member_plural: "%{orgs} zitten al in dit partnerschap."
+    no_admin_org: Je hebt geen beheerorganisatie die zich bij dit partnerschap kan aansluiten.
+    open_partnership: "%{partnership} openen →"
     sign_out_link: Uitloggen en een ander account gebruiken
     sign_out_confirm: Uitloggen bij je huidige account?
     already_have_account: Heb je al een Playverto-account?
@@ -426,7 +426,7 @@ nl:
   dashboard:
     welcome_back: Welkom terug
     heading_html: Jouw <span style="color:#01EACB;">Vertos</span>
-    subtitle: Start Vertos op, deel ze met je alliantie en zie de inzichten binnenstromen.
+    subtitle: Start Vertos op, deel ze met je partnerschap en zie de inzichten binnenstromen.
     create_new: Een nieuwe Verto aanmaken
     import_google_form_button: Nieuw formulier maken
     import_google_form_modal_subtitle: Plak de link van een bestaand Google Form en we maken er een bewerkbare Verto van.

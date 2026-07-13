@@ -3,7 +3,7 @@
   org  = current_organisation
   mem  = current_membership
 
-  active_alliances = org && path.start_with?("/alliances")
+  active_partnerships = org && path.start_with?("/partnerships")
   active_results   = path == "/"
   active_create    = org && path == new_survey_path
 %>
@@ -18,9 +18,9 @@
 
   <div class="bottom-bar-centre">
     <% if org %>
-      <a href="<%= alliances_path %>" class="bottom-bar-chip" data-active="<%= active_alliances %>">
+      <a href="<%= partnerships_path %>" class="bottom-bar-chip" data-active="<%= active_partnerships %>">
         <span class="bottom-bar-chip-dot" style="background:#FF1E6F;"></span>
-        <%= t("nav.alliances") %>
+        <%= t("nav.partnerships") %>
       </a>
     <% end %>
 

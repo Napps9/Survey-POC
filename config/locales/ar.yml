@@ -190,33 +190,33 @@ ar:
     wizard:
       step_counter: الخطوة %{n} من %{total}
   nav:
-    alliances: "الأثر الجماعي"
+    partnerships: "الشركاء"
     shared_vertos: فيرتوهات مشتركة
     my_vertos: فيرتوهاتي
     create: إنشاء
     members: الأعضاء
     sign_out: تسجيل الخروج
-  alliances:
+  partnerships:
     cq_section: "الأسئلة المشتركة"
-    cq_add_body: "اختر إحدى مجموعات أسئلتك — يمكن لكل شريك في هذا التحالف رؤية أسئلتها."
+    cq_add_body: "اختر إحدى مجموعات أسئلتك — يمكن لكل شريك في هذه الشراكة رؤية أسئلتها."
     cq_add_submit: "مشاركة المجموعة ←"
     cq_no_more: "لا توجد مجموعات أسئلة أخرى للمشاركة."
     cq_create_new: "إنشاء مجموعة ←"
     cq_empty_title: "لم تتم مشاركة أسئلة مشتركة بعد"
     cq_empty_body: "شارك مجموعة أسئلة أعلاه وسيراها كل الشركاء."
-    cq_remove_confirm: "إزالة «%{name}» من هذا التحالف؟ لن يرى الشركاء أسئلتها بعد الآن."
+    cq_remove_confirm: "إزالة «%{name}» من هذه الشراكة؟ لن يرى الشركاء أسئلتها بعد الآن."
     cq_partner_section: "الأسئلة المشتركة معك"
     cq_partner_empty_title: "لا توجد أسئلة مشتركة بعد"
     cq_partner_empty_body: "عندما يشارك %{org} مجموعة أسئلة، ستظهر أسئلتها هنا."
-    title: "الأثر الجماعي — Playverto"
-    index_eyebrow: تحالفاتك
-    index_heading: "الأثر الجماعي"
-    index_subtitle: اجمع المؤسسات الشريكة في تحالفات مُسماة. أضف Vertos ويحصل كل شريك على رابط مشاركة خاص به.
-    new_button: "+ تحالف جديد"
-    owned_section: التحالفات التي تديرها
-    owned_empty_title: لا توجد تحالفات بعد
-    owned_empty_admin_html: انقر فوق <span style="color:#FF1E6F;">+ تحالف جديد</span> أعلاه لبدء مجموعة، ثم ادعُ المؤسسات الشريكة وأضف Vertos.
-    owned_empty_member: اطلب من المسؤول لديك إنشاء تحالف.
+    title: "الشركاء — Playverto"
+    index_eyebrow: شراكاتك
+    index_heading: "الشركاء"
+    index_subtitle: اجمع المؤسسات الشريكة في شراكات مُسماة. أضف Vertos ويحصل كل شريك على رابط مشاركة خاص به.
+    new_button: "+ شراكة جديدة"
+    owned_section: الشراكات التي تديرها
+    owned_empty_title: لا توجد شراكات بعد
+    owned_empty_admin_html: انقر فوق <span style="color:#FF1E6F;">+ شراكة جديدة</span> أعلاه لبدء مجموعة، ثم ادعُ المؤسسات الشريكة وأضف Vertos.
+    owned_empty_member: اطلب من المسؤول لديك إنشاء شراكة.
     started_on: بدأ في %{date}
     partners_count:
       one: شريك
@@ -225,43 +225,43 @@ ar:
       one: verto
       other: vertos
     open: فتح ←
-    member_section: التحالفات التي أنت عضو فيها
-    member_empty_title: لم تتم دعوتك إلى أي تحالفات
-    member_empty_body: عندما تدعوك مؤسسة أخرى إلى أحد تحالفاتها، ستظهر هنا.
+    member_section: الشراكات التي أنت عضو فيها
+    member_empty_title: لم تتم دعوتك إلى أي شراكات
+    member_empty_body: عندما تدعوك مؤسسة أخرى إلى أحد شراكاتها، ستظهر هنا.
     member_run_by: تديره %{org}
     status:
       active: نشط
       pending: قيد الانتظار
       revoked: ملغى
-    new_title: تحالف جديد — Playverto
-    new_eyebrow: تحالف جديد
-    new_heading: اختر اسمًا لتحالفك
+    new_title: شراكة جديدة — Playverto
+    new_eyebrow: شراكة جديدة
+    new_heading: اختر اسمًا لشراكتك
     new_sub: امنح المجموعة اسمًا واضحًا حتى يعرف الشركاء ما الذي ينضمون إليه.
-    name_label: اسم التحالف
+    name_label: اسم الشراكة
     name_placeholder: 'مثال: الشركاء التجريبيون'
     cancel: إلغاء
-    create_submit: إنشاء التحالف ←
-    show_title: "%{name} — الأثر الجماعي"
-    back_to_all: جميع التحالفات
-    creator_eyebrow: تحالف · أنت تديره
-    partner_eyebrow: تحالف · عضو
+    create_submit: إنشاء الشراكة ←
+    show_title: "%{name} — الشركاء"
+    back_to_all: جميع الشراكات
+    creator_eyebrow: شراكة · أنت تديرها
+    partner_eyebrow: شراكة · عضو
     generate_link: إنشاء رابط الانضمام ←
     delete: حذف
-    delete_confirm: حذف %{name}؟ ستتوقف جميع روابط المشاركة لهذا التحالف عن العمل.
+    delete_confirm: حذف %{name}؟ ستتوقف جميع روابط المشاركة لهذه الشراكة عن العمل.
     new_link_heading: رابط انضمام جديد
-    new_link_body: يمكن لأي شخص لديه هذا الرابط الانضمام إلى %{alliance} كشريك. تنتهي صلاحيته خلال 14 يومًا.
+    new_link_body: يمكن لأي شخص لديه هذا الرابط الانضمام إلى %{partnership} كشريك. تنتهي صلاحيته خلال 14 يومًا.
     copy: نسخ
     copied: تم النسخ!
     partners_section: الشركاء
     no_partners_title: لا يوجد شركاء بعد
     no_partners_body_html: استخدم <span style="color:#FF1E6F;">إنشاء رابط الانضمام</span> أعلاه لدعوة المؤسسات الشريكة.
     joined_on: انضم في %{date}
-    remove_member_confirm: إزالة %{org} من %{alliance}؟ ستتوقف روابط المشاركة الخاصة بهم عن العمل.
-    vertos_section: Vertos في التحالف
+    remove_member_confirm: إزالة %{org} من %{partnership}؟ ستتوقف روابط المشاركة الخاصة بهم عن العمل.
+    vertos_section: Vertos في الشراكة
     no_vertos_title: لم تتم مشاركة Vertos بعد
     no_vertos_body: أضف Verto منشورًا أدناه وسيتم إنشاء رابط مشاركة فريد لكل شريك.
     remove: إزالة
-    remove_verto_confirm: إزالة هذا الـ Verto من %{alliance}؟ ستتوقف جميع روابط مشاركة الشركاء الخاصة به عن العمل.
+    remove_verto_confirm: إزالة هذا الـ Verto من %{partnership}؟ ستتوقف جميع روابط مشاركة الشركاء الخاصة به عن العمل.
     completion_label: الإكمال
     responses:
       one: إجابة
@@ -269,32 +269,32 @@ ar:
     partner_links_count:
       one: رابط شريك
       other: روابط شركاء
-    no_shares_yet: أضف شريكًا إلى التحالف لإنشاء روابط المشاركة.
+    no_shares_yet: أضف شريكًا إلى الشراكة لإنشاء روابط المشاركة.
     responses_short: "%{n} إجابة"
-    add_section: إضافة إلى التحالف
+    add_section: إضافة إلى الشراكة
     add_heading: أضف Verto آخر
-    add_body: اختر Verto منشورًا. سننشئ رابط مشاركة فريدًا لكل شريك في التحالف.
+    add_body: اختر Verto منشورًا. سننشئ رابط مشاركة فريدًا لكل شريك في الشراكة.
     no_more_vertos: لا توجد المزيد من Vertos المنشورة لإضافتها.
     create_new_verto: إنشاء Verto جديد ←
     add_submit: إضافة Verto ←
-    partners_in_alliance: الشركاء في التحالف
+    partners_in_partnership: الشركاء في الشراكة
     including_you: بمن فيهم أنت
     shared_vertos_short: Vertos المشتركة
     available_to_distribute: متاح لك للتوزيع
     other_partners: شركاء آخرون
-    only_partner: أنت الشريك الوحيد في هذا التحالف حتى الآن.
+    only_partner: أنت الشريك الوحيد في هذه الشراكة حتى الآن.
     your_vertos_section: Vertos التي تمت مشاركتها معك
     partner_no_vertos_title: لا توجد Vertos بعد
-    partner_no_vertos_body: عندما تضيف %{org} Verto إلى هذا التحالف، سترى رابط المشاركة الفريد الخاص بك هنا.
+    partner_no_vertos_body: عندما تضيف %{org} Verto إلى هذه الشراكة، سترى رابط المشاركة الفريد الخاص بك هنا.
     from_org: من %{org}
     your_link: رابطك
     results_link: النتائج ←
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Verto مشترك"
-    from_org_alliance: من %{org} · %{alliance}
+    from_org_partnership: من %{org} · %{partnership}
     share_link: رابط المشاركة
     mine_label: من رابطك
-    aggregate_label: عبر %{alliance}
+    aggregate_label: عبر %{partnership}
     card_n: البطاقة %{n}
     my_results: نتائجي
     aggregate: الإجمالي
@@ -310,19 +310,19 @@ ar:
     expired_title: انتهت صلاحية الدعوة
     expired_body: مضى على هذا الرابط أكثر من 7 أيام. اطلب من المسؤول لديك إرسال رابط جديد.
     invited_to_join: تمت دعوتك للانضمام إلى
-    alliance_by: تحالف من قِبل %{org}
+    partnership_by: شراكة من قِبل %{org}
     as_role: بصفتك %{role}
     addressed_for: "· لـ %{email}"
     signed_in_as: مُسجَّل الدخول باسم %{name}
     join_with: الانضمام باستخدام
     pick_org: اختر المؤسسة التي ستنضم
-    join_submit: الانضمام إلى %{alliance} ←
-    already_in_alliance: 'موجود بالفعل في هذا التحالف: %{orgs}'
-    you_run_this: أنت تدير هذا التحالف — قم بزيارته بدلاً من ذلك.
-    already_member_singular: "%{orgs} موجود بالفعل في هذا التحالف."
-    already_member_plural: "%{orgs} موجودون بالفعل في هذا التحالف."
-    no_admin_org: ليس لديك مؤسسة بصلاحيات المسؤول يمكنها الانضمام إلى هذا التحالف.
-    open_alliance: فتح %{alliance} ←
+    join_submit: الانضمام إلى %{partnership} ←
+    already_in_partnership: 'موجود بالفعل في هذه الشراكة: %{orgs}'
+    you_run_this: أنت تدير هذه الشراكة — قم بزيارتها بدلاً من ذلك.
+    already_member_singular: "%{orgs} موجود بالفعل في هذه الشراكة."
+    already_member_plural: "%{orgs} موجودون بالفعل في هذه الشراكة."
+    no_admin_org: ليس لديك مؤسسة بصلاحيات المسؤول يمكنها الانضمام إلى هذه الشراكة.
+    open_partnership: فتح %{partnership} ←
     sign_out_link: تسجيل الخروج واستخدام حساب آخر
     sign_out_confirm: هل تريد تسجيل الخروج من حسابك الحالي؟
     already_have_account: هل لديك حساب Playverto بالفعل؟
@@ -426,7 +426,7 @@ ar:
   dashboard:
     welcome_back: مرحبًا بعودتك
     heading_html: <span style="color:#01EACB;">فيرتوهاتك</span>
-    subtitle: أنشئ فيرتوهات، وشاركها مع تحالفك، وشاهد الرؤى تتدفق.
+    subtitle: أنشئ فيرتوهات، وشاركها مع شراكتك، وشاهد الرؤى تتدفق.
     create_new: إنشاء فيرتو جديد
     import_google_form_button: إنشاء نموذج جديد
     import_google_form_modal_subtitle: الصق رابط نموذج Google موجود وسنحوّله إلى Verto قابل للتعديل.

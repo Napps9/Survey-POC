@@ -1,4 +1,4 @@
-<% content_for :title, t("alliances.title") %>
+<% content_for :title, t("partnerships.title") %>
 <% content_for :head do %>
   <style>body { overflow: auto !important; height: auto !important; }</style>
 <% end %>
@@ -21,16 +21,16 @@
           <div style="min-width:0;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
               <span style="width:8px;height:8px;border-radius:50%;background:#FF1E6F;box-shadow:0 0 12px rgba(255,30,111,0.7);"></span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("alliances.index_eyebrow") %></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("partnerships.index_eyebrow") %></span>
             </div>
-            <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 8px;"><%= t("alliances.index_heading") %></h1>
+            <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 8px;"><%= t("partnerships.index_heading") %></h1>
             <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.45);margin:0;max-width:480px;line-height:1.55;">
-              <%= t("alliances.index_subtitle") %>
+              <%= t("partnerships.index_subtitle") %>
             </p>
           </div>
 
           <% if is_admin %>
-            <%= link_to t("alliances.new_button"), new_alliance_path,
+            <%= link_to t("partnerships.new_button"), new_partnership_path,
                   style: "flex-shrink:0;background:#FF1E6F;border:none;border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(255,30,111,0.28);text-decoration:none;" %>
           <% end %>
         </div>
@@ -47,55 +47,55 @@
         <div style="background:rgba(216,0,39,0.1);border:1px solid rgba(216,0,39,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#FF6B83;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:alert] %></div>
       <% end %>
 
-      <%# ── Alliances you run ── %>
+      <%# ── Partnerships you run ── %>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.owned_section") %></span>
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("partnerships.owned_section") %></span>
         <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
-        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @owned_alliances.size %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @owned_partnerships.size %></span>
       </div>
 
-      <% if @owned_alliances.empty? %>
+      <% if @owned_partnerships.empty? %>
         <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:36px 24px;text-align:center;margin-bottom:32px;">
-          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("alliances.owned_empty_title") %></div>
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("partnerships.owned_empty_title") %></div>
           <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto;line-height:1.5;">
             <% if is_admin %>
-              <%= t("alliances.owned_empty_admin_html").html_safe %>
+              <%= t("partnerships.owned_empty_admin_html").html_safe %>
             <% else %>
-              <%= t("alliances.owned_empty_member") %>
+              <%= t("partnerships.owned_empty_member") %>
             <% end %>
           </div>
         </div>
       <% else %>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:32px;">
-          <% @owned_alliances.each do |a| %>
-            <% members  = @member_counts_by_alliance[a.id] || 0 %>
-            <% vertos   = @verto_counts_by_alliance[a.id]  || 0 %>
-            <% replies  = @response_counts_by_alliance[a.id] || 0 %>
-            <%= link_to alliance_path(a), style: "text-decoration:none;display:block;" do %>
+          <% @owned_partnerships.each do |a| %>
+            <% members  = @member_counts_by_partnership[a.id] || 0 %>
+            <% vertos   = @verto_counts_by_partnership[a.id]  || 0 %>
+            <% replies  = @response_counts_by_partnership[a.id] || 0 %>
+            <%= link_to partnership_path(a), style: "text-decoration:none;display:block;" do %>
               <div style="position:relative;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
                 <div style="height:3px;background:linear-gradient(90deg,#FF1E6F,#615BF5);"></div>
                 <div style="padding:18px 20px 14px;">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;">
                     <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;line-height:1.2;"><%= a.name %></div>
                     <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:<%= a.active? ? 'rgba(1,234,203,0.15)' : 'rgba(255,255,255,0.08)' %>;color:<%= a.active? ? '#01EACB' : 'rgba(255,255,255,0.5)' %>;">
-                      <%= t("alliances.status.#{a.status}", default: a.status.capitalize) %>
+                      <%= t("partnerships.status.#{a.status}", default: a.status.capitalize) %>
                     </span>
                   </div>
                   <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);">
-                    <%= t("alliances.started_on", date: l(a.created_at.to_date, format: :long, default: a.created_at.to_date.to_s)) %>
+                    <%= t("partnerships.started_on", date: l(a.created_at.to_date, format: :long, default: a.created_at.to_date.to_s)) %>
                   </div>
                 </div>
                 <div style="display:flex;align-items:center;border-top:1px solid rgba(255,255,255,0.05);margin:0 20px;padding:12px 0;gap:18px;">
                   <div style="display:flex;align-items:baseline;gap:5px;">
                     <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:<%= members > 0 ? '#FF1E6F' : 'rgba(255,255,255,0.25)' %>;line-height:1;"><%= members %></span>
-                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("alliances.partners_count", count: members) %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("partnerships.partners_count", count: members) %></span>
                   </div>
                   <div style="display:flex;align-items:baseline;gap:5px;">
                     <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:rgba(255,255,255,0.55);line-height:1;"><%= vertos %></span>
-                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("alliances.vertos_count", count: vertos) %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("partnerships.vertos_count", count: vertos) %></span>
                   </div>
                   <div style="flex:1;"></div>
-                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);"><%= t("alliances.open") %></span>
+                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);"><%= t("partnerships.open") %></span>
                 </div>
               </div>
             <% end %>
@@ -103,45 +103,45 @@
         </div>
       <% end %>
 
-      <%# ── Alliances you're a member of ── %>
+      <%# ── Partnerships you're a member of ── %>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("alliances.member_section") %></span>
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("partnerships.member_section") %></span>
         <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
-        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @member_alliances.size %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @member_partnerships.size %></span>
       </div>
 
-      <% if @member_alliances.empty? %>
+      <% if @member_partnerships.empty? %>
         <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:36px 24px;text-align:center;">
-          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("alliances.member_empty_title") %></div>
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("partnerships.member_empty_title") %></div>
           <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:380px;margin:0 auto;line-height:1.5;">
-            <%= t("alliances.member_empty_body") %>
+            <%= t("partnerships.member_empty_body") %>
           </div>
         </div>
       <% else %>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;">
-          <% @member_alliances.each do |a| %>
+          <% @member_partnerships.each do |a| %>
             <% member_count = a.member_organisations.size %>
-            <% verto_count  = a.alliance_vertos.size %>
-            <%= link_to alliance_path(a), style: "text-decoration:none;display:block;" do %>
+            <% verto_count  = a.partnership_vertos.size %>
+            <%= link_to partnership_path(a), style: "text-decoration:none;display:block;" do %>
               <div style="position:relative;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
                 <div style="height:3px;background:linear-gradient(90deg,#01EACB,#0CA7FF);"></div>
                 <div style="padding:18px 20px 14px;">
                   <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;line-height:1.2;margin-bottom:4px;"><%= a.name %></div>
                   <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);">
-                    <%= t("alliances.member_run_by", org: a.organisation.name) %>
+                    <%= t("partnerships.member_run_by", org: a.organisation.name) %>
                   </div>
                 </div>
                 <div style="display:flex;align-items:center;border-top:1px solid rgba(255,255,255,0.05);margin:0 20px;padding:12px 0;gap:18px;">
                   <div style="display:flex;align-items:baseline;gap:5px;">
                     <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#01EACB;line-height:1;"><%= member_count %></span>
-                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("alliances.partners_count", count: member_count) %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("partnerships.partners_count", count: member_count) %></span>
                   </div>
                   <div style="display:flex;align-items:baseline;gap:5px;">
                     <span style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:rgba(255,255,255,0.55);line-height:1;"><%= verto_count %></span>
-                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("alliances.vertos_count", count: verto_count) %></span>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("partnerships.vertos_count", count: verto_count) %></span>
                   </div>
                   <div style="flex:1;"></div>
-                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);"><%= t("alliances.open") %></span>
+                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);"><%= t("partnerships.open") %></span>
                 </div>
               </div>
             <% end %>

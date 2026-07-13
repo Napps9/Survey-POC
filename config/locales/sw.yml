@@ -190,13 +190,13 @@ sw:
     wizard:
       step_counter: Hatua %{n} kati ya %{total}
   nav:
-    alliances: "Athari ya Pamoja"
+    partnerships: "Washirika"
     shared_vertos: Vertos Zilizoshirikishwa
     my_vertos: Vertos Zangu
     create: Unda
     members: Wanachama
     sign_out: Toka
-  alliances:
+  partnerships:
     cq_section: "Maswali ya Pamoja"
     cq_add_body: "Chagua seti yako ya maswali — kila mshirika katika muungano huu ataona maswali yake."
     cq_add_submit: "Shiriki seti →"
@@ -208,9 +208,9 @@ sw:
     cq_partner_section: "Maswali ya Pamoja yaliyoshirikiwa nawe"
     cq_partner_empty_title: "Hakuna Maswali ya Pamoja bado"
     cq_partner_empty_body: "%{org} akishiriki seti ya maswali, maswali yake yataonekana hapa."
-    title: "Athari ya Pamoja — Playverto"
+    title: "Washirika — Playverto"
     index_eyebrow: Ushirikiano wako
-    index_heading: "Athari ya Pamoja"
+    index_heading: "Washirika"
     index_subtitle: Panga mashirika washirika katika ushirikiano wenye majina. Ongeza Vertos na kila mshirika atapata kiungo chake cha kushiriki.
     new_button: "+ Ushirikiano mpya"
     owned_section: Ushirikiano unaouendesha
@@ -241,7 +241,7 @@ sw:
     name_placeholder: 'mfano: Washirika wa Majaribio'
     cancel: Ghairi
     create_submit: Unda ushirikiano →
-    show_title: "%{name} — Athari ya Pamoja"
+    show_title: "%{name} — Washirika"
     back_to_all: Ushirikiano wote
     creator_eyebrow: Ushirikiano · Wewe unauendesha
     partner_eyebrow: Ushirikiano · Mwanachama
@@ -249,19 +249,19 @@ sw:
     delete: Futa
     delete_confirm: Futa %{name}? Viungo vyote vya kushiriki vya ushirikiano huu vitaacha kufanya kazi.
     new_link_heading: Kiungo kipya cha kujiunga
-    new_link_body: Yeyote mwenye kiungo hiki anaweza kujiunga na %{alliance} kama mshirika. Kinaisha baada ya siku 14.
+    new_link_body: Yeyote mwenye kiungo hiki anaweza kujiunga na %{partnership} kama mshirika. Kinaisha baada ya siku 14.
     copy: Nakili
     copied: Imenakiliwa!
     partners_section: Washirika
     no_partners_title: Hakuna washirika bado
     no_partners_body_html: Tumia <span style="color:#FF1E6F;">Tengeneza kiungo cha kujiunga</span> hapo juu kualika mashirika washirika.
     joined_on: Alijiunga %{date}
-    remove_member_confirm: Ondoa %{org} kutoka %{alliance}? Viungo vyao vya kushiriki vitaacha kufanya kazi.
+    remove_member_confirm: Ondoa %{org} kutoka %{partnership}? Viungo vyao vya kushiriki vitaacha kufanya kazi.
     vertos_section: Vertos katika ushirikiano
     no_vertos_title: Hakuna Vertos zilizoshirikishwa bado
     no_vertos_body: Ongeza Verto iliyochapishwa hapa chini na kiungo cha kipekee cha kushiriki kitatengenezwa kwa kila mshirika.
     remove: Ondoa
-    remove_verto_confirm: Ondoa Verto hii kutoka %{alliance}? Viungo vyote vya kushiriki vya washirika vitaacha kufanya kazi.
+    remove_verto_confirm: Ondoa Verto hii kutoka %{partnership}? Viungo vyote vya kushiriki vya washirika vitaacha kufanya kazi.
     completion_label: ukamilishaji
     responses:
       one: jibu
@@ -277,7 +277,7 @@ sw:
     no_more_vertos: Hakuna Vertos zaidi zilizochapishwa za kuongeza.
     create_new_verto: Unda Verto mpya →
     add_submit: Ongeza Verto →
-    partners_in_alliance: Washirika katika ushirikiano
+    partners_in_partnership: Washirika katika ushirikiano
     including_you: Wewe ukijumuishwa
     shared_vertos_short: Vertos Zilizoshirikishwa
     available_to_distribute: Zinapatikana kwako kusambaza
@@ -289,12 +289,12 @@ sw:
     from_org: Kutoka %{org}
     your_link: Kiungo chako
     results_link: Matokeo →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Verto Iliyoshirikishwa"
-    from_org_alliance: Kutoka %{org} · %{alliance}
+    from_org_partnership: Kutoka %{org} · %{partnership}
     share_link: Kiungo cha kushiriki
     mine_label: kutoka kiungo chako
-    aggregate_label: katika %{alliance}
+    aggregate_label: katika %{partnership}
     card_n: Kadi %{n}
     my_results: Matokeo yangu
     aggregate: Jumla
@@ -310,19 +310,19 @@ sw:
     expired_title: Mwaliko umekwisha
     expired_body: Kiungo hiki kina zaidi ya siku 7. Muombe msimamizi wako akutumie kipya.
     invited_to_join: Umealikwa kujiunga na
-    alliance_by: ushirikiano wa %{org}
+    partnership_by: ushirikiano wa %{org}
     as_role: kama %{role}
     addressed_for: "· kwa %{email}"
     signed_in_as: Umeingia kama %{name}
     join_with: Jiunge na
     pick_org: Chagua shirika litakalojiunga
-    join_submit: Jiunge na %{alliance} →
-    already_in_alliance: 'Tayari katika ushirikiano huu: %{orgs}'
+    join_submit: Jiunge na %{partnership} →
+    already_in_partnership: 'Tayari katika ushirikiano huu: %{orgs}'
     you_run_this: Wewe unaendesha ushirikiano huu — tembelea badala yake.
     already_member_singular: "%{orgs} tayari yuko katika ushirikiano huu."
     already_member_plural: "%{orgs} tayari wako katika ushirikiano huu."
     no_admin_org: Huna shirika la msimamizi linaloweza kujiunga na ushirikiano huu.
-    open_alliance: Fungua %{alliance} →
+    open_partnership: Fungua %{partnership} →
     sign_out_link: Toka na utumie akaunti tofauti
     sign_out_confirm: Toka kwenye akaunti yako ya sasa?
     already_have_account: Tayari una akaunti ya Playverto?

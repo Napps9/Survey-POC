@@ -1,6 +1,6 @@
 require "test_helper"
 
-class AllianceCommonQuestionsTest < ActionDispatch::IntegrationTest
+class PartnershipCommonQuestionsTest < ActionDispatch::IntegrationTest
   def make_user_in_org(suffix, org)
     user = User.create!(name: "U#{suffix}", email_address: "u-#{suffix}-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
     org.memberships.create!(user: user, role: "admin")
@@ -17,8 +17,8 @@ class AllianceCommonQuestionsTest < ActionDispatch::IntegrationTest
     @partner_org = Organisation.create!(name: "Partner", slug: "partner-#{SecureRandom.hex(2)}")
     @creator     = make_user_in_org("c", @creator_org)
     @partner     = make_user_in_org("p", @partner_org)
-    @alliance    = @creator_org.alliances.create!(name: "Pilot")
-    @alliance.alliance_memberships.create!(organisation: @partner_org, status: "active")
+    @partnership    = @creator_org.partnerships.create!(name: "Pilot")
+    @partnership.partnership_memberships.create!(organisation: @partner_org, status: "active")
     @set = @creator_org.common_question_sets.create!(name: "Core battery")
     @set.common_questions.create!(text: "How confident do you feel?", card_type: "range")
     @set.common_questions.create!(text: "Would you recommend us?", card_type: "yes_no")
@@ -26,15 +26,15 @@ class AllianceCommonQuestionsTest < ActionDispatch::IntegrationTest
 
   test "creator shares a set and the partner sees its questions" do
     sign_in @creator
-    post alliance_alliance_common_question_sets_path(@alliance), params: { common_question_set_id: @set.id }
-    assert_redirected_to alliance_path(@alliance)
-    assert_equal 1, @alliance.alliance_common_question_sets.count
+    post partnership_partnership_common_question_sets_path(@partnership), params: { common_question_set_id: @set.id }
+    assert_redirected_to partnership_path(@partnership)
+    assert_equal 1, @partnership.partnership_common_question_sets.count
 
     follow_redirect!
     assert_match "Core battery", response.body
 
     sign_in @partner
-    get alliance_path(@alliance)
+    get partnership_path(@partnership)
     assert_response :success
     assert_match "Common Questions shared with you", response.body
     assert_match "Core battery", response.body
@@ -42,41 +42,43 @@ class AllianceCommonQuestionsTest < ActionDispatch::IntegrationTest
     assert_match "Would you recommend us?", response.body
   end
 
-  test "only the alliance creator can share or remove sets" do
-    acs = @alliance.alliance_common_question_sets.create!(common_question_set: @set)
+  test "only the partnership creator can share or remove sets" do
+    acs = @partnership.partnership_common_question_sets.create!(common_question_set: @set)
 
     sign_in @partner
     foreign_set = @partner_org.common_question_sets.create!(name: "Partner set")
-    post alliance_alliance_common_question_sets_path(@alliance), params: { common_question_set_id: foreign_set.id }
-    assert_redirected_to alliance_path(@alliance)
-    assert_equal 1, @alliance.alliance_common_question_sets.count, "partner must not be able to share"
+    post partnership_partnership_common_question_sets_path(@partnership), params: { common_question_set_id: foreign_set.id }
+    assert_redirected_to partnership_path(@partnership)
+    assert_equal 1, @partnership.partnership_common_question_sets.count, "partner must not be able to share"
 
-    delete alliance_alliance_common_question_set_path(@alliance, acs)
-    assert_equal 1, @alliance.alliance_common_question_sets.reload.count, "partner must not be able to remove"
+    delete partnership_partnership_common_question_set_path(@partnership, acs)
+    assert_equal 1, @partnership.partnership_common_question_sets.reload.count, "partner must not be able to remove"
   end
 
   test "removing a set hides it from partners; archived sets are hidden too" do
-    acs = @alliance.alliance_common_question_sets.create!(common_question_set: @set)
+    acs = @partnership.partnership_common_question_sets.create!(common_question_set: @set)
 
     sign_in @creator
-    delete alliance_alliance_common_question_set_path(@alliance, acs)
-    assert_equal 0, @alliance.alliance_common_question_sets.count
+    delete partnership_partnership_common_question_set_path(@partnership, acs)
+    assert_equal 0, @partnership.partnership_common_question_sets.count
 
     archived = @creator_org.common_question_sets.create!(name: "Old battery", deleted_at: Time.current)
-    @alliance.alliance_common_question_sets.create!(common_question_set: archived)
+    @partnership.partnership_common_question_sets.create!(common_question_set: archived)
     sign_in @partner
-    get alliance_path(@alliance)
+    get partnership_path(@partnership)
     assert_response :success
     refute_match "Old battery", response.body, "archived sets must not show to partners"
   end
 
-  test "the section is renamed Collective Impact" do
+  test "the section is named Partners everywhere" do
     sign_in @creator
-    get alliances_path
+    get partnerships_path
     assert_response :success
-    assert_match "Collective Impact", response.body
+    assert_match "Partners", response.body
+    refute_match "Collective Impact", response.body, "the old feature name is retired"
+    refute_match(/[Aa]lliance/, response.body, "no raw Alliance leaks")
 
     get root_path
-    assert_match "Collective Impact", response.body, "nav chip should use the new name"
+    assert_match "Partners", response.body, "nav chip should use the new name"
   end
 end

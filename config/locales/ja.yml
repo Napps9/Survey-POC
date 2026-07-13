@@ -190,33 +190,33 @@ ja:
     wizard:
       step_counter: "%{total}ステップ中 %{n}"
   nav:
-    alliances: "コレクティブ・インパクト"
+    partnerships: "パートナー"
     shared_vertos: 共有Vertos
     my_vertos: マイVertos
     create: 作成
     members: メンバー
     sign_out: ログアウト
-  alliances:
+  partnerships:
     cq_section: "共通の質問"
-    cq_add_body: "質問セットを選ぶと、このアライアンスのすべてのパートナーがその質問を見られます。"
+    cq_add_body: "質問セットを選ぶと、このパートナーシップのすべてのパートナーがその質問を見られます。"
     cq_add_submit: "セットを共有 →"
     cq_no_more: "共有できる質問セットはもうありません。"
     cq_create_new: "セットを作成 →"
     cq_empty_title: "共有された共通の質問はまだありません"
     cq_empty_body: "上で質問セットを共有すると、すべてのパートナーがその質問を見られます。"
-    cq_remove_confirm: "「%{name}」をこのアライアンスから削除しますか？パートナーはその質問を見られなくなります。"
+    cq_remove_confirm: "「%{name}」をこのパートナーシップから削除しますか？パートナーはその質問を見られなくなります。"
     cq_partner_section: "あなたと共有された共通の質問"
     cq_partner_empty_title: "共通の質問はまだありません"
     cq_partner_empty_body: "%{org} が質問セットを共有すると、その質問がここに表示されます。"
-    title: "コレクティブ・インパクト — Playverto"
-    index_eyebrow: あなたのアライアンス
-    index_heading: "コレクティブ・インパクト"
-    index_subtitle: パートナー組織を名前付きのアライアンスにまとめましょう。Verto を追加すると、各パートナーに専用の共有リンクが発行されます。
-    new_button: "+ 新しいアライアンス"
-    owned_section: あなたが運営するアライアンス
-    owned_empty_title: アライアンスはまだありません
-    owned_empty_admin_html: 上部の <span style="color:#FF1E6F;">+ 新しいアライアンス</span> をクリックしてグループを作成し、パートナー組織を招待して Verto を追加してください。
-    owned_empty_member: 管理者にアライアンスの作成を依頼してください。
+    title: "パートナー — Playverto"
+    index_eyebrow: あなたのパートナーシップ
+    index_heading: "パートナー"
+    index_subtitle: パートナー組織を名前付きのパートナーシップにまとめましょう。Verto を追加すると、各パートナーに専用の共有リンクが発行されます。
+    new_button: "+ 新しいパートナーシップ"
+    owned_section: あなたが運営するパートナーシップ
+    owned_empty_title: パートナーシップはまだありません
+    owned_empty_admin_html: 上部の <span style="color:#FF1E6F;">+ 新しいパートナーシップ</span> をクリックしてグループを作成し、パートナー組織を招待して Verto を追加してください。
+    owned_empty_member: 管理者にパートナーシップの作成を依頼してください。
     started_on: 開始日 %{date}
     partners_count:
       one: パートナー
@@ -225,43 +225,43 @@ ja:
       one: Verto
       other: Verto
     open: 開く →
-    member_section: 参加中のアライアンス
-    member_empty_title: アライアンスへの招待はまだありません
-    member_empty_body: 他の組織からアライアンスに招待されると、ここに表示されます。
+    member_section: 参加中のパートナーシップ
+    member_empty_title: パートナーシップへの招待はまだありません
+    member_empty_body: 他の組織からパートナーシップに招待されると、ここに表示されます。
     member_run_by: '運営: %{org}'
     status:
       active: 有効
       pending: 保留中
       revoked: 取り消し済み
-    new_title: 新しいアライアンス — Playverto
-    new_eyebrow: 新しいアライアンス
-    new_heading: アライアンスに名前を付ける
+    new_title: 新しいパートナーシップ — Playverto
+    new_eyebrow: 新しいパートナーシップ
+    new_heading: パートナーシップに名前を付ける
     new_sub: パートナーが参加先を理解できるよう、わかりやすい名前を付けてください。
-    name_label: アライアンス名
+    name_label: パートナーシップ名
     name_placeholder: '例: パイロットパートナー'
     cancel: キャンセル
-    create_submit: アライアンスを作成 →
-    show_title: "%{name} — コレクティブ・インパクト"
-    back_to_all: すべてのアライアンス
-    creator_eyebrow: アライアンス · あなたが運営
-    partner_eyebrow: アライアンス · メンバー
+    create_submit: パートナーシップを作成 →
+    show_title: "%{name} — パートナー"
+    back_to_all: すべてのパートナーシップ
+    creator_eyebrow: パートナーシップ · あなたが運営
+    partner_eyebrow: パートナーシップ · メンバー
     generate_link: 参加リンクを生成 →
     delete: 削除
-    delete_confirm: "%{name} を削除しますか?このアライアンスのすべての共有リンクが無効になります。"
+    delete_confirm: "%{name} を削除しますか?このパートナーシップのすべての共有リンクが無効になります。"
     new_link_heading: 新しい参加リンク
-    new_link_body: このリンクを持つ人は、パートナーとして %{alliance} に参加できます。14 日後に期限切れになります。
+    new_link_body: このリンクを持つ人は、パートナーとして %{partnership} に参加できます。14 日後に期限切れになります。
     copy: コピー
     copied: コピーしました!
     partners_section: パートナー
     no_partners_title: パートナーはまだいません
     no_partners_body_html: 上部の <span style="color:#FF1E6F;">参加リンクを生成</span> を使ってパートナー組織を招待してください。
     joined_on: 参加日 %{date}
-    remove_member_confirm: "%{org} を %{alliance} から削除しますか?共有リンクは無効になります。"
-    vertos_section: アライアンス内の Verto
+    remove_member_confirm: "%{org} を %{partnership} から削除しますか?共有リンクは無効になります。"
+    vertos_section: パートナーシップ内の Verto
     no_vertos_title: 共有された Verto はまだありません
     no_vertos_body: 以下から公開済みの Verto を追加すると、各パートナーに固有の共有リンクが生成されます。
     remove: 削除
-    remove_verto_confirm: この Verto を %{alliance} から削除しますか?すべてのパートナー共有リンクが無効になります。
+    remove_verto_confirm: この Verto を %{partnership} から削除しますか?すべてのパートナー共有リンクが無効になります。
     completion_label: 完了率
     responses:
       one: 回答
@@ -269,32 +269,32 @@ ja:
     partner_links_count:
       one: パートナーリンク
       other: パートナーリンク
-    no_shares_yet: 共有リンクを生成するには、アライアンスにパートナーを追加してください。
+    no_shares_yet: 共有リンクを生成するには、パートナーシップにパートナーを追加してください。
     responses_short: "%{n} 件"
-    add_section: アライアンスに追加
+    add_section: パートナーシップに追加
     add_heading: 別の Verto を追加
-    add_body: 公開済みの Verto を選択してください。アライアンス内のすべてのパートナーに固有の共有リンクを生成します。
+    add_body: 公開済みの Verto を選択してください。パートナーシップ内のすべてのパートナーに固有の共有リンクを生成します。
     no_more_vertos: 追加できる公開済み Verto はもうありません。
     create_new_verto: 新しい Verto を作成 →
     add_submit: Verto を追加 →
-    partners_in_alliance: アライアンス内のパートナー
+    partners_in_partnership: パートナーシップ内のパートナー
     including_you: あなたを含む
     shared_vertos_short: 共有された Verto
     available_to_distribute: 配布可能
     other_partners: その他のパートナー
-    only_partner: 現在、このアライアンスのパートナーはあなただけです。
+    only_partner: 現在、このパートナーシップのパートナーはあなただけです。
     your_vertos_section: あなたに共有された Verto
     partner_no_vertos_title: Verto はまだありません
-    partner_no_vertos_body: "%{org} がこのアライアンスに Verto を追加すると、あなた専用の共有リンクがここに表示されます。"
+    partner_no_vertos_body: "%{org} がこのパートナーシップに Verto を追加すると、あなた専用の共有リンクがここに表示されます。"
     from_org: "%{org} より"
     your_link: あなたのリンク
     results_link: 結果 →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — 共有された Verto"
-    from_org_alliance: "%{org} より · %{alliance}"
+    from_org_partnership: "%{org} より · %{partnership}"
     share_link: 共有リンク
     mine_label: あなたのリンクから
-    aggregate_label: "%{alliance} 全体"
+    aggregate_label: "%{partnership} 全体"
     card_n: カード %{n}
     my_results: 自分の結果
     aggregate: 集計
@@ -310,19 +310,19 @@ ja:
     expired_title: 招待の有効期限切れ
     expired_body: このリンクは 7 日以上前のものです。管理者に新しい招待を依頼してください。
     invited_to_join: 参加への招待が届いています
-    alliance_by: "%{org} のアライアンス"
+    partnership_by: "%{org} のパートナーシップ"
     as_role: "%{role} として"
     addressed_for: "· %{email} 宛"
     signed_in_as: "%{name} としてサインイン中"
     join_with: 参加する組織
     pick_org: 参加する組織を選択
-    join_submit: "%{alliance} に参加 →"
-    already_in_alliance: '既にこのアライアンスに参加中: %{orgs}'
-    you_run_this: あなたはこのアライアンスを運営しています — 直接アクセスしてください。
-    already_member_singular: "%{orgs} は既にこのアライアンスに参加しています。"
-    already_member_plural: "%{orgs} は既にこのアライアンスに参加しています。"
-    no_admin_org: このアライアンスに参加できる管理者組織がありません。
-    open_alliance: "%{alliance} を開く →"
+    join_submit: "%{partnership} に参加 →"
+    already_in_partnership: '既にこのパートナーシップに参加中: %{orgs}'
+    you_run_this: あなたはこのパートナーシップを運営しています — 直接アクセスしてください。
+    already_member_singular: "%{orgs} は既にこのパートナーシップに参加しています。"
+    already_member_plural: "%{orgs} は既にこのパートナーシップに参加しています。"
+    no_admin_org: このパートナーシップに参加できる管理者組織がありません。
+    open_partnership: "%{partnership} を開く →"
     sign_out_link: サインアウトして別のアカウントを使用
     sign_out_confirm: 現在のアカウントからサインアウトしますか?
     already_have_account: Playverto アカウントをお持ちですか?
@@ -426,7 +426,7 @@ ja:
   dashboard:
     welcome_back: おかえりなさい
     heading_html: あなたの<span style="color:#01EACB;">Vertos</span>
-    subtitle: Vertosを作成し、アライアンスと共有して、インサイトを集めましょう。
+    subtitle: Vertosを作成し、パートナーシップと共有して、インサイトを集めましょう。
     create_new: 新しいVertoを作成
     import_google_form_button: 新しいフォームを作成
     import_google_form_modal_subtitle: 既存のGoogleフォームのリンクを貼り付けると、編集可能なVertoに変換します。

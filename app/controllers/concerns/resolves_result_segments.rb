@@ -12,7 +12,7 @@ module ResolvesResultSegments
     segments = [ { id: "overall", label: "Overall", scope: base, count: base.count } ]
 
     shares = survey.survey_shares
-                   .includes(:partner_organisation, alliance_verto: :alliance)
+                   .includes(:partner_organisation, partnership_verto: :partnership)
                    .order(:created_at)
 
     if shares.any?
@@ -23,8 +23,8 @@ module ResolvesResultSegments
 
       shares.each do |share|
         scope = base.where(survey_share_id: share.id)
-        alliance_name = share.alliance_verto&.alliance&.name
-        label = alliance_name ? "#{share.display_name} · #{alliance_name}" : share.display_name
+        partnership_name = share.partnership_verto&.partnership&.name
+        label = partnership_name ? "#{share.display_name} · #{partnership_name}" : share.display_name
         segments << { id: "share_#{share.id}", label: label, scope: scope, count: scope.count }
       end
     end

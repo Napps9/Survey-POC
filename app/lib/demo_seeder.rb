@@ -1,5 +1,5 @@
 # Seeds a fully-featured VertoNow demo account: an organisation, a partner
-# organisation, a Collective Impact alliance between them, four Vertos that
+# organisation, a Collective Impact partnership between them, four Vertos that
 # between them exercise every card type, quiz mode, both tokenisation award
 # modes (per-answer and completion), a consent gate, a custom thank-you
 # screen + forward link, a custom /play link, results comparison, branding,
@@ -75,14 +75,14 @@ class DemoSeeder
       @partner = create_partner_organisation!
       create_user!(@org, ADMIN_EMAIL, "Demo Admin", password)
       create_user!(@partner, PARTNER_EMAIL, "Partner Admin", password)
-      @alliance = create_alliance!
+      @partnership = create_partnership!
 
       @money_matters    = build_money_matters!
       @workplace        = build_workplace_culture!
       @campus           = build_campus_wellness!
       @community_safety = build_community_safety!
 
-      share_into_alliance!(@money_matters)
+      share_into_partnership!(@money_matters)
 
       # Each Verto below gets several countries (for the global map) *and* more
       # than one region within at least two of those countries, so both the
@@ -160,15 +160,15 @@ class DemoSeeder
     user
   end
 
-  def create_alliance!
-    alliance = Alliance.create!(organisation: @org, name: "Youth Financial Empowerment Coalition", status: "active")
-    AllianceMembership.create!(alliance: alliance, organisation: @partner, status: "active")
-    alliance
+  def create_partnership!
+    partnership = Partnership.create!(organisation: @org, name: "Youth Financial Empowerment Coalition", status: "active")
+    PartnershipMembership.create!(partnership: partnership, organisation: @partner, status: "active")
+    partnership
   end
 
-  def share_into_alliance!(survey)
-    AllianceVerto.find_or_create_by!(alliance: @alliance, survey: survey)
-    AllianceShareSync.ensure_shares_for(alliance: @alliance)
+  def share_into_partnership!(survey)
+    PartnershipVerto.find_or_create_by!(partnership: @partnership, survey: survey)
+    PartnershipShareSync.ensure_shares_for(partnership: @partnership)
   end
 
   def safe_slug(candidate)
@@ -184,7 +184,7 @@ class DemoSeeder
   # Flagship: quiz mode + tokenisation (both per-answer and completion-mode
   # awards), a consent gate, a custom thank-you screen + forward link, a
   # custom /play link, results comparison, custom branding, published, and
-  # shared into the Collective Impact alliance.
+  # shared into the Collective Impact partnership.
   def build_money_matters!
     cards = DemographicQuestions.append_to([
       { "type" => "welcome_card", "text" => "Money Matters: how financially confident are you, really?",
@@ -511,7 +511,7 @@ class DemoSeeder
     puts "  Organisation : VertoNow Demo (#{ORG_SLUG})"
     puts "  Admin login  : #{ADMIN_EMAIL} / the password you set in DEMO_PASSWORD"
     puts "  Partner org  : Riverside Youth Trust (#{PARTNER_SLUG}), admin: #{PARTNER_EMAIL}"
-    puts "  Alliance     : Youth Financial Empowerment Coalition (Collective Impact)"
+    puts "  Partnership     : Youth Financial Empowerment Coalition (Collective Impact)"
     puts "  Vertos:"
     [ @money_matters, @workplace, @campus, @community_safety ].each do |s|
       status = s.published? ? "live" : "draft"

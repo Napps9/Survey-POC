@@ -190,33 +190,33 @@ pt:
     wizard:
       step_counter: Passo %{n} de %{total}
   nav:
-    alliances: "Impacto Coletivo"
+    partnerships: "Parceiros"
     shared_vertos: Vertos partilhados
     my_vertos: Os meus Vertos
     create: Criar
     members: Membros
     sign_out: Terminar sessão
-  alliances:
+  partnerships:
     cq_section: "Perguntas comuns"
-    cq_add_body: "Escolha um dos seus conjuntos de perguntas — todos os parceiros desta aliança poderão ver as suas perguntas."
+    cq_add_body: "Escolha um dos seus conjuntos de perguntas — todos os parceiros desta parceria poderão ver as suas perguntas."
     cq_add_submit: "Partilhar conjunto →"
     cq_no_more: "Não há mais conjuntos de perguntas para partilhar."
     cq_create_new: "Criar um conjunto →"
     cq_empty_title: "Ainda não foram partilhadas perguntas comuns"
     cq_empty_body: "Partilhe um conjunto de perguntas acima e todos os parceiros verão as suas perguntas."
-    cq_remove_confirm: "Remover “%{name}” desta aliança? Os parceiros deixarão de ver as suas perguntas."
+    cq_remove_confirm: "Remover “%{name}” desta parceria? Os parceiros deixarão de ver as suas perguntas."
     cq_partner_section: "Perguntas comuns partilhadas consigo"
     cq_partner_empty_title: "Ainda sem perguntas comuns"
     cq_partner_empty_body: "Quando %{org} partilhar um conjunto de perguntas, as suas perguntas aparecerão aqui."
-    title: "Impacto Coletivo — Playverto"
-    index_eyebrow: As suas alianças
-    index_heading: "Impacto Coletivo"
-    index_subtitle: Agrupe organizações parceiras em alianças nomeadas. Adicione Vertos e cada parceiro recebe o seu próprio link de partilha.
-    new_button: "+ Nova aliança"
-    owned_section: Alianças que gere
-    owned_empty_title: Ainda não há alianças
-    owned_empty_admin_html: Clique em <span style="color:#FF1E6F;">+ Nova aliança</span> acima para iniciar um grupo, depois convide organizações parceiras e adicione Vertos.
-    owned_empty_member: Peça ao seu administrador para criar uma aliança.
+    title: "Parceiros — Playverto"
+    index_eyebrow: As suas parcerias
+    index_heading: "Parceiros"
+    index_subtitle: Agrupe organizações parceiras em parcerias nomeadas. Adicione Vertos e cada parceiro recebe o seu próprio link de partilha.
+    new_button: "+ Nova parceria"
+    owned_section: Parcerias que gere
+    owned_empty_title: Ainda não há parcerias
+    owned_empty_admin_html: Clique em <span style="color:#FF1E6F;">+ Nova parceria</span> acima para iniciar um grupo, depois convide organizações parceiras e adicione Vertos.
+    owned_empty_member: Peça ao seu administrador para criar uma parceria.
     started_on: Iniciada em %{date}
     partners_count:
       one: parceiro
@@ -225,43 +225,43 @@ pt:
       one: verto
       other: vertos
     open: Abrir →
-    member_section: Alianças das quais é membro
-    member_empty_title: Não foi convidado para nenhuma aliança
-    member_empty_body: Quando outra organização o convidar para uma das suas alianças, ela aparecerá aqui.
+    member_section: Parcerias das quais é membro
+    member_empty_title: Não foi convidado para nenhuma parceria
+    member_empty_body: Quando outra organização o convidar para uma das suas parcerias, ela aparecerá aqui.
     member_run_by: Gerida por %{org}
     status:
       active: Ativa
       pending: Pendente
       revoked: Revogada
-    new_title: Nova aliança — Playverto
-    new_eyebrow: Nova aliança
-    new_heading: Nomeie a sua aliança
+    new_title: Nova parceria — Playverto
+    new_eyebrow: Nova parceria
+    new_heading: Nomeie a sua parceria
     new_sub: Dê ao grupo um nome claro para que os parceiros saibam ao que estão a aderir.
-    name_label: Nome da aliança
+    name_label: Nome da parceria
     name_placeholder: ex. Parceiros Piloto
     cancel: Cancelar
-    create_submit: Criar aliança →
-    show_title: "%{name} — Impacto Coletivo"
-    back_to_all: Todas as alianças
-    creator_eyebrow: Aliança · Gerida por si
-    partner_eyebrow: Aliança · Membro
+    create_submit: Criar parceria →
+    show_title: "%{name} — Parceiros"
+    back_to_all: Todas as parcerias
+    creator_eyebrow: Parceria · Gerida por si
+    partner_eyebrow: Parceria · Membro
     generate_link: Gerar link de adesão →
     delete: Eliminar
-    delete_confirm: Eliminar %{name}? Todos os links de partilha desta aliança deixarão de funcionar.
+    delete_confirm: Eliminar %{name}? Todos os links de partilha desta parceria deixarão de funcionar.
     new_link_heading: Novo link de adesão
-    new_link_body: Qualquer pessoa com este link pode aderir a %{alliance} como parceiro. Expira em 14 dias.
+    new_link_body: Qualquer pessoa com este link pode aderir a %{partnership} como parceiro. Expira em 14 dias.
     copy: Copiar
     copied: Copiado!
     partners_section: Parceiros
     no_partners_title: Ainda sem parceiros
     no_partners_body_html: Use <span style="color:#FF1E6F;">Gerar link de adesão</span> acima para convidar organizações parceiras.
     joined_on: Aderiu em %{date}
-    remove_member_confirm: Remover %{org} de %{alliance}? Os seus links de partilha deixarão de funcionar.
-    vertos_section: Vertos na aliança
+    remove_member_confirm: Remover %{org} de %{partnership}? Os seus links de partilha deixarão de funcionar.
+    vertos_section: Vertos na parceria
     no_vertos_title: Ainda não há Vertos partilhados
     no_vertos_body: Adicione um Verto publicado abaixo e será gerado um link de partilha único para cada parceiro.
     remove: Remover
-    remove_verto_confirm: Remover este Verto de %{alliance}? Todos os links de partilha dos parceiros para este Verto deixarão de funcionar.
+    remove_verto_confirm: Remover este Verto de %{partnership}? Todos os links de partilha dos parceiros para este Verto deixarão de funcionar.
     completion_label: conclusão
     responses:
       one: resposta
@@ -269,32 +269,32 @@ pt:
     partner_links_count:
       one: link de parceiro
       other: links de parceiros
-    no_shares_yet: Adicione um parceiro à aliança para gerar links de partilha.
+    no_shares_yet: Adicione um parceiro à parceria para gerar links de partilha.
     responses_short: "%{n} resp."
-    add_section: Adicionar à aliança
+    add_section: Adicionar à parceria
     add_heading: Adicionar outro Verto
-    add_body: Escolha um Verto publicado. Geraremos um link de partilha único para cada parceiro da aliança.
+    add_body: Escolha um Verto publicado. Geraremos um link de partilha único para cada parceiro da parceria.
     no_more_vertos: Não há mais Vertos publicados para adicionar.
     create_new_verto: Criar um novo Verto →
     add_submit: Adicionar Verto →
-    partners_in_alliance: Parceiros na aliança
+    partners_in_partnership: Parceiros na parceria
     including_you: Incluindo-o
     shared_vertos_short: Vertos partilhados
     available_to_distribute: Disponível para distribuir
     other_partners: Outros parceiros
-    only_partner: De momento, é o único parceiro nesta aliança.
+    only_partner: De momento, é o único parceiro nesta parceria.
     your_vertos_section: Vertos partilhados consigo
     partner_no_vertos_title: Ainda não há Vertos
-    partner_no_vertos_body: Quando %{org} adicionar um Verto a esta aliança, verá aqui o seu link de partilha único.
+    partner_no_vertos_body: Quando %{org} adicionar um Verto a esta parceria, verá aqui o seu link de partilha único.
     from_org: De %{org}
     your_link: O seu link
     results_link: Resultados →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Verto partilhado"
-    from_org_alliance: De %{org} · %{alliance}
+    from_org_partnership: De %{org} · %{partnership}
     share_link: Link de partilha
     mine_label: do seu link
-    aggregate_label: em toda a %{alliance}
+    aggregate_label: em toda a %{partnership}
     card_n: Cartão %{n}
     my_results: Os meus resultados
     aggregate: Agregado
@@ -310,19 +310,19 @@ pt:
     expired_title: Convite expirado
     expired_body: Este link tem mais de 7 dias. Peça ao seu administrador para enviar um novo.
     invited_to_join: Foi convidado para aderir a
-    alliance_by: uma aliança de %{org}
+    partnership_by: uma parceria de %{org}
     as_role: como %{role}
     addressed_for: "· para %{email}"
     signed_in_as: Sessão iniciada como %{name}
     join_with: Aderir com
     pick_org: Escolha qual organização adere
-    join_submit: Aderir a %{alliance} →
-    already_in_alliance: 'Já estão nesta aliança: %{orgs}'
-    you_run_this: Esta aliança é gerida por si — visite-a em vez disso.
-    already_member_singular: "%{orgs} já está nesta aliança."
-    already_member_plural: "%{orgs} já estão nesta aliança."
-    no_admin_org: Não tem uma organização de administrador que possa aderir a esta aliança.
-    open_alliance: Abrir %{alliance} →
+    join_submit: Aderir a %{partnership} →
+    already_in_partnership: 'Já estão nesta parceria: %{orgs}'
+    you_run_this: Esta parceria é gerida por si — visite-a em vez disso.
+    already_member_singular: "%{orgs} já está nesta parceria."
+    already_member_plural: "%{orgs} já estão nesta parceria."
+    no_admin_org: Não tem uma organização de administrador que possa aderir a esta parceria.
+    open_partnership: Abrir %{partnership} →
     sign_out_link: Terminar sessão e usar uma conta diferente
     sign_out_confirm: Terminar sessão da sua conta atual?
     already_have_account: Já tem uma conta Playverto?
@@ -426,7 +426,7 @@ pt:
   dashboard:
     welcome_back: Bem-vindo de volta
     heading_html: Os seus <span style="color:#01EACB;">Vertos</span>
-    subtitle: Crie Vertos, partilhe-os com a sua aliança e veja os insights chegarem.
+    subtitle: Crie Vertos, partilhe-os com a sua parceria e veja os insights chegarem.
     create_new: Criar um novo Verto
     import_google_form_button: Criar novo formulário
     import_google_form_modal_subtitle: Cole o link de um Google Form existente e transformamo-lo num Verto editável.

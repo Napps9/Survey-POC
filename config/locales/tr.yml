@@ -190,33 +190,33 @@ tr:
     wizard:
       step_counter: Adım %{n} / %{total}
   nav:
-    alliances: "Kolektif Etki"
+    partnerships: "Ortaklar"
     shared_vertos: Paylaşılan Verto'lar
     my_vertos: Verto'larım
     create: Oluştur
     members: Üyeler
     sign_out: Çıkış yap
-  alliances:
+  partnerships:
     cq_section: "Ortak Sorular"
-    cq_add_body: "Soru setlerinden birini seç — bu ittifaktaki her ortak sorularını görebilir."
+    cq_add_body: "Soru setlerinden birini seç — bu ortaklıktaki her ortak sorularını görebilir."
     cq_add_submit: "Seti paylaş →"
     cq_no_more: "Paylaşılacak başka soru seti yok."
     cq_create_new: "Set oluştur →"
     cq_empty_title: "Henüz ortak soru paylaşılmadı"
     cq_empty_body: "Yukarıda bir soru seti paylaş, her ortak sorularını görsün."
-    cq_remove_confirm: "“%{name}” bu ittifaktan kaldırılsın mı? Ortaklar artık sorularını göremeyecek."
+    cq_remove_confirm: "“%{name}” bu ortaklıktan kaldırılsın mı? Ortaklar artık sorularını göremeyecek."
     cq_partner_section: "Seninle paylaşılan ortak sorular"
     cq_partner_empty_title: "Henüz ortak soru yok"
     cq_partner_empty_body: "%{org} bir soru seti paylaştığında soruları burada görünecek."
-    title: "Kolektif Etki — Playverto"
-    index_eyebrow: İttifaklarınız
-    index_heading: "Kolektif Etki"
-    index_subtitle: Ortak kuruluşları adlandırılmış ittifaklarda gruplandırın. Verto ekleyin ve her ortak kendi paylaşım bağlantısını alsın.
-    new_button: "+ Yeni ittifak"
-    owned_section: Yönettiğiniz ittifaklar
-    owned_empty_title: Henüz ittifak yok
-    owned_empty_admin_html: Bir grup başlatmak için yukarıdaki <span style="color:#FF1E6F;">+ Yeni ittifak</span> bağlantısına tıklayın, ardından ortak kuruluşları davet edin ve Verto ekleyin.
-    owned_empty_member: Yöneticinizden bir ittifak oluşturmasını isteyin.
+    title: "Ortaklar — Playverto"
+    index_eyebrow: Ortaklıklarınız
+    index_heading: "Ortaklar"
+    index_subtitle: Ortak kuruluşları adlandırılmış ortaklıklarda gruplandırın. Verto ekleyin ve her ortak kendi paylaşım bağlantısını alsın.
+    new_button: "+ Yeni ortaklık"
+    owned_section: Yönettiğiniz ortaklıklar
+    owned_empty_title: Henüz ortaklık yok
+    owned_empty_admin_html: Bir grup başlatmak için yukarıdaki <span style="color:#FF1E6F;">+ Yeni ortaklık</span> bağlantısına tıklayın, ardından ortak kuruluşları davet edin ve Verto ekleyin.
+    owned_empty_member: Yöneticinizden bir ortaklık oluşturmasını isteyin.
     started_on: "%{date} tarihinde başladı"
     partners_count:
       one: ortak
@@ -225,43 +225,43 @@ tr:
       one: verto
       other: verto
     open: Aç →
-    member_section: Üyesi olduğunuz ittifaklar
-    member_empty_title: Henüz hiçbir ittifaka davet edilmediniz
-    member_empty_body: Başka bir kuruluş sizi bir ittifaklarına davet ettiğinde burada görünecek.
+    member_section: Üyesi olduğunuz ortaklıklar
+    member_empty_title: Henüz hiçbir ortaklığa davet edilmediniz
+    member_empty_body: Başka bir kuruluş sizi bir ortaklıklarına davet ettiğinde burada görünecek.
     member_run_by: "%{org} tarafından yönetiliyor"
     status:
       active: Aktif
       pending: Beklemede
       revoked: İptal edildi
-    new_title: Yeni ittifak — Playverto
-    new_eyebrow: Yeni ittifak
-    new_heading: İttifakınıza bir ad verin
+    new_title: Yeni ortaklık — Playverto
+    new_eyebrow: Yeni ortaklık
+    new_heading: Ortaklığınıza bir ad verin
     new_sub: Ortakların neye katıldıklarını bilmeleri için gruba net bir ad verin.
-    name_label: İttifak adı
+    name_label: Ortaklık adı
     name_placeholder: örn. Pilot Ortaklar
     cancel: İptal
-    create_submit: İttifak oluştur →
-    show_title: "%{name} — Kolektif Etki"
-    back_to_all: Tüm ittifaklar
-    creator_eyebrow: İttifak · Bunu siz yönetiyorsunuz
-    partner_eyebrow: İttifak · Üye
+    create_submit: Ortaklık oluştur →
+    show_title: "%{name} — Ortaklar"
+    back_to_all: Tüm ortaklıklar
+    creator_eyebrow: Ortaklık · Bunu siz yönetiyorsunuz
+    partner_eyebrow: Ortaklık · Üye
     generate_link: Katılım bağlantısı oluştur →
     delete: Sil
-    delete_confirm: "%{name} silinsin mi? Bu ittifak için tüm paylaşım bağlantıları çalışmayı durduracak."
+    delete_confirm: "%{name} silinsin mi? Bu ortaklık için tüm paylaşım bağlantıları çalışmayı durduracak."
     new_link_heading: Yeni katılım bağlantısı
-    new_link_body: Bu bağlantıya sahip olan herkes %{alliance} ittifakına ortak olarak katılabilir. 14 gün içinde süresi dolar.
+    new_link_body: Bu bağlantıya sahip olan herkes %{partnership} ortaklığına ortak olarak katılabilir. 14 gün içinde süresi dolar.
     copy: Kopyala
     copied: Kopyalandı!
     partners_section: Ortaklar
     no_partners_title: Henüz ortak yok
     no_partners_body_html: Ortak kuruluşları davet etmek için yukarıdaki <span style="color:#FF1E6F;">Katılım bağlantısı oluştur</span> seçeneğini kullanın.
     joined_on: "%{date} tarihinde katıldı"
-    remove_member_confirm: "%{org}, %{alliance} ittifakından çıkarılsın mı? Paylaşım bağlantıları çalışmayı durduracak."
-    vertos_section: İttifaktaki Verto'lar
+    remove_member_confirm: "%{org}, %{partnership} ortaklıkından çıkarılsın mı? Paylaşım bağlantıları çalışmayı durduracak."
+    vertos_section: Ortaklıktaki Verto'lar
     no_vertos_title: Henüz paylaşılmış Verto yok
     no_vertos_body: Aşağıya yayınlanmış bir Verto ekleyin; her ortak için benzersiz bir paylaşım bağlantısı oluşturulacak.
     remove: Kaldır
-    remove_verto_confirm: Bu Verto %{alliance} ittifakından kaldırılsın mı? Buna ait tüm ortak paylaşım bağlantıları çalışmayı durduracak.
+    remove_verto_confirm: Bu Verto %{partnership} ortaklıkından kaldırılsın mı? Buna ait tüm ortak paylaşım bağlantıları çalışmayı durduracak.
     completion_label: tamamlanma
     responses:
       one: yanıt
@@ -269,32 +269,32 @@ tr:
     partner_links_count:
       one: ortak bağlantısı
       other: ortak bağlantısı
-    no_shares_yet: Paylaşım bağlantıları oluşturmak için ittifaka bir ortak ekleyin.
+    no_shares_yet: Paylaşım bağlantıları oluşturmak için ortaklığa bir ortak ekleyin.
     responses_short: "%{n} yanıt"
-    add_section: İttifaka ekle
+    add_section: Ortaklıka ekle
     add_heading: Başka bir Verto ekle
-    add_body: Yayınlanmış bir Verto seçin. İttifaktaki her ortak için benzersiz bir paylaşım bağlantısı oluşturacağız.
+    add_body: Yayınlanmış bir Verto seçin. Ortaklıktaki her ortak için benzersiz bir paylaşım bağlantısı oluşturacağız.
     no_more_vertos: Eklenecek başka yayınlanmış Verto yok.
     create_new_verto: Yeni bir Verto oluştur →
     add_submit: Verto ekle →
-    partners_in_alliance: İttifaktaki ortaklar
+    partners_in_partnership: Ortaklıktaki ortaklar
     including_you: Sizinle birlikte
     shared_vertos_short: Paylaşılan Verto'lar
     available_to_distribute: Dağıtmanız için mevcut
     other_partners: Diğer ortaklar
-    only_partner: Şu an bu ittifaktaki tek ortak sizsiniz.
+    only_partner: Şu an bu ortaklıktaki tek ortak sizsiniz.
     your_vertos_section: Sizinle paylaşılan Verto'lar
     partner_no_vertos_title: Henüz Verto yok
-    partner_no_vertos_body: "%{org} bu ittifaka bir Verto eklediğinde benzersiz paylaşım bağlantınızı burada göreceksiniz."
+    partner_no_vertos_body: "%{org} bu ortaklığa bir Verto eklediğinde benzersiz paylaşım bağlantınızı burada göreceksiniz."
     from_org: "%{org} tarafından"
     your_link: Bağlantınız
     results_link: Sonuçlar →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Paylaşılan Verto"
-    from_org_alliance: "%{org} · %{alliance} tarafından"
+    from_org_partnership: "%{org} · %{partnership} tarafından"
     share_link: Paylaşım bağlantısı
     mine_label: bağlantınızdan
-    aggregate_label: "%{alliance} genelinde"
+    aggregate_label: "%{partnership} genelinde"
     card_n: Kart %{n}
     my_results: Sonuçlarım
     aggregate: Toplam
@@ -310,19 +310,19 @@ tr:
     expired_title: Davetin süresi doldu
     expired_body: Bu bağlantı 7 günden eski. Yöneticinizden yeni bir tane göndermesini isteyin.
     invited_to_join: 'Katılmaya davet edildiniz:'
-    alliance_by: "%{org} tarafından bir ittifak"
+    partnership_by: "%{org} tarafından bir ortaklık"
     as_role: "%{role} olarak"
     addressed_for: "· %{email} için"
     signed_in_as: "%{name} olarak giriş yapıldı"
     join_with: Şununla katıl
     pick_org: Hangi kuruluşun katılacağını seçin
-    join_submit: "%{alliance} ittifakına katıl →"
-    already_in_alliance: 'Bu ittifakta zaten var: %{orgs}'
-    you_run_this: Bu ittifakı siz yönetiyorsunuz — bunun yerine ziyaret edin.
-    already_member_singular: "%{orgs} zaten bu ittifakta."
-    already_member_plural: "%{orgs} zaten bu ittifakta."
-    no_admin_org: Bu ittifaka katılabilecek bir yönetici kuruluşunuz yok.
-    open_alliance: "%{alliance} ittifakını aç →"
+    join_submit: "%{partnership} ortaklığına katıl →"
+    already_in_partnership: 'Bu ortaklıkta zaten var: %{orgs}'
+    you_run_this: Bu ortaklıkı siz yönetiyorsunuz — bunun yerine ziyaret edin.
+    already_member_singular: "%{orgs} zaten bu ortaklıkta."
+    already_member_plural: "%{orgs} zaten bu ortaklıkta."
+    no_admin_org: Bu ortaklığa katılabilecek bir yönetici kuruluşunuz yok.
+    open_partnership: "%{partnership} ortaklıkını aç →"
     sign_out_link: Çıkış yap ve farklı bir hesap kullan
     sign_out_confirm: Mevcut hesabınızdan çıkış yapılsın mı?
     already_have_account: Zaten bir Playverto hesabınız var mı?
@@ -426,7 +426,7 @@ tr:
   dashboard:
     welcome_back: Tekrar hoş geldiniz
     heading_html: <span style="color:#01EACB;">Verto'larınız</span>
-    subtitle: Verto'lar oluşturun, ittifakınızla paylaşın ve içgörülerin akmasını izleyin.
+    subtitle: Verto'lar oluşturun, ortaklıkınızla paylaşın ve içgörülerin akmasını izleyin.
     create_new: Yeni bir Verto oluştur
     import_google_form_button: Yeni form oluştur
     import_google_form_modal_subtitle: Mevcut bir Google Form bağlantısını yapıştırın, onu düzenlenebilir bir Verto'ya dönüştürelim.

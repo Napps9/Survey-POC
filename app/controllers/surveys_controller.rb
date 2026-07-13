@@ -784,7 +784,7 @@ class SurveysController < ApplicationController
   end
 
   # Common Question sets the current org may attach to a Verto: its own kept
-  # sets, plus any kept set shared into a Collective Impact alliance it's an
+  # sets, plus any kept set shared into a Collective Impact partnership it's an
   # active member of. Own sets come first; shared sets keep their owning org
   # so the wizard can label provenance. Used by both the wizard and the
   # resolve above, so the picker and the authorization can't drift apart.
@@ -792,10 +792,10 @@ class SurveysController < ApplicationController
     own = Current.organisation.common_question_sets.kept
                   .includes(:common_questions).order(:name).to_a
 
-    alliance_ids = Current.organisation.member_alliances
-                     .where(alliance_memberships: { status: "active" }).pluck(:id)
-    shared = if alliance_ids.any?
-      set_ids = AllianceCommonQuestionSet.where(alliance_id: alliance_ids).pluck(:common_question_set_id)
+    partnership_ids = Current.organisation.member_partnerships
+                     .where(partnership_memberships: { status: "active" }).pluck(:id)
+    shared = if partnership_ids.any?
+      set_ids = PartnershipCommonQuestionSet.where(partnership_id: partnership_ids).pluck(:common_question_set_id)
       CommonQuestionSet.kept.where(id: set_ids)
                        .where.not(organisation_id: Current.organisation.id)
                        .includes(:common_questions, :organisation).order(:name).to_a

@@ -20,15 +20,15 @@
           <%= t("invites.invited_to_join") %>
         </div>
         <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;letter-spacing:0.04em;margin:0 0 4px;">
-          <% if @invite.partner? && @invite.alliance %>
-            <%= @invite.alliance.name %>
+          <% if @invite.partner? && @invite.partnership %>
+            <%= @invite.partnership.name %>
           <% else %>
             <%= @invite.organisation.name %>
           <% end %>
         </h1>
         <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.3);">
           <% if @invite.partner? %>
-            <%= t("invites.alliance_by", org: @invite.organisation.name) %>
+            <%= t("invites.partnership_by", org: @invite.organisation.name) %>
           <% else %>
             <%= t("invites.as_role", role: @invite.role) %>
           <% end %>
@@ -76,13 +76,13 @@
               <% end %>
             </div>
 
-            <%= f.submit t("invites.join_submit", alliance: @invite.alliance.name),
+            <%= f.submit t("invites.join_submit", partnership: @invite.partnership.name),
                   style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
           <% end %>
 
           <% if @already_member_orgs.any? %>
             <div style="margin-top:18px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);text-align:center;">
-              <%= t("invites.already_in_alliance", orgs: @already_member_orgs.map(&:name).join(", ")) %>
+              <%= t("invites.already_in_partnership", orgs: @already_member_orgs.map(&:name).join(", ")) %>
             </div>
           <% end %>
         <% else %>
@@ -99,8 +99,8 @@
               <%= t("invites.no_admin_org") %>
             <% end %>
           </div>
-          <% if (@creator_admin_orgs + @already_member_orgs).any? && @invite.alliance %>
-            <%= link_to t("invites.open_alliance", alliance: @invite.alliance.name), alliance_path(@invite.alliance),
+          <% if (@creator_admin_orgs + @already_member_orgs).any? && @invite.partnership %>
+            <%= link_to t("invites.open_partnership", partnership: @invite.partnership.name), partnership_path(@invite.partnership),
                   style: "display:block;text-align:center;margin-top:18px;color:#01EACB;font-family:'Alata',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
           <% end %>
         <% end %>

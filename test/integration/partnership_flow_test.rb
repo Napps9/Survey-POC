@@ -1,6 +1,6 @@
 require "test_helper"
 
-class AllianceFlowTest < ActionDispatch::IntegrationTest
+class PartnershipFlowTest < ActionDispatch::IntegrationTest
   setup do
     @admin = User.create!(name: "A", email_address: "creator@test.com", password: "verylongpassword")
     @oa = Organisation.create!(name: "Creator Co", slug: "creator-co-#{SecureRandom.hex(2)}")
@@ -8,31 +8,31 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     sign_in @admin
   end
 
-  test "creator creates an alliance, invites and adds a partner, shares a Verto" do
+  test "creator creates a partnership, invites and adds a partner, shares a Verto" do
     # Index: empty state
-    get alliances_path
+    get partnerships_path
     assert_response :success
-    assert_match "Alliances you run", response.body
-    assert_match "No alliances yet", response.body
+    assert_match "Partner groups you run", response.body
+    assert_match "No partner groups yet", response.body
 
     # New form
-    get new_alliance_path
+    get new_partnership_path
     assert_response :success
-    assert_match "Alliance name", response.body
+    assert_match "Group name", response.body
 
     # Create
-    post alliances_path, params: { alliance: { name: "Pilot Group" } }
-    assert_redirected_to alliance_path(Alliance.last)
+    post partnerships_path, params: { partnership: { name: "Pilot Group" } }
+    assert_redirected_to partnership_path(Partnership.last)
     follow_redirect!
     assert_response :success
     assert_match "Pilot Group", response.body
     assert_match "Generate join link", response.body
     assert_match "No partners yet", response.body
 
-    a = Alliance.last
+    a = Partnership.last
     # Generate invite
-    post alliance_alliance_invites_path(a)
-    assert_redirected_to alliance_path(a, new_invite_token: Invite.last.token)
+    post partnership_partnership_invites_path(a)
+    assert_redirected_to partnership_path(a, new_invite_token: Invite.last.token)
     follow_redirect!
     assert_match "New join link", response.body
 
@@ -48,7 +48,7 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
       password: "verylongpassword",
       password_confirmation: "verylongpassword"
     }
-    assert_redirected_to alliance_path(a)
+    assert_redirected_to partnership_path(a)
     follow_redirect!
     assert_match "Pilot Group", response.body
     assert_match "Run by Creator Co", response.body, "partner_show should label creator org"
@@ -57,7 +57,7 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     delete session_path
     sign_in @admin
 
-    # Create + publish a Verto, then add to alliance
+    # Create + publish a Verto, then add to partnership
     survey = @oa.surveys.create!(
       title: "Pilot Verto", theme: "Pilot Theme", audience_age: "18-35",
       key_insight: "x", default_locale: "en", locales: [ "en" ],
@@ -66,25 +66,25 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
       published_at: Time.current
     )
 
-    post alliance_alliance_vertos_path(a), params: { survey_id: survey.id }
-    assert_redirected_to alliance_path(a)
+    post partnership_partnership_vertos_path(a), params: { survey_id: survey.id }
+    assert_redirected_to partnership_path(a)
     follow_redirect!
-    assert_match "Pilot Verto", response.body, "alliance creator_show should list added Verto"
+    assert_match "Pilot Verto", response.body, "partnership creator_show should list added Verto"
 
-    # Should have exactly one SurveyShare auto-generated (one partner in alliance)
+    # Should have exactly one SurveyShare auto-generated (one partner in partnership)
     assert_equal 1, a.survey_shares.count
     share = a.survey_shares.first
     assert_equal "Partner B", share.partner_organisation.name
     assert share.share_token.present?
   end
 
-  test "partner sees alliance in member section and gets their share link + results page" do
+  test "partner sees partnership in member section and gets their share link + results page" do
     # Build the scenario
-    a = @oa.alliances.create!(name: "Trial")
+    a = @oa.partnerships.create!(name: "Trial")
     partner_admin = User.create!(name: "P", email_address: "p2-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
     partner_org = Organisation.create!(name: "Partner X", slug: "partner-x-#{SecureRandom.hex(2)}")
     partner_org.memberships.create!(user: partner_admin, role: "admin")
-    a.alliance_memberships.create!(organisation: partner_org)
+    a.partnership_memberships.create!(organisation: partner_org)
 
     survey = @oa.surveys.create!(
       title: "Trial Verto", theme: "T", audience_age: "all",
@@ -92,62 +92,62 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
       cards: [ { "type"=>"single_choice", "title"=>"Q", "options"=>[ { "label"=>"A" }, { "label"=>"B" } ] } ],
       publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current
     )
-    a.alliance_vertos.create!(survey: survey)
-    AllianceShareSync.ensure_shares_for(alliance: a)
+    a.partnership_vertos.create!(survey: survey)
+    PartnershipShareSync.ensure_shares_for(partnership: a)
     share = a.survey_shares.first
 
     delete session_path
     sign_in partner_admin
 
-    get alliances_path
+    get partnerships_path
     assert_response :success
-    assert_match(/Alliances you('|&#39;)re a member of/, response.body)
+    assert_match(/Partner groups you('|&#39;)re a member of/, response.body)
     assert_match "Trial", response.body
 
-    get alliance_path(a)
+    get partnership_path(a)
     assert_response :success
     assert_match "Partner X", response.body, "partner_show should not crash for member"
     assert_match "Trial Verto", response.body
     assert_match share.share_token, response.body, "partner sees their own share token"
 
-    av = a.alliance_vertos.first
-    get alliance_alliance_verto_path(a, av)
+    av = a.partnership_vertos.first
+    get partnership_partnership_verto_path(a, av)
     assert_response :success
     assert_match "Trial Verto", response.body
     assert_match share.share_token, response.body
-    assert_match "across Trial", response.body, "aggregate strip names the alliance"
+    assert_match "across Trial", response.body, "aggregate strip names the partnership"
   end
 
   test "any org can be a creator and a partner-member simultaneously" do
     # Set up: org A creates "Group A", org B creates "Group B" and invites A
-    a_alliance = @oa.alliances.create!(name: "Group A")
+    a_partnership = @oa.partnerships.create!(name: "Group A")
 
     ob_admin = User.create!(name: "B-admin", email_address: "b-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
     ob = Organisation.create!(name: "Org B", slug: "ob-#{SecureRandom.hex(2)}")
     ob.memberships.create!(user: ob_admin, role: "admin")
-    b_alliance = ob.alliances.create!(name: "Group B")
-    b_alliance.alliance_memberships.create!(organisation: @oa)
+    b_partnership = ob.partnerships.create!(name: "Group B")
+    b_partnership.partnership_memberships.create!(organisation: @oa)
 
-    get alliances_path
+    get partnerships_path
     assert_response :success
-    assert_match "Group A", response.body, "should list owned alliance"
-    assert_match "Group B", response.body, "should list member alliance"
+    assert_match "Group A", response.body, "should list owned partnership"
+    assert_match "Group B", response.body, "should list member partnership"
 
     # Visiting Group A → creator_show
-    get alliance_path(a_alliance)
+    get partnership_path(a_partnership)
     assert_response :success
-    assert_match "Generate join link", response.body, "creator view of own alliance"
+    assert_match "Generate join link", response.body, "creator view of own partnership"
 
     # Visiting Group B → partner_show
-    get alliance_path(b_alliance)
+    get partnership_path(b_partnership)
     assert_response :success
-    assert_match "Run by Org B", response.body, "member view of alliance"
-    refute_match "Generate join link", response.body, "should NOT see creator controls on alliance you're a member of"
+    assert_match "Run by Org B", response.body, "member view of partnership"
+    refute_match "Generate join link", response.body, "should NOT see creator controls on partnership you're a member of"
   end
 
-  test "aggregate scope is per-alliance, not cross-alliance" do
-    # Two alliances, both contain the same partner B and the same Verto.
-    # Responses through alliance 1's share should not appear in alliance 2's aggregate.
+  test "aggregate scope is per-partnership, not cross-partnership" do
+    # Two partnerships, both contain the same partner B and the same Verto.
+    # Responses through partnership 1's share should not appear in partnership 2's aggregate.
     partner_admin = User.create!(name: "B", email_address: "agg-b-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
     partner_org = Organisation.create!(name: "Agg Partner", slug: "agg-#{SecureRandom.hex(2)}")
     partner_org.memberships.create!(user: partner_admin, role: "admin")
@@ -159,15 +159,15 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
       publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current
     )
 
-    a1 = @oa.alliances.create!(name: "Aggregate Alpha")
-    a1.alliance_memberships.create!(organisation: partner_org)
-    a1.alliance_vertos.create!(survey: survey)
-    AllianceShareSync.ensure_shares_for(alliance: a1)
+    a1 = @oa.partnerships.create!(name: "Aggregate Alpha")
+    a1.partnership_memberships.create!(organisation: partner_org)
+    a1.partnership_vertos.create!(survey: survey)
+    PartnershipShareSync.ensure_shares_for(partnership: a1)
 
-    a2 = @oa.alliances.create!(name: "Aggregate Beta")
-    a2.alliance_memberships.create!(organisation: partner_org)
-    a2.alliance_vertos.create!(survey: survey)
-    AllianceShareSync.ensure_shares_for(alliance: a2)
+    a2 = @oa.partnerships.create!(name: "Aggregate Beta")
+    a2.partnership_memberships.create!(organisation: partner_org)
+    a2.partnership_vertos.create!(survey: survey)
+    PartnershipShareSync.ensure_shares_for(partnership: a2)
 
     a1_share = a1.survey_shares.first
     a2_share = a2.survey_shares.first
@@ -179,31 +179,31 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     delete session_path
     sign_in partner_admin
 
-    av1 = a1.alliance_vertos.first
-    get alliance_alliance_verto_path(a1, av1)
+    av1 = a1.partnership_vertos.first
+    get partnership_partnership_verto_path(a1, av1)
     assert_response :success
     assert_match "<strong style=\"font-family:'Alata',sans-serif;\">2</strong> from your link", response.body
     assert_match "<strong style=\"font-family:'Alata',sans-serif;\">2</strong> across Aggregate Alpha", response.body,
-                 "aggregate should be 2 — only this alliance's responses, NOT 7"
+                 "aggregate should be 2 — only this partnership's responses, NOT 7"
 
-    av2 = a2.alliance_vertos.first
-    get alliance_alliance_verto_path(a2, av2)
+    av2 = a2.partnership_vertos.first
+    get partnership_partnership_verto_path(a2, av2)
     assert_response :success
     assert_match "<strong style=\"font-family:'Alata',sans-serif;\">5</strong> across Aggregate Beta", response.body
   end
 
-  test "signed-in admin of an existing org joins an alliance via the join link" do
+  test "signed-in admin of an existing org joins a partnership via the join link" do
     # Setup: a partner org with an existing admin who's signed in
     partner_admin = User.create!(name: "Existing", email_address: "exist-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
     partner_org = Organisation.create!(name: "Existing Co", slug: "exist-#{SecureRandom.hex(2)}")
     partner_org.memberships.create!(user: partner_admin, role: "admin")
 
-    # Creator (admin @admin from setup) makes an alliance + invite
-    a = @oa.alliances.create!(name: "Existing-User Group")
+    # Creator (admin @admin from setup) makes a partnership + invite
+    a = @oa.partnerships.create!(name: "Existing-User Group")
     invite = @oa.invites.create!(
       email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
       role: "admin", kind: "partner",
-      alliance: a, invited_by: @admin,
+      partnership: a, invited_by: @admin,
       expires_at: 14.days.from_now
     )
 
@@ -222,12 +222,12 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
 
     # POST accept with join_as_organisation_id
     post accept_invite_path(invite.token), params: { join_as_organisation_id: partner_org.id }
-    assert_redirected_to alliance_path(a)
+    assert_redirected_to partnership_path(a)
     follow_redirect!
     assert_match "Existing-User Group", response.body
 
-    # AllianceMembership created without creating a new org
-    assert a.alliance_memberships.exists?(organisation: partner_org), "existing org should be linked"
+    # PartnershipMembership created without creating a new org
+    assert a.partnership_memberships.exists?(organisation: partner_org), "existing org should be linked"
     refute Organisation.exists?(name: "#{partner_admin.name}'s organisation"), "no new org should be created"
 
     # Invite is single-use
@@ -241,11 +241,11 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     org_x.memberships.create!(user: user, role: "admin")
     org_y.memberships.create!(user: user, role: "admin")
 
-    a = @oa.alliances.create!(name: "Multi-Org Group")
+    a = @oa.partnerships.create!(name: "Multi-Org Group")
     invite = @oa.invites.create!(
       email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
       role: "admin", kind: "partner",
-      alliance: a, invited_by: @admin,
+      partnership: a, invited_by: @admin,
       expires_at: 14.days.from_now
     )
 
@@ -259,48 +259,48 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     assert_match "Org Y", response.body
 
     post accept_invite_path(invite.token), params: { join_as_organisation_id: org_y.id }
-    assert_redirected_to alliance_path(a)
+    assert_redirected_to partnership_path(a)
 
-    assert a.alliance_memberships.exists?(organisation: org_y)
-    refute a.alliance_memberships.exists?(organisation: org_x), "only the picked org should join"
+    assert a.partnership_memberships.exists?(organisation: org_y)
+    refute a.partnership_memberships.exists?(organisation: org_x), "only the picked org should join"
   end
 
-  test "signed-in admin of the alliance creator cannot join their own alliance" do
-    a = @oa.alliances.create!(name: "Self-Join Test")
+  test "signed-in admin of the partnership creator cannot join their own partnership" do
+    a = @oa.partnerships.create!(name: "Self-Join Test")
     invite = @oa.invites.create!(
       email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
       role: "admin", kind: "partner",
-      alliance: a, invited_by: @admin,
+      partnership: a, invited_by: @admin,
       expires_at: 14.days.from_now
     )
 
-    # @admin is signed in (from setup) and is admin of @oa, which created the alliance
+    # @admin is signed in (from setup) and is admin of @oa, which created the partnership
     get invite_path(invite.token)
     assert_response :success
-    assert_match "You run this alliance", response.body, "should explain why join isn't possible"
+    assert_match "You run this partner group", response.body, "should explain why join isn't possible"
     refute_match "Pick which organisation joins", response.body
   end
 
-  test "signed-in admin of an org already in the alliance sees 'already a member'" do
+  test "signed-in admin of an org already in the partnership sees 'already a member'" do
     other_org = Organisation.create!(name: "Already Joined", slug: "aj-#{SecureRandom.hex(2)}")
     other_org.memberships.create!(user: @admin, role: "admin")
 
-    a = @oa.alliances.create!(name: "Already Member Test")
-    a.alliance_memberships.create!(organisation: other_org)
+    a = @oa.partnerships.create!(name: "Already Member Test")
+    a.partnership_memberships.create!(organisation: other_org)
 
     invite = @oa.invites.create!(
       email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
       role: "admin", kind: "partner",
-      alliance: a, invited_by: @admin,
+      partnership: a, invited_by: @admin,
       expires_at: 14.days.from_now
     )
 
     # @admin is signed in and admin of @oa (creator) + Already Joined (already member).
     get invite_path(invite.token)
     assert_response :success
-    # @oa is the creator → "You run this alliance" message wins over "already a member".
+    # @oa is the creator → "You run this partnership" message wins over "already a member".
     # That's fine; assert at least one informative banner shows.
-    assert(response.body.include?("You run this alliance") || response.body.include?("already in this alliance"))
+    assert(response.body.include?("You run this partner group") || response.body.include?("already in this partner group"))
     refute_match "Pick which organisation joins", response.body
   end
 
@@ -310,11 +310,11 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     partner_org = Organisation.create!(name: "Returning Co", slug: "ret-#{SecureRandom.hex(2)}")
     partner_org.memberships.create!(user: partner_admin, role: "admin")
 
-    a = @oa.alliances.create!(name: "Sign-In Test Group")
+    a = @oa.partnerships.create!(name: "Sign-In Test Group")
     invite = @oa.invites.create!(
       email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
       role: "admin", kind: "partner",
-      alliance: a, invited_by: @admin,
+      partnership: a, invited_by: @admin,
       expires_at: 14.days.from_now
     )
 
@@ -346,8 +346,8 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
 
     # Click join
     post accept_invite_path(invite.token), params: { join_as_organisation_id: partner_org.id }
-    assert_redirected_to alliance_path(a)
-    assert a.alliance_memberships.exists?(organisation: partner_org)
+    assert_redirected_to partnership_path(a)
+    assert a.partnership_memberships.exists?(organisation: partner_org)
     assert invite.reload.accepted?
   end
 
@@ -356,11 +356,11 @@ class AllianceFlowTest < ActionDispatch::IntegrationTest
     org = Organisation.create!(name: "X", slug: "wx-#{SecureRandom.hex(2)}")
     org.memberships.create!(user: user, role: "admin")
 
-    a = @oa.alliances.create!(name: "Wrong-PW Test")
+    a = @oa.partnerships.create!(name: "Wrong-PW Test")
     invite = @oa.invites.create!(
       email_address: "link-#{SecureRandom.hex(4)}@partner.invite",
       role: "admin", kind: "partner",
-      alliance: a, invited_by: @admin,
+      partnership: a, invited_by: @admin,
       expires_at: 14.days.from_now
     )
 

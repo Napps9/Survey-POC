@@ -1,7 +1,7 @@
 require "test_helper"
 
 class SurveysShowSmokeTest < ActionDispatch::IntegrationTest
-  test "surveys#show renders for a creator org without alliances or shares" do
+  test "surveys#show renders for a creator org without partnerships or shares" do
     user = User.create!(name: "U", email_address: "u-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
     org  = Organisation.create!(name: "O", slug: "o-#{SecureRandom.hex(2)}")
     org.memberships.create!(user: user, role: "admin")
@@ -12,8 +12,8 @@ class SurveysShowSmokeTest < ActionDispatch::IntegrationTest
 
     get survey_path(s)
     assert_response :success
-    assert_match "Share with an alliance", response.body
-    assert_match "Create an alliance →", response.body, "empty-alliances state should prompt to create one"
+    assert_match "Share with your Partners", response.body
+    assert_match "Create a partner group →", response.body, "empty-partnerships state should prompt to create one"
     # Draft share guidance: publishing yields a public link, no respondent account needed.
     assert_match "no Play Verto account needed", response.body
   end
@@ -34,11 +34,11 @@ class SurveysShowSmokeTest < ActionDispatch::IntegrationTest
     assert_match "no Play Verto account or sign-in required", response.body
   end
 
-  test "surveys#show 'Add to alliance' block lists available alliances" do
+  test "surveys#show 'Add to partnership' block lists available partnerships" do
     user = User.create!(name: "U", email_address: "u2-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
     org  = Organisation.create!(name: "O", slug: "o2-#{SecureRandom.hex(2)}")
     org.memberships.create!(user: user, role: "admin")
-    org.alliances.create!(name: "Pilot")
+    org.partnerships.create!(name: "Pilot")
     s = org.surveys.create!(title: "Smoke", theme: "Smoke", audience_age: "all", key_insight: "x", default_locale: "en", locales: [ "en" ], cards: [])
 
     post session_path, params: { email_address: user.email_address, password: "verylongpassword" }
@@ -47,7 +47,7 @@ class SurveysShowSmokeTest < ActionDispatch::IntegrationTest
     get survey_path(s)
     assert_response :success
     assert_match "Pilot", response.body
-    assert_match "Add to alliance", response.body
+    assert_match "Add to partnership", response.body
   end
 
   test "surveys#show renders the Rules-of-the-Game traffic lights" do

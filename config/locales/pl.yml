@@ -190,33 +190,33 @@ pl:
     wizard:
       step_counter: Krok %{n} z %{total}
   nav:
-    alliances: "Wspólny wpływ"
+    partnerships: "Partnerzy"
     shared_vertos: Udostępnione Verto
     my_vertos: Moje Verto
     create: Utwórz
     members: Członkowie
     sign_out: Wyloguj się
-  alliances:
+  partnerships:
     cq_section: "Wspólne pytania"
-    cq_add_body: "Wybierz jeden ze swoich zestawów pytań — każdy partner w tym sojuszu zobaczy jego pytania."
+    cq_add_body: "Wybierz jeden ze swoich zestawów pytań — każdy partner w tym partnerstwie zobaczy jego pytania."
     cq_add_submit: "Udostępnij zestaw →"
     cq_no_more: "Nie ma więcej zestawów pytań do udostępnienia."
     cq_create_new: "Utwórz zestaw →"
     cq_empty_title: "Nie udostępniono jeszcze wspólnych pytań"
     cq_empty_body: "Udostępnij zestaw pytań powyżej, a każdy partner zobaczy jego pytania."
-    cq_remove_confirm: "Usunąć „%{name}” z tego sojuszu? Partnerzy nie będą już widzieć jego pytań."
+    cq_remove_confirm: "Usunąć „%{name}” z tego partnerstwa? Partnerzy nie będą już widzieć jego pytań."
     cq_partner_section: "Wspólne pytania udostępnione tobie"
     cq_partner_empty_title: "Brak wspólnych pytań"
     cq_partner_empty_body: "Gdy %{org} udostępni zestaw pytań, jego pytania pojawią się tutaj."
-    title: "Wspólny wpływ — Playverto"
-    index_eyebrow: Twoje sojusze
-    index_heading: "Wspólny wpływ"
-    index_subtitle: Grupuj organizacje partnerskie w nazwane sojusze. Dodawaj Verto, a każdy partner otrzyma własny link do udostępniania.
-    new_button: "+ Nowy sojusz"
-    owned_section: Sojusze, którymi zarządzasz
-    owned_empty_title: Brak sojuszy
-    owned_empty_admin_html: Kliknij <span style="color:#FF1E6F;">+ Nowy sojusz</span> powyżej, aby utworzyć grupę, a następnie zaproś organizacje partnerskie i dodaj Verto.
-    owned_empty_member: Poproś administratora o utworzenie sojuszu.
+    title: "Partnerzy — Playverto"
+    index_eyebrow: Twoje partnerstwa
+    index_heading: "Partnerzy"
+    index_subtitle: Grupuj organizacje partnerskie w nazwane partnerstwa. Dodawaj Verto, a każdy partner otrzyma własny link do udostępniania.
+    new_button: "+ Nowe partnerstwo"
+    owned_section: Partnerstwa, którymi zarządzasz
+    owned_empty_title: Brak partnerstw
+    owned_empty_admin_html: Kliknij <span style="color:#FF1E6F;">+ Nowe partnerstwo</span> powyżej, aby utworzyć grupę, a następnie zaproś organizacje partnerskie i dodaj Verto.
+    owned_empty_member: Poproś administratora o utworzenie partnerstwa.
     started_on: Rozpoczęto %{date}
     partners_count:
       one: partner
@@ -225,43 +225,43 @@ pl:
       one: verto
       other: verto
     open: Otwórz →
-    member_section: Sojusze, których jesteś członkiem
-    member_empty_title: Nie zaproszono Cię do żadnego sojuszu
-    member_empty_body: Gdy inna organizacja zaprosi Cię do swojego sojuszu, pojawi się on tutaj.
+    member_section: Partnerstwa, których jesteś członkiem
+    member_empty_title: Nie zaproszono Cię do żadnego partnerstwa
+    member_empty_body: Gdy inna organizacja zaprosi Cię do swojego partnerstwa, pojawi się ono tutaj.
     member_run_by: Prowadzony przez %{org}
     status:
       active: Aktywny
       pending: Oczekujący
       revoked: Cofnięty
-    new_title: Nowy sojusz — Playverto
-    new_eyebrow: Nowy sojusz
-    new_heading: Nazwij swój sojusz
+    new_title: Nowe partnerstwo — Playverto
+    new_eyebrow: Nowe partnerstwo
+    new_heading: Nazwij swoje partnerstwo
     new_sub: Nadaj grupie jasną nazwę, aby partnerzy wiedzieli, do czego dołączają.
-    name_label: Nazwa sojuszu
+    name_label: Nazwa partnerstwa
     name_placeholder: np. Pilot Partners
     cancel: Anuluj
-    create_submit: Utwórz sojusz →
-    show_title: "%{name} — Wspólny wpływ"
-    back_to_all: Wszystkie sojusze
-    creator_eyebrow: Sojusz · Ty go prowadzisz
-    partner_eyebrow: Sojusz · Członek
+    create_submit: Utwórz partnerstwo →
+    show_title: "%{name} — Partnerzy"
+    back_to_all: Wszystkie partnerstwa
+    creator_eyebrow: Partnerstwo · Ty je prowadzisz
+    partner_eyebrow: Partnerstwo · Członek
     generate_link: Wygeneruj link dołączenia →
     delete: Usuń
-    delete_confirm: Usunąć %{name}? Wszystkie linki udostępniania tego sojuszu przestaną działać.
+    delete_confirm: Usunąć %{name}? Wszystkie linki udostępniania tego partnerstwa przestaną działać.
     new_link_heading: Nowy link dołączenia
-    new_link_body: Każdy, kto ma ten link, może dołączyć do %{alliance} jako partner. Wygasa za 14 dni.
+    new_link_body: Każdy, kto ma ten link, może dołączyć do %{partnership} jako partner. Wygasa za 14 dni.
     copy: Kopiuj
     copied: Skopiowano!
     partners_section: Partnerzy
     no_partners_title: Brak partnerów
     no_partners_body_html: Użyj <span style="color:#FF1E6F;">Wygeneruj link dołączenia</span> powyżej, aby zaprosić organizacje partnerskie.
     joined_on: Dołączono %{date}
-    remove_member_confirm: Usunąć %{org} z %{alliance}? Ich linki udostępniania przestaną działać.
-    vertos_section: Verto w sojuszu
+    remove_member_confirm: Usunąć %{org} z %{partnership}? Ich linki udostępniania przestaną działać.
+    vertos_section: Verto w partnerstwie
     no_vertos_title: Nie udostępniono jeszcze żadnego Verto
     no_vertos_body: Dodaj opublikowane Verto poniżej, a dla każdego partnera zostanie wygenerowany unikalny link udostępniania.
     remove: Usuń
-    remove_verto_confirm: Usunąć to Verto z %{alliance}? Wszystkie partnerskie linki udostępniania przestaną działać.
+    remove_verto_confirm: Usunąć to Verto z %{partnership}? Wszystkie partnerskie linki udostępniania przestaną działać.
     completion_label: ukończenie
     responses:
       one: odpowiedź
@@ -269,32 +269,32 @@ pl:
     partner_links_count:
       one: link partnerski
       other: linki partnerskie
-    no_shares_yet: Dodaj partnera do sojuszu, aby wygenerować linki udostępniania.
+    no_shares_yet: Dodaj partnera do partnerstwa, aby wygenerować linki udostępniania.
     responses_short: "%{n} odp."
-    add_section: Dodaj do sojuszu
+    add_section: Dodaj do partnerstwa
     add_heading: Dodaj kolejne Verto
-    add_body: Wybierz opublikowane Verto. Wygenerujemy unikalny link udostępniania dla każdego partnera w sojuszu.
+    add_body: Wybierz opublikowane Verto. Wygenerujemy unikalny link udostępniania dla każdego partnera w partnerstwie.
     no_more_vertos: Brak kolejnych opublikowanych Verto do dodania.
     create_new_verto: Utwórz nowe Verto →
     add_submit: Dodaj Verto →
-    partners_in_alliance: Partnerzy w sojuszu
+    partners_in_partnership: Partnerzy w partnerstwie
     including_you: Łącznie z Tobą
     shared_vertos_short: Udostępnione Verto
     available_to_distribute: Dostępne do dystrybucji
     other_partners: Inni partnerzy
-    only_partner: Jesteś na razie jedynym partnerem w tym sojuszu.
+    only_partner: Jesteś na razie jedynym partnerem w tym partnerstwie.
     your_vertos_section: Verto udostępnione Tobie
     partner_no_vertos_title: Brak Verto
-    partner_no_vertos_body: Gdy %{org} doda Verto do tego sojuszu, zobaczysz tutaj swój unikalny link udostępniania.
+    partner_no_vertos_body: Gdy %{org} doda Verto do tego partnerstwa, zobaczysz tutaj swój unikalny link udostępniania.
     from_org: Od %{org}
     your_link: Twój link
     results_link: Wyniki →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Udostępnione Verto"
-    from_org_alliance: Od %{org} · %{alliance}
+    from_org_partnership: Od %{org} · %{partnership}
     share_link: Link udostępniania
     mine_label: z Twojego linku
-    aggregate_label: w obrębie %{alliance}
+    aggregate_label: w obrębie %{partnership}
     card_n: Karta %{n}
     my_results: Moje wyniki
     aggregate: Suma
@@ -310,19 +310,19 @@ pl:
     expired_title: Zaproszenie wygasło
     expired_body: Ten link ma więcej niż 7 dni. Poproś administratora o przesłanie nowego.
     invited_to_join: Zaproszono Cię do dołączenia do
-    alliance_by: sojuszu prowadzonego przez %{org}
+    partnership_by: partnerstwa prowadzonego przez %{org}
     as_role: jako %{role}
     addressed_for: "· dla %{email}"
     signed_in_as: Zalogowano jako %{name}
     join_with: Dołącz jako
     pick_org: Wybierz, która organizacja dołączy
-    join_submit: Dołącz do %{alliance} →
-    already_in_alliance: 'Już w tym sojuszu: %{orgs}'
-    you_run_this: Prowadzisz ten sojusz — odwiedź go zamiast tego.
-    already_member_singular: "%{orgs} jest już w tym sojuszu."
-    already_member_plural: "%{orgs} są już w tym sojuszu."
-    no_admin_org: Nie masz organizacji administratorskiej, która mogłaby dołączyć do tego sojuszu.
-    open_alliance: Otwórz %{alliance} →
+    join_submit: Dołącz do %{partnership} →
+    already_in_partnership: 'Już w tym partnerstwie: %{orgs}'
+    you_run_this: Prowadzisz to partnerstwo — odwiedź je zamiast tego.
+    already_member_singular: "%{orgs} jest już w tym partnerstwie."
+    already_member_plural: "%{orgs} są już w tym partnerstwie."
+    no_admin_org: Nie masz organizacji administratorskiej, która mogłaby dołączyć do tego partnerstwa.
+    open_partnership: Otwórz %{partnership} →
     sign_out_link: Wyloguj się i użyj innego konta
     sign_out_confirm: Wylogować się z bieżącego konta?
     already_have_account: Masz już konto Playverto?
@@ -426,7 +426,7 @@ pl:
   dashboard:
     welcome_back: Witaj ponownie
     heading_html: Twoje <span style="color:#01EACB;">Verto</span>
-    subtitle: Twórz Verto, udostępniaj je swojemu sojuszowi i obserwuj napływające wnioski.
+    subtitle: Twórz Verto, udostępniaj je swojemu partnerstwu i obserwuj napływające wnioski.
     create_new: Utwórz nowe Verto
     import_google_form_button: Utwórz nowy formularz
     import_google_form_modal_subtitle: Wklej link do istniejącego Google Form, a zamienimy go w edytowalne Verto.

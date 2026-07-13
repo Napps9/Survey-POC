@@ -190,33 +190,33 @@ he:
     wizard:
       step_counter: שלב %{n} מתוך %{total}
   nav:
-    alliances: "השפעה משותפת"
+    partnerships: "שותפים"
     shared_vertos: Vertos משותפים
     my_vertos: ה-Vertos שלי
     create: צור
     members: חברים
     sign_out: התנתק
-  alliances:
+  partnerships:
     cq_section: "שאלות משותפות"
-    cq_add_body: "בחרו אחת מערכות השאלות שלכם — כל שותף בברית הזו יוכל לראות את השאלות שלה."
+    cq_add_body: "בחרו אחת מערכות השאלות שלכם — כל שותף בשותפות הזו יוכל לראות את השאלות שלה."
     cq_add_submit: "שיתוף ערכה ←"
     cq_no_more: "אין עוד ערכות שאלות לשיתוף."
     cq_create_new: "יצירת ערכה ←"
     cq_empty_title: "עוד לא שותפו שאלות משותפות"
     cq_empty_body: "שתפו ערכת שאלות למעלה וכל השותפים יראו את השאלות שלה."
-    cq_remove_confirm: "להסיר את “%{name}” מהברית הזו? השותפים לא יראו עוד את השאלות שלה."
+    cq_remove_confirm: "להסיר את “%{name}” מהשותפות הזו? השותפים לא יראו עוד את השאלות שלה."
     cq_partner_section: "שאלות משותפות ששותפו איתכם"
     cq_partner_empty_title: "אין עדיין שאלות משותפות"
     cq_partner_empty_body: "כאשר %{org} ישתף ערכת שאלות, השאלות שלה יופיעו כאן."
-    title: "השפעה משותפת — Playverto"
-    index_eyebrow: הבריתות שלך
-    index_heading: "השפעה משותפת"
-    index_subtitle: קבצו ארגונים שותפים לבריתות עם שם משלהן. הוסיפו Vertos וכל שותף יקבל קישור שיתוף משלו.
-    new_button: "+ ברית חדשה"
-    owned_section: בריתות שאתם מנהלים
-    owned_empty_title: אין עדיין בריתות
-    owned_empty_admin_html: לחצו על <span style="color:#FF1E6F;">+ ברית חדשה</span> למעלה כדי להתחיל קבוצה, ואז הזמינו ארגונים שותפים והוסיפו Vertos.
-    owned_empty_member: בקשו מהמנהל שלכם ליצור ברית.
+    title: "שותפים — Playverto"
+    index_eyebrow: השותפויות שלך
+    index_heading: "שותפים"
+    index_subtitle: קבצו ארגונים שותפים לשותפויות עם שם משלהן. הוסיפו Vertos וכל שותף יקבל קישור שיתוף משלו.
+    new_button: "+ שותפות חדשה"
+    owned_section: שותפויות שאתם מנהלים
+    owned_empty_title: אין עדיין שותפויות
+    owned_empty_admin_html: לחצו על <span style="color:#FF1E6F;">+ שותפות חדשה</span> למעלה כדי להתחיל קבוצה, ואז הזמינו ארגונים שותפים והוסיפו Vertos.
+    owned_empty_member: בקשו מהמנהל שלכם ליצור שותפות.
     started_on: החלה ב-%{date}
     partners_count:
       one: שותף
@@ -225,43 +225,43 @@ he:
       one: verto
       other: vertos
     open: פתח ←
-    member_section: בריתות שאתם חברים בהן
-    member_empty_title: לא הוזמנתם לאף ברית
-    member_empty_body: כאשר ארגון אחר יזמין אתכם לאחת הבריתות שלו, היא תופיע כאן.
+    member_section: שותפויות שאתם חברים בהן
+    member_empty_title: לא הוזמנתם לאף שותפות
+    member_empty_body: כאשר ארגון אחר יזמין אתכם לאחת השותפויות שלו, היא תופיע כאן.
     member_run_by: מנוהלת על ידי %{org}
     status:
       active: פעילה
       pending: ממתינה
       revoked: בוטלה
-    new_title: ברית חדשה — Playverto
-    new_eyebrow: ברית חדשה
-    new_heading: תנו שם לברית
+    new_title: שותפות חדשה — Playverto
+    new_eyebrow: שותפות חדשה
+    new_heading: תנו שם לשותפות
     new_sub: תנו לקבוצה שם ברור כדי שהשותפים יבינו למה הם מצטרפים.
-    name_label: שם הברית
+    name_label: שם השותפות
     name_placeholder: 'לדוגמה: שותפי פיילוט'
     cancel: ביטול
-    create_submit: צרו ברית ←
-    show_title: "%{name} — השפעה משותפת"
-    back_to_all: כל הבריתות
-    creator_eyebrow: ברית · אתם מנהלים זאת
-    partner_eyebrow: ברית · חבר
+    create_submit: צרו שותפות ←
+    show_title: "%{name} — שותפים"
+    back_to_all: כל השותפויות
+    creator_eyebrow: שותפות · אתם מנהלים זאת
+    partner_eyebrow: שותפות · חבר
     generate_link: צרו קישור הצטרפות ←
     delete: מחק
-    delete_confirm: למחוק את %{name}? כל קישורי השיתוף לברית זו יפסיקו לעבוד.
+    delete_confirm: למחוק את %{name}? כל קישורי השיתוף לשותפות זו יפסיקו לעבוד.
     new_link_heading: קישור הצטרפות חדש
-    new_link_body: כל מי שיש לו קישור זה יכול להצטרף ל-%{alliance} כשותף. תוקף ל-14 ימים.
+    new_link_body: כל מי שיש לו קישור זה יכול להצטרף ל-%{partnership} כשותף. תוקף ל-14 ימים.
     copy: העתק
     copied: הועתק!
     partners_section: שותפים
     no_partners_title: אין עדיין שותפים
     no_partners_body_html: השתמשו ב-<span style="color:#FF1E6F;">צרו קישור הצטרפות</span> למעלה כדי להזמין ארגונים שותפים.
     joined_on: הצטרף ב-%{date}
-    remove_member_confirm: להסיר את %{org} מ-%{alliance}? קישורי השיתוף שלהם יפסיקו לעבוד.
-    vertos_section: Vertos בברית
+    remove_member_confirm: להסיר את %{org} מ-%{partnership}? קישורי השיתוף שלהם יפסיקו לעבוד.
+    vertos_section: Vertos בשותפות
     no_vertos_title: לא שותפו עדיין Vertos
     no_vertos_body: הוסיפו Verto שפורסם למטה וייווצר קישור שיתוף ייחודי לכל שותף.
     remove: הסר
-    remove_verto_confirm: להסיר את ה-Verto הזה מ-%{alliance}? כל קישורי השיתוף של השותפים עבורו יפסיקו לעבוד.
+    remove_verto_confirm: להסיר את ה-Verto הזה מ-%{partnership}? כל קישורי השיתוף של השותפים עבורו יפסיקו לעבוד.
     completion_label: השלמה
     responses:
       one: תגובה
@@ -269,32 +269,32 @@ he:
     partner_links_count:
       one: קישור שותף
       other: קישורי שותפים
-    no_shares_yet: הוסיפו שותף לברית כדי ליצור קישורי שיתוף.
+    no_shares_yet: הוסיפו שותף לשותפות כדי ליצור קישורי שיתוף.
     responses_short: "%{n} תגובות"
-    add_section: הוספה לברית
+    add_section: הוספה לשותפות
     add_heading: הוסיפו Verto נוסף
-    add_body: בחרו Verto שפורסם. ניצור קישור שיתוף ייחודי לכל שותף בברית.
+    add_body: בחרו Verto שפורסם. ניצור קישור שיתוף ייחודי לכל שותף בשותפות.
     no_more_vertos: אין יותר Vertos שפורסמו להוספה.
     create_new_verto: צרו Verto חדש ←
     add_submit: הוסיפו Verto ←
-    partners_in_alliance: שותפים בברית
+    partners_in_partnership: שותפים בשותפות
     including_you: כולל אתכם
     shared_vertos_short: Vertos משותפים
     available_to_distribute: זמינים להפצה על ידכם
     other_partners: שותפים אחרים
-    only_partner: אתם השותף היחיד בברית זו כרגע.
+    only_partner: אתם השותף היחיד בשותפות זו כרגע.
     your_vertos_section: Vertos ששותפו איתכם
     partner_no_vertos_title: אין עדיין Vertos
-    partner_no_vertos_body: כאשר %{org} יוסיף Verto לברית זו, תראו כאן את קישור השיתוף הייחודי שלכם.
+    partner_no_vertos_body: כאשר %{org} יוסיף Verto לשותפות זו, תראו כאן את קישור השיתוף הייחודי שלכם.
     from_org: מאת %{org}
     your_link: הקישור שלכם
     results_link: תוצאות ←
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Verto משותף"
-    from_org_alliance: מאת %{org} · %{alliance}
+    from_org_partnership: מאת %{org} · %{partnership}
     share_link: קישור שיתוף
     mine_label: מהקישור שלכם
-    aggregate_label: בכל %{alliance}
+    aggregate_label: בכל %{partnership}
     card_n: כרטיס %{n}
     my_results: התוצאות שלי
     aggregate: מצטבר
@@ -310,19 +310,19 @@ he:
     expired_title: ההזמנה פגה
     expired_body: הקישור הזה ישן ביותר מ-7 ימים. בקשו מהמנהל שלכם לשלוח חדש.
     invited_to_join: הוזמנתם להצטרף
-    alliance_by: לברית של %{org}
+    partnership_by: לשותפות של %{org}
     as_role: בתפקיד %{role}
     addressed_for: "· עבור %{email}"
     signed_in_as: מחוברים בתור %{name}
     join_with: הצטרפו עם
     pick_org: בחרו איזה ארגון מצטרף
-    join_submit: הצטרפו ל-%{alliance} ←
-    already_in_alliance: 'כבר בברית זו: %{orgs}'
-    you_run_this: אתם מנהלים ברית זו — בקרו בה במקום זאת.
-    already_member_singular: "%{orgs} כבר נמצא בברית זו."
-    already_member_plural: "%{orgs} כבר נמצאים בברית זו."
-    no_admin_org: אין לכם ארגון מנהל שיכול להצטרף לברית זו.
-    open_alliance: פתחו את %{alliance} ←
+    join_submit: הצטרפו ל-%{partnership} ←
+    already_in_partnership: 'כבר בשותפות זו: %{orgs}'
+    you_run_this: אתם מנהלים שותפות זו — בקרו בה במקום זאת.
+    already_member_singular: "%{orgs} כבר נמצא בשותפות זו."
+    already_member_plural: "%{orgs} כבר נמצאים בשותפות זו."
+    no_admin_org: אין לכם ארגון מנהל שיכול להצטרף לשותפות זו.
+    open_partnership: פתחו את %{partnership} ←
     sign_out_link: התנתקו והשתמשו בחשבון אחר
     sign_out_confirm: להתנתק מהחשבון הנוכחי?
     already_have_account: כבר יש לכם חשבון Playverto?
@@ -426,7 +426,7 @@ he:
   dashboard:
     welcome_back: ברוך שובך
     heading_html: ה-<span style="color:#01EACB;">Vertos</span> שלך
-    subtitle: הפעל Vertos, שתף אותם עם הברית שלך, וצפה בתובנות מצטברות.
+    subtitle: הפעל Vertos, שתף אותם עם השותפות שלך, וצפה בתובנות מצטברות.
     create_new: צור Verto חדש
     import_google_form_button: יצירת טופס חדש
     import_google_form_modal_subtitle: הדבק קישור לטופס Google קיים ונהפוך אותו ל-Verto הניתן לעריכה.

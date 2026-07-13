@@ -190,33 +190,33 @@ vi:
     wizard:
       step_counter: Bước %{n} / %{total}
   nav:
-    alliances: "Tác động tập thể"
+    partnerships: "Đối tác"
     shared_vertos: Vertos được chia sẻ
     my_vertos: Vertos của tôi
     create: Tạo
     members: Thành viên
     sign_out: Đăng xuất
-  alliances:
+  partnerships:
     cq_section: "Câu hỏi chung"
-    cq_add_body: "Chọn một bộ câu hỏi của bạn — mọi đối tác trong liên minh này đều có thể xem các câu hỏi của nó."
+    cq_add_body: "Chọn một bộ câu hỏi của bạn — mọi đối tác trong nhóm đối tác này đều có thể xem các câu hỏi của nó."
     cq_add_submit: "Chia sẻ bộ →"
     cq_no_more: "Không còn bộ câu hỏi nào để chia sẻ."
     cq_create_new: "Tạo bộ mới →"
     cq_empty_title: "Chưa có Câu hỏi chung nào được chia sẻ"
     cq_empty_body: "Chia sẻ một bộ câu hỏi ở trên và mọi đối tác sẽ thấy các câu hỏi của nó."
-    cq_remove_confirm: "Gỡ “%{name}” khỏi liên minh này? Đối tác sẽ không còn thấy các câu hỏi của nó."
+    cq_remove_confirm: "Gỡ “%{name}” khỏi nhóm đối tác này? Đối tác sẽ không còn thấy các câu hỏi của nó."
     cq_partner_section: "Câu hỏi chung được chia sẻ với bạn"
     cq_partner_empty_title: "Chưa có Câu hỏi chung"
     cq_partner_empty_body: "Khi %{org} chia sẻ một bộ câu hỏi, các câu hỏi sẽ xuất hiện ở đây."
-    title: "Tác động tập thể — Playverto"
-    index_eyebrow: Liên minh của bạn
-    index_heading: "Tác động tập thể"
-    index_subtitle: Nhóm các tổ chức đối tác thành các liên minh có tên. Thêm Vertos và mỗi đối tác sẽ có liên kết chia sẻ riêng.
-    new_button: "+ Liên minh mới"
-    owned_section: Liên minh bạn quản lý
-    owned_empty_title: Chưa có liên minh nào
-    owned_empty_admin_html: Nhấp <span style="color:#FF1E6F;">+ Liên minh mới</span> ở trên để bắt đầu nhóm, sau đó mời các tổ chức đối tác và thêm Vertos.
-    owned_empty_member: Hãy đề nghị quản trị viên của bạn tạo một liên minh.
+    title: "Đối tác — Playverto"
+    index_eyebrow: Nhóm đối tác của bạn
+    index_heading: "Đối tác"
+    index_subtitle: Nhóm các tổ chức đối tác thành các nhóm đối tác có tên. Thêm Vertos và mỗi đối tác sẽ có liên kết chia sẻ riêng.
+    new_button: "+ Nhóm đối tác mới"
+    owned_section: Nhóm đối tác bạn quản lý
+    owned_empty_title: Chưa có nhóm đối tác nào
+    owned_empty_admin_html: Nhấp <span style="color:#FF1E6F;">+ Nhóm đối tác mới</span> ở trên để bắt đầu nhóm, sau đó mời các tổ chức đối tác và thêm Vertos.
+    owned_empty_member: Hãy đề nghị quản trị viên của bạn tạo một nhóm đối tác.
     started_on: Bắt đầu %{date}
     partners_count:
       one: đối tác
@@ -225,43 +225,43 @@ vi:
       one: verto
       other: vertos
     open: Mở →
-    member_section: Liên minh bạn là thành viên
-    member_empty_title: Bạn chưa được mời vào liên minh nào
-    member_empty_body: Khi một tổ chức khác mời bạn vào một trong các liên minh của họ, nó sẽ xuất hiện ở đây.
+    member_section: Nhóm đối tác bạn là thành viên
+    member_empty_title: Bạn chưa được mời vào nhóm đối tác nào
+    member_empty_body: Khi một tổ chức khác mời bạn vào một trong các nhóm đối tác của họ, nó sẽ xuất hiện ở đây.
     member_run_by: Quản lý bởi %{org}
     status:
       active: Đang hoạt động
       pending: Đang chờ
       revoked: Đã thu hồi
-    new_title: Liên minh mới — Playverto
-    new_eyebrow: Liên minh mới
-    new_heading: Đặt tên cho liên minh của bạn
+    new_title: Nhóm đối tác mới — Playverto
+    new_eyebrow: Nhóm đối tác mới
+    new_heading: Đặt tên cho nhóm đối tác của bạn
     new_sub: Đặt một cái tên rõ ràng để các đối tác biết họ đang tham gia gì.
-    name_label: Tên liên minh
+    name_label: Tên nhóm đối tác
     name_placeholder: 'ví dụ: Đối tác Thử nghiệm'
     cancel: Hủy
-    create_submit: Tạo liên minh →
-    show_title: "%{name} — Tác động tập thể"
-    back_to_all: Tất cả liên minh
-    creator_eyebrow: Liên minh · Bạn quản lý
-    partner_eyebrow: Liên minh · Thành viên
+    create_submit: Tạo nhóm đối tác →
+    show_title: "%{name} — Đối tác"
+    back_to_all: Tất cả nhóm đối tác
+    creator_eyebrow: Nhóm đối tác · Bạn quản lý
+    partner_eyebrow: Nhóm đối tác · Thành viên
     generate_link: Tạo liên kết tham gia →
     delete: Xóa
-    delete_confirm: Xóa %{name}? Tất cả liên kết chia sẻ cho liên minh này sẽ ngừng hoạt động.
+    delete_confirm: Xóa %{name}? Tất cả liên kết chia sẻ cho nhóm đối tác này sẽ ngừng hoạt động.
     new_link_heading: Liên kết tham gia mới
-    new_link_body: Bất kỳ ai có liên kết này đều có thể tham gia %{alliance} với tư cách đối tác. Hết hạn sau 14 ngày.
+    new_link_body: Bất kỳ ai có liên kết này đều có thể tham gia %{partnership} với tư cách đối tác. Hết hạn sau 14 ngày.
     copy: Sao chép
     copied: Đã sao chép!
     partners_section: Đối tác
     no_partners_title: Chưa có đối tác nào
     no_partners_body_html: Sử dụng <span style="color:#FF1E6F;">Tạo liên kết tham gia</span> ở trên để mời các tổ chức đối tác.
     joined_on: Tham gia %{date}
-    remove_member_confirm: Xóa %{org} khỏi %{alliance}? Liên kết chia sẻ của họ sẽ ngừng hoạt động.
-    vertos_section: Vertos trong liên minh
+    remove_member_confirm: Xóa %{org} khỏi %{partnership}? Liên kết chia sẻ của họ sẽ ngừng hoạt động.
+    vertos_section: Vertos trong nhóm đối tác
     no_vertos_title: Chưa có Verto nào được chia sẻ
     no_vertos_body: Thêm một Verto đã xuất bản bên dưới và một liên kết chia sẻ duy nhất sẽ được tạo cho mỗi đối tác.
     remove: Xóa
-    remove_verto_confirm: Xóa Verto này khỏi %{alliance}? Tất cả liên kết chia sẻ của đối tác cho nó sẽ ngừng hoạt động.
+    remove_verto_confirm: Xóa Verto này khỏi %{partnership}? Tất cả liên kết chia sẻ của đối tác cho nó sẽ ngừng hoạt động.
     completion_label: hoàn thành
     responses:
       one: phản hồi
@@ -269,32 +269,32 @@ vi:
     partner_links_count:
       one: liên kết đối tác
       other: liên kết đối tác
-    no_shares_yet: Thêm đối tác vào liên minh để tạo liên kết chia sẻ.
+    no_shares_yet: Thêm đối tác vào nhóm đối tác để tạo liên kết chia sẻ.
     responses_short: "%{n} ph.hồi"
-    add_section: Thêm vào liên minh
+    add_section: Thêm vào nhóm đối tác
     add_heading: Thêm một Verto khác
-    add_body: Chọn một Verto đã xuất bản. Chúng tôi sẽ tạo một liên kết chia sẻ duy nhất cho mỗi đối tác trong liên minh.
+    add_body: Chọn một Verto đã xuất bản. Chúng tôi sẽ tạo một liên kết chia sẻ duy nhất cho mỗi đối tác trong nhóm đối tác.
     no_more_vertos: Không còn Verto đã xuất bản nào để thêm.
     create_new_verto: Tạo Verto mới →
     add_submit: Thêm Verto →
-    partners_in_alliance: Đối tác trong liên minh
+    partners_in_partnership: Đối tác trong nhóm đối tác
     including_you: Bao gồm bạn
     shared_vertos_short: Vertos được chia sẻ
     available_to_distribute: Sẵn có để bạn phân phối
     other_partners: Các đối tác khác
-    only_partner: Hiện tại bạn là đối tác duy nhất trong liên minh này.
+    only_partner: Hiện tại bạn là đối tác duy nhất trong nhóm đối tác này.
     your_vertos_section: Vertos được chia sẻ với bạn
     partner_no_vertos_title: Chưa có Verto nào
-    partner_no_vertos_body: Khi %{org} thêm một Verto vào liên minh này, bạn sẽ thấy liên kết chia sẻ duy nhất của mình ở đây.
+    partner_no_vertos_body: Khi %{org} thêm một Verto vào nhóm đối tác này, bạn sẽ thấy liên kết chia sẻ duy nhất của mình ở đây.
     from_org: Từ %{org}
     your_link: Liên kết của bạn
     results_link: Kết quả →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Verto được chia sẻ"
-    from_org_alliance: Từ %{org} · %{alliance}
+    from_org_partnership: Từ %{org} · %{partnership}
     share_link: Liên kết chia sẻ
     mine_label: từ liên kết của bạn
-    aggregate_label: trên toàn %{alliance}
+    aggregate_label: trên toàn %{partnership}
     card_n: Thẻ %{n}
     my_results: Kết quả của tôi
     aggregate: Tổng hợp
@@ -310,19 +310,19 @@ vi:
     expired_title: Lời mời đã hết hạn
     expired_body: Liên kết này đã hơn 7 ngày. Hãy đề nghị quản trị viên của bạn gửi lại.
     invited_to_join: Bạn đã được mời tham gia
-    alliance_by: một liên minh bởi %{org}
+    partnership_by: một nhóm đối tác bởi %{org}
     as_role: với vai trò %{role}
     addressed_for: "· cho %{email}"
     signed_in_as: Đã đăng nhập với tên %{name}
     join_with: Tham gia với
     pick_org: Chọn tổ chức nào sẽ tham gia
-    join_submit: Tham gia %{alliance} →
-    already_in_alliance: 'Đã ở trong liên minh này: %{orgs}'
-    you_run_this: Bạn quản lý liên minh này — hãy ghé thăm thay vì tham gia.
-    already_member_singular: "%{orgs} đã ở trong liên minh này."
-    already_member_plural: "%{orgs} đã ở trong liên minh này."
-    no_admin_org: Bạn không có tổ chức quản trị nào có thể tham gia liên minh này.
-    open_alliance: Mở %{alliance} →
+    join_submit: Tham gia %{partnership} →
+    already_in_partnership: 'Đã ở trong nhóm đối tác này: %{orgs}'
+    you_run_this: Bạn quản lý nhóm đối tác này — hãy ghé thăm thay vì tham gia.
+    already_member_singular: "%{orgs} đã ở trong nhóm đối tác này."
+    already_member_plural: "%{orgs} đã ở trong nhóm đối tác này."
+    no_admin_org: Bạn không có tổ chức quản trị nào có thể tham gia nhóm đối tác này.
+    open_partnership: Mở %{partnership} →
     sign_out_link: Đăng xuất và sử dụng tài khoản khác
     sign_out_confirm: Đăng xuất khỏi tài khoản hiện tại?
     already_have_account: Đã có tài khoản Playverto?
@@ -426,7 +426,7 @@ vi:
   dashboard:
     welcome_back: Chào mừng trở lại
     heading_html: <span style="color:#01EACB;">Vertos</span> của bạn
-    subtitle: Khởi tạo Vertos, chia sẻ với liên minh của bạn và theo dõi các thông tin chi tiết đổ về.
+    subtitle: Khởi tạo Vertos, chia sẻ với nhóm đối tác của bạn và theo dõi các thông tin chi tiết đổ về.
     create_new: Tạo Verto mới
     import_google_form_button: Tạo biểu mẫu mới
     import_google_form_modal_subtitle: Dán liên kết đến một Google Form hiện có và chúng tôi sẽ biến nó thành một Verto có thể chỉnh sửa.

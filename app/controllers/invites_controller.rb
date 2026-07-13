@@ -137,11 +137,11 @@ class InvitesController < ApplicationController
     redirect_to invite_path(@invite.token)
   end
 
-  # Signed-in user joins the alliance with one of their existing admin orgs.
+  # Signed-in user joins the partnership with one of their existing admin orgs.
   # No password reconfirmation — the active session already authenticates them.
   def accept_partner_invite_as_signed_in
-    alliance = @invite.alliance
-    unless alliance
+    partnership = @invite.partnership
+    unless partnership
       return redirect_to new_session_path, alert: "This invite is no longer valid."
     end
 
@@ -153,25 +153,25 @@ class InvitesController < ApplicationController
     end
 
     org = membership.organisation
-    if org.id == alliance.organisation_id
-      flash.now[:alert] = "You can't join an alliance you created."
+    if org.id == partnership.organisation_id
+      flash.now[:alert] = "You can't join a partnership you created."
       return render :show, status: :unprocessable_entity
     end
-    if alliance.alliance_memberships.exists?(organisation_id: org.id)
-      return redirect_to alliance_path(alliance), notice: "#{org.name} is already a member of #{alliance.name}."
+    if partnership.partnership_memberships.exists?(organisation_id: org.id)
+      return redirect_to partnership_path(partnership), notice: "#{org.name} is already a member of #{partnership.name}."
     end
 
     ActiveRecord::Base.transaction do
-      join_alliance(org, alliance)
+      join_partnership(org, partnership)
       @invite.update!(accepted_at: Time.current)
     end
 
-    redirect_to alliance_path(alliance), notice: "#{org.name} joined #{alliance.name}."
+    redirect_to partnership_path(partnership), notice: "#{org.name} joined #{partnership.name}."
   end
 
   def accept_partner_invite
-    alliance = @invite.alliance
-    unless alliance
+    partnership = @invite.partnership
+    unless partnership
       return redirect_to new_session_path, alert: "This invite is no longer valid."
     end
 
@@ -185,16 +185,16 @@ class InvitesController < ApplicationController
         flash.now[:alert] = "Enter your existing Playverto password to link your organisation."
         return render :show, status: :unprocessable_entity
       end
-      if admin_org.id == alliance.organisation_id
-        flash.now[:alert] = "You can't join an alliance you created."
+      if admin_org.id == partnership.organisation_id
+        flash.now[:alert] = "You can't join a partnership you created."
         return render :show, status: :unprocessable_entity
       end
       ActiveRecord::Base.transaction do
-        join_alliance(admin_org, alliance)
+        join_partnership(admin_org, partnership)
         @invite.update!(accepted_at: Time.current)
         start_new_session_for existing_user
       end
-      redirect_to alliance_path(alliance), notice: "#{admin_org.name} joined #{alliance.name}."
+      redirect_to partnership_path(partnership), notice: "#{admin_org.name} joined #{partnership.name}."
     else
       name     = params[:name].to_s.strip
       org_name = params[:organisation_name].to_s.strip.presence || "#{name}'s organisation"
@@ -221,20 +221,20 @@ class InvitesController < ApplicationController
           slug: Organisation.generate_unique_slug(org_name)
         )
         partner_org.memberships.create!(user: user, role: "admin")
-        join_alliance(partner_org, alliance)
+        join_partnership(partner_org, partnership)
         @invite.update!(accepted_at: Time.current)
         start_new_session_for user
       end
-      redirect_to alliance_path(alliance), notice: "Welcome to #{alliance.name}!"
+      redirect_to partnership_path(partnership), notice: "Welcome to #{partnership.name}!"
     end
   end
 
-  def join_alliance(partner_org, alliance)
-    AllianceMembership.find_or_create_by!(
-      alliance: alliance,
+  def join_partnership(partner_org, partnership)
+    PartnershipMembership.find_or_create_by!(
+      partnership: partnership,
       organisation: partner_org
     ) { |m| m.status = "active" }
-    AllianceShareSync.ensure_shares_for(alliance: alliance)
+    PartnershipShareSync.ensure_shares_for(partnership: partnership)
   end
 
   # Populates Current.user if there's a valid session cookie. Used by the
@@ -245,19 +245,19 @@ class InvitesController < ApplicationController
   end
 
   # For the partner-invite show/accept actions, surface which of the
-  # signed-in user's admin orgs could join this alliance.
+  # signed-in user's admin orgs could join this partnership.
   def load_join_options
     @signed_in_user = Current.user
     return unless @signed_in_user && @invite&.partner?
 
-    alliance = @invite.alliance
-    return unless alliance
+    partnership = @invite.partnership
+    return unless partnership
 
-    member_org_ids = alliance.alliance_memberships.pluck(:organisation_id)
+    member_org_ids = partnership.partnership_memberships.pluck(:organisation_id)
     admin_orgs = @signed_in_user.memberships.admin.includes(:organisation).map(&:organisation)
-    @joinable_orgs       = admin_orgs.reject { |o| o.id == alliance.organisation_id || member_org_ids.include?(o.id) }
+    @joinable_orgs       = admin_orgs.reject { |o| o.id == partnership.organisation_id || member_org_ids.include?(o.id) }
     @already_member_orgs = admin_orgs.select { |o| member_org_ids.include?(o.id) }
-    @creator_admin_orgs  = admin_orgs.select { |o| o.id == alliance.organisation_id }
+    @creator_admin_orgs  = admin_orgs.select { |o| o.id == partnership.organisation_id }
   end
 
   def load_invite

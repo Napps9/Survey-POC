@@ -4,9 +4,9 @@ class Organisation < ApplicationRecord
   has_many :surveys, dependent: :destroy
   has_many :invites, dependent: :destroy
 
-  has_many :alliances, dependent: :destroy
-  has_many :alliance_memberships, dependent: :destroy
-  has_many :member_alliances, through: :alliance_memberships, source: :alliance
+  has_many :partnerships, dependent: :destroy
+  has_many :partnership_memberships, dependent: :destroy
+  has_many :member_partnerships, through: :partnership_memberships, source: :partnership
 
   has_many :common_question_sets, dependent: :destroy
 

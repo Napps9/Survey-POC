@@ -43,16 +43,16 @@ class CommonQuestionsAttachTest < ActionDispatch::IntegrationTest
     @owner   = make_user("o", @owner_org)
     @partner = make_user("p", @partner_org)
 
-    @alliance = @owner_org.alliances.create!(name: "Pilot")
-    @alliance.alliance_memberships.create!(organisation: @partner_org, status: "active")
+    @partnership = @owner_org.partnerships.create!(name: "Pilot")
+    @partnership.partnership_memberships.create!(organisation: @partner_org, status: "active")
 
     @shared = @owner_org.common_question_sets.create!(name: "Shared core")
     @q1 = @shared.common_questions.create!(text: "Confidence?", card_type: "range")
     @q2 = @shared.common_questions.create!(text: "Recommend?", card_type: "yes_no")
     @q3 = @shared.common_questions.create!(text: "Barriers?", card_type: "open_ended")
-    @alliance.alliance_common_question_sets.create!(common_question_set: @shared)
+    @partnership.partnership_common_question_sets.create!(common_question_set: @shared)
 
-    # A set the owner did NOT share with the alliance.
+    # A set the owner did NOT share with the partnership.
     @private = @owner_org.common_question_sets.create!(name: "Private set")
     @qp = @private.common_questions.create!(text: "Secret?", card_type: "open_ended")
   end

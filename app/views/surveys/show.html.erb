@@ -742,44 +742,44 @@
           <% end %>
         </details>
 
-        <%# Alliance share — add this Verto to an alliance and generate
-            per-partner links. Each row in the alliance produces a unique token. %>
+        <%# Partner share — add this Verto to a partner group and generate
+            per-partner links. Each row in the partnership produces a unique token. %>
         <% if current_membership&.admin? %>
-          <% all_alliances   = current_organisation.alliances.order(:name) %>
-          <% shared_in       = AllianceVerto.where(survey_id: @survey.id, alliance_id: all_alliances.map(&:id)).pluck(:alliance_id).to_set %>
-          <% available_allys = all_alliances.reject { |a| shared_in.include?(a.id) } %>
-          <% in_alliances    = all_alliances.select { |a| shared_in.include?(a.id) } %>
+          <% all_partnerships   = current_organisation.partnerships.order(:name) %>
+          <% shared_in       = PartnershipVerto.where(survey_id: @survey.id, partnership_id: all_partnerships.map(&:id)).pluck(:partnership_id).to_set %>
+          <% available_allys = all_partnerships.reject { |a| shared_in.include?(a.id) } %>
+          <% in_partnerships    = all_partnerships.select { |a| shared_in.include?(a.id) } %>
           <details class="publish-block">
-            <summary class="publish-block-title">Share with an alliance <span class="pub-chev">⌄</span></summary>
+            <summary class="publish-block-title">Share with your Partners <span class="pub-chev">⌄</span></summary>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:10px;line-height:1.45;">
-              Add this Verto to an alliance. Each partner in the alliance gets their own unique share link, and you'll see each one's responses separately.
+              Add this Verto to a partner group. Each partner gets their own unique share link, and you'll see each one's responses separately.
             </div>
-            <% if all_alliances.empty? %>
-              <%= link_to "Create an alliance →", new_alliance_path,
+            <% if all_partnerships.empty? %>
+              <%= link_to "Create a partner group →", new_partnership_path,
                     style: "display:inline-block;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:10px;padding:7px 14px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
             <% elsif available_allys.empty? %>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);">Already in every alliance you run.</span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);">Already in every partnership you run.</span>
             <% else %>
-              <%= form_with url: alliance_alliance_vertos_path(available_allys.first), method: :post,
+              <%= form_with url: partnership_partnership_vertos_path(available_allys.first), method: :post,
                     data: { turbo: false },
-                    html: { id: "add-to-alliance-form" },
+                    html: { id: "add-to-partnership-form" },
                     style: "display:flex;flex-direction:column;gap:8px;margin:0;" do |f| %>
                 <%= hidden_field_tag :survey_id, @survey.id %>
-                <select name="alliance_picker"
-                        onchange="document.getElementById('add-to-alliance-form').action = '/alliances/' + this.value + '/alliance_vertos'"
+                <select name="partnership_picker"
+                        onchange="document.getElementById('add-to-partnership-form').action = '/partnerships/' + this.value + '/partnership_vertos'"
                         style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 10px;color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);">
                   <% available_allys.each do |a| %>
                     <option value="<%= a.id %>" style="background:#1C2034;color:#fff;"><%= a.name %></option>
                   <% end %>
                 </select>
-                <%= f.submit "Add to alliance →",
+                <%= f.submit "Add to partnership →",
                       style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:10px;padding:8px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;" %>
               <% end %>
             <% end %>
-            <% if in_alliances.any? %>
+            <% if in_partnerships.any? %>
               <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
-                <% in_alliances.each do |a| %>
-                  <%= link_to alliance_path(a),
+                <% in_partnerships.each do |a| %>
+                  <%= link_to partnership_path(a),
                         style: "display:flex;align-items:center;justify-content:space-between;gap:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:9px 11px;text-decoration:none;" do %>
                     <span style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.78);"><%= a.name %></span>
                     <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.5);">Manage →</span>

@@ -110,10 +110,10 @@ class ResultsExport
 
   def share_labels
     @share_labels ||= @survey.survey_shares
-      .includes(:partner_organisation, alliance_verto: :alliance)
+      .includes(:partner_organisation, partnership_verto: :partnership)
       .each_with_object({}) do |share, h|
-        alliance_name = share.alliance_verto&.alliance&.name
-        h[share.id]   = alliance_name ? "#{share.display_name} · #{alliance_name}" : share.display_name
+        partnership_name = share.partnership_verto&.partnership&.name
+        h[share.id]   = partnership_name ? "#{share.display_name} · #{partnership_name}" : share.display_name
       end
   end
 

@@ -190,33 +190,33 @@ de:
     wizard:
       step_counter: Schritt %{n} von %{total}
   nav:
-    alliances: "Kollektive Wirkung"
+    partnerships: "Partner"
     shared_vertos: Geteilte Vertos
     my_vertos: Meine Vertos
     create: Erstellen
     members: Mitglieder
     sign_out: Abmelden
-  alliances:
+  partnerships:
     cq_section: "Gemeinsame Fragen"
-    cq_add_body: "Wähle eines deiner Fragensets — jeder Partner in dieser Allianz kann seine Fragen sehen."
+    cq_add_body: "Wähle eines deiner Fragensets — jeder Partner in dieser Partnerschaft kann seine Fragen sehen."
     cq_add_submit: "Set teilen →"
     cq_no_more: "Keine weiteren Fragensets zum Teilen."
     cq_create_new: "Set erstellen →"
     cq_empty_title: "Noch keine gemeinsamen Fragen geteilt"
     cq_empty_body: "Teile oben ein Fragenset und jeder Partner sieht seine Fragen."
-    cq_remove_confirm: "„%{name}“ aus dieser Allianz entfernen? Partner sehen die Fragen dann nicht mehr."
+    cq_remove_confirm: "„%{name}“ aus dieser Partnerschaft entfernen? Partner sehen die Fragen dann nicht mehr."
     cq_partner_section: "Mit dir geteilte gemeinsame Fragen"
     cq_partner_empty_title: "Noch keine gemeinsamen Fragen"
     cq_partner_empty_body: "Wenn %{org} ein Fragenset teilt, erscheinen die Fragen hier."
-    title: "Kollektive Wirkung — Playverto"
-    index_eyebrow: Ihre Allianzen
-    index_heading: "Kollektive Wirkung"
-    index_subtitle: Fassen Sie Partnerorganisationen in benannten Allianzen zusammen. Fügen Sie Vertos hinzu und jeder Partner erhält seinen eigenen Freigabelink.
-    new_button: "+ Neue Allianz"
-    owned_section: Von Ihnen geführte Allianzen
-    owned_empty_title: Noch keine Allianzen
-    owned_empty_admin_html: Klicken Sie oben auf <span style="color:#FF1E6F;">+ Neue Allianz</span>, um eine Gruppe zu starten, laden Sie dann Partnerorganisationen ein und fügen Sie Vertos hinzu.
-    owned_empty_member: Bitten Sie Ihren Administrator, eine Allianz zu erstellen.
+    title: "Partner — Playverto"
+    index_eyebrow: Ihre Partnerschaften
+    index_heading: "Partner"
+    index_subtitle: Fassen Sie Partnerorganisationen in benannten Partnerschaften zusammen. Fügen Sie Vertos hinzu und jeder Partner erhält seinen eigenen Freigabelink.
+    new_button: "+ Neue Partnerschaft"
+    owned_section: Von Ihnen geführte Partnerschaften
+    owned_empty_title: Noch keine Partnerschaften
+    owned_empty_admin_html: Klicken Sie oben auf <span style="color:#FF1E6F;">+ Neue Partnerschaft</span>, um eine Gruppe zu starten, laden Sie dann Partnerorganisationen ein und fügen Sie Vertos hinzu.
+    owned_empty_member: Bitten Sie Ihren Administrator, eine Partnerschaft zu erstellen.
     started_on: Gestartet am %{date}
     partners_count:
       one: Partner
@@ -225,43 +225,43 @@ de:
       one: Verto
       other: Vertos
     open: Öffnen →
-    member_section: Allianzen, in denen Sie Mitglied sind
-    member_empty_title: Sie wurden zu keinen Allianzen eingeladen
-    member_empty_body: Wenn eine andere Organisation Sie zu einer ihrer Allianzen einlädt, erscheint sie hier.
+    member_section: Partnerschaften, in denen Sie Mitglied sind
+    member_empty_title: Sie wurden zu keinen Partnerschaften eingeladen
+    member_empty_body: Wenn eine andere Organisation Sie zu einer ihrer Partnerschaften einlädt, erscheint sie hier.
     member_run_by: Geführt von %{org}
     status:
       active: Aktiv
       pending: Ausstehend
       revoked: Widerrufen
-    new_title: Neue Allianz — Playverto
-    new_eyebrow: Neue Allianz
-    new_heading: Benennen Sie Ihre Allianz
+    new_title: Neue Partnerschaft — Playverto
+    new_eyebrow: Neue Partnerschaft
+    new_heading: Benennen Sie Ihre Partnerschaft
     new_sub: Geben Sie der Gruppe einen klaren Namen, damit die Partner wissen, wem sie beitreten.
-    name_label: Name der Allianz
+    name_label: Name der Partnerschaft
     name_placeholder: z. B. Pilotpartner
     cancel: Abbrechen
-    create_submit: Allianz erstellen →
-    show_title: "%{name} — Kollektive Wirkung"
-    back_to_all: Alle Allianzen
-    creator_eyebrow: Allianz · Von Ihnen geführt
-    partner_eyebrow: Allianz · Mitglied
+    create_submit: Partnerschaft erstellen →
+    show_title: "%{name} — Partner"
+    back_to_all: Alle Partnerschaften
+    creator_eyebrow: Partnerschaft · Von Ihnen geführt
+    partner_eyebrow: Partnerschaft · Mitglied
     generate_link: Beitrittslink erstellen →
     delete: Löschen
-    delete_confirm: "%{name} löschen? Alle Freigabelinks für diese Allianz werden ungültig."
+    delete_confirm: "%{name} löschen? Alle Freigabelinks für diese Partnerschaft werden ungültig."
     new_link_heading: Neuer Beitrittslink
-    new_link_body: Jeder mit diesem Link kann %{alliance} als Partner beitreten. Läuft in 14 Tagen ab.
+    new_link_body: Jeder mit diesem Link kann %{partnership} als Partner beitreten. Läuft in 14 Tagen ab.
     copy: Kopieren
     copied: Kopiert!
     partners_section: Partner
     no_partners_title: Noch keine Partner
     no_partners_body_html: Verwenden Sie oben <span style="color:#FF1E6F;">Beitrittslink erstellen</span>, um Partnerorganisationen einzuladen.
     joined_on: Beigetreten am %{date}
-    remove_member_confirm: "%{org} aus %{alliance} entfernen? Ihre Freigabelinks werden ungültig."
-    vertos_section: Vertos in der Allianz
+    remove_member_confirm: "%{org} aus %{partnership} entfernen? Ihre Freigabelinks werden ungültig."
+    vertos_section: Vertos in der Partnerschaft
     no_vertos_title: Noch keine Vertos geteilt
     no_vertos_body: Fügen Sie unten ein veröffentlichtes Verto hinzu, und für jeden Partner wird ein eindeutiger Freigabelink erstellt.
     remove: Entfernen
-    remove_verto_confirm: Dieses Verto aus %{alliance} entfernen? Alle zugehörigen Partner-Freigabelinks werden ungültig.
+    remove_verto_confirm: Dieses Verto aus %{partnership} entfernen? Alle zugehörigen Partner-Freigabelinks werden ungültig.
     completion_label: Abschluss
     responses:
       one: Antwort
@@ -269,32 +269,32 @@ de:
     partner_links_count:
       one: Partnerlink
       other: Partnerlinks
-    no_shares_yet: Fügen Sie der Allianz einen Partner hinzu, um Freigabelinks zu erstellen.
+    no_shares_yet: Fügen Sie der Partnerschaft einen Partner hinzu, um Freigabelinks zu erstellen.
     responses_short: "%{n} Antw."
-    add_section: Zur Allianz hinzufügen
+    add_section: Zur Partnerschaft hinzufügen
     add_heading: Weiteres Verto hinzufügen
-    add_body: Wählen Sie ein veröffentlichtes Verto. Wir erstellen einen eindeutigen Freigabelink für jeden Partner in der Allianz.
+    add_body: Wählen Sie ein veröffentlichtes Verto. Wir erstellen einen eindeutigen Freigabelink für jeden Partner in der Partnerschaft.
     no_more_vertos: Keine weiteren veröffentlichten Vertos zum Hinzufügen.
     create_new_verto: Neues Verto erstellen →
     add_submit: Verto hinzufügen →
-    partners_in_alliance: Partner in der Allianz
+    partners_in_partnership: Partner in der Partnerschaft
     including_you: Inklusive Ihnen
     shared_vertos_short: Geteilte Vertos
     available_to_distribute: Verfügbar zur Verteilung
     other_partners: Andere Partner
-    only_partner: Sie sind derzeit der einzige Partner in dieser Allianz.
+    only_partner: Sie sind derzeit der einzige Partner in dieser Partnerschaft.
     your_vertos_section: Mit Ihnen geteilte Vertos
     partner_no_vertos_title: Noch keine Vertos
-    partner_no_vertos_body: Sobald %{org} dieser Allianz ein Verto hinzufügt, sehen Sie hier Ihren eindeutigen Freigabelink.
+    partner_no_vertos_body: Sobald %{org} dieser Partnerschaft ein Verto hinzufügt, sehen Sie hier Ihren eindeutigen Freigabelink.
     from_org: Von %{org}
     your_link: Ihr Link
     results_link: Ergebnisse →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Geteiltes Verto"
-    from_org_alliance: Von %{org} · %{alliance}
+    from_org_partnership: Von %{org} · %{partnership}
     share_link: Freigabelink
     mine_label: über Ihren Link
-    aggregate_label: in %{alliance}
+    aggregate_label: in %{partnership}
     card_n: Karte %{n}
     my_results: Meine Ergebnisse
     aggregate: Gesamtwerte
@@ -310,19 +310,19 @@ de:
     expired_title: Einladung abgelaufen
     expired_body: Dieser Link ist älter als 7 Tage. Bitten Sie Ihren Administrator, einen neuen zu senden.
     invited_to_join: Sie wurden eingeladen, beizutreten
-    alliance_by: einer Allianz von %{org}
+    partnership_by: einer Partnerschaft von %{org}
     as_role: als %{role}
     addressed_for: "· für %{email}"
     signed_in_as: Angemeldet als %{name}
     join_with: Beitreten mit
     pick_org: Wählen Sie, welche Organisation beitritt
-    join_submit: "%{alliance} beitreten →"
-    already_in_alliance: 'Bereits in dieser Allianz: %{orgs}'
-    you_run_this: Sie führen diese Allianz — besuchen Sie sie stattdessen.
-    already_member_singular: "%{orgs} ist bereits in dieser Allianz."
-    already_member_plural: "%{orgs} sind bereits in dieser Allianz."
-    no_admin_org: Sie haben keine Administrator-Organisation, die dieser Allianz beitreten kann.
-    open_alliance: "%{alliance} öffnen →"
+    join_submit: "%{partnership} beitreten →"
+    already_in_partnership: 'Bereits in dieser Partnerschaft: %{orgs}'
+    you_run_this: Sie führen diese Partnerschaft — besuchen Sie sie stattdessen.
+    already_member_singular: "%{orgs} ist bereits in dieser Partnerschaft."
+    already_member_plural: "%{orgs} sind bereits in dieser Partnerschaft."
+    no_admin_org: Sie haben keine Administrator-Organisation, die dieser Partnerschaft beitreten kann.
+    open_partnership: "%{partnership} öffnen →"
     sign_out_link: Abmelden und ein anderes Konto verwenden
     sign_out_confirm: Vom aktuellen Konto abmelden?
     already_have_account: Haben Sie bereits ein Playverto-Konto?
@@ -426,7 +426,7 @@ de:
   dashboard:
     welcome_back: Willkommen zurück
     heading_html: Deine <span style="color:#01EACB;">Vertos</span>
-    subtitle: Erstelle Vertos, teile sie mit deiner Allianz und sieh dabei zu, wie die Erkenntnisse hereinströmen.
+    subtitle: Erstelle Vertos, teile sie mit deiner Partnerschaft und sieh dabei zu, wie die Erkenntnisse hereinströmen.
     create_new: Neues Verto erstellen
     import_google_form_button: Neues Formular erstellen
     import_google_form_modal_subtitle: Füge den Link zu einem bestehenden Google Form ein, und wir verwandeln ihn in ein bearbeitbares Verto.

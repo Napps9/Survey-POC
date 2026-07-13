@@ -190,33 +190,33 @@ id:
     wizard:
       step_counter: Langkah %{n} dari %{total}
   nav:
-    alliances: "Dampak Kolektif"
+    partnerships: "Mitra"
     shared_vertos: Verto Dibagikan
     my_vertos: Verto Saya
     create: Buat
     members: Anggota
     sign_out: Keluar
-  alliances:
+  partnerships:
     cq_section: "Pertanyaan Bersama"
-    cq_add_body: "Pilih salah satu set pertanyaanmu — setiap mitra di aliansi ini dapat melihat pertanyaannya."
+    cq_add_body: "Pilih salah satu set pertanyaanmu — setiap mitra di kemitraan ini dapat melihat pertanyaannya."
     cq_add_submit: "Bagikan set →"
     cq_no_more: "Tidak ada lagi set pertanyaan untuk dibagikan."
     cq_create_new: "Buat set →"
     cq_empty_title: "Belum ada Pertanyaan Bersama yang dibagikan"
     cq_empty_body: "Bagikan set pertanyaan di atas dan setiap mitra akan melihat pertanyaannya."
-    cq_remove_confirm: "Hapus “%{name}” dari aliansi ini? Mitra tidak akan lagi melihat pertanyaannya."
+    cq_remove_confirm: "Hapus “%{name}” dari kemitraan ini? Mitra tidak akan lagi melihat pertanyaannya."
     cq_partner_section: "Pertanyaan Bersama yang dibagikan denganmu"
     cq_partner_empty_title: "Belum ada Pertanyaan Bersama"
     cq_partner_empty_body: "Saat %{org} membagikan set pertanyaan, pertanyaannya akan muncul di sini."
-    title: "Dampak Kolektif — Playverto"
-    index_eyebrow: Aliansi Anda
-    index_heading: "Dampak Kolektif"
-    index_subtitle: Kelompokkan organisasi mitra ke dalam aliansi yang diberi nama. Tambahkan Verto dan setiap mitra akan mendapatkan tautan berbaginya sendiri.
-    new_button: "+ Aliansi baru"
-    owned_section: Aliansi yang Anda kelola
-    owned_empty_title: Belum ada aliansi
-    owned_empty_admin_html: Klik <span style="color:#FF1E6F;">+ Aliansi baru</span> di atas untuk memulai grup, lalu undang organisasi mitra dan tambahkan Verto.
-    owned_empty_member: Mintalah admin Anda untuk membuat aliansi.
+    title: "Mitra — Playverto"
+    index_eyebrow: Kemitraan Anda
+    index_heading: "Mitra"
+    index_subtitle: Kelompokkan organisasi mitra ke dalam kemitraan yang diberi nama. Tambahkan Verto dan setiap mitra akan mendapatkan tautan berbaginya sendiri.
+    new_button: "+ Kemitraan baru"
+    owned_section: Kemitraan yang Anda kelola
+    owned_empty_title: Belum ada kemitraan
+    owned_empty_admin_html: Klik <span style="color:#FF1E6F;">+ Kemitraan baru</span> di atas untuk memulai grup, lalu undang organisasi mitra dan tambahkan Verto.
+    owned_empty_member: Mintalah admin Anda untuk membuat kemitraan.
     started_on: Dimulai %{date}
     partners_count:
       one: mitra
@@ -225,43 +225,43 @@ id:
       one: verto
       other: verto
     open: Buka →
-    member_section: Aliansi di mana Anda menjadi anggota
-    member_empty_title: Anda belum diundang ke aliansi mana pun
-    member_empty_body: Saat organisasi lain mengundang Anda ke salah satu aliansinya, akan muncul di sini.
+    member_section: Kemitraan di mana Anda menjadi anggota
+    member_empty_title: Anda belum diundang ke kemitraan mana pun
+    member_empty_body: Saat organisasi lain mengundang Anda ke salah satu kemitraannya, akan muncul di sini.
     member_run_by: Dikelola oleh %{org}
     status:
       active: Aktif
       pending: Tertunda
       revoked: Dicabut
-    new_title: Aliansi baru — Playverto
-    new_eyebrow: Aliansi baru
-    new_heading: Beri nama aliansi Anda
+    new_title: Kemitraan baru — Playverto
+    new_eyebrow: Kemitraan baru
+    new_heading: Beri nama kemitraan Anda
     new_sub: Berikan nama yang jelas untuk grup agar mitra tahu apa yang mereka ikuti.
-    name_label: Nama aliansi
+    name_label: Nama kemitraan
     name_placeholder: misal Mitra Pilot
     cancel: Batal
-    create_submit: Buat aliansi →
-    show_title: "%{name} — Dampak Kolektif"
-    back_to_all: Semua aliansi
-    creator_eyebrow: Aliansi · Anda mengelola ini
-    partner_eyebrow: Aliansi · Anggota
+    create_submit: Buat kemitraan →
+    show_title: "%{name} — Mitra"
+    back_to_all: Semua kemitraan
+    creator_eyebrow: Kemitraan · Anda mengelola ini
+    partner_eyebrow: Kemitraan · Anggota
     generate_link: Buat tautan bergabung →
     delete: Hapus
-    delete_confirm: Hapus %{name}? Semua tautan berbagi untuk aliansi ini akan berhenti berfungsi.
+    delete_confirm: Hapus %{name}? Semua tautan berbagi untuk kemitraan ini akan berhenti berfungsi.
     new_link_heading: Tautan bergabung baru
-    new_link_body: Siapa pun dengan tautan ini dapat bergabung dengan %{alliance} sebagai mitra. Kedaluwarsa dalam 14 hari.
+    new_link_body: Siapa pun dengan tautan ini dapat bergabung dengan %{partnership} sebagai mitra. Kedaluwarsa dalam 14 hari.
     copy: Salin
     copied: Tersalin!
     partners_section: Mitra
     no_partners_title: Belum ada mitra
     no_partners_body_html: Gunakan <span style="color:#FF1E6F;">Buat tautan bergabung</span> di atas untuk mengundang organisasi mitra.
     joined_on: Bergabung %{date}
-    remove_member_confirm: Hapus %{org} dari %{alliance}? Tautan berbagi mereka akan berhenti berfungsi.
-    vertos_section: Verto dalam aliansi
+    remove_member_confirm: Hapus %{org} dari %{partnership}? Tautan berbagi mereka akan berhenti berfungsi.
+    vertos_section: Verto dalam kemitraan
     no_vertos_title: Belum ada Verto yang dibagikan
     no_vertos_body: Tambahkan Verto yang telah dipublikasikan di bawah ini dan tautan berbagi unik akan dibuat untuk setiap mitra.
     remove: Hapus
-    remove_verto_confirm: Hapus Verto ini dari %{alliance}? Semua tautan berbagi mitra untuk itu akan berhenti berfungsi.
+    remove_verto_confirm: Hapus Verto ini dari %{partnership}? Semua tautan berbagi mitra untuk itu akan berhenti berfungsi.
     completion_label: penyelesaian
     responses:
       one: tanggapan
@@ -269,32 +269,32 @@ id:
     partner_links_count:
       one: tautan mitra
       other: tautan mitra
-    no_shares_yet: Tambahkan mitra ke aliansi untuk membuat tautan berbagi.
+    no_shares_yet: Tambahkan mitra ke kemitraan untuk membuat tautan berbagi.
     responses_short: "%{n} tanggapan"
-    add_section: Tambahkan ke aliansi
+    add_section: Tambahkan ke kemitraan
     add_heading: Tambahkan Verto lain
-    add_body: Pilih Verto yang telah dipublikasikan. Kami akan membuat tautan berbagi unik untuk setiap mitra dalam aliansi.
+    add_body: Pilih Verto yang telah dipublikasikan. Kami akan membuat tautan berbagi unik untuk setiap mitra dalam kemitraan.
     no_more_vertos: Tidak ada lagi Verto yang dipublikasikan untuk ditambahkan.
     create_new_verto: Buat Verto baru →
     add_submit: Tambahkan Verto →
-    partners_in_alliance: Mitra dalam aliansi
+    partners_in_partnership: Mitra dalam kemitraan
     including_you: Termasuk Anda
     shared_vertos_short: Verto Dibagikan
     available_to_distribute: Tersedia untuk Anda distribusikan
     other_partners: Mitra lain
-    only_partner: Untuk saat ini Anda satu-satunya mitra dalam aliansi ini.
+    only_partner: Untuk saat ini Anda satu-satunya mitra dalam kemitraan ini.
     your_vertos_section: Verto yang dibagikan dengan Anda
     partner_no_vertos_title: Belum ada Verto
-    partner_no_vertos_body: Saat %{org} menambahkan Verto ke aliansi ini, Anda akan melihat tautan berbagi unik Anda di sini.
+    partner_no_vertos_body: Saat %{org} menambahkan Verto ke kemitraan ini, Anda akan melihat tautan berbagi unik Anda di sini.
     from_org: Dari %{org}
     your_link: Tautan Anda
     results_link: Hasil →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Verto Dibagikan"
-    from_org_alliance: Dari %{org} · %{alliance}
+    from_org_partnership: Dari %{org} · %{partnership}
     share_link: Tautan berbagi
     mine_label: dari tautan Anda
-    aggregate_label: di seluruh %{alliance}
+    aggregate_label: di seluruh %{partnership}
     card_n: Kartu %{n}
     my_results: Hasil saya
     aggregate: Agregat
@@ -310,19 +310,19 @@ id:
     expired_title: Undangan kedaluwarsa
     expired_body: Tautan ini sudah berumur lebih dari 7 hari. Mintalah admin Anda untuk mengirim yang baru.
     invited_to_join: Anda diundang untuk bergabung
-    alliance_by: aliansi oleh %{org}
+    partnership_by: kemitraan oleh %{org}
     as_role: sebagai %{role}
     addressed_for: "· untuk %{email}"
     signed_in_as: Masuk sebagai %{name}
     join_with: Bergabung dengan
     pick_org: Pilih organisasi mana yang bergabung
-    join_submit: Bergabung dengan %{alliance} →
-    already_in_alliance: 'Sudah dalam aliansi ini: %{orgs}'
-    you_run_this: Anda mengelola aliansi ini — kunjungi saja.
-    already_member_singular: "%{orgs} sudah ada dalam aliansi ini."
-    already_member_plural: "%{orgs} sudah ada dalam aliansi ini."
-    no_admin_org: Anda tidak memiliki organisasi admin yang dapat bergabung dengan aliansi ini.
-    open_alliance: Buka %{alliance} →
+    join_submit: Bergabung dengan %{partnership} →
+    already_in_partnership: 'Sudah dalam kemitraan ini: %{orgs}'
+    you_run_this: Anda mengelola kemitraan ini — kunjungi saja.
+    already_member_singular: "%{orgs} sudah ada dalam kemitraan ini."
+    already_member_plural: "%{orgs} sudah ada dalam kemitraan ini."
+    no_admin_org: Anda tidak memiliki organisasi admin yang dapat bergabung dengan kemitraan ini.
+    open_partnership: Buka %{partnership} →
     sign_out_link: Keluar dan gunakan akun lain
     sign_out_confirm: Keluar dari akun Anda saat ini?
     already_have_account: Sudah punya akun Playverto?
@@ -426,7 +426,7 @@ id:
   dashboard:
     welcome_back: Selamat datang kembali
     heading_html: <span style="color:#01EACB;">Verto</span> Anda
-    subtitle: Buat Verto, bagikan ke aliansi Anda, dan saksikan wawasan mengalir masuk.
+    subtitle: Buat Verto, bagikan ke kemitraan Anda, dan saksikan wawasan mengalir masuk.
     create_new: Buat Verto baru
     import_google_form_button: Buat Formulir Baru
     import_google_form_modal_subtitle: Tempel tautan Google Form yang sudah ada dan kami akan mengubahnya menjadi Verto yang dapat diedit.

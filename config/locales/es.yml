@@ -190,33 +190,33 @@ es:
     wizard:
       step_counter: Paso %{n} de %{total}
   nav:
-    alliances: "Impacto Colectivo"
+    partnerships: "Socios"
     shared_vertos: Vertos compartidos
     my_vertos: Mis Vertos
     create: Crear
     members: Miembros
     sign_out: Cerrar sesión
-  alliances:
+  partnerships:
     cq_section: "Preguntas comunes"
-    cq_add_body: "Elige uno de tus conjuntos de preguntas: todos los socios de esta alianza podrán ver sus preguntas."
+    cq_add_body: "Elige uno de tus conjuntos de preguntas: todos los socios de esta asociación podrán ver sus preguntas."
     cq_add_submit: "Compartir conjunto →"
     cq_no_more: "No hay más conjuntos de preguntas para compartir."
     cq_create_new: "Crear un conjunto →"
     cq_empty_title: "Aún no se han compartido preguntas comunes"
     cq_empty_body: "Comparte un conjunto de preguntas arriba y todos los socios verán sus preguntas."
-    cq_remove_confirm: "¿Quitar “%{name}” de esta alianza? Los socios dejarán de ver sus preguntas."
+    cq_remove_confirm: "¿Quitar “%{name}” de esta asociación? Los socios dejarán de ver sus preguntas."
     cq_partner_section: "Preguntas comunes compartidas contigo"
     cq_partner_empty_title: "Aún no hay preguntas comunes"
     cq_partner_empty_body: "Cuando %{org} comparta un conjunto de preguntas, sus preguntas aparecerán aquí."
-    title: "Impacto Colectivo — Playverto"
-    index_eyebrow: Tus alianzas
-    index_heading: "Impacto Colectivo"
-    index_subtitle: Agrupa organizaciones colaboradoras en alianzas con nombre. Añade Vertos y cada socio recibirá su propio enlace para compartir.
-    new_button: "+ Nueva alianza"
-    owned_section: Alianzas que gestionas
-    owned_empty_title: Aún no hay alianzas
-    owned_empty_admin_html: Haz clic en <span style="color:#FF1E6F;">+ Nueva alianza</span> arriba para iniciar un grupo, luego invita a organizaciones socias y añade Vertos.
-    owned_empty_member: Pide a tu administrador que cree una alianza.
+    title: "Socios — Playverto"
+    index_eyebrow: Tus asociaciones
+    index_heading: "Socios"
+    index_subtitle: Agrupa organizaciones colaboradoras en asociaciones con nombre. Añade Vertos y cada socio recibirá su propio enlace para compartir.
+    new_button: "+ Nueva asociación"
+    owned_section: Asociaciones que gestionas
+    owned_empty_title: Aún no hay asociaciones
+    owned_empty_admin_html: Haz clic en <span style="color:#FF1E6F;">+ Nueva asociación</span> arriba para iniciar un grupo, luego invita a organizaciones socias y añade Vertos.
+    owned_empty_member: Pide a tu administrador que cree una asociación.
     started_on: Iniciada el %{date}
     partners_count:
       one: socio
@@ -225,43 +225,43 @@ es:
       one: verto
       other: vertos
     open: Abrir →
-    member_section: Alianzas de las que eres miembro
-    member_empty_title: No te han invitado a ninguna alianza
-    member_empty_body: Cuando otra organización te invite a una de sus alianzas, aparecerá aquí.
+    member_section: Asociaciones de las que eres miembro
+    member_empty_title: No te han invitado a ninguna asociación
+    member_empty_body: Cuando otra organización te invite a una de sus asociaciones, aparecerá aquí.
     member_run_by: Gestionada por %{org}
     status:
       active: Activa
       pending: Pendiente
       revoked: Revocada
-    new_title: Nueva alianza — Playverto
-    new_eyebrow: Nueva alianza
-    new_heading: Pon nombre a tu alianza
+    new_title: Nueva asociación — Playverto
+    new_eyebrow: Nueva asociación
+    new_heading: Pon nombre a tu asociación
     new_sub: Dale al grupo un nombre claro para que los socios sepan a qué se están uniendo.
-    name_label: Nombre de la alianza
+    name_label: Nombre de la asociación
     name_placeholder: p. ej. Socios Piloto
     cancel: Cancelar
-    create_submit: Crear alianza →
-    show_title: "%{name} — Impacto Colectivo"
-    back_to_all: Todas las alianzas
-    creator_eyebrow: Alianza · Tú la gestionas
-    partner_eyebrow: Alianza · Miembro
+    create_submit: Crear asociación →
+    show_title: "%{name} — Socios"
+    back_to_all: Todas las asociaciones
+    creator_eyebrow: Asociación · Tú la gestionas
+    partner_eyebrow: Asociación · Miembro
     generate_link: Generar enlace de invitación →
     delete: Eliminar
-    delete_confirm: "¿Eliminar %{name}? Todos los enlaces de compartir de esta alianza dejarán de funcionar."
+    delete_confirm: "¿Eliminar %{name}? Todos los enlaces de compartir de esta asociación dejarán de funcionar."
     new_link_heading: Nuevo enlace de invitación
-    new_link_body: Cualquiera con este enlace puede unirse a %{alliance} como socio. Caduca en 14 días.
+    new_link_body: Cualquiera con este enlace puede unirse a %{partnership} como socio. Caduca en 14 días.
     copy: Copiar
     copied: "¡Copiado!"
     partners_section: Socios
     no_partners_title: Aún no hay socios
     no_partners_body_html: Usa <span style="color:#FF1E6F;">Generar enlace de invitación</span> arriba para invitar a organizaciones socias.
     joined_on: Se unió el %{date}
-    remove_member_confirm: "¿Eliminar a %{org} de %{alliance}? Sus enlaces para compartir dejarán de funcionar."
-    vertos_section: Vertos en la alianza
+    remove_member_confirm: "¿Eliminar a %{org} de %{partnership}? Sus enlaces para compartir dejarán de funcionar."
+    vertos_section: Vertos en la asociación
     no_vertos_title: Aún no se han compartido Vertos
     no_vertos_body: Añade abajo un Verto publicado y se generará un enlace único para cada socio.
     remove: Eliminar
-    remove_verto_confirm: "¿Eliminar este Verto de %{alliance}? Todos los enlaces de los socios dejarán de funcionar."
+    remove_verto_confirm: "¿Eliminar este Verto de %{partnership}? Todos los enlaces de los socios dejarán de funcionar."
     completion_label: finalización
     responses:
       one: respuesta
@@ -269,32 +269,32 @@ es:
     partner_links_count:
       one: enlace de socio
       other: enlaces de socios
-    no_shares_yet: Añade un socio a la alianza para generar enlaces para compartir.
+    no_shares_yet: Añade un socio a la asociación para generar enlaces para compartir.
     responses_short: "%{n} resp."
-    add_section: Añadir a la alianza
+    add_section: Añadir a la asociación
     add_heading: Añadir otro Verto
-    add_body: Elige un Verto publicado. Generaremos un enlace único para compartir con cada socio de la alianza.
+    add_body: Elige un Verto publicado. Generaremos un enlace único para compartir con cada socio de la asociación.
     no_more_vertos: No hay más Vertos publicados para añadir.
     create_new_verto: Crear un nuevo Verto →
     add_submit: Añadir Verto →
-    partners_in_alliance: Socios en la alianza
+    partners_in_partnership: Socios en la asociación
     including_you: Incluyéndote a ti
     shared_vertos_short: Vertos compartidos
     available_to_distribute: Disponibles para que los distribuyas
     other_partners: Otros socios
-    only_partner: Por ahora eres el único socio en esta alianza.
+    only_partner: Por ahora eres el único socio en esta asociación.
     your_vertos_section: Vertos compartidos contigo
     partner_no_vertos_title: Aún no hay Vertos
-    partner_no_vertos_body: Cuando %{org} añada un Verto a esta alianza, verás aquí tu enlace único para compartir.
+    partner_no_vertos_body: Cuando %{org} añada un Verto a esta asociación, verás aquí tu enlace único para compartir.
     from_org: De %{org}
     your_link: Tu enlace
     results_link: Resultados →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Verto compartido"
-    from_org_alliance: De %{org} · %{alliance}
+    from_org_partnership: De %{org} · %{partnership}
     share_link: Enlace para compartir
     mine_label: desde tu enlace
-    aggregate_label: en %{alliance}
+    aggregate_label: en %{partnership}
     card_n: Tarjeta %{n}
     my_results: Mis resultados
     aggregate: Agregado
@@ -310,19 +310,19 @@ es:
     expired_title: Invitación caducada
     expired_body: Este enlace tiene más de 7 días. Pide a tu administrador que envíe uno nuevo.
     invited_to_join: Has sido invitado a unirte a
-    alliance_by: una alianza de %{org}
+    partnership_by: una asociación de %{org}
     as_role: como %{role}
     addressed_for: "· para %{email}"
     signed_in_as: Sesión iniciada como %{name}
     join_with: Unirse con
     pick_org: Elige qué organización se une
-    join_submit: Unirse a %{alliance} →
-    already_in_alliance: 'Ya en esta alianza: %{orgs}'
-    you_run_this: Gestionas esta alianza — visítala en su lugar.
-    already_member_singular: "%{orgs} ya está en esta alianza."
-    already_member_plural: "%{orgs} ya están en esta alianza."
-    no_admin_org: No tienes una organización de administrador que pueda unirse a esta alianza.
-    open_alliance: Abrir %{alliance} →
+    join_submit: Unirse a %{partnership} →
+    already_in_partnership: 'Ya en esta asociación: %{orgs}'
+    you_run_this: Gestionas esta asociación — visítala en su lugar.
+    already_member_singular: "%{orgs} ya está en esta asociación."
+    already_member_plural: "%{orgs} ya están en esta asociación."
+    no_admin_org: No tienes una organización de administrador que pueda unirse a esta asociación.
+    open_partnership: Abrir %{partnership} →
     sign_out_link: Cerrar sesión y usar otra cuenta
     sign_out_confirm: "¿Cerrar sesión de tu cuenta actual?"
     already_have_account: "¿Ya tienes una cuenta de Playverto?"
@@ -426,7 +426,7 @@ es:
   dashboard:
     welcome_back: Bienvenido de nuevo
     heading_html: Tus <span style="color:#01EACB;">Vertos</span>
-    subtitle: Crea Vertos, compártelos con tu alianza y observa cómo llegan los resultados.
+    subtitle: Crea Vertos, compártelos con tu asociación y observa cómo llegan los resultados.
     create_new: Crear un nuevo Verto
     import_google_form_button: Crear nuevo formulario
     import_google_form_modal_subtitle: Pega el enlace de un Google Form existente y lo convertiremos en un Verto editable.

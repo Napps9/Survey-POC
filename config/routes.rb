@@ -102,11 +102,11 @@ Rails.application.routes.draw do
     end
   end
 
-  # Alliances — named groups of orgs
-  resources :alliances, except: [ :edit, :update ] do
-    resources :alliance_invites,     only: [ :create ]
-    resources :alliance_vertos,      only: [ :create, :destroy, :show ]
-    resources :alliance_common_question_sets, only: [ :create, :destroy ]
-    resources :alliance_memberships, only: [ :destroy ]
+  # Partnerships — named groups of orgs
+  resources :partnerships, except: [ :edit, :update ] do
+    resources :partnership_invites,     only: [ :create ]
+    resources :partnership_vertos,      only: [ :create, :destroy, :show ]
+    resources :partnership_common_question_sets, only: [ :create, :destroy ]
+    resources :partnership_memberships, only: [ :destroy ]
   end
 end

@@ -190,33 +190,33 @@ hi:
     wizard:
       step_counter: चरण %{n} / %{total}
   nav:
-    alliances: "सामूहिक प्रभाव"
+    partnerships: "साझेदार"
     shared_vertos: साझा किए गए Verto
     my_vertos: मेरे Verto
     create: बनाएं
     members: सदस्य
     sign_out: साइन आउट
-  alliances:
+  partnerships:
     cq_section: "साझा प्रश्न"
-    cq_add_body: "अपने प्रश्न सेट में से एक चुनें — इस गठबंधन का हर साथी इसके प्रश्न देख सकेगा।"
+    cq_add_body: "अपने प्रश्न सेट में से एक चुनें — इस साझेदारी का हर साथी इसके प्रश्न देख सकेगा।"
     cq_add_submit: "सेट साझा करें →"
     cq_no_more: "साझा करने के लिए और प्रश्न सेट नहीं हैं।"
     cq_create_new: "सेट बनाएँ →"
     cq_empty_title: "अभी तक कोई साझा प्रश्न साझा नहीं किए गए"
     cq_empty_body: "ऊपर एक प्रश्न सेट साझा करें और हर साथी उसके प्रश्न देखेगा।"
-    cq_remove_confirm: "“%{name}” को इस गठबंधन से हटाएँ? साथी अब इसके प्रश्न नहीं देख पाएँगे।"
+    cq_remove_confirm: "“%{name}” को इस साझेदारी से हटाएँ? साथी अब इसके प्रश्न नहीं देख पाएँगे।"
     cq_partner_section: "आपके साथ साझा किए गए साझा प्रश्न"
     cq_partner_empty_title: "अभी कोई साझा प्रश्न नहीं"
     cq_partner_empty_body: "जब %{org} कोई प्रश्न सेट साझा करेगा, तो उसके प्रश्न यहाँ दिखेंगे।"
-    title: "सामूहिक प्रभाव — Playverto"
-    index_eyebrow: आपके गठबंधन
-    index_heading: "सामूहिक प्रभाव"
-    index_subtitle: साझेदार संगठनों को नामित गठबंधनों में समूहित करें। Vertos जोड़ें और प्रत्येक साझेदार को अपना खुद का शेयर लिंक मिलेगा।
-    new_button: "+ नया गठबंधन"
-    owned_section: आपके द्वारा चलाए जाने वाले गठबंधन
-    owned_empty_title: अभी तक कोई गठबंधन नहीं
-    owned_empty_admin_html: समूह शुरू करने के लिए ऊपर <span style="color:#FF1E6F;">+ नया गठबंधन</span> पर क्लिक करें, फिर साझेदार संगठनों को आमंत्रित करें और Vertos जोड़ें।
-    owned_empty_member: अपने एडमिन से गठबंधन बनाने के लिए कहें।
+    title: "साझेदार — Playverto"
+    index_eyebrow: आपके साझेदारी
+    index_heading: "साझेदार"
+    index_subtitle: साझेदार संगठनों को नामित साझेदारियों में समूहित करें। Vertos जोड़ें और प्रत्येक साझेदार को अपना खुद का शेयर लिंक मिलेगा।
+    new_button: "+ नई साझेदारी"
+    owned_section: आपके द्वारा चलाए जाने वाले साझेदारी
+    owned_empty_title: अभी तक कोई साझेदारी नहीं
+    owned_empty_admin_html: समूह शुरू करने के लिए ऊपर <span style="color:#FF1E6F;">+ नई साझेदारी</span> पर क्लिक करें, फिर साझेदार संगठनों को आमंत्रित करें और Vertos जोड़ें।
+    owned_empty_member: अपने एडमिन से साझेदारी बनाने के लिए कहें।
     started_on: "%{date} को शुरू हुआ"
     partners_count:
       one: साझेदार
@@ -225,43 +225,43 @@ hi:
       one: verto
       other: vertos
     open: खोलें →
-    member_section: वे गठबंधन जिनके आप सदस्य हैं
-    member_empty_title: आपको किसी गठबंधन में आमंत्रित नहीं किया गया है
-    member_empty_body: जब कोई अन्य संगठन आपको अपने किसी गठबंधन में आमंत्रित करेगा, तो वह यहाँ दिखाई देगा।
+    member_section: वे साझेदारी जिनके आप सदस्य हैं
+    member_empty_title: आपको किसी साझेदारी में आमंत्रित नहीं किया गया है
+    member_empty_body: जब कोई अन्य संगठन आपको अपने किसी साझेदारी में आमंत्रित करेगा, तो वह यहाँ दिखाई देगी।
     member_run_by: "%{org} द्वारा संचालित"
     status:
       active: सक्रिय
       pending: लंबित
       revoked: रद्द किया गया
-    new_title: नया गठबंधन — Playverto
-    new_eyebrow: नया गठबंधन
-    new_heading: अपने गठबंधन को नाम दें
+    new_title: नई साझेदारी — Playverto
+    new_eyebrow: नई साझेदारी
+    new_heading: अपनी साझेदारी को नाम दें
     new_sub: समूह को एक स्पष्ट नाम दें ताकि साझेदारों को पता चले कि वे किसमें शामिल हो रहे हैं।
-    name_label: गठबंधन का नाम
+    name_label: साझेदारी का नाम
     name_placeholder: उदा. Pilot Partners
     cancel: रद्द करें
-    create_submit: गठबंधन बनाएं →
-    show_title: "%{name} — सामूहिक प्रभाव"
-    back_to_all: सभी गठबंधन
-    creator_eyebrow: गठबंधन · आप इसे चलाते हैं
-    partner_eyebrow: गठबंधन · सदस्य
+    create_submit: साझेदारी बनाएं →
+    show_title: "%{name} — साझेदार"
+    back_to_all: सभी साझेदारी
+    creator_eyebrow: साझेदारी · आप इसे चलाते हैं
+    partner_eyebrow: साझेदारी · सदस्य
     generate_link: जॉइन लिंक बनाएं →
     delete: हटाएं
-    delete_confirm: "%{name} को हटाएं? इस गठबंधन के सभी शेयर लिंक काम करना बंद कर देंगे।"
+    delete_confirm: "%{name} को हटाएं? इस साझेदारी के सभी शेयर लिंक काम करना बंद कर देंगे।"
     new_link_heading: नया जॉइन लिंक
-    new_link_body: इस लिंक वाला कोई भी व्यक्ति %{alliance} में साझेदार के रूप में शामिल हो सकता है। 14 दिनों में समाप्त हो जाएगा।
+    new_link_body: इस लिंक वाला कोई भी व्यक्ति %{partnership} में साझेदार के रूप में शामिल हो सकता है। 14 दिनों में समाप्त हो जाएगा।
     copy: कॉपी करें
     copied: कॉपी किया गया!
     partners_section: साझेदार
     no_partners_title: अभी तक कोई साझेदार नहीं
     no_partners_body_html: साझेदार संगठनों को आमंत्रित करने के लिए ऊपर <span style="color:#FF1E6F;">जॉइन लिंक बनाएं</span> का उपयोग करें।
     joined_on: "%{date} को शामिल हुए"
-    remove_member_confirm: "%{org} को %{alliance} से हटाएं? उनके शेयर लिंक काम करना बंद कर देंगे।"
-    vertos_section: गठबंधन में Vertos
+    remove_member_confirm: "%{org} को %{partnership} से हटाएं? उनके शेयर लिंक काम करना बंद कर देंगे।"
+    vertos_section: साझेदारी में Vertos
     no_vertos_title: अभी तक कोई Verto साझा नहीं किया गया
     no_vertos_body: नीचे एक प्रकाशित Verto जोड़ें और प्रत्येक साझेदार के लिए एक अनूठा शेयर लिंक उत्पन्न होगा।
     remove: हटाएं
-    remove_verto_confirm: इस Verto को %{alliance} से हटाएं? इसके लिए सभी साझेदार शेयर लिंक काम करना बंद कर देंगे।
+    remove_verto_confirm: इस Verto को %{partnership} से हटाएं? इसके लिए सभी साझेदार शेयर लिंक काम करना बंद कर देंगे।
     completion_label: पूर्णता
     responses:
       one: प्रतिक्रिया
@@ -269,32 +269,32 @@ hi:
     partner_links_count:
       one: साझेदार लिंक
       other: साझेदार लिंक
-    no_shares_yet: शेयर लिंक बनाने के लिए गठबंधन में एक साझेदार जोड़ें।
+    no_shares_yet: शेयर लिंक बनाने के लिए साझेदारी में एक साझेदार जोड़ें।
     responses_short: "%{n} प्रत."
-    add_section: गठबंधन में जोड़ें
+    add_section: साझेदारी में जोड़ें
     add_heading: एक और Verto जोड़ें
-    add_body: एक प्रकाशित Verto चुनें। हम गठबंधन के हर साझेदार के लिए एक अनूठा शेयर लिंक बनाएंगे।
+    add_body: एक प्रकाशित Verto चुनें। हम साझेदारी के हर साझेदार के लिए एक अनूठा शेयर लिंक बनाएंगे।
     no_more_vertos: जोड़ने के लिए और कोई प्रकाशित Vertos नहीं हैं।
     create_new_verto: नया Verto बनाएं →
     add_submit: Verto जोड़ें →
-    partners_in_alliance: गठबंधन में साझेदार
+    partners_in_partnership: साझेदारी में साझेदार
     including_you: आप सहित
     shared_vertos_short: साझा Vertos
     available_to_distribute: आपके वितरण के लिए उपलब्ध
     other_partners: अन्य साझेदार
-    only_partner: फिलहाल आप इस गठबंधन में एकमात्र साझेदार हैं।
+    only_partner: फिलहाल आप इस साझेदारी में एकमात्र साझेदार हैं।
     your_vertos_section: आपके साथ साझा किए गए Vertos
     partner_no_vertos_title: अभी तक कोई Vertos नहीं
-    partner_no_vertos_body: जब %{org} इस गठबंधन में कोई Verto जोड़ेगा, तो आप यहाँ अपना अनूठा शेयर लिंक देखेंगे।
+    partner_no_vertos_body: जब %{org} इस साझेदारी में कोई Verto जोड़ेगा, तो आप यहाँ अपना अनूठा शेयर लिंक देखेंगे।
     from_org: "%{org} की ओर से"
     your_link: आपका लिंक
     results_link: परिणाम →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — साझा किया गया Verto"
-    from_org_alliance: "%{org} की ओर से · %{alliance}"
+    from_org_partnership: "%{org} की ओर से · %{partnership}"
     share_link: शेयर लिंक
     mine_label: आपके लिंक से
-    aggregate_label: "%{alliance} में सभी"
+    aggregate_label: "%{partnership} में सभी"
     card_n: कार्ड %{n}
     my_results: मेरे परिणाम
     aggregate: समग्र
@@ -310,19 +310,19 @@ hi:
     expired_title: आमंत्रण समाप्त हो गया
     expired_body: यह लिंक 7 दिनों से अधिक पुराना है। अपने एडमिन से नया भेजने के लिए कहें।
     invited_to_join: आपको शामिल होने के लिए आमंत्रित किया गया है
-    alliance_by: "%{org} द्वारा एक गठबंधन"
+    partnership_by: "%{org} द्वारा एक साझेदारी"
     as_role: "%{role} के रूप में"
     addressed_for: "· %{email} के लिए"
     signed_in_as: "%{name} के रूप में साइन इन किया गया"
     join_with: इसके साथ शामिल हों
     pick_org: चुनें कि कौन सा संगठन शामिल होगा
-    join_submit: "%{alliance} में शामिल हों →"
-    already_in_alliance: 'पहले से ही इस गठबंधन में: %{orgs}'
-    you_run_this: आप इस गठबंधन को चलाते हैं — इसके बजाय इस पर जाएं।
-    already_member_singular: "%{orgs} पहले से ही इस गठबंधन में है।"
-    already_member_plural: "%{orgs} पहले से ही इस गठबंधन में हैं।"
-    no_admin_org: आपके पास कोई एडमिन संगठन नहीं है जो इस गठबंधन में शामिल हो सके।
-    open_alliance: "%{alliance} खोलें →"
+    join_submit: "%{partnership} में शामिल हों →"
+    already_in_partnership: 'पहले से ही इस साझेदारी में: %{orgs}'
+    you_run_this: आप इस साझेदारी को चलाते हैं — इसके बजाय इस पर जाएं।
+    already_member_singular: "%{orgs} पहले से ही इस साझेदारी में है।"
+    already_member_plural: "%{orgs} पहले से ही इस साझेदारी में हैं।"
+    no_admin_org: आपके पास कोई एडमिन संगठन नहीं है जो इस साझेदारी में शामिल हो सके।
+    open_partnership: "%{partnership} खोलें →"
     sign_out_link: साइन आउट करें और एक अलग खाते का उपयोग करें
     sign_out_confirm: अपने वर्तमान खाते से साइन आउट करें?
     already_have_account: क्या आपके पास पहले से Playverto खाता है?
@@ -426,7 +426,7 @@ hi:
   dashboard:
     welcome_back: वापसी पर स्वागत है
     heading_html: आपके <span style="color:#01EACB;">Verto</span>
-    subtitle: Verto बनाएं, उन्हें अपने गठबंधन के साथ साझा करें, और अंतर्दृष्टि आते देखें।
+    subtitle: Verto बनाएं, उन्हें अपनी साझेदारी के साथ साझा करें, और अंतर्दृष्टि आते देखें।
     create_new: नया Verto बनाएं
     import_google_form_button: नया फ़ॉर्म बनाएं
     import_google_form_modal_subtitle: किसी मौजूदा Google Form का लिंक पेस्ट करें और हम उसे संपादन योग्य Verto में बदल देंगे।

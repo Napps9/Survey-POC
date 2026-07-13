@@ -190,33 +190,33 @@ uk:
     wizard:
       step_counter: Крок %{n} з %{total}
   nav:
-    alliances: "Колективний вплив"
+    partnerships: "Партнери"
     shared_vertos: Спільні Vertos
     my_vertos: Мої Vertos
     create: Створити
     members: Учасники
     sign_out: Вийти
-  alliances:
+  partnerships:
     cq_section: "Спільні питання"
-    cq_add_body: "Виберіть один із ваших наборів питань — кожен партнер цього альянсу бачитиме його питання."
+    cq_add_body: "Виберіть один із ваших наборів питань — кожен партнер цього партнерства бачитиме його питання."
     cq_add_submit: "Поділитися набором →"
     cq_no_more: "Більше немає наборів питань для спільного доступу."
     cq_create_new: "Створити набір →"
     cq_empty_title: "Спільні питання ще не опубліковано"
     cq_empty_body: "Поділіться набором питань вище, і кожен партнер побачить його питання."
-    cq_remove_confirm: "Прибрати «%{name}» з цього альянсу? Партнери більше не бачитимуть його питань."
+    cq_remove_confirm: "Прибрати «%{name}» з цього партнерства? Партнери більше не бачитимуть його питань."
     cq_partner_section: "Спільні питання, доступні вам"
     cq_partner_empty_title: "Спільних питань ще немає"
     cq_partner_empty_body: "Коли %{org} поділиться набором питань, його питання з'являться тут."
-    title: "Колективний вплив — Playverto"
-    index_eyebrow: Ваші альянси
-    index_heading: "Колективний вплив"
-    index_subtitle: Об'єднуйте партнерські організації в іменовані альянси. Додавайте Verto, і кожен партнер отримає власне посилання для поширення.
-    new_button: "+ Новий альянс"
-    owned_section: Альянси, якими ви керуєте
-    owned_empty_title: Альянсів поки немає
-    owned_empty_admin_html: Натисніть <span style="color:#FF1E6F;">+ Новий альянс</span> вище, щоб створити групу, а потім запросіть партнерські організації та додайте Verto.
-    owned_empty_member: Попросіть адміністратора створити альянс.
+    title: "Партнери — Playverto"
+    index_eyebrow: Ваші партнерства
+    index_heading: "Партнери"
+    index_subtitle: Об'єднуйте партнерські організації в іменовані партнерства. Додавайте Verto, і кожен партнер отримає власне посилання для поширення.
+    new_button: "+ Нове партнерство"
+    owned_section: Партнерства, якими ви керуєте
+    owned_empty_title: Партнерств поки немає
+    owned_empty_admin_html: Натисніть <span style="color:#FF1E6F;">+ Нове партнерство</span> вище, щоб створити групу, а потім запросіть партнерські організації та додайте Verto.
+    owned_empty_member: Попросіть адміністратора створити партнерство.
     started_on: Створено %{date}
     partners_count:
       one: партнер
@@ -225,43 +225,43 @@ uk:
       one: verto
       other: verto
     open: Відкрити →
-    member_section: Альянси, учасником яких ви є
-    member_empty_title: Вас не запрошували до жодного альянсу
-    member_empty_body: Коли інша організація запросить вас до свого альянсу, він з'явиться тут.
+    member_section: Партнерства, учасником яких ви є
+    member_empty_title: Вас не запрошували до жодного партнерства
+    member_empty_body: Коли інша організація запросить вас до свого партнерства, воно з'явиться тут.
     member_run_by: Керує %{org}
     status:
       active: Активний
       pending: Очікує
       revoked: Відкликано
-    new_title: Новий альянс — Playverto
-    new_eyebrow: Новий альянс
-    new_heading: Назвіть ваш альянс
+    new_title: Нове партнерство — Playverto
+    new_eyebrow: Нове партнерство
+    new_heading: Назвіть ваше партнерство
     new_sub: Дайте групі зрозумілу назву, щоб партнери знали, до чого приєднуються.
-    name_label: Назва альянсу
+    name_label: Назва партнерства
     name_placeholder: напр. Пілотні партнери
     cancel: Скасувати
-    create_submit: Створити альянс →
-    show_title: "%{name} — Колективний вплив"
-    back_to_all: Усі альянси
-    creator_eyebrow: Альянс · Ви керуєте
-    partner_eyebrow: Альянс · Учасник
+    create_submit: Створити партнерство →
+    show_title: "%{name} — Партнери"
+    back_to_all: Усі партнерства
+    creator_eyebrow: Партнерство · Ви керуєте
+    partner_eyebrow: Партнерство · Учасник
     generate_link: Створити посилання для приєднання →
     delete: Видалити
-    delete_confirm: Видалити %{name}? Усі посилання для поширення цього альянсу перестануть працювати.
+    delete_confirm: Видалити %{name}? Усі посилання для поширення цього партнерства перестануть працювати.
     new_link_heading: Нове посилання для приєднання
-    new_link_body: Будь-хто з цим посиланням може приєднатися до %{alliance} як партнер. Термін дії — 14 днів.
+    new_link_body: Будь-хто з цим посиланням може приєднатися до %{partnership} як партнер. Термін дії — 14 днів.
     copy: Копіювати
     copied: Скопійовано!
     partners_section: Партнери
     no_partners_title: Партнерів поки немає
     no_partners_body_html: Використайте <span style="color:#FF1E6F;">Створити посилання для приєднання</span> вище, щоб запросити партнерські організації.
     joined_on: Приєднався %{date}
-    remove_member_confirm: Видалити %{org} з %{alliance}? Їхні посилання для поширення перестануть працювати.
-    vertos_section: Verto в альянсі
+    remove_member_confirm: Видалити %{org} з %{partnership}? Їхні посилання для поширення перестануть працювати.
+    vertos_section: Verto в партнерстві
     no_vertos_title: Verto ще не поширено
     no_vertos_body: Додайте опублікований Verto нижче, і для кожного партнера буде створено унікальне посилання для поширення.
     remove: Видалити
-    remove_verto_confirm: Видалити цей Verto з %{alliance}? Усі партнерські посилання для нього перестануть працювати.
+    remove_verto_confirm: Видалити цей Verto з %{partnership}? Усі партнерські посилання для нього перестануть працювати.
     completion_label: завершення
     responses:
       one: відповідь
@@ -269,32 +269,32 @@ uk:
     partner_links_count:
       one: партнерське посилання
       other: партнерських посилань
-    no_shares_yet: Додайте партнера до альянсу, щоб створити посилання для поширення.
+    no_shares_yet: Додайте партнера до партнерства, щоб створити посилання для поширення.
     responses_short: "%{n} відп."
-    add_section: Додати до альянсу
+    add_section: Додати до партнерства
     add_heading: Додати ще один Verto
-    add_body: Виберіть опублікований Verto. Ми створимо унікальне посилання для поширення для кожного партнера в альянсі.
+    add_body: Виберіть опублікований Verto. Ми створимо унікальне посилання для поширення для кожного партнера в партнерстві.
     no_more_vertos: Більше немає опублікованих Verto для додавання.
     create_new_verto: Створити новий Verto →
     add_submit: Додати Verto →
-    partners_in_alliance: Партнери в альянсі
+    partners_in_partnership: Партнери в партнерстві
     including_you: Включно з вами
     shared_vertos_short: Спільні Verto
     available_to_distribute: Доступні для поширення
     other_partners: Інші партнери
-    only_partner: Наразі ви єдиний партнер у цьому альянсі.
+    only_partner: Наразі ви єдиний партнер у цьому партнерстві.
     your_vertos_section: Verto, поширені з вами
     partner_no_vertos_title: Verto поки немає
-    partner_no_vertos_body: Коли %{org} додасть Verto до цього альянсу, ви побачите тут своє унікальне посилання для поширення.
+    partner_no_vertos_body: Коли %{org} додасть Verto до цього партнерства, ви побачите тут своє унікальне посилання для поширення.
     from_org: Від %{org}
     your_link: Ваше посилання
     results_link: Результати →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Спільний Verto"
-    from_org_alliance: Від %{org} · %{alliance}
+    from_org_partnership: Від %{org} · %{partnership}
     share_link: Посилання для поширення
     mine_label: з вашого посилання
-    aggregate_label: по всьому %{alliance}
+    aggregate_label: по всьому %{partnership}
     card_n: Картка %{n}
     my_results: Мої результати
     aggregate: Загалом
@@ -310,19 +310,19 @@ uk:
     expired_title: Термін запрошення минув
     expired_body: Цьому посиланню понад 7 днів. Попросіть адміністратора надіслати нове.
     invited_to_join: Вас запросили приєднатися до
-    alliance_by: альянсу від %{org}
+    partnership_by: партнерства від %{org}
     as_role: як %{role}
     addressed_for: "· для %{email}"
     signed_in_as: Ви увійшли як %{name}
     join_with: Приєднатися як
     pick_org: Виберіть, яка організація приєднується
-    join_submit: Приєднатися до %{alliance} →
-    already_in_alliance: 'Уже в цьому альянсі: %{orgs}'
-    you_run_this: Ви керуєте цим альянсом — перейдіть до нього.
-    already_member_singular: "%{orgs} вже в цьому альянсі."
-    already_member_plural: "%{orgs} вже в цьому альянсі."
-    no_admin_org: У вас немає організації-адміністратора, яка може приєднатися до цього альянсу.
-    open_alliance: Відкрити %{alliance} →
+    join_submit: Приєднатися до %{partnership} →
+    already_in_partnership: 'Уже в цьому партнерстві: %{orgs}'
+    you_run_this: Ви керуєте цим партнерством — перейдіть до нього.
+    already_member_singular: "%{orgs} вже в цьому партнерстві."
+    already_member_plural: "%{orgs} вже в цьому партнерстві."
+    no_admin_org: У вас немає організації-адміністратора, яка може приєднатися до цього партнерства.
+    open_partnership: Відкрити %{partnership} →
     sign_out_link: Вийти й використати інший обліковий запис
     sign_out_confirm: Вийти з поточного облікового запису?
     already_have_account: Уже маєте обліковий запис Playverto?

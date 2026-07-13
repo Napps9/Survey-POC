@@ -190,33 +190,33 @@ fr:
     wizard:
       step_counter: Étape %{n} sur %{total}
   nav:
-    alliances: "Impact collectif"
+    partnerships: "Partenaires"
     shared_vertos: Vertos partagés
     my_vertos: Mes Vertos
     create: Créer
     members: Membres
     sign_out: Se déconnecter
-  alliances:
+  partnerships:
     cq_section: "Questions communes"
-    cq_add_body: "Choisissez un de vos jeux de questions — chaque partenaire de cette alliance pourra voir ses questions."
+    cq_add_body: "Choisissez un de vos jeux de questions — chaque partenaire de ce partenariat pourra voir ses questions."
     cq_add_submit: "Partager le jeu →"
     cq_no_more: "Plus aucun jeu de questions à partager."
     cq_create_new: "Créer un jeu →"
     cq_empty_title: "Aucune question commune partagée pour l'instant"
     cq_empty_body: "Partagez un jeu de questions ci-dessus et chaque partenaire verra ses questions."
-    cq_remove_confirm: "Retirer « %{name} » de cette alliance ? Les partenaires ne verront plus ses questions."
+    cq_remove_confirm: "Retirer « %{name} » de ce partenariat ? Les partenaires ne verront plus ses questions."
     cq_partner_section: "Questions communes partagées avec vous"
     cq_partner_empty_title: "Pas encore de questions communes"
     cq_partner_empty_body: "Quand %{org} partagera un jeu de questions, ses questions apparaîtront ici."
-    title: "Impact collectif — Playverto"
-    index_eyebrow: Vos alliances
-    index_heading: "Impact collectif"
-    index_subtitle: Regroupez vos organisations partenaires dans des alliances nommées. Ajoutez des Vertos et chaque partenaire reçoit son propre lien de partage.
-    new_button: "+ Nouvelle alliance"
-    owned_section: Alliances que vous gérez
-    owned_empty_title: Aucune alliance pour le moment
-    owned_empty_admin_html: Cliquez sur <span style="color:#FF1E6F;">+ Nouvelle alliance</span> ci-dessus pour créer un groupe, puis invitez des organisations partenaires et ajoutez des Vertos.
-    owned_empty_member: Demandez à votre administrateur de créer une alliance.
+    title: "Partenaires — Playverto"
+    index_eyebrow: Vos partenariats
+    index_heading: "Partenaires"
+    index_subtitle: Regroupez vos organisations partenaires dans des partenariats nommés. Ajoutez des Vertos et chaque partenaire reçoit son propre lien de partage.
+    new_button: "+ Nouveau partenariat"
+    owned_section: Partenariats que vous gérez
+    owned_empty_title: Aucun partenariat pour le moment
+    owned_empty_admin_html: Cliquez sur <span style="color:#FF1E6F;">+ Nouveau partenariat</span> ci-dessus pour créer un groupe, puis invitez des organisations partenaires et ajoutez des Vertos.
+    owned_empty_member: Demandez à votre administrateur de créer un partenariat.
     started_on: Démarrée le %{date}
     partners_count:
       one: partenaire
@@ -225,43 +225,43 @@ fr:
       one: verto
       other: vertos
     open: Ouvrir →
-    member_section: Alliances dont vous êtes membre
-    member_empty_title: Vous n'avez été invité à aucune alliance
-    member_empty_body: Lorsqu'une autre organisation vous invitera à l'une de ses alliances, elle apparaîtra ici.
+    member_section: Partenariats dont vous êtes membre
+    member_empty_title: Vous n'avez été invité à aucun partenariat
+    member_empty_body: Lorsqu'une autre organisation vous invitera à l'un de ses partenariats, il apparaîtra ici.
     member_run_by: Gérée par %{org}
     status:
       active: Active
       pending: En attente
       revoked: Révoquée
-    new_title: Nouvelle alliance — Playverto
-    new_eyebrow: Nouvelle alliance
-    new_heading: Nommez votre alliance
+    new_title: Nouveau partenariat — Playverto
+    new_eyebrow: Nouveau partenariat
+    new_heading: Nommez votre partenariat
     new_sub: Donnez au groupe un nom clair pour que les partenaires sachent ce qu'ils rejoignent.
-    name_label: Nom de l'alliance
+    name_label: Nom du partenariat
     name_placeholder: ex. Partenaires pilotes
     cancel: Annuler
-    create_submit: Créer l'alliance →
-    show_title: "%{name} — Impact collectif"
-    back_to_all: Toutes les alliances
-    creator_eyebrow: Alliance · Vous la gérez
-    partner_eyebrow: Alliance · Membre
+    create_submit: Créer le partenariat →
+    show_title: "%{name} — Partenaires"
+    back_to_all: Toutes les partenariats
+    creator_eyebrow: Partenariat · Vous le gérez
+    partner_eyebrow: Partenariat · Membre
     generate_link: Générer un lien d'invitation →
     delete: Supprimer
-    delete_confirm: Supprimer %{name} ? Tous les liens de partage de cette alliance cesseront de fonctionner.
+    delete_confirm: Supprimer %{name} ? Tous les liens de partage de ce partenariat cesseront de fonctionner.
     new_link_heading: Nouveau lien d'invitation
-    new_link_body: Toute personne disposant de ce lien peut rejoindre %{alliance} en tant que partenaire. Expire dans 14 jours.
+    new_link_body: Toute personne disposant de ce lien peut rejoindre %{partnership} en tant que partenaire. Expire dans 14 jours.
     copy: Copier
     copied: Copié !
     partners_section: Partenaires
     no_partners_title: Aucun partenaire pour le moment
     no_partners_body_html: Utilisez <span style="color:#FF1E6F;">Générer un lien d'invitation</span> ci-dessus pour inviter des organisations partenaires.
     joined_on: Rejoint le %{date}
-    remove_member_confirm: Retirer %{org} de %{alliance} ? Leurs liens de partage cesseront de fonctionner.
-    vertos_section: Vertos dans l'alliance
+    remove_member_confirm: Retirer %{org} de %{partnership} ? Leurs liens de partage cesseront de fonctionner.
+    vertos_section: Vertos dans le partenariat
     no_vertos_title: Aucun Verto partagé pour le moment
     no_vertos_body: Ajoutez un Verto publié ci-dessous et un lien de partage unique sera généré pour chaque partenaire.
     remove: Retirer
-    remove_verto_confirm: Retirer ce Verto de %{alliance} ? Tous les liens de partage partenaires associés cesseront de fonctionner.
+    remove_verto_confirm: Retirer ce Verto de %{partnership} ? Tous les liens de partage partenaires associés cesseront de fonctionner.
     completion_label: complétion
     responses:
       one: réponse
@@ -269,32 +269,32 @@ fr:
     partner_links_count:
       one: lien partenaire
       other: liens partenaires
-    no_shares_yet: Ajoutez un partenaire à l'alliance pour générer des liens de partage.
+    no_shares_yet: Ajoutez un partenaire au partenariat pour générer des liens de partage.
     responses_short: "%{n} rép."
-    add_section: Ajouter à l'alliance
+    add_section: Ajouter au partenariat
     add_heading: Ajouter un autre Verto
-    add_body: Choisissez un Verto publié. Nous générerons un lien de partage unique pour chaque partenaire de l'alliance.
+    add_body: Choisissez un Verto publié. Nous générerons un lien de partage unique pour chaque partenaire du partenariat.
     no_more_vertos: Aucun autre Verto publié à ajouter.
     create_new_verto: Créer un nouveau Verto →
     add_submit: Ajouter le Verto →
-    partners_in_alliance: Partenaires de l'alliance
+    partners_in_partnership: Partenaires du partenariat
     including_you: Vous inclus
     shared_vertos_short: Vertos partagés
     available_to_distribute: Disponible pour distribution
     other_partners: Autres partenaires
-    only_partner: Vous êtes pour l'instant le seul partenaire de cette alliance.
+    only_partner: Vous êtes pour l'instant le seul partenaire de ce partenariat.
     your_vertos_section: Vertos partagés avec vous
     partner_no_vertos_title: Aucun Verto pour le moment
-    partner_no_vertos_body: Lorsque %{org} ajoutera un Verto à cette alliance, vous verrez votre lien de partage unique ici.
+    partner_no_vertos_body: Lorsque %{org} ajoutera un Verto à ce partenariat, vous verrez votre lien de partage unique ici.
     from_org: De %{org}
     your_link: Votre lien
     results_link: Résultats →
-  alliance_verto:
+  partnership_verto:
     title: "%{title} — Verto partagé"
-    from_org_alliance: De %{org} · %{alliance}
+    from_org_partnership: De %{org} · %{partnership}
     share_link: Lien de partage
     mine_label: depuis votre lien
-    aggregate_label: dans l'ensemble de %{alliance}
+    aggregate_label: dans l'ensemble de %{partnership}
     card_n: Carte %{n}
     my_results: Mes résultats
     aggregate: Global
@@ -310,19 +310,19 @@ fr:
     expired_title: Invitation expirée
     expired_body: Ce lien a plus de 7 jours. Demandez à votre administrateur d'en envoyer un nouveau.
     invited_to_join: Vous avez été invité à rejoindre
-    alliance_by: une alliance de %{org}
+    partnership_by: un partenariat de %{org}
     as_role: en tant que %{role}
     addressed_for: "· pour %{email}"
     signed_in_as: Connecté en tant que %{name}
     join_with: Rejoindre avec
     pick_org: Choisissez quelle organisation rejoint
-    join_submit: Rejoindre %{alliance} →
-    already_in_alliance: 'Déjà dans cette alliance : %{orgs}'
-    you_run_this: Vous gérez cette alliance — accédez-y plutôt.
-    already_member_singular: "%{orgs} fait déjà partie de cette alliance."
-    already_member_plural: "%{orgs} font déjà partie de cette alliance."
-    no_admin_org: Vous n'avez pas d'organisation administrée pouvant rejoindre cette alliance.
-    open_alliance: Ouvrir %{alliance} →
+    join_submit: Rejoindre %{partnership} →
+    already_in_partnership: 'Déjà dans ce partenariat : %{orgs}'
+    you_run_this: Vous gérez ce partenariat — accédez-y plutôt.
+    already_member_singular: "%{orgs} fait déjà partie de ce partenariat."
+    already_member_plural: "%{orgs} font déjà partie de ce partenariat."
+    no_admin_org: Vous n'avez pas d'organisation administrée pouvant rejoindre ce partenariat.
+    open_partnership: Ouvrir %{partnership} →
     sign_out_link: Se déconnecter et utiliser un autre compte
     sign_out_confirm: Se déconnecter du compte actuel ?
     already_have_account: Vous avez déjà un compte Playverto ?
@@ -426,7 +426,7 @@ fr:
   dashboard:
     welcome_back: Bon retour
     heading_html: Vos <span style="color:#01EACB;">Vertos</span>
-    subtitle: Lancez des Vertos, partagez-les avec votre alliance et regardez les résultats arriver.
+    subtitle: Lancez des Vertos, partagez-les avec votre partenariat et regardez les résultats arriver.
     create_new: Créer un nouveau Verto
     import_google_form_button: Créer un nouveau formulaire
     import_google_form_modal_subtitle: Collez le lien d'un Google Form existant et nous le transformerons en Verto modifiable.
