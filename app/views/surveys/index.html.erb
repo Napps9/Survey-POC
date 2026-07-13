@@ -79,7 +79,7 @@
         where the reopen value lands straight in the Form panel. ── %>
     <div data-create-menu-target="modal" class="app-modal hidden">
       <div class="app-modal__backdrop" data-action="click->create-menu#close"></div>
-      <div class="app-modal__panel" style="max-width:480px;">
+      <div class="app-modal__panel" style="max-width:480px;background:#1C2034;border:1px solid rgba(255,255,255,0.1);">
         <div class="create-menu-bar"></div>
 
         <%# Level 1 — what do you want to create? %>
@@ -87,9 +87,9 @@
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
             <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.16em;text-transform:uppercase;font-weight:700;color:#01EACB;"><%= t("dashboard.create_menu_eyebrow") %></div>
             <button type="button" data-action="click->create-menu#close" aria-label="Close"
-                    style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(0,0,0,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
+                    style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(255,255,255,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
           </div>
-          <div style="font-family:'Alata',sans-serif;font-size:20px;color:#1C2034;line-height:1.25;margin-bottom:16px;"><%= t("dashboard.create_menu_title") %></div>
+          <div style="font-family:'Alata',sans-serif;font-size:20px;color:#fff;line-height:1.25;margin-bottom:16px;"><%= t("dashboard.create_menu_title") %></div>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <%= link_to new_survey_path, class: "create-menu-tile", style: "--tile-accent:#01EACB;" do %>
               <span class="create-menu-tile-icon">📊</span>
@@ -131,13 +131,13 @@
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
             <div style="display:flex;align-items:center;gap:10px;min-width:0;">
               <button type="button" data-action="click->create-menu#back" aria-label="Back"
-                      style="background:none;border:none;cursor:pointer;font-size:16px;color:rgba(0,0,0,0.45);line-height:1;padding:2px;flex-shrink:0;">←</button>
-              <div style="font-family:'Alata',sans-serif;font-size:19px;color:#1C2034;line-height:1.25;"><%= t("dashboard.create_menu_form") %></div>
+                      style="background:none;border:none;cursor:pointer;font-size:16px;color:rgba(255,255,255,0.45);line-height:1;padding:2px;flex-shrink:0;">←</button>
+              <div style="font-family:'Alata',sans-serif;font-size:19px;color:#fff;line-height:1.25;"><%= t("dashboard.create_menu_form") %></div>
             </div>
             <button type="button" data-action="click->create-menu#close" aria-label="Close"
-                    style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(0,0,0,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
+                    style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(255,255,255,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
           </div>
-          <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);line-height:1.5;margin:0 0 18px;"><%= t("dashboard.import_google_form_modal_subtitle") %></p>
+          <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);line-height:1.5;margin:0 0 18px;"><%= t("dashboard.import_google_form_modal_subtitle") %></p>
 
           <% if google_form_error %>
             <div style="background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);"><%= google_form_error %></div>
@@ -149,10 +149,11 @@
               <input type="url" name="google_form_url" required
                      placeholder="<%= t('wizard.import_gform_url_placeholder') %>"
                      data-create-menu-target="urlInput"
-                     style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);padding:12px 14px;border-radius:10px;border:1px solid rgba(0,0,0,0.16);background:#fafbfc;width:100%;box-sizing:border-box;margin-bottom:12px;" />
+                     class="create-menu-input"
+                     style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);padding:12px 14px;border-radius:10px;width:100%;box-sizing:border-box;margin-bottom:12px;" />
               <%= submit_tag t("wizard.import_gform_submit"),
                     data: { turbo_submits_with: t("wizard.importing_gform") },
-                    style: "width:100%;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;cursor:pointer;" %>
+                    style: "width:100%;background:#01EACB;color:#1C2034;border:none;border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;cursor:pointer;" %>
             <% end %>
           <% else %>
             <%= link_to t("wizard.import_gform_connect"), google_connect_path(return_to: "dashboard_import"),
@@ -160,15 +161,15 @@
           <% end %>
 
           <div style="display:flex;align-items:center;gap:10px;margin:18px 0 14px;">
-            <div style="flex:1;height:1px;background:rgba(0,0,0,0.1);"></div>
-            <span style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.35);"><%= t("dashboard.or_divider") %></span>
-            <div style="flex:1;height:1px;background:rgba(0,0,0,0.1);"></div>
+            <div style="flex:1;height:1px;background:rgba(255,255,255,0.12);"></div>
+            <span style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);"><%= t("dashboard.or_divider") %></span>
+            <div style="flex:1;height:1px;background:rgba(255,255,255,0.12);"></div>
           </div>
 
           <%= button_to t("dashboard.create_new_form_button"), create_blank_survey_path,
                 method: :post,
                 data: { turbo_submits_with: t("dashboard.creating_blank") },
-                style: "width:100%;background:transparent;color:#1C2034;border:1px solid rgba(0,0,0,0.16);border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;cursor:pointer;" %>
+                style: "width:100%;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.18);border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;cursor:pointer;" %>
         </div>
 
       </div>
