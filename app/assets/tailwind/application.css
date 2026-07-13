@@ -980,6 +980,23 @@
 .choice-list-label { flex: 1; }
 .choice-list-tick { margin-left: auto; }
 
+/* ── Per-type accents ─────────────────────────────
+   The list types share one chrome; these modifier classes (emitted by both
+   _card_component.html.erb and type_panel_controller.js's builders) give each
+   answer type a visible identity of its own before anything is selected.
+   Multi-pick reads as a checklist (brand bar + square ticks); Yes/No rows
+   carry a hint of their tile's green/red so the binary reads at a glance. */
+.choice-list--multi .choice-list-item {
+  border-left: 4px solid var(--brand-primary, #01EACB);
+  border-radius: 12px;
+}
+.choice-list--yesno .choice-list-item[data-selected="false"]:first-child {
+  background: linear-gradient(90deg, rgba(168,213,181,0.28), rgba(255,255,255,0) 62%);
+}
+.choice-list--yesno .choice-list-item[data-selected="false"]:last-child {
+  background: linear-gradient(90deg, rgba(245,168,176,0.28), rgba(255,255,255,0) 62%);
+}
+
 /* ── Prioritise (drag-to-rank list) ───────────────── */
 .prioritise-list { touch-action: pan-y; }
 .prioritise-item { cursor: grab; user-select: none; -webkit-user-select: none; }
@@ -1077,6 +1094,22 @@
   font-weight: 700;
 }
 .choice-card[data-selected="true"] .choice-tick { display: flex; }
+/* Per-type accents: single-pick grids show a radio-style ring on every tile
+   at rest, multi-pick grids a checkbox-style square — the dot/square metaphor
+   of the list types, visible before any selection. Filled on pick. */
+.choice-grid--single .choice-tick,
+.choice-grid--multi .choice-tick {
+  display: flex;
+  background: rgba(0,0,0,0.18);
+  border: 2px solid rgba(255,255,255,0.9);
+  color: transparent;
+}
+.choice-grid--multi .choice-tick { border-radius: 6px; }
+.choice-grid--single .choice-card[data-selected="true"] .choice-tick,
+.choice-grid--multi .choice-card[data-selected="true"] .choice-tick {
+  background: var(--brand-primary, var(--color-green-500));
+  color: white;
+}
 .choice-label {
   margin-top: 7px;
   text-align: center;
@@ -2538,6 +2571,7 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   font-family: "Alata", sans-serif; font-size: 10px; font-weight: 600; color: white;
   position: relative;
 }
+.mini-nps-face { font-size: 18px; line-height: 1; text-align: center; margin-bottom: 3px; }
 .mini-tooltip::after {
   content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
   border: 5px solid transparent; border-top-color: #01EACB; border-bottom: none;
@@ -2559,6 +2593,7 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   border: 1.5px solid rgba(255,255,255,0.2);
 }
 .mini-p-dot.selected { background: #01EACB; border-color: #01EACB; }
+.mini-p-square { border-radius: 5px; }
 .mini-img-grid { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 .mini-img-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
 .mini-img-card {

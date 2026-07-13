@@ -1,6 +1,7 @@
 require "test_helper"
 
 class ApplicationHelperTest < ActionView::TestCase
+  include ERB::Util # mini_preview_html calls the bare `h` escape helper
   # editor_cards_i18n powers the inline #survey-cards-i18n island. It must keep
   # the translatable text the language-tab JS reads, and drop the heavy
   # image/structural fields so base64 data URLs aren't serialised inline.
@@ -118,5 +119,26 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal({ on: "★", off: "☆", kind: "star" }, rating_icon(themed(theme: "")))
     assert_equal({ on: "★", off: "☆", kind: "star" }, rating_icon(nil))
     assert_equal "star", rating_icon(themed(theme: "Quarterly NPS pulse"))[:kind]
+  end
+
+  # mini_preview_html draws the little mockup inside each add-question type
+  # tile. Every pickable question type must produce one — a missing case falls
+  # through to the empty `else` and the tile renders blank (the nps bug).
+  test "every pickable question type renders a non-empty mini preview" do
+    CardTypes.pickable.each do |type, _attrs|
+      next unless CardTypes.question?(type)
+      html = mini_preview_html({ "type" => type, "options" => %w[A B C] })
+      assert html.present?, "mini_preview_html renders nothing for #{type}"
+    end
+  end
+
+  test "mini previews distinguish the look-alike pick types" do
+    nps = mini_preview_html({ "type" => "nps" })
+    assert_includes nps, "mini-nps-face"
+    assert_includes nps, "mini-slider-track"
+    many = mini_preview_html({ "type" => "select_many", "options" => %w[A B] })
+    assert_includes many, "mini-p-square"
+    one = mini_preview_html({ "type" => "multiple_choice", "options" => %w[A B] })
+    refute_includes one, "mini-p-square"
   end
 end

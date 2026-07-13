@@ -164,7 +164,7 @@ const COMPONENTS = {
   prioritise:      (opts) => prioritiseHtml(opts),
 
   yes_no: () => `
-    <ul class="choice-list" data-controller="picker" data-picker-mode-value="single">
+    <ul class="choice-list choice-list--yesno" data-controller="picker" data-picker-mode-value="single">
       ${[["Yes", 1], ["No", 4]].map(([label, bg]) => `
         <li class="choice-list-item pick-item" data-picker-target="item"
             data-action="click->picker#pick" data-selected="false">
@@ -263,7 +263,7 @@ function prioritiseHtml(opts) {
 function choiceListHtml(opts, mode) {
   const tick = mode === "multi" ? "pick-square" : "pick-dot"
   return `
-    <ul class="choice-list" data-controller="picker card-editor"
+    <ul class="choice-list choice-list--${mode}" data-controller="picker card-editor"
         data-picker-mode-value="${mode}">
       ${opts.map((o, i) => `
         <li class="choice-list-item pick-item" data-picker-target="item"
@@ -282,7 +282,7 @@ function choiceListHtml(opts, mode) {
 function gridHtml(opts, mode) {
   const cols = opts.length >= 5 ? 3 : 2
   return `
-    <ul class="choice-grid choice-grid-${cols}" data-controller="picker"
+    <ul class="choice-grid choice-grid--${mode} choice-grid-${cols}" data-controller="picker"
         data-picker-mode-value="${mode}">
       ${opts.map((o,i) => `
         <li class="choice-card" data-picker-target="item"

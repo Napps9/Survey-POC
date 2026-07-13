@@ -95,7 +95,7 @@
        when "multiple_choice", "select_many" %>
       <% items = Array(display["options"]) %>
       <% multi = (type == "select_many") %>
-      <ul class="choice-list"
+      <ul class="choice-list choice-list--<%= multi ? 'multi' : 'single' %>"
           data-controller="<%= picker_controllers %>"
           data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
         <% items.each_with_index do |opt, i| %>
@@ -162,7 +162,7 @@
       </ul>
 
     <% when "yes_no" %>
-      <ul class="choice-list"
+      <ul class="choice-list choice-list--yesno"
           data-controller="picker"
           data-picker-mode-value="single">
         <% [["Yes", 1], ["No", 4]].each do |canon_label, bg| %>
@@ -187,7 +187,7 @@
       <% opts = Array(display["options"]) %>
       <% cols = opts.size >= 5 ? 3 : 2 %>
       <% multi = (type == "select_many_grid") %>
-      <ul class="choice-grid choice-grid-<%= cols %>"
+      <ul class="choice-grid choice-grid--<%= multi ? 'multi' : 'single' %> choice-grid-<%= cols %>"
           data-controller="picker"
           data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
         <% opts.each_with_index do |opt, i| %>
