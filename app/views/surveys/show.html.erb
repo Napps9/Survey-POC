@@ -810,10 +810,12 @@
 
       <div class="publish-panel-body">
 
-        <%# Brand colours — edits THIS Verto's palette (not other Vertos). %>
+        <%# Branding — colours, background image and logo in one card.
+            Colours + background edit THIS Verto; the logo is organisation-wide. %>
         <div class="publish-block">
-          <div class="publish-block-title">Brand colours</div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:12px;line-height:1.45;">
+          <div class="publish-block-title">Branding</div>
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;">Brand colours</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin:3px 0 10px;line-height:1.45;">
             Applied to this Verto's cards, preview and player. Changes here don't affect your other Vertos.
           </div>
           <% pal = @survey.brand_palette %>
@@ -857,45 +859,45 @@
                       style="padding:9px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Remove</button>
             </div>
           </div>
-        </div>
-
-        <%# Logo — the organisation's logo, shown across all its Vertos. %>
-        <div class="publish-block" data-controller="logo-uploader"
-             data-logo-uploader-url-value="<%= organisation_path(current_organisation) %>"
-             data-logo-uploader-fallback-value="<%= image_path('playverto.svg') %>">
-          <div class="publish-block-title">Logo</div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:12px;line-height:1.45;">
-            Shown at the top of every Verto preview and shared play link. Applies across your organisation.
-          </div>
-          <div style="display:flex;align-items:center;gap:11px;">
-            <div data-logo-uploader-target="preview"
-                 style="height:48px;min-width:90px;display:flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);flex-shrink:0;">
-              <%= brand_logo_tag current_organisation, style: "height:30px;width:auto;max-width:150px;" %>
+          <%# Logo — the organisation's logo, shown across all its Vertos. %>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);"
+               data-controller="logo-uploader"
+               data-logo-uploader-url-value="<%= organisation_path(current_organisation) %>"
+               data-logo-uploader-fallback-value="<%= image_path('playverto.svg') %>">
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;">Logo</div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin:3px 0 10px;line-height:1.45;">
+              Shown at the top of every Verto preview and shared play link. Applies across your organisation.
+            </div>
+            <div style="display:flex;align-items:center;gap:11px;">
+              <div data-logo-uploader-target="preview"
+                   style="height:48px;min-width:90px;display:flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);flex-shrink:0;">
+                <%= brand_logo_tag current_organisation, style: "height:30px;width:auto;max-width:150px;" %>
+              </div>
+              <% if current_membership&.admin? %>
+                <button type="button" class="publish-block-btn" style="flex:1;"
+                        data-action="click->logo-uploader#choose">Upload logo</button>
+                <button type="button"
+                        data-logo-uploader-target="removeBtn"
+                        data-action="click->logo-uploader#remove"
+                        <%= "hidden" unless current_organisation.logo.attached? %>
+                        style="padding:9px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Remove</button>
+                <input type="file" hidden accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                       data-logo-uploader-target="input"
+                       data-action="change->logo-uploader#upload" />
+              <% end %>
             </div>
             <% if current_membership&.admin? %>
-              <button type="button" class="publish-block-btn" style="flex:1;"
-                      data-action="click->logo-uploader#choose">Upload logo</button>
-              <button type="button"
-                      data-logo-uploader-target="removeBtn"
-                      data-action="click->logo-uploader#remove"
-                      <%= "hidden" unless current_organisation.logo.attached? %>
-                      style="padding:9px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Remove</button>
-              <input type="file" hidden accept="image/png,image/jpeg,image/svg+xml,image/webp"
-                     data-logo-uploader-target="input"
-                     data-action="change->logo-uploader#upload" />
+              <div data-logo-uploader-target="status"
+                   style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:8px;"></div>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:2px;">
+                PNG, JPG, SVG or WebP · transparent backgrounds work best.
+              </div>
+            <% else %>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);margin-top:8px;">
+                Ask an organisation admin to change the logo.
+              </div>
             <% end %>
           </div>
-          <% if current_membership&.admin? %>
-            <div data-logo-uploader-target="status"
-                 style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:8px;"></div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:2px;">
-              PNG, JPG, SVG or WebP · transparent backgrounds work best.
-            </div>
-          <% else %>
-            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);margin-top:8px;">
-              Ask an organisation admin to change the logo.
-            </div>
-          <% end %>
         </div>
 
       </div><%# /design panel body %>

@@ -80,4 +80,26 @@ class SurveysShowSmokeTest < ActionDispatch::IntegrationTest
     # The welcome card is not a question, so it gets no traffic light.
     assert_select ".survey-card-wrap[data-card-type='welcome_card'] [data-role='card-light']", false
   end
+
+  test "the Design panel shows one Branding card with colours, background and logo" do
+    user = User.create!(name: "U", email_address: "u5-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    org  = Organisation.create!(name: "O", slug: "o5-#{SecureRandom.hex(2)}")
+    org.memberships.create!(user: user, role: "admin")
+    s = org.surveys.create!(title: "Smoke", theme: "Smoke", audience_age: "all", key_insight: "x", default_locale: "en", locales: [ "en" ], cards: [])
+
+    post session_path, params: { email_address: user.email_address, password: "verylongpassword" }
+    follow_redirect! if response.redirect?
+
+    get survey_path(s)
+    assert_response :success
+    # One consolidated card, not separate "Brand colours" / "Logo" blocks.
+    assert_equal 1, response.body.scan(%r{<div class="publish-block-title">Branding</div>}).size
+    refute_match %r{<div class="publish-block-title">Brand colours</div>}, response.body
+    refute_match %r{<div class="publish-block-title">Logo</div>}, response.body
+    # All three sub-sections live inside it.
+    assert_match ">Brand colours</div>", response.body
+    assert_match ">Background image</div>", response.body
+    assert_match ">Logo</div>", response.body
+    assert_match "Upload logo", response.body
+  end
 end
