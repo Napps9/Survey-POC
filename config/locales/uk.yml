@@ -109,7 +109,7 @@ uk:
     player:
       region_meta: "%{count} відповідей із регіоном"
       region_answered: "%{count} відповіли"
-      region_compare: "Порівняти →"
+      region_compare: "Порівняти з цим регіоном →"
       region_empty: "Регіональних відповідей ще немає — ваша може бути першою!"
       progress: Картка %{n} з %{total}
       queued: Збережено — синхронізується, коли ви знову онлайн

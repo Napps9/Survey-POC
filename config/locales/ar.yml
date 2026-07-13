@@ -109,7 +109,7 @@ ar:
     player:
       region_meta: "%{count} إجابة شاركت منطقتها"
       region_answered: "%{count} أجابوا"
-      region_compare: "قارن ←"
+      region_compare: "قارن مع هذه المنطقة ←"
       region_empty: "لا توجد إجابات إقليمية بعد — قد تكون إجابتك الأولى!"
       progress: البطاقة %{n} من %{total}
       queued: تم الحفظ — ستتم المزامنة عند عودتك للاتصال

@@ -109,7 +109,7 @@ id:
     player:
       region_meta: "%{count} jawaban menyertakan region"
       region_answered: "%{count} menjawab"
-      region_compare: "Bandingkan →"
+      region_compare: "Bandingkan dengan wilayah ini →"
       region_empty: "Belum ada jawaban regional — jawabanmu mungkin yang pertama!"
       progress: Kartu %{n} dari %{total}
       queued: Tersimpan — akan disinkronkan saat Anda kembali online

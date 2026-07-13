@@ -109,7 +109,7 @@ ja:
     player:
       region_meta: "%{count} 件の回答が地域を共有"
       region_answered: "%{count} 件の回答"
-      region_compare: "比較 →"
+      region_compare: "この地域と比較 →"
       region_empty: "まだ地域の回答がありません — あなたが最初かもしれません！"
       progress: "%{total}枚中 %{n}枚目"
       queued: 保存済み — オンラインに戻ったときに同期されます

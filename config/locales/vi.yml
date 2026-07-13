@@ -109,7 +109,7 @@ vi:
     player:
       region_meta: "%{count} câu trả lời có khu vực"
       region_answered: "%{count} đã trả lời"
-      region_compare: "So sánh →"
+      region_compare: "So sánh với khu vực này →"
       region_empty: "Chưa có câu trả lời theo khu vực — của bạn có thể là đầu tiên!"
       progress: Thẻ %{n} / %{total}
       queued: Đã lưu — sẽ đồng bộ khi bạn trực tuyến trở lại

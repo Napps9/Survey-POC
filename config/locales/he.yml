@@ -109,7 +109,7 @@ he:
     player:
       region_meta: "%{count} תשובות שיתפו אזור"
       region_answered: "%{count} ענו"
-      region_compare: "השוואה ←"
+      region_compare: "השווה עם אזור זה ←"
       region_empty: "אין עדיין תשובות אזוריות — אולי שלכם תהיה הראשונה!"
       progress: כרטיס %{n} מתוך %{total}
       queued: נשמר — יסונכרן כשתחזור לאינטרנט

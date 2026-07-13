@@ -109,7 +109,7 @@ nl:
     player:
       region_meta: "%{count} antwoorden met een regio"
       region_answered: "%{count} geantwoord"
-      region_compare: "Vergelijk →"
+      region_compare: "Vergelijk met deze regio →"
       region_empty: "Nog geen regionale antwoorden — die van jou kan de eerste zijn!"
       progress: Kaart %{n} van %{total}
       queued: Opgeslagen — wordt gesynchroniseerd zodra je weer online bent

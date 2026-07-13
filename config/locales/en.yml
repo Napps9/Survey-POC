@@ -111,7 +111,7 @@ en:
     player:
       region_meta: "%{count} answers shared a region"
       region_answered: "%{count} answered"
-      region_compare: "Compare →"
+      region_compare: "Compare with this region →"
       region_empty: "No regional answers yet — yours might be the first!"
       progress: "Card %{n} of %{total}"
       queued: "Saved — will sync when you're back online"

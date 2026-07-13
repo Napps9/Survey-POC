@@ -109,7 +109,7 @@ sw:
     player:
       region_meta: "Majibu %{count} yalishiriki kanda"
       region_answered: "%{count} wamejibu"
-      region_compare: "Linganisha →"
+      region_compare: "Linganisha na eneo hili →"
       region_empty: "Hakuna majibu ya kanda bado — lako linaweza kuwa la kwanza!"
       progress: Kadi %{n} kati ya %{total}
       queued: Imehifadhiwa — itasawazishwa utakaporejea mtandaoni

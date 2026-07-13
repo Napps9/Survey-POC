@@ -109,7 +109,7 @@ tr:
     player:
       region_meta: "%{count} yanıt bölge paylaştı"
       region_answered: "%{count} yanıtladı"
-      region_compare: "Karşılaştır →"
+      region_compare: "Bu bölgeyle karşılaştır →"
       region_empty: "Henüz bölgesel yanıt yok — ilki sizinki olabilir!"
       progress: "%{total} karttan %{n}. kart"
       queued: Kaydedildi — çevrimiçi olduğunuzda eşitlenecek

@@ -109,7 +109,7 @@ it:
     player:
       region_meta: "%{count} risposte con una regione"
       region_answered: "%{count} hanno risposto"
-      region_compare: "Confronta →"
+      region_compare: "Confronta con questa regione →"
       region_empty: "Ancora nessuna risposta regionale — la tua potrebbe essere la prima!"
       progress: Carta %{n} di %{total}
       queued: Salvato — verrà sincronizzato quando sarai di nuovo online

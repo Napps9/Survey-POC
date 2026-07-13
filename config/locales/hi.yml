@@ -109,7 +109,7 @@ hi:
     player:
       region_meta: "%{count} जवाबों में क्षेत्र साझा हुआ"
       region_answered: "%{count} ने जवाब दिया"
-      region_compare: "तुलना करें →"
+      region_compare: "इस क्षेत्र से तुलना करें →"
       region_empty: "अभी कोई क्षेत्रीय जवाब नहीं — आपका पहला हो सकता है!"
       progress: कार्ड %{n} / %{total}
       queued: सहेजा गया — ऑनलाइन होने पर सिंक होगा

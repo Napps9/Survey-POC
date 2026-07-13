@@ -114,11 +114,11 @@
           <div class="regions-box" data-controller="results-compare"
                data-results-compare-url-value="<%= survey_results_compare_path(@survey) %>">
             <div class="regions-box-head">
-              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 Regions</span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a region on the map to compare it</span>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 Audience segments</span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a region on the map to compare segments of your audience</span>
               <button type="button" class="compare-open-btn" style="margin-left:auto;"
                       data-results-compare-target="openBtn"
-                      data-action="click->results-compare#toggle">⛶ Compare regions</button>
+                      data-action="click->results-compare#toggle">⛶ Compare segments</button>
             </div>
 
             <%# ── Map stays visible & clickable at all times; the comparison
@@ -144,7 +144,7 @@
                 <div class="compare-panel hidden" data-results-compare-target="panel">
                   <div class="compare-panel-head">
                     <div>
-                      <div class="compare-panel-title">Compare regions</div>
+                      <div class="compare-panel-title">Compare segments</div>
                       <div class="compare-panel-meta" data-results-compare-target="meta">Loading…</div>
                     </div>
                     <button type="button" class="compare-close-btn" aria-label="Close">✕</button>
@@ -164,7 +164,7 @@
                   .compare-stage-row so it spans the full width, under both
                   the map and the panel. ── %>
               <div class="compare-picker-wrap hidden" data-results-compare-target="pickerWrap">
-                <div class="compare-picker-label">🌍 Regions — click to add or remove</div>
+                <div class="compare-picker-label">🌍 Segments — click to add or remove</div>
                 <div class="compare-picker" data-results-compare-target="picker"></div>
               </div>
             </div>

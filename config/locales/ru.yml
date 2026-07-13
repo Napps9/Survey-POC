@@ -109,7 +109,7 @@ ru:
     player:
       region_meta: "%{count} ответов с указанием региона"
       region_answered: "%{count} ответили"
-      region_compare: "Сравнить →"
+      region_compare: "Сравнить с этим регионом →"
       region_empty: "Региональных ответов пока нет — ваш может стать первым!"
       progress: Карточка %{n} из %{total}
       queued: Сохранено — синхронизируется при подключении

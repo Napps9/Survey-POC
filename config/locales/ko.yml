@@ -109,7 +109,7 @@ ko:
     player:
       region_meta: "%{count}개의 응답이 지역을 공유했어요"
       region_answered: "%{count}명 응답"
-      region_compare: "비교 →"
+      region_compare: "이 지역과 비교 →"
       region_empty: "아직 지역 응답이 없어요 — 첫 번째가 되어 보세요!"
       progress: "%{total}장 중 %{n}번째 카드"
       queued: 저장됨 — 온라인이 되면 동기화됩니다
