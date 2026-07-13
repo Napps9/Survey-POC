@@ -428,19 +428,19 @@ nl:
     heading_html: Jouw <span style="color:#01EACB;">Vertos</span>
     subtitle: Start Vertos op, deel ze met je partnerschap en zie de inzichten binnenstromen.
     create_new: Een nieuwe Verto aanmaken
-    import_google_form_button: Nieuw formulier maken
+    create_new_form_button: Nieuw formulier maken
     import_google_form_modal_subtitle: Plak de link van een bestaand Google Form en we maken er een bewerkbare Verto van.
     or_divider: of
-    start_from_scratch_button: Helemaal opnieuw beginnen
     creating_blank: Bezig met maken…
     create_button: "Maken"
+    create_menu_eyebrow: "Laten we beginnen"
     create_menu_title: "Wat wil je maken?"
     create_menu_impact: "Impactmeting"
-    create_menu_impact_desc: "Een door AI opgesteld Verto op basis van je briefing — de volledige begeleide flow."
+    create_menu_impact_desc: "Een door AI opgesteld Verto op basis van je briefing — of importeer je eigen vragen."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Beoordeelde antwoorden en een score die respondenten kunnen vergelijken."
+    create_menu_quiz_desc: "Beoordeelde antwoorden die respondenten kunnen vergelijken — of importeer je eigen vragen."
     create_menu_form: "Formulier"
-    create_menu_form_desc: "Een eenvoudige vragenlijst — importeer een Google Formulier of begin blanco."
+    create_menu_form_desc: "Een eenvoudige vragenlijst — importeer een Google Formulier of maak een nieuwe."
     create_menu_template: "Sjabloon"
     create_menu_template_desc: "Begin met een kant-en-klaar deck."
     stat_live: Live
@@ -594,6 +594,7 @@ nl:
     subtitle: Kies een kant-en-klaar Verto en verzamel binnen enkele minuten antwoorden
       — elk sjabloon is volledig aanpasbaar.
     back: Terug naar dashboard
+    import_instead: "Heb je al vragen? Importeer ze liever →"
     use: Dit sjabloon gebruiken
     question_count: "%{n} vragen"
     start_button: Begin met een sjabloon

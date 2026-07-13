@@ -428,19 +428,19 @@ de:
     heading_html: Deine <span style="color:#01EACB;">Vertos</span>
     subtitle: Erstelle Vertos, teile sie mit deiner Partnerschaft und sieh dabei zu, wie die Erkenntnisse hereinströmen.
     create_new: Neues Verto erstellen
-    import_google_form_button: Neues Formular erstellen
+    create_new_form_button: Neues Formular erstellen
     import_google_form_modal_subtitle: Füge den Link zu einem bestehenden Google Form ein, und wir verwandeln ihn in ein bearbeitbares Verto.
     or_divider: oder
-    start_from_scratch_button: Von vorne beginnen
     creating_blank: Wird erstellt…
     create_button: "Erstellen"
+    create_menu_eyebrow: "Los geht's"
     create_menu_title: "Was möchtest du erstellen?"
     create_menu_impact: "Wirkungsmessung"
-    create_menu_impact_desc: "Ein KI-entworfenes Verto aus deinem Briefing — der komplette geführte Ablauf."
+    create_menu_impact_desc: "Ein KI-entworfenes Verto aus deinem Briefing — oder importiere deine eigenen Fragen."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Bewertete Antworten und ein Punktestand zum Vergleichen."
+    create_menu_quiz_desc: "Bewertete Antworten zum Vergleichen — oder importiere deine eigenen Fragen."
     create_menu_form: "Formular"
-    create_menu_form_desc: "Ein schlichter Fragebogen — importiere ein Google-Formular oder starte bei null."
+    create_menu_form_desc: "Ein schlichter Fragebogen — importiere ein Google-Formular oder erstelle ein neues."
     create_menu_template: "Vorlage"
     create_menu_template_desc: "Starte mit einem fertigen Deck."
     stat_live: Live
@@ -594,6 +594,7 @@ de:
     subtitle: Wähle ein fertiges Verto und sammle in Minuten Antworten – jede Vorlage
       ist voll bearbeitbar.
     back: Zurück zum Dashboard
+    import_instead: "Schon Fragen parat? Stattdessen importieren →"
     use: Diese Vorlage verwenden
     question_count: "%{n} Fragen"
     start_button: Mit einer Vorlage starten

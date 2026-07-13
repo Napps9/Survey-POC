@@ -428,19 +428,19 @@ es:
     heading_html: Tus <span style="color:#01EACB;">Vertos</span>
     subtitle: Crea Vertos, compártelos con tu asociación y observa cómo llegan los resultados.
     create_new: Crear un nuevo Verto
-    import_google_form_button: Crear nuevo formulario
+    create_new_form_button: Crear nuevo formulario
     import_google_form_modal_subtitle: Pega el enlace de un Google Form existente y lo convertiremos en un Verto editable.
     or_divider: o
-    start_from_scratch_button: Empezar desde cero
     creating_blank: Creando…
     create_button: "Crear"
+    create_menu_eyebrow: "Empecemos"
     create_menu_title: "¿Qué quieres crear?"
     create_menu_impact: "Medición de impacto"
-    create_menu_impact_desc: "Un Verto redactado por IA a partir de tu brief — el flujo guiado completo."
+    create_menu_impact_desc: "Un Verto redactado por IA a partir de tu brief — o importa tus propias preguntas."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Respuestas calificadas y una puntuación que los participantes pueden comparar."
+    create_menu_quiz_desc: "Respuestas calificadas que los participantes pueden comparar — o importa tus propias preguntas."
     create_menu_form: "Formulario"
-    create_menu_form_desc: "Un cuestionario sencillo — importa un formulario de Google o empieza desde cero."
+    create_menu_form_desc: "Un cuestionario sencillo — importa un formulario de Google o crea uno nuevo."
     create_menu_template: "Plantilla"
     create_menu_template_desc: "Empieza desde un mazo ya preparado."
     stat_live: Activos
@@ -594,6 +594,7 @@ es:
     subtitle: 'Elige un Verto listo para usar y empieza a recoger respuestas en minutos:
       cada plantilla es totalmente editable.'
     back: Volver al panel
+    import_instead: "¿Ya tienes preguntas? Impórtalas en su lugar →"
     use: Usar esta plantilla
     question_count: "%{n} preguntas"
     start_button: Empezar con una plantilla

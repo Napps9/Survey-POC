@@ -428,19 +428,19 @@ it:
     heading_html: I tuoi <span style="color:#01EACB;">Vertos</span>
     subtitle: Crea Vertos, condividili con la tua partnership e guarda arrivare le intuizioni.
     create_new: Crea un nuovo Verto
-    import_google_form_button: Crea nuovo modulo
+    create_new_form_button: Crea nuovo modulo
     import_google_form_modal_subtitle: Incolla il link di un Google Form esistente e lo trasformeremo in un Verto modificabile.
     or_divider: o
-    start_from_scratch_button: Inizia da zero
     creating_blank: Creazione…
     create_button: "Crea"
+    create_menu_eyebrow: "Iniziamo"
     create_menu_title: "Cosa vuoi creare?"
     create_menu_impact: "Misurazione d'impatto"
-    create_menu_impact_desc: "Un Verto scritto dall'IA dal tuo brief — il percorso guidato completo."
+    create_menu_impact_desc: "Un Verto scritto dall'IA dal tuo brief — oppure importa le tue domande."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Risposte valutate e un punteggio che i partecipanti possono confrontare."
+    create_menu_quiz_desc: "Risposte valutate che i partecipanti possono confrontare — oppure importa le tue domande."
     create_menu_form: "Modulo"
-    create_menu_form_desc: "Un questionario semplice — importa un modulo Google o parti da zero."
+    create_menu_form_desc: "Un questionario semplice — importa un modulo Google o creane uno nuovo."
     create_menu_template: "Modello"
     create_menu_template_desc: "Parti da un mazzo già pronto."
     stat_live: Live
@@ -594,6 +594,7 @@ it:
     subtitle: 'Scegli un Verto pronto all’uso e inizia a raccogliere risposte in pochi
       minuti: ogni modello è completamente modificabile.'
     back: Torna alla dashboard
+    import_instead: "Hai già le domande? Importale invece →"
     use: Usa questo modello
     question_count: "%{n} domande"
     start_button: Parti da un modello

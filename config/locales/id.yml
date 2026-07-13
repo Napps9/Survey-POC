@@ -428,19 +428,19 @@ id:
     heading_html: <span style="color:#01EACB;">Verto</span> Anda
     subtitle: Buat Verto, bagikan ke kemitraan Anda, dan saksikan wawasan mengalir masuk.
     create_new: Buat Verto baru
-    import_google_form_button: Buat Formulir Baru
+    create_new_form_button: Buat Formulir Baru
     import_google_form_modal_subtitle: Tempel tautan Google Form yang sudah ada dan kami akan mengubahnya menjadi Verto yang dapat diedit.
     or_divider: atau
-    start_from_scratch_button: Mulai dari awal
     creating_blank: Membuat…
     create_button: "Buat"
+    create_menu_eyebrow: "Ayo mulai"
     create_menu_title: "Apa yang ingin kamu buat?"
     create_menu_impact: "Pengukuran Dampak"
-    create_menu_impact_desc: "Verto yang dirancang AI dari brief kamu — alur terpandu lengkap."
+    create_menu_impact_desc: "Verto yang dirancang AI dari brief kamu — atau impor pertanyaanmu sendiri."
     create_menu_quiz: "Kuis"
-    create_menu_quiz_desc: "Jawaban dinilai dan skor yang bisa dibandingkan responden."
+    create_menu_quiz_desc: "Jawaban dinilai yang bisa dibandingkan responden — atau impor pertanyaanmu sendiri."
     create_menu_form: "Formulir"
-    create_menu_form_desc: "Kuesioner sederhana — impor Google Form atau mulai dari nol."
+    create_menu_form_desc: "Kuesioner sederhana — impor Google Form atau buat yang baru."
     create_menu_template: "Templat"
     create_menu_template_desc: "Mulai dari dek siap pakai."
     stat_live: Live
@@ -594,6 +594,7 @@ id:
     subtitle: Pilih Verto siap pakai dan mulai mengumpulkan jawaban dalam hitungan menit
       — setiap templat sepenuhnya dapat diedit.
     back: Kembali ke dasbor
+    import_instead: "Sudah punya pertanyaan? Impor saja →"
     use: Gunakan templat ini
     question_count: "%{n} pertanyaan"
     start_button: Mulai dari templat

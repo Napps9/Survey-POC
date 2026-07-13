@@ -428,19 +428,19 @@ he:
     heading_html: ה-<span style="color:#01EACB;">Vertos</span> שלך
     subtitle: הפעל Vertos, שתף אותם עם השותפות שלך, וצפה בתובנות מצטברות.
     create_new: צור Verto חדש
-    import_google_form_button: יצירת טופס חדש
+    create_new_form_button: יצירת טופס חדש
     import_google_form_modal_subtitle: הדבק קישור לטופס Google קיים ונהפוך אותו ל-Verto הניתן לעריכה.
     or_divider: או
-    start_from_scratch_button: התחל מאפס
     creating_blank: יוצר…
     create_button: "יצירה"
+    create_menu_eyebrow: "בואו נתחיל"
     create_menu_title: "מה תרצו ליצור?"
     create_menu_impact: "מדידת השפעה"
-    create_menu_impact_desc: "‏Verto שמנוסח על ידי AI מהבריף שלכם — התהליך המודרך המלא."
+    create_menu_impact_desc: "‏Verto שמנוסח על ידי AI מהבריף שלכם — או ייבאו את השאלות שלכם."
     create_menu_quiz: "חידון"
-    create_menu_quiz_desc: "תשובות מדורגות וציון שמשיבים יכולים להשוות."
+    create_menu_quiz_desc: "תשובות מדורגות שמשיבים יכולים להשוות — או ייבאו את השאלות שלכם."
     create_menu_form: "טופס"
-    create_menu_form_desc: "שאלון פשוט — ייבאו טופס Google או התחילו מאפס."
+    create_menu_form_desc: "שאלון פשוט — ייבאו טופס Google או צרו טופס חדש."
     create_menu_template: "תבנית"
     create_menu_template_desc: "התחילו מחפיסה מוכנה."
     stat_live: פעיל
@@ -594,6 +594,7 @@ he:
     subtitle: בחרו Verto מוכן והתחילו לאסוף תשובות תוך דקות — כל תבנית ניתנת לעריכה
       מלאה.
     back: חזרה ללוח הבקרה
+    import_instead: "כבר יש לכם שאלות? ייבאו אותן במקום זאת ←"
     use: השתמשו בתבנית הזו
     question_count: "%{n} שאלות"
     start_button: התחילו מתבנית

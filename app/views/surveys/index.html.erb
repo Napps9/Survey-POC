@@ -79,55 +79,55 @@
         where the reopen value lands straight in the Form panel. ── %>
     <div data-create-menu-target="modal" class="app-modal hidden">
       <div class="app-modal__backdrop" data-action="click->create-menu#close"></div>
-      <div class="app-modal__panel" style="max-width:460px;">
+      <div class="app-modal__panel" style="max-width:480px;">
+        <div class="create-menu-bar"></div>
 
         <%# Level 1 — what do you want to create? %>
-        <div data-create-menu-target="chooser" style="padding:26px 26px 24px;">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
-            <div style="font-family:'Alata',sans-serif;font-size:19px;color:#1C2034;line-height:1.25;"><%= t("dashboard.create_menu_title") %></div>
+        <div data-create-menu-target="chooser" style="padding:24px 26px 24px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.16em;text-transform:uppercase;font-weight:700;color:#01EACB;"><%= t("dashboard.create_menu_eyebrow") %></div>
             <button type="button" data-action="click->create-menu#close" aria-label="Close"
                     style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(0,0,0,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
           </div>
+          <div style="font-family:'Alata',sans-serif;font-size:20px;color:#1C2034;line-height:1.25;margin-bottom:16px;"><%= t("dashboard.create_menu_title") %></div>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <%
-              tile_style = "display:flex;align-items:center;gap:14px;width:100%;padding:14px 16px;border-radius:14px;background:#fafbfc;border:1.5px solid rgba(0,0,0,0.1);cursor:pointer;text-align:left;text-decoration:none;box-sizing:border-box;"
-              tile_name  = "font-family:'Alata',sans-serif;font-size:15px;color:#1C2034;line-height:1.2;"
-              tile_desc  = "font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(0,0,0,0.5);margin-top:2px;line-height:1.4;"
-              tile_icon  = "display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:11px;font-size:17px;flex-shrink:0;"
-            %>
-            <%= link_to new_survey_path, style: tile_style do %>
-              <span style="<%= tile_icon %>background:rgba(1,234,203,0.14);border:1px solid rgba(1,234,203,0.3);">📊</span>
+            <%= link_to new_survey_path, class: "create-menu-tile", style: "--tile-accent:#01EACB;" do %>
+              <span class="create-menu-tile-icon">📊</span>
               <span style="flex:1;min-width:0;">
-                <span style="display:block;<%= tile_name %>"><%= t("dashboard.create_menu_impact") %></span>
-                <span style="display:block;<%= tile_desc %>"><%= t("dashboard.create_menu_impact_desc") %></span>
+                <span class="create-menu-tile-name" style="display:block;"><%= t("dashboard.create_menu_impact") %></span>
+                <span class="create-menu-tile-desc" style="display:block;"><%= t("dashboard.create_menu_impact_desc") %></span>
               </span>
+              <span class="create-menu-tile-chev" aria-hidden="true">→</span>
             <% end %>
-            <%= link_to new_survey_path(quiz: 1), style: tile_style do %>
-              <span style="<%= tile_icon %>background:rgba(97,91,245,0.12);border:1px solid rgba(97,91,245,0.3);">🎯</span>
+            <%= link_to new_survey_path(quiz: 1), class: "create-menu-tile", style: "--tile-accent:#615BF5;" do %>
+              <span class="create-menu-tile-icon">🎯</span>
               <span style="flex:1;min-width:0;">
-                <span style="display:block;<%= tile_name %>"><%= t("dashboard.create_menu_quiz") %></span>
-                <span style="display:block;<%= tile_desc %>"><%= t("dashboard.create_menu_quiz_desc") %></span>
+                <span class="create-menu-tile-name" style="display:block;"><%= t("dashboard.create_menu_quiz") %></span>
+                <span class="create-menu-tile-desc" style="display:block;"><%= t("dashboard.create_menu_quiz_desc") %></span>
               </span>
+              <span class="create-menu-tile-chev" aria-hidden="true">→</span>
             <% end %>
-            <button type="button" data-action="click->create-menu#openForm" style="<%= tile_style %>">
-              <span style="<%= tile_icon %>background:rgba(12,167,255,0.12);border:1px solid rgba(12,167,255,0.3);">▤</span>
+            <button type="button" data-action="click->create-menu#openForm" class="create-menu-tile" style="--tile-accent:#0CA7FF;">
+              <span class="create-menu-tile-icon">▤</span>
               <span style="flex:1;min-width:0;">
-                <span style="display:block;<%= tile_name %>"><%= t("dashboard.create_menu_form") %></span>
-                <span style="display:block;<%= tile_desc %>"><%= t("dashboard.create_menu_form_desc") %></span>
+                <span class="create-menu-tile-name" style="display:block;"><%= t("dashboard.create_menu_form") %></span>
+                <span class="create-menu-tile-desc" style="display:block;"><%= t("dashboard.create_menu_form_desc") %></span>
               </span>
+              <span class="create-menu-tile-chev" aria-hidden="true">→</span>
             </button>
-            <%= link_to survey_templates_path, style: tile_style do %>
-              <span style="<%= tile_icon %>background:rgba(255,250,119,0.16);border:1px solid rgba(255,250,119,0.4);">▚</span>
+            <%= link_to survey_templates_path, class: "create-menu-tile", style: "--tile-accent:#FFFA77;" do %>
+              <span class="create-menu-tile-icon">▚</span>
               <span style="flex:1;min-width:0;">
-                <span style="display:block;<%= tile_name %>"><%= t("dashboard.create_menu_template") %></span>
-                <span style="display:block;<%= tile_desc %>"><%= t("dashboard.create_menu_template_desc") %></span>
+                <span class="create-menu-tile-name" style="display:block;"><%= t("dashboard.create_menu_template") %></span>
+                <span class="create-menu-tile-desc" style="display:block;"><%= t("dashboard.create_menu_template_desc") %></span>
               </span>
+              <span class="create-menu-tile-chev" aria-hidden="true">→</span>
             <% end %>
           </div>
         </div>
 
-        <%# Level 2 — the Form flow (Google import / start from scratch). %>
-        <div data-create-menu-target="formPanel" class="hidden" style="padding:26px 26px 24px;">
+        <%# Level 2 — the Form flow (Google import / create new). %>
+        <div data-create-menu-target="formPanel" class="hidden" style="padding:24px 26px 24px;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
             <div style="display:flex;align-items:center;gap:10px;min-width:0;">
               <button type="button" data-action="click->create-menu#back" aria-label="Back"
@@ -165,7 +165,7 @@
             <div style="flex:1;height:1px;background:rgba(0,0,0,0.1);"></div>
           </div>
 
-          <%= button_to t("dashboard.start_from_scratch_button"), create_blank_survey_path,
+          <%= button_to t("dashboard.create_new_form_button"), create_blank_survey_path,
                 method: :post,
                 data: { turbo_submits_with: t("dashboard.creating_blank") },
                 style: "width:100%;background:transparent;color:#1C2034;border:1px solid rgba(0,0,0,0.16);border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;cursor:pointer;" %>

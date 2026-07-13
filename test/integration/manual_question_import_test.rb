@@ -66,6 +66,19 @@ class ManualQuestionImportTest < ActionDispatch::IntegrationTest
     assert_match "A very long rambling question", response.body
   end
 
+  test "pasting questions preserves quiz mode chosen via the Create menu" do
+    cards = [ { "type" => "rating", "text" => "How was the workshop?", "options" => %w[Poor Fair Good Great Excellent] } ]
+
+    stub_importer({ "title" => "Workshop Feedback", "cards" => cards }) do
+      post import_manual_survey_path, params: {
+        manual_questions: "How was the workshop?", default_locale: "en", locales: [ "en" ], quiz: "1"
+      }
+    end
+
+    survey = @org.surveys.order(:created_at).last
+    assert survey.quiz?, "quiz mode chosen at the Create menu must survive a pasted-question import, not just AI generation"
+  end
+
   test "blank text is rejected without calling the importer" do
     stub_method(ManualQuestionImporter, :new, ->(*) { raise "must not be instantiated" }) do
       assert_no_difference -> { @org.surveys.count } do

@@ -428,19 +428,19 @@ pt:
     heading_html: Os seus <span style="color:#01EACB;">Vertos</span>
     subtitle: Crie Vertos, partilhe-os com a sua parceria e veja os insights chegarem.
     create_new: Criar um novo Verto
-    import_google_form_button: Criar novo formulário
+    create_new_form_button: Criar novo formulário
     import_google_form_modal_subtitle: Cole o link de um Google Form existente e transformamo-lo num Verto editável.
     or_divider: ou
-    start_from_scratch_button: Começar do zero
     creating_blank: A criar…
     create_button: "Criar"
+    create_menu_eyebrow: "Vamos começar"
     create_menu_title: "O que você quer criar?"
     create_menu_impact: "Medição de impacto"
-    create_menu_impact_desc: "Um Verto redigido por IA a partir do seu brief — o fluxo guiado completo."
+    create_menu_impact_desc: "Um Verto redigido por IA a partir do seu brief — ou importe as suas próprias perguntas."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Respostas avaliadas e uma pontuação que os participantes podem comparar."
+    create_menu_quiz_desc: "Respostas avaliadas que os participantes podem comparar — ou importe as suas próprias perguntas."
     create_menu_form: "Formulário"
-    create_menu_form_desc: "Um questionário simples — importe um Formulário Google ou comece do zero."
+    create_menu_form_desc: "Um questionário simples — importe um Formulário Google ou crie um novo."
     create_menu_template: "Modelo"
     create_menu_template_desc: "Comece com um baralho pronto."
     stat_live: Ao vivo
@@ -594,6 +594,7 @@ pt:
     subtitle: Escolha um Verto pronto e comece a coletar respostas em minutos — cada
       modelo é totalmente editável.
     back: Voltar ao painel
+    import_instead: "Já tem perguntas? Importe em vez disso →"
     use: Usar este modelo
     question_count: "%{n} perguntas"
     start_button: Começar com um modelo

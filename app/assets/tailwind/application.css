@@ -4281,6 +4281,35 @@ body.generating-overlay-active .bottom-bar { display: none; }
   max-height: calc(100vh - 48px); overflow-y: auto;
 }
 
+/* Create-menu chooser tiles (dashboard "+ Create" popup) — colour-accented and
+   grouped like the rest of Verto's product surfaces (command palette tiles,
+   dashboard stat cards) instead of a plain grey list. Each tile sets
+   --tile-accent inline; the gradient icon badge and hover glow derive from it. */
+.create-menu-bar { height: 4px; background: linear-gradient(90deg,#FF1E6F,#615BF5,#0CA7FF,#01EACB); border-radius: 18px 18px 0 0; }
+.create-menu-tile {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  padding: 14px 16px; border-radius: 14px;
+  background: #fafbfc; border: 1.5px solid rgba(0,0,0,0.08);
+  cursor: pointer; text-align: left; text-decoration: none; box-sizing: border-box;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.create-menu-tile:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--tile-accent, #01EACB) 55%, transparent);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--tile-accent, #01EACB) 22%, transparent);
+  background: color-mix(in srgb, var(--tile-accent, #01EACB) 6%, #fff);
+}
+.create-menu-tile-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 12px; font-size: 19px; flex-shrink: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tile-accent, #01EACB) 26%, white), color-mix(in srgb, var(--tile-accent, #01EACB) 8%, white));
+  border: 1px solid color-mix(in srgb, var(--tile-accent, #01EACB) 38%, transparent);
+}
+.create-menu-tile-name { font-family: "Alata", sans-serif; font-size: 15px; color: #1C2034; line-height: 1.2; }
+.create-menu-tile-desc { font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(0,0,0,0.5); margin-top: 2px; line-height: 1.4; }
+.create-menu-tile-chev { margin-left: auto; opacity: 0.32; font-size: 13px; flex-shrink: 0; transition: opacity 0.15s, transform 0.15s; color: #1C2034; }
+.create-menu-tile:hover .create-menu-tile-chev { opacity: 0.75; transform: translateX(2px); }
+
 /* Date-flavoured open question (demographic "When were you born?") */
 .freeform-date {
   width: 100%; max-width: 280px; margin: 0 auto; display: block;

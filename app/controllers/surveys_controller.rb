@@ -717,7 +717,12 @@ class SurveysController < ApplicationController
       "brand_palette"       => BrandPalette.sanitize(params[:brand_palette]),
       "default_locale"      => default_locale,
       "locales"             => locales,
-      "common_question_ids" => Array(params[:common_question_ids])
+      "common_question_ids" => Array(params[:common_question_ids]),
+      # Quiz mode is chosen once, up front (Create menu's Quiz tile / Card 1's
+      # hidden field) and must survive whichever door the creator ends up
+      # using — AI generation, PDF import, Google Form import, or pasted
+      # questions — since these import buttons submit the SAME wizard <form>.
+      "quiz"                => ActiveModel::Type::Boolean.new.cast(params[:quiz]) || false
     }
   end
 
@@ -751,7 +756,8 @@ class SurveysController < ApplicationController
       cards:          cards,
       brand_palette:  payload["brand_palette"].presence,
       default_locale: payload["default_locale"],
-      locales:        payload["locales"]
+      locales:        payload["locales"],
+      quiz:           ActiveModel::Type::Boolean.new.cast(payload["quiz"]) || false
     )
 
     Current.organisation.update(default_brand_palette: payload["brand_palette"]) if payload["brand_palette"].present?

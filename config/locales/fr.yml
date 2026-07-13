@@ -428,19 +428,19 @@ fr:
     heading_html: Vos <span style="color:#01EACB;">Vertos</span>
     subtitle: Lancez des Vertos, partagez-les avec votre partenariat et regardez les résultats arriver.
     create_new: Créer un nouveau Verto
-    import_google_form_button: Créer un nouveau formulaire
+    create_new_form_button: Créer un nouveau formulaire
     import_google_form_modal_subtitle: Collez le lien d'un Google Form existant et nous le transformerons en Verto modifiable.
     or_divider: ou
-    start_from_scratch_button: Partir de zéro
     creating_blank: Création…
     create_button: "Créer"
+    create_menu_eyebrow: "Commençons"
     create_menu_title: "Que voulez-vous créer ?"
     create_menu_impact: "Mesure d'impact"
-    create_menu_impact_desc: "Un Verto rédigé par l'IA à partir de votre brief — le parcours guidé complet."
+    create_menu_impact_desc: "Un Verto rédigé par l'IA à partir de votre brief — ou importez vos propres questions."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Réponses notées et un score que les répondants peuvent comparer."
+    create_menu_quiz_desc: "Réponses notées que les répondants peuvent comparer — ou importez vos propres questions."
     create_menu_form: "Formulaire"
-    create_menu_form_desc: "Un questionnaire simple — importez un formulaire Google ou partez de zéro."
+    create_menu_form_desc: "Un questionnaire simple — importez un formulaire Google ou créez-en un nouveau."
     create_menu_template: "Modèle"
     create_menu_template_desc: "Partez d'un jeu de cartes prêt à l'emploi."
     stat_live: En ligne
@@ -594,6 +594,7 @@ fr:
     subtitle: Choisissez un Verto prêt à l’emploi et commencez à collecter en quelques
       minutes — chaque modèle est entièrement modifiable.
     back: Retour au tableau de bord
+    import_instead: "Vous avez déjà des questions ? Importez-les plutôt →"
     use: Utiliser ce modèle
     question_count: "%{n} questions"
     start_button: Partir d’un modèle

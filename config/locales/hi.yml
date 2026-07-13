@@ -428,19 +428,19 @@ hi:
     heading_html: आपके <span style="color:#01EACB;">Verto</span>
     subtitle: Verto बनाएं, उन्हें अपनी साझेदारी के साथ साझा करें, और अंतर्दृष्टि आते देखें।
     create_new: नया Verto बनाएं
-    import_google_form_button: नया फ़ॉर्म बनाएं
+    create_new_form_button: नया फ़ॉर्म बनाएं
     import_google_form_modal_subtitle: किसी मौजूदा Google Form का लिंक पेस्ट करें और हम उसे संपादन योग्य Verto में बदल देंगे।
     or_divider: या
-    start_from_scratch_button: शुरुआत से करें
     creating_blank: बनाया जा रहा है…
     create_button: "बनाएँ"
+    create_menu_eyebrow: "चलिए शुरू करते हैं"
     create_menu_title: "आप क्या बनाना चाहते हैं?"
     create_menu_impact: "प्रभाव मापन"
-    create_menu_impact_desc: "आपके ब्रीफ़ से AI द्वारा तैयार Verto — पूरा गाइडेड फ़्लो।"
+    create_menu_impact_desc: "आपके ब्रीफ़ से AI द्वारा तैयार Verto — या अपने प्रश्न आयात करें।"
     create_menu_quiz: "क्विज़"
-    create_menu_quiz_desc: "ग्रेड किए गए उत्तर और एक स्कोर जिसकी तुलना उत्तरदाता कर सकते हैं।"
+    create_menu_quiz_desc: "ऐसे ग्रेड किए गए उत्तर जिनकी तुलना उत्तरदाता कर सकते हैं — या अपने प्रश्न आयात करें।"
     create_menu_form: "फ़ॉर्म"
-    create_menu_form_desc: "सादा प्रश्नावली — Google फ़ॉर्म आयात करें या शून्य से शुरू करें।"
+    create_menu_form_desc: "सादा प्रश्नावली — Google फ़ॉर्म आयात करें या नया बनाएं।"
     create_menu_template: "टेम्पलेट"
     create_menu_template_desc: "तैयार डेक से शुरू करें।"
     stat_live: लाइव
@@ -594,6 +594,7 @@ hi:
     subtitle: तैयार Verto चुनें और मिनटों में जवाब जुटाना शुरू करें — हर टेम्पलेट पूरी
       तरह संपादन योग्य है।
     back: डैशबोर्ड पर वापस जाएँ
+    import_instead: "पहले से प्रश्न हैं? इसके बजाय आयात करें →"
     use: यह टेम्पलेट इस्तेमाल करें
     question_count: "%{n} सवाल"
     start_button: टेम्पलेट से शुरू करें

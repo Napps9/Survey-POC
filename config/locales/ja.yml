@@ -428,19 +428,19 @@ ja:
     heading_html: あなたの<span style="color:#01EACB;">Vertos</span>
     subtitle: Vertosを作成し、パートナーシップと共有して、インサイトを集めましょう。
     create_new: 新しいVertoを作成
-    import_google_form_button: 新しいフォームを作成
+    create_new_form_button: 新しいフォームを作成
     import_google_form_modal_subtitle: 既存のGoogleフォームのリンクを貼り付けると、編集可能なVertoに変換します。
     or_divider: または
-    start_from_scratch_button: ゼロから作成
     creating_blank: 作成中…
     create_button: "作成"
+    create_menu_eyebrow: "はじめましょう"
     create_menu_title: "何を作成しますか?"
     create_menu_impact: "インパクト測定"
-    create_menu_impact_desc: "ブリーフからAIが下書きするVerto — フルガイド付きフロー。"
+    create_menu_impact_desc: "ブリーフからAIが下書きするVerto — または自分の質問をインポート。"
     create_menu_quiz: "クイズ"
-    create_menu_quiz_desc: "採点付きの回答と、回答者が比較できるスコア。"
+    create_menu_quiz_desc: "回答者が比較できる採点付きの回答 — または自分の質問をインポート。"
     create_menu_form: "フォーム"
-    create_menu_form_desc: "シンプルなアンケート — Googleフォームをインポートするか、ゼロから作成。"
+    create_menu_form_desc: "シンプルなアンケート — Googleフォームをインポートするか、新規作成。"
     create_menu_template: "テンプレート"
     create_menu_template_desc: "既製のデッキから始める。"
     stat_live: ライブ
@@ -593,6 +593,7 @@ ja:
     heading_html: <span style="color:#615BF5;">テンプレート</span>から始める
     subtitle: すぐ使えるVertoを選んで、数分で回答集めを開始できます。どのテンプレートも自由に編集できます。
     back: ダッシュボードに戻る
+    import_instead: "すでに質問がありますか?代わりにインポート →"
     use: このテンプレートを使う
     question_count: 設問%{n}件
     start_button: テンプレートから始める

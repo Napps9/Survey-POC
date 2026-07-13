@@ -428,19 +428,19 @@ pl:
     heading_html: Twoje <span style="color:#01EACB;">Verto</span>
     subtitle: Twórz Verto, udostępniaj je swojemu partnerstwu i obserwuj napływające wnioski.
     create_new: Utwórz nowe Verto
-    import_google_form_button: Utwórz nowy formularz
+    create_new_form_button: Utwórz nowy formularz
     import_google_form_modal_subtitle: Wklej link do istniejącego Google Form, a zamienimy go w edytowalne Verto.
     or_divider: lub
-    start_from_scratch_button: Zacznij od zera
     creating_blank: Tworzenie…
     create_button: "Utwórz"
+    create_menu_eyebrow: "Zaczynajmy"
     create_menu_title: "Co chcesz utworzyć?"
     create_menu_impact: "Pomiar wpływu"
-    create_menu_impact_desc: "Verto napisane przez AI na podstawie Twojego briefu — pełny proces z przewodnikiem."
+    create_menu_impact_desc: "Verto napisane przez AI na podstawie Twojego briefu — albo zaimportuj własne pytania."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Oceniane odpowiedzi i wynik, który respondenci mogą porównać."
+    create_menu_quiz_desc: "Oceniane odpowiedzi, które respondenci mogą porównać — albo zaimportuj własne pytania."
     create_menu_form: "Formularz"
-    create_menu_form_desc: "Prosty kwestionariusz — zaimportuj Formularz Google lub zacznij od zera."
+    create_menu_form_desc: "Prosty kwestionariusz — zaimportuj Formularz Google lub utwórz nowy."
     create_menu_template: "Szablon"
     create_menu_template_desc: "Zacznij od gotowej talii."
     stat_live: Na żywo
@@ -594,6 +594,7 @@ pl:
     subtitle: Wybierz gotowy Verto i zacznij zbierać odpowiedzi w kilka minut — każdy
       szablon jest w pełni edytowalny.
     back: Powrót do panelu
+    import_instead: "Masz już pytania? Zaimportuj je zamiast tego →"
     use: Użyj tego szablonu
     question_count: 'Liczba pytań: %{n}'
     start_button: Zacznij od szablonu

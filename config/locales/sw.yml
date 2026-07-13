@@ -428,19 +428,19 @@ sw:
     heading_html: <span style="color:#01EACB;">Vertos</span> Zako
     subtitle: Anzisha Vertos, zishiriki na ushirikiano wako, na utazame maarifa yakimiminika.
     create_new: Unda Verto mpya
-    import_google_form_button: Unda Fomu Mpya
+    create_new_form_button: Unda Fomu Mpya
     import_google_form_modal_subtitle: Bandika kiungo cha Google Form iliyopo nasi tutaigeuza kuwa Verto inayoweza kuhaririwa.
     or_divider: au
-    start_from_scratch_button: Anza kutoka mwanzo
     creating_blank: Inaunda…
     create_button: "Unda"
+    create_menu_eyebrow: "Hebu tuanze"
     create_menu_title: "Unataka kuunda nini?"
     create_menu_impact: "Kipimo cha Athari"
-    create_menu_impact_desc: "Verto iliyoandaliwa na AI kutoka kwa muhtasari wako — mtiririko kamili wa kuongozwa."
+    create_menu_impact_desc: "Verto iliyoandaliwa na AI kutoka kwa muhtasari wako — au leta maswali yako mwenyewe."
     create_menu_quiz: "Chemsha bongo"
-    create_menu_quiz_desc: "Majibu yanayopimwa na alama ambayo washiriki wanaweza kulinganisha."
+    create_menu_quiz_desc: "Majibu yanayopimwa ambayo washiriki wanaweza kulinganisha — au leta maswali yako mwenyewe."
     create_menu_form: "Fomu"
-    create_menu_form_desc: "Hojaji rahisi — leta Fomu ya Google au anza upya."
+    create_menu_form_desc: "Hojaji rahisi — leta Fomu ya Google au unda mpya."
     create_menu_template: "Kiolezo"
     create_menu_template_desc: "Anza na seti iliyo tayari."
     stat_live: Hai
@@ -594,6 +594,7 @@ sw:
     subtitle: Chagua Verto iliyo tayari na uanze kukusanya majibu kwa dakika chache
       — kila kiolezo kinaweza kuhaririwa kikamilifu.
     back: Rudi kwenye dashibodi
+    import_instead: "Una maswali tayari? Yalete badala yake →"
     use: Tumia kiolezo hiki
     question_count: Maswali %{n}
     start_button: Anza na kiolezo

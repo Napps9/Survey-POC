@@ -428,19 +428,19 @@ tr:
     heading_html: <span style="color:#01EACB;">Verto'larınız</span>
     subtitle: Verto'lar oluşturun, ortaklıkınızla paylaşın ve içgörülerin akmasını izleyin.
     create_new: Yeni bir Verto oluştur
-    import_google_form_button: Yeni form oluştur
+    create_new_form_button: Yeni form oluştur
     import_google_form_modal_subtitle: Mevcut bir Google Form bağlantısını yapıştırın, onu düzenlenebilir bir Verto'ya dönüştürelim.
     or_divider: veya
-    start_from_scratch_button: Sıfırdan başla
     creating_blank: Oluşturuluyor…
     create_button: "Oluştur"
+    create_menu_eyebrow: "Hadi başlayalım"
     create_menu_title: "Ne oluşturmak istiyorsun?"
     create_menu_impact: "Etki Ölçümü"
-    create_menu_impact_desc: "Brief'inden yapay zekânın taslağını çıkardığı bir Verto — eksiksiz rehberli akış."
+    create_menu_impact_desc: "Brief'inden yapay zekânın taslağını çıkardığı bir Verto — ya da kendi sorularını içe aktar."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Puanlanan yanıtlar ve katılımcıların karşılaştırabileceği bir skor."
+    create_menu_quiz_desc: "Katılımcıların karşılaştırabileceği puanlanan yanıtlar — ya da kendi sorularını içe aktar."
     create_menu_form: "Form"
-    create_menu_form_desc: "Sade bir anket — bir Google Formu içe aktar ya da sıfırdan başla."
+    create_menu_form_desc: "Sade bir anket — bir Google Formu içe aktar ya da yenisini oluştur."
     create_menu_template: "Şablon"
     create_menu_template_desc: "Hazır bir desteyle başla."
     stat_live: Canlı
@@ -594,6 +594,7 @@ tr:
     subtitle: Hazır bir Verto seçin ve dakikalar içinde yanıt toplamaya başlayın — her
       şablon tamamen düzenlenebilir.
     back: Panoya dön
+    import_instead: "Zaten soruların mı var? Bunun yerine içe aktar →"
     use: Bu şablonu kullan
     question_count: "%{n} soru"
     start_button: Şablonla başla

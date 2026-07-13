@@ -32,6 +32,17 @@ class PdfImportTest < ActionDispatch::IntegrationTest
     assert_match import_pdf_survey_path, response.body
   end
 
+  test "importing a PDF preserves quiz mode chosen via the Create menu" do
+    cards = [ { "type" => "select_one_grid", "text" => "Which best describes you?", "options" => %w[New Returning Lapsed Curious] } ]
+
+    stub_importer({ "title" => "Imported", "cards" => cards }) do
+      post import_pdf_survey_path, params: { pdf: pdf_upload, default_locale: "en", locales: [ "en" ], quiz: "1" }
+    end
+
+    survey = @org.surveys.order(:created_at).last
+    assert survey.quiz?, "quiz mode chosen at the Create menu must survive a PDF import, not just AI generation"
+  end
+
   test "importing a PDF creates a Verto from the matched questions and opens the editor" do
     cards = [
       { "type" => "select_one_grid", "text" => "Which best describes you?", "options" => %w[New Returning Lapsed Curious] },

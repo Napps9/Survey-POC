@@ -428,19 +428,19 @@ vi:
     heading_html: <span style="color:#01EACB;">Vertos</span> của bạn
     subtitle: Khởi tạo Vertos, chia sẻ với nhóm đối tác của bạn và theo dõi các thông tin chi tiết đổ về.
     create_new: Tạo Verto mới
-    import_google_form_button: Tạo biểu mẫu mới
+    create_new_form_button: Tạo biểu mẫu mới
     import_google_form_modal_subtitle: Dán liên kết đến một Google Form hiện có và chúng tôi sẽ biến nó thành một Verto có thể chỉnh sửa.
     or_divider: hoặc
-    start_from_scratch_button: Bắt đầu từ đầu
     creating_blank: Đang tạo…
     create_button: "Tạo"
+    create_menu_eyebrow: "Bắt đầu nào"
     create_menu_title: "Bạn muốn tạo gì?"
     create_menu_impact: "Đo lường tác động"
-    create_menu_impact_desc: "Một Verto do AI soạn từ bản tóm tắt của bạn — quy trình hướng dẫn đầy đủ."
+    create_menu_impact_desc: "Một Verto do AI soạn từ bản tóm tắt của bạn — hoặc nhập câu hỏi của riêng bạn."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Câu trả lời được chấm điểm và điểm số để người tham gia so sánh."
+    create_menu_quiz_desc: "Câu trả lời được chấm điểm để so sánh — hoặc nhập câu hỏi của riêng bạn."
     create_menu_form: "Biểu mẫu"
-    create_menu_form_desc: "Bảng câu hỏi đơn giản — nhập Google Form hoặc bắt đầu từ đầu."
+    create_menu_form_desc: "Bảng câu hỏi đơn giản — nhập Google Form hoặc tạo mới."
     create_menu_template: "Mẫu"
     create_menu_template_desc: "Bắt đầu từ bộ thẻ có sẵn."
     stat_live: Trực tiếp
@@ -594,6 +594,7 @@ vi:
     subtitle: Chọn một Verto có sẵn và bắt đầu thu thập câu trả lời trong vài phút —
       mọi mẫu đều có thể chỉnh sửa hoàn toàn.
     back: Quay lại bảng điều khiển
+    import_instead: "Đã có câu hỏi? Nhập vào thay vì tạo mới →"
     use: Dùng mẫu này
     question_count: "%{n} câu hỏi"
     start_button: Bắt đầu từ mẫu

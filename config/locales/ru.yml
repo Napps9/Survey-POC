@@ -428,19 +428,19 @@ ru:
     heading_html: Ваши <span style="color:#01EACB;">Vertos</span>
     subtitle: Создавайте Vertos, делитесь ими с вашим партнёрством и наблюдайте за накоплением инсайтов.
     create_new: Создать новый Verto
-    import_google_form_button: Создать новую форму
+    create_new_form_button: Создать новую форму
     import_google_form_modal_subtitle: Вставьте ссылку на существующую Google Form, и мы превратим её в редактируемый Verto.
     or_divider: или
-    start_from_scratch_button: Начать с нуля
     creating_blank: Создание…
     create_button: "Создать"
+    create_menu_eyebrow: "Начнём"
     create_menu_title: "Что вы хотите создать?"
     create_menu_impact: "Оценка воздействия"
-    create_menu_impact_desc: "Verto, составленный ИИ по вашему брифу — полный пошаговый процесс."
+    create_menu_impact_desc: "Verto, составленный ИИ по вашему брифу — или импортируйте свои вопросы."
     create_menu_quiz: "Квиз"
-    create_menu_quiz_desc: "Оцениваемые ответы и результат, который участники могут сравнить."
+    create_menu_quiz_desc: "Оцениваемые ответы, которые участники могут сравнить — или импортируйте свои вопросы."
     create_menu_form: "Форма"
-    create_menu_form_desc: "Простой опросник — импортируйте Google Форму или начните с нуля."
+    create_menu_form_desc: "Простой опросник — импортируйте Google Форму или создайте новую."
     create_menu_template: "Шаблон"
     create_menu_template_desc: "Начните с готовой колоды."
     stat_live: Активных
@@ -594,6 +594,7 @@ ru:
     subtitle: Выберите готовый Verto и начните собирать ответы за считаные минуты —
       каждый шаблон полностью редактируется.
     back: Назад к панели
+    import_instead: "Уже есть вопросы? Импортировать вместо этого →"
     use: Использовать шаблон
     question_count: 'Вопросов: %{n}'
     start_button: Начать с шаблона

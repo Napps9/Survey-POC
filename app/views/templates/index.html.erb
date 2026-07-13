@@ -31,9 +31,15 @@
         <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 8px;">
           <%= t("templates.heading_html").html_safe %>
         </h1>
-        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.45);margin:0;max-width:520px;line-height:1.55;">
+        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.45);margin:0 0 14px;max-width:520px;line-height:1.55;">
           <%= t("templates.subtitle") %>
         </p>
+        <%# Every other Create option (Impact Measurement, Quiz, Form) offers
+            an import path — reopen the dashboard's Create popup straight into
+            it, via the same open_import mechanism the Form tile's error
+            round-trip already relies on (see surveys/index.html.erb). %>
+        <%= link_to t("templates.import_instead"), root_path(open_import: 1),
+              style: "display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#01EACB;text-decoration:none;" %>
       </div>
     </div>
 

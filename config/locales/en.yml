@@ -430,19 +430,19 @@ en:
     heading_html: 'My <span style="color:#01EACB;">Verto''s</span>'
     subtitle: "Spin up Vertos, share them with your partners, and watch the insights roll in."
     create_new: "Create a new Verto"
-    import_google_form_button: "Create New Form"
+    create_new_form_button: "Create New Form"
     import_google_form_modal_subtitle: "Paste the link to an existing Google Form and we'll turn it into an editable Verto."
     or_divider: "or"
-    start_from_scratch_button: "Start from scratch"
     creating_blank: "Creating…"
     create_button: "Create"
+    create_menu_eyebrow: "Let's get started"
     create_menu_title: "What do you want to create?"
     create_menu_impact: "Impact Measurement"
-    create_menu_impact_desc: "An AI-drafted Verto from your brief — the full guided flow."
+    create_menu_impact_desc: "An AI-drafted Verto from your brief — or import your own questions."
     create_menu_quiz: "Quiz"
-    create_menu_quiz_desc: "Graded answers and a score respondents can compare."
+    create_menu_quiz_desc: "Graded answers respondents can compare — or import your own questions."
     create_menu_form: "Form"
-    create_menu_form_desc: "A plain questionnaire — import a Google Form or start from scratch."
+    create_menu_form_desc: "A plain questionnaire — import a Google Form or create a new one."
     create_menu_template: "Template"
     create_menu_template_desc: "Start from a ready-made deck."
     stat_live: "Live"
@@ -596,6 +596,7 @@ en:
     subtitle: Pick a ready-made Verto and start collecting in minutes — every template
       is fully editable.
     back: Back to dashboard
+    import_instead: "Already have questions? Import instead →"
     use: Use this template
     question_count: "%{n} questions"
     start_button: Start from a template
