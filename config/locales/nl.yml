@@ -428,7 +428,8 @@ nl:
     heading_html: Jouw <span style="color:#01EACB;">Vertos</span>
     subtitle: Start Vertos op, deel ze met je alliantie en zie de inzichten binnenstromen.
     create_new: Een nieuwe Verto aanmaken
-    import_google_form_button: Importeren vanuit Google Forms
+    import_google_form_button: Een formulier maken
+    import_google_form_modal_subtitle: Plak de link van een bestaand Google Form en we maken er een bewerkbare Verto van.
     stat_live: Live
     stat_drafts: Concepten
     stat_responses: Reacties

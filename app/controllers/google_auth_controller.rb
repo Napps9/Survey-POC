@@ -47,10 +47,12 @@ class GoogleAuthController < ApplicationController
 
   private
 
-  # Where the connect flow drops back to: the Verto-import wizard when it was
-  # started from there, otherwise the results page (Sheets export) or root.
+  # Where the connect flow drops back to: the Verto-import wizard or the
+  # dashboard's own "Create a Form" modal when it was started from there,
+  # otherwise the results page (Sheets export) or root.
   def return_target(ret, **flags)
     return new_survey_path(**flags) if ret["to"] == "import"
+    return root_path(**flags, open_import: 1) if ret["to"] == "dashboard_import"
     results_or_root(ret["survey_id"], ret["segment"], **flags)
   end
 

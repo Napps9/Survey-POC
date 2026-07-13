@@ -190,30 +190,30 @@ class SurveysController < ApplicationController
   # best-fitting Verto card type (verbatim), and opens the editor — where the
   # per-card "Optimise" turns them into rule-compliant Verto questions.
   def import_google_form
-    return import_pdf_error("Google isn't set up on this server.") unless GoogleOauthService.configured?
-    return redirect_to google_connect_path(return_to: "import") unless Current.user&.google_connected?
+    return import_google_form_error("Google isn't set up on this server.") unless GoogleOauthService.configured?
+    return redirect_to google_connect_path(return_to: google_form_return_to) unless Current.user&.google_connected?
 
     form_id = GoogleFormsClient.extract_form_id(params[:google_form_url])
     if form_id.blank?
-      return import_pdf_error("Paste your Google Form's edit link, e.g. https://docs.google.com/forms/d/…/edit")
+      return import_google_form_error("Paste your Google Form's edit link, e.g. https://docs.google.com/forms/d/…/edit")
     end
 
     token  = GoogleOauthService.client_for(Current.user).access_token
     form   = GoogleFormsClient.new(token).fetch(form_id)
     result = GoogleFormsImporter.call(form)
 
-    return import_pdf_error("We couldn't find any questions in that form.") if Array(result["cards"]).empty?
+    return import_google_form_error("We couldn't find any questions in that form.") if Array(result["cards"]).empty?
 
     @survey = create_imported_survey!(wizard_import_payload(result), variant: "verbatim")
     redirect_to survey_path(@survey)
   rescue GoogleOauthService::NotConnected, GoogleFormsClient::NotAuthorized
     # Connected before Forms access was added (or token revoked) — reconnect.
-    redirect_to google_connect_path(return_to: "import")
+    redirect_to google_connect_path(return_to: google_form_return_to)
   rescue GoogleFormsClient::Error => e
-    import_pdf_error(e.message)
+    import_google_form_error(e.message)
   rescue => e
     Rails.logger.error("[SurveysController#import_google_form] #{e.class}: #{e.message}")
-    import_pdf_error("We couldn't import that Google Form — #{friendly_generate_error(e)}")
+    import_google_form_error("We couldn't import that Google Form — #{friendly_generate_error(e)}")
   end
 
   def update
@@ -747,6 +747,26 @@ class SurveysController < ApplicationController
   def import_pdf_error(message)
     flash.now[:alert] = message
     render :new, layout: "fullscreen", status: :unprocessable_entity
+  end
+
+  # Google Form import is reachable from both the wizard's Card 1 and the
+  # dashboard's own "Create a Form" modal — send an error back to wherever the
+  # request actually came from (via the Referer) rather than always landing on
+  # the wizard, so a dashboard-started import fails back into the dashboard.
+  # flash[:alert] is the message itself (the wizard already renders it);
+  # reopen_google_form_modal is a dashboard-only marker so the modal reopens
+  # with that same message instead of it vanishing as a page-level flash.
+  def import_google_form_error(message)
+    flash[:alert] = message
+    flash[:reopen_google_form_modal] = true if params[:source] == "dashboard"
+    redirect_back fallback_location: new_survey_path
+  end
+
+  # Which page a "Connect Google" detour should return to afterwards — the
+  # dashboard modal marks its form with source=dashboard; the wizard's import
+  # box (no such field) keeps the existing "import" target.
+  def google_form_return_to
+    params[:source] == "dashboard" ? "dashboard_import" : "import"
   end
 
   # Turn an exception from the generate pipeline into something the operator

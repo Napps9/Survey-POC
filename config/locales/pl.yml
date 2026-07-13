@@ -428,7 +428,8 @@ pl:
     heading_html: Twoje <span style="color:#01EACB;">Verto</span>
     subtitle: Twórz Verto, udostępniaj je swojemu sojuszowi i obserwuj napływające wnioski.
     create_new: Utwórz nowe Verto
-    import_google_form_button: Importuj z Google Forms
+    import_google_form_button: Utwórz formularz
+    import_google_form_modal_subtitle: Wklej link do istniejącego Google Form, a zamienimy go w edytowalne Verto.
     stat_live: Na żywo
     stat_drafts: Wersje robocze
     stat_responses: Odpowiedzi

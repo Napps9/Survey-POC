@@ -428,7 +428,8 @@ de:
     heading_html: Deine <span style="color:#01EACB;">Vertos</span>
     subtitle: Erstelle Vertos, teile sie mit deiner Allianz und sieh dabei zu, wie die Erkenntnisse hereinströmen.
     create_new: Neues Verto erstellen
-    import_google_form_button: Aus Google Forms importieren
+    import_google_form_button: Formular erstellen
+    import_google_form_modal_subtitle: Füge den Link zu einem bestehenden Google Form ein, und wir verwandeln ihn in ein bearbeitbares Verto.
     stat_live: Live
     stat_drafts: Entwürfe
     stat_responses: Antworten

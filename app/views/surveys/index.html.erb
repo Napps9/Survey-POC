@@ -22,8 +22,16 @@
   completion_rate      = total_responders.positive? ? ((completed_responders.to_f / total_responders) * 100).round : nil
 %>
 
+<%
+  google_form_error       = flash[:reopen_google_form_modal] && flash[:alert].present? ? flash[:alert] : nil
+  open_google_form_modal  = google_form_error.present? || params[:open_import].present?
+%>
+
 <div style="display:flex;min-height:100vh;background:#1C2034;">
-  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;"
+       data-controller="google-form-import"
+       data-google-form-import-reopen-value="<%= open_google_form_modal %>"
+       data-action="keydown.esc@window->google-form-import#closeOnEsc">
 
     <%# ── Hero ── %>
     <div style="position:relative;overflow:hidden;padding:32px 36px 40px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
@@ -57,15 +65,54 @@
                     style: "display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;text-decoration:none;" do %>
                 <span style="font-size:16px;line-height:1;">▚</span> <%= t("templates.start_button") %>
               <% end %>
-              <%= link_to new_survey_path,
-                    style: "display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;text-decoration:none;" do %>
-                <span style="font-size:16px;line-height:1;">⇩</span> <%= t("dashboard.import_google_form_button") %>
-              <% end %>
+              <button type="button" data-action="click->google-form-import#open"
+                    style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;cursor:pointer;">
+                <span style="font-size:16px;line-height:1;">▤</span> <%= t("dashboard.import_google_form_button") %>
+              </button>
               <%= link_to new_survey_path,
                     style: "display:inline-flex;align-items:center;gap:8px;background:#01EACB;border:none;border-radius:100px;padding:12px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(1,234,203,0.28);text-decoration:none;" do %>
                 <span style="font-size:18px;line-height:1;">+</span> <%= t("dashboard.create_new") %>
               <% end %>
             </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <%# ── "Create a Form" modal — its own peer flow next to "Start from a
+        template" and "+ Create a new Verto", not a detour into the generic
+        wizard. Posts straight to the existing import_google_form endpoint;
+        source=dashboard tells the controller to send errors (and a
+        Connect-Google round trip) back here instead of the wizard. ── %>
+    <div data-google-form-import-target="modal" class="app-modal hidden">
+      <div class="app-modal__backdrop" data-action="click->google-form-import#close"></div>
+      <div class="app-modal__panel" style="max-width:440px;">
+        <div style="padding:26px 26px 24px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
+            <div style="font-family:'Alata',sans-serif;font-size:19px;color:#1C2034;line-height:1.25;"><%= t("dashboard.import_google_form_button") %></div>
+            <button type="button" data-action="click->google-form-import#close" aria-label="Close"
+                    style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(0,0,0,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
+          </div>
+          <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.55);line-height:1.5;margin:0 0 18px;"><%= t("dashboard.import_google_form_modal_subtitle") %></p>
+
+          <% if google_form_error %>
+            <div style="background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);"><%= google_form_error %></div>
+          <% end %>
+
+          <% if Current.user&.google_connected? %>
+            <%= form_with url: import_google_form_survey_path, method: :post do %>
+              <input type="hidden" name="source" value="dashboard" />
+              <input type="url" name="google_form_url" required
+                     placeholder="<%= t('wizard.import_gform_url_placeholder') %>"
+                     data-google-form-import-target="urlInput"
+                     style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);padding:12px 14px;border-radius:10px;border:1px solid rgba(0,0,0,0.16);background:#fafbfc;width:100%;box-sizing:border-box;margin-bottom:12px;" />
+              <%= submit_tag t("wizard.import_gform_submit"),
+                    data: { turbo_submits_with: t("wizard.importing_gform") },
+                    style: "width:100%;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;cursor:pointer;" %>
+            <% end %>
+          <% else %>
+            <%= link_to t("wizard.import_gform_connect"), google_connect_path(return_to: "dashboard_import"),
+                  style: "display:flex;justify-content:center;text-decoration:none;background:#01EACB;color:#1C2034;border:none;border-radius:100px;padding:12px 20px;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.02em;" %>
           <% end %>
         </div>
       </div>
@@ -112,8 +159,8 @@
                   style: "padding:12px 26px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
             <%= link_to t("templates.browse"), survey_templates_path,
                   style: "padding:12px 26px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
-            <%= link_to t("dashboard.import_google_form_button"), new_survey_path,
-                  style: "padding:12px 26px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
+            <button type="button" data-action="click->google-form-import#open"
+                  style="padding:12px 26px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;"><%= t("dashboard.import_google_form_button") %></button>
           </div>
         </div>
 

@@ -428,7 +428,8 @@ fr:
     heading_html: Vos <span style="color:#01EACB;">Vertos</span>
     subtitle: Lancez des Vertos, partagez-les avec votre alliance et regardez les résultats arriver.
     create_new: Créer un nouveau Verto
-    import_google_form_button: Importer depuis Google Forms
+    import_google_form_button: Créer un formulaire
+    import_google_form_modal_subtitle: Collez le lien d'un Google Form existant et nous le transformerons en Verto modifiable.
     stat_live: En ligne
     stat_drafts: Brouillons
     stat_responses: Réponses

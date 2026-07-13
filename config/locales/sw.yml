@@ -428,7 +428,8 @@ sw:
     heading_html: <span style="color:#01EACB;">Vertos</span> Zako
     subtitle: Anzisha Vertos, zishiriki na ushirikiano wako, na utazame maarifa yakimiminika.
     create_new: Unda Verto mpya
-    import_google_form_button: Agiza kutoka Google Forms
+    import_google_form_button: Unda Fomu
+    import_google_form_modal_subtitle: Bandika kiungo cha Google Form iliyopo nasi tutaigeuza kuwa Verto inayoweza kuhaririwa.
     stat_live: Hai
     stat_drafts: Rasimu
     stat_responses: Majibu
