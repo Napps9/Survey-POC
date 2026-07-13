@@ -332,18 +332,24 @@ module ApplicationHelper
       "<div class=\"mini-img-grid#{cols}\">#{cards}</div>"
 
     when "tap_card"
+      # Non-interactive mockup — spans, not buttons: this preview is placed
+      # inside a real <button> (the add-question type-tile), and a <button>
+      # can't legally contain another <button> (the browser silently closes
+      # the outer one early, wrecking everything rendered after it).
       "<div class=\"mini-swipe-stack\">" \
       "<div class=\"mini-swipe-card c1\"></div>" \
       "<div class=\"mini-swipe-card c2\"></div>" \
       "<div class=\"mini-swipe-card c3\"><span style=\"font-size:9px;color:rgba(0,0,0,0.5);padding:0 6px;text-align:center\">Swipe to respond</span></div>" \
       "</div>" \
       "<div class=\"mini-swipe-actions\">" \
-      "<button class=\"mini-swipe-btn no\">✕</button>" \
-      "<button class=\"mini-swipe-btn yes\">✓</button>" \
+      "<span class=\"mini-swipe-btn no\">✕</span>" \
+      "<span class=\"mini-swipe-btn yes\">✓</span>" \
       "</div>"
 
     when "open_ended"
-      "<textarea class=\"mini-textarea\" placeholder=\"Type your answer here…\" readonly></textarea>"
+      # A <div>, not a <textarea>, for the same reason — <textarea> is
+      # interactive content and isn't allowed inside a <button> either.
+      "<div class=\"mini-textarea\">Type your answer here…</div>"
 
     else
       ""
