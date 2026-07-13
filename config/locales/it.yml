@@ -428,6 +428,7 @@ it:
     heading_html: I tuoi <span style="color:#01EACB;">Vertos</span>
     subtitle: Crea Vertos, condividili con la tua alleanza e guarda arrivare le intuizioni.
     create_new: Crea un nuovo Verto
+    import_google_form_button: Importa da Google Forms
     stat_live: Live
     stat_drafts: Bozze
     stat_responses: Risposte

@@ -428,6 +428,7 @@ ru:
     heading_html: Ваши <span style="color:#01EACB;">Vertos</span>
     subtitle: Создавайте Vertos, делитесь ими с вашим альянсом и наблюдайте за накоплением инсайтов.
     create_new: Создать новый Verto
+    import_google_form_button: Импортировать из Google Forms
     stat_live: Активных
     stat_drafts: Черновиков
     stat_responses: Ответов

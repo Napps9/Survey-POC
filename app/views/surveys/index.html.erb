@@ -58,6 +58,10 @@
                 <span style="font-size:16px;line-height:1;">▚</span> <%= t("templates.start_button") %>
               <% end %>
               <%= link_to new_survey_path,
+                    style: "display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;text-decoration:none;" do %>
+                <span style="font-size:16px;line-height:1;">⇩</span> <%= t("dashboard.import_google_form_button") %>
+              <% end %>
+              <%= link_to new_survey_path,
                     style: "display:inline-flex;align-items:center;gap:8px;background:#01EACB;border:none;border-radius:100px;padding:12px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(1,234,203,0.28);text-decoration:none;" do %>
                 <span style="font-size:18px;line-height:1;">+</span> <%= t("dashboard.create_new") %>
               <% end %>
@@ -107,6 +111,8 @@
             <%= link_to t("dashboard.empty_cta"), new_survey_path,
                   style: "padding:12px 26px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
             <%= link_to t("templates.browse"), survey_templates_path,
+                  style: "padding:12px 26px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
+            <%= link_to t("dashboard.import_google_form_button"), new_survey_path,
                   style: "padding:12px 26px;border-radius:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
           </div>
         </div>

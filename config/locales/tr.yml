@@ -428,6 +428,7 @@ tr:
     heading_html: <span style="color:#01EACB;">Verto'larınız</span>
     subtitle: Verto'lar oluşturun, ittifakınızla paylaşın ve içgörülerin akmasını izleyin.
     create_new: Yeni bir Verto oluştur
+    import_google_form_button: Google Forms'tan içe aktar
     stat_live: Canlı
     stat_drafts: Taslaklar
     stat_responses: Yanıtlar

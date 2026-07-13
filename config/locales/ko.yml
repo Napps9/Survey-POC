@@ -428,6 +428,7 @@ ko:
     heading_html: 내 <span style="color:#01EACB;">Verto</span>
     subtitle: Verto를 만들어 얼라이언스와 공유하고, 들어오는 인사이트를 확인하세요.
     create_new: 새 Verto 만들기
+    import_google_form_button: Google Forms에서 가져오기
     stat_live: 라이브
     stat_drafts: 초안
     stat_responses: 응답

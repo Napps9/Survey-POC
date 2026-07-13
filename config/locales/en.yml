@@ -430,6 +430,7 @@ en:
     heading_html: 'My <span style="color:#01EACB;">Verto''s</span>'
     subtitle: "Spin up Vertos, share them with your alliance, and watch the insights roll in."
     create_new: "Create a new Verto"
+    import_google_form_button: "Import from Google Forms"
     stat_live: "Live"
     stat_drafts: "Drafts"
     stat_responses: "Responses"

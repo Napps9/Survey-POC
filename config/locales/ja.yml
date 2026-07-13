@@ -428,6 +428,7 @@ ja:
     heading_html: あなたの<span style="color:#01EACB;">Vertos</span>
     subtitle: Vertosを作成し、アライアンスと共有して、インサイトを集めましょう。
     create_new: 新しいVertoを作成
+    import_google_form_button: Googleフォームからインポート
     stat_live: ライブ
     stat_drafts: 下書き
     stat_responses: 回答数

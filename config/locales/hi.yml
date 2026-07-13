@@ -428,6 +428,7 @@ hi:
     heading_html: आपके <span style="color:#01EACB;">Verto</span>
     subtitle: Verto बनाएं, उन्हें अपने गठबंधन के साथ साझा करें, और अंतर्दृष्टि आते देखें।
     create_new: नया Verto बनाएं
+    import_google_form_button: Google Forms से आयात करें
     stat_live: लाइव
     stat_drafts: ड्राफ़्ट
     stat_responses: उत्तर

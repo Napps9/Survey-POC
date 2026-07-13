@@ -428,6 +428,7 @@ vi:
     heading_html: <span style="color:#01EACB;">Vertos</span> của bạn
     subtitle: Khởi tạo Vertos, chia sẻ với liên minh của bạn và theo dõi các thông tin chi tiết đổ về.
     create_new: Tạo Verto mới
+    import_google_form_button: Nhập từ Google Forms
     stat_live: Trực tiếp
     stat_drafts: Bản nháp
     stat_responses: Phản hồi

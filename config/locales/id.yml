@@ -428,6 +428,7 @@ id:
     heading_html: <span style="color:#01EACB;">Verto</span> Anda
     subtitle: Buat Verto, bagikan ke aliansi Anda, dan saksikan wawasan mengalir masuk.
     create_new: Buat Verto baru
+    import_google_form_button: Impor dari Google Forms
     stat_live: Live
     stat_drafts: Draf
     stat_responses: Tanggapan
