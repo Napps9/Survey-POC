@@ -126,7 +126,6 @@
             <button type="button" class="lang-dd-btn"
                     data-action="click->locale-switcher#toggle" aria-haspopup="true"
                     aria-label="<%= t("locale_switcher.label") %>">
-              <span class="lang-dd-flag" data-survey-editor-target="localeFlag"><%= cur&.flag %></span>
               <span data-survey-editor-target="localeCode"><%= @survey.default_locale.upcase %></span>
               <svg class="lang-switcher-caret" width="10" height="6" viewBox="0 0 10 6" fill="none">
                 <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -138,10 +137,9 @@
                 <button type="button"
                         class="lang-dd-item<%= ' is-active' if code == @survey.default_locale %>"
                         data-survey-editor-target="tab"
-                        data-locale="<%= code %>" data-flag="<%= loc&.flag %>" data-code="<%= code.upcase %>"
+                        data-locale="<%= code %>" data-code="<%= code.upcase %>"
                         data-action="click->survey-editor#switchLocale click->locale-switcher#close">
-                  <span class="lang-dd-item-flag"><%= loc&.flag %></span>
-                  <span class="lang-dd-item-name"><%= loc&.native_name %></span>
+                  <span class="lang-dd-item-name"><%= loc&.english_name %></span>
                   <% if code == @survey.default_locale %><span class="lang-tab-primary"><%= t("editor.primary") %></span><% end %>
                   <span class="lang-dd-item-tick">✓</span>
                 </button>

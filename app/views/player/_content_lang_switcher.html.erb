@@ -8,7 +8,6 @@
     <button type="button" class="lang-switcher-btn"
             data-action="click->locale-switcher#toggle" aria-haspopup="true"
             aria-label="<%= t("locale_switcher.label") %>">
-      <span class="lang-switcher-flag"><%= current&.flag %></span>
       <span class="lang-switcher-code"><%= @display_locale.to_s.upcase %></span>
       <svg class="lang-switcher-caret" width="10" height="6" viewBox="0 0 10 6" fill="none">
         <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -20,8 +19,7 @@
         <% loc = SupportedLocales.find(code) %>
         <a class="lang-switcher-item<%= ' is-active' if code == @display_locale.to_s %>"
            href="?lang=<%= code %>">
-          <span class="lang-switcher-item-flag"><%= loc&.flag %></span>
-          <span class="lang-switcher-item-name"><%= loc&.native_name %></span>
+          <span class="lang-switcher-item-name"><%= loc&.english_name %></span>
           <% if code == @display_locale.to_s %><span class="lang-switcher-item-tick">✓</span><% end %>
         </a>
       <% end %>

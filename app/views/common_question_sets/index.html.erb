@@ -108,7 +108,7 @@
                     </span>
                   </div>
                   <div style="display:flex;align-items:center;gap:10px;font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.08em;text-transform:uppercase;">
-                    <span><%= SupportedLocales.flag(set.default_locale) %> <%= set.default_locale.upcase %></span>
+                    <span><%= SupportedLocales.english_name(set.default_locale) %></span>
                   </div>
                   <div style="display:flex;gap:8px;margin-top:auto;">
                     <%= link_to t("common_questions.manage", default: "Manage"), common_question_set_path(set),

@@ -30,4 +30,21 @@ class WizardSmokeTest < ActionDispatch::IntegrationTest
     assert_match "Generate Verto", response.body
     assert_match "Import them instead", response.body
   end
+
+  test "language pickers use English names, not flag emoji" do
+    user = User.create!(name: "U", email_address: "ws-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    org  = Organisation.create!(name: "O", slug: "ws-#{SecureRandom.hex(2)}")
+    org.memberships.create!(user: user, role: "admin")
+    post session_path, params: { email_address: user.email_address, password: "verylongpassword" }
+    follow_redirect! if response.redirect?
+
+    get new_survey_path
+    assert_response :success
+    # The Languages card labels each language by its English name…
+    assert_match ">Spanish<", response.body
+    assert_match ">Swahili<", response.body
+    refute_match "Español", response.body
+    # …and no flag emoji (regional-indicator pairs) anywhere on the page.
+    refute_match(/[\u{1F1E6}-\u{1F1FF}]/, response.body)
+  end
 end

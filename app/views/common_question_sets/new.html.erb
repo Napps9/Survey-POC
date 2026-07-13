@@ -113,7 +113,7 @@
             <div style="display:flex;flex-direction:column;gap:6px;">
               <div style="<%= section_label_style %>"><%= t("common_questions.label_language", default: "Set language") %></div>
               <%= select_tag :default_locale,
-                    options_for_select(SupportedLocales.ui_ready.map { |l| [ "#{l.flag} #{l.native_name}", l.code ] }, @set.default_locale),
+                    options_for_select(SupportedLocales.ui_ready.map { |l| [ l.english_name, l.code ] }, @set.default_locale),
                     style: "#{light_input_style}padding:12px 16px;appearance:auto;" %>
             </div>
 

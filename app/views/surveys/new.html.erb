@@ -379,7 +379,7 @@
                       data-action="change->language-picker#syncPrimary"
                       style="<%= light_input_style %>">
                 <% SupportedLocales.all.each do |loc| %>
-                  <option value="<%= loc.code %>" <%= "selected" if loc.code == I18n.locale.to_s %>><%= loc.flag %> <%= loc.native_name %></option>
+                  <option value="<%= loc.code %>" <%= "selected" if loc.code == I18n.locale.to_s %>><%= loc.english_name %></option>
                 <% end %>
               </select>
             </label>
@@ -391,7 +391,7 @@
                          data-language-picker-target="option"
                          data-action="change->language-picker#toggle"
                          <%= "checked" if loc.code == I18n.locale.to_s %> />
-                  <span><%= loc.flag %> <%= loc.native_name %></span>
+                  <span><%= loc.english_name %></span>
                 </label>
               <% end %>
             </div>

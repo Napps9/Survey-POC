@@ -13,7 +13,7 @@ const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
 const CHOICE_TYPES = [ "multiple_choice", "select_many", "yes_no", "select_one_grid", "select_many_grid" ]
 
 export default class extends Controller {
-  static targets = ["card", "saveButton", "status", "tab", "feed", "localeFlag", "localeCode", "vertoScore", "scoreBoard", "panelLight"]
+  static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight"]
   static values  = {
     url: String, title: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -93,7 +93,6 @@ export default class extends Controller {
     }
     // Reflect the choice in the compact dropdown button.
     const btn = event.currentTarget
-    if (this.hasLocaleFlagTarget && btn.dataset.flag) this.localeFlagTarget.textContent = btn.dataset.flag
     if (this.hasLocaleCodeTarget && btn.dataset.code) this.localeCodeTarget.textContent = btn.dataset.code
     this.element.classList.toggle("editing-translation", locale !== this.defaultLocaleValue)
     if (this.hasFeedTarget) {
