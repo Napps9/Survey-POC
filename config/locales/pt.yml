@@ -428,7 +428,7 @@ pt:
     heading_html: Os seus <span style="color:#01EACB;">Vertos</span>
     subtitle: Crie Vertos, partilhe-os com a sua aliança e veja os insights chegarem.
     create_new: Criar um novo Verto
-    import_google_form_button: Criar um formulário
+    import_google_form_button: Criar novo formulário
     import_google_form_modal_subtitle: Cole o link de um Google Form existente e transformamo-lo num Verto editável.
     or_divider: ou
     start_from_scratch_button: Começar do zero

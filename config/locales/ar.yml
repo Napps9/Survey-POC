@@ -428,7 +428,7 @@ ar:
     heading_html: <span style="color:#01EACB;">فيرتوهاتك</span>
     subtitle: أنشئ فيرتوهات، وشاركها مع تحالفك، وشاهد الرؤى تتدفق.
     create_new: إنشاء فيرتو جديد
-    import_google_form_button: إنشاء نموذج
+    import_google_form_button: إنشاء نموذج جديد
     import_google_form_modal_subtitle: الصق رابط نموذج Google موجود وسنحوّله إلى Verto قابل للتعديل.
     or_divider: أو
     start_from_scratch_button: البدء من الصفر

@@ -428,7 +428,7 @@ ja:
     heading_html: あなたの<span style="color:#01EACB;">Vertos</span>
     subtitle: Vertosを作成し、アライアンスと共有して、インサイトを集めましょう。
     create_new: 新しいVertoを作成
-    import_google_form_button: フォームを作成
+    import_google_form_button: 新しいフォームを作成
     import_google_form_modal_subtitle: 既存のGoogleフォームのリンクを貼り付けると、編集可能なVertoに変換します。
     or_divider: または
     start_from_scratch_button: ゼロから作成

@@ -428,7 +428,7 @@ uk:
     heading_html: Ваші <span style="color:#01EACB;">Vertos</span>
     subtitle: Запускайте Vertos, діліться ними зі своєю спільнотою та спостерігайте, як надходять інсайти.
     create_new: Створити новий Verto
-    import_google_form_button: Створити форму
+    import_google_form_button: Створити нову форму
     import_google_form_modal_subtitle: Вставте посилання на наявну Google Form, і ми перетворимо її на редаговану Verto.
     or_divider: або
     start_from_scratch_button: Почати з нуля
