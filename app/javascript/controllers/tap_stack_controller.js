@@ -5,7 +5,7 @@ import { Controller } from "@hotwired/stimulus"
 // On click, the top card animates off-screen in that direction and the
 // next card surfaces.
 export default class extends Controller {
-  static targets = ["card", "counter", "dots"]
+  static targets = ["card", "counter", "dots", "controls"]
 
   connect() {
     this.position = 0
@@ -58,6 +58,11 @@ export default class extends Controller {
   layout() {
     const total = this.cardTargets.length
     this._syncDots(total)
+    // The response buttons sit in an overlay layered on top of the card stack
+    // (see .rotate-card-controls), so they must out-rank every card's z-index
+    // (top card = `total`) or an extra-long statement list (past the CSS
+    // default of 5) visually buries the Yes/Unsure/No buttons under the card.
+    if (this.hasControlsTarget) this.controlsTarget.style.zIndex = String(total + 1)
     this.cardTargets.forEach((card, i) => {
       const offset = i - this.position
       if (offset < 0) {

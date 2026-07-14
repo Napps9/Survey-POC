@@ -15,16 +15,21 @@ export default class extends Controller {
     // Fall back to a DOM lookup so a manual call (no event) still works.
     const form = event?.target?.closest?.("form") || this.element.querySelector("form")
 
-    // "Import from PDF" path: a dedicated submit button posts the chosen file
-    // to import_pdf and skips the brief gate. It's the first submit in the
-    // form, so a stray Enter keypress targets it too — only proceed when a
-    // file is actually attached, otherwise let the user keep filling the brief.
-    if (event?.submitter?.hasAttribute?.("data-generating-import")) {
-      const file = form?.querySelector('input[name="pdf"]')
-      if (!file?.files?.length) {
-        event?.preventDefault()
-        this._shakeSubmit(event.submitter)
-        return
+    // Import paths (manual paste, PDF, Google Form) all skip the theme/age/
+    // insight brief gate below and show the generic "reading your questions"
+    // overlay instead. Only the PDF door needs a pre-submit guard: it's the
+    // first submit in the form, so a stray Enter keypress targets it too —
+    // only proceed when a file is actually attached, otherwise let the user
+    // keep filling the brief rather than posting an empty upload.
+    const importKind = event?.submitter?.dataset?.generatingImport
+    if (importKind) {
+      if (importKind === "pdf") {
+        const file = form?.querySelector('input[name="pdf"]')
+        if (!file?.files?.length) {
+          event?.preventDefault()
+          this._shakeSubmit(event.submitter)
+          return
+        }
       }
       this._showImport()
       return

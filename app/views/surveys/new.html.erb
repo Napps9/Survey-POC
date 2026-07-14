@@ -544,7 +544,7 @@
               <%= f.submit t("wizard.import_manual_submit"),
                     formaction: import_manual_survey_path,
                     formnovalidate: true,
-                    data: { generating_import: "", turbo_submits_with: t("wizard.importing_manual") },
+                    data: { generating_import: "manual", turbo_submits_with: t("wizard.importing_manual") },
                     style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
             </div>
 
@@ -568,7 +568,7 @@
                 <%= f.submit t("wizard.import_pdf"),
                       formaction: import_pdf_survey_path,
                       formnovalidate: true,
-                      data: { generating_import: "", turbo_submits_with: t("wizard.importing") },
+                      data: { generating_import: "pdf", turbo_submits_with: t("wizard.importing") },
                       style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
               </div>
             </details>
@@ -587,7 +587,7 @@
                   <%= f.submit t("wizard.import_gform_submit"),
                         formaction: import_google_form_survey_path,
                         formnovalidate: true,
-                        data: { generating_import: "", turbo_submits_with: t("wizard.importing_gform") },
+                        data: { generating_import: "google_form", turbo_submits_with: t("wizard.importing_gform") },
                         style: "align-self:flex-start;background:#1C2034;color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.02em;cursor:pointer;" %>
                 <% else %>
                   <%= link_to t("wizard.import_gform_connect"), google_connect_path(return_to: "import"),
