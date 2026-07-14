@@ -4,36 +4,91 @@
 require "net/http"
 require "uri"
 require "json"
+require "optparse"
 
 BOARD_ID = "ntNghZRN"
 
-def trello_request(method, path, params)
-  uri = URI("https://api.trello.com/1#{path}")
-  uri.query = URI.encode_www_form(params)
-  request = method == :post ? Net::HTTP::Post.new(uri) : Net::HTTP::Get.new(uri)
-
+def trello_http(uri)
   # Net::HTTP's built-in :ENV proxy detection only reads http_proxy, never
   # https_proxy, so it misses this sandbox's proxy entirely. Read it directly.
   proxy_env = ENV["https_proxy"] || ENV["HTTPS_PROXY"]
   proxy_uri = URI(proxy_env) if proxy_env
   http = Net::HTTP.new(uri.host, uri.port, proxy_uri&.host, proxy_uri&.port)
   http.use_ssl = true
-  response = http.start { |h| h.request(request) }
+  http
+end
+
+def trello_request(method, path, params)
+  uri = URI("https://api.trello.com/1#{path}")
+  uri.query = URI.encode_www_form(params)
+  request = method == :post ? Net::HTTP::Post.new(uri) : Net::HTTP::Get.new(uri)
+  response = trello_http(uri).start { |h| h.request(request) }
   raise "Trello API error #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
 
   JSON.parse(response.body)
 end
 
-title = ARGV[0]
-abort "Usage: bin/trello_log \"<title>\" [\"<description>\"]" if title.nil? || title.empty?
+def trello_attach(card_id, file_path, auth)
+  abort "Screenshot not found: #{file_path}" unless File.exist?(file_path)
 
-description = ARGV[1] || ""
+  uri = URI("https://api.trello.com/1/cards/#{card_id}/attachments")
+  request = Net::HTTP::Post.new(uri)
+  form_fields = [
+    [ "key", auth[:key] ],
+    [ "token", auth[:token] ],
+    [ "file", File.open(file_path, "rb"), { filename: File.basename(file_path) } ]
+  ]
+  request.set_form(form_fields, "multipart/form-data")
+  response = trello_http(uri).start { |h| h.request(request) }
+  raise "Trello API error #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
+
+  JSON.parse(response.body)
+end
+
+options = { tests: [], screenshots: [] }
+parser = OptionParser.new do |opts|
+  opts.banner = <<~BANNER
+    Usage: bin/trello_log "<title>" ["<summary>"] [options]
+        --frontend TEXT       Frontend changes, rendered under a "## Frontend" heading
+        --backend TEXT        Backend changes, rendered under a "## Backend" heading
+        --test NAME:STATUS    Test suite result, repeatable (e.g. --test "rails test:pass")
+        --screenshot PATH     Attach a screenshot/mockup file to the card, repeatable
+  BANNER
+  opts.on("--frontend TEXT") { |v| options[:frontend] = v }
+  opts.on("--backend TEXT") { |v| options[:backend] = v }
+  opts.on("--test NAME:STATUS") { |v| options[:tests] << v }
+  opts.on("--screenshot PATH") { |v| options[:screenshots] << v }
+end
+parser.parse!(ARGV)
+
+title = ARGV[0]
+abort parser.banner if title.nil? || title.empty?
+
+summary = ARGV[1] || ""
 list_name = ENV.fetch("TRELLO_LIST_NAME", "Done")
 auth = { key: ENV.fetch("TRELLO_API_KEY"), token: ENV.fetch("TRELLO_TOKEN") }
+
+description = summary.dup
+description << "\n\n## Frontend\n#{options[:frontend]}" if options[:frontend]
+description << "\n\n## Backend\n#{options[:backend]}" if options[:backend]
 
 lists = trello_request(:get, "/boards/#{BOARD_ID}/lists", auth)
 list = lists.find { |l| l["name"].casecmp?(list_name) }
 list ||= trello_request(:post, "/boards/#{BOARD_ID}/lists", auth.merge(name: list_name))
 
 card = trello_request(:post, "/cards", auth.merge(idList: list["id"], name: title, desc: description))
+
+unless options[:tests].empty?
+  checklist = trello_request(:post, "/checklists", auth.merge(idCard: card["id"], name: "Tests"))
+  options[:tests].each do |entry|
+    name, status = entry.split(":", 2)
+    abort "Malformed --test entry (expected NAME:STATUS): #{entry}" if status.nil?
+
+    trello_request(:post, "/checklists/#{checklist['id']}/checkItems",
+                    auth.merge(name: name, checked: status.casecmp?("pass")))
+  end
+end
+
+options[:screenshots].each { |path| trello_attach(card["id"], path, auth) }
+
 puts "Logged to Trello: #{card['shortUrl']}"

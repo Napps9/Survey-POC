@@ -24,14 +24,29 @@ After a push to Main passes the local suite (i.e. you're actually pushing),
 log a card summarizing what shipped:
 
 ```
-bin/trello_log "Short title of what shipped" "1-3 sentence summary"
+bin/trello_log "Short title of what shipped" "1-3 sentence summary" \
+  --frontend "What changed in views/Stimulus/Tailwind, if anything." \
+  --backend "What changed in models/controllers/services, if anything." \
+  --test "rails test:pass" --test "rubocop:pass" \
+  --test "brakeman:pass" --test "importmap audit:pass" \
+  --screenshot tmp/screenshots/whatever.png
 ```
 
 This posts to the `Done` list on the team's Trello board
-(https://trello.com/b/ntNghZRN) via the REST API. Requires `TRELLO_API_KEY`
-and `TRELLO_TOKEN` env vars (set at the environment level, never committed).
-If they're not present in this session, skip logging rather than failing the
-push — the code change is what matters, the log entry is best-effort.
+(https://trello.com/b/ntNghZRN) via the REST API. `--frontend`/`--backend` are
+rendered as `## Frontend`/`## Backend` sections in the card description —
+omit whichever side didn't change. `--test NAME:STATUS` (repeatable) adds a
+"Tests" checklist item per suite, checked iff STATUS is `pass` — use the
+actual result of the four commands above, not a guess. `--screenshot PATH`
+(repeatable) attaches a mockup/screenshot file to the card; only pass this
+when the change is user-visible and a screenshot was actually taken (e.g. via
+the `/verify` skill) — don't invent one. All four flags are optional; a bare
+`bin/trello_log "title" "summary"` still works exactly as before.
+
+Requires `TRELLO_API_KEY` and `TRELLO_TOKEN` env vars (set at the environment
+level, never committed). If they're not present in this session, skip logging
+rather than failing the push — the code change is what matters, the log
+entry is best-effort.
 
 ## Deploys
 
