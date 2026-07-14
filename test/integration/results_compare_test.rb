@@ -23,92 +23,100 @@ class ResultsCompareTest < ActionDispatch::IntegrationTest
 
   def seed_region(survey, country, label, count)
     count.times do |i|
-      survey.responses.create!(session_token: "#{country}-#{i}-#{SecureRandom.hex(3)}", status: "completed",
+      survey.responses.create!(session_token: "#{country}-#{label}-#{i}-#{SecureRandom.hex(3)}", status: "completed",
                                region_country: country, region_label: label,
                                answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
     end
   end
 
-  test "includes resolved lat/lng and country bounds for a region segment" do
-    org = create_org_and_sign_in("geo")
+  test "segments group by country, not sub-region label" do
+    org = create_org_and_sign_in("group")
     s   = create_survey(org)
     seed_region(s, "US", "Austin, Texas", 5)
+    seed_region(s, "US", "Dallas", 5)
 
-    stub_method(NominatimGeocodeClient, :coordinates_for, ->(**_kw) { { lat: 30.27, lng: -97.74 } }) do
-      get survey_results_compare_path(s)
-    end
+    get survey_results_compare_path(s)
     assert_response :success
 
     data = JSON.parse(response.body)
     assert data["ok"]
-    region = data["segments"].find { |seg| seg["label"].include?("Austin, Texas") }
-    assert_equal 30.27, region["lat"]
-    assert_equal(-97.74, region["lng"])
-    assert_equal [ 25.0, 49.5, -125.0, -66.96 ], data["bounds"]["us"]
+    region_segments = data["segments"].select { |seg| seg["id"] == "region_US" }
+    assert_equal 1, region_segments.size
+    region = region_segments.first
+    assert_equal "🌍 United States", region["label"]
+    assert_equal 10, region["count"]
   end
 
-  test "includes a resolved boundary outline for a region segment when Nominatim has one" do
-    org = create_org_and_sign_in("geo-boundary")
+  test "no geocoding keys appear anywhere in the response" do
+    org = create_org_and_sign_in("no-geo")
     s   = create_survey(org)
     seed_region(s, "US", "Austin, Texas", 5)
 
-    boundary = [ [ [ -97.8, 30.1 ], [ -97.6, 30.1 ], [ -97.6, 30.4 ], [ -97.8, 30.1 ] ] ]
-    stub_method(NominatimGeocodeClient, :coordinates_for, ->(**_kw) { { lat: 30.27, lng: -97.74, boundary: boundary } }) do
-      get survey_results_compare_path(s)
-    end
+    get survey_results_compare_path(s)
     assert_response :success
 
     data = JSON.parse(response.body)
-    region = data["segments"].find { |seg| seg["label"].include?("Austin, Texas") }
-    assert_equal boundary, region["boundary"]
+    refute data.key?("bounds")
+    data["segments"].each do |seg|
+      refute seg.key?("lat")
+      refute seg.key?("lng")
+      refute seg.key?("boundary")
+    end
   end
 
-  test "omits lat/lng when Nominatim can't resolve the tag, without breaking the response" do
-    org = create_org_and_sign_in("geo-miss")
+  test "sub-region labels below the per-label threshold combine to clear country-level suppression" do
+    org = create_org_and_sign_in("combine")
     s   = create_survey(org)
-    seed_region(s, "ZA", "Nowhereville", 5)
+    seed_region(s, "GB", "Yorkshire", 3)
+    seed_region(s, "GB", "London", 2)
 
-    stub_method(NominatimGeocodeClient, :coordinates_for, ->(**_kw) { nil }) do
-      get survey_results_compare_path(s)
-    end
+    get survey_results_compare_path(s)
     assert_response :success
 
     data = JSON.parse(response.body)
-    region = data["segments"].find { |seg| seg["label"].include?("Nowhereville") }
-    refute region.key?("lat")
-    refute region.key?("lng")
+    region = data["segments"].find { |seg| seg["id"] == "region_GB" }
+    assert region, "expected a combined GB segment"
+    assert_equal 5, region["count"]
+    assert data["aggregates"].key?("region_GB")
   end
 
-  test "discards a geocoded point that falls outside the tagged country's bounds" do
-    org = create_org_and_sign_in("geo-wrong-country")
+  test "a country below the sample-size floor is still suppressed" do
+    org = create_org_and_sign_in("below-floor")
     s   = create_survey(org)
-    seed_region(s, "US", "New York", 5)
+    seed_region(s, "GB", "Yorkshire", 4)
 
-    # A real village called "New York" exists in Lincolnshire, England —
-    # simulates Nominatim matching that instead of the US tag despite the
-    # countrycodes hint.
-    stub_method(NominatimGeocodeClient, :coordinates_for, ->(**_kw) { { lat: 53.13, lng: -0.08 } }) do
-      get survey_results_compare_path(s)
-    end
+    get survey_results_compare_path(s)
     assert_response :success
 
     data = JSON.parse(response.body)
-    region = data["segments"].find { |seg| seg["label"].include?("New York") }
-    refute region.key?("lat")
-    refute region.key?("lng")
+    refute data["segments"].any? { |seg| seg["id"] == "region_GB" }
   end
 
-  test "the overall segment is never geocoded" do
-    org = create_org_and_sign_in("geo-overall")
+  test "two different countries produce two segments" do
+    org = create_org_and_sign_in("two-countries")
+    s   = create_survey(org)
+    seed_region(s, "US", "Austin, Texas", 5)
+    seed_region(s, "GB", "Yorkshire", 5)
+
+    get survey_results_compare_path(s)
+    assert_response :success
+
+    data = JSON.parse(response.body)
+    region_ids = data["segments"].map { |seg| seg["id"] }.select { |id| id.start_with?("region_") }
+    assert_equal [ "region_GB", "region_US" ], region_ids.sort
+  end
+
+  test "the overall segment is always present and unaffected by region grouping" do
+    org = create_org_and_sign_in("overall")
     s   = create_survey(org)
     s.responses.create!(session_token: "plain-#{SecureRandom.hex(3)}", status: "completed",
                         answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
 
-    stub_method(NominatimGeocodeClient, :coordinates_for, ->(**_kw) { raise "should not geocode Overall" }) do
-      get survey_results_compare_path(s)
-    end
+    get survey_results_compare_path(s)
     assert_response :success
+
     overall = JSON.parse(response.body)["segments"].find { |seg| seg["id"] == "overall" }
+    assert overall
     refute overall.key?("lat")
   end
 end

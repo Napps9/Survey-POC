@@ -85,10 +85,12 @@ class DemoSeeder
       share_into_partnership!(@money_matters)
 
       # Each Verto below gets several countries (for the global map) *and* more
-      # than one region within at least two of those countries, so both the
-      # creator Results map and the player-facing region drill-down have real
-      # within-country breakdowns to explore, not just one dot per country.
-      # Only *completed* responses get tagged with a region (see
+      # than one sub-region label within at least two of those countries —
+      # region display/aggregation is country-level only (see
+      # ResolvesResultSegments), so this demonstrates several distinct
+      # self-declared sub-regions (e.g. "Greater London" + "Manchester")
+      # correctly collapsing into one country total rather than each needing
+      # its own dot. Only *completed* responses get tagged with a region (see
       # seed_responses!), so every cluster here is sized well above
       # Response::MIN_REGION_SAMPLE_SIZE (5) to comfortably clear it even
       # after ~12% of a cluster don't finish — 8 raw survives that with room

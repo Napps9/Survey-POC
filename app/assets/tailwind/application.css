@@ -4090,37 +4090,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .world-map .map-country { cursor: pointer; transition: filter 0.15s; }
 .world-map .map-country:hover { filter: brightness(1.35); }
 
-/* Labeled pin per tagged location when the map is zoomed into a single
-   country (all currently-compared segments share one country) — see
-   results_compare_controller.js#_updateMapZoom. Placement uses the
-   coordinate Nominatim resolved for the tag when available, falling back
-   to an even split across the country's shape when it isn't (free-text
-   location labels don't always resolve). */
-.map-pin {
-  position: absolute; transform: translate(-50%, -50%);
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  pointer-events: none; z-index: 3;
-}
-.map-pin-dot {
-  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
-  border: 2px solid rgba(255,255,255,0.9);
-  box-shadow: 0 0 0 3px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.4);
-}
-.map-pin-label {
-  font-family: "ABeeZee", sans-serif; font-size: 12px; font-weight: 600; color: #fff;
-  background: rgba(10,12,24,0.88); padding: 3px 9px; border-radius: 100px;
-  white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-}
-
-/* Real administrative outline for a tagged region, drawn only when
-   Nominatim resolved a boundary polygon for it (see
-   NominatimGeocodeClient#extract_boundary) — a pin alone still shows for
-   regions without one. pointer-events: none on the layer lets clicks pass
-   through to the country shape underneath; non-scaling-stroke keeps the
-   line the same visual weight regardless of how deep the map has zoomed. */
-.region-boundary-layer { pointer-events: none; }
-.region-boundary { fill-opacity: 0.22; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
-
 .compare-panel {
   flex: 0 0 380px; width: 380px; max-height: 540px;
   display: flex; flex-direction: column; overflow: hidden;
@@ -4151,12 +4120,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .compare-panel-title { font-family: "Alata", sans-serif; font-size: 20px; color: #fff; letter-spacing: 0.02em; }
 .compare-panel-meta { font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 3px; }
-.compare-geo-credit {
-  flex-shrink: 0; padding: 6px 18px; font-family: "ABeeZee", sans-serif; font-size: 10px;
-  color: rgba(255,255,255,0.25); border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.compare-geo-credit a { color: rgba(255,255,255,0.4); }
-.compare-geo-credit a:hover { color: rgba(255,255,255,0.6); }
 .compare-close-btn {
   flex-shrink: 0; width: 32px; height: 32px; border-radius: 100px;
   display: flex; align-items: center; justify-content: center;

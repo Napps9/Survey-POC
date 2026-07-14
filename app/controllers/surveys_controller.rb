@@ -509,14 +509,12 @@ class SurveysController < ApplicationController
   def results_compare
     _base, segments, = resolve_result_segments(@survey, nil)
     cards = Array(@survey.cards)
-    coords_by_id = geocode_compare_segments(segments)
 
     render json: {
       ok: true,
       cards: cards.map.with_index { |card, idx| { index: idx, type: card["type"], text: card["text"], options: card["options"] } },
-      segments: segments.map { |seg| seg.slice(:id, :label, :count).merge(coords_by_id[seg[:id]] || {}) },
-      aggregates: segments.each_with_object({}) { |seg, acc| acc[seg[:id]] = aggregate_results(cards, seg[:scope]) },
-      bounds: compare_country_bounds(segments)
+      segments: segments.map { |seg| seg.slice(:id, :label, :count) },
+      aggregates: segments.each_with_object({}) { |seg, acc| acc[seg[:id]] = aggregate_results(cards, seg[:scope]) }
     }
   end
 
@@ -609,52 +607,6 @@ class SurveysController < ApplicationController
   end
 
   private
-
-  # Geocoding is capped per request (not per survey) so a Verto with an
-  # unusually wide spread of tagged regions can't turn one page load into
-  # 20+ seconds of sequential Nominatim calls — results are cached for a
-  # month (see NominatimGeocodeClient), so this only ever bites the first
-  # viewer after new regions show up. Returns { segment_id => { lat:, lng: } }.
-  COMPARE_GEOCODE_CAP = 12
-
-  def geocode_compare_segments(segments)
-    geocodable = segments.select { |s| s[:country].present? && s[:region_label].present? }.first(COMPARE_GEOCODE_CAP)
-    geocodable.each_with_object({}) do |seg, acc|
-      # Naming the country in the query text — on top of the countrycodes
-      # filter below — gives Nominatim's ranking better disambiguation for
-      # a short, common tag like "New York" that also names a real place
-      # elsewhere in the world (there's a village called exactly that in
-      # Lincolnshire, England).
-      query = "#{seg[:region_label]}, #{WorldRegions.name_for(seg[:country])}"
-      coords = NominatimGeocodeClient.coordinates_for(query: query, country_code: seg[:country])
-      next unless coords && plausible_for_country?(coords, seg[:country])
-      acc[seg[:id]] = coords.slice(:lat, :lng, :boundary).compact
-    end
-  end
-
-  # Discards a geocoded point that falls outside the tagged country's own
-  # bounds — protects against Nominatim matching a same-named place in the
-  # wrong country (e.g. there's a literal village called "New York" in
-  # Lincolnshire, England) despite the countrycodes hint, which would
-  # otherwise plot a confident-looking pin in a wildly wrong spot rather
-  # than falling back to the honest even-spread placement.
-  def plausible_for_country?(coords, country_code)
-    box = CountryBoundingBoxes.for(country_code)
-    return true unless box
-    min_lat, max_lat, min_lng, max_lng = box
-    coords[:lat].between?(min_lat, max_lat) && coords[:lng].between?(min_lng, max_lng)
-  end
-
-  # { country_code (lowercase) => [min_lat, max_lat, min_lng, max_lng] } for
-  # every distinct country among this survey's region segments — lets the
-  # results-compare map place a resolved coordinate proportionally within
-  # the country's own drawn shape.
-  def compare_country_bounds(segments)
-    segments.filter_map { |s| s[:country] }.uniq.each_with_object({}) do |cc, acc|
-      box = CountryBoundingBoxes.for(cc)
-      acc[cc.downcase] = box if box
-    end
-  end
 
   def pexels_photo_results(query, orientation, context, age = [])
     PexelsClient.new.search(query: query, orientation: orientation, per_page: 24)

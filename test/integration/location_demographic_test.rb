@@ -107,7 +107,36 @@ class LocationDemographicTest < ActionDispatch::IntegrationTest
     # FR (2 responders) is below Response::MIN_REGION_SAMPLE_SIZE — suppressed.
     assert_equal [ "GB" ], data["regions"].map { |r| r["country"] }
     top = data["regions"].first
-    assert_equal [ "GB", "Yorkshire", 5 ], [ top["country"], top["label"], top["responders"] ]
+    assert_equal [ "GB", 5 ], [ top["country"], top["responders"] ]
+    refute top.key?("label")
+  end
+
+  test "the regions endpoint rolls sub-region labels within a country into one group" do
+    org = create_org_and_sign_in("agg-collapse")
+    s   = create_survey(org)
+
+    # Neither label alone clears MIN_REGION_SAMPLE_SIZE (5), but together the
+    # country does — region display/aggregation is country-level only.
+    3.times do |i|
+      s.responses.create!(session_token: "gb-yorks-#{i}-#{SecureRandom.hex(3)}", status: "completed",
+                          region_country: "GB", region_label: "Yorkshire",
+                          answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    end
+    2.times do |i|
+      s.responses.create!(session_token: "gb-london-#{i}-#{SecureRandom.hex(3)}", status: "completed",
+                          region_country: "GB", region_label: "London",
+                          answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    end
+
+    get player_regions_path(s.publish_token)
+    assert_response :success
+    data = JSON.parse(response.body)
+    assert data["ok"]
+    assert_equal 1, data["regions"].size
+    row = data["regions"].first
+    assert_equal "GB", row["country"]
+    assert_equal 5, row["responders"]
+    refute row.key?("label")
   end
 
   test "the regions endpoint counts partial responders, not only completers" do
@@ -128,18 +157,29 @@ class LocationDemographicTest < ActionDispatch::IntegrationTest
     assert_equal 5, data["regions"].first["responders"]
   end
 
-  test "creator results show region segments and the world map once responses accumulate" do
+  test "creator results show one country segment even when respondents span sub-regions" do
     org = create_org_and_sign_in("results")
     s   = create_survey(org)
-    5.times do |i|
-      s.responses.create!(session_token: "r-#{i}-#{SecureRandom.hex(3)}", status: "completed",
+    # Neither label alone clears MIN_REGION_SAMPLE_SIZE (5), but together the
+    # country does — proving sub-region labels collapse to one country
+    # segment rather than each needing its own dot/pin.
+    3.times do |i|
+      s.responses.create!(session_token: "r-yorks-#{i}-#{SecureRandom.hex(3)}", status: "completed",
                           region_country: "GB", region_label: "Yorkshire",
+                          answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    end
+    2.times do |i|
+      s.responses.create!(session_token: "r-london-#{i}-#{SecureRandom.hex(3)}", status: "completed",
+                          region_country: "GB", region_label: "London",
                           answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
     end
 
     get survey_results_path(s)
     assert_response :success
     assert_match 'id="world-map"', response.body
-    assert_match "United Kingdom · Yorkshire", response.body
+    assert_match "United Kingdom", response.body
+    assert_no_match(/United Kingdom\s*·/, response.body)
+    assert_no_match "Yorkshire", response.body
+    assert_no_match "London", response.body
   end
 end

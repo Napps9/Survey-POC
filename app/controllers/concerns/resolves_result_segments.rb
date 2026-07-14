@@ -30,26 +30,27 @@ module ResolvesResultSegments
     end
 
     # Region segments come from the responses themselves, so they cover both
-    # link-minted regions and ask-players self-declared ones. Ordered by
-    # volume and capped, so a Verto with hundreds of regions doesn't explode
-    # the filter row. Ids hash the region key — stable across requests.
+    # link-minted regions and ask-players self-declared ones. Rolled up to
+    # COUNTRY level only — sub-region labels (e.g. "Yorkshire", "London") stay
+    # on Response#region_label for potential future use, but two respondents
+    # in different UK sub-regions count as one "GB" segment, matching the
+    # map/list UI which is country-granularity everywhere. Ordered by volume
+    # and capped, so a Verto with hundreds of tagged countries doesn't explode
+    # the filter row.
     # reorder(nil) drops base's `ORDER BY created_at`: Postgres rejects an
     # ORDER BY column that isn't in the GROUP BY (SQLite quietly allows it).
-    # Small-cell suppression: a region with fewer than MIN_REGION_SAMPLE_SIZE
+    # Small-cell suppression: a country with fewer than MIN_REGION_SAMPLE_SIZE
     # respondents never gets its own segment — see Response for why.
-    region_counts = base.reorder(nil).where.not(region_country: nil)
-                        .group(:region_country, :region_label).count
-                        .select { |_, count| count >= Response::MIN_REGION_SAMPLE_SIZE }
-    region_counts.sort_by { |_, count| -count }.first(REGION_SEGMENT_CAP).each do |(country, label), count|
-      name    = WorldRegions.name_for(country)
-      display = label.present? ? "#{name} · #{label}" : name
+    country_counts = base.reorder(nil).where.not(region_country: nil)
+                         .group(:region_country).count
+                         .select { |_, count| count >= Response::MIN_REGION_SAMPLE_SIZE }
+    country_counts.sort_by { |_, count| -count }.first(REGION_SEGMENT_CAP).each do |country, count|
       segments << {
-        id:           "region_#{Digest::MD5.hexdigest("#{country}|#{label}").first(10)}",
-        label:        "🌍 #{display}",
-        country:      country,
-        region_label: label,
-        scope:        base.where(region_country: country, region_label: label),
-        count:        count
+        id:      "region_#{country}",
+        label:   "🌍 #{WorldRegions.name_for(country)}",
+        country: country,
+        scope:   base.where(region_country: country),
+        count:   count
       }
     end
 

@@ -95,13 +95,9 @@
         <% region_segments = @segments.select { |s| s[:id].to_s.start_with?("region_") } %>
         <% if region_segments.any? %>
           <%
-            # cc → { count:, name:, segment_ids: [...] }: response counts
-            # summed across a country's sub-regions, plus every region
-            # segment id tagged to that country. The map only has
-            # country-level shapes, so a click toggles ALL of a country's
-            # region segments into the comparison panel together — the
-            # smallest clickable unit is a country, even when it holds
-            # several tagged regions (e.g. Edinburgh + London under "gb").
+            # cc → { count:, name:, segment_ids: [...] }: one region segment
+            # per country (see ResolvesResultSegments), keyed here by its
+            # lowercase map shape id.
             map_data = {}
             region_segments.each do |seg|
               next if seg[:country].blank?
@@ -115,7 +111,7 @@
                data-results-compare-url-value="<%= survey_results_compare_path(@survey) %>">
             <div class="regions-box-head">
               <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 Audience segments</span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a region on the map to compare segments of your audience</span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a country on the map to compare segments of your audience</span>
               <button type="button" class="compare-open-btn" style="margin-left:auto;"
                       data-results-compare-target="openBtn"
                       data-action="click->results-compare#toggle">⛶ Compare segments</button>
@@ -130,12 +126,9 @@
             <div class="regions-box-body" data-results-compare-target="stage">
               <div class="compare-stage-row">
                 <div class="regions-map-col">
-                  <%# Positioned wrapper the controller zooms/pins against —
-                      when every selected segment is in one country, the map
-                      zooms to that country and drops a labeled pin per tagged
-                      location, with a real administrative outline drawn
-                      underneath when Nominatim resolved a boundary for it
-                      (falls back to pin-only otherwise). ── %>
+                  <%# Positioned wrapper the controller zooms against — when
+                      every selected segment is in one country, the map zooms
+                      in on that country's shape for a closer look. ── %>
                   <div class="compare-map-stage" data-results-compare-target="mapStage">
                     <%= render "shared/world_map" %>
                   </div>
@@ -149,11 +142,6 @@
                     </div>
                     <button type="button" class="compare-close-btn" aria-label="Close">✕</button>
                   </div>
-                  <%# Nominatim/OSM usage policy requires a visible
-                      attribution near results it powers — here, the
-                      coordinates NominatimGeocodeClient resolves for pin
-                      placement (see app/services/nominatim_geocode_client.rb). ── %>
-                  <div class="compare-geo-credit">Location data: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></div>
                   <div class="compare-body" data-results-compare-target="body"></div>
                 </div>
               </div>

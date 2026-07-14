@@ -238,31 +238,33 @@ class PlayerController < ApplicationController
                    results: aggregate_rows(responses) + token_comparison_rows(responses) }
   end
 
-  # Per-region aggregates for the post-finish map view: one entry per region
-  # (country + label) that has at least one region-tagged responder. Every Verto
-  # captures this via the "Where do you live?" demographic question, so there's
-  # no separate opt-in gate — an empty result set just renders the "no regional
-  # answers yet" copy.
+  # Per-country aggregates for the post-finish map view: one entry per country
+  # that has at least one region-tagged responder. Every Verto captures this
+  # via the "Where do you live?" demographic question, so there's no separate
+  # opt-in gate — an empty result set just renders the "no regional answers
+  # yet" copy.
   def regions
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
 
     # Every responder (answered ≥1 question), not only completers — consistent
-    # with the results comparison above. Only the columns the region grouping +
-    # per-region aggregation read, so rows aren't loaded with all their columns.
+    # with the results comparison above. Only the columns the country grouping
+    # + per-country aggregation read, so rows aren't loaded with all their columns.
     tagged = @survey.responses.where(answered: true).where.not(region_country: nil)
-                    .select(:id, :region_country, :region_label, :answers)
-    groups = tagged.group_by(&:region_key)
-    # Small-cell suppression: a region with fewer than MIN_REGION_SAMPLE_SIZE
-    # respondents never appears on the map/list — see Response for why.
-    rows = groups.filter_map do |key, rs|
+                    .select(:id, :region_country, :answers)
+    groups = tagged.group_by(&:region_country)
+    # Small-cell suppression: a country with fewer than MIN_REGION_SAMPLE_SIZE
+    # respondents never appears on the map/list — see Response for why. Two
+    # respondents self-declaring different sub-regions of the same country
+    # (e.g. "Yorkshire" and "London") count together in one GB group here —
+    # display/aggregation is country-level only; region_label stays on the
+    # Response row but isn't grouped on.
+    rows = groups.filter_map do |country, rs|
       next if rs.size < Response::MIN_REGION_SAMPLE_SIZE
-      sample = rs.first
       {
-        id:           key,
-        country:      sample.region_country,
-        country_name: WorldRegions.name_for(sample.region_country),
-        label:        sample.region_label,
+        id:           country,
+        country:      country,
+        country_name: WorldRegions.name_for(country),
         responders:   rs.size,
         results:      aggregate_rows(rs)
       }

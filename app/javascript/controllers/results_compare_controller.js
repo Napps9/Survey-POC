@@ -30,16 +30,12 @@ export default class extends Controller {
   _selected = new Set()
   _isOpen   = false
   _escHandler = null
-  _resizeHandler = null
   _mapData  = null
   _mapSvg   = null
   _stagePlaceholder = null
   _countryForSegment = {}
   _worldViewBox = null
-  _zoomedCountry = null
   _zoomRaf  = null
-  _pins     = []
-  _boundaryLayer = null
 
   // Compare mode moves the "stage" (map + panel) to <body> for full-screen
   // room, and its interactive bits (close button, picker chips, card
@@ -69,22 +65,16 @@ export default class extends Controller {
 
     this._setupMap()
     this._loadPromise = this._loadData()
-
-    this._resizeHandler = () => this._positionPins()
-    window.addEventListener("resize", this._resizeHandler)
   }
 
   disconnect() {
     if (this._escHandler) document.removeEventListener("keydown", this._escHandler)
-    if (this._resizeHandler) window.removeEventListener("resize", this._resizeHandler)
     if (this._zoomRaf) cancelAnimationFrame(this._zoomRaf)
     this._exitFullscreen()
   }
 
-  // Segments carry a server-resolved lat/lng for pin placement when
-  // available (see SurveysController#results_compare /
-  // NominatimGeocodeClient) alongside a per-country `bounds` map — both
-  // fetched here, no separate request needed.
+  // Segments and their per-question aggregates are fetched here, no
+  // separate request needed.
   async _loadData() {
     try {
       const res = await fetch(this.urlValue, { headers: { "Accept": "application/json" } })
@@ -99,10 +89,10 @@ export default class extends Controller {
     this._paintMap()
   }
 
-  // ── Map: click a region to toggle it into the comparison ────────────────
-  // The SVG only has country-level shapes, so a click toggles ALL of that
-  // country's tagged region segments together — the smallest unit the map
-  // can represent, even when a country holds several distinct regions.
+  // ── Map: click a country to toggle its region segment into the comparison ──
+  // The SVG only has country-level shapes, and segments are now
+  // country-granularity too (one region segment per country), so a click
+  // toggles exactly the one segment tagged to that country.
   _setupMap() {
     this._mapSvg = this._stageEl.querySelector(".world-map")
     const dataEl = document.getElementById("results-region-map-data")
@@ -110,16 +100,6 @@ export default class extends Controller {
     if (!this._mapSvg) return
 
     this._worldViewBox = this._mapSvg.getAttribute("viewBox").trim().split(/\s+/).map(Number)
-
-    // Region outlines are drawn as native SVG paths in their own top-level
-    // group (not nested inside any country's <g>) so _paintMap's per-country
-    // `querySelectorAll("path")` recoloring never touches them, and so they
-    // pan/zoom for free with the map's own viewBox — no per-frame
-    // repositioning like the HTML-overlay pins need. pointer-events: none
-    // lets clicks fall through to the country shape underneath.
-    this._boundaryLayer = document.createElementNS("http://www.w3.org/2000/svg", "g")
-    this._boundaryLayer.setAttribute("class", "region-boundary-layer")
-    this._mapSvg.appendChild(this._boundaryLayer)
 
     Object.entries(this._mapData).forEach(([ cc, d ]) => {
       const el = this._mapSvg.querySelector("#" + cc)
@@ -165,14 +145,13 @@ export default class extends Controller {
     })
   }
 
-  // ── Map zoom: when every compared region shares one country, zoom in and
-  // drop a labeled pin per tagged location. Only active while the compare
-  // panel is open — otherwise the small inline map preview would zoom in on
-  // its own, before the user ever asked to compare anything. ─────────────
+  // ── Map zoom: when every compared segment shares one country, zoom in on
+  // it for a closer look. Only active while the compare panel is open —
+  // otherwise the small inline map preview would zoom in on its own, before
+  // the user ever asked to compare anything. ─────────────────────────────
   _updateMapZoom() {
     if (!this._isOpen || !this._data) {
       this._zoomTo(this._worldViewBox)
-      this._clearPins()
       return
     }
 
@@ -187,13 +166,11 @@ export default class extends Controller {
         const padX = Math.max(bbox.width * 0.4, 8)
         const padY = Math.max(bbox.height * 0.4, 8)
         this._zoomTo([ bbox.x - padX, bbox.y - padY, bbox.width + padX * 2, bbox.height + padY * 2 ])
-        this._renderPins(cc, regionIds.filter(id => this._countryForSegment[id] === cc))
         return
       }
     }
 
     this._zoomTo(this._worldViewBox)
-    this._clearPins()
   }
 
   // Multi-part countries (e.g. the US: mainland + Alaska + Hawaii + islands,
@@ -218,135 +195,9 @@ export default class extends Controller {
       const eased = t < 0.5 ? 2 * t * t : 1 - ((-2 * t + 2) ** 2) / 2
       const cur = start.map((v, i) => v + (targetBox[i] - v) * eased)
       this._mapSvg.setAttribute("viewBox", cur.join(" "))
-      this._positionPins()
       if (t < 1) this._zoomRaf = requestAnimationFrame(step)
     }
     this._zoomRaf = requestAnimationFrame(step)
-  }
-
-  // Placement uses the coordinate the server resolved for this segment
-  // (see _geoFractionFor); falls back to an even split across the
-  // country's shape in _positionPins when unresolved.
-  _renderPins(cc, regionIds) {
-    this._clearPins()
-    this._zoomedCountry = cc
-    const orderedIds = this._data.segments.map(s => s.id).filter(id => regionIds.includes(id))
-    orderedIds.forEach(id => this._renderBoundary(cc, id))
-    this._pins = orderedIds.map((id, i) => {
-      const seg = this._data.segments.find(s => s.id === id)
-      const pin = document.createElement("div")
-      pin.className = "map-pin"
-      pin.innerHTML =
-        `<span class="map-pin-dot" style="background:${this._colorFor(id)}"></span>` +
-        `<span class="map-pin-label">${esc(this._regionNameFor(seg, cc))}</span>`
-      this._mapStageEl.appendChild(pin)
-      return { el: pin, index: i, total: orderedIds.length, lat: seg.lat, lng: seg.lng }
-    })
-    this._positionPins()
-  }
-
-  // Draws the region's real administrative outline when Nominatim resolved
-  // one (see NominatimGeocodeClient#extract_boundary) — each ring's real
-  // lat/lng vertices go through the same country-bbox-fraction mapping as
-  // pin placement (_geoFractionFor), just applied per-vertex instead of to
-  // a single point. Silently does nothing when this segment has no
-  // boundary — the pin drawn in _renderPins is still an honest fallback.
-  _renderBoundary(cc, id) {
-    const seg = this._data.segments.find(s => s.id === id)
-    if (!seg?.boundary?.length) return
-    const countryEl = this._mapSvg.querySelector("#" + cc)
-    if (!countryEl) return
-    const bbox = this._boundsElFor(countryEl).getBBox()
-
-    const d = seg.boundary.map(ring => {
-      const pts = ring.map(([ lng, lat ]) => {
-        const geo = this._geoFractionFor(cc, lat, lng)
-        if (!geo) return null
-        return `${(bbox.x + bbox.width * geo.fracX).toFixed(2)},${(bbox.y + bbox.height * geo.fracY).toFixed(2)}`
-      }).filter(Boolean)
-      return pts.length > 2 ? `M${pts.join("L")}Z` : ""
-    }).filter(Boolean).join(" ")
-    if (!d) return
-
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
-    path.setAttribute("class", "region-boundary")
-    path.setAttribute("d", d)
-    path.style.fill = this._colorFor(id)
-    path.style.stroke = this._colorFor(id)
-    this._boundaryLayer.appendChild(path)
-    this._boundaryLayer.setAttribute("clip-path", `url(#${this._countryClipId(cc, countryEl)})`)
-  }
-
-  // A hand-illustrated map's coastline is only an approximation of the real
-  // one — even correctly-resolved real administrative geometry can poke a
-  // few SVG units past it in spots (a real border area rendering right at
-  // the map's own imprecise edge). Clipping every region outline to the
-  // country's own drawn silhouette means a boundary can never visually spill
-  // into the ocean or a neighboring country, regardless of exactly how far
-  // the illustration and the real coordinates disagree at the coastline.
-  _countryClipId(cc, countryEl) {
-    const clipId = `region-clip-${cc}`
-    if (this._mapSvg.querySelector("#" + clipId)) return clipId
-    let defs = this._mapSvg.querySelector("defs")
-    if (!defs) {
-      defs = document.createElementNS("http://www.w3.org/2000/svg", "defs")
-      this._mapSvg.insertBefore(defs, this._mapSvg.firstChild)
-    }
-    const clipPath = document.createElementNS("http://www.w3.org/2000/svg", "clipPath")
-    clipPath.setAttribute("id", clipId)
-    const boundsEl = this._boundsElFor(countryEl)
-    const shapes = boundsEl.tagName.toLowerCase() === "path" ? [ boundsEl ] : boundsEl.querySelectorAll("path")
-    shapes.forEach(shape => clipPath.appendChild(shape.cloneNode(false)))
-    defs.appendChild(clipPath)
-    return clipId
-  }
-
-  _clearPins() {
-    this._pins.forEach(p => p.el.remove())
-    this._pins = []
-    this._zoomedCountry = null
-    if (this._boundaryLayer) this._boundaryLayer.replaceChildren()
-  }
-
-  // Uses the coordinate resolved server-side (see
-  // SurveysController#results_compare / NominatimGeocodeClient) against the
-  // country's real geographic bounds (CountryBoundingBoxes) when both are
-  // available; falls back to an even split across the country's shape
-  // otherwise — e.g. Nominatim had no match for this particular tag, or the
-  // country isn't in the (curated, ~170-country) bounds table.
-  _geoFractionFor(cc, lat, lng) {
-    const bounds = this._data.bounds?.[cc]
-    if (!bounds || lat == null || lng == null) return null
-    const [ minLat, maxLat, minLng, maxLng ] = bounds
-    return {
-      fracX: Math.min(1, Math.max(0, (lng - minLng) / (maxLng - minLng))),
-      fracY: Math.min(1, Math.max(0, (maxLat - lat) / (maxLat - minLat)))
-    }
-  }
-
-  _positionPins() {
-    if (!this._pins.length || !this._zoomedCountry || !this._mapSvg) return
-    const countryEl = this._mapSvg.querySelector("#" + this._zoomedCountry)
-    const ctm = this._mapSvg.getScreenCTM()
-    if (!countryEl || !ctm) return
-    const bbox = this._boundsElFor(countryEl).getBBox()
-    const stageRect = this._mapStageEl.getBoundingClientRect()
-    this._pins.forEach(({ el, index, total, lat, lng }) => {
-      const geo = this._geoFractionFor(this._zoomedCountry, lat, lng)
-      const fracX = geo ? geo.fracX : (index + 1) / (total + 1)
-      const fracY = geo ? geo.fracY : 0.5
-      const pt = this._mapSvg.createSVGPoint()
-      pt.x = bbox.x + bbox.width * fracX
-      pt.y = bbox.y + bbox.height * fracY
-      const screen = pt.matrixTransform(ctm)
-      el.style.left = `${screen.x - stageRect.left}px`
-      el.style.top = `${screen.y - stageRect.top}px`
-    })
-  }
-
-  _regionNameFor(seg, cc) {
-    const prefix = "🌍 " + (this._mapData[cc]?.name || "") + " · "
-    return seg.label.startsWith(prefix) ? seg.label.slice(prefix.length) : seg.label
   }
 
   // ── Panel open/close (full-screen) ──────────────────────────────────────
