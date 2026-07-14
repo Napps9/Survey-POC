@@ -246,6 +246,8 @@ pl:
     creator_eyebrow: Partnerstwo · Ty je prowadzisz
     partner_eyebrow: Partnerstwo · Członek
     generate_link: Wygeneruj link dołączenia →
+    add_account: "+ Utwórz konto dla partnera"
+    setup_pending: "Oczekuje na konfigurację"
     delete: Usuń
     delete_confirm: Usunąć %{name}? Wszystkie linki udostępniania tego partnerstwa przestaną działać.
     new_link_heading: Nowy link dołączenia
@@ -289,6 +291,29 @@ pl:
     from_org: Od %{org}
     your_link: Twój link
     results_link: Wyniki →
+  partnership_accounts:
+    title: "Utwórz konto — %{partnership}"
+    heading: "Utwórz konto dla partnera"
+    subtitle: "Skonfigurujemy organizację partnera i wyślemy e-mailem link do ustawienia hasła dla %{partnership}."
+    name_label: "Imię i nazwisko partnera"
+    name_placeholder: "Jamie Rivera"
+    email_label: "E-mail partnera"
+    email_placeholder: "jamie@partner.org"
+    org_label: "Nazwa organizacji partnera"
+    org_placeholder: "Riverside Youth Trust"
+    submit: "Utwórz konto →"
+    cancel: "Anuluj"
+    missing_fields: "Imię i nazwisko, e-mail oraz nazwa organizacji są wymagane."
+    email_taken: "%{email} ma już konto Playverto — zamiast tego wyślij link dołączenia, aby połączyć istniejącą organizację."
+    created: "Utworzono konto dla %{email} — wysłano wiadomość e-mail z instrukcjami ustawienia hasła i rozpoczęcia pracy."
+  partner_account_setups:
+    title: "Ustaw hasło — Playverto"
+    heading: "Ustaw hasło"
+    subtitle: "Witaj, %{name} — ustaw hasło, aby dokończyć konfigurację konta."
+    submit: "Ustaw hasło i kontynuuj →"
+    welcome: "Witaj! Twoje hasło zostało ustawione."
+    invalid_link: "Ten link konfiguracyjny jest nieprawidłowy lub wygasł. Poproś administratora swojego partnerstwa o ponowne wysłanie."
+    password_mismatch: "Hasła nie są zgodne."
   partnership_verto:
     title: "%{title} — Udostępnione Verto"
     from_org_partnership: Od %{org} · %{partnership}

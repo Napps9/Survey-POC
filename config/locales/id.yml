@@ -246,6 +246,8 @@ id:
     creator_eyebrow: Kemitraan · Anda mengelola ini
     partner_eyebrow: Kemitraan · Anggota
     generate_link: Buat tautan bergabung →
+    add_account: "+ Buat akun untuk mitra"
+    setup_pending: Penyiapan tertunda
     delete: Hapus
     delete_confirm: Hapus %{name}? Semua tautan berbagi untuk kemitraan ini akan berhenti berfungsi.
     new_link_heading: Tautan bergabung baru
@@ -289,6 +291,29 @@ id:
     from_org: Dari %{org}
     your_link: Tautan Anda
     results_link: Hasil →
+  partnership_accounts:
+    title: "Buat akun — %{partnership}"
+    heading: Buat akun untuk mitra
+    subtitle: Kami akan menyiapkan organisasi mereka dan mengirimkan tautan lewat email untuk memilih kata sandi mereka sendiri untuk %{partnership}.
+    name_label: Nama mereka
+    name_placeholder: Jamie Rivera
+    email_label: Email mereka
+    email_placeholder: jamie@partner.org
+    org_label: Nama organisasi mereka
+    org_placeholder: Riverside Youth Trust
+    submit: Buat akun →
+    cancel: Batal
+    missing_fields: Nama, email, dan nama organisasi semuanya wajib diisi.
+    email_taken: "%{email} sudah memiliki akun Playverto — kirimkan tautan bergabung sebagai gantinya agar mereka dapat menghubungkan organisasi mereka yang sudah ada."
+    created: Akun untuk %{email} telah dibuat — mereka telah menerima email berisi petunjuk untuk mengatur kata sandi dan memulai.
+  partner_account_setups:
+    title: "Atur kata sandi Anda — Playverto"
+    heading: Atur kata sandi Anda
+    subtitle: Selamat datang, %{name} — pilih kata sandi untuk menyelesaikan penyiapan akun Anda.
+    submit: Atur kata sandi dan lanjutkan →
+    welcome: Selamat datang! Kata sandi Anda telah diatur.
+    invalid_link: Tautan penyiapan ini tidak valid atau telah kedaluwarsa. Mintalah admin kemitraan Anda untuk mengirimkannya kembali.
+    password_mismatch: Kata sandi tidak cocok.
   partnership_verto:
     title: "%{title} — Verto Dibagikan"
     from_org_partnership: Dari %{org} · %{partnership}

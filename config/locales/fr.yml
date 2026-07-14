@@ -246,6 +246,8 @@ fr:
     creator_eyebrow: Partenariat · Vous le gérez
     partner_eyebrow: Partenariat · Membre
     generate_link: Générer un lien d'invitation →
+    add_account: "+ Créer un compte pour un partenaire"
+    setup_pending: Configuration en attente
     delete: Supprimer
     delete_confirm: Supprimer %{name} ? Tous les liens de partage de ce partenariat cesseront de fonctionner.
     new_link_heading: Nouveau lien d'invitation
@@ -289,6 +291,29 @@ fr:
     from_org: De %{org}
     your_link: Votre lien
     results_link: Résultats →
+  partnership_accounts:
+    title: "Créer un compte — %{partnership}"
+    heading: Créer un compte pour un partenaire
+    subtitle: Nous configurerons son organisation et lui enverrons un lien par e-mail pour choisir son propre mot de passe pour %{partnership}.
+    name_label: Son nom
+    name_placeholder: Jamie Rivera
+    email_label: Son e-mail
+    email_placeholder: jamie@partner.org
+    org_label: Le nom de son organisation
+    org_placeholder: Riverside Youth Trust
+    submit: Créer le compte →
+    cancel: Annuler
+    missing_fields: Le nom, l'e-mail et le nom de l'organisation sont tous requis.
+    email_taken: "%{email} possède déjà un compte Playverto — envoyez-lui plutôt un lien d'invitation afin qu'il puisse relier son organisation existante."
+    created: Compte créé pour %{email} — la personne a reçu par e-mail les instructions pour définir son mot de passe et démarrer.
+  partner_account_setups:
+    title: "Définir votre mot de passe — Playverto"
+    heading: Définissez votre mot de passe
+    subtitle: Bienvenue, %{name} — choisissez un mot de passe pour terminer la configuration de votre compte.
+    submit: Définir le mot de passe et continuer →
+    welcome: Bienvenue ! Votre mot de passe est défini.
+    invalid_link: Ce lien de configuration n'est pas valide ou a expiré. Demandez à l'administrateur de votre partenariat de vous le renvoyer.
+    password_mismatch: Les mots de passe ne correspondaient pas.
   partnership_verto:
     title: "%{title} — Verto partagé"
     from_org_partnership: De %{org} · %{partnership}

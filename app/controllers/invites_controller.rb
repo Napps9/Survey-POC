@@ -230,11 +230,7 @@ class InvitesController < ApplicationController
   end
 
   def join_partnership(partner_org, partnership)
-    PartnershipMembership.find_or_create_by!(
-      partnership: partnership,
-      organisation: partner_org
-    ) { |m| m.status = "active" }
-    PartnershipShareSync.ensure_shares_for(partnership: partnership)
+    PartnershipMembership.join!(partnership: partnership, organisation: partner_org)
   end
 
   # Populates Current.user if there's a valid session cookie. Used by the

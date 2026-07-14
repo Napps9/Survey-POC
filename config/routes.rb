@@ -106,8 +106,13 @@ Rails.application.routes.draw do
   # Partnerships — named groups of orgs
   resources :partnerships, except: [ :edit, :update ] do
     resources :partnership_invites,     only: [ :create ]
+    resources :partnership_accounts,    only: [ :new, :create ]
     resources :partnership_vertos,      only: [ :create, :destroy, :show ]
     resources :partnership_common_question_sets, only: [ :create, :destroy ]
     resources :partnership_memberships, only: [ :destroy ]
   end
+
+  # Owner-created partner account: partner sets their own password here
+  # (emailed by PartnershipAccountMailer), never told it by the owner.
+  resources :partner_account_setups, param: :token, only: [ :edit, :update ]
 end

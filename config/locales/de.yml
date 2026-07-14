@@ -246,6 +246,8 @@ de:
     creator_eyebrow: Partnerschaft · Von Ihnen geführt
     partner_eyebrow: Partnerschaft · Mitglied
     generate_link: Beitrittslink erstellen →
+    add_account: "+ Konto für einen Partner erstellen"
+    setup_pending: Einrichtung ausstehend
     delete: Löschen
     delete_confirm: "%{name} löschen? Alle Freigabelinks für diese Partnerschaft werden ungültig."
     new_link_heading: Neuer Beitrittslink
@@ -289,6 +291,29 @@ de:
     from_org: Von %{org}
     your_link: Ihr Link
     results_link: Ergebnisse →
+  partnership_accounts:
+    title: "Konto erstellen — %{partnership}"
+    heading: Konto für einen Partner erstellen
+    subtitle: Wir richten die Organisation ein und senden ihr per E-Mail einen Link, um ein eigenes Passwort für %{partnership} zu wählen.
+    name_label: Name des Partners
+    name_placeholder: Jamie Rivera
+    email_label: E-Mail-Adresse des Partners
+    email_placeholder: jamie@partner.org
+    org_label: Name der Organisation des Partners
+    org_placeholder: Riverside Youth Trust
+    submit: Konto erstellen →
+    cancel: Abbrechen
+    missing_fields: Name, E-Mail-Adresse und Name der Organisation sind erforderlich.
+    email_taken: "%{email} hat bereits ein Playverto-Konto — senden Sie stattdessen einen Beitrittslink, damit die bestehende Organisation verknüpft werden kann."
+    created: Konto für %{email} erstellt — die Person hat eine E-Mail mit Anweisungen zum Festlegen des Passworts und Loslegen erhalten.
+  partner_account_setups:
+    title: "Passwort festlegen — Playverto"
+    heading: Legen Sie Ihr Passwort fest
+    subtitle: Willkommen, %{name} — wählen Sie ein Passwort, um die Einrichtung Ihres Kontos abzuschließen.
+    submit: Passwort festlegen und fortfahren →
+    welcome: Willkommen! Ihr Passwort wurde festgelegt.
+    invalid_link: Dieser Einrichtungslink ist ungültig oder abgelaufen. Bitten Sie den Administrator Ihrer Partnerschaft, ihn erneut zu senden.
+    password_mismatch: Die Passwörter stimmten nicht überein.
   partnership_verto:
     title: "%{title} — Geteiltes Verto"
     from_org_partnership: Von %{org} · %{partnership}

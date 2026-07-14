@@ -38,6 +38,8 @@
 
           <% if is_admin %>
             <div style="display:flex;gap:10px;">
+              <%= link_to t("partnerships.add_account"), new_partnership_partnership_account_path(@partnership),
+                    style: "background:none;border:1px solid rgba(255,30,111,0.4);border-radius:100px;padding:9px 19px;color:#FF1E6F;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;text-decoration:none;" %>
               <%= button_to t("partnerships.generate_link"), partnership_partnership_invites_path(@partnership), method: :post,
                     style: "background:#FF1E6F;border:none;border-radius:100px;padding:10px 20px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;cursor:pointer;",
                     form: { style: "margin:0;" } %>
@@ -100,7 +102,12 @@
                 <%= m.organisation.name.first.upcase %>
               </div>
               <div style="flex:1;min-width:0;">
-                <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= m.organisation.name %></div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= m.organisation.name %></span>
+                  <% if m.setup_pending? %>
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:100px;background:rgba(255,193,7,0.15);color:#FFC107;white-space:nowrap;flex-shrink:0;"><%= t("partnerships.setup_pending") %></span>
+                  <% end %>
+                </div>
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("partnerships.joined_on", date: l(m.created_at.to_date, format: :long, default: m.created_at.to_date.to_s)) %></div>
               </div>
               <% if is_admin %>

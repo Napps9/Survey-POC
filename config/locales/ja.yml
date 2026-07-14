@@ -246,6 +246,8 @@ ja:
     creator_eyebrow: パートナーシップ · あなたが運営
     partner_eyebrow: パートナーシップ · メンバー
     generate_link: 参加リンクを生成 →
+    add_account: "+ パートナー用のアカウントを作成"
+    setup_pending: 設定待ち
     delete: 削除
     delete_confirm: "%{name} を削除しますか?このパートナーシップのすべての共有リンクが無効になります。"
     new_link_heading: 新しい参加リンク
@@ -289,6 +291,29 @@ ja:
     from_org: "%{org} より"
     your_link: あなたのリンク
     results_link: 結果 →
+  partnership_accounts:
+    title: "アカウントを作成 — %{partnership}"
+    heading: パートナー用のアカウントを作成
+    subtitle: 相手の組織を設定し、%{partnership} 用のパスワードを選択するためのリンクをメールでお送りします。
+    name_label: 相手の名前
+    name_placeholder: ジェイミー・リベラ
+    email_label: 相手のメールアドレス
+    email_placeholder: jamie@partner.org
+    org_label: 相手の組織名
+    org_placeholder: Riverside Youth Trust
+    submit: アカウントを作成 →
+    cancel: キャンセル
+    missing_fields: 名前、メールアドレス、組織名はすべて必須です。
+    email_taken: "%{email} はすでに Playverto アカウントを持っています — 代わりに参加リンクを送って、既存の組織と連携してもらいましょう。"
+    created: "%{email} のアカウントを作成しました — パスワード設定と開始方法の案内をメールで送信しました。"
+  partner_account_setups:
+    title: "パスワードを設定 — Playverto"
+    heading: パスワードを設定
+    subtitle: "ようこそ、%{name} さん — アカウントの設定を完了するためにパスワードを選択してください。"
+    submit: パスワードを設定して続ける →
+    welcome: ようこそ！パスワードが設定されました。
+    invalid_link: この設定リンクは無効か期限切れです。パートナーシップの管理者に再送を依頼してください。
+    password_mismatch: パスワードが一致しませんでした。
   partnership_verto:
     title: "%{title} — 共有された Verto"
     from_org_partnership: "%{org} より · %{partnership}"

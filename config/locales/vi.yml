@@ -246,6 +246,8 @@ vi:
     creator_eyebrow: Nhóm đối tác · Bạn quản lý
     partner_eyebrow: Nhóm đối tác · Thành viên
     generate_link: Tạo liên kết tham gia →
+    add_account: "+ Tạo tài khoản cho đối tác"
+    setup_pending: "Đang chờ thiết lập"
     delete: Xóa
     delete_confirm: Xóa %{name}? Tất cả liên kết chia sẻ cho nhóm đối tác này sẽ ngừng hoạt động.
     new_link_heading: Liên kết tham gia mới
@@ -289,6 +291,29 @@ vi:
     from_org: Từ %{org}
     your_link: Liên kết của bạn
     results_link: Kết quả →
+  partnership_accounts:
+    title: "Tạo tài khoản — %{partnership}"
+    heading: "Tạo tài khoản cho đối tác"
+    subtitle: "Chúng tôi sẽ thiết lập tổ chức của đối tác và gửi email kèm liên kết để họ tự chọn mật khẩu cho %{partnership}."
+    name_label: "Tên của đối tác"
+    name_placeholder: "Jamie Rivera"
+    email_label: "Email của đối tác"
+    email_placeholder: "jamie@partner.org"
+    org_label: "Tên tổ chức của đối tác"
+    org_placeholder: "Riverside Youth Trust"
+    submit: "Tạo tài khoản →"
+    cancel: "Hủy"
+    missing_fields: "Tên, email và tên tổ chức đều là bắt buộc."
+    email_taken: "%{email} đã có tài khoản Playverto — hãy gửi liên kết tham gia thay vào đó để họ có thể liên kết tổ chức hiện có của mình."
+    created: "Đã tạo tài khoản cho %{email} — họ đã được gửi email hướng dẫn đặt mật khẩu và bắt đầu."
+  partner_account_setups:
+    title: "Đặt mật khẩu của bạn — Playverto"
+    heading: "Đặt mật khẩu của bạn"
+    subtitle: "Chào mừng, %{name} — hãy chọn một mật khẩu để hoàn tất thiết lập tài khoản của bạn."
+    submit: "Đặt mật khẩu và tiếp tục →"
+    welcome: "Chào mừng! Mật khẩu của bạn đã được đặt."
+    invalid_link: "Liên kết thiết lập này không hợp lệ hoặc đã hết hạn. Hãy đề nghị quản trị viên của nhóm đối tác gửi lại liên kết này."
+    password_mismatch: "Mật khẩu không khớp."
   partnership_verto:
     title: "%{title} — Verto được chia sẻ"
     from_org_partnership: Từ %{org} · %{partnership}

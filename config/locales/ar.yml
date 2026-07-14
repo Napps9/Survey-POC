@@ -246,6 +246,8 @@ ar:
     creator_eyebrow: شراكة · أنت تديرها
     partner_eyebrow: شراكة · عضو
     generate_link: إنشاء رابط الانضمام ←
+    add_account: "+ إنشاء حساب لشريك"
+    setup_pending: الإعداد قيد الانتظار
     delete: حذف
     delete_confirm: حذف %{name}؟ ستتوقف جميع روابط المشاركة لهذه الشراكة عن العمل.
     new_link_heading: رابط انضمام جديد
@@ -289,6 +291,29 @@ ar:
     from_org: من %{org}
     your_link: رابطك
     results_link: النتائج ←
+  partnership_accounts:
+    title: "إنشاء حساب — %{partnership}"
+    heading: إنشاء حساب لشريك
+    subtitle: سنقوم بإعداد مؤسسته ونرسل له عبر البريد الإلكتروني رابطًا لاختيار كلمة المرور الخاصة به لـ %{partnership}.
+    name_label: اسم الشريك
+    name_placeholder: جيمي ريفيرا
+    email_label: البريد الإلكتروني للشريك
+    email_placeholder: jamie@partner.org
+    org_label: اسم مؤسسة الشريك
+    org_placeholder: Riverside Youth Trust
+    submit: إنشاء الحساب ←
+    cancel: إلغاء
+    missing_fields: الاسم والبريد الإلكتروني واسم المؤسسة كلها مطلوبة.
+    email_taken: لدى %{email} حساب Playverto بالفعل — أرسل له رابط انضمام بدلاً من ذلك حتى يتمكن من ربط مؤسسته الحالية.
+    created: تم إنشاء حساب لـ %{email} — تم إرسال تعليمات إليه عبر البريد الإلكتروني لتعيين كلمة المرور والبدء.
+  partner_account_setups:
+    title: "تعيين كلمة المرور — Playverto"
+    heading: عيّن كلمة المرور الخاصة بك
+    subtitle: "أهلاً بك يا %{name} — اختر كلمة مرور لإكمال إعداد حسابك."
+    submit: تعيين كلمة المرور والمتابعة ←
+    welcome: أهلاً بك! تم تعيين كلمة المرور الخاصة بك.
+    invalid_link: رابط الإعداد هذا غير صالح أو منتهي الصلاحية. اطلب من مسؤول شراكتك إعادة إرساله.
+    password_mismatch: كلمتا المرور غير متطابقتين.
   partnership_verto:
     title: "%{title} — Verto مشترك"
     from_org_partnership: من %{org} · %{partnership}

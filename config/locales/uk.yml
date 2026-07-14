@@ -246,6 +246,8 @@ uk:
     creator_eyebrow: Партнерство · Ви керуєте
     partner_eyebrow: Партнерство · Учасник
     generate_link: Створити посилання для приєднання →
+    add_account: "+ Створити акаунт для партнера"
+    setup_pending: "Очікує налаштування"
     delete: Видалити
     delete_confirm: Видалити %{name}? Усі посилання для поширення цього партнерства перестануть працювати.
     new_link_heading: Нове посилання для приєднання
@@ -289,6 +291,29 @@ uk:
     from_org: Від %{org}
     your_link: Ваше посилання
     results_link: Результати →
+  partnership_accounts:
+    title: "Створити акаунт — %{partnership}"
+    heading: "Створити акаунт для партнера"
+    subtitle: "Ми налаштуємо організацію партнера та надішлемо на email посилання для вибору пароля в %{partnership}."
+    name_label: "Ім'я партнера"
+    name_placeholder: "Jamie Rivera"
+    email_label: "Електронна пошта партнера"
+    email_placeholder: "jamie@partner.org"
+    org_label: "Назва організації партнера"
+    org_placeholder: "Riverside Youth Trust"
+    submit: "Створити акаунт →"
+    cancel: "Скасувати"
+    missing_fields: "Ім'я, електронна пошта та назва організації є обов'язковими."
+    email_taken: "%{email} вже має акаунт Playverto — натомість надішліть посилання для приєднання, щоб приєднати наявну організацію."
+    created: "Акаунт для %{email} створено — на цю адресу надіслано інструкції щодо встановлення пароля та початку роботи."
+  partner_account_setups:
+    title: "Встановіть пароль — Playverto"
+    heading: "Встановіть пароль"
+    subtitle: "Ласкаво просимо, %{name} — виберіть пароль, щоб завершити налаштування акаунта."
+    submit: "Встановити пароль і продовжити →"
+    welcome: "Ласкаво просимо! Ваш пароль встановлено."
+    invalid_link: "Це посилання для налаштування недійсне або термін його дії минув. Попросіть адміністратора вашого партнерства надіслати його повторно."
+    password_mismatch: "Паролі не збігаються."
   partnership_verto:
     title: "%{title} — Спільний Verto"
     from_org_partnership: Від %{org} · %{partnership}

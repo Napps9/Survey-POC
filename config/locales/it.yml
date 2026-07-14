@@ -246,6 +246,8 @@ it:
     creator_eyebrow: Partnership · La gestisci tu
     partner_eyebrow: Partnership · Membro
     generate_link: Genera link di adesione →
+    add_account: "+ Crea account per un partner"
+    setup_pending: Configurazione in attesa
     delete: Elimina
     delete_confirm: Eliminare %{name}? Tutti i link di condivisione di questa partnership smetteranno di funzionare.
     new_link_heading: Nuovo link di adesione
@@ -289,6 +291,29 @@ it:
     from_org: Da %{org}
     your_link: Il tuo link
     results_link: Risultati →
+  partnership_accounts:
+    title: "Crea account — %{partnership}"
+    heading: Crea un account per un partner
+    subtitle: Configureremo la sua organizzazione e gli invieremo un link via email per scegliere la propria password per %{partnership}.
+    name_label: Il suo nome
+    name_placeholder: Jamie Rivera
+    email_label: La sua email
+    email_placeholder: jamie@partner.org
+    org_label: Il nome della sua organizzazione
+    org_placeholder: Riverside Youth Trust
+    submit: Crea account →
+    cancel: Annulla
+    missing_fields: Nome, email e nome dell'organizzazione sono tutti obbligatori.
+    email_taken: "%{email} ha già un account Playverto — invia invece un link di adesione così potrà collegare la sua organizzazione esistente."
+    created: Account creato per %{email} — ha ricevuto via email le istruzioni per impostare la password e iniziare.
+  partner_account_setups:
+    title: "Imposta la tua password — Playverto"
+    heading: Imposta la tua password
+    subtitle: Benvenuto/a, %{name} — scegli una password per completare la configurazione del tuo account.
+    submit: Imposta password e continua →
+    welcome: Benvenuto/a! La tua password è stata impostata.
+    invalid_link: Questo link di configurazione non è valido o è scaduto. Chiedi all'amministratore della tua partnership di inviartelo di nuovo.
+    password_mismatch: Le password non corrispondevano.
   partnership_verto:
     title: "%{title} — Verto condiviso"
     from_org_partnership: Da %{org} · %{partnership}

@@ -38,4 +38,12 @@ class User < ApplicationRecord
   generates_token_for :password_reset, expires_in: 15.minutes do
     password_salt&.last(10)
   end
+
+  # Powers PartnershipAccountsController + PartnerAccountSetupsController: an
+  # owner-created partner account has a random, discarded password until the
+  # partner follows the emailed link to set their own. A week (vs. the 15
+  # minutes above) gives them realistic time to check email.
+  generates_token_for :account_setup, expires_in: 7.days do
+    password_salt&.last(10)
+  end
 end

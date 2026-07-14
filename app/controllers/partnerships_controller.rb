@@ -81,7 +81,7 @@ class PartnershipsController < ApplicationController
   end
 
   def load_creator_show_data
-    @memberships = @partnership.partnership_memberships.includes(:organisation).order(:created_at)
+    @memberships = @partnership.partnership_memberships.includes(organisation: { memberships: :user }).order(:created_at)
     @partnership_vertos = @partnership.partnership_vertos.includes(:survey).order(:created_at)
 
     av_ids = @partnership_vertos.map(&:id)

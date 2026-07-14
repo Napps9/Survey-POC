@@ -246,6 +246,8 @@ sw:
     creator_eyebrow: Ushirikiano · Wewe unauendesha
     partner_eyebrow: Ushirikiano · Mwanachama
     generate_link: Tengeneza kiungo cha kujiunga →
+    add_account: "+ Fungua akaunti kwa mshirika"
+    setup_pending: "Usanidi unasubiri"
     delete: Futa
     delete_confirm: Futa %{name}? Viungo vyote vya kushiriki vya ushirikiano huu vitaacha kufanya kazi.
     new_link_heading: Kiungo kipya cha kujiunga
@@ -289,6 +291,29 @@ sw:
     from_org: Kutoka %{org}
     your_link: Kiungo chako
     results_link: Matokeo →
+  partnership_accounts:
+    title: "Fungua akaunti — %{partnership}"
+    heading: "Fungua akaunti kwa mshirika"
+    subtitle: "Tutasanidi shirika la mshirika na kumtumia barua pepe yenye kiungo cha kuchagua nenosiri lake mwenyewe kwa ajili ya %{partnership}."
+    name_label: "Jina la mshirika"
+    name_placeholder: "Jamie Rivera"
+    email_label: "Barua pepe ya mshirika"
+    email_placeholder: "jamie@partner.org"
+    org_label: "Jina la shirika la mshirika"
+    org_placeholder: "Riverside Youth Trust"
+    submit: "Fungua akaunti →"
+    cancel: "Ghairi"
+    missing_fields: "Jina, barua pepe, na jina la shirika vinahitajika."
+    email_taken: "%{email} tayari ana akaunti ya Playverto — badala yake mtumie kiungo cha kujiunga ili aweze kuunganisha shirika lake lililopo."
+    created: "Akaunti imeundwa kwa ajili ya %{email} — ametumiwa barua pepe yenye maelekezo ya kuweka nenosiri na kuanza."
+  partner_account_setups:
+    title: "Weka nenosiri lako — Playverto"
+    heading: "Weka nenosiri lako"
+    subtitle: "Karibu, %{name} — chagua nenosiri ili kukamilisha usanidi wa akaunti yako."
+    submit: "Weka nenosiri na uendelee →"
+    welcome: "Karibu! Nenosiri lako limewekwa."
+    invalid_link: "Kiungo hiki cha usanidi si sahihi au kimeisha muda wake. Muombe msimamizi wa ushirikiano wako akitume tena."
+    password_mismatch: "Manenosiri hayakufanana."
   partnership_verto:
     title: "%{title} — Verto Iliyoshirikishwa"
     from_org_partnership: Kutoka %{org} · %{partnership}

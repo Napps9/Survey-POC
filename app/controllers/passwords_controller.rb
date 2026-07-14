@@ -27,6 +27,7 @@ class PasswordsController < ApplicationController
 
   def update
     if @user.update(params.permit(:password, :password_confirmation))
+      @user.update!(password_pending: false) if @user.password_pending?
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: "Password has been reset. Sign in with your new password."
     else

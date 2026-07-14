@@ -246,6 +246,8 @@ tr:
     creator_eyebrow: Ortaklık · Bunu siz yönetiyorsunuz
     partner_eyebrow: Ortaklık · Üye
     generate_link: Katılım bağlantısı oluştur →
+    add_account: "+ Ortak için hesap oluştur"
+    setup_pending: "Kurulum bekleniyor"
     delete: Sil
     delete_confirm: "%{name} silinsin mi? Bu ortaklık için tüm paylaşım bağlantıları çalışmayı durduracak."
     new_link_heading: Yeni katılım bağlantısı
@@ -289,6 +291,29 @@ tr:
     from_org: "%{org} tarafından"
     your_link: Bağlantınız
     results_link: Sonuçlar →
+  partnership_accounts:
+    title: "Hesap oluştur — %{partnership}"
+    heading: "Bir ortak için hesap oluştur"
+    subtitle: "Kuruluşlarını ayarlayacak ve %{partnership} için kendi şifrelerini seçmeleri amacıyla e-posta ile bir bağlantı göndereceğiz."
+    name_label: "Ortağın adı"
+    name_placeholder: "Jamie Rivera"
+    email_label: "Ortağın e-postası"
+    email_placeholder: "jamie@partner.org"
+    org_label: "Ortağın kuruluşunun adı"
+    org_placeholder: "Riverside Youth Trust"
+    submit: "Hesap oluştur →"
+    cancel: "İptal"
+    missing_fields: "Ad, e-posta ve kuruluş adı zorunludur."
+    email_taken: "%{email} adresinin zaten bir Playverto hesabı var — bunun yerine mevcut kuruluşlarını bağlayabilmeleri için bir katılım bağlantısı gönderin."
+    created: "%{email} için hesap oluşturuldu — şifrelerini belirleyip başlamalarına yönelik talimatlar kendilerine e-postayla gönderildi."
+  partner_account_setups:
+    title: "Şifrenizi belirleyin — Playverto"
+    heading: "Şifrenizi belirleyin"
+    subtitle: "Hoş geldiniz, %{name} — hesabınızın kurulumunu tamamlamak için bir şifre belirleyin."
+    submit: "Şifreyi belirle ve devam et →"
+    welcome: "Hoş geldiniz! Şifreniz belirlendi."
+    invalid_link: "Bu kurulum bağlantısının süresi dolmuş veya geçersiz. Ortaklığınızın yöneticisinden bağlantıyı yeniden göndermesini isteyin."
+    password_mismatch: "Şifreler eşleşmedi."
   partnership_verto:
     title: "%{title} — Paylaşılan Verto"
     from_org_partnership: "%{org} · %{partnership} tarafından"

@@ -246,6 +246,8 @@ nl:
     creator_eyebrow: Partnerschap · Jij beheert dit
     partner_eyebrow: Partnerschap · Lid
     generate_link: Deelnamelink genereren →
+    add_account: "+ Account aanmaken voor een partner"
+    setup_pending: "Instellen in afwachting"
     delete: Verwijderen
     delete_confirm: "%{name} verwijderen? Alle deellinks voor dit partnerschap zullen niet meer werken."
     new_link_heading: Nieuwe deelnamelink
@@ -289,6 +291,29 @@ nl:
     from_org: Van %{org}
     your_link: Jouw link
     results_link: Resultaten →
+  partnership_accounts:
+    title: "Account aanmaken — %{partnership}"
+    heading: "Een account aanmaken voor een partner"
+    subtitle: "We stellen hun organisatie in en sturen hen een link om hun eigen wachtwoord te kiezen voor %{partnership}."
+    name_label: "Hun naam"
+    name_placeholder: "Jamie Rivera"
+    email_label: "Hun e-mail"
+    email_placeholder: "jamie@partner.org"
+    org_label: "Naam van hun organisatie"
+    org_placeholder: "Riverside Youth Trust"
+    submit: "Account aanmaken →"
+    cancel: "Annuleren"
+    missing_fields: "Naam, e-mail en organisatienaam zijn allemaal verplicht."
+    email_taken: "%{email} heeft al een Playverto-account — stuur in plaats daarvan een deelnamelink zodat de bestaande organisatie gekoppeld kan worden."
+    created: "Account aangemaakt voor %{email} — er is een e-mail gestuurd met instructies om het wachtwoord in te stellen en aan de slag te gaan."
+  partner_account_setups:
+    title: "Stel je wachtwoord in — Playverto"
+    heading: "Stel je wachtwoord in"
+    subtitle: "Welkom, %{name} — kies een wachtwoord om je account af te ronden."
+    submit: "Wachtwoord instellen en doorgaan →"
+    welcome: "Welkom! Je wachtwoord is ingesteld."
+    invalid_link: "Deze link is ongeldig of verlopen. Vraag de beheerder van je partnerschap om hem opnieuw te versturen."
+    password_mismatch: "Wachtwoorden kwamen niet overeen."
   partnership_verto:
     title: "%{title} — Gedeelde Verto"
     from_org_partnership: Van %{org} · %{partnership}

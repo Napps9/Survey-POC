@@ -246,6 +246,8 @@ ru:
     creator_eyebrow: Партнёрство · Вы управляете
     partner_eyebrow: Партнёрство · Участник
     generate_link: Создать ссылку для присоединения →
+    add_account: "+ Создать аккаунт для партнёра"
+    setup_pending: "Ожидает настройки"
     delete: Удалить
     delete_confirm: Удалить %{name}? Все ссылки для распространения этого партнёрства перестанут работать.
     new_link_heading: Новая ссылка для присоединения
@@ -289,6 +291,29 @@ ru:
     from_org: От %{org}
     your_link: Ваша ссылка
     results_link: Результаты →
+  partnership_accounts:
+    title: "Создать аккаунт — %{partnership}"
+    heading: "Создать аккаунт для партнёра"
+    subtitle: "Мы настроим организацию партнёра и отправим на email ссылку для выбора пароля в %{partnership}."
+    name_label: "Имя партнёра"
+    name_placeholder: "Jamie Rivera"
+    email_label: "Эл. почта партнёра"
+    email_placeholder: "jamie@partner.org"
+    org_label: "Название организации партнёра"
+    org_placeholder: "Riverside Youth Trust"
+    submit: "Создать аккаунт →"
+    cancel: "Отмена"
+    missing_fields: "Имя, email и название организации обязательны для заполнения."
+    email_taken: "У %{email} уже есть аккаунт Playverto — отправьте ссылку для присоединения, чтобы связать существующую организацию."
+    created: "Аккаунт для %{email} создан — на этот адрес отправлены инструкции по настройке пароля и началу работы."
+  partner_account_setups:
+    title: "Установите пароль — Playverto"
+    heading: "Установите пароль"
+    subtitle: "Добро пожаловать, %{name} — выберите пароль, чтобы завершить настройку аккаунта."
+    submit: "Установить пароль и продолжить →"
+    welcome: "Добро пожаловать! Пароль установлен."
+    invalid_link: "Эта ссылка для настройки недействительна или срок её действия истёк. Попросите администратора вашего партнёрства отправить её повторно."
+    password_mismatch: "Пароли не совпадают."
   partnership_verto:
     title: "%{title} — Общий Verto"
     from_org_partnership: От %{org} · %{partnership}

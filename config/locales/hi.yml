@@ -246,6 +246,8 @@ hi:
     creator_eyebrow: साझेदारी · आप इसे चलाते हैं
     partner_eyebrow: साझेदारी · सदस्य
     generate_link: जॉइन लिंक बनाएं →
+    add_account: "+ साथी के लिए खाता बनाएं"
+    setup_pending: सेटअप लंबित
     delete: हटाएं
     delete_confirm: "%{name} को हटाएं? इस साझेदारी के सभी शेयर लिंक काम करना बंद कर देंगे।"
     new_link_heading: नया जॉइन लिंक
@@ -289,6 +291,29 @@ hi:
     from_org: "%{org} की ओर से"
     your_link: आपका लिंक
     results_link: परिणाम →
+  partnership_accounts:
+    title: "खाता बनाएं — %{partnership}"
+    heading: किसी साथी के लिए खाता बनाएं
+    subtitle: हम उनका संगठन सेट अप करेंगे और उन्हें %{partnership} के लिए अपना पासवर्ड चुनने का लिंक ईमेल करेंगे।
+    name_label: उनका नाम
+    name_placeholder: जेमी रिवेरा
+    email_label: उनका ईमेल
+    email_placeholder: jamie@partner.org
+    org_label: उनके संगठन का नाम
+    org_placeholder: Riverside Youth Trust
+    submit: खाता बनाएं →
+    cancel: रद्द करें
+    missing_fields: नाम, ईमेल और संगठन का नाम — तीनों आवश्यक हैं।
+    email_taken: "%{email} के पास पहले से ही Playverto खाता है — इसके बजाय उन्हें जॉइन लिंक भेजें ताकि वे अपने मौजूदा संगठन को जोड़ सकें।"
+    created: "%{email} के लिए खाता बना दिया गया है — उन्हें पासवर्ड सेट करने और शुरुआत करने के निर्देश ईमेल कर दिए गए हैं।"
+  partner_account_setups:
+    title: "अपना पासवर्ड सेट करें — Playverto"
+    heading: अपना पासवर्ड सेट करें
+    subtitle: "स्वागत है, %{name} — अपना खाता सेटअप पूरा करने के लिए एक पासवर्ड चुनें।"
+    submit: पासवर्ड सेट करें और जारी रखें →
+    welcome: स्वागत है! आपका पासवर्ड सेट हो गया है।
+    invalid_link: यह सेटअप लिंक अमान्य है या इसकी समय-सीमा समाप्त हो चुकी है। इसे दोबारा भेजने के लिए अपनी साझेदारी के एडमिन से कहें।
+    password_mismatch: पासवर्ड मेल नहीं खाए।
   partnership_verto:
     title: "%{title} — साझा किया गया Verto"
     from_org_partnership: "%{org} की ओर से · %{partnership}"
