@@ -11,7 +11,14 @@ def trello_request(method, path, params)
   uri = URI("https://api.trello.com/1#{path}")
   uri.query = URI.encode_www_form(params)
   request = method == :post ? Net::HTTP::Post.new(uri) : Net::HTTP::Get.new(uri)
-  response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.request(request) }
+
+  # Net::HTTP's built-in :ENV proxy detection only reads http_proxy, never
+  # https_proxy, so it misses this sandbox's proxy entirely. Read it directly.
+  proxy_env = ENV["https_proxy"] || ENV["HTTPS_PROXY"]
+  proxy_uri = URI(proxy_env) if proxy_env
+  http = Net::HTTP.new(uri.host, uri.port, proxy_uri&.host, proxy_uri&.port)
+  http.use_ssl = true
+  response = http.start { |h| h.request(request) }
   raise "Trello API error #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
 
   JSON.parse(response.body)
