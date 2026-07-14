@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "net/http"
+require "uri"
+require "json"
+
+BOARD_ID = "ntNghZRN"
+
+def trello_request(method, path, params)
+  uri = URI("https://api.trello.com/1#{path}")
+  uri.query = URI.encode_www_form(params)
+  request = method == :post ? Net::HTTP::Post.new(uri) : Net::HTTP::Get.new(uri)
+  response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.request(request) }
+  raise "Trello API error #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
+
+  JSON.parse(response.body)
+end
+
+title = ARGV[0]
+abort "Usage: bin/trello_log \"<title>\" [\"<description>\"]" if title.nil? || title.empty?
+
+description = ARGV[1] || ""
+list_name = ENV.fetch("TRELLO_LIST_NAME", "Done")
+auth = { key: ENV.fetch("TRELLO_API_KEY"), token: ENV.fetch("TRELLO_TOKEN") }
+
+lists = trello_request(:get, "/boards/#{BOARD_ID}/lists", auth)
+list = lists.find { |l| l["name"].casecmp?(list_name) }
+list ||= trello_request(:post, "/boards/#{BOARD_ID}/lists", auth.merge(name: list_name))
+
+card = trello_request(:post, "/cards", auth.merge(idList: list["id"], name: title, desc: description))
+puts "Logged to Trello: #{card['shortUrl']}"

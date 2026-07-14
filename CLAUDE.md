@@ -18,6 +18,21 @@ bin/brakeman --no-pager
 bin/importmap audit
 ```
 
+## Work log (Trello)
+
+After a push to Main passes the local suite (i.e. you're actually pushing),
+log a card summarizing what shipped:
+
+```
+bin/trello_log "Short title of what shipped" "1-3 sentence summary"
+```
+
+This posts to the `Done` list on the team's Trello board
+(https://trello.com/b/ntNghZRN) via the REST API. Requires `TRELLO_API_KEY`
+and `TRELLO_TOKEN` env vars (set at the environment level, never committed).
+If they're not present in this session, skip logging rather than failing the
+push — the code change is what matters, the log entry is best-effort.
+
 ## Deploys
 
 Render deploys the `Main` branch automatically, gated on CI: `render.yaml`
