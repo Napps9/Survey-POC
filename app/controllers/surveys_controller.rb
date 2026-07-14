@@ -512,7 +512,10 @@ class SurveysController < ApplicationController
 
     render json: {
       ok: true,
-      cards: cards.map.with_index { |card, idx| { index: idx, type: card["type"], text: card["text"], options: card["options"] } },
+      cards: cards.map.with_index { |card, idx|
+        { index: idx, type: card["type"], text: card["text"], options: card["options"],
+          demographic: card["demographic"].present? }
+      },
       segments: segments.map { |seg| seg.slice(:id, :label, :count) },
       aggregates: segments.each_with_object({}) { |seg, acc| acc[seg[:id]] = aggregate_results(cards, seg[:scope]) }
     }

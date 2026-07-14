@@ -108,7 +108,8 @@
             end
           %>
           <div class="regions-box" data-controller="results-compare"
-               data-results-compare-url-value="<%= survey_results_compare_path(@survey) %>">
+               data-results-compare-url-value="<%= survey_results_compare_path(@survey) %>"
+               data-results-compare-summarize-url-value="<%= survey_results_summarize_texts_path(@survey) %>">
             <div class="regions-box-head">
               <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 Audience segments</span>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a country on the map to compare segments of your audience</span>

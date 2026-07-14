@@ -199,4 +199,48 @@ class QuizPlayerTest < ActionDispatch::IntegrationTest
     get player_scores_path(s.publish_token)
     assert_response :forbidden
   end
+
+  # Quiz score comparison and general answer comparison are independent
+  # settings — a creator can turn on either or both. They used to render as
+  # two separate "compare" CTAs/panels on the thank-you screen; there must
+  # now be exactly one of each, with whichever section(s) apply inside.
+  test "quiz mode alone renders one compare button with only the scores section" do
+    s = quiz_survey(quiz: true)
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_select "[data-player-target='compareBtn']", 1
+    assert_select "[data-player-target='comparePanel']", 1
+    assert_select "[data-player-target='scoresSection']", 1
+    assert_select "[data-player-target='comparisonSection']", 0
+  end
+
+  test "results comparison alone renders one compare button with only the comparison section" do
+    s = quiz_survey(quiz: false)
+    s.update!(show_results_comparison: true)
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_select "[data-player-target='compareBtn']", 1
+    assert_select "[data-player-target='comparePanel']", 1
+    assert_select "[data-player-target='scoresSection']", 0
+    assert_select "[data-player-target='comparisonSection']", 1
+  end
+
+  test "quiz mode and results comparison together render one button with both sections" do
+    s = quiz_survey(quiz: true)
+    s.update!(show_results_comparison: true)
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_select "[data-player-target='compareBtn']", 1
+    assert_select "[data-player-target='comparePanel']", 1
+    assert_select "[data-player-target='scoresSection']", 1
+    assert_select "[data-player-target='comparisonSection']", 1
+  end
+
+  test "neither setting renders no compare button at all" do
+    s = quiz_survey(quiz: false)
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_select "[data-player-target='compareBtn']", 0
+    assert_select "[data-player-target='comparePanel']", 0
+  end
 end

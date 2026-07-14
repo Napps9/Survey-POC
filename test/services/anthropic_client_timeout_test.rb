@@ -15,7 +15,8 @@ class AnthropicClientTimeoutTest < ActiveSupport::TestCase
     CommonQuestionGenerator,
     QuestionTypeClassifier,
     ResultsSummariser,
-    ResultsChat
+    ResultsChat,
+    OpenTextSummariser
   ].freeze
 
   test "the shared Anthropic timeout is bounded well below the SDK default" do

@@ -24,7 +24,7 @@ const SKIP_TYPES = new Set([ "welcome_card", "token_checkpoint" ])
 
 export default class extends Controller {
   static targets = [ "stage", "panel", "meta", "picker", "pickerWrap", "body", "openBtn", "mapStage" ]
-  static values  = { url: String }
+  static values  = { url: String, summarizeUrl: String }
 
   _data     = null
   _selected = new Set()
@@ -323,11 +323,7 @@ export default class extends Controller {
     if (card.type === "open_ended") {
       selected.forEach(seg => {
         const agg = this._data.aggregates[seg.id][card.index]
-        const row = document.createElement("div")
-        row.className = "compare-freeform-note"
-        row.innerHTML = `<span class="compare-chip-dot" style="background:${this._colorFor(seg.id)}"></span>` +
-          `${esc(seg.label)} — ${(agg?.texts || []).length} free-text answer${(agg?.texts || []).length === 1 ? "" : "s"}`
-        body.appendChild(row)
+        body.appendChild(this._buildOpenEndedGroup(card, seg, agg?.texts || []))
       })
     } else {
       this._rowKeysFor(card).forEach(({ key, label }) => {
@@ -359,6 +355,87 @@ export default class extends Controller {
 
     wrap.appendChild(body)
     return wrap
+  }
+
+  // One block per selected segment: the raw free-text answers (capped, with
+  // a "+N more" tail so a popular question doesn't flood the panel) and an
+  // on-demand AI theme summary — reading every answer segment-by-segment
+  // doesn't scale once a region has dozens of responses.
+  _buildOpenEndedGroup(card, seg, texts) {
+    const group = document.createElement("div")
+    group.className = "compare-freeform-group"
+
+    const head = document.createElement("div")
+    head.className = "compare-freeform-head"
+    head.innerHTML =
+      `<span class="compare-bar-item-label" style="color:${this._colorFor(seg.id)}" title="${esc(seg.label)}">` +
+        `<span class="compare-chip-dot" style="background:${this._colorFor(seg.id)}"></span>${esc(seg.label)}` +
+      `</span>` +
+      `<span class="compare-freeform-count">${texts.length} free-text answer${texts.length === 1 ? "" : "s"}</span>`
+    group.appendChild(head)
+
+    if (!texts.length) return group
+
+    // The demographic tail (birth month, location) is stored as open_ended
+    // too, but its values are structured picks ("GB|London", "1995-06"), not
+    // qualitative text — asking Claude to find "themes" in those would be
+    // nonsense, so only genuine free-text questions get the summarize button.
+    if (this.hasSummarizeUrlValue && !card.demographic) {
+      const summaryBtn = document.createElement("button")
+      summaryBtn.type = "button"
+      summaryBtn.className = "compare-summarize-btn"
+      summaryBtn.textContent = "✦ Summarise with AI"
+      const summaryBox = document.createElement("div")
+      summaryBox.className = "compare-summary-box hidden"
+      summaryBtn.addEventListener("click", () => this._summariseOpenEnded(card, seg, summaryBtn, summaryBox))
+      group.appendChild(summaryBtn)
+      group.appendChild(summaryBox)
+    }
+
+    const CAP = 15
+    const list = document.createElement("div")
+    list.className = "compare-freeform-list"
+    texts.slice(0, CAP).forEach(text => {
+      const item = document.createElement("div")
+      item.className = "compare-freeform-item"
+      item.textContent = `“${text}”`
+      list.appendChild(item)
+    })
+    if (texts.length > CAP) {
+      const more = document.createElement("div")
+      more.className = "compare-freeform-more"
+      more.textContent = `+ ${texts.length - CAP} more`
+      list.appendChild(more)
+    }
+    group.appendChild(list)
+
+    return group
+  }
+
+  async _summariseOpenEnded(card, seg, btn, box) {
+    if (btn.disabled) return
+    btn.disabled = true
+    const original = btn.textContent
+    btn.textContent = "Summarising…"
+    box.classList.remove("hidden")
+    box.textContent = ""
+    try {
+      const url = `${this.summarizeUrlValue}?card_index=${card.index}&segment=${encodeURIComponent(seg.id)}`
+      const res = await fetch(url, { headers: { "Accept": "text/plain" } })
+      if (!res.ok || !res.body) throw new Error()
+      const reader = res.body.getReader()
+      const dec = new TextDecoder()
+      for (;;) {
+        const { done, value } = await reader.read()
+        if (done) break
+        box.textContent += dec.decode(value, { stream: true })
+      }
+    } catch (_) {
+      box.textContent = "Couldn't summarise right now."
+    } finally {
+      btn.textContent = original
+      btn.disabled = false
+    }
   }
 
   _rowKeysFor(card) {

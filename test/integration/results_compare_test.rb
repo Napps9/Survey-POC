@@ -106,6 +106,44 @@ class ResultsCompareTest < ActionDispatch::IntegrationTest
     assert_equal [ "region_GB", "region_US" ], region_ids.sort
   end
 
+  test "open-ended aggregates include the raw per-segment texts, not just a count" do
+    org = create_org_and_sign_in("open-text")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ],
+                              cards: CARDS + [ { "type" => "open_ended", "text" => "Anything else?" } ],
+                              publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    s.responses.create!(session_token: "gb-#{SecureRandom.hex(3)}", status: "completed",
+                        region_country: "GB",
+                        answers: { "2" => { "type" => "open_ended", "value" => "More benches please" } })
+    4.times do |i|
+      s.responses.create!(session_token: "gb-pad-#{i}-#{SecureRandom.hex(2)}", status: "completed",
+                          region_country: "GB", answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    end
+
+    get survey_results_compare_path(s)
+    assert_response :success
+
+    data = JSON.parse(response.body)
+    region_agg = data["aggregates"]["region_GB"][2]
+    assert_equal [ "More benches please" ], region_agg["texts"]
+    refute data["cards"][2]["demographic"], "a plain open_ended question isn't the demographic tail"
+  end
+
+  test "the demographic location/birth-month cards are flagged so the client skips AI summarising them" do
+    org = create_org_and_sign_in("demographic-flag")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ],
+                              cards: CARDS + DemographicQuestions.cards,
+                              publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    get survey_results_compare_path(s)
+    assert_response :success
+
+    data = JSON.parse(response.body)
+    location_card = data["cards"].find { |c| c["text"] == "Where do you live?" }
+    assert location_card["demographic"]
+  end
+
   test "the overall segment is always present and unaffected by region grouping" do
     org = create_org_and_sign_in("overall")
     s   = create_survey(org)

@@ -84,6 +84,7 @@ Rails.application.routes.draw do
   post "surveys/:id/optimise_card",   to: "surveys#optimise_card", as: :optimise_survey_card
   get  "surveys/:id/pexels",          to: "surveys#pexels_search", as: :pexels_search_survey
   get  "surveys/:id/results/summary", to: "survey_summaries#show",  as: :survey_results_summary
+  get  "surveys/:id/results/summarize_texts", to: "survey_summaries#texts", as: :survey_results_summarize_texts
   post "surveys/:survey_id/chat",     to: "survey_chats#create",    as: :survey_chat
   delete "surveys/bulk_archive",        to: "surveys#bulk_archive",        as: :bulk_archive_surveys
   delete "surveys/bulk_destroy",        to: "surveys#bulk_destroy",        as: :bulk_destroy_surveys

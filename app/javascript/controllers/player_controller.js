@@ -7,12 +7,14 @@ const MAP_MAX_SCALE = 8
 
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
-                    "thankyouMain", "compareBtn", "comparison", "comparisonList", "comparisonMeta",
+                    "thankyouMain", "compareBtn", "comparePanel",
+                    "scoresSection", "comparisonSection",
+                    "comparisonList", "comparisonMeta",
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
                     "regionsMapViewport", "regionsMapStage",
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
                     "consentMain", "consentDeclined",
-                    "scoreChip", "quizScore", "scoresBtn", "scoresPanel", "scoresList", "scoresMeta",
+                    "scoreChip", "quizScore", "scoresList", "scoresMeta",
                     "tokenScoreChip", "tokenScore"]
   static values  = {
     progressUrl: { type: String, default: "" },
@@ -402,33 +404,40 @@ export default class extends Controller {
     if (this.tokenisationValue) this._renderTokenScore()
   }
 
-  async showComparison() {
-    if (!this.showComparisonValue || !this.resultsUrlValue) return
-    if (this.hasCompareBtnTarget) {
-      this.compareBtnTarget.disabled = true
-      this.compareBtnTarget.textContent = t("player.compare_loading")
-    }
+  // One button, one panel: the quiz score section and the general answer-
+  // comparison section each load independently (whichever the creator has
+  // turned on) so one being slow/unavailable never blocks the other.
+  async showCompare() {
+    const wantScores  = this.hasScoresSectionTarget
+    const wantCompare = this.showComparisonValue && this.resultsUrlValue && this.hasComparisonSectionTarget
+    if (!wantScores && !wantCompare || !this.hasComparePanelTarget) return
+
+    this.thankyouMainTarget.classList.add("hidden")
+    this.comparePanelTarget.classList.remove("hidden")
+    if (this.hasCompareBtnTarget) this.compareBtnTarget.disabled = true
+
+    const tasks = []
+    if (wantScores) tasks.push(this._loadScores())
+    if (wantCompare) tasks.push(this._loadComparison())
+    await Promise.all(tasks)
+
+    if (this.hasCompareBtnTarget) this.compareBtnTarget.disabled = false
+  }
+
+  hideCompare() {
+    if (this.hasComparePanelTarget) this.comparePanelTarget.classList.add("hidden")
+    if (this.hasThankyouMainTarget) this.thankyouMainTarget.classList.remove("hidden")
+  }
+
+  async _loadComparison() {
+    if (this.hasComparisonMetaTarget) this.comparisonMetaTarget.textContent = t("player.compare_loading")
     try {
       const res  = await fetch(this.resultsUrlValue, { headers: { "Accept": "application/json" } })
       const data = await res.json()
       if (!data.ok) throw new Error(data.error || "Failed to load results")
       this._renderComparison(data)
-      this.thankyouMainTarget.classList.add("hidden")
-      this.comparisonTarget.classList.remove("hidden")
     } catch (e) {
-      if (this.hasCompareBtnTarget) {
-        this.compareBtnTarget.disabled = false
-        this.compareBtnTarget.textContent = t("player.compare_error")
-      }
-    }
-  }
-
-  hideComparison() {
-    if (this.hasComparisonTarget) this.comparisonTarget.classList.add("hidden")
-    if (this.hasThankyouMainTarget) this.thankyouMainTarget.classList.remove("hidden")
-    if (this.hasCompareBtnTarget) {
-      this.compareBtnTarget.disabled = false
-      this.compareBtnTarget.textContent = t("player.compare_cta")
+      if (this.hasComparisonMetaTarget) this.comparisonMetaTarget.textContent = t("player.compare_error")
     }
   }
 
@@ -437,7 +446,7 @@ export default class extends Controller {
   async showRegions() {
     if (!this.regionsUrlValue || !this.hasRegionsPanelTarget) return
     this.thankyouMainTarget.classList.add("hidden")
-    if (this.hasComparisonTarget) this.comparisonTarget.classList.add("hidden")
+    if (this.hasComparePanelTarget) this.comparePanelTarget.classList.add("hidden")
     this.regionsPanelTarget.classList.remove("hidden")
     this._resetMapView()
     if (this._regionsData) return
@@ -1126,11 +1135,8 @@ export default class extends Controller {
 
   // ── Quiz: how you compare (anonymous score distribution) ─────────────────
 
-  async showScores() {
-    if (!this.scoresUrlValue || !this.hasScoresPanelTarget) return
-    this.thankyouMainTarget.classList.add("hidden")
-    if (this.hasComparisonTarget) this.comparisonTarget.classList.add("hidden")
-    this.scoresPanelTarget.classList.remove("hidden")
+  async _loadScores() {
+    if (!this.scoresUrlValue) return
     if (this._scoresData) return this._renderScores(this._scoresData)
     this.scoresMetaTarget.textContent = t("player.compare_loading")
     try {
@@ -1142,11 +1148,6 @@ export default class extends Controller {
     } catch (_) {
       this.scoresMetaTarget.textContent = t("player.compare_error")
     }
-  }
-
-  hideScores() {
-    if (this.hasScoresPanelTarget) this.scoresPanelTarget.classList.add("hidden")
-    if (this.hasThankyouMainTarget) this.thankyouMainTarget.classList.remove("hidden")
   }
 
   _renderScores(data) {

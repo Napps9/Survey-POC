@@ -187,23 +187,19 @@
         <% end %>
 
         <%# Thank-you actions: compare (brand CTA) then the outline secondaries —
-            forward-to-website, share, and regions. %>
+            forward-to-website, share, and regions. Quiz score comparison and
+            general answer comparison are independent settings (a creator can
+            turn on either or both), but they used to render as two separate
+            CTAs/panels — redundant and confusing when both are on. One button
+            now opens one panel with whichever section(s) apply. %>
+        <% show_quiz_scores = quiz_mode && scores_url.present? %>
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:22px;width:100%;">
-          <% if quiz_mode && scores_url.present? %>
-            <button type="button"
-                    data-player-target="scoresBtn"
-                    data-action="click->player#showScores"
-                    style="padding:11px 22px;border-radius:100px;background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
-              <%= t("player.quiz_compare_cta") %>
-            </button>
-          <% end %>
-
-          <% if show_comparison %>
+          <% if show_quiz_scores || show_comparison %>
             <button type="button"
                     data-player-target="compareBtn"
-                    data-action="click->player#showComparison"
+                    data-action="click->player#showCompare"
                     style="padding:11px 22px;border-radius:100px;background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
-              <%= t("player.compare_cta") %>
+              <%= show_comparison ? t("player.compare_cta") : t("player.quiz_compare_cta") %>
             </button>
           <% end %>
 
@@ -279,39 +275,40 @@
         </div>
       <% end %>
 
-      <%# Quiz: "how you compare" — your score against everyone's distribution,
-          plus a per-question correct-rate. Filled by player#showScores. %>
-      <% if quiz_mode && scores_url.present? %>
-        <div data-player-target="scoresPanel" class="hidden"
+      <%# "How you compare" — one panel, up to two sections: the quiz score
+          distribution + per-question correct-rate (filled by
+          player#showCompare's scores fetch), and the general per-question
+          answer distribution (its results fetch). Either section renders
+          alone when only its setting is on; both stack when the creator has
+          turned on both quiz mode and results comparison. %>
+      <% if show_quiz_scores || show_comparison %>
+        <div data-player-target="comparePanel" class="hidden"
              style="width:100%;max-width:640px;margin:0 auto;padding:24px 22px 28px;overflow-y:auto;max-height:calc(100vh - 120px);background:#1C2034;border:1px solid rgba(255,255,255,0.08);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);">
-          <div style="text-align:center;margin-bottom:18px;">
-            <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.quiz_compare_title") %></div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"
-                 data-player-target="scoresMeta"></div>
-          </div>
-          <div data-player-target="scoresList" style="display:flex;flex-direction:column;gap:14px;"></div>
-          <div style="display:flex;justify-content:center;margin-top:18px;">
-            <button type="button"
-                    data-action="click->player#hideScores"
-                    style="padding:9px 18px;border-radius:100px;background:transparent;color:#fff;font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
-              <%= t("player.back") %>
-            </button>
-          </div>
-        </div>
-      <% end %>
+          <% if show_quiz_scores %>
+            <div data-player-target="scoresSection">
+              <div style="text-align:center;margin-bottom:18px;">
+                <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.quiz_compare_title") %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"
+                     data-player-target="scoresMeta"></div>
+              </div>
+              <div data-player-target="scoresList" style="display:flex;flex-direction:column;gap:14px;"></div>
+            </div>
+          <% end %>
 
-      <% if show_comparison %>
-        <div data-player-target="comparison" class="hidden"
-             style="width:100%;max-width:640px;margin:0 auto;padding:24px 22px 28px;overflow-y:auto;max-height:calc(100vh - 120px);background:#1C2034;border:1px solid rgba(255,255,255,0.08);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);">
-          <div style="text-align:center;margin-bottom:18px;">
-            <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.comparison_title") %></div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"
-                 data-player-target="comparisonMeta"></div>
-          </div>
-          <div data-player-target="comparisonList" style="display:flex;flex-direction:column;gap:14px;"></div>
+          <% if show_comparison %>
+            <div data-player-target="comparisonSection" style="<%= "margin-top:28px;" if show_quiz_scores %>">
+              <div style="text-align:center;margin-bottom:18px;">
+                <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.comparison_title") %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"
+                     data-player-target="comparisonMeta"></div>
+              </div>
+              <div data-player-target="comparisonList" style="display:flex;flex-direction:column;gap:14px;"></div>
+            </div>
+          <% end %>
+
           <div style="display:flex;justify-content:center;margin-top:18px;">
             <button type="button"
-                    data-action="click->player#hideComparison"
+                    data-action="click->player#hideCompare"
                     style="padding:9px 18px;border-radius:100px;background:transparent;color:#fff;font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
               <%= t("player.back") %>
             </button>

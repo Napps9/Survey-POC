@@ -1,6 +1,7 @@
 class SurveySummariesController < ApplicationController
   include ActionController::Live
   include AggregatesSurveyResults
+  include ResolvesResultSegments
 
   def show
     survey    = Current.organisation.surveys.find(params[:id])
@@ -33,6 +34,58 @@ class SurveySummariesController < ApplicationController
   rescue => e
     Rails.logger.error "[SurveySummariesController] #{e.class}: #{e.message}"
     response.stream.write("Insights unavailable.") rescue nil
+  ensure
+    response.stream.close if response.committed?
+  end
+
+  # GET /surveys/:id/results/summarize_texts?card_index=&segment=
+  # Streams a short AI theme summary of one open-ended question's free-text
+  # answers, scoped to a single results segment (a region, a partner share, or
+  # "overall") — the per-region qualitative digest surfaced in the Compare
+  # view (results_compare_controller.js), where reading every raw answer
+  # segment-by-segment doesn't scale. Not cached: segment-scoped requests are
+  # comparatively rare (an explicit click per card+segment), unlike the
+  # whole-survey summary above which every results-page visit would trigger.
+  def texts
+    survey = Current.organisation.surveys.find(params[:id])
+    cards  = Array(survey.cards)
+    idx    = params[:card_index].to_i
+    card   = cards[idx]
+
+    response.headers["Content-Type"]      = "text/plain; charset=utf-8"
+    response.headers["X-Accel-Buffering"] = "no"
+    response.headers["Cache-Control"]     = "no-cache"
+
+    # The demographic tail (birth month, location) is open_ended too, but its
+    # values are structured picks ("GB|London", "1995-06"), not qualitative
+    # text worth theme-summarising — see DemographicQuestions.
+    unless card.is_a?(Hash) && card["type"] == "open_ended" && card["demographic"].blank?
+      response.stream.write("Not an open-text question.")
+      return
+    end
+
+    _base, segments, = resolve_result_segments(survey, nil)
+    segment = segments.find { |s| s[:id] == params[:segment] }
+    unless segment
+      response.stream.write("Unknown segment.")
+      return
+    end
+
+    # Aggregate the FULL card list (not just this one) so each response's
+    # answers hash — keyed by the card's real position in survey.cards — lines
+    # up correctly; aggregate_results indexes positionally against whatever
+    # array it's given, so trimming to [card] alone would silently read every
+    # response's answer at index 0 instead of this card's actual index.
+    texts = aggregate_results(cards, segment[:scope])[idx][:texts]
+
+    OpenTextSummariser.new.call(question: card["text"], texts: texts) do |chunk|
+      response.stream.write(chunk)
+    end
+  rescue ActiveRecord::RecordNotFound
+    raise
+  rescue => e
+    Rails.logger.error "[SurveySummariesController#texts] #{e.class}: #{e.message}"
+    response.stream.write("Summary unavailable.") rescue nil
   ensure
     response.stream.close if response.committed?
   end
