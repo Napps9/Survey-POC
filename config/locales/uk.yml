@@ -247,6 +247,13 @@ uk:
     partner_eyebrow: Партнерство · Учасник
     generate_link: Створити посилання для приєднання →
     add_account: "+ Створити акаунт для партнера"
+    add_partner: "Додати партнера"
+    picker_eyebrow: "Додати партнера"
+    picker_title: "Як ви хочете додати партнера?"
+    picker_link_name: "Посилання для приєднання"
+    picker_link_desc: "Поділіться посиланням — вони створять власний акаунт і організацію."
+    picker_account_name: "Створити акаунт"
+    picker_account_desc: "Налаштуйте все самостійно — ми надішлемо їм лист для вибору пароля."
     setup_pending: "Очікує налаштування"
     delete: Видалити
     delete_confirm: Видалити %{name}? Усі посилання для поширення цього партнерства перестануть працювати.
@@ -257,6 +264,11 @@ uk:
     partners_section: Партнери
     no_partners_title: Партнерів поки немає
     no_partners_body_html: Використайте <span style="color:#FF1E6F;">Створити посилання для приєднання</span> вище, щоб запросити партнерські організації.
+    no_partners_body: "Надішліть посилання для приєднання або створіть їм акаунт напряму."
+    stat_groups: "Групи"
+    stat_partners: "Партнери"
+    stat_vertos: "Verto"
+    stat_responses: "Відповіді"
     joined_on: Приєднався %{date}
     remove_member_confirm: Видалити %{org} з %{partnership}? Їхні посилання для поширення перестануть працювати.
     vertos_section: Verto в партнерстві
@@ -293,6 +305,7 @@ uk:
     results_link: Результати →
   partnership_accounts:
     title: "Створити акаунт — %{partnership}"
+    back_to_partnership: "Назад до %{partnership}"
     heading: "Створити акаунт для партнера"
     subtitle: "Ми налаштуємо організацію партнера та надішлемо на email посилання для вибору пароля в %{partnership}."
     name_label: "Ім'я партнера"

@@ -247,6 +247,13 @@ ko:
     partner_eyebrow: 파트너십 · 멤버
     generate_link: 참여 링크 생성 →
     add_account: "+ 파트너 계정 만들기"
+    add_partner: "파트너 추가"
+    picker_eyebrow: "파트너 추가"
+    picker_title: "어떻게 추가하시겠어요?"
+    picker_link_name: "참여 링크"
+    picker_link_desc: "링크를 공유하세요 — 상대방이 직접 계정과 조직을 만듭니다."
+    picker_account_name: "계정 만들기"
+    picker_account_desc: "직접 설정해 드립니다 — 비밀번호 설정 링크를 이메일로 보내드립니다."
     setup_pending: "설정 대기 중"
     delete: 삭제
     delete_confirm: "%{name}을(를) 삭제하시겠습니까? 이 파트너십의 모든 공유 링크가 작동을 멈춥니다."
@@ -257,6 +264,11 @@ ko:
     partners_section: 파트너
     no_partners_title: 아직 파트너가 없습니다
     no_partners_body_html: 위의 <span style="color:#FF1E6F;">참여 링크 생성</span>을 사용해 파트너 조직을 초대하세요.
+    no_partners_body: "참여 링크를 보내거나, 직접 파트너 계정을 만들어 주세요."
+    stat_groups: "그룹"
+    stat_partners: "파트너"
+    stat_vertos: "Verto"
+    stat_responses: "응답"
     joined_on: "%{date}에 참여"
     remove_member_confirm: "%{partnership}에서 %{org}을(를) 제거하시겠습니까? 그들의 공유 링크가 작동을 멈춥니다."
     vertos_section: 파트너십의 Verto
@@ -293,6 +305,7 @@ ko:
     results_link: 결과 →
   partnership_accounts:
     title: "계정 만들기 — %{partnership}"
+    back_to_partnership: "%{partnership}(으)로 돌아가기"
     heading: "파트너용 계정 만들기"
     subtitle: "상대방의 조직을 설정하고, %{partnership}에서 사용할 비밀번호를 직접 만들 수 있는 링크를 이메일로 보내드립니다."
     name_label: "상대방 이름"

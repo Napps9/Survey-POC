@@ -247,6 +247,13 @@ ar:
     partner_eyebrow: شراكة · عضو
     generate_link: إنشاء رابط الانضمام ←
     add_account: "+ إنشاء حساب لشريك"
+    add_partner: إضافة شريك
+    picker_eyebrow: إضافة شريك
+    picker_title: كيف تريد إضافته؟
+    picker_link_name: رابط الانضمام
+    picker_link_desc: شارك رابطًا — سينشئون حسابهم الخاص ومؤسستهم.
+    picker_account_name: إنشاء حسابهم
+    picker_account_desc: أعدّ لهم كل شيء مباشرة — سنرسل لهم بريدًا إلكترونيًا لاختيار كلمة المرور.
     setup_pending: الإعداد قيد الانتظار
     delete: حذف
     delete_confirm: حذف %{name}؟ ستتوقف جميع روابط المشاركة لهذه الشراكة عن العمل.
@@ -257,6 +264,11 @@ ar:
     partners_section: الشركاء
     no_partners_title: لا يوجد شركاء بعد
     no_partners_body_html: استخدم <span style="color:#FF1E6F;">إنشاء رابط الانضمام</span> أعلاه لدعوة المؤسسات الشريكة.
+    no_partners_body: أرسل رابط انضمام، أو أنشئ حسابهم مباشرة بنفسك.
+    stat_groups: المجموعات
+    stat_partners: الشركاء
+    stat_vertos: Vertos
+    stat_responses: الردود
     joined_on: انضم في %{date}
     remove_member_confirm: إزالة %{org} من %{partnership}؟ ستتوقف روابط المشاركة الخاصة بهم عن العمل.
     vertos_section: Vertos في الشراكة
@@ -293,6 +305,7 @@ ar:
     results_link: النتائج ←
   partnership_accounts:
     title: "إنشاء حساب — %{partnership}"
+    back_to_partnership: العودة إلى %{partnership}
     heading: إنشاء حساب لشريك
     subtitle: سنقوم بإعداد مؤسسته ونرسل له عبر البريد الإلكتروني رابطًا لاختيار كلمة المرور الخاصة به لـ %{partnership}.
     name_label: اسم الشريك

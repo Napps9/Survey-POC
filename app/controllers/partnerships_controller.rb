@@ -28,6 +28,11 @@ class PartnershipsController < ApplicationController
       @response_counts_by_partnership = {}
       @member_counts_by_partnership   = {}
     end
+
+    # Header stat strip — summed from the per-partnership hashes above.
+    @total_partners           = @member_counts_by_partnership.values.sum
+    @total_shared_vertos      = @verto_counts_by_partnership.values.sum
+    @total_partnership_responses = @response_counts_by_partnership.values.sum
   end
 
   def new
@@ -96,6 +101,11 @@ class PartnershipsController < ApplicationController
       Response.where(survey_share_id: share_ids).group(:survey_share_id).count : {}
     @completed_counts_by_share = share_ids.any? ?
       Response.where(survey_share_id: share_ids, status: "completed").group(:survey_share_id).count : {}
+
+    # Header stat strip.
+    @total_responses = @response_counts_by_share.values.sum
+    total_completed  = @completed_counts_by_share.values.sum
+    @completion_rate = @total_responses.positive? ? ((total_completed.to_f / @total_responses) * 100).round : nil
 
     @available_surveys = current_organisation.surveys.kept
                            .where.not(id: @partnership_vertos.map(&:survey_id))

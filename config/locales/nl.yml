@@ -247,6 +247,13 @@ nl:
     partner_eyebrow: Partnerschap · Lid
     generate_link: Deelnamelink genereren →
     add_account: "+ Account aanmaken voor een partner"
+    add_partner: "Partner toevoegen"
+    picker_eyebrow: "Partner toevoegen"
+    picker_title: "Hoe wil je ze toevoegen?"
+    picker_link_name: "Deelnamelink"
+    picker_link_desc: "Deel een link — ze maken hun eigen account en organisatie aan."
+    picker_account_name: "Account aanmaken"
+    picker_account_desc: "Stel ze direct in — we sturen hen een e-mail om een wachtwoord te kiezen."
     setup_pending: "Instellen in afwachting"
     delete: Verwijderen
     delete_confirm: "%{name} verwijderen? Alle deellinks voor dit partnerschap zullen niet meer werken."
@@ -257,6 +264,11 @@ nl:
     partners_section: Partners
     no_partners_title: Nog geen partners
     no_partners_body_html: Gebruik hierboven <span style="color:#FF1E6F;">Deelnamelink genereren</span> om partnerorganisaties uit te nodigen.
+    no_partners_body: "Stuur een deelnamelink, of maak hun account direct voor hen aan."
+    stat_groups: "Groepen"
+    stat_partners: "Partners"
+    stat_vertos: "Vertos"
+    stat_responses: "Reacties"
     joined_on: Aangesloten op %{date}
     remove_member_confirm: "%{org} verwijderen uit %{partnership}? Hun deellinks zullen niet meer werken."
     vertos_section: Vertos in partnerschap
@@ -293,6 +305,7 @@ nl:
     results_link: Resultaten →
   partnership_accounts:
     title: "Account aanmaken — %{partnership}"
+    back_to_partnership: "Terug naar %{partnership}"
     heading: "Een account aanmaken voor een partner"
     subtitle: "We stellen hun organisatie in en sturen hen een link om hun eigen wachtwoord te kiezen voor %{partnership}."
     name_label: "Hun naam"

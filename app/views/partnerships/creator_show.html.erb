@@ -5,7 +5,9 @@
 
 <% is_admin = current_membership&.admin? %>
 
-<div style="display:flex;min-height:100vh;background:#1C2034;">
+<div style="display:flex;min-height:100vh;background:#1C2034;"
+     data-controller="create-menu"
+     data-action="keydown.esc@window->create-menu#closeOnEsc">
   <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
 
     <%# ── Hero ── %>
@@ -37,12 +39,12 @@
           </div>
 
           <% if is_admin %>
-            <div style="display:flex;gap:10px;">
-              <%= link_to t("partnerships.add_account"), new_partnership_partnership_account_path(@partnership),
-                    style: "background:none;border:1px solid rgba(255,30,111,0.4);border-radius:100px;padding:9px 19px;color:#FF1E6F;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;text-decoration:none;" %>
-              <%= button_to t("partnerships.generate_link"), partnership_partnership_invites_path(@partnership), method: :post,
-                    style: "background:#FF1E6F;border:none;border-radius:100px;padding:10px 20px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;cursor:pointer;",
-                    form: { style: "margin:0;" } %>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button type="button" data-action="click->create-menu#open"
+                      style="display:inline-flex;align-items:center;gap:8px;background:#FF1E6F;border:none;border-radius:100px;padding:10px 20px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(255,30,111,0.28);cursor:pointer;">
+                <span style="font-size:18px;line-height:1;">+</span> <%= t("partnerships.add_partner") %>
+              </button>
+              <div style="width:1px;height:24px;background:rgba(255,255,255,0.12);"></div>
               <%= button_to t("partnerships.delete"), partnership_path(@partnership), method: :delete,
                     data: { turbo_confirm: t("partnerships.delete_confirm", name: @partnership.name) },
                     form: { style: "margin:0;" },
@@ -50,6 +52,68 @@
             </div>
           <% end %>
         </div>
+      </div>
+    </div>
+
+    <%# ── "Add a partner" popup — mirrors the dashboard's "+ Create" popup
+        (surveys/index.html.erb) so adding a partner reads as the same kind
+        of decision: pick a tile, either choice acts immediately (no nested
+        panel needed here, unlike the Form tile over there). ── %>
+    <% if is_admin %>
+      <div data-create-menu-target="modal" class="app-modal hidden">
+        <div class="app-modal__backdrop" data-action="click->create-menu#close"></div>
+        <div class="app-modal__panel" style="max-width:440px;background:#1C2034;border:1px solid rgba(255,255,255,0.1);">
+          <div class="create-menu-bar"></div>
+
+          <div data-create-menu-target="chooser" style="padding:24px 26px 24px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
+              <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.16em;text-transform:uppercase;font-weight:700;color:#FF1E6F;"><%= t("partnerships.picker_eyebrow") %></div>
+              <button type="button" data-action="click->create-menu#close" aria-label="Close"
+                      style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(255,255,255,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
+            </div>
+            <div style="font-family:'Alata',sans-serif;font-size:20px;color:#fff;line-height:1.25;margin-bottom:16px;"><%= t("partnerships.picker_title") %></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <%= button_to partnership_partnership_invites_path(@partnership), method: :post,
+                    class: "create-menu-tile", style: "--tile-accent:#FF1E6F;",
+                    form: { style: "margin:0;" } do %>
+                <span class="create-menu-tile-icon">🔗</span>
+                <span style="flex:1;min-width:0;">
+                  <span class="create-menu-tile-name" style="display:block;"><%= t("partnerships.picker_link_name") %></span>
+                  <span class="create-menu-tile-desc" style="display:block;"><%= t("partnerships.picker_link_desc") %></span>
+                </span>
+                <span class="create-menu-tile-chev" aria-hidden="true">→</span>
+              <% end %>
+              <%= link_to new_partnership_partnership_account_path(@partnership), class: "create-menu-tile", style: "--tile-accent:#01EACB;" do %>
+                <span class="create-menu-tile-icon">✉️</span>
+                <span style="flex:1;min-width:0;">
+                  <span class="create-menu-tile-name" style="display:block;"><%= t("partnerships.picker_account_name") %></span>
+                  <span class="create-menu-tile-desc" style="display:block;"><%= t("partnerships.picker_account_desc") %></span>
+                </span>
+                <span class="create-menu-tile-chev" aria-hidden="true">→</span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%# ── Stat strip ── %>
+    <div style="position:relative;padding:24px 36px 4px;flex-shrink:0;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;">
+        <%
+          creator_stats = [
+            { value: @memberships.size.to_s, label: t("partnerships.stat_partners"), accent: "#FF1E6F", grad: "linear-gradient(135deg,rgba(255,30,111,0.18),rgba(255,30,111,0.04))" },
+            { value: @partnership_vertos.size.to_s, label: t("partnerships.stat_vertos"), accent: "#01EACB", grad: "linear-gradient(135deg,rgba(1,234,203,0.18),rgba(1,234,203,0.04))" },
+            { value: @total_responses.to_s, label: t("partnerships.stat_responses"), accent: "#0CA7FF", grad: "linear-gradient(135deg,rgba(12,167,255,0.18),rgba(12,167,255,0.04))" },
+            { value: @completion_rate ? "#{@completion_rate}%" : "—", label: t("partnerships.completion_label"), accent: "#615BF5", grad: "linear-gradient(135deg,rgba(97,91,245,0.18),rgba(97,91,245,0.04))" },
+          ]
+        %>
+        <% creator_stats.each do |s| %>
+          <div style="background:<%= s[:grad] %>;border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:16px 16px;text-align:center;backdrop-filter:blur(8px);">
+            <div style="font-family:'Alata',sans-serif;font-size:32px;color:<%= s[:accent] %>;line-height:1;letter-spacing:-0.01em;"><%= s[:value] %></div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.5);margin-top:6px;letter-spacing:0.12em;text-transform:uppercase;"><%= s[:label] %></div>
+          </div>
+        <% end %>
       </div>
     </div>
 
@@ -90,9 +154,15 @@
       <% if @memberships.empty? %>
         <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:36px 24px;text-align:center;margin-bottom:32px;">
           <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("partnerships.no_partners_title") %></div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto;line-height:1.5;">
-            <%= t("partnerships.no_partners_body_html").html_safe %>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto 16px;line-height:1.5;">
+            <%= t("partnerships.no_partners_body") %>
           </div>
+          <% if is_admin %>
+            <button type="button" data-action="click->create-menu#open"
+                    style="display:inline-flex;align-items:center;gap:8px;background:#FF1E6F;border:none;border-radius:100px;padding:10px 20px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;cursor:pointer;">
+              <span style="font-size:18px;line-height:1;">+</span> <%= t("partnerships.add_partner") %>
+            </button>
+          <% end %>
         </div>
       <% else %>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:32px;">
@@ -178,7 +248,9 @@
             <% verto_completed = shares.sum { |sh| @completed_counts_by_share[sh.id] || 0 } %>
             <% verto_rate = verto_responses.positive? ? ((verto_completed.to_f / verto_responses) * 100).round : nil %>
             <% s_archived = s.deleted? %>
-            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;"
+                 onmouseover="this.style.borderColor='rgba(255,255,255,0.18)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 30px rgba(0,0,0,0.28)'"
+                 onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='';this.style.boxShadow=''">
               <div style="height:3px;background:<%= s_archived ? 'rgba(255,255,255,0.1)' : 'linear-gradient(90deg,#01EACB,#FF1E6F)' %>;"></div>
               <div style="padding:16px 20px 12px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">

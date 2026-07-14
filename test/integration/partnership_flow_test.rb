@@ -26,7 +26,7 @@ class PartnershipFlowTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
     assert_match "Pilot Group", response.body
-    assert_match "Generate join link", response.body
+    assert_match "Add a partner", response.body
     assert_match "No partners yet", response.body
 
     a = Partnership.last
@@ -136,13 +136,13 @@ class PartnershipFlowTest < ActionDispatch::IntegrationTest
     # Visiting Group A → creator_show
     get partnership_path(a_partnership)
     assert_response :success
-    assert_match "Generate join link", response.body, "creator view of own partnership"
+    assert_match "Add a partner", response.body, "creator view of own partnership"
 
     # Visiting Group B → partner_show
     get partnership_path(b_partnership)
     assert_response :success
     assert_match "Run by Org B", response.body, "member view of partnership"
-    refute_match "Generate join link", response.body, "should NOT see creator controls on partnership you're a member of"
+    refute_match "Add a partner", response.body, "should NOT see creator controls on partnership you're a member of"
   end
 
   test "aggregate scope is per-partnership, not cross-partnership" do

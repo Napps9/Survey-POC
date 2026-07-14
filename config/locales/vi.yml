@@ -247,6 +247,13 @@ vi:
     partner_eyebrow: Nhóm đối tác · Thành viên
     generate_link: Tạo liên kết tham gia →
     add_account: "+ Tạo tài khoản cho đối tác"
+    add_partner: "Thêm đối tác"
+    picker_eyebrow: "Thêm đối tác"
+    picker_title: "Bạn muốn thêm họ bằng cách nào?"
+    picker_link_name: "Liên kết tham gia"
+    picker_link_desc: "Chia sẻ một liên kết — họ sẽ tự tạo tài khoản và tổ chức của mình."
+    picker_account_name: "Tạo tài khoản"
+    picker_account_desc: "Thiết lập trực tiếp cho họ — chúng tôi sẽ gửi email để họ chọn mật khẩu."
     setup_pending: "Đang chờ thiết lập"
     delete: Xóa
     delete_confirm: Xóa %{name}? Tất cả liên kết chia sẻ cho nhóm đối tác này sẽ ngừng hoạt động.
@@ -257,6 +264,11 @@ vi:
     partners_section: Đối tác
     no_partners_title: Chưa có đối tác nào
     no_partners_body_html: Sử dụng <span style="color:#FF1E6F;">Tạo liên kết tham gia</span> ở trên để mời các tổ chức đối tác.
+    no_partners_body: "Gửi liên kết tham gia, hoặc tạo tài khoản cho họ trực tiếp."
+    stat_groups: "Nhóm"
+    stat_partners: "Đối tác"
+    stat_vertos: "Vertos"
+    stat_responses: "Phản hồi"
     joined_on: Tham gia %{date}
     remove_member_confirm: Xóa %{org} khỏi %{partnership}? Liên kết chia sẻ của họ sẽ ngừng hoạt động.
     vertos_section: Vertos trong nhóm đối tác
@@ -293,6 +305,7 @@ vi:
     results_link: Kết quả →
   partnership_accounts:
     title: "Tạo tài khoản — %{partnership}"
+    back_to_partnership: "Quay lại %{partnership}"
     heading: "Tạo tài khoản cho đối tác"
     subtitle: "Chúng tôi sẽ thiết lập tổ chức của đối tác và gửi email kèm liên kết để họ tự chọn mật khẩu cho %{partnership}."
     name_label: "Tên của đối tác"

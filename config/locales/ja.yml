@@ -247,6 +247,13 @@ ja:
     partner_eyebrow: パートナーシップ · メンバー
     generate_link: 参加リンクを生成 →
     add_account: "+ パートナー用のアカウントを作成"
+    add_partner: パートナーを追加
+    picker_eyebrow: パートナーを追加
+    picker_title: どのように追加しますか？
+    picker_link_name: 参加リンク
+    picker_link_desc: リンクを共有 — 相手が自分のアカウントと組織を作成します。
+    picker_account_name: アカウントを作成
+    picker_account_desc: こちらで直接設定 — パスワードを選択するためのメールをお送りします。
     setup_pending: 設定待ち
     delete: 削除
     delete_confirm: "%{name} を削除しますか?このパートナーシップのすべての共有リンクが無効になります。"
@@ -257,6 +264,11 @@ ja:
     partners_section: パートナー
     no_partners_title: パートナーはまだいません
     no_partners_body_html: 上部の <span style="color:#FF1E6F;">参加リンクを生成</span> を使ってパートナー組織を招待してください。
+    no_partners_body: 参加リンクを送るか、直接アカウントを作成してください。
+    stat_groups: グループ
+    stat_partners: パートナー
+    stat_vertos: Verto
+    stat_responses: 回答数
     joined_on: 参加日 %{date}
     remove_member_confirm: "%{org} を %{partnership} から削除しますか?共有リンクは無効になります。"
     vertos_section: パートナーシップ内の Verto
@@ -293,6 +305,7 @@ ja:
     results_link: 結果 →
   partnership_accounts:
     title: "アカウントを作成 — %{partnership}"
+    back_to_partnership: "%{partnership} に戻る"
     heading: パートナー用のアカウントを作成
     subtitle: 相手の組織を設定し、%{partnership} 用のパスワードを選択するためのリンクをメールでお送りします。
     name_label: 相手の名前

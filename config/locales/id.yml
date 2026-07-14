@@ -247,6 +247,13 @@ id:
     partner_eyebrow: Kemitraan · Anggota
     generate_link: Buat tautan bergabung →
     add_account: "+ Buat akun untuk mitra"
+    add_partner: Tambahkan mitra
+    picker_eyebrow: Tambahkan mitra
+    picker_title: Bagaimana Anda ingin menambahkannya?
+    picker_link_name: Tautan bergabung
+    picker_link_desc: Bagikan tautan — mereka akan membuat akun dan organisasi mereka sendiri.
+    picker_account_name: Buat akun mereka
+    picker_account_desc: Siapkan langsung untuk mereka — kami akan mengirim email agar mereka memilih kata sandi.
     setup_pending: Penyiapan tertunda
     delete: Hapus
     delete_confirm: Hapus %{name}? Semua tautan berbagi untuk kemitraan ini akan berhenti berfungsi.
@@ -257,6 +264,11 @@ id:
     partners_section: Mitra
     no_partners_title: Belum ada mitra
     no_partners_body_html: Gunakan <span style="color:#FF1E6F;">Buat tautan bergabung</span> di atas untuk mengundang organisasi mitra.
+    no_partners_body: Kirim tautan bergabung, atau buat akun mereka secara langsung.
+    stat_groups: Grup
+    stat_partners: Mitra
+    stat_vertos: Verto
+    stat_responses: Tanggapan
     joined_on: Bergabung %{date}
     remove_member_confirm: Hapus %{org} dari %{partnership}? Tautan berbagi mereka akan berhenti berfungsi.
     vertos_section: Verto dalam kemitraan
@@ -293,6 +305,7 @@ id:
     results_link: Hasil →
   partnership_accounts:
     title: "Buat akun — %{partnership}"
+    back_to_partnership: Kembali ke %{partnership}
     heading: Buat akun untuk mitra
     subtitle: Kami akan menyiapkan organisasi mereka dan mengirimkan tautan lewat email untuk memilih kata sandi mereka sendiri untuk %{partnership}.
     name_label: Nama mereka

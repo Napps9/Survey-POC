@@ -247,6 +247,13 @@ hi:
     partner_eyebrow: साझेदारी · सदस्य
     generate_link: जॉइन लिंक बनाएं →
     add_account: "+ साथी के लिए खाता बनाएं"
+    add_partner: साझेदार जोड़ें
+    picker_eyebrow: साझेदार जोड़ें
+    picker_title: आप उन्हें कैसे जोड़ना चाहते हैं?
+    picker_link_name: जॉइन लिंक
+    picker_link_desc: एक लिंक शेयर करें — वे अपना खुद का खाता और संगठन बनाएंगे।
+    picker_account_name: उनका खाता बनाएं
+    picker_account_desc: उन्हें सीधे सेट अप करें — हम उन्हें पासवर्ड चुनने के लिए ईमेल करेंगे।
     setup_pending: सेटअप लंबित
     delete: हटाएं
     delete_confirm: "%{name} को हटाएं? इस साझेदारी के सभी शेयर लिंक काम करना बंद कर देंगे।"
@@ -257,6 +264,11 @@ hi:
     partners_section: साझेदार
     no_partners_title: अभी तक कोई साझेदार नहीं
     no_partners_body_html: साझेदार संगठनों को आमंत्रित करने के लिए ऊपर <span style="color:#FF1E6F;">जॉइन लिंक बनाएं</span> का उपयोग करें।
+    no_partners_body: जॉइन लिंक भेजें, या सीधे उनका खाता बनाएं।
+    stat_groups: समूह
+    stat_partners: साझेदार
+    stat_vertos: Vertos
+    stat_responses: उत्तर
     joined_on: "%{date} को शामिल हुए"
     remove_member_confirm: "%{org} को %{partnership} से हटाएं? उनके शेयर लिंक काम करना बंद कर देंगे।"
     vertos_section: साझेदारी में Vertos
@@ -293,6 +305,7 @@ hi:
     results_link: परिणाम →
   partnership_accounts:
     title: "खाता बनाएं — %{partnership}"
+    back_to_partnership: "%{partnership} पर वापस"
     heading: किसी साथी के लिए खाता बनाएं
     subtitle: हम उनका संगठन सेट अप करेंगे और उन्हें %{partnership} के लिए अपना पासवर्ड चुनने का लिंक ईमेल करेंगे।
     name_label: उनका नाम

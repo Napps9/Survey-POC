@@ -247,6 +247,13 @@ pt:
     partner_eyebrow: Parceria · Membro
     generate_link: Gerar link de adesão →
     add_account: "+ Criar conta para um parceiro"
+    add_partner: "Adicionar um parceiro"
+    picker_eyebrow: "Adicionar um parceiro"
+    picker_title: "Como quer adicionar o parceiro?"
+    picker_link_name: "Link de adesão"
+    picker_link_desc: "Partilhe um link — eles criam a própria conta e organização."
+    picker_account_name: "Criar a conta"
+    picker_account_desc: "Configure-os diretamente — enviaremos um e-mail para escolherem uma palavra-passe."
     setup_pending: "Configuração pendente"
     delete: Eliminar
     delete_confirm: Eliminar %{name}? Todos os links de partilha desta parceria deixarão de funcionar.
@@ -257,6 +264,11 @@ pt:
     partners_section: Parceiros
     no_partners_title: Ainda sem parceiros
     no_partners_body_html: Use <span style="color:#FF1E6F;">Gerar link de adesão</span> acima para convidar organizações parceiras.
+    no_partners_body: "Envie um link de adesão ou crie a conta deles diretamente."
+    stat_groups: "Grupos"
+    stat_partners: "Parceiros"
+    stat_vertos: "Vertos"
+    stat_responses: "Respostas"
     joined_on: Aderiu em %{date}
     remove_member_confirm: Remover %{org} de %{partnership}? Os seus links de partilha deixarão de funcionar.
     vertos_section: Vertos na parceria
@@ -293,6 +305,7 @@ pt:
     results_link: Resultados →
   partnership_accounts:
     title: "Criar conta — %{partnership}"
+    back_to_partnership: "Voltar a %{partnership}"
     heading: "Criar uma conta para um parceiro"
     subtitle: "Vamos configurar a organização do parceiro e enviar-lhe por e-mail um link para escolher a sua própria palavra-passe para %{partnership}."
     name_label: "Nome do parceiro"

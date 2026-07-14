@@ -37,6 +37,26 @@
       </div>
     </div>
 
+    <%# ── Stat strip ── %>
+    <div style="position:relative;padding:24px 36px 4px;flex-shrink:0;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;">
+        <%
+          index_stats = [
+            { value: @owned_partnerships.size.to_s, label: t("partnerships.stat_groups"), accent: "#FF1E6F", grad: "linear-gradient(135deg,rgba(255,30,111,0.18),rgba(255,30,111,0.04))" },
+            { value: @total_partners.to_s, label: t("partnerships.stat_partners"), accent: "#615BF5", grad: "linear-gradient(135deg,rgba(97,91,245,0.18),rgba(97,91,245,0.04))" },
+            { value: @total_shared_vertos.to_s, label: t("partnerships.stat_vertos"), accent: "#01EACB", grad: "linear-gradient(135deg,rgba(1,234,203,0.18),rgba(1,234,203,0.04))" },
+            { value: @total_partnership_responses.to_s, label: t("partnerships.stat_responses"), accent: "#0CA7FF", grad: "linear-gradient(135deg,rgba(12,167,255,0.18),rgba(12,167,255,0.04))" },
+          ]
+        %>
+        <% index_stats.each do |s| %>
+          <div style="background:<%= s[:grad] %>;border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:16px 16px;text-align:center;backdrop-filter:blur(8px);">
+            <div style="font-family:'Alata',sans-serif;font-size:32px;color:<%= s[:accent] %>;line-height:1;letter-spacing:-0.01em;"><%= s[:value] %></div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.5);margin-top:6px;letter-spacing:0.12em;text-transform:uppercase;"><%= s[:label] %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
     <%# ── Body ── %>
     <div style="flex:1;padding:32px 36px 60px;">
 
@@ -72,7 +92,9 @@
             <% vertos   = @verto_counts_by_partnership[a.id]  || 0 %>
             <% replies  = @response_counts_by_partnership[a.id] || 0 %>
             <%= link_to partnership_path(a), style: "text-decoration:none;display:block;" do %>
-              <div style="position:relative;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
+              <div style="position:relative;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;"
+                   onmouseover="this.style.borderColor='rgba(255,30,111,0.4)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 30px rgba(0,0,0,0.28)'"
+                   onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='';this.style.boxShadow=''">
                 <div style="height:3px;background:linear-gradient(90deg,#FF1E6F,#615BF5);"></div>
                 <div style="padding:18px 20px 14px;">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;">
@@ -123,7 +145,9 @@
             <% member_count = a.member_organisations.size %>
             <% verto_count  = a.partnership_vertos.size %>
             <%= link_to partnership_path(a), style: "text-decoration:none;display:block;" do %>
-              <div style="position:relative;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
+              <div style="position:relative;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;"
+                   onmouseover="this.style.borderColor='rgba(1,234,203,0.4)';this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 30px rgba(0,0,0,0.28)'"
+                   onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.transform='';this.style.boxShadow=''">
                 <div style="height:3px;background:linear-gradient(90deg,#01EACB,#0CA7FF);"></div>
                 <div style="padding:18px 20px 14px;">
                   <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;line-height:1.2;margin-bottom:4px;"><%= a.name %></div>

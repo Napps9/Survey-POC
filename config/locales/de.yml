@@ -247,6 +247,13 @@ de:
     partner_eyebrow: Partnerschaft · Mitglied
     generate_link: Beitrittslink erstellen →
     add_account: "+ Konto für einen Partner erstellen"
+    add_partner: Partner hinzufügen
+    picker_eyebrow: Partner hinzufügen
+    picker_title: Wie möchten Sie den Partner hinzufügen?
+    picker_link_name: Beitrittslink
+    picker_link_desc: Teilen Sie einen Link — sie erstellen ihr eigenes Konto und ihre eigene Organisation.
+    picker_account_name: Konto erstellen
+    picker_account_desc: Richten Sie sie direkt ein — wir schicken ihnen eine E-Mail, damit sie ein Passwort wählen können.
     setup_pending: Einrichtung ausstehend
     delete: Löschen
     delete_confirm: "%{name} löschen? Alle Freigabelinks für diese Partnerschaft werden ungültig."
@@ -257,6 +264,11 @@ de:
     partners_section: Partner
     no_partners_title: Noch keine Partner
     no_partners_body_html: Verwenden Sie oben <span style="color:#FF1E6F;">Beitrittslink erstellen</span>, um Partnerorganisationen einzuladen.
+    no_partners_body: Senden Sie einen Beitrittslink oder erstellen Sie ihr Konto direkt selbst.
+    stat_groups: Gruppen
+    stat_partners: Partner
+    stat_vertos: Vertos
+    stat_responses: Antworten
     joined_on: Beigetreten am %{date}
     remove_member_confirm: "%{org} aus %{partnership} entfernen? Ihre Freigabelinks werden ungültig."
     vertos_section: Vertos in der Partnerschaft
@@ -293,6 +305,7 @@ de:
     results_link: Ergebnisse →
   partnership_accounts:
     title: "Konto erstellen — %{partnership}"
+    back_to_partnership: Zurück zu %{partnership}
     heading: Konto für einen Partner erstellen
     subtitle: Wir richten die Organisation ein und senden ihr per E-Mail einen Link, um ein eigenes Passwort für %{partnership} zu wählen.
     name_label: Name des Partners

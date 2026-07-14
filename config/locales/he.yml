@@ -247,6 +247,13 @@ he:
     partner_eyebrow: שותפות · חבר
     generate_link: צרו קישור הצטרפות ←
     add_account: "+ יצירת חשבון לשותף"
+    add_partner: הוסף שותף
+    picker_eyebrow: הוספת שותף
+    picker_title: איך תרצו להוסיף אותו?
+    picker_link_name: קישור הצטרפות
+    picker_link_desc: שתפו קישור — הם ייצרו חשבון וארגון משלהם.
+    picker_account_name: יצירת חשבון
+    picker_account_desc: נגדיר להם הכול ישירות — נשלח להם אימייל לבחירת סיסמה.
     setup_pending: ההגדרה ממתינה
     delete: מחק
     delete_confirm: למחוק את %{name}? כל קישורי השיתוף לשותפות זו יפסיקו לעבוד.
@@ -257,6 +264,11 @@ he:
     partners_section: שותפים
     no_partners_title: אין עדיין שותפים
     no_partners_body_html: השתמשו ב-<span style="color:#FF1E6F;">צרו קישור הצטרפות</span> למעלה כדי להזמין ארגונים שותפים.
+    no_partners_body: שלחו קישור הצטרפות, או צרו את החשבון שלהם ישירות.
+    stat_groups: קבוצות
+    stat_partners: שותפים
+    stat_vertos: Vertos
+    stat_responses: תגובות
     joined_on: הצטרף ב-%{date}
     remove_member_confirm: להסיר את %{org} מ-%{partnership}? קישורי השיתוף שלהם יפסיקו לעבוד.
     vertos_section: Vertos בשותפות
@@ -293,6 +305,7 @@ he:
     results_link: תוצאות ←
   partnership_accounts:
     title: "יצירת חשבון — %{partnership}"
+    back_to_partnership: חזרה ל-%{partnership}
     heading: יצירת חשבון לשותף
     subtitle: אנחנו נגדיר את הארגון שלו ונשלח לו קישור באימייל לבחירת סיסמה משלו עבור %{partnership}.
     name_label: השם שלו

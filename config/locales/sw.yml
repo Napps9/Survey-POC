@@ -247,6 +247,13 @@ sw:
     partner_eyebrow: Ushirikiano · Mwanachama
     generate_link: Tengeneza kiungo cha kujiunga →
     add_account: "+ Fungua akaunti kwa mshirika"
+    add_partner: "Ongeza mshirika"
+    picker_eyebrow: "Ongeza mshirika"
+    picker_title: "Unataka kumwongeza vipi?"
+    picker_link_name: "Kiungo cha kujiunga"
+    picker_link_desc: "Shiriki kiungo — watajiundia akaunti na shirika lao wenyewe."
+    picker_account_name: "Fungua akaunti"
+    picker_account_desc: "Wasanidi moja kwa moja — tutawatumia barua pepe wachague nenosiri."
     setup_pending: "Usanidi unasubiri"
     delete: Futa
     delete_confirm: Futa %{name}? Viungo vyote vya kushiriki vya ushirikiano huu vitaacha kufanya kazi.
@@ -257,6 +264,11 @@ sw:
     partners_section: Washirika
     no_partners_title: Hakuna washirika bado
     no_partners_body_html: Tumia <span style="color:#FF1E6F;">Tengeneza kiungo cha kujiunga</span> hapo juu kualika mashirika washirika.
+    no_partners_body: "Tuma kiungo cha kujiunga, au fungua akaunti yao moja kwa moja."
+    stat_groups: "Vikundi"
+    stat_partners: "Washirika"
+    stat_vertos: "Vertos"
+    stat_responses: "Majibu"
     joined_on: Alijiunga %{date}
     remove_member_confirm: Ondoa %{org} kutoka %{partnership}? Viungo vyao vya kushiriki vitaacha kufanya kazi.
     vertos_section: Vertos katika ushirikiano
@@ -293,6 +305,7 @@ sw:
     results_link: Matokeo →
   partnership_accounts:
     title: "Fungua akaunti — %{partnership}"
+    back_to_partnership: "Rudi kwa %{partnership}"
     heading: "Fungua akaunti kwa mshirika"
     subtitle: "Tutasanidi shirika la mshirika na kumtumia barua pepe yenye kiungo cha kuchagua nenosiri lake mwenyewe kwa ajili ya %{partnership}."
     name_label: "Jina la mshirika"

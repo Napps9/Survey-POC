@@ -247,6 +247,13 @@ fr:
     partner_eyebrow: Partenariat · Membre
     generate_link: Générer un lien d'invitation →
     add_account: "+ Créer un compte pour un partenaire"
+    add_partner: Ajouter un partenaire
+    picker_eyebrow: Ajouter un partenaire
+    picker_title: Comment souhaitez-vous l'ajouter ?
+    picker_link_name: Lien d'invitation
+    picker_link_desc: Partagez un lien — il créera son propre compte et sa propre organisation.
+    picker_account_name: Créer son compte
+    picker_account_desc: Configurez-le directement — nous lui enverrons un e-mail pour qu'il choisisse un mot de passe.
     setup_pending: Configuration en attente
     delete: Supprimer
     delete_confirm: Supprimer %{name} ? Tous les liens de partage de ce partenariat cesseront de fonctionner.
@@ -257,6 +264,11 @@ fr:
     partners_section: Partenaires
     no_partners_title: Aucun partenaire pour le moment
     no_partners_body_html: Utilisez <span style="color:#FF1E6F;">Générer un lien d'invitation</span> ci-dessus pour inviter des organisations partenaires.
+    no_partners_body: Envoyez un lien d'invitation, ou créez directement son compte.
+    stat_groups: Groupes
+    stat_partners: Partenaires
+    stat_vertos: Vertos
+    stat_responses: Réponses
     joined_on: Rejoint le %{date}
     remove_member_confirm: Retirer %{org} de %{partnership} ? Leurs liens de partage cesseront de fonctionner.
     vertos_section: Vertos dans le partenariat
@@ -293,6 +305,7 @@ fr:
     results_link: Résultats →
   partnership_accounts:
     title: "Créer un compte — %{partnership}"
+    back_to_partnership: Retour à %{partnership}
     heading: Créer un compte pour un partenaire
     subtitle: Nous configurerons son organisation et lui enverrons un lien par e-mail pour choisir son propre mot de passe pour %{partnership}.
     name_label: Son nom

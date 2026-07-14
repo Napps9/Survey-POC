@@ -247,6 +247,13 @@ ru:
     partner_eyebrow: Партнёрство · Участник
     generate_link: Создать ссылку для присоединения →
     add_account: "+ Создать аккаунт для партнёра"
+    add_partner: "Добавить партнёра"
+    picker_eyebrow: "Добавить партнёра"
+    picker_title: "Как вы хотите добавить партнёра?"
+    picker_link_name: "Ссылка для присоединения"
+    picker_link_desc: "Поделитесь ссылкой — они создадут собственный аккаунт и организацию."
+    picker_account_name: "Создать аккаунт"
+    picker_account_desc: "Настройте всё за них — мы отправим им письмо для выбора пароля."
     setup_pending: "Ожидает настройки"
     delete: Удалить
     delete_confirm: Удалить %{name}? Все ссылки для распространения этого партнёрства перестанут работать.
@@ -257,6 +264,11 @@ ru:
     partners_section: Партнёры
     no_partners_title: Партнёров пока нет
     no_partners_body_html: Используйте <span style="color:#FF1E6F;">Создать ссылку для присоединения</span> выше, чтобы пригласить партнёрские организации.
+    no_partners_body: "Отправьте ссылку для присоединения или создайте им аккаунт напрямую."
+    stat_groups: "Группы"
+    stat_partners: "Партнёры"
+    stat_vertos: "Vertos"
+    stat_responses: "Ответы"
     joined_on: Присоединился %{date}
     remove_member_confirm: Удалить %{org} из %{partnership}? Их ссылки для распространения перестанут работать.
     vertos_section: Verto в партнёрстве
@@ -293,6 +305,7 @@ ru:
     results_link: Результаты →
   partnership_accounts:
     title: "Создать аккаунт — %{partnership}"
+    back_to_partnership: "Назад к %{partnership}"
     heading: "Создать аккаунт для партнёра"
     subtitle: "Мы настроим организацию партнёра и отправим на email ссылку для выбора пароля в %{partnership}."
     name_label: "Имя партнёра"

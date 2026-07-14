@@ -247,6 +247,13 @@ es:
     partner_eyebrow: Asociación · Miembro
     generate_link: Generar enlace de invitación →
     add_account: "+ Crear cuenta para un socio"
+    add_partner: Añadir un socio
+    picker_eyebrow: Añadir un socio
+    picker_title: "¿Cómo quieres añadirlo?"
+    picker_link_name: Enlace de invitación
+    picker_link_desc: Comparte un enlace — crearán su propia cuenta y organización.
+    picker_account_name: Crear su cuenta
+    picker_account_desc: Configúralos directamente — les enviaremos un correo para que elijan su contraseña.
     setup_pending: Configuración pendiente
     delete: Eliminar
     delete_confirm: "¿Eliminar %{name}? Todos los enlaces de compartir de esta asociación dejarán de funcionar."
@@ -257,6 +264,11 @@ es:
     partners_section: Socios
     no_partners_title: Aún no hay socios
     no_partners_body_html: Usa <span style="color:#FF1E6F;">Generar enlace de invitación</span> arriba para invitar a organizaciones socias.
+    no_partners_body: Envía un enlace de invitación o crea su cuenta directamente.
+    stat_groups: Grupos
+    stat_partners: Socios
+    stat_vertos: Vertos
+    stat_responses: Respuestas
     joined_on: Se unió el %{date}
     remove_member_confirm: "¿Eliminar a %{org} de %{partnership}? Sus enlaces para compartir dejarán de funcionar."
     vertos_section: Vertos en la asociación
@@ -293,6 +305,7 @@ es:
     results_link: Resultados →
   partnership_accounts:
     title: "Crear cuenta — %{partnership}"
+    back_to_partnership: Volver a %{partnership}
     heading: Crear una cuenta para un socio
     subtitle: Configuraremos su organización y le enviaremos un enlace por correo electrónico para que elija su propia contraseña para %{partnership}.
     name_label: Su nombre

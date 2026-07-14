@@ -247,6 +247,13 @@ pl:
     partner_eyebrow: Partnerstwo · Członek
     generate_link: Wygeneruj link dołączenia →
     add_account: "+ Utwórz konto dla partnera"
+    add_partner: "Dodaj partnera"
+    picker_eyebrow: "Dodaj partnera"
+    picker_title: "Jak chcesz ich dodać?"
+    picker_link_name: "Link dołączenia"
+    picker_link_desc: "Udostępnij link — sami utworzą własne konto i organizację."
+    picker_account_name: "Utwórz konto"
+    picker_account_desc: "Skonfiguruj ich bezpośrednio — wyślemy e-mail z prośbą o wybranie hasła."
     setup_pending: "Oczekuje na konfigurację"
     delete: Usuń
     delete_confirm: Usunąć %{name}? Wszystkie linki udostępniania tego partnerstwa przestaną działać.
@@ -257,6 +264,11 @@ pl:
     partners_section: Partnerzy
     no_partners_title: Brak partnerów
     no_partners_body_html: Użyj <span style="color:#FF1E6F;">Wygeneruj link dołączenia</span> powyżej, aby zaprosić organizacje partnerskie.
+    no_partners_body: "Wyślij link dołączenia lub utwórz dla nich konto bezpośrednio."
+    stat_groups: "Grupy"
+    stat_partners: "Partnerzy"
+    stat_vertos: "Verto"
+    stat_responses: "Odpowiedzi"
     joined_on: Dołączono %{date}
     remove_member_confirm: Usunąć %{org} z %{partnership}? Ich linki udostępniania przestaną działać.
     vertos_section: Verto w partnerstwie
@@ -293,6 +305,7 @@ pl:
     results_link: Wyniki →
   partnership_accounts:
     title: "Utwórz konto — %{partnership}"
+    back_to_partnership: "Wróć do %{partnership}"
     heading: "Utwórz konto dla partnera"
     subtitle: "Skonfigurujemy organizację partnera i wyślemy e-mailem link do ustawienia hasła dla %{partnership}."
     name_label: "Imię i nazwisko partnera"

@@ -247,6 +247,13 @@ tr:
     partner_eyebrow: Ortaklık · Üye
     generate_link: Katılım bağlantısı oluştur →
     add_account: "+ Ortak için hesap oluştur"
+    add_partner: "Ortak ekle"
+    picker_eyebrow: "Ortak ekle"
+    picker_title: "Nasıl eklemek istersiniz?"
+    picker_link_name: "Katılım bağlantısı"
+    picker_link_desc: "Bir bağlantı paylaşın — kendi hesaplarını ve kuruluşlarını oluştursunlar."
+    picker_account_name: "Hesap oluştur"
+    picker_account_desc: "Doğrudan siz kurun — şifre seçmeleri için onlara e-posta göndereceğiz."
     setup_pending: "Kurulum bekleniyor"
     delete: Sil
     delete_confirm: "%{name} silinsin mi? Bu ortaklık için tüm paylaşım bağlantıları çalışmayı durduracak."
@@ -257,6 +264,11 @@ tr:
     partners_section: Ortaklar
     no_partners_title: Henüz ortak yok
     no_partners_body_html: Ortak kuruluşları davet etmek için yukarıdaki <span style="color:#FF1E6F;">Katılım bağlantısı oluştur</span> seçeneğini kullanın.
+    no_partners_body: "Bir katılım bağlantısı gönderin ya da hesaplarını doğrudan siz oluşturun."
+    stat_groups: "Gruplar"
+    stat_partners: "Ortaklar"
+    stat_vertos: "Verto"
+    stat_responses: "Yanıtlar"
     joined_on: "%{date} tarihinde katıldı"
     remove_member_confirm: "%{org}, %{partnership} ortaklıkından çıkarılsın mı? Paylaşım bağlantıları çalışmayı durduracak."
     vertos_section: Ortaklıktaki Verto'lar
@@ -293,6 +305,7 @@ tr:
     results_link: Sonuçlar →
   partnership_accounts:
     title: "Hesap oluştur — %{partnership}"
+    back_to_partnership: "%{partnership}'e dön"
     heading: "Bir ortak için hesap oluştur"
     subtitle: "Kuruluşlarını ayarlayacak ve %{partnership} için kendi şifrelerini seçmeleri amacıyla e-posta ile bir bağlantı göndereceğiz."
     name_label: "Ortağın adı"

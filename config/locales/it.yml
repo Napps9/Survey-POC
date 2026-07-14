@@ -247,6 +247,13 @@ it:
     partner_eyebrow: Partnership · Membro
     generate_link: Genera link di adesione →
     add_account: "+ Crea account per un partner"
+    add_partner: Aggiungi un partner
+    picker_eyebrow: Aggiungi un partner
+    picker_title: Come vuoi aggiungerlo?
+    picker_link_name: Link di adesione
+    picker_link_desc: Condividi un link — creeranno il proprio account e la propria organizzazione.
+    picker_account_name: Crea il suo account
+    picker_account_desc: Configuralo direttamente — gli invieremo un'e-mail per scegliere una password.
     setup_pending: Configurazione in attesa
     delete: Elimina
     delete_confirm: Eliminare %{name}? Tutti i link di condivisione di questa partnership smetteranno di funzionare.
@@ -257,6 +264,11 @@ it:
     partners_section: Partner
     no_partners_title: Nessun partner ancora
     no_partners_body_html: Usa <span style="color:#FF1E6F;">Genera link di adesione</span> qui sopra per invitare le organizzazioni partner.
+    no_partners_body: Invia un link di adesione, oppure crea direttamente il suo account.
+    stat_groups: Gruppi
+    stat_partners: Partner
+    stat_vertos: Verto
+    stat_responses: Risposte
     joined_on: Iscritto il %{date}
     remove_member_confirm: Rimuovere %{org} da %{partnership}? I suoi link di condivisione smetteranno di funzionare.
     vertos_section: Verto nella partnership
@@ -293,6 +305,7 @@ it:
     results_link: Risultati →
   partnership_accounts:
     title: "Crea account — %{partnership}"
+    back_to_partnership: Torna a %{partnership}
     heading: Crea un account per un partner
     subtitle: Configureremo la sua organizzazione e gli invieremo un link via email per scegliere la propria password per %{partnership}.
     name_label: Il suo nome
