@@ -180,13 +180,16 @@
             onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
     </div>
 
-    <% if current_membership&.admin? %>
-      <div style="padding:0 16px 12px;display:flex;justify-content:flex-end;">
+    <div style="padding:0 16px 12px;display:flex;align-items:center;justify-content:space-between;">
+      <%= button_to t("dashboard_card.duplicate"), duplicate_survey_path(survey), method: :post,
+            form: { style: "margin:0;" },
+            style: "background:none;border:none;padding:4px 8px;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;text-decoration:underline;text-underline-offset:3px;" %>
+      <% if current_membership&.admin? %>
         <%= button_to t("dashboard_card.delete"), survey_path(survey), method: :delete,
               data: { turbo_confirm: delete_warning },
               form: { style: "margin:0;" },
               style: "background:none;border:none;padding:4px 8px;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;text-decoration:underline;text-underline-offset:3px;" %>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   <% end %>
 </div>

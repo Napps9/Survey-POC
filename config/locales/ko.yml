@@ -407,6 +407,7 @@ ko:
     edit: Verto 편집
     results: 결과 →
     publish: 게시 →
+    duplicate: 복제
     delete: 삭제
     delete_forever: 영구 삭제
     edit_warning: '"%{title}"은(는) 라이브 상태입니다. 응답을 수집하는 동안 질문을 편집하면 데이터 품질에 영향을 미칩니다 — 편집 전후의 답변은 직접 비교할 수 없습니다. 계속하시겠습니까?'

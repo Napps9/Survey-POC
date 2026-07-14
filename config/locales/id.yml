@@ -407,6 +407,7 @@ id:
     edit: Edit Verto
     results: Hasil →
     publish: Publikasikan →
+    duplicate: Duplikat
     delete: Hapus
     delete_forever: Hapus selamanya
     edit_warning: '"%{title}" sedang live. Mengedit pertanyaan saat sedang mengumpulkan tanggapan akan memengaruhi kualitas data — jawaban sebelum dan sesudah pengeditan tidak dapat dibandingkan langsung. Lanjutkan?'

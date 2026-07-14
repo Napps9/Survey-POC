@@ -407,6 +407,7 @@ ja:
     edit: Vertoを編集
     results: 結果 →
     publish: 公開 →
+    duplicate: 複製
     delete: 削除
     delete_forever: 永遠に削除
     edit_warning: "「%{title}」はライブ中です。回答収集中に質問を編集するとデータの品質に影響します — 編集前後の回答は直接比較できません。続けますか？"

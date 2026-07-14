@@ -407,6 +407,7 @@ pt:
     edit: Editar Verto
     results: Resultados →
     publish: Publicar →
+    duplicate: Duplicar
     delete: Eliminar
     delete_forever: Deletar permanentemente
     edit_warning: "“%{title}” está ao vivo. Editar perguntas enquanto está a recolher respostas afetará a qualidade dos dados — as respostas antes e depois da edição não serão diretamente comparáveis. Continuar?"

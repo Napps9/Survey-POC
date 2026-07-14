@@ -407,6 +407,7 @@ tr:
     edit: Verto'yu düzenle
     results: Sonuçlar →
     publish: Yayınla →
+    duplicate: Çoğalt
     delete: Sil
     delete_forever: Kalıcı olarak sil
     edit_warning: '"%{title}" canlı. Yanıt toplarken soruları düzenlemek veri kalitesini etkileyecektir — düzenlemeden önceki ve sonraki yanıtlar doğrudan karşılaştırılamaz. Devam edilsin mi?'

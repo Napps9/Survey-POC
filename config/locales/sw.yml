@@ -407,6 +407,7 @@ sw:
     edit: Hariri Verto
     results: Matokeo →
     publish: Chapisha →
+    duplicate: Nakili
     delete: Futa
     delete_forever: Futa milele
     edit_warning: '"%{title}" iko hai. Kuhariri maswali wakati inakusanya majibu kutaathiri ubora wa data — majibu ya kabla na baada ya uhariri hayatalinganishwa moja kwa moja. Endelea?'

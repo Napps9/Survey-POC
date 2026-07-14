@@ -407,6 +407,7 @@ vi:
     edit: Chỉnh sửa Verto
     results: Kết quả →
     publish: Xuất bản →
+    duplicate: Nhân bản
     delete: Xóa
     delete_forever: Xóa vĩnh viễn
     edit_warning: '"%{title}" đang trực tiếp. Việc chỉnh sửa câu hỏi khi đang thu thập phản hồi sẽ ảnh hưởng đến chất lượng dữ liệu — câu trả lời trước và sau khi chỉnh sửa sẽ không so sánh trực tiếp được. Tiếp tục?'

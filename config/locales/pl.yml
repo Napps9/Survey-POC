@@ -407,6 +407,7 @@ pl:
     edit: Edytuj Verto
     results: Wyniki →
     publish: Opublikuj →
+    duplicate: Duplikuj
     delete: Usuń
     delete_forever: Usuń na zawsze
     edit_warning: "„%{title}” jest aktywne. Edytowanie pytań podczas zbierania odpowiedzi wpłynie na jakość danych — odpowiedzi sprzed i po edycji nie będą bezpośrednio porównywalne. Kontynuować?"

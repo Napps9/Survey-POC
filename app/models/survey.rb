@@ -225,6 +225,42 @@ class Survey < ApplicationRecord
     publish_token.present?
   end
 
+  # A same-organisation copy for the dashboard's "Duplicate" action. Always
+  # lands in Drafts regardless of the source's status: publish_token,
+  # published_at and slug share the /play/:token unique-index namespace, so
+  # they're left nil rather than copied, and the results-report/summary
+  # columns are generated from a specific run of responses the copy doesn't
+  # have. `cards` is round-tripped through JSON so the copy owns its own
+  # option/i18n arrays instead of sharing the source's in-memory objects.
+  def duplicate!
+    organisation.surveys.create!(
+      title:                   self.class.append_copy_suffix(title),
+      description:             description,
+      theme:                   self.class.append_copy_suffix(theme),
+      audience_age:            audience_age,
+      key_insight:             key_insight,
+      cards:                   JSON.parse(cards.to_json),
+      brand_palette:           read_attribute(:brand_palette),
+      background_image:        background_image,
+      default_locale:          default_locale,
+      locales:                 locales,
+      quiz:                    quiz,
+      render_mode:             render_mode,
+      show_results_comparison: show_results_comparison,
+      tokenisation_enabled:    tokenisation_enabled,
+      token_types:             token_types,
+      compare_note:            compare_note,
+      thankyou_title:          thankyou_title,
+      thankyou_body:           thankyou_body,
+      forward_url:             forward_url,
+      consent_text:            consent_text
+    )
+  end
+
+  def self.append_copy_suffix(value)
+    value.present? ? "#{value} (Copy)" : value
+  end
+
   # The compare-results promise shown on the welcome card. Falls back to the
   # default copy when the creator hasn't customised it.
   def compare_note_text

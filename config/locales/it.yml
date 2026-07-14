@@ -407,6 +407,7 @@ it:
     edit: Modifica Verto
     results: Risultati →
     publish: Pubblica →
+    duplicate: Duplica
     delete: Elimina
     delete_forever: Elimina per sempre
     edit_warning: "“%{title}” è live. Modificare le domande mentre raccoglie risposte influirà sulla qualità dei dati — le risposte prima e dopo la modifica non saranno direttamente confrontabili. Continuare?"

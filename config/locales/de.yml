@@ -407,6 +407,7 @@ de:
     edit: Verto bearbeiten
     results: Ergebnisse →
     publish: Veröffentlichen →
+    duplicate: Duplizieren
     delete: Löschen
     delete_forever: Dauerhaft löschen
     edit_warning: "„%{title}“ ist live. Das Bearbeiten von Fragen, während Antworten gesammelt werden, beeinträchtigt die Datenqualität — Antworten von vor und nach der Bearbeitung sind nicht direkt vergleichbar. Fortfahren?"

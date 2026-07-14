@@ -407,6 +407,7 @@ nl:
     edit: Verto bewerken
     results: Resultaten →
     publish: Publiceren →
+    duplicate: Dupliceren
     delete: Verwijderen
     delete_forever: Voor altijd verwijderen
     edit_warning: "“%{title}” is live. Het bewerken van vragen terwijl er reacties worden verzameld, heeft invloed op de datakwaliteit — antwoorden van vóór en na de bewerking zijn niet rechtstreeks vergelijkbaar. Doorgaan?"

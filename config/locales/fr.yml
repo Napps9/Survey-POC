@@ -407,6 +407,7 @@ fr:
     edit: Modifier le Verto
     results: Résultats →
     publish: Publier →
+    duplicate: Dupliquer
     delete: Supprimer
     delete_forever: Supprimer définitivement
     edit_warning: "« %{title} » est en ligne. Modifier les questions pendant la collecte de réponses affectera la qualité des données — les réponses avant et après la modification ne seront pas directement comparables. Continuer ?"

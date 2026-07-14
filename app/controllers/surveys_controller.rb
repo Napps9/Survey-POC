@@ -379,6 +379,15 @@ class SurveysController < ApplicationController
     redirect_to survey_path(@survey)
   end
 
+  # POST /surveys/:id/duplicate
+  # Copies a Verto — draft or live — into a brand-new draft under the same
+  # organisation, then opens it in the editor. See Survey#duplicate! for what
+  # is and isn't carried over.
+  def duplicate
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    redirect_to survey_path(survey.duplicate!)
+  end
+
   # Settings forms each post the one field they own — only touch what's sent.
   def update_settings
     attrs = {}

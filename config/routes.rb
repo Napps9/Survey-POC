@@ -67,6 +67,7 @@ Rails.application.routes.draw do
   post "surveys/:id/moderate_image",  to: "surveys#moderate_image", as: :moderate_image_survey
   post "surveys/finalize_import",     to: "surveys#finalize_import", as: :finalize_import_survey
   post "surveys/:id/publish",         to: "surveys#publish",  as: :publish_survey
+  post "surveys/:id/duplicate",       to: "surveys#duplicate", as: :duplicate_survey
   get  "surveys/:id/preview",         to: "surveys#preview",  as: :preview_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
   post "surveys/:id/shuffle_assets",  to: "surveys#shuffle_assets",  as: :shuffle_survey_assets

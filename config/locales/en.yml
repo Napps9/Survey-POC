@@ -409,6 +409,7 @@ en:
     edit: "Edit Verto"
     results: "Results →"
     publish: "Publish →"
+    duplicate: "Duplicate"
     delete: "Delete"
     delete_forever: "Delete forever"
     edit_warning: "“%{title}” is live. Editing questions while it's collecting responses will affect data quality — answers from before and after the edit won't be directly comparable. Continue?"
