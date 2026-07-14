@@ -94,7 +94,7 @@ class VertoCsvImporter
     "congo, democratic republic of the" => "CD", "democratic republic of the congo" => "CD",
     "dr congo" => "CD", "congo (kinshasa)" => "CD", "congo, the democratic republic of the" => "CD",
     "palestine, state of" => "PS", "palestinian territory" => "PS", "palestinian territories" => "PS",
-    "korea, republic of" => "KR", "south korea" => "KR", "republic of korea" => "KR",
+    "korea, republic of" => "KR", "south korea" => "KR", "republic of korea" => "KR", "korea, south" => "KR",
     "korea, democratic people's republic of" => "KP", "north korea" => "KP",
     "tanzania, united republic of" => "TZ", "tanzania" => "TZ",
     "russian federation" => "RU", "russia" => "RU",
