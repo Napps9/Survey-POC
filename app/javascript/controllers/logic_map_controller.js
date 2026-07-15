@@ -2,17 +2,27 @@ import { Controller } from "@hotwired/stimulus"
 
 // The "zoom out" flow map for answer-branching. Reads the LIVE deck from the
 // survey-editor controller (serialize() → cards with cid + logic), builds a
-// layered DAG of card nodes + end-screen terminals, and draws it as hand-rolled
-// inline SVG with cubic-Bézier connectors — no external graph library (the
-// importmap has no bundler and the app's only precedent is hand-authored SVG).
-// Read-only: pan (drag) + zoom (wheel) via the SVG viewBox, and click a card to
-// jump to it in the editor. Editable drag-to-branch lands in a later phase.
+// layered DAG and draws it as hand-rolled inline SVG with cubic-Bézier
+// connectors — no external graph library (the importmap has no bundler and the
+// app's only precedent is hand-authored SVG). Each card node shows the REAL
+// card (design + question + options) as a scaled, sanitised clone inside a
+// <foreignObject>; end screens render as finish pills. Pan (drag) + zoom (wheel)
+// via the SVG viewBox. On an unpublished Verto it's an editable canvas: drag an
+// answer port onto a node to route it, drop on empty space for a new branch
+// card, click a connector to remove it — all written back through the card
+// editor's own route <select> so autosave persists them.
 const SVG = "http://www.w3.org/2000/svg"
-const NODE_W = 200
-const NODE_H = 70
-const COL_GAP = 120
-const ROW_GAP = 34
-const MARGIN = 48
+const XHTML = "http://www.w3.org/1999/xhtml"
+// Card nodes render the REAL card (design + question + options) as a scaled,
+// sanitised clone inside a <foreignObject>; heights vary with the clone.
+const CARD_W = 320
+const CARD_H_MIN = 130
+const CARD_H_MAX = 300
+const END_W = 200
+const END_H = 66
+const COL_GAP = 130
+const ROW_GAP = 40
+const MARGIN = 56
 
 export default class extends Controller {
   static targets = ["overlay", "svg", "empty"]
@@ -142,25 +152,41 @@ export default class extends Controller {
     const endLayer = maxLayer + 1
     endNodes.forEach(n => layer.set(n.key, endLayer))
 
-    // Order within each layer by original index (cards) / insertion (ends).
+    // Per-node dimensions: a card node is the real card scaled to CARD_W (its
+    // height follows the clone, clamped); end nodes are compact pills.
+    graph.nodes.forEach(n => {
+      const src = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(n.key)}"] .split-card`)
+      const r = src && src.getBoundingClientRect()
+      const naturalW = (r && r.width) || 680
+      const naturalH = (r && r.height) || 360
+      n.w = CARD_W
+      n.scale = CARD_W / naturalW
+      n.naturalW = naturalW
+      n.h = Math.max(CARD_H_MIN, Math.min(CARD_H_MAX, Math.round(naturalH * n.scale)))
+    })
+    endNodes.forEach(n => { n.w = END_W; n.h = END_H })
+
+    // Order within each layer by original index (cards) / insertion (ends), then
+    // stack each column independently by cumulative height (nodes vary in size).
     const byLayer = new Map()
     graph.allNodes.forEach(n => {
       const L = layer.get(n.key) ?? 0
       if (!byLayer.has(L)) byLayer.set(L, [])
       byLayer.get(L).push(n)
     })
-    let maxRows = 1
+    let height = 0
     byLayer.forEach(list => {
       list.sort((a, b) => (a.index ?? 999) - (b.index ?? 999))
-      list.forEach((n, k) => {
-        n.x = MARGIN + (layer.get(n.key)) * (NODE_W + COL_GAP)
-        n.y = MARGIN + k * (NODE_H + ROW_GAP)
+      let y = MARGIN
+      list.forEach(n => {
+        n.x = MARGIN + (layer.get(n.key)) * (CARD_W + COL_GAP)
+        n.y = y
+        y += n.h + ROW_GAP
       })
-      maxRows = Math.max(maxRows, list.length)
+      height = Math.max(height, y)
     })
-    const width  = MARGIN * 2 + endLayer * (NODE_W + COL_GAP) + NODE_W
-    const height = MARGIN * 2 + (maxRows - 1) * (NODE_H + ROW_GAP) + NODE_H
-    return { width, height }
+    const width = MARGIN * 2 + endLayer * (CARD_W + COL_GAP) + CARD_W
+    return { width, height: height + MARGIN }
   }
 
   // ── render ───────────────────────────────────────────────────────────────
@@ -213,10 +239,10 @@ export default class extends Controller {
   _edgePath(e, posByKey) {
     const from = posByKey.get(e.from)
     if (!from) return null
-    const sx = from.x + NODE_W, sy = from.y + NODE_H / 2
+    const sx = from.x + from.w, sy = from.y + this._portY(from, e.opt)
     let tx, ty
     if (e.to && posByKey.has(e.to)) {
-      const to = posByKey.get(e.to); tx = to.x; ty = to.y + NODE_H / 2
+      const to = posByKey.get(e.to); tx = to.x; ty = to.y + to.h / 2
     } else {
       tx = sx + 90; ty = sy // dangling: a short stub
     }
@@ -273,43 +299,105 @@ export default class extends Controller {
   _cardNode(n) {
     const g = this._g()
     g.setAttribute("transform", `translate(${n.x} ${n.y})`)
-    g.setAttribute("style", "cursor:pointer")
     g.dataset.nodeKey = n.key
     g.dataset.nodeKind = "card"
-    g.addEventListener("click", () => this._jumpTo(n.key))
 
-    const rect = document.createElementNS(SVG, "rect")
-    rect.setAttribute("width", NODE_W); rect.setAttribute("height", NODE_H); rect.setAttribute("rx", 14)
-    rect.setAttribute("fill", n.unreachable ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.07)")
-    rect.setAttribute("stroke", n.unreachable ? "rgba(248,113,113,0.55)" : "rgba(255,255,255,0.16)")
-    if (n.unreachable) rect.setAttribute("stroke-dasharray", "4 4")
-    rect.setAttribute("stroke-width", "1.5")
-    g.appendChild(rect)
+    // The real card (design + question + options), scaled to fit the node.
+    const fo = document.createElementNS(SVG, "foreignObject")
+    fo.setAttribute("x", 0); fo.setAttribute("y", 0)
+    fo.setAttribute("width", n.w); fo.setAttribute("height", n.h)
+    const box = document.createElementNS(XHTML, "div")
+    box.setAttribute("class", `lm-card-box${n.unreachable ? " lm-card-unreachable" : ""}`)
+    // Carry the Verto's brand palette onto the clone so its design renders true.
+    const srcWrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(n.key)}"]`)
+    if (srcWrap) {
+      const cs = getComputedStyle(srcWrap)
+      ;["--brand-primary", "--brand-cta", "--brand-bg", "--brand-bg-image", "--brand-cta-text", "--brand-primary-text", "--brand-secondary"]
+        .forEach(v => { const val = cs.getPropertyValue(v); if (val && val.trim()) box.style.setProperty(v, val.trim()) })
+    }
+    const clone = this._cloneCard(n.key)
+    if (clone) {
+      const inner = document.createElementNS(XHTML, "div")
+      inner.setAttribute("class", "lm-card-scale")
+      inner.setAttribute("style", `width:${n.naturalW}px;transform:scale(${n.scale});transform-origin:top left;`)
+      inner.appendChild(clone)
+      box.appendChild(inner)
+    } else {
+      box.appendChild(this._fallbackCard(n))
+    }
+    fo.appendChild(box)
+    g.appendChild(fo)
 
-    g.appendChild(this._text(14, 22, this._trunc(this._badge(n.type), 20), { size: 10, fill: "rgba(1,234,203,0.85)", spacing: "0.06em" }))
-    g.appendChild(this._text(14, 44, this._trunc(n.text || "Untitled", 24), { size: 13, fill: "#fff" }))
-    g.appendChild(this._text(14, 60, n.unreachable ? "unreachable" : `Card ${n.num}`, { size: 10, fill: n.unreachable ? "#F87171" : "rgba(255,255,255,0.4)" }))
+    // A transparent hit layer over the card: click to jump to it, and it's the
+    // drop target for a dragged route (the card clone itself is pointer-inert).
+    const hit = document.createElementNS(SVG, "rect")
+    hit.setAttribute("width", n.w); hit.setAttribute("height", n.h); hit.setAttribute("rx", 16)
+    hit.setAttribute("fill", "transparent"); hit.style.cursor = "pointer"
+    hit.addEventListener("click", () => this._jumpTo(n.key))
+    g.appendChild(hit)
 
-    // Editable: a draggable output port per answer (+ an "otherwise" default),
-    // on the right edge. Drag a port onto another node to route that answer.
+    // A small caption chip (card number) so nodes are identifiable when zoomed out.
+    const cap = this._text(10, n.h - 8, n.unreachable ? "unreachable" : `Card ${n.num}`,
+      { size: 11, fill: n.unreachable ? "#F87171" : "rgba(255,255,255,0.55)" })
+    g.appendChild(cap)
+
+    // Editable: a draggable output port per answer (+ an "otherwise" default).
     if (this.editableValue && this.constructor.ROUTABLE.includes(n.type)) {
-      const ports = [...n.options.map(o => ({ opt: o, label: o })), { opt: "__default__", label: "otherwise" }]
-      const gap = Math.min(16, (NODE_H - 8) / Math.max(1, ports.length - 1))
-      const startY = Math.max(12, (NODE_H - (ports.length - 1) * gap) / 2)
-      ports.forEach((port, k) => {
-        const py = startY + k * gap
+      this._portLayout(n).forEach(port => {
         const dot = document.createElementNS(SVG, "circle")
-        dot.setAttribute("cx", NODE_W); dot.setAttribute("cy", py); dot.setAttribute("r", 5)
-        dot.setAttribute("fill", "#615BF5"); dot.setAttribute("stroke", "#fff"); dot.setAttribute("stroke-width", "1")
+        dot.setAttribute("cx", n.w); dot.setAttribute("cy", port.py); dot.setAttribute("r", 6)
+        dot.setAttribute("fill", "#615BF5"); dot.setAttribute("stroke", "#fff"); dot.setAttribute("stroke-width", "1.5")
         dot.style.cursor = "crosshair"
         const title = document.createElementNS(SVG, "title")
         title.textContent = `Drag to route "${port.label}"`
         dot.appendChild(title)
-        dot.addEventListener("pointerdown", (ev) => { ev.stopPropagation(); this._beginConnect(n.key, port.opt, n.x + NODE_W, n.y + py, ev) })
+        dot.addEventListener("pointerdown", (ev) => { ev.stopPropagation(); this._beginConnect(n.key, port.opt, n.x + n.w, n.y + port.py, ev) })
         g.appendChild(dot)
       })
     }
     return g
+  }
+
+  // Port positions down the right edge — shared by port drawing and edge anchors.
+  _portLayout(node) {
+    const opts = [...(node.options || []).map(o => ({ opt: o, label: o })), { opt: "__default__", label: "otherwise" }]
+    const count = opts.length
+    const gap = Math.min(26, (node.h - 28) / Math.max(1, count - 1))
+    const startY = Math.max(18, (node.h - (count - 1) * gap) / 2)
+    return opts.map((o, k) => ({ ...o, py: startY + k * gap }))
+  }
+
+  _portY(node, opt) {
+    if (opt == null || node.kind !== "card" || !this.constructor.ROUTABLE.includes(node.type)) return node.h / 2
+    return (this._portLayout(node).find(p => p.opt === opt)?.py) ?? node.h / 2
+  }
+
+  // A sanitised, inert clone of the real card's .split-card: strips the editor
+  // chrome and every controller/action/contenteditable so the map never wires
+  // up duplicate widgets — it's a static picture of design + question + options.
+  _cloneCard(cid) {
+    const src = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(cid)}"] .split-card`)
+    if (!src) return null
+    const clone = src.cloneNode(true)
+    clone.querySelectorAll(".logic-route-select, .logic-default-row, .mark-correct, .pick-item-delete, .pick-add-btn, [data-card-editor-add], .card-reorder, .card-delete-btn")
+      .forEach(el => el.remove())
+    const scrub = (el) => {
+      el.removeAttribute("data-controller")
+      el.removeAttribute("data-action")
+      el.removeAttribute("contenteditable")
+      el.removeAttribute("id")
+      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT") el.removeAttribute("name")
+      el.querySelectorAll?.("*").forEach(scrub)
+    }
+    scrub(clone)
+    return clone
+  }
+
+  _fallbackCard(n) {
+    const d = document.createElementNS(XHTML, "div")
+    d.setAttribute("style", "padding:14px;color:#fff;font-family:'ABeeZee',sans-serif;")
+    d.textContent = n.text || this._badge(n.type)
+    return d
   }
 
   _endNode(n) {
@@ -318,11 +406,11 @@ export default class extends Controller {
     g.dataset.nodeKey = n.key
     g.dataset.nodeKind = "end"
     const rect = document.createElementNS(SVG, "rect")
-    rect.setAttribute("width", NODE_W); rect.setAttribute("height", NODE_H); rect.setAttribute("rx", NODE_H / 2)
+    rect.setAttribute("width", n.w); rect.setAttribute("height", n.h); rect.setAttribute("rx", n.h / 2)
     rect.setAttribute("fill", "rgba(1,234,203,0.12)"); rect.setAttribute("stroke", "#01EACB"); rect.setAttribute("stroke-width", "1.5")
     g.appendChild(rect)
-    g.appendChild(this._text(20, 30, "FINISH", { size: 10, fill: "rgba(1,234,203,0.85)", spacing: "0.08em" }))
-    g.appendChild(this._text(20, 48, "🏁 " + this._trunc(n.text, 20), { size: 13, fill: "#fff" }))
+    g.appendChild(this._text(20, 28, "FINISH", { size: 10, fill: "rgba(1,234,203,0.85)", spacing: "0.08em" }))
+    g.appendChild(this._text(20, 46, "🏁 " + this._trunc(n.text, 20), { size: 13, fill: "#fff" }))
     return g
   }
 
