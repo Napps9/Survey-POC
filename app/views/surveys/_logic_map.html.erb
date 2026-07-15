@@ -5,7 +5,11 @@
   <div class="logic-map-topbar">
     <div class="logic-map-titles">
       <span class="logic-map-title">Flow map</span>
-      <span class="logic-map-hint">Scroll to zoom · drag to pan · click a card to edit it</span>
+      <% if local_assigns[:editable] %>
+        <span class="logic-map-hint">Drag a ● from an answer onto a card or finish screen to route it (drop on empty space for a new branch) · click a line to remove · scroll to zoom · drag to pan</span>
+      <% else %>
+        <span class="logic-map-hint">Scroll to zoom · drag to pan · click a card to open it</span>
+      <% end %>
     </div>
     <div class="logic-map-legend">
       <span><i class="lm-swatch lm-route"></i> answer route</span>

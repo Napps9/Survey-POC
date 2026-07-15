@@ -163,6 +163,7 @@ class LogicBranchingTest < ActionDispatch::IntegrationTest
     assert_match "click->logic-map#open", response.body           # the Flow map button
     assert_select "[data-logic-map-target='svg']"                 # the overlay canvas
     assert_match "data-logic-map-ends-value", response.body
+    assert_match 'data-logic-map-editable-value="true"', response.body # draft ⇒ editable canvas
 
     @survey.update!(logic: false)
     get survey_path(@survey)

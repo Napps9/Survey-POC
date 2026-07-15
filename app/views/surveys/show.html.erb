@@ -50,6 +50,7 @@
      data-survey-editor-logic-value="<%= @survey.logic? %>"
      data-survey-editor-logic-config-value="<%= { continue: 'Continue (default flow)', finishPrefix: 'Finish', ends: @survey.end_screens_list.map { |e| { id: e['id'], label: e['title'] } } }.to_json %>"
      data-logic-map-ends-value="<%= @survey.end_screens_list.map { |e| { id: e['id'], title: e['title'] } }.to_json %>"
+     data-logic-map-editable-value="<%= !@survey.published? %>"
      data-type-panel-quiz-value="<%= @survey.quiz? %>"
      data-type-panel-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
@@ -1056,6 +1057,6 @@
 
   <%= render "surveys/media_modal" %>
   <%= render "surveys/add_question_modal" %>
-  <% if @survey.logic? %><%= render "surveys/logic_map" %><% end %>
+  <% if @survey.logic? %><%= render "surveys/logic_map", editable: !@survey.published? %><% end %>
 
 </div><%# /editor %>
