@@ -588,6 +588,11 @@ export default class extends Controller {
       const entry = this._store.get(card) || {}
       const prim  = entry[primary] || this._readCard(card)
 
+      // Stable card id — carried through every rebuild so answer-branching
+      // routes (which target a card by cid, never index) never break. New cards
+      // with no cid yet get one server-side (Survey.sanitize_cards_images!).
+      if (card.dataset.cardCid) out.cid = card.dataset.cardCid
+
       out.text = (prim.text || "").trim()
       if (prim.description && prim.description.trim()) out.description = prim.description.trim()
 

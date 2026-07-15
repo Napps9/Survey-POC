@@ -31,6 +31,9 @@ export default class extends Controller {
     scoresUrl: { type: String, default: "" },
     tokenisation: { type: Boolean, default: false },
     tokenTypes: { type: Array, default: [] },
+    // Answer-branching: when on, next()/back() follow the answer-logic graph
+    // instead of stepping linearly. Off ⇒ byte-identical linear behaviour.
+    logic: { type: Boolean, default: false },
     current: { type: Number, default: 0 },
     // Form mode: same flow, but drop the game-like haptic buzz so it reads as a
     // plain questionnaire (motion/swipe are stripped via CSS + tap_stack).
@@ -45,6 +48,15 @@ export default class extends Controller {
   _answers = {}
   _registered = false
   _regionsData = null
+
+  // Answer-branching state: the visited-card stack (cardTarget indices, so
+  // back() retraces the taken path, not idx-1), a hop budget that guarantees
+  // termination on a malformed/looping graph, a cid→index lookup, and the end
+  // screen a route sent us to (used once multiple end screens exist).
+  _path = [0]
+  _hops = 0
+  _cidIndex = new Map()
+  _endId = "default"
 
   // Regions map pan/zoom state — plain translate/scale, no external library.
   _mapScale = 1
@@ -73,6 +85,11 @@ export default class extends Controller {
     this._sessionToken = this._ensureToken()
     this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
     this._finishLabel = this.hasFinishBtnTarget ? this.finishBtnTarget.textContent : ""
+    this._path = [this.currentValue]
+    this._hops = 0
+    if (this.logicValue) {
+      this._cidIndex = new Map(this.cardTargets.map((c, i) => [c.dataset.cardCid, i]))
+    }
     this._update()
     if (this.quizValue) this._initQuiz()
     if (this.tokenisationValue) this._initTokens()
@@ -118,6 +135,13 @@ export default class extends Controller {
     if (!this._requireGuard(this.currentValue)) return
     this._applyTokenEarn(this.currentValue)
     this._saveProgress()
+    this._advance()
+  }
+
+  // Advance one step. Linear by default; follows the answer-logic graph when the
+  // Verto has logic enabled (routing off ⇒ this is byte-identical to before).
+  _advance() {
+    if (this.logicValue) { this._advanceLogic(); return }
     if (this.currentValue < this.cardTargets.length - 1) {
       this._buzz()
       this.currentValue++
@@ -128,6 +152,17 @@ export default class extends Controller {
   back() {
     this._capture(this.currentValue)
     this._saveProgress()
+    if (this.logicValue) {
+      // Retrace the taken path — a plain currentValue-- could land on a card
+      // this respondent skipped by branching.
+      if (this._path.length > 1) {
+        this._path.pop()
+        this.currentValue = this._path[this._path.length - 1]
+        this._hops = Math.max(0, this._hops - 1)
+        this._update()
+      }
+      return
+    }
     if (this.currentValue > 0) {
       this.currentValue--
       this._update()
@@ -135,7 +170,18 @@ export default class extends Controller {
   }
 
   _payload() {
-    return { session_token: this._sessionToken, answers: this._answers, locale: this.localeValue }
+    let answers = this._answers
+    // Under logic, only submit answers for cards actually on the taken path —
+    // backing up and re-routing can leave a stale answer for a now-skipped
+    // card, which the server's index-based quiz/token totals would else count.
+    if (this.logicValue) {
+      const keep = new Set(
+        this._path.map(i => this.cardTargets[i]?.dataset.cardIndex).filter(k => k != null && k !== "")
+      )
+      answers = {}
+      for (const [k, v] of Object.entries(this._answers)) if (keep.has(k)) answers[k] = v
+    }
+    return { session_token: this._sessionToken, answers, locale: this.localeValue }
   }
 
   async finish() {
@@ -150,7 +196,16 @@ export default class extends Controller {
     this._capture(this.currentValue)
     if (!this._requireGuard(this.currentValue)) return
     this._applyTokenEarn(this.currentValue)
+    // Logic Vertos resolve the answer graph even on Finish — the terminal
+    // card's chosen answer may still route onward, or to a specific end screen.
+    if (this.logicValue) { await this._advanceLogic(); return }
     this._buzz([10, 30, 10]) // a little "done" buzz on completion
+    await this._finalize()
+  }
+
+  // Submit the recorded answers and reveal the thank-you screen. Shared by the
+  // linear Finish button and logic's _goToEnd, so both paths record identically.
+  async _finalize() {
     // Owner preview runs without a submit endpoint — nothing is recorded,
     // just show the thank-you screen.
     if (!this.submitUrlValue) return this._showThankyou(false)
@@ -186,6 +241,101 @@ export default class extends Controller {
       if (this.hasFinishBtnTarget) this.finishBtnTarget.dataset.disabled = "false"
     }
     this._showThankyou(queued)
+  }
+
+  // ── Answer-branching: graph traversal ──────────────────────────────────────
+
+  // Follow the answer-logic graph from the current card: hop to the resolved
+  // next card, or finalise on a reached end screen. A hop budget guarantees
+  // termination even on a malformed (looping) graph.
+  async _advanceLogic() {
+    const dest = this._resolveNext(this.currentValue)
+    if (dest.index != null && dest.index >= 0 && dest.index < this.cardTargets.length) {
+      if (this._hops >= this.cardTargets.length) { await this._goToEnd("default"); return }
+      this._hops++
+      this._buzz()
+      this._path.push(dest.index)
+      this.currentValue = dest.index
+      this._update()
+      return
+    }
+    await this._goToEnd(dest.end != null ? dest.end : "default")
+  }
+
+  // Reach an end screen: remember which one (used once multiple end screens
+  // exist) and run the shared submit + thank-you finalise.
+  async _goToEnd(id) {
+    this._endId = id || "default"
+    this._buzz([10, 30, 10])
+    await this._finalize()
+  }
+
+  // Resolve the next step for the current card from its logic + captured answer.
+  // Returns { index } to move to a card, or { end } to finish on an end screen.
+  // Mirrors the server-side LogicGraph (app/lib/logic_graph.rb).
+  _resolveNext(idx) {
+    const card   = this.cardTargets[idx]
+    const logic  = this._logicOf(card)
+    const linear = { index: idx + 1 }
+    if (!logic) return linear
+    const value  = this._answers[card?.dataset.cardIndex]?.value
+    const routes = Array.isArray(logic.routes) ? logic.routes : []
+    let to = null
+    for (const r of routes) {
+      if (r && r.to && this._logicMatch(r.match, value)) { to = r.to; break }
+    }
+    if (!to && this._validTarget(logic.default)) to = logic.default
+    if (!to) return linear
+    // A dangling cid target fails safe to the linear next card.
+    return this._mapTarget(to) || linear
+  }
+
+  // A best-effort, answer-independent guess of whether the current card is the
+  // last step (default/linear leads off the end), used only to toggle the
+  // Next/Finish button label. A specific route to an end still finalises via
+  // _advanceLogic regardless of the label.
+  _staticNext(idx) {
+    const logic = this._logicOf(this.cardTargets[idx])
+    if (logic && this._validTarget(logic.default)) {
+      const mapped = this._mapTarget(logic.default)
+      if (mapped) return mapped
+    }
+    const nxt = idx + 1
+    return nxt < this.cardTargets.length ? { index: nxt } : { end: "default" }
+  }
+
+  _mapTarget(to) {
+    if (!to || typeof to !== "object") return null
+    if (to.end != null && to.end !== "") return { end: to.end }
+    if (to.card != null && to.card !== "") {
+      const ci = this._cidIndex.get(to.card)
+      if (ci != null) return { index: ci }
+    }
+    return null
+  }
+
+  _validTarget(t) {
+    return !!(t && typeof t === "object" &&
+      ((t.card != null && t.card !== "") || (t.end != null && t.end !== "")))
+  }
+
+  _logicMatch(match, value) {
+    if (!match || typeof match !== "object") return false
+    switch (match.op) {
+      case "equals": return this._norm(value) === this._norm(match.value)
+      default: return false
+    }
+  }
+
+  _norm(v) { return (v == null ? "" : String(v)).trim() }
+
+  _logicOf(card) {
+    const raw = card?.dataset.cardLogic
+    if (!raw || raw === "null") return null
+    try {
+      const l = JSON.parse(raw)
+      return (l && typeof l === "object") ? l : null
+    } catch (_) { return null }
   }
 
   // Share the public play link so respondents can pass the Verto on. Uses the
@@ -887,13 +1037,21 @@ export default class extends Controller {
     // Keep the consent card out of the progress the respondent sees.
     const offset = hasConsent ? 1 : 0
     const total  = cards.length - offset
-    const n      = idx + 1 - offset
+    // With logic the path is variable and its length unknown up front, so show
+    // honest, monotonic path progress against the deck size as a loose upper
+    // bound. Linear mode keeps its exact "n of N". The path stack already
+    // includes the consent card when present, so it shares the same offset.
+    const n = this.logicValue
+      ? Math.min(Math.max(this._path.length - offset, 1), total)
+      : idx + 1 - offset
     this.progressTarget.textContent = t("player.progress", { n, total })
-    this.element.style.setProperty("--player-progress", `${Math.round((n / total) * 100)}%`)
+    this.element.style.setProperty("--player-progress", `${Math.min(100, Math.round((n / total) * 100))}%`)
     this.backBtnTarget.classList.remove("hidden")
-    // Don't allow stepping back onto the consent gate once agreed.
-    this.backBtnTarget.classList.toggle("invisible", idx === offset)
-    const isLast = idx === cards.length - 1
+    // Don't allow stepping back onto the consent gate once agreed (or off the
+    // start of the visited path under logic).
+    this.backBtnTarget.classList.toggle("invisible", this.logicValue ? this._path.length <= 1 : idx === offset)
+    // Under logic, "last" depends on the graph, not the array position.
+    const isLast = this.logicValue ? (this._staticNext(idx).end != null) : (idx === cards.length - 1)
     this.nextBtnTarget.classList.toggle("hidden", isLast)
     this.finishBtnTarget.classList.toggle("hidden", !isLast)
     if (this.quizValue) this._labelQuizNav()

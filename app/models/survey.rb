@@ -139,6 +139,11 @@ class Survey < ApplicationRecord
     Array(cards).map do |card|
       next card unless card.is_a?(Hash)
       c = card.dup
+      # Every card carries a stable opaque id so answer-branching can target it
+      # by cid (not array index). The editor serialiser sends one; this is the
+      # backstop for AI/import/hand-crafted cards that arrive without one.
+      c["cid"] = c["cid"].to_s.strip.presence || "c_#{SecureRandom.hex(3)}"
+      c.delete("logic") unless c["logic"].is_a?(Hash) # drop malformed logic blocks
       c["image"] = sanitize_image_url(c["image"]) if c.key?("image")
       if c.key?("option_images")
         c["option_images"] = Array(c["option_images"]).map { |u| sanitize_image_url(u) }
@@ -231,7 +236,9 @@ class Survey < ApplicationRecord
   # they're left nil rather than copied, and the results-report/summary
   # columns are generated from a specific run of responses the copy doesn't
   # have. `cards` is round-tripped through JSON so the copy owns its own
-  # option/i18n arrays instead of sharing the source's in-memory objects.
+  # option/i18n arrays instead of sharing the source's in-memory objects. Card
+  # cids are regenerated and every branching route/default rewritten old→new,
+  # so the copy's routes point at the COPY's cards, never the original's.
   def duplicate!
     organisation.surveys.create!(
       title:                   self.class.append_copy_suffix(title),
@@ -239,12 +246,13 @@ class Survey < ApplicationRecord
       theme:                   self.class.append_copy_suffix(theme),
       audience_age:            audience_age,
       key_insight:             key_insight,
-      cards:                   JSON.parse(cards.to_json),
+      cards:                   self.class.remap_card_logic!(JSON.parse(cards.to_json)),
       brand_palette:           read_attribute(:brand_palette),
       background_image:        background_image,
       default_locale:          default_locale,
       locales:                 locales,
       quiz:                    quiz,
+      logic:                   logic,
       render_mode:             render_mode,
       show_results_comparison: show_results_comparison,
       tokenisation_enabled:    tokenisation_enabled,
@@ -255,6 +263,35 @@ class Survey < ApplicationRecord
       forward_url:             forward_url,
       consent_text:            consent_text
     )
+  end
+
+  # Give every card a fresh cid and rewrite each branching target (route +
+  # default) from the old cid to the new one, so a duplicated deck's routes
+  # stay internally consistent. Targets whose old cid isn't in the deck (an
+  # unexpected dangling route) are left as-is; the player fails them safe to
+  # the linear next card. Mutates and returns `cards`.
+  def self.remap_card_logic!(cards)
+    cards  = Array(cards)
+    id_map = {}
+    cards.each do |card|
+      next unless card.is_a?(Hash)
+      old   = card["cid"].to_s
+      fresh = "c_#{SecureRandom.hex(3)}"
+      id_map[old] = fresh if old.present?
+      card["cid"] = fresh
+    end
+    cards.each do |card|
+      next unless card.is_a?(Hash) && card["logic"].is_a?(Hash)
+      logic = card["logic"]
+      Array(logic["routes"]).each { |route| remap_logic_target!(route["to"], id_map) if route.is_a?(Hash) }
+      remap_logic_target!(logic["default"], id_map)
+    end
+    cards
+  end
+
+  def self.remap_logic_target!(target, id_map)
+    return unless target.is_a?(Hash) && target["card"].present?
+    target["card"] = id_map[target["card"]] if id_map.key?(target["card"])
   end
 
   def self.append_copy_suffix(value)

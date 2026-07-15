@@ -27,7 +27,34 @@ class SurveyDuplicateTest < ActionDispatch::IntegrationTest
     assert_not copy.published?
     assert_equal "T (Copy)", copy.title
     assert_equal "Theme (Copy)", copy.theme
-    assert_equal CARDS, copy.cards
+    # Card content is copied verbatim; only the stable cids are freshly minted.
+    assert_equal CARDS, copy.cards.map { |c| c.except("cid") }
+    assert(copy.cards.all? { |c| c["cid"].to_s.start_with?("c_") })
+  end
+
+  test "duplicating regenerates cids and remaps branching routes to the copy's cards" do
+    cards = [
+      { "type" => "multiple_choice", "cid" => "c_src_a", "text" => "Hub?", "options" => %w[UK US],
+        "logic" => { "routes" => [
+          { "match" => { "op" => "equals", "value" => "UK" }, "to" => { "card" => "c_src_b" } }
+        ], "default" => { "card" => "c_src_b" } } },
+      { "type" => "open_ended", "cid" => "c_src_b", "text" => "UK page" }
+    ]
+    original = @org.surveys.create!(title: "T", theme: "Theme", audience_age: "all", key_insight: "k",
+                                     default_locale: "en", locales: [ "en" ], logic: true, cards: cards)
+
+    post duplicate_survey_path(original)
+    copy = @org.surveys.order(:id).last
+
+    assert copy.logic?
+    src_cids  = original.cards.map { |c| c["cid"] }
+    copy_cids = copy.cards.map { |c| c["cid"] }
+    assert_empty(copy_cids & src_cids, "copy must not reuse any source cid")
+
+    # The route now points at the COPY's second card, not the original's.
+    route_target = copy.cards.first.dig("logic", "routes", 0, "to", "card")
+    assert_equal copy.cards.second["cid"], route_target
+    assert_equal copy.cards.second["cid"], copy.cards.first.dig("logic", "default", "card")
   end
 
   test "duplicating a live Verto lands the copy in Drafts" do

@@ -397,6 +397,9 @@ class SurveysController < ApplicationController
     if params.key?(:quiz)
       attrs[:quiz] = ActiveModel::Type::Boolean.new.cast(params[:quiz])
     end
+    if params.key?(:logic)
+      attrs[:logic] = ActiveModel::Type::Boolean.new.cast(params[:logic])
+    end
     if params.key?(:render_mode)
       attrs[:render_mode] = Survey.normalize_render_mode(params[:render_mode])
     end

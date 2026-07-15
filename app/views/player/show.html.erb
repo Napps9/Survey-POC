@@ -43,6 +43,10 @@
   # authoritative total at progress/submit time (PlayerController#apply_token_totals).
   token_mode         = @survey.tokenisation_enabled?
   token_awarding_set = token_mode ? @survey.token_awarding_indices.to_set : Set.new
+
+  # Answer-branching: a card's routing config is public (like token config), so
+  # the player follows the graph entirely client-side from the same cards JSON.
+  logic_mode = @survey.logic?
 %>
 <%# No inline height here — `.preview-overlay`'s own CSS (position:fixed +
     inset:0, backed by the JS-measured --app-100vh custom property on mobile)
@@ -70,7 +74,8 @@
      data-player-quiz-state-url-value="<%= quiz_state_url %>"
      data-player-scores-url-value="<%= scores_url %>"
      data-player-tokenisation-value="<%= token_mode %>"
-     data-player-token-types-value="<%= @survey.token_types.to_json %>">
+     data-player-token-types-value="<%= @survey.token_types.to_json %>"
+     data-player-logic-value="<%= logic_mode %>">
 
   <% if preview_mode %>
     <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 14px;background:rgba(1,234,203,0.1);border-bottom:1px solid rgba(1,234,203,0.25);">
@@ -149,6 +154,8 @@
       <div class="preview-card"
            data-player-target="card"
            data-card-index="<%= idx %>"
+           data-card-cid="<%= card['cid'].to_s %>"
+           <% if logic_mode %>data-card-logic="<%= card['logic'].to_json %>"<% end %>
            data-card-type="<%= type %>"
            data-card-graded="<%= graded %>"
            <% if preview_mode && graded %>data-card-correct="<%= QuizGrading.correct_display(card).to_json %>" data-card-explanation="<%= card['explanation'] %>"<% end %>
