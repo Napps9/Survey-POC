@@ -74,7 +74,9 @@ class ThankYouScreenTest < ActionDispatch::IntegrationTest
 
     assert_select ".preview-thankyou-title", text: I18n.t("player.thank_you_title")
     assert_select "button[data-player-target='shareBtn']"
-    # No forward URL set → no website CTA, but the share button still shows.
-    assert_select "[data-player-target='thankyou'] a[target='_blank']", false
+    # No forward URL set → the website CTA renders but starts hidden (a branch
+    # end screen can reveal + repoint it at its own link); share still shows.
+    assert_select "a.hidden[data-player-target='forwardBtn']"
+    assert_select "a[data-player-target='forwardBtn']:not(.hidden)", false
   end
 end

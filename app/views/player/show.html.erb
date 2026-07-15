@@ -75,7 +75,9 @@
      data-player-scores-url-value="<%= scores_url %>"
      data-player-tokenisation-value="<%= token_mode %>"
      data-player-token-types-value="<%= @survey.token_types.to_json %>"
-     data-player-logic-value="<%= logic_mode %>">
+     data-player-logic-value="<%= logic_mode %>"
+     data-player-end-screens-value="<%= @survey.end_screens_list.to_json %>"
+     data-player-forward-label-value="<%= t('player.visit_website') %>">
 
   <% if preview_mode %>
     <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 14px;background:rgba(1,234,203,0.1);border-bottom:1px solid rgba(1,234,203,0.25);">
@@ -174,8 +176,8 @@
             is the only place the brand is shown. %>
         <%= brand_logo_tag @survey.organisation, style: "height:44px;width:auto;max-width:60%;margin:0 auto 18px;display:block;" %>
 
-        <div class="preview-thankyou-title"><%= @survey.thankyou_title_text %></div>
-        <div class="preview-thankyou-sub">
+        <div class="preview-thankyou-title" data-player-target="thankyouTitle"><%= @survey.thankyou_title_text %></div>
+        <div class="preview-thankyou-sub" data-player-target="thankyouSub">
           <%= safe_join(@survey.thankyou_body_text.split("\n"), tag.br) %>
         </div>
 
@@ -210,12 +212,15 @@
             </button>
           <% end %>
 
-          <% if @survey.forward_url? %>
-            <a href="<%= @survey.forward_url %>" target="_blank" rel="noopener"
-               style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);text-decoration:none;cursor:pointer;">
-              <%= t("player.visit_website") %> →
-            </a>
-          <% end %>
+          <%# Forward-to-website CTA. Always rendered (hidden until it has a URL)
+              so answer-branching can point different end screens at different
+              links — e.g. a per-hub Stripe page — swapped in by _applyEndScreen. %>
+          <a data-player-target="forwardBtn"
+             href="<%= @survey.forward_url %>" target="_blank" rel="noopener"
+             class="<%= "hidden" unless @survey.forward_url? %>"
+             style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);text-decoration:none;cursor:pointer;">
+            <%= t("player.visit_website") %> →
+          </a>
 
           <button type="button"
                   data-player-target="shareBtn"

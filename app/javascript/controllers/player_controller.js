@@ -7,7 +7,7 @@ const MAP_MAX_SCALE = 8
 
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
-                    "thankyouMain", "compareBtn", "comparePanel",
+                    "thankyouMain", "thankyouTitle", "thankyouSub", "forwardBtn", "compareBtn", "comparePanel",
                     "scoresSection", "comparisonSection",
                     "comparisonList", "comparisonMeta",
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
@@ -34,6 +34,10 @@ export default class extends Controller {
     // Answer-branching: when on, next()/back() follow the answer-logic graph
     // instead of stepping linearly. Off ⇒ byte-identical linear behaviour.
     logic: { type: Boolean, default: false },
+    // The resolved end screens (id/title/body/forward_url/forward_label). A
+    // branch can finish on a specific one; _goToEnd records which via _endId.
+    endScreens: { type: Array, default: [] },
+    forwardLabel: { type: String, default: "" },
     current: { type: Number, default: 0 },
     // Form mode: same flow, but drop the game-like haptic buzz so it reads as a
     // plain questionnaire (motion/swipe are stripped via CSS + tap_stack).
@@ -546,6 +550,7 @@ export default class extends Controller {
 
   _showThankyou(queued = false) {
     this.cardTargets.forEach(c => c.classList.remove("active"))
+    this._applyEndScreen(this._endId)
     this.thankyouTarget.classList.add("active")
     this.backBtnTarget.classList.add("hidden")
     this.nextBtnTarget.classList.add("hidden")
@@ -559,6 +564,33 @@ export default class extends Controller {
     }
     if (this.quizValue) this._renderQuizScore()
     if (this.tokenisationValue) this._renderTokenScore()
+  }
+
+  // Swap the thank-you screen's title / message / forward CTA to the end screen
+  // a branch routed to (default when unrouted or the id is unknown — fail-safe).
+  _applyEndScreen(id) {
+    const screens = this.endScreensValue || []
+    if (!screens.length) return
+    const s = screens.find(x => x.id === id) ||
+              screens.find(x => x.id === "default") || screens[0]
+    if (!s) return
+    if (this.hasThankyouTitleTarget && s.title) this.thankyouTitleTarget.textContent = s.title
+    if (this.hasThankyouSubTarget && s.body != null) {
+      this.thankyouSubTarget.replaceChildren()
+      String(s.body).split("\n").forEach((line, i) => {
+        if (i) this.thankyouSubTarget.appendChild(document.createElement("br"))
+        this.thankyouSubTarget.appendChild(document.createTextNode(line))
+      })
+    }
+    if (this.hasForwardBtnTarget) {
+      if (s.forward_url) {
+        this.forwardBtnTarget.href = s.forward_url
+        this.forwardBtnTarget.textContent = `${s.forward_label || this.forwardLabelValue || "Visit website"} →`
+        this.forwardBtnTarget.classList.remove("hidden")
+      } else {
+        this.forwardBtnTarget.classList.add("hidden")
+      }
+    }
   }
 
   // One button, one panel: the quiz score section and the general answer-

@@ -424,6 +424,9 @@ class SurveysController < ApplicationController
     if params.key?(:consent_text)
       attrs[:consent_text] = params[:consent_text].to_s.strip.first(2000).presence
     end
+    if params.key?(:end_screens)
+      attrs[:end_screens] = Survey.sanitize_end_screens(JSON.parse(params[:end_screens]))
+    end
 
     # The custom link shares the /play/:token namespace with publish_token and
     # every share/region token (PlayerController#load_survey_and_share), so an

@@ -253,6 +253,7 @@ class Survey < ApplicationRecord
       locales:                 locales,
       quiz:                    quiz,
       logic:                   logic,
+      end_screens:             read_attribute(:end_screens),
       render_mode:             render_mode,
       show_results_comparison: show_results_comparison,
       tokenisation_enabled:    tokenisation_enabled,
@@ -316,6 +317,74 @@ class Survey < ApplicationRecord
 
   def forward_url?
     forward_url.present?
+  end
+
+  # ── End screens (answer-branching) ─────────────────────────────────────────
+  # A branch can finish on its own thank-you screen (e.g. a per-hub Stripe link)
+  # instead of the shared one. The built-in "default" screen stays backed by the
+  # legacy thankyou_* / forward_url columns (so the existing single thank-you is
+  # unchanged); extra screens live in the end_screens JSON column.
+  MAX_END_SCREENS = 12
+  MAX_END_TITLE   = 80
+  MAX_END_BODY    = 400
+  MAX_END_LABEL   = 40
+  DEFAULT_END_ID  = "default"
+
+  def default_end_screen
+    {
+      "id" => DEFAULT_END_ID,
+      "title" => thankyou_title_text,
+      "body" => thankyou_body_text,
+      "forward_url" => forward_url.presence,
+      "forward_label" => nil
+    }
+  end
+
+  def extra_end_screens
+    Array(read_attribute(:end_screens)).filter_map do |s|
+      next unless s.is_a?(Hash) && s["id"].to_s.present? && s["id"].to_s != DEFAULT_END_ID
+      {
+        "id" => s["id"].to_s,
+        "title" => s["title"].to_s.strip.presence || I18n.t("player.thank_you_title"),
+        "body" => s["body"].to_s.strip.presence || I18n.t("player.thank_you_from", org: organisation.name),
+        "forward_url" => s["forward_url"].presence,
+        "forward_label" => s["forward_label"].to_s.strip.presence
+      }
+    end
+  end
+
+  # The full list: the built-in default first, then any extra branch screens.
+  def end_screens_list
+    [ default_end_screen ] + extra_end_screens
+  end
+
+  def end_screen(id)
+    end_screens_list.find { |s| s["id"] == id.to_s } || default_end_screen
+  end
+
+  def end_screen_ids
+    end_screens_list.map { |s| s["id"] }
+  end
+
+  # Coerce creator-submitted extra end screens into a safe, bounded array. The
+  # "default" id is reserved for the built-in screen, so it's dropped here.
+  def self.sanitize_end_screens(value)
+    Array(value).filter_map do |entry|
+      next unless entry.is_a?(Hash)
+      id = entry["id"].to_s.strip.presence || "es_#{SecureRandom.hex(4)}"
+      next if id == DEFAULT_END_ID
+      title = entry["title"].to_s.strip.first(MAX_END_TITLE)
+      body  = entry["body"].to_s.strip.first(MAX_END_BODY)
+      fwd   = sanitize_forward_url(entry["forward_url"])
+      next if title.blank? && body.blank? && fwd.blank?
+      {
+        "id" => id,
+        "title" => title.presence,
+        "body" => body.presence,
+        "forward_url" => fwd,
+        "forward_label" => entry["forward_label"].to_s.strip.first(MAX_END_LABEL).presence
+      }.compact
+    end.first(MAX_END_SCREENS)
   end
 
   # When set, respondents must agree to this text before the first card.

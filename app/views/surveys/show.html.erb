@@ -48,7 +48,7 @@
      data-survey-editor-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-token-types-value="<%= @survey.token_types.to_json %>"
      data-survey-editor-logic-value="<%= @survey.logic? %>"
-     data-survey-editor-logic-config-value="<%= { continue: 'Continue (default flow)', finishPrefix: 'Finish', ends: [ { id: 'default', label: @survey.thankyou_title_text } ] }.to_json %>"
+     data-survey-editor-logic-config-value="<%= { continue: 'Continue (default flow)', finishPrefix: 'Finish', ends: @survey.end_screens_list.map { |e| { id: e['id'], label: e['title'] } } }.to_json %>"
      data-type-panel-quiz-value="<%= @survey.quiz? %>"
      data-type-panel-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
@@ -761,6 +761,39 @@
             </div>
           <% end %>
         </details>
+
+        <%# Branch end screens — extra finish screens a branch can route to, each
+            with its own title/message/link (e.g. a unique Stripe page per hub).
+            Only relevant with logic on; the "Thank-you screen" above is always
+            the default. Rows serialize into the hidden end_screens field on save
+            (mirrors the Tokenisation manager). %>
+        <% if @survey.logic? %>
+          <% raw_end_screens = Array(@survey.read_attribute(:end_screens)) %>
+          <details class="publish-block" data-controller="end-screens">
+            <summary class="publish-block-title">Branch end screens <span class="pub-chev">⌄</span></summary>
+            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:8px;line-height:1.45;">
+                Extra finish screens a branch can end on — each with its own title, message and link. Point an answer's route at one (e.g. a unique Stripe page per hub). The “Thank-you screen” above stays the default.
+              </div>
+              <input type="hidden" name="end_screens" value="<%= raw_end_screens.to_json %>" data-end-screens-target="field" />
+              <div data-end-screens-target="list" style="display:flex;flex-direction:column;gap:10px;">
+                <% raw_end_screens.each do |es| %>
+                  <%= render "surveys/end_screen_row", es: es %>
+                <% end %>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <button type="button" data-action="click->end-screens#addRow"
+                        style="padding:6px 12px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px dashed rgba(255,255,255,0.25);cursor:pointer;">
+                  ＋ Add end screen
+                </button>
+                <button type="button" data-action="click->end-screens#save"
+                        style="padding:6px 14px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:none;cursor:pointer;">
+                  Save end screens
+                </button>
+              </div>
+            <% end %>
+          </details>
+        <% end %>
 
         <%# Partner share — add this Verto to a partner group and generate
             per-partner links. Each row in the partnership produces a unique token. %>

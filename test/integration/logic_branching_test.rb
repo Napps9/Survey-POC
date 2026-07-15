@@ -114,4 +114,54 @@ class LogicBranchingTest < ActionDispatch::IntegrationTest
     assert_match 'data-card-cid="c_hub"', response.body
     assert_match "data-card-logic=", response.body
   end
+
+  # ── Phase 3: extra end screens ──────────────────────────────────────────────
+
+  test "sanitize_end_screens drops the reserved default id, caps, requires content" do
+    out = Survey.sanitize_end_screens([
+      { "id" => "default", "title" => "should be dropped" },
+      { "id" => "uk_hub", "title" => "Join UK", "forward_url" => "https://buy.stripe.com/uk", "forward_label" => "Pay" },
+      { "title" => "", "body" => "", "forward_url" => "" } # no content ⇒ dropped
+    ])
+    assert_equal 1, out.size
+    assert_equal "uk_hub", out.first["id"]
+    assert_equal "https://buy.stripe.com/uk", out.first["forward_url"]
+  end
+
+  test "end_screens_list is the default screen plus extras" do
+    @survey.update!(thankyou_title: "Cheers", end_screens: [ { "id" => "uk_hub", "title" => "Join UK" } ])
+    ids = @survey.end_screens_list.map { |s| s["id"] }
+    assert_equal %w[default uk_hub], ids
+    assert_equal "Cheers", @survey.end_screen("default")["title"]
+    assert_equal "Join UK", @survey.end_screen("uk_hub")["title"]
+    assert_equal "Cheers", @survey.end_screen("missing")["title"] # unknown ⇒ default
+  end
+
+  test "update_settings persists sanitized end screens" do
+    post survey_settings_path(@survey), params: {
+      end_screens: [ { "id" => "uk_hub", "title" => "Join the UK hub", "forward_url" => "https://buy.stripe.com/uk" } ].to_json
+    }
+    screens = @survey.reload.read_attribute(:end_screens)
+    assert_equal 1, screens.size
+    assert_equal "uk_hub", screens.first["id"]
+  end
+
+  test "the player carries end-screen data and an (initially hidden) forward CTA" do
+    @survey.update!(end_screens: [ { "id" => "uk_hub", "title" => "Join the UK hub", "forward_url" => "https://buy.stripe.com/uk" } ],
+                    publish_token: SecureRandom.hex(8), published_at: Time.current)
+    get play_survey_path(@survey.publish_token)
+    assert_response :success
+    assert_match "data-player-end-screens-value=", response.body
+    assert_match "uk_hub", response.body
+    assert_select "a.hidden[data-player-target='forwardBtn']" # no default forward_url ⇒ hidden
+  end
+
+  test "the editor lists extra end screens as route targets and offers the manager" do
+    @survey.update!(end_screens: [ { "id" => "uk_hub", "title" => "Join the UK hub" } ])
+    get survey_path(@survey)
+    assert_response :success
+    assert_match "uk_hub", response.body                 # in the logic-config ends
+    assert_match "Branch end screens", response.body      # the manager block
+    assert_select "[data-controller='end-screens']"
+  end
 end
