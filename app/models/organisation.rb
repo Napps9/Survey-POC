@@ -8,6 +8,10 @@ class Organisation < ApplicationRecord
   has_many :partnership_memberships, dependent: :destroy
   has_many :member_partnerships, through: :partnership_memberships, source: :partnership
 
+  has_many :funders, dependent: :destroy
+  has_many :funder_memberships, dependent: :destroy
+  has_many :member_funders, through: :funder_memberships, source: :funder
+
   has_many :common_question_sets, dependent: :destroy
 
   has_one_attached :logo

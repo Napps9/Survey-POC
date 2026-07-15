@@ -1,0 +1,74 @@
+<% content_for :title, t("funders.show_title", name: @funder.name) %>
+<% content_for :head do %>
+  <style>body { overflow: auto !important; height: auto !important; }</style>
+<% end %>
+
+<div style="display:flex;min-height:100vh;background:#1C2034;">
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+
+    <%# ── Hero ── %>
+    <div style="position:relative;overflow:hidden;padding:36px 36px 32px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
+      <div class="gen-orbs" style="opacity:0.25;">
+        <div class="gen-orb gen-orb-2"></div>
+        <div class="gen-orb gen-orb-3"></div>
+      </div>
+
+      <div style="position:relative;z-index:1;">
+        <%= link_to funders_path,
+              style: "display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);text-decoration:none;margin-bottom:18px;" do %>
+          <span style="opacity:0.7;">←</span> <%= t("funders.back_to_all") %>
+        <% end %>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#01EACB;box-shadow:0 0 12px rgba(1,234,203,0.7);"></span>
+          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("funders.member_eyebrow") %></span>
+        </div>
+        <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 6px;"><%= @funder.name %></h1>
+        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
+          <%= t("funders.member_run_by", org: @funder.organisation.name) %>
+        </p>
+
+        <%# ── Top-line stats ── %>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:24px;">
+          <div style="background:rgba(22,27,46,0.85);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:18px 20px;backdrop-filter:blur(8px);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:#615BF5;"></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;"><%= t("funders.licensed_orgs_in_network") %></span>
+            </div>
+            <div style="font-family:'Alata',sans-serif;font-size:34px;color:#615BF5;line-height:1;margin-bottom:4px;"><%= @total_partner_count %></div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);line-height:1.4;"><%= t("funders.including_you") %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# ── Body ── %>
+    <div style="flex:1;padding:32px 36px 60px;">
+
+      <%# ── Other licensed orgs ── %>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("funders.other_licensed_orgs") %></span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @other_members.size %></span>
+      </div>
+
+      <% if @other_members.empty? %>
+        <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:24px;text-align:center;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);">
+          <%= t("funders.only_licensed_org") %>
+        </div>
+      <% else %>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;">
+          <% @other_members.each do |o| %>
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 14px;">
+              <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#01EACB,#0CA7FF);display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:#fff;flex-shrink:0;">
+                <%= o.name.first.upcase %>
+              </div>
+              <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= o.name %></div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>

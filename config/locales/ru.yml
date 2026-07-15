@@ -191,6 +191,7 @@ ru:
       step_counter: Шаг %{n} из %{total}
   nav:
     partnerships: "Партнёры"
+    funders: "Спонсоры"
     shared_vertos: Общие Vertos
     my_vertos: Мои Vertos
     create: Создать
@@ -380,6 +381,163 @@ ru:
     password_placeholder: Не менее 12 символов
     confirm_password_label: Подтвердите пароль
     accept_submit: Принять приглашение →
+  funders:
+    title: "Спонсоры — Playverto"
+    index_eyebrow: Ваши спонсорские сети
+    index_heading: "Спонсоры"
+    index_subtitle: Лицензируйте другим организациям фиксированное количество мест и управляйте тем, кто их занимает.
+    new_button: "+ Новый спонсор"
+    stat_funders: "Спонсоры"
+    stat_seats: "Места"
+    stat_assigned: "Назначено"
+    stat_available: "Доступно"
+    stat_suspended: "Приостановлено"
+    seats_short: мест
+    available_count:
+      one: место доступно
+      other: мест доступно
+    owned_section: Спонсоры, которыми вы управляете
+    owned_empty_title: Пока нет спонсоров
+    owned_empty_admin_html: Нажмите <span style="color:#615BF5;">+ Новый спонсор</span> выше, чтобы лицензировать места другим организациям.
+    owned_empty_member: Попросите вашего администратора создать спонсора.
+    started_on: Создан %{date}
+    open: Открыть →
+    member_section: Спонсоры, которые лицензировали вас
+    member_empty_title: Вас пока никто не лицензировал
+    member_empty_body: Когда спонсор назначит вам место, оно появится здесь.
+    member_run_by: Управляет %{org}
+    status:
+      active: Активный
+      revoked: Отозван
+    new_title: Новый спонсор — Playverto
+    new_eyebrow: Новый спонсор
+    new_heading: Настройте спонсора
+    new_sub: Дайте ему название и укажите, сколько мест вы лицензируете другим организациям.
+    name_label: Название спонсора
+    name_placeholder: напр. Northside Foundation
+    seat_count_label: Места
+    seat_count_placeholder: "15"
+    seat_count_hint: Сколько организаций может иметь лицензию — вы сможете изменить это позже.
+    cancel: Отмена
+    create_submit: Создать спонсора →
+    created: "Спонсор \"%{name}\" создан."
+    show_title: "%{name} — Спонсоры"
+    back_to_all: Все спонсоры
+    creator_eyebrow: Спонсор · Вы управляете
+    member_eyebrow: Спонсор · Лицензиат
+    assign_seat: Назначить место
+    delete: Удалить
+    delete_confirm: Удалить %{name}? Все лицензированные организации потеряют доступ.
+    deleted: Спонсор удалён.
+    not_found: Спонсор не найден.
+    not_owner: Это может сделать только владелец спонсора.
+    no_seats_available: Нет свободных мест — освободите одно или сначала добавьте ещё мест.
+    picker_eyebrow: "Назначить место"
+    picker_title: "Как вы хотите его назначить?"
+    picker_link_name: "Ссылка для присоединения"
+    picker_link_desc: "Поделитесь ссылкой — они создадут собственный аккаунт и организацию."
+    picker_account_name: "Создать аккаунт"
+    picker_account_desc: "Настройте всё за них — мы отправим им письмо для выбора пароля."
+    new_link_heading: Новая ссылка для присоединения
+    new_link_body: Любой, у кого есть эта ссылка, может занять место в %{funder}. Срок действия — 14 дней.
+    copy: Копировать
+    copied: Скопировано!
+    seats_purchased: Места
+    seats_purchased_hint: Общее количество организаций, которым вы можете предоставить лицензию.
+    update_seats: Обновить
+    seats_updated: Количество мест обновлено.
+    licensed_orgs_section: Лицензированные организации
+    no_licensed_orgs_title: Пока нет лицензированных организаций
+    no_licensed_orgs_body: "Отправьте ссылку для присоединения или создайте им аккаунт напрямую."
+    membership_status:
+      active: Активный
+      suspended: Приостановлен
+    licensed_on: Лицензирован %{date}
+    suspend: Приостановить
+    suspend_confirm: Приостановить лицензию %{org}? Они немедленно потеряют доступ, а место освободится.
+    reactivate: Возобновить
+    membership_suspended: "%{org} приостановлен — место освобождено."
+    membership_reactivated: "%{org} возобновлён."
+    licensed_orgs_in_network: Лицензированные организации спонсора
+    including_you: Включая вас
+    other_licensed_orgs: Другие лицензированные организации
+    only_licensed_org: Пока вы единственная лицензированная организация у этого спонсора.
+  funder_accounts:
+    title: "Создать аккаунт — %{funder}"
+    back_to_funder: "Назад к %{funder}"
+    heading: "Создать аккаунт для лицензированной организации"
+    subtitle: "Мы настроим их организацию и отправим на email ссылку для выбора пароля в %{funder}."
+    name_label: "Имя лицензиата"
+    name_placeholder: "Jamie Rivera"
+    email_label: "Эл. почта лицензиата"
+    email_placeholder: "jamie@licensed.org"
+    org_label: "Название организации лицензиата"
+    org_placeholder: "Riverside Youth Trust"
+    submit: "Создать аккаунт →"
+    cancel: "Отмена"
+    missing_fields: "Имя, email и название организации обязательны для заполнения."
+    email_taken: "У %{email} уже есть аккаунт Playverto — отправьте ссылку для присоединения, чтобы связать существующую организацию."
+    created: "Аккаунт для %{email} создан — на этот адрес отправлены инструкции по настройке пароля и началу работы."
+  funder_account_setups:
+    title: "Установите пароль — Playverto"
+    heading: "Установите пароль"
+    subtitle: "Добро пожаловать, %{name} — выберите пароль, чтобы завершить настройку аккаунта."
+    submit: "Установить пароль и продолжить →"
+    welcome: "Добро пожаловать! Пароль установлен."
+    invalid_link: "Эта ссылка для настройки недействительна или срок её действия истёк. Попросите спонсора отправить её повторно."
+    password_mismatch: "Пароли не совпадают."
+  funder_invites:
+    title: Принять приглашение — Playverto
+    already_used_title: Приглашение уже использовано
+    already_used_body_html: Это приглашение уже было принято. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Войти</a>
+    expired_title: Срок приглашения истёк
+    expired_body: Этой ссылке более 14 дней. Попросите спонсора отправить новую.
+    invited_to_join: Вас пригласили вступить в
+    licensed_by: лицензировано %{org}
+    addressed_for: "· для %{email}"
+    signed_in_as: Вы вошли как %{name}
+    join_with: Присоединиться от
+    pick_org: Выберите, какая организация присоединится
+    join_submit: Присоединиться к %{funder} →
+    already_in_funder: "Уже лицензированы у этого спонсора: %{orgs}"
+    you_run_this: Вы управляете этим спонсором — просто откройте его.
+    already_member_singular: "%{orgs} уже лицензирован у этого спонсора."
+    already_member_plural: "%{orgs} уже лицензированы у этого спонсора."
+    no_admin_org: У вас нет администрируемой организации, которая может занять это место.
+    open_funder: Открыть %{funder} →
+    sign_out_link: Выйти и использовать другой аккаунт
+    sign_out_confirm: Выйти из текущего аккаунта?
+    already_have_account: Уже есть аккаунт Playverto?
+    sign_in_instead: Войти вместо этого
+    new_to_playverto: Впервые в Playverto?
+    create_new_account: Создать аккаунт
+    sign_in_email_label: Эл. почта
+    sign_in_email_placeholder: you@organisation.org
+    sign_in_password_label: Пароль
+    sign_in_password_placeholder: Ваш пароль
+    sign_in_submit: Войти и присоединиться →
+    your_name_label: Ваше имя
+    your_name_placeholder: Jamie Rivera
+    your_org_name_label: Название вашей организации
+    your_org_name_placeholder: Riverside Youth Trust
+    password_label: Пароль
+    password_placeholder: Не менее 12 символов
+    confirm_password_label: Подтвердите пароль
+    accept_submit: Занять место →
+    not_found: Приглашение не найдено.
+    already_used: Эта ссылка-приглашение уже была использована.
+    expired: Срок действия приглашения истёк. Попросите спонсора отправить его повторно.
+    pick_org_error: Выберите одну из ваших организаций для присоединения.
+    cannot_join_own: Вы не можете присоединиться к спонсору, которым сами управляете.
+    already_licensed: "%{org} уже лицензирован у %{funder}."
+    joined: "%{org} присоединился к %{funder}."
+    wrong_password: Введите ваш существующий пароль Playverto, чтобы связать вашу организацию.
+    default_org_name: Организация %{name}
+    name_required: Укажите имя.
+    email_required: Укажите email.
+    sign_in_required: Введите email и пароль, чтобы войти.
+    sign_in_failed: Не удалось найти аккаунт с таким email и паролем.
+    welcome: Добро пожаловать в %{funder}!
   editor:
     live_locked_bar: "Этот Verto опубликован — вопросы заблокированы для защиты качества данных."
     live_results: "Смотреть результаты →"

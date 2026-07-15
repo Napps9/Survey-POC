@@ -191,6 +191,7 @@ ja:
       step_counter: "%{total}ステップ中 %{n}"
   nav:
     partnerships: "パートナー"
+    funders: "資金提供者"
     shared_vertos: 共有Vertos
     my_vertos: マイVertos
     create: 作成
@@ -380,6 +381,163 @@ ja:
     password_placeholder: 12 文字以上
     confirm_password_label: パスワード(確認)
     accept_submit: 招待を承認 →
+  funders:
+    title: "資金提供者 — Playverto"
+    index_eyebrow: あなたの資金提供者ネットワーク
+    index_heading: "資金提供者"
+    index_subtitle: 他の組織に一定数のシートをライセンス提供し、誰がシートを保有しているかを管理しましょう。
+    new_button: "+ 新しい資金提供者"
+    stat_funders: 資金提供者
+    stat_seats: シート
+    stat_assigned: 割り当て済み
+    stat_available: 利用可能
+    stat_suspended: 停止中
+    seats_short: シート
+    available_count:
+      one: 空きシート
+      other: 空きシート
+    owned_section: あなたが運営する資金提供者
+    owned_empty_title: 資金提供者はまだありません
+    owned_empty_admin_html: 上部の <span style="color:#615BF5;">+ 新しい資金提供者</span> をクリックして、他の組織にシートをライセンス供与しましょう。
+    owned_empty_member: 管理者に資金提供者の設定を依頼してください。
+    started_on: 開始日 %{date}
+    open: 開く →
+    member_section: あなたをライセンス中の資金提供者
+    member_empty_title: まだ誰にもライセンスされていません
+    member_empty_body: 資金提供者からシートを割り当てられると、ここに表示されます。
+    member_run_by: '運営: %{org}'
+    status:
+      active: 有効
+      revoked: 取り消し済み
+    new_title: 新しい資金提供者 — Playverto
+    new_eyebrow: 新しい資金提供者
+    new_heading: 資金提供者を設定する
+    new_sub: 名前と、他の組織にライセンス供与するシート数を入力してください。
+    name_label: 資金提供者名
+    name_placeholder: '例: Northside Foundation'
+    seat_count_label: シート数
+    seat_count_placeholder: "15"
+    seat_count_hint: ライセンスを保有できる組織の数です — 後で変更できます。
+    cancel: キャンセル
+    create_submit: 資金提供者を作成 →
+    created: "資金提供者「%{name}」を作成しました。"
+    show_title: "%{name} — 資金提供者"
+    back_to_all: すべての資金提供者
+    creator_eyebrow: 資金提供者 · あなたが運営
+    member_eyebrow: 資金提供者 · ライセンス済み
+    assign_seat: シートを割り当てる
+    delete: 削除
+    delete_confirm: "%{name} を削除しますか?ライセンス済みのすべての組織がアクセスできなくなります。"
+    deleted: 資金提供者を削除しました。
+    not_found: 資金提供者が見つかりません。
+    not_owner: 資金提供者のオーナーのみがこの操作を行えます。
+    no_seats_available: 利用可能なシートがありません — 先にシートを空けるか追加してください。
+    picker_eyebrow: シートを割り当てる
+    picker_title: どのように割り当てますか？
+    picker_link_name: 参加リンク
+    picker_link_desc: リンクを共有 — 相手が自分のアカウントと組織を作成します。
+    picker_account_name: アカウントを作成
+    picker_account_desc: こちらで直接設定 — パスワードを選択するためのメールをお送りします。
+    new_link_heading: 新しい参加リンク
+    new_link_body: このリンクを持つ人は、%{funder} のシートを獲得できます。14 日後に期限切れになります。
+    copy: コピー
+    copied: コピーしました!
+    seats_purchased: シート数
+    seats_purchased_hint: ライセンスできる組織の総数です。
+    update_seats: 更新
+    seats_updated: シート数を更新しました。
+    licensed_orgs_section: ライセンス組織
+    no_licensed_orgs_title: ライセンス組織はまだいません
+    no_licensed_orgs_body: 参加リンクを送るか、直接アカウントを作成してください。
+    membership_status:
+      active: 有効
+      suspended: 停止中
+    licensed_on: ライセンス日 %{date}
+    suspend: 停止
+    suspend_confirm: "%{org} のライセンスを停止しますか?即座にアクセスできなくなり、シートが解放されます。"
+    reactivate: 再開
+    membership_suspended: "%{org} を停止しました — シートが解放されました。"
+    membership_reactivated: "%{org} を再開しました。"
+    licensed_orgs_in_network: ライセンス組織
+    including_you: あなたを含む
+    other_licensed_orgs: その他のライセンス組織
+    only_licensed_org: 現在、この資金提供者の下でライセンスされている組織はあなただけです。
+  funder_accounts:
+    title: "アカウントを作成 — %{funder}"
+    back_to_funder: "%{funder} に戻る"
+    heading: ライセンス組織用のアカウントを作成
+    subtitle: 相手の組織を設定し、%{funder} 用のパスワードを選択するためのリンクをメールでお送りします。
+    name_label: 相手の名前
+    name_placeholder: ジェイミー・リベラ
+    email_label: 相手のメールアドレス
+    email_placeholder: jamie@licensed.org
+    org_label: 相手の組織名
+    org_placeholder: Riverside Youth Trust
+    submit: アカウントを作成 →
+    cancel: キャンセル
+    missing_fields: 名前、メールアドレス、組織名はすべて必須です。
+    email_taken: "%{email} はすでに Playverto アカウントを持っています — 代わりに参加リンクを送って、既存の組織と連携してもらいましょう。"
+    created: "%{email} のアカウントを作成しました — パスワード設定と開始方法の案内をメールで送信しました。"
+  funder_account_setups:
+    title: "パスワードを設定 — Playverto"
+    heading: パスワードを設定
+    subtitle: "ようこそ、%{name} さん — アカウントの設定を完了するためにパスワードを選択してください。"
+    submit: パスワードを設定して続ける →
+    welcome: ようこそ！パスワードが設定されました。
+    invalid_link: この設定リンクは無効か期限切れです。資金提供者に再送を依頼してください。
+    password_mismatch: パスワードが一致しませんでした。
+  funder_invites:
+    title: 招待を承認 — Playverto
+    already_used_title: この招待は使用済みです
+    already_used_body_html: この招待リンクはすでに承認されています。<a href="%{href}" style="color:#01EACB;text-decoration:none;">サインイン</a>
+    expired_title: 招待の有効期限切れ
+    expired_body: このリンクは 14 日以上前のものです。資金提供者に新しい招待の送付を依頼してください。
+    invited_to_join: 参加への招待が届いています
+    licensed_by: "ライセンス元: %{org}"
+    addressed_for: "· %{email} 宛"
+    signed_in_as: "%{name} としてサインイン中"
+    join_with: 参加する組織
+    pick_org: 参加する組織を選択
+    join_submit: "%{funder} に参加 →"
+    already_in_funder: "既にこの資金提供者の下でライセンス中: %{orgs}"
+    you_run_this: あなたはこの資金提供者を運営しています — 直接アクセスしてください。
+    already_member_singular: "%{orgs} は既にこの資金提供者の下でライセンスされています。"
+    already_member_plural: "%{orgs} は既にこの資金提供者の下でライセンスされています。"
+    no_admin_org: このシートを取得できる管理者組織がありません。
+    open_funder: "%{funder} を開く →"
+    sign_out_link: サインアウトして別のアカウントを使用
+    sign_out_confirm: 現在のアカウントからサインアウトしますか?
+    already_have_account: Playverto アカウントをお持ちですか?
+    sign_in_instead: サインインする
+    new_to_playverto: Playverto は初めてですか?
+    create_new_account: 新しいアカウントを作成
+    sign_in_email_label: メールアドレス
+    sign_in_email_placeholder: you@organisation.org
+    sign_in_password_label: パスワード
+    sign_in_password_placeholder: あなたのパスワード
+    sign_in_submit: サインインして参加 →
+    your_name_label: お名前
+    your_name_placeholder: 山田 太郎
+    your_org_name_label: 組織名
+    your_org_name_placeholder: Riverside Youth Trust
+    password_label: パスワード
+    password_placeholder: 12 文字以上
+    confirm_password_label: パスワード(確認)
+    accept_submit: シートを取得 →
+    not_found: 招待が見つかりません。
+    already_used: この招待リンクはすでに使用されています。
+    expired: この招待は期限切れです。資金提供者に再送を依頼してください。
+    pick_org_error: 参加する組織を選択してください。
+    cannot_join_own: 自分が運営する資金提供者には参加できません。
+    already_licensed: "%{org} はすでに %{funder} の下でライセンスされています。"
+    joined: "%{org} が %{funder} に参加しました。"
+    wrong_password: 組織を連携するには、既存の Playverto パスワードを入力してください。
+    default_org_name: "%{name} の組織"
+    name_required: 名前は必須です。
+    email_required: メールアドレスは必須です。
+    sign_in_required: サインインするにはメールアドレスとパスワードを入力してください。
+    sign_in_failed: そのメールアドレスとパスワードのアカウントが見つかりませんでした。
+    welcome: "%{funder} へようこそ！"
   editor:
     live_locked_bar: "このVertoは公開中 — データ品質を守るため質問はロックされています。"
     live_results: "結果を見る →"

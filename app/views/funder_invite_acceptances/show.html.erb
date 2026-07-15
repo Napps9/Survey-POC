@@ -1,0 +1,214 @@
+<% content_for :title, t("funder_invites.title") %>
+
+<div style="min-height:100vh;background:#272D4A;display:flex;align-items:center;justify-content:center;padding:24px;">
+  <div style="width:100%;max-width:480px;">
+
+    <div style="text-align:center;margin-bottom:36px;">
+      <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
+      <% if @invite.accepted? %>
+        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#F7F7F7;margin:0 0 8px;"><%= t("funder_invites.already_used_title") %></h1>
+        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
+          <%= t("funder_invites.already_used_body_html", href: new_session_path).html_safe %>
+        </p>
+      <% elsif @invite.expired? %>
+        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#F7F7F7;margin:0 0 8px;"><%= t("funder_invites.expired_title") %></h1>
+        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
+          <%= t("funder_invites.expired_body") %>
+        </p>
+      <% else %>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);margin-bottom:8px;">
+          <%= t("funder_invites.invited_to_join") %>
+        </div>
+        <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;letter-spacing:0.04em;margin:0 0 4px;">
+          <%= @invite.funder.name %>
+        </h1>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.3);">
+          <%= t("funder_invites.licensed_by", org: @invite.organisation.name) %>
+          <% if @invite.addressed_email.present? %>
+            <%= t("funder_invites.addressed_for", email: @invite.addressed_email) %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <% unless @invite.accepted? || @invite.expired? %>
+
+      <% if flash[:alert] %>
+        <div class="alert-error">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
+      <% if @signed_in_user %>
+        <%# ─── Signed-in flow: pick which existing org claims the seat ─── %>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.55);margin-bottom:18px;text-align:center;">
+          <%= t("funder_invites.signed_in_as", name: (@signed_in_user.name.presence || @signed_in_user.email_address)) %>
+        </div>
+
+        <% if @joinable_orgs.any? %>
+          <%= form_with url: accept_funder_invite_path(@invite.token), method: :post, local: true do |f| %>
+            <div style="margin-bottom:18px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">
+                <% if @joinable_orgs.size == 1 %>
+                  <%= t("funder_invites.join_with") %>
+                <% else %>
+                  <%= t("funder_invites.pick_org") %>
+                <% end %>
+              </label>
+              <% if @joinable_orgs.size == 1 %>
+                <%= hidden_field_tag :join_as_organisation_id, @joinable_orgs.first.id %>
+                <div style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-xl);box-sizing:border-box;">
+                  <%= @joinable_orgs.first.name %>
+                </div>
+              <% else %>
+                <%= select_tag :join_as_organisation_id,
+                      options_for_select(@joinable_orgs.map { |o| [ o.name, o.id ] }),
+                      class: "form-input",
+                      style: "appearance:menulist;" %>
+              <% end %>
+            </div>
+
+            <%= f.submit t("funder_invites.join_submit", funder: @invite.funder.name),
+                  style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
+          <% end %>
+
+          <% if @already_member_orgs.any? %>
+            <div style="margin-top:18px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);text-align:center;">
+              <%= t("funder_invites.already_in_funder", orgs: @already_member_orgs.map(&:name).join(", ")) %>
+            </div>
+          <% end %>
+        <% else %>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);line-height:1.5;text-align:center;">
+            <% if @creator_admin_orgs.any? %>
+              <%= t("funder_invites.you_run_this") %>
+            <% elsif @already_member_orgs.any? %>
+              <% if @already_member_orgs.size == 1 %>
+                <%= t("funder_invites.already_member_singular", orgs: @already_member_orgs.first.name) %>
+              <% else %>
+                <%= t("funder_invites.already_member_plural", orgs: @already_member_orgs.map(&:name).join(", ")) %>
+              <% end %>
+            <% else %>
+              <%= t("funder_invites.no_admin_org") %>
+            <% end %>
+          </div>
+          <% if (@creator_admin_orgs + @already_member_orgs).any? %>
+            <%= link_to t("funder_invites.open_funder", funder: @invite.funder.name), funder_path(@invite.funder),
+                  style: "display:block;text-align:center;margin-top:18px;color:#01EACB;font-family:'Alata',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
+          <% end %>
+        <% end %>
+
+        <div style="margin-top:24px;text-align:center;">
+          <%= button_to t("funder_invites.sign_out_link"), session_path, method: :delete,
+                style: "background:none;border:none;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:underline;cursor:pointer;padding:0;",
+                form: { style: "margin:0;" },
+                data: { turbo_confirm: t("funder_invites.sign_out_confirm") } %>
+        </div>
+
+      <% else %>
+        <%# ─── Not signed in: signup form by default, with toggle to sign-in ─── %>
+        <% sign_in_default = params[:mode] == "sign_in" %>
+
+        <div id="invite-signup-form" <%= "hidden" if sign_in_default %>>
+          <%= form_with url: accept_funder_invite_path(@invite.token), method: :post do |f| %>
+
+            <div style="margin-bottom:18px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("funder_invites.your_name_label") %></label>
+              <%= f.text_field :name,
+                    required: true, autofocus: !sign_in_default, autocomplete: "name",
+                    placeholder: t("funder_invites.your_name_placeholder"), value: params[:name],
+                    class: "form-input" %>
+            </div>
+
+            <% if @invite.addressed_email.blank? || !User.exists?(email_address: @invite.addressed_email) %>
+              <div style="margin-bottom:18px;">
+                <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("funder_invites.your_org_name_label") %></label>
+                <%= f.text_field :organisation_name,
+                      required: true, placeholder: t("funder_invites.your_org_name_placeholder"),
+                      value: params[:organisation_name], class: "form-input" %>
+              </div>
+            <% end %>
+
+            <div style="margin-bottom:18px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("funder_invites.sign_in_email_label") %></label>
+              <% if @invite.addressed_email.present? %>
+                <div style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px 16px;color:rgba(255,255,255,0.4);font-family:'ABeeZee',sans-serif;font-size: var(--text-xl);box-sizing:border-box;">
+                  <%= @invite.addressed_email %>
+                </div>
+              <% else %>
+                <%= f.email_field :email_address,
+                      required: true, autocomplete: "email",
+                      placeholder: t("funder_invites.sign_in_email_placeholder"), value: params[:email_address],
+                      class: "form-input" %>
+              <% end %>
+            </div>
+
+            <div style="margin-bottom:18px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("funder_invites.password_label") %></label>
+              <%= f.password_field :password,
+                    required: true, autocomplete: "new-password",
+                    placeholder: t("funder_invites.password_placeholder"), maxlength: 72, minlength: 12,
+                    class: "form-input" %>
+            </div>
+
+            <div style="margin-bottom:24px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("funder_invites.confirm_password_label") %></label>
+              <%= f.password_field :password_confirmation,
+                    required: true, autocomplete: "new-password",
+                    placeholder: "••••••••••••", maxlength: 72,
+                    class: "form-input" %>
+            </div>
+
+            <%= f.submit t("funder_invites.accept_submit"),
+                  style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
+
+          <% end %>
+
+          <div style="margin-top:18px;text-align:center;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
+            <%= t("funder_invites.already_have_account") %>
+            <button type="button"
+                    onclick="document.getElementById('invite-signup-form').hidden=true;document.getElementById('invite-signin-form').hidden=false;document.querySelector('#invite-signin-form input[type=email]').focus();"
+                    style="background:none;border:none;color:#01EACB;font-family:inherit;font-size:inherit;text-decoration:underline;cursor:pointer;padding:0;">
+              <%= t("funder_invites.sign_in_instead") %>
+            </button>
+          </div>
+        </div>
+
+        <div id="invite-signin-form" <%= "hidden" unless sign_in_default %>>
+          <%= form_with url: accept_funder_invite_path(@invite.token), method: :post do |f| %>
+            <%= hidden_field_tag :mode, "sign_in" %>
+
+            <div style="margin-bottom:18px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("funder_invites.sign_in_email_label") %></label>
+              <%= f.email_field :email_address,
+                    required: true, autofocus: sign_in_default, autocomplete: "email",
+                    placeholder: t("funder_invites.sign_in_email_placeholder"), value: params[:email_address],
+                    class: "form-input" %>
+            </div>
+
+            <div style="margin-bottom:24px;">
+              <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;"><%= t("funder_invites.sign_in_password_label") %></label>
+              <%= f.password_field :password,
+                    required: true, autocomplete: "current-password",
+                    placeholder: t("funder_invites.sign_in_password_placeholder"), maxlength: 72,
+                    class: "form-input" %>
+            </div>
+
+            <%= f.submit t("funder_invites.sign_in_submit"),
+                  style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
+          <% end %>
+
+          <div style="margin-top:18px;text-align:center;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
+            <%= t("funder_invites.new_to_playverto") %>
+            <button type="button"
+                    onclick="document.getElementById('invite-signin-form').hidden=true;document.getElementById('invite-signup-form').hidden=false;document.querySelector('#invite-signup-form input[name=name]').focus();"
+                    style="background:none;border:none;color:#01EACB;font-family:inherit;font-size:inherit;text-decoration:underline;cursor:pointer;padding:0;">
+              <%= t("funder_invites.create_new_account") %>
+            </button>
+          </div>
+        </div>
+
+      <% end %>
+
+    <% end %>
+  </div>
+</div>

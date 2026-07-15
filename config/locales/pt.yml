@@ -191,6 +191,7 @@ pt:
       step_counter: Passo %{n} de %{total}
   nav:
     partnerships: "Parceiros"
+    funders: "Financiadores"
     shared_vertos: Vertos partilhados
     my_vertos: Os meus Vertos
     create: Criar
@@ -380,6 +381,163 @@ pt:
     password_placeholder: Pelo menos 12 caracteres
     confirm_password_label: Confirmar palavra-passe
     accept_submit: Aceitar convite →
+  funders:
+    title: "Financiadores — Playverto"
+    index_eyebrow: "As suas redes de financiadores"
+    index_heading: "Financiadores"
+    index_subtitle: "Licencie um número fixo de vagas a outras organizações e gira quem detém uma."
+    new_button: "+ Novo financiador"
+    stat_funders: "Financiadores"
+    stat_seats: "Vagas"
+    stat_assigned: "Atribuídas"
+    stat_available: "Disponíveis"
+    stat_suspended: "Suspensas"
+    seats_short: "vagas"
+    available_count:
+      one: vaga disponível
+      other: vagas disponíveis
+    owned_section: "Financiadores que gere"
+    owned_empty_title: "Ainda não há financiadores"
+    owned_empty_admin_html: Clique em <span style="color:#615BF5;">+ Novo financiador</span> acima para licenciar vagas a outras organizações.
+    owned_empty_member: "Peça ao seu administrador para configurar um financiador."
+    started_on: "Iniciado em %{date}"
+    open: Abrir →
+    member_section: "Financiadores que o licenciam"
+    member_empty_title: "Ainda ninguém o licenciou"
+    member_empty_body: "Quando um financiador lhe atribuir uma vaga, esta aparecerá aqui."
+    member_run_by: "Gerido por %{org}"
+    status:
+      active: Ativa
+      revoked: Revogada
+    new_title: "Novo financiador — Playverto"
+    new_eyebrow: "Novo financiador"
+    new_heading: "Configure um financiador"
+    new_sub: "Dê ao financiador um nome e indique quantas vagas está a licenciar a outras organizações."
+    name_label: "Nome do financiador"
+    name_placeholder: ex. Northside Foundation
+    seat_count_label: "Vagas"
+    seat_count_placeholder: "15"
+    seat_count_hint: "Quantas organizações podem deter uma licença — pode alterar isto mais tarde."
+    cancel: Cancelar
+    create_submit: "Criar financiador →"
+    created: "Financiador \"%{name}\" criado."
+    show_title: "%{name} — Financiadores"
+    back_to_all: "Todos os financiadores"
+    creator_eyebrow: "Financiadores · Gerido por si"
+    member_eyebrow: "Financiadores · Licenciado"
+    assign_seat: "Atribuir uma vaga"
+    delete: Eliminar
+    delete_confirm: "Eliminar %{name}? Todas as organizações licenciadas perderão o acesso."
+    deleted: "Financiador removido."
+    not_found: "Financiador não encontrado."
+    not_owner: "Só o proprietário do financiador pode fazer isso."
+    no_seats_available: "Não há vagas disponíveis — liberte uma ou adicione mais vagas primeiro."
+    picker_eyebrow: "Atribuir uma vaga"
+    picker_title: "Como quer atribuir a vaga?"
+    picker_link_name: "Link de adesão"
+    picker_link_desc: "Partilhe um link — eles criam a própria conta e organização."
+    picker_account_name: "Criar a conta"
+    picker_account_desc: "Configure-os diretamente — enviaremos um e-mail para escolherem uma palavra-passe."
+    new_link_heading: "Novo link de adesão"
+    new_link_body: "Qualquer pessoa com este link pode reivindicar uma vaga em %{funder}. Expira em 14 dias."
+    copy: Copiar
+    copied: "Copiado!"
+    seats_purchased: "Vagas"
+    seats_purchased_hint: "O número total de organizações que pode licenciar."
+    update_seats: Atualizar
+    seats_updated: "Número de vagas atualizado."
+    licensed_orgs_section: "Organizações licenciadas"
+    no_licensed_orgs_title: "Ainda não há organizações licenciadas"
+    no_licensed_orgs_body: "Envie um link de adesão ou crie a conta deles diretamente."
+    membership_status:
+      active: Ativa
+      suspended: Suspensa
+    licensed_on: "Licenciada em %{date}"
+    suspend: Suspender
+    suspend_confirm: "Suspender a licença de %{org}? Perderá o acesso imediatamente e a vaga ficará disponível."
+    reactivate: Reativar
+    membership_suspended: "%{org} suspensa — vaga libertada."
+    membership_reactivated: "%{org} reativada."
+    licensed_orgs_in_network: "Organizações licenciadas"
+    including_you: Incluindo-o
+    other_licensed_orgs: "Outras organizações licenciadas"
+    only_licensed_org: "De momento, é a única organização licenciada neste financiador."
+  funder_accounts:
+    title: "Criar conta — %{funder}"
+    back_to_funder: "Voltar a %{funder}"
+    heading: "Criar uma conta para uma organização licenciada"
+    subtitle: "Vamos configurar a organização licenciada e enviar-lhe por e-mail um link para escolher a sua própria palavra-passe para %{funder}."
+    name_label: "Nome do contacto"
+    name_placeholder: "Jamie Rivera"
+    email_label: "E-mail do contacto"
+    email_placeholder: "jamie@licensed.org"
+    org_label: "Nome da organização licenciada"
+    org_placeholder: "Riverside Youth Trust"
+    submit: "Criar conta →"
+    cancel: "Cancelar"
+    missing_fields: "Nome, e-mail e nome da organização são todos obrigatórios."
+    email_taken: "%{email} já tem uma conta Playverto — envie antes um link de adesão para poder associar a organização existente."
+    created: "Conta criada para %{email} — foram-lhe enviadas por e-mail instruções para definir a palavra-passe e começar."
+  funder_account_setups:
+    title: "Defina a sua palavra-passe — Playverto"
+    heading: "Defina a sua palavra-passe"
+    subtitle: "Bem-vindo(a), %{name} — escolha uma palavra-passe para concluir a configuração da sua conta."
+    submit: "Definir palavra-passe e continuar →"
+    welcome: "Bem-vindo(a)! A sua palavra-passe foi definida."
+    invalid_link: "Este link de configuração é inválido ou expirou. Peça ao financiador para o reenviar."
+    password_mismatch: "As palavras-passe não coincidiram."
+  funder_invites:
+    title: Aceitar convite — Playverto
+    already_used_title: Convite já utilizado
+    already_used_body_html: Este link de convite já foi aceite. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Iniciar sessão</a>
+    expired_title: Convite expirado
+    expired_body: Este link tem mais de 14 dias. Peça ao financiador para enviar um novo.
+    invited_to_join: Foi convidado para aderir a
+    licensed_by: licenciado por %{org}
+    addressed_for: "· para %{email}"
+    signed_in_as: Sessão iniciada como %{name}
+    join_with: Aderir com
+    pick_org: Escolha qual organização adere
+    join_submit: Aderir a %{funder} →
+    already_in_funder: "Já licenciadas neste financiador: %{orgs}"
+    you_run_this: Este financiador é gerido por si — visite-o em vez disso.
+    already_member_singular: "%{orgs} já está licenciada neste financiador."
+    already_member_plural: "%{orgs} já estão licenciadas neste financiador."
+    no_admin_org: Não tem uma organização de administrador que possa reivindicar esta vaga.
+    open_funder: Abrir %{funder} →
+    sign_out_link: Terminar sessão e usar uma conta diferente
+    sign_out_confirm: Terminar sessão da sua conta atual?
+    already_have_account: Já tem uma conta Playverto?
+    sign_in_instead: Iniciar sessão em vez disso
+    new_to_playverto: Novo no Playverto?
+    create_new_account: Criar uma nova conta
+    sign_in_email_label: E-mail
+    sign_in_email_placeholder: voce@organizacao.org
+    sign_in_password_label: Palavra-passe
+    sign_in_password_placeholder: A sua palavra-passe
+    sign_in_submit: Iniciar sessão para aderir →
+    your_name_label: O seu nome
+    your_name_placeholder: Jamie Rivera
+    your_org_name_label: Nome da sua organização
+    your_org_name_placeholder: Riverside Youth Trust
+    password_label: Palavra-passe
+    password_placeholder: Pelo menos 12 caracteres
+    confirm_password_label: Confirmar palavra-passe
+    accept_submit: Reivindicar vaga →
+    not_found: "Convite não encontrado."
+    already_used: "Este link de convite já foi utilizado."
+    expired: "Este convite expirou. Peça ao financiador para o reenviar."
+    pick_org_error: "Escolha uma das suas organizações para aderir."
+    cannot_join_own: "Não pode aderir a um financiador que gere."
+    already_licensed: "%{org} já está licenciada em %{funder}."
+    joined: "%{org} aderiu a %{funder}."
+    wrong_password: "Introduza a sua palavra-passe Playverto existente para associar a sua organização."
+    default_org_name: "Organização de %{name}"
+    name_required: "O nome é obrigatório."
+    email_required: "O e-mail é obrigatório."
+    sign_in_required: "Introduza o seu e-mail e palavra-passe para iniciar sessão."
+    sign_in_failed: "Não foi possível encontrar uma conta com esse e-mail e palavra-passe."
+    welcome: "Bem-vindo(a) a %{funder}!"
   editor:
     live_locked_bar: "Este Verto está no ar — as perguntas estão bloqueadas para proteger a qualidade dos dados."
     live_results: "Ver resultados →"

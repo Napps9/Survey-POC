@@ -116,4 +116,19 @@ Rails.application.routes.draw do
   # Owner-created partner account: partner sets their own password here
   # (emailed by PartnershipAccountMailer), never told it by the owner.
   resources :partner_account_setups, param: :token, only: [ :edit, :update ]
+
+  # Funders — orgs that license a fixed number of seats to other orgs
+  resources :funders, except: [ :edit ] do
+    resources :funder_invites,     only: [ :create ]
+    resources :funder_accounts,    only: [ :new, :create ]
+    resources :funder_memberships, only: [ :update ]
+  end
+
+  # Public funder-invite acceptance (no auth)
+  get  "funder_invites/:token",        to: "funder_invite_acceptances#show",   as: :funder_invite
+  post "funder_invites/:token/accept", to: "funder_invite_acceptances#accept", as: :accept_funder_invite
+
+  # Owner-created licensed-org account: they set their own password here
+  # (emailed by FunderAccountMailer), never told it by the owner.
+  resources :funder_account_setups, param: :token, only: [ :edit, :update ]
 end

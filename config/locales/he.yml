@@ -191,6 +191,7 @@ he:
       step_counter: שלב %{n} מתוך %{total}
   nav:
     partnerships: "שותפים"
+    funders: "מממנים"
     shared_vertos: Vertos משותפים
     my_vertos: ה-Vertos שלי
     create: צור
@@ -380,6 +381,163 @@ he:
     password_placeholder: לפחות 12 תווים
     confirm_password_label: אישור סיסמה
     accept_submit: קבלו את ההזמנה ←
+  funders:
+    title: "מממנים — Playverto"
+    index_eyebrow: רשת המממנים שלך
+    index_heading: "מממנים"
+    index_subtitle: הקצו מספר קבוע של רישיונות לארגונים אחרים ונהלו מי מחזיק בהם.
+    new_button: "+ מממן חדש"
+    stat_funders: "מממנים"
+    stat_seats: "רישיונות"
+    stat_assigned: "מוקצים"
+    stat_available: "פנויים"
+    stat_suspended: "מושעים"
+    seats_short: "רישיונות"
+    available_count:
+      one: רישיון פנוי
+      other: רישיונות פנויים
+    owned_section: מממנים שאתם מנהלים
+    owned_empty_title: אין עדיין מממנים
+    owned_empty_admin_html: 'לחצו על <span style="color:#615BF5;">+ מממן חדש</span> למעלה כדי להעניק רישיונות לארגונים אחרים.'
+    owned_empty_member: בקשו מהמנהל שלכם להקים מממן.
+    started_on: החל ב-%{date}
+    open: פתח ←
+    member_section: מממנים שמעניקים לכם רישיון
+    member_empty_title: עדיין לא קיבלתם רישיון מאף אחד
+    member_empty_body: כאשר מממן יקצה לכם רישיון, הוא יופיע כאן.
+    member_run_by: מנוהל על ידי %{org}
+    status:
+      active: פעיל
+      revoked: בוטל
+    new_title: מממן חדש — Playverto
+    new_eyebrow: מממן חדש
+    new_heading: הקימו מממן
+    new_sub: תנו לו שם וציינו כמה רישיונות אתם מעניקים לארגונים אחרים.
+    name_label: שם המממן
+    name_placeholder: 'לדוגמה: קרן הצפון'
+    seat_count_label: רישיונות
+    seat_count_placeholder: "15"
+    seat_count_hint: כמה ארגונים יכולים להחזיק רישיון — תוכלו לשנות זאת מאוחר יותר.
+    cancel: ביטול
+    create_submit: צרו מממן ←
+    created: "מממן “%{name}” נוצר."
+    show_title: "%{name} — מממנים"
+    back_to_all: כל המממנים
+    creator_eyebrow: מממנים · אתם מנהלים זאת
+    member_eyebrow: מממנים · מורשה
+    assign_seat: הקצאת רישיון
+    delete: מחק
+    delete_confirm: למחוק את %{name}? כל הארגונים המורשים יאבדו את הגישה.
+    deleted: המממן הוסר.
+    not_found: המממן לא נמצא.
+    not_owner: רק המנהל של המממן יכול לבצע פעולה זו.
+    no_seats_available: אין רישיונות פנויים — פנו רישיון קיים או הוסיפו רישיונות נוספים.
+    picker_eyebrow: הקצאת רישיון
+    picker_title: איך תרצו להקצות אותו?
+    picker_link_name: קישור הצטרפות
+    picker_link_desc: שתפו קישור — הם ייצרו חשבון וארגון משלהם.
+    picker_account_name: יצירת חשבון
+    picker_account_desc: נגדיר להם הכול ישירות — נשלח להם אימייל לבחירת סיסמה.
+    new_link_heading: קישור הצטרפות חדש
+    new_link_body: כל מי שיש לו קישור זה יכול לקבל רישיון תחת %{funder}. תוקף ל-14 ימים.
+    copy: העתק
+    copied: הועתק!
+    seats_purchased: רישיונות
+    seats_purchased_hint: המספר הכולל של הארגונים שתוכלו להעניק להם רישיון.
+    update_seats: עדכון
+    seats_updated: מספר הרישיונות עודכן.
+    licensed_orgs_section: ארגונים מורשים
+    no_licensed_orgs_title: אין עדיין ארגונים מורשים
+    no_licensed_orgs_body: שלחו קישור הצטרפות, או צרו את החשבון שלהם ישירות.
+    membership_status:
+      active: פעיל
+      suspended: מושעה
+    licensed_on: קיבל רישיון ב-%{date}
+    suspend: השעה
+    suspend_confirm: להשעות את הרישיון של %{org}? הם יאבדו גישה מיידית והרישיון יתפנה.
+    reactivate: הפעל מחדש
+    membership_suspended: "%{org} הושעה — הרישיון התפנה."
+    membership_reactivated: "%{org} הופעל מחדש."
+    licensed_orgs_in_network: ארגונים מורשים
+    including_you: כולל אתכם
+    other_licensed_orgs: ארגונים מורשים אחרים
+    only_licensed_org: אתם הארגון המורשה היחיד תחת מממן זה כרגע.
+  funder_accounts:
+    title: "יצירת חשבון — %{funder}"
+    back_to_funder: חזרה ל-%{funder}
+    heading: יצירת חשבון לארגון מורשה
+    subtitle: אנחנו נגדיר את הארגון שלו ונשלח לו קישור באימייל לבחירת סיסמה משלו עבור %{funder}.
+    name_label: השם שלו
+    name_placeholder: ג'יימי ריברה
+    email_label: האימייל שלו
+    email_placeholder: jamie@licensed.org
+    org_label: שם הארגון שלו
+    org_placeholder: Riverside Youth Trust
+    submit: יצירת חשבון ←
+    cancel: ביטול
+    missing_fields: יש למלא שם, אימייל ושם ארגון — כולם שדות חובה.
+    email_taken: ל-%{email} כבר יש חשבון Playverto — שלחו לו במקום זאת קישור הצטרפות כדי שיוכל לחבר את הארגון הקיים שלו.
+    created: נוצר חשבון עבור %{email} — נשלחו אליו הוראות באימייל להגדרת הסיסמה ולהתחלת העבודה.
+  funder_account_setups:
+    title: "הגדירו סיסמה — Playverto"
+    heading: הגדירו את הסיסמה שלכם
+    subtitle: "ברוכים הבאים, %{name} — בחרו סיסמה כדי לסיים את הגדרת החשבון שלכם."
+    submit: הגדירו סיסמה והמשיכו ←
+    welcome: ברוכים הבאים! הסיסמה שלכם הוגדרה.
+    invalid_link: קישור ההגדרה הזה אינו תקין או שפג תוקפו. בקשו מהמממן לשלוח אותו שוב.
+    password_mismatch: הסיסמאות לא תאמו.
+  funder_invites:
+    title: קבלת הזמנה — Playverto
+    already_used_title: ההזמנה כבר נוצלה
+    already_used_body_html: 'קישור ההזמנה כבר התקבל. <a href="%{href}" style="color:#01EACB;text-decoration:none;">היכנסו</a>'
+    expired_title: ההזמנה פגה
+    expired_body: הקישור הזה ישן ביותר מ-14 ימים. בקשו מהמממן לשלוח חדש.
+    invited_to_join: הוזמנתם להצטרף
+    licensed_by: ברישיון של %{org}
+    addressed_for: "· עבור %{email}"
+    signed_in_as: מחוברים בתור %{name}
+    join_with: הצטרפו עם
+    pick_org: בחרו איזה ארגון מצטרף
+    join_submit: הצטרפו ל-%{funder} ←
+    already_in_funder: 'כבר מורשים תחת מממן זה: %{orgs}'
+    you_run_this: אתם מנהלים מממן זה — בקרו בו במקום זאת.
+    already_member_singular: "%{orgs} כבר מורשה תחת מממן זה."
+    already_member_plural: "%{orgs} כבר מורשים תחת מממן זה."
+    no_admin_org: אין לכם ארגון מנהל שיכול לקבל רישיון זה.
+    open_funder: פתחו את %{funder} ←
+    sign_out_link: התנתקו והשתמשו בחשבון אחר
+    sign_out_confirm: להתנתק מהחשבון הנוכחי?
+    already_have_account: כבר יש לכם חשבון Playverto?
+    sign_in_instead: היכנסו במקום זאת
+    new_to_playverto: חדשים ב-Playverto?
+    create_new_account: צרו חשבון חדש
+    sign_in_email_label: אימייל
+    sign_in_email_placeholder: you@organisation.org
+    sign_in_password_label: סיסמה
+    sign_in_password_placeholder: הסיסמה שלכם
+    sign_in_submit: היכנסו כדי להצטרף ←
+    your_name_label: השם שלכם
+    your_name_placeholder: ג'יימי ריברה
+    your_org_name_label: שם הארגון שלכם
+    your_org_name_placeholder: Riverside Youth Trust
+    password_label: סיסמה
+    password_placeholder: לפחות 12 תווים
+    confirm_password_label: אישור סיסמה
+    accept_submit: קבלו רישיון ←
+    not_found: ההזמנה לא נמצאה.
+    already_used: קישור ההזמנה הזה כבר נוצל.
+    expired: ההזמנה הזו פגה. בקשו מהמממן לשלוח אותה שוב.
+    pick_org_error: בחרו אחד מהארגונים שלכם כדי להצטרף איתו.
+    cannot_join_own: אינכם יכולים להצטרף למממן שאתם מנהלים.
+    already_licensed: "%{org} כבר מורשה תחת %{funder}."
+    joined: "%{org} הצטרף ל-%{funder}."
+    wrong_password: הזינו את הסיסמה הקיימת שלכם ב-Playverto כדי לחבר את הארגון שלכם.
+    default_org_name: הארגון של %{name}
+    name_required: יש להזין שם.
+    email_required: יש להזין אימייל.
+    sign_in_required: הזינו אימייל וסיסמה כדי להתחבר.
+    sign_in_failed: לא נמצא חשבון עם אימייל וסיסמה אלו.
+    welcome: ברוכים הבאים ל-%{funder}!
   editor:
     live_locked_bar: "הוורטו פעיל — השאלות נעולות כדי להגן על איכות הנתונים."
     live_results: "צפייה בתוצאות ←"

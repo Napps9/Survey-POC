@@ -191,6 +191,7 @@ id:
       step_counter: Langkah %{n} dari %{total}
   nav:
     partnerships: "Mitra"
+    funders: "Pendana"
     shared_vertos: Verto Dibagikan
     my_vertos: Verto Saya
     create: Buat
@@ -380,6 +381,163 @@ id:
     password_placeholder: Minimal 12 karakter
     confirm_password_label: Konfirmasi kata sandi
     accept_submit: Terima undangan →
+  funders:
+    title: "Pendana — Playverto"
+    index_eyebrow: Jaringan pendana Anda
+    index_heading: "Pendana"
+    index_subtitle: Lisensikan sejumlah kursi tetap kepada organisasi lain dan kelola siapa saja yang memilikinya.
+    new_button: "+ Pendana baru"
+    stat_funders: Pendana
+    stat_seats: Kursi
+    stat_assigned: Ditetapkan
+    stat_available: Tersedia
+    stat_suspended: Ditangguhkan
+    seats_short: kursi
+    available_count:
+      one: kursi tersedia
+      other: kursi tersedia
+    owned_section: Pendana yang Anda kelola
+    owned_empty_title: Belum ada pendana
+    owned_empty_admin_html: Klik <span style="color:#615BF5;">+ Pendana baru</span> di atas untuk melisensikan kursi kepada organisasi lain.
+    owned_empty_member: Mintalah admin Anda untuk menyiapkan pendana.
+    started_on: Dimulai %{date}
+    open: Buka →
+    member_section: Pendana yang melisensikan Anda
+    member_empty_title: Belum ada yang melisensikan Anda
+    member_empty_body: Saat pendana menetapkan kursi untuk Anda, akan muncul di sini.
+    member_run_by: Dikelola oleh %{org}
+    status:
+      active: Aktif
+      revoked: Dicabut
+    new_title: Pendana baru — Playverto
+    new_eyebrow: Pendana baru
+    new_heading: Siapkan pendana
+    new_sub: Beri nama dan tentukan berapa banyak kursi yang Anda lisensikan kepada organisasi lain.
+    name_label: Nama pendana
+    name_placeholder: misal Yayasan Northside
+    seat_count_label: Kursi
+    seat_count_placeholder: "15"
+    seat_count_hint: Berapa banyak organisasi yang dapat memiliki lisensi — Anda dapat mengubahnya nanti.
+    cancel: Batal
+    create_submit: Buat pendana →
+    created: "Pendana \"%{name}\" berhasil dibuat."
+    show_title: "%{name} — Pendana"
+    back_to_all: Semua pendana
+    creator_eyebrow: Pendana · Anda mengelola ini
+    member_eyebrow: Pendana · Berlisensi
+    assign_seat: Tetapkan kursi
+    delete: Hapus
+    delete_confirm: Hapus %{name}? Semua organisasi berlisensi akan kehilangan akses.
+    deleted: Pendana telah dihapus.
+    not_found: Pendana tidak ditemukan.
+    not_owner: Hanya pemilik pendana yang dapat melakukan ini.
+    no_seats_available: Tidak ada kursi yang tersedia — bebaskan satu kursi atau tambahkan kursi terlebih dahulu.
+    picker_eyebrow: Tetapkan kursi
+    picker_title: Bagaimana Anda ingin menetapkannya?
+    picker_link_name: Tautan bergabung
+    picker_link_desc: Bagikan tautan — mereka akan membuat akun dan organisasi mereka sendiri.
+    picker_account_name: Buat akun mereka
+    picker_account_desc: Siapkan langsung untuk mereka — kami akan mengirim email agar mereka memilih kata sandi.
+    new_link_heading: Tautan bergabung baru
+    new_link_body: Siapa pun dengan tautan ini dapat mengklaim kursi di bawah %{funder}. Kedaluwarsa dalam 14 hari.
+    copy: Salin
+    copied: Tersalin!
+    seats_purchased: Kursi
+    seats_purchased_hint: Jumlah total organisasi yang dapat Anda lisensikan.
+    update_seats: Perbarui
+    seats_updated: Jumlah kursi diperbarui.
+    licensed_orgs_section: Organisasi berlisensi
+    no_licensed_orgs_title: Belum ada organisasi berlisensi
+    no_licensed_orgs_body: Kirim tautan bergabung, atau buat akun mereka secara langsung.
+    membership_status:
+      active: Aktif
+      suspended: Ditangguhkan
+    licensed_on: Dilisensikan %{date}
+    suspend: Tangguhkan
+    suspend_confirm: Tangguhkan lisensi %{org}? Mereka akan langsung kehilangan akses dan kursinya akan dibebaskan.
+    reactivate: Aktifkan kembali
+    membership_suspended: "%{org} ditangguhkan — kursi dibebaskan."
+    membership_reactivated: "%{org} diaktifkan kembali."
+    licensed_orgs_in_network: Organisasi berlisensi
+    including_you: Termasuk Anda
+    other_licensed_orgs: Organisasi berlisensi lain
+    only_licensed_org: Untuk saat ini Anda satu-satunya organisasi berlisensi di bawah pendana ini.
+  funder_accounts:
+    title: "Buat akun — %{funder}"
+    back_to_funder: Kembali ke %{funder}
+    heading: Buat akun untuk organisasi berlisensi
+    subtitle: Kami akan menyiapkan organisasi mereka dan mengirimkan tautan lewat email untuk memilih kata sandi mereka sendiri untuk %{funder}.
+    name_label: Nama mereka
+    name_placeholder: Jamie Rivera
+    email_label: Email mereka
+    email_placeholder: jamie@licensed.org
+    org_label: Nama organisasi mereka
+    org_placeholder: Riverside Youth Trust
+    submit: Buat akun →
+    cancel: Batal
+    missing_fields: Nama, email, dan nama organisasi semuanya wajib diisi.
+    email_taken: "%{email} sudah memiliki akun Playverto — kirimkan tautan bergabung sebagai gantinya agar mereka dapat menghubungkan organisasi mereka yang sudah ada."
+    created: Akun untuk %{email} telah dibuat — mereka telah menerima email berisi petunjuk untuk mengatur kata sandi dan memulai.
+  funder_account_setups:
+    title: "Atur kata sandi Anda — Playverto"
+    heading: Atur kata sandi Anda
+    subtitle: Selamat datang, %{name} — pilih kata sandi untuk menyelesaikan penyiapan akun Anda.
+    submit: Atur kata sandi dan lanjutkan →
+    welcome: Selamat datang! Kata sandi Anda telah diatur.
+    invalid_link: Tautan penyiapan ini tidak valid atau telah kedaluwarsa. Mintalah pendana untuk mengirimkannya kembali.
+    password_mismatch: Kata sandi tidak cocok.
+  funder_invites:
+    title: Terima undangan — Playverto
+    already_used_title: Undangan sudah digunakan
+    already_used_body_html: Tautan undangan ini sudah diterima. <a href="%{href}" style="color:#01EACB;text-decoration:none;">Masuk</a>
+    expired_title: Undangan kedaluwarsa
+    expired_body: Tautan ini sudah berumur lebih dari 14 hari. Mintalah pendana untuk mengirim yang baru.
+    invited_to_join: Anda diundang untuk bergabung
+    licensed_by: dilisensikan oleh %{org}
+    addressed_for: "· untuk %{email}"
+    signed_in_as: Masuk sebagai %{name}
+    join_with: Bergabung dengan
+    pick_org: Pilih organisasi mana yang bergabung
+    join_submit: Bergabung dengan %{funder} →
+    already_in_funder: "Sudah dilisensikan di bawah pendana ini: %{orgs}"
+    you_run_this: Anda mengelola pendana ini — kunjungi saja.
+    already_member_singular: "%{orgs} sudah dilisensikan di bawah pendana ini."
+    already_member_plural: "%{orgs} sudah dilisensikan di bawah pendana ini."
+    no_admin_org: Anda tidak memiliki organisasi admin yang dapat mengklaim kursi ini.
+    open_funder: Buka %{funder} →
+    sign_out_link: Keluar dan gunakan akun lain
+    sign_out_confirm: Keluar dari akun Anda saat ini?
+    already_have_account: Sudah punya akun Playverto?
+    sign_in_instead: Masuk saja
+    new_to_playverto: Baru di Playverto?
+    create_new_account: Buat akun baru
+    sign_in_email_label: Email
+    sign_in_email_placeholder: anda@contoh.com
+    sign_in_password_label: Kata sandi
+    sign_in_password_placeholder: Kata sandi Playverto Anda
+    sign_in_submit: Masuk untuk bergabung →
+    your_name_label: Nama Anda
+    your_name_placeholder: Jamie Rivera
+    your_org_name_label: Nama organisasi Anda
+    your_org_name_placeholder: Riverside Youth Trust
+    password_label: Kata sandi
+    password_placeholder: Minimal 12 karakter
+    confirm_password_label: Konfirmasi kata sandi
+    accept_submit: Klaim kursi →
+    not_found: Undangan tidak ditemukan.
+    already_used: Tautan undangan ini sudah digunakan.
+    expired: Undangan ini telah kedaluwarsa. Mintalah pendana untuk mengirimkannya kembali.
+    pick_org_error: Pilih salah satu organisasi Anda untuk bergabung.
+    cannot_join_own: Anda tidak dapat bergabung dengan pendana yang Anda kelola sendiri.
+    already_licensed: "%{org} sudah dilisensikan di bawah %{funder}."
+    joined: "%{org} bergabung dengan %{funder}."
+    wrong_password: Masukkan kata sandi Playverto Anda yang sudah ada untuk menghubungkan organisasi Anda.
+    default_org_name: Organisasi %{name}
+    name_required: Nama wajib diisi.
+    email_required: Email wajib diisi.
+    sign_in_required: Masukkan email dan kata sandi Anda untuk masuk.
+    sign_in_failed: Tidak dapat menemukan akun dengan email dan kata sandi tersebut.
+    welcome: "Selamat datang di %{funder}!"
   editor:
     live_locked_bar: "Verto ini live — pertanyaan terkunci untuk menjaga kualitas data."
     live_results: "Lihat hasil →"

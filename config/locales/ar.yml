@@ -191,6 +191,7 @@ ar:
       step_counter: الخطوة %{n} من %{total}
   nav:
     partnerships: "الشركاء"
+    funders: "الممولون"
     shared_vertos: فيرتوهات مشتركة
     my_vertos: فيرتوهاتي
     create: إنشاء
@@ -380,6 +381,163 @@ ar:
     password_placeholder: 12 حرفًا على الأقل
     confirm_password_label: تأكيد كلمة المرور
     accept_submit: قبول الدعوة ←
+  funders:
+    title: "الممولون — Playverto"
+    index_eyebrow: شبكات الممولين لديك
+    index_heading: "الممولون"
+    index_subtitle: رخّص عددًا ثابتًا من المقاعد لمؤسسات أخرى، وأدر من يشغل كل مقعد.
+    new_button: "+ ممول جديد"
+    stat_funders: الممولون
+    stat_seats: المقاعد
+    stat_assigned: مخصّصة
+    stat_available: متاحة
+    stat_suspended: معلّقة
+    seats_short: مقاعد
+    available_count:
+      one: مقعد متاح
+      other: مقاعد متاحة
+    owned_section: الممولون الذين تديرهم
+    owned_empty_title: لا يوجد ممولون بعد
+    owned_empty_admin_html: انقر فوق <span style="color:#615BF5;">+ ممول جديد</span> أعلاه لترخيص مقاعد لمؤسسات أخرى.
+    owned_empty_member: اطلب من المسؤول لديك إعداد ممول.
+    started_on: بدأ في %{date}
+    open: فتح ←
+    member_section: الممولون الذين يرخّصون لك
+    member_empty_title: لم يرخّص لك أحد بعد
+    member_empty_body: عندما يخصص لك ممول مقعدًا، سيظهر هنا.
+    member_run_by: تديره %{org}
+    status:
+      active: نشط
+      revoked: ملغى
+    new_title: ممول جديد — Playverto
+    new_eyebrow: ممول جديد
+    new_heading: أعدّ ممولاً
+    new_sub: امنح له اسمًا وحدد عدد المقاعد التي ترخّصها لمؤسسات أخرى.
+    name_label: اسم الممول
+    name_placeholder: 'مثال: مؤسسة نورثسايد'
+    seat_count_label: المقاعد
+    seat_count_placeholder: "15"
+    seat_count_hint: عدد المؤسسات التي يمكنها الحصول على ترخيص — يمكنك تغيير هذا لاحقًا.
+    cancel: إلغاء
+    create_submit: إنشاء الممول ←
+    created: "تم إنشاء الممول \"%{name}\"."
+    show_title: "%{name} — الممولون"
+    back_to_all: جميع الممولين
+    creator_eyebrow: ممول · أنت تديره
+    member_eyebrow: ممول · مرخّص
+    assign_seat: تعيين مقعد
+    delete: حذف
+    delete_confirm: حذف %{name}؟ ستفقد جميع المؤسسات المرخَّص لها إمكانية الوصول.
+    deleted: تمت إزالة الممول.
+    not_found: الممول غير موجود.
+    not_owner: يمكن فقط لمالك الممول القيام بذلك.
+    no_seats_available: لا توجد مقاعد متاحة — أخلِ مقعدًا أو أضف مزيدًا من المقاعد أولاً.
+    picker_eyebrow: تعيين مقعد
+    picker_title: كيف تريد تعيينه؟
+    picker_link_name: رابط الانضمام
+    picker_link_desc: شارك رابطًا — سينشئون حسابهم الخاص ومؤسستهم.
+    picker_account_name: إنشاء حسابهم
+    picker_account_desc: أعدّ لهم كل شيء مباشرة — سنرسل لهم بريدًا إلكترونيًا لاختيار كلمة المرور.
+    new_link_heading: رابط انضمام جديد
+    new_link_body: يمكن لأي شخص لديه هذا الرابط الحصول على مقعد ضمن %{funder}. تنتهي صلاحيته خلال 14 يومًا.
+    copy: نسخ
+    copied: تم النسخ!
+    seats_purchased: المقاعد
+    seats_purchased_hint: العدد الإجمالي للمؤسسات التي يمكنك ترخيصها.
+    update_seats: تحديث
+    seats_updated: تم تحديث عدد المقاعد.
+    licensed_orgs_section: المؤسسات المرخَّص لها
+    no_licensed_orgs_title: لا توجد مؤسسات مرخَّص لها بعد
+    no_licensed_orgs_body: أرسل رابط انضمام، أو أنشئ حسابهم مباشرة بنفسك.
+    membership_status:
+      active: نشط
+      suspended: معلّق
+    licensed_on: رُخِّص في %{date}
+    suspend: تعليق
+    suspend_confirm: تعليق ترخيص %{org}؟ سيفقدون الوصول فورًا وسيتم إخلاء المقعد.
+    reactivate: إعادة تفعيل
+    membership_suspended: تم تعليق %{org} — تم إخلاء المقعد.
+    membership_reactivated: تمت إعادة تفعيل %{org}.
+    licensed_orgs_in_network: المؤسسات المرخَّص لها
+    including_you: بمن فيهم أنت
+    other_licensed_orgs: مؤسسات أخرى مرخَّص لها
+    only_licensed_org: أنت المؤسسة الوحيدة المرخَّص لها ضمن هذا الممول حتى الآن.
+  funder_accounts:
+    title: "إنشاء حساب — %{funder}"
+    back_to_funder: العودة إلى %{funder}
+    heading: إنشاء حساب لمؤسسة مرخَّص لها
+    subtitle: سنقوم بإعداد مؤسسته ونرسل له عبر البريد الإلكتروني رابطًا لاختيار كلمة المرور الخاصة به لـ %{funder}.
+    name_label: اسم المرخَّص له
+    name_placeholder: جيمي ريفيرا
+    email_label: البريد الإلكتروني للمرخَّص له
+    email_placeholder: jamie@licensed.org
+    org_label: اسم مؤسسة المرخَّص له
+    org_placeholder: Riverside Youth Trust
+    submit: إنشاء الحساب ←
+    cancel: إلغاء
+    missing_fields: الاسم والبريد الإلكتروني واسم المؤسسة كلها مطلوبة.
+    email_taken: لدى %{email} حساب Playverto بالفعل — أرسل له رابط انضمام بدلاً من ذلك حتى يتمكن من ربط مؤسسته الحالية.
+    created: تم إنشاء حساب لـ %{email} — تم إرسال تعليمات إليه عبر البريد الإلكتروني لتعيين كلمة المرور والبدء.
+  funder_account_setups:
+    title: "تعيين كلمة المرور — Playverto"
+    heading: عيّن كلمة المرور الخاصة بك
+    subtitle: "أهلاً بك يا %{name} — اختر كلمة مرور لإكمال إعداد حسابك."
+    submit: تعيين كلمة المرور والمتابعة ←
+    welcome: أهلاً بك! تم تعيين كلمة المرور الخاصة بك.
+    invalid_link: رابط الإعداد هذا غير صالح أو منتهي الصلاحية. اطلب من الممول إعادة إرساله.
+    password_mismatch: كلمتا المرور غير متطابقتين.
+  funder_invites:
+    title: قبول الدعوة — Playverto
+    already_used_title: تم استخدام الدعوة بالفعل
+    already_used_body_html: تم قبول رابط الدعوة هذا بالفعل. <a href="%{href}" style="color:#01EACB;text-decoration:none;">تسجيل الدخول</a>
+    expired_title: انتهت صلاحية الدعوة
+    expired_body: مضى على هذا الرابط أكثر من 14 يومًا. اطلب من الممول إرسال رابط جديد.
+    invited_to_join: تمت دعوتك للانضمام إلى
+    licensed_by: مرخَّص من قِبل %{org}
+    addressed_for: "· لـ %{email}"
+    signed_in_as: مُسجَّل الدخول باسم %{name}
+    join_with: الانضمام باستخدام
+    pick_org: اختر المؤسسة التي ستنضم
+    join_submit: الانضمام إلى %{funder} ←
+    already_in_funder: 'مرخَّص له بالفعل ضمن هذا الممول: %{orgs}'
+    you_run_this: أنت تدير هذا الممول — قم بزيارته بدلاً من ذلك.
+    already_member_singular: "%{orgs} مرخَّص له بالفعل ضمن هذا الممول."
+    already_member_plural: "%{orgs} مرخَّص لهم بالفعل ضمن هذا الممول."
+    no_admin_org: ليس لديك مؤسسة بصلاحيات المسؤول يمكنها الحصول على هذا المقعد.
+    open_funder: فتح %{funder} ←
+    sign_out_link: تسجيل الخروج واستخدام حساب آخر
+    sign_out_confirm: هل تريد تسجيل الخروج من حسابك الحالي؟
+    already_have_account: هل لديك حساب Playverto بالفعل؟
+    sign_in_instead: تسجيل الدخول بدلاً من ذلك
+    new_to_playverto: جديد على Playverto؟
+    create_new_account: إنشاء حساب جديد
+    sign_in_email_label: البريد الإلكتروني
+    sign_in_email_placeholder: you@organisation.org
+    sign_in_password_label: كلمة المرور
+    sign_in_password_placeholder: كلمة مرور Playverto الخاصة بك
+    sign_in_submit: سجّل الدخول للانضمام ←
+    your_name_label: اسمك
+    your_name_placeholder: جيمي ريفيرا
+    your_org_name_label: اسم مؤسستك
+    your_org_name_placeholder: Riverside Youth Trust
+    password_label: كلمة المرور
+    password_placeholder: 12 حرفًا على الأقل
+    confirm_password_label: تأكيد كلمة المرور
+    accept_submit: الحصول على المقعد ←
+    not_found: الدعوة غير موجودة.
+    already_used: تم استخدام رابط الدعوة هذا بالفعل.
+    expired: انتهت صلاحية هذه الدعوة. اطلب من الممول إعادة إرسالها.
+    pick_org_error: اختر إحدى مؤسساتك للانضمام بها.
+    cannot_join_own: لا يمكنك الانضمام إلى ممول تديره أنت.
+    already_licensed: "%{org} مرخَّص له بالفعل ضمن %{funder}."
+    joined: انضم %{org} إلى %{funder}.
+    wrong_password: أدخل كلمة مرور Playverto الحالية لربط مؤسستك.
+    default_org_name: مؤسسة %{name}
+    name_required: الاسم مطلوب.
+    email_required: البريد الإلكتروني مطلوب.
+    sign_in_required: أدخل بريدك الإلكتروني وكلمة المرور لتسجيل الدخول.
+    sign_in_failed: تعذّر العثور على حساب بهذا البريد الإلكتروني وكلمة المرور.
+    welcome: مرحبًا بك في %{funder}!
   editor:
     live_locked_bar: "هذه الـVerto نشطة — الأسئلة مقفلة لحماية جودة البيانات."
     live_results: "عرض النتائج ←"

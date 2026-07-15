@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_14_110925) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_090000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -122,6 +122,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_14_110925) do
     t.index ["common_question_set_id"], name: "index_common_questions_on_common_question_set_id"
   end
 
+  create_table "funder_memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "funder_id", null: false
+    t.integer "organisation_id", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["funder_id", "organisation_id"], name: "index_funder_memberships_on_funder_id_and_organisation_id", unique: true
+    t.index ["funder_id"], name: "index_funder_memberships_on_funder_id"
+    t.index ["organisation_id"], name: "index_funder_memberships_on_organisation_id"
+  end
+
+  create_table "funders", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "organisation_id", null: false
+    t.integer "seat_count", default: 0, null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organisation_id", "name"], name: "index_funders_on_organisation_id_and_name", unique: true
+    t.index ["organisation_id"], name: "index_funders_on_organisation_id"
+  end
+
   create_table "identities", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email"
@@ -139,6 +161,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_14_110925) do
     t.datetime "created_at", null: false
     t.string "email_address"
     t.datetime "expires_at", null: false
+    t.integer "funder_id"
     t.integer "invited_by_id", null: false
     t.string "kind", default: "member", null: false
     t.integer "organisation_id", null: false
@@ -146,6 +169,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_14_110925) do
     t.string "role", default: "member", null: false
     t.string "token", null: false
     t.datetime "updated_at", null: false
+    t.index ["funder_id"], name: "index_invites_on_funder_id"
     t.index ["invited_by_id"], name: "index_invites_on_invited_by_id"
     t.index ["kind"], name: "index_invites_on_kind"
     t.index ["organisation_id"], name: "index_invites_on_organisation_id"
@@ -331,6 +355,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_14_110925) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "common_question_sets", "organisations"
   add_foreign_key "common_questions", "common_question_sets"
+  add_foreign_key "funder_memberships", "funders"
+  add_foreign_key "funder_memberships", "organisations"
+  add_foreign_key "funders", "organisations"
+  add_foreign_key "invites", "funders"
   add_foreign_key "invites", "organisations"
   add_foreign_key "invites", "partnerships"
   add_foreign_key "invites", "users", column: "invited_by_id"

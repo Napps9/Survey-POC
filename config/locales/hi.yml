@@ -191,6 +191,7 @@ hi:
       step_counter: चरण %{n} / %{total}
   nav:
     partnerships: "साझेदार"
+    funders: "फंडर्स"
     shared_vertos: साझा किए गए Verto
     my_vertos: मेरे Verto
     create: बनाएं
@@ -380,6 +381,163 @@ hi:
     password_placeholder: कम से कम 12 वर्ण
     confirm_password_label: पासवर्ड की पुष्टि करें
     accept_submit: आमंत्रण स्वीकार करें →
+  funders:
+    title: "फंडर्स — Playverto"
+    index_eyebrow: आपके फंडर नेटवर्क
+    index_heading: "फंडर्स"
+    index_subtitle: अन्य संगठनों को तय संख्या में सीटें लाइसेंस करें और नियंत्रित करें कि किसके पास सीट है।
+    new_button: "+ नया फंडर"
+    stat_funders: फंडर्स
+    stat_seats: सीटें
+    stat_assigned: आवंटित
+    stat_available: उपलब्ध
+    stat_suspended: निलंबित
+    seats_short: सीटें
+    available_count:
+      one: सीट उपलब्ध
+      other: सीटें उपलब्ध
+    owned_section: आपके द्वारा चलाए जाने वाले फंडर्स
+    owned_empty_title: अभी तक कोई फंडर नहीं
+    owned_empty_admin_html: अन्य संगठनों को सीटें लाइसेंस करने के लिए ऊपर <span style="color:#615BF5;">+ नया फंडर</span> पर क्लिक करें।
+    owned_empty_member: अपने एडमिन से फंडर सेट अप करने के लिए कहें।
+    started_on: "%{date} को शुरू हुआ"
+    open: खोलें →
+    member_section: वे फंडर्स जो आपको लाइसेंस देते हैं
+    member_empty_title: अभी तक किसी ने आपको लाइसेंस नहीं दिया है
+    member_empty_body: जब कोई फंडर आपको सीट आवंटित करेगा, तो वह यहाँ दिखाई देगी।
+    member_run_by: "%{org} द्वारा संचालित"
+    status:
+      active: सक्रिय
+      revoked: रद्द किया गया
+    new_title: नया फंडर — Playverto
+    new_eyebrow: नया फंडर
+    new_heading: एक फंडर सेट अप करें
+    new_sub: इसे एक नाम दें और बताएं कि आप अन्य संगठनों को कितनी सीटें लाइसेंस कर रहे हैं।
+    name_label: फंडर का नाम
+    name_placeholder: उदा. Northside Foundation
+    seat_count_label: सीटें
+    seat_count_placeholder: "15"
+    seat_count_hint: कितने संगठन लाइसेंस रख सकते हैं — आप इसे बाद में बदल सकते हैं।
+    cancel: रद्द करें
+    create_submit: फंडर बनाएं →
+    created: "फंडर \"%{name}\" बनाया गया।"
+    show_title: "%{name} — फंडर्स"
+    back_to_all: सभी फंडर्स
+    creator_eyebrow: फंडर्स · आप इसे चलाते हैं
+    member_eyebrow: फंडर्स · लाइसेंस प्राप्त
+    assign_seat: सीट आवंटित करें
+    delete: हटाएं
+    delete_confirm: "%{name} को हटाएं? सभी लाइसेंस प्राप्त संगठनों की पहुंच समाप्त हो जाएगी।"
+    deleted: फंडर हटा दिया गया।
+    not_found: फंडर नहीं मिला।
+    not_owner: केवल फंडर चलाने वाला ही यह कर सकता है।
+    no_seats_available: कोई सीट उपलब्ध नहीं है — पहले कोई सीट खाली करें या और सीटें जोड़ें।
+    picker_eyebrow: सीट आवंटित करें
+    picker_title: आप इसे कैसे आवंटित करना चाहते हैं?
+    picker_link_name: जॉइन लिंक
+    picker_link_desc: एक लिंक शेयर करें — वे अपना खुद का खाता और संगठन बनाएंगे।
+    picker_account_name: उनका खाता बनाएं
+    picker_account_desc: उन्हें सीधे सेट अप करें — हम उन्हें पासवर्ड चुनने के लिए ईमेल करेंगे।
+    new_link_heading: नया जॉइन लिंक
+    new_link_body: इस लिंक वाला कोई भी व्यक्ति %{funder} के अंतर्गत एक सीट प्राप्त कर सकता है। 14 दिनों में समाप्त हो जाएगा।
+    copy: कॉपी करें
+    copied: कॉपी किया गया!
+    seats_purchased: सीटें
+    seats_purchased_hint: आप कुल कितने संगठनों को लाइसेंस दे सकते हैं।
+    update_seats: बदलें
+    seats_updated: सीटों की संख्या बदल दी गई।
+    licensed_orgs_section: लाइसेंस प्राप्त संगठन
+    no_licensed_orgs_title: अभी तक किसी संगठन को लाइसेंस नहीं दिया गया
+    no_licensed_orgs_body: जॉइन लिंक भेजें, या सीधे उनका खाता बनाएं।
+    membership_status:
+      active: सक्रिय
+      suspended: निलंबित
+    licensed_on: "%{date} को लाइसेंस दिया गया"
+    suspend: निलंबित करें
+    suspend_confirm: "%{org} का लाइसेंस निलंबित करें? उनकी पहुंच तुरंत समाप्त हो जाएगी और सीट खाली हो जाएगी।"
+    reactivate: पुनः सक्रिय करें
+    membership_suspended: "%{org} निलंबित — सीट खाली हो गई।"
+    membership_reactivated: "%{org} पुनः सक्रिय हो गया।"
+    licensed_orgs_in_network: लाइसेंस प्राप्त संगठन
+    including_you: आप सहित
+    other_licensed_orgs: अन्य लाइसेंस प्राप्त संगठन
+    only_licensed_org: फिलहाल आप इस फंडर के तहत एकमात्र लाइसेंस प्राप्त संगठन हैं।
+  funder_accounts:
+    title: "खाता बनाएं — %{funder}"
+    back_to_funder: "%{funder} पर वापस"
+    heading: किसी लाइसेंस प्राप्त संगठन के लिए खाता बनाएं
+    subtitle: हम उनका संगठन सेट अप करेंगे और उन्हें %{funder} के लिए अपना पासवर्ड चुनने का लिंक ईमेल करेंगे।
+    name_label: उनका नाम
+    name_placeholder: जेमी रिवेरा
+    email_label: उनका ईमेल
+    email_placeholder: jamie@licensed.org
+    org_label: उनके संगठन का नाम
+    org_placeholder: Riverside Youth Trust
+    submit: खाता बनाएं →
+    cancel: रद्द करें
+    missing_fields: नाम, ईमेल और संगठन का नाम — तीनों आवश्यक हैं।
+    email_taken: "%{email} के पास पहले से ही Playverto खाता है — इसके बजाय उन्हें जॉइन लिंक भेजें ताकि वे अपने मौजूदा संगठन को जोड़ सकें।"
+    created: "%{email} के लिए खाता बना दिया गया है — उन्हें पासवर्ड सेट करने और शुरुआत करने के निर्देश ईमेल कर दिए गए हैं।"
+  funder_account_setups:
+    title: "अपना पासवर्ड सेट करें — Playverto"
+    heading: अपना पासवर्ड सेट करें
+    subtitle: "स्वागत है, %{name} — अपना खाता सेटअप पूरा करने के लिए एक पासवर्ड चुनें।"
+    submit: पासवर्ड सेट करें और जारी रखें →
+    welcome: स्वागत है! आपका पासवर्ड सेट हो गया है।
+    invalid_link: यह सेटअप लिंक अमान्य है या इसकी समय-सीमा समाप्त हो चुकी है। इसे दोबारा भेजने के लिए फंडर से कहें।
+    password_mismatch: पासवर्ड मेल नहीं खाए।
+  funder_invites:
+    title: आमंत्रण स्वीकार करें — Playverto
+    already_used_title: आमंत्रण पहले ही उपयोग किया जा चुका है
+    already_used_body_html: यह आमंत्रण लिंक पहले ही स्वीकार किया जा चुका है। <a href="%{href}" style="color:#01EACB;text-decoration:none;">साइन इन करें</a>
+    expired_title: आमंत्रण समाप्त हो गया
+    expired_body: यह लिंक 14 दिनों से अधिक पुराना है। फंडर से नया भेजने के लिए कहें।
+    invited_to_join: आपको शामिल होने के लिए आमंत्रित किया गया है
+    licensed_by: "%{org} द्वारा लाइसेंस प्राप्त"
+    addressed_for: "· %{email} के लिए"
+    signed_in_as: "%{name} के रूप में साइन इन किया गया"
+    join_with: इसके साथ शामिल हों
+    pick_org: चुनें कि कौन सा संगठन शामिल होगा
+    join_submit: "%{funder} में शामिल हों →"
+    already_in_funder: 'पहले से ही इस फंडर के तहत लाइसेंस प्राप्त: %{orgs}'
+    you_run_this: आप इस फंडर को चलाते हैं — इसके बजाय इस पर जाएं।
+    already_member_singular: "%{orgs} पहले से ही इस फंडर के तहत लाइसेंस प्राप्त है।"
+    already_member_plural: "%{orgs} पहले से ही इस फंडर के तहत लाइसेंस प्राप्त हैं।"
+    no_admin_org: आपके पास कोई एडमिन संगठन नहीं है जो यह सीट प्राप्त कर सके।
+    open_funder: "%{funder} खोलें →"
+    sign_out_link: साइन आउट करें और एक अलग खाते का उपयोग करें
+    sign_out_confirm: अपने वर्तमान खाते से साइन आउट करें?
+    already_have_account: क्या आपके पास पहले से Playverto खाता है?
+    sign_in_instead: इसके बजाय साइन इन करें
+    new_to_playverto: Playverto पर नए हैं?
+    create_new_account: नया खाता बनाएं
+    sign_in_email_label: ईमेल
+    sign_in_email_placeholder: you@organisation.org
+    sign_in_password_label: पासवर्ड
+    sign_in_password_placeholder: आपका पासवर्ड
+    sign_in_submit: शामिल होने के लिए साइन इन करें →
+    your_name_label: आपका नाम
+    your_name_placeholder: जेमी रिवेरा
+    your_org_name_label: आपके संगठन का नाम
+    your_org_name_placeholder: Riverside Youth Trust
+    password_label: पासवर्ड
+    password_placeholder: कम से कम 12 वर्ण
+    confirm_password_label: पासवर्ड की पुष्टि करें
+    accept_submit: सीट प्राप्त करें →
+    not_found: आमंत्रण नहीं मिला।
+    already_used: यह आमंत्रण लिंक पहले ही उपयोग किया जा चुका है।
+    expired: यह आमंत्रण समाप्त हो चुका है। इसे दोबारा भेजने के लिए फंडर से कहें।
+    pick_org_error: शामिल होने के लिए अपने किसी संगठन को चुनें।
+    cannot_join_own: आप उस फंडर में शामिल नहीं हो सकते जिसे आप चलाते हैं।
+    already_licensed: "%{org} पहले से ही %{funder} के तहत लाइसेंस प्राप्त है।"
+    joined: "%{org} %{funder} में शामिल हो गया।"
+    wrong_password: अपने संगठन को जोड़ने के लिए अपना मौजूदा Playverto पासवर्ड दर्ज करें।
+    default_org_name: "%{name} का संगठन"
+    name_required: नाम आवश्यक है।
+    email_required: ईमेल आवश्यक है।
+    sign_in_required: साइन इन करने के लिए अपना ईमेल और पासवर्ड दर्ज करें।
+    sign_in_failed: उस ईमेल और पासवर्ड से कोई खाता नहीं मिला।
+    welcome: "%{funder} में आपका स्वागत है!"
   editor:
     live_locked_bar: "यह वर्टो लाइव है — डेटा गुणवत्ता की रक्षा के लिए सवाल लॉक हैं।"
     live_results: "नतीजे देखें →"

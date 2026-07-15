@@ -1,0 +1,227 @@
+<% content_for :title, t("funders.show_title", name: @funder.name) %>
+<% content_for :head do %>
+  <style>body { overflow: auto !important; height: auto !important; }</style>
+<% end %>
+
+<% is_admin = current_membership&.admin? %>
+<% assigned = @memberships.count(&:active?) %>
+<%# Matches Funder#seats_available (active memberships + pending invites) so
+    the "Assign a seat" button never offers an assignment the controller
+    would immediately reject as over capacity. %>
+<% available = [ @funder.seats_available, 0 ].max %>
+
+<div style="display:flex;min-height:100vh;background:#1C2034;"
+     data-controller="create-menu"
+     data-action="keydown.esc@window->create-menu#closeOnEsc">
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+
+    <%# ── Hero ── %>
+    <div style="position:relative;overflow:hidden;padding:36px 36px 32px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
+      <div class="gen-orbs" style="opacity:0.25;">
+        <div class="gen-orb gen-orb-2"></div>
+        <div class="gen-orb gen-orb-3"></div>
+      </div>
+
+      <div style="position:relative;z-index:1;">
+        <%= link_to funders_path,
+              style: "display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);text-decoration:none;margin-bottom:18px;" do %>
+          <span style="opacity:0.7;">←</span> <%= t("funders.back_to_all") %>
+        <% end %>
+
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#615BF5;box-shadow:0 0 12px rgba(97,91,245,0.7);"></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("funders.creator_eyebrow") %></span>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:<%= @funder.active? ? 'rgba(1,234,203,0.15)' : 'rgba(255,255,255,0.08)' %>;color:<%= @funder.active? ? '#01EACB' : 'rgba(255,255,255,0.5)' %>;">
+                <%= t("funders.status.#{@funder.status}", default: @funder.status.capitalize) %>
+              </span>
+            </div>
+            <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 6px;"><%= @funder.name %></h1>
+            <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
+              <%= t("funders.started_on", date: l(@funder.created_at.to_date, format: :long, default: @funder.created_at.to_date.to_s)) %>
+            </p>
+          </div>
+
+          <% if is_admin %>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <% if available > 0 %>
+                <button type="button" data-action="click->create-menu#open"
+                        style="display:inline-flex;align-items:center;gap:8px;background:#615BF5;border:none;border-radius:100px;padding:10px 20px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(97,91,245,0.28);cursor:pointer;">
+                  <span style="font-size:18px;line-height:1;">+</span> <%= t("funders.assign_seat") %>
+                </button>
+              <% end %>
+              <div style="width:1px;height:24px;background:rgba(255,255,255,0.12);"></div>
+              <%= button_to t("funders.delete"), funder_path(@funder), method: :delete,
+                    data: { turbo_confirm: t("funders.delete_confirm", name: @funder.name) },
+                    form: { style: "margin:0;" },
+                    style: "background:none;border:1px solid rgba(255,255,255,0.15);border-radius:100px;padding:9px 18px;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <%# ── "Assign a seat" popup — mirrors Partners' "+ Add a partner" picker. ── %>
+    <% if is_admin %>
+      <div data-create-menu-target="modal" class="app-modal hidden">
+        <div class="app-modal__backdrop" data-action="click->create-menu#close"></div>
+        <div class="app-modal__panel" style="max-width:440px;background:#1C2034;border:1px solid rgba(255,255,255,0.1);">
+          <div class="create-menu-bar"></div>
+
+          <div data-create-menu-target="chooser" style="padding:24px 26px 24px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;">
+              <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.16em;text-transform:uppercase;font-weight:700;color:#615BF5;"><%= t("funders.picker_eyebrow") %></div>
+              <button type="button" data-action="click->create-menu#close" aria-label="Close"
+                      style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(255,255,255,0.4);line-height:1;padding:2px;flex-shrink:0;">✕</button>
+            </div>
+            <div style="font-family:'Alata',sans-serif;font-size:20px;color:#fff;line-height:1.25;margin-bottom:16px;"><%= t("funders.picker_title") %></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <%= button_to funder_funder_invites_path(@funder), method: :post,
+                    class: "create-menu-tile", style: "--tile-accent:#615BF5;",
+                    form: { style: "margin:0;" } do %>
+                <span class="create-menu-tile-icon">🔗</span>
+                <span style="flex:1;min-width:0;">
+                  <span class="create-menu-tile-name" style="display:block;"><%= t("funders.picker_link_name") %></span>
+                  <span class="create-menu-tile-desc" style="display:block;"><%= t("funders.picker_link_desc") %></span>
+                </span>
+                <span class="create-menu-tile-chev" aria-hidden="true">→</span>
+              <% end %>
+              <%= link_to new_funder_funder_account_path(@funder), class: "create-menu-tile", style: "--tile-accent:#01EACB;" do %>
+                <span class="create-menu-tile-icon">✉️</span>
+                <span style="flex:1;min-width:0;">
+                  <span class="create-menu-tile-name" style="display:block;"><%= t("funders.picker_account_name") %></span>
+                  <span class="create-menu-tile-desc" style="display:block;"><%= t("funders.picker_account_desc") %></span>
+                </span>
+                <span class="create-menu-tile-chev" aria-hidden="true">→</span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%# ── Seat stat strip ── %>
+    <div style="position:relative;padding:24px 36px 4px;flex-shrink:0;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;">
+        <%
+          creator_stats = [
+            { value: @funder.seat_count.to_s, label: t("funders.stat_seats"), accent: "#FF1E6F", grad: "linear-gradient(135deg,rgba(255,30,111,0.18),rgba(255,30,111,0.04))" },
+            { value: assigned.to_s, label: t("funders.stat_assigned"), accent: "#615BF5", grad: "linear-gradient(135deg,rgba(97,91,245,0.18),rgba(97,91,245,0.04))" },
+            { value: available.to_s, label: t("funders.stat_available"), accent: "#01EACB", grad: "linear-gradient(135deg,rgba(1,234,203,0.18),rgba(1,234,203,0.04))" },
+            { value: @memberships.count(&:suspended?).to_s, label: t("funders.stat_suspended"), accent: "#0CA7FF", grad: "linear-gradient(135deg,rgba(12,167,255,0.18),rgba(12,167,255,0.04))" },
+          ]
+        %>
+        <% creator_stats.each do |s| %>
+          <div style="background:<%= s[:grad] %>;border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:16px 16px;text-align:center;backdrop-filter:blur(8px);">
+            <div style="font-family:'Alata',sans-serif;font-size:32px;color:<%= s[:accent] %>;line-height:1;letter-spacing:-0.01em;"><%= s[:value] %></div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.5);margin-top:6px;letter-spacing:0.12em;text-transform:uppercase;"><%= s[:label] %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# ── Body ── %>
+    <div style="flex:1;padding:32px 36px 60px;">
+
+      <% if flash[:notice] %>
+        <div style="background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:notice] %></div>
+      <% end %>
+      <% if flash[:alert] %>
+        <div style="background:rgba(216,0,39,0.1);border:1px solid rgba(216,0,39,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#FF6B83;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:alert] %></div>
+      <% end %>
+
+      <% if params[:new_invite_token].present? %>
+        <% new_url = funder_invite_url(params[:new_invite_token]) %>
+        <div style="background:#161B2E;border:1px solid rgba(97,91,245,0.3);border-radius:14px;padding:18px 20px;margin-bottom:24px;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#615BF5;letter-spacing:0.05em;margin-bottom:4px;"><%= t("funders.new_link_heading") %></div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);margin-bottom:12px;"><%= t("funders.new_link_body", funder: @funder.name) %></div>
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;">
+            <input type="text" readonly id="new-funder-link" value="<%= new_url %>"
+                   style="flex:1;background:transparent;border:none;color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;" />
+            <button type="button"
+                    data-copy-label="<%= t("funders.copy") %>"
+                    data-copied-label="<%= t("funders.copied") %>"
+                    onclick="navigator.clipboard.writeText(document.getElementById('new-funder-link').value).then(()=>{this.textContent=this.dataset.copiedLabel;this.style.color='#01EACB';setTimeout(()=>{this.textContent=this.dataset.copyLabel;this.style.color=''},1500)})"
+                    style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:6px 12px;color:rgba(255,255,255,0.6);font-family:'Alata',sans-serif;font-size: var(--text-base);cursor:pointer;"><%= t("funders.copy") %></button>
+          </div>
+        </div>
+      <% end %>
+
+      <%# ── Seat count editor ── %>
+      <% if is_admin %>
+        <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px 22px;margin-bottom:32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:220px;">
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:2px;"><%= t("funders.seats_purchased") %></div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);"><%= t("funders.seats_purchased_hint") %></div>
+          </div>
+          <%= form_with url: funder_path(@funder), method: :patch, local: true,
+                html: { style: "display:flex;gap:8px;align-items:center;" } do %>
+            <%= number_field_tag "funder[seat_count]", @funder.seat_count, min: 0,
+                  style: "width:90px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 12px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);outline:none;text-align:center;" %>
+            <button type="submit"
+                    style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:100px;padding:10px 18px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);cursor:pointer;white-space:nowrap;">
+              <%= t("funders.update_seats") %>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%# ── Licensed organisations ── %>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("funders.licensed_orgs_section") %></span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @memberships.size %></span>
+      </div>
+
+      <% if @memberships.empty? %>
+        <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:36px 24px;text-align:center;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("funders.no_licensed_orgs_title") %></div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto 16px;line-height:1.5;">
+            <%= t("funders.no_licensed_orgs_body") %>
+          </div>
+          <% if is_admin && available > 0 %>
+            <button type="button" data-action="click->create-menu#open"
+                    style="display:inline-flex;align-items:center;gap:8px;background:#615BF5;border:none;border-radius:100px;padding:10px 20px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;cursor:pointer;">
+              <span style="font-size:18px;line-height:1;">+</span> <%= t("funders.assign_seat") %>
+            </button>
+          <% end %>
+        </div>
+      <% else %>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;">
+          <% @memberships.each do |m| %>
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px;">
+              <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#615BF5,#FF1E6F);display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;flex-shrink:0;opacity:<%= m.active? ? '1' : '0.4' %>;">
+                <%= m.organisation.name.first.upcase %>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= m.organisation.name %></span>
+                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:100px;background:<%= m.active? ? 'rgba(1,234,203,0.15)' : 'rgba(255,193,7,0.15)' %>;color:<%= m.active? ? '#01EACB' : '#FFC107' %>;white-space:nowrap;flex-shrink:0;">
+                    <%= t("funders.membership_status.#{m.status}", default: m.status.capitalize) %>
+                  </span>
+                </div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("funders.licensed_on", date: l(m.created_at.to_date, format: :long, default: m.created_at.to_date.to_s)) %></div>
+              </div>
+              <% if is_admin %>
+                <% if m.active? %>
+                  <%= button_to t("funders.suspend"), funder_funder_membership_path(@funder, m), method: :patch,
+                        params: { status: "suspended" },
+                        data: { turbo_confirm: t("funders.suspend_confirm", org: m.organisation.name) },
+                        form: { style: "margin:0;" },
+                        style: "background:none;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:4px 10px;color:rgba(255,255,255,0.5);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;white-space:nowrap;" %>
+                <% else %>
+                  <%= button_to t("funders.reactivate"), funder_funder_membership_path(@funder, m), method: :patch,
+                        params: { status: "active" },
+                        form: { style: "margin:0;" },
+                        style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:6px;padding:4px 10px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;white-space:nowrap;" %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>
