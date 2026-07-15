@@ -87,6 +87,25 @@ class LogicBranchingTest < ActionDispatch::IntegrationTest
     assert_response :locked
   end
 
+  test "the editor renders per-option route selects and the default row when logic is on" do
+    get survey_path(@survey)
+    assert_response :success
+    # One route select per option (2 hub options) + a default row select, on the
+    # single-pick hub card; the open_ended cards get none.
+    assert_select "select.logic-route-select[data-logic-route][data-canonical='UK']"
+    assert_select "select.logic-route-select[data-logic-route][data-canonical='US']"
+    assert_select "select.logic-route-select[data-logic-default]", minimum: 1
+    assert_match 'data-survey-editor-logic-value="true"', response.body
+    assert_match "Logic &amp; branching", response.body # settings toggle
+  end
+
+  test "no route selects render when logic is off" do
+    @survey.update!(logic: false)
+    get survey_path(@survey)
+    assert_response :success
+    assert_select "select.logic-route-select", false
+  end
+
   test "the player deck carries cid and routing config when logic is on" do
     @survey.update!(publish_token: SecureRandom.hex(8), published_at: Time.current)
     get play_survey_path(@survey.publish_token)

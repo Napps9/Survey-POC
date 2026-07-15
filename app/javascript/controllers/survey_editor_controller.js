@@ -22,6 +22,11 @@ export default class extends Controller {
     rtlLocales: { type: Array, default: [] },
     quiz: { type: Boolean, default: false },
     tokenisation: { type: Boolean, default: false },
+    // Answer-branching: gates the per-option "go to…" route selects and their
+    // serialization. logicConfig carries the static labels + end-screen list
+    // the route dropdowns are built from (see refreshLogicTargets).
+    logic: { type: Boolean, default: false },
+    logicConfig: { type: Object, default: {} },
     live: { type: Boolean, default: false }
   }
 
@@ -240,6 +245,8 @@ export default class extends Controller {
       if (fill) fill.style.width = `${pct}%`
     })
     this._updateMoveButtonStates(cards)
+    // Keep every route dropdown's target list in sync with the current deck.
+    this.refreshLogicTargets()
   }
 
   // Disable "up" on the first movable card (and any card sitting just below the
@@ -661,6 +668,14 @@ export default class extends Controller {
         }
       }
 
+      // Answer-branching: single-pick cards carry per-option `routes` (+ an
+      // optional `default`). Leaving every option on "Continue" keeps the card
+      // linear (LogicGraph.routing? stays false).
+      if (this.logicValue) {
+        const logic = this._readLogic(card, type)
+        if (this._hasLogic(logic)) out.logic = logic
+      }
+
       const i18n = {}
       secondary.forEach(loc => {
         const t = entry[loc]
@@ -804,6 +819,83 @@ export default class extends Controller {
       default:
         return {}
     }
+  }
+
+  // ── Answer-branching: per-option routing ────────────────────────────────
+
+  // This card's routing config, in the shape LogicGraph expects. Reads the
+  // inline per-option <select data-logic-route> plus the card's default
+  // ("otherwise") select. Only single-pick types route this pass.
+  _readLogic(card, type) {
+    if (type !== "multiple_choice" && type !== "yes_no") return null
+    const routes = []
+    card.querySelectorAll("[data-logic-route][data-canonical]").forEach(sel => {
+      const label = (sel.dataset.canonical || "").trim()
+      const to    = this._logicTargetFromValue(sel.value)
+      if (label && to) routes.push({ match: { op: "equals", value: label }, to })
+    })
+    const logic = {}
+    if (routes.length) logic.routes = routes
+    const defSel = card.querySelector("[data-logic-default]")
+    const def    = defSel ? this._logicTargetFromValue(defSel.value) : null
+    if (def) logic.default = def
+    return this._hasLogic(logic) ? logic : null
+  }
+
+  _hasLogic(logic) {
+    return !!(logic && ((Array.isArray(logic.routes) && logic.routes.length) || logic.default))
+  }
+
+  // Decode a route select value: "" (continue/linear), "card:<cid>", "end:<id>".
+  _logicTargetFromValue(value) {
+    if (!value) return null
+    if (value.startsWith("end:"))  { const id  = value.slice(4); return id  ? { end: id }   : null }
+    if (value.startsWith("card:")) { const cid = value.slice(5); return cid ? { card: cid } : null }
+    return null
+  }
+
+  // Rebuild the <option> list of every inline route select from the CURRENT
+  // deck, so targets always reflect live reorders/inserts/deletes. Each select
+  // keeps its chosen value via data-logic-selected; a target that has since
+  // vanished falls back to "Continue". Cheap enough (~16 cards) to run whole.
+  refreshLogicTargets() {
+    if (!this.logicValue) return
+    const selects = this.element.querySelectorAll("[data-logic-route], [data-logic-default]")
+    if (!selects.length) return
+    const cfg   = this.logicConfigValue || {}
+    const ends  = Array.isArray(cfg.ends) ? cfg.ends : []
+    const cards = this.cardTargets.map(c => ({
+      cid: c.dataset.cardCid,
+      num: c.dataset.cardNum,
+      label: (c.querySelector(".q-title, .activity-title")?.textContent || "").trim().slice(0, 40)
+    }))
+    selects.forEach(sel => {
+      const ownerCid = sel.closest("[data-survey-editor-target='card']")?.dataset.cardCid
+      const chosen   = sel.dataset.logicSelected || ""
+      sel.innerHTML  = ""
+      sel.appendChild(this._logicOption("", cfg.continue || "Continue (default flow)"))
+      ends.forEach(e => sel.appendChild(this._logicOption(`end:${e.id}`, `${cfg.finishPrefix || "Finish"} · ${e.label}`)))
+      cards.forEach(c => {
+        if (!c.cid || c.cid === ownerCid) return
+        sel.appendChild(this._logicOption(`card:${c.cid}`, c.label ? `→ Card ${c.num}: ${c.label}` : `→ Card ${c.num}`))
+      })
+      sel.value = chosen
+      if (sel.value !== chosen) { sel.value = ""; sel.dataset.logicSelected = "" } // target gone ⇒ fall through
+    })
+  }
+
+  _logicOption(value, label) {
+    const o = document.createElement("option")
+    o.value = value
+    o.textContent = label
+    return o
+  }
+
+  // Persist the creator's route choice so a later refresh keeps it, then save.
+  logicRouteChanged(event) {
+    const sel = event.currentTarget
+    sel.dataset.logicSelected = sel.value
+    this.markDirty()
   }
 
   // Mark / unmark an option as correct. Single-choice acts like a radio.

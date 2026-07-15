@@ -1,0 +1,16 @@
+<%# Inline answer-routing control (editor only). `selected` is the encoded
+    target ("card:<cid>" | "end:<id>" | "" for the default linear flow). The
+    <option> list is populated live from the current deck by
+    survey_editor#refreshLogicTargets, so it always reflects reorders/inserts.
+    Pass `canonical` for a per-option route; omit it for the card's default
+    ("otherwise") route. onclick stops the click bubbling to the option's
+    picker#pick so opening the dropdown never toggles the answer. %>
+<select class="logic-route-select"
+        <%= canonical ? "data-logic-route data-canonical=\"#{canonical}\"".html_safe : "data-logic-default".html_safe %>
+        data-logic-selected="<%= selected %>"
+        onclick="event.stopPropagation()"
+        <%# Fire on `input` (not just `change`) so this handler records the choice
+            in data-logic-selected BEFORE the root's `input->markDirty` runs its
+            refreshLogicTargets — target listeners fire before ancestor listeners
+            on the same event, so the rebuilt dropdown keeps the new value. %>
+        data-action="input->survey-editor#logicRouteChanged change->survey-editor#logicRouteChanged"></select>

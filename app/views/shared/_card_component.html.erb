@@ -47,6 +47,29 @@
   # award for completing the question at all — see TokenGrading.completion_award?.
   token_award_mode = card["token_award_mode"].to_s == "completion" ? "completion" : "per_answer"
 
+  # Logic / answer-branching: single-pick cards can route each answer to a
+  # different card or end screen. Editor-only chrome (like the quiz/token
+  # controls); the player follows the same routes from the cards JSON. Only
+  # single-pick types are routable this pass (multiple_choice, yes_no).
+  logic_on     = local_assigns.key?(:logic) ? local_assigns[:logic] : @survey&.logic?
+  logic_mode   = editable && LogicGraph::ROUTABLE.include?(type) && !!logic_on
+  logic_block  = card["logic"].is_a?(Hash) ? card["logic"] : {}
+  logic_routes = logic_block["routes"].is_a?(Array) ? logic_block["routes"] : []
+  # The encoded select value ("card:<cid>" / "end:<id>" / "") for one option.
+  logic_route_value = lambda do |label|
+    route = logic_routes.find { |r| r.is_a?(Hash) && r.dig("match", "value").to_s == label.to_s }
+    to    = route.is_a?(Hash) ? route["to"] : nil
+    next "" unless to.is_a?(Hash)
+    next "card:#{to['card']}" if to["card"].to_s != ""
+    next "end:#{to['end']}"   if to["end"].to_s != ""
+    ""
+  end
+  logic_default = logic_block["default"]
+  logic_default_value =
+    if logic_default.is_a?(Hash) && logic_default["card"].to_s != "" then "card:#{logic_default['card']}"
+    elsif logic_default.is_a?(Hash) && logic_default["end"].to_s != "" then "end:#{logic_default['end']}"
+    else "" end
+
   # Picker-style lists carry an extra card-editor controller in :editor
   # mode so the per-card "delete option" / "add option" actions resolve.
   picker_controllers = editable ? "picker card-editor" : "picker"
@@ -112,6 +135,9 @@
               <button type="button" class="mark-correct" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
                       data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
             <% end %>
+            <% if logic_mode %>
+              <%= render "shared/logic_route_select", canonical: canon[i], selected: logic_route_value.call(canon[i]) %>
+            <% end %>
             <% if editable %>
               <button type="button" class="pick-item-delete"
                       data-action="click->card-editor#deleteOption">×</button>
@@ -126,6 +152,12 @@
           </li>
         <% end %>
       </ul>
+      <% if logic_mode %>
+        <div class="logic-default-row">
+          <span class="logic-default-label">If no answer above matches, go to</span>
+          <%= render "shared/logic_route_select", canonical: nil, selected: logic_default_value %>
+        </div>
+      <% end %>
 
     <% when "prioritise" %>
       <%# Drag-to-rank list: respondents arrange the options top (highest
@@ -179,9 +211,18 @@
               <button type="button" class="mark-correct" data-picker-mode="single"
                       data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
             <% end %>
+            <% if logic_mode %>
+              <%= render "shared/logic_route_select", canonical: canon_label, selected: logic_route_value.call(canon_label) %>
+            <% end %>
           </li>
         <% end %>
       </ul>
+      <% if logic_mode %>
+        <div class="logic-default-row">
+          <span class="logic-default-label">If no answer above matches, go to</span>
+          <%= render "shared/logic_route_select", canonical: nil, selected: logic_default_value %>
+        </div>
+      <% end %>
 
     <% when "select_one_grid", "select_many_grid" %>
       <% opts = Array(display["options"]) %>

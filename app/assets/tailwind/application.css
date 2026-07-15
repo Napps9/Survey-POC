@@ -4679,6 +4679,28 @@ body.generating-overlay-active .bottom-bar { display: none; }
 [data-card-component] .pick-item[data-correct="true"] { outline: 2px solid rgba(16,185,129,0.55); outline-offset: 1px; border-radius: 14px; }
 [data-card-component] .choice-card[data-correct="true"] { outline: 2px solid #10B981; outline-offset: 1px; }
 
+/* Answer-branching: the inline per-option "go to…" route select and the card's
+   default ("otherwise") row. Editor-only chrome; mirrors the muted, compact
+   feel of the mark-correct control. */
+.logic-route-select {
+  flex-shrink: 0; max-width: 180px; margin-left: 6px;
+  font-family: "ABeeZee", sans-serif; font-size: 11px; line-height: 1.2;
+  padding: 4px 6px; border-radius: 8px; cursor: pointer;
+  background: rgba(97,91,245,0.06); color: #4A45C4;
+  border: 1px solid rgba(97,91,245,0.3);
+}
+.logic-route-select:hover { border-color: rgba(97,91,245,0.6); }
+.logic-default-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 10px; padding: 8px 10px; border-radius: 12px;
+  background: rgba(97,91,245,0.04); border: 1px dashed rgba(97,91,245,0.3);
+}
+.logic-default-label {
+  font-family: "ABeeZee", sans-serif; font-size: 11px; letter-spacing: 0.02em;
+  color: rgba(74,69,196,0.85);
+}
+.logic-default-row .logic-route-select { margin-left: 0; }
+
 /* The correct-answer block (swipe directions, scale/open answers, explanation). */
 .quiz-correct-block {
   margin-top: 12px; padding: 12px 14px; border-radius: 14px;

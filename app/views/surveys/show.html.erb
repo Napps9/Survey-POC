@@ -47,6 +47,8 @@
      data-survey-editor-quiz-value="<%= @survey.quiz? %>"
      data-survey-editor-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-token-types-value="<%= @survey.token_types.to_json %>"
+     data-survey-editor-logic-value="<%= @survey.logic? %>"
+     data-survey-editor-logic-config-value="<%= { continue: 'Continue (default flow)', finishPrefix: 'Finish', ends: [ { id: 'default', label: @survey.thankyou_title_text } ] }.to_json %>"
      data-type-panel-quiz-value="<%= @survey.quiz? %>"
      data-type-panel-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
@@ -614,6 +616,24 @@
                 <%= @survey.quiz_question_count %> of <%= total_q %> questions graded — mark the correct answer on each card.
               </div>
             <% end %>
+          <% end %>
+        </details>
+
+        <%# Logic & branching — route each answer of a single-pick question to a
+            different next card or end screen instead of the linear flow.
+            Toggling reloads the editor so every multiple-choice / yes-no card
+            gains its per-answer "go to…" controls. %>
+        <details class="publish-block">
+          <summary class="publish-block-title">Logic &amp; branching <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="logic" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="logic" value="1"
+                     <%= "checked" if @survey.logic? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#615BF5;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Send respondents down a different path based on their answer. Each single-pick question gains a “go to…” control on every option — route to another card, a branch, or the finish screen.</span>
+            </label>
           <% end %>
         </details>
 

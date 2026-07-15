@@ -604,6 +604,9 @@ class SurveysController < ApplicationController
       return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
     end
     card   = JSON.parse(request.body.read)
+    # Stamp a stable cid now so the freshly inserted card is a valid
+    # answer-branching target (and carries its identity) before the first save.
+    card["cid"] = card["cid"].to_s.strip.presence || "c_#{SecureRandom.hex(3)}" if card.is_a?(Hash)
 
     html = render_card_html(survey, card)
     render json: { ok: true, html: html }
