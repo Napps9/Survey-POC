@@ -4701,6 +4701,48 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .logic-default-row .logic-route-select { margin-left: 0; }
 
+/* The "zoom out" flow-map overlay (logic_map_controller). Full-viewport dark
+   canvas; the SVG fills the area below the top bar. */
+.logic-map-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; flex-direction: column;
+  background: #14172A;
+}
+.logic-map-topbar {
+  flex-shrink: 0; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.2);
+}
+.logic-map-titles { display: flex; flex-direction: column; gap: 2px; margin-right: auto; }
+.logic-map-title { font-family: "Alata", sans-serif; font-size: 16px; color: #fff; }
+.logic-map-hint  { font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.45); }
+.logic-map-legend {
+  display: flex; gap: 16px; font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.6);
+}
+.logic-map-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.lm-swatch { width: 16px; height: 0; border-top-width: 2px; border-top-style: solid; display: inline-block; }
+.lm-swatch.lm-route   { border-top-color: #01EACB; }
+.lm-swatch.lm-default { border-top-color: rgba(255,255,255,0.5); border-top-style: dashed; }
+.lm-swatch.lm-finish  { width: 14px; height: 14px; border: 1.5px solid #01EACB; border-radius: 7px; background: rgba(1,234,203,0.12); }
+.logic-map-close {
+  padding: 8px 16px; border-radius: 12px; cursor: pointer;
+  background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+  font-family: "ABeeZee", sans-serif; font-size: 13px;
+}
+.logic-map-close:hover { background: rgba(255,255,255,0.14); }
+.logic-map-svg { flex: 1; width: 100%; min-height: 0; touch-action: none; }
+.logic-map-empty {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: "ABeeZee", sans-serif; font-size: 15px; color: rgba(255,255,255,0.4);
+}
+
+/* Brief highlight when jumping to a card from the flow map. */
+.card-flash { animation: card-flash 1.2s ease-out; }
+@keyframes card-flash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(1,234,203,0); }
+  25% { box-shadow: 0 0 0 3px rgba(1,234,203,0.6); }
+}
+
 /* The correct-answer block (swipe directions, scale/open answers, explanation). */
 .quiz-correct-block {
   margin-top: 12px; padding: 12px 14px; border-radius: 14px;

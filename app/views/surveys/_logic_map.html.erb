@@ -1,0 +1,19 @@
+<%# The "zoom out" flow map overlay — a full-viewport canvas showing the default
+    flow plus answer→card branch connectors. Read-only: pan/zoom + click a card
+    to jump to it. Built entirely from the live deck by logic_map_controller. %>
+<div class="logic-map-overlay hidden" data-logic-map-target="overlay">
+  <div class="logic-map-topbar">
+    <div class="logic-map-titles">
+      <span class="logic-map-title">Flow map</span>
+      <span class="logic-map-hint">Scroll to zoom · drag to pan · click a card to edit it</span>
+    </div>
+    <div class="logic-map-legend">
+      <span><i class="lm-swatch lm-route"></i> answer route</span>
+      <span><i class="lm-swatch lm-default"></i> default flow</span>
+      <span><i class="lm-swatch lm-finish"></i> finish screen</span>
+    </div>
+    <button type="button" class="logic-map-close" data-action="click->logic-map#close">✕ Close</button>
+  </div>
+  <svg class="logic-map-svg" data-logic-map-target="svg" preserveAspectRatio="xMidYMid meet" aria-label="Verto flow map"></svg>
+  <div class="logic-map-empty hidden" data-logic-map-target="empty">Add some cards to see the flow.</div>
+</div>

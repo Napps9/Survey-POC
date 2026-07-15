@@ -25,7 +25,7 @@
 <script id="survey-cards-i18n" type="application/json"><%= editor_cards_i18n(@survey.cards).to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker publish-panel brand-palette add-question"
+     data-controller="type-panel preview-verto survey-editor media-picker publish-panel brand-palette add-question logic-map"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
      data-media-picker-url-value="<%= survey_path(@survey) %>"
@@ -49,6 +49,7 @@
      data-survey-editor-token-types-value="<%= @survey.token_types.to_json %>"
      data-survey-editor-logic-value="<%= @survey.logic? %>"
      data-survey-editor-logic-config-value="<%= { continue: 'Continue (default flow)', finishPrefix: 'Finish', ends: @survey.end_screens_list.map { |e| { id: e['id'], label: e['title'] } } }.to_json %>"
+     data-logic-map-ends-value="<%= @survey.end_screens_list.map { |e| { id: e['id'], title: e['title'] } }.to_json %>"
      data-type-panel-quiz-value="<%= @survey.quiz? %>"
      data-type-panel-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
@@ -202,6 +203,13 @@
           </span>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
+          <% if @survey.logic? %>
+            <button type="button"
+                    style="padding:10px 22px;border-radius:16px;background:rgba(1,234,203,0.1);color:#01EACB;border:1px solid rgba(1,234,203,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
+                    onmouseover="this.style.background='rgba(1,234,203,0.18)'"
+                    onmouseout="this.style.background='rgba(1,234,203,0.1)'"
+                    data-action="click->logic-map#open">⤢ Flow map</button>
+          <% end %>
           <% unless live_locked %>
             <%= button_to t("editor.shuffle"), shuffle_survey_assets_path(@survey),
                   method: :post,
@@ -1048,5 +1056,6 @@
 
   <%= render "surveys/media_modal" %>
   <%= render "surveys/add_question_modal" %>
+  <% if @survey.logic? %><%= render "surveys/logic_map" %><% end %>
 
 </div><%# /editor %>
