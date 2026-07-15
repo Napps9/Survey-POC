@@ -29,7 +29,8 @@ bin/trello_log "Short title of what shipped" "1-3 sentence summary" \
   --backend "What changed in models/controllers/services, if anything." \
   --test "rails test:pass" --test "rubocop:pass" \
   --test "brakeman:pass" --test "importmap audit:pass" \
-  --screenshot tmp/screenshots/whatever.png
+  --screenshot tmp/screenshots/whatever.png \
+  --points 5
 ```
 
 This posts to the `Done` list on the team's Trello board
@@ -40,7 +41,11 @@ omit whichever side didn't change. `--test NAME:STATUS` (repeatable) adds a
 actual result of the four commands above, not a guess. `--screenshot PATH`
 (repeatable) attaches a mockup/screenshot file to the card; only pass this
 when the change is user-visible and a screenshot was actually taken (e.g. via
-the `/verify` skill) — don't invent one. All four flags are optional; a bare
+the `/verify` skill) — don't invent one. `--points N` sets a Fibonacci story
+point value (1, 2, 3, 5, 8, 13) as a card label, colored by the board's
+default label colors (green → blue as complexity rises) — estimate it
+yourself based on the size/risk of the change, the same way you judge test
+results, don't skip it out of laziness. All flags are optional; a bare
 `bin/trello_log "title" "summary"` still works exactly as before.
 
 Requires `TRELLO_API_KEY` and `TRELLO_TOKEN` env vars (set at the environment
