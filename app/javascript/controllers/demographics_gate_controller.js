@@ -13,11 +13,24 @@ export default class extends Controller {
   check(e) {
     if (e.submitter?.hasAttribute("data-generating-import")) return
     if (this._acked()) return
+    // If the brief is incomplete, let the event fall through to
+    // generating#show (next in the submit action chain) so its own
+    // shake-the-CTA feedback fires instead of this modal — a first-time
+    // creator should see why the click "didn't work" before an unrelated
+    // one-time explainer.
+    if (this._requiredFieldsMissing()) return
     e.preventDefault()
     e.stopImmediatePropagation()
     this._submitter = e.submitter
     this.modalTarget.classList.remove("hidden")
     document.body.style.overflow = "hidden"
+  }
+
+  _requiredFieldsMissing() {
+    const generatingEl = this.element.closest('[data-controller~="generating"]')
+    const generating = generatingEl &&
+      this.application.getControllerForElementAndIdentifier(generatingEl, "generating")
+    return generating ? generating.requiredFieldsMissing(this.element) : false
   }
 
   // "Got it" — remember the acknowledgement and let the generation proceed.

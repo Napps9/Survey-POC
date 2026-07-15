@@ -627,6 +627,7 @@ ar:
     create_new: إنشاء فيرتو جديد
     create_new_form_button: إنشاء نموذج جديد
     import_google_form_modal_subtitle: الصق رابط نموذج Google موجود وسنحوّله إلى Verto قابل للتعديل.
+    google_connect_failed: تعذّر الاتصال بـ Google. يرجى المحاولة مرة أخرى.
     or_divider: أو
     creating_blank: جارٍ الإنشاء…
     create_button: "إنشاء"

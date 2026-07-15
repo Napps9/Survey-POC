@@ -627,6 +627,7 @@ hi:
     create_new: नया Verto बनाएं
     create_new_form_button: नया फ़ॉर्म बनाएं
     import_google_form_modal_subtitle: किसी मौजूदा Google Form का लिंक पेस्ट करें और हम उसे संपादन योग्य Verto में बदल देंगे।
+    google_connect_failed: Google से कनेक्ट नहीं हो सका। कृपया पुनः प्रयास करें।
     or_divider: या
     creating_blank: बनाया जा रहा है…
     create_button: "बनाएँ"

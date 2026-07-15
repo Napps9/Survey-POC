@@ -14,6 +14,22 @@ export default class extends Controller {
     "tabs", "typeTab", "scoreTab", "whyTab"
   ]
 
+  connect() {
+    // The Publish panel's settings toggles (results-comparison, quiz mode,
+    // form mode, tokenisation, consent, thank-you, custom link) submit as
+    // plain full-page POSTs — see SurveysController#update_settings — so the
+    // panel would otherwise silently reset to the answer-type tab on every
+    // toggle. The redirect echoes back panel=publish so we can reopen it.
+    const params = new URLSearchParams(window.location.search)
+    if (params.get("panel") === "publish") {
+      this.open()
+      params.delete("panel")
+      const query = params.toString()
+      const url = window.location.pathname + (query ? `?${query}` : "") + window.location.hash
+      window.history.replaceState(window.history.state, "", url)
+    }
+  }
+
   open() { this._show("publishView") }
   openDesign() { this._show("designView") }
   close() { this._show("typeView") }

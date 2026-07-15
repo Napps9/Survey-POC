@@ -4,7 +4,9 @@
   <div style="width:100%;max-width:420px;">
 
     <div style="text-align:center;margin-bottom:36px;">
-      <%= image_tag "playverto.svg", style: "height:40px;margin:0 auto 16px;display:block;" rescue nil %>
+      <%= link_to root_path, style: "display:block;width:fit-content;margin:0 auto 16px;" do %>
+        <%= image_tag "playverto.svg", style: "height:40px;display:block;" rescue nil %>
+      <% end %>
       <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-4xl);color:#F7F7F7;letter-spacing:0.05em;margin:0 0 6px;"><%= t("auth.signup_title") %></h1>
       <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);margin:0;"><%= t("auth.signup_have_one") %> <%= link_to t("auth.signup_sign_in"), new_session_path, style: "color:#01EACB;text-decoration:none;" %></p>
     </div>

@@ -627,6 +627,7 @@ vi:
     create_new: Tạo Verto mới
     create_new_form_button: Tạo biểu mẫu mới
     import_google_form_modal_subtitle: Dán liên kết đến một Google Form hiện có và chúng tôi sẽ biến nó thành một Verto có thể chỉnh sửa.
+    google_connect_failed: Không thể kết nối với Google. Vui lòng thử lại.
     or_divider: hoặc
     creating_blank: Đang tạo…
     create_button: "Tạo"

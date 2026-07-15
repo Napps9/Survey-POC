@@ -155,6 +155,11 @@ export default class extends Controller {
     // just show the thank-you screen.
     if (!this.submitUrlValue) return this._showThankyou(false)
     let queued = false
+    // No label swap (unlike _setGradingBusy) since that would need a new
+    // translated string across all locales — the dimmed/not-allowed state
+    // from [data-disabled="true"] already gives visible feedback and blocks
+    // a second tap from firing a duplicate submit while this one is in flight.
+    if (this.hasFinishBtnTarget) this.finishBtnTarget.dataset.disabled = "true"
     try {
       const res = await fetch(this.submitUrlValue, {
         method: "POST",
@@ -177,6 +182,8 @@ export default class extends Controller {
       // No SW running and offline — answers are lost. Still show thank-you
       // so the player completes; flag as queued to set expectations.
       queued = !navigator.onLine
+    } finally {
+      if (this.hasFinishBtnTarget) this.finishBtnTarget.dataset.disabled = "false"
     }
     this._showThankyou(queued)
   }
@@ -616,12 +623,15 @@ export default class extends Controller {
   }
 
   _onMapPointerDown(e) {
+    // Reset before the zoom-btn early-return below, so a stale "true" left
+    // over from a pan that ended over the map can never survive into the
+    // next tap and get misread by _onMapClickCapture as another drag.
+    this._mapDragMoved = false
     // Let zoom-control buttons handle their own clicks — capturing the
     // pointer here would retarget their mouseup/click to the viewport instead.
     if (e.target.closest(".regions-zoom-btn")) return
     this.regionsMapViewportTarget.setPointerCapture(e.pointerId)
     this._mapPointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
-    this._mapDragMoved = false
     this._mapDragStart = { x: e.clientX, y: e.clientY }
     if (this._mapPointers.size === 2) {
       const [a, b] = [...this._mapPointers.values()]

@@ -627,6 +627,7 @@ tr:
     create_new: Yeni bir Verto oluştur
     create_new_form_button: Yeni form oluştur
     import_google_form_modal_subtitle: Mevcut bir Google Form bağlantısını yapıştırın, onu düzenlenebilir bir Verto'ya dönüştürelim.
+    google_connect_failed: Google'a bağlanılamadı. Lütfen tekrar deneyin.
     or_divider: veya
     creating_blank: Oluşturuluyor…
     create_button: "Oluştur"

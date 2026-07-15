@@ -17,6 +17,7 @@ export default class extends Controller {
   pick(event) {
     if (event.target.isContentEditable) return
     if (event.target.closest("button")) return
+    event.stopPropagation() // don't also select/apply the type underneath
     const item = event.currentTarget
     if (this.modeValue === "multi") {
       this.setSelected(item, item.dataset.selected !== "true")

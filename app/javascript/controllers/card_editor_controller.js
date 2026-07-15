@@ -17,7 +17,8 @@ export default class extends Controller {
     if (wasTapCard) this.element.dispatchEvent(new Event("tap-stack:reset"))
   }
 
-  addPickOption() {
+  addPickOption(event) {
+    event.stopPropagation() // don't also select/apply the type underneath
     const addBtn  = this.element.querySelector("[data-card-editor-add]")
     const isMulti = this.element.dataset.pickerModeValue === "multi"
     const li = document.createElement("li")
@@ -43,7 +44,8 @@ export default class extends Controller {
     }
   }
 
-  addTapOption() {
+  addTapOption(event) {
+    event.stopPropagation() // don't also select/apply the type underneath
     const stack = this.element.querySelector(".rotate-card-stack")
     if (!stack) return
     const n = stack.querySelectorAll(".rotate-card").length

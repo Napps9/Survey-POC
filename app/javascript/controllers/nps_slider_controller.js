@@ -33,6 +33,7 @@ export default class extends Controller {
   start(event) {
     if (event.target.isContentEditable) return
     event.preventDefault()
+    event.stopPropagation() // don't also select/apply the type underneath
     this.element.focus()
     this.dragging = true
     this._fromEvent(event)

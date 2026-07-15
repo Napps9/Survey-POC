@@ -19,6 +19,7 @@ export default class extends Controller {
 
   pick(event) {
     if (event.target.isContentEditable) return
+    event.stopPropagation() // don't also select/apply the type underneath
     const dir = event.currentTarget.dataset.tapStackDirection || "right"
     const top = this.cardTargets[this.position]
     if (!top) return

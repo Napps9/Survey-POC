@@ -629,6 +629,7 @@ en:
     create_new: "Create a new Verto"
     create_new_form_button: "Create New Form"
     import_google_form_modal_subtitle: "Paste the link to an existing Google Form and we'll turn it into an editable Verto."
+    google_connect_failed: "Couldn't connect to Google. Please try again."
     or_divider: "or"
     creating_blank: "Creating…"
     create_button: "Create"

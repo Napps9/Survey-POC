@@ -627,6 +627,7 @@ he:
     create_new: צור Verto חדש
     create_new_form_button: יצירת טופס חדש
     import_google_form_modal_subtitle: הדבק קישור לטופס Google קיים ונהפוך אותו ל-Verto הניתן לעריכה.
+    google_connect_failed: לא ניתן היה להתחבר ל-Google. נסה שוב.
     or_divider: או
     creating_blank: יוצר…
     create_button: "יצירה"

@@ -627,6 +627,7 @@ sw:
     create_new: Unda Verto mpya
     create_new_form_button: Unda Fomu Mpya
     import_google_form_modal_subtitle: Bandika kiungo cha Google Form iliyopo nasi tutaigeuza kuwa Verto inayoweza kuhaririwa.
+    google_connect_failed: Imeshindwa kuunganisha na Google. Tafadhali jaribu tena.
     or_divider: au
     creating_blank: Inaunda…
     create_button: "Unda"

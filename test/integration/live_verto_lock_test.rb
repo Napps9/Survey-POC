@@ -77,7 +77,7 @@ class LiveVertoLockTest < ActionDispatch::IntegrationTest
 
   test "live settings remain editable" do
     post survey_settings_path(@live), params: { show_results_comparison: "1", compare_note: "still editable" }
-    assert_redirected_to survey_path(@live)
+    assert_redirected_to survey_path(@live, panel: "publish")
     assert @live.reload.show_results_comparison
     assert_equal "still editable", @live.compare_note
   end

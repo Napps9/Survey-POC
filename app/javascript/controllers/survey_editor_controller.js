@@ -518,6 +518,7 @@ export default class extends Controller {
   }
 
   toggleCardAnalysis(event) {
+    event.stopPropagation() // don't also select/apply the type underneath
     const card = event.currentTarget.closest("[data-survey-editor-target='card']")
     const panel = card?.querySelector("[data-role='card-analysis']")
     if (!panel) return

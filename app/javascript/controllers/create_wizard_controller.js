@@ -31,7 +31,21 @@ export default class extends Controller {
     const card = this.cardTargets[idx]
     if (!card) return true
     const required = card.querySelectorAll("[data-required='true']")
-    return Array.from(required).every(el => el.value.trim().length > 0)
+    if (!Array.from(required).every(el => el.value.trim().length > 0)) return false
+    return this._satisfiesInsightOrCommon(card)
+  }
+
+  // The learning-goal textarea and Common Questions are an or/and (mirrors
+  // generating_controller.js's submit-time gate): a card that carries the
+  // key_insight field needs either text in it or at least one Common
+  // Question checked, so the Finish/Next button doesn't render as clickable
+  // when the actual submit would still be rejected.
+  _satisfiesInsightOrCommon(card) {
+    const insight = card.querySelector('[name="key_insight"]')
+    if (!insight) return true
+    const hasInsight = insight.value.trim().length > 0
+    const hasCommon  = !!card.querySelector("input[name='common_question_ids[]']:checked")
+    return hasInsight || hasCommon
   }
 
   _isFormValid() {
@@ -44,6 +58,19 @@ export default class extends Controller {
       required.forEach(el => {
         el.addEventListener("input", () => this._updateButtons())
       })
+
+      const insight = card.querySelector('[name="key_insight"]')
+      if (insight) insight.addEventListener("input", () => this._updateButtons())
+
+      // Delegated: individual question checkboxes dispatch their own native
+      // "change" (bubbles here), and so does the per-set "select all" box —
+      // by the time it bubbles, common-questions#toggleSet has already
+      // ticked the individual boxes, so one listener covers both paths.
+      if (card.querySelector("input[name='common_question_ids[]']")) {
+        card.addEventListener("change", (e) => {
+          if (e.target.matches("input[name='common_question_ids[]'], [data-cq-all]")) this._updateButtons()
+        })
+      }
     })
   }
 

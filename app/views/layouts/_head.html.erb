@@ -23,9 +23,20 @@
 <%= favicon_link_tag "favicon.svg", rel: "apple-touch-icon", type: "image/svg+xml" %>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<%# Loaded non-render-blocking: request it at low priority as a print
+    stylesheet (browsers still fetch it, just without blocking first paint),
+    then flip it to "all" once it arrives. font-display:swap on the
+    stylesheet itself already keeps text visible with a fallback font in the
+    meantime, so this only removes the render-blocking network round trip —
+    including on the public /play/:token player, the most INP/LCP-sensitive
+    page for anonymous mobile respondents. %>
 <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Alata&display=swap"
-      media="all">
+      media="print" onload="this.media='all'">
+<noscript>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Alata&display=swap">
+</noscript>
 <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
 <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 <%= render "layouts/i18n_js" %>

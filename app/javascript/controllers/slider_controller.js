@@ -24,6 +24,7 @@ export default class extends Controller {
   start(event) {
     if (event.target.isContentEditable) return
     event.preventDefault()
+    event.stopPropagation() // don't also select/apply the type underneath
     this.dragging = true
     this.updateFromEvent(event)
     window.addEventListener("pointermove", this._onMove)

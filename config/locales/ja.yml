@@ -627,6 +627,7 @@ ja:
     create_new: 新しいVertoを作成
     create_new_form_button: 新しいフォームを作成
     import_google_form_modal_subtitle: 既存のGoogleフォームのリンクを貼り付けると、編集可能なVertoに変換します。
+    google_connect_failed: Googleに接続できませんでした。もう一度お試しください。
     or_divider: または
     creating_blank: 作成中…
     create_button: "作成"

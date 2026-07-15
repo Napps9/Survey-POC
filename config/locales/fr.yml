@@ -627,6 +627,7 @@ fr:
     create_new: Créer un nouveau Verto
     create_new_form_button: Créer un nouveau formulaire
     import_google_form_modal_subtitle: Collez le lien d'un Google Form existant et nous le transformerons en Verto modifiable.
+    google_connect_failed: Impossible de se connecter à Google. Veuillez réessayer.
     or_divider: ou
     creating_blank: Création…
     create_button: "Créer"

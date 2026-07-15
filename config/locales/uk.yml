@@ -627,6 +627,7 @@ uk:
     create_new: Створити новий Verto
     create_new_form_button: Створити нову форму
     import_google_form_modal_subtitle: Вставте посилання на наявну Google Form, і ми перетворимо її на редаговану Verto.
+    google_connect_failed: Не вдалося підключитися до Google. Спробуйте ще раз.
     or_divider: або
     creating_blank: Створення…
     create_button: "Створити"

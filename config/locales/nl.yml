@@ -627,6 +627,7 @@ nl:
     create_new: Een nieuwe Verto aanmaken
     create_new_form_button: Nieuw formulier maken
     import_google_form_modal_subtitle: Plak de link van een bestaand Google Form en we maken er een bewerkbare Verto van.
+    google_connect_failed: Kan geen verbinding maken met Google. Probeer het opnieuw.
     or_divider: of
     creating_blank: Bezig met maken…
     create_button: "Maken"

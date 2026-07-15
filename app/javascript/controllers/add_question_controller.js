@@ -48,6 +48,10 @@ export default class extends Controller {
     this._selectedType = null
     this._escListener  = (e) => { if (e.key === "Escape") this.close() }
     this._typeMeta     = this._loadTypeMeta()
+    // Bumped on every close/reopen so a generate/render request that's still
+    // in flight when the user dismisses the modal can tell it's stale and
+    // skip inserting a card the user never asked to keep.
+    this._requestToken = 0
   }
 
   // ──────────────────────────────────────────────────────────
@@ -72,6 +76,7 @@ export default class extends Controller {
     // without a fresh type pick when the modal is reopened.
     this._showStep("stepChoice")
     document.removeEventListener("keydown", this._escListener)
+    this._requestToken++ // invalidate any generate/render request still in flight
   }
 
   backdropClick(event) {
@@ -179,6 +184,7 @@ export default class extends Controller {
   // ──────────────────────────────────────────────────────────
 
   async _generateQuestion() {
+    const token = this._requestToken
     try {
       const res = await fetch(this.generateUrlValue, {
         method:  "POST",
@@ -191,11 +197,13 @@ export default class extends Controller {
       })
       const json = await res.json()
       if (!json.ok) throw new Error(json.error || "Generation failed")
+      if (token !== this._requestToken) return // modal was closed/reopened — drop it
 
       this._insertHTML(json.html)
       this._notifyEditor()
       this.close()
     } catch (err) {
+      if (token !== this._requestToken) return
       this._showStep("stepChoice")
       this._showError(`Couldn't generate a question: ${err.message}. Try again or start from blank.`)
 
@@ -207,6 +215,7 @@ export default class extends Controller {
   // ──────────────────────────────────────────────────────────
 
   async _renderAndInsert(card) {
+    const token = this._requestToken
     try {
       const res = await fetch(this.renderUrlValue, {
         method:  "POST",
@@ -219,11 +228,13 @@ export default class extends Controller {
       })
       const json = await res.json()
       if (!json.ok) throw new Error(json.error || "Render failed")
+      if (token !== this._requestToken) return // modal was closed/reopened — drop it
 
       this._insertHTML(json.html)
       this._notifyEditor()
       this.close()
     } catch (err) {
+      if (token !== this._requestToken) return
       this.addBtnTarget.disabled = false
       this.addBtnTarget.textContent = "Add to survey →"
       this._showError(`Couldn't add the question: ${err.message}`)

@@ -627,6 +627,7 @@ id:
     create_new: Buat Verto baru
     create_new_form_button: Buat Formulir Baru
     import_google_form_modal_subtitle: Tempel tautan Google Form yang sudah ada dan kami akan mengubahnya menjadi Verto yang dapat diedit.
+    google_connect_failed: Tidak dapat terhubung ke Google. Silakan coba lagi.
     or_divider: atau
     creating_blank: Membuat…
     create_button: "Buat"

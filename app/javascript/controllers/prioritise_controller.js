@@ -23,6 +23,7 @@ export default class extends Controller {
     if (event.target.closest("button")) return // delete / add controls
     const item = event.currentTarget
     event.preventDefault()
+    event.stopPropagation() // don't also select/apply the type underneath
 
     this.items       = this.itemTargets
     this.dragEl      = item

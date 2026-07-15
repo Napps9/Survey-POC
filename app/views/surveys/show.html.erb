@@ -512,7 +512,7 @@
                    style="width:100%;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
             <div style="display:flex;gap:8px;margin-top:8px;">
               <button type="button"
-                      onclick="navigator.clipboard.writeText(document.getElementById('publish-url-<%= @survey.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',2000)})"
+                      onclick="(navigator.clipboard?.writeText(document.getElementById('publish-url-<%= @survey.id %>').value) ?? Promise.reject()).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',2000)}).catch(()=>{this.textContent='Copy failed — select &amp; copy';setTimeout(()=>this.textContent='Copy link',2000)})"
                       style="flex:1;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy link</button>
               <%= link_to "View Results →", survey_results_path(@survey),
                     style: "flex:1;text-align:center;padding:8px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
@@ -558,7 +558,7 @@
                      value="<%= play_survey_url(@survey.slug) %>"
                      style="width:100%;margin-top:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
               <button type="button"
-                      onclick="navigator.clipboard.writeText(document.getElementById('custom-url-<%= @survey.id %>').value).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy custom link',2000)})"
+                      onclick="(navigator.clipboard?.writeText(document.getElementById('custom-url-<%= @survey.id %>').value) ?? Promise.reject()).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy custom link',2000)}).catch(()=>{this.textContent='Copy failed — select &amp; copy';setTimeout(()=>this.textContent='Copy custom link',2000)})"
                       style="width:100%;margin-top:8px;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy custom link</button>
             <% else %>
               <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
@@ -675,7 +675,7 @@
                 </div>
 
                 <div style="display:flex;gap:8px;margin-top:8px;">
-                  <button type="button" data-action="click->token-types#addRow"
+                  <button type="button" class="token-type-add-btn" data-action="click->token-types#addRow"
                           <%= "disabled" if @survey.token_types.size >= Survey::MAX_TOKEN_TYPES %>
                           style="padding:6px 12px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px dashed rgba(255,255,255,0.25);cursor:pointer;">
                     ＋ Add token type

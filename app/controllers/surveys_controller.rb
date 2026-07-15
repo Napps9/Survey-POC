@@ -440,7 +440,7 @@ class SurveysController < ApplicationController
     end
 
     @survey.update!(attrs) if attrs.any?
-    redirect_to survey_path(@survey, slug_error: (slug_taken ? "taken" : nil))
+    redirect_to survey_path(@survey, slug_error: (slug_taken ? "taken" : nil), panel: "publish")
   end
 
   def shuffle_assets

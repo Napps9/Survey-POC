@@ -23,7 +23,11 @@
 %>
 
 <%
-  google_form_error       = flash[:reopen_google_form_modal] && flash[:alert].present? ? flash[:alert] : nil
+  # google_error is a query-param signal (GoogleAuthController#return_target),
+  # not flash, so it survives the redirect the same way results.html.erb's
+  # own OAuth round-trip banner does for the fullscreen layout.
+  google_form_error       = (flash[:reopen_google_form_modal] && flash[:alert].present? ? flash[:alert] : nil) ||
+                             (params[:google_error].present? ? t("dashboard.google_connect_failed") : nil)
   open_google_form_modal  = google_form_error.present? || params[:open_import].present?
 %>
 

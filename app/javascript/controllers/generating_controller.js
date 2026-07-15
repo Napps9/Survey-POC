@@ -35,23 +35,18 @@ export default class extends Controller {
       return
     }
 
-    const rawTheme   = form?.querySelector('[name="theme"]')?.value.trim()        || ""
-    const rawAge     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
-    const rawInsight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
-    const hasCommon  = !!form?.querySelector("input[name='common_question_ids[]']:checked")
-
     // Required-field gate. The learning goal is an or/and with Common
     // Questions — either one unlocks generation. Cancel the submit and shake
     // the CTA so the user gets a playful "nope" instead of a server bounce.
-    if (!rawTheme || !rawAge || (!rawInsight && !hasCommon)) {
+    if (this.requiredFieldsMissing(form)) {
       event?.preventDefault()
-      this._shakeSubmit(form)
+      this._shakeSubmit(event?.submitter || form)
       return
     }
 
-    const theme   = rawTheme   || "your Verto"
-    const age     = rawAge
-    const insight = rawInsight
+    const theme   = form?.querySelector('[name="theme"]')?.value.trim()        || "your Verto"
+    const age     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
+    const insight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
 
     this._theme   = theme
     this._age     = age
@@ -69,6 +64,18 @@ export default class extends Controller {
     document.body.classList.add("generating-overlay-active")
 
     this._runSteps()
+  }
+
+  // Shared with demographics_gate_controller.js so it can skip its one-time
+  // explainer modal (and let this method's own shake-the-CTA feedback show
+  // instead) when the brief is incomplete — otherwise a first-time creator
+  // sees an unrelated modal before ever finding out why Generate didn't work.
+  requiredFieldsMissing(form) {
+    const rawTheme   = form?.querySelector('[name="theme"]')?.value.trim()        || ""
+    const rawAge     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
+    const rawInsight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
+    const hasCommon  = !!form?.querySelector("input[name='common_question_ids[]']:checked")
+    return !rawTheme || !rawAge || (!rawInsight && !hasCommon)
   }
 
   // Import-from-PDF has no theme/age/insight to echo, so show a generic

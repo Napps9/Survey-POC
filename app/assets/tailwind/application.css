@@ -822,6 +822,8 @@
 }
 .card-move-btn:disabled { opacity: 0.3; cursor: default; }
 
+.token-type-add-btn:disabled { opacity: 0.4; cursor: default; }
+
 /* Insert/reorder chrome is editing-only: hide it on translation tabs (structural
    edits are locked to the primary language) and inside the device-preview
    frames, matching how the add-question CTA already behaves. */
