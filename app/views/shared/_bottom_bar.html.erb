@@ -7,6 +7,7 @@
   active_funders   = org && path.start_with?("/funders")
   active_results   = path == "/"
   active_create    = org && path == new_survey_path
+  show_funders     = org && (org.funder_enabled? || org.member_funders.exists?)
 %>
 <nav class="bottom-bar" aria-label="Primary">
   <div class="bottom-bar-left">
@@ -35,10 +36,12 @@
         <span class="bottom-bar-chip-dot" style="background:#0CA7FF;"></span>
         <%= t("nav.create") %>
       </a>
-      <a href="<%= funders_path %>" class="bottom-bar-chip" data-active="<%= active_funders %>">
-        <span class="bottom-bar-chip-dot" style="background:#615BF5;"></span>
-        <%= t("nav.funders") %>
-      </a>
+      <% if show_funders %>
+        <a href="<%= funders_path %>" class="bottom-bar-chip" data-active="<%= active_funders %>">
+          <span class="bottom-bar-chip-dot" style="background:#615BF5;"></span>
+          <%= t("nav.funders") %>
+        </a>
+      <% end %>
     <% end %>
   </div>
 

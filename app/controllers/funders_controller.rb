@@ -2,6 +2,8 @@ class FundersController < ApplicationController
   layout "fullscreen"
 
   before_action :require_admin!, only: [ :new, :create, :update, :destroy ]
+  before_action :require_funder_access!, only: [ :index ]
+  before_action :require_funder_enabled!, only: [ :new, :create ]
   before_action :load_funder, only: [ :show, :update, :destroy ]
   before_action :require_creator_ownership!, only: [ :update, :destroy ]
 
@@ -61,6 +63,19 @@ class FundersController < ApplicationController
   end
 
   private
+
+  # Funders is a staff-granted capability (Organisation#funder_enabled, set
+  # via console/Blazer) rather than self-serve like Partnerships — but an
+  # org licensed under someone else's funder still needs to see it.
+  def require_funder_access!
+    return if current_organisation.funder_enabled? || current_organisation.member_funders.exists?
+    redirect_to root_path, alert: "Funders isn't available for your organisation yet."
+  end
+
+  def require_funder_enabled!
+    return if current_organisation.funder_enabled?
+    redirect_to root_path, alert: "Funders isn't available for your organisation yet."
+  end
 
   def load_funder
     @funder = Funder.find_by(id: params[:id])

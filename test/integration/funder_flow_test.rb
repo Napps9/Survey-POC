@@ -3,7 +3,7 @@ require "test_helper"
 class FunderFlowTest < ActionDispatch::IntegrationTest
   setup do
     @admin = User.create!(name: "A", email_address: "creator@test.com", password: "verylongpassword")
-    @oa = Organisation.create!(name: "Creator Co", slug: "creator-co-#{SecureRandom.hex(2)}")
+    @oa = Organisation.create!(name: "Creator Co", slug: "creator-co-#{SecureRandom.hex(2)}", funder_enabled: true)
     @oa.memberships.create!(user: @admin, role: "admin")
     sign_in @admin
   end
@@ -232,6 +232,65 @@ class FunderFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to funder_path(fu)
     assert fu.funder_memberships.exists?(organisation: licensed_org)
     assert invite.reload.accepted?
+  end
+
+  test "an org without funder_enabled cannot see or create funders" do
+    plain_admin = User.create!(name: "P", email_address: "plain-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    plain_org = Organisation.create!(name: "Plain Co", slug: "plain-#{SecureRandom.hex(2)}")
+    plain_org.memberships.create!(user: plain_admin, role: "admin")
+
+    delete session_path
+    sign_in plain_admin
+
+    get funders_path
+    assert_redirected_to root_path
+    assert_equal "Funders isn't available for your organisation yet.", flash[:alert]
+
+    get new_funder_path
+    assert_redirected_to root_path
+
+    assert_no_difference "Funder.count" do
+      post funders_path, params: { funder: { name: "Sneaky Fund", seat_count: 5 } }
+    end
+    assert_redirected_to root_path
+  end
+
+  test "the Funders nav chip is hidden for orgs with no funder relationship, shown once licensed" do
+    plain_admin = User.create!(name: "P2", email_address: "plain2-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    plain_org = Organisation.create!(name: "Plain Co 2", slug: "plain2-#{SecureRandom.hex(2)}")
+    plain_org.memberships.create!(user: plain_admin, role: "admin")
+
+    delete session_path
+    sign_in plain_admin
+    get root_path
+    assert_response :success
+    refute_match "/funders\"", response.body, "nav should not link to /funders for an ineligible org"
+
+    fu = @oa.funders.create!(name: "Licensing Fund", seat_count: 2)
+    FunderMembership.assign!(funder: fu, organisation: plain_org)
+
+    get root_path
+    assert_response :success
+    assert_match "/funders\"", response.body, "nav should link to /funders once the org is licensed"
+  end
+
+  test "an org licensed under a funder (but not funder_enabled itself) can view the funders area but not create a new one" do
+    licensed_admin = User.create!(name: "L", email_address: "licensed-#{SecureRandom.hex(2)}@test.com", password: "verylongpassword")
+    licensed_org = Organisation.create!(name: "Licensed Co", slug: "licensed-#{SecureRandom.hex(2)}")
+    licensed_org.memberships.create!(user: licensed_admin, role: "admin")
+
+    fu = @oa.funders.create!(name: "Parent Fund", seat_count: 2)
+    FunderMembership.assign!(funder: fu, organisation: licensed_org)
+
+    delete session_path
+    sign_in licensed_admin
+
+    get funders_path
+    assert_response :success
+    assert_match "Parent Fund", response.body
+
+    get new_funder_path
+    assert_redirected_to root_path
   end
 
   private
