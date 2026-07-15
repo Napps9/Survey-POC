@@ -16,7 +16,12 @@ Rails.application.configure do
     policy.default_src      :self
     policy.base_uri         :self
     policy.object_src       :none
-    policy.form_action      :self
+    # accounts.google.com: the Google sign-in button POSTs same-origin to
+    # /auth/google_oauth2, but Chrome also enforces form-action against the
+    # redirect that same-origin response issues (to Google's consent screen),
+    # not just the initial submission target — without this the browser
+    # silently aborts the redirect and the button appears to do nothing.
+    policy.form_action      :self, "https://accounts.google.com"
     policy.frame_ancestors  :self # matches the existing X-Frame-Options: SAMEORIGIN
 
     # Inline scripts/handlers stay allowed. External scripts are limited to
