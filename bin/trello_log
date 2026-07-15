@@ -1,76 +1,9 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "net/http"
-require "uri"
-require "json"
 require "optparse"
-
-BOARD_ID = "ntNghZRN"
-
-# Fibonacci story points, mapped onto the board's 6 default (unnamed) label
-# colors instead of creating new labels.
-FIB_LABEL_COLORS = {
-  "1" => "green",
-  "2" => "yellow",
-  "3" => "orange",
-  "5" => "red",
-  "8" => "purple",
-  "13" => "blue"
-}.freeze
-
-def trello_http(uri)
-  # Net::HTTP's built-in :ENV proxy detection only reads http_proxy, never
-  # https_proxy, so it misses this sandbox's proxy entirely. Read it directly.
-  proxy_env = ENV["https_proxy"] || ENV["HTTPS_PROXY"]
-  proxy_uri = URI(proxy_env) if proxy_env
-  http = Net::HTTP.new(uri.host, uri.port, proxy_uri&.host, proxy_uri&.port)
-  http.use_ssl = true
-  http
-end
-
-def trello_request(method, path, params)
-  uri = URI("https://api.trello.com/1#{path}")
-  uri.query = URI.encode_www_form(params)
-  request = case method
-  when :post then Net::HTTP::Post.new(uri)
-  when :put then Net::HTTP::Put.new(uri)
-  else Net::HTTP::Get.new(uri)
-  end
-  response = trello_http(uri).start { |h| h.request(request) }
-  raise "Trello API error #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
-
-  JSON.parse(response.body)
-end
-
-# Finds the board's default label for the given points value's color and
-# names it (e.g. "5") if it isn't already, then returns the label id.
-def trello_points_label_id(points, auth)
-  color = FIB_LABEL_COLORS.fetch(points)
-  labels = trello_request(:get, "/boards/#{BOARD_ID}/labels", auth.merge(fields: "name,color", limit: 1000))
-  label = labels.find { |l| l["color"] == color }
-  raise "No \"#{color}\" label found on the board to represent #{points} points" unless label
-
-  trello_request(:put, "/labels/#{label['id']}", auth.merge(name: points)) unless label["name"] == points
-  label["id"]
-end
-
-def trello_attach(card_id, file_path, auth)
-  abort "Screenshot not found: #{file_path}" unless File.exist?(file_path)
-
-  uri = URI("https://api.trello.com/1/cards/#{card_id}/attachments")
-  request = Net::HTTP::Post.new(uri)
-  form_fields = [
-    [ "key", auth[:key] ],
-    [ "token", auth[:token] ],
-    [ "file", File.open(file_path, "rb"), { filename: File.basename(file_path) } ]
-  ]
-  request.set_form(form_fields, "multipart/form-data")
-  response = trello_http(uri).start { |h| h.request(request) }
-  raise "Trello API error #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
-
-  JSON.parse(response.body)
-end
+require_relative "trello_client"
+require_relative "estimate_points_lib"
 
 options = { tests: [], screenshots: [] }
 parser = OptionParser.new do |opts|
@@ -80,21 +13,30 @@ parser = OptionParser.new do |opts|
         --backend TEXT        Backend changes, rendered under a "## Backend" heading
         --test NAME:STATUS    Test suite result, repeatable (e.g. --test "rails test:pass")
         --screenshot PATH     Attach a screenshot/mockup file to the card, repeatable
-        --points N            Fibonacci story points (#{FIB_LABEL_COLORS.keys.join(', ')}), shown as a card label
+        --points N            Fibonacci story points (#{TrelloClient::FIB_LABEL_COLORS.keys.join(', ')}), shown as a card label.
+                               Omit this to have bin/estimate_points size the card automatically
+                               (deterministic pre-filter, or a 3x self-consistency Claude score
+                               with the axis breakdown posted as a comment on the card).
+        --base-ref REF         Git ref the auto-estimator diffs against (default: HEAD~1 — the
+                               previous commit; pass this explicitly if a push bundles more than
+                               one commit, e.g. --base-ref origin/Main).
+        --no-estimate          Skip automatic point estimation entirely (no label, no comment).
   BANNER
   opts.on("--frontend TEXT") { |v| options[:frontend] = v }
   opts.on("--backend TEXT") { |v| options[:backend] = v }
   opts.on("--test NAME:STATUS") { |v| options[:tests] << v }
   opts.on("--screenshot PATH") { |v| options[:screenshots] << v }
   opts.on("--points N") { |v| options[:points] = v }
+  opts.on("--base-ref REF") { |v| options[:base_ref] = v }
+  opts.on("--no-estimate") { options[:no_estimate] = true }
 end
 parser.parse!(ARGV)
 
 title = ARGV[0]
 abort parser.banner if title.nil? || title.empty?
 
-if options[:points] && !FIB_LABEL_COLORS.key?(options[:points])
-  abort "Invalid --points #{options[:points]} (must be one of: #{FIB_LABEL_COLORS.keys.join(', ')})"
+if options[:points] && !TrelloClient::FIB_LABEL_COLORS.key?(options[:points])
+  abort "Invalid --points #{options[:points]} (must be one of: #{TrelloClient::FIB_LABEL_COLORS.keys.join(', ')})"
 end
 
 summary = ARGV[1] || ""
@@ -105,26 +47,50 @@ description = summary.dup
 description << "\n\n## Frontend\n#{options[:frontend]}" if options[:frontend]
 description << "\n\n## Backend\n#{options[:backend]}" if options[:backend]
 
-lists = trello_request(:get, "/boards/#{BOARD_ID}/lists", auth)
-list = lists.find { |l| l["name"].casecmp?(list_name) }
-list ||= trello_request(:post, "/boards/#{BOARD_ID}/lists", auth.merge(name: list_name))
+list = TrelloClient.find_or_create_list(list_name, auth)
 
 card_params = auth.merge(idList: list["id"], name: title, desc: description)
-card_params[:idLabels] = trello_points_label_id(options[:points], auth) if options[:points]
+# A manual --points still wins outright — set the label at creation time,
+# same as before, and skip the auto-estimator entirely below.
+card_params[:idLabels] = TrelloClient.points_label_id(options[:points], auth) if options[:points]
 
-card = trello_request(:post, "/cards", card_params)
+card = TrelloClient.request(:post, "/cards", card_params)
 
 unless options[:tests].empty?
-  checklist = trello_request(:post, "/checklists", auth.merge(idCard: card["id"], name: "Tests"))
+  checklist = TrelloClient.request(:post, "/checklists", auth.merge(idCard: card["id"], name: "Tests"))
   options[:tests].each do |entry|
     name, status = entry.split(":", 2)
     abort "Malformed --test entry (expected NAME:STATUS): #{entry}" if status.nil?
 
-    trello_request(:post, "/checklists/#{checklist['id']}/checkItems",
-                    auth.merge(name: name, checked: status.casecmp?("pass")))
+    TrelloClient.request(:post, "/checklists/#{checklist['id']}/checkItems",
+                          auth.merge(name: name, checked: status.casecmp?("pass")))
   end
 end
 
-options[:screenshots].each { |path| trello_attach(card["id"], path, auth) }
+options[:screenshots].each { |path| TrelloClient.attach(card["id"], path, auth) }
 
 puts "Logged to Trello: #{card['shortUrl']}"
+
+if options[:points]
+  puts "Points: #{options[:points]} (manual)"
+elsif options[:no_estimate]
+  puts "Points: skipped (--no-estimate)"
+else
+  begin
+    base_ref = options[:base_ref] || "HEAD~1"
+    outcome = StoryPointEstimator.run(base_ref: base_ref, card_id: card["id"], auth: auth)
+    case outcome["result"]["status"]
+    when "auto", "auto_median"
+      qualifier = outcome["result"]["status"] == "auto_median" ? " (median of a 1-step split — see the card comment)" : ""
+      puts "Points: #{outcome['result']['points']}#{qualifier} [#{outcome['method']}]"
+    when "flagged"
+      puts "Points: NOT auto-assigned — the 3 scoring attempts disagreed by " \
+           "#{outcome['result']['disagreement_steps']} Fibonacci steps. Flagged on the card for manual review."
+    end
+  rescue => e
+    # Best-effort, same philosophy as the rest of this script: a broken
+    # estimator (missing key, network blip, API error) must never make an
+    # otherwise-successful card log look like it failed.
+    warn "[trello_log] Automatic point estimation failed (card was still logged): #{e.class}: #{e.message}"
+  end
+end

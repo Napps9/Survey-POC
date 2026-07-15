@@ -1,0 +1,69 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# CLI wrapper for the automated Fibonacci story-point estimator. The actual
+# logic lives in estimate_points_lib.rb (require_relative can't load this
+# file directly since it has no .rb extension, by design — every other
+# script in bin/ is extensionless too).
+#
+# Usage:
+#   bin/estimate_points diff-stats --base <ref> [--head <ref>]
+#   bin/estimate_points score      --base <ref> [--head <ref>]
+#   bin/estimate_points run        --base <ref> --card <trello-card-id> [--head <ref>] [--dry-run]
+#
+# Library usage (from bin/trello_log):
+#   require_relative "estimate_points_lib"
+#   result = StoryPointEstimator.run(base_ref: "...", card_id: "...", auth: {...})
+
+require_relative "estimate_points_lib"
+require "optparse"
+require "json"
+
+options = { head: "HEAD" }
+parser = OptionParser.new do |opts|
+  opts.banner = <<~BANNER
+    Usage: bin/estimate_points <command> --base <ref> [options]
+      diff-stats --base REF [--head REF]          Stage 1 only, no LLM call.
+      score      --base REF [--head REF]          Stages 1-4, prints the result, writes nothing.
+      run        --base REF --card ID [--head REF] [--dry-run]
+                                                   Full pipeline incl. Trello write + local log.
+  BANNER
+  opts.on("--base REF") { |v| options[:base] = v }
+  opts.on("--head REF") { |v| options[:head] = v }
+  opts.on("--card ID") { |v| options[:card] = v }
+  opts.on("--dry-run") { options[:dry_run] = true }
+end
+
+command = ARGV.shift
+parser.parse!(ARGV)
+abort "Missing --base <ref>" unless options[:base]
+
+case command
+when "diff-stats"
+  stats = StoryPointEstimator::DiffStats.extract(options[:base], options[:head])
+  puts JSON.pretty_generate(stats)
+  puts
+  puts "Trivial (would skip LLM, auto-1-point): #{StoryPointEstimator.trivial?(stats)}"
+when "score"
+  stats = StoryPointEstimator::DiffStats.extract(options[:base], options[:head])
+  if StoryPointEstimator.trivial?(stats)
+    puts "Trivial diff — auto 1 point, no LLM call made."
+    puts JSON.pretty_generate(stats)
+  else
+    diff_content = StoryPointEstimator::DiffStats.git_diff_content(options[:base], options[:head])
+    api_key = ENV.fetch("ANTHROPIC_API_KEY") { abort "ANTHROPIC_API_KEY is required for the score command" }
+    attempts = StoryPointEstimator::Scoring.score_three_times(stats, diff_content, api_key: api_key)
+    result = StoryPointEstimator.self_consistency(attempts)
+    puts JSON.pretty_generate(result)
+  end
+when "run"
+  abort "Missing --card <trello-card-id>" unless options[:card]
+  auth = { key: ENV.fetch("TRELLO_API_KEY"), token: ENV.fetch("TRELLO_TOKEN") }
+  outcome = StoryPointEstimator.run(
+    base_ref: options[:base], head_ref: options[:head], card_id: options[:card],
+    auth: auth, dry_run: options[:dry_run] || false
+  )
+  puts JSON.pretty_generate(outcome)
+else
+  abort "Unknown or not-yet-implemented command: #{command.inspect}\n#{parser.banner}"
+end
