@@ -33,6 +33,18 @@ tr:
     token_award_title: "Puan"
     token_award_hint: "Sadece cevap verdiğiniz için kazanılır"
     token_checkpoint_placeholder: "Bir oyuncunun şimdiye kadar topladığı puanları gösterir."
+    eyebrow:
+      range: "Kaydırıcıyı sürükleyin"
+      rating: "Puanlamak için dokunun"
+      nps: "Puanlamak için sürükleyin"
+      multiple_choice: "Birini seçin"
+      select_many: "Uygun olan tüm seçenekleri seçin"
+      prioritise: "Öncelik sırasına göre düzenlemek için tıklayıp sürükleyin"
+      yes_no: "Birini seçin"
+      select_one_grid: "Birini seçin"
+      select_many_grid: "Uygun olan tüm seçenekleri seçin"
+      tap_card: "Yanıtlamak için kaydırın"
+      open_ended: "Cevabınızı yazın"
   auth:
     social_continue: "%{provider} ile devam et"
     social_divider: "veya"

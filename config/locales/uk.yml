@@ -33,6 +33,18 @@ uk:
     token_award_title: "Бали"
     token_award_hint: "Нараховуються просто за відповідь"
     token_checkpoint_placeholder: "Показує бали, які гравець зібрав на цей момент."
+    eyebrow:
+      range: "Перетягніть повзунок"
+      rating: "Торкніться, щоб оцінити"
+      nps: "Перетягніть, щоб оцінити"
+      multiple_choice: "Виберіть один варіант"
+      select_many: "Виберіть усі, що підходять"
+      prioritise: "Натисніть і перетягніть, щоб розташувати за пріоритетом"
+      yes_no: "Виберіть один варіант"
+      select_one_grid: "Виберіть один варіант"
+      select_many_grid: "Виберіть усі, що підходять"
+      tap_card: "Свайпніть, щоб відповісти"
+      open_ended: "Введіть відповідь"
   auth:
     social_continue: "Продовжити з %{provider}"
     social_divider: "або"

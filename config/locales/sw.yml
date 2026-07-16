@@ -33,6 +33,18 @@ sw:
     token_award_title: "Pointi"
     token_award_hint: "Zinatolewa kwa kujibu tu"
     token_checkpoint_placeholder: "Inaonyesha pointi ambazo mchezaji amekusanya hadi sasa."
+    eyebrow:
+      range: "Buruta kitelezi"
+      rating: "Gusa ili kukadiria"
+      nps: "Buruta ili kukadiria"
+      multiple_choice: "Chagua moja"
+      select_many: "Chagua zote zinazofaa"
+      prioritise: "Bofya na buruta ili kupanga kwa vipaumbele"
+      yes_no: "Chagua moja"
+      select_one_grid: "Chagua moja"
+      select_many_grid: "Chagua zote zinazofaa"
+      tap_card: "Buruta ili kujibu"
+      open_ended: "Andika jibu lako"
   auth:
     social_continue: "Endelea na %{provider}"
     social_divider: "au"

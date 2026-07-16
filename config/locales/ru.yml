@@ -33,6 +33,18 @@ ru:
     token_award_title: "Баллы"
     token_award_hint: "Начисляются просто за ответ"
     token_checkpoint_placeholder: "Показывает баллы, которые игрок набрал на данный момент."
+    eyebrow:
+      range: "Перетащите ползунок"
+      rating: "Нажмите, чтобы оценить"
+      nps: "Перетащите, чтобы оценить"
+      multiple_choice: "Выберите один вариант"
+      select_many: "Отметьте все подходящие варианты"
+      prioritise: "Нажмите и перетащите, чтобы расставить по приоритету"
+      yes_no: "Выберите один вариант"
+      select_one_grid: "Выберите один вариант"
+      select_many_grid: "Отметьте все подходящие варианты"
+      tap_card: "Перетащите, чтобы ответить"
+      open_ended: "Введите свой ответ"
   auth:
     social_continue: "Продолжить с %{provider}"
     social_divider: "или"

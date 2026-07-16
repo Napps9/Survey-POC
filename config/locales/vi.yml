@@ -33,6 +33,18 @@ vi:
     token_award_title: "Điểm"
     token_award_hint: "Chỉ cần trả lời là được cộng điểm"
     token_checkpoint_placeholder: "Hiển thị số điểm người chơi đã thu thập được cho đến nay."
+    eyebrow:
+      range: "Kéo thanh trượt"
+      rating: "Chạm để đánh giá"
+      nps: "Kéo để đánh giá"
+      multiple_choice: "Chọn một"
+      select_many: "Chọn tất cả đáp án phù hợp"
+      prioritise: "Chạm và kéo để sắp xếp theo thứ tự ưu tiên"
+      yes_no: "Chọn một"
+      select_one_grid: "Chọn một"
+      select_many_grid: "Chọn tất cả đáp án phù hợp"
+      tap_card: "Vuốt để trả lời"
+      open_ended: "Nhập câu trả lời của bạn"
   auth:
     social_continue: "Tiếp tục với %{provider}"
     social_divider: "hoặc"
