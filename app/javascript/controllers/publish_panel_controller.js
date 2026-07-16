@@ -33,6 +33,18 @@ export default class extends Controller {
   open() { this._show("publishView") }
   openDesign() { this._show("designView") }
   close() { this._show("typeView") }
+
+  // A card was clicked. Only drop back to the answer-type editor if a full-column
+  // overlay (Publish / Design) is open, so clicking a card there reveals its edit
+  // options. The peer tabs (Answer type / Why / Branching / Score) stay put —
+  // selecting or editing a card shouldn't yank you off the tab you're working in.
+  closeForCard() {
+    const shown = (has, el) => has && !el.classList.contains("hidden")
+    if (shown(this.hasPublishViewTarget, this.publishViewTarget) ||
+        shown(this.hasDesignViewTarget, this.designViewTarget)) {
+      this._show("typeView")
+    }
+  }
   showType() { this._show("typeView") }
   showScore() { this._show("scoreView") }
   showWhy() { this._show("whyView") }
