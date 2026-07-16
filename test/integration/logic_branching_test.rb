@@ -59,6 +59,30 @@ class LogicBranchingTest < ActionDispatch::IntegrationTest
     refute @survey.reload.cards.first.key?("logic")
   end
 
+  test "the per-card next pointer survives sanitize; a malformed one is dropped" do
+    patch_cards([
+      { "type" => "open_ended", "cid" => "c_a", "text" => "A", "next" => { "card" => "c_b" } },
+      { "type" => "open_ended", "cid" => "c_b", "text" => "B", "next" => "nonsense" }
+    ])
+    assert_response :success
+    cards = @survey.reload.cards
+    assert_equal({ "card" => "c_b" }, cards[0]["next"])
+    refute cards[1].key?("next"), "a non-hash next is dropped"
+  end
+
+  test "a branch lane_label is kept (bounded) and blank ones are dropped" do
+    patch_cards([
+      { "type" => "open_ended", "cid" => "c_a", "text" => "A", "lane_label" => "  UK hub  " },
+      { "type" => "open_ended", "cid" => "c_b", "text" => "B", "lane_label" => "   " },
+      { "type" => "open_ended", "cid" => "c_c", "text" => "C", "lane_label" => "x" * 200 }
+    ])
+    assert_response :success
+    cards = @survey.reload.cards
+    assert_equal "UK hub", cards[0]["lane_label"]           # trimmed
+    refute cards[1].key?("lane_label")                       # blank ⇒ dropped
+    assert_equal Survey::MAX_LANE_LABEL, cards[2]["lane_label"].length # bounded
+  end
+
   test "routes still resolve after a reorder (cids are stable, no remap)" do
     reordered = [ @survey.cards[2], @survey.cards[0], @survey.cards[1] ] # US, hub, UK
     patch_cards(reordered)

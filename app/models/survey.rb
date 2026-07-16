@@ -89,6 +89,7 @@ class Survey < ApplicationRecord
   # profile). Doubles as the "link back to Pexels" the API guidelines ask for.
   PEXELS_CREDIT_URL = %r{\Ahttps://(?:www\.)?pexels\.com/[\w@\-./?=&%]*\z}i
   MAX_CREDIT_NAME   = 80
+  MAX_LANE_LABEL    = 60 # branch name shown on the flow map (stored on the entry card)
   # Pexels video CDN (host-whitelisted) — the streamable mp4 for a card's
   # left-panel video. Posters are images.pexels.com URLs (sanitize_image_url).
   PEXELS_VIDEO_URL  = %r{\Ahttps://videos\.pexels\.com/[\w\-./]+\.mp4(?:\?[\w%\-=&.+]*)?\z}i
@@ -148,6 +149,13 @@ class Survey < ApplicationRecord
       # { "card" => cid } / { "end" => id } target (see LogicGraph.card_next).
       unless c["next"].is_a?(Hash) && (c["next"]["card"].to_s != "" || c["next"]["end"].to_s != "")
         c.delete("next")
+      end
+      # Optional branch name shown on the flow map (editor-only), stored on the
+      # lane's entry card. Bounded plain text; blank ⇒ dropped (falls back to the
+      # answer that opens the lane).
+      if c.key?("lane_label")
+        c["lane_label"] = c["lane_label"].to_s.strip.first(MAX_LANE_LABEL).presence
+        c.delete("lane_label") if c["lane_label"].blank?
       end
       c["image"] = sanitize_image_url(c["image"]) if c.key?("image")
       if c.key?("option_images")

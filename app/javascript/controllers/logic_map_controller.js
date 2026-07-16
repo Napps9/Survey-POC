@@ -499,7 +499,30 @@ export default class extends Controller {
     rect.setAttribute("fill", n.lane.color)
     g.appendChild(rect)
     g.appendChild(this._text(9, -11, label, { size: 11, fill: "#14172A" }))
+    // Click to rename the branch (editable maps only).
+    if (this.editableValue) {
+      const title = document.createElementNS(SVG, "title"); title.textContent = "Rename this branch"
+      g.appendChild(title)
+      g.style.cursor = "text"
+      g.addEventListener("pointerdown", (ev) => ev.stopPropagation())
+      g.addEventListener("click", (ev) => { ev.stopPropagation(); this._renameLane(n.lane.entry, n.lane.label) })
+    }
     return g
+  }
+
+  // Rename a branch — stored as lane_label on its entry card, which the lane
+  // detector prefers over the answer-derived default. Persisted via autosave.
+  _renameLane(entryCid, current) {
+    if (!this.editableValue) return
+    const name = window.prompt("Branch name", current || "")
+    if (name == null) return // cancelled
+    const wrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(entryCid)}"]`)
+    if (!wrap) return
+    const trimmed = name.trim()
+    if (trimmed) wrap.dataset.cardLaneLabel = trimmed
+    else delete wrap.dataset.cardLaneLabel
+    this._editor()?.markDirty()
+    this._render()
   }
 
   // A draggable output port dot on a node's right edge.

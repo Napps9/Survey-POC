@@ -705,6 +705,9 @@ export default class extends Controller {
           if (n && ((n.card && n.card !== "") || (n.end && n.end !== ""))) out.next = n
         } catch (_) { /* drop malformed */ }
       }
+      // Optional branch name (flow map), stored on the lane's entry card.
+      const laneLabel = (card.dataset.cardLaneLabel || "").trim()
+      if (laneLabel) out.lane_label = laneLabel
 
       const i18n = {}
       secondary.forEach(loc => {
