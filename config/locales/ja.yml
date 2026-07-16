@@ -33,6 +33,18 @@ ja:
     token_award_title: "ポイント"
     token_award_hint: "回答するだけで獲得できます"
     token_checkpoint_placeholder: "プレイヤーがこれまでに集めたポイントを表示します。"
+    eyebrow:
+      range: "スライダーをドラッグ"
+      rating: "タップして評価"
+      nps: "ドラッグして評価"
+      multiple_choice: "1つ選択"
+      select_many: "当てはまるものをすべて選択"
+      prioritise: "ドラッグして優先順位を並べ替え"
+      yes_no: "1つ選択"
+      select_one_grid: "1つ選択"
+      select_many_grid: "当てはまるものをすべて選択"
+      tap_card: "スワイプして回答"
+      open_ended: "回答を入力"
   auth:
     social_continue: "%{provider} で続行"
     social_divider: "または"

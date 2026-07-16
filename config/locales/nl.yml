@@ -33,6 +33,18 @@ nl:
     token_award_title: "Punten"
     token_award_hint: "Verdiend door simpelweg te antwoorden"
     token_checkpoint_placeholder: "Toont de punten die een speler tot nu toe heeft verzameld."
+    eyebrow:
+      range: "Sleep de schuifregelaar"
+      rating: "Tik om te beoordelen"
+      nps: "Sleep om te beoordelen"
+      multiple_choice: "Kies één optie"
+      select_many: "Kies alles wat van toepassing is"
+      prioritise: "Sleep om te rangschikken op prioriteit"
+      yes_no: "Kies één optie"
+      select_one_grid: "Kies één optie"
+      select_many_grid: "Kies alles wat van toepassing is"
+      tap_card: "Sleep om te antwoorden"
+      open_ended: "Typ je antwoord"
   auth:
     social_continue: "Doorgaan met %{provider}"
     social_divider: "of"
