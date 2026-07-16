@@ -448,7 +448,8 @@ export default class extends Controller {
     "whyCardName", "whyEmpty", "whyBody", "whyNote", "whyFramework",
     "whyCompetencyRow", "whyCompetencyBadge", "whyCompetencyBlurb",
     "whyOutcomeRow", "whyOutcome",
-    "whyConditionRow", "whyConditionBadge", "whyConditionBlurb"
+    "whyConditionRow", "whyConditionBadge", "whyConditionBlurb",
+    "panelDeleteBtn"
   ]
 
   static values = { quiz: Boolean, tokenisation: Boolean, logic: Boolean, defaultLocale: { type: String, default: "en" } }
@@ -585,6 +586,8 @@ export default class extends Controller {
     this.cardEditorTarget.style.display = "flex"
     this.typeListTarget.style.display    = "flex"
     this.panelFooterTarget.style.display = "flex"
+    // The welcome card can't be deleted (mirrors the feed's own chrome row).
+    if (this.hasPanelDeleteBtnTarget) this.panelDeleteBtnTarget.hidden = cardType === "welcome_card"
 
     this._renderCompatibleTypes(cardType)
     this._updateSubtabsFor(card, cardType)
@@ -755,7 +758,10 @@ export default class extends Controller {
 
   deleteCard(event) {
     event.stopPropagation()
-    const card = event.currentTarget.closest("[data-type-panel-target='card']")
+    // The feed's own chrome-row button lives inside the card; the sidebar's
+    // pinned button (Answer type panel) doesn't, so it falls back to whichever
+    // card is currently selected.
+    const card = event.currentTarget.closest("[data-type-panel-target='card']") || this.activeCardEl
     if (!card) return
     if (!window.confirm(t("editor.delete_card_confirm"))) return
     // Remove the whole slot (card + its "Add question" CTA), falling back to the
