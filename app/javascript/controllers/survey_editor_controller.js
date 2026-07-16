@@ -590,6 +590,33 @@ export default class extends Controller {
     this.markDirty()
   }
 
+  // Range-card reaction-animation theme. Record it on the wrap (serialize()
+  // carries it into the card JSON) and swap the left-panel Lottie's URL set so
+  // the preview updates live (lottie-player#urlsValueChanged re-renders).
+  setRangeTheme(event) {
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    if (!card) return
+    const theme = event.currentTarget.value
+    card.dataset.cardRangeTheme = theme
+    const wrap = card.querySelector(".nps-lottie")
+    const urls = this._rangeThemeUrls[theme]
+    if (wrap && urls) wrap.dataset.lottiePlayerUrlsValue = JSON.stringify(urls)
+    this.markDirty()
+  }
+
+  // { slug: [5 asset URLs] } from the editor's range-theme-picker blob, used to
+  // swap the live preview when the theme changes.
+  get _rangeThemeUrls() {
+    if (this.__rangeThemeUrls) return this.__rangeThemeUrls
+    const map = {}
+    try {
+      const data = JSON.parse(document.getElementById("range-theme-picker")?.textContent || "{}")
+      ;(data.themes || []).forEach(th => { map[th.slug] = th.urls })
+    } catch (_) { /* leave empty */ }
+    this.__rangeThemeUrls = map
+    return map
+  }
+
   markDirty() {
     // Repaint the card being edited (or everything on a structural change) and
     // the overall score, so the lights track edits as they're typed.
@@ -650,6 +677,10 @@ export default class extends Controller {
       // otherwise-unrelated field on the card is edited.
       if (card.dataset.cardInput) out.input = card.dataset.cardInput
       if (card.dataset.cardDemographic === "true") out.demographic = true
+
+      // Range cards carry the reaction-animation theme picked in the editor.
+      // Server-side sanitize drops it if it isn't a known slug on a range card.
+      if (type === "range" && card.dataset.cardRangeTheme) out.range_theme = card.dataset.cardRangeTheme
 
       const primOpts = (prim.options || []).map(o => (o || "").trim()).filter(Boolean)
       if (primOpts.length) out.options = primOpts

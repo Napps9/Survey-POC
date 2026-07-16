@@ -551,6 +551,7 @@ id:
     sign_in_failed: Tidak dapat menemukan akun dengan email dan kata sandi tersebut.
     welcome: "Selamat datang di %{funder}!"
   editor:
+    animation_theme: "Animasi"
     live_locked_bar: "Verto ini live — pertanyaan terkunci untuk menjaga kualitas data."
     live_results: "Lihat hasil →"
     publish_confirm: "Terbitkan Verto ini? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."

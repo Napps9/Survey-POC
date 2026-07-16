@@ -551,6 +551,7 @@ it:
     sign_in_failed: "Non è stato possibile trovare un account con quell'email e password."
     welcome: "Benvenuto/a in %{funder}!"
   editor:
+    animation_theme: "Animazione"
     live_locked_bar: "Questo Verto è live — le domande sono bloccate per proteggere la qualità dei dati."
     live_results: "Vedi risultati →"
     publish_confirm: "Pubblicare questo Verto? Una volta live, le domande saranno bloccate e non modificabili — assicurati che tutto sia esattamente come vuoi."

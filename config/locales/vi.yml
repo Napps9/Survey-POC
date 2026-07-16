@@ -551,6 +551,7 @@ vi:
     sign_in_failed: "Không tìm thấy tài khoản nào khớp với email và mật khẩu đó."
     welcome: "Chào mừng đến với %{funder}!"
   editor:
+    animation_theme: "Hoạt ảnh"
     live_locked_bar: "Verto này đang hoạt động — câu hỏi bị khóa để bảo vệ chất lượng dữ liệu."
     live_results: "Xem kết quả →"
     publish_confirm: "Đăng Verto này? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."

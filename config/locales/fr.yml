@@ -551,6 +551,7 @@ fr:
     sign_in_failed: "Impossible de trouver un compte avec cet e-mail et ce mot de passe."
     welcome: "Bienvenue chez %{funder} !"
   editor:
+    animation_theme: "Animation"
     live_locked_bar: "Ce Verto est en ligne — les questions sont verrouillées pour protéger la qualité des données."
     live_results: "Voir les résultats →"
     publish_confirm: "Publier ce Verto ? Une fois en ligne, ses questions sont verrouillées et ne peuvent plus être modifiées — vérifiez que tout est exactement comme vous le voulez."

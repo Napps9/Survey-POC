@@ -551,6 +551,7 @@ tr:
     sign_in_failed: "Bu e-posta ve şifreyle eşleşen bir hesap bulunamadı."
     welcome: "%{funder}'a hoş geldiniz!"
   editor:
+    animation_theme: "Animasyon"
     live_locked_bar: "Bu Verto yayında — veri kalitesini korumak için sorular kilitli."
     live_results: "Sonuçları gör →"
     publish_confirm: "Bu Verto yayınlansın mı? Yayına girdikten sonra soruları kilitlenir ve düzenlenemez — her şeyin tam istediğin gibi olduğundan emin ol."

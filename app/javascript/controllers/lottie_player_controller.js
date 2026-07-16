@@ -22,6 +22,16 @@ export default class extends Controller {
     this.instance = null
   }
 
+  // The editor's theme picker swaps the `urls` value to a different animation
+  // set; re-render the current frame so the change shows at once. Guarded on the
+  // mount target since Stimulus fires this before connect() on first render
+  // (where connect() already does the initial show).
+  urlsValueChanged() {
+    if (!this.hasMountTarget) return
+    this.shown = null
+    this.show(this.currentValue)
+  }
+
   show(value) {
     const v = Number(value)
     if (!Number.isFinite(v) || v === this.shown) return

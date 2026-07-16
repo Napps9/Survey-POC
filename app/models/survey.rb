@@ -157,6 +157,17 @@ class Survey < ApplicationRecord
         c["lane_label"] = c["lane_label"].to_s.strip.first(MAX_LANE_LABEL).presence
         c.delete("lane_label") if c["lane_label"].blank?
       end
+      # A range card's reaction-animation theme — only a known slug survives, and
+      # only on a range card, so the helper always resolves to a real asset
+      # folder (NpsHelper owns the theme list).
+      if c.key?("range_theme")
+        slug = c["range_theme"].to_s
+        if c["type"].to_s == "range" && NpsHelper::RANGE_THEMES.include?(slug)
+          c["range_theme"] = slug
+        else
+          c.delete("range_theme")
+        end
+      end
       c["image"] = sanitize_image_url(c["image"]) if c.key?("image")
       if c.key?("option_images")
         c["option_images"] = Array(c["option_images"]).map { |u| sanitize_image_url(u) }

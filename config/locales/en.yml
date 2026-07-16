@@ -553,6 +553,7 @@ en:
     sign_in_failed: "Couldn't find an account with that email and password."
     welcome: "Welcome to %{funder}!"
   editor:
+    animation_theme: "Animation"
     live_locked_bar: "This Verto is live — questions are locked to protect data quality."
     live_results: "View results →"
     publish_confirm: "Publish this Verto? Once it's live, its questions are locked and can't be edited — make sure everything reads exactly as you want."

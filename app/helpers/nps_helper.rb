@@ -10,7 +10,14 @@ module NpsHelper
   # frames; the range slider maps its position proportionally onto these. Kept
   # separate from NPS_STEPS so the two move independently.
   NPS_FRAMES = 5
-  NPS_THEME  = "baseball".freeze # single global theme for v1; future theme picker swaps this
+  NPS_THEME  = "baseball".freeze # default reaction theme when a card doesn't pick one
+
+  # Every selectable reaction-animation theme. Each is a folder
+  # app/assets/lottie/<slug>/ holding 1..5.json (the five slider states). To add
+  # a set: drop the folder in and add its slug here. NPS_THEME must be one of
+  # these; Survey.sanitize_cards_images! whitelists a card's range_theme against
+  # this list.
+  RANGE_THEMES = %w[baseball football].freeze
 
   def nps_card?(card)
     card["type"].to_s == "nps"
@@ -25,18 +32,42 @@ module NpsHelper
   # `app/assets/lottie/<theme>/` which Sprockets treats as an asset path root,
   # so files resolve at `/assets/<theme>/<file>`. Using asset_path so digested
   # URLs work in prod.
-  def nps_lottie_urls
-    (1..NPS_FRAMES).map { |i| asset_path("#{NPS_THEME}/#{i}.json") }
+  def nps_lottie_urls(theme = NPS_THEME)
+    theme = NPS_THEME unless RANGE_THEMES.include?(theme.to_s)
+    (1..NPS_FRAMES).map { |i| asset_path("#{theme}/#{i}.json") }
+  end
+
+  # The reaction theme a range card actually uses: its own `range_theme` when
+  # that's a known slug, otherwise the default. Safe on any card hash.
+  def range_theme_slug(card)
+    slug = card.is_a?(Hash) ? card["range_theme"].to_s : ""
+    RANGE_THEMES.include?(slug) ? slug : NPS_THEME
+  end
+
+  # [[label, slug], …] for the range card's editor theme <select>.
+  def range_theme_options
+    RANGE_THEMES.map { |slug| [ slug.titleize, slug ] }
+  end
+
+  # Editor payload for the theme picker: the control label plus, per theme, its
+  # slug, display label and 5 asset URLs — so the editor can swap the live
+  # preview (and build the picker on a type-switch) without a round-trip.
+  # Emitted as JSON in the editor head (see surveys/show).
+  def range_theme_picker_data
+    {
+      label:  t("editor.animation_theme", default: "Animation"),
+      themes: RANGE_THEMES.map { |slug| { slug: slug, label: slug.titleize, urls: nps_lottie_urls(slug) } }
+    }
   end
 
   # LEFT panel: a div that the lottie-player Stimulus controller mounts into.
   # The full list of Lottie URLs is passed via data attribute so the JS doesn't
   # need to know about Rails asset digesting.
-  def render_nps_reaction(initial_value: 1)
+  def render_nps_reaction(initial_value: 1, theme: NPS_THEME)
     content_tag :div, class: "nps-lottie",
                 data: {
                   controller:                   "lottie-player",
-                  "lottie-player-urls-value":   nps_lottie_urls.to_json,
+                  "lottie-player-urls-value":   nps_lottie_urls(theme).to_json,
                   "lottie-player-current-value": initial_value
                 } do
       content_tag(:div, "", class: "nps-lottie-mount",

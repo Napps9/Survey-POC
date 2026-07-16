@@ -306,6 +306,31 @@
   height: 100% !important;
 }
 
+/* Editor-only picker under a Range slider to choose its reaction animation
+   theme. Neutral, colour-inherit styling so it reads on the card's background
+   in either panel. */
+.range-theme-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.range-theme-label {
+  font-size: 0.8rem;
+  opacity: 0.65;
+}
+.range-theme-select {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  background: rgba(128, 128, 128, 0.08);
+  color: inherit;
+  cursor: pointer;
+}
+.range-theme-select option { color: #111; }
+
 /* Labels: vertical column, top label = highest value. column-reverse keeps
    source order (0..N) but flips the visual stack so source-index 0 sits at
    the bottom, aligning with the container's bottom step. Each label takes an

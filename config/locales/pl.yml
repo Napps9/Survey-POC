@@ -551,6 +551,7 @@ pl:
     sign_in_failed: "Nie znaleziono konta z podanym e-mailem i hasłem."
     welcome: "Witaj w %{funder}!"
   editor:
+    animation_theme: "Animacja"
     live_locked_bar: "To Verto jest na żywo — pytania są zablokowane, by chronić jakość danych."
     live_results: "Zobacz wyniki →"
     publish_confirm: "Opublikować to Verto? Po publikacji pytania zostaną zablokowane i nie będzie można ich edytować — upewnij się, że wszystko wygląda dokładnie tak, jak chcesz."

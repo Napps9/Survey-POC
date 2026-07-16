@@ -551,6 +551,7 @@ de:
     sign_in_failed: "Es wurde kein Konto mit dieser E-Mail-Adresse und diesem Passwort gefunden."
     welcome: "Willkommen bei %{funder}!"
   editor:
+    animation_theme: "Animation"
     live_locked_bar: "Dieses Verto ist live — die Fragen sind gesperrt, um die Datenqualität zu schützen."
     live_results: "Ergebnisse ansehen →"
     publish_confirm: "Dieses Verto veröffentlichen? Sobald es live ist, sind die Fragen gesperrt und können nicht bearbeitet werden — prüfe, ob alles genau so ist, wie du es willst."

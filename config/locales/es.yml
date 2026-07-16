@@ -551,6 +551,7 @@ es:
     sign_in_failed: "No se encontró ninguna cuenta con ese correo electrónico y esa contraseña."
     welcome: "¡Bienvenido/a a %{funder}!"
   editor:
+    animation_theme: "Animación"
     live_locked_bar: "Este Verto está en vivo — las preguntas están bloqueadas para proteger la calidad de los datos."
     live_results: "Ver resultados →"
     publish_confirm: "¿Publicar este Verto? Una vez en vivo, sus preguntas quedan bloqueadas y no se pueden editar — asegúrate de que todo esté exactamente como quieres."

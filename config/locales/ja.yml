@@ -551,6 +551,7 @@ ja:
     sign_in_failed: そのメールアドレスとパスワードのアカウントが見つかりませんでした。
     welcome: "%{funder} へようこそ！"
   editor:
+    animation_theme: "アニメーション"
     live_locked_bar: "このVertoは公開中 — データ品質を守るため質問はロックされています。"
     live_results: "結果を見る →"
     publish_confirm: "このVertoを公開しますか？公開後は質問がロックされ編集できません — すべてが望みどおりか確認してください。"

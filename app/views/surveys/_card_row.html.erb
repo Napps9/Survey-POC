@@ -28,6 +28,7 @@
      data-card-recommended-images="<%= AssetPopulator.recommended_paths(@survey, context: :card, card: card).to_json %>"
      <% if card['next'].is_a?(Hash) %>data-card-next="<%= card['next'].to_json %>"<% end %>
      <% if card['lane_label'].present? %>data-card-lane-label="<%= card['lane_label'] %>"<% end %>
+     <% if card['range_theme'].present? %>data-card-range-theme="<%= card['range_theme'] %>"<% end %>
      data-card-competency="<%= card['competency'].to_s %>"
      data-card-outcome="<%= card['outcome'].to_s %>"
      data-card-condition="<%= card['condition'].to_s %>"

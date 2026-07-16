@@ -20,6 +20,10 @@
     type_panel_controller when a card is switched to nps so the left-panel
     lottie-player can mount with the right asset paths. %>
 <script id="nps-lottie-urls" type="application/json"><%= nps_lottie_urls.to_json.html_safe %></script>
+<%# Range-card reaction-animation themes (label + per-theme asset URLs), read by
+    type-panel (to build the theme picker on a type switch) and survey-editor
+    (to swap the live preview when the picker changes). %>
+<script id="range-theme-picker" type="application/json"><%= range_theme_picker_data.to_json.html_safe %></script>
 <%# Full cards incl. per-language i18n — the editor's language tabs swap text
     from here without a server round-trip. %>
 <script id="survey-cards-i18n" type="application/json"><%= editor_cards_i18n(@survey.cards).to_json.html_safe %></script>

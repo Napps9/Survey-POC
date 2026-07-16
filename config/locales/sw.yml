@@ -551,6 +551,7 @@ sw:
     sign_in_failed: "Hatukupata akaunti yenye barua pepe na nenosiri hayo."
     welcome: "Karibu %{funder}!"
   editor:
+    animation_theme: "Animation"
     live_locked_bar: "Verto hii iko hewani — maswali yamefungwa kulinda ubora wa data."
     live_results: "Ona matokeo →"
     publish_confirm: "Chapisha Verto hii? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."

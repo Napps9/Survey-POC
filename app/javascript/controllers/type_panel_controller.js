@@ -220,7 +220,7 @@ const COMPONENTS = {
       <button type="button" class="tap-add-btn" data-action="click->card-editor#addTapOption">＋ Add statement</button>
     </div>`,
 
-  range: (opts) => sliderHtml(opts),
+  range: (opts, ctx = {}) => sliderHtml(opts, ctx),
 
   nps: (opts, ctx = {}) => npsHtml(opts, ctx.npsShape),
 
@@ -406,12 +406,21 @@ function npsHtml(opts, shape) {
     </div>`
 }
 
-function sliderHtml(opts) {
+function sliderHtml(opts, ctx = {}) {
   const labels = opts.length ? opts : DEFAULT_OPTIONS.range
   const n = Math.max(labels.length, 2)
   const dots = Array.from({length: n}, (_, i) =>
     `<div class="s-dot" data-slider-target="dot" style="left:${(i / (n - 1) * 100).toFixed(2)}%"></div>`
   ).join("")
+  const themes = ctx.rangeThemes || []
+  const cur = ctx.rangeTheme || ""
+  const picker = themes.length ? `
+    <div class="range-theme-picker">
+      <label class="range-theme-label">${esc(ctx.rangeThemeLabel || "Animation")}</label>
+      <select class="range-theme-select" data-action="change->survey-editor#setRangeTheme">
+        ${themes.map(th => `<option value="${esc(th.slug)}"${th.slug === cur ? " selected" : ""}>${esc(th.label)}</option>`).join("")}
+      </select>
+    </div>` : ""
   return `
     <div class="slider-wrap" data-controller="slider" data-slider-steps-value="${n}">
       <div class="slider-track-wrap">
@@ -426,7 +435,7 @@ function sliderHtml(opts) {
       <div class="slider-labels">
         ${labels.map(o => `<span class="slider-label-text" contenteditable="true">${esc(o)}</span>`).join("")}
       </div>
-    </div>`
+    </div>${picker}`
 }
 
 export default class extends Controller {
@@ -897,7 +906,13 @@ export default class extends Controller {
     if (slot) {
       const opts = this._optionsFor(card, type)
       const builder = COMPONENTS[type] || (() => "")
-      slot.innerHTML = builder(opts, { ratingIcon: this._ratingIcon(), npsShape: this._npsShape() })
+      slot.innerHTML = builder(opts, {
+        ratingIcon:      this._ratingIcon(),
+        npsShape:        this._npsShape(),
+        rangeThemes:     this._rangeThemePicker.themes,
+        rangeThemeLabel: this._rangeThemePicker.label,
+        rangeTheme:      card.dataset.cardRangeTheme || ""
+      })
     }
 
     card.dataset.cardType = type
@@ -941,10 +956,23 @@ export default class extends Controller {
     return this.__npsLottieUrls
   }
 
+  // Range-card theme picker blob (label + [{slug,label,urls}]). Read once.
+  get _rangeThemePicker() {
+    if (this.__rangeThemePicker) return this.__rangeThemePicker
+    let data = {}
+    try { data = JSON.parse(document.getElementById("range-theme-picker")?.textContent || "{}") } catch (_) {}
+    data.themes = data.themes || []
+    data.label = data.label || "Animation"
+    this.__rangeThemePicker = data
+    return data
+  }
+
   _mountNpsLottie(card) {
     const left = card.querySelector(".split-left")
     if (!left || left.querySelector(".nps-lottie")) return
-    const urls = this._npsLottieUrls
+    // Honour the card's chosen theme; fall back to the default baseball set.
+    const theme = card.dataset.cardRangeTheme || ""
+    const urls = this._rangeThemePicker.themes.find(th => th.slug === theme)?.urls || this._npsLottieUrls
     if (!urls.length) return
 
     const wrap = document.createElement("div")

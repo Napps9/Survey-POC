@@ -68,6 +68,21 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil out[1]["image_credit"], "credit cleared when there's no image or video"
   end
 
+  test "sanitize_cards_images! whitelists range_theme on range cards and drops the rest" do
+    cards = [
+      { "type" => "range", "text" => "Q", "range_theme" => "football" },
+      { "type" => "range", "text" => "Q", "range_theme" => "baseball" },
+      { "type" => "range", "text" => "Q", "range_theme" => "not_a_theme" },
+      { "type" => "multiple_choice", "text" => "Q", "range_theme" => "football" }
+    ]
+    out = Survey.sanitize_cards_images!(cards)
+
+    assert_equal "football", out[0]["range_theme"]
+    assert_equal "baseball", out[1]["range_theme"]
+    assert_nil out[2]["range_theme"], "unknown theme slug is dropped"
+    assert_nil out[3]["range_theme"], "range_theme is only kept on range cards"
+  end
+
   test "sanitize_credit_url accepts pexels.com profile links and rejects others" do
     assert_equal "https://www.pexels.com/@jane", Survey.sanitize_credit_url("https://www.pexels.com/@jane")
     assert_equal "https://pexels.com/@jane",     Survey.sanitize_credit_url("https://pexels.com/@jane")
