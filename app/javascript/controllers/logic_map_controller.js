@@ -152,13 +152,37 @@ export default class extends Controller {
   // n.laneParent (the enclosing lane, for a nested chip). No stored data — the
   // label defaults to the answer value (or a card's lane_label).
   _attachLanes(graph, cards) {
-    const { nodes } = graph
+    const lanes = this._computeLanes(cards)
+    // Each card takes its INNERMOST containing lane (smallest member set) as its
+    // colour; the next-larger containing lane is its parent (for a nested chip).
+    // A card in a SIMPLE lane (a plain chain, no sub-branches) also gets reorder
+    // affordances based on its position in that lane's spine.
+    graph.nodes.forEach(n => {
+      const containing = lanes.filter(l => l.members.has(n.key)).sort((a, b) => a.members.size - b.members.size)
+      if (!containing.length) return
+      const lane = containing[0]
+      n.lane = lane
+      n.laneEntry = lane.entry === n.key
+      n.laneDepth = containing.length
+      n.laneParent = containing[1] || null
+      if (lane.simple) {
+        const idx = lane.spine.indexOf(n.key)
+        if (idx >= 0) n.reorder = { up: idx > 0, down: idx < lane.spine.length - 1 }
+      }
+    })
+  }
+
+  // The branch lanes for a deck (shared by rendering and reorder). A lane =
+  // an answer-route target's DOMINATED region; each carries its entry, label,
+  // colour, member set, inbound route, the main continuation `spine` (entry →
+  // continuation → … up to the rejoin), the encoded `rejoin` target, and
+  // `simple` (spine covers every member ⇒ a plain chain safe to reorder).
+  _computeLanes(cards) {
     const cids = cards.map(c => c.cid).filter(Boolean)
-    if (!cids.length) return
+    if (!cids.length) return []
     const byCid = new Map(cards.map(c => [c.cid, c]))
     const start = cids[0]
 
-    // Card→card flow adjacency (routes + default/next + linear), ends dropped.
     const adj = new Map(cids.map(c => [c, []]))
     const link = (from, to) => { if (byCid.has(to) && adj.has(from)) adj.get(from).push(to) }
     cards.forEach((c, i) => {
@@ -169,8 +193,6 @@ export default class extends Controller {
       if (!covered && c.next && (c.next.card || c.next.end)) { covered = true; if (c.next.card) link(c.cid, c.next.card) }
       if (!covered && i + 1 < cards.length && cards[i + 1].cid) link(c.cid, cards[i + 1].cid)
     })
-
-    // Cards reachable from the start, optionally with one card removed.
     const reach = (skip) => {
       const seen = new Set(), stack = [start]
       while (stack.length) {
@@ -183,8 +205,6 @@ export default class extends Controller {
     }
     const reach0 = reach(null)
 
-    // A lane per answer-route target: its members are the cards it dominates
-    // (reachable normally, but not once the entry is removed).
     const lanes = []
     const seenEntry = new Set()
     cards.forEach(c => {
@@ -196,21 +216,41 @@ export default class extends Controller {
         const without = reach(E)
         const members = new Set([...reach0].filter(x => x === E || !without.has(x)))
         const label = (byCid.get(E).lane_label || (r.match && r.match.value) || "Branch").toString()
-        lanes.push({ entry: E, label, members })
+        lanes.push({ entry: E, label, members, inbound: { cid: c.cid, answer: (r.match && r.match.value) || "" } })
       })
     })
-    lanes.forEach((l, i) => { l.color = LANE_PALETTE[i % LANE_PALETTE.length] })
-
-    // Each card takes its INNERMOST containing lane (smallest member set) as its
-    // colour; the next-larger containing lane is its parent (for a nested chip).
-    nodes.forEach(n => {
-      const containing = lanes.filter(l => l.members.has(n.key)).sort((a, b) => a.members.size - b.members.size)
-      if (!containing.length) return
-      n.lane = containing[0]
-      n.laneEntry = containing[0].entry === n.key
-      n.laneDepth = containing.length
-      n.laneParent = containing[1] || null
+    lanes.forEach((l, i) => {
+      l.color = LANE_PALETTE[i % LANE_PALETTE.length]
+      const spine = [], seen = new Set()
+      let cur = l.entry
+      while (cur && l.members.has(cur) && !seen.has(cur)) {
+        seen.add(cur); spine.push(cur)
+        cur = this._contCid(byCid.get(cur), cards)
+      }
+      l.spine = spine
+      l.rejoin = spine.length ? this._contTarget(byCid.get(spine[spine.length - 1]), cards) : ""
+      l.simple = spine.length === l.members.size
     })
+    return lanes
+  }
+
+  // A card's main continuation as an encoded target ("card:<cid>" | "end:<id>"):
+  // its answer-logic default, else its `next`, else the linear next card, else
+  // the finish. (Answer routes are NOT continuations — they open sub-branches.)
+  _contTarget(card, cards) {
+    if (!card) return ""
+    const d = card.logic && card.logic.default
+    if (d && d.card) return `card:${d.card}`
+    if (d && d.end) return `end:${d.end}`
+    if (card.next && card.next.card) return `card:${card.next.card}`
+    if (card.next && card.next.end) return `end:${card.next.end}`
+    const i = cards.findIndex(c => c.cid === card.cid)
+    return (i >= 0 && i + 1 < cards.length && cards[i + 1].cid) ? `card:${cards[i + 1].cid}` : "end:default"
+  }
+
+  _contCid(card, cards) {
+    const t = this._contTarget(card, cards)
+    return t.startsWith("card:") ? t.slice(5) : null
   }
 
   // Longest-path layering from the entry (card 0), cycle-safe. End nodes sit one
@@ -454,6 +494,13 @@ export default class extends Controller {
     // the answer that opens it), sitting just above the card in the lane colour.
     if (n.lane && n.laneEntry) g.appendChild(this._laneChip(n))
 
+    // Reorder controls for a card inside a simple lane — move it earlier/later
+    // in the branch's question order (rewires the chain).
+    if (this.editableValue && n.reorder) {
+      g.appendChild(this._reorderBtn(n.w - 46, -25, "▲", n.reorder.up, () => this._moveInLane(n.key, -1)))
+      g.appendChild(this._reorderBtn(n.w - 23, -25, "▼", n.reorder.down, () => this._moveInLane(n.key, 1)))
+    }
+
     // A transparent hit layer over the card: click to jump to it, and it's the
     // drop target for a dragged route (the card clone itself is pointer-inert).
     const hit = document.createElementNS(SVG, "rect")
@@ -523,6 +570,27 @@ export default class extends Controller {
     else delete wrap.dataset.cardLaneLabel
     this._editor()?.markDirty()
     this._render()
+  }
+
+  // A small up/down button to reorder a card within its lane. Dimmed + inert at
+  // the ends of the lane (enabled=false).
+  _reorderBtn(x, y, glyph, enabled, onClick) {
+    const g = this._g()
+    const rect = document.createElementNS(SVG, "rect")
+    rect.setAttribute("x", x); rect.setAttribute("y", y)
+    rect.setAttribute("width", 20); rect.setAttribute("height", 20); rect.setAttribute("rx", 6)
+    rect.setAttribute("fill", enabled ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.04)")
+    rect.setAttribute("stroke", "rgba(255,255,255,0.2)")
+    g.appendChild(rect)
+    g.appendChild(this._text(x + 5, y + 14, glyph, { size: 11, fill: enabled ? "#fff" : "rgba(255,255,255,0.25)" }))
+    if (enabled) {
+      const title = document.createElementNS(SVG, "title"); title.textContent = "Reorder in this branch"
+      g.appendChild(title)
+      g.style.cursor = "pointer"
+      g.addEventListener("pointerdown", (ev) => ev.stopPropagation())
+      g.addEventListener("click", (ev) => { ev.stopPropagation(); onClick() })
+    }
+    return g
   }
 
   // A draggable output port dot on a node's right edge.
@@ -718,6 +786,40 @@ export default class extends Controller {
     else delete wrap.dataset.cardNext
     this._editor()?.markDirty()
     this._render()
+  }
+
+  // Reorder a card within its (simple) lane by swapping it with an adjacent
+  // spine card and rewiring the chain: the predecessor (the inbound route if the
+  // entry moves, else the prior spine card) now leads to the moved-up card, that
+  // card leads to its new neighbour, and the neighbour leads on to what followed.
+  // Restricted to simple lanes so no sub-branch rejoin is silently broken.
+  _moveInLane(cid, dir) {
+    const cards = this._editor()?.serialize()?.cards || []
+    const byCid = new Map(cards.map(c => [c.cid, c]))
+    const lane = this._computeLanes(cards)
+      .filter(l => l.simple && l.members.has(cid))
+      .sort((a, b) => a.members.size - b.members.size)[0]
+    if (!lane) return
+    const spine = lane.spine
+    const i = spine.indexOf(cid), j = i + dir
+    if (i < 0 || j < 0 || j >= spine.length) return
+    const a = Math.min(i, j)                 // lower index of the swapped pair
+    const A = spine[a], B = spine[a + 1]      // A precedes B before the swap
+    const contOpt = (k) => this.constructor.ROUTABLE.includes(byCid.get(k)?.type) ? "__default__" : "__next__"
+    const after = (a + 1 === spine.length - 1) ? lane.rejoin : `card:${spine[a + 2]}` // what B led to
+
+    // Keep a custom name attached to the lane's first card when the entry moves.
+    if (a === 0) {
+      const wrapA = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(A)}"]`)
+      const wrapB = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(B)}"]`)
+      const lbl = wrapA?.dataset.cardLaneLabel
+      if (lbl && wrapB) { wrapB.dataset.cardLaneLabel = lbl; delete wrapA.dataset.cardLaneLabel }
+      this._setRoute(lane.inbound.cid, lane.inbound.answer, `card:${B}`) // inbound → new first (B)
+    } else {
+      this._applyTarget(spine[a - 1], contOpt(spine[a - 1]), `card:${B}`) // prior spine card → B
+    }
+    this._applyTarget(B, contOpt(B), `card:${A}`) // B → A
+    this._applyTarget(A, contOpt(A), after)       // A → what B used to lead to
   }
 
   // Write a routing choice by driving the same inline <select> the card editor
