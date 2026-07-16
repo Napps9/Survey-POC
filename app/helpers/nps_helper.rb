@@ -17,7 +17,7 @@ module NpsHelper
   # a set: drop the folder in and add its slug here. NPS_THEME must be one of
   # these; Survey.sanitize_cards_images! whitelists a card's range_theme against
   # this list.
-  RANGE_THEMES = %w[baseball football].freeze
+  RANGE_THEMES = %w[baseball football football_goal stopwatch].freeze
 
   def nps_card?(card)
     card["type"].to_s == "nps"
