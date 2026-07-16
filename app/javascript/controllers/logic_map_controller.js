@@ -618,9 +618,17 @@ export default class extends Controller {
     const url = rootEl?.dataset.addQuestionRenderUrlValue
     const feed = document.querySelector("[data-add-question-target='cardsFeed']")
     if (!url || !feed) return
+    // Where the source currently continues for this opt — the new card inherits
+    // it as its own `next`, so a fresh branch card SPLICES into the flow and
+    // rejoins the main line instead of dead-ending at the finish.
+    const rejoin = this._continuationFor(fromCid, opt)
     fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+      },
       body: JSON.stringify({ type: "open_ended", text: "New branch" })
     })
       .then(r => r.json())
@@ -637,10 +645,32 @@ export default class extends Controller {
         this.application.getControllerForElementAndIdentifier(rootWithEditor, "type-panel")?.registerCard(card)
         this._editor()?.refreshAll() // renumber + refreshLogicTargets so the new cid is routable
         const newCid = card.dataset.cardCid
-        if (newCid) this._applyTarget(fromCid, opt, `card:${newCid}`)
-        else { this._editor()?.markDirty(); this._render() }
+        if (newCid) {
+          this._applyTarget(fromCid, opt, `card:${newCid}`)           // source → new card
+          if (rejoin && rejoin !== `card:${newCid}`) this._setNext(newCid, rejoin) // new card → rejoin
+        } else { this._editor()?.markDirty(); this._render() }
       })
       .catch(() => { /* best-effort; the creator can add a card manually */ })
+  }
+
+  // Where card `fromCid` currently sends flow for `opt` (an answer canonical, or
+  // "__next__"): an existing route wins, else the card's default, else its
+  // `next`, else the linear next card, else the finish. Returned as an encoded
+  // target ("card:<cid>" | "end:<id>" | ""). Used to auto-rejoin new branch cards.
+  _continuationFor(fromCid, opt) {
+    const cards = this._editor()?.serialize()?.cards || []
+    const i = cards.findIndex(c => c.cid === fromCid)
+    if (i < 0) return ""
+    const c = cards[i]
+    const enc = (t) => (t && t.card) ? `card:${t.card}` : (t && t.end) ? `end:${t.end}` : ""
+    if (opt !== "__default__" && opt !== "__next__" && c.logic && Array.isArray(c.logic.routes)) {
+      const r = c.logic.routes.find(rt => rt && rt.match && rt.match.value === opt)
+      if (r && enc(r.to)) return enc(r.to)
+    }
+    if (opt !== "__next__" && c.logic && enc(c.logic.default)) return enc(c.logic.default)
+    if (enc(c.next)) return enc(c.next)
+    if (i + 1 < cards.length && cards[i + 1].cid) return `card:${cards[i + 1].cid}`
+    return "end:default"
   }
 
   _clientToUser(clientX, clientY) {
