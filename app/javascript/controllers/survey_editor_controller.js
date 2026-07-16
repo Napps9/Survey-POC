@@ -675,6 +675,15 @@ export default class extends Controller {
         const logic = this._readLogic(card, type)
         if (this._hasLogic(logic)) out.logic = logic
       }
+      // The unconditional flow pointer (any card type), set by the flow map to
+      // chain branch cards and rejoin. Carried on the wrap so it round-trips.
+      const nextRaw = card.dataset.cardNext
+      if (nextRaw) {
+        try {
+          const n = JSON.parse(nextRaw)
+          if (n && ((n.card && n.card !== "") || (n.end && n.end !== ""))) out.next = n
+        } catch (_) { /* drop malformed */ }
+      }
 
       const i18n = {}
       secondary.forEach(loc => {

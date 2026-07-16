@@ -56,6 +56,16 @@ module LogicGraph
     valid_target?(logic["default"]) ? logic["default"] : nil
   end
 
+  # A card's unconditional "next" flow override, honoured by ANY card type when
+  # no answer route/default applies. Same target shape as a route:
+  # { "card" => cid } | { "end" => id }. Absent/invalid ⇒ nil ⇒ linear next.
+  # This is the primitive first-class branches compile to: it lets a lane of
+  # cards (including plain, non-routable ones) chain forward and rejoin.
+  def card_next(card)
+    return nil unless card.is_a?(Hash)
+    valid_target?(card["next"]) ? card["next"] : nil
+  end
+
   # cid => array index for a deck (skips cards with no cid).
   def cid_index(cards)
     idx = {}
@@ -74,6 +84,10 @@ module LogicGraph
     card   = cards[idx]
     value  = answers.is_a?(Hash) ? answers[idx.to_s]&.dig("value") : nil
     target = card.is_a?(Hash) ? next_after(card, value) : nil
+    # No answer route/default applied ⇒ the card's unconditional flow pointer
+    # (any card type) takes over before the linear next. This is what lets a
+    # branch of plain cards chain and rejoin the main flow.
+    target = card_next(card) if target.nil?
 
     if target.is_a?(Hash)
       return { end: target["end"] } if target["end"].to_s != ""
@@ -111,7 +125,7 @@ module LogicGraph
     ci  ||= cid_index(cards)
     card  = cards[i]
     outs  = []
-    has_default = false
+    covered = false # a default / next (card or end) replaces the linear edge
 
     if card.is_a?(Hash) && routing?(card)
       logic = card["logic"]
@@ -122,12 +136,22 @@ module LogicGraph
       end
       default = logic["default"]
       if valid_target?(default)
-        has_default = true # a default (card or end) replaces the linear edge
+        covered = true
         outs << ci[default["card"]] if default["card"].to_s != "" && ci.key?(default["card"])
       end
     end
 
-    outs << (i + 1) if !has_default && (i + 1) < cards.length
+    # No default ⇒ the card's unconditional `next` (any type) is the otherwise
+    # edge; it too replaces the linear fall-through (mirrors next_index).
+    unless covered
+      nxt = card_next(card)
+      if nxt
+        covered = true
+        outs << ci[nxt["card"]] if nxt["card"].to_s != "" && ci.key?(nxt["card"])
+      end
+    end
+
+    outs << (i + 1) if !covered && (i + 1) < cards.length
     outs.uniq
   end
 
@@ -179,7 +203,7 @@ module LogicGraph
     loops    = []
 
     cards.each_with_index do |card, i|
-      next unless card.is_a?(Hash) && routing?(card)
+      next unless card.is_a?(Hash)
       targets(card).each do |target|
         if target["card"].to_s != ""
           if !ci.key?(target["card"])
@@ -196,12 +220,17 @@ module LogicGraph
     { dangling: dangling, self_loops: loops.uniq, unreachable: unreachable(cards) }
   end
 
-  # Every target hash on a card (routes + default), for validation.
+  # Every target hash on a card (routes + default + the unconditional `next`),
+  # for validation. Includes `next` for any card type, not just routing ones.
   def targets(card)
-    return [] unless card.is_a?(Hash) && card["logic"].is_a?(Hash)
-    logic = card["logic"]
-    out   = Array(logic["routes"]).filter_map { |r| r["to"] if valid_route?(r) }
-    out << logic["default"] if valid_target?(logic["default"])
+    return [] unless card.is_a?(Hash)
+    out = []
+    if card["logic"].is_a?(Hash)
+      logic = card["logic"]
+      out.concat(Array(logic["routes"]).filter_map { |r| r["to"] if valid_route?(r) })
+      out << logic["default"] if valid_target?(logic["default"])
+    end
+    out << card["next"] if valid_target?(card["next"])
     out
   end
 

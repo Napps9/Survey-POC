@@ -144,6 +144,11 @@ class Survey < ApplicationRecord
       # backstop for AI/import/hand-crafted cards that arrive without one.
       c["cid"] = c["cid"].to_s.strip.presence || "c_#{SecureRandom.hex(3)}"
       c.delete("logic") unless c["logic"].is_a?(Hash) # drop malformed logic blocks
+      # The unconditional flow pointer (any card type) — drop unless it's a valid
+      # { "card" => cid } / { "end" => id } target (see LogicGraph.card_next).
+      unless c["next"].is_a?(Hash) && (c["next"]["card"].to_s != "" || c["next"]["end"].to_s != "")
+        c.delete("next")
+      end
       c["image"] = sanitize_image_url(c["image"]) if c.key?("image")
       if c.key?("option_images")
         c["option_images"] = Array(c["option_images"]).map { |u| sanitize_image_url(u) }
@@ -282,10 +287,13 @@ class Survey < ApplicationRecord
       card["cid"] = fresh
     end
     cards.each do |card|
-      next unless card.is_a?(Hash) && card["logic"].is_a?(Hash)
-      logic = card["logic"]
-      Array(logic["routes"]).each { |route| remap_logic_target!(route["to"], id_map) if route.is_a?(Hash) }
-      remap_logic_target!(logic["default"], id_map)
+      next unless card.is_a?(Hash)
+      if card["logic"].is_a?(Hash)
+        logic = card["logic"]
+        Array(logic["routes"]).each { |route| remap_logic_target!(route["to"], id_map) if route.is_a?(Hash) }
+        remap_logic_target!(logic["default"], id_map)
+      end
+      remap_logic_target!(card["next"], id_map) # the unconditional flow pointer
     end
     cards
   end

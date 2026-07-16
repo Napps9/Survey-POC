@@ -281,7 +281,11 @@ export default class extends Controller {
     const card   = this.cardTargets[idx]
     const logic  = this._logicOf(card)
     const linear = { index: idx + 1 }
-    if (!logic) return linear
+    const next   = this._nextOf(card) // unconditional flow pointer (any card type)
+    if (!logic) {
+      // Plain card: honour its `next` before falling to the linear next.
+      return next ? (this._mapTarget(next) || linear) : linear
+    }
     const value  = this._answers[card?.dataset.cardIndex]?.value
     const routes = Array.isArray(logic.routes) ? logic.routes : []
     let to = null
@@ -289,6 +293,7 @@ export default class extends Controller {
       if (r && r.to && this._logicMatch(r.match, value)) { to = r.to; break }
     }
     if (!to && this._validTarget(logic.default)) to = logic.default
+    if (!to && next) to = next // `next` is the otherwise when no route/default applies
     if (!to) return linear
     // A dangling cid target fails safe to the linear next card.
     return this._mapTarget(to) || linear
@@ -299,9 +304,15 @@ export default class extends Controller {
   // Next/Finish button label. A specific route to an end still finalises via
   // _advanceLogic regardless of the label.
   _staticNext(idx) {
-    const logic = this._logicOf(this.cardTargets[idx])
+    const card  = this.cardTargets[idx]
+    const logic = this._logicOf(card)
     if (logic && this._validTarget(logic.default)) {
       const mapped = this._mapTarget(logic.default)
+      if (mapped) return mapped
+    }
+    const next = this._nextOf(card)
+    if (next) {
+      const mapped = this._mapTarget(next)
       if (mapped) return mapped
     }
     const nxt = idx + 1
@@ -339,6 +350,17 @@ export default class extends Controller {
     try {
       const l = JSON.parse(raw)
       return (l && typeof l === "object") ? l : null
+    } catch (_) { return null }
+  }
+
+  // The card's unconditional `next` flow pointer ({card}|{end}), or null.
+  // Mirrors LogicGraph.card_next — honoured after answer routes/default.
+  _nextOf(card) {
+    const raw = card?.dataset.cardNext
+    if (!raw || raw === "null") return null
+    try {
+      const n = JSON.parse(raw)
+      return this._validTarget(n) ? n : null
     } catch (_) { return null }
   }
 

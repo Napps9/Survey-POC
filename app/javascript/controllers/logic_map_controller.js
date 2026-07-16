@@ -118,6 +118,15 @@ export default class extends Controller {
           else if (d.end) edges.push({ from: c.cid, to: ensureEnd(d.end), label: "otherwise", kind: "default", opt: "__default__" })
         }
       }
+      // The card's unconditional `next` flow pointer is the "otherwise" for any
+      // card type (mirrors LogicGraph): it too replaces the linear fall-through.
+      const nx = c.next
+      if (!covered && nx && (nx.card || nx.end)) {
+        covered = true
+        if (nx.card && nodeByKey.has(nx.card)) edges.push({ from: c.cid, to: nx.card, label: "", kind: "next", opt: "__next__" })
+        else if (nx.card) edges.push({ from: c.cid, to: null, label: "", kind: "dangling", opt: "__next__" })
+        else if (nx.end) edges.push({ from: c.cid, to: ensureEnd(nx.end), label: "", kind: "next", opt: "__next__" })
+      }
       if (!covered) {
         if (i + 1 < cards.length) edges.push({ from: c.cid, to: cards[i + 1].cid, label: "", kind: "linear" })
         else edges.push({ from: c.cid, to: ensureEnd("default"), label: "", kind: "linear" })
@@ -235,6 +244,7 @@ export default class extends Controller {
     defs.appendChild(mk("arrow-route", "#01EACB"))
     defs.appendChild(mk("arrow-faint", "rgba(255,255,255,0.35)"))
     defs.appendChild(mk("arrow-danger", "#F87171"))
+    defs.appendChild(mk("arrow-next", "#8B85FF"))
     return defs
   }
 
@@ -250,6 +260,7 @@ export default class extends Controller {
     }
     const style = {
       route:   { stroke: "#01EACB", dash: "", marker: "arrow-route",  w: 2 },
+      next:    { stroke: "#8B85FF", dash: "", marker: "arrow-next",   w: 2 },
       default: { stroke: "rgba(255,255,255,0.5)", dash: "5 5", marker: "arrow-faint", w: 1.6 },
       linear:  { stroke: "rgba(255,255,255,0.22)", dash: "4 6", marker: "arrow-faint", w: 1.4 },
       dangling:{ stroke: "#F87171", dash: "3 4", marker: "arrow-danger", w: 1.8 }
@@ -369,21 +380,35 @@ export default class extends Controller {
       { size: 11, fill: n.unreachable ? "#F87171" : "rgba(255,255,255,0.55)" })
     g.appendChild(cap)
 
-    // Editable: a draggable output port per answer (+ an "otherwise" default).
-    if (this.editableValue && this.constructor.ROUTABLE.includes(n.type)) {
-      this._portLayout(n).forEach(port => {
-        const dot = document.createElementNS(SVG, "circle")
-        dot.setAttribute("cx", n.w); dot.setAttribute("cy", port.py); dot.setAttribute("r", 6)
-        dot.setAttribute("fill", "#615BF5"); dot.setAttribute("stroke", "#fff"); dot.setAttribute("stroke-width", "1.5")
-        dot.style.cursor = "crosshair"
-        const title = document.createElementNS(SVG, "title")
-        title.textContent = `Drag to route "${port.label}"`
-        dot.appendChild(title)
-        dot.addEventListener("pointerdown", (ev) => { ev.stopPropagation(); this._beginConnect(n.key, port.opt, n.x + n.w, n.y + port.py, ev) })
-        g.appendChild(dot)
-      })
+    // Editable output ports on the right edge. Routable cards get one per answer
+    // (+ an "otherwise" default); every other card type gets a single "flow" port
+    // that sets its unconditional `next` — this is what chains a lane of plain
+    // cards and rejoins the main flow.
+    if (this.editableValue) {
+      if (this.constructor.ROUTABLE.includes(n.type)) {
+        this._portLayout(n).forEach(port => {
+          g.appendChild(this._port(n.w, port.py, `Drag to route "${port.label}"`,
+            (ev) => this._beginConnect(n.key, port.opt, n.x + n.w, n.y + port.py, ev)))
+        })
+      } else {
+        const py = n.h / 2
+        g.appendChild(this._port(n.w, py, "Drag to set where this card leads next",
+          (ev) => this._beginConnect(n.key, "__next__", n.x + n.w, n.y + py, ev)))
+      }
     }
     return g
+  }
+
+  // A draggable output port dot on a node's right edge.
+  _port(cx, cy, tip, onDown) {
+    const dot = document.createElementNS(SVG, "circle")
+    dot.setAttribute("cx", cx); dot.setAttribute("cy", cy); dot.setAttribute("r", 6)
+    dot.setAttribute("fill", "#615BF5"); dot.setAttribute("stroke", "#fff"); dot.setAttribute("stroke-width", "1.5")
+    dot.style.cursor = "crosshair"
+    const title = document.createElementNS(SVG, "title"); title.textContent = tip
+    dot.appendChild(title)
+    dot.addEventListener("pointerdown", (ev) => { ev.stopPropagation(); onDown(ev) })
+    return dot
   }
 
   // Port positions down the right edge — shared by port drawing and edge anchors.
@@ -535,8 +560,8 @@ export default class extends Controller {
     const grp = el && el.closest ? el.closest("[data-node-key]") : null
     if (grp) {
       const key = grp.dataset.nodeKey
-      if (grp.dataset.nodeKind === "end") this._setRoute(c.from, c.opt, key)      // key = "end:<id>"
-      else if (key && key !== c.from) this._setRoute(c.from, c.opt, `card:${key}`) // ignore self-drop
+      if (grp.dataset.nodeKind === "end") this._applyTarget(c.from, c.opt, key)      // key = "end:<id>"
+      else if (key && key !== c.from) this._applyTarget(c.from, c.opt, `card:${key}`) // ignore self-drop
     } else {
       this._createBranchCard(c.from, c.opt) // dropped on empty canvas → new branch card
     }
@@ -544,7 +569,29 @@ export default class extends Controller {
 
   _deleteEdge(e) {
     if (!e || !e.opt) return
-    this._setRoute(e.from, e.opt, "") // revert this answer to the default flow
+    this._applyTarget(e.from, e.opt, "") // revert this answer / flow to the linear default
+  }
+
+  // Route a dragged connection to the right writer: a card's unconditional
+  // `next` flow pointer, or one of its per-answer route selects.
+  _applyTarget(fromCid, opt, targetValue) {
+    if (opt === "__next__") this._setNext(fromCid, targetValue)
+    else this._setRoute(fromCid, opt, targetValue)
+  }
+
+  // Set (or clear, on "") a card's unconditional `next` flow pointer directly on
+  // its wrap dataset — the serialiser reads data-card-next, so autosave persists
+  // it and the player follows it. This is how branch lanes chain and rejoin.
+  _setNext(fromCid, targetValue) {
+    const wrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(fromCid)}"]`)
+    if (!wrap) return
+    let next = null
+    if (typeof targetValue === "string" && targetValue.startsWith("card:")) next = { card: targetValue.slice(5) }
+    else if (typeof targetValue === "string" && targetValue.startsWith("end:")) next = { end: targetValue.slice(4) }
+    if (next && (next.card || next.end)) wrap.dataset.cardNext = JSON.stringify(next)
+    else delete wrap.dataset.cardNext
+    this._editor()?.markDirty()
+    this._render()
   }
 
   // Write a routing choice by driving the same inline <select> the card editor
@@ -590,7 +637,7 @@ export default class extends Controller {
         this.application.getControllerForElementAndIdentifier(rootWithEditor, "type-panel")?.registerCard(card)
         this._editor()?.refreshAll() // renumber + refreshLogicTargets so the new cid is routable
         const newCid = card.dataset.cardCid
-        if (newCid) this._setRoute(fromCid, opt, `card:${newCid}`)
+        if (newCid) this._applyTarget(fromCid, opt, `card:${newCid}`)
         else { this._editor()?.markDirty(); this._render() }
       })
       .catch(() => { /* best-effort; the creator can add a card manually */ })

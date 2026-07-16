@@ -4761,6 +4761,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .logic-map-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .lm-swatch { width: 16px; height: 0; border-top-width: 2px; border-top-style: solid; display: inline-block; }
 .lm-swatch.lm-route   { border-top-color: #01EACB; }
+.lm-swatch.lm-next    { border-top-color: #8B85FF; }
 .lm-swatch.lm-default { border-top-color: rgba(255,255,255,0.5); border-top-style: dashed; }
 .lm-swatch.lm-finish  { width: 14px; height: 14px; border: 1.5px solid #01EACB; border-radius: 7px; background: rgba(1,234,203,0.12); }
 .logic-map-close {

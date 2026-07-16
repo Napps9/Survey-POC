@@ -158,6 +158,7 @@
            data-card-index="<%= idx %>"
            data-card-cid="<%= card['cid'].to_s %>"
            <% if logic_mode %>data-card-logic="<%= card['logic'].to_json %>"<% end %>
+           <% if logic_mode && card['next'].is_a?(Hash) %>data-card-next="<%= card['next'].to_json %>"<% end %>
            data-card-type="<%= type %>"
            data-card-graded="<%= graded %>"
            <% if preview_mode && graded %>data-card-correct="<%= QuizGrading.correct_display(card).to_json %>" data-card-explanation="<%= card['explanation'] %>"<% end %>

@@ -157,4 +157,81 @@ class LogicGraphTest < ActiveSupport::TestCase
                "logic" => { "default" => { "end" => "anything" } } } ]
     assert_empty LogicGraph.validate(cards)[:dangling]
   end
+
+  # ── Per-card `next` flow pointer (the primitive first-class branches use) ─────
+
+  # A UK lane of two PLAIN cards that chains via `next` and rejoins a common
+  # tail: hub UK → c_uk1 → c_uk2 → c_common; everything else → c_common (skips
+  # the lane). Indices: c_hub=0, c_uk1=1, c_uk2=2, c_common=3.
+  def branch_cards
+    [
+      { "cid" => "c_hub", "type" => "multiple_choice", "text" => "Which hub?",
+        "options" => %w[UK Other],
+        "logic" => { "routes" => [
+          { "match" => { "op" => "equals", "value" => "UK" }, "to" => { "card" => "c_uk1" } }
+        ], "default" => { "card" => "c_common" } } },
+      { "cid" => "c_uk1",   "type" => "open_ended", "text" => "UK Q1", "next" => { "card" => "c_uk2" } },
+      { "cid" => "c_uk2",   "type" => "open_ended", "text" => "UK Q2", "next" => { "card" => "c_common" } },
+      { "cid" => "c_common", "type" => "open_ended", "text" => "Common" }
+    ]
+  end
+
+  test "card_next returns a valid target, else nil" do
+    assert_equal({ "card" => "c_uk2" }, LogicGraph.card_next(branch_cards[1]))
+    assert_nil LogicGraph.card_next(branch_cards[3])                 # no next ⇒ nil
+    assert_nil LogicGraph.card_next({ "next" => { "card" => "" } })  # invalid target ⇒ nil
+    assert_nil LogicGraph.card_next("not-a-hash")
+  end
+
+  test "next chains a plain card forward and rejoins, and siblings are skipped" do
+    cards = branch_cards
+    assert_equal 1, LogicGraph.next_index(cards, 0, answer("UK"))    # hub → c_uk1
+    assert_equal 3, LogicGraph.next_index(cards, 0, answer("Other")) # default → c_common (skips lane)
+    assert_equal 2, LogicGraph.next_index(cards, 1, {})              # c_uk1 next → c_uk2 (plain card!)
+    assert_equal 3, LogicGraph.next_index(cards, 2, {})              # c_uk2 next → c_common (rejoin)
+    assert_nil   LogicGraph.next_index(cards, 3, {})                 # common → finish
+  end
+
+  test "resolve_path walks a next-chained branch and rejoins the common tail" do
+    cards = branch_cards
+    assert_equal [ 0, 1, 2, 3 ], LogicGraph.resolve_path(cards, answer("UK"))
+    assert_equal [ 0, 3 ],       LogicGraph.resolve_path(cards, answer("Other"))
+  end
+
+  test "answer routes and a valid default both outrank next" do
+    cards = [
+      { "cid" => "c0", "type" => "multiple_choice", "options" => %w[A B],
+        "logic" => { "routes" => [ { "match" => { "op" => "equals", "value" => "A" }, "to" => { "card" => "c_a" } } ] },
+        "next" => { "card" => "c_next" } },
+      { "cid" => "c_a", "type" => "open_ended" },
+      { "cid" => "c_next", "type" => "open_ended" }
+    ]
+    assert_equal 1, LogicGraph.next_index(cards, 0, answer("A")) # matching route wins over next
+    assert_equal 2, LogicGraph.next_index(cards, 0, answer("B")) # unmatched, no default ⇒ next
+
+    withdef = [ { "cid" => "c0", "type" => "multiple_choice",
+                  "logic" => { "default" => { "card" => "c_def" } }, "next" => { "card" => "c_next" } },
+                { "cid" => "c_def", "type" => "open_ended" },
+                { "cid" => "c_next", "type" => "open_ended" } ]
+    assert_equal 1, LogicGraph.next_index(withdef, 0, {}) # a valid default outranks next
+  end
+
+  test "next fails safe to linear when its target is dangling" do
+    cards = [ { "cid" => "c0", "type" => "open_ended", "next" => { "card" => "c_gone" } },
+              { "cid" => "c1", "type" => "open_ended" } ]
+    assert_equal 1, LogicGraph.next_index(cards, 0, {}) # unknown cid ⇒ idx+1
+  end
+
+  test "edges_from includes a next edge and it replaces the linear edge" do
+    cards = branch_cards
+    assert_equal [ 2 ], LogicGraph.edges_from(cards, 1) # c_uk1 → c_uk2 only (no linear to c_uk2's slot)
+    assert_includes LogicGraph.edges_from(cards, 0), 1  # hub reaches the lane
+    assert_includes LogicGraph.edges_from(cards, 0), 3  # and the default/common
+  end
+
+  test "validate flags a dangling next on a plain (non-routing) card" do
+    cards = [ { "cid" => "c0", "type" => "open_ended", "next" => { "card" => "c_gone" } } ]
+    result = LogicGraph.validate(cards)
+    assert_equal [ { "card" => "c_gone" } ], result[:dangling].map { |d| d[:target] }
+  end
 end
