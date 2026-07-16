@@ -4,7 +4,7 @@
     application.css `.survey-card-wrap .logic-branch-block`). Editor-only chrome.
     `rows` is [{ canonical:, label:, selected: }]; `default_selected` is the
     encoded "otherwise" route ("card:<cid>" | "end:<id>" | ""). %>
-<div class="logic-branch-block" data-logic-block>
+<div class="logic-branch-block" data-logic-block data-owner-cid="<%= owner_cid %>">
   <div class="logic-branch-intro">
     Send each answer to a different card or finish screen. Leave one on
     “Continue” to follow the normal flow.

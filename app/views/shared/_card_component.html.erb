@@ -151,6 +151,7 @@
       </ul>
       <% if logic_mode %>
         <%= render "shared/logic_branch_block",
+              owner_cid: card["cid"],
               rows: items.each_with_index.map { |opt, i| { canonical: canon[i], label: opt, selected: logic_route_value.call(canon[i]) } },
               default_selected: logic_default_value %>
       <% end %>
@@ -212,6 +213,7 @@
       </ul>
       <% if logic_mode %>
         <%= render "shared/logic_branch_block",
+              owner_cid: card["cid"],
               rows: [["Yes", 1], ["No", 4]].map { |canon_label, _bg|
                 { canonical: canon_label,
                   label: t("card.#{canon_label.downcase}", locale: display_locale, default: canon_label),

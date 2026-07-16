@@ -882,7 +882,10 @@ export default class extends Controller {
       label: (c.querySelector(".q-title, .activity-title")?.textContent || "").trim().slice(0, 40)
     }))
     selects.forEach(sel => {
+      // The block may have been relocated into the sidebar's Branching tab, so
+      // fall back to the block's own owner-cid when it's no longer in a card.
       const ownerCid = sel.closest("[data-survey-editor-target='card']")?.dataset.cardCid
+                    || sel.closest("[data-logic-block]")?.dataset.ownerCid
       const chosen   = sel.dataset.logicSelected || ""
       sel.innerHTML  = ""
       sel.appendChild(this._logicOption("", cfg.continue || "Continue (default flow)"))
@@ -908,6 +911,78 @@ export default class extends Controller {
     const sel = event.currentTarget
     sel.dataset.logicSelected = sel.value
     this.markDirty()
+  }
+
+  // Keep a routable card's Branching-tab rows in step with its live answer
+  // options: one row per option, in document order, each remembering its chosen
+  // route. Fires when options are added/removed (card-editor:changed) or an
+  // option label is edited (focusout). Routes are keyed by the option label (its
+  // canonical), so each chosen target is carried across the rebuild by a stable
+  // per-option uid — surviving renames — with the row label and the select's
+  // canonical updated to the option's current text.
+  syncBranchingEvent(event) {
+    const card = event.target?.closest?.("[data-survey-editor-target='card']")
+    if (!card) return
+    // On focusout, only react to leaving an option label — not every field blur.
+    if (event.type === "focusout" && !event.target.closest?.(".pick-text")) return
+    this.syncBranchingFor(card)
+  }
+
+  syncBranchingFor(cardEl) {
+    if (!this.logicValue || !cardEl) return
+    if (cardEl.dataset.cardType !== "multiple_choice") return // yes_no answers are fixed
+    const scope = this._logicScope(cardEl)
+    const list  = scope.querySelector(".logic-branch-list")
+    if (!list) return
+
+    // Prior chosen route per option — by uid (survives renames), then by label,
+    // then by position (covers a rename made before any uid was assigned).
+    const byUid = new Map(), byLabel = new Map(), byIndex = []
+    list.querySelectorAll(".logic-branch-row").forEach(row => {
+      const sel = row.querySelector("[data-logic-route]")
+      if (!sel) return
+      const val = sel.dataset.logicSelected || sel.value || ""
+      byIndex.push(val)
+      if (row.dataset.optUid) byUid.set(row.dataset.optUid, val)
+      if (sel.dataset.canonical) byLabel.set(sel.dataset.canonical, val)
+    })
+
+    // Rebuild one row per current option, in order, carrying each route across.
+    list.textContent = ""
+    this._optionEls(cardEl).forEach((optEl, i) => {
+      const label = optEl.textContent.trim()
+      if (!label) return
+      let uid = optEl.dataset.optUid
+      if (!uid) { uid = String(this._optUidSeq = (this._optUidSeq || 0) + 1); optEl.dataset.optUid = uid }
+      const val = byUid.has(uid) ? byUid.get(uid)
+                : byLabel.has(label) ? byLabel.get(label)
+                : (byIndex[i] || "")
+      list.appendChild(this._branchRow(uid, label, val))
+    })
+    this.refreshLogicTargets() // fill the (possibly new) selects' option lists + values
+  }
+
+  // One "AnswerLabel → [route select]" row, matching shared/_logic_branch_block.
+  _branchRow(uid, label, selected) {
+    const row = document.createElement("li")
+    row.className = "logic-branch-row"
+    row.dataset.optUid = uid
+    const answer = document.createElement("span")
+    answer.className = "logic-branch-answer"
+    answer.textContent = label
+    const arrow = document.createElement("span")
+    arrow.className = "logic-branch-arrow"
+    arrow.setAttribute("aria-hidden", "true")
+    arrow.textContent = "→"
+    const sel = document.createElement("select")
+    sel.className = "logic-route-select"
+    sel.setAttribute("data-logic-route", "")
+    sel.dataset.canonical = label
+    sel.dataset.logicSelected = selected || ""
+    sel.dataset.action = "input->survey-editor#logicRouteChanged change->survey-editor#logicRouteChanged"
+    sel.onclick = (e) => e.stopPropagation()
+    row.append(answer, arrow, sel)
+    return row
   }
 
   // Mark / unmark an option as correct. Single-choice acts like a radio.
