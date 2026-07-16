@@ -357,8 +357,12 @@
         <div class="range-theme-picker">
           <label class="range-theme-label"><%= t("editor.animation_theme", default: "Animation") %></label>
           <select class="range-theme-select" data-action="change->survey-editor#setRangeTheme">
-            <% range_theme_options.each do |label, slug| %>
-              <option value="<%= slug %>" <%= "selected" if slug == cur_theme %>><%= label %></option>
+            <% range_theme_groups.each do |category, opts| %>
+              <optgroup label="<%= category %>">
+                <% opts.each do |label, slug| %>
+                  <option value="<%= slug %>" <%= "selected" if slug == cur_theme %>><%= label %></option>
+                <% end %>
+              </optgroup>
             <% end %>
           </select>
         </div>

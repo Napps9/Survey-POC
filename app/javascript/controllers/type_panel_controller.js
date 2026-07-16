@@ -413,12 +413,18 @@ function sliderHtml(opts, ctx = {}) {
     `<div class="s-dot" data-slider-target="dot" style="left:${(i / (n - 1) * 100).toFixed(2)}%"></div>`
   ).join("")
   const themes = ctx.rangeThemes || []
+  const groups = ctx.rangeThemeGroups || []
   const cur = ctx.rangeTheme || ""
+  const bySlug = Object.fromEntries(themes.map(t => [t.slug, t.label]))
+  const opt = (s) => `<option value="${esc(s)}"${s === cur ? " selected" : ""}>${esc(bySlug[s] || s)}</option>`
+  const optHtml = groups.length
+    ? groups.map(g => `<optgroup label="${esc(g.category)}">${g.slugs.map(opt).join("")}</optgroup>`).join("")
+    : themes.map(th => opt(th.slug)).join("")
   const picker = themes.length ? `
     <div class="range-theme-picker">
       <label class="range-theme-label">${esc(ctx.rangeThemeLabel || "Animation")}</label>
       <select class="range-theme-select" data-action="change->survey-editor#setRangeTheme">
-        ${themes.map(th => `<option value="${esc(th.slug)}"${th.slug === cur ? " selected" : ""}>${esc(th.label)}</option>`).join("")}
+        ${optHtml}
       </select>
     </div>` : ""
   return `
@@ -916,6 +922,7 @@ export default class extends Controller {
         ratingIcon:      this._ratingIcon(),
         npsShape:        this._npsShape(),
         rangeThemes:     this._rangeThemePicker.themes,
+        rangeThemeGroups: this._rangeThemePicker.groups,
         rangeThemeLabel: this._rangeThemePicker.label,
         rangeTheme:      card.dataset.cardRangeTheme || ""
       })
@@ -968,6 +975,7 @@ export default class extends Controller {
     let data = {}
     try { data = JSON.parse(document.getElementById("range-theme-picker")?.textContent || "{}") } catch (_) {}
     data.themes = data.themes || []
+    data.groups = data.groups || []
     data.label = data.label || "Animation"
     this.__rangeThemePicker = data
     return data

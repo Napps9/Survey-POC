@@ -12,13 +12,21 @@ module NpsHelper
   NPS_FRAMES = 5
   NPS_THEME  = "basketball".freeze # default reaction theme when a card doesn't pick one
 
-  # Every selectable reaction-animation theme. Each is a folder
+  # Selectable reaction-animation themes, grouped by subject category — this is
+  # the order (and grouping) shown in the editor's picker. Each slug is a folder
   # app/assets/lottie/<slug>/ holding 1..5.json (the five slider states). To add
-  # a set: drop the folder in and add its slug here. NPS_THEME must be one of
-  # these; Survey.sanitize_cards_images! whitelists a card's range_theme against
-  # this list.
-  RANGE_THEMES = %w[basketball football football_goal stopwatch
-                    sun flowers recycling balance pizza radar calendar].freeze
+  # a set: drop the folder in and add its slug to a group here. NPS_THEME (the
+  # default) must appear in one of these groups.
+  RANGE_THEME_GROUPS = {
+    "Sport"                     => %w[basketball football football_goal stopwatch],
+    "Climate & Sustainability"  => %w[sun flowers recycling],
+    "Mental Health & Wellbeing" => %w[balance],
+    "General"                   => %w[pizza radar calendar]
+  }.freeze
+
+  # Flat allow-list derived from the groups — the single source of truth for
+  # sanitisation (Survey.sanitize_cards_images!) and URL building.
+  RANGE_THEMES = RANGE_THEME_GROUPS.values.flatten.freeze
 
   def nps_card?(card)
     card["type"].to_s == "nps"
@@ -45,19 +53,22 @@ module NpsHelper
     RANGE_THEMES.include?(slug) ? slug : NPS_THEME
   end
 
-  # [[label, slug], …] for the range card's editor theme <select>.
-  def range_theme_options
-    RANGE_THEMES.map { |slug| [ slug.titleize, slug ] }
+  # [[category, [[label, slug], …]], …] for the range card's grouped <optgroup>
+  # theme picker.
+  def range_theme_groups
+    RANGE_THEME_GROUPS.map { |cat, slugs| [ cat, slugs.map { |slug| [ slug.titleize, slug ] } ] }
   end
 
-  # Editor payload for the theme picker: the control label plus, per theme, its
-  # slug, display label and 5 asset URLs — so the editor can swap the live
-  # preview (and build the picker on a type-switch) without a round-trip.
-  # Emitted as JSON in the editor head (see surveys/show).
+  # Editor payload for the theme picker: the control label; the flat theme list
+  # (slug → display label + 5 asset URLs, for live-preview swaps); and the
+  # category groups (for building the grouped <optgroup> picker on a type-switch)
+  # — so the editor never needs a round-trip. Emitted as JSON in the editor head
+  # (see surveys/show).
   def range_theme_picker_data
     {
       label:  t("editor.animation_theme", default: "Animation"),
-      themes: RANGE_THEMES.map { |slug| { slug: slug, label: slug.titleize, urls: nps_lottie_urls(slug) } }
+      themes: RANGE_THEMES.map { |slug| { slug: slug, label: slug.titleize, urls: nps_lottie_urls(slug) } },
+      groups: RANGE_THEME_GROUPS.map { |cat, slugs| { category: cat, slugs: slugs } }
     }
   end
 

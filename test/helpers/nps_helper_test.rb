@@ -33,4 +33,24 @@ class NpsHelperTest < ActionView::TestCase
       assert_equal NpsHelper::NPS_FRAMES, t[:urls].size
     end
   end
+
+  test "RANGE_THEMES is exactly the flattened groups (single source of truth)" do
+    assert_equal NpsHelper::RANGE_THEME_GROUPS.values.flatten, NpsHelper::RANGE_THEMES
+    assert_includes NpsHelper::RANGE_THEME_GROUPS.values.flatten, NpsHelper::NPS_THEME
+  end
+
+  test "range_theme_groups covers every theme exactly once, each with a label" do
+    slugs = range_theme_groups.flat_map { |_cat, opts| opts.map { |_label, slug| slug } }
+    assert_equal NpsHelper::RANGE_THEMES.sort, slugs.sort
+    assert_equal slugs, slugs.uniq, "no theme appears in two categories"
+    range_theme_groups.each do |cat, opts|
+      assert cat.present?
+      opts.each { |label, _slug| assert label.present? }
+    end
+  end
+
+  test "range_theme_picker_data groups cover all themes" do
+    slugs = range_theme_picker_data[:groups].flat_map { |g| g[:slugs] }
+    assert_equal NpsHelper::RANGE_THEMES.sort, slugs.sort
+  end
 end
