@@ -5,6 +5,10 @@ import { t } from "lib/i18n"
 // (app/lib/card_types.rb) and verto_rules.js's isQuestion.
 const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
 
+// Single-pick types whose answers can each route to a different card/end —
+// mirrors LogicGraph::ROUTABLE and logic_map_controller's ROUTABLE.
+const ROUTABLE_TYPES = [ "multiple_choice", "yes_no" ]
+
 // Read the canonical card-type metadata that the editor view emits as a
 // JSON blob (sourced from config/card_types.yml). Called from connect()
 // so each Turbo navigation re-reads the blob — otherwise the cache from
@@ -418,13 +422,14 @@ export default class extends Controller {
     "panelCardName", "panelHint", "typeOpt", "toast", "toastMsg", "cardCount",
     "allTypesModal", "allTypesList", "allTypeOpt", "modalCardName",
     "subtabs", "subtab", "subview", "tokenSlot", "quizSlot",
+    "logicSlot", "branchEmpty", "branchNote", "branchCardName",
     "whyCardName", "whyEmpty", "whyBody", "whyNote", "whyFramework",
     "whyCompetencyRow", "whyCompetencyBadge", "whyCompetencyBlurb",
     "whyOutcomeRow", "whyOutcome",
     "whyConditionRow", "whyConditionBadge", "whyConditionBlurb"
   ]
 
-  static values = { quiz: Boolean, tokenisation: Boolean }
+  static values = { quiz: Boolean, tokenisation: Boolean, logic: Boolean }
 
   // Emoji shown next to each recommended type in the side panel — 1st-4th place.
   RANK_EMOJI = ["🥇", "🥈", "🥉", "⭐"]
@@ -444,6 +449,7 @@ export default class extends Controller {
   connect() {
     this._quizBlocks  = new WeakMap()
     this._tokenBlocks = new WeakMap()
+    this._logicBlocks = new WeakMap()
     this.cardTargets.forEach(c => this.registerCard(c))
   }
 
@@ -452,10 +458,13 @@ export default class extends Controller {
     if (quiz) this._quizBlocks.set(card, quiz)
     const tokens = card.querySelector(".token-award-block")
     if (tokens) this._tokenBlocks.set(card, tokens)
+    const logic = card.querySelector(".logic-branch-block")
+    if (logic) this._logicBlocks.set(card, logic)
   }
 
   quizBlockFor(card)  { return this._quizBlocks?.get(card) }
   tokenBlockFor(card) { return this._tokenBlocks?.get(card) }
+  logicBlockFor(card) { return this._logicBlocks?.get(card) }
 
   // A hidden holding pen for the previously-active card's relocated blocks —
   // they stay attached to the document (so their inputs/values and Stimulus
@@ -473,6 +482,7 @@ export default class extends Controller {
   _parkSlotContents() {
     if (this.hasTokenSlotTarget) this._parkingLot.append(...this.tokenSlotTarget.children)
     if (this.hasQuizSlotTarget)  this._parkingLot.append(...this.quizSlotTarget.children)
+    if (this.hasLogicSlotTarget) this._parkingLot.append(...this.logicSlotTarget.children)
   }
 
   showSubtab(event) {
@@ -551,6 +561,7 @@ export default class extends Controller {
 
     this._renderCompatibleTypes(cardType)
     this._updateSubtabsFor(card, cardType)
+    this._updateBranchFor(card, cardType, cardNum)
     this._renderWhy(card, cardType, cardNum)
 
     // Paint the pinned sidebar traffic light immediately (it otherwise only
@@ -581,6 +592,30 @@ export default class extends Controller {
 
     const activeBtn = this.subtabTargets.find(b => b.classList.contains("is-active"))
     if (!activeBtn || activeBtn.hidden) this._showSubtab("type")
+  }
+
+  // Populate the top-level "Branching" tab for the selected card: relocate its
+  // routing block (per-answer "go to…" selects + default row) into the panel if
+  // the card is a routable single-pick question, otherwise show a note. Mirrors
+  // the Tokenomics/Quiz relocation — only one card's block is ever out of its
+  // card at a time; the previous one gets parked (see _parkSlotContents).
+  _updateBranchFor(card, cardType, cardNum) {
+    if (!this.hasLogicSlotTarget) return // logic off ⇒ no Branching panel
+
+    if (this.hasBranchCardNameTarget) {
+      const meta = this.typeMeta[cardType]
+      this.branchCardNameTarget.textContent = t("editor.card_n", { n: cardNum, type: meta?.badge || cardType })
+    }
+
+    const routable = this.logicValue && ROUTABLE_TYPES.includes(cardType)
+    this._parkingLot.append(...this.logicSlotTarget.children) // park previous card's block
+    const block = routable ? this.logicBlockFor(card) : null
+    if (block) this.logicSlotTarget.appendChild(block)
+
+    // .type-panel-empty forces display:flex, so toggle inline display (not the
+    // hidden attribute) the same way the Why panel's empty state does.
+    if (this.hasBranchEmptyTarget) this.branchEmptyTarget.style.display = "none"       // a card is now selected
+    if (this.hasBranchNoteTarget)  this.branchNoteTarget.style.display  = routable ? "none" : "flex" // only for non-routable
   }
 
   // Populate the "Why" tab for the selected card: the competency it sits under,

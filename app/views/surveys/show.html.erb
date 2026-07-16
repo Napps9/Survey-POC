@@ -53,6 +53,7 @@
      data-logic-map-editable-value="<%= !@survey.published? %>"
      data-type-panel-quiz-value="<%= @survey.quiz? %>"
      data-type-panel-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
+     data-type-panel-logic-value="<%= @survey.logic? %>"
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.published? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
@@ -247,6 +248,10 @@
               data-action="click->publish-panel#showType"><%= t("editor.answer_type") %></button>
       <button type="button" class="right-tab" data-publish-panel-target="whyTab"
               data-action="click->publish-panel#showWhy"><%= t("editor.why", default: "Why") %></button>
+      <% if @survey.logic? %>
+        <button type="button" class="right-tab" data-publish-panel-target="branchTab"
+                data-action="click->publish-panel#showBranch">Branching</button>
+      <% end %>
       <button type="button" class="right-tab verto-score" data-survey-editor-target="vertoScore"
               data-publish-panel-target="scoreTab"
               aria-label="<%= t('js.editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
@@ -470,6 +475,45 @@
         </div>
       </div>
     </div><%# /why panel %>
+
+    <%# ── "Branching" panel — route each answer of the selected single-pick
+        question to a different card or finish screen. The per-card controls are
+        authored inside the card (shared/logic_branch_block) and relocated here
+        for the selected card by type_panel_controller#selectCard; the card
+        itself shows nothing about routing. Only present when logic is on. ── %>
+    <% if @survey.logic? %>
+      <div class="type-panel hidden" data-publish-panel-target="branchView">
+        <div class="type-panel-top">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
+            Branching
+          </div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF1E6F;line-height:1.3;min-height:18px;"
+               data-type-panel-target="branchCardName"><%= t("editor.select_card") %></div>
+          <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;">
+            Choose where each answer leads. Any answer left on “Continue” follows the normal card order.
+          </div>
+        </div>
+
+        <%# No card selected yet. %>
+        <div class="type-panel-empty" data-type-panel-target="branchEmpty">
+          <div style="font-size:28px;opacity:0.25;">↖</div>
+          <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:240px;">
+            Select a multiple-choice or yes/no question to route its answers.
+          </div>
+        </div>
+
+        <%# Selected card can't branch (not a single-pick question). %>
+        <div class="type-panel-empty" style="display:none;" data-type-panel-target="branchNote">
+          <div style="font-size:28px;opacity:0.25;">⤳</div>
+          <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:260px;">
+            This question type can’t branch. Only multiple-choice and yes/no questions can send each answer to a different card.
+          </div>
+        </div>
+
+        <%# The selected routable card's branching block is relocated in here. %>
+        <div class="branch-slot card-subview-slot" data-type-panel-target="logicSlot"></div>
+      </div>
+    <% end %>
 
     <%# ── Verto-score breakdown — the Rules-of-the-Game results grouped by
         traffic light (red → amber → green), each row carrying what to change.

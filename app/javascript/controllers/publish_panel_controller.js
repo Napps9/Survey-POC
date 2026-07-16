@@ -10,8 +10,8 @@ import { Controller } from "@hotwired/stimulus"
 // hidden while an overlay is open.
 export default class extends Controller {
   static targets = [
-    "typeView", "scoreView", "whyView", "publishView", "designView",
-    "tabs", "typeTab", "scoreTab", "whyTab"
+    "typeView", "scoreView", "whyView", "branchView", "publishView", "designView",
+    "tabs", "typeTab", "scoreTab", "whyTab", "branchTab"
   ]
 
   connect() {
@@ -36,12 +36,14 @@ export default class extends Controller {
   showType() { this._show("typeView") }
   showScore() { this._show("scoreView") }
   showWhy() { this._show("whyView") }
+  showBranch() { this._show("branchView") }
 
   _show(which) {
     const views = {
       typeView: this.hasTypeViewTarget ? this.typeViewTarget : null,
       scoreView: this.hasScoreViewTarget ? this.scoreViewTarget : null,
       whyView: this.hasWhyViewTarget ? this.whyViewTarget : null,
+      branchView: this.hasBranchViewTarget ? this.branchViewTarget : null,
       publishView: this.hasPublishViewTarget ? this.publishViewTarget : null,
       designView: this.hasDesignViewTarget ? this.designViewTarget : null
     }
@@ -49,12 +51,13 @@ export default class extends Controller {
       if (el) el.classList.toggle("hidden", name !== which)
     })
 
-    // The tab strip belongs to the three peer views; the Publish/Design
-    // overlays take over the whole column.
-    const tabbed = which === "typeView" || which === "scoreView" || which === "whyView"
+    // The tab strip belongs to the peer views (answer type / why / branching /
+    // score); the Publish/Design overlays take over the whole column.
+    const tabbed = ["typeView", "scoreView", "whyView", "branchView"].includes(which)
     if (this.hasTabsTarget) this.tabsTarget.classList.toggle("hidden", !tabbed)
-    if (this.hasTypeTabTarget)  this.typeTabTarget.classList.toggle("is-active", which === "typeView")
-    if (this.hasScoreTabTarget) this.scoreTabTarget.classList.toggle("is-active", which === "scoreView")
-    if (this.hasWhyTabTarget)   this.whyTabTarget.classList.toggle("is-active", which === "whyView")
+    if (this.hasTypeTabTarget)   this.typeTabTarget.classList.toggle("is-active", which === "typeView")
+    if (this.hasScoreTabTarget)  this.scoreTabTarget.classList.toggle("is-active", which === "scoreView")
+    if (this.hasWhyTabTarget)    this.whyTabTarget.classList.toggle("is-active", which === "whyView")
+    if (this.hasBranchTabTarget) this.branchTabTarget.classList.toggle("is-active", which === "branchView")
   }
 }

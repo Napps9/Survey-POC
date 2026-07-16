@@ -715,6 +715,17 @@ export default class extends Controller {
   // been selected in the panel yet).
   _quizScope(card)  { return this._typePanel()?.quizBlockFor(card)  || card }
   _tokenScope(card) { return this._typePanel()?.tokenBlockFor(card) || card }
+  // The routing selects live in a block that the type panel relocates into the
+  // sidebar's Branching tab for the selected card, so read/write them wherever
+  // that block currently sits (falling back to the card if never relocated).
+  _logicScope(card) { return this._typePanel()?.logicBlockFor(card) || card }
+
+  // Public: the branching-block scope for a card by cid — used by the flow map
+  // to drive the same route selects after they've been relocated to the sidebar.
+  logicScopeForCid(cid) {
+    const wrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(cid)}"]`)
+    return wrap ? this._logicScope(wrap) : null
+  }
 
   // The marked correct answer for a card, in the shape QuizGrading expects.
   _readCorrect(card, type) {
@@ -828,15 +839,16 @@ export default class extends Controller {
   // ("otherwise") select. Only single-pick types route this pass.
   _readLogic(card, type) {
     if (type !== "multiple_choice" && type !== "yes_no") return null
+    const scope = this._logicScope(card)
     const routes = []
-    card.querySelectorAll("[data-logic-route][data-canonical]").forEach(sel => {
+    scope.querySelectorAll("[data-logic-route][data-canonical]").forEach(sel => {
       const label = (sel.dataset.canonical || "").trim()
       const to    = this._logicTargetFromValue(sel.value)
       if (label && to) routes.push({ match: { op: "equals", value: label }, to })
     })
     const logic = {}
     if (routes.length) logic.routes = routes
-    const defSel = card.querySelector("[data-logic-default]")
+    const defSel = scope.querySelector("[data-logic-default]")
     const def    = defSel ? this._logicTargetFromValue(defSel.value) : null
     if (def) logic.default = def
     return this._hasLogic(logic) ? logic : null

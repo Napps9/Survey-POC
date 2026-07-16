@@ -4647,7 +4647,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .editing-translation .mark-correct,
 .editing-translation .quiz-correct-block,
 .editing-translation .token-inputs,
-.editing-translation .token-award-block { display: none; }
+.editing-translation .token-award-block,
+.editing-translation .logic-branch-block { display: none; }
 
 /* These blocks live in the editor's Tokenomics/Quiz mode sidebar tabs now
    (see type-panel controller's selectCard), not on the card — hide them
@@ -4657,7 +4658,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
    of .survey-card-wrap into the sidebar's .card-subview, this no longer
    matches and it shows normally. */
 .survey-card-wrap .quiz-correct-block,
-.survey-card-wrap .token-award-block { display: none; }
+.survey-card-wrap .token-award-block,
+.survey-card-wrap .logic-branch-block { display: none; }
 
 /* Per-option "mark correct" toggle on list + grid choices. */
 .mark-correct {
@@ -4700,6 +4702,43 @@ body.generating-overlay-active .bottom-bar { display: none; }
   color: rgba(74,69,196,0.85);
 }
 .logic-default-row .logic-route-select { margin-left: 0; }
+
+/* The per-card branching controls, relocated into the right-hand "Branching"
+   tab (hidden while still in the card — see the .survey-card-wrap rule above).
+   Only ever visible in the dark sidebar, so it gets a dark-theme skin: one row
+   per answer (label → route select) plus the "otherwise" default row. */
+.branch-slot { flex: 1; min-height: 0; overflow-y: auto; }
+.logic-branch-block { padding: 14px 16px; }
+.logic-branch-intro {
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.5;
+  color: rgba(255,255,255,0.6); margin-bottom: 12px;
+}
+.logic-branch-list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.logic-branch-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+}
+.logic-branch-answer {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #fff;
+}
+.logic-branch-arrow { flex-shrink: 0; font-size: 13px; color: rgba(1,234,203,0.85); }
+/* Dark-sidebar skin for the route selects + default row inside the block
+   (the base styles above target the light card panel). */
+.logic-branch-block .logic-route-select {
+  margin-left: 0; max-width: 150px;
+  background: rgba(97,91,245,0.2); color: #fff; border-color: rgba(255,255,255,0.22);
+}
+.logic-branch-block .logic-route-select:hover { border-color: rgba(1,234,203,0.55); }
+.logic-branch-block .logic-route-select option { color: #1C2034; }
+.logic-branch-block .logic-default-row {
+  margin-top: 12px; background: rgba(97,91,245,0.1); border-color: rgba(255,255,255,0.18);
+}
+.logic-branch-block .logic-default-label { color: rgba(255,255,255,0.7); }
 
 /* The "zoom out" flow-map overlay (logic_map_controller). Full-viewport dark
    canvas; the SVG fills the area below the top bar. */

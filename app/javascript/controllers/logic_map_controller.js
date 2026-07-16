@@ -407,7 +407,7 @@ export default class extends Controller {
     const src = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(cid)}"] .split-card`)
     if (!src) return null
     const clone = src.cloneNode(true)
-    clone.querySelectorAll(".logic-route-select, .logic-default-row, .mark-correct, .pick-item-delete, .pick-add-btn, [data-card-editor-add], .card-reorder, .card-delete-btn")
+    clone.querySelectorAll(".logic-branch-block, .logic-route-select, .logic-default-row, .mark-correct, .pick-item-delete, .pick-add-btn, [data-card-editor-add], .card-reorder, .card-delete-btn")
       .forEach(el => el.remove())
     const scrub = (el) => {
       el.removeAttribute("data-controller")
@@ -550,11 +550,13 @@ export default class extends Controller {
   // Write a routing choice by driving the same inline <select> the card editor
   // uses, so there is ONE source of truth and autosave persists it as usual.
   _setRoute(fromCid, opt, targetValue) {
-    const wrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(fromCid)}"]`)
-    if (!wrap) return
+    // The route selects may have been relocated into the sidebar's Branching
+    // tab for the active card, so resolve their current home via the editor.
+    const scope = this._editor()?.logicScopeForCid(fromCid)
+    if (!scope) return
     const sel = opt === "__default__"
-      ? wrap.querySelector("[data-logic-default]")
-      : wrap.querySelector(`[data-logic-route][data-canonical="${CSS.escape(opt)}"]`)
+      ? scope.querySelector("[data-logic-default]")
+      : scope.querySelector(`[data-logic-route][data-canonical="${CSS.escape(opt)}"]`)
     if (!sel) return
     sel.dataset.logicSelected = targetValue
     const ed = this._editor()
