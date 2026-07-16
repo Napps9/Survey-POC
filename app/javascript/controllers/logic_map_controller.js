@@ -262,12 +262,17 @@ export default class extends Controller {
 
     const layer = new Map()
     if (nodes.length) layer.set(nodes[0].key, 0)
-    // Relax N times (bounded so weaving cycles can't loop forever).
+    // Relax N times (bounded so weaving cycles can't loop forever). A genuine
+    // DAG never needs a path longer than nodes.length - 1 hops, so cand is
+    // clamped to nodes.length: a cycle (e.g. a route that loops back to an
+    // earlier card) would otherwise keep compounding every pass, ballooning
+    // the canvas width into the tens of thousands of pixels and squeezing
+    // every card into an unreadable sliver in the corner.
     for (let pass = 0; pass < nodes.length + 1; pass++) {
       edges.forEach(e => {
         if (!e.to || !adj.has(e.to)) return
         if (!layer.has(e.from)) return
-        const cand = layer.get(e.from) + 1
+        const cand = Math.min(layer.get(e.from) + 1, nodes.length)
         if (!layer.has(e.to) || cand > layer.get(e.to)) layer.set(e.to, cand)
       })
     }
@@ -868,7 +873,14 @@ export default class extends Controller {
         const slot = document.createElement("div"); slot.className = "card-slot"; slot.appendChild(card)
         const insertRow = feed.querySelector(".aq-insert-row")
         if (insertRow) slot.appendChild(insertRow.cloneNode(true))
-        feed.appendChild(slot)
+        // Splice the slot in right after its source card rather than appending
+        // to the end of the deck: the new card's `next` rejoins mid-deck, so
+        // tacking it on at the bottom would make the (now-last) original card's
+        // own linear fall-through point BACK at it — a cycle that sends the
+        // layout's column widths (and the pan/zoom canvas) sky-high.
+        const fromSlot = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(fromCid)}"]`)?.closest(".card-slot")
+        if (fromSlot && fromSlot.parentElement === feed) fromSlot.after(slot)
+        else feed.appendChild(slot)
         const rootWithEditor = document.querySelector("[data-survey-editor-url-value]")
         this.application.getControllerForElementAndIdentifier(rootWithEditor, "type-panel")?.registerCard(card)
         this._editor()?.refreshAll() // renumber + refreshLogicTargets so the new cid is routable
