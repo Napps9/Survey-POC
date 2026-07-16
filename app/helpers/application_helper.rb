@@ -188,6 +188,23 @@ module ApplicationHelper
     { badge: m["badge"], badge_css: m["badge_css"], q_label: m["panel_label"] }
   end
 
+  # Per-type "how to answer" caption (card_component's `eyebrow`), translated
+  # into every language this Verto exists in — not the full app catalog, so
+  # the inline blob stays small. Read by survey_editor_controller._writeCard
+  # when a translation tab is switched (the editor swaps card text client-side,
+  # without a server round-trip — see #survey-cards-i18n) and by
+  # type_panel_controller for the primary-locale caption when a card's type
+  # changes. Server-rendered cards (editor primary tab, player) get theirs
+  # straight from `t` in card_component instead — see display_locale there.
+  def card_eyebrows_i18n(survey)
+    survey.verto_locales.index_with do |loc|
+      CardTypes.all.each_with_object({}) do |(key, attrs), out|
+        next if attrs["eyebrow"].blank?
+        out[key] = I18n.t("card.eyebrow.#{key}", locale: loc, default: attrs["eyebrow"])
+      end
+    end
+  end
+
   # Images present under app/assets/images/verto-library/, grouped by
   # sub-folder (`backgrounds`, `left-panel`, `select-art`, `range-art`,
   # `swipe-cards`, `mobile-backgrounds`, ...). Each value is an array of

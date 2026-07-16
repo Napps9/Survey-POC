@@ -33,6 +33,18 @@ fr:
     token_award_title: "Points"
     token_award_hint: "Attribués juste pour avoir répondu"
     token_checkpoint_placeholder: "Affiche les points qu'un joueur a collectés jusqu'à présent."
+    eyebrow:
+      range: "Faites glisser le curseur"
+      rating: "Touchez pour noter"
+      nps: "Faites glisser pour noter"
+      multiple_choice: "Choisissez une réponse"
+      select_many: "Sélectionnez toutes les réponses qui s'appliquent"
+      prioritise: "Cliquez et faites glisser pour classer par ordre de priorité"
+      yes_no: "Choisissez une réponse"
+      select_one_grid: "Choisissez une réponse"
+      select_many_grid: "Sélectionnez toutes les réponses qui s'appliquent"
+      tap_card: "Glissez pour répondre"
+      open_ended: "Saisissez votre réponse"
   auth:
     social_continue: "Continuer avec %{provider}"
     social_divider: "ou"

@@ -33,6 +33,18 @@ hi:
     token_award_title: "अंक"
     token_award_hint: "सिर्फ़ उत्तर देने पर मिलते हैं"
     token_checkpoint_placeholder: "दिखाता है कि खिलाड़ी ने अब तक कितने अंक अर्जित किए हैं।"
+    eyebrow:
+      range: "स्लाइडर खींचें"
+      rating: "रेटिंग के लिए टैप करें"
+      nps: "रेटिंग के लिए खींचें"
+      multiple_choice: "एक चुनें"
+      select_many: "सभी लागू विकल्प चुनें"
+      prioritise: "प्राथमिकता के क्रम में लगाने के लिए खींचें"
+      yes_no: "एक चुनें"
+      select_one_grid: "एक चुनें"
+      select_many_grid: "सभी लागू विकल्प चुनें"
+      tap_card: "उत्तर देने के लिए स्वाइप करें"
+      open_ended: "अपना उत्तर लिखें"
   auth:
     social_continue: "%{provider} के साथ जारी रखें"
     social_divider: "या"

@@ -15,7 +15,6 @@
   editable = (mode == :editor)
   type     = card["type"].to_s
   render_type = type
-  eyebrow  = CardTypes.eyebrow(type).presence || type.tr("_", " ")
   is_q     = CardTypes.question?(type)
   ce_attr  = editable ? "contenteditable=\"true\"".html_safe : "".html_safe
 
@@ -86,6 +85,15 @@
   # Verto's primary) — never the platform/UI locale, so a card never mixes
   # languages (e.g. an English question with Spanish Yes/No).
   display_locale   = (locale.presence || default_locale).to_s
+
+  # The "how to answer" caption (e.g. "Choose one") is per-type source data
+  # from config/card_types.yml, translated the same way as everything else on
+  # the card: it follows display_locale, not the platform/UI locale. The
+  # editor swaps this client-side when a translation tab is switched — see
+  # survey_editor_controller.js _writeCard, fed by the #card-eyebrows-i18n
+  # blob emitted in surveys/show.html.erb.
+  eyebrow = t("card.eyebrow.#{type}", locale: display_locale,
+              default: CardTypes.eyebrow(type).presence || type.tr("_", " "))
 %>
 
 <div class="split-right">

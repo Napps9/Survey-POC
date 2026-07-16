@@ -35,6 +35,7 @@ export default class extends Controller {
 
   connect() {
     this._activeLocale = this.defaultLocaleValue
+    this._eyebrows = this._loadEyebrows()
     this._seedStore()
     this.refreshAll()
 
@@ -106,6 +107,18 @@ export default class extends Controller {
     this.refreshAll()
   }
 
+  // Per-locale "how to answer" captions (e.g. "Choose one"), keyed by locale
+  // then card type — see application_helper.rb#card_eyebrows_i18n. Read once
+  // at connect(); the blob is re-rendered by the server on every full page
+  // load, same as _seedStore's source.
+  _loadEyebrows() {
+    try {
+      return JSON.parse(document.getElementById("card-eyebrows-i18n")?.textContent || "{}")
+    } catch (_) {
+      return {}
+    }
+  }
+
   _seedStore() {
     this._store = new Map()
     let data = []
@@ -151,7 +164,7 @@ export default class extends Controller {
     }
   }
 
-  _writeCard(cardEl, content, fallback) {
+  _writeCard(cardEl, content, fallback, locale) {
     content = content || {}; fallback = fallback || {}
     const titleEl = cardEl.querySelector(".q-title, .activity-title")
     if (titleEl) titleEl.textContent = content.text || fallback.text || titleEl.textContent
@@ -161,6 +174,14 @@ export default class extends Controller {
     this._optionEls(cardEl).forEach((el, k) => {
       el.textContent = (opts[k] && opts[k].trim()) || fopts[k] || el.textContent
     })
+    // The "how to answer" caption isn't authored text (it's derived from the
+    // card's type), so it isn't in the i18n store above — look it up straight
+    // from the eyebrows blob for the locale being shown.
+    const eyebrowEl = cardEl.querySelector(".q-eyebrow")
+    if (eyebrowEl && locale) {
+      const caption = (this._eyebrows[locale] || {})[cardEl.dataset.cardType]
+      if (caption) eyebrowEl.textContent = caption
+    }
     this.refreshCard(cardEl)
   }
 
@@ -176,7 +197,7 @@ export default class extends Controller {
     const primary = this.defaultLocaleValue
     this.cardTargets.forEach(el => {
       const entry = this._store.get(el) || {}
-      this._writeCard(el, entry[locale], entry[primary])
+      this._writeCard(el, entry[locale], entry[primary], locale)
     })
   }
 
@@ -478,7 +499,7 @@ export default class extends Controller {
     this._store.set(newEl, entry)
     // If a translation tab is active, show that language on the swapped-in card.
     if (this._activeLocale !== this.defaultLocaleValue) {
-      this._writeCard(newEl, entry[this._activeLocale], entry[this.defaultLocaleValue])
+      this._writeCard(newEl, entry[this._activeLocale], entry[this.defaultLocaleValue], this._activeLocale)
     }
 
     this.refreshCard(newEl)

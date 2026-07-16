@@ -33,6 +33,18 @@ id:
     token_award_title: "Poin"
     token_award_hint: "Didapat hanya karena menjawab"
     token_checkpoint_placeholder: "Menampilkan poin yang telah dikumpulkan pemain sejauh ini."
+    eyebrow:
+      range: "Seret slider"
+      rating: "Ketuk untuk menilai"
+      nps: "Seret untuk menilai"
+      multiple_choice: "Pilih salah satu"
+      select_many: "Pilih semua yang sesuai"
+      prioritise: "Klik dan seret untuk mengatur urutan prioritas"
+      yes_no: "Pilih salah satu"
+      select_one_grid: "Pilih salah satu"
+      select_many_grid: "Pilih semua yang sesuai"
+      tap_card: "Geser untuk menjawab"
+      open_ended: "Ketik jawaban Anda"
   auth:
     social_continue: "Lanjutkan dengan %{provider}"
     social_divider: "atau"

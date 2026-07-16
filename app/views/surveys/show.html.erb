@@ -23,6 +23,11 @@
 <%# Full cards incl. per-language i18n — the editor's language tabs swap text
     from here without a server round-trip. %>
 <script id="survey-cards-i18n" type="application/json"><%= editor_cards_i18n(@survey.cards).to_json.html_safe %></script>
+<%# Per-locale "how to answer" captions (e.g. "Choose one"), keyed by locale
+    then card type. Lets survey_editor_controller update the caption when a
+    translation tab is switched, and type_panel_controller show the right
+    caption when a card's type changes — see card_eyebrows_i18n. %>
+<script id="card-eyebrows-i18n" type="application/json"><%= card_eyebrows_i18n(@survey).to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
      data-controller="type-panel preview-verto survey-editor media-picker publish-panel brand-palette add-question logic-map"
@@ -54,6 +59,7 @@
      data-type-panel-quiz-value="<%= @survey.quiz? %>"
      data-type-panel-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-type-panel-logic-value="<%= @survey.logic? %>"
+     data-type-panel-default-locale-value="<%= @survey.default_locale %>"
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.published? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"

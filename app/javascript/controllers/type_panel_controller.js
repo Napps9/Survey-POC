@@ -30,6 +30,19 @@ function loadTypeMeta() {
   )
 }
 
+// Per-locale "how to answer" captions — see application_helper.rb
+// #card_eyebrows_i18n. Only used to caption a card just switched to a new
+// type (_applyToCard); translation tabs lock the type picker (CSS
+// .editing-translation .type-list), so this only ever needs the primary
+// locale's caption, not whichever tab happens to be active.
+function loadEyebrows() {
+  try {
+    return JSON.parse(document.getElementById("card-eyebrows-i18n")?.textContent || "{}")
+  } catch (_) {
+    return {}
+  }
+}
+
 // Read the Awareness/Intention/Agency + enabling-condition metadata the editor
 // view emits as a JSON blob (sourced from config/competencies.yml via
 // Framework.to_json). Used to label the "Why" tab badges. Same re-read-on-
@@ -429,7 +442,7 @@ export default class extends Controller {
     "whyConditionRow", "whyConditionBadge", "whyConditionBlurb"
   ]
 
-  static values = { quiz: Boolean, tokenisation: Boolean, logic: Boolean }
+  static values = { quiz: Boolean, tokenisation: Boolean, logic: Boolean, defaultLocale: { type: String, default: "en" } }
 
   // Emoji shown next to each recommended type in the side panel — 1st-4th place.
   RANK_EMOJI = ["🥇", "🥈", "🥉", "⭐"]
@@ -503,6 +516,11 @@ export default class extends Controller {
       this._typeMeta = loadTypeMeta()
     }
     return this._typeMeta
+  }
+
+  get eyebrows() {
+    if (!this._eyebrows) this._eyebrows = loadEyebrows()
+    return this._eyebrows
   }
 
   // Awareness/Intention/Agency + condition metadata for the Why tab. Lazy +
@@ -870,7 +888,9 @@ export default class extends Controller {
     if (badge) { badge.textContent = meta.badge; badge.className = `s-badge ${meta.css}` }
 
     const eyebrow = card.querySelector(".q-eyebrow")
-    if (eyebrow) eyebrow.textContent = meta.eyebrow
+    if (eyebrow) {
+      eyebrow.textContent = (this.eyebrows[this.defaultLocaleValue] || {})[type] || meta.eyebrow
+    }
 
     // 2. Swap the interactive component HTML on the RIGHT panel
     const slot = card.querySelector("[data-card-component]")

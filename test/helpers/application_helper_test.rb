@@ -121,6 +121,27 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "star", rating_icon(themed(theme: "Quarterly NPS pulse"))[:kind]
   end
 
+  # card_eyebrows_i18n feeds the #card-eyebrows-i18n island that
+  # survey_editor_controller reads when a translation tab is switched (the
+  # card_component partial itself can't re-render then — the editor swaps
+  # text client-side, no server round-trip).
+  test "card_eyebrows_i18n translates each question type's caption per Verto locale" do
+    survey = Struct.new(:verto_locales).new(%w[en es])
+    out = card_eyebrows_i18n(survey)
+
+    assert_equal %w[en es], out.keys
+    assert_equal I18n.t("card.eyebrow.multiple_choice", locale: "en"), out["en"]["multiple_choice"]
+    assert_equal I18n.t("card.eyebrow.multiple_choice", locale: "es"), out["es"]["multiple_choice"]
+    refute_equal out["en"]["multiple_choice"], out["es"]["multiple_choice"],
+                 "es translation must not silently fall back to the English caption"
+  end
+
+  test "card_eyebrows_i18n omits non-question types (welcome/checkpoint have no caption)" do
+    out = card_eyebrows_i18n(Struct.new(:verto_locales).new(%w[en]))
+    refute out["en"].key?("welcome_card")
+    refute out["en"].key?("token_checkpoint")
+  end
+
   # mini_preview_html draws the little mockup inside each add-question type
   # tile. Every pickable question type must produce one — a missing case falls
   # through to the empty `else` and the tile renders blank (the nps bug).

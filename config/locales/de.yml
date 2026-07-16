@@ -33,6 +33,18 @@ de:
     token_award_title: "Punkte"
     token_award_hint: "Wird schon fürs Antworten vergeben"
     token_checkpoint_placeholder: "Zeigt die Punkte, die ein Spieler bisher gesammelt hat."
+    eyebrow:
+      range: "Regler ziehen"
+      rating: "Tippen zum Bewerten"
+      nps: "Ziehen zum Bewerten"
+      multiple_choice: "Eine Option wählen"
+      select_many: "Alle zutreffenden Optionen wählen"
+      prioritise: "Klicken und ziehen, um nach Priorität zu ordnen"
+      yes_no: "Eine Option wählen"
+      select_one_grid: "Eine Option wählen"
+      select_many_grid: "Alle zutreffenden Optionen wählen"
+      tap_card: "Wischen, um zu antworten"
+      open_ended: "Antwort eingeben"
   auth:
     social_continue: "Weiter mit %{provider}"
     social_divider: "oder"

@@ -35,6 +35,18 @@ en:
     token_award_title: "Points"
     token_award_hint: "Awarded just for answering"
     token_checkpoint_placeholder: "Shows the points a player has collected so far."
+    eyebrow:
+      range: "Drag the slider"
+      rating: "Tap to rate"
+      nps: "Drag to rate"
+      multiple_choice: "Choose one"
+      select_many: "Choose all that apply"
+      prioritise: "Click and drag to arrange in order of priority"
+      yes_no: "Choose one"
+      select_one_grid: "Choose one"
+      select_many_grid: "Choose all that apply"
+      tap_card: "Swipe to respond"
+      open_ended: "Type your answer"
   auth:
     social_continue: "Continue with %{provider}"
     social_divider: "or"

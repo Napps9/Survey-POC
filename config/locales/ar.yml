@@ -33,6 +33,18 @@ ar:
     token_award_title: "النقاط"
     token_award_hint: "تُمنح لمجرد الإجابة"
     token_checkpoint_placeholder: "يعرض النقاط التي جمعها اللاعب حتى الآن."
+    eyebrow:
+      range: "اسحب شريط التمرير"
+      rating: "اضغط للتقييم"
+      nps: "اسحب للتقييم"
+      multiple_choice: "اختر خيارًا واحدًا"
+      select_many: "اختر كل ما ينطبق"
+      prioritise: "اضغط واسحب لترتيبها حسب الأولوية"
+      yes_no: "اختر خيارًا واحدًا"
+      select_one_grid: "اختر خيارًا واحدًا"
+      select_many_grid: "اختر كل ما ينطبق"
+      tap_card: "اسحب للإجابة"
+      open_ended: "اكتب إجابتك"
   auth:
     social_continue: "المتابعة عبر %{provider}"
     social_divider: "أو"
