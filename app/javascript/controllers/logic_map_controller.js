@@ -25,6 +25,8 @@ const ROW_GAP = 40
 const MARGIN = 56
 // Corner radius for the orthogonal connectors that thread the gutters.
 const CONNECTOR_R = 14
+// Distinct colours cycled across branch lanes so each reads as a unit.
+const LANE_PALETTE = ["#8B85FF", "#01EACB", "#F59E0B", "#F472B6", "#38BDF8", "#A3E635"]
 
 export default class extends Controller {
   static targets = ["overlay", "svg", "empty"]
@@ -134,7 +136,51 @@ export default class extends Controller {
     })
 
     const allNodes = [...nodes, ...endNodes.values()]
-    return { nodes, allNodes, endNodes, edges, nodeByKey }
+    const graph = { nodes, allNodes, endNodes, edges, nodeByKey }
+    this._attachLanes(graph, cards)
+    return graph
+  }
+
+  // Derive branch "lanes" from the wiring so a branch reads as a labelled,
+  // colour-grouped unit. A lane = an answer route into a PRIVATE region: the
+  // route's target card has in-degree 1 (reached only through that route), and
+  // the lane is the continuation chain of such private cards up to the rejoin
+  // (the first shared card, in-degree > 1). Each node gets n.lane {label,color}
+  // and n.laneEntry. Nested sub-branches surface as their own lanes. No stored
+  // data — the label defaults to the answer value (or a card's lane_label).
+  _attachLanes(graph, cards) {
+    const { nodes, edges } = graph
+    const byCid = new Map(cards.map(c => [c.cid, c]))
+    const idxOf = new Map(cards.map((c, i) => [c.cid, i]))
+    const indeg = new Map(nodes.map(n => [n.key, 0]))
+    edges.forEach(e => { if (e.to && indeg.has(e.to)) indeg.set(e.to, indeg.get(e.to) + 1) })
+
+    const laneOf = new Map()
+    let laneCount = 0
+    cards.forEach(c => {
+      const routes = (c.logic && Array.isArray(c.logic.routes)) ? c.logic.routes : []
+      routes.forEach(r => {
+        const to = r && r.to && r.to.card
+        if (!to || !byCid.has(to) || indeg.get(to) !== 1 || laneOf.has(to)) return
+        const members = []
+        let cur = to, budget = cards.length + 1
+        while (cur && byCid.has(cur) && indeg.get(cur) === 1 && !laneOf.has(cur) && budget-- > 0) {
+          members.push(cur)
+          const cc = byCid.get(cur)
+          let nxt = (cc.next && cc.next.card) ? cc.next.card
+                  : (cc.logic && cc.logic.default && cc.logic.default.card) ? cc.logic.default.card
+                  : null
+          if (!nxt) { const ii = idxOf.get(cur); nxt = (ii != null && ii + 1 < cards.length) ? cards[ii + 1].cid : null }
+          cur = nxt
+        }
+        if (!members.length) return
+        const label = (byCid.get(to).lane_label || (r.match && r.match.value) || "Branch").toString()
+        const lane = { entry: to, label, color: LANE_PALETTE[laneCount % LANE_PALETTE.length] }
+        laneCount++
+        members.forEach(m => laneOf.set(m, lane))
+      })
+    })
+    nodes.forEach(n => { const lane = laneOf.get(n.key); if (lane) { n.lane = lane; n.laneEntry = lane.entry === n.key } })
   }
 
   // Longest-path layering from the entry (card 0), cycle-safe. End nodes sit one
@@ -347,6 +393,13 @@ export default class extends Controller {
     fo.setAttribute("width", n.w); fo.setAttribute("height", n.h)
     const box = document.createElementNS(XHTML, "div")
     box.setAttribute("class", `lm-card-box${n.unreachable ? " lm-card-unreachable" : ""}`)
+    // Lane grouping: tint the frame in the lane's colour so a branch's cards
+    // read as one unit.
+    if (n.lane) {
+      box.style.borderColor = n.lane.color
+      box.style.borderWidth = "2px"
+      box.style.boxShadow = `0 0 0 3px ${n.lane.color}22`
+    }
     // Carry the Verto's brand palette onto the clone so its design renders true.
     const srcWrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(n.key)}"]`)
     if (srcWrap) {
@@ -366,6 +419,10 @@ export default class extends Controller {
     }
     fo.appendChild(box)
     g.appendChild(fo)
+
+    // Lane label chip on the branch's entry card — names the lane (defaults to
+    // the answer that opens it), sitting just above the card in the lane colour.
+    if (n.lane && n.laneEntry) g.appendChild(this._laneChip(n))
 
     // A transparent hit layer over the card: click to jump to it, and it's the
     // drop target for a dragged route (the card clone itself is pointer-inert).
@@ -396,6 +453,20 @@ export default class extends Controller {
           (ev) => this._beginConnect(n.key, "__next__", n.x + n.w, n.y + py, ev)))
       }
     }
+    return g
+  }
+
+  // The lane's name chip, drawn just above its entry card in the lane colour.
+  _laneChip(n) {
+    const g = this._g()
+    const label = "⎇ " + this._trunc(n.lane.label, 18)
+    const w = Math.min(n.w, 20 + label.length * 6.4)
+    const rect = document.createElementNS(SVG, "rect")
+    rect.setAttribute("x", 0); rect.setAttribute("y", -25)
+    rect.setAttribute("width", w); rect.setAttribute("height", 20); rect.setAttribute("rx", 10)
+    rect.setAttribute("fill", n.lane.color)
+    g.appendChild(rect)
+    g.appendChild(this._text(9, -11, label, { size: 11, fill: "#14172A" }))
     return g
   }
 
