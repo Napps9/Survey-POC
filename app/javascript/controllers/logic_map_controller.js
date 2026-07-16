@@ -142,45 +142,75 @@ export default class extends Controller {
   }
 
   // Derive branch "lanes" from the wiring so a branch reads as a labelled,
-  // colour-grouped unit. A lane = an answer route into a PRIVATE region: the
-  // route's target card has in-degree 1 (reached only through that route), and
-  // the lane is the continuation chain of such private cards up to the rejoin
-  // (the first shared card, in-degree > 1). Each node gets n.lane {label,color}
-  // and n.laneEntry. Nested sub-branches surface as their own lanes. No stored
-  // data — the label defaults to the answer value (or a card's lane_label).
+  // colour-grouped unit — with correct NESTING. A lane starts at a branch entry
+  // (the target of an answer route) and its members are the cards that entry
+  // DOMINATES: every path from the deck start to them passes through the entry.
+  // Dominators (vs a simple in-degree walk) keep a parent lane intact past the
+  // point where a sub-branch rejoins it, and make nested sub-branches fall out
+  // as smaller lanes contained in their parent. Each node gets its innermost
+  // containing lane (n.lane {label,color}), n.laneEntry, n.laneDepth, and
+  // n.laneParent (the enclosing lane, for a nested chip). No stored data — the
+  // label defaults to the answer value (or a card's lane_label).
   _attachLanes(graph, cards) {
-    const { nodes, edges } = graph
+    const { nodes } = graph
+    const cids = cards.map(c => c.cid).filter(Boolean)
+    if (!cids.length) return
     const byCid = new Map(cards.map(c => [c.cid, c]))
-    const idxOf = new Map(cards.map((c, i) => [c.cid, i]))
-    const indeg = new Map(nodes.map(n => [n.key, 0]))
-    edges.forEach(e => { if (e.to && indeg.has(e.to)) indeg.set(e.to, indeg.get(e.to) + 1) })
+    const start = cids[0]
 
-    const laneOf = new Map()
-    let laneCount = 0
+    // Card→card flow adjacency (routes + default/next + linear), ends dropped.
+    const adj = new Map(cids.map(c => [c, []]))
+    const link = (from, to) => { if (byCid.has(to) && adj.has(from)) adj.get(from).push(to) }
+    cards.forEach((c, i) => {
+      let covered = false
+      const L = c.logic
+      if (L && Array.isArray(L.routes)) L.routes.forEach(r => { if (r && r.to && r.to.card) link(c.cid, r.to.card) })
+      if (L && L.default && (L.default.card || L.default.end)) { covered = true; if (L.default.card) link(c.cid, L.default.card) }
+      if (!covered && c.next && (c.next.card || c.next.end)) { covered = true; if (c.next.card) link(c.cid, c.next.card) }
+      if (!covered && i + 1 < cards.length && cards[i + 1].cid) link(c.cid, cards[i + 1].cid)
+    })
+
+    // Cards reachable from the start, optionally with one card removed.
+    const reach = (skip) => {
+      const seen = new Set(), stack = [start]
+      while (stack.length) {
+        const x = stack.pop()
+        if (x === skip || seen.has(x) || !adj.has(x)) continue
+        seen.add(x)
+        adj.get(x).forEach(y => { if (y !== skip) stack.push(y) })
+      }
+      return seen
+    }
+    const reach0 = reach(null)
+
+    // A lane per answer-route target: its members are the cards it dominates
+    // (reachable normally, but not once the entry is removed).
+    const lanes = []
+    const seenEntry = new Set()
     cards.forEach(c => {
-      const routes = (c.logic && Array.isArray(c.logic.routes)) ? c.logic.routes : []
-      routes.forEach(r => {
-        const to = r && r.to && r.to.card
-        if (!to || !byCid.has(to) || indeg.get(to) !== 1 || laneOf.has(to)) return
-        const members = []
-        let cur = to, budget = cards.length + 1
-        while (cur && byCid.has(cur) && indeg.get(cur) === 1 && !laneOf.has(cur) && budget-- > 0) {
-          members.push(cur)
-          const cc = byCid.get(cur)
-          let nxt = (cc.next && cc.next.card) ? cc.next.card
-                  : (cc.logic && cc.logic.default && cc.logic.default.card) ? cc.logic.default.card
-                  : null
-          if (!nxt) { const ii = idxOf.get(cur); nxt = (ii != null && ii + 1 < cards.length) ? cards[ii + 1].cid : null }
-          cur = nxt
-        }
-        if (!members.length) return
-        const label = (byCid.get(to).lane_label || (r.match && r.match.value) || "Branch").toString()
-        const lane = { entry: to, label, color: LANE_PALETTE[laneCount % LANE_PALETTE.length] }
-        laneCount++
-        members.forEach(m => laneOf.set(m, lane))
+      if (!c.logic || !Array.isArray(c.logic.routes)) return
+      c.logic.routes.forEach(r => {
+        const E = r && r.to && r.to.card
+        if (!E || !byCid.has(E) || !reach0.has(E) || seenEntry.has(E)) return
+        seenEntry.add(E)
+        const without = reach(E)
+        const members = new Set([...reach0].filter(x => x === E || !without.has(x)))
+        const label = (byCid.get(E).lane_label || (r.match && r.match.value) || "Branch").toString()
+        lanes.push({ entry: E, label, members })
       })
     })
-    nodes.forEach(n => { const lane = laneOf.get(n.key); if (lane) { n.lane = lane; n.laneEntry = lane.entry === n.key } })
+    lanes.forEach((l, i) => { l.color = LANE_PALETTE[i % LANE_PALETTE.length] })
+
+    // Each card takes its INNERMOST containing lane (smallest member set) as its
+    // colour; the next-larger containing lane is its parent (for a nested chip).
+    nodes.forEach(n => {
+      const containing = lanes.filter(l => l.members.has(n.key)).sort((a, b) => a.members.size - b.members.size)
+      if (!containing.length) return
+      n.lane = containing[0]
+      n.laneEntry = containing[0].entry === n.key
+      n.laneDepth = containing.length
+      n.laneParent = containing[1] || null
+    })
   }
 
   // Longest-path layering from the entry (card 0), cycle-safe. End nodes sit one
@@ -457,9 +487,11 @@ export default class extends Controller {
   }
 
   // The lane's name chip, drawn just above its entry card in the lane colour.
+  // A nested lane is prefixed with its parent's name ("UK ▸ No") so depth reads.
   _laneChip(n) {
     const g = this._g()
-    const label = "⎇ " + this._trunc(n.lane.label, 18)
+    const prefix = n.laneParent ? this._trunc(n.laneParent.label, 10) + " ▸ " : ""
+    const label = "⎇ " + prefix + this._trunc(n.lane.label, 16)
     const w = Math.min(n.w, 20 + label.length * 6.4)
     const rect = document.createElementNS(SVG, "rect")
     rect.setAttribute("x", 0); rect.setAttribute("y", -25)
