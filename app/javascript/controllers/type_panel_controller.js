@@ -976,7 +976,7 @@ export default class extends Controller {
   _mountNpsLottie(card) {
     const left = card.querySelector(".split-left")
     if (!left || left.querySelector(".nps-lottie")) return
-    // Honour the card's chosen theme; fall back to the default baseball set.
+    // Honour the card's chosen theme; fall back to the default basketball set.
     const theme = card.dataset.cardRangeTheme || ""
     const urls = this._rangeThemePicker.themes.find(th => th.slug === theme)?.urls || this._npsLottieUrls
     if (!urls.length) return

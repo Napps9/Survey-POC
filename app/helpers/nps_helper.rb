@@ -10,14 +10,14 @@ module NpsHelper
   # frames; the range slider maps its position proportionally onto these. Kept
   # separate from NPS_STEPS so the two move independently.
   NPS_FRAMES = 5
-  NPS_THEME  = "baseball".freeze # default reaction theme when a card doesn't pick one
+  NPS_THEME  = "basketball".freeze # default reaction theme when a card doesn't pick one
 
   # Every selectable reaction-animation theme. Each is a folder
   # app/assets/lottie/<slug>/ holding 1..5.json (the five slider states). To add
   # a set: drop the folder in and add its slug here. NPS_THEME must be one of
   # these; Survey.sanitize_cards_images! whitelists a card's range_theme against
   # this list.
-  RANGE_THEMES = %w[baseball football football_goal stopwatch
+  RANGE_THEMES = %w[basketball football football_goal stopwatch
                     sun flowers recycling balance pizza radar calendar].freeze
 
   def nps_card?(card)
