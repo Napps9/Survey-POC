@@ -23,6 +23,8 @@ const END_H = 66
 const COL_GAP = 130
 const ROW_GAP = 40
 const MARGIN = 56
+// Corner radius for the orthogonal connectors that thread the gutters.
+const CONNECTOR_R = 14
 
 export default class extends Controller {
   static targets = ["overlay", "svg", "empty"]
@@ -254,8 +256,7 @@ export default class extends Controller {
     }[e.kind] || { stroke: "rgba(255,255,255,0.3)", dash: "", marker: "arrow-faint", w: 1.4 }
 
     const g = this._g()
-    const dx = Math.max(40, Math.abs(tx - sx))
-    const d = `M ${sx} ${sy} C ${sx + dx * 0.5} ${sy}, ${tx - dx * 0.5} ${ty}, ${tx} ${ty}`
+    const d = this._connectorPath(sx, sy, tx, ty)
 
     // When editing, a fat invisible hit-path makes the connector easy to click
     // to remove (reverts that answer to the default flow).
@@ -282,11 +283,13 @@ export default class extends Controller {
     g.appendChild(path)
 
     if (e.label) {
-      // Place the label partway ALONG its own edge (not at the shared source),
-      // so several routes leaving one card don't stack their labels.
+      // Sit the label on this edge's first horizontal run, in the clear gutter
+      // just right of its source port — at the port's own height, so several
+      // routes leaving one card keep their labels separated (never stacked).
+      const forward = tx > sx + 2 * CONNECTOR_R
       const t = document.createElementNS(SVG, "text")
-      t.setAttribute("x", sx + (tx - sx) * 0.42)
-      t.setAttribute("y", sy + (ty - sy) * 0.42 - 6)
+      t.setAttribute("x", forward ? sx + (tx - sx) * 0.25 : sx + (tx - sx) * 0.42)
+      t.setAttribute("y", forward ? sy - 6 : sy + (ty - sy) * 0.42 - 6)
       t.setAttribute("text-anchor", "middle")
       t.setAttribute("fill", e.kind === "dangling" ? "#F87171" : (e.kind === "route" ? "#01EACB" : "rgba(255,255,255,0.5)"))
       t.setAttribute("font-size", "11"); t.setAttribute("font-family", "'ABeeZee', sans-serif")
@@ -294,6 +297,31 @@ export default class extends Controller {
       g.appendChild(t)
     }
     return g
+  }
+
+  // An orthogonal "elbow" connector routed through the empty gutter BETWEEN the
+  // two card columns: it leaves the source horizontally, makes its whole vertical
+  // turn in the clear channel (mid-way between the cards, where no card sits), then
+  // enters the target horizontally. This keeps the line outside every card body so
+  // its full path stays visible — cards no longer paint over it. Corners are
+  // rounded for legibility. Back/overlapping edges (cycles, no forward gutter) keep
+  // the soft Bézier, since there is no clean channel to route them through.
+  _connectorPath(sx, sy, tx, ty) {
+    const R = CONNECTOR_R
+    if (tx > sx + 2 * R) {
+      const midX = (sx + tx) / 2
+      if (Math.abs(ty - sy) < 1) return `M ${sx} ${sy} L ${tx} ${ty}` // straight — same height
+      const dirY = ty > sy ? 1 : -1
+      const r = Math.min(R, (tx - sx) / 2, Math.abs(ty - sy) / 2)
+      return `M ${sx} ${sy}` +
+        ` H ${midX - r}` +
+        ` Q ${midX} ${sy} ${midX} ${sy + dirY * r}` +
+        ` V ${ty - dirY * r}` +
+        ` Q ${midX} ${ty} ${midX + r} ${ty}` +
+        ` H ${tx}`
+    }
+    const dx = Math.max(40, Math.abs(tx - sx))
+    return `M ${sx} ${sy} C ${sx + dx * 0.5} ${sy}, ${tx - dx * 0.5} ${ty}, ${tx} ${ty}`
   }
 
   _cardNode(n) {
