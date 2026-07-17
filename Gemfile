@@ -38,6 +38,7 @@ gem "bootsnap", require: false
 # Anthropic Claude SDK
 gem "anthropic", "~> 1.40"
 gem "csv"
+gem "rubyzip", "~> 2.3", require: "zip" # bulk brand-asset import (extract a zip of images)
 
 # AI results report → PDF download + Google Doc
 gem "kramdown"               # Markdown → HTML for the report body
