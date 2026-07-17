@@ -8,6 +8,32 @@ class FunderFlowTest < ActionDispatch::IntegrationTest
     sign_in @admin
   end
 
+  # Security regression: a funder join link is an admin/licensee Invite into the
+  # funder-owner's OWN org. It must never be redeemable via the member-join path
+  # (/invites/:token), where it would mint an admin membership in the owner org.
+  test "a licensee (funder) invite cannot be redeemed as an org membership via /invites" do
+    fu = @oa.funders.create!(name: "Fund", seat_count: 2)
+    invite = @oa.invites.create!(
+      email_address: "link-#{SecureRandom.hex(4)}@funder.invite",
+      role: "admin", kind: "licensee", funder: fu, invited_by: @admin, expires_at: 14.days.from_now
+    )
+    reset! # anonymous attacker holding the link
+
+    # The member-join page must not render for a licensee invite.
+    get invite_path(invite.token)
+    assert_redirected_to funder_invite_path(invite.token)
+
+    # And the accept endpoint must not create a membership in the owner org.
+    assert_no_difference -> { @oa.reload.memberships.count } do
+      assert_no_difference -> { User.count } do
+        post accept_invite_path(invite.token),
+             params: { name: "Attacker", password: "verylongpassword", password_confirmation: "verylongpassword" }
+      end
+    end
+    assert_redirected_to funder_invite_path(invite.token)
+    refute invite.reload.accepted?, "the licensee invite must not be marked accepted via the member path"
+  end
+
   test "creator creates a funder, invites and adds a licensed org" do
     get funders_path
     assert_response :success

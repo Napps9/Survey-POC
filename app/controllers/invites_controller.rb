@@ -57,8 +57,14 @@ class InvitesController < ApplicationController
       else
         accept_partner_invite
       end
-    else
+    elsif @invite.member?
       accept_member_invite
+    else
+      # Defence in depth: only member/partner invites are redeemable here.
+      # (licensee is already redirected in load_invite.) Never fall a non-member
+      # invite through to accept_member_invite, which would grant its role in the
+      # invite's organisation.
+      redirect_to new_session_path, alert: "This invite can't be used here."
     end
   rescue ActiveRecord::RecordInvalid => e
     flash.now[:alert] = e.record.errors.full_messages.first
@@ -259,7 +265,16 @@ class InvitesController < ApplicationController
   def load_invite
     @invite = Invite.find_by(token: params[:token])
     unless @invite
-      redirect_to new_session_path, alert: "Invite not found."
+      redirect_to new_session_path, alert: "Invite not found." and return
+    end
+    # Licensee (funder) invites are ADMIN invites into the funder-owner's own
+    # organisation and must ONLY be redeemed through the funder-acceptance flow
+    # (which scopes them and assigns a licensee seat, not org admin). Redeeming
+    # one here would drop the holder straight into accept_member_invite and mint
+    # an admin membership in the owner's org — a full takeover. Send them to the
+    # correct flow instead.
+    if @invite.licensee?
+      redirect_to funder_invite_path(@invite.token)
     end
   end
 end
