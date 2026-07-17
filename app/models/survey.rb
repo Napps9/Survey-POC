@@ -145,13 +145,21 @@ class Survey < ApplicationRecord
   # only point at Pexels. Other card fields are untouched. When a card has no
   # image, any orphaned credit is dropped.
   def self.sanitize_cards_images!(cards)
+    seen_cids = Set.new
     Array(cards).map do |card|
       next card unless card.is_a?(Hash)
       c = card.dup
       # Every card carries a stable opaque id so answer-branching can target it
-      # by cid (not array index). The editor serialiser sends one; this is the
-      # backstop for AI/import/hand-crafted cards that arrive without one.
-      c["cid"] = c["cid"].to_s.strip.presence || "c_#{SecureRandom.hex(3)}"
+      # by cid (not array index). Backfill a missing cid AND de-dupe collisions:
+      # two cards sharing a cid (from a duplicated/imported/hand-crafted deck)
+      # would make a `{card: X}` route resolve to whichever card is last and
+      # orphan the other, so any blank-or-already-seen cid is reassigned a fresh
+      # unique one (the first occurrence keeps the id, so existing routes to it
+      # still resolve).
+      cid = c["cid"].to_s.strip
+      cid = "c_#{SecureRandom.hex(4)}" while cid.blank? || seen_cids.include?(cid)
+      seen_cids << cid
+      c["cid"] = cid
       c.delete("logic") unless c["logic"].is_a?(Hash) # drop malformed logic blocks
       # The unconditional flow pointer (any card type) — drop unless it's a valid
       # { "card" => cid } / { "end" => id } target (see LogicGraph.card_next).
@@ -306,10 +314,13 @@ class Survey < ApplicationRecord
   def self.remap_card_logic!(cards)
     cards  = Array(cards)
     id_map = {}
+    used   = Set.new
     cards.each do |card|
       next unless card.is_a?(Hash)
       old   = card["cid"].to_s
-      fresh = "c_#{SecureRandom.hex(3)}"
+      fresh = "c_#{SecureRandom.hex(4)}"
+      fresh = "c_#{SecureRandom.hex(4)}" while used.include?(fresh) # guarantee uniqueness
+      used << fresh
       id_map[old] = fresh if old.present?
       card["cid"] = fresh
     end

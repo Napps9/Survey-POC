@@ -39,6 +39,20 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil Survey.sanitize_background_image("https://evil.example.com/x.jpg")
   end
 
+  test "sanitize_cards_images! de-dupes shared cids and backfills missing ones" do
+    cards = [
+      { "type" => "multiple_choice", "text" => "A", "cid" => "c_dup" },
+      { "type" => "multiple_choice", "text" => "B", "cid" => "c_dup" }, # collision
+      { "type" => "multiple_choice", "text" => "C" }                     # missing
+    ]
+    cids = Survey.sanitize_cards_images!(cards).map { |c| c["cid"] }
+
+    assert_equal cids.size, cids.uniq.size, "every card must end with a unique cid"
+    assert_equal "c_dup", cids[0], "the first occurrence keeps its cid (existing routes still resolve)"
+    refute_equal "c_dup", cids[1], "the duplicate is reassigned a fresh cid"
+    assert cids[2].present?, "a missing cid is backfilled"
+  end
+
   test "sanitize_cards_images! scrubs image and option_images, leaves other fields" do
     cards = [
       { "type" => "multiple_choice", "text" => "Q", "image" => PEXELS_URL },
