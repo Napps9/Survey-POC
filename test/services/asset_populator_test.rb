@@ -46,8 +46,11 @@ class AssetPopulatorTest < ActiveSupport::TestCase
           "tap_card #{i} option_images count must match options count"
         c["option_images"].each { |u| assert_includes u, "verto-library/swipe-cards/" }
       when "range"
-        # Range shows the reactive Lottie on its left panel — no still image.
+        # Range shows the reactive Lottie on its left panel — no still image,
+        # but it does get a reaction-animation theme (its equivalent asset pick).
         assert_nil c["image"], "range card must not get a left-panel still"
+        assert_includes NpsHelper::RANGE_THEMES, c["range_theme"],
+          "range card must get a known reaction-animation theme"
       else
         assert c["image"].present?, "card #{i} (#{c['type']}) has no image"
       end
@@ -171,6 +174,61 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     s2_opts = s2.reload.cards.flat_map { |c| Array(c["option_images"]) }
     refute_equal s1_opts, s2_opts,
       "two different seeds should usually pick different swipe-card art across 18 statements"
+  end
+
+  # ── Range reaction-animation theme (Shuffle re-rolls it, like every asset) ──
+
+  test "populate! gives each range card a theme-matched reaction animation" do
+    s = make_survey(theme: "Climate action", audience_age: "all",
+                    cards: [ { "type" => "range", "text" => "How worried are you?",
+                               "options" => %w[Low Medium High] } ])
+
+    AssetPopulator.new(s).populate!
+
+    pool = NpsHelper.range_themes_for(AssetPopulator.theme_keywords("Climate action"))
+    assert_includes pool, s.reload.cards[0]["range_theme"],
+      "the applied animation must come from the theme-matched pool"
+    refute_includes pool, "basketball",
+      "an off-theme sport animation must not be eligible for a climate Verto"
+  end
+
+  test "populate! range animation falls back to the General group off-theme" do
+    s = make_survey(theme: "Something totally unrelated xyzzy", audience_age: "all",
+                    cards: [ { "type" => "range", "text" => "How do you feel?", "options" => %w[Bad Ok Good] } ])
+
+    AssetPopulator.new(s).populate!
+
+    assert_includes NpsHelper::RANGE_THEME_FALLBACK, s.reload.cards[0]["range_theme"]
+  end
+
+  test "same seed produces the same range animation theme" do
+    cards = [ { "type" => "range", "text" => "How hard?", "options" => %w[a b c] } ] * 4
+    s1 = make_survey(theme: "Sport fans", audience_age: "18-24", cards: cards.deep_dup)
+    s2 = make_survey(theme: "Sport fans", audience_age: "18-24", cards: cards.deep_dup)
+
+    AssetPopulator.new(s1, seed: "fixed-seed").populate!
+    AssetPopulator.new(s2, seed: "fixed-seed").populate!
+
+    assert_equal s1.reload.cards.map { |c| c["range_theme"] },
+                 s2.reload.cards.map { |c| c["range_theme"] }
+  end
+
+  test "shuffle (different seed) re-rolls the range animation" do
+    cards = (1..8).map { { "type" => "range", "text" => "How much?", "options" => %w[a b c] } }
+    s1 = make_survey(theme: "Sport fans", audience_age: "18-24", cards: cards.deep_dup)
+    s2 = make_survey(theme: "Sport fans", audience_age: "18-24", cards: cards.deep_dup)
+
+    AssetPopulator.new(s1, seed: "seed-A").populate!
+    AssetPopulator.new(s2, seed: "seed-B").populate!
+
+    themes1 = s1.reload.cards.map { |c| c["range_theme"] }
+    themes2 = s2.reload.cards.map { |c| c["range_theme"] }
+    # Both stay within the theme's animation pool…
+    pool = NpsHelper.range_themes_for(AssetPopulator.theme_keywords("Sport fans"))
+    (themes1 + themes2).each { |t| assert_includes pool, t }
+    # …but two different seeds re-roll the sequence (like the image shuffle test).
+    refute_equal themes1, themes2,
+      "two different seeds should usually pick a different animation sequence across 8 range cards"
   end
 
   test "no duplicate left-panel pictures across cards (within Tier 1 pool)" do

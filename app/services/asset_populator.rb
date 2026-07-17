@@ -17,6 +17,11 @@
 # no repeats within a card and preferring assets not already used elsewhere
 # in the survey.
 #
+# range cards carry no still image (their left panel plays a reactive Lottie
+# character) — instead they get a `range_theme` slug, seeded and theme-matched
+# via NpsHelper.range_themes_for, so Shuffle re-rolls the animation the same
+# way it re-rolls imagery.
+#
 # Background uses manifest.backgrounds with the same scoring. If every entry
 # scores zero the seed selects one round-robin so the editor never opens
 # with a blank backdrop.
@@ -231,6 +236,9 @@ class AssetPopulator
         if card["type"].to_s == "tap_card"
           new_card["option_images"] = pick_tap_card_option_images(card, idx, swipe_used)
         end
+        if card["type"].to_s == "range"
+          new_card["range_theme"] = pick_range_theme(idx)
+        end
       rescue => e
         Rails.logger.error("[AssetPopulator] card #{idx} (#{card['type']}): #{e.class}: #{e.message}")
       end
@@ -429,6 +437,18 @@ class AssetPopulator
     urls  = picks.map { |a| asset_url(SWIPE_CARDS_DIR, a["file"]) }
     urls.each { |u| swipe_used << u }
     urls
+  end
+
+  # The reaction-animation theme for a range card. Range cards carry no still
+  # image — their left panel plays a Lottie character that reacts to the slider
+  # — so this is their equivalent asset pick. Prefers an on-theme animation
+  # (a Climate Verto reacts with recycling/flowers, not basketball), seeded so
+  # the same seed is stable and Shuffle's new seed re-rolls it, exactly like
+  # every image pick. Overwrites any prior pick as Shuffle does for imagery; the
+  # creator can still re-choose from the card's Animation picker afterwards.
+  def pick_range_theme(idx)
+    pool = NpsHelper.range_themes_for(self.class.theme_keywords(@survey.theme))
+    pool[rand_for("range-theme-#{idx}").rand(pool.size)]
   end
 
   # ── Pexels source ───────────────────────────────────────────────────────

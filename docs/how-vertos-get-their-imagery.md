@@ -34,7 +34,7 @@ this covers visuals).*
 | **Background** | One full-bleed backdrop behind the whole Verto. |
 | **Card panel** | One photo **or** one short muted video on each card's left panel (never both). Videos autoplay, looped, no sound. |
 | **Tap-card statements** | One square image per swipe statement. |
-| **Range card** | No stored image — the panel plays a reactive animation that changes with the slider (see §7). |
+| **Range card** | No stored image — the panel plays a reactive animation that changes with the slider. The animation *set* is a per-card asset in its own right: theme-matched, re-rolled by Shuffle, and overridable by the creator (see §7). |
 | **Grid / list tiles** | No photos — small subject icons matched to each option's wording (see §7). |
 | **Mobile card backdrop** | A soft image behind the card body on phones, chosen per Verto so the mobile view never looks bare. |
 
@@ -195,8 +195,16 @@ the more specific the keywords, the more precisely it will be picked.
 ## 7. What is *not* photo-driven
 
 - **Range cards** play a reactive animated character that responds to the
-  slider position (one global animation theme today; a per-theme picker is a
-  future step).
+  slider position. The animation *set* is chosen like any other asset: at
+  creation (and on every Shuffle) the populator picks a **theme-matched** set —
+  a Climate Verto reacts with recycling/flowers/sun, a Sport Verto with a
+  ball or stopwatch — falling back to a neutral "General" set when nothing is
+  on-theme. Shuffle re-rolls it with the rest of the imagery, and the creator
+  can override it per card from the card's **Animation** picker (which stays
+  the source of truth once set until the next Shuffle). The sets and their
+  theme keywords live in `NpsHelper` (`RANGE_THEME_GROUPS` /
+  `RANGE_THEME_KEYWORDS`); each slug is a folder of five Lottie frames under
+  `app/assets/lottie/<slug>/`.
 - **NPS cards** render a procedurally drawn "vessel" that fills as the score
   rises — generated on the fly and tinted with the Verto's brand colour, not
   an image file.
@@ -269,7 +277,7 @@ kids/teen Vertos, or a curated-library-only mode for young audiences.
 | Background | Pexels landscape (theme query) | Library `backgrounds` (theme-gated, never blank) | Library / Pexels / upload |
 | Card panel | Pexels portrait (theme-anchored query, must clear the relevance floor) — every 3rd media card a video | Tier 1 themed → Tier 2 type art → blank | Library / Recommended / Pexels / upload |
 | Tap statements | Pexels square, unique per statement | `swipe_cards` pool, no repeats in a card | Per-statement pick in editor |
-| Range panel | Reactive animation (always) | — | — |
+| Range panel | Reactive animation, theme-matched set (Shuffle re-rolls it) | General animation set | Per-card **Animation** picker |
 | NPS control | Procedural vessel (always) | — | — |
 | Grid/list tiles | Keyword icon or gradient (always) | — | — |
 | Mobile backdrop | Library `mobile_backgrounds`, theme-matched | Random from the pool (never empty) | — |
@@ -287,5 +295,7 @@ kids/teen Vertos, or a curated-library-only mode for young audiences.
   picker; `SurveysController#pexels_search` / `#shuffle_assets` — its
   endpoints.
 - `app/helpers/nps_helper.rb` + `lottie_player_controller.js` — the range
-  animation and NPS vessel; `app/lib/option_icon_library.rb` — grid/list
-  option icons.
+  animation and NPS vessel; `NpsHelper.range_themes_for` picks the theme-matched
+  animation set the populator/Shuffle applies as a card's `range_theme`, and
+  `survey_editor_controller.js#setRangeTheme` is the creator's override.
+  `app/lib/option_icon_library.rb` — grid/list option icons.

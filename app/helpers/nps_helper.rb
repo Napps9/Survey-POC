@@ -28,6 +28,48 @@ module NpsHelper
   # sanitisation (Survey.sanitize_cards_images!) and URL building.
   RANGE_THEMES = RANGE_THEME_GROUPS.values.flatten.freeze
 
+  # Theme keywords each animation set speaks to, so auto-population and Shuffle
+  # can prefer an on-theme animation (a Climate range card reacts with
+  # recycling/flowers/sun, not basketball) before falling back to the General
+  # group. Keys are RANGE_THEMES slugs; the vocabulary mirrors the manifest's
+  # theme clusters (app/assets/images/verto-library/manifest.yml) so a survey
+  # theme and an animation resolve against the same words the image matcher uses.
+  RANGE_THEME_KEYWORDS = {
+    "basketball"    => %w[sport sports basketball game games athletic active fitness competition team],
+    "football"      => %w[sport sports football soccer game games team athletic active competition league],
+    "football_goal" => %w[sport sports football soccer goal game games team competition tournament],
+    "stopwatch"     => %w[sport sports fitness athletic running marathon exercise workout performance speed competition],
+    "sun"           => %w[climate environment sustainability sustainable nature outdoors weather renewable energy summer eco green],
+    "flowers"       => %w[climate nature environment sustainability sustainable gardening farming green wildlife biodiversity growth conservation],
+    "recycling"     => %w[climate sustainability sustainable environment recycling renewable eco green conservation waste pollution carbon],
+    "balance"       => %w[mental mindfulness meditation stress anxiety therapy counselling calm balance depression sleep],
+    "pizza"         => %w[food foods nutrition eating meal meals restaurant cuisine snack snacks cooking diet],
+    "radar"         => %w[tech technology technological digital data online internet innovation signal search software],
+    "calendar"      => %w[work career job planning schedule productivity time education study exam business office]
+  }.freeze
+
+  # Where an off-theme Verto's animation comes from: the General group is the
+  # neutral catch-all, so nothing themed matching still yields a sensible pool
+  # (never an arbitrary sport animation on an unrelated Verto).
+  RANGE_THEME_FALLBACK = (RANGE_THEME_GROUPS["General"] || RANGE_THEMES).freeze
+
+  # Range-animation slugs suited to a survey with these (already expanded) theme
+  # keywords, best-matching first. Falls back to the General group when nothing
+  # is on-theme, so the result is never empty — a caller (AssetPopulator, and
+  # thus Shuffle) can seed-pick from it directly. Matching mirrors the image
+  # matcher: keyword overlap against RANGE_THEME_KEYWORDS. Ties keep RANGE_THEMES
+  # order so the pick is fully deterministic for a given seed + theme.
+  def self.range_themes_for(theme_keywords)
+    words  = Array(theme_keywords).map { |w| w.to_s.downcase }
+    scored = RANGE_THEMES.each_with_index.map do |slug, i|
+      [ slug, (Array(RANGE_THEME_KEYWORDS[slug]) & words).size, i ]
+    end
+    themed = scored.select { |_slug, n, _i| n.positive? }
+                   .sort_by { |_slug, n, i| [ -n, i ] }
+                   .map(&:first)
+    themed.presence || RANGE_THEME_FALLBACK
+  end
+
   def nps_card?(card)
     card["type"].to_s == "nps"
   end

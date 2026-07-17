@@ -53,4 +53,35 @@ class NpsHelperTest < ActionView::TestCase
     slugs = range_theme_picker_data[:groups].flat_map { |g| g[:slugs] }
     assert_equal NpsHelper::RANGE_THEMES.sort, slugs.sort
   end
+
+  # ── range_themes_for (auto-population / Shuffle theme matching) ────────────
+
+  test "RANGE_THEME_KEYWORDS covers every theme slug" do
+    assert_equal NpsHelper::RANGE_THEMES.sort, NpsHelper::RANGE_THEME_KEYWORDS.keys.sort
+  end
+
+  test "range_themes_for keeps only on-theme animations, best match first" do
+    pool = NpsHelper.range_themes_for(%w[climate environment recycling])
+    assert_includes pool, "recycling"
+    assert_includes pool, "sun"
+    assert_includes pool, "flowers"
+    refute_includes pool, "basketball", "a sport animation must not match a climate theme"
+    assert_equal "recycling", pool.first, "the strongest keyword overlap ranks first"
+  end
+
+  test "range_themes_for picks sport animations for a sport theme" do
+    pool = NpsHelper.range_themes_for(%w[football team league])
+    assert(pool.all? { |slug| NpsHelper::RANGE_THEME_GROUPS["Sport"].include?(slug) },
+      "a football theme should only surface Sport animations, got #{pool.inspect}")
+  end
+
+  test "range_themes_for falls back to the General group when nothing is on-theme" do
+    assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for(%w[zzz nonsense])
+    assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for([])
+  end
+
+  test "range_themes_for is deterministic for the same keywords" do
+    assert_equal NpsHelper.range_themes_for(%w[food nutrition eating]),
+                 NpsHelper.range_themes_for(%w[food nutrition eating])
+  end
 end

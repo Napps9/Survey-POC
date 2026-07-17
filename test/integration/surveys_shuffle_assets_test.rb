@@ -36,6 +36,23 @@ class SurveysShuffleAssetsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "shuffle_assets sets a range card's reaction animation" do
+    s = @org.surveys.create!(
+      title: "S", theme: "Climate action", audience_age: "all", key_insight: "k",
+      default_locale: "en", locales: [ "en" ],
+      cards: [ { "type" => "range", "text" => "How worried are you?", "options" => %w[Low Med High] } ]
+    )
+
+    post shuffle_survey_assets_path(s)
+    assert_response :redirect
+
+    theme = s.reload.cards[0]["range_theme"]
+    assert_includes NpsHelper::RANGE_THEMES, theme, "shuffle should set a known range animation"
+    pool = NpsHelper.range_themes_for(AssetPopulator.theme_keywords("Climate action"))
+    assert_includes pool, theme, "shuffle should pick a theme-matched animation"
+    refute_includes pool, "basketball", "no off-theme sport animation for a climate Verto"
+  end
+
   test "editor renders a Shuffle button" do
     s = @org.surveys.create!(
       title: "S", theme: "Sport", audience_age: "all", key_insight: "k",
