@@ -52,6 +52,21 @@ class BrandAssetImporterTest < ActiveSupport::TestCase
     assert_equal %w[a.png b.webp], filenames
   end
 
+  test "recurses into subfolders (foldered brand kit)" do
+    dir = Dir.mktmpdir
+    FileUtils.mkdir_p(File.join(dir, "Backgrounds"))
+    FileUtils.mkdir_p(File.join(dir, "Select Icons"))
+    FileUtils.mkdir_p(File.join(dir, "__MACOSX"))
+    File.binwrite(File.join(dir, "Backgrounds", "bg-1.jpg"), PNG)
+    File.binwrite(File.join(dir, "Select Icons", "icon-1.png"), PNG)
+    File.binwrite(File.join(dir, "__MACOSX", "._bg-1.jpg"), "junk")
+
+    result = BrandAssetImporter.call(org: @org, source: dir)
+
+    assert_equal 2, result.added.size
+    assert_equal %w[bg-1.jpg icon-1.png], filenames
+  end
+
   test "imports a single image file" do
     dir = Dir.mktmpdir
     path = File.join(dir, "single.svg")

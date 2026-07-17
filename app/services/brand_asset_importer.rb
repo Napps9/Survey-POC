@@ -58,10 +58,14 @@ class BrandAssetImporter
   # being slurped into memory.
   def each_candidate(path, &block)
     if File.directory?(path)
-      Dir.children(path).sort.each do |name|
-        file = File.join(path, name)
-        next if name.start_with?(".") || !File.file?(file)
-        yield name, -> { File.binread(file) }
+      # Recurse: brand kits arrive foldered (Backgrounds/, Select Icons/, …).
+      # The stored name is the basename; a dotfile anywhere in the path (e.g.
+      # __MACOSX/._x, .DS_Store) is skipped.
+      Dir.glob("**/*", base: path).sort.each do |rel|
+        file = File.join(path, rel)
+        next unless File.file?(file)
+        next if rel.split("/").any? { |seg| seg.start_with?(".") }
+        yield File.basename(rel), -> { File.binread(file) }
       end
     elsif zip?(path)
       Zip::File.open(path) do |zip|
