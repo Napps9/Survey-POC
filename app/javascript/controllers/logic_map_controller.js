@@ -855,6 +855,12 @@ export default class extends Controller {
     // it as its own `next`, so a fresh branch card SPLICES into the flow and
     // rejoins the main line instead of dead-ending at the finish.
     const rejoin = this._continuationFor(fromCid, opt)
+    // Where the source's OTHER (unmatched) answers currently continue. Splicing
+    // the new card right after the source makes it the source's linear
+    // fall-through, which would silently reroute those answers through the new
+    // card too. Capture their target now (pre-splice) so we can pin it as an
+    // explicit default below.
+    const otherwise = this._continuationFor(fromCid, "__default__")
     fetch(url, {
       method: "POST",
       headers: {
@@ -888,6 +894,14 @@ export default class extends Controller {
         if (newCid) {
           this._applyTarget(fromCid, opt, `card:${newCid}`)           // source → new card
           if (rejoin && rejoin !== `card:${newCid}`) this._setNext(newCid, rejoin) // new card → rejoin
+          // Branching a single answer of a routable card: pin the source's
+          // "otherwise" default to where its other answers were already going,
+          // so they keep their path instead of falling through into the
+          // just-spliced card. No-op for the default/flow ports (already
+          // explicit) and for non-routable cards (no default select to set).
+          if (opt !== "__default__" && opt !== "__next__" && otherwise && otherwise !== `card:${newCid}`) {
+            this._applyTarget(fromCid, "__default__", otherwise)
+          }
         } else { this._editor()?.markDirty(); this._render() }
       })
       .catch(() => { /* best-effort; the creator can add a card manually */ })
