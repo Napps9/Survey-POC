@@ -5,6 +5,19 @@ if [ -z "${LD_PRELOAD+x}" ] && [ -f /usr/lib/*/libjemalloc.so.2 ]; then
   export LD_PRELOAD="$(echo /usr/lib/*/libjemalloc.so.2)"
 fi
 
+# Active Storage (org logos + the brand asset library) persists to
+# /rails/storage — a Render persistent disk in production. A freshly mounted
+# disk can land root-owned, which the non-root app user (uid 1000) can't write.
+# Handle it without ever failing the boot: if we're root, take ownership; if
+# we're the app user and the dir isn't writable, warn loudly so the misconfig
+# shows up in the logs instead of as silent upload 500s.
+STORAGE_DIR="${RAILS_STORAGE_DIR:-/rails/storage}"
+if [ "$(id -u)" = "0" ]; then
+  mkdir -p "$STORAGE_DIR" && chown -R rails:rails "$STORAGE_DIR" || true
+elif [ -d "$STORAGE_DIR" ] && [ ! -w "$STORAGE_DIR" ]; then
+  echo "WARNING: $STORAGE_DIR is not writable by $(id -un) — Active Storage uploads will fail. Check the Render disk mount ownership." >&2
+fi
+
 # Migrate/create database on every container start when DATABASE_URL is set.
 # Note: db:seed is intentionally NOT run on boot — it matches the previous
 # native-runtime start command (db:prepare only). Seeds are create-only/

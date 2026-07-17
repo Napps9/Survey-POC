@@ -313,10 +313,18 @@ drop onto any card or background from the editor's media picker.
   :self`) and pass storage sanitisation via `Survey::ACTIVE_STORAGE_IMAGE_URL`
   (anchored to the app's own mount + an image extension; no cross-origin, no
   `url('…')` breakout).
-- **⚠ Production persistence.** Active Storage runs on the local Disk service and
-  Render mounts no persistent disk, so uploaded assets (and logos) do **not**
-  survive a deploy today. Persisting them needs a Render disk or a move to
-  S3/GCS in `storage.yml` + `production.rb` — a pre-existing gap the logo shares.
+- **Production persistence.** Active Storage runs on the local Disk service
+  (`Rails.root/storage`), backed in production by a **Render persistent disk**
+  mounted at `/rails/storage` (`render.yaml` → `disk:`), so uploaded assets and
+  logos now survive deploys. Two consequences of attaching a disk: the service
+  is pinned to a single instance and each deploy is a brief stop/start rather
+  than zero-downtime (fine here — already one `starter` instance). The disk can
+  land root-owned on a freshly mounted volume, which the non-root app user
+  can't write; `bin/docker-entrypoint` self-heals when run as root and
+  otherwise logs a loud, non-fatal warning if `/rails/storage` isn't writable,
+  so a mount-permission misconfig surfaces in the logs rather than as silent
+  upload failures. (A move to S3/GCS in `storage.yml` + `production.rb` remains
+  the alternative if object storage is ever preferred.)
 
 ## 11. Quick reference
 

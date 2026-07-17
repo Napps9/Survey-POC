@@ -15,6 +15,18 @@ services:
     # Brakeman, importmap audit) are green on GitHub.
     autoDeployTrigger: checksPass
     healthCheckPath: /up
+    # Persistent disk for Active Storage (organisation logos + the per-account
+    # brand asset library). config.active_storage.service = :local writes to
+    # Rails.root/storage = /rails/storage (WORKDIR is /rails), so the disk is
+    # mounted exactly there — without it the container filesystem is ephemeral
+    # and every deploy wipes uploaded images. NOTE: attaching a disk pins the
+    # service to a single instance and swaps zero-downtime deploys for a brief
+    # stop/start (fine here — already WEB_CONCURRENCY=1 on starter). The disk is
+    # NOT available during build/pre-deploy, only at runtime (entrypoint on).
+    disk:
+      name: storage
+      mountPath: /rails/storage
+      sizeGB: 1
     envVars:
       - key: RAILS_ENV
         value: production
