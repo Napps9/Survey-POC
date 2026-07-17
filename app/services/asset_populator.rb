@@ -447,7 +447,11 @@ class AssetPopulator
   # every image pick. Overwrites any prior pick as Shuffle does for imagery; the
   # creator can still re-choose from the card's Animation picker afterwards.
   def pick_range_theme(idx)
-    pool = NpsHelper.range_themes_for(self.class.theme_keywords(@survey.theme))
+    # Match on the Verto theme's OWN words — NOT self.class.theme_keywords, whose
+    # image-library cluster expansion over-bridges (food → lifestyle → "game")
+    # and would land a sport animation on a food Verto. NpsHelper owns the
+    # animation vocabulary and the fallback.
+    pool = NpsHelper.range_themes_for(@survey.theme)
     pool[rand_for("range-theme-#{idx}").rand(pool.size)]
   end
 

@@ -559,6 +559,11 @@ pl:
     primary: główny
     change_media: Zmień multimedia
     change_media_title: Zmień obraz tej karty
+    change_animation: "Zmień animację"
+    change_animation_title: "Zmień animację tej karty"
+    animation_modal_title: "Wybierz animację"
+    animation_modal_sub: "Ta postać reaguje, gdy respondenci przesuwają suwak. Została dobrana do motywu Twojego Verto — możesz ją zmienić w każdej chwili."
+    close: "Zamknij"
     add_design: Dodaj projekt
     add_design_title: Dodaj obraz do tej karty
     add_design_sub: Dodaj obraz, aby ożywić tę kartę

@@ -559,6 +559,11 @@ pt:
     primary: principal
     change_media: Alterar média
     change_media_title: Alterar a imagem deste cartão
+    change_animation: "Alterar animação"
+    change_animation_title: "Alterar a animação deste cartão"
+    animation_modal_title: "Escolher uma animação"
+    animation_modal_sub: "Esta personagem reage à medida que os respondentes arrastam o cursor. É escolhida para combinar com o tema do seu Verto — troque-a quando quiser."
+    close: "Fechar"
     add_design: Adicionar design
     add_design_title: Adicionar uma imagem a este cartão
     add_design_sub: Adicione uma imagem para dar vida a este cartão

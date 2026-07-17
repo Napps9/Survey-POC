@@ -48,7 +48,7 @@ class SurveysShuffleAssetsTest < ActionDispatch::IntegrationTest
 
     theme = s.reload.cards[0]["range_theme"]
     assert_includes NpsHelper::RANGE_THEMES, theme, "shuffle should set a known range animation"
-    pool = NpsHelper.range_themes_for(AssetPopulator.theme_keywords("Climate action"))
+    pool = NpsHelper.range_themes_for("Climate action")
     assert_includes pool, theme, "shuffle should pick a theme-matched animation"
     refute_includes pool, "basketball", "no off-theme sport animation for a climate Verto"
   end
@@ -61,5 +61,25 @@ class SurveysShuffleAssetsTest < ActionDispatch::IntegrationTest
     get survey_path(s)
     assert_response :success
     assert_match ">Shuffle<", response.body
+  end
+
+  test "editor renders the Change-animation CTA and picker for a range card" do
+    s = @org.surveys.create!(
+      title: "S", theme: "Climate", audience_age: "all", key_insight: "k",
+      default_locale: "en", locales: [ "en" ],
+      cards: [ { "type" => "range", "text" => "How worried?", "options" => %w[Low High], "range_theme" => "recycling" } ]
+    )
+    get survey_path(s)
+    assert_response :success
+    # The per-card CTA on the animation panel…
+    assert_match "add-animation-fab", response.body
+    assert_match "animation-picker#open", response.body
+    # …and the picker modal it opens, wired to the same controller.
+    assert_match 'data-controller="type-panel preview-verto survey-editor media-picker animation-picker', response.body
+    assert_match "animation-picker#pick", response.body
+    # Every animation set is offered as an option.
+    NpsHelper::RANGE_THEMES.each do |slug|
+      assert_match "data-slug=\"#{slug}\"", response.body, "picker should offer the #{slug} animation"
+    end
   end
 end

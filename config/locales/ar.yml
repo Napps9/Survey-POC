@@ -559,6 +559,11 @@ ar:
     primary: الأساسية
     change_media: تغيير الوسائط
     change_media_title: تغيير صورة هذه البطاقة
+    change_animation: "تغيير الرسوم المتحركة"
+    change_animation_title: "تغيير الرسوم المتحركة لهذه البطاقة"
+    animation_modal_title: "اختر رسمًا متحركًا"
+    animation_modal_sub: "تتفاعل هذه الشخصية أثناء سحب اللاعبين لشريط التمرير. اختيرت لتلائم سمة Verto الخاصة بك — يمكنك تبديلها في أي وقت."
+    close: "إغلاق"
     add_design: إضافة تصميم
     add_design_title: إضافة صورة إلى هذه البطاقة
     add_design_sub: أضف صورة لإضفاء الحيوية على هذه البطاقة

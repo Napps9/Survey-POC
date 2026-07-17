@@ -354,7 +354,11 @@
             left-panel Lottie live (survey-editor#setRangeTheme) and persists as
             the card's `range_theme`. %>
         <% cur_theme = range_theme_slug(card) %>
-        <div class="range-theme-picker">
+        <%# The animation is now changed from the "Change animation" CTA on the
+            left panel (animation-picker modal), like every other asset — this
+            <select> stays as the hidden apply path the modal drives through
+            survey-editor#setRangeTheme, so there is one code path. %>
+        <div class="range-theme-picker" hidden>
           <label class="range-theme-label"><%= t("editor.animation_theme", default: "Animation") %></label>
           <select class="range-theme-select" data-action="change->survey-editor#setRangeTheme">
             <% range_theme_groups.each do |category, opts| %>

@@ -559,6 +559,11 @@ uk:
     primary: основний
     change_media: Змінити медіа
     change_media_title: Змінити зображення цієї картки
+    change_animation: "Змінити анімацію"
+    change_animation_title: "Змінити анімацію цієї картки"
+    animation_modal_title: "Оберіть анімацію"
+    animation_modal_sub: "Цей персонаж реагує, коли респонденти перетягують повзунок. Його дібрано під тему вашого Verto — замініть його будь-коли."
+    close: "Закрити"
     add_design: Додати дизайн
     add_design_title: Додати зображення до цієї картки
     add_design_sub: Додайте зображення, щоб оживити цю картку

@@ -59,7 +59,24 @@
       in the editor (e.g. range → NPS → range) finds it ready to reappear.
       CSS hides it while a Lottie is mounted (.split-left:has(.nps-lottie) …). %>
   <% if editable %>
-    <% if has_media %>
+    <% if card["type"].to_s == "range" %>
+      <%# Range cards play a Lottie instead of an image — give the animation its
+          own "change" CTA (the animation counterpart of the media picker), on
+          the panel like every other asset's. A distinct class so the
+          .split-left:has(.nps-lottie) rule that hides the image chrome leaves
+          this one visible. %>
+      <button type="button" class="add-animation-fab"
+              data-action="click->animation-picker#open"
+              title="<%= t("editor.change_animation_title", default: "Change this card's animation") %>">
+        <span class="add-animation-fab-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+            <path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"></path>
+          </svg>
+        </span>
+        <span><%= t("editor.change_animation", default: "Change animation") %></span>
+      </button>
+    <% elsif has_media %>
       <button type="button" class="add-media-fab"
               data-action="click->media-picker#open"
               title="<%= t("editor.change_media_title") %>">

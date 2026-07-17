@@ -559,6 +559,11 @@ nl:
     primary: primair
     change_media: Media wijzigen
     change_media_title: De afbeelding van deze kaart wijzigen
+    change_animation: "Animatie wijzigen"
+    change_animation_title: "De animatie van deze kaart wijzigen"
+    animation_modal_title: "Kies een animatie"
+    animation_modal_sub: "Dit personage reageert terwijl respondenten de schuifregelaar verslepen. Het is gekozen om bij het thema van je Verto te passen — je kunt het altijd verwisselen."
+    close: "Sluiten"
     add_design: Ontwerp toevoegen
     add_design_title: Een afbeelding aan deze kaart toevoegen
     add_design_sub: Voeg een afbeelding toe om deze kaart tot leven te brengen

@@ -559,6 +559,11 @@ id:
     primary: utama
     change_media: Ubah media
     change_media_title: Ubah gambar kartu ini
+    change_animation: "Ubah animasi"
+    change_animation_title: "Ubah animasi kartu ini"
+    animation_modal_title: "Pilih animasi"
+    animation_modal_sub: "Karakter ini bereaksi saat responden menyeret slider. Dipilih agar cocok dengan tema Verto Anda — ganti kapan saja."
+    close: "Tutup"
     add_design: Tambah desain
     add_design_title: Tambahkan gambar ke kartu ini
     add_design_sub: Tambahkan gambar untuk menghidupkan kartu ini

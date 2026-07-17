@@ -559,6 +559,11 @@ ko:
     primary: 기본
     change_media: 미디어 변경
     change_media_title: 이 카드의 이미지 변경
+    change_animation: "애니메이션 변경"
+    change_animation_title: "이 카드의 애니메이션 변경"
+    animation_modal_title: "애니메이션 선택"
+    animation_modal_sub: "응답자가 슬라이더를 드래그하면 이 캐릭터가 반응해요. Verto 테마에 맞춰 선택된 캐릭터이며, 언제든지 바꿀 수 있어요."
+    close: "닫기"
     add_design: 디자인 추가
     add_design_title: 이 카드에 이미지 추가
     add_design_sub: 이미지를 추가해 카드에 생동감을 더하세요

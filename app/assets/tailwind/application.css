@@ -376,8 +376,9 @@
 .split-right .rating-wrap,
 .split-right .rotate-wrap { text-align: left; }
 
-/* ── "Add media" floating CTA on left panel ── */
-.add-media-fab {
+/* ── "Add media" / "Change animation" floating CTA on left panel ── */
+.add-media-fab,
+.add-animation-fab {
   position: absolute;
   bottom: 14px; left: 50%;
   transform: translateX(-50%);
@@ -395,13 +396,71 @@
   backdrop-filter: blur(8px);
   transition: background 0.15s, border-color 0.15s, transform 0.15s;
 }
-.add-media-fab:hover {
+.add-media-fab:hover,
+.add-animation-fab:hover {
   background: rgba(1,234,203,0.85);
   color: #1C2034;
   border-color: rgba(1,234,203,1);
 }
 .add-media-fab .add-media-fab-plus {
   font-size: 16px; line-height: 1; font-weight: 600;
+}
+/* The range card's animation CTA sits ON TOP of the mounted Lottie (which the
+   .split-left:has(.nps-lottie) rule keeps the image chrome hidden behind), so
+   it needs a z-index above the animation and its icon vertically centred. */
+.add-animation-fab { z-index: 4; }
+.add-animation-fab .add-animation-fab-icon {
+  display: inline-flex; align-items: center;
+}
+
+/* ── Animation picker grid (reuses the .media-modal-* chrome) ── */
+.anim-modal-sub {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.85rem;
+  margin: 0 0 16px;
+  line-height: 1.4;
+}
+.anim-group { margin-bottom: 18px; }
+.anim-group:last-child { margin-bottom: 0; }
+.anim-group-label {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.7rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.anim-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 12px;
+}
+.anim-option {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 10px 8px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.anim-option:hover { background: rgba(255,255,255,0.11); }
+.anim-option[aria-selected="true"] {
+  border-color: var(--brand-primary, #01EACB);
+  background: rgba(1,234,203,0.12);
+}
+.anim-option-preview {
+  width: 84px; height: 84px;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.anim-option-preview svg { width: 100% !important; height: 100% !important; }
+.anim-option-label {
+  font-size: 0.8rem;
+  font-family: "Alata", sans-serif;
+  text-align: center;
 }
 
 /* ── Media picker modal ── */

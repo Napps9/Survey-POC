@@ -559,6 +559,11 @@ de:
     primary: primär
     change_media: Medien ändern
     change_media_title: Bild dieser Karte ändern
+    change_animation: "Animation ändern"
+    change_animation_title: "Animation dieser Karte ändern"
+    animation_modal_title: "Animation auswählen"
+    animation_modal_sub: "Diese Figur reagiert, während Teilnehmende den Schieberegler ziehen. Sie passt zum Design deines Vertos – du kannst sie jederzeit austauschen."
+    close: "Schließen"
     add_design: Design hinzufügen
     add_design_title: Bild zu dieser Karte hinzufügen
     add_design_sub: Füge ein Bild hinzu, um diese Karte zum Leben zu erwecken

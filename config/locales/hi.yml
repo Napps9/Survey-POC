@@ -559,6 +559,11 @@ hi:
     primary: प्राथमिक
     change_media: मीडिया बदलें
     change_media_title: इस कार्ड की छवि बदलें
+    change_animation: "एनिमेशन बदलें"
+    change_animation_title: "इस कार्ड का एनिमेशन बदलें"
+    animation_modal_title: "एक एनिमेशन चुनें"
+    animation_modal_sub: "यह किरदार तब प्रतिक्रिया देता है जब उत्तरदाता स्लाइडर खींचते हैं। इसे आपके Verto की थीम से मेल खाने के लिए चुना गया है — इसे कभी भी बदल सकते हैं।"
+    close: "बंद करें"
     add_design: डिज़ाइन जोड़ें
     add_design_title: इस कार्ड में एक छवि जोड़ें
     add_design_sub: इस कार्ड को जीवंत बनाने के लिए एक छवि जोड़ें

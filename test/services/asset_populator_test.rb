@@ -185,11 +185,25 @@ class AssetPopulatorTest < ActiveSupport::TestCase
 
     AssetPopulator.new(s).populate!
 
-    pool = NpsHelper.range_themes_for(AssetPopulator.theme_keywords("Climate action"))
+    pool = NpsHelper.range_themes_for("Climate action")
     assert_includes pool, s.reload.cards[0]["range_theme"],
       "the applied animation must come from the theme-matched pool"
     refute_includes pool, "basketball",
       "an off-theme sport animation must not be eligible for a climate Verto"
+  end
+
+  test "populate! never lands a sport animation on a food/sustainability Verto" do
+    # Regression: the image-library cluster expansion used to bridge food -> game
+    # and shuffle a football onto a food Verto.
+    cards = (1..6).map { { "type" => "range", "text" => "How do you feel?", "options" => %w[a b c] } }
+    s = make_survey(theme: "Food and Sustainability", audience_age: "Under 35's", cards: cards)
+
+    AssetPopulator.new(s, seed: "shuffle-1").populate!
+
+    s.reload.cards.each do |c|
+      refute_includes NpsHelper::RANGE_THEME_GROUPS["Sport"], c["range_theme"],
+        "a food/sustainability Verto must never get a sport animation, got #{c['range_theme'].inspect}"
+    end
   end
 
   test "populate! range animation falls back to the General group off-theme" do
@@ -224,7 +238,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     themes1 = s1.reload.cards.map { |c| c["range_theme"] }
     themes2 = s2.reload.cards.map { |c| c["range_theme"] }
     # Both stay within the theme's animation pool…
-    pool = NpsHelper.range_themes_for(AssetPopulator.theme_keywords("Sport fans"))
+    pool = NpsHelper.range_themes_for("Sport fans")
     (themes1 + themes2).each { |t| assert_includes pool, t }
     # …but two different seeds re-roll the sequence (like the image shuffle test).
     refute_equal themes1, themes2,

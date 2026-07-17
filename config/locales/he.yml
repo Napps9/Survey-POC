@@ -559,6 +559,11 @@ he:
     primary: ראשי
     change_media: שנה מדיה
     change_media_title: שנה את תמונת הכרטיס
+    change_animation: "החלפת אנימציה"
+    change_animation_title: "החלפת האנימציה של הכרטיס הזה"
+    animation_modal_title: "בחירת אנימציה"
+    animation_modal_sub: "הדמות מגיבה כשהמשיבים גוררים את המחוון. היא נבחרה כדי להתאים לעיצוב של ה-Verto שלך — אפשר להחליף אותה בכל עת."
+    close: "סגירה"
     add_design: הוסף עיצוב
     add_design_title: הוסף תמונה לכרטיס זה
     add_design_sub: הוסף תמונה כדי להחיות את הכרטיס

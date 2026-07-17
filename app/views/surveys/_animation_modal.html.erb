@@ -1,0 +1,45 @@
+<%# Animation picker modal — opened from the "Change animation" CTA on a Range
+    card's left panel. The animation counterpart of the media picker: a grid of
+    the reaction-animation sets, grouped by category, each a small looping
+    preview. Picking one drives the card's hidden <select> so
+    survey-editor#setRangeTheme does the live swap + autosave. %>
+<div class="media-modal-backdrop"
+     data-animation-picker-target="backdrop"
+     data-action="click->animation-picker#backdropClick"
+     hidden>
+  <div class="media-modal anim-modal" data-animation-picker-target="modal">
+
+    <div class="media-modal-head">
+      <div class="media-modal-title"><%= t("editor.animation_modal_title", default: "Choose an animation") %></div>
+      <button type="button" class="media-modal-close"
+              data-action="click->animation-picker#close"
+              aria-label="<%= t("editor.close", default: "Close") %>">✕</button>
+    </div>
+
+    <div class="media-modal-body">
+      <p class="anim-modal-sub"><%= t("editor.animation_modal_sub", default: "This character reacts as respondents drag the slider. It's picked to match your Verto's theme — swap it any time.") %></p>
+
+      <% range_theme_groups.each do |category, opts| %>
+        <div class="anim-group">
+          <div class="anim-group-label"><%= category %></div>
+          <div class="anim-grid">
+            <% opts.each do |label, slug| %>
+              <button type="button" class="anim-option"
+                      role="option" aria-selected="false"
+                      data-slug="<%= slug %>"
+                      data-animation-picker-target="option"
+                      data-action="click->animation-picker#pick"
+                      title="<%= label %>">
+                <span class="anim-option-preview"
+                      data-animation-picker-target="preview"
+                      data-slug="<%= slug %>"></span>
+                <span class="anim-option-label"><%= label %></span>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>

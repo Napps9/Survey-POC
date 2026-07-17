@@ -28,24 +28,30 @@ module NpsHelper
   # sanitisation (Survey.sanitize_cards_images!) and URL building.
   RANGE_THEMES = RANGE_THEME_GROUPS.values.flatten.freeze
 
-  # Theme keywords each animation set speaks to, so auto-population and Shuffle
-  # can prefer an on-theme animation (a Climate range card reacts with
+  # Subject-specific words each animation set depicts, so auto-population and
+  # Shuffle can prefer an on-theme animation (a Climate range card reacts with
   # recycling/flowers/sun, not basketball) before falling back to the General
-  # group. Keys are RANGE_THEMES slugs; the vocabulary mirrors the manifest's
-  # theme clusters (app/assets/images/verto-library/manifest.yml) so a survey
-  # theme and an animation resolve against the same words the image matcher uses.
+  # group. Keys are RANGE_THEMES slugs.
+  #
+  # These are matched against the Verto theme's OWN words (see range_themes_for),
+  # NOT the image matcher's cluster-expanded set: those clusters deliberately
+  # bridge topics for stock-photo breadth (food ↔ lifestyle ↔ "game"), which
+  # leaks generic words like "game"/"performance" into every set and lands a
+  # football on a food Verto. So the vocabulary here is kept deliberately
+  # concrete and non-generic — a word only earns its place if a survey that
+  # literally uses it genuinely wants that animation.
   RANGE_THEME_KEYWORDS = {
-    "basketball"    => %w[sport sports basketball game games athletic active fitness competition team],
-    "football"      => %w[sport sports football soccer game games team athletic active competition league],
-    "football_goal" => %w[sport sports football soccer goal game games team competition tournament],
-    "stopwatch"     => %w[sport sports fitness athletic running marathon exercise workout performance speed competition],
-    "sun"           => %w[climate environment sustainability sustainable nature outdoors weather renewable energy summer eco green],
-    "flowers"       => %w[climate nature environment sustainability sustainable gardening farming green wildlife biodiversity growth conservation],
-    "recycling"     => %w[climate sustainability sustainable environment recycling renewable eco green conservation waste pollution carbon],
-    "balance"       => %w[mental mindfulness meditation stress anxiety therapy counselling calm balance depression sleep],
-    "pizza"         => %w[food foods nutrition eating meal meals restaurant cuisine snack snacks cooking diet],
-    "radar"         => %w[tech technology technological digital data online internet innovation signal search software],
-    "calendar"      => %w[work career job planning schedule productivity time education study exam business office]
+    "basketball"    => %w[sport sports basketball nba hoop dunk court],
+    "football"      => %w[sport sports football soccer fifa striker goalkeeper kickoff],
+    "football_goal" => %w[sport sports football soccer goal penalty striker goalkeeper],
+    "stopwatch"     => %w[sport sports running run marathon sprint race racing athletics athlete fitness gym workout exercise],
+    "sun"           => %w[climate weather sustainability sustainable environment environmental nature outdoors renewable solar energy summer eco],
+    "flowers"       => %w[climate nature flower flowers garden gardening plant plants biodiversity wildlife spring bloom growth environment sustainability],
+    "recycling"     => %w[climate recycling recycle sustainability sustainable environment environmental waste plastic pollution renewable eco carbon conservation],
+    "balance"       => %w[wellbeing wellness mental mindfulness meditation stress anxiety therapy counselling calm balance burnout mood emotional sleep],
+    "pizza"         => %w[food foods nutrition eating meal meals restaurant cuisine snack snacks cooking diet dietary hunger grocery groceries],
+    "radar"         => %w[tech technology digital data online internet innovation software cyber signal],
+    "calendar"      => %w[work career job planning schedule productivity education study student students school university exam business office meeting deadline]
   }.freeze
 
   # Where an off-theme Verto's animation comes from: the General group is the
@@ -53,16 +59,23 @@ module NpsHelper
   # (never an arbitrary sport animation on an unrelated Verto).
   RANGE_THEME_FALLBACK = (RANGE_THEME_GROUPS["General"] || RANGE_THEMES).freeze
 
-  # Range-animation slugs suited to a survey with these (already expanded) theme
-  # keywords, best-matching first. Falls back to the General group when nothing
-  # is on-theme, so the result is never empty — a caller (AssetPopulator, and
-  # thus Shuffle) can seed-pick from it directly. Matching mirrors the image
-  # matcher: keyword overlap against RANGE_THEME_KEYWORDS. Ties keep RANGE_THEMES
-  # order so the pick is fully deterministic for a given seed + theme.
-  def self.range_themes_for(theme_keywords)
-    words  = Array(theme_keywords).map { |w| w.to_s.downcase }
+  # Range-animation slugs suited to a Verto whose theme is `theme` (a string or
+  # a list of words), best-matching first. Matches the theme's OWN words against
+  # RANGE_THEME_KEYWORDS — deliberately NOT the image matcher's cluster expansion
+  # (which over-bridges and would land a football on a food Verto). Words are
+  # singularised on both sides so "schools"/"school" and "sports"/"sport" match.
+  # Falls back to the General group when nothing is on-theme, so the result is
+  # never empty — a caller (AssetPopulator, and thus Shuffle) can seed-pick from
+  # it directly. Ties keep RANGE_THEMES order so the pick is deterministic for a
+  # given seed + theme.
+  def self.range_themes_for(theme)
+    words = Array(theme).flat_map { |t| t.to_s.downcase.scan(/[a-z]+/) }
+                        .select { |w| w.length >= 3 }
+                        .map { |w| w.singularize }
+                        .to_set
     scored = RANGE_THEMES.each_with_index.map do |slug, i|
-      [ slug, (Array(RANGE_THEME_KEYWORDS[slug]) & words).size, i ]
+      hits = Array(RANGE_THEME_KEYWORDS[slug]).count { |k| words.include?(k.singularize) }
+      [ slug, hits, i ]
     end
     themed = scored.select { |_slug, n, _i| n.positive? }
                    .sort_by { |_slug, n, i| [ -n, i ] }

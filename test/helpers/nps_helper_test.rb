@@ -60,28 +60,46 @@ class NpsHelperTest < ActionView::TestCase
     assert_equal NpsHelper::RANGE_THEMES.sort, NpsHelper::RANGE_THEME_KEYWORDS.keys.sort
   end
 
+  # The reported bug: a "Food and Sustainability" Verto shuffled to Football.
+  # Guard against any sport animation reaching a food/climate theme.
+  test "a food/sustainability theme never surfaces a sport animation" do
+    pool = NpsHelper.range_themes_for("Food and Sustainability")
+    assert (pool & NpsHelper::RANGE_THEME_GROUPS["Sport"]).empty?,
+      "no sport animation for a food/sustainability Verto, got #{pool.inspect}"
+    assert_includes pool, "pizza"
+    assert(pool.any? { |s| NpsHelper::RANGE_THEME_GROUPS["Climate & Sustainability"].include?(s) },
+      "a sustainability theme should surface climate animations too")
+  end
+
   test "range_themes_for keeps only on-theme animations, best match first" do
-    pool = NpsHelper.range_themes_for(%w[climate environment recycling])
+    pool = NpsHelper.range_themes_for("Climate change and recycling")
     assert_includes pool, "recycling"
     assert_includes pool, "sun"
-    assert_includes pool, "flowers"
     refute_includes pool, "basketball", "a sport animation must not match a climate theme"
     assert_equal "recycling", pool.first, "the strongest keyword overlap ranks first"
   end
 
-  test "range_themes_for picks sport animations for a sport theme" do
-    pool = NpsHelper.range_themes_for(%w[football team league])
-    assert(pool.all? { |slug| NpsHelper::RANGE_THEME_GROUPS["Sport"].include?(slug) },
-      "a football theme should only surface Sport animations, got #{pool.inspect}")
+  test "range_themes_for matches a theme string's own words (raw, not cluster-expanded)" do
+    assert_equal NpsHelper::RANGE_THEME_GROUPS["Sport"].sort,
+                 NpsHelper.range_themes_for("Grassroots sport and fitness").sort
+    assert_equal [ "balance" ], NpsHelper.range_themes_for("Mental health and wellbeing")
+    assert_includes NpsHelper.range_themes_for("Remote work productivity"), "calendar"
+    assert_includes NpsHelper.range_themes_for("New technology and AI"), "radar"
+  end
+
+  test "range_themes_for singularises so plural themes still match" do
+    assert_includes NpsHelper.range_themes_for("Schools and students"), "calendar"
+    assert_includes NpsHelper.range_themes_for("Sports fans"), "basketball"
   end
 
   test "range_themes_for falls back to the General group when nothing is on-theme" do
-    assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for(%w[zzz nonsense])
+    assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for("Personal finance and money")
+    assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for("")
     assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for([])
   end
 
-  test "range_themes_for is deterministic for the same keywords" do
-    assert_equal NpsHelper.range_themes_for(%w[food nutrition eating]),
-                 NpsHelper.range_themes_for(%w[food nutrition eating])
+  test "range_themes_for is deterministic for the same theme" do
+    assert_equal NpsHelper.range_themes_for("Food and nutrition"),
+                 NpsHelper.range_themes_for("Food and nutrition")
   end
 end

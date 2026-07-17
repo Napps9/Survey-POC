@@ -559,6 +559,11 @@ sw:
     primary: msingi
     change_media: Badilisha media
     change_media_title: Badilisha picha ya kadi hii
+    change_animation: "Badilisha uhuishaji"
+    change_animation_title: "Badilisha uhuishaji wa kadi hii"
+    animation_modal_title: "Chagua uhuishaji"
+    animation_modal_sub: "Mhusika huyu hujibu washiriki wanaposogeza kitelezi. Umechaguliwa ili kuendana na mandhari ya Verto yako — ubadilishe wakati wowote."
+    close: "Funga"
     add_design: Ongeza muundo
     add_design_title: Ongeza picha kwenye kadi hii
     add_design_sub: Ongeza picha ili kuipa kadi hii uhai

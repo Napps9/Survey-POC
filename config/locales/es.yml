@@ -559,6 +559,11 @@ es:
     primary: principal
     change_media: Cambiar imagen
     change_media_title: Cambiar la imagen de esta tarjeta
+    change_animation: "Cambiar animación"
+    change_animation_title: "Cambiar la animación de esta tarjeta"
+    animation_modal_title: "Elige una animación"
+    animation_modal_sub: "Este personaje reacciona a medida que los encuestados arrastran el control deslizante. Se elige para combinar con el tema de tu Verto; cámbialo cuando quieras."
+    close: "Cerrar"
     add_design: Agregar diseño
     add_design_title: Agregar una imagen a esta tarjeta
     add_design_sub: Añade una imagen para darle vida a esta tarjeta

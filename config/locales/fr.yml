@@ -559,6 +559,11 @@ fr:
     primary: principale
     change_media: Changer le média
     change_media_title: Modifier l'image de cette carte
+    change_animation: "Changer d'animation"
+    change_animation_title: "Changer l'animation de cette carte"
+    animation_modal_title: "Choisir une animation"
+    animation_modal_sub: "Ce personnage réagit quand les participants font glisser le curseur. Il est choisi pour correspondre au thème de votre Verto — changez-le quand vous voulez."
+    close: "Fermer"
     add_design: Ajouter un design
     add_design_title: Ajouter une image à cette carte
     add_design_sub: Ajoutez une image pour donner vie à cette carte

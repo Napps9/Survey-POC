@@ -559,6 +559,11 @@ tr:
     primary: birincil
     change_media: Medyayı değiştir
     change_media_title: Bu kartın resmini değiştir
+    change_animation: "Animasyonu değiştir"
+    change_animation_title: "Bu kartın animasyonunu değiştir"
+    animation_modal_title: "Bir animasyon seçin"
+    animation_modal_sub: "Bu karakter, katılımcılar kaydırıcıyı sürüklerken tepki verir. Verto'nuzun temasına uyacak şekilde seçildi — istediğiniz zaman değiştirin."
+    close: "Kapat"
     add_design: Tasarım ekle
     add_design_title: Bu karta bir resim ekle
     add_design_sub: Bu karta hayat vermek için bir resim ekleyin
