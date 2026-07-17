@@ -559,6 +559,7 @@ it:
     primary: principale
     change_media: Cambia media
     change_media_title: Cambia l'immagine di questa carta
+    brand_library: "La tua libreria del brand"
     change_animation: "Cambia animazione"
     change_animation_title: "Cambia l'animazione di questa scheda"
     animation_modal_title: "Scegli un'animazione"

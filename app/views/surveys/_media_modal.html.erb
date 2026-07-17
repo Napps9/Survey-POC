@@ -77,8 +77,31 @@
         </section>
 
         <% groups = verto_library_images %>
-        <% if groups.any? %>
+        <% brand_assets = current_organisation&.ordered_assets.to_a %>
+        <% if groups.any? || brand_assets.any? %>
           <div class="media-library-sections">
+            <%# The account's OWN uploaded brand assets (Organisation#assets),
+                shown first so a creator reaches for their brand before the
+                recommendations or the shared library. Same tile shape →
+                pickLibraryItem handles selection unchanged. %>
+            <% if brand_assets.any? %>
+              <section class="media-library-section">
+                <h4 class="media-library-section-label"><%= t("editor.brand_library", default: "Your brand library") %></h4>
+                <div class="media-library-grid">
+                  <% brand_assets.each do |att| %>
+                    <% url = rails_blob_path(att.blob, only_path: true) %>
+                    <button type="button"
+                            class="media-library-item"
+                            title="<%= att.blob.filename %>"
+                            style="background-image:url('<%= url %>');"
+                            data-url="<%= url %>"
+                            data-media-picker-target="libraryItem"
+                            data-action="click->media-picker#pickLibraryItem"
+                            aria-selected="false"></button>
+                  <% end %>
+                </div>
+              </section>
+            <% end %>
             <section class="media-library-section"
                      data-media-picker-target="recommendedSection" hidden>
               <h4 class="media-library-section-label"

@@ -81,6 +81,13 @@ class Survey < ApplicationRecord
   # else (or blank) clears the background.
   DATA_IMAGE_URL  = %r{\Adata:image/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+\z}
   ASSET_IMAGE_URL = %r{\A/[\w\-./]+\.(?:png|jpe?g|webp|svg|gif)\z}i
+  # Same-origin Active Storage image paths — the organisation brand-asset
+  # library (and logos). Broader than ASSET_IMAGE_URL because a signed-id path
+  # segment can carry base64url characters ASSET_IMAGE_URL's charset excludes,
+  # and blob URLs may append a query. Still anchored to the app's OWN
+  # /rails/active_storage/ mount and an image extension, and it excludes quotes/
+  # angles/whitespace so it stays safe inside an inline `url('…')` style.
+  ACTIVE_STORAGE_IMAGE_URL = %r{\A/rails/active_storage/[^\s'"<>?]+\.(?:png|jpe?g|webp|svg|gif)(?:\?[^\s'"<>]*)?\z}i
   # Pexels CDN URLs (host-whitelisted) so editor-picked and auto-populated
   # stock photos survive the sanitizer. No quotes/parens, so it stays safe to
   # interpolate into an inline `url('…')` style.
@@ -109,6 +116,7 @@ class Survey < ApplicationRecord
     v = value.to_s.strip
     return nil if v.blank?
     return v if v.match?(ASSET_IMAGE_URL)
+    return v if v.match?(ACTIVE_STORAGE_IMAGE_URL)
     return v if v.match?(PEXELS_IMAGE_URL)
     return v if v.match?(DATA_IMAGE_URL) && v.bytesize <= MAX_BACKGROUND_DATA_URL_BYTES
     nil

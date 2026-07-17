@@ -11,12 +11,27 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_equal PEXELS_URL, Survey.sanitize_image_url(PEXELS_URL)
   end
 
+  # A real Active Storage blob path (org brand-asset library): signed id with
+  # base64 padding + `--` separator, and a URL-encoded filename.
+  BLOB_URL = "/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MX19==--6b887ab3d44f50c2/logo%20mark.png"
+
+  test "sanitize_image_url accepts same-origin Active Storage image URLs" do
+    assert_equal BLOB_URL, Survey.sanitize_image_url(BLOB_URL)
+    assert_equal "/rails/active_storage/blobs/x.webp",
+                 Survey.sanitize_image_url("/rails/active_storage/blobs/x.webp")
+  end
+
   test "sanitize_image_url rejects other hosts and CSS-breaking input" do
     assert_nil Survey.sanitize_image_url("https://evil.example.com/x.jpg")
     assert_nil Survey.sanitize_image_url("https://images.pexels.com/x.jpg');background:url('http://evil")
     assert_nil Survey.sanitize_image_url("javascript:alert(1)")
     assert_nil Survey.sanitize_image_url("")
     assert_nil Survey.sanitize_image_url(nil)
+    # Active Storage path must stay an IMAGE and can't break out of url('…').
+    assert_nil Survey.sanitize_image_url("/rails/active_storage/blobs/redirect/abc/evil.svgx")
+    assert_nil Survey.sanitize_image_url("/rails/active_storage/blobs/x.png');background:url('http://evil")
+    # A cross-origin URL that merely contains the AS path must not pass.
+    assert_nil Survey.sanitize_image_url("https://evil.com/rails/active_storage/blobs/x.png")
   end
 
   test "sanitize_background_image delegates to sanitize_image_url" do

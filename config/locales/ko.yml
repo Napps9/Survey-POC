@@ -559,6 +559,7 @@ ko:
     primary: 기본
     change_media: 미디어 변경
     change_media_title: 이 카드의 이미지 변경
+    brand_library: "브랜드 라이브러리"
     change_animation: "애니메이션 변경"
     change_animation_title: "이 카드의 애니메이션 변경"
     animation_modal_title: "애니메이션 선택"

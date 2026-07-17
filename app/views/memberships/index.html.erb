@@ -60,6 +60,53 @@
         </div>
       </div>
 
+      <%# ── Brand asset library ── %>
+      <% assets = current_organisation.ordered_assets.to_a %>
+      <div style="background:#161B2E;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:22px 24px;margin-bottom:32px;">
+        <div style="margin-bottom:14px;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-lg);color:#F7F7F7;">Brand asset library</div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);margin-top:3px;line-height:1.5;">
+            Upload your brand images once — they appear under “Your brand library” in every Verto’s media picker, ready to drop onto any card or background. Only your account can see them.
+          </div>
+        </div>
+
+        <% if assets.any? %>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+            <% assets.each do |att| %>
+              <div style="position:relative;width:96px;height:96px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);background:#0f1322 center/cover no-repeat url('<%= rails_blob_path(att.blob, only_path: true) %>');">
+                <%= button_to "×",
+                      organisation_asset_path(current_organisation, att.id),
+                      method: :delete,
+                      data: { turbo_confirm: "Remove this asset from your brand library?" },
+                      form: { style: "position:absolute;top:4px;right:4px;margin:0;" },
+                      title: "Remove",
+                      style: "width:22px;height:22px;line-height:1;padding:0;border-radius:6px;background:rgba(12,15,26,0.82);border:1px solid rgba(255,255,255,0.2);color:#fff;font-family:'Alata',sans-serif;font-size:15px;cursor:pointer;" %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);margin-bottom:16px;">
+            No brand assets yet — add your logos, product shots or illustrations below.
+          </div>
+        <% end %>
+
+        <%= form_with url: organisation_assets_path(current_organisation),
+              method: :post,
+              multipart: true,
+              data: { turbo: false },
+              html: { style: "display:flex;flex-wrap:wrap;align-items:center;gap:10px;" } do %>
+          <%= file_field_tag "assets[]",
+                multiple: true,
+                accept: "image/png,image/jpeg,image/gif,image/svg+xml,image/webp",
+                style: "flex:1;min-width:200px;padding:10px 12px;border-radius:10px;background:#272D4A;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);" %>
+          <%= submit_tag "Add to library",
+                style: "padding:10px 20px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;border:none;cursor:pointer;" %>
+        <% end %>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:10px;">
+          PNG, JPG, GIF, SVG or WebP · up to <%= Organisation::ASSET_MAX_BYTES / 1.megabyte %> MB each · <%= assets.size %>/<%= Organisation::MAX_ASSETS %> used.
+        </div>
+      </div>
+
       <%# Active members %>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:32px;">
         <% @memberships.each do |membership| %>

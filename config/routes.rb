@@ -34,6 +34,9 @@ Rails.application.routes.draw do
   resources :organisations, only: [ :edit, :update ] do
     resources :memberships, only: [ :index, :destroy ]
     resources :invites,     only: [ :new, :create ]
+    # The account's own brand-asset library (uploaded images reusable across
+    # its Vertos from the editor media picker).
+    resources :assets, only: [ :create, :destroy ], controller: "organisation_assets"
   end
 
   # Public invite acceptance (no auth)

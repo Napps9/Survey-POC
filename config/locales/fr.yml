@@ -559,6 +559,7 @@ fr:
     primary: principale
     change_media: Changer le média
     change_media_title: Modifier l'image de cette carte
+    brand_library: "Votre bibliothèque de marque"
     change_animation: "Changer d'animation"
     change_animation_title: "Changer l'animation de cette carte"
     animation_modal_title: "Choisir une animation"

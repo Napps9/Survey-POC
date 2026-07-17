@@ -561,6 +561,7 @@ en:
     primary: "primary"
     change_media: "Change media"
     change_media_title: "Change this card's image"
+    brand_library: "Your brand library"
     change_animation: "Change animation"
     change_animation_title: "Change this card's animation"
     animation_modal_title: "Choose an animation"

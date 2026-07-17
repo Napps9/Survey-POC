@@ -232,6 +232,10 @@ the more specific the keywords, the more precisely it will be picked.
 The media picker (the "Add design" / "Change media" button on any card or the
 background) offers:
 
+- **Your brand library** — the *account's own* uploaded brand assets, shown
+  first (only when the organisation has any). Admins manage this set on the
+  branding page (Members → Brand asset library); it's scoped to the one
+  organisation and stored via Active Storage. See §11.
 - **Verto Library** — the curated tiles, always available.
 - **Recommended** — the same scoring engine's top suggestions for *this*
   card, shown only when something genuinely scores.
@@ -289,12 +293,37 @@ demographic cards remove the queries that surfaced such images, but the
 general gap remains. Proposed follow-up: vision-moderate auto-picks for
 kids/teen Vertos, or a curated-library-only mode for young audiences.
 
-## 10. Quick reference
+## 10. The per-account brand asset library
+
+Separate from the shared, code-bundled Verto Library, each **organisation has
+its own brand asset library** — images the account uploads once and can then
+drop onto any card or background from the editor's media picker.
+
+- **Storage.** `Organisation has_many_attached :assets` (Active Storage), same
+  image allow-list as the logo, capped at 5 MB/file and `MAX_ASSETS` in total.
+- **Management.** Admins upload / remove assets on the branding page (Members →
+  *Brand asset library*), via `OrganisationAssetsController` (`create` /
+  `destroy`, admin-gated). Removal purges the blob synchronously, like the logo.
+- **Where they appear.** The media picker's Library tab shows a **"Your brand
+  library"** section first (only when the org has assets), each tile a normal
+  `media-library-item` so selection flows through the existing `pickLibraryItem`
+  path unchanged.
+- **Security.** Asset URLs are same-origin Active Storage blob paths
+  (`/rails/active_storage/…`). They're already allowed by the CSP (`img-src
+  :self`) and pass storage sanitisation via `Survey::ACTIVE_STORAGE_IMAGE_URL`
+  (anchored to the app's own mount + an image extension; no cross-origin, no
+  `url('…')` breakout).
+- **⚠ Production persistence.** Active Storage runs on the local Disk service and
+  Render mounts no persistent disk, so uploaded assets (and logos) do **not**
+  survive a deploy today. Persisting them needs a Render disk or a move to
+  S3/GCS in `storage.yml` + `production.rb` — a pre-existing gap the logo shares.
+
+## 11. Quick reference
 
 | Slot | Primary | Fallback | Creator override |
 |---|---|---|---|
-| Background | Pexels landscape (theme query) | Library `backgrounds` (theme-gated, never blank) | Library / Pexels / upload |
-| Card panel | Pexels portrait (theme-anchored query, must clear the relevance floor) — every 3rd media card a video | Tier 1 themed → Tier 2 type art → blank | Library / Recommended / Pexels / upload |
+| Background | Pexels landscape (theme query) | Library `backgrounds` (theme-gated, never blank) | Brand library / Library / Pexels / upload |
+| Card panel | Pexels portrait (theme-anchored query, must clear the relevance floor) — every 3rd media card a video | Tier 1 themed → Tier 2 type art → blank | Brand library / Library / Recommended / Pexels / upload |
 | Tap statements | Pexels square, unique per statement | `swipe_cards` pool, no repeats in a card | Per-statement pick in editor |
 | Range panel | Reactive animation, theme-matched set (Shuffle re-rolls it) | General animation set | Per-card **Change animation** picker |
 | NPS control | Procedural vessel (always) | — | — |
@@ -313,6 +342,10 @@ kids/teen Vertos, or a curated-library-only mode for young audiences.
 - `app/javascript/controllers/media_picker_controller.js` — the editor's
   picker; `SurveysController#pexels_search` / `#shuffle_assets` — its
   endpoints.
+- `Organisation#assets` + `OrganisationAssetsController` — the per-account brand
+  asset library; surfaced in `surveys/_media_modal` ("Your brand library") and
+  managed on `memberships/index`; `Survey::ACTIVE_STORAGE_IMAGE_URL` allows its
+  blob URLs to be stored (see §10).
 - `app/helpers/nps_helper.rb` + `lottie_player_controller.js` — the range
   animation and NPS vessel; `NpsHelper.range_themes_for` picks the theme-matched
   animation set the populator/Shuffle applies as a card's `range_theme`.

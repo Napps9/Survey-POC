@@ -559,6 +559,7 @@ ja:
     primary: プライマリ
     change_media: メディアを変更
     change_media_title: このカードの画像を変更
+    brand_library: "ブランドライブラリ"
     change_animation: "アニメーションを変更"
     change_animation_title: "このカードのアニメーションを変更"
     animation_modal_title: "アニメーションを選択"
