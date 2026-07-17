@@ -89,12 +89,13 @@
                 <h4 class="media-library-section-label"><%= t("editor.brand_library", default: "Your brand library") %></h4>
                 <div class="media-library-grid">
                   <% brand_assets.each do |att| %>
-                    <% url = rails_blob_path(att.blob, only_path: true) %>
+                    <%# Tile shows a small variant; the FULL-size original is
+                        what data-url applies to the card when picked. %>
                     <button type="button"
                             class="media-library-item"
                             title="<%= att.blob.filename %>"
-                            style="background-image:url('<%= url %>');"
-                            data-url="<%= url %>"
+                            style="background-image:url('<%= as_thumb_path(att.blob) %>');"
+                            data-url="<%= rails_blob_path(att.blob, only_path: true) %>"
                             data-media-picker-target="libraryItem"
                             data-action="click->media-picker#pickLibraryItem"
                             aria-selected="false"></button>

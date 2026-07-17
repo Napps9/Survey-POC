@@ -76,6 +76,8 @@ class OrganisationAssetsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "Your brand library", response.body
     assert_match "media-library-item", response.body
-    assert_match "/rails/active_storage/", response.body
+    # Tile shows a resized VARIANT (thumbnail); picking applies the full blob.
+    assert_match "/rails/active_storage/representations/", response.body
+    assert_match %r{data-url="/rails/active_storage/blobs/}, response.body
   end
 end

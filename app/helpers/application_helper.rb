@@ -247,6 +247,20 @@ module ApplicationHelper
     end
   end
 
+  # A small same-origin thumbnail path for an Active Storage image — used for the
+  # brand-asset library tiles (media picker + branding page) so a tile loads a
+  # ~400px variant instead of the full-size original. Variable images get a
+  # resized variant (processed lazily in production, where libvips lives);
+  # non-variable ones (SVG) fall back to the original. Display only — the
+  # full-size blob path is what gets stored on a card when the tile is picked.
+  def as_thumb_path(blob, size: 400)
+    if blob.variable?
+      rails_representation_path(blob.variant(resize_to_limit: [ size, size ]), only_path: true)
+    else
+      rails_blob_path(blob, only_path: true)
+    end
+  end
+
   # Inline `style` value that sets the Verto-experience brand variables for a
   # given palette. Spread onto a wrapper element (player overlay, preview
   # overlay, editor card feed) so the brand colours are scoped to the Verto and

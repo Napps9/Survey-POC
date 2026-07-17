@@ -40,6 +40,14 @@ gem "anthropic", "~> 1.40"
 gem "csv"
 gem "rubyzip", "~> 2.3", require: "zip" # bulk brand-asset import (extract a zip of images)
 
+# Active Storage image analysis + variants (brand-library thumbnails). The
+# Docker image ships the libvips system lib (prod); ruby-vips is loaded LAZILY
+# by Active Storage only when it actually processes an image, so `require:
+# false` keeps boot working in dev/CI where libvips isn't installed (thumbnails
+# are only ever generated in production).
+gem "image_processing", "~> 1.2"
+gem "ruby-vips", require: false
+
 # AI results report → PDF download + Google Doc
 gem "kramdown"               # Markdown → HTML for the report body
 gem "wicked_pdf"             # HTML → PDF for the downloadable report
