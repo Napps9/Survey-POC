@@ -89,4 +89,19 @@ class BrandAssetImporterTest < ActiveSupport::TestCase
   test "raises a clear error for a missing local source" do
     assert_raises(ArgumentError) { BrandAssetImporter.call(org: @org, source: "/no/such/path.zip") }
   end
+
+  test "refuses a private/loopback/metadata URL (SSRF guard)" do
+    %w[
+      http://127.0.0.1/kit.zip
+      http://localhost/kit.zip
+      http://169.254.169.254/latest/meta-data
+      http://10.0.0.5/kit.zip
+      http://192.168.1.1/kit.zip
+    ].each do |url|
+      err = assert_raises(ArgumentError, "expected #{url} to be refused") do
+        BrandAssetImporter.call(org: @org, source: url)
+      end
+      assert_match(/private|loopback|link-local|resolve/i, err.message)
+    end
+  end
 end
