@@ -23,6 +23,10 @@ const END_H = 66
 const COL_GAP = 130
 const ROW_GAP = 40
 const MARGIN = 56
+// Vertical gap separating the main flow's band from each branch lane's band,
+// and from the endings band — this is what reads as "outside the flow"
+// rather than just another row squeezed into the same grid.
+const BAND_GAP = 90
 // Corner radius for the orthogonal connectors that thread the gutters.
 const CONNECTOR_R = 14
 // Distinct colours cycled across branch lanes so each reads as a unit.
@@ -45,6 +49,9 @@ export default class extends Controller {
       this._empty = this._overlay.querySelector(".logic-map-empty")
       this._overlay.querySelector(".logic-map-close")?.addEventListener("click", () => this.close())
     }
+    // Manually-dragged node positions (see _makeDraggable), remembered per
+    // browser so the layout doesn't snap back to the auto layout on reopen.
+    this._manualPos = this._loadManualPos()
   }
 
   open(event) {
@@ -148,11 +155,14 @@ export default class extends Controller {
   // Dominators (vs a simple in-degree walk) keep a parent lane intact past the
   // point where a sub-branch rejoins it, and make nested sub-branches fall out
   // as smaller lanes contained in their parent. Each node gets its innermost
-  // containing lane (n.lane {label,color}), n.laneEntry, n.laneDepth, and
-  // n.laneParent (the enclosing lane, for a nested chip). No stored data — the
-  // label defaults to the answer value (or a card's lane_label).
+  // containing lane (n.lane {label,color}), n.laneEntry, n.laneDepth,
+  // n.laneParent (the enclosing lane, for a nested chip), and n.topLane (the
+  // OUTERMOST containing lane, i.e. its own visual band — see _layout). No
+  // stored data — the label defaults to the answer value (or a card's
+  // lane_label).
   _attachLanes(graph, cards) {
     const lanes = this._computeLanes(cards)
+    graph.lanes = lanes
     // Each card takes its INNERMOST containing lane (smallest member set) as its
     // colour; the next-larger containing lane is its parent (for a nested chip).
     // A card in a SIMPLE lane (a plain chain, no sub-branches) also gets reorder
@@ -165,6 +175,7 @@ export default class extends Controller {
       n.laneEntry = lane.entry === n.key
       n.laneDepth = containing.length
       n.laneParent = containing[1] || null
+      n.topLane = containing[containing.length - 1]
       if (lane.simple) {
         const idx = lane.spine.indexOf(n.key)
         if (idx >= 0) n.reorder = { up: idx > 0, down: idx < lane.spine.length - 1 }
@@ -253,8 +264,12 @@ export default class extends Controller {
     return t.startsWith("card:") ? t.slice(5) : null
   }
 
-  // Longest-path layering from the entry (card 0), cycle-safe. End nodes sit one
-  // column past the deepest card. Unreached cards are pushed to their own column.
+  // Longest-path layering from the entry (card 0), cycle-safe, gives every
+  // node a COLUMN. Unreached cards are pushed to their own column past the
+  // deepest reachable one, and end nodes sit one column further still. Which
+  // ROW/band a node lands in is a separate concern — see the banding pass
+  // below — so branches and endings share the main flow's column grid
+  // (roughly lining up under where they forked) without sharing its row.
   _layout(graph) {
     const { nodes, endNodes, edges } = graph
     const adj = new Map(nodes.map(n => [n.key, []]))
@@ -298,27 +313,80 @@ export default class extends Controller {
     })
     endNodes.forEach(n => { n.w = END_W; n.h = END_H })
 
-    // Order within each layer by original index (cards) / insertion (ends), then
-    // stack each column independently by cumulative height (nodes vary in size).
-    const byLayer = new Map()
+    // ── banding: keep branches and endings OUT of the main flow's row ──────
+    // Every node lands in a BAND: 0 is the main spine (cards in no lane), one
+    // band per TOP-LEVEL branch lane (a lane not itself nested inside another —
+    // a nested sub-branch shares its parent's band; the lane chip + colour
+    // already read the nesting), and a final band holds every finish/end node,
+    // regardless of which lane or card reaches it. Bands stack top to bottom
+    // with a clear gap, so a branch or an ending never shares a row with the
+    // normal flow — it reads as a separate lane of its own. Columns within a
+    // band still key off the longest-path `layer`, so a branch's cards line up
+    // under roughly where they forked from the main flow.
+    const lanes = graph.lanes || []
+    const isTopLane = (l) => !lanes.some(o => o !== l && o.members.size > l.members.size &&
+      [ ...l.members ].every(m => o.members.has(m)))
+    const topLanes = lanes.filter(isTopLane)
+      .sort((a, b) => (layer.get(a.entry) ?? 0) - (layer.get(b.entry) ?? 0))
+    const bandOfLane = new Map(topLanes.map((l, i) => [ l, i + 1 ]))
+    const endBand = topLanes.length + 1
+    const bandOf = (n) => {
+      if (n.kind === "end") return endBand
+      if (!n.lane) return 0
+      return bandOfLane.get(n.topLane || n.lane) ?? 0
+    }
+
+    const byBand = new Map()
     graph.allNodes.forEach(n => {
-      const L = layer.get(n.key) ?? 0
-      if (!byLayer.has(L)) byLayer.set(L, [])
-      byLayer.get(L).push(n)
+      const b = bandOf(n)
+      if (!byBand.has(b)) byBand.set(b, [])
+      byBand.get(b).push(n)
     })
-    let height = 0
-    byLayer.forEach(list => {
-      list.sort((a, b) => (a.index ?? 999) - (b.index ?? 999))
-      let y = MARGIN
-      list.forEach(n => {
-        n.x = MARGIN + (layer.get(n.key)) * (CARD_W + COL_GAP)
-        n.y = y
-        y += n.h + ROW_GAP
+
+    let bandTop = MARGIN
+    ;[ ...byBand.keys() ].sort((a, b) => a - b).forEach(b => {
+      // Order within each band's layer/column by original index (cards) /
+      // insertion (ends), then stack each column independently by cumulative
+      // height (nodes vary in size) — same per-column stacking as before,
+      // just scoped to this band instead of the whole canvas.
+      const byLayer = new Map()
+      byBand.get(b).forEach(n => {
+        const L = layer.get(n.key) ?? 0
+        if (!byLayer.has(L)) byLayer.set(L, [])
+        byLayer.get(L).push(n)
       })
-      height = Math.max(height, y)
+      let bandHeight = 0
+      byLayer.forEach((list, L) => {
+        list.sort((x, y) => (x.index ?? 999) - (y.index ?? 999))
+        let y = bandTop
+        list.forEach(n => {
+          n.x = MARGIN + L * (CARD_W + COL_GAP)
+          n.y = y
+          y += n.h + ROW_GAP
+        })
+        bandHeight = Math.max(bandHeight, y - bandTop)
+      })
+      bandTop += bandHeight + BAND_GAP
     })
-    const width = MARGIN * 2 + endLayer * (CARD_W + COL_GAP) + CARD_W
-    return { width, height: height + MARGIN }
+
+    // A manually dragged node (see _makeDraggable) always wins over the
+    // computed slot — it's remembered per node key (see _setManualPos) so it
+    // survives the next render instead of snapping back to the auto layout.
+    graph.allNodes.forEach(n => {
+      const pos = this._manualPos && this._manualPos.get(n.key)
+      if (pos) { n.x = pos.x; n.y = pos.y }
+    })
+
+    // The initial view (see _render) fits this exact bounding box, not a
+    // fixed (0,0) origin — a node dragged up or left of the auto layout would
+    // otherwise sit outside a viewBox that always started at the top-left
+    // corner, and only be reachable by panning after the map reopens.
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+    graph.allNodes.forEach(n => {
+      minX = Math.min(minX, n.x); minY = Math.min(minY, n.y)
+      maxX = Math.max(maxX, n.x + n.w); maxY = Math.max(maxY, n.y + n.h)
+    })
+    return { x: minX - MARGIN, y: minY - MARGIN, width: (maxX - minX) + 2 * MARGIN, height: (maxY - minY) + 2 * MARGIN }
   }
 
   // ── render ───────────────────────────────────────────────────────────────
@@ -334,15 +402,20 @@ export default class extends Controller {
     }
     if (this._empty) this._empty.classList.add("hidden")
 
-    const { width, height } = this._layout(graph)
+    const { x, y, width, height } = this._layout(graph)
     // Keep the current pan/zoom across edit re-renders; re-fit only on open.
-    if (!this._vb) this._vb = { x: 0, y: 0, w: width, h: height }
+    if (!this._vb) this._vb = { x, y, w: width, h: height }
     svg.setAttribute("viewBox", `${this._vb.x} ${this._vb.y} ${this._vb.w} ${this._vb.h}`)
     svg.appendChild(this._defs())
 
     const posByKey = new Map(graph.allNodes.map(n => [n.key, n]))
+    this._posByKey = posByKey
+    this._edgeRecords = []
     const eLayer = this._g()
-    graph.edges.forEach(e => { const p = this._edgePath(e, posByKey); if (p) eLayer.appendChild(p) })
+    graph.edges.forEach(e => {
+      const rec = this._edgePath(e, posByKey)
+      if (rec) { eLayer.appendChild(rec.g); this._edgeRecords.push(rec) }
+    })
     svg.appendChild(eLayer)
 
     const nLayer = this._g()
@@ -369,7 +442,11 @@ export default class extends Controller {
     return defs
   }
 
-  _edgePath(e, posByKey) {
+  // Pure geometry for an edge given the current node positions — split out
+  // from _edgePath so a drag (see _makeDraggable / _refreshEdgesForNode) can
+  // recompute just the numbers and patch the existing DOM instead of
+  // rebuilding it every pointermove.
+  _edgeGeometry(e, posByKey) {
     const from = posByKey.get(e.from)
     if (!from) return null
     const sx = from.x + from.w, sy = from.y + this._portY(from, e.opt)
@@ -379,6 +456,13 @@ export default class extends Controller {
     } else {
       tx = sx + 90; ty = sy // dangling: a short stub
     }
+    return { sx, sy, tx, ty, d: this._connectorPath(sx, sy, tx, ty) }
+  }
+
+  _edgePath(e, posByKey) {
+    const geo = this._edgeGeometry(e, posByKey)
+    if (!geo) return null
+    const { sx, sy, tx, ty, d } = geo
     const style = {
       route:   { stroke: "#01EACB", dash: "", marker: "arrow-route",  w: 2 },
       next:    { stroke: "#8B85FF", dash: "", marker: "arrow-next",   w: 2 },
@@ -388,47 +472,68 @@ export default class extends Controller {
     }[e.kind] || { stroke: "rgba(255,255,255,0.3)", dash: "", marker: "arrow-faint", w: 1.4 }
 
     const g = this._g()
-    const d = this._connectorPath(sx, sy, tx, ty)
 
     // When editing, a fat invisible hit-path makes the connector easy to click
     // to remove (reverts that answer to the default flow).
     const deletable = this.editableValue && e.opt
+    let hitEl = null
     if (deletable) {
-      const hit = document.createElementNS(SVG, "path")
-      hit.setAttribute("d", d); hit.setAttribute("fill", "none")
-      hit.setAttribute("stroke", "transparent"); hit.setAttribute("stroke-width", "14")
-      hit.style.cursor = "pointer"
+      hitEl = document.createElementNS(SVG, "path")
+      hitEl.setAttribute("d", d); hitEl.setAttribute("fill", "none")
+      hitEl.setAttribute("stroke", "transparent"); hitEl.setAttribute("stroke-width", "14")
+      hitEl.style.cursor = "pointer"
       const title = document.createElementNS(SVG, "title"); title.textContent = "Click to remove this route"
-      hit.appendChild(title)
-      hit.addEventListener("click", () => this._deleteEdge(e))
-      g.appendChild(hit)
+      hitEl.appendChild(title)
+      hitEl.addEventListener("click", () => this._deleteEdge(e))
+      g.appendChild(hitEl)
     }
 
-    const path = document.createElementNS(SVG, "path")
-    path.setAttribute("d", d)
-    path.setAttribute("fill", "none")
-    path.setAttribute("stroke", style.stroke)
-    path.setAttribute("stroke-width", style.w)
-    if (style.dash) path.setAttribute("stroke-dasharray", style.dash)
-    path.setAttribute("marker-end", `url(#${style.marker})`)
-    path.style.pointerEvents = "none"
-    g.appendChild(path)
+    const pathEl = document.createElementNS(SVG, "path")
+    pathEl.setAttribute("d", d)
+    pathEl.setAttribute("fill", "none")
+    pathEl.setAttribute("stroke", style.stroke)
+    pathEl.setAttribute("stroke-width", style.w)
+    if (style.dash) pathEl.setAttribute("stroke-dasharray", style.dash)
+    pathEl.setAttribute("marker-end", `url(#${style.marker})`)
+    pathEl.style.pointerEvents = "none"
+    g.appendChild(pathEl)
 
+    let textEl = null
     if (e.label) {
       // Sit the label on this edge's first horizontal run, in the clear gutter
       // just right of its source port — at the port's own height, so several
       // routes leaving one card keep their labels separated (never stacked).
       const forward = tx > sx + 2 * CONNECTOR_R
-      const t = document.createElementNS(SVG, "text")
-      t.setAttribute("x", forward ? sx + (tx - sx) * 0.25 : sx + (tx - sx) * 0.42)
-      t.setAttribute("y", forward ? sy - 6 : sy + (ty - sy) * 0.42 - 6)
-      t.setAttribute("text-anchor", "middle")
-      t.setAttribute("fill", e.kind === "dangling" ? "#F87171" : (e.kind === "route" ? "#01EACB" : "rgba(255,255,255,0.5)"))
-      t.setAttribute("font-size", "11"); t.setAttribute("font-family", "'ABeeZee', sans-serif")
-      t.textContent = this._trunc(e.label, 18)
-      g.appendChild(t)
+      textEl = document.createElementNS(SVG, "text")
+      textEl.setAttribute("x", forward ? sx + (tx - sx) * 0.25 : sx + (tx - sx) * 0.42)
+      textEl.setAttribute("y", forward ? sy - 6 : sy + (ty - sy) * 0.42 - 6)
+      textEl.setAttribute("text-anchor", "middle")
+      textEl.setAttribute("fill", e.kind === "dangling" ? "#F87171" : (e.kind === "route" ? "#01EACB" : "rgba(255,255,255,0.5)"))
+      textEl.setAttribute("font-size", "11"); textEl.setAttribute("font-family", "'ABeeZee', sans-serif")
+      textEl.textContent = this._trunc(e.label, 18)
+      g.appendChild(textEl)
     }
-    return g
+    return { g, e, pathEl, hitEl, textEl }
+  }
+
+  // Live-updates every edge touching a just-moved node (see _makeDraggable) —
+  // patches existing path/label elements in place rather than re-rendering
+  // the whole map on every pointermove.
+  _refreshEdgesForNode(key) {
+    if (!this._edgeRecords || !this._posByKey) return
+    this._edgeRecords.forEach(rec => {
+      if (rec.e.from !== key && rec.e.to !== key) return
+      const geo = this._edgeGeometry(rec.e, this._posByKey)
+      if (!geo) return
+      const { sx, sy, tx, ty, d } = geo
+      rec.pathEl.setAttribute("d", d)
+      if (rec.hitEl) rec.hitEl.setAttribute("d", d)
+      if (rec.textEl) {
+        const forward = tx > sx + 2 * CONNECTOR_R
+        rec.textEl.setAttribute("x", forward ? sx + (tx - sx) * 0.25 : sx + (tx - sx) * 0.42)
+        rec.textEl.setAttribute("y", forward ? sy - 6 : sy + (ty - sy) * 0.42 - 6)
+      }
+    })
   }
 
   // An orthogonal "elbow" connector routed through the empty gutter BETWEEN the
@@ -461,6 +566,7 @@ export default class extends Controller {
     g.setAttribute("transform", `translate(${n.x} ${n.y})`)
     g.dataset.nodeKey = n.key
     g.dataset.nodeKind = "card"
+    n.group = g
 
     // The real card (design + question + options), scaled to fit the node.
     const fo = document.createElementNS(SVG, "foreignObject")
@@ -506,13 +612,15 @@ export default class extends Controller {
       g.appendChild(this._reorderBtn(n.w - 23, -25, "▼", n.reorder.down, () => this._moveInLane(n.key, 1)))
     }
 
-    // A transparent hit layer over the card: click to jump to it, and it's the
-    // drop target for a dragged route (the card clone itself is pointer-inert).
+    // A transparent hit layer over the card: drag it anywhere to reposition
+    // it (see _makeDraggable), or a plain click jumps to it in the deck — and
+    // it's the drop target for a dragged route (the card clone itself is
+    // pointer-inert).
     const hit = document.createElementNS(SVG, "rect")
     hit.setAttribute("width", n.w); hit.setAttribute("height", n.h); hit.setAttribute("rx", 16)
-    hit.setAttribute("fill", "transparent"); hit.style.cursor = "pointer"
-    hit.addEventListener("click", () => this._jumpTo(n.key))
+    hit.setAttribute("fill", "transparent")
     g.appendChild(hit)
+    this._makeDraggable(hit, n, () => this._jumpTo(n.key))
 
     // A small caption chip (card number) so nodes are identifiable when zoomed out.
     const cap = this._text(10, n.h - 8, n.unreachable ? "unreachable" : `Card ${n.num}`,
@@ -657,12 +765,22 @@ export default class extends Controller {
     g.setAttribute("transform", `translate(${n.x} ${n.y})`)
     g.dataset.nodeKey = n.key
     g.dataset.nodeKind = "end"
+    n.group = g
     const rect = document.createElementNS(SVG, "rect")
     rect.setAttribute("width", n.w); rect.setAttribute("height", n.h); rect.setAttribute("rx", n.h / 2)
     rect.setAttribute("fill", "rgba(1,234,203,0.12)"); rect.setAttribute("stroke", "#01EACB"); rect.setAttribute("stroke-width", "1.5")
     g.appendChild(rect)
     g.appendChild(this._text(20, 28, "FINISH", { size: 10, fill: "rgba(1,234,203,0.85)", spacing: "0.08em" }))
     g.appendChild(this._text(20, 46, "🏁 " + this._trunc(n.text, 20), { size: 13, fill: "#fff" }))
+
+    // A transparent hit layer on top: drag anywhere on the pill to reposition
+    // it (see _makeDraggable). No click behaviour — there's nothing in the
+    // deck to jump to for a finish screen.
+    const hit = document.createElementNS(SVG, "rect")
+    hit.setAttribute("width", n.w); hit.setAttribute("height", n.h); hit.setAttribute("rx", n.h / 2)
+    hit.setAttribute("fill", "transparent")
+    g.appendChild(hit)
+    this._makeDraggable(hit, n, null)
     return g
   }
 
@@ -688,6 +806,82 @@ export default class extends Controller {
       el.classList.add("card-flash")
       setTimeout(() => el.classList.remove("card-flash"), 1200)
     }
+  }
+
+  // ── free positioning: drag a node anywhere, remembered per browser ─────────
+
+  // Keyed by the survey's own URL so different Vertos (and different browsers)
+  // never collide; best-effort only — a manual layout is a viewing convenience,
+  // not survey data, so it's fine if it doesn't follow the creator across
+  // devices, and any storage failure (quota, private mode) just falls back to
+  // the auto layout instead of breaking the map.
+  _posStorageKey() {
+    const el = document.querySelector("[data-survey-editor-url-value]")
+    return `logic-map-positions:${el?.dataset.surveyEditorUrlValue || "unknown"}`
+  }
+
+  _loadManualPos() {
+    const map = new Map()
+    try {
+      const raw = window.localStorage.getItem(this._posStorageKey())
+      if (raw) {
+        Object.entries(JSON.parse(raw)).forEach(([ key, pos ]) => {
+          if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) map.set(key, pos)
+        })
+      }
+    } catch (_) { /* corrupt or unavailable storage — fall back to auto layout */ }
+    return map
+  }
+
+  _setManualPos(key, x, y) {
+    this._manualPos.set(key, { x, y })
+    try {
+      window.localStorage.setItem(this._posStorageKey(), JSON.stringify(Object.fromEntries(this._manualPos)))
+    } catch (_) { /* best-effort; the drag still holds for this open session */ }
+  }
+
+  // Wires a node's invisible hit layer to drag freely: a short movement
+  // threshold tells a genuine drag apart from a plain click (onClick, if
+  // given — a card jumps to it in the deck; an ending has none). Dragging
+  // stops the pointerdown from bubbling to the canvas's own pan handler, and
+  // live-updates any edge touching this node so connectors track the node
+  // instead of lagging a frame behind until the next full render.
+  _makeDraggable(hit, n, onClick) {
+    hit.style.cursor = "grab"
+    let drag = null
+    hit.addEventListener("pointerdown", (ev) => {
+      if (ev.button != null && ev.button !== 0) return
+      ev.stopPropagation()
+      try { hit.setPointerCapture(ev.pointerId) } catch (_) {}
+      // Bring the node to the front of its layer so dragging it over another
+      // node doesn't leave it painting underneath for the rest of this render.
+      if (n.group && n.group.parentNode) n.group.parentNode.appendChild(n.group)
+      const p = this._clientToUser(ev.clientX, ev.clientY)
+      drag = { pointerId: ev.pointerId, startUX: p.x, startUY: p.y, startNX: n.x, startNY: n.y, moved: false }
+    })
+    hit.addEventListener("pointermove", (ev) => {
+      if (!drag || ev.pointerId !== drag.pointerId) return
+      const p = this._clientToUser(ev.clientX, ev.clientY)
+      const dx = p.x - drag.startUX, dy = p.y - drag.startUY
+      if (!drag.moved && Math.hypot(dx, dy) < 4) return
+      drag.moved = true
+      hit.style.cursor = "grabbing"
+      n.x = drag.startNX + dx
+      n.y = drag.startNY + dy
+      n.group?.setAttribute("transform", `translate(${n.x} ${n.y})`)
+      this._refreshEdgesForNode(n.key)
+    })
+    const finish = (ev) => {
+      if (!drag || ev.pointerId !== drag.pointerId) return
+      try { hit.releasePointerCapture(ev.pointerId) } catch (_) {}
+      hit.style.cursor = "grab"
+      const moved = drag.moved
+      drag = null
+      if (moved) this._setManualPos(n.key, n.x, n.y)
+      else if (onClick) onClick()
+    }
+    hit.addEventListener("pointerup", finish)
+    hit.addEventListener("pointercancel", finish)
   }
 
   // ── pan / zoom via the SVG viewBox ─────────────────────────────────────────
