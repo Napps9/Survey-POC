@@ -35,7 +35,7 @@ const LANE_PALETTE = ["#8B85FF", "#01EACB", "#F59E0B", "#F472B6", "#38BDF8", "#A
 export default class extends Controller {
   static targets = ["overlay", "svg", "empty"]
   static values = { ends: { type: Array, default: [] }, editable: { type: Boolean, default: false } }
-  static ROUTABLE = ["multiple_choice", "yes_no"]
+  static ROUTABLE = ["multiple_choice", "yes_no", "scenario"]
 
   connect() {
     // The editor content sits inside a `position: fixed` wrapper (fullscreen

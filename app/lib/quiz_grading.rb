@@ -10,7 +10,7 @@ require "set"
 #
 # The `correct` shape per card type mirrors the value the player records for
 # that type (see player_controller.js `_read`):
-#   multiple_choice / yes_no / select_one_grid → a canonical option label (String)
+#   multiple_choice / yes_no / select_one_grid / scenario → a canonical option label (String)
 #   select_many / select_many_grid             → an array of canonical labels
 #   tap_card                                    → { "statement" => "yes"|"no" }
 #   range / nps / rating                        → an Integer (step / value / stars)
@@ -18,7 +18,7 @@ require "set"
 module QuizGrading
   module_function
 
-  CHOICE_ONE  = %w[multiple_choice yes_no select_one_grid].freeze
+  CHOICE_ONE  = %w[multiple_choice yes_no select_one_grid scenario].freeze
   CHOICE_MANY = %w[select_many select_many_grid].freeze
   SCALES      = %w[range nps rating].freeze
 

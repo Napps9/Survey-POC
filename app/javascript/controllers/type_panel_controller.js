@@ -7,7 +7,7 @@ const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
 
 // Single-pick types whose answers can each route to a different card/end —
 // mirrors LogicGraph::ROUTABLE and logic_map_controller's ROUTABLE.
-const ROUTABLE_TYPES = [ "multiple_choice", "yes_no" ]
+const ROUTABLE_TYPES = [ "multiple_choice", "yes_no", "scenario" ]
 
 // Read the canonical card-type metadata that the editor view emits as a
 // JSON blob (sourced from config/card_types.yml). Called from connect()

@@ -1245,7 +1245,7 @@ export default class extends Controller {
     const norm  = v => String(v ?? "").trim()
     const normT = v => norm(v).toLowerCase().replace(/\s+/g, " ")
     switch (type) {
-      case "multiple_choice": case "yes_no": case "select_one_grid":
+      case "multiple_choice": case "yes_no": case "select_one_grid": case "scenario":
         return norm(value) === norm(correct)
       case "select_many": case "select_many_grid": {
         const a = new Set((Array.isArray(value) ? value : []).map(norm).filter(Boolean))
@@ -1310,7 +1310,7 @@ export default class extends Controller {
   // reload (choice/grid/open/rating); other widgets rely on the reveal banner.
   _applyValue(card, type, value) {
     if (value === null || value === undefined) return
-    if ([ "multiple_choice", "yes_no", "select_one_grid", "select_many", "select_many_grid" ].includes(type)) {
+    if ([ "multiple_choice", "yes_no", "select_one_grid", "select_many", "select_many_grid", "scenario" ].includes(type)) {
       const set = new Set((Array.isArray(value) ? value : [ value ]).map(v => String(v ?? "").trim()))
       card.querySelectorAll('[data-picker-target="item"]').forEach(el => {
         if (set.has((el.dataset.canonical || "").trim())) el.dataset.selected = "true"
@@ -1463,7 +1463,7 @@ export default class extends Controller {
   // value earns, as {token_id => amount}. `card.dataset.cardTokens` /
   // `cardTokenAward` carry this card's public config (see player/show.html.erb).
   _computeEarned(card, type, value) {
-    const CHOICE_ONE  = [ "multiple_choice", "yes_no", "select_one_grid" ]
+    const CHOICE_ONE  = [ "multiple_choice", "yes_no", "select_one_grid", "scenario" ]
     const CHOICE_MANY = [ "select_many", "select_many_grid" ]
     const FLAT        = [ "range", "nps", "rating", "open_ended", "prioritise" ]
     const sumHashes = (hashes) => {

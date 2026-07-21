@@ -59,7 +59,7 @@ module AggregatesSurveyResults
 
   def accumulate_value(st, type, value)
     case type
-    when "multiple_choice", "yes_no", "select_one_grid"
+    when "multiple_choice", "yes_no", "select_one_grid", "scenario"
       st[:counts][value.to_s] += 1
     when "select_many", "select_many_grid"
       Array(value).each { |v| st[:counts][v.to_s] += 1 }
@@ -93,7 +93,7 @@ module AggregatesSurveyResults
     base = { type:, card:, other_texts: st[:other_texts] }
 
     case type
-    when "multiple_choice", "yes_no", "select_one_grid", "select_many", "select_many_grid"
+    when "multiple_choice", "yes_no", "select_one_grid", "select_many", "select_many_grid", "scenario"
       counts = st[:counts]
       counts["Other"] = other_count if other_count.positive?
       base.merge(total: st[:value_count] + other_count, counts:)

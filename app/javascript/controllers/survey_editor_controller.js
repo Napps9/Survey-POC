@@ -10,7 +10,7 @@ const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
 // Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
 // These default to a per-option token award but can opt into a flat award for
 // completing the question at all (see setTokenAwardMode).
-const CHOICE_TYPES = [ "multiple_choice", "select_many", "yes_no", "select_one_grid", "select_many_grid" ]
+const CHOICE_TYPES = [ "multiple_choice", "select_many", "yes_no", "select_one_grid", "select_many_grid", "scenario" ]
 
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight"]
@@ -835,7 +835,7 @@ export default class extends Controller {
       return (lbl?.textContent.trim()) || (item.dataset.canonical || "").trim()
     }
     switch (type) {
-      case "multiple_choice": case "yes_no": case "select_one_grid": {
+      case "multiple_choice": case "yes_no": case "select_one_grid": case "scenario": {
         const el = card.querySelector('[data-picker-target="item"][data-correct="true"]')
         return el ? labelOf(el) : null
       }
@@ -888,7 +888,7 @@ export default class extends Controller {
   _readTokens(card, type) {
     switch (type) {
       case "multiple_choice": case "select_many": case "yes_no":
-      case "select_one_grid": case "select_many_grid": {
+      case "select_one_grid": case "select_many_grid": case "scenario": {
         // Relocated into the sidebar's Tokenomics tab (see
         // _card_component.html.erb) — not inline on the option itself, so
         // read via the token scope, not `card` directly.
@@ -938,7 +938,7 @@ export default class extends Controller {
   // inline per-option <select data-logic-route> plus the card's default
   // ("otherwise") select. Only single-pick types route this pass.
   _readLogic(card, type) {
-    if (type !== "multiple_choice" && type !== "yes_no") return null
+    if (type !== "multiple_choice" && type !== "yes_no" && type !== "scenario") return null
     const scope = this._logicScope(card)
     const routes = []
     scope.querySelectorAll("[data-logic-route][data-canonical]").forEach(sel => {
@@ -1030,7 +1030,9 @@ export default class extends Controller {
 
   syncBranchingFor(cardEl) {
     if (!this.logicValue || !cardEl) return
-    if (cardEl.dataset.cardType !== "multiple_choice") return // yes_no answers are fixed
+    // yes_no answers are fixed; multiple_choice and scenario both have dynamic
+    // option lists whose branching rows need to stay in step with them.
+    if (!["multiple_choice", "scenario"].includes(cardEl.dataset.cardType)) return
     const scope = this._logicScope(cardEl)
     const list  = scope.querySelector(".logic-branch-list")
     if (!list) return

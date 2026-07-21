@@ -28,7 +28,7 @@ module LogicGraph
   module_function
 
   # Single-pick types that can carry routing logic this pass.
-  ROUTABLE = %w[multiple_choice yes_no].freeze
+  ROUTABLE = %w[multiple_choice yes_no scenario].freeze
 
   # Can this card type carry routing logic at all?
   def routable?(card)

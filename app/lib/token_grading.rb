@@ -13,7 +13,7 @@
 #
 # The `tokens` / `token_award` shape per card type mirrors the value the
 # player records for that type (see player_controller.js `_read`):
-#   multiple_choice / yes_no / select_one_grid → { "<canonical option>" => {token_id => amount} }, matched by the chosen label
+#   multiple_choice / yes_no / select_one_grid / scenario → { "<canonical option>" => {token_id => amount} }, matched by the chosen label
 #   select_many / select_many_grid             → same shape, summed across every chosen label
 #   tap_card                                    → { "<statement>" => { "yes"|"no"|"unsure" => {token_id => amount} } }, matched by the chosen swipe direction
 #   range / nps / rating / open_ended / prioritise → a flat `token_award` = {token_id => amount}, earned just for answering
@@ -25,7 +25,7 @@
 module TokenGrading
   module_function
 
-  CHOICE_ONE   = %w[multiple_choice yes_no select_one_grid].freeze
+  CHOICE_ONE   = %w[multiple_choice yes_no select_one_grid scenario].freeze
   CHOICE_MANY  = %w[select_many select_many_grid].freeze
   CHOICE       = (CHOICE_ONE + CHOICE_MANY).freeze
   FLAT         = %w[range nps rating open_ended prioritise].freeze
