@@ -139,7 +139,8 @@ export default class extends Controller {
     return {
       text: c.text || "",
       description: c.description || "",
-      options: Array.isArray(c.options) ? c.options.slice() : []
+      options: Array.isArray(c.options) ? c.options.slice() : [],
+      pages: Array.isArray(c.pages) ? c.pages.map(p => ({ id: p?.id || "", text: p?.text || "" })) : []
     }
   }
 
@@ -151,16 +152,28 @@ export default class extends Controller {
       select_one_grid: ".choice-label", select_many_grid: ".choice-label",
       range: ".slider-label-text", nps: ".slider-label-text",
       rating: ".rating-label",
-      tap_card: ".rotate-card span[contenteditable]"
+      tap_card: ".rotate-card span[contenteditable]",
+      scenario: ".pick-text"
     }[cardEl.dataset.cardType]
     return sel ? Array.from(cardEl.querySelectorAll(sel)) : []
+  }
+
+  // Scenario narrative-page text elements, excluding the answer page (whose
+  // options are read by _optionEls above) — id comes from the owning
+  // .book-page, not the text node itself.
+  _pageEls(cardEl) {
+    return Array.from(cardEl.querySelectorAll(".book-page:not(.is-answer) .book-page-text"))
   }
 
   _readCard(cardEl) {
     return {
       text: cardEl.querySelector(".q-title, .activity-title")?.textContent.trim() || "",
       description: cardEl.querySelector(".q-subtitle, .activity-desc")?.textContent.trim() || "",
-      options: this._optionEls(cardEl).map(el => el.textContent.trim())
+      options: this._optionEls(cardEl).map(el => el.textContent.trim()),
+      pages: this._pageEls(cardEl).map(el => ({
+        id: el.closest(".book-page")?.dataset.pageId || "",
+        text: el.textContent.trim()
+      }))
     }
   }
 
@@ -173,6 +186,15 @@ export default class extends Controller {
     const opts = content.options || [], fopts = fallback.options || []
     this._optionEls(cardEl).forEach((el, k) => {
       el.textContent = (opts[k] && opts[k].trim()) || fopts[k] || el.textContent
+    })
+    // Pages align by id (not index) — a creator plausibly reorders narrative
+    // pages after translating them, unlike options.
+    const pages = content.pages || [], fpages = fallback.pages || []
+    this._pageEls(cardEl).forEach(el => {
+      const id = el.closest(".book-page")?.dataset.pageId || ""
+      const tr = pages.find(p => p.id && p.id === id)
+      const fb = fpages.find(p => p.id && p.id === id)
+      el.textContent = (tr && tr.text.trim()) || (fb && fb.text) || el.textContent
     })
     // The "how to answer" caption isn't authored text (it's derived from the
     // card's type), so it isn't in the i18n store above — look it up straight
@@ -685,6 +707,13 @@ export default class extends Controller {
       const primOpts = (prim.options || []).map(o => (o || "").trim()).filter(Boolean)
       if (primOpts.length) out.options = primOpts
 
+      // Scenario narrative pages, in document order — id-and-text pairs so
+      // translations (below) can align by id instead of position.
+      const primPages = type === "scenario"
+        ? (prim.pages || []).map(p => ({ id: p.id || "", text: (p.text || "").trim() })).filter(p => p.text)
+        : []
+      if (primPages.length) out.pages = primPages
+
       // tap_card statement backgrounds (populated by AssetPopulator). Carry
       // them through autosave so editing other fields doesn't wipe the art.
       if (type === "tap_card") {
@@ -750,6 +779,13 @@ export default class extends Controller {
         if (primOpts.length) {
           const topts = t.options || []
           tEntry.options = primOpts.map((p, k) => ((topts[k] || "").trim()) || p)
+        }
+        if (primPages.length) {
+          const tpages = t.pages || []
+          tEntry.pages = primPages.map(p => {
+            const match = tpages.find(tp => tp.id && tp.id === p.id)
+            return { id: p.id, text: (match && match.text.trim()) || p.text }
+          })
         }
         if (Object.keys(tEntry).length) i18n[loc] = tEntry
       })

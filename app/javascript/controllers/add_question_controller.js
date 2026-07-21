@@ -4,7 +4,7 @@ import { Controller } from "@hotwired/stimulus"
 const OPTION_TYPES = new Set([
   "multiple_choice", "select_many",
   "select_one_grid", "select_many_grid",
-  "tap_card"
+  "tap_card", "scenario"
 ])
 
 // Types that expose min / max scale-label fields instead
@@ -20,6 +20,7 @@ const DEFAULT_OPTIONS = {
   select_one_grid:  ["A", "B", "C", "D"],
   select_many_grid: ["A", "B", "C", "D"],
   tap_card:         ["Statement 1", "Statement 2", "Statement 3", "Statement 4", "Statement 5"],
+  scenario:         ["Option A", "Option B"],
   open_ended:       [],
   welcome_card:     [],
 }

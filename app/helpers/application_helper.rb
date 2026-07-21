@@ -147,12 +147,13 @@ module ApplicationHelper
     out = {
       "text"        => card["text"],
       "description" => card["description"],
-      "options"     => card["options"]
+      "options"     => card["options"],
+      "pages"       => card["pages"]
     }
     if card["i18n"].is_a?(Hash)
       out["i18n"] = card["i18n"].transform_values do |tr|
         tr = tr || {}
-        { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"] }.compact
+        { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"], "pages" => tr["pages"] }.compact
       end
     end
     out.compact
@@ -171,12 +172,27 @@ module ApplicationHelper
 
     base_opts = Array(card["options"])
     loc_opts  = Array(tr["options"])
-    card.merge(
+    # Scenario pages align by id (not index) — unlike options, a creator
+    # plausibly reorders narrative pages after translating them, and index
+    # alignment would silently scramble which translation goes with which page.
+    merged = card.merge(
       "text"        => tr["text"].presence        || card["text"],
       "description" => tr["description"].presence  || card["description"],
       # Keep the primary array's length & order; fall back per slot.
       "options"     => base_opts.each_with_index.map { |o, i| loc_opts[i].presence || o }
     )
+
+    if card["pages"].present?
+      base_pages = Array(card["pages"])
+      loc_pages  = Array(tr["pages"]).index_by { |p| p.is_a?(Hash) ? p["id"].to_s : nil }
+      merged["pages"] = base_pages.map { |p|
+        next p unless p.is_a?(Hash)
+        translated = loc_pages[p["id"].to_s]
+        p.merge("text" => translated&.dig("text").presence || p["text"])
+      }
+    end
+
+    merged
   end
 
   # All card-type metadata lives in config/card_types.yml. This helper
@@ -389,6 +405,13 @@ module ApplicationHelper
       # A <div>, not a <textarea>, for the same reason — <textarea> is
       # interactive content and isn't allowed inside a <button> either.
       "<div class=\"mini-textarea\">Type your answer here…</div>"
+
+    when "scenario"
+      "<div class=\"mini-swipe-stack\">" \
+      "<div class=\"mini-swipe-card c1\"></div>" \
+      "<div class=\"mini-swipe-card c2\"></div>" \
+      "<div class=\"mini-swipe-card c3\"><span style=\"font-size:9px;color:rgba(0,0,0,0.5);padding:0 6px;text-align:center\">Read on, then choose</span></div>" \
+      "</div>"
 
     else
       ""

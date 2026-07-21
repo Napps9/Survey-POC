@@ -96,7 +96,7 @@
               default: CardTypes.eyebrow(type).presence || type.tr("_", " "))
 %>
 
-<div class="split-right">
+<div class="split-right<%= ' split-right--book' if type == 'scenario' %>">
 
   <%# Creator's logo, centred at the top of the right (content) panel on the
       welcome card — player only, and only when a logo is actually uploaded. %>
@@ -322,6 +322,105 @@
           <button type="button" class="tap-add-btn"
                   data-action="click->card-editor#addTapOption">＋ <%= t("card.add_statement") %></button>
         <% end %>
+      </div>
+
+    <% when "scenario" %>
+      <%# Book-style narrative choice: the creator writes the situation across
+          several pages; the respondent (or, in the editor, the creator)
+          turns through them one at a time via scenario_controller.js, landing
+          on an ordinary single-select .choice-list as the book's final
+          "page" — reused verbatim from multiple_choice, so grading/tokens/
+          branching/results all treat a scenario answer exactly like one. %>
+      <% pages = Array(display["pages"]) %>
+      <% pages = [{}] if pages.empty? %>
+      <% items = Array(display["options"]) %>
+      <div class="book-wrap"
+           data-controller="<%= editable ? 'scenario card-editor' : 'scenario' %>"
+           data-scenario-editable-value="<%= editable %>">
+        <div class="book-stack" data-scenario-target="stack">
+          <% pages.each_with_index do |page, i| %>
+            <div class="book-page" data-scenario-target="page" data-page-id="<%= page['id'].to_s %>">
+              <div class="book-page-scroll">
+                <div class="book-page-kicker" data-scenario-target="kicker">
+                  <%= t("editor.scenario.page_of", n: i + 1, total: pages.size, default: "Page #{i + 1} of #{pages.size}") %>
+                </div>
+                <div class="book-page-text" <%= ce_attr %>
+                     data-scenario-target="pageText"
+                     <% if editable %>data-placeholder="<%= t('editor.scenario.page_placeholder', default: 'Write this page…') %>"<% end %>><%= page["text"] %></div>
+              </div>
+              <div class="book-page-corner"><%= i + 1 %></div>
+              <div class="book-page-fade"></div>
+            </div>
+          <% end %>
+
+          <div class="book-page is-answer" data-scenario-target="page">
+            <div class="book-page-scroll">
+              <div class="book-page-kicker">
+                <%= editable ? t("editor.scenario.answer_kicker", default: "Answer options") : t("editor.scenario.choose_kicker", default: "Make your choice") %>
+              </div>
+              <ul class="choice-list choice-list--single"
+                  data-controller="<%= picker_controllers %>"
+                  data-picker-mode-value="single">
+                <% items.each_with_index do |opt, i| %>
+                  <li class="choice-list-item pick-item"
+                      data-picker-target="item"
+                      data-action="click->picker#pick"
+                      data-canonical="<%= canon[i] %>"
+                      data-correct="<%= mark_correct.call(canon[i]) %>"
+                      data-selected="false">
+                    <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"><%= OptionIconLibrary.svg_for(canon[i]) %></div>
+                    <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
+                    <span class="choice-list-tick pick-dot">✓</span>
+                    <% if quiz_mode %>
+                      <button type="button" class="mark-correct" data-picker-mode="single"
+                              data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
+                    <% end %>
+                    <% if editable %>
+                      <button type="button" class="pick-item-delete"
+                              data-action="click->card-editor#deleteOption">×</button>
+                    <% end %>
+                  </li>
+                <% end %>
+                <% if editable %>
+                  <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
+                    <span>＋</span> <%= t("card.add_option") %>
+                  </li>
+                <% end %>
+              </ul>
+              <% if logic_mode %>
+                <%= render "shared/logic_branch_block",
+                      owner_cid: card["cid"],
+                      rows: items.each_with_index.map { |opt, i| { canonical: canon[i], label: opt, selected: logic_route_value.call(canon[i]) } },
+                      default_selected: logic_default_value %>
+              <% end %>
+            </div>
+            <div class="book-page-fade"></div>
+          </div>
+        </div>
+
+        <% if editable %>
+          <div class="book-edit-tools" data-scenario-target="editTools">
+            <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn"
+                    data-action="click->scenario#deletePage"><%= t("editor.scenario.delete_page", default: "✕ Delete this page") %></button>
+            <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn"
+                    data-action="click->scenario#addPage"><%= t("editor.scenario.add_page", default: "＋ Add page") %></button>
+          </div>
+        <% end %>
+
+        <div class="book-dots" data-scenario-target="dots"></div>
+
+        <div class="book-nav-row">
+          <button type="button" class="book-chevron" data-scenario-target="prevBtn"
+                  data-action="click->scenario#back" aria-label="<%= t('editor.scenario.prev_page', default: 'Previous page') %>">‹</button>
+          <% if editable %>
+            <button type="button" class="next-btn" data-scenario-target="nextBtn"
+                    data-action="click->scenario#next"><%= t("editor.scenario.next_page_btn", default: "Next page ›") %></button>
+          <% else %>
+            <button type="button" class="book-chevron" data-scenario-target="nextBtn"
+                    data-action="click->scenario#next" aria-label="<%= t('editor.scenario.next_page', default: 'Next page') %>">›</button>
+          <% end %>
+        </div>
+        <div class="book-live" data-scenario-target="live" aria-live="polite"></div>
       </div>
 
     <% when "range" %>
