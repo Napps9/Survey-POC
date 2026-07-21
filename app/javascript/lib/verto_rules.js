@@ -29,8 +29,18 @@ const COUNT_RULES = {
   prioritise:       { min: 4, max: 5 },                  // §3 prioritise
   select_one_grid:  { min: 4, max: 10, even: true },     // §3 image grid
   select_many_grid: { min: 4, max: 10, even: true },     // §3 image grid
-  nps:              { exact: 11 }                        // §3 nps: 0–10
+  nps:              { exact: 11 },                       // §3 nps: 0–10
+  // A scenario's answer options are the book's final choice — 2, occasionally
+  // 3, never multiple_choice's odd-3/5 list rule (this isn't a list, it's a
+  // decision point).
+  scenario:         { min: 2, max: 3 }
 }
+
+// Scenario narrative pages — enough to feel like a story, not so many it
+// drags. Checked separately from COUNT_RULES/OPTION_LIMITS (those score the
+// answer options; this scores the story pages a scenario also carries).
+const PAGE_RULES = { min: 1, max: 5 }
+const PAGE_LENGTH_LIMIT = 400
 
 // §2 — answer label budget per card type. Image lists and Prioritise rows
 // get 30, grid tiles and scale labels stay at a scannable 20, and Tap
@@ -39,7 +49,7 @@ const OPTION_LIMITS = {
   multiple_choice: 30, select_many: 30, prioritise: 30,
   select_one_grid: 20, select_many_grid: 20,
   range: 20, rating: 20, nps: 20,
-  tap_card: 40
+  tap_card: 40, scenario: 40
 }
 
 // §2 — TEXT_MIN is the target floor shown in copy only; short is never flagged.
@@ -61,7 +71,8 @@ const TYPE_LABEL = {
   select_one_grid: "Pick one (grid)", select_many_grid: "Select many (grid)",
   tap_card: "Tap", range: "Range", rating: "Rating", nps: "NPS",
   yes_no: "Yes / No", open_ended: "Freeform", welcome_card: "Welcome",
-  token_checkpoint: "Points Checkpoint", prioritise: "Prioritise"
+  token_checkpoint: "Points Checkpoint", prioritise: "Prioritise",
+  scenario: "Scenario"
 }
 
 // Mirrors CardTypes::NON_QUESTION_TYPES (app/lib/card_types.rb).
@@ -70,6 +81,8 @@ const isQuestion = (c) => !NON_QUESTION_TYPES.includes(c && c.type ? c.type : ""
 export const typeLabel = (ty) => TYPE_LABEL[ty] || (ty || "").replace(/_/g, " ")
 const cleanOptions = (c) => (Array.isArray(c.options) ? c.options : [])
   .map((o) => (o || "").toString().trim()).filter(Boolean)
+const cleanPages = (c) => (Array.isArray(c.pages) ? c.pages : [])
+  .map((p) => (p && p.text ? p.text.toString().trim() : "")).filter(Boolean)
 const check = (id, rating, text) => ({ id, rating, text })
 
 function rate(score) {
@@ -90,6 +103,12 @@ export function analyzeCard(card) {
 
   const optionCheck = optionLengthCheck(card)
   if (optionCheck) checks.push(optionCheck)
+
+  if (card.type === "scenario") {
+    checks.push(pageCountCheck(card))
+    const pageLenCheck = pageLengthCheck(card)
+    if (pageLenCheck) checks.push(pageLenCheck)
+  }
 
   const penalty = checks.reduce((s, c) => s + (CARD_PENALTY[c.rating] || 0), 0)
   const score = Math.max(0, 100 - penalty)
@@ -147,6 +166,26 @@ function optionLengthCheck(card) {
   const rating = worst.length > limit * 1.5 ? RED : YELLOW
   const label = worst.length > 24 ? worst.slice(0, 23) + "…" : worst
   return check("option", rating, t("editor.rules.option_long", { opt: label, max: limit }))
+}
+
+// A scenario's narrative pages — separate from the answer-option count check
+// above, since a scenario has both (the story pages AND the final choice).
+function pageCountCheck(card) {
+  const n = cleanPages(card).length
+  const { min, max } = PAGE_RULES
+  if (n < min) return check("pages", RED, t("editor.rules.page_empty"))
+  if (n > max) return check("pages", n <= max + 2 ? YELLOW : RED, t("editor.rules.page_many", { n, max }))
+  return check("pages", GREEN, t("editor.rules.page_ok", { n, min, max }))
+}
+
+function pageLengthCheck(card) {
+  const pages = cleanPages(card)
+  if (!pages.length) return null
+  const over = pages.filter((p) => p.length > PAGE_LENGTH_LIMIT)
+  if (!over.length) return check("page_length", GREEN, t("editor.rules.page_length_ok", { max: PAGE_LENGTH_LIMIT }))
+  const worst = over.reduce((a, b) => (b.length > a.length ? b : a))
+  const rating = worst.length > PAGE_LENGTH_LIMIT * 1.5 ? RED : YELLOW
+  return check("page_length", rating, t("editor.rules.page_length_long", { n: worst.length, max: PAGE_LENGTH_LIMIT }))
 }
 
 // ── Whole-Verto analysis ─────────────────────────────────────────────────

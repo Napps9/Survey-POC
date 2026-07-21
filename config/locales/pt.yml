@@ -45,6 +45,7 @@ pt:
       select_many_grid: "Escolha todas as opções aplicáveis"
       tap_card: "Arraste para responder"
       open_ended: "Escreva a sua resposta"
+      scenario: "Continue a ler e depois escolha"
   auth:
     social_continue: "Continuar com %{provider}"
     social_divider: "ou"
@@ -186,6 +187,11 @@ pt:
         count_exact: "Use exatamente %{exact} pontos (agora %{n})."
         option_ok: "Os rótulos das respostas são curtos e legíveis (≤ %{max} caracteres)."
         option_long: "Encurte “%{opt}” para %{max} caracteres ou menos."
+        page_empty: "Adicione pelo menos uma página à história."
+        page_ok: "%{n} páginas — dentro do ideal %{min}–%{max}."
+        page_many: "%{n} páginas — reduza para %{max} ou menos para a história não se alongar."
+        page_length_ok: "As páginas têm um comprimento confortável (≤ %{max} carateres)."
+        page_length_long: "Uma página está muito longa (%{n} carateres) — mantenha as páginas abaixo de %{max} carateres ou divida-a em duas."
         ccount_ok: "%{n} cartões — na faixa ideal %{min}–%{max}."
         ccount_few: "%{n} cartões — mais alguns alcançam o ideal %{min}–%{max}."
         ccount_min: "%{n} cartões — mire pelo menos %{min}."
@@ -199,6 +205,14 @@ pt:
         whole_verto: "Verto inteiro"
         card_n: "Cartão %{n}"
         section_empty: "Nada aqui."
+      scenario:
+        page_of: "Página %{n} de %{total}"
+        page_placeholder: "Escreva esta página…"
+        end_of_card: "Fim do cartão"
+        edit_options: "Editar opções de resposta ›"
+        next_page_btn: "Página seguinte ›"
+        answer_kicker: "Opções de resposta"
+        choose_kicker: "Faça a sua escolha"
     wizard:
       step_counter: Passo %{n} de %{total}
   nav:

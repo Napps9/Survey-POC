@@ -45,6 +45,7 @@ ja:
       select_many_grid: "当てはまるものをすべて選択"
       tap_card: "スワイプして回答"
       open_ended: "回答を入力"
+      scenario: "読み進めてから選択"
   auth:
     social_continue: "%{provider} で続行"
     social_divider: "または"
@@ -186,6 +187,11 @@ ja:
         count_exact: "ちょうど%{exact}段階にしてください（現在%{n}）。"
         option_ok: "回答ラベルは短く読みやすいです（%{max}文字以下）。"
         option_long: "「%{opt}」を%{max}文字以下に短くしてください。"
+        page_empty: "ストーリーに少なくとも1ページ追加してください。"
+        page_ok: "%{n}ページ — 理想的な%{min}〜%{max}の範囲内です。"
+        page_many: "%{n}ページ — ストーリーが長引かないよう%{max}ページ以下に減らしましょう。"
+        page_length_ok: "ページは読みやすい長さです（%{max}文字以内）。"
+        page_length_long: "1ページが長すぎます（%{n}文字） — %{max}文字未満に抑えるか、2ページに分割してください。"
         ccount_ok: "%{n}枚のカード — 理想の%{min}〜%{max}の範囲です。"
         ccount_few: "%{n}枚のカード — あと数枚で理想の%{min}〜%{max}に届きます。"
         ccount_min: "%{n}枚のカード — 少なくとも%{min}枚を目指しましょう。"
@@ -199,6 +205,14 @@ ja:
         whole_verto: "Verto全体"
         card_n: "カード%{n}"
         section_empty: "ここには何もありません。"
+      scenario:
+        page_of: "%{total}ページ中%{n}ページ目"
+        page_placeholder: "このページを書く…"
+        end_of_card: "カードの終わり"
+        edit_options: "回答の選択肢を編集 ›"
+        next_page_btn: "次のページ ›"
+        answer_kicker: "回答の選択肢"
+        choose_kicker: "選択してください"
     wizard:
       step_counter: "%{total}ステップ中 %{n}"
   nav:
