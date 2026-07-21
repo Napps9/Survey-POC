@@ -11,7 +11,7 @@
 class ResultsExport
   RESPONSE_HEADER = [ "Response ID", "Submitted at", "Source", "Language" ].freeze
   SUMMARY_HEADER  = [ "Card #", "Card type", "Question", "Answer option", "Count", "Percentage", "Total answers" ].freeze
-  CHOICE_TYPES    = %w[multiple_choice yes_no select_one_grid select_many select_many_grid].freeze
+  CHOICE_TYPES    = %w[multiple_choice yes_no select_one_grid select_many select_many_grid scenario].freeze
 
   # Spreadsheet formula-injection guard: Excel/Sheets treat a cell beginning
   # with one of these as a formula, so a respondent's free-text answer like
