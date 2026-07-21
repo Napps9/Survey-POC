@@ -29,18 +29,23 @@ class PdfQuestionImporter
           items: {
             type: "object",
             properties: {
-              type: { type: "string", enum: SurveyGenerator::CARD_TYPES, description: "The best-fitting answer type for this question." },
+              type: { type: "string", enum: QuestionTypeClassifier::CLASSIFIABLE_TYPES, description: "The best-fitting answer type for this question." },
               original_text: { type: "string", description: "The question text EXACTLY as written in the PDF, unmodified." },
               compliant: { type: "boolean", description: "true when original_text already satisfies every per-card rule verbatim (length caps, single idea, neutral wording). false when it needed rewriting." },
               issue: { type: "string", description: "Only when compliant is false: one short sentence naming the rule it breaks (e.g. 'Over the 100-character cap' or 'Asks two things at once')." },
-              text: { type: "string", description: "The rule-compliant question text. When compliant is true this is identical to original_text. When false, it is the optimised rewrite: same intent, shorter and sharper. Target 50-70 chars; 100 hard max (text + any description <= 100)." },
+              text: { type: "string", description: "The rule-compliant question text. When compliant is true this is identical to original_text. When false, it is the optimised rewrite: same intent, shorter and sharper. Target 50-70 chars; 100 hard max (text + any description <= 100). For a scenario, this is the short question asked on the final page, not the narrative." },
               description: { type: "string", description: "Optional sub-text under the question. Shares the question's 100-char budget." },
+              pages: {
+                type: "array",
+                items: { type: "string", description: "One narrative page's text." },
+                description: "SCENARIO ONLY. The PDF's narrative situation split into 1-5 pages, each a short paragraph (<= 400 chars), in reading order. Preserve the source wording — do not invent story content."
+              },
               options: {
                 type: "array",
                 items: { type: "string", description: "Each option label within its type's character budget (see the design rules)." },
                 description: <<~DESC
                   Required for: multiple_choice, select_many, select_one_grid,
-                  select_many_grid, prioritise, tap_card, range, rating, nps. Use the
+                  select_many_grid, prioritise, tap_card, range, rating, nps, scenario. Use the
                   options written in the PDF when present; otherwise generate sensible,
                   mutually-exclusive options that satisfy the bounds:
                   - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 30 chars
@@ -53,6 +58,7 @@ class PdfQuestionImporter
                     neutral middle label
                   - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
                   - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
+                  - scenario: 2 or 3 options, each <= 30 chars
                 DESC
               },
               allow_other: { type: "boolean", description: "Set true only if the question explicitly offers a free-text 'Other'." }
@@ -109,6 +115,13 @@ class PdfQuestionImporter
     - A strict binary gate → yes_no (use sparingly).
     - An open, qualitative "tell us…" / "why…" question with no fixed answers →
       open_ended.
+    - A multi-sentence narrative situation ("Imagine you…", "You are faced
+      with…") that puts the reader in a scene before offering 2-3 options →
+      scenario. Split the narrative into `pages` (1-5 short paragraphs,
+      reading order, source wording preserved) and put the closing options
+      in `options` (2-3, each <= 30 chars). Only choose scenario when the
+      text is genuinely a short story or situation — a single plain
+      sentence with options is multiple_choice, not scenario.
     - NEVER emit a welcome_card — the import contains only the user's questions.
 
     When in doubt between a grid and a list, prefer the grid. When in doubt
