@@ -17,8 +17,8 @@ class QuizGradingTest < ActiveSupport::TestCase
     assert QuizGrading.graded?(card("tap_card", { "Earth is flat" => "no" }))
   end
 
-  test "single-choice / yes-no / image-grid grade by exact canonical match" do
-    %w[multiple_choice yes_no select_one_grid].each do |type|
+  test "single-choice / yes-no / image-grid / scenario grade by exact canonical match" do
+    %w[multiple_choice yes_no select_one_grid scenario].each do |type|
       c = card(type, "Blue")
       assert QuizGrading.correct?(c, "Blue")
       assert QuizGrading.correct?(c, " Blue "), "should ignore surrounding whitespace"

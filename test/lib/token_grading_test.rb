@@ -17,8 +17,8 @@ class TokenGradingTest < ActiveSupport::TestCase
     assert TokenGrading.awarding?(card("tap_card", "tokens" => { "Sky is blue" => { "yes" => { "gold" => 3 } } }))
   end
 
-  test "single-choice / yes-no / image-grid award by exact canonical match" do
-    %w[multiple_choice yes_no select_one_grid].each do |type|
+  test "single-choice / yes-no / image-grid / scenario award by exact canonical match" do
+    %w[multiple_choice yes_no select_one_grid scenario].each do |type|
       c = card(type, "tokens" => { "Blue" => { "gold" => 5 }, "Red" => { "coal" => 1 } })
       assert_equal({ "gold" => 5 }, TokenGrading.earned(c, "Blue"))
       assert_equal({ "coal" => 1 }, TokenGrading.earned(c, "Red"))
@@ -28,7 +28,7 @@ class TokenGradingTest < ActiveSupport::TestCase
   end
 
   test "choice-shaped cards can opt into a flat award for completing the question" do
-    %w[multiple_choice yes_no select_one_grid select_many select_many_grid].each do |type|
+    %w[multiple_choice yes_no select_one_grid select_many select_many_grid scenario].each do |type|
       c = card(type, "token_award_mode" => "completion", "token_award" => { "gold" => 4 })
       assert TokenGrading.completion_award?(c)
       assert TokenGrading.awarding?(c)

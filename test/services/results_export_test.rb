@@ -19,6 +19,7 @@ class ResultsExportTest < ActiveSupport::TestCase
         { "type" => "range", "text" => "How happy?", "options" => %w[Sad Meh Neutral Good Great] },
         { "type" => "rating", "text" => "Rate us" },
         { "type" => "tap_card", "text" => "Agree?", "options" => [ "Stmt A", "Stmt B" ] },
+        { "type" => "scenario", "text" => "Which path?", "pages" => [ { "id" => "pg1", "text" => "You reach a fork in the trail." } ], "options" => %w[Left Right] },
         { "type" => "open_ended", "text" => "Comments?" }
       ]
     )
@@ -28,7 +29,8 @@ class ResultsExportTest < ActiveSupport::TestCase
       "3" => { "type" => "range", "value" => 3 },
       "4" => { "type" => "rating", "value" => 5 },
       "5" => { "type" => "tap_card", "value" => { "Stmt A" => "yes", "Stmt B" => "no" } },
-      "6" => { "type" => "open_ended", "value" => "Great job" }
+      "6" => { "type" => "scenario", "value" => "Left" },
+      "7" => { "type" => "open_ended", "value" => "Great job" }
     })
     @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed", locale: "es", answers: {
       "1" => { "type" => "multiple_choice", "value" => nil, "other" => "Purple" },
@@ -36,7 +38,8 @@ class ResultsExportTest < ActiveSupport::TestCase
       "3" => { "type" => "range", "value" => 0 },
       "4" => { "type" => "rating", "value" => 3 },
       "5" => { "type" => "tap_card", "value" => { "Stmt A" => "no", "Stmt B" => "no" } },
-      "6" => { "type" => "open_ended", "value" => "" }
+      "6" => { "type" => "scenario", "value" => "Right" },
+      "7" => { "type" => "open_ended", "value" => "" }
     })
     responses   = @survey.responses.where(status: "completed").order(:created_at)
     aggregated  = AGG.build(Array(@survey.cards), responses)
@@ -51,7 +54,7 @@ class ResultsExportTest < ActiveSupport::TestCase
   test "response_rows header lists question texts and skips the welcome card" do
     header = @export.response_rows.first
     assert_equal %w[Response\ ID Submitted\ at Source Language], header.first(4).map(&:to_s)
-    assert_equal [ "Favourite colour?", "Which fruits?", "How happy?", "Rate us", "Agree?", "Comments?" ], header[4..]
+    assert_equal [ "Favourite colour?", "Which fruits?", "How happy?", "Rate us", "Agree?", "Which path?", "Comments?" ], header[4..]
     refute_includes header, "Welcome"
   end
 
@@ -65,13 +68,15 @@ class ResultsExportTest < ActiveSupport::TestCase
     assert_equal "Good", first[6]                    # range index 3 -> options[3]
     assert_equal "5", first[7]                        # rating
     assert_equal "Stmt A: yes; Stmt B: no", first[8] # tap_card hash
-    assert_equal "Great job", first[9]
+    assert_equal "Left", first[9]                     # scenario, formatted like multiple_choice
+    assert_equal "Great job", first[10]
 
     second = rows[2]
     assert_equal "Other: Purple", second[4]          # value nil + other
     assert_equal "Banana", second[5]
     assert_equal "Sad", second[6]                    # range index 0
-    assert_equal "", second[9]                       # blank open_ended
+    assert_equal "Right", second[9]
+    assert_equal "", second[10]                       # blank open_ended
   end
 
   test "summary_rows produce counts and percentages per option" do
@@ -91,6 +96,10 @@ class ResultsExportTest < ActiveSupport::TestCase
 
     agree = rows.select { |r| r[2] == "Agree?" }
     assert_includes agree, [ 6, "tap_card", "Agree?", "Stmt B — No", 2, 100.0, 2 ]
+
+    path = rows.select { |r| r[2] == "Which path?" }
+    assert_includes path, [ 7, "scenario", "Which path?", "Left", 1, 50.0, 2 ]
+    assert_includes path, [ 7, "scenario", "Which path?", "Right", 1, 50.0, 2 ]
 
     refute rows.any? { |r| r[1] == "welcome_card" }, "welcome card should be excluded from the summary"
   end

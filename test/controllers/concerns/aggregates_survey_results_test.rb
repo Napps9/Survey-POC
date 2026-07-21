@@ -23,7 +23,8 @@ class AggregatesSurveyResultsTest < ActiveSupport::TestCase
     { "type" => "tap_card",        "text" => "Tap" }, # 4
     { "type" => "open_ended",      "text" => "Say" }, # 5
     { "type" => "welcome_card",    "title" => "Hi" }, # 6 (else branch)
-    { "type" => "prioritise",      "text" => "Rank", "options" => %w[A B C] } # 7
+    { "type" => "prioritise",      "text" => "Rank", "options" => %w[A B C] }, # 7
+    { "type" => "scenario",        "text" => "Choose", "options" => %w[Left Right] } # 8
   ].freeze
 
   def sample_responses
@@ -66,6 +67,18 @@ class AggregatesSurveyResultsTest < ActiveSupport::TestCase
     assert_equal 1, row[:counts]["B"]
     assert_equal 1, row[:counts]["Other"]
     assert_equal [ "Custom" ], row[:other_texts]
+  end
+
+  test "scenario tallies counts and total like multiple_choice" do
+    responses = [
+      resp({ "8" => { "value" => "Left" } }),
+      resp({ "8" => { "value" => "Right" } }),
+      resp({ "8" => { "value" => "Left" } })
+    ]
+    row = @agg.run(CARDS, responses)[8]
+    assert_equal 3, row[:total]
+    assert_equal 2, row[:counts]["Left"]
+    assert_equal 1, row[:counts]["Right"]
   end
 
   test "select_many counts each selection but totals responders" do

@@ -59,6 +59,21 @@ class DemoSeederRulesTest < ActiveSupport::TestCase
     end
   end
 
+  test "every demo scenario card carries 1-5 pages and 2-3 options" do
+    decks.each do |name, cards|
+      cards.select { |c| c["type"] == "scenario" }.each do |card|
+        pages = Array(card["pages"])
+        opts  = Array(card["options"])
+        assert_includes 1..5, pages.size, "#{name}: #{card['text']}"
+        pages.each { |p| assert p["text"].length <= 400, "#{name}: page over 400 chars: #{p['text'].inspect}" }
+        assert_includes 2..3, opts.size, "#{name}: #{card['text']} has #{opts.size} options"
+        # Quiz scenario cards must grade/award against an option that's actually on the page.
+        assert_includes opts, card["correct"], "#{name}: correct answer matches an option" if card["correct"].present?
+        assert (Array(card["tokens"].keys) - opts).empty?, "#{name}: tokens map matches options" if card["tokens"].is_a?(Hash)
+      end
+    end
+  end
+
   test "every demo image-list card has an odd 3-5 option count" do
     decks.each do |name, cards|
       cards.select { |c| %w[multiple_choice select_many].include?(c["type"]) }.each do |card|
