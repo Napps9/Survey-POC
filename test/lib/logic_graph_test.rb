@@ -31,6 +31,7 @@ class LogicGraphTest < ActiveSupport::TestCase
   test "routable? only single-pick types this pass" do
     assert LogicGraph.routable?({ "type" => "multiple_choice" })
     assert LogicGraph.routable?({ "type" => "yes_no" })
+    assert LogicGraph.routable?({ "type" => "scenario" })
     refute LogicGraph.routable?({ "type" => "select_many" })
     refute LogicGraph.routable?({ "type" => "range" })
     refute LogicGraph.routable?({ "type" => "welcome_card" })

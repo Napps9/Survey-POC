@@ -204,8 +204,15 @@ class DemoSeeder
         "correct" => "Compound interest",
         "explanation" => "Compound interest earns returns on your returns, so the gap widens every year it's left alone.",
         "tokens" => { "Compound interest" => { "gem" => 5 } } },
-      { "type" => "yes_no", "text" => "True or false: a higher credit score usually means a lower loan rate.",
-        "correct" => "Yes", "explanation" => "Lenders price risk — a higher score signals lower risk, so you're usually offered a better rate." },
+      { "type" => "scenario", "text" => "Your laptop just died — what do you do?",
+        "pages" => [
+          { "id" => "pg_laptop_1", "text" => "Your laptop dies the week before a big assignment is due. A replacement costs $600 — more than you have spare in your everyday account right now." },
+          { "id" => "pg_laptop_2", "text" => "You could put it on a credit card and pay it off over a few months, or dip into the small emergency fund you've been quietly building for the last year." }
+        ],
+        "options" => [ "Use the emergency fund", "Put it on the credit card" ],
+        "correct" => "Use the emergency fund",
+        "explanation" => "That's exactly what an emergency fund is for — using it here avoids interest charges, and you can rebuild it once things settle.",
+        "tokens" => { "Use the emergency fund" => { "coin" => 5 } } },
       { "type" => "select_many_grid", "text" => "A surprise $500 lands in your account — where does it go?",
         "options" => [ "Emergency savings", "Pay off debt", "Treat myself", "Invest it", "Help family", "Start a side hustle" ],
         "token_award_mode" => "completion", "token_award" => { "coin" => 4 } },
@@ -460,7 +467,7 @@ class DemoSeeder
 
   def answer_value(card, region:)
     case card["type"]
-    when "multiple_choice", "select_one_grid"
+    when "multiple_choice", "select_one_grid", "scenario"
       biased_pick(card["options"], card["correct"])
     when "yes_no"
       biased_pick(%w[Yes No], card["correct"])

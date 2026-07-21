@@ -6,6 +6,7 @@ class CardTypesTest < ActiveSupport::TestCase
     refute CardTypes.question?("token_checkpoint")
     assert CardTypes.question?("multiple_choice")
     assert CardTypes.question?("open_ended")
+    assert CardTypes.question?("scenario")
   end
 
   test "pickable_for hides token_checkpoint unless the Verto is tokenised" do
