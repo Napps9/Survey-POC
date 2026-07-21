@@ -19,6 +19,18 @@ class QuestionTypeClassifier
   # and welcome_card / open_ended take none.
   TYPES_WITHOUT_OPTIONS = %w[welcome_card open_ended yes_no].freeze
 
+  # Types the classifier may assign — SurveyGenerator::CARD_TYPES plus
+  # scenario. Scenario is deliberately import/classification-only: it's never
+  # added to CARD_TYPES itself, so the freeform "generate a Verto from a
+  # topic" flow (SurveyGenerator) can never invent one, while PDF/paste
+  # imports and Common Question classification (both backed by this class)
+  # can still recognize and produce one from a creator's own narrative text.
+  CLASSIFIABLE_TYPES = (SurveyGenerator::CARD_TYPES + %w[scenario]).freeze
+
+  # Belt-and-braces bound for a classified scenario's answer options —
+  # mirrors SurveyGenerator::TAP_CARD_MAX_STATEMENTS for tap_card.
+  SCENARIO_MAX_OPTIONS = 3
+
   TOOL = {
     name: "classify_questions",
     description: "For each input question, pick the best-fitting Verto answer type and supply its options when needed. Echo each question's text back verbatim and preserve input order.",
@@ -32,14 +44,19 @@ class QuestionTypeClassifier
             type: "object",
             properties: {
               text: { type: "string", description: "The input question text, echoed verbatim. Do not reword." },
-              type: { type: "string", enum: SurveyGenerator::CARD_TYPES, description: "Best-fitting answer type." },
+              type: { type: "string", enum: CLASSIFIABLE_TYPES, description: "Best-fitting answer type." },
               description: { type: "string", description: "Optional sub-text. Shares the 100-char budget with text." },
+              pages: {
+                type: "array",
+                items: { type: "string", description: "One narrative page's text." },
+                description: "SCENARIO ONLY. The input's narrative situation split into 1-5 pages, each a short paragraph (<= 400 chars), in reading order. Preserve the source wording — do not invent story content."
+              },
               options: {
                 type: "array",
                 items: { type: "string", description: "Each option label within its type's character budget (see the design rules)." },
                 description: <<~DESC
                   Required for: multiple_choice, select_many, select_one_grid,
-                  select_many_grid, prioritise, tap_card, range, rating, nps.
+                  select_many_grid, prioritise, tap_card, range, rating, nps, scenario.
                   Generate sensible, mutually-exclusive options that satisfy the bounds:
                   - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 30 chars
                   - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any
@@ -51,6 +68,7 @@ class QuestionTypeClassifier
                     neutral middle label
                   - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
                   - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
+                  - scenario: 2 or 3 options, each <= 30 chars
                 DESC
               },
               allow_other: { type: "boolean", description: "Set true only if the question explicitly invites a free-text 'Other'." }
@@ -93,6 +111,14 @@ class QuestionTypeClassifier
     - A strict binary gate -> yes_no (use sparingly).
     - An open, qualitative "tell us..." / "why..." question with no fixed
       answers -> open_ended.
+    - A multi-sentence narrative situation ("Imagine you...", "You are
+      faced with...") that puts the reader in a scene before offering 2-3
+      options -> scenario. Split the narrative into `pages` (1-5 short
+      paragraphs, reading order, source wording preserved) and put the
+      closing options in `options` (2-3, each <= 30 chars). Only choose
+      scenario when the source text is genuinely a short story or situation
+      — a single plain sentence with options is multiple_choice, not
+      scenario, even if `pages` could technically hold it as one page.
     - NEVER emit a welcome_card — these are user-authored questions only.
 
     When in doubt between a grid and a list, prefer the grid. When in doubt
@@ -101,7 +127,9 @@ class QuestionTypeClassifier
     likelihood/recommendation -> nps).
 
     CRITICAL: Echo each input question's `text` back exactly as supplied. Do
-    not reword, translate, or punctuate-tidy. Preserve input order.
+    not reword, translate, or punctuate-tidy. Preserve input order. For a
+    scenario, `text` stays the short question asked on the final page (e.g.
+    "Which would you choose?") — the narrative itself lives in `pages`.
 
     Output via the classify_questions tool.
   PROMPT
@@ -144,10 +172,11 @@ class QuestionTypeClassifier
   end
 
   # Same normalization the editor/player rely on — keep only well-formed
-  # cards of a generatable type, clean options, enforce structural caps.
+  # cards of a generatable type (plus scenario, which is classification-only —
+  # see CLASSIFIABLE_TYPES), clean options, enforce structural caps.
   # Public so other callers (PdfQuestionImporter) can reuse it.
   def normalize_cards(cards)
-    allowed = SurveyGenerator.generatable_types
+    allowed = SurveyGenerator.generatable_types | %w[scenario]
     Array(cards).filter_map do |card|
       next unless card.is_a?(Hash)
       type = card["type"].to_s
@@ -156,9 +185,11 @@ class QuestionTypeClassifier
 
       out = { "type" => type, "text" => text }
       out["description"] = card["description"].to_s.strip if card["description"].to_s.strip.present?
+      out["pages"] = normalize_scenario_pages(card["pages"]) if type == "scenario"
 
       options = Array(card["options"]).map { |o| o.to_s.strip }.reject(&:empty?)
       options = options.first(SurveyGenerator::TAP_CARD_MAX_STATEMENTS) if type == "tap_card"
+      options = options.first(SCENARIO_MAX_OPTIONS) if type == "scenario"
       out["options"] = options unless TYPES_WITHOUT_OPTIONS.include?(type) || options.empty?
 
       out["allow_other"] = true if card["allow_other"] == true
@@ -167,6 +198,17 @@ class QuestionTypeClassifier
   end
 
   private
+
+  # Bounds + assigns stable ids to a classified scenario's narrative pages,
+  # mirroring Survey#sanitize_cards_images!'s scenario branch so an imported
+  # card already satisfies the same caps the editor enforces on save.
+  def normalize_scenario_pages(raw_pages)
+    Array(raw_pages).first(Survey::MAX_SCENARIO_PAGES).filter_map do |p|
+      text = p.to_s.strip.first(Survey::MAX_SCENARIO_PAGE_LENGTH)
+      next if text.blank?
+      { "id" => "pg_#{SecureRandom.hex(4)}", "text" => text }
+    end
+  end
 
   # Walk inputs in order. For each, take the next emitted classification (if
   # any) and force its `text` back to the original input. Extras the model
