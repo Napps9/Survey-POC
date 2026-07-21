@@ -45,6 +45,7 @@ tr:
       select_many_grid: "Uygun olan tüm seçenekleri seçin"
       tap_card: "Yanıtlamak için kaydırın"
       open_ended: "Cevabınızı yazın"
+      scenario: "Okumaya devam et, sonra seç"
   auth:
     social_continue: "%{provider} ile devam et"
     social_divider: "veya"
@@ -186,6 +187,11 @@ tr:
         count_exact: "Tam olarak %{exact} puan kullanın (şu an %{n})."
         option_ok: "Yanıt etiketleri kısa ve okunaklı (≤ %{max} karakter)."
         option_long: "“%{opt}” ifadesini %{max} karaktere veya altına indirin."
+        page_empty: "Hikayeye en az bir sayfa ekle."
+        page_ok: "%{n} sayfa — ideal aralık olan %{min}–%{max} içinde."
+        page_many: "%{n} sayfa — hikaye uzamasın diye %{max} veya daha aza indir."
+        page_length_ok: "Sayfalar rahat bir uzunlukta (≤ %{max} karakter)."
+        page_length_long: "Bir sayfa çok uzun (%{n} karakter) — sayfaları %{max} karakterin altında tut ya da ikiye böl."
         ccount_ok: "%{n} kart — ideal aralıkta %{min}–%{max}."
         ccount_few: "%{n} kart — birkaç tane daha ideal %{min}–%{max} aralığına ulaşır."
         ccount_min: "%{n} kart — en az %{min} hedefleyin."
@@ -199,6 +205,14 @@ tr:
         whole_verto: "Tüm Verto"
         card_n: "Kart %{n}"
         section_empty: "Burada bir şey yok."
+      scenario:
+        page_of: "Sayfa %{n} / %{total}"
+        page_placeholder: "Bu sayfayı yaz…"
+        end_of_card: "Kartın sonu"
+        edit_options: "Cevap seçeneklerini düzenle ›"
+        next_page_btn: "Sonraki sayfa ›"
+        answer_kicker: "Cevap seçenekleri"
+        choose_kicker: "Seçimini yap"
     wizard:
       step_counter: Adım %{n} / %{total}
   nav:

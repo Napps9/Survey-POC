@@ -320,6 +320,7 @@ export default class extends Controller {
       text: c.text,
       description: c.description,
       options: c.options,
+      pages: c.pages,
       allowOther: cardEl.dataset.cardAllowOther === "true"
     }
   }

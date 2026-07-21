@@ -45,6 +45,7 @@ id:
       select_many_grid: "Pilih semua yang sesuai"
       tap_card: "Geser untuk menjawab"
       open_ended: "Ketik jawaban Anda"
+      scenario: "Lanjutkan membaca, lalu pilih"
   auth:
     social_continue: "Lanjutkan dengan %{provider}"
     social_divider: "atau"
@@ -186,6 +187,11 @@ id:
         count_exact: "Gunakan tepat %{exact} poin (sekarang %{n})."
         option_ok: "Label jawaban singkat dan mudah dibaca (≤ %{max} karakter)."
         option_long: "Persingkat “%{opt}” menjadi %{max} karakter atau kurang."
+        page_empty: "Tambahkan setidaknya satu halaman ke cerita."
+        page_ok: "%{n} halaman — dalam rentang ideal %{min}–%{max}."
+        page_many: "%{n} halaman — pangkas jadi %{max} atau kurang agar cerita tidak bertele-tele."
+        page_length_ok: "Halaman memiliki panjang yang nyaman dibaca (≤ %{max} karakter)."
+        page_length_long: "Satu halaman terlalu panjang (%{n} karakter) — jaga halaman di bawah %{max} karakter atau bagi menjadi dua."
         ccount_ok: "%{n} kartu — dalam rentang ideal %{min}–%{max}."
         ccount_few: "%{n} kartu — beberapa lagi mencapai ideal %{min}–%{max}."
         ccount_min: "%{n} kartu — targetkan setidaknya %{min}."
@@ -199,6 +205,14 @@ id:
         whole_verto: "Seluruh Verto"
         card_n: "Kartu %{n}"
         section_empty: "Tidak ada apa-apa di sini."
+      scenario:
+        page_of: "Halaman %{n} dari %{total}"
+        page_placeholder: "Tulis halaman ini…"
+        end_of_card: "Akhir kartu"
+        edit_options: "Edit opsi jawaban ›"
+        next_page_btn: "Halaman berikutnya ›"
+        answer_kicker: "Opsi jawaban"
+        choose_kicker: "Buat pilihanmu"
     wizard:
       step_counter: Langkah %{n} dari %{total}
   nav:

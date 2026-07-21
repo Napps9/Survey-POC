@@ -45,6 +45,7 @@ ar:
       select_many_grid: "اختر كل ما ينطبق"
       tap_card: "اسحب للإجابة"
       open_ended: "اكتب إجابتك"
+      scenario: "اقرأ ثم اختر"
   auth:
     social_continue: "المتابعة عبر %{provider}"
     social_divider: "أو"
@@ -186,6 +187,11 @@ ar:
         count_exact: "استخدم %{exact} نقاط بالضبط (الآن %{n})."
         option_ok: "تسميات الإجابات قصيرة وواضحة (≤ %{max} حرفًا)."
         option_long: "اختصر «%{opt}» إلى %{max} حرفًا أو أقل."
+        page_empty: "أضف صفحة واحدة على الأقل إلى القصة."
+        page_ok: "%{n} صفحات — ضمن النطاق المثالي %{min}–%{max}."
+        page_many: "%{n} صفحات — قلّصها إلى %{max} أو أقل حتى لا تطول القصة."
+        page_length_ok: "طول الصفحات مريح للقراءة (≤ %{max} حرفًا)."
+        page_length_long: "إحدى الصفحات طويلة جدًا (%{n} حرفًا) — اجعل الصفحات أقل من %{max} حرفًا أو قسّمها إلى صفحتين."
         ccount_ok: "%{n} بطاقات — ضمن النطاق المثالي %{min}–%{max}."
         ccount_few: "%{n} بطاقات — القليل بعد يبلغ المثالي %{min}–%{max}."
         ccount_min: "%{n} بطاقات — استهدف %{min} على الأقل."
@@ -199,6 +205,14 @@ ar:
         whole_verto: "الـ Verto كاملاً"
         card_n: "البطاقة %{n}"
         section_empty: "لا شيء هنا."
+      scenario:
+        page_of: "الصفحة %{n} من %{total}"
+        page_placeholder: "اكتب هذه الصفحة…"
+        end_of_card: "نهاية البطاقة"
+        edit_options: "تعديل خيارات الإجابة ›"
+        next_page_btn: "الصفحة التالية ›"
+        answer_kicker: "خيارات الإجابة"
+        choose_kicker: "اختر إجابتك"
     wizard:
       step_counter: الخطوة %{n} من %{total}
   nav:

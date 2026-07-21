@@ -45,6 +45,7 @@ vi:
       select_many_grid: "Chọn tất cả đáp án phù hợp"
       tap_card: "Vuốt để trả lời"
       open_ended: "Nhập câu trả lời của bạn"
+      scenario: "Đọc tiếp rồi chọn"
   auth:
     social_continue: "Tiếp tục với %{provider}"
     social_divider: "hoặc"
@@ -186,6 +187,11 @@ vi:
         count_exact: "Dùng đúng %{exact} điểm (hiện %{n})."
         option_ok: "Nhãn đáp án ngắn gọn, dễ đọc (≤ %{max} ký tự)."
         option_long: "Rút gọn “%{opt}” còn %{max} ký tự hoặc ít hơn."
+        page_empty: "Thêm ít nhất một trang vào câu chuyện."
+        page_ok: "%{n} trang — trong khoảng lý tưởng %{min}–%{max}."
+        page_many: "%{n} trang — rút gọn còn %{max} trang trở xuống để câu chuyện không bị lê thê."
+        page_length_ok: "Các trang có độ dài thoải mái (≤ %{max} ký tự)."
+        page_length_long: "Một trang quá dài (%{n} ký tự) — giữ các trang dưới %{max} ký tự hoặc chia thành hai."
         ccount_ok: "%{n} thẻ — trong khoảng lý tưởng %{min}–%{max}."
         ccount_few: "%{n} thẻ — thêm vài thẻ nữa là đạt mức lý tưởng %{min}–%{max}."
         ccount_min: "%{n} thẻ — hãy nhắm ít nhất %{min}."
@@ -199,6 +205,14 @@ vi:
         whole_verto: "Toàn bộ Verto"
         card_n: "Thẻ %{n}"
         section_empty: "Không có gì ở đây."
+      scenario:
+        page_of: "Trang %{n} / %{total}"
+        page_placeholder: "Viết trang này…"
+        end_of_card: "Kết thúc thẻ"
+        edit_options: "Chỉnh sửa lựa chọn trả lời ›"
+        next_page_btn: "Trang tiếp theo ›"
+        answer_kicker: "Lựa chọn trả lời"
+        choose_kicker: "Hãy đưa ra lựa chọn của bạn"
     wizard:
       step_counter: Bước %{n} / %{total}
   nav:

@@ -45,6 +45,7 @@ sw:
       select_many_grid: "Chagua zote zinazofaa"
       tap_card: "Buruta ili kujibu"
       open_ended: "Andika jibu lako"
+      scenario: "Endelea kusoma, kisha chagua"
   auth:
     social_continue: "Endelea na %{provider}"
     social_divider: "au"
@@ -186,6 +187,11 @@ sw:
         count_exact: "Tumia pointi %{exact} haswa (sasa %{n})."
         option_ok: "Lebo za majibu ni fupi na zinasomeka (≤ herufi %{max})."
         option_long: "Fupisha “%{opt}” hadi herufi %{max} au chini."
+        page_empty: "Ongeza angalau ukurasa mmoja kwenye hadithi."
+        page_ok: "Kurasa %{n} — ndani ya wastani bora wa %{min}–%{max}."
+        page_many: "Kurasa %{n} — punguza hadi %{max} au chini ili hadithi isiwe ndefu mno."
+        page_length_ok: "Kurasa zina urefu unaofaa (≤ herufi %{max})."
+        page_length_long: "Ukurasa mmoja ni mrefu mno (herufi %{n}) — weka kurasa chini ya herufi %{max} au ugawanye kuwa mbili."
         ccount_ok: "Kadi %{n} — katika kiwango bora %{min}–%{max}."
         ccount_few: "Kadi %{n} — chache zaidi zitafikia kiwango bora %{min}–%{max}."
         ccount_min: "Kadi %{n} — lenga angalau %{min}."
@@ -199,6 +205,14 @@ sw:
         whole_verto: "Verto nzima"
         card_n: "Kadi %{n}"
         section_empty: "Hakuna kitu hapa."
+      scenario:
+        page_of: "Ukurasa %{n} kati ya %{total}"
+        page_placeholder: "Andika ukurasa huu…"
+        end_of_card: "Mwisho wa kadi"
+        edit_options: "Hariri chaguo za jibu ›"
+        next_page_btn: "Ukurasa unaofuata ›"
+        answer_kicker: "Chaguo za jibu"
+        choose_kicker: "Fanya chaguo lako"
     wizard:
       step_counter: Hatua %{n} kati ya %{total}
   nav:

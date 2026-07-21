@@ -45,6 +45,7 @@ nl:
       select_many_grid: "Kies alles wat van toepassing is"
       tap_card: "Sleep om te antwoorden"
       open_ended: "Typ je antwoord"
+      scenario: "Lees verder en kies dan"
   auth:
     social_continue: "Doorgaan met %{provider}"
     social_divider: "of"
@@ -186,6 +187,11 @@ nl:
         count_exact: "Gebruik precies %{exact} punten (nu %{n})."
         option_ok: "Antwoordlabels zijn kort en leesbaar (≤ %{max} tekens)."
         option_long: "Kort “%{opt}” in tot %{max} tekens of minder."
+        page_empty: "Voeg minstens één pagina toe aan het verhaal."
+        page_ok: "%{n} pagina's — binnen het ideale bereik %{min}–%{max}."
+        page_many: "%{n} pagina's — beperk tot %{max} of minder zodat het verhaal niet gaat slepen."
+        page_length_ok: "Pagina's hebben een prettige leeslengte (≤ %{max} tekens)."
+        page_length_long: "Eén pagina is te lang (%{n} tekens) — houd pagina's onder %{max} tekens of splits ze in tweeën."
         ccount_ok: "%{n} kaarten — in het ideale bereik %{min}–%{max}."
         ccount_few: "%{n} kaarten — een paar meer haalt het ideale %{min}–%{max}."
         ccount_min: "%{n} kaarten — mik op minstens %{min}."
@@ -199,6 +205,14 @@ nl:
         whole_verto: "Hele Verto"
         card_n: "Kaart %{n}"
         section_empty: "Niets hier."
+      scenario:
+        page_of: "Pagina %{n} van %{total}"
+        page_placeholder: "Schrijf deze pagina…"
+        end_of_card: "Einde van de kaart"
+        edit_options: "Antwoordopties bewerken ›"
+        next_page_btn: "Volgende pagina ›"
+        answer_kicker: "Antwoordopties"
+        choose_kicker: "Maak je keuze"
     wizard:
       step_counter: Stap %{n} van %{total}
   nav:

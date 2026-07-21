@@ -45,6 +45,7 @@ hi:
       select_many_grid: "सभी लागू विकल्प चुनें"
       tap_card: "उत्तर देने के लिए स्वाइप करें"
       open_ended: "अपना उत्तर लिखें"
+      scenario: "आगे पढ़ें, फिर चुनें"
   auth:
     social_continue: "%{provider} के साथ जारी रखें"
     social_divider: "या"
@@ -186,6 +187,11 @@ hi:
         count_exact: "ठीक %{exact} बिंदु रखें (अभी %{n})."
         option_ok: "उत्तर लेबल छोटे और पठनीय हैं (≤ %{max} अक्षर)."
         option_long: "“%{opt}” को %{max} अक्षर या कम करें."
+        page_empty: "कहानी में कम से कम एक पेज जोड़ें."
+        page_ok: "%{n} पेज — आदर्श %{min}–%{max} की सीमा में."
+        page_many: "%{n} पेज — कहानी को खिंचने से बचाने के लिए %{max} या उससे कम करें."
+        page_length_ok: "पेज आरामदायक लंबाई के हैं (≤ %{max} अक्षर)."
+        page_length_long: "एक पेज बहुत लंबा है (%{n} अक्षर) — पेज को %{max} से कम रखें या इसे दो में बाँटें."
         ccount_ok: "%{n} कार्ड — आदर्श सीमा %{min}–%{max} में."
         ccount_few: "%{n} कार्ड — कुछ और %{min}–%{max} के आदर्श तक पहुँचा देंगे."
         ccount_min: "%{n} कार्ड — कम से कम %{min} का लक्ष्य रखें."
@@ -199,6 +205,14 @@ hi:
         whole_verto: "पूरा Verto"
         card_n: "कार्ड %{n}"
         section_empty: "यहाँ कुछ नहीं।"
+      scenario:
+        page_of: "पेज %{n} / %{total}"
+        page_placeholder: "यह पेज लिखें…"
+        end_of_card: "कार्ड का अंत"
+        edit_options: "उत्तर विकल्प संपादित करें ›"
+        next_page_btn: "अगला पेज ›"
+        answer_kicker: "उत्तर विकल्प"
+        choose_kicker: "अपना चुनाव करें"
     wizard:
       step_counter: चरण %{n} / %{total}
   nav:
