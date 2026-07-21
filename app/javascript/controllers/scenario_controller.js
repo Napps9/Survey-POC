@@ -21,6 +21,13 @@ export default class extends Controller {
     // page-turn just snaps instead of animating.
     this.formsMode = !!this.element.closest(".forms-mode")
     this._pageSeq = 0
+    // The card's question text/eyebrow (.q-header) is shared markup rendered
+    // once above every type's answer widget — for scenario it belongs to the
+    // final choice, not the story, so it's hidden while flipping through
+    // narrative pages and only revealed on the answer page (see layout()).
+    // It lives outside .book-wrap (this controller's root), so it's resolved
+    // via the shared .split-right ancestor rather than a Stimulus target.
+    this._header = this.element.closest(".split-right")?.querySelector(".q-header") || null
     this.layout()
   }
 
@@ -148,6 +155,7 @@ export default class extends Controller {
     this._syncDots()
 
     const atAnswer = this.atAnswerPage
+    this._header?.classList.toggle("book-header-visible", atAnswer)
     if (this.hasPrevBtnTarget) this.prevBtnTarget.disabled = this.current === 0
     if (this.hasNextBtnTarget) {
       this.nextBtnTarget.disabled = atAnswer

@@ -1386,6 +1386,12 @@
    swipe-card stack above) so a page shows as much story as possible and
    getting through the card takes the fewest taps. ─────────────────── */
 .split-right--book { justify-content: flex-start; padding: 36px 32px 22px; gap: 10px; }
+/* The shared .q-header (question text) belongs to the final choice, not the
+   story — hidden while flipping narrative pages so the book gets that space
+   too, revealed only on the answer page (scenario_controller#layout toggles
+   .book-header-visible). */
+.split-right--book .q-header { display: none; }
+.split-right--book .q-header.book-header-visible { display: block; }
 /* _card_component.html.erb wraps every type's slot in a plain .mt-2 div —
    it has to join the flex-column chain too, or .book-wrap's flex:1 below has
    nothing to grow against and the book collapses to its min-height. */

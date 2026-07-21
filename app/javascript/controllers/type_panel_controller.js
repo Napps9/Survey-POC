@@ -969,6 +969,13 @@ export default class extends Controller {
 
     const wasType = card.dataset.cardType
 
+    // The scenario book widget needs its right panel to join the flex-column
+    // fill chain (see .split-right--book in application.css) — the server
+    // only adds this class on initial render, so a client-side type switch
+    // has to toggle it itself or the book silently sits at its min-height.
+    const splitRight = card.querySelector(".split-right")
+    if (splitRight) splitRight.classList.toggle("split-right--book", type === "scenario")
+
     // 1. Update badge + eyebrow
     const badge = card.querySelector(".s-badge")
     if (badge) { badge.textContent = meta.badge; badge.className = `s-badge ${meta.css}` }
