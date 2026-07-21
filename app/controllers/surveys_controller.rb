@@ -5,6 +5,12 @@ class SurveysController < ApplicationController
 
   MAX_PDF_BYTES = 10.megabytes
 
+  # Runs ahead of authentication: a creator who copies the address-bar URL of
+  # their own preview and sends THAT to respondents is handing out an
+  # authenticated, org-scoped link. When the Verto is published, forward those
+  # signed-out visitors to its real public player instead (see method).
+  prepend_before_action :forward_shared_preview_link, only: :preview
+
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
   before_action :set_survey,           only: [ :show, :preview, :publish, :update_settings ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
@@ -658,6 +664,26 @@ class SurveysController < ApplicationController
 
   def set_survey
     @survey = Current.organisation.surveys.kept.without_report_text.find(params[:id])
+  end
+
+  # GET /surveys/:id/preview is the owner's own authenticated, org-scoped
+  # preview. Creators sometimes copy that URL from the address bar and send it
+  # to respondents instead of the public /play link — respondents then hit the
+  # sign-in wall (or a 404) and report a "broken game link". When the Verto is
+  # actually published, forward those signed-out visitors to its real public
+  # player so the link they were given just works. Signed-in members still get
+  # the true owner preview (drafts, recording disabled); drafts and unknown ids
+  # fall through to the normal flow (the usual sign-in redirect / 404). The
+  # redirect target is the publish link the creator already distributes
+  # publicly, so nothing private is exposed; it's a 302 so it isn't cached and
+  # correctly stops applying the moment the Verto is unpublished.
+  def forward_shared_preview_link
+    return if resume_session # signed in → let the org-scoped owner preview run
+
+    survey = Survey.find_by(id: params[:id])
+    return if survey.nil? || survey.publish_token.blank?
+
+    redirect_to play_survey_url(survey.publish_token, lang: params[:lang].presence)
   end
 
   def self.import_verifier

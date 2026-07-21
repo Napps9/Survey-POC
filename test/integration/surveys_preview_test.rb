@@ -64,6 +64,41 @@ class SurveysPreviewTest < ActionDispatch::IntegrationTest
     refute_match "Preview mode", response.body
   end
 
+  test "a signed-out visitor to a published Verto's preview link is forwarded to the public player" do
+    # The creator copied /surveys/:id/preview from their address bar and sent it
+    # to respondents; a signed-out respondent should land on the real /play link
+    # rather than a sign-in wall.
+    org   = Organisation.create!(name: "O", slug: "fwd-#{SecureRandom.hex(2)}")
+    token = SecureRandom.urlsafe_base64(18)
+    s     = org.surveys.create!(title: "Live", theme: "Live", audience_age: "all", key_insight: "x",
+                                default_locale: "en", locales: [ "en" ], cards: CARDS,
+                                publish_token: token, published_at: Time.current)
+
+    get preview_survey_path(s)
+    assert_redirected_to play_survey_url(token)
+  end
+
+  test "the forward preserves an explicit ?lang= from the shared link" do
+    org   = Organisation.create!(name: "O", slug: "fwdlang-#{SecureRandom.hex(2)}")
+    token = SecureRandom.urlsafe_base64(18)
+    s     = org.surveys.create!(title: "Live", theme: "Live", audience_age: "all", key_insight: "x",
+                                default_locale: "en", locales: [ "en", "fr" ], cards: CARDS,
+                                publish_token: token, published_at: Time.current)
+
+    get preview_survey_path(s, lang: "fr")
+    assert_redirected_to play_survey_url(token, lang: "fr")
+  end
+
+  test "a signed-out visitor to a draft's preview link still hits the sign-in wall" do
+    # A draft has no public player to forward to, so the normal auth flow stands.
+    org = Organisation.create!(name: "O", slug: "draftfwd-#{SecureRandom.hex(2)}")
+    s   = org.surveys.create!(title: "Draft", theme: "Draft", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS)
+
+    get preview_survey_path(s)
+    assert_redirected_to new_session_path
+  end
+
   test "dashboard cards link to the preview" do
     org = sign_in_to_org("dash")
     s   = org.surveys.create!(title: "Card", theme: "Card", audience_age: "all", key_insight: "x",
