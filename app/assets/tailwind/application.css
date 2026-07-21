@@ -376,6 +376,37 @@
 .split-right .rating-wrap,
 .split-right .rotate-wrap { text-align: left; }
 
+/* Long option lists: .split-card is a fixed-height, overflow:hidden box, so
+   a list/grid with more options than the card is tall used to be silently
+   clipped past the card edge. Pin the question (.q-header) at the top and
+   let the option container scroll internally instead — scoped to list/grid
+   answer types only (:has(> .choice-list/.choice-grid/.prioritise-list)) so
+   other card types (slider, tap-card, freeform, …) keep their own layout. */
+.split-right > .q-header { flex: 0 0 auto; }
+.split-right > .mt-2:has(> .choice-list),
+.split-right > .mt-2:has(> .choice-grid),
+.split-right > .mt-2:has(> .prioritise-list) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.18) transparent;
+  display: flex;
+  flex-direction: column;
+}
+/* Vertical centring for short lists that still fit without scrolling, via
+   auto margins on the list itself rather than `justify-content: center` on
+   the scroll container: when content overflows, auto margins resolve to 0
+   (flush top) instead of centring the overflow equally above and below —
+   which would otherwise scroll-clip the first options above an
+   unreachable, negative scroll position. */
+.split-right > .mt-2:has(> .choice-list) > .choice-list,
+.split-right > .mt-2:has(> .choice-grid) > .choice-grid,
+.split-right > .mt-2:has(> .prioritise-list) > .prioritise-list {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 /* ── "Add media" / "Change animation" floating CTA on left panel ── */
 .add-media-fab,
 .add-animation-fab {
