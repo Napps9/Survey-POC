@@ -59,4 +59,31 @@ class QuestionTypeClassifierTest < ActiveSupport::TestCase
     cards = [ { "type" => "not_a_real_type", "text" => "Q" } ]
     assert_equal [], classifier.normalize_cards(cards)
   end
+
+  test "normalize_cards preserves original_text/compliant/issue when the input card has them" do
+    cards = [
+      { "type" => "multiple_choice", "text" => "Pick one", "original_text" => "Pick one, please", "compliant" => false, "issue" => "Too casual", "options" => %w[A B C] },
+      { "type" => "open_ended", "text" => "Tell us more", "original_text" => "Tell us more", "compliant" => true, "issue" => "" }
+    ]
+    out = classifier.normalize_cards(cards)
+
+    assert_equal "Pick one, please", out[0]["original_text"]
+    assert_equal false, out[0]["compliant"]
+    assert_equal "Too casual", out[0]["issue"]
+
+    assert_equal "Tell us more", out[1]["original_text"]
+    assert_equal true, out[1]["compliant"]
+    refute out[1].key?("issue"), "blank issue is dropped, not carried through as an empty string"
+  end
+
+  test "normalize_cards drops original_text/compliant/issue when the input card doesn't have them" do
+    # This is the shape QuestionTypeClassifier's own classify_questions tool
+    # emits (Common Question classification) — it never has these fields.
+    cards = [ { "type" => "multiple_choice", "text" => "Pick one", "options" => %w[A B] } ]
+    out = classifier.normalize_cards(cards).first
+
+    refute out.key?("original_text")
+    refute out.key?("compliant")
+    refute out.key?("issue")
+  end
 end

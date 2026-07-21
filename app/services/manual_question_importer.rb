@@ -115,13 +115,19 @@ class ManualQuestionImporter
     - A strict binary gate → yes_no (use sparingly).
     - An open, qualitative "tell us…" / "why…" question with no fixed answers →
       open_ended.
-    - A multi-sentence narrative situation ("Imagine you…", "You are faced
-      with…") that puts the reader in a scene before offering 2-3 options →
-      scenario. Split the narrative into `pages` (1-5 short paragraphs,
+    - A question whose full wording can't be kept within its type's length
+      cap without cutting real content, or a multi-sentence narrative
+      situation ("Imagine you…", "You are faced with…") that puts the
+      reader in a scene before offering 2-3 options → scenario. Don't
+      silently shorten a long, information-carrying question into a
+      truncated blurb — split it into `pages` (1-5 short paragraphs,
       reading order, source wording preserved) and put the closing options
-      in `options` (2-3, each <= 30 chars). Only choose scenario when the
-      text is genuinely a short story or situation — a single plain
-      sentence with options is multiple_choice, not scenario.
+      in `options` (2-3, each <= 30 chars). Both `text` AND `original_text`
+      for a scenario are the short closing question only (e.g. "Which
+      would you choose?") — never the full narrative, which belongs
+      entirely in `pages`. Only choose scenario when there's genuinely a
+      story/situation to read first — a single plain sentence with options
+      is multiple_choice, not scenario.
     - NEVER emit a welcome_card — the import contains only the user's questions.
 
     When in doubt between a grid and a list, prefer the grid. When in doubt

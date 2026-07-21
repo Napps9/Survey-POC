@@ -111,14 +111,17 @@ class QuestionTypeClassifier
     - A strict binary gate -> yes_no (use sparingly).
     - An open, qualitative "tell us..." / "why..." question with no fixed
       answers -> open_ended.
-    - A multi-sentence narrative situation ("Imagine you...", "You are
-      faced with...") that puts the reader in a scene before offering 2-3
-      options -> scenario. Split the narrative into `pages` (1-5 short
-      paragraphs, reading order, source wording preserved) and put the
-      closing options in `options` (2-3, each <= 30 chars). Only choose
-      scenario when the source text is genuinely a short story or situation
-      — a single plain sentence with options is multiple_choice, not
-      scenario, even if `pages` could technically hold it as one page.
+    - A question whose full wording can't be kept within its type's length
+      cap without cutting real content, or a multi-sentence narrative
+      situation ("Imagine you...", "You are faced with...") that puts the
+      reader in a scene before offering 2-3 options -> scenario. Don't
+      silently shorten a long, information-carrying question into a
+      truncated blurb — split it into `pages` (1-5 short paragraphs,
+      reading order, source wording preserved) and put the closing options
+      in `options` (2-3, each <= 30 chars). Only choose scenario when the
+      source text is genuinely a short story or situation — a single plain
+      sentence with options is multiple_choice, not scenario, even if
+      `pages` could technically hold it as one page.
     - NEVER emit a welcome_card — these are user-authored questions only.
 
     When in doubt between a grid and a list, prefer the grid. When in doubt
@@ -186,6 +189,16 @@ class QuestionTypeClassifier
       out = { "type" => type, "text" => text }
       out["description"] = card["description"].to_s.strip if card["description"].to_s.strip.present?
       out["pages"] = normalize_scenario_pages(card["pages"]) if type == "scenario"
+
+      # Review-only fields (PdfQuestionImporter / ManualQuestionImporter) —
+      # SurveysController reads `compliant` to decide whether to show the
+      # verbatim-vs-optimised review screen, and `original_text`/`issue` to
+      # render it. Carried through only when the caller's raw card actually
+      # has them (QuestionTypeClassifier's own classify_questions tool never
+      # emits these, so Common Question classification is unaffected).
+      out["original_text"] = card["original_text"].to_s.strip if card["original_text"].to_s.strip.present?
+      out["compliant"] = card["compliant"] if [ true, false ].include?(card["compliant"])
+      out["issue"] = card["issue"].to_s.strip if card["issue"].to_s.strip.present?
 
       options = Array(card["options"]).map { |o| o.to_s.strip }.reject(&:empty?)
       options = options.first(SurveyGenerator::TAP_CARD_MAX_STATEMENTS) if type == "tap_card"

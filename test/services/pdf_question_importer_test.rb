@@ -84,4 +84,51 @@ class PdfQuestionImporterTest < ActiveSupport::TestCase
 
     assert_equal [], result["cards"]
   end
+
+  # Regression: normalize_cards used to silently drop original_text/compliant/
+  # issue, which made SurveysController#import_pdf's `flagged = cards.select
+  # { |c| c["compliant"] == false }` check always empty in production — the
+  # verbatim-vs-optimised review screen was unreachable no matter what Claude
+  # judged. These three fields must survive the real #call pipeline.
+  test "preserves original_text/compliant/issue through the real pipeline" do
+    importer = importer_returning(
+      "title" => "T",
+      "cards" => [
+        { "type" => "multiple_choice", "text" => "Which one?", "original_text" => "Which one do you prefer out of these options?",
+          "compliant" => false, "issue" => "Over the 100-character cap", "options" => %w[A B C] },
+        { "type" => "yes_no", "text" => "Did you attend?", "original_text" => "Did you attend?", "compliant" => true, "issue" => "" }
+      ]
+    )
+
+    result = importer.call(pdf_data: "x")
+
+    flagged = result["cards"].select { |c| c["compliant"] == false }
+    assert_equal 1, flagged.size, "the review screen's flagging check must see a real false, not a stripped nil"
+    assert_equal "Which one do you prefer out of these options?", flagged.first["original_text"]
+    assert_equal "Over the 100-character cap", flagged.first["issue"]
+
+    compliant_card = result["cards"].find { |c| c["type"] == "yes_no" }
+    assert_equal true, compliant_card["compliant"]
+    assert_equal "Did you attend?", compliant_card["original_text"]
+  end
+
+  test "a long narrative question with a short closing question is imported as scenario, not truncated" do
+    importer = importer_returning(
+      "title" => "T",
+      "cards" => [
+        { "type" => "scenario", "text" => "Which would you choose?", "original_text" => "Which would you choose?",
+          "compliant" => true,
+          "pages" => [ "Summers are getting hotter and your room is stuffy at night.", "You could run the air conditioner, but it costs more." ],
+          "options" => [ "Windows and fans", "Air conditioner" ] }
+      ]
+    )
+
+    result = importer.call(pdf_data: "x")
+    card = result["cards"].first
+
+    assert_equal "scenario", card["type"]
+    assert_equal 2, card["pages"].size
+    assert_equal true, card["compliant"], "a scenario's short closing text is inherently rule-compliant"
+    assert_equal "Which would you choose?", card["original_text"]
+  end
 end
