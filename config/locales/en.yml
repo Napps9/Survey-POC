@@ -47,6 +47,7 @@ en:
       select_many_grid: "Choose all that apply"
       tap_card: "Swipe to respond"
       open_ended: "Type your answer"
+      scenario: "Read on, then choose"
   auth:
     social_continue: "Continue with %{provider}"
     social_divider: "or"
@@ -201,6 +202,14 @@ en:
         whole_verto: "Whole Verto"
         card_n: "Card %{n}"
         section_empty: "Nothing here."
+      scenario:
+        page_of: "Page %{n} of %{total}"
+        page_placeholder: "Write this page…"
+        end_of_card: "End of card"
+        edit_options: "Edit answer options ›"
+        next_page_btn: "Next page ›"
+        answer_kicker: "Answer options"
+        choose_kicker: "Make your choice"
     wizard:
       step_counter: "Step %{n} of %{total}"
   nav:

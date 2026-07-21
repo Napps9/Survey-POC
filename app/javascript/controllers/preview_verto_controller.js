@@ -22,6 +22,10 @@ export default class extends Controller {
   }
 
   next() {
+    // Scenario: mirror player_controller's interception so Preview behaves
+    // exactly like the real player — Next turns the page until the book's
+    // own answer page is showing.
+    if (this._scenarioTurn(this.currentValue, 1)) return
     if (this.currentValue < this.cardTargets.length - 1) {
       this.currentValue++
       this._update()
@@ -29,13 +33,32 @@ export default class extends Controller {
   }
 
   back() {
+    if (this._scenarioTurn(this.currentValue, -1)) return
     if (this.currentValue > 0) {
       this.currentValue--
       this._update()
     }
   }
 
+  // See player_controller.js — same pattern, duplicated because this preview
+  // overlay clones the editor DOM independently rather than sharing the
+  // player's controller.
+  _scenarioController(idx) {
+    const card = this.cardTargets[idx]
+    if (!card) return null
+    const el = card.querySelector('[data-controller~="scenario"]')
+    if (!el) return null
+    return this.application.getControllerForElementAndIdentifier(el, "scenario")
+  }
+
+  _scenarioTurn(idx, delta) {
+    const ctrl = this._scenarioController(idx)
+    if (!ctrl) return false
+    return delta > 0 ? ctrl.next() : ctrl.back()
+  }
+
   finish() {
+    if (this._scenarioTurn(this.currentValue, 1)) return
     this.cardTargets.forEach(c => c.classList.remove("active"))
     this.thankyouTarget.classList.add("active")
     this.backBtnTarget.classList.add("hidden")
@@ -148,7 +171,8 @@ export default class extends Controller {
     //    "Allow other" / "Required" checkboxes shown only to the creator.
     clone.querySelectorAll(
       ".pick-item-delete, .tap-card-delete, .pick-add-btn, .tap-add-btn, .add-media-fab, " +
-      ".split-left-design-prompt, .quiz-correct-block, .token-award-block, .other-edit-toggle"
+      ".split-left-design-prompt, .quiz-correct-block, .token-award-block, .other-edit-toggle, " +
+      ".book-edit-tools"
     ).forEach(el => el.remove())
 
     // 2. The "+ Other" CTA is disabled in the editor itself (there the

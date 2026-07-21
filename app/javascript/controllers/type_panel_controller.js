@@ -97,6 +97,11 @@ const COMPATIBILITY = {
     { type: "rating",           score: 55,  note: "Stars give a familiar scale, but you lose the rapid-fire feel of swipe." },
     { type: "select_one_grid",  score: 40,  note: "Removes the playful swipe mechanic — only swap if the question really is a single static choice." },
   ],
+  scenario: [
+    { type: "scenario",         score: 100, note: "A short story respondents turn through page by page, then a 2–3 option choice on the last page — best for longer, situational prompts that would overwhelm a single card." },
+    { type: "multiple_choice",  score: 45,  note: "Drops the narrative build-up for a plain single-pick list — switch if the story context isn't adding anything." },
+    { type: "yes_no",           score: 35,  note: "Strips it to a bare binary — only if the story genuinely reduces to a yes/no." },
+  ],
   range: [
     { type: "range",            score: 100, note: "Best at capturing strength of feeling, and the reactive animated character makes answering feel rewarding — a clean distribution plus an engaging visual." },
     { type: "nps",              score: 90,  note: "Classic 0–10 scale on a compact vertical slider — switch for a quieter, traditional feel without the animation." },
@@ -146,8 +151,15 @@ const DEFAULT_OPTIONS = {
   select_one_grid:  ["A", "B", "C", "D"],
   select_many_grid: ["A", "B", "C", "D"],
   tap_card:         ["Statement 1", "Statement 2", "Statement 3", "Statement 4", "Statement 5"],
+  scenario:         ["Option A", "Option B"],
   open_ended:       [],
   welcome_card:     [],
+}
+
+// Default narrative pages for a card freshly switched to Scenario — one
+// blank page (the .book-page-text placeholder invites the creator to write).
+const DEFAULT_PAGES = {
+  scenario: [ { id: "", text: "" } ],
 }
 
 // Default NPS label count (0–10). Server-side too (NpsHelper::NPS_STEPS).
@@ -219,6 +231,59 @@ const COMPONENTS = {
       </div>
       <button type="button" class="tap-add-btn" data-action="click->card-editor#addTapOption">＋ Add statement</button>
     </div>`,
+
+  // Mirrors the "when scenario" branch in _card_component.html.erb — a book
+  // stack of narrative pages (ctx.pages) plus the reused single-select
+  // .choice-list as the final page. Always built editable (client-side type
+  // switching only happens in the editor); scenario_controller.js drives the
+  // page-turn nav once this HTML lands in the DOM.
+  scenario: (opts, ctx = {}) => {
+    const pages = (ctx.pages && ctx.pages.length) ? ctx.pages : [ { id: "", text: "" } ]
+    const pagesHtml = pages.map((p, i) => `
+      <div class="book-page" data-scenario-target="page" data-page-id="${esc(p.id || "")}">
+        <div class="book-page-scroll">
+          <div class="book-page-kicker" data-scenario-target="kicker">Page ${i + 1} of ${pages.length}</div>
+          <div class="book-page-text" contenteditable="true" data-scenario-target="pageText"
+               data-placeholder="Write this page…">${esc(p.text || "")}</div>
+        </div>
+        <div class="book-page-corner">${i + 1}</div>
+        <div class="book-page-fade"></div>
+      </div>`).join("")
+    const answerHtml = `
+      <div class="book-page is-answer" data-scenario-target="page">
+        <div class="book-page-scroll">
+          <div class="book-page-kicker">Answer options</div>
+          <ul class="choice-list choice-list--single" data-controller="picker card-editor" data-picker-mode-value="single">
+            ${opts.map((o, i) => `
+              <li class="choice-list-item pick-item" data-picker-target="item"
+                  data-action="click->picker#pick" data-selected="false">
+                <div class="choice-list-tile choice-bg-${(i % 6) + 1}"></div>
+                <span class="pick-text choice-list-label" contenteditable="true">${esc(o)}</span>
+                <span class="choice-list-tick pick-dot">✓</span>
+                <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
+              </li>`).join("")}
+            <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
+              <span>＋</span> Add option
+            </li>
+          </ul>
+        </div>
+        <div class="book-page-fade"></div>
+      </div>`
+    return `
+      <div class="book-wrap" data-controller="scenario card-editor" data-scenario-editable-value="true">
+        <div class="book-stack" data-scenario-target="stack">${pagesHtml}${answerHtml}</div>
+        <div class="book-edit-tools" data-scenario-target="editTools">
+          <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn" data-action="click->scenario#deletePage">✕ Delete this page</button>
+          <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn" data-action="click->scenario#addPage">＋ Add page</button>
+        </div>
+        <div class="book-dots" data-scenario-target="dots"></div>
+        <div class="book-nav-row">
+          <button type="button" class="book-chevron" data-scenario-target="prevBtn" data-action="click->scenario#back" aria-label="Previous page">‹</button>
+          <button type="button" class="next-btn" data-scenario-target="nextBtn" data-action="click->scenario#next">Next page ›</button>
+        </div>
+        <div class="book-live" data-scenario-target="live" aria-live="polite"></div>
+      </div>`
+  },
 
   range: (opts, ctx = {}) => sliderHtml(opts, ctx),
 
@@ -924,7 +989,8 @@ export default class extends Controller {
         rangeThemes:     this._rangeThemePicker.themes,
         rangeThemeGroups: this._rangeThemePicker.groups,
         rangeThemeLabel: this._rangeThemePicker.label,
-        rangeTheme:      card.dataset.cardRangeTheme || ""
+        rangeTheme:      card.dataset.cardRangeTheme || "",
+        pages:           this._pagesFor(card, type)
       })
     }
 
@@ -1017,6 +1083,16 @@ export default class extends Controller {
     if (type === "yes_no") return ["Yes", "No"]
     if (original.length) return original
     return DEFAULT_OPTIONS[type] || []
+  }
+
+  // Existing pages if this card already had some (switching away from
+  // Scenario and back preserves what was written), else a fresh blank page.
+  _pagesFor(card, type) {
+    if (type !== "scenario") return []
+    let original = []
+    try { original = JSON.parse(card.dataset.cardPages || "[]") } catch (_) {}
+    if (Array.isArray(original) && original.length) return original
+    return DEFAULT_PAGES.scenario || []
   }
 
   _updateCount() {

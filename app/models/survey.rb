@@ -97,6 +97,8 @@ class Survey < ApplicationRecord
   PEXELS_CREDIT_URL = %r{\Ahttps://(?:www\.)?pexels\.com/[\w@\-./?=&%]*\z}i
   MAX_CREDIT_NAME   = 80
   MAX_LANE_LABEL    = 60 # branch name shown on the flow map (stored on the entry card)
+  MAX_SCENARIO_PAGES       = 6
+  MAX_SCENARIO_PAGE_LENGTH = 600
   # Pexels video CDN (host-whitelisted) — the streamable mp4 for a card's
   # left-panel video. Posters are images.pexels.com URLs (sanitize_image_url).
   PEXELS_VIDEO_URL  = %r{\Ahttps://videos\.pexels\.com/[\w\-./]+\.mp4(?:\?[\w%\-=&.+]*)?\z}i
@@ -184,6 +186,33 @@ class Survey < ApplicationRecord
           c.delete("range_theme")
         end
       end
+      # Scenario narrative pages — bounded count/length, and every page gets a
+      # stable id (mirrors the cid backfill above) so translations align by
+      # id rather than array index, which would silently scramble if a
+      # creator reorders pages after translating. Dropped entirely on any
+      # other type, same as range_theme above.
+      if c["type"].to_s == "scenario"
+        c["pages"] = Array(c["pages"]).first(MAX_SCENARIO_PAGES).filter_map do |p|
+          next unless p.is_a?(Hash)
+          text = p["text"].to_s.strip.first(MAX_SCENARIO_PAGE_LENGTH)
+          next if text.blank?
+          { "id" => p["id"].to_s.strip.presence || "pg_#{SecureRandom.hex(4)}", "text" => text }
+        end
+        if c["i18n"].is_a?(Hash)
+          c["i18n"] = c["i18n"].transform_values do |tr|
+            next tr unless tr.is_a?(Hash) && tr["pages"].present?
+            tr = tr.dup
+            tr["pages"] = Array(tr["pages"]).first(MAX_SCENARIO_PAGES).filter_map do |p|
+              next unless p.is_a?(Hash) && p["id"].present?
+              { "id" => p["id"].to_s, "text" => p["text"].to_s.strip.first(MAX_SCENARIO_PAGE_LENGTH) }
+            end
+            tr
+          end
+        end
+      else
+        c.delete("pages")
+      end
+
       c["image"] = sanitize_image_url(c["image"]) if c.key?("image")
       if c.key?("option_images")
         c["option_images"] = Array(c["option_images"]).map { |u| sanitize_image_url(u) }

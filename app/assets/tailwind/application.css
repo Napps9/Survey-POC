@@ -1379,6 +1379,102 @@
   font-size: 11px; color: rgba(0,0,0,0.3);
 }
 
+/* ── Scenario / book widget — shared by editor + player ───────────
+   One component (scenario_controller.js) drives both: the editor edits a
+   page full-size in place, the player reads it full-size. Pages fill
+   whatever height .split-right has to give (flex, not a fixed box like the
+   swipe-card stack above) so a page shows as much story as possible and
+   getting through the card takes the fewest taps. ─────────────────── */
+.split-right--book { justify-content: flex-start; padding: 36px 32px 22px; gap: 10px; }
+/* _card_component.html.erb wraps every type's slot in a plain .mt-2 div —
+   it has to join the flex-column chain too, or .book-wrap's flex:1 below has
+   nothing to grow against and the book collapses to its min-height. */
+.split-right--book .mt-2 { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.book-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.book-stack { position: relative; flex: 1; min-height: 140px; width: 100%; perspective: 1500px; }
+.book-page {
+  position: absolute; inset: 0;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.18);
+  overflow: hidden;
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(.4,0,.2,1), opacity 0.38s ease;
+  display: flex; flex-direction: column;
+}
+.forms-mode .book-page { transition: none; }
+/* Scrolls when a page runs long, but never shows a scrollbar — it should
+   read as a page, not a textarea. Overflow is cued by .book-page-fade
+   instead of a visible bar (see .book-page.has-more below). */
+.book-page-scroll {
+  flex: 1; min-height: 0;
+  padding: 22px 22px 18px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  display: flex; flex-direction: column;
+}
+.book-page-scroll::-webkit-scrollbar { display: none; }
+.book-page-fade {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 30px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.97) 70%);
+  pointer-events: none;
+  opacity: 0; transition: opacity 0.2s ease;
+}
+.book-page.has-more .book-page-fade { opacity: 1; }
+.book-page-kicker {
+  font-family: "Alata", sans-serif; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(0,0,0,0.32); margin-bottom: 10px; flex-shrink: 0;
+}
+.book-page-text {
+  font-family: "ABeeZee", sans-serif; font-size: 16px; line-height: 1.66; color: #1a1a1a;
+  text-align: left; outline: none;
+}
+.book-page-text[contenteditable]:empty::before { content: attr(data-placeholder); color: rgba(0,0,0,0.32); }
+.book-page-corner {
+  position: absolute; bottom: 10px; right: 14px;
+  font-family: "Alata", sans-serif; font-size: 18px; color: rgba(0,0,0,0.09);
+  pointer-events: none;
+}
+
+.book-edit-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+.book-tool-btn {
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.02em;
+  color: rgba(0,0,0,0.45); background: none; border: none; cursor: pointer; padding: 2px 0;
+}
+.book-tool-btn:hover { color: #00594D; }
+.book-tool-btn.danger:hover { color: var(--color-red); }
+.book-tool-btn:disabled { opacity: 0.35; cursor: default; }
+
+.book-dots { display: flex; align-items: center; justify-content: center; gap: 7px; flex-shrink: 0; }
+.book-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(0,0,0,0.16); transition: transform 0.2s, background 0.2s; }
+.book-dot.active { background: var(--brand-primary, var(--color-green-500)); transform: scale(1.35); }
+.book-dot.done   { background: rgba(0,0,0,0.3); }
+.book-dot.answer { border-radius: 3px; }
+
+.book-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.book-nav-row { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.book-chevron {
+  width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.14);
+  background: white; color: rgba(0,0,0,0.55); font-size: 15px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.12s, opacity 0.12s, transform 0.12s; flex-shrink: 0;
+}
+.book-chevron:hover:not(:disabled) { background: rgba(1,234,203,0.1); color: #007A66; transform: scale(1.06); }
+.book-chevron:disabled { opacity: 0.22; cursor: default; }
+
+.book-nav-row .next-btn {
+  font-family: "Alata", sans-serif; font-size: 13px; letter-spacing: 0.03em;
+  color: #06281F; background: var(--brand-primary, var(--color-green-500));
+  border: none; border-radius: 12px; padding: 11px 18px;
+  cursor: pointer; flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: filter 0.12s, opacity 0.15s, transform 0.1s;
+}
+.book-nav-row .next-btn:hover { filter: brightness(1.06); }
+.book-nav-row .next-btn:disabled { opacity: 0.4; cursor: default; filter: none; }
+
 /* ── Audio capture ──────────────────────────────── */
 .audio-ui { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 8px 0; }
 .audio-visualiser { display: flex; align-items: center; gap: 4px; height: 56px; }
@@ -1984,6 +2080,10 @@
 .phone-bottom .rotate-card-stack { width: 100%; max-width: 300px; height: 56vh; max-height: 420px; min-height: 320px; }
 .phone-bottom .rotate-action-btn { width: 40px; height: 40px; font-size: 16px; }
 .phone-bottom .rotate-card-controls { padding: 24px 12px 12px; gap: 7px; }
+
+.phone-bottom .split-right--book { padding: 20px 18px 16px; }
+.phone-bottom .book-stack { min-height: 45vh; }
+.phone-bottom .book-page-text { font-size: 14px; line-height: 1.55; }
 
 .phone-bottom .activity-tag {
   font-size: 9px; padding: 2px 8px;

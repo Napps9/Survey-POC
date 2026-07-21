@@ -119,6 +119,17 @@ tap_card:
   picker_icon:  "⇄"
   pickable:     true
 
+scenario:
+  badge:        "SCENARIO"
+  badge_css:    "sb-swipe"
+  panel_label:  "READ ON, THEN CHOOSE"
+  eyebrow:      "Read on, then choose"
+  picker_name:  "Scenario"
+  picker_desc:  "A short story, then a choice"
+  explainer:    "A multi-page narrative — respondents turn through story pages like a book, then pick between 2–3 options on the final page. Best for longer, situational prompts that would overwhelm a single question card."
+  picker_icon:  "📖"
+  pickable:     true
+
 open_ended:
   badge:        "OPEN TEXT"
   badge_css:    "sb-text"

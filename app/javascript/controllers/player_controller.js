@@ -127,6 +127,10 @@ export default class extends Controller {
   }
 
   next() {
+    // Scenario: the deck's Next means "turn the page" until the book's own
+    // answer page is showing — otherwise one tap could skip the whole story
+    // (and the choice) without the respondent ever seeing it.
+    if (this._scenarioTurn(this.currentValue, 1)) return
     // Quiz: a graded card reveals right/wrong on the first Next, and only
     // advances on the second — so the player always sees how they did.
     if (this._needsReveal(this.currentValue)) {
@@ -154,6 +158,8 @@ export default class extends Controller {
   }
 
   back() {
+    // Scenario: retrace pages before leaving the card, symmetric with next().
+    if (this._scenarioTurn(this.currentValue, -1)) return
     this._capture(this.currentValue)
     this._saveProgress()
     if (this.logicValue) {
@@ -189,6 +195,8 @@ export default class extends Controller {
   }
 
   async finish() {
+    // Scenario: same interception as next() — a scenario can be the last card.
+    if (this._scenarioTurn(this.currentValue, 1)) return
     // Quiz: if the last card is graded and unrevealed, reveal it first; the
     // player presses Finish again to actually submit.
     if (this._needsReveal(this.currentValue)) {
@@ -450,6 +458,25 @@ export default class extends Controller {
     return false
   }
 
+  // The scenario_controller instance for card `idx`, if it's a scenario card.
+  _scenarioController(idx) {
+    const card = this.cardTargets[idx]
+    if (!card || card.dataset.cardType !== "scenario") return null
+    const el = card.querySelector('[data-controller~="scenario"]')
+    if (!el) return null
+    return this.application.getControllerForElementAndIdentifier(el, "scenario")
+  }
+
+  // Ask card `idx`'s book to turn a page instead of the deck advancing.
+  // Returns true if a page actually turned (book wasn't already at that
+  // edge) — next()/back()/finish() fall through to normal navigation
+  // otherwise, so a scenario at its answer page behaves like any other card.
+  _scenarioTurn(idx, delta) {
+    const ctrl = this._scenarioController(idx)
+    if (!ctrl) return false
+    return delta > 0 ? ctrl.next() : ctrl.back()
+  }
+
   _showRequiredHint(card) {
     if (this.hasRequiredHintTarget) this.requiredHintTarget.classList.remove("hidden")
     if (card) {
@@ -496,6 +523,7 @@ export default class extends Controller {
       case "multiple_choice":
       case "yes_no":
       case "select_one_grid":
+      case "scenario":
         return this._canonicalOf(
           card.querySelector('[data-picker-target="item"][data-selected="true"]')
         )
