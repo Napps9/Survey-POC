@@ -489,10 +489,6 @@ ja:
     new_link_body: このリンクを持つ人は、%{funder} のシートを獲得できます。14 日後に期限切れになります。
     copy: コピー
     copied: コピーしました!
-    seats_purchased: シート数
-    seats_purchased_hint: ライセンスできる組織の総数です。
-    update_seats: 更新
-    seats_updated: シート数を更新しました。
     licensed_orgs_section: ライセンス組織
     no_licensed_orgs_title: ライセンス組織はまだいません
     no_licensed_orgs_body: 参加リンクを送るか、直接アカウントを作成してください。

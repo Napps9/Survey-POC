@@ -489,10 +489,6 @@ ar:
     new_link_body: يمكن لأي شخص لديه هذا الرابط الحصول على مقعد ضمن %{funder}. تنتهي صلاحيته خلال 14 يومًا.
     copy: نسخ
     copied: تم النسخ!
-    seats_purchased: المقاعد
-    seats_purchased_hint: العدد الإجمالي للمؤسسات التي يمكنك ترخيصها.
-    update_seats: تحديث
-    seats_updated: تم تحديث عدد المقاعد.
     licensed_orgs_section: المؤسسات المرخَّص لها
     no_licensed_orgs_title: لا توجد مؤسسات مرخَّص لها بعد
     no_licensed_orgs_body: أرسل رابط انضمام، أو أنشئ حسابهم مباشرة بنفسك.

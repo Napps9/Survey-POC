@@ -157,25 +157,6 @@
         </div>
       <% end %>
 
-      <%# ── Seat count editor ── %>
-      <% if is_admin %>
-        <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px 22px;margin-bottom:32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:220px;">
-            <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:2px;"><%= t("funders.seats_purchased") %></div>
-            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);"><%= t("funders.seats_purchased_hint") %></div>
-          </div>
-          <%= form_with url: funder_path(@funder), method: :patch, local: true,
-                html: { style: "display:flex;gap:8px;align-items:center;" } do %>
-            <%= number_field_tag "funder[seat_count]", @funder.seat_count, min: 0,
-                  style: "width:90px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 12px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);outline:none;text-align:center;" %>
-            <button type="submit"
-                    style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:100px;padding:10px 18px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);cursor:pointer;white-space:nowrap;">
-              <%= t("funders.update_seats") %>
-            </button>
-          <% end %>
-        </div>
-      <% end %>
-
       <%# ── Licensed organisations ── %>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
         <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("funders.licensed_orgs_section") %></span>

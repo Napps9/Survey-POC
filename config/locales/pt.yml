@@ -489,10 +489,6 @@ pt:
     new_link_body: "Qualquer pessoa com este link pode reivindicar uma vaga em %{funder}. Expira em 14 dias."
     copy: Copiar
     copied: "Copiado!"
-    seats_purchased: "Vagas"
-    seats_purchased_hint: "O número total de organizações que pode licenciar."
-    update_seats: Atualizar
-    seats_updated: "Número de vagas atualizado."
     licensed_orgs_section: "Organizações licenciadas"
     no_licensed_orgs_title: "Ainda não há organizações licenciadas"
     no_licensed_orgs_body: "Envie um link de adesão ou crie a conta deles diretamente."

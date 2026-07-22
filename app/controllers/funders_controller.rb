@@ -1,11 +1,11 @@
 class FundersController < ApplicationController
   layout "fullscreen"
 
-  before_action :require_admin!, only: [ :new, :create, :update, :destroy ]
+  before_action :require_admin!, only: [ :new, :create, :destroy ]
   before_action :require_funder_access!, only: [ :index ]
   before_action :require_funder_enabled!, only: [ :new, :create ]
-  before_action :load_funder, only: [ :show, :update, :destroy ]
-  before_action :require_creator_ownership!, only: [ :update, :destroy ]
+  before_action :load_funder, only: [ :show, :destroy ]
+  before_action :require_creator_ownership!, only: [ :destroy ]
 
   def index
     @owned_funders  = current_organisation.funders.order(created_at: :desc)
@@ -56,14 +56,6 @@ class FundersController < ApplicationController
     end
   end
 
-  def update
-    if @funder.update(seat_params)
-      redirect_to funder_path(@funder), notice: t("funders.seats_updated")
-    else
-      redirect_to funder_path(@funder), alert: @funder.errors.full_messages.first
-    end
-  end
-
   def destroy
     @funder.destroy!
     redirect_to funders_path, notice: t("funders.deleted")
@@ -99,12 +91,11 @@ class FundersController < ApplicationController
     redirect_to funders_path, alert: t("funders.not_owner")
   end
 
+  # Sets the starting seat count when a funder program is first created.
+  # Raising it later is a Playverto-side action (console/Blazer), not
+  # something the org can self-serve — see creator_show.html.erb.
   def funder_params
     params.require(:funder).permit(:name, :seat_count)
-  end
-
-  def seat_params
-    params.require(:funder).permit(:seat_count)
   end
 
   def load_creator_show_data

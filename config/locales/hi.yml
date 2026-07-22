@@ -489,10 +489,6 @@ hi:
     new_link_body: इस लिंक वाला कोई भी व्यक्ति %{funder} के अंतर्गत एक सीट प्राप्त कर सकता है। 14 दिनों में समाप्त हो जाएगा।
     copy: कॉपी करें
     copied: कॉपी किया गया!
-    seats_purchased: सीटें
-    seats_purchased_hint: आप कुल कितने संगठनों को लाइसेंस दे सकते हैं।
-    update_seats: बदलें
-    seats_updated: सीटों की संख्या बदल दी गई।
     licensed_orgs_section: लाइसेंस प्राप्त संगठन
     no_licensed_orgs_title: अभी तक किसी संगठन को लाइसेंस नहीं दिया गया
     no_licensed_orgs_body: जॉइन लिंक भेजें, या सीधे उनका खाता बनाएं।

@@ -141,12 +141,15 @@ class FunderFlowTest < ActionDispatch::IntegrationTest
     refute membership_a.reload.active?
   end
 
-  test "admin can raise the seat count from the dashboard" do
+  # Regression guard: raising a funder's seat count is a Playverto-side action
+  # (console/Blazer) now, not something the org can self-serve — there is no
+  # longer a route that would let it patch its own seat count.
+  test "the org cannot raise its own seat count from the dashboard" do
     fu = @oa.funders.create!(name: "Growing Fund", seat_count: 1)
 
-    patch funder_path(fu), params: { funder: { seat_count: 5 } }
-    assert_redirected_to funder_path(fu)
-    assert_equal 5, fu.reload.seat_count
+    patch "/funders/#{fu.id}", params: { funder: { seat_count: 5 } }
+    assert_response :not_found
+    assert_equal 1, fu.reload.seat_count
   end
 
   test "signed-in admin of an existing org joins a funder via the join link" do

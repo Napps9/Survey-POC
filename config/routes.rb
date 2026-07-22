@@ -127,7 +127,7 @@ Rails.application.routes.draw do
   resources :partner_account_setups, param: :token, only: [ :edit, :update ]
 
   # Funders — orgs that license a fixed number of seats to other orgs
-  resources :funders, except: [ :edit ] do
+  resources :funders, except: [ :edit, :update ] do
     resources :funder_invites,     only: [ :create ]
     resources :funder_accounts,    only: [ :new, :create ]
     resources :funder_memberships, only: [ :update ]

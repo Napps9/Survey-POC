@@ -489,10 +489,6 @@ he:
     new_link_body: כל מי שיש לו קישור זה יכול לקבל רישיון תחת %{funder}. תוקף ל-14 ימים.
     copy: העתק
     copied: הועתק!
-    seats_purchased: רישיונות
-    seats_purchased_hint: המספר הכולל של הארגונים שתוכלו להעניק להם רישיון.
-    update_seats: עדכון
-    seats_updated: מספר הרישיונות עודכן.
     licensed_orgs_section: ארגונים מורשים
     no_licensed_orgs_title: אין עדיין ארגונים מורשים
     no_licensed_orgs_body: שלחו קישור הצטרפות, או צרו את החשבון שלהם ישירות.

@@ -489,10 +489,6 @@ id:
     new_link_body: Siapa pun dengan tautan ini dapat mengklaim kursi di bawah %{funder}. Kedaluwarsa dalam 14 hari.
     copy: Salin
     copied: Tersalin!
-    seats_purchased: Kursi
-    seats_purchased_hint: Jumlah total organisasi yang dapat Anda lisensikan.
-    update_seats: Perbarui
-    seats_updated: Jumlah kursi diperbarui.
     licensed_orgs_section: Organisasi berlisensi
     no_licensed_orgs_title: Belum ada organisasi berlisensi
     no_licensed_orgs_body: Kirim tautan bergabung, atau buat akun mereka secara langsung.
