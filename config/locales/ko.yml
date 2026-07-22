@@ -238,6 +238,7 @@ ko:
   nav:
     partnerships: "파트너"
     funders: "펀더"
+    dashboard: "대시보드"
     shared_vertos: 공유된 Verto
     my_vertos: 내 Verto
     create: 만들기
@@ -508,6 +509,17 @@ ko:
     including_you: 본인 포함
     other_licensed_orgs: 다른 라이선스된 조직
     only_licensed_org: 현재 이 펀더의 유일한 라이선스된 조직입니다.
+    dashboard_title: "대시보드 — Playverto"
+    dashboard_eyebrow: "펀더 대시보드"
+    dashboard_heading: "대시보드"
+    claimed: "수락됨"
+    unclaimed: "미수락"
+    pending_invite_label: "대기 중인 초대"
+    invited_on: "%{date}에 초대됨"
+    expires_on: "%{date}에 만료"
+    published_label: "게시됨"
+    responses_label: "응답"
+    not_published_yet: "아직 게시되지 않음"
   funder_accounts:
     title: "계정 만들기 — %{funder}"
     back_to_funder: "%{funder}(으)로 돌아가기"

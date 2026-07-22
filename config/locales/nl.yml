@@ -238,6 +238,7 @@ nl:
   nav:
     partnerships: "Partners"
     funders: "Financiers"
+    dashboard: "Dashboard"
     shared_vertos: Gedeelde Vertos
     my_vertos: Mijn Vertos
     create: Aanmaken
@@ -508,6 +509,17 @@ nl:
     including_you: "Jij inbegrepen"
     other_licensed_orgs: "Andere gelicentieerde organisaties"
     only_licensed_org: "Je bent voorlopig de enige gelicentieerde organisatie onder deze financier."
+    dashboard_title: "Dashboard — Playverto"
+    dashboard_eyebrow: "Jouw financiersdashboard"
+    dashboard_heading: "Dashboard"
+    claimed: "Geclaimd"
+    unclaimed: "Niet geclaimd"
+    pending_invite_label: "Uitnodiging in behandeling"
+    invited_on: "Uitgenodigd op %{date}"
+    expires_on: "Verloopt op %{date}"
+    published_label: "Gepubliceerd"
+    responses_label: "Reacties"
+    not_published_yet: "Nog niet gepubliceerd"
   funder_accounts:
     title: "Account aanmaken — %{funder}"
     back_to_funder: "Terug naar %{funder}"

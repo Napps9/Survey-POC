@@ -35,7 +35,19 @@ module Authentication
     end
 
     def after_authentication_url
-      session.delete(:return_to_after_authenticating) || root_url
+      session.delete(:return_to_after_authenticating) || default_landing_url
+    end
+
+    # A funder-owner org's home base is its Dashboard (seats, licensed orgs,
+    # results) rather than the survey-authoring "My Vertos" screen — licensed
+    # orgs and plain orgs still land there as before. Reads the same
+    # membership OrganisationScope#set_current_organisation would pick, but
+    # side-effect-free — the real before_action still runs (and still handles
+    # a staff user with no organisation) on whichever page this sends them to.
+    def default_landing_url
+      org_id = session[:current_organisation_id]
+      membership = Current.user.memberships.find_by(organisation_id: org_id) || Current.user.memberships.first
+      membership&.organisation&.funder_enabled? ? funders_url : root_url
     end
 
     def start_new_session_for(user)

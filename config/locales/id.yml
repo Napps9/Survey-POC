@@ -238,6 +238,7 @@ id:
   nav:
     partnerships: "Mitra"
     funders: "Pendana"
+    dashboard: "Dasbor"
     shared_vertos: Verto Dibagikan
     my_vertos: Verto Saya
     create: Buat
@@ -508,6 +509,17 @@ id:
     including_you: Termasuk Anda
     other_licensed_orgs: Organisasi berlisensi lain
     only_licensed_org: Untuk saat ini Anda satu-satunya organisasi berlisensi di bawah pendana ini.
+    dashboard_title: "Dasbor — Playverto"
+    dashboard_eyebrow: "Dasbor pendana Anda"
+    dashboard_heading: "Dasbor"
+    claimed: "Diklaim"
+    unclaimed: "Belum diklaim"
+    pending_invite_label: "Undangan tertunda"
+    invited_on: "Diundang pada %{date}"
+    expires_on: "Kedaluwarsa pada %{date}"
+    published_label: "Dipublikasikan"
+    responses_label: "Tanggapan"
+    not_published_yet: "Belum dipublikasikan"
   funder_accounts:
     title: "Buat akun — %{funder}"
     back_to_funder: Kembali ke %{funder}

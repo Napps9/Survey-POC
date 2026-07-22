@@ -238,6 +238,7 @@ ru:
   nav:
     partnerships: "Партнёры"
     funders: "Спонсоры"
+    dashboard: "Панель управления"
     shared_vertos: Общие Vertos
     my_vertos: Мои Vertos
     create: Создать
@@ -508,6 +509,17 @@ ru:
     including_you: Включая вас
     other_licensed_orgs: Другие лицензированные организации
     only_licensed_org: Пока вы единственная лицензированная организация у этого спонсора.
+    dashboard_title: "Панель управления — Playverto"
+    dashboard_eyebrow: "Ваша панель спонсора"
+    dashboard_heading: "Панель управления"
+    claimed: "Занято"
+    unclaimed: "Не занято"
+    pending_invite_label: "Ожидающее приглашение"
+    invited_on: "Приглашён %{date}"
+    expires_on: "Истекает %{date}"
+    published_label: "Опубликовано"
+    responses_label: "Ответы"
+    not_published_yet: "Пока не опубликовано"
   funder_accounts:
     title: "Создать аккаунт — %{funder}"
     back_to_funder: "Назад к %{funder}"

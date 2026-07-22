@@ -1,4 +1,5 @@
-<% content_for :title, t("funders.title") %>
+<% owner_view = current_organisation.funder_enabled? %>
+<% content_for :title, owner_view ? t("funders.dashboard_title") : t("funders.title") %>
 <% content_for :head do %>
   <style>body { overflow: auto !important; height: auto !important; }</style>
 <% end %>
@@ -21,9 +22,9 @@
           <div style="min-width:0;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
               <span style="width:8px;height:8px;border-radius:50%;background:#615BF5;box-shadow:0 0 12px rgba(97,91,245,0.7);"></span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("funders.index_eyebrow") %></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= owner_view ? t("funders.dashboard_eyebrow") : t("funders.index_eyebrow") %></span>
             </div>
-            <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 8px;"><%= t("funders.index_heading") %></h1>
+            <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 8px;"><%= owner_view ? t("funders.dashboard_heading") : t("funders.index_heading") %></h1>
             <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.45);margin:0;max-width:480px;line-height:1.55;">
               <%= t("funders.index_subtitle") %>
             </p>

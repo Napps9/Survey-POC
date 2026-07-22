@@ -39,7 +39,7 @@
       <% if show_funders %>
         <a href="<%= funders_path %>" class="bottom-bar-chip" data-active="<%= active_funders %>">
           <span class="bottom-bar-chip-dot" style="background:#615BF5;"></span>
-          <%= t("nav.funders") %>
+          <%= org.funder_enabled? ? t("nav.dashboard") : t("nav.funders") %>
         </a>
       <% end %>
     <% end %>

@@ -238,6 +238,7 @@ he:
   nav:
     partnerships: "שותפים"
     funders: "מממנים"
+    dashboard: "לוח בקרה"
     shared_vertos: Vertos משותפים
     my_vertos: ה-Vertos שלי
     create: צור
@@ -508,6 +509,17 @@ he:
     including_you: כולל אתכם
     other_licensed_orgs: ארגונים מורשים אחרים
     only_licensed_org: אתם הארגון המורשה היחיד תחת מממן זה כרגע.
+    dashboard_title: "לוח בקרה — Playverto"
+    dashboard_eyebrow: "לוח הבקרה של המממן שלך"
+    dashboard_heading: "לוח בקרה"
+    claimed: "נתבע"
+    unclaimed: "לא נתבע"
+    pending_invite_label: "הזמנה ממתינה"
+    invited_on: "הוזמן ב-%{date}"
+    expires_on: "פג תוקף ב-%{date}"
+    published_label: "פורסם"
+    responses_label: "תגובות"
+    not_published_yet: "טרם פורסם"
   funder_accounts:
     title: "יצירת חשבון — %{funder}"
     back_to_funder: חזרה ל-%{funder}

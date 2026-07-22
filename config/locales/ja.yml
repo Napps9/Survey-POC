@@ -238,6 +238,7 @@ ja:
   nav:
     partnerships: "パートナー"
     funders: "資金提供者"
+    dashboard: "ダッシュボード"
     shared_vertos: 共有Vertos
     my_vertos: マイVertos
     create: 作成
@@ -508,6 +509,17 @@ ja:
     including_you: あなたを含む
     other_licensed_orgs: その他のライセンス組織
     only_licensed_org: 現在、この資金提供者の下でライセンスされている組織はあなただけです。
+    dashboard_title: "ダッシュボード — Playverto"
+    dashboard_eyebrow: "あなたのファンダーダッシュボード"
+    dashboard_heading: "ダッシュボード"
+    claimed: "受領済み"
+    unclaimed: "未受領"
+    pending_invite_label: "招待保留中"
+    invited_on: "%{date}に招待"
+    expires_on: "%{date}に期限切れ"
+    published_label: "公開済み"
+    responses_label: "回答数"
+    not_published_yet: "まだ公開されていません"
   funder_accounts:
     title: "アカウントを作成 — %{funder}"
     back_to_funder: "%{funder} に戻る"

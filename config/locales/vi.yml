@@ -238,6 +238,7 @@ vi:
   nav:
     partnerships: "Đối tác"
     funders: "Nhà tài trợ"
+    dashboard: "Bảng điều khiển"
     shared_vertos: Vertos được chia sẻ
     my_vertos: Vertos của tôi
     create: Tạo
@@ -508,6 +509,17 @@ vi:
     including_you: "Bao gồm bạn"
     other_licensed_orgs: "Các tổ chức được cấp phép khác"
     only_licensed_org: "Hiện tại bạn là tổ chức được cấp phép duy nhất dưới nhà tài trợ này."
+    dashboard_title: "Bảng điều khiển — Playverto"
+    dashboard_eyebrow: "Bảng điều khiển nhà tài trợ của bạn"
+    dashboard_heading: "Bảng điều khiển"
+    claimed: "Đã nhận"
+    unclaimed: "Chưa nhận"
+    pending_invite_label: "Lời mời đang chờ"
+    invited_on: "Đã mời vào %{date}"
+    expires_on: "Hết hạn vào %{date}"
+    published_label: "Đã xuất bản"
+    responses_label: "Phản hồi"
+    not_published_yet: "Chưa xuất bản"
   funder_accounts:
     title: "Tạo tài khoản — %{funder}"
     back_to_funder: "Quay lại %{funder}"

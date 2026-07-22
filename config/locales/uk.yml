@@ -238,6 +238,7 @@ uk:
   nav:
     partnerships: "Партнери"
     funders: "Донори"
+    dashboard: "Панель керування"
     shared_vertos: Спільні Vertos
     my_vertos: Мої Vertos
     create: Створити
@@ -508,6 +509,17 @@ uk:
     including_you: "Включно з вами"
     other_licensed_orgs: "Інші ліцензовані організації"
     only_licensed_org: "Наразі ви єдина ліцензована організація цього донора."
+    dashboard_title: "Панель керування — Playverto"
+    dashboard_eyebrow: "Ваша панель донора"
+    dashboard_heading: "Панель керування"
+    claimed: "Зайнято"
+    unclaimed: "Не зайнято"
+    pending_invite_label: "Очікуване запрошення"
+    invited_on: "Запрошено %{date}"
+    expires_on: "Закінчується %{date}"
+    published_label: "Опубліковано"
+    responses_label: "Відповіді"
+    not_published_yet: "Ще не опубліковано"
   funder_accounts:
     title: "Створити акаунт — %{funder}"
     back_to_funder: "Назад до %{funder}"

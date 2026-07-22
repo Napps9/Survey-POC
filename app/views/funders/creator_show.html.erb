@@ -1,4 +1,11 @@
-<% content_for :title, t("funders.show_title", name: @funder.name) %>
+<%# An org running exactly one funder program is redirected straight here
+    from the index (its Dashboard *is* this page) — a "back to the list"
+    link would just bounce it right back, so it only makes sense when
+    there's an actual list of other owned programs to return to. %>
+<% has_other_owned_funders = current_organisation.funders.count > 1 %>
+<% single_program_dashboard = current_organisation.funder_enabled? && !has_other_owned_funders %>
+
+<% content_for :title, single_program_dashboard ? t("funders.dashboard_title") : t("funders.show_title", name: @funder.name) %>
 <% content_for :head do %>
   <style>body { overflow: auto !important; height: auto !important; }</style>
 <% end %>
@@ -23,16 +30,18 @@
       </div>
 
       <div style="position:relative;z-index:1;">
-        <%= link_to funders_path,
-              style: "display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);text-decoration:none;margin-bottom:18px;" do %>
-          <span style="opacity:0.7;">←</span> <%= t("funders.back_to_all") %>
+        <% if has_other_owned_funders %>
+          <%= link_to funders_path,
+                style: "display:inline-flex;align-items:center;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);text-decoration:none;margin-bottom:18px;" do %>
+            <span style="opacity:0.7;">←</span> <%= t("funders.back_to_all") %>
+          <% end %>
         <% end %>
 
         <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;">
           <div>
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
               <span style="width:8px;height:8px;border-radius:50%;background:#615BF5;box-shadow:0 0 12px rgba(97,91,245,0.7);"></span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("funders.creator_eyebrow") %></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= single_program_dashboard ? t("funders.dashboard_eyebrow") : t("funders.creator_eyebrow") %></span>
               <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:<%= @funder.active? ? 'rgba(1,234,203,0.15)' : 'rgba(255,255,255,0.08)' %>;color:<%= @funder.active? ? '#01EACB' : 'rgba(255,255,255,0.5)' %>;">
                 <%= t("funders.status.#{@funder.status}", default: @funder.status.capitalize) %>
               </span>
@@ -171,10 +180,10 @@
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
         <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("funders.licensed_orgs_section") %></span>
         <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
-        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @memberships.size %></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.2);"><%= @memberships.size + @pending_invites.size %></span>
       </div>
 
-      <% if @memberships.empty? %>
+      <% if @memberships.empty? && @pending_invites.empty? %>
         <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:36px 24px;text-align:center;">
           <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:6px;"><%= t("funders.no_licensed_orgs_title") %></div>
           <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:340px;margin:0 auto 16px;line-height:1.5;">
@@ -190,18 +199,30 @@
       <% else %>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;">
           <% @memberships.each do |m| %>
+            <% published = @published_counts_by_org[m.organisation_id] || 0 %>
+            <% completed_responses = @completed_response_counts_by_org[m.organisation_id] || 0 %>
             <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px;">
               <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#615BF5,#FF1E6F);display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;flex-shrink:0;opacity:<%= m.active? ? '1' : '0.4' %>;">
                 <%= m.organisation.name.first.upcase %>
               </div>
               <div style="flex:1;min-width:0;">
-                <div style="display:flex;align-items:center;gap:6px;">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                   <span style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= m.organisation.name %></span>
-                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:100px;background:<%= m.active? ? 'rgba(1,234,203,0.15)' : 'rgba(255,193,7,0.15)' %>;color:<%= m.active? ? '#01EACB' : '#FFC107' %>;white-space:nowrap;flex-shrink:0;">
+                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:100px;background:rgba(1,234,203,0.15);color:#01EACB;white-space:nowrap;flex-shrink:0;">
+                    <%= t("funders.claimed") %>
+                  </span>
+                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:100px;background:<%= m.active? ? 'rgba(255,255,255,0.08)' : 'rgba(255,193,7,0.15)' %>;color:<%= m.active? ? 'rgba(255,255,255,0.5)' : '#FFC107' %>;white-space:nowrap;flex-shrink:0;">
                     <%= t("funders.membership_status.#{m.status}", default: m.status.capitalize) %>
                   </span>
                 </div>
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("funders.licensed_on", date: l(m.created_at.to_date, format: :long, default: m.created_at.to_date.to_s)) %></div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);margin-top:2px;">
+                  <% if published.zero? %>
+                    <%= t("funders.not_published_yet") %>
+                  <% else %>
+                    <%= t("funders.published_label") %> <%= published %> · <%= t("funders.responses_label") %> <%= completed_responses %>
+                  <% end %>
+                </div>
               </div>
               <% if is_admin %>
                 <% if m.active? %>
@@ -217,6 +238,25 @@
                         style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:6px;padding:4px 10px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;white-space:nowrap;" %>
                 <% end %>
               <% end %>
+            </div>
+          <% end %>
+          <% @pending_invites.each do |invite| %>
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.015);border:1px dashed rgba(255,255,255,0.14);border-radius:12px;padding:12px 14px;">
+              <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.3);flex-shrink:0;">
+                🔗
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);line-height:1.2;"><%= t("funders.pending_invite_label") %></span>
+                  <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:100px;background:rgba(255,193,7,0.15);color:#FFC107;white-space:nowrap;flex-shrink:0;">
+                    <%= t("funders.unclaimed") %>
+                  </span>
+                </div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);">
+                  <%= t("funders.invited_on", date: l(invite.created_at.to_date, format: :long, default: invite.created_at.to_date.to_s)) %>
+                  · <%= t("funders.expires_on", date: l(invite.expires_at.to_date, format: :long, default: invite.expires_at.to_date.to_s)) %>
+                </div>
+              </div>
             </div>
           <% end %>
         </div>

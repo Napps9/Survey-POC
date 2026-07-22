@@ -14,6 +14,13 @@ class FundersController < ApplicationController
                         .includes(:organisation)
                         .order("funders.created_at desc")
 
+    # An org that runs exactly one funder program has no real "list" to
+    # browse — its Dashboard *is* that program's detail page. Send it there
+    # directly instead of showing a list of one.
+    if current_organisation.funder_enabled? && @owned_funders.one?
+      redirect_to funder_path(@owned_funders.first) and return
+    end
+
     owned_ids = @owned_funders.map(&:id)
     @active_counts_by_funder = owned_ids.any? ?
       FunderMembership.active.where(funder_id: owned_ids).group(:funder_id).count : {}
@@ -102,6 +109,17 @@ class FundersController < ApplicationController
 
   def load_creator_show_data
     @memberships = @funder.funder_memberships.includes(organisation: { memberships: :user }).order(:created_at)
+    # An invite that hasn't been accepted yet holds a seat with no organisation
+    # attached — it's an "unclaimed" seat, shown alongside the claimed
+    # (membership) rows rather than as a separate concept to track.
+    @pending_invites = @funder.invites.licensee.pending.order(:created_at)
+
+    org_ids = @memberships.map(&:organisation_id)
+    surveys = Survey.where(organisation_id: org_ids).kept
+    @published_counts_by_org = surveys.where.not(publish_token: nil).group(:organisation_id).count
+    @completed_response_counts_by_org = Response.joins(:survey)
+      .where(status: "completed", surveys: { organisation_id: org_ids })
+      .group("surveys.organisation_id").count
   end
 
   def load_member_show_data

@@ -238,6 +238,7 @@ ar:
   nav:
     partnerships: "الشركاء"
     funders: "الممولون"
+    dashboard: "لوحة التحكم"
     shared_vertos: فيرتوهات مشتركة
     my_vertos: فيرتوهاتي
     create: إنشاء
@@ -508,6 +509,17 @@ ar:
     including_you: بمن فيهم أنت
     other_licensed_orgs: مؤسسات أخرى مرخَّص لها
     only_licensed_org: أنت المؤسسة الوحيدة المرخَّص لها ضمن هذا الممول حتى الآن.
+    dashboard_title: "لوحة التحكم — Playverto"
+    dashboard_eyebrow: "لوحة تحكم الممول الخاصة بك"
+    dashboard_heading: "لوحة التحكم"
+    claimed: "مُطالَب به"
+    unclaimed: "غير مُطالَب به"
+    pending_invite_label: "دعوة معلّقة"
+    invited_on: "تمت الدعوة في %{date}"
+    expires_on: "تنتهي الصلاحية في %{date}"
+    published_label: "منشور"
+    responses_label: "الردود"
+    not_published_yet: "لم يُنشر بعد"
   funder_accounts:
     title: "إنشاء حساب — %{funder}"
     back_to_funder: العودة إلى %{funder}

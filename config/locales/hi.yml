@@ -238,6 +238,7 @@ hi:
   nav:
     partnerships: "साझेदार"
     funders: "फंडर्स"
+    dashboard: "डैशबोर्ड"
     shared_vertos: साझा किए गए Verto
     my_vertos: मेरे Verto
     create: बनाएं
@@ -508,6 +509,17 @@ hi:
     including_you: आप सहित
     other_licensed_orgs: अन्य लाइसेंस प्राप्त संगठन
     only_licensed_org: फिलहाल आप इस फंडर के तहत एकमात्र लाइसेंस प्राप्त संगठन हैं।
+    dashboard_title: "डैशबोर्ड — Playverto"
+    dashboard_eyebrow: "आपका फंडर डैशबोर्ड"
+    dashboard_heading: "डैशबोर्ड"
+    claimed: "दावा किया गया"
+    unclaimed: "दावा नहीं किया गया"
+    pending_invite_label: "लंबित आमंत्रण"
+    invited_on: "%{date} को आमंत्रित किया गया"
+    expires_on: "%{date} को समाप्त होता है"
+    published_label: "प्रकाशित"
+    responses_label: "प्रतिक्रियाएं"
+    not_published_yet: "अभी तक प्रकाशित नहीं हुआ"
   funder_accounts:
     title: "खाता बनाएं — %{funder}"
     back_to_funder: "%{funder} पर वापस"

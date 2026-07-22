@@ -238,6 +238,7 @@ tr:
   nav:
     partnerships: "Ortaklar"
     funders: "Fon Sağlayıcılar"
+    dashboard: "Panel"
     shared_vertos: Paylaşılan Verto'lar
     my_vertos: Verto'larım
     create: Oluştur
@@ -508,6 +509,17 @@ tr:
     including_you: "Sizinle birlikte"
     other_licensed_orgs: "Diğer lisanslı kuruluşlar"
     only_licensed_org: "Şu an bu fon sağlayıcı altındaki tek lisanslı kuruluş sizsiniz."
+    dashboard_title: "Panel — Playverto"
+    dashboard_eyebrow: "Fon sağlayıcı panonuz"
+    dashboard_heading: "Panel"
+    claimed: "Talep edildi"
+    unclaimed: "Talep edilmedi"
+    pending_invite_label: "Bekleyen davet"
+    invited_on: "%{date} tarihinde davet edildi"
+    expires_on: "%{date} tarihinde sona eriyor"
+    published_label: "Yayınlandı"
+    responses_label: "Yanıtlar"
+    not_published_yet: "Henüz yayınlanmadı"
   funder_accounts:
     title: "Hesap oluştur — %{funder}"
     back_to_funder: "%{funder}'e dön"

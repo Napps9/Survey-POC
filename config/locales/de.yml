@@ -238,6 +238,7 @@ de:
   nav:
     partnerships: "Partner"
     funders: "Förderer"
+    dashboard: "Dashboard"
     shared_vertos: Geteilte Vertos
     my_vertos: Meine Vertos
     create: Erstellen
@@ -508,6 +509,17 @@ de:
     including_you: "Inklusive Ihnen"
     other_licensed_orgs: "Andere lizenzierte Organisationen"
     only_licensed_org: "Sie sind derzeit die einzige lizenzierte Organisation unter diesem Förderer."
+    dashboard_title: "Dashboard — Playverto"
+    dashboard_eyebrow: "Dein Förderer-Dashboard"
+    dashboard_heading: "Dashboard"
+    claimed: "Beansprucht"
+    unclaimed: "Nicht beansprucht"
+    pending_invite_label: "Ausstehende Einladung"
+    invited_on: "Eingeladen am %{date}"
+    expires_on: "Läuft ab am %{date}"
+    published_label: "Veröffentlicht"
+    responses_label: "Antworten"
+    not_published_yet: "Noch nicht veröffentlicht"
   funder_accounts:
     title: "Konto erstellen — %{funder}"
     back_to_funder: "Zurück zu %{funder}"

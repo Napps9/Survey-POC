@@ -238,6 +238,7 @@ sw:
   nav:
     partnerships: "Washirika"
     funders: "Wafadhili"
+    dashboard: "Dashibodi"
     shared_vertos: Vertos Zilizoshirikishwa
     my_vertos: Vertos Zangu
     create: Unda
@@ -508,6 +509,17 @@ sw:
     including_you: "Wewe ukijumuishwa"
     other_licensed_orgs: "Mashirika mengine yenye nafasi"
     only_licensed_org: "Wewe ndilo shirika pekee lenye nafasi chini ya mfadhili huyu kwa sasa."
+    dashboard_title: "Dashibodi — Playverto"
+    dashboard_eyebrow: "Dashibodi yako ya mfadhili"
+    dashboard_heading: "Dashibodi"
+    claimed: "Imedaiwa"
+    unclaimed: "Haijadaiwa"
+    pending_invite_label: "Mwaliko unaosubiri"
+    invited_on: "Alialikwa %{date}"
+    expires_on: "Inaisha %{date}"
+    published_label: "Imechapishwa"
+    responses_label: "Majibu"
+    not_published_yet: "Bado haijachapishwa"
   funder_accounts:
     title: "Fungua akaunti — %{funder}"
     back_to_funder: "Rudi kwa %{funder}"

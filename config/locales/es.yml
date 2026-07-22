@@ -238,6 +238,7 @@ es:
   nav:
     partnerships: "Socios"
     funders: "Financiadores"
+    dashboard: "Panel"
     shared_vertos: Vertos compartidos
     my_vertos: Mis Vertos
     create: Crear
@@ -508,6 +509,17 @@ es:
     including_you: "Incluyéndote a ti"
     other_licensed_orgs: "Otras organizaciones licenciadas"
     only_licensed_org: "Por ahora eres la única organización licenciada bajo este financiador."
+    dashboard_title: "Panel — Playverto"
+    dashboard_eyebrow: "Tu panel de financiador"
+    dashboard_heading: "Panel"
+    claimed: "Reclamado"
+    unclaimed: "Sin reclamar"
+    pending_invite_label: "Invitación pendiente"
+    invited_on: "Invitado el %{date}"
+    expires_on: "Caduca el %{date}"
+    published_label: "Publicado"
+    responses_label: "Respuestas"
+    not_published_yet: "Aún sin publicar"
   funder_accounts:
     title: "Crear cuenta — %{funder}"
     back_to_funder: "Volver a %{funder}"

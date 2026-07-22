@@ -8,7 +8,7 @@ class OauthSessionsController < ApplicationController
 
     user = locate_or_create_user!(auth)
     start_new_session_for user
-    redirect_to root_path
+    redirect_to after_authentication_url
   rescue MissingEmail
     redirect_to new_session_path,
                 alert: t("auth.social_no_email", provider: SocialAuth.label_for(params[:provider]))
