@@ -3854,6 +3854,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
     flex: 1 1 auto;
     height: auto;
   }
+
+  /* Tap card on mobile: the stack already carries its own per-statement
+     imagery, so a card-level hero image behind it just duplicated the photo
+     and read as torn/double imagery. Drop the hero strip and let the stack
+     fill the card, same treatment as NPS above. */
+  .preview-overlay .split-card:has(.rotate-wrap) .split-left { display: none; }
+  .preview-overlay .split-card:has(.rotate-wrap) .split-right {
+    flex: 1 1 auto;
+    height: auto;
+  }
   .preview-overlay .nps-control { height: 232px; }
   .preview-overlay .nps-slider { gap: 8px; }
   .preview-overlay .nps-slider-stage { gap: 12px; }
