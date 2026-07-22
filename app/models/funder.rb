@@ -3,6 +3,7 @@ class Funder < ApplicationRecord
   has_many :funder_memberships, dependent: :destroy
   has_many :member_organisations, through: :funder_memberships, source: :organisation
   has_many :invites, dependent: :nullify
+  has_many :portfolios, dependent: :destroy
 
   enum :status, { active: "active", revoked: "revoked" }
 

@@ -1,0 +1,42 @@
+<% content_for :title, t("portfolios.index_title", funder: @funder.name) %>
+<% content_for :head do %>
+  <style>body { overflow: auto !important; height: auto !important; }</style>
+<% end %>
+
+<div style="max-width:760px;margin:0 auto;padding:48px 24px 60px;">
+  <%= link_to t("portfolios.back_to_funder"), funder_path(@funder),
+        style: "display:inline-block;color:rgba(255,255,255,0.45);font-size: var(--text-sm);text-decoration:none;margin-bottom:18px;" %>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;">
+    <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;margin:0;"><%= t("portfolios.index_heading", funder: @funder.name) %></h1>
+    <% if @owner %>
+      <%= link_to t("portfolios.new_button"), new_funder_portfolio_path(@funder),
+            style: "flex-shrink:0;background:#615BF5;border-radius:100px;padding:10px 20px;color:#fff;font-size: var(--text-md);text-decoration:none;white-space:nowrap;" %>
+    <% end %>
+  </div>
+
+  <% if flash[:notice] %>
+    <div style="background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#01EACB;"><%= flash[:notice] %></div>
+  <% end %>
+  <% if flash[:alert] %>
+    <div style="background:rgba(216,0,39,0.1);border:1px solid rgba(216,0,39,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#FF6B83;"><%= flash[:alert] %></div>
+  <% end %>
+
+  <% if @portfolios.empty? %>
+    <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:14px;padding:36px 24px;text-align:center;color:rgba(255,255,255,0.4);">
+      <%= t("portfolios.owned_empty_title") %>
+    </div>
+  <% else %>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <% @portfolios.each do |portfolio| %>
+        <%= link_to funder_portfolio_path(@funder, portfolio),
+              style: "display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 18px;text-decoration:none;color:#fff;" do %>
+          <span style="font-family:'Alata',sans-serif;font-size: var(--text-lg);"><%= portfolio.name %></span>
+          <span style="color:rgba(255,255,255,0.4);font-size: var(--text-sm);">
+            <%= t("portfolios.member_count", count: portfolio.active_memberships.count) %>
+          </span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

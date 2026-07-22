@@ -19,14 +19,20 @@
           <span style="opacity:0.7;">←</span> <%= t("funders.back_to_all") %>
         <% end %>
 
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <span style="width:8px;height:8px;border-radius:50%;background:#01EACB;box-shadow:0 0 12px rgba(1,234,203,0.7);"></span>
-          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("funders.member_eyebrow") %></span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#01EACB;box-shadow:0 0 12px rgba(1,234,203,0.7);"></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("funders.member_eyebrow") %></span>
+            </div>
+            <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 6px;"><%= @funder.name %></h1>
+            <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
+              <%= t("funders.member_run_by", org: @funder.organisation.name) %>
+            </p>
+          </div>
+          <%= link_to t("portfolios.title"), funder_portfolios_path(@funder),
+                style: "flex-shrink:0;border:1px solid rgba(255,255,255,0.15);border-radius:100px;padding:10px 20px;color:rgba(255,255,255,0.7);font-family:'Alata',sans-serif;font-size: var(--text-md);white-space:nowrap;text-decoration:none;" %>
         </div>
-        <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 6px;"><%= @funder.name %></h1>
-        <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
-          <%= t("funders.member_run_by", org: @funder.organisation.name) %>
-        </p>
 
         <%# ── Top-line stats ── %>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:24px;">

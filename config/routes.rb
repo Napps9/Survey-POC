@@ -131,6 +131,17 @@ Rails.application.routes.draw do
     resources :funder_invites,     only: [ :create ]
     resources :funder_accounts,    only: [ :new, :create ]
     resources :funder_memberships, only: [ :update ]
+
+    # Portfolios — a funder's grantee orgs grouped by theme, with a shared
+    # Common Question bank that auto-populates into each grantee's own Verto
+    resources :portfolios, except: [ :edit, :update ] do
+      resources :portfolio_memberships, only: [ :create, :destroy ]
+      resources :portfolio_common_question_sets, only: [ :create, :destroy ]
+      member do
+        get  :results
+        post :resync
+      end
+    end
   end
 
   # Public funder-invite acceptance (no auth)

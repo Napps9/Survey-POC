@@ -1,0 +1,93 @@
+<% content_for :title, t("portfolios.show_title", name: @portfolio.name) %>
+<% content_for :head do %>
+  <style>body { overflow: auto !important; height: auto !important; }</style>
+<% end %>
+
+<div style="max-width:760px;margin:0 auto;padding:48px 24px 60px;">
+  <%= link_to t("portfolios.back_to_list"), funder_portfolios_path(@funder),
+        style: "display:inline-block;color:rgba(255,255,255,0.45);font-size: var(--text-sm);text-decoration:none;margin-bottom:18px;" %>
+
+  <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;margin:0 0 24px;"><%= @portfolio.name %></h1>
+
+  <% if flash[:notice] %>
+    <div style="background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#01EACB;"><%= flash[:notice] %></div>
+  <% end %>
+  <% if flash[:alert] %>
+    <div style="background:rgba(216,0,39,0.1);border:1px solid rgba(216,0,39,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#FF6B83;"><%= flash[:alert] %></div>
+  <% end %>
+
+  <%# ── Members section ── %>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <span style="color:rgba(255,255,255,0.3);font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;"><%= t("portfolios.members_section") %></span>
+    <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+  </div>
+
+  <% if @memberships.empty? %>
+    <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:12px;padding:20px;text-align:center;color:rgba(255,255,255,0.4);margin-bottom:12px;"><%= t("portfolios.no_members_title") %></div>
+  <% else %>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+      <% @memberships.each do |pm| %>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;">
+          <span style="color:#fff;"><%= pm.organisation.name %></span>
+          <%= button_to t("portfolios.remove"), funder_portfolio_portfolio_membership_path(@funder, @portfolio, pm), method: :delete,
+                form: { style: "margin:0;" },
+                style: "background:none;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:4px 10px;color:rgba(255,255,255,0.5);font-size: var(--text-xs);cursor:pointer;" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @available_memberships.any? %>
+    <%= form_with url: funder_portfolio_portfolio_memberships_path(@funder, @portfolio), method: :post, local: true, style: "display:flex;gap:8px;margin-bottom:32px;" do %>
+      <select name="funder_membership_id" class="form-input" style="flex:1;">
+        <% @available_memberships.each do |fm| %>
+          <option value="<%= fm.id %>"><%= fm.organisation.name %></option>
+        <% end %>
+      </select>
+      <button type="submit" style="background:#615BF5;border:none;border-radius:8px;padding:10px 18px;color:#fff;cursor:pointer;white-space:nowrap;"><%= t("portfolios.add_member") %></button>
+    <% end %>
+  <% end %>
+
+  <%# ── Common question sets section ── %>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <span style="color:rgba(255,255,255,0.3);font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;"><%= t("portfolios.common_question_sets_section") %></span>
+    <div style="flex:1;height:1px;background:rgba(255,255,255,0.06);"></div>
+  </div>
+
+  <% if @attached_sets.empty? %>
+    <div style="border:1px dashed rgba(255,255,255,0.12);border-radius:12px;padding:20px;text-align:center;color:rgba(255,255,255,0.4);margin-bottom:12px;"><%= t("portfolios.no_sets_title") %></div>
+  <% else %>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+      <% @attached_sets.each do |pcqs| %>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <span style="color:#fff;"><%= pcqs.common_question_set.name %></span>
+            <%= button_to t("portfolios.remove"), funder_portfolio_portfolio_common_question_set_path(@funder, @portfolio, pcqs), method: :delete,
+                  form: { style: "margin:0;" },
+                  style: "background:none;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:4px 10px;color:rgba(255,255,255,0.5);font-size: var(--text-xs);cursor:pointer;" %>
+          </div>
+          <ul style="margin:8px 0 0;padding-left:18px;color:rgba(255,255,255,0.45);font-size: var(--text-sm);">
+            <% pcqs.common_question_set.common_questions.each do |cq| %>
+              <li><%= cq.text %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @available_sets.any? %>
+    <%= form_with url: funder_portfolio_portfolio_common_question_sets_path(@funder, @portfolio), method: :post, local: true, style: "display:flex;gap:8px;margin-bottom:32px;" do %>
+      <select name="common_question_set_id" class="form-input" style="flex:1;">
+        <% @available_sets.each do |set| %>
+          <option value="<%= set.id %>"><%= set.name %></option>
+        <% end %>
+      </select>
+      <button type="submit" style="background:#615BF5;border:none;border-radius:8px;padding:10px 18px;color:#fff;cursor:pointer;white-space:nowrap;"><%= t("portfolios.attach_set") %></button>
+    <% end %>
+  <% end %>
+
+  <%= button_to t("portfolios.resync"), resync_funder_portfolio_path(@funder, @portfolio), method: :post,
+        form: { style: "margin-bottom:12px;" },
+        style: "background:none;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 16px;color:rgba(255,255,255,0.6);cursor:pointer;" %>
+</div>

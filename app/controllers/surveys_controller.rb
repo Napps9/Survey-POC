@@ -303,6 +303,10 @@ class SurveysController < ApplicationController
     attrs[:background_image] = Survey.sanitize_background_image(payload["background_image"]) if payload.key?("background_image")
 
     survey.update!(attrs)
+    # A grantee deleting a portfolio-mandated card in the editor re-appends it
+    # on the next autosave — enforced at the data layer, not the editor UI.
+    # Scoped to this one survey; never the org-wide backfill from a per-request hook.
+    PortfolioCommonQuestionSync.ensure_cards_for_survey(survey) if payload.key?("cards")
 
     render json: { ok: true, id: survey.id, updated_at: survey.updated_at }
   rescue => e
@@ -755,11 +759,16 @@ class SurveysController < ApplicationController
   # aggregation can cluster answers by question identity.
   def resolve_common_cards(ids_param)
     ids = Array(ids_param).map(&:to_i).reject(&:zero?)
-    return [] if ids.empty?
     accessible_ids = accessible_common_question_sets.map(&:id)
-    CommonQuestion.where(id: ids, common_question_set_id: accessible_ids)
-                  .order(:common_question_set_id, :position)
-                  .map(&:to_card)
+    picked = ids.any? ?
+      CommonQuestion.where(id: ids, common_question_set_id: accessible_ids)
+                    .order(:common_question_set_id, :position).to_a : []
+
+    # Portfolio-mandated questions (agreed with a funder at onboarding) are
+    # forced onto every new Verto regardless of what the creator picks —
+    # unlike the rest of this method's picks, these aren't opt-in.
+    mandatory = PortfolioCommonQuestionSync.mandatory_common_questions_for(Current.organisation).to_a
+    (mandatory + picked).uniq(&:id).map(&:to_card)
   end
 
   # Common Question sets the current org may attach to a Verto: its own kept

@@ -11,6 +11,8 @@ class Organisation < ApplicationRecord
   has_many :funders, dependent: :destroy
   has_many :funder_memberships, dependent: :destroy
   has_many :member_funders, through: :funder_memberships, source: :funder
+  has_many :portfolio_memberships, through: :funder_memberships
+  has_many :portfolios, through: :portfolio_memberships
 
   has_many :common_question_sets, dependent: :destroy
 

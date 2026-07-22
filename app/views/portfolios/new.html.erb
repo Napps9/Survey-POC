@@ -1,0 +1,30 @@
+<% content_for :title, t("portfolios.new_title") %>
+<% content_for :head do %>
+  <style>body { overflow: auto !important; height: auto !important; }</style>
+<% end %>
+
+<div style="max-width:440px;margin:0 auto;padding:48px 24px;">
+  <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;margin:0 0 6px;"><%= t("portfolios.new_heading") %></h1>
+  <p style="color:rgba(255,255,255,0.45);font-size: var(--text-md);margin:0 0 24px;"><%= t("portfolios.new_sub") %></p>
+
+  <% if flash[:alert] %>
+    <div style="background:rgba(216,0,39,0.1);border:1px solid rgba(216,0,39,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#FF6B83;"><%= flash[:alert] %></div>
+  <% end %>
+
+  <%= form_with model: @portfolio, url: funder_portfolios_path(@funder), local: true do |f| %>
+    <div style="margin-bottom:20px;">
+      <label style="display:block;color:rgba(247,247,247,0.6);font-size: var(--text-sm);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;"><%= t("portfolios.name_label") %></label>
+      <%= f.text_field :name,
+            required: true, autofocus: true, maxlength: 80,
+            placeholder: t("portfolios.name_placeholder"),
+            class: "form-input" %>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <%= link_to t("portfolios.cancel"), funder_portfolios_path(@funder),
+            style: "flex:0 0 auto;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 22px;color:rgba(255,255,255,0.7);text-decoration:none;text-align:center;" %>
+      <%= f.submit t("portfolios.create_submit"),
+            style: "flex:1;background:#615BF5;border:none;border-radius:8px;padding:14px;color:#fff;cursor:pointer;" %>
+    </div>
+  <% end %>
+</div>

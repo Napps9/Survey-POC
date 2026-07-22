@@ -1,6 +1,8 @@
 class FunderMembership < ApplicationRecord
   belongs_to :funder
   belongs_to :organisation
+  has_many :portfolio_memberships, dependent: :destroy
+  has_many :portfolios, through: :portfolio_memberships
 
   enum :status, { active: "active", suspended: "suspended" }
 

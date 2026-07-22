@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_130002) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_22_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -239,6 +239,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_130002) do
     t.index ["organisation_id"], name: "index_partnerships_on_organisation_id"
   end
 
+  create_table "portfolio_common_question_sets", force: :cascade do |t|
+    t.integer "common_question_set_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "portfolio_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["common_question_set_id"], name: "index_portfolio_common_question_sets_on_common_question_set_id"
+    t.index ["portfolio_id", "common_question_set_id"], name: "idx_portfolio_cq_sets_unique", unique: true
+    t.index ["portfolio_id"], name: "index_portfolio_common_question_sets_on_portfolio_id"
+  end
+
+  create_table "portfolio_memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "funder_membership_id", null: false
+    t.integer "portfolio_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["funder_membership_id"], name: "index_portfolio_memberships_on_funder_membership_id"
+    t.index ["portfolio_id", "funder_membership_id"], name: "idx_portfolio_memberships_unique", unique: true
+    t.index ["portfolio_id"], name: "index_portfolio_memberships_on_portfolio_id"
+  end
+
+  create_table "portfolios", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.integer "funder_id", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_portfolios_on_deleted_at"
+    t.index ["funder_id", "name"], name: "index_portfolios_on_funder_id_and_name", unique: true
+    t.index ["funder_id"], name: "index_portfolios_on_funder_id"
+  end
+
   create_table "responses", force: :cascade do |t|
     t.boolean "answered", default: false, null: false
     t.json "answers", default: {}, null: false
@@ -372,6 +403,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_130002) do
   add_foreign_key "partnership_vertos", "partnerships"
   add_foreign_key "partnership_vertos", "surveys"
   add_foreign_key "partnerships", "organisations"
+  add_foreign_key "portfolio_common_question_sets", "common_question_sets"
+  add_foreign_key "portfolio_common_question_sets", "portfolios"
+  add_foreign_key "portfolio_memberships", "funder_memberships"
+  add_foreign_key "portfolio_memberships", "portfolios"
+  add_foreign_key "portfolios", "funders"
   add_foreign_key "responses", "survey_shares"
   add_foreign_key "responses", "surveys"
   add_foreign_key "sessions", "users"
