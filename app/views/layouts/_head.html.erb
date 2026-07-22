@@ -7,36 +7,23 @@
 <%= csrf_meta_tags %>
 <%= csp_meta_tag %>
 
-<%# Microsoft Clarity analytics %>
-<script type="text/javascript">
-  (function(c,l,a,r,i,t,y){
-      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-  })(window, document, "clarity", "script", "wyq1mb82dv");
-</script>
+<%# Microsoft Clarity analytics — NOT loaded here. It's non-essential
+    (session-replay) analytics, so it must not run before the visitor has
+    given cookie consent. cookie_consent_controller.js injects this same tag
+    itself, only once the Analytics category is accepted (or was already
+    accepted on a prior visit). See app/javascript/controllers/
+    cookie_consent_controller.js and app/views/shared/_cookie_consent_banner. %>
 
 <%= yield :head %>
 
 <link rel="manifest" href="<%= pwa_manifest_path %>">
 <%= favicon_link_tag "favicon.svg", type: "image/svg+xml" %>
 <%= favicon_link_tag "favicon.svg", rel: "apple-touch-icon", type: "image/svg+xml" %>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<%# Loaded non-render-blocking: request it at low priority as a print
-    stylesheet (browsers still fetch it, just without blocking first paint),
-    then flip it to "all" once it arrives. font-display:swap on the
-    stylesheet itself already keeps text visible with a fallback font in the
-    meantime, so this only removes the render-blocking network round trip —
-    including on the public /play/:token player, the most INP/LCP-sensitive
-    page for anonymous mobile respondents. %>
-<link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Alata&display=swap"
-      media="print" onload="this.media='all'">
-<noscript>
-  <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Alata&display=swap">
-</noscript>
+<%# ABeeZee/Alata are now self-hosted (app/assets/tailwind/application.css +
+    public/fonts/) instead of loaded from Google's fonts.googleapis.com /
+    fonts.gstatic.com CDN, which sent every visitor's IP address to Google
+    before any consent — see the @font-face rules for details. They ship as
+    part of the "tailwind" stylesheet below, so no separate <link> is needed. %>
 <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
 <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 <%= render "layouts/i18n_js" %>

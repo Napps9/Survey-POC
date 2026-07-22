@@ -1,0 +1,51 @@
+<% content_for :title, "#{t('legal.cookie_policy_title')} · Playverto" %>
+
+<div class="legal-page">
+  <h1><%= t("legal.cookie_policy_title") %></h1>
+  <p class="legal-page-updated">Last updated: [date]</p>
+
+  <div class="legal-draft-notice"><%= t("legal.draft_notice") %></div>
+
+  <h2>What are cookies</h2>
+  <p>
+    Cookies are small text files a website stores in your browser. We use them
+    to run the site and, only if you agree, to understand how it's used.
+  </p>
+
+  <h2>Your choice</h2>
+  <p>
+    A banner asks you to accept, reject, or choose which of the categories
+    below to allow the first time you visit. You can change your choice at
+    any time:
+  </p>
+  <p>
+    <button type="button" class="cookie-consent-btn-primary"
+            onclick="window.dispatchEvent(new CustomEvent('cookie-consent:reopen'))">
+      <%= t("legal.footer_cookie_settings") %>
+    </button>
+  </p>
+
+  <h2>Necessary cookies — always on</h2>
+  <p><%= t("cookie_consent.necessary_description") %> These can't be switched off because the site can't function without them:</p>
+  <ul>
+    <li><code>session_id</code> — keeps you signed in (creator accounts).</li>
+    <li><code>locale</code> — remembers your chosen UI language.</li>
+    <li><code>verto_cookie_consent</code> — remembers the choice you make on this page.</li>
+  </ul>
+
+  <h2>Analytics cookies — opt-in</h2>
+  <p><%= t("cookie_consent.analytics_description") %></p>
+  <ul>
+    <li>
+      <strong>Microsoft Clarity</strong> — session-replay and heatmap analytics. May
+      collect your IP address, browser/OS version, and pages visited. Only loaded
+      once you accept this category.
+    </li>
+  </ul>
+
+  <h2>Questions</h2>
+  <p>
+    See our <%= link_to t("legal.footer_privacy"), privacy_path %> for how we handle
+    personal data more broadly, or contact us at <strong>[contact email]</strong>.
+  </p>
+</div>

@@ -31,9 +31,11 @@ Rails.application.configure do
     script_src << :unsafe_eval if Rails.env.development?
     policy.script_src(*script_src)
 
-    # Inline styles are used throughout the app; Google Fonts CSS is external.
-    policy.style_src  :self, :unsafe_inline, "https://fonts.googleapis.com"
-    policy.font_src   :self, :data, "https://fonts.gstatic.com"
+    # Inline styles are used throughout the app. Webfonts (ABeeZee, Alata) are
+    # self-hosted under public/fonts/ (see app/assets/tailwind/application.css)
+    # rather than loaded from Google's CDN, so no external font host is needed.
+    policy.style_src  :self, :unsafe_inline
+    policy.font_src   :self, :data
 
     # App assets + Active Storage logos (self), survey background data: URLs,
     # Pexels stock photos (editor media picker + auto-populated Verto imagery,

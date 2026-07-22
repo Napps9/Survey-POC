@@ -28,6 +28,10 @@
         <%= render "shared/bottom_bar" %>
         <%= render "shared/command_palette" %>
       </div>
+    <% else %>
+      <%= render "shared/legal_footer" %>
     <% end %>
+
+    <%= render "shared/cookie_consent_banner" %>
   </body>
 </html>

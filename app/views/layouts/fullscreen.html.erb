@@ -21,6 +21,14 @@
         <div class="lang-switcher-fixed"><%= render "shared/locale_switcher" %></div>
       <% end %>
       <%= yield %>
+      <%# Same non-player, non-chromeless gate as the locale switcher above —
+          the player's own consent gate / cookie banner is enough there; a
+          second links footer would clutter its full-viewport experience. %>
+      <% unless controller_name == "player" || @chromeless %>
+        <%= render "shared/legal_footer" %>
+      <% end %>
     <% end %>
+
+    <%= render "shared/cookie_consent_banner" %>
   </body>
 </html>

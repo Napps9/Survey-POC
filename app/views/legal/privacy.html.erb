@@ -1,0 +1,104 @@
+<% content_for :title, "#{t('legal.privacy_title')} · Playverto" %>
+
+<div class="legal-page">
+  <h1><%= t("legal.privacy_title") %></h1>
+  <p class="legal-page-updated">Last updated: [date]</p>
+
+  <div class="legal-draft-notice"><%= t("legal.draft_notice") %></div>
+
+  <h2>Who we are</h2>
+  <p>
+    VertoNow ("Verto", "we", "us") is a survey product operated by
+    <strong>[legal entity name and registered address — confirm controlling entity]</strong>.
+    This policy explains what personal data we collect when you create,
+    publish, or respond to a Verto, why we collect it, and the choices and
+    rights you have over it.
+  </p>
+
+  <h2>What we collect</h2>
+  <p>We collect different data depending on whether you're a creator or a respondent:</p>
+  <ul>
+    <li><strong>Creators (account holders):</strong> your name, email address, password, and the surveys ("Vertos") you build.</li>
+    <li>
+      <strong>Respondents:</strong> the answers you give to a Verto, plus a small amount of
+      technical data used to run the survey — a session identifier (so your progress
+      can be saved and you're not counted twice), your coarse location (country and
+      region only — for example "GB, Greater London" — never a precise address or
+      GPS coordinate), and, if a question asks for it, a birth month and year
+      (never a full date of birth).
+    </li>
+    <li>
+      <strong>Anyone, if you accept analytics cookies:</strong> device/browser information via
+      Microsoft Clarity (session-replay analytics) — see our <%= link_to t("legal.footer_cookie_policy"), cookie_policy_path %>.
+    </li>
+  </ul>
+  <p>
+    Some Vertos may ask questions that request personal information such as your
+    age, gender, or location, or let you answer with free text, audio, or photos.
+    We only collect, use, and retain this information in relation to the specific
+    Verto you're responding to, and answering is voluntary — a Verto only asks for
+    consent to this where the creator has turned on the consent step, and you can
+    decline it.
+  </p>
+
+  <h2>Why we collect it (legal basis)</h2>
+  <ul>
+    <li><strong>Running the service</strong> (contract) — creator accounts, hosting your surveys, recording responses.</li>
+    <li><strong>Consent</strong> — analytics cookies, and any Verto-specific research consent you agree to before answering.</li>
+    <li><strong>Legitimate interests</strong> — keeping the service secure and reliable (e.g. rate-limiting abuse), and small-sample suppression that protects respondent anonymity in results.</li>
+  </ul>
+
+  <h2>Cookies</h2>
+  <p>
+    We use cookies to run the site and, only with your consent, to understand how
+    it's used. See our <%= link_to t("legal.footer_cookie_policy"), cookie_policy_path %> for the full list and how to change your choice at any time.
+  </p>
+
+  <h2>Who we share it with</h2>
+  <p>Personal data is not sold. It may be processed by these sub-processors, only for the purposes below:</p>
+  <ul>
+    <li><strong>Microsoft Clarity</strong> — session-replay analytics, only if you accept analytics cookies.</li>
+    <li><strong>Nominatim / OpenStreetMap</strong> — resolves a respondent's typed location to a coarse country/region; we never send or store a precise address or coordinate.</li>
+    <li><strong>Google</strong> — sign-in (OAuth) and, for creators who connect it, exporting results to Google Sheets/Drive.</li>
+    <li><strong>[Hosting / database / email providers — list infrastructure sub-processors]</strong>.</li>
+  </ul>
+
+  <h2>How long we keep it</h2>
+  <p>
+    <strong>[Retention schedule pending — see the production-readiness checklist.]</strong>
+    As a placeholder commitment: we aim to retain respondent-identifying data no
+    longer than necessary for the Verto's active collection period, and creators
+    can permanently delete a Verto and its responses at any time from the dashboard.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>Under data protection law (including the UK/EU GDPR), you have the right to:</p>
+  <ul>
+    <li>Access the personal data we hold about you;</li>
+    <li>Have inaccurate data corrected;</li>
+    <li>Request deletion of your data ("right to be forgotten");</li>
+    <li>Object to or restrict certain processing;</li>
+    <li>Receive your data in a portable format;</li>
+    <li>Withdraw consent at any time (this won't affect processing already carried out).</li>
+  </ul>
+  <p>
+    To exercise any of these rights, contact us at
+    <strong>[privacy / data-protection contact email]</strong>.
+    You also have the right to complain to your local data protection authority.
+  </p>
+
+  <h2>Children</h2>
+  <p>
+    Where a Verto is aimed at, or may be answered by, people under 18, we ask only
+    for the minimum information needed and present the consent step clearly before
+    any question that could identify someone. If we discover we've unintentionally
+    collected an image containing an identifiable face where that wasn't intended,
+    we will delete it.
+  </p>
+
+  <h2>Changes to this policy</h2>
+  <p>We may update this policy from time to time. Material changes will be reflected by the "last updated" date above.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy or your data: <strong>[contact email]</strong>.</p>
+</div>

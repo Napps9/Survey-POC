@@ -25,8 +25,12 @@ class ContentSecurityPolicyTest < ActionDispatch::IntegrationTest
     assert_includes csp, "base-uri 'self'"
     assert_includes csp, "form-action 'self'"
     assert_includes csp, "frame-ancestors 'self'"
-    # Fonts/analytics origins are allowlisted so they don't break.
-    assert_includes csp, "https://fonts.gstatic.com"
+    # Analytics origin is allowlisted so it doesn't break (still gated behind
+    # cookie consent client-side — see cookie_consent_controller.js). Fonts
+    # are self-hosted (public/fonts/) now, not loaded from Google's CDN, so no
+    # external font host should be allowlisted any more.
     assert_includes csp, "https://www.clarity.ms"
+    assert_not_includes csp, "fonts.gstatic.com"
+    assert_not_includes csp, "fonts.googleapis.com"
   end
 end
