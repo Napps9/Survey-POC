@@ -52,20 +52,11 @@
             </p>
           </div>
 
-          <% if is_admin %>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <% if available > 0 %>
-                <button type="button" data-action="click->create-menu#open"
-                        style="display:inline-flex;align-items:center;gap:8px;background:#615BF5;border:none;border-radius:100px;padding:10px 20px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(97,91,245,0.28);cursor:pointer;">
-                  <span style="font-size:18px;line-height:1;">+</span> <%= t("funders.assign_seat") %>
-                </button>
-              <% end %>
-              <div style="width:1px;height:24px;background:rgba(255,255,255,0.12);"></div>
-              <%= button_to t("funders.delete"), funder_path(@funder), method: :delete,
-                    data: { turbo_confirm: t("funders.delete_confirm", name: @funder.name) },
-                    form: { style: "margin:0;" },
-                    style: "background:none;border:1px solid rgba(255,255,255,0.15);border-radius:100px;padding:9px 18px;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;" %>
-            </div>
+          <% if is_admin && available > 0 %>
+            <button type="button" data-action="click->create-menu#open"
+                    style="display:inline-flex;align-items:center;gap:8px;background:#615BF5;border:none;border-radius:100px;padding:10px 20px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(97,91,245,0.28);cursor:pointer;">
+              <span style="font-size:18px;line-height:1;">+</span> <%= t("funders.assign_seat") %>
+            </button>
           <% end %>
         </div>
       </div>

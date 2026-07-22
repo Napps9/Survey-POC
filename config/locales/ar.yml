@@ -473,11 +473,7 @@ ar:
     creator_eyebrow: ممول · أنت تديره
     member_eyebrow: ممول · مرخّص
     assign_seat: تعيين مقعد
-    delete: حذف
-    delete_confirm: حذف %{name}؟ ستفقد جميع المؤسسات المرخَّص لها إمكانية الوصول.
-    deleted: تمت إزالة الممول.
     not_found: الممول غير موجود.
-    not_owner: يمكن فقط لمالك الممول القيام بذلك.
     no_seats_available: لا توجد مقاعد متاحة — أخلِ مقعدًا أو أضف مزيدًا من المقاعد أولاً.
     picker_eyebrow: تعيين مقعد
     picker_title: كيف تريد تعيينه؟

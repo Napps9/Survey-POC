@@ -1,11 +1,10 @@
 class FundersController < ApplicationController
   layout "fullscreen"
 
-  before_action :require_admin!, only: [ :new, :create, :destroy ]
+  before_action :require_admin!, only: [ :new, :create ]
   before_action :require_funder_access!, only: [ :index ]
   before_action :require_funder_enabled!, only: [ :new, :create ]
-  before_action :load_funder, only: [ :show, :destroy ]
-  before_action :require_creator_ownership!, only: [ :destroy ]
+  before_action :load_funder, only: [ :show ]
 
   def index
     @owned_funders  = current_organisation.funders.order(created_at: :desc)
@@ -56,11 +55,6 @@ class FundersController < ApplicationController
     end
   end
 
-  def destroy
-    @funder.destroy!
-    redirect_to funders_path, notice: t("funders.deleted")
-  end
-
   private
 
   # Funders is a staff-granted capability (Organisation#funder_enabled, set
@@ -84,11 +78,6 @@ class FundersController < ApplicationController
     )
       redirect_to funders_path, alert: t("funders.not_found") and return
     end
-  end
-
-  def require_creator_ownership!
-    return if @funder.organisation_id == current_organisation.id
-    redirect_to funders_path, alert: t("funders.not_owner")
   end
 
   # Sets the starting seat count when a funder program is first created.

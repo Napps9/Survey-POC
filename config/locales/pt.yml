@@ -473,11 +473,7 @@ pt:
     creator_eyebrow: "Financiadores · Gerido por si"
     member_eyebrow: "Financiadores · Licenciado"
     assign_seat: "Atribuir uma vaga"
-    delete: Eliminar
-    delete_confirm: "Eliminar %{name}? Todas as organizações licenciadas perderão o acesso."
-    deleted: "Financiador removido."
     not_found: "Financiador não encontrado."
-    not_owner: "Só o proprietário do financiador pode fazer isso."
     no_seats_available: "Não há vagas disponíveis — liberte uma ou adicione mais vagas primeiro."
     picker_eyebrow: "Atribuir uma vaga"
     picker_title: "Como quer atribuir a vaga?"

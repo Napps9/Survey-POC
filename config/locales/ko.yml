@@ -473,11 +473,7 @@ ko:
     creator_eyebrow: 펀더 · 운영자
     member_eyebrow: 펀더 · 라이선스됨
     assign_seat: "시트 배정"
-    delete: 삭제
-    delete_confirm: "%{name}을(를) 삭제하시겠습니까? 라이선스된 모든 조직이 접근 권한을 잃게 됩니다."
-    deleted: "펀더가 삭제되었습니다."
     not_found: "펀더를 찾을 수 없습니다."
-    not_owner: "펀더의 운영자만 이 작업을 할 수 있습니다."
     no_seats_available: "사용 가능한 시트가 없습니다 — 먼저 시트를 확보하거나 추가하세요."
     picker_eyebrow: "시트 배정"
     picker_title: "어떻게 배정하시겠어요?"

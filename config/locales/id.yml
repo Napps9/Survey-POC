@@ -473,11 +473,7 @@ id:
     creator_eyebrow: Pendana · Anda mengelola ini
     member_eyebrow: Pendana · Berlisensi
     assign_seat: Tetapkan kursi
-    delete: Hapus
-    delete_confirm: Hapus %{name}? Semua organisasi berlisensi akan kehilangan akses.
-    deleted: Pendana telah dihapus.
     not_found: Pendana tidak ditemukan.
-    not_owner: Hanya pemilik pendana yang dapat melakukan ini.
     no_seats_available: Tidak ada kursi yang tersedia — bebaskan satu kursi atau tambahkan kursi terlebih dahulu.
     picker_eyebrow: Tetapkan kursi
     picker_title: Bagaimana Anda ingin menetapkannya?

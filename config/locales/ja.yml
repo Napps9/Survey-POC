@@ -473,11 +473,7 @@ ja:
     creator_eyebrow: 資金提供者 · あなたが運営
     member_eyebrow: 資金提供者 · ライセンス済み
     assign_seat: シートを割り当てる
-    delete: 削除
-    delete_confirm: "%{name} を削除しますか?ライセンス済みのすべての組織がアクセスできなくなります。"
-    deleted: 資金提供者を削除しました。
     not_found: 資金提供者が見つかりません。
-    not_owner: 資金提供者のオーナーのみがこの操作を行えます。
     no_seats_available: 利用可能なシートがありません — 先にシートを空けるか追加してください。
     picker_eyebrow: シートを割り当てる
     picker_title: どのように割り当てますか？

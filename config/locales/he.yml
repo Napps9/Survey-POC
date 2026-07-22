@@ -473,11 +473,7 @@ he:
     creator_eyebrow: מממנים · אתם מנהלים זאת
     member_eyebrow: מממנים · מורשה
     assign_seat: הקצאת רישיון
-    delete: מחק
-    delete_confirm: למחוק את %{name}? כל הארגונים המורשים יאבדו את הגישה.
-    deleted: המממן הוסר.
     not_found: המממן לא נמצא.
-    not_owner: רק המנהל של המממן יכול לבצע פעולה זו.
     no_seats_available: אין רישיונות פנויים — פנו רישיון קיים או הוסיפו רישיונות נוספים.
     picker_eyebrow: הקצאת רישיון
     picker_title: איך תרצו להקצות אותו?
