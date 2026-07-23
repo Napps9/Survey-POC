@@ -91,7 +91,7 @@ jobs:
       # runs bundle install, bootsnap precompile, and
       # SECRET_KEY_BASE_DUMMY=1 assets:precompile (already in the Dockerfile).
       - name: Build the production image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: false
