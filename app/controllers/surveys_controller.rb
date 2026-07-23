@@ -125,7 +125,7 @@ class SurveysController < ApplicationController
 
     redirect_to survey_path(@survey)
   rescue => e
-    Rails.logger.error("[SurveyGenerator] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveyGenerator", e)
     flash.now[:alert] = "We couldn't generate your Verto — #{friendly_generate_error(e)}"
     render :new, status: :unprocessable_entity
   end
@@ -167,7 +167,7 @@ class SurveysController < ApplicationController
 
     redirect_to survey_path(@survey)
   rescue => e
-    Rails.logger.error("[PdfQuestionImporter] #{e.class}: #{e.message}")
+    ErrorReporting.report("PdfQuestionImporter", e)
     import_pdf_error("We couldn't import your PDF — #{friendly_generate_error(e)}")
   end
 
@@ -204,7 +204,7 @@ class SurveysController < ApplicationController
     @survey = create_imported_survey!(payload, variant: "verbatim")
     redirect_to survey_path(@survey)
   rescue => e
-    Rails.logger.error("[ManualQuestionImporter] #{e.class}: #{e.message}")
+    ErrorReporting.report("ManualQuestionImporter", e)
     import_manual_error("We couldn't import your questions — #{friendly_generate_error(e)}")
   end
 
@@ -221,7 +221,7 @@ class SurveysController < ApplicationController
     @survey = create_imported_survey!(payload, variant: variant)
     redirect_to survey_path(@survey)
   rescue => e
-    Rails.logger.error("[SurveysController#finalize_import] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#finalize_import", e)
     redirect_to new_survey_path, alert: "We couldn't finish the import — #{friendly_generate_error(e)}"
   end
 
@@ -253,7 +253,7 @@ class SurveysController < ApplicationController
   rescue GoogleFormsClient::Error => e
     import_google_form_error(e.message)
   rescue => e
-    Rails.logger.error("[SurveysController#import_google_form] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#import_google_form", e)
     import_google_form_error("We couldn't import that Google Form — #{friendly_generate_error(e)}")
   end
 
@@ -277,7 +277,7 @@ class SurveysController < ApplicationController
     @survey = create_imported_survey!(payload, variant: "verbatim")
     redirect_to survey_path(@survey)
   rescue => e
-    Rails.logger.error("[SurveysController#create_blank] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#create_blank", e)
     redirect_back fallback_location: root_path, allow_other_host: false, alert: "We couldn't create your Verto — #{friendly_generate_error(e)}"
   end
 
@@ -310,7 +310,7 @@ class SurveysController < ApplicationController
 
     render json: { ok: true, id: survey.id, updated_at: survey.updated_at }
   rescue => e
-    Rails.logger.error("[SurveysController#update] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#update", e)
     render json: { ok: false, error: e.message }, status: :unprocessable_entity
   end
 
@@ -342,7 +342,7 @@ class SurveysController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     raise # let it 404 rather than read as "couldn't check"
   rescue => e
-    Rails.logger.error("[SurveysController#moderate_image] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#moderate_image", e)
     render json: { ok: false, reason: "We couldn't check that image — please try again." }, status: :bad_gateway
   end
 
@@ -371,7 +371,7 @@ class SurveysController < ApplicationController
       end
     render json: { images: images }
   rescue => e
-    Rails.logger.error("[SurveysController#pexels_search] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#pexels_search", e)
     render json: { images: [], error: "search_failed" }, status: :bad_gateway
   end
 
@@ -461,7 +461,7 @@ class SurveysController < ApplicationController
     AssetPopulator.new(survey, seed: SecureRandom.hex(4)).populate!
     redirect_to survey_path(survey)
   rescue => e
-    Rails.logger.error("[SurveysController#shuffle_assets] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#shuffle_assets", e)
     redirect_to survey_path(survey), alert: "Couldn't shuffle assets — #{e.message}"
   end
 
@@ -551,7 +551,7 @@ class SurveysController < ApplicationController
     html = render_card_html(survey, card)
     render json: { ok: true, html: html }
   rescue => e
-    Rails.logger.error("[SurveysController#generate_card] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#generate_card", e)
     render json: { ok: false, error: friendly_generate_error(e) }, status: :unprocessable_entity
   end
 
@@ -599,7 +599,7 @@ class SurveysController < ApplicationController
     html = render_card_html(survey, merged, idx: body["index"].to_i)
     render json: { ok: true, card: merged, html: html }
   rescue => e
-    Rails.logger.error("[SurveysController#optimise_card] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#optimise_card", e)
     render json: { ok: false, error: friendly_generate_error(e) }, status: :unprocessable_entity
   end
 
@@ -618,7 +618,7 @@ class SurveysController < ApplicationController
     html = render_card_html(survey, card)
     render json: { ok: true, html: html }
   rescue => e
-    Rails.logger.error("[SurveysController#render_card] #{e.class}: #{e.message}")
+    ErrorReporting.report("SurveysController#render_card", e)
     render json: { ok: false, error: e.message }, status: :unprocessable_entity
   end
 
@@ -748,7 +748,7 @@ class SurveysController < ApplicationController
   def auto_populate_assets!(survey)
     AssetPopulator.new(survey).populate!
   rescue => e
-    Rails.logger.error("[AssetPopulator] #{e.class}: #{e.message}")
+    ErrorReporting.report("AssetPopulator", e)
   end
 
   # Snapshot the SELECTED Common Questions into Verto-card hashes. Takes
@@ -855,7 +855,7 @@ class SurveysController < ApplicationController
       translated = SurveyTranslator.new.call(cards: cards, target_locale: loc, source_locale: source)
       cards = Survey.merge_card_translations(cards, loc, translated)
     rescue => e
-      Rails.logger.error("[SurveyTranslator] #{loc}: #{e.class}: #{e.message}")
+      ErrorReporting.report("SurveyTranslator", e, locale: loc)
     end
     survey.update!(cards: cards)
   end
@@ -869,7 +869,7 @@ class SurveysController < ApplicationController
       translated = SurveyTranslator.new.call(cards: [ card ], target_locale: loc, source_locale: survey.default_locale)
       card = Survey.merge_card_translations([ card ], loc, translated).first
     rescue => e
-      Rails.logger.error("[SurveyTranslator card] #{loc}: #{e.class}: #{e.message}")
+      ErrorReporting.report("SurveyTranslator card", e, locale: loc)
     end
     card
   end

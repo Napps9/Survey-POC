@@ -32,7 +32,7 @@ class SurveySummariesController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     raise # let Rails return a clean 404 before any stream is opened
   rescue => e
-    Rails.logger.error "[SurveySummariesController] #{e.class}: #{e.message}"
+    ErrorReporting.report("SurveySummariesController", e)
     response.stream.write("Insights unavailable.") rescue nil
   ensure
     response.stream.close if response.committed?
@@ -84,7 +84,7 @@ class SurveySummariesController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     raise
   rescue => e
-    Rails.logger.error "[SurveySummariesController#texts] #{e.class}: #{e.message}"
+    ErrorReporting.report("SurveySummariesController#texts", e)
     response.stream.write("Summary unavailable.") rescue nil
   ensure
     response.stream.close if response.committed?

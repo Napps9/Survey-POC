@@ -55,7 +55,7 @@ class ResultsReportsController < ApplicationController
       format.pdf  { head :not_found }
     end
   rescue => e
-    Rails.logger.error("[ResultsReportsController] #{e.class}: #{e.message}")
+    ErrorReporting.report("ResultsReportsController", e)
     respond_to do |format|
       format.json { render json: { ok: false, error: "Couldn't generate the report — please try again." }, status: :unprocessable_entity }
       format.pdf  { head :internal_server_error }

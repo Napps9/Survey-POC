@@ -30,7 +30,7 @@ class OrganisationAssetsController < ApplicationController
     redirect_to organisation_memberships_path(org),
       notice: "Added #{files.size} #{'asset'.pluralize(files.size)} to your brand library."
   rescue => e
-    Rails.logger.error("[OrganisationAssetsController#create] #{e.class}: #{e.message}")
+    ErrorReporting.report("OrganisationAssetsController#create", e)
     redirect_to organisation_memberships_path(org), alert: "Couldn't add those assets — please try again."
   end
 

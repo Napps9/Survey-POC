@@ -13,8 +13,7 @@ class PasswordsController < ApplicationController
       begin
         PasswordsMailer.reset(user).deliver_now
       rescue => e
-        Rails.logger.error "[PasswordsMailer] #{e.class}: #{e.message}"
-        Rails.logger.error e.backtrace.first(8).join("\n")
+        ErrorReporting.report("PasswordsMailer", e)
         raise if Rails.env.development?
       end
     end

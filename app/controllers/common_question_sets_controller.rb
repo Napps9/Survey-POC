@@ -82,7 +82,7 @@ class CommonQuestionSetsController < ApplicationController
 
     redirect_to common_question_set_path(set), notice: "Drafted #{set.common_questions.size} questions. Edit any of them below before attaching this set to a Verto."
   rescue => e
-    Rails.logger.error("[CommonQuestionGenerator] #{e.class}: #{e.message}")
+    ErrorReporting.report("CommonQuestionGenerator", e)
     flash.now[:alert] = "We couldn't draft your set — #{e.message.first(180)}"
     @set = Current.organisation.common_question_sets.new(name: name, theme: theme, key_insight: key_insight, default_locale: locale)
     render :new, status: :unprocessable_entity
@@ -132,7 +132,7 @@ class CommonQuestionSetsController < ApplicationController
 
     redirect_to common_question_set_path(@set)
   rescue => e
-    Rails.logger.error("[CommonQuestionSets#add_question] #{e.class}: #{e.message}")
+    ErrorReporting.report("CommonQuestionSets#add_question", e)
     redirect_to common_question_set_path(@set), alert: "Couldn't add the question — #{e.message.first(180)}"
   end
 
@@ -168,7 +168,7 @@ class CommonQuestionSetsController < ApplicationController
 
     redirect_to common_question_set_path(@set)
   rescue => e
-    Rails.logger.error("[CommonQuestionSets#update_question] #{e.class}: #{e.message}")
+    ErrorReporting.report("CommonQuestionSets#update_question", e)
     redirect_to common_question_set_path(@set), alert: "Couldn't update — #{e.message.first(180)}"
   end
 

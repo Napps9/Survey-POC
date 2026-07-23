@@ -45,7 +45,7 @@ class GoogleSheetsWriter
 
     Result.new(url: spreadsheet.spreadsheet_url, id: spreadsheet.spreadsheet_id)
   rescue Google::Apis::Error => e
-    Rails.logger.error("[GoogleSheetsWriter] #{e.class}: #{e.message}")
+    ErrorReporting.report("GoogleSheetsWriter", e)
     raise
   end
 end

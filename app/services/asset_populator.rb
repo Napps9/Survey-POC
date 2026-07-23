@@ -240,7 +240,7 @@ class AssetPopulator
           new_card["range_theme"] = pick_range_theme(idx)
         end
       rescue => e
-        Rails.logger.error("[AssetPopulator] card #{idx} (#{card['type']}): #{e.class}: #{e.message}")
+        ErrorReporting.report("AssetPopulator", e, card_index: idx, card_type: card["type"])
       end
       new_card
     end
@@ -254,7 +254,7 @@ class AssetPopulator
   def safe_pick
     yield
   rescue => e
-    Rails.logger.error("[AssetPopulator] #{e.class}: #{e.message}")
+    ErrorReporting.report("AssetPopulator", e)
     nil
   end
 

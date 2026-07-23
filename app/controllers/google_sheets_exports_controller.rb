@@ -29,7 +29,7 @@ class GoogleSheetsExportsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { ok: false, error: "Verto not found." }, status: :not_found
   rescue => e
-    Rails.logger.error("[GoogleSheetsExportsController] #{e.class}: #{e.message}")
+    ErrorReporting.report("GoogleSheetsExportsController", e)
     render json: { ok: false, error: "Couldn't create the Google Sheet — please try again." }, status: :unprocessable_entity
   end
 

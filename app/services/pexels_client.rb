@@ -105,7 +105,7 @@ class PexelsClient
     body = get_json(ENDPOINT, params)
     Array(body && body["photos"])
   rescue => e
-    Rails.logger.error("[PexelsClient] #{e.class}: #{e.message}")
+    ErrorReporting.report("PexelsClient", e)
     []
   end
 
@@ -121,7 +121,7 @@ class PexelsClient
     body = get_json(VIDEO_ENDPOINT, params)
     Array(body && body["videos"])
   rescue => e
-    Rails.logger.error("[PexelsClient] #{e.class}: #{e.message}")
+    ErrorReporting.report("PexelsClient", e)
     []
   end
 

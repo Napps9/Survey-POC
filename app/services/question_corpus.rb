@@ -80,7 +80,7 @@ class QuestionCorpus
       end
       rows
     rescue => e
-      Rails.logger.error("[QuestionCorpus] load failed: #{e.message}")
+      ErrorReporting.report("QuestionCorpus", e)
       []
     end
 

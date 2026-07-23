@@ -32,7 +32,7 @@ class GoogleDriveWriter
 
     Result.new(url: file.web_view_link, id: file.id)
   rescue Google::Apis::Error => e
-    Rails.logger.error("[GoogleDriveWriter] #{e.class}: #{e.message}")
+    ErrorReporting.report("GoogleDriveWriter", e)
     raise
   end
 end

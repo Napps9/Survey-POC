@@ -63,7 +63,7 @@ class QuizAnswerGrader
     return false unless block
     deep_stringify(input_of(block))["correct"] == true
   rescue => e
-    Rails.logger.error("[QuizAnswerGrader] #{e.class}: #{e.message}")
+    ErrorReporting.report("QuizAnswerGrader", e)
     false
   end
 end

@@ -28,7 +28,7 @@ class ResultsExportsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     raise
   rescue => e
-    Rails.logger.error("[ResultsExportsController] #{e.class}: #{e.message}")
+    ErrorReporting.report("ResultsExportsController", e)
     redirect_to survey_results_path(params[:survey_id]), alert: "Couldn't export results — #{e.message}"
   end
 end

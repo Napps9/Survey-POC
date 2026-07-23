@@ -13,7 +13,7 @@ class OauthSessionsController < ApplicationController
     redirect_to new_session_path,
                 alert: t("auth.social_no_email", provider: SocialAuth.label_for(params[:provider]))
   rescue => e
-    Rails.logger.error("[OauthSessions] #{e.class}: #{e.message}")
+    ErrorReporting.report("OauthSessions", e)
     failure
   end
 

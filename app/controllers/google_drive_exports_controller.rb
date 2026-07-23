@@ -29,7 +29,7 @@ class GoogleDriveExportsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { ok: false, error: "Verto not found." }, status: :not_found
   rescue => e
-    Rails.logger.error("[GoogleDriveExportsController] #{e.class}: #{e.message}")
+    ErrorReporting.report("GoogleDriveExportsController", e)
     render json: { ok: false, error: "Couldn't save to Google Drive — please try again." }, status: :unprocessable_entity
   end
 

@@ -43,7 +43,7 @@ class FunderAccountsController < ApplicationController
     begin
       FunderAccountMailer.welcome(user, @funder).deliver_now
     rescue => e
-      Rails.logger.error "[FunderAccountMailer] #{e.class}: #{e.message}"
+      ErrorReporting.report("FunderAccountMailer", e)
       raise if Rails.env.development?
     end
 

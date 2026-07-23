@@ -59,6 +59,11 @@ services:
         value: "33554432"
       - key: ANTHROPIC_API_KEY
         sync: false
+      # Error tracking. See config/initializers/sentry.rb and
+      # docs/DEPLOYMENT_RUNBOOK.md for the one-time Sentry org setup (EU data
+      # region is chosen there, not here). Blank = errors only reach the logs.
+      - key: SENTRY_DSN
+        sync: false
       # How long any single Claude call may hold a request thread, and how many
       # times it retries, before failing fast. Bounds thread occupancy so a slow
       # Anthropic API can't tie up every Puma thread and 502 the whole app.

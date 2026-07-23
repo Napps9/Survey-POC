@@ -63,6 +63,12 @@ gem "google-apis-drive_v3"   # create the AI report as a Google Doc in the user'
 # and app/lib/blazer_access.rb). Runs against Postgres in prod.
 gem "blazer", "~> 3.4"
 
+# Error tracking (EU/Frankfurt data region — respondent PII stays in the EU;
+# see config/initializers/sentry.rb). No-ops without SENTRY_DSN, so it's safe
+# to load in every environment, including dev/test.
+gem "sentry-ruby"
+gem "sentry-rails"
+
 # Social sign-in with Google. Activates only when GOOGLE_CLIENT_ID/SECRET are
 # present in the environment — see .env.example.
 gem "omniauth", "~> 2.1"

@@ -54,7 +54,7 @@ class PlayerController < ApplicationController
     resp.save!
     render json: { ok: true, session_token: token }
   rescue => e
-    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    ErrorReporting.report("PlayerController##{action_name}", e)
     render json: { ok: false, error: "Something went wrong saving your response." }, status: :unprocessable_entity
   end
 
@@ -76,7 +76,7 @@ class PlayerController < ApplicationController
     payload.merge!(token_totals: resp.token_totals) if @survey.tokenisation_enabled?
     render json: payload
   rescue => e
-    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    ErrorReporting.report("PlayerController##{action_name}", e)
     render json: { ok: false, error: "Something went wrong saving your response." }, status: :unprocessable_entity
   end
 
@@ -104,7 +104,7 @@ class PlayerController < ApplicationController
     resp.save!
     render json: { ok: true }
   rescue => e
-    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    ErrorReporting.report("PlayerController##{action_name}", e)
     render json: { ok: false, error: "Something went wrong recording your response." }, status: :unprocessable_entity
   end
 
@@ -149,7 +149,7 @@ class PlayerController < ApplicationController
       render json: base.merge(graded: false)
     end
   rescue => e
-    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    ErrorReporting.report("PlayerController##{action_name}", e)
     render json: { ok: false, error: "Something went wrong scoring your answer." }, status: :unprocessable_entity
   end
 
@@ -289,7 +289,7 @@ class PlayerController < ApplicationController
     end
     render json: { ok: true, results: results }
   rescue => e
-    Rails.logger.error("[PlayerController##{action_name}] #{e.class}: #{e.message}")
+    ErrorReporting.report("PlayerController##{action_name}", e)
     render json: { ok: false, error: "Search failed" }, status: :bad_gateway
   end
 
@@ -374,7 +374,7 @@ class PlayerController < ApplicationController
     # so ActiveRecord's dirty-tracking on the JSON column reliably sees it.
     resp.answers = resp.answers.merge(key => entry.merge("value" => accepted.first))
   rescue => e
-    Rails.logger.error("[PlayerController#grade] AI answer grading failed: #{e.class}: #{e.message}")
+    ErrorReporting.report("PlayerController#grade", e)
     # Best-effort: the respondent keeps the exact-match verdict.
   end
 

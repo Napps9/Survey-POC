@@ -41,7 +41,7 @@ class GoogleAuthController < ApplicationController
 
     redirect_to return_target(ret, google_connected: 1)
   rescue => e
-    Rails.logger.error("[GoogleAuthController] #{e.class}: #{e.message}")
+    ErrorReporting.report("GoogleAuthController", e)
     redirect_to return_target(ret, google_error: 1)
   end
 

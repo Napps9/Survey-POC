@@ -56,7 +56,7 @@ class NominatimClient
       Rails.cache.write(cache_key, results, expires_in: 1.day) if results.any?
       results
     rescue => e
-      Rails.logger.error("[NominatimClient] #{e.class}: #{e.message}")
+      ErrorReporting.report("NominatimClient", e)
       []
     end
 

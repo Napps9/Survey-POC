@@ -39,7 +39,7 @@ class PartnershipAccountsController < ApplicationController
     begin
       PartnershipAccountMailer.welcome(user, @partnership).deliver_now
     rescue => e
-      Rails.logger.error "[PartnershipAccountMailer] #{e.class}: #{e.message}"
+      ErrorReporting.report("PartnershipAccountMailer", e)
       raise if Rails.env.development?
     end
 

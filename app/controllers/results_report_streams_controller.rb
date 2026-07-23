@@ -21,7 +21,7 @@ class ResultsReportStreamsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     raise # clean 404 before the stream is opened
   rescue => e
-    Rails.logger.error("[ResultsReportStreamsController] #{e.class}: #{e.message}")
+    ErrorReporting.report("ResultsReportStreamsController", e)
     response.stream.write("\n\nReport unavailable right now.") rescue nil
   ensure
     response.stream.close if response.committed?

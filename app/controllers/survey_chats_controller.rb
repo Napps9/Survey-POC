@@ -26,7 +26,7 @@ class SurveyChatsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     raise # let Rails return a clean 404 before any stream is opened
   rescue => e
-    Rails.logger.error "[SurveyChatsController] #{e.class}: #{e.message}"
+    ErrorReporting.report("SurveyChatsController", e)
     response.stream.write("Sorry, I couldn't answer that right now.") rescue nil
   ensure
     response.stream.close if response.committed?
