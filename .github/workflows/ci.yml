@@ -76,3 +76,26 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+  build_image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Proves the exact Dockerfile Render deploys actually builds. No push,
+      # no registry credentials, no app secrets needed - docker build only
+      # runs bundle install, bootsnap precompile, and
+      # SECRET_KEY_BASE_DUMMY=1 assets:precompile (already in the Dockerfile).
+      - name: Build the production image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: survey-poc:ci-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
