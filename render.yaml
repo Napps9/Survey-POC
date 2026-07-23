@@ -15,6 +15,16 @@ services:
     # Brakeman, importmap audit) are green on GitHub.
     autoDeployTrigger: checksPass
     healthCheckPath: /up
+    # Runs once against a fresh instance before it's swapped into rotation -
+    # not on every boot like bin/docker-entrypoint's own db:prepare still
+    # does today. This is step 1 of a 2-step migration (see
+    # docs/DEPLOYMENT_RUNBOOK.md and PRODUCTION_READINESS_PLAN.md P1-4):
+    # once this is confirmed running in the Render deploy log, a follow-up
+    # change removes db:prepare from the entrypoint so a bad migration
+    # blocks the deploy (old instance keeps serving) instead of taking the
+    # running instance down on its next restart. Redundant but harmless
+    # until then - db:prepare is idempotent.
+    preDeployCommand: bundle exec rails db:prepare
     # Persistent disk for Active Storage (organisation logos + the per-account
     # brand asset library). config.active_storage.service = :local writes to
     # Rails.root/storage = /rails/storage (WORKDIR is /rails), so the disk is
