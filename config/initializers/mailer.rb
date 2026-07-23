@@ -23,6 +23,17 @@ if ENV["SMTP_ADDRESS"].present?
     enable_starttls_auto: ENV.fetch("SMTP_STARTTLS", "true") == "true",
     tls:                  ENV["SMTP_TLS"] == "true"
   }.compact
+elsif Rails.env.production?
+  # Without SMTP_ADDRESS, delivery falls back to Rails' bare default (smtp to
+  # localhost:25), which fails on Render. PasswordsController and friends
+  # rescue that failure and still show a success message, so a misconfigured
+  # deploy has no visible symptom anywhere except this line — password
+  # resets, invites, and account-setup emails all silently go nowhere.
+  Rails.logger.warn(
+    "[Mailer] SMTP_ADDRESS is not set — outbound email (password resets, invites, " \
+    "account setup links) cannot be delivered. Set SMTP_ADDRESS/SMTP_USERNAME/" \
+    "SMTP_PASSWORD/MAIL_FROM in the Render dashboard (see .env.example)."
+  )
 end
 
 # Public host used to build links inside emails (password reset, etc.)
