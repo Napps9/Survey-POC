@@ -130,4 +130,39 @@ class PortfolioFlowTest < ActionDispatch::IntegrationTest
     assert_includes survey.reload.cards.filter_map { |c| c["common_question_id"] }, @q1.id,
       "the mandatory card must be re-appended, not stay deleted"
   end
+
+  test "the funder dashboard groups a licensed org under its Portfolio, out of the flat list" do
+    portfolio = @funder.portfolios.create!(name: "Climate")
+    portfolio.portfolio_memberships.create!(funder_membership: @fm)
+
+    unassigned_org = Organisation.create!(name: "Unassigned Org", slug: "unassigned-#{SecureRandom.hex(2)}")
+    FunderMembership.assign!(funder: @funder, organisation: unassigned_org)
+
+    sign_in @funder_admin
+    get funder_path(@funder)
+    assert_response :success
+    assert_match "Climate", response.body
+    assert_match "Grantee Co", response.body
+    assert_match "Unassigned Org", response.body
+    refute_match "%{funder}", response.body, "no raw locale placeholder should leak into rendered HTML"
+  end
+
+  test "a new portfolio can be created via the dashboard modal's POST target" do
+    sign_in @funder_admin
+    assert_difference -> { @funder.portfolios.count }, 1 do
+      post funder_portfolios_path(@funder), params: { portfolio: { name: "Education" } }
+    end
+    assert_redirected_to funder_portfolio_path(@funder, Portfolio.last)
+  end
+
+  test "an invalid portfolio creation redirects back to the dashboard with an alert" do
+    @funder.portfolios.create!(name: "Dup")
+    sign_in @funder_admin
+
+    post funder_portfolios_path(@funder), params: { portfolio: { name: "Dup" } }
+    assert_redirected_to funder_path(@funder)
+    follow_redirect!
+    assert_response :success
+    assert_match(/taken|already/i, response.body)
+  end
 end

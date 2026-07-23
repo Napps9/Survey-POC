@@ -1,0 +1,44 @@
+<%# One licensed-org row: name, claimed/status badges, publish/response
+    summary, and (for admins) suspend/reactivate. Shared between the flat
+    "Licensed organisations" list and each Portfolio's member list, so both
+    stay visually and functionally identical. %>
+<% published = published_counts_by_org[membership.organisation_id] || 0 %>
+<% completed_responses = completed_response_counts_by_org[membership.organisation_id] || 0 %>
+<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px;">
+  <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#615BF5,#FF1E6F);display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;flex-shrink:0;opacity:<%= membership.active? ? '1' : '0.4' %>;">
+    <%= membership.organisation.name.first.upcase %>
+  </div>
+  <div style="flex:1;min-width:0;">
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= membership.organisation.name %></span>
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:100px;background:rgba(1,234,203,0.15);color:#01EACB;white-space:nowrap;flex-shrink:0;">
+        <%= t("funders.claimed") %>
+      </span>
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.05em;text-transform:uppercase;padding:2px 7px;border-radius:100px;background:<%= membership.active? ? 'rgba(255,255,255,0.08)' : 'rgba(255,193,7,0.15)' %>;color:<%= membership.active? ? 'rgba(255,255,255,0.5)' : '#FFC107' %>;white-space:nowrap;flex-shrink:0;">
+        <%= t("funders.membership_status.#{membership.status}", default: membership.status.capitalize) %>
+      </span>
+    </div>
+    <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("funders.licensed_on", date: l(membership.created_at.to_date, format: :long, default: membership.created_at.to_date.to_s)) %></div>
+    <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);margin-top:2px;">
+      <% if published.zero? %>
+        <%= t("funders.not_published_yet") %>
+      <% else %>
+        <%= t("funders.published_label") %> <%= published %> · <%= t("funders.responses_label") %> <%= completed_responses %>
+      <% end %>
+    </div>
+  </div>
+  <% if is_admin %>
+    <% if membership.active? %>
+      <%= button_to t("funders.suspend"), funder_funder_membership_path(funder, membership), method: :patch,
+            params: { status: "suspended" },
+            data: { turbo_confirm: t("funders.suspend_confirm", org: membership.organisation.name) },
+            form: { style: "margin:0;" },
+            style: "background:none;border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:4px 10px;color:rgba(255,255,255,0.5);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;white-space:nowrap;" %>
+    <% else %>
+      <%= button_to t("funders.reactivate"), funder_funder_membership_path(funder, membership), method: :patch,
+            params: { status: "active" },
+            form: { style: "margin:0;" },
+            style: "background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.35);border-radius:6px;padding:4px 10px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;white-space:nowrap;" %>
+    <% end %>
+  <% end %>
+</div>

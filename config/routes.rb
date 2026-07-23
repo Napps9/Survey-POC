@@ -133,8 +133,9 @@ Rails.application.routes.draw do
     resources :funder_memberships, only: [ :update ]
 
     # Portfolios — a funder's grantee orgs grouped by theme, with a shared
-    # Common Question bank that auto-populates into each grantee's own Verto
-    resources :portfolios, except: [ :edit, :update ] do
+    # Common Question bank that auto-populates into each grantee's own Verto.
+    # Created via a modal on the Funder dashboard, so there's no :new page.
+    resources :portfolios, except: [ :edit, :update, :new ] do
       resources :portfolio_memberships, only: [ :create, :destroy ]
       resources :portfolio_common_question_sets, only: [ :create, :destroy ]
       member do

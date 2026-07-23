@@ -100,6 +100,15 @@ class FundersController < ApplicationController
     @completed_response_counts_by_org = Response.joins(:survey)
       .where(status: "completed", surveys: { organisation_id: org_ids })
       .group("surveys.organisation_id").count
+
+    @portfolios = @funder.portfolios.kept
+                    .includes(portfolio_memberships: { funder_membership: :organisation })
+                    .order(:name)
+    # An org grouped under a Portfolio is shown there instead — the flat list
+    # below only holds orgs not yet assigned to any Portfolio.
+    grouped_membership_ids = PortfolioMembership.where(portfolio_id: @portfolios.map(&:id)).pluck(:funder_membership_id)
+    @unassigned_memberships = @memberships.reject { |m| grouped_membership_ids.include?(m.id) }
+    @new_portfolio = @funder.portfolios.new
   end
 
   def load_member_show_data

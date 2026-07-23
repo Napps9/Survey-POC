@@ -3,14 +3,13 @@ class PortfoliosController < ApplicationController
 
   before_action :load_funder
   before_action :load_portfolio, only: [ :show, :destroy, :results, :resync ]
-  before_action :require_funder_owner!, only: [ :new, :create, :destroy, :results, :resync ]
+  before_action :require_funder_owner!, only: [ :create, :destroy, :results, :resync ]
 
   # Owner sees every portfolio under this funder; a grantee only sees the
   # portfolio(s) their own org actively belongs to — never the funder's full
   # roster of other grantees.
   def index
-    @owner = owner?
-    @portfolios = if @owner
+    @portfolios = if owner?
       @funder.portfolios.kept.order(:name)
     else
       @funder.portfolios.kept
@@ -20,17 +19,15 @@ class PortfoliosController < ApplicationController
     end
   end
 
-  def new
-    @portfolio = @funder.portfolios.new
-  end
-
+  # Created via a modal on the Funder dashboard, not a separate page — on
+  # failure there's no page to re-render back into, so send the creator back
+  # to the dashboard with the error instead.
   def create
     @portfolio = @funder.portfolios.new(portfolio_params)
     if @portfolio.save
       redirect_to funder_portfolio_path(@funder, @portfolio), notice: "Portfolio \"#{@portfolio.name}\" created."
     else
-      flash.now[:alert] = @portfolio.errors.full_messages.first
-      render :new, status: :unprocessable_entity
+      redirect_to funder_path(@funder), alert: @portfolio.errors.full_messages.first
     end
   end
 

@@ -4,7 +4,7 @@
 <% end %>
 
 <div style="max-width:760px;margin:0 auto;padding:48px 24px 60px;">
-  <%= link_to t("portfolios.back_to_list"), funder_portfolios_path(@funder),
+  <%= link_to t("portfolios.back_to_funder", funder: @funder.name), funder_path(@funder),
         style: "display:inline-block;color:rgba(255,255,255,0.45);font-size: var(--text-sm);text-decoration:none;margin-bottom:18px;" %>
 
   <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;margin:0 0 24px;"><%= @portfolio.name %></h1>
