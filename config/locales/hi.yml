@@ -236,6 +236,15 @@ hi:
         choose_kicker: "अपना चुनाव करें"
     wizard:
       step_counter: चरण %{n} / %{total}
+    results:
+      compare_picker_meta: '%{total} में से %{selected} दिखाए गए — जोड़ने या हटाने के लिए क्लिक करें'
+      compare_pick_prompt: 'तुलना करने के लिए ऊपर कम से कम एक सेगमेंट चुनें (या मानचित्र पर किसी क्षेत्र पर क्लिक करें).'
+      compare_card_n: 'कार्ड %{n}'
+      compare_freeform_count_one: '%{n} मुक्त-पाठ उत्तर'
+      compare_freeform_count_other: '%{n} मुक्त-पाठ उत्तर'
+      compare_summarize_btn: '✦ AI से सारांशित करें'
+      compare_summarizing: 'सारांशित किया जा रहा है…'
+      compare_summarize_error: 'अभी सारांशित नहीं किया जा सका.'
   nav:
     partnerships: "साझेदार"
     funders: "फंडर्स"

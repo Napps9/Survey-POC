@@ -236,6 +236,15 @@ ja:
         choose_kicker: "選択してください"
     wizard:
       step_counter: "%{total}ステップ中 %{n}"
+    results:
+      compare_picker_meta: "%{total}件中%{selected}件を表示中 — クリックで追加・削除"
+      compare_pick_prompt: "比較するには、上のセグメントを1つ以上選択するか、地図の地域をクリックしてください。"
+      compare_card_n: "カード%{n}"
+      compare_freeform_count_one: "自由記述の回答 %{n}件"
+      compare_freeform_count_other: "自由記述の回答 %{n}件"
+      compare_summarize_btn: "✦ AIで要約"
+      compare_summarizing: "要約しています…"
+      compare_summarize_error: "現在要約できませんでした。"
   nav:
     partnerships: "パートナー"
     funders: "資金提供者"

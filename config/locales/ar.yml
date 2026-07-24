@@ -236,6 +236,15 @@ ar:
         choose_kicker: "اختر إجابتك"
     wizard:
       step_counter: الخطوة %{n} من %{total}
+    results:
+      compare_picker_meta: '%{selected} من %{total} ظاهر — انقر للإضافة أو الإزالة'
+      compare_pick_prompt: 'اختر شريحة واحدة على الأقل أعلاه (أو انقر على منطقة في الخريطة) للمقارنة.'
+      compare_card_n: 'البطاقة %{n}'
+      compare_freeform_count_one: '%{n} إجابة نصية حرة'
+      compare_freeform_count_other: '%{n} إجابات نصية حرة'
+      compare_summarize_btn: '✦ تلخيص باستخدام الذكاء الاصطناعي'
+      compare_summarizing: 'جارٍ التلخيص…'
+      compare_summarize_error: 'تعذّر التلخيص الآن.'
   nav:
     partnerships: "الشركاء"
     funders: "الممولون"

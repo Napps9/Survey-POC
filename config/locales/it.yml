@@ -236,6 +236,15 @@ it:
         choose_kicker: "Fai la tua scelta"
     wizard:
       step_counter: Passo %{n} di %{total}
+    results:
+      compare_picker_meta: '%{selected} di %{total} mostrati — clicca per aggiungere o rimuovere'
+      compare_pick_prompt: 'Scegli almeno un segmento sopra (o clicca su una regione della mappa) per confrontare.'
+      compare_card_n: 'Scheda %{n}'
+      compare_freeform_count_one: '%{n} risposta a testo libero'
+      compare_freeform_count_other: '%{n} risposte a testo libero'
+      compare_summarize_btn: '✦ Riassumi con l''IA'
+      compare_summarizing: 'Riassumendo…'
+      compare_summarize_error: 'Impossibile riassumere in questo momento.'
   nav:
     partnerships: "Partner"
     funders: "Finanziatori"

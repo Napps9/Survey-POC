@@ -236,6 +236,15 @@ sw:
         choose_kicker: "Fanya chaguo lako"
     wizard:
       step_counter: Hatua %{n} kati ya %{total}
+    results:
+      compare_picker_meta: '%{selected} kati ya %{total} zinaonyeshwa — bofya ili kuongeza au kuondoa'
+      compare_pick_prompt: 'Chagua sehemu moja au zaidi hapo juu (au bofya eneo kwenye ramani) ili kulinganisha.'
+      compare_card_n: 'Kadi %{n}'
+      compare_freeform_count_one: 'Jibu %{n} la maandishi huru'
+      compare_freeform_count_other: 'Majibu %{n} ya maandishi huru'
+      compare_summarize_btn: '✦ Fupisha kwa AI'
+      compare_summarizing: 'Inafupisha…'
+      compare_summarize_error: 'Imeshindwa kufupisha kwa sasa.'
   nav:
     partnerships: "Washirika"
     funders: "Wafadhili"

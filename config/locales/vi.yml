@@ -236,6 +236,15 @@ vi:
         choose_kicker: "Hãy đưa ra lựa chọn của bạn"
     wizard:
       step_counter: Bước %{n} / %{total}
+    results:
+      compare_picker_meta: 'Đang hiện %{selected} trong số %{total} — nhấp để thêm hoặc bỏ'
+      compare_pick_prompt: 'Chọn ít nhất một phân khúc ở trên (hoặc nhấp vào một khu vực trên bản đồ) để so sánh.'
+      compare_card_n: 'Thẻ %{n}'
+      compare_freeform_count_one: '%{n} câu trả lời dạng văn bản tự do'
+      compare_freeform_count_other: '%{n} câu trả lời dạng văn bản tự do'
+      compare_summarize_btn: '✦ Tóm tắt bằng AI'
+      compare_summarizing: 'Đang tóm tắt…'
+      compare_summarize_error: 'Hiện không thể tóm tắt.'
   nav:
     partnerships: "Đối tác"
     funders: "Nhà tài trợ"

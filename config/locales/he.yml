@@ -236,6 +236,15 @@ he:
         choose_kicker: "בחר את תשובתך"
     wizard:
       step_counter: שלב %{n} מתוך %{total}
+    results:
+      compare_picker_meta: '%{selected} מתוך %{total} מוצגים — יש ללחוץ כדי להוסיף או להסיר'
+      compare_pick_prompt: 'בחרו לפחות פלח אחד למעלה (או לחצו על אזור במפה) כדי להשוות.'
+      compare_card_n: 'כרטיס %{n}'
+      compare_freeform_count_one: '%{n} תשובת טקסט חופשי'
+      compare_freeform_count_other: '%{n} תשובות טקסט חופשי'
+      compare_summarize_btn: '✦ סכם באמצעות AI'
+      compare_summarizing: 'מסכם…'
+      compare_summarize_error: 'לא ניתן לסכם כרגע.'
   nav:
     partnerships: "שותפים"
     funders: "מממנים"

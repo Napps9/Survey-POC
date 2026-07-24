@@ -236,6 +236,15 @@ nl:
         choose_kicker: "Maak je keuze"
     wizard:
       step_counter: Stap %{n} van %{total}
+    results:
+      compare_picker_meta: '%{selected} van %{total} weergegeven — klik om toe te voegen of te verwijderen'
+      compare_pick_prompt: 'Kies hierboven ten minste één segment (of klik op een regio op de kaart) om te vergelijken.'
+      compare_card_n: 'Kaart %{n}'
+      compare_freeform_count_one: '%{n} vrije-tekstantwoord'
+      compare_freeform_count_other: '%{n} vrije-tekstantwoorden'
+      compare_summarize_btn: '✦ Samenvatten met AI'
+      compare_summarizing: 'Wordt samengevat…'
+      compare_summarize_error: 'Kon nu niet worden samengevat.'
   nav:
     partnerships: "Partners"
     funders: "Financiers"

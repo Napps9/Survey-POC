@@ -236,6 +236,15 @@ de:
         choose_kicker: "Triff deine Wahl"
     wizard:
       step_counter: Schritt %{n} von %{total}
+    results:
+      compare_picker_meta: '%{selected} von %{total} angezeigt — klicken zum Hinzufügen oder Entfernen'
+      compare_pick_prompt: 'Wählen Sie oben mindestens ein Segment aus (oder klicken Sie auf eine Region auf der Karte), um zu vergleichen.'
+      compare_card_n: 'Karte %{n}'
+      compare_freeform_count_one: '%{n} Freitextantwort'
+      compare_freeform_count_other: '%{n} Freitextantworten'
+      compare_summarize_btn: '✦ Mit KI zusammenfassen'
+      compare_summarizing: 'Wird zusammengefasst…'
+      compare_summarize_error: 'Konnte gerade nicht zusammengefasst werden.'
   nav:
     partnerships: "Partner"
     funders: "Förderer"

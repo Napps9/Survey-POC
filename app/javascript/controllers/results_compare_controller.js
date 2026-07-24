@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { t } from "lib/i18n"
 
 // Categorical palette (dataviz skill's validated 8-hue dark-mode set,
 // re-validated against this page's own dark surface #1C2034). Colour is
@@ -223,11 +224,11 @@ export default class extends Controller {
     document.addEventListener("keydown", this._escHandler)
 
     if (!this._data) {
-      this._metaEl.textContent = "Loading…"
+      this._metaEl.textContent = t("player.compare_loading")
       await this._loadPromise
     }
     if (!this._data) {
-      this._metaEl.textContent = "Couldn't load comparison data."
+      this._metaEl.textContent = t("player.compare_error")
       return
     }
 
@@ -268,7 +269,7 @@ export default class extends Controller {
   }
 
   _renderPicker() {
-    this._metaEl.textContent = `${this._selected.size} of ${this._data.segments.length} shown — click to add or remove`
+    this._metaEl.textContent = t("results.compare_picker_meta", { selected: this._selected.size, total: this._data.segments.length })
     this._pickerEl.innerHTML = ""
     this._data.segments.forEach(seg => {
       const chip = document.createElement("button")
@@ -286,7 +287,7 @@ export default class extends Controller {
     const selected = this._data.segments.filter(s => this._selected.has(s.id))
     this._bodyEl.innerHTML = ""
     if (!selected.length) {
-      this._bodyEl.innerHTML = `<div class="compare-empty">Pick at least one segment above (or click a region on the map) to compare.</div>`
+      this._bodyEl.innerHTML = `<div class="compare-empty">${esc(t("results.compare_pick_prompt"))}</div>`
       return
     }
     this._data.cards.forEach(card => {
@@ -311,7 +312,7 @@ export default class extends Controller {
     head.innerHTML =
       `<span class="compare-card-chevron">▾</span>` +
       `<span class="compare-card-head-text">` +
-        `<span class="compare-card-eyebrow">Card ${card.index + 1}</span>` +
+        `<span class="compare-card-eyebrow">${esc(t("results.compare_card_n", { n: card.index + 1 }))}</span>` +
         `<span class="compare-card-title">${esc(card.text || "")}</span>` +
       `</span>`
     head.addEventListener("click", () => wrap.classList.toggle("is-collapsed"))
@@ -371,7 +372,7 @@ export default class extends Controller {
       `<span class="compare-bar-item-label" style="color:${this._colorFor(seg.id)}" title="${esc(seg.label)}">` +
         `<span class="compare-chip-dot" style="background:${this._colorFor(seg.id)}"></span>${esc(seg.label)}` +
       `</span>` +
-      `<span class="compare-freeform-count">${texts.length} free-text answer${texts.length === 1 ? "" : "s"}</span>`
+      `<span class="compare-freeform-count">${esc(t(texts.length === 1 ? "results.compare_freeform_count_one" : "results.compare_freeform_count_other", { n: texts.length }))}</span>`
     group.appendChild(head)
 
     if (!texts.length) return group
@@ -384,7 +385,7 @@ export default class extends Controller {
       const summaryBtn = document.createElement("button")
       summaryBtn.type = "button"
       summaryBtn.className = "compare-summarize-btn"
-      summaryBtn.textContent = "✦ Summarise with AI"
+      summaryBtn.textContent = t("results.compare_summarize_btn")
       const summaryBox = document.createElement("div")
       summaryBox.className = "compare-summary-box hidden"
       summaryBtn.addEventListener("click", () => this._summariseOpenEnded(card, seg, summaryBtn, summaryBox))
@@ -416,7 +417,7 @@ export default class extends Controller {
     if (btn.disabled) return
     btn.disabled = true
     const original = btn.textContent
-    btn.textContent = "Summarising…"
+    btn.textContent = t("results.compare_summarizing")
     box.classList.remove("hidden")
     box.textContent = ""
     try {
@@ -431,7 +432,7 @@ export default class extends Controller {
         box.textContent += dec.decode(value, { stream: true })
       }
     } catch (_) {
-      box.textContent = "Couldn't summarise right now."
+      box.textContent = t("results.compare_summarize_error")
     } finally {
       btn.textContent = original
       btn.disabled = false

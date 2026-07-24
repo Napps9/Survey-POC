@@ -236,6 +236,15 @@ tr:
         choose_kicker: "Seçimini yap"
     wizard:
       step_counter: Adım %{n} / %{total}
+    results:
+      compare_picker_meta: '%{total} içinden %{selected} gösteriliyor — eklemek veya kaldırmak için tıklayın'
+      compare_pick_prompt: 'Karşılaştırmak için yukarıdan en az bir segment seçin (veya haritada bir bölgeye tıklayın).'
+      compare_card_n: 'Kart %{n}'
+      compare_freeform_count_one: '%{n} serbest metin yanıtı'
+      compare_freeform_count_other: '%{n} serbest metin yanıtı'
+      compare_summarize_btn: '✦ Yapay zekâ ile özetle'
+      compare_summarizing: 'Özetleniyor…'
+      compare_summarize_error: 'Şu anda özetlenemedi.'
   nav:
     partnerships: "Ortaklar"
     funders: "Fon Sağlayıcılar"

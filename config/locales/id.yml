@@ -236,6 +236,15 @@ id:
         choose_kicker: "Buat pilihanmu"
     wizard:
       step_counter: Langkah %{n} dari %{total}
+    results:
+      compare_picker_meta: '%{selected} dari %{total} ditampilkan — klik untuk menambah atau menghapus'
+      compare_pick_prompt: 'Pilih setidaknya satu segmen di atas (atau klik wilayah pada peta) untuk membandingkan.'
+      compare_card_n: 'Kartu %{n}'
+      compare_freeform_count_one: '%{n} jawaban teks bebas'
+      compare_freeform_count_other: '%{n} jawaban teks bebas'
+      compare_summarize_btn: '✦ Ringkas dengan AI'
+      compare_summarizing: 'Meringkas…'
+      compare_summarize_error: 'Tidak dapat meringkas saat ini.'
   nav:
     partnerships: "Mitra"
     funders: "Pendana"

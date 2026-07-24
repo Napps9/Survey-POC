@@ -236,6 +236,15 @@ pl:
         choose_kicker: "Dokonaj wyboru"
     wizard:
       step_counter: Krok %{n} z %{total}
+    results:
+      compare_picker_meta: '%{selected} z %{total} pokazanych — kliknij, aby dodać lub usunąć'
+      compare_pick_prompt: 'Wybierz powyżej co najmniej jeden segment (lub kliknij region na mapie), aby porównać.'
+      compare_card_n: 'Karta %{n}'
+      compare_freeform_count_one: '%{n} odpowiedź tekstowa'
+      compare_freeform_count_other: '%{n} odpowiedzi tekstowych'
+      compare_summarize_btn: '✦ Podsumuj z AI'
+      compare_summarizing: 'Podsumowywanie…'
+      compare_summarize_error: 'Nie udało się teraz podsumować.'
   nav:
     partnerships: "Partnerzy"
     funders: "Fundatorzy"

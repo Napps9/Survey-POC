@@ -236,6 +236,15 @@ uk:
         choose_kicker: "Зробіть вибір"
     wizard:
       step_counter: Крок %{n} з %{total}
+    results:
+      compare_picker_meta: 'Показано %{selected} з %{total} — натисніть, щоб додати або прибрати'
+      compare_pick_prompt: 'Виберіть вище щонайменше один сегмент (або натисніть на регіон на карті), щоб порівняти.'
+      compare_card_n: 'Картка %{n}'
+      compare_freeform_count_one: '%{n} текстова відповідь'
+      compare_freeform_count_other: '%{n} текстових відповідей'
+      compare_summarize_btn: '✦ Узагальнити за допомогою ШІ'
+      compare_summarizing: 'Узагальнюємо…'
+      compare_summarize_error: 'Зараз не вдалося узагальнити.'
   nav:
     partnerships: "Партнери"
     funders: "Донори"

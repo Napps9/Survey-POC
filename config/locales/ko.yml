@@ -236,6 +236,15 @@ ko:
         choose_kicker: "선택하세요"
     wizard:
       step_counter: "%{total}단계 중 %{n}단계"
+    results:
+      compare_picker_meta: "%{total}개 중 %{selected}개 표시 중 — 클릭하여 추가 또는 제거"
+      compare_pick_prompt: "비교하려면 위에서 세그먼트를 하나 이상 선택하거나 지도에서 지역을 클릭하세요."
+      compare_card_n: "카드 %{n}"
+      compare_freeform_count_one: "자유 서술형 답변 %{n}개"
+      compare_freeform_count_other: "자유 서술형 답변 %{n}개"
+      compare_summarize_btn: "✦ AI로 요약"
+      compare_summarizing: "요약하는 중…"
+      compare_summarize_error: "지금은 요약할 수 없습니다."
   nav:
     partnerships: "파트너"
     funders: "펀더"

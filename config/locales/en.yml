@@ -238,6 +238,15 @@ en:
         choose_kicker: "Make your choice"
     wizard:
       step_counter: "Step %{n} of %{total}"
+    results:
+      compare_picker_meta: "%{selected} of %{total} shown — click to add or remove"
+      compare_pick_prompt: "Pick at least one segment above (or click a region on the map) to compare."
+      compare_card_n: "Card %{n}"
+      compare_freeform_count_one: "%{n} free-text answer"
+      compare_freeform_count_other: "%{n} free-text answers"
+      compare_summarize_btn: "✦ Summarise with AI"
+      compare_summarizing: "Summarising…"
+      compare_summarize_error: "Couldn't summarise right now."
   nav:
     partnerships: "Partners"
     funders: "Funders"
