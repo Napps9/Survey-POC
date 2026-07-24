@@ -638,6 +638,7 @@ vi:
     brand_library: "Thư viện thương hiệu của bạn"
     change_animation: "Đổi hoạt ảnh"
     change_animation_title: "Đổi hoạt ảnh của thẻ này"
+    change_statement_image_title: "Đổi hình ảnh của câu này"
     animation_modal_title: "Chọn hoạt ảnh"
     animation_modal_sub: "Nhân vật này phản ứng khi người trả lời kéo thanh trượt. Nhân vật được chọn để hợp với chủ đề Verto của bạn — thay bất cứ lúc nào."
     close: "Đóng"

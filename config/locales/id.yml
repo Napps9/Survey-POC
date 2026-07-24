@@ -638,6 +638,7 @@ id:
     brand_library: "Pustaka merek Anda"
     change_animation: "Ubah animasi"
     change_animation_title: "Ubah animasi kartu ini"
+    change_statement_image_title: "Ubah gambar pernyataan ini"
     animation_modal_title: "Pilih animasi"
     animation_modal_sub: "Karakter ini bereaksi saat responden menyeret slider. Dipilih agar cocok dengan tema Verto Anda — ganti kapan saja."
     close: "Tutup"

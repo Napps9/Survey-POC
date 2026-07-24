@@ -638,6 +638,7 @@ ja:
     brand_library: "ブランドライブラリ"
     change_animation: "アニメーションを変更"
     change_animation_title: "このカードのアニメーションを変更"
+    change_statement_image_title: "この文の画像を変更"
     animation_modal_title: "アニメーションを選択"
     animation_modal_sub: "このキャラクターは、回答者がスライダーを動かすと反応します。Vertoのテーマに合わせて選ばれていますが、いつでも変更できます。"
     close: "閉じる"

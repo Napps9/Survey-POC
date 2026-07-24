@@ -638,6 +638,7 @@ es:
     brand_library: "Tu biblioteca de marca"
     change_animation: "Cambiar animación"
     change_animation_title: "Cambiar la animación de esta tarjeta"
+    change_statement_image_title: "Cambiar la imagen de esta afirmación"
     animation_modal_title: "Elige una animación"
     animation_modal_sub: "Este personaje reacciona a medida que los encuestados arrastran el control deslizante. Se elige para combinar con el tema de tu Verto; cámbialo cuando quieras."
     close: "Cerrar"

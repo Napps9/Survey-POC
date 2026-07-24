@@ -638,6 +638,7 @@ ar:
     brand_library: "مكتبة علامتك التجارية"
     change_animation: "تغيير الرسوم المتحركة"
     change_animation_title: "تغيير الرسوم المتحركة لهذه البطاقة"
+    change_statement_image_title: "تغيير صورة هذه العبارة"
     animation_modal_title: "اختر رسمًا متحركًا"
     animation_modal_sub: "تتفاعل هذه الشخصية أثناء سحب اللاعبين لشريط التمرير. اختيرت لتلائم سمة Verto الخاصة بك — يمكنك تبديلها في أي وقت."
     close: "إغلاق"

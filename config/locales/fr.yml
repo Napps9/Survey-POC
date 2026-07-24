@@ -638,6 +638,7 @@ fr:
     brand_library: "Votre bibliothèque de marque"
     change_animation: "Changer d'animation"
     change_animation_title: "Changer l'animation de cette carte"
+    change_statement_image_title: "Changer l'image de cette affirmation"
     animation_modal_title: "Choisir une animation"
     animation_modal_sub: "Ce personnage réagit quand les participants font glisser le curseur. Il est choisi pour correspondre au thème de votre Verto — changez-le quand vous voulez."
     close: "Fermer"

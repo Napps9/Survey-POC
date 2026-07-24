@@ -214,6 +214,9 @@ const COMPONENTS = {
           return `<div class="rotate-card" data-tap-stack-target="card"
                        style="background:linear-gradient(135deg,${a},${b});">
                     <span contenteditable="true" style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;">${esc(o)}</span>
+                    <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${i}" title="Change this statement's image">
+                      <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
+                    </button>
                     <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption">×</button>
                   </div>`
         }).join("")}

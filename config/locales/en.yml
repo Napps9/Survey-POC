@@ -640,6 +640,7 @@ en:
     brand_library: "Your brand library"
     change_animation: "Change animation"
     change_animation_title: "Change this card's animation"
+    change_statement_image_title: "Change this statement's image"
     animation_modal_title: "Choose an animation"
     animation_modal_sub: "This character reacts as respondents drag the slider. It's picked to match your Verto's theme — swap it any time."
     close: "Close"

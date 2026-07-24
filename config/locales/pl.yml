@@ -640,6 +640,7 @@ pl:
     brand_library: "Twoja biblioteka marki"
     change_animation: "Zmień animację"
     change_animation_title: "Zmień animację tej karty"
+    change_statement_image_title: "Zmień obraz tego stwierdzenia"
     animation_modal_title: "Wybierz animację"
     animation_modal_sub: "Ta postać reaguje, gdy respondenci przesuwają suwak. Została dobrana do motywu Twojego Verto — możesz ją zmienić w każdej chwili."
     close: "Zamknij"

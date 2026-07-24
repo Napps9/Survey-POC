@@ -638,6 +638,7 @@ de:
     brand_library: "Deine Markenbibliothek"
     change_animation: "Animation ändern"
     change_animation_title: "Animation dieser Karte ändern"
+    change_statement_image_title: "Bild dieser Aussage ändern"
     animation_modal_title: "Animation auswählen"
     animation_modal_sub: "Diese Figur reagiert, während Teilnehmende den Schieberegler ziehen. Sie passt zum Design deines Vertos – du kannst sie jederzeit austauschen."
     close: "Schließen"

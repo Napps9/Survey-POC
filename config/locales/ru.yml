@@ -640,6 +640,7 @@ ru:
     brand_library: "Ваша библиотека бренда"
     change_animation: "Сменить анимацию"
     change_animation_title: "Сменить анимацию этой карточки"
+    change_statement_image_title: "Сменить изображение этого утверждения"
     animation_modal_title: "Выберите анимацию"
     animation_modal_sub: "Этот персонаж реагирует, когда респонденты двигают ползунок. Он подобран под тему вашего Verto — замените его в любой момент."
     close: "Закрыть"

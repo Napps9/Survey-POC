@@ -25,11 +25,20 @@ export default class extends Controller {
   static ENCODE_QUALITY  = 0.82
   static SVG_BYTE_CAP    = 500 * 1024       // SVGs skip downscaling, so cap them directly
 
+  // Same gradient pairs _card_component.html.erb falls back to when a tap-card
+  // statement has no image, so a cleared/never-set slot repaints identically
+  // to a fresh server render.
+  static TAP_OPTION_FILLS = [
+    [ "#d4edda", "#a8d5b5" ], [ "#d1ecf1", "#9fd5df" ], [ "#fff3cd", "#ffd88a" ],
+    [ "#f8d7da", "#f5a8b0" ], [ "#e2d9f3", "#c3aee8" ]
+  ]
+
   connect() {
     this._activeCard = null
     this._pendingUrl = null
     this._pendingVideo = null
     this._mode = "card"
+    this._optionIndex = null
     this._searchMedia = "photos"
     this._escListener = (e) => { if (e.key === "Escape") this.close() }
   }
@@ -77,6 +86,40 @@ export default class extends Controller {
     this.clearBtnTarget.hidden = !this._currentBg()
     this._renderRecommended(this.hasBackgroundRecommendedValue ? this.backgroundRecommendedValue : [], "Recommended backgrounds")
     this._seedSearch()
+    this.backdropTarget.hidden = false
+    document.addEventListener("keydown", this._escListener)
+  }
+
+  // Opens the same modal but targets ONE tap-card statement's image instead
+  // of the card's own left-panel image/video.
+  openTapOption(event) {
+    event?.preventDefault()
+    event?.stopPropagation()
+    const trigger = event?.currentTarget
+    const card    = trigger?.closest("[data-survey-editor-target='card']")
+                 || trigger?.closest(".survey-card-wrap")
+    const index   = parseInt(trigger?.dataset.mediaPickerOptionIndex, 10)
+    if (!card || Number.isNaN(index)) return
+    this._mode = "tapOption"
+    this._optionIndex = index
+    this._activeCard = card
+    this._pendingUrl = null
+    this._pendingVideo = null
+    this._setApplyEnabled(false)
+    this._switchTabKey("library")
+    // A tap-card statement's image is a photo only — no video slot here.
+    this._setMedia("photos")
+    this._showMediaToggle(false)
+
+    const images = this._parseUrls(card.dataset.cardOptionImages)
+    this.clearBtnTarget.hidden = !images[index]
+
+    // The card-level "Recommended" list is for the card's own image, not any
+    // one statement — leave it empty rather than showing designs for the
+    // wrong slot.
+    this._renderRecommended([], "")
+    this._seedSearch()
+
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
   }
@@ -393,6 +436,14 @@ export default class extends Controller {
       return
     }
     if (!this._activeCard) return
+    if (this._mode === "tapOption") {
+      // Tap-card statements are photos only (the video toggle stays hidden
+      // for this mode), so there's nothing to check for _pendingVideo here.
+      if (this._pendingUrl) this._setTapOptionImage(this._activeCard, this._optionIndex, this._pendingUrl)
+      this._notifyDirty()
+      this.close()
+      return
+    }
     if (this._pendingVideo) {
       this._setCardVideo(this._activeCard, this._pendingVideo.video, this._pendingVideo.poster,
         this._pendingCredit, this._pendingCreditUrl)
@@ -439,6 +490,12 @@ export default class extends Controller {
       return
     }
     if (!this._activeCard) return
+    if (this._mode === "tapOption") {
+      this._setTapOptionImage(this._activeCard, this._optionIndex, "")
+      this._notifyDirty()
+      this.close()
+      return
+    }
     this._setCardImage(this._activeCard, "")
     this._notifyDirty()
     this.close()
@@ -499,6 +556,29 @@ export default class extends Controller {
   _flashEditor(msg) {
     const editor = this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")
     if (editor && typeof editor.flash === "function") editor.flash(msg, "text-hot-pink")
+  }
+
+  // Sets (or clears) ONE tap-card statement's image — mirrors _setCardImage
+  // but writes into the option_images array at `index` and repaints only
+  // that one card slot, not the whole card. Targets .rotate-card-media when
+  // present (the server-rendered markup); falls back to the .rotate-card
+  // itself for type_panel_controller.js's client-side preview, which paints
+  // its background directly on that element instead.
+  _setTapOptionImage(card, index, url) {
+    const images = this._parseUrls(card.dataset.cardOptionImages)
+    while (images.length <= index) images.push("")
+    images[index] = url || ""
+    card.dataset.cardOptionImages = JSON.stringify(images)
+
+    const rotateCard = card.querySelectorAll(".rotate-card")[index]
+    if (!rotateCard) return
+    const target = rotateCard.querySelector(".rotate-card-media") || rotateCard
+    if (url) {
+      target.style.background = `#fff url('${url.replace(/'/g, "\\'")}') center/cover no-repeat`
+    } else {
+      const [ a, b ] = this.constructor.TAP_OPTION_FILLS[index % this.constructor.TAP_OPTION_FILLS.length]
+      target.style.background = `linear-gradient(135deg,${a},${b})`
+    }
   }
 
   _setCardImage(card, url, credit = "", creditUrl = "") {

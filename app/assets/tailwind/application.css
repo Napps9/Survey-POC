@@ -3069,6 +3069,17 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .rotate-card:hover .tap-card-delete { opacity: 1; }
 .tap-card-delete:hover { color: #D80027; }
+.tap-card-image-btn {
+  position: absolute; top: 7px; left: 9px;
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  background: rgba(0,0,0,0.55); border: none; border-radius: 50%;
+  cursor: pointer; color: #fff;
+  opacity: 0; transition: opacity 0.15s, background 0.15s, color 0.15s;
+  z-index: 10; padding: 0;
+}
+.rotate-card:hover .tap-card-image-btn { opacity: 1; }
+.tap-card-image-btn:hover { background: rgba(1,234,203,0.85); color: #1C2034; }
 .tap-add-btn {
   background: transparent;
   border: 1px dashed rgba(0,0,0,0.15); border-radius: 12px;
@@ -3471,6 +3482,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .editing-translation .pick-item-delete,
 .editing-translation .tap-add-btn,
 .editing-translation .tap-card-delete,
+.editing-translation .tap-card-image-btn,
 .editing-translation .aq-trigger-btn,
 .editing-translation .other-edit-toggle,
 .editing-translation [data-action*="type-panel#deleteCard"] { display: none !important; }

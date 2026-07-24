@@ -638,6 +638,7 @@ tr:
     brand_library: "Marka kütüphaneniz"
     change_animation: "Animasyonu değiştir"
     change_animation_title: "Bu kartın animasyonunu değiştir"
+    change_statement_image_title: "Bu ifadenin görselini değiştir"
     animation_modal_title: "Bir animasyon seçin"
     animation_modal_sub: "Bu karakter, katılımcılar kaydırıcıyı sürüklerken tepki verir. Verto'nuzun temasına uyacak şekilde seçildi — istediğiniz zaman değiştirin."
     close: "Kapat"
