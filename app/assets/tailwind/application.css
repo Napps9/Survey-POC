@@ -1034,7 +1034,7 @@
 }
 
 /* ── Slider ─────────────────────────────────────── */
-.slider-wrap { display: flex; flex-direction: column; gap: 14px; padding-top: 12px; }
+.slider-wrap { position: relative; display: flex; flex-direction: column; gap: 14px; padding-top: 12px; }
 .slider-track-wrap { position: relative; padding: 8px 0; }
 .slider-track {
   height: 48px;
@@ -1077,6 +1077,65 @@
 .slider-label-text { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75); flex: 1; text-align: center; outline: none; }
 .slider-label-text:first-child { text-align: left; }
 .slider-label-text:last-child { text-align: right; }
+
+/* Layout toggle (auto/horizontal/vertical cycle) — always in the corner so
+   it never competes with the track/labels for flex space in either axis. */
+.slider-axis-toggle {
+  position: absolute; top: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  background: rgba(0,0,0,0.08); border: none; border-radius: 50%;
+  cursor: pointer; color: rgba(0,0,0,0.45);
+  transition: background 0.15s, color 0.15s;
+  padding: 0; z-index: 6;
+}
+.slider-axis-toggle:hover { background: rgba(1,234,203,0.85); color: #1C2034; }
+
+/* Vertical layout — track becomes a tall narrow column with the labels
+   beside it (mirroring the NPS vessel + label-column stage), for when the
+   horizontal pill would leave option text cramped. Dots/thumb keep their
+   inline left/top-based positioning replaced by bottom-based positioning at
+   render time (see _card_component.html.erb and sliderHtml in
+   type_panel_controller.js) — only their CROSS-axis centering lives here. */
+.slider-wrap[data-slider-axis-value="vertical"] {
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: 16px;
+  height: 320px;
+}
+.slider-wrap[data-slider-axis-value="vertical"] .slider-track-wrap {
+  padding: 0 8px;
+  height: 100%;
+}
+.slider-wrap[data-slider-axis-value="vertical"] .slider-track {
+  width: 48px;
+  height: 100%;
+  background: linear-gradient(0deg, #d0e8ff 0%, #01EACB 43%, #ffd88a 100%);
+}
+.slider-wrap[data-slider-axis-value="vertical"] .s-dot {
+  top: auto; left: 50%;
+  transform: translate(-50%, 50%);
+}
+.slider-wrap[data-slider-axis-value="vertical"] .slider-thumb {
+  top: auto; left: 50%;
+  transform: translate(-50%, 50%);
+}
+.slider-wrap[data-slider-axis-value="vertical"] .slider-labels {
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0;
+  margin-top: 0;
+}
+.slider-wrap[data-slider-axis-value="vertical"] .slider-label-text,
+.slider-wrap[data-slider-axis-value="vertical"] .slider-label-text:first-child,
+.slider-wrap[data-slider-axis-value="vertical"] .slider-label-text:last-child {
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
 
 /* ── Pick list (single + multi) ─────────────────── */
 .pick-list {

@@ -102,4 +102,32 @@ class NpsHelperTest < ActionView::TestCase
     assert_equal NpsHelper.range_themes_for("Food and nutrition"),
                  NpsHelper.range_themes_for("Food and nutrition")
   end
+
+  # ── resolved_slider_axis ─────────────────────────────────────────────────
+
+  test "resolved_slider_axis honors an explicit horizontal/vertical override" do
+    assert_equal "horizontal", resolved_slider_axis({ "slider_axis" => "horizontal", "options" => %w[A B] })
+    assert_equal "vertical", resolved_slider_axis({ "slider_axis" => "vertical", "options" => %w[A B] })
+  end
+
+  test "resolved_slider_axis defaults short labels to horizontal" do
+    assert_equal "horizontal", resolved_slider_axis({ "options" => %w[Low High] })
+    assert_equal "horizontal", resolved_slider_axis({ "options" => [] })
+  end
+
+  test "resolved_slider_axis picks vertical for a long label, even unset/auto" do
+    long = "This option's text is definitely too long for a horizontal pill"
+    assert_equal "vertical", resolved_slider_axis({ "options" => [ "Short", long ] })
+    assert_equal "vertical", resolved_slider_axis({ "slider_axis" => "auto", "options" => [ "Short", long ] })
+  end
+
+  test "resolved_slider_axis picks vertical for many short options" do
+    labels = %w[A B C D E F]
+    assert_equal "vertical", resolved_slider_axis({ "options" => labels })
+  end
+
+  test "resolved_slider_axis is safe on a blank/malformed card" do
+    assert_equal "horizontal", resolved_slider_axis({})
+    assert_equal "horizontal", resolved_slider_axis(nil)
+  end
 end

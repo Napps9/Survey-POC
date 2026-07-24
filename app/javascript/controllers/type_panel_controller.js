@@ -479,12 +479,27 @@ function npsHtml(opts, shape) {
     </div>`
 }
 
+// A tunable starting point, not a precisely derived number — mirrors
+// NpsHelper#resolved_slider_axis (same thresholds), refine visually via the
+// /verify skill rather than by adjusting the math.
+const SLIDER_AXIS_LABEL_THRESHOLD = 18
+const SLIDER_AXIS_COUNT_THRESHOLD = 5
+
+function resolvedSliderAxis(storedAxis, labels) {
+  if (storedAxis === "horizontal" || storedAxis === "vertical") return storedAxis
+  const longest = labels.reduce((max, l) => Math.max(max, String(l).length), 0)
+  return (longest > SLIDER_AXIS_LABEL_THRESHOLD || labels.length > SLIDER_AXIS_COUNT_THRESHOLD) ? "vertical" : "horizontal"
+}
+
 function sliderHtml(opts, ctx = {}) {
   const labels = opts.length ? opts : DEFAULT_OPTIONS.range
   const n = Math.max(labels.length, 2)
-  const dots = Array.from({length: n}, (_, i) =>
-    `<div class="s-dot" data-slider-target="dot" style="left:${(i / (n - 1) * 100).toFixed(2)}%"></div>`
-  ).join("")
+  const storedAxis = ctx.sliderAxis || "auto"
+  const axis = resolvedSliderAxis(storedAxis, labels)
+  const dots = Array.from({length: n}, (_, i) => {
+    const pos = (i / (n - 1) * 100).toFixed(2)
+    return `<div class="s-dot" data-slider-target="dot" style="${axis === "vertical" ? `bottom:${pos}%` : `left:${pos}%`}"></div>`
+  }).join("")
   const themes = ctx.rangeThemes || []
   const groups = ctx.rangeThemeGroups || []
   const cur = ctx.rangeTheme || ""
@@ -500,13 +515,15 @@ function sliderHtml(opts, ctx = {}) {
         ${optHtml}
       </select>
     </div>` : ""
+  const nextAxis = { auto: "horizontal", horizontal: "vertical", vertical: "auto" }[storedAxis] || "horizontal"
+  const axisToggleTitle = esc(t(`editor.slider_axis_${nextAxis}`, { default: "Change layout" }))
   return `
-    <div class="slider-wrap" data-controller="slider" data-slider-steps-value="${n}">
+    <div class="slider-wrap" data-controller="slider" data-slider-steps-value="${n}" data-slider-axis-value="${axis}">
       <div class="slider-track-wrap">
         <div class="slider-track" data-slider-target="track"
              data-action="pointerdown->slider#start">
           ${dots}
-          <div class="slider-thumb" data-slider-target="thumb" style="left:50%;">
+          <div class="slider-thumb" data-slider-target="thumb" style="${axis === "vertical" ? "bottom:50%;" : "left:50%;"}">
             <div class="s-line"></div><div class="s-line"></div><div class="s-line"></div>
           </div>
         </div>
@@ -514,6 +531,9 @@ function sliderHtml(opts, ctx = {}) {
       <div class="slider-labels">
         ${labels.map(o => `<span class="slider-label-text" contenteditable="true">${esc(o)}</span>`).join("")}
       </div>
+      <button type="button" class="slider-axis-toggle" data-action="click->type-panel#setSliderAxis" title="${axisToggleTitle}">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path></svg>
+      </button>
     </div>${picker}`
 }
 
@@ -799,6 +819,21 @@ export default class extends Controller {
     this.typeOptTargets.forEach(o => o.classList.toggle("active", o.dataset.type === type))
   }
 
+  // Cycles a Range card's slider layout auto -> horizontal -> vertical -> auto
+  // and rebuilds it in place. Reuses _applyToCard rather than hand-patching
+  // the DOM: the type isn't actually changing (wasType and type are both
+  // "range"), so its badge/eyebrow/lottie side effects are all no-ops here —
+  // it's just the one code path that already knows how to rebuild this slot.
+  setSliderAxis(event) {
+    const card = event.currentTarget.closest('[data-survey-editor-target="card"]')
+    if (!card || card.dataset.cardType !== "range") return
+    const CYCLE = { auto: "horizontal", horizontal: "vertical", vertical: "auto" }
+    const current = card.dataset.cardSliderAxis || "auto"
+    card.dataset.cardSliderAxis = CYCLE[current] || "auto"
+    this._applyToCard(card, "range")
+    this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")?.markDirty()
+  }
+
   applyType() {
     if (!this.activeCardEl || !this.pendingType) return
     this._applyToCard(this.activeCardEl, this.pendingType)
@@ -1005,6 +1040,7 @@ export default class extends Controller {
         rangeThemeGroups: this._rangeThemePicker.groups,
         rangeThemeLabel: this._rangeThemePicker.label,
         rangeTheme:      card.dataset.cardRangeTheme || "",
+        sliderAxis:      card.dataset.cardSliderAxis || "auto",
         pages:           this._pagesFor(card, type),
         optionImages:    this._optionImagesFor(card, type)
       })

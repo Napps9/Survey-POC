@@ -141,6 +141,23 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil out[3]["range_theme"], "range_theme is only kept on range cards"
   end
 
+  test "sanitize_cards_images! whitelists slider_axis on range cards and drops the rest" do
+    cards = [
+      { "type" => "range", "text" => "Q", "slider_axis" => "horizontal" },
+      { "type" => "range", "text" => "Q", "slider_axis" => "vertical" },
+      { "type" => "range", "text" => "Q", "slider_axis" => "auto" },
+      { "type" => "range", "text" => "Q", "slider_axis" => "diagonal" },
+      { "type" => "multiple_choice", "text" => "Q", "slider_axis" => "vertical" }
+    ]
+    out = Survey.sanitize_cards_images!(cards)
+
+    assert_equal "horizontal", out[0]["slider_axis"]
+    assert_equal "vertical", out[1]["slider_axis"]
+    assert_equal "auto", out[2]["slider_axis"]
+    assert_nil out[3]["slider_axis"], "unknown axis value is dropped"
+    assert_nil out[4]["slider_axis"], "slider_axis is only kept on range cards"
+  end
+
   test "sanitize_credit_url accepts pexels.com profile links and rejects others" do
     assert_equal "https://www.pexels.com/@jane", Survey.sanitize_credit_url("https://www.pexels.com/@jane")
     assert_equal "https://pexels.com/@jane",     Survey.sanitize_credit_url("https://pexels.com/@jane")

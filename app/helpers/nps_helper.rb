@@ -108,6 +108,24 @@ module NpsHelper
     RANGE_THEMES.include?(slug) ? slug : NPS_THEME
   end
 
+  # A tunable starting point, not a precisely derived number — refine
+  # visually (see the /verify skill) rather than by adjusting the math.
+  SLIDER_AXIS_LABEL_THRESHOLD = 18
+  SLIDER_AXIS_COUNT_THRESHOLD = 5
+
+  # Whether a Range card's slider should render vertical or horizontal. An
+  # explicit slider_axis (set via the editor's toggle) always wins; otherwise
+  # a simple length heuristic picks vertical when the horizontal layout would
+  # likely look cramped — long labels, or a lot of them.
+  def resolved_slider_axis(card)
+    card = card.is_a?(Hash) ? card : {}
+    explicit = card["slider_axis"].to_s
+    return explicit if %w[horizontal vertical].include?(explicit)
+    labels  = Array(card["options"]).map(&:to_s)
+    longest = labels.map(&:length).max.to_i
+    (longest > SLIDER_AXIS_LABEL_THRESHOLD || labels.size > SLIDER_AXIS_COUNT_THRESHOLD) ? "vertical" : "horizontal"
+  end
+
   # [[category, [[label, slug], …]], …] for the range card's grouped <optgroup>
   # theme picker.
   def range_theme_groups

@@ -191,6 +191,17 @@ class Survey < ApplicationRecord
           c.delete("range_theme")
         end
       end
+      # A range card's slider orientation — "auto" (heuristic decides at
+      # render time) or an explicit creator override, and only on a range
+      # card. Same allowlist-or-drop shape as range_theme above.
+      if c.key?("slider_axis")
+        axis = c["slider_axis"].to_s
+        if c["type"].to_s == "range" && %w[auto horizontal vertical].include?(axis)
+          c["slider_axis"] = axis
+        else
+          c.delete("slider_axis")
+        end
+      end
       # Scenario narrative pages — bounded count/length, and every page gets a
       # stable id (mirrors the cid backfill above) so translations align by
       # id rather than array index, which would silently scramble if a

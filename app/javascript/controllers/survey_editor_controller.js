@@ -704,6 +704,8 @@ export default class extends Controller {
       // Range cards carry the reaction-animation theme picked in the editor.
       // Server-side sanitize drops it if it isn't a known slug on a range card.
       if (type === "range" && card.dataset.cardRangeTheme) out.range_theme = card.dataset.cardRangeTheme
+      // ...and the slider layout toggle (auto/horizontal/vertical), same gate.
+      if (type === "range" && card.dataset.cardSliderAxis) out.slider_axis = card.dataset.cardSliderAxis
 
       const primOpts = (prim.options || []).map(o => (o || "").trim()).filter(Boolean)
       if (primOpts.length) out.options = primOpts
