@@ -42,4 +42,19 @@ class SurveysUpdateTest < ActionDispatch::IntegrationTest
     assert_equal [], body["warnings"]
     assert_equal PEXELS_URL, @survey.reload.cards.first["image"]
   end
+
+  test "option_images survive a save even while the card's current type isn't tap_card" do
+    # Regression test: the client used to only serialize option_images while
+    # the card's CURRENT type was tap_card, so switching a card away from
+    # tap_card and autosaving silently deleted its saved statement images
+    # (sanitize_cards_images! itself has no such type gate, unlike
+    # pages/range_theme, so the server-side half of this was always safe).
+    patch_cards([ { type: "range", text: "Q", options: [ "A", "B" ], option_images: [ PEXELS_URL, PEXELS_URL ] } ])
+
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal true, body["ok"]
+    assert_equal [], body["warnings"]
+    assert_equal [ PEXELS_URL, PEXELS_URL ], @survey.reload.cards.first["option_images"]
+  end
 end

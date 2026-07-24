@@ -715,16 +715,23 @@ export default class extends Controller {
         : []
       if (primPages.length) out.pages = primPages
 
-      // tap_card statement backgrounds (populated by AssetPopulator). Carry
-      // them through autosave so editing other fields doesn't wipe the art.
-      if (type === "tap_card") {
-        try {
-          const optImgs = JSON.parse(card.dataset.cardOptionImages || "[]")
-          if (Array.isArray(optImgs) && optImgs.length) {
-            out.option_images = optImgs.slice(0, primOpts.length)
-          }
-        } catch (_) { /* ignore malformed */ }
-      }
+      // tap_card statement backgrounds (populated by AssetPopulator, or
+      // generated/picked in the editor). Carried through autosave regardless
+      // of the card's CURRENT type — not just while it's tap_card — so
+      // switching away and back restores them instead of the server silently
+      // losing them on the next save while some other type is active.
+      // Survey.sanitize_cards_images! has no type gate on option_images
+      // (unlike pages/range_theme), so it's safe to carry this through even
+      // on a card that isn't tap_card right now. Only bound the array to the
+      // current option count while tap_card is actually active — primOpts is
+      // some OTHER type's options otherwise, and truncating against it would
+      // destroy statements this card isn't even showing right now.
+      try {
+        const optImgs = JSON.parse(card.dataset.cardOptionImages || "[]")
+        if (Array.isArray(optImgs) && optImgs.length) {
+          out.option_images = type === "tap_card" ? optImgs.slice(0, primOpts.length) : optImgs
+        }
+      } catch (_) { /* ignore malformed */ }
 
       // Quiz: a card with a marked correct answer carries `correct` (+ optional
       // `explanation`); leaving it unmarked keeps the card as a measurement Q.

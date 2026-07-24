@@ -206,13 +206,17 @@ const COMPONENTS = {
   select_one_grid:  (opts) => gridHtml(opts, "single"),
   select_many_grid: (opts) => gridHtml(opts, "multi"),
 
-  tap_card: (opts) => `
+  tap_card: (opts, ctx = {}) => {
+    const optionImages = ctx.optionImages || []
+    return `
     <div class="rotate-wrap" data-controller="tap-stack card-editor">
       <div class="rotate-card-stack">
         ${opts.map((o,i) => {
+          const img = optionImages[i]
           const [a,b] = SWIPE_FILLS[i % SWIPE_FILLS.length]
+          const bg = img ? `#fff url('${img.replace(/'/g, "\\'")}') center/cover no-repeat` : `linear-gradient(135deg,${a},${b})`
           return `<div class="rotate-card" data-tap-stack-target="card"
-                       style="background:linear-gradient(135deg,${a},${b});">
+                       style="background:${bg};">
                     <span contenteditable="true" style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;">${esc(o)}</span>
                     <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${i}" title="Change this statement's image">
                       <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
@@ -233,7 +237,8 @@ const COMPONENTS = {
                 data-action="click->tap-stack#pick" data-tap-stack-direction="right">✓</button>
       </div>
       <button type="button" class="tap-add-btn" data-action="click->card-editor#addTapOption">＋ Add statement</button>
-    </div>`,
+    </div>`
+  },
 
   // Mirrors the "when scenario" branch in _card_component.html.erb — a book
   // stack of narrative pages (ctx.pages) plus the reused single-select
@@ -1000,7 +1005,8 @@ export default class extends Controller {
         rangeThemeGroups: this._rangeThemePicker.groups,
         rangeThemeLabel: this._rangeThemePicker.label,
         rangeTheme:      card.dataset.cardRangeTheme || "",
-        pages:           this._pagesFor(card, type)
+        pages:           this._pagesFor(card, type),
+        optionImages:    this._optionImagesFor(card, type)
       })
     }
 
@@ -1103,6 +1109,54 @@ export default class extends Controller {
     try { original = JSON.parse(card.dataset.cardPages || "[]") } catch (_) {}
     if (Array.isArray(original) && original.length) return original
     return DEFAULT_PAGES.scenario || []
+  }
+
+  // Existing option_images if this card already had some (switching away
+  // from Tap Cards and back restores the previous designs), else a fresh
+  // set generated from the same curated pool addTapOption draws from —
+  // applying Tap Cards for the first time shouldn't leave every statement a
+  // bare gradient when a ready-made pool of on-brand images already exists.
+  //
+  // Unlike _pagesFor/_optionsFor, a freshly generated result is written back
+  // onto card.dataset.cardOptionImages before returning it (not just handed
+  // to the builder for this one render). That dataset attribute is the only
+  // record of a tap card's images — the autosave serializer reads it
+  // directly, and this same method reads it back on the NEXT call to decide
+  // whether to restore vs. regenerate. Without persisting it here, a fresh
+  // set would render once, never reach the server, and regenerate a
+  // different random set every time the card round-tripped through this
+  // type again.
+  _optionImagesFor(card, type) {
+    if (type !== "tap_card") return []
+    let original = []
+    try { original = JSON.parse(card.dataset.cardOptionImages || "[]") } catch (_) {}
+    if (Array.isArray(original) && original.length) return original
+    const generated = this._generateTapOptionImages(card, this._optionsFor(card, type).length)
+    if (generated.length) card.dataset.cardOptionImages = JSON.stringify(generated)
+    return generated
+  }
+
+  _generateTapOptionImages(card, count) {
+    const pool = this._swipeCardPool(card)
+    if (!pool.length || !count) return []
+    const picks = []
+    for (let i = 0; i < count; i++) {
+      const unused = pool.filter(u => !picks.includes(u))
+      const choices = unused.length > 0 ? unused : pool // exhausted → allow repeats
+      picks.push(choices[Math.floor(Math.random() * choices.length)])
+    }
+    return picks
+  }
+
+  // Mirrors card_editor_controller.js#_pickSwipeUrl's pool lookup — the
+  // curated swipe-card URLs live as a data attribute on the editor root.
+  _swipeCardPool(card) {
+    const editorRoot = card.closest("[data-swipe-card-urls]") || this.element.closest("[data-swipe-card-urls]")
+    if (!editorRoot) return []
+    try {
+      const pool = JSON.parse(editorRoot.dataset.swipeCardUrls || "[]")
+      return Array.isArray(pool) ? pool : []
+    } catch (_) { return [] }
   }
 
   _updateCount() {
