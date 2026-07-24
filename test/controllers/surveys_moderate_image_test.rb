@@ -19,9 +19,10 @@ class SurveysModerateImageTest < ActionDispatch::IntegrationTest
   # Returns a no-arg lambda so stub_method makes `ImageModerator.new` RETURN the
   # fake (the fake itself responds to :call, which stub_method would otherwise
   # treat as the impl to invoke).
-  def returns_moderator(safe:, reason: "")
+  def returns_moderator(safe:, reason: "", ambiguous: false)
     fake = Object.new
-    fake.define_singleton_method(:call) { |**_kw| { safe: safe, reason: reason } }
+    verdict = ambiguous ? { safe: safe, reason: reason, ambiguous: true } : { safe: safe, reason: reason }
+    fake.define_singleton_method(:call) { |**_kw| verdict }
     -> { fake }
   end
 
@@ -44,6 +45,18 @@ class SurveysModerateImageTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal false, body["ok"]
     assert_equal "shows alcohol", body["reason"]
+  end
+
+  test "shows an honest couldn't-verify message for an ambiguous verdict, not the not-PG copy" do
+    stub_method(ImageModerator, :configured?, true) do
+      stub_method(ImageModerator, :new, returns_moderator(safe: false, ambiguous: true)) do
+        post moderate_image_survey_path(@survey), params: { image: PNG }, as: :json
+      end
+    end
+    assert_response :bad_gateway
+    body = JSON.parse(response.body)
+    assert_equal false, body["ok"]
+    assert_equal SurveysController::COULD_NOT_VERIFY_IMAGE_MESSAGE, body["reason"]
   end
 
   test "allows through when moderation is unconfigured" do

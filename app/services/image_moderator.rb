@@ -7,8 +7,11 @@ require "anthropic"
 # every autosave.
 #
 # Fails SAFE where sensible: unreadable/unsupported formats and an unconfigured
-# API pass through (nothing to check); a configured call that errors is treated
-# as "couldn't verify" by the caller and blocks the upload.
+# API pass through (nothing to check); a configured call that errors, or that
+# returns no parseable verdict even after one retry, is treated as "couldn't
+# verify" (ambiguous: true) rather than "unsafe" — the caller blocks the
+# upload either way, but tells the user honestly instead of implying a real
+# content judgment was made.
 class ImageModerator
   include AnthropicHelpers
 
@@ -40,11 +43,26 @@ class ImageModerator
     @client = build_anthropic_client(api_key)
   end
 
-  # Returns { safe: true|false, reason: "" }.
+  # Returns { safe: true|false, reason: "" }. On the rare response that lacks
+  # a tool_use block at all (a model hedge/refusal, not a real verdict), retry
+  # once; if it's still ambiguous, return { safe: false, reason: "", ambiguous: true }
+  # so the caller can tell "Claude said unsafe" apart from "couldn't get a
+  # verdict" and message the user honestly instead of implying a real judgment.
   def call(data_url:, audience_age: nil)
     media_type, data = parse_data_url(data_url)
     return { safe: true, reason: "" } if media_type.nil? || !SUPPORTED.include?(media_type)
 
+    out = perform_call(media_type, data, audience_age) || perform_call(media_type, data, audience_age)
+    return { safe: false, reason: "", ambiguous: true } unless out
+
+    { safe: out["safe"] == true, reason: out["reason"].to_s.strip }
+  end
+
+  private
+
+  # One Claude call. Returns the tool input as a string-keyed hash, or nil if
+  # the response has no tool_use block.
+  def perform_call(media_type, data, audience_age)
     response = @client.messages.create(
       model:       MODEL,
       max_tokens:  MAX_TOKENS,
@@ -59,11 +77,11 @@ class ImageModerator
     log_usage("ImageModerator", response.usage, model: MODEL)
 
     block = Array(response.content).find { |b| tool_use?(b) }
-    out   = block ? deep_stringify(input_of(block)) : {}
-    { safe: out["safe"] == true, reason: out["reason"].to_s.strip }
-  end
+    return deep_stringify(input_of(block)) if block
 
-  private
+    Rails.logger.warn("[ImageModerator] no tool_use block in response: #{response.content.inspect.truncate(500)}")
+    nil
+  end
 
   def system_prompt(audience_age)
     audience = audience_age.to_s.strip.presence

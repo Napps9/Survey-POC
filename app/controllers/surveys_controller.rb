@@ -5,6 +5,11 @@ class SurveysController < ApplicationController
 
   MAX_PDF_BYTES = 10.megabytes
 
+  # Shown for moderate_image when we genuinely couldn't get a verdict (API
+  # error, or an ambiguous Claude response even after retry) — never implies
+  # the image was actually judged unsafe.
+  COULD_NOT_VERIFY_IMAGE_MESSAGE = "We couldn't check that image — please try again."
+
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
   before_action :set_survey,           only: [ :show, :preview, :publish, :update_settings ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
@@ -336,6 +341,8 @@ class SurveysController < ApplicationController
     verdict = ImageModerator.new.call(data_url: image, audience_age: survey.audience_age)
     if verdict[:safe]
       render json: { ok: true }
+    elsif verdict[:ambiguous]
+      render json: { ok: false, reason: COULD_NOT_VERIFY_IMAGE_MESSAGE }, status: :bad_gateway
     else
       render json: { ok: false, reason: verdict[:reason].presence || "That image isn't PG or age-appropriate for this Verto." }
     end
@@ -343,7 +350,7 @@ class SurveysController < ApplicationController
     raise # let it 404 rather than read as "couldn't check"
   rescue => e
     ErrorReporting.report("SurveysController#moderate_image", e)
-    render json: { ok: false, reason: "We couldn't check that image — please try again." }, status: :bad_gateway
+    render json: { ok: false, reason: COULD_NOT_VERIFY_IMAGE_MESSAGE }, status: :bad_gateway
   end
 
   def pexels_search
