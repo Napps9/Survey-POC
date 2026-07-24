@@ -72,3 +72,11 @@ that: push green.
   must be added to all of them (they mirror en.yml's structure).
 - Dashboard/player styling is mostly inline `style` attributes plus classes
   in `app/assets/tailwind/application.css`; match the file you're editing.
+- `/play/:token` is served through a Service Worker (`app/views/pwa/service-worker.js`)
+  with stale-while-revalidate for the player HTML — a respondent who already
+  loaded a Verto keeps getting their own cached copy until `CACHE_VERSION`
+  bumps. Any change to player-rendering files (`app/views/shared/_card_component.html.erb`,
+  `app/views/player/**`, `app/javascript/controllers/player_controller.js`,
+  related player CSS/JS) must bump `CACHE_VERSION`, or the fix silently won't
+  reach anyone who's already visited. This has already bitten a real deploy
+  once (see commit bumping v2→v3) — don't let it happen again.

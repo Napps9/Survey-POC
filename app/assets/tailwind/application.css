@@ -632,7 +632,7 @@
   background: rgba(1,234,203,0.05);
   color: #fff;
 }
-.media-upload-zone-icon { font-size: 30px; margin-bottom: 8px; }
+.media-upload-zone-icon { display: flex; justify-content: center; margin-bottom: 8px; }
 .media-upload-hint {
   font-size: 11px; color: rgba(255,255,255,0.35);
   margin-top: 6px;
