@@ -1676,6 +1676,18 @@
   color: rgba(0,0,0,0.55); margin-bottom: 8px; cursor: pointer;
 }
 .other-edit-toggle input { accent-color: #FF1E6F; cursor: pointer; }
+
+/* Allow-other/Required toggles, below the card (see _card_row.html.erb) —
+   this sits on the dark feed background, not the white card, so override
+   .other-edit-toggle's white-card-context grey text with the light styling
+   already used by everything else in this zone (card-move-btn etc). */
+.card-question-settings {
+  display: flex;
+  gap: 20px;
+  margin-top: 14px;
+  padding: 0 4px;
+}
+.card-question-settings .other-edit-toggle { color: rgba(255,255,255,0.7); }
 .other-cta-btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 16px; border-radius: 100px;

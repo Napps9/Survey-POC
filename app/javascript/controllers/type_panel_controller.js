@@ -1048,9 +1048,12 @@ export default class extends Controller {
 
     card.dataset.cardType = type
 
-    // The "Other" block applies to question types only.
+    // The "Other" block and the Allow-other/Required toggles below the
+    // card apply to question types only.
     const otherBlock = card.querySelector(".other-block")
     if (otherBlock) otherBlock.hidden = NON_QUESTION_TYPES.includes(type)
+    const questionSettings = card.querySelector(".card-question-settings")
+    if (questionSettings) questionSettings.hidden = NON_QUESTION_TYPES.includes(type)
 
     // 3. Swap LEFT panel when entering or leaving Range — Range shows the
     //    reactive Lottie that other types don't, and other types need the

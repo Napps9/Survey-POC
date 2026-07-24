@@ -784,22 +784,13 @@
 
   <%# "Other" free-text — a standalone answer the creator can toggle per card.
       Rendered for every question type (not welcome). In the editor it's always
-      present (hidden on welcome) so the toggle survives a type switch. %>
+      present (hidden on welcome) so the toggle survives a type switch. The
+      "Allow other"/"Required" checkboxes themselves live below the card, not
+      here — see _card_row.html.erb's .card-question-settings — so they don't
+      distort the card's visual design; only the respondent-facing "+Other"
+      CTA/panel stays in the card itself. %>
   <% if editable || (is_q && card["allow_other"]) %>
     <div class="other-block" data-controller="other"<%= ' hidden'.html_safe if (editable && !is_q) %>>
-      <% if editable %>
-        <label class="other-edit-toggle">
-          <input type="checkbox" data-action="change->survey-editor#toggleOther" <%= "checked" if card["allow_other"] %>>
-          <span><%= t("card.allow_other") %></span>
-        </label>
-        <%# Required — when on, the player blocks Next until this card is
-            answered. Persisted like allow_other (data-card-required on the wrap,
-            serialised back into the card JSON). %>
-        <label class="other-edit-toggle">
-          <input type="checkbox" data-action="change->survey-editor#toggleRequired" <%= "checked" if card["required"] %>>
-          <span><%= t("card.required") %></span>
-        </label>
-      <% end %>
       <div class="other-cta-wrap" data-other-target="wrap"<%= ' hidden'.html_safe unless card["allow_other"] %>>
         <button type="button" class="other-cta-btn" data-other-target="btn"
                 data-action="click->other#toggle"<%= ' disabled'.html_safe if editable %>>＋ <%= t("card.other") %></button>
