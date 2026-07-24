@@ -167,6 +167,7 @@ pl:
       saving: Zapisywanie…
       saved: Zapisano %{time}
       save_failed: 'Zapis nie powiódł się: %{msg}'
+      save_warning: 'Zapisano, ale jeden obraz się nie zapisał — sprawdź i prześlij go ponownie.'
       card_n: Karta %{n} · %{type}
       choose_format: Wybierz format odpowiedzi poniżej.
       type_updated: Typ odpowiedzi zmieniono na %{type}

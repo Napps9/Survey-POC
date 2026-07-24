@@ -167,6 +167,7 @@ he:
       saving: שומר…
       saved: נשמר %{time}
       save_failed: 'השמירה נכשלה: %{msg}'
+      save_warning: 'נשמר, אך תמונה אחת לא נשמרה — יש לבדוק ולהעלות אותה שוב.'
       card_n: כרטיס %{n} · %{type}
       choose_format: בחר פורמט תשובה למטה.
       type_updated: סוג התשובה עודכן ל-%{type}

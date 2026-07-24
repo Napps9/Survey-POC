@@ -169,6 +169,7 @@ en:
       saving: "Saving…"
       saved: "Saved %{time}"
       save_failed: "Save failed: %{msg}"
+      save_warning: "Saved, but an image didn't stick — check and re-upload it."
       card_n: "Card %{n} · %{type}"
       choose_format: "Choose an answer format below."
       type_updated: "Answer type updated to %{type}"

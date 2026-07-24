@@ -167,6 +167,7 @@ tr:
       saving: Kaydediliyor…
       saved: "%{time} kaydedildi"
       save_failed: 'Kaydetme başarısız: %{msg}'
+      save_warning: 'Kaydedildi, ancak bir görsel kaydedilmedi — lütfen kontrol edip yeniden yükleyin.'
       card_n: Kart %{n} · %{type}
       choose_format: Aşağıdan bir yanıt formatı seçin.
       type_updated: Yanıt türü %{type} olarak güncellendi

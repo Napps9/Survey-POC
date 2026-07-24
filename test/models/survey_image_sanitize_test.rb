@@ -34,6 +34,11 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil Survey.sanitize_image_url("https://evil.com/rails/active_storage/blobs/x.png")
   end
 
+  test "sanitize_image_url rejects a data-URL over the byte cap" do
+    oversized = "data:image/png;base64,#{"A" * (Survey::MAX_BACKGROUND_DATA_URL_BYTES + 1)}"
+    assert_nil Survey.sanitize_image_url(oversized)
+  end
+
   test "sanitize_background_image delegates to sanitize_image_url" do
     assert_equal PEXELS_URL, Survey.sanitize_background_image(PEXELS_URL)
     assert_nil Survey.sanitize_background_image("https://evil.example.com/x.jpg")
@@ -95,6 +100,30 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil out[1]["video"], "non-Pexels video host is rejected"
     assert_nil out[1]["video_poster"], "poster dropped when its video is rejected"
     assert_nil out[1]["image_credit"], "credit cleared when there's no image or video"
+  end
+
+  test "sanitize_cards_images! with warnings: reports only fields that were present and got dropped" do
+    oversized = "data:image/png;base64,#{"A" * (Survey::MAX_BACKGROUND_DATA_URL_BYTES + 1)}"
+    cards = [
+      { "type" => "multiple_choice", "text" => "Q", "image" => oversized },
+      { "type" => "tap_card", "text" => "Swipe", "option_images" => [ PEXELS_URL, oversized ] },
+      { "type" => "multiple_choice", "text" => "Q", "image" => PEXELS_URL }, # valid — no warning
+      { "type" => "multiple_choice", "text" => "Q", "image" => "" }         # already blank — no warning
+    ]
+    warnings = []
+    out = Survey.sanitize_cards_images!(cards, warnings: warnings)
+
+    assert_nil out[0]["image"]
+    assert_equal [ PEXELS_URL, nil ], out[1]["option_images"]
+    assert_equal %w[image option_images], warnings.sort
+  end
+
+  test "sanitize_cards_images! defaults to not tracking warnings" do
+    oversized = "data:image/png;base64,#{"A" * (Survey::MAX_BACKGROUND_DATA_URL_BYTES + 1)}"
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => oversized } ]
+    out = Survey.sanitize_cards_images!(cards) # no warnings: kwarg — must not raise
+
+    assert_nil out[0]["image"]
   end
 
   test "sanitize_cards_images! whitelists range_theme on range cards and drops the rest" do

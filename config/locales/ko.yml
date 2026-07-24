@@ -167,6 +167,7 @@ ko:
       saving: 저장 중…
       saved: "%{time}에 저장됨"
       save_failed: '저장 실패: %{msg}'
+      save_warning: '저장되었지만 이미지가 저장되지 않았습니다 — 확인 후 다시 업로드해 주세요.'
       card_n: 카드 %{n} · %{type}
       choose_format: 아래에서 답변 형식을 선택하세요.
       type_updated: 답변 유형이 %{type}(으)로 업데이트되었습니다

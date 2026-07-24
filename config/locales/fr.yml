@@ -167,6 +167,7 @@ fr:
       saving: Enregistrement…
       saved: Enregistré %{time}
       save_failed: 'Échec de l''enregistrement : %{msg}'
+      save_warning: 'Enregistré, mais une image n''a pas été conservée — vérifiez-la et réimportez-la.'
       card_n: Carte %{n} · %{type}
       choose_format: Choisissez un format de réponse ci-dessous.
       type_updated: 'Type de réponse mis à jour : %{type}'

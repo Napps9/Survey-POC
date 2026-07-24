@@ -23,6 +23,7 @@ export default class extends Controller {
   static SOURCE_BYTE_CAP = 12 * 1024 * 1024 // reject absurdly large uploads outright
   static MAX_EDGE        = 1600             // longest side, px
   static ENCODE_QUALITY  = 0.82
+  static SVG_BYTE_CAP    = 500 * 1024       // SVGs skip downscaling, so cap them directly
 
   connect() {
     this._activeCard = null
@@ -130,7 +131,12 @@ export default class extends Controller {
     // Uploaded images carry no photographer credit.
     this._pendingCredit = ""
     this._pendingCreditUrl = ""
-    if (!file.type.startsWith("image/")) {
+    // Some browsers report a blank `type` for formats they don't recognise by
+    // sniffing (HEIC/HEIF is the common case) — fall back to the extension
+    // rather than rejecting a file that might be perfectly fine.
+    const name = file.name || ""
+    const looksLikeImage = file.type.startsWith("image/") || /\.(jpe?g|png|gif|webp|heic|heif|svg)$/i.test(name)
+    if (!looksLikeImage) {
       this._showUploadError("That doesn't look like an image file.")
       return
     }
@@ -139,9 +145,25 @@ export default class extends Controller {
       this._showUploadError(`That image is too large — please choose one under ${mb} MB.`)
       return
     }
-    // SVGs are vector and already tiny; rasterising them on a canvas would only
-    // make them bigger and blurry, so keep them as-is.
+    // HEIC/HEIF (the default iPhone photo format) can't be decoded on a canvas
+    // in most browsers — Safari 17+ is the exception. Rather than silently
+    // falling through to the raw-file path below and forwarding an
+    // undownscaled multi-MB blob the server will likely reject anyway, say so
+    // up front.
+    if (file.type === "image/heic" || file.type === "image/heif" || /\.hei[cf]$/i.test(name)) {
+      this._showUploadError("iPhone HEIC photos aren't supported yet — please convert to JPEG or PNG and try again.")
+      return
+    }
+    // SVGs are vector and usually tiny; rasterising them on a canvas would only
+    // make them bigger and blurry, so keep them as-is — but a hand-exported or
+    // embedded-raster SVG can still be large, so cap it directly since it skips
+    // the downscale step that normally bounds upload size.
     if (file.type === "image/svg+xml") {
+      if (file.size > this.constructor.SVG_BYTE_CAP) {
+        const kb = Math.round(this.constructor.SVG_BYTE_CAP / 1024)
+        this._showUploadError(`That SVG is too large — please choose one under ${kb} KB.`)
+        return
+      }
       this._readAsDataUrl(file)
       return
     }

@@ -167,6 +167,7 @@ sw:
       saving: Inahifadhi…
       saved: Imehifadhiwa %{time}
       save_failed: 'Kuhifadhi kumeshindikana: %{msg}'
+      save_warning: 'Imehifadhiwa, lakini picha moja haikuhifadhiwa — tafadhali angalia na upakie tena.'
       card_n: Kadi %{n} · %{type}
       choose_format: Chagua muundo wa jibu hapa chini.
       type_updated: Aina ya jibu imebadilishwa kuwa %{type}

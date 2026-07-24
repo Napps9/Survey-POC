@@ -167,6 +167,7 @@ vi:
       saving: Đang lưu…
       saved: Đã lưu %{time}
       save_failed: 'Lưu thất bại: %{msg}'
+      save_warning: 'Đã lưu, nhưng một hình ảnh chưa được lưu — vui lòng kiểm tra và tải lên lại.'
       card_n: Thẻ %{n} · %{type}
       choose_format: Chọn định dạng câu trả lời bên dưới.
       type_updated: Đã cập nhật loại câu trả lời thành %{type}

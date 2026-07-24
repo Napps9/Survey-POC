@@ -167,6 +167,7 @@ pt:
       saving: A guardar…
       saved: Guardado %{time}
       save_failed: 'Falha ao guardar: %{msg}'
+      save_warning: 'Guardado, mas uma imagem não foi guardada — verifique e carregue-a novamente.'
       card_n: Cartão %{n} · %{type}
       choose_format: Escolha um formato de resposta abaixo.
       type_updated: Tipo de resposta atualizado para %{type}

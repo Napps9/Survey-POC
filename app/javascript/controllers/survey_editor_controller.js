@@ -1157,7 +1157,14 @@ export default class extends Controller {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = await res.json()
       this._dirty = false
-      this.flash(t("editor.saved", { time: new Date(json.updated_at).toLocaleTimeString() }), "text-aquamarine")
+      // The save itself succeeded, but the server may have silently dropped an
+      // oversized/invalid image (sanitize_cards_images! nils it out rather than
+      // erroring) — tell the editor instead of just showing "Saved".
+      if (Array.isArray(json.warnings) && json.warnings.length) {
+        this.flash(t("editor.save_warning"), "text-hot-pink")
+      } else {
+        this.flash(t("editor.saved", { time: new Date(json.updated_at).toLocaleTimeString() }), "text-aquamarine")
+      }
     } catch (err) {
       this.flash(t("editor.save_failed", { msg: err.message }), "text-hot-pink")
     }

@@ -292,6 +292,7 @@ class SurveysController < ApplicationController
       return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
     end
     payload = JSON.parse(request.body.read)
+    warnings = []
 
     # Only touch the attributes present in the payload, so the brand-colour
     # PATCH (which sends just `brand_palette`) doesn't wipe title/cards, and the
@@ -300,12 +301,15 @@ class SurveysController < ApplicationController
     attrs[:title]       = payload["title"]       if payload.key?("title")
     attrs[:description] = payload["description"] if payload.key?("description")
     if payload.key?("cards")
-      attrs[:cards]                          = Survey.sanitize_cards_images!(payload["cards"])
+      attrs[:cards]                          = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings)
       attrs[:results_summary]                = nil
       attrs[:results_summary_response_count] = nil
     end
     attrs[:brand_palette] = BrandPalette.sanitize(payload["brand_palette"]).presence if payload.key?("brand_palette")
-    attrs[:background_image] = Survey.sanitize_background_image(payload["background_image"]) if payload.key?("background_image")
+    if payload.key?("background_image")
+      attrs[:background_image] = Survey.sanitize_background_image(payload["background_image"])
+      warnings << "background_image" if payload["background_image"].present? && attrs[:background_image].nil?
+    end
 
     survey.update!(attrs)
     # A grantee deleting a portfolio-mandated card in the editor re-appends it
@@ -313,7 +317,7 @@ class SurveysController < ApplicationController
     # Scoped to this one survey; never the org-wide backfill from a per-request hook.
     PortfolioCommonQuestionSync.ensure_cards_for_survey(survey) if payload.key?("cards")
 
-    render json: { ok: true, id: survey.id, updated_at: survey.updated_at }
+    render json: { ok: true, id: survey.id, updated_at: survey.updated_at, warnings: warnings.uniq }
   rescue => e
     ErrorReporting.report("SurveysController#update", e)
     render json: { ok: false, error: e.message }, status: :unprocessable_entity

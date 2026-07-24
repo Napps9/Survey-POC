@@ -167,6 +167,7 @@ ja:
       saving: 保存中…
       saved: "%{time}に保存済み"
       save_failed: '保存失敗: %{msg}'
+      save_warning: '保存しましたが、画像が保存されませんでした。確認して再アップロードしてください。'
       card_n: カード %{n} · %{type}
       choose_format: 以下から回答形式を選択してください。
       type_updated: 回答タイプが %{type} に更新されました

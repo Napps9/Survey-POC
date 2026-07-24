@@ -167,6 +167,7 @@ id:
       saving: Menyimpan…
       saved: Tersimpan %{time}
       save_failed: 'Gagal menyimpan: %{msg}'
+      save_warning: 'Disimpan, tetapi satu gambar tidak tersimpan — periksa dan unggah ulang.'
       card_n: Kartu %{n} · %{type}
       choose_format: Pilih format jawaban di bawah ini.
       type_updated: Tipe jawaban diperbarui menjadi %{type}

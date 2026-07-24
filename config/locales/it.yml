@@ -167,6 +167,7 @@ it:
       saving: Salvataggio…
       saved: Salvato %{time}
       save_failed: 'Salvataggio non riuscito: %{msg}'
+      save_warning: 'Salvato, ma un''immagine non è stata salvata — controllala e ricaricala.'
       card_n: Carta %{n} · %{type}
       choose_format: Scegli un formato di risposta qui sotto.
       type_updated: Tipo di risposta aggiornato a %{type}

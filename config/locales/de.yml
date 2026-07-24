@@ -167,6 +167,7 @@ de:
       saving: Wird gespeichert…
       saved: Gespeichert %{time}
       save_failed: 'Speichern fehlgeschlagen: %{msg}'
+      save_warning: 'Gespeichert, aber ein Bild wurde nicht übernommen — bitte prüfen und erneut hochladen.'
       card_n: Karte %{n} · %{type}
       choose_format: Wähle unten ein Antwortformat.
       type_updated: Antworttyp aktualisiert auf %{type}

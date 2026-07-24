@@ -146,7 +146,12 @@ class Survey < ApplicationRecord
   # inline styles if it's a recognised, CSS-safe form and the credit link can
   # only point at Pexels. Other card fields are untouched. When a card has no
   # image, any orphaned credit is dropped.
-  def self.sanitize_cards_images!(cards)
+  #
+  # Pass `warnings:` (an array) to have it collect a short code per field that
+  # had a real, present value which sanitizing dropped (e.g. an oversized or
+  # unsupported upload) — so the caller can tell the editor something didn't
+  # stick, instead of the drop being silent.
+  def self.sanitize_cards_images!(cards, warnings: nil)
     seen_cids = Set.new
     Array(cards).map do |card|
       next card unless card.is_a?(Hash)
@@ -213,9 +218,15 @@ class Survey < ApplicationRecord
         c.delete("pages")
       end
 
-      c["image"] = sanitize_image_url(c["image"]) if c.key?("image")
+      if c.key?("image")
+        had_image = c["image"].present?
+        c["image"] = sanitize_image_url(c["image"])
+        warnings << "image" if warnings && had_image && c["image"].nil?
+      end
       if c.key?("option_images")
-        c["option_images"] = Array(c["option_images"]).map { |u| sanitize_image_url(u) }
+        before = Array(c["option_images"])
+        c["option_images"] = before.map { |u| sanitize_image_url(u) }
+        warnings << "option_images" if warnings && before.any?(&:present?) && c["option_images"].any?(&:nil?)
       end
 
       # A card's left panel holds a photo OR a video. Scrub both; a poster only

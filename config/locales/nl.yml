@@ -167,6 +167,7 @@ nl:
       saving: Opslaan…
       saved: Opgeslagen %{time}
       save_failed: 'Opslaan mislukt: %{msg}'
+      save_warning: 'Opgeslagen, maar een afbeelding is niet bewaard — controleer en upload deze opnieuw.'
       card_n: Kaart %{n} · %{type}
       choose_format: Kies hieronder een antwoordformaat.
       type_updated: Antwoordtype bijgewerkt naar %{type}

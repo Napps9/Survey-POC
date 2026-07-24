@@ -167,6 +167,7 @@ es:
       saving: Guardando…
       saved: Guardado %{time}
       save_failed: 'Error al guardar: %{msg}'
+      save_warning: 'Guardado, pero una imagen no se guardó — revísala y vuelve a subirla.'
       card_n: Tarjeta %{n} · %{type}
       choose_format: Elige un formato de respuesta a continuación.
       type_updated: Tipo de respuesta actualizado a %{type}
