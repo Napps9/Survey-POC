@@ -172,7 +172,8 @@ export default class extends Controller {
     clone.querySelectorAll(
       ".pick-item-delete, .tap-card-delete, .pick-add-btn, .tap-add-btn, .add-media-fab, " +
       ".split-left-design-prompt, .quiz-correct-block, .token-award-block, .other-edit-toggle, " +
-      ".book-edit-tools"
+      ".book-edit-tools, .logic-branch-block, .mark-correct, .mark-correct-grid, " +
+      ".tap-card-image-btn, .slider-axis-toggle, .add-animation-fab"
     ).forEach(el => el.remove())
 
     // 2. The "+ Other" CTA is disabled in the editor itself (there the
