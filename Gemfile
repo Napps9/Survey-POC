@@ -40,6 +40,12 @@ gem "anthropic", "~> 1.40"
 gem "csv"
 gem "rubyzip", "~> 2.3", require: "zip" # bulk brand-asset import (extract a zip of images)
 
+# Scannable QR for a published Verto's share panel. Pure Ruby (no native
+# extension, nothing to install in the Docker image) and renders SVG markup
+# directly, so the QR goes inline into the page rather than as a data-URL
+# <img> — one less thing fighting the CSP.
+gem "rqrcode", "~> 3.0"
+
 # Active Storage image analysis + variants (brand-library thumbnails). The
 # Docker image ships the libvips system lib (prod); ruby-vips is loaded LAZILY
 # by Active Storage only when it actually processes an image, so `require:

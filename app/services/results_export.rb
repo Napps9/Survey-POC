@@ -9,7 +9,8 @@
 # `answers` is untrusted client JSON keyed by card index ("0", "1", …) with the
 # shape { "type", "value", "other"? }; every accessor guards nil / wrong types.
 class ResultsExport
-  RESPONSE_HEADER = [ "Response ID", "Submitted at", "Source", "Language" ].freeze
+  RESPONSE_HEADER = [ "Response ID", "Submitted at", "Source", "Language",
+                      "Duration (seconds)", "Device" ].freeze
   SUMMARY_HEADER  = [ "Card #", "Card type", "Question", "Answer option", "Count", "Percentage", "Total answers" ].freeze
   CHOICE_TYPES    = %w[multiple_choice yes_no select_one_grid select_many select_many_grid scenario].freeze
 
@@ -55,7 +56,9 @@ class ResultsExport
         response.id,
         response.created_at&.strftime("%Y-%m-%d %H:%M"),
         source_label(response),
-        response.locale
+        response.locale,
+        response.duration_seconds,
+        response.device_kind
       ] + question_cards.map { |card, idx| format_answer(card, answers[idx.to_s]) })
     end
   end
@@ -81,7 +84,8 @@ class ResultsExport
   def each_export_response(&block)
     if @responses.respond_to?(:find_each)
       @responses.reorder(nil)
-        .select(:id, :created_at, :locale, :survey_share_id, :answers)
+        .select(:id, :created_at, :locale, :survey_share_id, :answers,
+                :started_at, :completed_at, :device_kind)
         .find_each(batch_size: 500, &block)
     else
       @responses.each(&block)

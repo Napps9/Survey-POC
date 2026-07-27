@@ -40,6 +40,22 @@ class SurveyTranslator
                 type: "array",
                 items: { type: "string" },
                 description: "Translated option labels in the SAME order and SAME count as the source card. Empty array if the source had none."
+              },
+              pages: {
+                type: "array",
+                description: "Translated scenario narrative pages. One entry per source page, echoing its id EXACTLY. Empty array if the source had none.",
+                items: {
+                  type: "object",
+                  properties: {
+                    id:   { type: "string", description: "The source page's id, copied verbatim — never invent or renumber." },
+                    text: { type: "string", description: "That page's translated narrative text." }
+                  },
+                  required: %w[id text]
+                }
+              },
+              explanation: {
+                type: "string",
+                description: "Translated quiz answer explanation, shown after the respondent answers. Empty string if the source had none."
               }
             },
             required: %w[text options]
@@ -62,6 +78,11 @@ class SurveyTranslator
       add, drop, merge, split or reorder options.
     - Translate the meaning of each option faithfully; option N in your output
       must correspond to option N in the source.
+    - For a card with narrative `pages`, output the SAME number of pages and
+      copy each page's `id` EXACTLY as given. Match pages by id, never by
+      position, and never invent, drop, merge or renumber one.
+    - Translate `explanation` (the after-the-answer quiz feedback) when the
+      source card has one; omit it otherwise.
     - Keep translations concise to fit UI constraints: question text short
       (aim under ~70 characters), option labels short (aim under ~20 characters).
     - Preserve numbers, and leave proper nouns / brand names untranslated.
@@ -125,13 +146,21 @@ class SurveyTranslator
 
   def user_message(source, source_locale, target)
     payload = source.each_with_index.map do |card, i|
-      {
+      entry = {
         index: i,
         type: card["type"],
         text: card["text"].to_s,
         description: card["description"].to_s,
         options: Array(card["options"]).map(&:to_s)
       }
+      # Only sent for the cards that have them, so a deck of ordinary questions
+      # doesn't pay for two empty fields on every card.
+      pages = Array(card["pages"]).filter_map do |p|
+        { id: p["id"].to_s, text: p["text"].to_s } if p.is_a?(Hash) && p["id"].present?
+      end
+      entry[:pages] = pages if pages.any?
+      entry[:explanation] = card["explanation"].to_s if card["explanation"].present?
+      entry
     end
 
     <<~MSG
@@ -153,11 +182,38 @@ class SurveyTranslator
       t          = translated[i].is_a?(Hash) ? translated[i] : {}
       src_opts   = Array(card["options"])
       trans_opts = Array(t["options"])
-      {
+      entry = {
         "text"        => t["text"].presence || card["text"].to_s,
         "description" => t["description"].presence || card["description"].to_s,
         "options"     => src_opts.each_with_index.map { |o, j| trans_opts[j].presence || o.to_s }
       }
+
+      pages = align_pages(card, t)
+      entry["pages"] = pages if pages.any?
+
+      if card["explanation"].present?
+        entry["explanation"] = t["explanation"].presence || card["explanation"].to_s
+      end
+
+      entry
+    end
+  end
+
+  # Narrative pages align by id, NOT by position — a creator can reorder pages
+  # after translating, and the sanitizer already stores them id-keyed for that
+  # reason (Survey.sanitize_cards_images!). A page the model dropped, renamed or
+  # returned empty falls back to its source text, so the page count never drifts.
+  def align_pages(card, translation)
+    src_pages = Array(card["pages"]).select { |p| p.is_a?(Hash) && p["id"].present? }
+    return [] if src_pages.empty?
+
+    by_id = Array(translation["pages"]).each_with_object({}) do |p, acc|
+      acc[p["id"].to_s] = p["text"] if p.is_a?(Hash) && p["id"].present?
+    end
+
+    src_pages.map do |p|
+      id = p["id"].to_s
+      { "id" => id, "text" => by_id[id].presence || p["text"].to_s }
     end
   end
 

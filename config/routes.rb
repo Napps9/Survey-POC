@@ -78,6 +78,7 @@ Rails.application.routes.draw do
   post "surveys/:id/publish",         to: "surveys#publish",  as: :publish_survey
   post "surveys/:id/duplicate",       to: "surveys#duplicate", as: :duplicate_survey
   get  "surveys/:id/preview",         to: "surveys#preview",  as: :preview_survey
+  get  "surveys/:id/qr",              to: "surveys#qr",       as: :qr_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
   post "surveys/:id/shuffle_assets",  to: "surveys#shuffle_assets",  as: :shuffle_survey_assets
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results

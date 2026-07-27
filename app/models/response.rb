@@ -16,6 +16,19 @@ class Response < ApplicationRecord
   # add_answered_to_responses migration.
   before_save :sync_answered
 
+  # How long the respondent took, in whole seconds, or nil until both ends are
+  # stamped. Derived rather than stored so there's no third column to keep in
+  # sync with the two timestamps.
+  #
+  # Caveat worth knowing before reading these as engagement data: a submit that
+  # was queued offline drains whenever the device next has a network, so
+  # completed_at is server-receipt time and the duration can be wildly long.
+  def duration_seconds
+    return nil if started_at.blank? || completed_at.blank?
+
+    (completed_at - started_at).round
+  end
+
   # Whether this response holds a real answer to at least one question (a value
   # present on any card). Drives the `answered` column / responder counts.
   def content_answered?

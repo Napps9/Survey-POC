@@ -799,7 +799,9 @@
 /* Step 1: two-card choice grid */
 .aq-choice-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* auto-fit rather than a fixed 1fr 1fr: the "From your library" tile only
+     appears when the org has saved questions, so this row is 2 or 3 wide. */
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 14px;
   padding: 8px 0;
 }
@@ -848,6 +850,42 @@
 }
 .aq-loading-sub {
   font-size: var(--text-sm); color: rgba(255,255,255,0.45); margin-top: 6px;
+}
+
+/* Step L: saved Common Questions, grouped by the set they belong to */
+.aq-library-set { margin-bottom: 18px; }
+.aq-library-set:last-child { margin-bottom: 0; }
+.aq-library-set-name {
+  font-family: "Alata", sans-serif;
+  font-size: var(--text-sm); color: rgba(255,255,255,0.5);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+}
+.aq-library-set-org {
+  text-transform: none; letter-spacing: 0;
+  font-size: var(--text-xs); color: rgba(255,255,255,0.35);
+}
+.aq-library-list { display: flex; flex-direction: column; gap: 6px; }
+.aq-library-item {
+  background: rgba(255,255,255,0.02);
+  border: 1.5px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 11px 14px;
+  cursor: pointer; text-align: left;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 10px;
+}
+.aq-library-item:hover:not(:disabled) {
+  background: rgba(255,255,255,0.06);
+  border-color: #01EACB;
+}
+.aq-library-item:disabled { opacity: 0.5; cursor: default; }
+.aq-library-item-type { font-size: 17px; line-height: 1; flex-shrink: 0; }
+.aq-library-item-text {
+  font-family: "ABeeZee", sans-serif;
+  font-size: var(--text-base); color: rgba(255,255,255,0.85);
+  line-height: 1.4;
 }
 
 /* Step B-1: type picker grid */

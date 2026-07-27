@@ -51,10 +51,16 @@ class ResultsExportTest < ActiveSupport::TestCase
     @org.destroy
   end
 
+  # Answer columns start after the per-response metadata columns. Derived from
+  # the constant rather than hard-coded, so adding a metadata column doesn't
+  # send every index below off by one.
+  META = ResultsExport::RESPONSE_HEADER.size
+
   test "response_rows header lists question texts and skips the welcome card" do
     header = @export.response_rows.first
-    assert_equal %w[Response\ ID Submitted\ at Source Language], header.first(4).map(&:to_s)
-    assert_equal [ "Favourite colour?", "Which fruits?", "How happy?", "Rate us", "Agree?", "Which path?", "Comments?" ], header[4..]
+    assert_equal [ "Response ID", "Submitted at", "Source", "Language",
+                   "Duration (seconds)", "Device" ], header.first(META).map(&:to_s)
+    assert_equal [ "Favourite colour?", "Which fruits?", "How happy?", "Rate us", "Agree?", "Which path?", "Comments?" ], header[META..]
     refute_includes header, "Welcome"
   end
 
@@ -63,20 +69,20 @@ class ResultsExportTest < ActiveSupport::TestCase
     assert_equal 3, rows.size # header + 2 responses
 
     first = rows[1]
-    assert_equal "Blue", first[4]
-    assert_equal "Apple; Cherry", first[5]           # select_many joined
-    assert_equal "Good", first[6]                    # range index 3 -> options[3]
-    assert_equal "5", first[7]                        # rating
-    assert_equal "Stmt A: yes; Stmt B: no", first[8] # tap_card hash
-    assert_equal "Left", first[9]                     # scenario, formatted like multiple_choice
-    assert_equal "Great job", first[10]
+    assert_equal "Blue", first[META]
+    assert_equal "Apple; Cherry", first[META + 1]           # select_many joined
+    assert_equal "Good", first[META + 2]                    # range index 3 -> options[3]
+    assert_equal "5", first[META + 3]                        # rating
+    assert_equal "Stmt A: yes; Stmt B: no", first[META + 4] # tap_card hash
+    assert_equal "Left", first[META + 5]                     # scenario, formatted like multiple_choice
+    assert_equal "Great job", first[META + 6]
 
     second = rows[2]
-    assert_equal "Other: Purple", second[4]          # value nil + other
-    assert_equal "Banana", second[5]
-    assert_equal "Sad", second[6]                    # range index 0
-    assert_equal "Right", second[9]
-    assert_equal "", second[10]                       # blank open_ended
+    assert_equal "Other: Purple", second[META]              # value nil + other
+    assert_equal "Banana", second[META + 1]
+    assert_equal "Sad", second[META + 2]                    # range index 0
+    assert_equal "Right", second[META + 5]
+    assert_equal "", second[META + 6]                        # blank open_ended
   end
 
   test "summary_rows produce counts and percentages per option" do

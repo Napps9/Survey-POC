@@ -28,7 +28,8 @@ const DEFAULT_OPTIONS = {
 export default class extends Controller {
   static targets = [
     "backdrop", "modal", "modalTitle",
-    "stepChoice", "stepGenerating", "stepPickType", "stepDetails",
+    "stepChoice", "stepGenerating", "stepPickType", "stepDetails", "stepLibrary",
+    "libraryChoice", "libraryItem",
     "typeTile",
     "selectedTypeDisplay",
     "questionText", "charCount",
@@ -73,6 +74,7 @@ export default class extends Controller {
   close() {
     this.backdropTarget.hidden = true
     this._setSelectedType(null)
+    this._enableLibraryItems()
     // Reset to the first step so a stale details view can never resurface
     // without a fresh type pick when the modal is reopened.
     this._showStep("stepChoice")
@@ -99,6 +101,38 @@ export default class extends Controller {
     event.preventDefault()
     this._clearError()
     this._showStep("stepPickType")
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // Step L: pick a saved Common Question from the org's library
+  // ──────────────────────────────────────────────────────────
+
+  chooseLibrary(event) {
+    event.preventDefault()
+    this._clearError()
+    this._showStep("stepLibrary")
+  }
+
+  pickLibraryQuestion(event) {
+    event.preventDefault()
+    let card
+    try {
+      card = JSON.parse(event.currentTarget.dataset.card || "null")
+    } catch (_) {
+      card = null
+    }
+    if (!card) {
+      this._showStep("stepChoice")
+      this._showError("Couldn't read that saved question — try another, or start from blank.")
+      return
+    }
+
+    // Same insert path as "Start from blank": the server renders the card row
+    // (stamping a cid) and we splice the HTML in. The common_question_id rides
+    // along inside `card` untouched, so the new card stays tied to the library
+    // question for results aggregation.
+    event.currentTarget.disabled = true
+    this._renderAndInsert(card)
   }
 
   // ──────────────────────────────────────────────────────────
@@ -238,8 +272,13 @@ export default class extends Controller {
       if (token !== this._requestToken) return
       this.addBtnTarget.disabled = false
       this.addBtnTarget.textContent = "Add to survey →"
+      this._enableLibraryItems() // the library path disables the tile it picked
       this._showError(`Couldn't add the question: ${err.message}`)
     }
+  }
+
+  _enableLibraryItems() {
+    this.libraryItemTargets.forEach(el => { el.disabled = false })
   }
 
   // ──────────────────────────────────────────────────────────
@@ -247,7 +286,7 @@ export default class extends Controller {
   // ──────────────────────────────────────────────────────────
 
   _showStep(stepName) {
-    const steps = ["stepChoice", "stepGenerating", "stepPickType", "stepDetails"]
+    const steps = ["stepChoice", "stepGenerating", "stepPickType", "stepDetails", "stepLibrary"]
     steps.forEach(name => {
       const el = this[`${name}Target`]
       if (el) el.hidden = (name !== stepName)

@@ -701,6 +701,18 @@ export default class extends Controller {
       if (card.dataset.cardInput) out.input = card.dataset.cardInput
       if (card.dataset.cardDemographic === "true") out.demographic = true
 
+      // Common Question provenance — the ids that let results aggregate the
+      // same question across Vertos. Nothing in the editor displays them, so
+      // without carrying them here the first autosave would quietly orphan a
+      // question the wizard (or the library picker) attached, and the rollup
+      // would stop counting it with no visible symptom.
+      if (card.dataset.cardCommonQuestionId) {
+        out.common_question_id = Number(card.dataset.cardCommonQuestionId)
+      }
+      if (card.dataset.cardCommonQuestionSetId) {
+        out.common_question_set_id = Number(card.dataset.cardCommonQuestionSetId)
+      }
+
       // Range cards carry the reaction-animation theme picked in the editor.
       // Server-side sanitize drops it if it isn't a known slug on a range card.
       if (type === "range" && card.dataset.cardRangeTheme) out.range_theme = card.dataset.cardRangeTheme

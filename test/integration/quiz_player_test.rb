@@ -243,4 +243,41 @@ class QuizPlayerTest < ActionDispatch::IntegrationTest
     assert_select "[data-player-target='compareBtn']", 0
     assert_select "[data-player-target='comparePanel']", 0
   end
+
+  # A multilingual quiz must reveal its answer feedback in the language the
+  # respondent is reading. The correct ANSWER stays canonical on purpose — the
+  # player matches it against the stored option values to tint right/wrong.
+  test "grade returns the explanation in the respondent's language" do
+    fr_cards = [
+      CARDS[0],
+      CARDS[1].merge(
+        "i18n" => { "fr" => {
+          "text"        => "Capitale de la France ?",
+          "options"     => %w[Paris Londres Berlin],
+          "explanation" => "Paris est la capitale depuis 987."
+        } }
+      )
+    ]
+    s = quiz_survey(cards: fr_cards)
+    s.update!(locales: %w[en fr])
+
+    body = json_post grade_survey_path(s.publish_token),
+                     session_token: "fr1", card_index: 1, locale: "fr",
+                     answers: { "1" => { "type" => "multiple_choice", "value" => "Paris" } }
+
+    assert_response :success
+    assert_equal "Paris est la capitale depuis 987.", body["explanation"]
+    assert_equal "Paris", body["correct_answer"], "canonical, so option tinting still matches"
+  end
+
+  test "grade falls back to the source explanation when a locale has none" do
+    s = quiz_survey
+    s.update!(locales: %w[en fr])
+
+    body = json_post grade_survey_path(s.publish_token),
+                     session_token: "fr2", card_index: 1, locale: "fr",
+                     answers: { "1" => { "type" => "multiple_choice", "value" => "Paris" } }
+
+    assert_equal "Paris has been the capital since 987.", body["explanation"]
+  end
 end

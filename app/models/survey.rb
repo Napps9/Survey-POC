@@ -59,7 +59,13 @@ class Survey < ApplicationRecord
       entry = {
         "text"        => t["text"].to_s,
         "description" => t["description"].presence,
-        "options"     => Array(t["options"])
+        "options"     => Array(t["options"]),
+        # Scenario narrative pages and quiz answer feedback — respondent-facing
+        # copy that would otherwise sit in the source language in every
+        # secondary locale. Only written when the translation carried them, so
+        # an ordinary question card's i18n entry stays the same shape as before.
+        "pages"       => Array(t["pages"]).presence,
+        "explanation" => t["explanation"].presence
       }.compact
       card.merge("i18n" => (card["i18n"] || {}).merge(locale.to_s => entry))
     end
@@ -303,6 +309,16 @@ class Survey < ApplicationRecord
       cid = "c_#{SecureRandom.hex(4)}" while cid.blank? || seen_cids.include?(cid)
       seen_cids << cid
       c["cid"] = cid
+      # Common Question provenance rides in from the editor's autosave payload
+      # (the card row carries it as a data attribute so it survives the DOM
+      # round-trip). Coerce to a positive integer or drop it: it's client-supplied
+      # from here on, and the aggregator matches on it, so junk shouldn't be able
+      # to settle in the cards JSON.
+      %w[common_question_id common_question_set_id].each do |key|
+        next unless c.key?(key)
+        id = c[key].to_i
+        id.positive? ? c[key] = id : c.delete(key)
+      end
       c.delete("logic") unless c["logic"].is_a?(Hash) # drop malformed logic blocks
       # The unconditional flow pointer (any card type) — drop unless it's a valid
       # { "card" => cid } / { "end" => id } target (see LogicGraph.card_next).
@@ -455,6 +471,17 @@ class Survey < ApplicationRecord
 
   def published?
     publish_token.present?
+  end
+
+  # The /play/:token segment to put in front of a respondent. Both the slug and
+  # the publish_token resolve the same Verto (PlayerController#load_survey_and_share),
+  # but a creator who bothered to set a custom link wants THAT one on the QR code
+  # and anywhere else the link is handed out — it's the memorable one, and it
+  # survives being read off a printed page. nil until published.
+  def public_link_key
+    return nil unless published?
+
+    slug.presence || publish_token
   end
 
   # A same-organisation copy for the dashboard's "Duplicate" action. Always

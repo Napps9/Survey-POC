@@ -68,6 +68,11 @@ class PlayerController < ApplicationController
     sync_region_from_answers!(resp)
     resp.status  = "completed"
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
+    # A respondent who never triggered /progress (a one-card Verto, or a submit
+    # replayed from the offline queue after the page was closed) still needs a
+    # start stamp, otherwise their duration is unmeasurable.
+    stamp_started_metadata(resp)
+    resp.completed_at ||= Time.current
     apply_quiz_score(resp)
     apply_token_totals(resp)
     resp.save!
@@ -140,8 +145,13 @@ class PlayerController < ApplicationController
       render json: base.merge(
         graded: true,
         correct: QuizGrading.correct?(card, stored["value"]),
+        # correct_answer stays CANONICAL (source-language) on purpose: the player
+        # matches it against the stored option values to tint the right/wrong
+        # picks, so a translated label here would break the reveal highlighting.
+        # The explanation is free prose nobody compares against, so it can — and
+        # should — come back in the respondent's language.
         correct_answer: QuizGrading.correct_display(card),
-        explanation: card["explanation"].to_s
+        explanation: localized_explanation(card, resp.locale)
       )
     else
       # Measurement card, unknown index, or no committed answer yet — record
@@ -310,6 +320,22 @@ class PlayerController < ApplicationController
   # "started".
   def mark_started_unless_completed(resp)
     resp.status = "started" unless resp.persisted? && resp.status == "completed"
+    stamp_started_metadata(resp)
+  end
+
+  # The quiz answer feedback in the language the respondent is actually reading,
+  # falling back to the source text when this Verto has no translation for it.
+  def localized_explanation(card, locale)
+    helpers.localized_card(card, locale, @survey.default_locale)["explanation"].to_s
+  end
+
+  # First-touch metadata for the response. Both are `||=` on purpose: /progress
+  # fires on every card, a refresh reuses the same session_token, and an offline
+  # submit can replay hours later — none of which should move the clock back to
+  # the start or relabel the device.
+  def stamp_started_metadata(resp)
+    resp.started_at  ||= Time.current
+    resp.device_kind ||= DeviceKind.from(request.user_agent)
   end
 
   # The answers already persisted for a response (empty for a brand-new row).

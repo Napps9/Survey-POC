@@ -43,6 +43,22 @@
             </div>
           </button>
 
+          <%# Only offered when the org actually has saved questions — an empty
+              library tile that leads to an empty list is worse than no tile. %>
+          <% library_sets = accessible_common_question_sets.select { |s| s.common_questions.any? } %>
+          <% if library_sets.any? %>
+            <button type="button"
+                    class="aq-choice-card"
+                    data-add-question-target="libraryChoice"
+                    data-action="click->add-question#chooseLibrary">
+              <div class="aq-choice-icon">📚</div>
+              <div class="aq-choice-name">From your library</div>
+              <div class="aq-choice-desc">
+                Reuse a saved Common Question so results line up across Vertos
+              </div>
+            </button>
+          <% end %>
+
         </div>
 
         <%# Error message shown if generation fails %>
@@ -60,6 +76,45 @@
         <div class="aq-spinner"></div>
         <div class="aq-loading-text">Generating a question…</div>
         <div class="aq-loading-sub">Claude is crafting a question that fits your brief</div>
+      </div>
+    </div>
+
+    <%# ════════════════════════════════════════════
+        STEP L — Pick a saved Common Question
+        Each tile carries the whole card payload; picking one posts it straight
+        to render_card, the same endpoint the blank path uses. The
+        common_question_id / _set_id ride along so results still aggregate this
+        question across every Verto that reuses it.
+        ════════════════════════════════════════════ %>
+    <div class="aq-step" data-add-question-target="stepLibrary" hidden>
+      <div class="aq-modal-body">
+        <% accessible_common_question_sets.each do |set| %>
+          <% next if set.common_questions.empty? %>
+          <div class="aq-library-set">
+            <div class="aq-library-set-name">
+              <%= set.name %>
+              <% if set.organisation_id != Current.organisation.id %>
+                <span class="aq-library-set-org">shared by <%= set.organisation.name %></span>
+              <% end %>
+            </div>
+            <div class="aq-library-list">
+              <% set.common_questions.sort_by(&:position).each do |question| %>
+                <button type="button"
+                        class="aq-library-item"
+                        data-add-question-target="libraryItem"
+                        data-card="<%= question.to_card.to_json %>"
+                        data-action="click->add-question#pickLibraryQuestion">
+                  <span class="aq-library-item-type"><%= CardTypes.meta(question.card_type)["picker_icon"] %></span>
+                  <span class="aq-library-item-text"><%= question.text %></span>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div class="media-modal-foot">
+        <button type="button" class="media-btn-ghost"
+                data-action="click->add-question#backToChoice">← Back</button>
       </div>
     </div>
 

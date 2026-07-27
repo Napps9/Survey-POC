@@ -29,6 +29,12 @@
      data-card-recommended-images="<%= AssetPopulator.recommended_paths(@survey, context: :card, card: card).to_json %>"
      <% if card['next'].is_a?(Hash) %>data-card-next="<%= card['next'].to_json %>"<% end %>
      <% if card['lane_label'].present? %>data-card-lane-label="<%= card['lane_label'] %>"<% end %>
+     <%# Common Question provenance. Invisible in the editor, but it's what
+         CommonQuestionAggregator and the funder portfolio rollup key on to
+         recognise the same question across Vertos — so it has to survive the
+         DOM round-trip that autosave rebuilds every card from. %>
+     <% if card['common_question_id'].present? %>data-card-common-question-id="<%= card['common_question_id'] %>"<% end %>
+     <% if card['common_question_set_id'].present? %>data-card-common-question-set-id="<%= card['common_question_set_id'] %>"<% end %>
      <% if card['range_theme'].present? %>data-card-range-theme="<%= card['range_theme'] %>"<% end %>
      <% if card['slider_axis'].present? %>data-card-slider-axis="<%= card['slider_axis'] %>"<% end %>
      data-card-competency="<%= card['competency'].to_s %>"

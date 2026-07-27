@@ -192,6 +192,12 @@ module ApplicationHelper
       }
     end
 
+    # Quiz answer feedback, shown to the respondent after they answer — plain
+    # scalar, so a straight fall-back to the source string.
+    if card["explanation"].present?
+      merged["explanation"] = tr["explanation"].presence || card["explanation"]
+    end
+
     merged
   end
 
@@ -261,6 +267,39 @@ module ApplicationHelper
     else
       image_tag("playverto.svg", style: style, alt: alt || "Playverto")
     end
+  end
+
+  # SVG QR code for a published Verto's share link, so a participant can point a
+  # camera at a screen (or a printed handout) instead of typing a URL.
+  #
+  # SVG rather than PNG: it stays crisp at any print size, weighs a few KB, and
+  # goes into the page as markup — no data-URL <img>, nothing extra for the CSP
+  # to allow. `level: :m` is the middle error-correction tier: it tolerates a
+  # fair bit of print smudging without inflating the module count the way :h
+  # would, and a denser code is harder for a phone to read off a screen at arm's
+  # length.
+  #
+  # `offset` is the quiet zone — the blank margin a scanner needs to find the
+  # code's edges. Four modules is the spec minimum; without it a QR dropped onto
+  # a coloured poster often just won't scan. viewbox + no width/height means the
+  # caller sizes it with CSS rather than the gem baking in a fixed pixel size.
+  QR_MODULE_SIZE = 4
+  private_constant :QR_MODULE_SIZE
+
+  def verto_qr_svg_document(url)
+    RQRCode::QRCode.new(url.to_s, level: :m).as_svg(
+      color: "1C2034", shape_rendering: "crispEdges",
+      module_size: QR_MODULE_SIZE, offset: QR_MODULE_SIZE * 4,
+      standalone: true, use_path: true, viewbox: true
+    )
+  end
+
+  # The same QR for embedding in a page. Identical markup minus the XML prolog,
+  # which is meaningless (and invalid) inside an HTML document.
+  def verto_qr_svg(url)
+    verto_qr_svg_document(url)
+      .sub(/\A<\?xml.*?\?>/, "")
+      .html_safe # rubocop:disable Rails/OutputSafety -- markup comes from rqrcode, not user input
   end
 
   # A small same-origin thumbnail path for an Active Storage image — used for the

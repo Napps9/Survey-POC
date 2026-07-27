@@ -11,7 +11,7 @@ class SurveysController < ApplicationController
   COULD_NOT_VERIFY_IMAGE_MESSAGE = "We couldn't check that image — please try again."
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
-  before_action :set_survey,           only: [ :show, :preview, :publish, :update_settings ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :update_settings, :qr ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
@@ -392,6 +392,21 @@ class SurveysController < ApplicationController
       published_at:  @survey.published_at  || Time.current
     )
     redirect_to survey_path(@survey)
+  end
+
+  # GET /surveys/:id/qr
+  # The share panel's QR as a downloadable file, for posters, flyers and slide
+  # decks — the panel itself renders the same SVG inline for scanning off a
+  # screen. 404s for a draft: there is no public link to encode yet, and a QR
+  # pointing at a dead URL is worse than no QR.
+  def qr
+    key = @survey.public_link_key
+    return head :not_found if key.blank?
+
+    send_data helpers.verto_qr_svg_document(play_survey_url(key)),
+              type:        "image/svg+xml",
+              disposition: "attachment",
+              filename:    "#{key.parameterize}-qr.svg"
   end
 
   # POST /surveys/:id/duplicate

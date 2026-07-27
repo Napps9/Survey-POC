@@ -15,12 +15,26 @@ class TranslationCache < ApplicationRecord
   # Stable hash of the fields SurveyTranslator actually translates. Same
   # source string + same options array (case- and whitespace-sensitive) →
   # same hash → cache hit.
+  #
+  # Every translated field must be in here. When `pages`/`explanation` were
+  # added to the translator, omitting them would have kept serving pre-existing
+  # cache entries that predate those fields — the new translations would appear
+  # to do nothing on exactly the Vertos that already had translations, which is
+  # the hardest version of this bug to spot. Including them changes the hash for
+  # cards that carry them, so those miss once and re-translate; ordinary cards
+  # keep hashing identically and their cache stays warm.
   def self.source_hash_for(card)
     canonical = {
       "text"        => card["text"].to_s,
       "description" => card["description"].to_s,
       "options"     => Array(card["options"]).map(&:to_s)
     }
+    pages = Array(card["pages"]).filter_map do |p|
+      { "id" => p["id"].to_s, "text" => p["text"].to_s } if p.is_a?(Hash) && p["id"].present?
+    end
+    canonical["pages"]       = pages if pages.any?
+    canonical["explanation"] = card["explanation"].to_s if card["explanation"].present?
+
     Digest::SHA256.hexdigest(canonical.to_json)
   end
 
