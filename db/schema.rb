@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_160000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -268,6 +268,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_150000) do
     t.index ["deleted_at"], name: "index_portfolios_on_deleted_at"
     t.index ["funder_id", "name"], name: "index_portfolios_on_funder_id_and_name", unique: true
     t.index ["funder_id"], name: "index_portfolios_on_funder_id"
+  end
+
+  create_table "report_renders", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.string "status", default: "pending", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["status", "created_at"], name: "index_report_renders_on_status_and_created_at"
+    t.index ["survey_id"], name: "index_report_renders_on_survey_id"
+    t.index ["user_id"], name: "index_report_renders_on_user_id"
   end
 
   create_table "responses", force: :cascade do |t|
@@ -549,6 +561,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_150000) do
   add_foreign_key "portfolio_memberships", "funder_memberships"
   add_foreign_key "portfolio_memberships", "portfolios"
   add_foreign_key "portfolios", "funders"
+  add_foreign_key "report_renders", "surveys"
+  add_foreign_key "report_renders", "users"
   add_foreign_key "responses", "survey_shares"
   add_foreign_key "responses", "surveys"
   add_foreign_key "sessions", "users"

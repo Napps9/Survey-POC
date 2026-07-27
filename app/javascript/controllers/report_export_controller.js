@@ -9,7 +9,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["modal", "status", "body", "driveBtn", "driveStatus",
                     "brief", "goal", "audience", "length",
-                    "editor", "editBtn", "saveBtn", "regenBtn"]
+                    "editor", "editBtn", "saveBtn", "regenBtn", "pdfBtn"]
   static values  = { streamUrl: String, driveUrl: String, saveUrl: String,
                      exists: Boolean, brief: String }
 
@@ -209,6 +209,54 @@ export default class extends Controller {
     }
     this._saving = false
     if (this.hasDriveBtnTarget) this.driveBtnTarget.disabled = false
+  }
+
+  // ── PDF download ───────────────────────────────────────────
+  // The render spawns a wkhtmltopdf process using 100-200MB transiently, so it
+  // happens in a job rather than on the request thread. Ask for one, watch it,
+  // then collect the file.
+  async downloadPdf(event) {
+    event.preventDefault()
+    const btn = event.currentTarget
+    const url = btn.dataset.reportExportPdfUrl
+    if (!url || btn.disabled) return
+
+    const original = btn.textContent
+    btn.disabled = true
+    btn.textContent = "Preparing…"
+
+    try {
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content
+      const res  = await fetch(url, {
+        method: "POST",
+        headers: { "Accept": "application/json", ...(csrf ? { "X-CSRF-Token": csrf } : {}) }
+      })
+      const data = await res.json()
+      if (!data.ok) throw new Error(data.error || "Couldn't start the download")
+
+      const href = await this._awaitPdf(data.poll_url)
+      // A plain navigation, so the browser handles it as a download and the
+      // modal stays exactly as the creator left it.
+      window.location = href
+    } catch (err) {
+      this._setStatus(err.message)
+    } finally {
+      btn.disabled = false
+      btn.textContent = original
+    }
+  }
+
+  // Resolves to the download URL, or throws with a reason to show.
+  async _awaitPdf(pollUrl) {
+    const deadline = Date.now() + 120000 // the render itself is seconds; this is a backstop
+    while (Date.now() < deadline) {
+      const res  = await fetch(pollUrl, { headers: { "Accept": "application/json" } })
+      const data = await res.json()
+      if (data.download_url) return data.download_url
+      if (data.status === "failed") throw new Error(data.error || "That PDF couldn't be built.")
+      await new Promise(r => setTimeout(r, 1200))
+    }
+    throw new Error("That took longer than expected — please try again.")
   }
 
   _setStatus(text) { if (this.hasStatusTarget) this.statusTarget.textContent = text }

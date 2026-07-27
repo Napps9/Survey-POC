@@ -269,8 +269,13 @@
                                 spellcheck="false" aria-label="Edit the report markdown"></textarea>
                     </div>
                     <div class="report-modal-foot">
-                      <a href="<%= survey_results_report_path(@survey, format: :pdf) %>" data-turbo="false"
-                         class="report-foot-btn report-foot-primary">⤓ Download PDF</a>
+                      <%# The PDF is built by a job (the render spikes 100-200MB), so this
+                          asks for one and collects it when it's ready rather than holding
+                          the request open for it. %>
+                      <button type="button" class="report-foot-btn report-foot-primary"
+                              data-action="click->report-export#downloadPdf"
+                              data-report-export-target="pdfBtn"
+                              data-report-export-pdf-url="<%= survey_report_renders_path(@survey) %>">⤓ Download PDF</button>
                       <% if google_sheets_configured? %>
                         <button type="button" class="report-foot-btn" data-action="click->report-export#saveDrive" data-report-export-target="driveBtn">Save to Google Drive</button>
                         <span class="report-foot-status" data-report-export-target="driveStatus"></span>

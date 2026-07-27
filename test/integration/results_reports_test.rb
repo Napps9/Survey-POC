@@ -28,14 +28,72 @@ class ResultsReportsTest < ActionDispatch::IntegrationTest
     assert_equal 1, @survey.results_report_response_count
   end
 
-  test "pdf streams a real downloadable PDF" do
+  # The wkhtmltopdf render spawns a native process using 100-200MB transiently,
+  # so it happens in a job now: ask for a render, wait for it, collect the file.
+  test "requesting a PDF renders it in the background and serves a real file" do
     stub_method(ResultsReportGenerator, :call, MD) do
-      get survey_results_report_path(@survey, format: :pdf)
+      perform_enqueued_jobs { post survey_report_renders_path(@survey) }
     end
+    assert_response :success
+    poll_url = JSON.parse(response.body)["poll_url"]
+
+    get poll_url
+    body = JSON.parse(response.body)
+    assert_equal "succeeded", body["status"]
+
+    get body["download_url"]
     assert_response :success
     assert_equal "application/pdf", response.media_type
     assert_match(/attachment/, response.headers["Content-Disposition"])
     assert_equal "%PDF", response.body[0, 4]
+  end
+
+  test "the results page offers the PDF button wired to the render endpoint" do
+    # The page renders a share link, so it needs a published Verto.
+    @survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    get survey_results_path(@survey)
+    assert_response :success
+    assert_select "[data-action='click->report-export#downloadPdf'][data-report-export-pdf-url=?]",
+                  survey_report_renders_path(@survey)
+  end
+
+  test "the download is not offered until the render has finished" do
+    post survey_report_renders_path(@survey) # enqueued, never run
+    poll_url = JSON.parse(response.body)["poll_url"]
+
+    get poll_url
+    body = JSON.parse(response.body)
+    assert_equal "pending", body["status"]
+    assert_nil body["download_url"]
+
+    get download_report_render_path(ReportRender.sole)
+    assert_response :not_found
+  end
+
+  test "a render whose job died is surfaced rather than polled forever" do
+    post survey_report_renders_path(@survey)
+    ReportRender.sole.update_columns(status: "running", updated_at: 10.minutes.ago)
+
+    get report_render_path(ReportRender.sole)
+    assert_equal "failed", JSON.parse(response.body)["status"]
+  end
+
+  test "another organisation's render is not reachable" do
+    stub_method(ResultsReportGenerator, :call, MD) do
+      perform_enqueued_jobs { post survey_report_renders_path(@survey) }
+    end
+    mine = ReportRender.sole
+
+    other_org  = Organisation.create!(name: "Other", slug: "rr-#{SecureRandom.hex(3)}")
+    other_user = User.create!(name: "X", email_address: "rr-#{SecureRandom.hex(3)}@test.com", password: "verylongpassword")
+    other_org.memberships.create!(user: other_user, role: "admin")
+    delete session_path
+    post session_path, params: { email_address: other_user.email_address, password: "verylongpassword" }
+    follow_redirect! if response.redirect?
+
+    get report_render_path(mine)
+    assert_response :not_found
   end
 
   test "uses the cache without regenerating when fresh" do
