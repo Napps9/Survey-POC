@@ -47,7 +47,7 @@ class PortfolioResultsTest < ActionDispatch::IntegrationTest
 
   test "funder results shows the mandatory aggregate but never a grantee's other question text or answer" do
     sign_in @funder_admin
-    get results_funder_portfolio_path(@funder, @portfolio)
+    get results_funder_portfolio_path(@funder, @portfolio, format: :json)
     assert_response :success
 
     body = response.parsed_body
@@ -63,19 +63,19 @@ class PortfolioResultsTest < ActionDispatch::IntegrationTest
 
   test "the grantee's own admin is redirected — funder-owner-only" do
     sign_in @grantee_admin
-    get results_funder_portfolio_path(@funder, @portfolio)
+    get results_funder_portfolio_path(@funder, @portfolio, format: :json)
     assert_redirected_to funder_path(@funder)
   end
 
   test "suspending the grantee's license removes it from a subsequent results call" do
     sign_in @funder_admin
-    get results_funder_portfolio_path(@funder, @portfolio)
+    get results_funder_portfolio_path(@funder, @portfolio, format: :json)
     set_payload = response.parsed_body["sets"].find { |s| s["common_question_set_id"] == @set.id }
     assert_equal 1, set_payload["total_responses"]
 
     @fm.suspend!
 
-    get results_funder_portfolio_path(@funder, @portfolio)
+    get results_funder_portfolio_path(@funder, @portfolio, format: :json)
     set_payload_after = response.parsed_body["sets"].find { |s| s["common_question_set_id"] == @set.id }
     assert_equal 0, set_payload_after["total_responses"]
   end

@@ -87,7 +87,14 @@
     <% end %>
   <% end %>
 
-  <%= button_to t("portfolios.resync"), resync_funder_portfolio_path(@funder, @portfolio), method: :post,
-        form: { style: "margin-bottom:12px;" },
-        style: "background:none;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 16px;color:rgba(255,255,255,0.6);cursor:pointer;" %>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+    <%# The comparison view — previously this aggregate was JSON with no way to
+        reach it from the UI at all. %>
+    <%= link_to "⛶ Compare grantees", results_funder_portfolio_path(@funder, @portfolio),
+          style: "background:#01EACB;border-radius:8px;padding:9px 16px;color:#1C2034;font-family:'ABeeZee',sans-serif;text-decoration:none;white-space:nowrap;" %>
+
+    <%= button_to t("portfolios.resync"), resync_funder_portfolio_path(@funder, @portfolio), method: :post,
+          form: { style: "margin:0;" },
+          style: "background:none;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 16px;color:rgba(255,255,255,0.6);cursor:pointer;" %>
+  </div>
 </div>

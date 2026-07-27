@@ -1,0 +1,101 @@
+<%# Portfolio comparison — grantee organisations side by side on the Common
+    Questions a funder mandated across them.
+
+    A TABLE, not a grouped bar chart, and deliberately: a portfolio can hold
+    many organisations, and past roughly seven colour classes carrying meaning
+    adjacent hues stop being tellable apart. The single-hue bar in each cell is
+    there to make a column scannable, not to encode identity — identity is the
+    column header. %>
+<div style="height:100%;background:#1C2034;display:flex;flex-direction:column;overflow:hidden;">
+
+  <div style="height:54px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;padding:0 24px;gap:12px;">
+    <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;">Portfolio results</span>
+    <span style="color:rgba(255,255,255,0.15);">·</span>
+    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);flex:1;"><%= @portfolio.name %></span>
+    <%= link_to "← Portfolio", funder_portfolio_path(@funder, @portfolio),
+          style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);text-decoration:none;padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);" %>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding:24px 24px 48px;">
+    <div style="max-width:1100px;margin:0 auto;">
+
+      <% if @comparison.empty? %>
+        <div class="pf-empty">
+          No Common Question sets are attached to this portfolio yet — attach one
+          to compare its grantees on the same questions.
+        </div>
+      <% end %>
+
+      <% @comparison.each do |group| %>
+        <% set = group[:set] %>
+        <div style="margin-bottom:34px;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-lg);color:#fff;margin-bottom:2px;"><%= set.name %></div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);margin-bottom:12px;">
+            <%= group[:columns].size %> <%= "organisation".pluralize(group[:columns].size) %>
+            <% if group[:suppressed].positive? %>
+              · <%= group[:suppressed] %> too small to break down
+            <% end %>
+          </div>
+
+          <% if group[:columns].empty? %>
+            <div class="pf-empty">No grantee has run a Verto using this set yet.</div>
+          <% else %>
+            <% group[:questions].each do |question| %>
+              <% labels = ReportChartRows.rows_for(
+                   { type: question.card_type, card: { "options" => question.options },
+                     counts: group[:columns].filter_map { |c| c[:rows][question.id] }
+                              .map { |r| r[:counts] }.reduce({}) { |a, b| a.merge(b) { |_k, x, y| x.to_i + y.to_i } } }
+                 ).map(&:label) %>
+              <% next if labels.empty? %>
+
+              <div class="pf-q">
+                <div class="pf-q-text"><%= question.text %></div>
+                <div class="pf-table-wrap">
+                  <table class="pf-table">
+                    <thead>
+                      <tr>
+                        <th class="pf-th-label">Answer</th>
+                        <% group[:columns].each do |col| %>
+                          <th>
+                            <div class="pf-org"><%= col[:organisation].name %></div>
+                            <div class="pf-org-n"><%= col[:total_responses] %> responses</div>
+                          </th>
+                        <% end %>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% labels.each do |label| %>
+                        <tr>
+                          <td class="pf-td-label"><%= label %></td>
+                          <% group[:columns].each do |col| %>
+                            <% row = col[:rows][question.id] %>
+                            <td>
+                              <% if col[:suppressed] %>
+                                <span class="pf-suppressed" title="Too few responses to break down">—</span>
+                              <% elsif row.nil? %>
+                                <span class="pf-suppressed">·</span>
+                              <% else %>
+                                <% counts = row[:counts] || {} %>
+                                <% grand  = counts.values.sum { |v| v.is_a?(Numeric) ? v : 0 } %>
+                                <% n      = counts[label].is_a?(Numeric) ? counts[label] : 0 %>
+                                <% pct    = grand.positive? ? (n * 100.0 / grand).round : 0 %>
+                                <div class="pf-cell">
+                                  <div class="pf-cell-bar" style="width:<%= pct %>%;"></div>
+                                  <span class="pf-cell-value"><%= pct %>%</span>
+                                </div>
+                              <% end %>
+                            </td>
+                          <% end %>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

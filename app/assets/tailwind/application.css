@@ -5415,3 +5415,41 @@ body.generating-overlay-active .bottom-bar { display: none; }
   35%  { transform: scale(1.14); color: #FFFFFF; }
   100% { transform: scale(1);    color: #01EACB; }
 }
+
+/* ── Portfolio comparison table ────────────────────────────────────────────
+   Grantee organisations side by side. Identity is the column header, not a
+   colour, so the in-cell bar is a single hue used purely to make a column
+   scannable — a portfolio can hold more organisations than there are
+   tellable-apart hues. */
+.pf-empty {
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-base);
+  color: rgba(255,255,255,0.35); padding: 14px 16px;
+  border: 1px dashed rgba(255,255,255,0.12); border-radius: 12px;
+}
+.pf-q { margin-bottom: 18px; }
+.pf-q-text {
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-md);
+  color: rgba(255,255,255,0.8); margin-bottom: 6px;
+}
+/* The table scrolls inside its own container: a portfolio with many grantees
+   must not make the whole page scroll sideways. */
+.pf-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); }
+.pf-table { width: 100%; border-collapse: collapse; min-width: 520px; }
+.pf-table th, .pf-table td {
+  padding: 8px 12px; text-align: left; vertical-align: middle;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.pf-table thead th { background: rgba(255,255,255,0.03); }
+.pf-th-label, .pf-td-label {
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.55); white-space: nowrap;
+}
+.pf-org { font-family: "Alata", sans-serif; font-size: var(--text-sm); color: #fff; white-space: nowrap; }
+.pf-org-n { font-family: "ABeeZee", sans-serif; font-size: var(--text-2xs); color: rgba(255,255,255,0.3); }
+.pf-cell { display: flex; align-items: center; gap: 8px; min-width: 96px; }
+.pf-cell-bar { height: 10px; border-radius: 0 3px 3px 0; background: #3987e5; flex-shrink: 0; min-width: 0; }
+.pf-cell-value {
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.6); font-variant-numeric: tabular-nums;
+}
+.pf-suppressed { color: rgba(255,255,255,0.2); }

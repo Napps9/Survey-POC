@@ -46,10 +46,21 @@ class PortfoliosController < ApplicationController
     redirect_to funder_path(@funder), notice: "Portfolio \"#{@portfolio.name}\" removed."
   end
 
-  # GET /funders/:funder_id/portfolios/:id/results — JSON-only, funder-scoped
-  # aggregate. No view: the results/dashboard visual language is a separate
-  # piece of work, out of scope for this data-layer build.
+  # GET /funders/:funder_id/portfolios/:id/results
+  # JSON returns the funder-scoped aggregate across the whole portfolio; HTML
+  # renders the same questions broken down per grantee organisation, side by
+  # side, which is the comparison a funder actually wants.
   def results
+    respond_to do |format|
+      format.html do
+        @comparison = portfolio_comparison
+        render :results, layout: "fullscreen"
+      end
+      format.json { render json: portfolio_results_payload }
+    end
+  end
+
+  def portfolio_results_payload
     org_ids = @portfolio.active_memberships.pluck("funder_memberships.organisation_id")
     sets = @portfolio.portfolio_common_question_sets
                       .includes(common_question_set: :common_questions)
@@ -81,8 +92,8 @@ class PortfoliosController < ApplicationController
       }
     end
 
-    render json: { portfolio: { id: @portfolio.id, name: @portfolio.name },
-                   member_organisation_count: org_ids.size, sets: payload }
+    { portfolio: { id: @portfolio.id, name: @portfolio.name },
+      member_organisation_count: org_ids.size, sets: payload }
   end
 
   # Manual re-splice escape hatch — e.g. after adding a question to a set
@@ -90,6 +101,53 @@ class PortfoliosController < ApplicationController
   def resync
     PortfolioCommonQuestionSync.ensure_cards_for_portfolio(@portfolio)
     redirect_to funder_portfolio_path(@funder, @portfolio), notice: "Portfolio questions re-synced to every member."
+  end
+
+  # Per-grantee breakdown for the comparison view: the same Common Question
+  # sets, aggregated once per member organisation instead of pooled.
+  #
+  # An organisation below the small-cell threshold is counted but never broken
+  # down. A funder looking at a grantee with three responses could otherwise
+  # read individual answers, which is precisely what the threshold exists to
+  # prevent everywhere else in this app.
+  MIN_ORG_SAMPLE = Response::MIN_REGION_SAMPLE_SIZE
+
+  def portfolio_comparison
+    memberships = @portfolio.active_memberships.includes(:organisation)
+    orgs = memberships.map(&:organisation).uniq.sort_by(&:name)
+
+    sets = @portfolio.portfolio_common_question_sets
+                     .includes(common_question_set: :common_questions)
+                     .reject { |pcqs| pcqs.common_question_set.deleted? }
+                     .map(&:common_question_set)
+
+    sets.map do |set|
+      columns = orgs.map { |org| comparison_column(set, org) }.compact
+
+      {
+        set: set,
+        questions: set.common_questions.sort_by(&:position),
+        columns: columns,
+        suppressed: columns.count { |c| c[:suppressed] }
+      }
+    end
+  end
+
+  def comparison_column(set, org)
+    surveys = set.surveys_using(org.surveys.kept)
+    return nil if surveys.empty?
+
+    per_question, _variants, _total_surveys, total_responses =
+      CommonQuestionAggregator.new(set, surveys).aggregate
+
+    {
+      organisation: org,
+      total_responses: total_responses,
+      suppressed: total_responses < MIN_ORG_SAMPLE,
+      # Keyed by common_question_id so the view can line every organisation up
+      # against the same question row even when they answered different subsets.
+      rows: per_question.index_by { |row| row[:common_question].id }
+    }
   end
 
   private
