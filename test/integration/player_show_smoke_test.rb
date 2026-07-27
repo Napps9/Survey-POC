@@ -32,6 +32,28 @@ class PlayerShowSmokeTest < ActionDispatch::IntegrationTest
     assert_select "[data-player-target='thankyou'] .preview-thankyou-card"
   end
 
+  # The one context with no other guard: a respondent's very first sight of a
+  # Range card. Opening on frame 1 would greet them with the "strongly
+  # disagree" pose before they've touched the slider.
+  test "a range card's reaction animation is served resting on the neutral frame" do
+    org = Organisation.create!(name: "Acme", slug: "acme-#{SecureRandom.hex(2)}")
+    survey = org.surveys.create!(
+      title: "Sports", theme: "Sports", audience_age: "all", key_insight: "x",
+      default_locale: "en", locales: [ "en" ],
+      cards: [ { "type" => "range", "text" => "How much?",
+                 "options" => %w[SD D N A SA], "range_theme" => "football" } ]
+    )
+    survey.update!(publish_token: SecureRandom.hex(8))
+
+    get play_survey_path(survey.publish_token)
+    assert_response :success
+
+    assert_select ".nps-lottie[data-lottie-player-current-value=?]",
+                  NpsHelper::NPS_NEUTRAL_FRAME.to_s
+    assert_select ".nps-lottie[data-lottie-player-current-value='1']", false,
+                  "the character must not open on the most extreme pose"
+  end
+
   test "welcome card shows the creator's logo, centred, when one is uploaded" do
     survey = published_survey
     survey.organisation.logo.attach(

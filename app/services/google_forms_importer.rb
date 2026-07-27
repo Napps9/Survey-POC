@@ -57,6 +57,11 @@ class GoogleFormsImporter
       labels = (low..high).map(&:to_s)
       # A 0–10-ish scale reads as NPS; a shorter one as a range slider.
       type = (low <= 0 && high >= 8) ? "nps" : "range"
+      # A Verto range is always a 5-point scale, so a Form's 1–4 or 1–7 linear
+      # scale is re-cut to five consecutive numbers from its own start (1–4 ->
+      # 1–5, 0–3 -> 0–4). Survey#enforce_range_scale would do this on save
+      # anyway; doing it here keeps the imported preview honest.
+      labels = Survey.normalize_range_labels(labels) if type == "range"
       card(text, type, labels)
     elsif question["ratingQuestion"]
       card(text, "rating", [])

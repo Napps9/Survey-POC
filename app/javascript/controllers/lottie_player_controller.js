@@ -6,18 +6,39 @@ import lottie from "lottie-web"
 // previous animation and plays the next one from frame 0 (no loop).
 // Animation URLs (one per slider value 1..N) are supplied as a JSON array
 // in the `urls` value, so Rails can pass digested asset paths.
+//
+// The default `current` is the NEUTRAL middle frame (3 of 5), matching
+// NpsHelper::NPS_NEUTRAL_FRAME and where slider_controller parks its thumb —
+// a character resting on frame 1 reads as "strongly disagree" and biases the
+// answer before the respondent has touched anything.
+const NEUTRAL_FRAME = 3
+
 export default class extends Controller {
-  static values  = { urls: Array, current: { type: Number, default: 1 } }
+  static values  = { urls: Array, current: { type: Number, default: NEUTRAL_FRAME } }
   static targets = ["mount"]
 
   connect() {
     this._onChange = (e) => this.show(e.detail.value)
-    document.addEventListener("verto:scaleValue", this._onChange)
-    this.show(this.currentValue)
+    // Listen on THIS card, not the document: the player and the editor both
+    // hold every card in the DOM at once, so a document-level listener let one
+    // card's drag move every other card's character off its neutral resting
+    // pose. The slider dispatches a bubbling event from inside the same
+    // .split-card, so scoping here keeps each card's animation its own.
+    this._scope = this.element.closest(".split-card") || document
+    this._scope.addEventListener("verto:scaleValue", this._onChange)
+    // Derive the resting frame from the set actually mounted when the server
+    // didn't name one, so a theme shipping a different frame count still opens
+    // centred rather than on whatever NEUTRAL_FRAME happens to say.
+    this.show(this.hasCurrentValue ? this.currentValue : this._neutralFrame)
+  }
+
+  get _neutralFrame() {
+    return Math.ceil(this.urlsValue.length / 2) || NEUTRAL_FRAME
   }
 
   disconnect() {
-    document.removeEventListener("verto:scaleValue", this._onChange)
+    this._scope?.removeEventListener("verto:scaleValue", this._onChange)
+    this._scope = null
     this.instance?.destroy()
     this.instance = null
   }
@@ -38,6 +59,10 @@ export default class extends Controller {
     const url = this.urlsValue[v - 1] // 1-indexed value
     if (!url) return
     this.shown = v
+    // Remember where we are, so urlsValueChanged() (the editor's animation
+    // picker swapping the set) re-renders the frame actually on screen instead
+    // of snapping back to the mount default.
+    this.currentValue = v
     this.instance?.destroy()
     this.instance = lottie.loadAnimation({
       container: this.mountTarget,

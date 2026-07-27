@@ -17,13 +17,17 @@ export const INFO = "info" // a non-scoring tip (e.g. "consider a midway break")
 // Per-card answer-count rule, by card type. {min,max} is the green range;
 // `even` grids must have an even count (the doc counts the "Other" box);
 // `odd` types must have an odd count — image lists so a compact 3-or-5 row
-// scans well, ranges so the slider always has a true centre step to rest a
-// genuinely neutral option on; `exact` pins a fixed count. Types absent
-// here carry no count rule.
+// scans well; `exact` pins a fixed count. Types absent here carry no count
+// rule.
 const COUNT_RULES = {
   multiple_choice:  { min: 3, max: 5, odd: true },       // §3 image list
   select_many:      { min: 3, max: 5, odd: true },       // §3 image list
-  range:            { min: 3, max: 5, odd: true },       // §3 range
+  // A range is ALWAYS a 5-point scale (Survey::RANGE_POINTS), enforced on
+  // save by Survey#enforce_range_scale — so the slider always has a true
+  // centre to rest a genuinely neutral option on, and answers compare card to
+  // card. Scoring it as a 3–5 span would tell a creator a 3-point scale is
+  // fine when the server is about to make it 5.
+  range:            { exact: 5 },                        // §3 range
   rating:           { min: 3, max: 5 },                  // §3 rating
   tap_card:         { min: 5, max: 8 },                  // §3 tap card
   prioritise:       { min: 4, max: 5 },                  // §3 prioritise

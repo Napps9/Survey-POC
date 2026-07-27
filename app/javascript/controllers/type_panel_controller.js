@@ -485,6 +485,47 @@ function npsHtml(opts, shape) {
 const SLIDER_AXIS_LABEL_THRESHOLD = 18
 const SLIDER_AXIS_COUNT_THRESHOLD = 5
 
+// A Range card is always a 5-point scale (Survey::RANGE_POINTS). Switching a
+// card TO Range carries the previous type's options across, so a 4-tile grid
+// or a 3-option list would otherwise render a 4- or 3-point slider — and the
+// autosave reads the labels straight back off the DOM, persisting it. Mirrors
+// Survey.normalize_range_labels exactly: an already-5 scale keeps every stop
+// in place, endpoints stay endpoints, a numeric run keeps counting, and no
+// stop is left nameless.
+const RANGE_POINTS = 5
+const RANGE_UPSAMPLE_SLOTS = { 1: [0], 2: [0, 4], 3: [0, 2, 4], 4: [0, 1, 3, 4] }
+
+function nameBlankStops(labels, filler) {
+  return labels.map((l, i) => l || filler[i] || DEFAULT_OPTIONS.range[i])
+}
+
+function rangeLabels(opts, filler = DEFAULT_OPTIONS.range) {
+  const raw = (opts || []).map(o => String(o == null ? "" : o).trim())
+  if (raw.length === RANGE_POINTS) return nameBlankStops(raw, filler)
+
+  const given = raw.filter(Boolean)
+  if (!given.length) return filler.slice(0, RANGE_POINTS)
+  if (given.length === RANGE_POINTS) return nameBlankStops(given, filler)
+
+  const nums = given.map(l => (/^-?\d+$/.test(l) ? Number(l) : null))
+  const consecutive = given.length > 1 && nums.every(n => n !== null) &&
+                      nums.every((n, i) => i === 0 || n === nums[i - 1] + 1)
+  if (consecutive) {
+    return Array.from({ length: RANGE_POINTS }, (_, i) => String(nums[0] + i))
+  }
+
+  let spread
+  if (given.length > RANGE_POINTS) {
+    const last = given.length - 1
+    spread = Array.from({ length: RANGE_POINTS },
+      (_, i) => given[Math.round(i * last / (RANGE_POINTS - 1))])
+  } else {
+    spread = new Array(RANGE_POINTS).fill("")
+    RANGE_UPSAMPLE_SLOTS[given.length].forEach((slot, i) => { spread[slot] = given[i] })
+  }
+  return nameBlankStops(spread, filler)
+}
+
 function resolvedSliderAxis(storedAxis, labels) {
   if (storedAxis === "horizontal" || storedAxis === "vertical") return storedAxis
   const longest = labels.reduce((max, l) => Math.max(max, String(l).length), 0)
@@ -492,8 +533,8 @@ function resolvedSliderAxis(storedAxis, labels) {
 }
 
 function sliderHtml(opts, ctx = {}) {
-  const labels = opts.length ? opts : DEFAULT_OPTIONS.range
-  const n = Math.max(labels.length, 2)
+  const labels = rangeLabels(opts)
+  const n = labels.length
   const storedAxis = ctx.sliderAxis || "auto"
   const axis = resolvedSliderAxis(storedAxis, labels)
   const dots = Array.from({length: n}, (_, i) => {
@@ -1114,7 +1155,10 @@ export default class extends Controller {
     wrap.className = "nps-lottie"
     wrap.dataset.controller = "lottie-player"
     wrap.dataset.lottiePlayerUrlsValue = JSON.stringify(urls)
-    wrap.dataset.lottiePlayerCurrentValue = "1"
+    // Start on the NEUTRAL middle frame (3 of 5), same as the server-rendered
+    // path — see NpsHelper::NPS_NEUTRAL_FRAME. Derived from the set's own
+    // length so it stays centred if the frame count ever changes.
+    wrap.dataset.lottiePlayerCurrentValue = String(Math.ceil(urls.length / 2))
 
     const mount = document.createElement("div")
     mount.className = "nps-lottie-mount"

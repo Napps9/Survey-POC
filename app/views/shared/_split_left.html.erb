@@ -19,8 +19,10 @@
   <% if card["type"].to_s == "range" %>
     <%# Range: the LEFT panel plays a Lottie animation that swaps to match the
         slider position. The lottie-player controller listens for the
-        `verto:scaleValue` event dispatched by the range slider on the right. %>
-    <%= render_nps_reaction(initial_value: 1, theme: range_theme_slug(card)) %>
+        `verto:scaleValue` event dispatched by the range slider on the right.
+        No initial_value — the helper defaults to the neutral middle frame, so
+        the character starts expressionless (see NpsHelper::NPS_NEUTRAL_FRAME). %>
+    <%= render_nps_reaction(theme: range_theme_slug(card)) %>
   <% elsif has_media %>
     <% if has_video %>
       <%# Autoplaying, looped, muted card video. preload="none" + poster keeps

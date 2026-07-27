@@ -54,8 +54,8 @@ class PdfQuestionImporter
                   - prioritise: 4 or 5 options (4 ideal), each <= 30 chars
                   - tap_card: 5 to 8 statements covering negative, neutral and positive
                     sentiments in that order, each <= 40 chars
-                  - range: ODD count only (3 or 5, 5 ideal — never 4) with a genuinely
-                    neutral middle label
+                  - range: EXACTLY 5 points — never 3, never 4 — with a genuinely
+                    neutral MIDDLE label (the 3rd)
                   - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
                   - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
                   - scenario: 2 or 3 options, each <= 30 chars

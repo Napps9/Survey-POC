@@ -70,8 +70,8 @@ class SurveyGenerator
                   - prioritise: 4 or 5 options (4 ideal), each <= 30 chars
                   - tap_card: 5 to 8 statements covering negative, neutral and positive
                     sentiments in that order, each <= 40 chars
-                  - range: ODD count only (3 or 5, 5 ideal — never 4) with a genuinely
-                    neutral middle label
+                  - range: EXACTLY 5 points — never 3, never 4 — with a genuinely
+                    neutral MIDDLE label (the 3rd)
                   - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
                   - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
                 DESC
@@ -128,9 +128,11 @@ class SurveyGenerator
       positives last). Each statement is its own swipe card; the respondent
       swipes yes/no on each, and the combination reveals their sentiment.
       Keep each statement <= 40 characters.
-    - range: an ODD count — 3 or 5 points (5 ideal), never an even count
-      like 4 — so the scale always has a true centre point. That centre
-      point's label must be genuinely neutral (e.g. "Neutral" / "Unsure" /
+    - range: EXACTLY 5 points. Not 3, not 4, not 7 — always 5, so every
+      slider in the Verto is read on the same scale and the answers compare
+      card to card. An even count like 4 has no true centre and forces
+      someone who genuinely sits in the middle to lean. The 3rd label is
+      that centre and must be genuinely neutral (e.g. "Neutral" / "Unsure" /
       "Neither agree nor disagree"), never leaning positive or negative.
       The slider starts resting on that neutral centre by default.
     - rating: 3 to 5 points (5 ideal — the visual is a 5-star row). Supply
@@ -140,8 +142,8 @@ class SurveyGenerator
       "10" — no word labels.
     - Question text: 50-70 chars target, 100 hard max. Any description below the
       question SHARES that same 100-char budget (text + description <= 100).
-    - "How often" questions: default to range with an odd count (3 or 5) and
-      a neutral middle. If more are genuinely required, fall back rating ->
+    - "How often" questions: default to range with its 5 points and a neutral
+      middle. If more are genuinely required, fall back rating ->
       multiple_choice -> select_one_grid; never exceed 5 options for a
       "How often" question.
   RULES
@@ -258,9 +260,9 @@ class SurveyGenerator
       combination reveals their stance. Each statement <= 40 characters.
       Best when you want quick gut reactions to a single subject from
       several angles.
-    - range (Verto "Range"): playful ODD-count (3 or 5, 5 ideal) sliding
-      scale for emotion or agree/disagree, ALWAYS with a genuinely neutral
-      middle label — never an even count with no true centre. Lower and
+    - range (Verto "Range"): a playful 5-point sliding scale (always exactly
+      5) for emotion or agree/disagree, ALWAYS with a genuinely neutral
+      middle label — never a count with no true centre. Lower and
       negative to the left, positive to the right, starting neutral in the
       middle. The left panel plays a reactive Lottie animation matched to
       the slider position — an engaging on-theme reaction. Use for mood,
@@ -298,10 +300,10 @@ class SurveyGenerator
     [ ] No more than 2 of the same answer type in a row
     [ ] Lists ODD 3 or 5 options (each <= 30 chars); grids EVEN and 4-10 (each <= 20 chars);
         prioritise 4-5 (4 ideal); tap_card 5-8 statements (neg -> neutral -> pos, each <= 40 chars);
-        range ODD (3 or 5) with a genuine neutral middle label; rating 3-5 with one label per
+        range EXACTLY 5 points with a genuine neutral middle label; rating 3-5 with one label per
         point; nps EXACTLY 11 numeric labels "0"-"10"
     [ ] Every question's text plus its description <= 100 chars
-    [ ] "How often" -> range with an odd count (3 or 5) and a neutral middle
+    [ ] "How often" -> range with its 5 points and a neutral middle
     [ ] Every question card has an `outcome`; competency/condition tagged where they apply
     [ ] The deck spans Awareness/Intention/Agency where the theme allows (not all one competency)
     [ ] Any Agency question is paired with an enabling-condition question (esp. wellbeing/belonging)

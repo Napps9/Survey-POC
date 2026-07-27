@@ -13,6 +13,10 @@ import { Controller } from "@hotwired/stimulus"
 // lottie-player controller listens for.
 const REACTION_FRAMES = 5
 
+// The neutral, expressionless middle frame — where the character rests before
+// the respondent has said anything (mirrors NpsHelper::NPS_NEUTRAL_FRAME).
+const REACTION_NEUTRAL = Math.ceil(REACTION_FRAMES / 2)
+
 export default class extends Controller {
   static targets = ["track", "thumb", "dot", "label"]
   static values  = {
@@ -26,7 +30,12 @@ export default class extends Controller {
     this._onUp   = this.onUp.bind(this)
     this.indexValue = Math.floor((this.stepsValue - 1) / 2)
     this.render()
-    this._dispatchScaleValue() // sync the reaction animation to the start position
+    // Open on the NEUTRAL frame explicitly rather than deriving it from the
+    // step count: a legacy even-count scale (a published 4-point Verto, which
+    // Survey#enforce_range_scale deliberately leaves alone) maps its centre
+    // index to an off-centre frame, so the character would greet the
+    // respondent already leaning one way.
+    this._dispatchScaleValue(REACTION_NEUTRAL)
   }
 
   start(event) {
@@ -62,13 +71,17 @@ export default class extends Controller {
   }
 
   // Map the current step (0…n-1) onto a 1…5 frame and broadcast it for the
-  // reaction animation. Global document event, matching the player's
-  // one-card-on-screen model.
-  _dispatchScaleValue() {
+  // reaction animation. Dispatched from this slider's own element and left to
+  // BUBBLE, so the lottie-player in the same .split-card picks it up and no
+  // other card's does — the player and editor both hold every card in the DOM,
+  // so a document-level event used to drag every character off neutral at once.
+  _dispatchScaleValue(forced = null) {
     const n     = Math.max(2, this.stepsValue)
     const ratio = n > 1 ? this.indexValue / (n - 1) : 0
-    const value = Math.round(ratio * (REACTION_FRAMES - 1)) + 1
-    document.dispatchEvent(new CustomEvent("verto:scaleValue", { detail: { value } }))
+    const value = forced || Math.round(ratio * (REACTION_FRAMES - 1)) + 1
+    this.element.dispatchEvent(
+      new CustomEvent("verto:scaleValue", { detail: { value }, bubbles: true })
+    )
   }
 
   render() {

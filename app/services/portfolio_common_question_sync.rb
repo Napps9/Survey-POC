@@ -32,7 +32,13 @@ class PortfolioCommonQuestionSync
     existing_ids = Array(survey.cards).filter_map { |c| c["common_question_id"] if c.is_a?(Hash) }
     missing = mandatory.reject { |cq| existing_ids.include?(cq.id) }
     return if missing.empty?
-    survey.update!(cards: Array(survey.cards) + missing.map(&:to_card))
+    # Normalise only the cards being appended. Survey#enforce_range_scale skips
+    # published Vertos to protect answers already collected against their
+    # scale, but these cards are brand new and hold no answers — so a mandatory
+    # Range question defined with 4 (or no) options must still land as the
+    # 5-point scale every other Range card is.
+    added = Survey.normalize_range_cards!(missing.map(&:to_card))
+    survey.update!(cards: Array(survey.cards) + added)
   end
 
   # Backfill every kept Verto an org owns — used when the org joins a

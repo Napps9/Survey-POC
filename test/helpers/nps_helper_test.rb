@@ -16,6 +16,31 @@ class NpsHelperTest < ActionView::TestCase
     assert_equal nps_lottie_urls(NpsHelper::NPS_THEME), nps_lottie_urls("not_a_theme")
   end
 
+  # ── neutral resting frame ──────────────────────────────────────────────────
+  # The reaction character must greet a respondent expressionless: opening on
+  # frame 1 reads as "strongly disagree" and leans the answer before they've
+  # touched the slider.
+
+  test "NPS_NEUTRAL_FRAME is the middle of the frame set, derived not hardcoded" do
+    assert_equal 3, NpsHelper::NPS_NEUTRAL_FRAME
+    assert_equal (NpsHelper::NPS_FRAMES + 1) / 2, NpsHelper::NPS_NEUTRAL_FRAME
+  end
+
+  test "render_nps_reaction mounts on the neutral middle frame by default" do
+    html = render_nps_reaction(theme: "football")
+    assert_includes html, %(data-lottie-player-current-value="#{NpsHelper::NPS_NEUTRAL_FRAME}")
+    refute_includes html, %(data-lottie-player-current-value="1")
+  end
+
+  test "the neutral frame indexes a real asset in every animation set" do
+    NpsHelper::RANGE_THEMES.each do |slug|
+      url = nps_lottie_urls(slug)[NpsHelper::NPS_NEUTRAL_FRAME - 1]
+      assert url.present?, "#{slug} has no asset at the neutral frame"
+      assert Rails.root.join("app/assets/lottie/#{slug}/#{NpsHelper::NPS_NEUTRAL_FRAME}.json").exist?,
+        "#{slug} is missing its neutral frame file"
+    end
+  end
+
   test "range_theme_slug returns a known card theme, default otherwise" do
     assert_equal "football", range_theme_slug({ "range_theme" => "football" })
     assert_equal NpsHelper::NPS_THEME, range_theme_slug({ "range_theme" => "not_a_theme" })

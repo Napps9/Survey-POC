@@ -70,6 +70,24 @@ class GoogleFormsImporterTest < ActiveSupport::TestCase
     assert_equal %w[1 2 3 4 5], rng["options"]
   end
 
+  # A Verto range is always a 5-point scale, so a Form's 1–4 or 1–7 linear
+  # scale is re-cut to five consecutive numbers from its own start rather than
+  # importing a 4-point slider with no true centre.
+  test "a linear scale that isn't 5 points is re-cut to 5, keeping its start" do
+    scale = ->(low, high) do
+      GoogleFormsImporter.call({
+        "info"  => { "title" => "S" },
+        "items" => [ { "title" => "How much?", "questionItem" => { "question" => {
+          "scaleQuestion" => { "low" => low, "high" => high }
+        } } } ]
+      })["cards"].find { |c| c["type"] == "range" }
+    end
+
+    assert_equal %w[1 2 3 4 5], scale.call(1, 4)["options"], "a 1–4 scale should grow to 1–5"
+    assert_equal %w[0 1 2 3 4], scale.call(0, 3)["options"], "a 0–3 scale should keep its zero"
+    assert_equal %w[1 2 3 4 5], scale.call(1, 7)["options"], "a 1–7 scale should shrink to 1–5"
+  end
+
   test "rating → rating and text → open_ended" do
     assert_equal "rating", cards.find { |x| x["text"] == "Star rating" }["type"]
     assert_equal "open_ended", cards.find { |x| x["text"] == "Anything else?" }["type"]

@@ -707,7 +707,13 @@ export default class extends Controller {
       // ...and the slider layout toggle (auto/horizontal/vertical), same gate.
       if (type === "range" && card.dataset.cardSliderAxis) out.slider_axis = card.dataset.cardSliderAxis
 
-      const primOpts = (prim.options || []).map(o => (o || "").trim()).filter(Boolean)
+      // Range labels are POSITIONAL — each one names a fixed stop on a 5-point
+      // track, so a blank is an unnamed stop, not an option to discard.
+      // Dropping it would shorten the scale and shuffle every label after it
+      // (the server re-spreads what it receives). Every other type treats a
+      // blank as "not an option" and drops it as before.
+      const trimmedOpts = (prim.options || []).map(o => (o || "").trim())
+      const primOpts    = type === "range" ? trimmedOpts : trimmedOpts.filter(Boolean)
       if (primOpts.length) out.options = primOpts
 
       // Scenario narrative pages, in document order — id-and-text pairs so

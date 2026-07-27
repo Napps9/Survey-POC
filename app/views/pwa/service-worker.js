@@ -1,5 +1,9 @@
 // Playverto service worker — offline support for /play/:token Vertos.
 //
+// Registered at /play/ scope ONLY (see app/javascript/sw_register.js), so it
+// never controls the studio. Everything below is written for a respondent who
+// may go offline mid-Verto, not for a creator editing artwork.
+//
 // Strategies:
 //   • /play/:token        → stale-while-revalidate (card JSON is inlined in HTML)
 //   • /assets/*           → cache-first (fingerprinted; safe to keep)
@@ -13,7 +17,7 @@
 // Bump on any player JS/CSS/HTML behaviour change so existing respondents
 // don't keep getting the stale-while-revalidate copy. The activate handler
 // below deletes every cache that doesn't start with the current version.
-const CACHE_VERSION = "playverto-v4"
+const CACHE_VERSION = "playverto-v5"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
@@ -77,7 +81,7 @@ self.addEventListener("fetch", (event) => {
 
   // Images (any origin) — cache-on-fetch with no-cors fallback.
   if (req.destination === "image") {
-    event.respondWith(imageCache(req))
+    event.respondWith(imageCache(req, event))
     return
   }
 
@@ -128,23 +132,36 @@ async function networkFirst(req, cacheName) {
   }
 }
 
-async function imageCache(req) {
+// Images — serve the cached copy instantly, but ALWAYS refetch in the
+// background so the next view gets a corrected one. Cross-origin images come
+// back opaque (status 0), which is indistinguishable from a 404 or a rate
+// limit, so a plain cache-first strategy could pin a broken image forever and
+// leave a hard refresh as the only way out. Revalidating makes that
+// self-healing at the cost of one conditional request per image per visit.
+async function imageCache(req, event) {
   const cache = await caches.open(IMAGE_CACHE)
-  const hit = await cache.match(req)
-  if (hit) return hit
-  try {
-    const res = await fetch(req)
+  const hit   = await cache.match(req)
+
+  const revalidate = fetch(req).then(res => {
     if (res && (res.ok || res.type === "opaque")) cache.put(req, res.clone())
     return res
+  }).catch(() => null)
+
+  // Keep the worker alive for the refetch — otherwise it can be killed the
+  // moment the cached copy is returned and the poisoned entry never heals.
+  event?.waitUntil(revalidate)
+  if (hit) return hit
+
+  const res = await revalidate
+  if (res) return res
+
+  // Cross-origin retry with no-cors so we can at least keep an opaque copy.
+  try {
+    const fallback = await fetch(req.url, { mode: "no-cors" })
+    if (fallback) cache.put(req, fallback.clone())
+    return fallback
   } catch (_) {
-    // Cross-origin retry with no-cors so we can at least cache an opaque copy.
-    try {
-      const res = await fetch(req.url, { mode: "no-cors" })
-      if (res) cache.put(req, res.clone())
-      return res
-    } catch (__) {
-      return hit || Response.error()
-    }
+    return Response.error()
   }
 }
 

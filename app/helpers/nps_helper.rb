@@ -10,6 +10,14 @@ module NpsHelper
   # frames; the range slider maps its position proportionally onto these. Kept
   # separate from NPS_STEPS so the two move independently.
   NPS_FRAMES = 5
+
+  # The NEUTRAL middle frame (3 of 5) — the resting pose every reaction
+  # animation must start on, before the respondent has expressed anything. A
+  # character that opens on frame 1 reads as "strongly disagree" and biases the
+  # answer before the slider is touched. Derived from NPS_FRAMES so adding
+  # frames can't silently leave the resting pose off-centre.
+  NPS_NEUTRAL_FRAME = (NPS_FRAMES + 1) / 2
+
   NPS_THEME  = "basketball".freeze # default reaction theme when a card doesn't pick one
 
   # Selectable reaction-animation themes, grouped by subject category — this is
@@ -148,7 +156,11 @@ module NpsHelper
   # LEFT panel: a div that the lottie-player Stimulus controller mounts into.
   # The full list of Lottie URLs is passed via data attribute so the JS doesn't
   # need to know about Rails asset digesting.
-  def render_nps_reaction(initial_value: 1, theme: NPS_THEME)
+  #
+  # Starts on the NEUTRAL middle frame, matching where slider_controller parks
+  # the thumb on connect — so the character is expressionless until the
+  # respondent actually moves the slider, and there's no frame-1 flash.
+  def render_nps_reaction(initial_value: NPS_NEUTRAL_FRAME, theme: NPS_THEME)
     content_tag :div, class: "nps-lottie",
                 data: {
                   controller:                   "lottie-player",

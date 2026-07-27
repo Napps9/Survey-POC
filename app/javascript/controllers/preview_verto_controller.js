@@ -212,6 +212,15 @@ export default class extends Controller {
       el.removeAttribute("style")
       if (bg) el.style.background = bg
     })
+    // A Range card's reaction character tracks its slider (lottie-player#show
+    // records the frame it renders), so a clone taken after the creator dragged
+    // the editor slider would open mid-expression. Park it back on the neutral
+    // middle frame, derived from the set's own length.
+    clone.querySelectorAll(".nps-lottie").forEach(el => {
+      let frames = 0
+      try { frames = (JSON.parse(el.dataset.lottiePlayerUrlsValue || "[]") || []).length } catch (_) { /* leave as-is */ }
+      if (frames) el.dataset.lottiePlayerCurrentValue = String(Math.ceil(frames / 2))
+    })
 
     // 7. Drop the editor's active-card outline class if present.
     clone.classList.remove("selected")

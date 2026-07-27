@@ -8,6 +8,13 @@ class Survey < ApplicationRecord
   scope :kept,     -> { where(deleted_at: nil) }
   scope :archived, -> { where.not(deleted_at: nil) }
 
+  # Range cards are always a 5-point scale (see RANGE_POINTS). Enforced on the
+  # way in so every authoring path is covered by one rule, and skipped once a
+  # Verto is live: a stored answer is an INDEX into the scale it was collected
+  # on, so resizing a published card's options would silently re-point every
+  # response already gathered. Published Vertos are locked for editing anyway.
+  before_save :enforce_range_scale, if: -> { will_save_change_to_cards? && !published? }
+
   # Large AI-generated TEXT columns only needed on the results path. Omit them
   # everywhere else (editor, dashboard, player, preview) so multi-KB blobs
   # aren't loaded into every row for nothing — a pure baseline memory saving.
@@ -99,6 +106,25 @@ class Survey < ApplicationRecord
   MAX_LANE_LABEL    = 60 # branch name shown on the flow map (stored on the entry card)
   MAX_SCENARIO_PAGES       = 6
   MAX_SCENARIO_PAGE_LENGTH = 600
+
+  # Every Range card is a 5-point scale — never 4, never 3. An even scale has
+  # no true centre, so someone who genuinely sits in the middle is forced to
+  # lean; and a deck mixing 3-, 4- and 5-point sliders can't be compared card
+  # to card. The AI prompts ask for exactly 5, but a model can drift and the
+  # importers map whatever the source form used (a Google Forms 1–4 linear
+  # scale arrives as four labels), so the count is enforced here rather than
+  # trusted upstream.
+  RANGE_POINTS = 5
+
+  # Names any stop a scale doesn't name itself — the same 5-point agree scale
+  # the editor's "Add question" flow already fills a new range card with, so a
+  # card repaired here is indistinguishable from one authored in the UI. Every
+  # stop must end up named: an unlabelled one reads as a gap on the track, and
+  # the editor's autosave drops blank labels, which would shorten the scale
+  # again on the next save.
+  RANGE_DEFAULT_LABELS = [
+    "Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"
+  ].freeze
   # Pexels video CDN (host-whitelisted) — the streamable mp4 for a card's
   # left-panel video. Posters are images.pexels.com URLs (sanitize_image_url).
   PEXELS_VIDEO_URL  = %r{\Ahttps://videos\.pexels\.com/[\w\-./]+\.mp4(?:\?[\w%\-=&.+]*)?\z}i
@@ -110,6 +136,116 @@ class Survey < ApplicationRecord
   # memory driver behind the production 502s. Generous headroom over a normal
   # downscaled image; reject anything larger rather than persist it.
   MAX_BACKGROUND_DATA_URL_BYTES = 3_000_000
+
+  # Coerce every range card's `options` to exactly RANGE_POINTS labels. Other
+  # card types are untouched. Applied on save (see enforce_range_scale) so it
+  # covers every authoring path — AI generation, the PDF/Forms/manual
+  # importers, the CSV importer, templates and the editor's autosave — instead
+  # of each one having to remember.
+  def self.normalize_range_cards!(cards)
+    Array(cards).map do |card|
+      next card unless card.is_a?(Hash) && card["type"].to_s == "range"
+      c = card.dup
+      c["options"] = normalize_range_labels(c["options"])
+      # Translations align to options POSITIONALLY, so a resized scale has to
+      # resize its translations too — otherwise locale N shows label 4 at
+      # stop 5. A translation that comes up short falls back to the primary
+      # language for that stop, which is what the player renders anyway.
+      if c["i18n"].is_a?(Hash)
+        c["i18n"] = c["i18n"].transform_values do |tr|
+          next tr unless tr.is_a?(Hash) && tr.key?("options")
+          tr.merge("options" => normalize_range_labels(tr["options"], fill: c["options"]))
+        end
+      end
+      c
+    end
+  end
+
+  # Resize a range card's labels to exactly RANGE_POINTS, keeping the words
+  # that are actually there:
+  #
+  #   5         → every stop stays put; only blanks get named
+  #   6 or more → sampled evenly, so both endpoints survive
+  #   4         → all four kept, the missing true centre opened up between them
+  #   2 or 3    → spread across the scale, endpoints staying endpoints
+  #   0         → `fill` (the default agree scale)
+  #
+  # Whatever the path, the gaps are then named from `fill` so no stop is left
+  # blank, and the result is idempotent — re-normalising never shifts a label.
+  #
+  # A purely numeric scale keeps counting instead of gaining a word, so a
+  # Google Forms 1–4 import reads "1 2 3 4 5" and not "1 2 Neutral 3 4".
+  # `fill` names the stops this scale can't name itself: the default agree
+  # scale for a card's own labels, and the primary-language labels when
+  # normalising a translation, so a short translation falls through to the
+  # primary word at that stop instead of rendering empty.
+  def self.normalize_range_labels(labels, fill: RANGE_DEFAULT_LABELS)
+    filler = Array(fill)
+    raw    = Array(labels).map { |l| l.to_s.strip }
+
+    # Already the right length: keep every stop exactly where it is and only
+    # name the blanks. Re-spreading here would shuffle the whole scale when a
+    # creator simply clears one label in the editor.
+    return name_blank_stops(raw, filler) if raw.size == RANGE_POINTS
+
+    given = raw.reject(&:blank?)
+    return default_range_labels(filler)  if given.empty?
+    return name_blank_stops(given, filler) if given.size == RANGE_POINTS
+
+    # Numeric first, whichever direction it needs resizing: sampling a 1–7 run
+    # the way words are sampled would print "1 3 4 6 7".
+    numeric = resize_numeric_range_labels(given)
+    return numeric if numeric
+
+    spread = given.size > RANGE_POINTS ? downsample_range_labels(given) : upsample_range_labels(given)
+    name_blank_stops(spread, filler)
+  end
+
+  # No stop is left nameless: an unlabelled point renders as a gap on the
+  # track, and the editor's autosave would then drop it and shorten the scale.
+  def self.name_blank_stops(labels, filler)
+    labels.each_with_index.map do |label, i|
+      label.presence || filler[i].to_s.strip.presence || RANGE_DEFAULT_LABELS[i]
+    end
+  end
+
+  # Nothing to preserve: the translation falls back to the primary language,
+  # and a card with no labels at all gets the default agree scale.
+  def self.default_range_labels(fill)
+    Array(fill).first(RANGE_POINTS).presence || RANGE_DEFAULT_LABELS.dup
+  end
+
+  # More labels than stops: pick RANGE_POINTS of them at even spacing. Both
+  # endpoints are always included, so the scale keeps the range it described.
+  def self.downsample_range_labels(given)
+    last = given.size - 1
+    (0...RANGE_POINTS).map { |i| given[(i * last / (RANGE_POINTS - 1.0)).round] }
+  end
+
+  # A consecutive integer run ("1".."4" or "1".."7", as a Google Forms linear
+  # scale imports) is re-cut to RANGE_POINTS integers from its own starting
+  # point: 1–4 grows to 1–5, 1–7 shrinks to 1–5, and 0–3 keeps its zero and
+  # becomes 0–4. Anything else returns nil and takes the word path — including
+  # a lone number, which says nothing about the intended run.
+  def self.resize_numeric_range_labels(given)
+    return nil if given.size < 2
+    nums = given.map { |l| Integer(l, exception: false) }
+    return nil if nums.any?(&:nil?)
+    return nil unless nums.each_cons(2).all? { |a, b| b == a + 1 }
+    (nums.first...(nums.first + RANGE_POINTS)).map(&:to_s)
+  end
+
+  # Fewer labels than stops: spread what we have so the creator's endpoints
+  # stay endpoints. A 4-point scale keeps all four labels and opens up the true
+  # centre it was missing (slot 2) — the case this whole rule exists for.
+  # Remaining slots come back blank for name_blank_stops to fill.
+  RANGE_UPSAMPLE_SLOTS = { 1 => [ 0 ], 2 => [ 0, 4 ], 3 => [ 0, 2, 4 ], 4 => [ 0, 1, 3, 4 ] }.freeze
+
+  def self.upsample_range_labels(given)
+    slots = Array.new(RANGE_POINTS)
+    RANGE_UPSAMPLE_SLOTS.fetch(given.size).each_with_index { |slot, i| slots[slot] = given[i] }
+    slots
+  end
 
   # A single image value (background, card image, or one option_image): an
   # uploaded data-URL (size-capped), an app-rooted asset path, or a Pexels CDN
@@ -556,5 +692,11 @@ class Survey < ApplicationRecord
     total = responders_count
     return nil if total.zero?
     (responses.where(answered: true, status: "completed").count * 100.0 / total).round
+  end
+
+  private
+
+  def enforce_range_scale
+    self.cards = self.class.normalize_range_cards!(cards)
   end
 end
