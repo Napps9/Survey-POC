@@ -69,6 +69,7 @@ Rails.application.routes.draw do
   post "templates/:id",               to: "templates#create", as: :survey_template
   get  "surveys/new",                 to: "surveys#new",     as: :new_survey
   post "surveys/generate",            to: "surveys#generate", as: :generate_survey
+  resources :verto_builds, only: [ :show ]
   post "surveys/import_pdf",          to: "surveys#import_pdf", as: :import_pdf_survey
   post "surveys/import_google_form",  to: "surveys#import_google_form", as: :import_google_form_survey
   post "surveys/import_manual",       to: "surveys#import_manual", as: :import_manual_survey

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -509,6 +509,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_130000) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  create_table "verto_builds", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.integer "organisation_id", null: false
+    t.json "payload", default: {}, null: false
+    t.string "status", default: "pending", null: false
+    t.integer "survey_id"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["organisation_id", "created_at"], name: "index_verto_builds_on_organisation_id_and_created_at"
+    t.index ["organisation_id"], name: "index_verto_builds_on_organisation_id"
+    t.index ["status"], name: "index_verto_builds_on_status"
+    t.index ["survey_id"], name: "index_verto_builds_on_survey_id"
+    t.index ["user_id"], name: "index_verto_builds_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "common_question_sets", "organisations"
@@ -545,4 +561,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_130000) do
   add_foreign_key "survey_shares", "partnership_vertos"
   add_foreign_key "survey_shares", "surveys"
   add_foreign_key "surveys", "organisations"
+  add_foreign_key "verto_builds", "organisations"
+  add_foreign_key "verto_builds", "surveys"
+  add_foreign_key "verto_builds", "users"
 end

@@ -82,53 +82,24 @@ class SurveysController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    if key_insight.empty?
-      result = {
-        "title" => theme,
-        "description" => nil,
-        "theme" => theme,
-        "audience_age" => audience_age,
-        "key_insight" => nil,
-        "cards" => [ { "type" => "welcome_card", "title" => theme, "text" => theme } ] + common_cards
+    # Everything above needs the request: it authorizes the org, validates the
+    # form and resolves which Common Questions this account may actually use.
+    # Everything below is 30-120s of Claude and Pexels calls, which used to hold
+    # one of three Puma threads for the duration — a few concurrent creations
+    # exhausted the pool and 502'd the whole app (P0-3). The job takes it from
+    # here and the wizard's overlay polls the build.
+    build = Current.organisation.verto_builds.create!(
+      user: Current.user,
+      payload: {
+        theme: theme, audience_age: audience_age, key_insight: key_insight,
+        notes: notes, quiz: quiz, show_results_comparison: show_compare,
+        brand_palette: palette.presence, default_locale: default_locale,
+        locales: locales, common_cards: common_cards
       }
-    else
-      result = SurveyGenerator.new.call(
-        theme: theme,
-        audience_age: audience_age,
-        key_insight: key_insight,
-        notes: notes,
-        locale: default_locale,
-        common_cards: common_cards,
-        quiz: quiz
-      )
-    end
-
-    # No name is asked up front — the AI-written title from the generation is
-    # the Verto's name, renameable any time in the editor header.
-    @survey = Current.organisation.surveys.create!(
-      title:        result["title"],
-      description:  result["description"],
-      theme:        result["theme"].presence || theme,
-      audience_age: result["audience_age"].presence || audience_age,
-      key_insight:  result["key_insight"].presence || key_insight,
-      cards:        DemographicQuestions.append_to(result["cards"]),
-      show_results_comparison: show_compare,
-      quiz:         quiz,
-      brand_palette: palette.presence,
-      default_locale: default_locale,
-      locales:        locales
     )
+    BuildVertoJob.perform_later(build.id)
 
-    # Remember the palette as the company default so the next Verto inherits it.
-    Current.organisation.update(default_brand_palette: palette) if palette.present?
-
-    translate_survey!(@survey)
-
-    # Every new Verto comes pre-populated with imagery (background + card art)
-    # so the editor never opens blank; creators can swap or clear any image.
-    auto_populate_assets!(@survey)
-
-    redirect_to survey_path(@survey)
+    redirect_to verto_build_path(build)
   rescue => e
     ErrorReporting.report("SurveyGenerator", e)
     flash.now[:alert] = "We couldn't generate your Verto — #{friendly_generate_error(e)}"
@@ -798,9 +769,7 @@ class SurveysController < ApplicationController
   # Pre-populate a freshly created Verto's imagery. Best-effort: a populator
   # failure (e.g. a transient Pexels issue) must never block Verto creation.
   def auto_populate_assets!(survey)
-    AssetPopulator.new(survey).populate!
-  rescue => e
-    ErrorReporting.report("AssetPopulator", e)
+    VertoGeneration.auto_populate_assets!(survey)
   end
 
   # Snapshot the SELECTED Common Questions into Verto-card hashes. Takes
@@ -880,36 +849,14 @@ class SurveysController < ApplicationController
   # (e.g. "credit balance too low", "rate limit") rather than the generic
   # "try again" line, which sent us in circles diagnosing the bug.
   def friendly_generate_error(e)
-    api_msg = anthropic_api_message(e)
-    return api_msg if api_msg.present?
-
-    msg = e.message.to_s.strip
-    msg = msg.first(200) + "…" if msg.length > 200
-    msg.presence || "#{e.class.name.split('::').last}. Check the server logs."
-  end
-
-  def anthropic_api_message(e)
-    return nil unless defined?(Anthropic::Errors::APIError) && e.is_a?(Anthropic::Errors::APIError)
-    body = e.respond_to?(:body) ? e.body : nil
-    return nil unless body.is_a?(Hash)
-    body.dig(:error, :message) || body.dig("error", "message")
+    VertoGeneration.friendly_error(e)
   end
 
   # Translate the survey's primary cards into each secondary language and store
   # the result in each card's i18n map. Per-language failures are non-fatal —
   # that language simply falls back to the primary text until re-translated.
   def translate_survey!(survey)
-    return unless survey.secondary_locales.any?
-
-    cards  = Array(survey.cards)
-    source = survey.default_locale
-    survey.secondary_locales.each do |loc|
-      translated = SurveyTranslator.new.call(cards: cards, target_locale: loc, source_locale: source)
-      cards = Survey.merge_card_translations(cards, loc, translated)
-    rescue => e
-      ErrorReporting.report("SurveyTranslator", e, locale: loc)
-    end
-    survey.update!(cards: cards)
+    VertoGeneration.translate_survey!(survey)
   end
 
   # Translate a single freshly-generated card into the Verto's secondary

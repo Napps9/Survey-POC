@@ -5,6 +5,12 @@ require "rails/test_help"
 class ActiveSupport::TestCase
   parallelize(workers: 1)
 
+  # Verto creation and the other AI paths enqueue jobs rather than running
+  # inline (P0-3). The suite uses the :test adapter, so a test that cares about
+  # the RESULT of that work wraps the request in perform_enqueued_jobs, and a
+  # test that cares about the hand-off asserts on enqueued_jobs instead.
+  include ActiveJob::TestHelper
+
   # Temporarily replace a singleton (class/instance) method for the duration of
   # the block, restoring it afterwards. A lightweight stand-in for minitest's
   # Object#stub, which this minitest version doesn't ship. `return_value` may be

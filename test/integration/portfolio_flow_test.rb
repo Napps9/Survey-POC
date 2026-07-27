@@ -22,7 +22,9 @@ class PortfolioFlowTest < ActionDispatch::IntegrationTest
         "cards" => [ { "type" => "welcome_card", "title" => "hi" } ] + Array(kwargs[:common_cards]) }
     end
     SurveyGenerator.define_singleton_method(:new) { |*| fake }
-    yield
+    # Verto creation is a background job now (P0-3); these tests are about the
+    # generation pipeline, so drain the queue inside the stub.
+    perform_enqueued_jobs { yield }
   ensure
     SurveyGenerator.singleton_class.remove_method(:new)
   end

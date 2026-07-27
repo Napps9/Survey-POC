@@ -17,7 +17,9 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
                                            { "type" => "yes_no", "text" => "Like it?", "options" => [ "Yes", "No" ] } ] }
     end
     SurveyGenerator.define_singleton_method(:new) { |*| fake }
-    yield
+    # Verto creation is a background job now (P0-3); these tests are about the
+    # generation pipeline, so drain the queue inside the stub.
+    perform_enqueued_jobs { yield }
   ensure
     SurveyGenerator.singleton_class.remove_method(:new)
   end
@@ -84,16 +86,20 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
     def boom.call(**) = raise("SurveyGenerator must not be called")
     SurveyGenerator.define_singleton_method(:new) { |*| boom }
     begin
-      post generate_survey_path, params: {
-        theme: "T", audience_age: "a",
-        show_results_comparison: "0", common_question_ids: [ q.id ]
-      }
+      perform_enqueued_jobs do
+        post generate_survey_path, params: {
+          theme: "T", audience_age: "a",
+          show_results_comparison: "0", common_question_ids: [ q.id ]
+        }
+      end
     ensure
       SurveyGenerator.singleton_class.remove_method(:new)
     end
 
     survey = @org.surveys.order(:id).last
-    assert_redirected_to survey_path(survey)
+    # Creation hands off to a background job, so the request redirects to the
+    # build's wait screen; that screen forwards to the editor once it lands.
+    assert_redirected_to verto_build_path(@org.verto_builds.order(:id).last)
     assert_equal "T", survey.title, "with no AI generation the theme names the Verto"
     types = survey.cards.map { |c| c["type"] }
     assert_equal "welcome_card", types.first
