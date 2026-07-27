@@ -423,7 +423,10 @@ export default class extends Controller {
     try {
       const url = `${this.summarizeUrlValue}?card_index=${card.index}&segment=${encodeURIComponent(seg.id)}`
       const res = await fetch(url, { headers: { "Accept": "text/plain" } })
-      if (!res.ok || !res.body) throw new Error()
+      // 503 = no streaming slot free right now; the server's text says so and
+      // retrying in a moment works, so don't bury it under the generic error.
+      if (!res.ok) throw new Error((await res.text()).trim())
+      if (!res.body) throw new Error()
       const reader = res.body.getReader()
       const dec = new TextDecoder()
       for (;;) {
@@ -431,8 +434,8 @@ export default class extends Controller {
         if (done) break
         box.textContent += dec.decode(value, { stream: true })
       }
-    } catch (_) {
-      box.textContent = t("results.compare_summarize_error")
+    } catch (err) {
+      box.textContent = err?.message || t("results.compare_summarize_error")
     } finally {
       btn.textContent = original
       btn.disabled = false

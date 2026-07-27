@@ -2,6 +2,9 @@ class SurveySummariesController < ApplicationController
   include ActionController::Live
   include AggregatesSurveyResults
   include ResolvesResultSegments
+  include LimitsConcurrentStreams
+
+  limit_concurrent_streams only: [ :show, :texts ]
 
   def show
     survey    = Current.organisation.surveys.find(params[:id])

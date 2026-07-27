@@ -68,8 +68,10 @@
             card.classList.add("is-generating")
             const stop = () => { card.classList.remove("is-generating"); thinkEl.style.display = "none" }
             fetch(<%= survey_results_summary_path(@survey).to_json.html_safe %>)
-              .then(r => {
-                if (!r.ok) throw new Error()
+              .then(async r => {
+                // A 503 means every streaming slot is busy, not that insights
+                // are broken — show the server's wording, which says to retry.
+                if (!r.ok) throw new Error((await r.text()).trim())
                 const reader = r.body.getReader()
                 const dec    = new TextDecoder()
                 let started  = false
@@ -83,9 +85,9 @@
                 }
                 return pump()
               })
-              .catch(() => {
+              .catch(err => {
                 stop()
-                textEl.textContent = "Insights unavailable right now."
+                textEl.textContent = (err && err.message) || "Insights unavailable right now."
                 textEl.style.color = "rgba(255,255,255,0.2)"
               })
           })()

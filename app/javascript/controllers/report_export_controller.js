@@ -81,7 +81,11 @@ export default class extends Controller {
     this.bodyTarget.innerHTML = ""
     try {
       const res = await fetch(url, { headers: { "Accept": "text/plain" } })
-      if (!res.ok || !res.body) throw new Error("stream failed")
+      // A 503 here means the instance is already streaming as much as it can
+      // without starving ordinary requests — show the server's reason rather
+      // than a generic failure, since retrying shortly genuinely works.
+      if (!res.ok) throw new Error((await res.text()).trim() || "Couldn't generate the report.")
+      if (!res.body) throw new Error("Couldn't generate the report.")
 
       const reader = res.body.getReader()
       const dec    = new TextDecoder()

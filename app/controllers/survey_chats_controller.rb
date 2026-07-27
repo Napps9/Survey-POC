@@ -1,6 +1,9 @@
 class SurveyChatsController < ApplicationController
   include ActionController::Live
   include AggregatesSurveyResults
+  include LimitsConcurrentStreams
+
+  limit_concurrent_streams only: :create
 
   def create
     survey    = Current.organisation.surveys.find(params[:survey_id])

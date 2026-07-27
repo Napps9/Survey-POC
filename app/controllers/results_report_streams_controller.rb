@@ -4,6 +4,9 @@
 class ResultsReportStreamsController < ApplicationController
   include ActionController::Live
   include GeneratesResultsReport
+  include LimitsConcurrentStreams
+
+  limit_concurrent_streams only: :show
 
   def show
     survey = Current.organisation.surveys.find(params[:survey_id])
