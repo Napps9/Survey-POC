@@ -5407,3 +5407,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
   color: #FBBF6B; border-radius: 10px; padding: 14px 16px;
   font-size: var(--text-sm, 13px); line-height: 1.6; margin: 0 0 28px;
 }
+
+/* Live results tally — a brief lift when a new response lands, so a creator
+   watching the page notices the number moved without it being distracting. */
+@keyframes results-live-pulse {
+  0%   { transform: scale(1);    color: #01EACB; }
+  35%  { transform: scale(1.14); color: #FFFFFF; }
+  100% { transform: scale(1);    color: #01EACB; }
+}

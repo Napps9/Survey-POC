@@ -16,6 +16,15 @@ class Response < ApplicationRecord
   # add_answered_to_responses migration.
   before_save :sync_answered
 
+  # Live results. Deliberately NOT on every save: /progress writes on each card,
+  # so a single respondent saves a dozen times and broadcasting each one would
+  # put a burst of renders on the instance for no new information.
+  #
+  # Only two transitions actually change what a creator sees — a response
+  # becoming a responder (its first real answer) and a responder finishing — so
+  # those are what broadcast, at most twice per respondent.
+  after_commit :broadcast_results_activity, on: [ :create, :update ]
+
   # How long the respondent took, in whole seconds, or nil until both ends are
   # stamped. Derived rather than stored so there's no third column to keep in
   # sync with the two timestamps.
@@ -39,5 +48,16 @@ class Response < ApplicationRecord
 
   def sync_answered
     self.answered = content_answered?
+  end
+
+  def broadcast_results_activity
+    return unless saved_change_to_answered? || saved_change_to_status?
+    return unless answered? # an empty, abandoned session isn't news
+
+    ResultsActivity.broadcast(survey)
+  rescue => e
+    # A live counter is a nicety. It must never be able to fail the write that
+    # stored a respondent's answers.
+    ErrorReporting.report("Response#broadcast_results_activity", e, survey_id: survey_id)
   end
 end

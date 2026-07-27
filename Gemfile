@@ -37,6 +37,11 @@ gem "bcrypt", "~> 3.1.7"
 # Render disks mount to exactly one service and Active Storage lives on ours.
 gem "solid_queue", "~> 1.1"
 
+# Action Cable over the existing database, so live results need no Redis. The
+# production adapter pointed at a Redis that was never provisioned and the redis
+# gem was commented out (P1-1) — latent until the first broadcast, which this is.
+gem "solid_cable", "~> 3.0"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

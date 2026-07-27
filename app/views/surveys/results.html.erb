@@ -168,10 +168,21 @@
 
           <%# Stats strip %>
           <div style="display:flex;align-items:center;gap:16px;padding:2px 0 6px;">
-            <div style="display:flex;align-items:baseline;gap:5px;">
-              <span style="font-family:'Alata',sans-serif;font-size:34px;color:#01EACB;line-height:1;"><%= @total %></span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);">response<%= @total == 1 ? "" : "s" %></span>
-            </div>
+            <%# The tally updates live as answers land; the breakdown below
+                rebuilds on request. Only meaningful on the unsegmented view —
+                a segment's count comes from its own filtered scope, which a
+                broadcast carrying whole-Verto totals would contradict. %>
+            <% if @active_segment && @active_segment[:id] != "overall" %>
+              <div style="display:flex;align-items:baseline;gap:5px;">
+                <span style="font-family:'Alata',sans-serif;font-size:34px;color:#01EACB;line-height:1;"><%= @total %></span>
+                <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);">response<%= @total == 1 ? "" : "s" %></span>
+              </div>
+            <% else %>
+              <%= turbo_stream_from(*ResultsActivity.stream_for(@survey)) %>
+              <%= render "surveys/results_live",
+                    survey: @survey, live: false,
+                    **ResultsActivity.counts_for(@survey) %>
+            <% end %>
             <% if @active_segment && @active_segment[:id] != "overall" %>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);">of <%= @overall_total %> overall</span>
             <% end %>
