@@ -394,6 +394,32 @@ class SurveysController < ApplicationController
     redirect_to survey_path(@survey)
   end
 
+  # POST /surveys/:id/card_image
+  # Persists an uploaded card/background image and hands back a short
+  # same-origin path to store on the card, instead of the multi-MB base64
+  # data-URL that used to be written straight into the cards JSON (P1-7).
+  #
+  # The editor calls this after moderation passes, so nothing unmoderated is
+  # ever written to storage. A failure here is non-fatal on the client: it falls
+  # back to the data-URL, which sanitize_image_url still accepts, so a creator
+  # is never blocked from applying an image by a storage hiccup.
+  def card_image
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.published?
+      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    end
+
+    blob = Survey::CardImageStore.attach(survey, params[:image].to_s)
+    return render json: { ok: false, error: "That image couldn't be stored." }, status: :unprocessable_entity unless blob
+
+    render json: { ok: true, url: rails_blob_path(blob, only_path: true) }
+  rescue ActiveRecord::RecordNotFound
+    raise
+  rescue => e
+    ErrorReporting.report("SurveysController#card_image", e)
+    render json: { ok: false, error: "That image couldn't be stored." }, status: :unprocessable_entity
+  end
+
   # GET /surveys/:id/qr
   # The share panel's QR as a downloadable file, for posters, flyers and slide
   # decks — the panel itself renders the same SVG inline for scanning off a

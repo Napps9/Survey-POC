@@ -4,6 +4,23 @@ class Survey < ApplicationRecord
   has_many :survey_shares, dependent: :destroy
   has_many :partnership_vertos, dependent: :destroy
 
+  # Creator-uploaded card/background imagery. Previously these lived inline in
+  # the `cards` JSON as base64 data-URLs, which meant every render of a Verto
+  # re-materialized several MB of image data into memory — the acknowledged
+  # driver behind the production 502s on a 512MB instance (P1-7). Now the bytes
+  # live in Active Storage (a persistent Render disk) and the cards JSON keeps
+  # only a short /rails/active_storage/... path.
+  #
+  # Attached to the Verto, not the organisation, so they purge with it and stay
+  # out of the account's curated brand-asset library (Organisation#assets).
+  has_many_attached :card_images
+
+  CARD_IMAGE_CONTENT_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
+  # Matches the client-side downscale budget (1600px longest edge, WebP q0.82);
+  # generous enough for an image that skipped downscaling, small enough that a
+  # deck can't fill the disk.
+  CARD_IMAGE_MAX_BYTES = 3.megabytes
+
   scope :recent,   -> { order(updated_at: :desc) }
   scope :kept,     -> { where(deleted_at: nil) }
   scope :archived, -> { where.not(deleted_at: nil) }

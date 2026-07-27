@@ -13,7 +13,7 @@ export default class extends Controller {
     "searchInput", "searchSection", "searchStatus", "searchGrid",
     "mediaToggle", "mediaTab"
   ]
-  static values = { url: String, pexsearchUrl: String, moderateUrl: String, theme: String, backgroundRecommended: Array }
+  static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, theme: String, backgroundRecommended: Array }
 
   // Uploaded images are normalised before they're stored: capped in source
   // size, downscaled to a max edge, and re-encoded to a compact format. Raw
@@ -428,6 +428,10 @@ export default class extends Controller {
     if (this._pendingUrl && this._pendingUrl.startsWith("data:")) {
       const ok = await this._moderateUpload(this._pendingUrl)
       if (!ok) return // reason already shown on the upload pane
+
+      // Store the bytes once and carry a short path on the card instead of the
+      // base64. Inline data-URLs were the memory driver behind the 502s.
+      this._pendingUrl = await this._persistUpload(this._pendingUrl)
     }
 
     if (this._mode === "background") {
@@ -452,6 +456,30 @@ export default class extends Controller {
     }
     this._notifyDirty()
     this.close()
+  }
+
+  // Hand the moderated upload to the server, which stores it and returns a
+  // short same-origin path to put on the card. Returns that path, or the
+  // original data URL if anything goes wrong — the server still accepts inline
+  // base64, so a storage hiccup degrades to the old behaviour rather than
+  // blocking a creator mid-edit.
+  async _persistUpload(dataUrl) {
+    if (!this.hasCardImageUrlValue) return dataUrl
+    try {
+      const res = await fetch(this.cardImageUrlValue, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+        },
+        body: JSON.stringify({ image: dataUrl })
+      })
+      const data = await res.json().catch(() => ({}))
+      return data.ok && data.url ? data.url : dataUrl
+    } catch (_) {
+      return dataUrl
+    }
   }
 
   // POST the uploaded image for a content-safety verdict. Returns true to
