@@ -69,6 +69,7 @@ class PlayerController < ApplicationController
     # what's already stored so an already-answered graded card can't be changed.
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     sync_region_from_answers!(resp)
+    sync_demographics_from_answers!(resp)
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     mark_started_unless_completed(resp)
     apply_quiz_score(resp)
@@ -88,6 +89,7 @@ class PlayerController < ApplicationController
     resp  = find_or_init_response(token)
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     sync_region_from_answers!(resp)
+    sync_demographics_from_answers!(resp)
     resp.status  = "completed"
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     # A respondent who never triggered /progress (a one-card Verto, or a submit
@@ -153,6 +155,7 @@ class PlayerController < ApplicationController
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     ai_normalize_open_ended_answer!(resp, idx) if first_time
     sync_region_from_answers!(resp)
+    sync_demographics_from_answers!(resp)
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
     mark_started_unless_completed(resp)
     apply_quiz_score(resp)
@@ -503,6 +506,7 @@ class PlayerController < ApplicationController
   # since it reads the freshly merged answer. An unanswered/invalid pick just
   # leaves the response untagged, same as skipping any other optional card.
   def sync_region_from_answers!(resp)
+    sync_demographics_from_answers!(resp)
     idx = Array(@survey.cards).find_index { |c| c.is_a?(Hash) && c["demographic"] && c["input"] == "location" }
     value = idx && resp.answers.is_a?(Hash) ? resp.answers[idx.to_s]&.dig("value") : nil
     sep = value.to_s.index("|")
@@ -516,6 +520,30 @@ class PlayerController < ApplicationController
       resp.region_country = nil
       resp.region_label   = nil
     end
+  end
+
+  # Denormalise the two set demographic answers that make useful filter
+  # dimensions, for the same reason region is denormalised: the alternative is a
+  # JSON query keyed by a card index that differs per Verto.
+  #
+  # Re-derived on every save rather than written once, so a respondent who goes
+  # back and changes their answer is reflected — same as the region above.
+  def sync_demographics_from_answers!(resp)
+    cards = Array(@survey.cards)
+    answers = resp.answers.is_a?(Hash) ? resp.answers : {}
+
+    gender_idx = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["type"] == "multiple_choice" }
+    gender     = gender_idx ? answers[gender_idx.to_s]&.dig("value").to_s.strip.presence : nil
+    # Only the options this Verto actually offers, so a tampered payload can't
+    # invent a segment label that then renders in the creator's dashboard.
+    allowed    = gender_idx ? Array(cards[gender_idx]["options"]).map(&:to_s) : []
+    resp.demographic_gender = allowed.include?(gender) ? gender : nil
+
+    birth_idx = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["input"] == "month" }
+    raw_year  = birth_idx ? answers[birth_idx.to_s]&.dig("value").to_s[/\A(\d{4})/, 1] : nil
+    year      = raw_year&.to_i
+    # A year outside living memory is a typo or a probe, not a birth year.
+    resp.demographic_birth_year = year && year.between?(1900, Date.current.year) ? year : nil
   end
 
   # The Verto content language to render: an explicit ?lang=, else the

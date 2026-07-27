@@ -15,6 +15,7 @@ class SurveysController < ApplicationController
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
+  helper_method :date_range_options
 
   def index
     @surveys          = Current.organisation.surveys.kept.without_report_text.order(updated_at: :desc).to_a
@@ -521,7 +522,8 @@ class SurveysController < ApplicationController
   end
 
   def results
-    base, @segments, @active_segment = resolve_result_segments(@survey, params[:segment])
+    @date_range = params[:range].presence
+    base, @segments, @active_segment = resolve_result_segments(@survey, params[:segment], @date_range)
     @overall_total  = base.count
 
     @responses  = @active_segment[:scope]

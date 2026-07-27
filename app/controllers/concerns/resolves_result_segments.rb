@@ -54,10 +54,58 @@ module ResolvesResultSegments
       }
     end
 
-    segments
+    segments + demographic_segments(base)
   end
 
   REGION_SEGMENT_CAP = 30
+  # Same small-cell rule the regions use: a demographic slice thin enough to
+  # identify someone is worse than no slice at all.
+  MIN_DEMOGRAPHIC_SAMPLE = Response::MIN_REGION_SAMPLE_SIZE
+
+  # Age bands rather than birth years: a year is close to an identifier on a
+  # small Verto, and nobody analyses "people born in 1987" — they analyse
+  # "under 25". Open-ended at both ends so no respondent falls outside a band.
+  AGE_BANDS = [
+    [ "Under 18",  0,  17 ],
+    [ "18–24",    18,  24 ],
+    [ "25–34",    25,  34 ],
+    [ "35–49",    35,  49 ],
+    [ "50–64",    50,  64 ],
+    [ "65+",      65, 200 ]
+  ].freeze
+
+  # Slices by the two set demographic questions, from the denormalised columns
+  # (see AddDemographicsToResponses for why they aren't read out of the answers
+  # JSON). Suppressed below the small-cell threshold, like regions.
+  def demographic_segments(base)
+    gender_segments(base) + age_segments(base)
+  end
+
+  def gender_segments(base)
+    counts = base.reorder(nil).where.not(demographic_gender: nil)
+                 .group(:demographic_gender).count
+
+    counts.select { |_g, n| n >= MIN_DEMOGRAPHIC_SAMPLE }
+          .sort_by { |_g, n| -n }
+          .map do |gender, count|
+      { id: "gender_#{gender.parameterize}", label: "👤 #{gender}",
+        scope: base.where(demographic_gender: gender), count: count }
+    end
+  end
+
+  def age_segments(base)
+    this_year = Date.current.year
+
+    AGE_BANDS.filter_map do |label, min_age, max_age|
+      # A band maps to a birth-year window; the boundary year is approximate by
+      # up to a birthday, which is the right trade for not storing birth dates.
+      scope = base.where(demographic_birth_year: (this_year - max_age)..(this_year - min_age))
+      count = scope.reorder(nil).count
+      next if count < MIN_DEMOGRAPHIC_SAMPLE
+
+      { id: "age_#{label.parameterize}", label: "🎂 #{label}", scope: scope, count: count }
+    end
+  end
 
   # The base response scope, plus the segments and the active segment selected
   # by params[:segment]. Returns [base, segments, active_segment].
@@ -68,10 +116,35 @@ module ResolvesResultSegments
   # aggregator counts each card off its own answers, so an unfinished response
   # simply contributes to the questions it did reach. (Completion is still
   # surfaced separately as the dashboard's completion rate.)
-  def resolve_result_segments(survey, segment_param)
+  def resolve_result_segments(survey, segment_param, range_param = nil)
     base     = survey.responses.where(answered: true).order(created_at: :desc)
+    base     = apply_date_range(base, range_param)
     segments = result_segments(survey, base)
     active   = segments.find { |s| s[:id] == segment_param } || segments.first
     [ base, segments, active ]
+  end
+
+  # Named windows rather than free date pickers: these are the questions a
+  # researcher actually asks of a running Verto ("how's the last week going?"),
+  # and a preset can't be given an invalid or inverted range.
+  DATE_RANGES = {
+    "7d"  => [ "Last 7 days",   7 ],
+    "30d" => [ "Last 30 days",  30 ],
+    "90d" => [ "Last 90 days",  90 ]
+  }.freeze
+
+  def date_range_options
+    [ { id: "all", label: "All time" } ] +
+      DATE_RANGES.map { |id, (label, _days)| { id: id, label: label } }
+  end
+
+  # The range narrows the BASE, so every segment below it is counted within the
+  # window too — a date filter that only moved the charts while the segment
+  # pills kept whole-Verto counts would be lying about one of them.
+  def apply_date_range(base, range_param)
+    entry = DATE_RANGES[range_param.to_s]
+    return base unless entry
+
+    base.where(created_at: entry.last.days.ago..)
   end
 end

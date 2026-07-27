@@ -311,12 +311,29 @@
             <div style="margin:0 0 10px;padding:9px 14px;border-radius:10px;background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.3);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#FF6FA0;">Couldn’t connect to Google Sheets. Please try again.</div>
           <% end %>
 
-          <%# Segment filter pills — only when this Verto has partner segments %>
+          <%# Date window. Narrows the base, so the segment counts below are
+              counted within the window too — a range that only moved the charts
+              while the pills kept whole-Verto totals would misreport one of them. %>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 0 8px;">
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-right:2px;">When</span>
+            <% date_range_options.each do |opt| %>
+              <% current = (@date_range.presence || "all") == opt[:id] %>
+              <%# The window is deliberately kept when switching it, but the
+                  segment is not carried across ranges blindly — a segment that
+                  falls below the small-cell threshold in a narrower window
+                  disappears, and linking to it would 404 the pill. %>
+              <%= link_to opt[:label],
+                    survey_results_path(@survey, range: (opt[:id] == "all" ? nil : opt[:id])),
+                    class: "seg-pill", aria: { current: current.to_s } %>
+            <% end %>
+          </div>
+
+          <%# Segment filter pills — partner shares, regions and demographics %>
           <% if @segments.size > 1 %>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 0 10px;">
               <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-right:2px;">View</span>
               <% @segments.each do |seg| %>
-                <%= link_to survey_results_path(@survey, segment: seg[:id]),
+                <%= link_to survey_results_path(@survey, segment: seg[:id], range: @date_range),
                       class: "seg-pill", aria: { current: (seg[:id] == @active_segment[:id]).to_s } do %>
                   <%= seg[:label] %><span class="seg-pill-count"><%= seg[:count] %></span>
                 <% end %>
