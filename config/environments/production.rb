@@ -71,7 +71,12 @@ Rails.application.configure do
   # config.cache_store = :mem_cache_store
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
-  # config.active_job.queue_adapter = :resque
+  # Solid Queue on the primary database — see CreateSolidQueueTables for why the
+  # queue isn't split onto its own connection. The worker runs inside Puma
+  # (config/puma.rb): Render disks mount to exactly one service and Active
+  # Storage lives on ours, so a separate worker service couldn't reach the
+  # images it needs to write.
+  config.active_job.queue_adapter = :solid_queue
   # config.active_job.queue_name_prefix = "survey_poc_production"
 
   # Disable caching for Action Mailer templates even if Action Controller

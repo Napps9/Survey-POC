@@ -29,6 +29,14 @@ gem "tailwindcss-rails"
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
 
+# Background jobs on the existing database (no Redis). Every Claude call used to
+# run inline on a Puma request thread: with one worker and three threads, a few
+# slow calls exhausted the pool and the whole app 502'd — including pages that
+# never touch Claude. See AnthropicHelpers and PRODUCTION_READINESS_PLAN P0-3.
+# Runs inside Puma (config/puma.rb) rather than as a separate service, because
+# Render disks mount to exactly one service and Active Storage lives on ours.
+gem "solid_queue", "~> 1.1"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

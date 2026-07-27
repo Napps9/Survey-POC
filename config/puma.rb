@@ -57,6 +57,16 @@ end
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
 
+# Run Solid Queue inside this process instead of as a separate service. The
+# worker needs the same Active Storage disk the web process has mounted, and a
+# Render disk attaches to exactly one service — so a standalone worker could not
+# read or write card imagery. Jobs get their own threads, which is the point:
+# a 120s Claude call no longer occupies one of the three request threads.
+#
+# Off by default outside production so `bin/rails server` in development doesn't
+# quietly start a worker; set SOLID_QUEUE_IN_PUMA=1 to opt in locally.
+plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"].present? || ENV["RAILS_ENV"] == "production"
+
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
