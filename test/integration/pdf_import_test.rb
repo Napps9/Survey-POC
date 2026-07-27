@@ -21,7 +21,13 @@ class PdfImportTest < ActionDispatch::IntegrationTest
   def stub_importer(result, &block)
     fake = Object.new
     fake.define_singleton_method(:call) { |**_| result }
-    stub_method(PdfQuestionImporter, :new, ->(*_a, **_k) { fake }, &block)
+    # The import runs in a background job now (P0-3), so drain the queue inside
+    # the stub and walk the wait-screen redirect chain — these tests are about
+    # the import itself, not the hand-off.
+    stub_method(PdfQuestionImporter, :new, ->(*_a, **_k) { fake }) do
+      perform_enqueued_jobs { block.call }
+      follow_verto_build!
+    end
   end
 
   test "the wizard exposes the Import from PDF entry point" do
@@ -49,8 +55,10 @@ class PdfImportTest < ActionDispatch::IntegrationTest
       { "type" => "open_ended",      "text" => "What would make you stay?" }
     ]
 
-    stub_importer({ "title" => "Imported", "description" => "Hi", "cards" => cards }) do
-      assert_difference -> { @org.surveys.count }, 1 do
+    # The Verto is created on the import's second leg (resume_import), which
+    # stub_importer walks to — so the count is asserted around the whole flow.
+    assert_difference -> { @org.surveys.count }, 1 do
+      stub_importer({ "title" => "Imported", "description" => "Hi", "cards" => cards }) do
         post import_pdf_survey_path, params: { pdf: pdf_upload, default_locale: "en", locales: [ "en" ] }
       end
     end
@@ -131,12 +139,15 @@ class PdfImportTest < ActionDispatch::IntegrationTest
   end
 
   test "a PDF with no extractable questions re-renders the wizard with an error" do
-    stub_importer({ "title" => "Empty", "cards" => [] }) do
-      assert_no_difference -> { @org.surveys.count } do
+    assert_no_difference -> { @org.surveys.count } do
+      stub_importer({ "title" => "Empty", "cards" => [] }) do
         post import_pdf_survey_path, params: { pdf: pdf_upload }
       end
     end
-    assert_response :unprocessable_entity
-    assert_match "couldn&#39;t find any questions", response.body
+    # The read happens in a job now, so "nothing to import" comes back through
+    # the build rather than as an immediate re-render — the creator still lands
+    # on the wizard with the reason.
+    assert_redirected_to new_survey_path
+    assert_match(/couldn't find any questions/i, flash[:alert])
   end
 end

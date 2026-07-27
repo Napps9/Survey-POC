@@ -17,7 +17,7 @@ class VertoBuildsController < ApplicationController
     respond_to do |format|
       format.html do
         # Nothing left to wait for — don't show a spinner over a finished build.
-        return redirect_to survey_path(build.survey) if build.succeeded? && build.survey
+        return redirect_to(finished_path(build)) if build.succeeded? && finished_path(build)
         return redirect_to new_survey_path, alert: build_failure_message(build) if build.failed?
 
         @build = build
@@ -32,9 +32,19 @@ class VertoBuildsController < ApplicationController
 
   def build_status(build)
     status = { status: build.status }
-    status[:redirect_to] = survey_path(build.survey) if build.succeeded? && build.survey
+    status[:redirect_to] = finished_path(build) if build.succeeded?
     status[:error]       = build_failure_message(build) if build.failed?
-    status
+    status.compact
+  end
+
+  # Where a finished build sends the creator. A generation ends at its Verto; an
+  # import stops one step short, because whether its questions go straight to
+  # the editor or pause at the review screen is the creator's decision to make.
+  def finished_path(build)
+    return resume_import_path(build) if build.import? && build.result
+    return survey_path(build.survey) if build.survey
+
+    nil
   end
 
   def build_failure_message(build)

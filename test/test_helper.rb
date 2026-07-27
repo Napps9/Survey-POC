@@ -11,6 +11,13 @@ class ActiveSupport::TestCase
   # test that cares about the hand-off asserts on enqueued_jobs instead.
   include ActiveJob::TestHelper
 
+  # Creation and the imports hand off to a background job: the request redirects
+  # to a wait screen, which forwards on once the job lands. Walk that chain so a
+  # test can go on asserting the destination it always did.
+  def follow_verto_build!
+    follow_redirect! while response.redirect? && response.location.include?("/verto_builds/")
+  end
+
   # Temporarily replace a singleton (class/instance) method for the duration of
   # the block, restoring it afterwards. A lightweight stand-in for minitest's
   # Object#stub, which this minitest version doesn't ship. `return_value` may be

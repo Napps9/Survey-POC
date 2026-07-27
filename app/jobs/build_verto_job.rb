@@ -29,6 +29,16 @@ class BuildVertoJob < ApplicationJob
     return if build.finished? || build.running?
 
     build.start!
+
+    if build.import?
+      run_import(build)
+      # An import stops here on purpose. What happens next — straight to the
+      # editor, or pause at the review screen because some questions break the
+      # design rules — is the creator's call, and resolving it needs the request
+      # context the job doesn't have.
+      return build.succeed!(nil)
+    end
+
     survey = create_survey(build)
 
     # Both are best-effort inside: a Verto with untranslated cards or no imagery
@@ -41,6 +51,41 @@ class BuildVertoJob < ApplicationJob
   end
 
   private
+
+  # Run the importer for this build's door and stash its output on the build for
+  # the resume step. Raising here is fine — discard_on records the reason.
+  def run_import(build)
+    p      = build.payload
+    locale = p["default_locale"]
+
+    result =
+      case build.kind
+      when "import_manual"
+        ManualQuestionImporter.new.call(text: p["text"].to_s, locale: locale)
+      when "import_google_form"
+        # The token is fetched here from the build's user rather than carried in
+        # the payload — an access token has no business sitting at rest in a
+        # JSON column, and the client refreshes it if it expired while queued.
+        token = GoogleOauthService.client_for(build.user).access_token
+        GoogleFormsImporter.call(GoogleFormsClient.new(token).fetch(p["form_id"]))
+      when "import_pdf"
+        # Re-read the staged upload rather than carrying its bytes through the
+        # queue; the attachment is purged with the build.
+        PdfQuestionImporter.new.call(pdf_data: Base64.strict_encode64(build.source_file.download), locale: locale)
+      else
+        raise ArgumentError, "unknown import kind #{build.kind.inspect}"
+      end
+
+    raise ImportedNothing if Array(result["cards"]).empty?
+
+    build.update!(payload: p.merge("result" => result))
+  end
+
+  # No questions found — a real, creator-fixable outcome rather than a crash,
+  # so it carries wording they can act on.
+  class ImportedNothing < StandardError
+    def message = "we couldn't find any questions to import — try a different file or wording."
+  end
 
   def create_survey(build)
     p = build.payload

@@ -11,8 +11,24 @@ class VertoBuild < ApplicationRecord
   belongs_to :user
   belongs_to :survey, optional: true
 
+  # A PDF import's source document. Attached rather than base64'd into the
+  # payload: a multi-MB string in a JSON column is exactly the pattern that
+  # drove the production 502s (P1-7).
+  has_one_attached :source_file
+
   STATUSES = %w[pending running succeeded failed].freeze
   validates :status, inclusion: { in: STATUSES }
+
+  # Which slow call this build is waiting on. "generate" ends at a Verto; the
+  # imports end at a payload the request turns into either a Verto or the
+  # review screen, since that decision needs the creator.
+  KINDS = %w[generate import_manual import_google_form import_pdf].freeze
+  validates :kind, inclusion: { in: KINDS }
+
+  def import? = kind != "generate"
+
+  # The importer output the resume step works from.
+  def result = payload["result"]
 
   # A build the poller should stop waiting on, either way.
   scope :finished, -> { where(status: %w[succeeded failed]) }

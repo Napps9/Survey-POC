@@ -119,29 +119,13 @@ class SurveysController < ApplicationController
       return import_pdf_error("That PDF is too large — please keep it under #{MAX_PDF_BYTES / 1.megabyte}MB.")
     end
 
-    default_locale = wizard_default_locale
-    data    = Base64.strict_encode64(pdf.read)
-    result  = PdfQuestionImporter.new.call(pdf_data: data, locale: default_locale)
-    cards   = Array(result["cards"])
-
-    return import_pdf_error("We couldn't find any questions in that PDF — try a different file.") if cards.empty?
-
-    payload = wizard_import_payload(result)
-
-    # Questions that don't fit Verto's design rules pause the import: the
-    # creator reviews their wording next to Verto's optimised version and
-    # decides. Fully compliant decks go straight to the editor as before.
-    flagged = cards.select { |c| c["compliant"] == false }
-    if flagged.any?
-      @import_payload = self.class.import_verifier.generate(payload)
-      @import_cards   = cards
-      @flagged_count  = flagged.size
-      return render :import_review, layout: "fullscreen"
+    # The upload is staged on the build rather than base64'd through the queue —
+    # a multi-MB string in a JSON column is the pattern that drove the 502s.
+    build = enqueue_import("import_pdf") do |b|
+      b.source_file.attach(io: pdf.tempfile, filename: pdf.original_filename, content_type: pdf.content_type)
     end
 
-    @survey = create_imported_survey!(payload, variant: "verbatim")
-
-    redirect_to survey_path(@survey)
+    redirect_to verto_build_path(build)
   rescue => e
     ErrorReporting.report("PdfQuestionImporter", e)
     import_pdf_error("We couldn't import your PDF — #{friendly_generate_error(e)}")
@@ -162,14 +146,26 @@ class SurveysController < ApplicationController
       return import_manual_error("That's a lot of text — please keep it under #{MAX_MANUAL_CHARS / 1_000}k characters.")
     end
 
-    result = ManualQuestionImporter.new.call(text: text, locale: wizard_default_locale)
-    cards  = Array(result["cards"])
+    redirect_to verto_build_path(enqueue_import("import_manual", "text" => text))
+  rescue => e
+    ErrorReporting.report("ManualQuestionImporter", e)
+    import_manual_error("We couldn't import your questions — #{friendly_generate_error(e)}")
+  end
 
-    return import_manual_error("We couldn't find any questions in that text — try one question per line.") if cards.empty?
+  # GET /verto_builds/:id/import
+  # Second leg of every import: the slow read has finished in the background and
+  # its questions are on the build. What happens now needs the creator, which is
+  # why the job stopped here — questions that break Verto's design rules pause
+  # at the review screen so they can choose their wording or Verto's, and a
+  # clean import goes straight to the editor.
+  def resume_import
+    build = Current.organisation.verto_builds.find(params[:id])
+    return redirect_to new_survey_path, alert: "That import is no longer available." unless build.succeeded? && build.result
 
-    payload = wizard_import_payload(result)
-
+    payload = build.payload
+    cards   = Array(build.result["cards"])
     flagged = cards.select { |c| c["compliant"] == false }
+
     if flagged.any?
       @import_payload = self.class.import_verifier.generate(payload)
       @import_cards   = cards
@@ -179,9 +175,11 @@ class SurveysController < ApplicationController
 
     @survey = create_imported_survey!(payload, variant: "verbatim")
     redirect_to survey_path(@survey)
+  rescue ActiveRecord::RecordNotFound
+    raise # another org's build is a 404, not a redirect — same as every other survey path
   rescue => e
-    ErrorReporting.report("ManualQuestionImporter", e)
-    import_manual_error("We couldn't import your questions — #{friendly_generate_error(e)}")
+    ErrorReporting.report("SurveysController#resume_import", e)
+    redirect_to new_survey_path, alert: "We couldn't finish the import — #{friendly_generate_error(e)}"
   end
 
   # POST /surveys/finalize_import
@@ -215,14 +213,11 @@ class SurveysController < ApplicationController
       return import_google_form_error("Paste your Google Form's edit link, e.g. https://docs.google.com/forms/d/…/edit")
     end
 
-    token  = GoogleOauthService.client_for(Current.user).access_token
-    form   = GoogleFormsClient.new(token).fetch(form_id)
-    result = GoogleFormsImporter.call(form)
+    # Check the connection here, while we can still redirect the creator into
+    # the OAuth flow — the job can only report a failure after the fact.
+    GoogleOauthService.client_for(Current.user)
 
-    return import_google_form_error("We couldn't find any questions in that form.") if Array(result["cards"]).empty?
-
-    @survey = create_imported_survey!(wizard_import_payload(result), variant: "verbatim")
-    redirect_to survey_path(@survey)
+    redirect_to verto_build_path(enqueue_import("import_google_form", "form_id" => form_id))
   rescue GoogleOauthService::NotConnected, GoogleFormsClient::NotAuthorized
     # Connected before Forms access was added (or token revoked) — reconnect.
     redirect_to google_connect_path(return_to: google_form_return_to)
@@ -704,6 +699,19 @@ class SurveysController < ApplicationController
 
   # Shared import payload built from the wizard form fields — used by both the
   # PDF and Google Forms import paths so they can't drift.
+  # Stage an import for the background job: the wizard's answers (resolved here,
+  # where params and the org are in scope) plus whatever that door needs to do
+  # the read. `result` is filled in by the job.
+  def enqueue_import(kind, extra = {})
+    build = Current.organisation.verto_builds.create!(
+      user: Current.user, kind: kind,
+      payload: wizard_import_payload(nil).merge(extra)
+    )
+    yield build if block_given?
+    BuildVertoJob.perform_later(build.id)
+    build
+  end
+
   def wizard_import_payload(result)
     default_locale = wizard_default_locale
     locales        = ([ default_locale ] + SupportedLocales.sanitize_list(params[:locales], fallback: [ Current.locale.to_s ])).uniq

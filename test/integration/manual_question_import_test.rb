@@ -15,7 +15,13 @@ class ManualQuestionImportTest < ActionDispatch::IntegrationTest
   def stub_importer(result, &block)
     fake = Object.new
     fake.define_singleton_method(:call) { |**_| result }
-    stub_method(ManualQuestionImporter, :new, ->(*_a, **_k) { fake }, &block)
+    # The import runs in a background job now (P0-3), so drain the queue inside
+    # the stub and walk the wait-screen redirect chain — these tests are about
+    # the import itself, not the hand-off.
+    stub_method(ManualQuestionImporter, :new, ->(*_a, **_k) { fake }) do
+      perform_enqueued_jobs { block.call }
+      follow_verto_build!
+    end
   end
 
   test "the wizard exposes the manual-questions entry point on the final card" do
@@ -32,8 +38,8 @@ class ManualQuestionImportTest < ActionDispatch::IntegrationTest
       { "type" => "open_ended", "text" => "What should we change?" }
     ]
 
-    stub_importer({ "title" => "Workshop Feedback", "description" => "Hi", "cards" => cards }) do
-      assert_difference -> { @org.surveys.count }, 1 do
+    assert_difference -> { @org.surveys.count }, 1 do
+      stub_importer({ "title" => "Workshop Feedback", "description" => "Hi", "cards" => cards }) do
         post import_manual_survey_path, params: {
           manual_questions: "How was the workshop?\nWhat should we change?",
           default_locale: "en", locales: [ "en" ]

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_150000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -512,6 +512,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_140000) do
   create_table "verto_builds", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "error_message"
+    t.string "kind", default: "generate", null: false
     t.integer "organisation_id", null: false
     t.json "payload", default: {}, null: false
     t.string "status", default: "pending", null: false
