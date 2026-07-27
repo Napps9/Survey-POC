@@ -72,7 +72,10 @@ module GeneratesResultsReport
 
   # A self-contained, light-themed HTML document — used for both the PDF
   # (wicked_pdf) and the Google Doc (Drive converts HTML → a Doc).
-  def results_report_document(survey, markdown)
+  # `charts: false` for the Google Doc export: Drive converts the HTML into a
+  # Doc, and div-width bars don't survive that conversion — it gets the same
+  # figures as tables instead, which do.
+  def results_report_document(survey, markdown, charts: true)
     render_to_string(
       template: "results_reports/document",
       formats:  [ :html ],
@@ -80,8 +83,20 @@ module GeneratesResultsReport
       locals:   {
         survey:       survey,
         body_html:    results_report_body_html(markdown),
-        generated_at: Time.current
+        generated_at: Time.current,
+        charts:       charts,
+        aggregated:   report_figures_for(survey)
       }
+    )
+  end
+
+  # The per-question tallies the report's figures draw. Completed responses
+  # only, matching the set the narrative was generated from — a report whose
+  # charts and prose counted different people would be worse than no charts.
+  def report_figures_for(survey)
+    aggregate_results(
+      Array(survey.cards),
+      survey.responses.where(status: "completed").order(created_at: :desc)
     )
   end
 

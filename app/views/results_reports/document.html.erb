@@ -16,6 +16,35 @@
     li { margin: 0 0 5px; }
     strong { color: #111827; }
     .doc-foot { margin-top: 28px; border-top: 1px solid #e5e7eb; padding-top: 10px; color: #9ca3af; font-size: 9pt; }
+
+    /* ── Figures ──────────────────────────────────────────────────────────
+       One series per chart, so one bar colour (#2a78d6, validated >= 3:1 on
+       this white page). Thin marks, values outside the bar end because a PDF
+       has no hover layer, and spacing instead of borders between bars. */
+    .fig-stats { display: table; width: 100%; margin: 4px 0 20px; border-spacing: 0; }
+    .fig-stat { display: table-cell; width: 25%; padding: 10px 12px 10px 0; vertical-align: top; }
+    /* Proportional figures, not tabular-nums: equal-width digits read loose at
+       display size. Same sans as the body — a serif here is decoration. */
+    .fig-stat-value { font-size: 24pt; font-weight: 700; color: #1c2034; line-height: 1.05; }
+    .fig-stat-label { font-size: 9pt; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .fig-block { margin: 0 0 18px; page-break-inside: avoid; }
+    .fig-q { font-size: 11.5pt; font-weight: 700; margin: 0 0 1px; }
+    .fig-q-meta { font-size: 9pt; color: #9ca3af; margin: 0 0 7px; }
+
+    .fig-chart { width: 100%; border-collapse: separate; border-spacing: 0 2px; }
+    .fig-chart-label { width: 30%; font-size: 10pt; color: #374151; padding-right: 10px; vertical-align: middle; }
+    .fig-chart-track { width: 55%; vertical-align: middle; }
+    .fig-bar { height: 13px; background: #2a78d6; border-radius: 0 3px 3px 0; }
+    .fig-chart-value { width: 15%; font-size: 9.5pt; color: #6b7280; text-align: right;
+                       white-space: nowrap; vertical-align: middle; font-variant-numeric: tabular-nums; }
+
+    .fig-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+    .fig-table th { text-align: left; color: #6b7280; font-size: 9pt; text-transform: uppercase;
+                    letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb; padding: 4px 8px 4px 0; }
+    .fig-table td { padding: 4px 8px 4px 0; border-bottom: 1px solid #f3f4f6; }
+    .fig-num { text-align: right; font-variant-numeric: tabular-nums; }
+    .fig-note { font-size: 9pt; color: #9ca3af; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -25,6 +54,13 @@
       <div class="doc-meta">Generated <%= generated_at.strftime("%B %-d, %Y") %> · Playverto AI</div>
     </div>
 
+    <%# Numbers first, then the narrative — a reader can check the prose
+        against the data rather than taking it on trust. %>
+    <%= render "results_reports/figures",
+          stats: ReportChartRows.summary_stats(survey),
+          aggregated: aggregated, charts: charts %>
+
+    <h2>Analysis</h2>
     <%= body_html %>
 
     <div class="doc-foot">

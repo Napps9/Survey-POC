@@ -19,7 +19,10 @@ class GoogleDriveExportsController < ApplicationController
     result   = GoogleDriveWriter.call(
       user:  Current.user,
       title: doc_title(survey),
-      html:  results_report_document(survey, markdown)
+      # Tables rather than bar charts: Drive's HTML-to-Doc conversion
+      # doesn't carry div-width bars, so the Doc gets the same numbers
+      # in a form it can actually render.
+      html:  results_report_document(survey, markdown, charts: false)
     )
 
     render json: { ok: true, url: result.url }

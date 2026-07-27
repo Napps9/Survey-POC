@@ -1,0 +1,93 @@
+<%# Summary statistics and per-question charts for the results report.
+
+    Design notes, since a PDF is a medium with real constraints:
+
+    - The bars are a SINGLE series — every bar answers the same question ("how
+      many chose this"), so they share one colour. Eight categorical hues here
+      would imply eight different things are being measured. One hue, no legend;
+      the question above the bars names the series.
+    - Values sit OUTSIDE the bar end. A PDF has no hover layer, so every bar has
+      to carry its own number — and a label inside a short bar clips.
+    - Bars are thin with a 2px surface gap and no borders between them; a border
+      around a mark is chrome standing in for spacing.
+    - A question with fewer than two answer categories renders as a figure, not
+      a one-bar chart.
+    - `charts:` is false for the Google Doc export, which converts HTML through
+      Drive and would mangle div-width bars — it gets the same numbers as a
+      table instead. %>
+
+<section class="fig-stats">
+  <div class="fig-stat">
+    <div class="fig-stat-value"><%= stats[:responders] %></div>
+    <div class="fig-stat-label">responses</div>
+  </div>
+  <div class="fig-stat">
+    <div class="fig-stat-value"><%= stats[:completed] %></div>
+    <div class="fig-stat-label">completed</div>
+  </div>
+  <div class="fig-stat">
+    <div class="fig-stat-value"><%= stats[:completion] %>%</div>
+    <div class="fig-stat-label">completion rate</div>
+  </div>
+  <div class="fig-stat">
+    <div class="fig-stat-value"><%= stats[:questions] %></div>
+    <div class="fig-stat-label">questions</div>
+  </div>
+</section>
+
+<% drawable = aggregated.select { |r| ReportChartRows.chartable?(r) } %>
+<% if drawable.any? %>
+  <h2>Question breakdown</h2>
+
+  <% drawable.each_with_index do |result, i| %>
+    <% rows = ReportChartRows.rows_for(result) %>
+    <%# Scale against the largest bar, computed rather than assumed to be first:
+        a range or NPS chart stays in scale order, not size order. %>
+    <% peak = [ rows.map(&:count).max, 1 ].max %>
+    <div class="fig-block">
+      <div class="fig-q"><%= i + 1 %>. <%= result[:card]["text"].presence || result[:card]["title"] %></div>
+      <div class="fig-q-meta"><%= result[:total] %> answer<%= result[:total] == 1 ? "" : "s" %></div>
+
+      <% if charts %>
+        <table class="fig-chart">
+          <% rows.each do |row| %>
+            <tr>
+              <td class="fig-chart-label"><%= row.label %></td>
+              <td class="fig-chart-track">
+                <%# Width as a percentage of the largest bar, so short bars stay
+                    visible rather than collapsing to a sliver. %>
+                <%# A zero stays empty; anything else keeps a 2% floor so a
+                    small-but-real value doesn't vanish into a hairline. %>
+                <div class="fig-bar" style="width:<%= row.count.zero? ? 0 : [ (row.count * 100.0 / peak).round, 2 ].max %>%;"></div>
+              </td>
+              <td class="fig-chart-value"><%= row.count %> · <%= row.pct %>%</td>
+            </tr>
+          <% end %>
+        </table>
+      <% else %>
+        <table class="fig-table">
+          <tr><th>Answer</th><th>Count</th><th>Share</th></tr>
+          <% rows.each do |row| %>
+            <tr>
+              <td><%= row.label %></td>
+              <td class="fig-num"><%= row.count %></td>
+              <td class="fig-num"><%= row.pct %>%</td>
+            </tr>
+          <% end %>
+        </table>
+      <% end %>
+
+      <% if ReportChartRows.truncated?(result) %>
+        <div class="fig-note">
+          <%# tap_card drops whole statements, not individual answers, so the
+              note has to say which — "top 12 answers" would be wrong there. %>
+          <% if result[:type].to_s == "tap_card" %>
+            Showing the first <%= ReportChartRows::MAX_ROWS / 3 %> statements — the rest are in the CSV export.
+          <% else %>
+            Showing the top <%= ReportChartRows::MAX_ROWS %> answers — the full list is in the CSV export.
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

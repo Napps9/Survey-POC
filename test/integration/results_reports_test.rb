@@ -48,6 +48,38 @@ class ResultsReportsTest < ActionDispatch::IntegrationTest
     assert_equal "%PDF", response.body[0, 4]
   end
 
+  test "the report document carries summary statistics and charts" do
+    @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed",
+                              answers: { "0" => { "value" => "Yes" } })
+    @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed",
+                              answers: { "0" => { "value" => "No" } })
+
+    # The job is the real production caller — it includes the concern properly
+    # and lends it a renderer, so this exercises the path the PDF actually takes.
+    html = RenderReportPdfJob.new.send(:results_report_document, @survey, "## Findings\n\nText.")
+
+    assert_includes html, "completion rate", "the report should carry summary statistics"
+    assert_includes html, "Question breakdown"
+    assert_includes html, 'class="fig-bar"', "the report should carry charts, not just prose"
+    assert_includes html, "Analysis", "the AI narrative is still there, below the numbers"
+  end
+
+  test "the Google Doc export gets tables instead of bar charts" do
+    # Drive's HTML-to-Doc conversion doesn't carry div-width bars, so that
+    # export takes the same figures in a form it can render.
+    @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed",
+                              answers: { "0" => { "value" => "Yes" } })
+    @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed",
+                              answers: { "0" => { "value" => "No" } })
+
+    html = RenderReportPdfJob.new.send(:results_report_document, @survey, "## Findings", charts: false)
+
+    assert_includes html, "completion rate"
+    # Match rendered markup, not the stylesheet — the CSS ships either way.
+    assert_not_includes html, 'class="fig-bar"'
+    assert_includes html, 'class="fig-table"'
+  end
+
   test "the results page offers the PDF button wired to the render endpoint" do
     # The page renders a share link, so it needs a published Verto.
     @survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
