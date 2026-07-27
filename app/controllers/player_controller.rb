@@ -25,6 +25,28 @@ class PlayerController < ApplicationController
   rate_limit to: 30, within: 1.minute, only: :location_search,
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
 
+  # Respondents don't pick their browser the way a creator does — they open a
+  # link on whatever phone they already own, often an older Android or an iPhone
+  # that stopped getting iOS updates. ApplicationController's
+  # `allow_browser versions: :modern` (Safari 17.2+, Chrome 120+, Firefox 121+)
+  # is a fair bar for the creator studio, but applying it here served a stock
+  # "browser not supported" 406 instead of the Verto — which reads to the
+  # respondent, and to the creator chasing a low response rate, as a dead link.
+  #
+  # The floor below is what the player ACTUALLY needs: import-map support. Below
+  # that no player JS loads at all and the page is inert, so blocking is honest.
+  # Above it, everything else only degrades — a Chrome 89-110 respondent misses
+  # some color-mix()/@property styling and still answers every question, which
+  # beats being turned away. Gate on what breaks the page, not on what makes it
+  # prettiest.
+  #
+  # Rails registers allow_browser as an anonymous before_action lambda, so there
+  # is no callback name to skip_before_action; overriding the private method that
+  # lambda calls is how you re-point it at a different version set.
+  PLAYER_BROWSER_VERSIONS = {
+    safari: 16.4, chrome: 89, firefox: 108, opera: 76, ie: false
+  }.freeze
+
   before_action :load_survey_and_share
 
   def show
@@ -304,6 +326,13 @@ class PlayerController < ApplicationController
   end
 
   private
+
+  # Swap the inherited :modern version set for the player's own (see
+  # PLAYER_BROWSER_VERSIONS). Keeps the caller's `block` so a browser that really
+  # is too old still gets the standard 406 page rather than a broken screen.
+  def allow_browser(versions:, block:)
+    super(versions: PLAYER_BROWSER_VERSIONS, block: block)
+  end
 
   # Finds (or starts) this session's response row and attaches it to the
   # current survey/share — the shared first step of every write action.

@@ -4,8 +4,9 @@ require "test_helper"
 # never moved by a refresh or a replayed offline submit, and surfaced in the
 # export so a researcher can actually use them.
 class ResponseMetadataTest < ActionDispatch::IntegrationTest
-  # Full, realistic UA strings: ApplicationController runs Rails' `allow_browser
-  # versions: :modern` gate, which 406s anything it can't read a version out of.
+  # Full, realistic UA strings, so the browser gate reads a real version out of
+  # them (see PlayerController::PLAYER_BROWSER_VERSIONS) and these exercise the
+  # metadata path rather than the 406.
   IPHONE  = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 " \
             "(KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1".freeze
   DESKTOP = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " \
