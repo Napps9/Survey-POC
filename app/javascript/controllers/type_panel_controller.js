@@ -588,8 +588,7 @@ export default class extends Controller {
     "whyCardName", "whyEmpty", "whyBody", "whyNote", "whyFramework",
     "whyCompetencyRow", "whyCompetencyBadge", "whyCompetencyBlurb",
     "whyOutcomeRow", "whyOutcome",
-    "whyConditionRow", "whyConditionBadge", "whyConditionBlurb",
-    "panelDeleteBtn"
+    "whyConditionRow", "whyConditionBadge", "whyConditionBlurb"
   ]
 
   static values = { quiz: Boolean, tokenisation: Boolean, logic: Boolean, defaultLocale: { type: String, default: "en" } }
@@ -717,8 +716,6 @@ export default class extends Controller {
     this.cardEditorTarget.style.display = "flex"
     this.typeListTarget.style.display    = "flex"
     this.panelFooterTarget.style.display = "flex"
-    // The welcome card can't be deleted (mirrors the feed's own chrome row).
-    if (this.hasPanelDeleteBtnTarget) this.panelDeleteBtnTarget.hidden = cardType === "welcome_card"
 
     this._renderCompatibleTypes(cardType)
     this._updateFeatureSlotsFor(card, cardType)

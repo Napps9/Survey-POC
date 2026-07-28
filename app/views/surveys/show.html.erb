@@ -407,6 +407,8 @@
           feature on AND the selected card is a question (see selectCard). ── %>
       <div class="panel-island" style="display:none;flex:0 1 auto;min-height:0;flex-direction:column;" data-type-panel-target="cardEditor">
 
+        <%# The card's ONE delete CTA lives on its feed chrome row
+            (card_row.html.erb) — no mirrored button here. %>
         <div style="display:flex;align-items:center;gap:8px;margin:0 16px 12px;">
           <button type="button" class="card-light panel-card-light" hidden
                   style="margin:0;align-self:center;"
@@ -415,20 +417,6 @@
             <span class="rule-dot"></span>
             <span class="card-light-word" data-role="card-light-word"></span>
             <span class="card-light-score" data-role="card-light-score"></span>
-          </button>
-
-          <%# Mirrors the feed's own per-card delete button (card_row.html.erb) so
-              it's reachable from the Answer type panel too, whichever sub-tab is
-              open — deleteCard falls back to the selected card when this button
-              isn't nested inside one. Hidden for the welcome card, same as the feed. %>
-          <button type="button" class="card-delete-btn" hidden style="margin-left:auto;"
-                  data-type-panel-target="panelDeleteBtn"
-                  title="<%= t('editor.delete_card_title', default: 'Delete this question card') %>"
-                  data-action="click->type-panel#deleteCard">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
-              <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a1 1 0 01-1 1H7a1 1 0 01-1-1V6h12z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span><%= t("editor.delete_card", default: "Delete card") %></span>
           </button>
         </div>
 
