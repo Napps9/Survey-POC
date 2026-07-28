@@ -154,7 +154,7 @@
               class list (text-xs + a colour), so the pill styling lives on
               the wrapper and persistent text styling inline. %>
           <span class="editor-save-pill">
-            <span class="text-xs text-aquamarine" data-survey-editor-target="status"
+            <span class="text-xs text-aquamarine" role="status" data-survey-editor-target="status"
                   style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
           </span>
         </div>
@@ -181,6 +181,7 @@
                  [ "mobile",  "▯",  t("editor.device_mobile",  default: "Mobile")  ]
                ].each do |device, icon, label| %>
               <button type="button" class="device-toggle-btn<%= ' is-active' if device == 'desktop' %>"
+                      aria-pressed="<%= (device == 'desktop').to_s %>"
                       data-device-frame-target="btn" data-device="<%= device %>"
                       data-action="click->device-frame#set" title="<%= label %>" aria-label="<%= label %>">
                 <span aria-hidden="true"><%= icon %></span>
@@ -257,6 +258,8 @@
                   <div class="q-title"><%= t("player.consent_title") %></div>
                 </div>
                 <div class="play-consent-body gate-editable" contenteditable="true"
+                     role="textbox" aria-multiline="true"
+                     aria-label="<%= t("editor.consent_gate", default: "Consent gate") %>"
                      data-gate-cards-target="consentBody"
                      data-default-text="<%= t("editor.consent_default") %>"
                      data-action="input->gate-cards#queueConsentSave:stop"><%= @survey.consent_text %></div>
@@ -305,10 +308,14 @@
           <div class="preview-thankyou-card gate-ty-card">
             <div class="preview-thankyou-emoji">🎉</div>
             <div class="preview-thankyou-title gate-editable" contenteditable="true"
+                 role="textbox"
+                 aria-label="<%= t("editor.ty_title_label", default: "Thank-you title") %>"
                  data-gate-cards-target="tyTitle"
                  data-default-text="<%= t("player.thank_you_title") %>"
                  data-action="input->gate-cards#queueThankyouSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.thankyou_title_text %></div>
             <div class="preview-thankyou-sub gate-editable" contenteditable="true"
+                 role="textbox" aria-multiline="true"
+                 aria-label="<%= t("editor.ty_body_label", default: "Thank-you message") %>"
                  data-gate-cards-target="tyBody"
                  data-default-text="<%= t("player.thank_you_from", org: @survey.organisation.name) %>"
                  data-action="input->gate-cards#queueThankyouSave:stop"><%= @survey.thankyou_body_text %></div>
@@ -365,14 +372,16 @@
         feature is on. The publish-panel controller hides this strip while the
         Publish/Design overlays are open. %>
     <div class="right-tabs" data-publish-panel-target="tabs">
-      <button type="button" class="right-tab right-tab-folder right-tab--types is-active" data-publish-panel-target="typeTab"
+      <div class="right-tabs-set" role="tablist">
+      <button type="button" class="right-tab right-tab-folder right-tab--types is-active" role="tab" aria-selected="true" aria-controls="panel-view-types" data-publish-panel-target="typeTab"
               data-action="click->publish-panel#showType"><%= t("editor.answer_type") %></button>
-      <button type="button" class="right-tab right-tab-folder right-tab--quiz" data-publish-panel-target="quizTab"
+      <button type="button" class="right-tab right-tab-folder right-tab--quiz" role="tab" aria-selected="false" aria-controls="panel-view-quiz" data-publish-panel-target="quizTab"
               data-action="click->publish-panel#showQuizTab"><%= t("editor.tab_quiz", default: "Quiz mode") %></button>
-      <button type="button" class="right-tab right-tab-folder right-tab--tokens" data-publish-panel-target="tokensTab"
+      <button type="button" class="right-tab right-tab-folder right-tab--tokens" role="tab" aria-selected="false" aria-controls="panel-view-tokens" data-publish-panel-target="tokensTab"
               data-action="click->publish-panel#showTokensTab"><%= t("editor.tab_tokens", default: "Tokenisation") %></button>
-      <button type="button" class="right-tab right-tab-folder right-tab--logic" data-publish-panel-target="branchTab"
+      <button type="button" class="right-tab right-tab-folder right-tab--logic" role="tab" aria-selected="false" aria-controls="panel-view-logic" data-publish-panel-target="branchTab"
               data-action="click->publish-panel#showBranch"><%= t("editor.tab_logic", default: "Logic & flows") %></button>
+      </div><%# /tablist %>
       <%# The Why view has no tab (each card carries a round ? CTA under its
           type badge — see _card_row) and the Verto score lives in the
           top-left chrome, opening a modal. %>
@@ -381,14 +390,14 @@
               data-action="click->editor-panel#close">✕</button>
     </div>
 
-    <div class="type-panel panel--types panel-paper" data-publish-panel-target="typeView"
+    <div class="type-panel panel--types panel-paper" id="panel-view-types" role="tabpanel" data-publish-panel-target="typeView"
          data-controller="type-info" data-action="keydown.esc@window->type-info#closeOnEsc">
 
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
           <%= t("editor.answer_type") %>
         </div>
-        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF1E6F;line-height:1.3;min-height:18px;"
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF5C93;line-height:1.3;min-height:18px;"
              data-type-panel-target="panelCardName"><%= t("editor.select_card") %></div>
         <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;"
              data-type-panel-target="panelHint"><%= t("editor.click_any") %></div>
@@ -534,7 +543,7 @@
     <%# ── Quiz mode tab — the Verto-wide toggle comes first (moved out of the
         Publish panel); once on, the selected question card's correct-answer
         block (relocated by type_panel_controller) appears below it. ── %>
-    <div class="type-panel panel--quiz panel-paper hidden" data-publish-panel-target="quizView">
+    <div class="type-panel panel--quiz panel-paper hidden" id="panel-view-quiz" role="tabpanel" data-publish-panel-target="quizView">
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#FFCC00;margin-bottom:5px;">
           <%= t("editor.tab_quiz", default: "Quiz mode") %>
@@ -551,7 +560,7 @@
               <span>Score answers as right or wrong and show players their score. Each question card gains a “correct answer” control.</span>
             </label>
             <% if @survey.quiz? %>
-              <div style="margin-top:8px;padding-left:24px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);line-height:1.45;">
+              <div style="margin-top:8px;padding-left:24px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;">
                 <%= @survey.quiz_question_count %> of <%= total_q %> questions graded — mark the correct answer on each card.
               </div>
             <% end %>
@@ -575,7 +584,7 @@
     <%# ── Tokenisation tab — Verto-wide setup first: the toggle plus the token
         types manager (icons + names, moved out of the Publish panel); once on,
         the selected card's token-award block appears below. ── %>
-    <div class="type-panel panel--tokens panel-paper hidden" data-publish-panel-target="tokensView">
+    <div class="type-panel panel--tokens panel-paper hidden" id="panel-view-tokens" role="tabpanel" data-publish-panel-target="tokensView">
       <div class="type-panel-top" data-controller="token-types">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#01EACB;margin-bottom:5px;">
           <%= t("editor.tab_tokens", default: "Tokenisation") %>
@@ -596,7 +605,7 @@
 
             <% if @survey.tokenisation_enabled? %>
               <div style="margin-top:10px;">
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:6px;">
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin-bottom:6px;">
                   <%= @survey.token_awarding_count %> of <%= total_q %> cards award points — set amounts on each card.
                 </div>
 
@@ -604,9 +613,9 @@
                   <% @survey.token_types.each do |tt| %>
                     <div class="token-type-row" data-token-types-target="row" data-token-id="<%= tt['id'] %>"
                          style="display:flex;gap:6px;align-items:center;">
-                      <input type="text" data-token-types-target="icon" maxlength="8" value="<%= tt['icon'] %>"
+                      <input type="text" aria-label="Token icon" data-token-types-target="icon" maxlength="8" value="<%= tt['icon'] %>"
                              style="width:40px;text-align:center;padding:7px 4px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size: var(--text-md);outline:none;" />
-                      <input type="text" data-token-types-target="name" maxlength="40" value="<%= tt['name'] %>"
+                      <input type="text" aria-label="Token name" data-token-types-target="name" maxlength="40" value="<%= tt['name'] %>"
                              placeholder="e.g. Gold Coins"
                              style="flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
                       <button type="button" data-action="click->token-types#removeRow"
@@ -654,7 +663,7 @@
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
           <%= t("editor.why", default: "Why") %>
         </div>
-        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF1E6F;line-height:1.3;min-height:18px;"
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF5C93;line-height:1.3;min-height:18px;"
              data-type-panel-target="whyCardName"><%= t("editor.select_card") %></div>
         <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;">
           <%= t("editor.why_intro", default: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you.") %>
@@ -704,7 +713,7 @@
         authored inside the card (shared/logic_branch_block) and relocated here
         for the selected card by type_panel_controller#selectCard; the card
         itself shows nothing about routing. Only present when logic is on. ── %>
-    <div class="type-panel panel--logic panel-paper hidden" data-publish-panel-target="branchView">
+    <div class="type-panel panel--logic panel-paper hidden" id="panel-view-logic" role="tabpanel" data-publish-panel-target="branchView">
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#0CA7FF;margin-bottom:5px;">
           <%= t("editor.tab_logic", default: "Logic & flows") %>
@@ -728,7 +737,7 @@
           <% end %>
         </div>
         <% if @survey.logic? %>
-          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF1E6F;line-height:1.3;min-height:18px;margin-top:10px;"
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF5C93;line-height:1.3;min-height:18px;margin-top:10px;"
                data-type-panel-target="branchCardName"><%= t("editor.select_card") %></div>
           <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;">
             Choose where each answer leads. Any answer left on “Continue” follows the normal card order.
@@ -830,7 +839,7 @@
               <%= link_to "View Results →", survey_results_path(@survey),
                     style: "flex:1;text-align:center;padding:8px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
             </div>
-            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;">
               Anyone with this link can respond — no Play Verto account or sign-in required.
             </div>
 
@@ -847,7 +856,7 @@
                 </div>
               </div>
               <div style="min-width:0;">
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;">
                   Scan to open this Verto. Point a phone camera at it, or download
                   the code for posters and slides.
                 </div>
@@ -884,18 +893,18 @@
                         onclick="(navigator.clipboard?.writeText(document.getElementById('custom-url-<%= @survey.id %>').value) ?? Promise.reject()).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy custom link',2000)}).catch(()=>{this.textContent='Copy failed — select &amp; copy';setTimeout(()=>this.textContent='Copy custom link',2000)})"
                         style="width:100%;margin-top:8px;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy custom link</button>
               <% else %>
-                <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+                <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;">
                   Optional — set a memorable link alongside the one above. Both work.
                 </div>
               <% end %>
             </div>
           <% else %>
-            <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.6);margin-bottom:10px;">Draft — not yet published</div>
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.78);margin-bottom:10px;">Draft — not yet published</div>
             <%= button_to "Publish Verto →", publish_survey_path(@survey),
                   method: :post,
                   style: "width:100%;padding:10px;border-radius:12px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;",
                   form: { style: "margin:0;", data: { turbo_confirm: t("editor.publish_confirm") } } %>
-            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;">
               Publishing gives you a public link to share. Respondents just open it and answer — no Play Verto account needed.
             </div>
           <% end %>
@@ -918,7 +927,7 @@
               <%# The promise shown on the welcome card — editable. Submitting on
                   change saves it alongside the toggle (same form). %>
               <div style="margin-top:10px;padding-left:24px;">
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Promise shown on the welcome card:</div>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin-bottom:5px;">Promise shown on the welcome card:</div>
                 <input type="text" name="compare_note" maxlength="160"
                        value="<%= @survey.compare_note_text %>"
                        onchange="this.form.requestSubmit()"

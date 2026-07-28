@@ -631,6 +631,8 @@ en:
   editor:
     all_saved: 'Saved'
     leave_editor: 'Leave editor'
+    ty_title_label: 'Thank-you title'
+    ty_body_label: 'Thank-you message'
     tab_quiz: 'Quiz mode'
     tab_tokens: 'Tokenisation'
     tab_logic: 'Logic & flows'

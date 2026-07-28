@@ -11,6 +11,10 @@ export default class extends Controller {
     const device = e.currentTarget.dataset.device || "desktop"
     this.feedTarget.classList.remove("device-desktop", "device-tablet", "device-mobile")
     this.feedTarget.classList.add(`device-${device}`)
-    this.btnTargets.forEach(b => b.classList.toggle("is-active", b.dataset.device === device))
+    this.btnTargets.forEach(b => {
+      const active = b.dataset.device === device
+      b.classList.toggle("is-active", active)
+      b.setAttribute("aria-pressed", active)
+    })
   }
 }

@@ -629,6 +629,8 @@ he:
   editor:
     all_saved: 'נשמר'
     leave_editor: 'יציאה מהעורך'
+    ty_title_label: 'כותרת התודה'
+    ty_body_label: 'הודעת התודה'
     tab_quiz: 'מצב חידון'
     tab_tokens: 'טוקניזציה'
     tab_logic: 'לוגיקה וזרימות'

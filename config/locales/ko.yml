@@ -629,6 +629,8 @@ ko:
   editor:
     all_saved: '저장됨'
     leave_editor: '편집기 나가기'
+    ty_title_label: '감사 제목'
+    ty_body_label: '감사 메시지'
     tab_quiz: '퀴즈 모드'
     tab_tokens: '토큰화'
     tab_logic: '로직과 흐름'

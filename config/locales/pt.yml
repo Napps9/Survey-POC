@@ -629,6 +629,8 @@ pt:
   editor:
     all_saved: 'Guardado'
     leave_editor: 'Sair do editor'
+    ty_title_label: 'Título de agradecimento'
+    ty_body_label: 'Mensagem de agradecimento'
     tab_quiz: 'Modo de quiz'
     tab_tokens: 'Tokenização'
     tab_logic: 'Lógica e fluxos'

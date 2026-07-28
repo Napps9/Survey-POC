@@ -1032,8 +1032,8 @@
    insert chrome, so (like the old panel fields) they survive on live Vertos
    where the per-card insert rows are hidden. Same centred layout. */
 .gate-cta-row { display: flex; justify-content: center; }
-.gate-badge-consent { background: #FFC24B; color: #4A3200; }
-.gate-badge-ty { background: #FF1E6F; }
+.s-badge.gate-badge-consent { background: #FFC24B; color: #4A3200; }
+.s-badge.gate-badge-ty { background: #DB0E58; }
 .gate-ty-card { margin-inline: auto; }
 .gate-editable { outline: none; border-radius: 6px; cursor: text; transition: box-shadow 0.15s; }
 .gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,234,203,0.3); }
@@ -2359,11 +2359,11 @@
   letter-spacing: 0.1em; text-transform: uppercase;
   padding: 3px 9px; border-radius: 100px; color: #fff;
 }
-.sb-welcome  { background: #01EACB; }
+.sb-welcome  { background: #01EACB; color: #04221E; }
 .sb-range    { background: #4D588A; }
 .sb-choice   { background: #615BF5; }
-.sb-text     { background: #FF1E6F; }
-.sb-swipe    { background: #0CA7FF; }
+.sb-text     { background: #DB0E58; }
+.sb-swipe    { background: #0CA7FF; color: #03253A; }
 .sb-rank     { background: #615BF5; }
 .sb-activity { background: #2a5b4a; }
 .sb-audio    { background: #8b5a2a; }
@@ -2549,7 +2549,7 @@
 .score-section-head .rule-dot { width: 10px; height: 10px; }
 .score-count {
   margin-left: auto; font-family: "Alata", sans-serif; font-size: 11px;
-  color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06);
   border-radius: 100px; padding: 1px 9px;
 }
 .score-rows { display: flex; flex-direction: column; gap: 7px; }
@@ -2571,7 +2571,7 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 }
 .score-empty {
   font-family: "ABeeZee", sans-serif; font-size: 12px;
-  color: rgba(255,255,255,0.32); padding: 2px 2px 4px;
+  color: rgba(255,255,255,0.62); padding: 2px 2px 4px;
 }
 
 /* A flagged card row in the score board: the clickable jump area plus an
@@ -2691,6 +2691,7 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
      all four folder tabs on the one row that touches the panel */
   padding-inline: 12px 46px;
 }
+.right-tabs-set { display: flex; gap: 3px; align-items: flex-end; }
 .right-tabs .right-tab-close {
   position: absolute; inset-inline-end: 8px; bottom: 5px;
   background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
@@ -2740,6 +2741,7 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   box-shadow: none;
   background: var(--tab-color, #2A2D3A);
   border-color: var(--panel-edge, rgba(255,255,255,0.09));
+  color: var(--tab-ink, #fff); /* beats .right-tab.is-active's white — AA on every fill */
   padding-top: 9px;
   margin-bottom: -1px; position: relative; z-index: 1;
 }
@@ -2747,10 +2749,10 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 /* The brand colours (tab fill + darker folder edge). Tab text uses per-colour
    inks that clear WCAG AA on the solid fills: dark ink on yellow/teal/blue,
    white on navy. */
-.right-tab--types  { --tab-color: #4D588A; --panel-edge: #39426B; color: #fff; }
-.right-tab--quiz   { --tab-color: #FFCC00; --panel-edge: #B99400; color: #3A2A00; }
-.right-tab--tokens { --tab-color: #01EACB; --panel-edge: #01AD97; color: #04221E; }
-.right-tab--logic  { --tab-color: #0CA7FF; --panel-edge: #0880C7; color: #03253A; }
+.right-tab--types  { --tab-color: #4D588A; --panel-edge: #39426B; --tab-ink: #fff; color: var(--tab-ink); }
+.right-tab--quiz   { --tab-color: #FFCC00; --panel-edge: #B99400; --tab-ink: #3A2A00; color: var(--tab-ink); }
+.right-tab--tokens { --tab-color: #01EACB; --panel-edge: #01AD97; --tab-ink: #04221E; color: var(--tab-ink); }
+.right-tab--logic  { --tab-color: #0CA7FF; --panel-edge: #0880C7; --tab-ink: #03253A; color: var(--tab-ink); }
 
 /* The folder paper — each view body is the SOLID tab colour (Why purple for
    its ? CTA; Publish/Design keep navy). Content sits in dark islands (below)
@@ -3124,7 +3126,7 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.72);
   margin-bottom: 8px;
 }
 /* Each publish-block is a <details> so the panel opens short — only Status
@@ -3553,8 +3555,8 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .play-consent-decline {
   padding: 11px 22px; border-radius: 100px; cursor: pointer;
-  background: transparent; color: rgba(28,32,52,0.55);
-  border: 1px solid rgba(28,32,52,0.2);
+  background: transparent; color: rgba(28,32,52,0.75);
+  border: 1px solid rgba(28,32,52,0.4);
   font-family: "ABeeZee", sans-serif; font-size: 13px;
 }
 .play-consent-declined {
@@ -5014,10 +5016,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
   display: inline-flex; align-items: center; gap: 7px;
   padding: 6px 14px; border-radius: 100px;
   background: #341A27; border: 1.5px solid #FF1E6F; /* opaque, not see-through */
-  color: #FF1E6F; font-family: "ABeeZee", sans-serif; font-size: 12.5px;
+  color: #FF5C93; font-family: "ABeeZee", sans-serif; font-size: 12.5px;
   letter-spacing: 0.02em; cursor: pointer; transition: all 0.15s;
 }
 .card-delete-btn:hover { background: #FF1E6F; border-color: #FF1E6F; color: #fff; box-shadow: 0 2px 12px rgba(255,30,111,0.45); }
+.card-delete-btn:focus-visible { outline: 2px solid #FF5C93; outline-offset: 2px; }
 
 /* ── Device preview toggle ── */
 .device-toggle {
@@ -5685,3 +5688,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
   color: rgba(255,255,255,0.6); font-variant-numeric: tabular-nums;
 }
 .pf-suppressed { color: rgba(255,255,255,0.2); }
+
+/* Respect prefers-reduced-motion in the editor: no smooth scroll gliding or
+   panel-slide animation (scroll snapping itself still positions instantly). */
+@media (prefers-reduced-motion: reduce) {
+  .editor-feed { scroll-behavior: auto; }
+  .editor-grid { transition: none; }
+  .right-tab-folder, .editor-leave-btn, .editor-score-cta { transition: none; }
+}

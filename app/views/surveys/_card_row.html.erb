@@ -57,7 +57,7 @@
               aria-label="<%= t('editor.why', default: 'Why') %>"
               data-action="click->publish-panel#showWhy">?</button>
     </div>
-    <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:3px;" data-role="card-number">Card <%= idx + 1 %></span>
+    <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.88);text-shadow:0 1px 4px rgba(0,0,0,0.7);margin-top:3px;" data-role="card-number">Card <%= idx + 1 %></span>
     <% unless type == "welcome_card" %>
       <% if is_q %>
         <button type="button" class="card-light" data-role="card-light" hidden

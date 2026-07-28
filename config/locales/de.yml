@@ -629,6 +629,8 @@ de:
   editor:
     all_saved: 'Gespeichert'
     leave_editor: 'Editor verlassen'
+    ty_title_label: 'Titel der Dankeschön-Seite'
+    ty_body_label: 'Nachricht der Dankeschön-Seite'
     tab_quiz: 'Quizmodus'
     tab_tokens: 'Tokenisierung'
     tab_logic: 'Logik & Abläufe'

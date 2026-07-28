@@ -629,6 +629,8 @@ fr:
   editor:
     all_saved: 'Enregistré'
     leave_editor: 'Quitter l''éditeur'
+    ty_title_label: 'Titre de remerciement'
+    ty_body_label: 'Message de remerciement'
     tab_quiz: 'Mode quiz'
     tab_tokens: 'Tokenisation'
     tab_logic: 'Logique et parcours'

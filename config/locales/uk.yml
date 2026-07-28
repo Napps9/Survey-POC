@@ -631,6 +631,8 @@ uk:
   editor:
     all_saved: 'Збережено'
     leave_editor: 'Вийти з редактора'
+    ty_title_label: 'Заголовок подяки'
+    ty_body_label: 'Повідомлення подяки'
     tab_quiz: 'Режим вікторини'
     tab_tokens: 'Токенізація'
     tab_logic: 'Логіка та потоки'

@@ -631,6 +631,8 @@ pl:
   editor:
     all_saved: 'Zapisano'
     leave_editor: 'Opuść edytor'
+    ty_title_label: 'Tytuł podziękowania'
+    ty_body_label: 'Wiadomość podziękowania'
     tab_quiz: 'Tryb quizu'
     tab_tokens: 'Tokenizacja'
     tab_logic: 'Logika i przepływy'

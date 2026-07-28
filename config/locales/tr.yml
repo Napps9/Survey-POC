@@ -629,6 +629,8 @@ tr:
   editor:
     all_saved: 'Kaydedildi'
     leave_editor: 'Editörden çık'
+    ty_title_label: 'Teşekkür başlığı'
+    ty_body_label: 'Teşekkür mesajı'
     tab_quiz: 'Sınav modu'
     tab_tokens: 'Jetonlaştırma'
     tab_logic: 'Mantık ve akışlar'

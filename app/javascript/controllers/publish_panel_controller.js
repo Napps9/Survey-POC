@@ -81,10 +81,17 @@ export default class extends Controller {
     // logic / why); the Publish/Design overlays take over the column.
     const tabbed = ["typeView", "whyView", "branchView", "quizView", "tokensView"].includes(which)
     if (this.hasTabsTarget) this.tabsTarget.classList.toggle("hidden", !tabbed)
-    if (this.hasTypeTabTarget)   this.typeTabTarget.classList.toggle("is-active", which === "typeView")
-    if (this.hasWhyTabTarget)    this.whyTabTarget.classList.toggle("is-active", which === "whyView")
-    if (this.hasBranchTabTarget) this.branchTabTarget.classList.toggle("is-active", which === "branchView")
-    if (this.hasQuizTabTarget)   this.quizTabTarget.classList.toggle("is-active", which === "quizView")
-    if (this.hasTokensTabTarget) this.tokensTabTarget.classList.toggle("is-active", which === "tokensView")
+    const setTab = (has, el, view) => {
+      if (!has) return
+      const active = which === view
+      el.classList.toggle("is-active", active)
+      // Mirror the visual state for assistive tech (the tabs carry role=tab).
+      if (el.getAttribute("role") === "tab") el.setAttribute("aria-selected", active)
+    }
+    setTab(this.hasTypeTabTarget, this.hasTypeTabTarget && this.typeTabTarget, "typeView")
+    setTab(this.hasWhyTabTarget, this.hasWhyTabTarget && this.whyTabTarget, "whyView")
+    setTab(this.hasBranchTabTarget, this.hasBranchTabTarget && this.branchTabTarget, "branchView")
+    setTab(this.hasQuizTabTarget, this.hasQuizTabTarget && this.quizTabTarget, "quizView")
+    setTab(this.hasTokensTabTarget, this.hasTokensTabTarget && this.tokensTabTarget, "tokensView")
   }
 }

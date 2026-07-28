@@ -629,6 +629,8 @@ sw:
   editor:
     all_saved: 'Imehifadhiwa'
     leave_editor: 'Ondoka kwenye kihariri'
+    ty_title_label: 'Kichwa cha shukrani'
+    ty_body_label: 'Ujumbe wa shukrani'
     tab_quiz: 'Hali ya maswali'
     tab_tokens: 'Utoaji wa tokeni'
     tab_logic: 'Mantiki na mtiririko'

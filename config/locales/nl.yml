@@ -629,6 +629,8 @@ nl:
   editor:
     all_saved: 'Opgeslagen'
     leave_editor: 'Editor verlaten'
+    ty_title_label: 'Bedanktitel'
+    ty_body_label: 'Bedankbericht'
     tab_quiz: 'Quizmodus'
     tab_tokens: 'Tokenisatie'
     tab_logic: 'Logica & flows'

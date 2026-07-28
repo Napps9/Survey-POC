@@ -17,9 +17,9 @@ export default class extends Controller {
     row.dataset.tokenTypesTarget = "row"
     row.style.cssText = "display:flex;gap:6px;align-items:center;"
     row.innerHTML = `
-      <input type="text" data-token-types-target="icon" maxlength="8" value="⭐"
+      <input type="text" aria-label="Token icon" data-token-types-target="icon" maxlength="8" value="⭐"
              style="width:40px;text-align:center;padding:7px 4px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:16px;outline:none;" />
-      <input type="text" data-token-types-target="name" maxlength="40" placeholder="e.g. Gold Coins"
+      <input type="text" aria-label="Token name" data-token-types-target="name" maxlength="40" placeholder="e.g. Gold Coins"
              style="flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;" />
       <button type="button" data-action="click->token-types#removeRow"
               style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);cursor:pointer;">×</button>

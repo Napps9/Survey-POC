@@ -631,6 +631,8 @@ ru:
   editor:
     all_saved: 'Сохранено'
     leave_editor: 'Выйти из редактора'
+    ty_title_label: 'Заголовок благодарности'
+    ty_body_label: 'Сообщение благодарности'
     tab_quiz: 'Режим викторины'
     tab_tokens: 'Токенизация'
     tab_logic: 'Логика и потоки'
