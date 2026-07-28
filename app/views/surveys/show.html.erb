@@ -107,80 +107,6 @@
         </div>
       <% end %>
 
-      <%# Brief strip — also hosts the compact language switcher (right side) so
-          the cards keep full height. Switching swaps the cards' language in
-          place; structural edits stay locked to the primary language. %>
-      <div class="brief-strip">
-        <%# The global top nav is hidden in the editor (@hide_main_nav) — this
-            back CTA is the way out, with the autosave status right beside it
-            so creators can check nothing is lost before leaving. %>
-        <%= link_to root_path, class: "editor-leave-btn",
-              title: t("editor.leave_editor", default: "Leave editor"),
-              "aria-label": t("editor.leave_editor", default: "Leave editor") do %>
-          <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span class="editor-leave-label"><%= t("editor.leave_editor", default: "Leave editor") %></span>
-        <% end %>
-        <%# flash() in survey_editor_controller rewrites this span's class list
-            (text-xs + a colour), so persistent styling lives inline. %>
-        <span class="text-xs text-aquamarine" data-survey-editor-target="status"
-              style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
-        <span class="brief-strip-divider" aria-hidden="true"></span>
-        <span style="color:rgba(255,255,255,0.85);font-weight:600;"><%= @survey.theme %></span>
-        <span style="color:rgba(255,255,255,0.3);">·</span>
-        <span style="color:rgba(255,255,255,0.85);font-weight:600;"><%= @survey.audience_age %></span>
-        <span style="color:rgba(255,255,255,0.3);">·</span>
-        <span style="color:rgba(255,255,255,0.55);font-size: var(--text-base);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:340px;">
-          <%= @survey.key_insight %>
-        </span>
-        <div class="brief-q-count"><%= total_q %> <%= t("editor.questions") %></div>
-
-        <%# Device preview toggle — reframes the cards at phone / tablet width
-            so creators see (and still edit) the responsive layout. %>
-        <div class="device-toggle" role="group" aria-label="<%= t('editor.device_label', default: 'Preview size') %>">
-          <% [
-               [ "desktop", "🖥", t("editor.device_desktop", default: "Desktop") ],
-               [ "tablet",  "▭",  t("editor.device_tablet",  default: "Tablet")  ],
-               [ "mobile",  "▯",  t("editor.device_mobile",  default: "Mobile")  ]
-             ].each do |device, icon, label| %>
-            <button type="button" class="device-toggle-btn<%= ' is-active' if device == 'desktop' %>"
-                    data-device-frame-target="btn" data-device="<%= device %>"
-                    data-action="click->device-frame#set" title="<%= label %>" aria-label="<%= label %>">
-              <span aria-hidden="true"><%= icon %></span>
-            </button>
-          <% end %>
-        </div>
-
-        <% if @survey.multilingual? %>
-          <% cur = SupportedLocales.find(@survey.default_locale) %>
-          <div class="lang-dd" data-controller="locale-switcher">
-            <button type="button" class="lang-dd-btn"
-                    data-action="click->locale-switcher#toggle" aria-haspopup="true"
-                    aria-label="<%= t("locale_switcher.label") %>">
-              <span data-survey-editor-target="localeCode"><%= @survey.default_locale.upcase %></span>
-              <svg class="lang-switcher-caret" width="10" height="6" viewBox="0 0 10 6" fill="none">
-                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="lang-dd-popover" data-locale-switcher-target="popover" hidden>
-              <% @survey.verto_locales.each do |code| %>
-                <% loc = SupportedLocales.find(code) %>
-                <button type="button"
-                        class="lang-dd-item<%= ' is-active' if code == @survey.default_locale %>"
-                        data-survey-editor-target="tab"
-                        data-locale="<%= code %>" data-code="<%= code.upcase %>"
-                        data-action="click->survey-editor#switchLocale click->locale-switcher#close">
-                  <span class="lang-dd-item-name"><%= loc&.english_name %></span>
-                  <% if code == @survey.default_locale %><span class="lang-tab-primary"><%= t("editor.primary") %></span><% end %>
-                  <span class="lang-dd-item-tick">✓</span>
-                </button>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-      </div>
-
       <% live_locked = @survey.publish_token.present? %>
 
       <% if live_locked %>
@@ -195,15 +121,89 @@
         </div>
       <% end %>
 
+      <%# Feed wrapper — anchors the floating editor chrome (below the live
+          lock bar when one shows) while the feed scrolls underneath it. %>
+      <div class="flex-1 min-h-0 relative flex flex-col">
+
+      <%# Floating chrome — the brief strip is gone. What survives floats over
+          the feed: "Leave editor" + save status at the inline-start edge, the
+          device toggle (and language dropdown when multilingual) at the
+          inline-end edge. %>
+      <div class="editor-float-bar">
+        <div class="editor-float-group">
+          <%= link_to root_path, class: "editor-leave-btn",
+                title: t("editor.leave_editor", default: "Leave editor"),
+                "aria-label": t("editor.leave_editor", default: "Leave editor") do %>
+            <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="editor-leave-label"><%= t("editor.leave_editor", default: "Leave editor") %></span>
+          <% end %>
+          <%# flash() in survey_editor_controller rewrites the inner span's
+              class list (text-xs + a colour), so the pill styling lives on
+              the wrapper and persistent text styling inline. %>
+          <span class="editor-save-pill">
+            <span class="text-xs text-aquamarine" data-survey-editor-target="status"
+                  style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
+          </span>
+        </div>
+
+        <div class="editor-float-group">
+          <%# Device preview toggle — reframes the cards at phone / tablet
+              width so creators see (and still edit) the responsive layout. %>
+          <div class="device-toggle" role="group" aria-label="<%= t('editor.device_label', default: 'Preview size') %>">
+            <% [
+                 [ "desktop", "🖥", t("editor.device_desktop", default: "Desktop") ],
+                 [ "tablet",  "▭",  t("editor.device_tablet",  default: "Tablet")  ],
+                 [ "mobile",  "▯",  t("editor.device_mobile",  default: "Mobile")  ]
+               ].each do |device, icon, label| %>
+              <button type="button" class="device-toggle-btn<%= ' is-active' if device == 'desktop' %>"
+                      data-device-frame-target="btn" data-device="<%= device %>"
+                      data-action="click->device-frame#set" title="<%= label %>" aria-label="<%= label %>">
+                <span aria-hidden="true"><%= icon %></span>
+              </button>
+            <% end %>
+          </div>
+
+          <% if @survey.multilingual? %>
+            <div class="lang-dd" data-controller="locale-switcher">
+              <button type="button" class="lang-dd-btn"
+                      data-action="click->locale-switcher#toggle" aria-haspopup="true"
+                      aria-label="<%= t("locale_switcher.label") %>">
+                <span data-survey-editor-target="localeCode"><%= @survey.default_locale.upcase %></span>
+                <svg class="lang-switcher-caret" width="10" height="6" viewBox="0 0 10 6" fill="none">
+                  <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="lang-dd-popover" data-locale-switcher-target="popover" hidden>
+                <% @survey.verto_locales.each do |code| %>
+                  <% loc = SupportedLocales.find(code) %>
+                  <button type="button"
+                          class="lang-dd-item<%= ' is-active' if code == @survey.default_locale %>"
+                          data-survey-editor-target="tab"
+                          data-locale="<%= code %>" data-code="<%= code.upcase %>"
+                          data-action="click->survey-editor#switchLocale click->locale-switcher#close">
+                    <span class="lang-dd-item-name"><%= loc&.english_name %></span>
+                    <% if code == @survey.default_locale %><span class="lang-tab-primary"><%= t("editor.primary") %></span><% end %>
+                    <span class="lang-dd-item-tick">✓</span>
+                  </button>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
       <%# Cards feed — stacked, full-width split-cards. The Verto's brand
           palette is scoped here so the cards render in brand colours while the
-          surrounding editor chrome stays Playverto. %>
+          surrounding editor chrome stays Playverto. The extra top padding
+          keeps the first card's badges clear of the floating chrome. %>
       <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 device-desktop <%= 'editor-feed-locked' if live_locked %>"
            data-brand-palette-target="preview"
            data-add-question-target="cardsFeed"
            data-survey-editor-target="feed"
            data-device-frame-target="feed"
-           style="scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;background-color:var(--brand-bg,#272D4A);background-image:var(--brand-bg-image,none);background-size:cover;background-position:center;<%= verto_backdrop_style_attr(@survey, image: false) %>">
+           style="padding-top:64px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;background-color:var(--brand-bg,#272D4A);background-image:var(--brand-bg-image,none);background-size:cover;background-position:center;<%= verto_backdrop_style_attr(@survey, image: false) %>">
 
         <%# Each card lives in a .card-slot together with the "Add question" CTA
             that follows it — so creators can insert a question after any card,
@@ -220,6 +220,7 @@
         <% end %>
 
       </div><%# /cards feed %>
+      </div><%# /feed wrapper %>
 
       <%# Slim editor footer — survey facts on the left, single CTA on the right.
           All publish/share controls now live in the right-hand publish panel. %>

@@ -2122,38 +2122,49 @@
   background-clip: padding-box, border-box;
 }
 
-.brief-strip {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 24px;
-  background: rgba(0,0,0,0.2);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  font-size: 12px; flex-shrink: 0;
+/* ── Floating editor chrome — the brief strip is gone; its survivors float
+   over the cards feed on dark translucent pills: "Leave editor" + save
+   status at the inline-start edge, the device toggle (and language dropdown
+   when multilingual) at the inline-end edge. ── */
+.editor-float-bar {
+  position: absolute; top: 12px; left: 16px; right: 16px; z-index: 30;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; pointer-events: none;
 }
-.brief-q-count {
-  margin-left: auto;
-  font-family: "Alata", sans-serif;
-  font-size: 11px; color: #01EACB;
-  border: 1px solid rgba(1,234,203,0.35);
-  padding: 2px 9px; border-radius: 100px;
+.editor-float-group {
+  display: flex; align-items: center; gap: 8px; pointer-events: auto;
 }
-
-/* "Leave editor" CTA — the editor hides the global top nav, so this back
-   pill (plus the autosave status beside it) is the way out. */
 .editor-leave-btn {
   display: inline-flex; align-items: center; gap: 7px;
-  padding: 6px 12px; margin-inline-start: -6px;
+  padding: 7px 13px;
   border-radius: 100px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.14);
   color: #fff; text-decoration: none;
   font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.03em;
   white-space: nowrap; flex-shrink: 0;
   transition: background 0.15s, border-color 0.15s;
 }
-.editor-leave-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
+.editor-leave-btn:hover { background: rgba(20,23,38,0.85); border-color: rgba(255,255,255,0.3); }
 .editor-leave-arrow { flex-shrink: 0; }
 [dir="rtl"] .editor-leave-arrow { transform: scaleX(-1); }
-.brief-strip-divider { width: 1px; height: 16px; background: rgba(255,255,255,0.12); flex-shrink: 0; }
+.editor-save-pill {
+  display: inline-flex; align-items: center;
+  padding: 7px 13px; border-radius: 100px;
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.14);
+  white-space: nowrap;
+}
+.editor-float-bar .device-toggle {
+  margin-left: 0; padding: 4px;
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
+  border-color: rgba(255,255,255,0.14);
+}
+.editor-float-bar .lang-dd-btn {
+  padding: 6px 12px;
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
+  border-color: rgba(255,255,255,0.14);
+}
 
 /* ── Phone-shaped survey card (vertical, iPhone-ratio) ── */
 .cards-grid {
