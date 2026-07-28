@@ -899,3 +899,14 @@ es:
     not_found: Esa plantilla no está disponible.
     created: 'Creaste “%{name}” a partir de una plantilla: personalízala y publícala
       cuando quieras.'
+  oops:
+    private_link_title: "Vaya — este es un enlace privado del editor"
+    private_link_body: "Este enlace abre el editor del Verto, que solo puede usar su creador — no es el enlace público para compartir, así que aquí no hay nada que jugar."
+    private_link_hint: "¿Creaste este Verto? Inicia sesión, publícalo y copia el enlace para compartir desde Publish & share — se parece a %{example}."
+    unpublished_title: "Vaya — este Verto aún no está en línea"
+    unpublished_body: "No hay ningún Verto publicado en este enlace. Puede que aún no se haya publicado, o que la dirección esté mal escrita."
+    unpublished_hint: "¿Creaste este Verto? Ábrelo, pulsa Publicar y comparte el enlace desde Publish & share."
+    gone_title: "Este Verto ya no está disponible"
+    gone_body: "Su creador lo ha cerrado o eliminado."
+    sign_in: "Iniciar sesión"
+    my_vertos: "Ir a mis Vertos"

@@ -898,3 +898,14 @@ id:
     browse: Jelajahi templat
     not_found: Templat itu tidak tersedia.
     created: Membuat “%{name}” dari templat — sesuaikan dan terbitkan saat Anda siap.
+  oops:
+    private_link_title: "Ups — ini tautan editor pribadi"
+    private_link_body: "Tautan ini membuka editor Verto yang hanya bisa digunakan pembuatnya — ini bukan tautan berbagi publik, jadi tidak ada yang bisa dimainkan di sini."
+    private_link_hint: "Anda yang membuat Verto ini? Masuk, terbitkan, lalu salin tautan berbagi dari Publish & share — bentuknya seperti %{example}."
+    unpublished_title: "Ups — Verto ini belum tayang"
+    unpublished_body: "Tidak ada Verto yang diterbitkan di tautan ini. Mungkin belum diterbitkan, atau alamatnya salah ketik."
+    unpublished_hint: "Anda yang membuat Verto ini? Buka, tekan Terbitkan, lalu bagikan tautannya dari Publish & share."
+    gone_title: "Verto ini sudah tidak tersedia"
+    gone_body: "Pembuatnya telah menutup atau menghapusnya."
+    sign_in: "Masuk"
+    my_vertos: "Ke Verto saya"

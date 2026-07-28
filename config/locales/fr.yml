@@ -899,3 +899,14 @@ fr:
     not_found: Ce modèle n’est pas disponible.
     created: "« %{name} » créé à partir d’un modèle — personnalisez-le et publiez-le
       quand vous êtes prêt."
+  oops:
+    private_link_title: "Oups — ceci est un lien privé vers l'éditeur"
+    private_link_body: "Ce lien ouvre l'éditeur du Verto, réservé à son créateur — ce n'est pas le lien public de partage, il n'y a donc rien à jouer ici."
+    private_link_hint: "Vous avez créé ce Verto ? Connectez-vous, publiez-le, puis copiez le lien de partage depuis Publish & share — il ressemble à %{example}."
+    unpublished_title: "Oups — ce Verto n'est pas encore en ligne"
+    unpublished_body: "Aucun Verto publié ne correspond à ce lien. Il n'a peut-être pas encore été publié, ou l'adresse est erronée."
+    unpublished_hint: "Vous avez créé ce Verto ? Ouvrez-le, appuyez sur Publier, puis partagez le lien depuis Publish & share."
+    gone_title: "Ce Verto n'est plus disponible"
+    gone_body: "Son créateur l'a fermé ou supprimé."
+    sign_in: "Se connecter"
+    my_vertos: "Voir mes Vertos"

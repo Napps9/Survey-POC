@@ -899,3 +899,14 @@ sw:
     not_found: Kiolezo hicho hakipatikani.
     created: Umeanzisha “%{name}” kutoka kwa kiolezo — kibinafsishe na uchapishe ukiwa
       tayari.
+  oops:
+    private_link_title: "Samahani — hiki ni kiungo cha faragha cha kihariri"
+    private_link_body: "Kiungo hiki hufungua kihariri cha Verto, kinachotumika na mtengenezaji wake pekee — si kiungo cha umma cha kushiriki, kwa hivyo hakuna cha kucheza hapa."
+    private_link_hint: "Je, ulitengeneza Verto hii? Ingia, ichapishe, kisha nakili kiungo cha kushiriki kutoka Publish & share — kinafanana na %{example}."
+    unpublished_title: "Samahani — Verto hii bado haiko hewani"
+    unpublished_body: "Hakuna Verto iliyochapishwa kwenye kiungo hiki. Huenda bado haijachapishwa, au anwani imeandikwa vibaya."
+    unpublished_hint: "Je, ulitengeneza Verto hii? Ifungue, bonyeza Chapisha, kisha shiriki kiungo kutoka Publish & share."
+    gone_title: "Verto hii haipatikani tena"
+    gone_body: "Mtengenezaji wake ameifunga au kuiondoa."
+    sign_in: "Ingia"
+    my_vertos: "Nenda kwenye Verto zangu"

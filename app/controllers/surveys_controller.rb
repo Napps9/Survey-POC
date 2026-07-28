@@ -682,6 +682,33 @@ class SurveysController < ApplicationController
 
   def set_survey
     @survey = Current.organisation.surveys.kept.without_report_text.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    # A signed-in user on the editor URL of a Verto that isn't in their
+    # account — same wrong-link-shared story as the unauthenticated case
+    # below, same branded explainer. Other actions keep the plain 404.
+    raise unless action_name == "show" && request.format.html?
+    render_private_link_page
+  end
+
+  # Authentication#request_authentication redirects to sign-in — right for the
+  # app proper, but the editor URL (/surveys/:id) is what a creator gets by
+  # copying the address bar instead of the /play share link, and the person
+  # opening it is usually a would-be respondent. Show them a branded page that
+  # says to publish the Verto and share the /play link instead. return_to is
+  # still stored, so the creator's own Sign-in path lands back in the editor.
+  def request_authentication
+    return super unless action_name == "show" && request.get? && request.format.html?
+    session[:return_to_after_authenticating] = request.url
+    render_private_link_page
+  end
+
+  # This can run from request_authentication, i.e. before the switch_locale
+  # around_action has wrapped the request — resolve the locale explicitly so
+  # the page still comes up in the visitor's language.
+  def render_private_link_page
+    I18n.with_locale(resolve_locale) do
+      render "surveys/private_link", layout: "fullscreen", status: :not_found
+    end
   end
 
   def self.import_verifier

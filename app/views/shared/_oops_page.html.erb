@@ -1,0 +1,35 @@
+<%# Verto-branded full-screen "oops" page, shown when someone lands on a link
+    that can't be played — a private /surveys/:id editor URL shared by mistake,
+    or a /play/:token that doesn't resolve to a published Verto. Friendly and
+    on-brand rather than a bare 404, because the person seeing it is usually a
+    respondent who was handed the wrong link, and the fix ("publish the Verto,
+    share the /play link") belongs on the page.
+
+    Locals:
+      title     — headline
+      body      — one-sentence explanation for the person holding the link
+      hint      — what the creator should do instead (optional)
+      cta_path  — when present, renders a button linking here (optional)
+      cta_label — button text, required alongside cta_path
+%>
+<% hint     = local_assigns[:hint] %>
+<% cta_path = local_assigns[:cta_path] %>
+<div style="height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:#272D4A;">
+  <%= image_tag "playverto.svg", alt: "Playverto", style: "height:36px;width:auto;margin-bottom:28px;" %>
+  <div style="font-size:44px;line-height:1;margin-bottom:18px;">🙈</div>
+  <h1 style="font-family:'Alata',sans-serif;font-size: var(--text-2xl, 24px);color:#fff;margin:0 0 12px;max-width:34rem;line-height:1.25;">
+    <%= title %>
+  </h1>
+  <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md, 15px);color:rgba(255,255,255,0.75);margin:0 auto;max-width:30rem;line-height:1.5;">
+    <%= body %>
+  </p>
+  <% if hint.present? %>
+    <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 13px);color:#01EACB;margin:16px auto 0;max-width:30rem;line-height:1.5;">
+      <%= hint %>
+    </p>
+  <% end %>
+  <% if cta_path.present? %>
+    <%= link_to local_assigns[:cta_label], cta_path,
+          style: "display:inline-block;margin-top:24px;padding:10px 28px;border-radius:12px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md, 15px);text-decoration:none;" %>
+  <% end %>
+</div>

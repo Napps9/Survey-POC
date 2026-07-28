@@ -901,3 +901,14 @@ pl:
     not_found: Ten szablon jest niedostępny.
     created: Utworzono „%{name}” z szablonu — dostosuj go i opublikuj, gdy będziesz
       gotowy.
+  oops:
+    private_link_title: "Ups — to prywatny link do edytora"
+    private_link_body: "Ten link otwiera edytor Verto, z którego może korzystać tylko jego twórca — to nie jest publiczny link do udostępniania, więc nie ma tu w co grać."
+    private_link_hint: "To Twoje Verto? Zaloguj się, opublikuj je, a następnie skopiuj link do udostępniania z Publish & share — wygląda jak %{example}."
+    unpublished_title: "Ups — to Verto nie jest jeszcze dostępne"
+    unpublished_body: "Pod tym linkiem nie ma opublikowanego Verto. Być może nie zostało jeszcze opublikowane albo adres jest błędny."
+    unpublished_hint: "To Twoje Verto? Otwórz je, naciśnij Opublikuj i udostępnij link z Publish & share."
+    gone_title: "To Verto nie jest już dostępne"
+    gone_body: "Twórca je zamknął lub usunął."
+    sign_in: "Zaloguj się"
+    my_vertos: "Przejdź do moich Verto"

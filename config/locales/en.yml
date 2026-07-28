@@ -901,3 +901,14 @@ en:
     not_found: That template isn't available.
     created: Started “%{name}” from a template — customise it and publish when you're
       ready.
+  oops:
+    private_link_title: "Oops — that's a private editor link"
+    private_link_body: "This link opens the Verto editor, which only its creator can use — it isn't the public share link, so there's nothing to play here."
+    private_link_hint: "Made this Verto? Sign in and publish it, then copy the share link from Publish & share — it looks like %{example}."
+    unpublished_title: "Oops — this Verto isn't live yet"
+    unpublished_body: "There's no published Verto at this link. It may not have been published yet, or the address was mistyped."
+    unpublished_hint: "Made this Verto? Open it, press Publish, then share the link from Publish & share."
+    gone_title: "This Verto is no longer available"
+    gone_body: "Its creator has closed or removed it."
+    sign_in: "Sign in"
+    my_vertos: "Go to my Vertos"

@@ -1,0 +1,14 @@
+<% content_for :title, "Playverto" %>
+<%# /play/:token didn't resolve to a live Verto. @oops_gone distinguishes a
+    Verto that existed and was archived (410) from a token that never matched —
+    typically an unpublished draft's link, or a typo (404). %>
+<% if @oops_gone %>
+  <%= render "shared/oops_page",
+        title: t("oops.gone_title"),
+        body:  t("oops.gone_body") %>
+<% else %>
+  <%= render "shared/oops_page",
+        title: t("oops.unpublished_title"),
+        body:  t("oops.unpublished_body"),
+        hint:  t("oops.unpublished_hint") %>
+<% end %>

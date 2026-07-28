@@ -898,3 +898,14 @@ he:
     browse: עיינו בתבניות
     not_found: התבנית הזו אינה זמינה.
     created: "“%{name}” נוצר מתבנית — התאימו ופרסמו כשתהיו מוכנים."
+  oops:
+    private_link_title: "אופס — זהו קישור פרטי לעורך"
+    private_link_body: "הקישור הזה פותח את עורך ה-Verto, שרק יוצרו יכול להשתמש בו — זה אינו קישור השיתוף הציבורי, כך שאין כאן מה להפעיל."
+    private_link_hint: "יצרת את ה-Verto הזה? היכנס/י, פרסמ/י אותו והעתק/י את קישור השיתוף מ-Publish & share — הוא נראה כמו %{example}."
+    unpublished_title: "אופס — ה-Verto הזה עדיין לא פעיל"
+    unpublished_body: "אין Verto מפורסם בקישור הזה. ייתכן שהוא עדיין לא פורסם, או שהכתובת שגויה."
+    unpublished_hint: "יצרת את ה-Verto הזה? פתח/י אותו, לחצ/י על פרסום ושתפ/י את הקישור מ-Publish & share."
+    gone_title: "ה-Verto הזה אינו זמין עוד"
+    gone_body: "יוצרו סגר או הסיר אותו."
+    sign_in: "התחברות"
+    my_vertos: "אל ה-Verto שלי"

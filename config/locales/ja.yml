@@ -897,3 +897,14 @@ ja:
     browse: テンプレートを見る
     not_found: そのテンプレートは利用できません。
     created: テンプレートから「%{name}」を作成しました。編集して、準備ができたら公開しましょう。
+  oops:
+    private_link_title: "おっと — これは非公開のエディターリンクです"
+    private_link_body: "このリンクは作成者だけが使える Verto エディターを開くものです。公開用の共有リンクではないため、ここで回答することはできません。"
+    private_link_hint: "この Verto を作成した方へ:サインインして公開し、Publish & share から共有リンク(%{example} のような形式)をコピーしてください。"
+    unpublished_title: "おっと — この Verto はまだ公開されていません"
+    unpublished_body: "このリンクに公開済みの Verto はありません。まだ公開されていないか、アドレスが間違っている可能性があります。"
+    unpublished_hint: "この Verto を作成した方へ:開いて「公開」を押し、Publish & share からリンクを共有してください。"
+    gone_title: "この Verto は利用できなくなりました"
+    gone_body: "作成者によって終了または削除されました。"
+    sign_in: "サインイン"
+    my_vertos: "マイ Verto へ"

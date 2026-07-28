@@ -899,3 +899,14 @@ pt:
     not_found: Esse modelo não está disponível.
     created: Você criou “%{name}” a partir de um modelo — personalize e publique quando
       quiser.
+  oops:
+    private_link_title: "Ops — este é um link privado do editor"
+    private_link_body: "Este link abre o editor do Verto, que só o criador pode usar — não é o link público de partilha, por isso não há nada para jogar aqui."
+    private_link_hint: "Criou este Verto? Inicie sessão, publique-o e copie o link de partilha em Publish & share — parece-se com %{example}."
+    unpublished_title: "Ops — este Verto ainda não está no ar"
+    unpublished_body: "Não há nenhum Verto publicado neste link. Pode ainda não ter sido publicado, ou o endereço está errado."
+    unpublished_hint: "Criou este Verto? Abra-o, toque em Publicar e partilhe o link em Publish & share."
+    gone_title: "Este Verto já não está disponível"
+    gone_body: "O criador fechou-o ou removeu-o."
+    sign_in: "Iniciar sessão"
+    my_vertos: "Ir para os meus Vertos"

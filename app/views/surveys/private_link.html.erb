@@ -1,0 +1,13 @@
+<% content_for :title, "Playverto" %>
+<%# Someone followed a /surveys/:id editor URL they can't open — almost always
+    a creator who copied the browser address bar instead of the /play share
+    link from Publish & share. Tell them exactly that, and give the creator a
+    way back in (sign-in preserves return_to, so they land straight in the
+    editor). Rendered without looking the Verto up, so it leaks nothing about
+    whether the id exists. %>
+<%= render "shared/oops_page",
+      title: t("oops.private_link_title"),
+      body:  t("oops.private_link_body"),
+      hint:  t("oops.private_link_hint", example: "#{root_url}play/…"),
+      cta_path:  authenticated? ? root_path : new_session_path,
+      cta_label: authenticated? ? t("oops.my_vertos") : t("oops.sign_in") %>

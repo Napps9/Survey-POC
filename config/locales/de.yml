@@ -899,3 +899,14 @@ de:
     not_found: Diese Vorlage ist nicht verfügbar.
     created: "„%{name}“ aus einer Vorlage erstellt – passe es an und veröffentliche
       es, wenn du bereit bist."
+  oops:
+    private_link_title: "Ups — das ist ein privater Editor-Link"
+    private_link_body: "Dieser Link öffnet den Verto-Editor, den nur die erstellende Person nutzen kann — es ist nicht der öffentliche Teilen-Link, hier gibt es also nichts zu spielen."
+    private_link_hint: "Hast du diesen Verto erstellt? Melde dich an, veröffentliche ihn und kopiere dann den Teilen-Link aus Publish & share — er sieht so aus: %{example}."
+    unpublished_title: "Ups — dieser Verto ist noch nicht live"
+    unpublished_body: "Unter diesem Link gibt es keinen veröffentlichten Verto. Er wurde vielleicht noch nicht veröffentlicht, oder die Adresse ist falsch."
+    unpublished_hint: "Hast du diesen Verto erstellt? Öffne ihn, klicke auf Veröffentlichen und teile dann den Link aus Publish & share."
+    gone_title: "Dieser Verto ist nicht mehr verfügbar"
+    gone_body: "Die erstellende Person hat ihn geschlossen oder entfernt."
+    sign_in: "Anmelden"
+    my_vertos: "Zu meinen Vertos"

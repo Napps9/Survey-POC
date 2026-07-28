@@ -897,3 +897,14 @@ ko:
     browse: 템플릿 둘러보기
     not_found: 해당 템플릿을 사용할 수 없습니다.
     created: 템플릿에서 “%{name}”을(를) 만들었습니다. 원하는 대로 수정하고 준비되면 게시하세요.
+  oops:
+    private_link_title: "이런 — 이것은 비공개 편집기 링크예요"
+    private_link_body: "이 링크는 제작자만 사용할 수 있는 Verto 편집기를 여는 링크입니다. 공개 공유 링크가 아니므로 여기서 참여할 수 있는 것이 없어요."
+    private_link_hint: "이 Verto를 만드셨나요? 로그인해 게시한 뒤 Publish & share에서 공유 링크를 복사하세요 — %{example} 같은 형태입니다."
+    unpublished_title: "이런 — 이 Verto는 아직 공개되지 않았어요"
+    unpublished_body: "이 링크에 게시된 Verto가 없습니다. 아직 게시되지 않았거나 주소가 잘못 입력되었을 수 있어요."
+    unpublished_hint: "이 Verto를 만드셨나요? 열어서 게시를 누른 뒤 Publish & share에서 링크를 공유하세요."
+    gone_title: "이 Verto는 더 이상 이용할 수 없어요"
+    gone_body: "제작자가 종료했거나 삭제했습니다."
+    sign_in: "로그인"
+    my_vertos: "내 Verto로 이동"

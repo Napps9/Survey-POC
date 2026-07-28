@@ -899,3 +899,14 @@ tr:
     not_found: Bu şablon kullanılamıyor.
     created: "“%{name}” bir şablondan oluşturuldu — özelleştirin ve hazır olduğunuzda
       yayınlayın."
+  oops:
+    private_link_title: "Hata — bu özel bir düzenleyici bağlantısı"
+    private_link_body: "Bu bağlantı, yalnızca oluşturanın kullanabildiği Verto düzenleyicisini açar — herkese açık paylaşım bağlantısı değildir, bu yüzden burada oynanacak bir şey yok."
+    private_link_hint: "Bu Verto'yu siz mi oluşturdunuz? Giriş yapın, yayınlayın ve paylaşım bağlantısını Publish & share bölümünden kopyalayın — şöyle görünür: %{example}."
+    unpublished_title: "Hata — bu Verto henüz yayında değil"
+    unpublished_body: "Bu bağlantıda yayınlanmış bir Verto yok. Henüz yayınlanmamış olabilir ya da adres yanlış yazılmış olabilir."
+    unpublished_hint: "Bu Verto'yu siz mi oluşturdunuz? Açın, Yayınla'ya basın ve bağlantıyı Publish & share bölümünden paylaşın."
+    gone_title: "Bu Verto artık kullanılamıyor"
+    gone_body: "Oluşturan kişi onu kapattı veya kaldırdı."
+    sign_in: "Giriş yap"
+    my_vertos: "Verto'larıma git"

@@ -898,3 +898,14 @@ vi:
     browse: Xem các mẫu
     not_found: Mẫu đó không khả dụng.
     created: Đã tạo “%{name}” từ một mẫu — tùy chỉnh và xuất bản khi bạn sẵn sàng.
+  oops:
+    private_link_title: "Rất tiếc — đây là liên kết trình chỉnh sửa riêng tư"
+    private_link_body: "Liên kết này mở trình chỉnh sửa Verto mà chỉ người tạo mới dùng được — đây không phải liên kết chia sẻ công khai, nên không có gì để tham gia ở đây."
+    private_link_hint: "Bạn đã tạo Verto này? Hãy đăng nhập, xuất bản nó, rồi sao chép liên kết chia sẻ từ Publish & share — liên kết có dạng %{example}."
+    unpublished_title: "Rất tiếc — Verto này chưa hoạt động"
+    unpublished_body: "Không có Verto nào được xuất bản tại liên kết này. Có thể nó chưa được xuất bản, hoặc địa chỉ bị gõ sai."
+    unpublished_hint: "Bạn đã tạo Verto này? Hãy mở nó, nhấn Xuất bản, rồi chia sẻ liên kết từ Publish & share."
+    gone_title: "Verto này không còn khả dụng"
+    gone_body: "Người tạo đã đóng hoặc xóa nó."
+    sign_in: "Đăng nhập"
+    my_vertos: "Đến Verto của tôi"

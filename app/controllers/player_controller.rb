@@ -50,8 +50,14 @@ class PlayerController < ApplicationController
   before_action :load_survey_and_share
 
   def show
-    return render plain: "Survey not found", status: :not_found unless @survey
-    return render plain: "This Verto is no longer available.", status: :gone if @survey.deleted?
+    # A token that resolves nothing is almost always a link shared before the
+    # Verto was published (or a typo) — a respondent dead-end either way, so
+    # serve a branded explainer instead of a bare error string.
+    return render :unavailable, status: :not_found unless @survey
+    if @survey.deleted?
+      @oops_gone = true
+      return render :unavailable, status: :gone
+    end
     @display_locale = resolve_play_locale
   end
 

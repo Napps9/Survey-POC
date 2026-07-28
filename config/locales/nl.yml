@@ -899,3 +899,14 @@ nl:
     not_found: Dat sjabloon is niet beschikbaar.
     created: "“%{name}” aangemaakt vanuit een sjabloon — pas het aan en publiceer wanneer
       je klaar bent."
+  oops:
+    private_link_title: "Oeps — dit is een privé-editorlink"
+    private_link_body: "Deze link opent de Verto-editor, die alleen de maker kan gebruiken — het is niet de openbare deellink, dus hier valt niets te spelen."
+    private_link_hint: "Heb je deze Verto gemaakt? Log in, publiceer hem en kopieer dan de deellink uit Publish & share — die ziet eruit als %{example}."
+    unpublished_title: "Oeps — deze Verto is nog niet live"
+    unpublished_body: "Er is geen gepubliceerde Verto op deze link. Misschien is hij nog niet gepubliceerd, of klopt het adres niet."
+    unpublished_hint: "Heb je deze Verto gemaakt? Open hem, druk op Publiceren en deel dan de link uit Publish & share."
+    gone_title: "Deze Verto is niet meer beschikbaar"
+    gone_body: "De maker heeft hem gesloten of verwijderd."
+    sign_in: "Inloggen"
+    my_vertos: "Naar mijn Verto's"
