@@ -2665,6 +2665,11 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
      content mid-slide. */
   width: 430px;
   margin-block: 14px; margin-inline-end: 14px;
+  /* Top-align the folder PAPER with the top of a centre-snapped card: cards
+     are 680px tall and snap to the viewport centre, so a card's top edge
+     sits at 50dvh − 333px (chrome row included); the 32px tab strip rides
+     above that line. Clamped so short viewports keep the old 14px inset. */
+  margin-block-start: max(14px, calc(50dvh - 365px));
   /* Unfocusable while collapsed; the delay lets the slide-out finish. */
   visibility: hidden; transition: visibility 0s linear 0.3s;
 }
