@@ -2674,13 +2674,16 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
    chip and ✕ keep their pill shape, on dark glass so they stay legible on
    any artwork. */
 .right-tabs {
-  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 3px;
+  flex-shrink: 0; display: flex; gap: 3px;
   align-items: flex-end;
-  padding: 0 14px;
+  position: relative;
+  /* end padding reserves the corner for the absolutely-pinned ✕, keeping
+     all four folder tabs on the one row that touches the panel */
+  padding-inline: 12px 46px;
 }
 .right-tabs .right-tab-close {
+  position: absolute; inset-inline-end: 8px; bottom: 5px;
   background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
-  margin-bottom: 6px;
 }
 .right-tab-close { margin-inline-start: auto; padding: 5px 10px; }
 
@@ -2708,28 +2711,79 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
    tab's traffic-light colour. */
 .right-tab.is-active { color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4); }
 
-/* Folder tabs — always solid in their Verto brand colour with the name in
-   the tab; the active one sits "in front" at full colour and a touch
-   taller, the rest dim like folders behind. After the base .right-tab
-   rules so these win the cascade. */
+/* Folder tabs — each solid in its Verto brand colour with the name in the
+   tab. The ACTIVE tab instead takes its panel's tinted surface and fuses
+   with it (negative bottom margin over the panel's top border), so tab +
+   panel read as one folder whose paper is the tab's colour. After the base
+   .right-tab rules so these win the cascade. */
 .right-tab-folder {
-  border: none;
+  border: 1px solid transparent; border-bottom: none;
   border-radius: 10px 10px 0 0;
-  padding: 7px 15px 9px;
-  font-family: "Alata", sans-serif; letter-spacing: 0.02em;
-  transition: filter 0.15s, padding 0.15s;
+  padding: 7px 10px 8px;
+  font-family: "Alata", sans-serif; font-size: 10.5px; letter-spacing: 0.02em;
+  background: var(--tab-color, #4D588A);
+  transition: filter 0.15s, background 0.15s;
 }
-.right-tab-folder:not(.is-active) { filter: brightness(0.55) saturate(0.9); }
-.right-tab-folder:hover:not(.is-active) { filter: brightness(0.78); }
-.right-tab-folder.is-active { box-shadow: none; padding-top: 10px; }
+.right-tab-folder:not(.is-active):hover { filter: brightness(1.12); }
+.right-tab-folder.is-active {
+  box-shadow: none;
+  background: var(--panel-tint, #2A2D3A);
+  border-color: var(--panel-edge, rgba(255,255,255,0.09));
+  color: #fff;
+  padding-top: 9px;
+  margin-bottom: -1px; position: relative; z-index: 1;
+}
 
-/* The brand colours: answer types navy, quiz yellow, tokenisation teal,
-   logic blue, why purple. Explicit :hover/.is-active repeats keep the base
-   .right-tab hover/active washes from overriding the solid fills. */
-.right-tab--types, .right-tab--types:hover, .right-tab--types.is-active { background: #4D588A; color: #fff; }
-.right-tab--quiz, .right-tab--quiz:hover, .right-tab--quiz.is-active { background: #FFCC00; color: #3A2A00; }
-.right-tab--tokens, .right-tab--tokens:hover, .right-tab--tokens.is-active { background: #01EACB; color: #04221E; }
-.right-tab--logic, .right-tab--logic:hover, .right-tab--logic.is-active { background: #0CA7FF; color: #03253A; }
+/* The brand colours (tab fill + matching panel tint and edge): answer types
+   navy, quiz yellow, tokenisation teal, logic blue. */
+.right-tab--types {
+  --tab-color: #4D588A;
+  --panel-tint: color-mix(in srgb, #4D588A 28%, #232838);
+  --panel-edge: color-mix(in srgb, #4D588A 60%, transparent);
+  color: #fff;
+}
+.right-tab--quiz {
+  --tab-color: #FFCC00;
+  --panel-tint: color-mix(in srgb, #FFCC00 20%, #232838);
+  --panel-edge: color-mix(in srgb, #FFCC00 50%, transparent);
+  color: #3A2A00;
+}
+.right-tab--tokens {
+  --tab-color: #01EACB;
+  --panel-tint: color-mix(in srgb, #01EACB 20%, #232838);
+  --panel-edge: color-mix(in srgb, #01EACB 50%, transparent);
+  color: #04221E;
+}
+.right-tab--logic {
+  --tab-color: #0CA7FF;
+  --panel-tint: color-mix(in srgb, #0CA7FF 22%, #232838);
+  --panel-edge: color-mix(in srgb, #0CA7FF 52%, transparent);
+  color: #03253A;
+}
+
+/* The matching folder paper — each view body wears its tab's tint (Why in
+   purple for its ? CTA; Publish/Design keep the default navy). Scoped under
+   .right-column so these outrank the .right-column > .type-panel border. */
+.right-column > .panel--types {
+  background: color-mix(in srgb, #4D588A 28%, #232838);
+  border-color: color-mix(in srgb, #4D588A 60%, transparent);
+}
+.right-column > .panel--quiz {
+  background: color-mix(in srgb, #FFCC00 20%, #232838);
+  border-color: color-mix(in srgb, #FFCC00 50%, transparent);
+}
+.right-column > .panel--tokens {
+  background: color-mix(in srgb, #01EACB 20%, #232838);
+  border-color: color-mix(in srgb, #01EACB 50%, transparent);
+}
+.right-column > .panel--logic {
+  background: color-mix(in srgb, #0CA7FF 22%, #232838);
+  border-color: color-mix(in srgb, #0CA7FF 52%, transparent);
+}
+.right-column > .panel--why {
+  background: color-mix(in srgb, #615BF5 26%, #232838);
+  border-color: color-mix(in srgb, #615BF5 55%, transparent);
+}
 
 /* Per-card "Why" CTA — the round ? under each card's type badge. Clicking it
    opens the Why view; the same click bubbles to type-panel#selectCard, which

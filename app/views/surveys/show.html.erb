@@ -383,7 +383,7 @@
               data-action="click->editor-panel#close">✕</button>
     </div>
 
-    <div class="type-panel" data-publish-panel-target="typeView"
+    <div class="type-panel panel--types" data-publish-panel-target="typeView"
          data-controller="type-info" data-action="keydown.esc@window->type-info#closeOnEsc">
 
       <div class="type-panel-top">
@@ -548,7 +548,7 @@
     <%# ── Quiz mode tab — the Verto-wide toggle comes first (moved out of the
         Publish panel); once on, the selected question card's correct-answer
         block (relocated by type_panel_controller) appears below it. ── %>
-    <div class="type-panel hidden" data-publish-panel-target="quizView">
+    <div class="type-panel panel--quiz hidden" data-publish-panel-target="quizView">
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#FFCC00;margin-bottom:5px;">
           <%= t("editor.tab_quiz", default: "Quiz mode") %>
@@ -589,7 +589,7 @@
     <%# ── Tokenisation tab — Verto-wide setup first: the toggle plus the token
         types manager (icons + names, moved out of the Publish panel); once on,
         the selected card's token-award block appears below. ── %>
-    <div class="type-panel hidden" data-publish-panel-target="tokensView">
+    <div class="type-panel panel--tokens hidden" data-publish-panel-target="tokensView">
       <div class="type-panel-top" data-controller="token-types">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#01EACB;margin-bottom:5px;">
           <%= t("editor.tab_tokens", default: "Tokenisation") %>
@@ -663,7 +663,7 @@
         Awareness/Intention/Agency competency it sits under, the plain-language
         insight its answers generate, and any enabling condition it measures.
         Populated per selected card by type_panel_controller#selectCard. ── %>
-    <div class="type-panel hidden" data-publish-panel-target="whyView">
+    <div class="type-panel panel--why hidden" data-publish-panel-target="whyView">
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
           <%= t("editor.why", default: "Why") %>
@@ -718,7 +718,7 @@
         authored inside the card (shared/logic_branch_block) and relocated here
         for the selected card by type_panel_controller#selectCard; the card
         itself shows nothing about routing. Only present when logic is on. ── %>
-    <div class="type-panel hidden" data-publish-panel-target="branchView">
+    <div class="type-panel panel--logic hidden" data-publish-panel-target="branchView">
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#0CA7FF;margin-bottom:5px;">
           <%= t("editor.tab_logic", default: "Logic & flows") %>
