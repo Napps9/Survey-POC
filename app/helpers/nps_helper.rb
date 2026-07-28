@@ -26,9 +26,10 @@ module NpsHelper
   # a set: drop the folder in and add its slug to a group here. NPS_THEME (the
   # default) must appear in one of these groups.
   RANGE_THEME_GROUPS = {
-    "Sport"                     => %w[basketball football football_goal stopwatch target snooker_ball],
+    "Sport"                     => %w[basketball football football_goal stopwatch target snooker_ball
+                                      sport_trainers water_bottle],
     "Climate & Sustainability"  => %w[sun flowers recycling lotus plant tree],
-    "Mental Health & Wellbeing" => %w[balance lightbulb lightbulb_loading heart journal stones],
+    "Mental Health & Wellbeing" => %w[balance lightbulb lightbulb_loading heart journal stones loading_hearts],
     "Education"                 => %w[puzzle robot],
     "General"                   => %w[pizza radar calendar coins cookies emoji_a emoji_b hand_gestures
                                       koala pv_mascots dog speech_bubbles speech_bubbles_colour speedometer]
@@ -84,7 +85,10 @@ module NpsHelper
     "dog"           => %w[animal animals dog dogs puppy pet pets wildlife],
     "speech_bubbles"        => %w[communication conversation chat chatting message messages messaging talk talking discussion opinion opinions feedback],
     "speech_bubbles_colour" => %w[communication conversation chat chatting message messages messaging talk talking discussion opinion opinions feedback],
-    "speedometer"   => %w[speed pace fast driving traffic transport travel commute frequency]
+    "speedometer"   => %w[speed pace fast driving traffic transport travel commute frequency],
+    "sport_trainers" => %w[sport sports running run runner jog jogging trainers sneakers shoes fitness gym workout exercise],
+    "water_bottle"  => %w[sport sports hydration water drink drinking fitness gym workout exercise],
+    "loading_hearts" => %w[love heart hearts kindness empathy compassion emotion emotional feeling feelings mood wellbeing]
   }.freeze
 
   # Where an off-theme Verto's animation comes from: the General group is the
@@ -118,6 +122,7 @@ module NpsHelper
 
   # Picker display names where slug.titleize doesn't read right.
   RANGE_THEME_LABELS = {
+    "water_bottle"          => "Sports Water Bottle",
     "lightbulb"             => "Light Bulb",
     "lightbulb_loading"     => "Light Bulb (Loading)",
     "emoji_a"               => "Emoji Set A",
