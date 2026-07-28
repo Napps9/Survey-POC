@@ -323,7 +323,7 @@
           estimate facts) is gone; the actions float over the feed as solid
           pills at the inline-end edge, mirroring the top chrome. %>
       <div class="editor-float-bar editor-float-bottom">
-        <div class="editor-float-group" style="margin-inline-start:auto;">
+        <div class="editor-float-group">
           <% if @survey.logic? %>
             <button type="button"
                     style="padding:10px 22px;border-radius:100px;background:#16342F;color:#01EACB;border:1px solid rgba(1,234,203,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
@@ -407,7 +407,7 @@
           open) + the Question type / Tokenomics / Quiz mode sub-tabs. The
           Tokenomics/Quiz mode tabs only appear once this Verto has that
           feature on AND the selected card is a question (see selectCard). ── %>
-      <div class="panel-island" style="display:none;flex:1;min-height:0;flex-direction:column;" data-type-panel-target="cardEditor">
+      <div class="panel-island" style="display:none;flex:0 1 auto;min-height:0;flex-direction:column;" data-type-panel-target="cardEditor">
 
         <div style="display:flex;align-items:center;gap:8px;margin:0 16px 12px;">
           <button type="button" class="card-light panel-card-light" hidden
