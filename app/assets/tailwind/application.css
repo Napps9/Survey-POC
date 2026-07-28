@@ -2134,6 +2134,10 @@
 .editor-float-group {
   display: flex; align-items: center; gap: 8px; pointer-events: auto;
 }
+/* Bottom variant — hosts the Flow map / Shuffle / Design / Publish pills
+   where the finalize bar used to be. */
+.editor-float-bottom { top: auto; bottom: 14px; }
+.editor-float-bottom form { display: inline-flex; margin: 0; }
 .editor-leave-btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 7px 13px;
@@ -2386,12 +2390,6 @@
 .card-q-sub   { font-size: 11px; color: rgba(0,0,0,0.5); line-height: 1.4; }
 
 /* Finalize bar */
-.finalize-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 24px; background: #1C2034;
-  border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;
-}
-
 /* ══════════════════════════════════════════════════
    RULES OF THE GAME — editor traffic-light analysis
    Red = against the rules, amber = partly aligned, green = spot on.

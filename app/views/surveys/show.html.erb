@@ -2,7 +2,6 @@
   cards   = Array(@survey.cards)
   total_q = cards.count { |c| CardTypes.question?(c["type"]) }
   q_idx   = 0
-  est_min = [(total_q * 30 / 60.0).ceil, 1].max
 
   # Placeholder grid colours for left panel (6 cells, 2 cols × 3 rows)
   grid_colours = %w[choice-bg-1 choice-bg-2 choice-bg-3 choice-bg-4 choice-bg-5 choice-bg-6]
@@ -213,7 +212,7 @@
            data-add-question-target="cardsFeed"
            data-survey-editor-target="feed"
            data-device-frame-target="feed"
-           style="padding-top:64px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;<%= verto_backdrop_style_attr(@survey, image: false) %>">
+           style="padding-top:64px;padding-bottom:84px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;<%= verto_backdrop_style_attr(@survey, image: false) %>">
 
         <%# Each card lives in a .card-slot together with the "Add question" CTA
             that follows it — so creators can insert a question after any card,
@@ -230,23 +229,17 @@
         <% end %>
 
       </div><%# /cards feed %>
-      </div><%# /feed wrapper %>
 
-      <%# Slim editor footer — survey facts on the left, single CTA on the right.
-          All publish/share controls now live in the right-hand publish panel. %>
-      <div class="finalize-bar">
-        <div style="font-size: var(--text-md);color:rgba(255,255,255,0.65);display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-          <span>
-            <strong style="color:#fff;" data-type-panel-target="cardCount"><%= t("editor.cards", count: cards.size) %></strong>
-            &nbsp;·&nbsp; <%= t("editor.estimated", count: est_min) %>
-          </span>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;">
+      <%# Floating bottom CTAs — the finalize bar (and its card-count /
+          estimate facts) is gone; the actions float over the feed as solid
+          pills at the inline-end edge, mirroring the top chrome. %>
+      <div class="editor-float-bar editor-float-bottom">
+        <div class="editor-float-group" style="margin-inline-start:auto;">
           <% if @survey.logic? %>
             <button type="button"
-                    style="padding:10px 22px;border-radius:16px;background:rgba(1,234,203,0.1);color:#01EACB;border:1px solid rgba(1,234,203,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
-                    onmouseover="this.style.background='rgba(1,234,203,0.18)'"
-                    onmouseout="this.style.background='rgba(1,234,203,0.1)'"
+                    style="padding:10px 22px;border-radius:100px;background:#16342F;color:#01EACB;border:1px solid rgba(1,234,203,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
+                    onmouseover="this.style.background='#1D453D'"
+                    onmouseout="this.style.background='#16342F'"
                     data-action="click->logic-map#open">⤢ Flow map</button>
           <% end %>
           <% unless live_locked %>
@@ -254,22 +247,23 @@
                   method: :post,
                   form: { data: { turbo_confirm: t("editor.shuffle_confirm") } },
                   title: t("editor.shuffle_title"),
-                  style: "padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;",
-                  onmouseover: "this.style.background='rgba(255,255,255,0.12)'",
-                  onmouseout:  "this.style.background='rgba(255,255,255,0.07)'" %>
+                  style: "padding:10px 22px;border-radius:100px;background:#2A2D3A;color:#fff;border:1px solid rgba(255,255,255,0.22);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;",
+                  onmouseover: "this.style.background='#383D4E'",
+                  onmouseout:  "this.style.background='#2A2D3A'" %>
             <button type="button"
-                    style="padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
-                    onmouseover="this.style.background='rgba(255,255,255,0.12)'"
-                    onmouseout="this.style.background='rgba(255,255,255,0.07)'"
+                    style="padding:10px 22px;border-radius:100px;background:#2A2D3A;color:#fff;border:1px solid rgba(255,255,255,0.22);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
+                    onmouseover="this.style.background='#383D4E'"
+                    onmouseout="this.style.background='#2A2D3A'"
                     data-action="click->publish-panel#openDesign click->editor-panel#open"><%= t("editor.design") %></button>
           <% end %>
           <button type="button"
-                  style="padding:10px 26px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
+                  style="padding:10px 26px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
                   onmouseover="this.style.background='#00C4AB'"
                   onmouseout="this.style.background='#01EACB'"
                   data-action="click->publish-panel#open click->editor-panel#open"><%= t("editor.publish_share") %></button>
         </div>
       </div>
+      </div><%# /feed wrapper %>
 
     </div><%# /cards column %>
 
