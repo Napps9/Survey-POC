@@ -2481,6 +2481,62 @@
 .verto-score.is-yellow .verto-score-num { color: #FFFA77; }
 .verto-score.is-red    .verto-score-num { color: #FF8FB6; }
 
+/* ── Overall Verto-score CTA in the top-left chrome ─ sits under the Leave
+   editor + Saved pills, stretched to their combined width; the traffic
+   tint comes from .verto-score.is-*, over dark glass so it reads on any
+   artwork. Opens the Rules-of-the-Game modal. ── */
+.editor-float-stack { flex-direction: column; align-items: stretch; }
+.editor-float-row { display: flex; align-items: center; gap: 8px; }
+.editor-score-cta {
+  display: flex; align-items: center; gap: 7px;
+  width: 100%;
+  padding: 7px 13px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
+  color: #fff; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.editor-score-cta:hover { background: rgba(20,23,38,0.85); }
+.editor-score-cta .verto-score-word { margin-inline-start: auto; }
+/* Keep the dark glass under the traffic tints (the .verto-score.is-* fills
+   are too transparent to sit directly on artwork). */
+.editor-score-cta.is-green  { background: rgba(6,42,38,0.75); }
+.editor-score-cta.is-yellow { background: rgba(46,42,10,0.75); }
+.editor-score-cta.is-red    { background: rgba(50,12,26,0.75); }
+
+/* The score-breakdown modal the CTA opens. */
+.score-modal-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(8,10,22,0.74); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; padding: 28px;
+}
+.score-modal-overlay.hidden { display: none; }
+.score-modal {
+  width: min(600px, 100%); max-height: 84vh;
+  background: #2A2D3A;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+  display: flex; flex-direction: column; overflow: hidden;
+  animation: fadeIn 0.18s ease-out;
+}
+.score-modal-head {
+  flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; padding: 20px 20px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.score-modal-eyebrow {
+  font-family: "Alata", sans-serif; font-size: var(--text-sm);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.5); margin-bottom: 4px;
+}
+.score-modal-title { font-family: "ABeeZee", sans-serif; font-size: var(--text-xl); color: #fff; line-height: 1.3; }
+.score-modal-hint { font-size: var(--text-md); color: rgba(255,255,255,0.6); margin-top: 5px; line-height: 1.45; }
+/* .score-board's flex:1 assumes a fixed-height column (its old panel home);
+   in the content-sized modal that basis:0 collapses it — size by content
+   instead, shrinking into scroll when the 84vh cap bites. */
+.score-modal .score-board { flex: 1 1 auto; min-height: 0; }
+
 /* Verto-score breakdown board — the right-column "Verto score" tab. The Rules-
    of-the-Game results, grouped red → amber → green, each row holding its fixes. */
 .score-board {
@@ -2622,7 +2678,6 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   align-items: flex-end;
   padding: 0 14px;
 }
-.right-tabs .verto-score,
 .right-tabs .right-tab-close {
   background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
   margin-bottom: 6px;

@@ -33,7 +33,7 @@
 <script id="card-eyebrows-i18n" type="application/json"><%= card_eyebrows_i18n(@survey).to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question logic-map editor-panel gate-cards"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question logic-map editor-panel gate-cards score-modal"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
@@ -136,26 +136,41 @@
       <div class="flex-1 min-h-0 relative flex flex-col">
 
       <%# Floating chrome — the brief strip is gone. What survives floats over
-          the feed: "Leave editor" + save status at the inline-start edge, the
-          device toggle (and language dropdown when multilingual) at the
-          inline-end edge. %>
+          the feed: "Leave editor" + save status with the overall Verto-score
+          CTA beneath them (opens the Rules-of-the-Game modal) at the
+          inline-start edge, the device toggle (and language dropdown when
+          multilingual) at the inline-end edge. %>
       <div class="editor-float-bar">
-        <div class="editor-float-group">
-          <%= link_to root_path, class: "editor-leave-btn",
-                title: t("editor.leave_editor", default: "Leave editor"),
-                "aria-label": t("editor.leave_editor", default: "Leave editor") do %>
-            <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span class="editor-leave-label"><%= t("editor.leave_editor", default: "Leave editor") %></span>
-          <% end %>
-          <%# flash() in survey_editor_controller rewrites the inner span's
-              class list (text-xs + a colour), so the pill styling lives on
-              the wrapper and persistent text styling inline. %>
-          <span class="editor-save-pill">
-            <span class="text-xs text-aquamarine" data-survey-editor-target="status"
-                  style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
-          </span>
+        <div class="editor-float-group editor-float-stack">
+          <div class="editor-float-row">
+            <%= link_to root_path, class: "editor-leave-btn",
+                  title: t("editor.leave_editor", default: "Leave editor"),
+                  "aria-label": t("editor.leave_editor", default: "Leave editor") do %>
+              <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="editor-leave-label"><%= t("editor.leave_editor", default: "Leave editor") %></span>
+            <% end %>
+            <%# flash() in survey_editor_controller rewrites the inner span's
+                class list (text-xs + a colour), so the pill styling lives on
+                the wrapper and persistent text styling inline. %>
+            <span class="editor-save-pill">
+              <span class="text-xs text-aquamarine" data-survey-editor-target="status"
+                    style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
+            </span>
+          </div>
+          <%# Overall Verto score — painted live by survey_editor#refreshScore
+              (same target/roles as the old right-tabs chip); stretches to the
+              combined width of the row above. Opens the breakdown modal. %>
+          <button type="button" class="verto-score editor-score-cta"
+                  data-survey-editor-target="vertoScore"
+                  aria-label="<%= t('js.editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
+                  data-action="click->score-modal#open">
+            <span class="rule-dot"></span>
+            <span class="verto-score-label"><%= t("js.editor.rules.score_label", default: "Verto score") %></span>
+            <span class="verto-score-num" data-role="verto-score-num">–</span>
+            <span class="verto-score-word" data-role="verto-score-word"></span>
+          </button>
         </div>
 
         <div class="editor-float-group">
@@ -360,17 +375,9 @@
               data-action="click->publish-panel#showTokensTab"><%= t("editor.tab_tokens", default: "Tokenisation") %></button>
       <button type="button" class="right-tab right-tab-folder right-tab--logic" data-publish-panel-target="branchTab"
               data-action="click->publish-panel#showBranch"><%= t("editor.tab_logic", default: "Logic & flows") %></button>
-      <%# The Why view has no tab — each card carries a round ? CTA under its
-          type badge (see _card_row) that opens it. %>
-      <button type="button" class="right-tab verto-score" data-survey-editor-target="vertoScore"
-              data-publish-panel-target="scoreTab"
-              aria-label="<%= t('js.editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
-              data-action="click->publish-panel#showScore">
-        <span class="rule-dot"></span>
-        <span class="verto-score-label"><%= t("js.editor.rules.score_label", default: "Verto score") %></span>
-        <span class="verto-score-num" data-role="verto-score-num">–</span>
-        <span class="verto-score-word" data-role="verto-score-word"></span>
-      </button>
+      <%# The Why view has no tab (each card carries a round ? CTA under its
+          type badge — see _card_row) and the Verto score lives in the
+          top-left chrome, opening a modal. %>
       <button type="button" class="right-tab right-tab-close"
               title="<%= t("editor.close") %>" aria-label="<%= t("editor.close") %>"
               data-action="click->editor-panel#close">✕</button>
@@ -764,24 +771,6 @@
         <div class="branch-slot card-subview-slot" data-type-panel-target="logicSlot"></div>
       <% end %>
     </div>
-
-    <%# ── Verto-score breakdown — the Rules-of-the-Game results grouped by
-        traffic light (red → amber → green), each row carrying what to change.
-        Filled in by survey_editor_controller#refreshScore. ── %>
-    <div class="type-panel hidden" data-publish-panel-target="scoreView">
-      <div class="type-panel-top">
-        <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
-          <%= t("js.editor.rules.title", default: "Rules of the Game") %>
-        </div>
-        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#fff;line-height:1.3;">
-          <%= t("js.editor.rules.board_heading", default: "What's working and what to fix") %>
-        </div>
-        <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;">
-          <%= t("js.editor.rules.board_hint", default: "Grouped by traffic light — tap a card to jump to it.") %>
-        </div>
-      </div>
-      <div class="score-board" data-survey-editor-target="scoreBoard"></div>
-    </div><%# /score panel %>
 
     <%# ── Publish & share panel (toggles in place of the answer-type panel) ── %>
     <div class="type-panel publish-panel hidden" data-publish-panel-target="publishView">
@@ -1244,6 +1233,29 @@
     </div>
 
   </div><%# /preview-overlay %>
+
+  <%# ── Verto-score breakdown modal — the Rules-of-the-Game results grouped
+      by traffic light (red → amber → green), each row carrying what to
+      change. Filled in by survey_editor_controller#refreshScore; opened from
+      the score CTA in the top-left chrome (score_modal_controller). Lives at
+      the root, NOT in the right column — the column is visibility:hidden
+      while collapsed, which would swallow the fixed overlay with it. ── %>
+  <div class="score-modal-overlay hidden" data-score-modal-target="overlay"
+       data-action="click->score-modal#overlayClick keydown.esc@window->score-modal#closeOnEsc">
+    <div class="score-modal" role="dialog" aria-modal="true"
+         aria-label="<%= t('js.editor.rules.title', default: 'Rules of the Game') %>">
+      <div class="score-modal-head">
+        <div>
+          <div class="score-modal-eyebrow"><%= t("js.editor.rules.title", default: "Rules of the Game") %></div>
+          <div class="score-modal-title"><%= t("js.editor.rules.board_heading", default: "What's working and what to fix") %></div>
+          <div class="score-modal-hint"><%= t("js.editor.rules.board_hint", default: "Grouped by traffic light — tap a card to jump to it.") %></div>
+        </div>
+        <button type="button" class="all-types-close" data-action="click->score-modal#close"
+                aria-label="<%= t('editor.close', default: 'Close') %>">✕</button>
+      </div>
+      <div class="score-board" data-survey-editor-target="scoreBoard"></div>
+    </div>
+  </div><%# /score modal %>
 
   <%= render "surveys/media_modal" %>
   <%= render "surveys/animation_modal" %>
