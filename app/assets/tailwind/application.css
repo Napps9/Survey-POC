@@ -2545,19 +2545,47 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 /* Right column hosts the answer-type picker, the Verto-score breakdown and the
    publish & share / design panels — one visible at a time, toggled by the
    publish-panel controller; the tab strip swaps the first two. */
+/* ── Main editor grid: the right panel is collapsed until needed (a card
+   click / Publish / Design opens it — editor-panel controller), so by
+   default the cards sit centred like the player. The grid columns animate
+   the slide. ── */
+.editor-grid {
+  display: grid; grid-template-columns: 1fr 0;
+  transition: grid-template-columns 0.28s ease;
+}
+.editor-grid.is-panel-open { grid-template-columns: 1fr 444px; }
+/* Collapsed: centre the full-size cards. 1120px ≈ the width cards get when
+   the panel is open, so opening reads as a slide, not a resize. */
+.editor-grid:not(.is-panel-open) .device-desktop .survey-card-wrap {
+  max-width: 1120px; width: 100%; margin-inline: auto;
+}
+
 .right-column {
   display: flex; flex-direction: column;
   min-height: 0;
+  /* Floating panel: inset from the top, bottom and screen edge, rounded and
+     self-contained. Fixed width (cell 444px − 14px inset) so collapsing the
+     grid column clips it (the grid wrapper is overflow-hidden) instead of
+     squishing its content mid-slide. */
+  width: 430px;
+  margin-block: 14px; margin-inline-end: 14px;
+  border-radius: 20px; overflow: hidden;
+  background: #2A2D3A;
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.35);
+  /* Unfocusable while collapsed; the delay lets the slide-out finish. */
+  visibility: hidden; transition: visibility 0s linear 0.3s;
 }
+.editor-grid.is-panel-open .right-column { visibility: visible; transition-delay: 0s; }
 
 /* Right-column tab strip — Answer type ⇆ Verto score. The score tab also
    carries .verto-score, so its traffic-light colour shows through. */
 .right-tabs {
   flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px;
   padding: 11px 12px; background: #2A2D3A;
-  border-left: 1px solid rgba(255,255,255,0.07);
   border-bottom: 1px solid rgba(255,255,255,0.07);
 }
+.right-tab-close { margin-inline-start: auto; padding: 5px 10px; }
 .right-tabs.hidden { display: none; }
 .right-tab {
   display: inline-flex; align-items: center; gap: 7px;
@@ -2585,9 +2613,9 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 .type-panel.hidden,
 .publish-panel.hidden { display: none; }
 
-/* Answer type panel */
+/* Answer type panel (also the shell for the Why/score/Publish/Design views —
+   the floating right column carries the outer border now). */
 .type-panel {
-  border-left: 1px solid rgba(255,255,255,0.07);
   background: #2A2D3A;
   display: flex; flex-direction: column; overflow: hidden;
 }

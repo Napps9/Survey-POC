@@ -34,7 +34,7 @@
 <script id="card-eyebrows-i18n" type="application/json"><%= card_eyebrows_i18n(@survey).to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question logic-map"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question logic-map editor-panel"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
      data-media-picker-url-value="<%= survey_path(@survey) %>"
@@ -68,7 +68,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.published? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -76,8 +76,9 @@
      style="<%= verto_brand_bg_image_var(@survey) %>">
 
 
-  <%# Main grid: cards feed | type panel %>
-  <div class="flex-1 overflow-hidden" style="display:grid;grid-template-columns:1fr 444px;">
+  <%# Main grid: cards feed | type panel. The panel column is collapsed until
+      a card click / Publish / Design opens it (editor-panel controller). %>
+  <div class="flex-1 overflow-hidden editor-grid" data-editor-panel-target="grid">
 
     <%# ── LEFT: Cards column ── %>
     <div class="flex flex-col overflow-hidden" data-controller="device-frame">
@@ -251,13 +252,13 @@
                     style="padding:10px 22px;border-radius:16px;background:rgba(255,255,255,0.07);color:#fff;border:1px solid rgba(255,255,255,0.2);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
                     onmouseover="this.style.background='rgba(255,255,255,0.12)'"
                     onmouseout="this.style.background='rgba(255,255,255,0.07)'"
-                    data-action="click->publish-panel#openDesign"><%= t("editor.design") %></button>
+                    data-action="click->publish-panel#openDesign click->editor-panel#open"><%= t("editor.design") %></button>
           <% end %>
           <button type="button"
                   style="padding:10px 26px;border-radius:16px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;transition:background 0.15s;"
                   onmouseover="this.style.background='#00C4AB'"
                   onmouseout="this.style.background='#01EACB'"
-                  data-action="click->publish-panel#open"><%= t("editor.publish_share") %></button>
+                  data-action="click->publish-panel#open click->editor-panel#open"><%= t("editor.publish_share") %></button>
         </div>
       </div>
 
@@ -288,6 +289,9 @@
         <span class="verto-score-num" data-role="verto-score-num">–</span>
         <span class="verto-score-word" data-role="verto-score-word"></span>
       </button>
+      <button type="button" class="right-tab right-tab-close"
+              title="<%= t("editor.close") %>" aria-label="<%= t("editor.close") %>"
+              data-action="click->editor-panel#close">✕</button>
     </div>
 
     <div class="type-panel" data-publish-panel-target="typeView"
