@@ -264,8 +264,12 @@
 
     </div><%# /cards column %>
 
-    <%# ── RIGHT: Answer type panel + Publish panel (toggled) ── %>
-    <div class="right-column">
+    <%# ── RIGHT: Answer type panel + Publish panel (toggled). Carries the
+        Verto's palette vars (same as the feed) so its floating shell paints
+        the Verto's own backdrop, kept live by brand-palette on Design edits. %>
+    <div class="right-column"
+         data-brand-palette-target="preview"
+         style="<%= verto_backdrop_style_attr(@survey, image: false) %>">
 
     <%# Right-column tabs — Answer type ⇆ Verto score. The score tab carries the
         live Rules-of-the-Game number/word (filled by survey_editor_controller);
