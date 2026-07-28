@@ -111,6 +111,22 @@
           the cards keep full height. Switching swaps the cards' language in
           place; structural edits stay locked to the primary language. %>
       <div class="brief-strip">
+        <%# The global top nav is hidden in the editor (@hide_main_nav) — this
+            back CTA is the way out, with the autosave status right beside it
+            so creators can check nothing is lost before leaving. %>
+        <%= link_to root_path, class: "editor-leave-btn",
+              title: t("editor.leave_editor", default: "Leave editor"),
+              "aria-label": t("editor.leave_editor", default: "Leave editor") do %>
+          <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="editor-leave-label"><%= t("editor.leave_editor", default: "Leave editor") %></span>
+        <% end %>
+        <%# flash() in survey_editor_controller rewrites this span's class list
+            (text-xs + a colour), so persistent styling lives inline. %>
+        <span class="text-xs text-aquamarine" data-survey-editor-target="status"
+              style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
+        <span class="brief-strip-divider" aria-hidden="true"></span>
         <span style="color:rgba(255,255,255,0.85);font-weight:600;"><%= @survey.theme %></span>
         <span style="color:rgba(255,255,255,0.3);">·</span>
         <span style="color:rgba(255,255,255,0.85);font-weight:600;"><%= @survey.audience_age %></span>
@@ -212,7 +228,6 @@
           <span>
             <strong style="color:#fff;" data-type-panel-target="cardCount"><%= t("editor.cards", count: cards.size) %></strong>
             &nbsp;·&nbsp; <%= t("editor.estimated", count: est_min) %>
-            &nbsp;·&nbsp; <span data-survey-editor-target="status" style="font-size: var(--text-sm);"></span>
           </span>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">

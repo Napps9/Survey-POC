@@ -627,6 +627,8 @@ ko:
     sign_in_failed: "해당 이메일과 비밀번호로 계정을 찾을 수 없습니다."
     welcome: "%{funder}에 오신 것을 환영합니다!"
   editor:
+    all_saved: '저장됨'
+    leave_editor: '편집기 나가기'
     animation_theme: "애니메이션"
     live_locked_bar: "이 Verto는 라이브 중 — 데이터 품질 보호를 위해 질문이 잠겨 있어요."
     live_results: "결과 보기 →"

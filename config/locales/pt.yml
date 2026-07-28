@@ -627,6 +627,8 @@ pt:
     sign_in_failed: "Não foi possível encontrar uma conta com esse e-mail e palavra-passe."
     welcome: "Bem-vindo(a) a %{funder}!"
   editor:
+    all_saved: 'Guardado'
+    leave_editor: 'Sair do editor'
     animation_theme: "Animação"
     live_locked_bar: "Este Verto está no ar — as perguntas estão bloqueadas para proteger a qualidade dos dados."
     live_results: "Ver resultados →"

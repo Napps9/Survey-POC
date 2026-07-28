@@ -627,6 +627,8 @@ tr:
     sign_in_failed: "Bu e-posta ve şifreyle eşleşen bir hesap bulunamadı."
     welcome: "%{funder}'a hoş geldiniz!"
   editor:
+    all_saved: 'Kaydedildi'
+    leave_editor: 'Editörden çık'
     animation_theme: "Animasyon"
     live_locked_bar: "Bu Verto yayında — veri kalitesini korumak için sorular kilitli."
     live_results: "Sonuçları gör →"

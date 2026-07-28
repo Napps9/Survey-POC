@@ -627,6 +627,8 @@ vi:
     sign_in_failed: "Không tìm thấy tài khoản nào khớp với email và mật khẩu đó."
     welcome: "Chào mừng đến với %{funder}!"
   editor:
+    all_saved: 'Đã lưu'
+    leave_editor: 'Rời trình chỉnh sửa'
     animation_theme: "Hoạt ảnh"
     live_locked_bar: "Verto này đang hoạt động — câu hỏi bị khóa để bảo vệ chất lượng dữ liệu."
     live_results: "Xem kết quả →"

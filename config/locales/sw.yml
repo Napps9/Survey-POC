@@ -627,6 +627,8 @@ sw:
     sign_in_failed: "Hatukupata akaunti yenye barua pepe na nenosiri hayo."
     welcome: "Karibu %{funder}!"
   editor:
+    all_saved: 'Imehifadhiwa'
+    leave_editor: 'Ondoka kwenye kihariri'
     animation_theme: "Animation"
     live_locked_bar: "Verto hii iko hewani — maswali yamefungwa kulinda ubora wa data."
     live_results: "Ona matokeo →"

@@ -38,6 +38,9 @@ class SurveysController < ApplicationController
   end
 
   def show
+    # The editor hides the global top nav — it gets a "Leave editor" CTA in
+    # its brief strip instead (the command palette stays reachable via ⌘K).
+    @hide_main_nav = true
     render :show
   end
 

@@ -627,6 +627,8 @@ es:
     sign_in_failed: "No se encontró ninguna cuenta con ese correo electrónico y esa contraseña."
     welcome: "¡Bienvenido/a a %{funder}!"
   editor:
+    all_saved: 'Guardado'
+    leave_editor: 'Salir del editor'
     animation_theme: "Animación"
     live_locked_bar: "Este Verto está en vivo — las preguntas están bloqueadas para proteger la calidad de los datos."
     live_results: "Ver resultados →"

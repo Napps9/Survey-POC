@@ -629,6 +629,8 @@ en:
     sign_in_failed: "Couldn't find an account with that email and password."
     welcome: "Welcome to %{funder}!"
   editor:
+    all_saved: 'Saved'
+    leave_editor: 'Leave editor'
     animation_theme: "Animation"
     live_locked_bar: "This Verto is live — questions are locked to protect data quality."
     live_results: "View results →"

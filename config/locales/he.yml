@@ -627,6 +627,8 @@ he:
     sign_in_failed: לא נמצא חשבון עם אימייל וסיסמה אלו.
     welcome: ברוכים הבאים ל-%{funder}!
   editor:
+    all_saved: 'נשמר'
+    leave_editor: 'יציאה מהעורך'
     animation_theme: "אנימציה"
     live_locked_bar: "הוורטו פעיל — השאלות נעולות כדי להגן על איכות הנתונים."
     live_results: "צפייה בתוצאות ←"

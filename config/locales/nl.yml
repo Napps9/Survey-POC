@@ -627,6 +627,8 @@ nl:
     sign_in_failed: "Geen account gevonden met dat e-mailadres en wachtwoord."
     welcome: "Welkom bij %{funder}!"
   editor:
+    all_saved: 'Opgeslagen'
+    leave_editor: 'Editor verlaten'
     animation_theme: "Animatie"
     live_locked_bar: "Deze Verto is live — vragen zijn vergrendeld om de datakwaliteit te beschermen."
     live_results: "Bekijk resultaten →"

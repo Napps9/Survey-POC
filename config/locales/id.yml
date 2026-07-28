@@ -627,6 +627,8 @@ id:
     sign_in_failed: Tidak dapat menemukan akun dengan email dan kata sandi tersebut.
     welcome: "Selamat datang di %{funder}!"
   editor:
+    all_saved: 'Tersimpan'
+    leave_editor: 'Keluar dari editor'
     animation_theme: "Animasi"
     live_locked_bar: "Verto ini live — pertanyaan terkunci untuk menjaga kualitas data."
     live_results: "Lihat hasil →"

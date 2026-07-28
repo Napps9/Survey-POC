@@ -629,6 +629,8 @@ ru:
     sign_in_failed: Не удалось найти аккаунт с таким email и паролем.
     welcome: Добро пожаловать в %{funder}!
   editor:
+    all_saved: 'Сохранено'
+    leave_editor: 'Выйти из редактора'
     animation_theme: "Анимация"
     live_locked_bar: "Этот Verto опубликован — вопросы заблокированы для защиты качества данных."
     live_results: "Смотреть результаты →"

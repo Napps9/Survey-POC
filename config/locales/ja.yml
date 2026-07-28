@@ -627,6 +627,8 @@ ja:
     sign_in_failed: そのメールアドレスとパスワードのアカウントが見つかりませんでした。
     welcome: "%{funder} へようこそ！"
   editor:
+    all_saved: '保存済み'
+    leave_editor: 'エディターを離れる'
     animation_theme: "アニメーション"
     live_locked_bar: "このVertoは公開中 — データ品質を守るため質問はロックされています。"
     live_results: "結果を見る →"

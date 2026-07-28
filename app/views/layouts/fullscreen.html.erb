@@ -8,10 +8,12 @@
         when signed in, so they replicate exactly what a respondent sees. %>
     <% if Current.user && !@chromeless %>
       <div data-controller="command-palette">
-        <%= render "shared/bottom_bar" %>
+        <%# @hide_main_nav pages (the editor) drop the top nav to free the
+            space, but keep the command palette reachable via ⌘K. %>
+        <%= render "shared/bottom_bar" unless @hide_main_nav %>
         <%= render "shared/command_palette" %>
       </div>
-      <div style="position: fixed; top: 56px; left: 0; right: 0; bottom: 0; overflow: auto;">
+      <div style="position: fixed; top: <%= @hide_main_nav ? "0" : "56px" %>; left: 0; right: 0; bottom: 0; overflow: auto;">
         <%= yield %>
       </div>
     <% else %>
