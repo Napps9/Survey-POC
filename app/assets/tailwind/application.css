@@ -2608,12 +2608,13 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 }
 .editor-grid.is-panel-open .right-column { visibility: visible; transition-delay: 0s; }
 
-/* Right-column tab strip — Answer type ⇆ Verto score. The score tab also
-   carries .verto-score, so its traffic-light colour shows through. */
+/* Right-column tab strip — folder-divider style: the view tabs are solid
+   colour-coded folder tabs (rounded tops, flat bottoms) sitting flush on the
+   panel content; the score chip and ✕ keep their pill shape alongside. */
 .right-tabs {
-  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px;
-  padding: 11px 12px; background: #2A2D3A;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 3px;
+  align-items: flex-end;
+  padding: 10px 10px 0; background: #2A2D3A;
 }
 .right-tab-close { margin-inline-start: auto; padding: 5px 10px; }
 
@@ -2641,21 +2642,29 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
    tab's traffic-light colour. */
 .right-tab.is-active { color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4); }
 
-/* Feature tabs in Verto brand colours — answer types navy, quiz yellow,
-   tokenisation teal, logic blue. Tinted outline at rest, solid fill when
-   active. After the base .right-tab rules so the colours win the cascade. */
-.right-tab--types { background: rgba(77,88,138,0.28); border-color: rgba(122,137,196,0.55); color: #B9C3E8; }
-.right-tab--types:hover { background: rgba(77,88,138,0.45); color: #fff; }
-.right-tab--types.is-active { background: #4D588A; border-color: #4D588A; color: #fff; }
-.right-tab--quiz { background: rgba(255,204,0,0.1); border-color: rgba(255,204,0,0.5); color: #FFCC00; }
-.right-tab--quiz:hover { background: rgba(255,204,0,0.2); color: #FFDD55; }
-.right-tab--quiz.is-active { background: #FFCC00; border-color: #FFCC00; color: #3A2A00; }
-.right-tab--tokens { background: rgba(1,234,203,0.08); border-color: rgba(1,234,203,0.45); color: #01EACB; }
-.right-tab--tokens:hover { background: rgba(1,234,203,0.18); color: #4FF3DC; }
-.right-tab--tokens.is-active { background: #01EACB; border-color: #01EACB; color: #04221E; }
-.right-tab--logic { background: rgba(12,167,255,0.1); border-color: rgba(12,167,255,0.5); color: #5FC6FF; }
-.right-tab--logic:hover { background: rgba(12,167,255,0.2); color: #8AD6FF; }
-.right-tab--logic.is-active { background: #0CA7FF; border-color: #0CA7FF; color: #03253A; }
+/* Folder tabs — always solid in their Verto brand colour with the name in
+   the tab; the active one sits "in front" at full colour and a touch
+   taller, the rest dim like folders behind. After the base .right-tab
+   rules so these win the cascade. */
+.right-tab-folder {
+  border: none;
+  border-radius: 10px 10px 0 0;
+  padding: 7px 15px 9px;
+  font-family: "Alata", sans-serif; letter-spacing: 0.02em;
+  transition: filter 0.15s, padding 0.15s;
+}
+.right-tab-folder:not(.is-active) { filter: brightness(0.55) saturate(0.9); }
+.right-tab-folder:hover:not(.is-active) { filter: brightness(0.78); }
+.right-tab-folder.is-active { box-shadow: none; padding-top: 10px; }
+
+/* The brand colours: answer types navy, quiz yellow, tokenisation teal,
+   logic blue, why purple. Explicit :hover/.is-active repeats keep the base
+   .right-tab hover/active washes from overriding the solid fills. */
+.right-tab--types, .right-tab--types:hover, .right-tab--types.is-active { background: #4D588A; color: #fff; }
+.right-tab--quiz, .right-tab--quiz:hover, .right-tab--quiz.is-active { background: #FFCC00; color: #3A2A00; }
+.right-tab--tokens, .right-tab--tokens:hover, .right-tab--tokens.is-active { background: #01EACB; color: #04221E; }
+.right-tab--logic, .right-tab--logic:hover, .right-tab--logic.is-active { background: #0CA7FF; color: #03253A; }
+.right-tab--why, .right-tab--why:hover, .right-tab--why.is-active { background: #615BF5; color: #fff; }
 
 /* Pulse a card when the score board jumps to it. */
 .card-flash { animation: cardFlash 1.3s ease-out; border-radius: 18px; }

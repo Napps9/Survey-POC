@@ -352,15 +352,15 @@
         feature is on. The publish-panel controller hides this strip while the
         Publish/Design overlays are open. %>
     <div class="right-tabs" data-publish-panel-target="tabs">
-      <button type="button" class="right-tab right-tab--types is-active" data-publish-panel-target="typeTab"
+      <button type="button" class="right-tab right-tab-folder right-tab--types is-active" data-publish-panel-target="typeTab"
               data-action="click->publish-panel#showType"><%= t("editor.answer_type") %></button>
-      <button type="button" class="right-tab right-tab--quiz" data-publish-panel-target="quizTab"
+      <button type="button" class="right-tab right-tab-folder right-tab--quiz" data-publish-panel-target="quizTab"
               data-action="click->publish-panel#showQuizTab"><%= t("editor.tab_quiz", default: "Quiz mode") %></button>
-      <button type="button" class="right-tab right-tab--tokens" data-publish-panel-target="tokensTab"
+      <button type="button" class="right-tab right-tab-folder right-tab--tokens" data-publish-panel-target="tokensTab"
               data-action="click->publish-panel#showTokensTab"><%= t("editor.tab_tokens", default: "Tokenisation") %></button>
-      <button type="button" class="right-tab right-tab--logic" data-publish-panel-target="branchTab"
+      <button type="button" class="right-tab right-tab-folder right-tab--logic" data-publish-panel-target="branchTab"
               data-action="click->publish-panel#showBranch"><%= t("editor.tab_logic", default: "Logic & flows") %></button>
-      <button type="button" class="right-tab" data-publish-panel-target="whyTab"
+      <button type="button" class="right-tab right-tab-folder right-tab--why" data-publish-panel-target="whyTab"
               data-action="click->publish-panel#showWhy"><%= t("editor.why", default: "Why") %></button>
       <button type="button" class="right-tab verto-score" data-survey-editor-target="vertoScore"
               data-publish-panel-target="scoreTab"
