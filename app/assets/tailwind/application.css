@@ -2552,6 +2552,17 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 .editor-grid {
   display: grid; grid-template-columns: 1fr 0;
   transition: grid-template-columns 0.28s ease;
+  position: relative;
+}
+/* The Verto's backdrop, spanning both columns so the solid floating panel
+   sits on it. z-index:-1 keeps it behind the in-flow columns; its palette
+   vars are inlined on the element itself (see the view) so they don't
+   cascade into the editor chrome. */
+.editor-backdrop {
+  position: absolute; inset: 0; z-index: -1;
+  background-color: var(--brand-bg, #272D4A);
+  background-image: var(--brand-bg-image, none);
+  background-size: cover; background-position: center;
 }
 .editor-grid.is-panel-open { grid-template-columns: 1fr 444px; }
 /* Collapsed: centre the full-size cards. 1120px ≈ the width cards get when
@@ -2570,12 +2581,7 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   width: 430px;
   margin-block: 14px; margin-inline-end: 14px;
   border-radius: 20px; overflow: hidden;
-  /* The Verto's own backdrop (palette vars are inlined on the element and
-     live-updated by brand-palette; --brand-bg-image inherits from the editor
-     root). The tab strip and panel views lay a frosted veil over it. */
-  background-color: var(--brand-bg, #272D4A);
-  background-image: var(--brand-bg-image, none);
-  background-size: cover; background-position: center;
+  background: #2A2D3A;
   border: 1px solid rgba(255,255,255,0.09);
   box-shadow: 0 18px 44px rgba(0,0,0,0.35);
   /* Unfocusable while collapsed; the delay lets the slide-out finish. */
@@ -2587,8 +2593,7 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
    carries .verto-score, so its traffic-light colour shows through. */
 .right-tabs {
   flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px;
-  padding: 11px 12px;
-  background: rgba(26,29,42,0.55); backdrop-filter: blur(14px);
+  padding: 11px 12px; background: #2A2D3A;
   border-bottom: 1px solid rgba(255,255,255,0.07);
 }
 .right-tab-close { margin-inline-start: auto; padding: 5px 10px; }
@@ -2620,10 +2625,9 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 .publish-panel.hidden { display: none; }
 
 /* Answer type panel (also the shell for the Why/score/Publish/Design views —
-   the floating right column paints the Verto backdrop; each view lays a
-   frosted veil over it so its content stays legible on any artwork). */
+   the floating right column carries the outer border now). */
 .type-panel {
-  background: rgba(26,29,42,0.55); backdrop-filter: blur(14px);
+  background: #2A2D3A;
   display: flex; flex-direction: column; overflow: hidden;
 }
 .type-panel-top {
