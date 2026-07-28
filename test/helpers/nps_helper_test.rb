@@ -79,6 +79,24 @@ class NpsHelperTest < ActionView::TestCase
     assert_equal NpsHelper::RANGE_THEMES.sort, slugs.sort
   end
 
+  test "every registered theme ships all five animation frames" do
+    NpsHelper::RANGE_THEMES.each do |slug|
+      (1..NpsHelper::NPS_FRAMES).each do |i|
+        path = Rails.root.join("app/assets/lottie", slug, "#{i}.json")
+        assert File.exist?(path), "missing #{path}"
+      end
+    end
+  end
+
+  test "range_theme_label overrides titleize where configured" do
+    assert_equal "PV Mascots", range_theme_label("pv_mascots")
+    assert_equal "Emoji Set A", range_theme_label("emoji_a")
+    assert_equal "Basketball", range_theme_label("basketball")
+    NpsHelper::RANGE_THEME_LABELS.each_key do |slug|
+      assert_includes NpsHelper::RANGE_THEMES, slug, "label override for unknown slug #{slug}"
+    end
+  end
+
   # ── range_themes_for (auto-population / Shuffle theme matching) ────────────
 
   test "RANGE_THEME_KEYWORDS covers every theme slug" do
@@ -107,7 +125,10 @@ class NpsHelperTest < ActionView::TestCase
   test "range_themes_for matches a theme string's own words (raw, not cluster-expanded)" do
     assert_equal NpsHelper::RANGE_THEME_GROUPS["Sport"].sort,
                  NpsHelper.range_themes_for("Grassroots sport and fitness").sort
-    assert_equal [ "balance" ], NpsHelper.range_themes_for("Mental health and wellbeing")
+    wellbeing_pool = NpsHelper.range_themes_for("Mental health and wellbeing")
+    assert_includes wellbeing_pool, "balance"
+    assert (wellbeing_pool & NpsHelper::RANGE_THEME_GROUPS["Sport"]).empty?,
+      "no sport animation for a wellbeing Verto, got #{wellbeing_pool.inspect}"
     assert_includes NpsHelper.range_themes_for("Remote work productivity"), "calendar"
     assert_includes NpsHelper.range_themes_for("New technology and AI"), "radar"
   end
@@ -118,9 +139,13 @@ class NpsHelperTest < ActionView::TestCase
   end
 
   test "range_themes_for falls back to the General group when nothing is on-theme" do
-    assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for("Personal finance and money")
+    assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for("Opera and classical composers")
     assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for("")
     assert_equal NpsHelper::RANGE_THEME_FALLBACK, NpsHelper.range_themes_for([])
+  end
+
+  test "range_themes_for surfaces the coins animation for a money theme" do
+    assert_equal "coins", NpsHelper.range_themes_for("Personal finance and money").first
   end
 
   test "range_themes_for is deterministic for the same theme" do

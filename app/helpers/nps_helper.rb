@@ -26,10 +26,12 @@ module NpsHelper
   # a set: drop the folder in and add its slug to a group here. NPS_THEME (the
   # default) must appear in one of these groups.
   RANGE_THEME_GROUPS = {
-    "Sport"                     => %w[basketball football football_goal stopwatch],
-    "Climate & Sustainability"  => %w[sun flowers recycling],
-    "Mental Health & Wellbeing" => %w[balance],
-    "General"                   => %w[pizza radar calendar]
+    "Sport"                     => %w[basketball football football_goal stopwatch target snooker_ball],
+    "Climate & Sustainability"  => %w[sun flowers recycling lotus plant tree],
+    "Mental Health & Wellbeing" => %w[balance lightbulb lightbulb_loading heart journal stones],
+    "Education"                 => %w[puzzle robot],
+    "General"                   => %w[pizza radar calendar coins cookies emoji_a emoji_b hand_gestures
+                                      koala pv_mascots dog speech_bubbles speech_bubbles_colour speedometer]
   }.freeze
 
   # Flat allow-list derived from the groups — the single source of truth for
@@ -59,7 +61,30 @@ module NpsHelper
     "balance"       => %w[wellbeing wellness mental mindfulness meditation stress anxiety therapy counselling calm balance burnout mood emotional sleep],
     "pizza"         => %w[food foods nutrition eating meal meals restaurant cuisine snack snacks cooking diet dietary hunger grocery groceries],
     "radar"         => %w[tech technology digital data online internet innovation software cyber signal],
-    "calendar"      => %w[work career job planning schedule productivity education study student students school university exam business office meeting deadline]
+    "calendar"      => %w[work career job planning schedule productivity education study student students school university exam business office meeting deadline],
+    "target"        => %w[sport sports darts dart archery target targets aim accuracy precision goal goals],
+    "snooker_ball"  => %w[sport sports snooker pool billiards cue],
+    "lotus"         => %w[nature lotus flower flowers bloom blossom garden pond yoga meditation mindfulness calm],
+    "plant"         => %w[nature plant plants seed seeds seedling sprout garden gardening soil growth growing],
+    "tree"          => %w[nature tree trees forest forests woodland planting climate environment sustainability growth],
+    "lightbulb"     => %w[idea ideas creativity creative innovation insight inspiration learning thinking mental wellbeing],
+    "lightbulb_loading" => %w[idea ideas thinking loading progress patience learning],
+    "heart"         => %w[love heart hearts kindness empathy compassion emotion emotional feeling feelings mood wellbeing mental health],
+    "journal"       => %w[journal journaling diary writing reflection gratitude notes study studying homework],
+    "stones"        => %w[calm balance mindfulness meditation zen stress patience stability],
+    "puzzle"        => %w[puzzle puzzles problem problems solving logic thinking skills learning education],
+    "robot"         => %w[robot robots ai technology tech coding programming stem digital education],
+    "coins"         => %w[money finance financial saving savings budget budgeting income wealth economy economic cost costs price prices],
+    "cookies"       => %w[food snack snacks baking treat treats cookie cookies],
+    "emoji_a"       => %w[emotion emotions emotional mood moods feeling feelings],
+    "emoji_b"       => %w[emotion emotions emotional mood moods feeling feelings],
+    "hand_gestures" => %w[gesture gestures hand hands approval agreement vote voting feedback],
+    "koala"         => %w[animal animals wildlife koala zoo pet pets nature],
+    "pv_mascots"    => [], # brand characters, no subject of their own — reachable via the General fallback and the picker
+    "dog"           => %w[animal animals dog dogs puppy pet pets wildlife],
+    "speech_bubbles"        => %w[communication conversation chat chatting message messages messaging talk talking discussion opinion opinions feedback],
+    "speech_bubbles_colour" => %w[communication conversation chat chatting message messages messaging talk talking discussion opinion opinions feedback],
+    "speedometer"   => %w[speed pace fast driving traffic transport travel commute frequency]
   }.freeze
 
   # Where an off-theme Verto's animation comes from: the General group is the
@@ -89,6 +114,21 @@ module NpsHelper
                    .sort_by { |_slug, n, i| [ -n, i ] }
                    .map(&:first)
     themed.presence || RANGE_THEME_FALLBACK
+  end
+
+  # Picker display names where slug.titleize doesn't read right.
+  RANGE_THEME_LABELS = {
+    "lightbulb"             => "Light Bulb",
+    "lightbulb_loading"     => "Light Bulb (Loading)",
+    "emoji_a"               => "Emoji Set A",
+    "emoji_b"               => "Emoji Set B",
+    "pv_mascots"            => "PV Mascots",
+    "speech_bubbles"        => "Speech Bubbles (White)",
+    "speech_bubbles_colour" => "Speech Bubbles (Colour)"
+  }.freeze
+
+  def range_theme_label(slug)
+    RANGE_THEME_LABELS[slug] || slug.titleize
   end
 
   def nps_card?(card)
@@ -137,7 +177,7 @@ module NpsHelper
   # [[category, [[label, slug], …]], …] for the range card's grouped <optgroup>
   # theme picker.
   def range_theme_groups
-    RANGE_THEME_GROUPS.map { |cat, slugs| [ cat, slugs.map { |slug| [ slug.titleize, slug ] } ] }
+    RANGE_THEME_GROUPS.map { |cat, slugs| [ cat, slugs.map { |slug| [ range_theme_label(slug), slug ] } ] }
   end
 
   # Editor payload for the theme picker: the control label; the flat theme list
@@ -148,7 +188,7 @@ module NpsHelper
   def range_theme_picker_data
     {
       label:  t("editor.animation_theme", default: "Animation"),
-      themes: RANGE_THEMES.map { |slug| { slug: slug, label: slug.titleize, urls: nps_lottie_urls(slug) } },
+      themes: RANGE_THEMES.map { |slug| { slug: slug, label: range_theme_label(slug), urls: nps_lottie_urls(slug) } },
       groups: RANGE_THEME_GROUPS.map { |cat, slugs| { category: cat, slugs: slugs } }
     }
   end
