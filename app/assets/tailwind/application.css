@@ -2675,7 +2675,19 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 .right-tab--quiz, .right-tab--quiz:hover, .right-tab--quiz.is-active { background: #FFCC00; color: #3A2A00; }
 .right-tab--tokens, .right-tab--tokens:hover, .right-tab--tokens.is-active { background: #01EACB; color: #04221E; }
 .right-tab--logic, .right-tab--logic:hover, .right-tab--logic.is-active { background: #0CA7FF; color: #03253A; }
-.right-tab--why, .right-tab--why:hover, .right-tab--why.is-active { background: #615BF5; color: #fff; }
+
+/* Per-card "Why" CTA — the round ? under each card's type badge. Clicking it
+   opens the Why view; the same click bubbles to type-panel#selectCard, which
+   populates that view for the card (as the old Why tab did post-selection). */
+.why-cta {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: none; cursor: pointer;
+  background: #615BF5; color: #fff;
+  font-family: "Alata", sans-serif; font-size: 14px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: transform 0.12s, filter 0.15s;
+}
+.why-cta:hover { filter: brightness(1.18); transform: scale(1.08); }
 
 /* Pulse a card when the score board jumps to it. */
 .card-flash { animation: cardFlash 1.3s ease-out; border-radius: 18px; }

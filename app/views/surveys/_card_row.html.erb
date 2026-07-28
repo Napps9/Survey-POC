@@ -42,12 +42,22 @@
      data-card-condition="<%= card['condition'].to_s %>"
      data-action="click->type-panel#selectCard">
 
-  <%# Chrome row above card — type badge, card number, the Rules-of-the-Game
-      traffic light, and delete. The light + analysis panel are filled in and
-      toggled by survey_editor_controller. %>
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
-    <span class="s-badge <%= meta[:badge_css] %>"><%= meta[:badge] %></span>
-    <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.3);" data-role="card-number">Card <%= idx + 1 %></span>
+  <%# Chrome row above card — type badge (with the round "Why" ? CTA beneath
+      it), card number, the Rules-of-the-Game traffic light, and delete. The
+      light + analysis panel are filled in and toggled by
+      survey_editor_controller. %>
+  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;padding:0 4px;">
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;flex-shrink:0;">
+      <span class="s-badge <%= meta[:badge_css] %>"><%= meta[:badge] %></span>
+      <%# Opens the Why view for this card — the click also bubbles to
+          type-panel#selectCard, which populates it (same behaviour the old
+          Why tab had after selecting a card). %>
+      <button type="button" class="why-cta"
+              title="<%= t('editor.why', default: 'Why') %>"
+              aria-label="<%= t('editor.why', default: 'Why') %>"
+              data-action="click->publish-panel#showWhy">?</button>
+    </div>
+    <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:3px;" data-role="card-number">Card <%= idx + 1 %></span>
     <% unless type == "welcome_card" %>
       <% if is_q %>
         <button type="button" class="card-light" data-role="card-light" hidden

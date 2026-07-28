@@ -360,8 +360,8 @@
               data-action="click->publish-panel#showTokensTab"><%= t("editor.tab_tokens", default: "Tokenisation") %></button>
       <button type="button" class="right-tab right-tab-folder right-tab--logic" data-publish-panel-target="branchTab"
               data-action="click->publish-panel#showBranch"><%= t("editor.tab_logic", default: "Logic & flows") %></button>
-      <button type="button" class="right-tab right-tab-folder right-tab--why" data-publish-panel-target="whyTab"
-              data-action="click->publish-panel#showWhy"><%= t("editor.why", default: "Why") %></button>
+      <%# The Why view has no tab — each card carries a round ? CTA under its
+          type badge (see _card_row) that opens it. %>
       <button type="button" class="right-tab verto-score" data-survey-editor-target="vertoScore"
               data-publish-panel-target="scoreTab"
               aria-label="<%= t('js.editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
