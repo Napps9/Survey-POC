@@ -2481,24 +2481,21 @@
 .verto-score.is-yellow .verto-score-num { color: #FFFA77; }
 .verto-score.is-red    .verto-score-num { color: #FF8FB6; }
 
-/* ── Overall Verto-score CTA in the top-left chrome ─ sits under the Leave
-   editor + Saved pills, stretched to their combined width; the traffic
+/* ── Overall Verto-score CTA — a pill in the top-right chrome, in line with
+   the Leave editor + Saved pills, next to the device toggle; the traffic
    tint comes from .verto-score.is-*, over dark glass so it reads on any
    artwork. Opens the Rules-of-the-Game modal. ── */
-.editor-float-stack { flex-direction: column; align-items: stretch; }
-.editor-float-row { display: flex; align-items: center; gap: 8px; }
 .editor-score-cta {
   display: flex; align-items: center; gap: 7px;
-  width: 100%;
   padding: 7px 13px; border-radius: 100px;
   border: 1px solid rgba(255,255,255,0.14);
   background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
   color: #fff; cursor: pointer;
   font-family: "ABeeZee", sans-serif; font-size: 12px;
+  white-space: nowrap;
   transition: background 0.15s, border-color 0.15s;
 }
 .editor-score-cta:hover { background: rgba(20,23,38,0.85); }
-.editor-score-cta .verto-score-word { margin-inline-start: auto; }
 /* Keep the dark glass under the traffic tints (the .verto-score.is-* fills
    are too transparent to sit directly on artwork). */
 .editor-score-cta.is-green  { background: rgba(6,42,38,0.75); }

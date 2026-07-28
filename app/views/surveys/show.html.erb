@@ -141,27 +141,28 @@
           inline-start edge, the device toggle (and language dropdown when
           multilingual) at the inline-end edge. %>
       <div class="editor-float-bar">
-        <div class="editor-float-group editor-float-stack">
-          <div class="editor-float-row">
-            <%= link_to root_path, class: "editor-leave-btn",
-                  title: t("editor.leave_editor", default: "Leave editor"),
-                  "aria-label": t("editor.leave_editor", default: "Leave editor") do %>
-              <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <span class="editor-leave-label"><%= t("editor.leave_editor", default: "Leave editor") %></span>
-            <% end %>
-            <%# flash() in survey_editor_controller rewrites the inner span's
-                class list (text-xs + a colour), so the pill styling lives on
-                the wrapper and persistent text styling inline. %>
-            <span class="editor-save-pill">
-              <span class="text-xs text-aquamarine" data-survey-editor-target="status"
-                    style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
-            </span>
-          </div>
+        <div class="editor-float-group">
+          <%= link_to root_path, class: "editor-leave-btn",
+                title: t("editor.leave_editor", default: "Leave editor"),
+                "aria-label": t("editor.leave_editor", default: "Leave editor") do %>
+            <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="editor-leave-label"><%= t("editor.leave_editor", default: "Leave editor") %></span>
+          <% end %>
+          <%# flash() in survey_editor_controller rewrites the inner span's
+              class list (text-xs + a colour), so the pill styling lives on
+              the wrapper and persistent text styling inline. %>
+          <span class="editor-save-pill">
+            <span class="text-xs text-aquamarine" data-survey-editor-target="status"
+                  style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
+          </span>
+        </div>
+
+        <div class="editor-float-group">
           <%# Overall Verto score — painted live by survey_editor#refreshScore
-              (same target/roles as the old right-tabs chip); stretches to the
-              combined width of the row above. Opens the breakdown modal. %>
+              (same target/roles as the old right-tabs chip); opens the
+              Rules-of-the-Game breakdown modal. %>
           <button type="button" class="verto-score editor-score-cta"
                   data-survey-editor-target="vertoScore"
                   aria-label="<%= t('js.editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
@@ -171,9 +172,6 @@
             <span class="verto-score-num" data-role="verto-score-num">–</span>
             <span class="verto-score-word" data-role="verto-score-word"></span>
           </button>
-        </div>
-
-        <div class="editor-float-group">
           <%# Device preview toggle — reframes the cards at phone / tablet
               width so creators see (and still edit) the responsive layout. %>
           <div class="device-toggle" role="group" aria-label="<%= t('editor.device_label', default: 'Preview size') %>">
