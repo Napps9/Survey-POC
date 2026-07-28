@@ -2155,6 +2155,12 @@
 .editor-float-group {
   display: flex; align-items: center; gap: 8px; pointer-events: auto;
 }
+/* The Verto score + device toggle hold the screen's top-right corner at all
+   times — fixed to the viewport, not the cards area, so the folder panel
+   opening doesn't push them around. */
+.editor-float-pinned {
+  position: fixed; top: 12px; inset-inline-end: 16px; z-index: 45;
+}
 /* Bottom variant — hosts the Flow map / Shuffle / Design / Publish pills
    where the finalize bar used to be. */
 .editor-float-bottom { top: auto; bottom: 14px; justify-content: center; }
@@ -2666,7 +2672,7 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
      are 680px tall and snap to the viewport centre, so a card's top edge
      sits at 50dvh − 333px (chrome row included); the 32px tab strip rides
      above that line. Clamped so short viewports keep the old 14px inset. */
-  margin-block-start: max(14px, calc(50dvh - 365px));
+  margin-block-start: max(60px, calc(50dvh - 365px));
   /* Unfocusable while collapsed; the delay lets the slide-out finish. */
   visibility: hidden; transition: visibility 0s linear 0.3s;
 }

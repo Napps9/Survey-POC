@@ -159,7 +159,9 @@
           </span>
         </div>
 
-        <div class="editor-float-group">
+        <%# Pinned to the screen's top-right corner — position:fixed, so it
+            holds the corner whether the folder panel is open or closed. %>
+        <div class="editor-float-group editor-float-pinned">
           <%# Overall Verto score — painted live by survey_editor#refreshScore
               (same target/roles as the old right-tabs chip); opens the
               Rules-of-the-Game breakdown modal. %>
