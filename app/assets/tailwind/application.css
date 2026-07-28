@@ -2724,66 +2724,51 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   background: var(--tab-color, #4D588A);
   transition: filter 0.15s, background 0.15s;
 }
-.right-tab-folder:not(.is-active):hover { filter: brightness(1.12); }
+.right-tab-folder:not(.is-active) { filter: brightness(0.82); }
+.right-tab-folder:not(.is-active):hover { filter: brightness(1); }
 .right-tab-folder.is-active {
   box-shadow: none;
-  background: var(--panel-tint, #2A2D3A);
+  background: var(--tab-color, #2A2D3A);
   border-color: var(--panel-edge, rgba(255,255,255,0.09));
-  color: #fff;
   padding-top: 9px;
   margin-bottom: -1px; position: relative; z-index: 1;
 }
 
-/* The brand colours (tab fill + matching panel tint and edge): answer types
-   navy, quiz yellow, tokenisation teal, logic blue. */
-.right-tab--types {
-  --tab-color: #4D588A;
-  --panel-tint: color-mix(in srgb, #4D588A 28%, #232838);
-  --panel-edge: color-mix(in srgb, #4D588A 60%, transparent);
-  color: #fff;
-}
-.right-tab--quiz {
-  --tab-color: #FFCC00;
-  --panel-tint: color-mix(in srgb, #FFCC00 20%, #232838);
-  --panel-edge: color-mix(in srgb, #FFCC00 50%, transparent);
-  color: #3A2A00;
-}
-.right-tab--tokens {
-  --tab-color: #01EACB;
-  --panel-tint: color-mix(in srgb, #01EACB 20%, #232838);
-  --panel-edge: color-mix(in srgb, #01EACB 50%, transparent);
-  color: #04221E;
-}
-.right-tab--logic {
-  --tab-color: #0CA7FF;
-  --panel-tint: color-mix(in srgb, #0CA7FF 22%, #232838);
-  --panel-edge: color-mix(in srgb, #0CA7FF 52%, transparent);
-  color: #03253A;
-}
+/* The brand colours (tab fill + darker folder edge). Tab text uses per-colour
+   inks that clear WCAG AA on the solid fills: dark ink on yellow/teal/blue,
+   white on navy. */
+.right-tab--types  { --tab-color: #4D588A; --panel-edge: #39426B; color: #fff; }
+.right-tab--quiz   { --tab-color: #FFCC00; --panel-edge: #B99400; color: #3A2A00; }
+.right-tab--tokens { --tab-color: #01EACB; --panel-edge: #01AD97; color: #04221E; }
+.right-tab--logic  { --tab-color: #0CA7FF; --panel-edge: #0880C7; color: #03253A; }
 
-/* The matching folder paper — each view body wears its tab's tint (Why in
-   purple for its ? CTA; Publish/Design keep the default navy). Scoped under
+/* The folder paper — each view body is the SOLID tab colour (Why purple for
+   its ? CTA; Publish/Design keep navy). Content sits in dark islands (below)
+   so text keeps its designed white-on-dark contrast. Scoped under
    .right-column so these outrank the .right-column > .type-panel border. */
-.right-column > .panel--types {
-  background: color-mix(in srgb, #4D588A 28%, #232838);
-  border-color: color-mix(in srgb, #4D588A 60%, transparent);
+.right-column > .panel--types  { background: #4D588A; border-color: #39426B; }
+.right-column > .panel--quiz   { background: #FFCC00; border-color: #B99400; }
+.right-column > .panel--tokens { background: #01EACB; border-color: #01AD97; }
+.right-column > .panel--logic  { background: #0CA7FF; border-color: #0880C7; }
+.right-column > .panel--why    { background: #615BF5; border-color: #4A45C9; }
+
+/* Dark content islands on the solid paper: every content zone keeps an
+   opaque dark surface, so all inner text and controls retain their
+   white-on-dark WCAG AA contrast whatever the paper colour, and the
+   containers themselves clear the 3:1 non-text contrast against every
+   paper. The paper shows as the frame between islands. */
+.panel-paper { padding: 8px; gap: 8px; }
+.panel-paper .type-panel-top,
+.panel-paper .type-panel-empty,
+.panel-paper .card-subview,
+.panel-paper .why-body,
+.panel-paper .branch-slot,
+.panel-paper .panel-island {
+  background: #232838;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
 }
-.right-column > .panel--quiz {
-  background: color-mix(in srgb, #FFCC00 20%, #232838);
-  border-color: color-mix(in srgb, #FFCC00 50%, transparent);
-}
-.right-column > .panel--tokens {
-  background: color-mix(in srgb, #01EACB 20%, #232838);
-  border-color: color-mix(in srgb, #01EACB 50%, transparent);
-}
-.right-column > .panel--logic {
-  background: color-mix(in srgb, #0CA7FF 22%, #232838);
-  border-color: color-mix(in srgb, #0CA7FF 52%, transparent);
-}
-.right-column > .panel--why {
-  background: color-mix(in srgb, #615BF5 26%, #232838);
-  border-color: color-mix(in srgb, #615BF5 55%, transparent);
-}
+.panel-paper .type-panel-top { border-bottom: 1px solid rgba(255,255,255,0.08); }
 
 /* Per-card "Why" CTA — the round ? under each card's type badge. Clicking it
    opens the Why view; the same click bubbles to type-panel#selectCard, which
