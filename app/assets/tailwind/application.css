@@ -2646,6 +2646,14 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   max-width: 1120px; width: 100%; margin-inline: auto;
 }
 
+/* Scroll snap — while scrolling the feed, each card (and gate card) clicks
+   into the centre of the view so the one being edited is always fully in
+   sight. Mandatory so there's no dead zone between cards; snap areas taller
+   than the viewport stay scrollable within, per the scroll-snap spec. */
+.editor-feed { scroll-snap-type: y mandatory; }
+.editor-feed .survey-card-wrap,
+.editor-feed .gate-card-wrap { scroll-snap-align: center; }
+
 .right-column {
   display: flex; flex-direction: column;
   min-height: 0;

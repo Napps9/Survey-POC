@@ -223,7 +223,7 @@
           palette is scoped here so the cards render in brand colours while the
           surrounding editor chrome stays Playverto. The extra top padding
           keeps the first card's badges clear of the floating chrome. %>
-      <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 device-desktop <%= 'editor-feed-locked' if live_locked %>"
+      <div class="editor-feed flex-1 overflow-y-auto p-5 flex flex-col gap-5 device-desktop <%= 'editor-feed-locked' if live_locked %>"
            data-brand-palette-target="preview"
            data-add-question-target="cardsFeed"
            data-survey-editor-target="feed"
