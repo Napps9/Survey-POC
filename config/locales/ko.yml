@@ -629,6 +629,10 @@ ko:
   editor:
     all_saved: '저장됨'
     leave_editor: '편집기 나가기'
+    tab_quiz: '퀴즈 모드'
+    tab_tokens: '토큰화'
+    tab_logic: '로직과 흐름'
+    select_card_for_options: '왼쪽에서 질문 카드를 선택하여 옵션을 설정하세요.'
     consent_gate: '동의 단계'
     consent_default: '참여하시면 익명 답변이 연구에 사용될 수 있음에 동의하는 것입니다.'
     thank_you_screen: '감사 화면'

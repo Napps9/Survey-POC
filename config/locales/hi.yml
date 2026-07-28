@@ -629,6 +629,10 @@ hi:
   editor:
     all_saved: 'सहेजा गया'
     leave_editor: 'संपादक से बाहर निकलें'
+    tab_quiz: 'क्विज़ मोड'
+    tab_tokens: 'टोकन प्रणाली'
+    tab_logic: 'लॉजिक और फ़्लो'
+    select_card_for_options: 'इसके विकल्प सेट करने के लिए बाईं ओर एक प्रश्न कार्ड चुनें.'
     consent_gate: 'सहमति चरण'
     consent_default: 'भाग लेकर आप सहमत होते हैं कि आपके अनाम उत्तर शोध के लिए उपयोग किए जा सकते हैं.'
     thank_you_screen: 'धन्यवाद स्क्रीन'

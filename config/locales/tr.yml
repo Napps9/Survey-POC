@@ -629,6 +629,10 @@ tr:
   editor:
     all_saved: 'Kaydedildi'
     leave_editor: 'Editörden çık'
+    tab_quiz: 'Sınav modu'
+    tab_tokens: 'Jetonlaştırma'
+    tab_logic: 'Mantık ve akışlar'
+    select_card_for_options: 'Seçeneklerini ayarlamak için soldan bir soru kartı seçin.'
     consent_gate: 'Onay adımı'
     consent_default: 'Katılarak anonim yanıtlarınızın araştırma için kullanılabileceğini kabul etmiş olursunuz.'
     thank_you_screen: 'Teşekkür ekranı'

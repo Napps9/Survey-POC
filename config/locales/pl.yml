@@ -631,6 +631,10 @@ pl:
   editor:
     all_saved: 'Zapisano'
     leave_editor: 'Opuść edytor'
+    tab_quiz: 'Tryb quizu'
+    tab_tokens: 'Tokenizacja'
+    tab_logic: 'Logika i przepływy'
+    select_card_for_options: 'Wybierz kartę pytania po lewej, aby ustawić jej opcje.'
     consent_gate: 'Krok zgody'
     consent_default: 'Biorąc udział, zgadzasz się, że Twoje anonimowe odpowiedzi mogą zostać wykorzystane do badań.'
     thank_you_screen: 'Ekran podziękowania'

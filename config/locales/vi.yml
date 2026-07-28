@@ -629,6 +629,10 @@ vi:
   editor:
     all_saved: 'Đã lưu'
     leave_editor: 'Rời trình chỉnh sửa'
+    tab_quiz: 'Chế độ đố vui'
+    tab_tokens: 'Mã hóa token'
+    tab_logic: 'Logic & luồng'
+    select_card_for_options: 'Chọn một thẻ câu hỏi ở bên trái để thiết lập tùy chọn.'
     consent_gate: 'Bước đồng ý'
     consent_default: 'Khi tham gia, bạn đồng ý rằng các câu trả lời ẩn danh của bạn có thể được dùng cho nghiên cứu.'
     thank_you_screen: 'Màn hình cảm ơn'

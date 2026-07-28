@@ -629,6 +629,10 @@ nl:
   editor:
     all_saved: 'Opgeslagen'
     leave_editor: 'Editor verlaten'
+    tab_quiz: 'Quizmodus'
+    tab_tokens: 'Tokenisatie'
+    tab_logic: 'Logica & flows'
+    select_card_for_options: 'Selecteer links een vraagkaart om de opties in te stellen.'
     consent_gate: 'Toestemmingsstap'
     consent_default: 'Door deel te nemen ga je ermee akkoord dat je anonieme antwoorden voor onderzoek gebruikt mogen worden.'
     thank_you_screen: 'Bedankscherm'

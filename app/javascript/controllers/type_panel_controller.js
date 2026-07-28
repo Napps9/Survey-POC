@@ -583,7 +583,7 @@ export default class extends Controller {
     "card", "panelEmpty", "cardEditor", "typeList", "panelFooter",
     "panelCardName", "panelHint", "typeOpt", "toast", "toastMsg", "cardCount",
     "allTypesModal", "allTypesList", "allTypeOpt", "modalCardName",
-    "subtabs", "subtab", "subview", "tokenSlot", "quizSlot",
+    "tokenSlot", "quizSlot", "tokensEmpty", "quizEmpty",
     "logicSlot", "branchEmpty", "branchNote", "branchCardName",
     "whyCardName", "whyEmpty", "whyBody", "whyNote", "whyFramework",
     "whyCompetencyRow", "whyCompetencyBadge", "whyCompetencyBlurb",
@@ -646,15 +646,6 @@ export default class extends Controller {
     if (this.hasTokenSlotTarget) this._parkingLot.append(...this.tokenSlotTarget.children)
     if (this.hasQuizSlotTarget)  this._parkingLot.append(...this.quizSlotTarget.children)
     if (this.hasLogicSlotTarget) this._parkingLot.append(...this.logicSlotTarget.children)
-  }
-
-  showSubtab(event) {
-    this._showSubtab(event.currentTarget.dataset.subtab)
-  }
-
-  _showSubtab(name) {
-    this.subtabTargets.forEach(b => b.classList.toggle("is-active", b.dataset.subtab === name))
-    this.subviewTargets.forEach(v => { v.hidden = v.dataset.subtab !== name })
   }
 
   // Lazy getter so the JSON blob is read from the current page's DOM on
@@ -730,7 +721,7 @@ export default class extends Controller {
     if (this.hasPanelDeleteBtnTarget) this.panelDeleteBtnTarget.hidden = cardType === "welcome_card"
 
     this._renderCompatibleTypes(cardType)
-    this._updateSubtabsFor(card, cardType)
+    this._updateFeatureSlotsFor(card, cardType)
     this._updateBranchFor(card, cardType, cardNum)
     this._renderWhy(card, cardType, cardNum)
 
@@ -739,29 +730,21 @@ export default class extends Controller {
     this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")?.refreshCard(card)
   }
 
-  // Show/hide the Tokenomics and Quiz mode sub-tabs for the just-selected
-  // card, and relocate its quiz/token blocks (if any) into their slots. Only
-  // one card's blocks are ever out of their card at a time — the previously
-  // active card's blocks get parked (not lost — see _parkSlotContents).
-  _updateSubtabsFor(card, cardType) {
+  // Relocate the just-selected card's quiz/token blocks (if any) into the
+  // Quiz mode / Tokenisation tabs' per-card slots, and toggle those tabs'
+  // select-a-card hints. Only one card's blocks are ever out of their card at
+  // a time — the previously active card's blocks get parked (not lost — see
+  // _parkSlotContents). The slots only render when the feature is on.
+  _updateFeatureSlotsFor(card, cardType) {
     const isQ = !NON_QUESTION_TYPES.includes(cardType)
-    const showTokens = isQ && this.tokenisationValue
-    const showQuiz   = isQ && this.quizValue
-
-    const tokensBtn = this.subtabTargets.find(b => b.dataset.subtab === "tokens")
-    const quizBtn   = this.subtabTargets.find(b => b.dataset.subtab === "quiz")
-    if (tokensBtn) tokensBtn.hidden = !showTokens
-    if (quizBtn)   quizBtn.hidden   = !showQuiz
-    this.subtabsTarget.hidden = !(showTokens || showQuiz)
 
     this._parkSlotContents()
-    const tokenBlock = showTokens ? this.tokenBlockFor(card) : null
-    const quizBlock  = showQuiz   ? this.quizBlockFor(card)  : null
+    const tokenBlock = isQ && this.tokenisationValue ? this.tokenBlockFor(card) : null
+    const quizBlock  = isQ && this.quizValue         ? this.quizBlockFor(card)  : null
     if (this.hasTokenSlotTarget && tokenBlock) this.tokenSlotTarget.appendChild(tokenBlock)
     if (this.hasQuizSlotTarget && quizBlock)   this.quizSlotTarget.appendChild(quizBlock)
-
-    const activeBtn = this.subtabTargets.find(b => b.classList.contains("is-active"))
-    if (!activeBtn || activeBtn.hidden) this._showSubtab("type")
+    if (this.hasTokensEmptyTarget) this.tokensEmptyTarget.style.display = tokenBlock ? "none" : ""
+    if (this.hasQuizEmptyTarget)   this.quizEmptyTarget.style.display   = quizBlock ? "none" : ""
   }
 
   // Populate the top-level "Branching" tab for the selected card: relocate its
@@ -931,12 +914,8 @@ export default class extends Controller {
       // The deleted card's blocks (if relocated into the sidebar) go with it —
       // there's no card left to save their data against.
       this._parkSlotContents()
-      const tokensBtn = this.subtabTargets.find(b => b.dataset.subtab === "tokens")
-      const quizBtn   = this.subtabTargets.find(b => b.dataset.subtab === "quiz")
-      if (tokensBtn) tokensBtn.hidden = true
-      if (quizBtn)   quizBtn.hidden   = true
-      this.subtabsTarget.hidden = true
-      this._showSubtab("type")
+      if (this.hasTokensEmptyTarget) this.tokensEmptyTarget.style.display = ""
+      if (this.hasQuizEmptyTarget)   this.quizEmptyTarget.style.display   = ""
     }
     this._updateCount()
     this.dispatch("changed")

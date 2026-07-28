@@ -473,9 +473,15 @@ class SurveysController < ApplicationController
 
     @survey.update!(attrs) if attrs.any?
     respond_to do |format|
-      # The publish panel's forms are plain full-page POSTs; the in-feed
+      # The settings forms are plain full-page POSTs; the in-feed
       # consent/thank-you gate cards save the same fields via fetch + JSON.
-      format.html { redirect_to survey_path(@survey, slug_error: (slug_taken ? "taken" : nil), panel: "publish") }
+      # Forms in the right panel's feature tabs (quiz / tokens / logic) send
+      # return_tab so the reload reopens their tab instead of the Publish view.
+      format.html do
+        return_tab = params[:return_tab].to_s.presence
+        redirect_to survey_path(@survey, slug_error: (slug_taken ? "taken" : nil),
+          panel: (return_tab ? nil : "publish"), tab: return_tab)
+      end
       format.json { render json: { ok: true, slug_taken: slug_taken } }
     end
   end

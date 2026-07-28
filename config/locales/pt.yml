@@ -629,6 +629,10 @@ pt:
   editor:
     all_saved: 'Guardado'
     leave_editor: 'Sair do editor'
+    tab_quiz: 'Modo de quiz'
+    tab_tokens: 'Tokenização'
+    tab_logic: 'Lógica e fluxos'
+    select_card_for_options: 'Selecione um cartão de pergunta à esquerda para definir as suas opções.'
     consent_gate: 'Passo de consentimento'
     consent_default: 'Ao participar, aceita que as suas respostas anónimas possam ser utilizadas para investigação.'
     thank_you_screen: 'Ecrã de agradecimento'

@@ -629,6 +629,10 @@ de:
   editor:
     all_saved: 'Gespeichert'
     leave_editor: 'Editor verlassen'
+    tab_quiz: 'Quizmodus'
+    tab_tokens: 'Tokenisierung'
+    tab_logic: 'Logik & Abläufe'
+    select_card_for_options: 'Wähle links eine Fragekarte, um ihre Optionen festzulegen.'
     consent_gate: 'Einwilligungsschritt'
     consent_default: 'Mit deiner Teilnahme erklärst du dich einverstanden, dass deine anonymen Antworten für Forschungszwecke verwendet werden dürfen.'
     thank_you_screen: 'Dankeschön-Seite'

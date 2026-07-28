@@ -629,6 +629,10 @@ ja:
   editor:
     all_saved: '保存済み'
     leave_editor: 'エディターを離れる'
+    tab_quiz: 'クイズモード'
+    tab_tokens: 'トークン化'
+    tab_logic: 'ロジックとフロー'
+    select_card_for_options: '左側の質問カードを選択してオプションを設定してください。'
     consent_gate: '同意ステップ'
     consent_default: '参加することで、匿名の回答が研究に使用されることに同意したものとみなされます。'
     thank_you_screen: 'サンクス画面'

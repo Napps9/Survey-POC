@@ -629,6 +629,10 @@ es:
   editor:
     all_saved: 'Guardado'
     leave_editor: 'Salir del editor'
+    tab_quiz: 'Modo cuestionario'
+    tab_tokens: 'Tokenización'
+    tab_logic: 'Lógica y flujos'
+    select_card_for_options: 'Selecciona una tarjeta de pregunta a la izquierda para configurar sus opciones.'
     consent_gate: 'Paso de consentimiento'
     consent_default: 'Al participar, aceptas que tus respuestas anónimas puedan utilizarse con fines de investigación.'
     thank_you_screen: 'Pantalla de agradecimiento'

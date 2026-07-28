@@ -629,6 +629,10 @@ he:
   editor:
     all_saved: 'נשמר'
     leave_editor: 'יציאה מהעורך'
+    tab_quiz: 'מצב חידון'
+    tab_tokens: 'טוקניזציה'
+    tab_logic: 'לוגיקה וזרימות'
+    select_card_for_options: 'בחר כרטיס שאלה כדי להגדיר את האפשרויות שלו.'
     consent_gate: 'שלב הסכמה'
     consent_default: 'בהשתתפותך, אתה מסכים שתשובותיך האנונימיות עשויות לשמש למחקר.'
     thank_you_screen: 'מסך תודה'

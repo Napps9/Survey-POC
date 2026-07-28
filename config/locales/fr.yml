@@ -629,6 +629,10 @@ fr:
   editor:
     all_saved: 'Enregistré'
     leave_editor: 'Quitter l''éditeur'
+    tab_quiz: 'Mode quiz'
+    tab_tokens: 'Tokenisation'
+    tab_logic: 'Logique et parcours'
+    select_card_for_options: 'Sélectionnez une carte question à gauche pour définir ses options.'
     consent_gate: 'Étape de consentement'
     consent_default: 'En participant, vous acceptez que vos réponses anonymes puissent être utilisées à des fins de recherche.'
     thank_you_screen: 'Écran de remerciement'

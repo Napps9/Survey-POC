@@ -10,23 +10,35 @@ import { Controller } from "@hotwired/stimulus"
 // hidden while an overlay is open.
 export default class extends Controller {
   static targets = [
-    "typeView", "scoreView", "whyView", "branchView", "publishView", "designView",
-    "tabs", "typeTab", "scoreTab", "whyTab", "branchTab"
+    "typeView", "scoreView", "whyView", "branchView", "quizView", "tokensView",
+    "publishView", "designView",
+    "tabs", "typeTab", "scoreTab", "whyTab", "branchTab", "quizTab", "tokensTab"
   ]
 
   connect() {
-    // The Publish panel's settings toggles (results-comparison, quiz mode,
-    // form mode, tokenisation, consent, thank-you, custom link) submit as
-    // plain full-page POSTs — see SurveysController#update_settings — so the
-    // panel would otherwise silently reset to the answer-type tab on every
-    // toggle. The redirect echoes back panel=publish so we can reopen it.
+    // The settings toggles (results-comparison, form mode, custom link in the
+    // Publish panel; quiz / logic / tokenisation in their feature tabs) submit
+    // as plain full-page POSTs — see SurveysController#update_settings — so
+    // the panel would otherwise silently reset to the answer-type tab on
+    // every toggle. The redirect echoes back panel=publish or tab=<feature>
+    // so we can reopen the right view (editor-panel reads the same params to
+    // un-collapse the column; URL cleanup waits a frame so it isn't raced).
     const params = new URLSearchParams(window.location.search)
+    const tabViews = { quiz: "quizView", tokens: "tokensView", logic: "branchView" }
+    const returnedTab = tabViews[params.get("tab")]
     if (params.get("panel") === "publish") {
       this.open()
-      params.delete("panel")
-      const query = params.toString()
-      const url = window.location.pathname + (query ? `?${query}` : "") + window.location.hash
-      window.history.replaceState(window.history.state, "", url)
+    } else if (returnedTab) {
+      this._show(returnedTab)
+    }
+    if (params.get("panel") === "publish" || returnedTab) {
+      requestAnimationFrame(() => {
+        params.delete("panel")
+        params.delete("tab")
+        const query = params.toString()
+        const url = window.location.pathname + (query ? `?${query}` : "") + window.location.hash
+        window.history.replaceState(window.history.state, "", url)
+      })
     }
   }
 
@@ -49,6 +61,8 @@ export default class extends Controller {
   showScore() { this._show("scoreView") }
   showWhy() { this._show("whyView") }
   showBranch() { this._show("branchView") }
+  showQuizTab() { this._show("quizView") }
+  showTokensTab() { this._show("tokensView") }
 
   _show(which) {
     const views = {
@@ -56,6 +70,8 @@ export default class extends Controller {
       scoreView: this.hasScoreViewTarget ? this.scoreViewTarget : null,
       whyView: this.hasWhyViewTarget ? this.whyViewTarget : null,
       branchView: this.hasBranchViewTarget ? this.branchViewTarget : null,
+      quizView: this.hasQuizViewTarget ? this.quizViewTarget : null,
+      tokensView: this.hasTokensViewTarget ? this.tokensViewTarget : null,
       publishView: this.hasPublishViewTarget ? this.publishViewTarget : null,
       designView: this.hasDesignViewTarget ? this.designViewTarget : null
     }
@@ -63,13 +79,15 @@ export default class extends Controller {
       if (el) el.classList.toggle("hidden", name !== which)
     })
 
-    // The tab strip belongs to the peer views (answer type / why / branching /
-    // score); the Publish/Design overlays take over the whole column.
-    const tabbed = ["typeView", "scoreView", "whyView", "branchView"].includes(which)
+    // The tab strip belongs to the peer views (answer types / quiz / tokens /
+    // logic / why / score); the Publish/Design overlays take over the column.
+    const tabbed = ["typeView", "scoreView", "whyView", "branchView", "quizView", "tokensView"].includes(which)
     if (this.hasTabsTarget) this.tabsTarget.classList.toggle("hidden", !tabbed)
     if (this.hasTypeTabTarget)   this.typeTabTarget.classList.toggle("is-active", which === "typeView")
     if (this.hasScoreTabTarget)  this.scoreTabTarget.classList.toggle("is-active", which === "scoreView")
     if (this.hasWhyTabTarget)    this.whyTabTarget.classList.toggle("is-active", which === "whyView")
     if (this.hasBranchTabTarget) this.branchTabTarget.classList.toggle("is-active", which === "branchView")
+    if (this.hasQuizTabTarget)   this.quizTabTarget.classList.toggle("is-active", which === "quizView")
+    if (this.hasTokensTabTarget) this.tokensTabTarget.classList.toggle("is-active", which === "tokensView")
   }
 }

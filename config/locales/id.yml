@@ -629,6 +629,10 @@ id:
   editor:
     all_saved: 'Tersimpan'
     leave_editor: 'Keluar dari editor'
+    tab_quiz: 'Mode kuis'
+    tab_tokens: 'Tokenisasi'
+    tab_logic: 'Logika & alur'
+    select_card_for_options: 'Pilih kartu pertanyaan di sebelah kiri untuk mengatur opsinya.'
     consent_gate: 'Langkah persetujuan'
     consent_default: 'Dengan berpartisipasi, Anda setuju bahwa jawaban anonim Anda dapat digunakan untuk penelitian.'
     thank_you_screen: 'Layar terima kasih'

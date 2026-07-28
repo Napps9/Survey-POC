@@ -2616,6 +2616,16 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   border-bottom: 1px solid rgba(255,255,255,0.07);
 }
 .right-tab-close { margin-inline-start: auto; padding: 5px 10px; }
+
+/* Verto-wide activation/setup block that leads each feature tab — the
+   toggle (and e.g. the token-types manager) lives here; per-card options
+   render below it once the feature is on. */
+.feature-setup {
+  margin-top: 8px; padding: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
 .right-tabs.hidden { display: none; }
 .right-tab {
   display: inline-flex; align-items: center; gap: 7px;
@@ -2630,6 +2640,22 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 /* Selected tab gets an inset ring so it reads as active whatever the score
    tab's traffic-light colour. */
 .right-tab.is-active { color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4); }
+
+/* Feature tabs in Verto brand colours — answer types navy, quiz yellow,
+   tokenisation teal, logic blue. Tinted outline at rest, solid fill when
+   active. After the base .right-tab rules so the colours win the cascade. */
+.right-tab--types { background: rgba(77,88,138,0.28); border-color: rgba(122,137,196,0.55); color: #B9C3E8; }
+.right-tab--types:hover { background: rgba(77,88,138,0.45); color: #fff; }
+.right-tab--types.is-active { background: #4D588A; border-color: #4D588A; color: #fff; }
+.right-tab--quiz { background: rgba(255,204,0,0.1); border-color: rgba(255,204,0,0.5); color: #FFCC00; }
+.right-tab--quiz:hover { background: rgba(255,204,0,0.2); color: #FFDD55; }
+.right-tab--quiz.is-active { background: #FFCC00; border-color: #FFCC00; color: #3A2A00; }
+.right-tab--tokens { background: rgba(1,234,203,0.08); border-color: rgba(1,234,203,0.45); color: #01EACB; }
+.right-tab--tokens:hover { background: rgba(1,234,203,0.18); color: #4FF3DC; }
+.right-tab--tokens.is-active { background: #01EACB; border-color: #01EACB; color: #04221E; }
+.right-tab--logic { background: rgba(12,167,255,0.1); border-color: rgba(12,167,255,0.5); color: #5FC6FF; }
+.right-tab--logic:hover { background: rgba(12,167,255,0.2); color: #8AD6FF; }
+.right-tab--logic.is-active { background: #0CA7FF; border-color: #0CA7FF; color: #03253A; }
 
 /* Pulse a card when the score board jumps to it. */
 .card-flash { animation: cardFlash 1.3s ease-out; border-radius: 18px; }
@@ -2764,24 +2790,6 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 /* Pinned per-card traffic light, above the sub-tabs — stays visible whichever
    of Question type / Tokenomics / Quiz mode is open. */
 .panel-card-light { margin: 0 16px 12px; align-self: flex-start; }
-
-/* Per-card sub-tabs — Question type, plus Tokenomics / Quiz mode once this
-   Verto (and the selected card) supports them. Nested version of .right-tab. */
-.card-subtabs {
-  flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 0 16px 12px;
-}
-.card-subtab {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 12px; border-radius: 100px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.04);
-  font-family: "ABeeZee", sans-serif; font-size: 11px;
-  color: rgba(255,255,255,0.6); cursor: pointer; line-height: 1.4;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-.card-subtab:hover { background: rgba(255,255,255,0.09); color: #fff; }
-.card-subtab.is-active { color: #fff; background: rgba(1,234,203,0.1); border-color: rgba(1,234,203,0.5); }
 
 .card-subview { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .card-subview-slot:empty { display: none; }

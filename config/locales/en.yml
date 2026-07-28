@@ -631,6 +631,10 @@ en:
   editor:
     all_saved: 'Saved'
     leave_editor: 'Leave editor'
+    tab_quiz: 'Quiz mode'
+    tab_tokens: 'Tokenisation'
+    tab_logic: 'Logic & flows'
+    select_card_for_options: 'Select a question card on the left to set its options.'
     consent_gate: 'Consent gate'
     consent_default: 'By taking part you agree that your anonymous answers may be used for research.'
     thank_you_screen: 'Thank-you screen'

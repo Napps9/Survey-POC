@@ -120,7 +120,9 @@ class LogicBranchingTest < ActionDispatch::IntegrationTest
     assert_select "select.logic-route-select[data-logic-route][data-canonical='US']"
     assert_select "select.logic-route-select[data-logic-default]", minimum: 1
     assert_match 'data-survey-editor-logic-value="true"', response.body
-    assert_match "Logic &amp; branching", response.body # settings toggle
+    # The activation toggle lives in the right panel's Logic & flows tab now.
+    assert_match "Logic &amp; flows", response.body
+    assert_select ".right-tabs .right-tab--logic"
   end
 
   test "no route selects render when logic is off" do

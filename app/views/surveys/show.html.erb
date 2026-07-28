@@ -344,19 +344,24 @@
     <%# ── RIGHT: Answer type panel + Publish panel (toggled) ── %>
     <div class="right-column">
 
-    <%# Right-column tabs — Answer type ⇆ Verto score. The score tab carries the
-        live Rules-of-the-Game number/word (filled by survey_editor_controller);
-        clicking it opens the colour-grouped breakdown. The publish-panel
-        controller hides this strip while the Publish/Design overlays are open. %>
+    <%# Right-column tabs — the four feature tabs in Verto brand colours
+        (answer types navy, quiz yellow, tokenisation teal, logic blue), then
+        Why and the Verto-score chip (live Rules-of-the-Game number/word,
+        filled by survey_editor_controller). Each feature tab leads with the
+        Verto-wide activation/setup; per-card options appear below it once the
+        feature is on. The publish-panel controller hides this strip while the
+        Publish/Design overlays are open. %>
     <div class="right-tabs" data-publish-panel-target="tabs">
-      <button type="button" class="right-tab is-active" data-publish-panel-target="typeTab"
+      <button type="button" class="right-tab right-tab--types is-active" data-publish-panel-target="typeTab"
               data-action="click->publish-panel#showType"><%= t("editor.answer_type") %></button>
+      <button type="button" class="right-tab right-tab--quiz" data-publish-panel-target="quizTab"
+              data-action="click->publish-panel#showQuizTab"><%= t("editor.tab_quiz", default: "Quiz mode") %></button>
+      <button type="button" class="right-tab right-tab--tokens" data-publish-panel-target="tokensTab"
+              data-action="click->publish-panel#showTokensTab"><%= t("editor.tab_tokens", default: "Tokenisation") %></button>
+      <button type="button" class="right-tab right-tab--logic" data-publish-panel-target="branchTab"
+              data-action="click->publish-panel#showBranch"><%= t("editor.tab_logic", default: "Logic & flows") %></button>
       <button type="button" class="right-tab" data-publish-panel-target="whyTab"
               data-action="click->publish-panel#showWhy"><%= t("editor.why", default: "Why") %></button>
-      <% if @survey.logic? %>
-        <button type="button" class="right-tab" data-publish-panel-target="branchTab"
-                data-action="click->publish-panel#showBranch">Branching</button>
-      <% end %>
       <button type="button" class="right-tab verto-score" data-survey-editor-target="vertoScore"
               data-publish-panel-target="scoreTab"
               aria-label="<%= t('js.editor.rules.verto_aria', default: 'How this Verto scores against the Rules of the Game') %>"
@@ -422,16 +427,9 @@
           </button>
         </div>
 
-        <div class="card-subtabs" data-type-panel-target="subtabs">
-          <button type="button" class="card-subtab is-active" data-type-panel-target="subtab"
-                  data-subtab="type" data-action="click->type-panel#showSubtab">Question type</button>
-          <button type="button" class="card-subtab" data-type-panel-target="subtab"
-                  data-subtab="tokens" hidden data-action="click->type-panel#showSubtab">Tokenomics</button>
-          <button type="button" class="card-subtab" data-type-panel-target="subtab"
-                  data-subtab="quiz" hidden data-action="click->type-panel#showSubtab">Quiz mode</button>
-        </div>
-
-        <div class="card-subview" data-type-panel-target="subview" data-subtab="type">
+        <%# Tokenomics and Quiz mode moved to their own top-level tabs — this
+            view is the question-type picker only. %>
+        <div class="card-subview">
           <div class="type-list" data-type-panel-target="typeList">
             <% CardTypes.pickable_for(@survey).each do |key, t| %>
               <div class="type-opt-wrap">
@@ -474,13 +472,6 @@
           </div>
         </div>
 
-        <div class="card-subview" hidden data-type-panel-target="subview" data-subtab="tokens">
-          <div class="card-subview-slot" data-type-panel-target="tokenSlot"></div>
-        </div>
-
-        <div class="card-subview" hidden data-type-panel-target="subview" data-subtab="quiz">
-          <div class="card-subview-slot" data-type-panel-target="quizSlot"></div>
-        </div>
       </div>
 
       <%# ── All question types modal ── %>
@@ -547,6 +538,120 @@
 
     </div><%# /type panel %>
 
+    <%# ── Quiz mode tab — the Verto-wide toggle comes first (moved out of the
+        Publish panel); once on, the selected question card's correct-answer
+        block (relocated by type_panel_controller) appears below it. ── %>
+    <div class="type-panel hidden" data-publish-panel-target="quizView">
+      <div class="type-panel-top">
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#FFCC00;margin-bottom:5px;">
+          <%= t("editor.tab_quiz", default: "Quiz mode") %>
+        </div>
+        <div class="feature-setup">
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="return_tab" value="quiz" />
+            <input type="hidden" name="quiz" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="quiz" value="1"
+                     <%= "checked" if @survey.quiz? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#FFCC00;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Score answers as right or wrong and show players their score. Each question card gains a “correct answer” control.</span>
+            </label>
+            <% if @survey.quiz? %>
+              <div style="margin-top:8px;padding-left:24px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);line-height:1.45;">
+                <%= @survey.quiz_question_count %> of <%= total_q %> questions graded — mark the correct answer on each card.
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @survey.quiz? %>
+        <div class="type-panel-empty" data-type-panel-target="quizEmpty">
+          <div style="font-size:28px;opacity:0.25;">↖</div>
+          <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:240px;">
+            <%= t("editor.select_card_for_options", default: "Select a question card on the left to set its options.") %>
+          </div>
+        </div>
+        <div class="card-subview">
+          <div class="card-subview-slot" data-type-panel-target="quizSlot"></div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ── Tokenisation tab — Verto-wide setup first: the toggle plus the token
+        types manager (icons + names, moved out of the Publish panel); once on,
+        the selected card's token-award block appears below. ── %>
+    <div class="type-panel hidden" data-publish-panel-target="tokensView">
+      <div class="type-panel-top" data-controller="token-types">
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#01EACB;margin-bottom:5px;">
+          <%= t("editor.tab_tokens", default: "Tokenisation") %>
+        </div>
+        <div class="feature-setup">
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="return_tab" value="tokens" />
+            <input type="hidden" name="tokenisation_enabled" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="tokenisation_enabled" value="1"
+                     <%= "checked" if @survey.tokenisation_enabled? %>
+                     data-action="change->token-types#save"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Let players earn points as they answer. Each question card gains token-amount controls, and players see a running total, a final total, and — only if “Show results comparison” is also on — how their total compares with everyone else's.</span>
+            </label>
+
+            <input type="hidden" name="token_types" value="<%= @survey.token_types.to_json %>" data-token-types-target="field" />
+
+            <% if @survey.tokenisation_enabled? %>
+              <div style="margin-top:10px;">
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:6px;">
+                  <%= @survey.token_awarding_count %> of <%= total_q %> cards award points — set amounts on each card.
+                </div>
+
+                <div data-token-types-target="list" style="display:flex;flex-direction:column;gap:6px;">
+                  <% @survey.token_types.each do |tt| %>
+                    <div class="token-type-row" data-token-types-target="row" data-token-id="<%= tt['id'] %>"
+                         style="display:flex;gap:6px;align-items:center;">
+                      <input type="text" data-token-types-target="icon" maxlength="8" value="<%= tt['icon'] %>"
+                             style="width:40px;text-align:center;padding:7px 4px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size: var(--text-md);outline:none;" />
+                      <input type="text" data-token-types-target="name" maxlength="40" value="<%= tt['name'] %>"
+                             placeholder="e.g. Gold Coins"
+                             style="flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                      <button type="button" data-action="click->token-types#removeRow"
+                              style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);cursor:pointer;">×</button>
+                    </div>
+                  <% end %>
+                </div>
+
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                  <button type="button" class="token-type-add-btn" data-action="click->token-types#addRow"
+                          <%= "disabled" if @survey.token_types.size >= Survey::MAX_TOKEN_TYPES %>
+                          style="padding:6px 12px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px dashed rgba(255,255,255,0.25);cursor:pointer;">
+                    ＋ Add token type
+                  </button>
+                  <button type="button" data-action="click->token-types#save"
+                          style="padding:6px 14px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:none;cursor:pointer;">
+                    Save token types
+                  </button>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @survey.tokenisation_enabled? %>
+        <div class="type-panel-empty" data-type-panel-target="tokensEmpty">
+          <div style="font-size:28px;opacity:0.25;">↖</div>
+          <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:240px;">
+            <%= t("editor.select_card_for_options", default: "Select a question card on the left to set its options.") %>
+          </div>
+        </div>
+        <div class="card-subview">
+          <div class="card-subview-slot" data-type-panel-target="tokenSlot"></div>
+        </div>
+      <% end %>
+    </div>
+
     <%# ── "Why" panel — why the selected question is worth asking: the
         Awareness/Intention/Agency competency it sits under, the plain-language
         insight its answers generate, and any enabling condition it measures.
@@ -606,19 +711,39 @@
         authored inside the card (shared/logic_branch_block) and relocated here
         for the selected card by type_panel_controller#selectCard; the card
         itself shows nothing about routing. Only present when logic is on. ── %>
-    <% if @survey.logic? %>
-      <div class="type-panel hidden" data-publish-panel-target="branchView">
-        <div class="type-panel-top">
-          <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
-            Branching
-          </div>
-          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF1E6F;line-height:1.3;min-height:18px;"
+    <div class="type-panel hidden" data-publish-panel-target="branchView">
+      <div class="type-panel-top">
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#0CA7FF;margin-bottom:5px;">
+          <%= t("editor.tab_logic", default: "Logic & flows") %>
+        </div>
+        <div class="feature-setup">
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="return_tab" value="logic" />
+            <input type="hidden" name="logic" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="logic" value="1"
+                     <%= "checked" if @survey.logic? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#0CA7FF;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Send respondents down a different path based on their answer. Each single-pick question gains a “go to…” control on every option — route to another card, a branch, or the finish screen.</span>
+            </label>
+          <% end %>
+          <% if @survey.logic? %>
+            <button type="button"
+                    style="margin-top:10px;padding:8px 18px;border-radius:100px;background:rgba(12,167,255,0.12);color:#5FC6FF;border:1px solid rgba(12,167,255,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;"
+                    data-action="click->logic-map#open">⤢ Flow map</button>
+          <% end %>
+        </div>
+        <% if @survey.logic? %>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF1E6F;line-height:1.3;min-height:18px;margin-top:10px;"
                data-type-panel-target="branchCardName"><%= t("editor.select_card") %></div>
           <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;">
             Choose where each answer leads. Any answer left on “Continue” follows the normal card order.
           </div>
-        </div>
+        <% end %>
+      </div>
 
+      <% if @survey.logic? %>
         <%# No card selected yet. %>
         <div class="type-panel-empty" data-type-panel-target="branchEmpty">
           <div style="font-size:28px;opacity:0.25;">↖</div>
@@ -637,8 +762,8 @@
 
         <%# The selected routable card's branching block is relocated in here. %>
         <div class="branch-slot card-subview-slot" data-type-panel-target="logicSlot"></div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
 
     <%# ── Verto-score breakdown — the Rules-of-the-Game results grouped by
         traffic light (red → amber → green), each row carrying what to change.
@@ -797,45 +922,8 @@
           <% end %>
         </details>
 
-        <%# Quiz mode — score answers right/wrong, show a score, and let players
-            compare. Toggling reloads the editor so each question card gains its
-            correct-answer controls. %>
-        <details class="publish-block">
-          <summary class="publish-block-title">Quiz mode <span class="pub-chev">⌄</span></summary>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-            <input type="hidden" name="quiz" value="0" />
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
-              <input type="checkbox" name="quiz" value="1"
-                     <%= "checked" if @survey.quiz? %>
-                     onchange="this.form.requestSubmit()"
-                     style="width:14px;height:14px;accent-color:#615BF5;cursor:pointer;margin-top:1px;flex-shrink:0;" />
-              <span>Score answers as right or wrong and show players their score. Each question card gains a “correct answer” control.</span>
-            </label>
-            <% if @survey.quiz? %>
-              <div style="margin-top:8px;padding-left:24px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);line-height:1.45;">
-                <%= @survey.quiz_question_count %> of <%= total_q %> questions graded — mark the correct answer on each card.
-              </div>
-            <% end %>
-          <% end %>
-        </details>
-
-        <%# Logic & branching — route each answer of a single-pick question to a
-            different next card or end screen instead of the linear flow.
-            Toggling reloads the editor so every multiple-choice / yes-no card
-            gains its per-answer "go to…" controls. %>
-        <details class="publish-block">
-          <summary class="publish-block-title">Logic &amp; branching <span class="pub-chev">⌄</span></summary>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-            <input type="hidden" name="logic" value="0" />
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
-              <input type="checkbox" name="logic" value="1"
-                     <%= "checked" if @survey.logic? %>
-                     onchange="this.form.requestSubmit()"
-                     style="width:14px;height:14px;accent-color:#615BF5;cursor:pointer;margin-top:1px;flex-shrink:0;" />
-              <span>Send respondents down a different path based on their answer. Each single-pick question gains a “go to…” control on every option — route to another card, a branch, or the finish screen.</span>
-            </label>
-          <% end %>
-        </details>
+        <%# Quiz mode, Logic & flows and Tokenisation are activated and
+            configured in their own right-panel tabs now. %>
 
         <%# Form mode — same one-question-at-a-time flow, but the swipe gestures
             and game-like animation are stripped so it reads as a plain
@@ -851,62 +939,6 @@
                      style="width:14px;height:14px;accent-color:#615BF5;cursor:pointer;margin-top:1px;flex-shrink:0;" />
               <span>Show it as a plain questionnaire — respondents still answer one question at a time, but without the swipe and animation.</span>
             </label>
-          <% end %>
-        </details>
-
-        <%# Tokenisation — creators define one or more token types (e.g. Gold
-            Coins, Coal) and assign amounts to cards/answers below; players see
-            a running total as they answer, a final total, and — only if
-            "Show results comparison" above is also on — how their total
-            compares with everyone else's. %>
-        <details class="publish-block" data-controller="token-types">
-          <summary class="publish-block-title">Tokenisation <span class="pub-chev">⌄</span></summary>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-            <input type="hidden" name="tokenisation_enabled" value="0" />
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
-              <input type="checkbox" name="tokenisation_enabled" value="1"
-                     <%= "checked" if @survey.tokenisation_enabled? %>
-                     data-action="change->token-types#save"
-                     style="width:14px;height:14px;accent-color:#615BF5;cursor:pointer;margin-top:1px;flex-shrink:0;" />
-              <span>Let players earn points as they answer. Each question card gains token-amount controls, and players see a running total, a final total, and — only if “Show results comparison” above is also on — how their total compares with everyone else's.</span>
-            </label>
-
-            <input type="hidden" name="token_types" value="<%= @survey.token_types.to_json %>" data-token-types-target="field" />
-
-            <% if @survey.tokenisation_enabled? %>
-              <div style="margin-top:10px;padding-left:24px;">
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:6px;">
-                  <%= @survey.token_awarding_count %> of <%= total_q %> cards award points — set amounts on each card.
-                </div>
-
-                <div data-token-types-target="list" style="display:flex;flex-direction:column;gap:6px;">
-                  <% @survey.token_types.each do |tt| %>
-                    <div class="token-type-row" data-token-types-target="row" data-token-id="<%= tt['id'] %>"
-                         style="display:flex;gap:6px;align-items:center;">
-                      <input type="text" data-token-types-target="icon" maxlength="8" value="<%= tt['icon'] %>"
-                             style="width:40px;text-align:center;padding:7px 4px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size: var(--text-md);outline:none;" />
-                      <input type="text" data-token-types-target="name" maxlength="40" value="<%= tt['name'] %>"
-                             placeholder="e.g. Gold Coins"
-                             style="flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
-                      <button type="button" data-action="click->token-types#removeRow"
-                              style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);cursor:pointer;">×</button>
-                    </div>
-                  <% end %>
-                </div>
-
-                <div style="display:flex;gap:8px;margin-top:8px;">
-                  <button type="button" class="token-type-add-btn" data-action="click->token-types#addRow"
-                          <%= "disabled" if @survey.token_types.size >= Survey::MAX_TOKEN_TYPES %>
-                          style="padding:6px 12px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px dashed rgba(255,255,255,0.25);cursor:pointer;">
-                    ＋ Add token type
-                  </button>
-                  <button type="button" data-action="click->token-types#save"
-                          style="padding:6px 14px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:none;cursor:pointer;">
-                    Save token types
-                  </button>
-                </div>
-              </div>
-            <% end %>
           <% end %>
         </details>
 
