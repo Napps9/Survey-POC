@@ -19,7 +19,12 @@ class RequiredQuestionTest < ActionDispatch::IntegrationTest
 
     get survey_path(s)
     assert_response :success
-    assert_select "input[data-action='change->survey-editor#toggleRequired']"
+    # The Required switch lives in the Answer Type tab's Card settings block
+    # (one instance, acts on the selected card), with a passive chip on the
+    # card chrome that JS unhides while the flag is on.
+    assert_select "[data-survey-editor-target='cardFlags'] input[data-action='change->survey-editor#togglePanelRequired']"
+    assert_select "[data-survey-editor-target='cardFlags'] input[data-action='change->survey-editor#togglePanelOther']"
+    assert_select ".required-chip[data-role='required-chip']"
 
     # The autosave PATCH stores cards as sent — the required flag round-trips.
     patch survey_path(s),

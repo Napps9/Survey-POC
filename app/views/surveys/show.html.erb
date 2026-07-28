@@ -476,6 +476,25 @@
           </div>
         </div>
 
+        <%# Card settings — Allow-Other / Required, moved off the card into
+            the per-card control centre. The switches write to the selected
+            card's data attributes (survey-editor#togglePanel*), which is
+            where serialize() reads them from. %>
+        <div class="card-flags" data-survey-editor-target="cardFlags" hidden>
+          <label class="card-flag">
+            <input type="checkbox" data-survey-editor-target="panelOther"
+                   data-action="change->survey-editor#togglePanelOther">
+            <span class="card-flag-track" aria-hidden="true"></span>
+            <span class="card-flag-label"><%= t("card.allow_other") %></span>
+          </label>
+          <label class="card-flag">
+            <input type="checkbox" data-survey-editor-target="panelRequired"
+                   data-action="change->survey-editor#togglePanelRequired">
+            <span class="card-flag-track" aria-hidden="true"></span>
+            <span class="card-flag-label"><%= t("card.required") %></span>
+          </label>
+        </div>
+
       </div>
 
       <%# ── All question types modal ── %>

@@ -629,6 +629,7 @@ nl:
   editor:
     all_saved: 'Opgeslagen'
     leave_editor: 'Editor verlaten'
+    required_chip: 'Verplicht'
     ty_title_label: 'Bedanktitel'
     ty_body_label: 'Bedankbericht'
     tab_quiz: 'Quizmodus'

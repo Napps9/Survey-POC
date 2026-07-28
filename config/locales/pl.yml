@@ -631,6 +631,7 @@ pl:
   editor:
     all_saved: 'Zapisano'
     leave_editor: 'Opuść edytor'
+    required_chip: 'Wymagane'
     ty_title_label: 'Tytuł podziękowania'
     ty_body_label: 'Wiadomość podziękowania'
     tab_quiz: 'Tryb quizu'

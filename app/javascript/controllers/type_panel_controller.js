@@ -723,8 +723,11 @@ export default class extends Controller {
     this._renderWhy(card, cardType, cardNum)
 
     // Paint the pinned sidebar traffic light immediately (it otherwise only
-    // repaints on the next markDirty/refreshAll cycle).
-    this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")?.refreshCard(card)
+    // repaints on the next markDirty/refreshAll cycle), and point the panel's
+    // Card settings switches (Allow other / Required) at this card.
+    const surveyEditor = this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")
+    surveyEditor?.refreshCard(card)
+    surveyEditor?.syncCardFlags(card)
   }
 
   // Relocate the just-selected card's quiz/token blocks (if any) into the
@@ -858,6 +861,7 @@ export default class extends Controller {
   applyType() {
     if (!this.activeCardEl || !this.pendingType) return
     this._applyToCard(this.activeCardEl, this.pendingType)
+    this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")?.syncCardFlags(this.activeCardEl)
     this._toast(t("editor.type_updated", { type: this.typeMeta[this.pendingType]?.badge || this.pendingType }))
     this.dispatch("changed")
   }
@@ -886,6 +890,7 @@ export default class extends Controller {
     if (!this.activeCardEl || !type) return
     this.pendingType = type
     this._applyToCard(this.activeCardEl, type)
+    this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")?.syncCardFlags(this.activeCardEl)
     this._toast(t("editor.type_updated", { type: this.typeMeta[type]?.badge || type }))
     this.dispatch("changed")
     this.closeAllTypes()
@@ -913,6 +918,7 @@ export default class extends Controller {
       this._parkSlotContents()
       if (this.hasTokensEmptyTarget) this.tokensEmptyTarget.style.display = ""
       if (this.hasQuizEmptyTarget)   this.quizEmptyTarget.style.display   = ""
+      this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")?.syncCardFlags(null)
     }
     this._updateCount()
     this.dispatch("changed")
@@ -1065,12 +1071,14 @@ export default class extends Controller {
 
     card.dataset.cardType = type
 
-    // The "Other" block and the Allow-other/Required toggles below the
-    // card apply to question types only.
+    // The "Other" block applies to question types only; same for the Required
+    // chip on the chrome row (its switch lives in the Answer Type tab's Card
+    // settings — see survey-editor#syncCardFlags).
+    const isQuestion = !NON_QUESTION_TYPES.includes(type)
     const otherBlock = card.querySelector(".other-block")
-    if (otherBlock) otherBlock.hidden = NON_QUESTION_TYPES.includes(type)
-    const questionSettings = card.querySelector(".card-question-settings")
-    if (questionSettings) questionSettings.hidden = NON_QUESTION_TYPES.includes(type)
+    if (otherBlock) otherBlock.hidden = !isQuestion
+    const requiredChip = card.querySelector("[data-role='required-chip']")
+    if (requiredChip) requiredChip.hidden = !isQuestion || card.dataset.cardRequired !== "true"
 
     // 3. Swap LEFT panel when entering or leaving Range — Range shows the
     //    reactive Lottie that other types don't, and other types need the

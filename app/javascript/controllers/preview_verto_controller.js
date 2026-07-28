@@ -167,11 +167,10 @@ export default class extends Controller {
     //    token-award-block are the creator's Tokenomics/Quiz mode controls
     //    (relocated into the editor's sidebar tabs, or parked off-screen —
     //    either way still present in the editor DOM this clones from) and
-    //    must never reach a respondent-facing view. other-edit-toggle is the
-    //    "Allow other" / "Required" checkboxes shown only to the creator.
+    //    must never reach a respondent-facing view.
     clone.querySelectorAll(
       ".pick-item-delete, .tap-card-delete, .pick-add-btn, .tap-add-btn, .add-media-fab, " +
-      ".split-left-design-prompt, .quiz-correct-block, .token-award-block, .other-edit-toggle, " +
+      ".split-left-design-prompt, .quiz-correct-block, .token-award-block, " +
       ".book-edit-tools, .logic-branch-block, .mark-correct, .mark-correct-grid, " +
       ".tap-card-image-btn, .slider-axis-toggle, .add-animation-fab"
     ).forEach(el => el.remove())

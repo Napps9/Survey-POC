@@ -629,6 +629,7 @@ ar:
   editor:
     all_saved: 'تم الحفظ'
     leave_editor: 'مغادرة المحرر'
+    required_chip: 'إلزامي'
     ty_title_label: 'عنوان الشكر'
     ty_body_label: 'رسالة الشكر'
     tab_quiz: 'وضع الاختبار'

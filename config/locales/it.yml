@@ -629,6 +629,7 @@ it:
   editor:
     all_saved: 'Salvato'
     leave_editor: 'Esci dall''editor'
+    required_chip: 'Obbligatoria'
     ty_title_label: 'Titolo di ringraziamento'
     ty_body_label: 'Messaggio di ringraziamento'
     tab_quiz: 'Modalità quiz'

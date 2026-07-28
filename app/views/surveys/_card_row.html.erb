@@ -58,6 +58,11 @@
               data-action="click->publish-panel#showWhy">?</button>
     </div>
     <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.88);text-shadow:0 1px 4px rgba(0,0,0,0.7);margin-top:3px;" data-role="card-number">Card <%= idx + 1 %></span>
+    <% if is_q %>
+      <%# Passive glance indicator — visible only while the card is Required
+          (toggled live from the Answer Type tab's Card settings). %>
+      <span class="required-chip" data-role="required-chip" <%= "hidden" unless card["required"] %>>✳ <%= t("editor.required_chip", default: "Required") %></span>
+    <% end %>
     <% unless type == "welcome_card" %>
       <% if is_q %>
         <button type="button" class="card-light" data-role="card-light" hidden
@@ -110,21 +115,7 @@
           quiz: local_assigns.fetch(:quiz, false), tokenisation: local_assigns.fetch(:tokenisation, false) %>
   </div><%# /split-card %>
 
-  <%# "Allow other"/"Required" toggles — editor-only, live below the card
-      (not inside .split-card) so they don't distort its layout. This
-      partial only ever renders in the editor, so keeping them here also
-      means they're structurally absent from Preview/the player, not just
-      hidden. Rendered for every card so the toggle survives a client-side
-      type switch (see type_panel_controller.js's NON_QUESTION_TYPES hide,
-      mirroring the same pattern .other-block already uses). %>
-  <div class="card-question-settings"<%= ' hidden'.html_safe unless is_q %>>
-    <label class="other-edit-toggle">
-      <input type="checkbox" data-action="change->survey-editor#toggleOther" <%= "checked" if card["allow_other"] %>>
-      <span><%= t("card.allow_other") %></span>
-    </label>
-    <label class="other-edit-toggle">
-      <input type="checkbox" data-action="change->survey-editor#toggleRequired" <%= "checked" if card["required"] %>>
-      <span><%= t("card.required") %></span>
-    </label>
-  </div>
+  <%# Allow-Other / Required moved to the Answer Type tab's Card settings —
+      their state lives on the wrap's data attributes (the serializer reads
+      those), so nothing structural remains below the card. %>
 </div><%# /survey-card-wrap %>

@@ -629,6 +629,7 @@ he:
   editor:
     all_saved: 'נשמר'
     leave_editor: 'יציאה מהעורך'
+    required_chip: 'חובה'
     ty_title_label: 'כותרת התודה'
     ty_body_label: 'הודעת התודה'
     tab_quiz: 'מצב חידון'

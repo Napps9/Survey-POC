@@ -785,10 +785,10 @@
   <%# "Other" free-text — a standalone answer the creator can toggle per card.
       Rendered for every question type (not welcome). In the editor it's always
       present (hidden on welcome) so the toggle survives a type switch. The
-      "Allow other"/"Required" checkboxes themselves live below the card, not
-      here — see _card_row.html.erb's .card-question-settings — so they don't
-      distort the card's visual design; only the respondent-facing "+Other"
-      CTA/panel stays in the card itself. %>
+      "Allow other"/"Required" switches themselves live in the Answer Type
+      tab's Card settings (show.html.erb .card-flags), not here — so they
+      don't distort the card's visual design; only the respondent-facing
+      "+Other" CTA/panel stays in the card itself. %>
   <% if editable || (is_q && card["allow_other"]) %>
     <div class="other-block" data-controller="other"<%= ' hidden'.html_safe if (editable && !is_q) %>>
       <div class="other-cta-wrap" data-other-target="wrap"<%= ' hidden'.html_safe unless card["allow_other"] %>>

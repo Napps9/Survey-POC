@@ -13,7 +13,8 @@ const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
 const CHOICE_TYPES = [ "multiple_choice", "select_many", "yes_no", "select_one_grid", "select_many_grid", "scenario" ]
 
 export default class extends Controller {
-  static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight"]
+  static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
+    "cardFlags", "panelOther", "panelRequired"]
   static values  = {
     url: String, title: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -593,8 +594,28 @@ export default class extends Controller {
     this.markDirty()
   }
 
-  toggleOther(event) {
-    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+  // ── Card settings (Answer Type tab) — Allow-Other / Required ──────────
+  // The switches live in the panel, so they act on the currently selected
+  // card; state is recorded on the wrap's data attributes, which is where
+  // serialize() reads it from.
+  _selectedCard() {
+    return this.cardTargets.find(c => c.classList.contains("selected")) || null
+  }
+
+  // Show the switches for a question card (with its current state) or hide
+  // them for welcome/checkpoint cards and empty selection. Called by
+  // type-panel on select, type apply and delete.
+  syncCardFlags(card) {
+    if (!this.hasCardFlagsTarget) return
+    const isQ = card && !NON_QUESTION_TYPES.includes(card.dataset.cardType)
+    this.cardFlagsTarget.hidden = !isQ
+    if (!isQ) return
+    if (this.hasPanelOtherTarget)    this.panelOtherTarget.checked    = card.dataset.cardAllowOther === "true"
+    if (this.hasPanelRequiredTarget) this.panelRequiredTarget.checked = card.dataset.cardRequired === "true"
+  }
+
+  togglePanelOther(event) {
+    const card = this._selectedCard()
     if (!card) return
     const on = event.currentTarget.checked
     card.dataset.cardAllowOther = on ? "true" : "false"
@@ -604,12 +625,15 @@ export default class extends Controller {
     this.markDirty()
   }
 
-  // Required is a pure data flag (no card-light effect), so just record it on
-  // the wrap and autosave; serialize() carries it into the card JSON.
-  toggleRequired(event) {
-    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+  // Required is a pure data flag (no card-light effect) — record it, flip the
+  // chrome-row chip so the deck stays scannable, and autosave.
+  togglePanelRequired(event) {
+    const card = this._selectedCard()
     if (!card) return
-    card.dataset.cardRequired = event.currentTarget.checked ? "true" : "false"
+    const on = event.currentTarget.checked
+    card.dataset.cardRequired = on ? "true" : "false"
+    const chip = card.querySelector("[data-role='required-chip']")
+    if (chip) chip.hidden = !on
     this.markDirty()
   }
 
