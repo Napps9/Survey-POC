@@ -629,6 +629,10 @@ he:
   editor:
     all_saved: 'נשמר'
     leave_editor: 'יציאה מהעורך'
+    consent_gate: 'שלב הסכמה'
+    consent_default: 'בהשתתפותך, אתה מסכים שתשובותיך האנונימיות עשויות לשמש למחקר.'
+    thank_you_screen: 'מסך תודה'
+    remove: 'הסרה'
     animation_theme: "אנימציה"
     live_locked_bar: "הוורטו פעיל — השאלות נעולות כדי להגן על איכות הנתונים."
     live_results: "צפייה בתוצאות ←"

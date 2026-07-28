@@ -629,6 +629,10 @@ de:
   editor:
     all_saved: 'Gespeichert'
     leave_editor: 'Editor verlassen'
+    consent_gate: 'Einwilligungsschritt'
+    consent_default: 'Mit deiner Teilnahme erklärst du dich einverstanden, dass deine anonymen Antworten für Forschungszwecke verwendet werden dürfen.'
+    thank_you_screen: 'Dankeschön-Seite'
+    remove: 'Entfernen'
     animation_theme: "Animation"
     live_locked_bar: "Dieses Verto ist live — die Fragen sind gesperrt, um die Datenqualität zu schützen."
     live_results: "Ergebnisse ansehen →"

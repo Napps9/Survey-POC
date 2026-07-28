@@ -629,6 +629,10 @@ sw:
   editor:
     all_saved: 'Imehifadhiwa'
     leave_editor: 'Ondoka kwenye kihariri'
+    consent_gate: 'Hatua ya idhini'
+    consent_default: 'Kwa kushiriki, unakubali kwamba majibu yako yasiyo na jina yanaweza kutumika kwa utafiti.'
+    thank_you_screen: 'Skrini ya shukrani'
+    remove: 'Ondoa'
     animation_theme: "Animation"
     live_locked_bar: "Verto hii iko hewani — maswali yamefungwa kulinda ubora wa data."
     live_results: "Ona matokeo →"

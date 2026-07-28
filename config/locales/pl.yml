@@ -631,6 +631,10 @@ pl:
   editor:
     all_saved: 'Zapisano'
     leave_editor: 'Opuść edytor'
+    consent_gate: 'Krok zgody'
+    consent_default: 'Biorąc udział, zgadzasz się, że Twoje anonimowe odpowiedzi mogą zostać wykorzystane do badań.'
+    thank_you_screen: 'Ekran podziękowania'
+    remove: 'Usuń'
     animation_theme: "Animacja"
     live_locked_bar: "To Verto jest na żywo — pytania są zablokowane, by chronić jakość danych."
     live_results: "Zobacz wyniki →"

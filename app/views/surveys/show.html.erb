@@ -33,7 +33,8 @@
 <script id="card-eyebrows-i18n" type="application/json"><%= card_eyebrows_i18n(@survey).to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question logic-map editor-panel"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question logic-map editor-panel gate-cards"
+     data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
      data-media-picker-url-value="<%= survey_path(@survey) %>"
@@ -67,7 +68,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.published? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open gate-cards:status->survey-editor#gateStatus card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -214,6 +215,47 @@
            data-device-frame-target="feed"
            style="padding-top:64px;padding-bottom:84px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;<%= verto_backdrop_style_attr(@survey, image: false) %>">
 
+        <%# ── Consent gate slot — a CTA above the welcome card until a consent
+            gate exists, then an editable in-feed replica of the player's
+            consent card (player/show renders the live version from the same
+            consent_text). Persisted by gate_cards_controller. ── %>
+        <% has_consent = @survey.consent_required? %>
+        <div class="gate-cta-row" data-gate-cards-target="consentCta" <%= "hidden" if has_consent %>>
+          <button type="button" class="aq-trigger-btn aq-insert-btn"
+                  data-action="click->gate-cards#addConsent">
+            ＋ <%= t("editor.consent_gate", default: "Consent gate") %>
+          </button>
+        </div>
+        <div class="gate-card-wrap" data-gate-cards-target="consentCard" <%= "hidden" if !has_consent %>>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
+            <span class="s-badge gate-badge-consent"><%= t("editor.consent_gate", default: "Consent gate") %></span>
+            <button type="button" class="card-delete-btn" style="margin-left:auto;"
+                    data-action="click->gate-cards#removeConsent">
+              ✕ <span><%= t("editor.remove", default: "Remove") %></span>
+            </button>
+          </div>
+          <div class="split-card">
+            <div class="split-left">
+              <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
+            </div>
+            <div class="split-right">
+              <div class="play-consent-main">
+                <div class="q-header">
+                  <div class="q-title"><%= t("player.consent_title") %></div>
+                </div>
+                <div class="play-consent-body gate-editable" contenteditable="true"
+                     data-gate-cards-target="consentBody"
+                     data-default-text="<%= t("editor.consent_default") %>"
+                     data-action="input->gate-cards#queueConsentSave:stop"><%= @survey.consent_text %></div>
+                <div class="play-consent-actions" aria-hidden="true" style="pointer-events:none;">
+                  <button type="button" class="play-consent-agree" tabindex="-1"><%= t("player.consent_agree") %></button>
+                  <button type="button" class="play-consent-decline" tabindex="-1"><%= t("player.consent_decline") %></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <%# Each card lives in a .card-slot together with the "Add question" CTA
             that follows it — so creators can insert a question after any card,
             and the last slot's CTA doubles as the add-to-end button. %>
@@ -227,6 +269,38 @@
                 default_locale: @survey.default_locale, quiz: @survey.quiz?,
                 tokenisation: @survey.tokenisation_enabled? %>
         <% end %>
+
+        <%# ── Thank-you slot — a CTA below the last card until the thank-you
+            screen is customised, then an editable in-feed replica of the
+            player's thank-you card (defaults mirror thankyou_title_text /
+            thankyou_body_text). Clearing both fields restores the CTA. ── %>
+        <% has_ty = @survey.thankyou_title.present? || @survey.thankyou_body.present? %>
+        <div class="gate-cta-row" data-gate-cards-target="tyCta" <%= "hidden" if has_ty %>>
+          <button type="button" class="aq-trigger-btn aq-insert-btn"
+                  data-action="click->gate-cards#addThankyou">
+            ＋ <%= t("editor.thank_you_screen", default: "Thank-you screen") %>
+          </button>
+        </div>
+        <div class="gate-card-wrap" data-gate-cards-target="tyCard" <%= "hidden" unless has_ty %>>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
+            <span class="s-badge gate-badge-ty"><%= t("editor.thank_you_screen", default: "Thank-you screen") %></span>
+            <button type="button" class="card-delete-btn" style="margin-left:auto;"
+                    data-action="click->gate-cards#removeThankyou">
+              ✕ <span><%= t("editor.remove", default: "Remove") %></span>
+            </button>
+          </div>
+          <div class="preview-thankyou-card gate-ty-card">
+            <div class="preview-thankyou-emoji">🎉</div>
+            <div class="preview-thankyou-title gate-editable" contenteditable="true"
+                 data-gate-cards-target="tyTitle"
+                 data-default-text="<%= t("player.thank_you_title") %>"
+                 data-action="input->gate-cards#queueThankyouSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.thankyou_title_text %></div>
+            <div class="preview-thankyou-sub gate-editable" contenteditable="true"
+                 data-gate-cards-target="tyBody"
+                 data-default-text="<%= t("player.thank_you_from", org: @survey.organisation.name) %>"
+                 data-action="input->gate-cards#queueThankyouSave:stop"><%= @survey.thankyou_body_text %></div>
+          </div>
+        </div>
 
       </div><%# /cards feed %>
 
@@ -836,54 +910,21 @@
           <% end %>
         </details>
 
-        <%# Consent gate — when set, respondents must agree to this text before
-            the first card. Blank = no consent step. %>
-        <details class="publish-block">
-          <summary class="publish-block-title">Consent gate <span class="pub-chev">⌄</span></summary>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:8px;line-height:1.45;">
-              Shown before the first card with an “Agree to continue” button. Leave blank for no consent step.
-            </div>
-            <textarea name="consent_text" maxlength="2000" rows="4"
-                      data-controller="autogrow"
-                      placeholder="e.g. By taking part you agree that your anonymous answers may be used for research."
-                      onchange="this.form.requestSubmit()"
-                      style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.consent_text %></textarea>
-          <% end %>
-        </details>
-
-        <%# Thank-you screen — custom title/message shown after Finish, plus an
-            optional link forwarding respondents to the org's website. All three
-            fields post to update_settings, which only writes the keys it's sent. %>
+        <%# The consent gate and the thank-you screen's title/message are edited
+            in the cards feed now (in-feed gate cards above the welcome card /
+            below the last card — see gate_cards_controller). Only the optional
+            finish link remains a panel setting. %>
         <details class="publish-block">
           <summary class="publish-block-title">Thank-you screen <span class="pub-chev">⌄</span></summary>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-            <div style="display:flex;flex-direction:column;gap:12px;">
-              <div>
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Title</div>
-                <input type="text" name="thankyou_title" maxlength="80"
-                       value="<%= @survey.thankyou_title %>"
-                       placeholder="<%= t('player.thank_you_title') %>"
-                       onchange="this.form.requestSubmit()"
-                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
-              </div>
-              <div>
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Message</div>
-                <textarea name="thankyou_body" maxlength="400" rows="2"
-                          data-controller="autogrow"
-                          placeholder="Your responses have been recorded."
-                          onchange="this.form.requestSubmit()"
-                          style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.thankyou_body %></textarea>
-              </div>
-              <div>
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Send respondents to your website when they finish (optional)</div>
-                <input type="url" name="forward_url" inputmode="url"
-                       value="<%= @survey.forward_url %>"
-                       placeholder="https://your-organisation.org"
-                       onchange="this.form.requestSubmit()"
-                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);margin-top:5px;">Respondents also get a Share button to pass the Verto on.</div>
-              </div>
+            <div>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Send respondents to your website when they finish (optional)</div>
+              <input type="url" name="forward_url" inputmode="url"
+                     value="<%= @survey.forward_url %>"
+                     placeholder="https://your-organisation.org"
+                     onchange="this.form.requestSubmit()"
+                     style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);margin-top:5px;">Respondents also get a Share button to pass the Verto on. The screen's title and message are edited on the thank-you card at the bottom of the feed.</div>
             </div>
           <% end %>
         </details>

@@ -629,6 +629,10 @@ tr:
   editor:
     all_saved: 'Kaydedildi'
     leave_editor: 'Editörden çık'
+    consent_gate: 'Onay adımı'
+    consent_default: 'Katılarak anonim yanıtlarınızın araştırma için kullanılabileceğini kabul etmiş olursunuz.'
+    thank_you_screen: 'Teşekkür ekranı'
+    remove: 'Kaldır'
     animation_theme: "Animasyon"
     live_locked_bar: "Bu Verto yayında — veri kalitesini korumak için sorular kilitli."
     live_results: "Sonuçları gör →"

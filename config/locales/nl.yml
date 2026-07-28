@@ -629,6 +629,10 @@ nl:
   editor:
     all_saved: 'Opgeslagen'
     leave_editor: 'Editor verlaten'
+    consent_gate: 'Toestemmingsstap'
+    consent_default: 'Door deel te nemen ga je ermee akkoord dat je anonieme antwoorden voor onderzoek gebruikt mogen worden.'
+    thank_you_screen: 'Bedankscherm'
+    remove: 'Verwijderen'
     animation_theme: "Animatie"
     live_locked_bar: "Deze Verto is live — vragen zijn vergrendeld om de datakwaliteit te beschermen."
     live_results: "Bekijk resultaten →"

@@ -472,7 +472,12 @@ class SurveysController < ApplicationController
     end
 
     @survey.update!(attrs) if attrs.any?
-    redirect_to survey_path(@survey, slug_error: (slug_taken ? "taken" : nil), panel: "publish")
+    respond_to do |format|
+      # The publish panel's forms are plain full-page POSTs; the in-feed
+      # consent/thank-you gate cards save the same fields via fetch + JSON.
+      format.html { redirect_to survey_path(@survey, slug_error: (slug_taken ? "taken" : nil), panel: "publish") }
+      format.json { render json: { ok: true, slug_taken: slug_taken } }
+    end
   end
 
   def shuffle_assets

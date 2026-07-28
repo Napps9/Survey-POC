@@ -631,6 +631,10 @@ en:
   editor:
     all_saved: 'Saved'
     leave_editor: 'Leave editor'
+    consent_gate: 'Consent gate'
+    consent_default: 'By taking part you agree that your anonymous answers may be used for research.'
+    thank_you_screen: 'Thank-you screen'
+    remove: 'Remove'
     animation_theme: "Animation"
     live_locked_bar: "This Verto is live — questions are locked to protect data quality."
     live_results: "View results →"

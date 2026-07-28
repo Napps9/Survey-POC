@@ -629,6 +629,10 @@ fr:
   editor:
     all_saved: 'Enregistré'
     leave_editor: 'Quitter l''éditeur'
+    consent_gate: 'Étape de consentement'
+    consent_default: 'En participant, vous acceptez que vos réponses anonymes puissent être utilisées à des fins de recherche.'
+    thank_you_screen: 'Écran de remerciement'
+    remove: 'Retirer'
     animation_theme: "Animation"
     live_locked_bar: "Ce Verto est en ligne — les questions sont verrouillées pour protéger la qualité des données."
     live_results: "Voir les résultats →"

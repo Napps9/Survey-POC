@@ -52,11 +52,20 @@ class EditorReorderInsertTest < ActionDispatch::IntegrationTest
     assert_includes json["html"], "survey-editor#moveCardUp"
   end
 
-  test "creator textareas auto-grow (consent + thank-you)" do
+  test "consent + thank-you are edited on in-feed gate cards, not panel textareas" do
     get survey_path(@survey)
     assert_response :success
-    assert_select "textarea[name='consent_text'][data-controller='autogrow']"
-    assert_select "textarea[name='thankyou_body'][data-controller='autogrow']"
+    # The publish panel's consent/thank-you text fields moved into the feed as
+    # editable gate cards (a CTA until one exists, then the card itself).
+    assert_select "[data-gate-cards-target='consentCta']"
+    assert_select "[data-gate-cards-target='consentBody'][contenteditable='true']"
+    assert_select "[data-gate-cards-target='tyCta']"
+    assert_select "[data-gate-cards-target='tyTitle'][contenteditable='true']"
+    assert_select "[data-gate-cards-target='tyBody'][contenteditable='true']"
+    assert_select "textarea[name='consent_text']", false
+    assert_select "input[name='thankyou_title']", false
+    # The optional finish link is the one thank-you setting left in the panel.
+    assert_select "input[name='forward_url']"
   end
 
   test "quiz answer textareas auto-grow (explanation + accepted answers)" do

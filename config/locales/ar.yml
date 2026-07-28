@@ -629,6 +629,10 @@ ar:
   editor:
     all_saved: 'تم الحفظ'
     leave_editor: 'مغادرة المحرر'
+    consent_gate: 'بوابة الموافقة'
+    consent_default: 'بمشاركتك، فإنك توافق على إمكانية استخدام إجاباتك المجهولة لأغراض البحث.'
+    thank_you_screen: 'شاشة الشكر'
+    remove: 'إزالة'
     animation_theme: "الرسوم المتحركة"
     live_locked_bar: "هذه الـVerto نشطة — الأسئلة مقفلة لحماية جودة البيانات."
     live_results: "عرض النتائج ←"

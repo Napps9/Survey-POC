@@ -1024,6 +1024,27 @@
   transform: translateY(-1px);
 }
 
+/* ── In-feed consent-gate / thank-you cards — editable replicas of the
+   player's consent card and thank-you screen, toggled with their add-CTAs
+   by gate_cards_controller. ── */
+.gate-card-wrap[hidden], .gate-cta-row[hidden] { display: none !important; }
+/* Own class rather than .aq-insert-row: the gate CTAs aren't structural
+   insert chrome, so (like the old panel fields) they survive on live Vertos
+   where the per-card insert rows are hidden. Same centred layout. */
+.gate-cta-row { display: flex; justify-content: center; }
+.gate-badge-consent { background: #FFC24B; color: #4A3200; }
+.gate-badge-ty { background: #FF1E6F; }
+.gate-ty-card { margin-inline: auto; }
+.gate-editable { outline: none; border-radius: 6px; cursor: text; transition: box-shadow 0.15s; }
+.gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,234,203,0.3); }
+.gate-editable:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.55); }
+/* Structural edits are locked to the primary language, and the device frames
+   preview only the question cards — hide the gate chrome in both, matching
+   the add-question rows. */
+.editing-translation .gate-card-wrap, .editing-translation .gate-cta-row,
+.device-tablet .gate-card-wrap, .device-tablet .gate-cta-row,
+.device-mobile .gate-card-wrap, .device-mobile .gate-cta-row { display: none !important; }
+
 /* Reorder controls in the per-card chrome row. */
 .card-reorder { display: inline-flex; gap: 4px; align-items: center; }
 .card-move-btn {

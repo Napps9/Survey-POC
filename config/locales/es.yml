@@ -629,6 +629,10 @@ es:
   editor:
     all_saved: 'Guardado'
     leave_editor: 'Salir del editor'
+    consent_gate: 'Paso de consentimiento'
+    consent_default: 'Al participar, aceptas que tus respuestas anónimas puedan utilizarse con fines de investigación.'
+    thank_you_screen: 'Pantalla de agradecimiento'
+    remove: 'Quitar'
     animation_theme: "Animación"
     live_locked_bar: "Este Verto está en vivo — las preguntas están bloqueadas para proteger la calidad de los datos."
     live_results: "Ver resultados →"

@@ -629,6 +629,10 @@ hi:
   editor:
     all_saved: 'सहेजा गया'
     leave_editor: 'संपादक से बाहर निकलें'
+    consent_gate: 'सहमति चरण'
+    consent_default: 'भाग लेकर आप सहमत होते हैं कि आपके अनाम उत्तर शोध के लिए उपयोग किए जा सकते हैं.'
+    thank_you_screen: 'धन्यवाद स्क्रीन'
+    remove: 'हटाएं'
     animation_theme: "एनिमेशन"
     live_locked_bar: "यह वर्टो लाइव है — डेटा गुणवत्ता की रक्षा के लिए सवाल लॉक हैं।"
     live_results: "नतीजे देखें →"

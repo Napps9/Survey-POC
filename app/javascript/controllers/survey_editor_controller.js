@@ -1202,4 +1202,14 @@ export default class extends Controller {
     this.statusTarget.textContent = text
     this.statusTarget.className = `text-xs ${klass}`
   }
+
+  // Save-status relay for the in-feed consent/thank-you gate cards —
+  // gate_cards_controller persists them via update_settings rather than the
+  // card autosave, so their saves surface in the same top-left status pill.
+  gateStatus(event) {
+    const { state, time, msg } = event.detail || {}
+    if (state === "saving")     this.flash(t("editor.saving"), "text-smoke/60")
+    else if (state === "saved") this.flash(t("editor.saved", { time }), "text-aquamarine")
+    else if (state === "error") this.flash(t("editor.save_failed", { msg }), "text-hot-pink")
+  }
 }
