@@ -769,6 +769,39 @@
 
         <%# The selected routable card's branching block is relocated in here. %>
         <div class="branch-slot card-subview-slot" data-type-panel-target="logicSlot"></div>
+
+      <%# Branch end screens — extra finish screens a branch can route to, each
+          with its own title/message/link (e.g. a unique Stripe page per hub).
+          Lives in the Logic & flows tab; the in-feed thank-you stays the default. Rows serialize into the hidden end_screens field on save
+          (mirrors the Tokenisation manager). %>
+      <% if @survey.logic? %>
+        <% raw_end_screens = Array(@survey.read_attribute(:end_screens)) %>
+        <details class="publish-block panel-island" data-controller="end-screens">
+          <summary class="publish-block-title">Branch end screens <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="return_tab" value="logic" />
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:8px;line-height:1.45;">
+              Extra finish screens a branch can end on — each with its own title, message and link. Point an answer's route at one (e.g. a unique Stripe page per hub). The main thank-you screen stays the default.
+            </div>
+            <input type="hidden" name="end_screens" value="<%= raw_end_screens.to_json %>" data-end-screens-target="field" />
+            <div data-end-screens-target="list" style="display:flex;flex-direction:column;gap:10px;">
+              <% raw_end_screens.each do |es| %>
+                <%= render "surveys/end_screen_row", es: es %>
+              <% end %>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button type="button" data-action="click->end-screens#addRow"
+                      style="padding:6px 12px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px dashed rgba(255,255,255,0.25);cursor:pointer;">
+                ＋ Add end screen
+              </button>
+              <button type="button" data-action="click->end-screens#save"
+                      style="padding:6px 14px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:none;cursor:pointer;">
+                Save end screens
+              </button>
+            </div>
+          <% end %>
+        </details>
+      <% end %>
       <% end %>
     </div>
 
@@ -848,45 +881,9 @@
           <% end %>
         </details>
 
-        <%# Custom link — an optional, memorable alternative to the opaque
-            publish_token above; both resolve the same Verto
-            (PlayerController#load_survey_and_share). Only meaningful once
-            published, same gate the token itself is under. %>
-        <% if @survey.publish_token.present? %>
-          <details class="publish-block">
-            <summary class="publish-block-title">Custom link <span class="pub-chev">⌄</span></summary>
-            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);white-space:nowrap;"><%= root_url %>play/</span>
-                <input type="text" name="slug" maxlength="60"
-                       value="<%= @survey.slug %>"
-                       placeholder="summer-feedback-2026"
-                       onchange="this.form.requestSubmit()"
-                       style="flex:1;min-width:0;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
-              </div>
-            <% end %>
-            <% if params[:slug_error] == "taken" %>
-              <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#F87171;">That link is already taken — try another.</div>
-            <% end %>
-            <% if @survey.slug? %>
-              <input type="text" readonly
-                     id="custom-url-<%= @survey.id %>"
-                     value="<%= play_survey_url(@survey.slug) %>"
-                     style="width:100%;margin-top:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
-              <button type="button"
-                      onclick="(navigator.clipboard?.writeText(document.getElementById('custom-url-<%= @survey.id %>').value) ?? Promise.reject()).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy custom link',2000)}).catch(()=>{this.textContent='Copy failed — select &amp; copy';setTimeout(()=>this.textContent='Copy custom link',2000)})"
-                      style="width:100%;margin-top:8px;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy custom link</button>
-            <% else %>
-              <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
-                Optional — set a memorable link alongside the one above. Both work.
-              </div>
-            <% end %>
-          </details>
-        <% end %>
-
         <%# Results comparison toggle %>
         <details class="publish-block">
-          <summary class="publish-block-title">Respondent view <span class="pub-chev">⌄</span></summary>
+          <summary class="publish-block-title">Response comparison <span class="pub-chev">⌄</span></summary>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true,
                 style: "margin:0;" do %>
             <input type="hidden" name="show_results_comparison" value="0" />
@@ -910,78 +907,6 @@
             <% end %>
           <% end %>
         </details>
-
-        <%# Quiz mode, Logic & flows and Tokenisation are activated and
-            configured in their own right-panel tabs now. %>
-
-        <%# Form mode — same one-question-at-a-time flow, but the swipe gestures
-            and game-like animation are stripped so it reads as a plain
-            questionnaire. Toggling reloads the editor/preview. %>
-        <details class="publish-block">
-          <summary class="publish-block-title">Form mode <span class="pub-chev">⌄</span></summary>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-            <input type="hidden" name="render_mode" value="cards" />
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
-              <input type="checkbox" name="render_mode" value="form"
-                     <%= "checked" if @survey.forms_mode? %>
-                     onchange="this.form.requestSubmit()"
-                     style="width:14px;height:14px;accent-color:#615BF5;cursor:pointer;margin-top:1px;flex-shrink:0;" />
-              <span>Show it as a plain questionnaire — respondents still answer one question at a time, but without the swipe and animation.</span>
-            </label>
-          <% end %>
-        </details>
-
-        <%# The consent gate and the thank-you screen's title/message are edited
-            in the cards feed now (in-feed gate cards above the welcome card /
-            below the last card — see gate_cards_controller). Only the optional
-            finish link remains a panel setting. %>
-        <details class="publish-block">
-          <summary class="publish-block-title">Thank-you screen <span class="pub-chev">⌄</span></summary>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-            <div>
-              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin-bottom:5px;">Send respondents to your website when they finish (optional)</div>
-              <input type="url" name="forward_url" inputmode="url"
-                     value="<%= @survey.forward_url %>"
-                     placeholder="https://your-organisation.org"
-                     onchange="this.form.requestSubmit()"
-                     style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
-              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);margin-top:5px;">Respondents also get a Share button to pass the Verto on. The screen's title and message are edited on the thank-you card at the bottom of the feed.</div>
-            </div>
-          <% end %>
-        </details>
-
-        <%# Branch end screens — extra finish screens a branch can route to, each
-            with its own title/message/link (e.g. a unique Stripe page per hub).
-            Only relevant with logic on; the "Thank-you screen" above is always
-            the default. Rows serialize into the hidden end_screens field on save
-            (mirrors the Tokenisation manager). %>
-        <% if @survey.logic? %>
-          <% raw_end_screens = Array(@survey.read_attribute(:end_screens)) %>
-          <details class="publish-block" data-controller="end-screens">
-            <summary class="publish-block-title">Branch end screens <span class="pub-chev">⌄</span></summary>
-            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:8px;line-height:1.45;">
-                Extra finish screens a branch can end on — each with its own title, message and link. Point an answer's route at one (e.g. a unique Stripe page per hub). The “Thank-you screen” above stays the default.
-              </div>
-              <input type="hidden" name="end_screens" value="<%= raw_end_screens.to_json %>" data-end-screens-target="field" />
-              <div data-end-screens-target="list" style="display:flex;flex-direction:column;gap:10px;">
-                <% raw_end_screens.each do |es| %>
-                  <%= render "surveys/end_screen_row", es: es %>
-                <% end %>
-              </div>
-              <div style="display:flex;gap:8px;margin-top:10px;">
-                <button type="button" data-action="click->end-screens#addRow"
-                        style="padding:6px 12px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px dashed rgba(255,255,255,0.25);cursor:pointer;">
-                  ＋ Add end screen
-                </button>
-                <button type="button" data-action="click->end-screens#save"
-                        style="padding:6px 14px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:none;cursor:pointer;">
-                  Save end screens
-                </button>
-              </div>
-            <% end %>
-          </details>
-        <% end %>
 
         <%# Partner share — add this Verto to a partner group and generate
             per-partner links. Each row in the partnership produces a unique token. %>

@@ -64,8 +64,9 @@ class EditorReorderInsertTest < ActionDispatch::IntegrationTest
     assert_select "[data-gate-cards-target='tyBody'][contenteditable='true']"
     assert_select "textarea[name='consent_text']", false
     assert_select "input[name='thankyou_title']", false
-    # The optional finish link is the one thank-you setting left in the panel.
-    assert_select "input[name='forward_url']"
+    # The publish panel is down to Preview / Status / Response comparison /
+    # Share with Partners — the finish-link field left with the rest.
+    assert_select "input[name='forward_url']", false
   end
 
   test "quiz answer textareas auto-grow (explanation + accepted answers)" do
