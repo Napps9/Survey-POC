@@ -10,7 +10,7 @@ import { Controller } from "@hotwired/stimulus"
 // status pill through the gate-cards:status event (survey-editor#gateStatus).
 export default class extends Controller {
   static targets = [
-    "consentCta", "consentCard", "consentBody",
+    "consentCta", "consentCard", "consentBody", "consentLeft",
     "tyCta", "tyCard", "tyTitle", "tyBody"
   ]
   static values = { url: String }
@@ -28,7 +28,58 @@ export default class extends Controller {
     this.consentCardTarget.hidden = true
     this.consentCtaTarget.hidden = false
     this.consentBodyTarget.textContent = this.consentBodyTarget.dataset.defaultText || ""
-    this._save({ consent_text: "" })
+    // The design image goes with the gate — re-adding starts from a clean card.
+    this._paintConsentImage("", "", "")
+    this._save({ consent_text: "", consent_image: "", consent_image_credit: "", consent_image_credit_url: "" })
+  }
+
+  // Consent-gate design image, picked in the media-picker modal (its
+  // "consent" mode dispatches media-picker:consentImage to here). Repaints
+  // the in-feed replica's left panel and persists the survey-level
+  // consent_image fields the same way the consent text saves.
+  setConsentImage(event) {
+    const { url = "", credit = "", creditUrl = "" } = event.detail || {}
+    this._paintConsentImage(url, credit, creditUrl)
+    this._save({
+      consent_image: url,
+      consent_image_credit: url ? credit : "",
+      consent_image_credit_url: url ? creditUrl : ""
+    })
+  }
+
+  // Mirrors media-picker's _setCardImage (photo-only path) against the gate
+  // card's left panel — everything it paints carries [data-consent-media] so
+  // a repaint/clear swaps cleanly with the server-rendered markup.
+  _paintConsentImage(url, credit, creditUrl) {
+    if (!this.hasConsentLeftTarget) return
+    const left = this.consentLeftTarget
+    left.querySelectorAll("[data-consent-media]").forEach(el => el.remove())
+    if (!url) return
+    const img = document.createElement("div")
+    img.className = "split-left-img"
+    img.dataset.consentMedia = "true"
+    img.style.backgroundImage = `url('${url.replace(/'/g, "\\'")}')`
+    left.prepend(img)
+    const ov = document.createElement("div")
+    ov.className = "split-left-overlay"
+    ov.dataset.consentMedia = "true"
+    img.after(ov)
+    if (!credit) return
+    const el = document.createElement("div")
+    el.className = "split-left-credit"
+    el.dataset.consentMedia = "true"
+    const label = `Photo by ${credit}`
+    if (creditUrl) {
+      const a = document.createElement("a")
+      a.href = creditUrl
+      a.target = "_blank"
+      a.rel = "noopener nofollow"
+      a.textContent = label
+      el.replaceChildren(a)
+    } else {
+      el.textContent = label
+    }
+    ov.after(el)
   }
 
   queueConsentSave() {

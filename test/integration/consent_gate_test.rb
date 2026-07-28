@@ -38,6 +38,63 @@ class ConsentGateTest < ActionDispatch::IntegrationTest
     assert_not s.consent_required?
   end
 
+  test "update_settings stores the consent image and rejects unsafe URLs with their credit" do
+    org = sign_in_org("consent-img")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ], cards: CARDS)
+
+    post survey_settings_path(s), params: {
+      consent_image: "https://images.pexels.com/photos/12/race.jpg?auto=compress",
+      consent_image_credit: "  Jane Doe  ",
+      consent_image_credit_url: "https://www.pexels.com/@janedoe"
+    }
+    s.reload
+    assert_equal "https://images.pexels.com/photos/12/race.jpg?auto=compress", s.consent_image
+    assert_equal "Jane Doe", s.consent_image_credit
+    assert_equal "https://www.pexels.com/@janedoe", s.consent_image_credit_url
+
+    # A URL outside the allowed forms is dropped, and the now-orphaned credit
+    # goes with it (same convention as the card image sanitizer).
+    post survey_settings_path(s), params: {
+      consent_image: "javascript:alert(1)",
+      consent_image_credit: "Mallory",
+      consent_image_credit_url: "https://evil.example/x"
+    }
+    s.reload
+    assert_nil s.consent_image
+    assert_nil s.consent_image_credit
+    assert_nil s.consent_image_credit_url
+  end
+
+  test "editor consent card offers Add design, then Change design once an image is set" do
+    org = sign_in_org("consent-fab")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ], cards: CARDS,
+                            consent_text: "Agree to continue.")
+
+    get survey_path(s)
+    assert_response :success
+    assert_select "[data-gate-cards-target='consentLeft'] button.split-left-design-prompt[data-action='click->media-picker#openConsent']"
+
+    s.update!(consent_image: "https://images.pexels.com/photos/12/race.jpg")
+    get survey_path(s)
+    assert_select "[data-gate-cards-target='consentLeft'] .split-left-img[data-consent-media]"
+    assert_select "[data-gate-cards-target='consentLeft'] button.add-media-fab[data-action='click->media-picker#openConsent']"
+  end
+
+  test "player consent card shows the creator's design image with its credit" do
+    s = published_survey(consent: "Agree to continue.")
+    s.update!(consent_image: "https://images.pexels.com/photos/12/race.jpg",
+              consent_image_credit: "Jane Doe",
+              consent_image_credit_url: "https://www.pexels.com/@janedoe")
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_select ".preview-card[data-card-type='consent_card'] .split-left .split-left-img"
+    assert_select ".preview-card[data-card-type='consent_card'] .split-left-credit a[href=?]",
+                  "https://www.pexels.com/@janedoe", text: /Jane Doe/
+  end
+
   test "consent shows as the first card when consent text is set" do
     s = published_survey(consent: "You agree your anonymous answers may be used for research.")
 

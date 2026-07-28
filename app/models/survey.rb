@@ -534,7 +534,10 @@ class Survey < ApplicationRecord
       thankyou_title:          thankyou_title,
       thankyou_body:           thankyou_body,
       forward_url:             forward_url,
-      consent_text:            consent_text
+      consent_text:            consent_text,
+      consent_image:           consent_image,
+      consent_image_credit:    consent_image_credit,
+      consent_image_credit_url: consent_image_credit_url
     )
   end
 

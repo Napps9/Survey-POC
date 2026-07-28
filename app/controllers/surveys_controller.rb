@@ -450,6 +450,23 @@ class SurveysController < ApplicationController
     if params.key?(:consent_text)
       attrs[:consent_text] = params[:consent_text].to_s.strip.first(2000).presence
     end
+    # Consent-gate design image — same allowed forms as card/backdrop images
+    # (stored-upload path, asset path, Pexels CDN, capped data URL) and the
+    # same Pexels-only rule for the credit link. A cleared/rejected image
+    # drops its credit with it, mirroring the card sanitizer.
+    if params.key?(:consent_image)
+      attrs[:consent_image] = Survey.sanitize_image_url(params[:consent_image])
+    end
+    if params.key?(:consent_image_credit)
+      attrs[:consent_image_credit] = params[:consent_image_credit].to_s.strip.first(Survey::MAX_CREDIT_NAME).presence
+    end
+    if params.key?(:consent_image_credit_url)
+      attrs[:consent_image_credit_url] = Survey.sanitize_credit_url(params[:consent_image_credit_url])
+    end
+    if attrs.key?(:consent_image) && attrs[:consent_image].nil?
+      attrs[:consent_image_credit]     = nil
+      attrs[:consent_image_credit_url] = nil
+    end
     if params.key?(:end_screens)
       attrs[:end_screens] = Survey.sanitize_end_screens(JSON.parse(params[:end_screens]))
     end

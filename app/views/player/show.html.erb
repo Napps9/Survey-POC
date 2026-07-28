@@ -111,9 +111,23 @@
            data-player-target="card"
            data-card-type="consent_card">
         <%# Rendered as the standard split-card so consent is in keeping with the
-            question-card design (empty branded left panel + content on the right). %>
+            question-card design (branded left panel — with the creator's chosen
+            design image when one is set — + content on the right). %>
         <div class="split-card">
           <div class="split-left">
+            <% if @survey.consent_image.present? %>
+              <div class="split-left-img" style="background-image:url('<%= @survey.consent_image %>');"></div>
+              <div class="split-left-overlay"></div>
+              <% if @survey.consent_image_credit.present? %>
+                <div class="split-left-credit">
+                  <% if @survey.consent_image_credit_url.present? %>
+                    <a href="<%= @survey.consent_image_credit_url %>" target="_blank" rel="noopener nofollow">Photo by <%= @survey.consent_image_credit %></a>
+                  <% else %>
+                    Photo by <%= @survey.consent_image_credit %>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
             <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
           </div>
           <div class="split-right">

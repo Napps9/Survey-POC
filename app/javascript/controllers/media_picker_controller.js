@@ -90,6 +90,34 @@ export default class extends Controller {
     document.addEventListener("keydown", this._escListener)
   }
 
+  // Opens the same modal but targets the consent gate's left panel. The gate
+  // is a survey-level setting, not a card — applying dispatches to
+  // gate-cards#setConsentImage, which paints the in-feed replica and persists
+  // consent_image via update_settings. Photos only, like the Verto backdrop.
+  openConsent(event) {
+    event?.preventDefault()
+    event?.stopPropagation()
+    this._mode = "consent"
+    this._activeCard = null
+    this._pendingUrl = null
+    this._pendingVideo = null
+    this._setApplyEnabled(false)
+    this._switchTabKey("library")
+    this._setMedia("photos")
+    this._showMediaToggle(false)
+    this.clearBtnTarget.hidden = !this._consentLeft()?.querySelector(".split-left-img")
+    // The per-card "Recommended" list keys off a card's own content — the
+    // gate has none, so lean on the theme-seeded stock search instead.
+    this._renderRecommended([], "")
+    this._seedSearch()
+    this.backdropTarget.hidden = false
+    document.addEventListener("keydown", this._escListener)
+  }
+
+  _consentLeft() {
+    return this.element.querySelector("[data-gate-cards-target='consentLeft']")
+  }
+
   // Opens the same modal but targets ONE tap-card statement's image instead
   // of the card's own left-panel image/video.
   openTapOption(event) {
@@ -439,6 +467,18 @@ export default class extends Controller {
       if (this._pendingUrl) { this._setVertoBackground(this._pendingUrl); this.close() }
       return
     }
+    if (this._mode === "consent") {
+      // Consent gate is photos only (the video toggle is hidden here).
+      if (this._pendingUrl) {
+        this.dispatch("consentImage", { detail: {
+          url: this._pendingUrl,
+          credit: this._pendingCredit || "",
+          creditUrl: this._pendingCreditUrl || ""
+        } })
+        this.close()
+      }
+      return
+    }
     if (!this._activeCard) return
     if (this._mode === "tapOption") {
       // Tap-card statements are photos only (the video toggle stays hidden
@@ -514,6 +554,11 @@ export default class extends Controller {
   clearImage() {
     if (this._mode === "background") {
       this._setVertoBackground("")
+      this.close()
+      return
+    }
+    if (this._mode === "consent") {
+      this.dispatch("consentImage", { detail: { url: "", credit: "", creditUrl: "" } })
       this.close()
       return
     }
