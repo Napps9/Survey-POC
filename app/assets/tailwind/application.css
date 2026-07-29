@@ -2785,10 +2785,19 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   padding: 7px 10px 8px;
   font-family: "Alata", sans-serif; font-size: 10.5px; letter-spacing: 0.02em;
   background: var(--tab-color, #4D588A);
-  transition: filter 0.15s, background 0.15s;
+  transition: filter 0.15s, background 0.15s, box-shadow 0.15s;
 }
 .right-tab-folder:not(.is-active) { filter: brightness(0.82); }
-.right-tab-folder:not(.is-active):hover { filter: brightness(1); }
+/* Hover: stay SOLID in the tab's own colour and glow. The explicit
+   background/color are needed because the base .right-tab:hover rule
+   (higher specificity) would otherwise swap the fill for translucent
+   white — the "tab goes transparent" bug. */
+.right-tab-folder:not(.is-active):hover {
+  filter: brightness(1);
+  background: var(--tab-color, #4D588A);
+  color: var(--tab-ink, #fff);
+  box-shadow: 0 0 14px 2px color-mix(in srgb, var(--tab-color, #4D588A) 70%, transparent);
+}
 .right-tab-folder.is-active {
   box-shadow: none;
   background: var(--tab-color, #2A2D3A);
