@@ -185,6 +185,11 @@ pl:
       optimise: "Optymalizuj"
       optimising: "Optymalizowanie…"
       optimise_failed: "Nie udało się zoptymalizować: %{msg}"
+      flows:
+        group: "Przepływy"
+        option: "↳ Przepływ %{name}"
+        empty_suffix: "(pusty)"
+        header_count: "%{count} kart"
       rules:
         title: "Zasady gry"
         score_label: "Wynik Verto"

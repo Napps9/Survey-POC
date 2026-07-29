@@ -185,6 +185,11 @@ uk:
       optimise: "Оптимізувати"
       optimising: "Оптимізація…"
       optimise_failed: "Не вдалося оптимізувати: %{msg}"
+      flows:
+        group: "Потоки"
+        option: "↳ Потік %{name}"
+        empty_suffix: "(порожньо)"
+        header_count: "%{count} карток"
       rules:
         title: "Правила гри"
         score_label: "Оцінка Verto"

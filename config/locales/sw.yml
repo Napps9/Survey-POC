@@ -185,6 +185,11 @@ sw:
       optimise: "Boresha"
       optimising: "Inaboresha…"
       optimise_failed: "Imeshindwa kuboresha: %{msg}"
+      flows:
+        group: "Mitiririko"
+        option: "↳ Mtiririko wa %{name}"
+        empty_suffix: "(tupu)"
+        header_count: "Kadi %{count}"
       rules:
         title: "Kanuni za Mchezo"
         score_label: "Alama ya Verto"

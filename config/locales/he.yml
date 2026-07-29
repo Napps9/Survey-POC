@@ -185,6 +185,11 @@ he:
       optimise: "מטב"
       optimising: "ממטב…"
       optimise_failed: "לא ניתן למטב: %{msg}"
+      flows:
+        group: "מסלולים"
+        option: "↳ מסלול %{name}"
+        empty_suffix: "(ריק)"
+        header_count: "%{count} כרטיסים"
       rules:
         title: "חוקי המשחק"
         score_label: "ציון Verto"

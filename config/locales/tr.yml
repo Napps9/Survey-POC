@@ -185,6 +185,11 @@ tr:
       optimise: "İyileştir"
       optimising: "İyileştiriliyor…"
       optimise_failed: "İyileştirilemedi: %{msg}"
+      flows:
+        group: "Akışlar"
+        option: "↳ %{name} akışı"
+        empty_suffix: "(boş)"
+        header_count: "%{count} kart"
       rules:
         title: "Oyunun Kuralları"
         score_label: "Verto puanı"

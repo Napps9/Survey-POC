@@ -185,6 +185,11 @@ es:
       optimise: "Optimizar"
       optimising: "Optimizando…"
       optimise_failed: "No se pudo optimizar: %{msg}"
+      flows:
+        group: "Flujos"
+        option: "↳ Flujo %{name}"
+        empty_suffix: "(vacío)"
+        header_count: "%{count} tarjetas"
       rules:
         title: "Reglas del juego"
         score_label: "Puntuación del Verto"

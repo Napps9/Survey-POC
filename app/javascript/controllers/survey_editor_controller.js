@@ -12,6 +12,10 @@ const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
 // completing the question at all (see setTokenAwardMode).
 const CHOICE_TYPES = [ "multiple_choice", "select_many", "yes_no", "select_one_grid", "select_many_grid", "scenario" ]
 
+// Flow colours — mirrors Survey::FLOW_COLORS (and the flow map's LANE_PALETTE)
+// so a flow minted client-side gets the same palette the server would assign.
+const FLOW_COLORS = [ "#8B85FF", "#01EACB", "#F59E0B", "#F472B6", "#38BDF8", "#A3E635" ]
+
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
     "cardFlags", "panelOther", "panelRequired"]
@@ -28,6 +32,9 @@ export default class extends Controller {
     // the route dropdowns are built from (see refreshLogicTargets).
     logic: { type: Boolean, default: false },
     logicConfig: { type: Object, default: {} },
+    // First-class named flows ({id, name, color, exit} — Survey#flows_list).
+    // Copied to a mutable working set in connect(); serialize() sends it back.
+    flows: { type: Array, default: [] },
     live: { type: Boolean, default: false }
   }
 
@@ -37,6 +44,7 @@ export default class extends Controller {
   connect() {
     this._activeLocale = this.defaultLocaleValue
     this._eyebrows = this._loadEyebrows()
+    this._flows = JSON.parse(JSON.stringify(this.flowsValue || []))
     this._seedStore()
     this.refreshAll()
 
@@ -242,7 +250,7 @@ export default class extends Controller {
     event.stopPropagation()
     const card = event.currentTarget.closest("[data-survey-editor-target='card']")
     const slot = card?.closest(".card-slot")
-    const prevSlot = slot?.previousElementSibling
+    const prevSlot = this._prevCardSlot(slot)
     const prevCard = prevSlot?.querySelector("[data-survey-editor-target='card']")
     if (!slot || !prevSlot || !prevCard || prevCard.dataset.cardType === "welcome_card") return
     prevSlot.before(slot)
@@ -253,10 +261,24 @@ export default class extends Controller {
     event.stopPropagation()
     const card = event.currentTarget.closest("[data-survey-editor-target='card']")
     const slot = card?.closest(".card-slot")
-    const nextSlot = slot?.nextElementSibling
-    if (!slot || !nextSlot || !nextSlot.classList.contains("card-slot")) return
+    const nextSlot = this._nextCardSlot(slot)
+    if (!slot || !nextSlot) return
     nextSlot.after(slot)
     this._afterReorder(card)
+  }
+
+  // The neighbouring .card-slot, hopping any .flow-header-row chrome the flow
+  // painter inserts between slots (the only non-slot siblings in the feed).
+  _prevCardSlot(slot) {
+    let el = slot?.previousElementSibling
+    while (el && !el.classList.contains("card-slot")) el = el.previousElementSibling
+    return el
+  }
+
+  _nextCardSlot(slot) {
+    let el = slot?.nextElementSibling
+    while (el && !el.classList.contains("card-slot")) el = el.nextElementSibling
+    return el
   }
 
   _afterReorder(card) {
@@ -291,6 +313,8 @@ export default class extends Controller {
     this._updateMoveButtonStates(cards)
     // Keep every route dropdown's target list in sync with the current deck.
     this.refreshLogicTargets()
+    // …and the flow rails/headers in step with membership + order.
+    this._paintFlowChrome()
   }
 
   // Disable "up" on the first movable card (and any card sitting just below the
@@ -301,12 +325,11 @@ export default class extends Controller {
       const up   = card.querySelector("[data-role='move-up']")
       const down = card.querySelector("[data-role='move-down']")
       if (up) {
-        const prevCard = slot?.previousElementSibling?.querySelector("[data-survey-editor-target='card']")
+        const prevCard = this._prevCardSlot(slot)?.querySelector("[data-survey-editor-target='card']")
         up.disabled = !prevCard || prevCard.dataset.cardType === "welcome_card"
       }
       if (down) {
-        const nextSlot = slot?.nextElementSibling
-        down.disabled = !nextSlot || !nextSlot.classList.contains("card-slot")
+        down.disabled = !this._nextCardSlot(slot)
       }
     })
   }
@@ -820,6 +843,10 @@ export default class extends Controller {
       // Optional branch name (flow map), stored on the lane's entry card.
       const laneLabel = (card.dataset.cardLaneLabel || "").trim()
       if (laneLabel) out.lane_label = laneLabel
+      // First-class flow membership. Only a known flow's id is carried —
+      // Survey.reconcile_flows! would drop a ghost id server-side anyway.
+      const flowId = card.dataset.cardFlowId
+      if (flowId && this.flowById(flowId)) out.flow_id = flowId
 
       const i18n = {}
       secondary.forEach(loc => {
@@ -846,7 +873,11 @@ export default class extends Controller {
       return out
     })
 
-    return { title: this.titleValue, description: this.descriptionValue, cards }
+    // Compile flow membership + exits down to the per-card `next` chain (the
+    // runtime primitive) — see _compileFlows / FlowCompiler.
+    this._compileFlows(cards)
+
+    return { title: this.titleValue, description: this.descriptionValue, cards, flows: this.flowsList() }
   }
 
   // ── Quiz: correct-answer marking ─────────────────────────────────────────
@@ -984,6 +1015,201 @@ export default class extends Controller {
     }
   }
 
+  // ── Flows: first-class named branches ───────────────────────────────────
+  // A flow is a named, coloured group of cards (membership rides on the wrap
+  // as data-card-flow-id, mirroring card["flow_id"]). The flows array itself
+  // is authoring metadata; _compileFlows() compiles membership + exit down to
+  // the per-card `next` pointers the player already resolves — the JS mirror
+  // of FlowCompiler (app/lib/flow_compiler.rb), which re-runs server-side on
+  // every save as the authoritative backstop. Keep the two in sync.
+
+  flowsList() { return this._flows || [] }
+
+  flowById(id) { return this.flowsList().find(f => f.id === id) || null }
+
+  // A flow's member wraps, in deck (document) order — flow order IS deck order.
+  flowMemberWraps(id) {
+    if (!id) return []
+    return this.cardTargets.filter(c => c.dataset.cardFlowId === id)
+  }
+
+  // The cid a route targeting this flow resolves to: its first member's.
+  flowEntryCid(id) {
+    const members = this.flowMemberWraps(id)
+    return members.length ? (members[0].dataset.cardCid || null) : null
+  }
+
+  addFlow({ name, color, exit } = {}) {
+    const flows = this.flowsList()
+    const flow = {
+      id: this._mintFlowId(),
+      name: (name || "").trim().slice(0, 60) || `Flow ${flows.length + 1}`,
+      color: color || FLOW_COLORS[flows.length % FLOW_COLORS.length]
+    }
+    const ex = this._validFlowExit(exit)
+    if (ex) flow.exit = ex
+    flows.push(flow)
+    this.refreshAll()
+    this.markDirty()
+    return flow
+  }
+
+  renameFlow(id, name) {
+    const flow = this.flowById(id)
+    const clean = (name || "").trim().slice(0, 60)
+    if (!flow || !clean || flow.name === clean) return
+    flow.name = clean
+    this.refreshAll()
+    this.markDirty()
+  }
+
+  // exit: { card } | { end } | null (null ⇒ fall through linearly after the flow).
+  setFlowExit(id, exit) {
+    const flow = this.flowById(id)
+    if (!flow) return
+    const ex = this._validFlowExit(exit)
+    if (ex) flow.exit = ex
+    else delete flow.exit
+    this.refreshAll()
+    this.markDirty()
+  }
+
+  // Assign a card to a flow (flowId null ⇒ leave its flow). Membership only
+  // ever changes through here / removeFlow — reordering cards never re-parents
+  // them, so a move can split a flow's visual run but not its membership.
+  setCardFlow(cardEl, flowId) {
+    if (!cardEl) return
+    if (flowId && this.flowById(flowId)) {
+      cardEl.dataset.cardFlowId = flowId
+    } else {
+      delete cardEl.dataset.cardFlowId
+      delete cardEl.dataset.cardNext // compiled plumbing goes with the membership
+    }
+    this.refreshAll()
+    this.markDirty()
+  }
+
+  // Delete a flow. Dissolve (default) keeps the member cards, clearing their
+  // membership + compiled `next` chain; deleteCards removes their slots too
+  // (routes that pointed at them reset via refreshLogicTargets' target-gone
+  // fallback on the next repaint).
+  removeFlow(id, { deleteCards = false } = {}) {
+    this.flowMemberWraps(id).forEach(wrap => {
+      if (deleteCards) {
+        ;(wrap.closest(".card-slot") || wrap).remove()
+      } else {
+        delete wrap.dataset.cardFlowId
+        delete wrap.dataset.cardNext
+      }
+    })
+    this._flows = this.flowsList().filter(f => f.id !== id)
+    this.refreshAll()
+    this.markDirty()
+  }
+
+  _mintFlowId() {
+    const used = new Set(this.flowsList().map(f => f.id))
+    let id
+    do {
+      const bytes = crypto.getRandomValues(new Uint8Array(4))
+      id = "f_" + Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("")
+    } while (used.has(id))
+    return id
+  }
+
+  // Mirror of FlowCompiler.valid_exit: a single-key target or null (end wins
+  // over card on a malformed hash, matching LogicGraph's resolution order).
+  _validFlowExit(target) {
+    if (!target || typeof target !== "object") return null
+    if (target.end != null && String(target.end) !== "") return { end: String(target.end) }
+    if (target.card != null && String(target.card) !== "") return { card: String(target.card) }
+    return null
+  }
+
+  // Mirror of FlowCompiler.compile!: chain each flow's members with `next`
+  // pointers and point the last at the exit. Runs inside serialize() so the
+  // flow map (which renders from serialize()) and autosave payloads agree
+  // mid-edit. Also writes the computed pointer back onto each member wrap's
+  // data-card-next — the wrap dataset is the editor's source of truth for
+  // `next` (the flow map's _setNext writes it, serialize() reads it), so a
+  // stale value there would resurrect an old pointer on a later edit. A
+  // member with no cid yet (fresh card, server stamps cids) is skipped as a
+  // chain TARGET client-side; the server compile completes the chain on save.
+  _compileFlows(cards) {
+    const wraps = this.cardTargets
+    this.flowsList().forEach(flow => {
+      const memberIdxs = []
+      cards.forEach((c, i) => { if (c.flow_id === flow.id) memberIdxs.push(i) })
+      memberIdxs.forEach((cardIdx, k) => {
+        const last = k === memberIdxs.length - 1
+        let next = null
+        if (!last) {
+          const targetCid = cards[memberIdxs[k + 1]].cid
+          next = targetCid ? { card: targetCid } : null
+        } else {
+          next = this._validFlowExit(flow.exit)
+        }
+        if (next) {
+          cards[cardIdx].next = next
+          if (wraps[cardIdx]) wraps[cardIdx].dataset.cardNext = JSON.stringify(next)
+        } else {
+          delete cards[cardIdx].next
+          if (wraps[cardIdx]) delete wraps[cardIdx].dataset.cardNext
+        }
+      })
+    })
+    return cards
+  }
+
+  // Paint flow identity onto the feed: a coloured rail on member slots (via
+  // --flow-color) and a lightweight header row before each contiguous run of
+  // members. Presentation only — membership lives on the wraps; a run split
+  // by a reorder simply renders a second header for the same flow.
+  _paintFlowChrome() {
+    this.element.querySelectorAll(".flow-header-row").forEach(el => el.remove())
+    const flowsById = new Map(this.flowsList().map(f => [ f.id, f ]))
+    const counts = new Map()
+    this.cardTargets.forEach(c => {
+      const fid = c.dataset.cardFlowId
+      if (fid && flowsById.has(fid)) counts.set(fid, (counts.get(fid) || 0) + 1)
+    })
+    let prevFlowId = null
+    this.cardTargets.forEach(card => {
+      const slot = card.closest(".card-slot")
+      if (!slot) return
+      const flow = flowsById.get(card.dataset.cardFlowId)
+      if (flow) {
+        slot.dataset.flowId = flow.id
+        slot.style.setProperty("--flow-color", flow.color)
+        slot.classList.add("in-flow")
+        if (prevFlowId !== flow.id) slot.before(this._flowHeaderRow(flow, counts.get(flow.id) || 0))
+      } else {
+        delete slot.dataset.flowId
+        slot.style.removeProperty("--flow-color")
+        slot.classList.remove("in-flow")
+      }
+      prevFlowId = flow ? flow.id : null
+    })
+  }
+
+  _flowHeaderRow(flow, count) {
+    const row = document.createElement("div")
+    row.className = "flow-header-row"
+    row.dataset.flowId = flow.id
+    row.style.setProperty("--flow-color", flow.color)
+    const dot = document.createElement("span")
+    dot.className = "flow-header-dot"
+    dot.setAttribute("aria-hidden", "true")
+    const name = document.createElement("span")
+    name.className = "flow-header-name"
+    name.textContent = flow.name
+    const meta = document.createElement("span")
+    meta.className = "flow-header-count"
+    meta.textContent = t("editor.flows.header_count", { count })
+    row.append(dot, name, meta)
+    return row
+  }
+
   // ── Answer-branching: per-option routing ────────────────────────────────
 
   // This card's routing config, in the shape LogicGraph expects. Reads the
@@ -1010,11 +1236,19 @@ export default class extends Controller {
     return !!(logic && ((Array.isArray(logic.routes) && logic.routes.length) || logic.default))
   }
 
-  // Decode a route select value: "" (continue/linear), "card:<cid>", "end:<id>".
+  // Decode a route select value: "" (continue/linear), "card:<cid>",
+  // "end:<id>", or "flow:<id>" — a flow resolves to its entry (first member)
+  // card, recomputed here on every serialize so the route tracks the FLOW
+  // through reorders, not a frozen cid. An empty flow resolves to Continue
+  // (the panel warns about it) rather than a dangling target.
   _logicTargetFromValue(value) {
     if (!value) return null
     if (value.startsWith("end:"))  { const id  = value.slice(4); return id  ? { end: id }   : null }
     if (value.startsWith("card:")) { const cid = value.slice(5); return cid ? { card: cid } : null }
+    if (value.startsWith("flow:")) {
+      const entry = this.flowEntryCid(value.slice(5))
+      return entry ? { card: entry } : null
+    }
     return null
   }
 
@@ -1028,24 +1262,56 @@ export default class extends Controller {
     if (!selects.length) return
     const cfg   = this.logicConfigValue || {}
     const ends  = Array.isArray(cfg.ends) ? cfg.ends : []
+    const flows = this.flowsList().map(f => ({ ...f, entryCid: this.flowEntryCid(f.id) }))
+    const entryToFlow = new Map(flows.filter(f => f.entryCid).map(f => [ f.entryCid, f.id ]))
+    // Flow members stay off the plain card list — a flow is targeted as a
+    // whole (its optgroup entry), not by an individual member card.
+    const memberCids = new Set(
+      this.cardTargets.filter(c => c.dataset.cardFlowId && this.flowById(c.dataset.cardFlowId))
+                      .map(c => c.dataset.cardCid).filter(Boolean)
+    )
     const cards = this.cardTargets.map(c => ({
       cid: c.dataset.cardCid,
       num: c.dataset.cardNum,
       label: (c.querySelector(".q-title, .activity-title")?.textContent || "").trim().slice(0, 40)
     }))
+    const cardLabel = c => c.label ? `→ Card ${c.num}: ${c.label}` : `→ Card ${c.num}`
     selects.forEach(sel => {
       // The block may have been relocated into the sidebar's Branching tab, so
       // fall back to the block's own owner-cid when it's no longer in a card.
       const ownerCid = sel.closest("[data-survey-editor-target='card']")?.dataset.cardCid
                     || sel.closest("[data-logic-block]")?.dataset.ownerCid
-      const chosen   = sel.dataset.logicSelected || ""
-      sel.innerHTML  = ""
+      let chosen = sel.dataset.logicSelected || ""
+      // Upgrade a raw card target to its flow when that cid is a flow's entry:
+      // from here on the route tracks the FLOW, so reordering members (which
+      // changes which card is the entry) re-resolves automatically.
+      if (chosen.startsWith("card:") && entryToFlow.has(chosen.slice(5))) {
+        chosen = `flow:${entryToFlow.get(chosen.slice(5))}`
+        sel.dataset.logicSelected = chosen
+      }
+      sel.innerHTML = ""
       sel.appendChild(this._logicOption("", cfg.continue || "Continue (default flow)"))
+      if (flows.length) {
+        const group = document.createElement("optgroup")
+        group.label = t("editor.flows.group")
+        flows.forEach(f => {
+          const label = f.entryCid ? t("editor.flows.option", { name: f.name })
+                                   : `${t("editor.flows.option", { name: f.name })} ${t("editor.flows.empty_suffix")}`
+          group.appendChild(this._logicOption(`flow:${f.id}`, label))
+        })
+        sel.appendChild(group)
+      }
       ends.forEach(e => sel.appendChild(this._logicOption(`end:${e.id}`, `${cfg.finishPrefix || "Finish"} · ${e.label}`)))
       cards.forEach(c => {
-        if (!c.cid || c.cid === ownerCid) return
-        sel.appendChild(this._logicOption(`card:${c.cid}`, c.label ? `→ Card ${c.num}: ${c.label}` : `→ Card ${c.num}`))
+        if (!c.cid || c.cid === ownerCid || memberCids.has(c.cid)) return
+        sel.appendChild(this._logicOption(`card:${c.cid}`, cardLabel(c)))
       })
+      // A legacy/map-set route can point INTO a flow (a hidden member cid) —
+      // keep it resolvable rather than silently resetting it to Continue.
+      if (chosen.startsWith("card:") && memberCids.has(chosen.slice(5))) {
+        const c = cards.find(x => x.cid === chosen.slice(5))
+        if (c) sel.appendChild(this._logicOption(`card:${c.cid}`, cardLabel(c)))
+      }
       sel.value = chosen
       if (sel.value !== chosen) { sel.value = ""; sel.dataset.logicSelected = "" } // target gone ⇒ fall through
     })

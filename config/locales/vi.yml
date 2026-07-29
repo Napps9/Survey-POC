@@ -185,6 +185,11 @@ vi:
       optimise: "Tối ưu hóa"
       optimising: "Đang tối ưu hóa…"
       optimise_failed: "Không thể tối ưu hóa: %{msg}"
+      flows:
+        group: "Luồng"
+        option: "↳ Luồng %{name}"
+        empty_suffix: "(trống)"
+        header_count: "%{count} thẻ"
       rules:
         title: "Luật chơi"
         score_label: "Điểm Verto"

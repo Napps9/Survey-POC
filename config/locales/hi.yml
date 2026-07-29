@@ -185,6 +185,11 @@ hi:
       optimise: "अनुकूलित करें"
       optimising: "अनुकूलित किया जा रहा है…"
       optimise_failed: "अनुकूलित नहीं किया जा सका: %{msg}"
+      flows:
+        group: "फ़्लो"
+        option: "↳ %{name} फ़्लो"
+        empty_suffix: "(खाली)"
+        header_count: "%{count} कार्ड"
       rules:
         title: "खेल के नियम"
         score_label: "Verto स्कोर"

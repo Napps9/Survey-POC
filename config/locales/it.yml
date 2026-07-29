@@ -185,6 +185,11 @@ it:
       optimise: "Ottimizza"
       optimising: "Ottimizzazione…"
       optimise_failed: "Impossibile ottimizzare: %{msg}"
+      flows:
+        group: "Flussi"
+        option: "↳ Flusso %{name}"
+        empty_suffix: "(vuoto)"
+        header_count: "%{count} schede"
       rules:
         title: "Regole del gioco"
         score_label: "Punteggio del Verto"

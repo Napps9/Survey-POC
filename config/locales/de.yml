@@ -185,6 +185,11 @@ de:
       optimise: "Optimieren"
       optimising: "Optimieren…"
       optimise_failed: "Optimierung fehlgeschlagen: %{msg}"
+      flows:
+        group: "Flows"
+        option: "↳ Flow %{name}"
+        empty_suffix: "(leer)"
+        header_count: "%{count} Karten"
       rules:
         title: "Spielregeln"
         score_label: "Verto-Punktzahl"

@@ -185,6 +185,11 @@ fr:
       optimise: "Optimiser"
       optimising: "Optimisation…"
       optimise_failed: "Impossible d'optimiser : %{msg}"
+      flows:
+        group: "Flux"
+        option: "↳ Flux %{name}"
+        empty_suffix: "(vide)"
+        header_count: "%{count} cartes"
       rules:
         title: "Règles du jeu"
         score_label: "Score du Verto"

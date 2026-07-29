@@ -185,6 +185,11 @@ ru:
       optimise: "Оптимизировать"
       optimising: "Оптимизация…"
       optimise_failed: "Не удалось оптимизировать: %{msg}"
+      flows:
+        group: "Потоки"
+        option: "↳ Поток %{name}"
+        empty_suffix: "(пусто)"
+        header_count: "%{count} карточек"
       rules:
         title: "Правила игры"
         score_label: "Оценка Verto"

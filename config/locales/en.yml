@@ -187,6 +187,11 @@ en:
       optimise: "Optimise"
       optimising: "Optimising…"
       optimise_failed: "Couldn't optimise: %{msg}"
+      flows:
+        group: "Flows"
+        option: "↳ %{name} flow"
+        empty_suffix: "(empty)"
+        header_count: "%{count} cards"
       rules:
         title: "Rules of the Game"
         score_label: "Verto score"

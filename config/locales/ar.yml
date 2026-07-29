@@ -185,6 +185,11 @@ ar:
       optimise: "تحسين"
       optimising: "جارٍ التحسين…"
       optimise_failed: "تعذّر التحسين: %{msg}"
+      flows:
+        group: "المسارات"
+        option: "↳ مسار %{name}"
+        empty_suffix: "(فارغ)"
+        header_count: "%{count} بطاقات"
       rules:
         title: "قواعد اللعبة"
         score_label: "نتيجة Verto"

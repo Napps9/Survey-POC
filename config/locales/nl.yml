@@ -185,6 +185,11 @@ nl:
       optimise: "Optimaliseren"
       optimising: "Optimaliseren…"
       optimise_failed: "Optimaliseren mislukt: %{msg}"
+      flows:
+        group: "Flows"
+        option: "↳ Flow %{name}"
+        empty_suffix: "(leeg)"
+        header_count: "%{count} kaarten"
       rules:
         title: "Spelregels"
         score_label: "Verto-score"

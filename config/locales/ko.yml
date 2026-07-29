@@ -185,6 +185,11 @@ ko:
       optimise: "최적화"
       optimising: "최적화 중…"
       optimise_failed: "최적화할 수 없습니다: %{msg}"
+      flows:
+        group: "플로우"
+        option: "↳ %{name} 플로우"
+        empty_suffix: "(비어 있음)"
+        header_count: "카드 %{count}장"
       rules:
         title: "게임의 규칙"
         score_label: "Verto 점수"

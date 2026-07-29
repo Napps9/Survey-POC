@@ -185,6 +185,11 @@ ja:
       optimise: "最適化"
       optimising: "最適化中…"
       optimise_failed: "最適化できませんでした: %{msg}"
+      flows:
+        group: "フロー"
+        option: "↳ %{name}フロー"
+        empty_suffix: "（空）"
+        header_count: "%{count}枚のカード"
       rules:
         title: "ゲームのルール"
         score_label: "Vertoスコア"

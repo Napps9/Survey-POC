@@ -185,6 +185,11 @@ id:
       optimise: "Optimalkan"
       optimising: "Mengoptimalkan…"
       optimise_failed: "Tidak dapat mengoptimalkan: %{msg}"
+      flows:
+        group: "Alur"
+        option: "↳ Alur %{name}"
+        empty_suffix: "(kosong)"
+        header_count: "%{count} kartu"
       rules:
         title: "Aturan Main"
         score_label: "Skor Verto"

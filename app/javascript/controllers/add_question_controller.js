@@ -448,6 +448,10 @@ export default class extends Controller {
     const anchor = this._insertAfterSlot
     if (anchor && anchor.parentNode === feed) {
       anchor.after(slot)
+      // Inserting below a flow member joins the flow — the new card lands
+      // inside the flow's visual run, so membership should match.
+      const anchorFlowId = anchor.querySelector("[data-survey-editor-target='card']")?.dataset.cardFlowId
+      if (anchorFlowId) card.dataset.cardFlowId = anchorFlowId
     } else {
       feed.appendChild(slot)
     }

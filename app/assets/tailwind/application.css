@@ -1005,6 +1005,42 @@
 
 /* ── Card slot: a card plus the "Add question" CTA beneath it ── */
 .card-slot { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── Flows: feed chrome for first-class named branches ──
+   A member slot gets a coloured left rail (--flow-color is stamped inline by
+   survey_editor_controller#_paintFlowChrome), and each contiguous run of
+   members gets a header row above it. Presentation only — membership lives on
+   the card wraps as data-card-flow-id. */
+.card-slot.in-flow {
+  border-left: 3px solid var(--flow-color, #8B85FF);
+  border-radius: 4px;
+  padding-left: 14px;
+  margin-left: -17px; /* rail sits in the gutter; cards keep their column */
+}
+.flow-header-row {
+  display: flex; align-items: center; gap: 9px;
+  margin: 6px 0 -2px;
+  padding: 7px 14px;
+  border-radius: 100px;
+  width: fit-content;
+  background: color-mix(in srgb, var(--flow-color, #8B85FF) 16%, #10131F);
+  border: 1px solid color-mix(in srgb, var(--flow-color, #8B85FF) 45%, transparent);
+}
+.flow-header-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--flow-color, #8B85FF);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--flow-color, #8B85FF) 70%, transparent);
+}
+.flow-header-name {
+  font-family: 'Alata', sans-serif;
+  font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #F4F6FF;
+}
+.flow-header-count {
+  font-family: 'ABeeZee', sans-serif;
+  font-size: 11.5px;
+  color: rgba(244,246,255,0.62);
+}
 /* Bottom-right, mirroring the Delete CTA on the chrome row above the card
    (same 4px inset), so the centre column stays clear of the floating pills. */
 .aq-insert-row { display: flex; justify-content: flex-end; padding: 0 4px; }

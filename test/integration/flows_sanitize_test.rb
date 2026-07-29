@@ -105,6 +105,16 @@ class FlowsSanitizeTest < ActionDispatch::IntegrationTest
     assert_equal [ 0, 3 ],       LogicGraph.resolve_path(cards, { "0" => { "value" => "UAE" } })
   end
 
+  test "the editor renders flow identity into the DOM round-trip" do
+    get survey_path(@survey)
+    assert_response :success
+    # The root carries the flows working set the editor's serialize() sends back…
+    assert_match "data-survey-editor-flows-value=", response.body
+    assert_match "f_uk", response.body
+    # …and each member wrap carries its membership for the DOM round-trip.
+    assert_select ".survey-card-wrap[data-card-flow-id='f_uk']", 2
+  end
+
   test "editing flows on a published Verto is locked" do
     @survey.update!(publish_token: SecureRandom.hex(8), published_at: Time.current)
     patch_survey(flows: [])

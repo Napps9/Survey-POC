@@ -58,6 +58,7 @@
      data-survey-editor-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-token-types-value="<%= @survey.token_types.to_json %>"
      data-survey-editor-logic-value="<%= @survey.logic? %>"
+     data-survey-editor-flows-value="<%= @survey.flows_list.to_json %>"
      data-survey-editor-logic-config-value="<%= { continue: 'Continue (default flow)', finishPrefix: 'Finish', ends: @survey.end_screens_list.map { |e| { id: e['id'], label: e['title'] } } }.to_json %>"
      data-logic-map-ends-value="<%= @survey.end_screens_list.map { |e| { id: e['id'], title: e['title'] } }.to_json %>"
      data-logic-map-editable-value="<%= !@survey.published? %>"
