@@ -18,3 +18,10 @@ production:
   adapter: postgresql
   url: <%= ENV["DATABASE_URL"] %>
   prepared_statements: false
+  # Solid Queue runs as threads INSIDE the Puma process in production
+  # (solid_queue_mode :async, config/puma.rb), so this one pool serves the web
+  # threads (3) plus the queue worker threads (2, config/queue.yml), the
+  # dispatcher, the scheduler, the supervisor's maintenance task and Solid
+  # Cable's poller. 3 + 12 leaves comfortable slack for all of them while
+  # staying far under Render Postgres' connection limit with one instance.
+  pool: <%= Integer(ENV.fetch("RAILS_MAX_THREADS", 3)) + 12 %>

@@ -51,7 +51,8 @@ be **threads inside the existing Puma process**, costing almost no CPU or RAM.
 - **Jobs — Solid Queue, run in-Puma in _non-forking_ (threaded) mode.** Not a
   separate Render worker service (+$7/mo, overkill now) and **not** the default
   *forking* Puma-plugin mode (forks a second ~150–250 MB Rails process — dangerous
-  on a memory-tuned 512 MB box already running jemalloc + `puma_worker_killer`).
+  on a memory-tuned 512 MB box already running jemalloc + a cgroup memory
+  watchdog).
   Non-forking runs workers as threads with near-zero extra RAM. Keep worker
   threads low (2–3) and ensure the DB pool ≥ web threads + worker threads.
   - _Alternative worth knowing:_ **GoodJob** (also Postgres, built-in dashboard,

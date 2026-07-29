@@ -53,10 +53,11 @@ class VertoBuild < ApplicationRecord
     update!(status: "failed", error_message: message.to_s.presence || "Something went wrong.")
   end
 
-  # A build whose job died without ever reporting back — the worker was killed
-  # mid-run (puma_worker_killer restarts at 85% RSS on this instance), or the
-  # process restarted during a deploy. Without this the wizard would poll a
-  # "running" row forever, which looks exactly like a hung app.
+  # A build whose job died without ever reporting back — the process was
+  # recycled mid-run (the memory watchdog restarts Puma, and Solid Queue with
+  # it, when the container nears its memory limit), or it restarted during a
+  # deploy. Without this the wizard would poll a "running" row forever, which
+  # looks exactly like a hung app.
   STALE_AFTER = 10.minutes
 
   def stale?

@@ -1,58 +1,36 @@
 # This configuration file will be evaluated by Puma. The top-level methods that
 # are invoked here are part of Puma's configuration DSL. For more information
 # about methods provided by the DSL, see https://puma.io/puma/Puma/DSL.html.
+#
+# Production runs ONE Ruby process that does everything: Puma in single mode
+# serving requests on 3 threads, with Solid Queue's dispatcher/worker/scheduler
+# as supervised threads inside it (async plugin mode, below). The previous
+# arrangement — cluster mode with one worker plus Solid Queue's forking
+# supervisor tree — put SIX Ruby processes on the 512MB Render instance
+# (master, worker, supervisor, dispatcher, queue worker, scheduler). Their
+# combined footprint sat against the container's memory limit from boot, and
+# the kernel OOM-killed the container over and over (the July 2026 crash
+# loop) — while puma_worker_killer watched only master+worker RSS and so never
+# fired. One process leaves real headroom for the transient spikes
+# (wkhtmltopdf report renders, libvips variants) that used to tip the box over.
 
-# Puma starts a configurable number of processes (workers) and each process
-# serves each request in a thread from an internal thread pool.
-#
-# The ideal number of threads per worker depends both on how much time the
-# application spends waiting for IO operations and on how much you wish to
-# to prioritize throughput over latency.
-#
-# As a rule of thumb, increasing the number of threads will increase how much
-# traffic a given process can handle (throughput), but due to CRuby's
-# Global VM Lock (GVL) it has diminishing returns and will degrade the
-# response time (latency) of the application.
-#
-# The default is set to 3 threads as it's deemed a decent compromise between
-# throughput and latency for the average Rails application.
-#
-# Any libraries that use a connection pool or another resource pool should
-# be configured to provide at least as many connections as the number of
-# threads. This includes Active Record's `pool` parameter in `database.yml`.
+# Puma serves each request in a thread from an internal thread pool. The
+# default of 3 is a decent compromise between throughput and latency for the
+# average Rails application; libraries using a connection pool should provide
+# at least as many connections (see config/database.yml, which also covers the
+# in-process Solid Queue threads).
 threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
 threads threads_count, threads_count
 
-# Number of worker processes. Without an explicit `workers` line Puma 8 ignores
+# Single mode (workers 0) everywhere unless WEB_CONCURRENCY explicitly opts
+# into cluster workers. Without an explicit `workers` line Puma 8 ignores
 # WEB_CONCURRENCY and starts its own default — two workers on the 512MB Render
-# instance, which doubles memory and gets the process OOM-killed (the cause of
-# the production 502s). Honour the env var so production runs the single worker
-# it's configured for; unset (local dev/test) stays in single mode.
+# instance, which doubles memory and gets the process OOM-killed. On one vCPU
+# a second worker buys no parallelism; it only duplicates the app's memory.
 workers Integer(ENV.fetch("WEB_CONCURRENCY", 0))
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 port ENV.fetch("PORT", 3000)
-
-# Restart a worker before it OOM-kills the instance and Render 502s the whole
-# app. `before_fork` only fires in clustered mode (workers >= 1), so this is a
-# no-op in local dev/test single mode and only arms in production. Restart the
-# largest worker when total RSS crosses ~85% of the 512MB box, checked every
-# 20s. A restart drops in-flight requests on that one worker — a brief blip —
-# so the ceiling is set high enough to fire only as a last resort.
-before_fork do
-  begin
-    require "puma_worker_killer"
-    PumaWorkerKiller.config do |config|
-      config.ram               = Integer(ENV.fetch("PWK_RAM_MB", 512))
-      config.frequency         = 20
-      config.percent_usage     = 0.85
-      config.rolling_restart_frequency = false
-    end
-    PumaWorkerKiller.start
-  rescue LoadError
-    # gem not present (e.g. non-production bundle) — skip the safety net.
-  end
-end
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
@@ -60,12 +38,33 @@ plugin :tmp_restart
 # Run Solid Queue inside this process instead of as a separate service. The
 # worker needs the same Active Storage disk the web process has mounted, and a
 # Render disk attaches to exactly one service — so a standalone worker could not
-# read or write card imagery. Jobs get their own threads, which is the point:
-# a 120s Claude call no longer occupies one of the three request threads.
+# read or write card imagery.
 #
-# Off by default outside production so `bin/rails server` in development doesn't
-# quietly start a worker; set SOLID_QUEUE_IN_PUMA=1 to opt in locally.
-plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"].present? || ENV["RAILS_ENV"] == "production"
+# :async mode runs the dispatcher, worker and scheduler as supervised THREADS
+# in this process, not as the default forked supervisor + three child
+# processes — that fork tree cost ~150-250MB the 512MB instance didn't have
+# (and is why it kept getting OOM-killed). Threads are all this workload
+# needs: the jobs are I/O-bound Claude calls that release the GVL while they
+# wait, which is also why they were moved off the request threads in the
+# first place. Worker thread count lives in config/queue.yml.
+#
+# Off by default outside production so `bin/rails server` in development
+# doesn't quietly start a worker; set SOLID_QUEUE_IN_PUMA=1 to opt in locally.
+if !ENV["SOLID_QUEUE_IN_PUMA"].to_s.empty? || ENV["RAILS_ENV"] == "production"
+  plugin :solid_queue
+  solid_queue_mode :async
+end
+
+# Replace puma_worker_killer (cluster-only, and blind to everything but
+# master+worker RSS) with a watchdog on the container's actual cgroup memory —
+# the number the kernel OOM killer enforces. It logs usage every 30s and
+# hot-restarts Puma gracefully if usage stays over 90% of the limit, instead
+# of letting the platform SIGKILL the container mid-request. No-ops where no
+# cgroup limit exists; set MEMORY_WATCHDOG=1 to exercise it locally.
+if ENV["RAILS_ENV"] == "production" || !ENV["MEMORY_WATCHDOG"].to_s.empty?
+  require_relative "../lib/puma/plugin/memory_watchdog"
+  plugin :memory_watchdog
+end
 
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.

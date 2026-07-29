@@ -4,12 +4,13 @@ default: &default
       batch_size: 500
   workers:
     - queues: "*"
-      # Two job threads, not the generated three. The worker runs inside Puma on
-      # a 512MB Render instance that is already memory-constrained (jemalloc,
-      # MALLOC_ARENA_MAX and puma_worker_killer are all in play), and every job
-      # here is a Claude call holding its response in memory. Two is enough that
-      # one slow generation doesn't block the next, without competing with the
-      # web process for the headroom puma_worker_killer restarts at.
+      # Two job threads, not the generated three. The worker runs as threads
+      # inside the Puma process (solid_queue_mode :async, config/puma.rb) on a
+      # 512MB Render instance that is memory-constrained (jemalloc,
+      # MALLOC_ARENA_MAX and the cgroup memory watchdog are all in play), and
+      # every job here is a Claude call holding its response in memory. Two is
+      # enough that one slow generation doesn't block the next, without
+      # crowding the request threads sharing the process.
       threads: 2
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
       polling_interval: 1

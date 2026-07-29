@@ -9,9 +9,6 @@ gem "sqlite3", ">= 1.4", group: [ :development, :test ]
 gem "pg", "~> 1.5",      group: :production
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
-# Restart a worker before it OOM-kills the 512MB instance (production safety
-# net). Only active in clustered mode (WEB_CONCURRENCY >= 1); see config/puma.rb.
-gem "puma_worker_killer", group: :production
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]

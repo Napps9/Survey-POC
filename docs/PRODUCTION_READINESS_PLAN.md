@@ -155,8 +155,10 @@ effort goes to the real gaps:
   120s/1-retry client bound, graceful degradation on Pexels/Google failures.
 - **i18n depth.** 19 locales, 500 keys each, parity-enforced by a test; player is
   RTL-aware. (Leaks are only in creator-side flashes — P2-2.)
-- **Memory strategy.** jemalloc + `MALLOC_ARENA_MAX` + GC tuning +
-  `puma_worker_killer` — a coherent 512MB plan.
+- **Memory strategy.** One Ruby process for everything (single-mode Puma with
+  Solid Queue running as threads via `solid_queue_mode :async`) + jemalloc +
+  `MALLOC_ARENA_MAX` + GC tuning + a cgroup memory watchdog that restarts Puma
+  gracefully before the kernel OOM-kills the container — a coherent 512MB plan.
 
 ---
 

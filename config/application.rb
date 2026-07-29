@@ -26,7 +26,10 @@ module SurveyPoc
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks])
+    # `puma` is ignored because lib/puma holds the memory-watchdog plugin that
+    # config/puma.rb requires before Rails boots — Zeitwerk must not also
+    # manage those files.
+    config.autoload_lib(ignore: %w[assets tasks puma])
 
     # Configuration for the application, engines, and railties goes here.
     #

@@ -46,8 +46,20 @@ services:
         value: "1"
       - key: RAILS_SERVE_STATIC_FILES
         value: "1"
+      # Single-mode Puma (no cluster workers): one Ruby process runs the web
+      # threads AND Solid Queue's threads (solid_queue_mode :async in
+      # config/puma.rb). The old value of 1 ran cluster mode — a master plus a
+      # duplicate worker process, on top of Solid Queue's four forked
+      # processes — and the six processes' combined footprint kept the 512MB
+      # instance pinned against its memory limit and OOM-crash-looping.
       - key: WEB_CONCURRENCY
-        value: "1"
+        value: "0"
+      # Restart Puma gracefully (drain, then re-exec in place) once container
+      # memory stays above this percent of the cgroup limit for two 30s
+      # checks, instead of letting the kernel SIGKILL the container
+      # mid-request. See lib/puma/plugin/memory_watchdog.rb; 0 = log only.
+      - key: MEMORY_WATCHDOG_RESTART_PERCENT
+        value: "90"
       # Cap glibc malloc arenas (default is 8 x CPU). Ruby's threaded server
       # otherwise fragments memory across many arenas and RSS creeps up until
       # the 512MB starter instance is OOM-killed and Render returns 502s.
