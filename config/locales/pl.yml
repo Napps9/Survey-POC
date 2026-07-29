@@ -210,6 +210,9 @@ pl:
         warn_cycle: "Pętla przepływów: %{names}"
         legacy_title: "Wykryte rozgałęzienia"
         convert: "Zamień na przepływ"
+        wire_none: "Nie podpinaj jeszcze"
+        prompt_needed: "Opisz, o co ma pytać ten przepływ."
+        generate_failed: "Nie udało się wygenerować: %{msg}"
       rules:
         title: "Zasady gry"
         score_label: "Wynik Verto"
@@ -666,6 +669,13 @@ pl:
     flows_title: "Przepływy"
     flows_intro: "Nazwane grupy kart, do których trafia skierowana odpowiedź — np. zestawy pytań UK, ZEA i USA, które potem się schodzą lub kończą na własnych ekranach."
     flows_new: "Nowy przepływ"
+    flows_generate: "Wygeneruj przepływ"
+    flows_generate_title: "Wygeneruj przepływ z AI"
+    flows_generate_hint: "Opisz, o co ma pytać ten przepływ — Claude przygotuje 3–6 kart dla tego segmentu, podpiętych pod wybrane pytanie."
+    flows_generate_placeholder: "np. Zapytaj respondentów z UK o lokalny transport, ceny energii i usługi gminne"
+    flows_generate_wire: "Otwiera się z odpowiedzi:"
+    flows_generate_cta: "Generuj"
+    flows_generating: "Claude tworzy ten przepływ…"
     select_card_for_options: 'Wybierz kartę pytania po lewej, aby ustawić jej opcje.'
     consent_gate: 'Krok zgody'
     consent_default: 'Biorąc udział, zgadzasz się, że Twoje anonimowe odpowiedzi mogą zostać wykorzystane do badań.'

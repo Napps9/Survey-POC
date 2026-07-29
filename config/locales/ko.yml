@@ -210,6 +210,9 @@ ko:
         warn_cycle: "플로우 순환: %{names}"
         legacy_title: "감지된 분기"
         convert: "플로우로 전환"
+        wire_none: "아직 연결 안 함"
+        prompt_needed: "이 플로우가 물어볼 내용을 설명하세요."
+        generate_failed: "생성 실패: %{msg}"
       rules:
         title: "게임의 규칙"
         score_label: "Verto 점수"
@@ -664,6 +667,13 @@ ko:
     flows_title: "플로우"
     flows_intro: "라우팅된 답변이 들어가는 이름 있는 카드 그룹 — 예: 나중에 합류하거나 각자의 화면에서 끝나는 UK·UAE·USA 질문 세트."
     flows_new: "새 플로우"
+    flows_generate: "플로우 생성"
+    flows_generate_title: "AI로 플로우 생성"
+    flows_generate_hint: "이 플로우가 물어볼 내용을 설명하면 Claude가 해당 세그먼트용 카드 3–6장을 만들어 선택한 질문 아래에 연결합니다."
+    flows_generate_placeholder: "예: UK 응답자에게 지역 교통, 에너지 요금, 시의회 서비스에 대해 묻기"
+    flows_generate_wire: "여는 답변:"
+    flows_generate_cta: "생성"
+    flows_generating: "Claude가 플로우를 만드는 중…"
     select_card_for_options: '왼쪽에서 질문 카드를 선택하여 옵션을 설정하세요.'
     consent_gate: '동의 단계'
     consent_default: '참여하시면 익명 답변이 연구에 사용될 수 있음에 동의하는 것입니다.'

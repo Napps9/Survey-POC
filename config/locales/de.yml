@@ -210,6 +210,9 @@ de:
         warn_cycle: "Flows im Kreis: %{names}"
         legacy_title: "Erkannte Verzweigungen"
         convert: "In Flow umwandeln"
+        wire_none: "Noch nicht verdrahten"
+        prompt_needed: "Beschreibe, was dieser Flow fragen soll."
+        generate_failed: "Generieren fehlgeschlagen: %{msg}"
       rules:
         title: "Spielregeln"
         score_label: "Verto-Punktzahl"
@@ -664,6 +667,13 @@ de:
     flows_title: "Flows"
     flows_intro: "Benannte Kartengruppen, in die eine geroutete Antwort führt — z. B. Fragesets für UK, VAE und USA, die wieder zusammenlaufen oder auf eigenen Screens enden."
     flows_new: "Neuer Flow"
+    flows_generate: "Flow generieren"
+    flows_generate_title: "Flow mit KI generieren"
+    flows_generate_hint: "Beschreibe, was dieser Flow fragen soll — Claude entwirft 3–6 Karten für dieses Segment, verdrahtet unter der gewählten Frage."
+    flows_generate_placeholder: "z. B. Frage UK-Teilnehmende zu Nahverkehr, Energiepreisen und kommunalen Diensten"
+    flows_generate_wire: "Öffnet sich bei Antwort:"
+    flows_generate_cta: "Generieren"
+    flows_generating: "Claude entwirft diesen Flow…"
     select_card_for_options: 'Wähle links eine Fragekarte, um ihre Optionen festzulegen.'
     consent_gate: 'Einwilligungsschritt'
     consent_default: 'Mit deiner Teilnahme erklärst du dich einverstanden, dass deine anonymen Antworten für Forschungszwecke verwendet werden dürfen.'

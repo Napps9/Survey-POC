@@ -210,6 +210,9 @@ ja:
         warn_cycle: "フローがループしています:%{names}"
         legacy_title: "検出された分岐"
         convert: "フローに変換"
+        wire_none: "まだ接続しない"
+        prompt_needed: "このフローで聞きたい内容を説明してください。"
+        generate_failed: "生成できませんでした:%{msg}"
       rules:
         title: "ゲームのルール"
         score_label: "Vertoスコア"
@@ -664,6 +667,13 @@ ja:
     flows_title: "フロー"
     flows_intro: "ルーティングされた回答が入る名前付きカードグループ。例:UK・UAE・USAの質問セットが後で合流するか、それぞれの画面で終了します。"
     flows_new: "新しいフロー"
+    flows_generate: "フローを生成"
+    flows_generate_title: "AIでフローを生成"
+    flows_generate_hint: "このフローで聞きたい内容を説明すると、Claudeがそのセグメント向けに3〜6枚のカードを作成し、選んだ質問の下に接続します。"
+    flows_generate_placeholder: "例:UKの回答者に地域交通・エネルギー価格・自治体サービスについて聞く"
+    flows_generate_wire: "開始する回答:"
+    flows_generate_cta: "生成"
+    flows_generating: "Claudeがフローを作成中…"
     select_card_for_options: '左側の質問カードを選択してオプションを設定してください。'
     consent_gate: '同意ステップ'
     consent_default: '参加することで、匿名の回答が研究に使用されることに同意したものとみなされます。'

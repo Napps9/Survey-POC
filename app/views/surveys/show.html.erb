@@ -59,6 +59,7 @@
      data-survey-editor-token-types-value="<%= @survey.token_types.to_json %>"
      data-survey-editor-logic-value="<%= @survey.logic? %>"
      data-survey-editor-flows-value="<%= @survey.flows_list.to_json %>"
+     data-flows-generate-url-value="<%= generate_survey_flow_path(@survey) %>"
      data-survey-editor-logic-config-value="<%= { continue: 'Continue (default flow)', finishPrefix: 'Finish', ends: @survey.end_screens_list.map { |e| { id: e['id'], label: e['title'] } } }.to_json %>"
      data-logic-map-ends-value="<%= @survey.end_screens_list.map { |e| { id: e['id'], title: e['title'] } }.to_json %>"
      data-logic-map-editable-value="<%= !@survey.published? %>"
@@ -1273,6 +1274,7 @@
   <%= render "surveys/media_modal" %>
   <%= render "surveys/animation_modal" %>
   <%= render "surveys/add_question_modal" %>
+  <% if @survey.logic? && !@survey.published? %><%= render "surveys/generate_flow_modal" %><% end %>
   <% if @survey.logic? %><%= render "surveys/logic_map", editable: !@survey.published? %><% end %>
 
 </div><%# /editor %>

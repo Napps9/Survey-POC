@@ -210,6 +210,9 @@ it:
         warn_cycle: "Flussi in loop: %{names}"
         legacy_title: "Diramazioni rilevate"
         convert: "Converti in flusso"
+        wire_none: "Non collegare ancora"
+        prompt_needed: "Descrivi cosa deve chiedere questo flusso."
+        generate_failed: "Generazione non riuscita: %{msg}"
       rules:
         title: "Regole del gioco"
         score_label: "Punteggio del Verto"
@@ -664,6 +667,13 @@ it:
     flows_title: "Flussi"
     flows_intro: "Gruppi di schede con nome in cui entra una risposta instradata — es. set di domande UK, EAU e USA che poi convergono o finiscono su schermate proprie."
     flows_new: "Nuovo flusso"
+    flows_generate: "Genera flusso"
+    flows_generate_title: "Genera un flusso con l'IA"
+    flows_generate_hint: "Descrivi cosa deve chiedere questo flusso: Claude preparerà 3–6 schede per quel segmento, collegate sotto la domanda scelta."
+    flows_generate_placeholder: "es. Chiedi ai rispondenti UK di trasporti locali, prezzi dell'energia e servizi comunali"
+    flows_generate_wire: "Si apre dalla risposta:"
+    flows_generate_cta: "Genera"
+    flows_generating: "Claude sta creando questo flusso…"
     select_card_for_options: 'Seleziona una scheda domanda a sinistra per impostarne le opzioni.'
     consent_gate: 'Passaggio di consenso'
     consent_default: 'Partecipando accetti che le tue risposte anonime possano essere utilizzate per la ricerca.'

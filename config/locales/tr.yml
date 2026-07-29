@@ -210,6 +210,9 @@ tr:
         warn_cycle: "Akışlar döngüde: %{names}"
         legacy_title: "Algılanan dallar"
         convert: "Akışa dönüştür"
+        wire_none: "Şimdilik bağlama"
+        prompt_needed: "Bu akışın ne sormasını istediğini anlat."
+        generate_failed: "Oluşturulamadı: %{msg}"
       rules:
         title: "Oyunun Kuralları"
         score_label: "Verto puanı"
@@ -664,6 +667,13 @@ tr:
     flows_title: "Akışlar"
     flows_intro: "Yönlendirilen bir yanıtın girdiği adlandırılmış kart grupları — ör. sonradan birleşen ya da kendi ekranlarında biten UK, BAE ve ABD soru setleri."
     flows_new: "Yeni akış"
+    flows_generate: "Akış oluştur"
+    flows_generate_title: "Yapay zekâ ile akış oluştur"
+    flows_generate_hint: "Bu akışın ne sormasını istediğini anlat — Claude o segment için 3–6 kart hazırlayıp seçtiğin sorunun altına bağlar."
+    flows_generate_placeholder: "ör. UK katılımcılarına yerel ulaşım, enerji fiyatları ve belediye hizmetlerini sor"
+    flows_generate_wire: "Şu yanıttan açılır:"
+    flows_generate_cta: "Oluştur"
+    flows_generating: "Claude bu akışı hazırlıyor…"
     select_card_for_options: 'Seçeneklerini ayarlamak için soldan bir soru kartı seçin.'
     consent_gate: 'Onay adımı'
     consent_default: 'Katılarak anonim yanıtlarınızın araştırma için kullanılabileceğini kabul etmiş olursunuz.'

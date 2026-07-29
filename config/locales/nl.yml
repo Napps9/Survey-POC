@@ -210,6 +210,9 @@ nl:
         warn_cycle: "Flows in een lus: %{names}"
         legacy_title: "Gedetecteerde vertakkingen"
         convert: "Omzetten naar flow"
+        wire_none: "Nog niet aansluiten"
+        prompt_needed: "Beschrijf wat deze flow moet vragen."
+        generate_failed: "Genereren mislukt: %{msg}"
       rules:
         title: "Spelregels"
         score_label: "Verto-score"
@@ -664,6 +667,13 @@ nl:
     flows_title: "Flows"
     flows_intro: "Benoemde kaartgroepen waar een gerouteerd antwoord in terechtkomt — bijv. vragensets voor UK, VAE en VS die daarna samenkomen of op eigen schermen eindigen."
     flows_new: "Nieuwe flow"
+    flows_generate: "Flow genereren"
+    flows_generate_title: "Een flow genereren met AI"
+    flows_generate_hint: "Beschrijf wat deze flow moet vragen — Claude stelt 3–6 kaarten op voor dat segment, aangesloten onder de gekozen vraag."
+    flows_generate_placeholder: "bijv. Vraag UK-respondenten naar lokaal vervoer, energieprijzen en gemeentediensten"
+    flows_generate_wire: "Opent bij antwoord:"
+    flows_generate_cta: "Genereren"
+    flows_generating: "Claude werkt aan deze flow…"
     select_card_for_options: 'Selecteer links een vraagkaart om de opties in te stellen.'
     consent_gate: 'Toestemmingsstap'
     consent_default: 'Door deel te nemen ga je ermee akkoord dat je anonieme antwoorden voor onderzoek gebruikt mogen worden.'

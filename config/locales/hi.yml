@@ -210,6 +210,9 @@ hi:
         warn_cycle: "फ़्लो लूप में हैं: %{names}"
         legacy_title: "पहचानी गई शाखाएँ"
         convert: "फ़्लो में बदलें"
+        wire_none: "अभी न जोड़ें"
+        prompt_needed: "बताएँ कि इस फ़्लो में क्या पूछना है।"
+        generate_failed: "बनाया नहीं जा सका: %{msg}"
       rules:
         title: "खेल के नियम"
         score_label: "Verto स्कोर"
@@ -664,6 +667,13 @@ hi:
     flows_title: "फ़्लो"
     flows_intro: "नाम वाले कार्ड समूह जिनमें रूट किया गया जवाब जाता है — जैसे UK, UAE और USA के सवाल-सेट जो बाद में मिल जाते हैं या अपनी स्क्रीन पर ख़त्म होते हैं।"
     flows_new: "नया फ़्लो"
+    flows_generate: "फ़्लो बनाएँ"
+    flows_generate_title: "AI से फ़्लो बनाएँ"
+    flows_generate_hint: "बताएँ कि इस फ़्लो में क्या पूछना है — Claude उस सेगमेंट के लिए 3–6 कार्ड तैयार करेगा, आपके चुने सवाल के नीचे जुड़े हुए।"
+    flows_generate_placeholder: "जैसे: UK के उत्तरदाताओं से स्थानीय परिवहन, ऊर्जा की कीमतों और काउंसिल सेवाओं के बारे में पूछें"
+    flows_generate_wire: "इस जवाब से खुले:"
+    flows_generate_cta: "बनाएँ"
+    flows_generating: "Claude यह फ़्लो तैयार कर रहा है…"
     select_card_for_options: 'इसके विकल्प सेट करने के लिए बाईं ओर एक प्रश्न कार्ड चुनें.'
     consent_gate: 'सहमति चरण'
     consent_default: 'भाग लेकर आप सहमत होते हैं कि आपके अनाम उत्तर शोध के लिए उपयोग किए जा सकते हैं.'

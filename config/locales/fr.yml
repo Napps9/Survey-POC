@@ -210,6 +210,9 @@ fr:
         warn_cycle: "Boucle de flux : %{names}"
         legacy_title: "Branches détectées"
         convert: "Convertir en flux"
+        wire_none: "Ne pas relier maintenant"
+        prompt_needed: "Décrivez ce que ce flux doit demander."
+        generate_failed: "Génération impossible : %{msg}"
       rules:
         title: "Règles du jeu"
         score_label: "Score du Verto"
@@ -664,6 +667,13 @@ fr:
     flows_title: "Flux"
     flows_intro: "Groupes de cartes nommés où mène une réponse routée — p. ex. des séries de questions UK, EAU et USA qui convergent ensuite ou finissent sur leurs propres écrans."
     flows_new: "Nouveau flux"
+    flows_generate: "Générer un flux"
+    flows_generate_title: "Générer un flux avec l'IA"
+    flows_generate_hint: "Décrivez ce que ce flux doit demander — Claude rédigera 3 à 6 cartes pour ce segment, reliées sous la question choisie."
+    flows_generate_placeholder: "p. ex. Interroger les répondants UK sur les transports locaux, les prix de l'énergie et les services municipaux"
+    flows_generate_wire: "S'ouvre depuis la réponse :"
+    flows_generate_cta: "Générer"
+    flows_generating: "Claude prépare ce flux…"
     select_card_for_options: 'Sélectionnez une carte question à gauche pour définir ses options.'
     consent_gate: 'Étape de consentement'
     consent_default: 'En participant, vous acceptez que vos réponses anonymes puissent être utilisées à des fins de recherche.'

@@ -212,6 +212,9 @@ en:
         warn_cycle: "Flows loop: %{names}"
         legacy_title: "Detected branches"
         convert: "Convert to flow"
+        wire_none: "Don't wire yet"
+        prompt_needed: "Describe what this flow should ask."
+        generate_failed: "Couldn't generate: %{msg}"
       rules:
         title: "Rules of the Game"
         score_label: "Verto score"
@@ -666,6 +669,13 @@ en:
     flows_title: 'Flows'
     flows_intro: 'Named groups of cards a routed answer can enter — e.g. UK, UAE and USA question sets that converge back or finish on their own screens.'
     flows_new: 'New flow'
+    flows_generate: 'Generate flow'
+    flows_generate_title: 'Generate a flow with AI'
+    flows_generate_hint: 'Describe what this flow should ask and Claude will draft 3–6 cards for that segment, wired in below the question you pick.'
+    flows_generate_placeholder: 'e.g. Ask UK respondents about local transport, energy prices and council services'
+    flows_generate_wire: 'Open from answer:'
+    flows_generate_cta: 'Generate'
+    flows_generating: 'Claude is crafting this flow…'
     select_card_for_options: 'Select a question card on the left to set its options.'
     consent_gate: 'Consent gate'
     consent_default: 'By taking part you agree that your anonymous answers may be used for research.'

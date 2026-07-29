@@ -210,6 +210,9 @@ id:
         warn_cycle: "Alur berputar: %{names}"
         legacy_title: "Cabang terdeteksi"
         convert: "Ubah jadi alur"
+        wire_none: "Jangan sambungkan dulu"
+        prompt_needed: "Jelaskan apa yang harus ditanyakan alur ini."
+        generate_failed: "Gagal membuat: %{msg}"
       rules:
         title: "Aturan Main"
         score_label: "Skor Verto"
@@ -664,6 +667,13 @@ id:
     flows_title: "Alur"
     flows_intro: "Kelompok kartu bernama yang dimasuki jawaban yang dirutekan — mis. set pertanyaan UK, UEA, dan AS yang kemudian bergabung kembali atau berakhir di layarnya sendiri."
     flows_new: "Alur baru"
+    flows_generate: "Buat alur"
+    flows_generate_title: "Buat alur dengan AI"
+    flows_generate_hint: "Jelaskan apa yang harus ditanyakan alur ini — Claude akan menyusun 3–6 kartu untuk segmen itu, tersambung di bawah pertanyaan yang kamu pilih."
+    flows_generate_placeholder: "mis. Tanyakan responden UK soal transportasi lokal, harga energi, dan layanan dewan kota"
+    flows_generate_wire: "Terbuka dari jawaban:"
+    flows_generate_cta: "Buat"
+    flows_generating: "Claude sedang menyusun alur ini…"
     select_card_for_options: 'Pilih kartu pertanyaan di sebelah kiri untuk mengatur opsinya.'
     consent_gate: 'Langkah persetujuan'
     consent_default: 'Dengan berpartisipasi, Anda setuju bahwa jawaban anonim Anda dapat digunakan untuk penelitian.'

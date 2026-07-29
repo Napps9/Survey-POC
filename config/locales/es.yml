@@ -210,6 +210,9 @@ es:
         warn_cycle: "Flujos en bucle: %{names}"
         legacy_title: "Ramas detectadas"
         convert: "Convertir en flujo"
+        wire_none: "No conectar aún"
+        prompt_needed: "Describe qué debe preguntar este flujo."
+        generate_failed: "No se pudo generar: %{msg}"
       rules:
         title: "Reglas del juego"
         score_label: "Puntuación del Verto"
@@ -664,6 +667,13 @@ es:
     flows_title: "Flujos"
     flows_intro: "Grupos de tarjetas con nombre a los que llega una respuesta enrutada — p. ej. sets de preguntas para UK, EAU y EE. UU. que convergen de nuevo o terminan en sus propias pantallas."
     flows_new: "Nuevo flujo"
+    flows_generate: "Generar flujo"
+    flows_generate_title: "Generar un flujo con IA"
+    flows_generate_hint: "Describe qué debe preguntar este flujo y Claude redactará 3–6 tarjetas para ese segmento, conectadas bajo la pregunta que elijas."
+    flows_generate_placeholder: "p. ej. Pregunta a los encuestados de UK por el transporte local, los precios de la energía y los servicios municipales"
+    flows_generate_wire: "Se abre con la respuesta:"
+    flows_generate_cta: "Generar"
+    flows_generating: "Claude está creando este flujo…"
     select_card_for_options: 'Selecciona una tarjeta de pregunta a la izquierda para configurar sus opciones.'
     consent_gate: 'Paso de consentimiento'
     consent_default: 'Al participar, aceptas que tus respuestas anónimas puedan utilizarse con fines de investigación.'

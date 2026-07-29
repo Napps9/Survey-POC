@@ -1,0 +1,43 @@
+<%# Generate-a-flow modal — opened from the Flows panel's ✨ button. Owned by
+    the root-scoped `flows` controller; reuses the add-question modal's chrome
+    (.aq-modal / .media-modal-head / .aq-spinner) so the two read as one
+    family. The optional "wire to answer" select lists currently-unrouted
+    single-pick answers; picking one names the flow after the answer, routes
+    it on success, and pins the question's "otherwise". %>
+<div class="aq-modal-backdrop" data-flows-target="modal" data-action="click->flows#backdropClick" hidden>
+  <div class="aq-modal" role="dialog" aria-modal="true" aria-label="<%= t("editor.flows_generate_title") %>">
+    <div class="media-modal-head">
+      <div class="media-modal-title">✨ <%= t("editor.flows_generate_title") %></div>
+      <button type="button" class="media-modal-close" data-action="click->flows#closeGenerate" aria-label="Close">✕</button>
+    </div>
+
+    <div class="aq-step" data-flows-target="generateStep">
+      <div class="aq-modal-body">
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.6);line-height:1.5;margin-bottom:10px;">
+          <%= t("editor.flows_generate_hint") %>
+        </div>
+        <textarea data-flows-target="generatePrompt" rows="3" maxlength="500"
+                  placeholder="<%= t("editor.flows_generate_placeholder") %>"
+                  style="width:100%;resize:vertical;background:rgba(0,0,0,0.3);color:#F4F6FF;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);line-height:1.5;"></textarea>
+        <label style="display:flex;align-items:center;gap:10px;margin-top:12px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.6);">
+          <%= t("editor.flows_generate_wire") %>
+          <select data-flows-target="generateAnswer" class="logic-route-select" style="flex:1;min-width:0;"></select>
+        </label>
+        <div data-flows-target="generateError"
+             style="display:none;color:#FF1E6F;font-size: var(--text-sm);padding:8px 0 0;"></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+          <button type="button"
+                  style="padding:9px 20px;border-radius:100px;background:#01EACB;color:#04221E;border:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);font-weight:600;cursor:pointer;"
+                  data-action="click->flows#submitGenerate">✨ <%= t("editor.flows_generate_cta") %></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="aq-step" data-flows-target="generateSpinner" hidden>
+      <div class="aq-modal-body aq-loading-body">
+        <div class="aq-spinner"></div>
+        <div class="aq-loading-text"><%= t("editor.flows_generating") %></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -210,6 +210,9 @@ sw:
         warn_cycle: "Mitiririko inazunguka: %{names}"
         legacy_title: "Matawi yaliyogunduliwa"
         convert: "Badilisha kuwa mtiririko"
+        wire_none: "Usiunganishe bado"
+        prompt_needed: "Eleza mtiririko huu unapaswa kuuliza nini."
+        generate_failed: "Imeshindikana kutengeneza: %{msg}"
       rules:
         title: "Kanuni za Mchezo"
         score_label: "Alama ya Verto"
@@ -664,6 +667,13 @@ sw:
     flows_title: "Mitiririko"
     flows_intro: "Vikundi vya kadi vyenye majina ambavyo jibu lililoelekezwa huingia — mf. seti za maswali za UK, UAE na USA zinazoungana tena baadaye au kuishia kwenye skrini zao."
     flows_new: "Mtiririko mpya"
+    flows_generate: "Tengeneza mtiririko"
+    flows_generate_title: "Tengeneza mtiririko kwa AI"
+    flows_generate_hint: "Eleza mtiririko huu unapaswa kuuliza nini — Claude ataandaa kadi 3–6 kwa kundi hilo, zikiunganishwa chini ya swali utakalochagua."
+    flows_generate_placeholder: "mf. Waulize washiriki wa UK kuhusu usafiri wa eneo, bei za nishati na huduma za halmashauri"
+    flows_generate_wire: "Hufunguka kutoka jibu:"
+    flows_generate_cta: "Tengeneza"
+    flows_generating: "Claude anaandaa mtiririko huu…"
     select_card_for_options: 'Chagua kadi ya swali upande wa kushoto ili kuweka chaguo zake.'
     consent_gate: 'Hatua ya idhini'
     consent_default: 'Kwa kushiriki, unakubali kwamba majibu yako yasiyo na jina yanaweza kutumika kwa utafiti.'

@@ -210,6 +210,9 @@ pt:
         warn_cycle: "Fluxos em ciclo: %{names}"
         legacy_title: "Ramos detetados"
         convert: "Converter em fluxo"
+        wire_none: "Não ligar ainda"
+        prompt_needed: "Descreva o que este fluxo deve perguntar."
+        generate_failed: "Não foi possível gerar: %{msg}"
       rules:
         title: "Regras do jogo"
         score_label: "Pontuação do Verto"
@@ -664,6 +667,13 @@ pt:
     flows_title: "Fluxos"
     flows_intro: "Grupos de cartões com nome onde uma resposta encaminhada entra — p. ex. conjuntos de perguntas UK, EAU e EUA que depois convergem ou terminam em ecrãs próprios."
     flows_new: "Novo fluxo"
+    flows_generate: "Gerar fluxo"
+    flows_generate_title: "Gerar um fluxo com IA"
+    flows_generate_hint: "Descreva o que este fluxo deve perguntar — o Claude redigirá 3–6 cartões para esse segmento, ligados sob a pergunta que escolher."
+    flows_generate_placeholder: "p. ex. Pergunte aos respondentes do UK sobre transportes locais, preços da energia e serviços municipais"
+    flows_generate_wire: "Abre com a resposta:"
+    flows_generate_cta: "Gerar"
+    flows_generating: "O Claude está a criar este fluxo…"
     select_card_for_options: 'Selecione um cartão de pergunta à esquerda para definir as suas opções.'
     consent_gate: 'Passo de consentimento'
     consent_default: 'Ao participar, aceita que as suas respostas anónimas possam ser utilizadas para investigação.'

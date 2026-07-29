@@ -15,12 +15,17 @@ import { computeLanes } from "lib/flow_lanes"
 // change) and must stay render-only on that path — mutating or markDirty-ing
 // from a repaint would loop.
 export default class extends Controller {
-  static targets = [ "list", "warnings", "legacy" ]
+  static targets = [ "list", "warnings", "legacy",
+    "modal", "generateStep", "generateSpinner", "generatePrompt", "generateAnswer", "generateError" ]
+  static values = { generateUrl: { type: String, default: "" } }
 
   connect() {
     // survey-editor may not have connected yet (same element, order not
     // guaranteed) — defer the first paint a frame.
     requestAnimationFrame(() => this.repaint())
+    // Staleness counter for the generate modal (add-question's idiom): a
+    // response whose token no longer matches was superseded — drop it.
+    this._requestToken = 0
   }
 
   repaint() {
@@ -70,6 +75,106 @@ export default class extends Controller {
     sel.dataset.logicSelected = `flow:${flow.id}`
     editor.refreshAll()
     editor.markDirty()
+  }
+
+  // ── Generate a flow with AI ──────────────────────────────────────────────
+
+  openGenerate() {
+    const editor = this._editor()
+    if (!this.hasModalTarget || !editor || editor.liveValue) return
+    this._fillAnswerOptions(editor)
+    this.generateErrorTarget.style.display = "none"
+    this.generateStepTarget.hidden = false
+    this.generateSpinnerTarget.hidden = true
+    this.modalTarget.hidden = false
+    this.generatePromptTarget.focus()
+  }
+
+  closeGenerate() {
+    this._requestToken++
+    if (this.hasModalTarget) this.modalTarget.hidden = true
+  }
+
+  backdropClick(event) {
+    if (event.target === this.modalTarget) this.closeGenerate()
+  }
+
+  // Currently-unrouted single-pick answers the generated flow can be wired to.
+  _fillAnswerOptions(editor) {
+    const sel = this.generateAnswerTarget
+    sel.innerHTML = ""
+    sel.appendChild(this._option("", t("editor.flows.wire_none")))
+    this.element.querySelectorAll("[data-logic-route]").forEach(rs => {
+      if (rs.dataset.logicSelected || !rs.dataset.canonical) return
+      const ownerCid = rs.closest("[data-survey-editor-target='card']")?.dataset.cardCid
+                    || rs.closest("[data-logic-block]")?.dataset.ownerCid
+      if (!ownerCid) return
+      const wrap = this.element.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(ownerCid)}"]`)
+      const label = t("editor.flows.entry_from", { card: wrap?.dataset.cardNum || "?", answer: rs.dataset.canonical })
+      sel.appendChild(this._option(JSON.stringify([ ownerCid, rs.dataset.canonical ]), label))
+    })
+  }
+
+  async submitGenerate() {
+    const editor = this._editor()
+    if (!editor || editor.liveValue) return
+    const prompt = (this.generatePromptTarget.value || "").trim()
+    if (!prompt) {
+      this.generateErrorTarget.textContent = t("editor.flows.prompt_needed")
+      this.generateErrorTarget.style.display = ""
+      return
+    }
+    let wire = null
+    try { wire = this.generateAnswerTarget.value ? JSON.parse(this.generateAnswerTarget.value) : null } catch (_) {}
+    const ownerWrap = wire &&
+      this.element.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(wire[0])}"]`)
+    const entryText = ownerWrap?.querySelector(".q-title, .activity-title")?.textContent?.trim() || null
+
+    const token = ++this._requestToken
+    this.generateStepTarget.hidden = true
+    this.generateSpinnerTarget.hidden = false
+    try {
+      const res = await fetch(this.generateUrlValue, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+        },
+        body: JSON.stringify({ prompt, answer: wire ? wire[1] : null, entry_text: entryText })
+      })
+      const json = await res.json()
+      if (!json || !json.ok) throw new Error((json && json.error) || "Generation failed")
+      if (token !== this._requestToken) return // modal closed/reopened — drop it
+
+      const flow = editor.addFlow({ name: json.name || (wire ? wire[1] : "") })
+      // Splice the generated cards right below the entry question (or at the
+      // feed end when unanchored), capturing the pre-splice continuation so
+      // the question's other answers keep their path.
+      let afterSlot = ownerWrap?.closest(".card-slot") || null
+      const continuation = ownerWrap ? this._continuationAfter(afterSlot) : null
+      ;(json.cards || []).forEach(item => {
+        const card = this._spliceHTML(item.html, afterSlot, flow.id)
+        if (card) afterSlot = card.closest(".card-slot")
+      })
+      if (wire && ownerWrap) {
+        const scope = editor.logicScopeForCid?.(wire[0])
+        const rs = scope?.querySelector(`[data-logic-route][data-canonical="${CSS.escape(wire[1])}"]`)
+        if (rs) rs.dataset.logicSelected = `flow:${flow.id}`
+        const defSel = scope?.querySelector("[data-logic-default]")
+        if (defSel && !defSel.dataset.logicSelected && continuation) defSel.dataset.logicSelected = continuation
+      }
+      editor.refreshAll()
+      editor.markDirty()
+      this.closeGenerate()
+      editor.flowMemberWraps(flow.id)[0]?.scrollIntoView({ behavior: "smooth", block: "center" })
+    } catch (err) {
+      if (token !== this._requestToken) return
+      this.generateSpinnerTarget.hidden = true
+      this.generateStepTarget.hidden = false
+      this.generateErrorTarget.textContent = t("editor.flows.generate_failed", { msg: err.message })
+      this.generateErrorTarget.style.display = ""
+    }
   }
 
   // ── Rendering ────────────────────────────────────────────────────────────
@@ -332,14 +437,11 @@ export default class extends Controller {
     card.scrollIntoView({ behavior: "smooth", block: "center" })
   }
 
-  // POST a card JSON to render_card and splice the returned row into the feed
-  // (after `afterSlot`, else at the end), tagged with the flow. The server
-  // stamps the cid; autosave persists the deck. Mirrors add_question's
-  // _insertHTML / the flow map's _createBranchCard splice.
+  // POST a card JSON to render_card and splice the returned row into the feed.
+  // The server stamps the cid; autosave persists the deck.
   async _spliceCard(cardJson, afterSlot, flowId) {
     const url = this.element.dataset.addQuestionRenderUrlValue
-    const feed = this.element.querySelector("[data-add-question-target='cardsFeed']")
-    if (!url || !feed) return null
+    if (!url) return null
     try {
       const res = await fetch(url, {
         method: "POST",
@@ -352,23 +454,32 @@ export default class extends Controller {
       })
       const json = await res.json()
       if (!json || !json.ok) return null
-      const tmp = document.createElement("div")
-      tmp.innerHTML = (json.html || "").trim()
-      const card = tmp.firstElementChild
-      if (!card) return null
-      const slot = document.createElement("div")
-      slot.className = "card-slot"
-      slot.appendChild(card)
-      const insertRow = feed.querySelector(".aq-insert-row")
-      if (insertRow) slot.appendChild(insertRow.cloneNode(true))
-      if (afterSlot && afterSlot.parentNode === feed) afterSlot.after(slot)
-      else feed.appendChild(slot)
-      if (flowId) card.dataset.cardFlowId = flowId
-      this.application.getControllerForElementAndIdentifier(this.element, "type-panel")?.registerCard(card)
-      return card
+      return this._spliceHTML(json.html, afterSlot, flowId)
     } catch (_) {
       return null
     }
+  }
+
+  // Wrap a server-rendered card row in a slot and splice it into the feed
+  // (after `afterSlot`, else at the end), tagged with the flow. Mirrors
+  // add_question's _insertHTML / the flow map's _createBranchCard splice.
+  _spliceHTML(html, afterSlot, flowId) {
+    const feed = this.element.querySelector("[data-add-question-target='cardsFeed']")
+    if (!feed) return null
+    const tmp = document.createElement("div")
+    tmp.innerHTML = (html || "").trim()
+    const card = tmp.firstElementChild
+    if (!card) return null
+    const slot = document.createElement("div")
+    slot.className = "card-slot"
+    slot.appendChild(card)
+    const insertRow = feed.querySelector(".aq-insert-row")
+    if (insertRow) slot.appendChild(insertRow.cloneNode(true))
+    if (afterSlot && afterSlot.parentNode === feed) afterSlot.after(slot)
+    else feed.appendChild(slot)
+    if (flowId) card.dataset.cardFlowId = flowId
+    this.application.getControllerForElementAndIdentifier(this.element, "type-panel")?.registerCard(card)
+    return card
   }
 
   _option(value, label) {

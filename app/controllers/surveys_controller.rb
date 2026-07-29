@@ -620,6 +620,46 @@ class SurveysController < ApplicationController
     render json: { ok: false, error: friendly_generate_error(e) }, status: :unprocessable_entity
   end
 
+  # POST /surveys/:id/generate_flow
+  # Generates a NAMED FLOW (3-6 cards for one audience segment) from a creator
+  # prompt, rendering each card's editor partial. Nothing is persisted here —
+  # the client splices the cards in, creates the flow in its working set and
+  # wires the answer; autosave persists the lot (same contract as generate_card).
+  def generate_flow
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.published?
+      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    end
+    body   = JSON.parse(request.body.read)
+    prompt = body["prompt"].to_s.strip.first(500)
+    if prompt.blank?
+      return render json: { ok: false, error: "Describe what this flow should ask." }, status: :unprocessable_entity
+    end
+
+    result = FlowGenerator.new.call(
+      prompt:         prompt,
+      answer:         body["answer"].to_s.strip.first(100).presence,
+      entry_text:     body["entry_text"].to_s.strip.first(200).presence,
+      theme:          survey.theme,
+      audience_age:   survey.audience_age,
+      key_insight:    survey.key_insight,
+      existing_cards: Array(survey.cards),
+      locale:         survey.default_locale
+    )
+
+    cards = result["cards"].map do |card|
+      # Stamp cids now (same as render_card) so each card is a valid routing
+      # target the moment the client splices it in.
+      card["cid"] = "c_#{SecureRandom.hex(3)}"
+      card = translate_card!(card, survey)
+      { cid: card["cid"], html: render_card_html(survey, card) }
+    end
+    render json: { ok: true, name: result["name"], cards: cards }
+  rescue => e
+    ErrorReporting.report("SurveysController#generate_flow", e)
+    render json: { ok: false, error: friendly_generate_error(e) }, status: :unprocessable_entity
+  end
+
   # POST /surveys/:id/optimise_card
   # AI-rewrite ONE flagged card so it satisfies the Rules of the Game, fixing the
   # editor-listed issues while keeping the answer type and intent. Returns the

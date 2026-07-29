@@ -210,6 +210,9 @@ he:
         warn_cycle: "המסלולים בלולאה: %{names}"
         legacy_title: "הסתעפויות שזוהו"
         convert: "המרה למסלול"
+        wire_none: "לא לחבר עדיין"
+        prompt_needed: "תארו מה המסלול הזה צריך לשאול."
+        generate_failed: "היצירה נכשלה: %{msg}"
       rules:
         title: "חוקי המשחק"
         score_label: "ציון Verto"
@@ -664,6 +667,13 @@ he:
     flows_title: "מסלולים"
     flows_intro: "קבוצות כרטיסים בעלות שם שאליהן מגיעה תשובה מנותבת — למשל סטים של שאלות ל-UK, איחוד האמירויות וארצות הברית שמתאחדים בהמשך או מסתיימים במסכים משלהם."
     flows_new: "מסלול חדש"
+    flows_generate: "יצירת מסלול"
+    flows_generate_title: "יצירת מסלול עם AI"
+    flows_generate_hint: "תארו מה המסלול הזה צריך לשאול — Claude ינסח 3–6 כרטיסים לפלח הזה, מחוברים מתחת לשאלה שתבחרו."
+    flows_generate_placeholder: "למשל: לשאול משיבים מה-UK על תחבורה מקומית, מחירי אנרגיה ושירותי הרשות"
+    flows_generate_wire: "נפתח מהתשובה:"
+    flows_generate_cta: "יצירה"
+    flows_generating: "Claude מנסח את המסלול…"
     select_card_for_options: 'בחר כרטיס שאלה כדי להגדיר את האפשרויות שלו.'
     consent_gate: 'שלב הסכמה'
     consent_default: 'בהשתתפותך, אתה מסכים שתשובותיך האנונימיות עשויות לשמש למחקר.'

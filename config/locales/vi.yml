@@ -210,6 +210,9 @@ vi:
         warn_cycle: "Các luồng bị lặp: %{names}"
         legacy_title: "Nhánh được phát hiện"
         convert: "Chuyển thành luồng"
+        wire_none: "Chưa nối vội"
+        prompt_needed: "Mô tả luồng này cần hỏi gì."
+        generate_failed: "Không tạo được: %{msg}"
       rules:
         title: "Luật chơi"
         score_label: "Điểm Verto"
@@ -664,6 +667,13 @@ vi:
     flows_title: "Luồng"
     flows_intro: "Nhóm thẻ có tên mà câu trả lời được định tuyến sẽ đi vào — vd. bộ câu hỏi UK, UAE và USA rồi hội tụ lại hoặc kết thúc trên màn hình riêng."
     flows_new: "Luồng mới"
+    flows_generate: "Tạo luồng"
+    flows_generate_title: "Tạo luồng bằng AI"
+    flows_generate_hint: "Mô tả luồng này cần hỏi gì — Claude sẽ soạn 3–6 thẻ cho phân khúc đó, nối bên dưới câu hỏi bạn chọn."
+    flows_generate_placeholder: "vd. Hỏi người trả lời ở UK về giao thông địa phương, giá năng lượng và dịch vụ hội đồng"
+    flows_generate_wire: "Mở từ câu trả lời:"
+    flows_generate_cta: "Tạo"
+    flows_generating: "Claude đang soạn luồng này…"
     select_card_for_options: 'Chọn một thẻ câu hỏi ở bên trái để thiết lập tùy chọn.'
     consent_gate: 'Bước đồng ý'
     consent_default: 'Khi tham gia, bạn đồng ý rằng các câu trả lời ẩn danh của bạn có thể được dùng cho nghiên cứu.'
