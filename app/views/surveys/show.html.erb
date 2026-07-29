@@ -417,8 +417,11 @@
               data-action="click->publish-panel#showQuizTab"><%= t("editor.tab_quiz", default: "Quiz mode") %></button>
       <button type="button" class="right-tab right-tab-folder right-tab--tokens" role="tab" aria-selected="false" aria-controls="panel-view-tokens" data-publish-panel-target="tokensTab"
               data-action="click->publish-panel#showTokensTab"><%= t("editor.tab_tokens", default: "Tokenisation") %></button>
-      <button type="button" class="right-tab right-tab-folder right-tab--logic" role="tab" aria-selected="false" aria-controls="panel-view-logic" data-publish-panel-target="branchTab"
-              data-action="click->publish-panel#showBranch"><%= t("editor.tab_logic", default: "Logic & flows") %></button>
+      <%# Logic & flows outgrew the column — its tab opens a modal over the
+          cards (see the logic-flows-modal overlay below the score modal). %>
+      <button type="button" class="right-tab right-tab-folder right-tab--logic" role="tab" aria-selected="false"
+              aria-haspopup="dialog" aria-controls="logic-flows-modal"
+              data-action="click->flows#openPanel"><%= t("editor.tab_logic", default: "Logic & flows") %></button>
       </div><%# /tablist %>
       <%# The Why view has no tab (each card carries a round ? CTA under its
           type badge — see _card_row) and the Verto score lives in the
@@ -765,100 +768,10 @@
       </div>
     </div><%# /why panel %>
 
-    <%# ── "Branching" panel — route each answer of the selected single-pick
-        question to a different card or finish screen. The per-card controls are
-        authored inside the card (shared/logic_branch_block) and relocated here
-        for the selected card by type_panel_controller#selectCard; the card
-        itself shows nothing about routing. Only present when logic is on. ── %>
-    <div class="type-panel panel--logic panel-paper hidden" id="panel-view-logic" role="tabpanel" data-publish-panel-target="branchView">
-      <div class="type-panel-top">
-        <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:#0CA7FF;margin-bottom:5px;">
-          <%= t("editor.tab_logic", default: "Logic & flows") %>
-        </div>
-        <div class="feature-setup">
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-            <input type="hidden" name="return_tab" value="logic" />
-            <input type="hidden" name="logic" value="0" />
-            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
-              <input type="checkbox" name="logic" value="1"
-                     <%= "checked" if @survey.logic? %>
-                     onchange="this.form.requestSubmit()"
-                     style="width:14px;height:14px;accent-color:#0CA7FF;cursor:pointer;margin-top:1px;flex-shrink:0;" />
-              <span>Send respondents down a different path based on their answer. Each single-pick question gains a “go to…” control on every option — route to another card, a branch, or the finish screen.</span>
-            </label>
-          <% end %>
-          <% if @survey.logic? %>
-            <button type="button"
-                    style="margin-top:10px;padding:8px 18px;border-radius:100px;background:rgba(12,167,255,0.12);color:#5FC6FF;border:1px solid rgba(12,167,255,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;"
-                    data-action="click->logic-map#open">⤢ Flow map</button>
-          <% end %>
-        </div>
-        <% if @survey.logic? %>
-          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF5C93;line-height:1.3;min-height:18px;margin-top:10px;"
-               data-type-panel-target="branchCardName"><%= t("editor.select_card") %></div>
-          <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;">
-            Choose where each answer leads. Any answer left on “Continue” follows the normal card order.
-          </div>
-        <% end %>
-      </div>
-
-      <% if @survey.logic? %>
-        <%# Flows overview — list/create/rename/rewire the deck's named flows. %>
-        <%= render "surveys/flow_panel" %>
-
-        <%# No card selected yet. %>
-        <div class="type-panel-empty" data-type-panel-target="branchEmpty">
-          <div style="font-size:28px;opacity:0.25;">↖</div>
-          <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:240px;">
-            Select a multiple-choice or yes/no question to route its answers.
-          </div>
-        </div>
-
-        <%# Selected card can't branch (not a single-pick question). %>
-        <div class="type-panel-empty" style="display:none;" data-type-panel-target="branchNote">
-          <div style="font-size:28px;opacity:0.25;">⤳</div>
-          <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:260px;">
-            This question type can’t branch. Only multiple-choice and yes/no questions can send each answer to a different card.
-          </div>
-        </div>
-
-        <%# The selected routable card's branching block is relocated in here. %>
-        <div class="branch-slot card-subview-slot" data-type-panel-target="logicSlot"></div>
-
-      <%# Branch end screens — extra finish screens a branch can route to, each
-          with its own title/message/link (e.g. a unique Stripe page per hub).
-          Lives in the Logic & flows tab; the in-feed thank-you stays the default. Rows serialize into the hidden end_screens field on save
-          (mirrors the Tokenisation manager). %>
-      <% if @survey.logic? %>
-        <% raw_end_screens = Array(@survey.read_attribute(:end_screens)) %>
-        <details class="publish-block panel-island" data-controller="end-screens">
-          <summary class="publish-block-title">Branch end screens <span class="pub-chev">⌄</span></summary>
-          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
-            <input type="hidden" name="return_tab" value="logic" />
-            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:8px;line-height:1.45;">
-              Extra finish screens a branch can end on — each with its own title, message and link. Point an answer's route at one (e.g. a unique Stripe page per hub). The main thank-you screen stays the default.
-            </div>
-            <input type="hidden" name="end_screens" value="<%= raw_end_screens.to_json %>" data-end-screens-target="field" />
-            <div data-end-screens-target="list" style="display:flex;flex-direction:column;gap:10px;">
-              <% raw_end_screens.each do |es| %>
-                <%= render "surveys/end_screen_row", es: es %>
-              <% end %>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:10px;">
-              <button type="button" data-action="click->end-screens#addRow"
-                      style="padding:6px 12px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px dashed rgba(255,255,255,0.25);cursor:pointer;">
-                ＋ Add end screen
-              </button>
-              <button type="button" data-action="click->end-screens#save"
-                      style="padding:6px 14px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:none;cursor:pointer;">
-                Save end screens
-              </button>
-            </div>
-          <% end %>
-        </details>
-      <% end %>
-      <% end %>
-    </div>
+    <%# The Logic & flows workspace no longer lives in this column — it
+        outgrew it (no room to scroll a flows list + routing + end screens).
+        Its tab above opens the logic-flows-modal dialog rendered with the
+        other modals at the bottom of this file. %>
 
     <%# ── Publish & share panel (toggles in place of the answer-type panel) ── %>
     <div class="type-panel publish-panel hidden" data-publish-panel-target="publishView">
@@ -1270,6 +1183,109 @@
       <div class="score-board" data-survey-editor-target="scoreBoard"></div>
     </div>
   </div><%# /score modal %>
+
+  <%# ── Logic & flows modal — the routing workspace, opened from its tab in
+      the right column (and reopened by ?tab=logic after its full-page
+      settings POSTs). Same dialog chrome as the score modal, with a
+      scrollable body: toggle + flow map, the Flows overview, the selected
+      card's per-answer routing (authored inside the card and relocated into
+      the branch slot by type_panel_controller#selectCard), and the branch
+      end screens manager. ── %>
+  <div class="score-modal-overlay logic-modal-overlay hidden" id="logic-flows-modal" data-flows-target="panelOverlay"
+       data-action="click->flows#panelOverlayClick keydown.esc@window->flows#closePanelOnEsc">
+    <div class="score-modal logic-modal" role="dialog" aria-modal="true"
+         aria-label="<%= t("editor.tab_logic", default: "Logic & flows") %>">
+      <div class="score-modal-head">
+        <div class="score-modal-eyebrow" style="color:#0CA7FF;margin-bottom:0;"><%= t("editor.tab_logic", default: "Logic & flows") %></div>
+        <button type="button" class="all-types-close" data-action="click->flows#closePanel"
+                aria-label="<%= t('editor.close', default: 'Close') %>">✕</button>
+      </div>
+      <div class="logic-modal-body">
+        <div class="feature-setup">
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="return_tab" value="logic" />
+            <input type="hidden" name="logic" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="logic" value="1"
+                     <%= "checked" if @survey.logic? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#0CA7FF;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Send respondents down a different path based on their answer. Each single-pick question gains a “go to…” control on every option — route to another card, a branch, or the finish screen.</span>
+            </label>
+          <% end %>
+          <% if @survey.logic? %>
+            <button type="button"
+                    style="margin-top:10px;padding:8px 18px;border-radius:100px;background:rgba(12,167,255,0.12);color:#5FC6FF;border:1px solid rgba(12,167,255,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;"
+                    data-action="click->logic-map#open">⤢ Flow map</button>
+          <% end %>
+        </div>
+
+        <% if @survey.logic? %>
+          <%# Flows overview — list/create/rename/rewire the deck's named flows. %>
+          <%= render "surveys/flow_panel" %>
+
+          <%# The selected card's per-answer routing. The heading is filled by
+              type_panel_controller with "Card N · TYPE" as cards are selected. %>
+          <div class="publish-block panel-island">
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF5C93;line-height:1.3;min-height:18px;"
+                 data-type-panel-target="branchCardName"><%= t("editor.select_card") %></div>
+            <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin:4px 0 10px;line-height:1.45;">
+              Choose where each answer leads. Any answer left on “Continue” follows the normal card order.
+            </div>
+
+            <%# No card selected yet. %>
+            <div class="type-panel-empty" data-type-panel-target="branchEmpty">
+              <div style="font-size:28px;opacity:0.25;">↖</div>
+              <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:240px;">
+                Select a multiple-choice or yes/no question to route its answers.
+              </div>
+            </div>
+
+            <%# Selected card can't branch (not a single-pick question). %>
+            <div class="type-panel-empty" style="display:none;" data-type-panel-target="branchNote">
+              <div style="font-size:28px;opacity:0.25;">⤳</div>
+              <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:260px;">
+                This question type can’t branch. Only multiple-choice and yes/no questions can send each answer to a different card.
+              </div>
+            </div>
+
+            <%# The selected routable card's branching block is relocated in here. %>
+            <div class="branch-slot card-subview-slot" data-type-panel-target="logicSlot"></div>
+          </div>
+
+          <%# Branch end screens — extra finish screens a branch can route to,
+              each with its own title/message/link (e.g. a unique Stripe page
+              per hub). Rows serialize into the hidden end_screens field. %>
+          <% raw_end_screens = Array(@survey.read_attribute(:end_screens)) %>
+          <details class="publish-block panel-island" data-controller="end-screens">
+            <summary class="publish-block-title">Branch end screens <span class="pub-chev">⌄</span></summary>
+            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+              <input type="hidden" name="return_tab" value="logic" />
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin-bottom:8px;line-height:1.45;">
+                Extra finish screens a branch can end on — each with its own title, message and link. Point an answer's route at one (e.g. a unique Stripe page per hub). The main thank-you screen stays the default.
+              </div>
+              <input type="hidden" name="end_screens" value="<%= raw_end_screens.to_json %>" data-end-screens-target="field" />
+              <div data-end-screens-target="list" style="display:flex;flex-direction:column;gap:10px;">
+                <% raw_end_screens.each do |es| %>
+                  <%= render "surveys/end_screen_row", es: es %>
+                <% end %>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <button type="button" data-action="click->end-screens#addRow"
+                        style="padding:6px 12px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px dashed rgba(255,255,255,0.25);cursor:pointer;">
+                  ＋ Add end screen
+                </button>
+                <button type="button" data-action="click->end-screens#save"
+                        style="padding:6px 14px;border-radius:100px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:none;cursor:pointer;">
+                  Save end screens
+                </button>
+              </div>
+            <% end %>
+          </details>
+        <% end %>
+      </div>
+    </div>
+  </div><%# /logic & flows modal %>
 
   <%= render "surveys/media_modal" %>
   <%= render "surveys/animation_modal" %>

@@ -24,14 +24,21 @@ export default class extends Controller {
     // so we can reopen the right view (editor-panel reads the same params to
     // un-collapse the column; URL cleanup waits a frame so it isn't raced).
     const params = new URLSearchParams(window.location.search)
-    const tabViews = { quiz: "quizView", tokens: "tokensView", logic: "branchView" }
+    const tabViews = { quiz: "quizView", tokens: "tokensView" }
     const returnedTab = tabViews[params.get("tab")]
+    // Logic & flows is a modal now, not a column view — reopen it after its
+    // full-page settings POSTs. Deferred a frame so the flows controller on
+    // the same root element has connected.
+    const returnedLogic = params.get("tab") === "logic"
     if (params.get("panel") === "publish") {
       this.open()
     } else if (returnedTab) {
       this._show(returnedTab)
+    } else if (returnedLogic) {
+      requestAnimationFrame(() =>
+        this.application.getControllerForElementAndIdentifier(this.element, "flows")?.openPanel())
     }
-    if (params.get("panel") === "publish" || returnedTab) {
+    if (params.get("panel") === "publish" || returnedTab || returnedLogic) {
       requestAnimationFrame(() => {
         params.delete("panel")
         params.delete("tab")

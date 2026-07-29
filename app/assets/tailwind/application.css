@@ -1042,6 +1042,21 @@
   color: rgba(244,246,255,0.62);
 }
 
+/* ── Logic & flows modal: the routing workspace over the cards ──
+   Reuses the score modal's overlay/dialog chrome; the body is the scroll
+   region (the old right-column home had none, which cut the content off). */
+.logic-modal { width: min(720px, 100%); }
+.logic-modal-body {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  padding: 16px 18px 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent;
+}
+/* .branch-slot's flex/scroll settings belong to its old fixed-height panel
+   home — inside the scrollable modal body it sizes by content. */
+.logic-modal .branch-slot { flex: none; min-height: auto; overflow: visible; }
+.logic-modal .type-panel-empty { padding: 18px; }
+
 /* ── Sibling-flow pills: a multi-flow stretch shows one header pill PER
    flow (rendered by _paintFlowChrome); only the active pill's slots are
    visible (.flow-hidden), so same-position cards across flows are one tap —

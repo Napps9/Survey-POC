@@ -15,7 +15,7 @@ import { computeLanes } from "lib/flow_lanes"
 // change) and must stay render-only on that path — mutating or markDirty-ing
 // from a repaint would loop.
 export default class extends Controller {
-  static targets = [ "list", "warnings", "legacy",
+  static targets = [ "list", "warnings", "legacy", "panelOverlay",
     "modal", "generateStep", "generateSpinner", "generatePrompt", "generateAnswer", "generateError" ]
   static values = { generateUrl: { type: String, default: "" } }
 
@@ -36,6 +36,53 @@ export default class extends Controller {
     this._renderList(editor)
     this._renderLegacyLanes(editor, cards)
     this._renderWarnings(editor, cards, flows)
+  }
+
+  // ── The Logic & flows modal ──────────────────────────────────────────────
+  // The routing workspace opens as a dialog over the cards (it outgrew the
+  // right column). Same focus contract as score_modal_controller: remember
+  // the opener, move focus in, trap Tab until close.
+
+  openPanel() {
+    if (!this.hasPanelOverlayTarget) return
+    this.repaint() // fresh flows list/warnings the moment it opens
+    this._panelOpener = document.activeElement
+    this.panelOverlayTarget.classList.remove("hidden")
+    const dialog = this.panelOverlayTarget.querySelector(".logic-modal")
+    if (dialog) {
+      dialog.setAttribute("tabindex", "-1")
+      dialog.focus()
+    }
+    this._panelTrap = (e) => {
+      if (e.key !== "Tab") return
+      const focusables = [ ...this.panelOverlayTarget.querySelectorAll(
+        "button, [href], input, select, textarea, summary, [tabindex]:not([tabindex='-1'])"
+      ) ].filter(el => el.offsetParent !== null)
+      if (!focusables.length) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+        e.preventDefault(); last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus()
+      }
+    }
+    this.panelOverlayTarget.addEventListener("keydown", this._panelTrap)
+  }
+
+  closePanel() {
+    if (!this.hasPanelOverlayTarget) return
+    this.panelOverlayTarget.classList.add("hidden")
+    if (this._panelTrap) this.panelOverlayTarget.removeEventListener("keydown", this._panelTrap)
+    if (this._panelOpener && document.contains(this._panelOpener)) this._panelOpener.focus()
+  }
+
+  panelOverlayClick(event) {
+    if (event.target === this.panelOverlayTarget) this.closePanel()
+  }
+
+  closePanelOnEsc() {
+    if (this.hasPanelOverlayTarget && !this.panelOverlayTarget.classList.contains("hidden")) this.closePanel()
   }
 
   // ── Actions ──────────────────────────────────────────────────────────────
