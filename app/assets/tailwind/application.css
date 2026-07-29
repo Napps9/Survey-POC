@@ -2210,6 +2210,9 @@
   font-size: var(--text-xl); color: rgba(255,255,255,0.7);
   line-height: 1.6; font-style: italic;
 }
+/* No insight to quote (imports, or a Common-Questions-only brief) — don't
+   leave an empty accent box floating mid-stage. */
+.gen-insight:empty { display: none; }
 
 /* Horizontal step row */
 .gen-steps-row { display: flex; max-width: 560px; width: 100%; }

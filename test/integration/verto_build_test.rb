@@ -87,7 +87,7 @@ class VertoBuildTest < ActionDispatch::IntegrationTest
 
     get verto_build_path(build)
     assert_response :success
-    assert_select "[data-controller='verto-build']"
+    assert_select "[data-controller~='verto-build']"
   end
 
   test "the poll endpoint reports status and a redirect when done" do

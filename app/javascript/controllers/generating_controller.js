@@ -4,11 +4,44 @@ const STEP2_DONE_MS = 4500
 const STEP3_DONE_MS = 9000
 const STEP4_HINT_MS = 13000
 
+// Drives the shared generating stage (shared/_generating_stage.html.erb) in
+// two homes:
+//
+//  - the wizard's overlay (surveys/new): show() runs on form submit, reads the
+//    brief straight from the form, and bridges the moment until the server
+//    redirects to the build page;
+//  - the build wait screen (verto_builds/show): autostart-value runs the same
+//    theatre from the build's payload on connect, offset by the build's
+//    elapsed time so a refresh resumes mid-story instead of restarting.
 export default class extends Controller {
   static targets = [
-    "overlay", "heroTheme", "heroAge", "insightText", "pillAudience",
+    "overlay", "heroTheme", "insightText", "pillsRow", "pillAudience",
     "step1", "step2", "step3", "step4"
   ]
+
+  static values = {
+    autostart: Boolean,
+    kind:      String,  // a VertoBuild kind — "generate" or an import_* variant
+    theme:     String,
+    age:       String,
+    insight:   String,
+    elapsed:   Number   // seconds since the build started, for resumed timing
+  }
+
+  connect() {
+    if (!this.autostartValue) return
+
+    const elapsedMs = Math.max(0, (this.elapsedValue || 0) * 1000)
+    if (this.kindValue && this.kindValue !== "generate") {
+      this._beginImport(this.kindValue.replace(/^import_/, ""), elapsedMs)
+    } else {
+      this._begin(this.themeValue, this.ageValue, this.insightValue, elapsedMs)
+    }
+  }
+
+  disconnect() {
+    this._timers?.forEach(clearTimeout)
+  }
 
   show(event) {
     // On a submit event, event.target IS the form that was submitted.
@@ -31,7 +64,8 @@ export default class extends Controller {
           return
         }
       }
-      this._showImport()
+      this._showOverlay()
+      this._beginImport(importKind)
       return
     }
 
@@ -44,26 +78,12 @@ export default class extends Controller {
       return
     }
 
-    const theme   = form?.querySelector('[name="theme"]')?.value.trim()        || "your Verto"
-    const age     = form?.querySelector('[name="audience_age"]')?.value.trim() || ""
-    const insight = form?.querySelector('[name="key_insight"]')?.value.trim()  || ""
-
-    this._theme   = theme
-    this._age     = age
-    this._insight = insight
-
-    if (this.hasPillAudienceTarget) this.pillAudienceTarget.textContent = age
-    this.insightTextTarget.textContent = insight ? `"${insight}"` : ""
-
-    // Stage 1 message — echo theme back as a forward-looking statement
-    this._setHero(this._stage1Message(theme, age))
-    this.heroAgeTarget.textContent = ""
-
-    this.overlayTarget.classList.remove("hidden")
-    this.overlayTarget.classList.add("flex")
-    document.body.classList.add("generating-overlay-active")
-
-    this._runSteps()
+    this._showOverlay()
+    this._begin(
+      form?.querySelector('[name="theme"]')?.value        || "your Verto",
+      form?.querySelector('[name="audience_age"]')?.value || "",
+      form?.querySelector('[name="key_insight"]')?.value  || ""
+    )
   }
 
   // Shared with demographics_gate_controller.js so it can skip its one-time
@@ -78,46 +98,74 @@ export default class extends Controller {
     return !rawTheme || !rawAge || (!rawInsight && !hasCommon)
   }
 
-  // Import-from-PDF has no theme/age/insight to echo, so show a generic
-  // progress message and reuse the same step cadence.
-  _showImport() {
-    this._theme = ""
-    this._age = ""
-    this._insight = ""
-    if (this.hasPillAudienceTarget) this.pillAudienceTarget.textContent = ""
-    if (this.hasInsightTextTarget) this.insightTextTarget.textContent = ""
-    this._setHero("Reading your PDF and matching question types")
-    this.heroAgeTarget.textContent = ""
+  // ── The staged story ──────────────────────────────────────────────────────
 
+  _begin(theme, age, insight, elapsedMs = 0) {
+    this._import  = false
+    this._theme   = String(theme ?? "").trim()
+    this._age     = String(age ?? "").trim()
+    this._insight = String(insight ?? "").trim()
+
+    this.pillsRowTarget.classList.remove("hidden")
+    if (this.hasPillAudienceTarget) this.pillAudienceTarget.textContent = this._age
+    this.insightTextTarget.textContent = this._insight ? `"${this._insight}"` : ""
+
+    this._runFrom(elapsedMs)
+  }
+
+  // Imports have no theme/age/insight to echo — hide the brief pills and tell
+  // the reading-your-questions story instead, named for where they came from.
+  _beginImport(kind, elapsedMs = 0) {
+    this._import = true
+    this._source = { pdf: "PDF", google_form: "Google Form" }[kind] || "questions"
+
+    this.pillsRowTarget.classList.add("hidden")
+    this.insightTextTarget.textContent = ""
+
+    this._runFrom(elapsedMs)
+  }
+
+  // Apply whatever stage elapsedMs falls in right now, then schedule the rest.
+  _runFrom(elapsedMs) {
+    this._timers?.forEach(clearTimeout)
+    this._timers = []
+
+    this._setHero(this._stageMessage(this._stageFor(elapsedMs)))
+
+    this._at(STEP2_DONE_MS, elapsedMs, () => {
+      this._done(this.step2Target)
+      this._active(this.step3Target)
+      this._setHero(this._stageMessage(2))
+    })
+    this._at(STEP3_DONE_MS, elapsedMs, () => {
+      this._done(this.step3Target)
+      this._active(this.step4Target)
+      this._setHero(this._stageMessage(3))
+    })
+    this._at(STEP4_HINT_MS, elapsedMs, () => {
+      this._setHero(this._stageMessage(4))
+    })
+  }
+
+  // Run fn at `atMs` on the build's clock: overdue moments run now (catching
+  // step states up after a refresh), future ones are scheduled.
+  _at(atMs, elapsedMs, fn) {
+    const delay = atMs - elapsedMs
+    if (delay <= 0) fn()
+    else this._timers.push(setTimeout(fn, delay))
+  }
+
+  _stageFor(elapsedMs) {
+    if (elapsedMs < STEP2_DONE_MS) return 1
+    if (elapsedMs < STEP3_DONE_MS) return 2
+    if (elapsedMs < STEP4_HINT_MS) return 3
+    return 4
+  }
+
+  _showOverlay() {
     this.overlayTarget.classList.remove("hidden")
     this.overlayTarget.classList.add("flex")
     document.body.classList.add("generating-overlay-active")
-
-    this._runSteps()
-  }
-
-  _runSteps() {
-    setTimeout(() => {
-      this._done(this.step2Target)
-      this._active(this.step3Target)
-      // Stage 2 — picking the right formats
-      this._setHero(this._stage2Message(this._theme, this._age))
-      this.heroAgeTarget.textContent = ""
-    }, STEP2_DONE_MS)
-
-    setTimeout(() => {
-      this._done(this.step3Target)
-      this._active(this.step4Target)
-      // Stage 3 — design rules applied
-      this._setHero(this._stage3Message(this._theme, this._age))
-      this.heroAgeTarget.textContent = ""
-    }, STEP3_DONE_MS)
-
-    setTimeout(() => {
-      // Still waiting — soften the message
-      this._setHero(this._stage4Message())
-      this.heroAgeTarget.textContent = ""
-    }, STEP4_HINT_MS)
   }
 
   // Set hero text and scale font-size so longer messages still fill
@@ -137,8 +185,8 @@ export default class extends Controller {
     }
   }
 
-  // One concise phrase per step, reactive to the user's topic + audience.
-  _audience(age) { return age ? `${age} year olds` : "your audience" }
+  // One concise phrase per stage, reactive to the user's topic + audience.
+  _audience(age) { return age ? this._esc(age) : "your audience" }
 
   _topic(theme) {
     const t = String(theme ?? "").trim()
@@ -146,20 +194,21 @@ export default class extends Controller {
     return this._esc(clipped)
   }
 
-  _stage1Message(theme, age) {
-    return `Writing questions on <em>${this._topic(theme)}</em> for ${this._audience(age)}`
-  }
-
-  _stage2Message(theme, age) {
-    return `Choosing formats that keep <em>${this._audience(age)}</em> engaged`
-  }
-
-  _stage3Message(theme, age) {
-    return `Tuning your <em>${this._topic(theme)}</em> Verto for ${this._audience(age)}`
-  }
-
-  _stage4Message() {
-    return `Almost there — adding the final touches`
+  _stageMessage(stage) {
+    if (this._import) {
+      switch (stage) {
+        case 1:  return `Reading your ${this._source} and matching question types`
+        case 2:  return `Choosing the best card for each question`
+        case 3:  return `Applying design to your questions`
+        default: return `Almost there — adding the final touches`
+      }
+    }
+    switch (stage) {
+      case 1:  return `Writing questions on <em>${this._topic(this._theme)}</em> for ${this._audience(this._age)}`
+      case 2:  return `Choosing formats that keep <em>${this._audience(this._age)}</em> engaged`
+      case 3:  return `Tuning your <em>${this._topic(this._theme)}</em> Verto for ${this._audience(this._age)}`
+      default: return `Almost there — adding the final touches`
+    }
   }
 
   _done(el) {

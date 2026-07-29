@@ -1,49 +1,26 @@
-<%# The wait screen for a Verto being generated in the background. Visually a
-    continuation of the wizard's own generating overlay (same orbs, shimmer and
-    hero classes), so handing off from the form to this page is seamless — the
-    creator shouldn't be able to tell the work moved to a job.
+<%# The wait screen for a Verto being generated in the background. This is the
+    screen the creator actually watches for the 30-120s a build takes — the
+    wizard's own overlay only shows for the moment before the redirect lands
+    here — so it runs the full staged experience (shared/_generating_stage +
+    generating_controller in autostart mode): rotating hero messages, brief
+    pills, insight quote and step dots, not a static title.
 
-    Difference from the overlay: this one is real. It reflects a build row, so a
-    refresh, a closed laptop or a flaky connection all resume correctly instead
-    of losing a generation that is still running on the server. %>
+    Difference from the overlay: this one is real. It reflects a build row, so
+    a refresh, a closed laptop or a flaky connection all resume correctly —
+    including the stage theatre, which picks up from the build's elapsed time
+    instead of restarting. %>
 <div class="fixed inset-0 z-50 flex flex-col overflow-hidden"
      style="background:#1C2034;"
-     data-controller="verto-build"
-     data-verto-build-url-value="<%= verto_build_path(@build, format: :json) %>">
+     data-controller="verto-build generating"
+     data-verto-build-url-value="<%= verto_build_path(@build, format: :json) %>"
+     data-generating-autostart-value="true"
+     data-generating-kind-value="<%= @build.kind %>"
+     data-generating-theme-value="<%= @build.payload["theme"] %>"
+     data-generating-age-value="<%= @build.payload["audience_age"] %>"
+     data-generating-insight-value="<%= @build.payload["key_insight"] %>"
+     data-generating-elapsed-value="<%= (Time.current - @build.created_at).round %>">
 
-  <div class="gen-orbs">
-    <div class="gen-orb gen-orb-1"></div>
-    <div class="gen-orb gen-orb-2"></div>
-    <div class="gen-orb gen-orb-3"></div>
-    <div class="gen-orb gen-orb-4"></div>
-  </div>
-
-  <div class="gen-stage flex-1 flex flex-col items-center justify-center gap-8 px-16 py-10">
-    <div class="gen-shimmer"
-         style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">
-      <%= t("wizard.building") %>
-    </div>
-
-    <div class="text-center" style="max-width:min(1040px,92vw);">
-      <div class="gen-hero-theme"><%= @build.payload["theme"] %></div>
-      <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xl);color:rgba(255,255,255,0.38);letter-spacing:-0.2px;line-height:1.5;margin-top:6px;">
-        <%= @build.payload["audience_age"] %>
-      </div>
-    </div>
-
-    <div class="flex gap-2.5 flex-wrap justify-center">
-      <div class="gen-pill">
-        <div class="gen-pill-dot" style="background:#01EACB;"></div>
-        <span class="gen-pill-label"><%= t("wizard.pill_audience") %></span>
-        <span><%= @build.payload["audience_age"] %></span>
-      </div>
-      <div class="gen-pill">
-        <div class="gen-pill-dot" style="background:#FF1E6F;"></div>
-        <span class="gen-pill-label"><%= t("wizard.pill_tone") %></span>
-        <span><%= t("wizard.pill_tone_value") %></span>
-      </div>
-    </div>
-
+  <%= render layout: "shared/generating_stage" do %>
     <%# Only shown if polling itself breaks — the build keeps running on the
         server regardless, so the copy points at a reload rather than a retry. %>
     <div class="hidden" data-verto-build-target="stalled"
@@ -51,5 +28,5 @@
       Still working. This page will update on its own — you can also reload it,
       or come back to it later from your dashboard.
     </div>
-  </div>
+  <% end %>
 </div>

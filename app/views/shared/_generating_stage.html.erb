@@ -1,0 +1,70 @@
+<%# The generating stage — floating orbs, "BUILDING YOUR VERTO" shimmer, the
+    staged hero message, brief pills, insight quote and step dots — shared by
+    the wizard's pre-redirect overlay (surveys/new) and the real wait screen
+    (verto_builds/show), so the two can't drift apart again. Every dynamic
+    field starts empty; generating_controller fills it — from the form on
+    submit (overlay) or from the build's payload values on connect (autostart).
+
+    Rendered with `render layout:` — the caller's block lands at the end of
+    the stage (the build page drops its stalled-polling notice there). %>
+
+<div class="gen-orbs">
+  <div class="gen-orb gen-orb-1"></div>
+  <div class="gen-orb gen-orb-2"></div>
+  <div class="gen-orb gen-orb-3"></div>
+  <div class="gen-orb gen-orb-4"></div>
+</div>
+
+<div class="gen-stage flex-1 flex flex-col items-center justify-center gap-8 px-16 py-10">
+
+  <div class="gen-shimmer"
+       style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.22em;font-weight:700;">
+    <%= t("wizard.building") %>
+  </div>
+
+  <div class="text-center" style="max-width:min(1040px,92vw);">
+    <div class="gen-hero-theme" data-generating-target="heroTheme"></div>
+  </div>
+
+  <div class="flex gap-2.5 flex-wrap justify-center" data-generating-target="pillsRow">
+    <div class="gen-pill">
+      <div class="gen-pill-dot" style="background:#01EACB;"></div>
+      <span class="gen-pill-label"><%= t("wizard.pill_audience") %></span>
+      <span data-generating-target="pillAudience"></span>
+    </div>
+    <div class="gen-pill">
+      <div class="gen-pill-dot" style="background:#FF1E6F;"></div>
+      <span class="gen-pill-label"><%= t("wizard.pill_tone") %></span>
+      <span><%= t("wizard.pill_tone_value") %></span>
+    </div>
+    <div class="gen-pill">
+      <div class="gen-pill-dot" style="background:#0CA7FF;"></div>
+      <span class="gen-pill-label"><%= t("wizard.pill_cards") %></span>
+      <span>10–15</span>
+    </div>
+  </div>
+
+  <div class="gen-insight" data-generating-target="insightText"></div>
+
+  <div class="gen-steps-row">
+    <div class="gen-step" data-state="done" data-generating-target="step1">
+      <div class="step-dot">✓</div>
+      <span><%= t("wizard.gen_brief_read") %></span>
+    </div>
+    <div class="gen-step" data-state="active" data-generating-target="step2">
+      <div class="step-dot"></div>
+      <span><%= t("wizard.gen_writing") %></span>
+    </div>
+    <div class="gen-step" data-state="pending" data-generating-target="step3">
+      <div class="step-dot"></div>
+      <span><%= t("wizard.gen_formats") %></span>
+    </div>
+    <div class="gen-step" data-state="pending" data-generating-target="step4">
+      <div class="step-dot"></div>
+      <span><%= t("wizard.gen_design") %></span>
+    </div>
+  </div>
+
+  <%= yield %>
+
+</div>
