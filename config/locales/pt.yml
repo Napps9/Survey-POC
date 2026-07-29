@@ -190,6 +190,24 @@ pt:
         option: "↳ Fluxo %{name}"
         empty_suffix: "(vazio)"
         header_count: "%{count} cartões"
+        new_from_answer: "＋ Novo fluxo a partir desta resposta…"
+        name_prompt: "Dê um nome ao fluxo (p. ex. UK)"
+        entry_from: "Cartão %{card} · %{answer}"
+        entry_otherwise: "caso contrário"
+        entry_none: "Nenhuma resposta chega aqui ainda"
+        exit_label: "depois"
+        exit_continue: "Continuar pela ordem dos cartões"
+        add_card: "＋ Adicionar cartão"
+        jump: "Ver cartões"
+        dissolve: "Dissolver"
+        delete_cards: "Eliminar cartões"
+        confirm: "De certeza?"
+        no_flows: "Ainda sem fluxos — escolha “＋ Novo fluxo a partir desta resposta…” numa rota, ou crie um aqui."
+        warn_dangling: "Cartão %{n}: uma rota aponta para um destino em falta"
+        warn_self: "O cartão %{n} encaminha para si próprio"
+        warn_empty: "“%{name}” ainda não tem cartões"
+        warn_unreachable: "Nenhuma rota leva a “%{name}”"
+        warn_cycle: "Fluxos em ciclo: %{names}"
       rules:
         title: "Regras do jogo"
         score_label: "Pontuação do Verto"
@@ -641,6 +659,9 @@ pt:
     tab_quiz: 'Modo de quiz'
     tab_tokens: 'Tokenização'
     tab_logic: 'Lógica e fluxos'
+    flows_title: "Fluxos"
+    flows_intro: "Grupos de cartões com nome onde uma resposta encaminhada entra — p. ex. conjuntos de perguntas UK, EAU e EUA que depois convergem ou terminam em ecrãs próprios."
+    flows_new: "Novo fluxo"
     select_card_for_options: 'Selecione um cartão de pergunta à esquerda para definir as suas opções.'
     consent_gate: 'Passo de consentimento'
     consent_default: 'Ao participar, aceita que as suas respostas anónimas possam ser utilizadas para investigação.'

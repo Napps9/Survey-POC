@@ -1041,6 +1041,71 @@
   font-size: 11.5px;
   color: rgba(244,246,255,0.62);
 }
+
+/* ── Flows panel (right column, Logic & flows tab) ──
+   One .flow-card per flow, painted by flows_controller. */
+.flow-list { display: flex; flex-direction: column; gap: 10px; }
+.flow-list-empty {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.45); line-height: 1.5; padding: 4px 0;
+}
+.flow-card {
+  border: 1px solid color-mix(in srgb, var(--flow-color, #8B85FF) 40%, transparent);
+  border-left: 3px solid var(--flow-color, #8B85FF);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--flow-color, #8B85FF) 7%, transparent);
+  display: flex; flex-direction: column; gap: 7px;
+}
+.flow-card-head { display: flex; align-items: center; gap: 8px; }
+.flow-name-input {
+  flex: 1; min-width: 0;
+  background: transparent; border: 1px solid transparent; border-radius: 7px;
+  padding: 3px 6px; margin: -3px 0;
+  font-family: 'Alata', sans-serif; font-size: 13.5px;
+  letter-spacing: 0.05em; color: #F4F6FF;
+}
+.flow-name-input:hover:not(:disabled) { border-color: rgba(255,255,255,0.18); }
+.flow-name-input:focus { outline: none; border-color: var(--flow-color, #8B85FF); background: rgba(0,0,0,0.25); }
+.flow-card-entry {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.6); line-height: 1.4;
+}
+.flow-card-entry.is-warn { color: #FFC97A; }
+.flow-card-exit {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.6);
+}
+.flow-exit-select { flex: 1; min-width: 0; }
+.flow-card-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.flow-action-btn {
+  padding: 4px 11px; border-radius: 100px;
+  background: transparent; color: rgba(255,255,255,0.75);
+  border: 1px solid rgba(255,255,255,0.22);
+  font-family: 'ABeeZee', sans-serif; font-size: 11.5px; cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.flow-action-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+.flow-action-btn.flow-action-danger { color: #FF8FB4; border-color: rgba(255,30,111,0.4); }
+.flow-action-btn.flow-action-danger:hover { border-color: #FF1E6F; color: #FF5C93; }
+.flow-action-btn.is-armed { background: #FF1E6F; border-color: #FF1E6F; color: #fff; }
+.flow-new-btn {
+  margin-top: 10px; padding: 6px 14px; border-radius: 100px;
+  background: transparent; color: rgba(255,255,255,0.78);
+  border: 1px dashed rgba(255,255,255,0.25);
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm); cursor: pointer;
+}
+.flow-new-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+.flow-warnings { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.flow-warn-chip {
+  padding: 4px 11px; border-radius: 100px;
+  background: rgba(255,201,122,0.1); color: #FFC97A;
+  border: 1px solid rgba(255,201,122,0.4);
+  font-family: 'ABeeZee', sans-serif; font-size: 11.5px; cursor: pointer;
+  text-align: left;
+}
+.flow-warn-chip:hover { border-color: #FFC97A; }
 /* Bottom-right, mirroring the Delete CTA on the chrome row above the card
    (same 4px inset), so the centre column stays clear of the floating pills. */
 .aq-insert-row { display: flex; justify-content: flex-end; padding: 0 4px; }

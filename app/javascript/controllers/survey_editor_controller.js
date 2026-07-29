@@ -239,6 +239,9 @@ export default class extends Controller {
     this.renumberCards()
     this.cardTargets.forEach(c => this.refreshCard(c))
     this.refreshScore()
+    // Let passive listeners (the Flows panel) repaint from the fresh state.
+    // Render-only on their side — never mutate/markDirty from this event.
+    this.dispatch("refreshed")
   }
 
   // ── Reorder ──────────────────────────────────────────────────────────────
@@ -1117,13 +1120,26 @@ export default class extends Controller {
     return id
   }
 
-  // Mirror of FlowCompiler.valid_exit: a single-key target or null (end wins
-  // over card on a malformed hash, matching LogicGraph's resolution order).
+  // Mirror of FlowCompiler.valid_exit: a single-key authoring target or null.
+  // { end } finishes on a branch screen, { flow } chains into another flow
+  // (resolved to its entry at compile time so it tracks reorders), { card }
+  // converges on a specific card. Priority end > flow > card.
   _validFlowExit(target) {
     if (!target || typeof target !== "object") return null
     if (target.end != null && String(target.end) !== "") return { end: String(target.end) }
+    if (target.flow != null && String(target.flow) !== "") return { flow: String(target.flow) }
     if (target.card != null && String(target.card) !== "") return { card: String(target.card) }
     return null
+  }
+
+  // Mirror of FlowCompiler.resolve_exit: the runtime target the last member's
+  // `next` carries — a flow exit resolves to that flow's entry card, or null
+  // when it's empty/unknown (fail safe: fall through linearly).
+  _resolveFlowExit(target, cards) {
+    const ex = this._validFlowExit(target)
+    if (!ex || ex.flow == null) return ex
+    const entry = cards.find(c => c.flow_id === ex.flow)
+    return entry && entry.cid ? { card: entry.cid } : null
   }
 
   // Mirror of FlowCompiler.compile!: chain each flow's members with `next`
@@ -1147,7 +1163,7 @@ export default class extends Controller {
           const targetCid = cards[memberIdxs[k + 1]].cid
           next = targetCid ? { card: targetCid } : null
         } else {
-          next = this._validFlowExit(flow.exit)
+          next = this._resolveFlowExit(flow.exit, cards)
         }
         if (next) {
           cards[cardIdx].next = next
@@ -1312,6 +1328,11 @@ export default class extends Controller {
         const c = cards.find(x => x.cid === chosen.slice(5))
         if (c) sel.appendChild(this._logicOption(`card:${c.cid}`, cardLabel(c)))
       }
+      // Per-answer selects (not the "otherwise") close with a create action:
+      // picking it spins up a flow named after the answer (see logicRouteChanged).
+      if (!this.liveValue && sel.hasAttribute("data-logic-route")) {
+        sel.appendChild(this._logicOption("__new_flow__", t("editor.flows.new_from_answer")))
+      }
       sel.value = chosen
       if (sel.value !== chosen) { sel.value = ""; sel.dataset.logicSelected = "" } // target gone ⇒ fall through
     })
@@ -1327,6 +1348,15 @@ export default class extends Controller {
   // Persist the creator's route choice so a later refresh keeps it, then save.
   logicRouteChanged(event) {
     const sel = event.currentTarget
+    // The "+ New flow from this answer…" action option: hand off to the Flows
+    // panel (which creates the flow + its first card, then wires this select)
+    // and restore the previous selection meanwhile.
+    if (sel.value === "__new_flow__") {
+      sel.value = sel.dataset.logicSelected || ""
+      this.application.getControllerForElementAndIdentifier(this.element, "flows")
+        ?.createFromRouteSelect(sel)
+      return
+    }
     sel.dataset.logicSelected = sel.value
     this.markDirty()
   }

@@ -190,6 +190,24 @@ sw:
         option: "↳ Mtiririko wa %{name}"
         empty_suffix: "(tupu)"
         header_count: "Kadi %{count}"
+        new_from_answer: "＋ Mtiririko mpya kutoka jibu hili…"
+        name_prompt: "Lipe jina mtiririko huu (mf. UK)"
+        entry_from: "Kadi %{card} · %{answer}"
+        entry_otherwise: "vinginevyo"
+        entry_none: "Hakuna jibu linaloelekea hapa bado"
+        exit_label: "kisha"
+        exit_continue: "Endelea kwa mpangilio wa kadi"
+        add_card: "＋ Ongeza kadi"
+        jump: "Onyesha kadi"
+        dissolve: "Vunja"
+        delete_cards: "Futa kadi"
+        confirm: "Una uhakika?"
+        no_flows: "Hakuna mitiririko bado — chagua “＋ Mtiririko mpya kutoka jibu hili…” kwenye njia, au tengeneza mmoja hapa."
+        warn_dangling: "Kadi %{n}: njia inaelekeza kwenye lengo lisilopo"
+        warn_self: "Kadi %{n} inajielekeza yenyewe"
+        warn_empty: "“%{name}” haina kadi bado"
+        warn_unreachable: "Hakuna njia inayoingia “%{name}”"
+        warn_cycle: "Mitiririko inazunguka: %{names}"
       rules:
         title: "Kanuni za Mchezo"
         score_label: "Alama ya Verto"
@@ -641,6 +659,9 @@ sw:
     tab_quiz: 'Hali ya maswali'
     tab_tokens: 'Utoaji wa tokeni'
     tab_logic: 'Mantiki na mtiririko'
+    flows_title: "Mitiririko"
+    flows_intro: "Vikundi vya kadi vyenye majina ambavyo jibu lililoelekezwa huingia — mf. seti za maswali za UK, UAE na USA zinazoungana tena baadaye au kuishia kwenye skrini zao."
+    flows_new: "Mtiririko mpya"
     select_card_for_options: 'Chagua kadi ya swali upande wa kushoto ili kuweka chaguo zake.'
     consent_gate: 'Hatua ya idhini'
     consent_default: 'Kwa kushiriki, unakubali kwamba majibu yako yasiyo na jina yanaweza kutumika kwa utafiti.'

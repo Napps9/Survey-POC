@@ -48,6 +48,21 @@ class FlowCompilerTest < ActiveSupport::TestCase
     assert_equal({ "end" => "uk_hub" }, cards[2]["next"])
   end
 
+  test "a flow exit chains into the target flow's entry card" do
+    deck = region_deck
+    deck[3]["flow_id"] = "f_shared" # the tail card becomes a one-card flow
+    flows = [ uk_flow({ "flow" => "f_shared" }),
+              { "id" => "f_shared", "name" => "Shared", "color" => "#01EACB" } ]
+    cards = FlowCompiler.compile!(deck, flows)
+    assert_equal({ "card" => "c_tail" }, cards[2]["next"],
+                 "the UK flow's last member should point at the shared flow's entry")
+  end
+
+  test "a flow exit to an empty or unknown flow fails safe to linear" do
+    cards = FlowCompiler.compile!(region_deck, [ uk_flow({ "flow" => "f_ghost" }) ])
+    refute cards[2].key?("next"), "unresolvable flow exit ⇒ fall through linearly"
+  end
+
   test "cards outside any flow are untouched" do
     before = region_deck
     after  = FlowCompiler.compile!(JSON.parse(before.to_json), [ uk_flow ])

@@ -190,6 +190,24 @@ he:
         option: "↳ מסלול %{name}"
         empty_suffix: "(ריק)"
         header_count: "%{count} כרטיסים"
+        new_from_answer: "＋ מסלול חדש מהתשובה הזו…"
+        name_prompt: "תנו שם למסלול (למשל UK)"
+        entry_from: "כרטיס %{card} · %{answer}"
+        entry_otherwise: "אחרת"
+        entry_none: "עוד אין תשובה שמובילה לכאן"
+        exit_label: "ואז"
+        exit_continue: "להמשיך לפי סדר הכרטיסים"
+        add_card: "＋ הוספת כרטיס"
+        jump: "הצגת כרטיסים"
+        dissolve: "פירוק"
+        delete_cards: "מחיקת כרטיסים"
+        confirm: "בטוח?"
+        no_flows: "אין עדיין מסלולים — בחרו „＋ מסלול חדש מהתשובה הזו…” בניתוב, או צרו אחד כאן."
+        warn_dangling: "כרטיס %{n}: ניתוב מצביע על יעד חסר"
+        warn_self: "כרטיס %{n} מנתב לעצמו"
+        warn_empty: "ל„%{name}” אין עדיין כרטיסים"
+        warn_unreachable: "שום ניתוב לא מוביל אל „%{name}”"
+        warn_cycle: "המסלולים בלולאה: %{names}"
       rules:
         title: "חוקי המשחק"
         score_label: "ציון Verto"
@@ -641,6 +659,9 @@ he:
     tab_quiz: 'מצב חידון'
     tab_tokens: 'טוקניזציה'
     tab_logic: 'לוגיקה וזרימות'
+    flows_title: "מסלולים"
+    flows_intro: "קבוצות כרטיסים בעלות שם שאליהן מגיעה תשובה מנותבת — למשל סטים של שאלות ל-UK, איחוד האמירויות וארצות הברית שמתאחדים בהמשך או מסתיימים במסכים משלהם."
+    flows_new: "מסלול חדש"
     select_card_for_options: 'בחר כרטיס שאלה כדי להגדיר את האפשרויות שלו.'
     consent_gate: 'שלב הסכמה'
     consent_default: 'בהשתתפותך, אתה מסכים שתשובותיך האנונימיות עשויות לשמש למחקר.'

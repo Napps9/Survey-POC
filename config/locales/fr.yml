@@ -190,6 +190,24 @@ fr:
         option: "↳ Flux %{name}"
         empty_suffix: "(vide)"
         header_count: "%{count} cartes"
+        new_from_answer: "＋ Nouveau flux depuis cette réponse…"
+        name_prompt: "Nommez ce flux (p. ex. UK)"
+        entry_from: "Carte %{card} · %{answer}"
+        entry_otherwise: "sinon"
+        entry_none: "Aucune réponse ne mène ici pour l'instant"
+        exit_label: "ensuite"
+        exit_continue: "Continuer dans l'ordre des cartes"
+        add_card: "＋ Ajouter une carte"
+        jump: "Voir les cartes"
+        dissolve: "Dissoudre"
+        delete_cards: "Supprimer les cartes"
+        confirm: "Sûr ?"
+        no_flows: "Pas encore de flux — choisissez « ＋ Nouveau flux depuis cette réponse… » sur une route, ou créez-en un ici."
+        warn_dangling: "Carte %{n} : une route pointe vers une cible manquante"
+        warn_self: "La carte %{n} se route vers elle-même"
+        warn_empty: "« %{name} » n'a pas encore de cartes"
+        warn_unreachable: "Aucune route ne mène à « %{name} »"
+        warn_cycle: "Boucle de flux : %{names}"
       rules:
         title: "Règles du jeu"
         score_label: "Score du Verto"
@@ -641,6 +659,9 @@ fr:
     tab_quiz: 'Mode quiz'
     tab_tokens: 'Tokenisation'
     tab_logic: 'Logique et parcours'
+    flows_title: "Flux"
+    flows_intro: "Groupes de cartes nommés où mène une réponse routée — p. ex. des séries de questions UK, EAU et USA qui convergent ensuite ou finissent sur leurs propres écrans."
+    flows_new: "Nouveau flux"
     select_card_for_options: 'Sélectionnez une carte question à gauche pour définir ses options.'
     consent_gate: 'Étape de consentement'
     consent_default: 'En participant, vous acceptez que vos réponses anonymes puissent être utilisées à des fins de recherche.'

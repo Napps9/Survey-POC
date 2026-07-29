@@ -190,6 +190,24 @@ ar:
         option: "↳ مسار %{name}"
         empty_suffix: "(فارغ)"
         header_count: "%{count} بطاقات"
+        new_from_answer: "＋ مسار جديد من هذه الإجابة…"
+        name_prompt: "سمِّ هذا المسار (مثل UK)"
+        entry_from: "بطاقة %{card} · %{answer}"
+        entry_otherwise: "خلاف ذلك"
+        entry_none: "لا توجد إجابة تقود إلى هنا بعد"
+        exit_label: "ثم"
+        exit_continue: "المتابعة بترتيب البطاقات"
+        add_card: "＋ إضافة بطاقة"
+        jump: "عرض البطاقات"
+        dissolve: "تفكيك"
+        delete_cards: "حذف البطاقات"
+        confirm: "متأكد؟"
+        no_flows: "لا مسارات بعد — اختر «＋ مسار جديد من هذه الإجابة…» على مسار إجابة، أو أنشئ واحدًا هنا."
+        warn_dangling: "البطاقة %{n}: مسار يشير إلى هدف مفقود"
+        warn_self: "البطاقة %{n} توجّه إلى نفسها"
+        warn_empty: "«%{name}» بلا بطاقات بعد"
+        warn_unreachable: "لا مسار يقود إلى «%{name}»"
+        warn_cycle: "المسارات في حلقة: %{names}"
       rules:
         title: "قواعد اللعبة"
         score_label: "نتيجة Verto"
@@ -641,6 +659,9 @@ ar:
     tab_quiz: 'وضع الاختبار'
     tab_tokens: 'الترميز'
     tab_logic: 'المنطق والمسارات'
+    flows_title: "المسارات"
+    flows_intro: "مجموعات بطاقات مسمّاة تقود إليها إجابة موجَّهة — مثل مجموعات أسئلة للمملكة المتحدة والإمارات وأمريكا تلتقي لاحقًا أو تنتهي بشاشاتها الخاصة."
+    flows_new: "مسار جديد"
     select_card_for_options: 'اختر بطاقة سؤال لضبط خياراتها.'
     consent_gate: 'بوابة الموافقة'
     consent_default: 'بمشاركتك، فإنك توافق على إمكانية استخدام إجاباتك المجهولة لأغراض البحث.'

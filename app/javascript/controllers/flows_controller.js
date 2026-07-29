@@ -1,0 +1,360 @@
+import { Controller } from "@hotwired/stimulus"
+import { t } from "lib/i18n"
+import { computeWarnings } from "lib/graph_warnings"
+
+// The Flows panel: lists the deck's first-class flows (name, colour, entry,
+// exit, member count), creates/renames/deletes them, and surfaces wiring
+// warnings. Declared on the editor ROOT alongside survey-editor (the
+// established one-root pattern), with its targets living inside the Logic &
+// flows panel partial (surveys/_flow_panel).
+//
+// All flow STATE lives in survey-editor (the working set serialize() sends);
+// this controller is a view over it plus thin action handlers. It repaints on
+// survey-editor:refreshed (dispatched from refreshAll on every structural
+// change) and must stay render-only on that path — mutating or markDirty-ing
+// from a repaint would loop.
+export default class extends Controller {
+  static targets = [ "list", "warnings" ]
+
+  connect() {
+    // survey-editor may not have connected yet (same element, order not
+    // guaranteed) — defer the first paint a frame.
+    requestAnimationFrame(() => this.repaint())
+  }
+
+  repaint() {
+    if (!this.hasListTarget) return
+    const editor = this._editor()
+    if (!editor || typeof editor.flowsList !== "function") return
+    this._renderList(editor)
+    this._renderWarnings(editor)
+  }
+
+  // ── Actions ──────────────────────────────────────────────────────────────
+
+  newFlow() {
+    const name = (prompt(t("editor.flows.name_prompt")) || "").trim()
+    if (!name) return
+    this._editor()?.addFlow({ name })
+  }
+
+  // The "+ New flow from this answer…" action on a route select: create a
+  // flow named after the answer with one starter card spliced right below the
+  // question, wire the answer to it, and pin the question's "otherwise" to
+  // where its other answers were already going (splicing directly below would
+  // otherwise silently reroute them through the new flow — same trap the flow
+  // map's _createBranchCard pins).
+  async createFromRouteSelect(sel) {
+    const editor = this._editor()
+    if (!editor || editor.liveValue) return
+    const ownerCid = sel.closest("[data-survey-editor-target='card']")?.dataset.cardCid
+                  || sel.closest("[data-logic-block]")?.dataset.ownerCid
+    const ownerWrap = ownerCid &&
+      this.element.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(ownerCid)}"]`)
+    if (!ownerWrap) return
+
+    const flow = editor.addFlow({ name: sel.dataset.canonical || "" })
+    const ownerSlot = ownerWrap.closest(".card-slot")
+    const continuation = this._continuationAfter(ownerSlot)
+    const card = await this._spliceCard({ type: "open_ended", text: "", flow_id: flow.id }, ownerSlot, flow.id)
+    if (!card) { editor.removeFlow(flow.id); return }
+
+    // Pin the otherwise before the new card becomes the linear fall-through.
+    const defSel = editor.logicScopeForCid?.(ownerCid)?.querySelector("[data-logic-default]")
+    if (defSel && !(defSel.dataset.logicSelected || "")) {
+      defSel.dataset.logicSelected = continuation
+    }
+    sel.dataset.logicSelected = `flow:${flow.id}`
+    editor.refreshAll()
+    editor.markDirty()
+  }
+
+  // ── Rendering ────────────────────────────────────────────────────────────
+
+  _renderList(editor) {
+    const flows = editor.flowsList()
+    const list = this.listTarget
+    list.textContent = ""
+    if (!flows.length) {
+      const empty = document.createElement("div")
+      empty.className = "flow-list-empty"
+      empty.textContent = t("editor.flows.no_flows")
+      list.appendChild(empty)
+      return
+    }
+    const inbound = this._inboundByFlow()
+    flows.forEach(flow => list.appendChild(this._flowCard(editor, flow, inbound.get(flow.id) || [])))
+  }
+
+  _flowCard(editor, flow, inbound) {
+    const editable = !editor.liveValue
+    const members = editor.flowMemberWraps(flow.id)
+    const card = document.createElement("div")
+    card.className = "flow-card"
+    card.style.setProperty("--flow-color", flow.color)
+    card.dataset.flowId = flow.id
+
+    // Head: colour dot + name + member count
+    const head = document.createElement("div")
+    head.className = "flow-card-head"
+    const dot = document.createElement("span")
+    dot.className = "flow-header-dot"
+    dot.setAttribute("aria-hidden", "true")
+    const name = document.createElement("input")
+    name.className = "flow-name-input"
+    name.type = "text"
+    name.maxLength = 60
+    name.value = flow.name
+    name.disabled = !editable
+    name.setAttribute("aria-label", t("editor.flows.name_prompt"))
+    name.addEventListener("change", () => this._editor()?.renameFlow(flow.id, name.value))
+    name.addEventListener("keydown", e => { if (e.key === "Enter") name.blur() })
+    const count = document.createElement("span")
+    count.className = "flow-header-count"
+    count.textContent = t("editor.flows.header_count", { count: members.length })
+    head.append(dot, name, count)
+    card.appendChild(head)
+
+    // Entry: which answer(s) open this flow
+    const entry = document.createElement("div")
+    entry.className = "flow-card-entry"
+    if (inbound.length) {
+      const first = inbound[0]
+      const extra = inbound.length > 1 ? ` +${inbound.length - 1}` : ""
+      entry.textContent = `← ${first.label}${extra}`
+    } else {
+      entry.textContent = `⚠ ${t("editor.flows.entry_none")}`
+      entry.classList.add("is-warn")
+    }
+    card.appendChild(entry)
+
+    // Exit: where the flow goes when its cards run out
+    const exitRow = document.createElement("div")
+    exitRow.className = "flow-card-exit"
+    const exitLabel = document.createElement("span")
+    exitLabel.textContent = t("editor.flows.exit_label")
+    const exitSel = this._exitSelect(editor, flow)
+    exitSel.disabled = !editable
+    exitRow.append(exitLabel, exitSel)
+    card.appendChild(exitRow)
+
+    // Actions
+    if (editable) {
+      const actions = document.createElement("div")
+      actions.className = "flow-card-actions"
+      if (members.length) actions.appendChild(this._actionBtn(t("editor.flows.jump"), () => {
+        members[0].scrollIntoView({ behavior: "smooth", block: "center" })
+      }))
+      actions.appendChild(this._actionBtn(t("editor.flows.add_card"), () => this._addCard(flow.id)))
+      actions.appendChild(this._armedBtn(t("editor.flows.dissolve"), () => {
+        this._editor()?.removeFlow(flow.id, { deleteCards: false })
+      }))
+      if (members.length) actions.appendChild(this._armedBtn(t("editor.flows.delete_cards"), () => {
+        this._editor()?.removeFlow(flow.id, { deleteCards: true })
+      }, "flow-action-danger"))
+      card.appendChild(actions)
+    }
+    return card
+  }
+
+  // Options mirror the route selects' vocabulary: continue linearly, finish
+  // on an end screen, chain into another flow, or converge on a card outside
+  // any flow. Values encode as "" | "end:<id>" | "flow:<id>" | "card:<cid>".
+  _exitSelect(editor, flow) {
+    const sel = document.createElement("select")
+    sel.className = "logic-route-select flow-exit-select"
+    sel.appendChild(this._option("", t("editor.flows.exit_continue")))
+    const cfg = editor.logicConfigValue || {}
+    const flows = editor.flowsList().filter(f => f.id !== flow.id)
+    if (flows.length) {
+      const group = document.createElement("optgroup")
+      group.label = t("editor.flows.group")
+      flows.forEach(f => group.appendChild(this._option(`flow:${f.id}`, t("editor.flows.option", { name: f.name }))))
+      sel.appendChild(group)
+    }
+    ;(Array.isArray(cfg.ends) ? cfg.ends : []).forEach(e =>
+      sel.appendChild(this._option(`end:${e.id}`, `${cfg.finishPrefix || "Finish"} · ${e.label}`)))
+    editor.cardTargets.forEach(c => {
+      const cid = c.dataset.cardCid
+      if (!cid || c.dataset.cardFlowId) return
+      const label = (c.querySelector(".q-title, .activity-title")?.textContent || "").trim().slice(0, 40)
+      sel.appendChild(this._option(`card:${cid}`, label ? `→ Card ${c.dataset.cardNum}: ${label}` : `→ Card ${c.dataset.cardNum}`))
+    })
+    const ex = flow.exit || {}
+    sel.value = ex.end ? `end:${ex.end}` : ex.flow ? `flow:${ex.flow}` : ex.card ? `card:${ex.card}` : ""
+    if (sel.value === "" && (ex.end || ex.flow || ex.card)) sel.value = "" // target gone ⇒ continue
+    sel.addEventListener("change", () => {
+      const v = sel.value
+      const target = v.startsWith("end:")  ? { end: v.slice(4) }
+                   : v.startsWith("flow:") ? { flow: v.slice(5) }
+                   : v.startsWith("card:") ? { card: v.slice(5) }
+                   : null
+      this._editor()?.setFlowExit(flow.id, target)
+    })
+    return sel
+  }
+
+  _renderWarnings(editor) {
+    if (!this.hasWarningsTarget) return
+    const box = this.warningsTarget
+    const { cards, flows } = editor.serialize()
+    const endIds = [ "default", ...((editor.logicConfigValue?.ends || []).map(e => e.id)) ]
+    const warnings = computeWarnings(cards, flows, endIds)
+    box.textContent = ""
+    box.style.display = warnings.length ? "" : "none"
+    const nameOf = id => editor.flowById(id)?.name || id
+    warnings.forEach(w => {
+      const chip = document.createElement("button")
+      chip.type = "button"
+      chip.className = "flow-warn-chip"
+      if (w.kind === "dangling")          chip.textContent = t("editor.flows.warn_dangling", { n: w.num })
+      else if (w.kind === "self_loop")    chip.textContent = t("editor.flows.warn_self", { n: w.num })
+      else if (w.kind === "empty_flow")   chip.textContent = t("editor.flows.warn_empty", { name: nameOf(w.flowId) })
+      else if (w.kind === "unreachable_flow") chip.textContent = t("editor.flows.warn_unreachable", { name: nameOf(w.flowId) })
+      else if (w.kind === "flow_cycle")   chip.textContent = t("editor.flows.warn_cycle", { names: w.flowIds.map(nameOf).join(" → ") })
+      else return
+      chip.addEventListener("click", () => this._jumpToWarning(w))
+      box.appendChild(chip)
+    })
+  }
+
+  _jumpToWarning(w) {
+    const editor = this._editor()
+    if (!editor) return
+    let el = null
+    if (w.num != null) el = editor.cardTargets[w.num - 1]
+    else if (w.flowId) el = editor.flowMemberWraps(w.flowId)[0]
+    else if (w.flowIds?.length) el = editor.flowMemberWraps(w.flowIds[0])[0]
+    el?.scrollIntoView({ behavior: "smooth", block: "center" })
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  _editor() {
+    return this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")
+  }
+
+  // Route selects currently sending an answer into each flow, for the entry
+  // readout: [{ label: "Card 2 · UK" }]. Scans the live selects (wherever the
+  // relocation machinery has them) rather than serialized data so it matches
+  // what the creator just picked, saved or not.
+  _inboundByFlow() {
+    const map = new Map()
+    this.element.querySelectorAll("[data-logic-route], [data-logic-default]").forEach(sel => {
+      const chosen = sel.dataset.logicSelected || ""
+      if (!chosen.startsWith("flow:")) return
+      const flowId = chosen.slice(5)
+      const ownerCid = sel.closest("[data-survey-editor-target='card']")?.dataset.cardCid
+                    || sel.closest("[data-logic-block]")?.dataset.ownerCid
+      const ownerWrap = ownerCid &&
+        this.element.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(ownerCid)}"]`)
+      const cardNum = ownerWrap?.dataset.cardNum
+      const answer = sel.hasAttribute("data-logic-route")
+        ? (sel.dataset.canonical || "")
+        : t("editor.flows.entry_otherwise")
+      const label = t("editor.flows.entry_from", { card: cardNum || "?", answer })
+      if (!map.has(flowId)) map.set(flowId, [])
+      map.get(flowId).push({ label })
+    })
+    return map
+  }
+
+  // Where the deck currently continues after `slot` — the next slot's card
+  // (encoded "card:<cid>") or the finish. Captured BEFORE splicing a new card
+  // in, to pin a question's "otherwise" route.
+  _continuationAfter(slot) {
+    let el = slot?.nextElementSibling
+    while (el && !el.classList.contains("card-slot")) el = el.nextElementSibling
+    const cid = el?.querySelector("[data-survey-editor-target='card']")?.dataset.cardCid
+    return cid ? `card:${cid}` : "end:default"
+  }
+
+  async _addCard(flowId) {
+    const editor = this._editor()
+    if (!editor || editor.liveValue) return
+    const members = editor.flowMemberWraps(flowId)
+    const afterSlot = members.length ? members[members.length - 1].closest(".card-slot") : null
+    const card = await this._spliceCard({ type: "open_ended", text: "", flow_id: flowId }, afterSlot, flowId)
+    if (!card) return
+    editor.refreshAll()
+    editor.markDirty()
+    card.scrollIntoView({ behavior: "smooth", block: "center" })
+  }
+
+  // POST a card JSON to render_card and splice the returned row into the feed
+  // (after `afterSlot`, else at the end), tagged with the flow. The server
+  // stamps the cid; autosave persists the deck. Mirrors add_question's
+  // _insertHTML / the flow map's _createBranchCard splice.
+  async _spliceCard(cardJson, afterSlot, flowId) {
+    const url = this.element.dataset.addQuestionRenderUrlValue
+    const feed = this.element.querySelector("[data-add-question-target='cardsFeed']")
+    if (!url || !feed) return null
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+        },
+        body: JSON.stringify(cardJson)
+      })
+      const json = await res.json()
+      if (!json || !json.ok) return null
+      const tmp = document.createElement("div")
+      tmp.innerHTML = (json.html || "").trim()
+      const card = tmp.firstElementChild
+      if (!card) return null
+      const slot = document.createElement("div")
+      slot.className = "card-slot"
+      slot.appendChild(card)
+      const insertRow = feed.querySelector(".aq-insert-row")
+      if (insertRow) slot.appendChild(insertRow.cloneNode(true))
+      if (afterSlot && afterSlot.parentNode === feed) afterSlot.after(slot)
+      else feed.appendChild(slot)
+      if (flowId) card.dataset.cardFlowId = flowId
+      this.application.getControllerForElementAndIdentifier(this.element, "type-panel")?.registerCard(card)
+      return card
+    } catch (_) {
+      return null
+    }
+  }
+
+  _option(value, label) {
+    const o = document.createElement("option")
+    o.value = value
+    o.textContent = label
+    return o
+  }
+
+  _actionBtn(label, onClick, extraClass) {
+    const btn = document.createElement("button")
+    btn.type = "button"
+    btn.className = `flow-action-btn${extraClass ? ` ${extraClass}` : ""}`
+    btn.textContent = label
+    btn.addEventListener("click", onClick)
+    return btn
+  }
+
+  // Two-tap confirm, matching the feed's delete button idiom: first click
+  // arms (label swaps to a confirm), second within 3s fires, timeout resets.
+  _armedBtn(label, onConfirm, extraClass) {
+    const btn = this._actionBtn(label, () => {
+      if (btn.dataset.armed === "true") {
+        clearTimeout(this._armTimer)
+        onConfirm()
+        return
+      }
+      btn.dataset.armed = "true"
+      btn.textContent = t("editor.flows.confirm")
+      btn.classList.add("is-armed")
+      clearTimeout(this._armTimer)
+      this._armTimer = setTimeout(() => {
+        btn.dataset.armed = "false"
+        btn.textContent = label
+        btn.classList.remove("is-armed")
+      }, 3000)
+    }, extraClass)
+    return btn
+  }
+}

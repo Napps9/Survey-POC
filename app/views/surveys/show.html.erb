@@ -33,7 +33,7 @@
 <script id="card-eyebrows-i18n" type="application/json"><%= card_eyebrows_i18n(@survey).to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question logic-map editor-panel gate-cards score-modal"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question logic-map editor-panel gate-cards score-modal flows"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
@@ -69,7 +69,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.published? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent survey-editor:refreshed->flows#repaint"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -802,6 +802,9 @@
       </div>
 
       <% if @survey.logic? %>
+        <%# Flows overview — list/create/rename/rewire the deck's named flows. %>
+        <%= render "surveys/flow_panel" %>
+
         <%# No card selected yet. %>
         <div class="type-panel-empty" data-type-panel-target="branchEmpty">
           <div style="font-size:28px;opacity:0.25;">↖</div>

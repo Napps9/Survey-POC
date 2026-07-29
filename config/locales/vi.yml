@@ -190,6 +190,24 @@ vi:
         option: "↳ Luồng %{name}"
         empty_suffix: "(trống)"
         header_count: "%{count} thẻ"
+        new_from_answer: "＋ Luồng mới từ câu trả lời này…"
+        name_prompt: "Đặt tên luồng (vd. UK)"
+        entry_from: "Thẻ %{card} · %{answer}"
+        entry_otherwise: "nếu không"
+        entry_none: "Chưa có câu trả lời nào dẫn đến đây"
+        exit_label: "sau đó"
+        exit_continue: "Tiếp tục theo thứ tự thẻ"
+        add_card: "＋ Thêm thẻ"
+        jump: "Xem thẻ"
+        dissolve: "Giải tán"
+        delete_cards: "Xoá thẻ"
+        confirm: "Chắc chứ?"
+        no_flows: "Chưa có luồng nào — chọn “＋ Luồng mới từ câu trả lời này…” trên một tuyến, hoặc tạo tại đây."
+        warn_dangling: "Thẻ %{n}: một tuyến trỏ đến đích không tồn tại"
+        warn_self: "Thẻ %{n} tự định tuyến về chính nó"
+        warn_empty: "“%{name}” chưa có thẻ"
+        warn_unreachable: "Không có tuyến nào dẫn vào “%{name}”"
+        warn_cycle: "Các luồng bị lặp: %{names}"
       rules:
         title: "Luật chơi"
         score_label: "Điểm Verto"
@@ -641,6 +659,9 @@ vi:
     tab_quiz: 'Chế độ đố vui'
     tab_tokens: 'Mã hóa token'
     tab_logic: 'Logic & luồng'
+    flows_title: "Luồng"
+    flows_intro: "Nhóm thẻ có tên mà câu trả lời được định tuyến sẽ đi vào — vd. bộ câu hỏi UK, UAE và USA rồi hội tụ lại hoặc kết thúc trên màn hình riêng."
+    flows_new: "Luồng mới"
     select_card_for_options: 'Chọn một thẻ câu hỏi ở bên trái để thiết lập tùy chọn.'
     consent_gate: 'Bước đồng ý'
     consent_default: 'Khi tham gia, bạn đồng ý rằng các câu trả lời ẩn danh của bạn có thể được dùng cho nghiên cứu.'

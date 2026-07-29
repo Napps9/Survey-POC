@@ -190,6 +190,24 @@ tr:
         option: "↳ %{name} akışı"
         empty_suffix: "(boş)"
         header_count: "%{count} kart"
+        new_from_answer: "＋ Bu yanıttan yeni akış…"
+        name_prompt: "Akışa bir ad verin (ör. UK)"
+        entry_from: "Kart %{card} · %{answer}"
+        entry_otherwise: "aksi halde"
+        entry_none: "Henüz buraya yönlenen yanıt yok"
+        exit_label: "sonra"
+        exit_continue: "Kart sırasına göre devam et"
+        add_card: "＋ Kart ekle"
+        jump: "Kartları göster"
+        dissolve: "Dağıt"
+        delete_cards: "Kartları sil"
+        confirm: "Emin misin?"
+        no_flows: "Henüz akış yok — bir rotada “＋ Bu yanıttan yeni akış…” seç ya da burada oluştur."
+        warn_dangling: "Kart %{n}: bir rota olmayan bir hedefe işaret ediyor"
+        warn_self: "Kart %{n} kendisine yönleniyor"
+        warn_empty: "“%{name}” henüz kartsız"
+        warn_unreachable: "Hiçbir rota “%{name}” akışına gitmiyor"
+        warn_cycle: "Akışlar döngüde: %{names}"
       rules:
         title: "Oyunun Kuralları"
         score_label: "Verto puanı"
@@ -641,6 +659,9 @@ tr:
     tab_quiz: 'Sınav modu'
     tab_tokens: 'Jetonlaştırma'
     tab_logic: 'Mantık ve akışlar'
+    flows_title: "Akışlar"
+    flows_intro: "Yönlendirilen bir yanıtın girdiği adlandırılmış kart grupları — ör. sonradan birleşen ya da kendi ekranlarında biten UK, BAE ve ABD soru setleri."
+    flows_new: "Yeni akış"
     select_card_for_options: 'Seçeneklerini ayarlamak için soldan bir soru kartı seçin.'
     consent_gate: 'Onay adımı'
     consent_default: 'Katılarak anonim yanıtlarınızın araştırma için kullanılabileceğini kabul etmiş olursunuz.'

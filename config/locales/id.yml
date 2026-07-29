@@ -190,6 +190,24 @@ id:
         option: "↳ Alur %{name}"
         empty_suffix: "(kosong)"
         header_count: "%{count} kartu"
+        new_from_answer: "＋ Alur baru dari jawaban ini…"
+        name_prompt: "Beri nama alur ini (mis. UK)"
+        entry_from: "Kartu %{card} · %{answer}"
+        entry_otherwise: "selain itu"
+        entry_none: "Belum ada jawaban yang mengarah ke sini"
+        exit_label: "lalu"
+        exit_continue: "Lanjut sesuai urutan kartu"
+        add_card: "＋ Tambah kartu"
+        jump: "Lihat kartu"
+        dissolve: "Bubarkan"
+        delete_cards: "Hapus kartu"
+        confirm: "Yakin?"
+        no_flows: "Belum ada alur — pilih “＋ Alur baru dari jawaban ini…” di sebuah rute, atau buat di sini."
+        warn_dangling: "Kartu %{n}: ada rute yang menunjuk target yang hilang"
+        warn_self: "Kartu %{n} merutekan ke dirinya sendiri"
+        warn_empty: "“%{name}” belum punya kartu"
+        warn_unreachable: "Tidak ada rute menuju “%{name}”"
+        warn_cycle: "Alur berputar: %{names}"
       rules:
         title: "Aturan Main"
         score_label: "Skor Verto"
@@ -641,6 +659,9 @@ id:
     tab_quiz: 'Mode kuis'
     tab_tokens: 'Tokenisasi'
     tab_logic: 'Logika & alur'
+    flows_title: "Alur"
+    flows_intro: "Kelompok kartu bernama yang dimasuki jawaban yang dirutekan — mis. set pertanyaan UK, UEA, dan AS yang kemudian bergabung kembali atau berakhir di layarnya sendiri."
+    flows_new: "Alur baru"
     select_card_for_options: 'Pilih kartu pertanyaan di sebelah kiri untuk mengatur opsinya.'
     consent_gate: 'Langkah persetujuan'
     consent_default: 'Dengan berpartisipasi, Anda setuju bahwa jawaban anonim Anda dapat digunakan untuk penelitian.'

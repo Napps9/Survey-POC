@@ -190,6 +190,24 @@ ja:
         option: "↳ %{name}フロー"
         empty_suffix: "（空）"
         header_count: "%{count}枚のカード"
+        new_from_answer: "＋ この回答から新しいフロー…"
+        name_prompt: "フローに名前を付ける(例:UK)"
+        entry_from: "カード%{card} · %{answer}"
+        entry_otherwise: "それ以外"
+        entry_none: "まだこのフローへのルートがありません"
+        exit_label: "その後"
+        exit_continue: "カード順に進む"
+        add_card: "＋ カードを追加"
+        jump: "カードを表示"
+        dissolve: "解除"
+        delete_cards: "カードを削除"
+        confirm: "よろしいですか?"
+        no_flows: "まだフローがありません。ルートで「＋ この回答から新しいフロー…」を選ぶか、ここで作成してください。"
+        warn_dangling: "カード%{n}:存在しない行き先へのルートがあります"
+        warn_self: "カード%{n}が自分自身にルートしています"
+        warn_empty: "「%{name}」にはまだカードがありません"
+        warn_unreachable: "「%{name}」へのルートがありません"
+        warn_cycle: "フローがループしています:%{names}"
       rules:
         title: "ゲームのルール"
         score_label: "Vertoスコア"
@@ -641,6 +659,9 @@ ja:
     tab_quiz: 'クイズモード'
     tab_tokens: 'トークン化'
     tab_logic: 'ロジックとフロー'
+    flows_title: "フロー"
+    flows_intro: "ルーティングされた回答が入る名前付きカードグループ。例:UK・UAE・USAの質問セットが後で合流するか、それぞれの画面で終了します。"
+    flows_new: "新しいフロー"
     select_card_for_options: '左側の質問カードを選択してオプションを設定してください。'
     consent_gate: '同意ステップ'
     consent_default: '参加することで、匿名の回答が研究に使用されることに同意したものとみなされます。'

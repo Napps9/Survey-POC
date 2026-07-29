@@ -115,6 +115,28 @@ class FlowsSanitizeTest < ActionDispatch::IntegrationTest
     assert_select ".survey-card-wrap[data-card-flow-id='f_uk']", 2
   end
 
+  test "the editor renders the Flows panel shell when logic is on" do
+    get survey_path(@survey)
+    assert_response :success
+    assert_select ".flow-panel [data-flows-target='list']"
+    assert_select ".flow-panel [data-flows-target='warnings']"
+    assert_select ".flow-panel .flow-new-btn"
+    # The flows controller rides the editor root, one-root pattern.
+    assert_match(/data-controller="[^"]*\bflows\b[^"]*"/, response.body)
+  end
+
+  test "a flow-typed exit survives sanitize and compiles into the target flow's entry" do
+    cards = @survey.cards
+    cards[3]["flow_id"] = "f_shared"
+    flows = [ { "id" => "f_uk", "name" => "UK", "color" => "#8B85FF", "exit" => { "flow" => "f_shared" } },
+              { "id" => "f_shared", "name" => "Shared", "color" => "#01EACB" } ]
+    patch_survey(cards: cards, flows: flows)
+    assert_response :success
+    @survey.reload
+    assert_equal({ "flow" => "f_shared" }, @survey.flows_list.first["exit"], "authoring shape persists")
+    assert_equal({ "card" => "c_tail" }, @survey.cards[2]["next"], "compiled to the shared flow's entry")
+  end
+
   test "editing flows on a published Verto is locked" do
     @survey.update!(publish_token: SecureRandom.hex(8), published_at: Time.current)
     patch_survey(flows: [])

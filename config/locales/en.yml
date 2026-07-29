@@ -192,6 +192,24 @@ en:
         option: "↳ %{name} flow"
         empty_suffix: "(empty)"
         header_count: "%{count} cards"
+        new_from_answer: "＋ New flow from this answer…"
+        name_prompt: "Name this flow (e.g. UK)"
+        entry_from: "Card %{card} · %{answer}"
+        entry_otherwise: "otherwise"
+        entry_none: "No answer routes here yet"
+        exit_label: "then"
+        exit_continue: "Continue in card order"
+        add_card: "＋ Add card"
+        jump: "Show cards"
+        dissolve: "Dissolve"
+        delete_cards: "Delete cards"
+        confirm: "Sure?"
+        no_flows: "No flows yet — pick “＋ New flow from this answer…” on a route, or create one here."
+        warn_dangling: "Card %{n}: a route points at a missing target"
+        warn_self: "Card %{n} routes to itself"
+        warn_empty: "“%{name}” has no cards yet"
+        warn_unreachable: "No route leads into “%{name}”"
+        warn_cycle: "Flows loop: %{names}"
       rules:
         title: "Rules of the Game"
         score_label: "Verto score"
@@ -643,6 +661,9 @@ en:
     tab_quiz: 'Quiz mode'
     tab_tokens: 'Tokenisation'
     tab_logic: 'Logic & flows'
+    flows_title: 'Flows'
+    flows_intro: 'Named groups of cards a routed answer can enter — e.g. UK, UAE and USA question sets that converge back or finish on their own screens.'
+    flows_new: 'New flow'
     select_card_for_options: 'Select a question card on the left to set its options.'
     consent_gate: 'Consent gate'
     consent_default: 'By taking part you agree that your anonymous answers may be used for research.'

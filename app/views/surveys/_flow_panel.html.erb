@@ -1,0 +1,18 @@
+<%# Flows overview — first-class named branches (UK / UAE / USA-style question
+    sets). The list and warnings are painted client-side by flows_controller
+    from survey-editor's working set, since flows are created/renamed/rewired
+    in the editor without a server round-trip; this partial only lays out the
+    shell + targets. The `flows` controller itself is declared on the editor
+    ROOT alongside survey-editor (the one-root pattern every editor controller
+    follows), so the targets here are in its scope. %>
+<div class="publish-block panel-island flow-panel">
+  <div class="publish-block-title"><%= t("editor.flows_title") %></div>
+  <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);margin:2px 0 10px;line-height:1.45;">
+    <%= t("editor.flows_intro") %>
+  </div>
+  <div class="flow-warnings" data-flows-target="warnings" style="display:none;"></div>
+  <div class="flow-list" data-flows-target="list"></div>
+  <% unless @survey.published? %>
+    <button type="button" class="flow-new-btn" data-action="click->flows#newFlow">＋ <%= t("editor.flows_new") %></button>
+  <% end %>
+</div>

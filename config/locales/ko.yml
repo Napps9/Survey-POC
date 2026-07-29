@@ -190,6 +190,24 @@ ko:
         option: "↳ %{name} 플로우"
         empty_suffix: "(비어 있음)"
         header_count: "카드 %{count}장"
+        new_from_answer: "＋ 이 답변에서 새 플로우…"
+        name_prompt: "플로우 이름 지정 (예: UK)"
+        entry_from: "카드 %{card} · %{answer}"
+        entry_otherwise: "그 외"
+        entry_none: "아직 이곳으로 오는 답변이 없습니다"
+        exit_label: "그다음"
+        exit_continue: "카드 순서대로 계속"
+        add_card: "＋ 카드 추가"
+        jump: "카드 보기"
+        dissolve: "해제"
+        delete_cards: "카드 삭제"
+        confirm: "확실한가요?"
+        no_flows: "아직 플로우가 없습니다 — 라우트에서 “＋ 이 답변에서 새 플로우…”를 선택하거나 여기서 만드세요."
+        warn_dangling: "카드 %{n}: 없는 대상을 가리키는 라우트가 있습니다"
+        warn_self: "카드 %{n}이(가) 자기 자신으로 라우팅됩니다"
+        warn_empty: "“%{name}”에 아직 카드가 없습니다"
+        warn_unreachable: "“%{name}”(으)로 가는 라우트가 없습니다"
+        warn_cycle: "플로우 순환: %{names}"
       rules:
         title: "게임의 규칙"
         score_label: "Verto 점수"
@@ -641,6 +659,9 @@ ko:
     tab_quiz: '퀴즈 모드'
     tab_tokens: '토큰화'
     tab_logic: '로직과 흐름'
+    flows_title: "플로우"
+    flows_intro: "라우팅된 답변이 들어가는 이름 있는 카드 그룹 — 예: 나중에 합류하거나 각자의 화면에서 끝나는 UK·UAE·USA 질문 세트."
+    flows_new: "새 플로우"
     select_card_for_options: '왼쪽에서 질문 카드를 선택하여 옵션을 설정하세요.'
     consent_gate: '동의 단계'
     consent_default: '참여하시면 익명 답변이 연구에 사용될 수 있음에 동의하는 것입니다.'

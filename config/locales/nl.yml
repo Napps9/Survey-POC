@@ -190,6 +190,24 @@ nl:
         option: "↳ Flow %{name}"
         empty_suffix: "(leeg)"
         header_count: "%{count} kaarten"
+        new_from_answer: "＋ Nieuwe flow vanuit dit antwoord…"
+        name_prompt: "Geef deze flow een naam (bijv. UK)"
+        entry_from: "Kaart %{card} · %{answer}"
+        entry_otherwise: "anders"
+        entry_none: "Nog geen antwoord leidt hierheen"
+        exit_label: "daarna"
+        exit_continue: "Doorgaan in kaartvolgorde"
+        add_card: "＋ Kaart toevoegen"
+        jump: "Kaarten tonen"
+        dissolve: "Ontbinden"
+        delete_cards: "Kaarten verwijderen"
+        confirm: "Zeker?"
+        no_flows: "Nog geen flows — kies “＋ Nieuwe flow vanuit dit antwoord…” op een route, of maak er hier een."
+        warn_dangling: "Kaart %{n}: een route wijst naar een ontbrekend doel"
+        warn_self: "Kaart %{n} routeert naar zichzelf"
+        warn_empty: "“%{name}” heeft nog geen kaarten"
+        warn_unreachable: "Geen route leidt naar “%{name}”"
+        warn_cycle: "Flows in een lus: %{names}"
       rules:
         title: "Spelregels"
         score_label: "Verto-score"
@@ -641,6 +659,9 @@ nl:
     tab_quiz: 'Quizmodus'
     tab_tokens: 'Tokenisatie'
     tab_logic: 'Logica & flows'
+    flows_title: "Flows"
+    flows_intro: "Benoemde kaartgroepen waar een gerouteerd antwoord in terechtkomt — bijv. vragensets voor UK, VAE en VS die daarna samenkomen of op eigen schermen eindigen."
+    flows_new: "Nieuwe flow"
     select_card_for_options: 'Selecteer links een vraagkaart om de opties in te stellen.'
     consent_gate: 'Toestemmingsstap'
     consent_default: 'Door deel te nemen ga je ermee akkoord dat je anonieme antwoorden voor onderzoek gebruikt mogen worden.'

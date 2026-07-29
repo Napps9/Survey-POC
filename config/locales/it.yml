@@ -190,6 +190,24 @@ it:
         option: "↳ Flusso %{name}"
         empty_suffix: "(vuoto)"
         header_count: "%{count} schede"
+        new_from_answer: "＋ Nuovo flusso da questa risposta…"
+        name_prompt: "Dai un nome al flusso (es. UK)"
+        entry_from: "Scheda %{card} · %{answer}"
+        entry_otherwise: "altrimenti"
+        entry_none: "Nessuna risposta arriva ancora qui"
+        exit_label: "poi"
+        exit_continue: "Continua nell'ordine delle schede"
+        add_card: "＋ Aggiungi scheda"
+        jump: "Mostra schede"
+        dissolve: "Sciogli"
+        delete_cards: "Elimina schede"
+        confirm: "Sicuro?"
+        no_flows: "Ancora nessun flusso — scegli “＋ Nuovo flusso da questa risposta…” su una rotta, o creane uno qui."
+        warn_dangling: "Scheda %{n}: una rotta punta a una destinazione mancante"
+        warn_self: "La scheda %{n} si instrada su sé stessa"
+        warn_empty: "“%{name}” non ha ancora schede"
+        warn_unreachable: "Nessuna rotta porta a “%{name}”"
+        warn_cycle: "Flussi in loop: %{names}"
       rules:
         title: "Regole del gioco"
         score_label: "Punteggio del Verto"
@@ -641,6 +659,9 @@ it:
     tab_quiz: 'Modalità quiz'
     tab_tokens: 'Tokenizzazione'
     tab_logic: 'Logica e flussi'
+    flows_title: "Flussi"
+    flows_intro: "Gruppi di schede con nome in cui entra una risposta instradata — es. set di domande UK, EAU e USA che poi convergono o finiscono su schermate proprie."
+    flows_new: "Nuovo flusso"
     select_card_for_options: 'Seleziona una scheda domanda a sinistra per impostarne le opzioni.'
     consent_gate: 'Passaggio di consenso'
     consent_default: 'Partecipando accetti che le tue risposte anonime possano essere utilizzate per la ricerca.'
