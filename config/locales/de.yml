@@ -163,6 +163,7 @@ de:
       tokens_result_label: "Du hast gesammelt"
     editor:
       delete_card_confirm: Diese Karte löschen?
+      confirm_delete: "Wirklich löschen?"
       unsaved: Ungespeicherte Änderungen
       saving: Wird gespeichert…
       saved: Gespeichert %{time}

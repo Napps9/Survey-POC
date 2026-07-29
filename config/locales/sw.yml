@@ -163,6 +163,7 @@ sw:
       tokens_result_label: "Umekusanya"
     editor:
       delete_card_confirm: Futa kadi hii?
+      confirm_delete: "Ufute kweli?"
       unsaved: Mabadiliko hayajahifadhiwa
       saving: Inahifadhi…
       saved: Imehifadhiwa %{time}

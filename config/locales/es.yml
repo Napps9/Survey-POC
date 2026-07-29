@@ -163,6 +163,7 @@ es:
       tokens_result_label: "Has conseguido"
     editor:
       delete_card_confirm: "¿Eliminar esta tarjeta?"
+      confirm_delete: "¿Eliminar de verdad?"
       unsaved: Cambios sin guardar
       saving: Guardando…
       saved: Guardado %{time}

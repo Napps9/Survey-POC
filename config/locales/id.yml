@@ -163,6 +163,7 @@ id:
       tokens_result_label: "Kamu mengumpulkan"
     editor:
       delete_card_confirm: Hapus kartu ini?
+      confirm_delete: "Yakin hapus?"
       unsaved: Perubahan belum disimpan
       saving: Menyimpan…
       saved: Tersimpan %{time}

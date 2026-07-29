@@ -163,6 +163,7 @@ tr:
       tokens_result_label: "Topladığınız puan"
     editor:
       delete_card_confirm: Bu kart silinsin mi?
+      confirm_delete: "Gerçekten silinsin mi?"
       unsaved: Kaydedilmemiş değişiklikler
       saving: Kaydediliyor…
       saved: "%{time} kaydedildi"

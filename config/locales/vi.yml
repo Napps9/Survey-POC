@@ -163,6 +163,7 @@ vi:
       tokens_result_label: "Bạn đã thu thập"
     editor:
       delete_card_confirm: Xóa thẻ này?
+      confirm_delete: "Xóa thật chứ?"
       unsaved: Thay đổi chưa lưu
       saving: Đang lưu…
       saved: Đã lưu %{time}

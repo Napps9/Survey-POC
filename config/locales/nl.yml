@@ -163,6 +163,7 @@ nl:
       tokens_result_label: "Je hebt verzameld"
     editor:
       delete_card_confirm: Deze kaart verwijderen?
+      confirm_delete: "Echt verwijderen?"
       unsaved: Niet-opgeslagen wijzigingen
       saving: Opslaan…
       saved: Opgeslagen %{time}

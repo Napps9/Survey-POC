@@ -163,6 +163,7 @@ uk:
       tokens_result_label: "Ви зібрали"
     editor:
       delete_card_confirm: Видалити цю картку?
+      confirm_delete: "Точно видалити?"
       unsaved: Незбережені зміни
       saving: Збереження…
       saved: Збережено %{time}

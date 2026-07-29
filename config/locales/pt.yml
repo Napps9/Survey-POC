@@ -163,6 +163,7 @@ pt:
       tokens_result_label: "Pontos reunidos"
     editor:
       delete_card_confirm: Eliminar este cartão?
+      confirm_delete: "Eliminar mesmo?"
       unsaved: Alterações não guardadas
       saving: A guardar…
       saved: Guardado %{time}

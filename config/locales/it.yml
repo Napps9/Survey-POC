@@ -163,6 +163,7 @@ it:
       tokens_result_label: "Hai raccolto"
     editor:
       delete_card_confirm: Eliminare questa carta?
+      confirm_delete: "Eliminare davvero?"
       unsaved: Modifiche non salvate
       saving: Salvataggio…
       saved: Salvato %{time}

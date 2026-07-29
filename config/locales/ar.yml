@@ -163,6 +163,7 @@ ar:
       tokens_result_label: "جمعت"
     editor:
       delete_card_confirm: حذف هذه البطاقة؟
+      confirm_delete: "حذف فعلاً؟"
       unsaved: تغييرات غير محفوظة
       saving: جارٍ الحفظ…
       saved: تم الحفظ %{time}

@@ -163,6 +163,7 @@ fr:
       tokens_result_label: "Vous avez collecté"
     editor:
       delete_card_confirm: Supprimer cette carte ?
+      confirm_delete: "Vraiment supprimer ?"
       unsaved: Modifications non enregistrées
       saving: Enregistrement…
       saved: Enregistré %{time}

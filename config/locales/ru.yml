@@ -163,6 +163,7 @@ ru:
       tokens_result_label: "Вы собрали"
     editor:
       delete_card_confirm: Удалить эту карточку?
+      confirm_delete: "Точно удалить?"
       unsaved: Несохранённые изменения
       saving: Сохранение…
       saved: Сохранено %{time}

@@ -165,6 +165,7 @@ en:
       tokens_result_label: "You collected"
     editor:
       delete_card_confirm: "Delete this card?"
+      confirm_delete: "Really delete?"
       unsaved: "Unsaved changes"
       saving: "Saving…"
       saved: "Saved %{time}"

@@ -5069,10 +5069,30 @@ body.generating-overlay-active .bottom-bar { display: none; }
   padding: 6px 14px; border-radius: 100px;
   background: #341A27; border: 1.5px solid #FF1E6F; /* opaque, not see-through */
   color: #FF5C93; font-family: "ABeeZee", sans-serif; font-size: 12.5px;
+  font-weight: 600; /* same weight as .aq-insert-btn — they're a mirrored pair */
   letter-spacing: 0.02em; cursor: pointer; transition: all 0.15s;
 }
-.card-delete-btn:hover { background: #FF1E6F; border-color: #FF1E6F; color: #fff; box-shadow: 0 2px 12px rgba(255,30,111,0.45); }
+/* #DB0E58 rather than the brand pink for the filled states: white text on it
+   holds AA (~5:1) at this size, which #FF1E6F doesn't. */
+.card-delete-btn:hover {
+  background: #DB0E58; border-color: #DB0E58; color: #fff;
+  box-shadow: 0 2px 12px rgba(219,14,88,0.45); transform: translateY(-1px);
+}
 .card-delete-btn:focus-visible { outline: 2px solid #FF5C93; outline-offset: 2px; }
+/* Armed (first tap) — solid fill + slow pulse while it waits for the
+   confirming second tap; type_panel_controller swaps the label to
+   "Really delete?" and stands it down after 3s. */
+.card-delete-btn.is-armed {
+  background: #DB0E58; border-color: #DB0E58; color: #fff;
+  animation: delete-armed-pulse 1.1s ease-in-out infinite;
+}
+@keyframes delete-armed-pulse {
+  0%, 100% { box-shadow: 0 2px 12px rgba(219,14,88,0.45); }
+  50%      { box-shadow: 0 2px 20px rgba(219,14,88,0.85); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-delete-btn.is-armed { animation: none; box-shadow: 0 2px 12px rgba(219,14,88,0.6); }
+}
 
 /* ── Device preview toggle ── */
 .device-toggle {

@@ -163,6 +163,7 @@ hi:
       tokens_result_label: "आपने अर्जित किए"
     editor:
       delete_card_confirm: इस कार्ड को हटाएं?
+      confirm_delete: "वाकई हटाएं?"
       unsaved: असहेजे परिवर्तन
       saving: सहेजा जा रहा है…
       saved: "%{time} पर सहेजा गया"

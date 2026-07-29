@@ -163,6 +163,7 @@ pl:
       tokens_result_label: "Zebrane punkty"
     editor:
       delete_card_confirm: Usunąć tę kartę?
+      confirm_delete: "Na pewno usunąć?"
       unsaved: Niezapisane zmiany
       saving: Zapisywanie…
       saved: Zapisano %{time}

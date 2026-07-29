@@ -163,6 +163,7 @@ ja:
       tokens_result_label: "獲得ポイント"
     editor:
       delete_card_confirm: このカードを削除しますか？
+      confirm_delete: "本当に削除？"
       unsaved: 未保存の変更
       saving: 保存中…
       saved: "%{time}に保存済み"

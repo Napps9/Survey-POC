@@ -698,6 +698,7 @@ export default class extends Controller {
     // If the publish-and-share panel is open, drop back to the answer-type
     // picker so the click reveals the card's edit options.
     this.dispatch("cardSelected")
+    this._disarmDelete() // moving on ⇒ any half-armed Delete stands down
 
     const card = event.currentTarget
     this.cardTargets.forEach(c => c.classList.remove("selected"))
@@ -901,9 +902,26 @@ export default class extends Controller {
     // The feed's own chrome-row button lives inside the card; the sidebar's
     // pinned button (Answer type panel) doesn't, so it falls back to whichever
     // card is currently selected.
-    const card = event.currentTarget.closest("[data-type-panel-target='card']") || this.activeCardEl
+    const btn  = event.currentTarget
+    const card = btn.closest("[data-type-panel-target='card']") || this.activeCardEl
     if (!card) return
-    if (!window.confirm(t("editor.delete_card_confirm"))) return
+    // Two-step confirm on the button itself — the first tap arms it (solid
+    // fill + "Really delete?"), a second tap within 3s deletes, and anything
+    // else disarms it. Replaces the native window.confirm popup, which broke
+    // the editor's look mid-flow.
+    if (btn !== this._armedDeleteBtn) {
+      this._disarmDelete()
+      this._armedDeleteBtn = btn
+      btn.classList.add("is-armed")
+      const label = btn.querySelector("span")
+      if (label) {
+        btn.dataset.restingLabel = label.textContent
+        label.textContent = t("editor.confirm_delete")
+      }
+      this._armTimer = setTimeout(() => this._disarmDelete(), 3000)
+      return
+    }
+    this._disarmDelete()
     // Remove the whole slot (card + its "Add question" CTA), falling back to the
     // bare card for any context that doesn't use slots.
     ;(card.closest(".card-slot") || card).remove()
@@ -922,6 +940,19 @@ export default class extends Controller {
     }
     this._updateCount()
     this.dispatch("changed")
+  }
+
+  // Put an armed Delete button back to rest (label + styling). Safe to call
+  // when nothing is armed, or after the button's card left the DOM.
+  _disarmDelete() {
+    clearTimeout(this._armTimer)
+    const btn = this._armedDeleteBtn
+    this._armedDeleteBtn = null
+    if (!btn || !btn.isConnected) return
+    btn.classList.remove("is-armed")
+    const label = btn.querySelector("span")
+    if (label && btn.dataset.restingLabel) label.textContent = btn.dataset.restingLabel
+    delete btn.dataset.restingLabel
   }
 
   // ── private ──────────────────────────────────────────

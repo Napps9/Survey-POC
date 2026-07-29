@@ -163,6 +163,7 @@ he:
       tokens_result_label: "צברת"
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
+      confirm_delete: "באמת למחוק?"
       unsaved: שינויים שלא נשמרו
       saving: שומר…
       saved: נשמר %{time}

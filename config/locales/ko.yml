@@ -163,6 +163,7 @@ ko:
       tokens_result_label: "모은 포인트"
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
+      confirm_delete: "정말 삭제할까요?"
       unsaved: 저장되지 않은 변경사항
       saving: 저장 중…
       saved: "%{time}에 저장됨"
