@@ -216,6 +216,7 @@ uk:
         duplicate_into: "⧉ Дублювати картку сюди…"
         duplicate_pick: "Оберіть картку для копіювання"
       rules:
+        flows_path: "Розгалужений Verto — довжина оцінюється за найдовшим шляхом респондента: %{n} з %{total} карток."
         title: "Правила гри"
         score_label: "Оцінка Verto"
         cards_label: "Картки"

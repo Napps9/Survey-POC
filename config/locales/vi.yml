@@ -216,6 +216,7 @@ vi:
         duplicate_into: "⧉ Nhân bản thẻ vào đây…"
         duplicate_pick: "Chọn thẻ để sao chép"
       rules:
+        flows_path: "Verto phân nhánh — độ dài được chấm theo lộ trình dài nhất của người trả lời: %{n} trên %{total} thẻ."
         title: "Luật chơi"
         score_label: "Điểm Verto"
         cards_label: "Thẻ"

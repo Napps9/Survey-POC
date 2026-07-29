@@ -216,6 +216,7 @@ nl:
         duplicate_into: "⧉ Kaart hierheen dupliceren…"
         duplicate_pick: "Kies een kaart om te kopiëren"
       rules:
+        flows_path: "Vertakte Verto — de lengte wordt beoordeeld op het langste pad van een respondent: %{n} van %{total} kaarten."
         title: "Spelregels"
         score_label: "Verto-score"
         cards_label: "Kaarten"

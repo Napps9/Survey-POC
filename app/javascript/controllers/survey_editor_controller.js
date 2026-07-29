@@ -415,8 +415,26 @@ export default class extends Controller {
 
   refreshScore() {
     if (!this.hasVertoScoreTarget) return
-    const cardData = this.cardTargets.map(el => this._cardData(el))
-    const result = analyzeVerto(cardData)
+    // Score cards carry their wiring too (cid / routes / next / flow_id), so
+    // a branched Verto is judged on the longest respondent path and per-flow
+    // variety instead of the flat deck — see analyzeVerto. The compile pass
+    // keeps member `next` chains current even before the next autosave.
+    const cardData = this.cardTargets.map(el => {
+      const d = this._cardData(el)
+      if (el.dataset.cardCid) d.cid = el.dataset.cardCid
+      if (el.dataset.cardFlowId && this.flowById(el.dataset.cardFlowId)) d.flow_id = el.dataset.cardFlowId
+      try {
+        const nx = el.dataset.cardNext ? JSON.parse(el.dataset.cardNext) : null
+        if (nx && (nx.card || nx.end)) d.next = nx
+      } catch (_) { /* malformed — score as unwired */ }
+      if (this.logicValue) {
+        const logic = this._readLogic(el, el.dataset.cardType)
+        if (this._hasLogic(logic)) d.logic = logic
+      }
+      return d
+    })
+    this._compileFlows(cardData)
+    const result = analyzeVerto(cardData, { flows: this.flowsList() })
 
     // Paint the score tab. Use classList (not className) so the tab's own
     // classes — right-tab, verto-score, is-active — survive the repaint.

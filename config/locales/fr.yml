@@ -216,6 +216,7 @@ fr:
         duplicate_into: "⧉ Dupliquer une carte ici…"
         duplicate_pick: "Choisissez une carte à copier"
       rules:
+        flows_path: "Verto ramifié — la longueur est évaluée sur le plus long parcours d'un répondant : %{n} cartes sur %{total}."
         title: "Règles du jeu"
         score_label: "Score du Verto"
         cards_label: "Cartes"

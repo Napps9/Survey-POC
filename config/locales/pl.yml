@@ -216,6 +216,7 @@ pl:
         duplicate_into: "⧉ Powiel kartę tutaj…"
         duplicate_pick: "Wybierz kartę do skopiowania"
       rules:
+        flows_path: "Rozgałęziony Verto — długość oceniana jest po najdłuższej ścieżce respondenta: %{n} z %{total} kart."
         title: "Zasady gry"
         score_label: "Wynik Verto"
         cards_label: "Karty"

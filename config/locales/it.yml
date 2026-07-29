@@ -216,6 +216,7 @@ it:
         duplicate_into: "⧉ Duplica una scheda qui…"
         duplicate_pick: "Scegli una scheda da copiare"
       rules:
+        flows_path: "Verto ramificato — la lunghezza è valutata sul percorso più lungo di un rispondente: %{n} schede su %{total}."
         title: "Regole del gioco"
         score_label: "Punteggio del Verto"
         cards_label: "Schede"

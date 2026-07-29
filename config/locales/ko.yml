@@ -216,6 +216,7 @@ ko:
         duplicate_into: "⧉ 카드를 여기로 복제…"
         duplicate_pick: "복사할 카드 선택"
       rules:
+        flows_path: "분기가 있는 Verto — 길이는 가장 긴 응답 경로로 평가합니다: 전체 %{total}장 중 %{n}장."
         title: "게임의 규칙"
         score_label: "Verto 점수"
         cards_label: "카드"

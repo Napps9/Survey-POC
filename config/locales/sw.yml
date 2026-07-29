@@ -216,6 +216,7 @@ sw:
         duplicate_into: "⧉ Nakili kadi hapa…"
         duplicate_pick: "Chagua kadi ya kunakili"
       rules:
+        flows_path: "Verto yenye matawi — urefu hupimwa kwa njia ndefu zaidi ya mjibu: kadi %{n} kati ya %{total}."
         title: "Kanuni za Mchezo"
         score_label: "Alama ya Verto"
         cards_label: "Kadi"

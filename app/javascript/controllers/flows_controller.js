@@ -61,14 +61,20 @@ export default class extends Controller {
       this.element.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(ownerCid)}"]`)
     if (!ownerWrap) return
 
-    const flow = editor.addFlow({ name: sel.dataset.canonical || "" })
     const ownerSlot = ownerWrap.closest(".card-slot")
     const continuation = this._continuationAfter(ownerSlot)
+    const defSel = editor.logicScopeForCid?.(ownerCid)?.querySelector("[data-logic-default]")
+    // The flow's exit defaults to where the question's OTHER answers go (the
+    // pinned otherwise, else the pre-splice continuation) so sibling flows
+    // spliced side by side converge instead of bleeding into each other
+    // linearly — same capture the flow map's canvas-drop does. The creator
+    // can still pick "Continue in card order" explicitly in the panel.
+    const converge = (defSel?.dataset.logicSelected || "") || continuation
+    const flow = editor.addFlow({ name: sel.dataset.canonical || "", exit: this._decodeTarget(converge) })
     const card = await this._spliceCard({ type: "open_ended", text: "", flow_id: flow.id }, ownerSlot, flow.id)
     if (!card) { editor.removeFlow(flow.id); return }
 
     // Pin the otherwise before the new card becomes the linear fall-through.
-    const defSel = editor.logicScopeForCid?.(ownerCid)?.querySelector("[data-logic-default]")
     if (defSel && !(defSel.dataset.logicSelected || "")) {
       defSel.dataset.logicSelected = continuation
     }
@@ -209,21 +215,23 @@ export default class extends Controller {
       if (!json || !json.ok) throw new Error((json && json.error) || "Generation failed")
       if (token !== this._requestToken) return // modal closed/reopened — drop it
 
-      const flow = editor.addFlow({ name: json.name || (wire ? wire[1] : "") })
       // Splice the generated cards right below the entry question (or at the
       // feed end when unanchored), capturing the pre-splice continuation so
-      // the question's other answers keep their path.
+      // the question's other answers keep their path — and so the flow's
+      // exit converges there instead of bleeding into whatever follows.
       let afterSlot = ownerWrap?.closest(".card-slot") || null
       const continuation = ownerWrap ? this._continuationAfter(afterSlot) : null
+      const defSel = wire ? editor.logicScopeForCid?.(wire[0])?.querySelector("[data-logic-default]") : null
+      const converge = wire ? ((defSel?.dataset.logicSelected || "") || continuation) : null
+      const flow = editor.addFlow({ name: json.name || (wire ? wire[1] : ""), exit: this._decodeTarget(converge) })
       ;(json.cards || []).forEach(item => {
         const card = this._spliceHTML(item.html, afterSlot, flow.id)
         if (card) afterSlot = card.closest(".card-slot")
       })
       if (wire && ownerWrap) {
-        const scope = editor.logicScopeForCid?.(wire[0])
-        const rs = scope?.querySelector(`[data-logic-route][data-canonical="${CSS.escape(wire[1])}"]`)
+        const rs = editor.logicScopeForCid?.(wire[0])
+          ?.querySelector(`[data-logic-route][data-canonical="${CSS.escape(wire[1])}"]`)
         if (rs) rs.dataset.logicSelected = `flow:${flow.id}`
-        const defSel = scope?.querySelector("[data-logic-default]")
         if (defSel && !defSel.dataset.logicSelected && continuation) defSel.dataset.logicSelected = continuation
       }
       editor.refreshAll()
@@ -474,6 +482,16 @@ export default class extends Controller {
       map.get(flowId).push({ label })
     })
     return map
+  }
+
+  // Decode an encoded target ("card:<cid>" | "end:<id>" | "flow:<id>") into
+  // the { card } / { end } / { flow } authoring shape, or null.
+  _decodeTarget(value) {
+    if (!value) return null
+    if (value.startsWith("card:")) return { card: value.slice(5) }
+    if (value.startsWith("end:")) return { end: value.slice(4) }
+    if (value.startsWith("flow:")) return { flow: value.slice(5) }
+    return null
   }
 
   // Where the deck currently continues after `slot` — the next slot's card

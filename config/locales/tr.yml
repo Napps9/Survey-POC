@@ -216,6 +216,7 @@ tr:
         duplicate_into: "⧉ Buraya kart kopyala…"
         duplicate_pick: "Kopyalanacak kartı seç"
       rules:
+        flows_path: "Dallanmış Verto — uzunluk en uzun yanıtlayıcı yoluna göre puanlanır: %{total} karttan %{n} tanesi."
         title: "Oyunun Kuralları"
         score_label: "Verto puanı"
         cards_label: "Kartlar"

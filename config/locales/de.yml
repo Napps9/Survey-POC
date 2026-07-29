@@ -216,6 +216,7 @@ de:
         duplicate_into: "⧉ Karte hierher kopieren…"
         duplicate_pick: "Karte zum Kopieren wählen"
       rules:
+        flows_path: "Verzweigter Verto — die Länge wird am längsten Antwortpfad gemessen: %{n} von %{total} Karten."
         title: "Spielregeln"
         score_label: "Verto-Punktzahl"
         cards_label: "Karten"

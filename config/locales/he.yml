@@ -216,6 +216,7 @@ he:
         duplicate_into: "⧉ שכפול כרטיס לכאן…"
         duplicate_pick: "בחרו כרטיס להעתקה"
       rules:
+        flows_path: "ורטו מסועף — האורך נמדד לפי המסלול הארוך ביותר של משיב: %{n} מתוך %{total} כרטיסים."
         title: "חוקי המשחק"
         score_label: "ציון Verto"
         cards_label: "כרטיסים"

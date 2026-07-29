@@ -216,6 +216,7 @@ id:
         duplicate_into: "⧉ Gandakan kartu ke sini…"
         duplicate_pick: "Pilih kartu untuk disalin"
       rules:
+        flows_path: "Verto bercabang — panjang dinilai dari jalur responden terpanjang: %{n} dari %{total} kartu."
         title: "Aturan Main"
         score_label: "Skor Verto"
         cards_label: "Kartu"

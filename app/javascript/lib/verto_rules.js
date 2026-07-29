@@ -193,16 +193,26 @@ function pageLengthCheck(card) {
 }
 
 // ── Whole-Verto analysis ─────────────────────────────────────────────────
-// `cards` is an ordered array of the same card objects. Returns
-// { score, rating, checks, tally, cardCount, questionCount }.
-export function analyzeVerto(cards) {
+// `cards` is an ordered array of the same card objects — optionally carrying
+// their wiring (cid / logic / next / flow_id) — and `flows` is the deck's
+// first-class flow list. Returns
+// { score, rating, checks, tally, cardCount, questionCount, pathLength }.
+export function analyzeVerto(cards, { flows = [] } = {}) {
   const list = Array.isArray(cards) ? cards : []
   const checks = []
 
   // §1.1 — card count. The scored unit is CARDS (welcome included), per the
-  // Rules of the Game table "12–16 inc. welcome/end".
+  // Rules of the Game table "12–16 inc. welcome/end" — but a BRANCHED Verto
+  // is scored on the longest path one respondent can actually take, not the
+  // flat deck: a 30-card deck split into three regional flows plays as ~14
+  // cards, and punishing that with "trim to 16" would fight the feature. For
+  // a linear deck the path length IS the deck length, so nothing changes.
   const cardCount = list.length
-  checks.push(cardCountCheck(cardCount))
+  const pathLength = longestPathLength(list)
+  checks.push(cardCountCheck(pathLength))
+  if (pathLength < cardCount) {
+    checks.push(check("flows_path", INFO, t("editor.rules.flows_path", { n: pathLength, total: cardCount })))
+  }
 
   // §1.2 — the weighted question count (a Tap card counts as its statements)
   // no longer drives the score, but still informs the pace tip below.
@@ -211,8 +221,11 @@ export function analyzeVerto(cards) {
     return sum + (c.type === "tap_card" ? Math.max(cleanOptions(c).length, 1) : 1)
   }, 0)
 
-  // §1.4 — answer diversity: never more than 2 of a type in a row.
-  checks.push(varietyCheck(list))
+  // §1.4 — answer diversity: never more than 2 of a type in a row. Judged per
+  // GROUP a respondent actually sees in sequence — the main spine and each
+  // flow separately — so a type run that only exists across a flow boundary
+  // (never played back-to-back) isn't punished.
+  checks.push(varietyCheck(list, flows))
 
   // §1.3 — at most one welcome card. Counted by type: a token checkpoint is
   // also a non-question, but it isn't a welcome card.
@@ -233,7 +246,60 @@ export function analyzeVerto(cards) {
   const tally = { green: 0, yellow: 0, red: 0 }
   cardResults.forEach((r) => { tally[r.rating] += 1 })
 
-  return { score, rating: rate(score), checks, tally, cardCount, questionCount }
+  return { score, rating: rate(score), checks, tally, cardCount, questionCount, pathLength }
+}
+
+// ── Branch-aware deck length ─────────────────────────────────────────────
+// Longest path (in cards) a respondent can take over the static routing
+// graph, cycles broken — the JS mirror of LogicGraph.longest_path /
+// edges_from (app/lib/logic_graph.rb); keep the edge rules in lock-step.
+// A linear deck (no logic/next wiring) degenerates to the deck length, and
+// cards no route reaches (a parked/orphaned branch) aren't counted — a
+// respondent never sees them.
+const ROUTABLE = [ "multiple_choice", "yes_no", "scenario" ]
+
+function edgesFrom(cards, i, ci) {
+  const card = cards[i] || {}
+  const outs = []
+  let covered = false // a default / next (card or end) replaces the linear edge
+  const logic = ROUTABLE.includes(card.type) && card.logic && typeof card.logic === "object" ? card.logic : null
+  if (logic) {
+    ;(Array.isArray(logic.routes) ? logic.routes : []).forEach(r => {
+      const to = r && r.to
+      if (to && to.card && ci.has(to.card)) outs.push(ci.get(to.card))
+    })
+    const d = logic.default
+    if (d && (d.card || d.end)) {
+      covered = true
+      if (d.card && ci.has(d.card)) outs.push(ci.get(d.card))
+    }
+  }
+  const nx = card.next
+  if (!covered && nx && (nx.card || nx.end)) {
+    covered = true
+    if (nx.card && ci.has(nx.card)) outs.push(ci.get(nx.card))
+  }
+  if (!covered && i + 1 < cards.length) outs.push(i + 1)
+  return [ ...new Set(outs) ]
+}
+
+function longestPathLength(cards) {
+  if (!cards.length) return 0
+  const ci = new Map()
+  cards.forEach((c, i) => { if (c && c.cid) ci.set(c.cid, i) })
+  const memo = new Map()
+  const visiting = new Set()
+  const dfs = (i) => {
+    if (i == null || i < 0 || i >= cards.length) return 0
+    if (memo.has(i)) return memo.get(i)
+    if (visiting.has(i)) return 0 // break cycle
+    visiting.add(i)
+    const best = Math.max(0, ...edgesFrom(cards, i, ci).map(dfs))
+    visiting.delete(i)
+    memo.set(i, 1 + best)
+    return 1 + best
+  }
+  return dfs(0)
 }
 
 // §1.1 — green 12–16 cards, yellow 8–11, red under 8 or over 16.
@@ -244,13 +310,25 @@ function cardCountCheck(n) {
   return check("c_count", RED, t("editor.rules.ccount_min", { n, min: CARD_MIN }))
 }
 
-function varietyCheck(cards) {
-  const types = cards.filter(isQuestion).map((c) => c.type)
-  let runType = null, runLen = 0, worst = null
-  types.forEach((ty) => {
-    runLen = ty === runType ? runLen + 1 : 1
-    runType = ty
-    if (runLen > RUN_MAX && (!worst || runLen > worst.len)) worst = { type: ty, len: runLen }
+function varietyCheck(cards, flows = []) {
+  // One sequence per thing a respondent plays straight through: the main
+  // spine (cards in no flow), then each flow's members. Without flows this
+  // is just the flat deck, exactly as before.
+  const flowIds = (Array.isArray(flows) ? flows : []).map((f) => f && f.id).filter(Boolean)
+  const groups = flowIds.length
+    ? [ cards.filter((c) => !c || !flowIds.includes(c.flow_id)),
+        ...flowIds.map((id) => cards.filter((c) => c && c.flow_id === id)) ]
+    : [ cards ]
+
+  let worst = null
+  groups.forEach((group) => {
+    const types = group.filter(isQuestion).map((c) => c.type)
+    let runType = null, runLen = 0
+    types.forEach((ty) => {
+      runLen = ty === runType ? runLen + 1 : 1
+      runType = ty
+      if (runLen > RUN_MAX && (!worst || runLen > worst.len)) worst = { type: ty, len: runLen }
+    })
   })
   return worst
     ? check("variety", RED, t("editor.rules.variety_run", { type: typeLabel(worst.type), n: worst.len }))

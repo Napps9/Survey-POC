@@ -216,6 +216,7 @@ ar:
         duplicate_into: "⧉ نسخ بطاقة إلى هنا…"
         duplicate_pick: "اختر بطاقة لنسخها"
       rules:
+        flows_path: "فيرتو متفرّع — يُحتسب الطول على أطول مسار للمجيب: %{n} من %{total} بطاقة."
         title: "قواعد اللعبة"
         score_label: "نتيجة Verto"
         cards_label: "البطاقات"

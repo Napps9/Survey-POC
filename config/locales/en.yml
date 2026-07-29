@@ -219,6 +219,7 @@ en:
         duplicate_pick: "Pick a card to copy"
       rules:
         title: "Rules of the Game"
+        flows_path: "Branched Verto — length is scored on the longest respondent path: %{n} of %{total} cards."
         score_label: "Verto score"
         cards_label: "Cards"
         card_aria: "How this card scores against the Rules of the Game"

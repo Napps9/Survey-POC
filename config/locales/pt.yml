@@ -216,6 +216,7 @@ pt:
         duplicate_into: "⧉ Duplicar um cartão para aqui…"
         duplicate_pick: "Escolha um cartão para copiar"
       rules:
+        flows_path: "Verto ramificado — o comprimento é avaliado pelo caminho mais longo do respondente: %{n} de %{total} cartões."
         title: "Regras do jogo"
         score_label: "Pontuação do Verto"
         cards_label: "Cartões"
