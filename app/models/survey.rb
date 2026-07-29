@@ -350,6 +350,13 @@ class Survey < ApplicationRecord
         c["lane_label"] = c["lane_label"].to_s.strip.first(MAX_LANE_LABEL).presence
         c.delete("lane_label") if c["lane_label"].blank?
       end
+      # First-class flow membership — an opaque flow id in the same format
+      # sanitize_flows mints, or nothing. Whether the id names a REAL flow is
+      # cross-checked in reconcile_flows! (it needs the flows list too).
+      if c.key?("flow_id")
+        fid = c["flow_id"].to_s.strip
+        fid.match?(FLOW_ID_FORMAT) ? c["flow_id"] = fid : c.delete("flow_id")
+      end
       # A range card's reaction-animation theme — only a known slug survives, and
       # only on a range card, so the helper always resolves to a real asset
       # folder (NpsHelper owns the theme list).
@@ -512,13 +519,19 @@ class Survey < ApplicationRecord
   # cids are regenerated and every branching route/default rewritten old→new,
   # so the copy's routes point at the COPY's cards, never the original's.
   def duplicate!
+    # Cards and flows must be remapped with the SAME cid map: a flow's exit can
+    # point at a card, and the copy's exit has to follow the copy's fresh cid.
+    dup_cards = JSON.parse(cards.to_json)
+    dup_flows = JSON.parse(flows_list.to_json)
+    self.class.remap_card_logic!(dup_cards, dup_flows)
     organisation.surveys.create!(
       title:                   self.class.append_copy_suffix(title),
       description:             description,
       theme:                   self.class.append_copy_suffix(theme),
       audience_age:            audience_age,
       key_insight:             key_insight,
-      cards:                   self.class.remap_card_logic!(JSON.parse(cards.to_json)),
+      cards:                   dup_cards,
+      flows:                   dup_flows,
       brand_palette:           read_attribute(:brand_palette),
       background_image:        background_image,
       default_locale:          default_locale,
@@ -545,8 +558,11 @@ class Survey < ApplicationRecord
   # default) from the old cid to the new one, so a duplicated deck's routes
   # stay internally consistent. Targets whose old cid isn't in the deck (an
   # unexpected dangling route) are left as-is; the player fails them safe to
-  # the linear next card. Mutates and returns `cards`.
-  def self.remap_card_logic!(cards)
+  # the linear next card. Pass the deck's flows too and each flow's card exit
+  # is rewritten through the same map (flow ids themselves are survey-scoped,
+  # so they and the cards' flow_id memberships copy verbatim). Mutates and
+  # returns `cards`.
+  def self.remap_card_logic!(cards, flows = nil)
     cards  = Array(cards)
     id_map = {}
     used   = Set.new
@@ -568,6 +584,7 @@ class Survey < ApplicationRecord
       end
       remap_logic_target!(card["next"], id_map) # the unconditional flow pointer
     end
+    Array(flows).each { |f| remap_logic_target!(f["exit"], id_map) if f.is_a?(Hash) }
     cards
   end
 
@@ -666,6 +683,61 @@ class Survey < ApplicationRecord
         "forward_label" => entry["forward_label"].to_s.strip.first(MAX_END_LABEL).presence
       }.compact
     end.first(MAX_END_SCREENS)
+  end
+
+  # ── Flows (first-class named branches) ────────────────────────────────────
+  # A flow is a named, coloured group of cards a routed answer can enter (e.g.
+  # UK / UAE / USA regional question sets). Membership rides on each card as
+  # `flow_id` (allowlisted in sanitize_cards_images!); this array holds only
+  # the authoring metadata. FlowCompiler compiles membership + exit down to the
+  # per-card `next` pointers the player already resolves, so play-time
+  # semantics don't change. Flows supersede the flow map's older `lane_label`
+  # (which remains as a read-only fallback for hand-wired decks).
+  MAX_FLOWS      = 12
+  MAX_FLOW_NAME  = MAX_LANE_LABEL
+  # An opaque `f_`-prefixed token. Server/client mint hex, but any bounded
+  # DOM/JSON-safe id is accepted (readable ids like "f_uk" are fine — cids
+  # aren't format-constrained either, and the id never renders as copy).
+  FLOW_ID_FORMAT = /\Af_[a-z0-9_-]{1,24}\z/i
+  # Mirrors the flow map's LANE_PALETTE (logic_map_controller.js) so stored
+  # flow colours match what the map already paints for derived lanes.
+  FLOW_COLORS = %w[#8B85FF #01EACB #F59E0B #F472B6 #38BDF8 #A3E635].freeze
+
+  def flows_list
+    Array(read_attribute(:flows))
+  end
+
+  # Coerce creator-submitted flows into a safe, bounded array: opaque `f_` ids
+  # (backfilled and de-duped like card cids), bounded plain-text name, a colour
+  # from a fixed shape, and a single-key exit target or none. Same
+  # allowlist-or-drop posture as sanitize_end_screens above.
+  def self.sanitize_flows(value)
+    seen = Set.new
+    Array(value).each_with_index.filter_map do |entry, i|
+      next unless entry.is_a?(Hash)
+      id = entry["id"].to_s.strip
+      id = nil unless id.match?(FLOW_ID_FORMAT)
+      id = "f_#{SecureRandom.hex(4)}" while id.blank? || seen.include?(id)
+      seen << id
+      name  = entry["name"].to_s.strip.first(MAX_FLOW_NAME).presence || "Flow #{i + 1}"
+      color = entry["color"].to_s.match?(/\A#\h{6}\z/) ? entry["color"] : FLOW_COLORS[i % FLOW_COLORS.size]
+      out = { "id" => id, "name" => name, "color" => color }
+      exit_target = FlowCompiler.valid_exit(entry["exit"])
+      out["exit"] = exit_target if exit_target
+      out
+    end.first(MAX_FLOWS)
+  end
+
+  # Cross-field cleanup: a card can only claim membership of a flow that
+  # exists. Needs both sides of the pair, so it can't live inside
+  # sanitize_cards_images! (cards-only) or sanitize_flows (flows-only).
+  # Mutates and returns `cards`.
+  def self.reconcile_flows!(cards, flows)
+    known = Array(flows).filter_map { |f| f["id"] if f.is_a?(Hash) }.to_set
+    Array(cards).each do |c|
+      c.delete("flow_id") if c.is_a?(Hash) && c.key?("flow_id") && !known.include?(c["flow_id"])
+    end
+    cards
   end
 
   # When set, respondents must agree to this text before the first card.

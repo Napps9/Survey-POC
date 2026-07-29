@@ -57,6 +57,32 @@ class SurveyDuplicateTest < ActionDispatch::IntegrationTest
     assert_equal copy.cards.second["cid"], copy.cards.first.dig("logic", "default", "card")
   end
 
+  test "duplicating copies flows and remaps a flow's card exit to the copy's cids" do
+    cards = [
+      { "type" => "multiple_choice", "cid" => "c_hub", "text" => "Region?", "options" => %w[UK Other],
+        "logic" => { "routes" => [
+          { "match" => { "op" => "equals", "value" => "UK" }, "to" => { "card" => "c_uk1" } }
+        ] } },
+      { "type" => "open_ended", "cid" => "c_uk1", "text" => "UK Q", "flow_id" => "f_uk", "next" => { "card" => "c_tail" } },
+      { "type" => "open_ended", "cid" => "c_tail", "text" => "Tail" }
+    ]
+    flows = [ { "id" => "f_uk", "name" => "UK", "color" => "#8B85FF", "exit" => { "card" => "c_tail" } } ]
+    original = @org.surveys.create!(title: "T", theme: "Theme", audience_age: "all", key_insight: "k",
+                                     default_locale: "en", locales: [ "en" ], logic: true,
+                                     cards: cards, flows: flows)
+
+    post duplicate_survey_path(original)
+    copy = @org.surveys.order(:id).last
+
+    assert_equal 1, copy.flows_list.size
+    flow = copy.flows_list.first
+    assert_equal %w[f_uk UK], [ flow["id"], flow["name"] ], "flow identity copies verbatim (survey-scoped ids)"
+    assert_equal "f_uk", copy.cards.second["flow_id"], "membership copies verbatim"
+    # The exit points at the COPY's tail card, which has a fresh cid.
+    assert_equal copy.cards.third["cid"], flow.dig("exit", "card")
+    refute_equal "c_tail", flow.dig("exit", "card")
+  end
+
   test "duplicating a live Verto lands the copy in Drafts" do
     live = @org.surveys.create!(title: "Live", theme: "Live", audience_age: "all", key_insight: "k",
                                  default_locale: "en", locales: [ "en" ], cards: CARDS.map(&:dup),

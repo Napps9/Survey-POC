@@ -270,10 +270,24 @@ class SurveysController < ApplicationController
     attrs = {}
     attrs[:title]       = payload["title"]       if payload.key?("title")
     attrs[:description] = payload["description"] if payload.key?("description")
+    attrs[:flows]       = Survey.sanitize_flows(payload["flows"]) if payload.key?("flows")
     if payload.key?("cards")
-      attrs[:cards]                          = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings)
+      attrs[:cards] = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings)
+      # First-class flows compile down to the per-card `next` pointers the
+      # player resolves (see FlowCompiler). Run on every save so the STORED
+      # deck can never disagree with the stored flows, whatever the client
+      # sent — the editor's client-side compile is only a preview of this.
+      flows_now = attrs.key?(:flows) ? attrs[:flows] : survey.flows_list
+      Survey.reconcile_flows!(attrs[:cards], flows_now)
+      FlowCompiler.compile!(attrs[:cards], flows_now)
       attrs[:results_summary]                = nil
       attrs[:results_summary_response_count] = nil
+    elsif attrs.key?(:flows)
+      # Flows changed without cards (the editor always sends both, but the
+      # invariant shouldn't depend on that): recompile the stored deck so
+      # member chains and exits stay consistent with the new flows.
+      cards = JSON.parse(Array(survey.cards).to_json)
+      attrs[:cards] = FlowCompiler.compile!(Survey.reconcile_flows!(cards, attrs[:flows]), attrs[:flows])
     end
     attrs[:brand_palette] = BrandPalette.sanitize(payload["brand_palette"]).presence if payload.key?("brand_palette")
     if payload.key?("background_image")
