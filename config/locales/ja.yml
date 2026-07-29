@@ -215,8 +215,6 @@ ja:
         generate_failed: "生成できませんでした:%{msg}"
         duplicate_into: "⧉ カードをここに複製…"
         duplicate_pick: "コピーするカードを選択"
-        prev_flow: "前のフロー"
-        next_flow: "次のフロー"
       rules:
         flows_path: "分岐ありのVerto — 長さは回答者の最長経路で評価します:全%{total}枚中%{n}枚。"
         title: "ゲームのルール"

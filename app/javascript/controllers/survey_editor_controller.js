@@ -1211,15 +1211,16 @@ export default class extends Controller {
   }
 
   // Paint flow identity onto the feed: a coloured rail on member slots (via
-  // --flow-color) and, per contiguous stretch of flow cards, either a simple
-  // header row (one flow) or a swipeable CLUSTER BAR (several sibling flows —
-  // UK | UAE | USA). In a cluster only the active flow's slots are shown; the
-  // tabs and ‹ › switch flows, landing on the SAME card position in the next
-  // flow so "flow 1 card 3 → flow 3 card 3" is one tap (see _switchFlow).
-  // Presentation only — membership lives on the wraps, and hidden slots still
-  // serialize/compile exactly like visible ones.
+  // --flow-color) and, per contiguous stretch of flow cards, a row of header
+  // pills — one pill when a single flow sits there, one pill PER FLOW when
+  // sibling flows do (UK | UAE | USA). With siblings, only the active pill's
+  // flow is shown; tapping another pill (or swiping the row) switches flows,
+  // landing on the SAME card position in the next flow so "flow 1 card 3 →
+  // flow 3 card 3" is one tap (see _switchFlow). Presentation only —
+  // membership lives on the wraps, and hidden slots still serialize/compile
+  // exactly like visible ones.
   _paintFlowChrome() {
-    this.element.querySelectorAll(".flow-header-row, .flow-cluster-bar").forEach(el => el.remove())
+    this.element.querySelectorAll(".flow-header-row, .flow-tabs-row").forEach(el => el.remove())
     const flowsById = new Map(this.flowsList().map(f => [ f.id, f ]))
     const counts = new Map()
     this.cardTargets.forEach(c => {
@@ -1273,64 +1274,50 @@ export default class extends Controller {
       if (!cl.flowOrder.some(f => f.id === active)) active = cl.flowOrder[0].id
       this._activeFlowTabs.set(key, active)
       cl.slots.forEach(e => e.slot.classList.toggle("flow-hidden", e.flow.id !== active))
-      first.before(this._flowClusterBar(cl, key, active, counts))
+      first.before(this._flowTabsRow(cl, key, active, counts))
     })
   }
 
-  // The tab strip above a multi-flow cluster: ‹ [● UK 3] [● UAE 3] [● USA 3] ›.
-  _flowClusterBar(cluster, key, activeId, counts) {
-    const bar = document.createElement("div")
-    bar.className = "flow-cluster-bar"
+  // Sibling-flow pills above a multi-flow stretch: [● UK 3] [● UAE 3] [● USA 3]
+  // — the same little header pill each flow already gets on its own, just one
+  // per flow, active lit and siblings ghosted. No extra chrome: the pills ARE
+  // the switcher (tap one, or swipe across the row).
+  _flowTabsRow(cluster, key, activeId, counts) {
+    const row = document.createElement("div")
+    row.className = "flow-tabs-row"
+    row.setAttribute("role", "tablist")
     const ids = cluster.flowOrder.map(f => f.id)
-    const cycle = (dir) => {
-      const i = ids.indexOf(this._activeFlowTabs.get(key) || activeId)
-      this._switchFlow(key, ids[(i + dir + ids.length) % ids.length])
-    }
-    const arrow = (glyph, dir, label) => {
-      const btn = document.createElement("button")
-      btn.type = "button"
-      btn.className = "flow-arrow-btn"
-      btn.textContent = glyph
-      btn.setAttribute("aria-label", label)
-      btn.title = label
-      btn.addEventListener("click", () => cycle(dir))
-      return btn
-    }
-    bar.appendChild(arrow("‹", -1, t("editor.flows.prev_flow")))
-    const tabs = document.createElement("div")
-    tabs.className = "flow-cluster-tabs"
-    tabs.setAttribute("role", "tablist")
     cluster.flowOrder.forEach(flow => {
-      const tab = document.createElement("button")
-      tab.type = "button"
-      tab.className = "flow-tab"
-      tab.setAttribute("role", "tab")
-      tab.setAttribute("aria-selected", String(flow.id === activeId))
-      tab.classList.toggle("is-active", flow.id === activeId)
-      tab.style.setProperty("--flow-color", flow.color)
+      const pill = document.createElement("button")
+      pill.type = "button"
+      pill.className = "flow-header-row flow-tab-pill"
+      pill.setAttribute("role", "tab")
+      pill.setAttribute("aria-selected", String(flow.id === activeId))
+      pill.classList.toggle("is-active", flow.id === activeId)
+      pill.style.setProperty("--flow-color", flow.color)
       const dot = document.createElement("span")
       dot.className = "flow-header-dot"
       dot.setAttribute("aria-hidden", "true")
       const name = document.createElement("span")
-      name.className = "flow-tab-name"
+      name.className = "flow-header-name"
       name.textContent = flow.name
       const count = document.createElement("span")
       count.className = "flow-header-count"
       count.textContent = t("editor.flows.header_count", { count: counts.get(flow.id) || 0 })
-      tab.append(dot, name, count)
-      tab.addEventListener("click", () => this._switchFlow(key, flow.id))
-      tabs.appendChild(tab)
+      pill.append(dot, name, count)
+      pill.addEventListener("click", () => this._switchFlow(key, flow.id))
+      row.appendChild(pill)
     })
-    bar.appendChild(tabs)
-    bar.appendChild(arrow("›", 1, t("editor.flows.next_flow")))
-    // Touch swipe on the bar mirrors the arrows.
-    bar.addEventListener("pointerdown", (e) => { this._flowSwipeX = e.clientX })
-    bar.addEventListener("pointerup", (e) => {
+    // Swiping across the row steps to the neighbouring flow.
+    row.addEventListener("pointerdown", (e) => { this._flowSwipeX = e.clientX })
+    row.addEventListener("pointerup", (e) => {
       const dx = e.clientX - (this._flowSwipeX ?? e.clientX)
-      if (Math.abs(dx) > 48) cycle(dx < 0 ? 1 : -1)
       this._flowSwipeX = null
+      if (Math.abs(dx) < 48) return
+      const i = ids.indexOf(this._activeFlowTabs.get(key) || activeId)
+      this._switchFlow(key, ids[(i + (dx < 0 ? 1 : -1) + ids.length) % ids.length])
     })
-    return bar
+    return row
   }
 
   // Switch a cluster to another flow, preserving CARD POSITION: whatever

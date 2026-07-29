@@ -215,8 +215,6 @@ nl:
         generate_failed: "Genereren mislukt: %{msg}"
         duplicate_into: "⧉ Kaart hierheen dupliceren…"
         duplicate_pick: "Kies een kaart om te kopiëren"
-        prev_flow: "Vorige flow"
-        next_flow: "Volgende flow"
       rules:
         flows_path: "Vertakte Verto — de lengte wordt beoordeeld op het langste pad van een respondent: %{n} van %{total} kaarten."
         title: "Spelregels"

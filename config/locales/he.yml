@@ -215,8 +215,6 @@ he:
         generate_failed: "היצירה נכשלה: %{msg}"
         duplicate_into: "⧉ שכפול כרטיס לכאן…"
         duplicate_pick: "בחרו כרטיס להעתקה"
-        prev_flow: "המסלול הקודם"
-        next_flow: "המסלול הבא"
       rules:
         flows_path: "ורטו מסועף — האורך נמדד לפי המסלול הארוך ביותר של משיב: %{n} מתוך %{total} כרטיסים."
         title: "חוקי המשחק"

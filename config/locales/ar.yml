@@ -215,8 +215,6 @@ ar:
         generate_failed: "تعذّر التوليد: %{msg}"
         duplicate_into: "⧉ نسخ بطاقة إلى هنا…"
         duplicate_pick: "اختر بطاقة لنسخها"
-        prev_flow: "المسار السابق"
-        next_flow: "المسار التالي"
       rules:
         flows_path: "فيرتو متفرّع — يُحتسب الطول على أطول مسار للمجيب: %{n} من %{total} بطاقة."
         title: "قواعد اللعبة"

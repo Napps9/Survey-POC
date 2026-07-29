@@ -215,8 +215,6 @@ pl:
         generate_failed: "Nie udało się wygenerować: %{msg}"
         duplicate_into: "⧉ Powiel kartę tutaj…"
         duplicate_pick: "Wybierz kartę do skopiowania"
-        prev_flow: "Poprzedni przepływ"
-        next_flow: "Następny przepływ"
       rules:
         flows_path: "Rozgałęziony Verto — długość oceniana jest po najdłuższej ścieżce respondenta: %{n} z %{total} kart."
         title: "Zasady gry"

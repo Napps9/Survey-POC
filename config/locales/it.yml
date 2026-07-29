@@ -215,8 +215,6 @@ it:
         generate_failed: "Generazione non riuscita: %{msg}"
         duplicate_into: "⧉ Duplica una scheda qui…"
         duplicate_pick: "Scegli una scheda da copiare"
-        prev_flow: "Flusso precedente"
-        next_flow: "Flusso successivo"
       rules:
         flows_path: "Verto ramificato — la lunghezza è valutata sul percorso più lungo di un rispondente: %{n} schede su %{total}."
         title: "Regole del gioco"

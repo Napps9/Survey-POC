@@ -215,8 +215,6 @@ es:
         generate_failed: "No se pudo generar: %{msg}"
         duplicate_into: "⧉ Duplicar una tarjeta aquí…"
         duplicate_pick: "Elige una tarjeta para copiar"
-        prev_flow: "Flujo anterior"
-        next_flow: "Flujo siguiente"
       rules:
         flows_path: "Verto ramificado: la longitud se puntúa sobre la ruta de respuesta más larga: %{n} de %{total} tarjetas."
         title: "Reglas del juego"

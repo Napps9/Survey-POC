@@ -217,8 +217,6 @@ en:
         generate_failed: "Couldn't generate: %{msg}"
         duplicate_into: "⧉ Duplicate a card in…"
         duplicate_pick: "Pick a card to copy"
-        prev_flow: "Previous flow"
-        next_flow: "Next flow"
       rules:
         title: "Rules of the Game"
         flows_path: "Branched Verto — length is scored on the longest respondent path: %{n} of %{total} cards."

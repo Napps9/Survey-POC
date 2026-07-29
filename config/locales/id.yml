@@ -215,8 +215,6 @@ id:
         generate_failed: "Gagal membuat: %{msg}"
         duplicate_into: "⧉ Gandakan kartu ke sini…"
         duplicate_pick: "Pilih kartu untuk disalin"
-        prev_flow: "Alur sebelumnya"
-        next_flow: "Alur berikutnya"
       rules:
         flows_path: "Verto bercabang — panjang dinilai dari jalur responden terpanjang: %{n} dari %{total} kartu."
         title: "Aturan Main"
