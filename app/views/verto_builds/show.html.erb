@@ -22,11 +22,15 @@
 
   <%= render layout: "shared/generating_stage" do %>
     <%# Only shown if polling itself breaks — the build keeps running on the
-        server regardless, so the copy points at a reload rather than a retry. %>
+        server regardless, so the copy points at a reload rather than a retry.
+        The dashboard is a real link here because this screen carries no top
+        nav: if polling has broken, this is the only way out of the page. %>
     <div class="hidden" data-verto-build-target="stalled"
          style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.5);text-align:center;max-width:520px;line-height:1.5;">
       Still working. This page will update on its own — you can also reload it,
-      or come back to it later from your dashboard.
+      or come back to it later from
+      <%= link_to "your dashboard", root_path,
+            style: "color:rgba(255,255,255,0.75);text-decoration:underline;text-underline-offset:3px;" %>.
     </div>
   <% end %>
 </div>

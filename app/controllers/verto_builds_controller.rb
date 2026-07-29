@@ -20,6 +20,13 @@ class VertoBuildsController < ApplicationController
         return redirect_to(finished_path(build)) if build.succeeded? && finished_path(build)
         return redirect_to new_survey_path, alert: build_failure_message(build) if build.failed?
 
+        # No top nav on the wait screen. The wizard's overlay already hides it
+        # (body.generating-overlay-active) and the editor this forwards to hides
+        # it too, so leaving it here made the bar blink back for the duration of
+        # the build — the one seam in an otherwise continuous handoff. Dropping
+        # it also lifts the layout's 56px offset, so the stage is truly
+        # full-bleed rather than 56px short of it.
+        @hide_main_nav = true
         @build = build
         render :show
       end
