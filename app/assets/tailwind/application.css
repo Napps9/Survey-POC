@@ -1009,12 +1009,16 @@
    (same 4px inset), so the centre column stays clear of the floating pills. */
 .aq-insert-row { display: flex; justify-content: flex-end; padding: 0 4px; }
 /* One sits under every card. Solid teal so it's always easy to spot as the
-   primary "add another question" action. */
+   primary "add another question" action. Sized to match .card-delete-btn
+   exactly (padding/type/radius/border) — the two mirror each other across
+   the card, so they should read as the same family of control. */
 .aq-insert-btn {
-  padding: 8px 18px; font-size: var(--text-base); font-weight: 600;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 14px; border-radius: 100px;
+  font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em;
   opacity: 1;
   background: #01EACB;
-  border-color: #01EACB;
+  border: 1.5px solid #01EACB;
   color: #04221E;
   transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
