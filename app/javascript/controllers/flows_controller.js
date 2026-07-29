@@ -114,6 +114,7 @@ export default class extends Controller {
     if (!card) return null
     editor.refreshAll()
     editor.markDirty()
+    editor.focusFlowForCard(card) // reveal if its cluster shows another flow
     card.scrollIntoView({ behavior: "smooth", block: "nearest" })
     return card
   }
@@ -321,6 +322,7 @@ export default class extends Controller {
       const actions = document.createElement("div")
       actions.className = "flow-card-actions"
       if (members.length) actions.appendChild(this._actionBtn(t("editor.flows.jump"), () => {
+        this._editor()?.focusFlowForCard(members[0]) // reveal if tabbed away
         members[0].scrollIntoView({ behavior: "smooth", block: "center" })
       }))
       actions.appendChild(this._actionBtn(t("editor.flows.add_card"), () => this.addCardToFlow(flow.id)))
@@ -515,6 +517,7 @@ export default class extends Controller {
     if (!card) return
     editor.refreshAll()
     editor.markDirty()
+    editor.focusFlowForCard(card) // reveal if its cluster shows another flow
     card.scrollIntoView({ behavior: "smooth", block: "center" })
   }
 

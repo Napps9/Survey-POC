@@ -215,6 +215,8 @@ tr:
         generate_failed: "Oluşturulamadı: %{msg}"
         duplicate_into: "⧉ Buraya kart kopyala…"
         duplicate_pick: "Kopyalanacak kartı seç"
+        prev_flow: "Önceki akış"
+        next_flow: "Sonraki akış"
       rules:
         flows_path: "Dallanmış Verto — uzunluk en uzun yanıtlayıcı yoluna göre puanlanır: %{total} karttan %{n} tanesi."
         title: "Oyunun Kuralları"

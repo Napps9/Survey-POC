@@ -215,6 +215,8 @@ hi:
         generate_failed: "बनाया नहीं जा सका: %{msg}"
         duplicate_into: "⧉ यहाँ कार्ड की कॉपी बनाएँ…"
         duplicate_pick: "कॉपी करने के लिए कार्ड चुनें"
+        prev_flow: "पिछला फ़्लो"
+        next_flow: "अगला फ़्लो"
       rules:
         flows_path: "शाखाओं वाला Verto — लंबाई सबसे लंबे उत्तरदाता पथ पर आँकी जाती है: %{total} में से %{n} कार्ड।"
         title: "खेल के नियम"

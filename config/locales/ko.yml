@@ -215,6 +215,8 @@ ko:
         generate_failed: "생성 실패: %{msg}"
         duplicate_into: "⧉ 카드를 여기로 복제…"
         duplicate_pick: "복사할 카드 선택"
+        prev_flow: "이전 플로우"
+        next_flow: "다음 플로우"
       rules:
         flows_path: "분기가 있는 Verto — 길이는 가장 긴 응답 경로로 평가합니다: 전체 %{total}장 중 %{n}장."
         title: "게임의 규칙"

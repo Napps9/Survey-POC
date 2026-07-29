@@ -45,6 +45,8 @@ export default class extends Controller {
     this._activeLocale = this.defaultLocaleValue
     this._eyebrows = this._loadEyebrows()
     this._flows = JSON.parse(JSON.stringify(this.flowsValue || []))
+    // Which flow each multi-flow cluster is showing (cluster key → flow id).
+    this._activeFlowTabs = new Map()
     this._seedStore()
     this.refreshAll()
 
@@ -253,10 +255,11 @@ export default class extends Controller {
     event.stopPropagation()
     const card = event.currentTarget.closest("[data-survey-editor-target='card']")
     const slot = card?.closest(".card-slot")
-    const prevSlot = this._prevCardSlot(slot)
-    const prevCard = prevSlot?.querySelector("[data-survey-editor-target='card']")
-    if (!slot || !prevSlot || !prevCard || prevCard.dataset.cardType === "welcome_card") return
-    prevSlot.before(slot)
+    const hit = this._reorderNeighbor(card, slot, -1)
+    const prevCard = hit?.slot.querySelector("[data-survey-editor-target='card']")
+    if (!slot || !hit || !prevCard || prevCard.dataset.cardType === "welcome_card") return
+    if (hit.hopped) hit.slot.after(slot)   // hopped a flow run ⇒ land just after it
+    else hit.slot.before(slot)
     this._afterReorder(card)
   }
 
@@ -264,24 +267,34 @@ export default class extends Controller {
     event.stopPropagation()
     const card = event.currentTarget.closest("[data-survey-editor-target='card']")
     const slot = card?.closest(".card-slot")
-    const nextSlot = this._nextCardSlot(slot)
-    if (!slot || !nextSlot) return
-    nextSlot.after(slot)
+    const hit = this._reorderNeighbor(card, slot, 1)
+    if (!slot || !hit) return
+    if (hit.hopped) hit.slot.before(slot)  // hopped a flow run ⇒ land just before it
+    else hit.slot.after(slot)
     this._afterReorder(card)
   }
 
-  // The neighbouring .card-slot, hopping any .flow-header-row chrome the flow
-  // painter inserts between slots (the only non-slot siblings in the feed).
-  _prevCardSlot(slot) {
-    let el = slot?.previousElementSibling
-    while (el && !el.classList.contains("card-slot")) el = el.previousElementSibling
-    return el
-  }
-
-  _nextCardSlot(slot) {
-    let el = slot?.nextElementSibling
-    while (el && !el.classList.contains("card-slot")) el = el.nextElementSibling
-    return el
+  // The slot a reorder should swap with, respecting flows: a flow member only
+  // reorders WITHIN its flow (order inside a flow is meaning — the compiled
+  // chain — so it never drifts out by nudging), and a spine card hops a whole
+  // flow run as one unit instead of burrowing into it. Walks over the flow
+  // painter's header/cluster chrome. Returns { slot, hopped } or null at a
+  // boundary; `hopped` = flow-member slots were skipped on the way.
+  _reorderNeighbor(card, slot, dir) {
+    if (!card || !slot) return null
+    const moverFlow = card.dataset.cardFlowId || null
+    let el = dir < 0 ? slot.previousElementSibling : slot.nextElementSibling
+    let hopped = false
+    while (el) {
+      if (el.classList.contains("card-slot")) {
+        const otherFlow = el.querySelector("[data-survey-editor-target='card']")?.dataset.cardFlowId || null
+        if (moverFlow) return otherFlow === moverFlow ? { slot: el, hopped: false } : null
+        if (!otherFlow) return { slot: el, hopped }
+        hopped = true // spine mover: skip the flow run and keep walking
+      }
+      el = dir < 0 ? el.previousElementSibling : el.nextElementSibling
+    }
+    return null
   }
 
   _afterReorder(card) {
@@ -328,11 +341,12 @@ export default class extends Controller {
       const up   = card.querySelector("[data-role='move-up']")
       const down = card.querySelector("[data-role='move-down']")
       if (up) {
-        const prevCard = this._prevCardSlot(slot)?.querySelector("[data-survey-editor-target='card']")
+        const prevCard = this._reorderNeighbor(card, slot, -1)?.slot
+          .querySelector("[data-survey-editor-target='card']")
         up.disabled = !prevCard || prevCard.dataset.cardType === "welcome_card"
       }
       if (down) {
-        down.disabled = !this._nextCardSlot(slot)
+        down.disabled = !this._reorderNeighbor(card, slot, 1)
       }
     })
   }
@@ -588,6 +602,7 @@ export default class extends Controller {
     const num = event.currentTarget.dataset.cardNum
     const card = this.cardTargets.find(c => c.dataset.cardNum === num)
     if (!card) return
+    this.focusFlowForCard(card) // reveal it if its flow is tabbed away
     card.scrollIntoView({ behavior: "smooth", block: "center" })
     card.classList.remove("card-flash")
     void card.offsetWidth // restart the animation if the card was just pulsed
@@ -1196,34 +1211,176 @@ export default class extends Controller {
   }
 
   // Paint flow identity onto the feed: a coloured rail on member slots (via
-  // --flow-color) and a lightweight header row before each contiguous run of
-  // members. Presentation only — membership lives on the wraps; a run split
-  // by a reorder simply renders a second header for the same flow.
+  // --flow-color) and, per contiguous stretch of flow cards, either a simple
+  // header row (one flow) or a swipeable CLUSTER BAR (several sibling flows —
+  // UK | UAE | USA). In a cluster only the active flow's slots are shown; the
+  // tabs and ‹ › switch flows, landing on the SAME card position in the next
+  // flow so "flow 1 card 3 → flow 3 card 3" is one tap (see _switchFlow).
+  // Presentation only — membership lives on the wraps, and hidden slots still
+  // serialize/compile exactly like visible ones.
   _paintFlowChrome() {
-    this.element.querySelectorAll(".flow-header-row").forEach(el => el.remove())
+    this.element.querySelectorAll(".flow-header-row, .flow-cluster-bar").forEach(el => el.remove())
     const flowsById = new Map(this.flowsList().map(f => [ f.id, f ]))
     const counts = new Map()
     this.cardTargets.forEach(c => {
       const fid = c.dataset.cardFlowId
       if (fid && flowsById.has(fid)) counts.set(fid, (counts.get(fid) || 0) + 1)
     })
-    let prevFlowId = null
+
+    // Rails + collect the member run structure in document order.
+    const entries = []
     this.cardTargets.forEach(card => {
       const slot = card.closest(".card-slot")
       if (!slot) return
+      slot.classList.remove("flow-hidden")
       const flow = flowsById.get(card.dataset.cardFlowId)
       if (flow) {
         slot.dataset.flowId = flow.id
         slot.style.setProperty("--flow-color", flow.color)
         slot.classList.add("in-flow")
-        if (prevFlowId !== flow.id) slot.before(this._flowHeaderRow(flow, counts.get(flow.id) || 0))
       } else {
         delete slot.dataset.flowId
         slot.style.removeProperty("--flow-color")
         slot.classList.remove("in-flow")
       }
-      prevFlowId = flow ? flow.id : null
+      entries.push({ slot, flow })
     })
+
+    // Clusters: maximal consecutive stretches of flow slots (any flows).
+    let cluster = null
+    const clusters = []
+    entries.forEach(e => {
+      if (e.flow) {
+        if (!cluster) { cluster = { slots: [], flowOrder: [] }; clusters.push(cluster) }
+        cluster.slots.push(e)
+        if (!cluster.flowOrder.includes(e.flow)) cluster.flowOrder.push(e.flow)
+      } else {
+        cluster = null
+      }
+    })
+
+    clusters.forEach(cl => {
+      const first = cl.slots[0].slot
+      if (cl.flowOrder.length === 1) {
+        const flow = cl.flowOrder[0]
+        first.before(this._flowHeaderRow(flow, counts.get(flow.id) || 0))
+        return
+      }
+      // Multi-flow cluster: show the remembered tab (jumps into a hidden
+      // flow go through focusFlowForCard, which updates the memory first).
+      const key = cl.flowOrder.map(f => f.id).sort().join("|")
+      let active = this._activeFlowTabs.get(key)
+      if (!cl.flowOrder.some(f => f.id === active)) active = cl.flowOrder[0].id
+      this._activeFlowTabs.set(key, active)
+      cl.slots.forEach(e => e.slot.classList.toggle("flow-hidden", e.flow.id !== active))
+      first.before(this._flowClusterBar(cl, key, active, counts))
+    })
+  }
+
+  // The tab strip above a multi-flow cluster: ‹ [● UK 3] [● UAE 3] [● USA 3] ›.
+  _flowClusterBar(cluster, key, activeId, counts) {
+    const bar = document.createElement("div")
+    bar.className = "flow-cluster-bar"
+    const ids = cluster.flowOrder.map(f => f.id)
+    const cycle = (dir) => {
+      const i = ids.indexOf(this._activeFlowTabs.get(key) || activeId)
+      this._switchFlow(key, ids[(i + dir + ids.length) % ids.length])
+    }
+    const arrow = (glyph, dir, label) => {
+      const btn = document.createElement("button")
+      btn.type = "button"
+      btn.className = "flow-arrow-btn"
+      btn.textContent = glyph
+      btn.setAttribute("aria-label", label)
+      btn.title = label
+      btn.addEventListener("click", () => cycle(dir))
+      return btn
+    }
+    bar.appendChild(arrow("‹", -1, t("editor.flows.prev_flow")))
+    const tabs = document.createElement("div")
+    tabs.className = "flow-cluster-tabs"
+    tabs.setAttribute("role", "tablist")
+    cluster.flowOrder.forEach(flow => {
+      const tab = document.createElement("button")
+      tab.type = "button"
+      tab.className = "flow-tab"
+      tab.setAttribute("role", "tab")
+      tab.setAttribute("aria-selected", String(flow.id === activeId))
+      tab.classList.toggle("is-active", flow.id === activeId)
+      tab.style.setProperty("--flow-color", flow.color)
+      const dot = document.createElement("span")
+      dot.className = "flow-header-dot"
+      dot.setAttribute("aria-hidden", "true")
+      const name = document.createElement("span")
+      name.className = "flow-tab-name"
+      name.textContent = flow.name
+      const count = document.createElement("span")
+      count.className = "flow-header-count"
+      count.textContent = t("editor.flows.header_count", { count: counts.get(flow.id) || 0 })
+      tab.append(dot, name, count)
+      tab.addEventListener("click", () => this._switchFlow(key, flow.id))
+      tabs.appendChild(tab)
+    })
+    bar.appendChild(tabs)
+    bar.appendChild(arrow("›", 1, t("editor.flows.next_flow")))
+    // Touch swipe on the bar mirrors the arrows.
+    bar.addEventListener("pointerdown", (e) => { this._flowSwipeX = e.clientX })
+    bar.addEventListener("pointerup", (e) => {
+      const dx = e.clientX - (this._flowSwipeX ?? e.clientX)
+      if (Math.abs(dx) > 48) cycle(dx < 0 ? 1 : -1)
+      this._flowSwipeX = null
+    })
+    return bar
+  }
+
+  // Switch a cluster to another flow, preserving CARD POSITION: whatever
+  // ordinal the creator was on in the old flow (the selected card, else the
+  // member nearest the viewport centre), land on — and select — the same
+  // ordinal in the new one, so same-position cards can be compared and
+  // restyled flow by flow without scrolling.
+  _switchFlow(clusterKey, toFlowId) {
+    const fromId = this._activeFlowTabs.get(clusterKey)
+    if (fromId === toFlowId) return
+    let ordinal = 0
+    if (fromId) {
+      const fromMembers = this.flowMemberWraps(fromId)
+      const selected = this._typePanelActiveCard()
+      const selIdx = selected ? fromMembers.indexOf(selected) : -1
+      ordinal = selIdx >= 0 ? selIdx : this._viewportFocalOrdinal(fromMembers)
+    }
+    this._activeFlowTabs.set(clusterKey, toFlowId)
+    this._paintFlowChrome()
+    const targets = this.flowMemberWraps(toFlowId)
+    const target = targets[Math.min(ordinal, targets.length - 1)]
+    if (!target) return
+    target.scrollIntoView({ behavior: "smooth", block: "center" })
+    target.click() // select it, so the right panel is ready to edit
+  }
+
+  // Which member (by index) currently sits closest to the viewport centre.
+  _viewportFocalOrdinal(wraps) {
+    const mid = window.innerHeight / 2
+    let best = 0, bestDist = Infinity
+    wraps.forEach((w, i) => {
+      const r = w.getBoundingClientRect()
+      const dist = Math.abs((r.top + r.bottom) / 2 - mid)
+      if (dist < bestDist) { best = i; bestDist = dist }
+    })
+    return best
+  }
+
+  // Make sure a card is visible before jumping to it: if it sits in a
+  // cluster's hidden flow, switch its cluster to that flow. Public — the
+  // Flows panel, score board and flow map all jump through here.
+  focusFlowForCard(cardEl) {
+    const flowId = cardEl?.dataset.cardFlowId
+    if (!flowId) return
+    const slot = cardEl.closest(".card-slot")
+    if (!slot || !slot.classList.contains("flow-hidden")) return
+    for (const [ key ] of this._activeFlowTabs) {
+      if (key.split("|").includes(flowId)) this._activeFlowTabs.set(key, flowId)
+    }
+    this._paintFlowChrome()
   }
 
   _flowHeaderRow(flow, count) {

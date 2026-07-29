@@ -215,6 +215,8 @@ vi:
         generate_failed: "Không tạo được: %{msg}"
         duplicate_into: "⧉ Nhân bản thẻ vào đây…"
         duplicate_pick: "Chọn thẻ để sao chép"
+        prev_flow: "Luồng trước"
+        next_flow: "Luồng tiếp theo"
       rules:
         flows_path: "Verto phân nhánh — độ dài được chấm theo lộ trình dài nhất của người trả lời: %{n} trên %{total} thẻ."
         title: "Luật chơi"

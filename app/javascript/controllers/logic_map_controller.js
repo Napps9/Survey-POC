@@ -799,6 +799,7 @@ export default class extends Controller {
     this.close()
     const el = document.querySelector(`.survey-card-wrap[data-card-cid="${cid}"]`)
     if (el) {
+      this._editor()?.focusFlowForCard?.(el) // reveal it if its flow is tabbed away
       el.scrollIntoView({ behavior: "smooth", block: "center" })
       el.classList.add("card-flash")
       setTimeout(() => el.classList.remove("card-flash"), 1200)

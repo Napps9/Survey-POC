@@ -1042,6 +1042,60 @@
   color: rgba(244,246,255,0.62);
 }
 
+/* ── Flow cluster bar: sibling flows side by side as swipeable tabs ──
+   Rendered by _paintFlowChrome above a stretch of ≥2 flows; only the active
+   tab's slots are visible (.flow-hidden), so same-position cards across
+   flows are one tap apart instead of a long scroll. */
+.flow-hidden { display: none !important; }
+.flow-cluster-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin: 10px 0 2px;
+  padding: 6px 8px;
+  border-radius: 14px;
+  background: rgba(16,19,31,0.85);
+  border: 1px solid rgba(255,255,255,0.14);
+  touch-action: pan-y; /* keep vertical scroll; horizontal drags are ours */
+  user-select: none;
+}
+.flow-cluster-tabs {
+  display: flex; align-items: center; gap: 6px;
+  flex: 1; min-width: 0;
+  overflow-x: auto; scrollbar-width: none;
+}
+.flow-cluster-tabs::-webkit-scrollbar { display: none; }
+.flow-tab {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 13px; border-radius: 100px; flex-shrink: 0;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.16);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s, opacity 0.15s;
+  opacity: 0.6;
+}
+.flow-tab .flow-header-dot { width: 9px; height: 9px; box-shadow: none; }
+.flow-tab-name {
+  font-family: 'Alata', sans-serif;
+  font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase;
+  color: #F4F6FF; white-space: nowrap;
+}
+.flow-tab:hover { opacity: 0.9; border-color: rgba(255,255,255,0.4); }
+.flow-tab.is-active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--flow-color, #8B85FF) 18%, transparent);
+  border-color: color-mix(in srgb, var(--flow-color, #8B85FF) 60%, transparent);
+}
+.flow-tab.is-active .flow-header-dot {
+  box-shadow: 0 0 8px color-mix(in srgb, var(--flow-color, #8B85FF) 70%, transparent);
+}
+.flow-arrow-btn {
+  flex-shrink: 0;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: transparent; color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.22);
+  font-size: 16px; line-height: 1; cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.flow-arrow-btn:hover { border-color: #01EACB; color: #01EACB; }
+
 /* ── Flows panel (right column, Logic & flows tab) ──
    One .flow-card per flow, painted by flows_controller. */
 .flow-list { display: flex; flex-direction: column; gap: 10px; }
