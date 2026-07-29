@@ -33,7 +33,7 @@
 <script id="card-eyebrows-i18n" type="application/json"><%= card_eyebrows_i18n(@survey).to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question logic-map editor-panel gate-cards score-modal flows"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel gate-cards score-modal flows"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
@@ -61,8 +61,8 @@
      data-survey-editor-flows-value="<%= @survey.flows_list.to_json %>"
      data-flows-generate-url-value="<%= generate_survey_flow_path(@survey) %>"
      data-survey-editor-logic-config-value="<%= { continue: 'Continue (default flow)', finishPrefix: 'Finish', ends: @survey.end_screens_list.map { |e| { id: e['id'], label: e['title'] } } }.to_json %>"
-     data-logic-map-ends-value="<%= @survey.end_screens_list.map { |e| { id: e['id'], title: e['title'] } }.to_json %>"
-     data-logic-map-editable-value="<%= !@survey.published? %>"
+     data-journey-ends-value="<%= @survey.end_screens_list.map { |e| { id: e['id'], title: e['title'] } }.to_json %>"
+     data-journey-editable-value="<%= !@survey.published? %>"
      data-type-panel-quiz-value="<%= @survey.quiz? %>"
      data-type-panel-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-type-panel-logic-value="<%= @survey.logic? %>"
@@ -70,7 +70,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.published? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent survey-editor:refreshed->flows#repaint"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -372,7 +372,7 @@
                     style="padding:10px 22px;border-radius:100px;background:#16342F;color:#01EACB;border:1px solid rgba(1,234,203,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
                     onmouseover="this.style.background='#1D453D'"
                     onmouseout="this.style.background='#16342F'"
-                    data-action="click->logic-map#open">⤢ Flow map</button>
+                    data-action="click->journey#open">⤢ Journey</button>
           <% end %>
           <% unless live_locked %>
             <%= button_to t("editor.shuffle"), shuffle_survey_assets_path(@survey),
@@ -417,11 +417,12 @@
               data-action="click->publish-panel#showQuizTab"><%= t("editor.tab_quiz", default: "Quiz mode") %></button>
       <button type="button" class="right-tab right-tab-folder right-tab--tokens" role="tab" aria-selected="false" aria-controls="panel-view-tokens" data-publish-panel-target="tokensTab"
               data-action="click->publish-panel#showTokensTab"><%= t("editor.tab_tokens", default: "Tokenisation") %></button>
-      <%# Logic & flows outgrew the column — its tab opens a modal over the
-          cards (see the logic-flows-modal overlay below the score modal). %>
+      <%# Logic & flows opens the Journey canvas — the deck drawn as a map.
+          Detailed settings (toggle, end screens) live in its ⚙ modal. When
+          logic is off, journey#open forwards straight to that modal. %>
       <button type="button" class="right-tab right-tab-folder right-tab--logic" role="tab" aria-selected="false"
               aria-haspopup="dialog" aria-controls="logic-flows-modal"
-              data-action="click->flows#openPanel"><%= t("editor.tab_logic", default: "Logic & flows") %></button>
+              data-action="click->journey#open"><%= t("editor.tab_logic", default: "Logic & flows") %></button>
       </div><%# /tablist %>
       <%# The Why view has no tab (each card carries a round ? CTA under its
           type badge — see _card_row) and the Verto score lives in the
@@ -1216,7 +1217,7 @@
           <% if @survey.logic? %>
             <button type="button"
                     style="margin-top:10px;padding:8px 18px;border-radius:100px;background:rgba(12,167,255,0.12);color:#5FC6FF;border:1px solid rgba(12,167,255,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;"
-                    data-action="click->logic-map#open">⤢ Flow map</button>
+                    data-action="click->journey#open">⤢ Journey</button>
           <% end %>
         </div>
 
@@ -1291,6 +1292,6 @@
   <%= render "surveys/animation_modal" %>
   <%= render "surveys/add_question_modal" %>
   <% if @survey.logic? && !@survey.published? %><%= render "surveys/generate_flow_modal" %><% end %>
-  <% if @survey.logic? %><%= render "surveys/logic_map", editable: !@survey.published? %><% end %>
+  <% if @survey.logic? %><%= render "surveys/journey" %><% end %>
 
 </div><%# /editor %>

@@ -5655,57 +5655,100 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .logic-branch-block .logic-default-label { color: rgba(255,255,255,0.7); }
 
-/* The "zoom out" flow-map overlay (logic_map_controller). Full-viewport dark
-   canvas; the SVG fills the area below the top bar. */
-.logic-map-overlay {
-  position: fixed; inset: 0; z-index: 9999;
+/* ── The Journey: the Logic & flows canvas (journey_controller) ──
+   Full-viewport overlay portalled to <body>; the deck as a vertical
+   storyboard of real card clones, with routing wires drawn in the SVG layer
+   behind the nodes. Sits UNDER the settings modal (90) and the generate
+   modal (100) so both open above it. */
+.journey-overlay {
+  position: fixed; inset: 0; z-index: 80;
   display: flex; flex-direction: column;
   background: #14172A;
 }
-.logic-map-topbar {
-  flex-shrink: 0; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-  padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.08);
+.journey-overlay.hidden { display: none; }
+.journey-topbar {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
   background: rgba(0,0,0,0.2);
 }
-.logic-map-titles { display: flex; flex-direction: column; gap: 2px; margin-right: auto; }
-.logic-map-title { font-family: "Alata", sans-serif; font-size: 16px; color: #fff; }
-.logic-map-hint  { font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.45); }
-.logic-map-legend {
-  display: flex; gap: 16px; font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.6);
-}
-.logic-map-legend span { display: inline-flex; align-items: center; gap: 6px; }
-.lm-swatch { width: 16px; height: 0; border-top-width: 2px; border-top-style: solid; display: inline-block; }
-.lm-swatch.lm-route   { border-top-color: #01EACB; }
-.lm-swatch.lm-next    { border-top-color: #8B85FF; }
-.lm-swatch.lm-default { border-top-color: rgba(255,255,255,0.5); border-top-style: dashed; }
-.lm-swatch.lm-finish  { width: 14px; height: 14px; border: 1.5px solid #01EACB; border-radius: 7px; background: rgba(1,234,203,0.12); }
-.logic-map-close {
+.journey-title { font-family: "Alata", sans-serif; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: #0CA7FF; margin-right: 14px; }
+.journey-hint { font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.45); }
+.journey-topbar-actions { display: flex; gap: 8px; }
+.journey-btn {
   padding: 8px 16px; border-radius: 12px; cursor: pointer;
   background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2);
   font-family: "ABeeZee", sans-serif; font-size: 13px;
 }
-.logic-map-close:hover { background: rgba(255,255,255,0.14); }
-.logic-map-svg { flex: 1; width: 100%; min-height: 0; touch-action: none; }
-
-/* Full-card nodes: a scaled, inert clone of the real card sits inside each
-   node's <foreignObject>. The box clips + frames it; pointer-events:none so the
-   SVG hit layer above handles clicks/drops. */
-.lm-card-box {
-  width: 100%; height: 100%; overflow: hidden;
-  border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.16);
-  background: #1C2034; pointer-events: none;
+.journey-btn:hover { background: rgba(255,255,255,0.14); }
+.journey-scroll { flex: 1; min-height: 0; overflow: auto; position: relative; }
+.journey-wires { position: absolute; top: 0; left: 0; pointer-events: none; }
+.journey-wires .j-wire-clickable { pointer-events: stroke; cursor: pointer; }
+.journey-wires .j-wire-clickable:hover { stroke-width: 4; }
+.journey-canvas {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 34px;
+  padding: 36px 40px 60px; min-width: fit-content;
 }
-.lm-card-unreachable { border-color: rgba(248,113,113,0.55); border-style: dashed; opacity: 0.6; }
-.lm-card-scale { pointer-events: none; }
-/* The cloned card must fill the node width regardless of the editor's own
-   layout constraints, and never trap pointer events. */
-.lm-card-scale .split-card { width: 100%; margin: 0; pointer-events: none; }
-.logic-map-empty {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-family: "ABeeZee", sans-serif; font-size: 15px; color: rgba(255,255,255,0.4);
+.j-node { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.j-clone {
+  position: relative; overflow: hidden; cursor: pointer;
+  border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.16);
+  background: #1C2034;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  transition: border-color 0.15s, transform 0.15s;
 }
+.j-clone:hover { border-color: rgba(255,255,255,0.45); transform: translateY(-2px); }
+.j-member .j-clone { border-color: color-mix(in srgb, var(--flow-color, #8B85FF) 55%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--flow-color, #8B85FF) 14%, transparent), 0 10px 30px rgba(0,0,0,0.45); }
+.j-clone-inner { pointer-events: none; }
+.j-clone-inner .split-card { width: 100%; margin: 0; pointer-events: none; }
+.j-fallback { padding: 16px; font-family: "ABeeZee", sans-serif; font-size: 12px; color: rgba(255,255,255,0.7); width: 250px; }
+.j-caption { font-family: "Alata", sans-serif; font-size: 10.5px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); }
+.j-stacked { box-shadow: 6px 6px 0 -1px #1C2034, 6px 6px 0 0 rgba(255,255,255,0.18), 12px 12px 0 -1px #1C2034, 12px 12px 0 0 rgba(255,255,255,0.12), 0 10px 30px rgba(0,0,0,0.45); }
+.j-stack-cap { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.6); font-family: "Alata", sans-serif; font-size: 10.5px; letter-spacing: 0.08em; margin-top: 8px; }
+.j-stack-cap:hover { color: #01EACB; }
+.j-answers { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 300px; margin-top: 3px; }
+.j-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 11px; border-radius: 100px; cursor: grab;
+  background: #232741; border: 1px solid rgba(255,255,255,0.2); color: #F4F6FF;
+  font-family: "ABeeZee", sans-serif; font-size: 11.5px;
+  touch-action: none; user-select: none;
+}
+.j-chip[data-routed="false"] { opacity: 0.75; }
+.j-chip:hover { border-color: rgba(255,255,255,0.5); }
+.j-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.j-cols { display: flex; align-items: flex-start; justify-content: center; gap: 46px; }
+.j-col {
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  padding: 14px 16px 12px; border-radius: 20px;
+  border: 1.5px solid color-mix(in srgb, var(--flow-color, #8B85FF) 40%, transparent);
+  background: color-mix(in srgb, var(--flow-color, #8B85FF) 6%, transparent);
+}
+.j-lanechip {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  background: var(--flow-color, #8B85FF); color: #14172A; border: none;
+  border-radius: 100px; padding: 5px 14px;
+  font-family: "Alata", sans-serif; font-size: 11.5px; letter-spacing: 0.07em; text-transform: uppercase;
+}
+.j-lanecount { font-family: "ABeeZee", sans-serif; text-transform: none; letter-spacing: 0; opacity: 0.65; }
+.j-ghost { display: flex; gap: 8px; }
+.j-ghost button, .j-exit {
+  padding: 5px 12px; border-radius: 100px; cursor: pointer;
+  background: transparent; border: 1.5px dashed rgba(255,255,255,0.3); color: rgba(255,255,255,0.65);
+  font-family: "ABeeZee", sans-serif; font-size: 11.5px;
+}
+.j-ghost button:hover { border-color: #01EACB; color: #01EACB; }
+.j-exit { cursor: grab; border-style: solid; border-color: color-mix(in srgb, var(--flow-color, #8B85FF) 55%, transparent); color: var(--flow-color, #8B85FF); touch-action: none; user-select: none; }
+.j-flags { display: flex; gap: 16px; margin-top: 8px; }
+.j-flag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #0E2B26; border: 1.5px solid #01EACB; color: #01EACB;
+  border-radius: 100px; padding: 8px 18px;
+  font-family: "ABeeZee", sans-serif; font-size: 13px;
+}
+.j-flag-alt { background: #2B1A0E; border-color: #F59E0B; color: #F59E0B; }
 
-/* Brief highlight when jumping to a card from the flow map. */
+/* Brief highlight when jumping to a card from the Journey. */
 .card-flash { animation: card-flash 1.2s ease-out; }
 @keyframes card-flash {
   0%, 100% { box-shadow: 0 0 0 0 rgba(1,234,203,0); }

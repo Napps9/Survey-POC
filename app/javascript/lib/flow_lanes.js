@@ -5,7 +5,7 @@
 // in-degree walk) keep a parent lane intact past the point where a sub-branch
 // rejoins it, and make nested sub-branches fall out as smaller lanes.
 //
-// Extracted from logic_map_controller so the map (legacy-deck rendering) and
+// Extracted from the retired flow map so the Journey (legacy-deck rendering) and
 // the Flows panel (per-lane "convert to flow") share one implementation.
 // First-class flows supersede this: the map builds lanes from stored flow
 // data first and only derives lanes over cards no flow claims.

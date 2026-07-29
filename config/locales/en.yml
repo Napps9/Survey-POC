@@ -217,6 +217,11 @@ en:
         generate_failed: "Couldn't generate: %{msg}"
         duplicate_into: "⧉ Duplicate a card in…"
         duplicate_pick: "Pick a card to copy"
+        stack_label: "Cards %{from}–%{to}"
+        stack_hint: "tap to expand"
+        finish_default: "Thank you"
+        wire_clear: "Click to clear this route"
+        generate_short: "Generate"
       rules:
         title: "Rules of the Game"
         flows_path: "Branched Verto — length is scored on the longest respondent path: %{n} of %{total} cards."
@@ -672,6 +677,8 @@ en:
     flows_title: 'Flows'
     flows_intro: 'Named groups of cards a routed answer can enter — e.g. UK, UAE and USA question sets that converge back or finish on their own screens.'
     flows_new: 'New flow'
+    journey_hint: 'Your deck as a map — tap a card to edit it, drag an answer chip to route it, or drop it on empty space to start a new flow.'
+    journey_settings: 'Settings'
     flows_generate: 'Generate flow'
     flows_generate_title: 'Generate a flow with AI'
     flows_generate_hint: 'Describe what this flow should ask and Claude will draft 3–6 cards for that segment, wired in below the question you pick.'

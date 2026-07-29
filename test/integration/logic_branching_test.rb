@@ -182,19 +182,20 @@ class LogicBranchingTest < ActionDispatch::IntegrationTest
     assert_select "a.hidden[data-player-target='forwardBtn']" # no default forward_url ⇒ hidden
   end
 
-  test "the editor mounts the flow map (button + overlay) only when logic is on" do
+  test "the editor mounts the Journey (button + overlay) only when logic is on" do
     get survey_path(@survey)
     assert_response :success
-    assert_match "logic-map", response.body                       # controller on the root
-    assert_match "click->logic-map#open", response.body           # the Flow map button
-    assert_select "[data-logic-map-target='svg']"                 # the overlay canvas
-    assert_match "data-logic-map-ends-value", response.body
-    assert_match 'data-logic-map-editable-value="true"', response.body # draft ⇒ editable canvas
+    assert_match(/data-controller="[^"]*\bjourney\b[^"]*"/, response.body) # controller on the root
+    assert_match "click->journey#open", response.body             # the Journey buttons + tab
+    assert_select "[data-journey-target='wires']"                 # the overlay's wire canvas
+    assert_select "[data-journey-target='canvas']"
+    assert_match "data-journey-ends-value", response.body
+    assert_match 'data-journey-editable-value="true"', response.body # draft ⇒ editable canvas
 
     @survey.update!(logic: false)
     get survey_path(@survey)
     assert_response :success
-    assert_select "[data-logic-map-target='svg']", false
+    assert_select "[data-journey-target='wires']", false
   end
 
   test "the editor lists extra end screens as route targets and offers the manager" do

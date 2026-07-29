@@ -1,0 +1,21 @@
+<%# The Journey — the Logic & flows canvas: the deck as a vertical storyboard
+    of real card clones, answer lines fanning into flow columns and merging at
+    the finish flags. Built entirely from the live deck by journey_controller
+    (which portals this overlay to <body>); ⚙ opens the settings modal
+    (feature toggle, flows detail, branch end screens) ABOVE it. %>
+<div class="journey-overlay hidden" data-journey-target="overlay">
+  <div class="journey-topbar">
+    <div>
+      <span class="journey-title"><%= t("editor.tab_logic", default: "Logic & flows") %></span>
+      <span class="journey-hint"><%= t("editor.journey_hint") %></span>
+    </div>
+    <div class="journey-topbar-actions">
+      <button type="button" class="journey-btn" data-action="click->journey#openSettings">⚙ <%= t("editor.journey_settings") %></button>
+      <button type="button" class="journey-btn" data-action="click->journey#close">✕ <%= t("editor.close", default: "Close") %></button>
+    </div>
+  </div>
+  <div class="journey-scroll" data-journey-target="scroll">
+    <svg class="journey-wires" data-journey-target="wires" aria-hidden="true"></svg>
+    <div class="journey-canvas" data-journey-target="canvas"></div>
+  </div>
+</div>
