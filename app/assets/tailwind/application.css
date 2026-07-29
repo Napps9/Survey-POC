@@ -1005,7 +1005,9 @@
 
 /* ── Card slot: a card plus the "Add question" CTA beneath it ── */
 .card-slot { display: flex; flex-direction: column; gap: 10px; }
-.aq-insert-row { display: flex; justify-content: center; }
+/* Bottom-right, mirroring the Delete CTA on the chrome row above the card
+   (same 4px inset), so the centre column stays clear of the floating pills. */
+.aq-insert-row { display: flex; justify-content: flex-end; padding: 0 4px; }
 /* One sits under every card. Solid teal so it's always easy to spot as the
    primary "add another question" action. */
 .aq-insert-btn {
@@ -2680,6 +2682,12 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 /* Collapsed: centre the full-size cards. 1120px ≈ the width cards get when
    the panel is open, so opening reads as a slide, not a resize. */
 .editor-grid:not(.is-panel-open) .device-desktop .survey-card-wrap {
+  max-width: 1120px; width: 100%; margin-inline: auto;
+}
+/* The insert row lives outside the wrap (device frames would clip it), so it
+   needs the same width cap for its right edge to keep lining up with the
+   wrap's chrome row — i.e. the Add question CTA stays under Delete. */
+.editor-grid:not(.is-panel-open) .device-desktop .aq-insert-row {
   max-width: 1120px; width: 100%; margin-inline: auto;
 }
 
