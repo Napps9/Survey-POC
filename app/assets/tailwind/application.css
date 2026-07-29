@@ -2405,6 +2405,18 @@
   letter-spacing: 0.1em; text-transform: uppercase;
   padding: 3px 9px; border-radius: 100px; color: #fff;
 }
+
+/* "Card N" pill — the chrome row's one label now that the type badge is
+   gone (the Answer Type panel header still names the type). Solid ink so
+   it reads over any Verto backdrop. */
+.card-num-pill {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 100px;
+  background: #232838; border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.04em;
+  white-space: nowrap;
+}
 .sb-welcome  { background: #01EACB; color: #04221E; }
 .sb-range    { background: #4D588A; }
 .sb-choice   { background: #615BF5; }

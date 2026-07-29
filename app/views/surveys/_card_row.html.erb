@@ -1,7 +1,6 @@
 <%
   default_locale ||= SupportedLocales::DEFAULT
   type     = card["type"].to_s
-  meta     = card_type_meta(type)
   is_q     = CardTypes.question?(type)
   progress = total_q > 0 && is_q ? ((q_idx.to_f / total_q) * 100).round : 5
   eyebrow  = CardTypes.eyebrow(type).presence || type.tr('_', ' ')
@@ -42,13 +41,14 @@
      data-card-condition="<%= card['condition'].to_s %>"
      data-action="click->type-panel#selectCard">
 
-  <%# Chrome row above card — type badge (with the round "Why" ? CTA beneath
-      it), card number, the Rules-of-the-Game traffic light, and delete. The
-      light + analysis panel are filled in and toggled by
-      survey_editor_controller. %>
+  <%# Chrome row above card — the "Card N" pill (with the round "Why" ? CTA
+      beneath it), the Rules-of-the-Game traffic light, and delete. The card's
+      TYPE badge is gone from the chrome — the Answer Type panel header names
+      it — so the number is the card's one label here. The light + analysis
+      panel are filled in and toggled by survey_editor_controller. %>
   <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;padding:0 4px;">
     <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;flex-shrink:0;">
-      <span class="s-badge <%= meta[:badge_css] %>"><%= meta[:badge] %></span>
+      <span class="card-num-pill" data-role="card-number">Card <%= idx + 1 %></span>
       <%# Opens the Why view for this card — the click also bubbles to
           type-panel#selectCard, which populates it (same behaviour the old
           Why tab had after selecting a card). %>
@@ -57,7 +57,6 @@
               aria-label="<%= t('editor.why', default: 'Why') %>"
               data-action="click->publish-panel#showWhy">?</button>
     </div>
-    <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.88);text-shadow:0 1px 4px rgba(0,0,0,0.7);margin-top:3px;" data-role="card-number">Card <%= idx + 1 %></span>
     <% if is_q %>
       <%# Passive glance indicator — visible only while the card is Required
           (toggled live from the Answer Type tab's Card settings). %>
