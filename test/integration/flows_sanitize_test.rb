@@ -115,6 +115,44 @@ class FlowsSanitizeTest < ActionDispatch::IntegrationTest
     assert_select ".survey-card-wrap[data-card-flow-id='f_uk']", 2
   end
 
+  test "every option-bearing type renders branching rows with type-shaped canonicals" do
+    @survey.update!(cards: [
+      { "type" => "select_one_grid", "cid" => "c_grid", "text" => "Which hub?",
+        "options" => %w[North South East West] },
+      { "type" => "select_many", "cid" => "c_many", "text" => "Which services?",
+        "options" => %w[Buses Trains] },
+      { "type" => "range", "cid" => "c_range", "text" => "How connected?",
+        "options" => [ "Not at all", "A little", "Neutral", "Quite", "Fully" ] },
+      { "type" => "open_ended", "cid" => "c_free", "text" => "Tell us more" }
+    ])
+    get survey_path(@survey)
+    assert_response :success
+    # Grid + multi-pick rows key by option label…
+    assert_select "[data-owner-cid='c_grid'] [data-logic-route][data-canonical='North']"
+    assert_select "[data-owner-cid='c_many'] [data-logic-route][data-canonical='Buses']"
+    # …scales key by numeric position…
+    assert_select "[data-owner-cid='c_range'] [data-logic-route][data-canonical='0']"
+    assert_select "[data-owner-cid='c_range'] [data-logic-route][data-canonical='4']"
+    # …and open text gets no branch rows at all.
+    assert_select "[data-owner-cid='c_free']", 0
+  end
+
+  test "a contains-op route survives sanitize and resolves for a multi-pick answer" do
+    patch_survey(cards: [
+      { "type" => "select_many", "cid" => "c_many", "text" => "Which services?", "options" => %w[Buses Trains],
+        "logic" => { "routes" => [
+          { "match" => { "op" => "contains", "value" => "Buses" }, "to" => { "card" => "c_tail" } }
+        ] } },
+      { "type" => "open_ended", "cid" => "c_mid", "text" => "Mid" },
+      { "type" => "open_ended", "cid" => "c_tail", "text" => "Tail" }
+    ], flows: [])
+    assert_response :success
+    cards = @survey.reload.cards
+    assert_equal "contains", cards.first.dig("logic", "routes", 0, "match", "op")
+    assert_equal [ 0, 2 ], LogicGraph.resolve_path(cards, { "0" => { "value" => [ "Trains", "Buses" ] } })
+    assert_equal [ 0, 1, 2 ], LogicGraph.resolve_path(cards, { "0" => { "value" => [ "Trains" ] } })
+  end
+
   test "the editor renders the Flows panel shell when logic is on" do
     get survey_path(@survey)
     assert_response :success

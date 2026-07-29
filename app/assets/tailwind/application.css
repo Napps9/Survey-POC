@@ -5631,6 +5631,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.5;
   color: rgba(255,255,255,0.6); margin-bottom: 12px;
 }
+/* Type-specific match semantics (multi-pick "includes", prioritise "top choice"). */
+.logic-branch-hint { display: block; margin-top: 4px; color: #FFC97A; font-style: italic; }
 .logic-branch-list {
   list-style: none; margin: 0; padding: 0;
   display: flex; flex-direction: column; gap: 8px;

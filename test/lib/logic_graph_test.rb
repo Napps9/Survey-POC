@@ -1,5 +1,57 @@
 require "test_helper"
 
+# Match-op semantics across answer shapes — every option-bearing type routes:
+# scalars by equality (choice labels; numeric scale positions), multi-pick
+# arrays by inclusion, prioritise by its top-ranked value.
+class LogicGraphMatchOpsTest < ActiveSupport::TestCase
+  def route(op, value, to = { "card" => "c_t" })
+    { "match" => { "op" => op, "value" => value }, "to" => to }
+  end
+
+  test "every option-bearing type is routable" do
+    %w[multiple_choice yes_no scenario select_one_grid range rating nps
+       select_many select_many_grid prioritise].each do |type|
+      assert LogicGraph.routable?({ "type" => type }), "#{type} should be routable"
+    end
+    refute LogicGraph.routable?({ "type" => "open_ended" })
+    refute LogicGraph.routable?({ "type" => "tap_card" })
+  end
+
+  test "equals matches numeric scale answers against string canonicals" do
+    card = { "cid" => "c_q", "type" => "nps", "logic" => { "routes" => [ route("equals", "9") ] } }
+    assert_equal({ "card" => "c_t" }, LogicGraph.next_after(card, 9))
+    assert_nil LogicGraph.next_after(card, 3)
+  end
+
+  test "contains fires when a multi-pick answer includes the value" do
+    card = { "cid" => "c_q", "type" => "select_many",
+             "logic" => { "routes" => [ route("contains", "Buses") ] } }
+    assert_equal({ "card" => "c_t" }, LogicGraph.next_after(card, [ "Trains", "Buses" ]))
+    assert_nil LogicGraph.next_after(card, [ "Trains" ])
+  end
+
+  test "contains with multiple matching routes: the first route wins" do
+    card = { "cid" => "c_q", "type" => "select_many_grid",
+             "logic" => { "routes" => [ route("contains", "A", { "card" => "c_a" }),
+                                        route("contains", "B", { "card" => "c_b" }) ] } }
+    assert_equal({ "card" => "c_a" }, LogicGraph.next_after(card, [ "B", "A" ]),
+                 "route order decides priority, not answer order")
+  end
+
+  test "first matches only the top-ranked prioritise value" do
+    card = { "cid" => "c_q", "type" => "prioritise",
+             "logic" => { "routes" => [ route("first", "Safety") ] } }
+    assert_equal({ "card" => "c_t" }, LogicGraph.next_after(card, [ "Safety", "Parks" ]))
+    assert_nil LogicGraph.next_after(card, [ "Parks", "Safety" ])
+  end
+
+  test "an unknown op fails safe to no match" do
+    card = { "cid" => "c_q", "type" => "multiple_choice",
+             "logic" => { "routes" => [ route("regex", "x") ] } }
+    assert_nil LogicGraph.next_after(card, "x")
+  end
+end
+
 # Answer-branching is resolved by pure functions over (cards, answers); this
 # locks the routing rules the live player (player_controller.js _resolveNext)
 # mirrors client-side. Targets reference cards by stable cid, never index.
@@ -28,12 +80,13 @@ class LogicGraphTest < ActiveSupport::TestCase
     { "0" => { "type" => "multiple_choice", "value" => value } }
   end
 
-  test "routable? only single-pick types this pass" do
+  test "routable? covers every option-bearing type, never answerless ones" do
     assert LogicGraph.routable?({ "type" => "multiple_choice" })
     assert LogicGraph.routable?({ "type" => "yes_no" })
     assert LogicGraph.routable?({ "type" => "scenario" })
-    refute LogicGraph.routable?({ "type" => "select_many" })
-    refute LogicGraph.routable?({ "type" => "range" })
+    assert LogicGraph.routable?({ "type" => "select_many" })
+    assert LogicGraph.routable?({ "type" => "range" })
+    refute LogicGraph.routable?({ "type" => "open_ended" })
     refute LogicGraph.routable?({ "type" => "welcome_card" })
   end
 
@@ -41,8 +94,8 @@ class LogicGraphTest < ActiveSupport::TestCase
     refute LogicGraph.routing?({ "type" => "multiple_choice", "options" => %w[A B] })
     refute LogicGraph.routing?({ "type" => "multiple_choice", "logic" => {} })
     refute LogicGraph.routing?({ "type" => "multiple_choice", "logic" => { "routes" => [] } })
-    # A logic block on a non-routable type never routes.
-    refute LogicGraph.routing?({ "type" => "select_many",
+    # A logic block on a type with no discrete answers never routes.
+    refute LogicGraph.routing?({ "type" => "open_ended",
                                  "logic" => { "default" => { "card" => "c_x" } } })
     assert LogicGraph.routing?({ "type" => "multiple_choice",
                                  "logic" => { "default" => { "card" => "c_x" } } })

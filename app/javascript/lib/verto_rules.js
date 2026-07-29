@@ -1,3 +1,4 @@
+import { ROUTABLE_TYPES } from "lib/routable_types"
 // Rules of the Game — the "Do's and Don'ts" the Verto generator follows
 // (SurveyGenerator::SYSTEM / CARD_RULES and the source "Rules of the Game"
 // document), re-expressed as live editor checks. Each check returns a
@@ -256,13 +257,12 @@ export function analyzeVerto(cards, { flows = [] } = {}) {
 // A linear deck (no logic/next wiring) degenerates to the deck length, and
 // cards no route reaches (a parked/orphaned branch) aren't counted — a
 // respondent never sees them.
-const ROUTABLE = [ "multiple_choice", "yes_no", "scenario" ]
 
 function edgesFrom(cards, i, ci) {
   const card = cards[i] || {}
   const outs = []
   let covered = false // a default / next (card or end) replaces the linear edge
-  const logic = ROUTABLE.includes(card.type) && card.logic && typeof card.logic === "object" ? card.logic : null
+  const logic = ROUTABLE_TYPES.includes(card.type) && card.logic && typeof card.logic === "object" ? card.logic : null
   if (logic) {
     ;(Array.isArray(logic.routes) ? logic.routes : []).forEach(r => {
       const to = r && r.to

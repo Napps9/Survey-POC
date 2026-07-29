@@ -21,14 +21,25 @@ require "set"
 #     "default" => { "card" => "c_next01" }        # optional; omit ⇒ linear next
 #   }
 #
-# `match.value` is the CANONICAL (primary-language) option label, keyed exactly
-# like card["correct"] / card["tokens"], so routing aggregates across languages.
-# `op` is "equals" only for now (single-pick). First matching route wins.
+# `match.value` is the CANONICAL answer value, keyed exactly like
+# card["correct"] / card["tokens"]: the primary-language option label for
+# choice types, the numeric position for the scale types (range 0-4 step,
+# rating 1-N stars, nps 0-10). First matching route wins. Three ops, one per
+# answer shape:
+#   "equals"   — single-pick / scale answers (a scalar)
+#   "contains" — multi-pick answers (an array): fires when it INCLUDES value
+#   "first"    — prioritise (an ordered array): fires on the TOP-ranKED value
 module LogicGraph
   module_function
 
-  # Single-pick types that can carry routing logic this pass.
-  ROUTABLE = %w[multiple_choice yes_no scenario].freeze
+  # Every option-bearing type can carry routing logic. Open text and swipe
+  # decks have no discrete answer to route on — they continue in card order
+  # (or via their unconditional `next`). Mirrored by lib/routable_types.js.
+  ROUTABLE = %w[
+    multiple_choice yes_no scenario select_one_grid
+    range rating nps
+    select_many select_many_grid prioritise
+  ].freeze
 
   # Can this card type carry routing logic at all?
   def routable?(card)
@@ -239,8 +250,10 @@ module LogicGraph
   def match?(matcher, value)
     return false unless matcher.is_a?(Hash)
     case matcher["op"].to_s
-    when "equals" then norm(value) == norm(matcher["value"])
-    else false
+    when "equals"   then norm(value) == norm(matcher["value"])
+    when "contains" then Array(value).any? { |v| norm(v) == norm(matcher["value"]) }
+    when "first"    then value.is_a?(Array) && norm(value.first) == norm(matcher["value"])
+    else false # unknown op fails safe to no-match (linear next)
     end
   end
 

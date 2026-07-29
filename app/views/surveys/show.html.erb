@@ -1238,15 +1238,15 @@
             <div class="type-panel-empty" data-type-panel-target="branchEmpty">
               <div style="font-size:28px;opacity:0.25;">↖</div>
               <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:240px;">
-                Select a multiple-choice or yes/no question to route its answers.
+                Select a question card to route its answers.
               </div>
             </div>
 
-            <%# Selected card can't branch (not a single-pick question). %>
+            <%# Selected card has no discrete answers to route. %>
             <div class="type-panel-empty" style="display:none;" data-type-panel-target="branchNote">
               <div style="font-size:28px;opacity:0.25;">⤳</div>
               <div style="font-size: var(--text-lg);color:rgba(255,255,255,0.7);line-height:1.55;max-width:260px;">
-                This question type can’t branch. Only multiple-choice and yes/no questions can send each answer to a different card.
+                This card has no answer options to route — open text and swipe decks continue in card order.
               </div>
             </div>
 

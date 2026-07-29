@@ -342,11 +342,19 @@ export default class extends Controller {
       ((t.card != null && t.card !== "") || (t.end != null && t.end !== "")))
   }
 
+  // Mirrors LogicGraph.match?: "equals" for single-pick/scale answers,
+  // "contains" for multi-pick arrays (fires when the answer includes the
+  // value), "first" for prioritise (fires on the top-ranked value).
   _logicMatch(match, value) {
     if (!match || typeof match !== "object") return false
     switch (match.op) {
       case "equals": return this._norm(value) === this._norm(match.value)
-      default: return false
+      case "contains": {
+        const list = Array.isArray(value) ? value : (value == null ? [] : [ value ])
+        return list.some(v => this._norm(v) === this._norm(match.value))
+      }
+      case "first": return Array.isArray(value) && this._norm(value[0]) === this._norm(match.value)
+      default: return false // unknown op fails safe to no-match (linear next)
     }
   }
 

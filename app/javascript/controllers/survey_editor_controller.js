@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
 import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
+import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_types"
 
 // Card types with no answer captured — mirrors CardTypes::NON_QUESTION_TYPES
 // (app/lib/card_types.rb). welcome_card additionally stays pinned first (see
@@ -1392,15 +1393,17 @@ export default class extends Controller {
 
   // This card's routing config, in the shape LogicGraph expects. Reads the
   // inline per-option <select data-logic-route> plus the card's default
-  // ("otherwise") select. Only single-pick types route this pass.
+  // ("otherwise") select. Every option-bearing type routes; the match op is
+  // the type's answer shape (equals / contains / first — lib/routable_types).
   _readLogic(card, type) {
-    if (type !== "multiple_choice" && type !== "yes_no" && type !== "scenario") return null
+    if (!ROUTABLE_TYPES.includes(type)) return null
+    const op = matchOpFor(type)
     const scope = this._logicScope(card)
     const routes = []
     scope.querySelectorAll("[data-logic-route][data-canonical]").forEach(sel => {
       const label = (sel.dataset.canonical || "").trim()
       const to    = this._logicTargetFromValue(sel.value)
-      if (label && to) routes.push({ match: { op: "equals", value: label }, to })
+      if (label && to) routes.push({ match: { op, value: label }, to })
     })
     const logic = {}
     if (routes.length) logic.routes = routes
@@ -1540,9 +1543,10 @@ export default class extends Controller {
 
   syncBranchingFor(cardEl) {
     if (!this.logicValue || !cardEl) return
-    // yes_no answers are fixed; multiple_choice and scenario both have dynamic
-    // option lists whose branching rows need to stay in step with them.
-    if (!["multiple_choice", "scenario"].includes(cardEl.dataset.cardType)) return
+    // Only types whose option LISTS are edited live in the card need their
+    // branching rows rebuilt (yes_no is fixed; the scales key routes by
+    // numeric position and don't expose their option lists in the editor).
+    if (!OPTION_EDITED_TYPES.includes(cardEl.dataset.cardType)) return
     const scope = this._logicScope(cardEl)
     const list  = scope.querySelector(".logic-branch-list")
     if (!list) return

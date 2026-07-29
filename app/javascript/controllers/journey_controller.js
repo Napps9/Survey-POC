@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
+import { ROUTABLE_TYPES, routeOptionsFor } from "lib/routable_types"
 
 // The Journey — THE Logic & flows surface. A vertical storyboard of the deck
 // built from REAL card clones (design + question + options, scaled), where
@@ -111,8 +112,7 @@ export default class extends Controller {
       // Every routable question renders on its own WITH its answer chips —
       // wired or not, it's a potential branch point and the chips are how
       // routing starts. Cards that already route always show too.
-      const routable = [ "multiple_choice", "yes_no", "scenario" ].includes(c.type) &&
-                       Array.isArray(c.options) && c.options.length
+      const routable = ROUTABLE_TYPES.includes(c.type) && Array.isArray(c.options) && c.options.length
       const hasRouting = c.logic && ((Array.isArray(c.logic.routes) && c.logic.routes.length) || c.logic.default)
       if (routable || hasRouting) eventful.add(c.cid)
     })
@@ -200,7 +200,7 @@ export default class extends Controller {
     ;((card.logic && card.logic.routes) || []).forEach(r => {
       if (r?.match?.value != null && r.to) routes.set(String(r.match.value), r.to)
     })
-    const routable = [ "multiple_choice", "yes_no", "scenario" ].includes(card.type)
+    const routable = ROUTABLE_TYPES.includes(card.type)
     if (routable && Array.isArray(card.options) && card.options.length) {
       node.appendChild(this._answerStrip(card, cards, routes))
     }
@@ -237,7 +237,7 @@ export default class extends Controller {
       strip.appendChild(chip)
       return chip
     }
-    card.options.forEach(o => chipFor(o, String(o), false))
+    routeOptionsFor(card.type, card.options).forEach(o => chipFor(o.label, o.canonical, false))
     chipFor(t("editor.flows.entry_otherwise"), null, true)
     return strip
   }
