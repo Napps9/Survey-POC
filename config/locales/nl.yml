@@ -213,6 +213,8 @@ nl:
         wire_none: "Nog niet aansluiten"
         prompt_needed: "Beschrijf wat deze flow moet vragen."
         generate_failed: "Genereren mislukt: %{msg}"
+        duplicate_into: "⧉ Kaart hierheen dupliceren…"
+        duplicate_pick: "Kies een kaart om te kopiëren"
       rules:
         title: "Spelregels"
         score_label: "Verto-score"

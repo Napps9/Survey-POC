@@ -213,6 +213,8 @@ ja:
         wire_none: "まだ接続しない"
         prompt_needed: "このフローで聞きたい内容を説明してください。"
         generate_failed: "生成できませんでした:%{msg}"
+        duplicate_into: "⧉ カードをここに複製…"
+        duplicate_pick: "コピーするカードを選択"
       rules:
         title: "ゲームのルール"
         score_label: "Vertoスコア"

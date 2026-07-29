@@ -213,6 +213,8 @@ es:
         wire_none: "No conectar aún"
         prompt_needed: "Describe qué debe preguntar este flujo."
         generate_failed: "No se pudo generar: %{msg}"
+        duplicate_into: "⧉ Duplicar una tarjeta aquí…"
+        duplicate_pick: "Elige una tarjeta para copiar"
       rules:
         title: "Reglas del juego"
         score_label: "Puntuación del Verto"

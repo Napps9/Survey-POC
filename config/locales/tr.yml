@@ -213,6 +213,8 @@ tr:
         wire_none: "Şimdilik bağlama"
         prompt_needed: "Bu akışın ne sormasını istediğini anlat."
         generate_failed: "Oluşturulamadı: %{msg}"
+        duplicate_into: "⧉ Buraya kart kopyala…"
+        duplicate_pick: "Kopyalanacak kartı seç"
       rules:
         title: "Oyunun Kuralları"
         score_label: "Verto puanı"

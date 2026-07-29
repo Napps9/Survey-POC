@@ -213,6 +213,8 @@ de:
         wire_none: "Noch nicht verdrahten"
         prompt_needed: "Beschreibe, was dieser Flow fragen soll."
         generate_failed: "Generieren fehlgeschlagen: %{msg}"
+        duplicate_into: "⧉ Karte hierher kopieren…"
+        duplicate_pick: "Karte zum Kopieren wählen"
       rules:
         title: "Spielregeln"
         score_label: "Verto-Punktzahl"

@@ -213,6 +213,8 @@ id:
         wire_none: "Jangan sambungkan dulu"
         prompt_needed: "Jelaskan apa yang harus ditanyakan alur ini."
         generate_failed: "Gagal membuat: %{msg}"
+        duplicate_into: "⧉ Gandakan kartu ke sini…"
+        duplicate_pick: "Pilih kartu untuk disalin"
       rules:
         title: "Aturan Main"
         score_label: "Skor Verto"

@@ -213,6 +213,8 @@ ru:
         wire_none: "Пока не подключать"
         prompt_needed: "Опишите, о чём должен спрашивать этот поток."
         generate_failed: "Не удалось сгенерировать: %{msg}"
+        duplicate_into: "⧉ Дублировать карточку сюда…"
+        duplicate_pick: "Выберите карточку для копирования"
       rules:
         title: "Правила игры"
         score_label: "Оценка Verto"

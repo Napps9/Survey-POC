@@ -213,6 +213,8 @@ pt:
         wire_none: "Não ligar ainda"
         prompt_needed: "Descreva o que este fluxo deve perguntar."
         generate_failed: "Não foi possível gerar: %{msg}"
+        duplicate_into: "⧉ Duplicar um cartão para aqui…"
+        duplicate_pick: "Escolha um cartão para copiar"
       rules:
         title: "Regras do jogo"
         score_label: "Pontuação do Verto"

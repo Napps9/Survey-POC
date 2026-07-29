@@ -213,6 +213,8 @@ hi:
         wire_none: "अभी न जोड़ें"
         prompt_needed: "बताएँ कि इस फ़्लो में क्या पूछना है।"
         generate_failed: "बनाया नहीं जा सका: %{msg}"
+        duplicate_into: "⧉ यहाँ कार्ड की कॉपी बनाएँ…"
+        duplicate_pick: "कॉपी करने के लिए कार्ड चुनें"
       rules:
         title: "खेल के नियम"
         score_label: "Verto स्कोर"

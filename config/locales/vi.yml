@@ -213,6 +213,8 @@ vi:
         wire_none: "Chưa nối vội"
         prompt_needed: "Mô tả luồng này cần hỏi gì."
         generate_failed: "Không tạo được: %{msg}"
+        duplicate_into: "⧉ Nhân bản thẻ vào đây…"
+        duplicate_pick: "Chọn thẻ để sao chép"
       rules:
         title: "Luật chơi"
         score_label: "Điểm Verto"

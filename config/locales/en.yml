@@ -215,6 +215,8 @@ en:
         wire_none: "Don't wire yet"
         prompt_needed: "Describe what this flow should ask."
         generate_failed: "Couldn't generate: %{msg}"
+        duplicate_into: "⧉ Duplicate a card in…"
+        duplicate_pick: "Pick a card to copy"
       rules:
         title: "Rules of the Game"
         score_label: "Verto score"

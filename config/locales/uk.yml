@@ -213,6 +213,8 @@ uk:
         wire_none: "Поки не під'єднувати"
         prompt_needed: "Опишіть, про що має питати цей потік."
         generate_failed: "Не вдалося згенерувати: %{msg}"
+        duplicate_into: "⧉ Дублювати картку сюди…"
+        duplicate_pick: "Оберіть картку для копіювання"
       rules:
         title: "Правила гри"
         score_label: "Оцінка Verto"

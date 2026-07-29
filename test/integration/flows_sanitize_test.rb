@@ -137,6 +137,14 @@ class FlowsSanitizeTest < ActionDispatch::IntegrationTest
     assert_equal({ "card" => "c_tail" }, @survey.cards[2]["next"], "compiled to the shared flow's entry")
   end
 
+  test "the feed renders a duplicate button per card on drafts and none when live" do
+    get survey_path(@survey)
+    assert_select ".card-duplicate-btn", 4
+    @survey.update!(publish_token: SecureRandom.hex(8), published_at: Time.current)
+    get survey_path(@survey)
+    assert_select ".card-duplicate-btn", 0
+  end
+
   test "editing flows on a published Verto is locked" do
     @survey.update!(publish_token: SecureRandom.hex(8), published_at: Time.current)
     patch_survey(flows: [])

@@ -213,6 +213,8 @@ he:
         wire_none: "לא לחבר עדיין"
         prompt_needed: "תארו מה המסלול הזה צריך לשאול."
         generate_failed: "היצירה נכשלה: %{msg}"
+        duplicate_into: "⧉ שכפול כרטיס לכאן…"
+        duplicate_pick: "בחרו כרטיס להעתקה"
       rules:
         title: "חוקי המשחק"
         score_label: "ציון Verto"

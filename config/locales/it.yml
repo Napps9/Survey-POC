@@ -213,6 +213,8 @@ it:
         wire_none: "Non collegare ancora"
         prompt_needed: "Descrivi cosa deve chiedere questo flusso."
         generate_failed: "Generazione non riuscita: %{msg}"
+        duplicate_into: "⧉ Duplica una scheda qui…"
+        duplicate_pick: "Scegli una scheda da copiare"
       rules:
         title: "Regole del gioco"
         score_label: "Punteggio del Verto"

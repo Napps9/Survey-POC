@@ -213,6 +213,8 @@ sw:
         wire_none: "Usiunganishe bado"
         prompt_needed: "Eleza mtiririko huu unapaswa kuuliza nini."
         generate_failed: "Imeshindikana kutengeneza: %{msg}"
+        duplicate_into: "⧉ Nakili kadi hapa…"
+        duplicate_pick: "Chagua kadi ya kunakili"
       rules:
         title: "Kanuni za Mchezo"
         score_label: "Alama ya Verto"

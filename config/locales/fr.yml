@@ -213,6 +213,8 @@ fr:
         wire_none: "Ne pas relier maintenant"
         prompt_needed: "Décrivez ce que ce flux doit demander."
         generate_failed: "Génération impossible : %{msg}"
+        duplicate_into: "⧉ Dupliquer une carte ici…"
+        duplicate_pick: "Choisissez une carte à copier"
       rules:
         title: "Règles du jeu"
         score_label: "Score du Verto"

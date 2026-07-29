@@ -213,6 +213,8 @@ pl:
         wire_none: "Nie podpinaj jeszcze"
         prompt_needed: "Opisz, o co ma pytać ten przepływ."
         generate_failed: "Nie udało się wygenerować: %{msg}"
+        duplicate_into: "⧉ Powiel kartę tutaj…"
+        duplicate_pick: "Wybierz kartę do skopiowania"
       rules:
         title: "Zasady gry"
         score_label: "Wynik Verto"

@@ -91,6 +91,15 @@
         </div>
       <% end %>
 
+      <% unless live %>
+        <%# Duplicate — same content, fresh identity; wiring and Common
+            Question provenance stay with the original (flows_controller
+            strips them before render_card mints the copy). %>
+        <button type="button" class="card-duplicate-btn"
+                title="<%= t('editor.duplicate_card_title', default: 'Duplicate this card') %>"
+                aria-label="<%= t('editor.duplicate_card_title', default: 'Duplicate this card') %>"
+                data-action="click->flows#duplicateCardClicked">⧉</button>
+      <% end %>
       <button type="button" class="card-delete-btn" style="<%= 'margin-left:auto;' if live %>"
               title="<%= t('editor.delete_card_title', default: 'Delete this question card') %>"
               data-action="click->type-panel#deleteCard">

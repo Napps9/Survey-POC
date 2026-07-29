@@ -213,6 +213,8 @@ ar:
         wire_none: "لا توصيل الآن"
         prompt_needed: "صف ما يجب أن يسأله هذا المسار."
         generate_failed: "تعذّر التوليد: %{msg}"
+        duplicate_into: "⧉ نسخ بطاقة إلى هنا…"
+        duplicate_pick: "اختر بطاقة لنسخها"
       rules:
         title: "قواعد اللعبة"
         score_label: "نتيجة Verto"

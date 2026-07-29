@@ -77,6 +77,68 @@ export default class extends Controller {
     editor.markDirty()
   }
 
+  // ── Card duplication ─────────────────────────────────────────────────────
+  // Lives here (not survey-editor) because this controller owns the shared
+  // card-splice path; the feed's ⧉ button and the flow panel's
+  // "duplicate into flow" picker both land in duplicateCard.
+
+  async duplicateCardClicked(event) {
+    event.stopPropagation()
+    const cardEl = event.currentTarget.closest("[data-survey-editor-target='card']")
+    if (cardEl) await this.duplicateCard(cardEl)
+  }
+
+  // Duplicate a card: same content, fresh identity (render_card mints the
+  // cid), no inherited wiring — routes/next/lane_label stay with the
+  // original, and Common Question provenance is dropped because a duplicate
+  // is a NEW measurement (keeping the id would double-count it in rollups).
+  // Defaults: splice right below the source, joining the source's flow if it
+  // is in one; pass flowId/afterSlot to duplicate INTO a specific flow.
+  async duplicateCard(cardEl, { flowId, afterSlot } = {}) {
+    const editor = this._editor()
+    if (!editor || editor.liveValue || !cardEl) return null
+    const idx = editor.cardTargets.indexOf(cardEl)
+    const source = editor.serialize().cards[idx]
+    if (!source) return null
+    const copy = { ...source }
+    ;[ "cid", "logic", "next", "lane_label", "flow_id",
+       "common_question_id", "common_question_set_id" ].forEach(k => delete copy[k])
+    const targetFlow = flowId !== undefined ? flowId : (cardEl.dataset.cardFlowId || null)
+    const card = await this._spliceCard(copy, afterSlot || cardEl.closest(".card-slot"), targetFlow)
+    if (!card) return null
+    editor.refreshAll()
+    editor.markDirty()
+    card.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    return card
+  }
+
+  // The flow panel's "duplicate into this flow" picker: swaps the action
+  // button for a one-shot card select; picking a card copies it to the end
+  // of the flow (the repaint after duplicateCard clears the select away).
+  _showDuplicatePicker(btn, flowId) {
+    const editor = this._editor()
+    if (!editor || btn.parentElement.querySelector(".flow-dup-select")) return
+    const sel = document.createElement("select")
+    sel.className = "logic-route-select flow-dup-select"
+    sel.appendChild(this._option("", t("editor.flows.duplicate_pick")))
+    editor.cardTargets.forEach(c => {
+      const cid = c.dataset.cardCid
+      if (!cid || c.dataset.cardType === "welcome_card") return
+      const label = (c.querySelector(".q-title, .activity-title")?.textContent || "").trim().slice(0, 40)
+      sel.appendChild(this._option(cid, `Card ${c.dataset.cardNum}${label ? `: ${label}` : ""}`))
+    })
+    sel.addEventListener("change", async () => {
+      const cid = sel.value
+      if (!cid) return
+      const cardEl = this.element.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(cid)}"]`)
+      const members = editor.flowMemberWraps(flowId)
+      const lastSlot = members.length ? members[members.length - 1].closest(".card-slot") : null
+      await this.duplicateCard(cardEl, { flowId, afterSlot: lastSlot })
+    })
+    btn.after(sel)
+    sel.focus()
+  }
+
   // ── Generate a flow with AI ──────────────────────────────────────────────
 
   openGenerate() {
@@ -254,6 +316,7 @@ export default class extends Controller {
         members[0].scrollIntoView({ behavior: "smooth", block: "center" })
       }))
       actions.appendChild(this._actionBtn(t("editor.flows.add_card"), () => this.addCardToFlow(flow.id)))
+      actions.appendChild(this._actionBtn(t("editor.flows.duplicate_into"), e => this._showDuplicatePicker(e.currentTarget, flow.id)))
       actions.appendChild(this._armedBtn(t("editor.flows.dissolve"), () => {
         this._editor()?.removeFlow(flow.id, { deleteCards: false })
       }))
