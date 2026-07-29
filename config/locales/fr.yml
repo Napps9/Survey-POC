@@ -208,6 +208,8 @@ fr:
         warn_empty: "« %{name} » n'a pas encore de cartes"
         warn_unreachable: "Aucune route ne mène à « %{name} »"
         warn_cycle: "Boucle de flux : %{names}"
+        legacy_title: "Branches détectées"
+        convert: "Convertir en flux"
       rules:
         title: "Règles du jeu"
         score_label: "Score du Verto"

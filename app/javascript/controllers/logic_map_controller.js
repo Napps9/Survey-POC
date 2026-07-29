@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { computeLanes, contTarget, LANE_PALETTE } from "lib/flow_lanes"
 
 // The "zoom out" flow map for answer-branching. Reads the LIVE deck from the
 // survey-editor controller (serialize() → cards with cid + logic), builds a
@@ -28,9 +29,9 @@ const MARGIN = 56
 // rather than just another row squeezed into the same grid.
 const BAND_GAP = 90
 // Corner radius for the orthogonal connectors that thread the gutters.
+// (Lane colours come from lib/flow_lanes' LANE_PALETTE, shared with the
+// Flows panel and mirrored by Survey::FLOW_COLORS.)
 const CONNECTOR_R = 14
-// Distinct colours cycled across branch lanes so each reads as a unit.
-const LANE_PALETTE = ["#8B85FF", "#01EACB", "#F59E0B", "#F472B6", "#38BDF8", "#A3E635"]
 
 export default class extends Controller {
   static targets = ["overlay", "svg", "empty"]
@@ -161,7 +162,43 @@ export default class extends Controller {
   // stored data — the label defaults to the answer value (or a card's
   // lane_label).
   _attachLanes(graph, cards) {
-    const lanes = this._computeLanes(cards)
+    // First-class flows claim their lanes from STORED data (stable name +
+    // colour, membership from flow_id, exit from the compiled chain); the
+    // dominator-derived detection below only runs over cards no flow claims,
+    // as the fallback for pre-flows hand-wired decks.
+    const flows = this._editor()?.flowsList?.() || []
+    const flowLanes = []
+    flows.forEach(flow => {
+      const memberCids = cards.filter(c => c.flow_id === flow.id).map(c => c.cid).filter(Boolean)
+      if (!memberCids.length) return
+      const entry = memberCids[0]
+      let inbound = null
+      cards.some(c => {
+        const routes = (c.logic && Array.isArray(c.logic.routes)) ? c.logic.routes : []
+        const hit = routes.find(r => r && r.to && r.to.card === entry)
+        if (hit) { inbound = { cid: c.cid, answer: (hit.match && hit.match.value) || "" } }
+        return !!hit
+      })
+      const last = cards.find(c => c.cid === memberCids[memberCids.length - 1])
+      flowLanes.push({
+        entry, label: flow.name, color: flow.color, flowId: flow.id,
+        members: new Set(memberCids), spine: memberCids,
+        rejoin: contTarget(last, cards), inbound, orphan: !inbound, simple: true
+      })
+    })
+    const claimed = new Set(flowLanes.flatMap(l => [ ...l.members ]))
+    const derived = computeLanes(cards)
+      .filter(l => !claimed.has(l.entry))
+      .map(l => {
+        const members = new Set([ ...l.members ].filter(x => !claimed.has(x)))
+        const spine = l.spine.filter(x => !claimed.has(x))
+        return { ...l, members, spine, simple: l.simple && spine.length === members.size }
+      })
+      .filter(l => l.members.size)
+    // Continue the palette after the flow lanes so the two sets don't collide
+    // on the first colours.
+    derived.forEach((l, i) => { l.color = LANE_PALETTE[(flowLanes.length + i) % LANE_PALETTE.length] })
+    const lanes = [ ...flowLanes, ...derived ]
     graph.lanes = lanes
     // Each card takes its INNERMOST containing lane (smallest member set) as its
     // colour; the next-larger containing lane is its parent (for a nested chip).
@@ -183,86 +220,8 @@ export default class extends Controller {
     })
   }
 
-  // The branch lanes for a deck (shared by rendering and reorder). A lane =
-  // an answer-route target's DOMINATED region; each carries its entry, label,
-  // colour, member set, inbound route, the main continuation `spine` (entry →
-  // continuation → … up to the rejoin), the encoded `rejoin` target, and
-  // `simple` (spine covers every member ⇒ a plain chain safe to reorder).
-  _computeLanes(cards) {
-    const cids = cards.map(c => c.cid).filter(Boolean)
-    if (!cids.length) return []
-    const byCid = new Map(cards.map(c => [c.cid, c]))
-    const start = cids[0]
-
-    const adj = new Map(cids.map(c => [c, []]))
-    const link = (from, to) => { if (byCid.has(to) && adj.has(from)) adj.get(from).push(to) }
-    cards.forEach((c, i) => {
-      let covered = false
-      const L = c.logic
-      if (L && Array.isArray(L.routes)) L.routes.forEach(r => { if (r && r.to && r.to.card) link(c.cid, r.to.card) })
-      if (L && L.default && (L.default.card || L.default.end)) { covered = true; if (L.default.card) link(c.cid, L.default.card) }
-      if (!covered && c.next && (c.next.card || c.next.end)) { covered = true; if (c.next.card) link(c.cid, c.next.card) }
-      if (!covered && i + 1 < cards.length && cards[i + 1].cid) link(c.cid, cards[i + 1].cid)
-    })
-    const reach = (skip) => {
-      const seen = new Set(), stack = [start]
-      while (stack.length) {
-        const x = stack.pop()
-        if (x === skip || seen.has(x) || !adj.has(x)) continue
-        seen.add(x)
-        adj.get(x).forEach(y => { if (y !== skip) stack.push(y) })
-      }
-      return seen
-    }
-    const reach0 = reach(null)
-
-    const lanes = []
-    const seenEntry = new Set()
-    cards.forEach(c => {
-      if (!c.logic || !Array.isArray(c.logic.routes)) return
-      c.logic.routes.forEach(r => {
-        const E = r && r.to && r.to.card
-        if (!E || !byCid.has(E) || !reach0.has(E) || seenEntry.has(E)) return
-        seenEntry.add(E)
-        const without = reach(E)
-        const members = new Set([...reach0].filter(x => x === E || !without.has(x)))
-        const label = (byCid.get(E).lane_label || (r.match && r.match.value) || "Branch").toString()
-        lanes.push({ entry: E, label, members, inbound: { cid: c.cid, answer: (r.match && r.match.value) || "" } })
-      })
-    })
-    lanes.forEach((l, i) => {
-      l.color = LANE_PALETTE[i % LANE_PALETTE.length]
-      const spine = [], seen = new Set()
-      let cur = l.entry
-      while (cur && l.members.has(cur) && !seen.has(cur)) {
-        seen.add(cur); spine.push(cur)
-        cur = this._contCid(byCid.get(cur), cards)
-      }
-      l.spine = spine
-      l.rejoin = spine.length ? this._contTarget(byCid.get(spine[spine.length - 1]), cards) : ""
-      l.simple = spine.length === l.members.size
-    })
-    return lanes
-  }
-
-  // A card's main continuation as an encoded target ("card:<cid>" | "end:<id>"):
-  // its answer-logic default, else its `next`, else the linear next card, else
-  // the finish. (Answer routes are NOT continuations — they open sub-branches.)
-  _contTarget(card, cards) {
-    if (!card) return ""
-    const d = card.logic && card.logic.default
-    if (d && d.card) return `card:${d.card}`
-    if (d && d.end) return `end:${d.end}`
-    if (card.next && card.next.card) return `card:${card.next.card}`
-    if (card.next && card.next.end) return `end:${card.next.end}`
-    const i = cards.findIndex(c => c.cid === card.cid)
-    return (i >= 0 && i + 1 < cards.length && cards[i + 1].cid) ? `card:${cards[i + 1].cid}` : "end:default"
-  }
-
-  _contCid(card, cards) {
-    const t = this._contTarget(card, cards)
-    return t.startsWith("card:") ? t.slice(5) : null
-  }
+  // (Derived-lane detection and the continuation walk live in lib/flow_lanes —
+  // computeLanes / contTarget / contCid — shared with the Flows panel.)
 
   // Longest-path layering from the entry (card 0), cycle-safe, gives every
   // node a COLUMN. Unreached cards are pushed to their own column past the
@@ -637,7 +596,11 @@ export default class extends Controller {
           g.appendChild(this._port(n.w, port.py, `Drag to route "${port.label}"`,
             (ev) => this._beginConnect(n.key, port.opt, n.x + n.w, n.y + port.py, ev)))
         })
-      } else {
+      } else if (!this._isMidFlowMember(n.key)) {
+        // A mid-flow member's continuation IS the flow chain (the compiler
+        // owns its `next`), so only a flow's LAST member — or a card outside
+        // any flow — offers the single flow port. On a last member the drag
+        // sets the FLOW's exit (see _setNext).
         const py = n.h / 2
         g.appendChild(this._port(n.w, py, "Drag to set where this card leads next",
           (ev) => this._beginConnect(n.key, "__next__", n.x + n.w, n.y + py, ev)))
@@ -647,11 +610,12 @@ export default class extends Controller {
   }
 
   // The lane's name chip, drawn just above its entry card in the lane colour.
-  // A nested lane is prefixed with its parent's name ("UK ▸ No") so depth reads.
+  // A nested lane is prefixed with its parent's name ("UK ▸ No") so depth
+  // reads; an orphaned flow (no answer routes into it) is flagged with ⚠.
   _laneChip(n) {
     const g = this._g()
     const prefix = n.laneParent ? this._trunc(n.laneParent.label, 10) + " ▸ " : ""
-    const label = "⎇ " + prefix + this._trunc(n.lane.label, 16)
+    const label = "⎇ " + (n.lane.orphan ? "⚠ " : "") + prefix + this._trunc(n.lane.label, 16)
     const w = Math.min(n.w, 20 + label.length * 6.4)
     const rect = document.createElementNS(SVG, "rect")
     rect.setAttribute("x", 0); rect.setAttribute("y", -25)
@@ -661,22 +625,55 @@ export default class extends Controller {
     g.appendChild(this._text(9, -11, label, { size: 11, fill: "#14172A" }))
     // Click to rename the branch (editable maps only).
     if (this.editableValue) {
-      const title = document.createElementNS(SVG, "title"); title.textContent = "Rename this branch"
+      const title = document.createElementNS(SVG, "title")
+      title.textContent = n.lane.orphan ? "Rename this branch (no answer routes into it yet)" : "Rename this branch"
       g.appendChild(title)
       g.style.cursor = "text"
       g.addEventListener("pointerdown", (ev) => ev.stopPropagation())
-      g.addEventListener("click", (ev) => { ev.stopPropagation(); this._renameLane(n.lane.entry, n.lane.label) })
+      g.addEventListener("click", (ev) => { ev.stopPropagation(); this._renameLane(n.lane) })
+      // Flow lanes get a "+" bubble beside the chip — append a card to the flow.
+      if (n.lane.flowId) {
+        const plus = this._g()
+        const pr = document.createElementNS(SVG, "rect")
+        pr.setAttribute("x", w + 6); pr.setAttribute("y", -25)
+        pr.setAttribute("width", 20); pr.setAttribute("height", 20); pr.setAttribute("rx", 10)
+        pr.setAttribute("fill", n.lane.color)
+        plus.appendChild(pr)
+        plus.appendChild(this._text(w + 11, -11, "＋", { size: 11, fill: "#14172A" }))
+        const ptitle = document.createElementNS(SVG, "title"); ptitle.textContent = "Add a card to this flow"
+        plus.appendChild(ptitle)
+        plus.style.cursor = "pointer"
+        plus.addEventListener("pointerdown", (ev) => ev.stopPropagation())
+        plus.addEventListener("click", async (ev) => {
+          ev.stopPropagation()
+          const flowsCtrl = this._flowsPanel()
+          if (flowsCtrl) { await flowsCtrl.addCardToFlow(n.lane.flowId); this._render() }
+        })
+        g.appendChild(plus)
+      }
     }
     return g
   }
 
-  // Rename a branch — stored as lane_label on its entry card, which the lane
-  // detector prefers over the answer-derived default. Persisted via autosave.
-  _renameLane(entryCid, current) {
+  // The Flows panel controller (rides the editor root, same as survey-editor).
+  _flowsPanel() {
+    const el = document.querySelector("[data-survey-editor-url-value]")
+    return el ? this.application.getControllerForElementAndIdentifier(el, "flows") : null
+  }
+
+  // Rename a branch. A first-class flow renames through the editor's flow
+  // registry; a derived lane stores lane_label on its entry card, which the
+  // lane detector prefers over the answer-derived default.
+  _renameLane(lane) {
     if (!this.editableValue) return
-    const name = window.prompt("Branch name", current || "")
+    const name = window.prompt("Branch name", lane.label || "")
     if (name == null) return // cancelled
-    const wrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(entryCid)}"]`)
+    if (lane.flowId) {
+      this._editor()?.renameFlow(lane.flowId, name)
+      this._render()
+      return
+    }
+    const wrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(lane.entry)}"]`)
     if (!wrap) return
     const trimmed = name.trim()
     if (trimmed) wrap.dataset.cardLaneLabel = trimmed
@@ -972,18 +969,43 @@ export default class extends Controller {
     else this._setRoute(fromCid, opt, targetValue)
   }
 
+  // Whether a card is a flow member with members after it — its `next` is the
+  // compiler's, not the creator's.
+  _isMidFlowMember(cid) {
+    const wrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(cid)}"]`)
+    const flowId = wrap?.dataset.cardFlowId
+    if (!flowId) return false
+    const members = this._editor()?.flowMemberWraps(flowId) || []
+    return members.length > 0 && members[members.length - 1] !== wrap
+  }
+
   // Set (or clear, on "") a card's unconditional `next` flow pointer directly on
   // its wrap dataset — the serialiser reads data-card-next, so autosave persists
   // it and the player follows it. This is how branch lanes chain and rejoin.
+  // A flow's LAST member routes the write through the flow's exit instead, so
+  // the registry and the compiled chain stay one thing.
   _setNext(fromCid, targetValue) {
     const wrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(fromCid)}"]`)
     if (!wrap) return
+    const editor = this._editor()
+    const flowId = wrap.dataset.cardFlowId
+    if (flowId && editor) {
+      const members = editor.flowMemberWraps(flowId)
+      if (members[members.length - 1] === wrap) {
+        let target = null
+        if (typeof targetValue === "string" && targetValue.startsWith("card:")) target = { card: targetValue.slice(5) }
+        else if (typeof targetValue === "string" && targetValue.startsWith("end:")) target = { end: targetValue.slice(4) }
+        editor.setFlowExit(flowId, target)
+        this._render()
+        return
+      }
+    }
     let next = null
     if (typeof targetValue === "string" && targetValue.startsWith("card:")) next = { card: targetValue.slice(5) }
     else if (typeof targetValue === "string" && targetValue.startsWith("end:")) next = { end: targetValue.slice(4) }
     if (next && (next.card || next.end)) wrap.dataset.cardNext = JSON.stringify(next)
     else delete wrap.dataset.cardNext
-    this._editor()?.markDirty()
+    editor?.markDirty()
     this._render()
   }
 
@@ -993,9 +1015,28 @@ export default class extends Controller {
   // card leads to its new neighbour, and the neighbour leads on to what followed.
   // Restricted to simple lanes so no sub-branch rejoin is silently broken.
   _moveInLane(cid, dir) {
-    const cards = this._editor()?.serialize()?.cards || []
+    const editor = this._editor()
+    const cards = editor?.serialize()?.cards || []
+    // A flow member reorders by swapping the two member SLOTS in the feed —
+    // flow order IS deck order, and the compile pass rewrites the chain — so
+    // no pointer surgery is needed (or wanted: it would fight the compiler).
+    const moved = cards.find(c => c.cid === cid)
+    if (moved && moved.flow_id && editor) {
+      const wraps = editor.flowMemberWraps(moved.flow_id)
+      const i = wraps.findIndex(w => w.dataset.cardCid === cid)
+      const j = i + dir
+      if (i < 0 || j < 0 || j >= wraps.length) return
+      const slotA = wraps[Math.min(i, j)].closest(".card-slot")
+      const slotB = wraps[Math.max(i, j)].closest(".card-slot")
+      if (!slotA || !slotB) return
+      slotB.after(slotA)
+      editor.refreshAll()
+      editor.markDirty()
+      this._render()
+      return
+    }
     const byCid = new Map(cards.map(c => [c.cid, c]))
-    const lane = this._computeLanes(cards)
+    const lane = computeLanes(cards)
       .filter(l => l.simple && l.members.has(cid))
       .sort((a, b) => a.members.size - b.members.size)[0]
     if (!lane) return
@@ -1083,20 +1124,35 @@ export default class extends Controller {
         else feed.appendChild(slot)
         const rootWithEditor = document.querySelector("[data-survey-editor-url-value]")
         this.application.getControllerForElementAndIdentifier(rootWithEditor, "type-panel")?.registerCard(card)
-        this._editor()?.refreshAll() // renumber + refreshLogicTargets so the new cid is routable
+        const editor = this._editor()
+        editor?.refreshAll() // renumber + refreshLogicTargets so the new cid is routable
         const newCid = card.dataset.cardCid
+        const isAnswer = opt !== "__default__" && opt !== "__next__"
         if (newCid) {
-          this._applyTarget(fromCid, opt, `card:${newCid}`)           // source → new card
-          if (rejoin && rejoin !== `card:${newCid}`) this._setNext(newCid, rejoin) // new card → rejoin
+          if (isAnswer && editor?.addFlow) {
+            // Dropping an ANSWER on empty canvas creates a first-class flow
+            // named after the answer, seeded with this card; the captured
+            // continuation becomes the flow's exit (compile writes the chain,
+            // so no manual `next` here — it would only fight the compiler).
+            const exit = rejoin.startsWith("card:") ? { card: rejoin.slice(5) }
+                       : rejoin.startsWith("end:")  ? { end: rejoin.slice(4) }
+                       : null
+            const flow = editor.addFlow({ name: opt, exit })
+            card.dataset.cardFlowId = flow.id
+            this._applyTarget(fromCid, opt, `flow:${flow.id}`)        // source answer → flow
+          } else {
+            this._applyTarget(fromCid, opt, `card:${newCid}`)         // source → new card
+            if (rejoin && rejoin !== `card:${newCid}`) this._setNext(newCid, rejoin) // new card → rejoin
+          }
           // Branching a single answer of a routable card: pin the source's
           // "otherwise" default to where its other answers were already going,
           // so they keep their path instead of falling through into the
           // just-spliced card. No-op for the default/flow ports (already
           // explicit) and for non-routable cards (no default select to set).
-          if (opt !== "__default__" && opt !== "__next__" && otherwise && otherwise !== `card:${newCid}`) {
+          if (isAnswer && otherwise && otherwise !== `card:${newCid}`) {
             this._applyTarget(fromCid, "__default__", otherwise)
           }
-        } else { this._editor()?.markDirty(); this._render() }
+        } else { editor?.markDirty(); this._render() }
       })
       .catch(() => { /* best-effort; the creator can add a card manually */ })
   }

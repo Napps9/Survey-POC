@@ -208,6 +208,8 @@ pt:
         warn_empty: "“%{name}” ainda não tem cartões"
         warn_unreachable: "Nenhuma rota leva a “%{name}”"
         warn_cycle: "Fluxos em ciclo: %{names}"
+        legacy_title: "Ramos detetados"
+        convert: "Converter em fluxo"
       rules:
         title: "Regras do jogo"
         score_label: "Pontuação do Verto"

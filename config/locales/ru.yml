@@ -208,6 +208,8 @@ ru:
         warn_empty: "«%{name}» пока без карточек"
         warn_unreachable: "Ни один маршрут не ведёт в «%{name}»"
         warn_cycle: "Потоки зациклены: %{names}"
+        legacy_title: "Обнаруженные ветки"
+        convert: "Преобразовать в поток"
       rules:
         title: "Правила игры"
         score_label: "Оценка Verto"

@@ -1106,6 +1106,20 @@
   text-align: left;
 }
 .flow-warn-chip:hover { border-color: #FFC97A; }
+.flow-legacy { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.flow-legacy-title {
+  font-family: 'Alata', sans-serif; font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.flow-legacy-chip {
+  padding: 5px 12px; border-radius: 100px; width: fit-content;
+  background: transparent; color: rgba(255,255,255,0.75);
+  border: 1px dashed rgba(255,255,255,0.3);
+  font-family: 'ABeeZee', sans-serif; font-size: 11.5px; cursor: pointer;
+  text-align: left;
+}
+.flow-legacy-chip:hover { border-color: #01EACB; color: #01EACB; }
 /* Bottom-right, mirroring the Delete CTA on the chrome row above the card
    (same 4px inset), so the centre column stays clear of the floating pills. */
 .aq-insert-row { display: flex; justify-content: flex-end; padding: 0 4px; }

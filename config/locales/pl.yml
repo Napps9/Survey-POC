@@ -208,6 +208,8 @@ pl:
         warn_empty: "„%{name}” nie ma jeszcze kart"
         warn_unreachable: "Żadna trasa nie prowadzi do „%{name}”"
         warn_cycle: "Pętla przepływów: %{names}"
+        legacy_title: "Wykryte rozgałęzienia"
+        convert: "Zamień na przepływ"
       rules:
         title: "Zasady gry"
         score_label: "Wynik Verto"

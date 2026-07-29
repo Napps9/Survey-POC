@@ -208,6 +208,8 @@ id:
         warn_empty: "“%{name}” belum punya kartu"
         warn_unreachable: "Tidak ada rute menuju “%{name}”"
         warn_cycle: "Alur berputar: %{names}"
+        legacy_title: "Cabang terdeteksi"
+        convert: "Ubah jadi alur"
       rules:
         title: "Aturan Main"
         score_label: "Skor Verto"

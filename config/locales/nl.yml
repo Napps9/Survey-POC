@@ -208,6 +208,8 @@ nl:
         warn_empty: "“%{name}” heeft nog geen kaarten"
         warn_unreachable: "Geen route leidt naar “%{name}”"
         warn_cycle: "Flows in een lus: %{names}"
+        legacy_title: "Gedetecteerde vertakkingen"
+        convert: "Omzetten naar flow"
       rules:
         title: "Spelregels"
         score_label: "Verto-score"

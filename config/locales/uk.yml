@@ -208,6 +208,8 @@ uk:
         warn_empty: "«%{name}» поки без карток"
         warn_unreachable: "Жоден маршрут не веде до «%{name}»"
         warn_cycle: "Потоки зациклені: %{names}"
+        legacy_title: "Виявлені гілки"
+        convert: "Перетворити на потік"
       rules:
         title: "Правила гри"
         score_label: "Оцінка Verto"

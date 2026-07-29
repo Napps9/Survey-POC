@@ -208,6 +208,8 @@ de:
         warn_empty: "„%{name}“ hat noch keine Karten"
         warn_unreachable: "Keine Route führt in „%{name}“"
         warn_cycle: "Flows im Kreis: %{names}"
+        legacy_title: "Erkannte Verzweigungen"
+        convert: "In Flow umwandeln"
       rules:
         title: "Spielregeln"
         score_label: "Verto-Punktzahl"

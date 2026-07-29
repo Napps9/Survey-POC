@@ -208,6 +208,8 @@ ko:
         warn_empty: "“%{name}”에 아직 카드가 없습니다"
         warn_unreachable: "“%{name}”(으)로 가는 라우트가 없습니다"
         warn_cycle: "플로우 순환: %{names}"
+        legacy_title: "감지된 분기"
+        convert: "플로우로 전환"
       rules:
         title: "게임의 규칙"
         score_label: "Verto 점수"

@@ -208,6 +208,8 @@ es:
         warn_empty: "“%{name}” aún no tiene tarjetas"
         warn_unreachable: "Ninguna ruta lleva a “%{name}”"
         warn_cycle: "Flujos en bucle: %{names}"
+        legacy_title: "Ramas detectadas"
+        convert: "Convertir en flujo"
       rules:
         title: "Reglas del juego"
         score_label: "Puntuación del Verto"

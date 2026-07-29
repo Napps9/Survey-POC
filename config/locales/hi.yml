@@ -208,6 +208,8 @@ hi:
         warn_empty: "“%{name}” में अभी कार्ड नहीं हैं"
         warn_unreachable: "कोई रूट “%{name}” तक नहीं जाता"
         warn_cycle: "फ़्लो लूप में हैं: %{names}"
+        legacy_title: "पहचानी गई शाखाएँ"
+        convert: "फ़्लो में बदलें"
       rules:
         title: "खेल के नियम"
         score_label: "Verto स्कोर"

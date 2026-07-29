@@ -208,6 +208,8 @@ tr:
         warn_empty: "“%{name}” henüz kartsız"
         warn_unreachable: "Hiçbir rota “%{name}” akışına gitmiyor"
         warn_cycle: "Akışlar döngüde: %{names}"
+        legacy_title: "Algılanan dallar"
+        convert: "Akışa dönüştür"
       rules:
         title: "Oyunun Kuralları"
         score_label: "Verto puanı"

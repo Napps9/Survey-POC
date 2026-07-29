@@ -208,6 +208,8 @@ ar:
         warn_empty: "«%{name}» بلا بطاقات بعد"
         warn_unreachable: "لا مسار يقود إلى «%{name}»"
         warn_cycle: "المسارات في حلقة: %{names}"
+        legacy_title: "فروع مكتشفة"
+        convert: "تحويل إلى مسار"
       rules:
         title: "قواعد اللعبة"
         score_label: "نتيجة Verto"

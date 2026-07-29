@@ -208,6 +208,8 @@ sw:
         warn_empty: "“%{name}” haina kadi bado"
         warn_unreachable: "Hakuna njia inayoingia “%{name}”"
         warn_cycle: "Mitiririko inazunguka: %{names}"
+        legacy_title: "Matawi yaliyogunduliwa"
+        convert: "Badilisha kuwa mtiririko"
       rules:
         title: "Kanuni za Mchezo"
         score_label: "Alama ya Verto"

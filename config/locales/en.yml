@@ -210,6 +210,8 @@ en:
         warn_empty: "“%{name}” has no cards yet"
         warn_unreachable: "No route leads into “%{name}”"
         warn_cycle: "Flows loop: %{names}"
+        legacy_title: "Detected branches"
+        convert: "Convert to flow"
       rules:
         title: "Rules of the Game"
         score_label: "Verto score"

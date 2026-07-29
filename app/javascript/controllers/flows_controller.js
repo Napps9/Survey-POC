@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
 import { computeWarnings } from "lib/graph_warnings"
+import { computeLanes } from "lib/flow_lanes"
 
 // The Flows panel: lists the deck's first-class flows (name, colour, entry,
 // exit, member count), creates/renames/deletes them, and surfaces wiring
@@ -14,7 +15,7 @@ import { computeWarnings } from "lib/graph_warnings"
 // change) and must stay render-only on that path — mutating or markDirty-ing
 // from a repaint would loop.
 export default class extends Controller {
-  static targets = [ "list", "warnings" ]
+  static targets = [ "list", "warnings", "legacy" ]
 
   connect() {
     // survey-editor may not have connected yet (same element, order not
@@ -26,8 +27,10 @@ export default class extends Controller {
     if (!this.hasListTarget) return
     const editor = this._editor()
     if (!editor || typeof editor.flowsList !== "function") return
+    const { cards, flows } = editor.serialize()
     this._renderList(editor)
-    this._renderWarnings(editor)
+    this._renderLegacyLanes(editor, cards)
+    this._renderWarnings(editor, cards, flows)
   }
 
   // ── Actions ──────────────────────────────────────────────────────────────
@@ -145,7 +148,7 @@ export default class extends Controller {
       if (members.length) actions.appendChild(this._actionBtn(t("editor.flows.jump"), () => {
         members[0].scrollIntoView({ behavior: "smooth", block: "center" })
       }))
-      actions.appendChild(this._actionBtn(t("editor.flows.add_card"), () => this._addCard(flow.id)))
+      actions.appendChild(this._actionBtn(t("editor.flows.add_card"), () => this.addCardToFlow(flow.id)))
       actions.appendChild(this._armedBtn(t("editor.flows.dissolve"), () => {
         this._editor()?.removeFlow(flow.id, { deleteCards: false })
       }))
@@ -194,10 +197,56 @@ export default class extends Controller {
     return sel
   }
 
-  _renderWarnings(editor) {
+  // Hand-wired branches (derived lanes) not yet covered by a flow, each with a
+  // one-click upgrade. Only SIMPLE lanes (a plain chain) convert — a lane with
+  // sub-branches keeps its wiring untouched.
+  _renderLegacyLanes(editor, cards) {
+    if (!this.hasLegacyTarget) return
+    const box = this.legacyTarget
+    box.textContent = ""
+    if (editor.liveValue) { box.style.display = "none"; return }
+    const claimed = new Set(cards.filter(c => c.flow_id).map(c => c.cid))
+    const lanes = computeLanes(cards).filter(l => l.simple && !claimed.has(l.entry))
+    box.style.display = lanes.length ? "" : "none"
+    if (!lanes.length) return
+    const title = document.createElement("div")
+    title.className = "flow-legacy-title"
+    title.textContent = t("editor.flows.legacy_title")
+    box.appendChild(title)
+    lanes.forEach(lane => {
+      const chip = document.createElement("button")
+      chip.type = "button"
+      chip.className = "flow-legacy-chip"
+      chip.textContent = `⎇ ${lane.label} — ${t("editor.flows.convert")}`
+      chip.addEventListener("click", () => this._convertLane(lane))
+      box.appendChild(chip)
+    })
+  }
+
+  // Upgrade a derived lane to a first-class flow: same name, exit = the lane's
+  // rejoin target, membership = its spine. The inbound answer route already
+  // points at the entry card, so refreshLogicTargets upgrades it to flow:<id>
+  // on the next repaint; the entry's lane_label is superseded and cleared.
+  _convertLane(lane) {
+    const editor = this._editor()
+    if (!editor || editor.liveValue) return
+    const exit = lane.rejoin.startsWith("card:") ? { card: lane.rejoin.slice(5) }
+               : lane.rejoin.startsWith("end:")  ? { end: lane.rejoin.slice(4) }
+               : null
+    const flow = editor.addFlow({ name: lane.label, exit })
+    lane.spine.forEach(cid => {
+      const wrap = this.element.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(cid)}"]`)
+      if (!wrap) return
+      wrap.dataset.cardFlowId = flow.id
+      delete wrap.dataset.cardLaneLabel
+    })
+    editor.refreshAll()
+    editor.markDirty()
+  }
+
+  _renderWarnings(editor, cards, flows) {
     if (!this.hasWarningsTarget) return
     const box = this.warningsTarget
-    const { cards, flows } = editor.serialize()
     const endIds = [ "default", ...((editor.logicConfigValue?.ends || []).map(e => e.id)) ]
     const warnings = computeWarnings(cards, flows, endIds)
     box.textContent = ""
@@ -269,7 +318,9 @@ export default class extends Controller {
     return cid ? `card:${cid}` : "end:default"
   }
 
-  async _addCard(flowId) {
+  // Append a blank card to a flow. Public: the flow map's lane-chip "+" calls
+  // it too, so both surfaces share one splice path.
+  async addCardToFlow(flowId) {
     const editor = this._editor()
     if (!editor || editor.liveValue) return
     const members = editor.flowMemberWraps(flowId)

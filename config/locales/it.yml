@@ -208,6 +208,8 @@ it:
         warn_empty: "“%{name}” non ha ancora schede"
         warn_unreachable: "Nessuna rotta porta a “%{name}”"
         warn_cycle: "Flussi in loop: %{names}"
+        legacy_title: "Diramazioni rilevate"
+        convert: "Converti in flusso"
       rules:
         title: "Regole del gioco"
         score_label: "Punteggio del Verto"

@@ -208,6 +208,8 @@ he:
         warn_empty: "ל„%{name}” אין עדיין כרטיסים"
         warn_unreachable: "שום ניתוב לא מוביל אל „%{name}”"
         warn_cycle: "המסלולים בלולאה: %{names}"
+        legacy_title: "הסתעפויות שזוהו"
+        convert: "המרה למסלול"
       rules:
         title: "חוקי המשחק"
         score_label: "ציון Verto"

@@ -208,6 +208,8 @@ ja:
         warn_empty: "「%{name}」にはまだカードがありません"
         warn_unreachable: "「%{name}」へのルートがありません"
         warn_cycle: "フローがループしています:%{names}"
+        legacy_title: "検出された分岐"
+        convert: "フローに変換"
       rules:
         title: "ゲームのルール"
         score_label: "Vertoスコア"

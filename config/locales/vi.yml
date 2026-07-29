@@ -208,6 +208,8 @@ vi:
         warn_empty: "“%{name}” chưa có thẻ"
         warn_unreachable: "Không có tuyến nào dẫn vào “%{name}”"
         warn_cycle: "Các luồng bị lặp: %{names}"
+        legacy_title: "Nhánh được phát hiện"
+        convert: "Chuyển thành luồng"
       rules:
         title: "Luật chơi"
         score_label: "Điểm Verto"
