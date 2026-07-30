@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -326,6 +326,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_170000) do
     t.index ["survey_id", "answered", "status"], name: "index_responses_on_survey_answered_status"
     t.index ["survey_id", "demographic_birth_year"], name: "index_responses_on_survey_id_and_demographic_birth_year"
     t.index ["survey_id", "demographic_gender"], name: "index_responses_on_survey_id_and_demographic_gender"
+    t.index ["survey_id", "region_country"], name: "index_responses_on_survey_and_region_country"
     t.index ["survey_id", "respondent_code_digest"], name: "index_responses_on_survey_and_respondent_code"
     t.index ["survey_id"], name: "index_responses_on_survey_id"
     t.index ["survey_share_id"], name: "index_responses_on_survey_share_id"
@@ -606,12 +607,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_170000) do
   add_foreign_key "funder_memberships", "funders"
   add_foreign_key "funder_memberships", "organisations"
   add_foreign_key "funders", "organisations"
+  add_foreign_key "identities", "users"
   add_foreign_key "invites", "funders"
   add_foreign_key "invites", "organisations"
   add_foreign_key "invites", "partnerships"
   add_foreign_key "invites", "users", column: "invited_by_id"
   add_foreign_key "memberships", "organisations"
   add_foreign_key "memberships", "users"
+  add_foreign_key "partnership_common_question_sets", "common_question_sets"
+  add_foreign_key "partnership_common_question_sets", "partnerships"
   add_foreign_key "partnership_memberships", "organisations"
   add_foreign_key "partnership_memberships", "partnerships"
   add_foreign_key "partnership_vertos", "partnerships"
