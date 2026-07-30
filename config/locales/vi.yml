@@ -754,6 +754,7 @@ vi:
     badge_archived: Đã lưu trữ
     badge_live: Trực tiếp
     badge_draft: Bản nháp
+    badge_closed: 'Đã đóng'
     fallback_name: Verto này
     deleted_on: Đã xóa %{date}
     untitled: Chưa đặt tên

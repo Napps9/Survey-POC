@@ -754,6 +754,7 @@ he:
     badge_archived: בארכיון
     badge_live: פעיל
     badge_draft: טיוטה
+    badge_closed: 'סגור'
     fallback_name: Verto זה
     deleted_on: נמחק %{date}
     untitled: ללא כותרת

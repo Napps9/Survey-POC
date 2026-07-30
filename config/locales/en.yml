@@ -756,6 +756,7 @@ en:
     badge_archived: "Archived"
     badge_live: "Live"
     badge_draft: "Draft"
+    badge_closed: 'Closed'
     fallback_name: "this Verto"
     deleted_on: "Deleted %{date}"
     untitled: "Untitled"

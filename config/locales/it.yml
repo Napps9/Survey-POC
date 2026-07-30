@@ -754,6 +754,7 @@ it:
     badge_archived: Archiviato
     badge_live: Live
     badge_draft: Bozza
+    badge_closed: 'Chiuso'
     fallback_name: questo Verto
     deleted_on: Eliminato il %{date}
     untitled: Senza titolo

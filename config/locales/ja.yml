@@ -754,6 +754,7 @@ ja:
     badge_archived: アーカイブ済み
     badge_live: ライブ
     badge_draft: 下書き
+    badge_closed: '終了'
     fallback_name: このVerto
     deleted_on: "%{date}に削除"
     untitled: タイトルなし

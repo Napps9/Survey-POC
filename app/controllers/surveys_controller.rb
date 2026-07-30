@@ -10,8 +10,14 @@ class SurveysController < ApplicationController
   # the image was actually judged unsafe.
   COULD_NOT_VERIFY_IMAGE_MESSAGE = "We couldn't check that image — please try again."
 
+  # Structural edits are refused while a Verto is live, and stay refused once it
+  # has responses even after being unpublished — answers are keyed by card
+  # index, so a deck change would misalign what's already stored. See
+  # Survey#editing_locked?.
+  EDITING_LOCKED_MESSAGE = "Editing is locked — this Verto is live, or has already collected responses."
+
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
-  before_action :set_survey,           only: [ :show, :preview, :publish, :update_settings, :qr ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :update_settings, :qr ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
@@ -26,6 +32,10 @@ class SurveysController < ApplicationController
     # Ruby per card — the cause of the multi-second index ActiveRecord time.
     ids = (@surveys + @archived_surveys).map(&:id)
     @completed_counts           = Response.where(survey_id: ids, status: "completed").group(:survey_id).count
+    # Raw existence, for the tile's Closed-vs-Draft badge on an unpublished
+    # Verto (Survey#closed?) — kept as a grouped count so it costs one query,
+    # not one per tile.
+    @response_counts            = Response.where(survey_id: ids).group(:survey_id).count
     @responder_counts           = Response.where(survey_id: ids, answered: true).group(:survey_id).count
     @responder_completed_counts = Response.where(survey_id: ids, answered: true, status: "completed").group(:survey_id).count
     render :index, layout: "fullscreen"
@@ -258,8 +268,8 @@ class SurveysController < ApplicationController
 
   def update
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.published?
-      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    if survey.editing_locked?
+      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
     end
     payload = JSON.parse(request.body.read)
     warnings = []
@@ -373,9 +383,34 @@ class SurveysController < ApplicationController
   def publish
     @survey.update!(
       publish_token: @survey.publish_token || SecureRandom.urlsafe_base64(18),
-      published_at:  @survey.published_at  || Time.current
+      published_at:  @survey.published_at  || Time.current,
+      # Re-publishing after a take-down reuses the original token, so the same
+      # /play link (and any printed QR code) comes back to life.
+      unpublished_at: nil
     )
     redirect_to survey_path(@survey)
+  end
+
+  # POST /surveys/:id/unpublish
+  # Takes a live Verto off /play. Deliberately does NOT clear publish_token:
+  # that column is the public link, and a creator who unpublishes to fix a typo
+  # expects the same link back afterwards. What happens next depends on whether
+  # anyone answered:
+  #
+  #   no responses  → a fully editable draft again (nothing to misalign)
+  #   has responses → closed: results kept, deck permanently frozen
+  #
+  # Survey#editing_locked? is what enforces the second case, so unpublishing can
+  # never be used as a route to editing a deck people have already answered.
+  def unpublish
+    unless @survey.published?
+      return redirect_to survey_path(@survey), alert: "That Verto isn't live."
+    end
+
+    @survey.update!(unpublished_at: Time.current)
+    notice = @survey.closed? ? "Verto closed — it's off /play and its results are kept." :
+                               "Verto unpublished — it's back to a draft you can edit."
+    redirect_to survey_path(@survey), notice: notice
   end
 
   # POST /surveys/:id/card_image
@@ -389,8 +424,8 @@ class SurveysController < ApplicationController
   # is never blocked from applying an image by a storage hiccup.
   def card_image
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.published?
-      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    if survey.editing_locked?
+      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
     end
 
     blob = Survey::CardImageStore.attach(survey, params[:image].to_s)
@@ -524,8 +559,8 @@ class SurveysController < ApplicationController
 
   def shuffle_assets
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.published?
-      return redirect_to survey_path(survey), alert: "This Verto is live — editing is locked."
+    if survey.editing_locked?
+      return redirect_to survey_path(survey), alert: EDITING_LOCKED_MESSAGE
     end
     AssetPopulator.new(survey, seed: SecureRandom.hex(4)).populate!
     redirect_to survey_path(survey)
@@ -605,8 +640,8 @@ class SurveysController < ApplicationController
   # Generates a single new question card using Claude, renders its HTML partial.
   def generate_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.published?
-      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    if survey.editing_locked?
+      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
     end
 
     card = SingleQuestionGenerator.new.call(
@@ -632,8 +667,8 @@ class SurveysController < ApplicationController
   # wires the answer; autosave persists the lot (same contract as generate_card).
   def generate_flow
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.published?
-      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    if survey.editing_locked?
+      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
     end
     body   = JSON.parse(request.body.read)
     prompt = body["prompt"].to_s.strip.first(500)
@@ -674,8 +709,8 @@ class SurveysController < ApplicationController
   # in place and the traffic light turns green.
   def optimise_card
     @survey = survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.published?
-      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    if survey.editing_locked?
+      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
     end
     body = JSON.parse(request.body.read)
     card = body["card"].is_a?(Hash) ? body["card"] : {}
@@ -719,8 +754,8 @@ class SurveysController < ApplicationController
   # Renders the HTML partial for a given card JSON (used by "Start from Blank" flow).
   def render_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.published?
-      return render json: { ok: false, error: "This Verto is live — editing is locked." }, status: :locked
+    if survey.editing_locked?
+      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
     end
     card   = JSON.parse(request.body.read)
     # Stamp a stable cid now so the freshly inserted card is a valid

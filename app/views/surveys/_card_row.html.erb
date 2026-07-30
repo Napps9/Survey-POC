@@ -4,7 +4,7 @@
   is_q     = CardTypes.question?(type)
   progress = total_q > 0 && is_q ? ((q_idx.to_f / total_q) * 100).round : 5
   eyebrow  = CardTypes.eyebrow(type).presence || type.tr('_', ' ')
-  live     = @survey&.published?
+  live     = @survey&.editing_locked?
 %>
 
 <div class="survey-card-wrap"

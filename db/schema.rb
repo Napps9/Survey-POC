@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_090134) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_105832) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -507,6 +507,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_090134) do
     t.string "title"
     t.json "token_types", default: [], null: false
     t.boolean "tokenisation_enabled", default: false, null: false
+    t.datetime "unpublished_at"
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_surveys_on_deleted_at"
     t.index ["organisation_id"], name: "index_surveys_on_organisation_id"

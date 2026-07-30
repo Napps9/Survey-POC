@@ -756,6 +756,7 @@ pl:
     badge_archived: Zarchiwizowane
     badge_live: Na żywo
     badge_draft: Wersja robocza
+    badge_closed: 'Zamknięty'
     fallback_name: to Verto
     deleted_on: Usunięto %{date}
     untitled: Bez tytułu

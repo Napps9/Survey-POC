@@ -4,7 +4,7 @@
     framed, selectable card. Keeping the insert CTA outside the wrap means it
     isn't clipped by the phone/tablet device frames (which clip the wrap). %>
 <%
-  live = @survey&.published?
+  live = @survey&.editing_locked?
 %>
 <div class="card-slot">
   <%= render "surveys/card_row", card: card, idx: idx, q_idx: q_idx, total_q: total_q,

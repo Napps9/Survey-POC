@@ -754,6 +754,7 @@ sw:
     badge_archived: Imehifadhiwa
     badge_live: Hai
     badge_draft: Rasimu
+    badge_closed: 'Imefungwa'
     fallback_name: Verto hii
     deleted_on: Imefutwa %{date}
     untitled: Bila kichwa

@@ -1,13 +1,22 @@
 <%
   archived    = local_assigns[:archived] == true
-  published   = survey.publish_token.present? && !archived
+  # publish_token alone no longer means "live" — it survives an unpublish so the
+  # link can be restored, so the live test has to be Survey#published?.
+  published   = survey.published? && !archived
+  unpublished = survey.unpublished? && !archived
   # Counts come from the controller's grouped queries (no responses loaded). Fall
   # back to the cheap SQL methods if a card is ever rendered outside the index.
   resp_count  = (@completed_counts || {})[survey.id] || survey.responses.where(status: "completed").count
   q_count     = Array(survey.cards).count { |c| CardTypes.question?(c["type"]) }
-  responders  = published ? ((@responder_counts || {})[survey.id] || survey.responders_count) : 0
+  # Whether anyone has answered — the same test Survey#closed? makes, but read
+  # off the index's grouped counts so the dashboard doesn't fire a query per tile.
+  has_responses = @response_counts ? (@response_counts[survey.id].to_i.positive?) : survey.responses.exists?
+  # Response stats belong to any Verto that has ever been open, not just a live
+  # one: a closed Verto keeps its results and the tile should still show them.
+  ever_open   = (published || unpublished)
+  responders  = ever_open ? ((@responder_counts || {})[survey.id] || survey.responders_count) : 0
   completion  =
-    if published && responders.to_i.positive?
+    if ever_open && responders.to_i.positive?
       done = (@responder_completed_counts || {})[survey.id] || survey.responses.where(answered: true, status: "completed").count
       (done * 100.0 / responders).round
     end
@@ -28,6 +37,16 @@
     badge_bg      = "#FF1E6F"
     badge_color   = "#fff"
     badge_text    = t("dashboard_card.badge_live")
+  elsif unpublished
+    # Taken off /play. "Closed" once it has responses (results kept, deck frozen
+    # for good); otherwise it really is a draft again, so it says so.
+    accent_bg     = "rgba(255,255,255,0.03)"
+    border        = "rgba(255,194,75,0.22)"
+    border_hover  = "rgba(255,194,75,0.5)"
+    top_bar       = "linear-gradient(90deg,#FFC24B,#615BF5)"
+    badge_bg      = "rgba(255,194,75,0.18)"
+    badge_color   = "#FFC24B"
+    badge_text    = has_responses ? t("dashboard_card.badge_closed") : t("dashboard_card.badge_draft")
   else
     accent_bg     = "rgba(255,255,255,0.03)"
     border        = "rgba(255,255,255,0.07)"
@@ -163,7 +182,10 @@
             onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
             onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
 
-      <% if published %>
+      <%# A closed Verto keeps its results, so it offers Results rather than
+          Publish — re-publishing lives in the editor's Status panel, behind a
+          confirm that explains the link comes back. %>
+      <% if published || (unpublished && has_responses) %>
         <%= link_to t("dashboard_card.results"), survey_results_path(survey),
               style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,30,111,0.14);border:1px solid rgba(255,30,111,0.32);color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;white-space:nowrap;",
               onmouseover: "this.style.background='rgba(255,30,111,0.22)'",

@@ -494,8 +494,46 @@ class Survey < ApplicationRecord
     update!(deleted_at: Time.current)
   end
 
+  # ── Publish lifecycle ──────────────────────────────────────────────────────
+  # Publishing mints a publish_token; unpublishing stamps unpublished_at and
+  # leaves the token alone, so re-publishing restores the same /play link
+  # (printed QR codes keep working). A Verto is therefore live only while it has
+  # a token AND has not been taken down.
   def published?
-    publish_token.present?
+    publish_token.present? && unpublished_at.nil?
+  end
+
+  # Published once, currently taken down.
+  def unpublished?
+    publish_token.present? && unpublished_at.present?
+  end
+
+  # Taken down after collecting responses. Results are kept, but the deck can
+  # never be edited again (see editing_locked?), so this is a terminal "closed"
+  # state rather than a return to draft.
+  def closed?
+    unpublished? && responses.exists?
+  end
+
+  # Back to a fully editable draft: taken down before anyone answered, so
+  # there's nothing for a deck change to misalign.
+  def reverted_to_draft?
+    unpublished? && !responses.exists?
+  end
+
+  # Structural edits are locked while a Verto is live, and STAY locked once it
+  # has collected responses even after being taken down: answers are keyed by
+  # card index, so adding, removing or reordering cards silently misaligns every
+  # later answer already stored. This — not published? — is the real editing
+  # boundary, and every write path guards on it.
+  def editing_locked?
+    published? || responses.exists?
+  end
+
+  # Reachable by a respondent at /play/:token (or a partner share link): live,
+  # and not archived. The single boundary every public player action guards on.
+  def playable?
+    published? && !deleted?
   end
 
   # The /play/:token segment to put in front of a respondent. Both the slug and

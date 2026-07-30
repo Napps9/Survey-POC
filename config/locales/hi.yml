@@ -754,6 +754,7 @@ hi:
     badge_archived: संग्रहीत
     badge_live: लाइव
     badge_draft: ड्राफ़्ट
+    badge_closed: 'बंद'
     fallback_name: यह Verto
     deleted_on: "%{date} को हटाया गया"
     untitled: बिना शीर्षक

@@ -756,6 +756,7 @@ uk:
     badge_archived: В архіві
     badge_live: Активний
     badge_draft: Чернетка
+    badge_closed: 'Закрито'
     fallback_name: цього Verto
     deleted_on: Видалено %{date}
     untitled: Без назви

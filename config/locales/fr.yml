@@ -754,6 +754,7 @@ fr:
     badge_archived: Archivé
     badge_live: En ligne
     badge_draft: Brouillon
+    badge_closed: 'Clôturé'
     fallback_name: ce Verto
     deleted_on: Supprimé le %{date}
     untitled: Sans titre

@@ -754,6 +754,7 @@ nl:
     badge_archived: Gearchiveerd
     badge_live: Live
     badge_draft: Concept
+    badge_closed: 'Gesloten'
     fallback_name: deze Verto
     deleted_on: Verwijderd %{date}
     untitled: Naamloos

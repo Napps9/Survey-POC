@@ -754,6 +754,7 @@ ar:
     badge_archived: مؤرشف
     badge_live: مباشر
     badge_draft: مسودة
+    badge_closed: 'مغلق'
     fallback_name: هذا الـ Verto
     deleted_on: حُذف في %{date}
     untitled: بدون عنوان

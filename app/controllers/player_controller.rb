@@ -72,6 +72,11 @@ class PlayerController < ApplicationController
       @oops_gone = true
       return render :unavailable, status: :gone
     end
+    # Unpublished by the creator. The link itself is real and may well come back
+    # (unpublishing keeps publish_token so re-publishing restores it), so this is
+    # a 410 rather than a 404 — but the "not published yet" copy is the accurate
+    # explanation for a respondent, not the archived-forever one.
+    return render :unavailable, status: :gone unless @survey.published?
     @display_locale = resolve_play_locale
   end
 
@@ -81,7 +86,7 @@ class PlayerController < ApplicationController
   # response that has already been completed.
   def progress
     return render json: { ok: false }, status: :not_found unless @survey
-    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
     resp  = find_or_init_response(token)
@@ -103,7 +108,7 @@ class PlayerController < ApplicationController
 
   def submit
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
-    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
     resp  = find_or_init_response(token)
@@ -137,7 +142,7 @@ class PlayerController < ApplicationController
   # consent_text shown at that moment, immune to the creator editing it later.
   def consent
     return render json: { ok: false }, status: :not_found unless @survey
-    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
 
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
@@ -164,7 +169,7 @@ class PlayerController < ApplicationController
   # committed an answer to — so it can't be peeked before answering.
   def grade
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
-    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
     return render json: { ok: false, error: "Not a quiz" }, status: :forbidden unless @survey.quiz?
 
     data  = JSON.parse(request.body.read)
@@ -213,7 +218,7 @@ class PlayerController < ApplicationController
   # token; these answers are already committed, so revealing them is safe.
   def quiz_state
     return render json: { ok: false }, status: :not_found unless @survey
-    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
     return render json: { ok: true, quiz: false } unless @survey.quiz?
 
     token = params[:session_token].to_s
@@ -242,7 +247,7 @@ class PlayerController < ApplicationController
   # per-question correct-rate).
   def scores
     return render json: { ok: false }, status: :not_found unless @survey
-    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
     return render json: { ok: false, error: "Not a quiz" }, status: :forbidden unless @survey.quiz?
 
     max    = QuizGrading.graded_indices(@survey.cards).size
@@ -279,7 +284,7 @@ class PlayerController < ApplicationController
 
   def results
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
-    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
     unless @survey.show_results_comparison?
       return render json: { ok: false, error: "Comparison not enabled" }, status: :forbidden
     end
@@ -300,7 +305,7 @@ class PlayerController < ApplicationController
   # yet" copy.
   def regions
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
-    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone if @survey.deleted?
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
 
     # Every responder (answered ≥1 question), not only completers — consistent
     # with the results comparison above. Only the columns the country grouping

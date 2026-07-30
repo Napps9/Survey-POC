@@ -754,6 +754,7 @@ id:
     badge_archived: Diarsipkan
     badge_live: Live
     badge_draft: Draf
+    badge_closed: 'Ditutup'
     fallback_name: Verto ini
     deleted_on: Dihapus %{date}
     untitled: Tanpa judul

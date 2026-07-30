@@ -756,6 +756,7 @@ ru:
     badge_archived: В архиве
     badge_live: Активен
     badge_draft: Черновик
+    badge_closed: 'Закрыт'
     fallback_name: этот Verto
     deleted_on: Удалено %{date}
     untitled: Без названия

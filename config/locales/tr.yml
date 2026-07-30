@@ -754,6 +754,7 @@ tr:
     badge_archived: Arşivlendi
     badge_live: Canlı
     badge_draft: Taslak
+    badge_closed: 'Kapatıldı'
     fallback_name: bu Verto
     deleted_on: "%{date} tarihinde silindi"
     untitled: Başlıksız

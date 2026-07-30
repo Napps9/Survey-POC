@@ -754,6 +754,7 @@ ko:
     badge_archived: 보관됨
     badge_live: 라이브
     badge_draft: 초안
+    badge_closed: '종료됨'
     fallback_name: 이 Verto
     deleted_on: "%{date}에 삭제됨"
     untitled: 제목 없음
