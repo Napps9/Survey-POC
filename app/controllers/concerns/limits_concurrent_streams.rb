@@ -31,32 +31,9 @@ module LimitsConcurrentStreams
     [ Integer(ENV.fetch("RAILS_MAX_THREADS", 3)) - 2, 1 ].max
   end
 
-  # A plain counting semaphore that never blocks: a caller either gets a slot
-  # immediately or is turned away. Waiting for one would just move the thread
-  # starvation rather than fix it.
-  class SlotPool
-    def initialize(size)
-      @size  = size
-      @taken = 0
-      @mutex = Mutex.new
-    end
-
-    def acquire
-      @mutex.synchronize do
-        return false if @taken >= @size
-
-        @taken += 1
-        true
-      end
-    end
-
-    def release
-      @mutex.synchronize { @taken -= 1 if @taken.positive? }
-    end
-
-    def available = @mutex.synchronize { @size - @taken }
-  end
-
+  # The semaphore itself lives in app/lib/slot_pool.rb — respondent-side grading
+  # bounds its own AI work with a separate instance, and it shouldn't have to
+  # reach into a concern named for streaming to do it.
   POOL = SlotPool.new(slot_count)
 
   BUSY_MESSAGE = "Too many reports are being written right now — please try again in a moment.".freeze

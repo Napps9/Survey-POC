@@ -192,6 +192,77 @@ class QuizPlayerTest < ActionDispatch::IntegrationTest
     QuizAnswerGrader.singleton_class.remove_method(:new)
   end
 
+  # #grade is public and unauthenticated, so its Claude call is bounded by a
+  # slot pool. These pin the two halves of that bound: the AI is skipped when
+  # the process is saturated, and the slot always comes back afterwards.
+  def with_pool_drained
+    pool = PlayerController::AI_GRADE_POOL
+    held = []
+    held << true while pool.acquire
+    yield
+  ensure
+    held.size.times { pool.release }
+  end
+
+  test "a saturated AI pool still saves the answer — it only skips the refinement" do
+    s = quiz_survey
+    body = with_pool_drained do
+      # This fake would call the near-miss correct if it were ever reached.
+      with_fake_grader(true) do
+        json_post grade_survey_path(s.publish_token),
+                  session_token: "busy", card_index: 3,
+                  answers: { "3" => { "type" => "open_ended", "value" => "it is four" } }
+      end
+    end
+
+    assert_response :success
+    refute body["correct"], "with no slot free the respondent keeps the exact-match verdict"
+
+    # The assertion that matters: bounding the AI call must not cost the
+    # respondent their answer. A bulkhead around the whole action would
+    # short-circuit before the save and lose this.
+    stored = s.responses.find_by(session_token: "busy")
+    assert stored, "the response row must still be created"
+    assert_equal "it is four", stored.answers["3"]["value"], "the answer is persisted verbatim"
+  end
+
+  test "the AI slot is released after a call, so the next respondent still gets judged" do
+    s = quiz_survey
+    before = PlayerController::AI_GRADE_POOL.available
+
+    with_fake_grader(true) do
+      json_post grade_survey_path(s.publish_token),
+                session_token: "first", card_index: 3,
+                answers: { "3" => { "type" => "open_ended", "value" => "it is four" } }
+    end
+    assert_equal before, PlayerController::AI_GRADE_POOL.available, "the slot came back"
+
+    body = with_fake_grader(true) do
+      json_post grade_survey_path(s.publish_token),
+                session_token: "second", card_index: 3,
+                answers: { "3" => { "type" => "open_ended", "value" => "it is four" } }
+    end
+    assert body["correct"], "a later respondent still reaches the AI"
+  end
+
+  test "the AI slot is released even when the grader raises" do
+    s = quiz_survey
+    before = PlayerController::AI_GRADE_POOL.available
+    boom = Object.new
+    boom.define_singleton_method(:call) { |**_kw| raise "network down" }
+    QuizAnswerGrader.define_singleton_method(:new) { |*| boom }
+
+    json_post grade_survey_path(s.publish_token),
+              session_token: "raise", card_index: 3,
+              answers: { "3" => { "type" => "open_ended", "value" => "it is four" } }
+
+    assert_response :success
+    assert_equal before, PlayerController::AI_GRADE_POOL.available,
+                 "a leaked slot would shrink the pool permanently until restart"
+  ensure
+    QuizAnswerGrader.singleton_class.remove_method(:new)
+  end
+
   test "grade and scores are forbidden for a non-quiz Verto" do
     s = quiz_survey(quiz: false)
     json_post grade_survey_path(s.publish_token), session_token: "x", card_index: 1, answers: {}

@@ -25,6 +25,20 @@ class PlayerController < ApplicationController
   rate_limit to: 30, within: 1.minute, only: :location_search,
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
 
+  # How many respondent-facing Claude calls may be in flight in this process.
+  # Rate limiting above bounds requests per IP; this bounds concurrency, which
+  # is the thing that actually exhausts a 3-thread pool — and it has to, because
+  # respondents behind one venue's NAT are legitimate traffic the caps let past.
+  #
+  # A separate pool from LimitsConcurrentStreams::POOL by design: that one is
+  # sized for creator report streams, and sharing it would let a creator
+  # watching a report write itself turn away a respondent mid-quiz, or the
+  # reverse. Same formula (leave two threads for ordinary requests), tunable on
+  # its own so respondent and creator AI can be balanced independently.
+  AI_GRADE_POOL = SlotPool.new(
+    [ (ENV["AI_GRADE_SLOTS"].presence&.to_i || (Integer(ENV.fetch("RAILS_MAX_THREADS", 3)) - 2)), 1 ].max
+  )
+
   # Respondents don't pick their browser the way a creator does — they open a
   # link on whatever phone they already own, often an older Android or an iPhone
   # that stopped getting iOS updates. ApplicationController's
@@ -432,7 +446,7 @@ class PlayerController < ApplicationController
 
     accepted = Array(card["correct"]).map(&:to_s).reject(&:empty?)
     return if accepted.empty?
-    return unless QuizAnswerGrader.new.call(question: card["text"].to_s, accepted_answers: accepted, answer: value.to_s)
+    return unless ai_confirms_match?(question: card["text"].to_s, accepted_answers: accepted, answer: value.to_s)
 
     # Reassign the whole hash (rather than mutate the nested entry in place)
     # so ActiveRecord's dirty-tracking on the JSON column reliably sees it.
@@ -440,6 +454,25 @@ class PlayerController < ApplicationController
   rescue => e
     ErrorReporting.report("PlayerController#grade", e)
     # Best-effort: the respondent keeps the exact-match verdict.
+  end
+
+  # Ask Claude whether a near-miss answer is a genuine match — but only if this
+  # process has a slot free for respondent-facing AI.
+  #
+  # #grade is public and unauthenticated, so this is the one Claude call a
+  # creator cannot throttle: a popular quiz with open-ended graded cards can
+  # point real respondent traffic straight at it, and three Puma threads is all
+  # there is. When every slot is busy we skip the call and the respondent keeps
+  # the exact-match verdict — the exact outcome the rescue above has always
+  # produced on a network error, so this adds no new behaviour, only a bound.
+  #
+  # The bound sits here rather than around the action on purpose: #grade saves
+  # the respondent's answer *after* this step, so short-circuiting the action
+  # would drop the answer itself, not just the refinement.
+  def ai_confirms_match?(question:, accepted_answers:, answer:)
+    AI_GRADE_POOL.with_slot(false) do
+      QuizAnswerGrader.new.call(question: question, accepted_answers: accepted_answers, answer: answer)
+    end
   end
 
   # Cache the server-computed score on quiz responses so "how you compare" is a

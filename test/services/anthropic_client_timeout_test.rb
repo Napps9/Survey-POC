@@ -16,7 +16,14 @@ class AnthropicClientTimeoutTest < ActiveSupport::TestCase
     QuestionTypeClassifier,
     ResultsSummariser,
     ResultsChat,
-    OpenTextSummariser
+    OpenTextSummariser,
+    # QuizAnswerGrader is reachable from #grade — public and unauthenticated —
+    # so it is the one service respondent traffic can point at directly. It was
+    # missing from this list, which is precisely the gap this test exists to
+    # close. FlowGenerator and CardOptimiser are the editor-side equivalents.
+    QuizAnswerGrader,
+    FlowGenerator,
+    CardOptimiser
   ].freeze
 
   test "the shared Anthropic timeout is bounded well below the SDK default" do

@@ -102,7 +102,7 @@ class StreamConcurrencyTest < ActionDispatch::IntegrationTest
   end
 
   test "the pool hands out exactly its size and no more" do
-    pool = LimitsConcurrentStreams::SlotPool.new(2)
+    pool = SlotPool.new(2)
     assert pool.acquire
     assert pool.acquire
     assert_not pool.acquire, "third caller must be turned away"
@@ -112,7 +112,7 @@ class StreamConcurrencyTest < ActionDispatch::IntegrationTest
   end
 
   test "releasing more than was taken cannot inflate the pool" do
-    pool = LimitsConcurrentStreams::SlotPool.new(1)
+    pool = SlotPool.new(1)
     5.times { pool.release }
     assert_equal 1, pool.available
     assert pool.acquire
