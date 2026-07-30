@@ -79,4 +79,87 @@ class ThankYouScreenTest < ActionDispatch::IntegrationTest
     assert_select "a.hidden[data-player-target='forwardBtn']"
     assert_select "a[data-player-target='forwardBtn']:not(.hidden)", false
   end
+
+  # ── The off-site link's button label ──────────────────────────────────────
+  # The URL column existed and rendered on the player, but nothing in the
+  # editor could set it, and the button was always the generic "Visit website".
+
+  test "update_settings stores, caps and clears the forward label" do
+    org = sign_in_org("label")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS)
+
+    post survey_settings_path(s), params: { forward_url: "acme.example", forward_label: "  Book your place  " }
+    assert_equal "Book your place", s.reload.forward_label
+
+    post survey_settings_path(s), params: { forward_label: "x" * (Survey::MAX_END_LABEL + 25) }
+    assert_equal Survey::MAX_END_LABEL, s.reload.forward_label.length
+
+    post survey_settings_path(s), params: { forward_label: "   " }
+    assert_nil s.reload.forward_label
+  end
+
+  test "the player's forward button uses the custom label, falling back to the localised default" do
+    s = published_survey
+    s.update!(forward_url: "https://acme.example", forward_label: "Book your place")
+
+    get play_survey_path(s.publish_token)
+    assert_select "a[data-player-target='forwardBtn']", text: /Book your place/
+    assert_no_match I18n.t("player.visit_website"), css_select("a[data-player-target='forwardBtn']").first.text
+
+    s.update!(forward_label: nil)
+    get play_survey_path(s.publish_token)
+    assert_select "a[data-player-target='forwardBtn']", text: /#{Regexp.escape(I18n.t("player.visit_website"))}/
+  end
+
+  test "the default end screen carries the label through to the player payload" do
+    s = published_survey
+    s.update!(forward_url: "https://acme.example", forward_label: "Book your place")
+
+    screen = s.default_end_screen
+    assert_equal "https://acme.example", screen["forward_url"]
+    assert_equal "Book your place", screen["forward_label"]
+
+    # A branch screen keeps its own pair — the default no longer forces nil.
+    assert_nil s.reload.tap { |x| x.update!(forward_label: nil) }.default_end_screen["forward_label"]
+  end
+
+  # The actual reported gap: the editor rendered the CTA in its preview but had
+  # no field to set it, so a creator could only get one by enabling Logic &
+  # flows and adding a branch end screen.
+  test "the editor exposes the link and label fields, prefilled" do
+    org = sign_in_org("editor")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS,
+                              forward_url: "https://acme.example", forward_label: "Book your place")
+
+    get survey_path(s)
+    assert_response :success
+    assert_select "input[data-gate-cards-target='tyForwardUrl'][value='https://acme.example']"
+    assert_select "input[data-gate-cards-target='tyForwardLabel'][value='Book your place']"
+  end
+
+  # A link with no custom copy still has to open the thank-you card, or the
+  # fields that hold it would be hidden behind the "＋ Thank-you screen" CTA.
+  test "a forward URL alone opens the thank-you card in the editor" do
+    org = sign_in_org("open")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS,
+                              forward_url: "https://acme.example")
+
+    get survey_path(s)
+    assert_select "div.gate-card-wrap[data-gate-cards-target='tyCard']:not([hidden])"
+    assert_select "div.gate-cta-row[data-gate-cards-target='tyCta'][hidden]"
+  end
+
+  test "duplicating a Verto carries the forward link and its label" do
+    org = sign_in_org("dup")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS,
+                              forward_url: "https://acme.example", forward_label: "Book your place")
+
+    copy = s.duplicate!
+    assert_equal "https://acme.example", copy.forward_url
+    assert_equal "Book your place", copy.forward_label
+  end
 end

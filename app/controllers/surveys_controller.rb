@@ -461,6 +461,11 @@ class SurveysController < ApplicationController
     if params.key?(:forward_url)
       attrs[:forward_url] = Survey.sanitize_forward_url(params[:forward_url])
     end
+    # Button label for the thank-you screen's off-site link. Same cap as a
+    # branch end screen's, so the two screens can't drift apart.
+    if params.key?(:forward_label)
+      attrs[:forward_label] = params[:forward_label].to_s.strip.first(Survey::MAX_END_LABEL).presence
+    end
     if params.key?(:consent_text)
       attrs[:consent_text] = params[:consent_text].to_s.strip.first(2000).presence
     end

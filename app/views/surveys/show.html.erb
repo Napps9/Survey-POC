@@ -328,7 +328,7 @@
             screen is customised, then an editable in-feed replica of the
             player's thank-you card (defaults mirror thankyou_title_text /
             thankyou_body_text). Clearing both fields restores the CTA. ── %>
-        <% has_ty = @survey.thankyou_title.present? || @survey.thankyou_body.present? %>
+        <% has_ty = @survey.thankyou_title.present? || @survey.thankyou_body.present? || @survey.forward_url? %>
         <div class="gate-cta-row" data-gate-cards-target="tyCta" <%= "hidden" if has_ty %>>
           <button type="button" class="aq-trigger-btn aq-insert-btn"
                   data-action="click->gate-cards#addThankyou">
@@ -357,6 +357,30 @@
                  data-gate-cards-target="tyBody"
                  data-default-text="<%= t("player.thank_you_from", org: @survey.organisation.name) %>"
                  data-action="input->gate-cards#queueThankyouSave:stop"><%= @survey.thankyou_body_text %></div>
+
+            <%# Off-site link — the "Visit website →" button the respondent sees
+                after finishing. Backed by the survey's own forward_url/label
+                columns (branch end screens carry their own pair in the
+                end_screens JSON). Until now this rendered on the player with no
+                way to set it from the editor at all. %>
+            <div class="gate-ty-forward">
+              <label class="gate-ty-forward-label" for="ty-forward-url">
+                <%= t("editor.ty_forward_url_label", default: "Link button (optional)") %>
+              </label>
+              <input type="url" id="ty-forward-url"
+                     data-gate-cards-target="tyForwardUrl"
+                     data-action="input->gate-cards#queueThankyouSave:stop"
+                     value="<%= @survey.forward_url %>"
+                     placeholder="<%= t("editor.ty_forward_url_placeholder", default: "https://example.org") %>"
+                     class="gate-ty-forward-input" />
+              <input type="text" id="ty-forward-label"
+                     data-gate-cards-target="tyForwardLabel"
+                     data-action="input->gate-cards#queueThankyouSave:stop"
+                     value="<%= @survey.forward_label %>"
+                     maxlength="<%= Survey::MAX_END_LABEL %>"
+                     placeholder="<%= t("editor.ty_forward_label_placeholder", default: "Button label (e.g. Visit our site)") %>"
+                     class="gate-ty-forward-input" />
+            </div>
           </div>
         </div>
 
@@ -1128,7 +1152,7 @@
           <%# Non-interactive preview of the respondent's thank-you actions. %>
           <div style="margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:10px;">
             <% if @survey.forward_url? %>
-              <span style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);"><%= t("player.visit_website") %></span>
+              <span style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);"><%= @survey.forward_label.presence || t("player.visit_website") %></span>
             <% end %>
             <span style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);"><%= t("player.share") %></span>
           </div>

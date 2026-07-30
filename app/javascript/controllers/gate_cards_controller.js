@@ -11,7 +11,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "consentCta", "consentCard", "consentBody", "consentLeft",
-    "tyCta", "tyCard", "tyTitle", "tyBody"
+    "tyCta", "tyCard", "tyTitle", "tyBody", "tyForwardUrl", "tyForwardLabel"
   ]
   static values = { url: String }
 
@@ -101,7 +101,12 @@ export default class extends Controller {
     // Back to the player defaults, which is what the reopened card shows.
     this.tyTitleTarget.textContent = this.tyTitleTarget.dataset.defaultText || ""
     this.tyBodyTarget.textContent = this.tyBodyTarget.dataset.defaultText || ""
-    this._save({ thankyou_title: "", thankyou_body: "" })
+    // The off-site link goes with the screen. Leaving it behind would keep a
+    // live redirect on a thank-you screen the creator believes they removed,
+    // with nothing in the editor still showing it.
+    if (this.hasTyForwardUrlTarget) this.tyForwardUrlTarget.value = ""
+    if (this.hasTyForwardLabelTarget) this.tyForwardLabelTarget.value = ""
+    this._save({ thankyou_title: "", thankyou_body: "", forward_url: "", forward_label: "" })
   }
 
   queueThankyouSave() {
@@ -116,7 +121,9 @@ export default class extends Controller {
   _saveThankyou() {
     this._save({
       thankyou_title: this.tyTitleTarget.textContent.trim(),
-      thankyou_body: this.tyBodyTarget.textContent.trim()
+      thankyou_body: this.tyBodyTarget.textContent.trim(),
+      forward_url: this.hasTyForwardUrlTarget ? this.tyForwardUrlTarget.value.trim() : "",
+      forward_label: this.hasTyForwardLabelTarget ? this.tyForwardLabelTarget.value.trim() : ""
     })
   }
 

@@ -234,7 +234,7 @@
              href="<%= @survey.forward_url %>" target="_blank" rel="noopener"
              class="<%= "hidden" unless @survey.forward_url? %>"
              style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);text-decoration:none;cursor:pointer;">
-            <%= t("player.visit_website") %> →
+            <%= @survey.forward_label.presence || t("player.visit_website") %> →
           </a>
 
           <button type="button"

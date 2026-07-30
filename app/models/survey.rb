@@ -547,6 +547,7 @@ class Survey < ApplicationRecord
       thankyou_title:          thankyou_title,
       thankyou_body:           thankyou_body,
       forward_url:             forward_url,
+      forward_label:           forward_label,
       consent_text:            consent_text,
       consent_image:           consent_image,
       consent_image_credit:    consent_image_credit,
@@ -634,7 +635,7 @@ class Survey < ApplicationRecord
       "title" => thankyou_title_text,
       "body" => thankyou_body_text,
       "forward_url" => forward_url.presence,
-      "forward_label" => nil
+      "forward_label" => forward_label.presence
     }
   end
 
