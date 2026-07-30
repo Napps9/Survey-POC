@@ -100,6 +100,9 @@ Rails.application.routes.draw do
   post "surveys/:survey_id/results/google_drive", to: "google_drive_exports#create",  as: :survey_google_drive
   post "surveys/:id/generate_card",   to: "surveys#generate_card", as: :generate_survey_card
   post "surveys/:id/generate_flow",   to: "surveys#generate_flow", as: :generate_survey_flow
+  # Flow generation runs as a job (GenerateFlowJob); the editor polls this and
+  # splices the rendered cards when they land.
+  resources :flow_generations, only: [ :show ]
   post "surveys/:id/render_card",     to: "surveys#render_card",   as: :render_survey_card
   post "surveys/:id/optimise_card",   to: "surveys#optimise_card", as: :optimise_survey_card
   get  "surveys/:id/pexels",          to: "surveys#pexels_search", as: :pexels_search_survey

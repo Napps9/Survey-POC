@@ -8,6 +8,11 @@ module GeneratesResultsReport
 
   private
 
+  # Raised when a cold-cache generation can't get a slot. The caller turns it
+  # into a "try again in a moment", which is what the streaming endpoints already
+  # say in the same situation.
+  class ReportBusy < StandardError; end
+
   # The report markdown for `survey`, generating + caching it when missing or
   # stale (cache is keyed to the completed-response count, like the summary).
   def results_report_markdown(survey)
@@ -18,14 +23,29 @@ module GeneratesResultsReport
       return survey.results_report
     end
 
-    aggregated = aggregate_results(Array(survey.cards), responses.order(created_at: :desc))
-    markdown   = ResultsReportGenerator.call(survey: survey, aggregated: aggregated, total: total,
-                                             brief: survey.results_report_brief_data)
-    if markdown.present?
-      survey.update_columns(results_report: markdown, results_report_response_count: total,
-                            results_report_edited_at: nil)
+    # A cold cache means a full ResultsReportGenerator call — Claude, on a Puma
+    # request thread, in an action that (unlike the streaming report) had no
+    # bound at all. It shares the streaming pool, because it's the same scarce
+    # resource: this process's threads.
+    #
+    # Deliberately only on THIS branch. Bulkheading the whole action would make a
+    # warm cache — a single column read, and the overwhelmingly common case —
+    # queue behind someone else's generation, trading a rare outage for a
+    # frequent 503.
+    raise ReportBusy unless LimitsConcurrentStreams::POOL.acquire
+
+    begin
+      aggregated = aggregate_results(Array(survey.cards), responses.order(created_at: :desc))
+      markdown   = ResultsReportGenerator.call(survey: survey, aggregated: aggregated, total: total,
+                                               brief: survey.results_report_brief_data)
+      if markdown.present?
+        survey.update_columns(results_report: markdown, results_report_response_count: total,
+                              results_report_edited_at: nil)
+      end
+      markdown
+    ensure
+      LimitsConcurrentStreams::POOL.release
     end
-    markdown
   end
 
   # Streams the report markdown chunk-by-chunk (yielding to the block) while

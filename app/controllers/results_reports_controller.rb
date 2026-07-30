@@ -40,6 +40,8 @@ class ResultsReportsController < ApplicationController
     render json: { ok: true, body_html: results_report_body_html(markdown) }
   rescue ActiveRecord::RecordNotFound
     render json: { ok: false, error: "Verto not found." }, status: :not_found
+  rescue ReportBusy
+    render json: { ok: false, error: LimitsConcurrentStreams::BUSY_MESSAGE }, status: :service_unavailable
   rescue => e
     ErrorReporting.report("ResultsReportsController", e)
     render json: { ok: false, error: "Couldn't generate the report — please try again." }, status: :unprocessable_entity

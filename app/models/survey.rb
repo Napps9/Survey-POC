@@ -4,6 +4,7 @@ class Survey < ApplicationRecord
   has_many :survey_shares, dependent: :destroy
   has_many :partnership_vertos, dependent: :destroy
   has_many :report_renders, dependent: :destroy
+  has_many :flow_generations, dependent: :destroy
 
   # Creator-uploaded card/background imagery. Previously these lived inline in
   # the `cards` JSON as base64 data-URLs, which meant every render of a Verto

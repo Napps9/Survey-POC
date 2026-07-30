@@ -31,6 +31,8 @@ class GoogleDriveExportsController < ApplicationController
     render_reconnect(survey)
   rescue ActiveRecord::RecordNotFound
     render json: { ok: false, error: "Verto not found." }, status: :not_found
+  rescue ReportBusy
+    render json: { ok: false, error: LimitsConcurrentStreams::BUSY_MESSAGE }, status: :service_unavailable
   rescue => e
     ErrorReporting.report("GoogleDriveExportsController", e)
     render json: { ok: false, error: "Couldn't save to Google Drive — please try again." }, status: :unprocessable_entity

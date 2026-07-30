@@ -259,9 +259,13 @@ export default class extends Controller {
         },
         body: JSON.stringify({ prompt, answer: wire ? wire[1] : null, entry_text: entryText })
       })
-      const json = await res.json()
-      if (!json || !json.ok) throw new Error((json && json.error) || "Generation failed")
-      if (token !== this._requestToken) return // modal closed/reopened — drop it
+      const queued = await res.json()
+      if (!queued || !queued.ok) throw new Error((queued && queued.error) || "Generation failed")
+      // Generation runs as a job now (it's up to six sequential Claude calls, so
+      // it can no longer hold a Puma thread). Poll until the cards land; the
+      // splice below is unchanged.
+      const json = await this._awaitFlow(queued.poll_url, token)
+      if (!json) return // modal closed/reopened — drop it
 
       // Splice the generated cards right below the entry question (or at the
       // feed end when unanchored), capturing the pre-splice continuation so
@@ -293,6 +297,25 @@ export default class extends Controller {
       this.generateErrorTarget.textContent = t("editor.flows.generate_failed", { msg: err.message })
       this.generateErrorTarget.style.display = ""
     }
+  }
+
+  // Poll a queued flow generation until it succeeds. Resolves to the payload
+  // (name + rendered cards), or null if the modal was closed/reopened while
+  // waiting — the same drop-it check the inline version made once. Throws with a
+  // reason to show on failure.
+  async _awaitFlow(pollUrl, token) {
+    // A five-language generation is six Claude calls, each with its own 120s
+    // ceiling, so this backstop is deliberately longer than the PDF poller's.
+    const deadline = Date.now() + 300000
+    while (Date.now() < deadline) {
+      if (token !== this._requestToken) return null
+      const res  = await fetch(pollUrl, { headers: { "Accept": "application/json" } })
+      const data = await res.json()
+      if (data && data.status === "succeeded") return data
+      if (!data || data.ok === false) throw new Error((data && data.error) || "Generation failed")
+      await new Promise(r => setTimeout(r, 1500))
+    }
+    throw new Error("That took longer than expected — please try again.")
   }
 
   // ── Rendering ────────────────────────────────────────────────────────────

@@ -11,7 +11,16 @@ module VertoGeneration
   # Fill in every secondary language's i18n entries. Each locale is independent:
   # one failing translation leaves that language on the source text rather than
   # losing the whole deck, which is why the rescue is inside the loop.
-  def translate_survey!(survey)
+  # `if_unchanged:` guards the write for callers that run AFTER the creator can
+  # already be editing (FinishVertoSetupJob — an import's creator is in the editor
+  # while this runs). Translation takes tens of seconds, so the deck can be saved
+  # from under us in between; writing the pre-translation cards back would
+  # silently undo that save. When the digest no longer matches we drop the
+  # translations instead, which is the recoverable direction to fail in.
+  #
+  # BuildVertoJob passes nothing, because the wizard holds its creator on the wait
+  # screen until the job finishes — there is nobody to race.
+  def translate_survey!(survey, if_unchanged: nil)
     return unless survey.secondary_locales.any?
 
     cards  = Array(survey.cards)
@@ -22,7 +31,51 @@ module VertoGeneration
     rescue => e
       ErrorReporting.report("SurveyTranslator", e, locale: loc)
     end
-    survey.update!(cards: cards)
+
+    return survey.update!(cards: cards) if if_unchanged.nil?
+
+    write_cards_if_unchanged!(survey, cards, if_unchanged)
+  end
+
+  # A stable fingerprint of a deck, for the guard above.
+  def cards_digest(survey)
+    Digest::SHA256.hexdigest(Array(survey.cards).to_json)
+  end
+
+  # Row-locked so the check and the write are one step — otherwise the creator's
+  # autosave could land between them and be lost anyway.
+  def write_cards_if_unchanged!(survey, cards, expected_digest)
+    survey.with_lock do
+      survey.reload
+      if cards_digest(survey) != expected_digest
+        ErrorReporting.report("VertoGeneration.translate_survey! skipped",
+                              StandardError.new("deck changed while translating"),
+                              survey_id: survey.id)
+        return false
+      end
+      survey.update!(cards: cards)
+    end
+    true
+  end
+
+  # Translate a LOOSE array of cards (not yet attached to the survey) — what the
+  # flow generator produces before the client splices it in. Same one-call-per-
+  # locale shape as translate_survey!, and the same per-locale rescue, but it
+  # returns the cards instead of saving them.
+  #
+  # Lives here rather than on SurveysController because GenerateFlowJob needs it
+  # too, and a job reaching into controller privates is how the two drift apart.
+  def translate_cards!(cards, survey)
+    return cards unless survey.secondary_locales.any?
+
+    survey.secondary_locales.each do |loc|
+      translated = SurveyTranslator.new.call(cards: cards, target_locale: loc,
+                                             source_locale: survey.default_locale)
+      cards = Survey.merge_card_translations(cards, loc, translated)
+    rescue => e
+      ErrorReporting.report("SurveyTranslator cards", e, locale: loc)
+    end
+    cards
   end
 
   # Every new Verto opens with imagery rather than a blank editor. Best-effort:

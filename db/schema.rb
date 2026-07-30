@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_114232) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_120557) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -120,6 +120,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_114232) do
     t.datetime "updated_at", null: false
     t.index ["common_question_set_id", "position"], name: "index_common_questions_on_common_question_set_id_and_position"
     t.index ["common_question_set_id"], name: "index_common_questions_on_common_question_set_id"
+  end
+
+  create_table "flow_generations", force: :cascade do |t|
+    t.json "cards", default: [], null: false
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.string "flow_name"
+    t.json "payload", default: {}, null: false
+    t.string "status", default: "pending", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["status"], name: "index_flow_generations_on_status"
+    t.index ["survey_id", "created_at"], name: "index_flow_generations_on_survey_id_and_created_at"
+    t.index ["survey_id"], name: "index_flow_generations_on_survey_id"
+    t.index ["user_id"], name: "index_flow_generations_on_user_id"
   end
 
   create_table "funder_memberships", force: :cascade do |t|
@@ -567,6 +583,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_114232) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "common_question_sets", "organisations"
   add_foreign_key "common_questions", "common_question_sets"
+  add_foreign_key "flow_generations", "surveys"
+  add_foreign_key "flow_generations", "users"
   add_foreign_key "funder_memberships", "funders"
   add_foreign_key "funder_memberships", "organisations"
   add_foreign_key "funders", "organisations"

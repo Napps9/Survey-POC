@@ -1,6 +1,7 @@
 class SurveysController < ApplicationController
   include AggregatesSurveyResults
   include ResolvesResultSegments
+  include RendersCardHtml
   layout "fullscreen", only: [ :show, :new ]
 
   MAX_PDF_BYTES = 10.megabytes
@@ -728,27 +729,22 @@ class SurveysController < ApplicationController
       return render json: { ok: false, error: "Describe what this flow should ask." }, status: :unprocessable_entity
     end
 
-    result = FlowGenerator.new.call(
-      prompt:         prompt,
-      answer:         body["answer"].to_s.strip.first(100).presence,
-      entry_text:     body["entry_text"].to_s.strip.first(200).presence,
-      theme:          survey.theme,
-      audience_age:   survey.audience_age,
-      key_insight:    survey.key_insight,
-      existing_cards: Array(survey.cards),
-      locale:         survey.default_locale
+    # Off the request thread: FlowGenerator plus one translation call per
+    # secondary locale is up to six sequential Claude calls, and three of those
+    # in flight occupied every Puma thread this instance has. The editor polls
+    # FlowGenerationsController#show and splices when the cards land.
+    generation = survey.flow_generations.create!(
+      user: Current.user,
+      payload: {
+        "prompt"     => prompt,
+        "answer"     => body["answer"].to_s.strip.first(100).presence,
+        "entry_text" => body["entry_text"].to_s.strip.first(200).presence
+      }
     )
+    GenerateFlowJob.perform_later(generation.id)
 
-    # Stamp cids now (same as render_card) so each card is a valid routing
-    # target the moment the client splices it in.
-    generated = Array(result["cards"]).each { |card| card["cid"] = "c_#{SecureRandom.hex(3)}" }
-    # One translation pass for the whole flow rather than one per card — see
-    # translate_cards! for why that distinction is the difference between 5
-    # Claude calls and 30.
-    generated = translate_cards!(generated, survey)
-
-    cards = generated.map { |card| { cid: card["cid"], html: render_card_html(survey, card) } }
-    render json: { ok: true, name: result["name"], cards: cards }
+    render json: { ok: true, id: generation.id, poll_url: flow_generation_path(generation) },
+           status: :accepted
   rescue => e
     ErrorReporting.report("SurveysController#generate_flow", e)
     render json: { ok: false, error: friendly_generate_error(e) }, status: :unprocessable_entity
@@ -977,8 +973,12 @@ class SurveysController < ApplicationController
     )
 
     Current.organisation.update(default_brand_palette: payload["brand_palette"]) if payload["brand_palette"].present?
-    translate_survey!(survey)
-    auto_populate_assets!(survey)
+    # Translation and imagery are the slow tail of an import — five Claude calls
+    # on a five-language deck, plus a run of Pexels lookups — and they used to run
+    # right here, on a request thread. The creator goes straight to the editor now
+    # and the cards fill in behind them. The digest is what stops the job writing
+    # a stale deck over an edit they make in the meantime; see the job.
+    FinishVertoSetupJob.perform_later(survey.id, VertoGeneration.cards_digest(survey))
     survey
   end
 
@@ -1091,16 +1091,9 @@ class SurveysController < ApplicationController
   #
   # Order is load-bearing — merge_card_translations pairs source to translation
   # by index — so never filter or reorder between the call and the merge.
+  # Lives on VertoGeneration so GenerateFlowJob runs the identical pass.
   def translate_cards!(cards, survey)
-    return cards unless survey.secondary_locales.any?
-
-    survey.secondary_locales.each do |loc|
-      translated = SurveyTranslator.new.call(cards: cards, target_locale: loc, source_locale: survey.default_locale)
-      cards = Survey.merge_card_translations(cards, loc, translated)
-    rescue => e
-      ErrorReporting.report("SurveyTranslator cards", e, locale: loc)
-    end
-    cards
+    VertoGeneration.translate_cards!(cards, survey)
   end
 
   # Single-card convenience — generate_card and optimise_card each produce one
@@ -1113,30 +1106,6 @@ class SurveysController < ApplicationController
   # one appended to the deck (the add-question flow); with an explicit `idx` it's
   # rendered in place at that position (the optimise flow), so its card number
   # and progress match where it already sits.
-  def render_card_html(survey, card, idx: nil)
-    # The card_row partial (and its children) read @survey — e.g. for the
-    # "recommended for this card" images. generate_card / render_card don't go
-    # through set_survey, so make sure it's set or those renders 500 on nil.
-    @survey ||= survey
-    existing = Array(survey.cards)
-    if idx
-      total_q = existing.count { |c| CardTypes.question?(c["type"]) }
-      q_idx   = existing.first(idx + 1).count { |c| CardTypes.question?(c["type"]) }
-    else
-      idx     = existing.size
-      total_q = existing.count { |c| CardTypes.question?(c["type"]) } +
-                (CardTypes.question?(card["type"]) ? 1 : 0)
-      q_idx   = CardTypes.question?(card["type"]) ? total_q : 0
-    end
-    render_to_string(
-      partial: "surveys/card_row",
-      formats: [ :html ],
-      locals:  { card: card, idx: idx, q_idx: q_idx, total_q: total_q,
-                 default_locale: survey.default_locale, quiz: survey.quiz?,
-                 tokenisation: survey.tokenisation_enabled? }
-    )
-  end
-
   def set_survey_including_archived
     @survey = Current.organisation.surveys.find(params[:id])
   end
