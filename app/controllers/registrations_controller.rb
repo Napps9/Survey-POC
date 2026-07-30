@@ -34,7 +34,17 @@ class RegistrationsController < ApplicationController
     @user.terms_accepted_at = Time.current
 
     unless @user.valid?
-      flash.now[:alert] = @user.errors.full_messages.first
+      # Don't confirm whether an address is already registered (P1-16):
+      # "Email address has already been taken" turns signup into an
+      # account-existence oracle for anyone with a list of addresses. Every
+      # other validation message describes what the visitor just typed, so
+      # those stay specific and useful.
+      if @user.errors.of_kind?(:email_address, :taken)
+        Rails.logger.info("[Registrations] duplicate signup attempt")
+        flash.now[:alert] = t("registrations.signup_failed")
+      else
+        flash.now[:alert] = @user.errors.full_messages.first
+      end
       return render :new, status: :unprocessable_entity
     end
 

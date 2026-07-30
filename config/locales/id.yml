@@ -1027,5 +1027,6 @@ id:
     publish_blocked: "Konfirmasi alamat email Anda sebelum menerbitkan — periksa kotak masuk, atau kirim ulang dari banner di dasbor."
   registrations:
     terms_required: "Setujui Ketentuan dan Kebijakan Privasi untuk melanjutkan."
+    signup_failed: "Kami tidak dapat membuat akun itu. Jika Anda sudah punya, coba masuk atau atur ulang kata sandi Anda."
     accept_terms_html: "Saya menyetujui %{terms} dan %{privacy}."
     welcome_confirm: "Selamat datang di Playverto! Periksa %{email} untuk mengonfirmasi alamat Anda."

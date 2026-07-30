@@ -1028,5 +1028,6 @@ fr:
     publish_blocked: "Confirmez votre adresse e-mail avant de publier — vérifiez votre boîte de réception, ou renvoyez depuis le bandeau du tableau de bord."
   registrations:
     terms_required: "Veuillez accepter les Conditions et la Politique de confidentialité pour continuer."
+    signup_failed: "Nous n'avons pas pu créer ce compte. Si vous en avez déjà un, connectez-vous ou réinitialisez votre mot de passe."
     accept_terms_html: "J'accepte les %{terms} et la %{privacy}."
     welcome_confirm: "Bienvenue sur Playverto ! Consultez %{email} pour confirmer votre adresse."

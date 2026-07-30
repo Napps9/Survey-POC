@@ -1026,5 +1026,6 @@ ko:
     publish_blocked: "게시하기 전에 이메일 주소를 확인하세요 — 받은편지함을 확인하거나 대시보드 배너에서 다시 보내세요."
   registrations:
     terms_required: "계속하려면 이용약관과 개인정보처리방침에 동의해 주세요."
+    signup_failed: "해당 계정을 만들 수 없습니다. 이미 계정이 있다면 로그인하거나 비밀번호를 재설정하세요."
     accept_terms_html: "%{terms} 및 %{privacy}에 동의합니다."
     welcome_confirm: "Playverto에 오신 것을 환영합니다! %{email}에서 주소를 확인하세요."

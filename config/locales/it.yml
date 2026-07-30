@@ -1028,5 +1028,6 @@ it:
     publish_blocked: "Conferma il tuo indirizzo email prima di pubblicare: controlla la posta, o rinvia dal banner nella dashboard."
   registrations:
     terms_required: "Accetta i Termini e l'Informativa sulla privacy per continuare."
+    signup_failed: "Non siamo riusciti a creare quell'account. Se ne hai già uno, accedi o reimposta la password."
     accept_terms_html: "Accetto i %{terms} e la %{privacy}."
     welcome_confirm: "Benvenuto su Playverto! Controlla %{email} per confermare il tuo indirizzo."

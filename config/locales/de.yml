@@ -1028,5 +1028,6 @@ de:
     publish_blocked: "Bestätige deine E-Mail-Adresse vor dem Veröffentlichen — sieh in deinem Postfach nach oder sende sie über das Banner im Dashboard erneut."
   registrations:
     terms_required: "Bitte akzeptiere die AGB und die Datenschutzerklärung, um fortzufahren."
+    signup_failed: "Wir konnten dieses Konto nicht anlegen. Falls du schon eines hast, melde dich an oder setze dein Passwort zurück."
     accept_terms_html: "Ich stimme den %{terms} und der %{privacy} zu."
     welcome_confirm: "Willkommen bei Playverto! Prüfe %{email}, um deine Adresse zu bestätigen."

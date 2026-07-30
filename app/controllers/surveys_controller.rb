@@ -377,8 +377,12 @@ class SurveysController < ApplicationController
 
     render json: { ok: true, id: survey.id, updated_at: survey.updated_at, warnings: warnings.uniq }
   rescue => e
+    # Generic to the client, specific to Sentry (P1-16): a raw exception message
+    # can carry a SQL fragment, a column name or a file path, and none of that
+    # helps the person whose save just failed.
     ErrorReporting.report("SurveysController#update", e)
-    render json: { ok: false, error: e.message }, status: :unprocessable_entity
+    render json: { ok: false, error: "Couldn't save your changes — please try again." },
+           status: :unprocessable_entity
   end
 
   # On-demand Pexels search for the editor media picker. `context` selects the
@@ -675,7 +679,7 @@ class SurveysController < ApplicationController
     redirect_to survey_path(survey)
   rescue => e
     ErrorReporting.report("SurveysController#shuffle_assets", e)
-    redirect_to survey_path(survey), alert: "Couldn't shuffle assets — #{e.message}"
+    redirect_to survey_path(survey), alert: "Couldn't shuffle assets — please try again."
   end
 
   def destroy
@@ -918,7 +922,8 @@ class SurveysController < ApplicationController
     render json: { ok: true, html: html }
   rescue => e
     ErrorReporting.report("SurveysController#render_card", e)
-    render json: { ok: false, error: e.message }, status: :unprocessable_entity
+    render json: { ok: false, error: "Couldn't build that card — please try again." },
+           status: :unprocessable_entity
   end
 
   private

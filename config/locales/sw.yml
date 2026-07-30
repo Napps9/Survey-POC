@@ -1028,5 +1028,6 @@ sw:
     publish_blocked: "Thibitisha barua pepe yako kabla ya kuchapisha — angalia kikasha chako, au tuma tena kutoka kwenye bango la dashibodi."
   registrations:
     terms_required: "Tafadhali kubali Masharti na Sera ya Faragha ili kuendelea."
+    signup_failed: "Hatukuweza kuunda akaunti hiyo. Kama tayari unayo, jaribu kuingia au kuweka upya nenosiri lako."
     accept_terms_html: "Ninakubali %{terms} na %{privacy}."
     welcome_confirm: "Karibu Playverto! Angalia %{email} ili kuthibitisha anwani yako."

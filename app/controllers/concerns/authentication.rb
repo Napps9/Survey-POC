@@ -51,6 +51,20 @@ module Authentication
     end
 
     def start_new_session_for(user)
+      # Session fixation (P1-16): rotate the Rails session at the privilege
+      # boundary, so a session id an attacker planted before sign-in isn't the
+      # one that ends up authenticated. The DB-backed Session row and its
+      # signed cookie were already fresh per login; this covers the cookie
+      # session that rides alongside them.
+      #
+      # One key survives on purpose: the URL the visitor was trying to reach
+      # when they were bounced to sign-in is written BEFORE authentication and
+      # read after it, so a blanket reset would silently send everyone to the
+      # dashboard instead of where they were going.
+      return_to = session[:return_to_after_authenticating]
+      reset_session
+      session[:return_to_after_authenticating] = return_to if return_to.present?
+
       user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session
         cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }

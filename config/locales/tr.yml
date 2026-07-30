@@ -1028,5 +1028,6 @@ tr:
     publish_blocked: "Yayımlamadan önce e-posta adresinizi onaylayın — gelen kutunuza bakın ya da panodaki bandan yeniden gönderin."
   registrations:
     terms_required: "Devam etmek için Koşulları ve Gizlilik Politikasını kabul edin."
+    signup_failed: "Bu hesabı oluşturamadık. Zaten bir hesabınız varsa giriş yapın ya da şifrenizi sıfırlayın."
     accept_terms_html: "%{terms} ve %{privacy} şartlarını kabul ediyorum."
     welcome_confirm: "Playverto'ya hoş geldiniz! Adresinizi onaylamak için %{email} adresini kontrol edin."

@@ -1028,5 +1028,6 @@ nl:
     publish_blocked: "Bevestig je e-mailadres voordat je publiceert — kijk in je inbox, of verstuur opnieuw via de banner op je dashboard."
   registrations:
     terms_required: "Accepteer de Voorwaarden en het Privacybeleid om door te gaan."
+    signup_failed: "We konden dat account niet aanmaken. Heb je er al een, log dan in of stel je wachtwoord opnieuw in."
     accept_terms_html: "Ik ga akkoord met de %{terms} en het %{privacy}."
     welcome_confirm: "Welkom bij Playverto! Check %{email} om je adres te bevestigen."

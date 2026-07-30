@@ -1026,5 +1026,6 @@ ja:
     publish_blocked: "公開の前にメールアドレスを確認してください。受信トレイを確認するか、ダッシュボードのバナーから再送信できます。"
   registrations:
     terms_required: "続けるには利用規約とプライバシーポリシーに同意してください。"
+    signup_failed: "そのアカウントを作成できませんでした。すでにお持ちの場合は、サインインするかパスワードを再設定してください。"
     accept_terms_html: "%{terms}と%{privacy}に同意します。"
     welcome_confirm: "Playverto へようこそ！%{email} を確認してアドレスを認証してください。"
