@@ -16,6 +16,28 @@ class SurveysController < ApplicationController
   # Survey#editing_locked?.
   EDITING_LOCKED_MESSAGE = "Editing is locked — this Verto is live, or has already collected responses."
 
+  # update_settings was the ONLY content endpoint with no lock at all, which is
+  # how a consent gate could be bolted onto a Verto people had already answered.
+  # A blanket guard would be wrong — most of what it handles is presentation and
+  # distribution (thank-you copy, the off-site link, response comparison, the
+  # custom slug, branch end screens), and a creator legitimately changes those
+  # for the life of a Verto. These are the fields that can't move once it's in
+  # use: consent, because consent_text_snapshot on earlier responses would no
+  # longer match what those people actually saw and agreed to; and the scoring
+  # switches, because flipping them silently rewrites results respondents have
+  # already been shown.
+  #
+  # `logic` and `render_mode` are deliberately NOT here: they change which cards
+  # a respondent is routed through and how cards are presented, not what anyone
+  # agreed to and not how a stored answer scores.
+  SETTINGS_LOCKED_IN_USE = %i[
+    consent_text consent_image consent_image_credit consent_image_credit_url
+    tokenisation_enabled token_types quiz
+  ].freeze
+
+  SETTINGS_LOCKED_MESSAGE =
+    "This Verto is live or already has responses — consent and scoring settings can't change now."
+
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
   before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :update_settings, :qr ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
@@ -540,6 +562,18 @@ class SurveysController < ApplicationController
       else
         attrs[:slug] = desired
       end
+    end
+
+    # Refuse the whole request rather than applying it in part: a save that
+    # silently drops half of what was asked for is harder to reason about than
+    # one that plainly didn't happen. In practice each of these forms submits a
+    # single field, so nothing legitimate gets caught alongside.
+    if @survey.editing_locked? && (attrs.keys & SETTINGS_LOCKED_IN_USE).any?
+      respond_to do |format|
+        format.html { redirect_to survey_path(@survey, panel: "publish"), alert: SETTINGS_LOCKED_MESSAGE }
+        format.json { render json: { ok: false, error: SETTINGS_LOCKED_MESSAGE }, status: :locked }
+      end
+      return
     end
 
     @survey.update!(attrs) if attrs.any?

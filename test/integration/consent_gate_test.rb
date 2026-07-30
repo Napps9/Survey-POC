@@ -23,11 +23,10 @@ class ConsentGateTest < ActionDispatch::IntegrationTest
                         publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
   end
 
-  test "update_settings stores and clears the consent text" do
+  test "update_settings stores and clears the consent text on a draft" do
     org = sign_in_org("consent-set")
     s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
-                            default_locale: "en", locales: [ "en" ], cards: CARDS,
-                            publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+                            default_locale: "en", locales: [ "en" ], cards: CARDS)
 
     post survey_settings_path(s), params: { consent_text: "  You agree to take part.  " }
     assert_equal "You agree to take part.", s.reload.consent_text
@@ -36,6 +35,122 @@ class ConsentGateTest < ActionDispatch::IntegrationTest
     post survey_settings_path(s), params: { consent_text: "   " }
     assert_nil s.reload.consent_text
     assert_not s.consent_required?
+  end
+
+  # ── Consent can't be bolted on after the fact ─────────────────────────────
+  # update_settings used to be the only content endpoint with no lock, so a
+  # consent gate could be added to a Verto people had already answered — leaving
+  # their responses with a nil consent_text_snapshot while the Verto claimed
+  # everyone had agreed to something.
+
+  test "a live Verto refuses consent changes" do
+    org = sign_in_org("consent-live")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ], cards: CARDS,
+                            publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    post survey_settings_path(s), params: { consent_text: "Agree, retroactively." }
+    assert_redirected_to survey_path(s, panel: "publish")
+    assert_nil s.reload.consent_text
+
+    post survey_settings_path(s), params: { consent_image: "https://images.pexels.com/photos/12/race.jpg" }
+    assert_nil s.reload.consent_image
+  end
+
+  test "a closed Verto with responses still refuses consent changes" do
+    org = sign_in_org("consent-closed")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ], cards: CARDS,
+                            publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    s.responses.create!(session_token: SecureRandom.uuid, answers: {}, answered: true, status: "completed")
+    s.update!(unpublished_at: Time.current)
+
+    assert_not s.published?, "it's been taken down…"
+    assert s.editing_locked?, "…but the responses keep it locked"
+
+    post survey_settings_path(s), params: { consent_text: "Too late." }
+    assert_nil s.reload.consent_text
+  end
+
+  test "a Verto unpublished before anyone answered accepts consent again" do
+    org = sign_in_org("consent-revert")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ], cards: CARDS,
+                            publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    s.update!(unpublished_at: Time.current)
+
+    post survey_settings_path(s), params: { consent_text: "Now it's a draft again." }
+    assert_equal "Now it's a draft again.", s.reload.consent_text
+  end
+
+  test "the scoring switches are locked too, and the JSON path reports it" do
+    org = sign_in_org("consent-score")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ], cards: CARDS,
+                            publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    post survey_settings_path(s), params: { quiz: "1" }
+    assert_not s.reload.quiz?
+
+    post survey_settings_path(s), params: { tokenisation_enabled: "1" }
+    assert_not s.reload.tokenisation_enabled?
+
+    # The in-feed gate cards save by fetch, so that path needs a real status.
+    post survey_settings_path(s), params: { consent_text: "nope" }, as: :json
+    assert_response :locked
+    assert_not JSON.parse(response.body)["ok"]
+  end
+
+  # Presentation and distribution stay editable for the life of a Verto —
+  # a blanket guard here would have been wrong.
+  test "a live Verto still accepts presentation and distribution settings" do
+    org = sign_in_org("consent-open")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ], cards: CARDS,
+                            publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    post survey_settings_path(s), params: {
+      show_results_comparison: "1", compare_note: "still fine",
+      thankyou_title: "Thanks!", forward_url: "example.org", forward_label: "Visit"
+    }
+    s.reload
+    assert s.show_results_comparison
+    assert_equal "still fine", s.compare_note
+    assert_equal "Thanks!", s.thankyou_title
+    assert_equal "https://example.org", s.forward_url
+    assert_equal "Visit", s.forward_label
+  end
+
+  test "the editor stops offering a consent gate once the Verto is in use" do
+    org = sign_in_org("consent-ui")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ], cards: CARDS)
+
+    get survey_path(s)
+    assert_select "[data-gate-cards-target='consentCta']:not([hidden])"
+
+    s.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    get survey_path(s)
+    assert_select "[data-gate-cards-target='consentCta'][hidden]"
+    assert_select "input[name='quiz'][disabled]"
+    assert_select "input[name='tokenisation_enabled'][disabled]"
+  end
+
+  # An existing gate stays visible when locked — the creator still needs to read
+  # what respondents actually agreed to — but not editable.
+  test "an existing consent gate is shown read-only when locked" do
+    org = sign_in_org("consent-ro")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ], cards: CARDS,
+                            consent_text: "You agreed to this.",
+                            publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    get survey_path(s)
+    assert_select "[data-gate-cards-target='consentCard']:not([hidden])"
+    assert_select "[data-gate-cards-target='consentBody']", text: "You agreed to this."
+    assert_select "[data-gate-cards-target='consentBody'][contenteditable='true']", false
+    assert_select "[data-action*='removeConsent']", false
+    assert_select "[data-action*='media-picker#openConsent']", false
   end
 
   test "update_settings stores the consent image and rejects unsafe URLs with their credit" do

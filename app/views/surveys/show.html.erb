@@ -256,7 +256,13 @@
             consent card (player/show renders the live version from the same
             consent_text). Persisted by gate_cards_controller. ── %>
         <% has_consent = @survey.consent_required? %>
-        <div class="gate-cta-row" data-gate-cards-target="consentCta" <%= "hidden" if has_consent %>>
+        <%# Consent can't be added or changed once the Verto is in use: earlier
+            responses carry a consent_text_snapshot of what those people actually
+            agreed to, and a later edit would make it a record of something else.
+            update_settings enforces this; the CTA is hidden here so nothing is
+            offered that would only come back 423. An existing gate stays visible
+            (read-only) — the creator still needs to see what was agreed to. %>
+        <div class="gate-cta-row" data-gate-cards-target="consentCta" <%= "hidden" if has_consent || live_locked %>>
           <button type="button" class="aq-trigger-btn aq-insert-btn"
                   data-action="click->gate-cards#addConsent">
             ＋ <%= t("editor.consent_gate", default: "Consent gate") %>
@@ -265,12 +271,14 @@
         <div class="gate-card-wrap" data-gate-cards-target="consentCard" <%= "hidden" if !has_consent %>>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
             <span class="s-badge gate-badge-consent"><%= t("editor.consent_gate", default: "Consent gate") %></span>
+            <% unless live_locked %>
             <button type="button" class="card-delete-btn" style="margin-left:auto;"
                     title="<%= t("editor.remove_consent_gate", default: "Remove consent gate") %>"
                     aria-label="<%= t("editor.remove_consent_gate", default: "Remove consent gate") %>"
                     data-action="click->gate-cards#removeConsent">
               ✕ <span><%= t("editor.remove", default: "Remove") %></span>
             </button>
+            <% end %>
           </div>
           <div class="split-card">
             <%# Left panel mirrors _split_left's editor mode: current design
@@ -293,21 +301,25 @@
                 <% end %>
               <% end %>
               <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
-              <% if @survey.consent_image.present? %>
-                <button type="button" class="add-media-fab"
-                        data-action="click->media-picker#openConsent"
-                        title="<%= t("editor.change_media_title") %>">
-                  <span class="add-media-fab-plus">＋</span>
-                  <span><%= t("editor.change_media") %></span>
-                </button>
-              <% else %>
-                <button type="button" class="split-left-design-prompt"
-                        data-action="click->media-picker#openConsent"
-                        title="<%= t("editor.add_design_title") %>">
-                  <span class="split-left-design-prompt-icon">＋</span>
-                  <span class="split-left-design-prompt-title"><%= t("editor.add_design") %></span>
-                  <span class="split-left-design-prompt-sub"><%= t("editor.add_design_sub") %></span>
-                </button>
+              <%# The design image saves through the same locked consent_image
+                  field, so the picker goes away with the rest of the editing. %>
+              <% unless live_locked %>
+                <% if @survey.consent_image.present? %>
+                  <button type="button" class="add-media-fab"
+                          data-action="click->media-picker#openConsent"
+                          title="<%= t("editor.change_media_title") %>">
+                    <span class="add-media-fab-plus">＋</span>
+                    <span><%= t("editor.change_media") %></span>
+                  </button>
+                <% else %>
+                  <button type="button" class="split-left-design-prompt"
+                          data-action="click->media-picker#openConsent"
+                          title="<%= t("editor.add_design_title") %>">
+                    <span class="split-left-design-prompt-icon">＋</span>
+                    <span class="split-left-design-prompt-title"><%= t("editor.add_design") %></span>
+                    <span class="split-left-design-prompt-sub"><%= t("editor.add_design_sub") %></span>
+                  </button>
+                <% end %>
               <% end %>
             </div>
             <div class="split-right">
@@ -315,7 +327,8 @@
                 <div class="q-header">
                   <div class="q-title"><%= t("player.consent_title") %></div>
                 </div>
-                <div class="play-consent-body gate-editable" contenteditable="true"
+                <div class="play-consent-body<%= ' gate-editable' unless live_locked %>"
+                     contenteditable="<%= live_locked ? 'false' : 'true' %>"
                      role="textbox" aria-multiline="true"
                      aria-label="<%= t("editor.consent_gate", default: "Consent gate") %>"
                      data-gate-cards-target="consentBody"
@@ -660,8 +673,12 @@
             <input type="hidden" name="return_tab" value="quiz" />
             <input type="hidden" name="quiz" value="0" />
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <%# Flipping this re-scores answers people have already given, so
+                  it's locked once the Verto is in use (update_settings enforces
+                  it; disabled here so the switch doesn't look available). %>
               <input type="checkbox" name="quiz" value="1"
                      <%= "checked" if @survey.quiz? %>
+                     <%= "disabled" if live_locked %>
                      onchange="this.form.requestSubmit()"
                      style="width:14px;height:14px;accent-color:#FFCC00;cursor:pointer;margin-top:1px;flex-shrink:0;" />
               <span>Score answers as right or wrong and show players their score. Each question card gains a “correct answer” control.</span>
@@ -701,8 +718,11 @@
             <input type="hidden" name="return_tab" value="tokens" />
             <input type="hidden" name="tokenisation_enabled" value="0" />
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <%# Same reasoning as quiz mode: turning points on or off changes
+                  totals respondents have already been shown. %>
               <input type="checkbox" name="tokenisation_enabled" value="1"
                      <%= "checked" if @survey.tokenisation_enabled? %>
+                     <%= "disabled" if live_locked %>
                      data-action="change->token-types#save"
                      style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
               <span>Let players earn points as they answer. Each question card gains token-amount controls, and players see a running total, a final total, and — only if “Show results comparison” is also on — how their total compares with everyone else's.</span>
