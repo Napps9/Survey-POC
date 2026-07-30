@@ -34,6 +34,7 @@ class Survey
       # untouched rather than half-rewritten.
       cards      = JSON.parse(Array(survey.cards).to_json)
       background = survey.read_attribute(:background_image)
+      consent    = survey.read_attribute(:consent_image)
       touched    = false
 
       cards.each do |card|
@@ -57,6 +58,13 @@ class Survey
         touched = true
       end
 
+      # The consent gate's design image travels the same sanitizer as a card's,
+      # so it could hold base64 too — it was simply missed here.
+      if (url = convert(survey, consent))
+        consent = url
+        touched = true
+      end
+
       unless touched
         @result.skipped += 1
         return
@@ -67,7 +75,7 @@ class Survey
       # normalisation that runs on save. This task only rewrites image URLs and
       # must not be able to reshape a deck as a side effect — least of all a
       # published Verto, whose stored answers are indexes into its options.
-      survey.update_columns(cards: cards, background_image: background)
+      survey.update_columns(cards: cards, background_image: background, consent_image: consent)
       log "converted Verto #{survey.id} (#{survey.title})"
     end
 

@@ -1,6 +1,12 @@
 require "test_helper"
 
 # The one-off conversion of decks that still carry inline base64 card imagery.
+#
+# Every fixture here PLANTS its data-URLs with update_columns rather than
+# create!, because Survey now externalises inline images on save — a deck
+# written through the normal path can't hold base64 any more. Bypassing the
+# callback is what makes these rows look like the pre-callback ones this task
+# exists to clean up.
 class CardImageBackfillTest < ActiveSupport::TestCase
   PNG_BYTES = Base64.decode64(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
@@ -12,9 +18,10 @@ class CardImageBackfillTest < ActiveSupport::TestCase
   end
 
   def survey_with(cards, background: nil)
-    @org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
-                         default_locale: "en", locales: [ "en" ], cards: cards,
-                         background_image: background)
+    survey = @org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                                  default_locale: "en", locales: [ "en" ], cards: [])
+    survey.update_columns(cards: cards, background_image: background)
+    survey.reload
   end
 
   test "converts a card image, an option image and the background" do

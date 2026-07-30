@@ -34,6 +34,19 @@ class Survey < ApplicationRecord
   # response already gathered. Published Vertos are locked for editing anyway.
   before_save :enforce_range_scale, if: -> { will_save_change_to_cards? && !published? }
 
+  # Inline base64 images never reach a column. CardImageStore and the backfill
+  # task moved the EXISTING data-URLs out (P1-7), but the door stayed open:
+  # sanitize_image_url still accepts a data-URL, so every write path — the
+  # editor's upload fallback, background and consent images, imports, generated
+  # decks — could put megabytes of base64 straight back. Cleaning up history
+  # without closing the door just means doing it again.
+  #
+  # Here rather than in the sanitizers because it catches every path at once,
+  # including the ones no sanitizer covers, and because it needs a persisted
+  # survey to attach a blob to.
+  before_save  :externalize_inline_images
+  after_create :externalize_inline_images_after_create
+
   # Large AI-generated TEXT columns only needed on the results path. Omit them
   # everywhere else (editor, dashboard, player, preview) so multi-KB blobs
   # aren't loaded into every row for nothing — a pure baseline memory saving.
@@ -1088,6 +1101,98 @@ class Survey < ApplicationRecord
 
   def enforce_range_scale
     self.cards = self.class.normalize_range_cards!(cards)
+  end
+
+  # Replace any inline base64 image about to be written with a stored blob path.
+  #
+  # Deliberately forgiving: a conversion that fails leaves the data-URL alone,
+  # exactly as the upload path and the backfill already do. A fat image beats a
+  # broken one, and this must never be the reason a creator's save is refused.
+  # Only the attributes actually being written, so an unrelated save never walks
+  # a whole deck looking for images.
+  def externalize_inline_images
+    attributes = []
+    attributes << :cards if will_save_change_to_cards?
+    attributes += %i[background_image consent_image].select { |a| will_save_change_to_attribute?(a) }
+    externalize_images_in(attributes)
+  end
+
+  # On create there's no id yet, so a blob can't be attached and the data-URL
+  # rides through. Converting straight after means the base64 is in the column
+  # for one write rather than indefinitely — the create path is the rare one
+  # (a duplicate of a not-yet-converted deck), so paying an extra UPDATE there
+  # is the right trade for never having to special-case it elsewhere.
+  def externalize_inline_images_after_create
+    updates = externalize_images_in(%i[cards background_image consent_image])
+    update_columns(updates) if updates.any?
+  end
+
+  # Converts in place and returns { attribute => new_value } for whatever moved.
+  def externalize_images_in(attributes)
+    updates = {}
+
+    if attributes.include?(:cards)
+      converted = externalized_cards
+      if converted
+        self.cards = converted
+        updates[:cards] = converted
+      end
+    end
+
+    (attributes & %i[background_image consent_image]).each do |attribute|
+      path = externalized_image_path(read_attribute(attribute))
+      next unless path
+
+      write_attribute(attribute, path)
+      updates[attribute] = path
+    end
+
+    updates
+  end
+
+  # The deck with every inline image replaced by a stored path, or nil when
+  # there was nothing to convert.
+  def externalized_cards
+    touched = false
+
+    converted = Array(cards).map do |card|
+      next card unless card.is_a?(Hash)
+
+      c = card
+      if (path = externalized_image_path(c["image"]))
+        c = c.merge("image" => path)
+        touched = true
+      end
+
+      images = Array(c["option_images"])
+      if images.any? { |value| Survey::CardImageStore.data_url?(value) }
+        c = c.merge("option_images" => images.map { |value| externalized_image_path(value) || value })
+        touched = true
+      end
+
+      c
+    end
+
+    touched ? converted : nil
+  end
+
+  # The stored path for an inline image, or nil when there's nothing to do (it's
+  # already a path, blank, or the conversion failed).
+  def externalized_image_path(value)
+    return nil unless Survey::CardImageStore.data_url?(value)
+
+    # A blob has to belong to a persisted record. On create the row doesn't exist
+    # yet, so the data-URL rides through this save and is converted on the next
+    # one — or by the backfill task, whichever comes first.
+    return nil unless persisted?
+
+    blob = Survey::CardImageStore.attach(self, value)
+    return nil unless blob
+
+    Rails.application.routes.url_helpers.rails_blob_path(blob, only_path: true)
+  rescue => e
+    ErrorReporting.report("Survey#externalize_inline_images", e, survey_id: id)
+    nil
   end
 
   # Per-survey HMAC key, from Rails' own key generator — tied to
