@@ -77,6 +77,34 @@
   # mode so the per-card "delete option" / "add option" actions resolve.
   picker_controllers = editable ? "picker card-editor" : "picker"
 
+  # Accessibility for the respondent-facing picker (P2-4). The options are <li>
+  # elements with a click handler: perfectly usable with a mouse or a thumb, and
+  # completely unusable with a keyboard or a screen reader — not focusable, and
+  # announced as plain list items with nothing conveying that they are choices
+  # or which one is chosen. That covers multiple_choice, select_many, yes_no and
+  # both grids, i.e. most of what a respondent is ever asked.
+  #
+  # Only applied outside the editor: there the same <li> holds contenteditable
+  # option text, and making it a focusable radio would fight the caret.
+  # The keydown hook only belongs where the item is focusable. The controller
+  # also guards on contenteditable, but not shipping the binding at all in the
+  # editor is one fewer thing that can misfire while someone types.
+  # html_safe because ERB would otherwise escape the arrows to &gt; inside the
+  # attribute. The browser decodes them either way — verified in Chromium — but
+  # leaving the rendered source identical to the literal it replaced keeps it
+  # greppable, and keeps any test matching on "click->picker#pick" working.
+  pick_actions = (editable ? "click->picker#pick" : "click->picker#pick keydown->picker#pickOnKey").html_safe
+
+  pick_a11y = lambda do |multi_mode, checked = false|
+    next "".html_safe if editable
+
+    tag.attributes(
+      role:         multi_mode ? "checkbox" : "radio",
+      tabindex:     0,
+      "aria-checked": checked.to_s
+    )
+  end
+
   # Language: `display` holds the text/options for the locale being shown
   # (falls back to primary); `canon` holds the PRIMARY option labels, which is
   # what answers are stored against so results align across languages. The
@@ -131,16 +159,18 @@
       <% items = Array(display["options"]) %>
       <% multi = (type == "select_many") %>
       <ul class="choice-list choice-list--<%= multi ? 'multi' : 'single' %>"
+          <%= editable ? "".html_safe : tag.attributes(role: multi ? "group" : "radiogroup") %>
           data-controller="<%= picker_controllers %>"
           data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
         <% items.each_with_index do |opt, i| %>
           <li class="choice-list-item pick-item"
               data-picker-target="item"
-              data-action="click->picker#pick"
+              data-action="<%= pick_actions %>"
               data-canonical="<%= canon[i] %>"
               data-correct="<%= mark_correct.call(canon[i]) %>"
-              data-selected="false">
-            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"><%= OptionIconLibrary.svg_for(canon[i]) %></div>
+              data-selected="false"
+              <%= pick_a11y.call(multi) %>>
+            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true"><%= OptionIconLibrary.svg_for(canon[i]) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
             <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
             <% if quiz_mode %>
@@ -198,16 +228,18 @@
 
     <% when "yes_no" %>
       <ul class="choice-list choice-list--yesno"
+          <%= editable ? "".html_safe : tag.attributes(role: "radiogroup") %>
           data-controller="picker"
           data-picker-mode-value="single">
         <% [["Yes", 1], ["No", 4]].each do |canon_label, bg| %>
           <li class="choice-list-item pick-item"
               data-picker-target="item"
-              data-action="click->picker#pick"
+              data-action="<%= pick_actions %>"
               data-canonical="<%= canon_label %>"
               data-correct="<%= mark_correct.call(canon_label) %>"
-              data-selected="false">
-            <div class="choice-list-tile choice-bg-<%= bg %>"></div>
+              data-selected="false"
+              <%= pick_a11y.call(false) %>>
+            <div class="choice-list-tile choice-bg-<%= bg %>" aria-hidden="true"></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= t("card.#{canon_label.downcase}", locale: display_locale, default: canon_label) %></span>
             <span class="choice-list-tick pick-dot">✓</span>
             <% if quiz_mode %>
@@ -223,15 +255,17 @@
       <% cols = opts.size >= 5 ? 3 : 2 %>
       <% multi = (type == "select_many_grid") %>
       <ul class="choice-grid choice-grid--<%= multi ? 'multi' : 'single' %> choice-grid-<%= cols %>"
+          <%= editable ? "".html_safe : tag.attributes(role: multi ? "group" : "radiogroup") %>
           data-controller="picker"
           data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
         <% opts.each_with_index do |opt, i| %>
           <li class="choice-card"
               data-picker-target="item"
-              data-action="click->picker#pick"
+              data-action="<%= pick_actions %>"
               data-canonical="<%= canon[i] %>"
               data-correct="<%= mark_correct.call(canon[i]) %>"
-              data-selected="false">
+              data-selected="false"
+              <%= pick_a11y.call(multi) %>>
             <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>">
               <%= OptionIconLibrary.svg_for(canon[i]) %>
               <div class="choice-overlay"></div>
