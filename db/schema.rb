@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_190000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -136,6 +136,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.index ["survey_id", "created_at"], name: "index_flow_generations_on_survey_id_and_created_at"
     t.index ["survey_id"], name: "index_flow_generations_on_survey_id"
     t.index ["user_id"], name: "index_flow_generations_on_user_id"
+    t.check_constraint "status IN ('pending', 'running', 'succeeded', 'failed')", name: "chk_flow_generations_status"
   end
 
   create_table "funder_memberships", force: :cascade do |t|
@@ -147,6 +148,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.index ["funder_id", "organisation_id"], name: "index_funder_memberships_on_funder_id_and_organisation_id", unique: true
     t.index ["funder_id"], name: "index_funder_memberships_on_funder_id"
     t.index ["organisation_id"], name: "index_funder_memberships_on_organisation_id"
+    t.check_constraint "status IN ('active', 'suspended')", name: "chk_funder_memberships_status"
   end
 
   create_table "funders", force: :cascade do |t|
@@ -158,6 +160,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.datetime "updated_at", null: false
     t.index ["organisation_id", "name"], name: "index_funders_on_organisation_id_and_name", unique: true
     t.index ["organisation_id"], name: "index_funders_on_organisation_id"
+    t.check_constraint "status IN ('active', 'revoked')", name: "chk_funders_status"
   end
 
   create_table "identities", force: :cascade do |t|
@@ -191,6 +194,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.index ["organisation_id"], name: "index_invites_on_organisation_id"
     t.index ["partnership_id"], name: "index_invites_on_partnership_id"
     t.index ["token"], name: "index_invites_on_token", unique: true
+    t.check_constraint "kind IN ('member', 'partner', 'licensee')", name: "chk_invites_kind"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -202,6 +206,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.index ["organisation_id"], name: "index_memberships_on_organisation_id"
     t.index ["user_id", "organisation_id"], name: "index_memberships_on_user_id_and_organisation_id", unique: true
     t.index ["user_id"], name: "index_memberships_on_user_id"
+    t.check_constraint "role IN ('member', 'admin')", name: "chk_memberships_role"
   end
 
   create_table "organisations", force: :cascade do |t|
@@ -233,6 +238,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.index ["organisation_id"], name: "index_partnership_memberships_on_organisation_id"
     t.index ["partnership_id", "organisation_id"], name: "idx_on_partnership_id_organisation_id_292249422a", unique: true
     t.index ["partnership_id"], name: "index_partnership_memberships_on_partnership_id"
+    t.check_constraint "status IN ('active', 'pending', 'revoked')", name: "chk_partnership_memberships_status"
   end
 
   create_table "partnership_vertos", force: :cascade do |t|
@@ -253,6 +259,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.datetime "updated_at", null: false
     t.index ["organisation_id", "name"], name: "index_partnerships_on_organisation_id_and_name", unique: true
     t.index ["organisation_id"], name: "index_partnerships_on_organisation_id"
+    t.check_constraint "status IN ('active', 'pending', 'revoked')", name: "chk_partnerships_status"
   end
 
   create_table "portfolio_common_question_sets", force: :cascade do |t|
@@ -296,6 +303,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.index ["status", "created_at"], name: "index_report_renders_on_status_and_created_at"
     t.index ["survey_id"], name: "index_report_renders_on_survey_id"
     t.index ["user_id"], name: "index_report_renders_on_user_id"
+    t.check_constraint "status IN ('pending', 'running', 'succeeded', 'failed')", name: "chk_report_renders_status"
   end
 
   create_table "responses", force: :cascade do |t|
@@ -330,6 +338,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.index ["survey_id", "respondent_code_digest"], name: "index_responses_on_survey_and_respondent_code"
     t.index ["survey_id"], name: "index_responses_on_survey_id"
     t.index ["survey_share_id"], name: "index_responses_on_survey_share_id"
+    t.check_constraint "status IN ('started', 'completed')", name: "chk_responses_status"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -596,6 +605,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_180000) do
     t.index ["status"], name: "index_verto_builds_on_status"
     t.index ["survey_id"], name: "index_verto_builds_on_survey_id"
     t.index ["user_id"], name: "index_verto_builds_on_user_id"
+    t.check_constraint "kind IN ('generate', 'import_manual', 'import_google_form', 'import_pdf')", name: "chk_verto_builds_kind"
+    t.check_constraint "status IN ('pending', 'running', 'succeeded', 'failed')", name: "chk_verto_builds_status"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

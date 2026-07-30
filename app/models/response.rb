@@ -3,6 +3,14 @@ class Response < ApplicationRecord
   belongs_to :survey_share, optional: true
   validates :session_token, presence: true, uniqueness: true
 
+  # The only two states a response is ever in: "started" once it has an answer,
+  # "completed" once the respondent reaches the end. Every other model with a
+  # status column already declared its values; this one didn't, so the P2-8
+  # database CHECK would have surfaced a bad value as a raw DB exception rather
+  # than an ordinary validation error.
+  STATUSES = %w[started completed].freeze
+  validates :status, inclusion: { in: STATUSES }
+
   # Small-cell suppression for region groupings: any region/results view
   # grouped by region_country should drop groups smaller than this before
   # display, so a single respondent (or a handful) is never singled out on a
