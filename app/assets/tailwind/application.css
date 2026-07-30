@@ -3853,6 +3853,45 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .preview-card { display: none; width: 845px; max-width: 100%; }
 .preview-card.active { display: block; }
 
+/* Card-to-card motion.
+ *
+ * Every other transition in the player animates — the book turns its pages, the
+ * tap stack throws its cards — but advancing the DECK just swapped `display`,
+ * so the last tap of a scenario card (and every ordinary Next) jumped with no
+ * motion at all. Against animated cards that reads as a glitch rather than a
+ * deliberately plain transition.
+ *
+ * `display` stays the show/hide mechanism on purpose: .preview-card.active is
+ * `block` here and `flex` on mobile (see the .preview-overlay override), and
+ * cards must not share layout — animating opacity instead would put the whole
+ * deck in the flow at once. So this animates the ARRIVING card only, driven by
+ * a transient class the player adds per navigation rather than by .active
+ * itself: a class that stuck around would re-fire whenever card-shake was
+ * removed, replaying the entry on a failed required-field tap.
+ *
+ * No exit animation to pair with it — the outgoing card is display:none the
+ * moment it loses .active, and a real cross-fade would need both on screen at
+ * once, which is the layout constraint above. */
+@keyframes player-card-in {
+  from { opacity: 0; transform: translate3d(22px, 0, 0) scale(0.985); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes player-card-in-back {
+  from { opacity: 0; transform: translate3d(-22px, 0, 0) scale(0.985); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+.preview-card.is-entering      { animation: player-card-in      0.26s cubic-bezier(.4, 0, .2, 1) both; }
+.preview-card.is-entering-back { animation: player-card-in-back 0.26s cubic-bezier(.4, 0, .2, 1) both; }
+/* Form mode strips the game-like motion, and reduced-motion means it. Both are
+   belt-and-braces — player_controller skips adding the class in either case —
+   but a stylesheet shouldn't rely on that. */
+.forms-mode .preview-card.is-entering,
+.forms-mode .preview-card.is-entering-back { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .preview-card.is-entering,
+  .preview-card.is-entering-back { animation: none; }
+}
+
 /* Create-wizard cards grow with their content (the auto-growing name/theme/
    audience/insight fields) instead of clipping at the fixed editor/player card
    height. Keeps the spacious look via a min-height, then expands as needed. */

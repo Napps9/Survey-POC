@@ -190,6 +190,7 @@ export default class extends Controller {
   // Advance one step. Linear by default; follows the answer-logic graph when the
   // Verto has logic enabled (routing off ⇒ this is byte-identical to before).
   _advance() {
+    this._navBack = false
     if (this.logicValue) { this._advanceLogic(); return }
     if (this.currentValue < this.cardTargets.length - 1) {
       this._buzz()
@@ -201,6 +202,11 @@ export default class extends Controller {
   back() {
     // Scenario: retrace pages before leaving the card, symmetric with next().
     if (this._scenarioTurn(this.currentValue, -1)) return
+    // Which way the next _update() should animate. Set here rather than derived
+    // from the index, because under logic the index can move either way on a
+    // forward step — it's the respondent's intent that decides the direction,
+    // not the arithmetic.
+    this._navBack = true
     this._capture(this.currentValue)
     this._saveProgress()
     if (this.logicValue) {
@@ -1156,6 +1162,7 @@ export default class extends Controller {
     const cards = this.cardTargets
     const idx   = this.currentValue
     cards.forEach((c, i) => c.classList.toggle("active", i === idx))
+    this._animateCardEntry(cards[idx], idx)
 
     // Two gate shapes: "consent_card" is the survey-level pseudo-card pinned
     // first, "consent_gate" is a real multi-page card the creator placed in the
@@ -1535,6 +1542,32 @@ export default class extends Controller {
     this._lockInputs(card)
     this._renderTokenChip()
     if (this.tokenRevealValue) this._revealTokenEarn(card, earned)
+  }
+
+  // Play the arriving card's entry animation. Only on an actual card CHANGE —
+  // _update() runs for plenty of reasons that aren't navigation (a token
+  // checkpoint repainting, quiz nav relabelling), and replaying the animation on
+  // those would make the deck twitch while standing still.
+  //
+  // The class is transient: added here, removed when the animation ends. Left
+  // on, it would re-fire whenever card-shake was removed from the same card,
+  // replaying the entry on a failed required-field tap.
+  _animateCardEntry(card, idx) {
+    const changed = this._enteredIdx !== idx
+    this._enteredIdx = idx
+    if (!card || !changed) return
+    if (this.formsValue) return           // form mode strips game-like motion
+    if (this._reducedMotion) return
+
+    card.classList.remove("is-entering", "is-entering-back")
+    void card.offsetWidth                 // reflow, so a re-entry restarts it
+    const cls = this._navBack ? "is-entering-back" : "is-entering"
+    card.classList.add(cls)
+    card.addEventListener("animationend", () => card.classList.remove(cls), { once: true })
+  }
+
+  get _reducedMotion() {
+    return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true
   }
 
   // Mirrors TokenGrading.blank_value? — what the server treats as "not
