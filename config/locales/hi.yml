@@ -44,6 +44,7 @@ hi:
     other: अन्य
     other_placeholder: अपने शब्दों में बताएं…
     mark_correct: "सही उत्तर चिह्नित करें"
+    rating_star: "%{total} में से %{number}"
     correct_pick_hint: "उस विकल्प पर टैप करें जिसे सही होने के लिए खिलाड़ियों को चुनना होगा।"
     correct_tap_hint: "हर कथन के लिए सही स्वाइप सेट करें।"
     correct_scale_hint: "वह मान चुनें जो सही माना जाए।"

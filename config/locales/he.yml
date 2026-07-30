@@ -44,6 +44,7 @@ he:
     other: אחר
     other_placeholder: ספר לנו במילים שלך…
     mark_correct: "סמן את התשובה הנכונה"
+    rating_star: "%{number} מתוך %{total}"
     correct_pick_hint: "הקש על האפשרות/אפשרויות שעל השחקנים לבחור כדי לצדוק."
     correct_tap_hint: "הגדר את ההחלקה הנכונה לכל היגד."
     correct_scale_hint: "בחר את הערך שנחשב נכון."

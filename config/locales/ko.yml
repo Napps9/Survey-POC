@@ -44,6 +44,7 @@ ko:
     other: 기타
     other_placeholder: 직접 입력해 주세요…
     mark_correct: "정답 표시하기"
+    rating_star: "%{total}점 중 %{number}점"
     correct_pick_hint: "플레이어가 맞히려면 선택해야 하는 옵션을 탭하세요."
     correct_tap_hint: "각 문장에 대한 올바른 스와이프를 설정하세요."
     correct_scale_hint: "정답으로 인정할 값을 선택하세요."

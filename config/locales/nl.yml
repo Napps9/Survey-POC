@@ -44,6 +44,7 @@ nl:
     other: Anders
     other_placeholder: Vertel het in je eigen woorden…
     mark_correct: "Markeer het juiste antwoord"
+    rating_star: "%{number} van %{total}"
     correct_pick_hint: "Tik op de optie(s) die spelers moeten kiezen om goed te zijn."
     correct_tap_hint: "Stel de juiste swipe in voor elke stelling."
     correct_scale_hint: "Kies de waarde die als juist telt."

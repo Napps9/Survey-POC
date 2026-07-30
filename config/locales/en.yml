@@ -46,6 +46,7 @@ en:
     other: "Other"
     other_placeholder: "Tell us in your own words…"
     mark_correct: "Mark the correct answer"
+    rating_star: "%{number} of %{total}"
     correct_pick_hint: "Tap the option(s) players must choose to be right."
     correct_tap_hint: "Set the correct swipe for each statement."
     correct_scale_hint: "Pick the value that counts as correct."

@@ -38,6 +38,27 @@ export default class extends Controller {
     this._dispatchScaleValue(REACTION_NEUTRAL)
   }
 
+  // Arrow keys step the slider, mirroring nps_slider_controller#key (P2-4).
+  // Without this the range card is drag-only — pointerdown is the sole way to
+  // answer it, which locks out anyone not using a pointer.
+  key(event) {
+    const up   = [ "ArrowUp", "ArrowRight" ].includes(event.key)
+    const down = [ "ArrowDown", "ArrowLeft" ].includes(event.key)
+    if (!up && !down) return
+    if (event.target.isContentEditable) return
+    event.preventDefault()
+
+    const n    = Math.max(2, this.stepsValue)
+    const next = Math.max(0, Math.min(n - 1, this.indexValue + (up ? 1 : -1)))
+    if (next === this.indexValue) return
+
+    this.indexValue = next
+    this.render()
+    // No argument: _dispatchScaleValue derives the reaction frame from
+    // indexValue, exactly as the drag path does.
+    this._dispatchScaleValue()
+  }
+
   start(event) {
     if (event.target.isContentEditable) return
     event.preventDefault()
@@ -102,5 +123,13 @@ export default class extends Controller {
     this.dotTargets.forEach((dot, i) =>
       dot.classList.toggle("active", i === this.indexValue)
     )
+
+    // Keep the announced value in step with the visible thumb. Only where the
+    // role was applied — the editor renders the same markup without it.
+    if (this.element.hasAttribute("role")) {
+      this.element.setAttribute("aria-valuenow", String(this.indexValue))
+      const label = this.labelTargets[this.indexValue]
+      if (label) this.element.setAttribute("aria-valuetext", label.textContent.trim())
+    }
   }
 }

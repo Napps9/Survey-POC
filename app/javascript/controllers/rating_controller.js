@@ -17,13 +17,41 @@ export default class extends Controller {
     this.dispatch("pick", { detail: { index: this.indexValue } })
   }
 
+  // Stars are radios outside the editor (P2-4), so Enter/Space select and the
+  // arrows move between them — the pointer was previously the only way in.
+  pickOnKey(event) {
+    const activate = [ "Enter", " ", "Spacebar" ].includes(event.key)
+    const forward  = [ "ArrowRight", "ArrowDown" ].includes(event.key)
+    const back     = [ "ArrowLeft", "ArrowUp" ].includes(event.key)
+    if (!activate && !forward && !back) return
+    if (event.target.isContentEditable) return
+    event.preventDefault()
+
+    if (activate) return this.pick(event)
+
+    const from = this.indexValue < 0 ? (forward ? -1 : this.starTargets.length) : this.indexValue
+    const next = Math.max(0, Math.min(this.starTargets.length - 1, from + (forward ? 1 : -1)))
+    this.indexValue = next
+    this._render()
+    this.starTargets[next]?.focus()
+    haptic()
+    this.dispatch("pick", { detail: { index: next } })
+  }
+
   hover(event) {
     this._highlight(parseInt(event.currentTarget.dataset.ratingIndex, 10))
   }
 
   unhover() { this._highlight(this.indexValue) }
 
-  _render() { this._highlight(this.indexValue) }
+  _render() {
+    this._highlight(this.indexValue)
+    // Announce which star is chosen. Guarded on the role so the editor, which
+    // renders the same stars without radio semantics, isn't given a state.
+    this.starTargets.forEach((star, i) => {
+      if (star.hasAttribute("role")) star.setAttribute("aria-checked", i === this.indexValue ? "true" : "false")
+    })
+  }
 
   _highlight(upTo) {
     this.starTargets.forEach((star, i) => {

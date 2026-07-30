@@ -44,6 +44,7 @@ tr:
     other: Diğer
     other_placeholder: Kendi sözcüklerinizle anlatın…
     mark_correct: "Doğru cevabı işaretle"
+    rating_star: "%{total} üzerinden %{number}"
     correct_pick_hint: "Oyuncuların doğru olmak için seçmesi gereken seçenek(ler)e dokunun."
     correct_tap_hint: "Her ifade için doğru kaydırmayı belirleyin."
     correct_scale_hint: "Doğru sayılan değeri seçin."

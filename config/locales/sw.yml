@@ -44,6 +44,7 @@ sw:
     other: Nyingine
     other_placeholder: Tuambie kwa maneno yako mwenyewe…
     mark_correct: "Weka jibu sahihi"
+    rating_star: "%{number} kati ya %{total}"
     correct_pick_hint: "Gusa chaguo ambalo wachezaji lazima walichague ili wawe sahihi."
     correct_tap_hint: "Weka uteleshaji sahihi kwa kila kauli."
     correct_scale_hint: "Chagua thamani inayohesabiwa kuwa sahihi."

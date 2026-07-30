@@ -44,6 +44,7 @@ ar:
     other: أخرى
     other_placeholder: أخبرنا بكلماتك الخاصة…
     mark_correct: "حدِّد الإجابة الصحيحة"
+    rating_star: "%{number} من %{total}"
     correct_pick_hint: "اضغط على الخيار/الخيارات التي يجب على اللاعبين اختيارها ليكونوا على صواب."
     correct_tap_hint: "حدِّد السحب الصحيح لكل عبارة."
     correct_scale_hint: "اختر القيمة التي تُحتسب صحيحة."

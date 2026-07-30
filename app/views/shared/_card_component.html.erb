@@ -539,10 +539,19 @@
       <% axis = resolved_slider_axis(card) %>
       <% stored_axis = card["slider_axis"].to_s.presence || "auto" %>
       <% next_axis = { "auto" => "horizontal", "horizontal" => "vertical", "vertical" => "auto" }[stored_axis] %>
+      <%# Keyboard + screen-reader access, matching the NPS slider's existing
+          pattern (P2-4). Without it the range card is drag-only: pointerdown
+          is the sole way to answer. Editor excluded — the labels underneath
+          are contenteditable there. %>
       <div class="slider-wrap"
            data-controller="slider"
            data-slider-steps-value="<%= n %>"
-           data-slider-axis-value="<%= axis %>">
+           data-slider-axis-value="<%= axis %>"
+           <%= editable ? "".html_safe : tag.attributes(
+                 tabindex: 0, role: "slider",
+                 "aria-valuemin": 0, "aria-valuemax": n - 1,
+                 "aria-orientation": axis) %>
+           data-action="<%= (editable ? "" : "keydown->slider#key").html_safe %>">
         <div class="slider-track-wrap">
           <div class="slider-track"
                data-slider-target="track"
@@ -630,15 +639,23 @@
       <% first_lbl = labels.first || "Poor" %>
       <% last_lbl  = labels.last  || "Excellent" %>
       <% icon      = rating_icon(@survey) %>
+      <% rating_actions = (editable ? "click->rating#pick mouseover->rating#hover mouseout->rating#unhover" :
+                                       "click->rating#pick mouseover->rating#hover mouseout->rating#unhover keydown->rating#pickOnKey").html_safe %>
       <div class="rating-wrap rating-kind-<%= icon[:kind] %>" data-controller="rating">
-        <div class="rating-stars">
+        <div class="rating-stars" <%= editable ? "".html_safe : tag.attributes(role: "radiogroup") %>>
           <% 5.times do |i| %>
+            <%# Radio rather than slider semantics: five discrete, individually
+                labelled choices is what a rating is, and it's what a screen
+                reader user expects from stars (P2-4). %>
             <span class="rating-star"
                   data-rating-target="star"
                   data-rating-index="<%= i %>"
                   data-rating-on="<%= icon[:on] %>"
                   data-rating-off="<%= icon[:off] %>"
-                  data-action="click->rating#pick mouseover->rating#hover mouseout->rating#unhover"><%= icon[:off] %></span>
+                  <%= editable ? "".html_safe : tag.attributes(
+                        role: "radio", tabindex: 0, "aria-checked": "false",
+                        "aria-label": t("card.rating_star", number: i + 1, total: 5, locale: display_locale, default: "#{i + 1} of 5")) %>
+                  data-action="<%= rating_actions %>"><%= icon[:off] %></span>
           <% end %>
         </div>
         <div class="rating-labels">

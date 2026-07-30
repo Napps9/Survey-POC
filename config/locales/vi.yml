@@ -44,6 +44,7 @@ vi:
     other: Khác
     other_placeholder: Hãy chia sẻ bằng lời của bạn…
     mark_correct: "Đánh dấu câu trả lời đúng"
+    rating_star: "%{number} trên %{total}"
     correct_pick_hint: "Chạm vào (các) tùy chọn mà người chơi phải chọn để đúng."
     correct_tap_hint: "Đặt kiểu vuốt đúng cho mỗi phát biểu."
     correct_scale_hint: "Chọn giá trị được tính là đúng."

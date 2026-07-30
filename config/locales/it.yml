@@ -44,6 +44,7 @@ it:
     other: Altro
     other_placeholder: Raccontacelo con parole tue…
     mark_correct: "Indica la risposta corretta"
+    rating_star: "%{number} su %{total}"
     correct_pick_hint: "Tocca le opzioni che i giocatori devono scegliere per indovinare."
     correct_tap_hint: "Imposta lo swipe corretto per ogni affermazione."
     correct_scale_hint: "Scegli il valore che conta come corretto."

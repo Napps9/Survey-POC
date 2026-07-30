@@ -44,6 +44,7 @@ id:
     other: Lainnya
     other_placeholder: Beri tahu kami dengan kata-kata Anda sendiri…
     mark_correct: "Tandai jawaban yang benar"
+    rating_star: "%{number} dari %{total}"
     correct_pick_hint: "Ketuk opsi yang harus dipilih pemain agar benar."
     correct_tap_hint: "Atur geseran yang benar untuk setiap pernyataan."
     correct_scale_hint: "Pilih nilai yang dianggap benar."

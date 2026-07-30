@@ -44,6 +44,7 @@ fr:
     other: Autre
     other_placeholder: Dites-le avec vos propres mots…
     mark_correct: "Indiquer la bonne réponse"
+    rating_star: "%{number} sur %{total}"
     correct_pick_hint: "Touchez la ou les options que les joueurs doivent choisir pour avoir raison."
     correct_tap_hint: "Définissez le bon glissement pour chaque affirmation."
     correct_scale_hint: "Choisissez la valeur considérée comme correcte."

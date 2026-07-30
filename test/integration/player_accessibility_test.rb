@@ -124,4 +124,66 @@ class PlayerAccessibilityTest < ActionDispatch::IntegrationTest
     assert_equal 3, html.scan(/aria-label=/).size,
                  "the three swipe actions should stay labelled"
   end
+
+  # ── The other answer controls (P2-4, second pass) ───────────────────────
+
+  RANGE  = { "type" => "range", "cid" => "c", "text" => "How confident?",
+             "options" => %w[Low Mid High] }.freeze
+  RATING = { "type" => "rating", "cid" => "c", "text" => "Rate it",
+             "options" => [ "Poor", "Great" ] }.freeze
+
+  test "the range slider is focusable and announces its bounds" do
+    # It was drag-only: pointerdown was the sole way to answer, which locks out
+    # anyone not using a pointer.
+    html = render_card(RANGE, mode: :player)
+    assert_includes html, 'role="slider"'
+    assert_includes html, 'tabindex="0"'
+    assert_includes html, 'aria-valuemin="0"'
+    assert_match(/aria-valuemax="\d+"/, html)
+    assert_includes html, "aria-orientation="
+  end
+
+  test "the range slider binds arrow keys" do
+    assert_includes render_card(RANGE, mode: :player), "keydown->slider#key"
+  end
+
+  test "rating stars are radios in a group, each individually labelled" do
+    html = render_card(RATING, mode: :player)
+    assert_equal 5, html.scan(/class="rating-star"/).size
+    assert_equal 5, html.scan(/role="radio"/).size
+    assert_equal 5, html.scan(/aria-checked="false"/).size
+    assert_includes html, 'role="radiogroup"'
+    # Individually labelled, so "3 of 5" is announced rather than five
+    # identical unlabelled controls.
+    (1..5).each { |i| assert_includes html, %(aria-label="#{i} of 5") }
+  end
+
+  test "rating stars bind a keyboard activator" do
+    assert_includes render_card(RATING, mode: :player), "keydown->rating#pickOnKey"
+  end
+
+  test "the star label is translated, not hardcoded" do
+    html = render_card(RATING, mode: :player)
+    assert_includes html, I18n.t("card.rating_star", number: 3, total: 5)
+  end
+
+  test "neither control gets the treatment in the editor" do
+    [ RANGE, RATING ].each do |card|
+      html = render_card(card, mode: :editor)
+      assert_not_includes html, 'role="slider"'
+      assert_not_includes html, 'role="radio"'
+      assert_not_includes html, "aria-checked"
+      assert_not_includes html, "keydown->"
+      assert_equal 0, html.scan(/tabindex="0"/).size
+    end
+  end
+
+  test "the NPS slider keeps the semantics it already had" do
+    # It was the one control already doing this properly, and is the pattern
+    # the range slider now follows — so a regression there matters.
+    html = render_card({ "type" => "nps", "cid" => "c", "text" => "Recommend?" }, mode: :player)
+    assert_includes html, 'role="slider"'
+    assert_includes html, 'tabindex="0"'
+    assert_includes html, "keydown->nps-slider#key"
+  end
 end

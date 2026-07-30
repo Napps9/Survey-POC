@@ -44,6 +44,7 @@ ja:
     other: その他
     other_placeholder: ご自身の言葉でお聞かせください…
     mark_correct: "正解をマークする"
+    rating_star: "%{total} 段階中 %{number}"
     correct_pick_hint: "プレイヤーが正解するために選ぶべき選択肢をタップしてください。"
     correct_tap_hint: "各ステートメントに正しいスワイプを設定してください。"
     correct_scale_hint: "正解とみなす値を選んでください。"

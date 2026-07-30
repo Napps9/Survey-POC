@@ -44,6 +44,7 @@ pt:
     other: Outro
     other_placeholder: Diga-nos pelas suas próprias palavras…
     mark_correct: "Marque a resposta correta"
+    rating_star: "%{number} de %{total}"
     correct_pick_hint: "Toque na(s) opção(ões) que os jogadores devem escolher para acertar."
     correct_tap_hint: "Defina o deslize correto para cada afirmação."
     correct_scale_hint: "Escolha o valor que conta como correto."

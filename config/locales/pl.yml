@@ -44,6 +44,7 @@ pl:
     other: Inne
     other_placeholder: Powiedz nam własnymi słowami…
     mark_correct: "Zaznacz poprawną odpowiedź"
+    rating_star: "%{number} z %{total}"
     correct_pick_hint: "Stuknij opcję (opcje), które gracze muszą wybrać, aby mieć rację."
     correct_tap_hint: "Ustaw poprawne przeciągnięcie dla każdego stwierdzenia."
     correct_scale_hint: "Wybierz wartość, która liczy się jako poprawna."
