@@ -37,6 +37,8 @@ sw:
     reset: Weka upya
     answer_placeholder: Andika jibu…
     characters: Herufi
+    char_limit_label: 'Urefu wa jibu'
+    char_limit_option: 'Herufi %{n}'
     allow_other: Ruhusu jibu huru la "Nyingine"
     required: "Swali la lazima"
     other: Nyingine

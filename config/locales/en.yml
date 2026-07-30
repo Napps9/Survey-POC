@@ -39,6 +39,8 @@ en:
     reset: "Reset"
     answer_placeholder: "Type answer…"
     characters: "Characters"
+    char_limit_label: 'Answer length'
+    char_limit_option: '%{n} characters'
     allow_other: "Allow “Other” free-text answer"
     required: "Required question"
     other: "Other"

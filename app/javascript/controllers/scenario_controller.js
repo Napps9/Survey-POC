@@ -130,8 +130,13 @@ export default class extends Controller {
     pages.forEach((page, i) => {
       const pos = i - this.current
       let transform
+      // A turned page fades on a delayed, longer curve (see .book-page.is-turning)
+      // so the rotation stays legible instead of vanishing mid-arc.
+      page.classList.toggle("is-turning", pos < 0)
       if (pos < 0) {
-        transform = "rotateY(-122deg) translateX(-8px)"
+        // Stops short of edge-on: past about 105deg there's nothing left to see,
+        // so the extra rotation was only shortening the visible part of the turn.
+        transform = "rotateY(-104deg) translateX(-6px)"
         page.style.opacity = "0"
         page.style.zIndex = 0
         page.style.pointerEvents = "none"
@@ -141,9 +146,11 @@ export default class extends Controller {
         page.style.zIndex = 40
         page.style.pointerEvents = "auto"
       } else {
-        const scale = Math.max(1 - pos * 0.04, 0.85)
-        transform = `rotateY(0deg) translateY(${pos * 7}px) scale(${scale})`
-        page.style.opacity = String(Math.max(1 - pos * 0.32, 0))
+        // More travel than before (7px / 0.04) — the arriving page barely moved,
+        // so a turn gave almost no sense of a new page coming forward.
+        const scale = Math.max(1 - pos * 0.05, 0.85)
+        transform = `rotateY(0deg) translateY(${pos * 13}px) scale(${scale})`
+        page.style.opacity = String(Math.max(1 - pos * 0.3, 0))
         page.style.zIndex = 40 - pos
         page.style.pointerEvents = "none"
       }

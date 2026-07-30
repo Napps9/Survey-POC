@@ -37,6 +37,8 @@ hi:
     reset: रीसेट करें
     answer_placeholder: उत्तर लिखें…
     characters: वर्ण
+    char_limit_label: 'उत्तर की लंबाई'
+    char_limit_option: '%{n} वर्ण'
     allow_other: "“अन्य” मुक्त-पाठ उत्तर की अनुमति दें"
     required: "अनिवार्य प्रश्न"
     other: अन्य

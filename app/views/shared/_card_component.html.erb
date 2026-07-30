@@ -676,14 +676,39 @@
           </div>
         </div>
       <% else %>
+        <%# Per-card free-text cap (Survey#free_text_limit_at). Was hardcoded to
+            200 with no maxlength and no server check — the counter turned pink
+            and the answer saved in full anyway. %>
+        <% char_limit = card["char_limit"].to_i %>
+        <% char_limit = Survey::DEFAULT_FREE_TEXT_LIMIT unless char_limit.positive? %>
         <div class="freeform-wrap"
              data-controller="freeform"
-             data-freeform-max-value="200">
+             data-freeform-max-value="<%= char_limit %>">
           <textarea class="freeform-textarea"
                     placeholder="<%= t("card.answer_placeholder") %>"
+                    maxlength="<%= char_limit %>"
                     data-freeform-target="input"
                     data-action="input->freeform#update"></textarea>
-          <div class="freeform-counter" data-freeform-target="counter">0/200 <%= t("card.characters") %></div>
+          <div class="freeform-counter" data-freeform-target="counter">0/<%= char_limit %> <%= t("card.characters") %></div>
+          <% if editable %>
+            <label class="freeform-limit-row">
+              <span><%= t("card.char_limit_label", default: "Answer length") %></span>
+              <select data-char-limit data-action="change->survey-editor#markDirty">
+                <% Survey::FREE_TEXT_LIMIT_PRESETS.each do |preset| %>
+                  <option value="<%= preset %>" <%= "selected" if preset == char_limit %>>
+                    <%= t("card.char_limit_option", n: preset, default: "#{preset} characters") %>
+                  </option>
+                <% end %>
+                <%# A limit typed in before the presets existed, or set by an
+                    import — keep it selectable rather than silently rewriting it. %>
+                <% unless Survey::FREE_TEXT_LIMIT_PRESETS.include?(char_limit) %>
+                  <option value="<%= char_limit %>" selected>
+                    <%= t("card.char_limit_option", n: char_limit, default: "#{char_limit} characters") %>
+                  </option>
+                <% end %>
+              </select>
+            </label>
+          <% end %>
         </div>
       <% end %>
 
@@ -927,14 +952,19 @@
       <div class="other-cta-wrap" data-other-target="wrap"<%= ' hidden'.html_safe unless card["allow_other"] %>>
         <button type="button" class="other-cta-btn" data-other-target="btn"
                 data-action="click->other#toggle"<%= ' disabled'.html_safe if editable %>>＋ <%= t("card.other") %></button>
+        <%# The Other box is free text by another name, so it takes the card's
+            limit too — and the server clamps it alongside the answer value. %>
+        <% other_limit = card["char_limit"].to_i %>
+        <% other_limit = Survey::DEFAULT_FREE_TEXT_LIMIT unless other_limit.positive? %>
         <div class="other-panel" data-other-target="panel" hidden
-             data-controller="freeform" data-freeform-max-value="200">
+             data-controller="freeform" data-freeform-max-value="<%= other_limit %>">
           <textarea class="freeform-textarea other-textarea"
                     placeholder="<%= t("card.other_placeholder") %>"
+                    maxlength="<%= other_limit %>"
                     data-other-input
                     data-freeform-target="input"
                     data-action="input->freeform#update"></textarea>
-          <div class="freeform-counter" data-freeform-target="counter">0/200 <%= t("card.characters") %></div>
+          <div class="freeform-counter" data-freeform-target="counter">0/<%= other_limit %> <%= t("card.characters") %></div>
         </div>
       </div>
     </div>

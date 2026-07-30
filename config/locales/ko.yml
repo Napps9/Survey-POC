@@ -37,6 +37,8 @@ ko:
     reset: 초기화
     answer_placeholder: 답변 입력…
     characters: 글자 수
+    char_limit_label: '답변 길이'
+    char_limit_option: '%{n}자'
     allow_other: '"기타" 자유 입력 답변 허용'
     required: "필수 질문"
     other: 기타

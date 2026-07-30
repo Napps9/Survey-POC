@@ -1200,6 +1200,19 @@
 .gate-editable { outline: none; border-radius: 6px; cursor: text; transition: box-shadow 0.15s; }
 .gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,234,203,0.3); }
 .gate-editable:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.55); }
+/* Creator's answer-length control, under the free-text counter in the editor. */
+.freeform-limit-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 8px;
+  font-family: 'ABeeZee', sans-serif; font-size: 12px; color: rgba(0,0,0,0.5);
+}
+.freeform-limit-row select {
+  padding: 4px 8px; border-radius: 8px;
+  background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.12);
+  font-family: 'ABeeZee', sans-serif; font-size: 12px; color: #1C2034;
+  cursor: pointer; outline: none;
+}
+.freeform-limit-row select:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.5); border-color: transparent; }
+
 /* Explicit "this question awards points" switch, at the top of a card's token
    block in the editor's Tokenomics tab. */
 .token-enabled-row {
@@ -1824,8 +1837,19 @@
   box-shadow: 0 14px 34px rgba(0,0,0,0.18);
   overflow: hidden;
   transform-origin: left center;
-  transition: transform 0.5s cubic-bezier(.4,0,.2,1), opacity 0.38s ease;
+  /* Arriving page: opacity resolves well inside the transform so the page is
+     solid by the time it lands. */
+  transition: transform 0.5s cubic-bezier(.4,0,.2,1), opacity 0.28s ease;
   display: flex; flex-direction: column;
+}
+/* The page being turned away (scenario_controller#layout sets this). It needs
+   the OPPOSITE opacity timing to an arriving page, which is why it can't share
+   one transition: the old rule faded it out over 0.38s against a 0.5s rotation,
+   so it was fully invisible three-quarters of the way through its own turn and
+   the turn read as a flicker rather than a page. Now the fade waits, then
+   finishes with the rotation. */
+.book-page.is-turning {
+  transition: transform 0.52s cubic-bezier(.4,0,.2,1), opacity 0.3s ease 0.22s;
 }
 .forms-mode .book-page { transition: none; }
 /* Scrolls when a page runs long, but never shows a scrollbar — it should

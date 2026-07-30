@@ -37,6 +37,8 @@ nl:
     reset: Resetten
     answer_placeholder: Typ je antwoord…
     characters: Tekens
+    char_limit_label: 'Antwoordlengte'
+    char_limit_option: '%{n} tekens'
     allow_other: Sta een vrij tekstantwoord “Anders” toe
     required: "Verplichte vraag"
     other: Anders

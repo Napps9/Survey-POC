@@ -37,6 +37,8 @@ id:
     reset: Atur ulang
     answer_placeholder: Ketik jawaban…
     characters: Karakter
+    char_limit_label: 'Panjang jawaban'
+    char_limit_option: '%{n} karakter'
     allow_other: Izinkan jawaban teks bebas "Lainnya"
     required: "Pertanyaan wajib"
     other: Lainnya

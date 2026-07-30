@@ -37,6 +37,8 @@ vi:
     reset: Đặt lại
     answer_placeholder: Nhập câu trả lời…
     characters: Ký tự
+    char_limit_label: 'Độ dài câu trả lời'
+    char_limit_option: '%{n} ký tự'
     allow_other: Cho phép câu trả lời tự do "Khác"
     required: "Câu hỏi bắt buộc"
     other: Khác

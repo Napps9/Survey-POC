@@ -37,6 +37,8 @@ tr:
     reset: Sıfırla
     answer_placeholder: Cevabı yazın…
     characters: Karakter
+    char_limit_label: 'Yanıt uzunluğu'
+    char_limit_option: '%{n} karakter'
     allow_other: '"Diğer" serbest metin yanıtına izin ver'
     required: "Zorunlu soru"
     other: Diğer

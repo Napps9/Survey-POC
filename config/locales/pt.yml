@@ -37,6 +37,8 @@ pt:
     reset: Repor
     answer_placeholder: Escreva a resposta…
     characters: Caracteres
+    char_limit_label: 'Comprimento da resposta'
+    char_limit_option: '%{n} caracteres'
     allow_other: Permitir resposta livre “Outro”
     required: "Pergunta obrigatória"
     other: Outro

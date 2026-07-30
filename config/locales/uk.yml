@@ -37,6 +37,8 @@ uk:
     reset: Скинути
     answer_placeholder: Введіть відповідь…
     characters: Символи
+    char_limit_label: 'Довжина відповіді'
+    char_limit_option: '%{n} символів'
     allow_other: Дозволити вільну відповідь «Інше»
     required: "Обов'язкове питання"
     other: Інше

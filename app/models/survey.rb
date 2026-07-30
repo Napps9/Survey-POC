@@ -136,6 +136,19 @@ class Survey < ApplicationRecord
   # (scenario_controller.js) and the same id-keyed translation handling.
   PAGED_TYPES = %w[scenario consent_gate].freeze
 
+  # Free-text answer length. This used to be a hardcoded 200 in the card
+  # partial, and it was advisory only — no maxlength on the textarea and no
+  # server check anywhere, so the counter turned pink and the answer saved in
+  # full regardless. Now it's per-card and actually enforced.
+  DEFAULT_FREE_TEXT_LIMIT = 200
+  # Bounds on what a creator can choose. The floor keeps a limit from being set
+  # so low the question can't be answered; the ceiling keeps a single answer from
+  # becoming the thing that bloats the answers JSON.
+  FREE_TEXT_LIMIT_RANGE = (20..2000).freeze
+  # Offered in the editor. The default is in the list so the control always shows
+  # the current value, including on decks that never set one.
+  FREE_TEXT_LIMIT_PRESETS = [ 80, 140, DEFAULT_FREE_TEXT_LIMIT, 500, 1000 ].freeze
+
   # Every Range card is a 5-point scale — never 4, never 3. An even scale has
   # no true centre, so someone who genuinely sits in the middle is forced to
   # lean; and a deck mixing 3-, 4- and 5-point sliders can't be compared card
@@ -412,6 +425,18 @@ class Survey < ApplicationRecord
         c.delete("pages")
       end
 
+      # Per-card free-text cap. Clamped into FREE_TEXT_LIMIT_RANGE rather than
+      # rejected, and dropped when it equals the default so a deck only carries
+      # the key when a creator actually changed it.
+      if c.key?("char_limit")
+        limit = c["char_limit"].to_i
+        if limit.zero? || limit == DEFAULT_FREE_TEXT_LIMIT
+          c.delete("char_limit")
+        else
+          c["char_limit"] = limit.clamp(FREE_TEXT_LIMIT_RANGE.min, FREE_TEXT_LIMIT_RANGE.max)
+        end
+      end
+
       # Explicit "this question awards no points". Coerced to a real boolean
       # because TokenGrading.awarding? tests for `false` exactly — a "false"
       # string arriving from JSON would otherwise read as truthy and award. Only
@@ -591,6 +616,40 @@ class Survey < ApplicationRecord
   # and not archived. The single boundary every public player action guards on.
   def playable?
     published? && !deleted?
+  end
+
+  # ── Free-text limits ───────────────────────────────────────────────────────
+
+  # The free-text cap for the card at `index`.
+  def free_text_limit_at(index)
+    card = Array(cards)[index.to_i]
+    return DEFAULT_FREE_TEXT_LIMIT unless card.is_a?(Hash)
+
+    limit = card["char_limit"].to_i
+    limit.positive? ? limit.clamp(FREE_TEXT_LIMIT_RANGE.min, FREE_TEXT_LIMIT_RANGE.max) : DEFAULT_FREE_TEXT_LIMIT
+  end
+
+  # Truncate every free-text answer to its card's limit.
+  #
+  # The client has a maxlength now, but a maxlength is a courtesy: this endpoint
+  # is public and takes JSON, so anything relying on the browser to keep the
+  # answers column bounded isn't a limit at all. Applies to the answer value and
+  # to the "Other" box, which is free text by another name.
+  def clamp_free_text(answers)
+    return answers unless answers.is_a?(Hash)
+
+    answers.each_with_object({}) do |(key, entry), out|
+      unless entry.is_a?(Hash)
+        out[key] = entry
+        next
+      end
+
+      limit = free_text_limit_at(key)
+      clamped = entry.dup
+      clamped["value"] = entry["value"].first(limit) if entry["value"].is_a?(String)
+      clamped["other"] = entry["other"].first(limit) if entry["other"].is_a?(String)
+      out[key] = clamped
+    end
   end
 
   # The /play/:token segment to put in front of a respondent. Both the slug and

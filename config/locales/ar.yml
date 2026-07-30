@@ -37,6 +37,8 @@ ar:
     reset: إعادة تعيين
     answer_placeholder: اكتب الإجابة…
     characters: الأحرف
+    char_limit_label: 'طول الإجابة'
+    char_limit_option: '%{n} حرفًا'
     allow_other: السماح بإجابة "أخرى" بنص حر
     required: "سؤال إلزامي"
     other: أخرى

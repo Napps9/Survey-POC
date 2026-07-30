@@ -37,6 +37,8 @@ pl:
     reset: Resetuj
     answer_placeholder: Wpisz odpowiedź…
     characters: Znaki
+    char_limit_label: 'Długość odpowiedzi'
+    char_limit_option: '%{n} znaków'
     allow_other: Zezwól na odpowiedź „Inne” w formie tekstu
     required: "Pytanie obowiązkowe"
     other: Inne

@@ -37,6 +37,8 @@ ru:
     reset: Сбросить
     answer_placeholder: Введите ответ…
     characters: Символы
+    char_limit_label: 'Длина ответа'
+    char_limit_option: '%{n} символов'
     allow_other: Разрешить свободный ответ «Другое»
     required: "Обязательный вопрос"
     other: Другое

@@ -37,6 +37,8 @@ fr:
     reset: Réinitialiser
     answer_placeholder: Saisissez votre réponse…
     characters: Caractères
+    char_limit_label: 'Longueur de réponse'
+    char_limit_option: '%{n} caractères'
     allow_other: Autoriser une réponse libre « Autre »
     required: "Question obligatoire"
     other: Autre

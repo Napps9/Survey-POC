@@ -37,6 +37,8 @@ ja:
     reset: リセット
     answer_placeholder: 回答を入力…
     characters: 文字数
+    char_limit_label: '回答の長さ'
+    char_limit_option: '%{n} 文字'
     allow_other: "「その他」の自由記述回答を許可"
     required: "必須の質問"
     other: その他

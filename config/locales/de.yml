@@ -37,6 +37,8 @@ de:
     reset: Zurücksetzen
     answer_placeholder: Antwort eingeben…
     characters: Zeichen
+    char_limit_label: 'Antwortlänge'
+    char_limit_option: '%{n} Zeichen'
     allow_other: "„Andere“-Freitextantwort erlauben"
     required: "Pflichtfrage"
     other: Andere

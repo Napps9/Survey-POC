@@ -413,7 +413,10 @@ class PlayerController < ApplicationController
   # cards take the incoming value as normal. A plain Verto (neither quiz nor
   # tokenised) merges nothing (incoming wins outright).
   def locked_merge(stored, incoming)
-    incoming = incoming.is_a?(Hash) ? incoming : {}
+    # Every write path goes through here, so it's the one place free text has to
+    # be bounded — the client's maxlength is a courtesy, and this endpoint is
+    # public and takes JSON.
+    incoming = @survey.clamp_free_text(incoming.is_a?(Hash) ? incoming : {})
     return incoming unless @survey.quiz? || @survey.tokenisation_enabled?
     stored = stored.is_a?(Hash) ? stored : {}
     merged = incoming.dup

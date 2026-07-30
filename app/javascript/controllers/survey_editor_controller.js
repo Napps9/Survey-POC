@@ -883,6 +883,15 @@ export default class extends Controller {
       // scale/open/prioritise carry a flat `token_award`. Leaving every amount
       // at 0 keeps the card unawarded (TokenGrading.awarding? stays false).
       // Choice-shaped cards can opt into a flat award too (token_award_mode).
+      // Per-card free-text cap. Only serialised when it differs from the default,
+      // so a deck nobody has changed stays free of the key (the sanitiser drops
+      // a default-valued one anyway).
+      const limitSel = card.querySelector("[data-char-limit]")
+      if (limitSel) {
+        const limit = parseInt(limitSel.value, 10)
+        if (limit && limit !== 200) out.char_limit = limit
+      }
+
       if (this.tokenisationValue) {
         const { tokens, token_award } = this._readTokens(card, type)
         if (tokens && Object.keys(tokens).length) out.tokens = tokens

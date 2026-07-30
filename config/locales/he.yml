@@ -37,6 +37,8 @@ he:
     reset: אפס
     answer_placeholder: הקלד תשובה…
     characters: תווים
+    char_limit_label: 'אורך התשובה'
+    char_limit_option: '%{n} תווים'
     allow_other: אפשר תשובה חופשית מסוג ״אחר״
     required: "שאלת חובה"
     other: אחר

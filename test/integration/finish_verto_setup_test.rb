@@ -146,13 +146,13 @@ class ReportGenerationBulkheadTest < ActionDispatch::IntegrationTest
 
   test "a cold cache is refused rather than queued when no slot is free" do
     generated = false
-    ResultsReportGenerator.define_singleton_method(:call) { |**| generated = true; "# Report" }
-    n = drain_pool
-    begin
-      get survey_results_report_path(@survey), headers: { "Accept" => "application/json" }
-    ensure
-      release_pool(n)
-      ResultsReportGenerator.singleton_class.remove_method(:call)
+    stub_method(ResultsReportGenerator, :call, ->(**) { generated = true; "# Report" }) do
+      n = drain_pool
+      begin
+        get survey_results_report_path(@survey), headers: { "Accept" => "application/json" }
+      ensure
+        release_pool(n)
+      end
     end
 
     assert_response :service_unavailable
@@ -177,29 +177,23 @@ class ReportGenerationBulkheadTest < ActionDispatch::IntegrationTest
   end
 
   test "the slot is released after a successful generation" do
-    ResultsReportGenerator.define_singleton_method(:call) { |**| "# Fresh" }
-    begin
+    stub_method(ResultsReportGenerator, :call, ->(**) { "# Fresh" }) do
       get survey_results_report_path(@survey), headers: { "Accept" => "application/json" }
       assert_response :success
-      # Nothing leaked: the pool is whole again.
-      n = drain_pool
-      release_pool(n)
-      assert_operator n, :>=, 1, "the slot came back"
-    ensure
-      ResultsReportGenerator.singleton_class.remove_method(:call)
     end
+    # Nothing leaked: the pool is whole again.
+    n = drain_pool
+    release_pool(n)
+    assert_operator n, :>=, 1, "the slot came back"
   end
 
   test "the slot is released when generation raises" do
-    ResultsReportGenerator.define_singleton_method(:call) { |**| raise "boom" }
-    begin
+    stub_method(ResultsReportGenerator, :call, ->(**) { raise "boom" }) do
       get survey_results_report_path(@survey), headers: { "Accept" => "application/json" }
       assert_response :unprocessable_entity
-      n = drain_pool
-      release_pool(n)
-      assert_operator n, :>=, 1, "an exception must not leak the slot"
-    ensure
-      ResultsReportGenerator.singleton_class.remove_method(:call)
     end
+    n = drain_pool
+    release_pool(n)
+    assert_operator n, :>=, 1, "an exception must not leak the slot"
   end
 end
