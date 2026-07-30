@@ -162,3 +162,19 @@ token_checkpoint:
   explainer:    "A milestone screen that reveals the points collected so far. Only available once Tokenisation is on — great for a long Verto, giving players a boost of momentum partway through."
   picker_icon:  "🏆"
   pickable:     true
+
+# Multi-page consent, as a real card in the deck. The survey-level consent gate
+# (consent_text + consent_image) is a single pseudo-card pinned before the
+# welcome card and can't be paged or reordered; this can do both, because it's an
+# ordinary card. Pages are stored exactly like a scenario's, so it inherits that
+# type's page sanitiser, id-keyed translations and page-turn widget.
+consent_gate:
+  badge:        "CONSENT"
+  badge_css:    "sb-welcome"
+  panel_label:  ""
+  eyebrow:      ""
+  picker_name:  "Consent screens"
+  picker_desc:  "Multi-page consent — agree to continue"
+  explainer:    "Consent spread over as many screens as it needs — an information sheet, then the agreement. Respondents turn through the pages and agree (or decline) on the last one; declining ends the Verto for them. Use this instead of the single consent gate when there's too much to fit on one screen."
+  picker_icon:  "📋"
+  pickable:     true

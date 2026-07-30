@@ -692,6 +692,8 @@ uk:
     select_card_for_options: 'Виберіть картку запитання ліворуч, щоб налаштувати її параметри.'
     consent_gate: 'Крок згоди'
     consent_default: 'Беручи участь, ви погоджуєтеся, що ваші анонімні відповіді можуть бути використані для досліджень.'
+    consent_page_placeholder: 'Напишіть цей екран згоди…'
+    consent_agreement_kicker: 'Згода'
     thank_you_screen: 'Екран подяки'
     verto_name: 'Назва Verto'
     delete_card_n: 'Видалити картку %{n}'

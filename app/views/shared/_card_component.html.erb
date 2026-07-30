@@ -97,7 +97,7 @@
               default: CardTypes.eyebrow(type).presence || type.tr("_", " "))
 %>
 
-<div class="split-right<%= ' split-right--book' if type == 'scenario' %>">
+<div class="split-right<%= ' split-right--book' if Survey::PAGED_TYPES.include?(type) %>">
 
   <%# Creator's logo, centred at the top of the right (content) panel on the
       welcome card — player only, and only when a logo is actually uploaded. %>
@@ -385,6 +385,87 @@
                   </li>
                 <% end %>
               </ul>
+            </div>
+            <div class="book-page-fade"></div>
+          </div>
+        </div>
+
+        <% if editable %>
+          <div class="book-edit-tools" data-scenario-target="editTools">
+            <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn"
+                    data-action="click->scenario#deletePage"><%= t("editor.scenario.delete_page", default: "✕ Delete this page") %></button>
+            <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn"
+                    data-action="click->scenario#addPage"><%= t("editor.scenario.add_page", default: "＋ Add page") %></button>
+          </div>
+        <% end %>
+
+        <div class="book-dots" data-scenario-target="dots"></div>
+
+        <div class="book-nav-row">
+          <button type="button" class="book-chevron" data-scenario-target="prevBtn"
+                  data-action="click->scenario#back" aria-label="<%= t('editor.scenario.prev_page', default: 'Previous page') %>">‹</button>
+          <% if editable %>
+            <button type="button" class="next-btn" data-scenario-target="nextBtn"
+                    data-action="click->scenario#next"><%= t("editor.scenario.next_page_btn", default: "Next page ›") %></button>
+          <% else %>
+            <button type="button" class="book-chevron" data-scenario-target="nextBtn"
+                    data-action="click->scenario#next" aria-label="<%= t('editor.scenario.next_page', default: 'Next page') %>">›</button>
+          <% end %>
+        </div>
+        <div class="book-live" data-scenario-target="live" aria-live="polite"></div>
+      </div>
+
+    <% when "consent_gate" %>
+      <%# Multi-page consent. Same book as a scenario — the creator writes the
+          information sheet across pages, the respondent turns through them —
+          but the final page is Agree / Decline instead of a choice list, and
+          agreement is recorded on the response (consent_agreed_at) rather than
+          stored as an answer. Reuses scenario_controller.js verbatim, so page
+          turns, dots, add/delete-page and the id-keyed translations all behave
+          exactly as they do for a scenario. %>
+      <% pages = Array(display["pages"]) %>
+      <% pages = [ {} ] if pages.empty? %>
+      <div class="book-wrap"
+           data-controller="scenario"
+           data-scenario-editable-value="<%= editable %>">
+        <div class="book-stack" data-scenario-target="stack">
+          <% pages.each_with_index do |page, i| %>
+            <div class="book-page" data-scenario-target="page" data-page-id="<%= page['id'].to_s %>">
+              <div class="book-page-scroll">
+                <div class="book-page-kicker" data-scenario-target="kicker">
+                  <%= t("editor.scenario.page_of", n: i + 1, total: pages.size, default: "Page #{i + 1} of #{pages.size}") %>
+                </div>
+                <div class="book-page-text" <%= ce_attr %>
+                     data-scenario-target="pageText"
+                     <% if editable %>data-placeholder="<%= t('editor.consent_page_placeholder', default: 'Write this consent screen…') %>"<% end %>><%= page["text"] %></div>
+              </div>
+              <div class="book-page-corner"><%= i + 1 %></div>
+              <div class="book-page-fade"></div>
+            </div>
+          <% end %>
+
+          <%# Final page: the agreement itself. In the editor it's an inert
+              replica (same markup, no actions) so the creator sees where the
+              story lands without being able to consent on a respondent's
+              behalf. %>
+          <div class="book-page is-answer" data-scenario-target="page">
+            <div class="book-page-scroll">
+              <div class="book-page-kicker">
+                <%= t("editor.consent_agreement_kicker", default: "Agreement") %>
+              </div>
+              <div <%= mode == :player ? 'data-player-target=consentMain'.html_safe : "" %> class="play-consent-main">
+                <div class="play-consent-actions" <%= 'aria-hidden="true" style="pointer-events:none;"'.html_safe if editable %>>
+                  <button type="button" class="play-consent-agree" <%= 'tabindex="-1"'.html_safe if editable %>
+                          <% if mode == :player %>data-action="click->player#agreeConsent"<% end %>><%= t("player.consent_agree") %></button>
+                  <button type="button" class="play-consent-decline" <%= 'tabindex="-1"'.html_safe if editable %>
+                          <% if mode == :player %>data-action="click->player#declineConsent"<% end %>><%= t("player.consent_decline") %></button>
+                </div>
+              </div>
+              <% if mode == :player %>
+                <div class="play-consent-declined hidden" data-player-target="consentDeclined">
+                  <%= t("player.consent_declined") %>
+                </div>
+              <% end %>
             </div>
             <div class="book-page-fade"></div>
           </div>

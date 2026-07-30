@@ -130,6 +130,10 @@ class Survey < ApplicationRecord
   MAX_LANE_LABEL    = 60 # branch name shown on the flow map (stored on the entry card)
   MAX_SCENARIO_PAGES       = 6
   MAX_SCENARIO_PAGE_LENGTH = 600
+  # Card types whose content is stored as `pages` — a bounded array of
+  # { id, text }. They share one sanitiser, one page-turn widget
+  # (scenario_controller.js) and the same id-keyed translation handling.
+  PAGED_TYPES = %w[scenario consent_gate].freeze
 
   # Every Range card is a 5-point scale — never 4, never 3. An even scale has
   # no true centre, so someone who genuinely sits in the middle is forced to
@@ -379,12 +383,13 @@ class Survey < ApplicationRecord
           c.delete("slider_axis")
         end
       end
-      # Scenario narrative pages — bounded count/length, and every page gets a
-      # stable id (mirrors the cid backfill above) so translations align by
-      # id rather than array index, which would silently scramble if a
-      # creator reorders pages after translating. Dropped entirely on any
-      # other type, same as range_theme above.
-      if c["type"].to_s == "scenario"
+      # Paged text — bounded count/length, and every page gets a stable id
+      # (mirrors the cid backfill above) so translations align by id rather than
+      # array index, which would silently scramble if a creator reorders pages
+      # after translating. Shared by scenario (narrative before a choice) and
+      # consent_gate (an information sheet before agreeing), which store pages
+      # identically. Dropped entirely on any other type, same as range_theme.
+      if PAGED_TYPES.include?(c["type"].to_s)
         c["pages"] = Array(c["pages"]).first(MAX_SCENARIO_PAGES).filter_map do |p|
           next unless p.is_a?(Hash)
           text = p["text"].to_s.strip.first(MAX_SCENARIO_PAGE_LENGTH)
@@ -779,9 +784,42 @@ class Survey < ApplicationRecord
     cards
   end
 
-  # When set, respondents must agree to this text before the first card.
+  # ── Consent ────────────────────────────────────────────────────────────────
+  # Two shapes, one respondent-facing promise. The survey-level gate
+  # (consent_text) is a single pseudo-card pinned before the welcome card; a
+  # consent_gate CARD is an ordinary deck card that can span several pages and
+  # be reordered. A Verto uses one or the other — never both, or a respondent
+  # would be asked to agree twice.
+
+  # The multi-page consent card, if the deck has one.
+  def consent_gate_card
+    Array(cards).find { |c| c.is_a?(Hash) && c["type"].to_s == "consent_gate" }
+  end
+
+  def consent_gate_card?
+    consent_gate_card.present?
+  end
+
+  # The survey-level gate. False once a consent card is in the deck, so the
+  # pseudo-card stops rendering rather than stacking a second gate in front of
+  # the first — the card wins, being the more specific thing the creator built.
   def consent_required?
-    consent_text.present?
+    consent_text.present? && !consent_gate_card?
+  end
+
+  # Whether a respondent has to agree before answering, by either route.
+  def consent_gated?
+    consent_required? || consent_gate_card?
+  end
+
+  # What a response records as the text the respondent actually agreed to. For a
+  # card gate that's its pages joined in order, so the snapshot stays a faithful
+  # record of what was on screen even if the card is edited later.
+  def consent_snapshot_text
+    card = consent_gate_card
+    return consent_text if card.nil?
+
+    Array(card["pages"]).filter_map { |p| p["text"].presence if p.is_a?(Hash) }.join("\n\n").presence
   end
 
   # How the player presents this Verto. "cards" is the default immersive,

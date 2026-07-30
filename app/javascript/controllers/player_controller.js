@@ -5,6 +5,14 @@ import { haptic } from "lib/haptics"
 const MAP_MIN_SCALE = 1
 const MAP_MAX_SCALE = 8
 
+// Cards that ask for agreement rather than an answer, and drive their own
+// navigation. "consent_card" is the survey-level gate rendered as a pseudo-card
+// before the deck (from consent_text); "consent_gate" is the multi-page card
+// type a creator can place and reorder like any other. A Verto has one or the
+// other — Survey#consent_required? goes false once a consent_gate card exists,
+// so the pseudo-card stops rendering rather than stacking two gates.
+const CONSENT_TYPES = [ "consent_card", "consent_gate" ]
+
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "thankyouTitle", "thankyouSub", "forwardBtn", "compareBtn", "comparePanel",
@@ -1111,11 +1119,18 @@ export default class extends Controller {
     const idx   = this.currentValue
     cards.forEach((c, i) => c.classList.toggle("active", i === idx))
 
-    const hasConsent = cards[0]?.dataset.cardType === "consent_card"
-    const onConsent  = cards[idx]?.dataset.cardType === "consent_card"
+    // Two gate shapes: "consent_card" is the survey-level pseudo-card pinned
+    // first, "consent_gate" is a real multi-page card the creator placed in the
+    // deck. Both drive themselves, so both suppress the deck nav; only a gate
+    // sitting FIRST is held out of the progress count, the same way a mid-deck
+    // welcome card or checkpoint is counted where it stands.
+    const hasConsent = CONSENT_TYPES.includes(cards[0]?.dataset.cardType)
+    const onConsent  = CONSENT_TYPES.includes(cards[idx]?.dataset.cardType)
 
     if (onConsent) {
       // The consent gate drives itself (Agree / decline) — hide the deck nav.
+      // A multi-page gate turns its pages with the book's own chevrons, so
+      // nothing here needs to reach them.
       this.progressTarget.textContent = ""
       this.element.style.setProperty("--player-progress", "0%")
       this.backBtnTarget.classList.add("invisible")

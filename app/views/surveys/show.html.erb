@@ -262,7 +262,9 @@
             update_settings enforces this; the CTA is hidden here so nothing is
             offered that would only come back 423. An existing gate stays visible
             (read-only) — the creator still needs to see what was agreed to. %>
-        <div class="gate-cta-row" data-gate-cards-target="consentCta" <%= "hidden" if has_consent || live_locked %>>
+        <%# Also hidden when the deck already has a multi-page consent_gate card:
+            one gate per Verto, or a respondent agrees twice. %>
+        <div class="gate-cta-row" data-gate-cards-target="consentCta" <%= "hidden" if has_consent || live_locked || @survey.consent_gate_card? %>>
           <button type="button" class="aq-trigger-btn aq-insert-btn"
                   data-action="click->gate-cards#addConsent">
             ＋ <%= t("editor.consent_gate", default: "Consent gate") %>

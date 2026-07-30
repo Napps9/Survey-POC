@@ -690,6 +690,8 @@ ar:
     select_card_for_options: 'اختر بطاقة سؤال لضبط خياراتها.'
     consent_gate: 'بوابة الموافقة'
     consent_default: 'بمشاركتك، فإنك توافق على إمكانية استخدام إجاباتك المجهولة لأغراض البحث.'
+    consent_page_placeholder: 'اكتب شاشة الموافقة هذه…'
+    consent_agreement_kicker: 'الموافقة'
     thank_you_screen: 'شاشة الشكر'
     verto_name: 'اسم الفيرتو'
     delete_card_n: 'حذف البطاقة %{n}'

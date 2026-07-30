@@ -81,7 +81,7 @@ const TYPE_LABEL = {
 }
 
 // Mirrors CardTypes::NON_QUESTION_TYPES (app/lib/card_types.rb).
-const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
+const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint", "consent_gate" ]
 const isQuestion = (c) => !NON_QUESTION_TYPES.includes(c && c.type ? c.type : "")
 export const typeLabel = (ty) => TYPE_LABEL[ty] || (ty || "").replace(/_/g, " ")
 const cleanOptions = (c) => (Array.isArray(c.options) ? c.options : [])

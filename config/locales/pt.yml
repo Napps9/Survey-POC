@@ -690,6 +690,8 @@ pt:
     select_card_for_options: 'Selecione um cartão de pergunta à esquerda para definir as suas opções.'
     consent_gate: 'Passo de consentimento'
     consent_default: 'Ao participar, aceita que as suas respostas anónimas possam ser utilizadas para investigação.'
+    consent_page_placeholder: 'Escreva este ecrã de consentimento…'
+    consent_agreement_kicker: 'Consentimento'
     thank_you_screen: 'Ecrã de agradecimento'
     verto_name: 'Nome do Verto'
     delete_card_n: 'Eliminar o cartão %{n}'

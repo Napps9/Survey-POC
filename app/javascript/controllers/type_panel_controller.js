@@ -4,7 +4,7 @@ import { t } from "lib/i18n"
 
 // Card types with no answer captured — mirrors CardTypes::NON_QUESTION_TYPES
 // (app/lib/card_types.rb) and verto_rules.js's isQuestion.
-const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
+const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint", "consent_gate" ]
 
 // Single-pick types whose answers can each route to a different card/end —
 // (Routable types come from lib/routable_types — the LogicGraph::ROUTABLE mirror.)

@@ -692,6 +692,8 @@ en:
     select_card_for_options: 'Select a question card on the left to set its options.'
     consent_gate: 'Consent gate'
     consent_default: 'By taking part you agree that your anonymous answers may be used for research.'
+    consent_page_placeholder: 'Write this consent screen…'
+    consent_agreement_kicker: 'Agreement'
     thank_you_screen: 'Thank-you screen'
     verto_name: 'Verto name'
     delete_card_n: 'Delete card %{n}'

@@ -690,6 +690,8 @@ he:
     select_card_for_options: 'בחר כרטיס שאלה כדי להגדיר את האפשרויות שלו.'
     consent_gate: 'שלב הסכמה'
     consent_default: 'בהשתתפותך, אתה מסכים שתשובותיך האנונימיות עשויות לשמש למחקר.'
+    consent_page_placeholder: 'כתבו את מסך ההסכמה הזה…'
+    consent_agreement_kicker: 'הסכמה'
     thank_you_screen: 'מסך תודה'
     verto_name: 'שם הוורטו'
     delete_card_n: 'מחיקת כרטיס %{n}'

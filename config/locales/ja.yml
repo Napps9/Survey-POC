@@ -690,6 +690,8 @@ ja:
     select_card_for_options: '左側の質問カードを選択してオプションを設定してください。'
     consent_gate: '同意ステップ'
     consent_default: '参加することで、匿名の回答が研究に使用されることに同意したものとみなされます。'
+    consent_page_placeholder: 'この同意画面を書いてください…'
+    consent_agreement_kicker: '同意'
     thank_you_screen: 'サンクス画面'
     verto_name: 'Verto の名前'
     delete_card_n: 'カード %{n} を削除'

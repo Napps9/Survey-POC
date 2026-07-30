@@ -690,6 +690,8 @@ tr:
     select_card_for_options: 'Seçeneklerini ayarlamak için soldan bir soru kartı seçin.'
     consent_gate: 'Onay adımı'
     consent_default: 'Katılarak anonim yanıtlarınızın araştırma için kullanılabileceğini kabul etmiş olursunuz.'
+    consent_page_placeholder: 'Bu onay ekranını yazın…'
+    consent_agreement_kicker: 'Onay'
     thank_you_screen: 'Teşekkür ekranı'
     verto_name: 'Verto adı'
     delete_card_n: '%{n}. kartı sil'

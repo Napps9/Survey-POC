@@ -8,7 +8,7 @@ import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_ty
 // moveCardUp / _updateMoveButtonStates), so it opens the deck by default —
 // though it can now be nudged down itself, which token_checkpoint has always
 // been able to do.
-const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
+const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint", "consent_gate" ]
 
 // Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
 // These default to a per-option token award but can opt into a flat award for

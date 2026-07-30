@@ -692,6 +692,8 @@ pl:
     select_card_for_options: 'Wybierz kartę pytania po lewej, aby ustawić jej opcje.'
     consent_gate: 'Krok zgody'
     consent_default: 'Biorąc udział, zgadzasz się, że Twoje anonimowe odpowiedzi mogą zostać wykorzystane do badań.'
+    consent_page_placeholder: 'Napisz ten ekran zgody…'
+    consent_agreement_kicker: 'Zgoda'
     thank_you_screen: 'Ekran podziękowania'
     verto_name: 'Nazwa Verto'
     delete_card_n: 'Usuń kartę %{n}'

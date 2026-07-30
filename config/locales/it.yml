@@ -690,6 +690,8 @@ it:
     select_card_for_options: 'Seleziona una scheda domanda a sinistra per impostarne le opzioni.'
     consent_gate: 'Passaggio di consenso'
     consent_default: 'Partecipando accetti che le tue risposte anonime possano essere utilizzate per la ricerca.'
+    consent_page_placeholder: 'Scrivi questa schermata di consenso…'
+    consent_agreement_kicker: 'Consenso'
     thank_you_screen: 'Schermata di ringraziamento'
     verto_name: 'Nome del Verto'
     delete_card_n: 'Elimina la scheda %{n}'

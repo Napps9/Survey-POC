@@ -692,6 +692,8 @@ ru:
     select_card_for_options: 'Выберите карточку вопроса слева, чтобы настроить её параметры.'
     consent_gate: 'Шаг согласия'
     consent_default: 'Участвуя, вы соглашаетесь с тем, что ваши анонимные ответы могут быть использованы в исследовательских целях.'
+    consent_page_placeholder: 'Напишите этот экран согласия…'
+    consent_agreement_kicker: 'Согласие'
     thank_you_screen: 'Экран благодарности'
     verto_name: 'Название Verto'
     delete_card_n: 'Удалить карточку %{n}'

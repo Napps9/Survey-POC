@@ -690,6 +690,8 @@ sw:
     select_card_for_options: 'Chagua kadi ya swali upande wa kushoto ili kuweka chaguo zake.'
     consent_gate: 'Hatua ya idhini'
     consent_default: 'Kwa kushiriki, unakubali kwamba majibu yako yasiyo na jina yanaweza kutumika kwa utafiti.'
+    consent_page_placeholder: 'Andika skrini hii ya idhini…'
+    consent_agreement_kicker: 'Idhini'
     thank_you_screen: 'Skrini ya shukrani'
     verto_name: 'Jina la Verto'
     delete_card_n: 'Futa kadi %{n}'

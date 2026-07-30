@@ -150,10 +150,10 @@ class PlayerController < ApplicationController
     mark_started_unless_completed(resp)
     if data["agreed"]
       resp.consent_agreed_at ||= Time.current
-      resp.consent_text_snapshot ||= @survey.consent_text
+      resp.consent_text_snapshot ||= @survey.consent_snapshot_text
     else
       resp.consent_declined_at ||= Time.current
-      resp.consent_text_snapshot ||= @survey.consent_text
+      resp.consent_text_snapshot ||= @survey.consent_snapshot_text
     end
     resp.save!
     render json: { ok: true }

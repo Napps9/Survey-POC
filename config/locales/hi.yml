@@ -690,6 +690,8 @@ hi:
     select_card_for_options: 'इसके विकल्प सेट करने के लिए बाईं ओर एक प्रश्न कार्ड चुनें.'
     consent_gate: 'सहमति चरण'
     consent_default: 'भाग लेकर आप सहमत होते हैं कि आपके अनाम उत्तर शोध के लिए उपयोग किए जा सकते हैं.'
+    consent_page_placeholder: 'यह सहमति स्क्रीन लिखें…'
+    consent_agreement_kicker: 'सहमति'
     thank_you_screen: 'धन्यवाद स्क्रीन'
     verto_name: 'वर्टो का नाम'
     delete_card_n: 'कार्ड %{n} हटाएँ'

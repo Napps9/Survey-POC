@@ -690,6 +690,8 @@ ko:
     select_card_for_options: '왼쪽에서 질문 카드를 선택하여 옵션을 설정하세요.'
     consent_gate: '동의 단계'
     consent_default: '참여하시면 익명 답변이 연구에 사용될 수 있음에 동의하는 것입니다.'
+    consent_page_placeholder: '이 동의 화면을 작성하세요…'
+    consent_agreement_kicker: '동의'
     thank_you_screen: '감사 화면'
     verto_name: 'Verto 이름'
     delete_card_n: '카드 %{n} 삭제'

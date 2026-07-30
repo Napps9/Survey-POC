@@ -690,6 +690,8 @@ id:
     select_card_for_options: 'Pilih kartu pertanyaan di sebelah kiri untuk mengatur opsinya.'
     consent_gate: 'Langkah persetujuan'
     consent_default: 'Dengan berpartisipasi, Anda setuju bahwa jawaban anonim Anda dapat digunakan untuk penelitian.'
+    consent_page_placeholder: 'Tulis layar persetujuan ini…'
+    consent_agreement_kicker: 'Persetujuan'
     thank_you_screen: 'Layar terima kasih'
     verto_name: 'Nama Verto'
     delete_card_n: 'Hapus kartu %{n}'

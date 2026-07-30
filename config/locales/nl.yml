@@ -690,6 +690,8 @@ nl:
     select_card_for_options: 'Selecteer links een vraagkaart om de opties in te stellen.'
     consent_gate: 'Toestemmingsstap'
     consent_default: 'Door deel te nemen ga je ermee akkoord dat je anonieme antwoorden voor onderzoek gebruikt mogen worden.'
+    consent_page_placeholder: 'Schrijf dit toestemmingsscherm…'
+    consent_agreement_kicker: 'Toestemming'
     thank_you_screen: 'Bedankscherm'
     verto_name: 'Verto-naam'
     delete_card_n: 'Kaart %{n} verwijderen'

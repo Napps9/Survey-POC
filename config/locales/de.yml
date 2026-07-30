@@ -690,6 +690,8 @@ de:
     select_card_for_options: 'Wähle links eine Fragekarte, um ihre Optionen festzulegen.'
     consent_gate: 'Einwilligungsschritt'
     consent_default: 'Mit deiner Teilnahme erklärst du dich einverstanden, dass deine anonymen Antworten für Forschungszwecke verwendet werden dürfen.'
+    consent_page_placeholder: 'Diesen Einwilligungstext schreiben…'
+    consent_agreement_kicker: 'Einwilligung'
     thank_you_screen: 'Dankeschön-Seite'
     verto_name: 'Verto-Name'
     delete_card_n: 'Karte %{n} löschen'

@@ -690,6 +690,8 @@ vi:
     select_card_for_options: 'Chọn một thẻ câu hỏi ở bên trái để thiết lập tùy chọn.'
     consent_gate: 'Bước đồng ý'
     consent_default: 'Khi tham gia, bạn đồng ý rằng các câu trả lời ẩn danh của bạn có thể được dùng cho nghiên cứu.'
+    consent_page_placeholder: 'Viết màn hình đồng ý này…'
+    consent_agreement_kicker: 'Đồng ý'
     thank_you_screen: 'Màn hình cảm ơn'
     verto_name: 'Tên Verto'
     delete_card_n: 'Xoá thẻ %{n}'

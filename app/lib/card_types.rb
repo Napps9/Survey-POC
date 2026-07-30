@@ -46,10 +46,12 @@ module CardTypes
     DATA.select { |_key, attrs| attrs["pickable"] }
   end
 
-  # Card types with no answer captured — a "question" card is everything
-  # else. Both welcome_card and token_checkpoint are intro/milestone screens,
-  # never graded, scored, aggregated, or counted toward progress.
-  NON_QUESTION_TYPES = %w[welcome_card token_checkpoint].freeze
+  # Card types with no answer captured — a "question" card is everything else.
+  # welcome_card and token_checkpoint are intro/milestone screens; consent_gate
+  # captures an agreement, which is recorded on the response itself
+  # (consent_agreed_at) rather than as an answer. None are graded, scored,
+  # aggregated, or counted toward progress.
+  NON_QUESTION_TYPES = %w[welcome_card token_checkpoint consent_gate].freeze
 
   def question?(type)
     !NON_QUESTION_TYPES.include?(type.to_s)
