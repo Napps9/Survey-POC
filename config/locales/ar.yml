@@ -160,6 +160,7 @@ ar:
       compare_cta: شاهد نتائجك مقارنة بالآخرين ←
       compare_loading: جارٍ التحميل…
       compare_error: تعذّر التحميل — أعد المحاولة
+      compare_too_few: "لا توجد إجابات كافية للمقارنة بعد — عد بعد أن يشارك المزيد من الأشخاص."
       quiz_score: "النتيجة %{score}/%{max}"
       quiz_correct: "صحيح!"
       quiz_wrong: "ليس تمامًا"

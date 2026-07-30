@@ -160,6 +160,7 @@ sw:
       compare_cta: Ona matokeo yako yakilinganishwa na wengine →
       compare_loading: Inapakia…
       compare_error: Imeshindwa kupakia — jaribu tena
+      compare_too_few: "Bado hakuna majibu ya kutosha kulinganisha — rudi baada ya watu wachache zaidi kushiriki."
       quiz_score: "Alama %{score}/%{max}"
       quiz_correct: "Sahihi!"
       quiz_wrong: "Sio sahihi kabisa"

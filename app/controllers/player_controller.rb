@@ -255,6 +255,15 @@ class PlayerController < ApplicationController
     max    = QuizGrading.graded_indices(@survey.cards).size
     graded = Array(@survey.cards).each_with_index.select { |card, _idx| QuizGrading.graded?(card) }
 
+    # Small-cell suppression (P1-14), as on #results. A per-question
+    # correct-rate over one other person is that person's answer sheet: "100%
+    # got Q3 right" with a total of 1 says exactly what they scored.
+    scored = @survey.responses.where(status: "completed").where.not(score: nil)
+    if scored.count < Response::MIN_REGION_SAMPLE_SIZE
+      return render json: { ok: true, suppressed: true, total: scored.count, max: max,
+                            average: 0.0, distribution: [], per_question: [] }
+    end
+
     # One batched pass: score histogram, total/average, and per-question correct
     # counts together — instead of loading every scored response into memory and
     # re-scanning the set once per graded card.
@@ -296,7 +305,18 @@ class PlayerController < ApplicationController
     # matching the creator Results screen. Each row is tallied off its own
     # answers, so partial responses just count toward the questions they reached.
     responses = @survey.responses.where(answered: true)
-    render json: { ok: true, total_responses: responses.count,
+    total     = responses.count
+
+    # Small-cell suppression (P1-14). #regions has enforced this from the start;
+    # #results did not, so on a Verto with one or two responders the comparison
+    # a respondent is shown IS the other respondent's answers, attributable to
+    # them by anyone who knows who else was asked. Same threshold and same
+    # reasoning as the map — see Response::MIN_REGION_SAMPLE_SIZE.
+    if total < Response::MIN_REGION_SAMPLE_SIZE
+      return render json: { ok: true, suppressed: true, total_responses: total, results: [] }
+    end
+
+    render json: { ok: true, total_responses: total,
                    results: aggregate_rows(responses) + token_comparison_rows(responses) }
   end
 

@@ -160,6 +160,7 @@ tr:
       compare_cta: Sonuçlarınızı diğerleriyle karşılaştırın →
       compare_loading: Yükleniyor…
       compare_error: Yüklenemedi — tekrar deneyin
+      compare_too_few: "Karşılaştırmak için henüz yeterli yanıt yok — birkaç kişi daha katıldığında tekrar bakın."
       quiz_score: "Puan %{score}/%{max}"
       quiz_correct: "Doğru!"
       quiz_wrong: "Tam değil"

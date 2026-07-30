@@ -160,6 +160,7 @@ ko:
       compare_cta: 다른 사람들과 비교한 결과 보기 →
       compare_loading: 불러오는 중…
       compare_error: 불러올 수 없습니다 — 다시 시도하세요
+      compare_too_few: "아직 비교할 만큼 답변이 모이지 않았습니다 — 몇 명 더 참여한 뒤에 다시 확인해 주세요."
       quiz_score: "점수 %{score}/%{max}"
       quiz_correct: "정답!"
       quiz_wrong: "아쉬워요"

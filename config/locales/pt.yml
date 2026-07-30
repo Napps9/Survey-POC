@@ -160,6 +160,7 @@ pt:
       compare_cta: Veja os seus resultados comparados com os outros →
       compare_loading: A carregar…
       compare_error: Não foi possível carregar — tente novamente
+      compare_too_few: "Ainda não há respostas suficientes para comparar — volte quando mais algumas pessoas tiverem participado."
       quiz_score: "Pontuação %{score}/%{max}"
       quiz_correct: "Correto!"
       quiz_wrong: "Quase"

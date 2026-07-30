@@ -108,20 +108,27 @@ class TokenPlayerTest < ActionDispatch::IntegrationTest
   end
 
   test "results folds a token-total comparison row in per token type, gated on show_results_comparison" do
-    s = tokenised_survey(show_results_comparison: true)
-    json_post submit_survey_path(s.publish_token), session_token: "a",
-              answers: { "1" => { "value" => "Pizza" } } # 5 gold
-    json_post submit_survey_path(s.publish_token), session_token: "b",
+    # Scaled to Response::MIN_REGION_SAMPLE_SIZE because small-cell suppression
+    # (P1-14) withholds the comparison below it. One respondent picks Salad so
+    # the row still has two distinct token totals to fold together.
+    s     = tokenised_survey(show_results_comparison: true)
+    total = Response::MIN_REGION_SAMPLE_SIZE
+    json_post submit_survey_path(s.publish_token), session_token: "salad",
               answers: { "1" => { "value" => "Salad" } } # 2 gold, 1 coal
+    (total - 1).times do |i|
+      json_post submit_survey_path(s.publish_token), session_token: "pizza#{i}",
+                answers: { "1" => { "value" => "Pizza" } } # 5 gold
+    end
 
     get player_results_path(s.publish_token)
     body = JSON.parse(response.body)
     assert body["ok"]
+    assert_nil body["suppressed"]
 
     gold_row = body["results"].find { |r| r["type"] == "token_total" && r["token_id"] == "gold" }
     assert gold_row, "expected a synthetic gold token_total row"
-    assert_equal({ "5" => 1, "2" => 1 }, gold_row["counts"])
-    assert_equal 2, gold_row["total"]
+    assert_equal({ "5" => total - 1, "2" => 1 }, gold_row["counts"])
+    assert_equal total, gold_row["total"]
   end
 
   test "results omits token_total rows when show_results_comparison is off" do

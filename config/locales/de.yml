@@ -160,6 +160,7 @@ de:
       compare_cta: Vergleiche deine Ergebnisse mit anderen →
       compare_loading: Wird geladen…
       compare_error: Laden fehlgeschlagen — bitte erneut versuchen
+      compare_too_few: "Noch nicht genug Antworten für einen Vergleich — schau wieder vorbei, wenn ein paar mehr Leute teilgenommen haben."
       quiz_score: "Punktzahl %{score}/%{max}"
       quiz_correct: "Richtig!"
       quiz_wrong: "Nicht ganz"

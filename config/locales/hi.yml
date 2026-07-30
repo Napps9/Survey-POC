@@ -160,6 +160,7 @@ hi:
       compare_cta: अपने परिणामों की दूसरों से तुलना देखें →
       compare_loading: लोड हो रहा है…
       compare_error: लोड नहीं हो सका — पुनः प्रयास करें
+      compare_too_few: "तुलना के लिए अभी पर्याप्त उत्तर नहीं हैं — कुछ और लोगों के भाग लेने पर वापस आएँ।"
       quiz_score: "स्कोर %{score}/%{max}"
       quiz_correct: "सही!"
       quiz_wrong: "बिल्कुल नहीं"

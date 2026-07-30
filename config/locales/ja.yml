@@ -160,6 +160,7 @@ ja:
       compare_cta: 他の人との結果を比較する →
       compare_loading: 読み込み中…
       compare_error: 読み込めませんでした — もう一度お試しください
+      compare_too_few: "比較できるだけの回答がまだ集まっていません。もう少し参加者が増えたらまたご覧ください。"
       quiz_score: "スコア %{score}/%{max}"
       quiz_correct: "正解！"
       quiz_wrong: "惜しい"

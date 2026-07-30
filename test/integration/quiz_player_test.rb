@@ -117,22 +117,31 @@ class QuizPlayerTest < ActionDispatch::IntegrationTest
   end
 
   test "scores reports the distribution, average and per-question correct rate" do
-    s = quiz_survey
-    json_post submit_survey_path(s.publish_token), session_token: "a",
-              answers: { "1" => { "value" => "Paris" }, "3" => { "value" => "4" } } # 2/2
-    json_post submit_survey_path(s.publish_token), session_token: "b",
-              answers: { "1" => { "value" => "Paris" }, "3" => { "value" => "nope" } } # 1/2
+    # Small-cell suppression (P1-14) withholds scores below
+    # Response::MIN_REGION_SAMPLE_SIZE takers, so this scales its cohort to the
+    # threshold. Half score 2/2 and half 1/2, keeping the average and the
+    # per-question rate this test is really about easy to state.
+    s     = quiz_survey
+    total = Response::MIN_REGION_SAMPLE_SIZE
+    full  = total / 2
+
+    total.times do |i|
+      json_post submit_survey_path(s.publish_token), session_token: "t#{i}",
+                answers: { "1" => { "value" => "Paris" },
+                           "3" => { "value" => i < full ? "4" : "nope" } }
+    end
 
     get player_scores_path(s.publish_token)
     body = JSON.parse(response.body)
     assert body["ok"]
-    assert_equal 2, body["total"]
+    assert_nil body["suppressed"]
+    assert_equal total, body["total"]
     assert_equal 2, body["max"]
-    assert_equal 1.5, body["average"]
+    assert_equal ((full * 2 + (total - full)).to_f / total).round(1), body["average"]
     counts = body["distribution"].to_h { |d| [ d["score"], d["count"] ] }
-    assert_equal({ 0 => 0, 1 => 1, 2 => 1 }, counts)
+    assert_equal({ 0 => 0, 1 => total - full, 2 => full }, counts)
     q1 = body["per_question"].find { |q| q["index"] == 1 }
-    assert_equal 100, q1["pct"], "both got the capital right"
+    assert_equal 100, q1["pct"], "everyone got the capital right"
   end
 
   test "the initial player page never reveals which option is correct" do

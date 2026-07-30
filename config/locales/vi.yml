@@ -160,6 +160,7 @@ vi:
       compare_cta: Xem kết quả của bạn so với người khác →
       compare_loading: Đang tải…
       compare_error: Không tải được — thử lại
+      compare_too_few: "Chưa đủ câu trả lời để so sánh — hãy quay lại khi có thêm vài người tham gia."
       quiz_score: "Điểm %{score}/%{max}"
       quiz_correct: "Chính xác!"
       quiz_wrong: "Chưa đúng lắm"

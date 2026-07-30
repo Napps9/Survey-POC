@@ -160,6 +160,7 @@ nl:
       compare_cta: Bekijk je resultaten ten opzichte van anderen →
       compare_loading: Laden…
       compare_error: Kon niet laden — probeer opnieuw
+      compare_too_few: "Nog niet genoeg antwoorden om te vergelijken — kom terug als er wat meer mensen hebben meegedaan."
       quiz_score: "Score %{score}/%{max}"
       quiz_correct: "Juist!"
       quiz_wrong: "Net niet"

@@ -986,6 +986,14 @@ export default class extends Controller {
 
   _renderComparison(data) {
     const total = data.total_responses || 0
+    // Small-cell suppression (P1-14): with only a handful of responders the
+    // "comparison" would be one other person's answers. The server withholds
+    // the rows; say why rather than showing an empty panel.
+    if (data.suppressed) {
+      if (this.hasComparisonMetaTarget) this.comparisonMetaTarget.textContent = t("player.compare_too_few")
+      this.comparisonListTarget.innerHTML = ""
+      return
+    }
     if (this.hasComparisonMetaTarget) {
       this.comparisonMetaTarget.textContent =
         `Based on ${total} response${total === 1 ? "" : "s"} (including yours)`
@@ -1476,6 +1484,13 @@ export default class extends Controller {
   }
 
   _renderScores(data) {
+    // Same suppression as the answer comparison: a per-question correct-rate
+    // over one or two people is their answer sheet.
+    if (data.suppressed) {
+      this.scoresMetaTarget.textContent = t("player.compare_too_few")
+      this.scoresListTarget.innerHTML = ""
+      return
+    }
     const total = data.total || 0
     const mine  = this._quizScore
     const below = (data.distribution || []).filter(d => d.score < mine).reduce((s, d) => s + d.count, 0)

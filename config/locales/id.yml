@@ -160,6 +160,7 @@ id:
       compare_cta: Lihat hasil Anda dibandingkan dengan yang lain →
       compare_loading: Memuat…
       compare_error: Gagal memuat — coba lagi
+      compare_too_few: "Belum cukup jawaban untuk dibandingkan — kembalilah setelah beberapa orang lagi ikut serta."
       quiz_score: "Skor %{score}/%{max}"
       quiz_correct: "Benar!"
       quiz_wrong: "Belum tepat"

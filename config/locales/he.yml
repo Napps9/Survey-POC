@@ -160,6 +160,7 @@ he:
       compare_cta: ראה את התוצאות שלך לעומת אחרים →
       compare_loading: טוען…
       compare_error: לא ניתן לטעון — נסה שוב
+      compare_too_few: "אין עדיין מספיק תשובות להשוואה — חזור כשעוד כמה אנשים ישתתפו."
       quiz_score: "ניקוד %{score}/%{max}"
       quiz_correct: "נכון!"
       quiz_wrong: "לא בדיוק"

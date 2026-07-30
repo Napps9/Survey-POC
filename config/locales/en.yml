@@ -162,6 +162,7 @@ en:
       compare_cta: "See your results compared to others →"
       compare_loading: "Loading…"
       compare_error: "Couldn't load — try again"
+      compare_too_few: "Not enough answers to compare yet — come back when a few more people have taken part."
       quiz_score: "Score %{score}/%{max}"
       quiz_correct: "Correct!"
       quiz_wrong: "Not quite"
