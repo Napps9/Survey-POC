@@ -134,6 +134,12 @@ uk:
     consent_agree: "Погоджуюсь і продовжити"
     consent_decline: "Я не погоджуюсь"
     consent_declined: "Нічого страшного — ви можете закрити цю сторінку."
+    respondent_code_title: 'Перш ніж почати'
+    respondent_code_prompt_default: 'Придумайте код, який запам’ятаєте'
+    respondent_code_placeholder: 'напр. sam14'
+    respondent_code_note: 'Ми його не бачимо — він зберігається як односторонній хеш, лише щоб наступного разу зіставити ваші відповіді з вашими.'
+    respondent_code_continue: 'Продовжити'
+    respondent_code_skip: 'Пропустити'
     comparison_title: Ваші відповіді проти всіх
     back: "← Назад"
     next: Далі →

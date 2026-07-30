@@ -134,6 +134,12 @@ tr:
     consent_agree: "Kabul et ve devam et"
     consent_decline: "Kabul etmiyorum"
     consent_declined: "Sorun değil — bu sayfayı kapatabilirsiniz."
+    respondent_code_title: 'Başlamadan önce'
+    respondent_code_prompt_default: 'Hatırlayacağınız bir kod uydurun'
+    respondent_code_placeholder: 'örn. sam14'
+    respondent_code_note: 'Bunu hiç görmüyoruz — tek yönlü bir özet olarak saklanır, yalnızca yanıtlarınız bir sonraki kez kendi yanıtlarınızla eşleştirilebilsin diye.'
+    respondent_code_continue: 'Devam'
+    respondent_code_skip: 'Atla'
     comparison_title: Yanıtlarınız vs herkes
     back: "← Geri"
     next: İleri →

@@ -134,6 +134,12 @@ vi:
     consent_agree: "Đồng ý & tiếp tục"
     consent_decline: "Tôi không đồng ý"
     consent_declined: "Không sao — bạn có thể đóng trang này."
+    respondent_code_title: 'Trước khi bắt đầu'
+    respondent_code_prompt_default: 'Hãy tự đặt một mã bạn sẽ nhớ'
+    respondent_code_placeholder: 'vd. sam14'
+    respondent_code_note: 'Chúng tôi không bao giờ thấy mã này — nó được lưu dưới dạng băm một chiều, chỉ để đối chiếu câu trả lời của bạn với chính bạn lần sau.'
+    respondent_code_continue: 'Tiếp tục'
+    respondent_code_skip: 'Bỏ qua'
     comparison_title: Câu trả lời của bạn so với mọi người
     back: "← Quay lại"
     next: Tiếp →

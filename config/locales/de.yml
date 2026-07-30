@@ -134,6 +134,12 @@ de:
     consent_agree: "Zustimmen & fortfahren"
     consent_decline: "Ich stimme nicht zu"
     consent_declined: "Kein Problem — du kannst diese Seite schließen."
+    respondent_code_title: 'Bevor Sie beginnen'
+    respondent_code_prompt_default: 'Denken Sie sich einen Code aus, den Sie sich merken'
+    respondent_code_placeholder: 'z. B. sam14'
+    respondent_code_note: 'Wir sehen ihn nie — er wird als Einweg-Hash gespeichert, nur damit Ihre Antworten beim nächsten Mal Ihren eigenen zugeordnet werden können.'
+    respondent_code_continue: 'Weiter'
+    respondent_code_skip: 'Überspringen'
     comparison_title: Deine Antworten vs. alle anderen
     back: "← Zurück"
     next: Weiter →

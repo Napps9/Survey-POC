@@ -134,6 +134,12 @@ sw:
     consent_agree: "Kubali na uendelee"
     consent_decline: "Sikubali"
     consent_declined: "Hakuna shida — unaweza kufunga ukurasa huu."
+    respondent_code_title: 'Kabla ya kuanza'
+    respondent_code_prompt_default: 'Tunga msimbo utakaokumbuka'
+    respondent_code_placeholder: 'k.m. sam14'
+    respondent_code_note: 'Hatuuoni kamwe — huhifadhiwa kama hashi ya njia moja, ili majibu yako yalinganishwe na yako mwenyewe wakati ujao.'
+    respondent_code_continue: 'Endelea'
+    respondent_code_skip: 'Ruka'
     comparison_title: Majibu yako dhidi ya kila mtu
     back: "← Rudi"
     next: Endelea →

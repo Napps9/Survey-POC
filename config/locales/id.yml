@@ -134,6 +134,12 @@ id:
     consent_agree: "Setuju & lanjutkan"
     consent_decline: "Saya tidak setuju"
     consent_declined: "Tidak masalah — Anda bisa menutup halaman ini."
+    respondent_code_title: 'Sebelum mulai'
+    respondent_code_prompt_default: 'Buat kode yang akan Anda ingat'
+    respondent_code_placeholder: 'mis. sam14'
+    respondent_code_note: 'Kami tidak pernah melihatnya — disimpan sebagai hash satu arah, hanya agar jawaban Anda dapat dicocokkan dengan jawaban Anda sendiri berikutnya.'
+    respondent_code_continue: 'Lanjutkan'
+    respondent_code_skip: 'Lewati'
     comparison_title: Jawaban Anda vs semua orang
     back: "← Kembali"
     next: Lanjut →

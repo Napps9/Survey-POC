@@ -134,6 +134,12 @@ he:
     consent_agree: "מסכים/ה וממשיך/ה"
     consent_decline: "אינני מסכים/ה"
     consent_declined: "אין בעיה — אפשר לסגור את הדף."
+    respondent_code_title: 'לפני שמתחילים'
+    respondent_code_prompt_default: 'בחרו קוד שתזכרו'
+    respondent_code_placeholder: 'לדוגמה sam14'
+    respondent_code_note: 'אנחנו לא רואים אותו — הוא נשמר כגיבוב חד-כיווני, רק כדי שנוכל להתאים את התשובות שלכם לשלכם בפעם הבאה.'
+    respondent_code_continue: 'המשך'
+    respondent_code_skip: 'דלגו'
     comparison_title: התשובות שלך מול כולם
     back: "← חזרה"
     next: הבא →

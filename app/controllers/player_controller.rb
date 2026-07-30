@@ -93,6 +93,7 @@ class PlayerController < ApplicationController
     # Quiz answers are immutable once committed — fold the incoming payload over
     # what's already stored so an already-answered graded card can't be changed.
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    apply_respondent_code(resp, data["respondent_code"])
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
@@ -113,6 +114,7 @@ class PlayerController < ApplicationController
     token = data["session_token"].presence || SecureRandom.uuid
     resp  = find_or_init_response(token)
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    apply_respondent_code(resp, data["respondent_code"])
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
     resp.status  = "completed"
@@ -374,6 +376,20 @@ class PlayerController < ApplicationController
     resp.survey       ||= @survey
     resp.survey_share ||= @survey_share
     resp
+  end
+
+  # Record the respondent's self-invented code as a digest. The plaintext is used
+  # to compute the HMAC and then dropped on the floor — it is never assigned to
+  # the record, never logged (see filter_parameter_logging) and never returned.
+  #
+  # Set once per response: a later request can't overwrite it, so a respondent who
+  # reloads mid-Verto keeps the identity they started with.
+  def apply_respondent_code(resp, code)
+    return unless @survey.respondent_code_enabled?
+    return if resp.respondent_code_digest.present?
+
+    digest = @survey.respondent_code_digest(code)
+    resp.respondent_code_digest = digest if digest
   end
 
   # NB: the status column defaults to "completed", so a freshly initialized

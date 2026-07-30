@@ -4,5 +4,10 @@
 # Use this to limit dissemination of sensitive information.
 # See the ActiveSupport::ParameterFilter documentation for supported notations and behaviors.
 Rails.application.config.filter_parameters += [
-  :passw, :email, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn
+  :passw, :email, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn,
+  # A respondent's self-invented code. Only ever stored as an HMAC (see
+  # Survey#respondent_code_digest), so it must not survive in a log either —
+  # otherwise the logs would hold the one copy of the plaintext the database
+  # deliberately doesn't.
+  :respondent_code
 ]

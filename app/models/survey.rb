@@ -618,6 +618,47 @@ class Survey < ApplicationRecord
     published? && !deleted?
   end
 
+  # ── Respondent code ────────────────────────────────────────────────────────
+  # An optional self-invented code ("your nickname and the day of the month you
+  # were born") that links one person's answers across waves of the same Verto
+  # without identifying them.
+  #
+  # Only ever stored as an HMAC. The key is derived per survey, so a digest is
+  # comparable only WITHIN this Verto: the same code given to two Vertos yields
+  # two unrelated digests, and a creator with database access can neither read a
+  # code nor recognise someone across their other Vertos.
+
+  MAX_RESPONDENT_CODE = 60
+
+  def respondent_code_prompt_text
+    respondent_code_prompt.presence || I18n.t("player.respondent_code_prompt_default")
+  end
+
+  # nil for anything that isn't a usable code, so a blank or whitespace-only
+  # entry is simply "no code" rather than a digest everyone shares.
+  def respondent_code_digest(code)
+    normalised = self.class.normalize_respondent_code(code)
+    return nil if normalised.blank?
+
+    OpenSSL::HMAC.hexdigest("SHA256", respondent_code_key, normalised)
+  end
+
+  # Case and spacing shouldn't decide whether someone matches themselves — a
+  # respondent typing "Sam 14" in wave two after "sam14" in wave one is the same
+  # person, and the whole feature is worthless if that misses.
+  def self.normalize_respondent_code(code)
+    code.to_s.unicode_normalize(:nfkc).downcase.gsub(/\s+/, "").first(MAX_RESPONDENT_CODE)
+  end
+
+  # How many respondents gave a code that another response also gave — i.e. came
+  # back. Counted in SQL; the digests never leave the database.
+  def returning_respondents_count
+    responses.where.not(respondent_code_digest: nil)
+             .group(:respondent_code_digest)
+             .having("COUNT(*) > 1")
+             .count.size
+  end
+
   # ── Free-text limits ───────────────────────────────────────────────────────
 
   # The free-text cap for the card at `index`.
@@ -1006,5 +1047,13 @@ class Survey < ApplicationRecord
 
   def enforce_range_scale
     self.cards = self.class.normalize_range_cards!(cards)
+  end
+
+  # Per-survey HMAC key, from Rails' own key generator — tied to
+  # secret_key_base, so it needs no column of its own and rotating the secret
+  # invalidates every digest at once (which is the correct behaviour: they were
+  # only ever comparable to each other).
+  def respondent_code_key
+    Rails.application.key_generator.generate_key("respondent_code/survey/#{id}", 32)
   end
 end

@@ -1070,6 +1070,37 @@
           <% end %>
         </details>
 
+        <%# Respondent code — links one person's answers across waves of the same
+            Verto without identifying them. Only a per-survey HMAC is stored, so
+            the code can't be read back or matched against another Verto. %>
+        <details class="publish-block">
+          <summary class="publish-block-title">Repeat participation <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="respondent_code_enabled" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="respondent_code_enabled" value="1"
+                     <%= "checked" if @survey.respondent_code_enabled? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Ask respondents for a code they make up themselves, so you can compare the same people across repeat runs. You never see the code — only a one-way hash, which can't be matched against any other Verto.</span>
+            </label>
+            <% if @survey.respondent_code_enabled? %>
+              <input type="text" name="respondent_code_prompt" maxlength="200"
+                     value="<%= @survey.respondent_code_prompt %>"
+                     onchange="this.form.requestSubmit()"
+                     placeholder="<%= t("player.respondent_code_prompt_default") %>"
+                     style="width:100%;box-sizing:border-box;margin-top:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;">
+                Tell them how to build a code they'll reproduce next time. Blank uses the default wording.
+                <% returning = @survey.returning_respondents_count %>
+                <% if returning.positive? %>
+                  <br><strong style="color:#01EACB;"><%= pluralize(returning, "respondent") %></strong> have answered more than once.
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        </details>
+
         <%# Results comparison toggle %>
         <details class="publish-block">
           <summary class="publish-block-title">Response comparison <span class="pub-chev">⌄</span></summary>

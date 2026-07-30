@@ -134,6 +134,12 @@ pt:
     consent_agree: "Concordar e continuar"
     consent_decline: "Não concordo"
     consent_declined: "Sem problema — pode fechar esta página."
+    respondent_code_title: 'Antes de começar'
+    respondent_code_prompt_default: 'Invente um código de que se lembre'
+    respondent_code_placeholder: 'ex. sam14'
+    respondent_code_note: 'Nunca o vemos — é guardado como um hash unidirecional, apenas para que as suas respostas possam ser associadas às suas na próxima vez.'
+    respondent_code_continue: 'Continuar'
+    respondent_code_skip: 'Ignorar'
     comparison_title: As suas respostas vs todos
     back: "← Voltar"
     next: Seguinte →

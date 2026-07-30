@@ -134,6 +134,12 @@ ru:
     consent_agree: "Согласен и продолжить"
     consent_decline: "Я не согласен"
     consent_declined: "Ничего страшного — вы можете закрыть эту страницу."
+    respondent_code_title: 'Прежде чем начать'
+    respondent_code_prompt_default: 'Придумайте код, который запомните'
+    respondent_code_placeholder: 'напр. sam14'
+    respondent_code_note: 'Мы его не видим — он сохраняется как односторонний хеш, только чтобы в следующий раз сопоставить ваши ответы с вашими же.'
+    respondent_code_continue: 'Продолжить'
+    respondent_code_skip: 'Пропустить'
     comparison_title: Ваши ответы vs все остальные
     back: "← Назад"
     next: Далее →

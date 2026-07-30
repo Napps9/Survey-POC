@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_120557) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_123055) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -313,6 +313,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120557) do
     t.integer "quiz_max"
     t.string "region_country"
     t.string "region_label"
+    t.string "respondent_code_digest"
     t.integer "score"
     t.string "session_token", null: false
     t.datetime "started_at"
@@ -325,6 +326,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120557) do
     t.index ["survey_id", "answered", "status"], name: "index_responses_on_survey_answered_status"
     t.index ["survey_id", "demographic_birth_year"], name: "index_responses_on_survey_id_and_demographic_birth_year"
     t.index ["survey_id", "demographic_gender"], name: "index_responses_on_survey_id_and_demographic_gender"
+    t.index ["survey_id", "respondent_code_digest"], name: "index_responses_on_survey_and_respondent_code"
     t.index ["survey_id"], name: "index_responses_on_survey_id"
     t.index ["survey_share_id"], name: "index_responses_on_survey_share_id"
   end
@@ -510,6 +512,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_120557) do
     t.boolean "quiz", default: false, null: false
     t.boolean "regions_enabled", default: true, null: false
     t.string "render_mode", default: "cards", null: false
+    t.boolean "respondent_code_enabled", default: false, null: false
+    t.string "respondent_code_prompt"
     t.text "results_report"
     t.text "results_report_brief"
     t.datetime "results_report_edited_at"

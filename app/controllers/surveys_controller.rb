@@ -521,9 +521,14 @@ class SurveysController < ApplicationController
     # deliberately NOT in SETTINGS_LOCKED_IN_USE. None of them re-scores an
     # answer or changes what anyone agreed to; they only affect what a
     # respondent is shown from here on.
-    %i[token_reveal_enabled token_back_nav_enabled share_enabled regions_enabled].each do |flag|
+    %i[token_reveal_enabled token_back_nav_enabled share_enabled regions_enabled
+       respondent_code_enabled].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
+    end
+    if params.key?(:respondent_code_prompt)
+      attrs[:respondent_code_prompt] =
+        params[:respondent_code_prompt].to_s.strip.first(200).presence
     end
     if params.key?(:compare_note)
       attrs[:compare_note] = params[:compare_note].to_s.strip.first(160).presence

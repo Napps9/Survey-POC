@@ -134,6 +134,12 @@ nl:
     consent_agree: "Akkoord & doorgaan"
     consent_decline: "Ik ga niet akkoord"
     consent_declined: "Geen probleem — je kunt deze pagina sluiten."
+    respondent_code_title: 'Voordat je begint'
+    respondent_code_prompt_default: 'Verzin een code die je onthoudt'
+    respondent_code_placeholder: 'bijv. sam14'
+    respondent_code_note: 'Wij zien deze nooit — hij wordt als eenrichtingshash opgeslagen, alleen zodat je antwoorden volgende keer aan die van jou gekoppeld kunnen worden.'
+    respondent_code_continue: 'Doorgaan'
+    respondent_code_skip: 'Overslaan'
     comparison_title: Jouw antwoorden vs iedereen
     back: "← Terug"
     next: Volgende →

@@ -134,6 +134,12 @@ ko:
     consent_agree: "동의하고 계속하기"
     consent_decline: "동의하지 않음"
     consent_declined: "괜찮습니다 — 이 페이지를 닫으셔도 됩니다."
+    respondent_code_title: '시작하기 전에'
+    respondent_code_prompt_default: '기억할 수 있는 코드를 만들어 주세요'
+    respondent_code_placeholder: '예: sam14'
+    respondent_code_note: '저희는 이 값을 볼 수 없습니다. 단방향 해시로 저장되며, 다음에 본인의 답변과 연결하는 데만 사용됩니다.'
+    respondent_code_continue: '계속'
+    respondent_code_skip: '건너뛰기'
     comparison_title: 내 답변 vs 전체
     back: "← 뒤로"
     next: 다음 →

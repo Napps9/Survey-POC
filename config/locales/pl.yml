@@ -134,6 +134,12 @@ pl:
     consent_agree: "Zgadzam się i kontynuuję"
     consent_decline: "Nie zgadzam się"
     consent_declined: "Nie ma problemu — możesz zamknąć tę stronę."
+    respondent_code_title: 'Zanim zaczniesz'
+    respondent_code_prompt_default: 'Wymyśl kod, który zapamiętasz'
+    respondent_code_placeholder: 'np. sam14'
+    respondent_code_note: 'Nigdy go nie widzimy — jest zapisywany jako jednokierunkowy skrót, tylko po to, aby następnym razem powiązać Twoje odpowiedzi z Twoimi.'
+    respondent_code_continue: 'Kontynuuj'
+    respondent_code_skip: 'Pomiń'
     comparison_title: Twoje odpowiedzi vs wszyscy
     back: "← Wstecz"
     next: Dalej →

@@ -134,6 +134,12 @@ hi:
     consent_agree: "सहमत हैं और जारी रखें"
     consent_decline: "मैं सहमत नहीं हूँ"
     consent_declined: "कोई बात नहीं — आप इस पृष्ठ को बंद कर सकते हैं।"
+    respondent_code_title: 'शुरू करने से पहले'
+    respondent_code_prompt_default: 'एक कोड सोचें जो आपको याद रहे'
+    respondent_code_placeholder: 'उदा. sam14'
+    respondent_code_note: 'हम इसे कभी नहीं देखते — यह एकतरफ़ा हैश के रूप में सहेजा जाता है, केवल इसलिए कि अगली बार आपके उत्तर आपके ही उत्तरों से मिलाए जा सकें।'
+    respondent_code_continue: 'जारी रखें'
+    respondent_code_skip: 'छोड़ें'
     comparison_title: आपके उत्तर बनाम सभी
     back: "← वापस"
     next: आगे →

@@ -136,6 +136,12 @@ en:
     consent_agree: "Agree & continue"
     consent_decline: "I don't agree"
     consent_declined: "No problem — you can close this page."
+    respondent_code_title: 'Before you start'
+    respondent_code_prompt_default: 'Make up a code you''ll remember'
+    respondent_code_placeholder: 'e.g. sam14'
+    respondent_code_note: 'We never see this — it''s stored as a one-way hash, only so your answers can be matched to your own next time.'
+    respondent_code_continue: 'Continue'
+    respondent_code_skip: 'Skip this'
     comparison_title: "Your answers vs everyone"
     back: "← Back"
     next: "Next →"

@@ -13,6 +13,11 @@ const MAP_MAX_SCALE = 8
 // so the pseudo-card stops rendering rather than stacking two gates.
 const CONSENT_TYPES = [ "consent_card", "consent_gate" ]
 
+// Cards that drive their own navigation, so the deck's Back/Next/Finish are
+// hidden while one is showing. The consent shapes above, plus the
+// respondent-code gate.
+const SELF_DRIVING_TYPES = [ ...CONSENT_TYPES, "respondent_code_card" ]
+
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "thankyouTitle", "thankyouSub", "forwardBtn", "compareBtn", "comparePanel",
@@ -21,7 +26,7 @@ export default class extends Controller {
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
                     "regionsMapViewport", "regionsMapStage",
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
-                    "consentMain", "consentDeclined",
+                    "consentMain", "consentDeclined", "respondentCode",
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
                     "tokenScoreChip", "tokenScore"]
   static values  = {
@@ -131,6 +136,28 @@ export default class extends Controller {
     if (this.hasConsentDeclinedTarget) this.consentDeclinedTarget.classList.remove("hidden")
   }
 
+  // The respondent-code gate. The code is held in memory only until the next
+  // save carries it; nothing writes it to storage on this side either, so a
+  // reload genuinely forgets it (the digest already recorded on the response is
+  // what keeps the identity).
+  submitRespondentCode() {
+    const entered = (this.hasRespondentCodeTarget ? this.respondentCodeTarget.value : "").trim()
+    if (entered) {
+      this._respondentCode = entered
+      this._buzz()
+    }
+    // Deliberately does NOT save here. _saveProgress refuses to create a row
+    // before there's a real answer, so that someone who opens a Verto and leaves
+    // isn't counted as a respondent — a code on its own shouldn't change that.
+    // It rides along with the first genuine save instead (see _payload).
+    this.next()
+  }
+
+  skipRespondentCode() {
+    this._respondentCode = null
+    this.next()
+  }
+
   _recordConsent(agreed) {
     if (!this.consentUrlValue) return
     fetch(this.consentUrlValue, {
@@ -205,7 +232,12 @@ export default class extends Controller {
       answers = {}
       for (const [k, v] of Object.entries(this._answers)) if (keep.has(k)) answers[k] = v
     }
-    return { session_token: this._sessionToken, answers, locale: this.localeValue }
+    const payload = { session_token: this._sessionToken, answers, locale: this.localeValue }
+    // Rides along with the ordinary save rather than needing an endpoint of its
+    // own. The server hashes it and drops the plaintext; it's only sent until a
+    // digest is recorded, and the server ignores a second one anyway.
+    if (this._respondentCode) payload.respondent_code = this._respondentCode
+    return payload
   }
 
   async finish() {
@@ -1130,8 +1162,15 @@ export default class extends Controller {
     // deck. Both drive themselves, so both suppress the deck nav; only a gate
     // sitting FIRST is held out of the progress count, the same way a mid-deck
     // welcome card or checkpoint is counted where it stands.
-    const hasConsent = CONSENT_TYPES.includes(cards[0]?.dataset.cardType)
-    const onConsent  = CONSENT_TYPES.includes(cards[idx]?.dataset.cardType)
+    // Leading pseudo-cards (the consent gate rendered from consent_text, the
+    // respondent-code gate) carry no data-card-index, because they're not
+    // positions in @survey.cards and must never shift the answer keys. Counting
+    // them is also how they stay out of the progress the respondent sees —
+    // derived from the absence of an index rather than a hardcoded 1, so adding a
+    // second gate didn't silently make "Card 1 of N" wrong.
+    let offset = 0
+    while (offset < cards.length && cards[offset].dataset.cardIndex == null) offset++
+    const onConsent = SELF_DRIVING_TYPES.includes(cards[idx]?.dataset.cardType)
 
     if (onConsent) {
       // The consent gate drives itself (Agree / decline) — hide the deck nav.
@@ -1145,8 +1184,8 @@ export default class extends Controller {
       return
     }
 
-    // Keep the consent card out of the progress the respondent sees.
-    const offset = hasConsent ? 1 : 0
+    // `offset` (computed above) holds the leading pseudo-cards out of the
+    // progress the respondent sees.
     const total  = cards.length - offset
     // With logic the path is variable and its length unknown up front, so show
     // honest, monotonic path progress against the deck size as a loose upper

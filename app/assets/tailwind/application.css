@@ -1200,6 +1200,21 @@
 .gate-editable { outline: none; border-radius: 6px; cursor: text; transition: box-shadow 0.15s; }
 .gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,234,203,0.3); }
 .gate-editable:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.55); }
+/* Respondent-code gate: a single line the respondent invents, before the deck. */
+.respondent-code-input {
+  width: 100%; box-sizing: border-box; margin-top: 14px;
+  padding: 11px 14px; border-radius: 12px;
+  background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.14);
+  font-family: 'ABeeZee', sans-serif; font-size: 15px; color: #1C2034;
+  outline: none; transition: box-shadow 0.15s, border-color 0.15s;
+}
+.respondent-code-input:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.55); border-color: transparent; }
+.respondent-code-note {
+  margin-top: 8px;
+  font-family: 'ABeeZee', sans-serif; font-size: 12.5px; line-height: 1.5;
+  color: rgba(0,0,0,0.55);
+}
+
 /* Creator's answer-length control, under the free-text counter in the editor. */
 .freeform-limit-row {
   display: flex; align-items: center; gap: 8px; margin-top: 8px;

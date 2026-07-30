@@ -134,6 +134,12 @@ it:
     consent_agree: "Accetto e continuo"
     consent_decline: "Non accetto"
     consent_declined: "Nessun problema: puoi chiudere questa pagina."
+    respondent_code_title: 'Prima di iniziare'
+    respondent_code_prompt_default: 'Inventa un codice che ricorderai'
+    respondent_code_placeholder: 'es. sam14'
+    respondent_code_note: 'Non lo vediamo mai: è salvato come hash a senso unico, solo per poter collegare le tue risposte alle tue la prossima volta.'
+    respondent_code_continue: 'Continua'
+    respondent_code_skip: 'Salta'
     comparison_title: Le tue risposte vs tutti
     back: "← Indietro"
     next: Avanti →

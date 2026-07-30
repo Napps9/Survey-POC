@@ -134,6 +134,12 @@ ar:
     consent_agree: "أوافق وأتابع"
     consent_decline: "لا أوافق"
     consent_declined: "لا مشكلة — يمكنك إغلاق هذه الصفحة."
+    respondent_code_title: 'قبل أن تبدأ'
+    respondent_code_prompt_default: 'اختر رمزًا تتذكره'
+    respondent_code_placeholder: 'مثال: sam14'
+    respondent_code_note: 'لا نرى هذا أبدًا — يُخزَّن كتجزئة أحادية الاتجاه، فقط لمطابقة إجاباتك بإجاباتك في المرة القادمة.'
+    respondent_code_continue: 'متابعة'
+    respondent_code_skip: 'تخطٍّ'
     comparison_title: إجاباتك مقابل الجميع
     back: "← رجوع"
     next: التالي ←
