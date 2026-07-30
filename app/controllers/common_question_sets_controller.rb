@@ -9,11 +9,18 @@ class CommonQuestionSetsController < ApplicationController
 
     @total_questions = @kept_sets.sum { |s| s.common_questions.size }
     set_ids = @kept_sets.map(&:id)
-    attached_surveys = Current.organisation.surveys.kept.includes(:responses).select do |s|
-      Array(s.cards).any? { |c| c.is_a?(Hash) && set_ids.include?(c["common_question_set_id"]) }
+
+    # Which cards carry a set can only be answered by reading the cards JSON, so
+    # the surveys themselves are still loaded — but without the report/summary
+    # text columns, which this never looks at.
+    attached_ids = Current.organisation.surveys.kept.without_report_text.filter_map do |s|
+      s.id if Array(s.cards).any? { |c| c.is_a?(Hash) && set_ids.include?(c["common_question_set_id"]) }
     end
-    @vertos_using_count = attached_surveys.size
-    @cq_response_count  = attached_surveys.sum { |s| s.responses.size }
+
+    @vertos_using_count = attached_ids.size
+    # One COUNT, rather than eager-loading every response row of every attached
+    # Verto — answers JSON and all — purely to call .size on them.
+    @cq_response_count  = attached_ids.any? ? Response.where(survey_id: attached_ids).count : 0
   end
 
   def new
@@ -179,7 +186,9 @@ class CommonQuestionSetsController < ApplicationController
   end
 
   def results
-    surveys = @set.surveys_using(Current.organisation.surveys)
+    # without_report_text: the aggregator reads cards and responses, never the
+    # multi-KB AI report/summary columns those Vertos may be carrying.
+    surveys = @set.surveys_using(Current.organisation.surveys.without_report_text)
     @per_question, @snapshot_variants, @total_surveys, @total_responses =
       CommonQuestionAggregator.new(@set, surveys).aggregate
   end

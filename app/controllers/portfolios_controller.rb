@@ -68,7 +68,7 @@ class PortfoliosController < ApplicationController
 
     payload = sets.map do |pcqs|
       set = pcqs.common_question_set
-      surveys = set.surveys_using(Survey.where(organisation_id: org_ids).kept)
+      surveys = set.surveys_using(Survey.where(organisation_id: org_ids).kept.without_report_text)
       per_question, _variants, total_surveys, total_responses =
         CommonQuestionAggregator.new(set, surveys).aggregate
 
@@ -134,7 +134,7 @@ class PortfoliosController < ApplicationController
   end
 
   def comparison_column(set, org)
-    surveys = set.surveys_using(org.surveys.kept)
+    surveys = set.surveys_using(org.surveys.kept.without_report_text)
     return nil if surveys.empty?
 
     per_question, _variants, _total_surveys, total_responses =

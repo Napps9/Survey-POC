@@ -24,6 +24,7 @@ class CommonQuestionAggregator
     per_question_answers = Hash.new { |h, cq_id| h[cq_id] = [] }
     snapshot_variants    = Hash.new { |h, cq_id| h[cq_id] = Hash.new { |hh, k| hh[k] = [] } }
     total_responses      = 0
+    surveys_with_data    = 0
 
     @surveys.each do |survey|
       cards     = Array(survey.cards)
@@ -40,16 +41,24 @@ class CommonQuestionAggregator
 
       next if cq_by_idx.empty?
 
-      survey_responses = survey.responses.to_a
-      total_responses += survey_responses.size
-
-      survey_responses.each do |response|
+      # Streamed in batches, and only the two columns this actually reads.
+      # `responses.to_a` pulled every row of every contributing Verto into memory
+      # at once, whole — quiz scores, token totals, region strings, consent
+      # snapshots and all — to look at one JSON column. On a portfolio rollup
+      # that's every response across every grantee org at the same time, on a
+      # 512MB instance.
+      survey_total = 0
+      survey.responses.select(:id, :answers).find_each do |response|
+        survey_total += 1
         next unless response.answers.is_a?(Hash)
         cq_by_idx.each do |idx, cq_id|
           ans = response.answers[idx.to_s]
           per_question_answers[cq_id] << ans if ans.is_a?(Hash) && ans["value"].present?
         end
       end
+
+      total_responses += survey_total
+      surveys_with_data += 1 if survey_total.positive?
     end
 
     per_question = @set.common_questions.map do |cq|
@@ -59,6 +68,13 @@ class CommonQuestionAggregator
       row.merge(common_question: cq, drift?: snapshot_variants[cq.id].keys.reject { |t| t == cq.text }.any?)
     end
 
-    [ per_question, snapshot_variants, @surveys.count { |s| s.responses.any? }, total_responses ]
+    # Counted in the pass above rather than re-queried. `@surveys.count { |s|
+    # s.responses.any? }` fired one EXISTS query per contributing Verto, on top
+    # of having already loaded every one of those responses a moment earlier.
+    #
+    # It also counted Vertos that carry the set but contributed nothing to this
+    # aggregate, which contradicts what this value is documented to be ("surveys
+    # contributing data") and what the view labels it. Now it means what it says.
+    [ per_question, snapshot_variants, surveys_with_data, total_responses ]
   end
 end
