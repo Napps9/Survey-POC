@@ -14,6 +14,7 @@ class OpenTextSummariser
     are too few or too thin to summarise meaningfully, say so plainly rather
     than inventing a theme.
   PROMPT
+  SYSTEM_WITH_SAFETY = (SYSTEM + PromptSafety::INSTRUCTION).freeze
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
     @client = build_anthropic_client(api_key)
@@ -26,7 +27,7 @@ class OpenTextSummariser
     stream = @client.messages.stream_raw(
       model:      MODEL,
       max_tokens: MAX_TOKENS,
-      system:     SYSTEM,
+      system:     SYSTEM_WITH_SAFETY,
       messages:   [ { role: "user", content: build_prompt(question, texts) } ]
     )
 
@@ -52,7 +53,7 @@ class OpenTextSummariser
   def build_prompt(question, texts)
     sample = texts.first(MAX_ANSWERS_IN_PROMPT)
     lines  = [ "Question: \"#{question}\"", "", "Answers (#{texts.size} total):" ]
-    sample.each { |t| lines << "- \"#{t.truncate(300)}\"" }
+    sample.each { |t| lines << "- #{PromptSafety.quote(t, limit: 300)}" }
     lines.join("\n")
   end
 end

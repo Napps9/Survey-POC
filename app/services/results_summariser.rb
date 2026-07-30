@@ -14,6 +14,7 @@ class ResultsSummariser
     Keep the whole summary under 200 words. Tone: clear, professional, slightly
     warm — like a thoughtful colleague sharing a debrief.
   PROMPT
+  SYSTEM_WITH_SAFETY = (SYSTEM + PromptSafety::INSTRUCTION).freeze
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
     @client = build_anthropic_client(api_key)
@@ -27,7 +28,7 @@ class ResultsSummariser
     stream = @client.messages.stream_raw(
       model:      MODEL,
       max_tokens: MAX_TOKENS,
-      system:     SYSTEM,
+      system:     SYSTEM_WITH_SAFETY,
       messages:   [ { role: "user", content: prompt } ]
     )
 

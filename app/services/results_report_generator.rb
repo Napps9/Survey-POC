@@ -46,6 +46,7 @@ class ResultsReportGenerator
     sharper report beats a longer one. Under a tight length budget, compress the
     question-by-question section rather than the summary or recommendations.
   PROMPT
+  SYSTEM_WITH_SAFETY = (SYSTEM + PromptSafety::INSTRUCTION).freeze
 
   def self.call(...) = new.call(...)
 
@@ -64,7 +65,7 @@ class ResultsReportGenerator
     stream = @client.messages.stream_raw(
       model:      MODEL,
       max_tokens: length[:max_tokens],
-      system:     SYSTEM,
+      system:     SYSTEM_WITH_SAFETY,
       messages:   [ { role: "user", content: prompt } ]
     )
 

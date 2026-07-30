@@ -13,6 +13,7 @@ class ResultsChat
     Keep responses under 150 words unless the question genuinely requires more detail.
     Never use markdown formatting — plain text only, short paragraphs.
   PROMPT
+  SYSTEM_WITH_SAFETY = (SYSTEM + PromptSafety::INSTRUCTION).freeze
 
   def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
     @client = build_anthropic_client(api_key)
@@ -24,7 +25,7 @@ class ResultsChat
     # In a multi-turn chat every follow-up then reads that prefix from cache
     # (~0.1x input) instead of re-billing the entire dataset each message.
     system_blocks = [
-      { type: "text", text: SYSTEM },
+      { type: "text", text: SYSTEM_WITH_SAFETY },
       { type: "text", text: build_context(survey, aggregated, total),
         cache_control: { type: "ephemeral" } }
     ]
@@ -93,7 +94,8 @@ class ResultsChat
       when "rating"
         lines << "  Average: #{result[:avg]} / 5 (#{result[:total]} responses)"
       when "open_ended"
-        lines << "  #{result[:total]} text responses. Sample: #{result[:texts].first(3).map { |t| "\"#{t.truncate(80)}\"" }.join(", ")}"
+        quoted = PromptSafety.quote_all(result[:texts].first(3), limit: 80)
+        lines << "  #{result[:total]} text responses. Sample: #{quoted.join(" ")}"
       end
       lines << ""
     end

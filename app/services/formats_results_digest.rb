@@ -70,7 +70,7 @@ module FormatsResultsDigest
       when "open_ended"
         sample = result[:texts].first(5)
         lines << "  Sample responses (#{result[:total]} total):"
-        sample.each { |t| lines << "    - \"#{t.truncate(120)}\"" }
+        sample.each { |t| lines << "    - #{PromptSafety.quote(t, limit: 120)}" }
       end
 
       lines << ""
