@@ -1,0 +1,87 @@
+# Data retention & respondent rights
+
+Written for P0-7. Describes what Playverto stores about respondents, how long,
+who can remove it, and the limits of what the platform can actually honour.
+
+## What is stored about a respondent
+
+Every Verto ends with an automatically appended demographic tail
+(`DemographicQuestions`): birth month/year, where they live, and gender. So in
+practice **every** Verto holds personal data, not just ones whose creator chose
+to ask for it.
+
+A `responses` row can hold:
+
+| Field | What it is |
+|---|---|
+| `answers` | Their answers, keyed by card index |
+| `demographic_birth_year`, `demographic_gender` | From the demographic tail |
+| `region_country`, `region_label` | Derived from the location answer |
+| `locale`, `device_kind` | Language and rough device class |
+| `started_at`, `completed_at`, `created_at` | Timings |
+| `consent_agreed_at` / `consent_declined_at`, `consent_text_snapshot` | The consent record, including the exact wording shown |
+| `score`, `quiz_max`, `token_totals` | Quiz and token scoring |
+| `session_token` | A random per-session UUID minted in the browser |
+| `respondent_code_digest` | HMAC of a code the respondent chose, if the creator enabled codes |
+
+No email address, name or account is attached to a response. The
+`respondent_code_digest` is a one-way HMAC keyed per Verto
+(`Survey#respondent_code_key`), so a code is comparable **within** one Verto and
+nowhere else, and the plaintext is never stored, logged or returned.
+
+## Retention period
+
+Responses are kept for the life of the Verto. Deleting a Verto deletes its
+responses (`dependent:` on the association); archiving one does not.
+
+`rake responses:purge[days]` removes responses older than N days across all
+organisations, for a controller who wants a shorter horizon than "forever".
+It is **not scheduled by default** — retention length is the customer's policy
+decision, not ours, and silently deleting a funder's research data would be
+worse than keeping it. Run it deliberately, or add it to `config/recurring.yml`
+once a period has been agreed.
+
+```
+bin/rails responses:purge[365]          # delete responses older than a year
+bin/rails "responses:purge[365,dry]"    # count them without deleting
+```
+
+## Subject access and erasure
+
+Admins get **Results → Download CSV → One respondent's data…**
+(`/surveys/:id/respondent-data`), which:
+
+- finds a respondent's rows by session token or by respondent code;
+- exports **everything** held about them as JSON (Article 15 / 20) — including
+  the demographics, consent record, derived region, device, timings and scoring
+  that the ordinary results export leaves out;
+- erases those rows permanently (Article 17).
+
+Erasure is a hard delete, not an anonymisation pass. A stripped-but-present row
+would still be personal data if it could be re-linked, and the right is erasure.
+The consequence is honest: response counts drop, and any cached summary or
+report keyed to the old count regenerates the next time it is opened.
+
+The creator is the data controller here. A respondent's request reaches them,
+not Playverto, so this is a creator-facing tool rather than a self-service
+portal.
+
+## The limit worth knowing
+
+**Most respondents cannot be identified after the fact.** The session token
+lives in `sessionStorage`, keyed to the Verto's submit URL, and is gone when the
+browser tab closes. Unless the creator enabled respondent codes — in which case
+the respondent knows their own code — a person who comes back a week later has
+no handle on their own row, and neither does anyone else.
+
+This is a real gap in honouring Article 17 on request, and it is a deliberate
+consequence of collecting no identifier. Closing it would mean either showing
+respondents a receipt code at the end of a Verto that they could quote later, or
+storing a durable identifier — which trades a privacy property for a rights one.
+That is a product decision, not a bug fix, and it is not made here.
+
+## Related
+
+- Consent enforcement: `Survey#default_consent_gate?` (P0-6)
+- Small-cell suppression on public comparisons: `Response::MIN_REGION_SAMPLE_SIZE`
+- Encryption keys backup: `PRODUCTION_READINESS_PLAN.md` P1-6

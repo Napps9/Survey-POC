@@ -98,6 +98,11 @@ Rails.application.routes.draw do
   patch "surveys/:survey_id/results/report",      to: "results_reports#update"
   get  "surveys/:survey_id/results/report/stream", to: "results_report_streams#show",  as: :survey_results_report_stream
   post "surveys/:survey_id/results/google_drive", to: "google_drive_exports#create",  as: :survey_google_drive
+  # GDPR data-subject rights for one respondent (P0-7). Admin-only — unlike every
+  # other results route these answer for a named individual, not the aggregate.
+  get    "surveys/:survey_id/respondent-data",        to: "respondent_data#show",    as: :survey_respondent_data
+  get    "surveys/:survey_id/respondent-data/export", to: "respondent_data#export",  as: :survey_respondent_data_export
+  delete "surveys/:survey_id/respondent-data",        to: "respondent_data#destroy"
   post "surveys/:id/generate_card",   to: "surveys#generate_card", as: :generate_survey_card
   post "surveys/:id/generate_flow",   to: "surveys#generate_flow", as: :generate_survey_flow
   # Flow generation runs as a job (GenerateFlowJob); the editor polls this and

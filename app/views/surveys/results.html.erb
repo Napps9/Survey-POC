@@ -206,6 +206,14 @@
                   <%= link_to "Summary (.csv)", survey_results_export_path(@survey, kind: "summary", segment: @active_segment[:id]),
                         data: { turbo: false }, style: csv_item,
                         onmouseover: "this.style.background='rgba(255,255,255,0.06)'", onmouseout: "this.style.background='transparent'" %>
+                  <%# One respondent's own data, for a subject access or erasure
+                      request. Admin-only, so it's only offered to admins. %>
+                  <% if current_membership&.admin? %>
+                    <div style="height:1px;background:rgba(255,255,255,0.1);margin:5px 8px;"></div>
+                    <%= link_to t("respondent_data.menu_link"), survey_respondent_data_path(@survey),
+                          style: csv_item,
+                          onmouseover: "this.style.background='rgba(255,255,255,0.06)'", onmouseout: "this.style.background='transparent'" %>
+                  <% end %>
                 </div>
               </details>
 
