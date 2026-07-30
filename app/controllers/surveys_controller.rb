@@ -2,7 +2,42 @@ class SurveysController < ApplicationController
   include AggregatesSurveyResults
   include ResolvesResultSegments
   include RendersCardHtml
+  include ThrottlesAiSpend
   layout "fullscreen", only: [ :show, :new ]
+
+  # Spend guards (P0-4). Three tiers, because the cost per request differs by
+  # two orders of magnitude:
+  #
+  #   deck      — each one enqueues a job that makes many Claude calls
+  #               (generation, then one translation call per secondary locale,
+  #               then asset population). The expensive tier.
+  #   card      — one Claude call per request.
+  #   stock     — Pexels rather than Anthropic, so no money changes hands, but
+  #               it's still an external quota worth not burning.
+  #
+  # Limits are per user per hour and set well above real editing behaviour;
+  # they exist to stop a retry loop or a scripted client, not to ration work.
+  throttle_ai to: 20,  within: 1.hour, name: "ai-deck", respond: :html,
+              only: %i[ generate import_pdf import_manual import_google_form
+                        finalize_import create_blank ]
+  throttle_ai to: 20,  within: 1.hour, name: "ai-deck-json", respond: :json,
+              only: %i[ resume_import generate_flow ]
+  throttle_ai to: 120, within: 1.hour, name: "ai-card", respond: :json,
+              only: %i[ generate_card optimise_card moderate_image ]
+  throttle_ai to: 60,  within: 1.hour, name: "stock-media", respond: :json,
+              only: %i[ pexels_search ]
+  throttle_ai to: 60,  within: 1.hour, name: "stock-shuffle", respond: :html,
+              only: %i[ shuffle_assets ]
+
+  # The organisation-wide daily ceiling, which is the number that shows up on
+  # the Anthropic invoice. Only the Claude endpoints count against it —
+  # pexels_search and shuffle_assets are rate-limited above but cost nothing.
+  cap_ai_spend respond: :html,
+               only: %i[ generate import_pdf import_manual import_google_form
+                         finalize_import create_blank ]
+  cap_ai_spend respond: :json,
+               only: %i[ resume_import generate_flow generate_card optimise_card
+                         moderate_image ]
 
   MAX_PDF_BYTES = 10.megabytes
 

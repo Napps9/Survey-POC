@@ -3,8 +3,16 @@ class SurveySummariesController < ApplicationController
   include AggregatesSurveyResults
   include ResolvesResultSegments
   include LimitsConcurrentStreams
+  include ThrottlesAiSpend
 
   limit_concurrent_streams only: [ :show, :texts ]
+
+  # Deliberately NOT counted against the organisation's daily cap: both actions
+  # replay a cached summary when the response count hasn't moved, so most
+  # requests here spend nothing and charging them against a spend ceiling would
+  # lock creators out of reading text they already paid for. The rate limit
+  # still bounds the cold-cache case (P0-4).
+  throttle_ai to: 30, within: 1.hour, name: "ai-summary", respond: :plain, only: %i[ show texts ]
 
   def show
     survey    = Current.organisation.surveys.find(params[:id])

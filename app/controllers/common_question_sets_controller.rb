@@ -1,5 +1,11 @@
 class CommonQuestionSetsController < ApplicationController
+  include ThrottlesAiSpend
   layout "fullscreen", only: [ :index, :new, :show, :results ]
+
+  # #generate runs CommonQuestionGenerator plus QuestionTypeClassifier — two
+  # Claude calls per request, on a form post (P0-4).
+  throttle_ai to: 20, within: 1.hour, name: "ai-question-set", respond: :html, only: %i[ generate ]
+  cap_ai_spend respond: :html, only: %i[ generate ]
 
   before_action :set_set, only: [ :show, :update, :destroy, :results, :add_question, :update_question, :destroy_question ]
 

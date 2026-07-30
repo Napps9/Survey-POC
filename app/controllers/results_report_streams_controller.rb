@@ -5,8 +5,15 @@ class ResultsReportStreamsController < ApplicationController
   include ActionController::Live
   include GeneratesResultsReport
   include LimitsConcurrentStreams
+  include ThrottlesAiSpend
 
   limit_concurrent_streams only: :show
+
+  # Same reasoning as the summaries: a plain open replays the cached markdown
+  # and costs nothing, so this isn't counted against the daily cap. The limit
+  # is lower than the chat's because ?regenerate=1 forces a full report — the
+  # single most expensive Claude call in the app (P0-4).
+  throttle_ai to: 30, within: 1.hour, name: "ai-report", respond: :plain, only: %i[ show ]
 
   def show
     survey = Current.organisation.surveys.find(params[:survey_id])

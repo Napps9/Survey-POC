@@ -2,8 +2,14 @@ class SurveyChatsController < ApplicationController
   include ActionController::Live
   include AggregatesSurveyResults
   include LimitsConcurrentStreams
+  include ThrottlesAiSpend
 
   limit_concurrent_streams only: :create
+
+  # One Claude call per message sent. The slot pool below bounds how many run at
+  # once; this bounds how many one user can start (P0-4). Generous, because a
+  # real conversation is a run of messages in quick succession.
+  throttle_ai to: 60, within: 1.hour, name: "ai-chat", respond: :plain, only: %i[ create ]
 
   def create
     survey    = Current.organisation.surveys.find(params[:survey_id])

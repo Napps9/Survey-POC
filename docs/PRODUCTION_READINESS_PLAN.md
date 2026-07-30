@@ -33,14 +33,13 @@ readable against the audit it came from._
    location + birth date, and the consent gate is still optional: a Verto can be
    published collecting both with no gate at all. The pages (`/privacy`,
    `/terms`) and the audit trail exist; the requirement doesn't (P0-6).
-5. 🟠 **No spend guardrails on the editor** — the public player and auth are
-   rate-limited, but `SurveysController`'s Claude endpoints are not, so a
-   signed-in user (or a double-click) can queue unbounded paid generations
-   (P0-4).
+5. ~~🟠 **No spend guardrails on the editor**~~ — **fixed** (P0-4): per-user
+   hourly limits on every Claude endpoint plus a per-organisation daily cap.
+   The client-side "disable the button while it's in flight" polish remains.
 
-The live top three are now items 4 and 5 above, plus **P0-7 (GDPR data-subject
-rights)** and **P0-8 (email verification + terms acceptance)** — the remaining
-compliance work.
+What's left in P0 is entirely compliance: **P0-6 (consent is still optional on
+Vertos that collect location and birth date)**, **P0-7 (GDPR data-subject
+rights)** and **P0-8 (email verification + terms acceptance)**.
 
 Plus, commercially: **there is no billing, subscription, or usage metering of any
 kind** — a prerequisite for a paid "customer-ready" product.
@@ -69,7 +68,7 @@ Effort estimates are rough (S ≤ half-day, M ≈ 1–2 days, L ≈ 3–5 days).
 | ~~P0-1~~ | ~~**Move Active Storage off ephemeral disk**~~ **Done** — a 1GB Render persistent disk is mounted at `/rails/storage`, which is where `:local` writes (WORKDIR is `/rails`); `bin/docker-entrypoint` also handles the root-owned-mount case. Trade-off taken knowingly: a disk pins the service to one instance and swaps zero-downtime deploys for a brief stop/start. | Prevented silent, customer-visible data loss on every deploy. | S–M | `render.yaml:36-39`, `bin/docker-entrypoint:14-20` |
 | ~~P0-2~~ | ~~**Add error tracking + uptime monitoring**~~ **Done in code** — `sentry-rails` with `config/initializers/sentry.rb` and a `SENTRY_DSN` env var, plus `healthCheckPath: /up` pointing at a DB-verifying action. The external uptime check is an ops task, not a repo change. | Without it you won't know when prod breaks. | S | `config/initializers/sentry.rb`, `render.yaml:99` |
 | ~~P0-3~~ | ~~**Get AI work off request threads**~~ **Done** — Solid Queue in-process (`solid_queue_mode :async`) with `BuildVertoJob`, `FinishVertoSetupJob`, `GenerateFlowJob` and `RenderReportPdfJob`. The streaming endpoints still hold a thread by design; they are bounded by the slot pool and exempted from `rack-timeout`. | Removed the 3-concurrent-call → app-wide 502 failure mode. | L | `app/jobs/`, `config/puma.rb` |
-| P0-4 | **Rate-limit + quota the AI editor endpoints** — `rate_limit` is in place on the public player (`submit`, `progress`/`grade`, `results`/`scores`/`regions`, `location_search`) and on auth (`sessions`, `passwords`, `registrations`), but **`SurveysController` has none**: `create`, `generate_card`, `generate_flow`, `optimise_card`, `resume_import`, `moderate_image` are all unthrottled for a signed-in user. Add per-user limits and a per-org daily generation cap. Now meaningful, since P0-5 made the counters durable. | Runaway Anthropic spend; a signed-in user can queue unbounded Claude work. | M | `surveys_controller.rb` (no `rate_limit`), `player_controller.rb:14-25` |
+| ~~P0-4~~ | ~~**Rate-limit + quota all AI endpoints**~~ **Done (server side)** — `ThrottlesAiSpend` adds per-user hourly limits on every Claude endpoint (deck generation and the imports at 20/h, per-card generate/optimise/moderate at 120/h, chat at 60/h, summaries and the report stream at 30/h, Pexels at 60/h) plus a per-organisation daily ceiling, `AI_DAILY_GENERATION_CAP`, default 300. The summaries and report stream are rate-limited but deliberately **not** counted against the daily cap — both replay a cache when the response count hasn't moved, so most requests there spend nothing. **Still open:** disabling the editor's submit buttons client-side while a request is in flight. | Runaway Anthropic spend; a signed-in user or a stuck retry loop could queue unbounded paid generations. | M | `concerns/throttles_ai_spend.rb`, `surveys_controller.rb` |
 | ~~P0-5~~ | ~~**Configure a durable, shared cache store**~~ **Done** — Solid Cache on the primary database (no separate `cache` database; the generator's template default would have pointed at one that doesn't exist), 64MB cap. **Correction to the original note:** only Rails' own `rate_limit` counters and `NominatimClient`'s geocode cache used `Rails.cache` — `TranslationCache` and the results-report markdown are database columns and were never affected. | Made every `rate_limit` in the app a real throttle instead of a per-process counter reset by each deploy. | S | `config/cache.yml`, `production.rb`, `CreateSolidCacheTables` |
 | P0-6 | **Enforce the consent baseline** — the *pages* shipped (`/privacy`, `/terms`, `/cookie_policy`, footer links, cookie-consent banner) and the consent gate exists in two forms (survey-level `consent_text` and the `consent_gate` card). What is still missing is the **enforcement**: `consent_gated?` is advisory, so a Verto collecting location or birth date can still be published with no gate at all. | Compliance blocker for collecting respondent PII. The consent *audit trail* is well-built — it just isn't required. | S | `survey.rb:1012-1019` (`consent_required?` optional), `legal_controller.rb` |
 | P0-7 | **GDPR data-subject rights** — respondent data export + per-respondent deletion/anonymization (by token/email); a documented retention policy. | Legal requirement; today PII can only be removed by destroying the whole Verto. | M | `verto_csv_importer.rb:155` |
