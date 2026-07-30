@@ -93,14 +93,22 @@
         <%= form_with url: organisation_assets_path(current_organisation),
               method: :post,
               multipart: true,
-              data: { turbo: false },
+              data: { turbo: false,
+                      controller: "asset-upload",
+                      asset_upload_remaining_value: Organisation::MAX_ASSETS - assets.size,
+                      asset_upload_max_bytes_value: Organisation::ASSET_MAX_BYTES,
+                      asset_upload_accept_value: Organisation::ASSET_CONTENT_TYPES.join(",") },
               html: { style: "display:flex;flex-wrap:wrap;align-items:center;gap:10px;" } do %>
           <%= file_field_tag "assets[]",
                 multiple: true,
-                accept: "image/png,image/jpeg,image/gif,image/svg+xml,image/webp",
+                accept: Organisation::ASSET_CONTENT_TYPES.join(","),
+                data: { asset_upload_target: "input", action: "change->asset-upload#check" },
                 style: "flex:1;min-width:200px;padding:10px 12px;border-radius:10px;background:#272D4A;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);" %>
           <%= submit_tag "Add to library",
+                data: { asset_upload_target: "submit" },
                 style: "padding:10px 20px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;border:none;cursor:pointer;" %>
+          <div data-asset-upload-target="error" hidden
+               style="flex-basis:100%;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#FF1E6F;"></div>
         <% end %>
         <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:10px;">
           PNG, JPG, GIF, SVG or WebP · up to <%= Organisation::ASSET_MAX_BYTES / 1.megabyte %> MB each · <%= assets.size %>/<%= Organisation::MAX_ASSETS %> used.

@@ -16,12 +16,32 @@ class OrganisationsController < ApplicationController
 
   def update
     @organisation = current_organisation
-    attrs = params.require(:organisation).permit(:name, :logo, :remove_logo)
+
+    # `params.require` raises ActionController::ParameterMissing, which Rails
+    # maps to a bare 400 with no body and no `public/400.html` to fill it. From
+    # the client that is indistinguishable from the app falling over — and it is
+    # exactly what an interrupted or unparseable multipart upload produces, i.e.
+    # the case a logo upload actually hits. A missing key is a malformed
+    # request, not a crash, so answer it the way every other rejection here is
+    # answered: a status the client can read, with a reason attached.
+    attrs  = params.fetch(:organisation, ActionController::Parameters.new)
+                   .permit(:name, :logo, :remove_logo)
     remove = ActiveModel::Type::Boolean.new.cast(attrs.delete(:remove_logo))
+
+    if attrs.empty? && !remove
+      return respond_to_update(false, remove,
+                               "We didn't receive the file — the upload may have been interrupted. Please try again.")
+    end
+
     @organisation.logo.purge if remove
     ok = @organisation.update(attrs)
-    error = @organisation.errors.full_messages.to_sentence.presence || "Could not update organisation."
+    respond_to_update(ok, remove,
+                      @organisation.errors.full_messages.to_sentence.presence || "Could not update organisation.")
+  end
 
+  private
+
+  def respond_to_update(ok, remove, error)
     respond_to do |format|
       format.html do
         if ok

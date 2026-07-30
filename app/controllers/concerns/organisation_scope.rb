@@ -27,7 +27,17 @@ module OrganisationScope
     Current.user.memberships.find_by(organisation: Current.organisation)
   end
 
+  # A redirect answers an HTML request fine, but a fetch() asking for JSON gets
+  # a 302 to a page of HTML it can't parse — which reads to the caller as a
+  # mystery failure rather than "you're not an admin". Answer each in its own
+  # language.
   def require_admin!
-    redirect_to root_path, alert: "Not authorised." unless current_membership&.admin?
+    return if current_membership&.admin?
+
+    if request.format.json?
+      render json: { ok: false, error: "Not authorised." }, status: :forbidden
+    else
+      redirect_to root_path, alert: "Not authorised."
+    end
   end
 end

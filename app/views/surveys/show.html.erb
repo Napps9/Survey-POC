@@ -1032,7 +1032,11 @@
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);"
                data-controller="logo-uploader"
                data-logo-uploader-url-value="<%= organisation_path(current_organisation) %>"
-               data-logo-uploader-fallback-value="<%= image_path('playverto.svg') %>">
+               data-logo-uploader-fallback-value="<%= image_path('playverto.svg') %>"
+               <%# The model's own limits, so the pre-upload check matches the
+                   validation that would reject it server-side. %>
+               data-logo-uploader-max-bytes-value="<%= Organisation::LOGO_MAX_BYTES %>"
+               data-logo-uploader-accept-value="<%= Organisation::LOGO_CONTENT_TYPES.join(',') %>">
             <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;">Logo</div>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin:3px 0 10px;line-height:1.45;">
               Shown at the top of every Verto preview and shared play link. Applies across your organisation.
@@ -1050,7 +1054,10 @@
                         data-action="click->logo-uploader#remove"
                         <%= "hidden" unless current_organisation.logo.attached? %>
                         style="padding:9px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">Remove</button>
-                <input type="file" hidden accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                <%# Same allow-list as the model — the hardcoded one here was
+                    missing image/gif, so a GIF the server accepts was hidden
+                    by the picker. %>
+                <input type="file" hidden accept="<%= Organisation::LOGO_CONTENT_TYPES.join(',') %>"
                        data-logo-uploader-target="input"
                        data-action="change->logo-uploader#upload" />
               <% end %>
@@ -1059,7 +1066,7 @@
               <div data-logo-uploader-target="status"
                    style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:8px;"></div>
               <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:2px;">
-                PNG, JPG, SVG or WebP · transparent backgrounds work best.
+                PNG, JPG, GIF, SVG or WebP · up to <%= Organisation::LOGO_MAX_BYTES / 1.megabyte %> MB · transparent backgrounds work best.
               </div>
             <% else %>
               <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);margin-top:8px;">
