@@ -112,4 +112,56 @@ class SurveyTranslatorCacheTest < ActiveSupport::TestCase
     assert_equal "TRANSLATED", out[0]["text"]
     assert_equal "TRANSLATED", out[1]["text"]
   end
+
+  # Returns fewer cards than it was sent, and says why — the shape of a batch
+  # that ran out of output budget. MAX_TOKENS bounds the whole batch, so the
+  # bigger the batch the likelier this is.
+  class TruncatingClient
+    attr_reader :calls
+
+    def initialize
+      @calls = 0
+    end
+
+    def messages = self
+
+    def create(model:, max_tokens:, system:, tools:, tool_choice:, messages:)
+      @calls += 1
+      Struct.new(:content, :usage, :stop_reason).new(
+        [ Struct.new(:type, :input).new(:tool_use, {
+          cards: [ { text: "TRANSLATED", description: "", options: [ "A_T", "B_T" ] } ]
+        }) ],
+        Struct.new(:input_tokens, :output_tokens,
+                   :cache_creation_input_tokens, :cache_read_input_tokens).new(100, 20, 0, 0),
+        "max_tokens"
+      )
+    end
+  end
+
+  test "a truncated batch still returns, but is never cached" do
+    fake = TruncatingClient.new
+    translator = SurveyTranslator.new(api_key: "x")
+    translator.instance_variable_set(:@client, fake)
+
+    cards = [
+      { "type" => "multiple_choice", "text" => "One", "description" => "", "options" => [ "A", "B" ] },
+      { "type" => "multiple_choice", "text" => "Two", "description" => "", "options" => [ "C", "D" ] }
+    ]
+
+    out = translator.call(cards: cards, target_locale: "es", source_locale: "en")
+
+    # The request still succeeds — a partly translated deck beats none — and the
+    # shortfall falls back to source text rather than erroring.
+    assert_equal 2, out.size
+    assert_equal "TRANSLATED", out[0]["text"]
+    assert_equal "Two", out[1]["text"], "the truncated tail falls back to source text"
+
+    # The important half: source text must NOT be cached as if it were a
+    # translation, or the gap becomes permanent and invisible.
+    assert_equal 0, TranslationCache.count, "a truncated batch must not poison the cache"
+
+    # And a retry gets a fresh attempt rather than a cache hit.
+    translator.call(cards: cards, target_locale: "es", source_locale: "en")
+    assert_equal 2, fake.calls, "the retry must reach the API again"
+  end
 end

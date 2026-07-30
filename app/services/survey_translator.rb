@@ -131,9 +131,23 @@ class SurveyTranslator
 
     translated_misses = align(miss_cards, Array(deep_stringify(input_of(block))["cards"]))
 
-    # Write each miss back to the cache so the next call hits it.
-    miss_cards.zip(translated_misses).each do |card, translation|
-      TranslationCache.write(card, source_locale: source_locale, target_locale: target_locale, translation: translation)
+    # A batch whose output hit the token ceiling returns fewer cards than it was
+    # given, and `align` backfills the shortfall with SOURCE-language text rather
+    # than failing. That is the right call for a live request — a partly
+    # translated deck beats none — but caching it would make the gap permanent
+    # and invisible. So on truncation: report it, and skip the cache write so the
+    # next attempt gets a clean run at these cards.
+    if truncated?(response)
+      ErrorReporting.report(
+        "SurveyTranslator",
+        RuntimeError.new("translation truncated at #{MAX_TOKENS} output tokens — #{miss_cards.size} cards sent, cache write skipped"),
+        target_locale: target_locale.to_s, cards: miss_cards.size
+      )
+    else
+      # Write each miss back to the cache so the next call hits it.
+      miss_cards.zip(translated_misses).each do |card, translation|
+        TranslationCache.write(card, source_locale: source_locale, target_locale: target_locale, translation: translation)
+      end
     end
 
     # Merge cache hits + fresh translations into the source-aligned shape.
@@ -173,6 +187,13 @@ class SurveyTranslator
 
       #{JSON.pretty_generate(payload)}
     MSG
+  end
+
+  # Did the model run out of output budget mid-batch? `try` rather than a direct
+  # read because the suite's client fakes are minimal Structs that carry only
+  # the fields they need — an absent stop_reason simply means "not truncated".
+  def truncated?(response)
+    response.try(:stop_reason).to_s == "max_tokens"
   end
 
   # Force the output to match the source's shape exactly, falling back to source

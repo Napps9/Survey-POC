@@ -647,13 +647,15 @@ class SurveysController < ApplicationController
       locale:         survey.default_locale
     )
 
-    cards = result["cards"].map do |card|
-      # Stamp cids now (same as render_card) so each card is a valid routing
-      # target the moment the client splices it in.
-      card["cid"] = "c_#{SecureRandom.hex(3)}"
-      card = translate_card!(card, survey)
-      { cid: card["cid"], html: render_card_html(survey, card) }
-    end
+    # Stamp cids now (same as render_card) so each card is a valid routing
+    # target the moment the client splices it in.
+    generated = Array(result["cards"]).each { |card| card["cid"] = "c_#{SecureRandom.hex(3)}" }
+    # One translation pass for the whole flow rather than one per card — see
+    # translate_cards! for why that distinction is the difference between 5
+    # Claude calls and 30.
+    generated = translate_cards!(generated, survey)
+
+    cards = generated.map { |card| { cid: card["cid"], html: render_card_html(survey, card) } }
     render json: { ok: true, name: result["name"], cards: cards }
   rescue => e
     ErrorReporting.report("SurveysController#generate_flow", e)
@@ -981,18 +983,38 @@ class SurveysController < ApplicationController
     VertoGeneration.translate_survey!(survey)
   end
 
-  # Translate a single freshly-generated card into the Verto's secondary
-  # languages, returning the card with its i18n map populated.
-  def translate_card!(card, survey)
-    return card unless survey.secondary_locales.any?
+  # Translate freshly-generated cards into the Verto's secondary languages,
+  # returning them with their i18n maps populated.
+  #
+  # ONE translator call per locale carrying the whole batch — never one per card.
+  # SurveyTranslator is built for that: it runs TranslationCache.lookup_many over
+  # the array and sends only the misses, in a single Claude call. Translating
+  # card-by-card defeated both, so a 6-card flow on a 5-language Verto fired 30
+  # sequential calls, each bounded at ANTHROPIC_TIMEOUT_SECONDS, on one of only
+  # three Puma threads — an editor action that could 502 the instance by itself.
+  #
+  # Mirrors VertoGeneration.translate_survey!, including the rescue position:
+  # it sits INSIDE the loop so one failing locale doesn't discard the merges
+  # already accumulated for the others.
+  #
+  # Order is load-bearing — merge_card_translations pairs source to translation
+  # by index — so never filter or reorder between the call and the merge.
+  def translate_cards!(cards, survey)
+    return cards unless survey.secondary_locales.any?
 
     survey.secondary_locales.each do |loc|
-      translated = SurveyTranslator.new.call(cards: [ card ], target_locale: loc, source_locale: survey.default_locale)
-      card = Survey.merge_card_translations([ card ], loc, translated).first
+      translated = SurveyTranslator.new.call(cards: cards, target_locale: loc, source_locale: survey.default_locale)
+      cards = Survey.merge_card_translations(cards, loc, translated)
     rescue => e
-      ErrorReporting.report("SurveyTranslator card", e, locale: loc)
+      ErrorReporting.report("SurveyTranslator cards", e, locale: loc)
     end
-    card
+    cards
+  end
+
+  # Single-card convenience — generate_card and optimise_card each produce one
+  # card, so their per-locale calls are the floor rather than a fan-out.
+  def translate_card!(card, survey)
+    translate_cards!([ card ], survey).first
   end
 
   # Renders a card's editor partial. With no `idx` the card is treated as a new

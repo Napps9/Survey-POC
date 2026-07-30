@@ -31,6 +31,21 @@ class GenerateFlowTest < ActionDispatch::IntegrationTest
          headers: { "Content-Type" => "application/json", "Accept" => "application/json" }
   end
 
+  # Records every SurveyTranslator call so a test can assert the call *pattern*,
+  # not just the result. Yields the recorder: an array of [locale, card_count].
+  def with_translator
+    calls = []
+    fake  = Object.new
+    fake.define_singleton_method(:call) do |cards:, target_locale:, source_locale:|
+      calls << [ target_locale.to_s, Array(cards).size ]
+      Array(cards).map { |c| { "text" => "#{target_locale}:#{c['text']}", "options" => Array(c["options"]) } }
+    end
+    SurveyTranslator.define_singleton_method(:new) { |*| fake }
+    yield calls
+  ensure
+    SurveyTranslator.singleton_class.remove_method(:new)
+  end
+
   test "returns the flow name and rendered cards with fresh unique cids" do
     result = { "name" => "UK",
                "cards" => [
@@ -80,6 +95,47 @@ class GenerateFlowTest < ActionDispatch::IntegrationTest
       post_flow(prompt: "UK stuff")
     end
     assert_response :locked
+  end
+
+  # The regression guard for the 502 driver: a multilingual Verto used to make
+  # one translator call PER CARD PER LOCALE, so this asserts the call pattern
+  # (one per locale, each carrying the whole flow) rather than just the output.
+  # Every other fixture here is single-locale, which is exactly why the fan-out
+  # went unnoticed.
+  test "a multilingual flow translates once per locale, carrying every card" do
+    @survey.update!(locales: %w[en es fr])
+    result = { "name" => "UK",
+               "cards" => [
+                 { "type" => "open_ended", "text" => "How is local transport?" },
+                 { "type" => "yes_no", "text" => "Are energy prices fair?", "options" => %w[Yes No] },
+                 { "type" => "open_ended", "text" => "Anything else?" }
+               ] }
+
+    calls = nil
+    with_generator(->(**) { result }) do
+      with_translator do |recorded|
+        post_flow(prompt: "UK local issues", answer: "UK")
+        calls = recorded
+      end
+    end
+
+    assert_response :success
+    assert_equal %w[es fr], calls.map(&:first).sort, "one call per secondary locale, and only those"
+    assert_equal [ 3, 3 ], calls.map(&:last), "each call carries the whole flow, not a single card"
+    assert_equal 2, calls.size, "3 cards x 2 locales must be 2 calls, not 6"
+  end
+
+  test "a single-locale flow makes no translator calls at all" do
+    result = { "cards" => [ { "type" => "yes_no", "text" => "Fair?", "options" => %w[Yes No] } ] }
+    calls = nil
+    with_generator(->(**) { result }) do
+      with_translator do |recorded|
+        post_flow(prompt: "UK stuff")
+        calls = recorded
+      end
+    end
+    assert_response :success
+    assert_empty calls, "secondary_locales is empty — the translator must not be reached"
   end
 
   test "the editor renders the generate-flow modal for a logic draft" do
