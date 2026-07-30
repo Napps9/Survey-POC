@@ -17,23 +17,30 @@ whole app down at trivial concurrency.
 
 ### The five things that will hurt a real customer first
 
-1. 🔴 **Uploaded files vanish on every deploy** — Active Storage writes to the
-   container's ephemeral disk; no persistent disk/bucket is configured. Org logos
-   (shown to respondents) disappear on each release, leaving broken images and
-   dangling DB rows.
-2. 🔴 **You are blind to failures** — no error tracking, APM, or uptime
-   monitoring anywhere. Production errors only go to ephemeral STDOUT.
-3. 🔴 **~3 concurrent AI operations can 502 the whole app** — all AI generation
-   runs inline on 1 worker × 3 Puma threads, each call holding a thread up to
-   120s. Three simultaneous report/generate calls block every other request,
-   including the health check.
-4. 🔴 **No legal/consent story for the PII you collect** — respondents submit
-   location + birth date with no Privacy Policy, no Terms, and consent is
-   optional (only shown if the creator typed consent text). This is a
-   GDPR/compliance blocker for a PII-collecting product.
-5. 🟠 **No spend guardrails** — expensive Claude calls have no per-user/org rate
-   limit or quota; one account (or a double-click) can trigger unlimited paid
-   generations.
+_Updated 2026-07-30. The original five were written in July; three have since
+shipped and are struck through here rather than deleted, so the list stays
+readable against the audit it came from._
+
+1. ~~🔴 **Uploaded files vanish on every deploy**~~ — **fixed** (P0-1): a Render
+   persistent disk is mounted at `/rails/storage`.
+2. ~~🔴 **You are blind to failures**~~ — **fixed in code** (P0-2): Sentry plus a
+   DB-verifying `/up`. An external uptime check is still an ops task.
+3. ~~🔴 **~3 concurrent AI operations can 502 the whole app**~~ — **fixed**
+   (P0-3 and P1-5): AI generation runs in Solid Queue jobs, flow translation
+   batches one Claude call per locale instead of per card per locale, the public
+   grade endpoint is bulkheaded, and `rack-timeout` bounds every request.
+4. 🔴 **No enforced consent for the PII you collect** — respondents submit
+   location + birth date, and the consent gate is still optional: a Verto can be
+   published collecting both with no gate at all. The pages (`/privacy`,
+   `/terms`) and the audit trail exist; the requirement doesn't (P0-6).
+5. 🟠 **No spend guardrails on the editor** — the public player and auth are
+   rate-limited, but `SurveysController`'s Claude endpoints are not, so a
+   signed-in user (or a double-click) can queue unbounded paid generations
+   (P0-4).
+
+The live top three are now items 4 and 5 above, plus **P0-7 (GDPR data-subject
+rights)** and **P0-8 (email verification + terms acceptance)** — the remaining
+compliance work.
 
 Plus, commercially: **there is no billing, subscription, or usage metering of any
 kind** — a prerequisite for a paid "customer-ready" product.
@@ -59,12 +66,12 @@ Effort estimates are rough (S ≤ half-day, M ≈ 1–2 days, L ≈ 3–5 days).
 
 | # | Item | Why | Effort | Evidence |
 |---|------|-----|--------|----------|
-| P0-1 | **Move Active Storage off ephemeral disk** — configure S3/GCS (stubs already in `config/storage.yml`) or a Render persistent disk mounted at `/rails/storage`. | Prevents silent, customer-visible data loss on every deploy. | S–M | `production.rb:40`, `render.yaml` (no disk), `organisation.rb:13` |
-| P0-2 | **Add error tracking + uptime monitoring** — `sentry-ruby`/`sentry-rails` + `SENTRY_DSN`; an uptime check against a DB-touching health endpoint. | Without it you won't know when prod breaks. | S | no APM gem in `Gemfile` |
-| P0-3 | **Get AI work off request threads** — introduce a background queue (**Solid Queue** on the existing Postgres) and move survey generation, translation, report/summary, PDF & Forms import to jobs; UI polls or streams job status. | Removes the 3-concurrent-call → app-wide 502 failure mode. | L | `surveys_controller.rb:89,770`, `results_report_streams_controller.rb:6,15`, empty `app/jobs/` |
-| P0-4 | **Rate-limit + quota all AI endpoints** — `rate_limit` on `create`, `generate_card`, `optimise_card`, `import_pdf`, `import_google_form`, `moderate_image`, common-question generation; a per-org daily generation cap; disable submit buttons client-side. | Stops runaway spend and abuse; adds idempotency against double-submits. | M | `surveys_controller.rb:89,133,193,259,449,476` |
-| P0-5 | **Configure a durable, shared cache store** — `config.cache_store = :solid_cache_store` (Postgres). | `Rails.cache` currently defaults to per-process memory/file store on ephemeral disk, so **rate-limit counters and geocode caches reset on every deploy** and aren't shared across workers — the brute-force limit is effectively multiplied. | S | `production.rb:71`; noted by security, AI, and infra reviews |
-| P0-6 | **Legal + consent baseline** — add `/terms` and `/privacy` pages, a persistent footer with those links (app **and** player layouts), and a cookie-consent notice; **enforce** a baseline consent + privacy-link gate on any Verto collecting demographic/PII data. | Compliance blocker for collecting respondent PII (location, birth date). The consent *audit trail* is already well-built — it just isn't required. | M | no legal routes/views; `survey.rb:241` (consent optional); `player/show.html.erb` |
+| ~~P0-1~~ | ~~**Move Active Storage off ephemeral disk**~~ **Done** — a 1GB Render persistent disk is mounted at `/rails/storage`, which is where `:local` writes (WORKDIR is `/rails`); `bin/docker-entrypoint` also handles the root-owned-mount case. Trade-off taken knowingly: a disk pins the service to one instance and swaps zero-downtime deploys for a brief stop/start. | Prevented silent, customer-visible data loss on every deploy. | S–M | `render.yaml:36-39`, `bin/docker-entrypoint:14-20` |
+| ~~P0-2~~ | ~~**Add error tracking + uptime monitoring**~~ **Done in code** — `sentry-rails` with `config/initializers/sentry.rb` and a `SENTRY_DSN` env var, plus `healthCheckPath: /up` pointing at a DB-verifying action. The external uptime check is an ops task, not a repo change. | Without it you won't know when prod breaks. | S | `config/initializers/sentry.rb`, `render.yaml:99` |
+| ~~P0-3~~ | ~~**Get AI work off request threads**~~ **Done** — Solid Queue in-process (`solid_queue_mode :async`) with `BuildVertoJob`, `FinishVertoSetupJob`, `GenerateFlowJob` and `RenderReportPdfJob`. The streaming endpoints still hold a thread by design; they are bounded by the slot pool and exempted from `rack-timeout`. | Removed the 3-concurrent-call → app-wide 502 failure mode. | L | `app/jobs/`, `config/puma.rb` |
+| P0-4 | **Rate-limit + quota the AI editor endpoints** — `rate_limit` is in place on the public player (`submit`, `progress`/`grade`, `results`/`scores`/`regions`, `location_search`) and on auth (`sessions`, `passwords`, `registrations`), but **`SurveysController` has none**: `create`, `generate_card`, `generate_flow`, `optimise_card`, `resume_import`, `moderate_image` are all unthrottled for a signed-in user. Add per-user limits and a per-org daily generation cap. Now meaningful, since P0-5 made the counters durable. | Runaway Anthropic spend; a signed-in user can queue unbounded Claude work. | M | `surveys_controller.rb` (no `rate_limit`), `player_controller.rb:14-25` |
+| ~~P0-5~~ | ~~**Configure a durable, shared cache store**~~ **Done** — Solid Cache on the primary database (no separate `cache` database; the generator's template default would have pointed at one that doesn't exist), 64MB cap. **Correction to the original note:** only Rails' own `rate_limit` counters and `NominatimClient`'s geocode cache used `Rails.cache` — `TranslationCache` and the results-report markdown are database columns and were never affected. | Made every `rate_limit` in the app a real throttle instead of a per-process counter reset by each deploy. | S | `config/cache.yml`, `production.rb`, `CreateSolidCacheTables` |
+| P0-6 | **Enforce the consent baseline** — the *pages* shipped (`/privacy`, `/terms`, `/cookie_policy`, footer links, cookie-consent banner) and the consent gate exists in two forms (survey-level `consent_text` and the `consent_gate` card). What is still missing is the **enforcement**: `consent_gated?` is advisory, so a Verto collecting location or birth date can still be published with no gate at all. | Compliance blocker for collecting respondent PII. The consent *audit trail* is well-built — it just isn't required. | S | `survey.rb:1012-1019` (`consent_required?` optional), `legal_controller.rb` |
 | P0-7 | **GDPR data-subject rights** — respondent data export + per-respondent deletion/anonymization (by token/email); a documented retention policy. | Legal requirement; today PII can only be removed by destroying the whole Verto. | M | `verto_csv_importer.rb:155` |
 | P0-8 | **Email verification + Terms acceptance at signup** — Rails `generates_token_for :email_confirmation` + mailer; a required "I agree to Terms & Privacy" checkbox persisted on the user. | Prevents signup with unowned emails; records consent to terms. | M | `registrations_controller.rb`, `registrations/new.html.erb` |
 
@@ -75,10 +82,10 @@ Effort estimates are rough (S ≤ half-day, M ≈ 1–2 days, L ≈ 3–5 days).
 ### Infrastructure & ops
 | # | Item | Effort | Evidence |
 |---|------|--------|----------|
-| P1-1 | **Fix ActionCable backend** — production `cable.yml` points at a nonexistent Redis (`localhost:6379`) and the `redis` gem is commented out. Switch to `solid_cable` (Postgres) or `async` (single instance). Latent today (no broadcasts), fails the moment one is added. | S | `config/cable.yml:7-9`, `Gemfile:24` |
+| ~~P1-1~~ | ~~**Fix ActionCable backend**~~ **Done** — `cable.yml` production is `solid_cable` on the primary database, polling at 0.5s rather than the generated 0.1s. | S | `config/cable.yml`, `CreateSolidCableTables` |
 | P1-2 | **Verify & document DB + storage backups** — confirm Render Postgres backup retention, add a `pg_dump`-to-bucket job if needed, offsite the storage bucket; write down RPO/RTO and a rollback runbook. | M | `render.yaml:101`; no backup config in repo |
-| P1-3 | **DB-verifying health check** — point `/up` at an action that runs `ActiveRecord::Base.connection.verify!` so a DB outage actually fails the health check. | S | `render.yaml:17`, `routes.rb:44` |
-| P1-4 | **Gate migrations on deploy** — move `db:prepare` out of the boot entrypoint into Render's `preDeployCommand` (runs once, gated); keep migrations backward-compatible; add statement timeouts. | S | `bin/docker-entrypoint:12-14` |
+| ~~P1-3~~ | ~~**DB-verifying health check**~~ **Done** — `/up` routes to `HealthController#show`, which runs `verify!` on a checked-out connection and returns 503 on failure. | S | `health_controller.rb`, `routes.rb:53` |
+| P1-4 | **Gate migrations on deploy — step 2 of 2** — `preDeployCommand: bundle exec rails db:prepare` is in `render.yaml` (step 1). `bin/docker-entrypoint` still runs `db:prepare` on every container start, so a bad migration takes the running instance down on its next restart instead of blocking the deploy. Remove it from the entrypoint once the pre-deploy step is confirmed in a Render deploy log. Statement timeouts still to add. | S | `bin/docker-entrypoint:22-27`, `render.yaml:27` |
 | ~~P1-5~~ | ~~**Add `rack-timeout`** to bound all thread occupancy (reinforces P0-3).~~ **Done** — three tiers keyed off named routes: streams exempt, Claude/import/export endpoints at 240s, everything else at 45s. | S | `lib/request_timeout.rb`, `config/initializers/rack_timeout.rb` |
 | P1-6 | **Back up AR encryption keys** — the three `ACTIVE_RECORD_ENCRYPTION_*` keys are Render-generated and live nowhere the owner controls; if the service is recreated, all stored Google tokens become permanently undecryptable. Record them in a secret store; add `previous_keys` before any rotation. | S | `render.yaml:67-73` |
 

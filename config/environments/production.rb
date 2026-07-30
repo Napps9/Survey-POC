@@ -67,8 +67,14 @@ Rails.application.configure do
   # want to log everything, set the level to "debug".
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
-  # Use a different cache store in production.
-  # config.cache_store = :mem_cache_store
+  # Rails.cache on the primary database (see config/cache.yml). Without this the
+  # store fell back to a per-process, in-memory default, which quietly made
+  # every `rate_limit` in the app weaker than it reads: counters lived in one
+  # Puma process and were wiped by each deploy and each memory-watchdog restart.
+  # This line is also what carries the store to the throttles — `rate_limit`
+  # resolves `store:` from ActionController::Base.cache_store, which Rails
+  # derives from this during initialization, before the controllers load.
+  config.cache_store = :solid_cache_store
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # Solid Queue on the primary database — see CreateSolidQueueTables for why the

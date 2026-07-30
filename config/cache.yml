@@ -1,0 +1,28 @@
+default: &default
+  store_options:
+    # Solid Cache trims on write, so this is the ceiling the cache settles
+    # around rather than a hard cap. 64MB, not the generated 256MB: this shares
+    # one small Render Postgres with every application table, and the only
+    # things cached here are tiny — Rails' rate-limit counters and
+    # NominatimClient's geocode lookups.
+    max_size: <%= 64.megabytes %>
+    # Expiry is left on the gem default (:thread) deliberately. Routing it
+    # through Solid Queue instead would be a better fit for this process, but
+    # `expiry_method` is validated against the SYMBOLS :thread/:job and YAML
+    # can only give it the string "job", which the gem rejects at boot. The
+    # default is bounded anyway: one FixedThreadPool(1) that discards overflow.
+    namespace: <%= Rails.env %>
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  # No `database:` key. The generated template defaults to `database: cache`,
+  # which would look for a second database entry that doesn't exist here —
+  # Solid Cache goes in the PRIMARY database for the same reason Solid Queue
+  # and Solid Cable do: one small Postgres, where a second connection pool
+  # against the same server spends connections for no isolation.
+  <<: *default

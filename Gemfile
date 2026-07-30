@@ -46,6 +46,16 @@ gem "solid_queue", "~> 1.1"
 # gem was commented out (P1-1) — latent until the first broadcast, which this is.
 gem "solid_cable", "~> 3.0"
 
+# Rails.cache on the existing database. Production had no cache_store set, so it
+# fell back to a per-process memory store, which is not a throttle: the
+# rate-limit counters in SessionsController, PasswordsController,
+# RegistrationsController and PlayerController were counted per Puma process and
+# wiped by every deploy and every memory-watchdog restart. Those counters and
+# NominatimClient's geocode cache are the only Rails.cache users in the app —
+# TranslationCache and the results-report markdown are database columns and were
+# never affected (P0-5).
+gem "solid_cache", "~> 1.0"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
