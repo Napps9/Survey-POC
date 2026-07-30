@@ -166,6 +166,14 @@
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 12px;">
       <%= link_to t("dashboard_card.view_results"), survey_results_path(survey),
             style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
+      <%# Archiving was always reversible — deleted_at is a soft flag and the
+          kept/archived scopes have been there all along. There was simply no way
+          back from the UI, so a mis-click was effectively permanent. %>
+      <% if current_membership&.admin? %>
+        <%= button_to t("dashboard_card.restore"), restore_survey_path(survey), method: :post,
+              form: { style: "flex:1;display:flex;margin:0;" },
+              style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(1,234,203,0.14);border:1px solid rgba(1,234,203,0.32);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;white-space:nowrap;" %>
+      <% end %>
     </div>
     <% if current_membership&.admin? %>
       <div style="padding:0 16px 12px;display:flex;justify-content:flex-end;">

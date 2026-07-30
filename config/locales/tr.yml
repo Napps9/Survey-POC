@@ -176,6 +176,7 @@ tr:
       delete_card_confirm: Bu kart silinsin mi?
       confirm_delete: "Gerçekten silinsin mi?"
       unsaved: Kaydedilmemiş değişiklikler
+      undo_restored: 'Kart geri alındı'
       saving: Kaydediliyor…
       saved: "%{time} kaydedildi"
       save_failed: 'Kaydetme başarısız: %{msg}'
@@ -788,6 +789,7 @@ tr:
     duplicate: Çoğalt
     delete: Sil
     delete_forever: Kalıcı olarak sil
+    restore: 'Geri al'
     edit_warning: '"%{title}" canlı. Yanıt toplarken soruları düzenlemek veri kalitesini etkileyecektir — düzenlemeden önceki ve sonraki yanıtlar doğrudan karşılaştırılamaz. Devam edilsin mi?'
     delete_warning: '"%{title}" silinsin mi? Silinen bir Verto''yu geri alamazsınız. Yanıtlayıcıların bağlantısı çalışmayı durduracak — mevcut sonuçlar Arşivlenenler listenizde kalır.'
     delete_forever_warning: '"%{title}" kalıcı olarak silinsin? Tüm yanıtlar, paylaşımlar ve veriler silinecek. Bu işlem geri alınamaz.'

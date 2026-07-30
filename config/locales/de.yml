@@ -176,6 +176,7 @@ de:
       delete_card_confirm: Diese Karte löschen?
       confirm_delete: "Wirklich löschen?"
       unsaved: Ungespeicherte Änderungen
+      undo_restored: 'Karte wiederhergestellt'
       saving: Wird gespeichert…
       saved: Gespeichert %{time}
       save_failed: 'Speichern fehlgeschlagen: %{msg}'
@@ -788,6 +789,7 @@ de:
     duplicate: Duplizieren
     delete: Löschen
     delete_forever: Dauerhaft löschen
+    restore: 'Wiederherstellen'
     edit_warning: "„%{title}“ ist live. Das Bearbeiten von Fragen, während Antworten gesammelt werden, beeinträchtigt die Datenqualität — Antworten von vor und nach der Bearbeitung sind nicht direkt vergleichbar. Fortfahren?"
     delete_warning: "„%{title}“ löschen? Ein gelöschtes Verto lässt sich nicht wiederherstellen. Der Link für Teilnehmende funktioniert nicht mehr — bestehende Ergebnisse bleiben in deiner Archiv-Liste."
     delete_forever_warning: '"%{title}" dauerhaft löschen? Alle Antworten, Freigaben und Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden.'

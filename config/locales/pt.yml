@@ -176,6 +176,7 @@ pt:
       delete_card_confirm: Eliminar este cartão?
       confirm_delete: "Eliminar mesmo?"
       unsaved: Alterações não guardadas
+      undo_restored: 'Cartão restaurado'
       saving: A guardar…
       saved: Guardado %{time}
       save_failed: 'Falha ao guardar: %{msg}'
@@ -788,6 +789,7 @@ pt:
     duplicate: Duplicar
     delete: Eliminar
     delete_forever: Deletar permanentemente
+    restore: 'Restaurar'
     edit_warning: "“%{title}” está ao vivo. Editar perguntas enquanto está a recolher respostas afetará a qualidade dos dados — as respostas antes e depois da edição não serão diretamente comparáveis. Continuar?"
     delete_warning: Eliminar “%{title}”? Não é possível recuperar um Verto após eliminação. O link dos respondentes deixará de funcionar — os resultados existentes permanecem na sua lista de Arquivados.
     delete_forever_warning: Deletar permanentemente "%{title}"? Todas as respostas, compartilhamentos e dados serão apagados. Isso não pode ser desfeito.

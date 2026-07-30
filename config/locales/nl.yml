@@ -176,6 +176,7 @@ nl:
       delete_card_confirm: Deze kaart verwijderen?
       confirm_delete: "Echt verwijderen?"
       unsaved: Niet-opgeslagen wijzigingen
+      undo_restored: 'Kaart hersteld'
       saving: Opslaan…
       saved: Opgeslagen %{time}
       save_failed: 'Opslaan mislukt: %{msg}'
@@ -788,6 +789,7 @@ nl:
     duplicate: Dupliceren
     delete: Verwijderen
     delete_forever: Voor altijd verwijderen
+    restore: 'Herstellen'
     edit_warning: "“%{title}” is live. Het bewerken van vragen terwijl er reacties worden verzameld, heeft invloed op de datakwaliteit — antwoorden van vóór en na de bewerking zijn niet rechtstreeks vergelijkbaar. Doorgaan?"
     delete_warning: "“%{title}” verwijderen? Een verwijderde Verto kun je niet terughalen. De link voor respondenten werkt niet meer — bestaande resultaten blijven in je Archief staan."
     delete_forever_warning: Permanent "%{title}" verwijderen? Alle reacties, delingen en gegevens worden gewist. Dit kan niet ongedaan worden gemaakt.

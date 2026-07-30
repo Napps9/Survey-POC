@@ -39,7 +39,7 @@ class SurveysController < ApplicationController
   SETTINGS_LOCKED_MESSAGE =
     "This Verto is live or already has responses — consent and scoring settings can't change now."
 
-  before_action :require_admin!,       only: [ :destroy, :destroy_forever, :bulk_archive, :bulk_destroy ]
+  before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy ]
   before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :update_settings, :qr ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
@@ -315,6 +315,12 @@ class SurveysController < ApplicationController
       FlowCompiler.compile!(attrs[:cards], flows_now)
       attrs[:results_summary]                = nil
       attrs[:results_summary_response_count] = nil
+      # Anything that left the deck goes to the bin, so it can be restored after
+      # a reload — the one thing in-session undo can't survive. Computed from the
+      # SAVED deck rather than from a client signal, so a delete is caught however
+      # it happened (the card row's button, a flow dissolve, a bulk edit).
+      attrs[:deleted_cards] =
+        Survey.record_deleted_cards(survey.cards, attrs[:cards], survey.deleted_cards)
     elsif attrs.key?(:flows)
       # Flows changed without cards (the editor always sends both, but the
       # invariant shouldn't depend on that): recompile the stored deck so
@@ -633,6 +639,27 @@ class SurveysController < ApplicationController
     redirect_to root_path, notice: "“#{survey.theme.presence || survey.title.presence || 'Verto'}” deleted. Responders' link no longer works; results stay in your Archived list."
   end
 
+  # POST /surveys/:id/restore
+  # Undo an archive. Nothing about archiving destroys anything — deleted_at is a
+  # soft flag and the scopes have always been there — so this is just clearing
+  # it. It stays a DRAFT: publish_token and published_at were never touched by
+  # archiving, but re-opening a Verto to responders is a separate decision the
+  # creator should make deliberately, so unpublished_at is stamped rather than
+  # having the old link quietly go live again with the restore.
+  def restore
+    survey = Current.organisation.surveys.archived.find(params[:id])
+    attrs  = { deleted_at: nil }
+    # A Verto that had a live link comes back NOT live. Archiving never cleared
+    # publish_token, so without this the old /play link would quietly start
+    # working again the moment it's restored — re-opening to responders should be
+    # its own deliberate click.
+    attrs[:unpublished_at] = Time.current if survey.publish_token.present? && survey.unpublished_at.nil?
+    survey.update!(attrs)
+
+    redirect_to root_path,
+      notice: "“#{survey.title.presence || survey.theme.presence || 'Verto'}” restored. It's back in your drafts — publish again when you're ready."
+  end
+
   def destroy_forever
     survey = Current.organisation.surveys.archived.find(params[:id])
     name   = survey.theme.presence || survey.title.presence || "Verto"
@@ -753,6 +780,33 @@ class SurveysController < ApplicationController
   rescue => e
     ErrorReporting.report("SurveysController#generate_flow", e)
     render json: { ok: false, error: friendly_generate_error(e) }, status: :unprocessable_entity
+  end
+
+  # POST /surveys/:id/restore_card
+  # Bring a recently deleted card back, rendered ready to splice — the same
+  # contract as render_card, so the editor reuses its insertion path.
+  #
+  # The card keeps its original cid, so any route that pointed at it resolves
+  # again. Nothing is removed from the bin here: the card is only truly back once
+  # the editor's autosave stores a deck containing it, and record_deleted_cards
+  # takes it out of the bin at that point.
+  def restore_card
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.editing_locked?
+      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
+    end
+
+    body = JSON.parse(request.body.read)
+    card = survey.deleted_card(body["cid"])
+    unless card
+      return render json: { ok: false, error: "That card is no longer available to restore." },
+                    status: :not_found
+    end
+
+    render json: { ok: true, cid: card["cid"], html: render_card_html(survey, card) }
+  rescue => e
+    ErrorReporting.report("SurveysController#restore_card", e)
+    render json: { ok: false, error: "That card couldn't be restored." }, status: :unprocessable_entity
   end
 
   # POST /surveys/:id/optimise_card

@@ -176,6 +176,7 @@ fr:
       delete_card_confirm: Supprimer cette carte ?
       confirm_delete: "Vraiment supprimer ?"
       unsaved: Modifications non enregistrées
+      undo_restored: 'Carte restaurée'
       saving: Enregistrement…
       saved: Enregistré %{time}
       save_failed: 'Échec de l''enregistrement : %{msg}'
@@ -788,6 +789,7 @@ fr:
     duplicate: Dupliquer
     delete: Supprimer
     delete_forever: Supprimer définitivement
+    restore: 'Restaurer'
     edit_warning: "« %{title} » est en ligne. Modifier les questions pendant la collecte de réponses affectera la qualité des données — les réponses avant et après la modification ne seront pas directement comparables. Continuer ?"
     delete_warning: Supprimer « %{title} » ? La suppression est définitive. Le lien des répondants cessera de fonctionner — les résultats existants resteront dans votre liste Archivés.
     delete_forever_warning: Supprimer définitivement "%{title}" ? Toutes les réponses, partages et données seront effacés. Cette action est irréversible.

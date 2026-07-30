@@ -176,6 +176,7 @@ sw:
       delete_card_confirm: Futa kadi hii?
       confirm_delete: "Ufute kweli?"
       unsaved: Mabadiliko hayajahifadhiwa
+      undo_restored: 'Kadi imerejeshwa'
       saving: Inahifadhi…
       saved: Imehifadhiwa %{time}
       save_failed: 'Kuhifadhi kumeshindikana: %{msg}'
@@ -788,6 +789,7 @@ sw:
     duplicate: Nakili
     delete: Futa
     delete_forever: Futa milele
+    restore: 'Rejesha'
     edit_warning: '"%{title}" iko hai. Kuhariri maswali wakati inakusanya majibu kutaathiri ubora wa data — majibu ya kabla na baada ya uhariri hayatalinganishwa moja kwa moja. Endelea?'
     delete_warning: Futa "%{title}"? Huwezi kuirudisha Verto baada ya kufutwa. Kiungo cha wajibu kitaacha kufanya kazi — matokeo yaliyopo yatabaki katika orodha yako ya Yaliyohifadhiwa.
     delete_forever_warning: Futa milele "%{title}"? Majibu yote, upabuni, na data itafutwa. Hii haiwezi kutenduliwa.

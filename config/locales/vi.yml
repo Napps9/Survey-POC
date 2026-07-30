@@ -176,6 +176,7 @@ vi:
       delete_card_confirm: Xóa thẻ này?
       confirm_delete: "Xóa thật chứ?"
       unsaved: Thay đổi chưa lưu
+      undo_restored: 'Đã khôi phục thẻ'
       saving: Đang lưu…
       saved: Đã lưu %{time}
       save_failed: 'Lưu thất bại: %{msg}'
@@ -788,6 +789,7 @@ vi:
     duplicate: Nhân bản
     delete: Xóa
     delete_forever: Xóa vĩnh viễn
+    restore: 'Khôi phục'
     edit_warning: '"%{title}" đang trực tiếp. Việc chỉnh sửa câu hỏi khi đang thu thập phản hồi sẽ ảnh hưởng đến chất lượng dữ liệu — câu trả lời trước và sau khi chỉnh sửa sẽ không so sánh trực tiếp được. Tiếp tục?'
     delete_warning: Xóa "%{title}"? Bạn không thể khôi phục một Verto đã bị xóa. Liên kết của người phản hồi sẽ ngừng hoạt động — kết quả hiện có vẫn ở trong danh sách Lưu trữ của bạn.
     delete_forever_warning: Xóa vĩnh viễn "%{title}"? Tất cả các phản hồi, chia sẻ và dữ liệu sẽ bị xóa. Không thể hoàn tác hành động này.

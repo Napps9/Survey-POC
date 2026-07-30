@@ -104,6 +104,7 @@ Rails.application.routes.draw do
   # splices the rendered cards when they land.
   resources :flow_generations, only: [ :show ]
   post "surveys/:id/render_card",     to: "surveys#render_card",   as: :render_survey_card
+  post "surveys/:id/restore_card",    to: "surveys#restore_card",  as: :restore_survey_card
   post "surveys/:id/optimise_card",   to: "surveys#optimise_card", as: :optimise_survey_card
   get  "surveys/:id/pexels",          to: "surveys#pexels_search", as: :pexels_search_survey
   get  "surveys/:id/results/summary", to: "survey_summaries#show",  as: :survey_results_summary
@@ -112,6 +113,7 @@ Rails.application.routes.draw do
   delete "surveys/bulk_archive",        to: "surveys#bulk_archive",        as: :bulk_archive_surveys
   delete "surveys/bulk_destroy",        to: "surveys#bulk_destroy",        as: :bulk_destroy_surveys
   delete "surveys/:id/destroy_forever", to: "surveys#destroy_forever",     as: :destroy_forever_survey
+  post   "surveys/:id/restore",          to: "surveys#restore",             as: :restore_survey
   resources :surveys, only: [ :show, :update, :destroy ]
 
   # Common Questions — reusable sets attached to many Vertos

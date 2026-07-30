@@ -178,6 +178,7 @@ en:
       delete_card_confirm: "Delete this card?"
       confirm_delete: "Really delete?"
       unsaved: "Unsaved changes"
+      undo_restored: 'Card restored'
       saving: "Saving…"
       saved: "Saved %{time}"
       save_failed: "Save failed: %{msg}"
@@ -790,6 +791,7 @@ en:
     duplicate: "Duplicate"
     delete: "Delete"
     delete_forever: "Delete forever"
+    restore: 'Restore'
     edit_warning: "“%{title}” is live. Editing questions while it's collecting responses will affect data quality — answers from before and after the edit won't be directly comparable. Continue?"
     delete_warning: "Delete “%{title}”? You can't get a Verto back from being deleted. Responders' link will stop working — existing results stay in your Archived list."
     delete_forever_warning: "Permanently delete “%{title}”? All responses, shares, and data will be erased. This cannot be undone."

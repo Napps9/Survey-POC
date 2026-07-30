@@ -51,6 +51,7 @@ export default class extends Controller {
     // Which flow each multi-flow cluster is showing (cluster key → flow id).
     this._activeFlowTabs = new Map()
     this._seedStore()
+    this._bindUndo()
     this.refreshAll()
 
     // Safety net for the 1.5s autosave debounce: if the page is hidden or
@@ -70,6 +71,107 @@ export default class extends Controller {
     window.removeEventListener("pagehide", this._flushHandler)
     window.removeEventListener("beforeunload", this._flushHandler)
     document.removeEventListener("visibilitychange", this._visibilityHandler)
+    document.removeEventListener("keydown", this._undoHandler)
+  }
+
+  // ── Undo ──────────────────────────────────────────────────────────────────
+  // Operation-based, not snapshot-based, and that isn't a preference: serialize()
+  // rebuilds the deck by reading live DOM and there is no render-from-JSON path
+  // on this side, so a stored snapshot couldn't be put back. What's stored is the
+  // inverse of each structural change.
+  //
+  // For a delete that means keeping the detached .card-slot NODE. Node identity
+  // is what makes it work — type-panel keys its relocated quiz/token/logic blocks
+  // off the card element itself (a Map, not a cid), so re-inserting the same node
+  // silently reunites the card with blocks parked in the sidebar. Rebuilding an
+  // equivalent node would lose all of it.
+  //
+  // Scope, deliberately: structural card operations only. Text edits are left to
+  // the browser's own contenteditable undo, which is better at them than anything
+  // here would be. Gates, end screens and token types save through
+  // update_settings rather than serialize(), so they're outside this entirely.
+
+  MAX_UNDO = 25
+
+  _bindUndo() {
+    this._undoStack = []
+    this._undoHandler = (event) => {
+      const z = event.key === "z" || event.key === "Z"
+      if (!z || !(event.metaKey || event.ctrlKey) || event.shiftKey) return
+      // Typing? That's the browser's undo, not ours — it handles text far better.
+      const t = event.target
+      if (t?.isContentEditable || [ "INPUT", "TEXTAREA", "SELECT" ].includes(t?.tagName)) return
+      if (this.liveValue) return
+      if (!this._undoStack.length) return
+      event.preventDefault()
+      this._undoStack.pop()()
+      this._renumberAndPersist()
+    }
+    document.addEventListener("keydown", this._undoHandler)
+  }
+
+  _pushUndo(fn) {
+    this._undoStack.push(fn)
+    if (this._undoStack.length > this.MAX_UNDO) this._undoStack.shift()
+  }
+
+  // Where a slot currently sits, as a closure that puts it back there. Captured
+  // BEFORE the move, so a reorder undoes to its exact previous neighbour rather
+  // than to an index that other edits may have shifted.
+  _slotRestorer(slot) {
+    const parent = slot.parentNode
+    const next   = slot.nextElementSibling
+    return () => {
+      if (!parent) return
+      if (next && next.parentNode === parent) parent.insertBefore(slot, next)
+      else parent.appendChild(slot)
+    }
+  }
+
+  // Called by type-panel immediately BEFORE it removes a slot, so the node is
+  // captured while it's still attached and its position is still known.
+  recordCardDeletion(slot) {
+    if (!slot) return
+    const restore = this._slotRestorer(slot)
+    this._pushUndo(() => {
+      restore()
+      this.flash(t("editor.undo_restored", { default: "Card restored" }), "text-aquamarine")
+    })
+  }
+
+  // Shared tail: renumber, repaint and schedule the save that persists the undo.
+  _renumberAndPersist() {
+    this.refreshAll()
+    this.markDirty()
+  }
+
+  // Puts a server-rendered card back at the end of the feed. Used by the
+  // "Recently deleted" list, which restores across a reload — where the detached
+  // node above is long gone and only the stored card JSON remains.
+  spliceRestoredCard(html) {
+    const feed = this.hasFeedTarget ? this.feedTarget : null
+    if (!feed) return null
+
+    const tmp = document.createElement("div")
+    tmp.innerHTML = (html || "").trim()
+    const card = tmp.firstElementChild
+    if (!card) return null
+
+    const slot = document.createElement("div")
+    slot.className = "card-slot"
+    slot.appendChild(card)
+    const insertRow = feed.querySelector(".aq-insert-row")
+    if (insertRow) slot.appendChild(insertRow.cloneNode(true))
+
+    // Appended rather than put back at its old index: the deck has moved on
+    // since, and guessing a position it no longer has would be worse than a
+    // predictable landing spot the creator can drag from.
+    const lastSlot = [ ...feed.querySelectorAll(".card-slot") ].pop()
+    if (lastSlot) lastSlot.after(slot)
+    else feed.appendChild(slot)
+
+    this._renumberAndPersist()
+    return card
   }
 
   // Best-effort synchronous-ish flush of a pending autosave. Uses fetch with
@@ -261,8 +363,10 @@ export default class extends Controller {
     const hit = this._reorderNeighbor(card, slot, -1)
     const prevCard = hit?.slot.querySelector("[data-survey-editor-target='card']")
     if (!slot || !hit || !prevCard || prevCard.dataset.cardType === "welcome_card") return
+    const undo = this._slotRestorer(slot)   // captured before the move
     if (hit.hopped) hit.slot.after(slot)   // hopped a flow run ⇒ land just after it
     else hit.slot.before(slot)
+    this._pushUndo(undo)
     this._afterReorder(card)
   }
 
@@ -272,8 +376,10 @@ export default class extends Controller {
     const slot = card?.closest(".card-slot")
     const hit = this._reorderNeighbor(card, slot, 1)
     if (!slot || !hit) return
+    const undo = this._slotRestorer(slot)   // captured before the move
     if (hit.hopped) hit.slot.before(slot)  // hopped a flow run ⇒ land just before it
     else hit.slot.after(slot)
+    this._pushUndo(undo)
     this._afterReorder(card)
   }
 

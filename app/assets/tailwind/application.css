@@ -1200,6 +1200,31 @@
 .gate-editable { outline: none; border-radius: 6px; cursor: text; transition: box-shadow 0.15s; }
 .gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,234,203,0.3); }
 .gate-editable:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.55); }
+/* "Recently deleted" list in the publish panel — the restore that survives a
+   reload, where in-session undo can't. */
+.deleted-card-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 10px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+}
+.deleted-card-type {
+  font-family: 'Alata', sans-serif; font-size: var(--text-2xs);
+  letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.45);
+}
+.deleted-card-text {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.8); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.deleted-card-restore {
+  flex-shrink: 0; padding: 6px 12px; border-radius: 100px;
+  background: rgba(1,234,203,0.14); border: 1px solid rgba(1,234,203,0.32);
+  color: #01EACB; font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  cursor: pointer; transition: background 0.15s;
+}
+.deleted-card-restore:hover:not(:disabled) { background: rgba(1,234,203,0.24); }
+.deleted-card-restore:disabled { opacity: 0.5; cursor: default; }
+
 /* Respondent-code gate: a single line the respondent invents, before the deck. */
 .respondent-code-input {
   width: 100%; box-sizing: border-box; margin-top: 14px;

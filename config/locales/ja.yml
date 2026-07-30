@@ -176,6 +176,7 @@ ja:
       delete_card_confirm: このカードを削除しますか？
       confirm_delete: "本当に削除？"
       unsaved: 未保存の変更
+      undo_restored: 'カードを元に戻しました'
       saving: 保存中…
       saved: "%{time}に保存済み"
       save_failed: '保存失敗: %{msg}'
@@ -788,6 +789,7 @@ ja:
     duplicate: 複製
     delete: 削除
     delete_forever: 永遠に削除
+    restore: '復元'
     edit_warning: "「%{title}」はライブ中です。回答収集中に質問を編集するとデータの品質に影響します — 編集前後の回答は直接比較できません。続けますか？"
     delete_warning: "「%{title}」を削除しますか？削除したVertoは元に戻せません。回答者のリンクは機能しなくなりますが、既存の結果はアーカイブリストに残ります。"
     delete_forever_warning: '"%{title}"を永遠に削除しますか？すべての回答、共有、データが消去されます。この操作は取り消せません。'

@@ -176,6 +176,7 @@ it:
       delete_card_confirm: Eliminare questa carta?
       confirm_delete: "Eliminare davvero?"
       unsaved: Modifiche non salvate
+      undo_restored: 'Scheda ripristinata'
       saving: Salvataggio…
       saved: Salvato %{time}
       save_failed: 'Salvataggio non riuscito: %{msg}'
@@ -788,6 +789,7 @@ it:
     duplicate: Duplica
     delete: Elimina
     delete_forever: Elimina per sempre
+    restore: 'Ripristina'
     edit_warning: "“%{title}” è live. Modificare le domande mentre raccoglie risposte influirà sulla qualità dei dati — le risposte prima e dopo la modifica non saranno direttamente confrontabili. Continuare?"
     delete_warning: Eliminare “%{title}”? Non puoi recuperare un Verto dopo l'eliminazione. Il link per i risponditori smetterà di funzionare — i risultati esistenti restano nella tua lista Archiviati.
     delete_forever_warning: Eliminare permanentemente "%{title}"? Tutte le risposte, condivisioni e dati verranno cancellati. Questa azione non può essere annullata.

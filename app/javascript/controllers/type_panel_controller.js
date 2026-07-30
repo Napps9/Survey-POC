@@ -926,7 +926,14 @@ export default class extends Controller {
     this._disarmDelete()
     // Remove the whole slot (card + its "Add question" CTA), falling back to the
     // bare card for any context that doesn't use slots.
-    ;(card.closest(".card-slot") || card).remove()
+    const doomed = card.closest(".card-slot") || card
+    // Hand the still-attached node to the editor first: ⌘Z re-inserts THIS node,
+    // which is what reunites the card with any quiz/token/logic blocks parked in
+    // the sidebar (they're keyed off the card element, not its cid).
+    this.application
+        .getControllerForElementAndIdentifier(this.element, "survey-editor")
+        ?.recordCardDeletion(doomed)
+    doomed.remove()
     if (card === this.activeCardEl) {
       this.activeCardEl = null
       this.panelEmptyTarget.style.display  = ""

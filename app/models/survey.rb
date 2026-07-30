@@ -659,6 +659,47 @@ class Survey < ApplicationRecord
              .count.size
   end
 
+  # ── Recently deleted cards ─────────────────────────────────────────────────
+  # A bounded ring buffer of cards removed from the deck, so a deletion survives
+  # the page reload that in-session undo can't. Not a versioning gem: the need is
+  # "give me that card back", not a history of every edit.
+
+  MAX_DELETED_CARDS = 10
+
+  # Cards present in `before` but gone from `after`, newest first, capped.
+  # Matched on cid — the stable per-card id — so a reorder is never mistaken for
+  # a delete, which comparing by index would do constantly.
+  def self.record_deleted_cards(before, after, existing)
+    remaining = Array(after).filter_map { |c| c["cid"].to_s.presence if c.is_a?(Hash) }.to_set
+
+    # Anything back in the deck leaves the bin — evaluated on EVERY save, not
+    # only ones that also delete something, because a restore is precisely the
+    # save that removes nothing.
+    kept = Array(existing).reject { |e| e.is_a?(Hash) && remaining.include?(e.dig("card", "cid").to_s) }
+
+    removed = Array(before).select do |c|
+      c.is_a?(Hash) && c["cid"].to_s.present? && !remaining.include?(c["cid"].to_s)
+    end
+    return kept.first(MAX_DELETED_CARDS) if removed.empty?
+
+    entries = removed.map { |card| { "card" => card, "deleted_at" => Time.current.iso8601 } }
+    (entries + kept).first(MAX_DELETED_CARDS)
+  end
+
+  # The bin, newest first, with anything malformed dropped.
+  def recently_deleted_cards
+    Array(read_attribute(:deleted_cards)).select do |entry|
+      entry.is_a?(Hash) && entry["card"].is_a?(Hash) && entry.dig("card", "cid").present?
+    end
+  end
+
+  # Pull one card back out by cid. Returns the card hash, or nil if it's gone.
+  # Removing it from the bin is the caller's business — restoring is a client-side
+  # splice, and the card only truly returns once the deck is saved with it.
+  def deleted_card(cid)
+    recently_deleted_cards.find { |e| e.dig("card", "cid").to_s == cid.to_s }&.dig("card")
+  end
+
   # ── Free-text limits ───────────────────────────────────────────────────────
 
   # The free-text cap for the card at `index`.

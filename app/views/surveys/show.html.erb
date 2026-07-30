@@ -1070,6 +1070,33 @@
           <% end %>
         </details>
 
+        <%# Recently deleted cards. In-session undo (⌘Z) handles a mistake you
+            notice straight away; this is the one that survives a reload. %>
+        <% recently_deleted = live_locked ? [] : @survey.recently_deleted_cards %>
+        <% if recently_deleted.any? %>
+          <details class="publish-block" data-controller="deleted-cards"
+                   data-deleted-cards-url-value="<%= restore_survey_card_path(@survey) %>">
+            <summary class="publish-block-title">Recently deleted <span class="pub-chev">⌄</span></summary>
+            <div style="font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;margin-bottom:8px;">
+              The last <%= Survey::MAX_DELETED_CARDS %> cards you removed. Restoring puts one back at the end of the deck, keeping its original wiring.
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <% recently_deleted.each do |entry| %>
+                <% dcard = entry["card"] %>
+                <div class="deleted-card-row">
+                  <div style="min-width:0;flex:1;">
+                    <div class="deleted-card-type"><%= CardTypes.badge(dcard["type"]).presence || dcard["type"].to_s.tr("_", " ") %></div>
+                    <div class="deleted-card-text"><%= (dcard["title"].presence || dcard["text"].presence || "—").to_s.truncate(60) %></div>
+                  </div>
+                  <button type="button" class="deleted-card-restore"
+                          data-restore-cid="<%= dcard["cid"] %>"
+                          data-action="click->deleted-cards#restore">Restore</button>
+                </div>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+
         <%# Respondent code — links one person's answers across waves of the same
             Verto without identifying them. Only a per-survey HMAC is stored, so
             the code can't be read back or matched against another Verto. %>

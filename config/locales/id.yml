@@ -176,6 +176,7 @@ id:
       delete_card_confirm: Hapus kartu ini?
       confirm_delete: "Yakin hapus?"
       unsaved: Perubahan belum disimpan
+      undo_restored: 'Kartu dipulihkan'
       saving: Menyimpan…
       saved: Tersimpan %{time}
       save_failed: 'Gagal menyimpan: %{msg}'
@@ -788,6 +789,7 @@ id:
     duplicate: Duplikat
     delete: Hapus
     delete_forever: Hapus selamanya
+    restore: 'Pulihkan'
     edit_warning: '"%{title}" sedang live. Mengedit pertanyaan saat sedang mengumpulkan tanggapan akan memengaruhi kualitas data — jawaban sebelum dan sesudah pengeditan tidak dapat dibandingkan langsung. Lanjutkan?'
     delete_warning: Hapus "%{title}"? Verto yang dihapus tidak bisa dikembalikan. Tautan responden akan berhenti berfungsi — hasil yang ada akan tetap di daftar Diarsipkan Anda.
     delete_forever_warning: Hapus "%{title}" secara permanen? Semua respons, berbagi, dan data akan dihapus. Tindakan ini tidak dapat dibatalkan.

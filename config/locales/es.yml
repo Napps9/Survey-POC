@@ -176,6 +176,7 @@ es:
       delete_card_confirm: "¿Eliminar esta tarjeta?"
       confirm_delete: "¿Eliminar de verdad?"
       unsaved: Cambios sin guardar
+      undo_restored: 'Tarjeta restaurada'
       saving: Guardando…
       saved: Guardado %{time}
       save_failed: 'Error al guardar: %{msg}'
@@ -788,6 +789,7 @@ es:
     duplicate: Duplicar
     delete: Eliminar
     delete_forever: Eliminar permanentemente
+    restore: 'Restaurar'
     edit_warning: "«%{title}» está en vivo. Editar preguntas mientras recopila respuestas afectará la calidad de los datos — las respuestas anteriores y posteriores a la edición no serán directamente comparables. ¿Continuar?"
     delete_warning: "¿Eliminar «%{title}»? No podrás recuperar un Verto eliminado. El enlace de los participantes dejará de funcionar — los resultados existentes permanecerán en tu lista de archivados."
     delete_forever_warning: ¿Eliminar permanentemente "%{title}"? Todas las respuestas, comparticiones y datos se borrarán. Esta acción no se puede deshacer.
