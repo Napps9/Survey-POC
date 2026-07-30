@@ -112,7 +112,7 @@ Effort estimates are rough (S ≤ half-day, M ≈ 1–2 days, L ≈ 3–5 days).
 
 | # | Item | Effort | Evidence |
 |---|------|--------|----------|
-| P2-1 | **Rewrite the README** — still says "Survey POC / Rails 7.2 / nothing is persisted / auth & response storage out of scope"; every one of those is now shipped. | S | `README.md` |
+| ~~P2-1~~ | ~~**Rewrite the README**~~ **Done** — every claim in it was false: Rails 7.2 (it's 8.1), SQLite in production with an ephemeral disk (Postgres and a mounted disk), a build script that no longer exists, a four-file "Layout" section for an app with 45 controllers, and an "Out of scope" list — persistence, auth, taking the survey, response storage, sharing links — of which every single item has shipped. Replaced with the real stack, how the pieces fit, the four gates, the traps that actually catch people (capital-M `Main`, 19 locale files, the `js:` namespace, the `CACHE_VERSION` rule), and an honest status. | S | `README.md` |
 | P2-2 | **Close i18n leaks** — controller flash strings and a few view placeholders are hardcoded English despite 19 fully-localized locales (500 keys each, parity-tested). Non-English creators see English flashes. | M | `registrations_controller.rb`, `alliances_/invites_/passwords_` controllers, `_media_modal.html.erb:66` |
 | P2-3 | **Branded, localized error pages** — replace stock Rails `public/404/422/500.html`. | S | `public/*.html` |
 | P2-4 | **Accessibility audit of the player** — JS-rendered answer controls have thin ARIA/keyboard support; respondents may use assistive tech. Label inputs, add roles, manage focus between cards, check contrast. | M | `player/show.html.erb` |
