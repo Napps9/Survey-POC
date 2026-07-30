@@ -152,6 +152,21 @@
             </svg>
             <span class="editor-leave-label"><%= t("editor.leave_editor", default: "Leave editor") %></span>
           <% end %>
+          <%# Rename — writes survey-editor's titleValue, which serialize()
+              already sends as `title` and #update already accepts. The plumbing
+              was all there; nothing ever reassigned the value, so there was no
+              way to rename a Verto from the editor. Read-only once live,
+              because #update rejects any edit to a published Verto (423). %>
+          <span class="editor-verto-title<%= ' is-locked' if live_locked %>"
+                contenteditable="<%= live_locked ? 'false' : 'true' %>"
+                role="textbox"
+                spellcheck="false"
+                data-survey-editor-target="vertoTitle"
+                aria-label="<%= t("editor.verto_name", default: "Verto name") %>"
+                title="<%= t("editor.verto_name", default: "Verto name") %>"
+                data-action="input->survey-editor#renameVerto:stop
+                             keydown.enter->survey-editor#commitRename
+                             blur->survey-editor#restoreRenameIfBlank"><%= @survey.title %></span>
           <%# flash() in survey_editor_controller rewrites the inner span's
               class list (text-xs + a colour), so the pill styling lives on
               the wrapper and persistent text styling inline. %>
@@ -248,6 +263,8 @@
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
             <span class="s-badge gate-badge-consent"><%= t("editor.consent_gate", default: "Consent gate") %></span>
             <button type="button" class="card-delete-btn" style="margin-left:auto;"
+                    title="<%= t("editor.remove_consent_gate", default: "Remove consent gate") %>"
+                    aria-label="<%= t("editor.remove_consent_gate", default: "Remove consent gate") %>"
                     data-action="click->gate-cards#removeConsent">
               ✕ <span><%= t("editor.remove", default: "Remove") %></span>
             </button>
@@ -339,6 +356,8 @@
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
             <span class="s-badge gate-badge-ty"><%= t("editor.thank_you_screen", default: "Thank-you screen") %></span>
             <button type="button" class="card-delete-btn" style="margin-left:auto;"
+                    title="<%= t("editor.remove_thankyou_screen", default: "Remove thank-you screen") %>"
+                    aria-label="<%= t("editor.remove_thankyou_screen", default: "Remove thank-you screen") %>"
                     data-action="click->gate-cards#removeThankyou">
               ✕ <span><%= t("editor.remove", default: "Remove") %></span>
             </button>

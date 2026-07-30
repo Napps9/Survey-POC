@@ -691,6 +691,10 @@ ar:
     consent_gate: 'بوابة الموافقة'
     consent_default: 'بمشاركتك، فإنك توافق على إمكانية استخدام إجاباتك المجهولة لأغراض البحث.'
     thank_you_screen: 'شاشة الشكر'
+    verto_name: 'اسم الفيرتو'
+    delete_card_n: 'حذف البطاقة %{n}'
+    remove_consent_gate: 'إزالة بوابة الموافقة'
+    remove_thankyou_screen: 'إزالة شاشة الشكر'
     remove: 'إزالة'
     animation_theme: "الرسوم المتحركة"
     live_locked_bar: "هذه الـVerto نشطة — الأسئلة مقفلة لحماية جودة البيانات."

@@ -4,8 +4,10 @@ import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
 import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_types"
 
 // Card types with no answer captured — mirrors CardTypes::NON_QUESTION_TYPES
-// (app/lib/card_types.rb). welcome_card additionally stays pinned first (see
-// moveCardUp / _updateMoveButtonStates), which token_checkpoint does not.
+// (app/lib/card_types.rb). No other card may be moved ABOVE a welcome card (see
+// moveCardUp / _updateMoveButtonStates), so it opens the deck by default —
+// though it can now be nudged down itself, which token_checkpoint has always
+// been able to do.
 const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint" ]
 
 // Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
@@ -19,7 +21,7 @@ const FLOW_COLORS = [ "#8B85FF", "#01EACB", "#F59E0B", "#F472B6", "#38BDF8", "#A
 
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
-    "cardFlags", "panelOther", "panelRequired"]
+    "cardFlags", "panelOther", "panelRequired", "vertoTitle"]
   static values  = {
     url: String, title: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -722,6 +724,35 @@ export default class extends Controller {
     } catch (_) { /* leave empty */ }
     this.__rangeThemeUrls = map
     return map
+  }
+
+  // ── Rename ───────────────────────────────────────────────────────────────
+  // titleValue is what serialize() sends as `title`, and #update already
+  // accepts it — the plumbing existed, but nothing ever reassigned the value,
+  // so the editor had no way to rename a Verto. Reuses the ordinary autosave:
+  // markDirty schedules the same 1.5s save every other edit uses.
+
+  renameVerto() {
+    const el = this.vertoTitleTarget
+    const next = el.textContent.replace(/\s+/g, " ").trim()
+    if (next === this.titleValue) return
+    this.titleValue = next
+    this.markDirty()
+  }
+
+  // Enter would insert a newline into a single-line title; commit instead.
+  commitRename(event) {
+    event.preventDefault()
+    this.vertoTitleTarget.blur()
+  }
+
+  // An emptied title falls back to the last saved name rather than saving a
+  // blank one — the dashboard shows the title first now, so a blank would
+  // leave the tile with nothing to call itself.
+  restoreRenameIfBlank() {
+    const el = this.vertoTitleTarget
+    if (el.textContent.trim()) return
+    el.textContent = this.titleValue
   }
 
   markDirty() {

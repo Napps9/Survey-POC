@@ -691,6 +691,10 @@ hi:
     consent_gate: 'सहमति चरण'
     consent_default: 'भाग लेकर आप सहमत होते हैं कि आपके अनाम उत्तर शोध के लिए उपयोग किए जा सकते हैं.'
     thank_you_screen: 'धन्यवाद स्क्रीन'
+    verto_name: 'वर्टो का नाम'
+    delete_card_n: 'कार्ड %{n} हटाएँ'
+    remove_consent_gate: 'सहमति स्क्रीन हटाएँ'
+    remove_thankyou_screen: 'धन्यवाद स्क्रीन हटाएँ'
     remove: 'हटाएं'
     animation_theme: "एनिमेशन"
     live_locked_bar: "यह वर्टो लाइव है — डेटा गुणवत्ता की रक्षा के लिए सवाल लॉक हैं।"

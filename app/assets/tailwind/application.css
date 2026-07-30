@@ -1200,6 +1200,28 @@
 .gate-editable { outline: none; border-radius: 6px; cursor: text; transition: box-shadow 0.15s; }
 .gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,234,203,0.3); }
 .gate-editable:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.55); }
+/* Editable Verto name in the editor's top-left chrome. Reads as plain text
+   until hovered/focused so it doesn't compete with the cards, but is wide
+   enough to be an obvious click target. */
+.editor-verto-title {
+  max-width: 22ch;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 4px 8px; border-radius: 8px;
+  font-family: 'Alata', sans-serif; font-size: var(--text-md);
+  color: #fff; outline: none; cursor: text;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.editor-verto-title:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.18); }
+.editor-verto-title:focus {
+  background: rgba(255,255,255,0.07);
+  box-shadow: 0 0 0 2px rgba(1,234,203,0.55);
+  /* Focused means editing — show the whole name, not an ellipsis. */
+  max-width: 40ch; overflow: visible; text-overflow: clip;
+}
+.editor-verto-title.is-locked { cursor: default; opacity: 0.75; }
+.editor-verto-title.is-locked:hover { background: transparent; border-color: transparent; }
+
 /* Off-site link for the thank-you screen. Plain inputs rather than
    contenteditable: a URL is typed, pasted and corrected, not laid out, and the
    browser's url-type validation is worth having. */

@@ -29,16 +29,58 @@ class EditorReorderInsertTest < ActionDispatch::IntegrationTest
     assert_equal cards, response.body.scan('class="aq-insert-row"').size, "one insert CTA per card"
   end
 
-  test "question cards get reorder controls; the welcome card does not" do
+  # The welcome card used to be excluded from reorder AND delete, which is why a
+  # welcome card the creator no longer wanted couldn't be removed. It now takes
+  # part in both — ordering matters because it has to be movable against the
+  # consent gate.
+  test "every card on a draft gets reorder controls, welcome card included" do
     get survey_path(@survey)
     assert_response :success
-    questions = Array(@survey.cards).count { |c| c["type"] != "welcome_card" }
-    assert_equal questions, response.body.scan("survey-editor#moveCardUp").size
-    assert_equal questions, response.body.scan("survey-editor#moveCardDown").size
-    # The welcome card slot has no reorder block.
-    assert_select ".survey-card-wrap[data-card-type='welcome_card'] .card-reorder", false
+    cards = Array(@survey.cards).size
+    assert_equal cards, response.body.scan("survey-editor#moveCardUp").size
+    assert_equal cards, response.body.scan("survey-editor#moveCardDown").size
+    assert_select ".survey-card-wrap[data-card-type='welcome_card'] .card-reorder"
     # Card numbers carry the JS hook used to re-stamp them after a move.
     assert_select "[data-role='card-number']", minimum: 1
+  end
+
+  test "the welcome card can be deleted but not duplicated" do
+    get survey_path(@survey)
+    assert_response :success
+    welcome = ".survey-card-wrap[data-card-type='welcome_card']"
+    assert_select "#{welcome} .card-delete-btn"
+    # At most one welcome card is allowed (verto_rules §1.3), so duplicating one
+    # would create a deck that immediately fails its own rules.
+    assert_select "#{welcome} .card-duplicate-btn", false
+    # Not a question, so no Rules-of-the-Game traffic light either.
+    assert_select "#{welcome} .card-light", false
+  end
+
+  # Three visually identical delete buttons live in this editor, so each has to
+  # say which one it is.
+  test "delete CTAs name their target" do
+    get survey_path(@survey)
+    assert_response :success
+
+    Array(@survey.cards).each_with_index do |_card, i|
+      expected = I18n.t("editor.delete_card_n", n: i + 1)
+      assert_select ".card-delete-btn[aria-label=?]", expected
+    end
+
+    assert_select "[data-action*='removeConsent'][aria-label=?]",
+                  I18n.t("editor.remove_consent_gate")
+    assert_select "[data-action*='removeThankyou'][aria-label=?]",
+                  I18n.t("editor.remove_thankyou_screen")
+  end
+
+  test "a live Verto still hides reorder and duplicate, but keeps delete named" do
+    @survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    get survey_path(@survey)
+    assert_response :success
+    assert_select ".card-reorder", false
+    assert_select ".card-duplicate-btn", false
+    assert_select ".card-delete-btn[aria-label=?]", I18n.t("editor.delete_card_n", n: 1)
   end
 
   test "render_card renders a question with reorder controls (regression: @survey was nil)" do

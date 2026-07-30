@@ -899,11 +899,13 @@ export default class extends Controller {
 
   deleteCard(event) {
     event.stopPropagation()
-    // The feed's own chrome-row button lives inside the card; the sidebar's
-    // pinned button (Answer type panel) doesn't, so it falls back to whichever
-    // card is currently selected.
+    // Delete always acts on the card it lives inside. There used to be a
+    // fallback to whichever card was merely SELECTED, for a pinned sidebar
+    // button that no longer exists — a button with no visual tie to its target
+    // deleting the current selection is a trap, so it's gone rather than
+    // dormant.
     const btn  = event.currentTarget
-    const card = btn.closest("[data-type-panel-target='card']") || this.activeCardEl
+    const card = btn.closest("[data-type-panel-target='card']")
     if (!card) return
     // Two-step confirm on the button itself — the first tap arms it (solid
     // fill + "Really delete?"), a second tap within 3s deletes, and anything

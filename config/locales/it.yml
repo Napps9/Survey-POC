@@ -691,6 +691,10 @@ it:
     consent_gate: 'Passaggio di consenso'
     consent_default: 'Partecipando accetti che le tue risposte anonime possano essere utilizzate per la ricerca.'
     thank_you_screen: 'Schermata di ringraziamento'
+    verto_name: 'Nome del Verto'
+    delete_card_n: 'Elimina la scheda %{n}'
+    remove_consent_gate: 'Rimuovi la schermata di consenso'
+    remove_thankyou_screen: 'Rimuovi la schermata di ringraziamento'
     remove: 'Rimuovi'
     animation_theme: "Animazione"
     live_locked_bar: "Questo Verto è live — le domande sono bloccate per proteggere la qualità dei dati."

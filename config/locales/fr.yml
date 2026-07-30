@@ -691,6 +691,10 @@ fr:
     consent_gate: 'Étape de consentement'
     consent_default: 'En participant, vous acceptez que vos réponses anonymes puissent être utilisées à des fins de recherche.'
     thank_you_screen: 'Écran de remerciement'
+    verto_name: 'Nom du Verto'
+    delete_card_n: 'Supprimer la carte %{n}'
+    remove_consent_gate: 'Supprimer l’écran de consentement'
+    remove_thankyou_screen: 'Supprimer l’écran de remerciement'
     remove: 'Retirer'
     animation_theme: "Animation"
     live_locked_bar: "Ce Verto est en ligne — les questions sont verrouillées pour protéger la qualité des données."

@@ -691,6 +691,10 @@ es:
     consent_gate: 'Paso de consentimiento'
     consent_default: 'Al participar, aceptas que tus respuestas anónimas puedan utilizarse con fines de investigación.'
     thank_you_screen: 'Pantalla de agradecimiento'
+    verto_name: 'Nombre del Verto'
+    delete_card_n: 'Eliminar la tarjeta %{n}'
+    remove_consent_gate: 'Quitar la pantalla de consentimiento'
+    remove_thankyou_screen: 'Quitar la pantalla de agradecimiento'
     remove: 'Quitar'
     animation_theme: "Animación"
     live_locked_bar: "Este Verto está en vivo — las preguntas están bloqueadas para proteger la calidad de los datos."

@@ -38,7 +38,12 @@
     badge_text    = t("dashboard_card.badge_draft")
   end
 
-  verto_name   = survey.theme.presence || survey.title.presence || t("dashboard_card.fallback_name")
+  # Title first, theme second. The wizard already promises the name the creator
+  # types is what the Verto is called (surveys/new), and the editor can now
+  # rename it — reading `theme` first meant a rename appeared to do nothing.
+  # `theme` stays the AI brief's subject, and the fallback for older Vertos
+  # created before the name field existed.
+  verto_name   = survey.title.presence || survey.theme.presence || t("dashboard_card.fallback_name")
   publish_warning = t("dashboard_card.publish_warning", title: verto_name)
   delete_warning = t("dashboard_card.delete_warning", title: verto_name)
   delete_forever_warning = t("dashboard_card.delete_forever_warning", title: verto_name)

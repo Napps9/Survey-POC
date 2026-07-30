@@ -691,6 +691,10 @@ ko:
     consent_gate: '동의 단계'
     consent_default: '참여하시면 익명 답변이 연구에 사용될 수 있음에 동의하는 것입니다.'
     thank_you_screen: '감사 화면'
+    verto_name: 'Verto 이름'
+    delete_card_n: '카드 %{n} 삭제'
+    remove_consent_gate: '동의 화면 삭제'
+    remove_thankyou_screen: '감사 화면 삭제'
     remove: '제거'
     animation_theme: "애니메이션"
     live_locked_bar: "이 Verto는 라이브 중 — 데이터 품질 보호를 위해 질문이 잠겨 있어요."

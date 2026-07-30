@@ -691,6 +691,10 @@ nl:
     consent_gate: 'Toestemmingsstap'
     consent_default: 'Door deel te nemen ga je ermee akkoord dat je anonieme antwoorden voor onderzoek gebruikt mogen worden.'
     thank_you_screen: 'Bedankscherm'
+    verto_name: 'Verto-naam'
+    delete_card_n: 'Kaart %{n} verwijderen'
+    remove_consent_gate: 'Toestemmingsscherm verwijderen'
+    remove_thankyou_screen: 'Bedankscherm verwijderen'
     remove: 'Verwijderen'
     animation_theme: "Animatie"
     live_locked_bar: "Deze Verto is live — vragen zijn vergrendeld om de datakwaliteit te beschermen."

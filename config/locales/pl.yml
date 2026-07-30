@@ -693,6 +693,10 @@ pl:
     consent_gate: 'Krok zgody'
     consent_default: 'Biorąc udział, zgadzasz się, że Twoje anonimowe odpowiedzi mogą zostać wykorzystane do badań.'
     thank_you_screen: 'Ekran podziękowania'
+    verto_name: 'Nazwa Verto'
+    delete_card_n: 'Usuń kartę %{n}'
+    remove_consent_gate: 'Usuń ekran zgody'
+    remove_thankyou_screen: 'Usuń ekran podziękowania'
     remove: 'Usuń'
     animation_theme: "Animacja"
     live_locked_bar: "To Verto jest na żywo — pytania są zablokowane, by chronić jakość danych."

@@ -691,6 +691,10 @@ tr:
     consent_gate: 'Onay adımı'
     consent_default: 'Katılarak anonim yanıtlarınızın araştırma için kullanılabileceğini kabul etmiş olursunuz.'
     thank_you_screen: 'Teşekkür ekranı'
+    verto_name: 'Verto adı'
+    delete_card_n: '%{n}. kartı sil'
+    remove_consent_gate: 'Onay ekranını kaldır'
+    remove_thankyou_screen: 'Teşekkür ekranını kaldır'
     remove: 'Kaldır'
     animation_theme: "Animasyon"
     live_locked_bar: "Bu Verto yayında — veri kalitesini korumak için sorular kilitli."

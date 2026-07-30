@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title><%= (survey.theme.presence || survey.title.presence || "Verto") %> — Results report</title>
+  <title><%= (survey.title.presence || survey.theme.presence || "Verto") %> — Results report</title>
   <style>
     body { font-family: "Helvetica Neue", Arial, sans-serif; color: #1c2034; line-height: 1.55; font-size: 12pt; margin: 0; }
     .doc { max-width: 720px; margin: 0 auto; padding: 6px 0 24px; }
@@ -50,7 +50,7 @@
 <body>
   <div class="doc">
     <div class="doc-head">
-      <div class="doc-title"><%= (survey.theme.presence || survey.title.presence || "Verto") %> — Results report</div>
+      <div class="doc-title"><%= (survey.title.presence || survey.theme.presence || "Verto") %> — Results report</div>
       <div class="doc-meta">Generated <%= generated_at.strftime("%B %-d, %Y") %> · Playverto AI</div>
     </div>
 

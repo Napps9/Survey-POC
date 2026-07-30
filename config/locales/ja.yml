@@ -691,6 +691,10 @@ ja:
     consent_gate: '同意ステップ'
     consent_default: '参加することで、匿名の回答が研究に使用されることに同意したものとみなされます。'
     thank_you_screen: 'サンクス画面'
+    verto_name: 'Verto の名前'
+    delete_card_n: 'カード %{n} を削除'
+    remove_consent_gate: '同意画面を削除'
+    remove_thankyou_screen: 'サンクス画面を削除'
     remove: '削除'
     animation_theme: "アニメーション"
     live_locked_bar: "このVertoは公開中 — データ品質を守るため質問はロックされています。"

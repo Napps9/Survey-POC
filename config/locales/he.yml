@@ -691,6 +691,10 @@ he:
     consent_gate: 'שלב הסכמה'
     consent_default: 'בהשתתפותך, אתה מסכים שתשובותיך האנונימיות עשויות לשמש למחקר.'
     thank_you_screen: 'מסך תודה'
+    verto_name: 'שם הוורטו'
+    delete_card_n: 'מחיקת כרטיס %{n}'
+    remove_consent_gate: 'הסרת מסך ההסכמה'
+    remove_thankyou_screen: 'הסרת מסך התודה'
     remove: 'הסרה'
     animation_theme: "אנימציה"
     live_locked_bar: "הוורטו פעיל — השאלות נעולות כדי להגן על איכות הנתונים."

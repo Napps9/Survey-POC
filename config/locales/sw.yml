@@ -691,6 +691,10 @@ sw:
     consent_gate: 'Hatua ya idhini'
     consent_default: 'Kwa kushiriki, unakubali kwamba majibu yako yasiyo na jina yanaweza kutumika kwa utafiti.'
     thank_you_screen: 'Skrini ya shukrani'
+    verto_name: 'Jina la Verto'
+    delete_card_n: 'Futa kadi %{n}'
+    remove_consent_gate: 'Ondoa skrini ya idhini'
+    remove_thankyou_screen: 'Ondoa skrini ya shukrani'
     remove: 'Ondoa'
     animation_theme: "Animation"
     live_locked_bar: "Verto hii iko hewani — maswali yamefungwa kulinda ubora wa data."

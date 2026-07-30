@@ -693,6 +693,10 @@ uk:
     consent_gate: 'Крок згоди'
     consent_default: 'Беручи участь, ви погоджуєтеся, що ваші анонімні відповіді можуть бути використані для досліджень.'
     thank_you_screen: 'Екран подяки'
+    verto_name: 'Назва Verto'
+    delete_card_n: 'Видалити картку %{n}'
+    remove_consent_gate: 'Прибрати екран згоди'
+    remove_thankyou_screen: 'Прибрати екран подяки'
     remove: 'Прибрати'
     animation_theme: "Анімація"
     live_locked_bar: "Цей Verto опубліковано — питання заблоковано для захисту якості даних."
