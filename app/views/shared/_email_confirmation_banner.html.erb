@@ -1,0 +1,17 @@
+<%# Shown to a signed-in user who hasn't confirmed their address yet (P0-8).
+    Not dismissible: it's the only route back to a resend, and the thing it
+    blocks — publishing — is the one action a creator most wants. Existing
+    accounts were grandfathered as verified by the migration, so this only ever
+    appears for signups made after that. %>
+<% if Current.user && !Current.user.email_verified? %>
+  <div style="background:rgba(255,193,7,0.12);border-bottom:1px solid rgba(255,193,7,0.28);padding:10px 16px;">
+    <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.85);line-height:1.5;">
+        <%= t("email_confirmation.banner", email: Current.user.email_address) %>
+      </span>
+      <%= button_to t("email_confirmation.resend"), email_confirmations_path,
+            method: :post,
+            style: "margin-left:auto;padding:6px 16px;border-radius:100px;border:1px solid rgba(255,193,7,0.5);background:transparent;color:#FFC107;font-family:'Alata',sans-serif;font-size: var(--text-sm);cursor:pointer;white-space:nowrap;" %>
+    </div>
+  </div>
+<% end %>

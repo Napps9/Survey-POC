@@ -1016,3 +1016,16 @@ es:
     erase_confirm: "¿Borrar permanentemente %{count} respuesta(s)? Esto no se puede deshacer."
     erase_note: "El borrado elimina las respuestas por completo en lugar de vaciarlas. Los recuentos bajarán y cualquier resumen o informe en caché se regenerará la próxima vez que se abra."
     erased: "Se borraron %{count} respuesta(s)."
+  email_confirmation:
+    invalid: "Ese enlace de confirmación ha caducado o ya se usó. Inicia sesión y pide uno nuevo."
+    confirmed: "Correo confirmado: ya puedes publicar."
+    already_confirmed: "Tu correo ya está confirmado."
+    resent: "Correo de confirmación enviado a %{email}."
+    too_many: "Ya hemos enviado varios: revisa tu bandeja y la carpeta de spam antes de pedir otro."
+    banner: "Confirma tu correo (%{email}) antes de poder publicar un Verto."
+    resend: "Reenviar correo"
+    publish_blocked: "Confirma tu correo antes de publicar: revisa tu bandeja o reenvíalo desde el aviso del panel."
+  registrations:
+    terms_required: "Acepta los Términos y la Política de Privacidad para continuar."
+    accept_terms_html: "Acepto los %{terms} y la %{privacy}."
+    welcome_confirm: "¡Bienvenido a Playverto! Revisa %{email} para confirmar tu dirección."

@@ -14,6 +14,9 @@ class UnpublishVertoTest < ActionDispatch::IntegrationTest
 
   def setup
     @user = User.create!(name: "U", email_address: "unp-#{SecureRandom.hex(3)}@test.com", password: "verylongpassword")
+    # Publishing now requires a confirmed email address (P0-8); this test is
+    # about the publish/unpublish lifecycle, not that gate.
+    @user.verify_email!
     @org  = Organisation.create!(name: "O", slug: "unp-#{SecureRandom.hex(3)}")
     @org.memberships.create!(user: @user, role: "admin")
   end

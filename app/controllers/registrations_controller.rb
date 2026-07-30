@@ -24,6 +24,15 @@ class RegistrationsController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
+    # Terms acceptance is recorded at the moment it's given (P0-8). Checked
+    # before save so a refused signup never leaves an account behind whose
+    # terms_accepted_at we'd have to guess at later.
+    unless ActiveModel::Type::Boolean.new.cast(params[:accept_terms])
+      flash.now[:alert] = t("registrations.terms_required")
+      return render :new, status: :unprocessable_entity
+    end
+    @user.terms_accepted_at = Time.current
+
     unless @user.valid?
       flash.now[:alert] = @user.errors.full_messages.first
       return render :new, status: :unprocessable_entity
@@ -42,8 +51,13 @@ class RegistrationsController < ApplicationController
       Membership.create!(user: @user, organisation: org, role: "admin")
     end
 
+    # Outside the transaction: a mail failure must not roll back a created
+    # account. EmailConfirmationsController.deliver swallows its own errors and
+    # the banner offers a resend.
+    EmailConfirmationsController.deliver(@user)
+
     start_new_session_for @user
-    redirect_to root_path, notice: "Welcome to Playverto!"
+    redirect_to root_path, notice: t("registrations.welcome_confirm", email: @user.email_address)
   rescue ActiveRecord::RecordInvalid => e
     flash.now[:alert] = e.record.errors.full_messages.first
     render :new, status: :unprocessable_entity

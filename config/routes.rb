@@ -15,6 +15,10 @@ Rails.application.routes.draw do
   resource  :session,       only: [ :new, :create, :destroy ]
   resources :passwords,     param: :token, only: [ :new, :create, :edit, :update ]
   resources :registrations, only: [ :new, :create ]
+  # Email verification (P0-8). #show is the link in the email (unauthenticated —
+  # people open these on a device that isn't signed in); #create is the resend.
+  get  "email-confirmations/:token", to: "email_confirmations#show",   as: :email_confirmation
+  post "email-confirmations",        to: "email_confirmations#create", as: :email_confirmations
 
   # Social sign-in (OmniAuth). /auth/:provider itself is middleware.
   get "auth/:provider/callback", to: "oauth_sessions#create", as: :oauth_callback

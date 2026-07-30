@@ -1014,3 +1014,16 @@ ja:
     erase_confirm: "%{count} 件の回答を完全に削除しますか？元に戻せません。"
     erase_note: "削除は回答を空にするのではなく完全に消去します。回答数は減り、キャッシュ済みの要約やレポートは次回開いたときに再生成されます。"
     erased: "%{count} 件の回答を削除しました。"
+  email_confirmation:
+    invalid: "この確認リンクは期限切れか、すでに使用済みです。サインインして新しいリンクをリクエストしてください。"
+    confirmed: "メールアドレスを確認しました — 公開できます。"
+    already_confirmed: "メールアドレスはすでに確認済みです。"
+    resent: "確認メールを %{email} に送信しました。"
+    too_many: "すでに何通か送信しています。もう一度リクエストする前に受信トレイと迷惑メールをご確認ください。"
+    banner: "Verto を公開する前に、メールアドレス（%{email}）を確認してください。"
+    resend: "再送信"
+    publish_blocked: "公開の前にメールアドレスを確認してください。受信トレイを確認するか、ダッシュボードのバナーから再送信できます。"
+  registrations:
+    terms_required: "続けるには利用規約とプライバシーポリシーに同意してください。"
+    accept_terms_html: "%{terms}と%{privacy}に同意します。"
+    welcome_confirm: "Playverto へようこそ！%{email} を確認してアドレスを認証してください。"

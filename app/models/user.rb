@@ -46,4 +46,25 @@ class User < ApplicationRecord
   generates_token_for :account_setup, expires_in: 7.days do
     password_salt&.last(10)
   end
+
+  # ── Email verification & terms (P0-8) ──────────────────────────────────────
+
+  # A week, matching :account_setup — long enough that an email sitting unread
+  # over a holiday still works. Keyed to the address itself, so changing the
+  # email invalidates any outstanding link for the old one.
+  generates_token_for :email_confirmation, expires_in: 7.days do
+    email_address
+  end
+
+  def email_verified?
+    email_verified_at.present?
+  end
+
+  def verify_email!
+    update!(email_verified_at: Time.current) unless email_verified?
+  end
+
+  def accepted_terms?
+    terms_accepted_at.present?
+  end
 end

@@ -1,0 +1,15 @@
+playverto
+─────────
+
+Confirm your email address
+
+Thanks for signing up. Open the link below to confirm this address is
+yours — you'll need it before you can publish a Verto and start collecting
+responses:
+
+<%= email_confirmation_url(@user.generate_token_for(:email_confirmation)) %>
+
+This link expires in a week. If you didn't sign up for Playverto you can
+safely ignore this email — the account can't publish anything without it.
+
+— Playverto

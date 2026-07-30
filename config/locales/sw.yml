@@ -1016,3 +1016,16 @@ sw:
     erase_confirm: "Futa kabisa majibu %{count}? Hatua hii haiwezi kutenduliwa."
     erase_note: "Kufuta huondoa majibu kabisa badala ya kuyaacha matupu. Idadi ya majibu itapungua na muhtasari au ripoti yoyote iliyohifadhiwa itaundwa upya itakapofunguliwa tena."
     erased: "Majibu %{count} yamefutwa."
+  email_confirmation:
+    invalid: "Kiungo hicho cha uthibitisho kimeisha muda au tayari kimetumika. Ingia na uombe kipya."
+    confirmed: "Barua pepe imethibitishwa — sasa unaweza kuchapisha."
+    already_confirmed: "Barua pepe yako tayari imethibitishwa."
+    resent: "Barua pepe ya uthibitisho imetumwa kwa %{email}."
+    too_many: "Tayari tumetuma kadhaa — tafadhali angalia kikasha chako na folda ya taka kabla ya kuomba nyingine."
+    banner: "Thibitisha anwani yako ya barua pepe (%{email}) kabla ya kuchapisha Verto."
+    resend: "Tuma tena"
+    publish_blocked: "Thibitisha barua pepe yako kabla ya kuchapisha — angalia kikasha chako, au tuma tena kutoka kwenye bango la dashibodi."
+  registrations:
+    terms_required: "Tafadhali kubali Masharti na Sera ya Faragha ili kuendelea."
+    accept_terms_html: "Ninakubali %{terms} na %{privacy}."
+    welcome_confirm: "Karibu Playverto! Angalia %{email} ili kuthibitisha anwani yako."

@@ -31,6 +31,12 @@
   open_google_form_modal  = google_form_error.present? || params[:open_import].present?
 %>
 
+<%# Rendered here rather than in the layout: the dashboard is served with
+    layout: "fullscreen", whose content sits in a fixed-offset container, so a
+    band added to the layout chrome would overlap the page instead of pushing
+    it down. Inside the scrolling content it just works. (P0-8) %>
+<%= render "shared/email_confirmation_banner" %>
+
 <div style="display:flex;min-height:100vh;background:#1C2034;">
   <div style="flex:1;display:flex;flex-direction:column;min-width:0;"
        data-controller="create-menu"

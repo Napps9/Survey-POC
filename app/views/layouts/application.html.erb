@@ -19,6 +19,12 @@
       </header>
     <% end %>
 
+    <%# Only in this layout, not fullscreen: that one positions its content with
+        fixed offsets (top: 56px), so an extra band above it would sit under the
+        page rather than push it down. The editor surfaces the same block when
+        publishing is attempted. %>
+    <%= render "shared/email_confirmation_banner" %>
+
     <main class="<%= 'max-w-3xl mx-auto px-4 sm:px-5 md:px-6 py-8 md:py-10' unless Current.user %>">
       <%= yield %>
     </main>

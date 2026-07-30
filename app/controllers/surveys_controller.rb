@@ -445,6 +445,16 @@ class SurveysController < ApplicationController
   end
 
   def publish
+    # P0-8. Publishing is the outward-facing act: it puts a link in front of
+    # respondents who will hand over a birth date and a location. Doing that
+    # under an email address nobody proved they own is the hole email
+    # verification exists to close, so this is where the gate sits — rather
+    # than on sign-in, which would lock people out of the product entirely if
+    # SMTP were misconfigured. Building a Verto stays open.
+    unless Current.user&.email_verified?
+      return redirect_to survey_path(@survey), alert: t("email_confirmation.publish_blocked")
+    end
+
     @survey.update!(
       publish_token: @survey.publish_token || SecureRandom.urlsafe_base64(18),
       published_at:  @survey.published_at  || Time.current,

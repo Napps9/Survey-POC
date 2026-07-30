@@ -1018,3 +1018,16 @@ en:
     erase_confirm: "Permanently erase %{count} response(s)? This cannot be undone."
     erase_note: "Erasing deletes the responses outright rather than blanking them. Response counts will drop and any cached summary or report will regenerate the next time it is opened."
     erased: "Erased %{count} response(s)."
+  email_confirmation:
+    invalid: "That confirmation link has expired or already been used. Sign in and ask for a new one."
+    confirmed: "Email confirmed — you can publish now."
+    already_confirmed: "Your email is already confirmed."
+    resent: "Confirmation email sent to %{email}."
+    too_many: "We've sent several already — please check your inbox and spam folder before asking for another."
+    banner: "Confirm your email address (%{email}) before you can publish a Verto."
+    resend: "Resend email"
+    publish_blocked: "Confirm your email address before publishing — check your inbox, or resend from the banner on your dashboard."
+  registrations:
+    terms_required: "Please accept the Terms and Privacy Policy to continue."
+    accept_terms_html: "I agree to the %{terms} and the %{privacy}."
+    welcome_confirm: "Welcome to Playverto! Check %{email} to confirm your address."

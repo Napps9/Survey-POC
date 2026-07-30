@@ -1015,3 +1015,16 @@ vi:
     erase_confirm: "Xóa vĩnh viễn %{count} câu trả lời? Không thể hoàn tác."
     erase_note: "Xóa sẽ loại bỏ hoàn toàn các câu trả lời chứ không làm trống chúng. Số lượng câu trả lời sẽ giảm và mọi tóm tắt hay báo cáo đã lưu sẽ được tạo lại khi mở lần sau."
     erased: "Đã xóa %{count} câu trả lời."
+  email_confirmation:
+    invalid: "Liên kết xác nhận đó đã hết hạn hoặc đã được dùng. Hãy đăng nhập và yêu cầu liên kết mới."
+    confirmed: "Đã xác nhận email — bạn có thể xuất bản ngay."
+    already_confirmed: "Email của bạn đã được xác nhận."
+    resent: "Đã gửi email xác nhận tới %{email}."
+    too_many: "Chúng tôi đã gửi vài lần rồi — hãy kiểm tra hộp thư và thư rác trước khi yêu cầu thêm."
+    banner: "Xác nhận địa chỉ email (%{email}) trước khi có thể xuất bản một Verto."
+    resend: "Gửi lại"
+    publish_blocked: "Xác nhận địa chỉ email trước khi xuất bản — kiểm tra hộp thư, hoặc gửi lại từ biểu ngữ trên bảng điều khiển."
+  registrations:
+    terms_required: "Vui lòng chấp nhận Điều khoản và Chính sách quyền riêng tư để tiếp tục."
+    accept_terms_html: "Tôi đồng ý với %{terms} và %{privacy}."
+    welcome_confirm: "Chào mừng đến Playverto! Kiểm tra %{email} để xác nhận địa chỉ của bạn."

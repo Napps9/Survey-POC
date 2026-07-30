@@ -1016,3 +1016,16 @@ pt:
     erase_confirm: "Apagar permanentemente %{count} resposta(s)? Não é possível anular."
     erase_note: "Apagar remove as respostas por completo em vez de as esvaziar. As contagens vão descer e qualquer resumo ou relatório em cache será gerado de novo na próxima abertura."
     erased: "Apagadas %{count} resposta(s)."
+  email_confirmation:
+    invalid: "Esse link de confirmação expirou ou já foi usado. Inicie sessão e peça um novo."
+    confirmed: "E-mail confirmado — já pode publicar."
+    already_confirmed: "O seu e-mail já está confirmado."
+    resent: "E-mail de confirmação enviado para %{email}."
+    too_many: "Já enviámos vários — verifique a caixa de entrada e a pasta de spam antes de pedir outro."
+    banner: "Confirme o seu e-mail (%{email}) antes de poder publicar um Verto."
+    resend: "Reenviar e-mail"
+    publish_blocked: "Confirme o seu e-mail antes de publicar — verifique a caixa de entrada, ou reenvie a partir do aviso no painel."
+  registrations:
+    terms_required: "Aceite os Termos e a Política de Privacidade para continuar."
+    accept_terms_html: "Aceito os %{terms} e a %{privacy}."
+    welcome_confirm: "Bem-vindo ao Playverto! Verifique %{email} para confirmar o seu endereço."

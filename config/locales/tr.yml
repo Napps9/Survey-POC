@@ -1016,3 +1016,16 @@ tr:
     erase_confirm: "%{count} yanıt kalıcı olarak silinsin mi? Bu geri alınamaz."
     erase_note: "Silme, yanıtları boşaltmak yerine tamamen kaldırır. Yanıt sayıları düşer ve önbellekteki özet veya raporlar bir sonraki açılışta yeniden oluşturulur."
     erased: "%{count} yanıt silindi."
+  email_confirmation:
+    invalid: "Bu onay bağlantısının süresi dolmuş ya da zaten kullanılmış. Giriş yapıp yenisini isteyin."
+    confirmed: "E-posta onaylandı — artık yayımlayabilirsiniz."
+    already_confirmed: "E-postanız zaten onaylı."
+    resent: "Onay e-postası %{email} adresine gönderildi."
+    too_many: "Zaten birkaç tane gönderdik — bir tane daha istemeden önce gelen kutunuzu ve spam klasörünü kontrol edin."
+    banner: "Bir Verto yayımlayabilmek için e-posta adresinizi (%{email}) onaylayın."
+    resend: "Yeniden gönder"
+    publish_blocked: "Yayımlamadan önce e-posta adresinizi onaylayın — gelen kutunuza bakın ya da panodaki bandan yeniden gönderin."
+  registrations:
+    terms_required: "Devam etmek için Koşulları ve Gizlilik Politikasını kabul edin."
+    accept_terms_html: "%{terms} ve %{privacy} şartlarını kabul ediyorum."
+    welcome_confirm: "Playverto'ya hoş geldiniz! Adresinizi onaylamak için %{email} adresini kontrol edin."

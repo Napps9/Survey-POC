@@ -1014,3 +1014,16 @@ ko:
     erase_confirm: "응답 %{count}건을 영구 삭제할까요? 되돌릴 수 없습니다."
     erase_note: "삭제는 응답을 비우는 것이 아니라 완전히 지웁니다. 응답 수가 줄고, 캐시된 요약이나 보고서는 다음에 열 때 다시 생성됩니다."
     erased: "응답 %{count}건을 삭제했습니다."
+  email_confirmation:
+    invalid: "확인 링크가 만료되었거나 이미 사용되었습니다. 로그인 후 새로 요청하세요."
+    confirmed: "이메일이 확인되었습니다 — 이제 게시할 수 있습니다."
+    already_confirmed: "이메일이 이미 확인되었습니다."
+    resent: "%{email} 주소로 확인 메일을 보냈습니다."
+    too_many: "이미 여러 번 보냈습니다 — 다시 요청하기 전에 받은편지함과 스팸함을 확인하세요."
+    banner: "Verto를 게시하려면 먼저 이메일 주소(%{email})를 확인하세요."
+    resend: "다시 보내기"
+    publish_blocked: "게시하기 전에 이메일 주소를 확인하세요 — 받은편지함을 확인하거나 대시보드 배너에서 다시 보내세요."
+  registrations:
+    terms_required: "계속하려면 이용약관과 개인정보처리방침에 동의해 주세요."
+    accept_terms_html: "%{terms} 및 %{privacy}에 동의합니다."
+    welcome_confirm: "Playverto에 오신 것을 환영합니다! %{email}에서 주소를 확인하세요."

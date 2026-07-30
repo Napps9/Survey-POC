@@ -1018,3 +1018,16 @@ pl:
     erase_confirm: "Trwale usunąć %{count} odpowiedzi? Tej operacji nie można cofnąć."
     erase_note: "Usunięcie kasuje odpowiedzi całkowicie, a nie tylko je opróżnia. Liczby odpowiedzi spadną, a zapisane podsumowania i raporty zostaną wygenerowane ponownie przy następnym otwarciu."
     erased: "Usunięto %{count} odpowiedzi."
+  email_confirmation:
+    invalid: "Ten link potwierdzający wygasł lub został już użyty. Zaloguj się i poproś o nowy."
+    confirmed: "E-mail potwierdzony — możesz publikować."
+    already_confirmed: "Twój e-mail jest już potwierdzony."
+    resent: "E-mail potwierdzający wysłany na %{email}."
+    too_many: "Wysłaliśmy już kilka — sprawdź skrzynkę i folder spam, zanim poprosisz o kolejny."
+    banner: "Potwierdź swój adres e-mail (%{email}), zanim opublikujesz Verto."
+    resend: "Wyślij ponownie"
+    publish_blocked: "Potwierdź adres e-mail przed publikacją — sprawdź skrzynkę albo wyślij ponownie z banera na pulpicie."
+  registrations:
+    terms_required: "Zaakceptuj Regulamin i Politykę prywatności, aby kontynuować."
+    accept_terms_html: "Akceptuję %{terms} i %{privacy}."
+    welcome_confirm: "Witamy w Playverto! Sprawdź %{email}, aby potwierdzić swój adres."

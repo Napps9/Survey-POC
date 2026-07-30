@@ -1015,3 +1015,16 @@ id:
     erase_confirm: "Hapus permanen %{count} jawaban? Ini tidak bisa dibatalkan."
     erase_note: "Penghapusan menghapus jawaban sepenuhnya, bukan mengosongkannya. Jumlah jawaban akan turun dan ringkasan atau laporan yang tersimpan akan dibuat ulang saat berikutnya dibuka."
     erased: "%{count} jawaban dihapus."
+  email_confirmation:
+    invalid: "Tautan konfirmasi itu sudah kedaluwarsa atau telah dipakai. Masuk dan minta yang baru."
+    confirmed: "Email dikonfirmasi — Anda bisa menerbitkan sekarang."
+    already_confirmed: "Email Anda sudah dikonfirmasi."
+    resent: "Email konfirmasi dikirim ke %{email}."
+    too_many: "Kami sudah mengirim beberapa — periksa kotak masuk dan folder spam sebelum meminta lagi."
+    banner: "Konfirmasi alamat email Anda (%{email}) sebelum bisa menerbitkan Verto."
+    resend: "Kirim ulang"
+    publish_blocked: "Konfirmasi alamat email Anda sebelum menerbitkan — periksa kotak masuk, atau kirim ulang dari banner di dasbor."
+  registrations:
+    terms_required: "Setujui Ketentuan dan Kebijakan Privasi untuk melanjutkan."
+    accept_terms_html: "Saya menyetujui %{terms} dan %{privacy}."
+    welcome_confirm: "Selamat datang di Playverto! Periksa %{email} untuk mengonfirmasi alamat Anda."

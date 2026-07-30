@@ -78,6 +78,20 @@
         </div>
       </div>
 
+      <%# Terms acceptance, recorded on the user at the moment it's given
+          (P0-8). Not pre-checked: a pre-ticked box is not consent. %>
+      <label style="display:flex;gap:10px;align-items:flex-start;margin:4px 0 18px;cursor:pointer;">
+        <%= check_box_tag :accept_terms, "1", params[:accept_terms].present?,
+              style: "margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:#01EACB;cursor:pointer;" %>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(247,247,247,0.7);line-height:1.5;">
+          <%= t("registrations.accept_terms_html",
+                terms: link_to(t("legal.footer_terms"), terms_path, target: "_blank", rel: "noopener",
+                               style: "color:#01EACB;"),
+                privacy: link_to(t("legal.footer_privacy"), privacy_path, target: "_blank", rel: "noopener",
+                                 style: "color:#01EACB;")) %>
+        </span>
+      </label>
+
       <%= f.submit t("auth.signup_submit"),
             style: "width:100%;background:#01EACB;border:none;border-radius:8px;padding:14px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-xl);letter-spacing:0.05em;cursor:pointer;" %>
 
