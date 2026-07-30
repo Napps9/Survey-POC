@@ -73,7 +73,7 @@
         <% if assets.any? %>
           <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
             <% assets.each do |att| %>
-              <div style="position:relative;width:96px;height:96px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);background:#0f1322 center/cover no-repeat url('<%= as_thumb_path(att.blob) %>');">
+              <div style="position:relative;width:96px;height:96px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);background:#0f1322 center/cover no-repeat url('<%= as_thumb_path(att) %>');">
                 <%= button_to "×",
                       organisation_asset_path(current_organisation, att.id),
                       method: :delete,

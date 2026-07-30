@@ -22,7 +22,23 @@ class Organisation < ApplicationRecord
   # The organisation's own brand-asset library — images the org uploads once and
   # can then drop onto any card/background from the editor's media picker, the
   # same way the shared Verto Library works but scoped to this account only.
-  has_many_attached :assets
+  #
+  # The :thumb variant is what the library tiles render, and it is PREPROCESSED
+  # on purpose. Declared lazily, a library of 60 assets means 60 representation
+  # requests on first view, each spawning a libvips transform on a Puma request
+  # thread — a burst of native memory on a 512MB instance with three threads,
+  # which is exactly the shape that trips the memory watchdog. Preprocessing
+  # moves each transform to a job at upload time, so viewing the library is a
+  # redirect to an already-built blob and costs nothing.
+  #
+  # 400px because as_thumb_path's tiles are rendered at 96px: enough for a 2x
+  # display and for the larger media-picker tiles, without storing near-originals.
+  ASSET_THUMB_LIMIT = 400
+
+  has_many_attached :assets do |attachable|
+    attachable.variant :thumb, resize_to_limit: [ ASSET_THUMB_LIMIT, ASSET_THUMB_LIMIT ],
+                               preprocessed: true
+  end
 
   LOGO_CONTENT_TYPES = %w[image/png image/jpeg image/gif image/webp image/svg+xml].freeze
   LOGO_MAX_BYTES     = 2.megabytes

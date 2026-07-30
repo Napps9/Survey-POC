@@ -30,4 +30,51 @@ namespace :brand_assets do
     result.errors.each  { |fn, why| puts "    ! error #{fn} — #{why}" }
     puts "Done: #{result.summary}. Library now holds #{org.assets.attachments.size} asset(s)."
   end
+
+  # Brand-library tiles render a preprocessed :thumb variant, built by a job at
+  # upload time. Assets uploaded BEFORE that variant was declared have no thumb,
+  # so the first person to open their library still pays for a lazy libvips
+  # transform per tile — the exact spike preprocessing exists to avoid.
+  #
+  # This queues the missing ones. Deliberately a task rather than a migration or
+  # a boot hook: it's a bulk run of native image transforms, and when that
+  # happens on a memory-bounded instance should be somebody's decision.
+  #
+  #   bin/rails brand_assets:backfill_thumbs            # every organisation
+  #   bin/rails "brand_assets:backfill_thumbs[acme]"    # one, by slug or name
+  desc "Queue the preprocessed thumbnail for brand assets that predate it: brand_assets:backfill_thumbs[org]"
+  task :backfill_thumbs, [ :org ] => :environment do |_t, args|
+    ident = args[:org].to_s.strip
+    scope =
+      if ident.empty?
+        Organisation.all
+      else
+        org = Organisation.find_by(slug: ident) || Organisation.find_by(name: ident)
+        abort "No organisation matching #{ident.inspect} (by slug or name)." unless org
+        Organisation.where(id: org.id)
+      end
+
+    # The same call ActiveStorage makes for a preprocessed variant on upload
+    # (Attachment#transform_variants_later), so a backfilled thumb is built
+    # exactly the way a freshly uploaded one is.
+    transformations = Organisation.reflect_on_attachment(:assets).named_variants[:thumb].transformations
+
+    queued = skipped = 0
+    scope.find_each do |organisation|
+      organisation.assets.attachments.each do |attachment|
+        blob = attachment.blob
+        # Vector art has no variant to build, and anything already processed
+        # would only be re-transformed for nothing.
+        next skipped += 1 unless blob.variable?
+        next skipped += 1 if blob.variant(transformations).send(:processed?)
+
+        blob.preprocessed(transformations)
+        queued += 1
+      rescue => e
+        warn "  ! #{organisation.slug} / #{blob&.filename} — #{e.class}: #{e.message}"
+      end
+    end
+
+    puts "Queued #{queued} thumbnail transform(s); skipped #{skipped} (vector, or already built)."
+  end
 end

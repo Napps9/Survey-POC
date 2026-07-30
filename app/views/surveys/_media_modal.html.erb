@@ -100,7 +100,7 @@
                     <button type="button"
                             class="media-library-item"
                             title="<%= att.blob.filename %>"
-                            style="background-image:url('<%= as_thumb_path(att.blob) %>');"
+                            style="background-image:url('<%= as_thumb_path(att) %>');"
                             data-url="<%= rails_blob_path(att.blob, only_path: true) %>"
                             data-media-picker-target="libraryItem"
                             data-action="click->media-picker#pickLibraryItem"

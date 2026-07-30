@@ -302,18 +302,27 @@ module ApplicationHelper
       .html_safe # rubocop:disable Rails/OutputSafety -- markup comes from rqrcode, not user input
   end
 
-  # A small same-origin thumbnail path for an Active Storage image — used for the
-  # brand-asset library tiles (media picker + branding page) so a tile loads a
-  # ~400px variant instead of the full-size original. Variable images get a
-  # resized variant (processed lazily in production, where libvips lives);
-  # non-variable ones (SVG) fall back to the original. Display only — the
-  # full-size blob path is what gets stored on a card when the tile is picked.
-  def as_thumb_path(blob, size: 400)
-    if blob.variable?
-      rails_representation_path(blob.variant(resize_to_limit: [ size, size ]), only_path: true)
-    else
-      rails_blob_path(blob, only_path: true)
-    end
+  # A small same-origin thumbnail path for a brand-library image — used by the
+  # library tiles (media picker + branding page) so a tile loads a ~400px variant
+  # instead of the full-size original. Display only: the full-size blob path is
+  # what gets stored on a card when the tile is picked.
+  #
+  # Takes the ATTACHMENT, not the blob, so it can ask for the named :thumb
+  # variant declared on Organisation#assets. That variant is preprocessed at
+  # upload, so this resolves to an already-built blob rather than queueing a
+  # libvips transform onto a request thread — see the declaration for why that
+  # matters on a 60-tile library.
+  #
+  # Non-variable images (SVG) have no variant to serve and fall back to the
+  # original, which is the right answer for vector art anyway. An attachment
+  # without the named variant declared (or a bare blob passed by an older caller)
+  # falls back to an on-demand variant, so nothing breaks — it just costs what it
+  # always used to.
+  def as_thumb_path(attachment, size: Organisation::ASSET_THUMB_LIMIT)
+    blob = attachment.try(:blob) || attachment
+    return rails_blob_path(blob, only_path: true) unless blob.variable?
+
+    rails_representation_path(as_thumb_representation(attachment, blob, size), only_path: true)
   end
 
   # Inline `style` value that sets the Verto-experience brand variables for a
@@ -458,4 +467,28 @@ module ApplicationHelper
 
     html.html_safe
   end
+
+  private
+
+    # The representation as_thumb_path should link to.
+    #
+    # Prefers the attachment's declared :thumb, because that one is preprocessed
+    # at upload — asking for it is a lookup, not a transform. Falls back to an
+    # on-demand variant when there's no such declaration (a bare blob, or an
+    # attachment on some other model), which is exactly what this used to do for
+    # everything.
+    #
+    # ActiveStorage::Attachment#named_variants is private, so the declaration is
+    # checked through the record's public reflections rather than by asking the
+    # attachment — and never by rescuing the ArgumentError that variant(:thumb)
+    # raises for an undeclared name, which would hide a real mistake.
+    def as_thumb_representation(attachment, blob, size)
+      on_demand = -> { blob.variant(resize_to_limit: [ size, size ]) }
+      return on_demand.call unless attachment.respond_to?(:record) && attachment.respond_to?(:name)
+
+      reflection = attachment.record&.attachment_reflections&.[](attachment.name)
+      return on_demand.call unless reflection&.named_variants&.key?(:thumb)
+
+      attachment.variant(:thumb)
+    end
 end
