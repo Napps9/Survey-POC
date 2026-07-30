@@ -134,6 +134,8 @@ ja:
     consent_agree: "同意して続ける"
     consent_decline: "同意しません"
     consent_declined: "問題ありません — このページを閉じてください。"
+    consent_default_text: "この Verto では、回答に加えて生年月日、お住まいの地域、性別をお尋ねします。参加は任意で、回答は匿名であり、研究に利用されることがあります。"
+    consent_privacy_link: "データの取り扱いについて"
     respondent_code_title: 'はじめる前に'
     respondent_code_prompt_default: '覚えられるコードを決めてください'
     respondent_code_placeholder: '例: sam14'

@@ -111,7 +111,12 @@
     <%# Consent gate as the first card in the deck (reuses the creator's consent
         text). It carries NO data-card-index, so it's never captured as an answer
         and never shifts the answer keys, which align to the @survey.cards index. %>
-    <% if @survey.consent_required? %>
+    <%# show_consent_gate? rather than consent_required?: a Verto that collects
+        personal data (the auto-appended birth date / location / gender tail)
+        but has no creator-authored gate still gets one, with default wording.
+        See Survey#default_consent_gate? for why this is enforced here rather
+        than at publish. %>
+    <% if @survey.show_consent_gate? %>
       <div class="preview-card"
            data-player-target="card"
            data-card-type="consent_card">
@@ -140,7 +145,14 @@
               <div class="q-header">
                 <div class="q-title"><%= t("player.consent_title") %></div>
               </div>
-              <div class="play-consent-body"><%= safe_join(@survey.consent_text.split("\n"), tag.br) %></div>
+              <div class="play-consent-body"><%= safe_join(@survey.effective_consent_text.to_s.split("\n"), tag.br) %></div>
+              <%# The privacy policy is linked from every consent gate, not just
+                  the default one — agreeing to share a birth date and a location
+                  should always be one tap from how that data is handled. %>
+              <div class="play-consent-legal">
+                <%= link_to t("player.consent_privacy_link"), privacy_path,
+                            target: "_blank", rel: "noopener" %>
+              </div>
               <div class="play-consent-actions">
                 <button type="button" class="play-consent-agree"
                         data-action="click->player#agreeConsent"><%= t("player.consent_agree") %></button>

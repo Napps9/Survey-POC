@@ -1013,17 +1013,53 @@ class Survey < ApplicationRecord
     consent_text.present? && !consent_gate_card?
   end
 
-  # Whether a respondent has to agree before answering, by either route.
+  # Whether this Verto asks a respondent for personal data. DemographicQuestions
+  # appends birth month/year, location and gender to every Verto at creation, so
+  # in practice this is true almost everywhere — which is exactly why consent
+  # being optional was a compliance hole rather than an edge case (P0-6).
+  def collects_personal_data?
+    Array(cards).any? { |c| c.is_a?(Hash) && c["demographic"] }
+  end
+
+  # True when personal data is collected and the creator built no gate of either
+  # kind. The player supplies a default gate in that case rather than letting the
+  # collection happen ungated.
+  #
+  # Enforced at the player and not at publish, deliberately: a publish-time
+  # requirement would leave every ALREADY-live Verto collecting birth dates and
+  # locations with no gate at all, which is the actual exposure. This closes it
+  # for those too, at the cost of respondents on a live Verto meeting a consent
+  # screen they didn't see yesterday.
+  def default_consent_gate?
+    collects_personal_data? && consent_text.blank? && !consent_gate_card?
+  end
+
+  # Whether the player renders the survey-level pseudo-card before the deck,
+  # from either the creator's own consent_text or the default above.
+  def show_consent_gate?
+    consent_required? || default_consent_gate?
+  end
+
+  # The wording the survey-level gate actually shows.
+  def effective_consent_text
+    return consent_text if consent_text.present?
+
+    I18n.t("player.consent_default_text") if default_consent_gate?
+  end
+
+  # Whether a respondent has to agree before answering, by any route.
   def consent_gated?
-    consent_required? || consent_gate_card?
+    consent_required? || consent_gate_card? || default_consent_gate?
   end
 
   # What a response records as the text the respondent actually agreed to. For a
   # card gate that's its pages joined in order, so the snapshot stays a faithful
-  # record of what was on screen even if the card is edited later.
+  # record of what was on screen even if the card is edited later. For the
+  # default gate it's the default wording, so the audit trail records what the
+  # respondent was actually shown rather than a blank.
   def consent_snapshot_text
     card = consent_gate_card
-    return consent_text if card.nil?
+    return effective_consent_text if card.nil?
 
     Array(card["pages"]).filter_map { |p| p["text"].presence if p.is_a?(Hash) }.join("\n\n").presence
   end

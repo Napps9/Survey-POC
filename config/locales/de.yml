@@ -134,6 +134,8 @@ de:
     consent_agree: "Zustimmen & fortfahren"
     consent_decline: "Ich stimme nicht zu"
     consent_declined: "Kein Problem — du kannst diese Seite schließen."
+    consent_default_text: "Dieses Verto fragt neben deinen Antworten nach deinem Geburtsdatum, deinem Wohnort und deinem Geschlecht. Die Teilnahme ist freiwillig, deine Antworten sind anonym und können für Forschungszwecke verwendet werden."
+    consent_privacy_link: "Wie wir mit deinen Daten umgehen"
     respondent_code_title: 'Bevor Sie beginnen'
     respondent_code_prompt_default: 'Denken Sie sich einen Code aus, den Sie sich merken'
     respondent_code_placeholder: 'z. B. sam14'

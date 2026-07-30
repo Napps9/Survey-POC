@@ -134,6 +134,8 @@ uk:
     consent_agree: "Погоджуюсь і продовжити"
     consent_decline: "Я не погоджуюсь"
     consent_declined: "Нічого страшного — ви можете закрити цю сторінку."
+    consent_default_text: "Це Verto запитує вашу дату народження, місце проживання та стать — окрім ваших відповідей. Участь добровільна, ваші відповіді анонімні й можуть використовуватися для досліджень."
+    consent_privacy_link: "Як ми обробляємо ваші дані"
     respondent_code_title: 'Перш ніж почати'
     respondent_code_prompt_default: 'Придумайте код, який запам’ятаєте'
     respondent_code_placeholder: 'напр. sam14'

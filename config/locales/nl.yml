@@ -134,6 +134,8 @@ nl:
     consent_agree: "Akkoord & doorgaan"
     consent_decline: "Ik ga niet akkoord"
     consent_declined: "Geen probleem — je kunt deze pagina sluiten."
+    consent_default_text: "Dit Verto vraagt naast je antwoorden om je geboortedatum, waar je woont en je gender. Deelname is vrijwillig, je antwoorden zijn anoniem en kunnen voor onderzoek worden gebruikt."
+    consent_privacy_link: "Hoe we met je gegevens omgaan"
     respondent_code_title: 'Voordat je begint'
     respondent_code_prompt_default: 'Verzin een code die je onthoudt'
     respondent_code_placeholder: 'bijv. sam14'

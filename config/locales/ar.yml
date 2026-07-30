@@ -134,6 +134,8 @@ ar:
     consent_agree: "أوافق وأتابع"
     consent_decline: "لا أوافق"
     consent_declined: "لا مشكلة — يمكنك إغلاق هذه الصفحة."
+    consent_default_text: "يطلب منك هذا الاستبيان تاريخ ميلادك ومكان إقامتك وجنسك، إلى جانب إجاباتك. المشاركة طوعية، وإجاباتك مجهولة الهوية، وقد تُستخدم لأغراض البحث."
+    consent_privacy_link: "كيف نتعامل مع بياناتك"
     respondent_code_title: 'قبل أن تبدأ'
     respondent_code_prompt_default: 'اختر رمزًا تتذكره'
     respondent_code_placeholder: 'مثال: sam14'

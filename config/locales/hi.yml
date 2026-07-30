@@ -134,6 +134,8 @@ hi:
     consent_agree: "सहमत हैं और जारी रखें"
     consent_decline: "मैं सहमत नहीं हूँ"
     consent_declined: "कोई बात नहीं — आप इस पृष्ठ को बंद कर सकते हैं।"
+    consent_default_text: "यह Verto आपके उत्तरों के साथ आपकी जन्मतिथि, आप कहाँ रहते हैं और आपका लिंग पूछता है। भाग लेना स्वैच्छिक है, आपके उत्तर गुमनाम हैं और उनका उपयोग शोध के लिए किया जा सकता है।"
+    consent_privacy_link: "हम आपके डेटा को कैसे संभालते हैं"
     respondent_code_title: 'शुरू करने से पहले'
     respondent_code_prompt_default: 'एक कोड सोचें जो आपको याद रहे'
     respondent_code_placeholder: 'उदा. sam14'

@@ -3958,6 +3958,14 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   color: rgba(28,32,52,0.78); text-align: left;
   max-height: 300px; overflow-y: auto;
 }
+/* The privacy-policy link under the consent body. Quiet by design — it sits
+   between the wording and the Agree button without competing with either. */
+.play-consent-legal { text-align: left; margin-top: -6px; }
+.play-consent-legal a {
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
+  color: rgba(28,32,52,0.6); text-decoration: underline;
+}
+.play-consent-legal a:hover { color: rgba(28,32,52,0.85); }
 .play-consent-actions { display: flex; flex-direction: column; gap: 10px; }
 .play-consent-agree {
   padding: 13px 22px; border-radius: 100px; border: none; cursor: pointer;

@@ -134,6 +134,8 @@ id:
     consent_agree: "Setuju & lanjutkan"
     consent_decline: "Saya tidak setuju"
     consent_declined: "Tidak masalah — Anda bisa menutup halaman ini."
+    consent_default_text: "Verto ini menanyakan tanggal lahir, tempat tinggal, dan jenis kelamin Anda, di samping jawaban Anda. Partisipasi bersifat sukarela, jawaban Anda anonim, dan dapat digunakan untuk penelitian."
+    consent_privacy_link: "Cara kami menangani data Anda"
     respondent_code_title: 'Sebelum mulai'
     respondent_code_prompt_default: 'Buat kode yang akan Anda ingat'
     respondent_code_placeholder: 'mis. sam14'

@@ -29,17 +29,16 @@ readable against the audit it came from._
    (P0-3 and P1-5): AI generation runs in Solid Queue jobs, flow translation
    batches one Claude call per locale instead of per card per locale, the public
    grade endpoint is bulkheaded, and `rack-timeout` bounds every request.
-4. 🔴 **No enforced consent for the PII you collect** — respondents submit
-   location + birth date, and the consent gate is still optional: a Verto can be
-   published collecting both with no gate at all. The pages (`/privacy`,
-   `/terms`) and the audit trail exist; the requirement doesn't (P0-6).
+4. ~~🔴 **No enforced consent for the PII you collect**~~ — **fixed** (P0-6): a
+   Verto that collects the demographic tail and has no gate of its own now gets
+   a default consent screen, and every gate links to the privacy policy.
 5. ~~🟠 **No spend guardrails on the editor**~~ — **fixed** (P0-4): per-user
    hourly limits on every Claude endpoint plus a per-organisation daily cap.
    The client-side "disable the button while it's in flight" polish remains.
 
-What's left in P0 is entirely compliance: **P0-6 (consent is still optional on
-Vertos that collect location and birth date)**, **P0-7 (GDPR data-subject
-rights)** and **P0-8 (email verification + terms acceptance)**.
+What's left in P0 is **P0-7 (GDPR data-subject rights: respondent export and
+per-respondent deletion)** and **P0-8 (email verification + terms acceptance at
+signup)**.
 
 Plus, commercially: **there is no billing, subscription, or usage metering of any
 kind** — a prerequisite for a paid "customer-ready" product.
@@ -70,7 +69,7 @@ Effort estimates are rough (S ≤ half-day, M ≈ 1–2 days, L ≈ 3–5 days).
 | ~~P0-3~~ | ~~**Get AI work off request threads**~~ **Done** — Solid Queue in-process (`solid_queue_mode :async`) with `BuildVertoJob`, `FinishVertoSetupJob`, `GenerateFlowJob` and `RenderReportPdfJob`. The streaming endpoints still hold a thread by design; they are bounded by the slot pool and exempted from `rack-timeout`. | Removed the 3-concurrent-call → app-wide 502 failure mode. | L | `app/jobs/`, `config/puma.rb` |
 | ~~P0-4~~ | ~~**Rate-limit + quota all AI endpoints**~~ **Done (server side)** — `ThrottlesAiSpend` adds per-user hourly limits on every Claude endpoint (deck generation and the imports at 20/h, per-card generate/optimise/moderate at 120/h, chat at 60/h, summaries and the report stream at 30/h, Pexels at 60/h) plus a per-organisation daily ceiling, `AI_DAILY_GENERATION_CAP`, default 300. The summaries and report stream are rate-limited but deliberately **not** counted against the daily cap — both replay a cache when the response count hasn't moved, so most requests there spend nothing. **Still open:** disabling the editor's submit buttons client-side while a request is in flight. | Runaway Anthropic spend; a signed-in user or a stuck retry loop could queue unbounded paid generations. | M | `concerns/throttles_ai_spend.rb`, `surveys_controller.rb` |
 | ~~P0-5~~ | ~~**Configure a durable, shared cache store**~~ **Done** — Solid Cache on the primary database (no separate `cache` database; the generator's template default would have pointed at one that doesn't exist), 64MB cap. **Correction to the original note:** only Rails' own `rate_limit` counters and `NominatimClient`'s geocode cache used `Rails.cache` — `TranslationCache` and the results-report markdown are database columns and were never affected. | Made every `rate_limit` in the app a real throttle instead of a per-process counter reset by each deploy. | S | `config/cache.yml`, `production.rb`, `CreateSolidCacheTables` |
-| P0-6 | **Enforce the consent baseline** — the *pages* shipped (`/privacy`, `/terms`, `/cookie_policy`, footer links, cookie-consent banner) and the consent gate exists in two forms (survey-level `consent_text` and the `consent_gate` card). What is still missing is the **enforcement**: `consent_gated?` is advisory, so a Verto collecting location or birth date can still be published with no gate at all. | Compliance blocker for collecting respondent PII. The consent *audit trail* is well-built — it just isn't required. | S | `survey.rb:1012-1019` (`consent_required?` optional), `legal_controller.rb` |
+| ~~P0-6~~ | ~~**Legal + consent baseline**~~ **Done** — the pages, footer links and cookie banner had already shipped; what was missing was enforcement. `DemographicQuestions` appends birth month/year, location and gender to **every** Verto at creation, so consent being optional meant the platform was collecting personal data ungated wherever a creator hadn't written any. The player now supplies a default gate (localised, all 19 files) whenever a Verto collects personal data and has no gate of its own, and every consent gate links to `/privacy`. Enforced at the player rather than at publish **deliberately**: a publish-time rule would have left already-live Vertos ungated, which was the actual exposure. | Compliance blocker for collecting respondent PII. | S | `survey.rb` (`default_consent_gate?`), `player/show.html.erb` |
 | P0-7 | **GDPR data-subject rights** — respondent data export + per-respondent deletion/anonymization (by token/email); a documented retention policy. | Legal requirement; today PII can only be removed by destroying the whole Verto. | M | `verto_csv_importer.rb:155` |
 | P0-8 | **Email verification + Terms acceptance at signup** — Rails `generates_token_for :email_confirmation` + mailer; a required "I agree to Terms & Privacy" checkbox persisted on the user. | Prevents signup with unowned emails; records consent to terms. | M | `registrations_controller.rb`, `registrations/new.html.erb` |
 

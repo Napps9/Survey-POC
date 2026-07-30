@@ -134,6 +134,8 @@ tr:
     consent_agree: "Kabul et ve devam et"
     consent_decline: "Kabul etmiyorum"
     consent_declined: "Sorun değil — bu sayfayı kapatabilirsiniz."
+    consent_default_text: "Bu Verto, yanıtlarınızın yanı sıra doğum tarihinizi, nerede yaşadığınızı ve cinsiyetinizi sorar. Katılım gönüllüdür, yanıtlarınız anonimdir ve araştırma için kullanılabilir."
+    consent_privacy_link: "Verilerinizi nasıl işliyoruz"
     respondent_code_title: 'Başlamadan önce'
     respondent_code_prompt_default: 'Hatırlayacağınız bir kod uydurun'
     respondent_code_placeholder: 'örn. sam14'

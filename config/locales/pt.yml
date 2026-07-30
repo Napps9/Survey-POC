@@ -134,6 +134,8 @@ pt:
     consent_agree: "Concordar e continuar"
     consent_decline: "Não concordo"
     consent_declined: "Sem problema — pode fechar esta página."
+    consent_default_text: "Este Verto pede a sua data de nascimento, onde vive e o seu género, além das suas respostas. A participação é voluntária, as suas respostas são anónimas e podem ser usadas para investigação."
+    consent_privacy_link: "Como tratamos os seus dados"
     respondent_code_title: 'Antes de começar'
     respondent_code_prompt_default: 'Invente um código de que se lembre'
     respondent_code_placeholder: 'ex. sam14'
