@@ -79,7 +79,7 @@ Effort estimates are rough (S ≤ half-day, M ≈ 1–2 days, L ≈ 3–5 days).
 | P1-2 | **Verify & document DB + storage backups** — confirm Render Postgres backup retention, add a `pg_dump`-to-bucket job if needed, offsite the storage bucket; write down RPO/RTO and a rollback runbook. | M | `render.yaml:101`; no backup config in repo |
 | P1-3 | **DB-verifying health check** — point `/up` at an action that runs `ActiveRecord::Base.connection.verify!` so a DB outage actually fails the health check. | S | `render.yaml:17`, `routes.rb:44` |
 | P1-4 | **Gate migrations on deploy** — move `db:prepare` out of the boot entrypoint into Render's `preDeployCommand` (runs once, gated); keep migrations backward-compatible; add statement timeouts. | S | `bin/docker-entrypoint:12-14` |
-| P1-5 | **Add `rack-timeout`** to bound all thread occupancy (reinforces P0-3). | S | none present |
+| ~~P1-5~~ | ~~**Add `rack-timeout`** to bound all thread occupancy (reinforces P0-3).~~ **Done** — three tiers keyed off named routes: streams exempt, Claude/import/export endpoints at 240s, everything else at 45s. | S | `lib/request_timeout.rb`, `config/initializers/rack_timeout.rb` |
 | P1-6 | **Back up AR encryption keys** — the three `ACTIVE_RECORD_ENCRYPTION_*` keys are Render-generated and live nowhere the owner controls; if the service is recreated, all stored Google tokens become permanently undecryptable. Record them in a secret store; add `previous_keys` before any rotation. | S | `render.yaml:67-73` |
 
 ### Data layer

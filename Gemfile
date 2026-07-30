@@ -9,6 +9,13 @@ gem "sqlite3", ">= 1.4", group: [ :development, :test ]
 gem "pg", "~> 1.5",      group: :production
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
+# Bounds how long a request may hold a Puma thread. Required as
+# `rack/timeout/base` rather than the default entry point: the latter also
+# loads a railtie that inserts the middleware automatically at a 15s default,
+# which would kill generation, import, the exports and every stream on
+# contact. config/initializers/rack_timeout.rb inserts it deliberately, with
+# per-tier bounds.
+gem "rack-timeout", "~> 0.7.0", require: "rack/timeout/base"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]

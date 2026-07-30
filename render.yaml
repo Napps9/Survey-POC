@@ -60,6 +60,18 @@ services:
       # mid-request. See lib/puma/plugin/memory_watchdog.rb; 0 = log only.
       - key: MEMORY_WATCHDOG_RESTART_PERCENT
         value: "90"
+      # How long a request may hold one of the three Puma threads before
+      # rack-timeout raises in it. Two tiers, because the spread between a
+      # dashboard render and a multi-locale flow generation is two orders of
+      # magnitude: DEFAULT covers ordinary pages, SLOW covers the Claude
+      # endpoints, the imports and the exports. The streaming endpoints are
+      # exempt entirely. See lib/request_timeout.rb for which route is which.
+      # Render's edge drops the *client* connection on its own timeout but
+      # leaves Rails working, so this is what actually frees the thread.
+      - key: REQUEST_TIMEOUT_DEFAULT
+        value: "45"
+      - key: REQUEST_TIMEOUT_SLOW
+        value: "240"
       # Cap glibc malloc arenas (default is 8 x CPU). Ruby's threaded server
       # otherwise fragments memory across many arenas and RSS creeps up until
       # the 512MB starter instance is OOM-killed and Render returns 502s.
