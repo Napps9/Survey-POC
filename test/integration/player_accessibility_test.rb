@@ -186,4 +186,26 @@ class PlayerAccessibilityTest < ActionDispatch::IntegrationTest
     assert_includes html, 'tabindex="0"'
     assert_includes html, "keydown->nps-slider#key"
   end
+
+  # ── Focus management ────────────────────────────────────────────────────
+
+  test "the player moves focus when the card changes" do
+    # Honest about what this is: a smoke guard, not a behavioural test. Focus
+    # management is JS with no browser-test harness in this repo — which is
+    # exactly the gap P2-5 describes — so the real verification was driving
+    # Chromium: focus lands on the newly active card when the deck advances,
+    # stays on the Next button when a required card refuses to advance, and is
+    # not stolen on first load.
+    #
+    # What this pins is that the call still exists and is still conditional on
+    # the card having actually changed, so it can't be quietly dropped.
+    js = File.read(Rails.root.join("app/javascript/controllers/player_controller.js"))
+
+    assert_includes js, "_focusCard(card)"
+    assert_match(/if \(changed && !first\) this\._focusCard\(card\)/, js,
+                 "focus must move only on a real card change, and never on first render")
+    assert_match(/tabindex", "-1"/, js,
+                 "the card must be programmatically focusable without entering the tab order")
+    assert_includes js, "preventScroll: true"
+  end
 end

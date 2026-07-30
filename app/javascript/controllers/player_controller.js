@@ -1567,9 +1567,16 @@ export default class extends Controller {
   // The class is transient: added here, removed when the animation ends. Left
   // on, it would re-fire whenever card-shake was removed from the same card,
   // replaying the entry on a failed required-field tap.
+  // Card-entry effects. Named for the animation, but it also owns moving focus
+  // (P2-4) because this is where the "did the card actually change" test lives
+  // and duplicating that in _update would be worse. Note the ordering: focus
+  // moves before the motion guards below, since a respondent on reduced motion
+  // or in forms mode still needs the focus to follow the deck.
   _animateCardEntry(card, idx) {
+    const first   = this._enteredIdx === undefined
     const changed = this._enteredIdx !== idx
     this._enteredIdx = idx
+    if (changed && !first) this._focusCard(card)
     if (!card || !changed) return
     if (this.formsValue) return           // form mode strips game-like motion
     if (this._reducedMotion) return
@@ -1579,6 +1586,29 @@ export default class extends Controller {
     const cls = this._navBack ? "is-entering-back" : "is-entering"
     card.classList.add(cls)
     card.addEventListener("animationend", () => card.classList.remove(cls), { once: true })
+  }
+
+  // Move focus onto the card that just appeared (P2-4). Without this the deck
+  // is only half usable by keyboard: every control on a card can now be
+  // operated, but advancing leaves focus on an element that just went hidden,
+  // so the browser drops it to <body> and the respondent has to Tab from the
+  // top of the document on every single question.
+  //
+  // Focusing the card container also makes a screen reader announce the new
+  // question, which is the other half of what a sighted respondent gets for
+  // free from the card simply changing.
+  //
+  // Deliberately skipped on the FIRST render: stealing focus on page load is
+  // disorienting, moves it away from anything the browser restored, and
+  // nothing has happened yet that a respondent needs told about.
+  _focusCard(card) {
+    if (!card) return
+    // tabindex -1: programmatically focusable, but never inserted into the tab
+    // order, so Tab still walks the card's own controls rather than the wrapper.
+    if (!card.hasAttribute("tabindex")) card.setAttribute("tabindex", "-1")
+    // preventScroll: the deck positions cards itself, and letting the browser
+    // scroll to the focus target fights that.
+    try { card.focus({ preventScroll: true }) } catch (_) { card.focus() }
   }
 
   get _reducedMotion() {
