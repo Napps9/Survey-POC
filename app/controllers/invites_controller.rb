@@ -3,6 +3,20 @@ class InvitesController < ApplicationController
   skip_before_action :set_current_organisation, only: [ :show, :accept ]
   layout "fullscreen"
 
+  # #accept verifies a password (User.authenticate_by, for an existing-account
+  # holder following an invite link) and had NO rate limit at all — an
+  # unauthenticated password oracle against ANY address, since the email is
+  # taken from the form rather than from the invite (P1-12).
+  #
+  # Per-IP only, deliberately. This one action multiplexes several flows —
+  # creating an account, joining as an already-signed-in user, signing in — and
+  # a per-address limit would bucket every password-less request under one blank
+  # key, throttling legitimate signed-in joins. The IP bound is what closes the
+  # oracle; the precise per-address limits live on the dedicated sign-in and
+  # reset endpoints where the action means exactly one thing.
+  rate_limit to: 20, within: 3.minutes, only: :accept,
+             with: -> { redirect_to invite_path(params[:token]), alert: "Try again later." }
+
   before_action :require_admin!, only: [ :new, :create ]
   before_action :load_invite,    only: [ :show, :accept ]
   before_action :resume_session_if_possible, only: [ :show, :accept ]

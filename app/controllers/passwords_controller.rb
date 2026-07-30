@@ -3,7 +3,14 @@ class PasswordsController < ApplicationController
   layout "fullscreen"
   skip_before_action :set_current_organisation
   before_action :set_user_by_token, only: %i[ edit update ]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_password_path, alert: "Try again later." }
+  # Per-IP and per-address (P1-12). The second one matters twice over here: it
+  # bounds reset attempts against one account, and it stops someone mail-bombing
+  # a single inbox with reset links from a rotating pool of addresses.
+  rate_limit to: 10, within: 3.minutes, only: :create, name: "ip",
+             with: -> { redirect_to new_password_path, alert: "Try again later." }
+  rate_limit to: 5, within: 20.minutes, only: :create, name: "email",
+             by:   -> { "email:#{params[:email_address].to_s.strip.downcase}" },
+             with: -> { redirect_to new_password_path, alert: "Try again later." }
 
   def new
   end
