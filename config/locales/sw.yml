@@ -51,6 +51,7 @@ sw:
     explanation_placeholder: "Yanaonyeshwa baada ya mchezaji kujibu — k.m. kwa nini hili ni sahihi."
     correct_badge: "Sahihi"
     token_award_title: "Pointi"
+    token_enabled_label: 'Swali hili linatoa pointi'
     token_award_hint: "Zinatolewa kwa kujibu tu"
     token_checkpoint_placeholder: "Inaonyesha pointi ambazo mchezaji amekusanya hadi sasa."
     eyebrow:
@@ -161,6 +162,8 @@ sw:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Jinsi kila mtu alivyofanya, swali kwa swali"
       tokens_result_label: "Umekusanya"
+      tokens_earned: 'Pointi zilizopatikana'
+      tokens_earned_none: 'Hakuna pointi kwa hili'
     editor:
       delete_card_confirm: Futa kadi hii?
       confirm_delete: "Ufute kweli?"

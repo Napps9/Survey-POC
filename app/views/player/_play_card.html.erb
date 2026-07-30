@@ -3,8 +3,9 @@
     respondent's chosen content language (falls back to the Verto's primary). %>
 <% locale ||= nil %>
 <% default_locale ||= SupportedLocales::DEFAULT %>
+<% card_index = defined?(card_index) ? card_index : nil %>
 <div class="split-card">
   <%= render "shared/split_left",     card: card, progress: progress, mode: :player %>
-  <%= render "shared/card_component", card: card, mode: :player,
+  <%= render "shared/card_component", card: card, mode: :player, card_index: card_index,
         locale: locale, default_locale: default_locale %>
 </div>

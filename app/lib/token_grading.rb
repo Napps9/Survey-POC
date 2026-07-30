@@ -29,12 +29,21 @@ module TokenGrading
   CHOICE_MANY  = %w[select_many select_many_grid].freeze
   CHOICE       = (CHOICE_ONE + CHOICE_MANY).freeze
   FLAT         = %w[range nps rating open_ended prioritise].freeze
-  NON_QUESTION = %w[welcome_card token_checkpoint].freeze
+  # Was a hand-copied list; now the canonical one, so a new non-answer card type
+  # can't be added in one place and forgotten here.
+  NON_QUESTION = CardTypes::NON_QUESTION_TYPES
 
-  # Does this card define any non-zero token award (and so get counted)?
+  # Does this card award tokens (and so get counted)?
+  #
+  # "Off" used to be implicit — a card with all-zero amounts simply awarded
+  # nothing, and the editor dropped zeros on save, so there was no way to tell a
+  # deliberately-unawarded card from one a creator hadn't configured yet. An
+  # explicit `tokens_enabled: false` says "this question doesn't award points",
+  # and survives a save. Absent means enabled, so existing decks are unaffected.
   def awarding?(card)
     return false unless card.is_a?(Hash)
     return false if NON_QUESTION.include?(card["type"].to_s)
+    return false if card["tokens_enabled"] == false
     any_amount?(config_for(card))
   end
 

@@ -51,6 +51,7 @@ it:
     explanation_placeholder: "Mostrata dopo la risposta del giocatore — es. perché è corretta."
     correct_badge: "Corretta"
     token_award_title: "Punti"
+    token_enabled_label: 'Questa domanda assegna punti'
     token_award_hint: "Assegnati solo per aver risposto"
     token_checkpoint_placeholder: "Mostra i punti raccolti finora dal giocatore."
     eyebrow:
@@ -161,6 +162,8 @@ it:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Come hanno fatto tutti, domanda per domanda"
       tokens_result_label: "Hai raccolto"
+      tokens_earned: 'Punti guadagnati'
+      tokens_earned_none: 'Nessun punto per questa'
     editor:
       delete_card_confirm: Eliminare questa carta?
       confirm_delete: "Eliminare davvero?"

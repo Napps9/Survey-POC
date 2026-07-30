@@ -4,6 +4,8 @@
     Locals:
       card — the card hash (must respond to `[]` for "type", "options", etc.)
       mode — :editor, :preview, or :player (default: :preview)
+      card_index — this card's position in the deck. Player only, and only used
+        to place the tokenisation intro; nil everywhere else.
 
     The :editor mode adds inline edit chrome: contenteditable text,
     "card-editor" controller alongside "picker", per-option delete buttons,
@@ -12,6 +14,7 @@
 %>
 <%
   mode    ||= :preview
+  card_index = defined?(card_index) ? card_index : nil
   editable = (mode == :editor)
   type     = card["type"].to_s
   render_type = type
@@ -700,6 +703,14 @@
         <div class="token-checkpoint-placeholder"><%= t("card.token_checkpoint_placeholder") %></div>
       <% end %>
     <% end %>
+
+    <%# The tokenisation intro sits outside the type switch, because a creator
+        can pin it to any card — it's no longer welded to the welcome card.
+        Matched on deck index, not cid: a deck that never went through the
+        editor's save path has no cids, and the intro still has to show up. %>
+    <% if mode == :player && card_index.present? && @survey&.token_intro_index == card_index %>
+      <%= render "player/token_intro" %>
+    <% end %>
   </div>
 
   <%# Quiz: the correct-answer controls for this card. List/grid/yes-no mark the
@@ -774,6 +785,17 @@
     <% if type == "tap_card" || TokenGrading::FLAT.include?(type) || choice_shaped %>
       <div class="token-award-block" data-token-block>
         <div class="token-award-title"><span>🪙</span> <%= t("card.token_award_title") %></div>
+
+        <%# Explicit off. "Off" used to be implicit — all-zero amounts, which the
+            serialiser dropped, so a deliberately-unawarded question was
+            indistinguishable from one not set up yet. Absent means enabled, so
+            existing decks are untouched. %>
+        <label class="token-enabled-row">
+          <input type="checkbox" data-token-enabled
+                 <%= "checked" unless card["tokens_enabled"] == false %>
+                 data-action="change->survey-editor#markDirty" />
+          <span><%= t("card.token_enabled_label", default: "This question awards points") %></span>
+        </label>
 
         <% if type == "tap_card" %>
           <% Array(display["options"]).each_with_index do |opt, i| %>

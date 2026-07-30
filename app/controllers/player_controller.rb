@@ -306,6 +306,11 @@ class PlayerController < ApplicationController
   def regions
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
+    # Mirrors the #results guard above: hiding the CTA isn't enough, the endpoint
+    # is public and answers anyone who asks.
+    unless @survey.regions_enabled?
+      return render json: { ok: false, error: "Regional comparison not enabled" }, status: :forbidden
+    end
 
     # Every responder (answered ≥1 question), not only completers — consistent
     # with the results comparison above. Only the columns the country grouping

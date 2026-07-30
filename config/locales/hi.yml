@@ -51,6 +51,7 @@ hi:
     explanation_placeholder: "खिलाड़ी के उत्तर देने के बाद दिखाया जाता है — जैसे यह सही क्यों है।"
     correct_badge: "सही"
     token_award_title: "अंक"
+    token_enabled_label: 'यह प्रश्न अंक देता है'
     token_award_hint: "सिर्फ़ उत्तर देने पर मिलते हैं"
     token_checkpoint_placeholder: "दिखाता है कि खिलाड़ी ने अब तक कितने अंक अर्जित किए हैं।"
     eyebrow:
@@ -161,6 +162,8 @@ hi:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "सभी ने प्रश्न दर प्रश्न कैसा किया"
       tokens_result_label: "आपने अर्जित किए"
+      tokens_earned: 'अंक मिले'
+      tokens_earned_none: 'इसके लिए कोई अंक नहीं'
     editor:
       delete_card_confirm: इस कार्ड को हटाएं?
       confirm_delete: "वाकई हटाएं?"

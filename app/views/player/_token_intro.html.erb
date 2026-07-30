@@ -1,0 +1,21 @@
+<%# Tokenisation intro (player only): tells respondents up front that they'll
+    earn points per question, and previews the token types on offer — required
+    reading before they answer anything, since answers can't be changed
+    afterwards to earn more (see PlayerController#locked_merge).
+
+    Rendered on whichever card Survey#token_intro_card_cid names. It was
+    hardcoded onto the welcome card, which is a problem for a deck whose welcome
+    card is already busy — or has been deleted. The default is still the welcome
+    card, so an existing Verto looks exactly as it did. %>
+<div class="welcome-intake">
+  <div class="welcome-intake-tokens">
+    <div class="welcome-intake-tokens-note">🎯 <%= t("player.tokens_welcome_note") %></div>
+    <% if @survey.token_types.any? %>
+      <div class="welcome-intake-token-types">
+        <% @survey.token_types.each do |tt| %>
+          <span class="welcome-token-type-pill"><%= tt["icon"] %> <%= tt["name"] %></span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

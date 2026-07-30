@@ -51,6 +51,7 @@ vi:
     explanation_placeholder: "Hiển thị sau khi người chơi trả lời — ví dụ tại sao điều này đúng."
     correct_badge: "Đúng"
     token_award_title: "Điểm"
+    token_enabled_label: 'Câu hỏi này có điểm'
     token_award_hint: "Chỉ cần trả lời là được cộng điểm"
     token_checkpoint_placeholder: "Hiển thị số điểm người chơi đã thu thập được cho đến nay."
     eyebrow:
@@ -161,6 +162,8 @@ vi:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Mọi người đã làm thế nào, theo từng câu hỏi"
       tokens_result_label: "Bạn đã thu thập"
+      tokens_earned: 'Điểm nhận được'
+      tokens_earned_none: 'Câu này không có điểm'
     editor:
       delete_card_confirm: Xóa thẻ này?
       confirm_delete: "Xóa thật chứ?"

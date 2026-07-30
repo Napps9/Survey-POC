@@ -51,6 +51,7 @@ uk:
     explanation_placeholder: "Показується після відповіді гравця — напр. чому це правильно."
     correct_badge: "Правильно"
     token_award_title: "Бали"
+    token_enabled_label: 'Це питання нараховує бали'
     token_award_hint: "Нараховуються просто за відповідь"
     token_checkpoint_placeholder: "Показує бали, які гравець зібрав на цей момент."
     eyebrow:
@@ -161,6 +162,8 @@ uk:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Як упоралися всі, питання за питанням"
       tokens_result_label: "Ви зібрали"
+      tokens_earned: 'Нараховано балів'
+      tokens_earned_none: 'За цю відповідь балів немає'
     editor:
       delete_card_confirm: Видалити цю картку?
       confirm_delete: "Точно видалити?"

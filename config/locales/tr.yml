@@ -51,6 +51,7 @@ tr:
     explanation_placeholder: "Oyuncu cevapladıktan sonra gösterilir — örn. bunun neden doğru olduğu."
     correct_badge: "Doğru"
     token_award_title: "Puan"
+    token_enabled_label: 'Bu soru puan verir'
     token_award_hint: "Sadece cevap verdiğiniz için kazanılır"
     token_checkpoint_placeholder: "Bir oyuncunun şimdiye kadar topladığı puanları gösterir."
     eyebrow:
@@ -161,6 +162,8 @@ tr:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Herkesin soru soru nasıl yaptığı"
       tokens_result_label: "Topladığınız puan"
+      tokens_earned: 'Kazanılan puan'
+      tokens_earned_none: 'Bunda puan yok'
     editor:
       delete_card_confirm: Bu kart silinsin mi?
       confirm_delete: "Gerçekten silinsin mi?"

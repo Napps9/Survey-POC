@@ -767,6 +767,52 @@
               </div>
             <% end %>
           <% end %>
+
+          <%# Points behaviour — a separate form from the toggle above, because
+              these are presentation choices that stay editable for the life of
+              the Verto, while tokenisation_enabled itself locks once answers
+              exist (SETTINGS_LOCKED_IN_USE). %>
+          <% if @survey.tokenisation_enabled? %>
+            <%= form_with url: survey_settings_path(@survey), method: :post, local: true,
+                  style: "margin:12px 0 0;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);" do %>
+              <input type="hidden" name="return_tab" value="tokens" />
+
+              <%# Where the "you'll earn points" intro appears. Was welded to the
+                  welcome card, which is awkward on a busy welcome card — or
+                  impossible on a deck that hasn't got one. %>
+              <label style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin-bottom:5px;" for="token-intro-cid">
+                Show the points intro on
+              </label>
+              <select name="token_intro_cid" id="token-intro-cid"
+                      onchange="this.form.requestSubmit()"
+                      style="width:100%;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;">
+                <% current_intro = @survey.token_intro_selected_cid %>
+                <% @survey.token_intro_choices.each_with_index do |(cid, ctype, label), i| %>
+                  <option value="<%= cid %>" <%= "selected" if cid == current_intro %>>
+                    <%= "#{i + 1}. #{CardTypes.badge(ctype).presence || ctype.tr('_', ' ')}" %><%= " — #{label.to_s.truncate(38)}" if label.present? %>
+                  </option>
+                <% end %>
+              </select>
+
+              <input type="hidden" name="token_reveal_enabled" value="0" />
+              <label style="display:flex;align-items:flex-start;gap:10px;margin-top:12px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+                <input type="checkbox" name="token_reveal_enabled" value="1"
+                       <%= "checked" if @survey.token_reveal_enabled? %>
+                       onchange="this.form.requestSubmit()"
+                       style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+                <span>Show what each answer earned as players move on, not just the running total.</span>
+              </label>
+
+              <input type="hidden" name="token_back_nav_enabled" value="0" />
+              <label style="display:flex;align-items:flex-start;gap:10px;margin-top:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+                <input type="checkbox" name="token_back_nav_enabled" value="1"
+                       <%= "checked" if @survey.token_back_nav_enabled? %>
+                       onchange="this.form.requestSubmit()"
+                       style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+                <span>Let players go back and answer a points question they skipped. A question they already answered stays locked either way.</span>
+              </label>
+            <% end %>
+          <% end %>
         </div>
       </div>
 
@@ -993,6 +1039,34 @@
             <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;">
               Publishing gives you a public link to share. Respondents just open it and answer — no Play Verto account needed.
             </div>
+          <% end %>
+        </details>
+
+        <%# What the respondent can do once they've finished. Both were
+            hardcoded on for every published Verto, so both default to ON and
+            this panel only lets a creator turn them off — defaulting either to
+            off would silently withdraw a live feature from existing Vertos. %>
+        <details class="publish-block">
+          <summary class="publish-block-title">After they finish <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="share_enabled" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="share_enabled" value="1"
+                     <%= "checked" if @survey.share_enabled? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Offer a Share button on the thank-you screen, so respondents can pass the link on.</span>
+            </label>
+          <% end %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+            <input type="hidden" name="regions_enabled" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="regions_enabled" value="1"
+                     <%= "checked" if @survey.regions_enabled? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Let respondents see how other regions answered, on a map.</span>
+            </label>
           <% end %>
         </details>
 

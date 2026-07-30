@@ -39,6 +39,12 @@ export default class extends Controller {
     scoresUrl: { type: String, default: "" },
     tokenisation: { type: Boolean, default: false },
     tokenTypes: { type: Array, default: [] },
+    // Show each answer's own award as the respondent leaves the card, on top of
+    // the running total (see _revealTokenEarn).
+    tokenReveal: { type: Boolean, default: false },
+    // Let a respondent return to a tokenised card they left unanswered and
+    // still earn its points — what the server has always permitted.
+    tokenBackNav: { type: Boolean, default: false },
     // Answer-branching: when on, next()/back() follow the answer-logic graph
     // instead of stepping linearly. Off ⇒ byte-identical linear behaviour.
     logic: { type: Boolean, default: false },
@@ -1465,14 +1471,23 @@ export default class extends Controller {
   // right as the player advances past a card (Next/Finish) — going back to a
   // card already applied here can't re-earn, since _lockInputs makes its
   // widgets unresponsive and this method itself is idempotent per index.
+  //
+  // An UNANSWERED card is deliberately left alone when backNav is on. The
+  // server has always taken this view — locked_merge keys off whether an answer
+  // was actually stored, so it accepts a late answer to a card that was skipped
+  // — but this method used to lock on the way past regardless, making the
+  // client stricter than the server and quietly costing a respondent the points
+  // for a question they meant to come back to.
   _applyTokenEarn(idx) {
     if (!this.tokenisationValue) return
     const card = this.cardTargets[idx]
     if (!card || card.dataset.cardAwardsTokens !== "true" || this._tokenLocked.has(idx)) return
-    this._tokenLocked.add(idx)
 
     const key   = card.dataset.cardIndex
     const value = this._answers[key]?.value
+    if (this.tokenBackNavValue && this._isBlankAnswer(value)) return
+
+    this._tokenLocked.add(idx)
     const earned = this._computeEarned(card, card.dataset.cardType, value)
     Object.entries(earned).forEach(([id, amount]) => {
       this._tokenTotals[id] = (this._tokenTotals[id] || 0) + amount
@@ -1480,6 +1495,48 @@ export default class extends Controller {
 
     this._lockInputs(card)
     this._renderTokenChip()
+    if (this.tokenRevealValue) this._revealTokenEarn(card, earned)
+  }
+
+  // Mirrors TokenGrading.blank_value? — what the server treats as "not
+  // answered", and so what back-navigation is allowed to return to.
+  _isBlankAnswer(value) {
+    if (value === null || value === undefined) return true
+    if (typeof value === "string") return value.trim() === ""
+    if (Array.isArray(value)) return value.length === 0
+    if (typeof value === "object") return Object.keys(value).length === 0
+    return false
+  }
+
+  // Show what THIS answer earned, not just the running total. The amount was
+  // already being computed and thrown away into the total; this surfaces it,
+  // reusing the quiz reveal's markup and animation so the two feel like one
+  // idea rather than two.
+  _revealTokenEarn(card, earned) {
+    const host = card.querySelector(".split-right") || card
+    host.querySelectorAll(".token-reveal").forEach(el => el.remove())
+
+    const types = this.tokenTypesValue
+    const rows  = Object.entries(earned)
+      .filter(([ , amount ]) => Number(amount) > 0)
+      .map(([ id, amount ]) => {
+        const meta = types.find(t => String(t.id) === String(id))
+        return `${meta?.icon || "★"} ${meta?.name || ""} +${amount}`.trim()
+      })
+
+    const box = document.createElement("div")
+    box.className = `token-reveal ${rows.length ? "is-earned" : "is-none"}`
+    const head = document.createElement("div")
+    head.className = "token-reveal-head"
+    head.textContent = rows.length ? t("player.tokens_earned") : t("player.tokens_earned_none")
+    box.appendChild(head)
+    if (rows.length) {
+      const detail = document.createElement("div")
+      detail.className = "token-reveal-rows"
+      detail.textContent = rows.join(" · ")
+      box.appendChild(detail)
+    }
+    host.appendChild(box)
   }
 
   // Client mirror of TokenGrading.earned — the token amounts a stored answer

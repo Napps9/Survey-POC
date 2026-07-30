@@ -51,6 +51,7 @@ id:
     explanation_placeholder: "Ditampilkan setelah pemain menjawab — mis. mengapa ini benar."
     correct_badge: "Benar"
     token_award_title: "Poin"
+    token_enabled_label: 'Pertanyaan ini memberi poin'
     token_award_hint: "Didapat hanya karena menjawab"
     token_checkpoint_placeholder: "Menampilkan poin yang telah dikumpulkan pemain sejauh ini."
     eyebrow:
@@ -161,6 +162,8 @@ id:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Bagaimana semua orang menjawab, pertanyaan demi pertanyaan"
       tokens_result_label: "Kamu mengumpulkan"
+      tokens_earned: 'Poin diperoleh'
+      tokens_earned_none: 'Tidak ada poin untuk itu'
     editor:
       delete_card_confirm: Hapus kartu ini?
       confirm_delete: "Yakin hapus?"

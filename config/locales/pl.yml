@@ -51,6 +51,7 @@ pl:
     explanation_placeholder: "Pokazywane po udzieleniu odpowiedzi przez gracza — np. dlaczego to jest poprawne."
     correct_badge: "Poprawnie"
     token_award_title: "Punkty"
+    token_enabled_label: 'To pytanie przyznaje punkty'
     token_award_hint: "Przyznawane po prostu za odpowiedź"
     token_checkpoint_placeholder: "Pokazuje punkty, które gracz zebrał do tej pory."
     eyebrow:
@@ -161,6 +162,8 @@ pl:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Jak poradzili sobie wszyscy, pytanie po pytaniu"
       tokens_result_label: "Zebrane punkty"
+      tokens_earned: 'Zdobyte punkty'
+      tokens_earned_none: 'Bez punktów za to'
     editor:
       delete_card_confirm: Usunąć tę kartę?
       confirm_delete: "Na pewno usunąć?"

@@ -506,6 +506,24 @@ class SurveysController < ApplicationController
     if params.key?(:token_types)
       attrs[:token_types] = Survey.sanitize_token_types(JSON.parse(params[:token_types]))
     end
+    # Which card carries the token intro. A cid that isn't in the deck is stored
+    # as nil rather than rejected — Survey#token_intro_card_cid already falls
+    # back to the welcome card, so a stale cid degrades to the old behaviour.
+    if params.key?(:token_intro_cid)
+      wanted = params[:token_intro_cid].to_s.strip.presence
+      attrs[:token_intro_cid] =
+        if wanted && Array(@survey.cards).any? { |c| c.is_a?(Hash) && c["cid"].to_s == wanted }
+          wanted
+        end
+    end
+    # Presentation switches — safe to change at any point in a Verto's life, so
+    # deliberately NOT in SETTINGS_LOCKED_IN_USE. None of them re-scores an
+    # answer or changes what anyone agreed to; they only affect what a
+    # respondent is shown from here on.
+    %i[token_reveal_enabled token_back_nav_enabled share_enabled regions_enabled].each do |flag|
+      next unless params.key?(flag)
+      attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
+    end
     if params.key?(:compare_note)
       attrs[:compare_note] = params[:compare_note].to_s.strip.first(160).presence
     end

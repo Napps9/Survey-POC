@@ -890,6 +890,13 @@ export default class extends Controller {
         if (CHOICE_TYPES.includes(type) && this._tokenAwardMode(card) === "completion") {
           out.token_award_mode = "completion"
         }
+        // Only an explicit OFF is serialised. Absent means enabled, so this
+        // never appears on a deck the creator hasn't touched — and unlike
+        // all-zero amounts (which the serialiser drops), it survives the save,
+        // which is the whole point: it distinguishes "no points here" from
+        // "not set up yet".
+        const enabledBox = this._tokenScope(card).querySelector("[data-token-enabled]")
+        if (enabledBox && !enabledBox.checked) out.tokens_enabled = false
       }
 
       // Answer-branching: single-pick cards carry per-option `routes` (+ an

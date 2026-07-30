@@ -53,6 +53,7 @@ en:
     explanation_placeholder: "Shown after the player answers — e.g. why this is right."
     correct_badge: "Correct"
     token_award_title: "Points"
+    token_enabled_label: 'This question awards points'
     token_award_hint: "Awarded just for answering"
     token_checkpoint_placeholder: "Shows the points a player has collected so far."
     eyebrow:
@@ -163,6 +164,8 @@ en:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "How everyone did, question by question"
       tokens_result_label: "You collected"
+      tokens_earned: 'Points earned'
+      tokens_earned_none: 'No points for that one'
     editor:
       delete_card_confirm: "Delete this card?"
       confirm_delete: "Really delete?"

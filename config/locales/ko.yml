@@ -51,6 +51,7 @@ ko:
     explanation_placeholder: "플레이어가 답한 후 표시됩니다 — 예: 왜 이것이 정답인지."
     correct_badge: "정답"
     token_award_title: "포인트"
+    token_enabled_label: '이 문항은 점수를 부여합니다'
     token_award_hint: "답변만 해도 받을 수 있어요"
     token_checkpoint_placeholder: "플레이어가 지금까지 모은 포인트를 보여줍니다."
     eyebrow:
@@ -161,6 +162,8 @@ ko:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "모두가 문제별로 어떻게 했는지"
       tokens_result_label: "모은 포인트"
+      tokens_earned: '획득한 점수'
+      tokens_earned_none: '이 문항은 점수 없음'
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       confirm_delete: "정말 삭제할까요?"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_105832) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_30_114232) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -492,6 +492,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_105832) do
     t.string "publish_token"
     t.datetime "published_at"
     t.boolean "quiz", default: false, null: false
+    t.boolean "regions_enabled", default: true, null: false
     t.string "render_mode", default: "cards", null: false
     t.text "results_report"
     t.text "results_report_brief"
@@ -499,12 +500,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_105832) do
     t.integer "results_report_response_count"
     t.text "results_summary"
     t.integer "results_summary_response_count"
+    t.boolean "share_enabled", default: true, null: false
     t.boolean "show_results_comparison", default: false, null: false
     t.string "slug"
     t.text "thankyou_body"
     t.string "thankyou_title"
     t.string "theme"
     t.string "title"
+    t.boolean "token_back_nav_enabled", default: false, null: false
+    t.string "token_intro_cid"
+    t.boolean "token_reveal_enabled", default: false, null: false
     t.json "token_types", default: [], null: false
     t.boolean "tokenisation_enabled", default: false, null: false
     t.datetime "unpublished_at"

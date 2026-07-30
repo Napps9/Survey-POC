@@ -411,6 +411,16 @@ class Survey < ApplicationRecord
         c.delete("pages")
       end
 
+      # Explicit "this question awards no points". Coerced to a real boolean
+      # because TokenGrading.awarding? tests for `false` exactly — a "false"
+      # string arriving from JSON would otherwise read as truthy and award. Only
+      # an explicit false is kept; absent (and true) both mean enabled, so
+      # existing decks are untouched.
+      if c.key?("tokens_enabled")
+        enabled = ActiveModel::Type::Boolean.new.cast(c["tokens_enabled"])
+        enabled == false ? c["tokens_enabled"] = false : c.delete("tokens_enabled")
+      end
+
       if c.key?("image")
         had_image = c["image"].present?
         c["image"] = sanitize_image_url(c["image"])
@@ -464,6 +474,47 @@ class Survey < ApplicationRecord
   def token_awarding_indices
     return [] unless tokenisation_enabled?
     TokenGrading.awarding_indices(cards)
+  end
+
+  # Which deck position carries the "you'll earn points" intro.
+  #
+  # The creator's choice is STORED as a cid, so it follows its card through a
+  # reorder — but it's RESOLVED to an index, because a deck built outside the
+  # editor's save path (the demo seeder, a raw import) can have no cids at all,
+  # and the intro still has to appear. Falls back to the welcome card, where it
+  # used to be hardcoded, then to the first card.
+  def token_intro_index
+    return nil unless tokenisation_enabled?
+
+    list = Array(cards)
+    return nil if list.empty?
+
+    wanted = token_intro_cid.presence
+    if wanted
+      found = list.index { |c| c.is_a?(Hash) && c["cid"].to_s == wanted }
+      return found if found
+    end
+
+    list.index { |c| c.is_a?(Hash) && c["type"].to_s == "welcome_card" } || 0
+  end
+
+  # The cid of that card, when it has one — what the editor's picker marks as
+  # selected. Nil on a deck whose cards predate cid backfilling; the picker only
+  # offers cid-bearing cards, and the default above covers the rest.
+  def token_intro_selected_cid
+    idx = token_intro_index
+    return nil if idx.nil?
+
+    card = Array(cards)[idx]
+    card.is_a?(Hash) ? card["cid"].presence : nil
+  end
+
+  # Cards a creator can pin the token intro to — anything with a cid.
+  def token_intro_choices
+    Array(cards).filter_map do |c|
+      next unless c.is_a?(Hash) && c["cid"].present?
+      [ c["cid"].to_s, c["type"].to_s, c["title"].presence || c["text"].presence ]
+    end
   end
 
   def token_awarding_count

@@ -51,6 +51,7 @@ he:
     explanation_placeholder: "מוצג לאחר שהשחקן עונה — למשל מדוע זה נכון."
     correct_badge: "נכון"
     token_award_title: "נקודות"
+    token_enabled_label: 'שאלה זו מזכה בנקודות'
     token_award_hint: "ניתנות רק על מענה"
     token_checkpoint_placeholder: "מציג את הנקודות שהשחקן צבר עד כה."
     eyebrow:
@@ -161,6 +162,8 @@ he:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "איך כולם הסתדרו, שאלה אחר שאלה"
       tokens_result_label: "צברת"
+      tokens_earned: 'נקודות שהושגו'
+      tokens_earned_none: 'אין נקודות על זו'
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
       confirm_delete: "באמת למחוק?"

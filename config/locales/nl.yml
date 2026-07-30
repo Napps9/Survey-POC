@@ -51,6 +51,7 @@ nl:
     explanation_placeholder: "Wordt getoond nadat de speler heeft geantwoord — bijv. waarom dit juist is."
     correct_badge: "Juist"
     token_award_title: "Punten"
+    token_enabled_label: 'Deze vraag geeft punten'
     token_award_hint: "Verdiend door simpelweg te antwoorden"
     token_checkpoint_placeholder: "Toont de punten die een speler tot nu toe heeft verzameld."
     eyebrow:
@@ -161,6 +162,8 @@ nl:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "Hoe iedereen het deed, vraag voor vraag"
       tokens_result_label: "Je hebt verzameld"
+      tokens_earned: 'Punten verdiend'
+      tokens_earned_none: 'Hiervoor geen punten'
     editor:
       delete_card_confirm: Deze kaart verwijderen?
       confirm_delete: "Echt verwijderen?"

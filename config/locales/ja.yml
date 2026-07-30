@@ -51,6 +51,7 @@ ja:
     explanation_placeholder: "プレイヤーの回答後に表示されます — 例：なぜこれが正しいか。"
     correct_badge: "正解"
     token_award_title: "ポイント"
+    token_enabled_label: 'この質問はポイントを付与します'
     token_award_hint: "回答するだけで獲得できます"
     token_checkpoint_placeholder: "プレイヤーがこれまでに集めたポイントを表示します。"
     eyebrow:
@@ -161,6 +162,8 @@ ja:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "みんなの結果を質問ごとに"
       tokens_result_label: "獲得ポイント"
+      tokens_earned: '獲得ポイント'
+      tokens_earned_none: 'この回答ではポイントなし'
     editor:
       delete_card_confirm: このカードを削除しますか？
       confirm_delete: "本当に削除？"

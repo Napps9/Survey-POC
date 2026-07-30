@@ -18,12 +18,15 @@
   show_comparison = @survey.show_results_comparison? && results_url.present?
   # The public play link respondents can pass on via the Share button on the
   # thank-you screen. Blank in owner preview (and for token-less drafts).
-  share_url       = preview_mode || play_token.blank? ? "" : play_survey_url(play_token)
+  # Creators can switch Share off; it defaults on, because it has been on for
+  # every published Verto up to now.
+  share_url       = preview_mode || play_token.blank? || !@survey.share_enabled? ? "" : play_survey_url(play_token)
 
   # Every Verto captures region data via the "Where do you live?" demographic
   # question, so the post-finish map is always available — it just needs a
-  # reachable token (drafts in preview have none).
-  regions_url = play_token.present? ? player_regions_url(play_token) : ""
+  # reachable token (drafts in preview have none) and the creator's say-so
+  # (regions_enabled, also default on for the same reason).
+  regions_url = play_token.present? && @survey.regions_enabled? ? player_regions_url(play_token) : ""
 
   # Quiz mode: each graded card is scored server-side as the player advances.
   # The grade/state endpoints need a reachable token, so they're blank in owner
@@ -75,6 +78,8 @@
      data-player-scores-url-value="<%= scores_url %>"
      data-player-tokenisation-value="<%= token_mode %>"
      data-player-token-types-value="<%= @survey.token_types.to_json %>"
+     data-player-token-reveal-value="<%= @survey.token_reveal_enabled? %>"
+     data-player-token-back-nav-value="<%= @survey.token_back_nav_enabled? %>"
      data-player-logic-value="<%= logic_mode %>"
      data-player-end-screens-value="<%= @survey.end_screens_list.to_json %>"
      data-player-forward-label-value="<%= t('player.visit_website') %>">
@@ -179,7 +184,7 @@
            data-card-awards-tokens="<%= awards_tokens %>"
            <% if awards_tokens %>data-card-tokens="<%= card['tokens'].to_json %>" data-card-token-award="<%= card['token_award'].to_json %>" data-card-token-award-mode="<%= card['token_award_mode'] %>"<% end %>
            data-card-required="<%= (is_q && card['required']) ? 'true' : 'false' %>">
-        <%= render "player/play_card", card: card, progress: prog,
+        <%= render "player/play_card", card: card, progress: prog, card_index: idx,
               locale: @display_locale, default_locale: @survey.default_locale %>
       </div>
     <% end %>
@@ -237,12 +242,17 @@
             <%= @survey.forward_label.presence || t("player.visit_website") %> →
           </a>
 
-          <button type="button"
-                  data-player-target="shareBtn"
-                  data-action="click->player#share"
-                  style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);cursor:pointer;">
-            <%= t("player.share") %>
-          </button>
+          <%# Share is opt-OUT: it has been on for every published Verto so far,
+              so share_enabled defaults true and this only disappears when a
+              creator deliberately turns it off. %>
+          <% if @survey.share_enabled? %>
+            <button type="button"
+                    data-player-target="shareBtn"
+                    data-action="click->player#share"
+                    style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);cursor:pointer;">
+              <%= t("player.share") %>
+            </button>
+          <% end %>
 
           <% if regions_url.present? %>
             <button type="button"

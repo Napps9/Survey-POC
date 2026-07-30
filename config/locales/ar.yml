@@ -51,6 +51,7 @@ ar:
     explanation_placeholder: "يظهر بعد إجابة اللاعب — مثلًا لماذا هذا صحيح."
     correct_badge: "صحيح"
     token_award_title: "النقاط"
+    token_enabled_label: 'هذا السؤال يمنح نقاطًا'
     token_award_hint: "تُمنح لمجرد الإجابة"
     token_checkpoint_placeholder: "يعرض النقاط التي جمعها اللاعب حتى الآن."
     eyebrow:
@@ -161,6 +162,8 @@ ar:
       quiz_score_bucket: "%{score}/%{max}"
       quiz_per_question: "كيف أبلى الجميع، سؤالًا بسؤال"
       tokens_result_label: "جمعت"
+      tokens_earned: 'النقاط المكتسبة'
+      tokens_earned_none: 'لا نقاط على هذه'
     editor:
       delete_card_confirm: حذف هذه البطاقة؟
       confirm_delete: "حذف فعلاً؟"

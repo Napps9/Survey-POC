@@ -2,28 +2,13 @@
     promise — used to be a top banner. Region capture no longer lives here;
     it's the "Where do you live?" demographic card every Verto already asks
     (see DemographicQuestions / _card_component.html.erb's "location" input
-    flavour). %>
+    flavour).
+
+    The tokenisation intro used to live here too. It's now player/_token_intro,
+    rendered against whichever card Survey#token_intro_card_cid names — still the
+    welcome card by default, so nothing moves unless a creator moves it. %>
 <% if @survey.show_results_comparison? %>
   <div class="welcome-intake">
     <div class="welcome-intake-compare">🏁 <%= @survey.compare_note_text %></div>
-  </div>
-<% end %>
-
-<%# Tokenisation: tells respondents up front that they'll earn points per
-    question, and previews the token types on offer — required reading before
-    they answer anything, since answers can't be changed afterwards to earn
-    more (see PlayerController#locked_merge). %>
-<% if @survey.tokenisation_enabled? %>
-  <div class="welcome-intake">
-    <div class="welcome-intake-tokens">
-      <div class="welcome-intake-tokens-note">🎯 <%= t("player.tokens_welcome_note") %></div>
-      <% if @survey.token_types.any? %>
-        <div class="welcome-intake-token-types">
-          <% @survey.token_types.each do |tt| %>
-            <span class="welcome-token-type-pill"><%= tt["icon"] %> <%= tt["name"] %></span>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
   </div>
 <% end %>

@@ -1200,6 +1200,35 @@
 .gate-editable { outline: none; border-radius: 6px; cursor: text; transition: box-shadow 0.15s; }
 .gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,234,203,0.3); }
 .gate-editable:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.55); }
+/* Explicit "this question awards points" switch, at the top of a card's token
+   block in the editor's Tokenomics tab. */
+.token-enabled-row {
+  display: flex; align-items: center; gap: 8px;
+  margin: 2px 0 10px; cursor: pointer;
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.75);
+}
+.token-enabled-row input { width: 14px; height: 14px; accent-color: #01EACB; cursor: pointer; flex-shrink: 0; }
+
+/* Per-answer token award, revealed as the respondent leaves a card. Same shape
+   and animation as .quiz-reveal so the two read as one idea — the amount was
+   always being computed, it just went straight into the running total. */
+.token-reveal {
+  margin-top: 14px; padding: 12px 14px; border-radius: 12px;
+  border: 1px solid transparent; animation: quiz-reveal-in 0.28s ease both;
+}
+.token-reveal.is-earned { background: rgba(1,234,203,0.10); border-color: rgba(1,234,203,0.38); }
+.token-reveal.is-none   { background: rgba(0,0,0,0.04);     border-color: rgba(0,0,0,0.10); }
+.token-reveal-head {
+  font-family: "Alata", sans-serif; font-size: 14px; letter-spacing: 0.02em;
+  color: #0B7F6E;
+}
+.token-reveal.is-none .token-reveal-head { color: rgba(0,0,0,0.55); }
+.token-reveal-rows {
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034;
+  margin-top: 5px;
+}
+
 /* Editable Verto name in the editor's top-left chrome. Reads as plain text
    until hovered/focused so it doesn't compete with the cards, but is wide
    enough to be an obvious click target. */
