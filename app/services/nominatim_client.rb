@@ -26,15 +26,21 @@ require "uri"
 #
 # A custom User-Agent identifies the app (required by both). The 3-char minimum
 # query length, day-long cache of successful lookups and client-side debounce
-# keep call volume low; there's no cross-process shared throttle here — a
-# dedicated queue/limiter would be the right next step if traffic grows enough
-# to matter.
+# keep call volume low, and an app-wide budget (SharedRateLimiter, P1-11) caps
+# the total outbound rate across every thread and process. The per-IP
+# rate_limit on PlayerController#location_search bounds one respondent; this
+# bounds the app, which is what the provider's usage policy is written about
+# and what an IP ban would follow from.
 class NominatimClient
   NOMINATIM_ENDPOINT  = "https://nominatim.openstreetmap.org/search".freeze
   # LocationIQ mirrors Nominatim's /search API; region is us1 (default) or eu1.
   LOCATIONIQ_ENDPOINT = "https://%<region>s.locationiq.com/v1/search".freeze
   TIMEOUT_SECS = 6
   MIN_QUERY_LEN = 3
+  # Nominatim's public usage policy is an absolute maximum of 1 request/second;
+  # LocationIQ's free tier is 2/second. Default to the stricter of the two and
+  # let an operator raise it to match whatever plan they're actually on.
+  DEFAULT_MAX_RPS = 1
   USER_AGENT   = "Playverto/1.0 (https://playverto.app; support@playverto.app)".freeze
 
   class << self
@@ -49,6 +55,16 @@ class NominatimClient
       cached = Rails.cache.read(cache_key)
       return cached if cached
 
+      # Checked AFTER the cache read, deliberately: a cached term makes no
+      # outbound call, so it must not spend budget. Over the limit we return no
+      # suggestions rather than sleeping — the search box is a type-ahead, the
+      # respondent's next keystroke retries in a moment, and blocking a Puma
+      # thread on a third-party quota is the failure mode P0-3 was about.
+      unless limiter.allow?
+        Rails.logger.info("[NominatimClient] outbound budget reached, skipping search")
+        return []
+      end
+
       body    = get_json(endpoint, request_params(q, limit))
       results = Array(body).filter_map { |place| normalize(place) }
       # Only cache a real hit — never let a transient outage or a 403 poison a
@@ -60,7 +76,20 @@ class NominatimClient
       []
     end
 
+    def max_rps
+      Integer(ENV.fetch("GEOCODE_MAX_RPS", DEFAULT_MAX_RPS))
+    rescue ArgumentError
+      DEFAULT_MAX_RPS
+    end
+
     private
+
+    # Keyed per provider: switching to LocationIQ shouldn't inherit the budget
+    # already spent against the public OSM server, and the two have different
+    # published limits.
+    def limiter
+      SharedRateLimiter.new("geocode:#{provider}", per_second: max_rps)
+    end
 
     # "locationiq" when a key is configured, else the public "nominatim" server.
     def provider

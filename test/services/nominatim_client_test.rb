@@ -83,7 +83,12 @@ class NominatimClientTest < ActiveSupport::TestCase
   end
 
   test "an empty result is not cached, so a transient 403 never poisons a search term" do
+    # Needs headroom in the app-wide outbound budget (P1-11): this makes two
+    # network calls for the same term in one second, which the default 1/s
+    # would legitimately skip. The subject here is cache poisoning, not the
+    # throttle — that has its own tests below.
     with_memory_cache do
+      ENV["GEOCODE_MAX_RPS"] = "50"
       query = "somewhere-#{SecureRandom.hex(4)}"
       calls = 0
       stub_method(NominatimClient, :get_json, ->(_u, _p) { calls += 1; calls == 1 ? [] : [ PLACE ] }) do
@@ -93,6 +98,8 @@ class NominatimClientTest < ActiveSupport::TestCase
       end
       assert_equal 2, calls, "empty result must not be cached; the real hit should be"
     end
+  ensure
+    ENV.delete("GEOCODE_MAX_RPS")
   end
 
   private
@@ -111,5 +118,79 @@ class NominatimClientTest < ActiveSupport::TestCase
     yield
   ensure
     vars.each_key { |k| original.key?(k) ? ENV[k] = original[k] : ENV.delete(k) }
+  end
+
+  # ── App-wide outbound budget (P1-11) ──────────────────────────────────────
+
+  # Frozen clock: the budget window is one second wide, so without this a test
+  # whose calls straddle a boundary silently gets a second budget and the
+  # "must be skipped" assertions flake.
+  def with_cache_and_rps(rps)
+    previous = Rails.cache
+    Rails.cache = ActiveSupport::Cache.lookup_store(:solid_cache_store)
+    ENV["GEOCODE_MAX_RPS"] = rps.to_s
+    SolidCache::Entry.delete_all
+    travel_to(Time.utc(2026, 7, 30, 12, 0, 0)) { yield }
+  ensure
+    ENV.delete("GEOCODE_MAX_RPS")
+    SolidCache::Entry.delete_all
+    Rails.cache = previous
+  end
+
+  test "the outbound budget stops calls once the app-wide rate is spent" do
+    calls = 0
+    with_cache_and_rps(2) do
+      stub_method(NominatimClient, :get_json, ->(_u, _p) { calls += 1; [ PLACE ] }) do
+        # Distinct queries so the day-long result cache never serves them.
+        assert NominatimClient.search(query: "Austin").any?
+        assert NominatimClient.search(query: "Boston").any?
+        assert_equal [], NominatimClient.search(query: "Chicago"),
+                     "the third call in the same second must be skipped"
+      end
+    end
+    assert_equal 2, calls, "only the calls inside the budget should reach the network"
+  end
+
+  test "a cached term costs no budget" do
+    # The budget is checked AFTER the cache read on purpose: a cached term makes
+    # no outbound call, so spending budget on it would throttle the app for
+    # requests it never actually made.
+    calls = 0
+    with_cache_and_rps(1) do
+      stub_method(NominatimClient, :get_json, ->(_u, _p) { calls += 1; [ PLACE ] }) do
+        assert NominatimClient.search(query: "Austin").any?      # spends the budget
+        assert NominatimClient.search(query: "Austin").any?      # served from cache
+        assert NominatimClient.search(query: "Austin").any?
+      end
+    end
+    assert_equal 1, calls
+  end
+
+  test "being over budget degrades to no suggestions rather than raising" do
+    with_cache_and_rps(1) do
+      stub_method(NominatimClient, :get_json, ->(_u, _p) { [ PLACE ] }) do
+        NominatimClient.search(query: "Austin")
+        assert_nothing_raised { NominatimClient.search(query: "Denver") }
+        assert_equal [], NominatimClient.search(query: "Seattle")
+      end
+    end
+  end
+
+  test "an over-budget skip is not cached as an empty result" do
+    # A skipped search must not poison the term for a full day — the existing
+    # "only cache a real hit" rule is what protects this, so pin it.
+    with_cache_and_rps(1) do
+      stub_method(NominatimClient, :get_json, ->(_u, _p) { [ PLACE ] }) do
+        NominatimClient.search(query: "Austin")
+        assert_equal [], NominatimClient.search(query: "Lisbon")
+      end
+      # A later second, budget refreshed: the term resolves properly.
+      travel 2.seconds
+      SolidCache::Entry.delete_all
+      stub_method(NominatimClient, :get_json, ->(_u, _p) { [ PLACE ] }) do
+        assert NominatimClient.search(query: "Lisbon").any?,
+               "the skipped term must not have been cached empty"
+      end
+    end
   end
 end

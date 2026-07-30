@@ -138,6 +138,14 @@ services:
         sync: false
       - key: LOCATIONIQ_REGION
         value: us1
+      # App-wide outbound cap for the geocoder (SharedRateLimiter, P1-11). The
+      # per-IP rate_limit on #location_search bounds one respondent; this bounds
+      # the whole app, which is what the provider's usage policy is written
+      # about. LocationIQ's free tier allows 2/second — raise this to match a
+      # paid plan. Over budget, a search returns no suggestions rather than
+      # sleeping on a Puma thread.
+      - key: GEOCODE_MAX_RPS
+        value: "2"
       - key: APP_HOST
         sync: false
       - key: APP_PROTOCOL
