@@ -64,6 +64,33 @@ class VertoRenameTest < ActionDispatch::IntegrationTest
     assert_match "Fallback theme", response.body
   end
 
+  # BUG-013. The editor's blur guard restored the title from `titleValue` —
+  # which the input handler had already overwritten with the blank, so it put
+  # the blank back over the blank and the save wiped the name. The server took
+  # whatever it was sent. Both halves are fixed; this pins the server half,
+  # which is the one that decides what ends up in the column.
+  test "a blank title is ignored rather than saved over the name" do
+    s = draft(title: "Original name")
+
+    [ "", "   ", "\n\t " ].each do |blank|
+      patch survey_path(s), params: { title: blank, cards: s.cards }.to_json,
+                            headers: { "CONTENT_TYPE" => "application/json" }
+      assert_response :success
+      assert_equal "Original name", s.reload.title,
+                   "a blank title (#{blank.inspect}) must not overwrite the Verto's name"
+    end
+  end
+
+  # The blank guard must not swallow a legitimate rename that merely has
+  # surrounding whitespace — otherwise it fixes one bug by creating another.
+  test "a title with surrounding whitespace still renames" do
+    s = draft
+    patch survey_path(s), params: { title: "  Padded name  ", cards: s.cards }.to_json,
+                          headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :success
+    assert_equal "Padded name", s.reload.title
+  end
+
   # #update rejects any edit to a published Verto (423), so an editable title
   # there would be a field whose saves silently fail.
   test "the name is read-only once live" do

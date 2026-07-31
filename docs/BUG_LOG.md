@@ -8,6 +8,45 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-013 — A blank rename erased a Verto's name, past a guard written to stop it
+
+**Severity:** a stray select-all-delete in the editor wiped the Verto's name,
+and the autosave persisted it 1.5 s later with no confirmation.
+**Found:** P2-5, on the first run of the editor browser suite.
+
+The editor had a guard for exactly this. On `blur`:
+
+```js
+restoreRenameIfBlank() {
+  if (el.textContent.trim()) return
+  el.textContent = this.titleValue      // ← already blank by now
+}
+```
+
+The `input` handler fires first and does `this.titleValue = next` with `next`
+being the empty string, so the blur guard restored the blank **over the blank**.
+It read the one value the bug had already destroyed. The server took whatever
+it was sent — `attrs[:title] = payload["title"] if payload.key?("title")` — so
+nothing else stood in the way.
+
+**Fix:** `renameVerto` now bails on a blank instead of storing it, which both
+keeps blanks out of the payload and leaves the blur guard something real to
+restore. The server independently drops a blank title, and strips the one it
+does keep.
+
+**Guard:** the browser test that found it, plus two integration tests over the
+server half — one asserting three flavours of blank are ignored, one asserting a
+padded-but-real name still renames, so the fix can't over-correct into refusing
+legitimate titles. Both were verified to fail against the unfixed controller.
+
+**Lesson:** the same shape as BUG-008 and BUG-003 — a guard that reads state the
+bug has already corrupted is not a guard. No unit test would have caught it
+either: the defect lives in the *ordering* of two DOM event handlers, which is
+only observable in a browser. It sat in code that shipped with a comment
+explaining the protection it wasn't providing.
+
+---
+
 ## BUG-012 — A key added after the translation payload was dispatched
 
 **Severity:** three locales would have rendered a raw dot path.

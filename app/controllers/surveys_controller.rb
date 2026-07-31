@@ -338,7 +338,11 @@ class SurveysController < ApplicationController
     # PATCH (which sends just `brand_palette`) doesn't wipe title/cards, and the
     # editor autosave (title/description/cards) doesn't touch the palette.
     attrs = {}
-    attrs[:title]       = payload["title"]       if payload.key?("title")
+    # A blank title is dropped, not saved: the dashboard tile calls a Verto by
+    # its title first, so an empty one leaves it with nothing to call itself.
+    # The editor guards this too, but a client-side guard that has already
+    # failed once is not something to leave as the only one.
+    attrs[:title]       = payload["title"].to_s.strip if payload.key?("title") && payload["title"].to_s.strip.present?
     attrs[:description] = payload["description"] if payload.key?("description")
     attrs[:flows]       = Survey.sanitize_flows(payload["flows"]) if payload.key?("flows")
     if payload.key?("cards")

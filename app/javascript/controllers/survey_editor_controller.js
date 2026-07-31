@@ -841,6 +841,11 @@ export default class extends Controller {
   renameVerto() {
     const el = this.vertoTitleTarget
     const next = el.textContent.replace(/\s+/g, " ").trim()
+    // A blank is not a rename, it's a name mid-retype. Keep titleValue on the
+    // last good name so no save carries a blank AND so restoreRenameIfBlank
+    // below has something to put back — it reads titleValue, so clobbering it
+    // here made that guard restore the blank over the blank.
+    if (!next) return
     if (next === this.titleValue) return
     this.titleValue = next
     this.markDirty()
