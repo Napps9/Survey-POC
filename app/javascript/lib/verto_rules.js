@@ -1,4 +1,5 @@
 import { ROUTABLE_TYPES } from "lib/routable_types"
+import { isPaged } from "lib/paged_types"
 // Rules of the Game — the "Do's and Don'ts" the Verto generator follows
 // (SurveyGenerator::SYSTEM / CARD_RULES and the source "Rules of the Game"
 // document), re-expressed as live editor checks. Each check returns a
@@ -109,7 +110,11 @@ export function analyzeCard(card) {
   const optionCheck = optionLengthCheck(card)
   if (optionCheck) checks.push(optionCheck)
 
-  if (card.type === "scenario") {
+  // Every paged type, not just scenario. A no-op today — analyzeCard returns
+  // null for non-questions above and consent_gate is one — but the rule being
+  // expressed is "does this card have pages", and writing it as a literal type
+  // name is what let the editor drop a consent gate's pages on every save.
+  if (isPaged(card.type)) {
     checks.push(pageCountCheck(card))
     const pageLenCheck = pageLengthCheck(card)
     if (pageLenCheck) checks.push(pageLenCheck)

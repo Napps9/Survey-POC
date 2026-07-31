@@ -52,26 +52,49 @@ class JsConstantParityTest < ActiveSupport::TestCase
 
   # The specific hole the drift went through: the editor's type panel builds a
   # card's right-hand component from a lookup table, falling back to an empty
-  # string. A paged type missing from that table silently blanks the card when
-  # a creator picks it, which is how consent_gate behaved.
-  test "every paged type has a component builder in the type panel" do
+  # string. A type missing from that table silently blanks the card when a
+  # creator picks it, which is how consent_gate behaved.
+  #
+  # Scoped to EVERY pickable type, not just the paged ones. The first version of
+  # this test checked PAGED_TYPES only and passed while `token_checkpoint` — the
+  # one other type with the same gap — was still missing. A guard written from a
+  # single bug tends to be shaped like that bug; the rule is "anything a creator
+  # can pick must render as something".
+  test "every pickable card type has a component builder in the type panel" do
     source = js("controllers/type_panel_controller.js")
     table  = source[/const COMPONENTS = \{(.*?)\n\}/m]
     assert table, "COMPONENTS table not found in type_panel_controller.js"
 
-    missing = Survey::PAGED_TYPES.reject { |type| table.match?(/^\s+#{Regexp.escape(type)}:/) }
+    pickable = CardTypes.pickable.map(&:first)
+    assert_operator pickable.size, :>=, 10, "expected the pickable list to be substantial"
+
+    missing = pickable.reject { |type| table.match?(/^\s+#{Regexp.escape(type)}:/) }
     assert_empty missing,
-                 "these paged types fall through to COMPONENTS' `() => \"\"` default, so " \
-                 "picking them in the Answer Type panel blanks the card: #{missing.inspect}"
+                 "these types fall through to COMPONENTS' `() => \"\"` default, so picking " \
+                 "them in the Answer Type panel blanks the card: #{missing.inspect}. " \
+                 "A type that deliberately renders nothing still needs an explicit entry " \
+                 "(see welcome_card), so an omission stays distinguishable from a decision."
   end
 
-  test "the JS page gate is not keyed on a single literal type" do
-    # The original defect, stated directly: `type === "scenario"` where the rule
-    # is "is this a paged type". Both files now import isPaged instead.
-    %w[controllers/survey_editor_controller.js controllers/type_panel_controller.js].each do |path|
-      refute_match(/type\s*===\s*"scenario"/, js(path),
-                   "#{path} still gates behaviour on the literal type `scenario`. " \
-                   "Use isPaged() from lib/paged_types so a new paged type is picked up.")
+  # The original defect, stated directly: `type === "scenario"` where the rule is
+  # "is this a paged type".
+  #
+  # Scanned across every editor JS file rather than the two that were fixed —
+  # the first version listed two paths by hand and missed lib/verto_rules.js,
+  # which still had the literal. A ban that only covers the files you already
+  # edited bans nothing.
+  test "no editor JS gates paged behaviour on the literal type name" do
+    offenders = Dir[Rails.root.join("app/javascript/**/*.js")].filter_map do |path|
+      rel = path.sub("#{Rails.root}/app/javascript/", "")
+      # Comments stripped first: lib/paged_types.js documents the banned pattern
+      # by quoting it, and a guard that flags its own explanation is a guard
+      # people delete.
+      code = File.read(path).gsub(%r{//.*$}, "")
+      rel if code.match?(/type\s*===\s*"scenario"/)
     end
+    assert_empty offenders,
+                 "#{offenders.inspect} gate behaviour on the literal type `scenario`. " \
+                 "Use isPaged() from lib/paged_types so a new paged type is picked up — " \
+                 "this is what let a consent gate lose its pages on every save."
   end
 end

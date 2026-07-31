@@ -383,6 +383,17 @@ const COMPONENTS = {
     </div>`,
 
   welcome_card: () => "",
+
+  // Points Checkpoint. No answer is captured — the player fills the body in
+  // client-side from the cards already answered — so the editor shows the same
+  // placeholder the server renders for it.
+  //
+  // Missing entirely until now, which meant picking "Points Checkpoint" in the
+  // Answer Type panel emptied the card: it is `pickable: true` whenever
+  // tokenisation is on, and COMPONENTS falls back to `() => ""`. Exactly the
+  // consent_gate defect (BUG-015), in the one other type that had the same gap.
+  token_checkpoint: () => `
+    <div class="token-checkpoint-placeholder">Shows the points a player has collected so far.</div>`,
 }
 
 function prioritiseHtml(opts) {
