@@ -144,6 +144,10 @@ class Survey < ApplicationRecord
   MAX_LANE_LABEL    = 60 # branch name shown on the flow map (stored on the entry card)
   MAX_SCENARIO_PAGES       = 6
   MAX_SCENARIO_PAGE_LENGTH = 600
+  # The plain-language "what this card tells you" line in the Why panel. Free
+  # text, so bounded rather than allowlisted — the competency and condition
+  # beside it are checked against Framework instead.
+  MAX_OUTCOME_LENGTH       = 200
   # Card types whose content is stored as `pages` — a bounded array of
   # { id, text }. They share one sanitiser, one page-turn widget
   # (scenario_controller.js) and the same id-keyed translation handling.
@@ -388,6 +392,19 @@ class Survey < ApplicationRecord
         fid = c["flow_id"].to_s.strip
         fid.match?(FLOW_ID_FORMAT) ? c["flow_id"] = fid : c.delete("flow_id")
       end
+      # Framework provenance. SurveyGenerator#normalize_framework! already
+      # allowlists these, but that only runs on generation — this path now
+      # receives them from the editor's autosave too, so the same rule has to
+      # hold here or a crafted PATCH could put anything in the "Why this card?"
+      # panel. Same allowlist-or-drop shape as range_theme below. `outcome` is
+      # free text by design, so it is capped rather than checked.
+      c.delete("competency") if c.key?("competency") && !Framework.competency?(c["competency"])
+      c.delete("condition")  if c.key?("condition")  && !Framework.condition?(c["condition"])
+      if c.key?("outcome")
+        outcome = c["outcome"].to_s.strip.first(MAX_OUTCOME_LENGTH)
+        outcome.present? ? c["outcome"] = outcome : c.delete("outcome")
+      end
+
       # A range card's reaction-animation theme — only a known slug survives, and
       # only on a range card, so the helper always resolves to a real asset
       # folder (NpsHelper owns the theme list).

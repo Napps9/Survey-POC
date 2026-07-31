@@ -966,6 +966,17 @@ export default class extends Controller {
         out.common_question_set_id = Number(card.dataset.cardCommonQuestionSetId)
       }
 
+      // Framework provenance — which Awareness/Intention/Agency competency the
+      // card sits under, its enabling condition, and the plain-language outcome.
+      // SurveyGenerator tags every generated card with these and the editor
+      // DISPLAYS them, in the "Why this card?" panel. They were the one carried
+      // field with no line here, so the first autosave stripped them from every
+      // card in the deck and that panel went permanently empty — including for
+      // cards the creator never touched.
+      if (card.dataset.cardCompetency) out.competency = card.dataset.cardCompetency
+      if (card.dataset.cardCondition)  out.condition  = card.dataset.cardCondition
+      if (card.dataset.cardOutcome)    out.outcome    = card.dataset.cardOutcome
+
       // Range cards carry the reaction-animation theme picked in the editor.
       // Server-side sanitize drops it if it isn't a known slug on a range card.
       if (type === "range" && card.dataset.cardRangeTheme) out.range_theme = card.dataset.cardRangeTheme

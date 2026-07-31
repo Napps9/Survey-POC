@@ -8,6 +8,77 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-017 — Every autosave stripped the framework tags off every card
+
+**Severity:** silent, permanent loss of the provenance the "Why this card?"
+panel exists to show — on cards the creator never touched.
+**Found:** a bug hunt aimed specifically at the BUG-015 shape.
+
+`SurveyGenerator` tags each generated card with the Awareness/Intention/Agency
+competency it sits under, its enabling condition and a plain-language outcome.
+`_card_row.html.erb:40-42` carries all three into the DOM, the editor renders
+them in the Why panel, and `sanitize_cards_images!` preserves them perfectly.
+
+`serialize()` never read them back. It rebuilds each card as `const out = { type }`
+and adds only the keys it knows about, so the first autosave posted every card
+without them and the panel emptied for the whole deck.
+
+Proven by round trip rather than by reading:
+
+```
+sanitiser keeps competency? true  condition? true  outcome? true
+after an editor round trip: ["cid", "options", "text", "type"]
+```
+
+**Fix:** carried through from `data-card-competency` / `-condition` / `-outcome`,
+the way `common_question_id` and `range_theme` already are.
+
+**And the half that came with it:** carrying a field from the client means the
+server starts receiving it on a PATCH. `SurveyGenerator#normalize_framework!`
+allowlists competency and condition, but that runs on *generation* — not on
+save. Before this, a crafted PATCH could put any string in the Why panel and a
+5,000-character outcome in the column. The sanitiser now applies the same
+allowlist, and caps `outcome` (free text by design) at `MAX_OUTCOME_LENGTH`.
+
+**Guard:** `test/system/framework_tags_test.rb`. The regression test edits a
+*different* card, because that is the property that matters — `serialize()`
+rebuilds the whole deck, so a gap in it destroys data on cards nobody opened.
+Both round-trip tests fail against the unfixed build.
+
+**Lesson:** every "carry this through" line in `serialize()` exists because
+something was once lost. The list is not a feature list, it is a scar list —
+and anything the DOM carries but `serialize()` omits is already lost.
+
+---
+
+## BUG-016 — The guard written for BUG-015 was shaped like BUG-015
+
+**Severity:** one more blanked card type, and a test that read as coverage.
+**Found:** the same hunt, immediately.
+
+`token_checkpoint` is `pickable: true` whenever tokenisation is on and had no
+entry in the type panel's `COMPONENTS` table, which falls back to `() => ""`.
+Picking "Points Checkpoint" therefore emptied the card — the identical defect to
+consent_gate, in the only other type that had it.
+
+The parity test shipped with BUG-015 asserted *every paged type has a builder*.
+That is the property the bug happened to have, not the rule. It passed the whole
+time `token_checkpoint` was missing.
+
+The same test banned `type === "scenario"` across a hand-written list of the two
+files that had just been fixed — and so missed `lib/verto_rules.js`, which still
+had it.
+
+**Fix:** the table check now covers every **pickable** type, and the literal ban
+scans every JS file under `app/javascript` (comments stripped, since
+`paged_types.js` documents the banned pattern by quoting it).
+
+**Lesson:** a guard written immediately after a bug tends to encode that bug's
+incidental properties rather than the rule it violated. Ask what the rule is,
+then check where else it could be broken — not where it *was* broken.
+
+---
+
 ## BUG-015 — A consent gate that recorded no consent
 
 **Severity:** the highest in this log. A compliance feature that blocked
