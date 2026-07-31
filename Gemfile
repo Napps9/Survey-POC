@@ -121,6 +121,14 @@ group :development, :test do
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
 
+  # Browser tests (P2-5). Cuprite drives Chrome over CDP rather than through
+  # chromedriver, which is what makes one configuration work both on the
+  # GitHub runner (google-chrome on PATH) and in a container that only has a
+  # Playwright-managed binary. Kept out of `bin/rails test` — system tests run
+  # as their own CI step, so a browser hiccup can't take the unit suite down.
+  gem "capybara", require: false
+  gem "cuprite",  require: false
+
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 end

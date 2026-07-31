@@ -29,6 +29,40 @@ jobs:
           bin/rails db:test:prepare
           bin/rails test
 
+  system_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      # Browser tests (P2-5). A separate job from `test` on purpose: they drive
+      # a real Chrome, so if one goes flaky it is visible and separable rather
+      # than taking the unit suite — and therefore the deploy — down with it.
+      # ubuntu-latest ships Chrome; ApplicationSystemTestCase finds it, and
+      # falls back to Ferrum's own detection if the path ever moves.
+      - name: Run system tests
+        env:
+          RAILS_ENV: test
+          ANTHROPIC_API_KEY: ci-stub-key-no-real-calls
+        run: |
+          bin/rails db:test:prepare
+          bin/rails test:system
+
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-test-screenshots
+          path: tmp/screenshots
+          if-no-files-found: ignore
+
   scan_ruby:
     runs-on: ubuntu-latest
 
