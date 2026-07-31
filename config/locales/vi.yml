@@ -841,6 +841,16 @@ vi:
     section_live: Trực tiếp
     section_drafts: Bản nháp
     section_archived: Đã lưu trữ
+  welcome_mailer:
+    subject: "Chào mừng bạn đến với Playverto — cùng tạo Verto đầu tiên"
+    heading: "Mọi thứ đã sẵn sàng"
+    intro: "Email của bạn đã được xác nhận. Verto là một khảo sát mà người ta thích trả lời: những thẻ chạm để lướt qua, không phải biểu mẫu phải chịu đựng. Cách nhanh nhất để thấy điều đó là bắt đầu từ một mẫu rồi thay câu hỏi."
+    cta: "Bắt đầu từ một mẫu"
+    step_one: "Chọn một mẫu, hoặc mô tả điều bạn muốn tìm hiểu và để Playverto soạn câu hỏi."
+    step_two: "Chỉnh sửa bất kỳ thẻ nào. Điểm Verto bên phải cho bạn biết điều gì đang hiệu quả và điều gì thì không."
+    step_three: "Xuất bản rồi chia sẻ đường liên kết hoặc mã QR. Kết quả về dần khi mọi người trả lời."
+    footer: "Đang đăng nhập ở nơi khác? Bảng điều khiển của bạn luôn ở đây:"
+    sent_by: "Được gửi bởi Playverto"
   wizard:
     demographics_note: "Mỗi Verto kết thúc bằng 3 câu hỏi nhân khẩu học cố định — năm sinh, nơi sống và giới tính. Verto tự động thêm chúng: giữ việc thu thập dữ liệu nhất quán và xây dựng một tập thể nghiên cứu trên toàn nền tảng."
     create_verto: Tạo Verto

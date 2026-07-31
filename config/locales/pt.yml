@@ -841,6 +841,16 @@ pt:
     section_live: Ao vivo
     section_drafts: Rascunhos
     section_archived: Arquivados
+  welcome_mailer:
+    subject: "Boas-vindas ao Playverto — vamos criar o seu primeiro Verto"
+    heading: "Está tudo pronto"
+    intro: "O seu email está confirmado. Um Verto é um questionário que dá gosto responder: cartões que se percorrem com um toque, não um formulário que se suporta. A forma mais rápida de ver é começar por um modelo e trocar as perguntas."
+    cta: "Começar por um modelo"
+    step_one: "Escolha um modelo, ou descreva o que quer descobrir e deixe o Playverto redigir as perguntas."
+    step_two: "Edite qualquer cartão. A pontuação Verto à direita mostra o que está a resultar e o que não está."
+    step_three: "Publique e partilhe a ligação ou o código QR. Os resultados chegam à medida que as pessoas respondem."
+    footer: "Iniciou sessão noutro lado? O seu painel está sempre aqui:"
+    sent_by: "Enviado pelo Playverto"
   wizard:
     demographics_note: "Cada Verto termina com 3 perguntas demográficas fixas — ano de nascimento, onde vive e género. O Verto adiciona-as automaticamente: mantêm a recolha de dados consistente e constroem um coletivo de investigação em toda a plataforma."
     create_verto: Criar Verto

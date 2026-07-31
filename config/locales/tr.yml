@@ -841,6 +841,16 @@ tr:
     section_live: Canlı
     section_drafts: Taslaklar
     section_archived: Arşivlenenler
+  welcome_mailer:
+    subject: "Playverto'ya hoş geldiniz — ilk Verto'nuzu oluşturalım"
+    heading: "Her şey hazır"
+    intro: "E-posta adresiniz doğrulandı. Verto, yanıtlaması keyifli bir ankettir: katlanılan bir form değil, dokunarak ilerlenen kartlar. Bunu en hızlı görmenin yolu bir şablonla başlayıp soruları değiştirmek."
+    cta: "Şablonla başla"
+    step_one: "Bir şablon seçin ya da ne öğrenmek istediğinizi anlatın, soruları Playverto yazsın."
+    step_two: "İstediğiniz kartı düzenleyin. Sağdaki Verto puanı neyin işe yaradığını, neyin yaramadığını gösterir."
+    step_three: "Yayınlayın, ardından bağlantıyı ya da QR kodunu paylaşın. Yanıtlar geldikçe sonuçlar birikir."
+    footer: "Başka bir yerde mi oturum açtınız? Panonuz her zaman burada:"
+    sent_by: "Playverto tarafından gönderildi"
   wizard:
     demographics_note: "Her Verto, 3 sabit demografik soruyla biter — doğum yılı, yaşadığın yer ve cinsiyet. Verto bunları otomatik ekler: veri toplamayı tutarlı kılar ve tüm platformda bir araştırma kolektifi büyütür."
     create_verto: Verto Oluştur

@@ -841,6 +841,16 @@ de:
     section_live: Live
     section_drafts: Entwürfe
     section_archived: Archiviert
+  welcome_mailer:
+    subject: "Willkommen bei Playverto — auf zu Ihrem ersten Verto"
+    heading: "Alles bereit"
+    intro: "Ihre E-Mail-Adresse ist bestätigt. Ein Verto ist eine Umfrage, die man gern beantwortet: Karten zum Durchtippen statt eines Formulars, das man über sich ergehen lässt. Am schnellsten sehen Sie das, wenn Sie mit einer Vorlage beginnen und die Fragen austauschen."
+    cta: "Mit einer Vorlage starten"
+    step_one: "Wählen Sie eine Vorlage, oder beschreiben Sie, was Sie herausfinden möchten, und Playverto entwirft die Fragen."
+    step_two: "Bearbeiten Sie jede Karte. Der Verto-Score rechts zeigt Ihnen, was funktioniert und was nicht."
+    step_three: "Veröffentlichen Sie und teilen Sie den Link oder den QR-Code. Die Ergebnisse laufen ein, während geantwortet wird."
+    footer: "Woanders angemeldet? Ihr Dashboard finden Sie immer hier:"
+    sent_by: "Gesendet von Playverto"
   wizard:
     demographics_note: "Jedes Verto endet mit 3 festen demografischen Fragen — Geburtsjahr, Wohnort und Geschlecht. Verto fügt sie automatisch hinzu: Sie halten die Datenerhebung konsistent und bauen ein Forschungskollektiv über die ganze Plattform auf."
     create_verto: Verto erstellen

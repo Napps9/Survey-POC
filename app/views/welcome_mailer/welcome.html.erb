@@ -1,0 +1,77 @@
+<%# Inline styles + table layout for email-client compatibility, matching
+    email_confirmations_mailer/confirm.html.erb. Copy is translated (unlike the
+    older mailers) — see WelcomeMailer for why the locale has to be applied
+    explicitly here. %>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#272D4A;margin:0;padding:0;width:100%;">
+  <tr>
+    <td align="center" style="padding:40px 16px;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width:520px;background:#1C2034;border-radius:16px;">
+
+        <tr>
+          <td align="center" style="padding:40px 32px 8px;">
+            <span style="font-family:'Alata','Helvetica Neue',Arial,sans-serif;font-size:30px;letter-spacing:1.5px;line-height:1;">
+              <span style="color:#F7F7F7;">play</span><span style="color:#FF1E6F;">verto</span>
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center" style="padding:24px 32px 12px;">
+            <h1 style="font-family:'Alata','Helvetica Neue',Arial,sans-serif;font-size:22px;color:#F7F7F7;margin:0;font-weight:400;letter-spacing:0.5px;">
+              <%= t("welcome_mailer.heading") %>
+            </h1>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center" style="padding:0 40px 28px;">
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.6;color:rgba(247,247,247,0.7);margin:0;">
+              <%= t("welcome_mailer.intro") %>
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center" style="padding:0 32px 28px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+              <tr>
+                <td align="center" bgcolor="#01EACB" style="background:#01EACB;border-radius:10px;">
+                  <%= link_to t("welcome_mailer.cta"), survey_templates_url,
+                        style: "display:inline-block;padding:14px 32px;font-family:'Alata','Helvetica Neue',Arial,sans-serif;font-size:15px;letter-spacing:0.5px;color:#1C2034;text-decoration:none;font-weight:400;" %>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <%# Three steps rather than a wall of prose — the first Verto is the
+            only thing this email is trying to cause. %>
+        <tr>
+          <td style="padding:0 40px 8px;border-top:1px solid rgba(255,255,255,0.07);">
+            <% %w[one two three].each_with_index do |key, i| %>
+              <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:rgba(247,247,247,0.7);margin:<%= i.zero? ? "24px 0 10px" : "0 0 10px" %>;">
+                <span style="color:#01EACB;"><%= i + 1 %>.</span>
+                <%= t("welcome_mailer.step_#{key}") %>
+              </p>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center" style="padding:20px 40px 36px;">
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.55;color:rgba(247,247,247,0.4);margin:0;">
+              <%= t("welcome_mailer.footer") %>
+            </p>
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.55;margin:12px 0 0;word-break:break-all;">
+              <a href="<%= root_url %>" style="color:#01EACB;text-decoration:none;"><%= root_url %></a>
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;color:rgba(247,247,247,0.35);margin:20px 0 0;">
+        <%= t("welcome_mailer.sent_by") %>
+      </p>
+    </td>
+  </tr>
+</table>

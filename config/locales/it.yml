@@ -841,6 +841,16 @@ it:
     section_live: Live
     section_drafts: Bozze
     section_archived: Archiviati
+  welcome_mailer:
+    subject: "Benvenuto su Playverto: creiamo il tuo primo Verto"
+    heading: "È tutto pronto"
+    intro: "La tua email è confermata. Un Verto è un sondaggio a cui fa piacere rispondere: schede da scorrere con un tocco, non un modulo da sopportare. Il modo più rapido per vederlo è partire da un modello e cambiare le domande."
+    cta: "Parti da un modello"
+    step_one: "Scegli un modello, oppure descrivi cosa vuoi scoprire e lascia che Playverto scriva le domande."
+    step_two: "Modifica qualsiasi scheda. Il punteggio Verto a destra ti dice cosa funziona e cosa no."
+    step_three: "Pubblica, poi condividi il link o il suo codice QR. I risultati arrivano man mano che le persone rispondono."
+    footer: "Hai effettuato l'accesso altrove? La tua dashboard è sempre qui:"
+    sent_by: "Inviato da Playverto"
   wizard:
     demographics_note: "Ogni Verto termina con 3 domande demografiche fisse — anno di nascita, luogo in cui vivi e genere. Verto le aggiunge automaticamente: mantengono coerente la raccolta dati e costruiscono un collettivo di ricerca su tutta la piattaforma."
     create_verto: Crea Verto

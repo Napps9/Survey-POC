@@ -841,6 +841,16 @@ nl:
     section_live: Live
     section_drafts: Concepten
     section_archived: Gearchiveerd
+  welcome_mailer:
+    subject: "Welkom bij Playverto — we maken je eerste Verto"
+    heading: "Alles staat klaar"
+    intro: "Je e-mailadres is bevestigd. Een Verto is een vragenlijst die mensen graag invullen: kaarten die je doortikt, geen formulier dat je doorstaat. Het snelst zie je dat door met een sjabloon te beginnen en de vragen aan te passen."
+    cta: "Begin met een sjabloon"
+    step_one: "Kies een sjabloon, of beschrijf wat je wilt weten en laat Playverto de vragen opstellen."
+    step_two: "Bewerk elke kaart. De Verto-score rechts laat zien wat werkt en wat niet."
+    step_three: "Publiceer en deel de link of de QR-code. De resultaten komen binnen terwijl mensen antwoorden."
+    footer: "Elders ingelogd? Je dashboard vind je altijd hier:"
+    sent_by: "Verzonden door Playverto"
   wizard:
     demographics_note: "Elke Verto eindigt met 3 vaste demografische vragen — geboortejaar, woonplaats en gender. Verto voegt ze automatisch toe: ze houden dataverzameling consistent en bouwen een onderzoekscollectief over het hele platform."
     create_verto: Verto aanmaken

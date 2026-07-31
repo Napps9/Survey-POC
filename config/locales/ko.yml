@@ -841,6 +841,16 @@ ko:
     section_live: 라이브
     section_drafts: 초안
     section_archived: 보관됨
+  welcome_mailer:
+    subject: "Playverto에 오신 것을 환영합니다 — 첫 Verto를 만들어 보세요"
+    heading: "준비가 끝났습니다"
+    intro: "이메일이 확인되었습니다. Verto는 답하는 것이 즐거운 설문입니다. 참고 채우는 양식이 아니라 탭하며 넘기는 카드죠. 가장 빠르게 확인하는 방법은 템플릿으로 시작해 질문만 바꿔 보는 것입니다."
+    cta: "템플릿으로 시작하기"
+    step_one: "템플릿을 고르거나, 알고 싶은 내용을 적으면 Playverto가 질문을 작성합니다."
+    step_two: "어떤 카드든 편집하세요. 오른쪽의 Verto 점수가 무엇이 효과적이고 무엇이 그렇지 않은지 알려줍니다."
+    step_three: "게시한 뒤 링크나 QR 코드를 공유하세요. 사람들이 답할수록 결과가 쌓입니다."
+    footer: "다른 곳에서 로그인하셨나요? 대시보드는 언제나 여기 있습니다:"
+    sent_by: "Playverto에서 보냄"
   wizard:
     demographics_note: "모든 Verto는 3개의 고정 인구통계 질문으로 끝납니다 — 출생 연도, 거주지, 성별. Verto가 자동으로 추가해요: 데이터 수집을 일관되게 유지하고 플랫폼 전체의 리서치 컬렉티브를 키웁니다."
     create_verto: Verto 만들기

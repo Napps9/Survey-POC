@@ -841,6 +841,16 @@ id:
     section_live: Live
     section_drafts: Draf
     section_archived: Diarsipkan
+  welcome_mailer:
+    subject: "Selamat datang di Playverto — mari buat Verto pertama Anda"
+    heading: "Semua siap"
+    intro: "Email Anda sudah dikonfirmasi. Verto adalah survei yang menyenangkan untuk dijawab: kartu yang ditelusuri dengan sentuhan, bukan formulir yang harus ditahan. Cara tercepat melihatnya adalah mulai dari templat lalu ganti pertanyaannya."
+    cta: "Mulai dari templat"
+    step_one: "Pilih templat, atau jelaskan apa yang ingin Anda ketahui dan biarkan Playverto menyusun pertanyaannya."
+    step_two: "Edit kartu mana pun. Skor Verto di sebelah kanan menunjukkan apa yang berhasil dan apa yang tidak."
+    step_three: "Terbitkan, lalu bagikan tautannya atau kode QR-nya. Hasil masuk seiring orang menjawab."
+    footer: "Masuk di perangkat lain? Dasbor Anda selalu ada di sini:"
+    sent_by: "Dikirim oleh Playverto"
   wizard:
     demographics_note: "Setiap Verto diakhiri 3 pertanyaan demografi tetap — tahun lahir, tempat tinggal, dan gender. Verto menambahkannya otomatis: menjaga pengumpulan data tetap konsisten dan membangun kolektif riset di seluruh platform."
     create_verto: Buat Verto

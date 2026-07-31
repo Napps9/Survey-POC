@@ -843,6 +843,16 @@ en:
     section_live: "Live"
     section_drafts: "Drafts"
     section_archived: "Archived"
+  welcome_mailer:
+    subject: "Welcome to Playverto — let's build your first Verto"
+    heading: "You're all set"
+    intro: "Your email is confirmed. A Verto is a survey people actually enjoy answering — cards they tap through rather than a form they endure. The quickest way to see one is to start from a template and change the questions."
+    cta: "Start from a template"
+    step_one: "Pick a template, or describe what you want to learn and let Playverto draft the questions."
+    step_two: "Edit any card. The Verto score on the right tells you what's working and what isn't."
+    step_three: "Publish, then share the link or its QR code. Results land as people answer."
+    footer: "Signed in somewhere else? Your dashboard is always here:"
+    sent_by: "Sent by Playverto"
   wizard:
     demographics_note: "Every Verto ends with 3 set demographic questions — when you were born, where you live, and gender. Verto adds them automatically: they keep data collection consistent and grow a research collective across the whole platform."
     create_verto: "Create Verto"

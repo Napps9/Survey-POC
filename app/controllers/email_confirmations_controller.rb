@@ -27,7 +27,12 @@ class EmailConfirmationsController < ApplicationController
       return redirect_to root_path, alert: t("email_confirmation.invalid")
     end
 
+    # Captured before verify_email!, which is idempotent — someone re-opening
+    # the link from their inbox a week later must not get a second welcome.
+    first_confirmation = !user.email_verified?
     user.verify_email!
+    deliver_welcome(user) if first_confirmation
+
     redirect_to root_path, notice: t("email_confirmation.confirmed")
   end
 
@@ -57,5 +62,15 @@ class EmailConfirmationsController < ApplicationController
 
   def deliver_confirmation(user)
     self.class.deliver(user)
+  end
+
+  # Same discipline as .deliver: the confirmation itself has already succeeded
+  # and been persisted by this point, so a mail failure here must not turn a
+  # working confirmation link into an error page.
+  def deliver_welcome(user)
+    WelcomeMailer.welcome(user).deliver_later
+  rescue => e
+    ErrorReporting.report("WelcomeMailer", e, user_id: user.id)
+    nil
   end
 end

@@ -841,6 +841,16 @@ sw:
     section_live: Hai
     section_drafts: Rasimu
     section_archived: Yaliyohifadhiwa
+  welcome_mailer:
+    subject: "Karibu Playverto — tuunde Verto yako ya kwanza"
+    heading: "Kila kitu tayari"
+    intro: "Barua pepe yako imethibitishwa. Verto ni utafiti ambao watu hufurahia kujibu: kadi wanazopitia kwa kugusa, si fomu wanayovumilia. Njia ya haraka zaidi ya kuona hili ni kuanza na kiolezo kisha kubadilisha maswali."
+    cta: "Anza na kiolezo"
+    step_one: "Chagua kiolezo, au eleza unachotaka kujifunza na uache Playverto iandike maswali."
+    step_two: "Hariri kadi yoyote. Alama ya Verto upande wa kulia inakuonyesha kinachofanya kazi na kisichofanya kazi."
+    step_three: "Chapisha, kisha shiriki kiungo au msimbo wake wa QR. Matokeo huingia watu wanapojibu."
+    footer: "Umeingia mahali pengine? Dashibodi yako iko hapa daima:"
+    sent_by: "Imetumwa na Playverto"
   wizard:
     demographics_note: "Kila Verto huishia na maswali 3 ya kidemografia yaliyowekwa — mwaka wa kuzaliwa, unakoishi, na jinsia. Verto huyaongeza yenyewe: huweka ukusanyaji wa data sawasawa na hujenga jumuiya ya utafiti katika jukwaa lote."
     create_verto: Unda Verto

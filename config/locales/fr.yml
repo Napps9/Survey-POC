@@ -841,6 +841,16 @@ fr:
     section_live: En ligne
     section_drafts: Brouillons
     section_archived: Archivés
+  welcome_mailer:
+    subject: "Bienvenue sur Playverto — créons votre premier Verto"
+    heading: "Tout est prêt"
+    intro: "Votre adresse est confirmée. Un Verto, c'est un questionnaire auquel on répond avec plaisir : des cartes que l'on fait défiler, pas un formulaire que l'on subit. Le plus rapide, c'est de partir d'un modèle et d'en changer les questions."
+    cta: "Partir d'un modèle"
+    step_one: "Choisissez un modèle, ou décrivez ce que vous voulez apprendre et laissez Playverto rédiger les questions."
+    step_two: "Modifiez n'importe quelle carte. Le score Verto, à droite, vous dit ce qui fonctionne et ce qui ne fonctionne pas."
+    step_three: "Publiez, puis partagez le lien ou son QR code. Les résultats arrivent au fil des réponses."
+    footer: "Connecté ailleurs ? Votre tableau de bord est toujours ici :"
+    sent_by: "Envoyé par Playverto"
   wizard:
     demographics_note: "Chaque Verto se termine par 3 questions démographiques fixes — année de naissance, lieu de vie et genre. Verto les ajoute automatiquement : elles uniformisent la collecte de données et bâtissent un collectif de recherche sur toute la plateforme."
     create_verto: Créer un Verto

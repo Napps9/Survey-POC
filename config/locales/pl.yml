@@ -843,6 +843,16 @@ pl:
     section_live: Na żywo
     section_drafts: Wersje robocze
     section_archived: Zarchiwizowane
+  welcome_mailer:
+    subject: "Witamy w Playverto — stwórzmy Twoje pierwsze Verto"
+    heading: "Wszystko gotowe"
+    intro: "Twój adres e-mail został potwierdzony. Verto to ankieta, na którą odpowiada się z przyjemnością: karty, które się przeklikuje, a nie formularz, który trzeba znieść. Najszybciej przekonasz się, zaczynając od szablonu i zmieniając pytania."
+    cta: "Zacznij od szablonu"
+    step_one: "Wybierz szablon albo opisz, czego chcesz się dowiedzieć, a Playverto napisze pytania."
+    step_two: "Edytuj dowolną kartę. Wynik Verto po prawej pokazuje, co działa, a co nie."
+    step_three: "Opublikuj i udostępnij link lub kod QR. Wyniki spływają w miarę napływu odpowiedzi."
+    footer: "Zalogowany gdzie indziej? Twój panel zawsze znajdziesz tutaj:"
+    sent_by: "Wysłane przez Playverto"
   wizard:
     demographics_note: "Każde Verto kończy się 3 stałymi pytaniami demograficznymi — rok urodzenia, miejsce zamieszkania i płeć. Verto dodaje je automatycznie: ujednolicają zbieranie danych i budują kolektyw badawczy w całej platformie."
     create_verto: Utwórz Verto

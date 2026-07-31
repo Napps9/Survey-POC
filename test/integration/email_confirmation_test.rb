@@ -78,6 +78,69 @@ class EmailConfirmationTest < ActionDispatch::IntegrationTest
     assert_not user.email_verified?
   end
 
+  # Mailer class names of everything currently enqueued. enqueued_jobs holds
+  # ActionMailer::MailDeliveryJob entries whose first argument is the mailer
+  # class name; digging it out by hand keeps the assertion above readable AND
+  # checkable — a filter lambda that silently matches nothing would have looked
+  # exactly like a passing test.
+  def enqueued_mailers
+    enqueued_jobs.filter_map { |job| Array(job[:args]).first }
+  end
+
+  # ── The welcome email (P2-6a) ───────────────────────────────────────────
+  #
+  # Sent on CONFIRMATION, not at signup. Signup already sends the confirmation
+  # mail, and a second one alongside it would double the volume arriving at an
+  # address nobody has yet proved is deliverable.
+
+  test "signup sends exactly one email, and it is not the welcome" do
+    signup
+
+    # Asserted before the count, so a regression reports WHAT was wrongly sent
+    # rather than just that a number moved.
+    assert_empty enqueued_mailers.grep(/WelcomeMailer/),
+                 "the welcome mail must wait until the address is proven deliverable; " \
+                 "enqueued at signup: #{enqueued_mailers.inspect}"
+    assert_equal [ "EmailConfirmationsMailer" ], enqueued_mailers
+  end
+
+  test "confirming the address sends the welcome email" do
+    user  = signup
+    token = user.generate_token_for(:email_confirmation)
+
+    assert_enqueued_emails 1 do
+      get email_confirmation_path(token)
+    end
+    assert user.reload.email_verified?
+  end
+
+  test "re-opening the confirmation link does not send a second welcome" do
+    # People keep these links and click them again from their inbox. verify_email!
+    # is idempotent, so without capturing the state BEFORE it, every re-open
+    # would mail them again.
+    user  = signup
+    token = user.generate_token_for(:email_confirmation)
+    get email_confirmation_path(token)
+
+    assert_enqueued_emails 0 do
+      get email_confirmation_path(token)
+    end
+  end
+
+  test "a welcome delivery failure does not break the confirmation" do
+    # The address is already verified and persisted by the time this runs, so a
+    # mail failure must not turn a working link into an error page.
+    user  = signup
+    token = user.generate_token_for(:email_confirmation)
+
+    stub_method(WelcomeMailer, :welcome, ->(*) { raise "smtp down" }) do
+      get email_confirmation_path(token)
+    end
+
+    assert_redirected_to root_path
+    assert user.reload.email_verified?, "the confirmation itself must still have taken effect"
+  end
+
   test "following the emailed link verifies the address" do
     user = signup
     token = user.generate_token_for(:email_confirmation)
