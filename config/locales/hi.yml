@@ -181,6 +181,7 @@ hi:
       confirm_delete: "वाकई हटाएं?"
       unsaved: असहेजे परिवर्तन
       undo_restored: 'कार्ड बहाल किया गया'
+      undo_removed: 'कार्ड हटाया गया'
       saving: सहेजा जा रहा है…
       saved: "%{time} पर सहेजा गया"
       save_failed: 'सहेजना विफल: %{msg}'

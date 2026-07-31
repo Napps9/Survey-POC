@@ -181,6 +181,7 @@ it:
       confirm_delete: "Eliminare davvero?"
       unsaved: Modifiche non salvate
       undo_restored: 'Scheda ripristinata'
+      undo_removed: 'Scheda rimossa'
       saving: Salvataggio…
       saved: Salvato %{time}
       save_failed: 'Salvataggio non riuscito: %{msg}'

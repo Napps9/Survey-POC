@@ -181,6 +181,7 @@ de:
       confirm_delete: "Wirklich löschen?"
       unsaved: Ungespeicherte Änderungen
       undo_restored: 'Karte wiederhergestellt'
+      undo_removed: 'Karte entfernt'
       saving: Wird gespeichert…
       saved: Gespeichert %{time}
       save_failed: 'Speichern fehlgeschlagen: %{msg}'

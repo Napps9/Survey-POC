@@ -181,6 +181,7 @@ tr:
       confirm_delete: "Gerçekten silinsin mi?"
       unsaved: Kaydedilmemiş değişiklikler
       undo_restored: 'Kart geri alındı'
+      undo_removed: 'Kart kaldırıldı'
       saving: Kaydediliyor…
       saved: "%{time} kaydedildi"
       save_failed: 'Kaydetme başarısız: %{msg}'

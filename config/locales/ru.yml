@@ -181,6 +181,7 @@ ru:
       confirm_delete: "Точно удалить?"
       unsaved: Несохранённые изменения
       undo_restored: 'Карточка восстановлена'
+      undo_removed: 'Карточка удалена'
       saving: Сохранение…
       saved: Сохранено %{time}
       save_failed: 'Ошибка сохранения: %{msg}'

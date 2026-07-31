@@ -181,6 +181,7 @@ nl:
       confirm_delete: "Echt verwijderen?"
       unsaved: Niet-opgeslagen wijzigingen
       undo_restored: 'Kaart hersteld'
+      undo_removed: 'Kaart verwijderd'
       saving: Opslaan…
       saved: Opgeslagen %{time}
       save_failed: 'Opslaan mislukt: %{msg}'

@@ -181,6 +181,7 @@ pt:
       confirm_delete: "Eliminar mesmo?"
       unsaved: Alterações não guardadas
       undo_restored: 'Cartão restaurado'
+      undo_removed: 'Cartão removido'
       saving: A guardar…
       saved: Guardado %{time}
       save_failed: 'Falha ao guardar: %{msg}'

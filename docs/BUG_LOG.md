@@ -8,6 +8,43 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-014 — An undo stack that undid the wrong action
+
+**Severity:** ⌘Z silently reverted an edit the creator had finished with, while
+leaving the one they meant to undo in place.
+**Found:** auditing the backlog against the code rather than against the plan.
+
+`recordCardDeletion` and the reorder handlers pushed inverse operations. Adding
+a card pushed **nothing** — so the stack was asymmetric, and the next ⌘Z popped
+whatever delete or reorder happened *before* the add.
+
+The test makes the shape unmistakable. Delete card 2, add a new card, press ⌘Z.
+Expected three cards; the unfixed build gives **five** — the deleted card is
+back and the added one is still there. Two wrong outcomes from one keystroke.
+
+**Fix:** `recordCardInsertion` as the mirror of `recordCardDeletion`, wired into
+all four insertion gestures (add-question modal, duplicate, add-card-to-flow,
+and the flow-panel starter card). Flow creation gets `recordFlowCreation`
+instead: that gesture mints a flow *and* several cards, so a per-card inverse
+would let ⌘Z strand a flow holding fewer cards than it was built with. One
+gesture, one undo entry.
+
+**Guard:** `test/system/editor_undo_test.rb`, five tests, verified against a
+build with `recordCardInsertion` disabled — which is how the five-card result
+above was produced.
+
+**Also found while writing it:** the "Add consent gate" CTA wears the same
+`aq-insert-btn` class as the per-card "Add question" CTA and sits earlier in the
+DOM, so the obvious selector adds a consent gate instead. Not a user-facing bug
+— they have distinct `data-action`s and sit in different places on screen — but
+worth knowing before writing another editor test.
+
+**Lesson:** an incomplete undo stack is not a partial feature, it is a wrong
+one. Every operation that mutates the structure has to push, or the stack
+silently misattributes the next keystroke.
+
+---
+
 ## BUG-013 — A blank rename erased a Verto's name, past a guard written to stop it
 
 **Severity:** a stray select-all-delete in the editor wiped the Verto's name,

@@ -464,6 +464,13 @@ export default class extends Controller {
     )
     editorController?.registerCard(card)
 
+    // Put the inverse on the undo stack. Skipping this didn't just make "add"
+    // un-undoable — it left ⌘Z pointing at an older delete or reorder, so the
+    // next undo silently reverted something else.
+    this.application
+        .getControllerForElementAndIdentifier(this.element, "survey-editor")
+        ?.recordCardInsertion(slot)
+
     card.scrollIntoView({ behavior: "smooth", block: "nearest" })
   }
 

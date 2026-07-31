@@ -183,6 +183,7 @@ en:
       confirm_delete: "Really delete?"
       unsaved: "Unsaved changes"
       undo_restored: 'Card restored'
+      undo_removed: 'Card removed'
       saving: "Saving…"
       saved: "Saved %{time}"
       save_failed: "Save failed: %{msg}"

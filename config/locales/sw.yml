@@ -181,6 +181,7 @@ sw:
       confirm_delete: "Ufute kweli?"
       unsaved: Mabadiliko hayajahifadhiwa
       undo_restored: 'Kadi imerejeshwa'
+      undo_removed: 'Kadi imeondolewa'
       saving: Inahifadhi…
       saved: Imehifadhiwa %{time}
       save_failed: 'Kuhifadhi kumeshindikana: %{msg}'

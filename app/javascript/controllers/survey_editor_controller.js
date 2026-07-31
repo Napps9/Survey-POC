@@ -139,6 +139,32 @@ export default class extends Controller {
     })
   }
 
+  // The mirror of recordCardDeletion, called AFTER a slot has been spliced in.
+  //
+  // Without this the stack was asymmetric, which is worse than having no undo
+  // at all: adding a card pushed nothing, so the next ⌘Z popped whatever
+  // delete or reorder happened before it and silently undid *that* instead —
+  // an action the creator had no reason to think was still pending.
+  recordCardInsertion(slot) {
+    if (!slot) return
+    this._pushUndo(() => {
+      slot.remove()
+      this.flash(t("editor.undo_removed", { default: "Card removed" }), "text-aquamarine")
+    })
+  }
+
+  // One gesture, one undo entry. Creating a flow from an answer splices several
+  // cards AND mints the flow, so pushing a per-card inverse would let ⌘Z strand
+  // a flow holding fewer cards than it was built with. This undoes the whole
+  // gesture, which is the only state the creator ever saw.
+  recordFlowCreation(flowId) {
+    if (!flowId) return
+    this._pushUndo(() => {
+      this.removeFlow(flowId, { deleteCards: true })
+      this.flash(t("editor.undo_removed", { default: "Card removed" }), "text-aquamarine")
+    })
+  }
+
   // Shared tail: renumber, repaint and schedule the save that persists the undo.
   _renumberAndPersist() {
     this.refreshAll()

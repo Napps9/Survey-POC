@@ -181,6 +181,7 @@ ko:
       confirm_delete: "정말 삭제할까요?"
       unsaved: 저장되지 않은 변경사항
       undo_restored: '카드를 복원했습니다'
+      undo_removed: '카드를 삭제했습니다'
       saving: 저장 중…
       saved: "%{time}에 저장됨"
       save_failed: '저장 실패: %{msg}'

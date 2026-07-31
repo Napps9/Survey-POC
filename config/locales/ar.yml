@@ -181,6 +181,7 @@ ar:
       confirm_delete: "حذف فعلاً؟"
       unsaved: تغييرات غير محفوظة
       undo_restored: 'تمت استعادة البطاقة'
+      undo_removed: 'تمت إزالة البطاقة'
       saving: جارٍ الحفظ…
       saved: تم الحفظ %{time}
       save_failed: 'فشل الحفظ: %{msg}'

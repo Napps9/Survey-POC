@@ -181,6 +181,7 @@ vi:
       confirm_delete: "Xóa thật chứ?"
       unsaved: Thay đổi chưa lưu
       undo_restored: 'Đã khôi phục thẻ'
+      undo_removed: 'Đã xoá thẻ'
       saving: Đang lưu…
       saved: Đã lưu %{time}
       save_failed: 'Lưu thất bại: %{msg}'

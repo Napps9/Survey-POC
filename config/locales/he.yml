@@ -181,6 +181,7 @@ he:
       confirm_delete: "באמת למחוק?"
       unsaved: שינויים שלא נשמרו
       undo_restored: 'הכרטיס שוחזר'
+      undo_removed: 'הכרטיס הוסר'
       saving: שומר…
       saved: נשמר %{time}
       save_failed: 'השמירה נכשלה: %{msg}'

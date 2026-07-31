@@ -181,6 +181,7 @@ pl:
       confirm_delete: "Na pewno usunąć?"
       unsaved: Niezapisane zmiany
       undo_restored: 'Przywrócono kartę'
+      undo_removed: 'Usunięto kartę'
       saving: Zapisywanie…
       saved: Zapisano %{time}
       save_failed: 'Zapis nie powiódł się: %{msg}'

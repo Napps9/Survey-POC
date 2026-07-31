@@ -181,6 +181,7 @@ id:
       confirm_delete: "Yakin hapus?"
       unsaved: Perubahan belum disimpan
       undo_restored: 'Kartu dipulihkan'
+      undo_removed: 'Kartu dihapus'
       saving: Menyimpan…
       saved: Tersimpan %{time}
       save_failed: 'Gagal menyimpan: %{msg}'

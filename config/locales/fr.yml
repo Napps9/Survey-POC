@@ -181,6 +181,7 @@ fr:
       confirm_delete: "Vraiment supprimer ?"
       unsaved: Modifications non enregistrées
       undo_restored: 'Carte restaurée'
+      undo_removed: 'Carte supprimée'
       saving: Enregistrement…
       saved: Enregistré %{time}
       save_failed: 'Échec de l''enregistrement : %{msg}'

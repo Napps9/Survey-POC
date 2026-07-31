@@ -181,6 +181,7 @@ uk:
       confirm_delete: "Точно видалити?"
       unsaved: Незбережені зміни
       undo_restored: 'Картку відновлено'
+      undo_removed: 'Картку видалено'
       saving: Збереження…
       saved: Збережено %{time}
       save_failed: 'Помилка збереження: %{msg}'

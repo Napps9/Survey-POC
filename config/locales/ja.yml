@@ -181,6 +181,7 @@ ja:
       confirm_delete: "本当に削除？"
       unsaved: 未保存の変更
       undo_restored: 'カードを元に戻しました'
+      undo_removed: 'カードを削除しました'
       saving: 保存中…
       saved: "%{time}に保存済み"
       save_failed: '保存失敗: %{msg}'

@@ -181,6 +181,7 @@ es:
       confirm_delete: "¿Eliminar de verdad?"
       unsaved: Cambios sin guardar
       undo_restored: 'Tarjeta restaurada'
+      undo_removed: 'Tarjeta eliminada'
       saving: Guardando…
       saved: Guardado %{time}
       save_failed: 'Error al guardar: %{msg}'
