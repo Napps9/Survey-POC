@@ -1281,6 +1281,9 @@ export default class extends Controller {
     const card = this.cardTargets[idx]
     const key  = card.dataset.cardIndex
     this._revealed.add(idx) // lock now so a double-tap can't re-submit
+    // Clear any note from a previous failed attempt, so a retry that works
+    // doesn't leave the old error sitting under the answer.
+    card.querySelector(".quiz-grade-error")?.remove()
     card.classList.add("quiz-locking")
     this._setGradingBusy(true)
 
@@ -1289,7 +1292,14 @@ export default class extends Controller {
       : this._gradeLocal(card)               // owner preview: embedded answers
     card.classList.remove("quiz-locking")
     this._setGradingBusy(false)
-    if (!result) { this._revealed.delete(idx); return } // couldn't grade — allow a retry
+    if (result?.failed) {
+      // Say so and let them try again, rather than leaving a button that
+      // silently does nothing.
+      this._revealed.delete(idx)
+      this._showGradeError(card, result)
+      return
+    }
+    if (!result) { this._revealed.delete(idx); return } // nothing to grade here
 
     if (typeof result.score === "number") this._quizScore = result.score
     else if (result.correct) this._quizScore++
@@ -1313,6 +1323,22 @@ export default class extends Controller {
       .forEach(btn => { btn.textContent = label; btn.dataset.disabled = busy ? "true" : "false" })
   }
 
+  // A short, dismissible line on the card itself. Removed on the next attempt so
+  // it can't pile up.
+  _showGradeError(card, result) {
+    const host = card.querySelector(".split-right") || card
+    host.querySelector(".quiz-grade-error")?.remove()
+
+    const key = result.gone ? "player.quiz_gone"
+              : result.offline ? "player.quiz_offline"
+              : "player.quiz_grade_failed"
+    const note = document.createElement("div")
+    note.className = "quiz-grade-error"
+    note.setAttribute("role", "alert")
+    note.textContent = t(key)
+    host.appendChild(note)
+  }
+
   async _gradeRemote(key) {
     try {
       const res = await fetch(this.gradeUrlValue, {
@@ -1320,13 +1346,21 @@ export default class extends Controller {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...this._payload(), card_index: Number(key) })
       })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      // A refusal is not the same as "this card isn't graded". Distinguishing
+      // them is the whole point: on a bare null the caller silently returned,
+      // so tapping "Check answer" did nothing at all — no error, no hint, no
+      // retry prompt — and the respondent was stuck on the card with a dead
+      // button and no answers saved.
+      if (!res.ok) return { failed: true, gone: res.status === 410 }
       const data = await res.json()
-      if (!data.ok || !data.graded) return null
+      if (!data.ok) return { failed: true }
+      if (!data.graded) return null // genuinely nothing to grade — carry on
       return { correct: data.correct, correctAnswer: data.correct_answer,
                explanation: data.explanation, score: data.score, max: data.max,
                mine: this._answers[key]?.value }
-    } catch (_) { return null }
+    } catch (_) {
+      return { failed: true, offline: !navigator.onLine }
+    }
   }
 
   _gradeLocal(card) {
@@ -1561,12 +1595,13 @@ export default class extends Controller {
     const card = this.cardTargets[idx]
     if (!card || card.dataset.cardAwardsTokens !== "true" || this._tokenLocked.has(idx)) return
 
-    const key   = card.dataset.cardIndex
-    const value = this._answers[key]?.value
-    if (this.tokenBackNavValue && this._isBlankAnswer(value)) return
+    const key = card.dataset.cardIndex
+    // The whole answer decides whether it counts; the value alone decides what
+    // it earns (an "Other" write-in scores nothing — it matches no option).
+    if (this.tokenBackNavValue && !this._isAnswered(this._answers[key])) return
 
     this._tokenLocked.add(idx)
-    const earned = this._computeEarned(card, card.dataset.cardType, value)
+    const earned = this._computeEarned(card, card.dataset.cardType, this._answers[key]?.value)
     Object.entries(earned).forEach(([id, amount]) => {
       this._tokenTotals[id] = (this._tokenTotals[id] || 0) + amount
     })
@@ -1634,12 +1669,23 @@ export default class extends Controller {
 
   // Mirrors TokenGrading.blank_value? — what the server treats as "not
   // answered", and so what back-navigation is allowed to return to.
-  _isBlankAnswer(value) {
-    if (value === null || value === undefined) return true
-    if (typeof value === "string") return value.trim() === ""
-    if (Array.isArray(value)) return value.length === 0
-    if (typeof value === "object") return Object.keys(value).length === 0
-    return false
+  // The mirror of PlayerController#answered? (app/controllers/player_controller.rb).
+  // Takes the whole stored answer, not just its `value`: an "Other"-only answer
+  // has a null value and a real `other`, and reading only the value made the
+  // client leave such a card unlocked and unscored while the server locked it —
+  // so the respondent's correction was silently discarded and their points went
+  // with it.
+  //
+  // test/system/answer_parity_test.rb drives the same table of cases through
+  // both implementations and asserts they agree.
+  _isAnswered(ans) {
+    if (!ans || typeof ans !== "object") return false
+    if (String(ans.other ?? "").trim() !== "") return true
+    const v = ans.value
+    if (Array.isArray(v)) return v.length > 0
+    if (v !== null && typeof v === "object") return Object.keys(v).length > 0
+    if (typeof v === "string") return v.trim() !== ""
+    return v !== null && v !== undefined
   }
 
   // Show what THIS answer earned, not just the running total. The amount was

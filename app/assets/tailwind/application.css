@@ -5065,6 +5065,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-size: 12px;
 }
 
+/* A quiz answer that could not be checked — the Verto closed, the respondent
+   went offline, or the request failed. Sits under the card so the "Check
+   answer" button visibly did something, instead of appearing broken. */
+.quiz-grade-error {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255,30,111,0.12);
+  color: #FF1E6F;
+  border: 1px solid rgba(255,30,111,0.3);
+  font-family: "ABeeZee", sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 /* A submit the server refused — the Verto was unpublished or closed while this
    respondent had the page open. Amber says "hold on, it'll sync"; this one has
    to say "it didn't save", so it takes the error colour. */

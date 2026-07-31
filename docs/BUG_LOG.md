@@ -8,6 +8,68 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-024 to BUG-027 — Four ways a respondent's work went missing
+
+A batch from the boundary hunt, all respondent-facing, all confirmed by three
+independent refuters before being touched.
+
+**BUG-024 — the client and the server disagreed about what "answered" means.**
+`PlayerController#answered?` decides what a later submit may not overwrite;
+`_isBlankAnswer` in the player decided whether a token-awarding card locks. They
+disagreed twice, and both ways round cost the respondent:
+
+* an **"Other"-only** answer — the client read `.value` and never looked at
+  `.other`, so it left the card unlocked and awarded nothing while the server
+  called it answered and locked it. The respondent believed they could still
+  come back; their correction was discarded and the points went with it.
+* an **empty Hash** — a grid or tap card with nothing picked. The server called
+  that answered and locked a card the respondent had *skipped*. Here the client
+  was right, so the rule moved on the server.
+
+**BUG-025 — a response answered only via "Other" was recorded as unanswered.**
+`Response#content_answered?` checked `value.present?`, which is false for an
+Other-only answer *and* for a boolean `false`. That flag drives every
+responder-scoped view, so real completed responses were silently uncounted.
+
+The rule now exists **once**, as `Response.answered_entry?`. It had three
+implementations and all three disagreed; the controller delegates and the JS
+mirrors it.
+
+**BUG-026 — deleting a tap-card statement shifted every picture onto the wrong
+one.** `option_images` are positional and `serialize()` bounds the array by
+truncating its **tail**, so removing statement 1 of 5 left images 1–4 against
+statements 2–5. Nothing looked wrong at the time — the backgrounds are inline on
+the surviving nodes — so it only appeared after a reload, by which point the
+deck had been saved.
+
+**BUG-027 — quiz grading had no failure path.** `_gradeRemote` returned bare
+`null` for everything, and the caller silently returned on a falsy result. When
+the Verto closed mid-quiz or the signal dropped, "Check answer" did *nothing*:
+no error, no hint, a button that looked broken and a respondent who could not
+move on. The line's own comment said "couldn't grade — allow a retry", which was
+true and useless — the retry was permitted but never suggested.
+
+**Guards.** `test/system/answer_parity_test.rb` is the one worth copying: it
+drives the SAME table of seventeen answer shapes through both implementations
+and asserts they agree case by case, rather than asserting each is separately
+correct. That is the assertion that would have caught BUG-024, and it names the
+exact disagreeing case when it fails. Alongside it,
+`test/integration/answered_locking_test.rb`,
+`test/system/tap_card_images_test.rb` and
+`test/system/quiz_grade_failure_test.rb` — every one checked against a
+deliberately broken build.
+
+**Two fixtures that were quietly proving nothing**, both caught that way:
+
+* the empty-grid locking test used a plain grid card, but `locked_merge` only
+  protects *graded or token-awarding* cards — so it passed whichever rule was in
+  force. The card now awards tokens.
+* the quiz-failure tests set `currentValue` without calling `_update()`, so the
+  card was never displayed and its error note could not be visible. Capybara
+  reported the element as present-but-not-visible, which is the tell.
+
+---
+
 ## BUG-021, 022, 023 — Three ways the editor discarded work you could see on screen
 
 All three share the shape this log keeps returning to: the DOM is the editor's

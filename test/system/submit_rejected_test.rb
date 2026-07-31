@@ -70,6 +70,9 @@ class SubmitRejectedTest < ApplicationSystemTestCase
     finalise
 
     assert_no_selector ".preview-queued-pill", wait: 3
+    # _finalize is async: assert on the response landing rather than on the
+    # moment after the pill check, which passed by luck rather than by rule.
+    Timeout.timeout(10) { sleep 0.1 until @survey.reload.responses.count == 1 }
     assert_equal 1, @survey.reload.responses.count
   end
 

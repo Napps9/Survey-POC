@@ -11,10 +11,37 @@ export default class extends Controller {
     const item = event.currentTarget.closest(".pick-item, .rotate-card")
     if (!item) return
     const wasTapCard = item.classList.contains("rotate-card")
+    // A tap card's option_images are POSITIONAL — image[i] belongs to
+    // statement[i] — and serialize() bounds the array by truncating its TAIL.
+    // So removing a statement without removing its image shifted every picture
+    // after it onto the wrong statement: delete the first of five and each
+    // remaining statement inherits the one before it. On screen nothing looks
+    // wrong (the backgrounds are inline on the surviving nodes), so this only
+    // appeared after a reload, by which time the deck had already been saved.
+    if (wasTapCard) this._dropOptionImageAt(item)
     item.remove()
     this.dispatch("changed")
     // Re-layout the stack so the remaining-cards dots update.
     if (wasTapCard) this.element.dispatchEvent(new Event("tap-stack:reset"))
+  }
+
+  // Splice the doomed statement's image out of the card's positional array, so
+  // the array and the statements stay aligned. Called BEFORE the node is
+  // removed, while its position among its siblings is still readable.
+  _dropOptionImageAt(item) {
+    const card = item.closest("[data-survey-editor-target='card']")
+    if (!card) return
+
+    const siblings = Array.from(card.querySelectorAll(".rotate-card"))
+    const index = siblings.indexOf(item)
+    if (index < 0) return
+
+    let images = []
+    try { images = JSON.parse(card.dataset.cardOptionImages || "[]") } catch (_) { return }
+    if (!Array.isArray(images) || index >= images.length) return
+
+    images.splice(index, 1)
+    card.dataset.cardOptionImages = JSON.stringify(images)
   }
 
   addPickOption(event) {

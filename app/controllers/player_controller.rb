@@ -465,12 +465,12 @@ class PlayerController < ApplicationController
   end
 
   # Whether an answer hash holds a real response (a value, or free-text Other).
+  # One definition, in Response — this was a third implementation of it, and it
+  # disagreed with both of the others. See Response.answered_entry? for what the
+  # rule is and why each clause is there. locked_merge uses it to decide what a
+  # later submit may not overwrite.
   def answered?(ans)
-    return false unless ans.is_a?(Hash)
-    return true if ans["other"].to_s.strip != ""
-    v = ans["value"]
-    return v.any? if v.is_a?(Array)
-    !(v.nil? || (v.is_a?(String) && v.strip.empty?))
+    Response.answered_entry?(ans)
   end
 
   # Free-text quiz answers rarely match an accepted answer verbatim ("make the

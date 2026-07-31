@@ -46,10 +46,35 @@ class Response < ApplicationRecord
     (completed_at - started_at).round
   end
 
-  # Whether this response holds a real answer to at least one question (a value
-  # present on any card). Drives the `answered` column / responder counts.
+  # THE definition of "this card was answered", for the whole app.
+  #
+  # It used to exist twice in Ruby and once in JavaScript, and all three
+  # disagreed. This one is the canonical Ruby copy: PlayerController#answered?
+  # delegates to it, and _isAnswered in player_controller.js mirrors it (pinned
+  # by test/system/answer_parity_test.rb).
+  #
+  # The two things it must get right, because getting them wrong is silent:
+  #
+  #   * an "Other" write-in IS an answer. `content_answered?` used to check only
+  #     `value`, so a respondent whose single answer was typed into the Other
+  #     box was stored with `answered = false` and disappeared from every
+  #     responder-scoped view — undercounting real, completed responses.
+  #   * `present?` is the wrong test for a value. `false.present?` is false in
+  #     Rails, so a boolean answer read as unanswered. Emptiness is checked by
+  #     shape here instead.
+  def self.answered_entry?(entry)
+    return false unless entry.is_a?(Hash)
+    return true if entry["other"].to_s.strip != ""
+
+    v = entry["value"]
+    return v.any? if v.is_a?(Array) || v.is_a?(Hash)
+    !(v.nil? || (v.is_a?(String) && v.strip.empty?))
+  end
+
+  # Whether this response holds a real answer to at least one question.
+  # Drives the `answered` column / responder counts.
   def content_answered?
-    answers.is_a?(Hash) && answers.values.any? { |a| a.is_a?(Hash) && a["value"].present? }
+    answers.is_a?(Hash) && answers.values.any? { |a| self.class.answered_entry?(a) }
   end
 
   private
