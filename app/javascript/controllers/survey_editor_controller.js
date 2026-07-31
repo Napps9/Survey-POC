@@ -665,6 +665,7 @@ export default class extends Controller {
     const card = this.cardTargets.find(c => c.dataset.cardNum === num)
     if (!card || !this.optimiseUrlValue) return
 
+    const idx = this.cardTargets.indexOf(card)
     let issues = []
     try { issues = JSON.parse(btn.dataset.issues || "[]") } catch (_) { /* none */ }
 
@@ -677,10 +678,23 @@ export default class extends Controller {
       const res = await fetch(this.optimiseUrlValue, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": this._csrf() },
+        // The card's FULL current JSON, not just its readable content.
+        //
+        // This used to send `{ type, ...this._readCard(card) }` — five keys:
+        // type, text, description, options, pages. The server merges the AI's
+        // rewrite ONTO whatever it is given and re-renders from the result, so
+        // every key absent from the payload was absent from the card
+        // afterwards: its cid (which other cards' logic routes point AT), its
+        // image, required flag, logic routes, flow membership, Common Question
+        // provenance, quiz correct answers and token values — eleven fields,
+        // gone on one click of ✨ Optimise.
+        //
+        // serialize().cards[idx] is the same idiom flows#duplicateCard uses to
+        // get one card's complete object.
         body: JSON.stringify({
-          index:  this.cardTargets.indexOf(card),
+          index:  idx,
           issues: issues,
-          card:   { type: card.dataset.cardType, ...this._readCard(card) }
+          card:   this.serialize().cards[idx] || { type: card.dataset.cardType, ...this._readCard(card) }
         })
       })
       const json = await res.json()

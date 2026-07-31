@@ -8,6 +8,52 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-018 — "✨ Optimise" destroyed eleven fields on the card it improved
+
+**Severity:** data loss on a single click, including the card's identity.
+**Found:** the same hunt, then confirmed by reconstructing the payload.
+
+The editor sent one card to be rewritten as:
+
+```js
+card: { type: card.dataset.cardType, ...this._readCard(card) }
+```
+
+`_readCard` returns four keys. The server merges the AI's rewrite **onto**
+whatever it is given and re-renders the card from the result, so everything
+absent from that payload was absent from the card afterwards:
+
+```
+stored card : cid common_question_id common_question_set_id competency
+              condition correct flow_id image logic options outcome required
+              text tokens type
+after       : options outcome pages text type
+LOST        : cid common_question_id common_question_set_id competency
+              condition correct flow_id image logic required tokens
+```
+
+The `cid` matters most: other cards' logic routes point **at** it, so
+optimising a card silently orphaned every branch that led to it.
+
+The server's own comment claimed *"competency/condition ride along from the
+original card untouched"* — describing an intent the client made impossible, the
+same way BUG-013's guard described protection it wasn't providing.
+
+**Fix:** send `this.serialize().cards[idx]` — the card's complete current
+object, and the same idiom `flows#duplicateCard` already uses.
+
+**Guard:** `test/system/optimise_card_test.rb` asserts on the payload itself,
+because the payload *is* the defect; it fails against the old shape. Its fixture
+turns quiz and tokenisation **on**, because `serialize()` only emits `correct`
+and `tokens` when they are — with them off the test would have passed while
+proving less than it claimed.
+
+**Lesson:** "merge the improvement onto the original" is only safe when the
+original is the original. Here one side said merge and the other sent a
+summary — and each side, read alone, looked right.
+
+---
+
 ## BUG-017 — Every autosave stripped the framework tags off every card
 
 **Severity:** silent, permanent loss of the provenance the "Why this card?"
