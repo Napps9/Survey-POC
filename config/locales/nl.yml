@@ -158,6 +158,7 @@ nl:
       region_empty: "Nog geen regionale antwoorden — die van jou kan de eerste zijn!"
       progress: Kaart %{n} van %{total}
       queued: Opgeslagen — wordt gesynchroniseerd zodra je weer online bent
+      submit_rejected: "Dit Verto is gesloten, dus je antwoorden zijn niet opgeslagen."
       compare_cta: Bekijk je resultaten ten opzichte van anderen →
       compare_loading: Laden…
       compare_error: Kon niet laden — probeer opnieuw

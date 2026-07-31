@@ -17,7 +17,7 @@
 // Bump on any player JS/CSS/HTML behaviour change so existing respondents
 // don't keep getting the stale-while-revalidate copy. The activate handler
 // below deletes every cache that doesn't start with the current version.
-const CACHE_VERSION = "playverto-v20"
+const CACHE_VERSION = "playverto-v21"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
@@ -25,6 +25,10 @@ const IMAGE_CACHE   = `${CACHE_VERSION}-images`
 
 const IDB_NAME  = "playverto-queue"
 const IDB_STORE = "pending_submits"
+// How many offline delivery attempts a queued submit gets before it is dropped.
+// Without a cap an item that can never land is retried on every same-origin GET
+// for the life of the browser profile.
+const MAX_QUEUE_ATTEMPTS = 25
 
 // ── Lifecycle ────────────────────────────────────────────────────────────
 
@@ -167,22 +171,40 @@ async function imageCache(req, event) {
 
 // ── Submit queue ─────────────────────────────────────────────────────────
 
+// A response that ARRIVED means the network is fine — whatever it says. Only a
+// request that never got an answer, or one the server says to try again later,
+// is worth queueing.
+//
+// This used to queue on any non-2xx, so a 410 Gone (the Verto was unpublished
+// or deleted while the respondent had the page open from cache) was swallowed:
+// the respondent saw "Saved — will sync when you're back online", the answers
+// went into IndexedDB, and drainQueue retried them forever because it only
+// deleted an item on res.ok. The response was lost and nobody was told.
+function retryable(status) {
+  return status === 429 || status >= 500
+}
+
 async function handleSubmit(req) {
   const clone = req.clone()
+  let res
   try {
-    const res = await fetch(req)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return res
+    res = await fetch(req)
   } catch (_) {
-    try { await enqueueSubmit(clone) } catch (e) { /* best effort */ }
-    if (self.registration && self.registration.sync) {
-      try { await self.registration.sync.register("playverto-submit") } catch (e) { /* unsupported */ }
-    }
-    return new Response(
-      JSON.stringify({ ok: true, queued: true }),
-      { status: 202, headers: { "Content-Type": "application/json" } }
-    )
+    return queueSubmit(clone) // genuinely offline: no response at all
   }
+  if (res.ok || !retryable(res.status)) return res // 4xx goes to the page as-is
+  return queueSubmit(clone)
+}
+
+async function queueSubmit(clone) {
+  try { await enqueueSubmit(clone) } catch (e) { /* best effort */ }
+  if (self.registration && self.registration.sync) {
+    try { await self.registration.sync.register("playverto-submit") } catch (e) { /* unsupported */ }
+  }
+  return new Response(
+    JSON.stringify({ ok: true, queued: true }),
+    { status: 202, headers: { "Content-Type": "application/json" } }
+  )
 }
 
 self.addEventListener("sync", (event) => {
@@ -241,6 +263,22 @@ async function deleteQueued(id) {
   })
 }
 
+// Record a failed delivery attempt so drainQueue can eventually give up.
+async function bumpQueuedAttempts(id, attempts) {
+  const db = await openDB()
+  return new Promise((resolve, reject) => {
+    const tx    = db.transaction(IDB_STORE, "readwrite")
+    const store = tx.objectStore(IDB_STORE)
+    const get   = store.get(id)
+    get.onsuccess = () => {
+      const row = get.result
+      if (row) { row.attempts = attempts; store.put(row) }
+    }
+    tx.oncomplete = () => resolve()
+    tx.onerror    = () => reject(tx.error)
+  })
+}
+
 let _draining = false
 async function drainQueue() {
   if (_draining) return
@@ -254,8 +292,18 @@ async function drainQueue() {
           headers: { "Content-Type": "application/json" },
           body: item.body
         })
-        if (res.ok) await deleteQueued(item.id)
-      } catch (_) { /* keep for next attempt */ }
+        // Drop it on success OR on anything that will never succeed. Keeping
+        // only-on-ok meant a Verto unpublished mid-flight left an item retried
+        // on every same-origin GET, forever, on that respondent's device.
+        if (res.ok || !retryable(res.status)) await deleteQueued(item.id)
+      } catch (_) {
+        // Still offline. Give up after MAX_QUEUE_ATTEMPTS so a submit that
+        // can never land doesn't sit in IndexedDB for the life of the browser
+        // profile, draining battery on every page view.
+        const attempts = (item.attempts || 0) + 1
+        if (attempts >= MAX_QUEUE_ATTEMPTS) await deleteQueued(item.id)
+        else await bumpQueuedAttempts(item.id, attempts)
+      }
     }
   } finally {
     _draining = false

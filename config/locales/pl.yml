@@ -158,6 +158,7 @@ pl:
       region_empty: "Nie ma jeszcze odpowiedzi regionalnych — twoja może być pierwsza!"
       progress: Karta %{n} z %{total}
       queued: Zapisano — zsynchronizujemy, gdy wrócisz online
+      submit_rejected: "To Verto zostało zamknięte, więc Twoje odpowiedzi nie zostały zapisane."
       compare_cta: Zobacz, jak Twoje wyniki wypadają na tle innych →
       compare_loading: Ładowanie…
       compare_error: Nie udało się załadować — spróbuj ponownie

@@ -158,6 +158,7 @@ de:
       region_empty: "Noch keine regionalen Antworten — deine könnte die erste sein!"
       progress: Karte %{n} von %{total}
       queued: Gespeichert — wird synchronisiert, sobald du wieder online bist
+      submit_rejected: "Dieses Verto ist geschlossen — Ihre Antworten wurden nicht gespeichert."
       compare_cta: Vergleiche deine Ergebnisse mit anderen →
       compare_loading: Wird geladen…
       compare_error: Laden fehlgeschlagen — bitte erneut versuchen

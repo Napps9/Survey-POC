@@ -8,6 +8,76 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-020 — A closed Verto told respondents their answers were saved
+
+**Severity:** silent, permanent loss of a respondent's completed response —
+with an affirmative message saying the opposite.
+**Found:** the boundary bug hunt; confirmed by three independent refuters.
+
+The player HTML is served stale-while-revalidate, so a respondent can be part
+way through a Verto that the creator has since unpublished or closed. On submit
+the server correctly returns **410 Gone**. The service worker then did:
+
+```js
+const res = await fetch(req)
+if (!res.ok) throw new Error(...)   // ← a 410 is not an outage
+```
+
+which fell into the offline branch: the answers went into IndexedDB and the page
+got a synthesised `202 {ok: true, queued: true}`. The respondent was shown
+**"Saved — will sync when you're back online."** Nothing was saved and nothing
+ever would be — `drainQueue` deleted an item only on `res.ok`, so the 410 was
+retried on every same-origin GET for the life of the browser profile.
+
+The player could not have told the difference either: `if (!res.ok) throw` sent
+a refusal and a network failure to the same `catch`, whose only question was
+`navigator.onLine`.
+
+**Fix, both halves:**
+* the worker queues only when no response arrived at all, or the server asked to
+  be retried (429/5xx). A 4xx is passed to the page unchanged. `drainQueue`
+  drops an item on any non-retryable status, and gives up after
+  `MAX_QUEUE_ATTEMPTS` so a submit that can never land stops costing battery on
+  every page view;
+* the player distinguishes *refused* from *queued* and says so, in all 19
+  locales.
+
+**Guard:** `test/system/submit_rejected_test.rb`, including the negative case —
+a successful submit must show **no** pill, or an unconditional one would pass
+every other assertion while telling every respondent their answers were lost.
+
+`CACHE_VERSION` bumped to v21: without it no returning respondent would get the
+fixed worker, which is the whole point of the rule.
+
+---
+
+## BUG-019 — An edit made during a save was marked clean by that save
+
+**Severity:** silent loss of a creator's edit.
+**Found:** the boundary bug hunt.
+
+`_doSave` cleared `_dirty` *after* awaiting its response, so an edit typed while
+a save was in flight — which `markDirty` had correctly flagged — was marked
+clean by a request that did not contain it.
+
+On its own that only delays the edit: `markDirty` re-arms the 1.5s timer. The
+loss needs the page to go away inside that window, and `flushSave`, the
+pagehide/visibilitychange safety net, opens with `if (!this._dirty) return`.
+Typing something and immediately switching tabs is an ordinary thing to do.
+
+**Fix:** a generation counter. `markDirty` bumps it; `_doSave` snapshots it
+before serializing and only clears `_dirty` if it hasn't moved.
+
+**Guard:** `test/system/autosave_race_test.rb` holds the PATCH open from the
+test rather than sleeping, so "while the save is in flight" is a state under
+control rather than a window being raced — a timing-dependent version would
+pass on a fast machine either way. The second test cancels the re-armed timer
+before flushing: without that it passed against the unfixed build, because the
+ordinary debounced save landed the edit and `flushSave` was never the thing
+being tested.
+
+---
+
 ## BUG-018 — "✨ Optimise" destroyed eleven fields on the card it improved
 
 **Severity:** data loss on a single click, including the card's identity.

@@ -158,6 +158,7 @@ vi:
       region_empty: "Chưa có câu trả lời theo khu vực — của bạn có thể là đầu tiên!"
       progress: Thẻ %{n} / %{total}
       queued: Đã lưu — sẽ đồng bộ khi bạn trực tuyến trở lại
+      submit_rejected: "Verto này đã đóng nên câu trả lời của bạn chưa được lưu."
       compare_cta: Xem kết quả của bạn so với người khác →
       compare_loading: Đang tải…
       compare_error: Không tải được — thử lại

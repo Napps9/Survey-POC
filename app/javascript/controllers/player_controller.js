@@ -274,6 +274,11 @@ export default class extends Controller {
     // just show the thank-you screen.
     if (!this.submitUrlValue) return this._showThankyou(false)
     let queued = false
+    // Distinct from `queued`: the request reached the server and the server said
+    // no. Before the service worker stopped swallowing 4xx, this state could not
+    // arise here at all — a 410 came back as a synthetic 202 and the respondent
+    // was told their answers were saved and would sync.
+    let rejected = false
     // No label swap (unlike _setGradingBusy) since that would need a new
     // translated string across all locales — the dimmed/not-allowed state
     // from [data-disabled="true"] already gives visible feedback and blocks
@@ -285,8 +290,16 @@ export default class extends Controller {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(this._payload())
       })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.clone().json().catch(() => null)
+      if (!res.ok) {
+        // The Verto was unpublished, closed or deleted while this respondent
+        // had the page open — the player HTML is served stale-while-revalidate,
+        // so that is an ordinary thing to happen mid-session. Nothing was
+        // stored, and saying so beats a thank-you screen that isn't true.
+        rejected = true
+        this._showThankyou(false, true)
+        return
+      }
       queued = !!(data && data.queued)
       // Trust the server's final score over the running client tally.
       if (this.quizValue && data && typeof data.score === "number") {
@@ -298,13 +311,16 @@ export default class extends Controller {
         this._tokenTotals = { ...this._tokenTotals, ...data.token_totals }
       }
     } catch (_) {
-      // No SW running and offline — answers are lost. Still show thank-you
-      // so the player completes; flag as queued to set expectations.
-      queued = !navigator.onLine
+      // The request never got an answer. Offline with no service worker means
+      // the answers are gone; online means something else failed. Either way
+      // nothing was confirmed stored, so say which of the two it was rather
+      // than showing an unqualified thank-you.
+      queued   = !navigator.onLine
+      rejected = navigator.onLine
     } finally {
       if (this.hasFinishBtnTarget) this.finishBtnTarget.dataset.disabled = "false"
     }
-    this._showThankyou(queued)
+    this._showThankyou(queued, rejected)
   }
 
   // ── Answer-branching: graph traversal ──────────────────────────────────────
@@ -658,7 +674,7 @@ export default class extends Controller {
     }
   }
 
-  _showThankyou(queued = false) {
+  _showThankyou(queued = false, rejected = false) {
     this.cardTargets.forEach(c => c.classList.remove("active"))
     this._applyEndScreen(this._endId)
     this.thankyouTarget.classList.add("active")
@@ -666,10 +682,11 @@ export default class extends Controller {
     this.nextBtnTarget.classList.add("hidden")
     this.finishBtnTarget.classList.add("hidden")
     this.progressTarget.textContent = ""
-    if (queued && this.hasThankyouMainTarget && !this.thankyouMainTarget.querySelector(".preview-queued-pill")) {
+    const note = rejected ? t("player.submit_rejected") : (queued ? t("player.queued") : null)
+    if (note && this.hasThankyouMainTarget && !this.thankyouMainTarget.querySelector(".preview-queued-pill")) {
       const pill = document.createElement("div")
-      pill.className = "preview-queued-pill"
-      pill.textContent = t("player.queued")
+      pill.className = rejected ? "preview-queued-pill is-rejected" : "preview-queued-pill"
+      pill.textContent = note
       this.thankyouMainTarget.appendChild(pill)
     }
     if (this.quizValue) this._renderQuizScore()

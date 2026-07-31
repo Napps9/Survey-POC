@@ -158,6 +158,7 @@ tr:
       region_empty: "Henüz bölgesel yanıt yok — ilki sizinki olabilir!"
       progress: "%{total} karttan %{n}. kart"
       queued: Kaydedildi — çevrimiçi olduğunuzda eşitlenecek
+      submit_rejected: "Bu Verto kapandı, bu yüzden yanıtlarınız kaydedilmedi."
       compare_cta: Sonuçlarınızı diğerleriyle karşılaştırın →
       compare_loading: Yükleniyor…
       compare_error: Yüklenemedi — tekrar deneyin

@@ -158,6 +158,7 @@ he:
       region_empty: "אין עדיין תשובות אזוריות — אולי שלכם תהיה הראשונה!"
       progress: כרטיס %{n} מתוך %{total}
       queued: נשמר — יסונכרן כשתחזור לאינטרנט
+      submit_rejected: "ה-Verto הזה נסגר, ולכן התשובות שלך לא נשמרו."
       compare_cta: ראה את התוצאות שלך לעומת אחרים →
       compare_loading: טוען…
       compare_error: לא ניתן לטעון — נסה שוב

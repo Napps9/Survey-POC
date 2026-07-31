@@ -158,6 +158,7 @@ it:
       region_empty: "Ancora nessuna risposta regionale — la tua potrebbe essere la prima!"
       progress: Carta %{n} di %{total}
       queued: Salvato — verrà sincronizzato quando sarai di nuovo online
+      submit_rejected: "Questo Verto è chiuso, quindi le tue risposte non sono state salvate."
       compare_cta: Confronta i tuoi risultati con gli altri →
       compare_loading: Caricamento…
       compare_error: Caricamento non riuscito — riprova

@@ -158,6 +158,7 @@ sw:
       region_empty: "Hakuna majibu ya kanda bado — lako linaweza kuwa la kwanza!"
       progress: Kadi %{n} kati ya %{total}
       queued: Imehifadhiwa — itasawazishwa utakaporejea mtandaoni
+      submit_rejected: "Verto hii imefungwa, kwa hivyo majibu yako hayakuhifadhiwa."
       compare_cta: Ona matokeo yako yakilinganishwa na wengine →
       compare_loading: Inapakia…
       compare_error: Imeshindwa kupakia — jaribu tena

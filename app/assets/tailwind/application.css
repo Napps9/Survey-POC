@@ -5065,6 +5065,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-size: 12px;
 }
 
+/* A submit the server refused — the Verto was unpublished or closed while this
+   respondent had the page open. Amber says "hold on, it'll sync"; this one has
+   to say "it didn't save", so it takes the error colour. */
+.preview-queued-pill.is-rejected {
+  background: rgba(255,30,111,0.14);
+  color: #FF1E6F;
+  border-color: rgba(255,30,111,0.35);
+}
+
 /* ── Region tags: world map + region list (player regions view & results) ── */
 .world-map { width: 100%; height: auto; display: block; }
 .world-map path { fill: rgba(255,255,255,0.10); transition: fill 0.2s; }

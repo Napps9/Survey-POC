@@ -158,6 +158,7 @@ fr:
       region_empty: "Pas encore de réponses régionales — la vôtre sera peut-être la première !"
       progress: Carte %{n} sur %{total}
       queued: Enregistré — se synchronisera dès votre retour en ligne
+      submit_rejected: "Ce Verto est clôturé : vos réponses n'ont pas été enregistrées."
       compare_cta: Voyez vos résultats comparés aux autres →
       compare_loading: Chargement…
       compare_error: Échec du chargement — réessayez

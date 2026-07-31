@@ -158,6 +158,7 @@ id:
       region_empty: "Belum ada jawaban regional — jawabanmu mungkin yang pertama!"
       progress: Kartu %{n} dari %{total}
       queued: Tersimpan — akan disinkronkan saat Anda kembali online
+      submit_rejected: "Verto ini sudah ditutup, jadi jawaban Anda tidak tersimpan."
       compare_cta: Lihat hasil Anda dibandingkan dengan yang lain →
       compare_loading: Memuat…
       compare_error: Gagal memuat — coba lagi

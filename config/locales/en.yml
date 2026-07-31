@@ -160,6 +160,7 @@ en:
       region_empty: "No regional answers yet — yours might be the first!"
       progress: "Card %{n} of %{total}"
       queued: "Saved — will sync when you're back online"
+      submit_rejected: "This Verto has closed, so your answers weren't saved."
       compare_cta: "See your results compared to others →"
       compare_loading: "Loading…"
       compare_error: "Couldn't load — try again"

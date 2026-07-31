@@ -915,6 +915,9 @@ export default class extends Controller {
 
     this.flash(t("editor.unsaved"), "text-light-yellow")
     this._dirty = true
+    // Bumped on every edit so a save that completes can tell whether the deck
+    // still matches what it sent — see _doSave.
+    this._editGen = (this._editGen || 0) + 1
     clearTimeout(this._saveTimer)
     this._saveTimer = setTimeout(() => this._doSave(), 1500)
   }
@@ -1871,6 +1874,11 @@ export default class extends Controller {
     if (!this.hasUrlValue || !this.urlValue) return
     try {
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+      // Which revision this request is about to carry. Captured before
+      // serialize() builds the body, so anything typed while the request is in
+      // flight lands on a LATER generation and the completion below leaves
+      // _dirty alone.
+      const gen = this._editGen
       const res = await fetch(this.urlValue, {
         method: "PATCH",
         headers: {
@@ -1882,7 +1890,12 @@ export default class extends Controller {
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = await res.json()
-      this._dirty = false
+      // Only clear the flag if nothing was edited while this request was out.
+      // A bare `this._dirty = false` here marked those edits clean: markDirty
+      // had already re-armed the 1.5s timer, but flushSave — the
+      // pagehide/visibilitychange safety net — skips when _dirty is false, so
+      // closing the tab inside that window silently dropped them.
+      if (gen === this._editGen) this._dirty = false
       // The save itself succeeded, but the server may have silently dropped an
       // oversized/invalid image (sanitize_cards_images! nils it out rather than
       // erroring) — tell the editor instead of just showing "Saved".

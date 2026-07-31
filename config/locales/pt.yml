@@ -158,6 +158,7 @@ pt:
       region_empty: "Ainda não há respostas regionais — a sua pode ser a primeira!"
       progress: Cartão %{n} de %{total}
       queued: Guardado — será sincronizado quando voltar a estar online
+      submit_rejected: "Este Verto foi encerrado, por isso as suas respostas não foram guardadas."
       compare_cta: Veja os seus resultados comparados com os outros →
       compare_loading: A carregar…
       compare_error: Não foi possível carregar — tente novamente
