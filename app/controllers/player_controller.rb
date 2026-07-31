@@ -156,6 +156,11 @@ class PlayerController < ApplicationController
     else
       resp.consent_declined_at ||= Time.current
       resp.consent_text_snapshot ||= @survey.consent_snapshot_text
+      # Declining means "do not collect my data" — so anything already collected
+      # goes. Before this it was a timestamp and nothing more: answers given
+      # before a mid-deck gate stayed stored, counted as a responder, and fed
+      # the creator's and the public aggregates.
+      resp.purge_for_declined_consent!
     end
     resp.save!
     render json: { ok: true }

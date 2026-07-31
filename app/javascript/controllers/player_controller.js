@@ -131,6 +131,12 @@ export default class extends Controller {
   }
 
   declineConsent() {
+    // Drop anything already answered before telling the server, so no later
+    // save can put it back. The server purges the stored copy; this stops the
+    // client re-uploading its own — an unload flush or a queued submit would
+    // otherwise restore exactly what the respondent just refused to give.
+    this._answers = {}
+    this._declined = true
     this._recordConsent(false)
     if (this.hasConsentMainTarget) this.consentMainTarget.classList.add("hidden")
     if (this.hasConsentDeclinedTarget) this.consentDeclinedTarget.classList.remove("hidden")
@@ -495,7 +501,7 @@ export default class extends Controller {
   // who answer something then leave are still counted. Fire once on success.
   async _saveProgress() {
     if (this._registered || !this.progressUrlValue) return
-    const hasAnswer = Object.values(this._answers).some(a => a && this._isAnswered(a.value))
+    const hasAnswer = Object.values(this._answers).some(a => this._isAnswerGiven(a))
     if (!hasAnswer) return
     try {
       const res = await fetch(this.progressUrlValue, {
@@ -507,19 +513,11 @@ export default class extends Controller {
     } catch (_) { /* retry on the next navigation */ }
   }
 
-  _isAnswered(value) {
-    if (Array.isArray(value)) return value.length > 0
-    return value !== null && value !== undefined && value !== ""
-  }
-
   // Whether the card at `idx` has a usable answer (a value, or free-text Other).
   _isCardAnswered(idx) {
     const key = this.cardTargets[idx]?.dataset.cardIndex
     if (key === undefined || key === "") return true // non-answer cards never block
-    const a = this._answers[key]
-    if (!a) return false
-    if (a.other && a.other.trim()) return true
-    return this._isAnswered(a.value)
+    return this._isAnswerGiven(this._answers[key])
   }
 
   // Required gate: a card marked data-card-required must be answered before the
@@ -1598,7 +1596,7 @@ export default class extends Controller {
     const key = card.dataset.cardIndex
     // The whole answer decides whether it counts; the value alone decides what
     // it earns (an "Other" write-in scores nothing — it matches no option).
-    if (this.tokenBackNavValue && !this._isAnswered(this._answers[key])) return
+    if (this.tokenBackNavValue && !this._isAnswerGiven(this._answers[key])) return
 
     this._tokenLocked.add(idx)
     const earned = this._computeEarned(card, card.dataset.cardType, this._answers[key]?.value)
@@ -1678,7 +1676,7 @@ export default class extends Controller {
   //
   // test/system/answer_parity_test.rb drives the same table of cases through
   // both implementations and asserts they agree.
-  _isAnswered(ans) {
+  _isAnswerGiven(ans) {
     if (!ans || typeof ans !== "object") return false
     if (String(ans.other ?? "").trim() !== "") return true
     const v = ans.value

@@ -71,6 +71,40 @@ class Response < ApplicationRecord
     !(v.nil? || (v.is_a?(String) && v.strip.empty?))
   end
 
+  # Declining consent is not just a timestamp — it means "do not collect my
+  # data", so the data goes.
+  #
+  # A consent gate can sit after some questions on a deck built before gates
+  # were hoisted ahead of the first question, and /progress persists answers on
+  # every advance. So by the time a respondent read the sheet and declined,
+  # their earlier answers were already stored, already counted as a responder,
+  # and already feeding the public /results and /regions aggregates. Stamping
+  # consent_declined_at changed none of that.
+  #
+  # The row itself stays: consent_declined_at plus the wording they saw is the
+  # evidence that a decline was honoured, and the decline rate is worth knowing.
+  # Everything they gave is cleared, including the denormalised region and
+  # demographic columns — those are copies of answers, and leaving them would
+  # keep exactly the personal data the gate exists to protect. Clearing
+  # `answers` also drops `answered` to false via sync_answered, which is what
+  # takes the row out of every responder-scoped view.
+  def purge_for_declined_consent!
+    self.answers = {}
+    # status is deliberately left alone: STATUSES is a closed set with a DB
+    # CHECK constraint behind it, and a declined respondent is by definition
+    # mid-deck, so the row is "started" and already excluded from every
+    # status: "completed" count. `answered` going false is what removes it from
+    # the responder counts, which is the number that was wrong.
+    self.region_country = nil
+    self.region_label = nil
+    self.demographic_gender = nil
+    self.demographic_birth_year = nil
+    self.score = nil
+    self.quiz_max = nil
+    self.token_totals = {}
+    self.respondent_code_digest = nil
+  end
+
   # Whether this response holds a real answer to at least one question.
   # Drives the `answered` column / responder counts.
   def content_answered?

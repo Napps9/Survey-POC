@@ -511,7 +511,35 @@ class Survey < ApplicationRecord
         end
       end
       c
-    end
+    end.then { |list| hoist_consent_gate(list) }
+  end
+
+  # A consent gate must come before any card that captures an answer.
+  #
+  # It is an ordinary deck card, so a creator could put it at position four —
+  # and /progress persists answers on every advance, so by the time the
+  # respondent read the sheet and declined, three answers were already stored,
+  # counted as a responder, and feeding the public aggregates. Declining is
+  # supposed to mean their data is not collected.
+  #
+  # Non-question cards may still precede it: a welcome card or a points
+  # checkpoint captures nothing, so "Hello → consent → questions" is both a
+  # nicer flow and still safe. The rule is "before any QUESTION", not "first".
+  #
+  # Only reached from the editor's save path, and #update refuses any edit to a
+  # Verto that is published or already has responses (editing_locked?), so a
+  # deck being reordered here can have no stored answers to misalign — which
+  # matters, because answers are keyed by card index.
+  def self.hoist_consent_gate(list)
+    gate_at = list.index { |c| c.is_a?(Hash) && c["type"].to_s == "consent_gate" }
+    return list if gate_at.nil?
+
+    first_question = list.index { |c| c.is_a?(Hash) && CardTypes.question?(c["type"]) }
+    return list if first_question.nil? || gate_at < first_question
+
+    gate = list.delete_at(gate_at)
+    list.insert(first_question, gate)
+    list
   end
 
   # Quiz: the card indices that are graded (carry a correct answer). Empty for a

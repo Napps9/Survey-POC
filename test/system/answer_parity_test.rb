@@ -74,7 +74,7 @@ class AnswerParityTest < ApplicationSystemTestCase
         const app  = window.Stimulus || window.application
         const root = document.querySelector('[data-controller~="player"]')
         const c    = app.getControllerForElementAndIdentifier(root, "player")
-        return #{CASES.map { |_n, ans, _e| ans }.to_json}.map(a => c._isAnswered(a))
+        return #{CASES.map { |_n, ans, _e| ans }.to_json}.map(a => c._isAnswerGiven(a))
       })()
     JS
   end

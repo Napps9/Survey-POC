@@ -8,6 +8,58 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-028 — Declining consent kept the data anyway
+
+**Severity:** the platform collected and published data from people who had
+explicitly refused to give it.
+**Found:** the boundary hunt. Fixed to the owner's decision, not mine — this one
+was a policy question, not a defect with one right answer.
+
+A consent gate is an ordinary deck card, so it could sit at position four, and
+`/progress` persists answers on every advance. By the time a respondent read the
+sheet and tapped "No thanks", their earlier answers were already stored, already
+counted as a responder, and already feeding the creator's results and the public
+`/results` and `/regions` aggregates. `#consent` stamped `consent_declined_at`
+and touched nothing else. The creator's respondent-data screen renders only
+"agreed"/"none", so a declined respondent looked like someone who had never been
+asked — while their answers sat in the table.
+
+**Decided and built:**
+
+* **Declining purges.** `answers` is cleared, and so are the denormalised
+  `region_*` / `demographic_*` / score / token / respondent-code columns —
+  those are copies of the answers, and clearing only the JSON would leave the
+  personal data behind in its own columns. The row survives:
+  `consent_declined_at` plus the wording they were shown is the evidence the
+  decline was honoured, and the decline rate is worth knowing. Clearing
+  `answers` drops `answered` to false via `sync_answered`, which is what removes
+  it from every responder-scoped view.
+* **The gate is hoisted ahead of the first question on save**, so the situation
+  cannot arise on any deck built from now on. Not to index 0: non-question cards
+  may still precede it, because a welcome card captures nothing and "Hello →
+  consent → questions" is the better flow. The rule is *before any QUESTION*.
+  Safe to reorder there because `#update` refuses any edit to a Verto that is
+  published or has responses, so a deck reaching the sanitiser has no stored
+  answers to misalign — and answers are keyed by card index.
+* **The client drops its own copy too**, so an unload flush or a queued submit
+  can't re-upload what the server just purged.
+
+**A regression I introduced and caught mid-change:** the new whole-answer
+`_isAnswered(ans)` silently **shadowed** an existing `_isAnswered(value)` further
+down the same class. Its two callers pass a bare value, which the new one reads
+as "not an object" and reports unanswered — so `_saveProgress` would have
+stopped saving and the required-question guard would have stopped guarding.
+JavaScript takes the later definition without a word. The two are now one method
+(`_isAnswerGiven`), which is what should have happened first: `_isCardAnswered`
+had already reimplemented the `other` clause by hand, so the codebase held the
+right rule in a place `_applyTokenEarn` never looked.
+
+**Guard:** `test/integration/consent_decline_purge_test.rb` — nine tests
+covering the purge, what survives it, the public aggregates, the hoist and its
+three edge cases, plus the negative case that agreeing changes nothing.
+
+---
+
 ## BUG-024 to BUG-027 — Four ways a respondent's work went missing
 
 A batch from the boundary hunt, all respondent-facing, all confirmed by three
