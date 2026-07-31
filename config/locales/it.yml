@@ -1034,6 +1034,7 @@ it:
     welcome_confirm: "Benvenuto su Playverto! Controlla %{email} per confermare il tuo indirizzo."
   flash:
     surveys:
+      image_unverified: "Non siamo riusciti a controllare quell'immagine — riprova."
       editing_locked: "La modifica è bloccata — questo Verto è live oppure ha già raccolto risposte."
       settings_locked: "Questo Verto è live o ha già delle risposte — le impostazioni di consenso e di punteggio non si possono più cambiare."
       brief_required: "Dicci di cosa parla il tuo Verto e chi risponderà — sono entrambi obbligatori."

@@ -1034,6 +1034,7 @@ de:
     welcome_confirm: "Willkommen bei Playverto! Prüfe %{email}, um deine Adresse zu bestätigen."
   flash:
     surveys:
+      image_unverified: "Wir konnten dieses Bild nicht prüfen — bitte versuche es erneut."
       editing_locked: "Bearbeiten ist gesperrt — dieses Verto ist live oder hat bereits Antworten gesammelt."
       settings_locked: "Dieses Verto ist live oder hat bereits Antworten — Einwilligungs- und Bewertungseinstellungen lassen sich jetzt nicht mehr ändern."
       brief_required: "Sag uns, worum es in deinem Verto geht und wer antwortet — beides ist erforderlich."

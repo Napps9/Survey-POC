@@ -1034,6 +1034,7 @@ nl:
     welcome_confirm: "Welkom bij Playverto! Check %{email} om je adres te bevestigen."
   flash:
     surveys:
+      image_unverified: "We konden die afbeelding niet controleren — probeer het opnieuw."
       editing_locked: "Bewerken is vergrendeld — deze Verto is live of heeft al reacties verzameld."
       settings_locked: "Deze Verto is live of heeft al reacties — instellingen voor toestemming en scoring kun je nu niet meer wijzigen."
       brief_required: "Vertel ons waar je Verto over gaat en wie er antwoordt — die twee zijn verplicht."
