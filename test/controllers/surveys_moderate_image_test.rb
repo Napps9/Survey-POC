@@ -56,7 +56,7 @@ class SurveysModerateImageTest < ActionDispatch::IntegrationTest
     assert_response :bad_gateway
     body = JSON.parse(response.body)
     assert_equal false, body["ok"]
-    assert_equal SurveysController::COULD_NOT_VERIFY_IMAGE_MESSAGE, body["reason"]
+    assert_equal I18n.t("flash.surveys.image_unverified"), body["reason"]
   end
 
   test "allows through when moderation is unconfigured" do

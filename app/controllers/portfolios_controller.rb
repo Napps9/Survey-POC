@@ -25,7 +25,7 @@ class PortfoliosController < ApplicationController
   def create
     @portfolio = @funder.portfolios.new(portfolio_params)
     if @portfolio.save
-      redirect_to funder_portfolio_path(@funder, @portfolio), notice: "Portfolio \"#{@portfolio.name}\" created."
+      redirect_to funder_portfolio_path(@funder, @portfolio), notice: t("flash.portfolios.created", name: @portfolio.name)
     else
       redirect_to funder_path(@funder), alert: @portfolio.errors.full_messages.first
     end
@@ -43,7 +43,7 @@ class PortfoliosController < ApplicationController
 
   def destroy
     @portfolio.archive!
-    redirect_to funder_path(@funder), notice: "Portfolio \"#{@portfolio.name}\" removed."
+    redirect_to funder_path(@funder), notice: t("flash.portfolios.removed", name: @portfolio.name)
   end
 
   # GET /funders/:funder_id/portfolios/:id/results
@@ -100,7 +100,7 @@ class PortfoliosController < ApplicationController
   # already attached to this portfolio, which has no automatic sync hook.
   def resync
     PortfolioCommonQuestionSync.ensure_cards_for_portfolio(@portfolio)
-    redirect_to funder_portfolio_path(@funder, @portfolio), notice: "Portfolio questions re-synced to every member."
+    redirect_to funder_portfolio_path(@funder, @portfolio), notice: t("flash.portfolios.questions_resynced")
   end
 
   # Per-grantee breakdown for the comparison view: the same Common Question
@@ -158,13 +158,13 @@ class PortfoliosController < ApplicationController
       @funder.organisation_id == current_organisation.id ||
       @funder.funder_memberships.exists?(organisation_id: current_organisation.id)
     )
-      redirect_to funders_path, alert: "Funder not found." and return
+      redirect_to funders_path, alert: t("flash.portfolios.funder_not_found") and return
     end
   end
 
   def load_portfolio
     @portfolio = @funder.portfolios.kept.find_by(id: params[:id])
-    redirect_to funder_path(@funder), alert: "Portfolio not found." and return unless @portfolio
+    redirect_to funder_path(@funder), alert: t("flash.portfolios.not_found") and return unless @portfolio
   end
 
   def owner?
@@ -173,7 +173,7 @@ class PortfoliosController < ApplicationController
 
   def require_funder_owner!
     return if owner? && current_membership&.admin?
-    redirect_to funder_path(@funder), alert: "Only the funder can do that."
+    redirect_to funder_path(@funder), alert: t("flash.portfolios.funder_only")
   end
 
   def portfolio_params

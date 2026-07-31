@@ -9,13 +9,13 @@ class PartnershipVertosController < ApplicationController
     survey = current_organisation.surveys.kept.find(params[:survey_id])
     @partnership.partnership_vertos.find_or_create_by!(survey_id: survey.id)
     PartnershipShareSync.ensure_shares_for(partnership: @partnership)
-    redirect_to partnership_path(@partnership), notice: "Added \"#{survey.title.presence || 'Verto'}\" to #{@partnership.name}."
+    redirect_to partnership_path(@partnership), notice: t("flash.partnership_vertos.added", verto: survey.title.presence || "Verto", partnership: @partnership.name)
   end
 
   def destroy
     av = @partnership.partnership_vertos.find(params[:id])
     av.destroy!
-    redirect_to partnership_path(@partnership), notice: "Verto removed from #{@partnership.name}."
+    redirect_to partnership_path(@partnership), notice: t("flash.partnership_vertos.removed", partnership: @partnership.name)
   end
 
   def show
@@ -24,7 +24,7 @@ class PartnershipVertosController < ApplicationController
 
     @share = @partnership_verto.survey_shares.find_by(partner_organisation_id: current_organisation.id)
     unless @share
-      redirect_to partnership_path(@partnership), alert: "No share link for this Verto."
+      redirect_to partnership_path(@partnership), alert: t("flash.partnership_vertos.no_share_link")
       return
     end
 
@@ -47,12 +47,12 @@ class PartnershipVertosController < ApplicationController
       @partnership.organisation_id == current_organisation.id ||
       @partnership.partnership_memberships.active.exists?(organisation_id: current_organisation.id)
     )
-      redirect_to partnerships_path, alert: "Partnership not found."
+      redirect_to partnerships_path, alert: t("flash.partnership_vertos.partnership_not_found")
     end
   end
 
   def require_creator_admin!
     return if @partnership.organisation_id == current_organisation.id && current_membership&.admin?
-    redirect_to partnership_path(@partnership), alert: "Only the partnership creator can do that."
+    redirect_to partnership_path(@partnership), alert: t("flash.partnership_vertos.creator_only")
   end
 end

@@ -38,7 +38,7 @@ class CommonQuestionSetsController < ApplicationController
   def create
     @set = Current.organisation.common_question_sets.new(set_params)
     if @set.save
-      redirect_to common_question_set_path(@set), notice: "Common Questions set created. Add your first question below."
+      redirect_to common_question_set_path(@set), notice: t("flash.common_question_sets.created")
     else
       flash.now[:alert] = @set.errors.full_messages.to_sentence
       render :new, status: :unprocessable_entity
@@ -55,7 +55,7 @@ class CommonQuestionSetsController < ApplicationController
     locale      = SupportedLocales.coerce(params[:default_locale].presence || Current.locale.to_s)
 
     if theme.empty? || key_insight.empty?
-      flash.now[:alert] = "Tell us the theme and the key insight you're looking to gather — those two are required."
+      flash.now[:alert] = t("flash.common_question_sets.theme_and_insight_required")
       @set = Current.organisation.common_question_sets.new(name: name, theme: theme, key_insight: key_insight, default_locale: locale)
       return render :new, status: :unprocessable_entity
     end
@@ -67,7 +67,7 @@ class CommonQuestionSetsController < ApplicationController
     )
 
     if classified.empty?
-      flash.now[:alert] = "We couldn't draft a set from that — try a clearer theme or key insight."
+      flash.now[:alert] = t("flash.common_question_sets.draft_empty")
       @set = Current.organisation.common_question_sets.new(name: name, theme: theme, key_insight: key_insight, default_locale: locale)
       return render :new, status: :unprocessable_entity
     end
@@ -93,10 +93,10 @@ class CommonQuestionSetsController < ApplicationController
       end
     end
 
-    redirect_to common_question_set_path(set), notice: "Drafted #{set.common_questions.size} questions. Edit any of them below before attaching this set to a Verto."
+    redirect_to common_question_set_path(set), notice: t("flash.common_question_sets.drafted", count: set.common_questions.size)
   rescue => e
     ErrorReporting.report("CommonQuestionGenerator", e)
-    flash.now[:alert] = "We couldn't draft your set — #{e.message.first(180)}"
+    flash.now[:alert] = t("flash.common_question_sets.draft_failed", reason: e.message.first(180))
     @set = Current.organisation.common_question_sets.new(name: name, theme: theme, key_insight: key_insight, default_locale: locale)
     render :new, status: :unprocessable_entity
   end
@@ -107,7 +107,7 @@ class CommonQuestionSetsController < ApplicationController
 
   def update
     if @set.update(set_params)
-      redirect_to common_question_set_path(@set), notice: "Updated."
+      redirect_to common_question_set_path(@set), notice: t("flash.common_question_sets.updated")
     else
       flash.now[:alert] = @set.errors.full_messages.to_sentence
       render :show, status: :unprocessable_entity
@@ -116,7 +116,7 @@ class CommonQuestionSetsController < ApplicationController
 
   def destroy
     @set.archive!
-    redirect_to common_question_sets_path, notice: "“#{@set.name}” deleted. Existing Vertos keep their attached snapshot."
+    redirect_to common_question_sets_path, notice: t("flash.common_question_sets.deleted", name: @set.name)
   end
 
   # POST /common-question-sets/:id/add_question
@@ -125,14 +125,14 @@ class CommonQuestionSetsController < ApplicationController
   def add_question
     text = params[:text].to_s.strip
     if text.empty?
-      return redirect_to common_question_set_path(@set), alert: "Type the question first."
+      return redirect_to common_question_set_path(@set), alert: t("flash.common_question_sets.question_text_missing")
     end
 
     classified = QuestionTypeClassifier.new.call(questions: [ text ], locale: @set.default_locale)
     card = classified.first
 
     if card.blank?
-      return redirect_to common_question_set_path(@set), alert: "We couldn't classify that question — try rephrasing."
+      return redirect_to common_question_set_path(@set), alert: t("flash.common_question_sets.classification_failed")
     end
 
     @set.common_questions.create!(
@@ -146,7 +146,7 @@ class CommonQuestionSetsController < ApplicationController
     redirect_to common_question_set_path(@set)
   rescue => e
     ErrorReporting.report("CommonQuestionSets#add_question", e)
-    redirect_to common_question_set_path(@set), alert: "Couldn't add the question — #{e.message.first(180)}"
+    redirect_to common_question_set_path(@set), alert: t("flash.common_question_sets.add_question_failed", reason: e.message.first(180))
   end
 
   # PATCH /common-question-sets/:id/questions/:question_id
@@ -156,7 +156,7 @@ class CommonQuestionSetsController < ApplicationController
     new_type = params[:card_type].to_s.strip
 
     if text.empty?
-      return redirect_to common_question_set_path(@set), alert: "Question text can't be blank."
+      return redirect_to common_question_set_path(@set), alert: t("flash.common_question_sets.question_text_blank")
     end
 
     # If wording changed and no explicit type override, re-run the classifier
@@ -182,7 +182,7 @@ class CommonQuestionSetsController < ApplicationController
     redirect_to common_question_set_path(@set)
   rescue => e
     ErrorReporting.report("CommonQuestionSets#update_question", e)
-    redirect_to common_question_set_path(@set), alert: "Couldn't update — #{e.message.first(180)}"
+    redirect_to common_question_set_path(@set), alert: t("flash.common_question_sets.update_question_failed", reason: e.message.first(180))
   end
 
   def destroy_question

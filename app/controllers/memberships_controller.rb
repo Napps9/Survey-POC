@@ -10,10 +10,10 @@ class MembershipsController < ApplicationController
   def destroy
     membership = current_organisation.memberships.find(params[:id])
     if membership.user == Current.user
-      redirect_to organisation_memberships_path(current_organisation), alert: "You cannot remove yourself."
+      redirect_to organisation_memberships_path(current_organisation), alert: t("flash.memberships.cannot_remove_self")
     else
       membership.destroy
-      redirect_to organisation_memberships_path(current_organisation), notice: "Member removed."
+      redirect_to organisation_memberships_path(current_organisation), notice: t("flash.memberships.member_removed")
     end
   end
 end

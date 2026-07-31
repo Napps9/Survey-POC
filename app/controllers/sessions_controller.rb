@@ -13,10 +13,10 @@ class SessionsController < ApplicationController
   # actually matters. Both counters only became real with P0-5 — on the old
   # per-process memory store they reset on every deploy.
   rate_limit to: 10, within: 3.minutes, only: :create, name: "ip",
-             with: -> { redirect_to new_session_path, alert: "Try again later." }
+             with: -> { redirect_to new_session_path, alert: t("flash.sessions.rate_limited") }
   rate_limit to: 10, within: 20.minutes, only: :create, name: "email",
              by:   -> { "email:#{params[:email_address].to_s.strip.downcase}" },
-             with: -> { redirect_to new_session_path, alert: "Try again later." }
+             with: -> { redirect_to new_session_path, alert: t("flash.sessions.rate_limited") }
 
   def new
   end
@@ -26,7 +26,7 @@ class SessionsController < ApplicationController
       start_new_session_for user
       redirect_to after_authentication_url
     else
-      redirect_to new_session_path, alert: "Try another email address or password."
+      redirect_to new_session_path, alert: t("flash.sessions.invalid_credentials")
     end
   end
 

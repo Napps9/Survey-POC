@@ -62,12 +62,12 @@ class FundersController < ApplicationController
   # org licensed under someone else's funder still needs to see it.
   def require_funder_access!
     return if current_organisation.funder_enabled? || current_organisation.member_funders.exists?
-    redirect_to root_path, alert: "Funders isn't available for your organisation yet."
+    redirect_to root_path, alert: t("flash.funders.not_enabled_for_organisation")
   end
 
   def require_funder_enabled!
     return if current_organisation.funder_enabled?
-    redirect_to root_path, alert: "Funders isn't available for your organisation yet."
+    redirect_to root_path, alert: t("flash.funders.not_enabled_for_organisation")
   end
 
   def load_funder

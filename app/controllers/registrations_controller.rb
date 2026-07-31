@@ -3,7 +3,7 @@ class RegistrationsController < ApplicationController
   skip_before_action :set_current_organisation
   layout "fullscreen"
   rate_limit to: 10, within: 3.minutes, only: :create,
-             with: -> { redirect_to new_registration_path, alert: "Try again later." }
+             with: -> { redirect_to new_registration_path, alert: t("flash.registrations.rate_limited") }
 
   def new
     @user = User.new
@@ -20,7 +20,7 @@ class RegistrationsController < ApplicationController
     org_name = params[:organisation_name].to_s.strip
 
     if org_name.blank?
-      flash.now[:alert] = "Organisation name is required."
+      flash.now[:alert] = t("flash.registrations.organisation_name_required")
       return render :new, status: :unprocessable_entity
     end
 
@@ -49,7 +49,7 @@ class RegistrationsController < ApplicationController
     end
 
     if params[:password] != params[:password_confirmation]
-      flash.now[:alert] = "Passwords do not match."
+      flash.now[:alert] = t("flash.registrations.password_mismatch")
       return render :new, status: :unprocessable_entity
     end
 

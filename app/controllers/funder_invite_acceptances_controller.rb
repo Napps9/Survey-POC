@@ -15,7 +15,7 @@ class FunderInviteAcceptancesController < ApplicationController
   # oracle; the precise per-address limits live on the dedicated sign-in and
   # reset endpoints where the action means exactly one thing.
   rate_limit to: 20, within: 3.minutes, only: :accept,
-             with: -> { redirect_to funder_invite_path(params[:token]), alert: "Try again later." }
+             with: -> { redirect_to funder_invite_path(params[:token]), alert: t("flash.funder_invite_acceptances.rate_limited") }
 
   before_action :load_invite
   before_action :resume_session_if_possible

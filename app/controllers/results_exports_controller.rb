@@ -29,6 +29,6 @@ class ResultsExportsController < ApplicationController
     raise
   rescue => e
     ErrorReporting.report("ResultsExportsController", e)
-    redirect_to survey_results_path(params[:survey_id]), alert: "Couldn't export results — #{e.message}"
+    redirect_to survey_results_path(params[:survey_id]), alert: t("flash.results_exports.export_failed", reason: e.message)
   end
 end

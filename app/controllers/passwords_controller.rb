@@ -7,10 +7,10 @@ class PasswordsController < ApplicationController
   # bounds reset attempts against one account, and it stops someone mail-bombing
   # a single inbox with reset links from a rotating pool of addresses.
   rate_limit to: 10, within: 3.minutes, only: :create, name: "ip",
-             with: -> { redirect_to new_password_path, alert: "Try again later." }
+             with: -> { redirect_to new_password_path, alert: t("flash.passwords.rate_limited") }
   rate_limit to: 5, within: 20.minutes, only: :create, name: "email",
              by:   -> { "email:#{params[:email_address].to_s.strip.downcase}" },
-             with: -> { redirect_to new_password_path, alert: "Try again later." }
+             with: -> { redirect_to new_password_path, alert: t("flash.passwords.rate_limited") }
 
   def new
   end
@@ -25,7 +25,7 @@ class PasswordsController < ApplicationController
       end
     end
 
-    redirect_to new_session_path, notice: "Password reset instructions sent (if user with that email address exists)."
+    redirect_to new_session_path, notice: t("flash.passwords.reset_instructions_sent")
   end
 
   def edit
@@ -35,10 +35,10 @@ class PasswordsController < ApplicationController
     if @user.update(params.permit(:password, :password_confirmation))
       @user.update!(password_pending: false) if @user.password_pending?
       @user.sessions.destroy_all
-      redirect_to new_session_path, notice: "Password has been reset. Sign in with your new password."
+      redirect_to new_session_path, notice: t("flash.passwords.reset_complete")
     else
       redirect_to edit_password_path(params[:token]),
-        alert: @user.errors.full_messages.to_sentence.presence || "Passwords did not match."
+        alert: @user.errors.full_messages.to_sentence.presence || t("flash.passwords.confirmation_mismatch")
     end
   end
 
@@ -46,6 +46,6 @@ class PasswordsController < ApplicationController
     def set_user_by_token
       @user = User.find_by_password_reset_token!(params[:token])
     rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveRecord::RecordNotFound
-      redirect_to new_password_path, alert: "Password reset link is invalid or has expired."
+      redirect_to new_password_path, alert: t("flash.passwords.reset_link_invalid")
     end
 end

@@ -15,7 +15,7 @@ class InvitesController < ApplicationController
   # oracle; the precise per-address limits live on the dedicated sign-in and
   # reset endpoints where the action means exactly one thing.
   rate_limit to: 20, within: 3.minutes, only: :accept,
-             with: -> { redirect_to invite_path(params[:token]), alert: "Try again later." }
+             with: -> { redirect_to invite_path(params[:token]), alert: t("flash.invites.rate_limited") }
 
   before_action :require_admin!, only: [ :new, :create ]
   before_action :load_invite,    only: [ :show, :accept ]
@@ -30,13 +30,13 @@ class InvitesController < ApplicationController
     role  = params[:role].presence_in(%w[member admin]) || "member"
 
     if email.blank?
-      flash.now[:alert] = "Email address is required."
+      flash.now[:alert] = t("flash.invites.email_address_required")
       return render :new, status: :unprocessable_entity
     end
 
     existing = User.find_by(email_address: email)
     if existing && current_organisation.memberships.exists?(user: existing)
-      flash.now[:alert] = "#{email} is already a member of this organisation."
+      flash.now[:alert] = t("flash.invites.already_member", email: email)
       return render :new, status: :unprocessable_entity
     end
 
@@ -57,10 +57,10 @@ class InvitesController < ApplicationController
 
   def accept
     if @invite.accepted?
-      return redirect_to new_session_path, alert: "This invite link has already been used."
+      return redirect_to new_session_path, alert: t("flash.invites.already_used")
     end
     if @invite.expired?
-      return redirect_to new_session_path, alert: "This invite has expired. Ask your admin to resend it."
+      return redirect_to new_session_path, alert: t("flash.invites.expired")
     end
 
     if @invite.partner?
@@ -78,7 +78,7 @@ class InvitesController < ApplicationController
       # (licensee is already redirected in load_invite.) Never fall a non-member
       # invite through to accept_member_invite, which would grant its role in the
       # invite's organisation.
-      redirect_to new_session_path, alert: "This invite can't be used here."
+      redirect_to new_session_path, alert: t("flash.invites.not_redeemable_here")
     end
   rescue ActiveRecord::RecordInvalid => e
     flash.now[:alert] = e.record.errors.full_messages.first
@@ -98,7 +98,7 @@ class InvitesController < ApplicationController
     # they create the account.
     if existing_user
       unless Current.user == existing_user || authenticate_invitee(existing_user)
-        flash.now[:alert] = "An account already exists for #{@invite.email_address}. Enter its password to join #{@invite.organisation.name}."
+        flash.now[:alert] = t("flash.invites.account_exists_password_required", email: @invite.email_address, org: @invite.organisation.name)
         return render :show, status: :unprocessable_entity
       end
       user = existing_user
@@ -108,11 +108,11 @@ class InvitesController < ApplicationController
       confirm  = params[:password_confirmation]
 
       if name.blank?
-        flash.now[:alert] = "Name is required."
+        flash.now[:alert] = t("flash.invites.name_required")
         return render :show, status: :unprocessable_entity
       end
       if password.blank? || password != confirm
-        flash.now[:alert] = "Passwords are required and must match."
+        flash.now[:alert] = t("flash.invites.password_mismatch")
         return render :show, status: :unprocessable_entity
       end
       user = User.create!(name: name, email_address: @invite.email_address, password: password)
@@ -126,7 +126,7 @@ class InvitesController < ApplicationController
     end
 
     start_new_session_for(user) unless Current.user == user
-    redirect_to root_path, notice: "Welcome to #{@invite.organisation.name}!"
+    redirect_to root_path, notice: t("flash.invites.welcome_to_organisation", org: @invite.organisation.name)
   end
 
   # True when the accept form carries the existing account's correct password.
@@ -143,13 +143,13 @@ class InvitesController < ApplicationController
     password = params[:password].to_s
 
     if email.blank? || password.blank?
-      flash.now[:alert] = "Enter your email and password to sign in."
+      flash.now[:alert] = t("flash.invites.sign_in_required")
       return render :show, status: :unprocessable_entity
     end
 
     user = User.authenticate_by(email_address: email, password: password)
     unless user
-      flash.now[:alert] = "Couldn't find an account with that email and password."
+      flash.now[:alert] = t("flash.invites.sign_in_failed")
       return render :show, status: :unprocessable_entity
     end
 
@@ -162,23 +162,23 @@ class InvitesController < ApplicationController
   def accept_partner_invite_as_signed_in
     partnership = @invite.partnership
     unless partnership
-      return redirect_to new_session_path, alert: "This invite is no longer valid."
+      return redirect_to new_session_path, alert: t("flash.invites.invite_no_longer_valid")
     end
 
     org_id     = params[:join_as_organisation_id].to_i
     membership = Current.user.memberships.admin.find_by(organisation_id: org_id)
     unless membership
-      flash.now[:alert] = "Pick one of your organisations to join with."
+      flash.now[:alert] = t("flash.invites.pick_org_required")
       return render :show, status: :unprocessable_entity
     end
 
     org = membership.organisation
     if org.id == partnership.organisation_id
-      flash.now[:alert] = "You can't join a partnership you created."
+      flash.now[:alert] = t("flash.invites.cannot_join_own_partnership")
       return render :show, status: :unprocessable_entity
     end
     if partnership.partnership_memberships.exists?(organisation_id: org.id)
-      return redirect_to partnership_path(partnership), notice: "#{org.name} is already a member of #{partnership.name}."
+      return redirect_to partnership_path(partnership), notice: t("flash.invites.already_partnership_member", org: org.name, partnership: partnership.name)
     end
 
     ActiveRecord::Base.transaction do
@@ -186,13 +186,13 @@ class InvitesController < ApplicationController
       @invite.update!(accepted_at: Time.current)
     end
 
-    redirect_to partnership_path(partnership), notice: "#{org.name} joined #{partnership.name}."
+    redirect_to partnership_path(partnership), notice: t("flash.invites.joined_partnership", org: org.name, partnership: partnership.name)
   end
 
   def accept_partner_invite
     partnership = @invite.partnership
     unless partnership
-      return redirect_to new_session_path, alert: "This invite is no longer valid."
+      return redirect_to new_session_path, alert: t("flash.invites.invite_no_longer_valid")
     end
 
     email         = (@invite.addressed_email || params[:email_address].to_s.strip.downcase)
@@ -202,11 +202,11 @@ class InvitesController < ApplicationController
     if admin_org
       password = params[:password]
       unless password.present? && existing_user.authenticate(password)
-        flash.now[:alert] = "Enter your existing Playverto password to link your organisation."
+        flash.now[:alert] = t("flash.invites.existing_password_required")
         return render :show, status: :unprocessable_entity
       end
       if admin_org.id == partnership.organisation_id
-        flash.now[:alert] = "You can't join a partnership you created."
+        flash.now[:alert] = t("flash.invites.cannot_join_own_partnership")
         return render :show, status: :unprocessable_entity
       end
       ActiveRecord::Base.transaction do
@@ -214,7 +214,7 @@ class InvitesController < ApplicationController
         @invite.update!(accepted_at: Time.current)
         start_new_session_for existing_user
       end
-      redirect_to partnership_path(partnership), notice: "#{admin_org.name} joined #{partnership.name}."
+      redirect_to partnership_path(partnership), notice: t("flash.invites.joined_partnership", org: admin_org.name, partnership: partnership.name)
     else
       name     = params[:name].to_s.strip
       org_name = params[:organisation_name].to_s.strip.presence || "#{name}'s organisation"
@@ -222,15 +222,15 @@ class InvitesController < ApplicationController
       confirm  = params[:password_confirmation]
 
       if name.blank?
-        flash.now[:alert] = "Name is required."
+        flash.now[:alert] = t("flash.invites.name_required")
         return render :show, status: :unprocessable_entity
       end
       if email.blank?
-        flash.now[:alert] = "Email is required."
+        flash.now[:alert] = t("flash.invites.email_required")
         return render :show, status: :unprocessable_entity
       end
       if password.blank? || password != confirm
-        flash.now[:alert] = "Passwords are required and must match."
+        flash.now[:alert] = t("flash.invites.password_mismatch")
         return render :show, status: :unprocessable_entity
       end
 
@@ -245,7 +245,7 @@ class InvitesController < ApplicationController
         @invite.update!(accepted_at: Time.current)
         start_new_session_for user
       end
-      redirect_to partnership_path(partnership), notice: "Welcome to #{partnership.name}!"
+      redirect_to partnership_path(partnership), notice: t("flash.invites.welcome_to_partnership", partnership: partnership.name)
     end
   end
 
@@ -279,7 +279,7 @@ class InvitesController < ApplicationController
   def load_invite
     @invite = Invite.find_by(token: params[:token])
     unless @invite
-      redirect_to new_session_path, alert: "Invite not found." and return
+      redirect_to new_session_path, alert: t("flash.invites.not_found") and return
     end
     # Licensee (funder) invites are ADMIN invites into the funder-owner's own
     # organisation and must ONLY be redeemed through the funder-acceptance flow

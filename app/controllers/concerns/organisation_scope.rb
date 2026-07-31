@@ -13,7 +13,7 @@ module OrganisationScope
     membership = Current.user.memberships.includes(:organisation).find_by(organisation_id: org_id) ||
                  Current.user.memberships.includes(:organisation).first
     unless membership
-      redirect_to new_session_path, alert: "No organisation found." and return
+      redirect_to new_session_path, alert: t("flash.organisation_scope.no_organisation") and return
     end
     Current.organisation = membership.organisation
     session[:current_organisation_id] = Current.organisation.id
@@ -35,9 +35,9 @@ module OrganisationScope
     return if current_membership&.admin?
 
     if request.format.json?
-      render json: { ok: false, error: "Not authorised." }, status: :forbidden
+      render json: { ok: false, error: t("flash.organisation_scope.not_authorised") }, status: :forbidden
     else
-      redirect_to root_path, alert: "Not authorised."
+      redirect_to root_path, alert: t("flash.organisation_scope.not_authorised")
     end
   end
 end

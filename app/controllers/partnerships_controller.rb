@@ -42,7 +42,7 @@ class PartnershipsController < ApplicationController
   def create
     @partnership = current_organisation.partnerships.new(partnership_params)
     if @partnership.save
-      redirect_to partnership_path(@partnership), notice: "Partnership \"#{@partnership.name}\" created."
+      redirect_to partnership_path(@partnership), notice: t("flash.partnerships.created", name: @partnership.name)
     else
       flash.now[:alert] = @partnership.errors.full_messages.first
       render :new, status: :unprocessable_entity
@@ -61,7 +61,7 @@ class PartnershipsController < ApplicationController
 
   def destroy
     @partnership.destroy!
-    redirect_to partnerships_path, notice: "Partnership removed."
+    redirect_to partnerships_path, notice: t("flash.partnerships.removed")
   end
 
   private
@@ -72,13 +72,13 @@ class PartnershipsController < ApplicationController
       @partnership.organisation_id == current_organisation.id ||
       @partnership.partnership_memberships.active.exists?(organisation_id: current_organisation.id)
     )
-      redirect_to partnerships_path, alert: "Partnership not found." and return
+      redirect_to partnerships_path, alert: t("flash.partnerships.not_found") and return
     end
   end
 
   def require_creator_ownership!
     return if @partnership.organisation_id == current_organisation.id
-    redirect_to partnerships_path, alert: "Only the partnership creator can do that."
+    redirect_to partnerships_path, alert: t("flash.partnerships.creator_only")
   end
 
   def partnership_params

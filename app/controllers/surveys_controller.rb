@@ -44,13 +44,16 @@ class SurveysController < ApplicationController
   # Shown for moderate_image when we genuinely couldn't get a verdict (API
   # error, or an ambiguous Claude response even after retry) — never implies
   # the image was actually judged unsafe.
-  COULD_NOT_VERIFY_IMAGE_MESSAGE = "We couldn't check that image — please try again."
+  def could_not_verify_image_message = t("flash.surveys.image_unverified")
 
   # Structural edits are refused while a Verto is live, and stay refused once it
   # has responses even after being unpublished — answers are keyed by card
   # index, so a deck change would misalign what's already stored. See
   # Survey#editing_locked?.
-  EDITING_LOCKED_MESSAGE = "Editing is locked — this Verto is live, or has already collected responses."
+  # Deliberately a method, not a constant. `t` isn't available in a class body,
+  # and a constant would resolve once at boot and pin every creator to whatever
+  # locale happened to be active then — the exact thing P2-2 is undoing.
+  def editing_locked_message = t("flash.surveys.editing_locked")
 
   # update_settings was the ONLY content endpoint with no lock at all, which is
   # how a consent gate could be bolted onto a Verto people had already answered.
@@ -71,8 +74,7 @@ class SurveysController < ApplicationController
     tokenisation_enabled token_types quiz
   ].freeze
 
-  SETTINGS_LOCKED_MESSAGE =
-    "This Verto is live or already has responses — consent and scoring settings can't change now."
+  def settings_locked_message = t("flash.surveys.settings_locked")
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy ]
   before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :update_settings, :qr ]
@@ -140,7 +142,7 @@ class SurveysController < ApplicationController
     locales        = ([ default_locale ] + locales).uniq
 
     if theme.empty? || audience_age.empty?
-      flash.now[:alert] = "Tell us what your Verto's about and who's answering — those are required."
+      flash.now[:alert] = t("flash.surveys.brief_required")
       return render :new, status: :unprocessable_entity
     end
 
@@ -150,7 +152,7 @@ class SurveysController < ApplicationController
     # drives AI generation, picked Common Questions can ride along — and a
     # deck of ONLY Common Questions skips generation entirely.
     if key_insight.empty? && common_cards.empty?
-      flash.now[:alert] = "Add what you want to learn, or pick some Common Questions — one of the two is required."
+      flash.now[:alert] = t("flash.surveys.learning_goal_required")
       return render :new, status: :unprocessable_entity
     end
 
@@ -174,7 +176,7 @@ class SurveysController < ApplicationController
     redirect_to verto_build_path(build)
   rescue => e
     ErrorReporting.report("SurveyGenerator", e)
-    flash.now[:alert] = "We couldn't generate your Verto — #{friendly_generate_error(e)}"
+    flash.now[:alert] = t("flash.surveys.generate_failed", reason: friendly_generate_error(e))
     render :new, status: :unprocessable_entity
   end
 
@@ -185,10 +187,10 @@ class SurveysController < ApplicationController
     pdf = params[:pdf]
 
     unless pdf.respond_to?(:read) && pdf.content_type == "application/pdf"
-      return import_pdf_error("Please choose a PDF file to import.")
+      return import_pdf_error(t("flash.surveys.pdf_required"))
     end
     if pdf.size > MAX_PDF_BYTES
-      return import_pdf_error("That PDF is too large — please keep it under #{MAX_PDF_BYTES / 1.megabyte}MB.")
+      return import_pdf_error(t("flash.surveys.pdf_too_large", limit: MAX_PDF_BYTES / 1.megabyte))
     end
 
     # The upload is staged on the build rather than base64'd through the queue —
@@ -200,7 +202,7 @@ class SurveysController < ApplicationController
     redirect_to verto_build_path(build)
   rescue => e
     ErrorReporting.report("PdfQuestionImporter", e)
-    import_pdf_error("We couldn't import your PDF — #{friendly_generate_error(e)}")
+    import_pdf_error(t("flash.surveys.pdf_import_failed", reason: friendly_generate_error(e)))
   end
 
   # POST /surveys/import_manual
@@ -213,15 +215,15 @@ class SurveysController < ApplicationController
   def import_manual
     text = params[:manual_questions].to_s.strip
 
-    return import_manual_error("Type or paste your questions first.") if text.blank?
+    return import_manual_error(t("flash.surveys.manual_questions_required")) if text.blank?
     if text.size > MAX_MANUAL_CHARS
-      return import_manual_error("That's a lot of text — please keep it under #{MAX_MANUAL_CHARS / 1_000}k characters.")
+      return import_manual_error(t("flash.surveys.manual_questions_too_long", limit: MAX_MANUAL_CHARS / 1_000))
     end
 
     redirect_to verto_build_path(enqueue_import("import_manual", "text" => text))
   rescue => e
     ErrorReporting.report("ManualQuestionImporter", e)
-    import_manual_error("We couldn't import your questions — #{friendly_generate_error(e)}")
+    import_manual_error(t("flash.surveys.manual_import_failed", reason: friendly_generate_error(e)))
   end
 
   # GET /verto_builds/:id/import
@@ -232,7 +234,7 @@ class SurveysController < ApplicationController
   # clean import goes straight to the editor.
   def resume_import
     build = Current.organisation.verto_builds.find(params[:id])
-    return redirect_to new_survey_path, alert: "That import is no longer available." unless build.succeeded? && build.result
+    return redirect_to new_survey_path, alert: t("flash.surveys.import_unavailable") unless build.succeeded? && build.result
 
     payload = build.payload
     cards   = Array(build.result["cards"])
@@ -251,7 +253,7 @@ class SurveysController < ApplicationController
     raise # another org's build is a 404, not a redirect — same as every other survey path
   rescue => e
     ErrorReporting.report("SurveysController#resume_import", e)
-    redirect_to new_survey_path, alert: "We couldn't finish the import — #{friendly_generate_error(e)}"
+    redirect_to new_survey_path, alert: t("flash.surveys.import_finish_failed", reason: friendly_generate_error(e))
   end
 
   # POST /surveys/finalize_import
@@ -261,14 +263,14 @@ class SurveysController < ApplicationController
   # cards can't be tampered with between the two requests.
   def finalize_import
     payload = self.class.import_verifier.verified(params[:payload].to_s)
-    return redirect_to new_survey_path, alert: "That import session expired — please upload the PDF again." unless payload
+    return redirect_to new_survey_path, alert: t("flash.surveys.import_session_expired") unless payload
 
     variant = params[:variant] == "optimised" ? "optimised" : "verbatim"
     @survey = create_imported_survey!(payload, variant: variant)
     redirect_to survey_path(@survey)
   rescue => e
     ErrorReporting.report("SurveysController#finalize_import", e)
-    redirect_to new_survey_path, alert: "We couldn't finish the import — #{friendly_generate_error(e)}"
+    redirect_to new_survey_path, alert: t("flash.surveys.import_finish_failed", reason: friendly_generate_error(e))
   end
 
   # POST /surveys/import_google_form
@@ -277,12 +279,12 @@ class SurveysController < ApplicationController
   # best-fitting Verto card type (verbatim), and opens the editor — where the
   # per-card "Optimise" turns them into rule-compliant Verto questions.
   def import_google_form
-    return import_google_form_error("Google isn't set up on this server.") unless GoogleOauthService.configured?
+    return import_google_form_error(t("flash.surveys.google_not_configured")) unless GoogleOauthService.configured?
     return redirect_to google_connect_path(return_to: google_form_return_to) unless Current.user&.google_connected?
 
     form_id = GoogleFormsClient.extract_form_id(params[:google_form_url])
     if form_id.blank?
-      return import_google_form_error("Paste your Google Form's edit link, e.g. https://docs.google.com/forms/d/…/edit")
+      return import_google_form_error(t("flash.surveys.google_form_url_required"))
     end
 
     # Check the connection here, while we can still redirect the creator into
@@ -297,7 +299,7 @@ class SurveysController < ApplicationController
     import_google_form_error(e.message)
   rescue => e
     ErrorReporting.report("SurveysController#import_google_form", e)
-    import_google_form_error("We couldn't import that Google Form — #{friendly_generate_error(e)}")
+    import_google_form_error(t("flash.surveys.google_form_import_failed", reason: friendly_generate_error(e)))
   end
 
   # POST /surveys/create_blank
@@ -321,13 +323,13 @@ class SurveysController < ApplicationController
     redirect_to survey_path(@survey)
   rescue => e
     ErrorReporting.report("SurveysController#create_blank", e)
-    redirect_back fallback_location: root_path, allow_other_host: false, alert: "We couldn't create your Verto — #{friendly_generate_error(e)}"
+    redirect_back fallback_location: root_path, allow_other_host: false, alert: t("flash.surveys.create_blank_failed", reason: friendly_generate_error(e))
   end
 
   def update
     survey = Current.organisation.surveys.kept.find(params[:id])
     if survey.editing_locked?
-      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
+      return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     payload = JSON.parse(request.body.read)
     warnings = []
@@ -408,7 +410,7 @@ class SurveysController < ApplicationController
     if verdict[:safe]
       render json: { ok: true }
     elsif verdict[:ambiguous]
-      render json: { ok: false, reason: COULD_NOT_VERIFY_IMAGE_MESSAGE }, status: :bad_gateway
+      render json: { ok: false, reason: could_not_verify_image_message }, status: :bad_gateway
     else
       render json: { ok: false, reason: verdict[:reason].presence || "That image isn't PG or age-appropriate for this Verto." }
     end
@@ -416,7 +418,7 @@ class SurveysController < ApplicationController
     raise # let it 404 rather than read as "couldn't check"
   rescue => e
     ErrorReporting.report("SurveysController#moderate_image", e)
-    render json: { ok: false, reason: COULD_NOT_VERIFY_IMAGE_MESSAGE }, status: :bad_gateway
+    render json: { ok: false, reason: could_not_verify_image_message }, status: :bad_gateway
   end
 
   def pexels_search
@@ -482,12 +484,12 @@ class SurveysController < ApplicationController
   # never be used as a route to editing a deck people have already answered.
   def unpublish
     unless @survey.published?
-      return redirect_to survey_path(@survey), alert: "That Verto isn't live."
+      return redirect_to survey_path(@survey), alert: t("flash.surveys.not_live")
     end
 
     @survey.update!(unpublished_at: Time.current)
-    notice = @survey.closed? ? "Verto closed — it's off /play and its results are kept." :
-                               "Verto unpublished — it's back to a draft you can edit."
+    notice = @survey.closed? ? t("flash.surveys.closed") :
+                               t("flash.surveys.unpublished")
     redirect_to survey_path(@survey), notice: notice
   end
 
@@ -503,7 +505,7 @@ class SurveysController < ApplicationController
   def card_image
     survey = Current.organisation.surveys.kept.find(params[:id])
     if survey.editing_locked?
-      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
+      return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
     blob = Survey::CardImageStore.attach(survey, params[:image].to_s)
@@ -649,8 +651,8 @@ class SurveysController < ApplicationController
     # single field, so nothing legitimate gets caught alongside.
     if @survey.editing_locked? && (attrs.keys & SETTINGS_LOCKED_IN_USE).any?
       respond_to do |format|
-        format.html { redirect_to survey_path(@survey, panel: "publish"), alert: SETTINGS_LOCKED_MESSAGE }
-        format.json { render json: { ok: false, error: SETTINGS_LOCKED_MESSAGE }, status: :locked }
+        format.html { redirect_to survey_path(@survey, panel: "publish"), alert: settings_locked_message }
+        format.json { render json: { ok: false, error: settings_locked_message }, status: :locked }
       end
       return
     end
@@ -673,19 +675,19 @@ class SurveysController < ApplicationController
   def shuffle_assets
     survey = Current.organisation.surveys.kept.find(params[:id])
     if survey.editing_locked?
-      return redirect_to survey_path(survey), alert: EDITING_LOCKED_MESSAGE
+      return redirect_to survey_path(survey), alert: editing_locked_message
     end
     AssetPopulator.new(survey, seed: SecureRandom.hex(4)).populate!
     redirect_to survey_path(survey)
   rescue => e
     ErrorReporting.report("SurveysController#shuffle_assets", e)
-    redirect_to survey_path(survey), alert: "Couldn't shuffle assets — please try again."
+    redirect_to survey_path(survey), alert: t("flash.surveys.shuffle_failed")
   end
 
   def destroy
     survey = Current.organisation.surveys.kept.find(params[:id])
     survey.archive!
-    redirect_to root_path, notice: "“#{survey.theme.presence || survey.title.presence || 'Verto'}” deleted. Responders' link no longer works; results stay in your Archived list."
+    redirect_to root_path, notice: t("flash.surveys.archived", name: survey.theme.presence || survey.title.presence || "Verto")
   end
 
   # POST /surveys/:id/restore
@@ -706,14 +708,14 @@ class SurveysController < ApplicationController
     survey.update!(attrs)
 
     redirect_to root_path,
-      notice: "“#{survey.title.presence || survey.theme.presence || 'Verto'}” restored. It's back in your drafts — publish again when you're ready."
+      notice: t("flash.surveys.restored", name: survey.title.presence || survey.theme.presence || "Verto")
   end
 
   def destroy_forever
     survey = Current.organisation.surveys.archived.find(params[:id])
     name   = survey.theme.presence || survey.title.presence || "Verto"
     Survey.transaction { survey.destroy! }
-    redirect_to root_path, notice: "“#{name}” permanently deleted. All responses and data have been erased."
+    redirect_to root_path, notice: t("flash.surveys.destroyed_forever", name: name)
   end
 
   def bulk_archive
@@ -725,7 +727,7 @@ class SurveysController < ApplicationController
         count += 1
       end
     end
-    redirect_to root_path, notice: "#{count} #{'Verto'.pluralize(count)} deleted. Responders' links no longer work; results stay in your Archived list."
+    redirect_to root_path, notice: t("flash.surveys.bulk_archived", count: count)
   end
 
   def bulk_destroy
@@ -737,7 +739,7 @@ class SurveysController < ApplicationController
         count += 1
       end
     end
-    redirect_to root_path, notice: "#{count} #{'Verto'.pluralize(count)} permanently deleted. All responses and data have been erased."
+    redirect_to root_path, notice: t("flash.surveys.bulk_destroyed_forever", count: count)
   end
 
   def results
@@ -775,7 +777,7 @@ class SurveysController < ApplicationController
   def generate_card
     survey = Current.organisation.surveys.kept.find(params[:id])
     if survey.editing_locked?
-      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
+      return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
     card = SingleQuestionGenerator.new.call(
@@ -802,7 +804,7 @@ class SurveysController < ApplicationController
   def generate_flow
     survey = Current.organisation.surveys.kept.find(params[:id])
     if survey.editing_locked?
-      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
+      return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     body   = JSON.parse(request.body.read)
     prompt = body["prompt"].to_s.strip.first(500)
@@ -842,7 +844,7 @@ class SurveysController < ApplicationController
   def restore_card
     survey = Current.organisation.surveys.kept.find(params[:id])
     if survey.editing_locked?
-      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
+      return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
     body = JSON.parse(request.body.read)
@@ -866,7 +868,7 @@ class SurveysController < ApplicationController
   def optimise_card
     @survey = survey = Current.organisation.surveys.kept.find(params[:id])
     if survey.editing_locked?
-      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
+      return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     body = JSON.parse(request.body.read)
     card = body["card"].is_a?(Hash) ? body["card"] : {}
@@ -911,7 +913,7 @@ class SurveysController < ApplicationController
   def render_card
     survey = Current.organisation.surveys.kept.find(params[:id])
     if survey.editing_locked?
-      return render json: { ok: false, error: EDITING_LOCKED_MESSAGE }, status: :locked
+      return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     card   = JSON.parse(request.body.read)
     # Stamp a stable cid now so the freshly inserted card is a valid
