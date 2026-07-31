@@ -3,7 +3,19 @@
   <head>
     <%= render "layouts/head" %>
   </head>
-  <body style="height:100dvh;min-height:100vh;overflow:hidden;background:#272D4A;color:#F7F7F7;font-family:'ABeeZee',sans-serif;">
+  <%# Only the pages that are meant to be full-bleed lock the viewport: the
+      player (and the owner's @chromeless preview of it), and the signed-in
+      shell, which scrolls inside its own fixed container below. The
+      unauthenticated auth pages — sign in, register, password reset, invite
+      acceptance — are ordinary documents that can be taller than the viewport
+      (register always is; any of them is once a phone keyboard is up), so they
+      have to scroll like a normal page. `overflow:hidden` didn't stop them
+      being scrolled, only the user: the browser still scrolls a focused field
+      into view, so clicking into a text box moved the page and then stranded
+      it there with no way to scroll back — and it put the legal footer
+      permanently out of reach. %>
+  <% viewport_locked = Current.user || @chromeless || controller_name == "player" %>
+  <body style="<%= viewport_locked ? "height:100dvh;min-height:100vh;overflow:hidden;" : "min-height:100dvh;" %>background:#272D4A;color:#F7F7F7;font-family:'ABeeZee',sans-serif;">
     <%# @chromeless pages (e.g. the owner's Verto preview) render bare even
         when signed in, so they replicate exactly what a respondent sees. %>
     <% if Current.user && !@chromeless %>
