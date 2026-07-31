@@ -1,29 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
+import { DEFAULT_OPTIONS, OPTION_TYPES, LABEL_TYPES } from "lib/default_options"
 
-// Types that expose a list of answer options in the details form
-const OPTION_TYPES = new Set([
-  "multiple_choice", "select_many",
-  "select_one_grid", "select_many_grid",
-  "tap_card", "scenario"
-])
-
-// Types that expose min / max scale-label fields instead
-const LABEL_TYPES = new Set(["range", "rating"])
-
-// Default placeholder options (mirrors type_panel_controller.js)
-const DEFAULT_OPTIONS = {
-  range:            ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
-  rating:           ["Poor", "Fair", "Good", "Great", "Excellent"],
-  multiple_choice:  ["Option A", "Option B", "Option C"],
-  select_many:      ["Option A", "Option B", "Option C", "Option D", "Option E"],
-  yes_no:           ["Yes", "No"],
-  select_one_grid:  ["A", "B", "C", "D"],
-  select_many_grid: ["A", "B", "C", "D"],
-  tap_card:         ["Statement 1", "Statement 2", "Statement 3", "Statement 4", "Statement 5"],
-  scenario:         ["Option A", "Option B"],
-  open_ended:       [],
-  welcome_card:     [],
-}
 
 export default class extends Controller {
   static targets = [
@@ -234,7 +211,7 @@ export default class extends Controller {
       if (!json.ok) throw new Error(json.error || "Generation failed")
       if (token !== this._requestToken) return // modal was closed/reopened — drop it
 
-      this._insertHTML(json.html)
+      this._insertHTML(json.html, json.card)
       this._notifyEditor()
       this.close()
     } catch (err) {
@@ -265,7 +242,7 @@ export default class extends Controller {
       if (!json.ok) throw new Error(json.error || "Render failed")
       if (token !== this._requestToken) return // modal was closed/reopened — drop it
 
-      this._insertHTML(json.html)
+      this._insertHTML(json.html, json.card)
       this._notifyEditor()
       this.close()
     } catch (err) {
@@ -426,7 +403,7 @@ export default class extends Controller {
   // DOM insertion
   // ──────────────────────────────────────────────────────────
 
-  _insertHTML(html) {
+  _insertHTML(html, cardJson = null) {
     const feed = this.cardsFeedTarget
     if (!feed) return
 
@@ -467,9 +444,11 @@ export default class extends Controller {
     // Put the inverse on the undo stack. Skipping this didn't just make "add"
     // un-undoable — it left ⌘Z pointing at an older delete or reorder, so the
     // next undo silently reverted something else.
-    this.application
-        .getControllerForElementAndIdentifier(this.element, "survey-editor")
-        ?.recordCardInsertion(slot)
+    const editor = this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")
+    // Seed the translation store BEFORE the undo entry, so an undo of a
+    // generated card does not leave a store entry pointing at a detached node.
+    editor?.seedCardStore?.(card, cardJson)
+    editor?.recordCardInsertion(slot)
 
     card.scrollIntoView({ behavior: "smooth", block: "nearest" })
   }

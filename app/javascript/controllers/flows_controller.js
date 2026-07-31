@@ -280,7 +280,7 @@ export default class extends Controller {
       const converge = wire ? ((defSel?.dataset.logicSelected || "") || continuation) : null
       const flow = editor.addFlow({ name: json.name || (wire ? wire[1] : ""), exit: this._decodeTarget(converge) })
       ;(json.cards || []).forEach(item => {
-        const card = this._spliceHTML(item.html, afterSlot, flow.id)
+        const card = this._spliceHTML(item.html, afterSlot, flow.id, item.card)
         if (card) afterSlot = card.closest(".card-slot")
       })
       if (wire && ownerWrap) {
@@ -625,7 +625,7 @@ export default class extends Controller {
   // Wrap a server-rendered card row in a slot and splice it into the feed
   // (after `afterSlot`, else at the end), tagged with the flow. Mirrors
   // add_question's _insertHTML / the flow map's _createBranchCard splice.
-  _spliceHTML(html, afterSlot, flowId) {
+  _spliceHTML(html, afterSlot, flowId, cardJson = null) {
     const feed = this.element.querySelector("[data-add-question-target='cardsFeed']")
     if (!feed) return null
     const tmp = document.createElement("div")
@@ -641,6 +641,10 @@ export default class extends Controller {
     else feed.appendChild(slot)
     if (flowId) card.dataset.cardFlowId = flowId
     this.application.getControllerForElementAndIdentifier(this.element, "type-panel")?.registerCard(card)
+    // Generated flow cards are translated per locale by GenerateFlowJob before
+    // they get here; without seeding the store those translations are lost on
+    // the next autosave, same as for a generated single card.
+    this._editor()?.seedCardStore?.(card, cardJson)
     return card
   }
 

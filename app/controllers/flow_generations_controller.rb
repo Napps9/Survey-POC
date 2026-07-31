@@ -19,7 +19,10 @@ class FlowGenerationsController < ApplicationController
     if generation.succeeded?
       survey = generation.survey
       cards  = Array(generation.cards).map do |card|
-        { cid: card["cid"], html: render_card_html(survey, card) }
+        # Card JSON alongside the markup, for the same reason generate_card
+        # returns it: GenerateFlowJob translated these per locale, and HTML
+        # alone leaves the editor no way to learn the translations exist.
+        { cid: card["cid"], card: card, html: render_card_html(survey, card) }
       end
       return render json: { ok: true, status: "succeeded", name: generation.flow_name, cards: cards }
     end

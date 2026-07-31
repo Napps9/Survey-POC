@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { NON_QUESTION_TYPES } from "lib/question_types"
 import { t } from "lib/i18n"
 
 // Categorical palette (dataviz skill's validated 8-hue dark-mode set,
@@ -21,7 +22,9 @@ const FALLBACK_COLOR = "rgba(255,255,255,0.4)"
 // invisible against its own fill.
 const MAP_SELECTED_STROKE = "#ffffff"
 
-const SKIP_TYPES = new Set([ "welcome_card", "token_checkpoint" ])
+// Was a hand-copy that predated consent_gate, so the compare view built an
+// empty expandable block for one. Now the same list everything else uses.
+const SKIP_TYPES = new Set(NON_QUESTION_TYPES)
 
 export default class extends Controller {
   static targets = [ "stage", "panel", "meta", "picker", "pickerWrap", "body", "openBtn", "mapStage" ]

@@ -1,5 +1,6 @@
 import { ROUTABLE_TYPES } from "lib/routable_types"
 import { isPaged } from "lib/paged_types"
+import { isQuestionType } from "lib/question_types"
 // Rules of the Game — the "Do's and Don'ts" the Verto generator follows
 // (SurveyGenerator::SYSTEM / CARD_RULES and the source "Rules of the Game"
 // document), re-expressed as live editor checks. Each check returns a
@@ -81,9 +82,7 @@ const TYPE_LABEL = {
   scenario: "Scenario"
 }
 
-// Mirrors CardTypes::NON_QUESTION_TYPES (app/lib/card_types.rb).
-const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint", "consent_gate" ]
-const isQuestion = (c) => !NON_QUESTION_TYPES.includes(c && c.type ? c.type : "")
+const isQuestion = (c) => isQuestionType(c && c.type ? c.type : "")
 export const typeLabel = (ty) => TYPE_LABEL[ty] || (ty || "").replace(/_/g, " ")
 const cleanOptions = (c) => (Array.isArray(c.options) ? c.options : [])
   .map((o) => (o || "").toString().trim()).filter(Boolean)

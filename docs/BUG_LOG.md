@@ -8,6 +8,54 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-029 to BUG-032 — The last four from the hunt
+
+**BUG-029 — a removed consent gate came back on its own.** The gate's inline
+editor saves on a 900ms debounce, and the timer's closure read the element when
+it FIRED rather than when it was queued. `removeConsent` resets that same element
+to its default copy before saving an empty one — so typing a word and then
+clicking ✕ Remove inside the debounce window let the pending timer land
+afterwards with the DEFAULT consent text, putting a live consent gate back on a
+Verto the creator had just taken it off. Nothing on screen said so: the card was
+hidden and the CTA was back.
+
+Fixed twice over — the text is captured at queue time, and every add/remove
+cancels the pending timer first.
+
+**BUG-030 — generated cards discarded translations that had just been paid
+for.** `#generate_card` calls `translate_card!`, which bills one Claude call per
+secondary locale, and returned `{ ok: true, html: }` — the i18n map computed and
+thrown away. The editor could not have recovered it: `_seedStore()` reads a blob
+rendered into the page, so it only knows the deck as it was at page load. A card
+added afterwards had no store entry, `_captureLocale` filled one from the
+language on screen, and the next autosave wrote the card back monolingual. The
+endpoints now return the card JSON and `seedCardStore` teaches the store about
+it; the flow-generation path had the same gap and the same fix.
+
+**BUG-031 — a Prioritise card created from "Add question" arrived with no
+options.** `add_question_controller` carried its own `DEFAULT_OPTIONS`, under a
+comment claiming to mirror `type_panel_controller`'s. It was missing `nps` and
+`prioritise`, so the modal showed no option rows and `_collectCard` emitted no
+`options`.
+
+**BUG-032 — the compare view built an empty block for a consent gate.**
+`results_compare_controller`'s `SKIP_TYPES` was a hand-copy of
+`NON_QUESTION_TYPES` that predated `consent_gate`.
+
+**The two of those share a cause worth naming.** `NON_QUESTION_TYPES` was
+written out by hand in **four** JS files; three stayed in step and the fourth
+did not. `DEFAULT_OPTIONS` existed twice and the second copy was short two
+entries. Both are single modules now (`lib/question_types.js`,
+`lib/default_options.js`) and the parity test asserts not just that they match
+Ruby but that **nobody re-declares them** — because the previous guard compared
+three named files and could not see the fourth copy, which was spelled
+`SKIP_TYPES` and lived somewhere it was not looking.
+
+That guard, `card_types_test.rb`, was itself the third one this week that was
+shaped like the bug it was written for rather than like the rule.
+
+---
+
 ## BUG-028 — Declining consent kept the data anyway
 
 **Severity:** the platform collected and published data from people who had

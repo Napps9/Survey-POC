@@ -16,6 +16,7 @@ export default class extends Controller {
   static values = { url: String }
 
   addConsent() {
+    clearTimeout(this._consentTimer)
     this.consentCtaTarget.hidden = true
     this.consentCardTarget.hidden = false
     const body = this.consentBodyTarget
@@ -25,6 +26,7 @@ export default class extends Controller {
   }
 
   removeConsent() {
+    clearTimeout(this._consentTimer)
     this.consentCardTarget.hidden = true
     this.consentCtaTarget.hidden = false
     this.consentBodyTarget.textContent = this.consentBodyTarget.dataset.defaultText || ""
@@ -82,13 +84,20 @@ export default class extends Controller {
     ov.after(el)
   }
 
+  // The text is captured NOW, not read from the DOM when the timer fires. A
+  // closure that reads the element 900ms later reads whatever any sibling
+  // handler has since written into it — and removeConsent resets that element
+  // to its default text, so a pending keystroke timer would post the DEFAULT
+  // consent copy a moment after the gate was removed, silently putting a live
+  // consent gate back on a Verto the creator had just taken it off.
   queueConsentSave() {
     clearTimeout(this._consentTimer)
-    this._consentTimer = setTimeout(() =>
-      this._save({ consent_text: this.consentBodyTarget.textContent.trim() }), 900)
+    const text = this.consentBodyTarget.textContent.trim()
+    this._consentTimer = setTimeout(() => this._save({ consent_text: text }), 900)
   }
 
   addThankyou() {
+    clearTimeout(this._tyTimer)
     this.tyCtaTarget.hidden = true
     this.tyCardTarget.hidden = false
     this._focusEnd(this.tyTitleTarget)
@@ -96,6 +105,7 @@ export default class extends Controller {
   }
 
   removeThankyou() {
+    clearTimeout(this._tyTimer)
     this.tyCardTarget.hidden = true
     this.tyCtaTarget.hidden = false
     // Back to the player defaults, which is what the reopened card shows.

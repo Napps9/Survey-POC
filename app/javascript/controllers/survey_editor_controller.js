@@ -3,13 +3,8 @@ import { t } from "lib/i18n"
 import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
 import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_types"
 import { isPaged } from "lib/paged_types"
+import { NON_QUESTION_TYPES } from "lib/question_types"
 
-// Card types with no answer captured — mirrors CardTypes::NON_QUESTION_TYPES
-// (app/lib/card_types.rb). No other card may be moved ABOVE a welcome card (see
-// moveCardUp / _updateMoveButtonStates), so it opens the deck by default —
-// though it can now be nudged down itself, which token_checkpoint has always
-// been able to do.
-const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint", "consent_gate" ]
 
 // Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
 // These default to a per-option token award but can opt into a flat award for
@@ -714,6 +709,30 @@ export default class extends Controller {
 
   // Replace a card element with freshly rendered HTML and reseed its store entry
   // (so language tabs + autosave keep its translations), then re-score + save.
+  // Teach the translation store about a card that arrived after connect().
+  //
+  // _seedStore() reads a JSON blob rendered into the page, so it only ever
+  // knows the deck as it was at page load. A card added afterwards — generated,
+  // spliced into a flow — carries per-locale text the server has already paid
+  // Claude for, and without this the store never learned about it: the next
+  // autosave captured only the language on screen and wrote the card back
+  // monolingual, silently discarding the rest.
+  seedCardStore(el, cardJson) {
+    if (!el || !cardJson) return
+
+    const entry = {}
+    entry[this.defaultLocaleValue] = this._normContent(cardJson)
+    const i18n = cardJson.i18n || {}
+    Object.keys(i18n).forEach(loc => { entry[loc] = this._normContent(i18n[loc]) })
+    this._store.set(el, entry)
+
+    // If a translation tab is open, show that language on the new card rather
+    // than leaving the primary sitting under the wrong tab.
+    if (this._activeLocale !== this.defaultLocaleValue) {
+      this._writeCard(el, entry[this._activeLocale], entry[this.defaultLocaleValue], this._activeLocale)
+    }
+  }
+
   _replaceCard(oldEl, html, cardJson) {
     const tmp = document.createElement("div")
     tmp.innerHTML = (html || "").trim()
@@ -724,15 +743,7 @@ export default class extends Controller {
     this._typePanel()?.registerCard(newEl)
 
     this._store.delete(oldEl)
-    const entry = {}
-    entry[this.defaultLocaleValue] = this._normContent(cardJson)
-    const i18n = cardJson.i18n || {}
-    Object.keys(i18n).forEach(loc => { entry[loc] = this._normContent(i18n[loc]) })
-    this._store.set(newEl, entry)
-    // If a translation tab is active, show that language on the swapped-in card.
-    if (this._activeLocale !== this.defaultLocaleValue) {
-      this._writeCard(newEl, entry[this._activeLocale], entry[this.defaultLocaleValue], this._activeLocale)
-    }
+    this.seedCardStore(newEl, cardJson)
 
     this.refreshCard(newEl)
     this.refreshScore()

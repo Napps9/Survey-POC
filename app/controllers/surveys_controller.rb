@@ -794,7 +794,12 @@ class SurveysController < ApplicationController
     card = translate_card!(card, survey)
 
     html = render_card_html(survey, card)
-    render json: { ok: true, html: html }
+    # The card JSON as well as its markup. translate_card! above has just paid
+    # Claude for one translation per secondary locale, and returning only HTML
+    # threw every one of them away: the editor seeds its translation store at
+    # connect() and has no other way to learn about a card added after that, so
+    # the next autosave wrote the card back monolingual.
+    render json: { ok: true, card: card, html: html }
   rescue => e
     ErrorReporting.report("SurveysController#generate_card", e)
     render json: { ok: false, error: friendly_generate_error(e) }, status: :unprocessable_entity

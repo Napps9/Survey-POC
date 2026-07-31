@@ -1,11 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 import { ROUTABLE_TYPES } from "lib/routable_types"
 import { PAGED_TYPES, isPaged } from "lib/paged_types"
+import { NON_QUESTION_TYPES } from "lib/question_types"
+import { DEFAULT_OPTIONS } from "lib/default_options"
 import { t } from "lib/i18n"
 
-// Card types with no answer captured — mirrors CardTypes::NON_QUESTION_TYPES
-// (app/lib/card_types.rb) and verto_rules.js's isQuestion.
-const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint", "consent_gate" ]
+
 
 // Single-pick types whose answers can each route to a different card/end —
 // (Routable types come from lib/routable_types — the LogicGraph::ROUTABLE mirror.)
@@ -141,21 +141,6 @@ const COMPATIBILITY = {
   ],
 }
 
-const DEFAULT_OPTIONS = {
-  range:            ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
-  nps:              ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-  rating:           ["Poor", "Fair", "Good", "Great", "Excellent"],
-  multiple_choice:  ["Option A", "Option B", "Option C"],
-  select_many:      ["Option A", "Option B", "Option C", "Option D", "Option E"],
-  prioritise:       ["Option A", "Option B", "Option C", "Option D"],
-  yes_no:           ["Yes", "No"],
-  select_one_grid:  ["A", "B", "C", "D"],
-  select_many_grid: ["A", "B", "C", "D"],
-  tap_card:         ["Statement 1", "Statement 2", "Statement 3", "Statement 4", "Statement 5"],
-  scenario:         ["Option A", "Option B"],
-  open_ended:       [],
-  welcome_card:     [],
-}
 
 // Default narrative pages for a card freshly switched to Scenario — one
 // blank page (the .book-page-text placeholder invites the creator to write).

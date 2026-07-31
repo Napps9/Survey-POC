@@ -10,25 +10,22 @@ class CardTypesTest < ActiveSupport::TestCase
     assert CardTypes.question?("scenario")
   end
 
-  # NON_QUESTION_TYPES is hand-mirrored into three JS files (progress counting,
-  # the type panel, and the Rules-of-the-Game scorer). A type added on one side
-  # and not the other gets counted as a question in some places and not others,
-  # which is invisible until a score or a progress count looks wrong — so the
-  # lists are compared directly.
-  test "the JavaScript mirrors of NON_QUESTION_TYPES match Ruby" do
-    mirrors = {
-      "app/javascript/controllers/type_panel_controller.js" => nil,
-      "app/javascript/controllers/survey_editor_controller.js" => nil,
-      "app/javascript/lib/verto_rules.js" => nil
-    }
-
-    mirrors.each_key do |path|
-      source = Rails.root.join(path).read
-      line = source[/^const NON_QUESTION_TYPES = \[(.*?)\]/m, 1]
-      assert line, "#{path}: no NON_QUESTION_TYPES declaration found"
-      assert_equal CardTypes::NON_QUESTION_TYPES, line.scan(/"([^"]+)"/).flatten,
-                   "#{path} is out of step with CardTypes::NON_QUESTION_TYPES"
+  # NON_QUESTION_TYPES used to be hand-mirrored into three JS files, and this
+  # test compared all three against Ruby. It could not see the FOURTH copy —
+  # results_compare_controller's `SKIP_TYPES`, which was the one that had gone
+  # stale, because it was spelled differently and lived in a file this list did
+  # not name.
+  #
+  # There is one definition now (app/javascript/lib/question_types.js) and the
+  # comparison moved to js_constant_parity_test, which also asserts that nobody
+  # re-declares it anywhere. What is left here is the Ruby side of the contract.
+  test "the JS mirror is defined in exactly one place" do
+    declarations = Dir[Rails.root.join("app/javascript/**/*.js")].select do |path|
+      File.read(path).match?(/(?:const|let|var)\s+(?:NON_QUESTION_TYPES|SKIP_TYPES)\s*=\s*(?:new Set\()?\[/)
     end
+
+    assert_equal [ Rails.root.join("app/javascript/lib/question_types.js").to_s ], declarations,
+                 "import it from lib/question_types rather than writing the list out again"
   end
 
   test "consent_gate is offered in the picker" do

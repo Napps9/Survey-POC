@@ -43,6 +43,49 @@ class JsConstantParityTest < ActiveSupport::TestCase
                  "the reverse offers routing the compiler will discard."
   end
 
+  test "lib/question_types.js matches CardTypes::NON_QUESTION_TYPES" do
+    assert_equal CardTypes::NON_QUESTION_TYPES.sort,
+                 js_array("lib/question_types.js", "NON_QUESTION_TYPES").sort,
+                 "a type the server treats as a non-question but the JS does not gets scored, " \
+                 "counted and rendered as if it asked something."
+  end
+
+  # This list was hand-copied into four JS files and one of them went stale —
+  # results_compare kept the two-element version from before consent_gate, so
+  # the compare view built an empty expandable block for one. There is one copy
+  # now, and this asserts nobody re-types it.
+  test "the non-question list is defined once" do
+    definitions = Dir[Rails.root.join("app/javascript/**/*.js")].select do |path|
+      File.read(path).match?(/(?:const|let|var)\s+(?:NON_QUESTION_TYPES|SKIP_TYPES)\s*=\s*(?:new Set\()?\[/)
+    end.map { |path| path.sub("#{Rails.root}/app/javascript/", "") }
+
+    assert_equal [ "lib/question_types.js" ], definitions,
+                 "import NON_QUESTION_TYPES from lib/question_types instead of re-typing it"
+  end
+
+  # Every type a creator can pick must have placeholder options — including the
+  # ones that deliberately have none, so an omission stays distinguishable from
+  # a decision. `prioritise` and `nps` were missing from the add-question copy,
+  # so picking Prioritise there produced a card with no options at all.
+  test "every pickable type has default options" do
+    source = js("lib/default_options.js")
+    table  = source[/export const DEFAULT_OPTIONS = \{(.*?)\n\}/m]
+    assert table, "DEFAULT_OPTIONS not found in lib/default_options.js"
+
+    missing = CardTypes.pickable.map(&:first).reject { |type| table.match?(/^\s+#{Regexp.escape(type)}:/) }
+    assert_empty missing,
+                 "these pickable types have no entry, so a card created as one arrives empty: " \
+                 "#{missing.inspect}"
+  end
+
+  test "the default-options table is defined once" do
+    definitions = Dir[Rails.root.join("app/javascript/**/*.js")].select do |path|
+      File.read(path).match?(/(?:const|export const)\s+DEFAULT_OPTIONS\s*=\s*\{/)
+    end.map { |path| path.sub("#{Rails.root}/app/javascript/", "") }
+
+    assert_equal [ "lib/default_options.js" ], definitions
+  end
+
   # Bounds, not lists — same mirroring problem, and these had no JS side at all,
   # so the editor let a creator write a seventh page and the sanitiser dropped
   # it on the next save without a word.
