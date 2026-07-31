@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { ROUTABLE_TYPES } from "lib/routable_types"
+import { PAGED_TYPES, isPaged } from "lib/paged_types"
 import { t } from "lib/i18n"
 
 // Card types with no answer captured — mirrors CardTypes::NON_QUESTION_TYPES
@@ -160,6 +161,7 @@ const DEFAULT_OPTIONS = {
 // blank page (the .book-page-text placeholder invites the creator to write).
 const DEFAULT_PAGES = {
   scenario: [ { id: "", text: "" } ],
+  consent_gate: [ { id: "", text: "" } ],
 }
 
 // Default NPS label count (0–10). Server-side too (NpsHelper::NPS_STEPS).
@@ -280,6 +282,57 @@ const COMPONENTS = {
     return `
       <div class="book-wrap" data-controller="scenario card-editor" data-scenario-editable-value="true">
         <div class="book-stack" data-scenario-target="stack">${pagesHtml}${answerHtml}</div>
+        <div class="book-edit-tools" data-scenario-target="editTools">
+          <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn" data-action="click->scenario#deletePage">✕ Delete this page</button>
+          <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn" data-action="click->scenario#addPage">＋ Add page</button>
+        </div>
+        <div class="book-dots" data-scenario-target="dots"></div>
+        <div class="book-nav-row">
+          <button type="button" class="book-chevron" data-scenario-target="prevBtn" data-action="click->scenario#back" aria-label="Previous page">‹</button>
+          <button type="button" class="next-btn" data-scenario-target="nextBtn" data-action="click->scenario#next">Next page ›</button>
+        </div>
+        <div class="book-live" data-scenario-target="live" aria-live="polite"></div>
+      </div>`
+  },
+
+  // Mirrors the "when consent_gate" branch in _card_component.html.erb — the
+  // same book as a scenario, but the last page is Agree / Decline instead of a
+  // choice list, and in the editor it is an inert replica (aria-hidden, no
+  // actions, not tabbable) so a creator can see where the sheet lands without
+  // consenting on a respondent's behalf.
+  //
+  // Its absence was not a design choice: COMPONENTS[type] falls back to
+  // `() => ""`, so picking "Consent screens" in the Answer Type panel blanked
+  // the card. welcome_card is listed explicitly as `() => ""` precisely so an
+  // intentional blank is distinguishable from a missing entry.
+  consent_gate: (_opts, ctx = {}) => {
+    const pages = (ctx.pages && ctx.pages.length) ? ctx.pages : [ { id: "", text: "" } ]
+    const pagesHtml = pages.map((p, i) => `
+      <div class="book-page" data-scenario-target="page" data-page-id="${esc(p.id || "")}">
+        <div class="book-page-scroll">
+          <div class="book-page-kicker" data-scenario-target="kicker">Page ${i + 1} of ${pages.length}</div>
+          <div class="book-page-text" contenteditable="true" data-scenario-target="pageText"
+               data-placeholder="Write this consent screen…">${esc(p.text || "")}</div>
+        </div>
+        <div class="book-page-corner">${i + 1}</div>
+        <div class="book-page-fade"></div>
+      </div>`).join("")
+    return `
+      <div class="book-wrap" data-controller="scenario" data-scenario-editable-value="true">
+        <div class="book-stack" data-scenario-target="stack">${pagesHtml}
+          <div class="book-page is-answer" data-scenario-target="page">
+            <div class="book-page-scroll">
+              <div class="book-page-kicker">Agreement</div>
+              <div class="play-consent-main">
+                <div class="play-consent-actions" aria-hidden="true" style="pointer-events:none;">
+                  <button type="button" class="play-consent-agree" tabindex="-1">Agree &amp; continue</button>
+                  <button type="button" class="play-consent-decline" tabindex="-1">I don't agree</button>
+                </div>
+              </div>
+            </div>
+            <div class="book-page-fade"></div>
+          </div>
+        </div>
         <div class="book-edit-tools" data-scenario-target="editTools">
           <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn" data-action="click->scenario#deletePage">✕ Delete this page</button>
           <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn" data-action="click->scenario#addPage">＋ Add page</button>
@@ -1075,12 +1128,13 @@ export default class extends Controller {
 
     const wasType = card.dataset.cardType
 
-    // The scenario book widget needs its right panel to join the flex-column
-    // fill chain (see .split-right--book in application.css) — the server
-    // only adds this class on initial render, so a client-side type switch
-    // has to toggle it itself or the book silently sits at its min-height.
+    // The book widget needs its right panel to join the flex-column fill chain
+    // (see .split-right--book in application.css) — the server only adds this
+    // class on initial render, so a client-side type switch has to toggle it
+    // itself or the book silently sits at its min-height. Keyed on PAGED_TYPES
+    // to match the server template, which uses Survey::PAGED_TYPES.
     const splitRight = card.querySelector(".split-right")
-    if (splitRight) splitRight.classList.toggle("split-right--book", type === "scenario")
+    if (splitRight) splitRight.classList.toggle("split-right--book", isPaged(type))
 
     // 1. Update badge + eyebrow
     const badge = card.querySelector(".s-badge")
@@ -1211,11 +1265,11 @@ export default class extends Controller {
   // Existing pages if this card already had some (switching away from
   // Scenario and back preserves what was written), else a fresh blank page.
   _pagesFor(card, type) {
-    if (type !== "scenario") return []
+    if (!isPaged(type)) return []
     let original = []
     try { original = JSON.parse(card.dataset.cardPages || "[]") } catch (_) {}
     if (Array.isArray(original) && original.length) return original
-    return DEFAULT_PAGES.scenario || []
+    return DEFAULT_PAGES[type] || []
   }
 
   // Existing option_images if this card already had some (switching away

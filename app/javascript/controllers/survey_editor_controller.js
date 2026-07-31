@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
 import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
 import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_types"
+import { isPaged } from "lib/paged_types"
 
 // Card types with no answer captured — mirrors CardTypes::NON_QUESTION_TYPES
 // (app/lib/card_types.rb). No other card may be moved ABOVE a welcome card (see
@@ -980,9 +981,12 @@ export default class extends Controller {
       const primOpts    = type === "range" ? trimmedOpts : trimmedOpts.filter(Boolean)
       if (primOpts.length) out.options = primOpts
 
-      // Scenario narrative pages, in document order — id-and-text pairs so
-      // translations (below) can align by id instead of position.
-      const primPages = type === "scenario"
+      // Narrative pages, in document order — id-and-text pairs so translations
+      // (below) can align by id instead of position. Every PAGED type, not just
+      // scenario: this read "type === 'scenario'" while the server had already
+      // added consent_gate to PAGED_TYPES, so a consent gate autosaved with no
+      // pages at all and the sanitiser rewrote them to [].
+      const primPages = isPaged(type)
         ? (prim.pages || []).map(p => ({ id: p.id || "", text: (p.text || "").trim() })).filter(p => p.text)
         : []
       if (primPages.length) out.pages = primPages

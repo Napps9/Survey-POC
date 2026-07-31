@@ -8,6 +8,67 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-015 — A consent gate that recorded no consent
+
+**Severity:** the highest in this log. A compliance feature that blocked
+respondents, showed them a blank screen, and stored no record of what they
+agreed to.
+**Found:** by an adversarial pass over items the backlog audit had called
+*done*. The first auditor read the model, the migration, the player and 231
+lines of green tests and concluded the feature shipped. It had not.
+
+`consent_gate` joined `Survey::PAGED_TYPES` on the server. The editor's
+`serialize()` still said:
+
+```js
+const primPages = type === "scenario" ? … : []
+```
+
+`serialize()` rebuilds every card from live DOM on **every** save and PATCHes
+the whole deck, so a consent gate always arrived with no `pages`, and the
+sanitiser's `Array(nil)` rewrote them to `[]`. Confirmed by running the exact
+payload the editor emits through the sanitiser:
+
+```
+pages after a round-trip   : []
+consent_gate_card?         : true
+consent_gated?             : true
+consent_snapshot_text      : nil
+```
+
+The gate goes on blocking respondents — with nothing on the screen — and
+`Response#consent_text_snapshot` records nothing. Because autosave fires 1.5s
+after *any* edit, editing an unrelated card destroyed the consent copy.
+Translated pages died with it, on the same gate.
+
+A second omission sat next to it: the type panel's `COMPONENTS` table had no
+`consent_gate` entry, and the lookup falls back to `() => ""`, so picking
+"Consent screens" blanked the card. `welcome_card` is listed explicitly as
+`() => ""`, which is what shows the empty fallback here was an oversight rather
+than a decision.
+
+**Why every test passed:** `consent_gate_card_test.rb` calls the sanitiser with
+pages already supplied and renders from cards seeded via `create!`. Its only
+PATCH test asserts `:locked`. No test made a round trip through the editor, and
+there is no JS test runner, so nothing in the suite could see `serialize()`.
+
+**Fix:** `app/javascript/lib/paged_types.js` mirrors `Survey::PAGED_TYPES`, and
+the four places that hardcoded `"scenario"` now ask `isPaged(type)`. Added the
+missing `consent_gate` component builder.
+
+**Guards:** `test/system/consent_gate_editor_test.rb` drives a real editor
+round trip — three of its four tests fail against the unfixed build, including
+the snapshot one. `test/lib/js_constant_parity_test.rb` asserts the JS and Ruby
+lists agree, that every paged type has a component builder, and that neither
+file gates on the literal `"scenario"` again. It checks `ROUTABLE_TYPES` against
+`LogicGraph::ROUTABLE` too — same mirroring, same latent drift.
+
+**Lesson:** two constants kept in step by a comment that says "keep in
+lock-step" are not kept in step. And a feature is not shipped because its model
+and its player agree — the editor has to be able to author it.
+
+---
+
 ## BUG-014 — An undo stack that undid the wrong action
 
 **Severity:** ⌘Z silently reverted an edit the creator had finished with, while
@@ -309,11 +370,28 @@ been generous.
 
 ## The recurring shape
 
-Six of these (001, 003, 008, 009, 011, and BUG-004's whole class) share one
-pattern: **the check that was available said everything was fine.** `bin/rails
-runner` booted. `try` returned nil without error. The matcher returned true. The
-browser test went green. In each case the only thing that found the bug was
-deliberately trying to make it fail — force the eager load, break the feature and
-re-run the test, run the matcher against a known-negative.
+Nine of these (001, 003, 008, 009, 011, 013, 014, 015, and BUG-004's whole
+class) share one pattern: **the check that was available said everything was
+fine.** `bin/rails runner` booted. `try` returned nil without error. The matcher
+returned true. The browser test went green. The blur guard restored the title.
+231 lines of consent tests passed. In each case the only thing that found the
+bug was deliberately trying to make it fail — force the eager load, break the
+feature and re-run the test, run the matcher against a known-negative.
 
 Green is evidence only when you know what red looks like.
+
+## The second shape: a boundary nobody tests
+
+013, 014 and 015 add one of their own. Each lived exactly where two halves of
+the system meet and each half looked correct on its own:
+
+* an input handler and a blur handler, correct apart, wrong in sequence;
+* a stack that pushed on delete and not on insert;
+* a Ruby constant and its JS mirror, agreeing everywhere except the one type
+  that had just been added.
+
+No unit test can see any of them, because no unit owns the boundary. Two of the
+three were found only once a browser could drive the editor, and the third only
+because a second reader was asked to *refute* the first one's "done" rather than
+confirm it. Both are worth keeping: the harness, and the habit of not accepting
+a verdict from whoever produced the work.
