@@ -1,1 +1,20 @@
 # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+#
+# Every path below is reachable without signing in, and every one of them is a
+# CAPABILITY: holding the URL is the whole of the authorisation. /play/:token is
+# how a respondent answers a Verto, and the token IS the key — so an indexed
+# /play/ URL publishes the capability, not just a page. The product only ever
+# hands these out deliberately (copy-link, a QR code on a poster, a per-partner
+# link, a respondent passing it on); nothing in the product promises or wants
+# search discoverability.
+#
+# robots.txt is advisory, so it is the polite half only. The binding half is the
+# `X-Robots-Tag: noindex, nofollow` header the app sets on these same responses
+# (ApplicationController#discourage_indexing), which a crawler ignoring this
+# file still has to receive.
+
+User-agent: *
+Disallow: /play/
+Disallow: /invites/
+Disallow: /funder_invites/
+Disallow: /blazer

@@ -4,8 +4,26 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   around_action :switch_locale
+  before_action :discourage_indexing
+
+  # Paths whose URL *is* the authorisation — the token is the key, so an indexed
+  # URL publishes the capability rather than just a page. public/robots.txt asks
+  # crawlers not to fetch these; this is the half that binds a crawler which
+  # ignores it, and the half that still applies when a link leaks into a tweet,
+  # a Slack unfurl or a public doc rather than being crawled from the site.
+  #
+  # Matched on path rather than controller so the mounted Blazer engine — whose
+  # controllers inherit from this class but are not ours to annotate — is
+  # covered by the same rule.
+  NOINDEX_PATHS = %r{\A/(play|invites|funder_invites|blazer)(/|\z)}
 
   private
+
+  def discourage_indexing
+    return unless NOINDEX_PATHS.match?(request.path)
+
+    response.set_header("X-Robots-Tag", "noindex, nofollow")
+  end
 
   # Resolves the acting user for the mounted Blazer engine, whose controllers
   # inherit from this class (and skip its auth filters). Named by `user_method`

@@ -23,17 +23,6 @@ if ENV["SMTP_ADDRESS"].present?
     enable_starttls_auto: ENV.fetch("SMTP_STARTTLS", "true") == "true",
     tls:                  ENV["SMTP_TLS"] == "true"
   }.compact
-elsif Rails.env.production?
-  # Without SMTP_ADDRESS, delivery falls back to Rails' bare default (smtp to
-  # localhost:25), which fails on Render. PasswordsController and friends
-  # rescue that failure and still show a success message, so a misconfigured
-  # deploy has no visible symptom anywhere except this line — password
-  # resets, invites, and account-setup emails all silently go nowhere.
-  Rails.logger.warn(
-    "[Mailer] SMTP_ADDRESS is not set — outbound email (password resets, invites, " \
-    "account setup links) cannot be delivered. Set SMTP_ADDRESS/SMTP_USERNAME/" \
-    "SMTP_PASSWORD/MAIL_FROM in the Render dashboard (see .env.example)."
-  )
 end
 
 # Public host used to build links inside emails (password reset, etc.)
@@ -45,4 +34,18 @@ if host
   Rails.application.config.action_mailer.default_url_options = { host: host, protocol: proto }
   Rails.application.routes.default_url_options[:host]        = host
   Rails.application.routes.default_url_options[:protocol]    = proto
+end
+
+# Neither branch above says anything when it is skipped, and both are skipped by
+# omission rather than by choice: a production deploy missing SMTP_ADDRESS, or
+# missing both host variables, is completely silent while every email it sends
+# goes nowhere. See lib/mail_config_check.rb for why that is worse than it
+# sounds and what the two escalation levels are.
+#
+# after_initialize, not here: initializers run alphabetically and `mailer` sorts
+# before `sentry`, so a Sentry report from this file would only ever reach the
+# log — the exact silence this is meant to break.
+if Rails.env.production?
+  require Rails.root.join("lib/mail_config_check")
+  Rails.application.config.after_initialize { MailConfigCheck.run! }
 end
