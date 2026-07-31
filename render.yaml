@@ -121,8 +121,17 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
-      # Active Record Encryption (encrypts stored Google tokens) — see .env.example.
-      # Render auto-generates stable values; no manual key handling needed.
+      # Active Record Encryption (encrypts stored Google tokens) — see
+      # docs/ENCRYPTION_KEYS.md.
+      #
+      # generateValue mints these ONCE and keeps them stable for the life of
+      # THIS service. It does not back them up. If the service is ever recreated
+      # — or the env group rebuilt — Render generates new values, and every
+      # google_refresh_token already in the database becomes undecryptable.
+      #
+      # So they DO need manual handling: copy all three into a secret store the
+      # owner controls. This comment previously said the opposite, which is the
+      # kind of reassurance that stops anyone checking.
       - key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
         generateValue: true
       - key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY

@@ -44,7 +44,10 @@ class GoogleOauthService
     # An authorized Signet client for the user, refreshed from their stored
     # refresh token. Raises NotConnected when missing or revoked.
     def client_for(user)
-      raise NotConnected, "No Google refresh token" if user.google_refresh_token.blank?
+      # _if_readable, not the raw attribute: a token encrypted with keys that no
+      # longer exist routes into the same NotConnected path as a missing one,
+      # which the UI already turns into a reconnect prompt.
+      raise NotConnected, "No Google refresh token" if user.google_refresh_token_if_readable.blank?
 
       client = Signet::OAuth2::Client.new(
         token_credential_uri: TOKEN_URI,

@@ -17,8 +17,36 @@ class User < ApplicationRecord
   encrypts :google_refresh_token
   encrypts :google_access_token
 
+  # A token that cannot be decrypted is not a token. Rails raises
+  # ActiveRecord::Encryption::Errors::Decryption when the key that encrypted a
+  # value is no longer the key in use — which is what a recreated Render service
+  # produces, since ACTIVE_RECORD_ENCRYPTION_* are generateValue and are minted
+  # fresh with the service.
+  #
+  # This method is called from surveys/index.html.erb, the DASHBOARD, so letting
+  # that error out meant a key change took the app's home page down for every
+  # affected user — including the page they would have used to reconnect. Now it
+  # degrades to "not connected", which is both true (the stored token is
+  # unusable) and recoverable (they can reconnect, which overwrites it).
+  #
+  # Deliberately narrow: only the decryption error is swallowed, and only here
+  # and in google_credentials. Anything else still raises.
   def google_connected?
     google_refresh_token.present?
+  rescue ActiveRecord::Encryption::Errors::Decryption
+    report_undecryptable_google_token
+    false
+  end
+
+  # The refresh token, or nil if it can no longer be decrypted. Callers already
+  # handle a missing token (GoogleOauthService raises NotConnected and the UI
+  # offers a reconnect), so nil routes an unreadable token into a path that
+  # already exists rather than a 500 nobody planned for.
+  def google_refresh_token_if_readable
+    google_refresh_token
+  rescue ActiveRecord::Encryption::Errors::Decryption
+    report_undecryptable_google_token
+    nil
   end
 
   # Wipe stored Google credentials (e.g. after the refresh token is revoked).
@@ -29,6 +57,20 @@ class User < ApplicationRecord
       google_token_expires_at: nil,
       google_email:            nil,
       google_connected_at:     nil
+    )
+  end
+
+  # Loud, once per occurrence: an undecryptable token means the encryption keys
+  # changed under a live database, and the only fix is restoring them from a
+  # backup (see docs/ENCRYPTION_KEYS.md). Degrading quietly would hide that.
+  def report_undecryptable_google_token
+    ErrorReporting.report(
+      "User#google_token",
+      ActiveRecord::Encryption::Errors::Decryption.new(
+        "stored Google token could not be decrypted — ACTIVE_RECORD_ENCRYPTION_* " \
+        "no longer match the keys the data was written with (see docs/ENCRYPTION_KEYS.md)"
+      ),
+      user_id: id
     )
   end
 

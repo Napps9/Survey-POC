@@ -61,6 +61,12 @@ module SurveyPoc
       config.active_record.encryption.primary_key         = primary
       config.active_record.encryption.deterministic_key   = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
       config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
+
+      # Keys this data may ALSO have been written with — see
+      # config/initializers/encryption_previous_keys.rb, which has to build them
+      # later than this: DerivedSecretKeyProvider derives its key the moment it
+      # is constructed, and reads key_derivation_salt off a config the framework
+      # has not applied yet at this point in boot.
     elsif !Rails.env.production?
       config.active_record.encryption.primary_key         = "dev_only_ar_encryption_primary_key_0000000001"
       config.active_record.encryption.deterministic_key   = "dev_only_ar_encryption_deterministic_key_00002"
