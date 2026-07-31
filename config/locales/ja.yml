@@ -792,11 +792,11 @@ ja:
     publish: 公開 →
     duplicate: 複製
     delete: 削除
-    delete_forever: 永遠に削除
+    delete_forever: 完全に削除
     restore: '復元'
     edit_warning: "「%{title}」はライブ中です。回答収集中に質問を編集するとデータの品質に影響します — 編集前後の回答は直接比較できません。続けますか？"
     delete_warning: "「%{title}」を削除しますか？削除したVertoは元に戻せません。回答者のリンクは機能しなくなりますが、既存の結果はアーカイブリストに残ります。"
-    delete_forever_warning: '"%{title}"を永遠に削除しますか？すべての回答、共有、データが消去されます。この操作は取り消せません。'
+    delete_forever_warning: '"%{title}"を完全に削除しますか？すべての回答、共有、データが消去されます。この操作は取り消せません。'
     select: 選択
     cancel: キャンセル
     bulk_selected:
@@ -806,8 +806,8 @@ ja:
       one: "%{count}個のVertoを削除しますか？回答者のリンクは機能しなくなります。結果はアーカイブ済みリストに残ります。"
       other: "%{count}個のVertosを削除しますか？回答者のリンクは機能しなくなります。結果はアーカイブ済みリストに残ります。"
     bulk_destroy_confirm:
-      one: "%{count}個のVertoを永遠に削除しますか？すべての回答とデータが消去されます。この操作は取り消せません。"
-      other: "%{count}個のVertosを永遠に削除しますか？すべての回答とデータが消去されます。この操作は取り消せません。"
+      one: "%{count}個のVertoを完全に削除しますか？すべての回答とデータが消去されます。この操作は取り消せません。"
+      other: "%{count}個のVertosを完全に削除しますか？すべての回答とデータが消去されます。この操作は取り消せません。"
   dashboard:
     welcome_back: おかえりなさい
     heading_html: あなたの<span style="color:#01EACB;">Vertos</span>
@@ -1030,3 +1030,147 @@ ja:
     signup_failed: "そのアカウントを作成できませんでした。すでにお持ちの場合は、サインインするかパスワードを再設定してください。"
     accept_terms_html: "%{terms}と%{privacy}に同意します。"
     welcome_confirm: "Playverto へようこそ！%{email} を確認してアドレスを認証してください。"
+  flash:
+    common_question_sets:
+      add_question_failed: "質問を追加できませんでした — %{reason}"
+      classification_failed: "その質問を分類できませんでした — 表現を変えてお試しください。"
+      created: "共通の質問セットを作成しました。下で最初の質問を追加してください。"
+      deleted: "「%{name}」を削除しました。既存の Verto にはアタッチ済みのスナップショットが残ります。"
+      draft_empty: "その内容からセットを下書きできませんでした — テーマまたは重要なインサイトをより明確にしてお試しください。"
+      draft_failed: "セットを下書きできませんでした — %{reason}"
+      drafted:
+        one: "%{count} 問の質問を下書きしました。このセットを Verto にアタッチする前に、下で編集してください。"
+        other: "%{count} 問の質問を下書きしました。このセットを Verto にアタッチする前に、下で編集してください。"
+      question_text_blank: "質問文は空にできません。"
+      question_text_missing: "先に質問を入力してください。"
+      theme_and_insight_required: "テーマと、集めたい重要なインサイトを教えてください — この2つは必須です。"
+      update_question_failed: "更新できませんでした — %{reason}"
+      updated: "更新しました。"
+    funder_invite_acceptances:
+      rate_limited: "しばらくしてからもう一度お試しください。"
+    funders:
+      not_enabled_for_organisation: "「資金提供者」はまだあなたの組織ではご利用いただけません。"
+    invites:
+      account_exists_password_required: "%{email} のアカウントはすでに存在します。%{org} に参加するには、そのパスワードを入力してください。"
+      already_member: "%{email} はすでにこの組織のメンバーです。"
+      already_partnership_member: "%{org} はすでに %{partnership} のメンバーです。"
+      already_used: "この招待リンクはすでに使用されています。"
+      cannot_join_own_partnership: "自分が作成したパートナーシップには参加できません。"
+      email_address_required: "メールアドレスは必須です。"
+      email_required: "メールは必須です。"
+      existing_password_required: "組織を連携するには、既存の Playverto パスワードを入力してください。"
+      expired: "この招待は期限切れです。管理者に再送を依頼してください。"
+      invite_no_longer_valid: "この招待は有効ではなくなりました。"
+      joined_partnership: "%{org} が %{partnership} に参加しました。"
+      name_required: "名前は必須です。"
+      not_found: "招待が見つかりません。"
+      not_redeemable_here: "この招待はここでは使用できません。"
+      password_mismatch: "パスワードは必須で、一致している必要があります。"
+      pick_org_required: "参加に使う組織を1つ選択してください。"
+      rate_limited: "しばらくしてからもう一度お試しください。"
+      sign_in_failed: "そのメールアドレスとパスワードのアカウントが見つかりませんでした。"
+      sign_in_required: "サインインするにはメールアドレスとパスワードを入力してください。"
+      welcome_to_organisation: "%{org} へようこそ！"
+      welcome_to_partnership: "%{partnership} へようこそ！"
+    memberships:
+      cannot_remove_self: "自分自身を削除することはできません。"
+      member_removed: "メンバーを削除しました。"
+    organisation_assets:
+      add_failed: "それらのアセットを追加できませんでした — もう一度お試しください。"
+      asset_limit_exceeded: "アセット数の上限 %{limit} 件を超えてしまいます — 先にいくつか削除してください。"
+      asset_missing: "そのアセットはもう存在しません。"
+      asset_removed: "ブランドライブラリからアセットを削除しました。"
+      assets_added:
+        one: "%{count} 件のアセットをブランドライブラリに追加しました。"
+        other: "%{count} 件のアセットをブランドライブラリに追加しました。"
+      invalid_asset_file: "「%{filename}」は %{size} MB 未満の PNG、JPEG、GIF、WebP または SVG である必要があります。"
+      no_files_chosen: "追加する画像を少なくとも1つ選択してください。"
+    organisation_scope:
+      no_organisation: "組織が見つかりません。"
+      not_authorised: "権限がありません。"
+    partnership_common_question_sets:
+      creator_only: "この操作はパートナーシップの作成者のみが行えます。"
+      partnership_not_found: "パートナーシップが見つかりません。"
+      removed: "%{partnership} から質問セットを削除しました。"
+      shared: "「%{name}」を %{partnership} と共有しました。"
+    partnership_memberships:
+      organisation_removed: "%{org} を %{partnership} から削除しました。"
+      partnership_not_found: "パートナーシップが見つかりません。"
+    partnership_vertos:
+      added: "「%{verto}」を %{partnership} に追加しました。"
+      creator_only: "この操作はパートナーシップの作成者のみが行えます。"
+      no_share_link: "この Verto の共有リンクはありません。"
+      partnership_not_found: "パートナーシップが見つかりません。"
+      removed: "%{partnership} から Verto を削除しました。"
+    partnerships:
+      created: "パートナーシップ「%{name}」を作成しました。"
+      creator_only: "この操作はパートナーシップの作成者のみが行えます。"
+      not_found: "パートナーシップが見つかりません。"
+      removed: "パートナーシップを削除しました。"
+    passwords:
+      confirmation_mismatch: "パスワードが一致しませんでした。"
+      rate_limited: "しばらくしてからもう一度お試しください。"
+      reset_complete: "パスワードをリセットしました。新しいパスワードでサインインしてください。"
+      reset_instructions_sent: "パスワードリセットの手順を送信しました（そのメールアドレスのユーザーが存在する場合）。"
+      reset_link_invalid: "パスワードリセットのリンクが無効か、期限切れです。"
+    portfolio_common_question_sets:
+      attached: "「%{name}」を %{portfolio} にアタッチしました。"
+      funder_not_found: "資金提供者が見つかりません。"
+      funder_only: "この操作は資金提供者のみが行えます。"
+      portfolio_not_found: "ポートフォリオが見つかりません。"
+      removed: "%{portfolio} から質問セットを削除しました。"
+    portfolio_memberships:
+      funder_not_found: "資金提供者が見つかりません。"
+      funder_only: "この操作は資金提供者のみが行えます。"
+      organisation_added: "%{org} を %{portfolio} に追加しました。"
+      organisation_removed: "%{portfolio} から削除しました。"
+      portfolio_not_found: "ポートフォリオが見つかりません。"
+    portfolios:
+      created: "ポートフォリオ「%{name}」を作成しました。"
+      funder_not_found: "資金提供者が見つかりません。"
+      funder_only: "この操作は資金提供者のみが行えます。"
+      not_found: "ポートフォリオが見つかりません。"
+      questions_resynced: "ポートフォリオの質問をすべてのメンバーへ再同期しました。"
+      removed: "ポートフォリオ「%{name}」を削除しました。"
+    registrations:
+      organisation_name_required: "組織名は必須です。"
+      password_mismatch: "パスワードが一致しません。"
+      rate_limited: "しばらくしてからもう一度お試しください。"
+    results_exports:
+      export_failed: "結果をエクスポートできませんでした — %{reason}"
+    sessions:
+      invalid_credentials: "別のメールアドレスまたはパスワードをお試しください。"
+      rate_limited: "しばらくしてからもう一度お試しください。"
+    surveys:
+      image_unverified: "その画像を確認できませんでした — もう一度お試しください。"
+      archived: "「%{name}」を削除しました。回答者のリンクは機能しなくなりました。結果はアーカイブ済みリストに残ります。"
+      brief_required: "Verto のテーマと誰が回答するかを教えてください — これらは必須です。"
+      bulk_archived:
+        one: "%{count} 個の Verto を削除しました。回答者のリンクは機能しなくなりました。結果はアーカイブ済みリストに残ります。"
+        other: "%{count} 個の Verto を削除しました。回答者のリンクは機能しなくなりました。結果はアーカイブ済みリストに残ります。"
+      bulk_destroyed_forever:
+        one: "%{count} 個の Verto を完全に削除しました。すべての回答とデータが消去されました。"
+        other: "%{count} 個の Verto を完全に削除しました。すべての回答とデータが消去されました。"
+      closed: "Verto を終了しました — /play から外れ、結果は保持されます。"
+      create_blank_failed: "Verto を作成できませんでした — %{reason}"
+      destroyed_forever: "「%{name}」を完全に削除しました。すべての回答とデータが消去されました。"
+      editing_locked: "編集はロックされています — この Verto は公開中か、すでに回答を集めています。"
+      generate_failed: "Verto を生成できませんでした — %{reason}"
+      google_form_import_failed: "その Googleフォームをインポートできませんでした — %{reason}"
+      google_form_url_required: "Googleフォームの編集リンクを貼り付けてください。例: https://docs.google.com/forms/d/…/edit"
+      google_not_configured: "このサーバーでは Google が設定されていません。"
+      import_finish_failed: "インポートを完了できませんでした — %{reason}"
+      import_session_expired: "そのインポートセッションは期限切れです — PDF をもう一度アップロードしてください。"
+      import_unavailable: "そのインポートはもう利用できません。"
+      learning_goal_required: "学びたいことを追加するか、共通の質問を選択してください — どちらか一方が必須です。"
+      manual_import_failed: "質問をインポートできませんでした — %{reason}"
+      manual_questions_required: "先に質問を入力するか貼り付けてください。"
+      manual_questions_too_long: "テキストが多すぎます — %{limit}k 文字未満に収めてください。"
+      not_live: "その Verto は公開中ではありません。"
+      pdf_import_failed: "PDF をインポートできませんでした — %{reason}"
+      pdf_required: "インポートする PDF ファイルを選択してください。"
+      pdf_too_large: "その PDF は大きすぎます — %{limit}MB 未満に収めてください。"
+      restored: "「%{name}」を復元しました。下書きに戻りました — 準備ができたら再度公開してください。"
+      settings_locked: "この Verto は公開中か、すでに回答があります — 同意とスコアリングの設定は変更できません。"
+      shuffle_failed: "アセットをシャッフルできませんでした — もう一度お試しください。"
+      unpublished: "Verto の公開を取り消しました — 編集できる下書きに戻りました。"
