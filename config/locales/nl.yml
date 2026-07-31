@@ -284,6 +284,7 @@ nl:
       scenario:
         page_of: "Pagina %{n} van %{total}"
         page_placeholder: "Schrijf deze pagina…"
+        page_limit: "Dat is het maximum van %{max} pagina's."
         end_of_card: "Einde van de kaart"
         edit_options: "Antwoordopties bewerken ›"
         next_page_btn: "Volgende pagina ›"

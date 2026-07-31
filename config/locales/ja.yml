@@ -284,6 +284,7 @@ ja:
       scenario:
         page_of: "%{total}ページ中%{n}ページ目"
         page_placeholder: "このページを書く…"
+        page_limit: "ページは最大 %{max} 枚までです。"
         end_of_card: "カードの終わり"
         edit_options: "回答の選択肢を編集 ›"
         next_page_btn: "次のページ ›"

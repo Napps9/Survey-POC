@@ -284,6 +284,7 @@ id:
       scenario:
         page_of: "Halaman %{n} dari %{total}"
         page_placeholder: "Tulis halaman ini…"
+        page_limit: "Itu batas maksimum %{max} halaman."
         end_of_card: "Akhir kartu"
         edit_options: "Edit opsi jawaban ›"
         next_page_btn: "Halaman berikutnya ›"

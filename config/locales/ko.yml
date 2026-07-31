@@ -284,6 +284,7 @@ ko:
       scenario:
         page_of: "%{total}페이지 중 %{n}페이지"
         page_placeholder: "이 페이지를 작성하세요…"
+        page_limit: "페이지는 최대 %{max}개까지입니다."
         end_of_card: "카드 끝"
         edit_options: "답변 옵션 편집 ›"
         next_page_btn: "다음 페이지 ›"

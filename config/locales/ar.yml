@@ -284,6 +284,7 @@ ar:
       scenario:
         page_of: "الصفحة %{n} من %{total}"
         page_placeholder: "اكتب هذه الصفحة…"
+        page_limit: "هذا هو الحد الأقصى: %{max} صفحات."
         end_of_card: "نهاية البطاقة"
         edit_options: "تعديل خيارات الإجابة ›"
         next_page_btn: "الصفحة التالية ›"

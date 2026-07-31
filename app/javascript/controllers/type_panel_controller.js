@@ -1265,18 +1265,49 @@ export default class extends Controller {
     if (wrap) wrap.remove() // lottie-player controller's disconnect() destroys the lottie instance
   }
 
+  // What the rebuilt card should be given as its options.
+  //
+  // What is ON SCREEN wins. data-card-options is written once, by the server,
+  // at page render, and nothing updates it — so preferring it meant re-applying
+  // a type rebuilt the card from labels the creator had already replaced, and
+  // the autosave that followed persisted the revert. Only when the card has no
+  // options on screen (it is currently a type that has none) does the snapshot
+  // matter: that is the switch-away-and-back memory it exists for.
   _optionsFor(card, type) {
+    if (type === "yes_no") return [ "Yes", "No" ]
+
+    const live = this._liveOptions(card)
+    if (live.length) return live
+
     let original = []
     try { original = JSON.parse(card.dataset.cardOptions || "[]") } catch (_) {}
-    if (type === "yes_no") return ["Yes", "No"]
     if (original.length) return original
     return DEFAULT_OPTIONS[type] || []
+  }
+
+  // The same nodes serialize() reads, so the panel and the save agree about
+  // what the card currently says.
+  _liveOptions(card) {
+    const editor = this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")
+    if (!editor?._optionEls) return []
+    return editor._optionEls(card).map(el => el.textContent.trim()).filter(Boolean)
   }
 
   // Existing pages if this card already had some (switching away from
   // Scenario and back preserves what was written), else a fresh blank page.
   _pagesFor(card, type) {
     if (!isPaged(type)) return []
+
+    // Same rule as _optionsFor: live pages beat the render-time snapshot.
+    const editor = this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")
+    const live = editor?._pageEls
+      ? editor._pageEls(card).map(el => ({
+          id: el.closest(".book-page")?.dataset.pageId || "",
+          text: el.textContent.trim()
+        })).filter(p => p.text)
+      : []
+    if (live.length) return live
+
     let original = []
     try { original = JSON.parse(card.dataset.cardPages || "[]") } catch (_) {}
     if (Array.isArray(original) && original.length) return original

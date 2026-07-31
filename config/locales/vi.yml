@@ -284,6 +284,7 @@ vi:
       scenario:
         page_of: "Trang %{n} / %{total}"
         page_placeholder: "Viết trang này…"
+        page_limit: "Đó là tối đa %{max} trang."
         end_of_card: "Kết thúc thẻ"
         edit_options: "Chỉnh sửa lựa chọn trả lời ›"
         next_page_btn: "Trang tiếp theo ›"

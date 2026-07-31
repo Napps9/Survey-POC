@@ -43,6 +43,36 @@ class JsConstantParityTest < ActiveSupport::TestCase
                  "the reverse offers routing the compiler will discard."
   end
 
+  # Bounds, not lists — same mirroring problem, and these had no JS side at all,
+  # so the editor let a creator write a seventh page and the sanitiser dropped
+  # it on the next save without a word.
+  def js_number(path, name)
+    source = js(path)
+    match  = source[/export const #{Regexp.escape(name)}\s*=\s*(\d+)/, 1]
+    assert match, "#{path} no longer exports a numeric `#{name}`"
+    match.to_i
+  end
+
+  test "lib/page_limits.js matches the Survey page bounds" do
+    assert_equal Survey::MAX_SCENARIO_PAGES, js_number("lib/page_limits.js", "MAX_PAGES"),
+                 "the editor refuses to add a page past this; if it is higher than the " \
+                 "server's cap the extra pages are silently discarded on save."
+    assert_equal Survey::MAX_SCENARIO_PAGE_LENGTH, js_number("lib/page_limits.js", "MAX_PAGE_LENGTH")
+  end
+
+  # The advisory scoring thresholds must stay STRICTER than the hard caps, so a
+  # creator is nudged well before anything is actually thrown away.
+  test "the Rules of the Game warn before the hard limits bite" do
+    rules = js("lib/verto_rules.js")
+    max_pages  = rules[/PAGE_RULES\s*=\s*\{[^}]*max:\s*(\d+)/, 1].to_i
+    max_length = rules[/PAGE_LENGTH_LIMIT\s*=\s*(\d+)/, 1].to_i
+
+    assert_operator max_pages, :>, 0, "expected to find PAGE_RULES.max in verto_rules.js"
+    assert_operator max_pages, :<=, Survey::MAX_SCENARIO_PAGES
+    assert_operator max_length, :>, 0, "expected to find PAGE_LENGTH_LIMIT in verto_rules.js"
+    assert_operator max_length, :<=, Survey::MAX_SCENARIO_PAGE_LENGTH
+  end
+
   # The list is only worth asserting against if it is non-trivial — an empty or
   # unparsed array would make both tests above pass by comparing nothing.
   test "the parsed JS constants are non-empty" do

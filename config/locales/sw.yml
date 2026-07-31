@@ -284,6 +284,7 @@ sw:
       scenario:
         page_of: "Ukurasa %{n} kati ya %{total}"
         page_placeholder: "Andika ukurasa huu…"
+        page_limit: "Hicho ndicho kikomo cha kurasa %{max}."
         end_of_card: "Mwisho wa kadi"
         edit_options: "Hariri chaguo za jibu ›"
         next_page_btn: "Ukurasa unaofuata ›"

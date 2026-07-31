@@ -284,6 +284,7 @@ hi:
       scenario:
         page_of: "पेज %{n} / %{total}"
         page_placeholder: "यह पेज लिखें…"
+        page_limit: "यही अधिकतम है — %{max} पेज।"
         end_of_card: "कार्ड का अंत"
         edit_options: "उत्तर विकल्प संपादित करें ›"
         next_page_btn: "अगला पेज ›"

@@ -1019,6 +1019,15 @@ export default class extends Controller {
         : []
       if (primPages.length) out.pages = primPages
 
+      // Refresh the type panel's switch-away-and-back memory. data-card-options
+      // and data-card-pages were written once by the server at page render and
+      // never again, so after any edit they described a card that no longer
+      // existed — and re-applying a type rebuilt from them. Writing them here
+      // makes the snapshot mean "the last state that was saved", which is what
+      // the panel needs it to mean.
+      if (primOpts.length) card.dataset.cardOptions = JSON.stringify(primOpts)
+      if (primPages.length) card.dataset.cardPages = JSON.stringify(primPages)
+
       // tap_card statement backgrounds (populated by AssetPopulator, or
       // generated/picked in the editor). Carried through autosave regardless
       // of the card's CURRENT type — not just while it's tap_card — so

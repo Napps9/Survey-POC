@@ -284,6 +284,7 @@ uk:
       scenario:
         page_of: "Сторінка %{n} з %{total}"
         page_placeholder: "Напишіть цю сторінку…"
+        page_limit: "Це максимум — %{max} сторінок."
         end_of_card: "Кінець картки"
         edit_options: "Редагувати варіанти відповіді ›"
         next_page_btn: "Наступна сторінка ›"

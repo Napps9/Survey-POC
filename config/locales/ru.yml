@@ -284,6 +284,7 @@ ru:
       scenario:
         page_of: "Страница %{n} из %{total}"
         page_placeholder: "Напишите эту страницу…"
+        page_limit: "Это максимум — %{max} страниц."
         end_of_card: "Конец карточки"
         edit_options: "Изменить варианты ответа ›"
         next_page_btn: "Следующая страница ›"

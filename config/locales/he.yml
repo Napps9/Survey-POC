@@ -284,6 +284,7 @@ he:
       scenario:
         page_of: "עמוד %{n} מתוך %{total}"
         page_placeholder: "כתוב את העמוד הזה…"
+        page_limit: "זה המקסימום — %{max} עמודים."
         end_of_card: "סוף הכרטיס"
         edit_options: "ערוך אפשרויות תשובה ›"
         next_page_btn: "עמוד הבא ›"

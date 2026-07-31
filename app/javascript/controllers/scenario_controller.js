@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
+import { MAX_PAGES } from "lib/page_limits"
 
 // Book-style page-turn widget for the "scenario" question type — narrative
 // pages the respondent (or, in the editor, the creator) turns through one at
@@ -65,6 +66,15 @@ export default class extends Controller {
     if (event) event.preventDefault()
     if (!this.hasStackTarget) return
     const pages = this.pageTargets
+    // Refuse rather than let the server drop it. The sanitiser keeps only the
+    // first MAX_PAGES, so before this a creator could write a seventh page,
+    // watch it save, and find it gone on reload with nothing having said so.
+    // pages includes the answer page, which is not a narrative page.
+    if ((pages.length - 1) >= MAX_PAGES) {
+      if (this.hasLiveTarget) this.liveTarget.textContent = t("editor.scenario.page_limit", { max: MAX_PAGES })
+      if (this.hasAddPageBtnTarget) this.addPageBtnTarget.disabled = true
+      return
+    }
     const anchor = pages[Math.min(this.current, pages.length - 2)]
     const el = this._buildPage("")
     if (anchor) anchor.after(el)
@@ -174,6 +184,9 @@ export default class extends Controller {
     }
     if (this.hasEditToolsTarget) this.editToolsTarget.style.visibility = atAnswer ? "hidden" : "visible"
     if (this.hasDelPageBtnTarget) this.delPageBtnTarget.disabled = (pages.length - 1) <= 1
+    // Grey the add button at the cap, so the limit is visible before it is hit
+    // rather than only announced when it is.
+    if (this.hasAddPageBtnTarget) this.addPageBtnTarget.disabled = (pages.length - 1) >= MAX_PAGES
 
     if (this.hasLiveTarget) {
       this.liveTarget.textContent = atAnswer

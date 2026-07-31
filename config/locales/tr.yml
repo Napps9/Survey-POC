@@ -284,6 +284,7 @@ tr:
       scenario:
         page_of: "Sayfa %{n} / %{total}"
         page_placeholder: "Bu sayfayı yaz…"
+        page_limit: "En fazla %{max} sayfa olabilir."
         end_of_card: "Kartın sonu"
         edit_options: "Cevap seçeneklerini düzenle ›"
         next_page_btn: "Sonraki sayfa ›"

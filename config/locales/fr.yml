@@ -284,6 +284,7 @@ fr:
       scenario:
         page_of: "Page %{n} sur %{total}"
         page_placeholder: "Rédigez cette page…"
+        page_limit: "C'est le maximum de %{max} pages."
         end_of_card: "Fin de la carte"
         edit_options: "Modifier les options de réponse ›"
         next_page_btn: "Page suivante ›"

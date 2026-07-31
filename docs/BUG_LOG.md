@@ -8,6 +8,55 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-021, 022, 023 — Three ways the editor discarded work you could see on screen
+
+All three share the shape this log keeps returning to: the DOM is the editor's
+source of truth, and each of these trusted something else instead.
+
+**BUG-021 — re-applying a type reverted every option edit of the session.**
+`_optionsFor` / `_pagesFor` rebuilt a card from `data-card-options` and
+`data-card-pages`. The server writes those once, at page render, and nothing
+ever updated them — so re-applying a type restored the labels the card had when
+the page loaded, and the autosave a type change triggers then persisted the
+revert. Both now prefer what is on screen (the same nodes `serialize()` reads),
+falling back to the snapshot only when the card currently has no options at all
+— which is the switch-away-and-back case the snapshot exists for. `serialize()`
+also refreshes the snapshot now, so that memory means "last saved" instead of
+"as first rendered".
+
+**BUG-022 — the editor let you write a page the server would throw away.**
+`Survey::MAX_SCENARIO_PAGES` (6) had no JS counterpart, so `＋ Add page` kept
+going. The sanitiser keeps `.first(6)`, so a seventh page was written, saved,
+reported as saved, and gone on reload. `lib/page_limits.js` mirrors both bounds
+now; the button greys out at the cap and refuses past it. The parity test also
+asserts the Rules-of-the-Game thresholds stay *stricter* than the hard caps (5
+pages / 400 chars against 6 / 600), so a creator is nudged well before anything
+is discarded.
+
+**BUG-023 — deleting a narrative page never saved.** `addPage`/`deletePage`
+dispatch `scenario:changed`; the editor root listened for `type-panel:changed`
+and `card-editor:changed` and not that one. Adding usually survived by accident
+— typing into the new page fires `input`, which the root does listen to. Deleting
+had no such accident: the page vanished, nothing marked the editor dirty, and it
+came back on reload. One missing action in the root's `data-action`.
+
+**Guards:** `test/system/type_reapply_test.rb` and
+`test/system/scenario_pages_test.rb`. Six of their seven tests fail against the
+unfixed build. Two test-authoring notes worth keeping:
+
+* the re-apply tests originally called `_applyToCard` directly, which skips the
+  `markDirty` the real gesture causes — so the "and the revert is not then
+  autosaved" test passed whether or not the bug existed. They now go through
+  `applyType`, the public entry point.
+* the add-page test first asserted on the last page in the DOM. `addPage`
+  inserts after the page currently open, not at the end, so it was editing an
+  existing page and measuring nothing.
+
+`CACHE_VERSION` bumped to v22 — `scenario_controller.js` drives the player's
+page turns, not just the editor's.
+
+---
+
 ## BUG-020 — A closed Verto told respondents their answers were saved
 
 **Severity:** silent, permanent loss of a respondent's completed response —
