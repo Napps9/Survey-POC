@@ -199,6 +199,10 @@ de:
       tokens_earned_none: 'Dafür keine Punkte'
     editor:
       delete_card_confirm: Diese Karte löschen?
+      save_to_library: "Auch in meiner Markenbibliothek speichern"
+      add_to_library: "Zur Bibliothek hinzufügen"
+      library_saving: "Wird gespeichert…"
+      library_save_failed: "Speichern in der Bibliothek fehlgeschlagen"
       confirm_delete: "Wirklich löschen?"
       unsaved: Ungespeicherte Änderungen
       undo_restored: 'Karte wiederhergestellt'

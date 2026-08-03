@@ -199,6 +199,10 @@ vi:
       tokens_earned_none: 'Câu này không có điểm'
     editor:
       delete_card_confirm: Xóa thẻ này?
+      save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"
+      add_to_library: "Thêm vào thư viện"
+      library_saving: "Đang lưu…"
+      library_save_failed: "Không thể lưu vào thư viện"
       confirm_delete: "Xóa thật chứ?"
       unsaved: Thay đổi chưa lưu
       undo_restored: 'Đã khôi phục thẻ'

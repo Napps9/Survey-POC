@@ -199,6 +199,10 @@ ar:
       tokens_earned_none: 'لا نقاط على هذه'
     editor:
       delete_card_confirm: حذف هذه البطاقة؟
+      save_to_library: "حفظ أيضًا في مكتبة العلامة التجارية"
+      add_to_library: "إضافة إلى المكتبة"
+      library_saving: "جارٍ الحفظ…"
+      library_save_failed: "تعذّر الحفظ في المكتبة"
       confirm_delete: "حذف فعلاً؟"
       unsaved: تغييرات غير محفوظة
       undo_restored: 'تمت استعادة البطاقة'

@@ -199,6 +199,10 @@ ru:
       tokens_earned_none: 'За этот ответ баллов нет'
     editor:
       delete_card_confirm: Удалить эту карточку?
+      save_to_library: "Также сохранить в библиотеку бренда"
+      add_to_library: "Добавить в библиотеку"
+      library_saving: "Сохранение…"
+      library_save_failed: "Не удалось сохранить в библиотеку"
       confirm_delete: "Точно удалить?"
       unsaved: Несохранённые изменения
       undo_restored: 'Карточка восстановлена'

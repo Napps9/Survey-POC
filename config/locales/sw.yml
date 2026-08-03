@@ -199,6 +199,10 @@ sw:
       tokens_earned_none: 'Hakuna pointi kwa hili'
     editor:
       delete_card_confirm: Futa kadi hii?
+      save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"
+      add_to_library: "Ongeza kwenye maktaba"
+      library_saving: "Inahifadhi…"
+      library_save_failed: "Imeshindwa kuhifadhi kwenye maktaba"
       confirm_delete: "Ufute kweli?"
       unsaved: Mabadiliko hayajahifadhiwa
       undo_restored: 'Kadi imerejeshwa'

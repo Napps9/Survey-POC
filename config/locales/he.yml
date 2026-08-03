@@ -199,6 +199,10 @@ he:
       tokens_earned_none: 'אין נקודות על זו'
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
+      save_to_library: "שמור גם בספריית המותג שלי"
+      add_to_library: "הוסף לספרייה"
+      library_saving: "שומר…"
+      library_save_failed: "השמירה בספרייה נכשלה"
       confirm_delete: "באמת למחוק?"
       unsaved: שינויים שלא נשמרו
       undo_restored: 'הכרטיס שוחזר'

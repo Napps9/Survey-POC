@@ -199,6 +199,10 @@ tr:
       tokens_earned_none: 'Bunda puan yok'
     editor:
       delete_card_confirm: Bu kart silinsin mi?
+      save_to_library: "Marka kitaplığıma da kaydet"
+      add_to_library: "Kitaplığa ekle"
+      library_saving: "Kaydediliyor…"
+      library_save_failed: "Kitaplığa kaydedilemedi"
       confirm_delete: "Gerçekten silinsin mi?"
       unsaved: Kaydedilmemiş değişiklikler
       undo_restored: 'Kart geri alındı'

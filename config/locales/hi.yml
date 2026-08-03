@@ -199,6 +199,10 @@ hi:
       tokens_earned_none: 'इसके लिए कोई अंक नहीं'
     editor:
       delete_card_confirm: इस कार्ड को हटाएं?
+      save_to_library: "मेरी ब्रांड लाइब्रेरी में भी सहेजें"
+      add_to_library: "लाइब्रेरी में जोड़ें"
+      library_saving: "सहेजा जा रहा है…"
+      library_save_failed: "लाइब्रेरी में सहेजा नहीं जा सका"
       confirm_delete: "वाकई हटाएं?"
       unsaved: असहेजे परिवर्तन
       undo_restored: 'कार्ड बहाल किया गया'

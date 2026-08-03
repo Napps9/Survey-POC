@@ -199,6 +199,10 @@ ko:
       tokens_earned_none: '이 문항은 점수 없음'
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
+      save_to_library: "브랜드 라이브러리에도 저장"
+      add_to_library: "라이브러리에 추가"
+      library_saving: "저장 중…"
+      library_save_failed: "라이브러리에 저장하지 못했습니다"
       confirm_delete: "정말 삭제할까요?"
       unsaved: 저장되지 않은 변경사항
       undo_restored: '카드를 복원했습니다'

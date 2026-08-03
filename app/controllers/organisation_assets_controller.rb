@@ -7,7 +7,12 @@ class OrganisationAssetsController < ApplicationController
   before_action :require_admin!
 
   # POST /organisations/:organisation_id/assets
+  # Two shapes: the branding page posts multipart files; the editor's media
+  # picker posts JSON with a base64 data URL (`image`), the same payload shape
+  # as surveys#card_image, so an upload can also land in the brand library.
   def create
+    return create_from_data_url if params[:image].present?
+
     org   = current_organisation
     files = Array(params[:assets]).reject(&:blank?)
 
@@ -59,6 +64,66 @@ class OrganisationAssetsController < ApplicationController
   end
 
   private
+
+  DATA_URL   = %r{\Adata:(image/[a-zA-Z0-9.+-]+);base64,(.+)\z}m
+  EXTENSIONS = {
+    "image/png" => "png", "image/jpeg" => "jpg", "image/gif" => "gif",
+    "image/webp" => "webp", "image/svg+xml" => "svg"
+  }.freeze
+
+  def create_from_data_url
+    org = current_organisation
+    if org.assets.attachments.size >= Organisation::MAX_ASSETS
+      return render json: { ok: false,
+                            error: t("flash.organisation_assets.asset_limit_exceeded", limit: Organisation::MAX_ASSETS) },
+                    status: :unprocessable_entity
+    end
+
+    decoded = decode_asset_data_url(params[:image].to_s)
+    unless decoded
+      return render json: { ok: false, error: t("flash.organisation_assets.add_failed") },
+                    status: :unprocessable_entity
+    end
+
+    bytes, content_type = decoded
+    blob = ActiveStorage::Blob.create_and_upload!(
+      io:           StringIO.new(bytes),
+      filename:     "brand-#{SecureRandom.hex(8)}.#{EXTENSIONS.fetch(content_type)}",
+      content_type: content_type
+    )
+    org.assets.attach(blob)
+    attachment = org.assets.attachments.order(:id).last
+    render json: { ok: true, id: attachment.id,
+                   url:   rails_blob_path(blob, only_path: true),
+                   thumb: helpers.as_thumb_path(attachment) }
+  rescue => e
+    ErrorReporting.report("OrganisationAssetsController#create_from_data_url", e)
+    render json: { ok: false, error: t("flash.organisation_assets.add_failed") }, status: :unprocessable_entity
+  end
+
+  # [bytes, content_type] for a valid, in-budget brand-asset data URL; nil
+  # otherwise. SVG passes through the same sanitiser gate as every other SVG
+  # ingress (it is served inline — see config/initializers/active_storage.rb).
+  def decode_asset_data_url(value)
+    match = DATA_URL.match(value.strip)
+    return nil unless match
+
+    content_type = match[1].downcase
+    return nil unless Organisation::ASSET_CONTENT_TYPES.include?(content_type)
+
+    bytes = begin
+      Base64.strict_decode64(match[2].gsub(/\s+/, ""))
+    rescue ArgumentError
+      return nil
+    end
+    return nil if bytes.empty? || bytes.bytesize > Organisation::ASSET_MAX_BYTES
+
+    if content_type == "image/svg+xml"
+      bytes = SvgSanitizer.clean_document(bytes)
+      return nil unless bytes
+    end
+    [ bytes, content_type ]
+  end
 
   def valid_asset?(file)
     file.respond_to?(:content_type) &&

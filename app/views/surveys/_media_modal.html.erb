@@ -48,6 +48,17 @@
              data-media-picker-target="uploadError"
              style="margin-top:10px;color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size:13px;line-height:1.4;"
              hidden></div>
+        <%# Admin opt-in: also file this upload in the org's brand library so
+            it becomes pickable in every Verto. Off by default — the library
+            caps at Organisation::MAX_ASSETS and one-off card art shouldn't
+            silt it up. %>
+        <% if current_membership&.admin? %>
+          <label style="display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer;font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.75);">
+            <input type="checkbox" data-media-picker-target="saveToLibrary"
+                   style="width:15px;height:15px;accent-color:#01EACB;" />
+            <%= t("js.editor.save_to_library") %>
+          </label>
+        <% end %>
       </div>
 
       <%# Library pane %>
@@ -84,16 +95,29 @@
 
         <% groups = verto_library_images %>
         <% brand_assets = current_organisation&.ordered_assets.to_a %>
-        <% if groups.any? || brand_assets.any? %>
+        <% library_admin = current_membership&.admin? %>
+        <% if groups.any? || brand_assets.any? || library_admin %>
           <div class="media-library-sections">
             <%# The account's OWN uploaded brand assets (Organisation#assets),
                 shown first so a creator reaches for their brand before the
                 recommendations or the shared library. Same tile shape →
-                pickLibraryItem handles selection unchanged. %>
-            <% if brand_assets.any? %>
+                pickLibraryItem handles selection unchanged. Admins also get
+                an add-to-library tile (upload straight into the library). %>
+            <% if brand_assets.any? || library_admin %>
               <section class="media-library-section">
                 <h4 class="media-library-section-label"><%= t("editor.brand_library", default: "Your brand library") %></h4>
-                <div class="media-library-grid">
+                <div class="media-library-status" data-media-picker-target="brandStatus"></div>
+                <div class="media-library-grid" data-media-picker-target="brandGrid">
+                  <% if library_admin %>
+                    <button type="button"
+                            class="media-library-item media-library-add"
+                            title="<%= t("js.editor.add_to_library") %>"
+                            data-action="click->media-picker#chooseLibraryFile"
+                            aria-label="<%= t("js.editor.add_to_library") %>">＋</button>
+                    <input type="file" hidden accept="image/*"
+                           data-media-picker-target="libraryFileInput"
+                           data-action="change->media-picker#libraryFileChosen" />
+                  <% end %>
                   <% brand_assets.each do |att| %>
                     <%# Tile shows a small variant; the FULL-size original is
                         what data-url applies to the card when picked. %>

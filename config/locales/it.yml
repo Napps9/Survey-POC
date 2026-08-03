@@ -199,6 +199,10 @@ it:
       tokens_earned_none: 'Nessun punto per questa'
     editor:
       delete_card_confirm: Eliminare questa carta?
+      save_to_library: "Salva anche nella mia libreria del brand"
+      add_to_library: "Aggiungi alla libreria"
+      library_saving: "Salvataggio…"
+      library_save_failed: "Impossibile salvare nella libreria"
       confirm_delete: "Eliminare davvero?"
       unsaved: Modifiche non salvate
       undo_restored: 'Scheda ripristinata'

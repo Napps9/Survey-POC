@@ -207,6 +207,10 @@ en:
       tokens_earned_none: 'No points for that one'
     editor:
       delete_card_confirm: "Delete this card?"
+      save_to_library: "Also save to my brand library"
+      add_to_library: "Add to library"
+      library_saving: "Saving…"
+      library_save_failed: "Couldn't save to the library"
       confirm_delete: "Really delete?"
       unsaved: "Unsaved changes"
       undo_restored: 'Card restored'

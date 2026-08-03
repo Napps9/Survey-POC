@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { t } from "lib/i18n"
 
 // Modal that lets editors attach an image to a card's left panel.
 // Two sources: file upload (stored as a data URL on the card JSON) and the
@@ -11,9 +12,10 @@ export default class extends Controller {
     "bgThumb", "bgRemoveBtn",
     "recommendedSection", "recommendedLabel", "recommendedGrid",
     "searchInput", "searchSection", "searchStatus", "searchGrid",
-    "mediaToggle", "mediaTab"
+    "mediaToggle", "mediaTab",
+    "saveToLibrary", "brandGrid", "libraryFileInput", "brandStatus"
   ]
-  static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, theme: String, backgroundRecommended: Array }
+  static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array }
 
   // Uploaded images are normalised before they're stored: capped in source
   // size, downscaled to a max edge, and re-encoded to a compact format. Raw
@@ -243,7 +245,10 @@ export default class extends Controller {
 
   // Draw the upload onto a canvas resized to MAX_EDGE and re-encode it to WebP
   // (JPEG fallback) so every stored image is small and a consistent format.
-  _downscale(file) {
+  // Both encoders complete through `done`, defaulting to the card-apply flow
+  // (stash as the pending pick). The add-to-library tile passes its own
+  // completion instead.
+  _downscale(file, done = this._stashPending.bind(this)) {
     const url = URL.createObjectURL(file)
     const img = new Image()
     img.onload = () => {
@@ -267,25 +272,26 @@ export default class extends Controller {
       } catch (_e) {
         out = canvas.toDataURL("image/jpeg", q)
       }
-      this._pendingUrl = out
-      this._setApplyEnabled(true)
+      done(out)
     }
     img.onerror = () => {
       URL.revokeObjectURL(url)
       // Couldn't decode (exotic format) — fall back to the raw file so the user
       // isn't blocked; the server-side size cap is the backstop.
-      this._readAsDataUrl(file)
+      this._readAsDataUrl(file, done)
     }
     img.src = url
   }
 
-  _readAsDataUrl(file) {
+  _readAsDataUrl(file, done = this._stashPending.bind(this)) {
     const reader = new FileReader()
-    reader.onload = () => {
-      this._pendingUrl = reader.result
-      this._setApplyEnabled(true)
-    }
+    reader.onload = () => done(reader.result)
     reader.readAsDataURL(file)
+  }
+
+  _stashPending(dataUrl) {
+    this._pendingUrl = dataUrl
+    this._setApplyEnabled(true)
   }
 
   _showUploadError(msg) {
@@ -457,6 +463,12 @@ export default class extends Controller {
       const ok = await this._moderateUpload(this._pendingUrl)
       if (!ok) return // reason already shown on the upload pane
 
+      // Admin opt-in: also file this (already-moderated) upload in the org's
+      // brand library. Best-effort — a library failure never blocks the apply.
+      if (this.hasSaveToLibraryTarget && this.saveToLibraryTarget.checked) {
+        this._saveToLibrary(this._pendingUrl)
+      }
+
       // Store the bytes once and carry a short path on the card instead of the
       // base64. Inline data-URLs were the memory driver behind the 502s.
       this._pendingUrl = await this._persistUpload(this._pendingUrl)
@@ -549,6 +561,102 @@ export default class extends Controller {
     } finally {
       this._setApplyEnabled(true)
     }
+  }
+
+  // ── Brand library ──────────────────────────────────────
+  chooseLibraryFile(event) {
+    event.preventDefault()
+    if (this.hasLibraryFileInputTarget) this.libraryFileInputTarget.click()
+  }
+
+  // Upload straight into the org's brand library from the picker (admin
+  // only — the tile and input only render for admins). Same downscale +
+  // moderation pipeline as a card upload; nothing is applied to the card.
+  libraryFileChosen(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ""
+    if (!file) return
+    if (file.size > this.constructor.SOURCE_BYTE_CAP) {
+      this._brandStatus(t("js.editor.library_save_failed"))
+      return
+    }
+    const done = async (dataUrl) => {
+      this._brandStatus(t("js.editor.library_saving"))
+      const ok = await this._moderateLibraryUpload(dataUrl)
+      if (!ok) return
+      await this._saveToLibrary(dataUrl)
+    }
+    if (file.type === "image/svg+xml") this._readAsDataUrl(file, done)
+    else this._downscale(file, done)
+  }
+
+  // Moderation twin of _moderateUpload with feedback on the library section
+  // (the upload pane's error area lives on the other tab).
+  async _moderateLibraryUpload(dataUrl) {
+    if (!this.hasModerateUrlValue) return true
+    try {
+      const res = await fetch(this.moderateUrlValue, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+        },
+        body: JSON.stringify({ image: dataUrl })
+      })
+      const data = await res.json().catch(() => ({}))
+      if (data.ok) return true
+      this._brandStatus(data.reason || t("js.editor.library_save_failed"))
+      return false
+    } catch (_) {
+      this._brandStatus(t("js.editor.library_save_failed"))
+      return false
+    }
+  }
+
+  // POST an (already-moderated) data URL to the org brand library and surface
+  // the new tile immediately. Best-effort by design: callers never block a
+  // card apply on this.
+  async _saveToLibrary(dataUrl) {
+    if (!this.hasLibraryUrlValue || !this.libraryUrlValue) return
+    try {
+      const res = await fetch(this.libraryUrlValue, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+        },
+        body: JSON.stringify({ image: dataUrl })
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!data.ok) {
+        this._brandStatus(data.error || t("js.editor.library_save_failed"))
+        return
+      }
+      this._brandStatus("")
+      this._prependBrandTile(data)
+    } catch (_) {
+      this._brandStatus(t("js.editor.library_save_failed"))
+    }
+  }
+
+  _prependBrandTile({ url, thumb }) {
+    if (!this.hasBrandGridTarget || !url) return
+    const btn = document.createElement("button")
+    btn.type = "button"
+    btn.className = "media-library-item"
+    btn.style.backgroundImage = `url('${thumb || url}')`
+    btn.dataset.url = url
+    btn.dataset.mediaPickerTarget = "libraryItem"
+    btn.dataset.action = "click->media-picker#pickLibraryItem"
+    btn.setAttribute("aria-selected", "false")
+    const addTile = this.brandGridTarget.querySelector(".media-library-add")
+    addTile ? addTile.after(btn) : this.brandGridTarget.prepend(btn)
+  }
+
+  _brandStatus(message) {
+    if (this.hasBrandStatusTarget) this.brandStatusTarget.textContent = message
   }
 
   clearImage() {

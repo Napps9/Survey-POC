@@ -199,6 +199,10 @@ uk:
       tokens_earned_none: 'За цю відповідь балів немає'
     editor:
       delete_card_confirm: Видалити цю картку?
+      save_to_library: "Також зберегти в бібліотеку бренду"
+      add_to_library: "Додати до бібліотеки"
+      library_saving: "Збереження…"
+      library_save_failed: "Не вдалося зберегти в бібліотеку"
       confirm_delete: "Точно видалити?"
       unsaved: Незбережені зміни
       undo_restored: 'Картку відновлено'

@@ -199,6 +199,10 @@ fr:
       tokens_earned_none: 'Aucun point pour celle-ci'
     editor:
       delete_card_confirm: Supprimer cette carte ?
+      save_to_library: "Enregistrer aussi dans ma bibliothèque de marque"
+      add_to_library: "Ajouter à la bibliothèque"
+      library_saving: "Enregistrement…"
+      library_save_failed: "Échec de l'enregistrement dans la bibliothèque"
       confirm_delete: "Vraiment supprimer ?"
       unsaved: Modifications non enregistrées
       undo_restored: 'Carte restaurée'

@@ -199,6 +199,10 @@ nl:
       tokens_earned_none: 'Hiervoor geen punten'
     editor:
       delete_card_confirm: Deze kaart verwijderen?
+      save_to_library: "Ook opslaan in mijn merkbibliotheek"
+      add_to_library: "Toevoegen aan bibliotheek"
+      library_saving: "Opslaan…"
+      library_save_failed: "Opslaan in de bibliotheek mislukt"
       confirm_delete: "Echt verwijderen?"
       unsaved: Niet-opgeslagen wijzigingen
       undo_restored: 'Kaart hersteld'

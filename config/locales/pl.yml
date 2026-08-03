@@ -199,6 +199,10 @@ pl:
       tokens_earned_none: 'Bez punktów za to'
     editor:
       delete_card_confirm: Usunąć tę kartę?
+      save_to_library: "Zapisz też w mojej bibliotece marki"
+      add_to_library: "Dodaj do biblioteki"
+      library_saving: "Zapisywanie…"
+      library_save_failed: "Nie udało się zapisać w bibliotece"
       confirm_delete: "Na pewno usunąć?"
       unsaved: Niezapisane zmiany
       undo_restored: 'Przywrócono kartę'

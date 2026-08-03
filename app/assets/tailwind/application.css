@@ -654,6 +654,17 @@
 }
 .media-library-item:hover { border-color: rgba(1,234,203,0.5); transform: translateY(-2px); }
 .media-library-item[aria-selected="true"] { border-color: #01EACB; }
+/* The admin "add to library" tile — same footprint as an asset tile, drawn
+   as an affordance rather than an image. */
+.media-library-add {
+  display: flex; align-items: center; justify-content: center;
+  border-style: dashed;
+  border-color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.6);
+  font-size: 26px;
+  background: rgba(255,255,255,0.04);
+}
+.media-library-add:hover { color: #01EACB; }
 .media-library-empty {
   text-align: center;
   padding: 40px 16px;

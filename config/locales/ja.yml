@@ -199,6 +199,10 @@ ja:
       tokens_earned_none: 'この回答ではポイントなし'
     editor:
       delete_card_confirm: このカードを削除しますか？
+      save_to_library: "ブランドライブラリにも保存"
+      add_to_library: "ライブラリに追加"
+      library_saving: "保存中…"
+      library_save_failed: "ライブラリに保存できませんでした"
       confirm_delete: "本当に削除？"
       unsaved: 未保存の変更
       undo_restored: 'カードを元に戻しました'

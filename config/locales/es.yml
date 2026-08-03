@@ -199,6 +199,10 @@ es:
       tokens_earned_none: 'Sin puntos por esta'
     editor:
       delete_card_confirm: "¿Eliminar esta tarjeta?"
+      save_to_library: "Guardar también en mi biblioteca de marca"
+      add_to_library: "Agregar a la biblioteca"
+      library_saving: "Guardando…"
+      library_save_failed: "No se pudo guardar en la biblioteca"
       confirm_delete: "¿Eliminar de verdad?"
       unsaved: Cambios sin guardar
       undo_restored: 'Tarjeta restaurada'
