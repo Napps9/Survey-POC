@@ -23,7 +23,9 @@ class TypeReapplyTest < ApplicationSystemTestCase
       cards: [
         { "type" => "welcome_card", "title" => "Hello" },
         { "type" => "multiple_choice", "cid" => "c1", "text" => "How old are you?",
-          "options" => [ "Option A", "Option B", "Option C" ] }
+          "options" => [ "Option A", "Option B", "Option C" ] },
+        { "type" => "range", "cid" => "r1", "text" => "How often?",
+          "options" => [ "Never", "Rarely", "Sometimes", "Often", "Always" ] }
       ]
     )
   end
@@ -37,10 +39,10 @@ class TypeReapplyTest < ApplicationSystemTestCase
 
   # Retype the option labels the way a creator does — in the contenteditable
   # nodes serialize() reads.
-  def relabel_options(labels)
+  def relabel_options(labels, cid: "c1", selector: ".pick-text")
     execute_script(<<~JS)
-      const card = document.querySelector("[data-card-cid='c1']")
-      const els  = card.querySelectorAll(".pick-text")
+      const card = document.querySelector("[data-card-cid='#{cid}']")
+      const els  = card.querySelectorAll(#{selector.to_json})
       const next = #{labels.to_json}
       els.forEach((el, i) => {
         if (next[i] === undefined) return
@@ -54,25 +56,25 @@ class TypeReapplyTest < ApplicationSystemTestCase
   # point, which is what dispatches "changed" and gets the editor to mark dirty.
   # Calling the private rebuild directly skipped the autosave entirely, which
   # made the persistence test below pass whether or not the bug was present.
-  def reapply_type(type)
+  def reapply_type(type, cid: "c1")
     execute_script(<<~JS)
       const app  = window.Stimulus || window.application
       const root = document.querySelector('[data-controller~="type-panel"]')
       const tp   = app.getControllerForElementAndIdentifier(root, "type-panel")
-      const card = document.querySelector("[data-card-cid='c1']")
+      const card = document.querySelector("[data-card-cid='#{cid}']")
       tp.activeCardEl = card
       tp.pendingType  = #{type.to_json}
       tp.applyType()
     JS
   end
 
-  def stored_options
-    @survey.reload.cards.find { |c| c["cid"] == "c1" }["options"]
+  def stored_options(cid = "c1")
+    @survey.reload.cards.find { |c| c["cid"] == cid }["options"]
   end
 
-  def on_screen_options
+  def on_screen_options(cid: "c1", selector: ".pick-text")
     evaluate_script(<<~JS)
-      (() => Array.from(document.querySelectorAll("[data-card-cid='c1'] .pick-text"))
+      (() => Array.from(document.querySelectorAll("[data-card-cid='#{cid}'] #{selector}"))
                   .map(el => el.textContent.trim()))()
     JS
   end
@@ -116,5 +118,37 @@ class TypeReapplyTest < ApplicationSystemTestCase
     assert_equal [ "Under 18", "18-24", "25-34" ], on_screen_options,
                  "the switch-away-and-back memory should hold the edited labels, not the " \
                  "ones the server rendered"
+  end
+
+  # A RANGE label is a positional stop, not a list entry — a blank one means
+  # "unnamed stop", and every label after it still belongs to its own stop.
+  # _liveOptions used to filter blanks for every type, so re-applying the type
+  # on a range card with a blanked label handed the rebuild 4 labels, and the
+  # upsampler re-spread them across 5 stops — sliding the creator's remaining
+  # words onto the wrong positions and autosaving the shuffle.
+  test "a blanked range label does not shift the other stops on re-apply" do
+    open_editor
+    assert_text "How often?"
+
+    # Blank the second stop, the way a creator clears a label they don't want.
+    relabel_options([ "Never", "" ], cid: "r1", selector: ".slider-label-text")
+
+    reapply_type("range", cid: "r1")
+
+    labels = on_screen_options(cid: "r1", selector: ".slider-label-text")
+    assert_equal 5, labels.size, "a range card must keep all #{5} stops"
+    assert_equal "Sometimes", labels[2],
+                 "blanking stop 2 slid the later labels onto earlier stops — " \
+                 "range labels are positional and must not be compacted"
+    assert_equal "Always", labels[4]
+
+    # And the save that follows keeps the alignment: the server names the blank
+    # stop from the default scale but never moves a label the creator kept.
+    sleep 3
+    stored = stored_options("r1")
+    assert_equal 5, stored.size
+    assert_equal "Sometimes", stored[2],
+                 "the autosave after the re-apply persisted the re-spread labels"
+    assert_equal "Always", stored[4]
   end
 end

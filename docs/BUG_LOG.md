@@ -8,6 +8,90 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-033 to BUG-040 — What a second pair of eyes found
+
+Eight defects from five independent adversarial reviews of the day's ~20
+commits, each verified first-hand before being fixed. The theme across them:
+**a fix that is right about its own case and wrong about the case next door.**
+
+**BUG-033 — going offline burned the submit queue's retry budget.** The service
+worker's drain loop counted every failed replay against `MAX_QUEUE_ATTEMPTS`,
+including replays that failed because the device had no network at all — the
+one situation the queue exists for. A phone that spent a day offline could
+arrive at attempt 25 with the answer never having reached the network once,
+and the queue then deleted it. The drain now skips the attempt bookkeeping
+entirely when `navigator.onLine === false`: no network, no verdict, no charge.
+
+**BUG-034 — the hoisted consent gate kept its flow routing.** `hoist_consent_gate`
+moved the gate to the front of the deck but left `flow_id`, `next` and
+`lane_label` on it. FlowCompiler chains flow members in deck order, so a gate
+that had been sitting inside a flow arrived at the front still claiming
+membership — splicing the gate into the flow's chain and skipping the question
+the route pointed at. The hoist now strips all three and pushes a
+`consent_gate_moved` warning through the same channel image rejections use.
+The editor's ▼ on the gate is also disabled next to a question, so the creator
+is never shown an order the save would silently revert.
+
+**BUG-035 — a declined consent wasn't terminal.** Declining purges the
+response's answers, but the endpoints happily kept accepting progress and
+submits for that session afterwards — so a purge meant to be a data-protection
+event was just a pause. Decline is now a terminal state: progress, submit and
+grade all refuse the session with a 403 until the respondent explicitly
+re-agrees (which clears `consent_declined_at`). The consent endpoint also
+gained its own rate limit, and response lookup is scoped to the survey, so a
+token from one Verto can't open a row on another.
+
+**BUG-036 — every server fault on the public write path reported as the
+client's fault.** `progress`/`submit`/`grade` wrapped everything in
+`rescue => e` → 422. The service worker treats 4xx as permanent and deletes
+the queued submit — so a transient server bug threw away a respondent's
+answers instead of retrying them. The rescue is now split: malformed JSON is
+400, a cross-survey token is 403, and anything unexpected is a 500, which the
+queue retries. Same class of loss, opposite direction from BUG-033.
+
+**BUG-037 — a declined consent posted offline was fire-and-forget.** The
+service worker queued `/submit` POSTs but let `/consent` fall through to the
+network, so a decline (or an agree) made offline vanished. Both now go through
+the same IndexedDB queue. CACHE_VERSION bumped to v26.
+
+**BUG-038 — purging answers didn't tell the results dashboard.** The
+results broadcast fired only for responses currently counted as answered, so
+the decline-purge — an answered→unanswered transition — updated nothing: a
+creator watching the dashboard kept seeing a response that no longer existed.
+The broadcast now also fires when `answered` *changes*, either direction.
+
+**BUG-039 — blanking one range label slid the others onto the wrong stops.**
+`_liveOptions` filtered blank labels for every card type, but a range label is
+a positional stop — blank means "unnamed stop", not "one fewer option". Reapply
+the type with a blanked label and the rebuild got 4 labels, which the
+upsampler re-spread across 5 stops, moving words the creator had placed and
+autosaving the shuffle. Range now keeps blanks positionally, mirroring
+`serialize()`'s own rule.
+
+**BUG-040 — duplicating a card dropped its translations.** The BUG-030 shape
+on yet another path: `_spliceCard` posted the card JSON (i18n and all) to
+`render_card` but spliced the returned HTML without seeding the translation
+store, so the duplicate's first autosave wrote it back monolingual. The splice
+now passes the JSON through to `seedCardStore` — and the restore-deleted-card
+path, which had the same gap, was fixed the same way.
+
+Smaller findings fixed in the same pass: `#optimise_card` losing a card's
+description when the optimiser returned none; flow-undo entries going stale
+when the flow was deleted before ⌘Z; two undo browser tests that passed with
+their guard deleted (empty stacks — they now plant a stack entry and refute it
+fires); the BUG-030 server contract itself untested (an integration test now
+pins `card:` in the generate response); the welcome-email test not naming the
+mailer it asserted; and the previous-keys initializer now calls
+`reset_column_information`, so encrypted columns pick up appended keys
+regardless of load order.
+
+How they were found is the entry's real lesson: five reviewers were told to
+distrust every comment and commit message and to read only the code. Every
+finding above sat in code whose comments correctly described what the code was
+*supposed* to do.
+
+---
+
 ## BUG-029 to BUG-032 — The last four from the hunt
 
 **BUG-029 — a removed consent gate came back on its own.** The gate's inline

@@ -80,7 +80,7 @@ class JsConstantParityTest < ActiveSupport::TestCase
 
   test "the default-options table is defined once" do
     definitions = Dir[Rails.root.join("app/javascript/**/*.js")].select do |path|
-      File.read(path).match?(/(?:const|export const)\s+DEFAULT_OPTIONS\s*=\s*\{/)
+      File.read(path).match?(/(?:export\s+)?(?:const|let|var)\s+DEFAULT_OPTIONS\s*=\s*\{/)
     end.map { |path| path.sub("#{Rails.root}/app/javascript/", "") }
 
     assert_equal [ "lib/default_options.js" ], definitions

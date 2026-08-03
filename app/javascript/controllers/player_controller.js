@@ -278,6 +278,7 @@ export default class extends Controller {
   async _finalize() {
     // Owner preview runs without a submit endpoint — nothing is recorded,
     // just show the thank-you screen.
+    if (this._declined) return // the declined panel is already the end state
     if (!this.submitUrlValue) return this._showThankyou(false)
     let queued = false
     // Distinct from `queued`: the request reached the server and the server said
@@ -500,6 +501,10 @@ export default class extends Controller {
   // Register this session as a responder once it has ≥1 real answer, so people
   // who answer something then leave are still counted. Fire once on success.
   async _saveProgress() {
+    // After a decline nothing more may leave this device — the server refuses
+    // it now (403), but not sending is the behaviour the respondent was
+    // promised, not merely being refused.
+    if (this._declined) return
     if (this._registered || !this.progressUrlValue) return
     const hasAnswer = Object.values(this._answers).some(a => this._isAnswerGiven(a))
     if (!hasAnswer) return

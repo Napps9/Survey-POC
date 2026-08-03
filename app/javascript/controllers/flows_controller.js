@@ -616,7 +616,9 @@ export default class extends Controller {
       })
       const json = await res.json()
       if (!json || !json.ok) return null
-      return this._spliceHTML(json.html, afterSlot, flowId)
+      // cardJson carries the i18n a duplicated card already holds; without it
+      // the duplicate autosaved monolingual (the BUG-030 shape on this path).
+      return this._spliceHTML(json.html, afterSlot, flowId, cardJson)
     } catch (_) {
       return null
     }

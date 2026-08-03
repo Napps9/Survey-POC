@@ -30,7 +30,7 @@ class User < ApplicationRecord
   # unusable) and recoverable (they can reconnect, which overwrites it).
   #
   # Deliberately narrow: only the decryption error is swallowed, and only here
-  # and in google_credentials. Anything else still raises.
+  # and in google_refresh_token_if_readable. Anything else still raises.
   def google_connected?
     google_refresh_token.present?
   rescue ActiveRecord::Encryption::Errors::Decryption

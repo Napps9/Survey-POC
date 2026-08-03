@@ -105,6 +105,39 @@ class GeneratedCardTranslationsTest < ApplicationSystemTestCase
     assert_equal "Vous sentez-vous en sécurité ?", stored_card("q1").dig("i18n", "fr", "text")
   end
 
+  # The same seam on the DUPLICATE path. duplicateCard copies the source card's
+  # JSON — i18n included — and splices the server-rendered row back in; without
+  # seeding the store from that JSON the duplicate autosaved monolingual, same
+  # shape as BUG-030. This drives the real ⧉ button end to end: render_card is
+  # a live server round trip with no Claude call in it.
+  test "a duplicated card keeps the source card's translations" do
+    open_editor
+
+    ok = evaluate_script(<<~JS)
+      (() => {
+        const btn = document.querySelector("[data-card-cid='q1'] .card-duplicate-btn")
+        if (!btn) return false
+        btn.click()
+        return true
+      })()
+    JS
+    assert ok, "no duplicate button on q1"
+
+    # The duplicate gets a server-minted cid; wait for the second yes_no row.
+    assert_selector "[data-card-type='yes_no']", count: 2, wait: 10
+
+    # duplicateCard marks dirty itself, so the autosave carries the copy.
+    Timeout.timeout(15) do
+      sleep 0.25 until @survey.reload.cards.count { |c| c["type"] == "yes_no" } == 2
+    end
+
+    dupe = @survey.reload.cards.find { |c| c["type"] == "yes_no" && c["cid"] != "q1" }
+    assert dupe, "the duplicate never reached the server"
+    assert_equal "Vous sentez-vous en sécurité ?", dupe.dig("i18n", "fr", "text"),
+                 "the duplicate lost the source card's translations on its first autosave"
+    assert_equal %w[Oui Non], dupe.dig("i18n", "fr", "options")
+  end
+
   # A card inserted with no JSON (the blank "start from blank" path, which has
   # nothing to translate) must still work rather than throw.
   test "a card inserted without JSON is still inserted" do

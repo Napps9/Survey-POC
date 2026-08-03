@@ -98,7 +98,11 @@ class OptimiseCardTest < ApplicationSystemTestCase
                   "outcome" => "Shows age spread" }
     merged = sent.merge(
       "type" => optimised["type"], "text" => optimised["text"],
-      "description" => optimised["description"].presence,
+      # Mirrors the controller's fallback: an omitted description keeps the
+      # card's own (review finding — it was the one field with no fallback,
+      # so `.compact` deleted the creator's description whenever the
+      # optimiser said nothing about it).
+      "description" => optimised["description"].presence || sent["description"],
       "options" => optimised["options"], "outcome" => optimised["outcome"]
     ).except("i18n").compact
 

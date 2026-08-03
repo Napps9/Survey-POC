@@ -37,7 +37,7 @@ export default class extends Controller {
       const json = await res.json()
       if (!json || !json.ok) throw new Error((json && json.error) || "Couldn't restore that card")
 
-      const card = editor.spliceRestoredCard(json.html)
+      const card = editor.spliceRestoredCard(json.html, json.card)
       if (!card) throw new Error("Couldn't place that card")
 
       // Gone from the bin as far as this page is concerned — the save that

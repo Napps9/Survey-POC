@@ -6,12 +6,12 @@ namespace :encryption do
   #
   # Twelve hex characters of SHA-256. Enough that a match is not a coincidence,
   # far too little to reconstruct a 32+ character key from.
-  FINGERPRINT_LENGTH = 12
+  # A local, not a method: `def` at rake top level defines onto Object.
+  fingerprint_length = 12
+  fingerprint = lambda do |value|
+    next "(not set)" if value.to_s.strip.empty?
 
-  def fingerprint(value)
-    return "(not set)" if value.to_s.strip.empty?
-
-    Digest::SHA256.hexdigest(value.to_s)[0, FINGERPRINT_LENGTH]
+    Digest::SHA256.hexdigest(value.to_s)[0, fingerprint_length]
   end
 
   desc "Print non-reversible fingerprints of the Active Record encryption keys, " \
@@ -24,10 +24,10 @@ namespace :encryption do
       "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT" => ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
     }
 
-    puts "Active Record encryption key fingerprints (SHA-256, first #{FINGERPRINT_LENGTH} hex chars)"
+    puts "Active Record encryption key fingerprints (SHA-256, first #{fingerprint_length} hex chars)"
     puts "These are one-way. Compare them; do not treat them as the keys."
     puts
-    keys.each { |name, value| puts format("  %-46s %s", name, fingerprint(value)) }
+    keys.each { |name, value| puts format("  %-46s %s", name, fingerprint.call(value)) }
     puts
 
     missing = keys.select { |_n, v| v.to_s.strip.empty? }.keys

@@ -17,7 +17,7 @@
 // Bump on any player JS/CSS/HTML behaviour change so existing respondents
 // don't keep getting the stale-while-revalidate copy. The activate handler
 // below deletes every cache that doesn't start with the current version.
-const CACHE_VERSION = "playverto-v25"
+const CACHE_VERSION = "playverto-v26"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
@@ -53,8 +53,11 @@ self.addEventListener("fetch", (event) => {
   const req = event.request
   const url = new URL(req.url)
 
-  // Submit endpoint — POST only.
-  if (req.method === "POST" && /^\/play\/[^/]+\/submit$/.test(url.pathname)) {
+  // Submit and consent endpoints — POST only. Consent is queued for the same
+  // reason submit is: an offline decline used to be fire-and-forget, so the
+  // respondent was shown the declined end-state while the server never heard
+  // about it and kept everything they had refused to give.
+  if (req.method === "POST" && /^\/play\/[^/]+\/(submit|consent)$/.test(url.pathname)) {
     event.respondWith(handleSubmit(req))
     return
   }
@@ -297,9 +300,17 @@ async function drainQueue() {
         // on every same-origin GET, forever, on that respondent's device.
         if (res.ok || !retryable(res.status)) await deleteQueued(item.id)
       } catch (_) {
-        // Still offline. Give up after MAX_QUEUE_ATTEMPTS so a submit that
-        // can never land doesn't sit in IndexedDB for the life of the browser
-        // profile, draining battery on every page view.
+        // The fetch threw — usually because the device is offline, which is
+        // the exact case the queue exists to survive. The attempts budget must
+        // NOT burn here while offline: drainQueue fires on every same-origin
+        // GET, cached pages keep working offline, and each offline page view
+        // used to cost several attempts — so ~25 offline page views deleted a
+        // submit the respondent had been told was saved, before they ever got
+        // back online. (A request that reached the server and was refused is
+        // handled above by status; this catch is only ever network failure.)
+        // Only a throw while the browser believes it IS online counts against
+        // the budget — that is the "can never land" case the cap is for.
+        if (self.navigator && self.navigator.onLine === false) continue
         const attempts = (item.attempts || 0) + 1
         if (attempts >= MAX_QUEUE_ATTEMPTS) await deleteQueued(item.id)
         else await bumpQueuedAttempts(item.id, attempts)

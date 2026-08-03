@@ -863,7 +863,10 @@ class SurveysController < ApplicationController
                     status: :not_found
     end
 
-    render json: { ok: true, cid: card["cid"], html: render_card_html(survey, card) }
+    # The card JSON travels with the markup so the editor can seed its
+    # translation store — without it, restoring a translated card stripped its
+    # i18n on the next autosave, the BUG-030 shape on one more path.
+    render json: { ok: true, cid: card["cid"], card: card, html: render_card_html(survey, card) }
   rescue => e
     ErrorReporting.report("SurveysController#restore_card", e)
     render json: { ok: false, error: "That card couldn't be restored." }, status: :unprocessable_entity
@@ -899,7 +902,11 @@ class SurveysController < ApplicationController
     merged = card.merge(
       "type"        => optimised["type"],
       "text"        => optimised["text"].to_s.presence || card["text"],
-      "description" => optimised["description"].to_s.presence,
+      # Fall back to the card's own description like text/options/outcome do.
+      # This was the one field with no fallback: when the optimiser omitted it,
+      # `.compact` dropped the key and the creator's description was destroyed —
+      # the exact field-loss shape BUG-018 was supposed to have closed.
+      "description" => optimised["description"].to_s.presence || card["description"],
       "options"     => new_options.presence || card["options"],
       # Refresh the Why "outcome" line to match the rewrite; competency/condition
       # ride along from the original card untouched.

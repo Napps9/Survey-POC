@@ -27,5 +27,13 @@ if previous_keys.any? && ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"].present?
         key_provider: ActiveRecord::Encryption::DerivedSecretKeyProvider.new(old_key)
       )
     end
+    # The per-attribute scheme list is SNAPSHOTTED when the encrypted attribute
+    # type is built, and memoized. Today types build lazily, after this hook —
+    # but enabling the standard schema-cache boot optimization builds them
+    # earlier, and this append would then silently do nothing, killing the
+    # disaster-recovery path exactly when it is needed. Resetting the one model
+    # with encrypted columns forces its types to rebuild with the appended
+    # schemes, whichever order boot ran in.
+    User.reset_column_information if defined?(User)
   end
 end

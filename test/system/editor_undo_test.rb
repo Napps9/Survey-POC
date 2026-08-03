@@ -173,28 +173,53 @@ class EditorUndoTest < ApplicationSystemTestCase
     # Structural edits are refused server-side once a Verto is live (423), so an
     # undo that mutated the DOM would show the creator a change that can never
     # save.
+    #
+    # The stack must be NON-EMPTY for this to prove anything: the review caught
+    # the first version pressing ⌘Z with nothing on the stack, which passes
+    # with the live-guard deleted. A live editor renders no delete buttons, so
+    # the entry is planted directly — what matters is that a populated stack
+    # is not popped.
     @survey.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
 
     open_editor
+    execute_script(<<~JS)
+      const app  = window.Stimulus || window.application
+      const root = document.querySelector('[data-controller~="survey-editor"]')
+      const c    = app.getControllerForElementAndIdentifier(root, "survey-editor")
+      c._pushUndo(() => { window.__undoFired = true })
+    JS
     before = card_texts
 
     press_undo
+
     assert_equal before, card_texts
+    refute evaluate_script("!!window.__undoFired"),
+           "the live guard must stop the stack being popped, not merely find it empty"
   end
 
   test "typing undo inside a text field is left to the browser" do
     # The handler skips inputs and contenteditables on purpose — the browser is
     # better at text undo than an operation stack. If it didn't, ⌘Z while
     # correcting a typo would delete a card.
+    #
+    # A structural edit FIRST, so the stack is non-empty — the review caught
+    # the original pressing ⌘Z over an empty stack, which passes with the
+    # text-field skip rule deleted.
     open_editor
-    before = card_texts.size
+    delete_card("c2")
+    assert_no_selector "[data-card-cid='c2']"
 
-    field = first("[data-survey-editor-target='card'] [contenteditable='true'], [data-survey-editor-target='card'] input[type='text']")
-    skip "no editable text field on a card" if field.nil?
-    field.click
+    execute_script(<<~JS)
+      document.querySelector("[data-survey-editor-target='card'] [contenteditable='true'], " +
+                             "[data-survey-editor-target='card'] input[type='text']")?.focus()
+    JS
     press_undo
+    # ⌘Z in a text field must not pop a structural undo — c2 stays gone.
+    assert_no_selector "[data-card-cid='c2']"
 
-    assert_equal before, card_texts.size,
-                 "⌘Z in a text field must not pop a structural undo"
+    # And blurring hands the same keystroke back to the stack.
+    execute_script("document.activeElement?.blur?.()")
+    press_undo
+    assert_selector "[data-card-cid='c2']", wait: 5
   end
 end

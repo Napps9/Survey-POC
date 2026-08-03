@@ -119,7 +119,12 @@ class Response < ApplicationRecord
 
   def broadcast_results_activity
     return unless saved_change_to_answered? || saved_change_to_status?
-    return unless answered? # an empty, abandoned session isn't news
+    # Broadcast when a response BECOMES answered, and also when it STOPS being
+    # answered — the decline purge flips answered true→false, and that is the
+    # one transition where a creator's live results screen is showing numbers
+    # that must go DOWN. The old `return unless answered?` suppressed exactly
+    # that broadcast. Still silent for an empty session that never answered.
+    return unless answered? || saved_change_to_answered?
 
     ResultsActivity.broadcast(survey)
   rescue => e

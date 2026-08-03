@@ -20,6 +20,12 @@ class PlayerController < ApplicationController
   # a respondent hits each once after finishing.
   rate_limit to: 120, within: 1.minute, only: [ :results, :scores, :regions ],
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
+  # Consent is written at most twice per legitimate session (a decline, or a
+  # decline followed by an explicit re-agree), and declining PURGES the
+  # response — so an uncapped endpoint was an unauthenticated, repeatable
+  # destruction primitive keyed only by a session token.
+  rate_limit to: 30, within: 1.minute, only: :consent,
+             with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # A respondent's autocomplete keystrokes are debounced client-side, so a
   # generous per-minute cap here only guards against a runaway client/bot.
   rate_limit to: 30, within: 1.minute, only: :location_search,
@@ -90,6 +96,7 @@ class PlayerController < ApplicationController
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
     resp  = find_or_init_response(token)
+    return if refuse_if_declined(resp)
     # Quiz answers are immutable once committed — fold the incoming payload over
     # what's already stored so an already-answered graded card can't be changed.
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
@@ -102,9 +109,17 @@ class PlayerController < ApplicationController
     apply_token_totals(resp)
     resp.save!
     render json: { ok: true, session_token: token }
+  rescue JSON::ParserError
+    render json: { ok: false, error: "Malformed request body." }, status: :bad_request
+  rescue CrossSurveyToken
+    render json: { ok: false, error: "Invalid session." }, status: :forbidden
   rescue => e
     ErrorReporting.report("PlayerController##{action_name}", e)
-    render json: { ok: false, error: "Something went wrong saving your response." }, status: :unprocessable_entity
+    # 500, not 422: a transient fault (DB burp, mid-deploy restart) must look
+    # RETRYABLE to the service worker, which queues 5xx and drops 4xx. As a 422
+    # this told the respondent the Verto had closed and threw their answers
+    # away, when a retry seconds later would have landed them.
+    render json: { ok: false, error: "Something went wrong saving your response." }, status: :internal_server_error
   end
 
   def submit
@@ -113,6 +128,7 @@ class PlayerController < ApplicationController
     data  = JSON.parse(request.body.read)
     token = data["session_token"].presence || SecureRandom.uuid
     resp  = find_or_init_response(token)
+    return if refuse_if_declined(resp)
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     apply_respondent_code(resp, data["respondent_code"])
     sync_region_from_answers!(resp)
@@ -131,9 +147,17 @@ class PlayerController < ApplicationController
     payload.merge!(score: resp.score, max: resp.quiz_max) if @survey.quiz?
     payload.merge!(token_totals: resp.token_totals) if @survey.tokenisation_enabled?
     render json: payload
+  rescue JSON::ParserError
+    render json: { ok: false, error: "Malformed request body." }, status: :bad_request
+  rescue CrossSurveyToken
+    render json: { ok: false, error: "Invalid session." }, status: :forbidden
   rescue => e
     ErrorReporting.report("PlayerController##{action_name}", e)
-    render json: { ok: false, error: "Something went wrong saving your response." }, status: :unprocessable_entity
+    # 500, not 422: a transient fault (DB burp, mid-deploy restart) must look
+    # RETRYABLE to the service worker, which queues 5xx and drops 4xx. As a 422
+    # this told the respondent the Verto had closed and threw their answers
+    # away, when a retry seconds later would have landed them.
+    render json: { ok: false, error: "Something went wrong saving your response." }, status: :internal_server_error
   end
 
   # Records the consent gate's agree/decline event, so there's an audit trail
@@ -153,6 +177,10 @@ class PlayerController < ApplicationController
     if data["agreed"]
       resp.consent_agreed_at ||= Time.current
       resp.consent_text_snapshot ||= @survey.consent_snapshot_text
+      # An explicit agree after a decline is a re-consent, and the record must
+      # say ONE thing — both timestamps standing at once is an audit row nobody
+      # can interpret. The purge already ran; nothing is resurrected by this.
+      resp.consent_declined_at = nil
     else
       resp.consent_declined_at ||= Time.current
       resp.consent_text_snapshot ||= @survey.consent_snapshot_text
@@ -164,6 +192,10 @@ class PlayerController < ApplicationController
     end
     resp.save!
     render json: { ok: true }
+  rescue JSON::ParserError
+    render json: { ok: false, error: "Malformed request body." }, status: :bad_request
+  rescue CrossSurveyToken
+    render json: { ok: false, error: "Invalid session." }, status: :forbidden
   rescue => e
     ErrorReporting.report("PlayerController##{action_name}", e)
     render json: { ok: false, error: "Something went wrong recording your response." }, status: :unprocessable_entity
@@ -183,6 +215,7 @@ class PlayerController < ApplicationController
     token = data["session_token"].presence || SecureRandom.uuid
     idx   = data["card_index"].to_i
     resp  = find_or_init_response(token)
+    return if refuse_if_declined(resp)
     first_time = !answered?(stored_answers(resp)[idx.to_s])
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     ai_normalize_open_ended_answer!(resp, idx) if first_time
@@ -215,6 +248,10 @@ class PlayerController < ApplicationController
       # only, reveal nothing.
       render json: base.merge(graded: false)
     end
+  rescue JSON::ParserError
+    render json: { ok: false, error: "Malformed request body." }, status: :bad_request
+  rescue CrossSurveyToken
+    render json: { ok: false, error: "Invalid session." }, status: :forbidden
   rescue => e
     ErrorReporting.report("PlayerController##{action_name}", e)
     render json: { ok: false, error: "Something went wrong scoring your answer." }, status: :unprocessable_entity
@@ -380,6 +417,10 @@ class PlayerController < ApplicationController
       }
     end
     render json: { ok: true, results: results }
+  rescue JSON::ParserError
+    render json: { ok: false, error: "Malformed request body." }, status: :bad_request
+  rescue CrossSurveyToken
+    render json: { ok: false, error: "Invalid session." }, status: :forbidden
   rescue => e
     ErrorReporting.report("PlayerController##{action_name}", e)
     render json: { ok: false, error: "Search failed" }, status: :bad_gateway
@@ -396,11 +437,31 @@ class PlayerController < ApplicationController
 
   # Finds (or starts) this session's response row and attaches it to the
   # current survey/share — the shared first step of every write action.
+  # A token that belongs to a different survey is refused, not adopted.
+  class CrossSurveyToken < StandardError; end
+
   def find_or_init_response(token)
-    resp = Response.find_or_initialize_by(session_token: token)
-    resp.survey       ||= @survey
+    resp = @survey.responses.find_or_initialize_by(session_token: token)
+    if resp.new_record? && Response.where(session_token: token).where.not(survey_id: @survey.id).exists?
+      # The old global lookup made any playable survey's consent URL a lever on
+      # ANOTHER survey's response — including the purge. The client's tokens
+      # are keyed per Verto (sessionStorage key includes the submit URL), so a
+      # legitimate respondent never hits this; only a crafted request can.
+      raise CrossSurveyToken
+    end
     resp.survey_share ||= @survey_share
     resp
+  end
+
+  # Declining consent is terminal until the respondent explicitly re-agrees.
+  # Without this the purge only held for an instant: any later /progress,
+  # /submit or /grade with the same token — an in-flight request, a queued
+  # replay, a crafted POST — re-stored everything and re-entered the respondent
+  # in every count, while the row still said they had declined.
+  def refuse_if_declined(resp)
+    return false unless resp.persisted? && resp.consent_declined_at.present?
+    render json: { ok: false, error: "Consent was declined for this session." }, status: :forbidden
+    true
   end
 
   # Record the respondent's self-invented code as a digest. The plaintext is used

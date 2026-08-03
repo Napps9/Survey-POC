@@ -100,7 +100,12 @@ export default class extends Controller {
       if (this.liveValue) return
       if (!this._undoStack.length) return
       event.preventDefault()
-      this._undoStack.pop()()
+      // An entry may return false to mean "stale — nothing to undo" (a flow
+      // dissolved through the panel outlives its creation entry). Skip to the
+      // next real one instead of eating the keystroke on a no-op.
+      let acted
+      do { acted = this._undoStack.pop()() } while (acted === false && this._undoStack.length)
+      if (acted === false) return
       this._renumberAndPersist()
     }
     document.addEventListener("keydown", this._undoHandler)
@@ -156,6 +161,9 @@ export default class extends Controller {
   recordFlowCreation(flowId) {
     if (!flowId) return
     this._pushUndo(() => {
+      // The flow may have been dissolved through the panel since; undoing then
+      // would flash "removed" while removing nothing. Report stale instead.
+      if (!this.flowsList().some(f => f.id === flowId)) return false
       this.removeFlow(flowId, { deleteCards: true })
       this.flash(t("editor.undo_removed", { default: "Card removed" }), "text-aquamarine")
     })
@@ -170,7 +178,7 @@ export default class extends Controller {
   // Puts a server-rendered card back at the end of the feed. Used by the
   // "Recently deleted" list, which restores across a reload — where the detached
   // node above is long gone and only the stored card JSON remains.
-  spliceRestoredCard(html) {
+  spliceRestoredCard(html, cardJson = null) {
     const feed = this.hasFeedTarget ? this.feedTarget : null
     if (!feed) return null
 
@@ -192,6 +200,9 @@ export default class extends Controller {
     if (lastSlot) lastSlot.after(slot)
     else feed.appendChild(slot)
 
+    // Restored cards keep their translations: without seeding, the next
+    // autosave wrote the restored card back monolingual (the BUG-030 shape).
+    this.seedCardStore(card, cardJson)
     this._renumberAndPersist()
     return card
   }
@@ -399,12 +410,22 @@ export default class extends Controller {
     this._afterReorder(card)
   }
 
+  // The server hoists a consent gate back ahead of the first question on every
+  // save (Survey.hoist_consent_gate), so letting the gate move down past a
+  // question here would show the creator an order the save silently reverts.
+  _gateBlockedBelow(card, hit) {
+    if (card?.dataset.cardType !== "consent_gate") return false
+    const nextCard = hit?.slot.querySelector("[data-survey-editor-target='card']")
+    return !!nextCard && !NON_QUESTION_TYPES.includes(nextCard.dataset.cardType)
+  }
+
   moveCardDown(event) {
     event.stopPropagation()
     const card = event.currentTarget.closest("[data-survey-editor-target='card']")
     const slot = card?.closest(".card-slot")
     const hit = this._reorderNeighbor(card, slot, 1)
     if (!slot || !hit) return
+    if (this._gateBlockedBelow(card, hit)) return
     const undo = this._slotRestorer(slot)   // captured before the move
     if (hit.hopped) hit.slot.before(slot)  // hopped a flow run ⇒ land just before it
     else hit.slot.after(slot)
@@ -486,7 +507,8 @@ export default class extends Controller {
           (prevCard.dataset.cardType === "welcome_card" && card.dataset.cardType !== "consent_gate")
       }
       if (down) {
-        down.disabled = !this._reorderNeighbor(card, slot, 1)
+        const hit = this._reorderNeighbor(card, slot, 1)
+        down.disabled = !hit || this._gateBlockedBelow(card, hit)
       }
     })
   }

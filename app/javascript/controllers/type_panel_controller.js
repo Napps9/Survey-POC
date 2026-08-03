@@ -1275,7 +1275,14 @@ export default class extends Controller {
   _liveOptions(card) {
     const editor = this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")
     if (!editor?._optionEls) return []
-    return editor._optionEls(card).map(el => el.textContent.trim()).filter(Boolean)
+    const labels = editor._optionEls(card).map(el => el.textContent.trim())
+    // Mirror serialize()'s rule exactly: a RANGE label is a POSITIONAL stop,
+    // and a blank one is an unnamed stop, not an absent option. Filtering it
+    // here handed the rebuild 4 labels, whose upsampler then re-spread them
+    // across 5 stops — sliding the creator's remaining labels onto the wrong
+    // positions and autosaving the shuffle.
+    const kept = card.dataset.cardType === "range" ? labels : labels.filter(Boolean)
+    return kept.some(Boolean) ? kept : []
   }
 
   // Existing pages if this card already had some (switching away from

@@ -512,7 +512,7 @@ class Survey < ApplicationRecord
       end
       c
     end.then { |list| enforce_single_welcome(list, warnings: warnings) }
-       .then { |list| hoist_consent_gate(list) }
+       .then { |list| hoist_consent_gate(list, warnings: warnings) }
   end
 
   # At most one welcome card per deck. Nothing enforced this: welcome_card was
@@ -554,7 +554,7 @@ class Survey < ApplicationRecord
   # Verto that is published or already has responses (editing_locked?), so a
   # deck being reordered here can have no stored answers to misalign — which
   # matters, because answers are keyed by card index.
-  def self.hoist_consent_gate(list)
+  def self.hoist_consent_gate(list, warnings: nil)
     gate_at = list.index { |c| c.is_a?(Hash) && c["type"].to_s == "consent_gate" }
     return list if gate_at.nil?
 
@@ -562,6 +562,16 @@ class Survey < ApplicationRecord
     return list if first_question.nil? || gate_at < first_question
 
     gate = list.delete_at(gate_at)
+    # The gate is leaving its place in the deck, so any flow membership or
+    # branch routing it carried is stale — FlowCompiler chains flow members in
+    # deck order, and a hoisted gate still wearing its flow_id would splice the
+    # gate into the flow's chain at the front and skip the question the route
+    # actually pointed at. Same channel as the image warnings, so the editor
+    # can tell the creator the deck was reshaped.
+    gate.delete("next")
+    gate.delete("flow_id")
+    gate.delete("lane_label")
+    warnings << "consent_gate_moved" if warnings
     list.insert(first_question, gate)
     list
   end

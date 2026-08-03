@@ -155,6 +155,31 @@ class ConsentGateEditorTest < ApplicationSystemTestCase
     assert q1_disabled, "a question card must still be pinned below the welcome card"
   end
 
+  # The other half of the pin story: the server hoists a gate back ahead of the
+  # first question on every save, so a ▼ that moved the gate below a question
+  # would show the creator an order the next autosave silently reverts. The
+  # button must be disabled — a gesture that can't stick shouldn't be offered.
+  test "the consent gate's down arrow is disabled next to a question" do
+    open_editor
+
+    gate_down_disabled = evaluate_script(<<~JS)
+      (() => document.querySelector("[data-card-cid='cg1'] [data-role='move-down']")?.disabled)()
+    JS
+    assert gate_down_disabled,
+           "the gate's ▼ was enabled with a question below it — the move would be " \
+           "undone by the save-time hoist"
+
+    # Positive control, so this can't pass because every ▼ is dead: the welcome
+    # card's ▼ points at the gate (a non-question), which is a legal hop.
+    welcome_down_disabled = evaluate_script(<<~JS)
+      (() => {
+        const cards = document.querySelectorAll("[data-survey-editor-target='card']")
+        return cards[0].querySelector("[data-role='move-down']")?.disabled
+      })()
+    JS
+    refute welcome_down_disabled, "the welcome card's ▼ next to the gate should be enabled"
+  end
+
   test "editing a consent page persists that page" do
     open_editor
 

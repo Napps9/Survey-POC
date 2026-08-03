@@ -112,6 +112,8 @@ class EmailConfirmationTest < ActionDispatch::IntegrationTest
       get email_confirmation_path(token)
     end
     assert user.reload.email_verified?
+    assert_includes enqueued_mailers, "WelcomeMailer",
+                    "one email was enqueued, but nothing proved it was the welcome"
   end
 
   test "re-opening the confirmation link does not send a second welcome" do
