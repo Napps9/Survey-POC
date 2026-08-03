@@ -58,10 +58,18 @@ module CardTypes
   end
 
   # The picker list for one Verto: Points Checkpoint only appears once
-  # tokenisation is on (it has nothing to show before then).
+  # tokenisation is on (it has nothing to show before then), and Welcome
+  # disappears once the deck already has one — a second welcome card greets the
+  # respondent twice, and the server drops it on save anyway
+  # (Survey.enforce_single_welcome), so offering it is offering a card that
+  # cannot survive.
   def pickable_for(survey)
-    return pickable if survey&.tokenisation_enabled?
-    pickable.reject { |key, _attrs| key == "token_checkpoint" }
+    list = pickable
+    list = list.reject { |key, _attrs| key == "token_checkpoint" } unless survey&.tokenisation_enabled?
+    if survey && Array(survey.cards).any? { |c| c.is_a?(Hash) && c["type"].to_s == "welcome_card" }
+      list = list.reject { |key, _attrs| key == "welcome_card" }
+    end
+    list
   end
 
   # JSON blob emitted into the editor page so the JS controller has the

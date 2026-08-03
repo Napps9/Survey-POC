@@ -511,7 +511,31 @@ class Survey < ApplicationRecord
         end
       end
       c
-    end.then { |list| hoist_consent_gate(list) }
+    end.then { |list| enforce_single_welcome(list, warnings: warnings) }
+       .then { |list| hoist_consent_gate(list) }
+  end
+
+  # At most one welcome card per deck. Nothing enforced this: welcome_card was
+  # pickable like any other type, so a second could be added — or any card
+  # converted into one — and the player then greeted the respondent twice.
+  #
+  # Duplicates are DROPPED (keeping the first) rather than rejected, and the
+  # choice is deliberate: decks with two welcome cards already exist, and a
+  # validation error here would 422 their every autosave from now on — turning
+  # a historical oddity into an editor that can no longer save. The drop is not
+  # silent either: it pushes onto `warnings`, the same channel a rejected image
+  # uses, which the editor surfaces as a save warning.
+  def self.enforce_single_welcome(list, warnings: nil)
+    seen = false
+    list.filter_map do |c|
+      next c unless c.is_a?(Hash) && c["type"].to_s == "welcome_card"
+      if seen
+        warnings << "duplicate_welcome" if warnings
+        next nil
+      end
+      seen = true
+      c
+    end
   end
 
   # A consent gate must come before any card that captures an answer.

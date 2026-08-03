@@ -105,6 +105,56 @@ class ConsentGateEditorTest < ApplicationSystemTestCase
            "the consent snapshot — the record of what respondents agreed to — was lost on autosave"
   end
 
+  # 1c.3, the half that was missing. Both orders — "Hello → consent" and
+  # "consent → Hello" — were already legal and already persisted, but only ONE
+  # gesture could produce them: pressing ▼ on the welcome card. The gate's own
+  # ▲ sat greyed next to a welcome card (the generic welcome-stays-first pin),
+  # with nothing to suggest the other gesture existed. The pin now exempts the
+  # consent gate, so either card can make the swap.
+  test "the consent gate's up arrow can hop the welcome card" do
+    open_editor
+
+    ok = evaluate_script(<<~JS)
+      (() => {
+        const gate = document.querySelector("[data-card-cid='cg1']")
+        const up = gate.querySelector("[data-role='move-up']")
+        if (!up || up.disabled) return false
+        up.click()
+        return true
+      })()
+    JS
+    assert ok, "the gate's ▲ was disabled next to the welcome card — the pin still applies to it"
+
+    Timeout.timeout(15) do
+      sleep 0.25 until @survey.reload.cards.map { |c| c["type"] }.first == "consent_gate"
+    end
+    assert_equal %w[consent_gate welcome_card], @survey.reload.cards.map { |c| c["type"] }.first(2)
+  end
+
+  test "an ordinary question's up arrow is still pinned below the welcome card" do
+    # The exemption is for the gate alone — without this check the fix could
+    # have quietly unpinned the welcome card for every type. Arranged by first
+    # hopping the gate up (deck becomes [gate, welcome, q1]), which makes the
+    # welcome card q1's neighbour.
+    #
+    # (An earlier version tried to move q1 above the GATE and assert it was
+    # refused — but that move is undone by the save-time hoist, since a consent
+    # gate must precede every question. The editor allows the gesture; the
+    # sanitizer reverts it. Correct, just not this test's subject.)
+    open_editor
+    execute_script(<<~JS)
+      document.querySelector("[data-card-cid='cg1'] [data-role='move-up']")?.click()
+    JS
+    Timeout.timeout(15) do
+      sleep 0.25 until @survey.reload.cards.first["type"] == "consent_gate"
+    end
+
+    q1_disabled = evaluate_script(<<~JS)
+      (() => document.querySelector("[data-card-cid='q1'] [data-role='move-up']")?.disabled)()
+    JS
+    assert q1_disabled, "a question card must still be pinned below the welcome card"
+  end
+
   test "editing a consent page persists that page" do
     open_editor
 

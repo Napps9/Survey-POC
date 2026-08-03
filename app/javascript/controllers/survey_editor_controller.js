@@ -384,7 +384,14 @@ export default class extends Controller {
     const slot = card?.closest(".card-slot")
     const hit = this._reorderNeighbor(card, slot, -1)
     const prevCard = hit?.slot.querySelector("[data-survey-editor-target='card']")
-    if (!slot || !hit || !prevCard || prevCard.dataset.cardType === "welcome_card") return
+    // The welcome card is pinned first — EXCEPT against a consent gate, which
+    // may sit either side of it ("Hello → consent" or "consent → Hello" are
+    // both legitimate). The ordering was already reachable by pressing ▼ on
+    // the welcome card, but the gate's own ▲ sat greyed with no hint that the
+    // other gesture existed — a feature half of its users would call missing.
+    const pinned = prevCard?.dataset.cardType === "welcome_card" &&
+                   card?.dataset.cardType !== "consent_gate"
+    if (!slot || !hit || !prevCard || pinned) return
     const undo = this._slotRestorer(slot)   // captured before the move
     if (hit.hopped) hit.slot.after(slot)   // hopped a flow run ⇒ land just after it
     else hit.slot.before(slot)
@@ -474,7 +481,9 @@ export default class extends Controller {
       if (up) {
         const prevCard = this._reorderNeighbor(card, slot, -1)?.slot
           .querySelector("[data-survey-editor-target='card']")
-        up.disabled = !prevCard || prevCard.dataset.cardType === "welcome_card"
+        // Mirror of moveCardUp's pin rule: a consent gate may hop the welcome.
+        up.disabled = !prevCard ||
+          (prevCard.dataset.cardType === "welcome_card" && card.dataset.cardType !== "consent_gate")
       }
       if (down) {
         down.disabled = !this._reorderNeighbor(card, slot, 1)
