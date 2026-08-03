@@ -120,6 +120,29 @@ class TypeReapplyTest < ApplicationSystemTestCase
                  "ones the server rendered"
   end
 
+  # The builders' chrome must follow the viewer's UI language. The card markup
+  # a type switch mints comes from client-side COMPONENTS builders, which used
+  # to hardcode English regardless of locale — so a French creator's rebuilt
+  # card grew an English "Add option" row. The strings now come through
+  # window.I18N; this drives a real rebuild under ?locale=fr and reads the
+  # button off the DOM.
+  test "a rebuilt card's chrome renders in the viewer's locale" do
+    sign_in_as(@user)
+    visit survey_path(@survey, locale: "fr")
+    dismiss_cookie_banner
+    assert_text "How old are you?"
+
+    reapply_type("multiple_choice")
+
+    add_label = evaluate_script(<<~JS)
+      (() => document.querySelector("[data-card-cid='c1']")
+                     .closest(".card-slot")
+                     .querySelector(".pick-add-btn")?.textContent.trim())()
+    JS
+    assert_equal "＋ #{I18n.t("card.add_option", locale: :fr)}", add_label,
+                 "the rebuilt card's Add-option row ignored the UI locale"
+  end
+
   # A RANGE label is a positional stop, not a list entry — a blank one means
   # "unnamed stop", and every label after it still belongs to its own stop.
   # _liveOptions used to filter blanks for every type, so re-applying the type

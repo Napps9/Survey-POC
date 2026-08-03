@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { t } from "lib/i18n"
 
 // Manages the extra branch end-screen rows in the publish panel (add / edit /
 // remove), then serializes them into a hidden `end_screens` field right before
@@ -18,16 +19,16 @@ export default class extends Controller {
     const inp = "padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;"
     row.innerHTML = `
       <div style="display:flex;gap:6px;align-items:center;">
-        <input type="text" data-end-screens-target="title" maxlength="80" placeholder="Screen title (e.g. Join the UK hub)"
+        <input type="text" data-end-screens-target="title" maxlength="80" placeholder="${t("editor.end_screens.title_placeholder").replace(/"/g, "&quot;")}"
                style="flex:1;min-width:0;${inp}" />
         <button type="button" data-action="click->end-screens#removeRow"
                 style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);cursor:pointer;">×</button>
       </div>
-      <textarea data-end-screens-target="body" maxlength="400" rows="2" placeholder="Message"
+      <textarea data-end-screens-target="body" maxlength="400" rows="2" placeholder="${t("editor.end_screens.body_placeholder").replace(/"/g, "&quot;")}"
                 style="width:100%;box-sizing:border-box;resize:vertical;${inp}"></textarea>
-      <input type="url" data-end-screens-target="forwardUrl" placeholder="https://buy.stripe.com/… (optional link)"
+      <input type="url" data-end-screens-target="forwardUrl" placeholder="${t("editor.end_screens.url_placeholder").replace(/"/g, "&quot;")}"
              style="width:100%;box-sizing:border-box;${inp}" />
-      <input type="text" data-end-screens-target="forwardLabel" maxlength="40" placeholder="Button label (e.g. Pay &amp; join)"
+      <input type="text" data-end-screens-target="forwardLabel" maxlength="40" placeholder="${t("editor.end_screens.button_placeholder").replace(/"/g, "&quot;")}"
              style="width:100%;box-sizing:border-box;${inp}" />
     `
     this.listTarget.appendChild(row)

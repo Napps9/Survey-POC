@@ -70,6 +70,11 @@ that: push green.
   not `main` (ci.yml watches both).
 - Locale strings live in 19 files under `config/locales/` — new UI strings
   must be added to all of them (they mirror en.yml's structure).
+  `test/lib/locale_structure_parity_test.rb` enforces this for the
+  browser-facing namespaces (`js`, `defaults`, `card`); JS reads strings via
+  `window.I18N`, which carries `js:` plus the curated slice in
+  `app/views/layouts/_i18n_js.html.erb` — a JS-facing string anywhere else
+  renders as a raw dotted key.
 - Dashboard/player styling is mostly inline `style` attributes plus classes
   in `app/assets/tailwind/application.css`; match the file you're editing.
 - `/play/:token` is served through a Service Worker (`app/views/pwa/service-worker.js`)

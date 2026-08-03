@@ -1,7 +1,39 @@
-<%# Exposes the JS-facing translations (the `js` namespace) to the browser as
-    window.I18N, resolved for the current locale with English fallback so a
-    missing key still renders. Read via lib/i18n.js `t()`. %>
-<% js_strings = I18n.t("js", locale: :en, default: {}).deep_merge(I18n.t("js", default: {}).is_a?(Hash) ? I18n.t("js", default: {}) : {}) %>
+<%# Exposes the JS-facing translations to the browser as window.I18N, resolved
+    for the current locale with English fallback so a missing key still renders.
+    Read via lib/i18n.js `t()`.
+
+    Two sources merge here:
+    - the whole `js:` namespace — strings that exist only for the browser; and
+    - a CURATED slice of server-side namespaces (`card`, and named keys from
+      `editor`/`player`) whose strings the JS builders must render identically
+      to the ERB that also renders them (type_panel_controller's COMPONENTS
+      mirror _card_component.html.erb). Slicing keeps the payload small and the
+      string single-sourced instead of duplicated under js: in 19 locale files.
+    A JS-facing string must live in `js:` or be named in the slice below —
+    anything else renders as a raw dotted key (BUG-004). %>
+<%
+  ns = ->(key, locale) do
+    v = I18n.t(key, locale: locale, default: {})
+    v.is_a?(Hash) ? v.deep_stringify_keys : {}
+  end
+  shared = ->(locale) do
+    {
+      "card"   => ns.call("card", locale),
+      "editor" => ns.call("editor", locale).slice(
+        "change_statement_image_title", "consent_page_placeholder",
+        "consent_agreement_kicker", "animation_theme",
+        "slider_axis_auto", "slider_axis_horizontal", "slider_axis_vertical"
+      ),
+      "player" => ns.call("player", locale).slice(
+        "consent_agree", "consent_decline", "visit_website"
+      )
+    }
+  end
+  js_strings = ns.call("js", :en)
+               .deep_merge(shared.call(:en))
+               .deep_merge(ns.call("js", I18n.locale))
+               .deep_merge(shared.call(I18n.locale))
+%>
 <%= javascript_tag nonce: true do %>
   window.I18N = <%= js_strings.to_json.html_safe %>;
 <% end %>

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { t } from "lib/i18n"
 
 export default class extends Controller {
   static targets = ["messages", "input", "sendBtn"]
@@ -63,7 +64,7 @@ export default class extends Controller {
       await pump()
       this._messages.push({ role: "assistant", content: aiText })
     } catch (_) {
-      bubble.textContent = "Sorry, something went wrong. Please try again."
+      bubble.textContent = t("results.chat_error")
     }
 
     this._loading = false

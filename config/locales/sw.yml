@@ -150,6 +150,22 @@ sw:
     quiz_compare_cta: "Ona jinsi unavyolinganishwa →"
     quiz_compare_title: "Jinsi unavyolinganishwa"
     tokens_welcome_note: "Utapata pointi kila unapojibu swali — huwezi kurudi nyuma na kubadilisha jibu ili kupata zaidi."
+  defaults:
+    range: ["Sikubaliani kabisa", "Sikubaliani", "Sina upande", "Nakubaliana", "Nakubaliana kabisa"]
+    nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    rating: ["Hafifu", "Wastani", "Nzuri", "Nzuri sana", "Bora kabisa"]
+    multiple_choice: ["Chaguo A", "Chaguo B", "Chaguo C"]
+    select_many: ["Chaguo A", "Chaguo B", "Chaguo C", "Chaguo D", "Chaguo E"]
+    prioritise: ["Chaguo A", "Chaguo B", "Chaguo C", "Chaguo D"]
+    yes_no: ["Ndiyo", "Hapana"]
+    select_one_grid: ["A", "B", "C", "D"]
+    select_many_grid: ["A", "B", "C", "D"]
+    tap_card: ["Kauli 1", "Kauli 2", "Kauli 3", "Kauli 4", "Kauli 5"]
+    scenario: ["Chaguo A", "Chaguo B"]
+    open_ended: []
+    welcome_card: []
+    token_checkpoint: []
+    consent_gate: []
   js:
     player:
       region_meta: "Majibu %{count} yalishiriki kanda"
@@ -293,6 +309,97 @@ sw:
         next_page_btn: "Ukurasa unaofuata ›"
         answer_kicker: "Chaguo za jibu"
         choose_kicker: "Fanya chaguo lako"
+        delete_page: "✕ Futa ukurasa huu"
+        add_page: "＋ Ongeza ukurasa"
+        prev_page: "Ukurasa uliotangulia"
+      add_question:
+        add_to_survey: "Ongeza kwenye utafiti →"
+        adding: "Inaongeza…"
+        add_failed: "Imeshindwa kuongeza swali: %{message}"
+        enter_question_first: "Andika swali kwanza, kisha uliongeze kwenye utafiti."
+        saved_read_failed: "Imeshindwa kusoma swali hilo lililohifadhiwa — jaribu jingine, au anza kutoka mwanzo."
+        generation_failed: "Imeshindwa kutengeneza"
+        render_failed: "Imeshindwa kuonyesha"
+        low_end: "Upande wa chini"
+        high_end: "Upande wa juu"
+        remove_option: "Ondoa chaguo"
+      end_screens:
+        title_placeholder: "Kichwa cha skrini (mf. Jiunge na kituo cha UK)"
+        body_placeholder: "Ujumbe"
+        url_placeholder: "https://buy.stripe.com/… (kiungo cha hiari)"
+        button_placeholder: "Maandishi ya kitufe (mf. Lipa na ujiunge)"
+      token_types:
+        icon_label: "Ikoni ya tokeni"
+        name_label: "Jina la tokeni"
+        name_placeholder: "mf. Sarafu za Dhahabu"
+      logic_continue: "Endelea (mtiririko chaguomsingi)"
+      compat:
+        multiple_choice:
+          select_one_grid: "Chaguomsingi la Playverto kwa jibu moja — gridi ya picha inavutia kimchezo, huongeza ushiriki na hukuruhusu kuambatanisha kila chaguo na picha au rangi."
+          multiple_choice: "Orodha yenye picha, jibu moja — kigae kidogo upande wa kushoto wa kila chaguo. Rudi kwa hili lebo zikiwa ndefu au chaguo zikiwa nyingi mno kutoshea kwenye gridi."
+          select_many_grid: "Gridi ile ile ya picha, lakini inaruhusu watu kuchagua zaidi ya moja — badilisha kwa hili jibu lisipokuwa chaguo moja tu."
+          select_many: "Orodha yenye picha, chaguo nyingi — mpangilio ule ule wa kigae kushoto, na wigo mpana zaidi wa majibu; tumia gridi isipotosheleza."
+          yes_no: "Hupunguza undani hadi majibu mawili — fanya hivi tu ukitaka kweli ishara kali ya ndiyo/hapana."
+          range: "Hupoteza uwazi wa makundi wa orodha — badilisha tu ikiwa jibu liko kweli kwenye kipimo."
+        select_many:
+          select_many_grid: "Chaguomsingi la Playverto kwa chaguo nyingi — gridi ya picha au sampuli za rangi hupata majibu tajiri zaidi kuliko orodha tambarare."
+          select_many: "Orodha yenye picha, chaguo nyingi — kigae kidogo upande wa kushoto wa kila chaguo. Rudi kwa hili lebo zikiwa ndefu au chaguo zikiwa nyingi mno kwa gridi."
+          select_one_grid: "Gridi ile ile ya picha lakini imefungwa kwa chaguo moja — badilisha jibu moja la maamuzi likiwa muhimu zaidi kuliko wingi."
+          multiple_choice: "Orodha yenye picha, jibu moja — mpangilio ule ule wa kigae kushoto; ishara iliyo wazi zaidi, lakini chaguo linalobana zaidi hapa."
+          prioritise: "Chaguo zile zile, lakini wajibu huziburuta katika mpangilio wa kipaumbele — data tajiri zaidi (MPANGILIO wa upendeleo), si tu walichochagua."
+        prioritise:
+          prioritise: "Orodha ya kuburuta na kupanga — wajibu hupanga chaguo kutoka juu hadi chini, hivyo unajifunza mpangilio wa upendeleo. Bora zaidi na chaguo takriban tano."
+          select_many: "Orodha ile ile bila upangaji — badilisha ikiwa unahitaji tu kujua chaguo wangezichagua, si mpangilio wake."
+          select_one_grid: "Hupunguza upangaji hadi chaguo moja la picha — tu ikiwa jibu moja la maamuzi ni muhimu zaidi kuliko mpangilio."
+        select_one_grid:
+          select_one_grid: "Chaguo moja la picha — bora picha au rangi zinapozungumza zenyewe na unataka mwitikio wa haraka wa hisia."
+          select_many_grid: "Picha zile zile, chaguo nyingi — bora zaidi ikiwa zaidi ya chaguo moja linaweza kuwagusa."
+          multiple_choice: "Orodha yenye picha, jibu moja — kigae kidogo upande wa kushoto wa kila chaguo. Badilisha chaguo zikiwa ndefu au nyingi mno kutoshea kwenye gridi."
+          select_many: "Orodha yenye picha, chaguo nyingi — mpangilio ule ule wa kigae kushoto, lakini hupoteza uwazi wa chaguo moja."
+        select_many_grid:
+          select_many_grid: "Chaguo nyingi za picha — bora wajibu wanapoweza kujitambua na chaguo kadhaa za picha kwa wakati mmoja."
+          select_one_grid: "Muonekano ule ule wa picha lakini umefungwa kwa moja — chagua hili ukihitaji uamuzi mmoja wa wazi."
+          select_many: "Orodha yenye picha, chaguo nyingi — kigae kidogo upande wa kushoto wa kila chaguo. Rudi kwa hili lebo zikiwa ndefu au chaguo zikiwa nyingi mno kwa gridi."
+          multiple_choice: "Orodha yenye picha, jibu moja — mpangilio ule ule wa kigae kushoto; ishara iliyo wazi zaidi, lakini chaguo linalobana zaidi hapa."
+        tap_card:
+          tap_card: "Miitikio ya haraka ya hisia yenye mtindo wa mchezo — kamili kwa kujaribu kauli kadhaa fupi bila uchovu wa utafiti."
+          range: "Hubadilisha kasi kwa undani — tumia ukipendelea kuona jinsi watu wanavyokubaliana kwa nguvu badala ya kwa kasi gani."
+          rating: "Nyota hutoa kipimo kinachojulikana, lakini unapoteza mtiririko wa haraka wa kuburuta."
+          select_one_grid: "Huondoa mbinu ya kuvutia ya kuburuta — badilisha tu ikiwa swali kweli ni chaguo moja tuli."
+        scenario:
+          scenario: "Hadithi fupi ambayo wajibu huipitia ukurasa kwa ukurasa, kisha chaguo la chaguo 2–3 kwenye ukurasa wa mwisho — bora kwa maswali marefu ya kimazingira ambayo yangelemea kadi moja."
+          multiple_choice: "Huacha mjengeko wa hadithi kwa orodha rahisi ya jibu moja — badilisha ikiwa muktadha wa hadithi hauongezi chochote."
+          yes_no: "Huipunguza hadi ndiyo/hapana tupu — tu ikiwa hadithi kweli inajumlishwa kuwa ndiyo/hapana."
+        range:
+          range: "Bora zaidi katika kunasa nguvu ya hisia, na mhusika wa uhuishaji anayeitikia hufanya kujibu kufurahishe — mgawanyo safi pamoja na muonekano unaovutia."
+          nps: "Kipimo cha kawaida cha 0–10 kwenye kitelezi kifupi cha wima — badilisha kwa hali tulivu ya kimapokeo, bila uhuishaji."
+          rating: "Umbo linalofanana, lakini nyota zinajulikana zaidi ingawa hazielezi hisia kwa undani ule ule."
+          tap_card: "Hubadilisha kipimo kwa ndiyo/hapana kwa kila kauli — kinavutia zaidi, lakini undani hupungua."
+          yes_no: "Hupunguza kipimo hadi majibu mawili — na data nyingi huondoka nayo. Tumia tu ikiwa ndiyo/hapana ndiyo maarifa yenyewe."
+        rating:
+          rating: "Kipimo cha nyota kinaeleweka papo hapo na hutoa alama inayolinganishika kati ya maswali."
+          nps: "Hali ya kawaida ya 0–10 kwenye kitelezi kifupi cha wima — huchukua nafasi pale nyota zinapoonekana za kawaida mno."
+          range: "Kipimo kinachoeleza zaidi chenye ncha maalum na mhusika wa uhuishaji anayeitikia — bora wigo usipokuwa 'nzuri/mbaya' wa kawaida."
+          tap_card: "Hupoteza kipimo, lakini kinavutia zaidi ukitaka mwitikio wa haraka wa hisia kwa vipengele kadhaa."
+          select_one_grid: "Husambaratisha kipimo kuwa vigae tofauti vyenye lebo — hupoteza ulaini ambao watu huupenda kwenye nyota."
+        nps:
+          nps: "Kipimo kifupi cha wima cha 0–10 — safi na kinachojulikana kwa maswali ya maoni / kuridhika."
+          range: "Kipimo kile kile cha maoni cha pointi 5 chenye mhusika wa uhuishaji anayeitikia — badilisha pale muonekano unaovutia unapoinua ubora wa majibu."
+          rating: "Kipimo cha nyota ndicho msingi unaojulikana — badilisha ikiwa ukadiriaji wa nyota wa mlalo unaifaa hadhira zaidi."
+          tap_card: "Badilisha kipimo kwa ndiyo/hapana ya haraka kwa kauli kadhaa — tu ikiwa una nyingi za kujaribu."
+          yes_no: "Hupunguza kipimo hadi majibu mawili — na ishara nyingi huondoka nayo. Tumia tu ikiwa ndiyo/hapana ndiyo maarifa yenyewe."
+        yes_no:
+          yes_no: "Ishara kali unapohitaji kweli jibu la aina mbili — rahisi kusoma na rahisi kujibu."
+          select_one_grid: "Huongeza undani kwa chaguo chache za picha zilizobainishwa — bora pale 'ndiyo/hapana' inapoficha jibu halisi."
+          range: "Huongeza kipimo cha pointi 5 chenye mhusika wa uhuishaji anayeitikia — bora pale kiwango kinapokuwa muhimu na unataka muonekano unaovutia."
+          nps: "Huongeza kipimo kifupi cha wima cha 0–10 — bora pale kiwango kinapokuwa muhimu zaidi kuliko jibu la aina mbili."
+          tap_card: "Endesha ndiyo/hapana ya haraka kwa kauli kadhaa kwa pamoja — badilisha tu ikiwa una nyingi za kujaribu."
+        open_ended:
+          open_ended: "Huwaruhusu watu kujibu kwa maneno yao wenyewe — ishara tajiri zaidi ya kimaelezo, lakini ngumu zaidi kujumlisha."
+          select_one_grid: "Hubadilisha nukuu halisi kwa makundi ya picha ya haraka yanayolinganishika — chagua hili ikiwa tayari unajua majibu yanayowezekana."
+          range: "Hufanya kazi tu ikiwa jibu linajumlishwa kuwa kipimo kimoja — mara nyingi hupoteza sababu ya kuwa swali huru."
+        welcome_card:
+          welcome_card: "Huweka mazingira kabla ya maswali yoyote — kadi bora ya kwanza kwa hadhira mpya inayohitaji muktadha."
     wizard:
       step_counter: Hatua %{n} kati ya %{total}
     results:
@@ -304,6 +411,7 @@ sw:
       compare_summarize_btn: '✦ Fupisha kwa AI'
       compare_summarizing: 'Inafupisha…'
       compare_summarize_error: 'Imeshindwa kufupisha kwa sasa.'
+      chat_error: "Samahani, hitilafu imetokea. Tafadhali jaribu tena."
   nav:
     partnerships: "Washirika"
     funders: "Wafadhili"

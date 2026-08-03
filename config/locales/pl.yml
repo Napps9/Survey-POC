@@ -150,6 +150,22 @@ pl:
     quiz_compare_cta: "Zobacz, jak wypadasz →"
     quiz_compare_title: "Jak wypadasz"
     tokens_welcome_note: "Będziesz zdobywać punkty za każdą odpowiedź — nie możesz cofnąć się i zmienić odpowiedzi, aby zdobyć ich więcej."
+  defaults:
+    range: ["Zdecydowanie się nie zgadzam", "Nie zgadzam się", "Neutralnie", "Zgadzam się", "Zdecydowanie się zgadzam"]
+    nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    rating: ["Słabo", "Przeciętnie", "Dobrze", "Bardzo dobrze", "Znakomicie"]
+    multiple_choice: ["Opcja A", "Opcja B", "Opcja C"]
+    select_many: ["Opcja A", "Opcja B", "Opcja C", "Opcja D", "Opcja E"]
+    prioritise: ["Opcja A", "Opcja B", "Opcja C", "Opcja D"]
+    yes_no: ["Tak", "Nie"]
+    select_one_grid: ["A", "B", "C", "D"]
+    select_many_grid: ["A", "B", "C", "D"]
+    tap_card: ["Stwierdzenie 1", "Stwierdzenie 2", "Stwierdzenie 3", "Stwierdzenie 4", "Stwierdzenie 5"]
+    scenario: ["Opcja A", "Opcja B"]
+    open_ended: []
+    welcome_card: []
+    token_checkpoint: []
+    consent_gate: []
   js:
     player:
       region_meta: "%{count} odpowiedzi z regionem"
@@ -293,6 +309,97 @@ pl:
         next_page_btn: "Następna strona ›"
         answer_kicker: "Opcje odpowiedzi"
         choose_kicker: "Dokonaj wyboru"
+        delete_page: "✕ Usuń tę stronę"
+        add_page: "＋ Dodaj stronę"
+        prev_page: "Poprzednia strona"
+      add_question:
+        add_to_survey: "Dodaj do ankiety →"
+        adding: "Dodawanie…"
+        add_failed: "Nie udało się dodać pytania: %{message}"
+        enter_question_first: "Najpierw wpisz pytanie, a potem dodaj je do ankiety."
+        saved_read_failed: "Nie udało się odczytać tego zapisanego pytania — wybierz inne albo zacznij od pustego."
+        generation_failed: "Generowanie nie powiodło się"
+        render_failed: "Renderowanie nie powiodło się"
+        low_end: "Dolny koniec"
+        high_end: "Górny koniec"
+        remove_option: "Usuń opcję"
+      end_screens:
+        title_placeholder: "Tytuł ekranu (np. Dołącz do huba UK)"
+        body_placeholder: "Wiadomość"
+        url_placeholder: "https://buy.stripe.com/… (opcjonalny link)"
+        button_placeholder: "Etykieta przycisku (np. Zapłać i dołącz)"
+      token_types:
+        icon_label: "Ikona tokenu"
+        name_label: "Nazwa tokenu"
+        name_placeholder: "np. Złote monety"
+      logic_continue: "Kontynuuj (domyślny przepływ)"
+      compat:
+        multiple_choice:
+          select_one_grid: "Domyślny wybór Playverto dla pojedynczego wskazania — wizualna siatka jest lekka i wciągająca, a każdą opcję możesz podeprzeć obrazem lub kolorem."
+          multiple_choice: "Lista z obrazkami, jeden wybór — mały kafelek po lewej stronie każdej opcji. Sięgnij po nią, gdy etykiety są długie albo opcji jest zbyt wiele, by ładnie zmieścić je w siatce."
+          select_many_grid: "Ta sama wizualna siatka, ale można wybrać więcej niż jedną opcję — przełącz, gdy odpowiedź nie sprowadza się do jednego wyboru."
+          select_many: "Lista z obrazkami, wielokrotny wybór — ten sam układ z kafelkiem po lewej, szerszy zestaw odpowiedzi; użyj, gdy siatka się nie mieści."
+          yes_no: "Spłaszcza niuanse do dwóch odpowiedzi — rób to tylko wtedy, gdy naprawdę potrzebujesz twardego sygnału tak/nie."
+          range: "Traci kategorialną klarowność listy — zamieniaj tylko wtedy, gdy odpowiedź naprawdę leży na skali."
+        select_many:
+          select_many_grid: "Domyślny wybór Playverto dla wielokrotnego wskazania — wizualna siatka z obrazami lub próbkami kolorów daje bogatsze odpowiedzi niż płaska lista."
+          select_many: "Lista z obrazkami, wielokrotny wybór — mały kafelek po lewej stronie każdej opcji. Sięgnij po nią, gdy etykiety są długie albo opcji jest zbyt wiele, by ładnie zmieścić je w siatce."
+          select_one_grid: "Ta sama wizualna siatka, ale ograniczona do jednego wyboru — przełącz, gdy jedna rozstrzygająca odpowiedź jest ważniejsza niż szeroki obraz."
+          multiple_choice: "Lista z obrazkami, jeden wybór — ten sam układ z kafelkiem po lewej, najostrzejszy odczyt, ale najbardziej redukująca opcja tutaj."
+          prioritise: "Te same opcje, ale respondenci przeciągają je w kolejności ważności — bogatsze dane (KOLEJNOŚĆ preferencji), a nie tylko to, co wybrali."
+        prioritise:
+          prioritise: "Lista układana przeciąganiem — respondenci porządkują opcje od najważniejszej do najmniej ważnej, więc poznajesz kolejność preferencji. Najlepiej działa przy około pięciu opcjach."
+          select_many: "Ta sama lista bez porządkowania — przełącz, jeśli chcesz tylko wiedzieć, które opcje by wybrali, a nie w jakiej kolejności."
+          select_one_grid: "Sprowadza ranking do jednego wizualnego wyboru — tylko jeśli jedna rozstrzygająca odpowiedź jest ważniejsza niż kolejność."
+        select_one_grid:
+          select_one_grid: "Wizualny pojedynczy wybór — najlepszy, gdy obraz lub kolor mówi za siebie, a Ty chcesz szybkiej, instynktownej reakcji."
+          select_many_grid: "Te same obrazy, wielokrotny wybór — lepszy, gdy więcej niż jedna opcja może trafić do respondenta."
+          multiple_choice: "Lista z obrazkami, jeden wybór — mały kafelek po lewej stronie każdej opcji. Przełącz, gdy opcje są długie albo jest ich zbyt wiele na siatkę."
+          select_many: "Lista z obrazkami, wielokrotny wybór — ten sam układ z kafelkiem po lewej, ale traci klarowność pojedynczego wyboru."
+        select_many_grid:
+          select_many_grid: "Wizualny wielokrotny wybór — najlepszy, gdy respondenci mogą utożsamiać się z kilkoma obrazowymi opcjami naraz."
+          select_one_grid: "To samo wizualne wrażenie, ale ograniczone do jednego — wybierz to, jeśli potrzebujesz jednej rozstrzygającej decyzji."
+          select_many: "Lista z obrazkami, wielokrotny wybór — mały kafelek po lewej stronie każdej opcji. Sięgnij po nią, gdy etykiety są długie albo opcji jest zbyt wiele na siatkę."
+          multiple_choice: "Lista z obrazkami, jeden wybór — ten sam układ z kafelkiem po lewej, najostrzejszy odczyt, ale najbardziej redukująca opcja tutaj."
+        tap_card:
+          tap_card: "Szybkie, zgrywalizowane reakcje instynktowne — idealne do przetestowania kilku krótkich stwierdzeń bez zmęczenia ankietą."
+          range: "Zastępuje szybkość niuansem — użyj, jeśli wolisz zobaczyć, jak mocno ludzie się zgadzają, a nie jak szybko."
+          rating: "Gwiazdki dają znajomą skalę, ale tracisz dynamiczne wrażenie przesuwania."
+          select_one_grid: "Usuwa zabawną mechanikę przesuwania — zamieniaj tylko wtedy, gdy pytanie naprawdę jest jednym statycznym wyborem."
+        scenario:
+          scenario: "Krótka historia, którą respondenci przewracają strona po stronie, a na ostatniej stronie wybierają spośród 2–3 opcji — najlepsza do dłuższych, sytuacyjnych pytań, które przytłoczyłyby jedną kartę."
+          multiple_choice: "Porzuca narracyjne budowanie kontekstu na rzecz zwykłej listy z jednym wyborem — przełącz, jeśli kontekst historii nic nie wnosi."
+          yes_no: "Ogołaca do czystej alternatywy — tylko jeśli historia naprawdę sprowadza się do tak/nie."
+        range:
+          range: "Najlepiej oddaje siłę odczuć, a reagująca animowana postać sprawia, że odpowiadanie daje frajdę — czysty rozkład plus angażujący element wizualny."
+          nps: "Klasyczna skala 0–10 na kompaktowym pionowym suwaku — przełącz dla spokojniejszego, tradycyjnego charakteru bez animacji."
+          rating: "Podobny kształt, ale gwiazdki są bardziej znajome i odrobinę mniej wyraziste."
+          tap_card: "Zamienia skalę na tak/nie przy każdym stwierdzeniu — bardziej angażujące, mniej szczegółowe."
+          yes_no: "Ogołaca skalę do dwóch odpowiedzi — razem z nią przepada większość danych. Używaj tylko wtedy, gdy alternatywa tak/nie jest samym sednem."
+        rating:
+          rating: "Skala gwiazdek jest zrozumiała od razu i daje porównywalny wynik między pytaniami."
+          nps: "Klasyczne wrażenie 0–10 na kompaktowym pionowym suwaku — sprawdza się tam, gdzie gwiazdki wydają się zbyt sztampowe."
+          range: "Bardziej wyrazista skala z własnymi krańcami i reagującą animowaną postacią — lepsza, gdy spektrum nie sprowadza się do zwykłego „dobrze/źle”."
+          tap_card: "Traci skalę, ale bardziej angażuje, jeśli chcesz szybkiej, instynktownej oceny kilku pozycji."
+          select_one_grid: "Spłaszcza skalę do osobnych opisanych kafelków — traci płynność, na którą ludzie reagują przy gwiazdkach."
+        nps:
+          nps: "Kompaktowa pionowa skala 0–10 — czytelna i znajoma przy pytaniach o opinie i satysfakcję."
+          range: "Ta sama 5-punktowa skala opinii z reagującą animowaną postacią — przełącz, gdy angażujący element wizualny podnosi jakość odpowiedzi."
+          rating: "Skala gwiazdek to znajomy punkt wyjścia — przełącz, jeśli pozioma ocena gwiazdkowa lepiej pasuje do odbiorców."
+          tap_card: "Zastąp skalę szybkim, instynktownym tak/nie dla kilku stwierdzeń — tylko jeśli masz ich kilka do przetestowania."
+          yes_no: "Spłaszcza skalę do dwóch odpowiedzi — razem z nią przepada większość sygnału. Używaj tylko wtedy, gdy alternatywa tak/nie jest samym sednem."
+        yes_no:
+          yes_no: "Wyrazisty sygnał, gdy naprawdę potrzebujesz alternatywy — łatwy do odczytania i łatwy do udzielenia."
+          select_one_grid: "Dodaje niuans dzięki kilku zdefiniowanym wizualnym opcjom — lepszy, gdy „tak/nie” zasłania prawdziwą odpowiedź."
+          range: "Dodaje 5-punktową skalę z reagującą animowaną postacią — lepsza, gdy liczy się stopień i chcesz angażującego elementu wizualnego."
+          nps: "Dodaje kompaktową pionową skalę 0–10 — lepsza, gdy stopień znaczy więcej niż sama alternatywa."
+          tap_card: "Przeprowadź szybkie tak/nie dla kilku stwierdzeń naraz — zamieniaj tylko, jeśli masz ich kilka do przetestowania."
+        open_ended:
+          open_ended: "Pozwala ludziom odpowiadać własnymi słowami — najbogatszy sygnał jakościowy, ale trudniejszy do agregowania."
+          select_one_grid: "Zamienia surowe cytaty na szybkie, porównywalne wizualne kategorie — wybierz to, jeśli już znasz prawdopodobne odpowiedzi."
+          range: "Działa tylko wtedy, gdy odpowiedź sprowadza się do jednej skali — zwykle gubi sens pytania otwartego."
+        welcome_card:
+          welcome_card: "Nadaje ton, zanim padną pytania — idealna pierwsza karta dla odbiorców, którzy potrzebują kontekstu."
     wizard:
       step_counter: Krok %{n} z %{total}
     results:
@@ -304,6 +411,7 @@ pl:
       compare_summarize_btn: '✦ Podsumuj z AI'
       compare_summarizing: 'Podsumowywanie…'
       compare_summarize_error: 'Nie udało się teraz podsumować.'
+      chat_error: "Przepraszamy, coś poszło nie tak. Spróbuj ponownie."
   nav:
     partnerships: "Partnerzy"
     funders: "Fundatorzy"

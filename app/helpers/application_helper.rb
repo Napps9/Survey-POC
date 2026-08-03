@@ -227,6 +227,17 @@ module ApplicationHelper
     end
   end
 
+  # Placeholder answer options per card type, resolved in the VERTO's default
+  # locale (not the viewer's): they become real card content the moment a
+  # creator keeps them, so a French Verto edited from an English dashboard
+  # still starts its cards in French. Read by lib/default_options.js
+  # `defaultOptionsFor` via the `card-defaults` blob; the `defaults:` locale
+  # namespace mirrors DEFAULT_OPTIONS there, English fallback included.
+  def card_default_options_i18n(survey)
+    I18n.t("defaults", locale: survey.default_locale,
+                       default: I18n.t("defaults", locale: :en, default: {}))
+  end
+
   # Images present under app/assets/images/verto-library/, grouped by
   # sub-folder (`backgrounds`, `left-panel`, `select-art`, `range-art`,
   # `swipe-cards`, `mobile-backgrounds`, ...). Each value is an array of
@@ -407,7 +418,7 @@ module ApplicationHelper
       "</div>"
 
     when "multiple_choice", "select_many", "yes_no"
-      items  = type == "yes_no" ? %w[Yes No] : (opts.empty? ? [ "Option A", "Option B", "Option C" ] : opts.first(3))
+      items  = type == "yes_no" ? t("defaults.yes_no", default: %w[Yes No]) : (opts.empty? ? t("defaults.multiple_choice", default: [ "Option A", "Option B", "Option C" ]) : opts.first(3))
       square = type == "select_many" ? " mini-p-square" : ""
       rows   = items.map.with_index { |o, i|
         sel = i == 0 ? " selected" : ""
@@ -416,7 +427,7 @@ module ApplicationHelper
       "<div class=\"mini-pick-list\">#{rows}</div>"
 
     when "prioritise"
-      items = opts.empty? ? [ "Option A", "Option B", "Option C" ] : opts.first(3)
+      items = opts.empty? ? t("defaults.multiple_choice", default: [ "Option A", "Option B", "Option C" ]) : opts.first(3)
       rows  = items.map.with_index { |o, i|
         "<div class=\"mini-pick-item\"><span class=\"mini-p-dot selected\" style=\"display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff\">#{i + 1}</span>#{h(o.truncate(16))}</div>"
       }.join

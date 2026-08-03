@@ -152,6 +152,28 @@ en:
     quiz_compare_cta: "See how you compare →"
     quiz_compare_title: "How you compare"
     tokens_welcome_note: "You'll earn points as you answer each question — you can't go back and change an answer to earn more."
+  # Placeholder CONTENT a new card of each type starts with — answer options,
+  # scale labels, statements. Unlike UI chrome (which follows the viewer's
+  # locale), these are resolved in the Verto's default locale, because they are
+  # saved into the deck as real card content the moment the creator keeps them.
+  # Mirrors lib/default_options.js (the English fallback table); the editor
+  # receives this resolved per Verto via the `card-defaults` JSON blob.
+  defaults:
+    range: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
+    nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    rating: ["Poor", "Fair", "Good", "Great", "Excellent"]
+    multiple_choice: ["Option A", "Option B", "Option C"]
+    select_many: ["Option A", "Option B", "Option C", "Option D", "Option E"]
+    prioritise: ["Option A", "Option B", "Option C", "Option D"]
+    yes_no: ["Yes", "No"]
+    select_one_grid: ["A", "B", "C", "D"]
+    select_many_grid: ["A", "B", "C", "D"]
+    tap_card: ["Statement 1", "Statement 2", "Statement 3", "Statement 4", "Statement 5"]
+    scenario: ["Option A", "Option B"]
+    open_ended: []
+    welcome_card: []
+    token_checkpoint: []
+    consent_gate: []
   js:
     player:
       region_meta: "%{count} answers shared a region"
@@ -295,6 +317,97 @@ en:
         next_page_btn: "Next page ›"
         answer_kicker: "Answer options"
         choose_kicker: "Make your choice"
+        delete_page: "✕ Delete this page"
+        add_page: "＋ Add page"
+        prev_page: "Previous page"
+      add_question:
+        add_to_survey: "Add to survey →"
+        adding: "Adding…"
+        add_failed: "Couldn't add the question: %{message}"
+        enter_question_first: "Enter a question first, then add it to the survey."
+        saved_read_failed: "Couldn't read that saved question — try another, or start from blank."
+        generation_failed: "Generation failed"
+        render_failed: "Render failed"
+        low_end: "Low end"
+        high_end: "High end"
+        remove_option: "Remove option"
+      end_screens:
+        title_placeholder: "Screen title (e.g. Join the UK hub)"
+        body_placeholder: "Message"
+        url_placeholder: "https://buy.stripe.com/… (optional link)"
+        button_placeholder: "Button label (e.g. Pay & join)"
+      token_types:
+        icon_label: "Token icon"
+        name_label: "Token name"
+        name_placeholder: "e.g. Gold Coins"
+      logic_continue: "Continue (default flow)"
+      compat:
+        multiple_choice:
+          select_one_grid: "The Playverto default for a single-pick — visual grid feels playful, drives engagement, and lets you anchor each option with imagery or colour."
+          multiple_choice: "Image list, single pick — small tile left of each option. Fall back to this when labels are long or there are too many options to grid neatly."
+          select_many_grid: "Same visual grid, but lets people pick more than one — switch to this when the answer isn't a single choice."
+          select_many: "Image list, multi-pick — same tile-left layout, broader answer set; use when the grid can't fit."
+          yes_no: "Collapses nuance to two answers — only do this if you genuinely want a hard yes/no signal."
+          range: "Loses the categorical clarity of a list — only swap if the answer is really on a scale."
+        select_many:
+          select_many_grid: "The Playverto default for multi-pick — visual grid with imagery or colour swatches gets richer answers than a flat list."
+          select_many: "Image list, multi-pick — small tile left of each option. Fall back to this when labels are long or there are too many options to grid neatly."
+          select_one_grid: "Same visual grid but constrained to a single pick — switch when one decisive answer matters more than breadth."
+          multiple_choice: "Image list, single pick — same tile-left layout, sharpest read but most reductive option here."
+          prioritise: "Same options, but respondents drag them into an order of priority — richer data (the ORDER of preference), not just which they picked."
+        prioritise:
+          prioritise: "Drag-to-rank list — respondents order the options highest to lowest, so you learn the order of preference. Best with about five options."
+          select_many: "Same list without the ordering — switch if you only need which options they'd pick, not the order."
+          select_one_grid: "Collapses the ranking to a single visual pick — only if one decisive answer matters more than the order."
+        select_one_grid:
+          select_one_grid: "Visual single-pick — best when imagery or colour does the talking and you want a fast, gut response."
+          select_many_grid: "Same imagery, multi-pick — better when more than one option might resonate."
+          multiple_choice: "Image list, single pick — small tile left of each option. Switch when options are long or there are too many to fit a grid."
+          select_many: "Image list, multi-pick — same tile-left layout, loses the single-pick clarity."
+        select_many_grid:
+          select_many_grid: "Visual multi-pick — best when respondents may identify with several image-led options at once."
+          select_one_grid: "Same visual feel but constrained to one — pick this if you need a single decisive choice."
+          select_many: "Image list, multi-pick — small tile left of each option. Fall back when labels are long or there are too many to grid."
+          multiple_choice: "Image list, single pick — same tile-left layout, sharpest read but most reductive option here."
+        tap_card:
+          tap_card: "Quick, gamified gut reactions — perfect for testing several short statements without survey fatigue."
+          range: "Replaces speed with nuance — use if you'd rather see how strongly people agree than how fast."
+          rating: "Stars give a familiar scale, but you lose the rapid-fire feel of swipe."
+          select_one_grid: "Removes the playful swipe mechanic — only swap if the question really is a single static choice."
+        scenario:
+          scenario: "A short story respondents turn through page by page, then a 2–3 option choice on the last page — best for longer, situational prompts that would overwhelm a single card."
+          multiple_choice: "Drops the narrative build-up for a plain single-pick list — switch if the story context isn't adding anything."
+          yes_no: "Strips it to a bare binary — only if the story genuinely reduces to a yes/no."
+        range:
+          range: "Best at capturing strength of feeling, and the reactive animated character makes answering feel rewarding — a clean distribution plus an engaging visual."
+          nps: "Classic 0–10 scale on a compact vertical slider — switch for a quieter, traditional feel without the animation."
+          rating: "Similar shape, but stars are more familiar and a touch less expressive."
+          tap_card: "Trades the scale for a yes/no per statement — more engaging, less granular."
+          yes_no: "Strips the scale to two answers — most data goes with it. Only use if the binary is the insight."
+        rating:
+          rating: "Star scale is instantly understood and gives a comparable score across questions."
+          nps: "Classic 0–10 feel on a compact vertical slider — picks up where stars feel generic."
+          range: "More expressive scale with custom endpoints and a reactive animated character — better when the spectrum isn't generic 'good/bad'."
+          tap_card: "Loses the scale, but more engaging if you want a quick gut take across several items."
+          select_one_grid: "Flattens the scale into discrete labelled tiles — loses the smoothness people respond to in stars."
+        nps:
+          nps: "Compact 0–10 vertical scale — clean and familiar for opinion / satisfaction questions."
+          range: "Same 5-point opinion scale with a reactive animated character — switch when an engaging visual lifts response quality."
+          rating: "Star scale is the familiar baseline — switch if a horizontal star rating fits the audience better."
+          tap_card: "Replace the scale with a quick gut yes/no across several statements — only if you have multiple to test."
+          yes_no: "Collapses the scale to two answers — most signal goes with it. Only use if the binary is the insight."
+        yes_no:
+          yes_no: "Crisp signal when you genuinely need a binary — easy to read and easy to answer."
+          select_one_grid: "Adds nuance with a few defined visual options — better when 'yes/no' is hiding the real answer."
+          range: "Adds a 5-point scale with a reactive animated character — better when degree matters and you want an engaging visual."
+          nps: "Adds a compact 0–10 vertical scale — better when degree matters more than the binary."
+          tap_card: "Run a quick yes/no across several statements at once — only swap if you have multiple to test."
+        open_ended:
+          open_ended: "Lets people answer in their own words — richest qualitative signal, but harder to aggregate."
+          select_one_grid: "Trades raw quotes for fast, comparable visual categories — pick this if you already know the likely answers."
+          range: "Only works if the answer collapses to a single scale — usually loses the point of going open-ended."
+        welcome_card:
+          welcome_card: "Sets the tone before any questions — ideal first card for cold audiences who need context."
     wizard:
       step_counter: "Step %{n} of %{total}"
     results:
@@ -306,6 +419,7 @@ en:
       compare_summarize_btn: "✦ Summarise with AI"
       compare_summarizing: "Summarising…"
       compare_summarize_error: "Couldn't summarise right now."
+      chat_error: "Sorry, something went wrong. Please try again."
   nav:
     partnerships: "Partners"
     funders: "Funders"

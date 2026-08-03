@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { ROUTABLE_TYPES } from "lib/routable_types"
 import { PAGED_TYPES, isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
-import { DEFAULT_OPTIONS } from "lib/default_options"
+import { DEFAULT_OPTIONS, defaultOptionsFor } from "lib/default_options"
 import { t } from "lib/i18n"
 
 
@@ -59,6 +59,11 @@ function loadFramework() {
 // Each entry's `note` is shown as the natural-language reason this type
 // works (or doesn't) for the selected card. The `score` only drives the
 // fit-tier badge ("Best fit" / "Strong alternative" / etc.).
+//
+// The notes below are the ENGLISH FALLBACK — the displayed copy comes from
+// `js.editor.compat.<from>.<to>` in the locale files (all 19 mirror this
+// table), looked up via compatNote(). A note edited here must be edited
+// there too, or every locale silently keeps the old wording.
 const COMPATIBILITY = {
   multiple_choice: [
     { type: "select_one_grid",  score: 100, note: "The Playverto default for a single-pick — visual grid feels playful, drives engagement, and lets you anchor each option with imagery or colour." },
@@ -164,6 +169,15 @@ function esc(s) {
                        .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
 }
 
+// The localised compatibility note for switching `fromType` → `entry.type`.
+// t() returns the key itself when a translation is missing, so an untranslated
+// pair falls back to the English note baked into COMPATIBILITY.
+function compatNote(fromType, entry) {
+  const key = `editor.compat.${fromType}.${entry.type}`
+  const v = t(key)
+  return v === key ? entry.note : v
+}
+
 // Bucket a 0–100 compatibility score into a short, plain-English fit tier.
 function fitTier(score) {
   if (score >= 100) return t("editor.fit_best")
@@ -179,16 +193,19 @@ const COMPONENTS = {
   select_many:     (opts) => choiceListHtml(opts, "multi"),
   prioritise:      (opts) => prioritiseHtml(opts),
 
-  yes_no: () => `
+  yes_no: (opts) => {
+    const labels = (opts || []).length >= 2 ? opts : defaultOptionsFor("yes_no")
+    return `
     <ul class="choice-list choice-list--yesno" data-controller="picker" data-picker-mode-value="single">
-      ${[["Yes", 1], ["No", 4]].map(([label, bg]) => `
+      ${[[labels[0], 1], [labels[1], 4]].map(([label, bg]) => `
         <li class="choice-list-item pick-item" data-picker-target="item"
             data-action="click->picker#pick" data-selected="false">
           <div class="choice-list-tile choice-bg-${bg}"></div>
-          <span class="pick-text choice-list-label" contenteditable="true">${label}</span>
+          <span class="pick-text choice-list-label" contenteditable="true">${esc(label)}</span>
           <span class="choice-list-tick pick-dot">✓</span>
         </li>`).join("")}
-    </ul>`,
+    </ul>`
+  },
 
   select_one_grid:  (opts) => gridHtml(opts, "single"),
   select_many_grid: (opts) => gridHtml(opts, "multi"),
@@ -205,7 +222,7 @@ const COMPONENTS = {
           return `<div class="rotate-card" data-tap-stack-target="card"
                        style="background:${bg};">
                     <span contenteditable="true" style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;">${esc(o)}</span>
-                    <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${i}" title="Change this statement's image">
+                    <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${i}" title="${esc(t("editor.change_statement_image_title"))}">
                       <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
                     </button>
                     <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption">×</button>
@@ -213,9 +230,9 @@ const COMPONENTS = {
         }).join("")}
       </div>
       <div class="swipe-indicator">
-        <span style="color:#D80027;font-weight:700">← No</span>
-        <span class="mx-3">drag card to answer</span>
-        <span style="color:#01EACB;font-weight:700">Yes →</span>
+        <span style="color:#D80027;font-weight:700">← ${esc(t("card.swipe_no"))}</span>
+        <span class="mx-3">${esc(t("card.swipe_hint"))}</span>
+        <span style="color:#01EACB;font-weight:700">${esc(t("card.swipe_yes"))} →</span>
       </div>
       <div class="rotate-actions">
         <button type="button" class="rotate-action-btn rotate-action-no"
@@ -223,7 +240,7 @@ const COMPONENTS = {
         <button type="button" class="rotate-action-btn rotate-action-yes"
                 data-action="click->tap-stack#pick" data-tap-stack-direction="right">✓</button>
       </div>
-      <button type="button" class="tap-add-btn" data-action="click->card-editor#addTapOption">＋ Add statement</button>
+      <button type="button" class="tap-add-btn" data-action="click->card-editor#addTapOption">＋ ${esc(t("card.add_statement"))}</button>
     </div>`
   },
 
@@ -237,9 +254,9 @@ const COMPONENTS = {
     const pagesHtml = pages.map((p, i) => `
       <div class="book-page" data-scenario-target="page" data-page-id="${esc(p.id || "")}">
         <div class="book-page-scroll">
-          <div class="book-page-kicker" data-scenario-target="kicker">Page ${i + 1} of ${pages.length}</div>
+          <div class="book-page-kicker" data-scenario-target="kicker">${esc(t("editor.scenario.page_of", { n: i + 1, total: pages.length }))}</div>
           <div class="book-page-text" contenteditable="true" data-scenario-target="pageText"
-               data-placeholder="Write this page…">${esc(p.text || "")}</div>
+               data-placeholder="${esc(t("editor.scenario.page_placeholder"))}">${esc(p.text || "")}</div>
         </div>
         <div class="book-page-corner">${i + 1}</div>
         <div class="book-page-fade"></div>
@@ -247,7 +264,7 @@ const COMPONENTS = {
     const answerHtml = `
       <div class="book-page is-answer" data-scenario-target="page">
         <div class="book-page-scroll">
-          <div class="book-page-kicker">Answer options</div>
+          <div class="book-page-kicker">${esc(t("editor.scenario.answer_kicker"))}</div>
           <ul class="choice-list choice-list--single" data-controller="picker card-editor" data-picker-mode-value="single">
             ${opts.map((o, i) => `
               <li class="choice-list-item pick-item" data-picker-target="item"
@@ -258,7 +275,7 @@ const COMPONENTS = {
                 <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
               </li>`).join("")}
             <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
-              <span>＋</span> Add option
+              <span>＋</span> ${esc(t("card.add_option"))}
             </li>
           </ul>
         </div>
@@ -268,13 +285,13 @@ const COMPONENTS = {
       <div class="book-wrap" data-controller="scenario card-editor" data-scenario-editable-value="true">
         <div class="book-stack" data-scenario-target="stack">${pagesHtml}${answerHtml}</div>
         <div class="book-edit-tools" data-scenario-target="editTools">
-          <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn" data-action="click->scenario#deletePage">✕ Delete this page</button>
-          <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn" data-action="click->scenario#addPage">＋ Add page</button>
+          <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn" data-action="click->scenario#deletePage">${esc(t("editor.scenario.delete_page"))}</button>
+          <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn" data-action="click->scenario#addPage">${esc(t("editor.scenario.add_page"))}</button>
         </div>
         <div class="book-dots" data-scenario-target="dots"></div>
         <div class="book-nav-row">
-          <button type="button" class="book-chevron" data-scenario-target="prevBtn" data-action="click->scenario#back" aria-label="Previous page">‹</button>
-          <button type="button" class="next-btn" data-scenario-target="nextBtn" data-action="click->scenario#next">Next page ›</button>
+          <button type="button" class="book-chevron" data-scenario-target="prevBtn" data-action="click->scenario#back" aria-label="${esc(t("editor.scenario.prev_page"))}">‹</button>
+          <button type="button" class="next-btn" data-scenario-target="nextBtn" data-action="click->scenario#next">${esc(t("editor.scenario.next_page_btn"))}</button>
         </div>
         <div class="book-live" data-scenario-target="live" aria-live="polite"></div>
       </div>`
@@ -295,9 +312,9 @@ const COMPONENTS = {
     const pagesHtml = pages.map((p, i) => `
       <div class="book-page" data-scenario-target="page" data-page-id="${esc(p.id || "")}">
         <div class="book-page-scroll">
-          <div class="book-page-kicker" data-scenario-target="kicker">Page ${i + 1} of ${pages.length}</div>
+          <div class="book-page-kicker" data-scenario-target="kicker">${esc(t("editor.scenario.page_of", { n: i + 1, total: pages.length }))}</div>
           <div class="book-page-text" contenteditable="true" data-scenario-target="pageText"
-               data-placeholder="Write this consent screen…">${esc(p.text || "")}</div>
+               data-placeholder="${esc(t("editor.consent_page_placeholder"))}">${esc(p.text || "")}</div>
         </div>
         <div class="book-page-corner">${i + 1}</div>
         <div class="book-page-fade"></div>
@@ -307,11 +324,11 @@ const COMPONENTS = {
         <div class="book-stack" data-scenario-target="stack">${pagesHtml}
           <div class="book-page is-answer" data-scenario-target="page">
             <div class="book-page-scroll">
-              <div class="book-page-kicker">Agreement</div>
+              <div class="book-page-kicker">${esc(t("editor.consent_agreement_kicker"))}</div>
               <div class="play-consent-main">
                 <div class="play-consent-actions" aria-hidden="true" style="pointer-events:none;">
-                  <button type="button" class="play-consent-agree" tabindex="-1">Agree &amp; continue</button>
-                  <button type="button" class="play-consent-decline" tabindex="-1">I don't agree</button>
+                  <button type="button" class="play-consent-agree" tabindex="-1">${esc(t("player.consent_agree"))}</button>
+                  <button type="button" class="play-consent-decline" tabindex="-1">${esc(t("player.consent_decline"))}</button>
                 </div>
               </div>
             </div>
@@ -319,13 +336,13 @@ const COMPONENTS = {
           </div>
         </div>
         <div class="book-edit-tools" data-scenario-target="editTools">
-          <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn" data-action="click->scenario#deletePage">✕ Delete this page</button>
-          <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn" data-action="click->scenario#addPage">＋ Add page</button>
+          <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn" data-action="click->scenario#deletePage">${esc(t("editor.scenario.delete_page"))}</button>
+          <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn" data-action="click->scenario#addPage">${esc(t("editor.scenario.add_page"))}</button>
         </div>
         <div class="book-dots" data-scenario-target="dots"></div>
         <div class="book-nav-row">
-          <button type="button" class="book-chevron" data-scenario-target="prevBtn" data-action="click->scenario#back" aria-label="Previous page">‹</button>
-          <button type="button" class="next-btn" data-scenario-target="nextBtn" data-action="click->scenario#next">Next page ›</button>
+          <button type="button" class="book-chevron" data-scenario-target="prevBtn" data-action="click->scenario#back" aria-label="${esc(t("editor.scenario.prev_page"))}">‹</button>
+          <button type="button" class="next-btn" data-scenario-target="nextBtn" data-action="click->scenario#next">${esc(t("editor.scenario.next_page_btn"))}</button>
         </div>
         <div class="book-live" data-scenario-target="live" aria-live="polite"></div>
       </div>`
@@ -337,9 +354,10 @@ const COMPONENTS = {
 
   rating: (opts, ctx = {}) => {
     const icon = ctx.ratingIcon || { on: "★", off: "☆", kind: "star" }
-    const labels = opts.length >= 2 ? opts : ["Poor", "Fair", "Good", "Great", "Excellent"]
-    const first  = labels[0] || "Poor"
-    const last   = labels[labels.length - 1] || "Excellent"
+    const fallback = defaultOptionsFor("rating")
+    const labels = opts.length >= 2 ? opts : fallback
+    const first  = labels[0] || fallback[0]
+    const last   = labels[labels.length - 1] || fallback[fallback.length - 1]
     return `
       <div class="rating-wrap rating-kind-${icon.kind}" data-controller="rating">
         <div class="rating-stars">
@@ -361,10 +379,10 @@ const COMPONENTS = {
 
   open_ended: () => `
     <div class="freeform-wrap" data-controller="freeform" data-freeform-max-value="200">
-      <textarea class="freeform-textarea" placeholder="Type answer…"
+      <textarea class="freeform-textarea" placeholder="${esc(t("card.answer_placeholder"))}"
                 data-freeform-target="input"
                 data-action="input->freeform#update"></textarea>
-      <div class="freeform-counter" data-freeform-target="counter">0/200 Characters</div>
+      <div class="freeform-counter" data-freeform-target="counter">0/200 ${esc(t("card.characters"))}</div>
     </div>`,
 
   welcome_card: () => "",
@@ -378,7 +396,7 @@ const COMPONENTS = {
   // tokenisation is on, and COMPONENTS falls back to `() => ""`. Exactly the
   // consent_gate defect (BUG-015), in the one other type that had the same gap.
   token_checkpoint: () => `
-    <div class="token-checkpoint-placeholder">Shows the points a player has collected so far.</div>`,
+    <div class="token-checkpoint-placeholder">${esc(t("card.token_checkpoint_placeholder"))}</div>`,
 }
 
 function prioritiseHtml(opts) {
@@ -394,7 +412,7 @@ function prioritiseHtml(opts) {
           <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
         </li>`).join("")}
       <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
-        <span>＋</span> Add option
+        <span>＋</span> ${esc(t("card.add_option"))}
       </li>
     </ul>`
 }
@@ -413,7 +431,7 @@ function choiceListHtml(opts, mode) {
           <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
         </li>`).join("")}
       <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
-        <span>＋</span> Add option
+        <span>＋</span> ${esc(t("card.add_option"))}
       </li>
     </ul>`
 }
@@ -504,7 +522,7 @@ function npsVesselSvg(shape, v) {
 // follows the labels (≥2); a card with no usable labels falls back to the
 // default 0–10. The container silhouette is themed per Verto (shape).
 function npsHtml(opts, shape) {
-  const labels = opts.length >= 2 ? opts : DEFAULT_OPTIONS.nps
+  const labels = opts.length >= 2 ? opts : defaultOptionsFor("nps")
   const n = Math.max(labels.length, 2)
   const key = NPS_VESSELS[shape] ? shape : "pill"
   const v = NPS_VESSELS[key]
@@ -548,7 +566,7 @@ function nameBlankStops(labels, filler) {
   return labels.map((l, i) => l || filler[i] || DEFAULT_OPTIONS.range[i])
 }
 
-function rangeLabels(opts, filler = DEFAULT_OPTIONS.range) {
+function rangeLabels(opts, filler = defaultOptionsFor("range")) {
   const raw = (opts || []).map(o => String(o == null ? "" : o).trim())
   if (raw.length === RANGE_POINTS) return nameBlankStops(raw, filler)
 
@@ -600,7 +618,7 @@ function sliderHtml(opts, ctx = {}) {
     : themes.map(th => opt(th.slug)).join("")
   const picker = themes.length ? `
     <div class="range-theme-picker">
-      <label class="range-theme-label">${esc(ctx.rangeThemeLabel || "Animation")}</label>
+      <label class="range-theme-label">${esc(ctx.rangeThemeLabel || t("editor.animation_theme"))}</label>
       <select class="range-theme-select" data-action="change->survey-editor#setRangeTheme">
         ${optHtml}
       </select>
@@ -1062,11 +1080,12 @@ export default class extends Controller {
 
       // The contextual note is the explainer now — it surfaces in the ⓘ
       // modal (the panel card itself stays compact, desc is hidden via CSS).
-      if (entry.note) {
+      const note = compatNote(cardType, entry)
+      if (note) {
         const descEl = opt.querySelector(".type-opt-desc")
-        if (descEl) descEl.textContent = entry.note
+        if (descEl) descEl.textContent = note
         const infoEl = opt.querySelector(".type-opt-info")
-        if (infoEl) infoEl.dataset.typeExplainer = entry.note
+        if (infoEl) infoEl.dataset.typeExplainer = note
       }
     })
   }
@@ -1081,7 +1100,10 @@ export default class extends Controller {
       const hit = compat.find(c => c.type === t)
       return hit ? hit.score : 0
     }
-    const noteFor = (t) => compat.find(c => c.type === t)?.note || ""
+    const noteFor = (ty) => {
+      const entry = compat.find(c => c.type === ty)
+      return entry ? compatNote(cardType, entry) : ""
+    }
 
     const sorted = [...this.allTypeOptTargets].sort((a, b) =>
       scoreFor(b.dataset.type) - scoreFor(a.dataset.type)
@@ -1259,7 +1281,7 @@ export default class extends Controller {
   // options on screen (it is currently a type that has none) does the snapshot
   // matter: that is the switch-away-and-back memory it exists for.
   _optionsFor(card, type) {
-    if (type === "yes_no") return [ "Yes", "No" ]
+    if (type === "yes_no") return defaultOptionsFor("yes_no")
 
     const live = this._liveOptions(card)
     if (live.length) return live
@@ -1267,7 +1289,7 @@ export default class extends Controller {
     let original = []
     try { original = JSON.parse(card.dataset.cardOptions || "[]") } catch (_) {}
     if (original.length) return original
-    return DEFAULT_OPTIONS[type] || []
+    return defaultOptionsFor(type)
   }
 
   // The same nodes serialize() reads, so the panel and the save agree about

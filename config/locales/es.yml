@@ -150,6 +150,22 @@ es:
     quiz_compare_cta: "Mira cómo te comparas →"
     quiz_compare_title: "Cómo te comparas"
     tokens_welcome_note: "Ganarás puntos al responder cada pregunta — no puedes volver atrás y cambiar una respuesta para ganar más."
+  defaults:
+    range: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"]
+    nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    rating: ["Malo", "Regular", "Bueno", "Muy bueno", "Excelente"]
+    multiple_choice: ["Opción A", "Opción B", "Opción C"]
+    select_many: ["Opción A", "Opción B", "Opción C", "Opción D", "Opción E"]
+    prioritise: ["Opción A", "Opción B", "Opción C", "Opción D"]
+    yes_no: ["Sí", "No"]
+    select_one_grid: ["A", "B", "C", "D"]
+    select_many_grid: ["A", "B", "C", "D"]
+    tap_card: ["Afirmación 1", "Afirmación 2", "Afirmación 3", "Afirmación 4", "Afirmación 5"]
+    scenario: ["Opción A", "Opción B"]
+    open_ended: []
+    welcome_card: []
+    token_checkpoint: []
+    consent_gate: []
   js:
     player:
       region_meta: "%{count} respuestas compartieron su región"
@@ -293,6 +309,97 @@ es:
         next_page_btn: "Página siguiente ›"
         answer_kicker: "Opciones de respuesta"
         choose_kicker: "Haz tu elección"
+        delete_page: "✕ Eliminar esta página"
+        add_page: "＋ Añadir página"
+        prev_page: "Página anterior"
+      add_question:
+        add_to_survey: "Añadir a la encuesta →"
+        adding: "Añadiendo…"
+        add_failed: "No se pudo añadir la pregunta: %{message}"
+        enter_question_first: "Escribe primero una pregunta y luego añádela a la encuesta."
+        saved_read_failed: "No se pudo leer esa pregunta guardada — prueba con otra o empieza desde cero."
+        generation_failed: "No se pudo generar"
+        render_failed: "No se pudo mostrar"
+        low_end: "Extremo inferior"
+        high_end: "Extremo superior"
+        remove_option: "Quitar opción"
+      end_screens:
+        title_placeholder: "Título de la pantalla (p. ej. Únete al hub de UK)"
+        body_placeholder: "Mensaje"
+        url_placeholder: "https://buy.stripe.com/… (enlace opcional)"
+        button_placeholder: "Texto del botón (p. ej. Pagar y unirse)"
+      token_types:
+        icon_label: "Icono del token"
+        name_label: "Nombre del token"
+        name_placeholder: "p. ej. Monedas de oro"
+      logic_continue: "Continuar (flujo predeterminado)"
+      compat:
+        multiple_choice:
+          select_one_grid: "El estándar de Playverto para una elección única — la cuadrícula visual resulta lúdica, impulsa la participación y te permite anclar cada opción con imágenes o color."
+          multiple_choice: "Lista con imágenes, elección única — una casilla pequeña a la izquierda de cada opción. Recurre a ella cuando las etiquetas son largas o hay demasiadas opciones para una cuadrícula ordenada."
+          select_many_grid: "La misma cuadrícula visual, pero permite elegir más de una — cambia a esta cuando la respuesta no sea una elección única."
+          select_many: "Lista con imágenes, elección múltiple — mismo diseño con casilla a la izquierda y un abanico de respuestas más amplio; úsala cuando la cuadrícula no dé abasto."
+          yes_no: "Reduce los matices a dos respuestas — hazlo solo si de verdad quieres una señal tajante de sí/no."
+          range: "Pierde la claridad categórica de una lista — cambia solo si la respuesta está realmente en una escala."
+        select_many:
+          select_many_grid: "El estándar de Playverto para elección múltiple — la cuadrícula visual con imágenes o muestras de color obtiene respuestas más ricas que una lista plana."
+          select_many: "Lista con imágenes, elección múltiple — una casilla pequeña a la izquierda de cada opción. Recurre a ella cuando las etiquetas son largas o hay demasiadas opciones para una cuadrícula ordenada."
+          select_one_grid: "La misma cuadrícula visual pero limitada a una sola elección — cambia cuando una respuesta decisiva importe más que la amplitud."
+          multiple_choice: "Lista con imágenes, elección única — mismo diseño con casilla a la izquierda; la lectura más nítida pero la opción más reductiva aquí."
+          prioritise: "Las mismas opciones, pero los encuestados las arrastran a un orden de prioridad — datos más ricos (el ORDEN de preferencia), no solo cuáles eligieron."
+        prioritise:
+          prioritise: "Lista para ordenar arrastrando — los encuestados ordenan las opciones de mayor a menor, así conoces el orden de preferencia. Funciona mejor con unas cinco opciones."
+          select_many: "La misma lista sin el orden — cambia si solo necesitas saber qué opciones elegirían, no el orden."
+          select_one_grid: "Reduce el ranking a una sola elección visual — solo si una respuesta decisiva importa más que el orden."
+        select_one_grid:
+          select_one_grid: "Elección única visual — ideal cuando las imágenes o el color hablan por sí solos y quieres una respuesta rápida y visceral."
+          select_many_grid: "Las mismas imágenes, elección múltiple — mejor cuando más de una opción podría resonar."
+          multiple_choice: "Lista con imágenes, elección única — una casilla pequeña a la izquierda de cada opción. Cambia cuando las opciones son largas o hay demasiadas para una cuadrícula."
+          select_many: "Lista con imágenes, elección múltiple — mismo diseño con casilla a la izquierda, pero pierde la claridad de la elección única."
+        select_many_grid:
+          select_many_grid: "Elección múltiple visual — ideal cuando los encuestados pueden identificarse con varias opciones guiadas por imágenes a la vez."
+          select_one_grid: "La misma sensación visual pero limitada a una — elígela si necesitas una única elección decisiva."
+          select_many: "Lista con imágenes, elección múltiple — una casilla pequeña a la izquierda de cada opción. Recurre a ella cuando las etiquetas son largas o hay demasiadas para la cuadrícula."
+          multiple_choice: "Lista con imágenes, elección única — mismo diseño con casilla a la izquierda; la lectura más nítida pero la opción más reductiva aquí."
+        tap_card:
+          tap_card: "Reacciones viscerales rápidas y gamificadas — perfecto para probar varias afirmaciones cortas sin fatigar la encuesta."
+          range: "Cambia velocidad por matices — úsalo si prefieres ver cuánto está de acuerdo la gente en lugar de qué tan rápido."
+          rating: "Las estrellas dan una escala familiar, pero pierdes la agilidad del deslizar."
+          select_one_grid: "Elimina la mecánica lúdica de deslizar — cambia solo si la pregunta es realmente una elección única y estática."
+        scenario:
+          scenario: "Una historia corta que los encuestados pasan página a página, con una elección de 2–3 opciones en la última — ideal para planteamientos largos y situacionales que saturarían una sola tarjeta."
+          multiple_choice: "Renuncia a la construcción narrativa por una lista simple de elección única — cambia si el contexto de la historia no aporta nada."
+          yes_no: "Lo reduce a un binario puro — solo si la historia realmente se resume en un sí/no."
+        range:
+          range: "Es el mejor capturando la intensidad del sentir, y el personaje animado reactivo hace que responder resulte gratificante — una distribución limpia más un visual atractivo."
+          nps: "Escala clásica de 0–10 en un deslizador vertical compacto — cambia para un aire más sobrio y tradicional, sin animación."
+          rating: "Forma similar, pero las estrellas son más familiares y un punto menos expresivas."
+          tap_card: "Cambia la escala por un sí/no por afirmación — más atractivo, menos granular."
+          yes_no: "Reduce la escala a dos respuestas — y con ella se va la mayoría de los datos. Úsalo solo si el binario es justo lo que buscas."
+        rating:
+          rating: "La escala de estrellas se entiende al instante y da una puntuación comparable entre preguntas."
+          nps: "Sensación clásica de 0–10 en un deslizador vertical compacto — toma el relevo cuando las estrellas se sienten genéricas."
+          range: "Escala más expresiva con extremos personalizados y un personaje animado reactivo — mejor cuando el espectro no es el genérico “bueno/malo”."
+          tap_card: "Pierde la escala, pero es más atractivo si quieres una reacción rápida sobre varios elementos."
+          select_one_grid: "Aplana la escala en casillas discretas con etiquetas — pierde la suavidad a la que la gente responde con las estrellas."
+        nps:
+          nps: "Escala vertical compacta de 0–10 — limpia y familiar para preguntas de opinión o satisfacción."
+          range: "La misma escala de opinión de 5 puntos con un personaje animado reactivo — cambia cuando un visual atractivo eleva la calidad de las respuestas."
+          rating: "La escala de estrellas es la referencia familiar — cambia si una valoración horizontal con estrellas encaja mejor con tu audiencia."
+          tap_card: "Sustituye la escala por un sí/no visceral y rápido sobre varias afirmaciones — solo si tienes varias que probar."
+          yes_no: "Reduce la escala a dos respuestas — y con ella se va la mayor parte de la señal. Úsalo solo si el binario es justo lo que buscas."
+        yes_no:
+          yes_no: "Señal nítida cuando de verdad necesitas un binario — fácil de leer y fácil de responder."
+          select_one_grid: "Añade matices con unas pocas opciones visuales definidas — mejor cuando el “sí/no” esconde la respuesta real."
+          range: "Añade una escala de 5 puntos con un personaje animado reactivo — mejor cuando el grado importa y quieres un visual atractivo."
+          nps: "Añade una escala vertical compacta de 0–10 — mejor cuando el grado importa más que el binario."
+          tap_card: "Lanza un sí/no rápido sobre varias afirmaciones a la vez — cambia solo si tienes varias que probar."
+        open_ended:
+          open_ended: "Permite responder con sus propias palabras — la señal cualitativa más rica, pero más difícil de agregar."
+          select_one_grid: "Cambia citas en bruto por categorías visuales rápidas y comparables — elígela si ya conoces las respuestas probables."
+          range: "Solo funciona si la respuesta se reduce a una única escala — normalmente pierde el sentido de la pregunta abierta."
+        welcome_card:
+          welcome_card: "Marca el tono antes de cualquier pregunta — la primera tarjeta ideal para audiencias frías que necesitan contexto."
     wizard:
       step_counter: Paso %{n} de %{total}
     results:
@@ -304,6 +411,7 @@ es:
       compare_summarize_btn: '✦ Resumir con IA'
       compare_summarizing: 'Resumiendo…'
       compare_summarize_error: 'No se pudo resumir en este momento.'
+      chat_error: "Lo sentimos, algo salió mal. Inténtalo de nuevo."
   nav:
     partnerships: "Socios"
     funders: "Financiadores"

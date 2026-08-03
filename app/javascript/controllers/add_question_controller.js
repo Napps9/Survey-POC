@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
-import { DEFAULT_OPTIONS, OPTION_TYPES, LABEL_TYPES } from "lib/default_options"
+import { defaultOptionsFor, OPTION_TYPES, LABEL_TYPES } from "lib/default_options"
+import { t } from "lib/i18n"
 
 
 export default class extends Controller {
@@ -100,7 +101,7 @@ export default class extends Controller {
     }
     if (!card) {
       this._showStep("stepChoice")
-      this._showError("Couldn't read that saved question — try another, or start from blank.")
+      this._showError(t("editor.add_question.saved_read_failed"))
       return
     }
 
@@ -181,13 +182,13 @@ export default class extends Controller {
     event.preventDefault()
     const card = this._collectCard()
     if (!card) {
-      this._showDetailsError("Enter a question first, then add it to the survey.")
+      this._showDetailsError(t("editor.add_question.enter_question_first"))
       this.questionTextTarget?.focus()
       return
     }
     this._clearDetailsError()
     this.addBtnTarget.disabled = true
-    this.addBtnTarget.textContent = "Adding…"
+    this.addBtnTarget.textContent = t("editor.add_question.adding")
     this._renderAndInsert(card)
   }
 
@@ -208,7 +209,7 @@ export default class extends Controller {
         body: JSON.stringify({}),
       })
       const json = await res.json()
-      if (!json.ok) throw new Error(json.error || "Generation failed")
+      if (!json.ok) throw new Error(json.error || t("editor.add_question.generation_failed"))
       if (token !== this._requestToken) return // modal was closed/reopened — drop it
 
       this._insertHTML(json.html, json.card)
@@ -239,7 +240,7 @@ export default class extends Controller {
         body: JSON.stringify(card),
       })
       const json = await res.json()
-      if (!json.ok) throw new Error(json.error || "Render failed")
+      if (!json.ok) throw new Error(json.error || t("editor.add_question.render_failed"))
       if (token !== this._requestToken) return // modal was closed/reopened — drop it
 
       this._insertHTML(json.html, json.card)
@@ -248,9 +249,9 @@ export default class extends Controller {
     } catch (err) {
       if (token !== this._requestToken) return
       this.addBtnTarget.disabled = false
-      this.addBtnTarget.textContent = "Add to survey →"
+      this.addBtnTarget.textContent = t("editor.add_question.add_to_survey")
       this._enableLibraryItems() // the library path disables the tile it picked
-      this._showError(`Couldn't add the question: ${err.message}`)
+      this._showError(t("editor.add_question.add_failed", { message: err.message }))
     }
   }
 
@@ -286,11 +287,11 @@ export default class extends Controller {
       this.optionsAreaTarget.hidden = false
       this.labelsAreaTarget.hidden  = true
     } else if (LABEL_TYPES.has(type)) {
-      const defaults = DEFAULT_OPTIONS[type] || []
+      const defaults = defaultOptionsFor(type)
       this.minLabelTarget.value = defaults[0] || ""
-      this.maxLabelTarget.placeholder = defaults[0] || "Low end"
+      this.maxLabelTarget.placeholder = defaults[0] || t("editor.add_question.low_end")
       this.maxLabelTarget.value = defaults[defaults.length - 1] || ""
-      this.minLabelTarget.placeholder = defaults[defaults.length - 1] || "High end"
+      this.minLabelTarget.placeholder = defaults[defaults.length - 1] || t("editor.add_question.high_end")
       this.labelsAreaTarget.hidden  = false
       this.optionsAreaTarget.hidden = true
     } else {
@@ -303,7 +304,7 @@ export default class extends Controller {
     this.charCountTarget.textContent = "0 / 100"
     this.charCountTarget.style.color  = "rgba(255,255,255,0.35)"
     this.addBtnTarget.disabled        = false
-    this.addBtnTarget.textContent     = "Add to survey →"
+    this.addBtnTarget.textContent     = t("editor.add_question.add_to_survey")
     this._clearDetailsError()
 
     this._showStep("stepDetails")
@@ -322,7 +323,7 @@ export default class extends Controller {
   }
 
   _buildOptionsUI(type) {
-    const defaults = DEFAULT_OPTIONS[type] || []
+    const defaults = defaultOptionsFor(type)
     const list = this.optionsListTarget
     list.innerHTML = ""
     defaults.forEach(opt => list.appendChild(this._makeOptionRow(opt)))
@@ -331,7 +332,7 @@ export default class extends Controller {
     const btn = document.createElement("button")
     btn.type = "button"
     btn.className = "aq-add-option-btn"
-    btn.textContent = "＋ Add option"
+    btn.textContent = `＋ ${t("card.add_option")}`
     btn.dataset.action = "click->add-question#addOption"
     list.appendChild(btn)
   }
@@ -349,7 +350,7 @@ export default class extends Controller {
     const removeBtn = document.createElement("button")
     removeBtn.type = "button"
     removeBtn.className = "aq-remove-option-btn"
-    removeBtn.title = "Remove option"
+    removeBtn.title = t("editor.add_question.remove_option")
     removeBtn.textContent = "×"
     removeBtn.dataset.action = "click->add-question#removeOption"
 
@@ -381,7 +382,7 @@ export default class extends Controller {
       if (opts.length) card.options = opts
 
     } else if (LABEL_TYPES.has(type)) {
-      const defaults = DEFAULT_OPTIONS[type] || []
+      const defaults = defaultOptionsFor(type)
       const min = this.minLabelTarget.value.trim() || defaults[0] || ""
       const max = this.maxLabelTarget.value.trim() || defaults[defaults.length - 1] || ""
       // Range: emit full 5-point label array; Rating: emit min+max only

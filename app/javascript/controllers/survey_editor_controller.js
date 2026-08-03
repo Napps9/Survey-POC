@@ -724,7 +724,7 @@ export default class extends Controller {
         })
       })
       const json = await res.json()
-      if (!json.ok) throw new Error(json.error || "Optimise failed")
+      if (!json.ok) throw new Error(json.error || t("editor.optimise_failed"))
       this._replaceCard(card, json.html, json.card)
     } catch (err) {
       // Surface the failure where the click happened — a silent no-move reads
@@ -1738,7 +1738,7 @@ export default class extends Controller {
         sel.dataset.logicSelected = chosen
       }
       sel.innerHTML = ""
-      sel.appendChild(this._logicOption("", cfg.continue || "Continue (default flow)"))
+      sel.appendChild(this._logicOption("", cfg.continue || t("editor.logic_continue")))
       if (flows.length) {
         const group = document.createElement("optgroup")
         group.label = t("editor.flows.group")

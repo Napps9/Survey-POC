@@ -150,6 +150,22 @@ nl:
     quiz_compare_cta: "Bekijk hoe jij je verhoudt →"
     quiz_compare_title: "Hoe jij je verhoudt"
     tokens_welcome_note: "Je verdient punten bij elke vraag die je beantwoordt — je kunt niet terug om een antwoord te wijzigen en zo meer te verdienen."
+  defaults:
+    range: ["Helemaal oneens", "Oneens", "Neutraal", "Eens", "Helemaal eens"]
+    nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    rating: ["Slecht", "Matig", "Goed", "Zeer goed", "Uitstekend"]
+    multiple_choice: ["Optie A", "Optie B", "Optie C"]
+    select_many: ["Optie A", "Optie B", "Optie C", "Optie D", "Optie E"]
+    prioritise: ["Optie A", "Optie B", "Optie C", "Optie D"]
+    yes_no: ["Ja", "Nee"]
+    select_one_grid: ["A", "B", "C", "D"]
+    select_many_grid: ["A", "B", "C", "D"]
+    tap_card: ["Stelling 1", "Stelling 2", "Stelling 3", "Stelling 4", "Stelling 5"]
+    scenario: ["Optie A", "Optie B"]
+    open_ended: []
+    welcome_card: []
+    token_checkpoint: []
+    consent_gate: []
   js:
     player:
       region_meta: "%{count} antwoorden met een regio"
@@ -293,6 +309,97 @@ nl:
         next_page_btn: "Volgende pagina ›"
         answer_kicker: "Antwoordopties"
         choose_kicker: "Maak je keuze"
+        delete_page: "✕ Deze pagina verwijderen"
+        add_page: "＋ Pagina toevoegen"
+        prev_page: "Vorige pagina"
+      add_question:
+        add_to_survey: "Toevoegen aan enquête →"
+        adding: "Toevoegen…"
+        add_failed: "Kon de vraag niet toevoegen: %{message}"
+        enter_question_first: "Voer eerst een vraag in en voeg deze dan toe aan de enquête."
+        saved_read_failed: "Kon die opgeslagen vraag niet lezen — probeer een andere, of begin blanco."
+        generation_failed: "Genereren mislukt"
+        render_failed: "Weergeven mislukt"
+        low_end: "Ondergrens"
+        high_end: "Bovengrens"
+        remove_option: "Optie verwijderen"
+      end_screens:
+        title_placeholder: "Schermtitel (bijv. Word lid van de UK-hub)"
+        body_placeholder: "Bericht"
+        url_placeholder: "https://buy.stripe.com/… (optionele link)"
+        button_placeholder: "Knoptekst (bijv. Betaal & word lid)"
+      token_types:
+        icon_label: "Tokenpictogram"
+        name_label: "Tokennaam"
+        name_placeholder: "bijv. Gouden munten"
+      logic_continue: "Doorgaan (standaardflow)"
+      compat:
+        multiple_choice:
+          select_one_grid: "De Playverto-standaard voor één keuze — het visuele raster voelt speels, verhoogt de betrokkenheid en laat je elke optie verankeren met beeld of kleur."
+          multiple_choice: "Afbeeldingenlijst, één keuze — klein tegeltje links van elke optie. Val hierop terug wanneer labels lang zijn of er te veel opties zijn voor een net raster."
+          select_many_grid: "Hetzelfde visuele raster, maar mensen kunnen er meer dan één kiezen — schakel over wanneer het antwoord niet één keuze is."
+          select_many: "Afbeeldingenlijst, meerdere keuzes — dezelfde lay-out met tegel links, bredere antwoordset; gebruik dit wanneer het raster niet past."
+          yes_no: "Reduceert nuance tot twee antwoorden — doe dit alleen als je echt een hard ja/nee-signaal wilt."
+          range: "Verliest de categorische helderheid van een lijst — wissel alleen als het antwoord echt op een schaal ligt."
+        select_many:
+          select_many_grid: "De Playverto-standaard voor meerdere keuzes — een visueel raster met beeld of kleurstalen levert rijkere antwoorden op dan een platte lijst."
+          select_many: "Afbeeldingenlijst, meerdere keuzes — klein tegeltje links van elke optie. Val hierop terug wanneer labels lang zijn of er te veel opties zijn voor een net raster."
+          select_one_grid: "Hetzelfde visuele raster maar beperkt tot één keuze — schakel over wanneer één beslissend antwoord belangrijker is dan breedte."
+          multiple_choice: "Afbeeldingenlijst, één keuze — dezelfde lay-out met tegel links, het scherpste signaal maar de meest beperkende optie hier."
+          prioritise: "Dezelfde opties, maar respondenten slepen ze in volgorde van prioriteit — rijkere data (de VOLGORDE van voorkeur), niet alleen wat ze kozen."
+        prioritise:
+          prioritise: "Sleep-en-rangschik-lijst — respondenten ordenen de opties van hoog naar laag, zodat je de volgorde van voorkeur leert kennen. Werkt het best met ongeveer vijf opties."
+          select_many: "Dezelfde lijst zonder de ordening — schakel over als je alleen wilt weten welke opties ze zouden kiezen, niet in welke volgorde."
+          select_one_grid: "Reduceert de rangschikking tot één visuele keuze — alleen als één beslissend antwoord belangrijker is dan de volgorde."
+        select_one_grid:
+          select_one_grid: "Visuele enkele keuze — het best wanneer beeld of kleur het werk doet en je een snelle, intuïtieve reactie wilt."
+          select_many_grid: "Dezelfde beeldtaal, meerdere keuzes — beter wanneer meer dan één optie kan aanspreken."
+          multiple_choice: "Afbeeldingenlijst, één keuze — klein tegeltje links van elke optie. Schakel over wanneer opties lang zijn of er te veel zijn voor een raster."
+          select_many: "Afbeeldingenlijst, meerdere keuzes — dezelfde lay-out met tegel links, maar verliest de helderheid van één keuze."
+        select_many_grid:
+          select_many_grid: "Visuele meerkeuze — het best wanneer respondenten zich in meerdere beeldgedreven opties tegelijk kunnen herkennen."
+          select_one_grid: "Hetzelfde visuele gevoel maar beperkt tot één — kies dit als je één beslissende keuze nodig hebt."
+          select_many: "Afbeeldingenlijst, meerdere keuzes — klein tegeltje links van elke optie. Val hierop terug wanneer labels lang zijn of er te veel zijn voor een raster."
+          multiple_choice: "Afbeeldingenlijst, één keuze — dezelfde lay-out met tegel links, het scherpste signaal maar de meest beperkende optie hier."
+        tap_card:
+          tap_card: "Snelle, spelachtige onderbuikreacties — perfect om meerdere korte stellingen te testen zonder enquêtemoeheid."
+          range: "Ruilt snelheid in voor nuance — gebruik dit als je liever ziet hoe sterk mensen het eens zijn dan hoe snel."
+          rating: "Sterren geven een vertrouwde schaal, maar je verliest het vlotte swipe-gevoel."
+          select_one_grid: "Haalt het speelse swipe-mechanisme weg — wissel alleen als de vraag echt één statische keuze is."
+        scenario:
+          scenario: "Een kort verhaal dat respondenten pagina voor pagina doorbladeren, met op de laatste pagina een keuze uit 2–3 opties — het best voor langere, situationele vragen die één kaart zouden overladen."
+          multiple_choice: "Laat de verhaalopbouw vallen voor een gewone lijst met één keuze — schakel over als de verhaalcontext niets toevoegt."
+          yes_no: "Stript het tot een kaal ja/nee — alleen als het verhaal zich echt laat samenvatten tot ja of nee."
+        range:
+          range: "Het best in het vangen van gevoelssterkte, en het reagerende geanimeerde figuurtje maakt antwoorden lonend — een schone verdeling plus een aantrekkelijk visueel element."
+          nps: "Klassieke 0–10-schaal op een compacte verticale schuif — schakel over voor een rustiger, traditioneler gevoel zonder de animatie."
+          rating: "Vergelijkbare vorm, maar sterren zijn vertrouwder en net iets minder expressief."
+          tap_card: "Ruilt de schaal in voor een ja/nee per stelling — aantrekkelijker, minder verfijnd."
+          yes_no: "Stript de schaal tot twee antwoorden — de meeste data gaat mee verloren. Gebruik dit alleen als de binaire keuze het inzicht is."
+        rating:
+          rating: "De sterrenschaal wordt direct begrepen en geeft een vergelijkbare score over vragen heen."
+          nps: "Klassiek 0–10-gevoel op een compacte verticale schuif — springt bij waar sterren generiek aanvoelen."
+          range: "Expressievere schaal met eigen uiteinden en een reagerend geanimeerd figuurtje — beter wanneer het spectrum niet simpelweg 'goed/slecht' is."
+          tap_card: "Verliest de schaal, maar aantrekkelijker als je een snelle onderbuikreactie op meerdere items wilt."
+          select_one_grid: "Maakt van de schaal losse tegels met labels — verliest de soepelheid waar mensen bij sterren op reageren."
+        nps:
+          nps: "Compacte verticale 0–10-schaal — helder en vertrouwd voor opinie- en tevredenheidsvragen."
+          range: "Dezelfde 5-punts opinieschaal met een reagerend geanimeerd figuurtje — schakel over wanneer een aantrekkelijk visueel element de antwoordkwaliteit verhoogt."
+          rating: "De sterrenschaal is de vertrouwde basis — schakel over als een horizontale sterrenwaardering beter bij het publiek past."
+          tap_card: "Vervang de schaal door een snel ja/nee over meerdere stellingen — alleen als je er meerdere te testen hebt."
+          yes_no: "Reduceert de schaal tot twee antwoorden — het meeste signaal gaat mee verloren. Gebruik dit alleen als de binaire keuze het inzicht is."
+        yes_no:
+          yes_no: "Een scherp signaal wanneer je echt een binaire keuze nodig hebt — makkelijk te lezen en makkelijk te beantwoorden."
+          select_one_grid: "Voegt nuance toe met enkele duidelijke visuele opties — beter wanneer 'ja/nee' het echte antwoord verbergt."
+          range: "Voegt een 5-puntsschaal toe met een reagerend geanimeerd figuurtje — beter wanneer gradatie telt en je een aantrekkelijk visueel element wilt."
+          nps: "Voegt een compacte verticale 0–10-schaal toe — beter wanneer gradatie belangrijker is dan de binaire keuze."
+          tap_card: "Draai een snel ja/nee over meerdere stellingen tegelijk — wissel alleen als je er meerdere te testen hebt."
+        open_ended:
+          open_ended: "Laat mensen in hun eigen woorden antwoorden — het rijkste kwalitatieve signaal, maar lastiger te aggregeren."
+          select_one_grid: "Ruilt ruwe citaten in voor snelle, vergelijkbare visuele categorieën — kies dit als je de waarschijnlijke antwoorden al kent."
+          range: "Werkt alleen als het antwoord samenvalt tot één schaal — meestal gaat de kern van de open vraag verloren."
+        welcome_card:
+          welcome_card: "Zet de toon vóór de eerste vraag — de ideale eerste kaart voor een koud publiek dat context nodig heeft."
     wizard:
       step_counter: Stap %{n} van %{total}
     results:
@@ -304,6 +411,7 @@ nl:
       compare_summarize_btn: '✦ Samenvatten met AI'
       compare_summarizing: 'Wordt samengevat…'
       compare_summarize_error: 'Kon nu niet worden samengevat.'
+      chat_error: "Sorry, er ging iets mis. Probeer het opnieuw."
   nav:
     partnerships: "Partners"
     funders: "Financiers"

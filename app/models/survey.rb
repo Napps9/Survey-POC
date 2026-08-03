@@ -201,11 +201,24 @@ class Survey < ApplicationRecord
   # covers every authoring path — AI generation, the PDF/Forms/manual
   # importers, the CSV importer, templates and the editor's autosave — instead
   # of each one having to remember.
-  def self.normalize_range_cards!(cards)
+  # The stops a scale can't name itself are named from `fill` — resolved in
+  # `locale` (a Verto's default_locale from enforce_range_scale), so a French
+  # deck's repaired stop says "Plutôt d'accord", not "Agree". English constant
+  # as the last-resort fallback, same as everywhere else.
+  def self.localized_range_labels(locale = nil)
+    labels = I18n.t("defaults.range", locale: locale.presence || I18n.locale,
+                                      default: RANGE_DEFAULT_LABELS)
+    return RANGE_DEFAULT_LABELS unless labels.is_a?(Array) && labels.size == RANGE_DEFAULT_LABELS.size
+    labels.map(&:to_s)
+  rescue I18n::InvalidLocale
+    RANGE_DEFAULT_LABELS
+  end
+
+  def self.normalize_range_cards!(cards, fill: RANGE_DEFAULT_LABELS)
     Array(cards).map do |card|
       next card unless card.is_a?(Hash) && card["type"].to_s == "range"
       c = card.dup
-      c["options"] = normalize_range_labels(c["options"])
+      c["options"] = normalize_range_labels(c["options"], fill: fill)
       # Translations align to options POSITIONALLY, so a resized scale has to
       # resize its translations too — otherwise locale N shows label 4 at
       # stop 5. A translation that comes up short falls back to the primary
@@ -1215,7 +1228,9 @@ class Survey < ApplicationRecord
   private
 
   def enforce_range_scale
-    self.cards = self.class.normalize_range_cards!(cards)
+    self.cards = self.class.normalize_range_cards!(
+      cards, fill: self.class.localized_range_labels(default_locale)
+    )
   end
 
   # Replace any inline base64 image about to be written with a stored blob path.

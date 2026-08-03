@@ -150,6 +150,22 @@ id:
     quiz_compare_cta: "Lihat perbandinganmu →"
     quiz_compare_title: "Perbandinganmu"
     tokens_welcome_note: "Kamu akan mendapatkan poin setiap menjawab pertanyaan — kamu tidak bisa kembali dan mengubah jawaban untuk mendapatkan lebih banyak."
+  defaults:
+    range: ["Sangat tidak setuju", "Tidak setuju", "Netral", "Setuju", "Sangat setuju"]
+    nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    rating: ["Buruk", "Kurang baik", "Cukup", "Baik", "Sangat baik"]
+    multiple_choice: ["Opsi A", "Opsi B", "Opsi C"]
+    select_many: ["Opsi A", "Opsi B", "Opsi C", "Opsi D", "Opsi E"]
+    prioritise: ["Opsi A", "Opsi B", "Opsi C", "Opsi D"]
+    yes_no: ["Ya", "Tidak"]
+    select_one_grid: ["A", "B", "C", "D"]
+    select_many_grid: ["A", "B", "C", "D"]
+    tap_card: ["Pernyataan 1", "Pernyataan 2", "Pernyataan 3", "Pernyataan 4", "Pernyataan 5"]
+    scenario: ["Opsi A", "Opsi B"]
+    open_ended: []
+    welcome_card: []
+    token_checkpoint: []
+    consent_gate: []
   js:
     player:
       region_meta: "%{count} jawaban menyertakan region"
@@ -293,6 +309,97 @@ id:
         next_page_btn: "Halaman berikutnya ›"
         answer_kicker: "Opsi jawaban"
         choose_kicker: "Buat pilihanmu"
+        delete_page: "✕ Hapus halaman ini"
+        add_page: "＋ Tambah halaman"
+        prev_page: "Halaman sebelumnya"
+      add_question:
+        add_to_survey: "Tambahkan ke survei →"
+        adding: "Menambahkan…"
+        add_failed: "Tidak dapat menambahkan pertanyaan: %{message}"
+        enter_question_first: "Masukkan pertanyaan dulu, lalu tambahkan ke survei."
+        saved_read_failed: "Pertanyaan tersimpan itu tidak bisa dibaca — coba yang lain, atau mulai dari kosong."
+        generation_failed: "Gagal membuat"
+        render_failed: "Gagal menampilkan"
+        low_end: "Ujung bawah"
+        high_end: "Ujung atas"
+        remove_option: "Hapus opsi"
+      end_screens:
+        title_placeholder: "Judul layar (mis. Gabung hub UK)"
+        body_placeholder: "Pesan"
+        url_placeholder: "https://buy.stripe.com/… (tautan opsional)"
+        button_placeholder: "Label tombol (mis. Bayar & gabung)"
+      token_types:
+        icon_label: "Ikon token"
+        name_label: "Nama token"
+        name_placeholder: "mis. Koin Emas"
+      logic_continue: "Lanjutkan (alur bawaan)"
+      compat:
+        multiple_choice:
+          select_one_grid: "Default Playverto untuk pilihan tunggal — kisi visual terasa menyenangkan, mendorong keterlibatan, dan memungkinkan setiap opsi ditandai dengan gambar atau warna."
+          multiple_choice: "Daftar bergambar, pilihan tunggal — ubin kecil di kiri setiap opsi. Kembali ke sini bila label panjang atau opsi terlalu banyak untuk kisi yang rapi."
+          select_many_grid: "Kisi visual yang sama, tetapi orang bisa memilih lebih dari satu — beralihlah bila jawabannya bukan pilihan tunggal."
+          select_many: "Daftar bergambar, multi-pilih — tata letak ubin-kiri yang sama dengan rentang jawaban lebih luas; gunakan bila kisi tidak muat."
+          yes_no: "Meringkas nuansa menjadi dua jawaban — lakukan hanya jika Anda benar-benar butuh sinyal ya/tidak yang tegas."
+          range: "Kehilangan kejelasan kategoris sebuah daftar — beralihlah hanya jika jawabannya memang berupa skala."
+        select_many:
+          select_many_grid: "Default Playverto untuk multi-pilih — kisi visual dengan gambar atau contoh warna menghasilkan jawaban yang lebih kaya daripada daftar biasa."
+          select_many: "Daftar bergambar, multi-pilih — ubin kecil di kiri setiap opsi. Kembali ke sini bila label panjang atau opsi terlalu banyak untuk kisi yang rapi."
+          select_one_grid: "Kisi visual yang sama tetapi dibatasi satu pilihan — beralihlah bila satu jawaban yang tegas lebih penting daripada keluasan."
+          multiple_choice: "Daftar bergambar, pilihan tunggal — tata letak ubin-kiri yang sama, pembacaan paling tajam tetapi paling reduktif di sini."
+          prioritise: "Opsi yang sama, tetapi responden menyeretnya ke urutan prioritas — data lebih kaya (URUTAN preferensi), bukan sekadar mana yang dipilih."
+        prioritise:
+          prioritise: "Daftar seret-untuk-mengurutkan — responden mengurutkan opsi dari tertinggi ke terendah, jadi Anda tahu urutan preferensinya. Paling pas dengan sekitar lima opsi."
+          select_many: "Daftar yang sama tanpa pengurutan — beralihlah jika Anda hanya perlu tahu opsi mana yang dipilih, bukan urutannya."
+          select_one_grid: "Meringkas peringkat menjadi satu pilihan visual — hanya jika satu jawaban tegas lebih penting daripada urutannya."
+        select_one_grid:
+          select_one_grid: "Pilihan tunggal visual — terbaik saat gambar atau warna yang berbicara dan Anda ingin respons cepat yang spontan."
+          select_many_grid: "Gambar yang sama, multi-pilih — lebih baik bila lebih dari satu opsi mungkin mengena."
+          multiple_choice: "Daftar bergambar, pilihan tunggal — ubin kecil di kiri setiap opsi. Beralihlah bila opsi panjang atau terlalu banyak untuk masuk kisi."
+          select_many: "Daftar bergambar, multi-pilih — tata letak ubin-kiri yang sama, kehilangan kejelasan pilihan tunggal."
+        select_many_grid:
+          select_many_grid: "Multi-pilih visual — terbaik saat responden mungkin merasa cocok dengan beberapa opsi berbasis gambar sekaligus."
+          select_one_grid: "Nuansa visual yang sama tetapi dibatasi satu — pilih ini jika Anda butuh satu pilihan yang tegas."
+          select_many: "Daftar bergambar, multi-pilih — ubin kecil di kiri setiap opsi. Kembali ke sini bila label panjang atau terlalu banyak untuk kisi."
+          multiple_choice: "Daftar bergambar, pilihan tunggal — tata letak ubin-kiri yang sama, pembacaan paling tajam tetapi paling reduktif di sini."
+        tap_card:
+          tap_card: "Reaksi spontan yang cepat dan seru — sempurna untuk menguji beberapa pernyataan singkat tanpa membuat lelah."
+          range: "Menukar kecepatan dengan nuansa — gunakan jika Anda lebih ingin melihat seberapa kuat orang setuju daripada seberapa cepat."
+          rating: "Bintang memberi skala yang akrab, tetapi Anda kehilangan sensasi cepat khas geser."
+          select_one_grid: "Menghilangkan mekanik geser yang menyenangkan — beralihlah hanya jika pertanyaannya memang satu pilihan statis."
+        scenario:
+          scenario: "Cerita pendek yang dibuka responden halaman demi halaman, lalu pilihan 2–3 opsi di halaman terakhir — terbaik untuk pertanyaan situasional panjang yang akan memenuhi satu kartu."
+          multiple_choice: "Melepas bangunan cerita demi daftar pilihan tunggal biasa — beralihlah jika konteks cerita tidak menambah apa pun."
+          yes_no: "Memangkasnya menjadi biner polos — hanya jika ceritanya memang bermuara pada ya/tidak."
+        range:
+          range: "Paling baik menangkap kuatnya perasaan, dan karakter animasi yang reaktif membuat menjawab terasa menyenangkan — distribusi yang bersih plus visual yang menarik."
+          nps: "Skala 0–10 klasik pada slider vertikal ringkas — beralihlah untuk nuansa tradisional yang lebih tenang tanpa animasi."
+          rating: "Bentuk serupa, tetapi bintang lebih akrab dan sedikit kurang ekspresif."
+          tap_card: "Menukar skala dengan ya/tidak per pernyataan — lebih menarik, kurang granular."
+          yes_no: "Memangkas skala menjadi dua jawaban — sebagian besar data ikut hilang. Gunakan hanya jika jawaban biner itulah yang Anda cari."
+        rating:
+          rating: "Skala bintang langsung dipahami dan memberi skor yang bisa dibandingkan antar pertanyaan."
+          nps: "Nuansa 0–10 klasik pada slider vertikal ringkas — pilih saat bintang terasa terlalu generik."
+          range: "Skala lebih ekspresif dengan ujung yang bisa disesuaikan dan karakter animasi reaktif — lebih baik saat spektrumnya bukan sekadar 'baik/buruk'."
+          tap_card: "Kehilangan skala, tetapi lebih menarik jika Anda ingin reaksi spontan cepat atas beberapa hal."
+          select_one_grid: "Meratakan skala menjadi ubin berlabel yang terpisah — kehilangan kehalusan yang disukai orang dari bintang."
+        nps:
+          nps: "Skala vertikal 0–10 yang ringkas — bersih dan akrab untuk pertanyaan opini/kepuasan."
+          range: "Skala opini 5 poin yang sama dengan karakter animasi reaktif — beralihlah saat visual yang menarik dapat mengangkat kualitas respons."
+          rating: "Skala bintang adalah patokan yang akrab — beralihlah jika rating bintang horizontal lebih cocok untuk audiens Anda."
+          tap_card: "Ganti skala dengan ya/tidak spontan atas beberapa pernyataan — hanya jika ada beberapa yang ingin diuji."
+          yes_no: "Meringkas skala menjadi dua jawaban — sebagian besar sinyal ikut hilang. Gunakan hanya jika jawaban biner itulah yang Anda cari."
+        yes_no:
+          yes_no: "Sinyal tegas saat Anda memang butuh jawaban biner — mudah dibaca dan mudah dijawab."
+          select_one_grid: "Menambah nuansa dengan beberapa opsi visual yang terdefinisi — lebih baik saat 'ya/tidak' menyembunyikan jawaban sebenarnya."
+          range: "Menambah skala 5 poin dengan karakter animasi reaktif — lebih baik saat derajat itu penting dan Anda ingin visual yang menarik."
+          nps: "Menambah skala vertikal 0–10 yang ringkas — lebih baik saat derajat lebih penting daripada binernya."
+          tap_card: "Jalankan ya/tidak cepat atas beberapa pernyataan sekaligus — beralihlah hanya jika ada beberapa yang ingin diuji."
+        open_ended:
+          open_ended: "Membiarkan orang menjawab dengan kata-kata sendiri — sinyal kualitatif terkaya, tetapi lebih sulit diagregasi."
+          select_one_grid: "Menukar kutipan mentah dengan kategori visual cepat yang bisa dibandingkan — pilih ini jika Anda sudah tahu kemungkinan jawabannya."
+          range: "Hanya berhasil jika jawabannya bisa diringkas ke satu skala — biasanya menghilangkan gunanya pertanyaan terbuka."
+        welcome_card:
+          welcome_card: "Mengatur suasana sebelum pertanyaan dimulai — kartu pertama yang ideal untuk audiens baru yang butuh konteks."
     wizard:
       step_counter: Langkah %{n} dari %{total}
     results:
@@ -304,6 +411,7 @@ id:
       compare_summarize_btn: '✦ Ringkas dengan AI'
       compare_summarizing: 'Meringkas…'
       compare_summarize_error: 'Tidak dapat meringkas saat ini.'
+      chat_error: "Maaf, terjadi kesalahan. Silakan coba lagi."
   nav:
     partnerships: "Mitra"
     funders: "Pendana"

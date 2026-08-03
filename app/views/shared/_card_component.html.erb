@@ -377,11 +377,11 @@
             <div class="book-page" data-scenario-target="page" data-page-id="<%= page['id'].to_s %>">
               <div class="book-page-scroll">
                 <div class="book-page-kicker" data-scenario-target="kicker">
-                  <%= t("editor.scenario.page_of", n: i + 1, total: pages.size, default: "Page #{i + 1} of #{pages.size}") %>
+                  <%= t("js.editor.scenario.page_of", n: i + 1, total: pages.size, default: "Page #{i + 1} of #{pages.size}") %>
                 </div>
                 <div class="book-page-text" <%= ce_attr %>
                      data-scenario-target="pageText"
-                     <% if editable %>data-placeholder="<%= t('editor.scenario.page_placeholder', default: 'Write this page…') %>"<% end %>><%= page["text"] %></div>
+                     <% if editable %>data-placeholder="<%= t('js.editor.scenario.page_placeholder', default: 'Write this page…') %>"<% end %>><%= page["text"] %></div>
               </div>
               <div class="book-page-corner"><%= i + 1 %></div>
               <div class="book-page-fade"></div>
@@ -391,7 +391,7 @@
           <div class="book-page is-answer" data-scenario-target="page">
             <div class="book-page-scroll">
               <div class="book-page-kicker">
-                <%= editable ? t("editor.scenario.answer_kicker", default: "Answer options") : t("editor.scenario.choose_kicker", default: "Make your choice") %>
+                <%= editable ? t("js.editor.scenario.answer_kicker", default: "Answer options") : t("js.editor.scenario.choose_kicker", default: "Make your choice") %>
               </div>
               <ul class="choice-list choice-list--single"
                   data-controller="<%= picker_controllers %>"
@@ -430,9 +430,9 @@
         <% if editable %>
           <div class="book-edit-tools" data-scenario-target="editTools">
             <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn"
-                    data-action="click->scenario#deletePage"><%= t("editor.scenario.delete_page", default: "✕ Delete this page") %></button>
+                    data-action="click->scenario#deletePage"><%= t("js.editor.scenario.delete_page", default: "✕ Delete this page") %></button>
             <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn"
-                    data-action="click->scenario#addPage"><%= t("editor.scenario.add_page", default: "＋ Add page") %></button>
+                    data-action="click->scenario#addPage"><%= t("js.editor.scenario.add_page", default: "＋ Add page") %></button>
           </div>
         <% end %>
 
@@ -440,13 +440,13 @@
 
         <div class="book-nav-row">
           <button type="button" class="book-chevron" data-scenario-target="prevBtn"
-                  data-action="click->scenario#back" aria-label="<%= t('editor.scenario.prev_page', default: 'Previous page') %>">‹</button>
+                  data-action="click->scenario#back" aria-label="<%= t('js.editor.scenario.prev_page', default: 'Previous page') %>">‹</button>
           <% if editable %>
             <button type="button" class="next-btn" data-scenario-target="nextBtn"
-                    data-action="click->scenario#next"><%= t("editor.scenario.next_page_btn", default: "Next page ›") %></button>
+                    data-action="click->scenario#next"><%= t("js.editor.scenario.next_page_btn", default: "Next page ›") %></button>
           <% else %>
             <button type="button" class="book-chevron" data-scenario-target="nextBtn"
-                    data-action="click->scenario#next" aria-label="<%= t('editor.scenario.next_page', default: 'Next page') %>">›</button>
+                    data-action="click->scenario#next" aria-label="<%= t('js.editor.scenario.next_page', default: 'Next page') %>">›</button>
           <% end %>
         </div>
         <div class="book-live" data-scenario-target="live" aria-live="polite"></div>
@@ -470,7 +470,7 @@
             <div class="book-page" data-scenario-target="page" data-page-id="<%= page['id'].to_s %>">
               <div class="book-page-scroll">
                 <div class="book-page-kicker" data-scenario-target="kicker">
-                  <%= t("editor.scenario.page_of", n: i + 1, total: pages.size, default: "Page #{i + 1} of #{pages.size}") %>
+                  <%= t("js.editor.scenario.page_of", n: i + 1, total: pages.size, default: "Page #{i + 1} of #{pages.size}") %>
                 </div>
                 <div class="book-page-text" <%= ce_attr %>
                      data-scenario-target="pageText"
@@ -511,9 +511,9 @@
         <% if editable %>
           <div class="book-edit-tools" data-scenario-target="editTools">
             <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn"
-                    data-action="click->scenario#deletePage"><%= t("editor.scenario.delete_page", default: "✕ Delete this page") %></button>
+                    data-action="click->scenario#deletePage"><%= t("js.editor.scenario.delete_page", default: "✕ Delete this page") %></button>
             <button type="button" class="book-tool-btn" data-scenario-target="addPageBtn"
-                    data-action="click->scenario#addPage"><%= t("editor.scenario.add_page", default: "＋ Add page") %></button>
+                    data-action="click->scenario#addPage"><%= t("js.editor.scenario.add_page", default: "＋ Add page") %></button>
           </div>
         <% end %>
 
@@ -521,13 +521,13 @@
 
         <div class="book-nav-row">
           <button type="button" class="book-chevron" data-scenario-target="prevBtn"
-                  data-action="click->scenario#back" aria-label="<%= t('editor.scenario.prev_page', default: 'Previous page') %>">‹</button>
+                  data-action="click->scenario#back" aria-label="<%= t('js.editor.scenario.prev_page', default: 'Previous page') %>">‹</button>
           <% if editable %>
             <button type="button" class="next-btn" data-scenario-target="nextBtn"
-                    data-action="click->scenario#next"><%= t("editor.scenario.next_page_btn", default: "Next page ›") %></button>
+                    data-action="click->scenario#next"><%= t("js.editor.scenario.next_page_btn", default: "Next page ›") %></button>
           <% else %>
             <button type="button" class="book-chevron" data-scenario-target="nextBtn"
-                    data-action="click->scenario#next" aria-label="<%= t('editor.scenario.next_page', default: 'Next page') %>">›</button>
+                    data-action="click->scenario#next" aria-label="<%= t('js.editor.scenario.next_page', default: 'Next page') %>">›</button>
           <% end %>
         </div>
         <div class="book-live" data-scenario-target="live" aria-live="polite"></div>
@@ -636,8 +636,9 @@
 
     <% when "rating" %>
       <% labels    = Array(display["options"]) %>
-      <% first_lbl = labels.first || "Poor" %>
-      <% last_lbl  = labels.last  || "Excellent" %>
+      <% rating_defaults = t("defaults.rating", default: [ "Poor", "Fair", "Good", "Great", "Excellent" ]) %>
+      <% first_lbl = labels.first || rating_defaults.first %>
+      <% last_lbl  = labels.last  || rating_defaults.last %>
       <% icon      = rating_icon(@survey) %>
       <% rating_actions = (editable ? "click->rating#pick mouseover->rating#hover mouseout->rating#unhover" :
                                        "click->rating#pick mouseover->rating#hover mouseout->rating#unhover keydown->rating#pickOnKey").html_safe %>

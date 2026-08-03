@@ -32,6 +32,10 @@
     caption when a card's type changes — see card_eyebrows_i18n. %>
 <script id="card-eyebrows-i18n" type="application/json"><%= card_eyebrows_i18n(@survey).to_json.html_safe %></script>
 
+<%# Placeholder options per card type, in the VERTO's default locale — card
+    content, not chrome. See card_default_options_i18n / defaultOptionsFor. %>
+<script id="card-defaults" type="application/json"><%= card_default_options_i18n(@survey).to_json.html_safe %></script>
+
 <div class="flex flex-col h-full"
      data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel gate-cards score-modal flows"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"

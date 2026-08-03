@@ -150,6 +150,22 @@ tr:
     quiz_compare_cta: "Nasıl karşılaştırıldığını gör →"
     quiz_compare_title: "Nasıl karşılaştırılıyorsunuz"
     tokens_welcome_note: "Her soruyu cevapladıkça puan kazanacaksınız — daha fazla kazanmak için geri dönüp bir cevabı değiştiremezsiniz."
+  defaults:
+    range: ["Kesinlikle katılmıyorum", "Katılmıyorum", "Kararsızım", "Katılıyorum", "Kesinlikle katılıyorum"]
+    nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    rating: ["Zayıf", "Orta", "İyi", "Çok iyi", "Mükemmel"]
+    multiple_choice: ["Seçenek A", "Seçenek B", "Seçenek C"]
+    select_many: ["Seçenek A", "Seçenek B", "Seçenek C", "Seçenek D", "Seçenek E"]
+    prioritise: ["Seçenek A", "Seçenek B", "Seçenek C", "Seçenek D"]
+    yes_no: ["Evet", "Hayır"]
+    select_one_grid: ["A", "B", "C", "D"]
+    select_many_grid: ["A", "B", "C", "D"]
+    tap_card: ["İfade 1", "İfade 2", "İfade 3", "İfade 4", "İfade 5"]
+    scenario: ["Seçenek A", "Seçenek B"]
+    open_ended: []
+    welcome_card: []
+    token_checkpoint: []
+    consent_gate: []
   js:
     player:
       region_meta: "%{count} yanıt bölge paylaştı"
@@ -293,6 +309,97 @@ tr:
         next_page_btn: "Sonraki sayfa ›"
         answer_kicker: "Cevap seçenekleri"
         choose_kicker: "Seçimini yap"
+        delete_page: "✕ Bu sayfayı sil"
+        add_page: "＋ Sayfa ekle"
+        prev_page: "Önceki sayfa"
+      add_question:
+        add_to_survey: "Ankete ekle →"
+        adding: "Ekleniyor…"
+        add_failed: "Soru eklenemedi: %{message}"
+        enter_question_first: "Önce bir soru girin, sonra ankete ekleyin."
+        saved_read_failed: "Kaydedilmiş soru okunamadı — başka birini deneyin ya da boştan başlayın."
+        generation_failed: "Oluşturma başarısız"
+        render_failed: "Görüntüleme başarısız"
+        low_end: "Alt uç"
+        high_end: "Üst uç"
+        remove_option: "Seçeneği kaldır"
+      end_screens:
+        title_placeholder: "Ekran başlığı (ör. UK merkezine katıl)"
+        body_placeholder: "Mesaj"
+        url_placeholder: "https://buy.stripe.com/… (isteğe bağlı bağlantı)"
+        button_placeholder: "Buton etiketi (ör. Öde ve katıl)"
+      token_types:
+        icon_label: "Jeton simgesi"
+        name_label: "Jeton adı"
+        name_placeholder: "ör. Altın Paralar"
+      logic_continue: "Devam et (varsayılan akış)"
+      compat:
+        multiple_choice:
+          select_one_grid: "Tek seçim için Playverto varsayılanı — görsel ızgara oyuncul hissettirir, etkileşimi artırır ve her seçeneği bir görsel ya da renkle destekler."
+          multiple_choice: "Görselli liste, tek seçim — her seçeneğin solunda küçük bir kutucuk. Etiketler uzun olduğunda ya da ızgaraya sığmayacak kadar çok seçenek olduğunda buna dönün."
+          select_many_grid: "Aynı görsel ızgara, ama birden fazla seçime izin verir — yanıt tek bir seçim değilse buna geçin."
+          select_many: "Görselli liste, çoklu seçim — aynı sol-kutucuk düzeni, daha geniş yanıt kümesi; ızgara yetmediğinde kullanın."
+          yes_no: "Nüansı iki yanıta indirger — bunu yalnızca gerçekten net bir evet/hayır sinyali istiyorsanız yapın."
+          range: "Listenin kategorik netliğini kaybettirir — yalnızca yanıt gerçekten bir ölçek üzerindeyse geçin."
+        select_many:
+          select_many_grid: "Çoklu seçim için Playverto varsayılanı — görselli ya da renk örnekli görsel ızgara, düz bir listeden daha zengin yanıtlar getirir."
+          select_many: "Görselli liste, çoklu seçim — her seçeneğin solunda küçük bir kutucuk. Etiketler uzun olduğunda ya da ızgaraya sığmayacak kadar çok seçenek olduğunda buna dönün."
+          select_one_grid: "Aynı görsel ızgara ama tek seçimle sınırlı — genişlikten çok tek kararlı bir yanıt önemliyse geçin."
+          multiple_choice: "Görselli liste, tek seçim — aynı sol-kutucuk düzeni; en keskin okuma ama buradaki en indirgeyici seçenek."
+          prioritise: "Aynı seçenekler, ama katılımcılar onları öncelik sırasına sürükler — yalnızca neyi seçtiklerini değil, tercih SIRASINI da veren daha zengin veri."
+        prioritise:
+          prioritise: "Sürükle-sırala listesi — katılımcılar seçenekleri en yüksekten en düşüğe dizer, böylece tercih sırasını öğrenirsiniz. Yaklaşık beş seçenekle en iyi çalışır."
+          select_many: "Aynı liste, sıralama olmadan — sıraya değil yalnızca hangi seçenekleri seçeceklerine ihtiyacınız varsa geçin."
+          select_one_grid: "Sıralamayı tek bir görsel seçime indirger — yalnızca tek kararlı bir yanıt sıradan daha önemliyse."
+        select_one_grid:
+          select_one_grid: "Görsel tek seçim — sözü görselin ya da rengin söylediği ve hızlı, içgüdüsel bir tepki istediğiniz durumlar için en iyisi."
+          select_many_grid: "Aynı görseller, çoklu seçim — birden fazla seçenek karşılık bulabilecekse daha iyi."
+          multiple_choice: "Görselli liste, tek seçim — her seçeneğin solunda küçük bir kutucuk. Seçenekler uzunsa ya da ızgaraya sığmayacak kadar çoksa geçin."
+          select_many: "Görselli liste, çoklu seçim — aynı sol-kutucuk düzeni, tek seçimin netliğini kaybeder."
+        select_many_grid:
+          select_many_grid: "Görsel çoklu seçim — katılımcıların aynı anda birden fazla görsel ağırlıklı seçenekle özdeşleşebileceği durumlar için en iyisi."
+          select_one_grid: "Aynı görsel his ama tek seçimle sınırlı — tek kararlı bir seçime ihtiyacınız varsa bunu seçin."
+          select_many: "Görselli liste, çoklu seçim — her seçeneğin solunda küçük bir kutucuk. Etiketler uzunsa ya da ızgaraya sığmayacak kadar çoksa buna dönün."
+          multiple_choice: "Görselli liste, tek seçim — aynı sol-kutucuk düzeni; en keskin okuma ama buradaki en indirgeyici seçenek."
+        tap_card:
+          tap_card: "Hızlı, oyunlaştırılmış içgüdüsel tepkiler — anket yorgunluğu yaratmadan birkaç kısa ifadeyi test etmek için mükemmel."
+          range: "Hızın yerine nüans koyar — insanların ne kadar hızlı değil, ne kadar güçlü katıldığını görmek istiyorsanız kullanın."
+          rating: "Yıldızlar tanıdık bir ölçek sunar, ama kaydırmanın seri hissini kaybedersiniz."
+          select_one_grid: "Oyuncul kaydırma mekaniğini kaldırır — yalnızca soru gerçekten tek ve durağan bir seçimse geçin."
+        scenario:
+          scenario: "Katılımcıların sayfa sayfa çevirdiği kısa bir hikâye, son sayfada 2–3 seçenekli bir seçim — tek bir kartı boğacak uzun, durumsal sorular için en iyisi."
+          multiple_choice: "Anlatının birikimini bırakıp düz bir tek seçimli listeye döner — hikâye bağlamı bir şey katmıyorsa geçin."
+          yes_no: "Her şeyi yalın bir ikiliğe indirger — yalnızca hikâye gerçekten bir evet/hayıra iniyorsa."
+        range:
+          range: "Duygunun gücünü yakalamada en iyisi; tepki veren animasyonlu karakter yanıtlamayı keyifli kılar — temiz bir dağılım artı etkileyici bir görsel."
+          nps: "Kompakt dikey kaydırıcıda klasik 0–10 ölçeği — animasyonsuz, daha sakin ve geleneksel bir his için geçin."
+          rating: "Benzer biçim, ama yıldızlar daha tanıdık ve bir tık daha az ifade gücüne sahip."
+          tap_card: "Ölçeği ifade başına evet/hayır ile değiştirir — daha etkileşimli, daha az ayrıntılı."
+          yes_no: "Ölçeği iki yanıta indirger — verinin çoğu da onunla gider. Yalnızca içgörü ikilikteyse kullanın."
+        rating:
+          rating: "Yıldız ölçeği anında anlaşılır ve sorular arasında karşılaştırılabilir bir puan verir."
+          nps: "Kompakt dikey kaydırıcıda klasik 0–10 hissi — yıldızlar sıradan kaldığında devreye girer."
+          range: "Özel uçlara ve tepki veren animasyonlu karaktere sahip, ifade gücü daha yüksek bir ölçek — yelpaze basit bir 'iyi/kötü' değilse daha iyi."
+          tap_card: "Ölçeği kaybeder, ama birkaç öge için hızlı içgüdüsel tepki istiyorsanız daha etkileşimli."
+          select_one_grid: "Ölçeği ayrı etiketli kutucuklara düzleştirir — insanların yıldızlarda sevdiği akıcılığı kaybeder."
+        nps:
+          nps: "Kompakt 0–10 dikey ölçek — görüş / memnuniyet soruları için temiz ve tanıdık."
+          range: "Aynı 5 noktalı görüş ölçeği, tepki veren animasyonlu karakterle — etkileyici bir görsel yanıt kalitesini yükseltecekse geçin."
+          rating: "Yıldız ölçeği tanıdık taban çizgisidir — yatay bir yıldız derecelendirmesi kitleye daha uygunsa geçin."
+          tap_card: "Ölçeğin yerine birkaç ifade üzerinde hızlı içgüdüsel evet/hayır koyar — yalnızca test edecek birden fazla ifadeniz varsa."
+          yes_no: "Ölçeği iki yanıta indirger — sinyalin çoğu da onunla gider. Yalnızca içgörü ikilikteyse kullanın."
+        yes_no:
+          yes_no: "Gerçekten ikili bir yanıta ihtiyaç duyduğunuzda net sinyal — okuması da yanıtlaması da kolay."
+          select_one_grid: "Birkaç tanımlı görsel seçenekle nüans ekler — 'evet/hayır' asıl yanıtı gizliyorsa daha iyi."
+          range: "Tepki veren animasyonlu karakterli 5 noktalı bir ölçek ekler — derece önemliyse ve etkileyici bir görsel istiyorsanız daha iyi."
+          nps: "Kompakt 0–10 dikey ölçek ekler — derece ikilikten daha önemliyse daha iyi."
+          tap_card: "Birkaç ifade üzerinde aynı anda hızlı bir evet/hayır turu yapın — yalnızca test edecek birden fazla ifadeniz varsa geçin."
+        open_ended:
+          open_ended: "İnsanların kendi sözcükleriyle yanıtlamasına izin verir — en zengin nitel sinyal, ama toplulaştırması daha zor."
+          select_one_grid: "Ham alıntıların yerine hızlı, karşılaştırılabilir görsel kategoriler koyar — olası yanıtları zaten biliyorsanız bunu seçin."
+          range: "Yalnızca yanıt tek bir ölçeğe iniyorsa işe yarar — genellikle açık uçlu sormanın amacını kaybettirir."
+        welcome_card:
+          welcome_card: "Daha sorular gelmeden tonu belirler — bağlama ihtiyaç duyan soğuk kitleler için ideal ilk kart."
     wizard:
       step_counter: Adım %{n} / %{total}
     results:
@@ -304,6 +411,7 @@ tr:
       compare_summarize_btn: '✦ Yapay zekâ ile özetle'
       compare_summarizing: 'Özetleniyor…'
       compare_summarize_error: 'Şu anda özetlenemedi.'
+      chat_error: "Üzgünüz, bir şeyler ters gitti. Lütfen tekrar deneyin."
   nav:
     partnerships: "Ortaklar"
     funders: "Fon Sağlayıcılar"

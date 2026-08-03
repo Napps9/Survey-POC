@@ -715,7 +715,7 @@ export default class extends Controller {
     if (this.hasForwardBtnTarget) {
       if (s.forward_url) {
         this.forwardBtnTarget.href = s.forward_url
-        this.forwardBtnTarget.textContent = `${s.forward_label || this.forwardLabelValue || "Visit website"} →`
+        this.forwardBtnTarget.textContent = `${s.forward_label || this.forwardLabelValue || t("player.visit_website")} →`
         this.forwardBtnTarget.classList.remove("hidden")
       } else {
         this.forwardBtnTarget.classList.add("hidden")

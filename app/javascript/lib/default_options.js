@@ -30,6 +30,32 @@ export const DEFAULT_OPTIONS = {
   consent_gate:     []
 }
 
+// The table above is the ENGLISH FALLBACK. Placeholder options are card
+// content, not chrome — they get saved into the deck the moment the creator
+// keeps them — so they follow the Verto's default locale, not the UI locale.
+// The editor page emits them resolved for that locale as a `card-defaults`
+// JSON blob (see surveys/show + the `defaults:` locale namespace, which
+// mirrors this table across all 19 files). Always go through this function;
+// reach into DEFAULT_OPTIONS directly only for a deliberately-English fixture.
+// Parsed per call, not cached at module level: the module survives Turbo
+// navigations but the blob is per-survey (each Verto has its own default
+// locale), so a cache here would bleed one Verto's language into the next.
+// Calls are rare (a type switch), the blob is tiny.
+function localizedDefaults() {
+  try {
+    return JSON.parse(document.getElementById("card-defaults")?.textContent || "null")
+  } catch (_) {
+    return null
+  }
+}
+
+export function defaultOptionsFor(type) {
+  const blob = localizedDefaults()
+  const v = blob && blob[type]
+  if (Array.isArray(v) && v.length) return v.slice()
+  return (DEFAULT_OPTIONS[type] || []).slice()
+}
+
 // Types whose details form shows an editable list of answer options.
 export const OPTION_TYPES = new Set([
   "multiple_choice", "select_many", "prioritise",

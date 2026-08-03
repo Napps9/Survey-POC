@@ -150,6 +150,22 @@ vi:
     quiz_compare_cta: "Xem bạn so sánh thế nào →"
     quiz_compare_title: "Bạn so sánh thế nào"
     tokens_welcome_note: "Bạn sẽ nhận điểm khi trả lời mỗi câu hỏi — bạn không thể quay lại và đổi câu trả lời để nhận thêm điểm."
+  defaults:
+    range: ["Hoàn toàn không đồng ý", "Không đồng ý", "Trung lập", "Đồng ý", "Hoàn toàn đồng ý"]
+    nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    rating: ["Kém", "Tạm được", "Tốt", "Rất tốt", "Xuất sắc"]
+    multiple_choice: ["Lựa chọn A", "Lựa chọn B", "Lựa chọn C"]
+    select_many: ["Lựa chọn A", "Lựa chọn B", "Lựa chọn C", "Lựa chọn D", "Lựa chọn E"]
+    prioritise: ["Lựa chọn A", "Lựa chọn B", "Lựa chọn C", "Lựa chọn D"]
+    yes_no: ["Có", "Không"]
+    select_one_grid: ["A", "B", "C", "D"]
+    select_many_grid: ["A", "B", "C", "D"]
+    tap_card: ["Phát biểu 1", "Phát biểu 2", "Phát biểu 3", "Phát biểu 4", "Phát biểu 5"]
+    scenario: ["Lựa chọn A", "Lựa chọn B"]
+    open_ended: []
+    welcome_card: []
+    token_checkpoint: []
+    consent_gate: []
   js:
     player:
       region_meta: "%{count} câu trả lời có khu vực"
@@ -293,6 +309,97 @@ vi:
         next_page_btn: "Trang tiếp theo ›"
         answer_kicker: "Lựa chọn trả lời"
         choose_kicker: "Hãy đưa ra lựa chọn của bạn"
+        delete_page: "✕ Xóa trang này"
+        add_page: "＋ Thêm trang"
+        prev_page: "Trang trước"
+      add_question:
+        add_to_survey: "Thêm vào khảo sát →"
+        adding: "Đang thêm…"
+        add_failed: "Không thêm được câu hỏi: %{message}"
+        enter_question_first: "Nhập câu hỏi trước, rồi thêm vào khảo sát."
+        saved_read_failed: "Không đọc được câu hỏi đã lưu — thử câu khác hoặc bắt đầu từ đầu."
+        generation_failed: "Tạo thất bại"
+        render_failed: "Hiển thị thất bại"
+        low_end: "Đầu thấp"
+        high_end: "Đầu cao"
+        remove_option: "Xóa lựa chọn"
+      end_screens:
+        title_placeholder: "Tiêu đề màn hình (vd. Tham gia cộng đồng UK)"
+        body_placeholder: "Thông điệp"
+        url_placeholder: "https://buy.stripe.com/… (liên kết tùy chọn)"
+        button_placeholder: "Nhãn nút (vd. Thanh toán & tham gia)"
+      token_types:
+        icon_label: "Biểu tượng token"
+        name_label: "Tên token"
+        name_placeholder: "vd. Xu Vàng"
+      logic_continue: "Tiếp tục (luồng mặc định)"
+      compat:
+        multiple_choice:
+          select_one_grid: "Mặc định của Playverto cho câu chọn một — lưới trực quan tạo cảm giác vui tươi, tăng tương tác và cho phép gắn mỗi lựa chọn với hình ảnh hoặc màu sắc."
+          multiple_choice: "Danh sách kèm hình, chọn một — ô nhỏ bên trái mỗi lựa chọn. Quay về kiểu này khi nhãn dài hoặc có quá nhiều lựa chọn để xếp lưới gọn gàng."
+          select_many_grid: "Vẫn là lưới trực quan đó nhưng cho phép chọn nhiều — chuyển sang khi câu trả lời không chỉ là một lựa chọn duy nhất."
+          select_many: "Danh sách kèm hình, chọn nhiều — cùng bố cục ô bên trái, tập câu trả lời rộng hơn; dùng khi lưới không chứa hết."
+          yes_no: "Rút gọn mọi sắc thái còn hai câu trả lời — chỉ làm vậy nếu bạn thực sự cần tín hiệu có/không dứt khoát."
+          range: "Mất đi sự rõ ràng theo nhóm của danh sách — chỉ đổi nếu câu trả lời thực sự nằm trên một thang đo."
+        select_many:
+          select_many_grid: "Mặc định của Playverto cho câu chọn nhiều — lưới trực quan với hình ảnh hoặc mẫu màu cho câu trả lời phong phú hơn danh sách phẳng."
+          select_many: "Danh sách kèm hình, chọn nhiều — ô nhỏ bên trái mỗi lựa chọn. Quay về kiểu này khi nhãn dài hoặc có quá nhiều lựa chọn để xếp lưới gọn gàng."
+          select_one_grid: "Vẫn là lưới trực quan đó nhưng giới hạn chọn một — chuyển sang khi một câu trả lời dứt khoát quan trọng hơn độ bao quát."
+          multiple_choice: "Danh sách kèm hình, chọn một — cùng bố cục ô bên trái; tín hiệu sắc nét nhất nhưng cũng là lựa chọn giản lược nhất ở đây."
+          prioritise: "Cùng các lựa chọn, nhưng người trả lời kéo chúng vào thứ tự ưu tiên — dữ liệu phong phú hơn (THỨ TỰ ưa thích), không chỉ là họ đã chọn gì."
+        prioritise:
+          prioritise: "Danh sách kéo để xếp hạng — người trả lời sắp xếp các lựa chọn từ cao xuống thấp, nên bạn biết được thứ tự ưa thích. Tốt nhất với khoảng năm lựa chọn."
+          select_many: "Cùng danh sách nhưng không xếp hạng — chuyển sang nếu bạn chỉ cần biết họ chọn gì, không cần thứ tự."
+          select_one_grid: "Thu gọn bảng xếp hạng thành một lựa chọn trực quan duy nhất — chỉ khi một câu trả lời dứt khoát quan trọng hơn thứ tự."
+        select_one_grid:
+          select_one_grid: "Chọn một trực quan — tốt nhất khi hình ảnh hoặc màu sắc tự nói lên tất cả và bạn muốn phản ứng nhanh theo trực giác."
+          select_many_grid: "Cùng hình ảnh đó, chọn nhiều — tốt hơn khi có thể có nhiều hơn một lựa chọn gây đồng cảm."
+          multiple_choice: "Danh sách kèm hình, chọn một — ô nhỏ bên trái mỗi lựa chọn. Chuyển sang khi lựa chọn dài hoặc quá nhiều để xếp vừa lưới."
+          select_many: "Danh sách kèm hình, chọn nhiều — cùng bố cục ô bên trái, mất đi sự rõ ràng của việc chọn một."
+        select_many_grid:
+          select_many_grid: "Chọn nhiều trực quan — tốt nhất khi người trả lời có thể đồng cảm cùng lúc với vài lựa chọn thiên về hình ảnh."
+          select_one_grid: "Cùng cảm giác trực quan nhưng giới hạn còn một — chọn kiểu này nếu bạn cần một lựa chọn dứt khoát duy nhất."
+          select_many: "Danh sách kèm hình, chọn nhiều — ô nhỏ bên trái mỗi lựa chọn. Quay về khi nhãn dài hoặc quá nhiều để xếp lưới."
+          multiple_choice: "Danh sách kèm hình, chọn một — cùng bố cục ô bên trái; tín hiệu sắc nét nhất nhưng cũng là lựa chọn giản lược nhất ở đây."
+        tap_card:
+          tap_card: "Phản ứng trực giác nhanh, được trò chơi hóa — hoàn hảo để thử vài phát biểu ngắn mà không gây mệt mỏi khảo sát."
+          range: "Đổi tốc độ lấy sắc thái — dùng nếu bạn muốn xem mọi người đồng ý mạnh đến đâu thay vì nhanh đến đâu."
+          rating: "Sao cho một thang đo quen thuộc, nhưng bạn mất cảm giác vuốt nhanh liên tục."
+          select_one_grid: "Bỏ đi cơ chế vuốt vui tươi — chỉ đổi nếu câu hỏi thực sự là một lựa chọn tĩnh duy nhất."
+        scenario:
+          scenario: "Một câu chuyện ngắn người trả lời lật qua từng trang, rồi chọn 2–3 phương án ở trang cuối — tốt nhất cho những đề bài dài, mang tính tình huống mà một thẻ đơn sẽ quá tải."
+          multiple_choice: "Bỏ phần dẫn dắt câu chuyện để lấy danh sách chọn một đơn thuần — chuyển sang nếu bối cảnh câu chuyện không thêm được gì."
+          yes_no: "Rút gọn còn nhị phân thuần túy — chỉ khi câu chuyện thực sự quy về một câu có/không."
+        range:
+          range: "Nắm bắt cường độ cảm xúc tốt nhất, và nhân vật hoạt hình phản ứng khiến việc trả lời thấy thú vị — phân bố sạch cộng hình ảnh cuốn hút."
+          nps: "Thang 0–10 kinh điển trên thanh trượt dọc gọn gàng — chuyển sang để có cảm giác truyền thống, trầm hơn, không hoạt hình."
+          rating: "Hình dáng tương tự, nhưng sao quen thuộc hơn và kém biểu cảm hơn một chút."
+          tap_card: "Đổi thang đo lấy có/không cho từng phát biểu — cuốn hút hơn, ít chi tiết hơn."
+          yes_no: "Rút thang đo còn hai câu trả lời — phần lớn dữ liệu cũng mất theo. Chỉ dùng nếu nhị phân chính là điều bạn cần biết."
+        rating:
+          rating: "Thang sao được hiểu ngay lập tức và cho điểm so sánh được giữa các câu hỏi."
+          nps: "Cảm giác 0–10 kinh điển trên thanh trượt dọc gọn gàng — hữu ích khi sao trở nên nhàm."
+          range: "Thang đo biểu cảm hơn với hai đầu tùy chỉnh và nhân vật hoạt hình phản ứng — tốt hơn khi phổ đánh giá không đơn giản là 'tốt/xấu'."
+          tap_card: "Mất thang đo, nhưng cuốn hút hơn nếu bạn muốn phản ứng trực giác nhanh trên vài mục."
+          select_one_grid: "Ép thang đo thành các ô rời có nhãn — mất đi độ mượt mà mọi người thích ở sao."
+        nps:
+          nps: "Thang dọc 0–10 gọn gàng — sạch và quen thuộc cho câu hỏi về ý kiến / mức độ hài lòng."
+          range: "Cùng thang ý kiến 5 điểm với nhân vật hoạt hình phản ứng — chuyển sang khi hình ảnh cuốn hút nâng chất lượng câu trả lời."
+          rating: "Thang sao là chuẩn quen thuộc — chuyển sang nếu xếp hạng sao nằm ngang phù hợp hơn với khán giả."
+          tap_card: "Thay thang đo bằng có/không trực giác nhanh trên vài phát biểu — chỉ khi bạn có nhiều phát biểu để thử."
+          yes_no: "Rút thang đo còn hai câu trả lời — phần lớn tín hiệu cũng mất theo. Chỉ dùng nếu nhị phân chính là điều bạn cần biết."
+        yes_no:
+          yes_no: "Tín hiệu rõ ràng khi bạn thực sự cần nhị phân — dễ đọc và dễ trả lời."
+          select_one_grid: "Thêm sắc thái với vài lựa chọn trực quan được định sẵn — tốt hơn khi 'có/không' đang che mất câu trả lời thật."
+          range: "Thêm thang 5 điểm với nhân vật hoạt hình phản ứng — tốt hơn khi mức độ quan trọng và bạn muốn hình ảnh cuốn hút."
+          nps: "Thêm thang dọc 0–10 gọn gàng — tốt hơn khi mức độ quan trọng hơn nhị phân."
+          tap_card: "Chạy nhanh có/không trên vài phát biểu cùng lúc — chỉ đổi nếu bạn có nhiều phát biểu để thử."
+        open_ended:
+          open_ended: "Cho mọi người trả lời bằng lời của chính mình — tín hiệu định tính phong phú nhất, nhưng khó tổng hợp hơn."
+          select_one_grid: "Đổi trích dẫn thô lấy các nhóm trực quan nhanh, so sánh được — chọn kiểu này nếu bạn đã biết những câu trả lời khả dĩ."
+          range: "Chỉ hiệu quả nếu câu trả lời quy về một thang đo duy nhất — thường làm mất ý nghĩa của câu hỏi mở."
+        welcome_card:
+          welcome_card: "Định hình không khí trước khi có bất kỳ câu hỏi nào — thẻ mở đầu lý tưởng cho khán giả mới cần bối cảnh."
     wizard:
       step_counter: Bước %{n} / %{total}
     results:
@@ -304,6 +411,7 @@ vi:
       compare_summarize_btn: '✦ Tóm tắt bằng AI'
       compare_summarizing: 'Đang tóm tắt…'
       compare_summarize_error: 'Hiện không thể tóm tắt.'
+      chat_error: "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại."
   nav:
     partnerships: "Đối tác"
     funders: "Nhà tài trợ"
