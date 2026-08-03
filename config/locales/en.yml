@@ -1051,6 +1051,8 @@ en:
     brand_cta_desc: "Next / Submit buttons"
     brand_bg: "Background"
     brand_bg_desc: "The canvas behind cards"
+    brand_panel: "Left panel"
+    brand_panel_desc: "The media panel on each card"
     s6_eyebrow: "Step 05 · Context"
     optional: "Optional"
     s6_lead: "Anything else we should bake in?"

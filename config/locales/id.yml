@@ -1043,6 +1043,8 @@ id:
     brand_cta_desc: Tombol Lanjut / Kirim
     brand_bg: Latar belakang
     brand_bg_desc: Kanvas di belakang kartu
+    brand_panel: Panel kiri
+    brand_panel_desc: Panel media di setiap kartu
     s6_eyebrow: Langkah 06 · Konteks
     optional: Opsional
     s6_lead: Apa lagi yang harus kami sertakan?

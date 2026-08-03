@@ -1043,6 +1043,8 @@ vi:
     brand_cta_desc: Nút Tiếp / Gửi
     brand_bg: Nền
     brand_bg_desc: Khung nền phía sau các thẻ
+    brand_panel: Bảng bên trái
+    brand_panel_desc: Bảng phương tiện của mỗi thẻ
     s6_eyebrow: Bước 06 · Bối cảnh
     optional: Tùy chọn
     s6_lead: Còn gì khác chúng tôi nên đưa vào không?

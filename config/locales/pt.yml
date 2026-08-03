@@ -1043,6 +1043,8 @@ pt:
     brand_cta_desc: Botões Seguinte / Submeter
     brand_bg: Fundo
     brand_bg_desc: A tela por trás dos cartões
+    brand_panel: Painel esquerdo
+    brand_panel_desc: O painel de mídia de cada cartão
     s6_eyebrow: Passo 06 · Contexto
     optional: Opcional
     s6_lead: Algo mais que devamos incluir?

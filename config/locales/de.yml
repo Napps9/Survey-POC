@@ -1043,6 +1043,8 @@ de:
     brand_cta_desc: Weiter- / Absenden-Buttons
     brand_bg: Hintergrund
     brand_bg_desc: Die Fläche hinter den Karten
+    brand_panel: Linkes Panel
+    brand_panel_desc: Das Medien-Panel jeder Karte
     s6_eyebrow: Schritt 06 · Kontext
     optional: Optional
     s6_lead: Sollen wir noch etwas berücksichtigen?

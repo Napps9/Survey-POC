@@ -1043,6 +1043,8 @@ ar:
     brand_cta_desc: أزرار التالي / الإرسال
     brand_bg: الخلفية
     brand_bg_desc: اللوحة خلف البطاقات
+    brand_panel: اللوحة اليسرى
+    brand_panel_desc: لوحة الوسائط في كل بطاقة
     s6_eyebrow: الخطوة 06 · السياق
     optional: اختياري
     s6_lead: هل هناك أي شيء آخر ينبغي أن ندمجه؟

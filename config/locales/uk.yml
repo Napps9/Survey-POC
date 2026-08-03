@@ -1045,6 +1045,8 @@ uk:
     brand_cta_desc: Кнопки «Далі» / «Надіслати»
     brand_bg: Фон
     brand_bg_desc: Полотно за картками
+    brand_panel: Ліва панель
+    brand_panel_desc: Медіапанель кожної картки
     s6_eyebrow: Крок 06 · Контекст
     optional: Необов'язково
     s6_lead: Що ще варто врахувати?

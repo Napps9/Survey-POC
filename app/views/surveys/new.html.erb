@@ -376,11 +376,15 @@
 
       <%# ── Card 7 · Final touches: Brand colours + Populate vs Blank ── %>
       <%
-        org_pal = current_organisation.brand_palette
+        # Resolved (not raw) so the panel swatch prefills with its effective
+        # colour — org palettes saved before panel existed have no explicit
+        # value and it follows the background until picked.
+        org_pal = BrandPalette.resolve(current_organisation.brand_palette)
         brand_roles = [
           ["primary", t("wizard.brand_primary"), t("wizard.brand_primary_desc")],
           ["cta",     t("wizard.brand_cta"),     t("wizard.brand_cta_desc")],
-          ["bg",      t("wizard.brand_bg"),      t("wizard.brand_bg_desc")]
+          ["bg",      t("wizard.brand_bg"),      t("wizard.brand_bg_desc")],
+          ["panel",   t("wizard.brand_panel"),   t("wizard.brand_panel_desc")]
         ]
         section_label_style = "font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(0,0,0,0.42);font-weight:700;"
       %>

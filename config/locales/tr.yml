@@ -1043,6 +1043,8 @@ tr:
     brand_cta_desc: İleri / Gönder düğmeleri
     brand_bg: Arka plan
     brand_bg_desc: Kartların arkasındaki tuval
+    brand_panel: Sol panel
+    brand_panel_desc: Her kartın medya paneli
     s6_eyebrow: Adım 06 · Bağlam
     optional: İsteğe bağlı
     s6_lead: Eklememiz gereken başka bir şey var mı?

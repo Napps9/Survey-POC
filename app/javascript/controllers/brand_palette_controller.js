@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { resolve, applyVars, clearVars, isDefault, validHex } from "lib/brand_palette"
+import { DEFAULT, resolve, applyVars, clearVars, isDefault, validHex } from "lib/brand_palette"
 
 // Drives the brand-colour pickers in two places:
 //  - the Create wizard's "Brand colours" step (live mock, palette submitted
@@ -11,6 +11,7 @@ export default class extends Controller {
   static values = { url: String }
 
   connect() {
+    this._lastBg = this._roleValue("bg")
     this._apply()
   }
 
@@ -18,6 +19,7 @@ export default class extends Controller {
     const role = event.target.dataset.brandRole
     const hexInput = this._for(this.hexInputTargets, role)
     if (hexInput) hexInput.value = event.target.value.toUpperCase()
+    if (role === "bg") this._panelFollowsBg()
     this._apply()
     this._save()
   }
@@ -29,8 +31,30 @@ export default class extends Controller {
     if (!value.startsWith("#")) value = "#" + value
     const colorInput = this._for(this.colorInputTargets, role)
     if (colorInput) colorInput.value = value.toLowerCase()
+    if (role === "bg") this._panelFollowsBg()
     this._apply()
     this._save()
+  }
+
+  // The panel swatch tracks the background until the user picks a distinct
+  // panel colour: an untouched panel (still equal to the previous background,
+  // or to the legacy default) repainting itself to an old hex on every
+  // background change is exactly the "panel doesn't match what I picked"
+  // complaint that made panel a role.
+  _panelFollowsBg() {
+    const newBg = this._roleValue("bg")
+    const panel = this._roleValue("panel")
+    if (panel && (panel === this._lastBg || panel === DEFAULT.panel.toLowerCase())) {
+      const colorInput = this._for(this.colorInputTargets, "panel")
+      if (colorInput) colorInput.value = newBg
+      const hexInput = this._for(this.hexInputTargets, "panel")
+      if (hexInput) hexInput.value = newBg.toUpperCase()
+    }
+    this._lastBg = newBg
+  }
+
+  _roleValue(role) {
+    return (this._for(this.colorInputTargets, role)?.value || "").toLowerCase()
   }
 
   _for(targets, role) {

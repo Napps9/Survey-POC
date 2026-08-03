@@ -1043,6 +1043,8 @@ ja:
     brand_cta_desc: 次へ / 送信ボタン
     brand_bg: 背景
     brand_bg_desc: カードの背景
+    brand_panel: 左パネル
+    brand_panel_desc: 各カードのメディアパネル
     s6_eyebrow: ステップ06 · コンテキスト
     optional: 任意
     s6_lead: 他に盛り込むべきことはありますか？

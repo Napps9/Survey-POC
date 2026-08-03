@@ -1045,6 +1045,8 @@ pl:
     brand_cta_desc: Przyciski Dalej / Wyślij
     brand_bg: Tło
     brand_bg_desc: Powierzchnia za kartami
+    brand_panel: Lewy panel
+    brand_panel_desc: Panel multimedialny każdej karty
     s6_eyebrow: Krok 06 · Kontekst
     optional: Opcjonalne
     s6_lead: Coś jeszcze, co powinniśmy uwzględnić?

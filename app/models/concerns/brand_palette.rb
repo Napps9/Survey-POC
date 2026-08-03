@@ -1,14 +1,16 @@
 # Canonical brand-palette logic shared by the models, the controller and the
-# view helper. A palette is the three user-set roles (primary / cta / bg);
-# everything else (readable text, hover, surfaces) is derived so the Verto
-# experience stays legible whatever colours a user picks.
+# view helper. A palette is the four user-set roles (primary / cta / bg /
+# panel); everything else (readable text, hover, surfaces) is derived so the
+# Verto experience stays legible whatever colours a user picks.
 #
 # The JS mirror in app/javascript/lib/brand_palette.js must stay in sync with
 # the maths here so the live preview matches the server render.
 module BrandPalette
   # Matches today's Playverto look, so an unset palette renders unchanged.
-  DEFAULT = { "primary" => "#01EACB", "cta" => "#01EACB", "bg" => "#1C2034" }.freeze
-  ROLES   = %w[primary cta bg].freeze
+  # "panel" is the card's left media panel; its default is the legacy literal
+  # the CSS has always fallen back to.
+  DEFAULT = { "primary" => "#01EACB", "cta" => "#01EACB", "bg" => "#1C2034", "panel" => "#2E3564" }.freeze
+  ROLES   = %w[primary cta bg panel].freeze
   HEX     = /\A#[0-9a-fA-F]{6}\z/
 
   module_function
@@ -17,7 +19,7 @@ module BrandPalette
     value.is_a?(String) && value.strip.match?(HEX)
   end
 
-  # Keep only the three roles, only when they are valid 6-digit hex. Returns a
+  # Keep only the known roles, only when they are valid 6-digit hex. Returns a
   # hash of whatever survived (may be empty).
   def sanitize(raw)
     return {} unless raw.respond_to?(:[])
@@ -29,15 +31,24 @@ module BrandPalette
 
   # True when the palette is absent or equal to the Playverto default, so
   # callers can skip injecting variables and let the CSS fallbacks render the
-  # current look unchanged.
+  # current look unchanged. Compared role-by-role with the default filling the
+  # gaps (matching JS isDefault), so a legacy palette that stored the old
+  # three-role default explicitly still counts as default after new roles are
+  # added — otherwise every such Verto would repaint the day a role ships.
   def default?(raw)
     s = sanitize(raw)
-    s.empty? || s == sanitize(DEFAULT)
+    d = sanitize(DEFAULT)
+    ROLES.all? { |role| (s[role] || d[role]) == d[role] }
   end
 
   # Full hash including derived keys, ready to spread into CSS variables.
+  # "panel" is special-cased: when not explicitly set it follows the picked
+  # background exactly — the panel showing a colour nobody chose (the old
+  # lighten(bg, 13%) derivation) is the bug that made it a role.
   def resolve(raw)
-    p = DEFAULT.merge(sanitize(raw))
+    s = sanitize(raw)
+    p = DEFAULT.merge(s)
+    p["panel"] = s["panel"] || s["bg"] || DEFAULT["panel"]
     p.merge(
       "cta_text"     => contrast_text(p["cta"]),
       "cta_hover"    => darken(p["cta"], 0.12),

@@ -139,7 +139,7 @@
   width: 425px;                 /* equal half of 850 */
   flex: 0 0 425px;
   position: relative;
-  background: var(--brand-surface-2, #2E3564);
+  background: var(--brand-panel, #2E3564);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -203,7 +203,7 @@
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  background: var(--brand-surface-2, #2E3564);
+  background: var(--brand-panel, #2E3564);
 }
 .split-left-overlay {
   position: absolute; inset: 0;
@@ -4611,7 +4611,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
     padding: 0;
     border-radius: 0 0 18px 18px;
     overflow: hidden;
-    background: var(--brand-surface-2, #2E3564);
+    background: var(--brand-panel, #2E3564);
   }
   /* NPS hero strip is shorter so the vertical slider fits beneath the
      question text in the remaining viewport. */

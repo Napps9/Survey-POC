@@ -123,6 +123,20 @@ class JsConstantParityTest < ActiveSupport::TestCase
     assert_operator js_array("lib/routable_types.js", "ROUTABLE_TYPES").size, :>=, 5
   end
 
+  # The palette maths lives twice (live preview vs server render); the roles
+  # drifting means a colour a creator can pick that one side silently ignores.
+  test "lib/brand_palette.js roles and defaults match BrandPalette" do
+    assert_equal BrandPalette::ROLES, js_array("lib/brand_palette.js", "ROLES"),
+                 "a role missing from the JS side never live-previews; missing from " \
+                 "Ruby it never renders for respondents"
+
+    js_default = js("lib/brand_palette.js")[/export const DEFAULT = \{(.*?)\}/m, 1]
+                   .scan(/(\w+):\s*"([^"]+)"/).to_h
+    assert_equal BrandPalette::DEFAULT, js_default,
+                 "differing defaults make default? disagree across the mirror, so the " \
+                 "same palette brands the player but not the editor (or vice versa)"
+  end
+
   # The specific hole the drift went through: the editor's type panel builds a
   # card's right-hand component from a lookup table, falling back to an empty
   # string. A type missing from that table silently blanks the card when a

@@ -1043,6 +1043,8 @@ es:
     brand_cta_desc: Botones Siguiente / Enviar
     brand_bg: Fondo
     brand_bg_desc: El fondo detrás de las tarjetas
+    brand_panel: Panel izquierdo
+    brand_panel_desc: El panel multimedia de cada tarjeta
     s6_eyebrow: Paso 06 · Contexto
     optional: Opcional
     s6_lead: "¿Algo más que debamos tener en cuenta?"

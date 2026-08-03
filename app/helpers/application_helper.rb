@@ -349,6 +349,7 @@ module ApplicationHelper
       "--brand-primary"      => r["primary"],
       "--brand-cta"          => r["cta"],
       "--brand-bg"           => r["bg"],
+      "--brand-panel"        => r["panel"],
       "--brand-cta-text"     => r["cta_text"],
       "--brand-cta-hover"    => r["cta_hover"],
       "--brand-text"         => r["text"],

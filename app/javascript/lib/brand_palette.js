@@ -1,8 +1,8 @@
 // Mirror of app/models/concerns/brand_palette.rb so the live preview matches
 // the server render exactly. Keep the maths in sync with the Ruby module.
 
-export const DEFAULT = { primary: "#01EACB", cta: "#01EACB", bg: "#1C2034" }
-export const ROLES = ["primary", "cta", "bg"]
+export const DEFAULT = { primary: "#01EACB", cta: "#01EACB", bg: "#1C2034", panel: "#2E3564" }
+export const ROLES = ["primary", "cta", "bg", "panel"]
 const HEX = /^#?[0-9a-fA-F]{6}$/
 
 export function validHex(value) {
@@ -72,7 +72,12 @@ export function isDefault(raw) {
 }
 
 export function resolve(raw) {
-  const p = { ...DEFAULT, ...sanitize(raw) }
+  const s = sanitize(raw)
+  const p = { ...DEFAULT, ...s }
+  // Unset panel follows the picked background exactly (see the Ruby mirror —
+  // the old lighten(bg, 13%) derivation showing an unchosen colour is the bug
+  // that made panel a role).
+  p.panel = s.panel || s.bg || DEFAULT.panel
   return {
     ...p,
     cta_text: contrastText(p.cta),
@@ -89,6 +94,7 @@ export const CSS_VARS = {
   primary: "--brand-primary",
   cta: "--brand-cta",
   bg: "--brand-bg",
+  panel: "--brand-panel",
   cta_text: "--brand-cta-text",
   cta_hover: "--brand-cta-hover",
   text: "--brand-text",

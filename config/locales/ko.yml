@@ -1043,6 +1043,8 @@ ko:
     brand_cta_desc: 다음 / 제출 버튼
     brand_bg: 배경
     brand_bg_desc: 카드 뒤의 캔버스
+    brand_panel: 왼쪽 패널
+    brand_panel_desc: 각 카드의 미디어 패널
     s6_eyebrow: 6단계 · 맥락
     optional: 선택
     s6_lead: 추가로 반영할 사항이 있나요?

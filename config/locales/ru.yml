@@ -1045,6 +1045,8 @@ ru:
     brand_cta_desc: Кнопки «Далее» / «Отправить»
     brand_bg: Фон
     brand_bg_desc: Холст за карточками
+    brand_panel: Левая панель
+    brand_panel_desc: Медиапанель каждой карточки
     s6_eyebrow: Шаг 06 · Контекст
     optional: Необязательно
     s6_lead: Что ещё стоит учесть?

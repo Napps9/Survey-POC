@@ -1043,6 +1043,8 @@ nl:
     brand_cta_desc: Volgende-/Verzenden-knoppen
     brand_bg: Achtergrond
     brand_bg_desc: Het canvas achter de kaarten
+    brand_panel: Linkerpaneel
+    brand_panel_desc: Het mediapaneel van elke kaart
     s6_eyebrow: Stap 06 · Context
     optional: Optioneel
     s6_lead: Nog iets dat we moeten meenemen?

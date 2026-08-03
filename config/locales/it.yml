@@ -1043,6 +1043,8 @@ it:
     brand_cta_desc: Pulsanti Avanti / Invia
     brand_bg: Sfondo
     brand_bg_desc: Lo sfondo dietro le carte
+    brand_panel: Pannello sinistro
+    brand_panel_desc: Il pannello media di ogni scheda
     s6_eyebrow: Passo 06 · Contesto
     optional: Opzionale
     s6_lead: Qualcos'altro che dovremmo includere?

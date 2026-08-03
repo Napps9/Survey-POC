@@ -1043,6 +1043,8 @@ fr:
     brand_cta_desc: Boutons Suivant / Envoyer
     brand_bg: Arrière-plan
     brand_bg_desc: Le fond derrière les cartes
+    brand_panel: Panneau gauche
+    brand_panel_desc: Le panneau média de chaque carte
     s6_eyebrow: Étape 06 · Contexte
     optional: Facultatif
     s6_lead: Autre chose à intégrer ?
