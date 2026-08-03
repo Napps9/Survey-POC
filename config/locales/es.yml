@@ -29,6 +29,7 @@ es:
     'yes': Sí
     'no': 'No'
     add_option: Agregar opción
+    new_option: Nueva opción
     add_statement: Agregar enunciado
     swipe_no: "No"
     swipe_unsure: "Unsure"

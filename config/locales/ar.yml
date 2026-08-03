@@ -29,6 +29,7 @@ ar:
     'yes': نعم
     'no': لا
     add_option: إضافة خيار
+    new_option: خيار جديد
     add_statement: إضافة عبارة
     swipe_no: "لا"
     swipe_unsure: "Unsure"

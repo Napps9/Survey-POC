@@ -29,6 +29,7 @@ id:
     'yes': Ya
     'no': Tidak
     add_option: Tambah opsi
+    new_option: Opsi baru
     add_statement: Tambah pernyataan
     swipe_no: "Tidak"
     swipe_unsure: "Unsure"

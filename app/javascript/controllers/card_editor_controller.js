@@ -1,4 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
+import { choiceListItemHtml, prioritiseItemHtml } from "lib/choice_templates"
+import { t } from "lib/i18n"
 
 const SWIPE_FILLS = [
   ["#d4edda","#a8d5b5"], ["#d1ecf1","#9fd5df"], ["#fff3cd","#ffd88a"],
@@ -46,18 +48,18 @@ export default class extends Controller {
 
   addPickOption(event) {
     event.stopPropagation() // don't also select/apply the type underneath
-    const addBtn  = this.element.querySelector("[data-card-editor-add]")
-    const isMulti = this.element.dataset.pickerModeValue === "multi"
-    const li = document.createElement("li")
-    li.className = "pick-item"
-    li.dataset.pickerTarget = "item"
-    li.dataset.action = "click->picker#pick"
-    li.dataset.selected = "false"
-    li.innerHTML = `
-      <span class="${isMulti ? "pick-square" : "pick-dot"}">✓</span>
-      <span class="pick-text" contenteditable="true">New option</span>
-      <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
-    `
+    const addBtn = this.element.querySelector("[data-card-editor-add]")
+    // Same shared row template the server render and the type panel use — the
+    // old hand-built row here (no tile, square borders) sat visibly mis-sized
+    // between the server-rendered rows until the next full reload.
+    const index = this.element.querySelectorAll(".pick-item").length
+    const label = t("card.new_option")
+    const html = this.element.classList.contains("prioritise-list")
+      ? prioritiseItemHtml(label, index)
+      : choiceListItemHtml(label, index, this.element.dataset.pickerModeValue === "multi" ? "multi" : "single")
+    const holder = document.createElement("template")
+    holder.innerHTML = html.trim()
+    const li = holder.content.firstElementChild
     addBtn ? addBtn.before(li) : this.element.appendChild(li)
     this.dispatch("changed")
     const editable = li.querySelector("[contenteditable]")

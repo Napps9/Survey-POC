@@ -29,6 +29,7 @@ he:
     'yes': כן
     'no': לא
     add_option: הוסף אפשרות
+    new_option: אפשרות חדשה
     add_statement: הוסף משפט
     swipe_no: "לא"
     swipe_unsure: "Unsure"

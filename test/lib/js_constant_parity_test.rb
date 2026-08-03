@@ -123,6 +123,22 @@ class JsConstantParityTest < ActiveSupport::TestCase
     assert_operator js_array("lib/routable_types.js", "ROUTABLE_TYPES").size, :>=, 5
   end
 
+  # Option-row markup existed three times client-side (type panel rebuilds,
+  # card_editor's "Add option", scenario's answer page) and one copy drifted:
+  # "＋ Add option" built a tile-less row that sat visibly mis-sized between
+  # the server-rendered rows until the next reload. One template module now.
+  test "the option-row markup is defined once" do
+    %w[choice-list-item\ pick-item choice-card].each do |marker|
+      definitions = Dir[Rails.root.join("app/javascript/**/*.js")].select do |path|
+        File.read(path).include?(%(class="#{marker}"))
+      end.map { |path| path.sub("#{Rails.root}/app/javascript/", "") }
+
+      assert_equal [ "lib/choice_templates.js" ], definitions,
+                   "build option rows via lib/choice_templates instead of re-typing the " \
+                   "markup — a drifted copy renders mis-sized rows until the next reload"
+    end
+  end
+
   # The palette maths lives twice (live preview vs server render); the roles
   # drifting means a colour a creator can pick that one side silently ignores.
   test "lib/brand_palette.js roles and defaults match BrandPalette" do

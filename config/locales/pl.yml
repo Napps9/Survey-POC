@@ -29,6 +29,7 @@ pl:
     'yes': Tak
     'no': Nie
     add_option: Dodaj opcję
+    new_option: Nowa opcja
     add_statement: Dodaj stwierdzenie
     swipe_no: "Nie"
     swipe_unsure: "Unsure"

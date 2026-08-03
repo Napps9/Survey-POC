@@ -238,6 +238,16 @@ module ApplicationHelper
                        default: I18n.t("defaults", locale: :en, default: {}))
   end
 
+  # Icon lookup for option markup built client-side (lib/option_icons.js):
+  # `keywords` mirrors OptionIconLibrary::KEYWORD_TO_FILE with digest asset
+  # URLs, `ids` addresses each icon by its basename for explicit picks.
+  def option_icon_map_data
+    {
+      keywords: OptionIconLibrary::KEYWORD_TO_FILE.transform_values { |f| image_path("option-icons/#{f}") },
+      ids: OptionIconLibrary::DATA.to_h { |entry| [ File.basename(entry["file"], ".svg"), image_path("option-icons/#{entry["file"]}") ] }
+    }
+  end
+
   # Images present under app/assets/images/verto-library/, grouped by
   # sub-folder (`backgrounds`, `left-panel`, `select-art`, `range-art`,
   # `swipe-cards`, `mobile-backgrounds`, ...). Each value is an array of

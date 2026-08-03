@@ -31,6 +31,7 @@ en:
     "yes": "Yes"
     "no": "No"
     add_option: "Add option"
+    new_option: "New option"
     add_statement: "Add statement"
     swipe_no: "No"
     swipe_unsure: "Unsure"

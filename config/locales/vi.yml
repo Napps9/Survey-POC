@@ -29,6 +29,7 @@ vi:
     'yes': Có
     'no': Không
     add_option: Thêm tùy chọn
+    new_option: Tùy chọn mới
     add_statement: Thêm phát biểu
     swipe_no: "Không"
     swipe_unsure: "Unsure"

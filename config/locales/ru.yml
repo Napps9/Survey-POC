@@ -29,6 +29,7 @@ ru:
     'yes': Да
     'no': Нет
     add_option: Добавить вариант
+    new_option: Новый вариант
     add_statement: Добавить утверждение
     swipe_no: "Нет"
     swipe_unsure: "Unsure"

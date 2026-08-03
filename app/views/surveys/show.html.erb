@@ -36,6 +36,12 @@
     content, not chrome. See card_default_options_i18n / defaultOptionsFor. %>
 <script id="card-defaults" type="application/json"><%= card_default_options_i18n(@survey).to_json.html_safe %></script>
 
+<%# Option-icon lookup for markup built client-side (type switches, new
+    options): keyword→URL for label matching, id→URL for explicit picks. URLs
+    only — the SVG bodies total ~200KB and are fetched on demand. See
+    lib/option_icons.js / OptionIconLibrary. %>
+<script id="option-icon-map" type="application/json"><%= option_icon_map_data.to_json.html_safe %></script>
+
 <div class="flex flex-col h-full"
      data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel gate-cards score-modal flows"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"

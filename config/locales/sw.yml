@@ -29,6 +29,7 @@ sw:
     'yes': Ndiyo
     'no': Hapana
     add_option: Ongeza chaguo
+    new_option: Chaguo jipya
     add_statement: Ongeza kauli
     swipe_no: "Hapana"
     swipe_unsure: "Unsure"

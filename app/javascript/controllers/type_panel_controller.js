@@ -3,6 +3,8 @@ import { ROUTABLE_TYPES } from "lib/routable_types"
 import { PAGED_TYPES, isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
 import { DEFAULT_OPTIONS, defaultOptionsFor } from "lib/default_options"
+import { choiceListItemHtml, prioritiseItemHtml, choiceGridItemHtml, addOptionBtnHtml } from "lib/choice_templates"
+import { injectIcons } from "lib/option_icons"
 import { t } from "lib/i18n"
 
 
@@ -197,13 +199,7 @@ const COMPONENTS = {
     const labels = (opts || []).length >= 2 ? opts : defaultOptionsFor("yes_no")
     return `
     <ul class="choice-list choice-list--yesno" data-controller="picker" data-picker-mode-value="single">
-      ${[[labels[0], 1], [labels[1], 4]].map(([label, bg]) => `
-        <li class="choice-list-item pick-item" data-picker-target="item"
-            data-action="click->picker#pick" data-selected="false">
-          <div class="choice-list-tile choice-bg-${bg}"></div>
-          <span class="pick-text choice-list-label" contenteditable="true">${esc(label)}</span>
-          <span class="choice-list-tick pick-dot">✓</span>
-        </li>`).join("")}
+      ${[[labels[0], 1], [labels[1], 4]].map(([label, bg]) => yesNoItemHtml(label, bg)).join("")}
     </ul>`
   },
 
@@ -266,17 +262,7 @@ const COMPONENTS = {
         <div class="book-page-scroll">
           <div class="book-page-kicker">${esc(t("editor.scenario.answer_kicker"))}</div>
           <ul class="choice-list choice-list--single" data-controller="picker card-editor" data-picker-mode-value="single">
-            ${opts.map((o, i) => `
-              <li class="choice-list-item pick-item" data-picker-target="item"
-                  data-action="click->picker#pick" data-selected="false">
-                <div class="choice-list-tile choice-bg-${(i % 6) + 1}"></div>
-                <span class="pick-text choice-list-label" contenteditable="true">${esc(o)}</span>
-                <span class="choice-list-tick pick-dot">✓</span>
-                <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
-              </li>`).join("")}
-            <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
-              <span>＋</span> ${esc(t("card.add_option"))}
-            </li>
+            ${opts.map((o, i) => choiceListItemHtml(o, i, "single")).join("")}${addOptionBtnHtml()}
           </ul>
         </div>
         <div class="book-page-fade"></div>
@@ -402,37 +388,15 @@ const COMPONENTS = {
 function prioritiseHtml(opts) {
   return `
     <ul class="choice-list prioritise-list" data-controller="prioritise card-editor">
-      ${opts.map((o, i) => `
-        <li class="choice-list-item pick-item prioritise-item" data-prioritise-target="item"
-            data-action="pointerdown->prioritise#start">
-          <span class="prioritise-rank" data-prioritise-target="rank">${i + 1}</span>
-          <div class="choice-list-tile choice-bg-${(i % 6) + 1}"></div>
-          <span class="pick-text choice-list-label" contenteditable="true">${esc(o)}</span>
-          <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
-          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
-        </li>`).join("")}
-      <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
-        <span>＋</span> ${esc(t("card.add_option"))}
-      </li>
+      ${opts.map((o, i) => prioritiseItemHtml(o, i)).join("")}${addOptionBtnHtml()}
     </ul>`
 }
 
 function choiceListHtml(opts, mode) {
-  const tick = mode === "multi" ? "pick-square" : "pick-dot"
   return `
     <ul class="choice-list choice-list--${mode}" data-controller="picker card-editor"
         data-picker-mode-value="${mode}">
-      ${opts.map((o, i) => `
-        <li class="choice-list-item pick-item" data-picker-target="item"
-            data-action="click->picker#pick" data-selected="false">
-          <div class="choice-list-tile choice-bg-${(i % 6) + 1}"></div>
-          <span class="pick-text choice-list-label" contenteditable="true">${esc(o)}</span>
-          <span class="choice-list-tick ${tick}">✓</span>
-          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
-        </li>`).join("")}
-      <li class="pick-add-btn" data-action="click->card-editor#addPickOption" data-card-editor-add>
-        <span>＋</span> ${esc(t("card.add_option"))}
-      </li>
+      ${opts.map((o, i) => choiceListItemHtml(o, i, mode)).join("")}${addOptionBtnHtml()}
     </ul>`
 }
 
@@ -441,15 +405,7 @@ function gridHtml(opts, mode) {
   return `
     <ul class="choice-grid choice-grid--${mode} choice-grid-${cols}" data-controller="picker"
         data-picker-mode-value="${mode}">
-      ${opts.map((o,i) => `
-        <li class="choice-card" data-picker-target="item"
-            data-action="click->picker#pick" data-selected="false">
-          <div class="choice-card-bg choice-bg-${(i % 6) + 1}">
-            <div class="choice-overlay"></div>
-            <div class="choice-tick">✓</div>
-          </div>
-          <div class="choice-label" contenteditable="true">${esc(o)}</div>
-        </li>`).join("")}
+      ${opts.map((o, i) => choiceGridItemHtml(o, i)).join("")}
     </ul>`
 }
 
@@ -1179,6 +1135,9 @@ export default class extends Controller {
         pages:           this._pagesFor(card, type),
         optionImages:    this._optionImagesFor(card, type)
       })
+      // The server renders option icons inline; rebuilt markup must get the
+      // same pass or a type switch strips every icon until the next reload.
+      injectIcons(slot)
     }
 
     card.dataset.cardType = type

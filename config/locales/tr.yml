@@ -29,6 +29,7 @@ tr:
     'yes': Evet
     'no': Hayır
     add_option: Seçenek ekle
+    new_option: Yeni seçenek
     add_statement: İfade ekle
     swipe_no: "Hayır"
     swipe_unsure: "Unsure"

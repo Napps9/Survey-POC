@@ -29,6 +29,7 @@ hi:
     'yes': हाँ
     'no': नहीं
     add_option: विकल्प जोड़ें
+    new_option: नया विकल्प
     add_statement: कथन जोड़ें
     swipe_no: "नहीं"
     swipe_unsure: "Unsure"

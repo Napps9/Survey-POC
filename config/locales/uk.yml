@@ -29,6 +29,7 @@ uk:
     'yes': Так
     'no': Ні
     add_option: Додати варіант
+    new_option: Новий варіант
     add_statement: Додати твердження
     swipe_no: "Ні"
     swipe_unsure: "Unsure"

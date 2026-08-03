@@ -1547,6 +1547,10 @@
 .choice-list-item {
   display: flex; align-items: center; gap: 12px;
   padding: 8px 12px 8px 8px;
+  /* Tile (56px) + padding: rows without a tile (yes/no) or with short labels
+     still line up with their siblings instead of each row picking its own
+     height. */
+  min-height: 72px;
   background: white;
   border: 1px solid rgba(0,0,0,0.07);
   border-radius: 14px;
@@ -1618,7 +1622,12 @@
 .phone-bottom .prioritise-rank { width: 20px; height: 20px; font-size: 11px; }
 
 /* ── MCQ grid ───────────────────────────────────── */
-.choice-grid    { display: grid; gap: 10px; }
+/* grid-auto-rows + full-height cards: every row sizes to the tallest card and
+   every card fills its row, so tiles in the same grid stay one size instead
+   of a wrapped label stealing height from its own tile — the desktop twin of
+   the mobile player's equal-rows fix (see the mobile media query). */
+.choice-grid    { display: grid; gap: 10px; grid-auto-rows: 1fr; }
+.choice-grid .choice-card { height: 100%; }
 .choice-grid-2  { grid-template-columns: 1fr 1fr; }
 .choice-grid-3  { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .choice-card {
@@ -1707,6 +1716,9 @@
   font-weight: 600;
   color: #1C2034;
   line-height: 1.2;
+  /* Reserve two lines so a neighbour's wrapped label doesn't leave this
+     card's tile taller than the rest of the row. */
+  min-height: 2.4em;
   padding: 0 2px;
   outline: none;
 }

@@ -29,6 +29,7 @@ nl:
     'yes': Ja
     'no': Nee
     add_option: Optie toevoegen
+    new_option: Nieuwe optie
     add_statement: Stelling toevoegen
     swipe_no: "Nee"
     swipe_unsure: "Unsure"
