@@ -131,6 +131,7 @@ ko:
     region_zoom_out: "축소"
     region_reset_view: "보기 초기화"
     preview_banner: "미리보기 모드 — 응답은 저장되지 않습니다"
+    test_mode_banner: 테스트 모드 — 자유롭게 사용해 보세요. 입력한 내용은 저장되지 않습니다
     exit_preview: "미리보기 종료"
     thank_you_title: 감사합니다!
     thank_you_sub: 응답이 기록되었습니다.

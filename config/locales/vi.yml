@@ -131,6 +131,7 @@ vi:
     region_zoom_out: "Thu nhỏ"
     region_reset_view: "Đặt lại chế độ xem"
     preview_banner: "Chế độ xem trước — câu trả lời không được lưu"
+    test_mode_banner: Chế độ thử nghiệm — thoải mái dùng thử, không có gì bạn nhập được lưu lại
     exit_preview: "Thoát xem trước"
     thank_you_title: Cảm ơn bạn!
     thank_you_sub: Câu trả lời của bạn đã được ghi nhận.

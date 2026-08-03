@@ -77,7 +77,7 @@ class SurveysController < ApplicationController
   def settings_locked_message = t("flash.surveys.settings_locked")
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy ]
-  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :update_settings, :qr ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :update_settings, :qr ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
@@ -495,6 +495,23 @@ class SurveysController < ApplicationController
     notice = @survey.closed? ? t("flash.surveys.closed") :
                                t("flash.surveys.unpublished")
     redirect_to survey_path(@survey), notice: notice
+  end
+
+  # POST /surveys/:id/test_link — mint (or regenerate) the Test Mode token.
+  # No email-verification gate, unlike #publish: that gate exists because
+  # publishing starts collecting respondent data under an unproven identity,
+  # and Test Mode records nothing — it only exposes the creator's own content
+  # to people they hand the link to. Gating it would just obstruct
+  # try-before-verify.
+  def enable_test_link
+    @survey.update!(test_token: SecureRandom.urlsafe_base64(18))
+    redirect_to survey_path(@survey, panel: "publish")
+  end
+
+  # DELETE /surveys/:id/test_link — turn the link off (404s immediately).
+  def disable_test_link
+    @survey.update!(test_token: nil)
+    redirect_to survey_path(@survey, panel: "publish")
   end
 
   # POST /surveys/:id/card_image

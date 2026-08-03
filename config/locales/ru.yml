@@ -131,6 +131,7 @@ ru:
     region_zoom_out: "Отдалить"
     region_reset_view: "Сбросить вид"
     preview_banner: "Режим предпросмотра — ответы не сохраняются"
+    test_mode_banner: Тестовый режим — пробуйте свободно, введённые данные не сохраняются
     exit_preview: "Выйти из предпросмотра"
     thank_you_title: Спасибо!
     thank_you_sub: Ваши ответы сохранены.

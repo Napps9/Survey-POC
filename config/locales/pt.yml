@@ -131,6 +131,7 @@ pt:
     region_zoom_out: "Diminuir zoom"
     region_reset_view: "Repor vista"
     preview_banner: "Modo de pré-visualização — as respostas não são guardadas"
+    test_mode_banner: Modo de teste — experimente à vontade, nada do que você digitar é salvo
     exit_preview: "Sair da pré-visualização"
     thank_you_title: Obrigado!
     thank_you_sub: As suas respostas foram registadas.

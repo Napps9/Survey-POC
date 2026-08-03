@@ -1053,6 +1053,43 @@
           <% end %>
         </details>
 
+        <%# Test Mode — a second kind of link: shareable without sign-in,
+            plays the full Verto (drafts included), keeps working while you
+            edit, and records nothing. Served from /test/ (not /play/) so the
+            service worker never caches it stale — testers always see the
+            latest edit. %>
+        <details class="publish-block" <%= "open".html_safe if @survey.test_token.present? %>>
+          <summary class="publish-block-title">Test link <span class="pub-chev">⌄</span></summary>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.5;margin-bottom:10px;">
+            Share this to let anyone try the Verto — even as a draft — while you keep editing.
+            Testers always see your latest edits, and nothing they enter is saved.
+          </div>
+          <% if @survey.test_token.present? %>
+            <input type="text" readonly
+                   id="test-url-<%= @survey.id %>"
+                   value="<%= test_survey_url(@survey.test_token) %>"
+                   style="width:100%;padding:8px 12px;border-radius:10px;background:rgba(255,250,119,0.07);border:1px solid rgba(255,250,119,0.25);color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button type="button"
+                      onclick="(navigator.clipboard?.writeText(document.getElementById('test-url-<%= @survey.id %>').value) ?? Promise.reject()).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',2000)}).catch(()=>{this.textContent='Copy failed — select &amp; copy';setTimeout(()=>this.textContent='Copy link',2000)})"
+                      style="flex:1;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);cursor:pointer;">Copy link</button>
+              <%= button_to "Regenerate", test_link_survey_path(@survey),
+                    method: :post,
+                    form: { style: "flex:1;margin:0;", data: { turbo_confirm: "Regenerate the test link? The old link stops working immediately." } },
+                    style: "width:100%;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);cursor:pointer;" %>
+            </div>
+            <%= button_to "Turn off test link", test_link_survey_path(@survey),
+                  method: :delete,
+                  form: { style: "margin:8px 0 0;", data: { turbo_confirm: "Turn off the test link? Anyone holding it gets a not-found page." } },
+                  style: "width:100%;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px solid rgba(255,255,255,0.12);cursor:pointer;" %>
+          <% else %>
+            <%= button_to "Create test link", test_link_survey_path(@survey),
+                  method: :post,
+                  form: { style: "margin:0;" },
+                  style: "width:100%;padding:10px;border-radius:12px;background:rgba(255,250,119,0.85);color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;" %>
+          <% end %>
+        </details>
+
         <%# What the respondent can do once they've finished. Both were
             hardcoded on for every published Verto, so both default to ON and
             this panel only lets a creator turn them off — defaulting either to

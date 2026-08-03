@@ -10,7 +10,12 @@
   # Live visitors keep the token they arrived with (publish or share), so
   # progress/submit resolve the same attribution context.
   preview_mode    = @preview == true
-  play_token      = params[:token].presence || @survey.publish_token
+  # Test Mode (@test_mode, via /test/:token) blanks the token itself:
+  # params[:token] is the TEST token, not a play token, and every optional
+  # endpoint URL below (results/regions/quiz/share) derives from play_token —
+  # nil kills the whole URL family at the source, so an unauthenticated
+  # tester's page carries no live endpoint at all.
+  play_token      = @test_mode ? nil : (params[:token].presence || @survey.publish_token)
   progress_url    = preview_mode ? "" : progress_survey_url(play_token)
   submit_url      = preview_mode ? "" : submit_survey_url(play_token)
   consent_url     = preview_mode ? "" : consent_survey_url(play_token)
@@ -84,7 +89,15 @@
      data-player-end-screens-value="<%= @survey.end_screens_list.to_json %>"
      data-player-forward-label-value="<%= t('player.visit_website') %>">
 
-  <% if preview_mode %>
+  <% if @test_mode %>
+    <%# Test Mode strip: viewers are unauthenticated testers, so no exit link
+        into the studio — just what this link is and that nothing is saved. %>
+    <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 14px;background:rgba(255,250,119,0.1);border-bottom:1px solid rgba(255,250,119,0.3);">
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:#FFFA77;">
+        ⚗ <%= t("player.test_mode_banner") %>
+      </span>
+    </div>
+  <% elsif preview_mode %>
     <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 14px;background:rgba(1,234,203,0.1);border-bottom:1px solid rgba(1,234,203,0.25);">
       <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:#01EACB;">
         ▶ <%= t("player.preview_banner") %>

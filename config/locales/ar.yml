@@ -131,6 +131,7 @@ ar:
     region_zoom_out: "تصغير"
     region_reset_view: "إعادة ضبط العرض"
     preview_banner: "وضع المعاينة — لن يتم حفظ الإجابات"
+    test_mode_banner: وضع الاختبار — جرّب بحرية، لا يتم حفظ أي شيء تدخله
     exit_preview: "إنهاء المعاينة"
     thank_you_title: شكرًا لك!
     thank_you_sub: تم تسجيل إجاباتك.

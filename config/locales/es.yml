@@ -131,6 +131,7 @@ es:
     region_zoom_out: "Alejar"
     region_reset_view: "Restablecer vista"
     preview_banner: "Modo de vista previa — las respuestas no se guardan"
+    test_mode_banner: Modo de prueba — pruébalo libremente, nada de lo que escribas se guarda
     exit_preview: "Salir de la vista previa"
     thank_you_title: "¡Gracias!"
     thank_you_sub: Tus respuestas han sido registradas.

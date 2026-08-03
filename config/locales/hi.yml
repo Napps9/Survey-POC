@@ -131,6 +131,7 @@ hi:
     region_zoom_out: "ज़ूम आउट"
     region_reset_view: "दृश्य रीसेट करें"
     preview_banner: "पूर्वावलोकन मोड — जवाब सहेजे नहीं जाएँगे"
+    test_mode_banner: टेस्ट मोड — बेझिझक आज़माएँ, आपकी कोई भी प्रविष्टि सहेजी नहीं जाती
     exit_preview: "पूर्वावलोकन से बाहर निकलें"
     thank_you_title: धन्यवाद!
     thank_you_sub: आपके उत्तर दर्ज कर लिए गए हैं।

@@ -131,6 +131,7 @@ he:
     region_zoom_out: "הקטנה"
     region_reset_view: "איפוס תצוגה"
     preview_banner: "מצב תצוגה מקדימה — התשובות לא יישמרו"
+    test_mode_banner: מצב בדיקה — נסו בחופשיות, שום דבר שתזינו לא נשמר
     exit_preview: "יציאה מהתצוגה המקדימה"
     thank_you_title: תודה רבה!
     thank_you_sub: תגובותיך נשמרו.

@@ -131,6 +131,7 @@ id:
     region_zoom_out: "Perkecil"
     region_reset_view: "Atur ulang tampilan"
     preview_banner: "Mode pratinjau — jawaban tidak disimpan"
+    test_mode_banner: Mode Uji — coba dengan bebas, tidak ada yang Anda masukkan disimpan
     exit_preview: "Keluar dari pratinjau"
     thank_you_title: Terima kasih!
     thank_you_sub: Tanggapan Anda telah dicatat.

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_03_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_03_110000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -545,6 +545,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_03_100000) do
     t.boolean "share_enabled", default: true, null: false
     t.boolean "show_results_comparison", default: false, null: false
     t.string "slug"
+    t.string "test_token"
     t.text "thankyou_body"
     t.string "thankyou_title"
     t.string "theme"
@@ -560,6 +561,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_03_100000) do
     t.index ["organisation_id"], name: "index_surveys_on_organisation_id"
     t.index ["publish_token"], name: "index_surveys_on_publish_token", unique: true
     t.index ["slug"], name: "index_surveys_on_slug", unique: true
+    t.index ["test_token"], name: "index_surveys_on_test_token", unique: true
   end
 
   create_table "translation_cache", force: :cascade do |t|

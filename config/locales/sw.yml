@@ -131,6 +131,7 @@ sw:
     region_zoom_out: "Punguza"
     region_reset_view: "Weka upya mwonekano"
     preview_banner: "Hali ya kuhakiki — majibu hayahifadhiwi"
+    test_mode_banner: Hali ya Jaribio — jaribu kwa uhuru, hakuna unachoingiza kinachohifadhiwa
     exit_preview: "Funga hakiki"
     thank_you_title: Asante!
     thank_you_sub: Majibu yako yamehifadhiwa.

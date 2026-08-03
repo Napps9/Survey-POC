@@ -721,6 +721,16 @@ class Survey < ApplicationRecord
     publish_token.present? && unpublished_at.nil?
   end
 
+  # Test Mode: /test/:token plays the Verto — drafts included — without
+  # sign-in, records nothing, and stays current while the creator edits.
+  # Independent of published?/editing_locked? by design; since no responses
+  # are ever written through it, it can never flip the editing lock. The
+  # /test/ namespace resolves ONLY by exact test_token, so it never interacts
+  # with slug_taken?'s /play/ namespace guard.
+  def test_playable?
+    test_token.present? && !deleted?
+  end
+
   # Published once, currently taken down.
   def unpublished?
     publish_token.present? && unpublished_at.present?

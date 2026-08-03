@@ -131,6 +131,7 @@ pl:
     region_zoom_out: "Oddal"
     region_reset_view: "Zresetuj widok"
     preview_banner: "Tryb podglądu — odpowiedzi nie są zapisywane"
+    test_mode_banner: Tryb testowy — wypróbuj swobodnie, nic co wpiszesz nie jest zapisywane
     exit_preview: "Zamknij podgląd"
     thank_you_title: Dziękujemy!
     thank_you_sub: Twoje odpowiedzi zostały zapisane.

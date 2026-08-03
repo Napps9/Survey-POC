@@ -131,6 +131,7 @@ de:
     region_zoom_out: "Verkleinern"
     region_reset_view: "Ansicht zurücksetzen"
     preview_banner: "Vorschau-Modus — Antworten werden nicht gespeichert"
+    test_mode_banner: Testmodus — frei ausprobieren, nichts wird gespeichert
     exit_preview: "Vorschau beenden"
     thank_you_title: Vielen Dank!
     thank_you_sub: Deine Antworten wurden gespeichert.

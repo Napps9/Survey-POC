@@ -131,6 +131,7 @@ nl:
     region_zoom_out: "Uitzoomen"
     region_reset_view: "Weergave resetten"
     preview_banner: "Voorbeeldmodus — antwoorden worden niet opgeslagen"
+    test_mode_banner: Testmodus — probeer vrijuit, niets wat je invoert wordt opgeslagen
     exit_preview: "Voorbeeld sluiten"
     thank_you_title: Bedankt!
     thank_you_sub: Je antwoorden zijn vastgelegd.

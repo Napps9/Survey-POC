@@ -11,6 +11,12 @@ Rails.application.routes.draw do
   get  "play/:token/regions", to: "player#regions", as: :player_regions
   get  "play/:token/location_search", to: "player#location_search", as: :player_location_search
 
+  # Test Mode: shareable while still editable, records nothing. Deliberately
+  # OUTSIDE /play/ — the service worker's scope is /play/ only and it serves
+  # player HTML stale-while-revalidate, which would pin a mutable test link
+  # one edit behind forever (see app/javascript/sw_register.js).
+  get "test/:token", to: "player#test_show", as: :test_survey
+
   # Auth
   resource  :session,       only: [ :new, :create, :destroy ]
   resources :passwords,     param: :token, only: [ :new, :create, :edit, :update ]
@@ -83,6 +89,8 @@ Rails.application.routes.draw do
   post "surveys/finalize_import",     to: "surveys#finalize_import", as: :finalize_import_survey
   post "surveys/:id/publish",         to: "surveys#publish",  as: :publish_survey
   post "surveys/:id/unpublish",       to: "surveys#unpublish", as: :unpublish_survey
+  post   "surveys/:id/test_link",     to: "surveys#enable_test_link",  as: :test_link_survey
+  delete "surveys/:id/test_link",     to: "surveys#disable_test_link"
   post "surveys/:id/duplicate",       to: "surveys#duplicate", as: :duplicate_survey
   get  "surveys/:id/preview",         to: "surveys#preview",  as: :preview_survey
   get  "surveys/:id/qr",              to: "surveys#qr",       as: :qr_survey

@@ -133,6 +133,7 @@ en:
     region_zoom_out: "Zoom out"
     region_reset_view: "Reset view"
     preview_banner: "Preview mode — responses aren't saved"
+    test_mode_banner: "Test Mode — try it out freely, nothing you enter is saved"
     exit_preview: "Exit preview"
     thank_you_title: "Thanks for taking part!"
     thank_you_sub: "Your responses have been recorded."

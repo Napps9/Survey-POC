@@ -67,7 +67,29 @@ class PlayerController < ApplicationController
     safari: 16.4, chrome: 89, firefox: 108, opera: 76, ie: false
   }.freeze
 
-  before_action :load_survey_and_share
+  before_action :load_survey_and_share, except: :test_show
+  # A tester opening a shared link is read-only traffic; aligned with the
+  # other public read endpoints above.
+  rate_limit to: 120, within: 1.minute, only: :test_show
+
+  # GET /test/:token — Test Mode. The exact respondent experience (drafts
+  # included) with every recording endpoint blanked, shareable without
+  # sign-in. Reuses the owner-preview machinery in player/show.html.erb:
+  # @preview blanks progress/submit/consent, and @test_mode additionally
+  # blanks the play token itself so no results/regions/quiz URL leaks a live
+  # endpoint to an unauthenticated tester.
+  def test_show
+    @survey = Survey.without_report_text.find_by(test_token: params[:token])
+    return render :unavailable, status: :not_found unless @survey
+    if @survey.deleted?
+      @oops_gone = true
+      return render :unavailable, status: :gone
+    end
+    @preview   = true
+    @test_mode = true
+    @display_locale = resolve_play_locale
+    render :show
+  end
 
   def show
     # A token that resolves nothing is almost always a link shared before the

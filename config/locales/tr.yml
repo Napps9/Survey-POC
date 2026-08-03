@@ -131,6 +131,7 @@ tr:
     region_zoom_out: "Uzaklaştır"
     region_reset_view: "Görünümü sıfırla"
     preview_banner: "Önizleme modu — yanıtlar kaydedilmez"
+    test_mode_banner: Test Modu — özgürce dene, girdiğin hiçbir şey kaydedilmez
     exit_preview: "Önizlemeden çık"
     thank_you_title: Teşekkürler!
     thank_you_sub: Yanıtlarınız kaydedildi.
