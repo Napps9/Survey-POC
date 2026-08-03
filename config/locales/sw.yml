@@ -1221,6 +1221,15 @@ sw:
         description: "Inaendeshwa na OpenStreetMap — husaidia kujenga ramani unayoweza kuchunguza baada ya kumaliza."
       - text: "Jinsia"
         options: ["Mwanamume", "Mwanamke", "Si mwanamume wala mwanamke", "Nyingine", "Napendelea kutosema"]
+    optional:
+      heritage:
+        text: "Ni ipi kati ya hizi inayoakisi vyema urithi wako?"
+        description: "Asili yako ya kikabila au kitamaduni."
+        options: ["Urithi wa Kiasia", "Urithi wa watu weusi, Kiafrika au Karibiani", "Kihispania au Kilatino", "Urithi wa Mashariki ya Kati au Afrika Kaskazini", "Urithi wa wazungu au Ulaya", "Urithi wa wenyeji asilia", "Urithi mchanganyiko au wa aina nyingi", "Urithi mwingine", "Napendelea kutosema"]
+      neurodiversity:
+        text: "Je, yoyote kati ya haya yanakuelezea?"
+        description: "Kuhusu jinsi unavyofikiri na kuchakata taarifa — chagua yote yanayokuhusu."
+        options: ["ADHD", "Usonji (Autism)", "Dyslexia", "Dyspraxia", "Dyscalculia", "Tourette", "Aina nyingine ya tofauti za ubongo", "Hakuna kati ya haya", "Napendelea kutosema"]
   oops:
     private_link_title: "Samahani — hiki ni kiungo cha faragha cha kihariri"
     private_link_body: "Kiungo hiki hufungua kihariri cha Verto, kinachotumika na mtengenezaji wake pekee — si kiungo cha umma cha kushiriki, kwa hivyo hakuna cha kucheza hapa."

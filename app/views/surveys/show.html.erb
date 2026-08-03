@@ -60,6 +60,7 @@
      data-media-picker-background-recommended-value="<%= AssetPopulator.recommended_paths(@survey, context: :background).to_json %>"
      data-add-question-generate-url-value="<%= generate_survey_card_path(@survey) %>"
      data-add-question-render-url-value="<%= render_survey_card_path(@survey) %>"
+     data-add-question-demographic-url-value="<%= demographic_survey_card_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"
      data-survey-editor-description-value="<%= @survey.description %>"
      data-survey-editor-default-locale-value="<%= @survey.default_locale %>"

@@ -1221,6 +1221,15 @@ de:
         description: "Powered by OpenStreetMap – hilft, eine Karte zu erstellen, die du nach dem Abschluss erkunden kannst."
       - text: "Geschlecht"
         options: ["Männlich", "Weiblich", "Nicht-binär", "Anderes", "Möchte ich nicht angeben"]
+    optional:
+      heritage:
+        text: "Was spiegelt deine Herkunft am besten wider?"
+        description: "Dein ethnischer oder kultureller Hintergrund."
+        options: ["Asiatische Herkunft", "Schwarze, afrikanische oder karibische Herkunft", "Hispanisch oder Latino/Latina", "Nahöstliche oder nordafrikanische Herkunft", "Weiße oder europäische Herkunft", "Indigene Herkunft", "Gemischte oder mehrfache Herkunft", "Andere Herkunft", "Möchte ich nicht angeben"]
+      neurodiversity:
+        text: "Trifft etwas davon auf dich zu?"
+        description: "Es geht darum, wie du denkst und Informationen verarbeitest — wähle alles Zutreffende."
+        options: ["ADHS", "Autismus", "Legasthenie", "Dyspraxie", "Dyskalkulie", "Tourette", "Eine andere Form von Neurodivergenz", "Nichts davon", "Möchte ich nicht angeben"]
   oops:
     private_link_title: "Ups — das ist ein privater Editor-Link"
     private_link_body: "Dieser Link öffnet den Verto-Editor, den nur die erstellende Person nutzen kann — es ist nicht der öffentliche Teilen-Link, hier gibt es also nichts zu spielen."

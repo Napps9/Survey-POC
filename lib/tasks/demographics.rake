@@ -9,7 +9,14 @@ namespace :demographics do
 
     Survey.where.not(cards: nil).find_each(batch_size: 25) do |survey|
       cards      = Array(survey.cards)
-      gender_idx = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["type"] == "multiple_choice" }
+      # Keyless-or-"gender" guard mirrors PlayerController#sync_demographics_from_answers! —
+      # the opt-in Heritage card is also a demographic multiple_choice and must
+      # not steal the gender slot.
+      gender_idx = cards.find_index do |c|
+        next false unless c.is_a?(Hash) && c["demographic"] && c["type"] == "multiple_choice"
+        key = c["demographic_key"].to_s
+        key.empty? || key == "gender"
+      end
       birth_idx  = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["input"] == "month" }
       next if gender_idx.nil? && birth_idx.nil?
 

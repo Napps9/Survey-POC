@@ -72,7 +72,11 @@ class RespondentDataExport
         "birth_year" => response.demographic_birth_year,
         "gender"     => response.demographic_gender,
         "region"     => response.region_label,
-        "country"    => response.region_country
+        "country"    => response.region_country,
+        "heritage"   => response.demographic_heritage,
+        # Unpacked from the pipe-wrapped storage for the human reading their
+        # own subject-access export.
+        "neurodiversity" => response.demographic_neurodiversity&.split("|")&.reject(&:empty?)
       }.compact,
       "consent"        => {
         "agreed_at"   => response.consent_agreed_at&.utc&.iso8601,

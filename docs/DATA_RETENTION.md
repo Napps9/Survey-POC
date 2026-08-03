@@ -8,7 +8,10 @@ who can remove it, and the limits of what the platform can actually honour.
 Every Verto ends with an automatically appended demographic tail
 (`DemographicQuestions`): birth month/year, where they live, and gender. So in
 practice **every** Verto holds personal data, not just ones whose creator chose
-to ask for it.
+to ask for it. Creators can additionally add two opt-in demographic questions
+(`DemographicQuestions::OPTIONAL_CARDS`) — Heritage (ethnicity) and
+Neurodiversity — from the add-question modal; those are stored only on Vertos
+whose creator chose to ask.
 
 A `responses` row can hold:
 
@@ -16,6 +19,7 @@ A `responses` row can hold:
 |---|---|
 | `answers` | Their answers, keyed by card index |
 | `demographic_birth_year`, `demographic_gender` | From the demographic tail |
+| `demographic_heritage`, `demographic_neurodiversity` | From the opt-in demographic questions, when the creator added them |
 | `region_country`, `region_label` | Derived from the location answer |
 | `locale`, `device_kind` | Language and rough device class |
 | `started_at`, `completed_at`, `created_at` | Timings |

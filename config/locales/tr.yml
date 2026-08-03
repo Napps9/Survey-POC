@@ -1221,6 +1221,15 @@ tr:
         description: "OpenStreetMap altyapısıyla — bitirdikten sonra keşfedebileceğiniz bir harita oluşturmaya yardımcı olur."
       - text: "Cinsiyet"
         options: ["Erkek", "Kadın", "Non-binary", "Diğer", "Belirtmek istemiyorum"]
+    optional:
+      heritage:
+        text: "Aşağıdakilerden hangisi kökenini en iyi yansıtıyor?"
+        description: "Etnik veya kültürel kökenin."
+        options: ["Asya kökenli", "Siyah, Afrika veya Karayip kökenli", "Hispanik veya Latin kökenli", "Orta Doğu veya Kuzey Afrika kökenli", "Beyaz veya Avrupa kökenli", "Yerli halk kökenli", "Karma veya çoklu köken", "Başka bir köken", "Belirtmek istemiyorum"]
+      neurodiversity:
+        text: "Bunlardan herhangi biri seni tanımlıyor mu?"
+        description: "Düşünme ve bilgi işleme şeklinle ilgili — uyan hepsini seç."
+        options: ["DEHB", "Otizm", "Disleksi", "Dispraksi", "Diskalkuli", "Tourette", "Başka bir nörofarklılık türü", "Hiçbiri", "Belirtmek istemiyorum"]
   oops:
     private_link_title: "Hata — bu özel bir düzenleyici bağlantısı"
     private_link_body: "Bu bağlantı, yalnızca oluşturanın kullanabildiği Verto düzenleyicisini açar — herkese açık paylaşım bağlantısı değildir, bu yüzden burada oynanacak bir şey yok."

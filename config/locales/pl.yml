@@ -1223,6 +1223,15 @@ pl:
         description: "Oparte na OpenStreetMap — pomaga zbudować mapę, którą możesz przeglądać po zakończeniu."
       - text: "Płeć"
         options: ["Mężczyzna", "Kobieta", "Osoba niebinarna", "Inna", "Wolę nie mówić"]
+    optional:
+      heritage:
+        text: "Które z poniższych najlepiej oddaje Twoje pochodzenie?"
+        description: "Twoje pochodzenie etniczne lub kulturowe."
+        options: ["Pochodzenie azjatyckie", "Pochodzenie czarne, afrykańskie lub karaibskie", "Latynoskie", "Pochodzenie bliskowschodnie lub północnoafrykańskie", "Pochodzenie białe lub europejskie", "Pochodzenie rdzennych ludów", "Pochodzenie mieszane lub wielorakie", "Inne pochodzenie", "Wolę nie mówić"]
+      neurodiversity:
+        text: "Czy któreś z poniższych Cię opisuje?"
+        description: "Chodzi o to, jak myślisz i przetwarzasz informacje — wybierz wszystkie pasujące."
+        options: ["ADHD", "Autyzm", "Dysleksja", "Dyspraksja", "Dyskalkulia", "Zespół Tourette'a", "Inna forma neuroróżnorodności", "Żadne z powyższych", "Wolę nie mówić"]
   oops:
     private_link_title: "Ups — to prywatny link do edytora"
     private_link_body: "Ten link otwiera edytor Verto, z którego może korzystać tylko jego twórca — to nie jest publiczny link do udostępniania, więc nie ma tu w co grać."

@@ -1220,6 +1220,15 @@ id:
         description: "Didukung oleh OpenStreetMap — membantu membangun peta yang bisa Anda jelajahi setelah selesai."
       - text: "Jenis kelamin"
         options: ["Laki-laki", "Perempuan", "Non-biner", "Lainnya", "Memilih untuk tidak menjawab"]
+    optional:
+      heritage:
+        text: "Mana yang paling mencerminkan warisan budaya Anda?"
+        description: "Latar belakang etnis atau budaya Anda."
+        options: ["Warisan Asia", "Warisan kulit hitam, Afrika, atau Karibia", "Hispanik atau Latin", "Warisan Timur Tengah atau Afrika Utara", "Warisan kulit putih atau Eropa", "Warisan masyarakat adat", "Warisan campuran atau ganda", "Warisan lainnya", "Memilih untuk tidak menjawab"]
+      neurodiversity:
+        text: "Apakah ada yang menggambarkan diri Anda?"
+        description: "Tentang cara Anda berpikir dan memproses informasi — pilih semua yang sesuai."
+        options: ["ADHD", "Autisme", "Disleksia", "Dispraksia", "Diskalkulia", "Tourette", "Bentuk neurodivergensi lainnya", "Tidak ada yang sesuai", "Memilih untuk tidak menjawab"]
   oops:
     private_link_title: "Ups — ini tautan editor pribadi"
     private_link_body: "Tautan ini membuka editor Verto yang hanya bisa digunakan pembuatnya — ini bukan tautan berbagi publik, jadi tidak ada yang bisa dimainkan di sini."

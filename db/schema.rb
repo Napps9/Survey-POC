@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_03_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_03_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -316,6 +316,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_03_110000) do
     t.datetime "created_at", null: false
     t.integer "demographic_birth_year"
     t.string "demographic_gender"
+    t.string "demographic_heritage"
+    t.string "demographic_neurodiversity"
     t.string "device_kind"
     t.string "locale"
     t.integer "quiz_max"
@@ -334,6 +336,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_03_110000) do
     t.index ["survey_id", "answered", "status"], name: "index_responses_on_survey_answered_status"
     t.index ["survey_id", "demographic_birth_year"], name: "index_responses_on_survey_id_and_demographic_birth_year"
     t.index ["survey_id", "demographic_gender"], name: "index_responses_on_survey_id_and_demographic_gender"
+    t.index ["survey_id", "demographic_heritage"], name: "index_responses_on_survey_id_and_demographic_heritage"
+    t.index ["survey_id", "demographic_neurodiversity"], name: "index_responses_on_survey_id_and_demographic_neurodiversity"
     t.index ["survey_id", "region_country"], name: "index_responses_on_survey_and_region_country"
     t.index ["survey_id", "respondent_code_digest"], name: "index_responses_on_survey_and_respondent_code"
     t.index ["survey_id"], name: "index_responses_on_survey_id"

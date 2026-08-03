@@ -43,4 +43,83 @@ module DemographicQuestions
     return list if list.any? { |c| c.is_a?(Hash) && c["demographic"] }
     list + cards(locale: locale)
   end
+
+  # ── Opt-in demographic questions ───────────────────────────────────────────
+  # Unlike CARDS, never auto-appended: a creator adds these per-Verto from the
+  # add-question modal's Demographics tiles. Keyed by `demographic_key` — the
+  # discriminator the answer sync (PlayerController#sync_demographics_from_answers!)
+  # and results segmentation slice on, and the reason two multiple-choice
+  # demographic cards can coexist with the Gender tail card (which has no key).
+  OPTIONAL_CARDS = {
+    "heritage" => {
+      "type" => "multiple_choice",
+      "text" => "Which of these best reflects your heritage?",
+      "description" => "Your ethnic or cultural background.",
+      "options" => [ "Asian heritage", "Black, African or Caribbean heritage",
+                     "Hispanic or Latino/a", "Middle Eastern or North African heritage",
+                     "White or European heritage", "Indigenous heritage",
+                     "Mixed or multiple heritage", "Another heritage", "Prefer not to say" ],
+      "demographic" => true, "demographic_key" => "heritage"
+    },
+    # Deliberately framed around how people think and process information —
+    # many neurodivergent respondents don't describe themselves as disabled or
+    # having a disability, and a disability-framed question would undercount
+    # exactly the people it is trying to understand.
+    "neurodiversity" => {
+      "type" => "select_many",
+      "text" => "Do any of these describe you?",
+      "description" => "About how you think and process information — choose any that apply.",
+      "options" => [ "ADHD", "Autism", "Dyslexia", "Dyspraxia", "Dyscalculia",
+                     "Tourette's", "Another form of neurodivergence",
+                     "None of these", "Prefer not to say" ],
+      "demographic" => true, "demographic_key" => "neurodiversity"
+    }
+  }.freeze
+
+  # Every key Survey.sanitize_cards_images! will accept. "gender" is reserved
+  # so a future migration can tag the legacy tail card without another
+  # allowlist change.
+  DEMOGRAPHIC_KEYS = (OPTIONAL_CARDS.keys + [ "gender" ]).freeze
+
+  # One optional card resolved in `locale`, or nil for an unknown key. Deep
+  # dup (options array included) — callers mutate the hash (cid stamping,
+  # i18n prefill). Same translation posture as `cards`: text/description only
+  # when present, options only whole and at registry length, English on an
+  # invalid locale.
+  def self.optional_card(key, locale: nil)
+    spec = OPTIONAL_CARDS[key.to_s]
+    return nil unless spec
+
+    card = spec.dup
+    card["options"] = spec["options"].dup
+    tr = I18n.t("demographics.optional.#{key}", locale: locale.presence || I18n.locale, default: nil)
+    return card unless tr.is_a?(Hash)
+
+    tr = tr.transform_keys(&:to_s)
+    card["text"]        = tr["text"].to_s        if tr["text"].to_s.strip.present?
+    card["description"] = tr["description"].to_s if tr["description"].to_s.strip.present?
+    opts = tr["options"]
+    card["options"] = opts.map(&:to_s) if opts.is_a?(Array) && opts.size == spec["options"].size
+    card
+  rescue I18n::InvalidLocale
+    card
+  end
+
+  # The neurodiversity card's two mutually-exclusive options ("None of these",
+  # "Prefer not to say") in EVERY available locale. Stored answers are
+  # canonical primary-language labels, so a French Verto stores the French
+  # pair — the sync's exclusivity rule has to recognise them all. Identified
+  # positionally as the LAST TWO registry options, mirroring optional_card's
+  # whole-list-only translation guard.
+  def self.neuro_exclusive_labels
+    @neuro_exclusive_labels ||= begin
+      size = OPTIONAL_CARDS["neurodiversity"]["options"].size
+      labels = OPTIONAL_CARDS["neurodiversity"]["options"].last(2)
+      I18n.available_locales.each do |loc|
+        opts = I18n.t("demographics.optional.neurodiversity.options", locale: loc, default: nil)
+        labels += opts.last(2).map(&:to_s) if opts.is_a?(Array) && opts.size == size
+      end
+      labels.to_set.freeze
+    end
+  end
 end

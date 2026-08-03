@@ -121,6 +121,7 @@ Rails.application.routes.draw do
   # splices the rendered cards when they land.
   resources :flow_generations, only: [ :show ]
   post "surveys/:id/render_card",     to: "surveys#render_card",   as: :render_survey_card
+  post "surveys/:id/demographic_card", to: "surveys#add_demographic_card", as: :demographic_survey_card
   post "surveys/:id/restore_card",    to: "surveys#restore_card",  as: :restore_survey_card
   post "surveys/:id/optimise_card",   to: "surveys#optimise_card", as: :optimise_survey_card
   get  "surveys/:id/pexels",          to: "surveys#pexels_search", as: :pexels_search_survey

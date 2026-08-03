@@ -1221,6 +1221,15 @@ it:
         description: "Basato su OpenStreetMap — aiuta a costruire una mappa che potrai esplorare alla fine."
       - text: "Genere"
         options: ["Uomo", "Donna", "Non binario", "Altro", "Preferisco non rispondere"]
+    optional:
+      heritage:
+        text: "Quale di queste opzioni riflette meglio la tua origine?"
+        description: "Il tuo background etnico o culturale."
+        options: ["Origine asiatica", "Origine nera, africana o caraibica", "Ispanico o latinoamericano/a", "Origine mediorientale o nordafricana", "Origine bianca o europea", "Origine indigena", "Origine mista o multipla", "Un'altra origine", "Preferisco non rispondere"]
+      neurodiversity:
+        text: "Qualcuna di queste ti descrive?"
+        description: "Riguarda il modo in cui pensi ed elabori le informazioni — scegli tutte quelle pertinenti."
+        options: ["ADHD", "Autismo", "Dislessia", "Disprassia", "Discalculia", "Tourette", "Un'altra forma di neurodivergenza", "Nessuna di queste", "Preferisco non rispondere"]
   oops:
     private_link_title: "Ops — questo è un link privato dell'editor"
     private_link_body: "Questo link apre l'editor del Verto, utilizzabile solo dal suo creatore — non è il link pubblico di condivisione, quindi qui non c'è nulla da giocare."

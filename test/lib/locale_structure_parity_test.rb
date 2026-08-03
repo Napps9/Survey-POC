@@ -106,6 +106,16 @@ class LocaleStructureParityTest < ActiveSupport::TestCase
       assert_equal card["text"], demo[i]["text"], "demographics.cards[#{i}].text"
       assert_equal card["options"], demo[i]["options"], "demographics.cards[#{i}].options" if demo[i].key?("options")
     end
+
+    # The opt-in questions mirror their registry the same way — map-shaped by
+    # demographic_key rather than positional.
+    DemographicQuestions::OPTIONAL_CARDS.each do |key, card|
+      entry = en.dig("demographics", "optional", key)
+      assert entry, "en.yml has no demographics.optional.#{key} entry"
+      assert_equal card["text"], entry["text"], "demographics.optional.#{key}.text"
+      assert_equal card["description"], entry["description"], "demographics.optional.#{key}.description"
+      assert_equal card["options"], entry["options"], "demographics.optional.#{key}.options"
+    end
   end
 
   # Template/demographic card lists are POSITIONAL content in every language:
@@ -145,6 +155,17 @@ class LocaleStructureParityTest < ActiveSupport::TestCase
         theirs = demo[i].is_a?(Hash) ? demo[i]["options"] : nil
         unless theirs.is_a?(Array) && theirs.size == card["options"].size
           problems << "#{code}: demographics.cards[#{i}].options #{theirs.is_a?(Array) ? theirs.size : 'missing'} != #{card['options'].size}"
+        end
+      end
+
+      # Opt-in questions: options must keep the registry length in every
+      # language — DemographicQuestions.optional_card refuses a wrong-length
+      # list (English fallback), and neuro_exclusive_labels reads the LAST TWO
+      # positionally, so a short list would silently break exclusivity too.
+      DemographicQuestions::OPTIONAL_CARDS.each do |key, card|
+        theirs = data.dig("demographics", "optional", key, "options")
+        unless theirs.is_a?(Array) && theirs.size == card["options"].size
+          problems << "#{code}: demographics.optional.#{key}.options #{theirs.is_a?(Array) ? theirs.size : 'missing'} != #{card['options'].size}"
         end
       end
     end

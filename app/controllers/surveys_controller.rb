@@ -961,6 +961,48 @@ class SurveysController < ApplicationController
            status: :unprocessable_entity
   end
 
+  # POST /surveys/:id/demographic_card
+  # Inserts one of the OPT-IN demographic questions (Heritage/Neurodiversity —
+  # DemographicQuestions::OPTIONAL_CARDS) from the add-question modal's
+  # Demographics tiles. The card arrives fully formed from the registry in the
+  # Verto's default locale; response follows generate_card's {ok, card, html}
+  # shape so the client's seedCardStore receives the i18n prefill.
+  def add_demographic_card
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.editing_locked?
+      return render json: { ok: false, error: editing_locked_message }, status: :locked
+    end
+
+    key  = params[:key].to_s
+    card = DemographicQuestions.optional_card(key, locale: survey.default_locale)
+    unless card
+      return render json: { ok: false, error: "Unknown demographic question." }, status: :unprocessable_entity
+    end
+    # Belt-and-braces behind the tile grey-out (which reads the live DOM):
+    # one of each per deck, or the answer sync's first-match would be arbitrary.
+    if Array(survey.cards).any? { |c| c.is_a?(Hash) && c["demographic_key"] == key }
+      return render json: { ok: false, error: "This Verto already asks that." }, status: :unprocessable_entity
+    end
+
+    card["cid"] = "c_#{SecureRandom.hex(3)}"
+    # The translations are already sitting in the locale files — prefill i18n
+    # so a multilingual Verto's next autosave doesn't persist the card
+    # monolingual. No Claude call needed, unlike generate_card.
+    (Array(survey.locales) - [ survey.default_locale ]).each do |loc|
+      tr = DemographicQuestions.optional_card(key, locale: loc)
+      (card["i18n"] ||= {})[loc] =
+        { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"] }.compact
+    end
+
+    render json: { ok: true, card: card, html: render_card_html(survey, card) }
+  rescue ActiveRecord::RecordNotFound
+    raise # cross-org (or deleted) Verto — a real 404, not a swallowed 422
+  rescue => e
+    ErrorReporting.report("SurveysController#add_demographic_card", e)
+    render json: { ok: false, error: "Couldn't add that question — please try again." },
+           status: :unprocessable_entity
+  end
+
   private
 
   def pexels_photo_results(query, orientation, context, age = [])

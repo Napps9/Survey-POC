@@ -558,7 +558,10 @@ export default class extends Controller {
       description: c.description,
       options: c.options,
       pages: c.pages,
-      allowOther: cardEl.dataset.cardAllowOther === "true"
+      allowOther: cardEl.dataset.cardAllowOther === "true",
+      // Demographic cards are exempt from the option-shape rules (their
+      // option lists are platform-set taxonomies) — see verto_rules.js.
+      demographic: cardEl.dataset.cardDemographic === "true"
     }
   }
 
@@ -1053,6 +1056,12 @@ export default class extends Controller {
       // otherwise-unrelated field on the card is edited.
       if (card.dataset.cardInput) out.input = card.dataset.cardInput
       if (card.dataset.cardDemographic === "true") out.demographic = true
+      // Which opt-in demographic question this is (heritage/neurodiversity) —
+      // the discriminator the answer sync and results segments slice on. Not
+      // emitting it here would strip it on the first autosave, degrading the
+      // card to an unkeyed demographic MC that then collides with the gender
+      // finder. Sanitised server-side against DemographicQuestions::DEMOGRAPHIC_KEYS.
+      if (card.dataset.cardDemographicKey) out.demographic_key = card.dataset.cardDemographicKey
 
       // Common Question provenance — the ids that let results aggregate the
       // same question across Vertos. Nothing in the editor displays them, so

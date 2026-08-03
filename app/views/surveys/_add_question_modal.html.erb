@@ -61,6 +61,31 @@
 
         </div>
 
+        <%# ── Opt-in demographic questions ──
+            One-click inserts from DemographicQuestions::OPTIONAL_CARDS,
+            appended at the END of the deck (the demographics convention).
+            One of each per Verto: tiles grey out once the deck has the key —
+            server-rendered for first paint, re-synced client-side on open. %>
+        <div class="aq-section-label">Demographics</div>
+        <div class="aq-choice-grid">
+          <% [["heritage", "👥", "Heritage",
+               "Ethnic or cultural background — optional question added to the end of your Verto"],
+              ["neurodiversity", "🧠", "Neurodiversity",
+               "How people think and process information — optional, never framed around disability"]].each do |key, icon, name, desc| %>
+            <% already = Array(@survey.cards).any? { |c| c.is_a?(Hash) && c["demographic_key"] == key } %>
+            <button type="button"
+                    class="aq-choice-card aq-demographic-tile"
+                    data-add-question-target="demographicTile"
+                    data-demographic-key="<%= key %>"
+                    data-action="click->add-question#addDemographic"
+                    <%= "disabled" if already %>>
+              <div class="aq-choice-icon"><%= icon %></div>
+              <div class="aq-choice-name"><%= name %></div>
+              <div class="aq-choice-desc"><%= desc %></div>
+            </button>
+          <% end %>
+        </div>
+
         <%# Error message shown if generation fails %>
         <div data-add-question-target="errorMsg"
              style="display:none;color:#FF1E6F;font-size: var(--text-sm);text-align:center;padding:8px 0;">

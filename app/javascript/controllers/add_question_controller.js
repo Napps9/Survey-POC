@@ -17,11 +17,13 @@ export default class extends Controller {
     "cardsFeed",
     "errorMsg",
     "detailsError",
+    "demographicTile",
   ]
 
   static values = {
     generateUrl: String,
     renderUrl:   String,
+    demographicUrl: String,
   }
 
   connect() {
@@ -45,6 +47,7 @@ export default class extends Controller {
     this._insertAfterSlot = event?.currentTarget?.closest(".card-slot") || null
     this._showStep("stepChoice")
     this._clearError()
+    this._syncDemographicTiles()
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
   }
@@ -142,6 +145,55 @@ export default class extends Controller {
   backToChoice(event) {
     event.preventDefault()
     this._showStep("stepChoice")
+    this._syncDemographicTiles()
+  }
+
+  // ──────────────────────────────────────────────────────────
+  // Opt-in demographic questions (Heritage / Neurodiversity)
+  // ──────────────────────────────────────────────────────────
+
+  // One of each per Verto: a tile greys out while the deck holds a card with
+  // its demographic_key. Recomputed from the live feed on every open, so a
+  // client-side delete re-enables the tile without a reload.
+  _syncDemographicTiles() {
+    this.demographicTileTargets.forEach(tile => {
+      const key = tile.dataset.demographicKey
+      tile.disabled = !!this.cardsFeedTarget?.querySelector(`[data-card-demographic-key="${key}"]`)
+    })
+  }
+
+  // Insert the registry-built card via the server (it arrives fully formed
+  // and localised — no details step). Appended at the END of the deck, the
+  // demographics convention, by nulling the insert anchor.
+  async addDemographic(event) {
+    event.preventDefault()
+    const tile = event.currentTarget
+    const key = tile.dataset.demographicKey
+    tile.disabled = true
+    const token = this._requestToken
+    try {
+      const res = await fetch(this.demographicUrlValue, {
+        method:  "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept":       "application/json",
+          "X-CSRF-Token": this._csrf(),
+        },
+        body: JSON.stringify({ key }),
+      })
+      const json = await res.json()
+      if (!json.ok) throw new Error(json.error || t("editor.add_question.render_failed"))
+      if (token !== this._requestToken) return // modal closed/reopened — drop it
+
+      this._insertAfterSlot = null
+      this._insertHTML(json.html, json.card)
+      this._notifyEditor()
+      this.close()
+    } catch (err) {
+      if (token !== this._requestToken) return
+      tile.disabled = false
+      this._showError(t("editor.add_question.add_failed", { message: err.message }))
+    }
   }
 
   // ──────────────────────────────────────────────────────────

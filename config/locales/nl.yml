@@ -1221,6 +1221,15 @@ nl:
         description: "Mogelijk gemaakt door OpenStreetMap — helpt een kaart te bouwen die je na afloop kunt verkennen."
       - text: "Gender"
         options: ["Man", "Vrouw", "Non-binair", "Anders", "Zeg ik liever niet"]
+    optional:
+      heritage:
+        text: "Wat weerspiegelt jouw afkomst het best?"
+        description: "Je etnische of culturele achtergrond."
+        options: ["Aziatische afkomst", "Zwarte, Afrikaanse of Caribische afkomst", "Hispanic of Latino/a", "Afkomst uit het Midden-Oosten of Noord-Afrika", "Witte of Europese afkomst", "Inheemse afkomst", "Gemengde of meervoudige afkomst", "Een andere afkomst", "Zeg ik liever niet"]
+      neurodiversity:
+        text: "Is een van deze op jou van toepassing?"
+        description: "Over hoe je denkt en informatie verwerkt — kies alles wat van toepassing is."
+        options: ["ADHD", "Autisme", "Dyslexie", "Dyspraxie", "Dyscalculie", "Tourette", "Een andere vorm van neurodivergentie", "Geen van deze", "Zeg ik liever niet"]
   oops:
     private_link_title: "Oeps — dit is een privé-editorlink"
     private_link_body: "Deze link opent de Verto-editor, die alleen de maker kan gebruiken — het is niet de openbare deellink, dus hier valt niets te spelen."

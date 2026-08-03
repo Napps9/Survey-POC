@@ -1221,6 +1221,15 @@ fr:
         description: "Propulsé par OpenStreetMap — cela aide à construire une carte que vous pourrez explorer à la fin."
       - text: "Genre"
         options: ["Homme", "Femme", "Non-binaire", "Autre", "Je préfère ne pas répondre"]
+    optional:
+      heritage:
+        text: "Laquelle de ces réponses reflète le mieux votre héritage ?"
+        description: "Votre origine ethnique ou culturelle."
+        options: ["Héritage asiatique", "Héritage noir, africain ou caribéen", "Hispanique ou latino-américain(e)", "Héritage du Moyen-Orient ou d'Afrique du Nord", "Héritage blanc ou européen", "Héritage autochtone", "Héritage mixte ou multiple", "Autre héritage", "Je préfère ne pas répondre"]
+      neurodiversity:
+        text: "Est-ce que l'une de ces propositions vous décrit ?"
+        description: "Sur votre façon de penser et de traiter l'information — choisissez tout ce qui s'applique."
+        options: ["TDAH", "Autisme", "Dyslexie", "Dyspraxie", "Dyscalculie", "Tourette", "Une autre forme de neurodivergence", "Aucune de ces réponses", "Je préfère ne pas répondre"]
   oops:
     private_link_title: "Oups — ceci est un lien privé vers l'éditeur"
     private_link_body: "Ce lien ouvre l'éditeur du Verto, réservé à son créateur — ce n'est pas le lien public de partage, il n'y a donc rien à jouer ici."

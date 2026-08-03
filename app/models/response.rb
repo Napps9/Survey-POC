@@ -99,6 +99,8 @@ class Response < ApplicationRecord
     self.region_label = nil
     self.demographic_gender = nil
     self.demographic_birth_year = nil
+    self.demographic_heritage = nil
+    self.demographic_neurodiversity = nil
     self.score = nil
     self.quiz_max = nil
     self.token_totals = {}

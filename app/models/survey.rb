@@ -423,6 +423,21 @@ class Survey < ApplicationRecord
         outcome.present? ? c["outcome"] = outcome : c.delete("outcome")
       end
 
+      # Which opt-in demographic question a card is (heritage/neurodiversity) —
+      # only a known key survives, and only on a card that is actually flagged
+      # demographic. The flag requirement means a crafted payload can't hang a
+      # key on an arbitrary card without also flagging it demographic (which
+      # costs it imagery and buys consent gating — no win); the answer sync
+      # additionally validates every stored value against the card's own
+      # options. Same allowlist-or-drop shape as range_theme below.
+      if c.key?("demographic_key")
+        key = c["demographic_key"].to_s
+        if c["demographic"] && DemographicQuestions::DEMOGRAPHIC_KEYS.include?(key)
+          c["demographic_key"] = key
+        else
+          c.delete("demographic_key")
+        end
+      end
       # A range card's reaction-animation theme — only a known slug survives, and
       # only on a range card, so the helper always resolves to a real asset
       # folder (NpsHelper owns the theme list).

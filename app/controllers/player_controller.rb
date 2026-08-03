@@ -709,7 +709,15 @@ class PlayerController < ApplicationController
     cards = Array(@survey.cards)
     answers = resp.answers.is_a?(Hash) ? resp.answers : {}
 
-    gender_idx = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["type"] == "multiple_choice" }
+    # The tail's Gender card predates demographic_key, so it is the demographic
+    # multiple_choice with NO key (or, future-proofing, key "gender") — the
+    # guard is what lets the opt-in Heritage card (also a demographic
+    # multiple_choice, key "heritage") coexist without stealing this slot.
+    gender_idx = cards.find_index do |c|
+      next false unless c.is_a?(Hash) && c["demographic"] && c["type"] == "multiple_choice"
+      key = c["demographic_key"].to_s
+      key.empty? || key == "gender"
+    end
     gender     = gender_idx ? answers[gender_idx.to_s]&.dig("value").to_s.strip.presence : nil
     # Only the options this Verto actually offers, so a tampered payload can't
     # invent a segment label that then renders in the creator's dashboard.
@@ -721,6 +729,26 @@ class PlayerController < ApplicationController
     year      = raw_year&.to_i
     # A year outside living memory is a typo or a probe, not a birth year.
     resp.demographic_birth_year = year && year.between?(1900, Date.current.year) ? year : nil
+
+    # Opt-in demographics (DemographicQuestions::OPTIONAL_CARDS), same
+    # tamper-guard posture: values must be options the card actually offers.
+    heritage_idx = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["demographic_key"] == "heritage" }
+    heritage     = heritage_idx ? answers[heritage_idx.to_s]&.dig("value").to_s.strip.presence : nil
+    h_allowed    = heritage_idx ? Array(cards[heritage_idx]["options"]).map(&:to_s) : []
+    resp.demographic_heritage = h_allowed.include?(heritage) ? heritage : nil
+
+    # Neurodiversity is a multi-select; packed pipe-wrapped and sorted (see
+    # the column migration). A label containing "|" would corrupt the packing
+    # (only a creator-edited option could — registry labels never do), so it
+    # is dropped. Exclusivity: real conditions beat "None of these"/"Prefer
+    # not to say" if both were ticked; among exclusives alone, first wins.
+    neuro_idx = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["demographic_key"] == "neurodiversity" }
+    picked    = neuro_idx ? Array(answers[neuro_idx.to_s]&.dig("value")).map { |v| v.to_s.strip } : []
+    n_allowed = neuro_idx ? Array(cards[neuro_idx]["options"]).map(&:to_s) : []
+    valid      = (picked & n_allowed).reject { |v| v.include?("|") }
+    conditions = valid.reject { |v| DemographicQuestions.neuro_exclusive_labels.include?(v) }
+    chosen     = conditions.any? ? conditions : valid.first(1)
+    resp.demographic_neurodiversity = chosen.any? ? "|#{chosen.sort.join('|')}|" : nil
   end
 
   # The Verto content language to render: an explicit ?lang=, else the

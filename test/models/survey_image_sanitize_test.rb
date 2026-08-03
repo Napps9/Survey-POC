@@ -141,6 +141,23 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil out[3]["range_theme"], "range_theme is only kept on range cards"
   end
 
+  test "sanitize_cards_images! whitelists demographic_key on demographic cards and drops the rest" do
+    cards = [
+      { "type" => "multiple_choice", "text" => "Q", "demographic" => true, "demographic_key" => "heritage" },
+      { "type" => "select_many", "text" => "Q", "demographic" => true, "demographic_key" => "neurodiversity" },
+      { "type" => "multiple_choice", "text" => "Q", "demographic" => true, "demographic_key" => "astrology" },
+      { "type" => "multiple_choice", "text" => "Q", "demographic_key" => "heritage" }
+    ]
+    out = Survey.sanitize_cards_images!(cards)
+
+    assert_equal "heritage", out[0]["demographic_key"]
+    assert_equal "neurodiversity", out[1]["demographic_key"]
+    assert_nil out[2]["demographic_key"], "unknown key is dropped"
+    assert_nil out[3]["demographic_key"],
+               "a key without the demographic flag is dropped — the flag is what buys " \
+               "consent gating and imagery suppression, so a key can't ride without it"
+  end
+
   test "sanitize_cards_images! whitelists slider_axis on range cards and drops the rest" do
     cards = [
       { "type" => "range", "text" => "Q", "slider_axis" => "horizontal" },

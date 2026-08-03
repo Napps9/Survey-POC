@@ -968,6 +968,20 @@
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(1,234,203,0.08);
 }
+/* An already-added demographic tile: one of each per Verto. */
+.aq-choice-card[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.aq-section-label {
+  font-family: "Alata", sans-serif;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.45);
+  margin: 18px 0 10px;
+}
 .aq-choice-icon { font-size: 26px; line-height: 1; }
 .aq-choice-name {
   font-family: "Alata", sans-serif;

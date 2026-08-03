@@ -1221,6 +1221,15 @@ pt:
         description: "Com tecnologia OpenStreetMap — ajuda a criar um mapa que pode explorar no final."
       - text: "Género"
         options: ["Masculino", "Feminino", "Não-binário", "Outro", "Prefiro não dizer"]
+    optional:
+      heritage:
+        text: "Qual destas opções reflete melhor a sua herança?"
+        description: "Sua origem étnica ou cultural."
+        options: ["Herança asiática", "Herança negra, africana ou caribenha", "Hispânico ou latino/a", "Herança do Oriente Médio ou do Norte da África", "Herança branca ou europeia", "Herança indígena", "Herança mista ou múltipla", "Outra herança", "Prefiro não dizer"]
+      neurodiversity:
+        text: "Alguma destas opções descreve você?"
+        description: "Sobre como você pensa e processa informações — escolha todas que se aplicam."
+        options: ["TDAH", "Autismo", "Dislexia", "Dispraxia", "Discalculia", "Tourette", "Outra forma de neurodivergência", "Nenhuma destas", "Prefiro não dizer"]
   oops:
     private_link_title: "Ops — este é um link privado do editor"
     private_link_body: "Este link abre o editor do Verto, que só o criador pode usar — não é o link público de partilha, por isso não há nada para jogar aqui."

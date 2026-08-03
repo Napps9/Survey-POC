@@ -96,6 +96,8 @@ class ConsentDeclinePurgeTest < ActionDispatch::IntegrationTest
     assert_nil row.region_label
     assert_nil row.demographic_gender
     assert_nil row.demographic_birth_year
+    assert_nil row.demographic_heritage
+    assert_nil row.demographic_neurodiversity
     assert_nil row.respondent_code_digest
   end
 
