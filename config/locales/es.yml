@@ -30,6 +30,7 @@ es:
     'no': 'No'
     add_option: Agregar opción
     new_option: Nueva opción
+    style_option: Estilizar esta respuesta
     add_statement: Agregar enunciado
     swipe_no: "No"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ es:
     editor:
       delete_card_confirm: "¿Eliminar esta tarjeta?"
       save_to_library: "Guardar también en mi biblioteca de marca"
+      option_style_title: "Estilo de respuesta"
+      option_color: "Color"
+      option_emoji: "Emoji"
+      option_icon: "Icono"
+      option_style_reset: "Restablecer"
+      option_style_done: "Listo"
       add_to_library: "Agregar a la biblioteca"
       library_saving: "Guardando…"
       library_save_failed: "No se pudo guardar en la biblioteca"

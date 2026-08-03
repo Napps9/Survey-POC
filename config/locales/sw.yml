@@ -30,6 +30,7 @@ sw:
     'no': Hapana
     add_option: Ongeza chaguo
     new_option: Chaguo jipya
+    style_option: Panga mtindo wa jibu hili
     add_statement: Ongeza kauli
     swipe_no: "Hapana"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ sw:
     editor:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"
+      option_style_title: "Mtindo wa jibu"
+      option_color: "Rangi"
+      option_emoji: "Emoji"
+      option_icon: "Ikoni"
+      option_style_reset: "Weka upya"
+      option_style_done: "Imekamilika"
       add_to_library: "Ongeza kwenye maktaba"
       library_saving: "Inahifadhi…"
       library_save_failed: "Imeshindwa kuhifadhi kwenye maktaba"

@@ -191,20 +191,21 @@ function fitTier(score) {
 
 // HTML builders for the right-side interactive component on each card
 const COMPONENTS = {
-  multiple_choice: (opts) => choiceListHtml(opts, "single"),
-  select_many:     (opts) => choiceListHtml(opts, "multi"),
-  prioritise:      (opts) => prioritiseHtml(opts),
+  multiple_choice: (opts, ctx = {}) => choiceListHtml(opts, "single", ctx.optionStyles),
+  select_many:     (opts, ctx = {}) => choiceListHtml(opts, "multi", ctx.optionStyles),
+  prioritise:      (opts, ctx = {}) => prioritiseHtml(opts, ctx.optionStyles),
 
-  yes_no: (opts) => {
+  yes_no: (opts, ctx = {}) => {
     const labels = (opts || []).length >= 2 ? opts : defaultOptionsFor("yes_no")
+    const styles = ctx.optionStyles || []
     return `
     <ul class="choice-list choice-list--yesno" data-controller="picker" data-picker-mode-value="single">
-      ${[[labels[0], 1], [labels[1], 4]].map(([label, bg]) => yesNoItemHtml(label, bg)).join("")}
+      ${[[labels[0], 1], [labels[1], 4]].map(([label, bg], i) => yesNoItemHtml(label, bg, styles[i])).join("")}
     </ul>`
   },
 
-  select_one_grid:  (opts) => gridHtml(opts, "single"),
-  select_many_grid: (opts) => gridHtml(opts, "multi"),
+  select_one_grid:  (opts, ctx = {}) => gridHtml(opts, "single", ctx.optionStyles),
+  select_many_grid: (opts, ctx = {}) => gridHtml(opts, "multi", ctx.optionStyles),
 
   tap_card: (opts, ctx = {}) => {
     const optionImages = ctx.optionImages || []
@@ -262,7 +263,7 @@ const COMPONENTS = {
         <div class="book-page-scroll">
           <div class="book-page-kicker">${esc(t("editor.scenario.answer_kicker"))}</div>
           <ul class="choice-list choice-list--single" data-controller="picker card-editor" data-picker-mode-value="single">
-            ${opts.map((o, i) => choiceListItemHtml(o, i, "single")).join("")}${addOptionBtnHtml()}
+            ${opts.map((o, i) => choiceListItemHtml(o, i, "single", (ctx.optionStyles || [])[i])).join("")}${addOptionBtnHtml()}
           </ul>
         </div>
         <div class="book-page-fade"></div>
@@ -385,27 +386,27 @@ const COMPONENTS = {
     <div class="token-checkpoint-placeholder">${esc(t("card.token_checkpoint_placeholder"))}</div>`,
 }
 
-function prioritiseHtml(opts) {
+function prioritiseHtml(opts, styles = []) {
   return `
     <ul class="choice-list prioritise-list" data-controller="prioritise card-editor">
-      ${opts.map((o, i) => prioritiseItemHtml(o, i)).join("")}${addOptionBtnHtml()}
+      ${opts.map((o, i) => prioritiseItemHtml(o, i, styles[i])).join("")}${addOptionBtnHtml()}
     </ul>`
 }
 
-function choiceListHtml(opts, mode) {
+function choiceListHtml(opts, mode, styles = []) {
   return `
     <ul class="choice-list choice-list--${mode}" data-controller="picker card-editor"
         data-picker-mode-value="${mode}">
-      ${opts.map((o, i) => choiceListItemHtml(o, i, mode)).join("")}${addOptionBtnHtml()}
+      ${opts.map((o, i) => choiceListItemHtml(o, i, mode, styles[i])).join("")}${addOptionBtnHtml()}
     </ul>`
 }
 
-function gridHtml(opts, mode) {
+function gridHtml(opts, mode, styles = []) {
   const cols = opts.length >= 5 ? 3 : 2
   return `
     <ul class="choice-grid choice-grid--${mode} choice-grid-${cols}" data-controller="picker"
         data-picker-mode-value="${mode}">
-      ${opts.map((o, i) => choiceGridItemHtml(o, i)).join("")}
+      ${opts.map((o, i) => choiceGridItemHtml(o, i, styles[i])).join("")}
     </ul>`
 }
 
@@ -1133,7 +1134,8 @@ export default class extends Controller {
         rangeTheme:      card.dataset.cardRangeTheme || "",
         sliderAxis:      card.dataset.cardSliderAxis || "auto",
         pages:           this._pagesFor(card, type),
-        optionImages:    this._optionImagesFor(card, type)
+        optionImages:    this._optionImagesFor(card, type),
+        optionStyles:    this._optionStylesFor(card)
       })
       // The server renders option icons inline; rebuilt markup must get the
       // same pass or a type switch strips every icon until the next reload.
@@ -1310,6 +1312,19 @@ export default class extends Controller {
     const generated = this._generateTapOptionImages(card, this._optionsFor(card, type).length)
     if (generated.length) card.dataset.cardOptionImages = JSON.stringify(generated)
     return generated
+  }
+
+  // Per-option style overrides for the rebuild, from the same snapshot
+  // serialize() refreshes (data-card-option-styles) — positional, like
+  // option_images. Styles survive a type switch between choice-shaped types
+  // because every such builder threads them back into the rows.
+  _optionStylesFor(card) {
+    try {
+      const styles = JSON.parse(card.dataset.cardOptionStyles || "[]")
+      return Array.isArray(styles) ? styles : []
+    } catch (_) {
+      return []
+    }
   }
 
   _generateTapOptionImages(card, count) {

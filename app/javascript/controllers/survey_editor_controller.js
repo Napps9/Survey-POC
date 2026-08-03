@@ -4,6 +4,8 @@ import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
 import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_types"
 import { isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
+import { OPTION_STYLE_TYPES } from "lib/option_style_types"
+import { styleFromRow } from "lib/option_styles"
 
 
 // Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
@@ -1069,6 +1071,24 @@ export default class extends Controller {
       // the panel needs it to mean.
       if (primOpts.length) card.dataset.cardOptions = JSON.stringify(primOpts)
       if (primPages.length) card.dataset.cardPages = JSON.stringify(primPages)
+
+      // Per-option visual overrides, read off the option rows themselves —
+      // the style lives on the li (data-option-*), so DOM order IS the
+      // positional alignment with `options`: deleting or reordering an option
+      // carries its style with it, no splice bookkeeping (unlike the
+      // positional option_images array above). Filtered in lockstep with
+      // primOpts so indexes keep matching what the server stores.
+      if (OPTION_STYLE_TYPES.includes(type)) {
+        const styleEls = this._optionEls(card)
+        const rawStyles = trimmedOpts.map((o, i) => [ o, styleFromRow(styleEls[i]?.closest("li")) ])
+        const aligned = (type === "range" ? rawStyles : rawStyles.filter(([o]) => o)).map(([, s]) => s || null)
+        if (aligned.some(Boolean)) {
+          out.option_styles = aligned
+          card.dataset.cardOptionStyles = JSON.stringify(aligned)
+        } else {
+          delete card.dataset.cardOptionStyles
+        }
+      }
 
       // tap_card statement backgrounds (populated by AssetPopulator, or
       // generated/picked in the editor). Carried through autosave regardless

@@ -30,6 +30,7 @@ tr:
     'no': Hayır
     add_option: Seçenek ekle
     new_option: Yeni seçenek
+    style_option: Bu yanıtı biçimlendir
     add_statement: İfade ekle
     swipe_no: "Hayır"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ tr:
     editor:
       delete_card_confirm: Bu kart silinsin mi?
       save_to_library: "Marka kitaplığıma da kaydet"
+      option_style_title: "Yanıt stili"
+      option_color: "Renk"
+      option_emoji: "Emoji"
+      option_icon: "Simge"
+      option_style_reset: "Sıfırla"
+      option_style_done: "Bitti"
       add_to_library: "Kitaplığa ekle"
       library_saving: "Kaydediliyor…"
       library_save_failed: "Kitaplığa kaydedilemedi"

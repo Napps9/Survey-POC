@@ -30,6 +30,7 @@ ja:
     'no': いいえ
     add_option: 選択肢を追加
     new_option: 新しい選択肢
+    style_option: この選択肢のスタイル
     add_statement: ステートメントを追加
     swipe_no: "いいえ"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ ja:
     editor:
       delete_card_confirm: このカードを削除しますか？
       save_to_library: "ブランドライブラリにも保存"
+      option_style_title: "選択肢のスタイル"
+      option_color: "色"
+      option_emoji: "絵文字"
+      option_icon: "アイコン"
+      option_style_reset: "リセット"
+      option_style_done: "完了"
       add_to_library: "ライブラリに追加"
       library_saving: "保存中…"
       library_save_failed: "ライブラリに保存できませんでした"

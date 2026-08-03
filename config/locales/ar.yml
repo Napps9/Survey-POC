@@ -30,6 +30,7 @@ ar:
     'no': لا
     add_option: إضافة خيار
     new_option: خيار جديد
+    style_option: تنسيق هذه الإجابة
     add_statement: إضافة عبارة
     swipe_no: "لا"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ ar:
     editor:
       delete_card_confirm: حذف هذه البطاقة؟
       save_to_library: "حفظ أيضًا في مكتبة العلامة التجارية"
+      option_style_title: "تنسيق الإجابة"
+      option_color: "اللون"
+      option_emoji: "إيموجي"
+      option_icon: "أيقونة"
+      option_style_reset: "إعادة تعيين"
+      option_style_done: "تم"
       add_to_library: "إضافة إلى المكتبة"
       library_saving: "جارٍ الحفظ…"
       library_save_failed: "تعذّر الحفظ في المكتبة"

@@ -30,6 +30,7 @@ id:
     'no': Tidak
     add_option: Tambah opsi
     new_option: Opsi baru
+    style_option: Gaya jawaban ini
     add_statement: Tambah pernyataan
     swipe_no: "Tidak"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ id:
     editor:
       delete_card_confirm: Hapus kartu ini?
       save_to_library: "Simpan juga ke pustaka merek saya"
+      option_style_title: "Gaya jawaban"
+      option_color: "Warna"
+      option_emoji: "Emoji"
+      option_icon: "Ikon"
+      option_style_reset: "Atur ulang"
+      option_style_done: "Selesai"
       add_to_library: "Tambah ke pustaka"
       library_saving: "Menyimpan…"
       library_save_failed: "Gagal menyimpan ke pustaka"

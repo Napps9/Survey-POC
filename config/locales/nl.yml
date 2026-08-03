@@ -30,6 +30,7 @@ nl:
     'no': Nee
     add_option: Optie toevoegen
     new_option: Nieuwe optie
+    style_option: Dit antwoord stylen
     add_statement: Stelling toevoegen
     swipe_no: "Nee"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ nl:
     editor:
       delete_card_confirm: Deze kaart verwijderen?
       save_to_library: "Ook opslaan in mijn merkbibliotheek"
+      option_style_title: "Antwoordstijl"
+      option_color: "Kleur"
+      option_emoji: "Emoji"
+      option_icon: "Icoon"
+      option_style_reset: "Herstellen"
+      option_style_done: "Klaar"
       add_to_library: "Toevoegen aan bibliotheek"
       library_saving: "Opslaan…"
       library_save_failed: "Opslaan in de bibliotheek mislukt"

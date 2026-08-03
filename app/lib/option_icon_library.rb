@@ -33,6 +33,22 @@ module OptionIconLibrary
     file && inline_svg(file)
   end
 
+  # ── Explicit picks (per-option `option_styles.icon`) ─────────────────────
+  # Icons are addressed by their file basename (e.g. "basketball"), which is
+  # what the editor's icon picker stores and the sanitiser validates.
+
+  def ids
+    @ids ||= DATA.map { |entry| File.basename(entry["file"], ".svg") }.freeze
+  end
+
+  def valid_id?(id)
+    ids.include?(id.to_s)
+  end
+
+  def svg_by_id(id)
+    valid_id?(id) ? inline_svg("#{id}.svg") : nil
+  end
+
   def file_for(label)
     norm = normalize(label)
     return nil if norm.empty?

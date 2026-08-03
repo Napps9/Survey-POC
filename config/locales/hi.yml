@@ -30,6 +30,7 @@ hi:
     'no': नहीं
     add_option: विकल्प जोड़ें
     new_option: नया विकल्प
+    style_option: इस उत्तर को सजाएँ
     add_statement: कथन जोड़ें
     swipe_no: "नहीं"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ hi:
     editor:
       delete_card_confirm: इस कार्ड को हटाएं?
       save_to_library: "मेरी ब्रांड लाइब्रेरी में भी सहेजें"
+      option_style_title: "उत्तर की शैली"
+      option_color: "रंग"
+      option_emoji: "इमोजी"
+      option_icon: "आइकन"
+      option_style_reset: "रीसेट"
+      option_style_done: "हो गया"
       add_to_library: "लाइब्रेरी में जोड़ें"
       library_saving: "सहेजा जा रहा है…"
       library_save_failed: "लाइब्रेरी में सहेजा नहीं जा सका"

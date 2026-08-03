@@ -59,11 +59,21 @@ async function fetchSvg(url) {
 // one is already there. Async and best-effort — icons are decorative.
 export async function iconInto(tile, label) {
   if (!tile) return
-  const url = urlFor(label)
+  injectUrl(tile, urlFor(label))
+}
+
+// Inject an explicitly picked icon (per-option `option_styles.icon`) by its
+// library id — see OptionIconLibrary#svg_by_id for the server twin.
+export async function iconIntoById(tile, id) {
+  if (!tile) return
+  injectUrl(tile, iconMap().ids[String(id ?? "")] || null)
+}
+
+async function injectUrl(tile, url) {
   if (!url) return
   try {
     const svg = await fetchSvg(url)
-    if (svg && tile.isConnected && !tile.querySelector("svg")) {
+    if (svg && tile.isConnected && !tile.querySelector("svg, .choice-icon-emoji")) {
       tile.insertAdjacentHTML("afterbegin", svg)
     }
   } catch (_e) {
@@ -71,16 +81,23 @@ export async function iconInto(tile, label) {
   }
 }
 
-// Icon pass over freshly built option markup. Skips the flavours the server
-// deliberately renders without icons (prioritise, yes/no).
+// Icon pass over freshly built option markup, honouring per-option style
+// overrides (data-option-icon / data-option-emoji beat the keyword match).
+// Rows the server deliberately renders icon-free (prioritise, yes/no) only
+// ever get an explicit override.
 export function injectIcons(root) {
   if (!root) return
-  root
-    .querySelectorAll(".choice-list:not(.choice-list--yesno):not(.prioritise-list) .choice-list-item")
-    .forEach((li) => {
-      iconInto(li.querySelector(".choice-list-tile"), li.querySelector(".pick-text, .choice-list-label")?.textContent)
-    })
+  const fill = (li, tile, label, keywordOk) => {
+    if (!tile || tile.querySelector("svg, .choice-icon-emoji")) return
+    if (li.dataset.optionIcon) return iconIntoById(tile, li.dataset.optionIcon)
+    if (li.dataset.optionEmoji) return
+    if (keywordOk) iconInto(tile, label)
+  }
+  root.querySelectorAll(".choice-list .choice-list-item").forEach((li) => {
+    const keywordOk = !li.classList.contains("prioritise-item") && !li.closest(".choice-list--yesno")
+    fill(li, li.querySelector(".choice-list-tile"), li.querySelector(".pick-text, .choice-list-label")?.textContent, keywordOk)
+  })
   root.querySelectorAll(".choice-card").forEach((li) => {
-    iconInto(li.querySelector(".choice-card-bg"), li.querySelector(".choice-label")?.textContent)
+    fill(li, li.querySelector(".choice-card-bg"), li.querySelector(".choice-label")?.textContent, true)
   })
 }

@@ -166,14 +166,16 @@
           data-controller="<%= picker_controllers %>"
           data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
         <% items.each_with_index do |opt, i| %>
+          <% style = option_style_at(card, i) %>
           <li class="choice-list-item pick-item"
               data-picker-target="item"
               data-action="<%= pick_actions %>"
               data-canonical="<%= canon[i] %>"
               data-correct="<%= mark_correct.call(canon[i]) %>"
               data-selected="false"
+              <%= option_style_data_attrs(style) if editable %>
               <%= pick_a11y.call(multi) %>>
-            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true"><%= OptionIconLibrary.svg_for(canon[i]) %></div>
+            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i]) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
             <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
             <% if quiz_mode %>
@@ -181,6 +183,8 @@
                       data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
             <% end %>
             <% if editable %>
+              <button type="button" class="option-style-btn"
+                      data-action="click->option-style#open" title="<%= t('card.style_option') %>">🎨</button>
               <button type="button" class="pick-item-delete"
                       data-action="click->card-editor#deleteOption">×</button>
             <% end %>
@@ -206,15 +210,19 @@
           data-controller="<%= editable ? 'prioritise card-editor' : 'prioritise' %>"
           <%= 'data-prioritise-shuffle-value="true"'.html_safe if mode == :player %>>
         <% items.each_with_index do |opt, i| %>
+          <% style = option_style_at(card, i) %>
           <li class="choice-list-item pick-item prioritise-item"
               data-prioritise-target="item"
               data-canonical="<%= canon[i] %>"
+              <%= option_style_data_attrs(style) if editable %>
               data-action="pointerdown->prioritise#start">
             <span class="prioritise-rank" data-prioritise-target="rank"><%= i + 1 %></span>
-            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"></div>
+            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], keyword_fallback: false) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
             <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
             <% if editable %>
+              <button type="button" class="option-style-btn"
+                      data-action="click->option-style#open" title="<%= t('card.style_option') %>">🎨</button>
               <button type="button" class="pick-item-delete"
                       data-action="click->card-editor#deleteOption">×</button>
             <% end %>
@@ -234,20 +242,26 @@
           <%= editable ? "".html_safe : tag.attributes(role: "radiogroup") %>
           data-controller="picker"
           data-picker-mode-value="single">
-        <% [["Yes", 1], ["No", 4]].each do |canon_label, bg| %>
+        <% [["Yes", 1], ["No", 4]].each_with_index do |(canon_label, bg), i| %>
+          <% style = option_style_at(card, i) %>
           <li class="choice-list-item pick-item"
               data-picker-target="item"
               data-action="<%= pick_actions %>"
               data-canonical="<%= canon_label %>"
               data-correct="<%= mark_correct.call(canon_label) %>"
               data-selected="false"
+              <%= option_style_data_attrs(style) if editable %>
               <%= pick_a11y.call(false) %>>
-            <div class="choice-list-tile choice-bg-<%= bg %>" aria-hidden="true"></div>
+            <div class="choice-list-tile choice-bg-<%= bg %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon_label, keyword_fallback: false) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= t("card.#{canon_label.downcase}", locale: display_locale, default: canon_label) %></span>
             <span class="choice-list-tick pick-dot">✓</span>
             <% if quiz_mode %>
               <button type="button" class="mark-correct" data-picker-mode="single"
                       data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
+            <% end %>
+            <% if editable %>
+              <button type="button" class="option-style-btn"
+                      data-action="click->option-style#open" title="<%= t('card.style_option') %>">🎨</button>
             <% end %>
           </li>
         <% end %>
@@ -262,20 +276,26 @@
           data-controller="picker"
           data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
         <% opts.each_with_index do |opt, i| %>
+          <% style = option_style_at(card, i) %>
           <li class="choice-card"
               data-picker-target="item"
               data-action="<%= pick_actions %>"
               data-canonical="<%= canon[i] %>"
               data-correct="<%= mark_correct.call(canon[i]) %>"
               data-selected="false"
+              <%= option_style_data_attrs(style) if editable %>
               <%= pick_a11y.call(multi) %>>
-            <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>">
-              <%= OptionIconLibrary.svg_for(canon[i]) %>
+            <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>">
+              <%= option_tile_icon(style, canon[i]) %>
               <div class="choice-overlay"></div>
               <div class="choice-tick">✓</div>
               <% if quiz_mode %>
                 <button type="button" class="mark-correct mark-correct-grid" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
                         data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
+              <% end %>
+              <% if editable %>
+                <button type="button" class="option-style-btn option-style-btn-grid"
+                        data-action="click->option-style#open" title="<%= t('card.style_option') %>">🎨</button>
               <% end %>
             </div>
             <div class="choice-label" <%= ce_attr %>><%= opt %></div>
@@ -400,13 +420,15 @@
                   data-controller="<%= picker_controllers %>"
                   data-picker-mode-value="single">
                 <% items.each_with_index do |opt, i| %>
+                  <% style = option_style_at(card, i) %>
                   <li class="choice-list-item pick-item"
                       data-picker-target="item"
                       data-action="click->picker#pick"
                       data-canonical="<%= canon[i] %>"
                       data-correct="<%= mark_correct.call(canon[i]) %>"
+                      <%= option_style_data_attrs(style) if editable %>
                       data-selected="false">
-                    <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>"><%= OptionIconLibrary.svg_for(canon[i]) %></div>
+                    <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i]) %></div>
                     <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
                     <span class="choice-list-tick pick-dot">✓</span>
                     <% if quiz_mode %>
@@ -414,6 +436,8 @@
                               data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
                     <% end %>
                     <% if editable %>
+                      <button type="button" class="option-style-btn"
+                              data-action="click->option-style#open" title="<%= t('card.style_option') %>">🎨</button>
                       <button type="button" class="pick-item-delete"
                               data-action="click->card-editor#deleteOption">×</button>
                     <% end %>

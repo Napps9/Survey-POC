@@ -30,6 +30,7 @@ vi:
     'no': Không
     add_option: Thêm tùy chọn
     new_option: Tùy chọn mới
+    style_option: Tùy chỉnh câu trả lời này
     add_statement: Thêm phát biểu
     swipe_no: "Không"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ vi:
     editor:
       delete_card_confirm: Xóa thẻ này?
       save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"
+      option_style_title: "Kiểu câu trả lời"
+      option_color: "Màu sắc"
+      option_emoji: "Emoji"
+      option_icon: "Biểu tượng"
+      option_style_reset: "Đặt lại"
+      option_style_done: "Xong"
       add_to_library: "Thêm vào thư viện"
       library_saving: "Đang lưu…"
       library_save_failed: "Không thể lưu vào thư viện"

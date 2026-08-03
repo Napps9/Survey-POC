@@ -30,6 +30,7 @@ ru:
     'no': Нет
     add_option: Добавить вариант
     new_option: Новый вариант
+    style_option: Оформить этот ответ
     add_statement: Добавить утверждение
     swipe_no: "Нет"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ ru:
     editor:
       delete_card_confirm: Удалить эту карточку?
       save_to_library: "Также сохранить в библиотеку бренда"
+      option_style_title: "Стиль ответа"
+      option_color: "Цвет"
+      option_emoji: "Эмодзи"
+      option_icon: "Иконка"
+      option_style_reset: "Сбросить"
+      option_style_done: "Готово"
       add_to_library: "Добавить в библиотеку"
       library_saving: "Сохранение…"
       library_save_failed: "Не удалось сохранить в библиотеку"

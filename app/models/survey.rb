@@ -153,6 +153,11 @@ class Survey < ApplicationRecord
   # (scenario_controller.js) and the same id-keyed translation handling.
   PAGED_TYPES = %w[scenario consent_gate].freeze
 
+  # Card types whose options can carry per-option visual overrides
+  # (`option_styles`: color / icon / emoji). The tile-and-label answer shapes —
+  # scale, swipe and free-text types have no per-option tile to style.
+  OPTION_STYLE_TYPES = %w[multiple_choice select_many prioritise yes_no select_one_grid select_many_grid scenario].freeze
+
   # Free-text answer length. This used to be a hardcoded 200 in the card
   # partial, and it was advisory only — no maxlength on the textarea and no
   # server check anywhere, so the counter turned pink and the answer saved in
@@ -427,6 +432,32 @@ class Survey < ApplicationRecord
           c["range_theme"] = slug
         else
           c.delete("range_theme")
+        end
+      end
+      # Per-option visual overrides ({color, icon, emoji} or null, POSITIONAL
+      # against `options` — like option_images, DOM order in the editor is the
+      # alignment, so there is no splice bookkeeping here). Purely
+      # presentational: answers still key off the option's label text. Same
+      # allowlist-or-drop shape as range_theme below — hex via BrandPalette,
+      # icon ids via OptionIconLibrary, emoji clamped like token icons.
+      if c.key?("option_styles")
+        if OPTION_STYLE_TYPES.include?(c["type"].to_s)
+          limit  = c["type"].to_s == "yes_no" ? 2 : Array(c["options"]).length
+          styles = Array(c["option_styles"]).first(limit).map do |entry|
+            next nil unless entry.is_a?(Hash)
+            out = {}
+            color = entry["color"].to_s
+            out["color"] = "#" + color.strip.delete_prefix("#").downcase if BrandPalette.valid_hex?(color)
+            out["icon"]  = entry["icon"].to_s if OptionIconLibrary.valid_id?(entry["icon"].to_s)
+            emoji = entry["emoji"].to_s.strip
+            out["emoji"] = emoji.first(MAX_TOKEN_ICON) if emoji.present?
+            out.presence
+          end
+          # Pad so positions keep meaning even when the tail is unstyled.
+          styles += [ nil ] * (limit - styles.length) if styles.length < limit
+          styles.any? ? c["option_styles"] = styles : c.delete("option_styles")
+        else
+          c.delete("option_styles")
         end
       end
       # A range card's slider orientation — "auto" (heuristic decides at

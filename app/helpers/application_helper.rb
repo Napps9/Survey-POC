@@ -238,6 +238,44 @@ module ApplicationHelper
                        default: I18n.t("defaults", locale: :en, default: {}))
   end
 
+  # ── Per-option visual overrides (`option_styles` on choice-shaped cards) ──
+  # Mirrored client-side in lib/option_styles.js so the popover's live repaint
+  # matches the server render exactly.
+
+  def option_style_at(card, i)
+    style = Array(card["option_styles"])[i]
+    style.is_a?(Hash) ? style : nil
+  end
+
+  # Inline background for a styled tile — same gradient shape as the stock
+  # choice-bg-N classes, built from the picked hex. "" when unstyled (the
+  # positional class shows through).
+  def option_tile_style(style)
+    hex = style && style["color"].to_s
+    return "" unless hex.present? && BrandPalette.valid_hex?(hex)
+    "background:linear-gradient(135deg, #{BrandPalette.lighten(hex, 0.18)}, #{hex});"
+  end
+
+  # The tile's icon slot: explicit icon pick wins, then emoji, then (where the
+  # type shows them) the keyword-matched icon. nil-safe everywhere.
+  def option_tile_icon(style, label, keyword_fallback: true)
+    if style && (svg = OptionIconLibrary.svg_by_id(style["icon"].to_s))
+      svg
+    elsif style && style["emoji"].present?
+      content_tag(:span, style["emoji"], class: "choice-icon-emoji", aria: { hidden: true })
+    elsif keyword_fallback
+      OptionIconLibrary.svg_for(label)
+    end
+  end
+
+  # data-* attributes the editor's option-style popover reads/writes on each
+  # option row; serialize() reads them back off the DOM. Editable mode only.
+  def option_style_data_attrs(style)
+    return "".html_safe unless style
+    tag.attributes("data-option-color": style["color"], "data-option-icon": style["icon"],
+                   "data-option-emoji": style["emoji"])
+  end
+
   # Icon lookup for option markup built client-side (lib/option_icons.js):
   # `keywords` mirrors OptionIconLibrary::KEYWORD_TO_FILE with digest asset
   # URLs, `ids` addresses each icon by its basename for explicit picks.

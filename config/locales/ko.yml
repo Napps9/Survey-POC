@@ -30,6 +30,7 @@ ko:
     'no': 아니요
     add_option: 옵션 추가
     new_option: 새 옵션
+    style_option: 이 답변 스타일
     add_statement: 문장 추가
     swipe_no: "아니요"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ ko:
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       save_to_library: "브랜드 라이브러리에도 저장"
+      option_style_title: "답변 스타일"
+      option_color: "색상"
+      option_emoji: "이모지"
+      option_icon: "아이콘"
+      option_style_reset: "초기화"
+      option_style_done: "완료"
       add_to_library: "라이브러리에 추가"
       library_saving: "저장 중…"
       library_save_failed: "라이브러리에 저장하지 못했습니다"

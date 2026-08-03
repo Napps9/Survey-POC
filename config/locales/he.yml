@@ -30,6 +30,7 @@ he:
     'no': לא
     add_option: הוסף אפשרות
     new_option: אפשרות חדשה
+    style_option: עיצוב תשובה זו
     add_statement: הוסף משפט
     swipe_no: "לא"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ he:
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
       save_to_library: "שמור גם בספריית המותג שלי"
+      option_style_title: "עיצוב התשובה"
+      option_color: "צבע"
+      option_emoji: "אימוג'י"
+      option_icon: "סמל"
+      option_style_reset: "איפוס"
+      option_style_done: "סיום"
       add_to_library: "הוסף לספרייה"
       library_saving: "שומר…"
       library_save_failed: "השמירה בספרייה נכשלה"

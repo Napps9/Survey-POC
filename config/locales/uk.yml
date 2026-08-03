@@ -30,6 +30,7 @@ uk:
     'no': Ні
     add_option: Додати варіант
     new_option: Новий варіант
+    style_option: Оформити цю відповідь
     add_statement: Додати твердження
     swipe_no: "Ні"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ uk:
     editor:
       delete_card_confirm: Видалити цю картку?
       save_to_library: "Також зберегти в бібліотеку бренду"
+      option_style_title: "Стиль відповіді"
+      option_color: "Колір"
+      option_emoji: "Емодзі"
+      option_icon: "Іконка"
+      option_style_reset: "Скинути"
+      option_style_done: "Готово"
       add_to_library: "Додати до бібліотеки"
       library_saving: "Збереження…"
       library_save_failed: "Не вдалося зберегти в бібліотеку"

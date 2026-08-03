@@ -30,6 +30,7 @@ de:
     'no': Nein
     add_option: Option hinzufügen
     new_option: Neue Option
+    style_option: Diese Antwort gestalten
     add_statement: Aussage hinzufügen
     swipe_no: "Nein"
     swipe_unsure: "Unsure"
@@ -200,6 +201,12 @@ de:
     editor:
       delete_card_confirm: Diese Karte löschen?
       save_to_library: "Auch in meiner Markenbibliothek speichern"
+      option_style_title: "Antwort gestalten"
+      option_color: "Farbe"
+      option_emoji: "Emoji"
+      option_icon: "Symbol"
+      option_style_reset: "Zurücksetzen"
+      option_style_done: "Fertig"
       add_to_library: "Zur Bibliothek hinzufügen"
       library_saving: "Wird gespeichert…"
       library_save_failed: "Speichern in der Bibliothek fehlgeschlagen"

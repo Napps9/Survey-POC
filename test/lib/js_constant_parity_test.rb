@@ -139,6 +139,22 @@ class JsConstantParityTest < ActiveSupport::TestCase
     end
   end
 
+  # Per-option style overrides are serialized for exactly the types the server
+  # sanitiser accepts them on — drift in either direction silently loses a
+  # creator's colours/icons on the next autosave.
+  test "lib/option_style_types.js matches Survey::OPTION_STYLE_TYPES" do
+    assert_equal Survey::OPTION_STYLE_TYPES.sort,
+                 js_array("lib/option_style_types.js", "OPTION_STYLE_TYPES").sort
+  end
+
+  # The single most common data-loss shape in this codebase: a card field the
+  # serializer doesn't emit is stripped on the next autosave of ANY card.
+  test "serialize emits option_styles" do
+    assert_match(/out\.option_styles/, js("controllers/survey_editor_controller.js"),
+                 "serialize() no longer emits option_styles — every styled deck " \
+                 "loses its overrides on the next autosave")
+  end
+
   # The palette maths lives twice (live preview vs server render); the roles
   # drifting means a colour a creator can pick that one side silently ignores.
   test "lib/brand_palette.js roles and defaults match BrandPalette" do
