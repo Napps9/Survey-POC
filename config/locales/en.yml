@@ -1120,6 +1120,96 @@ en:
     not_found: That template isn't available.
     created: Started “%{name}” from a template — customise it and publish when you're
       ready.
+    # Per-template CONTENT, mirrored positionally from SurveyTemplates::ALL —
+    # instantiating a template resolves these in the creator's locale, so the
+    # new Verto starts in their language. Card entries align by index; an
+    # `options` list must keep the registry card's length (positional answer
+    # data). NPS number scales are not listed — numerals stay numerals.
+    nps:
+      name: "Net Promoter Score"
+      tagline: "Measure loyalty in two questions — how likely people are to recommend you, and why."
+      cards:
+        - text: "Quick question about your experience"
+          description: "Under a minute, fully anonymous — your answers help us improve."
+        - text: "How likely are you to recommend us to a friend or colleague?"
+        - text: "What's the main reason for your score?"
+        - text: "Which of these best describes you?"
+          options: ["New customer", "Returning customer", "Long-time customer", "Just browsing"]
+    csat:
+      name: "Customer Satisfaction"
+      tagline: "A short CSAT pulse: rate the experience, pinpoint what worked, and hear what to fix."
+      cards:
+        - text: "How did we do?"
+          description: "A few quick taps — thanks for helping us get better."
+        - text: "Overall, how satisfied are you with your experience?"
+          options: ["Very unsatisfied", "Unsatisfied", "Neutral", "Satisfied", "Very satisfied"]
+        - text: "Which part of your experience stood out most?"
+          options: ["Ease of use", "Speed", "Support", "Value for money", "Quality"]
+        - text: "Would you use us again?"
+        - text: "What's one thing we could do better?"
+    onboarding:
+      name: "New User Onboarding"
+      tagline: "Find out where new users get stuck and what would help them reach their first win faster."
+      cards:
+        - text: "How was getting started?"
+          description: "You just set things up — tell us how it went while it's fresh."
+        - text: "How easy was it to get started?"
+          options: ["Very hard", "Hard", "Okay", "Easy", "Very easy"]
+        - text: "Where, if anywhere, did you get stuck?"
+          options: ["Signing up", "Setting things up", "Finding what I needed", "Understanding how it works", "I didn't get stuck"]
+        - text: "What would have helped you get started faster? Pick all that apply."
+          options: ["A guided tour", "Templates or examples", "Clearer instructions", "Live chat support", "A short video"]
+        - text: "If you could change one thing about getting started, what would it be?"
+    employee-pulse:
+      name: "Employee Pulse Check"
+      tagline: "A fast, anonymous read on how the team is really feeling this week — plus an eNPS."
+      cards:
+        - text: "How's it going, really?"
+          description: "Fully anonymous — this is about making things better, not checking up."
+        - text: "How are you feeling about work this week?"
+          options: ["Struggling", "Not great", "Okay", "Good", "Thriving"]
+        - text: "How's your workload right now?"
+          options: ["Way too much", "A bit much", "About right", "A bit light", "Too light"]
+        - text: "How supported do you feel by your manager?"
+          options: ["Not at all", "A little", "Somewhat", "Well", "Very well"]
+        - text: "How likely are you to recommend this as a place to work?"
+        - text: "What's one change that would make this a better place to work?"
+    event-feedback:
+      name: "Event Feedback"
+      tagline: "Capture how your event landed — the highlights, the misses, and whether they'd come back."
+      cards:
+        - text: "Thanks for coming — how was it?"
+          description: "A couple of quick questions while it's still fresh."
+        - text: "How would you rate the event overall?"
+          options: ["Poor", "Fair", "Good", "Great", "Excellent"]
+        - text: "What was the best part for you?"
+          options: ["The speakers", "The content", "The networking", "The venue", "The organisation"]
+        - text: "Would you attend again?"
+        - text: "How likely are you to recommend this event to a colleague?"
+        - text: "What would make the next one even better?"
+    product-market-fit:
+      name: "Product-Market Fit"
+      tagline: "The classic Sean Ellis test — how people would feel without you, and who values you most."
+      cards:
+        - text: "Help shape where we go next"
+          description: "A few honest answers make a real difference — thank you."
+        - text: "How would you feel if you could no longer use us?"
+          options: ["Very disappointed", "Somewhat disappointed", "Not disappointed"]
+        - text: "What is the main benefit you get from us?"
+        - text: "What type of person do you think would benefit most?"
+          options: ["People like me", "Beginners", "Professionals", "Teams", "Not sure"]
+        - text: "How can we improve it for you?"
+  # The three set demographic questions appended to every Verto (see
+  # DemographicQuestions) — resolved in the Verto's default locale at append
+  # time, so a French Verto's tail asks in French. Positional; options keep
+  # the registry lengths.
+  demographics:
+    cards:
+      - text: "When were you born?"
+      - text: "Where do you live?"
+        description: "Powered by OpenStreetMap — helps build a map you can explore after finishing."
+      - text: "Gender"
+        options: ["Male", "Female", "Non-binary", "Other", "Prefer not to say"]
   oops:
     private_link_title: "Oops — that's a private editor link"
     private_link_body: "This link opens the Verto editor, which only its creator can use — it isn't the public share link, so there's nothing to play here."

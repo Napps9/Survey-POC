@@ -1112,6 +1112,87 @@ sw:
     not_found: Kiolezo hicho hakipatikani.
     created: Umeanzisha “%{name}” kutoka kwa kiolezo — kibinafsishe na uchapishe ukiwa
       tayari.
+    nps:
+      name: "Net Promoter Score"
+      tagline: "Pima uaminifu kwa maswali mawili — uwezekano wa watu kukupendekeza, na kwa nini."
+      cards:
+        - text: "Swali fupi kuhusu uzoefu wako"
+          description: "Chini ya dakika moja, bila utambulisho kabisa — majibu yako yanatusaidia kuboresha."
+        - text: "Kuna uwezekano gani wa wewe kutupendekeza kwa rafiki au mwenzako?"
+        - text: "Sababu kuu ya alama yako ni ipi?"
+        - text: "Ni ipi kati ya hizi inayokuelezea vizuri zaidi?"
+          options: ["Mteja mpya", "Mteja anayerudi", "Mteja wa muda mrefu", "Naangalia tu"]
+    csat:
+      name: "Kuridhika kwa Wateja"
+      tagline: "Pimo fupi la CSAT: kadiria uzoefu, bainisha kilichofanya kazi, na usikie cha kurekebisha."
+      cards:
+        - text: "Tulifanyaje?"
+          description: "Mibofyo michache tu — asante kwa kutusaidia kuboresha."
+        - text: "Kwa ujumla, umeridhika kiasi gani na uzoefu wako?"
+          options: ["Sijaridhika kabisa", "Sijaridhika", "Wastani", "Nimeridhika", "Nimeridhika sana"]
+        - text: "Sehemu gani ya uzoefu wako ilijitokeza zaidi?"
+          options: ["Urahisi wa kutumia", "Kasi", "Usaidizi", "Thamani ya pesa", "Ubora"]
+        - text: "Je, ungetutumia tena?"
+        - text: "Ni kitu gani kimoja tunachoweza kufanya vizuri zaidi?"
+    onboarding:
+      name: "Kuwapokea Watumiaji Wapya"
+      tagline: "Gundua mahali watumiaji wapya wanapokwama na kitakachowasaidia kufikia mafanikio yao ya kwanza haraka zaidi."
+      cards:
+        - text: "Kuanza kulikuwaje?"
+          description: "Umemaliza tu kuweka mambo sawa — tuambie ilivyokwenda ikiwa bado ni safi akilini."
+        - text: "Ilikuwa rahisi kiasi gani kuanza?"
+          options: ["Ngumu sana", "Ngumu", "Sawa tu", "Rahisi", "Rahisi sana"]
+        - text: "Ulikwama wapi, kama ulikwama?"
+          options: ["Kujisajili", "Kuweka mambo sawa", "Kutafuta nilichohitaji", "Kuelewa jinsi inavyofanya kazi", "Sikukwama"]
+        - text: "Nini kingekusaidia kuanza haraka zaidi? Chagua yote yanayohusika."
+          options: ["Ziara ya kuongozwa", "Violezo au mifano", "Maelekezo yaliyo wazi zaidi", "Usaidizi wa gumzo la moja kwa moja", "Video fupi"]
+        - text: "Kama ungeweza kubadilisha kitu kimoja kuhusu kuanza, kingekuwa nini?"
+    employee-pulse:
+      name: "Pima Hisia za Wafanyakazi"
+      tagline: "Usomaji wa haraka, usio na utambulisho, wa jinsi timu inavyojisikia kweli wiki hii — pamoja na eNPS."
+      cards:
+        - text: "Mambo yanaendaje, kwa kweli?"
+          description: "Bila utambulisho kabisa — lengo ni kuboresha mambo, si kumfuatilia mtu."
+        - text: "Unajisikiaje kuhusu kazi wiki hii?"
+          options: ["Napambana", "Si vizuri sana", "Sawa tu", "Vizuri", "Nastawi"]
+        - text: "Mzigo wako wa kazi ukoje kwa sasa?"
+          options: ["Mwingi mno", "Mwingi kidogo", "Sawasawa", "Mwepesi kidogo", "Mwepesi mno"]
+        - text: "Unahisi kuungwa mkono kiasi gani na meneja wako?"
+          options: ["Hata kidogo", "Kidogo", "Kiasi", "Vizuri", "Vizuri sana"]
+        - text: "Kuna uwezekano gani wa wewe kupendekeza hapa kama mahali pa kufanya kazi?"
+        - text: "Ni badiliko gani moja lingefanya hapa pawe mahali bora zaidi pa kufanya kazi?"
+    event-feedback:
+      name: "Maoni ya Tukio"
+      tagline: "Nasa jinsi tukio lako lilivyopokelewa — mambo mazuri, yaliyokosekana, na kama wangerudi tena."
+      cards:
+        - text: "Asante kwa kuja — ilikuwaje?"
+          description: "Maswali machache ya haraka wakati bado ni safi akilini."
+        - text: "Ungelikadiria tukio kwa ujumla vipi?"
+          options: ["Hafifu", "Wastani", "Nzuri", "Nzuri sana", "Bora kabisa"]
+        - text: "Sehemu gani ilikuwa bora zaidi kwako?"
+          options: ["Wazungumzaji", "Maudhui", "Kujenga mitandao", "Ukumbi", "Mpangilio"]
+        - text: "Je, ungehudhuria tena?"
+        - text: "Kuna uwezekano gani wa wewe kupendekeza tukio hili kwa mwenzako?"
+        - text: "Nini kingefanya lijalo liwe bora zaidi?"
+    product-market-fit:
+      name: "Product-Market Fit"
+      tagline: "Jaribio maarufu la Sean Ellis — watu wangejisikiaje bila wewe, na nani anakuthamini zaidi."
+      cards:
+        - text: "Saidia kuamua tuelekee wapi"
+          description: "Majibu machache ya kweli yanaleta tofauti kubwa — asante."
+        - text: "Ungejisikiaje kama usingeweza kututumia tena?"
+          options: ["Ningesikitika sana", "Ningesikitika kiasi", "Nisingesikitika"]
+        - text: "Faida kuu unayopata kutoka kwetu ni ipi?"
+        - text: "Unafikiri aina gani ya mtu ingefaidika zaidi?"
+          options: ["Watu kama mimi", "Wanaoanza", "Wataalamu", "Timu", "Sina uhakika"]
+        - text: "Tunawezaje kuiboresha kwa ajili yako?"
+  demographics:
+    cards:
+      - text: "Ulizaliwa lini?"
+      - text: "Unaishi wapi?"
+        description: "Inaendeshwa na OpenStreetMap — husaidia kujenga ramani unayoweza kuchunguza baada ya kumaliza."
+      - text: "Jinsia"
+        options: ["Mwanamume", "Mwanamke", "Si mwanamume wala mwanamke", "Nyingine", "Napendelea kutosema"]
   oops:
     private_link_title: "Samahani — hiki ni kiungo cha faragha cha kihariri"
     private_link_body: "Kiungo hiki hufungua kihariri cha Verto, kinachotumika na mtengenezaji wake pekee — si kiungo cha umma cha kushiriki, kwa hivyo hakuna cha kucheza hapa."

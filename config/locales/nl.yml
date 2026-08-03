@@ -1112,6 +1112,87 @@ nl:
     not_found: Dat sjabloon is niet beschikbaar.
     created: "“%{name}” aangemaakt vanuit een sjabloon — pas het aan en publiceer wanneer
       je klaar bent."
+    nps:
+      name: "Net Promoter Score"
+      tagline: "Meet loyaliteit met twee vragen — hoe waarschijnlijk het is dat mensen je aanbevelen, en waarom."
+      cards:
+        - text: "Een korte vraag over je ervaring"
+          description: "Minder dan een minuut, volledig anoniem — je antwoorden helpen ons verbeteren."
+        - text: "Hoe waarschijnlijk is het dat je ons aanbeveelt aan een vriend of collega?"
+        - text: "Wat is de belangrijkste reden voor je score?"
+        - text: "Wat omschrijft jou het best?"
+          options: ["Nieuwe klant", "Terugkerende klant", "Trouwe klant", "Ik kijk alleen rond"]
+    csat:
+      name: "Klanttevredenheid"
+      tagline: "Een korte CSAT-peiling: beoordeel de ervaring, ontdek wat werkte en hoor wat beter kan."
+      cards:
+        - text: "Hoe hebben we het gedaan?"
+          description: "Een paar snelle tikken — bedankt dat je ons helpt beter te worden."
+        - text: "Hoe tevreden ben je over het geheel genomen met je ervaring?"
+          options: ["Zeer ontevreden", "Ontevreden", "Neutraal", "Tevreden", "Zeer tevreden"]
+        - text: "Welk deel van je ervaring sprong er voor jou het meest uit?"
+          options: ["Gebruiksgemak", "Snelheid", "Ondersteuning", "Prijs-kwaliteitverhouding", "Kwaliteit"]
+        - text: "Zou je ons opnieuw gebruiken?"
+        - text: "Wat is één ding dat we beter zouden kunnen doen?"
+    onboarding:
+      name: "Onboarding van nieuwe gebruikers"
+      tagline: "Ontdek waar nieuwe gebruikers vastlopen en wat hen zou helpen om sneller hun eerste succes te behalen."
+      cards:
+        - text: "Hoe was het om te beginnen?"
+          description: "Je hebt net alles ingesteld — vertel ons hoe het ging nu het nog vers is."
+        - text: "Hoe makkelijk was het om te beginnen?"
+          options: ["Heel moeilijk", "Moeilijk", "Ging wel", "Makkelijk", "Heel makkelijk"]
+        - text: "Waar liep je vast, als dat ergens gebeurde?"
+          options: ["Bij het aanmelden", "Bij het instellen", "Bij het vinden van wat ik nodig had", "Bij het begrijpen hoe het werkt", "Ik liep nergens vast"]
+        - text: "Wat had je geholpen om sneller te beginnen? Kies alles wat van toepassing is."
+          options: ["Een rondleiding", "Sjablonen of voorbeelden", "Duidelijkere instructies", "Livechat-ondersteuning", "Een korte video"]
+        - text: "Als je één ding aan het beginnen kon veranderen, wat zou dat zijn?"
+    employee-pulse:
+      name: "Pulsmeting voor medewerkers"
+      tagline: "Een snelle, anonieme peiling van hoe het team zich deze week echt voelt — plus een eNPS."
+      cards:
+        - text: "Hoe gaat het, echt?"
+          description: "Volledig anoniem — dit gaat over dingen beter maken, niet over controleren."
+        - text: "Hoe voel je je deze week over je werk?"
+          options: ["Ik worstel", "Niet zo goed", "Oké", "Goed", "Ik floreer"]
+        - text: "Hoe is je werkdruk op dit moment?"
+          options: ["Veel te hoog", "Iets te hoog", "Precies goed", "Iets te laag", "Te laag"]
+        - text: "Hoe gesteund voel je je door je leidinggevende?"
+          options: ["Helemaal niet", "Een beetje", "Enigszins", "Goed", "Heel goed"]
+        - text: "Hoe waarschijnlijk is het dat je dit aanbeveelt als een fijne plek om te werken?"
+        - text: "Wat is één verandering die dit een betere werkplek zou maken?"
+    event-feedback:
+      name: "Evenementfeedback"
+      tagline: "Leg vast hoe je evenement is bevallen — de hoogtepunten, de missers en of ze terug zouden komen."
+      cards:
+        - text: "Bedankt voor je komst — hoe was het?"
+          description: "Een paar korte vragen nu het nog vers in het geheugen ligt."
+        - text: "Hoe beoordeel je het evenement in zijn geheel?"
+          options: ["Matig", "Redelijk", "Goed", "Heel goed", "Uitstekend"]
+        - text: "Wat was voor jou het beste onderdeel?"
+          options: ["De sprekers", "De inhoud", "Het netwerken", "De locatie", "De organisatie"]
+        - text: "Zou je opnieuw komen?"
+        - text: "Hoe waarschijnlijk is het dat je dit evenement aanbeveelt aan een collega?"
+        - text: "Wat zou de volgende editie nog beter maken?"
+    product-market-fit:
+      name: "Product-market fit"
+      tagline: "De klassieke Sean Ellis-test — hoe mensen zich zonder jou zouden voelen, en wie jou het meest waardeert."
+      cards:
+        - text: "Help bepalen waar we heen gaan"
+          description: "Een paar eerlijke antwoorden maken echt verschil — dank je wel."
+        - text: "Hoe zou je je voelen als je ons niet meer kon gebruiken?"
+          options: ["Heel teleurgesteld", "Enigszins teleurgesteld", "Niet teleurgesteld"]
+        - text: "Wat is het belangrijkste voordeel dat je van ons krijgt?"
+        - text: "Wat voor type persoon zou er volgens jou het meest baat bij hebben?"
+          options: ["Mensen zoals ik", "Beginners", "Professionals", "Teams", "Weet ik niet"]
+        - text: "Hoe kunnen we het voor jou verbeteren?"
+  demographics:
+    cards:
+      - text: "Wanneer ben je geboren?"
+      - text: "Waar woon je?"
+        description: "Mogelijk gemaakt door OpenStreetMap — helpt een kaart te bouwen die je na afloop kunt verkennen."
+      - text: "Gender"
+        options: ["Man", "Vrouw", "Non-binair", "Anders", "Zeg ik liever niet"]
   oops:
     private_link_title: "Oeps — dit is een privé-editorlink"
     private_link_body: "Deze link opent de Verto-editor, die alleen de maker kan gebruiken — het is niet de openbare deellink, dus hier valt niets te spelen."

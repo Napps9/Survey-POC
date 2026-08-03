@@ -60,10 +60,10 @@
               <%= tpl[:emoji] %>
             </div>
             <div style="font-family:'Alata',sans-serif;font-size: var(--text-xl);color:#fff;margin-bottom:8px;line-height:1.2;">
-              <%= tpl[:name] %>
+              <%= SurveyTemplates.localized_name(tpl) %>
             </div>
             <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.55;margin:0 0 20px;flex:1;">
-              <%= tpl[:tagline] %>
+              <%= SurveyTemplates.localized_tagline(tpl) %>
             </p>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.35);">

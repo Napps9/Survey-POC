@@ -6,9 +6,14 @@
 # editable afterwards. Demographic questions are appended at instantiation time
 # (SurveyTemplates::Instantiator), exactly as generate/import do.
 #
-# Template content is English by design: the instantiated Verto starts in
-# English and the creator can translate it like any other Verto. Only the
-# gallery *chrome* is localised (config/locales/*.yml → templates.*).
+# The registry below is the ENGLISH CANONICAL copy. The gallery and the
+# instantiated Verto both resolve in the creator's locale: names, taglines and
+# card content live (positionally mirrored) under `templates.<id>` in every
+# locale file, and `cards_for(id, locale:)` merges them over the registry —
+# so a French creator's template Verto starts in French, with French as its
+# default locale, not as an English deck to translate. A locale that lacks a
+# string falls back to the English here; the shape is pinned by
+# test/lib/locale_structure_parity_test.rb.
 module SurveyTemplates
   module_function
 
@@ -156,13 +161,39 @@ module SurveyTemplates
     ALL_BY_ID[id.to_s]
   end
 
+  # The template's display name/tagline in `locale`, falling back to the
+  # registry's English.
+  def localized_name(template, locale = I18n.locale)
+    I18n.t("templates.#{template[:id]}.name", locale: locale, default: template[:name])
+  end
+
+  def localized_tagline(template, locale = I18n.locale)
+    I18n.t("templates.#{template[:id]}.tagline", locale: locale, default: template[:tagline])
+  end
+
   # A deep copy of a template's content cards, safe to mutate/persist (the
-  # registry is frozen). Cards are pure JSON data (strings/arrays/hashes), so a
-  # JSON round-trip deep-copies nested option arrays and i18n hashes cleanly.
-  def cards_for(id)
+  # registry is frozen), resolved in `locale`. Cards are pure JSON data
+  # (strings/arrays/hashes), so a JSON round-trip deep-copies cleanly.
+  #
+  # Translations merge POSITIONALLY (card i, option j) and defensively: a
+  # missing entry keeps the English, and an options list is only taken whole
+  # and at the registry card's exact length — answer data is positional, so a
+  # short translation must not shorten a scale.
+  def cards_for(id, locale: nil)
     template = find(id)
     return nil unless template
 
-    JSON.parse(JSON.generate(template[:cards]))
+    cards = JSON.parse(JSON.generate(template[:cards]))
+    translated = Array(I18n.t("templates.#{id}.cards", locale: locale || I18n.locale, default: nil))
+    cards.each_with_index do |card, i|
+      tr = translated[i]
+      next unless tr.is_a?(Hash)
+      tr = tr.transform_keys(&:to_s)
+      card["text"]        = tr["text"].to_s        if tr["text"].to_s.strip.present?
+      card["description"] = tr["description"].to_s if tr["description"].to_s.strip.present?
+      opts = tr["options"]
+      card["options"] = opts.map(&:to_s) if opts.is_a?(Array) && opts.size == Array(card["options"]).size
+    end
+    cards
   end
 end

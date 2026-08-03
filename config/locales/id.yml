@@ -1111,6 +1111,87 @@ id:
     browse: Jelajahi templat
     not_found: Templat itu tidak tersedia.
     created: Membuat “%{name}” dari templat — sesuaikan dan terbitkan saat Anda siap.
+    nps:
+      name: "Net Promoter Score"
+      tagline: "Ukur loyalitas dengan dua pertanyaan — seberapa besar kemungkinan orang merekomendasikan Anda, dan alasannya."
+      cards:
+        - text: "Pertanyaan singkat tentang pengalaman Anda"
+          description: "Kurang dari satu menit, sepenuhnya anonim — jawaban Anda membantu kami menjadi lebih baik."
+        - text: "Seberapa besar kemungkinan Anda merekomendasikan kami kepada teman atau kolega?"
+        - text: "Apa alasan utama di balik nilai yang Anda berikan?"
+        - text: "Mana yang paling menggambarkan Anda?"
+          options: ["Pelanggan baru", "Pelanggan yang kembali", "Pelanggan lama", "Sekadar melihat-lihat"]
+    csat:
+      name: "Kepuasan Pelanggan"
+      tagline: "Survei CSAT singkat: nilai pengalamannya, temukan apa yang berhasil, dan dengar apa yang perlu diperbaiki."
+      cards:
+        - text: "Bagaimana kinerja kami?"
+          description: "Cukup beberapa ketukan — terima kasih telah membantu kami menjadi lebih baik."
+        - text: "Secara keseluruhan, seberapa puas Anda dengan pengalaman Anda?"
+          options: ["Sangat tidak puas", "Tidak puas", "Netral", "Puas", "Sangat puas"]
+        - text: "Bagian mana dari pengalaman Anda yang paling berkesan?"
+          options: ["Kemudahan penggunaan", "Kecepatan", "Dukungan", "Harga yang sepadan", "Kualitas"]
+        - text: "Apakah Anda akan menggunakan layanan kami lagi?"
+        - text: "Apa satu hal yang bisa kami lakukan lebih baik?"
+    onboarding:
+      name: "Orientasi Pengguna Baru"
+      tagline: "Cari tahu di mana pengguna baru terhambat dan apa yang membantu mereka lebih cepat meraih keberhasilan pertama."
+      cards:
+        - text: "Bagaimana pengalaman memulainya?"
+          description: "Anda baru saja menyiapkan semuanya — ceritakan pengalaman Anda selagi masih segar."
+        - text: "Seberapa mudah untuk memulai?"
+          options: ["Sangat sulit", "Sulit", "Lumayan", "Mudah", "Sangat mudah"]
+        - text: "Di bagian mana, jika ada, Anda terhambat?"
+          options: ["Mendaftar", "Menyiapkan semuanya", "Menemukan yang saya butuhkan", "Memahami cara kerjanya", "Saya tidak terhambat"]
+        - text: "Apa yang akan membantu Anda memulai lebih cepat? Pilih semua yang sesuai."
+          options: ["Tur berpemandu", "Templat atau contoh", "Instruksi yang lebih jelas", "Dukungan live chat", "Video singkat"]
+        - text: "Jika Anda bisa mengubah satu hal tentang proses memulai, apa itu?"
+    employee-pulse:
+      name: "Survei Pulse Karyawan"
+      tagline: "Gambaran cepat dan anonim tentang perasaan tim yang sebenarnya minggu ini — plus eNPS."
+      cards:
+        - text: "Bagaimana kabar Anda yang sebenarnya?"
+          description: "Sepenuhnya anonim — ini untuk membuat keadaan lebih baik, bukan untuk mengawasi."
+        - text: "Bagaimana perasaan Anda tentang pekerjaan minggu ini?"
+          options: ["Kewalahan", "Kurang baik", "Lumayan", "Baik", "Sangat baik"]
+        - text: "Bagaimana beban kerja Anda saat ini?"
+          options: ["Terlalu berat", "Agak berat", "Pas", "Agak ringan", "Terlalu ringan"]
+        - text: "Seberapa besar dukungan yang Anda rasakan dari manajer Anda?"
+          options: ["Tidak sama sekali", "Sedikit", "Cukup", "Baik", "Sangat baik"]
+        - text: "Seberapa besar kemungkinan Anda merekomendasikan tempat ini sebagai tempat bekerja?"
+        - text: "Apa satu perubahan yang akan membuat tempat ini lebih baik untuk bekerja?"
+    event-feedback:
+      name: "Umpan Balik Acara"
+      tagline: "Tangkap kesan acara Anda — momen terbaik, kekurangannya, dan apakah mereka akan datang lagi."
+      cards:
+        - text: "Terima kasih sudah hadir — bagaimana acaranya?"
+          description: "Beberapa pertanyaan singkat selagi masih segar di ingatan."
+        - text: "Bagaimana penilaian Anda terhadap acara ini secara keseluruhan?"
+          options: ["Buruk", "Cukup", "Baik", "Bagus", "Luar biasa"]
+        - text: "Apa bagian terbaik menurut Anda?"
+          options: ["Para pembicara", "Kontennya", "Networking", "Tempatnya", "Penyelenggaraannya"]
+        - text: "Apakah Anda akan hadir lagi?"
+        - text: "Seberapa besar kemungkinan Anda merekomendasikan acara ini kepada kolega?"
+        - text: "Apa yang akan membuat acara berikutnya lebih baik lagi?"
+    product-market-fit:
+      name: "Product-Market Fit"
+      tagline: "Tes klasik Sean Ellis — bagaimana perasaan orang tanpa Anda, dan siapa yang paling menghargai Anda."
+      cards:
+        - text: "Bantu tentukan arah kami selanjutnya"
+          description: "Beberapa jawaban jujur membuat perbedaan nyata — terima kasih."
+        - text: "Bagaimana perasaan Anda jika tidak bisa lagi menggunakan layanan kami?"
+          options: ["Sangat kecewa", "Agak kecewa", "Tidak kecewa"]
+        - text: "Apa manfaat utama yang Anda dapatkan dari kami?"
+        - text: "Menurut Anda, tipe orang seperti apa yang paling diuntungkan?"
+          options: ["Orang seperti saya", "Pemula", "Profesional", "Tim", "Tidak yakin"]
+        - text: "Bagaimana kami bisa membuatnya lebih baik untuk Anda?"
+  demographics:
+    cards:
+      - text: "Kapan Anda lahir?"
+      - text: "Di mana Anda tinggal?"
+        description: "Didukung oleh OpenStreetMap — membantu membangun peta yang bisa Anda jelajahi setelah selesai."
+      - text: "Jenis kelamin"
+        options: ["Laki-laki", "Perempuan", "Non-biner", "Lainnya", "Memilih untuk tidak menjawab"]
   oops:
     private_link_title: "Ups — ini tautan editor pribadi"
     private_link_body: "Tautan ini membuka editor Verto yang hanya bisa digunakan pembuatnya — ini bukan tautan berbagi publik, jadi tidak ada yang bisa dimainkan di sini."

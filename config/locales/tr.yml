@@ -1112,6 +1112,87 @@ tr:
     not_found: Bu şablon kullanılamıyor.
     created: "“%{name}” bir şablondan oluşturuldu — özelleştirin ve hazır olduğunuzda
       yayınlayın."
+    nps:
+      name: "Net Promoter Score"
+      tagline: "Sadakati iki soruda ölçün — insanların sizi önerme olasılığı ve bunun nedeni."
+      cards:
+        - text: "Deneyiminizle ilgili kısa bir soru"
+          description: "Bir dakikadan kısa sürer, tamamen anonim — yanıtlarınız gelişmemize yardımcı oluyor."
+        - text: "Bizi bir arkadaşınıza veya iş arkadaşınıza önerme olasılığınız nedir?"
+        - text: "Verdiğiniz puanın ana nedeni nedir?"
+        - text: "Aşağıdakilerden hangisi sizi en iyi tanımlıyor?"
+          options: ["Yeni müşteri", "Tekrar gelen müşteri", "Uzun süreli müşteri", "Sadece göz atıyorum"]
+    csat:
+      name: "Müşteri Memnuniyeti"
+      tagline: "Kısa bir CSAT nabız yoklaması: deneyimi puanlayın, neyin işe yaradığını belirleyin ve neyin düzeltilmesi gerektiğini öğrenin."
+      cards:
+        - text: "Nasıldık?"
+          description: "Birkaç hızlı dokunuş yeter — daha iyi olmamıza yardımcı olduğunuz için teşekkürler."
+        - text: "Genel olarak deneyiminizden ne kadar memnunsunuz?"
+          options: ["Hiç memnun değilim", "Memnun değilim", "Kararsızım", "Memnunum", "Çok memnunum"]
+        - text: "Deneyiminizin hangi kısmı en çok öne çıktı?"
+          options: ["Kullanım kolaylığı", "Hız", "Destek", "Fiyat/performans", "Kalite"]
+        - text: "Bizi tekrar kullanır mıydınız?"
+        - text: "Daha iyi yapabileceğimiz bir şey nedir?"
+    onboarding:
+      name: "Yeni Kullanıcı Oryantasyonu"
+      tagline: "Yeni kullanıcıların nerede takıldığını ve ilk başarılarına daha hızlı ulaşmalarına neyin yardımcı olacağını keşfedin."
+      cards:
+        - text: "Başlangıç nasıl geçti?"
+          description: "Her şeyi az önce kurdunuz — hafızanız tazeyken nasıl gittiğini anlatın."
+        - text: "Başlamak ne kadar kolaydı?"
+          options: ["Çok zor", "Zor", "İdare eder", "Kolay", "Çok kolay"]
+        - text: "Takıldıysanız, nerede takıldınız?"
+          options: ["Kayıt olurken", "Kurulum yaparken", "Aradığımı bulurken", "Nasıl çalıştığını anlarken", "Hiç takılmadım"]
+        - text: "Daha hızlı başlamanıza ne yardımcı olurdu? Uygun olanların hepsini seçin."
+          options: ["Rehberli bir tur", "Şablonlar veya örnekler", "Daha net talimatlar", "Canlı sohbet desteği", "Kısa bir video"]
+        - text: "Başlangıç deneyiminde bir şeyi değiştirebilseydiniz, bu ne olurdu?"
+    employee-pulse:
+      name: "Çalışan Nabız Yoklaması"
+      tagline: "Ekibin bu hafta gerçekte nasıl hissettiğine dair hızlı ve anonim bir bakış — artı bir eNPS."
+      cards:
+        - text: "Gerçekten, nasıl gidiyor?"
+          description: "Tamamen anonim — amaç işleri daha iyi hale getirmek, kimseyi denetlemek değil."
+        - text: "Bu hafta iş konusunda nasıl hissediyorsunuz?"
+          options: ["Zorlanıyorum", "Pek iyi değil", "İdare eder", "İyi", "Harika gidiyor"]
+        - text: "Şu anda iş yükünüz nasıl?"
+          options: ["Aşırı fazla", "Biraz fazla", "Tam kararında", "Biraz hafif", "Fazla hafif"]
+        - text: "Yöneticiniz tarafından ne kadar desteklendiğinizi hissediyorsunuz?"
+          options: ["Hiç", "Biraz", "Kısmen", "İyi", "Çok iyi"]
+        - text: "Burayı çalışılacak bir yer olarak önerme olasılığınız nedir?"
+        - text: "Burayı daha iyi bir çalışma yeri yapacak tek bir değişiklik ne olurdu?"
+    event-feedback:
+      name: "Etkinlik Geri Bildirimi"
+      tagline: "Etkinliğinizin nasıl karşılandığını yakalayın — öne çıkanlar, eksik kalanlar ve tekrar gelip gelmeyecekleri."
+      cards:
+        - text: "Geldiğiniz için teşekkürler — nasıldı?"
+          description: "Hafızanız tazeyken birkaç hızlı soru."
+        - text: "Etkinliği genel olarak nasıl değerlendirirsiniz?"
+          options: ["Zayıf", "Orta", "İyi", "Çok iyi", "Mükemmel"]
+        - text: "Sizin için en iyi kısım neydi?"
+          options: ["Konuşmacılar", "İçerik", "Ağ kurma", "Mekân", "Organizasyon"]
+        - text: "Tekrar katılır mıydınız?"
+        - text: "Bu etkinliği bir iş arkadaşınıza önerme olasılığınız nedir?"
+        - text: "Bir sonrakini daha da iyi yapacak şey ne olurdu?"
+    product-market-fit:
+      name: "Ürün-Pazar Uyumu"
+      tagline: "Klasik Sean Ellis testi — insanların siz olmadan nasıl hissedeceği ve size en çok kimin değer verdiği."
+      cards:
+        - text: "Bundan sonraki yönümüzü şekillendirmemize yardım edin"
+          description: "Birkaç içten yanıt gerçek bir fark yaratıyor — teşekkür ederiz."
+        - text: "Bizi artık kullanamasaydınız ne hissederdiniz?"
+          options: ["Çok hayal kırıklığına uğrardım", "Biraz hayal kırıklığına uğrardım", "Hayal kırıklığına uğramazdım"]
+        - text: "Bizden elde ettiğiniz temel fayda nedir?"
+        - text: "Sizce bundan en çok kim fayda görür?"
+          options: ["Benim gibi insanlar", "Yeni başlayanlar", "Profesyoneller", "Ekipler", "Emin değilim"]
+        - text: "Bunu sizin için nasıl daha iyi hale getirebiliriz?"
+  demographics:
+    cards:
+      - text: "Ne zaman doğdunuz?"
+      - text: "Nerede yaşıyorsunuz?"
+        description: "OpenStreetMap altyapısıyla — bitirdikten sonra keşfedebileceğiniz bir harita oluşturmaya yardımcı olur."
+      - text: "Cinsiyet"
+        options: ["Erkek", "Kadın", "Non-binary", "Diğer", "Belirtmek istemiyorum"]
   oops:
     private_link_title: "Hata — bu özel bir düzenleyici bağlantısı"
     private_link_body: "Bu bağlantı, yalnızca oluşturanın kullanabildiği Verto düzenleyicisini açar — herkese açık paylaşım bağlantısı değildir, bu yüzden burada oynanacak bir şey yok."

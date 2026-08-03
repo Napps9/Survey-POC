@@ -13,7 +13,7 @@ require "test_helper"
 # removed. Widening it to every namespace is desirable but needs the
 # backfill done first.
 class LocaleStructureParityTest < ActiveSupport::TestCase
-  NAMESPACES = %w[js defaults card].freeze
+  NAMESPACES = %w[js defaults card templates demographics].freeze
 
   def locale_files
     Dir[Rails.root.join("config/locales/*.yml")]
@@ -74,5 +74,81 @@ class LocaleStructureParityTest < ActiveSupport::TestCase
     end
 
     assert_empty problems, "positional defaults out of shape:\n  #{problems.join("\n  ")}"
+  end
+
+  # en.yml's template/demographic content mirrors the Ruby registries
+  # (SurveyTemplates::ALL, DemographicQuestions::CARDS) — the registries are
+  # canonical, the locale entry is what actually renders, and nothing else
+  # ties them together. Text equality, not just shape: an edit to one that
+  # skips the other silently forks the English copy.
+  test "en.yml's template content mirrors the SurveyTemplates registry" do
+    en = load_locale(Rails.root.join("config/locales/en.yml").to_s).last
+
+    SurveyTemplates.all.each do |tpl|
+      entry = en.dig("templates", tpl[:id])
+      assert entry, "en.yml has no templates.#{tpl[:id]} entry"
+      assert_equal tpl[:name],    entry["name"],    "templates.#{tpl[:id]}.name"
+      assert_equal tpl[:tagline], entry["tagline"], "templates.#{tpl[:id]}.tagline"
+
+      cards = entry["cards"]
+      assert_equal tpl[:cards].size, Array(cards).size, "templates.#{tpl[:id]}.cards count"
+      tpl[:cards].each_with_index do |card, i|
+        assert_equal card["text"], cards[i]["text"], "templates.#{tpl[:id]}.cards[#{i}].text"
+        if cards[i].key?("options")
+          assert_equal card["options"], cards[i]["options"], "templates.#{tpl[:id]}.cards[#{i}].options"
+        end
+      end
+    end
+
+    demo = en.dig("demographics", "cards")
+    assert_equal DemographicQuestions::CARDS.size, Array(demo).size
+    DemographicQuestions::CARDS.each_with_index do |card, i|
+      assert_equal card["text"], demo[i]["text"], "demographics.cards[#{i}].text"
+      assert_equal card["options"], demo[i]["options"], "demographics.cards[#{i}].options" if demo[i].key?("options")
+    end
+  end
+
+  # Template/demographic card lists are POSITIONAL content in every language:
+  # card i must stay card i, and a translated options list must keep the
+  # English length — the merge in cards_for/DemographicQuestions.cards refuses
+  # a wrong-length list (falling back to English), so a shape hole here means
+  # a half-translated deck, not a crash. Surface it at build time instead.
+  test "every locale's template and demographic card lists keep en's shape" do
+    problems = []
+    locale_files.each do |path|
+      code, data = load_locale(path)
+      next if code == "en"
+
+      SurveyTemplates.all.each do |tpl|
+        cards = data.dig("templates", tpl[:id], "cards")
+        unless cards.is_a?(Array) && cards.size == tpl[:cards].size
+          problems << "#{code}: templates.#{tpl[:id]}.cards count #{cards.is_a?(Array) ? cards.size : 'missing'} != #{tpl[:cards].size}"
+          next
+        end
+        tpl[:cards].each_with_index do |card, i|
+          en_opts = card["options"]
+          next unless en_opts.is_a?(Array) && en_opts.any? { |o| o.to_s =~ /[a-z]/i } # numeral scales aren't translated
+          theirs = cards[i].is_a?(Hash) ? cards[i]["options"] : nil
+          unless theirs.is_a?(Array) && theirs.size == en_opts.size
+            problems << "#{code}: templates.#{tpl[:id]}.cards[#{i}].options #{theirs.is_a?(Array) ? theirs.size : 'missing'} != #{en_opts.size}"
+          end
+        end
+      end
+
+      demo = data.dig("demographics", "cards")
+      unless demo.is_a?(Array) && demo.size == DemographicQuestions::CARDS.size
+        problems << "#{code}: demographics.cards count #{demo.is_a?(Array) ? demo.size : 'missing'}"
+        next
+      end
+      DemographicQuestions::CARDS.each_with_index do |card, i|
+        next unless card["options"].is_a?(Array)
+        theirs = demo[i].is_a?(Hash) ? demo[i]["options"] : nil
+        unless theirs.is_a?(Array) && theirs.size == card["options"].size
+          problems << "#{code}: demographics.cards[#{i}].options #{theirs.is_a?(Array) ? theirs.size : 'missing'} != #{card['options'].size}"
+        end
+      end
+    end
+
+    assert_empty problems, "positional template content out of shape:\n  #{problems.join("\n  ")}"
   end
 end

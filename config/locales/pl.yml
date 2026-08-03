@@ -1114,6 +1114,87 @@ pl:
     not_found: Ten szablon jest niedostępny.
     created: Utworzono „%{name}” z szablonu — dostosuj go i opublikuj, gdy będziesz
       gotowy.
+    nps:
+      name: "Net Promoter Score"
+      tagline: "Zmierz lojalność za pomocą dwóch pytań — jak bardzo prawdopodobne, że ktoś Cię poleci, i dlaczego."
+      cards:
+        - text: "Krótkie pytanie o Twoje wrażenia"
+          description: "Mniej niż minuta, w pełni anonimowo — Twoje odpowiedzi pomagają nam się poprawiać."
+        - text: "Jak bardzo prawdopodobne jest, że polecisz nas znajomemu lub współpracownikowi?"
+        - text: "Jaki jest główny powód Twojej oceny?"
+        - text: "Które z poniższych najlepiej Cię opisuje?"
+          options: ["Nowy klient", "Powracający klient", "Wieloletni klient", "Tylko się rozglądam"]
+    csat:
+      name: "Satysfakcja klienta"
+      tagline: "Krótki puls CSAT: oceń doświadczenie, wskaż, co zadziałało, i powiedz, co poprawić."
+      cards:
+        - text: "Jak nam poszło?"
+          description: "Kilka szybkich kliknięć — dzięki, że pomagasz nam być lepszymi."
+        - text: "Jak ogólnie oceniasz swoje zadowolenie z tego doświadczenia?"
+          options: ["Bardzo niezadowolony(-a)", "Niezadowolony(-a)", "Neutralnie", "Zadowolony(-a)", "Bardzo zadowolony(-a)"]
+        - text: "Która część Twojego doświadczenia najbardziej się wyróżniła?"
+          options: ["Łatwość obsługi", "Szybkość", "Wsparcie", "Stosunek jakości do ceny", "Jakość"]
+        - text: "Czy skorzystasz z naszych usług ponownie?"
+        - text: "Jaka jest jedna rzecz, którą moglibyśmy zrobić lepiej?"
+    onboarding:
+      name: "Wdrożenie nowych użytkowników"
+      tagline: "Dowiedz się, gdzie nowi użytkownicy utykają i co pomogłoby im szybciej osiągnąć pierwszy sukces."
+      cards:
+        - text: "Jak Ci poszło rozpoczęcie?"
+          description: "Wszystko masz właśnie skonfigurowane — opowiedz, jak było, póki pamiętasz to na świeżo."
+        - text: "Jak łatwo było zacząć?"
+          options: ["Bardzo trudno", "Trudno", "W porządku", "Łatwo", "Bardzo łatwo"]
+        - text: "Gdzie, jeśli w ogóle, coś Cię zatrzymało?"
+          options: ["Rejestracja", "Konfiguracja", "Znalezienie tego, czego szukam", "Zrozumienie, jak to działa", "Nigdzie nie utknąłem(-ęłam)"]
+        - text: "Co pomogłoby Ci zacząć szybciej? Zaznacz wszystkie pasujące."
+          options: ["Przewodnik po produkcie", "Szablony lub przykłady", "Jaśniejsze instrukcje", "Wsparcie na czacie na żywo", "Krótki film"]
+        - text: "Gdybyś mógł(-mogła) zmienić jedną rzecz w rozpoczęciu pracy, co by to było?"
+    employee-pulse:
+      name: "Puls pracowników"
+      tagline: "Szybki, anonimowy wgląd w to, jak zespół naprawdę czuje się w tym tygodniu — plus eNPS."
+      cards:
+        - text: "Jak naprawdę się masz?"
+          description: "W pełni anonimowo — chodzi o to, by było lepiej, a nie o kontrolę."
+        - text: "Jak czujesz się w pracy w tym tygodniu?"
+          options: ["Ledwo daję radę", "Nie najlepiej", "W porządku", "Dobrze", "Świetnie"]
+        - text: "Jak wygląda teraz Twoje obciążenie pracą?"
+          options: ["Zdecydowanie za duże", "Trochę za duże", "W sam raz", "Trochę za małe", "Za małe"]
+        - text: "Na ile czujesz wsparcie ze strony przełożonego?"
+          options: ["Wcale", "Trochę", "Umiarkowanie", "Dobrze", "Bardzo dobrze"]
+        - text: "Jak bardzo prawdopodobne jest, że polecisz to miejsce jako dobre do pracy?"
+        - text: "Jaka jedna zmiana sprawiłaby, że pracowałoby się tu lepiej?"
+    event-feedback:
+      name: "Opinie o wydarzeniu"
+      tagline: "Sprawdź, jak wypadło Twoje wydarzenie — co się udało, co nie, i czy uczestnicy wrócą."
+      cards:
+        - text: "Dzięki za przybycie — jak było?"
+          description: "Kilka szybkich pytań, póki wspomnienia są świeże."
+        - text: "Jak ogólnie oceniasz wydarzenie?"
+          options: ["Słabo", "Przeciętnie", "Dobrze", "Bardzo dobrze", "Znakomicie"]
+        - text: "Co było dla Ciebie najlepszą częścią?"
+          options: ["Prelegenci", "Treść", "Networking", "Miejsce", "Organizacja"]
+        - text: "Czy weźmiesz udział ponownie?"
+        - text: "Jak bardzo prawdopodobne jest, że polecisz to wydarzenie współpracownikowi?"
+        - text: "Co sprawiłoby, że następna edycja będzie jeszcze lepsza?"
+    product-market-fit:
+      name: "Dopasowanie produktu do rynku"
+      tagline: "Klasyczny test Seana Ellisa — jak ludzie czuliby się bez Ciebie i kto ceni Cię najbardziej."
+      cards:
+        - text: "Pomóż nam wybrać kierunek"
+          description: "Kilka szczerych odpowiedzi naprawdę robi różnicę — dziękujemy."
+        - text: "Jak byś się czuł(-a), gdybyś nie mógł(-mogła) już z nas korzystać?"
+          options: ["Bardzo rozczarowany(-a)", "Nieco rozczarowany(-a)", "Wcale nierozczarowany(-a)"]
+        - text: "Jaka jest główna korzyść, którą od nas otrzymujesz?"
+        - text: "Jaki typ osoby Twoim zdaniem skorzystałby najbardziej?"
+          options: ["Osoby takie jak ja", "Początkujący", "Profesjonaliści", "Zespoły", "Nie wiem"]
+        - text: "Jak możemy to dla Ciebie ulepszyć?"
+  demographics:
+    cards:
+      - text: "Jaka jest Twoja data urodzenia?"
+      - text: "Gdzie mieszkasz?"
+        description: "Oparte na OpenStreetMap — pomaga zbudować mapę, którą możesz przeglądać po zakończeniu."
+      - text: "Płeć"
+        options: ["Mężczyzna", "Kobieta", "Osoba niebinarna", "Inna", "Wolę nie mówić"]
   oops:
     private_link_title: "Ups — to prywatny link do edytora"
     private_link_body: "Ten link otwiera edytor Verto, z którego może korzystać tylko jego twórca — to nie jest publiczny link do udostępniania, więc nie ma tu w co grać."

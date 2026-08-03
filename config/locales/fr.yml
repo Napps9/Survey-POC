@@ -1112,6 +1112,87 @@ fr:
     not_found: Ce modèle n’est pas disponible.
     created: "« %{name} » créé à partir d’un modèle — personnalisez-le et publiez-le
       quand vous êtes prêt."
+    nps:
+      name: "Net Promoter Score"
+      tagline: "Mesurez la fidélité en deux questions — la probabilité qu'on vous recommande, et pourquoi."
+      cards:
+        - text: "Une petite question sur votre expérience"
+          description: "Moins d'une minute, totalement anonyme — vos réponses nous aident à nous améliorer."
+        - text: "Quelle est la probabilité que vous nous recommandiez à un ami ou à un collègue ?"
+        - text: "Quelle est la principale raison de votre note ?"
+        - text: "Laquelle de ces propositions vous décrit le mieux ?"
+          options: ["Nouveau client", "Client de retour", "Client de longue date", "Je regarde simplement"]
+    csat:
+      name: "Satisfaction client"
+      tagline: "Un court pouls CSAT : notez l'expérience, repérez ce qui a fonctionné et découvrez ce qu'il faut corriger."
+      cards:
+        - text: "Comment avons-nous fait ?"
+          description: "Quelques touches rapides — merci de nous aider à nous améliorer."
+        - text: "Dans l'ensemble, êtes-vous satisfait(e) de votre expérience ?"
+          options: ["Très insatisfait(e)", "Insatisfait(e)", "Neutre", "Satisfait(e)", "Très satisfait(e)"]
+        - text: "Quel aspect de votre expérience vous a le plus marqué ?"
+          options: ["Facilité d'utilisation", "Rapidité", "Assistance", "Rapport qualité-prix", "Qualité"]
+        - text: "Feriez-vous de nouveau appel à nous ?"
+        - text: "Quelle est la première chose que nous pourrions améliorer ?"
+    onboarding:
+      name: "Intégration des nouveaux utilisateurs"
+      tagline: "Découvrez où les nouveaux utilisateurs bloquent et ce qui les aiderait à atteindre leur première réussite plus vite."
+      cards:
+        - text: "Comment s'est passée la prise en main ?"
+          description: "Vous venez de tout configurer — racontez-nous pendant que c'est encore frais."
+        - text: "La prise en main a-t-elle été facile ?"
+          options: ["Très difficile", "Difficile", "Correcte", "Facile", "Très facile"]
+        - text: "Où avez-vous bloqué, le cas échéant ?"
+          options: ["À l'inscription", "À la configuration", "Pour trouver ce que je cherchais", "Pour comprendre le fonctionnement", "Je n'ai pas bloqué"]
+        - text: "Qu'est-ce qui vous aurait aidé à démarrer plus vite ? Cochez tout ce qui s'applique."
+          options: ["Une visite guidée", "Des modèles ou des exemples", "Des instructions plus claires", "Une assistance par chat en direct", "Une courte vidéo"]
+        - text: "Si vous pouviez changer une chose dans la prise en main, laquelle serait-ce ?"
+    employee-pulse:
+      name: "Pouls des équipes"
+      tagline: "Un instantané rapide et anonyme du moral réel de l'équipe cette semaine — avec un eNPS."
+      cards:
+        - text: "Comment ça va, vraiment ?"
+          description: "Totalement anonyme — l'objectif est d'améliorer les choses, pas de surveiller."
+        - text: "Comment vous sentez-vous au travail cette semaine ?"
+          options: ["En difficulté", "Pas très bien", "Ça va", "Bien", "En pleine forme"]
+        - text: "Comment est votre charge de travail en ce moment ?"
+          options: ["Beaucoup trop lourde", "Un peu trop lourde", "Juste comme il faut", "Un peu légère", "Trop légère"]
+        - text: "Vous sentez-vous soutenu(e) par votre manager ?"
+          options: ["Pas du tout", "Un peu", "Moyennement", "Bien", "Très bien"]
+        - text: "Quelle est la probabilité que vous recommandiez cet endroit comme lieu de travail ?"
+        - text: "Quel changement ferait d'ici un meilleur lieu de travail ?"
+    event-feedback:
+      name: "Retour d'événement"
+      tagline: "Capturez l'effet de votre événement — les temps forts, les ratés, et l'envie de revenir."
+      cards:
+        - text: "Merci d'être venu(e) — c'était comment ?"
+          description: "Deux ou trois questions rapides pendant que c'est encore frais."
+        - text: "Comment noteriez-vous l'événement dans l'ensemble ?"
+          options: ["Médiocre", "Passable", "Bien", "Très bien", "Excellent"]
+        - text: "Quel a été le meilleur moment pour vous ?"
+          options: ["Les intervenants", "Le contenu", "Le networking", "Le lieu", "L'organisation"]
+        - text: "Reviendriez-vous ?"
+        - text: "Quelle est la probabilité que vous recommandiez cet événement à un collègue ?"
+        - text: "Qu'est-ce qui rendrait la prochaine édition encore meilleure ?"
+    product-market-fit:
+      name: "Adéquation produit-marché"
+      tagline: "Le test classique de Sean Ellis — ce que les gens ressentiraient sans vous, et qui vous apprécie le plus."
+      cards:
+        - text: "Aidez-nous à décider de la suite"
+          description: "Quelques réponses sincères font une vraie différence — merci."
+        - text: "Que ressentiriez-vous si vous ne pouviez plus nous utiliser ?"
+          options: ["Très déçu(e)", "Un peu déçu(e)", "Pas déçu(e)"]
+        - text: "Quel est le principal bénéfice que vous retirez de nous ?"
+        - text: "Quel type de personne en profiterait le plus, selon vous ?"
+          options: ["Des gens comme moi", "Des débutants", "Des professionnels", "Des équipes", "Je ne sais pas"]
+        - text: "Comment pouvons-nous l'améliorer pour vous ?"
+  demographics:
+    cards:
+      - text: "Quelle est votre date de naissance ?"
+      - text: "Où habitez-vous ?"
+        description: "Propulsé par OpenStreetMap — cela aide à construire une carte que vous pourrez explorer à la fin."
+      - text: "Genre"
+        options: ["Homme", "Femme", "Non-binaire", "Autre", "Je préfère ne pas répondre"]
   oops:
     private_link_title: "Oups — ceci est un lien privé vers l'éditeur"
     private_link_body: "Ce lien ouvre l'éditeur du Verto, réservé à son créateur — ce n'est pas le lien public de partage, il n'y a donc rien à jouer ici."

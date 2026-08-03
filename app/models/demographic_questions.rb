@@ -15,13 +15,32 @@ module DemographicQuestions
       "demographic" => true }
   ].freeze
 
-  def self.cards
+  # The three cards resolved in `locale` (a Verto's default_locale), falling
+  # back to the English above. Every Verto used to get the English tail
+  # regardless of its language — a French generated Verto ended with "Where do
+  # you live?". Translations live under `demographics.cards` in the locale
+  # files, merged positionally; an options list is only taken whole and at the
+  # registry length, because answers are positional.
+  def self.cards(locale: nil)
+    translated = Array(I18n.t("demographics.cards", locale: locale.presence || I18n.locale, default: nil))
+    CARDS.each_with_index.map do |card, i|
+      c = card.dup
+      tr = translated[i]
+      next c unless tr.is_a?(Hash)
+      tr = tr.transform_keys(&:to_s)
+      c["text"]        = tr["text"].to_s        if tr["text"].to_s.strip.present?
+      c["description"] = tr["description"].to_s if tr["description"].to_s.strip.present?
+      opts = tr["options"]
+      c["options"] = opts.map(&:to_s) if opts.is_a?(Array) && opts.size == Array(c["options"]).size
+      c
+    end
+  rescue I18n::InvalidLocale
     CARDS.map(&:dup)
   end
 
-  def self.append_to(cards)
+  def self.append_to(cards, locale: nil)
     list = Array(cards)
     return list if list.any? { |c| c.is_a?(Hash) && c["demographic"] }
-    list + cards()
+    list + cards(locale: locale)
   end
 end

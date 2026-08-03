@@ -1111,6 +1111,87 @@ vi:
     browse: Xem các mẫu
     not_found: Mẫu đó không khả dụng.
     created: Đã tạo “%{name}” từ một mẫu — tùy chỉnh và xuất bản khi bạn sẵn sàng.
+    nps:
+      name: "Net Promoter Score"
+      tagline: "Đo lường mức độ trung thành chỉ với hai câu hỏi — khả năng mọi người giới thiệu bạn, và lý do vì sao."
+      cards:
+        - text: "Một câu hỏi nhanh về trải nghiệm của bạn"
+          description: "Chưa đầy một phút, hoàn toàn ẩn danh — câu trả lời của bạn giúp chúng tôi cải thiện."
+        - text: "Khả năng bạn giới thiệu chúng tôi cho bạn bè hoặc đồng nghiệp là bao nhiêu?"
+        - text: "Lý do chính cho điểm số của bạn là gì?"
+        - text: "Điều nào sau đây mô tả đúng nhất về bạn?"
+          options: ["Khách hàng mới", "Khách hàng quay lại", "Khách hàng lâu năm", "Chỉ đang xem qua"]
+    csat:
+      name: "Sự hài lòng của khách hàng"
+      tagline: "Một khảo sát CSAT ngắn: đánh giá trải nghiệm, xác định điều gì đã tốt và lắng nghe điều cần cải thiện."
+      cards:
+        - text: "Chúng tôi đã làm tốt chứ?"
+          description: "Chỉ vài thao tác nhanh — cảm ơn bạn đã giúp chúng tôi tốt hơn."
+        - text: "Nhìn chung, bạn hài lòng với trải nghiệm của mình đến mức nào?"
+          options: ["Rất không hài lòng", "Không hài lòng", "Bình thường", "Hài lòng", "Rất hài lòng"]
+        - text: "Phần nào trong trải nghiệm của bạn nổi bật nhất?"
+          options: ["Dễ sử dụng", "Tốc độ", "Hỗ trợ", "Đáng giá tiền", "Chất lượng"]
+        - text: "Bạn có dùng chúng tôi lần nữa không?"
+        - text: "Một điều chúng tôi có thể làm tốt hơn là gì?"
+    onboarding:
+      name: "Làm quen người dùng mới"
+      tagline: "Tìm hiểu người dùng mới gặp khó ở đâu và điều gì sẽ giúp họ đạt thành công đầu tiên nhanh hơn."
+      cards:
+        - text: "Việc bắt đầu diễn ra thế nào?"
+          description: "Bạn vừa thiết lập xong — hãy kể cho chúng tôi khi mọi thứ còn mới mẻ."
+        - text: "Việc bắt đầu dễ đến mức nào?"
+          options: ["Rất khó", "Khó", "Tạm ổn", "Dễ", "Rất dễ"]
+        - text: "Nếu có, bạn đã gặp khó ở đâu?"
+          options: ["Khi đăng ký", "Khi thiết lập", "Khi tìm thứ mình cần", "Khi tìm hiểu cách hoạt động", "Tôi không gặp khó khăn"]
+        - text: "Điều gì sẽ giúp bạn bắt đầu nhanh hơn? Chọn tất cả các mục phù hợp."
+          options: ["Hướng dẫn từng bước", "Mẫu hoặc ví dụ", "Hướng dẫn rõ ràng hơn", "Hỗ trợ trò chuyện trực tiếp", "Một video ngắn"]
+        - text: "Nếu có thể thay đổi một điều về việc bắt đầu, bạn sẽ thay đổi điều gì?"
+    employee-pulse:
+      name: "Khảo sát nhanh nhân viên"
+      tagline: "Nắm bắt nhanh và ẩn danh cảm nhận thật của đội ngũ trong tuần này — kèm theo eNPS."
+      cards:
+        - text: "Mọi việc thực sự thế nào?"
+          description: "Hoàn toàn ẩn danh — mục đích là làm mọi thứ tốt hơn, không phải kiểm tra ai cả."
+        - text: "Tuần này bạn cảm thấy thế nào về công việc?"
+          options: ["Đang chật vật", "Không ổn lắm", "Bình thường", "Tốt", "Rất tuyệt"]
+        - text: "Khối lượng công việc của bạn hiện tại thế nào?"
+          options: ["Quá nhiều", "Hơi nhiều", "Vừa phải", "Hơi ít", "Quá ít"]
+        - text: "Bạn cảm thấy được quản lý của mình hỗ trợ đến mức nào?"
+          options: ["Hoàn toàn không", "Một chút", "Phần nào", "Tốt", "Rất tốt"]
+        - text: "Khả năng bạn giới thiệu đây là một nơi làm việc tốt là bao nhiêu?"
+        - text: "Một thay đổi nào sẽ khiến nơi này trở thành chỗ làm việc tốt hơn?"
+    event-feedback:
+      name: "Phản hồi sự kiện"
+      tagline: "Ghi lại ấn tượng về sự kiện của bạn — điểm nổi bật, điều chưa đạt, và liệu mọi người có quay lại không."
+      cards:
+        - text: "Cảm ơn bạn đã đến — sự kiện thế nào?"
+          description: "Vài câu hỏi nhanh khi ấn tượng còn mới."
+        - text: "Nhìn chung, bạn đánh giá sự kiện thế nào?"
+          options: ["Kém", "Tạm được", "Tốt", "Rất tốt", "Xuất sắc"]
+        - text: "Phần nào là hay nhất với bạn?"
+          options: ["Diễn giả", "Nội dung", "Kết nối giao lưu", "Địa điểm", "Khâu tổ chức"]
+        - text: "Bạn có tham dự lần nữa không?"
+        - text: "Khả năng bạn giới thiệu sự kiện này cho đồng nghiệp là bao nhiêu?"
+        - text: "Điều gì sẽ khiến lần tổ chức tới còn tốt hơn nữa?"
+    product-market-fit:
+      name: "Mức độ phù hợp sản phẩm với thị trường"
+      tagline: "Bài kiểm tra Sean Ellis kinh điển — mọi người sẽ cảm thấy thế nào nếu thiếu bạn, và ai coi trọng bạn nhất."
+      cards:
+        - text: "Hãy giúp định hình bước đi tiếp theo của chúng tôi"
+          description: "Vài câu trả lời chân thành tạo nên khác biệt thực sự — cảm ơn bạn."
+        - text: "Bạn sẽ cảm thấy thế nào nếu không thể dùng chúng tôi nữa?"
+          options: ["Rất thất vọng", "Hơi thất vọng", "Không thất vọng"]
+        - text: "Lợi ích chính bạn nhận được từ chúng tôi là gì?"
+        - text: "Bạn nghĩ kiểu người nào sẽ hưởng lợi nhiều nhất?"
+          options: ["Những người giống tôi", "Người mới bắt đầu", "Người chuyên nghiệp", "Các nhóm", "Không chắc"]
+        - text: "Chúng tôi có thể cải thiện nó cho bạn như thế nào?"
+  demographics:
+    cards:
+      - text: "Bạn sinh vào ngày nào?"
+      - text: "Bạn sống ở đâu?"
+        description: "Được hỗ trợ bởi OpenStreetMap — giúp tạo một bản đồ bạn có thể khám phá sau khi hoàn thành."
+      - text: "Giới tính"
+        options: ["Nam", "Nữ", "Phi nhị giới", "Khác", "Không muốn trả lời"]
   oops:
     private_link_title: "Rất tiếc — đây là liên kết trình chỉnh sửa riêng tư"
     private_link_body: "Liên kết này mở trình chỉnh sửa Verto mà chỉ người tạo mới dùng được — đây không phải liên kết chia sẻ công khai, nên không có gì để tham gia ở đây."

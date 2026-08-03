@@ -1084,7 +1084,7 @@ class SurveysController < ApplicationController
     end
 
     cards += resolve_common_cards(payload["common_question_ids"])
-    cards  = DemographicQuestions.append_to(cards)
+    cards  = DemographicQuestions.append_to(cards, locale: payload["default_locale"])
 
     survey = Current.organisation.surveys.create!(
       title:          payload["verto_name"].presence || result["title"].presence || "Imported Verto",

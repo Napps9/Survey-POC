@@ -115,7 +115,7 @@ class BuildVertoJob < ApplicationJob
       theme:        result["theme"].presence || p["theme"],
       audience_age: result["audience_age"].presence || p["audience_age"],
       key_insight:  result["key_insight"].presence || p["key_insight"],
-      cards:        DemographicQuestions.append_to(result["cards"]),
+      cards:        DemographicQuestions.append_to(result["cards"], locale: p["default_locale"]),
       show_results_comparison: !!p["show_results_comparison"],
       quiz:           !!p["quiz"],
       brand_palette:  p["brand_palette"].presence,

@@ -1112,6 +1112,87 @@ es:
     not_found: Esa plantilla no está disponible.
     created: 'Creaste “%{name}” a partir de una plantilla: personalízala y publícala
       cuando quieras.'
+    nps:
+      name: "Net Promoter Score"
+      tagline: "Mide la lealtad con dos preguntas: qué probabilidad hay de que te recomienden, y por qué."
+      cards:
+        - text: "Una pregunta rápida sobre tu experiencia"
+          description: "Menos de un minuto, totalmente anónimo — tus respuestas nos ayudan a mejorar."
+        - text: "¿Qué probabilidad hay de que nos recomiendes a un amigo o colega?"
+        - text: "¿Cuál es el motivo principal de tu puntuación?"
+        - text: "¿Cuál de estas opciones te describe mejor?"
+          options: ["Cliente nuevo", "Cliente recurrente", "Cliente desde hace tiempo", "Solo estoy mirando"]
+    csat:
+      name: "Satisfacción del cliente"
+      tagline: "Un pulso CSAT breve: valora la experiencia, identifica qué funcionó y escucha qué mejorar."
+      cards:
+        - text: "¿Qué tal lo hicimos?"
+          description: "Unos pocos toques rápidos — gracias por ayudarnos a mejorar."
+        - text: "En general, ¿cómo de satisfecho estás con tu experiencia?"
+          options: ["Muy insatisfecho", "Insatisfecho", "Neutral", "Satisfecho", "Muy satisfecho"]
+        - text: "¿Qué parte de tu experiencia destacó más?"
+          options: ["Facilidad de uso", "Rapidez", "Soporte", "Relación calidad-precio", "Calidad"]
+        - text: "¿Volverías a usarnos?"
+        - text: "¿Qué es lo que podríamos hacer mejor?"
+    onboarding:
+      name: "Onboarding de nuevos usuarios"
+      tagline: "Descubre dónde se atascan los nuevos usuarios y qué les ayudaría a lograr su primer éxito más rápido."
+      cards:
+        - text: "¿Qué tal los primeros pasos?"
+          description: "Acabas de configurarlo todo — cuéntanos cómo fue mientras lo tienes fresco."
+        - text: "¿Cómo de fácil fue empezar?"
+          options: ["Muy difícil", "Difícil", "Normal", "Fácil", "Muy fácil"]
+        - text: "¿Dónde te atascaste, si es que te atascaste?"
+          options: ["Al registrarme", "Al configurarlo todo", "Al encontrar lo que buscaba", "Al entender cómo funciona", "No me atasqué"]
+        - text: "¿Qué te habría ayudado a empezar más rápido? Elige todas las que correspondan."
+          options: ["Un tour guiado", "Plantillas o ejemplos", "Instrucciones más claras", "Soporte por chat en vivo", "Un vídeo corto"]
+        - text: "Si pudieras cambiar una cosa de los primeros pasos, ¿cuál sería?"
+    employee-pulse:
+      name: "Pulso del equipo"
+      tagline: "Una lectura rápida y anónima de cómo se siente realmente el equipo esta semana — más un eNPS."
+      cards:
+        - text: "¿Cómo va todo, de verdad?"
+          description: "Totalmente anónimo — se trata de mejorar las cosas, no de controlar."
+        - text: "¿Cómo te sientes con el trabajo esta semana?"
+          options: ["Con dificultades", "No muy bien", "Normal", "Bien", "De maravilla"]
+        - text: "¿Cómo está tu carga de trabajo ahora mismo?"
+          options: ["Demasiado alta", "Un poco alta", "Adecuada", "Un poco baja", "Demasiado baja"]
+        - text: "¿Cómo de apoyado te sientes por tu responsable?"
+          options: ["Nada", "Un poco", "Algo", "Bien", "Muy bien"]
+        - text: "¿Qué probabilidad hay de que recomiendes este sitio como lugar para trabajar?"
+        - text: "¿Qué cambio haría de este un mejor lugar para trabajar?"
+    event-feedback:
+      name: "Feedback del evento"
+      tagline: "Captura cómo fue tu evento: lo mejor, lo que falló y si volverían."
+      cards:
+        - text: "Gracias por venir — ¿qué te pareció?"
+          description: "Un par de preguntas rápidas mientras lo tienes fresco."
+        - text: "¿Cómo valorarías el evento en general?"
+          options: ["Malo", "Regular", "Bueno", "Muy bueno", "Excelente"]
+        - text: "¿Qué fue lo mejor para ti?"
+          options: ["Los ponentes", "El contenido", "El networking", "El lugar", "La organización"]
+        - text: "¿Volverías a asistir?"
+        - text: "¿Qué probabilidad hay de que recomiendes este evento a un colega?"
+        - text: "¿Qué haría que el próximo fuera aún mejor?"
+    product-market-fit:
+      name: "Product-Market Fit"
+      tagline: "El clásico test de Sean Ellis: cómo se sentiría la gente sin ti y quién te valora más."
+      cards:
+        - text: "Ayúdanos a decidir hacia dónde vamos"
+          description: "Unas pocas respuestas sinceras marcan una gran diferencia — gracias."
+        - text: "¿Cómo te sentirías si ya no pudieras usarnos?"
+          options: ["Muy decepcionado", "Algo decepcionado", "Nada decepcionado"]
+        - text: "¿Cuál es el principal beneficio que obtienes de nosotros?"
+        - text: "¿Qué tipo de persona crees que se beneficiaría más?"
+          options: ["Gente como yo", "Principiantes", "Profesionales", "Equipos", "No estoy seguro"]
+        - text: "¿Cómo podemos mejorarlo para ti?"
+  demographics:
+    cards:
+      - text: "¿Cuándo naciste?"
+      - text: "¿Dónde vives?"
+        description: "Con tecnología de OpenStreetMap — ayuda a crear un mapa que podrás explorar al terminar."
+      - text: "Género"
+        options: ["Hombre", "Mujer", "No binario", "Otro", "Prefiero no decirlo"]
   oops:
     private_link_title: "Vaya — este es un enlace privado del editor"
     private_link_body: "Este enlace abre el editor del Verto, que solo puede usar su creador — no es el enlace público para compartir, así que aquí no hay nada que jugar."
