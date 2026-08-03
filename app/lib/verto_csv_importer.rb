@@ -31,6 +31,10 @@ class VertoCsvImporter
   BRAND_PALETTE       = { "primary" => "#00C2A8", "cta" => "#FF5A5F", "bg" => "#0F1B2D" }.freeze
 
   # ── answer-scale option orders (index order == stored range/rating value) ──
+  # English is the canonical form answers are STORED as (the deck is built in
+  # English), but matching is multilingual — see translation_aliases: a row
+  # whose respondent took the survey in French carries French labels, and
+  # dropping them because they aren't the English string is silent data loss.
   AGREE = [ "Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree" ].freeze
 
   MATRIX_STATEMENTS = [
@@ -121,7 +125,8 @@ class VertoCsvImporter
   def initialize(csv_path:, admin_password: nil,
                  org_name: DEFAULT_ORG_NAME, org_slug: DEFAULT_ORG_SLUG,
                  admin_email: DEFAULT_ADMIN_EMAIL, admin_name: nil,
-                 title: DEFAULT_TITLE, verto_slug: DEFAULT_VERTO_SLUG)
+                 title: DEFAULT_TITLE, verto_slug: DEFAULT_VERTO_SLUG,
+                 translations: nil)
     @csv_path       = csv_path
     @admin_password = admin_password
     @org_name       = org_name
@@ -131,7 +136,18 @@ class VertoCsvImporter
     @title          = title
     @verto_slug     = verto_slug
     @name_to_code   = WorldRegions::COUNTRIES.map { |code, c| [ c[:name].downcase, code ] }.to_h
+    # Optional sidecar mapping translated answer labels → the canonical English
+    # option, for survey-specific lists our locale files can't know about.
+    # Defaults to "<csv>.translations.yml" next to the export when it exists.
+    @translations_path = translations || default_translations_path
+    @unmatched = Hash.new { |h, k| h[k] = Hash.new(0) }
   end
+
+  # { column header => { raw value => count } } of answer values that matched
+  # no option in ANY language — i.e. what the import dropped (scales) or passed
+  # through as its own bucket (choices). Empty after a clean import; anything
+  # here is the first place to look when counts seem low.
+  attr_reader :unmatched
 
   # Builds the account + Verto + responses in one transaction. Returns the Survey.
   def call
@@ -215,7 +231,9 @@ class VertoCsvImporter
       responses:  survey.responses.count,
       completed:  survey.responses.where(status: "completed").count,
       answered:   survey.responders_count,
-      regions:    "#{tagged.count} tagged across #{tagged.distinct.count(:region_country)} countries"
+      regions:    "#{tagged.count} tagged across #{tagged.distinct.count(:region_country)} countries",
+      unmatched:  (@unmatched.empty? ? "none — every answer matched an option" :
+                     "#{@unmatched.values.sum { |h| h.values.sum }} values across #{@unmatched.size} columns (see #unmatched)")
     }
   end
 
@@ -353,13 +371,22 @@ class VertoCsvImporter
   def range_spec(text, options, col)
     lookup = indexer(options)
     { card: { "type" => "range", "text" => text, "options" => options }, col: col,
-      get: ->(row, source) { range_entry(lookup.call(row[source])) } }
+      get: ->(row, source) {
+        i = lookup.call(row[source])
+        record_unmatched(source, row[source]) if i.nil?
+        range_entry(i)
+      } }
   end
 
   def matrix_spec(statement)
     col = "Playing sport or being active helps me… - #{statement} (matrix)"
+    agree = indexer(AGREE)
     { card: { "type" => "range", "text" => "Playing sport or being active helps me… #{statement}", "options" => AGREE },
-      col: col, get: ->(row, source) { range_entry(matrix_index(row[source])) } }
+      col: col, get: ->(row, source) {
+        i = matrix_index(row[source]) || agree.call(row[source])
+        record_unmatched(source, row[source]) if i.nil?
+        range_entry(i)
+      } }
   end
 
   def rating_spec(text, options, col)
@@ -367,6 +394,7 @@ class VertoCsvImporter
     { card: { "type" => "rating", "text" => text, "options" => options }, col: col,
       get: ->(row, source) {
         i = lookup.call(row[source])
+        record_unmatched(source, row[source]) if i.nil?
         i.nil? ? nil : { "type" => "rating", "value" => i + 1 }
       } }
   end
@@ -375,7 +403,10 @@ class VertoCsvImporter
     { card: { "type" => "multiple_choice", "text" => text, "options" => options }, col: col,
       get: ->(row, source) {
         v = row[source].to_s.strip
-        v.empty? ? nil : { "type" => "multiple_choice", "value" => canonical(v, options) }
+        next nil if v.empty?
+        cv = canonical(v, options)
+        record_unmatched(source, v) unless options.include?(cv)
+        { "type" => "multiple_choice", "value" => cv }
       } }
   end
 
@@ -383,6 +414,7 @@ class VertoCsvImporter
     { card: { "type" => "select_many", "text" => text, "options" => options }, col: col,
       get: ->(row, source) {
         atoms = split_atoms(row[source]).map { |a| canonical(a, options) }
+        atoms.each { |a| record_unmatched(source, a) unless options.include?(a) }
         atoms.empty? ? nil : { "type" => "select_many", "value" => atoms }
       } }
   end
@@ -422,7 +454,10 @@ class VertoCsvImporter
       col: "What gender do you identify as? (gender)",
       get: ->(row, source) {
         v = row[source].to_s.strip
-        GENDER_OPTS.include?(v) ? { "type" => "multiple_choice", "value" => v } : nil
+        next nil if v.empty?
+        cv = canonical(v, GENDER_OPTS)
+        next record_unmatched(source, v) unless GENDER_OPTS.include?(cv)
+        { "type" => "multiple_choice", "value" => cv }
       } }
   end
 
@@ -437,16 +472,86 @@ class VertoCsvImporter
     text.to_s.strip.tr("’‘", "''")
   end
 
-  # The exact card-option label a raw value matches (modulo apostrophe/space),
-  # so stored answers line up with the card's options. Unknown values pass through.
-  def canonical(value, options)
-    options.find { |o| canon(o) == canon(value) } || value
+  # ── multilingual matching ─────────────────────────────────────────────────
+  # A multilingual source survey exports each row's answers in the language the
+  # RESPONDENT took it in, so exact-English matching drops every non-English
+  # answer. Matching therefore tries, in order: the exact English label, a
+  # translated alias resolved back to English, and (for scales) the ordinal
+  # position many platforms prefix or export bare ("4", "4 - D'accord").
+
+  def default_translations_path
+    p = "#{@csv_path.to_s.sub(/\.csv\z/i, '')}.translations.yml"
+    File.exist?(p) ? p : nil
   end
 
-  # Maps an ordered options list to a ->(text) { index } lookup (nil if absent).
+  # canon(label in any language) => canonical English label. Built from the
+  # scales our locale files already translate — the agree scale
+  # (defaults.range) and the gender options (demographics.cards), positionally
+  # per locale — plus the sidecar file for survey-specific option lists.
+  def translation_aliases
+    @translation_aliases ||= begin
+      map = {}
+      I18n.available_locales.each do |loc|
+        Survey.localized_range_labels(loc).each_with_index do |label, i|
+          map[canon(label)] ||= AGREE[i]
+        end
+        gender_card = Array(I18n.t("demographics.cards", locale: loc, default: nil)).last
+        Array(gender_card.is_a?(Hash) ? gender_card[:options] : nil).each_with_index do |label, i|
+          map[canon(label)] ||= GENDER_OPTS[i] if GENDER_OPTS[i]
+        end
+      end
+      sidecar_translations.each { |from, to| map[canon(from)] = to.to_s }
+      map
+    end
+  end
+
+  # The sidecar is a YAML hash — flat ({ "étiquette" => "English label" }) or
+  # nested per-locale ({ "fr" => { … } }); both flatten to the same aliases.
+  def sidecar_translations
+    return {} unless @translations_path
+
+    data = YAML.load_file(@translations_path)
+    return {} unless data.is_a?(Hash)
+
+    data.flat_map { |k, v| v.is_a?(Hash) ? v.to_a : [ [ k, v ] ] }
+        .select { |_k, v| v.is_a?(String) }.to_h
+  end
+
+  # The exact card-option label a raw value matches — in any language — so
+  # stored answers line up with the (English) card options. Unknown values
+  # pass through, as before.
+  def canonical(value, options)
+    c = canon(value)
+    options.find { |o| canon(o) == c } ||
+      options.find { |o| canon(o) == canon(translation_aliases[c].to_s) } ||
+      value
+  end
+
+  # Maps an ordered options list to a ->(text) { index } lookup (nil if absent
+  # in every language and not an in-range ordinal).
   def indexer(options)
     lut = options.each_with_index.to_h { |o, i| [ canon(o), i ] }
-    ->(text) { lut[canon(text)] }
+    ->(text) {
+      c = canon(text)
+      lut[c] || lut[canon(translation_aliases[c].to_s)] || ordinal_index(c, options.size)
+    }
+  end
+
+  # "4" or "4 - Agree"/"4 – D'accord"/"4: …" → index 3, only when the number is
+  # a plausible 1-based position on this scale. Never fires for labels that
+  # merely contain digits ("2+ hours a week", "About 30–60 minutes a week").
+  def ordinal_index(text, size)
+    n = text[/\A(\d+)\s*(?:[-–:.]|\z)/, 1]&.to_i
+    n&.between?(1, size) ? n - 1 : nil
+  end
+
+  # Every value that resolved to nothing, kept and surfaced (summary_for, the
+  # rake output) instead of silently dropped — the failure mode a non-English
+  # export used to hit for every row.
+  def record_unmatched(col, value)
+    v = value.to_s.strip
+    @unmatched[col][v] += 1 unless v.empty?
+    nil
   end
 
   def range_entry(index)
@@ -473,8 +578,10 @@ class VertoCsvImporter
   end
 
   def tap_value(row, cols, options)
-    yes = decision_atoms(row[cols[:yes]])
-    no  = decision_atoms(row[cols[:no]])
+    yes = decision_atoms(row[cols[:yes]]).map { |a| canonical(a, options) }
+    no  = decision_atoms(row[cols[:no]]).map { |a| canonical(a, options) }
+    (yes - options).each { |a| record_unmatched(cols[:yes], a) }
+    (no  - options).each { |a| record_unmatched(cols[:no],  a) }
     return nil if yes.empty? && no.empty?
 
     value = options.index_with do |opt|
@@ -497,10 +604,15 @@ class VertoCsvImporter
     v = cell.to_s.strip
     return nil if v.empty?
 
-    if v =~ /\AOther \(please share\)\s*\[(.*)\]\s*\z/m
-      { "type" => "multiple_choice", "value" => nil, "other" => Regexp.last_match(1).to_s.strip.presence }.compact
+    # "Other (please share) [free text]" — matched on the bracketed-suffix
+    # SHAPE, not the English prefix, so a localized export's Other rows keep
+    # their free text instead of becoming a one-off value bucket.
+    if v =~ /\A[^\[\]]+\(([^()\[\]]+)\)\s*\[(.*)\]\s*\z/m
+      { "type" => "multiple_choice", "value" => nil, "other" => Regexp.last_match(2).to_s.strip.presence }.compact
     else
-      { "type" => "multiple_choice", "value" => v }
+      cv = canonical(v, DIFFICULT_OPTS)
+      record_unmatched("What makes it difficult for you to take part in sport regularly? (pickOne)", v) unless DIFFICULT_OPTS.include?(cv)
+      { "type" => "multiple_choice", "value" => cv }
     end
   end
 

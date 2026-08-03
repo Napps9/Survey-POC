@@ -160,4 +160,92 @@ class VertoCsvImporterTest < ActiveSupport::TestCase
     end
     assert_match(/run the full import first/, err.message)
   end
+
+  # ── multilingual matching ──────────────────────────────────────────────────
+  # A multilingual source survey exports each row's answers in the language the
+  # respondent took it in. Exact-English matching dropped every one of those
+  # answers silently — the importer now matches through the locale files'
+  # translations, ordinal positions, and a per-import sidecar, and it REPORTS
+  # anything that still matched nothing.
+
+  def importer(**opts)
+    VertoCsvImporter.new(csv_path: FIXTURE, admin_password: PASSWORD, **opts)
+  end
+
+  test "an agree-scale answer matches in every language the platform speaks" do
+    imp    = importer
+    lookup = imp.send(:indexer, VertoCsvImporter::AGREE)
+
+    %i[fr de es ja ar].each do |loc|
+      labels = I18n.t("defaults.range", locale: loc)
+      assert_equal 3, lookup.call(labels[3]),
+                   "#{loc}'s 'Agree' label should resolve to stop 3, got nil — " \
+                   "that answer would have been silently dropped"
+    end
+  end
+
+  test "a gender answer matches in the respondent's language and stores the canonical option" do
+    imp = importer
+    es_female = I18n.t("demographics.cards", locale: :es).last[:options][1]
+    assert_equal "Female", imp.send(:canonical, es_female, VertoCsvImporter::GENDER_OPTS)
+  end
+
+  test "ordinal scale values match positionally, but only in range and only as prefixes" do
+    imp    = importer
+    lookup = imp.send(:indexer, VertoCsvImporter::AGREE)
+
+    assert_equal 3, lookup.call("4")
+    assert_equal 3, lookup.call("4 - Agree")
+    assert_equal 3, lookup.call("4 – D'accord")
+    assert_nil lookup.call("9"), "out-of-range ordinals must not clamp"
+
+    # Labels that merely contain digits must never be read as ordinals.
+    phys = imp.send(:indexer, VertoCsvImporter::PHYS_ACTIVITY)
+    assert_equal 4, phys.call("2+ hours a week"), "the label itself must win"
+    assert_nil phys.call("30 minutes"), "a bare number inside a phrase is not a position"
+  end
+
+  test "a sidecar translations file maps survey-specific labels the locale files can't know" do
+    dir = Dir.mktmpdir
+    path = File.join(dir, "map.translations.yml")
+    File.write(path, { "fr" => { "Jeu informel entre amis" => "Informal play with friends" },
+                       "Sala o ejercicio" => "Gym or exercise" }.to_yaml)
+
+    imp = importer(translations: path)
+    assert_equal "Informal play with friends",
+                 imp.send(:canonical, "Jeu informel entre amis", VertoCsvImporter::SPORT_TYPES)
+    assert_equal "Gym or exercise",
+                 imp.send(:canonical, "Sala o ejercicio", VertoCsvImporter::SPORT_TYPES)
+  ensure
+    FileUtils.remove_entry(dir)
+  end
+
+  test "a value matching nothing in any language is reported, not silently lost" do
+    imp  = importer
+    spec = imp.send(:range_spec, "t", VertoCsvImporter::AGREE, "col")
+
+    assert_nil spec[:get].call({ "col" => "Boaty McBoatface" }, "col")
+    assert_equal({ "col" => { "Boaty McBoatface" => 1 } }, imp.unmatched)
+
+    # Blanks are not noise — an unanswered cell is not an unmatched value.
+    spec[:get].call({ "col" => "  " }, "col")
+    assert_equal 1, imp.unmatched["col"].values.sum
+  end
+
+  test "a clean English import reports nothing unmatched" do
+    imp = VertoCsvImporter.new(csv_path: FIXTURE, admin_password: PASSWORD,
+                               org_slug: "unyo-test", admin_email: "admin@unyo.test")
+    survey = imp.call
+    assert_equal({}, imp.unmatched.reject { |_c, v| v.empty? },
+                 "the all-English fixture matched everything before; a regression here " \
+                 "means the new matching broke the exact-match path")
+    assert_match(/none/, imp.summary_for(survey)[:unmatched])
+  end
+
+  test "an Other free-text row is recognised by its bracketed shape, not the English prefix" do
+    imp = importer
+    entry = imp.send(:difficult_value, "Autre (précisez) [le coût du transport]")
+    assert_nil entry["value"]
+    assert_equal "le coût du transport", entry["other"]
+  end
 end

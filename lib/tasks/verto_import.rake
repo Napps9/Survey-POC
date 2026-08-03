@@ -27,6 +27,11 @@ namespace :verto do
     puts "── Verto CSV import complete ──"
     importer.summary_for(survey).each { |k, v| puts format("  %-10s %s", "#{k}:", v) }
     puts "  login pw:  the value you set in IMPORT_PASSWORD"
+    importer.unmatched.each do |col, values|
+      puts "  UNMATCHED in #{col}:"
+      values.sort_by { |_v, n| -n }.first(10).each { |v, n| puts "    #{n}× #{v.inspect}" }
+      puts "    …map these in <csv>.translations.yml (translated label → English option) and re-run."
+    end
   end
 
   desc "Append/refresh a CSV export into the EXISTING imported Verto without " \
