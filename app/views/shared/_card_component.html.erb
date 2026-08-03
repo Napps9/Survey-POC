@@ -149,10 +149,10 @@
       <div class="q-eyebrow"><%= eyebrow %></div>
     <% end %>
 
-    <div class="q-title" <%= ce_attr %>><%= display["text"] %></div>
+    <div class="q-title" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_card_text(card, display, "text") %></div>
 
     <% if display["description"].present? %>
-      <div class="q-subtitle" <%= ce_attr %>><%= display["description"] %></div>
+      <div class="q-subtitle" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_card_text(card, display, "description") %></div>
     <% end %>
   </div>
 
@@ -176,7 +176,7 @@
               <%= option_style_data_attrs(style) if editable %>
               <%= pick_a11y.call(multi) %>>
             <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i]) %></div>
-            <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
+            <span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span>
             <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
             <% if quiz_mode %>
               <button type="button" class="mark-correct" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
@@ -218,7 +218,7 @@
               data-action="pointerdown->prioritise#start">
             <span class="prioritise-rank" data-prioritise-target="rank"><%= i + 1 %></span>
             <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], keyword_fallback: false) %></div>
-            <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
+            <span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span>
             <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
             <% if editable %>
               <button type="button" class="option-style-btn"
@@ -298,7 +298,7 @@
                         data-action="click->option-style#open" title="<%= t('card.style_option') %>">🎨</button>
               <% end %>
             </div>
-            <div class="choice-label" <%= ce_attr %>><%= opt %></div>
+            <div class="choice-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></div>
           </li>
         <% end %>
       </ul>
@@ -404,7 +404,8 @@
                 </div>
                 <div class="book-page-text" <%= ce_attr %>
                      data-scenario-target="pageText"
-                     <% if editable %>data-placeholder="<%= t('js.editor.scenario.page_placeholder', default: 'Write this page…') %>"<% end %>><%= page["text"] %></div>
+                     <%= "data-rich-text".html_safe if editable %>
+                     <% if editable %>data-placeholder="<%= t('js.editor.scenario.page_placeholder', default: 'Write this page…') %>"<% end %>><%= rich_page_text(card, page) %></div>
               </div>
               <div class="book-page-corner"><%= i + 1 %></div>
               <div class="book-page-fade"></div>

@@ -210,6 +210,11 @@ tr:
     editor:
       delete_card_confirm: Bu kart silinsin mi?
       save_to_library: "Marka kitaplığıma da kaydet"
+      rich_bold: "Kalın"
+      rich_italic: "İtalik"
+      rich_underline: "Altı çizili"
+      rich_font: "Yazı tipi"
+      rich_size: "Metin boyutu"
       option_style_title: "Yanıt stili"
       option_color: "Renk"
       option_emoji: "Emoji"

@@ -6,6 +6,7 @@ import { isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
 import { OPTION_STYLE_TYPES } from "lib/option_style_types"
 import { styleFromRow } from "lib/option_styles"
+import { hasFormatting } from "lib/rich_text"
 
 
 // Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
@@ -291,7 +292,12 @@ export default class extends Controller {
       text: c.text || "",
       description: c.description || "",
       options: Array.isArray(c.options) ? c.options.slice() : [],
-      pages: Array.isArray(c.pages) ? c.pages.map(p => ({ id: p?.id || "", text: p?.text || "" })) : []
+      pages: Array.isArray(c.pages) ? c.pages.map(p => ({ id: p?.id || "", text: p?.text || "", html: p?.html || null })) : [],
+      // Rich-text layer — meaningful on the PRIMARY entry only (translations
+      // are plain by design; the server strips any html they might carry).
+      text_html: c.text_html || null,
+      description_html: c.description_html || null,
+      options_html: Array.isArray(c.options_html) ? c.options_html.slice() : []
     }
   }
 
@@ -317,26 +323,51 @@ export default class extends Controller {
   }
 
   _readCard(cardEl) {
+    const titleEl = cardEl.querySelector(".q-title, .activity-title")
+    const descEl  = cardEl.querySelector(".q-subtitle, .activity-desc")
+    const optEls  = this._optionEls(cardEl)
     return {
-      text: cardEl.querySelector(".q-title, .activity-title")?.textContent.trim() || "",
-      description: cardEl.querySelector(".q-subtitle, .activity-desc")?.textContent.trim() || "",
-      options: this._optionEls(cardEl).map(el => el.textContent.trim()),
+      text: titleEl?.textContent.trim() || "",
+      description: descEl?.textContent.trim() || "",
+      options: optEls.map(el => el.textContent.trim()),
       pages: this._pageEls(cardEl).map(el => ({
         id: el.closest(".book-page")?.dataset.pageId || "",
-        text: el.textContent.trim()
-      }))
+        text: el.textContent.trim(),
+        html: this._readHtml(el)
+      })),
+      text_html: this._readHtml(titleEl),
+      description_html: this._readHtml(descEl),
+      options_html: optEls.map(el => this._readHtml(el))
     }
+  }
+
+  // The rich-text layer of an editable region — innerHTML, but ONLY when
+  // formatting elements are actually present, so a deck nobody has formatted
+  // reads (and therefore serialises) byte-identically to the plain-text era.
+  _readHtml(el) {
+    return el && hasFormatting(el) ? el.innerHTML : null
   }
 
   _writeCard(cardEl, content, fallback, locale) {
     content = content || {}; fallback = fallback || {}
+    // Switching back to the primary tab must restore the rich-text layer —
+    // writing textContent here (as translations do) would flatten the
+    // formatting in the DOM, and the next autosave would then persist the
+    // loss. The html is our own previously-captured markup, not user input
+    // from this call site.
+    const primary = locale === this.defaultLocaleValue
+    const write = (el, html, text) => {
+      if (primary && html) el.innerHTML = html
+      else el.textContent = text
+    }
     const titleEl = cardEl.querySelector(".q-title, .activity-title")
-    if (titleEl) titleEl.textContent = content.text || fallback.text || titleEl.textContent
+    if (titleEl) write(titleEl, content.text_html, content.text || fallback.text || titleEl.textContent)
     const descEl = cardEl.querySelector(".q-subtitle, .activity-desc")
-    if (descEl) descEl.textContent = content.description || fallback.description || ""
+    if (descEl) write(descEl, content.description_html, content.description || fallback.description || "")
     const opts = content.options || [], fopts = fallback.options || []
+    const optsHtml = content.options_html || []
     this._optionEls(cardEl).forEach((el, k) => {
-      el.textContent = (opts[k] && opts[k].trim()) || fopts[k] || el.textContent
+      write(el, optsHtml[k], (opts[k] && opts[k].trim()) || fopts[k] || el.textContent)
     })
     // Pages align by id (not index) — a creator plausibly reorders narrative
     // pages after translating them, unlike options.
@@ -345,7 +376,8 @@ export default class extends Controller {
       const id = el.closest(".book-page")?.dataset.pageId || ""
       const tr = pages.find(p => p.id && p.id === id)
       const fb = fpages.find(p => p.id && p.id === id)
-      el.textContent = (tr && tr.text.trim()) || (fb && fb.text) || el.textContent
+      if (primary && tr && tr.html) el.innerHTML = tr.html
+      else el.textContent = (tr && tr.text.trim()) || (fb && fb.text) || el.textContent
     })
     // The "how to answer" caption isn't authored text (it's derived from the
     // card's type), so it isn't in the i18n store above — look it up straight
@@ -988,6 +1020,13 @@ export default class extends Controller {
       out.text = (prim.text || "").trim()
       if (prim.description && prim.description.trim()) out.description = prim.description.trim()
 
+      // Rich-text layer: emitted only when formatting exists (see _readHtml),
+      // so an unformatted deck serialises byte-identically to before. The
+      // server drops any html that no longer reads as its plain twin
+      // (RichTextSanitizer.clean_equivalent) — plain text stays canonical.
+      if (out.text && prim.text_html) out.text_html = prim.text_html
+      if (out.description && prim.description_html) out.description_html = prim.description_html
+
       // A card's left panel holds a video OR a photo. Carry whichever it is —
       // plus the creator credit — through autosave, since the editor rebuilds
       // cards from the DOM and would otherwise drop these.
@@ -1053,13 +1092,23 @@ export default class extends Controller {
       const primOpts    = type === "range" ? trimmedOpts : trimmedOpts.filter(Boolean)
       if (primOpts.length) out.options = primOpts
 
+      // Per-option rich text, filtered in lockstep with primOpts so indexes
+      // keep matching what the server stores.
+      const pairedOptHtml  = trimmedOpts.map((o, i) => [ o, (prim.options_html || [])[i] || null ])
+      const alignedOptHtml = (type === "range" ? pairedOptHtml : pairedOptHtml.filter(([ o ]) => o)).map(([ , h ]) => h)
+      if (primOpts.length && alignedOptHtml.some(Boolean)) out.options_html = alignedOptHtml
+
       // Narrative pages, in document order — id-and-text pairs so translations
       // (below) can align by id instead of position. Every PAGED type, not just
       // scenario: this read "type === 'scenario'" while the server had already
       // added consent_gate to PAGED_TYPES, so a consent gate autosaved with no
       // pages at all and the sanitiser rewrote them to [].
       const primPages = isPaged(type)
-        ? (prim.pages || []).map(p => ({ id: p.id || "", text: (p.text || "").trim() })).filter(p => p.text)
+        ? (prim.pages || []).map(p => {
+            const page = { id: p.id || "", text: (p.text || "").trim() }
+            if (p.html) page.html = p.html
+            return page
+          }).filter(p => p.text)
         : []
       if (primPages.length) out.pages = primPages
 

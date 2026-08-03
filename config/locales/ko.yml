@@ -210,6 +210,11 @@ ko:
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       save_to_library: "브랜드 라이브러리에도 저장"
+      rich_bold: "굵게"
+      rich_italic: "기울임"
+      rich_underline: "밑줄"
+      rich_font: "글꼴"
+      rich_size: "글자 크기"
       option_style_title: "답변 스타일"
       option_color: "색상"
       option_emoji: "이모지"

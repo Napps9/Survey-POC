@@ -210,6 +210,11 @@ sw:
     editor:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"
+      rich_bold: "Nzito"
+      rich_italic: "Mlazo"
+      rich_underline: "Kupigia mstari"
+      rich_font: "Fonti"
+      rich_size: "Ukubwa wa maandishi"
       option_style_title: "Mtindo wa jibu"
       option_color: "Rangi"
       option_emoji: "Emoji"

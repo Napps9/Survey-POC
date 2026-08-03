@@ -210,6 +210,11 @@ de:
     editor:
       delete_card_confirm: Diese Karte löschen?
       save_to_library: "Auch in meiner Markenbibliothek speichern"
+      rich_bold: "Fett"
+      rich_italic: "Kursiv"
+      rich_underline: "Unterstrichen"
+      rich_font: "Schriftart"
+      rich_size: "Textgröße"
       option_style_title: "Antwort gestalten"
       option_color: "Farbe"
       option_emoji: "Emoji"

@@ -434,6 +434,38 @@ class Survey < ApplicationRecord
           c.delete("range_theme")
         end
       end
+      # Rich-text layer: presentation-only HTML twins of the plain text
+      # fields (text_html / description_html / options_html; page html is
+      # handled in the PAGED_TYPES block below). Every value passes
+      # RichTextSanitizer.clean_equivalent — sanitised to the tag/class
+      # allowlist AND required to still read as its plain twin — so grading,
+      # aggregation, exports, AI and i18n (all keyed off the plain layer) can
+      # never disagree with what respondents saw. Translations stay plain:
+      # any *_html inside i18n is stripped outright.
+      if (html = RichTextSanitizer.clean_equivalent(c["text_html"], c["text"]))
+        c["text_html"] = html
+      else
+        c.delete("text_html")
+      end
+      if (html = RichTextSanitizer.clean_equivalent(c["description_html"], c["description"]))
+        c["description_html"] = html
+      else
+        c.delete("description_html")
+      end
+      if c.key?("options_html")
+        opts  = Array(c["options"])
+        htmls = Array(c["options_html"]).first(opts.length).each_with_index.map do |h, i|
+          RichTextSanitizer.clean_equivalent(h, opts[i])
+        end
+        htmls += [ nil ] * (opts.length - htmls.length) if htmls.length < opts.length
+        htmls.any? ? c["options_html"] = htmls : c.delete("options_html")
+      end
+      if c["i18n"].is_a?(Hash)
+        c["i18n"] = c["i18n"].transform_values do |tr|
+          tr.is_a?(Hash) ? tr.reject { |k, _| k.to_s.end_with?("_html") } : tr
+        end
+      end
+
       # Per-option visual overrides ({color, icon, emoji} or null, POSITIONAL
       # against `options` — like option_images, DOM order in the editor is the
       # alignment, so there is no splice bookkeeping here). Purely
@@ -482,7 +514,13 @@ class Survey < ApplicationRecord
           next unless p.is_a?(Hash)
           text = p["text"].to_s.strip.first(MAX_SCENARIO_PAGE_LENGTH)
           next if text.blank?
-          { "id" => p["id"].to_s.strip.presence || "pg_#{SecureRandom.hex(4)}", "text" => text }
+          page = { "id" => p["id"].to_s.strip.presence || "pg_#{SecureRandom.hex(4)}", "text" => text }
+          # Rich-text layer for the page, same equivalence contract as
+          # text_html below: presentation only, must still read as `text`.
+          if (html = RichTextSanitizer.clean_equivalent(p["html"], text))
+            page["html"] = html
+          end
+          page
         end
         if c["i18n"].is_a?(Hash)
           c["i18n"] = c["i18n"].transform_values do |tr|

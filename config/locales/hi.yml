@@ -210,6 +210,11 @@ hi:
     editor:
       delete_card_confirm: इस कार्ड को हटाएं?
       save_to_library: "मेरी ब्रांड लाइब्रेरी में भी सहेजें"
+      rich_bold: "बोल्ड"
+      rich_italic: "इटैलिक"
+      rich_underline: "रेखांकित"
+      rich_font: "फ़ॉन्ट"
+      rich_size: "टेक्स्ट आकार"
       option_style_title: "उत्तर की शैली"
       option_color: "रंग"
       option_emoji: "इमोजी"

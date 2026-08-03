@@ -210,6 +210,11 @@ it:
     editor:
       delete_card_confirm: Eliminare questa carta?
       save_to_library: "Salva anche nella mia libreria del brand"
+      rich_bold: "Grassetto"
+      rich_italic: "Corsivo"
+      rich_underline: "Sottolineato"
+      rich_font: "Carattere"
+      rich_size: "Dimensione testo"
       option_style_title: "Stile risposta"
       option_color: "Colore"
       option_emoji: "Emoji"

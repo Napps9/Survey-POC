@@ -155,6 +155,15 @@ class JsConstantParityTest < ActiveSupport::TestCase
                  "loses its overrides on the next autosave")
   end
 
+  test "serialize emits the rich-text layer" do
+    source = js("controllers/survey_editor_controller.js")
+    %w[out\.text_html out\.description_html out\.options_html].each do |emission|
+      assert_match(/#{emission}/, source,
+                   "serialize() no longer emits #{emission.delete("\\")} — every formatted deck " \
+                   "loses its rich text on the next autosave")
+    end
+  end
+
   # The palette maths lives twice (live preview vs server render); the roles
   # drifting means a colour a creator can pick that one side silently ignores.
   test "lib/brand_palette.js roles and defaults match BrandPalette" do

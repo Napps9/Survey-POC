@@ -218,6 +218,11 @@ en:
     editor:
       delete_card_confirm: "Delete this card?"
       save_to_library: "Also save to my brand library"
+      rich_bold: "Bold"
+      rich_italic: "Italic"
+      rich_underline: "Underline"
+      rich_font: "Font"
+      rich_size: "Text size"
       option_style_title: "Style answer"
       option_color: "Colour"
       option_emoji: "Emoji"

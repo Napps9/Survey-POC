@@ -148,7 +148,12 @@ module ApplicationHelper
       "text"        => card["text"],
       "description" => card["description"],
       "options"     => card["options"],
-      "pages"       => card["pages"]
+      "pages"       => card["pages"],
+      # Rich-text layer (primary locale only — translations are plain), so
+      # the editor's store starts with the same html the DOM shows.
+      "text_html"        => card["text_html"],
+      "description_html" => card["description_html"],
+      "options_html"     => card["options_html"]
     }
     if card["i18n"].is_a?(Hash)
       out["i18n"] = card["i18n"].transform_values do |tr|
@@ -236,6 +241,35 @@ module ApplicationHelper
   def card_default_options_i18n(survey)
     I18n.t("defaults", locale: survey.default_locale,
                        default: I18n.t("defaults", locale: :en, default: {}))
+  end
+
+  # ── Rich text (presentation-only HTML twins of plain card text) ───────────
+  # Rendered ONLY when the string being shown is the primary-locale one — a
+  # translation (plain by design) renders unformatted rather than wearing the
+  # primary text's markup. Re-sanitised at render as defence-in-depth; the
+  # stored value already passed clean_equivalent.
+
+  def rich_card_text(card, display, field)
+    html = card["#{field}_html"]
+    shown = display[field].to_s
+    return shown unless html.present? && shown == card[field].to_s
+
+    RichTextSanitizer.clean(html).html_safe
+  end
+
+  def rich_option_text(card, shown, index)
+    html = Array(card["options_html"])[index]
+    return shown unless html.present? && shown.to_s == Array(card["options"])[index].to_s
+
+    RichTextSanitizer.clean(html).html_safe
+  end
+
+  def rich_page_text(card, page)
+    primary = Array(card["pages"]).find { |p| p.is_a?(Hash) && p["id"] == page["id"] }
+    html = primary && primary["html"]
+    return page["text"] unless html.present? && page["text"].to_s == primary["text"].to_s
+
+    RichTextSanitizer.clean(html).html_safe
   end
 
   # ── Per-option visual overrides (`option_styles` on choice-shaped cards) ──

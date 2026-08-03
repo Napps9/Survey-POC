@@ -210,6 +210,11 @@ uk:
     editor:
       delete_card_confirm: Видалити цю картку?
       save_to_library: "Також зберегти в бібліотеку бренду"
+      rich_bold: "Жирний"
+      rich_italic: "Курсив"
+      rich_underline: "Підкреслений"
+      rich_font: "Шрифт"
+      rich_size: "Розмір тексту"
       option_style_title: "Стиль відповіді"
       option_color: "Колір"
       option_emoji: "Емодзі"

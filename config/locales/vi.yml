@@ -210,6 +210,11 @@ vi:
     editor:
       delete_card_confirm: Xóa thẻ này?
       save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"
+      rich_bold: "Đậm"
+      rich_italic: "Nghiêng"
+      rich_underline: "Gạch chân"
+      rich_font: "Phông chữ"
+      rich_size: "Cỡ chữ"
       option_style_title: "Kiểu câu trả lời"
       option_color: "Màu sắc"
       option_emoji: "Emoji"

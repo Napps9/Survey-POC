@@ -210,6 +210,11 @@ ja:
     editor:
       delete_card_confirm: このカードを削除しますか？
       save_to_library: "ブランドライブラリにも保存"
+      rich_bold: "太字"
+      rich_italic: "斜体"
+      rich_underline: "下線"
+      rich_font: "フォント"
+      rich_size: "文字サイズ"
       option_style_title: "選択肢のスタイル"
       option_color: "色"
       option_emoji: "絵文字"

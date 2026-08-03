@@ -210,6 +210,11 @@ he:
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
       save_to_library: "שמור גם בספריית המותג שלי"
+      rich_bold: "מודגש"
+      rich_italic: "נטוי"
+      rich_underline: "קו תחתון"
+      rich_font: "גופן"
+      rich_size: "גודל טקסט"
       option_style_title: "עיצוב התשובה"
       option_color: "צבע"
       option_emoji: "אימוג'י"

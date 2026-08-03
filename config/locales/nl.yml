@@ -210,6 +210,11 @@ nl:
     editor:
       delete_card_confirm: Deze kaart verwijderen?
       save_to_library: "Ook opslaan in mijn merkbibliotheek"
+      rich_bold: "Vet"
+      rich_italic: "Cursief"
+      rich_underline: "Onderstreept"
+      rich_font: "Lettertype"
+      rich_size: "Tekstgrootte"
       option_style_title: "Antwoordstijl"
       option_color: "Kleur"
       option_emoji: "Emoji"

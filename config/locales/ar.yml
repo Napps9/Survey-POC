@@ -210,6 +210,11 @@ ar:
     editor:
       delete_card_confirm: حذف هذه البطاقة؟
       save_to_library: "حفظ أيضًا في مكتبة العلامة التجارية"
+      rich_bold: "غامق"
+      rich_italic: "مائل"
+      rich_underline: "تسطير"
+      rich_font: "الخط"
+      rich_size: "حجم النص"
       option_style_title: "تنسيق الإجابة"
       option_color: "اللون"
       option_emoji: "إيموجي"

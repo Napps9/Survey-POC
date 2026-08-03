@@ -210,6 +210,11 @@ pt:
     editor:
       delete_card_confirm: Eliminar este cartão?
       save_to_library: "Salvar também na minha biblioteca de marca"
+      rich_bold: "Negrito"
+      rich_italic: "Itálico"
+      rich_underline: "Sublinhado"
+      rich_font: "Fonte"
+      rich_size: "Tamanho do texto"
       option_style_title: "Estilo da resposta"
       option_color: "Cor"
       option_emoji: "Emoji"

@@ -43,7 +43,7 @@
 <script id="option-icon-map" type="application/json"><%= option_icon_map_data.to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel gate-cards score-modal flows option-style"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel gate-cards score-modal flows option-style rich-text"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
@@ -81,7 +81,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.editing_locked? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -1594,6 +1594,22 @@
   <%= render "surveys/media_modal" %>
   <%= render "surveys/animation_modal" %>
   <%= render "surveys/add_question_modal" %>
+
+  <%# Floating rich-text toolbar — appears over a text selection inside any
+      [data-rich-text] editable region. Fonts/sizes are the sanitiser's class
+      allowlist; the selects are populated from lib/rich_text.js. %>
+  <div class="rich-text-toolbar" data-rich-text-target="toolbar" hidden>
+    <button type="button" data-rich-text-target="boldBtn"
+            data-action="click->rich-text#bold" title="<%= t("js.editor.rich_bold") %>"><b>B</b></button>
+    <button type="button" data-rich-text-target="italicBtn"
+            data-action="click->rich-text#italic" title="<%= t("js.editor.rich_italic") %>"><i>I</i></button>
+    <button type="button" data-rich-text-target="underlineBtn"
+            data-action="click->rich-text#underline" title="<%= t("js.editor.rich_underline") %>"><u>U</u></button>
+    <select data-rich-text-target="fontSelect" data-action="change->rich-text#fontChanged"
+            aria-label="<%= t("js.editor.rich_font") %>"></select>
+    <select data-rich-text-target="sizeSelect" data-action="change->rich-text#sizeChanged"
+            aria-label="<%= t("js.editor.rich_size") %>"></select>
+  </div>
 
   <%# Per-option style popover (one instance serves every 🎨 button) —
       colour / icon / emoji overrides carried as data-option-* on the row. %>

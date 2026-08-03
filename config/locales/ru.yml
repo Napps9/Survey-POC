@@ -210,6 +210,11 @@ ru:
     editor:
       delete_card_confirm: Удалить эту карточку?
       save_to_library: "Также сохранить в библиотеку бренда"
+      rich_bold: "Жирный"
+      rich_italic: "Курсив"
+      rich_underline: "Подчёркнутый"
+      rich_font: "Шрифт"
+      rich_size: "Размер текста"
       option_style_title: "Стиль ответа"
       option_color: "Цвет"
       option_emoji: "Эмодзи"

@@ -210,6 +210,11 @@ id:
     editor:
       delete_card_confirm: Hapus kartu ini?
       save_to_library: "Simpan juga ke pustaka merek saya"
+      rich_bold: "Tebal"
+      rich_italic: "Miring"
+      rich_underline: "Garis bawah"
+      rich_font: "Fon"
+      rich_size: "Ukuran teks"
       option_style_title: "Gaya jawaban"
       option_color: "Warna"
       option_emoji: "Emoji"

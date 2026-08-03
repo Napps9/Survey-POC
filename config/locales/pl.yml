@@ -210,6 +210,11 @@ pl:
     editor:
       delete_card_confirm: Usunąć tę kartę?
       save_to_library: "Zapisz też w mojej bibliotece marki"
+      rich_bold: "Pogrubienie"
+      rich_italic: "Kursywa"
+      rich_underline: "Podkreślenie"
+      rich_font: "Czcionka"
+      rich_size: "Rozmiar tekstu"
       option_style_title: "Styl odpowiedzi"
       option_color: "Kolor"
       option_emoji: "Emoji"

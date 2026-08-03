@@ -210,6 +210,11 @@ fr:
     editor:
       delete_card_confirm: Supprimer cette carte ?
       save_to_library: "Enregistrer aussi dans ma bibliothèque de marque"
+      rich_bold: "Gras"
+      rich_italic: "Italique"
+      rich_underline: "Souligné"
+      rich_font: "Police"
+      rich_size: "Taille du texte"
       option_style_title: "Style de la réponse"
       option_color: "Couleur"
       option_emoji: "Émoji"
