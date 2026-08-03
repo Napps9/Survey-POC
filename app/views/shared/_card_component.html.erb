@@ -131,8 +131,11 @@
 <div class="split-right<%= ' split-right--book' if Survey::PAGED_TYPES.include?(type) %>">
 
   <%# Creator's logo, centred at the top of the right (content) panel on the
-      welcome card — player only, and only when a logo is actually uploaded. %>
-  <% if mode == :player && type == "welcome_card" && @survey&.organisation&.logo&.attached? %>
+      welcome card — player and editor (the editor's Preview overlay clones
+      the editor DOM, so without the editor branch the promised "your logo on
+      every preview" never appeared), and only when a logo is uploaded.
+      Dashboard mini-previews (:preview) stay logo-free on purpose. %>
+  <% if (mode == :player || mode == :editor) && type == "welcome_card" && @survey&.organisation&.logo&.attached? %>
     <div class="split-right-logo">
       <%= brand_logo_tag @survey.organisation, style: "height:34px;width:auto;max-width:60%;display:block;" %>
     </div>

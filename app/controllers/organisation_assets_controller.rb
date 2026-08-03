@@ -26,7 +26,20 @@ class OrganisationAssetsController < ApplicationController
         alert: t("flash.organisation_assets.invalid_asset_file", filename: bad.original_filename, size: Organisation::ASSET_MAX_BYTES / 1.megabyte)
     end
 
-    org.assets.attach(files)
+    # SVG is stored and later served inline (config/initializers/
+    # active_storage.rb), so scrub it before it reaches storage. A file the
+    # sanitizer can't salvage is rejected like any other invalid asset.
+    attachables = files.map do |f|
+      next f unless f.content_type == "image/svg+xml"
+      cleaned = SvgSanitizer.clean_document(f.read)
+      if cleaned.nil?
+        return redirect_to organisation_memberships_path(org),
+          alert: t("flash.organisation_assets.invalid_asset_file", filename: f.original_filename, size: Organisation::ASSET_MAX_BYTES / 1.megabyte)
+      end
+      { io: StringIO.new(cleaned), filename: f.original_filename, content_type: "image/svg+xml" }
+    end
+
+    org.assets.attach(attachables)
     redirect_to organisation_memberships_path(org),
       notice: t("flash.organisation_assets.assets_added", count: files.size)
   rescue => e

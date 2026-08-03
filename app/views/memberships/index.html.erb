@@ -40,7 +40,7 @@
               data: { turbo: false },
               html: { style: "display:flex;flex-wrap:wrap;align-items:center;gap:10px;" } do |f| %>
           <%= f.file_field :logo,
-                accept: "image/png,image/jpeg,image/svg+xml,image/webp",
+                accept: Organisation::LOGO_CONTENT_TYPES.join(","),
                 style: "flex:1;min-width:200px;padding:10px 12px;border-radius:10px;background:#272D4A;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);" %>
           <%= f.submit "Upload",
                 style: "padding:10px 20px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;border:none;cursor:pointer;" %>
@@ -55,7 +55,7 @@
           <% end %>
         <% end %>
         <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);margin-top:10px;">
-          PNG, JPG, SVG or WebP · transparent backgrounds work best.
+          PNG, JPG, GIF, SVG or WebP · transparent backgrounds work best.
           Also editable from any Verto's Design panel, under Branding.
         </div>
       </div>

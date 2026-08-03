@@ -33,6 +33,20 @@ class OrganisationsController < ApplicationController
                                "We didn't receive the file — the upload may have been interrupted. Please try again.")
     end
 
+    # SVG is stored and later served inline (see config/initializers/
+    # active_storage.rb), so it must be scrubbed before it ever reaches
+    # storage — an unsanitised SVG served same-origin would be stored XSS.
+    attrs = attrs.to_h
+    if svg_upload?(attrs[:logo])
+      cleaned = SvgSanitizer.clean_document(attrs[:logo].read)
+      if cleaned.nil?
+        return respond_to_update(false, remove,
+                                 "We couldn't read that SVG safely — please re-export it, or upload a PNG instead.")
+      end
+      attrs[:logo] = { io: StringIO.new(cleaned), filename: attrs[:logo].original_filename,
+                       content_type: "image/svg+xml" }
+    end
+
     @organisation.logo.purge if remove
     ok = @organisation.update(attrs)
     respond_to_update(ok, remove,
@@ -40,6 +54,10 @@ class OrganisationsController < ApplicationController
   end
 
   private
+
+  def svg_upload?(file)
+    file.respond_to?(:content_type) && file.content_type == "image/svg+xml"
+  end
 
   def respond_to_update(ok, remove, error)
     respond_to do |format|

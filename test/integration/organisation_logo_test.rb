@@ -105,4 +105,78 @@ class OrganisationLogoTest < ActionDispatch::IntegrationTest
     assert_redirected_to organisation_memberships_path(@org)
     assert_equal "Brand updated.", flash[:notice]
   end
+
+  # --- SVG logos -------------------------------------------------------------
+  # SVG logos are stored sanitised and served inline (config/initializers/
+  # active_storage.rb) — the pre-existing bug was Rails' default serving them
+  # as application/octet-stream attachments, which <img> renders as nothing.
+
+  SVG_LOGO = <<~SVG.freeze
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 20" width="60" height="20">
+      <script>alert("stored xss")</script>
+      <rect width="60" height="20" fill="#01EACB" onclick="alert(1)"/>
+      <text x="4" y="14" font-size="10">Brand</text>
+    </svg>
+  SVG
+
+  def svg(name = "logo.svg", bytes: SVG_LOGO)
+    png(name, bytes: bytes, type: "image/svg+xml")
+  end
+
+  test "an SVG logo is stored sanitised, keeping its drawable content" do
+    patch_logo(organisation: { logo: svg })
+
+    assert_response :success
+    assert @org.reload.logo.attached?
+    stored = @org.logo.download
+    refute_match(/script|onclick/i, stored, "hostile content must never reach storage")
+    assert_includes stored, "<rect"
+    assert_includes stored, "Brand", "text must survive document sanitisation"
+    assert_includes stored, %(xmlns="http://www.w3.org/2000/svg"), "must stay renderable in <img>"
+  end
+
+  test "a stored SVG logo is served inline as image/svg+xml, not as a download" do
+    patch_logo(organisation: { logo: svg })
+    assert_response :success
+
+    get JSON.parse(response.body)["logo_url"]
+    assert_response :redirect # blob redirect service
+    follow_redirect!
+    assert_response :success
+    assert_equal "image/svg+xml", response.media_type,
+                 "octet-stream here is the exact bug: <img> never renders it"
+    refute_match(/attachment/, response.headers["Content-Disposition"].to_s,
+                 "an attachment disposition downloads instead of rendering")
+  end
+
+  test "an SVG with no usable drawing is refused with a reason" do
+    patch_logo(organisation: { logo: svg("bad.svg", bytes: "<html>not svg</html>") })
+
+    assert_response :unprocessable_entity
+    assert_match(/SVG/i, assert_readable_json_error["error"])
+    refute @org.reload.logo.attached?
+  end
+
+  test "the editor welcome card shows the logo so Preview inherits it" do
+    @org.logo.attach(io: StringIO.new("\x89PNG\r\n\x1a\n"), filename: "l.png", content_type: "image/png")
+    survey = @org.surveys.create!(
+      title: "S", theme: "Sports", audience_age: "all", key_insight: "x",
+      default_locale: "en", locales: [ "en" ],
+      cards: [ { "type" => "welcome_card", "text" => "hi" } ]
+    )
+
+    get survey_path(survey)
+
+    assert_response :success
+    assert_select ".split-right-logo", { minimum: 1 },
+                  "the Preview overlay clones editor DOM — no logo here means no logo in preview"
+  end
+
+  test "the branding page accept list comes from the model constant" do
+    get organisation_memberships_path(@org)
+
+    assert_response :success
+    # The hardcoded list had drifted (image/gif was missing).
+    assert_select "input[type=file][accept=?]", Organisation::LOGO_CONTENT_TYPES.join(","), minimum: 1
+  end
 end
