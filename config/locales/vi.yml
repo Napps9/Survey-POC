@@ -31,6 +31,12 @@ vi:
     add_option: Thêm tùy chọn
     new_option: Tùy chọn mới
     style_option: Tùy chỉnh câu trả lời này
+    contact_name: "Họ tên"
+    contact_company: "Công ty"
+    contact_industry: "Ngành"
+    contact_email: "Email"
+    contact_note: "Thông tin của bạn được gửi đến người tạo Verto này để họ có thể liên hệ với bạn."
+    contact_email_invalid: "Đó có vẻ không phải là địa chỉ email — vui lòng kiểm tra lại."
     add_statement: Thêm phát biểu
     swipe_no: "Không"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ vi:
       select_many_grid: "Chọn tất cả đáp án phù hợp"
       tap_card: "Vuốt để trả lời"
       open_ended: "Nhập câu trả lời của bạn"
+      contact_form: "Chia sẻ thông tin của bạn"
       scenario: "Đọc tiếp rồi chọn"
   auth:
     social_continue: "Tiếp tục với %{provider}"
@@ -165,6 +172,7 @@ vi:
     tap_card: ["Phát biểu 1", "Phát biểu 2", "Phát biểu 3", "Phát biểu 4", "Phát biểu 5"]
     scenario: ["Lựa chọn A", "Lựa chọn B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

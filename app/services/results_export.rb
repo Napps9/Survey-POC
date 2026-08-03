@@ -136,6 +136,9 @@ class ResultsExport
         range_label(card, value)
       when "tap_card"
         value.is_a?(Hash) ? value.map { |label, dir| "#{label}: #{dir}" }.join("; ") : ""
+      when "contact_form"
+        # "Name: …; Company: …" — one readable cell, fields in a fixed order.
+        value.is_a?(Hash) ? Survey::CONTACT_FIELDS.filter_map { |f| "#{f.capitalize}: #{value[f]}" if value[f].present? }.join("; ") : ""
       else
         # multiple_choice, yes_no, select_one_grid, nps, rating, open_ended, …
         value.nil? ? "" : value.to_s

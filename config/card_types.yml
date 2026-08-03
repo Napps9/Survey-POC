@@ -141,6 +141,17 @@ open_ended:
   picker_icon:  "✏"
   pickable:     true
 
+contact_form:
+  badge:        "CONTACT"
+  badge_css:    "sb-text"
+  panel_label:  "SHARE YOUR DETAILS"
+  eyebrow:      "Share your details"
+  picker_name:  "Contact details"
+  picker_desc:  "Name, company, industry, email"
+  explainer:    "A lead-capture card: name, company, industry and email, each optional for the respondent. The ONE card type that collects identifying data — the card says so to respondents, and these answers appear in results and exports like any other."
+  picker_icon:  "✉"
+  pickable:     true
+
 welcome_card:
   badge:        "WELCOME CARD"
   badge_css:    "sb-welcome"

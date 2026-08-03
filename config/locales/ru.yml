@@ -31,6 +31,12 @@ ru:
     add_option: Добавить вариант
     new_option: Новый вариант
     style_option: Оформить этот ответ
+    contact_name: "Имя"
+    contact_company: "Компания"
+    contact_industry: "Отрасль"
+    contact_email: "Эл. почта"
+    contact_note: "Ваши данные передаются создателю этого Verto, чтобы он мог с вами связаться."
+    contact_email_invalid: "Это не похоже на адрес электронной почты — проверьте, пожалуйста."
     add_statement: Добавить утверждение
     swipe_no: "Нет"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ ru:
       select_many_grid: "Отметьте все подходящие варианты"
       tap_card: "Перетащите, чтобы ответить"
       open_ended: "Введите свой ответ"
+      contact_form: "Поделитесь контактами"
       scenario: "Читайте дальше, затем выберите"
   auth:
     social_continue: "Продолжить с %{provider}"
@@ -165,6 +172,7 @@ ru:
     tap_card: ["Утверждение 1", "Утверждение 2", "Утверждение 3", "Утверждение 4", "Утверждение 5"]
     scenario: ["Вариант А", "Вариант Б"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

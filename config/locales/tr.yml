@@ -31,6 +31,12 @@ tr:
     add_option: Seçenek ekle
     new_option: Yeni seçenek
     style_option: Bu yanıtı biçimlendir
+    contact_name: "Ad"
+    contact_company: "Şirket"
+    contact_industry: "Sektör"
+    contact_email: "E-posta"
+    contact_note: "Bilgilerin, seninle iletişime geçebilmesi için bu Verto'nun sahibine iletilir."
+    contact_email_invalid: "Bu bir e-posta adresine benzemiyor — lütfen kontrol et."
     add_statement: İfade ekle
     swipe_no: "Hayır"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ tr:
       select_many_grid: "Uygun olan tüm seçenekleri seçin"
       tap_card: "Yanıtlamak için kaydırın"
       open_ended: "Cevabınızı yazın"
+      contact_form: "Bilgilerini paylaş"
       scenario: "Okumaya devam et, sonra seç"
   auth:
     social_continue: "%{provider} ile devam et"
@@ -165,6 +172,7 @@ tr:
     tap_card: ["İfade 1", "İfade 2", "İfade 3", "İfade 4", "İfade 5"]
     scenario: ["Seçenek A", "Seçenek B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

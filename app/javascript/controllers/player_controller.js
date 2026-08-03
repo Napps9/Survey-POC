@@ -651,6 +651,26 @@ export default class extends Controller {
         try { return JSON.parse(wrap?.dataset.swipeResults || "null") } catch { return null }
       }
 
+      case "contact_form": {
+        // Object of the non-blank fields; null when nothing was entered. A
+        // malformed email shows the inline nudge and is left out, so what the
+        // server receives is only ever plausibly-shaped (it re-validates —
+        // Survey#clamp_contact_entries — because this endpoint is public).
+        const out = {}
+        card.querySelectorAll(".contact-field").forEach(el => {
+          const v = el.value.trim()
+          if (v) out[el.dataset.contactKey] = v
+        })
+        const error = card.querySelector("[data-contact-error]")
+        if (out.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(out.email)) {
+          if (error) error.hidden = false
+          delete out.email
+        } else if (error) {
+          error.hidden = true
+        }
+        return Object.keys(out).length ? out : null
+      }
+
       case "open_ended": {
         // Location demographic: a hidden input carries the resolved
         // "CC|Label" the location-search widget picked (see
@@ -1482,11 +1502,15 @@ export default class extends Controller {
       card.querySelectorAll(".rating-star").forEach((s, i) => {
         const on = i < Number(value); s.classList.toggle("active", on); s.textContent = on ? "★" : "☆"
       })
+    } else if (type === "contact_form" && value && typeof value === "object") {
+      card.querySelectorAll(".contact-field").forEach(el => {
+        if (value[el.dataset.contactKey] != null) el.value = value[el.dataset.contactKey]
+      })
     }
   }
 
   _lockInputs(card) {
-    card.querySelectorAll(".choice-list, .choice-grid, .rotate-wrap, .slider-wrap, .nps-slider, .prioritise-list, .rating-wrap, .freeform-wrap, .other-block")
+    card.querySelectorAll(".choice-list, .choice-grid, .rotate-wrap, .slider-wrap, .nps-slider, .prioritise-list, .rating-wrap, .freeform-wrap, .other-block, .contact-form-wrap")
         .forEach(el => { el.style.pointerEvents = "none" })
     card.querySelectorAll("textarea, input, button[data-other-target='btn']").forEach(el => { el.disabled = true })
   }

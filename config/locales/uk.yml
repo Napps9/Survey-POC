@@ -31,6 +31,12 @@ uk:
     add_option: Додати варіант
     new_option: Новий варіант
     style_option: Оформити цю відповідь
+    contact_name: "Ім'я"
+    contact_company: "Компанія"
+    contact_industry: "Галузь"
+    contact_email: "Ел. пошта"
+    contact_note: "Ваші дані передаються творцеві цього Verto, щоб він міг з вами зв'язатися."
+    contact_email_invalid: "Це не схоже на адресу електронної пошти — перевірте, будь ласка."
     add_statement: Додати твердження
     swipe_no: "Ні"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ uk:
       select_many_grid: "Виберіть усі, що підходять"
       tap_card: "Свайпніть, щоб відповісти"
       open_ended: "Введіть відповідь"
+      contact_form: "Поділіться контактами"
       scenario: "Читайте далі, потім оберіть"
   auth:
     social_continue: "Продовжити з %{provider}"
@@ -165,6 +172,7 @@ uk:
     tap_card: ["Твердження 1", "Твердження 2", "Твердження 3", "Твердження 4", "Твердження 5"]
     scenario: ["Варіант А", "Варіант Б"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

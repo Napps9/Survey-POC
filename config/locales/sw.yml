@@ -31,6 +31,12 @@ sw:
     add_option: Ongeza chaguo
     new_option: Chaguo jipya
     style_option: Panga mtindo wa jibu hili
+    contact_name: "Jina"
+    contact_company: "Kampuni"
+    contact_industry: "Sekta"
+    contact_email: "Barua pepe"
+    contact_note: "Maelezo yako yanaenda kwa mtengenezaji wa Verto hii ili aweze kuwasiliana nawe."
+    contact_email_invalid: "Hiyo haionekani kama anwani ya barua pepe — tafadhali angalia."
     add_statement: Ongeza kauli
     swipe_no: "Hapana"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ sw:
       select_many_grid: "Chagua zote zinazofaa"
       tap_card: "Buruta ili kujibu"
       open_ended: "Andika jibu lako"
+      contact_form: "Shiriki maelezo yako"
       scenario: "Endelea kusoma, kisha chagua"
   auth:
     social_continue: "Endelea na %{provider}"
@@ -165,6 +172,7 @@ sw:
     tap_card: ["Kauli 1", "Kauli 2", "Kauli 3", "Kauli 4", "Kauli 5"]
     scenario: ["Chaguo A", "Chaguo B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

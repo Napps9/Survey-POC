@@ -31,6 +31,12 @@ hi:
     add_option: विकल्प जोड़ें
     new_option: नया विकल्प
     style_option: इस उत्तर को सजाएँ
+    contact_name: "नाम"
+    contact_company: "कंपनी"
+    contact_industry: "उद्योग"
+    contact_email: "ईमेल"
+    contact_note: "आपका विवरण इस Verto के निर्माता को जाता है ताकि वे आपसे संपर्क कर सकें।"
+    contact_email_invalid: "यह ईमेल पता जैसा नहीं लगता — कृपया जांचें।"
     add_statement: कथन जोड़ें
     swipe_no: "नहीं"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ hi:
       select_many_grid: "सभी लागू विकल्प चुनें"
       tap_card: "उत्तर देने के लिए स्वाइप करें"
       open_ended: "अपना उत्तर लिखें"
+      contact_form: "अपना विवरण साझा करें"
       scenario: "आगे पढ़ें, फिर चुनें"
   auth:
     social_continue: "%{provider} के साथ जारी रखें"
@@ -165,6 +172,7 @@ hi:
     tap_card: ["कथन 1", "कथन 2", "कथन 3", "कथन 4", "कथन 5"]
     scenario: ["विकल्प A", "विकल्प B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

@@ -31,6 +31,12 @@ he:
     add_option: הוסף אפשרות
     new_option: אפשרות חדשה
     style_option: עיצוב תשובה זו
+    contact_name: "שם"
+    contact_company: "חברה"
+    contact_industry: "תחום"
+    contact_email: "אימייל"
+    contact_note: "הפרטים שלכם נמסרים ליוצר של Verto זה כדי שיוכל לחזור אליכם."
+    contact_email_invalid: "זה לא נראה כמו כתובת אימייל — נא לבדוק."
     add_statement: הוסף משפט
     swipe_no: "לא"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ he:
       select_many_grid: "סמן את כל האפשרויות המתאימות"
       tap_card: "החלק כדי לענות"
       open_ended: "הקלד את התשובה שלך"
+      contact_form: "שתפו את הפרטים שלכם"
       scenario: "המשך לקרוא, ואז בחר"
   auth:
     social_continue: "המשך עם %{provider}"
@@ -165,6 +172,7 @@ he:
     tap_card: ["היגד 1", "היגד 2", "היגד 3", "היגד 4", "היגד 5"]
     scenario: ["אפשרות א", "אפשרות ב"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

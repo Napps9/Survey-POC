@@ -31,6 +31,12 @@ id:
     add_option: Tambah opsi
     new_option: Opsi baru
     style_option: Gaya jawaban ini
+    contact_name: "Nama"
+    contact_company: "Perusahaan"
+    contact_industry: "Industri"
+    contact_email: "Email"
+    contact_note: "Detail Anda dikirim ke pembuat Verto ini agar mereka dapat menghubungi Anda."
+    contact_email_invalid: "Itu tidak tampak seperti alamat email — mohon periksa."
     add_statement: Tambah pernyataan
     swipe_no: "Tidak"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ id:
       select_many_grid: "Pilih semua yang sesuai"
       tap_card: "Geser untuk menjawab"
       open_ended: "Ketik jawaban Anda"
+      contact_form: "Bagikan detail Anda"
       scenario: "Lanjutkan membaca, lalu pilih"
   auth:
     social_continue: "Lanjutkan dengan %{provider}"
@@ -165,6 +172,7 @@ id:
     tap_card: ["Pernyataan 1", "Pernyataan 2", "Pernyataan 3", "Pernyataan 4", "Pernyataan 5"]
     scenario: ["Opsi A", "Opsi B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

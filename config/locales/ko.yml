@@ -31,6 +31,12 @@ ko:
     add_option: 옵션 추가
     new_option: 새 옵션
     style_option: 이 답변 스타일
+    contact_name: "이름"
+    contact_company: "회사"
+    contact_industry: "업종"
+    contact_email: "이메일"
+    contact_note: "입력하신 정보는 이 Verto 제작자에게 전달되어 연락에 사용됩니다."
+    contact_email_invalid: "이메일 주소 형식이 아닌 것 같습니다 — 확인해 주세요."
     add_statement: 문장 추가
     swipe_no: "아니요"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ ko:
       select_many_grid: "해당하는 항목을 모두 선택하세요"
       tap_card: "스와이프해서 답변하세요"
       open_ended: "답변을 입력하세요"
+      contact_form: "연락처를 알려주세요"
       scenario: "계속 읽고 나서 선택하세요"
   auth:
     social_continue: "%{provider}로 계속하기"
@@ -165,6 +172,7 @@ ko:
     tap_card: ["문장 1", "문장 2", "문장 3", "문장 4", "문장 5"]
     scenario: ["옵션 A", "옵션 B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

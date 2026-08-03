@@ -31,6 +31,12 @@ ar:
     add_option: إضافة خيار
     new_option: خيار جديد
     style_option: تنسيق هذه الإجابة
+    contact_name: "الاسم"
+    contact_company: "الشركة"
+    contact_industry: "القطاع"
+    contact_email: "البريد الإلكتروني"
+    contact_note: "تُرسل بياناتك إلى منشئ هذا الاستطلاع ليتمكن من التواصل معك."
+    contact_email_invalid: "هذا لا يبدو كعنوان بريد إلكتروني — يرجى التحقق منه."
     add_statement: إضافة عبارة
     swipe_no: "لا"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ ar:
       select_many_grid: "اختر كل ما ينطبق"
       tap_card: "اسحب للإجابة"
       open_ended: "اكتب إجابتك"
+      contact_form: "شارك بياناتك"
       scenario: "اقرأ ثم اختر"
   auth:
     social_continue: "المتابعة عبر %{provider}"
@@ -165,6 +172,7 @@ ar:
     tap_card: ["العبارة 1", "العبارة 2", "العبارة 3", "العبارة 4", "العبارة 5"]
     scenario: ["الخيار أ", "الخيار ب"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

@@ -31,6 +31,12 @@ fr:
     add_option: Ajouter une option
     new_option: Nouvelle option
     style_option: Styliser cette réponse
+    contact_name: "Nom"
+    contact_company: "Entreprise"
+    contact_industry: "Secteur"
+    contact_email: "E-mail"
+    contact_note: "Vos coordonnées sont transmises au créateur de ce Verto afin qu'il puisse vous recontacter."
+    contact_email_invalid: "Cela ne ressemble pas à une adresse e-mail — merci de vérifier."
     add_statement: Ajouter une affirmation
     swipe_no: "Non"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ fr:
       select_many_grid: "Sélectionnez toutes les réponses qui s'appliquent"
       tap_card: "Glissez pour répondre"
       open_ended: "Saisissez votre réponse"
+      contact_form: "Partagez vos coordonnées"
       scenario: "Lisez, puis choisissez"
   auth:
     social_continue: "Continuer avec %{provider}"
@@ -165,6 +172,7 @@ fr:
     tap_card: ["Affirmation 1", "Affirmation 2", "Affirmation 3", "Affirmation 4", "Affirmation 5"]
     scenario: ["Option A", "Option B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

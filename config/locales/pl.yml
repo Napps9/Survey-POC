@@ -31,6 +31,12 @@ pl:
     add_option: Dodaj opcję
     new_option: Nowa opcja
     style_option: Stylizuj tę odpowiedź
+    contact_name: "Imię i nazwisko"
+    contact_company: "Firma"
+    contact_industry: "Branża"
+    contact_email: "E-mail"
+    contact_note: "Twoje dane trafiają do twórcy tego Verto, aby mógł się z Tobą skontaktować."
+    contact_email_invalid: "To nie wygląda na adres e-mail — sprawdź go, proszę."
     add_statement: Dodaj stwierdzenie
     swipe_no: "Nie"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ pl:
       select_many_grid: "Zaznacz wszystkie pasujące odpowiedzi"
       tap_card: "Przeciągnij, aby odpowiedzieć"
       open_ended: "Wpisz swoją odpowiedź"
+      contact_form: "Podaj swoje dane"
       scenario: "Czytaj dalej, a potem wybierz"
   auth:
     social_continue: "Kontynuuj przez %{provider}"
@@ -165,6 +172,7 @@ pl:
     tap_card: ["Stwierdzenie 1", "Stwierdzenie 2", "Stwierdzenie 3", "Stwierdzenie 4", "Stwierdzenie 5"]
     scenario: ["Opcja A", "Opcja B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

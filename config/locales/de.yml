@@ -31,6 +31,12 @@ de:
     add_option: Option hinzufügen
     new_option: Neue Option
     style_option: Diese Antwort gestalten
+    contact_name: "Name"
+    contact_company: "Unternehmen"
+    contact_industry: "Branche"
+    contact_email: "E-Mail"
+    contact_note: "Deine Angaben gehen an die Person hinter diesem Verto, damit sie sich bei dir melden kann."
+    contact_email_invalid: "Das sieht nicht wie eine E-Mail-Adresse aus — bitte prüfen."
     add_statement: Aussage hinzufügen
     swipe_no: "Nein"
     swipe_unsure: "Unsure"
@@ -71,6 +77,7 @@ de:
       select_many_grid: "Alle zutreffenden Optionen wählen"
       tap_card: "Wischen, um zu antworten"
       open_ended: "Antwort eingeben"
+      contact_form: "Teile deine Kontaktdaten"
       scenario: "Weiterlesen, dann wählen"
   auth:
     social_continue: "Weiter mit %{provider}"
@@ -165,6 +172,7 @@ de:
     tap_card: ["Aussage 1", "Aussage 2", "Aussage 3", "Aussage 4", "Aussage 5"]
     scenario: ["Option A", "Option B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

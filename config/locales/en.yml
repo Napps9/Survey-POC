@@ -33,6 +33,12 @@ en:
     add_option: "Add option"
     new_option: "New option"
     style_option: "Style this answer"
+    contact_name: "Name"
+    contact_company: "Company"
+    contact_industry: "Industry"
+    contact_email: "Email"
+    contact_note: "Your details go to the creator of this Verto so they can follow up with you."
+    contact_email_invalid: "That doesn't look like an email address — please check it."
     add_statement: "Add statement"
     swipe_no: "No"
     swipe_unsure: "Unsure"
@@ -73,6 +79,7 @@ en:
       select_many_grid: "Choose all that apply"
       tap_card: "Swipe to respond"
       open_ended: "Type your answer"
+      contact_form: "Share your details"
       scenario: "Read on, then choose"
   auth:
     social_continue: "Continue with %{provider}"
@@ -173,6 +180,7 @@ en:
     tap_card: ["Statement 1", "Statement 2", "Statement 3", "Statement 4", "Statement 5"]
     scenario: ["Option A", "Option B"]
     open_ended: []
+    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

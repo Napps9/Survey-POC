@@ -1734,6 +1734,41 @@
   outline: none;
 }
 
+/* ── Contact card (lead capture) ─────────────────── */
+.contact-form-wrap { display: flex; flex-direction: column; gap: 10px; }
+.contact-field-row { display: flex; flex-direction: column; gap: 4px; }
+.contact-field-label {
+  font-family: "Alata", sans-serif;
+  font-size: var(--text-sm);
+  color: rgba(0, 0, 0, 0.55);
+  letter-spacing: 0.02em;
+}
+.contact-field {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  font-family: "ABeeZee", sans-serif;
+  font-size: var(--text-base);
+  color: #1C2034;
+  outline: none;
+  transition: border-color 0.12s;
+}
+.contact-field:focus { border-color: var(--brand-primary, #01EACB); }
+.contact-field:disabled { background: rgba(0, 0, 0, 0.03); cursor: default; }
+.contact-email-error {
+  font-family: "ABeeZee", sans-serif;
+  font-size: var(--text-sm);
+  color: #D80027;
+}
+.contact-note {
+  font-family: "ABeeZee", sans-serif;
+  font-size: var(--text-xs);
+  color: rgba(0, 0, 0, 0.4);
+  line-height: 1.5;
+}
+
 /* ── Activity (welcome / static) ─────────────────── */
 .activity-content { display: flex; flex-direction: column; gap: 12px; }
 .activity-tag {

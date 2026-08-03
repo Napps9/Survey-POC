@@ -24,7 +24,13 @@ A `responses` row can hold:
 | `session_token` | A random per-session UUID minted in the browser |
 | `respondent_code_digest` | HMAC of a code the respondent chose, if the creator enabled codes |
 
-No email address, name or account is attached to a response. The
+No email address, name or account is attached to a response — with one
+deliberate, creator-chosen exception: a Verto that includes a **contact card**
+(`contact_form`) stores whatever the respondent typed into its name / company /
+industry / email fields inside `answers`, like any other answer. The card tells
+respondents their details go to the Verto's creator, every field is optional,
+and these answers ride the existing respondent-data export and deletion paths
+(`/respondent-data`) like the rest of the response. The
 `respondent_code_digest` is a one-way HMAC keyed per Verto
 (`Survey#respondent_code_key`), so a code is comparable **within** one Verto and
 nowhere else, and the plaintext is never stored, logged or returned.

@@ -511,6 +511,33 @@
                     <% end %>
                   </div>
 
+                <% elsif type == "contact_form" %>
+                  <%# Lead table — the submitted contact objects, newest last.
+                      Identifying data by design; the full set is in the CSV. %>
+                  <div style="max-height:200px;overflow-y:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#111;">
+                      <thead>
+                        <tr>
+                          <% Survey::CONTACT_FIELDS.each do |field| %>
+                            <th style="text-align:start;padding:5px 9px;color:rgba(0,0,0,0.4);font-weight:normal;border-bottom:1px solid rgba(0,0,0,0.08);"><%= t("card.contact_#{field}") %></th>
+                          <% end %>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% Array(result[:entries]).first(50).each do |entry| %>
+                          <tr>
+                            <% Survey::CONTACT_FIELDS.each do |field| %>
+                              <td style="padding:5px 9px;border-bottom:1px solid rgba(0,0,0,0.04);"><%= entry[field].to_s.truncate(60) %></td>
+                            <% end %>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
+                    <% if Array(result[:entries]).size > 50 %>
+                      <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.3);padding:3px 9px;">+ <%= result[:entries].size - 50 %> more</div>
+                    <% end %>
+                  </div>
+
                 <% end %>
 
                 <% if result[:other_texts].present? %>
