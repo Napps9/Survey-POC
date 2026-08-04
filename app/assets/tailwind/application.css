@@ -3268,8 +3268,13 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 }
 .editor-grid.is-panel-open { grid-template-columns: 1fr 444px; }
 /* Collapsed: centre the full-size cards. 1120px ≈ the width cards get when
-   the panel is open, so opening reads as a slide, not a resize. */
-.editor-grid:not(.is-panel-open) .device-desktop .survey-card-wrap {
+   the panel is open, so opening reads as a slide, not a resize. All devices,
+   not just desktop — in tablet/mobile the wrap carries the chrome row while
+   the bezel sits on the split-card inside, and the chrome should hold the
+   same lane whichever device is previewed. */
+.editor-grid:not(.is-panel-open) .device-desktop .survey-card-wrap,
+.editor-grid:not(.is-panel-open) .device-tablet .survey-card-wrap,
+.editor-grid:not(.is-panel-open) .device-mobile .survey-card-wrap {
   max-width: 1120px; width: 100%; margin-inline: auto;
 }
 /* The insert row lives outside the wrap (device frames would clip it), so it
@@ -5878,21 +5883,30 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .device-toggle-btn.is-active { background: #01EACB; color: #1C2034; }
 
 /* ── Device frames: reframe the editor cards at phone / tablet width. The
-   cards remain fully editable; only their layout changes. ── */
-.device-tablet .survey-card-wrap {
-  max-width: 720px; width: 100%; margin-inline: auto;
-  border: 14px solid #0e1020; border-radius: 28px; box-shadow: 0 16px 40px rgba(0,0,0,0.4);
-  overflow: hidden; background: #0e1020; padding: 0;
-  /* same flex-shrink:0 as mobile — overflow:hidden otherwise collapses the
-     framed card to a sliver inside the flex feed column. */
+   cards remain fully editable; only their layout changes.
+
+   The bezel lives on .split-card, NOT the wrap: the wrap also carries the
+   per-card chrome row (Card N pill, why-CTA, traffic light, reorder,
+   duplicate, delete), and framing the wrap squeezed all of that inside the
+   phone. The wrap keeps its desktop width so the chrome stays outside the
+   frame, exactly where it sits in desktop preview; only the split-card
+   narrows into the bezel, centred beneath it. ── */
+.device-tablet .survey-card-wrap,
+.device-mobile .survey-card-wrap {
+  /* Flex items with clipped children can shrink to a sliver in the feed
+     column — pin each frame to its content height (was on the old framed
+     wrap for the same reason). */
   flex-shrink: 0;
 }
 /* Tablet mirrors the mobile stack — hero image on top, question below — just
    at a larger scale (wider frame, taller hero, roomier padding). The desktop
    side-by-side split would clip inside the narrower frame. */
 .device-tablet .split-card {
-  flex-direction: column; width: 100%; height: auto; min-height: 760px;
-  border-radius: 16px; margin: 0;
+  flex-direction: column; height: auto; min-height: 760px;
+  max-width: 720px; width: 100%; margin: 0 auto;
+  border: 14px solid #0e1020; border-radius: 28px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  overflow: hidden; background: #0e1020;
 }
 .device-tablet .split-left {
   width: 100%; flex: 0 0 auto; min-height: 320px; max-height: 400px;
@@ -5903,28 +5917,30 @@ body.generating-overlay-active .bottom-bar { display: none; }
   justify-content: flex-start; background: #fff;
 }
 
-.device-mobile .survey-card-wrap {
-  max-width: 400px; width: 100%; margin-inline: auto;
-  border: 8px solid #0e1020; border-radius: 34px; box-shadow: 0 16px 40px rgba(0,0,0,0.4);
-  overflow: hidden; background: #0e1020; padding: 0;
-  /* overflow:hidden gives a flex item an automatic minimum size of ZERO, so
-     the feed column was shrinking every bezel to a sliver (~36px with many
-     cards). Pin it so each phone frame keeps its content height. */
-  flex-shrink: 0;
+.device-mobile .split-card {
+  flex-direction: column; height: auto; min-height: 580px;
+  max-width: 400px; width: 100%; margin: 0 auto;
+  border: 8px solid #0e1020; border-radius: 34px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  overflow: hidden; background: #0e1020;
 }
 /* Hero strip: round the bottom like the real mobile player and keep the
    image clipped to it. */
-.device-mobile .split-left { border-radius: 0 0 18px 18px; overflow: hidden; position: relative; }
-.device-mobile .split-right { background: #fff; }
-.device-mobile .split-card {
-  flex-direction: column; width: 100%; height: auto; min-height: 580px;
-  border-radius: 26px; margin: 0;
-}
 .device-mobile .split-left {
   width: 100%; flex: 0 0 auto; min-height: 190px; max-height: 240px;
+  border-radius: 0 0 18px 18px; overflow: hidden; position: relative;
 }
 .device-mobile .split-right {
-  width: 100%; flex: 1 1 auto; padding: 24px 22px; justify-content: flex-start;
+  width: 100%; flex: 1 1 auto; padding: 24px 22px;
+  justify-content: flex-start; background: #fff;
+}
+/* Selected: the split-card's 2px transparent border IS the bezel in device
+   modes, so the desktop rule's pink border-color would paint the whole
+   14px/8px bezel. Keep the bezel dark and ring the frame instead. */
+.device-tablet .survey-card-wrap.selected .split-card,
+.device-mobile .survey-card-wrap.selected .split-card {
+  border-color: #0e1020;
+  box-shadow: 0 0 0 3px rgba(255,30,111,0.45), 0 16px 40px rgba(0,0,0,0.4);
 }
 
 /* Player: slim language switcher bar (replaces the old logo+title nav).
