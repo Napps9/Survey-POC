@@ -3017,17 +3017,26 @@
 .card-rail .rail-add-btn .rail-icon { font-size: 13px; line-height: 1; }
 
 /* Collapsed: the open right panel narrows the feed, so the rail gives the
-   words up and keeps the icons — same one-size column, just narrow.
-   Tooltips/aria-labels carry the names. */
-.editor-grid.is-panel-open .card-rail { min-width: 0; }
+   words up and each control becomes a CIRCLE, centred in the column — only
+   the Card N pill keeps its shape (it's text). Reorder stacks vertically so
+   the column stays one circle wide. Tooltips/aria-labels carry the names. */
+.editor-grid.is-panel-open .card-rail { min-width: 0; align-items: center; }
+.editor-grid.is-panel-open .rail-top,
+.editor-grid.is-panel-open .rail-bottom { align-items: center; }
 .editor-grid.is-panel-open .card-rail .rail-label,
 .editor-grid.is-panel-open .card-rail .card-light-word,
 .editor-grid.is-panel-open .card-rail .card-light-score { display: none; }
-.editor-grid.is-panel-open .card-rail .why-cta { padding: 0 8px; }
-.editor-grid.is-panel-open .card-rail .card-light { padding: 5px 6px; }
-.editor-grid.is-panel-open .card-rail .card-duplicate-btn { padding: 6px 8px; }
-.editor-grid.is-panel-open .card-rail .card-delete-btn { padding: 6px 9px; }
-.editor-grid.is-panel-open .card-rail .rail-add-btn { padding: 6px 9px; }
+.editor-grid.is-panel-open .card-rail .why-cta,
+.editor-grid.is-panel-open .card-rail .card-light,
+.editor-grid.is-panel-open .card-rail .card-move-btn,
+.editor-grid.is-panel-open .card-rail .card-duplicate-btn,
+.editor-grid.is-panel-open .card-rail .card-delete-btn,
+.editor-grid.is-panel-open .card-rail .rail-add-btn,
+.editor-grid.is-panel-open .card-rail .required-chip {
+  width: 30px; height: 30px; min-height: 30px; padding: 0;
+  border-radius: 50%; justify-content: center; flex: 0 0 auto;
+}
+.editor-grid.is-panel-open .card-rail .card-reorder { flex-direction: column; }
 
 /* Compact survey card */
 .s-card {
