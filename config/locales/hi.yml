@@ -900,7 +900,7 @@ hi:
     all_types: सभी प्रश्न प्रकार
     ranked_for: उपयुक्तता अनुसार क्रमित
     this_card: यह कार्ड
-    why: "Why"
+    why: "क्यों"
     why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
     why_empty: "Select a question card to see why it's worth asking."
     why_competency_label: "Competency"

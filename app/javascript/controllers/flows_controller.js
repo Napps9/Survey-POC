@@ -634,11 +634,11 @@ export default class extends Controller {
     tmp.innerHTML = (html || "").trim()
     const card = tmp.firstElementChild
     if (!card) return null
+    // The server-rendered wrap carries its own CTA rail (Add question
+    // included), so the slot needs nothing besides the card.
     const slot = document.createElement("div")
     slot.className = "card-slot"
     slot.appendChild(card)
-    const insertRow = feed.querySelector(".aq-insert-row")
-    if (insertRow) slot.appendChild(insertRow.cloneNode(true))
     if (afterSlot && afterSlot.parentNode === feed) afterSlot.after(slot)
     else feed.appendChild(slot)
     if (flowId) card.dataset.cardFlowId = flowId

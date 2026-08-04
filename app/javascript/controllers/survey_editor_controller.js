@@ -209,11 +209,11 @@ export default class extends Controller {
     const card = tmp.firstElementChild
     if (!card) return null
 
+    // The server-rendered wrap carries its own CTA rail (Add question
+    // included), so the slot needs nothing besides the card.
     const slot = document.createElement("div")
     slot.className = "card-slot"
     slot.appendChild(card)
-    const insertRow = feed.querySelector(".aq-insert-row")
-    if (insertRow) slot.appendChild(insertRow.cloneNode(true))
 
     // Appended rather than put back at its old index: the deck has moved on
     // since, and guessing a position it no longer has would be worse than a

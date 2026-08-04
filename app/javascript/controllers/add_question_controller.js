@@ -460,9 +460,9 @@ export default class extends Controller {
     const feed = this.cardsFeedTarget
     if (!feed) return
 
-    // The server returns a bare .survey-card-wrap. Wrap it in a slot carrying
-    // its own "Add question" CTA (cloned from an existing one) so the new card
-    // behaves like every other — reorderable and insert-after-able.
+    // The server returns a bare .survey-card-wrap — rail included, so the new
+    // card arrives with its own Add-question CTA and behaves like every
+    // other: reorderable and insert-after-able. Wrap it in a slot.
     const tmp = document.createElement("div")
     tmp.innerHTML = (html || "").trim()
     const card = tmp.firstElementChild
@@ -471,8 +471,6 @@ export default class extends Controller {
     const slot = document.createElement("div")
     slot.className = "card-slot"
     slot.appendChild(card)
-    const insertRow = feed.querySelector(".aq-insert-row")
-    if (insertRow) slot.appendChild(insertRow.cloneNode(true))
 
     // Insert after the card whose CTA was clicked, else append to the end.
     const anchor = this._insertAfterSlot

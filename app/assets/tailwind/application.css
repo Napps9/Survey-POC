@@ -1322,13 +1322,10 @@
   text-align: left;
 }
 .flow-legacy-chip:hover { border-color: #01EACB; color: #01EACB; }
-/* Bottom-right, mirroring the Delete CTA on the chrome row above the card
-   (same 4px inset), so the centre column stays clear of the floating pills. */
-.aq-insert-row { display: flex; justify-content: flex-end; padding: 0 4px; }
-/* One sits under every card. Solid teal so it's always easy to spot as the
-   primary "add another question" action. Sized to match .card-delete-btn
-   exactly (padding/type/radius/border) — the two mirror each other across
-   the card, so they should read as the same family of control. */
+/* Solid teal so it's always easy to spot as the primary "add another
+   question" action — worn by the rail's Add-question CTA and the gate-card
+   add-CTAs. Sized to match .card-delete-btn (padding/type/radius/border) —
+   the two read as the same family of control. */
 .aq-insert-btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 6px 14px; border-radius: 100px;
@@ -1516,10 +1513,10 @@
 /* Insert/reorder chrome is editing-only: hide it on translation tabs (structural
    edits are locked to the primary language) and inside the device-preview
    frames, matching how the add-question CTA already behaves. */
-.editing-translation .aq-insert-row,
+.editing-translation .rail-add-btn,
 .editing-translation .card-reorder { display: none !important; }
-.device-tablet .aq-insert-row,
-.device-mobile .aq-insert-row { display: none; }
+.device-tablet .rail-add-btn,
+.device-mobile .rail-add-btn { display: none; }
 
 .q-eyebrow {
   font-family: "Alata", sans-serif;
@@ -2955,6 +2952,53 @@
   box-shadow: 0 0 0 3px rgba(255,30,111,0.2), 0 16px 40px rgba(0,0,0,0.25);
 }
 
+/* ── Per-card CTA rail ── all card controls stacked on the card's
+   inline-start side (flips with RTL): Card N, Why, traffic light,
+   reorder + duplicate, delete, Add question. Two states, keyed off the
+   right panel: expanded (icon + label) while it's closed, icons only
+   (.rail-label hidden) while it's open — the icons are present in both,
+   so collapsing only removes the words. */
+.editor-feed .survey-card-wrap { display: flex; align-items: flex-start; gap: 14px; }
+.card-col { flex: 1 1 auto; min-width: 0; }
+.card-rail {
+  display: flex; flex-direction: column; align-items: stretch; gap: 6px;
+  flex-shrink: 0; min-width: 128px;
+  /* Cards are taller than the viewport centre-snap shows at once; keep the
+     rail's controls in reach while the card scrolls past. Top clears the
+     floating editor chrome (top bar sits at 12px, ~40px tall). */
+  position: sticky; top: 60px;
+  z-index: 2;
+}
+.card-rail .card-num-pill { justify-content: center; }
+.card-rail .required-chip { justify-content: center; }
+/* The Why ? — same purple identity, reshaped from the old 26px circle into
+   a rail pill; collapsing back to the circle when the labels go. */
+.card-rail .why-cta {
+  width: auto; height: auto; border-radius: 100px;
+  padding: 5px 12px; gap: 7px; justify-content: center;
+  font-size: 12px; font-family: "ABeeZee", sans-serif;
+}
+.card-rail .why-cta .rail-icon { font-family: "Alata", sans-serif; font-size: 13px; }
+.card-rail .card-light { justify-content: center; }
+.card-rail .rail-row { display: flex; gap: 6px; justify-content: center; align-items: center; }
+.card-rail .card-delete-btn,
+.card-rail .rail-add-btn { justify-content: center; }
+.card-rail .rail-add-btn .rail-icon { font-size: 13px; line-height: 1; }
+
+/* Collapsed: the open right panel narrows the feed, so the rail gives the
+   words up and keeps the icons. Tooltips/aria-labels carry the names. */
+.editor-grid.is-panel-open .card-rail { min-width: 0; align-items: center; }
+.editor-grid.is-panel-open .card-rail .rail-label,
+.editor-grid.is-panel-open .card-rail .card-light-word,
+.editor-grid.is-panel-open .card-rail .card-light-score { display: none; }
+.editor-grid.is-panel-open .card-rail .why-cta {
+  width: 26px; height: 26px; padding: 0;
+}
+.editor-grid.is-panel-open .card-rail .card-light { padding: 5px 6px; }
+.editor-grid.is-panel-open .card-rail .rail-row { flex-direction: column; }
+.editor-grid.is-panel-open .card-rail .card-delete-btn { padding: 6px 9px; }
+.editor-grid.is-panel-open .card-rail .rail-add-btn { padding: 6px 9px; }
+
 /* Compact survey card */
 .s-card {
   border-radius: 14px; overflow: hidden;
@@ -3277,13 +3321,6 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 .editor-grid:not(.is-panel-open) .device-mobile .survey-card-wrap {
   max-width: 1120px; width: 100%; margin-inline: auto;
 }
-/* The insert row lives outside the wrap (device frames would clip it), so it
-   needs the same width cap for its right edge to keep lining up with the
-   wrap's chrome row — i.e. the Add question CTA stays under Delete. */
-.editor-grid:not(.is-panel-open) .device-desktop .aq-insert-row {
-  max-width: 1120px; width: 100%; margin-inline: auto;
-}
-
 /* Scroll snap — while scrolling the feed, each card (and gate card) clicks
    into the centre of the view so the one being edited is always fully in
    sight. Mandatory so there's no dead zone between cards; snap areas taller

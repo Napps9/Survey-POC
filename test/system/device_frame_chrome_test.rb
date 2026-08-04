@@ -42,18 +42,15 @@ class DeviceFrameChromeTest < ApplicationSystemTestCase
                 p = pill.getBoundingClientRect(), d = del.getBoundingClientRect()
           return {
             frameNarrowerThanWrap: f.width < w.width - 100,
-            chromeAboveFrame: p.bottom <= f.top && d.bottom <= f.top,
-            chromeSpansPastFrame: p.left < f.left - 20 && d.right > f.right + 20
+            chromeBesideFrame: p.right <= f.left && d.right <= f.left
           }
         })()
       JS
 
       assert geometry["frameNarrowerThanWrap"],
              "the bezel is as wide as the wrap — the frame is back on the wrap itself"
-      assert geometry["chromeAboveFrame"],
-             "the chrome row must sit fully above the device frame"
-      assert geometry["chromeSpansPastFrame"],
-             "the chrome must span the desktop lane, pill left and delete right of the bezel"
+      assert geometry["chromeBesideFrame"],
+             "the CTA rail must sit fully outside the device frame, on its inline-start side"
     end
   end
 end

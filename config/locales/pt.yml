@@ -900,7 +900,7 @@ pt:
     all_types: Todos os tipos de pergunta
     ranked_for: Ordenado por adequação para
     this_card: este cartão
-    why: "Why"
+    why: "Por quê"
     why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
     why_empty: "Select a question card to see why it's worth asking."
     why_competency_label: "Competency"

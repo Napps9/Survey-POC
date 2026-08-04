@@ -1,23 +1,10 @@
-<%# A card plus the "Add question" CTA that sits underneath it, bottom-right —
-    mirroring the Delete CTA on the chrome row above the card. The slot is the
-    unit the feed reorders/inserts, while the inner .survey-card-wrap stays the
-    framed, selectable card. Keeping the insert CTA outside the wrap means it
-    isn't clipped by the phone/tablet device frames (which clip the wrap). %>
-<%
-  live = @survey&.editing_locked?
-%>
+<%# A card in its slot — the unit the feed reorders/inserts, while the inner
+    .survey-card-wrap carries the CTA rail + the framed, selectable card.
+    The "Add question" CTA lives in the rail now (add_question#open resolves
+    its insertion point via closest(.card-slot), so the slot is still the
+    anchor a new card is spliced in after). %>
 <div class="card-slot">
   <%= render "surveys/card_row", card: card, idx: idx, q_idx: q_idx, total_q: total_q,
         default_locale: default_locale, quiz: local_assigns.fetch(:quiz, false),
         tokenisation: local_assigns.fetch(:tokenisation, false) %>
-
-  <% unless live %>
-    <div class="aq-insert-row">
-      <button type="button" class="aq-trigger-btn aq-insert-btn"
-              title="<%= t('editor.add_question_here', default: 'Add a question after this one') %>"
-              data-action="click->add-question#open">
-        ＋ <%= t("editor.add_question") %>
-      </button>
-    </div>
-  <% end %>
 </div>

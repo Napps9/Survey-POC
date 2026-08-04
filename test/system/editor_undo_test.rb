@@ -76,7 +76,11 @@ class EditorUndoTest < ApplicationSystemTestCase
   end
 
   def delete_card(cid)
-    find("[data-card-cid='#{cid}']").click
+    # Select via the card's number pill — it has no handler of its own, so the
+    # click bubbles to type-panel#selectCard. A click at the wrap's centre can
+    # land on the media "Add design" prompt and open the media modal instead,
+    # whose backdrop then swallows the delete click.
+    find("[data-card-cid='#{cid}'] .card-num-pill").click
     # The delete button asks for confirmation on the first press and acts on the
     # second — same two-step the creator gets.
     btn = find("[data-card-cid='#{cid}'] .card-delete-btn")

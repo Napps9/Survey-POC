@@ -44,48 +44,49 @@
      data-card-condition="<%= card['condition'].to_s %>"
      data-action="click->type-panel#selectCard">
 
-  <%# Chrome row above card — the "Card N" pill (with the round "Why" ? CTA
-      beneath it), the Rules-of-the-Game traffic light, and delete. The card's
-      TYPE badge is gone from the chrome — the Answer Type panel header names
-      it — so the number is the card's one label here. The light + analysis
-      panel are filled in and toggled by survey_editor_controller. %>
-  <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;padding:0 4px;">
-    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;flex-shrink:0;">
-      <span class="card-num-pill" data-role="card-number">Card <%= idx + 1 %></span>
-      <%# Opens the Why view for this card — the click also bubbles to
-          type-panel#selectCard, which populates it (same behaviour the old
-          Why tab had after selecting a card). %>
-      <button type="button" class="why-cta"
-              title="<%= t('editor.why', default: 'Why') %>"
-              aria-label="<%= t('editor.why', default: 'Why') %>"
-              data-action="click->publish-panel#showWhy">?</button>
-    </div>
+  <%# CTA rail — every per-card control stacked on the card's inline-start
+      side: Card N pill, the "Why" ?, the Rules-of-the-Game traffic light,
+      reorder + duplicate, delete, and Add question. Expanded (icon + label)
+      while the right panel is closed; when it opens, .is-panel-open hides
+      every .rail-label so the rail collapses to icons — each control keeps
+      its icon in both states. The light + analysis panel are filled in and
+      toggled by survey_editor_controller. %>
+  <div class="card-rail">
+    <span class="card-num-pill" data-role="card-number">Card <%= idx + 1 %></span>
     <% if is_q %>
       <%# Passive glance indicator — visible only while the card is Required
           (toggled live from the Answer Type tab's Card settings). %>
-      <span class="required-chip" data-role="required-chip" <%= "hidden" unless card["required"] %>>✳ <%= t("editor.required_chip", default: "Required") %></span>
+      <span class="required-chip" data-role="required-chip" <%= "hidden" unless card["required"] %>>✳ <span class="rail-label"><%= t("editor.required_chip", default: "Required") %></span></span>
     <% end %>
+    <%# Opens the Why view for this card — the click also bubbles to
+        type-panel#selectCard, which populates it (same behaviour the old
+        Why tab had after selecting a card). %>
+    <button type="button" class="why-cta"
+            title="<%= t('editor.why', default: 'Why') %>"
+            aria-label="<%= t('editor.why', default: 'Why') %>"
+            data-action="click->publish-panel#showWhy"><span class="rail-icon">?</span><span class="rail-label"><%= t('editor.why', default: 'Why') %></span></button>
+    <% if is_q %>
+      <button type="button" class="card-light" data-role="card-light" hidden
+              aria-expanded="false"
+              title="<%= t('editor.rules.card_aria', default: 'How this card scores against the Rules of the Game') %>"
+              data-action="click->survey-editor#toggleCardAnalysis">
+        <span class="rule-dot"></span>
+        <span class="card-light-word" data-role="card-light-word"></span>
+        <span class="card-light-score" data-role="card-light-score"></span>
+      </button>
+    <% end %>
+
     <%# The welcome card takes part in reorder and delete like any other card
         (it has no traffic light — that's gated on is_q — and can't be
         duplicated, since at most one welcome card is allowed: verto_rules §1.3).
         It used to be excluded from all four, which is why a welcome card the
         creator no longer wanted couldn't be removed. %>
-      <% if is_q %>
-        <button type="button" class="card-light" data-role="card-light" hidden
-                aria-expanded="false"
-                title="<%= t('editor.rules.card_aria', default: 'How this card scores against the Rules of the Game') %>"
-                data-action="click->survey-editor#toggleCardAnalysis">
-          <span class="rule-dot"></span>
-          <span class="card-light-word" data-role="card-light-word"></span>
-          <span class="card-light-score" data-role="card-light-score"></span>
-        </button>
-      <% end %>
-
-      <%# Reorder controls — move this question up/down in the deck. The move
-          swaps the card with its neighbour in the DOM; autosave persists the
-          new order (the serialiser reads cards in document order). %>
-      <% unless live %>
-        <div class="card-reorder" style="margin-left:auto;">
+    <% unless live %>
+      <div class="rail-row">
+        <%# Reorder — the move swaps the card's slot with its neighbour in the
+            DOM; autosave persists the new order (the serialiser reads cards
+            in document order). %>
+        <div class="card-reorder">
           <button type="button" class="card-move-btn" data-role="move-up"
                   title="<%= t('editor.move_up', default: 'Move question up') %>"
                   aria-label="<%= t('editor.move_up', default: 'Move question up') %>"
@@ -95,45 +96,58 @@
                   aria-label="<%= t('editor.move_down', default: 'Move question down') %>"
                   data-action="click->survey-editor#moveCardDown">▼</button>
         </div>
-      <% end %>
+        <% unless type == "welcome_card" %>
+          <%# Duplicate — same content, fresh identity; wiring and Common
+              Question provenance stay with the original (flows_controller
+              strips them before render_card mints the copy). %>
+          <button type="button" class="card-duplicate-btn"
+                  title="<%= t('editor.duplicate_card_title', default: 'Duplicate this card') %>"
+                  aria-label="<%= t('editor.duplicate_card_title', default: 'Duplicate this card') %>"
+                  data-action="click->flows#duplicateCardClicked">⧉</button>
+        <% end %>
+      </div>
+    <% end %>
 
-      <% unless live || type == "welcome_card" %>
-        <%# Duplicate — same content, fresh identity; wiring and Common
-            Question provenance stay with the original (flows_controller
-            strips them before render_card mints the copy). %>
-        <button type="button" class="card-duplicate-btn"
-                title="<%= t('editor.duplicate_card_title', default: 'Duplicate this card') %>"
-                aria-label="<%= t('editor.duplicate_card_title', default: 'Duplicate this card') %>"
-                data-action="click->flows#duplicateCardClicked">⧉</button>
-      <% end %>
-      <%# Names its target. Three visually identical delete buttons sit in this
-          editor (this one, plus Remove on the consent gate and the thank-you
-          screen), so the accessible name has to say WHICH — the visible label
-          stays short because the "Card N" pill is on the same row. %>
-      <% delete_name = t("editor.delete_card_n", n: idx + 1, default: "Delete card %{n}") %>
-      <button type="button" class="card-delete-btn" style="<%= 'margin-left:auto;' if live %>"
-              title="<%= delete_name %>"
-              aria-label="<%= delete_name %>"
-              data-action="click->type-panel#deleteCard">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
-          <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a1 1 0 01-1 1H7a1 1 0 01-1-1V6h12z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span><%= t("editor.delete_card", default: "Delete card") %></span>
-      </button>
-  </div>
+    <%# Names its target. Three visually identical delete buttons sit in this
+        editor (this one, plus Remove on the consent gate and the thank-you
+        screen), so the accessible name has to say WHICH — the visible label
+        stays short because the "Card N" pill is in the same rail. %>
+    <% delete_name = t("editor.delete_card_n", n: idx + 1, default: "Delete card %{n}") %>
+    <button type="button" class="card-delete-btn"
+            title="<%= delete_name %>"
+            aria-label="<%= delete_name %>"
+            data-action="click->type-panel#deleteCard">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="flex-shrink:0;">
+        <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a1 1 0 01-1 1H7a1 1 0 01-1-1V6h12z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="rail-label"><%= t("editor.delete_card", default: "Delete card") %></span>
+    </button>
 
-  <%# Rules-of-the-Game analysis for this card — populated + toggled by
-      survey_editor_controller when the traffic light is clicked. %>
-  <% if is_q %>
-    <div class="card-analysis" data-role="card-analysis" hidden></div>
-  <% end %>
+    <%# Insert a question after this card — was a row under the card
+        (.aq-insert-row); add_question#open still finds its insertion point
+        via closest(.card-slot). Hidden on live Vertos like reorder. %>
+    <% unless live %>
+      <button type="button" class="aq-trigger-btn rail-add-btn"
+              title="<%= t('editor.add_question_here', default: 'Add a question after this one') %>"
+              aria-label="<%= t('editor.add_question_here', default: 'Add a question after this one') %>"
+              data-action="click->add-question#open"><span class="rail-icon">＋</span><span class="rail-label"><%= t("editor.add_question") %></span></button>
+    <% end %>
+  </div><%# /card-rail %>
 
-  <%# Horizontal split-card %>
-  <div class="split-card">
-    <%= render "shared/split_left",     card: card, progress: progress, mode: :editor %>
-    <%= render "shared/card_component", card: card, mode: :editor, default_locale: default_locale,
-          quiz: local_assigns.fetch(:quiz, false), tokenisation: local_assigns.fetch(:tokenisation, false) %>
-  </div><%# /split-card %>
+  <div class="card-col">
+    <%# Rules-of-the-Game analysis for this card — populated + toggled by
+        survey_editor_controller when the traffic light is clicked. %>
+    <% if is_q %>
+      <div class="card-analysis" data-role="card-analysis" hidden></div>
+    <% end %>
+
+    <%# Horizontal split-card %>
+    <div class="split-card">
+      <%= render "shared/split_left",     card: card, progress: progress, mode: :editor %>
+      <%= render "shared/card_component", card: card, mode: :editor, default_locale: default_locale,
+            quiz: local_assigns.fetch(:quiz, false), tokenisation: local_assigns.fetch(:tokenisation, false) %>
+    </div><%# /split-card %>
+  </div><%# /card-col %>
 
   <%# Allow-Other / Required moved to the Answer Type tab's Card settings —
       their state lives on the wrap's data attributes (the serializer reads

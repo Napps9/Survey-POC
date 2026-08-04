@@ -26,7 +26,9 @@ class EditorReorderInsertTest < ActionDispatch::IntegrationTest
     assert_response :success
     cards = Array(@survey.cards).size
     assert_equal cards, response.body.scan('class="card-slot"').size, "one slot per card"
-    assert_equal cards, response.body.scan('class="aq-insert-row"').size, "one insert CTA per card"
+    # The CTA lives in each card's rail; add_question#open resolves its
+    # insertion point via closest(.card-slot), so per-card is what matters.
+    assert_select ".card-rail .rail-add-btn[data-action*='add-question#open']", cards
   end
 
   # The welcome card used to be excluded from reorder AND delete, which is why a
@@ -130,7 +132,7 @@ class EditorReorderInsertTest < ActionDispatch::IntegrationTest
     @survey.update!(publish_token: SecureRandom.hex(8), published_at: Time.current)
     get survey_path(@survey)
     assert_response :success
-    refute_match "aq-insert-row", response.body
+    refute_match "rail-add-btn", response.body
     refute_match "survey-editor#moveCardUp", response.body
   end
 end

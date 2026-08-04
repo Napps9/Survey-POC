@@ -902,7 +902,7 @@ pl:
     all_types: Wszystkie typy pytań
     ranked_for: Uszeregowane według dopasowania do
     this_card: tej karty
-    why: "Why"
+    why: "Dlaczego"
     why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
     why_empty: "Select a question card to see why it's worth asking."
     why_competency_label: "Competency"

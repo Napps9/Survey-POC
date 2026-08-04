@@ -900,7 +900,7 @@ ar:
     all_types: جميع أنواع الأسئلة
     ranked_for: مرتبة حسب الملاءمة لـ
     this_card: هذه البطاقة
-    why: "Why"
+    why: "لماذا"
     why_intro: "How this question maps to Awareness → Intention → Agency, and the insight its answers give you."
     why_empty: "Select a question card to see why it's worth asking."
     why_competency_label: "Competency"
