@@ -3446,6 +3446,19 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
   background: #2A2D3A;
   display: flex; flex-direction: column; overflow: hidden;
 }
+/* Quiz / Tokenisation papers: every other view has a designated scroll region
+   (.type-list, .why-body, .publish-panel-body), but these two keep their whole
+   Verto-wide setup in the shrink-proof .type-panel-top — so once the setup
+   outgrew the viewport, the panel just clipped and the per-card block below
+   was unreachable. Here the paper itself is the scroll region; the blocks
+   after the header must not shrink, or flexbox squashes them to nothing
+   instead of letting the paper scroll. */
+.type-panel.panel--quiz, .type-panel.panel--tokens {
+  overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent;
+}
+.panel--quiz .type-panel-empty, .panel--tokens .type-panel-empty,
+.panel--quiz .card-subview, .panel--tokens .card-subview { flex-shrink: 0; }
 .type-panel-top {
   flex-shrink: 0; padding: 16px 16px 12px;
   border-bottom: 1px solid rgba(255,255,255,0.07);
