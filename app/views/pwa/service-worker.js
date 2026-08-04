@@ -5,7 +5,7 @@
 // may go offline mid-Verto, not for a creator editing artwork.
 //
 // Strategies:
-//   • /play/:token        → stale-while-revalidate (card JSON is inlined in HTML)
+//   • /play/:token        → network-first (short timeout) → cache fallback (offline)
 //   • /assets/*           → cache-first (fingerprinted; safe to keep)
 //   • Card images         → cache-on-fetch, no-cors fallback for cross-origin
 //   • POST /play/:token/submit → network-first; on failure, queue in IndexedDB
@@ -14,10 +14,12 @@
 // Drain queue on Background Sync where supported; opportunistically on any
 // fetch event and on explicit page messages elsewhere (iOS Safari fallback).
 
-// Bump on any player JS/CSS/HTML behaviour change so existing respondents
-// don't keep getting the stale-while-revalidate copy. The activate handler
-// below deletes every cache that doesn't start with the current version.
-const CACHE_VERSION = "playverto-v35"
+// Bump when the WORKER'S OWN behaviour changes (strategies, queue logic,
+// cache layout) — the activate handler below deletes every cache that doesn't
+// start with the current version. Content/markup/CSS fixes no longer need a
+// bump: the player HTML is network-first, so a fresh copy (referencing fresh
+// asset digests) is fetched on every online visit.
+const CACHE_VERSION = "playverto-v36"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
@@ -68,9 +70,11 @@ self.addEventListener("fetch", (event) => {
   // Opportunistic queue drain on any same-origin GET (iOS fallback).
   if (url.origin === self.location.origin) event.waitUntil(drainQueue())
 
-  // Player HTML — SWR so it works offline after one visit.
+  // Player HTML — network-first so edits and unpublishes are seen on the next
+  // ordinary visit; the cache only answers when the network can't, which keeps
+  // the offline-after-one-visit behaviour.
   if (/^\/play\/[^/]+$/.test(url.pathname)) {
-    event.respondWith(staleWhileRevalidate(req, PAGE_CACHE))
+    event.respondWith(networkFirstWithTimeout(event, req, PAGE_CACHE))
     return
   }
 
@@ -117,14 +121,57 @@ async function cacheFirst(req, cacheName) {
   }
 }
 
-async function staleWhileRevalidate(req, cacheName) {
+// How long the network gets before a cached copy answers a /play/:token
+// navigation. Long enough for one HTML round trip on a slow mobile connection
+// (the whole deck is inlined — there is no second query); short enough that a
+// respondent who has a cached copy isn't left staring at a blank tab when the
+// network is effectively dead.
+const PAGE_NETWORK_TIMEOUT_MS = 3500
+
+// Network-first for the player HTML. Stale-while-revalidate here was why
+// edits "didn't take": the cache answered every visit, and the background
+// revalidation — never held open with waitUntil — was routinely killed before
+// its cache.put landed, so a returning respondent could keep a stale Verto
+// forever (hard refresh, which bypasses the worker, was the only way out).
+//
+// A response that ARRIVED is the answer, whatever its status — a 410 for an
+// unpublished Verto must reach the respondent, not be papered over with the
+// cached copy (same principle as handleSubmit below). Only a clean 200 is
+// worth keeping for offline; a redirected response is not, because Chrome
+// refuses to satisfy a navigation from a cached redirect.
+async function networkFirstWithTimeout(event, req, cacheName) {
   const cache = await caches.open(cacheName)
-  const cached = await cache.match(req)
+
   const network = fetch(req).then(res => {
-    if (res && res.ok) cache.put(req, res.clone())
+    // Clone before the page consumes the body; waitUntil keeps the worker
+    // alive until the put lands even after we've answered — the exact hazard
+    // imageCache documents for its own revalidate.
+    if (res && res.ok && !res.redirected) event.waitUntil(cache.put(req, res.clone()))
     return res
-  }).catch(() => null)
-  return cached || (await network) || Response.error()
+  })
+
+  const TIMED_OUT = {}
+  const winner = await Promise.race([
+    network.catch(() => null), // null = network failed outright
+    new Promise(resolve => setTimeout(resolve, PAGE_NETWORK_TIMEOUT_MS, TIMED_OUT))
+  ])
+  if (winner !== TIMED_OUT && winner !== null) return winner
+
+  const cached = await cache.match(req)
+  if (cached) {
+    // Timed out but still in flight: let it finish in the background so a
+    // slow 200 still refreshes the cache for next time.
+    if (winner === TIMED_OUT) event.waitUntil(network.catch(() => {}))
+    return cached
+  }
+
+  // Nothing cached to fall back on: give the network its full time — a
+  // first-ever visit on a slow connection should load slowly, not fail fast.
+  try {
+    return await network
+  } catch (_) {
+    return Response.error()
+  }
 }
 
 async function networkFirst(req, cacheName) {

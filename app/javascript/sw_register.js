@@ -1,8 +1,9 @@
 // Register the Playverto service worker for the RESPONDENT PLAYER ONLY.
 //
-// The worker exists to make /play/:token usable offline, so it caches the
-// player HTML, its assets and its card imagery hard. That is right for a
-// respondent on a phone and wrong for a creator in the studio: registered at
+// The worker exists to make /play/:token usable offline: player HTML is
+// network-first with a cached fallback, assets and card imagery are cached
+// hard. That is right for a respondent on a phone and wrong for a creator in
+// the studio: registered at
 // root scope it also controlled /surveys/* and /dashboard, where its
 // cache-first image strategy pinned whatever it saw first — a swapped photo,
 // or a picture whose very first fetch failed, then stayed that way until the
@@ -28,6 +29,27 @@ if ("serviceWorker" in navigator) {
 
   window.addEventListener("online", drain)
   window.addEventListener("pageshow", drain)
+
+  // When a new worker takes control of an ALREADY-controlled page
+  // (skipWaiting + clients.claim in the worker), what's on screen was
+  // produced by the old worker — possibly a stale cached copy. Reload once so
+  // the new worker's output reaches the respondent this visit, not next.
+  //
+  //  - hadController: on a first-ever visit clients.claim() also fires
+  //    controllerchange, but that page came straight from the network —
+  //    reloading would flash the page for every brand-new respondent.
+  //  - reloaded: controllerchange can fire again (another update mid-visit);
+  //    one reload is corrective, a second is a loop.
+  //  - playvertoEngaged: never yank the page from someone who has started —
+  //    answers live only in page memory until submit (player_controller.js
+  //    sets this on the first gesture inside the player).
+  const hadController = !!navigator.serviceWorker.controller
+  let reloaded = false
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController || reloaded || window.playvertoEngaged) return
+    reloaded = true
+    window.location.reload()
+  })
 }
 
 async function setUpServiceWorker() {

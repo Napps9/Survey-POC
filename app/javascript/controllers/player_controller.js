@@ -105,6 +105,16 @@ export default class extends Controller {
   _tokenTotals = {}
 
   connect() {
+    // The one signal sw_register.js reads before its corrective reload on
+    // controllerchange: any gesture inside the player means a reload could
+    // destroy respondent state (answers, the respondent code and a consent
+    // decline all live only in memory/DOM until a save), so it must stand
+    // down. Capture-phase so it fires whichever nested handler takes the
+    // tap; `once` so it costs a single call.
+    for (const type of ["pointerdown", "keydown"]) {
+      this.element.addEventListener(type, () => { window.playvertoEngaged = true },
+        { capture: true, once: true, passive: true })
+    }
     this._sessionToken = this._ensureToken()
     this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
     this._finishLabel = this.hasFinishBtnTarget ? this.finishBtnTarget.textContent : ""

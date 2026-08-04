@@ -62,8 +62,9 @@ markup is always minted server-side via `POST /surveys/:id/render_card`. There
 is no render-from-JSON path, which constrains anything that wants to
 reconstruct a card client-side.
 
-**Playing.** `/play/:token` is a PWA served through a Service Worker with
-stale-while-revalidate. Answers are keyed by **card index**, which is why a deck
+**Playing.** `/play/:token` is a PWA served through a Service Worker —
+network-first with an offline cache fallback for the player HTML. Answers are
+keyed by **card index**, which is why a deck
 freezes once responses exist — see `Survey#editing_locked?`.
 
 **Analysing.** Live results over Action Cable, streamed AI summaries and chat, a
@@ -73,8 +74,8 @@ programme.
 
 ## Working in this repo
 
-Read `CLAUDE.md` first — it carries the working agreements, including the
-`CACHE_VERSION` rule that has already broken one real deploy.
+Read `CLAUDE.md` first — it carries the working agreements, including when a
+`CACHE_VERSION` bump is (and is no longer) required.
 
 The four gates, all of which must pass before pushing to `Main`:
 
@@ -92,9 +93,11 @@ A few things that surprise people:
 - **Locale strings live in 19 files** under `config/locales/`, all mirroring
   `en.yml`. A string the browser needs must go under the `js:` namespace, or it
   renders to respondents as a raw key.
-- **Any change to a player-rendering file needs a `CACHE_VERSION` bump**
-  (`app/views/pwa/service-worker.js`). Without it, respondents who already
-  loaded a Verto keep their cached copy and never see the fix.
+- **A `CACHE_VERSION` bump is needed only for service-worker behaviour
+  changes** (`app/views/pwa/service-worker.js` — strategies, submit queue,
+  cache layout). Player content/markup/CSS fixes ship on their own: the
+  player HTML is network-first, so respondents pick them up on their next
+  ordinary online visit.
 - **Deploys are gated on CI.** `autoDeployTrigger: checksPass` means a red push
   to `Main` doesn't ship — but don't lean on that; push green.
 

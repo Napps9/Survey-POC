@@ -78,10 +78,12 @@ that: push green.
 - Dashboard/player styling is mostly inline `style` attributes plus classes
   in `app/assets/tailwind/application.css`; match the file you're editing.
 - `/play/:token` is served through a Service Worker (`app/views/pwa/service-worker.js`)
-  with stale-while-revalidate for the player HTML — a respondent who already
-  loaded a Verto keeps getting their own cached copy until `CACHE_VERSION`
-  bumps. Any change to player-rendering files (`app/views/shared/_card_component.html.erb`,
-  `app/views/player/**`, `app/javascript/controllers/player_controller.js`,
-  related player CSS/JS) must bump `CACHE_VERSION`, or the fix silently won't
-  reach anyone who's already visited. This has already bitten a real deploy
-  once (see commit bumping v2→v3) — don't let it happen again.
+  with **network-first (3.5s timeout) + offline cache fallback** for the
+  player HTML. Content/markup/CSS fixes therefore reach respondents on their
+  next ordinary online visit with **no** `CACHE_VERSION` bump. A bump is
+  still required when the **worker's own behaviour** changes (caching
+  strategies, the submit queue, cache layout) — and the `controllerchange`
+  reload in `app/javascript/sw_register.js` delivers such worker changes
+  same-visit. History: the HTML used to be stale-while-revalidate, which
+  pinned respondents on stale copies (one deploy shipped invisibly until a
+  v2→v3 bump) — that's why it's network-first now; don't quietly revert it.
