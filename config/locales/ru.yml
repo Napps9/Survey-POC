@@ -825,6 +825,7 @@ ru:
     all_saved: 'Сохранено'
     leave_editor: 'Выйти из редактора'
     undo: 'Отменить'
+    duplicate_card: 'Дублировать'
     required_chip: 'Обязательный'
     ty_title_label: 'Заголовок благодарности'
     ty_body_label: 'Сообщение благодарности'

@@ -825,6 +825,7 @@ pl:
     all_saved: 'Zapisano'
     leave_editor: 'Opuść edytor'
     undo: 'Cofnij'
+    duplicate_card: 'Duplikuj'
     required_chip: 'Wymagane'
     ty_title_label: 'Tytuł podziękowania'
     ty_body_label: 'Wiadomość podziękowania'

@@ -823,6 +823,7 @@ hi:
     all_saved: 'सहेजा गया'
     leave_editor: 'संपादक से बाहर निकलें'
     undo: 'पूर्ववत करें'
+    duplicate_card: 'डुप्लिकेट करें'
     required_chip: 'अनिवार्य'
     ty_title_label: 'धन्यवाद शीर्षक'
     ty_body_label: 'धन्यवाद संदेश'

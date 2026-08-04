@@ -823,6 +823,7 @@ pt:
     all_saved: 'Guardado'
     leave_editor: 'Sair do editor'
     undo: 'Desfazer'
+    duplicate_card: 'Duplicar'
     required_chip: 'Obrigatória'
     ty_title_label: 'Título de agradecimento'
     ty_body_label: 'Mensagem de agradecimento'

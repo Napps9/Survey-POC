@@ -823,6 +823,7 @@ nl:
     all_saved: 'Opgeslagen'
     leave_editor: 'Editor verlaten'
     undo: 'Ongedaan maken'
+    duplicate_card: 'Dupliceren'
     required_chip: 'Verplicht'
     ty_title_label: 'Bedanktitel'
     ty_body_label: 'Bedankbericht'

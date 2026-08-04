@@ -2958,21 +2958,37 @@
    right panel: expanded (icon + label) while it's closed, icons only
    (.rail-label hidden) while it's open — the icons are present in both,
    so collapsing only removes the words. */
-.editor-feed .survey-card-wrap { display: flex; align-items: flex-start; gap: 14px; }
+.editor-feed .survey-card-wrap { display: flex; align-items: stretch; gap: 14px; }
 .card-col { flex: 1 1 auto; min-width: 0; }
+/* The rail spans the card's full height so its two groups sit at the card's
+   head and foot: everyday controls (reorder / number / why / light /
+   duplicate) at the top, destructive + insert (delete / add question) at the
+   bottom, away from the everyday set. No sticky pinning — two sticky groups
+   in one column overlap each other as the card scrolls out of view, and the
+   centre-snapped feed keeps a card essentially whole on screen anyway. */
 .card-rail {
-  display: flex; flex-direction: column; align-items: stretch; gap: 6px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
   flex-shrink: 0; min-width: 128px;
-  /* Cards are taller than the viewport centre-snap shows at once; keep the
-     rail's controls in reach while the card scrolls past. Top clears the
-     floating editor chrome (top bar sits at 12px, ~40px tall). */
-  position: sticky; top: 60px;
   z-index: 2;
 }
+.rail-top, .rail-bottom {
+  display: flex; flex-direction: column; gap: 6px; align-items: stretch;
+}
+
+/* One size, SOLID surfaces: every control is a full-rail-width pill of the
+   same height, on an opaque fill — translucent chrome washed out over light
+   Verto artwork. */
+.rail-top > *, .rail-bottom > * { min-height: 30px; }
 .card-rail .card-num-pill { justify-content: center; }
-.card-rail .required-chip { justify-content: center; }
+.card-rail .required-chip { justify-content: center; margin-top: 0; }
+.card-rail .card-reorder { display: flex; gap: 6px; align-items: stretch; }
+.card-rail .card-move-btn {
+  flex: 1 1 0; width: auto; height: auto; min-height: 30px; border-radius: 100px;
+  background: #232838; border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.85);
+}
 /* The Why ? — same purple identity, reshaped from the old 26px circle into
-   a rail pill; collapsing back to the circle when the labels go. */
+   a rail pill; the label goes when the rail collapses, the ? stays. */
 .card-rail .why-cta {
   width: auto; height: auto; border-radius: 100px;
   padding: 5px 12px; gap: 7px; justify-content: center;
@@ -2980,22 +2996,36 @@
 }
 .card-rail .why-cta .rail-icon { font-family: "Alata", sans-serif; font-size: 13px; }
 .card-rail .card-light { justify-content: center; }
-.card-rail .rail-row { display: flex; gap: 6px; justify-content: center; align-items: center; }
-.card-rail .card-delete-btn,
-.card-rail .rail-add-btn { justify-content: center; }
+.card-rail .card-duplicate-btn {
+  gap: 7px; justify-content: center;
+  background: #232838; border-color: rgba(255,255,255,0.35);
+  font-size: 12px;
+}
+.card-rail .card-delete-btn { justify-content: center; }
+/* Solid teal, like the gate add-CTAs — the base .aq-trigger-btn ghost fill
+   disappears over light artwork. */
+.card-rail .rail-add-btn {
+  justify-content: center; gap: 7px; display: inline-flex; align-items: center;
+  border-radius: 100px; padding: 6px 14px;
+  background: #01EACB; border: 1.5px solid #01EACB; color: #04221E;
+  font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em;
+}
+.card-rail .rail-add-btn:hover {
+  background: #18F0D4; border-color: #18F0D4; color: #04221E;
+  box-shadow: 0 2px 10px rgba(1,234,203,0.35);
+}
 .card-rail .rail-add-btn .rail-icon { font-size: 13px; line-height: 1; }
 
 /* Collapsed: the open right panel narrows the feed, so the rail gives the
-   words up and keeps the icons. Tooltips/aria-labels carry the names. */
-.editor-grid.is-panel-open .card-rail { min-width: 0; align-items: center; }
+   words up and keeps the icons — same one-size column, just narrow.
+   Tooltips/aria-labels carry the names. */
+.editor-grid.is-panel-open .card-rail { min-width: 0; }
 .editor-grid.is-panel-open .card-rail .rail-label,
 .editor-grid.is-panel-open .card-rail .card-light-word,
 .editor-grid.is-panel-open .card-rail .card-light-score { display: none; }
-.editor-grid.is-panel-open .card-rail .why-cta {
-  width: 26px; height: 26px; padding: 0;
-}
+.editor-grid.is-panel-open .card-rail .why-cta { padding: 0 8px; }
 .editor-grid.is-panel-open .card-rail .card-light { padding: 5px 6px; }
-.editor-grid.is-panel-open .card-rail .rail-row { flex-direction: column; }
+.editor-grid.is-panel-open .card-rail .card-duplicate-btn { padding: 6px 8px; }
 .editor-grid.is-panel-open .card-rail .card-delete-btn { padding: 6px 9px; }
 .editor-grid.is-panel-open .card-rail .rail-add-btn { padding: 6px 9px; }
 

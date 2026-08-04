@@ -823,6 +823,7 @@ ja:
     all_saved: '保存済み'
     leave_editor: 'エディターを離れる'
     undo: '元に戻す'
+    duplicate_card: '複製'
     required_chip: '必須'
     ty_title_label: 'サンクスのタイトル'
     ty_body_label: 'サンクスのメッセージ'

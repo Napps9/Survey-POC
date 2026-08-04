@@ -823,6 +823,7 @@ ar:
     all_saved: 'تم الحفظ'
     leave_editor: 'مغادرة المحرر'
     undo: 'تراجع'
+    duplicate_card: 'تكرار'
     required_chip: 'إلزامي'
     ty_title_label: 'عنوان الشكر'
     ty_body_label: 'رسالة الشكر'

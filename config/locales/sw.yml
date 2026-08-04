@@ -823,6 +823,7 @@ sw:
     all_saved: 'Imehifadhiwa'
     leave_editor: 'Ondoka kwenye kihariri'
     undo: 'Tendua'
+    duplicate_card: 'Nakili'
     required_chip: 'Lazima'
     ty_title_label: 'Kichwa cha shukrani'
     ty_body_label: 'Ujumbe wa shukrani'

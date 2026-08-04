@@ -831,6 +831,7 @@ en:
     all_saved: 'Saved'
     leave_editor: 'Leave editor'
     undo: 'Undo'
+    duplicate_card: 'Duplicate'
     required_chip: 'Required'
     ty_title_label: 'Thank-you title'
     ty_body_label: 'Thank-you message'

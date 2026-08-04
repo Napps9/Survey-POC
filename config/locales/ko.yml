@@ -823,6 +823,7 @@ ko:
     all_saved: '저장됨'
     leave_editor: '편집기 나가기'
     undo: '실행 취소'
+    duplicate_card: '복제'
     required_chip: '필수'
     ty_title_label: '감사 제목'
     ty_body_label: '감사 메시지'

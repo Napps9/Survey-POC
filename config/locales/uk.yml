@@ -825,6 +825,7 @@ uk:
     all_saved: 'Збережено'
     leave_editor: 'Вийти з редактора'
     undo: 'Скасувати'
+    duplicate_card: 'Дублювати'
     required_chip: 'Обовʼязкове'
     ty_title_label: 'Заголовок подяки'
     ty_body_label: 'Повідомлення подяки'

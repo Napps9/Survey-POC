@@ -823,6 +823,7 @@ he:
     all_saved: 'נשמר'
     leave_editor: 'יציאה מהעורך'
     undo: 'ביטול'
+    duplicate_card: 'שכפול'
     required_chip: 'חובה'
     ty_title_label: 'כותרת התודה'
     ty_body_label: 'הודעת התודה'
