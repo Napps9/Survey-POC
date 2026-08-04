@@ -169,6 +169,28 @@ class EditorUndoTest < ApplicationSystemTestCase
                  "undo popped the earlier delete instead of the card just added"
   end
 
+  test "the undo button drives the same stack and tracks its depth" do
+    open_editor
+
+    # Nothing undoable yet: the button renders, disabled — visible so the
+    # affordance (and the shortcut its tooltip teaches) is discoverable.
+    assert_selector "[data-survey-editor-target='undoBtn'][disabled]"
+
+    delete_card("c2")
+    assert_no_selector "[data-card-cid='c2']"
+    assert_no_selector "[data-survey-editor-target='undoBtn'][disabled]"
+
+    # click_dom, not a pointer click — the button sits in the floating chrome
+    # (same reason the add-question flow above is driven through the DOM). A
+    # disabled button would swallow el.click() without firing the action, so
+    # this also only passes through the enabled state asserted above.
+    click_dom("[data-survey-editor-target='undoBtn']")
+
+    assert_selector "[data-card-cid='c2']", wait: 5
+    # The stack is empty again, and the button says so.
+    assert_selector "[data-survey-editor-target='undoBtn'][disabled]"
+  end
+
   test "undo does nothing on a live Verto" do
     # Structural edits are refused server-side once a Verto is live (423), so an
     # undo that mutated the DOM would show the creator a change that can never
@@ -182,6 +204,8 @@ class EditorUndoTest < ApplicationSystemTestCase
     @survey.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
 
     open_editor
+    # No button either: a live editor renders no undo affordance at all.
+    assert_no_selector "[data-survey-editor-target='undoBtn']"
     execute_script(<<~JS)
       const app  = window.Stimulus || window.application
       const root = document.querySelector('[data-controller~="survey-editor"]')

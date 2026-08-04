@@ -822,6 +822,7 @@ fr:
   editor:
     all_saved: 'Enregistré'
     leave_editor: 'Quitter l''éditeur'
+    undo: 'Annuler'
     required_chip: 'Obligatoire'
     ty_title_label: 'Titre de remerciement'
     ty_body_label: 'Message de remerciement'

@@ -2774,6 +2774,24 @@
 .editor-leave-btn:hover { background: rgba(20,23,38,0.85); border-color: rgba(255,255,255,0.3); }
 .editor-leave-arrow { flex-shrink: 0; }
 [dir="rtl"] .editor-leave-arrow { transform: scaleX(-1); }
+/* Undo — the ⌘Z stack's visible face, beside the save pill. Same glass pill
+   as .editor-leave-btn; with nothing to undo it fades rather than hides, so
+   the affordance (and the shortcut its tooltip teaches) stays discoverable. */
+.editor-undo-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 13px;
+  border-radius: 100px;
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #fff; cursor: pointer;
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.03em;
+  white-space: nowrap; flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.editor-undo-btn:hover:not(:disabled) { background: rgba(20,23,38,0.85); border-color: rgba(255,255,255,0.3); }
+.editor-undo-btn:disabled { opacity: 0.4; cursor: default; }
+.editor-undo-arrow { flex-shrink: 0; }
+[dir="rtl"] .editor-undo-arrow { transform: scaleX(-1); }
 .editor-save-pill {
   display: inline-flex; align-items: center;
   padding: 7px 13px; border-radius: 100px;
@@ -6563,5 +6581,5 @@ body.generating-overlay-active .bottom-bar { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .editor-feed { scroll-behavior: auto; }
   .editor-grid { transition: none; }
-  .right-tab-folder, .editor-leave-btn, .editor-score-cta { transition: none; }
+  .right-tab-folder, .editor-leave-btn, .editor-undo-btn, .editor-score-cta { transition: none; }
 }

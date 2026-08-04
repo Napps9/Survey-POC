@@ -830,6 +830,7 @@ en:
   editor:
     all_saved: 'Saved'
     leave_editor: 'Leave editor'
+    undo: 'Undo'
     required_chip: 'Required'
     ty_title_label: 'Thank-you title'
     ty_body_label: 'Thank-you message'

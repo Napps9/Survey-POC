@@ -20,7 +20,7 @@ const FLOW_COLORS = [ "#8B85FF", "#01EACB", "#F59E0B", "#F472B6", "#38BDF8", "#A
 
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
-    "cardFlags", "panelOther", "panelRequired", "vertoTitle"]
+    "cardFlags", "panelOther", "panelRequired", "vertoTitle", "undoBtn"]
   static values  = {
     url: String, title: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -94,6 +94,7 @@ export default class extends Controller {
 
   _bindUndo() {
     this._undoStack = []
+    this._refreshUndoButton()
     this._undoHandler = (event) => {
       const z = event.key === "z" || event.key === "Z"
       if (!z || !(event.metaKey || event.ctrlKey) || event.shiftKey) return
@@ -103,20 +104,38 @@ export default class extends Controller {
       if (this.liveValue) return
       if (!this._undoStack.length) return
       event.preventDefault()
-      // An entry may return false to mean "stale — nothing to undo" (a flow
-      // dissolved through the panel outlives its creation entry). Skip to the
-      // next real one instead of eating the keystroke on a no-op.
-      let acted
-      do { acted = this._undoStack.pop()() } while (acted === false && this._undoStack.length)
-      if (acted === false) return
-      this._renumberAndPersist()
+      this._performUndo()
     }
     document.addEventListener("keydown", this._undoHandler)
+  }
+
+  // The chrome's ↩ button — same stack and live guard as the keystroke, minus
+  // the focus rules that only make sense mid-typing. The button is disabled
+  // whenever the stack is empty, so the length check is belt and braces.
+  undoClick() {
+    if (this.liveValue || !this._undoStack.length) return
+    this._performUndo()
+  }
+
+  _performUndo() {
+    // An entry may return false to mean "stale — nothing to undo" (a flow
+    // dissolved through the panel outlives its creation entry). Skip to the
+    // next real one instead of eating the gesture on a no-op.
+    let acted
+    do { acted = this._undoStack.pop()() } while (acted === false && this._undoStack.length)
+    this._refreshUndoButton()
+    if (acted === false) return
+    this._renumberAndPersist()
   }
 
   _pushUndo(fn) {
     this._undoStack.push(fn)
     if (this._undoStack.length > this.MAX_UNDO) this._undoStack.shift()
+    this._refreshUndoButton()
+  }
+
+  _refreshUndoButton() {
+    if (this.hasUndoBtnTarget) this.undoBtnTarget.disabled = !this._undoStack.length
   }
 
   // Where a slot currently sits, as a closure that puts it back there. Captured

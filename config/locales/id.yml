@@ -822,6 +822,7 @@ id:
   editor:
     all_saved: 'Tersimpan'
     leave_editor: 'Keluar dari editor'
+    undo: 'Urungkan'
     required_chip: 'Wajib'
     ty_title_label: 'Judul terima kasih'
     ty_body_label: 'Pesan terima kasih'

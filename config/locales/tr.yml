@@ -822,6 +822,7 @@ tr:
   editor:
     all_saved: 'Kaydedildi'
     leave_editor: 'Editörden çık'
+    undo: 'Geri al'
     required_chip: 'Zorunlu'
     ty_title_label: 'Teşekkür başlığı'
     ty_body_label: 'Teşekkür mesajı'

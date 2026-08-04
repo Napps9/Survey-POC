@@ -822,6 +822,7 @@ vi:
   editor:
     all_saved: 'Đã lưu'
     leave_editor: 'Rời trình chỉnh sửa'
+    undo: 'Hoàn tác'
     required_chip: 'Bắt buộc'
     ty_title_label: 'Tiêu đề cảm ơn'
     ty_body_label: 'Lời nhắn cảm ơn'

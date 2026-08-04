@@ -822,6 +822,7 @@ de:
   editor:
     all_saved: 'Gespeichert'
     leave_editor: 'Editor verlassen'
+    undo: 'Rückgängig'
     required_chip: 'Pflicht'
     ty_title_label: 'Titel der Dankeschön-Seite'
     ty_body_label: 'Nachricht der Dankeschön-Seite'

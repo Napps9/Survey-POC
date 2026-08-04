@@ -189,6 +189,24 @@
             <span class="text-xs text-aquamarine" role="status" data-survey-editor-target="status"
                   style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
           </span>
+          <%# Undo — the visible face of the ⌘Z stack (structural card edits
+              only; text fields keep the browser's own undo). Disabled until
+              something is undoable; absent on live Vertos, where the server
+              refuses every structural mutation anyway. %>
+          <% unless live_locked %>
+            <button type="button" class="editor-undo-btn" disabled
+                    data-survey-editor-target="undoBtn"
+                    data-action="click->survey-editor#undoClick"
+                    title="<%= t("editor.undo", default: "Undo") %> (Ctrl+Z / ⌘Z)"
+                    aria-label="<%= t("editor.undo", default: "Undo") %>"
+                    aria-keyshortcuts="Control+Z Meta+Z">
+              <svg class="editor-undo-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M6.5 4.5 3 8l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3 8h5.5a3.5 3.5 0 0 1 0 7H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="editor-undo-label"><%= t("editor.undo", default: "Undo") %></span>
+            </button>
+          <% end %>
         </div>
 
         <%# Pinned to the screen's top-right corner — position:fixed, so it
