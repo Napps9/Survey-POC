@@ -3266,6 +3266,14 @@ button.score-row:hover { background: rgba(255,255,255,0.06); }
 .editor-feed { scroll-snap-type: y mandatory; }
 .editor-feed .survey-card-wrap,
 .editor-feed .gate-card-wrap { scroll-snap-align: center; }
+/* The consent / thank-you add-CTAs sit outside every card wrap, and under
+   mandatory snapping a scroller can ONLY rest on a snap target — so the feed
+   always sprang off the thank-you CTA back to the last card, and nobody could
+   click it. The CTAs must be snap targets themselves. Centre alignment is
+   safe at the extremes: the spec clamps snap positions to the scrollable
+   range, so the consent CTA rests at the very top and the thank-you CTA at
+   the very bottom of the feed. */
+.editor-feed .gate-cta-row { scroll-snap-align: center; }
 
 .right-column {
   display: flex; flex-direction: column;
