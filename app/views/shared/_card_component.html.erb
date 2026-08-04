@@ -269,9 +269,10 @@
 
     <% when "select_one_grid", "select_many_grid" %>
       <% opts = Array(display["options"]) %>
-      <% cols = opts.size >= 5 ? 3 : 2 %>
+      <%# Always two columns — three shrinks the tiles and labels too far,
+          whatever the option count (keep in step with type_panel's gridHtml). %>
       <% multi = (type == "select_many_grid") %>
-      <ul class="choice-grid choice-grid--<%= multi ? 'multi' : 'single' %> choice-grid-<%= cols %>"
+      <ul class="choice-grid choice-grid--<%= multi ? 'multi' : 'single' %> choice-grid-2"
           <%= editable ? "".html_safe : tag.attributes(role: multi ? "group" : "radiogroup") %>
           data-controller="picker"
           data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">

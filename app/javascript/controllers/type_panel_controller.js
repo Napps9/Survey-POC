@@ -414,9 +414,10 @@ function choiceListHtml(opts, mode, styles = []) {
 }
 
 function gridHtml(opts, mode, styles = []) {
-  const cols = opts.length >= 5 ? 3 : 2
+  // Always two columns — three shrinks the tiles and labels too far, whatever
+  // the option count (keep in step with _card_component's grid branch).
   return `
-    <ul class="choice-grid choice-grid--${mode} choice-grid-${cols}" data-controller="picker"
+    <ul class="choice-grid choice-grid--${mode} choice-grid-2" data-controller="picker"
         data-picker-mode-value="${mode}">
       ${opts.map((o, i) => choiceGridItemHtml(o, i, styles[i])).join("")}
     </ul>`

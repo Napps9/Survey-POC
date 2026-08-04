@@ -1790,7 +1790,11 @@
 .choice-grid    { display: grid; gap: 10px; grid-auto-rows: 1fr; }
 .choice-grid .choice-card { height: 100%; }
 .choice-grid-2  { grid-template-columns: 1fr 1fr; }
-.choice-grid-3  { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+/* Grids are ALWAYS two columns now — three shrank the tiles and labels too
+   far. Nothing emits .choice-grid-3 any more; the alias stays only so player
+   HTML cached by the service worker before the change still renders the
+   two-column layout rather than an unstyled clump. */
+.choice-grid-3  { grid-template-columns: 1fr 1fr; }
 .choice-card {
   position: relative;
   display: flex;
@@ -1816,10 +1820,9 @@
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   background-size: cover; background-position: center;
 }
-.choice-grid-3 .choice-card-bg { height: 58px; }
 /* Per-option icon (OptionIconLibrary) — sits centred on top of the
    choice-bg-N gradient, sized as a share of the tile so it auto-scales at
-   the .choice-grid-3 / .phone-bottom breakpoints with no extra rules. */
+   the .phone-bottom breakpoint with no extra rules. */
 .choice-icon-svg {
   width: 42%; height: 42%;
   max-width: 34px; max-height: 34px;
@@ -2894,7 +2897,6 @@
 
 .phone-bottom .choice-grid { gap: 6px; }
 .phone-bottom .choice-card-bg { height: 56px; border-radius: 10px; }
-.phone-bottom .choice-grid-3 .choice-card-bg { height: 44px; }
 .phone-bottom .choice-label { font-size: 10px; padding: 2px 4px; margin-top: 4px; }
 
 .phone-bottom .slider-wrap { gap: 8px; padding-top: 8px; }
@@ -5136,9 +5138,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card[data-selected="true"] {
     border-color: #FF1E6F;
   }
-  /* Default grid (non-image-tile contexts) still collapses 3→2 for readability */
-  .choice-grid-3  { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .choice-grid-3 .choice-card-bg { height: 60px; }
   .choice-label   { font-size: 12px; padding: 2px 4px; }
 
   /* Mobile-specific player tweaks live here — the footer-hide and
