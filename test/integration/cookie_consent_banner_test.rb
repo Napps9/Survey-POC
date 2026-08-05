@@ -25,6 +25,18 @@ class CookieConsentBannerTest < ActionDispatch::IntegrationTest
     assert_no_match(/clarity\.ms\/tag/, response.body)
   end
 
+  test "Test Mode renders no banner — it records nothing, so there is nothing to consent to" do
+    survey = published_survey
+    survey.update!(test_token: SecureRandom.hex(8))
+
+    get test_survey_path(survey.test_token)
+    assert_response :success
+
+    assert_select "[data-controller='cookie-consent']", false,
+      "Test Mode has no analytics to gate, and the link is embeddable — a banner there only blocks the first tap"
+    assert_no_match(/clarity\.ms/, response.body)
+  end
+
   test "the sign-in page also renders the cookie-consent banner (site-wide, not just the player)" do
     get new_session_path
     assert_response :success
