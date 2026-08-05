@@ -1051,12 +1051,16 @@ export default class extends Controller {
       if (out.text && prim.text_html) out.text_html = prim.text_html
       if (out.description && prim.description_html) out.description_html = prim.description_html
 
-      // A card's left panel holds a video OR a photo. Carry whichever it is —
-      // plus the creator credit — through autosave, since the editor rebuilds
-      // cards from the DOM and would otherwise drop these.
-      const video = card.dataset.cardVideo
-      const image = card.dataset.cardImage
-      if (video) {
+      // A card's left panel holds a Lottie animation OR a video OR a photo.
+      // Carry whichever it is — plus the creator credit — through autosave,
+      // since the editor rebuilds cards from the DOM and would otherwise drop
+      // these. Same exclusivity order as the server sanitiser.
+      const lottie = card.dataset.cardLottie
+      const video = lottie ? "" : card.dataset.cardVideo
+      const image = lottie ? "" : card.dataset.cardImage
+      if (lottie) {
+        out.lottie = lottie
+      } else if (video) {
         out.video = video
         if (card.dataset.cardVideoPoster) out.video_poster = card.dataset.cardVideoPoster
       } else if (image) {

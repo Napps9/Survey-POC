@@ -210,6 +210,7 @@ uk:
     editor:
       delete_card_confirm: Видалити цю картку?
       save_to_library: "Також зберегти в бібліотеку бренду"
+      lottie_failed: "Це посилання не схоже на анімацію LottieFiles."
       rich_bold: "Жирний"
       rich_italic: "Курсив"
       rich_underline: "Підкреслений"
@@ -826,6 +827,10 @@ uk:
     leave_editor: 'Вийти з редактора'
     undo: 'Скасувати'
     duplicate_card: 'Дублювати'
+    lottie_section: "Анімація (Lottie)"
+    lottie_placeholder: "Вставте посилання LottieFiles, напр. https://lottie.host/….json"
+    lottie_apply: "Використати анімацію"
+    lottie_hint: "Прямі посилання .json з lottiefiles.com або lottie.host. Анімація замінює фото або відео картки."
     required_chip: 'Обовʼязкове'
     ty_title_label: 'Заголовок подяки'
     ty_body_label: 'Повідомлення подяки'

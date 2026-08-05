@@ -210,6 +210,7 @@ de:
     editor:
       delete_card_confirm: Diese Karte löschen?
       save_to_library: "Auch in meiner Markenbibliothek speichern"
+      lottie_failed: "Dieser Link scheint keine LottieFiles-Animation zu sein."
       rich_bold: "Fett"
       rich_italic: "Kursiv"
       rich_underline: "Unterstrichen"
@@ -824,6 +825,10 @@ de:
     leave_editor: 'Editor verlassen'
     undo: 'Rückgängig'
     duplicate_card: 'Duplizieren'
+    lottie_section: "Animation (Lottie)"
+    lottie_placeholder: "LottieFiles-Link einfügen, z. B. https://lottie.host/….json"
+    lottie_apply: "Animation verwenden"
+    lottie_hint: "Direkte .json-Links von lottiefiles.com oder lottie.host. Die Animation ersetzt Foto oder Video der Karte."
     required_chip: 'Pflicht'
     ty_title_label: 'Titel der Dankeschön-Seite'
     ty_body_label: 'Nachricht der Dankeschön-Seite'

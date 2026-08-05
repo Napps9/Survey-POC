@@ -210,6 +210,7 @@ it:
     editor:
       delete_card_confirm: Eliminare questa carta?
       save_to_library: "Salva anche nella mia libreria del brand"
+      lottie_failed: "Quel link non sembra un'animazione LottieFiles."
       rich_bold: "Grassetto"
       rich_italic: "Corsivo"
       rich_underline: "Sottolineato"
@@ -824,6 +825,10 @@ it:
     leave_editor: 'Esci dall''editor'
     undo: 'Annulla'
     duplicate_card: 'Duplica'
+    lottie_section: "Animazione (Lottie)"
+    lottie_placeholder: "Incolla un link LottieFiles, es. https://lottie.host/….json"
+    lottie_apply: "Usa animazione"
+    lottie_hint: "Link .json diretti da lottiefiles.com o lottie.host. L'animazione sostituisce la foto o il video della scheda."
     required_chip: 'Obbligatoria'
     ty_title_label: 'Titolo di ringraziamento'
     ty_body_label: 'Messaggio di ringraziamento'

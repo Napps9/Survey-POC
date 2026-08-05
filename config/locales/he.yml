@@ -210,6 +210,7 @@ he:
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
       save_to_library: "שמור גם בספריית המותג שלי"
+      lottie_failed: "הקישור הזה לא נראה כמו אנימציית LottieFiles."
       rich_bold: "מודגש"
       rich_italic: "נטוי"
       rich_underline: "קו תחתון"
@@ -824,6 +825,10 @@ he:
     leave_editor: 'יציאה מהעורך'
     undo: 'ביטול'
     duplicate_card: 'שכפול'
+    lottie_section: "אנימציה (Lottie)"
+    lottie_placeholder: "הדביקו קישור LottieFiles, למשל https://lottie.host/….json"
+    lottie_apply: "שימוש באנימציה"
+    lottie_hint: "קישורי .json ישירים מ-lottiefiles.com או lottie.host. האנימציה מחליפה את התמונה או הווידאו של הכרטיס."
     required_chip: 'חובה'
     ty_title_label: 'כותרת התודה'
     ty_body_label: 'הודעת התודה'

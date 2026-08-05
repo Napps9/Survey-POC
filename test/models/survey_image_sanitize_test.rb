@@ -44,6 +44,44 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil Survey.sanitize_background_image("https://evil.example.com/x.jpg")
   end
 
+  # Card animations: only the same-origin stored copy survives — a pasted
+  # LottieFiles URL must go through CardLottieStore first, never straight
+  # onto the card.
+  LOTTIE_BLOB_URL = "/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MX19==--6b887ab3d44f50c2/card-lottie-abc123.json"
+
+  test "sanitize_lottie_url accepts same-origin Active Storage JSON only" do
+    assert_equal LOTTIE_BLOB_URL, Survey.sanitize_lottie_url(LOTTIE_BLOB_URL)
+    assert_nil Survey.sanitize_lottie_url("https://lottie.host/abc/anim.json"),
+               "external URLs never land on a card, allowlisted host or not"
+    assert_nil Survey.sanitize_lottie_url("/rails/active_storage/blobs/x.png")
+    assert_nil Survey.sanitize_lottie_url("https://evil.com/rails/active_storage/blobs/x.json")
+    assert_nil Survey.sanitize_lottie_url("")
+  end
+
+  test "sanitize_cards_images! keeps a stored lottie and drops the rest of the media" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q",
+                "lottie" => LOTTIE_BLOB_URL, "image" => ASSET_PATH,
+                "video" => "https://videos.pexels.com/x/clip.mp4", "video_poster" => ASSET_PATH,
+                "image_credit" => "Someone", "image_credit_url" => "https://www.pexels.com/@someone" } ]
+    out = Survey.sanitize_cards_images!(cards).first
+
+    assert_equal LOTTIE_BLOB_URL, out["lottie"]
+    refute out.key?("image"),        "an animation replaces the photo"
+    refute out.key?("video"),        "an animation replaces the video"
+    refute out.key?("video_poster")
+    refute out.key?("image_credit"), "credits belong to photos/videos only"
+  end
+
+  test "sanitize_cards_images! drops an external lottie URL with a warning" do
+    warnings = []
+    cards = [ { "type" => "multiple_choice", "text" => "Q",
+                "lottie" => "https://lottie.host/abc/anim.json" } ]
+    out = Survey.sanitize_cards_images!(cards, warnings: warnings).first
+
+    refute out.key?("lottie")
+    assert_includes warnings, "lottie"
+  end
+
   test "sanitize_cards_images! de-dupes shared cids and backfills missing ones" do
     cards = [
       { "type" => "multiple_choice", "text" => "A", "cid" => "c_dup" },

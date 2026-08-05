@@ -133,6 +133,11 @@ class Survey < ApplicationRecord
   # /rails/active_storage/ mount and an image extension, and it excludes quotes/
   # angles/whitespace so it stays safe inside an inline `url('…')` style.
   ACTIVE_STORAGE_IMAGE_URL = %r{\A/rails/active_storage/[^\s'"<>?]+\.(?:png|jpe?g|webp|svg|gif)(?:\?[^\s'"<>]*)?\z}i
+  # Same-origin Active Storage animation JSON — the ONLY form a card `lottie`
+  # value may take. Pasted LottieFiles URLs are fetched, scrubbed and stored by
+  # CardLottieStore first (see there for why hotlinking was rejected), so an
+  # external URL reaching this sanitiser is always dropped.
+  ACTIVE_STORAGE_LOTTIE_URL = %r{\A/rails/active_storage/[^\s'"<>?]+\.json(?:\?[^\s'"<>]*)?\z}i
   # Pexels CDN URLs (host-whitelisted) so editor-picked and auto-populated
   # stock photos survive the sanitizer. No quotes/parens, so it stays safe to
   # interpolate into an inline `url('…')` style.
@@ -345,6 +350,13 @@ class Survey < ApplicationRecord
   def self.sanitize_video_url(value)
     v = value.to_s.strip
     v.match?(PEXELS_VIDEO_URL) ? v : nil
+  end
+
+  # A card left-panel Lottie animation — only a same-origin stored copy is
+  # allowed (CardLottieStore ingests the pasted LottieFiles URL).
+  def self.sanitize_lottie_url(value)
+    v = value.to_s.strip
+    v.match?(ACTIVE_STORAGE_LOTTIE_URL) ? v : nil
   end
 
   # A photographer-credit link — only a pexels.com URL is allowed (rendered as
@@ -585,8 +597,8 @@ class Survey < ApplicationRecord
         warnings << "option_images" if warnings && before.any?(&:present?) && c["option_images"].any?(&:nil?)
       end
 
-      # A card's left panel holds a photo OR a video. Scrub both; a poster only
-      # makes sense alongside a video.
+      # A card's left panel holds a photo OR a video OR a Lottie animation.
+      # Scrub all three; a poster only makes sense alongside a video.
       if c.key?("video")
         c["video"] = sanitize_video_url(c["video"])
         c.delete("video") if c["video"].blank?
@@ -594,6 +606,20 @@ class Survey < ApplicationRecord
       if c.key?("video_poster")
         c["video_poster"] = sanitize_image_url(c["video_poster"])
         c.delete("video_poster") if c["video"].blank? || c["video_poster"].blank?
+      end
+      if c.key?("lottie")
+        had_lottie = c["lottie"].present?
+        c["lottie"] = sanitize_lottie_url(c["lottie"])
+        if c["lottie"].blank?
+          c.delete("lottie")
+          warnings << "lottie" if warnings && had_lottie
+        else
+          # Mirrors the client's exclusivity: applying an animation clears the
+          # photo/video (and with them the credit fields, below).
+          c.delete("image")
+          c.delete("video")
+          c.delete("video_poster")
+        end
       end
 
       if c.key?("image_credit") || c.key?("image_credit_url")

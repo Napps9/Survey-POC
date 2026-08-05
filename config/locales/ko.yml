@@ -210,6 +210,7 @@ ko:
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       save_to_library: "브랜드 라이브러리에도 저장"
+      lottie_failed: "이 링크는 LottieFiles 애니메이션이 아닌 것 같습니다."
       rich_bold: "굵게"
       rich_italic: "기울임"
       rich_underline: "밑줄"
@@ -824,6 +825,10 @@ ko:
     leave_editor: '편집기 나가기'
     undo: '실행 취소'
     duplicate_card: '복제'
+    lottie_section: "애니메이션 (Lottie)"
+    lottie_placeholder: "LottieFiles 링크를 붙여넣으세요 (예: https://lottie.host/….json)"
+    lottie_apply: "애니메이션 사용"
+    lottie_hint: "lottiefiles.com 또는 lottie.host의 직접 .json 링크. 애니메이션이 카드의 사진이나 영상을 대체합니다."
     required_chip: '필수'
     ty_title_label: '감사 제목'
     ty_body_label: '감사 메시지'

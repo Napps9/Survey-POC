@@ -540,6 +540,28 @@ class SurveysController < ApplicationController
     render json: { ok: false, error: "That image couldn't be stored." }, status: :unprocessable_entity
   end
 
+  # POST /surveys/:id/card_lottie
+  # A pasted LottieFiles URL, fetched server-side, scrubbed and re-served
+  # same-origin (see CardLottieStore for why hotlinking was rejected). Unlike
+  # card_image there is no client-side fallback: an external URL never
+  # survives the cards sanitiser, so a failure here means "not applied".
+  def card_lottie
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    if survey.editing_locked?
+      return render json: { ok: false, error: editing_locked_message }, status: :locked
+    end
+
+    blob = Survey::CardLottieStore.fetch_and_attach(survey, params[:url].to_s)
+    return render json: { ok: false, error: "That link doesn't look like a LottieFiles animation." }, status: :unprocessable_entity unless blob
+
+    render json: { ok: true, url: rails_blob_path(blob, only_path: true) }
+  rescue ActiveRecord::RecordNotFound
+    raise
+  rescue => e
+    ErrorReporting.report("SurveysController#card_lottie", e)
+    render json: { ok: false, error: "That animation couldn't be stored." }, status: :unprocessable_entity
+  end
+
   # GET /surveys/:id/qr
   # The share panel's QR as a downloadable file, for posters, flyers and slide
   # decks — the panel itself renders the same SVG inline for scanning off a

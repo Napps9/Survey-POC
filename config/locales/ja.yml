@@ -210,6 +210,7 @@ ja:
     editor:
       delete_card_confirm: このカードを削除しますか？
       save_to_library: "ブランドライブラリにも保存"
+      lottie_failed: "このリンクはLottieFilesのアニメーションではないようです。"
       rich_bold: "太字"
       rich_italic: "斜体"
       rich_underline: "下線"
@@ -824,6 +825,10 @@ ja:
     leave_editor: 'エディターを離れる'
     undo: '元に戻す'
     duplicate_card: '複製'
+    lottie_section: "アニメーション（Lottie）"
+    lottie_placeholder: "LottieFilesのリンクを貼り付け（例: https://lottie.host/….json）"
+    lottie_apply: "アニメーションを使用"
+    lottie_hint: "lottiefiles.com または lottie.host の直接 .json リンク。アニメーションはカードの写真や動画と置き換わります。"
     required_chip: '必須'
     ty_title_label: 'サンクスのタイトル'
     ty_body_label: 'サンクスのメッセージ'

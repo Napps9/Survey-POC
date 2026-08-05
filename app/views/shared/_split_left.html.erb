@@ -9,6 +9,7 @@
 <%
   mode      ||= :preview
   editable   = (mode == :editor)
+  has_lottie = card["lottie"].present?
   has_video  = card["video"].present?
   has_img    = card["image"].present?
   has_media  = has_video || has_img
@@ -23,6 +24,17 @@
         No initial_value — the helper defaults to the neutral middle frame, so
         the character starts expressionless (see NpsHelper::NPS_NEUTRAL_FRAME). %>
     <%= render_nps_reaction(theme: range_theme_slug(card)) %>
+  <% elsif has_lottie %>
+    <%# A pasted LottieFiles animation, stored same-origin by CardLottieStore
+        and played on a loop. Its own class (card-lottie, not nps-lottie): the
+        :has(.nps-lottie) CSS hides the Change-media CTA, which this keeps. %>
+    <div class="card-lottie"<%= " data-card-media".html_safe if editable %>
+         data-controller="lottie-player"
+         data-lottie-player-urls-value="<%= [ card["lottie"] ].to_json %>"
+         data-lottie-player-current-value="1"
+         data-lottie-player-loop-value="true">
+      <div class="card-lottie-mount" data-lottie-player-target="mount"></div>
+    </div>
   <% elsif has_media %>
     <% if has_video %>
       <%# Autoplaying, looped, muted card video. preload="none" + poster keeps
@@ -78,7 +90,7 @@
         </span>
         <span><%= t("editor.change_animation", default: "Change animation") %></span>
       </button>
-    <% elsif has_media %>
+    <% elsif has_media || has_lottie %>
       <button type="button" class="add-media-fab"
               data-action="click->media-picker#open"
               title="<%= t("editor.change_media_title") %>">

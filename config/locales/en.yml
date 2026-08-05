@@ -218,6 +218,7 @@ en:
     editor:
       delete_card_confirm: "Delete this card?"
       save_to_library: "Also save to my brand library"
+      lottie_failed: "That link doesn't look like a LottieFiles animation."
       rich_bold: "Bold"
       rich_italic: "Italic"
       rich_underline: "Underline"
@@ -832,6 +833,10 @@ en:
     leave_editor: 'Leave editor'
     undo: 'Undo'
     duplicate_card: 'Duplicate'
+    lottie_section: "Animation (Lottie)"
+    lottie_placeholder: "Paste a LottieFiles link, e.g. https://lottie.host/….json"
+    lottie_apply: "Use animation"
+    lottie_hint: "Direct .json links from lottiefiles.com or lottie.host. The animation replaces the card's photo or video."
     required_chip: 'Required'
     ty_title_label: 'Thank-you title'
     ty_body_label: 'Thank-you message'

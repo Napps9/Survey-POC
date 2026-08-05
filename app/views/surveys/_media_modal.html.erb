@@ -59,6 +59,26 @@
             <%= t("js.editor.save_to_library") %>
           </label>
         <% end %>
+
+        <%# Paste-a-LottieFiles-URL — card mode only (media-picker toggles it
+            with the Photos/Videos switch). The URL goes to card_lottie, which
+            fetches, scrubs and stores the JSON; only the same-origin stored
+            path ever lands on the card. %>
+        <div class="media-lottie-section" data-media-picker-target="lottieSection" hidden>
+          <div class="media-lottie-label"><%= t("editor.lottie_section", default: "Animation (Lottie)") %></div>
+          <div class="media-lottie-row">
+            <input type="url" class="media-lottie-input"
+                   data-media-picker-target="lottieInput"
+                   placeholder="<%= t("editor.lottie_placeholder", default: "Paste a LottieFiles link, e.g. https://lottie.host/….json") %>"
+                   aria-label="<%= t("editor.lottie_section", default: "Animation (Lottie)") %>" />
+            <button type="button" class="media-lottie-btn"
+                    data-media-picker-target="lottieBtn"
+                    data-action="click->media-picker#applyLottie"><%= t("editor.lottie_apply", default: "Use animation") %></button>
+          </div>
+          <div class="media-lottie-hint"><%= t("editor.lottie_hint", default: "Direct .json links from lottiefiles.com or lottie.host. The animation replaces the card's photo or video.") %></div>
+          <div class="media-upload-error" data-media-picker-target="lottieError"
+               style="margin-top:8px;color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size:13px;line-height:1.4;" hidden></div>
+        </div>
       </div>
 
       <%# Library pane %>

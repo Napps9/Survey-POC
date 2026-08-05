@@ -210,6 +210,7 @@ sw:
     editor:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"
+      lottie_failed: "Kiungo hicho hakionekani kama uhuishaji wa LottieFiles."
       rich_bold: "Nzito"
       rich_italic: "Mlazo"
       rich_underline: "Kupigia mstari"
@@ -824,6 +825,10 @@ sw:
     leave_editor: 'Ondoka kwenye kihariri'
     undo: 'Tendua'
     duplicate_card: 'Nakili'
+    lottie_section: "Uhuishaji (Lottie)"
+    lottie_placeholder: "Bandika kiungo cha LottieFiles, k.m. https://lottie.host/….json"
+    lottie_apply: "Tumia uhuishaji"
+    lottie_hint: "Viungo vya moja kwa moja vya .json kutoka lottiefiles.com au lottie.host. Uhuishaji huchukua nafasi ya picha au video ya kadi."
     required_chip: 'Lazima'
     ty_title_label: 'Kichwa cha shukrani'
     ty_body_label: 'Ujumbe wa shukrani'

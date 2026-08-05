@@ -505,6 +505,61 @@
   height: 100% !important;
 }
 
+/* Card-media Lottie — a pasted LottieFiles animation as the left panel's
+   media. Same geometry as .nps-lottie, but its OWN class: the
+   :has(.nps-lottie) rules above hide the Change-media CTA, and this variant
+   must keep it (the media picker is how the animation gets swapped for a
+   photo again). The design prompt still hides — the panel isn't empty. */
+.card-lottie {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.split-left:has(.card-lottie) > .split-left-design-prompt { display: none; }
+.card-lottie-mount {
+  width: 88%;
+  height: 88%;
+  max-width: 380px;
+  max-height: 380px;
+}
+.card-lottie-mount svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* The paste-a-LottieFiles-URL section on the media modal's Upload pane. */
+.media-lottie-section {
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.media-lottie-label {
+  font-family: "Alata", sans-serif; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.55); margin-bottom: 8px;
+}
+.media-lottie-row { display: flex; gap: 8px; }
+.media-lottie-input {
+  flex: 1; min-width: 0; padding: 8px 12px; border-radius: 10px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; font-family: "ABeeZee", sans-serif; font-size: 13px; outline: none;
+}
+.media-lottie-input:focus { border-color: #01EACB; }
+.media-lottie-btn {
+  flex-shrink: 0; padding: 8px 14px; border-radius: 100px;
+  background: #01EACB; border: none; color: #04221E; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: 12.5px; font-weight: 600;
+  transition: background 0.15s, opacity 0.15s;
+}
+.media-lottie-btn:hover:not(:disabled) { background: #18F0D4; }
+.media-lottie-btn:disabled { opacity: 0.5; cursor: default; }
+.media-lottie-hint {
+  margin-top: 8px; font-family: "ABeeZee", sans-serif; font-size: 12px;
+  color: rgba(255,255,255,0.45); line-height: 1.45;
+}
+
 /* Editor-only picker under a Range slider to choose its reaction animation
    theme. Neutral, colour-inherit styling so it reads on the card's background
    in either panel. */

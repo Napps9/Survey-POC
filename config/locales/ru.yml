@@ -210,6 +210,7 @@ ru:
     editor:
       delete_card_confirm: Удалить эту карточку?
       save_to_library: "Также сохранить в библиотеку бренда"
+      lottie_failed: "Эта ссылка не похожа на анимацию LottieFiles."
       rich_bold: "Жирный"
       rich_italic: "Курсив"
       rich_underline: "Подчёркнутый"
@@ -826,6 +827,10 @@ ru:
     leave_editor: 'Выйти из редактора'
     undo: 'Отменить'
     duplicate_card: 'Дублировать'
+    lottie_section: "Анимация (Lottie)"
+    lottie_placeholder: "Вставьте ссылку LottieFiles, напр. https://lottie.host/….json"
+    lottie_apply: "Использовать анимацию"
+    lottie_hint: "Прямые ссылки .json с lottiefiles.com или lottie.host. Анимация заменяет фото или видео карточки."
     required_chip: 'Обязательный'
     ty_title_label: 'Заголовок благодарности'
     ty_body_label: 'Сообщение благодарности'

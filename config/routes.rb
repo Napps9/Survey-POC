@@ -95,6 +95,7 @@ Rails.application.routes.draw do
   get  "surveys/:id/preview",         to: "surveys#preview",  as: :preview_survey
   get  "surveys/:id/qr",              to: "surveys#qr",       as: :qr_survey
   post "surveys/:id/card_image",      to: "surveys#card_image", as: :card_image_survey
+  post "surveys/:id/card_lottie",     to: "surveys#card_lottie", as: :card_lottie_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
   post "surveys/:id/shuffle_assets",  to: "surveys#shuffle_assets",  as: :shuffle_survey_assets
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results

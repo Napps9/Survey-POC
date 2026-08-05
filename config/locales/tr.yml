@@ -210,6 +210,7 @@ tr:
     editor:
       delete_card_confirm: Bu kart silinsin mi?
       save_to_library: "Marka kitaplığıma da kaydet"
+      lottie_failed: "Bu bağlantı bir LottieFiles animasyonuna benzemiyor."
       rich_bold: "Kalın"
       rich_italic: "İtalik"
       rich_underline: "Altı çizili"
@@ -824,6 +825,10 @@ tr:
     leave_editor: 'Editörden çık'
     undo: 'Geri al'
     duplicate_card: 'Çoğalt'
+    lottie_section: "Animasyon (Lottie)"
+    lottie_placeholder: "LottieFiles bağlantısı yapıştırın, örn. https://lottie.host/….json"
+    lottie_apply: "Animasyonu kullan"
+    lottie_hint: "lottiefiles.com veya lottie.host'tan doğrudan .json bağlantıları. Animasyon kartın fotoğraf veya videosunun yerini alır."
     required_chip: 'Zorunlu'
     ty_title_label: 'Teşekkür başlığı'
     ty_body_label: 'Teşekkür mesajı'

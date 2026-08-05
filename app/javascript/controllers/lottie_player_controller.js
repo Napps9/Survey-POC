@@ -14,7 +14,10 @@ import lottie from "lottie-web"
 const NEUTRAL_FRAME = 3
 
 export default class extends Controller {
-  static values  = { urls: Array, current: { type: Number, default: NEUTRAL_FRAME } }
+  // `loop` is for decorative card media (a pasted LottieFiles animation on the
+  // card's left panel): one URL, playing continuously. The slider reaction
+  // sets keep the default one-shot behaviour.
+  static values  = { urls: Array, current: { type: Number, default: NEUTRAL_FRAME }, loop: { type: Boolean, default: false } }
   static targets = ["mount"]
 
   connect() {
@@ -67,7 +70,7 @@ export default class extends Controller {
     this.instance = lottie.loadAnimation({
       container: this.mountTarget,
       renderer: "svg",
-      loop: false,
+      loop: this.loopValue,
       autoplay: true,
       path: url,
     })

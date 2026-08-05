@@ -210,6 +210,7 @@ vi:
     editor:
       delete_card_confirm: Xóa thẻ này?
       save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"
+      lottie_failed: "Liên kết đó không giống hoạt ảnh LottieFiles."
       rich_bold: "Đậm"
       rich_italic: "Nghiêng"
       rich_underline: "Gạch chân"
@@ -824,6 +825,10 @@ vi:
     leave_editor: 'Rời trình chỉnh sửa'
     undo: 'Hoàn tác'
     duplicate_card: 'Nhân bản'
+    lottie_section: "Hoạt ảnh (Lottie)"
+    lottie_placeholder: "Dán liên kết LottieFiles, vd. https://lottie.host/….json"
+    lottie_apply: "Dùng hoạt ảnh"
+    lottie_hint: "Liên kết .json trực tiếp từ lottiefiles.com hoặc lottie.host. Hoạt ảnh thay thế ảnh hoặc video của thẻ."
     required_chip: 'Bắt buộc'
     ty_title_label: 'Tiêu đề cảm ơn'
     ty_body_label: 'Lời nhắn cảm ơn'

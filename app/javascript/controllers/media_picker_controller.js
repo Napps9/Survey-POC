@@ -13,9 +13,10 @@ export default class extends Controller {
     "recommendedSection", "recommendedLabel", "recommendedGrid",
     "searchInput", "searchSection", "searchStatus", "searchGrid",
     "mediaToggle", "mediaTab",
-    "saveToLibrary", "brandGrid", "libraryFileInput", "brandStatus"
+    "saveToLibrary", "brandGrid", "libraryFileInput", "brandStatus",
+    "lottieSection", "lottieInput", "lottieError", "lottieBtn"
   ]
-  static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array }
+  static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, cardLottieUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array }
 
   // Uploaded images are normalised before they're stored: capped in source
   // size, downscaled to a max edge, and re-encoded to a compact format. Raw
@@ -62,8 +63,9 @@ export default class extends Controller {
     this._switchTabKey("library")
     this._setMedia("photos")            // cards can be photo or video
     this._showMediaToggle(true)
+    this._showLottieSection(true)       // paste-a-LottieFiles-URL, cards only
 
-    const currentUrl = card.dataset.cardImage || card.dataset.cardVideo || ""
+    const currentUrl = card.dataset.cardImage || card.dataset.cardVideo || card.dataset.cardLottie || ""
     this.clearBtnTarget.hidden = !currentUrl
 
     this._renderRecommended(this._parseUrls(card.dataset.cardRecommendedImages), "Recommended for this card")
@@ -85,6 +87,7 @@ export default class extends Controller {
     // Backgrounds are photos only — a video can't be a Verto backdrop.
     this._setMedia("photos")
     this._showMediaToggle(false)
+    this._showLottieSection(false)
     this.clearBtnTarget.hidden = !this._currentBg()
     this._renderRecommended(this.hasBackgroundRecommendedValue ? this.backgroundRecommendedValue : [], "Recommended backgrounds")
     this._seedSearch()
@@ -107,6 +110,7 @@ export default class extends Controller {
     this._switchTabKey("library")
     this._setMedia("photos")
     this._showMediaToggle(false)
+    this._showLottieSection(false)
     this.clearBtnTarget.hidden = !this._consentLeft()?.querySelector(".split-left-img")
     // The per-card "Recommended" list keys off a card's own content — the
     // gate has none, so lean on the theme-seeded stock search instead.
@@ -140,6 +144,7 @@ export default class extends Controller {
     // A tap-card statement's image is a photo only — no video slot here.
     this._setMedia("photos")
     this._showMediaToggle(false)
+    this._showLottieSection(false)
 
     const images = this._parseUrls(card.dataset.cardOptionImages)
     this.clearBtnTarget.hidden = !images[index]
@@ -766,12 +771,15 @@ export default class extends Controller {
     card.dataset.cardImage = url || ""
     card.dataset.cardImageCredit = url ? (credit || "") : ""
     card.dataset.cardImageCreditUrl = url ? (creditUrl || "") : ""
-    // Picking/clearing a photo replaces any auto-populated video on this card.
+    // Picking/clearing a photo replaces any auto-populated video or pasted
+    // animation on this card.
     card.dataset.cardVideo = ""
     card.dataset.cardVideoPoster = ""
+    card.dataset.cardLottie = ""
     const left = card.querySelector(".split-left")
     if (!left) return
     left.querySelector(".split-left-video[data-card-media]")?.remove()
+    left.querySelector(".card-lottie[data-card-media]")?.remove()
     let imgEl = left.querySelector(".split-left-img[data-card-media]")
     let ovEl  = left.querySelector(".split-left-overlay[data-card-media]")
     if (url) {
@@ -804,10 +812,12 @@ export default class extends Controller {
     card.dataset.cardImage = ""
     card.dataset.cardImageCredit = video ? (credit || "") : ""
     card.dataset.cardImageCreditUrl = video ? (creditUrl || "") : ""
+    card.dataset.cardLottie = ""
     const left = card.querySelector(".split-left")
     if (!left) return
     left.querySelector(".split-left-img[data-card-media]")?.remove()
     left.querySelector(".split-left-video[data-card-media]")?.remove()
+    left.querySelector(".card-lottie[data-card-media]")?.remove()
     if (!video) {
       left.querySelector(".split-left-overlay[data-card-media]")?.remove()
       left.querySelector(".split-left-credit[data-card-media]")?.remove()
@@ -835,6 +845,89 @@ export default class extends Controller {
       vid.after(ovEl)
     }
     this._renderCardCredit(left, ovEl, credit, creditUrl, "Video")
+  }
+
+  // ── Lottie (pasted LottieFiles URL) ────────────────────────────────────
+  // The URL never lands on the card: the server fetches, scrubs and stores
+  // the animation JSON (CardLottieStore) and hands back a same-origin path —
+  // the only form the cards sanitiser accepts for `lottie`.
+
+  _showLottieSection(show) {
+    if (this.hasLottieSectionTarget) this.lottieSectionTarget.hidden = !show
+    if (show && this.hasLottieErrorTarget) this.lottieErrorTarget.hidden = true
+  }
+
+  async applyLottie(event) {
+    event?.preventDefault()
+    if (this._mode !== "card" || !this._activeCard || !this.hasCardLottieUrlValue) return
+    const pasted = this.lottieInputTarget.value.trim()
+    if (!pasted) return
+
+    this.lottieErrorTarget.hidden = true
+    this.lottieBtnTarget.disabled = true
+    try {
+      const res = await fetch(this.cardLottieUrlValue, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+        },
+        body: JSON.stringify({ url: pasted })
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.ok || !data.url) {
+        this.lottieErrorTarget.textContent = data.error || t("js.editor.lottie_failed", { default: "That link doesn't look like a LottieFiles animation." })
+        this.lottieErrorTarget.hidden = false
+        return
+      }
+      this._setCardLottie(this._activeCard, data.url)
+      this.lottieInputTarget.value = ""
+      this._notifyDirty()
+      this.close()
+    } catch (_) {
+      this.lottieErrorTarget.textContent = t("js.editor.lottie_failed", { default: "That link doesn't look like a LottieFiles animation." })
+      this.lottieErrorTarget.hidden = false
+    } finally {
+      this.lottieBtnTarget.disabled = false
+    }
+  }
+
+  // Swap a card's left panel to a looping Lottie, mirroring the server render
+  // in shared/_split_left. Own class (card-lottie, NOT nps-lottie) — the
+  // :has(.nps-lottie) CSS hides the Change-media CTA, which this must keep.
+  _setCardLottie(card, url) {
+    card.dataset.cardLottie = url || ""
+    card.dataset.cardImage = ""
+    card.dataset.cardImageCredit = ""
+    card.dataset.cardImageCreditUrl = ""
+    card.dataset.cardVideo = ""
+    card.dataset.cardVideoPoster = ""
+    const left = card.querySelector(".split-left")
+    if (!left) return
+    left.querySelector(".split-left-img[data-card-media]")?.remove()
+    left.querySelector(".split-left-video[data-card-media]")?.remove()
+    left.querySelector(".split-left-overlay[data-card-media]")?.remove()
+    left.querySelector(".split-left-credit[data-card-media]")?.remove()
+    let el = left.querySelector(".card-lottie[data-card-media]")
+    if (!url) { el?.remove(); return }
+    if (el) {
+      // urlsValueChanged() re-renders the mounted player in place.
+      el.dataset.lottiePlayerUrlsValue = JSON.stringify([ url ])
+      return
+    }
+    el = document.createElement("div")
+    el.className = "card-lottie"
+    el.dataset.cardMedia = "true"
+    el.dataset.controller = "lottie-player"
+    el.dataset.lottiePlayerUrlsValue = JSON.stringify([ url ])
+    el.dataset.lottiePlayerCurrentValue = "1"
+    el.dataset.lottiePlayerLoopValue = "true"
+    const mount = document.createElement("div")
+    mount.className = "card-lottie-mount"
+    mount.dataset.lottiePlayerTarget = "mount"
+    el.appendChild(mount)
+    left.prepend(el)
   }
 
   // Add/update/remove the subtle creator credit on a card's left panel.
