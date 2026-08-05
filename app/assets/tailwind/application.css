@@ -3066,13 +3066,6 @@
   white-space: normal; text-align: center;
 }
 .card-rail .rail-label { min-width: 0; }
-/* Two-word labels don't fit beside their icon in half a rail, so these two
-   stack — icon over label, the label wrapping between words. */
-.card-rail .card-delete-btn,
-.card-rail .rail-add-btn {
-  flex-direction: column; gap: 2px; padding: 7px 4px;
-  border-radius: 14px; /* a two-line pill at half-rail width is a circle */
-}
 .card-rail .card-num-pill { justify-content: center; gap: 3px; }
 .card-rail .required-chip { justify-content: center; margin-top: 0; }
 /* The reorder pair defines the rail's column rhythm — every other row lines
@@ -3081,9 +3074,14 @@
   grid-column: 1 / -1; padding: 0;
   display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items: stretch;
 }
+/* Controls whose label is a whole phrase keep a row to themselves — the
+   destructive/insert pair included, so Delete card sits above Add question
+   rather than beside it. */
 .card-rail .card-light,
 .card-rail .required-chip,
-.card-rail .card-duplicate-btn { grid-column: 1 / -1; }
+.card-rail .card-duplicate-btn,
+.card-rail .card-delete-btn,
+.card-rail .rail-add-btn { grid-column: 1 / -1; }
 .card-rail .card-move-btn {
   flex: 1 1 0; width: auto; height: auto; min-height: 30px; border-radius: 100px;
   background: #232838; border: 1px solid rgba(255,255,255,0.25);
@@ -3104,14 +3102,14 @@
   background: #232838; border-color: rgba(255,255,255,0.35);
   font-size: 12px;
 }
-.card-rail .card-delete-btn { justify-content: center; }
+.card-rail .card-delete-btn { justify-content: center; gap: 7px; font-size: 12px; }
 /* Solid teal, like the gate add-CTAs — the base .aq-trigger-btn ghost fill
    disappears over light artwork. */
 .card-rail .rail-add-btn {
-  justify-content: center; display: inline-flex; align-items: center;
-  border-radius: 100px;
+  justify-content: center; gap: 7px; display: inline-flex; align-items: center;
+  border-radius: 100px; padding: 6px 12px;
   background: #01EACB; border: 1.5px solid #01EACB; color: #04221E;
-  font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+  font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em;
 }
 .card-rail .rail-add-btn:hover {
   background: #18F0D4; border-color: #18F0D4; color: #04221E;
@@ -3138,7 +3136,9 @@
 /* Nothing spans the row once it's a circle — they pair up like the rest. */
 .editor-grid.is-panel-open .card-rail .card-light,
 .editor-grid.is-panel-open .card-rail .required-chip,
-.editor-grid.is-panel-open .card-rail .card-duplicate-btn { grid-column: auto; }
+.editor-grid.is-panel-open .card-rail .card-duplicate-btn,
+.editor-grid.is-panel-open .card-rail .card-delete-btn,
+.editor-grid.is-panel-open .card-rail .rail-add-btn { grid-column: auto; }
 .editor-grid.is-panel-open .card-rail .rail-label,
 .editor-grid.is-panel-open .card-rail .card-light-word,
 .editor-grid.is-panel-open .card-rail .card-light-score { display: none; }
