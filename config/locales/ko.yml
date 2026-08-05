@@ -828,6 +828,8 @@ ko:
     duplicate_card: '복제'
     emoji_pick: "이모지 선택"
     brand_font: "서체"
+    answer_tint: "답변 아이콘을 브랜드 색상에 맞추기"
+    answer_tint_hint: "그렇지 않으면 기본 파스텔 세트를 사용합니다."
     brand_font_hint: "이 Verto의 모든 질문, 답변, 종료 화면 글꼴을 설정합니다."
     brand_font_default: "기본값 (ABeeZee)"
     emoji_search: "이모지 검색…"

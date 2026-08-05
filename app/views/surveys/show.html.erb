@@ -1334,6 +1334,18 @@
           <div data-brand-palette-target="status"
                style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:2px;"></div>
 
+          <%# Answer icons follow the brand colour. %>
+          <label style="display:flex;align-items:flex-start;gap:9px;margin-top:12px;cursor:pointer;">
+            <input type="checkbox" data-brand-palette-target="tintToggle"
+                   data-action="change->brand-palette#onTint"
+                   <%= "checked" if @survey.brand_answer_tint? %>
+                   style="width:15px;height:15px;accent-color:#01EACB;margin-top:2px;flex-shrink:0;" />
+            <span>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;display:block;"><%= t("editor.answer_tint", default: "Match answer icons to my brand colour") %></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);line-height:1.4;"><%= t("editor.answer_tint_hint", default: "Otherwise they use our default pastel set.") %></span>
+            </span>
+          </label>
+
           <%# Typeface — the same seven self-hosted families the rich-text
               toolbar offers per selection, applied to the whole Verto. Each
               option previews in its own face so the list reads as what it

@@ -449,6 +449,21 @@
               </div>
             </div>
 
+            <%# Answer icons follow the brand colour — the six answer tiles
+                become a ramp of the Primary colour instead of the stock
+                pastels. Live-previewed by brand-palette, same as the colours. %>
+            <label style="display:flex;align-items:flex-start;gap:9px;cursor:pointer;">
+              <input type="hidden" name="brand_answer_tint" value="0" />
+              <input type="checkbox" name="brand_answer_tint" value="1"
+                     data-brand-palette-target="tintToggle"
+                     data-action="change->brand-palette#onTint"
+                     style="width:15px;height:15px;accent-color:#01EACB;margin-top:2px;flex-shrink:0;" />
+              <span>
+                <span style="font-family:'Alata',sans-serif;font-size:13px;color:#1C2034;line-height:1.2;display:block;"><%= t("editor.answer_tint", default: "Match answer icons to my brand colour") %></span>
+                <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.45);line-height:1.3;"><%= t("editor.answer_tint_hint", default: "Otherwise they use our default pastel set.") %></span>
+              </span>
+            </label>
+
             <%# Section: Typeface — set here so a generated Verto arrives in the
                 creator's font, rather than being restyled card by card after
                 the fact. Same seven self-hosted families the Design panel and

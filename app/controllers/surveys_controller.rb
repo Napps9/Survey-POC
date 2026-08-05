@@ -134,6 +134,7 @@ class SurveysController < ApplicationController
     quiz         = ActiveModel::Type::Boolean.new.cast(params[:quiz]) || false
     palette      = BrandPalette.sanitize(params[:brand_palette])
     brand_font   = Survey.sanitize_brand_font(params[:brand_font])
+    answer_tint  = ActiveModel::Type::Boolean.new.cast(params[:brand_answer_tint]) || false
 
     # Languages this Verto is built in. The primary (default_locale) is the
     # generation source and the canonical language answers align against; the
@@ -169,6 +170,7 @@ class SurveysController < ApplicationController
         theme: theme, audience_age: audience_age, key_insight: key_insight,
         notes: notes, quiz: quiz, show_results_comparison: show_compare,
         brand_palette: palette.presence, brand_font: brand_font,
+        brand_answer_tint: answer_tint,
         default_locale: default_locale,
         locales: locales, common_cards: common_cards
       }
@@ -375,6 +377,9 @@ class SurveysController < ApplicationController
     # "" clears back to the platform default; anything not in BRAND_FONTS is
     # dropped the same way (the value reaches an inline style attribute).
     attrs[:brand_font] = Survey.sanitize_brand_font(payload["brand_font"]) if payload.key?("brand_font")
+    if payload.key?("brand_answer_tint")
+      attrs[:brand_answer_tint] = ActiveModel::Type::Boolean.new.cast(payload["brand_answer_tint"]) || false
+    end
     if payload.key?("background_image")
       attrs[:background_image] = Survey.sanitize_background_image(payload["background_image"])
       warnings << "background_image" if payload["background_image"].present? && attrs[:background_image].nil?

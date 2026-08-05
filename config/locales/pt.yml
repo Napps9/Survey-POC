@@ -828,6 +828,8 @@ pt:
     duplicate_card: 'Duplicar'
     emoji_pick: "Escolher um emoji"
     brand_font: "Tipografia"
+    answer_tint: "Combinar os ícones das respostas com a cor da marca"
+    answer_tint_hint: "Caso contrário, usamos o conjunto pastel predefinido."
     brand_font_hint: "Define a fonte de todas as perguntas, respostas e ecrãs finais."
     brand_font_default: "Predefinição (ABeeZee)"
     emoji_search: "Procurar emoji…"

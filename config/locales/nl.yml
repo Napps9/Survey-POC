@@ -828,6 +828,8 @@ nl:
     duplicate_card: 'Dupliceren'
     emoji_pick: "Kies een emoji"
     brand_font: "Lettertype"
+    answer_tint: "Antwoordpictogrammen afstemmen op mijn merkkleur"
+    answer_tint_hint: "Anders gebruiken we onze standaard pastelset."
     brand_font_hint: "Bepaalt het lettertype van elke vraag, antwoord en eindscherm."
     brand_font_default: "Standaard (ABeeZee)"
     emoji_search: "Zoek emoji…"

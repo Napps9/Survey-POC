@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { DEFAULT, resolve, applyVars, clearVars, isDefault, validHex } from "lib/brand_palette"
+import { DEFAULT, resolve, applyVars, clearVars, isDefault, validHex, tileGradients } from "lib/brand_palette"
 
 // Drives the brand-colour pickers in two places:
 //  - the Create wizard's "Brand colours" step (live mock, palette submitted
@@ -7,7 +7,7 @@ import { DEFAULT, resolve, applyVars, clearVars, isDefault, validHex } from "lib
 //  - the Verto editor's publish panel (live-applies to the card canvas +
 //    preview overlay and autosaves THIS survey's palette via PATCH)
 export default class extends Controller {
-  static targets = ["colorInput", "hexInput", "preview", "status", "fontSelect"]
+  static targets = ["colorInput", "hexInput", "preview", "status", "fontSelect", "tintToggle"]
   static values = { url: String }
 
   connect() {
@@ -42,6 +42,24 @@ export default class extends Controller {
   onFont() {
     this._applyFont()
     this._save()
+  }
+
+  // Answer icons following the brand colour. Recomputed on every colour
+  // change too, so the tiles track the primary as it's picked.
+  onTint() {
+    this._applyTint()
+    this._save()
+  }
+
+  _applyTint() {
+    const on = this.hasTintToggleTarget && this.tintToggleTarget.checked
+    const primary = this._roleValue("primary")
+    this.previewTargets.forEach((el) => {
+      tileGradients(on ? primary : null).forEach((grad, i) => {
+        grad ? el.style.setProperty(`--choice-bg-${i + 1}`, grad)
+             : el.style.removeProperty(`--choice-bg-${i + 1}`)
+      })
+    })
   }
 
   _applyFont() {
@@ -90,6 +108,7 @@ export default class extends Controller {
   }
 
   _apply() {
+    this._applyTint()
     const raw = this._palette()
     const resolved = resolve(raw)
     const blank = isDefault(raw)
@@ -111,7 +130,11 @@ export default class extends Controller {
           "Content-Type": "application/json",
           "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || "",
         },
-        body: JSON.stringify({ brand_palette: this._palette(), brand_font: this._font() }),
+        body: JSON.stringify({
+          brand_palette: this._palette(),
+          brand_font: this._font(),
+          brand_answer_tint: this.hasTintToggleTarget ? this.tintToggleTarget.checked : false,
+        }),
       })
       const data = await res.json()
       this._status(data.ok ? "Saved" : "Couldn't save")

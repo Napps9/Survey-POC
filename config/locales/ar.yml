@@ -828,6 +828,8 @@ ar:
     duplicate_card: 'تكرار'
     emoji_pick: "اختر رمزًا تعبيريًا"
     brand_font: "نوع الخط"
+    answer_tint: "مطابقة أيقونات الإجابات للون علامتي التجارية"
+    answer_tint_hint: "وإلا فستستخدم مجموعتنا الباستيلية الافتراضية."
     brand_font_hint: "يحدد الخط لكل سؤال وإجابة وشاشة نهاية في هذا الـVerto."
     brand_font_default: "الافتراضي (ABeeZee)"
     emoji_search: "ابحث عن رمز…"

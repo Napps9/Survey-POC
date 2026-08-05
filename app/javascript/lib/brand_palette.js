@@ -117,3 +117,17 @@ export function clearVars(el) {
   if (!el) return
   for (const varName of Object.values(CSS_VARS)) el.style.removeProperty(varName)
 }
+
+// Twin of BrandPalette.tile_gradients — the answer-icon ramp derived from the
+// Verto's primary colour. Same steps as the Ruby side (a parity test pins
+// them), so the live preview matches what the server will render.
+export const TINT_STEPS = [ 0.82, 0.70, 0.58, 0.46, 0.34, 0.22 ]
+
+export function tileGradients(primary) {
+  if (!primary || !validHex(primary)) return TINT_STEPS.map(() => null)
+  return TINT_STEPS.map((step) => {
+    const from = lighten(primary, step)
+    const to = lighten(primary, Math.max(step - 0.18, 0))
+    return `linear-gradient(135deg, ${from}, ${to})`
+  })
+}

@@ -828,6 +828,8 @@ ja:
     duplicate_card: '複製'
     emoji_pick: "絵文字を選ぶ"
     brand_font: "書体"
+    answer_tint: "回答アイコンをブランドカラーに合わせる"
+    answer_tint_hint: "オフの場合は既定のパステルセットを使用します。"
     brand_font_hint: "この Verto のすべての質問・回答・終了画面のフォントを設定します。"
     brand_font_default: "デフォルト（ABeeZee）"
     emoji_search: "絵文字を検索…"

@@ -836,6 +836,8 @@ en:
     duplicate_card: 'Duplicate'
     emoji_pick: "Choose an emoji"
     brand_font: "Typeface"
+    answer_tint: "Match answer icons to my brand colour"
+    answer_tint_hint: "Otherwise they use our default pastel set."
     brand_font_hint: "Sets the font for every question, answer and finish screen in this Verto."
     brand_font_default: "Default (ABeeZee)"
     emoji_search: "Search emoji…"
