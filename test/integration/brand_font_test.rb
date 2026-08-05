@@ -114,6 +114,43 @@ class BrandFontTest < ActionDispatch::IntegrationTest
                     "an empty heading variable would beat the CSS fallback to the body face"
   end
 
+  # The create flow is a different path to the editor's PATCH: the wizard
+  # posts to #generate, which parks a payload for BuildVertoJob to turn into a
+  # Verto. A branding field dropped at either seam looks fine in the wizard and
+  # then arrives unstyled, so both are asserted.
+  test "the wizard hands both fonts and the icon colours to the build" do
+    sign_in
+    post generate_survey_path, params: {
+      theme: "Community safety", audience_age: "adults", key_insight: "what helps",
+      brand_font: "font-lora", brand_font_heading: "font-anton", brand_answer_tint: "1",
+      brand_palette: { "primary" => "#8B5CF6" }
+    }
+
+    build = @org.verto_builds.order(:id).last
+    assert build, "the wizard should have parked a build"
+    assert_equal "font-lora",  build.payload["brand_font"]
+    assert_equal "font-anton", build.payload["brand_font_heading"]
+    assert_equal true,         build.payload["brand_answer_tint"]
+  end
+
+  test "the build maps all three onto the Verto it creates" do
+    # A Common-Questions-only deck (blank key_insight) is BuildVertoJob's
+    # no-Claude branch, so this exercises the real mapping without the API.
+    build = @org.verto_builds.create!(user: @user, payload: {
+      "theme" => "Community safety", "audience_age" => "adults", "key_insight" => "",
+      "common_cards" => [ { "type" => "multiple_choice", "text" => "Q", "options" => %w[a b] } ],
+      "default_locale" => "en", "locales" => [ "en" ],
+      "brand_font" => "font-lora", "brand_font_heading" => "font-anton",
+      "brand_answer_tint" => true
+    })
+
+    survey = BuildVertoJob.new.send(:create_survey, build)
+
+    assert_equal "font-lora",  survey.brand_font
+    assert_equal "font-anton", survey.brand_font_heading
+    assert survey.brand_answer_tint?, "the icon-colour choice must reach the Verto"
+  end
+
   test "the Design panel and the create wizard both offer the picker" do
     sign_in
     get survey_path(@survey)
