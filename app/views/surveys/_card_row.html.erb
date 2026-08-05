@@ -70,7 +70,10 @@
                   data-action="click->survey-editor#moveCardDown">▼</button>
         </div>
       <% end %>
-      <span class="card-num-pill" data-role="card-number">Card <%= idx + 1 %></span>
+      <%# Word and number split: the word is a .rail-label, so the collapsed
+          rail shows a circle holding just the number. The number span is the
+          re-stamp hook (survey_editor renumbers after every move). %>
+      <span class="card-num-pill"><span class="rail-label">Card</span><span data-role="card-number"><%= idx + 1 %></span></span>
       <% if is_q %>
         <%# Passive glance indicator — visible only while the card is Required
             (toggled live from the Answer Type tab's Card settings). %>

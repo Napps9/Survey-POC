@@ -529,8 +529,10 @@ export default class extends Controller {
     cards.forEach((card, i) => {
       const num = i + 1
       card.dataset.cardNum = String(num)
+      // Number only — the "Card" word is a separate .rail-label span in the
+      // pill, hidden when the rail collapses to a numbered circle.
       const numEl = card.querySelector("[data-role='card-number']")
-      if (numEl) numEl.textContent = `Card ${num}`
+      if (numEl) numEl.textContent = String(num)
 
       const isQ = !NON_QUESTION_TYPES.includes(card.dataset.cardType)
       if (isQ) qIdx++
