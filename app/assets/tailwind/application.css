@@ -2971,8 +2971,19 @@
   flex-shrink: 0; min-width: 128px;
   z-index: 2;
 }
+/* Each group is a DOCK: a rounded, near-opaque dark surface of its own, so
+   the controls read as one cohesive cluster — and keep their contrast on any
+   Verto backdrop (the brand bg is free-form: light, vivid or an image). The
+   blur keeps artwork behind from muddying the edge; the fill alone is dark
+   enough that white text holds AA even over pure white. */
 .rail-top, .rail-bottom {
   display: flex; flex-direction: column; gap: 6px; align-items: stretch;
+  padding: 8px;
+  border-radius: 16px;
+  background: rgba(17,20,34,0.88);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.35);
 }
 
 /* One size, SOLID surfaces: every control is a full-rail-width pill of the
@@ -3023,7 +3034,7 @@
    spot. Tooltips/aria-labels carry the names. */
 .editor-grid.is-panel-open .card-rail { min-width: 0; align-items: center; }
 .editor-grid.is-panel-open .rail-top,
-.editor-grid.is-panel-open .rail-bottom { align-items: center; }
+.editor-grid.is-panel-open .rail-bottom { align-items: center; padding: 6px; }
 .editor-grid.is-panel-open .card-rail .rail-label,
 .editor-grid.is-panel-open .card-rail .card-light-word,
 .editor-grid.is-panel-open .card-rail .card-light-score { display: none; }
