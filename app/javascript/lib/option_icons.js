@@ -31,7 +31,30 @@ export function iconMap() {
   }
   map.keywords ||= {}
   map.ids ||= {}
+  map.emojis ||= {}
+  map.fallbacks ||= []
   return map
+}
+
+// Twin of OptionIconLibrary.emoji_for — the guarantee that no selection answer
+// shows an empty tile. Keyword match first, then a neutral shape cycled by
+// position so a deck's rows stay distinct without asserting any meaning.
+export function emojiFor(label, index = 0) {
+  const { emojis, fallbacks } = iconMap()
+  if (!fallbacks.length) return null
+  const n = normalize(label)
+  return emojis[n] || emojis[n.replace(/s$/, "")] || fallbacks[Math.abs(index) % fallbacks.length]
+}
+
+export function emojiInto(tile, label, index = 0) {
+  if (!tile || tile.querySelector("svg, .choice-icon-emoji")) return
+  const emoji = emojiFor(label, index)
+  if (!emoji) return
+  const span = document.createElement("span")
+  span.className = "choice-icon-emoji"
+  span.setAttribute("aria-hidden", "true")
+  span.textContent = emoji
+  tile.insertAdjacentElement("afterbegin", span)
 }
 
 export function urlFor(label) {
@@ -83,21 +106,27 @@ async function injectUrl(tile, url) {
 
 // Icon pass over freshly built option markup, honouring per-option style
 // overrides (data-option-icon / data-option-emoji beat the keyword match).
-// Rows the server deliberately renders icon-free (prioritise, yes/no) only
-// ever get an explicit override.
+// Rows the server renders keyword-icon-free (prioritise, yes/no) still get the
+// emoji fallback — no selection answer should show an empty tile.
 export function injectIcons(root) {
   if (!root) return
-  const fill = (li, tile, label, keywordOk) => {
+  const fill = (li, tile, label, keywordOk, index) => {
     if (!tile || tile.querySelector("svg, .choice-icon-emoji")) return
     if (li.dataset.optionIcon) return iconIntoById(tile, li.dataset.optionIcon)
     if (li.dataset.optionEmoji) return
-    if (keywordOk) iconInto(tile, label)
+    // The keyword icon is async; the emoji fallback only lands if nothing
+    // matched, so it can't race an icon into the same tile.
+    if (keywordOk) {
+      iconInto(tile, label).then(() => emojiInto(tile, label, index))
+      return
+    }
+    emojiInto(tile, label, index)
   }
-  root.querySelectorAll(".choice-list .choice-list-item").forEach((li) => {
+  root.querySelectorAll(".choice-list .choice-list-item").forEach((li, i) => {
     const keywordOk = !li.classList.contains("prioritise-item") && !li.closest(".choice-list--yesno")
-    fill(li, li.querySelector(".choice-list-tile"), li.querySelector(".pick-text, .choice-list-label")?.textContent, keywordOk)
+    fill(li, li.querySelector(".choice-list-tile"), li.querySelector(".pick-text, .choice-list-label")?.textContent, keywordOk, i)
   })
-  root.querySelectorAll(".choice-card").forEach((li) => {
-    fill(li, li.querySelector(".choice-card-bg"), li.querySelector(".choice-label")?.textContent, true)
+  root.querySelectorAll(".choice-card").forEach((li, i) => {
+    fill(li, li.querySelector(".choice-card-bg"), li.querySelector(".choice-label")?.textContent, true, i)
   })
 }

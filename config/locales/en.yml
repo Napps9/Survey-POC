@@ -219,6 +219,7 @@ en:
       delete_card_confirm: "Delete this card?"
       save_to_library: "Also save to my brand library"
       lottie_failed: "That link doesn't look like a LottieFiles animation."
+      emoji_none: "No emoji match that."
       rich_bold: "Bold"
       rich_italic: "Italic"
       rich_underline: "Underline"
@@ -833,6 +834,9 @@ en:
     leave_editor: 'Leave editor'
     undo: 'Undo'
     duplicate_card: 'Duplicate'
+    emoji_pick: "Choose an emoji"
+    emoji_search: "Search emoji…"
+    emoji_clear: "Clear"
     lottie_section: "Animation (Lottie)"
     lottie_placeholder: "Paste a LottieFiles link, e.g. https://lottie.host/….json"
     lottie_apply: "Use animation"

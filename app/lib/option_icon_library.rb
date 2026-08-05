@@ -33,6 +33,28 @@ module OptionIconLibrary
     file && inline_svg(file)
   end
 
+  # ── Emoji fallback ───────────────────────────────────────────────────────
+  # A selection answer should never show an empty tile — a bare gradient reads
+  # as unfinished next to rows that did match. When no icon, no creator-picked
+  # emoji and no label emoji filled the tile, one comes from here: a curated
+  # keyword match if there is one, else a neutral shape cycled by position so
+  # a deck's options stay visually distinct without asserting any meaning.
+  EMOJI_DATA = YAML.load_file(Rails.root.join("config/option_emojis.yml")).freeze
+
+  EMOJI_KEYWORDS = EMOJI_DATA.fetch("keywords", {}).to_h { |k, v| [ k.to_s.downcase.strip, v.to_s ] }.freeze
+  EMOJI_FALLBACKS = Array(EMOJI_DATA.fetch("fallbacks", [])).map(&:to_s).freeze
+
+  def emoji_for(label, index = 0)
+    norm = normalize(label)
+    return nil if EMOJI_FALLBACKS.empty?
+    return EMOJI_KEYWORDS[norm] if EMOJI_KEYWORDS.key?(norm)
+
+    singular = norm.sub(/s\z/, "")
+    return EMOJI_KEYWORDS[singular] if EMOJI_KEYWORDS.key?(singular)
+
+    EMOJI_FALLBACKS[index.to_i % EMOJI_FALLBACKS.length]
+  end
+
   # ── Explicit picks (per-option `option_styles.icon`) ─────────────────────
   # Icons are addressed by their file basename (e.g. "basketball"), which is
   # what the editor's icon picker stores and the sanitiser validates.

@@ -211,6 +211,7 @@ hi:
       delete_card_confirm: इस कार्ड को हटाएं?
       save_to_library: "मेरी ब्रांड लाइब्रेरी में भी सहेजें"
       lottie_failed: "यह लिंक LottieFiles एनिमेशन जैसा नहीं लगता।"
+      emoji_none: "कोई इमोजी मेल नहीं खाता।"
       rich_bold: "बोल्ड"
       rich_italic: "इटैलिक"
       rich_underline: "रेखांकित"
@@ -825,6 +826,9 @@ hi:
     leave_editor: 'संपादक से बाहर निकलें'
     undo: 'पूर्ववत करें'
     duplicate_card: 'डुप्लिकेट करें'
+    emoji_pick: "इमोजी चुनें"
+    emoji_search: "इमोजी खोजें…"
+    emoji_clear: "हटाएँ"
     lottie_section: "एनिमेशन (Lottie)"
     lottie_placeholder: "LottieFiles लिंक पेस्ट करें, जैसे https://lottie.host/….json"
     lottie_apply: "एनिमेशन उपयोग करें"

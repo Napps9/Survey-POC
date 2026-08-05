@@ -211,6 +211,7 @@ id:
       delete_card_confirm: Hapus kartu ini?
       save_to_library: "Simpan juga ke pustaka merek saya"
       lottie_failed: "Tautan itu sepertinya bukan animasi LottieFiles."
+      emoji_none: "Tidak ada emoji yang cocok."
       rich_bold: "Tebal"
       rich_italic: "Miring"
       rich_underline: "Garis bawah"
@@ -825,6 +826,9 @@ id:
     leave_editor: 'Keluar dari editor'
     undo: 'Urungkan'
     duplicate_card: 'Gandakan'
+    emoji_pick: "Pilih emoji"
+    emoji_search: "Cari emoji…"
+    emoji_clear: "Hapus"
     lottie_section: "Animasi (Lottie)"
     lottie_placeholder: "Tempel tautan LottieFiles, mis. https://lottie.host/….json"
     lottie_apply: "Gunakan animasi"

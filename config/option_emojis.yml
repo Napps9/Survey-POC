@@ -1,0 +1,108 @@
+# Per-option emoji catalogue, consumed by app/lib/option_icon_library.rb.
+#
+# Every selection answer shows something in its icon tile — a bare gradient
+# reads as unfinished. The tile fills in this order: an explicit 🎨 icon, an
+# explicit 🎨 emoji, an emoji hoisted out of the label, a curated SVG from
+# config/option_icons.yml, and finally an emoji from here.
+#
+# `keywords` matches EXACTLY (after normalising case/punctuation/whitespace),
+# same rule as option_icons.yml — conservative on purpose, so an option never
+# picks up a surprising emoji. `fallbacks` is the cycle used when nothing
+# matches: deliberately neutral shapes that carry no meaning of their own, so
+# they decorate the row without asserting anything about the answer.
+#
+# Loaded once at boot — restart the dev server after editing.
+
+fallbacks: ["🔷", "🔶", "🟢", "🟣", "🔴", "🟡"]
+
+keywords:
+  # Agreement / sentiment — the most common selection vocabulary.
+  "yes": "👍"
+  "no": "👎"
+  "maybe": "🤔"
+  "unsure": "🤔"
+  "not sure": "🤔"
+  "prefer not to say": "🤐"
+  "strongly agree": "💚"
+  "agree": "🙂"
+  "neutral": "😐"
+  "disagree": "🙁"
+  "strongly disagree": "❤️"
+  "very unsafe": "😨"
+  "a bit unsafe": "😟"
+  "fairly safe": "🙂"
+  "very safe": "😌"
+  "extremely safe": "🥰"
+  "other": "✏️"
+  "none": "🚫"
+  "none of the above": "🚫"
+  "all of the above": "✅"
+
+  # Money
+  "pay off debt": "💳"
+  "debt": "💳"
+  "start saving": "🏦"
+  "saving": "🏦"
+  "savings": "🏦"
+  "build investments": "📈"
+  "investments": "📈"
+  "buy a home": "🏠"
+  "housing": "🏠"
+  "rent": "🔑"
+  "salary": "💷"
+  "income": "💷"
+  "cost of living": "🧾"
+  "bills": "🧾"
+  "budget": "🧮"
+
+  # Work / study
+  "work": "💼"
+  "job": "💼"
+  "find a stable job": "💼"
+  "start a business": "🚀"
+  "school": "🏫"
+  "college": "🎓"
+  "university": "🎓"
+  "training": "📚"
+  "apprenticeship": "🔧"
+  "unemployment": "📉"
+
+  # Health / wellbeing
+  "health": "❤️"
+  "mental health": "🧠"
+  "physical health": "💪"
+  "exercise": "🏃"
+  "sleep": "😴"
+  "diet": "🥗"
+  "food": "🍽️"
+  "healthcare costs": "🏥"
+  "stress": "😰"
+  "wellbeing": "🌱"
+
+  # Community / place
+  "family": "👨‍👩‍👧"
+  "friends": "🫂"
+  "community": "🏘️"
+  "neighbourhood": "🏘️"
+  "neighborhood": "🏘️"
+  "transport": "🚌"
+  "public transport": "🚌"
+  "safety": "🛡️"
+  "crime": "🚨"
+  "environment": "🌍"
+  "climate": "🌍"
+  "better lighting": "💡"
+  "more patrols": "👮"
+  "community events": "🎪"
+  "neighbourhood watch": "👀"
+  "cleaner streets": "🧹"
+
+  # Time / frequency
+  "daily": "📅"
+  "weekly": "📅"
+  "monthly": "🗓️"
+  "never": "🚫"
+  "always": "♾️"
+  "sometimes": "🔁"
+  "often": "🔁"
+  "rarely": "🌙"

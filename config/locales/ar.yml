@@ -211,6 +211,7 @@ ar:
       delete_card_confirm: حذف هذه البطاقة؟
       save_to_library: "حفظ أيضًا في مكتبة العلامة التجارية"
       lottie_failed: "لا يبدو أن هذا الرابط رسوم متحركة من LottieFiles."
+      emoji_none: "لا توجد رموز مطابقة."
       rich_bold: "غامق"
       rich_italic: "مائل"
       rich_underline: "تسطير"
@@ -825,6 +826,9 @@ ar:
     leave_editor: 'مغادرة المحرر'
     undo: 'تراجع'
     duplicate_card: 'تكرار'
+    emoji_pick: "اختر رمزًا تعبيريًا"
+    emoji_search: "ابحث عن رمز…"
+    emoji_clear: "مسح"
     lottie_section: "رسوم متحركة (Lottie)"
     lottie_placeholder: "الصق رابط LottieFiles، مثل https://lottie.host/….json"
     lottie_apply: "استخدام الرسوم"

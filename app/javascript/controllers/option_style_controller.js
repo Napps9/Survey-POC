@@ -14,6 +14,11 @@ export default class extends Controller {
     this._onDocClick = (e) => {
       if (!this.hasPopoverTarget || this.popoverTarget.hidden) return
       if (this.popoverTarget.contains(e.target) || e.target.closest(".option-style-btn")) return
+      // The emoji picker is a sibling popover, not a child of this one — its
+      // trigger lives inside our markup but the panel it opens does not.
+      // Without this, picking an emoji closed us first and cleared _row, so
+      // the pick landed in the input and was never written to the option.
+      if (e.target.closest(".emoji-picker-popover, [data-emoji-picker-trigger]")) return
       this.close()
     }
     this._onKeydown = (e) => { if (e.key === "Escape") this.close() }

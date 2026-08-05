@@ -43,7 +43,7 @@
 <script id="option-icon-map" type="application/json"><%= option_icon_map_data.to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel gate-cards score-modal flows option-style rich-text"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel gate-cards score-modal flows option-style rich-text emoji-picker"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
@@ -775,6 +775,13 @@
                          style="display:flex;gap:6px;align-items:center;">
                       <input type="text" aria-label="Token icon" data-token-types-target="icon" maxlength="8" value="<%= tt['icon'] %>"
                              style="width:40px;text-align:center;padding:7px 4px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size: var(--text-md);outline:none;" />
+                      <%# Same shared picker as the option-style popover — the
+                          trigger falls back to the input beside it, so no id
+                          is needed on these repeated rows. %>
+                      <button type="button" class="emoji-pick-btn" data-emoji-picker-trigger
+                              data-action="click->emoji-picker#open"
+                              title="<%= t("editor.emoji_pick", default: "Choose an emoji") %>"
+                              aria-label="<%= t("editor.emoji_pick", default: "Choose an emoji") %>">☺</button>
                       <input type="text" aria-label="Token name" data-token-types-target="name" maxlength="40" value="<%= tt['name'] %>"
                              placeholder="e.g. Gold Coins"
                              style="flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
@@ -1640,12 +1647,21 @@
       <input type="color" data-option-style-target="colorInput"
              data-action="input->option-style#onColor" />
     </label>
-    <label class="option-style-row">
+    <div class="option-style-row">
       <span><%= t("js.editor.option_emoji") %></span>
-      <input type="text" maxlength="8" data-option-style-target="emojiInput"
-             data-action="input->option-style#onEmoji"
-             placeholder="🎯" />
-    </label>
+      <span class="emoji-field">
+        <input type="text" maxlength="8" id="option-style-emoji" data-option-style-target="emojiInput"
+               data-action="input->option-style#onEmoji"
+               placeholder="🎯" />
+        <%# Opens the shared picker — the OS emoji keyboard was the only way in
+            before, which plenty of creators never find. %>
+        <button type="button" class="emoji-pick-btn" data-emoji-picker-trigger
+                data-emoji-picker-for="#option-style-emoji"
+                data-action="click->emoji-picker#open"
+                title="<%= t("editor.emoji_pick", default: "Choose an emoji") %>"
+                aria-label="<%= t("editor.emoji_pick", default: "Choose an emoji") %>">☺</button>
+      </span>
+    </div>
     <div class="option-style-row option-style-row--icons">
       <span><%= t("js.editor.option_icon") %></span>
       <div class="option-style-icon-grid" data-option-style-target="iconGrid"></div>
@@ -1657,6 +1673,24 @@
               data-action="click->option-style#close"><%= t("js.editor.option_style_done") %></button>
     </div>
   </div>
+  <%# Shared emoji picker — one popover for every emoji field in the editor
+      (option styles, token types). Positioned against whichever trigger
+      opened it; see emoji_picker_controller. %>
+  <div class="emoji-picker-popover" data-emoji-picker-target="popover" hidden
+       role="dialog" aria-label="<%= t("editor.emoji_pick", default: "Choose an emoji") %>">
+    <div class="emoji-picker-head">
+      <input type="search" class="emoji-picker-search"
+             data-emoji-picker-target="search"
+             data-action="input->emoji-picker#onSearch"
+             placeholder="<%= t("editor.emoji_search", default: "Search emoji…") %>"
+             aria-label="<%= t("editor.emoji_search", default: "Search emoji…") %>" />
+      <button type="button" class="emoji-picker-clear"
+              data-action="click->emoji-picker#clear"><%= t("editor.emoji_clear", default: "Clear") %></button>
+    </div>
+    <div class="emoji-picker-tabs" data-emoji-picker-target="tabs"></div>
+    <div class="emoji-picker-grid" data-emoji-picker-target="grid"></div>
+  </div>
+
   <% if @survey.logic? && !@survey.editing_locked? %><%= render "surveys/generate_flow_modal" %><% end %>
   <% if @survey.logic? %><%= render "surveys/journey" %><% end %>
 

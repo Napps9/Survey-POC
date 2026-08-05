@@ -211,6 +211,7 @@ sw:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"
       lottie_failed: "Kiungo hicho hakionekani kama uhuishaji wa LottieFiles."
+      emoji_none: "Hakuna emoji inayolingana."
       rich_bold: "Nzito"
       rich_italic: "Mlazo"
       rich_underline: "Kupigia mstari"
@@ -825,6 +826,9 @@ sw:
     leave_editor: 'Ondoka kwenye kihariri'
     undo: 'Tendua'
     duplicate_card: 'Nakili'
+    emoji_pick: "Chagua emoji"
+    emoji_search: "Tafuta emoji…"
+    emoji_clear: "Futa"
     lottie_section: "Uhuishaji (Lottie)"
     lottie_placeholder: "Bandika kiungo cha LottieFiles, k.m. https://lottie.host/….json"
     lottie_apply: "Tumia uhuishaji"

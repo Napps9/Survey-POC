@@ -211,6 +211,7 @@ nl:
       delete_card_confirm: Deze kaart verwijderen?
       save_to_library: "Ook opslaan in mijn merkbibliotheek"
       lottie_failed: "Die link lijkt geen LottieFiles-animatie te zijn."
+      emoji_none: "Geen emoji gevonden."
       rich_bold: "Vet"
       rich_italic: "Cursief"
       rich_underline: "Onderstreept"
@@ -825,6 +826,9 @@ nl:
     leave_editor: 'Editor verlaten'
     undo: 'Ongedaan maken'
     duplicate_card: 'Dupliceren'
+    emoji_pick: "Kies een emoji"
+    emoji_search: "Zoek emoji…"
+    emoji_clear: "Wissen"
     lottie_section: "Animatie (Lottie)"
     lottie_placeholder: "Plak een LottieFiles-link, bijv. https://lottie.host/….json"
     lottie_apply: "Animatie gebruiken"

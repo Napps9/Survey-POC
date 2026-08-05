@@ -175,7 +175,7 @@
               data-selected="false"
               <%= option_style_data_attrs(style) if editable %>
               <%= pick_a11y.call(multi) %>>
-            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i]) %></div>
+            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], index: i) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span>
             <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
             <% if quiz_mode %>
@@ -217,7 +217,7 @@
               <%= option_style_data_attrs(style) if editable %>
               data-action="pointerdown->prioritise#start">
             <span class="prioritise-rank" data-prioritise-target="rank"><%= i + 1 %></span>
-            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], keyword_fallback: false) %></div>
+            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], keyword_fallback: false, index: i) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span>
             <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
             <% if editable %>
@@ -252,7 +252,7 @@
               data-selected="false"
               <%= option_style_data_attrs(style) if editable %>
               <%= pick_a11y.call(false) %>>
-            <div class="choice-list-tile choice-bg-<%= bg %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon_label, keyword_fallback: false) %></div>
+            <div class="choice-list-tile choice-bg-<%= bg %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon_label, keyword_fallback: false, index: i) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= t("card.#{canon_label.downcase}", locale: display_locale, default: canon_label) %></span>
             <span class="choice-list-tick pick-dot">✓</span>
             <% if quiz_mode %>
@@ -287,7 +287,7 @@
               <%= option_style_data_attrs(style) if editable %>
               <%= pick_a11y.call(multi) %>>
             <div class="choice-card-bg choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>">
-              <%= option_tile_icon(style, canon[i]) %>
+              <%= option_tile_icon(style, canon[i], index: i) %>
               <div class="choice-overlay"></div>
               <div class="choice-tick">✓</div>
               <% if quiz_mode %>
@@ -430,7 +430,7 @@
                       data-correct="<%= mark_correct.call(canon[i]) %>"
                       <%= option_style_data_attrs(style) if editable %>
                       data-selected="false">
-                    <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i]) %></div>
+                    <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], index: i) %></div>
                     <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
                     <span class="choice-list-tick pick-dot">✓</span>
                     <% if quiz_mode %>

@@ -211,6 +211,7 @@ uk:
       delete_card_confirm: Видалити цю картку?
       save_to_library: "Також зберегти в бібліотеку бренду"
       lottie_failed: "Це посилання не схоже на анімацію LottieFiles."
+      emoji_none: "Немає відповідних емодзі."
       rich_bold: "Жирний"
       rich_italic: "Курсив"
       rich_underline: "Підкреслений"
@@ -827,6 +828,9 @@ uk:
     leave_editor: 'Вийти з редактора'
     undo: 'Скасувати'
     duplicate_card: 'Дублювати'
+    emoji_pick: "Вибрати емодзі"
+    emoji_search: "Пошук емодзі…"
+    emoji_clear: "Очистити"
     lottie_section: "Анімація (Lottie)"
     lottie_placeholder: "Вставте посилання LottieFiles, напр. https://lottie.host/….json"
     lottie_apply: "Використати анімацію"

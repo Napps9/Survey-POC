@@ -211,6 +211,7 @@ he:
       delete_card_confirm: למחוק את הכרטיס הזה?
       save_to_library: "שמור גם בספריית המותג שלי"
       lottie_failed: "הקישור הזה לא נראה כמו אנימציית LottieFiles."
+      emoji_none: "אין אימוג'י תואם."
       rich_bold: "מודגש"
       rich_italic: "נטוי"
       rich_underline: "קו תחתון"
@@ -825,6 +826,9 @@ he:
     leave_editor: 'יציאה מהעורך'
     undo: 'ביטול'
     duplicate_card: 'שכפול'
+    emoji_pick: "בחרו אימוג'י"
+    emoji_search: "חיפוש אימוג'י…"
+    emoji_clear: "ניקוי"
     lottie_section: "אנימציה (Lottie)"
     lottie_placeholder: "הדביקו קישור LottieFiles, למשל https://lottie.host/….json"
     lottie_apply: "שימוש באנימציה"

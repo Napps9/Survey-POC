@@ -211,6 +211,7 @@ ko:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       save_to_library: "브랜드 라이브러리에도 저장"
       lottie_failed: "이 링크는 LottieFiles 애니메이션이 아닌 것 같습니다."
+      emoji_none: "일치하는 이모지가 없습니다."
       rich_bold: "굵게"
       rich_italic: "기울임"
       rich_underline: "밑줄"
@@ -825,6 +826,9 @@ ko:
     leave_editor: '편집기 나가기'
     undo: '실행 취소'
     duplicate_card: '복제'
+    emoji_pick: "이모지 선택"
+    emoji_search: "이모지 검색…"
+    emoji_clear: "지우기"
     lottie_section: "애니메이션 (Lottie)"
     lottie_placeholder: "LottieFiles 링크를 붙여넣으세요 (예: https://lottie.host/….json)"
     lottie_apply: "애니메이션 사용"

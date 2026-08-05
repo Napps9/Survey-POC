@@ -5,7 +5,7 @@
 // carried as data-option-* attributes on the option row — serialize() reads
 // the rows back, so DOM order IS the positional alignment with `options`.
 import { lighten } from "lib/brand_palette"
-import { iconInto, iconIntoById } from "lib/option_icons"
+import { iconInto, iconIntoById, emojiInto } from "lib/option_icons"
 
 // Same gradient shape as the stock choice-bg-N classes, from the picked hex.
 export function tileStyle(style) {
@@ -55,8 +55,15 @@ export function repaintRow(li, style) {
     span.setAttribute("aria-hidden", "true")
     span.textContent = style.emoji
     tile.insertAdjacentElement("afterbegin", span)
-  } else if (keywordFallback(li)) {
+  } else {
+    // Nothing explicit left — fall back exactly as the server does, ending in
+    // an emoji so a cleared style never leaves an empty tile.
     const label = li.querySelector(".pick-text, .choice-list-label, .choice-label")?.textContent
-    iconInto(tile, label)
+    const index = [ ...(li.parentElement?.children || []) ].indexOf(li)
+    if (keywordFallback(li)) {
+      iconInto(tile, label).then(() => emojiInto(tile, label, index))
+    } else {
+      emojiInto(tile, label, index)
+    }
   }
 }

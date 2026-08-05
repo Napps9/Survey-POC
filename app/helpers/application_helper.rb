@@ -290,16 +290,26 @@ module ApplicationHelper
     "background:linear-gradient(135deg, #{BrandPalette.lighten(hex, 0.18)}, #{hex});"
   end
 
-  # The tile's icon slot: explicit icon pick wins, then emoji, then (where the
-  # type shows them) the keyword-matched icon. nil-safe everywhere.
-  def option_tile_icon(style, label, keyword_fallback: true)
+  # The tile's icon slot, in precedence order: the creator's explicit icon
+  # pick, their explicit emoji, the keyword-matched icon (where the type shows
+  # them), and finally a fallback emoji — because a selection answer with an
+  # empty tile reads as unfinished beside the rows that did match. nil-safe
+  # everywhere. `index` only feeds the neutral fallback cycle.
+  def option_tile_icon(style, label, keyword_fallback: true, index: 0)
     if style && (svg = OptionIconLibrary.svg_by_id(style["icon"].to_s))
       svg
     elsif style && style["emoji"].present?
-      content_tag(:span, style["emoji"], class: "choice-icon-emoji", aria: { hidden: true })
-    elsif keyword_fallback
-      OptionIconLibrary.svg_for(label)
+      emoji_tile_span(style["emoji"])
+    elsif keyword_fallback && (svg = OptionIconLibrary.svg_for(label))
+      svg
+    else
+      emoji_tile_span(OptionIconLibrary.emoji_for(label, index))
     end
+  end
+
+  def emoji_tile_span(emoji)
+    return nil if emoji.blank?
+    content_tag(:span, emoji, class: "choice-icon-emoji", aria: { hidden: true })
   end
 
   # data-* attributes the editor's option-style popover reads/writes on each
@@ -316,7 +326,11 @@ module ApplicationHelper
   def option_icon_map_data
     {
       keywords: OptionIconLibrary::KEYWORD_TO_FILE.transform_values { |f| image_path("option-icons/#{f}") },
-      ids: OptionIconLibrary::DATA.to_h { |entry| [ File.basename(entry["file"], ".svg"), image_path("option-icons/#{entry["file"]}") ] }
+      ids: OptionIconLibrary::DATA.to_h { |entry| [ File.basename(entry["file"], ".svg"), image_path("option-icons/#{entry["file"]}") ] },
+      # The emoji fallback, so a row built client-side (Add option, a type
+      # switch) fills its tile exactly like the server would.
+      emojis: OptionIconLibrary::EMOJI_KEYWORDS,
+      fallbacks: OptionIconLibrary::EMOJI_FALLBACKS
     }
   end
 

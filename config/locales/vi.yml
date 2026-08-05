@@ -211,6 +211,7 @@ vi:
       delete_card_confirm: Xóa thẻ này?
       save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"
       lottie_failed: "Liên kết đó không giống hoạt ảnh LottieFiles."
+      emoji_none: "Không có emoji phù hợp."
       rich_bold: "Đậm"
       rich_italic: "Nghiêng"
       rich_underline: "Gạch chân"
@@ -825,6 +826,9 @@ vi:
     leave_editor: 'Rời trình chỉnh sửa'
     undo: 'Hoàn tác'
     duplicate_card: 'Nhân bản'
+    emoji_pick: "Chọn emoji"
+    emoji_search: "Tìm emoji…"
+    emoji_clear: "Xóa"
     lottie_section: "Hoạt ảnh (Lottie)"
     lottie_placeholder: "Dán liên kết LottieFiles, vd. https://lottie.host/….json"
     lottie_apply: "Dùng hoạt ảnh"
