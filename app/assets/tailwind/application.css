@@ -3026,9 +3026,12 @@
    bottom, away from the everyday set. No sticky pinning — two sticky groups
    in one column overlap each other as the card scrolls out of view, and the
    centre-snapped feed keeps a card essentially whole on screen anyway. */
+/* The rail is exactly as wide as the reorder pair used to be — pairing the
+   controls off two-per-row must not widen the dock, so the pills share that
+   width instead of each keeping a full-width one. */
 .card-rail {
   display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
-  flex-shrink: 0; min-width: 128px;
+  flex-shrink: 0; width: 148px;
   z-index: 2;
 }
 /* Each group is a DOCK: a rounded, near-opaque dark surface of its own, so
@@ -3036,8 +3039,13 @@
    Verto backdrop (the brand bg is free-form: light, vivid or an image). The
    blur keeps artwork behind from muddying the edge; the fill alone is dark
    enough that white text holds AA even over pure white. */
+/* Two columns, so the controls pair off instead of running down a single
+   file: Card N beside Why, Delete beside Add question, and — collapsed —
+   every icon circle beside another, each row the same width as the reorder
+   pair above it. Controls that carry a full sentence (the traffic light, the
+   Required chip) still span the row. */
 .rail-top, .rail-bottom {
-  display: flex; flex-direction: column; gap: 6px; align-items: stretch;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items: stretch;
   padding: 8px;
   border-radius: 16px;
   background: rgba(17,20,34,0.88);
@@ -3049,10 +3057,33 @@
 /* One size, SOLID surfaces: every control is a full-rail-width pill of the
    same height, on an opaque fill — translucent chrome washed out over light
    Verto artwork. */
-.rail-top > *, .rail-bottom > * { min-height: 30px; }
+/* Half a rail each, so a paired label has ~54px to play with: the words wrap
+   onto a second line rather than pushing the dock wider. */
+.rail-top > *, .rail-bottom > * {
+  min-height: 30px; min-width: 0;
+  padding-left: 6px; padding-right: 6px;
+  font-size: 11px; line-height: 1.15;
+  white-space: normal; text-align: center;
+}
+.card-rail .rail-label { min-width: 0; }
+/* Two-word labels don't fit beside their icon in half a rail, so these two
+   stack — icon over label, the label wrapping between words. */
+.card-rail .card-delete-btn,
+.card-rail .rail-add-btn {
+  flex-direction: column; gap: 2px; padding: 7px 4px;
+  border-radius: 14px; /* a two-line pill at half-rail width is a circle */
+}
 .card-rail .card-num-pill { justify-content: center; gap: 3px; }
 .card-rail .required-chip { justify-content: center; margin-top: 0; }
-.card-rail .card-reorder { display: flex; gap: 6px; align-items: stretch; }
+/* The reorder pair defines the rail's column rhythm — every other row lines
+   up with these two. */
+.card-rail .card-reorder {
+  grid-column: 1 / -1; padding: 0;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items: stretch;
+}
+.card-rail .card-light,
+.card-rail .required-chip,
+.card-rail .card-duplicate-btn { grid-column: 1 / -1; }
 .card-rail .card-move-btn {
   flex: 1 1 0; width: auto; height: auto; min-height: 30px; border-radius: 100px;
   background: #232838; border: 1px solid rgba(255,255,255,0.25);
@@ -3062,11 +3093,12 @@
    a rail pill; the label goes when the rail collapses, the ? stays. */
 .card-rail .why-cta {
   width: auto; height: auto; border-radius: 100px;
-  padding: 5px 12px; gap: 7px; justify-content: center;
-  font-size: 12px; font-family: "ABeeZee", sans-serif;
+  padding: 5px 6px; gap: 6px; justify-content: center;
+  font-size: 11px; font-family: "ABeeZee", sans-serif;
 }
 .card-rail .why-cta .rail-icon { font-family: "Alata", sans-serif; font-size: 13px; }
-.card-rail .card-light { justify-content: center; }
+/* Row-spanning controls keep the roomier type — they have the whole 130px. */
+.card-rail .card-light { justify-content: center; font-size: 12px; }
 .card-rail .card-duplicate-btn {
   gap: 7px; justify-content: center;
   background: #232838; border-color: rgba(255,255,255,0.35);
@@ -3076,10 +3108,10 @@
 /* Solid teal, like the gate add-CTAs — the base .aq-trigger-btn ghost fill
    disappears over light artwork. */
 .card-rail .rail-add-btn {
-  justify-content: center; gap: 7px; display: inline-flex; align-items: center;
-  border-radius: 100px; padding: 6px 14px;
+  justify-content: center; display: inline-flex; align-items: center;
+  border-radius: 100px;
   background: #01EACB; border: 1.5px solid #01EACB; color: #04221E;
-  font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
 }
 .card-rail .rail-add-btn:hover {
   background: #18F0D4; border-color: #18F0D4; color: #04221E;
@@ -3092,9 +3124,21 @@
    Card pill included, holding just the number ("Card" is a .rail-label).
    Reorder keeps its side-by-side pair, so that row is the column's widest
    spot. Tooltips/aria-labels carry the names. */
-.editor-grid.is-panel-open .card-rail { min-width: 0; align-items: center; }
+.editor-grid.is-panel-open .card-rail { width: auto; min-width: 0; align-items: center; }
+/* Collapsed, every control is the same 30px circle, so the columns are fixed
+   to that width and each row is exactly two circles wide — including the
+   reorder pair, which the rest now matches. */
 .editor-grid.is-panel-open .rail-top,
-.editor-grid.is-panel-open .rail-bottom { align-items: center; padding: 6px; }
+.editor-grid.is-panel-open .rail-bottom {
+  grid-template-columns: repeat(2, 30px); justify-content: center; padding: 6px;
+}
+.editor-grid.is-panel-open .card-rail .card-reorder {
+  grid-template-columns: repeat(2, 30px);
+}
+/* Nothing spans the row once it's a circle — they pair up like the rest. */
+.editor-grid.is-panel-open .card-rail .card-light,
+.editor-grid.is-panel-open .card-rail .required-chip,
+.editor-grid.is-panel-open .card-rail .card-duplicate-btn { grid-column: auto; }
 .editor-grid.is-panel-open .card-rail .rail-label,
 .editor-grid.is-panel-open .card-rail .card-light-word,
 .editor-grid.is-panel-open .card-rail .card-light-score { display: none; }

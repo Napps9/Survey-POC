@@ -75,11 +75,6 @@
           rail shows a circle holding just the number. The number span is the
           re-stamp hook (survey_editor renumbers after every move). %>
       <span class="card-num-pill"><span class="rail-label">Card</span><span data-role="card-number"><%= idx + 1 %></span></span>
-      <% if is_q %>
-        <%# Passive glance indicator — visible only while the card is Required
-            (toggled live from the Answer Type tab's Card settings). %>
-        <span class="required-chip" data-role="required-chip" <%= "hidden" unless card["required"] %>>✳ <span class="rail-label"><%= t("editor.required_chip", default: "Required") %></span></span>
-      <% end %>
       <%# Opens the Why view for this card — the click also bubbles to
           type-panel#selectCard, which populates it (same behaviour the old
           Why tab had after selecting a card). %>
@@ -87,6 +82,11 @@
               title="<%= t('editor.why', default: 'Why') %>"
               aria-label="<%= t('editor.why', default: 'Why') %>"
               data-action="click->publish-panel#showWhy"><span class="rail-icon">?</span><span class="rail-label"><%= t('editor.why', default: 'Why') %></span></button>
+      <% if is_q %>
+        <%# Passive glance indicator — visible only while the card is Required
+            (toggled live from the Answer Type tab's Card settings). %>
+        <span class="required-chip" data-role="required-chip" <%= "hidden" unless card["required"] %>>✳ <span class="rail-label"><%= t("editor.required_chip", default: "Required") %></span></span>
+      <% end %>
       <% if is_q %>
         <button type="button" class="card-light" data-role="card-light" hidden
                 aria-expanded="false"
