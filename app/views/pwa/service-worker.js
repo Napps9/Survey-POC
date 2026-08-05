@@ -19,7 +19,7 @@
 // start with the current version. Content/markup/CSS fixes no longer need a
 // bump: the player HTML is network-first, so a fresh copy (referencing fresh
 // asset digests) is fetched on every online visit.
-const CACHE_VERSION = "playverto-v36"
+const CACHE_VERSION = "playverto-v37"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
@@ -66,6 +66,22 @@ self.addEventListener("fetch", (event) => {
 
   // Non-GET requests pass through.
   if (req.method !== "GET") return
+
+  // Media, and anything asking for a byte range, pass through untouched.
+  //
+  // A <video> doesn't fetch a file, it asks for ranges — and a worker that
+  // answers a Range request out of fetch() hands back something the element
+  // can't use: a cross-origin clip comes back opaque, carrying no 206 and no
+  // Content-Range, so playback errors instead of starting. A card video that
+  // never starts paints NOTHING (preload="none", and a poster only if the card
+  // has one), leaving the left panel showing the Verto's brand colour — which
+  // reads as "the image is broken" rather than "the video didn't load".
+  //
+  // Card videos are Pexels CDN URLs, so this is the path every one of them
+  // takes. There's nothing to gain by intercepting them either: the clips are
+  // large, and the generic networkFirst below would clone every response on
+  // its way past.
+  if (req.destination === "video" || req.destination === "audio" || req.headers.has("range")) return
 
   // Opportunistic queue drain on any same-origin GET (iOS fallback).
   if (url.origin === self.location.origin) event.waitUntil(drainQueue())

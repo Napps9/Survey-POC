@@ -11,7 +11,18 @@ class ServiceWorkerTest < ActionDispatch::IntegrationTest
     get pwa_service_worker_path(format: :js)
     assert_response :success
     assert_match %r{\Atext/javascript}, response.content_type
-    assert_includes response.body, '"playverto-v36"'
+    assert_includes response.body, '"playverto-v37"'
+  end
+
+  test "media and ranged requests are never intercepted" do
+    get pwa_service_worker_path(format: :js)
+    assert_response :success
+
+    # A <video> asks for byte ranges. Answered out of the worker, a cross-origin
+    # clip comes back opaque — no 206, no Content-Range — and the element errors
+    # instead of playing, leaving a card's left panel painting nothing at all.
+    assert_includes response.body,
+      'if (req.destination === "video" || req.destination === "audio" || req.headers.has("range")) return'
   end
 
   test "player HTML strategy stays network-first, not stale-while-revalidate" do

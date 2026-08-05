@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- vertonow one-pager · build 2026-08-05-e · view-source and check this line to confirm
+<!-- vertonow one-pager · build 2026-08-05-f · view-source and check this line to confirm
      which copy your browser is showing (a stale cache is otherwise invisible) -->
-<html lang="en" data-build="2026-08-05-e">
+<html lang="en" data-build="2026-08-05-f">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -967,7 +967,7 @@
 <script>
   // Which copy of this page is running — so "nothing changed" can be checked
   // rather than guessed at.
-  console.info('VertoNow one-pager · build 2026-08-05-e');
+  console.info('VertoNow one-pager · build 2026-08-05-f');
 
   // Theme toggle
   const themeToggle = document.getElementById('themeToggle');
@@ -1190,6 +1190,24 @@
   // every page width, so the laptop always shows the desktop layout.
   const EMBED_W = 1000;
 
+  // Card videos ship preload="none" with a poster, loaded by an
+  // IntersectionObserver when the card comes into view — right for a phone on
+  // mobile data, wrong for a demo in a laptop mockup, where a clip that hasn't
+  // buffered paints nothing and the panel shows the Verto's brand colour
+  // instead. Same origin, so the page can just ask them to load now. Cheap and
+  // idempotent: a video already loading is left alone, and the poll stops once
+  // the deck stops producing new ones.
+  function nudgeVideos(){
+    const frame = mockup?.querySelector('.screen-embed');
+    let doc;
+    try { doc = frame?.contentDocument } catch { return }
+    if (!doc) return;
+    doc.querySelectorAll('video').forEach(v => {
+      if (v.preload === 'none') v.preload = 'auto';
+      if (v.paused) v.play?.().catch(() => {});   // muted + playsinline: allowed
+    });
+  }
+
   function fitEmbed(){
     const frame = mockup?.querySelector('.screen-embed');
     if (!frame) return;
@@ -1223,6 +1241,14 @@
       clearTimeout(giveUp);
       if (embedded) {
         mockup.classList.add('is-live');
+        nudgeVideos();
+        // The deck swaps cards as it's played, so keep nudging for a while
+        // rather than only at boot.
+        let nudges = 0;
+        const nudger = setInterval(() => {
+          nudgeVideos();
+          if (++nudges > 40) clearInterval(nudger);   // ~2 minutes, then stop
+        }, 3000);
         const note = document.getElementById('demoNote');
         if (note) note.innerHTML = 'The real Verto, playing right here. ' +
           '<a href="' + DEMO_ORIGIN + DEMO_PATH + '" class="demo-link" target="_blank" rel="noopener">Open it full screen ↗</a>';
