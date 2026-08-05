@@ -15,6 +15,7 @@
 
 User-agent: *
 Disallow: /play/
+Disallow: /test/
 Disallow: /invites/
 Disallow: /funder_invites/
 Disallow: /blazer
