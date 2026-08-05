@@ -67,6 +67,24 @@ class PlayerController < ApplicationController
     safari: 16.4, chrome: 89, firefox: 108, opera: 76, ie: false
   }.freeze
 
+  # A Verto is meant to be embedded — in a partner's page, in a one-pager sent
+  # as an HTML file (public/vertonow.html). The app-wide policy's
+  # `frame-ancestors 'self'` blocks both, and 'self' is the only reason the
+  # one-pager's laptop mockup couldn't hold the real thing.
+  #
+  # `file:` is what makes a downloaded copy work: a local page's origin is
+  # opaque, and Chrome matches it against neither 'self' nor even `*` — only a
+  # `file:` scheme source. Deliberately NOT `*`: this grants the app's own
+  # origin and locally-opened files, so no website gains the ability to frame a
+  # Verto. X-Frame-Options has to go with it, since Rails' default SAMEORIGIN
+  # would block a file:// parent on its own whatever the CSP says.
+  #
+  # Set as a plain response header rather than through the
+  # `content_security_policy` macro — see config/initializers/blazer.rb: that
+  # macro shallow-clones and mutates the shared global policy, leaking the
+  # relaxation into every other response in the process.
+  after_action :allow_embedding, only: %i[ show test_show ]
+
   before_action :load_survey_and_share, except: :test_show
   # A tester opening a shared link is read-only traffic; aligned with the
   # other public read endpoints above.
@@ -449,6 +467,30 @@ class PlayerController < ApplicationController
   end
 
   private
+
+  # See the after_action above. Overrides frame-ancestors for THIS request only,
+  # leaving every other directive of the app-wide policy (script-src, img-src,
+  # the Pexels hosts…) exactly as configured.
+  #
+  # Done by handing the middleware a per-request policy rather than writing the
+  # header here: the CSP middleware builds the header on the way out, AFTER this
+  # runs, and skips a header that's already set — so writing one directly would
+  # have replaced the player's whole policy with this single directive. A dup,
+  # not the global object, so the relaxation can't leak into other responses
+  # (the hazard config/initializers/blazer.rb documents).
+  def allow_embedding
+    policy = request.content_security_policy
+    return if policy.nil?
+
+    embeddable = policy.dup
+    embeddable.frame_ancestors :self, "file:"
+    request.content_security_policy = embeddable
+
+    # Rails' default SAMEORIGIN blocks a file:// parent on its own, whatever the
+    # CSP says — modern browsers prefer frame-ancestors, but only when
+    # X-Frame-Options isn't there to contradict it.
+    response.headers.delete("X-Frame-Options")
+  end
 
   # Swap the inherited :modern version set for the player's own (see
   # PLAYER_BROWSER_VERSIONS). Keeps the caller's `block` so a browser that really

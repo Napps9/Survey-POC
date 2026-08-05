@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- vertonow one-pager · build 2026-08-05-f · view-source and check this line to confirm
+<!-- vertonow one-pager · build 2026-08-05-g · view-source and check this line to confirm
      which copy your browser is showing (a stale cache is otherwise invisible) -->
-<html lang="en" data-build="2026-08-05-f">
+<html lang="en" data-build="2026-08-05-g">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -967,7 +967,7 @@
 <script>
   // Which copy of this page is running — so "nothing changed" can be checked
   // rather than guessed at.
-  console.info('VertoNow one-pager · build 2026-08-05-f');
+  console.info('VertoNow one-pager · build 2026-08-05-g');
 
   // Theme toggle
   const themeToggle = document.getElementById('themeToggle');
@@ -990,14 +990,15 @@
   setTheme('dark');
 
   // ---- Playable Verto (section 04) ----------------------------------
-  // Served from the app, the laptop holds the REAL Verto in an iframe — same
-  // origin, so the player's own frame-ancestors 'self' allows it, and it lays
-  // out as a full desktop screen inside the bezel.
+  // The laptop holds the REAL Verto wherever this page is opened from — hosted,
+  // or a copy downloaded and opened off someone's disk. The player sends
+  // frame-ancestors 'self' file: (PlayerController#allow_embedding), and that
+  // file: scheme source is the whole trick: a local page's origin is opaque, so
+  // Chrome matches it against neither 'self' nor even '*'.
   //
-  // Opened any other way (a downloaded copy, another host) that iframe is
-  // impossible: a file:// page is an opaque origin the player refuses even
-  // against frame-ancestors '*'. So the cards below are played in-page
-  // instead — no network, no recording, works offline.
+  // The cards below are the fallback for when the embed genuinely can't work —
+  // no network, a host that isn't allowed to frame it, an unpublished Verto.
+  // They play in-page with no network at all.
   const DEMO_ORIGIN = "https://app.playverto.com";
   const DEMO_PATH   = "/play/KcwFrqUdXqFCfcmKapJH_JrO";
   document.querySelectorAll('.demo-link').forEach(a => { a.href = DEMO_ORIGIN + DEMO_PATH; });
@@ -1223,20 +1224,28 @@
   // The real Verto, whenever the browser will allow it.
   function embedRealVerto(){
     if (!mockup) return;
-    if (!location.protocol.startsWith('http')) return startRebuild();
 
     const frame = document.createElement('iframe');
     frame.className = 'screen-embed';
     frame.title = 'A live Verto you can play';
-    frame.src = DEMO_PATH;                 // relative — the app serving this page
+    // Absolute, so it resolves from a downloaded copy of this file too. Served
+    // from the app this is still same-origin, so nothing changes there.
+    frame.src = DEMO_ORIGIN + DEMO_PATH;
     mockup.appendChild(frame);
     fitEmbed();
     window.addEventListener('resize', fitEmbed);
+
+    // Two ways to know it booted. Same-origin (hosted): look for the player's
+    // root directly. Cross-origin (a downloaded copy): the player posts
+    // { verto: "ready" } when it starts — see player_controller.js#connect.
+    const onReady = (e) => { if (e.data && e.data.verto === "ready") finish(true) };
+    window.addEventListener('message', onReady);
 
     let settled = false;
     const finish = (embedded) => {
       if (settled) return;
       settled = true;
+      window.removeEventListener('message', onReady);
       clearInterval(poll);
       clearTimeout(giveUp);
       if (embedded) {
@@ -1255,11 +1264,12 @@
       } else startRebuild();
     };
     const check = () => {
-      // Same-origin when the app is serving us, so the frame's boot is
-      // directly observable; a throw means we're not on the app.
+      // Only conclusive same-origin. Cross-origin this throws, which says
+      // nothing either way — the postMessage above is what settles it there, so
+      // a throw must NOT count as failure; let the timeout decide.
       try {
         if (frame.contentDocument?.querySelector('[data-controller~="player"]')) finish(true);
-      } catch { finish(false); }
+      } catch { /* cross-origin: wait for verto:ready, or the timeout */ }
     };
     const poll   = setInterval(check, 500);
     const giveUp = setTimeout(() => finish(false), 6000);

@@ -115,6 +115,16 @@ export default class extends Controller {
       this.element.addEventListener(type, () => { window.playvertoEngaged = true },
         { capture: true, once: true, passive: true })
     }
+    // Embedded (see PlayerController#allow_embedding): tell the host page the
+    // player actually booted. A same-origin host could look for this element
+    // itself, but a Verto embedded from a downloaded HTML file is cross-origin,
+    // and there a refused or broken frame is indistinguishable from a working
+    // one — so the host waits for this and falls back to its own content if it
+    // never arrives.
+    if (window.parent !== window) {
+      try { window.parent.postMessage({ verto: "ready" }, "*") } catch (_e) { /* host gone */ }
+    }
+
     this._sessionToken = this._ensureToken()
     this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
     this._finishLabel = this.hasFinishBtnTarget ? this.finishBtnTarget.textContent : ""
