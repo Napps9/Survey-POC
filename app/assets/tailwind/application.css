@@ -2963,10 +2963,10 @@
 
 .phone-bottom .choice-list { gap: 4px; }
 .phone-bottom .choice-list-item { padding: 6px 10px 6px 6px; border-radius: 10px; }
-.phone-bottom .choice-list-tile { width: 40px; height: 40px; border-radius: 8px; }
+.phone-bottom .choice-list-tile { width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 19px; }
 
 .phone-bottom .choice-grid { gap: 6px; }
-.phone-bottom .choice-card-bg { height: 56px; border-radius: 10px; }
+.phone-bottom .choice-card-bg { height: 56px; border-radius: 10px; --tile-emoji: 23px; }
 .phone-bottom .choice-label { font-size: 10px; padding: 2px 4px; margin-top: 4px; }
 
 .phone-bottom .slider-wrap { gap: 8px; padding-top: 8px; }
@@ -4221,12 +4221,17 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   position: absolute; top: 6px; left: 6px; z-index: 2;
   background: rgba(255,255,255,0.85);
 }
+/* Sized from a custom property set ON THE TILE, so the emoji scales in the
+   same rule that changes the tile's dimensions and can't be forgotten —
+   .choice-icon-svg gets this for free by being sized in % of its container,
+   but an emoji is text and needs a px value. Before this, the emoji stayed at
+   26/30px while the tile shrank to 40/56px in phone preview and overflowed. */
 .choice-icon-emoji {
-  font-size: 26px; line-height: 1;
+  font-size: var(--tile-emoji, 26px); line-height: 1;
   display: flex; align-items: center; justify-content: center;
 }
-.choice-list-tile .choice-icon-emoji { font-size: 26px; }
-.choice-card-bg .choice-icon-emoji { font-size: 30px; }
+.choice-list-tile { --tile-emoji: 26px; }
+.choice-card-bg   { --tile-emoji: 30px; }
 .option-style-popover {
   position: fixed; z-index: 90;
   width: 272px; max-height: 340px; overflow-y: auto;

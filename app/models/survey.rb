@@ -34,6 +34,12 @@ class Survey < ApplicationRecord
   # response already gathered. Published Vertos are locked for editing anyway.
   before_save :enforce_range_scale, if: -> { will_save_change_to_cards? && !published? }
 
+  # An option label's own emoji belongs in that option's icon tile, not beside
+  # its words. Same guard as above and for the same reason: an option label is
+  # the answer key for responses already collected, so a live Verto is never
+  # rewritten. See hoist_option_label_emoji! for the full rules.
+  before_save :hoist_option_label_emoji, if: -> { will_save_change_to_cards? && !published? }
+
   # Inline base64 images never reach a column. CardImageStore and the backfill
   # task moved the EXISTING data-URLs out (P1-7), but the door stayed open:
   # sanitize_image_url still accepts a data-URL, so every write path — the
@@ -1393,6 +1399,90 @@ class Survey < ApplicationRecord
     self.cards = self.class.normalize_range_cards!(
       cards, fill: self.class.localized_range_labels(default_locale)
     )
+  end
+
+  def hoist_option_label_emoji
+    self.cards = self.class.hoist_option_label_emoji!(cards)
+  end
+
+  # Move an option label's leading/trailing emoji into that option's icon tile,
+  # by promoting it to `option_styles[i]["emoji"]` — the slot every render path
+  # (option_tile_icon, choice_templates.js, both repaint paths) already draws
+  # inside the tile. Generated decks routinely write "🎯 Pay off debt", which
+  # showed the emoji beside the words while the tile keyword-matched a
+  # different icon entirely.
+  #
+  # Doing it here rather than at render time is what keeps it simple: once the
+  # emoji IS an option style, nothing downstream needs to know — it renders,
+  # serializes and round-trips like any 🎨-picked icon, and a creator can change
+  # or clear it the same way.
+  #
+  # An option label is an ANSWER KEY (`correct`, `tokens` and logic
+  # `match.value` all reference it by string), so:
+  #   • published Vertos are skipped entirely — their labels are the key for
+  #     responses already collected, exactly the reasoning enforce_range_scale
+  #     documents above;
+  #   • every label-keyed field on the card is rewritten in the same pass;
+  #   • an option that already carries an explicit icon or emoji is left ALONE,
+  #     label included. That pick wins the tile, so hoisting would mean deleting
+  #     an emoji with nowhere to put it — and it makes the transform converge
+  #     after one pass instead of nibbling a second emoji off on the next save.
+  def self.hoist_option_label_emoji!(list)
+    Array(list).map do |card|
+      next card unless card.is_a?(Hash) && OPTION_STYLE_TYPES.include?(card["type"].to_s)
+
+      options = Array(card["options"])
+      next card if options.empty?
+
+      options = options.dup
+      styles  = Array(card["option_styles"]).dup
+      html    = Array(card["options_html"]).dup
+      renamed = {}
+
+      options.each_with_index do |label, i|
+        style = styles[i].is_a?(Hash) ? styles[i] : nil
+        next if style && (style["icon"].to_s.present? || style["emoji"].to_s.present?)
+
+        glyphs, text = LabelEmoji.split(label)
+        next unless glyphs && text.present? && text != label.to_s
+
+        options[i] = text
+        renamed[label.to_s] = text
+        styles[i] = (style || {}).merge("emoji" => glyphs.first(MAX_TOKEN_ICON))
+        # Keep the rich-text twin in step, or Survey#sanitize's equivalence
+        # check drops the whole formatting layer for this option.
+        html[i] = html[i].sub(glyphs, "") if html[i].is_a?(String) && html[i].include?(glyphs)
+      end
+
+      next card if renamed.empty?
+
+      out = card.merge("options" => options, "option_styles" => styles)
+      out["options_html"] = html if card.key?("options_html")
+      rename_option_key_references!(out, renamed)
+      out
+    end
+  end
+
+  # The three places a card refers to an option BY ITS LABEL. Missing one would
+  # silently unset a quiz answer, strand a branch, or drop a token award.
+  def self.rename_option_key_references!(card, renamed)
+    case card["correct"]
+    when String then card["correct"] = renamed.fetch(card["correct"], card["correct"])
+    when Array  then card["correct"] = card["correct"].map { |v| v.is_a?(String) ? renamed.fetch(v, v) : v }
+    end
+
+    if card["tokens"].is_a?(Hash)
+      card["tokens"] = card["tokens"].transform_keys { |k| renamed.fetch(k.to_s, k) }
+    end
+
+    if card["logic"].is_a?(Hash)
+      Array(card["logic"]["routes"]).each do |route|
+        match = route.is_a?(Hash) ? route["match"] : nil
+        next unless match.is_a?(Hash) && match["value"].is_a?(String)
+        match["value"] = renamed.fetch(match["value"], match["value"])
+      end
+    end
+    card
   end
 
   # Replace any inline base64 image about to be written with a stored blob path.
