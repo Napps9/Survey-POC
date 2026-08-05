@@ -1574,7 +1574,7 @@
 .device-mobile .rail-add-btn { display: none; }
 
 .q-eyebrow {
-  font-family: var(--verto-font, "Alata", sans-serif);
+  font-family: var(--verto-font-heading, var(--verto-font, "Alata", sans-serif));
   font-size: 12px;
   font-weight: 700;
   color: var(--brand-primary, var(--color-green-500));
@@ -1582,14 +1582,14 @@
   text-transform: uppercase;
 }
 .q-title {
-  font-family: var(--verto-font, "ABeeZee", sans-serif);
+  font-family: var(--verto-font-heading, var(--verto-font, "ABeeZee", sans-serif));
   font-size: 22px;
   line-height: 1.35;
   color: #000;
   outline: none;
 }
 .q-subtitle {
-  font-family: "ABeeZee", sans-serif;
+  font-family: var(--verto-font, "ABeeZee", sans-serif);
   font-size: 14px;
   line-height: 1.5;
   color: rgba(0,0,0,0.6);
@@ -4533,7 +4533,7 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .preview-thankyou-emoji { font-size: 60px; line-height: 1; }
 .preview-thankyou-title {
-  font-family: var(--verto-font, "Alata", sans-serif); font-size: 44px;
+  font-family: var(--verto-font-heading, var(--verto-font, "Alata", sans-serif)); font-size: 44px;
   color: #fff; letter-spacing: -0.5px;
 }
 .preview-thankyou-sub {

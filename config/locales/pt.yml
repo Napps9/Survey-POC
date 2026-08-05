@@ -828,6 +828,9 @@ pt:
     duplicate_card: 'Duplicar'
     emoji_pick: "Escolher um emoji"
     brand_font: "Tipografia"
+    brand_font_headings: "Títulos"
+    brand_font_body: "Texto"
+    brand_font_follow: "Igual ao texto"
     answer_tint: "Combinar os ícones das respostas com a cor da marca"
     answer_tint_hint: "Caso contrário, usamos o conjunto pastel predefinido."
     brand_font_hint: "Define a fonte de todas as perguntas, respostas e ecrãs finais."

@@ -7,7 +7,7 @@ import { DEFAULT, resolve, applyVars, clearVars, isDefault, validHex, tileGradie
 //  - the Verto editor's publish panel (live-applies to the card canvas +
 //    preview overlay and autosaves THIS survey's palette via PATCH)
 export default class extends Controller {
-  static targets = ["colorInput", "hexInput", "preview", "status", "fontSelect", "tintToggle"]
+  static targets = ["colorInput", "hexInput", "preview", "status", "fontSelect", "headingFontSelect", "tintToggle"]
   static values = { url: String }
 
   connect() {
@@ -63,9 +63,17 @@ export default class extends Controller {
   }
 
   _applyFont() {
-    const stack = this.fontSelectTarget.selectedOptions[0]?.style.fontFamily || ""
+    const body = this.hasFontSelectTarget
+      ? this.fontSelectTarget.selectedOptions[0]?.style.fontFamily || "" : ""
+    // Blank headings deliberately fall back to the body face in CSS, so the
+    // var is REMOVED rather than set empty — an empty custom property would
+    // win over the fallback and leave headings unstyled.
+    const heading = this.hasHeadingFontSelectTarget
+      ? this.headingFontSelectTarget.selectedOptions[0]?.style.fontFamily || "" : ""
     this.previewTargets.forEach((el) => {
-      stack ? el.style.setProperty("--verto-font", stack) : el.style.removeProperty("--verto-font")
+      body ? el.style.setProperty("--verto-font", body) : el.style.removeProperty("--verto-font")
+      heading ? el.style.setProperty("--verto-font-heading", heading)
+              : el.style.removeProperty("--verto-font-heading")
     })
   }
 
@@ -97,6 +105,10 @@ export default class extends Controller {
   // "" when the Verto uses the platform default — the server stores nil.
   _font() {
     return this.hasFontSelectTarget ? this.fontSelectTarget.value : ""
+  }
+
+  _headingFont() {
+    return this.hasHeadingFontSelectTarget ? this.headingFontSelectTarget.value : ""
   }
 
   _palette() {
@@ -133,6 +145,7 @@ export default class extends Controller {
         body: JSON.stringify({
           brand_palette: this._palette(),
           brand_font: this._font(),
+          brand_font_heading: this._headingFont(),
           brand_answer_tint: this.hasTintToggleTarget ? this.tintToggleTarget.checked : false,
         }),
       })

@@ -828,6 +828,9 @@ fr:
     duplicate_card: 'Dupliquer'
     emoji_pick: "Choisir un émoji"
     brand_font: "Police"
+    brand_font_headings: "Titres"
+    brand_font_body: "Corps de texte"
+    brand_font_follow: "Comme le corps de texte"
     answer_tint: "Adapter les icônes de réponse à ma couleur de marque"
     answer_tint_hint: "Sinon, notre palette pastel par défaut est utilisée."
     brand_font_hint: "Définit la police de toutes les questions, réponses et écrans de fin."

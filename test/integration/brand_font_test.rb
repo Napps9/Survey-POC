@@ -86,15 +86,43 @@ class BrandFontTest < ActionDispatch::IntegrationTest
                     "the default must fall through to the stylesheet, not restate itself"
   end
 
+  test "headings can take a second face, and follow the body when unset" do
+    sign_in
+    patch survey_path(@survey),
+          params: { brand_font: "font-lora", brand_font_heading: "font-anton" }.to_json,
+          headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :success
+    @survey.reload
+    assert_equal "font-lora",  @survey.brand_font
+    assert_equal "font-anton", @survey.brand_font_heading
+
+    get survey_path(@survey)
+    body = Nokogiri::HTML(response.body)
+    styled = body.css("[style*='--verto-font']").map { |el| el["style"] }.join(" ")
+    assert_includes styled, "--verto-font-heading", "headings need their own variable"
+    assert_includes styled, "Anton"
+    assert_includes styled, "Lora"
+  end
+
+  test "a Verto with only a body font emits no heading variable, so headings follow it" do
+    @survey.update!(brand_font: "font-lora")
+    sign_in
+    get survey_path(@survey)
+
+    assert_response :success
+    refute_includes response.body, "--verto-font-heading",
+                    "an empty heading variable would beat the CSS fallback to the body face"
+  end
+
   test "the Design panel and the create wizard both offer the picker" do
     sign_in
     get survey_path(@survey)
     assert_select "select.brand-font-select[data-brand-palette-target='fontSelect']", 1
-    assert_select "select.brand-font-select option", { count: Survey::BRAND_FONTS.size + 1 },
-                  "every font plus the default"
+    assert_select "select.brand-font-select[data-brand-palette-target='headingFontSelect']", 1
 
     get new_survey_path
     assert_response :success
     assert_select "select[name='brand_font']", 1
+    assert_select "select[name='brand_font_heading']", 1
   end
 end

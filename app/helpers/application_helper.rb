@@ -477,6 +477,9 @@ module ApplicationHelper
     if (stack = survey.brand_font_stack)
       parts << "--verto-font: #{stack}"
     end
+    if (heading = survey.brand_font_heading_stack)
+      parts << "--verto-font-heading: #{heading}"
+    end
     # Answer icon tiles derived from the brand colour. Same reasoning as the
     # font: declared once here, so the editor feed, the preview overlay and
     # the player all pick it up.

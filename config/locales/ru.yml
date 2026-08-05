@@ -830,6 +830,9 @@ ru:
     duplicate_card: 'Дублировать'
     emoji_pick: "Выбрать эмодзи"
     brand_font: "Шрифт"
+    brand_font_headings: "Заголовки"
+    brand_font_body: "Основной текст"
+    brand_font_follow: "Как основной текст"
     answer_tint: "Подобрать значки ответов под цвет бренда"
     answer_tint_hint: "Иначе используется наш стандартный пастельный набор."
     brand_font_hint: "Задаёт шрифт для всех вопросов, ответов и финальных экранов."

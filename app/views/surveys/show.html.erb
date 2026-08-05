@@ -1355,16 +1355,32 @@
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin:3px 0 10px;line-height:1.45;">
               <%= t("editor.brand_font_hint", default: "Sets the font for every question, answer and finish screen in this Verto.") %>
             </div>
-            <select class="brand-font-select"
-                    data-brand-palette-target="fontSelect"
-                    data-action="change->brand-palette#onFont"
-                    aria-label="<%= t("editor.brand_font", default: "Typeface") %>">
-              <option value="" <%= "selected" if @survey.brand_font.blank? %>><%= t("editor.brand_font_default", default: "Default (ABeeZee)") %></option>
-              <% Survey::BRAND_FONTS.each do |token, meta| %>
-                <option value="<%= token %>" <%= "selected" if @survey.brand_font == token %>
-                        style="font-family:<%= meta[:stack] %>;"><%= meta[:label] %></option>
-              <% end %>
-            </select>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <label style="display:flex;flex-direction:column;gap:4px;">
+                <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.6);"><%= t("editor.brand_font_headings", default: "Headings") %></span>
+                <select class="brand-font-select"
+                        data-brand-palette-target="headingFontSelect"
+                        data-action="change->brand-palette#onFont">
+                  <option value="" <%= "selected" if @survey.brand_font_heading.blank? %>><%= t("editor.brand_font_follow", default: "Same as body text") %></option>
+                  <% Survey::BRAND_FONTS.each do |token, meta| %>
+                    <option value="<%= token %>" <%= "selected" if @survey.brand_font_heading == token %>
+                            style="font-family:<%= meta[:stack] %>;"><%= meta[:label] %></option>
+                  <% end %>
+                </select>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:4px;">
+                <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.6);"><%= t("editor.brand_font_body", default: "Body text") %></span>
+                <select class="brand-font-select"
+                        data-brand-palette-target="fontSelect"
+                        data-action="change->brand-palette#onFont">
+                  <option value="" <%= "selected" if @survey.brand_font.blank? %>><%= t("editor.brand_font_default", default: "Default (ABeeZee)") %></option>
+                  <% Survey::BRAND_FONTS.each do |token, meta| %>
+                    <option value="<%= token %>" <%= "selected" if @survey.brand_font == token %>
+                            style="font-family:<%= meta[:stack] %>;"><%= meta[:label] %></option>
+                  <% end %>
+                </select>
+              </label>
+            </div>
           </div>
 
           <%# Background image — fills the backdrop behind the whole Verto. %>

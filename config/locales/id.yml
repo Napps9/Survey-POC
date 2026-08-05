@@ -828,6 +828,9 @@ id:
     duplicate_card: 'Gandakan'
     emoji_pick: "Pilih emoji"
     brand_font: "Tipografi"
+    brand_font_headings: "Judul"
+    brand_font_body: "Teks isi"
+    brand_font_follow: "Sama dengan teks isi"
     answer_tint: "Samakan ikon jawaban dengan warna merek saya"
     answer_tint_hint: "Jika tidak, set pastel bawaan kami akan dipakai."
     brand_font_hint: "Menentukan font untuk setiap pertanyaan, jawaban, dan layar akhir."

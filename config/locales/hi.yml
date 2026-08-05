@@ -828,6 +828,9 @@ hi:
     duplicate_card: 'डुप्लिकेट करें'
     emoji_pick: "इमोजी चुनें"
     brand_font: "टाइपफ़ेस"
+    brand_font_headings: "शीर्षक"
+    brand_font_body: "मुख्य पाठ"
+    brand_font_follow: "मुख्य पाठ जैसा"
     answer_tint: "उत्तर आइकनों को मेरे ब्रांड रंग से मिलाएँ"
     answer_tint_hint: "अन्यथा हमारा डिफ़ॉल्ट पेस्टल सेट उपयोग होगा।"
     brand_font_hint: "इस Verto के हर प्रश्न, उत्तर और समापन स्क्रीन का फ़ॉन्ट तय करता है।"

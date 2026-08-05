@@ -828,6 +828,9 @@ nl:
     duplicate_card: 'Dupliceren'
     emoji_pick: "Kies een emoji"
     brand_font: "Lettertype"
+    brand_font_headings: "Koppen"
+    brand_font_body: "Bodytekst"
+    brand_font_follow: "Zelfde als bodytekst"
     answer_tint: "Antwoordpictogrammen afstemmen op mijn merkkleur"
     answer_tint_hint: "Anders gebruiken we onze standaard pastelset."
     brand_font_hint: "Bepaalt het lettertype van elke vraag, antwoord en eindscherm."

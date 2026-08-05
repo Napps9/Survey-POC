@@ -470,15 +470,28 @@
                 the rich-text toolbar offer; each option previews in its face. %>
             <div style="display:flex;flex-direction:column;gap:6px;">
               <div style="<%= section_label_style %>"><%= t("editor.brand_font", default: "Typeface") %></div>
-              <select name="brand_font" class="brand-font-select brand-font-select--light"
-                      data-brand-palette-target="fontSelect"
-                      data-action="change->brand-palette#onFont"
-                      aria-label="<%= t("editor.brand_font", default: "Typeface") %>">
-                <option value=""><%= t("editor.brand_font_default", default: "Default (ABeeZee)") %></option>
-                <% Survey::BRAND_FONTS.each do |token, meta| %>
-                  <option value="<%= token %>" style="font-family:<%= meta[:stack] %>;"><%= meta[:label] %></option>
-                <% end %>
-              </select>
+              <label style="display:flex;flex-direction:column;gap:3px;">
+                <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.45);"><%= t("editor.brand_font_headings", default: "Headings") %></span>
+                <select name="brand_font_heading" class="brand-font-select brand-font-select--light"
+                        data-brand-palette-target="headingFontSelect"
+                        data-action="change->brand-palette#onFont">
+                  <option value=""><%= t("editor.brand_font_follow", default: "Same as body text") %></option>
+                  <% Survey::BRAND_FONTS.each do |token, meta| %>
+                    <option value="<%= token %>" style="font-family:<%= meta[:stack] %>;"><%= meta[:label] %></option>
+                  <% end %>
+                </select>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:3px;margin-top:6px;">
+                <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(0,0,0,0.45);"><%= t("editor.brand_font_body", default: "Body text") %></span>
+                <select name="brand_font" class="brand-font-select brand-font-select--light"
+                        data-brand-palette-target="fontSelect"
+                        data-action="change->brand-palette#onFont">
+                  <option value=""><%= t("editor.brand_font_default", default: "Default (ABeeZee)") %></option>
+                  <% Survey::BRAND_FONTS.each do |token, meta| %>
+                    <option value="<%= token %>" style="font-family:<%= meta[:stack] %>;"><%= meta[:label] %></option>
+                  <% end %>
+                </select>
+              </label>
             </div>
 
           </div>
