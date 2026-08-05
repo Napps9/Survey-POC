@@ -827,6 +827,9 @@ vi:
     undo: 'Hoàn tác'
     duplicate_card: 'Nhân bản'
     emoji_pick: "Chọn emoji"
+    brand_font: "Kiểu chữ"
+    brand_font_hint: "Đặt phông chữ cho mọi câu hỏi, câu trả lời và màn hình kết thúc."
+    brand_font_default: "Mặc định (ABeeZee)"
     emoji_search: "Tìm emoji…"
     emoji_clear: "Xóa"
     lottie_section: "Hoạt ảnh (Lottie)"

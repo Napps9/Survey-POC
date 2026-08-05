@@ -827,6 +827,9 @@ es:
     undo: 'Deshacer'
     duplicate_card: 'Duplicar'
     emoji_pick: "Elegir un emoji"
+    brand_font: "Tipografía"
+    brand_font_hint: "Define la fuente de todas las preguntas, respuestas y pantallas finales."
+    brand_font_default: "Predeterminada (ABeeZee)"
     emoji_search: "Buscar emoji…"
     emoji_clear: "Borrar"
     lottie_section: "Animación (Lottie)"

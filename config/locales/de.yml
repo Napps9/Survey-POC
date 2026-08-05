@@ -827,6 +827,9 @@ de:
     undo: 'Rückgängig'
     duplicate_card: 'Duplizieren'
     emoji_pick: "Emoji wählen"
+    brand_font: "Schriftart"
+    brand_font_hint: "Legt die Schrift für alle Fragen, Antworten und Abschlussbildschirme fest."
+    brand_font_default: "Standard (ABeeZee)"
     emoji_search: "Emoji suchen…"
     emoji_clear: "Löschen"
     lottie_section: "Animation (Lottie)"

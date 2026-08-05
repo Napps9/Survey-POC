@@ -449,6 +449,23 @@
               </div>
             </div>
 
+            <%# Section: Typeface — set here so a generated Verto arrives in the
+                creator's font, rather than being restyled card by card after
+                the fact. Same seven self-hosted families the Design panel and
+                the rich-text toolbar offer; each option previews in its face. %>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="<%= section_label_style %>"><%= t("editor.brand_font", default: "Typeface") %></div>
+              <select name="brand_font" class="brand-font-select brand-font-select--light"
+                      data-brand-palette-target="fontSelect"
+                      data-action="change->brand-palette#onFont"
+                      aria-label="<%= t("editor.brand_font", default: "Typeface") %>">
+                <option value=""><%= t("editor.brand_font_default", default: "Default (ABeeZee)") %></option>
+                <% Survey::BRAND_FONTS.each do |token, meta| %>
+                  <option value="<%= token %>" style="font-family:<%= meta[:stack] %>;"><%= meta[:label] %></option>
+                <% end %>
+              </select>
+            </div>
+
           </div>
         </div>
       </section>

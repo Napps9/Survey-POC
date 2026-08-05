@@ -827,6 +827,9 @@ id:
     undo: 'Urungkan'
     duplicate_card: 'Gandakan'
     emoji_pick: "Pilih emoji"
+    brand_font: "Tipografi"
+    brand_font_hint: "Menentukan font untuk setiap pertanyaan, jawaban, dan layar akhir."
+    brand_font_default: "Bawaan (ABeeZee)"
     emoji_search: "Cari emoji…"
     emoji_clear: "Hapus"
     lottie_section: "Animasi (Lottie)"

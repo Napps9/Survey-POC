@@ -827,6 +827,9 @@ ar:
     undo: 'تراجع'
     duplicate_card: 'تكرار'
     emoji_pick: "اختر رمزًا تعبيريًا"
+    brand_font: "نوع الخط"
+    brand_font_hint: "يحدد الخط لكل سؤال وإجابة وشاشة نهاية في هذا الـVerto."
+    brand_font_default: "الافتراضي (ABeeZee)"
     emoji_search: "ابحث عن رمز…"
     emoji_clear: "مسح"
     lottie_section: "رسوم متحركة (Lottie)"

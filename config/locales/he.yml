@@ -827,6 +827,9 @@ he:
     undo: 'ביטול'
     duplicate_card: 'שכפול'
     emoji_pick: "בחרו אימוג'י"
+    brand_font: "גופן"
+    brand_font_hint: "קובע את הגופן לכל שאלה, תשובה ומסך סיום ב-Verto הזה."
+    brand_font_default: "ברירת מחדל (ABeeZee)"
     emoji_search: "חיפוש אימוג'י…"
     emoji_clear: "ניקוי"
     lottie_section: "אנימציה (Lottie)"

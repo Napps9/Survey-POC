@@ -829,6 +829,9 @@ uk:
     undo: 'Скасувати'
     duplicate_card: 'Дублювати'
     emoji_pick: "Вибрати емодзі"
+    brand_font: "Шрифт"
+    brand_font_hint: "Задає шрифт для всіх запитань, відповідей і фінальних екранів."
+    brand_font_default: "За замовчуванням (ABeeZee)"
     emoji_search: "Пошук емодзі…"
     emoji_clear: "Очистити"
     lottie_section: "Анімація (Lottie)"

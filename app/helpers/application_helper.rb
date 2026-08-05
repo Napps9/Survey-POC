@@ -470,6 +470,13 @@ module ApplicationHelper
     parts = []
     palette = brand_palette_style_attr(survey.brand_palette)
     parts << palette if palette.present?
+    # The Verto's typeface, as a custom property the card text inherits. This
+    # helper is the one place the editor feed, the preview overlay and the
+    # player all set their brand vars, so declaring it here is what makes a
+    # font pick reach every surface at once.
+    if (stack = survey.brand_font_stack)
+      parts << "--verto-font: #{stack}"
+    end
     parts << verto_brand_bg_image_var(survey) if image && survey.background_image.present?
     # Mobile-only per-card backdrop: a themed image picked from
     # verto-library/mobile-backgrounds/, applied behind a heavy white

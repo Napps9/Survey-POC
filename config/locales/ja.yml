@@ -827,6 +827,9 @@ ja:
     undo: '元に戻す'
     duplicate_card: '複製'
     emoji_pick: "絵文字を選ぶ"
+    brand_font: "書体"
+    brand_font_hint: "この Verto のすべての質問・回答・終了画面のフォントを設定します。"
+    brand_font_default: "デフォルト（ABeeZee）"
     emoji_search: "絵文字を検索…"
     emoji_clear: "クリア"
     lottie_section: "アニメーション（Lottie）"

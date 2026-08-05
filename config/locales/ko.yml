@@ -827,6 +827,9 @@ ko:
     undo: '실행 취소'
     duplicate_card: '복제'
     emoji_pick: "이모지 선택"
+    brand_font: "서체"
+    brand_font_hint: "이 Verto의 모든 질문, 답변, 종료 화면 글꼴을 설정합니다."
+    brand_font_default: "기본값 (ABeeZee)"
     emoji_search: "이모지 검색…"
     emoji_clear: "지우기"
     lottie_section: "애니메이션 (Lottie)"

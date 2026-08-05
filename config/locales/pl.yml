@@ -829,6 +829,9 @@ pl:
     undo: 'Cofnij'
     duplicate_card: 'Duplikuj'
     emoji_pick: "Wybierz emoji"
+    brand_font: "Krój pisma"
+    brand_font_hint: "Ustawia czcionkę wszystkich pytań, odpowiedzi i ekranów końcowych."
+    brand_font_default: "Domyślny (ABeeZee)"
     emoji_search: "Szukaj emoji…"
     emoji_clear: "Wyczyść"
     lottie_section: "Animacja (Lottie)"

@@ -7,7 +7,7 @@ import { DEFAULT, resolve, applyVars, clearVars, isDefault, validHex } from "lib
 //  - the Verto editor's publish panel (live-applies to the card canvas +
 //    preview overlay and autosaves THIS survey's palette via PATCH)
 export default class extends Controller {
-  static targets = ["colorInput", "hexInput", "preview", "status"]
+  static targets = ["colorInput", "hexInput", "preview", "status", "fontSelect"]
   static values = { url: String }
 
   connect() {
@@ -36,6 +36,21 @@ export default class extends Controller {
     this._save()
   }
 
+  // The Verto's typeface. Same live-apply-then-autosave shape as the colours:
+  // --verto-font is what the card text reads (see .q-title et al), so setting
+  // it on the preview roots repaints the feed and the preview overlay at once.
+  onFont() {
+    this._applyFont()
+    this._save()
+  }
+
+  _applyFont() {
+    const stack = this.fontSelectTarget.selectedOptions[0]?.style.fontFamily || ""
+    this.previewTargets.forEach((el) => {
+      stack ? el.style.setProperty("--verto-font", stack) : el.style.removeProperty("--verto-font")
+    })
+  }
+
   // The panel swatch tracks the background until the user picks a distinct
   // panel colour: an untouched panel (still equal to the previous background,
   // or to the legacy default) repainting itself to an old hex on every
@@ -59,6 +74,11 @@ export default class extends Controller {
 
   _for(targets, role) {
     return targets.find((el) => el.dataset.brandRole === role)
+  }
+
+  // "" when the Verto uses the platform default — the server stores nil.
+  _font() {
+    return this.hasFontSelectTarget ? this.fontSelectTarget.value : ""
   }
 
   _palette() {
@@ -91,7 +111,7 @@ export default class extends Controller {
           "Content-Type": "application/json",
           "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || "",
         },
-        body: JSON.stringify({ brand_palette: this._palette() }),
+        body: JSON.stringify({ brand_palette: this._palette(), brand_font: this._font() }),
       })
       const data = await res.json()
       this._status(data.ok ? "Saved" : "Couldn't save")

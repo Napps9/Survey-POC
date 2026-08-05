@@ -827,6 +827,9 @@ sw:
     undo: 'Tendua'
     duplicate_card: 'Nakili'
     emoji_pick: "Chagua emoji"
+    brand_font: "Aina ya herufi"
+    brand_font_hint: "Huweka fonti ya kila swali, jibu na skrini ya mwisho."
+    brand_font_default: "Chaguo-msingi (ABeeZee)"
     emoji_search: "Tafuta emoji…"
     emoji_clear: "Futa"
     lottie_section: "Uhuishaji (Lottie)"

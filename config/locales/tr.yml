@@ -827,6 +827,9 @@ tr:
     undo: 'Geri al'
     duplicate_card: 'Çoğalt'
     emoji_pick: "Emoji seç"
+    brand_font: "Yazı tipi"
+    brand_font_hint: "Bu Verto'daki tüm soru, yanıt ve bitiş ekranlarının yazı tipini belirler."
+    brand_font_default: "Varsayılan (ABeeZee)"
     emoji_search: "Emoji ara…"
     emoji_clear: "Temizle"
     lottie_section: "Animasyon (Lottie)"

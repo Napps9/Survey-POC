@@ -835,6 +835,9 @@ en:
     undo: 'Undo'
     duplicate_card: 'Duplicate'
     emoji_pick: "Choose an emoji"
+    brand_font: "Typeface"
+    brand_font_hint: "Sets the font for every question, answer and finish screen in this Verto."
+    brand_font_default: "Default (ABeeZee)"
     emoji_search: "Search emoji…"
     emoji_clear: "Clear"
     lottie_section: "Animation (Lottie)"

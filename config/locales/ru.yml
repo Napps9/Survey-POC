@@ -829,6 +829,9 @@ ru:
     undo: 'Отменить'
     duplicate_card: 'Дублировать'
     emoji_pick: "Выбрать эмодзи"
+    brand_font: "Шрифт"
+    brand_font_hint: "Задаёт шрифт для всех вопросов, ответов и финальных экранов."
+    brand_font_default: "По умолчанию (ABeeZee)"
     emoji_search: "Поиск эмодзи…"
     emoji_clear: "Очистить"
     lottie_section: "Анимация (Lottie)"

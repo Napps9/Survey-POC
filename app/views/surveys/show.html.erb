@@ -1334,6 +1334,27 @@
           <div data-brand-palette-target="status"
                style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);min-height:16px;margin-top:2px;"></div>
 
+          <%# Typeface — the same seven self-hosted families the rich-text
+              toolbar offers per selection, applied to the whole Verto. Each
+              option previews in its own face so the list reads as what it
+              does. Saved through the same PATCH as the colours. %>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;"><%= t("editor.brand_font", default: "Typeface") %></div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);margin:3px 0 10px;line-height:1.45;">
+              <%= t("editor.brand_font_hint", default: "Sets the font for every question, answer and finish screen in this Verto.") %>
+            </div>
+            <select class="brand-font-select"
+                    data-brand-palette-target="fontSelect"
+                    data-action="change->brand-palette#onFont"
+                    aria-label="<%= t("editor.brand_font", default: "Typeface") %>">
+              <option value="" <%= "selected" if @survey.brand_font.blank? %>><%= t("editor.brand_font_default", default: "Default (ABeeZee)") %></option>
+              <% Survey::BRAND_FONTS.each do |token, meta| %>
+                <option value="<%= token %>" <%= "selected" if @survey.brand_font == token %>
+                        style="font-family:<%= meta[:stack] %>;"><%= meta[:label] %></option>
+              <% end %>
+            </select>
+          </div>
+
           <%# Background image — fills the backdrop behind the whole Verto. %>
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
             <div style="font-family:'Alata',sans-serif;font-size: var(--text-base);color:#fff;line-height:1.2;">Background image</div>

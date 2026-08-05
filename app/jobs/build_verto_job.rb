@@ -119,6 +119,7 @@ class BuildVertoJob < ApplicationJob
       show_results_comparison: !!p["show_results_comparison"],
       quiz:           !!p["quiz"],
       brand_palette:  p["brand_palette"].presence,
+      brand_font:     Survey.sanitize_brand_font(p["brand_font"]),
       default_locale: p["default_locale"],
       locales:        Array(p["locales"])
     )

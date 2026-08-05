@@ -169,6 +169,38 @@ class Survey < ApplicationRecord
   # scale, swipe and free-text types have no per-option tile to style.
   OPTION_STYLE_TYPES = %w[multiple_choice select_many prioritise yes_no select_one_grid select_many_grid scenario].freeze
 
+  # ── Verto typeface ───────────────────────────────────────────────────────
+  # The font a Verto is set in, picked in the Design panel beside its colours.
+  # Deliberately the SAME seven families the rich-text toolbar already offers
+  # per text selection (RichTextSanitizer::FONT_CLASSES is the authority, so
+  # the two can't drift): every one is self-hosted under public/fonts and
+  # already loaded, so a Verto font costs no extra request and needs nothing
+  # added to the CSP. The stored value is the class token; nil = the platform
+  # default. The CSS stack lives here because the browser needs a real
+  # font-family value, not a class, when it comes through a custom property.
+  BRAND_FONTS = {
+    "font-abeezee"  => { label: "ABeeZee", stack: %('ABeeZee', sans-serif) },
+    "font-alata"    => { label: "Alata",   stack: %('Alata', sans-serif) },
+    "font-poppins"  => { label: "Poppins", stack: %('Poppins', sans-serif) },
+    "font-lora"     => { label: "Lora",    stack: %('Lora', serif) },
+    "font-spectral" => { label: "Spectral", stack: %('Spectral', serif) },
+    "font-anton"    => { label: "Anton",   stack: %('Anton', sans-serif) },
+    "font-caveat"   => { label: "Caveat",  stack: %('Caveat', cursive) }
+  }.freeze
+
+  # Allowlist-or-nil, the same shape every other creator-supplied style value
+  # takes — the value reaches an inline `style` attribute, so nothing that
+  # isn't a known token may pass.
+  def self.sanitize_brand_font(value)
+    v = value.to_s.strip
+    BRAND_FONTS.key?(v) ? v : nil
+  end
+
+  # The CSS font stack for this Verto, or nil when it uses the default.
+  def brand_font_stack
+    BRAND_FONTS.dig(brand_font.to_s, :stack)
+  end
+
   # Free-text answer length. This used to be a hardcoded 200 in the card
   # partial, and it was advisory only — no maxlength on the textarea and no
   # server check anywhere, so the counter turned pink and the answer saved in

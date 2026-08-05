@@ -1574,7 +1574,7 @@
 .device-mobile .rail-add-btn { display: none; }
 
 .q-eyebrow {
-  font-family: "Alata", sans-serif;
+  font-family: var(--verto-font, "Alata", sans-serif);
   font-size: 12px;
   font-weight: 700;
   color: var(--brand-primary, var(--color-green-500));
@@ -1582,7 +1582,7 @@
   text-transform: uppercase;
 }
 .q-title {
-  font-family: "ABeeZee", sans-serif;
+  font-family: var(--verto-font, "ABeeZee", sans-serif);
   font-size: 22px;
   line-height: 1.35;
   color: #000;
@@ -1744,7 +1744,7 @@
 }
 .pick-text {
   flex: 1;
-  font-family: "ABeeZee", sans-serif;
+  font-family: var(--verto-font, "ABeeZee", sans-serif);
   font-size: 15px;
   color: #111;
   outline: none;
@@ -1927,7 +1927,7 @@
 .choice-label {
   margin-top: 7px;
   text-align: center;
-  font-family: "Alata", sans-serif;
+  font-family: var(--verto-font, "Alata", sans-serif);
   font-size: 12px;
   font-weight: 600;
   color: #1C2034;
@@ -4232,6 +4232,22 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .choice-list-tile { --tile-emoji: 26px; }
 .choice-card-bg   { --tile-emoji: 30px; }
+/* The Verto typeface picker — Design panel (dark) and the create wizard's
+   final step (light). Each <option> carries its own font-family inline so the
+   menu previews what it does. */
+.brand-font-select {
+  width: 100%; padding: 9px 11px; border-radius: 10px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; font-family: "ABeeZee", sans-serif; font-size: 13px;
+  outline: none; cursor: pointer;
+}
+.brand-font-select:focus { border-color: #01EACB; }
+.brand-font-select option { background: #1C2034; color: #fff; font-size: 15px; }
+.brand-font-select--light {
+  background: #fafbfc; border-color: rgba(0,0,0,0.12); color: #1C2034;
+}
+.brand-font-select--light option { background: #fff; color: #1C2034; }
+
 /* ── Emoji picker ── one popover shared by every emoji field in the editor
    (option styles, token types). The OS emoji keyboard used to be the only way
    to fill those fields, which many creators never find. ── */
@@ -4512,11 +4528,11 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .preview-thankyou-emoji { font-size: 60px; line-height: 1; }
 .preview-thankyou-title {
-  font-family: "Alata", sans-serif; font-size: 44px;
+  font-family: var(--verto-font, "Alata", sans-serif); font-size: 44px;
   color: #fff; letter-spacing: -0.5px;
 }
 .preview-thankyou-sub {
-  font-family: "ABeeZee", sans-serif; font-size: 16px;
+  font-family: var(--verto-font, "ABeeZee", sans-serif); font-size: 16px;
   color: rgba(255,255,255,0.45); max-width: 380px; line-height: 1.6;
 }
 
