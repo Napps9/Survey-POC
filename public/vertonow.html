@@ -392,16 +392,19 @@
     object-fit: cover;
     object-position: center top;
   }
-  /* The live Verto. Laid out at twice the screen's size and scaled by half, so
-     the player renders its full desktop layout rather than a squeezed one —
-     pointer events map through the transform, so it stays playable. */
+  /* The live Verto. The player composes for the viewport it's given, so the
+     frame is laid out at a FIXED logical width and scaled to fit the screen
+     area — a multiple of the container would shrink with the page and cross
+     the player's 768px mobile breakpoint on narrower screens, putting a phone
+     UI in a laptop. Pointer events map through the transform, so it stays
+     playable. --embed-scale is set from JS against the measured bezel. */
   .laptop-mockup .screen-embed{
     position: absolute;
     left: 12.4%;
     top: 3.1%;
-    width: 150.3%;
-    height: 138%;
-    transform: scale(0.5);
+    width: var(--embed-w, 1000px);
+    height: var(--embed-h, 567px);
+    transform: scale(var(--embed-scale, 0.65));
     transform-origin: top left;
     border: 0;
     z-index: 2;
@@ -1174,6 +1177,25 @@
     render();
   }
 
+  // The screen area inside the bezel, as fractions of the mockup — the same
+  // numbers the CSS positions against.
+  const SCREEN_W = 0.7515, SCREEN_H = 0.69;
+  // Logical viewport handed to the player. Above its 768px mobile breakpoint at
+  // every page width, so the laptop always shows the desktop layout.
+  const EMBED_W = 1000;
+
+  function fitEmbed(){
+    const frame = mockup?.querySelector('.screen-embed');
+    if (!frame) return;
+    const screenW = mockup.clientWidth * SCREEN_W;
+    const screenH = mockup.clientHeight * SCREEN_H;
+    if (screenW < 2) return;                       // laid out mobile: CSS takes over
+    const embedH = Math.round(EMBED_W * (screenH / screenW));
+    frame.style.setProperty('--embed-w', EMBED_W + 'px');
+    frame.style.setProperty('--embed-h', embedH + 'px');
+    frame.style.setProperty('--embed-scale', screenW / EMBED_W);
+  }
+
   // The real Verto, whenever the browser will allow it.
   function embedRealVerto(){
     if (!mockup) return;
@@ -1184,6 +1206,8 @@
     frame.title = 'A live Verto you can play';
     frame.src = DEMO_PATH;                 // relative — the app serving this page
     mockup.appendChild(frame);
+    fitEmbed();
+    window.addEventListener('resize', fitEmbed);
 
     let settled = false;
     const finish = (embedded) => {
