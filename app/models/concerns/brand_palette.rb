@@ -100,4 +100,26 @@ module BrandPalette
     r, g, b = rgb(hex)
     "rgba(#{r}, #{g}, #{b}, #{alpha})"
   end
+
+  # ── Answer-icon tints ────────────────────────────────────────────────────
+  # The six answer tiles ship as fixed pastels (.choice-bg-1..6). A Verto can
+  # instead derive them from its primary colour, so the answers look like the
+  # brand rather than like the product.
+  #
+  # A ramp of the SAME hue rather than six invented hues: the point is that
+  # they read as one family. Each step is a two-stop gradient like the stock
+  # pastels, so the tiles keep their depth. The lightest steps stay well above
+  # the option label's contrast floor — these sit behind an emoji or icon, and
+  # the label reads on the card, not on the tile.
+  TINT_STEPS = [ 0.82, 0.70, 0.58, 0.46, 0.34, 0.22 ].freeze
+
+  def tile_gradients(primary)
+    return [] unless valid_hex?(primary.to_s)
+
+    TINT_STEPS.map do |step|
+      from = lighten(primary, step)
+      to   = lighten(primary, [ step - 0.18, 0 ].max)
+      "linear-gradient(135deg, #{from}, #{to})"
+    end
+  end
 end

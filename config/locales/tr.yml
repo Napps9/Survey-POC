@@ -828,6 +828,11 @@ tr:
     duplicate_card: 'Çoğalt'
     emoji_pick: "Emoji seç"
     brand_font: "Yazı tipi"
+    brand_font_headings: "Başlıklar"
+    brand_font_body: "Gövde metni"
+    brand_font_follow: "Gövde metniyle aynı"
+    answer_tint: "Yanıt simgelerini marka rengimle eşleştir"
+    answer_tint_hint: "Aksi hâlde varsayılan pastel setimiz kullanılır."
     brand_font_hint: "Bu Verto'daki tüm soru, yanıt ve bitiş ekranlarının yazı tipini belirler."
     brand_font_default: "Varsayılan (ABeeZee)"
     emoji_search: "Emoji ara…"

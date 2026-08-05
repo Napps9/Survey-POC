@@ -86,15 +86,80 @@ class BrandFontTest < ActionDispatch::IntegrationTest
                     "the default must fall through to the stylesheet, not restate itself"
   end
 
+  test "headings can take a second face, and follow the body when unset" do
+    sign_in
+    patch survey_path(@survey),
+          params: { brand_font: "font-lora", brand_font_heading: "font-anton" }.to_json,
+          headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :success
+    @survey.reload
+    assert_equal "font-lora",  @survey.brand_font
+    assert_equal "font-anton", @survey.brand_font_heading
+
+    get survey_path(@survey)
+    body = Nokogiri::HTML(response.body)
+    styled = body.css("[style*='--verto-font']").map { |el| el["style"] }.join(" ")
+    assert_includes styled, "--verto-font-heading", "headings need their own variable"
+    assert_includes styled, "Anton"
+    assert_includes styled, "Lora"
+  end
+
+  test "a Verto with only a body font emits no heading variable, so headings follow it" do
+    @survey.update!(brand_font: "font-lora")
+    sign_in
+    get survey_path(@survey)
+
+    assert_response :success
+    refute_includes response.body, "--verto-font-heading",
+                    "an empty heading variable would beat the CSS fallback to the body face"
+  end
+
+  # The create flow is a different path to the editor's PATCH: the wizard
+  # posts to #generate, which parks a payload for BuildVertoJob to turn into a
+  # Verto. A branding field dropped at either seam looks fine in the wizard and
+  # then arrives unstyled, so both are asserted.
+  test "the wizard hands both fonts and the icon colours to the build" do
+    sign_in
+    post generate_survey_path, params: {
+      theme: "Community safety", audience_age: "adults", key_insight: "what helps",
+      brand_font: "font-lora", brand_font_heading: "font-anton", brand_answer_tint: "1",
+      brand_palette: { "primary" => "#8B5CF6" }
+    }
+
+    build = @org.verto_builds.order(:id).last
+    assert build, "the wizard should have parked a build"
+    assert_equal "font-lora",  build.payload["brand_font"]
+    assert_equal "font-anton", build.payload["brand_font_heading"]
+    assert_equal true,         build.payload["brand_answer_tint"]
+  end
+
+  test "the build maps all three onto the Verto it creates" do
+    # A Common-Questions-only deck (blank key_insight) is BuildVertoJob's
+    # no-Claude branch, so this exercises the real mapping without the API.
+    build = @org.verto_builds.create!(user: @user, payload: {
+      "theme" => "Community safety", "audience_age" => "adults", "key_insight" => "",
+      "common_cards" => [ { "type" => "multiple_choice", "text" => "Q", "options" => %w[a b] } ],
+      "default_locale" => "en", "locales" => [ "en" ],
+      "brand_font" => "font-lora", "brand_font_heading" => "font-anton",
+      "brand_answer_tint" => true
+    })
+
+    survey = BuildVertoJob.new.send(:create_survey, build)
+
+    assert_equal "font-lora",  survey.brand_font
+    assert_equal "font-anton", survey.brand_font_heading
+    assert survey.brand_answer_tint?, "the icon-colour choice must reach the Verto"
+  end
+
   test "the Design panel and the create wizard both offer the picker" do
     sign_in
     get survey_path(@survey)
     assert_select "select.brand-font-select[data-brand-palette-target='fontSelect']", 1
-    assert_select "select.brand-font-select option", { count: Survey::BRAND_FONTS.size + 1 },
-                  "every font plus the default"
+    assert_select "select.brand-font-select[data-brand-palette-target='headingFontSelect']", 1
 
     get new_survey_path
     assert_response :success
     assert_select "select[name='brand_font']", 1
+    assert_select "select[name='brand_font_heading']", 1
   end
 end

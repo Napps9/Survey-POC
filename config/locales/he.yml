@@ -828,6 +828,11 @@ he:
     duplicate_card: 'שכפול'
     emoji_pick: "בחרו אימוג'י"
     brand_font: "גופן"
+    brand_font_headings: "כותרות"
+    brand_font_body: "טקסט גוף"
+    brand_font_follow: "כמו טקסט הגוף"
+    answer_tint: "התאמת סמלי התשובות לצבע המותג שלי"
+    answer_tint_hint: "אחרת ייעשה שימוש בערכת הפסטל שלנו."
     brand_font_hint: "קובע את הגופן לכל שאלה, תשובה ומסך סיום ב-Verto הזה."
     brand_font_default: "ברירת מחדל (ABeeZee)"
     emoji_search: "חיפוש אימוג'י…"

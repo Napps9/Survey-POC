@@ -828,6 +828,11 @@ sw:
     duplicate_card: 'Nakili'
     emoji_pick: "Chagua emoji"
     brand_font: "Aina ya herufi"
+    brand_font_headings: "Vichwa"
+    brand_font_body: "Maandishi"
+    brand_font_follow: "Sawa na maandishi"
+    answer_tint: "Linganisha aikoni za majibu na rangi ya chapa yangu"
+    answer_tint_hint: "Vinginevyo tutatumia seti yetu ya pastel chaguo-msingi."
     brand_font_hint: "Huweka fonti ya kila swali, jibu na skrini ya mwisho."
     brand_font_default: "Chaguo-msingi (ABeeZee)"
     emoji_search: "Tafuta emoji…"

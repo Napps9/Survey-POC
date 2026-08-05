@@ -828,6 +828,11 @@ vi:
     duplicate_card: 'Nhân bản'
     emoji_pick: "Chọn emoji"
     brand_font: "Kiểu chữ"
+    brand_font_headings: "Tiêu đề"
+    brand_font_body: "Nội dung"
+    brand_font_follow: "Giống nội dung"
+    answer_tint: "Khớp biểu tượng câu trả lời với màu thương hiệu"
+    answer_tint_hint: "Nếu không, bộ pastel mặc định sẽ được dùng."
     brand_font_hint: "Đặt phông chữ cho mọi câu hỏi, câu trả lời và màn hình kết thúc."
     brand_font_default: "Mặc định (ABeeZee)"
     emoji_search: "Tìm emoji…"

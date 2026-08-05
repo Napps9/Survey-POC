@@ -830,6 +830,11 @@ pl:
     duplicate_card: 'Duplikuj'
     emoji_pick: "Wybierz emoji"
     brand_font: "Krój pisma"
+    brand_font_headings: "Nagłówki"
+    brand_font_body: "Tekst główny"
+    brand_font_follow: "Tak jak tekst główny"
+    answer_tint: "Dopasuj ikony odpowiedzi do koloru marki"
+    answer_tint_hint: "W przeciwnym razie użyjemy domyślnego zestawu pastelowego."
     brand_font_hint: "Ustawia czcionkę wszystkich pytań, odpowiedzi i ekranów końcowych."
     brand_font_default: "Domyślny (ABeeZee)"
     emoji_search: "Szukaj emoji…"

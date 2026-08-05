@@ -828,6 +828,11 @@ de:
     duplicate_card: 'Duplizieren'
     emoji_pick: "Emoji wählen"
     brand_font: "Schriftart"
+    brand_font_headings: "Überschriften"
+    brand_font_body: "Fließtext"
+    brand_font_follow: "Wie der Fließtext"
+    answer_tint: "Antwort-Symbole an meine Markenfarbe anpassen"
+    answer_tint_hint: "Sonst wird unser Standard-Pastellset verwendet."
     brand_font_hint: "Legt die Schrift für alle Fragen, Antworten und Abschlussbildschirme fest."
     brand_font_default: "Standard (ABeeZee)"
     emoji_search: "Emoji suchen…"

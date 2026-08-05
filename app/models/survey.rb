@@ -196,9 +196,17 @@ class Survey < ApplicationRecord
     BRAND_FONTS.key?(v) ? v : nil
   end
 
-  # The CSS font stack for this Verto, or nil when it uses the default.
+  # The CSS font stacks for this Verto, or nil where it uses the default.
+  # `brand_font` is the BODY face and the base for the whole Verto;
+  # `brand_font_heading` overrides it for questions and titles only. A blank
+  # heading font means headings follow the body — which is what every Verto
+  # did before headings were separable, so nothing changes until it's set.
   def brand_font_stack
     BRAND_FONTS.dig(brand_font.to_s, :stack)
+  end
+
+  def brand_font_heading_stack
+    BRAND_FONTS.dig(brand_font_heading.to_s, :stack)
   end
 
   # Free-text answer length. This used to be a hardcoded 200 in the card

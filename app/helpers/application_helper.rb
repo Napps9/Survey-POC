@@ -477,6 +477,16 @@ module ApplicationHelper
     if (stack = survey.brand_font_stack)
       parts << "--verto-font: #{stack}"
     end
+    if (heading = survey.brand_font_heading_stack)
+      parts << "--verto-font-heading: #{heading}"
+    end
+    # Answer icon tiles derived from the brand colour. Same reasoning as the
+    # font: declared once here, so the editor feed, the preview overlay and
+    # the player all pick it up.
+    if survey.brand_answer_tint?
+      BrandPalette.tile_gradients(BrandPalette.resolve(survey.brand_palette)["primary"])
+                  .each_with_index { |grad, i| parts << "--choice-bg-#{i + 1}: #{grad}" }
+    end
     parts << verto_brand_bg_image_var(survey) if image && survey.background_image.present?
     # Mobile-only per-card backdrop: a themed image picked from
     # verto-library/mobile-backgrounds/, applied behind a heavy white

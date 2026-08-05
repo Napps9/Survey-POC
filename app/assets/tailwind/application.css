@@ -1574,7 +1574,7 @@
 .device-mobile .rail-add-btn { display: none; }
 
 .q-eyebrow {
-  font-family: var(--verto-font, "Alata", sans-serif);
+  font-family: var(--verto-font-heading, var(--verto-font, "Alata", sans-serif));
   font-size: 12px;
   font-weight: 700;
   color: var(--brand-primary, var(--color-green-500));
@@ -1582,14 +1582,14 @@
   text-transform: uppercase;
 }
 .q-title {
-  font-family: var(--verto-font, "ABeeZee", sans-serif);
+  font-family: var(--verto-font-heading, var(--verto-font, "ABeeZee", sans-serif));
   font-size: 22px;
   line-height: 1.35;
   color: #000;
   outline: none;
 }
 .q-subtitle {
-  font-family: "ABeeZee", sans-serif;
+  font-family: var(--verto-font, "ABeeZee", sans-serif);
   font-size: 14px;
   line-height: 1.5;
   color: rgba(0,0,0,0.6);
@@ -1882,12 +1882,17 @@
   color: var(--brand-primary, rgba(0,0,0,0.6));
   flex-shrink: 0;
 }
-.choice-bg-1 { background: linear-gradient(135deg, #d4edda, #a8d5b5); }
-.choice-bg-2 { background: linear-gradient(135deg, #d1ecf1, #9fd5df); }
-.choice-bg-3 { background: linear-gradient(135deg, #fff3cd, #ffd88a); }
-.choice-bg-4 { background: linear-gradient(135deg, #f8d7da, #f5a8b0); }
-.choice-bg-5 { background: linear-gradient(135deg, #e2d9f3, #c3aee8); }
-.choice-bg-6 { background: linear-gradient(135deg, #d0e8ff, #9fcfff); }
+/* The stock pastels are the fallback; a Verto that derives its answer icons
+   from its brand colour supplies --choice-bg-N instead (one custom property
+   per tile, set alongside the other brand vars — see
+   verto_backdrop_style_attr). A per-option 🎨 colour still wins over both,
+   because it lands as an inline style on the tile itself. */
+.choice-bg-1 { background: var(--choice-bg-1, linear-gradient(135deg, #d4edda, #a8d5b5)); }
+.choice-bg-2 { background: var(--choice-bg-2, linear-gradient(135deg, #d1ecf1, #9fd5df)); }
+.choice-bg-3 { background: var(--choice-bg-3, linear-gradient(135deg, #fff3cd, #ffd88a)); }
+.choice-bg-4 { background: var(--choice-bg-4, linear-gradient(135deg, #f8d7da, #f5a8b0)); }
+.choice-bg-5 { background: var(--choice-bg-5, linear-gradient(135deg, #e2d9f3, #c3aee8)); }
+.choice-bg-6 { background: var(--choice-bg-6, linear-gradient(135deg, #d0e8ff, #9fcfff)); }
 .choice-overlay {
   position: absolute; inset: 0;
   background: transparent;
@@ -4528,7 +4533,7 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .preview-thankyou-emoji { font-size: 60px; line-height: 1; }
 .preview-thankyou-title {
-  font-family: var(--verto-font, "Alata", sans-serif); font-size: 44px;
+  font-family: var(--verto-font-heading, var(--verto-font, "Alata", sans-serif)); font-size: 44px;
   color: #fff; letter-spacing: -0.5px;
 }
 .preview-thankyou-sub {
