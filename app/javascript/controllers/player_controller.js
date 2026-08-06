@@ -163,6 +163,7 @@ export default class extends Controller {
       this.element.addEventListener(evt, (e) => {
         this._markTouched(e)
         this._queueAnsweredSync()
+        if (e.type === "click") requestAnimationFrame(() => this._fitCard())
       }, { capture: true, passive: true })
     }
   }
@@ -258,6 +259,51 @@ export default class extends Controller {
     footer.classList.toggle("is-tight", tight)
   }
 
+  // ── Running out of room: shed the pictures, never the controls ───────────
+  //
+  // A respondent can answer a question with no artwork on it. They cannot
+  // answer one whose options are off the bottom of the screen. So when the
+  // answer area overflows, the imagery goes — first the option tiles, then
+  // the card's hero image — and the widget and the footer are never touched.
+  //
+  // Measured, one rung at a time, because the alternative is guessing: how
+  // much room an answer needs depends on the option count, the label lengths,
+  // the question's own height and the phone, and no breakpoint knows any of
+  // that. Everything is reset before measuring, so a card that gained room
+  // back (rotation, the keyboard closing) climbs the ladder again rather than
+  // staying stripped for the rest of the deck.
+  _fitCard() {
+    const card = this.cardTargets[this.currentValue]
+    if (!card) return
+    const box = card.querySelector(".split-right > .mt-2")
+    if (!box) return
+
+    // A little scrolling is not a compromise — most option lists scroll by
+    // design and nobody minds. Shedding only starts when enough of the answer
+    // is hidden that the pictures are costing more than they give: past this
+    // ratio less than two thirds of the options are on screen. A grid showing
+    // two of its three rows stays exactly as it was drawn.
+    const TOLERANCE = 1.5
+    const tooTall = () => box.scrollHeight > box.clientHeight * TOLERANCE
+    const overflows = () => box.scrollHeight > box.clientHeight + 1
+
+    card.classList.remove("hero-off")
+    const grid = box.querySelector(".choice-grid")
+    grid?.classList.remove("art-off")
+    if (!tooTall()) return
+
+    // 2. The option tiles. The grid becomes the option list.
+    if (grid) {
+      grid.classList.add("art-off")
+      if (!overflows()) return
+    }
+
+    // 3. The card image. Worth 100-340px, and it never helped anyone answer.
+    card.classList.add("hero-off")
+
+    // 4. Whatever is still too tall scrolls, which is what the fade is for.
+  }
+
   _watchFooterFit() {
     this._fitFooter()
     const footer = this._footerEl
@@ -265,7 +311,7 @@ export default class extends Controller {
     // Catches rotation, the iOS toolbar collapsing, and a keyboard opening.
     // Label and chip changes call _fitFooter directly — they don't resize the
     // bar itself, so the observer would never hear about them.
-    this._footerObserver = new ResizeObserver(() => this._fitFooter())
+    this._footerObserver = new ResizeObserver(() => { this._fitFooter(); this._fitCard() })
     this._footerObserver.observe(footer)
   }
 
@@ -1427,6 +1473,7 @@ export default class extends Controller {
     // be on the moment the card appears, not on their next tap.
     this._syncAnswered()
     this._fitFooter()
+    this._fitCard()
   }
 
   // ── Quiz: per-card grading, reveal, lock, running score ──────────────────

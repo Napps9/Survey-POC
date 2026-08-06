@@ -47,6 +47,14 @@ class OptionTileProportionTest < ApplicationSystemTestCase
     super
   end
 
+  # Once the shed order takes the tiles away (player_shed_order_test) there is
+  # no banner left to measure — the artwork became a 34px swatch on a row.
+  # That is the same invariant reached another way: what must never happen is
+  # a DISTORTED tile, and a tile that isn't there can't be.
+  def art_shed?
+    page.has_css?(".preview-card.active .choice-grid.art-off", wait: 1)
+  end
+
   def tile_ratios_at(width, height)
     page.driver.browser.resize(width: width, height: height)
     visit "/play/#{@survey.publish_token}"
@@ -66,7 +74,9 @@ class OptionTileProportionTest < ApplicationSystemTestCase
     test "option tiles keep their proportion on a #{name}" do
       ratios = tile_ratios_at(width, height)
 
-      assert_equal 6, ratios.length, "expected all six option tiles to be laid out"
+      assert_equal 6, ratios.length, "expected all six options to be laid out"
+      next if art_shed? # no banner tile to be out of proportion
+
       ratios.each do |ratio|
         assert ratio <= FLATTEST,
                "#{name} (#{width}x#{height}) flattened a tile to #{ratio}:1 — a stripe, not a tile"
@@ -76,14 +86,22 @@ class OptionTileProportionTest < ApplicationSystemTestCase
     end
   end
 
-  # The specific shape that exposed it: the same phone, turned. Before the
-  # tile sized itself off its own width these differed by more than 2x.
-  test "turning a phone sideways does not change what a tile looks like" do
-    upright  = tile_ratios_at(393, 660).max
-    sideways = tile_ratios_at(844, 390).max
+  # The specific shape that exposed it: the same phone, turned. It used to
+  # answer with a 2:1 tile upright and a 4.6:1 smear sideways. Now it either
+  # keeps the proportion or drops the artwork — what it must never do again is
+  # show the same picture in two different shapes.
+  test "turning a phone sideways never restates a tile in a different shape" do
+    upright = tile_ratios_at(393, 660).max
+    assert upright.between?(TALLEST, FLATTEST), "upright should be a banner, got #{upright}:1"
 
-    assert_in_delta upright, sideways, 0.6,
-                    "a tile should look like itself in both orientations " \
-                    "(upright #{upright}:1, sideways #{sideways}:1)"
+    sideways = tile_ratios_at(844, 390).max
+    if art_shed?
+      assert_in_delta 1.0, sideways, 0.35,
+                      "a shed tile is a square swatch on a row, got #{sideways}:1"
+    else
+      assert_in_delta upright, sideways, 0.6,
+                      "kept as a banner, it should be the same banner " \
+                      "(upright #{upright}:1, sideways #{sideways}:1)"
+    end
   end
 end

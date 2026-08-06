@@ -5733,6 +5733,96 @@ body.generating-overlay-active .bottom-bar { display: none; }
      there isn't any, which is the difference between one row of scrolling
      and two. */
   .preview-overlay .choice-card-bg { height: auto; }
+
+  /* ── Running out of room: shed the pictures, never the controls ─────────
+     The order is fixed and it is a priority, not a fallback: a respondent
+     can answer a question with no artwork on it and cannot answer one whose
+     options are off the bottom of the screen. player_controller#_fitCard
+     measures the answer area and walks down this list only as far as it has
+     to — most cards never leave the first rung.
+
+       1. the hero shrinks to its floor          (flex, always on)
+       2. .art-off   — the option tiles go       (this rule)
+       3. .hero-off  — the card image goes       (below)
+       4. the answer area scrolls                (last resort)
+
+     Back, Next and the answer widget itself are never on the list.
+
+     Step 2 turns the image grid into the option LIST — the same component
+     the other pick types already use, so nothing here is a new design: a
+     colour swatch keeps each option's identity, the label gets the width it
+     was short of, and the tick is where a tick goes. Six options that were
+     scrolling now fit. */
+  /* Written against the same specificity as the two-column rule above, which
+     would otherwise win. Rows without artwork want width for their label, not
+     a fixed column count: one column on a phone panel, three across a tablet
+     or a sideways phone, decided by the panel rather than by a breakpoint. */
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid.art-off,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid.art-off {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: clamp(6px, 1.1svh, 9px);
+  }
+  .preview-overlay .choice-grid.art-off .choice-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 11px;
+    height: auto;
+    /* The tick is absolutely positioned, so the row has to keep its lane
+       clear by hand — without this a two-line label runs underneath it. */
+    padding: clamp(7px, 1.1svh, 11px) 40px clamp(7px, 1.1svh, 11px) 12px;
+    background: rgba(0,0,0,0.03);
+    border: 1.5px solid rgba(0,0,0,0.07);
+    border-radius: 13px;
+  }
+  .preview-overlay .choice-grid.art-off .choice-card[data-selected="true"] {
+    background: var(--brand-primary-soft, rgba(255,30,111,0.08));
+    border-color: var(--brand-primary, #FF1E6F);
+  }
+  /* The swatch keeps the tile's colour and icon at a size that suits a row.
+     `position: static` hands the tick back to the card, which is what it
+     should be pinned to now — it used to sit in the corner of the artwork. */
+  .preview-overlay .choice-grid.art-off .choice-card-bg {
+    position: static;
+    flex: 0 0 auto;
+    width: 34px; height: 34px;
+    min-height: 0; max-height: none;
+    border-radius: 9px;
+    box-shadow: none;
+    --tile-emoji: 18px;
+  }
+  .preview-overlay .choice-grid.art-off .choice-icon-svg {
+    width: 19px; height: 19px; min-width: 0; min-height: 0;
+  }
+  /* Its job was tinting artwork that is no longer there; left alone it would
+     paint the whole row instead. */
+  .preview-overlay .choice-grid.art-off .choice-overlay { display: none; }
+  .preview-overlay .choice-grid.art-off .choice-label {
+    margin: 0;
+    flex: 1 1 auto;
+    text-align: start;
+    font-size: clamp(14px, 3.8vw, 16px);
+  }
+  .preview-overlay .choice-grid.art-off .choice-tick {
+    top: 50%; right: 12px; bottom: auto;
+    transform: translateY(-50%);
+    width: 20px; height: 20px;
+  }
+
+  /* Step 3. `display: contents` rather than `display: none` so the progress
+     bar living inside the panel still renders — it is the one thing in there
+     that is not decoration. Its siblings have to be hidden by hand for the
+     same reason: freed from the panel, an inset-0 image would position
+     against the whole card and cover it. */
+  .preview-overlay .preview-card.hero-off .split-card .split-left { display: contents; }
+  .preview-overlay .preview-card.hero-off .split-left-img,
+  .preview-overlay .preview-card.hero-off .split-left-video,
+  .preview-overlay .preview-card.hero-off .split-left-overlay,
+  .preview-overlay .preview-card.hero-off .split-left-credit,
+  .preview-overlay .preview-card.hero-off .card-lottie { display: none; }
+  .preview-overlay .preview-card.hero-off .split-card .split-right {
+    margin-top: 0;
+    border-radius: 0;
+  }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-card[data-selected="true"],
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card[data-selected="true"] {
     border-color: #FF1E6F;
