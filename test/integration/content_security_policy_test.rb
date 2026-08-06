@@ -33,4 +33,17 @@ class ContentSecurityPolicyTest < ActionDispatch::IntegrationTest
     assert_not_includes csp, "fonts.gstatic.com"
     assert_not_includes csp, "fonts.googleapis.com"
   end
+
+  test "the Pexels CDNs are reachable by fetch(), not just by <img> and <video>" do
+    get new_session_path
+    csp = response.headers["Content-Security-Policy"].to_s
+    connect = csp.split(";").map(&:strip).find { |d| d.start_with?("connect-src") }
+
+    # The service worker refetches card art through the Fetch API, and a fetch()
+    # is governed by connect-src whatever it is fetching. Listing Pexels only in
+    # img-src/media-src left the worker's own request refused before it left the
+    # browser, so every Pexels-backed card panel rendered empty.
+    assert_includes connect, "https://images.pexels.com"
+    assert_includes connect, "https://videos.pexels.com"
+  end
 end

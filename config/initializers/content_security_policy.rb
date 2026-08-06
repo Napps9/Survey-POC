@@ -47,8 +47,19 @@ Rails.application.configure do
     # photos. If clips ever come from another host, add it here.
     policy.media_src  :self, "https://videos.pexels.com"
 
-    # XHR/fetch: same-origin app endpoints plus Clarity's upload endpoints.
-    policy.connect_src :self, "https://*.clarity.ms", "https://c.bing.com"
+    # XHR/fetch: same-origin app endpoints, Clarity's upload endpoints, and the
+    # Pexels CDNs.
+    #
+    # Pexels belongs here as well as in img_src/media_src because the service
+    # worker refetches card art through the Fetch API, and a fetch() is governed
+    # by connect-src no matter what it's fetching. Without it the worker's own
+    # request was refused before it left the browser ("Fetch API cannot load
+    # https://images.pexels.com/… Refused to connect"), imageCache rejected, and
+    # every Pexels-backed card panel rendered empty — the Verto's brand colour
+    # showing through where the photo should be. img_src alone only covers the
+    # <img>/CSS load the worker had already intercepted.
+    policy.connect_src :self, "https://*.clarity.ms", "https://c.bing.com",
+                       "https://images.pexels.com", "https://videos.pexels.com"
 
     policy.worker_src   :self
     policy.manifest_src :self
