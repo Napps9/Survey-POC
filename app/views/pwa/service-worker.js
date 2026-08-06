@@ -22,7 +22,16 @@
 // start with the current version. Content/markup/CSS fixes no longer need a
 // bump: the player HTML is network-first, so a fresh copy (referencing fresh
 // asset digests) is fetched on every online visit.
-const CACHE_VERSION = "playverto-v38"
+//
+// Bump for a CSP CHANGE TOO, even though none of this file's behaviour moved.
+// A worker's own fetches are governed by the Content-Security-Policy delivered
+// WITH THIS SCRIPT when it was installed, and the browser only installs a new
+// worker when the script's BYTES change. So relaxing connect-src for the Pexels
+// CDNs (config/initializers/content_security_policy.rb) reached new visitors
+// and nobody else: every already-registered worker kept enforcing the old
+// policy, kept refusing to fetch card art, and would have done so indefinitely.
+// Changing this constant is what forces the reinstall that picks the policy up.
+const CACHE_VERSION = "playverto-v39"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`

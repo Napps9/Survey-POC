@@ -11,7 +11,23 @@ class ServiceWorkerTest < ActionDispatch::IntegrationTest
     get pwa_service_worker_path(format: :js)
     assert_response :success
     assert_match %r{\Atext/javascript}, response.content_type
-    assert_includes response.body, '"playverto-v38"'
+    assert_includes response.body, '"playverto-v39"'
+  end
+
+  test "the worker can reach the Pexels CDNs it refetches card art from" do
+    get pwa_service_worker_path(format: :js)
+    assert_response :success
+
+    # A worker's own fetches are governed by the CSP delivered with THIS script
+    # at install time, and the browser only reinstalls when the script's bytes
+    # change. So connect-src has to allow Pexels on the very response that
+    # carries the worker — otherwise imageCache is refused before it reaches the
+    # network, which is what left every card panel blank.
+    csp = response.headers["Content-Security-Policy"].to_s
+    connect = csp.split(";").map(&:strip).find { |d| d.start_with?("connect-src") }
+
+    assert connect, "the worker script should carry the app's CSP"
+    assert_includes connect, "https://images.pexels.com"
   end
 
   test "cross-origin images are network-first, so a bad fetch can't be pinned" do
