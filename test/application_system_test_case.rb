@@ -42,6 +42,24 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       # --no-sandbox is required in a container running as root and on most CI
       # images; there is no untrusted content here, only our own app.
       browser_options: { "no-sandbox": nil, "disable-gpu": nil, "disable-dev-shm-usage": nil },
+      # Nothing outside the test server gets to decide whether CI passes.
+      #
+      # Fixtures build card art out of URLs like
+      # https://images.pexels.com/photos/2/x.jpg — deliberately fake, but the
+      # browser doesn't know that and dutifully goes to the internet for them.
+      # Ferrum then gives up waiting ("still pending connections: …") and the
+      # run fails on a public CDN's opinion of four 404s. That blocked a deploy
+      # once already: render.yaml gates on autoDeployTrigger: checksPass, so a
+      # flake here doesn't just annoy, it stops a ship.
+      #
+      # Blocked by "isn't the local server" rather than by naming hosts, so the
+      # next fixture reaching for a CDN can't reintroduce it — and it covers
+      # Clarity, which dismiss_cookie_banner activates by clicking Accept all.
+      # file:// is untouched by the pattern; the one-pager embed tests need it.
+      # A blocked request fails instantly, which is what a fake URL should do:
+      # these assertions are about the DOM carrying the right image, never about
+      # the bytes arriving.
+      url_blacklist: [ %r{\Ahttps?://(?!127\.0\.0\.1|localhost)}i ],
       process_timeout: 30,
       timeout: 20,
       headless: true
