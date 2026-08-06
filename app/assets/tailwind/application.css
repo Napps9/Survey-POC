@@ -5850,15 +5850,35 @@ body.generating-overlay-active .bottom-bar { display: none; }
     padding: 0 clamp(12px, 4vw, 32px);
     gap: clamp(8px, 3vw, 16px);
   }
-  /* Fluid padding + label so Back / Next stay on one line at 320px, where the
-     flat 20px padding and 15px label wrapped them into two-line buttons once
-     the quiz/points chips were sharing the bar. */
+  /* Back and Next scale DOWN from the desktop card and never past it.
+     Desktop's is 110 x 40 at 13px — measured, not chosen — and the stacked
+     layout used to treat that as a starting point rather than a ceiling:
+     `flex: 1 1 0` with no cap made each button as wide as half the bar, so an
+     upright iPad drew a 414 x 52 Next at 15px. Nearly four times the
+     reference, on a screen with a quarter of the room.
+
+     They still stretch to share a narrow bar, which is what a thumb wants —
+     a 280px Fold gets 69px buttons. The change is only that they stop at the
+     size the desktop uses.
+
+     Height is the one number that does not match: 44px against desktop's 40,
+     because 44 is the smallest reliable touch target and a pointer does not
+     need one. Everything else is desktop's or smaller. */
+  .preview-overlay .preview-footer {
+    --play-btn-max-w: 110px;   /* desktop's .preview-btn min-width */
+    --play-btn-h:      44px;   /* desktop is 40; this is the touch floor */
+    --play-btn-fs:     13px;   /* desktop's .preview-btn font-size */
+  }
   .preview-overlay .preview-btn {
     flex: 1 1 0;
-    min-height: 52px;
-    padding: 14px clamp(8px, 3.6vw, 20px);
+    max-width: var(--play-btn-max-w);
+    min-height: var(--play-btn-h);
+    padding: 10px clamp(8px, 3.2vw, 18px);
     min-width: 0;
-    font-size: clamp(13px, 3.8vw, 15px);
+    /* Floored as well as capped: a bare min() took the label to 9.5px on a
+       280px Fold, which is a cap doing its job and a floor missing. If 11px
+       still will not fit, _fitFooter drops the whole label for an arrow. */
+    font-size: clamp(11px, 3.4vw, var(--play-btn-fs));
     white-space: nowrap;
     border-radius: 14px;
   }

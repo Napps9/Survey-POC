@@ -174,4 +174,56 @@ class PlayerFooterTest < ApplicationSystemTestCase
 
     assert_not footer_tight?, "there is room on a desktop — nothing to collapse"
   end
+
+  # ── Back and Next never outgrow the desktop card ─────────────────────────
+  # The stacked layout used to stretch them to half the bar apiece, so an
+  # upright iPad drew a 414px Next against desktop's 110px — four times the
+  # size on a quarter of the screen. Desktop is the ceiling and mobile scales
+  # down from it. Measured rather than hardcoded, so the rule still holds if
+  # the desktop button is ever redrawn.
+
+  # width, height at which to check the cap
+  SCALED = [ [ 280, 653 ], [ 375, 553 ], [ 393, 660 ], [ 430, 730 ],
+             [ 844, 390 ], [ 768, 954 ], [ 1024, 1290 ] ].freeze
+
+  def next_button_box
+    page.evaluate_script(<<~JS)
+      (() => {
+        const b = document.querySelector(".preview-btn-next:not(.hidden)")
+        const r = b.getBoundingClientRect()
+        return { w: r.width, h: r.height, fs: parseFloat(getComputedStyle(b).fontSize) }
+      })()
+    JS
+  end
+
+  def next_box_at(width, height)
+    open_player(width: width, height: height)
+    click_button "Next" # off the welcome card, onto a question
+    next_button_box
+  end
+
+  test "no phone or tablet draws a bigger Next than the desktop card does" do
+    desktop = next_box_at(1280, 900)
+
+    SCALED.each do |w, h|
+      got = next_box_at(w, h)
+
+      assert got["w"] <= desktop["w"] + 1,
+             "#{w}x#{h} drew a #{got["w"].round}px Next; desktop's is #{desktop["w"].round}px"
+      assert got["fs"] <= desktop["fs"] + 0.1,
+             "#{w}x#{h} set the label at #{got["fs"]}px; desktop's is #{desktop["fs"]}px"
+      # Height is the one allowance: 44px is the smallest reliable touch
+      # target and a pointer does not need one.
+      assert got["h"] <= 44 + 1,
+             "#{w}x#{h} drew a #{got["h"].round}px-tall Next; the touch floor is 44px"
+    end
+  end
+
+  # Capped is not the same as shrunk to nothing — the label still has to be
+  # readable on the narrowest screen anyone owns.
+  test "the label keeps a floor as well as a ceiling" do
+    box = next_box_at(280, 653)
+
+    assert box["fs"] >= 11, "a 280px Fold cover screen set the label at #{box["fs"]}px"
+  end
 end
