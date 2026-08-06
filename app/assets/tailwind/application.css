@@ -5591,8 +5591,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
      over a fully-scrolled (or short, non-scrolling) list it fades white
      into white and disappears on its own — no scroll listener, no
      false "more below" on a list that has no more. */
-  .preview-overlay .choice-list::after,
-  .preview-overlay .prioritise-list::after {
+  .preview-overlay .mt-2.is-scrollable .choice-list::after,
+  .preview-overlay .mt-2.is-scrollable .prioritise-list::after {
     content: "";
     flex: 0 0 auto;
     position: sticky;
@@ -5695,8 +5695,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
      off the scroll container instead, sticky to the bottom edge and last in
      DOM order so it paints over the row sliding under it. On a grid that
      fits, it is white fading into white and disappears. */
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2::after,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2::after {
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2.is-scrollable::after,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2.is-scrollable::after {
     content: "";
     flex: 0 0 auto;
     position: sticky;

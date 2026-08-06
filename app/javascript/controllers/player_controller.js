@@ -286,11 +286,15 @@ export default class extends Controller {
     const TOLERANCE = 1.5
     const tooTall = () => box.scrollHeight > box.clientHeight * TOLERANCE
     const overflows = () => box.scrollHeight > box.clientHeight + 1
+    // The "more below" fade is drawn over the last of the content, so it has
+    // to know whether there IS anything below — left unconditional it greys
+    // out the final row's label on an answer that fits perfectly well.
+    const settle = () => box.classList.toggle("is-scrollable", overflows())
 
     card.classList.remove("hero-off")
     const grid = box.querySelector(".choice-grid")
     grid?.classList.remove("art-off")
-    if (!tooTall()) return
+    if (!tooTall()) return settle()
 
     // 2. The card image goes first. It is worth 100-340px, it is the only
     // thing here that is purely decorative, and it buys more room than the
@@ -300,13 +304,14 @@ export default class extends Controller {
     // narrow phone turns a two-column grid into a one-column list, which is
     // taller than what it replaced.
     card.classList.add("hero-off")
-    if (!overflows()) return
+    if (!overflows()) return settle()
 
     // 3. The option tiles. Now the grid becomes the option list — a colour
     // swatch keeps each option's identity and the label gets the width.
     if (grid) grid.classList.add("art-off")
 
     // 4. Whatever is still too tall scrolls, which is what the fade is for.
+    settle()
   }
 
   _watchFooterFit() {
