@@ -1851,11 +1851,16 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   border-radius: 14px;
   cursor: pointer;
   transition: transform 0.15s;
   outline: 0 solid var(--brand-primary, var(--color-green-500));
   outline-offset: 2px;
+  /* Lets the tile below size itself against ITS OWN width (cqw) instead of
+     against the viewport. The tile's proportion is a property of the tile,
+     not of the phone it happens to be on. */
+  container-type: inline-size;
 }
 .choice-card:hover { transform: scale(1.02); }
 .choice-card[data-selected="true"] { outline-width: 3px; }
@@ -1867,11 +1872,24 @@
   display: flex; align-items: center; justify-content: center;
   flex: 1 1 auto;
   height: 74px;
+  /* The tile is a banner, never a stripe and never a billboard. Its height is
+     bounded as a share of its own width, so the proportion holds at every
+     screen size instead of being whatever the row had left over: the grid
+     used to hand it 172x84 on a phone (2:1, as drawn) and 305x66 on the same
+     phone turned sideways — a 4.6:1 letterbox with the artwork squeezed into
+     a band. Between these two bounds it is free to fill the row; past them
+     the grid scrolls, which is the right way to run out of space.
+     2.6:1 at the flattest, 1.7:1 at the tallest. */
+  min-height: 38cqw;
+  max-height: 58cqw;
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   background-size: cover; background-position: center;
 }
+/* The mini phone mockups on the dashboard draw the same markup at a size the
+   bounds above were not written for; they keep their own fixed tile. */
+.phone-bottom .choice-card-bg { min-height: 0; max-height: none; }
 /* Per-option icon (OptionIconLibrary) — sits centred on top of the
    choice-bg-N gradient, sized as a share of the tile so it auto-scales at
    the .phone-bottom breakpoint with no extra rules. */
@@ -4280,7 +4298,17 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   display: flex; align-items: center; justify-content: center;
 }
 .choice-list-tile { --tile-emoji: 26px; }
-.choice-card-bg   { --tile-emoji: 30px; }
+/* Card tiles size their art against the tile's own width, so a 305px tablet
+   tile does not carry the same 30px emoji as a 172px phone one and look
+   half-empty. cqw is safe here and NOT on .choice-list-tile above: only
+   .choice-card declares a container, and a cqw with no container ancestor
+   silently falls back to the viewport. */
+.choice-card-bg { --tile-emoji: clamp(18px, 16cqw, 46px); }
+.choice-card-bg .choice-icon-svg {
+  width: 18cqw; height: 18cqw;
+  min-width: 20px; min-height: 20px;
+  max-width: 50px; max-height: 50px;
+}
 /* The Verto typeface picker — Design panel (dark) and the create wizard's
    final step (light). Each <option> carries its own font-family inline so the
    menu previews what it does. */
@@ -5293,7 +5321,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --play-eyebrow:    clamp(10px, 3vw, 12px);
     --play-title:      clamp(19px, 5.6vw, 26px);
     --play-subtitle:   clamp(13px, 3.6vw, 15px);
-    --play-tile-min:   clamp(58px, 9.5svh, 96px);
     --play-logo-h:     clamp(22px, 4.6svh, 34px);
   }
 
@@ -5642,29 +5669,51 @@ body.generating-overlay-active .bottom-bar { display: none; }
     font-size: 11px;
   }
 
-  /* Choice-grid cards: tiles share the panel's spare height evenly, and the
-     grid scrolls only once even the smallest legible tile won't fit.
+  /* Choice-grid cards. The rows used to be `minmax(0, 1fr)`, which divides
+     the panel's height between them whatever that costs: fine for four
+     options, eight unreadable slivers for eight, and on a phone turned
+     sideways a 4.6:1 letterbox with the artwork squeezed into a band.
 
-     `grid-auto-rows: minmax(var(--play-tile-min), 1fr)` replaces the old
-     `minmax(0, 1fr)`, and the change is the floor, not the 1fr. A zero
-     minimum divides the container height between the rows whatever that
-     costs — fine for four options, eight unreadable slivers for eight, and
-     (with the flat 80px min-height that used to sit on .choice-card) rows
-     overflowing a clipped panel. A fluid minimum means every tile stays
-     tappable and legible and the grid scrolls once there are more than fit;
-     keeping 1fr on top means that when there IS spare height — a tall phone,
-     an upright tablet — the tiles grow into it instead of leaving a dead
-     band above the "+ Other" row. */
+     `minmax(min-content, 1fr)` keeps the fill — spare height still goes into
+     the tiles rather than a dead band — but floors every row at what the card
+     inside it actually needs, so a tile can no longer be squeezed under its
+     own label. How far a tile may stretch is then the tile's business, capped
+     as a share of its own column width (.choice-card-bg's cqw bounds), which
+     is what holds the proportion on every screen. Past that the grid scrolls,
+     the honest way to run out of room. The row minimum used to be a viewport
+     figure, a second and disagreeing opinion about the same number. */
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2 {
     flex: 1 1 auto;
     display: flex;
+    flex-direction: column;   /* so the scroll fade below stacks under the grid */
     min-height: 0;
+    position: relative;
+  }
+  /* The same "there is more below" fade the option lists get. A grid can't
+     carry it on itself — a ::after inside a grid becomes a cell — so it hangs
+     off the scroll container instead, sticky to the bottom edge and last in
+     DOM order so it paints over the row sliding under it. On a grid that
+     fits, it is white fading into white and disappears. */
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2::after,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2::after {
+    content: "";
+    flex: 0 0 auto;
+    position: sticky;
+    bottom: 0;
+    height: 22px;
+    margin-top: -22px;
+    background: linear-gradient(rgba(255,255,255,0), #fff 78%);
+    pointer-events: none;
   }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: minmax(var(--play-tile-min), 1fr);
+    /* Rows follow the cards, and a card is its tile plus its label. The tile
+       sizes itself off the column width (see .choice-card-bg's cqw bounds),
+       so there is nothing left for a row minimum to usefully say — it only
+       ever disagreed, and when it lost the tile overflowed onto the label. */
+    grid-auto-rows: minmax(min-content, 1fr);
     gap: clamp(8px, 1.4svh, 12px);
     align-content: start;
     flex: 1 1 auto;
@@ -5674,11 +5723,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-card,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card {
     height: 100%;
-    min-height: var(--play-tile-min);
     aspect-ratio: auto;
     border-radius: 14px;
     border: 3px solid transparent;
   }
+  /* Drop the desktop card's fixed 74px so the tile's smallest legal size is
+     its own cqw floor, not a number from a 850px-wide layout. It still grows
+     into spare height; this only decides how tightly the grid may pack when
+     there isn't any, which is the difference between one row of scrolling
+     and two. */
+  .preview-overlay .choice-card-bg { height: auto; }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-card[data-selected="true"],
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card[data-selected="true"] {
     border-color: #FF1E6F;
@@ -5997,7 +6051,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay {
     --play-hero-h:     clamp(200px, 28svh, 340px);
     --play-right-min:  clamp(360px, 56svh, 620px);
-    --play-tile-min:   clamp(96px, 13svh, 168px);
     --play-title:      clamp(24px, 3.4vw, 32px);
     --play-subtitle:   clamp(15px, 2vw, 17px);
     --play-pad-x:      clamp(26px, 4vw, 44px);
@@ -6023,12 +6076,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --play-right-min: clamp(230px, 74svh, 400px);
     --play-pad-y:     clamp(10px, 2svh, 16px);
     --play-title:     clamp(17px, 4.8vw, 22px);
-    /* Not lower than this. Squeezed to 51px on a sideways phone the tile art
-       became a coloured stripe with the tick clipped off it — six options
-       that all fit and none of which could be read. Past this floor the
-       right answer is to let the grid scroll: two legible rows and a third
-       a thumb away beats six illegible ones. */
-    --play-tile-min:  clamp(62px, 17svh, 84px);
   }
 }
 
