@@ -5742,9 +5742,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
      to — most cards never leave the first rung.
 
        1. the hero shrinks to its floor          (flex, always on)
-       2. .art-off   — the option tiles go       (this rule)
-       3. .hero-off  — the card image goes       (below)
+       2. .hero-off  — the card image goes       (below)
+       3. .art-off   — the option tiles go       (this rule)
        4. the answer area scrolls                (last resort)
+
+     The card image goes first because it is the only purely decorative thing
+     on the card, and because it buys more room than step 3 does — a tile that
+     loses its artwork becomes a full-width row, which on a narrow phone is
+     taller than the two-column grid it replaced.
 
      Back, Next and the answer widget itself are never on the list.
 

@@ -292,14 +292,19 @@ export default class extends Controller {
     grid?.classList.remove("art-off")
     if (!tooTall()) return
 
-    // 2. The option tiles. The grid becomes the option list.
-    if (grid) {
-      grid.classList.add("art-off")
-      if (!overflows()) return
-    }
-
-    // 3. The card image. Worth 100-340px, and it never helped anyone answer.
+    // 2. The card image goes first. It is worth 100-340px, it is the only
+    // thing here that is purely decorative, and it buys more room than the
+    // step below does — on a 393px phone it alone is the difference between
+    // four of six options and all six, WITH their artwork. Measured the other
+    // way round first and it was strictly worse: taking the tiles from a
+    // narrow phone turns a two-column grid into a one-column list, which is
+    // taller than what it replaced.
     card.classList.add("hero-off")
+    if (!overflows()) return
+
+    // 3. The option tiles. Now the grid becomes the option list — a colour
+    // swatch keeps each option's identity and the label gets the width.
+    if (grid) grid.classList.add("art-off")
 
     // 4. Whatever is still too tall scrolls, which is what the fade is for.
   }
