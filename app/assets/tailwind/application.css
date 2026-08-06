@@ -4655,6 +4655,79 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   font-family: "ABeeZee", sans-serif; font-size: 13px;
   cursor: pointer; border: none; transition: all 0.15s;
   min-width: 110px; text-align: center;
+  /* Load-bearing, not cosmetic: player_controller#_fitFooter decides the bar
+     is cramped by seeing whether a label overflows its button, and a label
+     that is allowed to wrap never overflows — it just gets taller and the
+     measurement always says "fits". */
+  white-space: nowrap;
+}
+
+/* ── Cramped footer: labels give way to arrows ────────────────────────────
+   The labels are translated ("← Back", "Weiter →", "Enviar ✓"), so how much
+   room they need varies by locale as well as by phone — and the quiz and
+   points chips take a bite out of the same bar mid-deck. _fitFooter measures
+   it rather than guessing a breakpoint, and adds .is-tight when a label no
+   longer fits.
+
+   font-size: 0 rather than emptying the element: the arrow is baked into the
+   translated string, so there is no way to keep it and drop the word. Zeroing
+   the type hides the whole label and a pseudo-element draws a clean arrow in
+   its place — with no locale file touched. The button's text content is
+   untouched, so its accessible name still reads "Next". */
+/* Once the buttons are arrows they no longer need to share the bar evenly —
+   push them to the edges, which is where a thumb reaches for them, and let
+   the quiz and points chips have the middle they were competing for. */
+.preview-footer.is-tight { justify-content: space-between; }
+.preview-footer.is-tight .preview-btn {
+  font-size: 0;
+  flex: 0 0 auto;
+  min-width: 0;
+  width: 58px;
+  padding-inline: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.preview-footer.is-tight .preview-btn::before {
+  font-size: 20px; line-height: 1;
+}
+.preview-footer.is-tight .preview-btn-back::before   { content: "←"; }
+.preview-footer.is-tight .preview-btn-next::before,
+.preview-footer.is-tight .preview-btn-return::before { content: "→"; }
+.preview-footer.is-tight .preview-btn-finish::before { content: "✓"; }
+/* The deck runs right-to-left in Arabic, Hebrew and Urdu, and so does "onward". */
+[dir="rtl"] .preview-footer.is-tight .preview-btn-back::before   { content: "→"; }
+[dir="rtl"] .preview-footer.is-tight .preview-btn-next::before,
+[dir="rtl"] .preview-footer.is-tight .preview-btn-return::before { content: "←"; }
+
+/* ── Answered: the primary button lights up ───────────────────────────────
+   Set the moment the card holds an answer by ITS OWN type's rule — one star
+   on a rating, one tick on a multi-select, a moved thumb on a scale, a
+   non-blank string on an open question (player_controller#_syncAnswered).
+   So the button stops being a thing you hunt for and starts being a thing
+   that tells you it is ready.
+
+   --answer-glow is a variable, not a literal, so the glow follows the Verto's
+   own CTA colour on a branded deck instead of always being Playverto teal. */
+.preview-btn-next,
+.preview-btn-finish,
+.preview-btn-return { --answer-glow: var(--brand-cta, #01EACB); }
+
+/* The rim is mixed toward white on purpose. A Verto whose CTA colour IS the
+   button's fill — the default magenta deck is exactly that — would otherwise
+   be glowing magenta on magenta, and the button would look no different at
+   arm's length. A lighter rim reads against any fill; the halo behind it is
+   the pure brand colour and has the dark footer to spread onto. */
+.preview-btn.is-answered {
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--answer-glow) 35%, #fff),
+    0 0 16px -2px color-mix(in srgb, var(--answer-glow) 80%, transparent),
+    0 0 38px -8px var(--answer-glow);
+}
+/* A steady glow, not a pulse: this fires on most cards of most Vertos, and
+   something blinking at the bottom of every screen stops being a signal and
+   becomes a nuisance. The transition is the whole animation. */
+.preview-btn.is-answered { transition: box-shadow 0.28s ease, all 0.15s; }
+@supports not (color: color-mix(in srgb, red 50%, transparent)) {
+  .preview-btn.is-answered { box-shadow: 0 0 18px -3px var(--answer-glow); }
 }
 .preview-btn-back {
   /* Dark translucent surface so it reads on any brand background. */
@@ -5301,7 +5374,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
     height: var(--play-hero-h);
     min-height: var(--play-hero-min);
     padding: 0;
-    border-radius: 0 0 18px 18px;
+    /* Full bleed. The strip used to be a rounded 18px band, which read as a
+       cropped thumbnail pasted on top of a card — the desktop split-card
+       folded in half. Edge to edge, with the content panel below riding over
+       its lower edge, the two stop being two things. */
+    border-radius: 0;
     overflow: hidden;
     background: var(--brand-panel, #2E3564);
   }
@@ -5354,7 +5431,22 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
   .preview-overlay .split-card:has(.split-left-img) .split-left-img,
   .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
-    border-radius: 0 0 18px 18px;
+    border-radius: 0;
+  }
+  /* Deepen the scrim into the card's edge, so the photograph resolves into
+     the content panel instead of stopping at a hard line. Desktop keeps its
+     lighter scrim — there the panel sits beside the image, not under it. */
+  .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
+    background: linear-gradient(transparent 42%, rgba(0,0,0,0.34) 88%, rgba(0,0,0,0.5));
+  }
+  /* The content panel rides over the bottom of the image. Scoped to the cards
+     that actually have a hero — on an imageless card .split-left is
+     display:contents and there would be nothing above to overlap. */
+  .preview-overlay .split-card:has(.split-left-img) .split-right,
+  .preview-overlay .split-card:has(.nps-lottie)     .split-right {
+    margin-top: -22px;
+    border-radius: 22px 22px 0 0;
+    z-index: 1;
   }
 
   /* Player right pane on white — matches desktop colours. Content is
@@ -5566,6 +5658,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* Mobile-specific player tweaks live here — the footer-hide and
      advance-chip styles are now global (search "Player: footer hidden"). */
   .preview-overlay .preview-progress-text { display: none; }
+  /* The desktop bar's flat 32px side padding costs 64px of a 320px phone —
+     more than a whole button — before the quiz and points chips have taken
+     their share. */
+  .preview-overlay .preview-footer {
+    padding: 0 clamp(12px, 4vw, 32px);
+    gap: clamp(8px, 3vw, 16px);
+  }
   /* Fluid padding + label so Back / Next stay on one line at 320px, where the
      flat 20px padding and 15px label wrapped them into two-line buttons once
      the quiz/points chips were sharing the bar. */
