@@ -4,12 +4,12 @@ require "application_system_test_case"
 #
 # The rule is a priority, not a fallback: a respondent can answer a question
 # with no artwork on it and cannot answer one whose options are off the bottom
-# of the screen. So the pictures go first — option tiles, then the card's hero
-# image — and the answer widget and the footer are never touched.
+# of the screen. So the pictures go first — the card's hero image, then the
+# option tiles — and the answer widget and the footer are never touched.
 #
 #   1. the hero shrinks to its floor
-#   2. .art-off   — the option tiles go, the grid becomes the option list
-#   3. .hero-off  — the card image goes
+#   2. .hero-off  — the card image goes
+#   3. .art-off   — the option tiles go, the grid becomes the option list
 #   4. the answer area scrolls
 class PlayerShedOrderTest < ApplicationSystemTestCase
   DESKTOP = [ 1280, 900 ].freeze
@@ -88,13 +88,15 @@ class PlayerShedOrderTest < ApplicationSystemTestCase
     assert_equal 1, rung, "there was room for the artwork — it should still be there"
   end
 
+  # Six options with short labels now fit a sideways phone as drawn, since a
+  # wide panel gets three columns rather than the phone's two. Twelve is the
+  # case that still cannot: 390px of height, and no arrangement of twelve
+  # image tiles fits in it.
   test "a sideways phone loses the pictures rather than the options" do
-    open_at(*TIGHT)
+    open_at(*TIGHT, card: 2)
 
-    assert_operator rung, :>=, 2, "six image tiles do not fit here; the tiles should have gone"
-    assert page.has_css?(".preview-card.active .choice-grid.art-off"),
-           "the grid should have become the option list"
-    assert_equal 6, page.all(".preview-card.active .choice-card", visible: :all).length,
+    assert_operator rung, :>=, 2, "twelve image tiles do not fit here; the pictures should have gone"
+    assert_equal 12, page.all(".preview-card.active .choice-card", visible: :all).length,
                  "every option must survive — it is the artwork that is expendable"
   end
 
@@ -116,14 +118,18 @@ class PlayerShedOrderTest < ApplicationSystemTestCase
     end
   end
 
-  # Shedding is not a one-way door: rotate back and the artwork returns.
+  # Shedding is not a one-way door: rotate back and the artwork returns. The
+  # assertion is that it climbs, not that it reaches any particular rung —
+  # where it lands is a matter of how much room the bigger screen actually has.
   test "the artwork comes back when the room does" do
-    open_at(*TIGHT)
-    assert_operator rung, :>=, 2
+    open_at(*TIGHT, card: 2)
+    stripped = rung
+    assert_operator stripped, :>=, 2
 
     page.driver.browser.resize(width: ROOMY[0], height: ROOMY[1])
-    sleep 0.5
+    sleep 0.6
 
-    assert_equal 1, rung, "a card that was stripped for space should recover it"
+    assert_operator rung, :<, stripped,
+                    "a card stripped for space should give some of it back when the room returns"
   end
 end

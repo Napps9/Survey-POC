@@ -4303,12 +4303,18 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
    half-empty. cqw is safe here and NOT on .choice-list-tile above: only
    .choice-card declares a container, and a cqw with no container ancestor
    silently falls back to the viewport. */
-.choice-card-bg { --tile-emoji: clamp(18px, 16cqw, 46px); }
+.choice-card-bg { --tile-emoji: clamp(18px, 16cqw, 34px); }
 .choice-card-bg .choice-icon-svg {
   width: 18cqw; height: 18cqw;
   min-width: 20px; min-height: 20px;
-  max-width: 50px; max-height: 50px;
+  max-width: 36px; max-height: 36px;
 }
+/* And the tile itself. 58cqw is the proportion bound; this is the absolute
+   one, because a column can be 300px wide on a screen that is 390px tall and
+   a correctly-proportioned tile at that width is still an oddly big object.
+   Desktop's own tile is 74px, so nothing here is ever much more than half
+   again as tall as the layout this component was drawn for. */
+.choice-card-bg { max-height: min(58cqw, 124px); }
 /* The Verto typeface picker — Design panel (dark) and the create wizard's
    final step (light). Each <option> carries its own font-family inline so the
    menu previews what it does. */
@@ -6142,6 +6148,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
 /* Height tokens for an upright tablet only — a sideways phone shares the
    width problem above but has the opposite problem here, and the short
    viewport tier below is what speaks to it. */
+@media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait),
+       (min-width: 600px) and (max-width: 1024px) and (max-height: 600px) {
+  .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
   .preview-overlay {
     --play-hero-h:     clamp(200px, 28svh, 340px);
