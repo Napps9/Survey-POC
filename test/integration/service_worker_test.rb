@@ -11,7 +11,7 @@ class ServiceWorkerTest < ActionDispatch::IntegrationTest
     get pwa_service_worker_path(format: :js)
     assert_response :success
     assert_match %r{\Atext/javascript}, response.content_type
-    assert_includes response.body, '"playverto-v39"'
+    assert_includes response.body, '"playverto-v40"'
   end
 
   test "the worker can reach the Pexels CDNs it refetches card art from" do
@@ -53,6 +53,35 @@ class ServiceWorkerTest < ActionDispatch::IntegrationTest
     strategy = response.body[/async function imageCache.*?\n\}/m]
     assert strategy, "expected to find the imageCache strategy in the worker"
     assert_not_includes strategy, "Response.error()"
+  end
+
+  test "the cache-first strategy never answers with a network error either" do
+    get pwa_service_worker_path(format: :js)
+    assert_response :success
+
+    # cacheFirst serves the Active Storage blobs — including the publishing
+    # organisation's logo on the player's welcome and thank-you cards. It used
+    # to answer Response.error() when a fetch failed, and an <img> handed a
+    # network error paints the browser's broken-image glyph, so one flaky
+    # request on a phone changing cells was enough to make a Verto look broken.
+    # Same rule as imageCache above — every path ends at the plain network.
+    strategy = response.body[/async function cacheFirst.*?\n\}/m]
+    assert strategy, "expected to find the cacheFirst strategy in the worker"
+    assert_not_includes strategy, "Response.error()"
+  end
+
+  test "cache-first writes are held open with waitUntil so they land on iOS" do
+    get pwa_service_worker_path(format: :js)
+    assert_response :success
+
+    # WebKit kills an idle worker the moment it has answered, so a bare
+    # `cache.put(...)` after the response is returned routinely never completes
+    # — the exact hazard networkFirstWithTimeout and imageCache each already
+    # guard against. Both call sites must pass `event` for the guard to work.
+    strategy = response.body[/async function cacheFirst.*?\n\}/m]
+    assert_includes strategy, "event?.waitUntil(cache.put("
+    assert_includes response.body, "cacheFirst(req, IMAGE_CACHE, event)"
+    assert_includes response.body, "cacheFirst(req, ASSET_CACHE, event)"
   end
 
   test "media and ranged requests are never intercepted" do

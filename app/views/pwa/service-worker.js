@@ -31,7 +31,7 @@
 // and nobody else: every already-registered worker kept enforcing the old
 // policy, kept refusing to fetch card art, and would have done so indefinitely.
 // Changing this constant is what forces the reinstall that picks the policy up.
-const CACHE_VERSION = "playverto-v39"
+const CACHE_VERSION = "playverto-v40"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
@@ -108,13 +108,13 @@ self.addEventListener("fetch", (event) => {
 
   // Same-origin fingerprinted assets — cache-first.
   if (url.origin === self.location.origin && /^\/assets\//.test(url.pathname)) {
-    event.respondWith(cacheFirst(req, ASSET_CACHE))
+    event.respondWith(cacheFirst(req, ASSET_CACHE, event))
     return
   }
 
   // Active Storage blobs (same-origin) — cache-first.
   if (url.origin === self.location.origin && /^\/rails\/active_storage\//.test(url.pathname)) {
-    event.respondWith(cacheFirst(req, IMAGE_CACHE))
+    event.respondWith(cacheFirst(req, IMAGE_CACHE, event))
     return
   }
 
@@ -126,7 +126,7 @@ self.addEventListener("fetch", (event) => {
 
   // Fonts — cache-first.
   if (req.destination === "font" || /\.(woff2?|ttf|otf)$/i.test(url.pathname)) {
-    event.respondWith(cacheFirst(req, ASSET_CACHE))
+    event.respondWith(cacheFirst(req, ASSET_CACHE, event))
     return
   }
 
@@ -136,16 +136,45 @@ self.addEventListener("fetch", (event) => {
 
 // ── Strategies ───────────────────────────────────────────────────────────
 
-async function cacheFirst(req, cacheName) {
-  const cache = await caches.open(cacheName)
-  const hit = await cache.match(req)
+// Cache-first — the strategy every Active Storage blob takes, including the
+// publishing organisation's logo on the player's welcome and thank-you cards.
+// It never got the guarantees imageCache spells out below, and it should have:
+//
+//   • A failed fetch answered `Response.error()`, and an <img> handed a network
+//     error paints the browser's broken-image glyph. A cache miss is not a
+//     reason to fail a request — the last resort is always the plain network,
+//     exactly as imageCache says. `caches.open` was unguarded for the same
+//     reason: it rejects on quota, and in a partitioned third-party frame (a
+//     Verto embedded in someone else's page) storage may be gone entirely, and
+//     neither may take the image down with it.
+//   • `cache.put` was fire-and-forget with nothing holding the worker open, so
+//     on iOS — where WebKit kills an idle worker the moment it has answered —
+//     the write can be lost and the next visit pays for the image again. Same
+//     hazard networkFirstWithTimeout documents for its own put.
+//
+// This is hardening, not a diagnosis: a logo reported as a broken box in the
+// field could equally be a blob whose bytes are gone (nothing here can fix
+// that — see brand_logo_controller.js for the cosmetic backstop).
+//
+// `event` is optional so the signature stays usable from anywhere, but every
+// call site passes it — without it the waitUntil is a no-op and the iOS write
+// hazard is back.
+async function cacheFirst(req, cacheName, event) {
+  let cache = null
+  try { cache = await caches.open(cacheName) } catch (_) { return fetch(req) }
+
+  const hit = await cache.match(req).catch(() => null)
   if (hit) return hit
+
   try {
     const res = await fetch(req)
-    if (res && res.ok) cache.put(req, res.clone())
+    // Keep the worker alive until the write lands, and swallow the rejection:
+    // put() rejects on quota, and in a partitioned third-party frame (a Verto
+    // embedded in someone else's page) storage may be unavailable outright.
+    if (res && res.ok) event?.waitUntil(cache.put(req, res.clone()).catch(() => {}))
     return res
   } catch (_) {
-    return hit || Response.error()
+    return fetch(req)
   }
 }
 

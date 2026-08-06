@@ -5164,6 +5164,38 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay { height: var(--app-100vh, 100dvh); }
   .regions-overlay { height: var(--app-100vh, 100dvh); }
 
+  /* ── Mobile card layout tokens ────────────────────────────────────────
+     One place to retune the whole phone player. Every value is fluid
+     (clamp + svh/vw) rather than a fixed pixel or vh number, so a 320px
+     iPhone SE, a 393px iPhone and a 767px small tablet each get a
+     proportionate card without a per-device breakpoint.
+
+     `svh` (small viewport height) rather than `vh`: vh on mobile Safari is
+     the toolbar-HIDDEN height, so vh-sized boxes are systematically too
+     tall on first paint — the same trap --app-100vh exists to dodge. svh
+     is the toolbar-VISIBLE height, i.e. the pessimistic one, which is what
+     a layout budget wants. Supported since iOS 15.4 / Chrome 108; the
+     clamp() floor is the graceful answer on anything older.
+
+     THE ANSWER WIDGET OUTRANKS THE HERO. --play-right-min is the content
+     panel's claim on the card, and the hero (--play-hero-h) is the only
+     shrinkable child, so when the two don't both fit the image gives way
+     first — down to --play-hero-min and no further. See the .split-left /
+     .split-right rules below for the mechanism. */
+  .preview-overlay {
+    --play-hero-h:     clamp(132px, 26svh, 240px);
+    --play-hero-min:   96px;
+    --play-right-min:  clamp(300px, 58svh, 520px);
+    --play-pad-x:      clamp(16px, 5vw, 26px);
+    --play-pad-y:      clamp(14px, 2.4svh, 22px);
+    --play-gap:        clamp(8px, 1.6svh, 14px);
+    --play-eyebrow:    clamp(10px, 3vw, 12px);
+    --play-title:      clamp(19px, 5.6vw, 26px);
+    --play-subtitle:   clamp(13px, 3.6vw, 15px);
+    --play-tile-min:   clamp(58px, 9.5svh, 96px);
+    --play-logo-h:     clamp(22px, 4.6svh, 34px);
+  }
+
   /* In-card .panel-progress now drives the mobile progress indicator —
      matches the desktop pattern (white bar at the top of the card body),
      replacing the earlier viewport-top 3px pink line that ran above it. */
@@ -5250,16 +5282,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
   /* Image cards OR NPS cards: full-width hero strip with rounded bottom
      corners. NPS shows its slider-reactive Lottie in the strip; other
-     cards show their card["image"]. */
+     cards show their card["image"].
+
+     `flex: 0 1 auto` is the whole point: the strip states a PREFERRED
+     height and is the only shrinkable child of .split-card, so when the
+     content panel's --play-right-min doesn't fit alongside it, the browser
+     takes the difference out of the image rather than out of the answer
+     widget. It used to be `0 0 auto` with `height: 36vh; min-height: 220px`
+     — an unshrinkable 220px+ band that ate ~40% of a phone, which is why a
+     six-option grid ended up squeezed into ~100px of clipped card. The
+     floor (--play-hero-min) keeps the photo readable as a photo. */
   .preview-overlay .split-card:has(.split-left-img) .split-left,
   .preview-overlay .split-card:has(.nps-lottie)     .split-left {
     display: block;
     position: relative;
     width: 100%;
-    flex: 0 0 auto;
-    height: 36vh;
-    min-height: 220px;
-    max-height: 40vh;
+    flex: 0 1 auto;
+    height: var(--play-hero-h);
+    min-height: var(--play-hero-min);
     padding: 0;
     border-radius: 0 0 18px 18px;
     overflow: hidden;
@@ -5268,9 +5308,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* NPS hero strip is shorter so the vertical slider fits beneath the
      question text in the remaining viewport. */
   .preview-overlay .split-card:has(.nps-lottie) .split-left {
-    height: 28vh;
-    min-height: 180px;
-    max-height: 30vh;
+    height: clamp(104px, 20svh, 190px);
+    min-height: 88px;
   }
 
   /* NPS on mobile: drop the media "header" panel entirely and give the liquid
@@ -5325,11 +5364,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
      chip (when present) is absolute-positioned at the bottom so it
      doesn't push content; .split-right widens its padding-bottom when
      a chip is in the DOM so the controls can't slip beneath. */
+  /* `min-height: var(--play-right-min)` is the answer widget's claim on the
+     card, and it is what makes the hero above yield: with the content panel
+     refusing to shrink past its floor, the flex algorithm has nowhere to
+     take the overflow except the image. Was `min-height: 0`, which meant
+     the panel absorbed 100% of the squeeze and the options were clipped.
+     If the card still can't fit at the hero's floor, .split-card grows past
+     the viewport and .preview-body (overflow-y: auto) scrolls — nothing is
+     ever unreachable. */
   .preview-overlay .split-card .split-right {
     width: 100%;
     flex: 1 1 auto;
-    min-height: 0;
-    padding: 22px 24px calc(20px + env(safe-area-inset-bottom));
+    min-height: var(--play-right-min);
+    padding: var(--play-pad-y) var(--play-pad-x)
+             calc(var(--play-pad-y) + env(safe-area-inset-bottom));
     background: #fff;
     color: #1C2034;
     text-align: center;
@@ -5338,14 +5386,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
        and other flex children fill the card width at their natural
        height. Headings centre horizontally via text-align. */
     justify-content: center;
-    gap: 14px;
+    gap: var(--play-gap);
     overflow: hidden;
     position: relative;
   }
+  /* The question never shrinks — it is the point of the card. Sizing it in
+     vw as well as px means a long title wraps to the same number of lines
+     on a 320px phone as on a 430px one instead of gaining two. */
+  .preview-overlay .split-card .split-right > .q-header { flex: 0 0 auto; }
   .preview-overlay .q-eyebrow {
     color: #FF1E6F;
     font-family: "Alata", sans-serif;
-    font-size: 12px;
+    font-size: var(--play-eyebrow, 12px);
     letter-spacing: 0.18em;
     text-transform: uppercase;
     font-weight: 700;
@@ -5353,28 +5405,89 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .q-title {
     color: #1C2034;
     font-family: "Alata", sans-serif;
-    font-size: 26px;
+    font-size: var(--play-title, 26px);
     line-height: 1.2;
     letter-spacing: -0.01em;
     font-weight: 700;
+    text-wrap: balance;
   }
   .preview-overlay .q-subtitle {
     color: rgba(28,32,52,0.55);
     font-family: "ABeeZee", sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: var(--play-subtitle, 14px);
+    line-height: 1.45;
   }
 
-  /* Picker rows on the white card — light gray pills with magenta accent */
+  /* ── The answer widget is the card's scroll container ──────────────────
+     Mirrors the desktop rule (search ".split-right > .mt-2:has") and is
+     scoped to the same three list/grid shapes, so slider / rating /
+     freeform / tap-card / book layouts keep their own sizing. The desktop
+     rule already supplies overflow-y; what mobile adds is the flex-grow
+     that lets the container claim the panel's spare height, plus momentum
+     scrolling and scroll containment so a flick through the options doesn't
+     drag the page behind it. */
+  .preview-overlay .split-card .split-right > .mt-2:has(> .choice-list),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .choice-grid),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .prioritise-list) {
+    flex: 1 1 auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  /* "There are more options below" affordance. The usual pure-CSS trick —
+     background-attachment: local/scroll shadow layers on the scroll
+     container — is useless here because the option pills have backgrounds
+     of their own and paint straight over it. A sticky last child does work:
+     it pins to the bottom edge of the scrollport, and being last in DOM
+     order it paints ON TOP of the rows sliding under it. The negative
+     margin means it overlays the final rows instead of adding height, and
+     over a fully-scrolled (or short, non-scrolling) list it fades white
+     into white and disappears on its own — no scroll listener, no
+     false "more below" on a list that has no more. */
+  .preview-overlay .choice-list::after,
+  .preview-overlay .prioritise-list::after {
+    content: "";
+    flex: 0 0 auto;
+    position: sticky;
+    bottom: 0;
+    height: 22px;
+    margin-top: -22px;
+    background: linear-gradient(rgba(255,255,255,0), #fff 78%);
+    pointer-events: none;
+  }
+  /* "+ Other" sits under the options rather than inside the scroller, so it
+     must not be squeezed out when the list is long. */
+  .preview-overlay .split-card .split-right > .other-block {
+    flex: 0 0 auto;
+    margin-top: 0;
+  }
+
+  /* Picker rows on the white card — light gray pills with magenta accent.
+     Row height, tile and gap are fluid rather than the flat 72px row + 56px
+     tile + 12/14px padding the desktop chrome brings: on a phone that made
+     every row 82px, so a five-option question showed one and a bit of an
+     option above the fold. At the small end of the clamp a row is ~58px —
+     comfortably past the 44px touch target, and four to five options are
+     visible at once. */
   .preview-overlay .choice-list,
-  .preview-overlay .pick-list { gap: 10px; }
+  .preview-overlay .pick-list { gap: clamp(6px, 1.2svh, 10px); }
   .preview-overlay .choice-list-item,
   .preview-overlay .pick-item {
     background: rgba(0,0,0,0.03);
     border: 1px solid rgba(0,0,0,0.06);
     border-radius: 14px;
     color: #1C2034;
+    min-height: clamp(56px, 8.4svh, 76px);
+    padding: clamp(6px, 1.2svh, 10px) clamp(10px, 3vw, 14px);
+    gap: clamp(8px, 2.4vw, 12px);
   }
+  .preview-overlay .choice-list-tile {
+    width:  clamp(40px, 6.4svh, 56px);
+    height: clamp(40px, 6.4svh, 56px);
+    --tile-emoji: clamp(19px, 3.2svh, 26px);
+  }
+  .preview-overlay .choice-list-label,
+  .preview-overlay .pick-text { font-size: clamp(14px, 3.9vw, 16px); line-height: 1.3; }
   .preview-overlay .choice-list-label,
   .preview-overlay .pick-text { color: #1C2034; }
   .preview-overlay .pick-item[data-selected="true"],
@@ -5409,12 +5522,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
     font-size: 11px;
   }
 
-  /* Choice-grid cards: tiles distribute the remaining vertical height
-     so 4, 6, or 8 options all fit without scrolling */
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .split-right,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .split-right {
-    min-height: 0;
-  }
+  /* Choice-grid cards: tiles share the panel's spare height evenly, and the
+     grid scrolls only once even the smallest legible tile won't fit.
+
+     `grid-auto-rows: minmax(var(--play-tile-min), auto)` replaces the old
+     `minmax(0, 1fr)`. 1fr divides the container height between the rows —
+     which reads fine for four options and turns eight options into eight
+     unreadable slivers, or (with the flat 80px min-height that used to be
+     on .choice-card) into rows overflowing a clipped panel. A fluid minimum
+     plus `auto` means every tile is at least tappable and legible, the grid
+     scrolls when there are more than fit, and the hero above has already
+     given up its height to make that rarer. */
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2 {
     flex: 1 1 auto;
@@ -5424,8 +5542,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: minmax(0, 1fr);
-    gap: 12px;
+    grid-auto-rows: minmax(var(--play-tile-min), auto);
+    gap: clamp(8px, 1.4svh, 12px);
+    align-content: start;
     flex: 1 1 auto;
     width: 100%;
     min-height: 0;
@@ -5433,7 +5552,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-card,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card {
     height: 100%;
-    min-height: 80px;
+    min-height: var(--play-tile-min);
     aspect-ratio: auto;
     border-radius: 14px;
     border: 3px solid transparent;
@@ -5442,17 +5561,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card[data-selected="true"] {
     border-color: #FF1E6F;
   }
-  .choice-label   { font-size: 12px; padding: 2px 4px; }
+  .choice-label   { font-size: clamp(11px, 3vw, 13px); padding: 2px 4px; }
 
   /* Mobile-specific player tweaks live here — the footer-hide and
      advance-chip styles are now global (search "Player: footer hidden"). */
   .preview-overlay .preview-progress-text { display: none; }
+  /* Fluid padding + label so Back / Next stay on one line at 320px, where the
+     flat 20px padding and 15px label wrapped them into two-line buttons once
+     the quiz/points chips were sharing the bar. */
   .preview-overlay .preview-btn {
     flex: 1 1 0;
     min-height: 52px;
-    padding: 14px 20px;
+    padding: 14px clamp(8px, 3.6vw, 20px);
     min-width: 0;
-    font-size: 15px;
+    font-size: clamp(13px, 3.8vw, 15px);
+    white-space: nowrap;
     border-radius: 14px;
   }
   .preview-overlay .preview-btn-back {
@@ -5475,10 +5598,23 @@ body.generating-overlay-active .bottom-bar { display: none; }
     color: var(--brand-cta-text, #fff);
   }
 
+  /* Creator's logo on the welcome card. Desktop floats it over the top of
+     the content panel, which works there because the panel is 680px tall
+     and vertically centred. On a phone the panel is whatever the hero left
+     behind, so an absolutely-positioned logo landed ON TOP of the question
+     title. Put it back in the flow: it takes its own row, pushes nothing
+     off, and shrinks with the card like everything else. */
+  .preview-overlay .split-right-logo {
+    position: static;
+    flex: 0 0 auto;
+    margin-bottom: calc(var(--play-gap) * -0.5);
+  }
+  .preview-overlay .split-right-logo img { max-height: var(--play-logo-h); width: auto; }
+
   .preview-thankyou       { padding: 28px 20px; }
   .preview-thankyou-card  { padding: 32px 22px; }
   .preview-thankyou-emoji { font-size: 52px; }
-  .preview-thankyou-title { font-size: 32px; }
+  .preview-thankyou-title { font-size: clamp(24px, 7.4vw, 32px); }
   .preview-thankyou-sub   { font-size: 14px; max-width: 100%; }
 
   /* ═════════════════════════════════════════════════════════════════
@@ -5693,6 +5829,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .bottom-bar-chip { padding: 6px 10px; font-size: 12px; }
   .bottom-bar-user-name { display: none; }
   .has-bottom-bar { padding-top: 64px; }
+}
+
+/* ── Short viewports (≤767px wide AND ≤560px tall) ───────────────────────
+   A phone held in landscape, a split-screen window, an older 4" handset, or
+   any phone with the soft keyboard up — --app-100vh tracks the keyboard, so
+   this tier engages there too. Retuning the four tokens is the whole change:
+   every rule in the block above reads them, so the hero drops to a slim
+   banner, the answer widget claims the rest, and nothing else needs a
+   second, near-duplicate copy of itself here. */
+@media (max-width: 767px) and (max-height: 560px) {
+  .preview-overlay {
+    --play-hero-h:    clamp(72px, 16svh, 120px);
+    --play-hero-min:  60px;
+    --play-right-min: clamp(230px, 74svh, 400px);
+    --play-pad-y:     clamp(10px, 2svh, 16px);
+    --play-title:     clamp(17px, 4.8vw, 22px);
+    --play-tile-min:  clamp(48px, 13svh, 72px);
+  }
 }
 
 /* Touch-only — show controls that desktop reveals on :hover */

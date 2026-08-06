@@ -162,4 +162,46 @@ class ApplicationHelperTest < ActionView::TestCase
     one = mini_preview_html({ "type" => "multiple_choice", "options" => %w[A B] })
     refute_includes one, "mini-p-square"
   end
+
+  # ── brand_logo_tag ──────────────────────────────────────────────────────
+  # Respondents were seeing the browser's broken-image glyph where the
+  # publishing organisation's logo should be, on the player's welcome and
+  # thank-you cards. Both properties below exist to stop that recurring.
+
+  test "an uploaded logo is served through the proxy, not the expiring redirect" do
+    org = Organisation.create!(name: "Logo Co", slug: "logo-co-#{SecureRandom.hex(3)}")
+    org.logo.attach(io: StringIO.new("\x89PNG\r\n\x1a\n"), filename: "l.png", content_type: "image/png")
+
+    html = brand_logo_tag(org)
+
+    # blobs/redirect is a 302 to a SEPARATELY signed disk URL that expires five
+    # minutes after the server minted it, while the redirect itself is cached
+    # for five minutes from when the BROWSER got it. Replaying a still-fresh
+    # redirect whose signature has lapsed yields a 404 — a broken <img>.
+    assert_includes html, "/rails/active_storage/blobs/proxy/"
+    refute_includes html, "/rails/active_storage/blobs/redirect/"
+  end
+
+  test "an uploaded logo carries the hide-on-error hook" do
+    org = Organisation.create!(name: "Logo Co", slug: "logo-co-#{SecureRandom.hex(3)}")
+    org.logo.attach(io: StringIO.new("\x89PNG\r\n\x1a\n"), filename: "l.png", content_type: "image/png")
+
+    html = brand_logo_tag(org)
+
+    # A blob whose bytes are genuinely gone can't be recovered by any URL
+    # scheme; it must vanish rather than render as a grey "?" box.
+    assert_includes html, 'data-controller="brand-logo"'
+    # ERB escapes the arrow inside the attribute; the browser decodes it back.
+    assert_includes html, "error-&gt;brand-logo#failed"
+  end
+
+  test "an organisation with no logo falls back to the Playverto wordmark" do
+    org = Organisation.create!(name: "Bare Co", slug: "bare-co-#{SecureRandom.hex(3)}")
+
+    html = brand_logo_tag(org)
+
+    assert_match(/playverto.*\.svg/, html)
+    # Nothing to fail, so no fallback hook — the wordmark is a local asset.
+    refute_includes html, "brand-logo"
+  end
 end

@@ -364,12 +364,30 @@ module ApplicationHelper
 
   # Renders the organisation's uploaded logo if present, otherwise falls back
   # to the Playverto wordmark. `style` overrides the default sizing.
+  #
+  # PROXY rather than the usual redirect path. `rails_blob_path` returns
+  # /rails/active_storage/blobs/redirect/…: a 302 cached for 300s pointing at a
+  # SECOND, separately signed disk URL that lapses 300s after the server minted
+  # it (ActiveStorage.service_urls_expire_in). Replay a still-fresh redirect
+  # whose disk signature has expired and you get a bare 404 — which an <img>
+  # paints as the grey broken-image box. The margin is sub-second on a
+  # clock-synced device, so this is a flake rather than the explanation for any
+  # particular report, but it is a real one and there is no reason to keep it
+  # in the path of the offline player, whose whole job is replaying cached
+  # markup hours later. The proxy path is a single same-origin 200 with an
+  # immutable cache header and no expiring signature anywhere; a new upload
+  # mints a new blob and therefore a new URL, so nothing goes stale.
+  #
+  # `brand-logo` is the backstop. A blob whose bytes are genuinely gone can't
+  # be rescued by any URL scheme, and a respondent should get no logo rather
+  # than a broken-image glyph on someone's Verto.
   def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil)
     if organisation&.logo&.attached?
       image_tag(
-        rails_blob_path(organisation.logo, only_path: true),
+        rails_storage_proxy_path(organisation.logo, only_path: true),
         style: "#{style};object-fit:contain;",
-        alt:   alt || "#{organisation.name} logo"
+        alt:   alt || "#{organisation.name} logo",
+        data:  { controller: "brand-logo", action: "error->brand-logo#failed" }
       )
     else
       image_tag("playverto.svg", style: style, alt: alt || "Playverto")
