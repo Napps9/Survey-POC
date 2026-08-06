@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- vertonow one-pager · build 2026-08-05-g · view-source and check this line to confirm
+<!-- vertonow one-pager · build 2026-08-05-h · view-source and check this line to confirm
      which copy your browser is showing (a stale cache is otherwise invisible) -->
-<html lang="en" data-build="2026-08-05-g">
+<html lang="en" data-build="2026-08-05-h">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -404,9 +404,9 @@
     position: absolute;
     left: 12.4%;
     top: 3.1%;
-    width: var(--embed-w, 1000px);
-    height: var(--embed-h, 567px);
-    transform: scale(var(--embed-scale, 0.65));
+    width: var(--embed-w, 1376px);
+    height: var(--embed-h, 780px);
+    transform: scale(var(--embed-scale, 0.51));
     transform-origin: top left;
     border: 0;
     z-index: 2;
@@ -967,7 +967,7 @@
 <script>
   // Which copy of this page is running — so "nothing changed" can be checked
   // rather than guessed at.
-  console.info('VertoNow one-pager · build 2026-08-05-g');
+  console.info('VertoNow one-pager · build 2026-08-05-h');
 
   // Theme toggle
   const themeToggle = document.getElementById('themeToggle');
@@ -1187,9 +1187,14 @@
   // The screen area inside the bezel, as fractions of the mockup — the same
   // numbers the CSS positions against.
   const SCREEN_W = 0.7515, SCREEN_H = 0.69;
-  // Logical viewport handed to the player. Above its 768px mobile breakpoint at
-  // every page width, so the laptop always shows the desktop layout.
-  const EMBED_W = 1000;
+  // Logical viewport handed to the player, driven by HEIGHT because height is
+  // what constrains it: the player's card is a fixed 850x680 box (.split-card)
+  // that no rule ever shrinks, so a frame shorter than ~680 clips it — centred,
+  // so the top goes first. 780 clears the card with ~24px above it and leaves
+  // room for the bottom bar; the width is derived from the screen's own aspect
+  // so the Verto still fills the glass edge to edge, uncropped and undistorted.
+  // Measured, not guessed: 567 cut 82px off the top, 700 still cut 16px.
+  const EMBED_H = 780;
 
   // Card videos ship preload="none" with a poster, loaded by an
   // IntersectionObserver when the card comes into view — right for a phone on
@@ -1214,11 +1219,11 @@
     if (!frame) return;
     const screenW = mockup.clientWidth * SCREEN_W;
     const screenH = mockup.clientHeight * SCREEN_H;
-    if (screenW < 2) return;                       // laid out mobile: CSS takes over
-    const embedH = Math.round(EMBED_W * (screenH / screenW));
-    frame.style.setProperty('--embed-w', EMBED_W + 'px');
-    frame.style.setProperty('--embed-h', embedH + 'px');
-    frame.style.setProperty('--embed-scale', screenW / EMBED_W);
+    if (screenW < 2 || screenH < 2) return;        // laid out mobile: CSS takes over
+    const embedW = Math.round(EMBED_H * (screenW / screenH));
+    frame.style.setProperty('--embed-w', embedW + 'px');
+    frame.style.setProperty('--embed-h', EMBED_H + 'px');
+    frame.style.setProperty('--embed-scale', screenH / EMBED_H);
   }
 
   // The real Verto, whenever the browser will allow it.
@@ -1233,7 +1238,11 @@
     frame.src = DEMO_ORIGIN + DEMO_PATH;
     mockup.appendChild(frame);
     fitEmbed();
-    window.addEventListener('resize', fitEmbed);
+    // The mockup's box can change without the window resizing — fonts settling,
+    // the side nav resolving, a zoom change — and a stale scale is how the frame
+    // ends up spilling past the bezel. Watch the element, not the window.
+    if ('ResizeObserver' in window) new ResizeObserver(fitEmbed).observe(mockup);
+    else window.addEventListener('resize', fitEmbed);
 
     // Two ways to know it booted. Same-origin (hosted): look for the player's
     // root directly. Cross-origin (a downloaded copy): the player posts
