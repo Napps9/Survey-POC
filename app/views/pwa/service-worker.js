@@ -7,7 +7,10 @@
 // Strategies:
 //   • /play/:token        → network-first (short timeout) → cache fallback (offline)
 //   • /assets/*           → cache-first (fingerprinted; safe to keep)
-//   • Card images         → cache-on-fetch, no-cors fallback for cross-origin
+//   • Card images         → same-origin cache-first; cross-origin network-first
+//                           (opaque responses can't be judged, so the cache is
+//                           the offline fallback, never the first answer)
+//   • Video / audio / any ranged request → not intercepted at all
 //   • POST /play/:token/submit → network-first; on failure, queue in IndexedDB
 //                                and return { ok: true, queued: true }
 //
@@ -19,7 +22,7 @@
 // start with the current version. Content/markup/CSS fixes no longer need a
 // bump: the player HTML is network-first, so a fresh copy (referencing fresh
 // asset digests) is fetched on every online visit.
-const CACHE_VERSION = "playverto-v37"
+const CACHE_VERSION = "playverto-v38"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
@@ -202,36 +205,59 @@ async function networkFirst(req, cacheName) {
   }
 }
 
-// Images — serve the cached copy instantly, but ALWAYS refetch in the
-// background so the next view gets a corrected one. Cross-origin images come
-// back opaque (status 0), which is indistinguishable from a 404 or a rate
-// limit, so a plain cache-first strategy could pin a broken image forever and
-// leave a hard refresh as the only way out. Revalidating makes that
-// self-healing at the cost of one conditional request per image per visit.
+// Images. A cross-origin image comes back OPAQUE — status 0, no headers — which
+// is indistinguishable from a 404 or a rate limit. Serving the cached copy first
+// therefore can't work for them: one bad fetch (Pexels rate-limiting a burst of
+// card art is enough) gets stored as though it were the photo, and every later
+// visit is handed that copy. Revalidating in the background doesn't heal it
+// either, because the replacement is another opaque response the worker can't
+// judge. That is how a deck of card photos goes permanently grey.
+//
+// So: same-origin images stay cache-first, where a status means something.
+// Cross-origin images are network-first with the cache as the OFFLINE fallback,
+// which is what that cache is actually for.
+//
+// Every cache operation is guarded. caches.open and cache.put both reject in
+// ordinary conditions — quota (Chrome pads opaque entries heavily), or storage
+// being unavailable in a partitioned third-party frame, which is exactly what
+// embedding a Verto in another page creates. A cache failure must never take the
+// image request down with it, so nothing here answers with Response.error():
+// the last resort is always the plain network.
 async function imageCache(req, event) {
-  const cache = await caches.open(IMAGE_CACHE)
-  const hit   = await cache.match(req)
+  const sameOrigin = new URL(req.url).origin === self.location.origin
 
-  const revalidate = fetch(req).then(res => {
-    if (res && (res.ok || res.type === "opaque")) cache.put(req, res.clone())
-    return res
-  }).catch(() => null)
+  let cache = null
+  try { cache = await caches.open(IMAGE_CACHE) } catch (_) { return fetch(req) }
 
-  // Keep the worker alive for the refetch — otherwise it can be killed the
-  // moment the cached copy is returned and the poisoned entry never heals.
-  event?.waitUntil(revalidate)
-  if (hit) return hit
+  const keep = (res) => {
+    if (!cache || !res) return
+    if (!(res.ok || res.type === "opaque")) return
+    // Fire-and-forget, but swallow the rejection: an unhandled one here would
+    // take down the strategy that's still trying to answer the request.
+    cache.put(req, res.clone()).catch(() => {})
+  }
 
-  const res = await revalidate
-  if (res) return res
+  if (sameOrigin) {
+    const hit = await cache.match(req).catch(() => null)
+    const revalidate = fetch(req).then(res => { keep(res); return res }).catch(() => null)
+    // Keep the worker alive for the refetch — otherwise it can be killed the
+    // moment the cached copy is returned and a stale entry never refreshes.
+    event?.waitUntil(revalidate)
+    if (hit) return hit
+    const res = await revalidate
+    if (res) return res
+    return fetch(req)
+  }
 
-  // Cross-origin retry with no-cors so we can at least keep an opaque copy.
+  // Cross-origin: the network is the only source whose answer can be trusted.
   try {
-    const fallback = await fetch(req.url, { mode: "no-cors" })
-    if (fallback) cache.put(req, fallback.clone())
-    return fallback
+    const res = await fetch(req)
+    keep(res)
+    return res
   } catch (_) {
-    return Response.error()
+    const hit = await cache.match(req).catch(() => null)
+    if (hit) return hit                 // offline, and we have something
+    return fetch(req.url, { mode: "no-cors" })
   }
 }
 

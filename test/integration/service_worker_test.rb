@@ -11,7 +11,32 @@ class ServiceWorkerTest < ActionDispatch::IntegrationTest
     get pwa_service_worker_path(format: :js)
     assert_response :success
     assert_match %r{\Atext/javascript}, response.content_type
-    assert_includes response.body, '"playverto-v37"'
+    assert_includes response.body, '"playverto-v38"'
+  end
+
+  test "cross-origin images are network-first, so a bad fetch can't be pinned" do
+    get pwa_service_worker_path(format: :js)
+    assert_response :success
+
+    # An opaque response is indistinguishable from a 404 or a rate limit, so
+    # answering from cache first is how a deck of Pexels card photos goes
+    # permanently grey: one bad fetch is stored as though it were the photo, and
+    # the background revalidate can't tell the replacement is bad either.
+    assert_includes response.body, "const sameOrigin = new URL(req.url).origin === self.location.origin"
+    assert_match(/Cross-origin: the network is the only source/, response.body)
+  end
+
+  test "the image strategy never answers with a network error" do
+    get pwa_service_worker_path(format: :js)
+    assert_response :success
+
+    # caches.open and cache.put both reject in ordinary conditions — quota, or
+    # storage being unavailable in a partitioned third-party frame, which is
+    # exactly what embedding a Verto in another page creates. Neither may take
+    # the image request down with it, so every path ends at the plain network.
+    strategy = response.body[/async function imageCache.*?\n\}/m]
+    assert strategy, "expected to find the imageCache strategy in the worker"
+    assert_not_includes strategy, "Response.error()"
   end
 
   test "media and ranged requests are never intercepted" do
