@@ -5212,7 +5212,35 @@ body.generating-overlay-active .bottom-bar { display: none; }
    view stops working. Define the class explicitly so JS toggles do too. */
 .hidden { display: none !important; }
 
-@media (max-width: 767px) {
+/* ═══════════════════════════════════════════════════════════════════════
+   Where the PLAYER stops being a desktop split-card.
+
+   This used to be a flat `max-width: 767px`, which is a phone test, not a
+   "can this screen hold the desktop card" test — and those are different
+   questions. The desktop card is a fixed 850 x 680 box: it needs both a wide
+   AND a reasonably tall viewport, and a portrait iPad has only one of those.
+   At 768 x 1024 it landed one pixel on the desktop side of the line and got
+   a 680px card floating in a 954px screen with the image beside the question,
+   which nobody chose — it was inherited from a number picked for phones.
+
+   Three clauses, deliberately overlapping so each states its own case:
+     1. ≤767px — every phone, any orientation. Redundant with 2 and 3 below,
+        kept because it is the rule everyone already has in their head.
+     2. ≤1024px AND portrait — every tablet held upright, up to and including
+        a 12.9" iPad Pro at exactly 1024. Tall and narrow is the stacked
+        layout's whole premise, and a tablet in portrait is just a big phone
+        as far as this card is concerned.
+     3. ≤1024px AND ≤600px tall — a phone turned sideways (844 x 390 on an
+        iPhone 14), which was the other side of the same bug: too wide for
+        clause 1, far too short for a 680px card, so it got the desktop
+        layout and overflowed. A laptop is excluded by the width.
+
+   A tablet in LANDSCAPE keeps the desktop card on purpose: 1024 x 768 is
+   wide and short, which is exactly the shape that card was drawn for.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px),
+       (max-width: 1024px) and (orientation: portrait),
+       (max-width: 1024px) and (max-height: 600px) {
 
   /* ── Universal touch + form ergonomics ── */
   textarea,
@@ -5617,14 +5645,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* Choice-grid cards: tiles share the panel's spare height evenly, and the
      grid scrolls only once even the smallest legible tile won't fit.
 
-     `grid-auto-rows: minmax(var(--play-tile-min), auto)` replaces the old
-     `minmax(0, 1fr)`. 1fr divides the container height between the rows —
-     which reads fine for four options and turns eight options into eight
-     unreadable slivers, or (with the flat 80px min-height that used to be
-     on .choice-card) into rows overflowing a clipped panel. A fluid minimum
-     plus `auto` means every tile is at least tappable and legible, the grid
-     scrolls when there are more than fit, and the hero above has already
-     given up its height to make that rarer. */
+     `grid-auto-rows: minmax(var(--play-tile-min), 1fr)` replaces the old
+     `minmax(0, 1fr)`, and the change is the floor, not the 1fr. A zero
+     minimum divides the container height between the rows whatever that
+     costs — fine for four options, eight unreadable slivers for eight, and
+     (with the flat 80px min-height that used to sit on .choice-card) rows
+     overflowing a clipped panel. A fluid minimum means every tile stays
+     tappable and legible and the grid scrolls once there are more than fit;
+     keeping 1fr on top means that when there IS spare height — a tall phone,
+     an upright tablet — the tiles grow into it instead of leaving a dead
+     band above the "+ Other" row. */
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2 {
     flex: 1 1 auto;
@@ -5634,7 +5664,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: minmax(var(--play-tile-min), auto);
+    grid-auto-rows: minmax(var(--play-tile-min), 1fr);
     gap: clamp(8px, 1.4svh, 12px);
     align-content: start;
     flex: 1 1 auto;
@@ -5715,6 +5745,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-thankyou-emoji { font-size: 52px; }
   .preview-thankyou-title { font-size: clamp(24px, 7.4vw, 32px); }
   .preview-thankyou-sub   { font-size: 14px; max-width: 100%; }
+}
+
+/* Everything below is phone-only and stays on the flat 767px test. The studio
+   is not the player: the editor, the create wizard and the dashboard chrome
+   are all built for a pointer and a wide canvas, and a portrait iPad has room
+   for them in a way it does not for a 680px card floating in a 954px screen.
+   Widening the player's breakpoint should not quietly drag the whole studio
+   into a phone layout with it. */
+@media (max-width: 767px) {
 
   /* ═════════════════════════════════════════════════════════════════
      CREATE WIZARD (`/surveys/new`) — same mobile pattern
@@ -5930,21 +5969,66 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .has-bottom-bar { padding-top: 64px; }
 }
 
-/* ── Short viewports (≤767px wide AND ≤560px tall) ───────────────────────
+/* ── The stacked player on a big screen (≥600px wide) ────────────────────
+   The phone layout stretches to whatever it is handed, and on a portrait
+   iPad that means a ~970px line of question text and option tiles four
+   times wider than they are tall — technically fine, visibly wrong. Cap the
+   content column so line length stays readable, and let the tiles use the
+   vertical room a tablet actually has instead of staying phone-sized.
+
+   Both clauses are the ≥600px slice of the player breakpoint above: a
+   tablet upright, and a phone turned sideways. A landscape tablet never
+   reaches here — it is still on the desktop card. */
+@media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait),
+       (min-width: 600px) and (max-width: 1024px) and (max-height: 600px) {
+  .preview-overlay .split-card .split-right > .q-header,
+  .preview-overlay .split-card .split-right > .mt-2,
+  .preview-overlay .split-card .split-right > .other-block {
+    width: 100%;
+    max-width: 640px;
+    margin-inline: auto;
+  }
+}
+
+/* Height tokens for an upright tablet only — a sideways phone shares the
+   width problem above but has the opposite problem here, and the short
+   viewport tier below is what speaks to it. */
+@media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
+  .preview-overlay {
+    --play-hero-h:     clamp(200px, 28svh, 340px);
+    --play-right-min:  clamp(360px, 56svh, 620px);
+    --play-tile-min:   clamp(96px, 13svh, 168px);
+    --play-title:      clamp(24px, 3.4vw, 32px);
+    --play-subtitle:   clamp(15px, 2vw, 17px);
+    --play-pad-x:      clamp(26px, 4vw, 44px);
+    --play-pad-y:      clamp(20px, 2.6svh, 30px);
+  }
+}
+
+/* ── Short viewports (≤560px tall) ───────────────────────────────────────
    A phone held in landscape, a split-screen window, an older 4" handset, or
    any phone with the soft keyboard up — --app-100vh tracks the keyboard, so
    this tier engages there too. Retuning the four tokens is the whole change:
    every rule in the block above reads them, so the hero drops to a slim
    banner, the answer widget claims the rest, and nothing else needs a
-   second, near-duplicate copy of itself here. */
-@media (max-width: 767px) and (max-height: 560px) {
+   second, near-duplicate copy of itself here.
+
+   Width bound matches the player breakpoint's own ceiling, not 767 — a
+   sideways phone is 844px wide and needs this tier more than anything else
+   does. A laptop is still excluded. */
+@media (max-width: 1024px) and (max-height: 560px) {
   .preview-overlay {
     --play-hero-h:    clamp(72px, 16svh, 120px);
     --play-hero-min:  60px;
     --play-right-min: clamp(230px, 74svh, 400px);
     --play-pad-y:     clamp(10px, 2svh, 16px);
     --play-title:     clamp(17px, 4.8vw, 22px);
-    --play-tile-min:  clamp(48px, 13svh, 72px);
+    /* Not lower than this. Squeezed to 51px on a sideways phone the tile art
+       became a coloured stripe with the tick clipped off it — six options
+       that all fit and none of which could be read. Past this floor the
+       right answer is to let the grid scroll: two legible rows and a third
+       a thumb away beats six illegible ones. */
+    --play-tile-min:  clamp(62px, 17svh, 84px);
   }
 }
 
