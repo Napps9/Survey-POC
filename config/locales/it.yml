@@ -310,6 +310,8 @@ it:
         count_exact: "Usa esattamente %{exact} punti (ora %{n})."
         option_ok: "Le etichette delle risposte sono brevi e leggibili (≤ %{max} caratteri)."
         option_long: "Accorcia “%{opt}” a %{max} caratteri o meno."
+        phone_hero: "%{n} riquadri — su un telefono l'immagine della scheda salta per farli entrare. Meno di 7 li mantiene entrambi."
+        phone_scroll: "%{n} riquadri — troppi per un telefono: le opzioni scorrono e l'immagine sparisce. Punta a 6 o meno."
         page_empty: "Aggiungi almeno una pagina alla storia."
         page_ok: "%{n} pagine — nell'ideale %{min}–%{max}."
         page_many: "%{n} pagine — riduci a %{max} o meno perché la storia non si trascini."

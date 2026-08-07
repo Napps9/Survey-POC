@@ -318,6 +318,8 @@ en:
         count_exact: "Use exactly %{exact} points (now %{n})."
         option_ok: "Answer labels are short and scannable (≤ %{max} characters)."
         option_long: "Shorten “%{opt}” to %{max} characters or fewer."
+        phone_hero: "%{n} tiles — a phone will drop the card image to fit them. Fewer than 7 keeps both."
+        phone_scroll: "%{n} tiles — too many for a phone: the options scroll and the card image goes. Aim for 6 or fewer."
         page_empty: "Add at least one page to the story."
         page_ok: "%{n} pages — within the ideal %{min}–%{max}."
         page_many: "%{n} pages — trim to %{max} or fewer so the story doesn't drag."

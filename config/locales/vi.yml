@@ -310,6 +310,8 @@ vi:
         count_exact: "Dùng đúng %{exact} điểm (hiện %{n})."
         option_ok: "Nhãn đáp án ngắn gọn, dễ đọc (≤ %{max} ký tự)."
         option_long: "Rút gọn “%{opt}” còn %{max} ký tự hoặc ít hơn."
+        phone_hero: "%{n} ô — trên điện thoại, ảnh thẻ sẽ bị bỏ để vừa chỗ. Dưới 7 thì giữ được cả hai."
+        phone_scroll: "%{n} ô — quá nhiều cho điện thoại: các lựa chọn phải cuộn và ảnh thẻ bị bỏ. Hãy nhắm 6 hoặc ít hơn."
         page_empty: "Thêm ít nhất một trang vào câu chuyện."
         page_ok: "%{n} trang — trong khoảng lý tưởng %{min}–%{max}."
         page_many: "%{n} trang — rút gọn còn %{max} trang trở xuống để câu chuyện không bị lê thê."

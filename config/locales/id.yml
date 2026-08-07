@@ -310,6 +310,8 @@ id:
         count_exact: "Gunakan tepat %{exact} poin (sekarang %{n})."
         option_ok: "Label jawaban singkat dan mudah dibaca (≤ %{max} karakter)."
         option_long: "Persingkat “%{opt}” menjadi %{max} karakter atau kurang."
+        phone_hero: "%{n} ubin — di ponsel gambar kartu dilepas agar muat. Kurang dari 7 mempertahankan keduanya."
+        phone_scroll: "%{n} ubin — terlalu banyak untuk ponsel: opsi harus digulir dan gambar kartu hilang. Targetkan 6 atau kurang."
         page_empty: "Tambahkan setidaknya satu halaman ke cerita."
         page_ok: "%{n} halaman — dalam rentang ideal %{min}–%{max}."
         page_many: "%{n} halaman — pangkas jadi %{max} atau kurang agar cerita tidak bertele-tele."

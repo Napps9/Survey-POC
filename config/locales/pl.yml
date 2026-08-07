@@ -310,6 +310,8 @@ pl:
         count_exact: "Użyj dokładnie %{exact} punktów (teraz %{n})."
         option_ok: "Etykiety odpowiedzi są krótkie i czytelne (≤ %{max} znaków)."
         option_long: "Skróć „%{opt}” do %{max} znaków lub mniej."
+        phone_hero: "%{n} kafelków — na telefonie zniknie obraz karty, żeby się zmieściły. Poniżej 7 zostaje jedno i drugie."
+        phone_scroll: "%{n} kafelków — za dużo na telefon: opcje się przewijają, a obraz karty znika. Celuj w 6 lub mniej."
         page_empty: "Dodaj co najmniej jedną stronę do historii."
         page_ok: "%{n} stron — w idealnym zakresie %{min}–%{max}."
         page_many: "%{n} stron — ogranicz do %{max} lub mniej, aby historia się nie dłużyła."

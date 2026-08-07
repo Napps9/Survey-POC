@@ -4502,7 +4502,25 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   background-size: cover;
   background-position: center;
   flex-direction: column;
+  /* Every control a respondent types into. Below 16 CSS px iOS Safari zooms
+     the page on focus and leaves it zoomed, which on a card-per-screen layout
+     means the question scrolls off and the footer goes with it. Three controls
+     were under the line — the free-text answer (15px), the contact card's
+     fields including email (14px) and the location search in every Verto's
+     demographic tail (13px) — and the rule written to stop exactly this
+     (`textarea { font-size: 16px }`, in the mobile block) has been losing on
+     specificity to all three.
+
+     max(), not a bare rem: the threshold is 16 CSS PX, so a respondent who has
+     made their browser text SMALLER would otherwise get the zoom handed back.
+     This scales up with their preference and never below the line. Defined
+     here rather than in the mobile block because a 13px search field is a poor
+     input on a desktop too — the zoom is just what makes it a bug. */
+  --play-input-fs: max(1rem, 16px);
 }
+.preview-overlay .freeform-textarea,
+.preview-overlay .contact-field,
+.preview-overlay .location-search-field { font-size: var(--play-input-fs); }
 .preview-nav {
   height: 54px; flex-shrink: 0;
   background: var(--brand-bg, rgba(28,32,52,0.9)); backdrop-filter: blur(10px);
@@ -4619,6 +4637,113 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   color: rgba(255,255,255,0.45); max-width: 380px; line-height: 1.6;
 }
 
+/* ── After the last card: end-screen actions and the post-finish panels ────
+   These were built as inline `style="…font-size:11px…"` strings, half in
+   player/show.html.erb and half in player_controller's DOM builders, which
+   put a dozen respondent-facing type sizes somewhere no stylesheet could
+   reach and no floor could be applied to. They are classes now, and the sizes
+   are in rem like the rest of the respondent's text.
+
+   The floors here are the same two the card uses: 0.875rem for anything the
+   respondent reads as prose, 0.75rem for counts and meta furniture. Nothing
+   is smaller than 0.75rem except the Playverto wordmark, which is our chrome
+   rather than their content. */
+.play-banner {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  gap: 14px; padding: 7px 14px;
+}
+.play-banner-text, .play-banner-link {
+  font-family: "ABeeZee", sans-serif; font-size: 0.8125rem;
+}
+.play-banner-link { color: rgba(255,255,255,0.85); text-decoration: underline; text-underline-offset: 3px; }
+.play-banner-test    { background: rgba(255,250,119,0.1); border-bottom: 1px solid rgba(255,250,119,0.3); }
+.play-banner-test    .play-banner-text { color: #FFFA77; }
+.play-banner-preview { background: rgba(1,234,203,0.1);   border-bottom: 1px solid rgba(1,234,203,0.25); }
+.play-banner-preview .play-banner-text { color: #01EACB; }
+
+.play-end-actions {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; margin-top: 22px; width: 100%;
+}
+/* Same size as .preview-btn — these are the same kind of control, and the
+   thank-you screen is where a respondent decides whether to keep going. */
+.play-end-btn {
+  padding: 11px 22px; border-radius: 100px;
+  font-family: "Alata", sans-serif; font-size: 0.9375rem;
+  letter-spacing: 0.05em; cursor: pointer; text-decoration: none;
+  background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.25);
+}
+.play-end-btn-primary {
+  background: var(--brand-cta, #01EACB); color: var(--brand-cta-text, #1C2034);
+  border: none;
+}
+.play-powered {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; margin-top: 22px; opacity: 0.45;
+}
+/* Our wordmark, not the respondent's content — the one thing here that stays
+   deliberately small. A class so it is at least reachable. */
+.play-powered-text { font-family: "ABeeZee", sans-serif; font-size: 0.625rem; color: #fff; }
+.play-powered-mark { height: 12px; width: auto; }
+
+.play-panel {
+  width: 100%; max-width: 640px; margin: 0 auto;
+  padding: 24px 22px 28px; overflow-y: auto;
+  /* NOT `calc(100vh - 120px)`, which is what this was. Plain vh on mobile
+     Safari is the toolbar-HIDDEN height, so the panel was drawn 60-90px
+     taller than the visible area and its last rows — the comparison the
+     respondent opened it for — sat below the fold with nothing to say so.
+     --app-100vh is the measured visible height (lib/viewport_height.js). */
+  max-height: calc(var(--app-100vh, 100dvh) - 120px);
+  background: #1C2034; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+.play-panel-head  { text-align: center; margin-bottom: 18px; }
+.play-panel-title { font-family: "Alata", sans-serif; font-size: 1.375rem; color: #fff; letter-spacing: 0.02em; }
+.play-panel-meta  { font-family: "ABeeZee", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.play-panel-list  { display: flex; flex-direction: column; gap: 14px; }
+.play-panel-foot  { display: flex; justify-content: center; margin-top: 18px; }
+.play-panel-back {
+  padding: 9px 18px; border-radius: 100px; background: transparent; color: #fff;
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem;
+  border: 1px solid rgba(255,255,255,0.2); cursor: pointer;
+}
+.play-panel-section-next { margin-top: 28px; }
+.play-panel-empty {
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem;
+  color: rgba(255,255,255,0.5); text-align: center; padding: 10px;
+}
+.play-region-title {
+  font-family: "Alata", sans-serif; font-size: 1rem; color: #01EACB;
+  margin-bottom: 12px; text-align: center;
+}
+.play-region-name  { flex: 1; text-align: start; font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: #fff; }
+.play-region-count { font-family: "Alata", sans-serif; font-size: 0.75rem; color: #01EACB; }
+.play-region-arrow { font-family: "ABeeZee", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.45); }
+
+.play-compare-head   { font-family: "Alata", sans-serif; font-size: 0.875rem; color: #fff; margin: 8px 0 -4px; }
+.play-compare-prompt { font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: #fff; line-height: 1.45; margin-bottom: 10px; }
+.play-compare-mine {
+  display: inline-block; padding: 4px 10px; border-radius: 100px;
+  background: var(--brand-primary-soft, rgba(1,234,203,0.15));
+  color: var(--brand-primary, #01EACB);
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem; margin-bottom: 10px;
+}
+.play-compare-note {
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem;
+  color: rgba(255,255,255,0.4); font-style: italic;
+}
+.play-bar-label {
+  flex: 1; min-width: 0; font-family: "ABeeZee", sans-serif;
+  font-size: 0.875rem; line-height: 1.35; color: rgba(255,255,255,0.82);
+}
+.play-bar-label.is-mine { color: var(--brand-primary, #01EACB); }
+.play-bar-pct   { flex-shrink: 0; font-family: "Alata", sans-serif; font-size: 0.875rem; color: #fff; }
+.play-bar-count {
+  flex-shrink: 0; min-width: 22px; text-align: right;
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.4);
+}
+
 /* Inline nudge shown above the footer when a required question is unanswered. */
 .preview-required-hint {
   flex-shrink: 0; display: block;
@@ -4686,7 +4811,12 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .preview-btn {
   padding: 10px 28px; border-radius: 100px;
-  font-family: "ABeeZee", sans-serif; font-size: 13px;
+  /* 15px, raised from 13, so there is ONE number for this button rather than a
+     desktop one and a phone one. It is the control a respondent uses on every
+     card and it was the smallest text in the bar. In rem so a raised browser
+     font-size reaches it; min-width below is unchanged and still holds the
+     longest English label. */
+  font-family: "ABeeZee", sans-serif; font-size: 0.9375rem;
   cursor: pointer; border: none; transition: all 0.15s;
   min-width: 110px; text-align: center;
   /* Load-bearing, not cosmetic: player_controller#_fitFooter decides the bar
@@ -5316,7 +5446,23 @@ body.generating-overlay-active .bottom-bar { display: none; }
      panel's claim on the card, and the hero (--play-hero-h) is the only
      shrinkable child, so when the two don't both fit the image gives way
      first — down to --play-hero-min and no further. See the .split-left /
-     .split-right rules below for the mechanism. */
+     .split-right rules below for the mechanism.
+
+     TEXT IS NOT ON THE FLUID LIST. Every token above is a box, and boxes scale.
+     The type tokens below are flat floors, because a card that runs short of
+     room used to pay for it in words: the question went 26px → 22px on a normal
+     phone and 17px on a short one, grid option labels — the answer itself —
+     bottomed out at 11px, the eyebrow at 10px. That inverts the priority.
+     Content and images can be lost before the question and answers change; a
+     respondent can answer a question with no photograph on it, and cannot
+     answer one they can't read. Nothing here shrinks with the viewport, and
+     what a card can't fit it sheds (see the .has-art / .has-hero ladder below)
+     or scrolls.
+
+     `rem`, not px, so the browser's own font-size setting finally does
+     something. Nothing in this app overrides the root font-size, so 1rem is
+     exactly what the respondent asked for — 16px unless they changed it, and
+     the people who did change it are the ones an 11px label hurt most. */
   .preview-overlay {
     --play-hero-h:     clamp(132px, 26svh, 240px);
     --play-hero-min:   96px;
@@ -5324,10 +5470,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --play-pad-x:      clamp(16px, 5vw, 26px);
     --play-pad-y:      clamp(14px, 2.4svh, 22px);
     --play-gap:        clamp(8px, 1.6svh, 14px);
-    --play-eyebrow:    clamp(10px, 3vw, 12px);
-    --play-title:      clamp(19px, 5.6vw, 26px);
-    --play-subtitle:   clamp(13px, 3.6vw, 15px);
     --play-logo-h:     clamp(22px, 4.6svh, 34px);
+
+    --play-eyebrow:    0.75rem;    /* 12px — desktop's, no smaller */
+    --play-title:      1.625rem;   /* 26px — the question. Above desktop's 22 on purpose */
+    --play-subtitle:   0.9375rem;  /* 15px */
+    --play-label:      1rem;       /* 16px — option text; this IS the answer */
   }
 
   /* In-card .panel-progress now drives the mobile progress indicator —
@@ -5475,8 +5623,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
     height: 232px;
     min-width: 44px;
   }
+  /* NPS is the one scale that keeps 13px — see the .slider-label-text rule
+     further down for why. */
   .preview-overlay .nps-slider-labels .slider-label-text {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-family: "ABeeZee", sans-serif;
     line-height: 1.2;
   }
@@ -5529,8 +5679,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
     width: 100%;
     flex: 1 1 auto;
     min-height: var(--play-right-min);
-    padding: var(--play-pad-y) var(--play-pad-x)
-             calc(var(--play-pad-y) + env(safe-area-inset-bottom));
+    /* No safe-area inset here any more. This panel is not the bottom-most
+       element — the footer below it is, and that is where the inset moved to.
+       Padding for a bezel two boxes away cost ~34px of card interior while
+       leaving the buttons that actually touch the indicator unprotected. */
+    padding: var(--play-pad-y) var(--play-pad-x);
     background: #fff;
     color: #1C2034;
     text-align: center;
@@ -5614,6 +5767,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
     flex: 0 0 auto;
     margin-top: 0;
   }
+  /* The answer container is `class="mt-2"` in the shared card component — a
+     Tailwind 8px that predates this panel having a gap. .split-right already
+     sets `gap: var(--play-gap)`, so the margin is a second and disagreeing
+     opinion about the same distance, and the gap is the one that's fluid.
+     Its sibling .other-block above was zeroed for this reason; this one was
+     missed. */
+  .preview-overlay .split-card .split-right > .mt-2 { margin-top: 0; }
 
   /* Picker rows on the white card — light gray pills with magenta accent.
      Row height, tile and gap are fluid rather than the flat 72px row + 56px
@@ -5640,7 +5800,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --tile-emoji: clamp(19px, 3.2svh, 26px);
   }
   .preview-overlay .choice-list-label,
-  .preview-overlay .pick-text { font-size: clamp(14px, 3.9vw, 16px); line-height: 1.3; }
+  .preview-overlay .pick-text { font-size: var(--play-label); line-height: 1.3; }
   .preview-overlay .choice-list-label,
   .preview-overlay .pick-text { color: #1C2034; }
   .preview-overlay .pick-item[data-selected="true"],
@@ -5660,7 +5820,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
     color: #1C2034;
     border-radius: 14px;
     min-height: 140px;
-    max-height: 32vh;
+    /* svh, not vh — vh is the toolbar-hidden height on mobile Safari, so this
+       cap was ~15% larger than the room actually on screen and let the box
+       grow under the footer. */
+    max-height: 32svh;
     padding: 14px;
     width: 100%;
     resize: none;
@@ -5672,7 +5835,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
     background: transparent;
     padding: 0;
     color: rgba(0,0,0,0.4);
-    font-size: 11px;
+    font-size: 0.75rem;
   }
 
   /* Choice-grid cards. The rows used to be `minmax(0, 1fr)`, which divides
@@ -5695,6 +5858,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
     flex-direction: column;   /* so the scroll fade below stacks under the grid */
     min-height: 0;
     position: relative;
+    /* How many columns the grid gets is a question about THIS PANEL's width,
+       and the panel is not the viewport: it measures 640px on an upright iPad
+       mini (768 wide) and on a sideways iPhone (844 wide), but 353px on a 393
+       phone. Naming it as a container lets the grid ask directly instead of
+       reading a viewport number chosen as a proxy for it — see the
+       @container rule further down, which replaced a `min-width: 600px` media
+       query. inline-size only: querying height would mean `container-type:
+       size`, whose containment zeroes this box's intrinsic height and costs
+       ~37px of the answer area on a 393px phone — measured. The height
+       decision stays with _fitCard, which can see what CSS can't. */
+    container-type: inline-size;
+    container-name: answer;
   }
   /* The same "there is more below" fade the option lists get. A grid can't
      carry it on itself — a ::after inside a grid becomes a cell — so it hangs
@@ -5726,12 +5901,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
     width: 100%;
     min-height: 0;
   }
+  /* No transparent 3px border reserving the selection ring. A border is in
+     the box, so an invisible one still costs 6px per row — 18px across a
+     three-row grid, taken from the artwork it was drawn around. The desktop
+     base rule already marks selection with `outline` (see .choice-card), which
+     paints outside the box and costs no layout at all; mobile just stops
+     overriding it. */
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-card,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card {
     height: 100%;
     aspect-ratio: auto;
     border-radius: 14px;
-    border: 3px solid transparent;
   }
   /* Drop the desktop card's fixed 74px so the tile's smallest legal size is
      its own cqw floor, not a number from a 850px-wide layout. It still grows
@@ -5809,9 +5989,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .choice-grid.art-off .choice-overlay { display: none; }
   .preview-overlay .choice-grid.art-off .choice-label {
     margin: 0;
+    min-height: 0;
     flex: 1 1 auto;
     text-align: start;
-    font-size: clamp(14px, 3.8vw, 16px);
+    font-size: var(--play-label);
   }
   .preview-overlay .choice-grid.art-off .choice-tick {
     top: 50%; right: 12px; bottom: auto;
@@ -5834,11 +6015,49 @@ body.generating-overlay-active .bottom-bar { display: none; }
     margin-top: 0;
     border-radius: 0;
   }
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-card[data-selected="true"],
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-card[data-selected="true"] {
-    border-color: #FF1E6F;
+  /* The selected-tile border-colour rule that used to live here went with the
+     border. It was also outranking .art-off's own selected rule (same
+     specificity, later in the file), which repainted a brand-coloured row in
+     hardcoded magenta. */
+  /* Label furniture, retuned for a panel rather than a desktop card. The base
+     rule reserves 2.4em — two lines whether or not the label wraps — plus a
+     flat 7px margin. Across three grid rows that is 106px, more than the whole
+     footer, spent on blank space beneath one-word options.
+
+     One line is enough now because the row equalises anyway: grid-auto-rows is
+     minmax(min-content, 1fr) and every .choice-card is height:100%, so a
+     neighbour's second line grows the row and both tiles give up the same
+     amount. That is the thing the two-line reserve was protecting against, and
+     the grid handles it without reserving anything.
+
+     Scoped to .preview-overlay: the unscoped version of this rule was landing
+     on the editor canvas too, which is not a phone and never asked. */
+  .preview-overlay .choice-label {
+    margin-top: clamp(4px, 0.8svh, 7px);
+    min-height: 1.2em;   /* one line at this rule's line-height */
+    padding: 2px 4px;
+    /* Was clamp(11px, 3vw, 13px) — the answer itself, set smaller than any
+       other text on the card and smaller than desktop draws it. */
+    font-size: var(--play-label);
   }
-  .choice-label   { font-size: clamp(11px, 3vw, 13px); padding: 2px 4px; }
+
+  /* "+ Other" carries the desktop card's flat 8/16px padding into a panel
+     where everything else is fluid, and it sits below the scroller so its
+     height comes straight off the options. */
+  .preview-overlay .other-cta-btn {
+    padding: clamp(6px, 1.1svh, 8px) clamp(12px, 3.6vw, 16px);
+    font-size: 0.8125rem;   /* desktop's 13, in rem so preference reaches it */
+  }
+
+  /* A range card's scale words ARE its answer options, and they were the one
+     set of option labels still sitting at the desktop chrome's 13px. They run
+     across the panel rather than down it, so a long scale on a narrow phone
+     wraps — which grows the row, the correct way to run out of width.
+
+     NPS is the exception and keeps 13px: its labels are the digits 0-10 in a
+     fixed-height vertical column (11 of them in 232px), where the readability
+     argument for 16px doesn't apply and the extra leading would collide. */
+  .preview-overlay .slider-label-text { font-size: var(--play-label); }
 
   /* Mobile-specific player tweaks live here — the footer-hide and
      advance-chip styles are now global (search "Player: footer hidden"). */
@@ -5849,6 +6068,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-footer {
     padding: 0 clamp(12px, 4vw, 32px);
     gap: clamp(8px, 3vw, 16px);
+    /* Desktop's flat 80px around a 44px button is 36px of air, and on a 660px
+       phone that is 12% of the screen spent on nothing. Fluid down to 56px,
+       which still clears the touch target with room to breathe.
+
+       `height: auto` + `min-height` rather than `height`, because of what the
+       padding below has to do: with border-box sizing a padded fixed height
+       moves the buttons UP instead of making room beneath them. Auto lets the
+       inset genuinely add to the bar.
+
+       env(safe-area-inset-bottom) belongs HERE — the footer is the bottom-most
+       element on the card, and it was the one box not asking for it. It sat on
+       .split-right instead (two boxes up, burning card interior for a bezel it
+       doesn't touch), so on a home-indicator phone added to the home screen the
+       bottom ~16px of Back and Next lived under the indicator, where iOS takes
+       the swipe before the button sees it. */
+    height: auto;
+    min-height: clamp(56px, 9svh, 80px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   /* Back and Next scale DOWN from the desktop card and never past it.
      Desktop's is 110 x 40 at 13px — measured, not chosen — and the stacked
@@ -5865,9 +6102,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
      because 44 is the smallest reliable touch target and a pointer does not
      need one. Everything else is desktop's or smaller. */
   .preview-overlay .preview-footer {
-    --play-btn-max-w: 110px;   /* desktop's .preview-btn min-width */
-    --play-btn-h:      44px;   /* desktop is 40; this is the touch floor */
-    --play-btn-fs:     13px;   /* desktop's .preview-btn font-size */
+    --play-btn-max-w: 110px;      /* desktop's .preview-btn min-width */
+    --play-btn-h:      44px;      /* desktop is 40; this is the touch floor */
+    --play-btn-fs:     0.9375rem; /* 15px — desktop's, raised from 13 to match */
   }
   .preview-overlay .preview-btn {
     flex: 1 1 0;
@@ -5921,8 +6158,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-thankyou       { padding: 28px 20px; }
   .preview-thankyou-card  { padding: 32px 22px; }
   .preview-thankyou-emoji { font-size: 52px; }
-  .preview-thankyou-title { font-size: clamp(24px, 7.4vw, 32px); }
-  .preview-thankyou-sub   { font-size: 14px; max-width: 100%; }
+  /* The title is display type and keeps its scale — its floor is generous.
+     The sub is prose the respondent is meant to read, so it goes back to
+     desktop's size rather than being shaved to 14. */
+  .preview-thankyou-title { font-size: clamp(1.5rem, 7.4vw, 2rem); }
+  .preview-thankyou-sub   { font-size: 1rem; max-width: 100%; }
 }
 
 /* Everything below is phone-only and stays on the flat 767px test. The studio
@@ -6168,23 +6408,34 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
 }
 
-/* Height tokens for an upright tablet only — a sideways phone shares the
-   width problem above but has the opposite problem here, and the short
-   viewport tier below is what speaks to it. */
-@media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait),
-       (min-width: 600px) and (max-width: 1024px) and (max-height: 600px) {
+/* A wide answer panel gets a third column. This was two viewport media queries
+   — `min-width: 600px` AND portrait, plus the same for a short landscape — a
+   pair of proxies for the one thing that actually decides it: how wide the
+   panel is. Asking the panel removes the proxy and the orientation clauses
+   with it, and it resolves during layout rather than after paint, so a panel
+   that is wide for a reason the viewport can't see (the editor's preview
+   frame, chrome stacked above the card) gets the right answer too.
+
+   520px, because the widest phone panel measured is 387px (a 430px iPhone)
+   and the narrowest tablet panel is 640px — the threshold sits in the gap
+   with room on both sides rather than on top of a real device. */
+@container answer (min-width: 520px) {
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
+/* Tablets upright: more room than a phone, so the card spends it. Type may
+   grow here — the rule is a floor and no shrink, not a fixed size — but the
+   floors are the phone's, never below. The title's used to be 24px, i.e. a
+   tablet could draw the question SMALLER than a 393px phone. */
 @media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
   .preview-overlay {
     --play-hero-h:     clamp(200px, 28svh, 340px);
     --play-right-min:  clamp(360px, 56svh, 620px);
-    --play-title:      clamp(24px, 3.4vw, 32px);
-    --play-subtitle:   clamp(15px, 2vw, 17px);
+    --play-title:      clamp(1.625rem, 3.4vw, 2rem);
+    --play-subtitle:   clamp(0.9375rem, 2vw, 1.0625rem);
     --play-pad-x:      clamp(26px, 4vw, 44px);
     --play-pad-y:      clamp(20px, 2.6svh, 30px);
   }
@@ -6207,7 +6458,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --play-hero-min:  60px;
     --play-right-min: clamp(230px, 74svh, 400px);
     --play-pad-y:     clamp(10px, 2svh, 16px);
-    --play-title:     clamp(17px, 4.8vw, 22px);
+    /* --play-title used to drop to clamp(17px, 4.8vw, 22px) here. This tier is
+       the least room on the card and the question was paying for it: an iPhone
+       SE (375 x 553) crosses this line, so that 17px was not an edge case, it
+       was a common phone. The tier keeps its LAYOUT retunes — the hero halves,
+       the answer panel takes the difference — and buys the rest by shedding
+       imagery rather than by shrinking the question. */
   }
 }
 
@@ -6312,7 +6568,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .regions-list {
   flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
-  max-height: 34vh; overflow-y: auto; padding: 12px 20px 20px;
+  max-height: 34svh; overflow-y: auto; padding: 12px 20px 20px;
 }
 .regions-detail { overflow-y: auto; padding: 20px 22px 24px; }
 

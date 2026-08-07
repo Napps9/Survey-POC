@@ -1,16 +1,22 @@
 require "application_system_test_case"
 
-# What the player gives up when it runs out of room, and in what order.
+# What the player can afford, and what it gives up when it can't.
 #
 # The rule is a priority, not a fallback: a respondent can answer a question
 # with no artwork on it and cannot answer one whose options are off the bottom
-# of the screen. So the pictures go first — the card's hero image, then the
-# option tiles — and the answer widget and the footer are never touched.
+# of the screen. So the pictures are what go, and the answer widget and the
+# footer are never touched.
 #
-#   1. the hero shrinks to its floor
-#   2. .hero-off  — the card image goes
-#   3. .art-off   — the option tiles go, the grid becomes the option list
-#   4. the answer area scrolls
+# _fitCard budgets UP rather than stripping down — it starts from the
+# undecorated answer, prices that as the debt, and buys back the option
+# artwork and then the hero only while neither adds to it. What this file
+# asserts is the outcome, which is the same either way and is the part worth
+# pinning: the artwork goes before the options do, every option survives, the
+# footer survives, and the card climbs again when the room comes back.
+#
+#   .art-off   — the option tiles go, the grid becomes the option list
+#   .hero-off  — the card image goes
+#   then whatever is still too tall scrolls
 class PlayerShedOrderTest < ApplicationSystemTestCase
   DESKTOP = [ 1280, 900 ].freeze
   ROOMY   = [ 1024, 1290 ].freeze  # iPad Pro upright — everything fits

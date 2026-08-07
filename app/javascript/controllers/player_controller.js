@@ -163,7 +163,12 @@ export default class extends Controller {
       this.element.addEventListener(evt, (e) => {
         this._markTouched(e)
         this._queueAnsweredSync()
-        if (e.type === "click") requestAnimationFrame(() => this._fitCard())
+        // `input` as well as `click`: a freeform answer grows its textarea as
+        // it is typed, which changes what the card can afford, and a click was
+        // never going to arrive to tell us about it.
+        if (e.type === "click" || e.type === "input") {
+          requestAnimationFrame(() => this._fitCard())
+        }
       }, { capture: true, passive: true })
     }
   }
@@ -259,59 +264,82 @@ export default class extends Controller {
     footer.classList.toggle("is-tight", tight)
   }
 
-  // ── Running out of room: shed the pictures, never the controls ───────────
+  // ── What the card can afford ────────────────────────────────────────────
   //
-  // A respondent can answer a question with no artwork on it. They cannot
-  // answer one whose options are off the bottom of the screen. So when the
-  // answer area overflows, the imagery goes — first the option tiles, then
-  // the card's hero image — and the widget and the footer are never touched.
+  // This used to render everything and then strip until it stopped hurting.
+  // That reads fine and behaves badly: a degradation path has no bottom, so
+  // whatever is cheapest to shave keeps getting shaved — which is how the
+  // option labels ended up at 11px. So it runs the other way now. Start from
+  // what the card cannot do without — the question, the answer widget, the
+  // footer — and BUY BACK the imagery, in priority order, only while the card
+  // can pay for it.
   //
-  // Measured, one rung at a time, because the alternative is guessing: how
-  // much room an answer needs depends on the option count, the label lengths,
-  // the question's own height and the phone, and no breakpoint knows any of
-  // that. Everything is reset before measuring, so a card that gained room
-  // back (rotation, the keyboard closing) climbs the ladder again rather than
-  // staying stripped for the rest of the deck.
+  // The price of everything is measured in one currency: how much of the
+  // answer ends up off the bottom of the screen. At the floor that number is
+  // whatever the options themselves cost — six options on a short phone are
+  // six options, and no amount of shedding changes it — so the floor's figure
+  // is the DEBT, and an enhancement is affordable when it doesn't add to it.
+  //
+  // Two rungs, bought in this order:
+  //
+  //   1. The option artwork, because a tile is part of the ANSWER — it is how
+  //      one option tells itself apart from the next.
+  //   2. The card's hero image, which is decoration and goes last.
+  //
+  // Both on the same terms: free, or not at all. There is deliberately no
+  // "it's only a bit over" allowance. The old code had one — start shedding
+  // once more than a third of the answer is hidden — and it was the right
+  // shape for a question this no longer asks. As a TRIGGER ("is it bad enough
+  // to act?") a threshold is reasonable. Re-read as a LICENCE ("may I spend
+  // this?") the same number let a sideways phone buy tile artwork that pushed
+  // 29% of the options off screen, when the undecorated list had shown all of
+  // them. A respondent can answer a question with no photograph on it. They
+  // cannot answer one whose options are below the fold.
+  //
+  // Measured rather than guessed, because how much room an answer needs
+  // depends on the option count, the label lengths, the question's own height
+  // and the phone, and no breakpoint knows any of that. Nothing paints
+  // mid-flight: reading scrollHeight forces layout synchronously, so all of
+  // this resolves inside one task and the browser paints once, already
+  // correct. And it starts from the floor every time, so a card that gained
+  // room back (a rotation, the keyboard closing) buys its pictures again
+  // instead of staying stripped for the rest of the deck.
+  //
+  // The widget, the question and the footer are never on the list.
   _fitCard() {
     const card = this.cardTargets[this.currentValue]
     if (!card) return
     const box = card.querySelector(".split-right > .mt-2")
     if (!box) return
+    const grid = box.querySelector(".choice-grid")
 
-    // A little scrolling is not a compromise — most option lists scroll by
-    // design and nobody minds. Shedding only starts when enough of the answer
-    // is hidden that the pictures are costing more than they give: past this
-    // ratio less than two thirds of the options are on screen. A grid showing
-    // two of its three rows stays exactly as it was drawn.
-    const TOLERANCE = 1.5
-    const tooTall = () => box.scrollHeight > box.clientHeight * TOLERANCE
-    const overflows = () => box.scrollHeight > box.clientHeight + 1
+    // A pixel of slack throughout: these are sub-pixel layout figures and an
+    // enhancement that rounds to "costs 0.4px" is free.
+    const over = () => box.scrollHeight - box.clientHeight
+
+    // The floor: the answer, undecorated.
+    card.classList.add("hero-off")
+    grid?.classList.add("art-off")
+    let owed = over()
+
+    // Rung 1 — the option artwork. It can come out CHEAPER than the floor as
+    // well as dearer: dropping tiles turns the grid into full-width rows, and
+    // on a narrow phone that is taller than the two-column grid it replaced.
+    // Hence re-reading the debt rather than assuming it only ever grows.
+    if (grid) {
+      grid.classList.remove("art-off")
+      if (over() > owed + 1) grid.classList.add("art-off")
+      else owed = over()
+    }
+
+    // Rung 2 — the hero, against whatever rung 1 settled on.
+    card.classList.remove("hero-off")
+    if (over() > owed + 1) card.classList.add("hero-off")
+
     // The "more below" fade is drawn over the last of the content, so it has
     // to know whether there IS anything below — left unconditional it greys
     // out the final row's label on an answer that fits perfectly well.
-    const settle = () => box.classList.toggle("is-scrollable", overflows())
-
-    card.classList.remove("hero-off")
-    const grid = box.querySelector(".choice-grid")
-    grid?.classList.remove("art-off")
-    if (!tooTall()) return settle()
-
-    // 2. The card image goes first. It is worth 100-340px, it is the only
-    // thing here that is purely decorative, and it buys more room than the
-    // step below does — on a 393px phone it alone is the difference between
-    // four of six options and all six, WITH their artwork. Measured the other
-    // way round first and it was strictly worse: taking the tiles from a
-    // narrow phone turns a two-column grid into a one-column list, which is
-    // taller than what it replaced.
-    card.classList.add("hero-off")
-    if (!overflows()) return settle()
-
-    // 3. The option tiles. Now the grid becomes the option list — a colour
-    // swatch keeps each option's identity and the label gets the width.
-    if (grid) grid.classList.add("art-off")
-
-    // 4. Whatever is still too tall scrolls, which is what the fade is for.
-    settle()
+    box.classList.toggle("is-scrollable", over() > 1)
   }
 
   _watchFooterFit() {
@@ -1057,7 +1085,7 @@ export default class extends Controller {
     list.innerHTML = ""
     if (regions.length === 0) {
       const empty = document.createElement("div")
-      empty.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);text-align:center;padding:10px;"
+      empty.className = "play-panel-empty"
       empty.textContent = t("player.region_empty")
       list.appendChild(empty)
       return
@@ -1068,13 +1096,13 @@ export default class extends Controller {
       row.className = "region-row"
       row.dataset.country = region.country
       const name = document.createElement("span")
-      name.style.cssText = "flex:1;text-align:start;font-family:'ABeeZee',sans-serif;font-size:13px;color:#fff;"
+      name.className = "play-region-name"
       name.textContent = region.label ? `${region.country_name} · ${region.label}` : region.country_name
       const count = document.createElement("span")
-      count.style.cssText = "font-family:'Alata',sans-serif;font-size:12px;color:#01EACB;"
+      count.className = "play-region-count"
       count.textContent = t("player.region_answered", { count: region.responders })
       const arrow = document.createElement("span")
-      arrow.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);"
+      arrow.className = "play-region-arrow"
       arrow.textContent = t("player.region_compare")
       row.append(name, count, arrow)
       row.addEventListener("click", () => this._showRegionDetail(region))
@@ -1274,12 +1302,12 @@ export default class extends Controller {
     wrap.style.cssText = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;"
 
     const prompt = document.createElement("div")
-    prompt.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:13px;color:#fff;line-height:1.45;margin-bottom:10px;"
+    prompt.className = "play-compare-prompt"
     prompt.textContent = row.prompt || `Question ${row.index + 1}`
     wrap.appendChild(prompt)
 
     const yourPill = document.createElement("div")
-    yourPill.style.cssText = "display:inline-block;padding:4px 10px;border-radius:100px;background:var(--brand-primary-soft,rgba(1,234,203,0.15));color:var(--brand-primary,#01EACB);font-family:'ABeeZee',sans-serif;font-size:11px;margin-bottom:10px;"
+    yourPill.className = "play-compare-mine"
     yourPill.textContent = `Your answer: ${this._formatMine(mine, row)}`
     wrap.appendChild(yourPill)
 
@@ -1317,7 +1345,7 @@ export default class extends Controller {
       for (let i = 1; i <= max; i++) entries.push([`${i} ★`, counts[i] || counts[String(i)] || 0, i])
     } else if (row.type === "open_ended") {
       const note = document.createElement("div")
-      note.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;"
+      note.className = "play-compare-note"
       note.textContent = `${row.total || 0} open-ended response${row.total === 1 ? "" : "s"} total`
       container.appendChild(note)
       return container
@@ -1395,17 +1423,17 @@ export default class extends Controller {
     head.style.cssText = "display:flex;align-items:baseline;gap:8px;"
 
     const lbl = document.createElement("span")
-    lbl.style.cssText = `flex:1;min-width:0;font-family:'ABeeZee',sans-serif;font-size:12px;line-height:1.35;color:${isMine ? "var(--brand-primary,#01EACB)" : "rgba(255,255,255,0.82)"};`
+    lbl.className = `play-bar-label${isMine ? " is-mine" : ""}`
     lbl.textContent = (isMine ? "● " : "") + label
     head.appendChild(lbl)
 
     const pctEl = document.createElement("span")
-    pctEl.style.cssText = "flex-shrink:0;font-family:'Alata',sans-serif;font-size:14px;color:#fff;"
+    pctEl.className = "play-bar-pct"
     pctEl.textContent = `${pct}%`
     head.appendChild(pctEl)
 
     const countEl = document.createElement("span")
-    countEl.style.cssText = "flex-shrink:0;min-width:22px;text-align:right;font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);"
+    countEl.className = "play-bar-count"
     countEl.textContent = count
     head.appendChild(countEl)
     row.appendChild(head)
@@ -1811,7 +1839,7 @@ export default class extends Controller {
     })
     if ((data.per_question || []).length) {
       const head = document.createElement("div")
-      head.style.cssText = "font-family:'Alata',sans-serif;font-size:13px;color:#fff;margin:8px 0 -4px;"
+      head.className = "play-compare-head"
       head.textContent = t("player.quiz_per_question")
       list.appendChild(head)
       data.per_question.forEach(q => list.appendChild(this._buildBar(q.prompt || `#${q.index + 1}`, q.correct, q.pct, false)))

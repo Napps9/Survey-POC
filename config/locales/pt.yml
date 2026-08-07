@@ -310,6 +310,8 @@ pt:
         count_exact: "Use exatamente %{exact} pontos (agora %{n})."
         option_ok: "Os rótulos das respostas são curtos e legíveis (≤ %{max} caracteres)."
         option_long: "Encurte “%{opt}” para %{max} caracteres ou menos."
+        phone_hero: "%{n} blocos — num telemóvel a imagem do cartão desaparece para caberem. Menos de 7 mantém ambos."
+        phone_scroll: "%{n} blocos — demasiados para um telemóvel: as opções deslizam e a imagem desaparece. Aponte para 6 ou menos."
         page_empty: "Adicione pelo menos uma página à história."
         page_ok: "%{n} páginas — dentro do ideal %{min}–%{max}."
         page_many: "%{n} páginas — reduza para %{max} ou menos para a história não se alongar."

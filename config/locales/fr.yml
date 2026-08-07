@@ -310,6 +310,8 @@ fr:
         count_exact: "Utilisez exactement %{exact} points (actuellement %{n})."
         option_ok: "Les libellés de réponse sont courts et lisibles (≤ %{max} caractères)."
         option_long: "Raccourcissez « %{opt} » à %{max} caractères ou moins."
+        phone_hero: "%{n} tuiles — sur mobile, l'image de la carte disparaît pour leur faire place. Moins de 7 garde les deux."
+        phone_scroll: "%{n} tuiles — trop pour un mobile : les options défilent et l'image disparaît. Visez 6 ou moins."
         page_empty: "Ajoutez au moins une page à l'histoire."
         page_ok: "%{n} pages — dans l'idéal %{min}–%{max}."
         page_many: "%{n} pages — réduisez à %{max} ou moins pour que l'histoire ne traîne pas."

@@ -310,6 +310,8 @@ de:
         count_exact: "Nutze genau %{exact} Punkte (jetzt %{n})."
         option_ok: "Antwortlabels sind kurz und gut lesbar (≤ %{max} Zeichen)."
         option_long: "Kürze „%{opt}“ auf %{max} Zeichen oder weniger."
+        phone_hero: "%{n} Kacheln — auf dem Handy entfällt das Kartenbild, damit sie passen. Unter 7 bleibt beides."
+        phone_scroll: "%{n} Kacheln — zu viele fürs Handy: Die Optionen scrollen und das Kartenbild entfällt. Ziel: 6 oder weniger."
         page_empty: "Füge der Geschichte mindestens eine Seite hinzu."
         page_ok: "%{n} Seiten — im idealen Bereich %{min}–%{max}."
         page_many: "%{n} Seiten — kürze auf %{max} oder weniger, damit die Geschichte nicht zu lang wird."

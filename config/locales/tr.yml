@@ -310,6 +310,8 @@ tr:
         count_exact: "Tam olarak %{exact} puan kullanın (şu an %{n})."
         option_ok: "Yanıt etiketleri kısa ve okunaklı (≤ %{max} karakter)."
         option_long: "“%{opt}” ifadesini %{max} karaktere veya altına indirin."
+        phone_hero: "%{n} kutucuk — telefonda sığdırmak için kart görseli kaldırılır. 7'den azı ikisini de korur."
+        phone_scroll: "%{n} kutucuk — bir telefon için fazla: seçenekler kaydırılır ve kart görseli kalkar. 6 veya altını hedefleyin."
         page_empty: "Hikayeye en az bir sayfa ekle."
         page_ok: "%{n} sayfa — ideal aralık olan %{min}–%{max} içinde."
         page_many: "%{n} sayfa — hikaye uzamasın diye %{max} veya daha aza indir."

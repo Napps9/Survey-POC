@@ -114,6 +114,12 @@ export function analyzeCard(card) {
   const optionCheck = card.demographic ? null : optionLengthCheck(card)
   if (optionCheck) checks.push(optionCheck)
 
+  // Same exemption as the two above: a demographic card's options are a fixed
+  // platform taxonomy, so telling the creator to trim them is advice they
+  // cannot take.
+  const phoneCheck = card.demographic ? null : phoneFitCheck(card)
+  if (phoneCheck) checks.push(phoneCheck)
+
   // Every paged type, not just scenario. A no-op today — analyzeCard returns
   // null for non-questions above and consent_gate is one — but the rule being
   // expressed is "does this card have pages", and writing it as a literal type
@@ -166,6 +172,37 @@ function countCheck(card, rule) {
     return check("count", YELLOW, t(key, { n }))
   }
   return check("count", GREEN, t("editor.rules.count_ok", { n, min, max }))
+}
+
+// Will this image grid work on a phone? COUNT_RULES allows a grid up to ten
+// answers, and a creator building on a desktop sees all ten as tiles — but the
+// phone player has a fixed budget and buys the imagery back only while the
+// answer still fits (player_controller#_fitCard). Past a certain count it
+// can't, and the card the respondent gets is not the card the creator was
+// shown. Better to say so here than to degrade it silently in front of them.
+//
+// The numbers are measured, not guessed: a two-column grid at the 16px option
+// label, walked across a 280px Fold, a 375 SE, a 393 iPhone and a 430 Max.
+// Seven is where the hero image stops fitting on all four; nine is where the
+// options themselves start scrolling even with the hero already gone. Counted
+// the way countCheck counts, so the Other box is one of them.
+//
+// Rated INFO — a tip, not a mark against the card (CARD_PENALTY[INFO] is 0).
+// Ten answers is inside the Rules of the Game and a creator who wants ten on a
+// desktop-first Verto is not doing anything wrong; they just deserve to know
+// what the phone will do with it.
+const PHONE_HERO_LIMIT = 7    // at or above this, a phone drops the card image
+const PHONE_FIT_LIMIT  = 9    // at or above this, the options scroll as well
+
+function phoneFitCheck(card) {
+  if (card.type !== "select_one_grid" && card.type !== "select_many_grid") return null
+  let n = cleanOptions(card).length
+  if (!n) return null
+  if (card.allowOther) n += 1
+
+  if (n >= PHONE_FIT_LIMIT) return check("phone", INFO, t("editor.rules.phone_scroll", { n }))
+  if (n >= PHONE_HERO_LIMIT) return check("phone", INFO, t("editor.rules.phone_hero", { n }))
+  return null
 }
 
 // §2 — answer labels within their per-type budget (see OPTION_LIMITS).
