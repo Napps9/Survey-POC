@@ -64,10 +64,10 @@ class SurveyGenerator
                 description: <<~DESC
                   Required for: multiple_choice, select_many, select_one_grid, select_many_grid,
                   prioritise, tap_card, range, rating, nps. Bounds (per the design rules):
-                  - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 30 chars
+                  - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 40 chars
                   - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any
                     "Other", each label <= 20 chars
-                  - prioritise: 4 or 5 options (4 ideal), each <= 30 chars
+                  - prioritise: 4 or 5 options (4 ideal), each <= 40 chars
                   - tap_card: 5 to 8 statements covering negative, neutral and positive
                     sentiments in that order, each <= 40 chars
                   - range: EXACTLY 5 points — never 3, never 4 — with a genuinely
@@ -116,11 +116,11 @@ class SurveyGenerator
   # paths can't drift apart.
   CARD_RULES = <<~RULES.freeze
     - List types (multiple_choice / select_many): an ODD count — 3 or 5
-      options, never an even count — each <= 30 chars.
+      options, never an even count — each <= 40 chars.
     - Grids (select_one_grid / select_many_grid): EVEN option count, 4 to 10
       total including any "Other", each label <= 20 chars. Tiles sit 2
       across, so an even count keeps the grid balanced (2x2 up to ~3x4).
-    - prioritise: 4 or 5 options (4 ideal), each <= 30 chars. Use when
+    - prioritise: 4 or 5 options (4 ideal), each <= 40 chars. Use when
       the ORDER of preference matters (rank these highest to lowest).
     - tap_card: 5 to 8 statement cards. Together the statements MUST cover
       a NEGATIVE, a NEUTRAL and a POSITIVE sentiment on the question's
@@ -298,7 +298,7 @@ class SurveyGenerator
     (unless the brief explicitly requires the exception):
     [ ] 12 to 15 cards TOTAL (welcome card included); starts with exactly 1 welcome card
     [ ] No more than 2 of the same answer type in a row
-    [ ] Lists ODD 3 or 5 options (each <= 30 chars); grids EVEN and 4-10 (each <= 20 chars);
+    [ ] Lists ODD 3 or 5 options (each <= 40 chars); grids EVEN and 4-10 (each <= 20 chars);
         prioritise 4-5 (4 ideal); tap_card 5-8 statements (neg -> neutral -> pos, each <= 40 chars);
         range EXACTLY 5 points with a genuine neutral middle label; rating 3-5 with one label per
         point; nps EXACTLY 11 numeric labels "0"-"10"
@@ -353,7 +353,7 @@ class SurveyGenerator
       - tap_card 5-8 statements (neg -> neutral -> pos) · grids even count, ≤10
       - lists ODD 3 or 5 options · prioritise 4-5 · nps exactly "0"-"10"
       - question text 50-70 chars target, never exceed 100
-      - option text ≤ 14 chars when using a grid; ≤ 30 chars in a text list
+      - option text ≤ 14 chars when using a grid; ≤ 40 chars in a text list
       - ALWAYS start with exactly one welcome_card that sets the scene
       - span Awareness -> Intention -> Agency where the theme allows (don't
         make an all-Awareness deck), and pair any Agency question with a

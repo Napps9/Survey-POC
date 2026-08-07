@@ -49,19 +49,39 @@ const COUNT_RULES = {
 const PAGE_RULES = { min: 1, max: 5 }
 const PAGE_LENGTH_LIMIT = 400
 
-// §2 — answer label budget per card type. Image lists and Prioritise rows
-// get 30, grid tiles and scale labels stay at a scannable 20, and Tap
-// statements read as full mini-statements so they get 40.
+// §2 — answer label budget per card type, and the numbers are the width the
+// label actually gets rather than a house style. Measured at 16px by laying
+// real text out in the real font, on the phones that matter:
 //
-// The grid figure is no longer only advice. survey_editor imports GRID_LABEL_MAX
-// below and stops a tile label being typed past it, because the phone player
-// draws the tile at a fixed proportion with one line of label under it, and 20
-// characters is what that holds: measured at 16px, a 393px phone gives a grid
-// column ~172px wide and ~8.6px a character, and a 280px Fold gives ~14
-// characters a line. Advising a number and not enforcing it is how a creator
-// ends up shown one card on a desktop and a respondent shown another.
+//                 grid tile     list row
+//   Fold 280        15 chars     19 chars
+//   iPhone SE 375   21           30
+//   iPhone 15 393   22           32
+//   iPhone Max 430  24           35
+//   iPad mini 768   26           66
+//
+// A LIST row spans the answer panel; a GRID tile gets a column of it, so the
+// list gets roughly half as much again and the two limits are properly
+// different. Lists 40, grids 20, scale captions 20 (they sit side by side
+// across the panel), Tap statements 40 (they read as mini-statements).
+//
+// The grid figure is the only one that is not merely advice. survey_editor
+// imports GRID_LABEL_MAX below and stops a tile label being typed past it,
+// because the phone player draws the tile at a fixed proportion with one line
+// of label under it and 20 characters is what that line holds — past it the
+// label wraps, the row grows, and the tile stops matching its neighbours.
+// Advising a number and not enforcing it is how a creator ends up shown one
+// card on a desktop and a respondent shown another.
+//
+// A list label is not load-bearing in the same way: the row simply gets
+// taller, and the square tile beside it does not depend on the label at all.
+// So 40 is shown and scored, never enforced.
+//
+// Keep in step with app/services/survey_generator.rb, which states these same
+// budgets in prose for the model — pinned by
+// test/services/survey_generator_rules_test.rb.
 const OPTION_LIMITS = {
-  multiple_choice: 30, select_many: 30, prioritise: 30,
+  multiple_choice: 40, select_many: 40, prioritise: 40,
   select_one_grid: 20, select_many_grid: 20,
   range: 20, rating: 20, nps: 20,
   tap_card: 40, scenario: 40
@@ -72,6 +92,17 @@ const OPTION_LIMITS = {
 // test/lib/phone_fit_rule_test.rb so a change to one has to be a change to both.
 export const GRID_LABEL_TYPES = [ "select_one_grid", "select_many_grid" ]
 export const GRID_LABEL_MAX = OPTION_LIMITS.select_one_grid
+
+// Which types show the creator a live character count while they type. The
+// grids, where the count is a hard stop, plus the three list types, where it
+// is a nudge. Not every type with a budget: a scale caption or a Tap statement
+// has one too, and nobody has asked to be counted while writing those.
+export const COUNTED_LABEL_TYPES = [
+  ...GRID_LABEL_TYPES, "multiple_choice", "select_many", "prioritise"
+]
+
+// The budget for a type, or null where there isn't one (yes_no's fixed pair).
+export const optionLabelLimit = (type) => OPTION_LIMITS[type] ?? null
 
 // §2 — TEXT_MIN is the target floor shown in copy only; short is never flagged.
 const TEXT_MIN = 50, TEXT_MAX = 70, TEXT_HARD_MAX = 100

@@ -34,8 +34,8 @@ class SingleQuestionGenerator
             Required for: multiple_choice, select_many, select_one_grid,
             select_many_grid, prioritise, tap_card, range, rating, nps.
             Bounds (per the design rules): list types ODD 3 or 5 options
-            (each <= 30 chars); grids EVEN and 4-10 including any "Other"
-            (each <= 20 chars); prioritise 4-5 (4 ideal, each <= 30 chars);
+            (each <= 40 chars); grids EVEN and 4-10 including any "Other"
+            (each <= 20 chars); prioritise 4-5 (4 ideal, each <= 40 chars);
             tap_card 5-8 statements (neg -> neutral -> pos, each <= 40
             chars); range EXACTLY 5 points with a neutral middle; rating 3-5 with
             one label per point; nps EXACTLY 11 numeric labels "0"-"10".

@@ -65,6 +65,21 @@ class PhoneFitRuleTest < ActiveSupport::TestCase
                  "16px, a 393px phone gives the grid column ~172px and ~8.6px a character."
   end
 
+  # A list row spans the answer panel where a tile gets a column of it, so it
+  # holds about half as much again — measured at 16px: 32 characters a line on
+  # a 393px phone against a tile's 22, and 19 against 15 on a 280px Fold. The
+  # two limits are meant to differ, so both are pinned; a well-meaning tidy-up
+  # that made them match would be a silent halving of what a list may say.
+  test "list labels carry the wider budget" do
+    limits = source[/const OPTION_LIMITS\s*=\s*\{(.*?)\}/m, 1]
+    lists  = %w[multiple_choice select_many prioritise].to_h do |type|
+      [ type, limits[/#{type}:\s*(\d+)/, 1].to_i ]
+    end
+
+    assert_equal({ "multiple_choice" => 40, "select_many" => 40, "prioritise" => 40 }, lists,
+                 "the list types share one budget and it is 40, wider than the grids' 20")
+  end
+
   test "the check counts the Other box, the way the count rule does" do
     body = source[/function phoneFitCheck\(card\)\s*\{(.*?)\n\}/m, 1]
 

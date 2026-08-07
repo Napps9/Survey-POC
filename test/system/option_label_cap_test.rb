@@ -16,7 +16,8 @@ require "application_system_test_case"
 # to shorten past it. This is the editor no longer advising something it
 # declines to enforce.
 class OptionLabelCapTest < ApplicationSystemTestCase
-  CAP = 20
+  CAP = 20         # grid tiles — enforced
+  LIST_LIMIT = 40  # list rows — counted only
 
   CARDS = [
     { "type" => "welcome_card", "title" => "Hello" },
@@ -146,18 +147,60 @@ class OptionLabelCapTest < ApplicationSystemTestCase
                     "label has to keep working or it can never be brought under the limit"
   end
 
-  # ── Scope ────────────────────────────────────────────────────────────────
+  # ── Lists: counted, never capped ─────────────────────────────────────────
+  #
+  # The asymmetry is the design, not an oversight. A grid tile's label sits in
+  # a column under a fixed-proportion tile, so past 20 it wraps, the row grows,
+  # and the tile stops matching its neighbours — the cap is load-bearing. A
+  # list row spans the whole answer panel and the square tile beside it does
+  # not depend on the label at all, so a long one just makes the row taller.
+  # Nothing breaks, so nothing is refused: the count is a nudge toward the
+  # Rules of the Game budget, measured at ~32 characters a line on an iPhone 15
+  # against a grid tile's ~22.
+
+  def list_row(type = "multiple_choice")
+    page.all("[data-card-type='#{type}'] .pick-text[contenteditable]", minimum: 1).first
+  end
 
   test "a list row is not capped — it has the width for a longer label" do
     open_editor
-
-    row = page.all("[data-card-type='multiple_choice'] .pick-text[contenteditable]", minimum: 1).first
+    row = list_row
     focus_and_clear(row)
-    row.send_keys("ABCDEFGHIJKLMNOPQRSTUVWXY")
+    row.send_keys("A" * (LIST_LIMIT + 12))
 
-    assert_operator row.text.length, :>, CAP,
-                    "the hard cap is for grid TILES; a list row spans the panel (~39 " \
-                    "characters at 16px) and keeps its advisory-only 30"
+    assert_operator row.text.length, :>, LIST_LIMIT,
+                    "a list label must be able to pass #{LIST_LIMIT}; the hard cap is for " \
+                    "grid TILES, where the width genuinely runs out"
+  end
+
+  test "a list row is counted, against its own higher limit" do
+    open_editor
+    row = list_row
+    focus_and_clear(row)
+    row.send_keys("Watching the recording")   # 22 — over a tile's cap, inside a list's
+
+    c = counter
+    assert c, "no counter appeared while a list label had focus"
+    assert_match(/22\/#{LIST_LIMIT}/, c.text,
+                 "a list label should be counted against #{LIST_LIMIT}, not the grid's #{CAP}")
+    assert page.has_no_css?(".option-limit-counter.is-full", wait: 1),
+           "22 characters is well inside a list's budget — nothing should read as full"
+  end
+
+  # Two hot states that mean different things, and they must not look alike:
+  # a grid at its cap is a wall, a list past its budget is a line crossed.
+  test "a list past its budget warns rather than stopping" do
+    open_editor
+    row = list_row
+    focus_and_clear(row)
+    row.send_keys("B" * (LIST_LIMIT + 3))
+
+    assert_equal LIST_LIMIT + 3, row.text.length, "the keystrokes past #{LIST_LIMIT} were refused"
+    assert page.has_css?(".option-limit-counter.is-over", wait: 2),
+           "past its budget a list counter should show .is-over"
+    assert page.has_no_css?(".option-limit-counter.is-full", wait: 1),
+           ".is-full means the next keystroke does nothing, which is not true here — " \
+           "a creator who learns pink means stop on a grid must not meet it on a list"
   end
 
   # ── The counter ──────────────────────────────────────────────────────────

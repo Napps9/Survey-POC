@@ -2370,6 +2370,7 @@
 .option-limit-counter {
   margin: 4px auto 0;
   width: fit-content;
+  flex: 0 0 auto;
   font-family: "Alata", sans-serif;
   font-size: 11px;
   color: rgba(0,0,0,0.5);
@@ -2379,7 +2380,46 @@
   user-select: none;
   pointer-events: none;   /* never steals the click that would edit the label */
 }
-.option-limit-counter.is-full { color: #FF1E6F; font-weight: 600; }
+/* Two hot states, because there are two kinds of limit here and they must not
+   look alike. A grid tile's 20 is a wall — the next keystroke does nothing —
+   and a list row's 40 is a line already crossed, with typing still allowed. A
+   creator who learns that pink means "stop" on a grid should not meet the same
+   pink on a list and find it doesn't.
+
+   The count itself carries the distinction first: "20/20" cannot exceed its
+   limit and "43/40" plainly has, so the meaning survives with the colour
+   ignored entirely. Hue only reinforces it.
+
+   Amber rather than the Rules of the Game panel's own #FFFA77: that yellow is
+   drawn for the dark analysis panel and would be unreadable on this near-white
+   pill. This is the same signal at a weight that works on a light surface. */
+.option-limit-counter.is-full {
+  color: #FF1E6F; font-weight: 600;
+  background: rgba(255,30,111,0.10);
+}
+.option-limit-counter.is-over {
+  color: #8A6600; font-weight: 600;
+  background: rgba(255,204,0,0.18);
+}
+/* A grid tile stacks its label under its artwork, so the counter can sit in
+   normal flow beneath it. A LIST row is a flex line — tile, label, tick — and
+   a counter dropped into it becomes a fourth flex item that takes its width
+   out of the label, squeezing a 40-character option into a narrow column
+   exactly when the creator is trying to read it. Out of flow on those rows.
+   The row is the positioning context; .pick-item and .choice-list-item get
+   `position: relative` alongside, since neither had a reason to be positioned
+   before this. */
+.pick-item, .choice-list-item { position: relative; }
+.pick-item > .option-limit-counter,
+.choice-list-item > .option-limit-counter {
+  position: absolute;
+  /* Just under the row rather than inside it: the row's right-hand end is
+     already the tick, the 🎨 and the delete ×, and a counter tucked in among
+     them reads as another control. */
+  top: 100%; right: 10px;
+  margin: 2px 0 0;
+  z-index: 2;
+}
 /* The keystroke that was refused. Without this the cap is silent — the letter
    simply doesn't appear, which reads as a broken keyboard rather than a limit. */
 .option-limit-counter.is-rejected { animation: option-limit-nudge 0.22s ease; }

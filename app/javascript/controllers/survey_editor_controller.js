@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
-import { analyzeCard, analyzeVerto, typeLabel, GRID_LABEL_MAX, GRID_LABEL_TYPES } from "lib/verto_rules"
+import { analyzeCard, analyzeVerto, typeLabel, GRID_LABEL_MAX, GRID_LABEL_TYPES,
+         COUNTED_LABEL_TYPES, optionLabelLimit } from "lib/verto_rules"
 import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_types"
 import { isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
@@ -17,6 +18,22 @@ const CHOICE_TYPES = [ "multiple_choice", "select_many", "yes_no", "select_one_g
 // Flow colours — mirrors Survey::FLOW_COLORS (and the flow map's LANE_PALETTE)
 // so a flow minted client-side gets the same palette the server would assign.
 const FLOW_COLORS = [ "#8B85FF", "#01EACB", "#F59E0B", "#F472B6", "#38BDF8", "#A3E635" ]
+
+// Where a card type keeps its option labels. The single definition of "an
+// option label" on this side: _optionEls reads it to serialize a card, and the
+// character counter reads it to know what it is counting. It used to be an
+// object literal inside _optionEls, which was fine while serializing was the
+// only caller — a second caller is exactly when a private literal becomes a
+// second opinion waiting to drift.
+const OPTION_LABEL_SELECTORS = {
+  multiple_choice: ".pick-text", select_many: ".pick-text", yes_no: ".pick-text",
+  prioritise: ".choice-list-label",
+  select_one_grid: ".choice-label", select_many_grid: ".choice-label",
+  range: ".slider-label-text", nps: ".slider-label-text",
+  rating: ".rating-label",
+  tap_card: ".rotate-card span[contenteditable]",
+  scenario: ".pick-text"
+}
 
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
@@ -105,13 +122,18 @@ export default class extends Controller {
   // creators to shorten past it. This makes the editor stop advising something
   // it doesn't enforce, and imports the figure rather than copying it.
   //
-  // Delegated from the editor root rather than hooked per row, because
-  // .choice-label is emitted from two places that have to mirror each other —
+  // Delegated from the editor root rather than hooked per row, because these
+  // labels are emitted from two places that have to mirror each other —
   // shared/_card_component.html.erb and lib/choice_templates.js — and that
   // file's own header records what happens when they drift.
   //
-  // Grids only. A list row has the full panel width (~39 characters at 16px)
-  // and keeps its advisory-only 30.
+  // A LIST row is counted but not capped, and the asymmetry is the point
+  // rather than an inconsistency: a list row spans the answer panel, so a long
+  // label just makes the row taller and the square tile beside it does not
+  // depend on the label at all. Nothing breaks, so nothing is refused — the
+  // count is a nudge toward the Rules of the Game budget (40 for lists,
+  // measured: an iPhone 15 list row fits ~32 characters a line against a grid
+  // tile's ~22).
   _bindGridLabelCap() {
     // Capture, so a rich-text or picker handler can't swallow it first.
     this.element.addEventListener("beforeinput", (e) => this._capGridLabel(e), { capture: true })
@@ -119,19 +141,38 @@ export default class extends Controller {
     this.element.addEventListener("focusout", () => this._hideLabelCount())
     // Typing fires beforeinput then input; the counter reads the settled value.
     this.element.addEventListener("input", (e) => {
-      const label = this._gridLabelOf(e.target)
+      const label = this._optionLabelOf(e.target)
       if (!label) return
-      this._trimGridLabel(label)
+      if (this._isCapped(label)) this._trimGridLabel(label)
       this._renderLabelCount(label)
     })
   }
 
-  // The .choice-label being edited, if the event is inside one on a grid card.
-  _gridLabelOf(node) {
-    const label = node?.closest?.(".choice-label")
-    if (!label || !label.isContentEditable) return null
-    const card = label.closest("[data-survey-editor-target='card']")
-    return GRID_LABEL_TYPES.includes(card?.dataset.cardType) ? label : null
+  // The option label being edited, if the event is inside one on a card type
+  // that gets a counter. Resolves through OPTION_LABEL_SELECTORS rather than a
+  // hardcoded class, so a grid tile and a list row are found the same way.
+  _optionLabelOf(node) {
+    const card = node?.closest?.("[data-survey-editor-target='card']")
+    const type = card?.dataset.cardType
+    if (!COUNTED_LABEL_TYPES.includes(type)) return null
+    const sel = OPTION_LABEL_SELECTORS[type]
+    const label = sel ? node.closest(sel) : null
+    return label?.isContentEditable ? label : null
+  }
+
+  // Whether this label's limit is a wall or a line on the floor. Only the
+  // grids refuse the keystroke; see _bindGridLabelCap for why.
+  _isCapped(label) {
+    const type = label.closest("[data-survey-editor-target='card']")?.dataset.cardType
+    return GRID_LABEL_TYPES.includes(type)
+  }
+
+  // The budget for the label being edited — 20 on a grid tile, 40 on a list
+  // row — read from OPTION_LIMITS so the counter and the Rules of the Game
+  // panel can never quote different numbers at the same label.
+  _limitFor(label) {
+    const type = label.closest("[data-survey-editor-target='card']")?.dataset.cardType
+    return optionLabelLimit(type)
   }
 
   // Refuse anything that would make the label longer once it is at the cap.
@@ -154,8 +195,8 @@ export default class extends Controller {
   // ordinary keystroke at the cap is simply refused, with no character ever
   // painted and taken away again.
   _capGridLabel(event) {
-    const label = this._gridLabelOf(event.target)
-    if (!label) return
+    const label = this._optionLabelOf(event.target)
+    if (!label || !this._isCapped(label)) return
     if (!event.inputType?.startsWith("insert")) return
 
     const incoming = event.data?.length ??
@@ -234,14 +275,20 @@ export default class extends Controller {
 
   // ── The counter ──────────────────────────────────────────────────────────
   // Same shape as the free-text counter respondents already get
-  // (freeform_controller): "n/max characters", and an .over class past the cap.
-  // One node that follows the focus rather than one per option, which on a
-  // ten-tile grid would be ten pieces of chrome for one that is being used.
+  // (freeform_controller): "n/max characters", going hot when the limit is
+  // reached. One node that follows the focus rather than one per option, which
+  // on a ten-tile grid would be ten pieces of chrome for one that is in use.
+  //
+  // Two hot states, because there are two kinds of limit and they must not
+  // look alike: .is-full is a wall (a grid tile at 20 — the next keystroke
+  // does nothing) and .is-over is a line already crossed (a list row past 40 —
+  // still typable). A creator who learns that pink means "stop" on a grid
+  // would otherwise be confused when it doesn't on a list.
   _showLabelCount(event) {
-    const label = this._gridLabelOf(event.target)
+    const label = this._optionLabelOf(event.target)
     if (!label) return
     // Read compliance here, not on input — see _trimGridLabel.
-    this._labelCompliant = label.textContent.length <= GRID_LABEL_MAX
+    this._labelCompliant = label.textContent.length <= this._limitFor(label)
     this._labelCounter ||= Object.assign(document.createElement("div"),
                                          { className: "option-limit-counter" })
     label.after(this._labelCounter)
@@ -256,11 +303,18 @@ export default class extends Controller {
     const el = this._labelCounter
     if (!el?.isConnected) return
     const target = label || el.previousElementSibling
-    const len = target?.textContent.length ?? 0
-    el.textContent = `${len}/${GRID_LABEL_MAX} ${t("card.characters")}`
-    // >= not >: at the cap the counter should already read as "full", since
-    // that is the moment the next keystroke stops doing anything.
-    el.classList.toggle("is-full", len >= GRID_LABEL_MAX)
+    if (!target) return
+    const limit = this._limitFor(target)
+    if (limit == null) return
+    const len = target.textContent.length
+    el.textContent = `${len}/${limit} ${t("card.characters")}`
+    // A capped label reads as full AT the limit — that is the moment the next
+    // keystroke stops doing anything, so saying so a character early would be
+    // a lie in the other direction. An advisory one only goes hot once the
+    // limit is actually behind it, because reaching 40 on a list is fine.
+    const capped = this._isCapped(target)
+    el.classList.toggle("is-full", capped && len >= limit)
+    el.classList.toggle("is-over", !capped && len > limit)
     // A flash on the keystroke that was refused, so the cap is felt and not
     // just silently ignored.
     if (rejected) {
@@ -502,15 +556,7 @@ export default class extends Controller {
 
   // Option-label elements for a card, by type — the same nodes serialize reads.
   _optionEls(cardEl) {
-    const sel = {
-      multiple_choice: ".pick-text", select_many: ".pick-text", yes_no: ".pick-text",
-      prioritise: ".choice-list-label",
-      select_one_grid: ".choice-label", select_many_grid: ".choice-label",
-      range: ".slider-label-text", nps: ".slider-label-text",
-      rating: ".rating-label",
-      tap_card: ".rotate-card span[contenteditable]",
-      scenario: ".pick-text"
-    }[cardEl.dataset.cardType]
+    const sel = OPTION_LABEL_SELECTORS[cardEl.dataset.cardType]
     return sel ? Array.from(cardEl.querySelectorAll(sel)) : []
   }
 
