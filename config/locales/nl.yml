@@ -179,6 +179,16 @@ nl:
     consent_gate: []
   js:
     ask:
+      answering: "Het antwoord schrijven…"
+      hero_body: "Bij elk cijfer krijg je de Verto, de vraag en hoeveel mensen erachter zitten. Begin met een van deze, of stel je eigen vraag."
+      hero_eyebrow: "Antwoorden met bron"
+      hero_title: "Vraag het de data"
+      jump_to_sources: "Bronnen bekijken"
+      reading: "De resultaten lezen…"
+      searching: "Het corpus doorzoeken…"
+      stat_countries: "Landen"
+      stat_responses: "Antwoorden"
+      stat_vertos: "Verto's"
       consent_aggregates: "Alleen totalen zijn gedeeld — geen enkel individueel antwoord"
       consent_approved: "Verto heeft het beoordeeld en goedgekeurd"
       consent_opted_in: "De maker heeft deze Verto aan Ask Verto aangeboden"
@@ -1458,6 +1468,18 @@ nl:
       portfolio_not_found: "Portfolio niet gevonden."
       funder_only: "Alleen de financier kan dat doen."
   ask:
+    suggest:
+      agreement: "Waarover zijn de bevindingen over %{theme} het eens tussen Verto's?"
+      agreement_label: "Waar ze het eens zijn"
+      countries: "Hoe verschillen de antwoorden per land?"
+      countries_label: "Tussen landen"
+      meta_countries: "%{count} landen"
+      meta_questions: "%{count} vragen"
+      meta_responses: "%{count} antwoorden"
+      meta_vertos: "%{count} Verto's"
+      own_words: "Wat komt het vaakst terug in hun eigen woorden?"
+      own_words_label: "In hun eigen woorden"
+      theme: "Wat zeggen mensen over %{theme}?"
     chat:
       error: "Sorry, dat kon nu niet worden beantwoord."
     opt_in:

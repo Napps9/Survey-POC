@@ -179,6 +179,16 @@ tr:
     consent_gate: []
   js:
     ask:
+      answering: "Yanıt yazılıyor…"
+      hero_body: "Her rakam; Verto'su, sorusu ve arkasındaki kişi sayısıyla birlikte gelir. Bunlardan biriyle başlayın ya da kendi sorunuzu sorun."
+      hero_eyebrow: "Kaynaklı yanıtlar"
+      hero_title: "Verilere sorun"
+      jump_to_sources: "Kaynakları gör"
+      reading: "Sonuçlar okunuyor…"
+      searching: "Veri kümesi aranıyor…"
+      stat_countries: "Ülkeler"
+      stat_responses: "Yanıtlar"
+      stat_vertos: "Verto"
       consent_aggregates: "Yalnızca toplamlar paylaşıldı — hiçbir tekil yanıt paylaşılmadı"
       consent_approved: "Verto inceledi ve onayladı"
       consent_opted_in: "Sahibi bu Verto'yu Ask Verto'ya sundu"
@@ -1458,6 +1468,18 @@ tr:
       shuffle_failed: "Görseller karıştırılamadı — lütfen tekrar deneyin."
       unpublished: "Verto yayından kaldırıldı — düzenleyebileceğiniz bir taslağa döndü."
   ask:
+    suggest:
+      agreement: "%{theme} bulguları Verto'lar arasında nerede örtüşüyor?"
+      agreement_label: "Nerede örtüşüyor"
+      countries: "Yanıtlar ülkeye göre nasıl farklılaşıyor?"
+      countries_label: "Ülkeler arasında"
+      meta_countries: "%{count} ülke"
+      meta_questions: "%{count} soru"
+      meta_responses: "%{count} yanıt"
+      meta_vertos: "%{count} Verto"
+      own_words: "İnsanların kendi sözlerinde en çok ne öne çıkıyor?"
+      own_words_label: "Kendi sözleriyle"
+      theme: "İnsanlar %{theme} hakkında ne diyor?"
     chat:
       error: "Üzgünüz, şu anda yanıtlanamadı."
     opt_in:

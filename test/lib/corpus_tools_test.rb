@@ -160,6 +160,107 @@ class CorpusToolsTest < ActiveSupport::TestCase
     assert_in_delta 1.0, row[:mean_rank]["Money"], 0.01
   end
 
+  # ── Presentation carried on a source ──────────────────────────────────────
+  test "a stamped source carries its question type's accent and icon" do
+    entry = indexed_verto
+    tools = CorpusTools.new
+    tools.call("get_questions", { "ids" => [ entry.corpus_questions.first.id ] })
+
+    source = tools.sources.first
+    assert_equal CardTypes.accent("multiple_choice"), source["accent"]
+    assert_equal CardTypes.icon("multiple_choice"), source["icon"]
+  end
+
+  test "a source carries the Verto's own brand colour, separately from the type accent" do
+    entry = indexed_verto
+    entry.survey.update!(brand_palette: { "primary" => "#FF8800" })
+    tools = CorpusTools.new
+    tools.call("get_questions", { "ids" => [ entry.corpus_questions.first.id ] })
+
+    source = tools.sources.first
+    assert_equal "#FF8800", source["brand"], "the card says WHICH study"
+    assert_equal CardTypes.accent("multiple_choice"), source["accent"], "the chip says WHAT KIND of evidence"
+  end
+
+  # ── Suggestions ───────────────────────────────────────────────────────────
+  # These are shown on the empty screen before anyone has asked anything, so
+  # they are a disclosure of what the corpus holds — theme names and counts.
+  # They have to obey the same gate as every other read here.
+  test "suggestions never name a theme from a Verto that is not citable" do
+    entry = indexed_verto(question: "How worried are you about climate change?")
+    entry.survey.update!(theme: "Secret Programme")
+    entry.corpus_questions.update_all(theme: "Secret Programme")
+    assert(CorpusTools.new.suggestions.any? { |s| s[:label] == "Secret Programme" } ||
+           CorpusTools.new.suggestions.empty?)
+
+    entry.withdraw!
+
+    labels = CorpusTools.new.suggestions.map { |s| s[:label] }
+    assert_not_includes labels, "Secret Programme",
+      "a withdrawn Verto's themes must not survive on the front page"
+  end
+
+  test "an empty corpus offers nothing rather than inventing a starting point" do
+    assert_empty CorpusTools.new.suggestions
+  end
+
+  test "a theme with only one question behind it is not offered" do
+    # One card cannot be compared with anything — the suggestion would open onto
+    # a recital, not a finding.
+    indexed_verto
+    themes = CorpusTools.new.suggestions.map { |s| s[:label] }
+
+    assert_not_includes themes, "Climate Action"
+  end
+
+  test "a well-covered theme is offered, with its accent and a real count" do
+    entry = indexed_verto
+    # A second question on the same theme makes it comparable.
+    entry.corpus_questions.create!(
+      cid: "c_second", position: 1, card_type: "open_ended", theme: "Climate Action",
+      question_text: "What would help you act?", response_count: 120,
+      distribution: { "responses" => 120 }
+    )
+
+    suggestion = CorpusTools.new.suggestions.find { |s| s[:label] == "Climate Action" }
+
+    assert_not_nil suggestion
+    assert_includes suggestion[:question], "climate action"
+    assert_match(/\A#[0-9A-Fa-f]{6}\z/, suggestion[:accent])
+    assert_equal "2 questions", suggestion[:meta]
+  end
+
+  test "open text is offered only when the corpus has some" do
+    entry = indexed_verto
+    assert_empty CorpusTools.new.suggestions.select { |s| s[:icon] == CardTypes.icon("open_ended") }
+
+    entry.corpus_questions.create!(
+      cid: "c_open", position: 1, card_type: "open_ended", theme: "Climate Action",
+      question_text: "What do you dream about?", response_count: 900,
+      distribution: { "responses" => 900 }
+    )
+
+    own_words = CorpusTools.new.suggestions.find { |s| s[:icon] == CardTypes.icon("open_ended") }
+    assert_not_nil own_words
+    assert_equal CardTypes.accent("open_ended"), own_words[:accent]
+  end
+
+  test "suggestions are capped" do
+    entry = indexed_verto
+    10.times do |i|
+      entry.corpus_questions.create!(
+        cid: "c_#{i}", position: i + 1, card_type: "multiple_choice", theme: "Theme #{i % 5}",
+        question_text: "Q#{i}", response_count: 100, distribution: { "A" => 100 }
+      )
+      entry.corpus_questions.create!(
+        cid: "c_b#{i}", position: i + 20, card_type: "multiple_choice", theme: "Theme #{i % 5}",
+        question_text: "Q b#{i}", response_count: 90, distribution: { "A" => 90 }
+      )
+    end
+
+    assert_operator CorpusTools.new.suggestions.size, :<=, CorpusTools::MAX_SUGGESTIONS
+  end
+
   # ── Behaviour under bad input ─────────────────────────────────────────────
   test "an unknown tool name is an error the model can recover from, not a raise" do
     assert_equal({ error: "Unknown tool nonsense." }, CorpusTools.new.call("nonsense", {}))

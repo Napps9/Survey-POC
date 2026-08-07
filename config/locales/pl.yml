@@ -179,6 +179,16 @@ pl:
     consent_gate: []
   js:
     ask:
+      answering: "Pisanie odpowiedzi…"
+      hero_body: "Każda liczba wraca z Verto, pytaniem i liczbą osób, które za nią stoją. Zacznij od jednego z tych pytań lub zadaj własne."
+      hero_eyebrow: "Odpowiedzi ze źródłem"
+      hero_title: "Zapytaj dane"
+      jump_to_sources: "Zobacz źródła"
+      reading: "Odczytywanie wyników…"
+      searching: "Przeszukiwanie korpusu…"
+      stat_countries: "Kraje"
+      stat_responses: "Odpowiedzi"
+      stat_vertos: "Vertos"
       consent_aggregates: "Udostępniono wyłącznie sumy — żadnej pojedynczej odpowiedzi"
       consent_approved: "Verto sprawdziło je i zatwierdziło"
       consent_opted_in: "Twórca udostępnił to Verto do Ask Verto"
@@ -1468,6 +1478,18 @@ pl:
       shuffle_failed: "Nie udało się przetasować obrazów — spróbuj jeszcze raz."
       unpublished: "Publikacja Verto cofnięta — wróciło do wersji roboczej, którą możesz edytować."
   ask:
+    suggest:
+      agreement: "W czym wyniki dotyczące %{theme} zgadzają się między Verto?"
+      agreement_label: "Gdzie się zgadzają"
+      countries: "Czym różnią się odpowiedzi w poszczególnych krajach?"
+      countries_label: "Między krajami"
+      meta_countries: "kraje: %{count}"
+      meta_questions: "pytania: %{count}"
+      meta_responses: "odpowiedzi: %{count}"
+      meta_vertos: "Verto: %{count}"
+      own_words: "Co najczęściej pojawia się w ich własnych słowach?"
+      own_words_label: "Ich własnymi słowami"
+      theme: "Co ludzie mówią o %{theme}?"
     chat:
       error: "Przepraszamy, nie udało się teraz odpowiedzieć."
     opt_in:

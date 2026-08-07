@@ -3,17 +3,43 @@
     Three columns — scope rail, conversation, folder — laid out with the editor's
     own geometry (see .ask-grid in application.css, which mirrors .editor-grid).
     The folder is closed until it's asked for: clicking a citation chip or the
-    Sources CTA slides it in over 0.28s and collapses the rail to circles, which
-    is the same trade the editor makes when you select a card. %>
+    Sources CTA slides it in over 0.28s and collapses the rail to circles, the
+    same trade the editor makes when you select a card.
+
+    Colour carries meaning twice over. A citation takes the accent of the QUESTION
+    TYPE it points at (CardTypes.accent — the families results.html.erb already
+    paints its card rails with), and a source card additionally carries the
+    VERTO's own brand primary on its edge. So you can see both what kind of
+    evidence an answer rests on and which studies it came from, without opening
+    anything. %>
+
+<%
+  # Rail stat tiles and hero tiles share these three accents.
+  stats = [
+    { key: "vertos",    value: @coverage[:vertos],    accent: "#01EACB" },
+    { key: "responses", value: @coverage[:responses], accent: "#615BF5" },
+    { key: "countries", value: @coverage[:countries], accent: "#0CA7FF" }
+  ]
+  # Threads cycle the categorical set the flows editor already uses, so two
+  # conversations are never the same colour side by side.
+  thread_colours = Survey::FLOW_COLORS
+%>
+
 <div class="ask-grid"
      data-controller="ask-verto"
      data-ask-verto-thread-url-value="<%= @thread ? ask_thread_messages_path(@thread) : "" %>"
      data-ask-verto-new-thread-url-value="<%= ask_threads_path %>"
+     <%# The last answer's sources, so a reloaded page can open its folder with
+         everything the live stream had — icon, brand, counts and all. Scraping
+         the chips instead would only recover what a chip carries, which is the
+         accent and nothing else. %>
+     data-ask-verto-sources-value="<%= (@messages.reverse.find(&:assistant?)&.citation_list || []).to_json %>"
      data-ask-verto-target="grid">
 
-  <%# The backdrop the floating panel floats on — the app's own orbs, at the
-      results screen's opacity. %>
-  <div class="gen-orbs results-orbs" aria-hidden="true">
+  <%# The backdrop the floating panel floats on — the app's own orbs, pitched
+      between the results screen's restraint and the generating screen's full
+      brightness. %>
+  <div class="gen-orbs ask-orbs" aria-hidden="true">
     <div class="gen-orb gen-orb-1"></div>
     <div class="gen-orb gen-orb-2"></div>
     <div class="gen-orb gen-orb-3"></div>
@@ -31,25 +57,37 @@
 
     <%# Shown only while the panel is open, in place of everything below. %>
     <div class="ask-rail-mini" aria-hidden="true">
-      <span class="ask-rail-mini-btn is-on"><%= @coverage[:vertos] %></span>
-      <button type="button" class="ask-rail-mini-btn"
+      <% stats.first(2).each do |stat| %>
+        <span class="ask-rail-mini-btn" style="--stat-accent:<%= stat[:accent] %>;"><%= number_to_human(stat[:value], format: "%n%u", units: { thousand: "k", million: "M" }) %></span>
+      <% end %>
+      <button type="button" class="ask-rail-mini-btn" style="--stat-accent:#8B85FF;"
               data-action="click->ask-verto#closePanel"
               title="<%= t("js.ask.close") %>">≡</button>
     </div>
 
     <div class="ask-rail-sec"><%= t("ask.page.scope") %></div>
-    <div class="ask-scope-row"><%= t("ask.page.vertos") %><span class="val"><%= number_with_delimiter(@coverage[:vertos]) %></span></div>
-    <div class="ask-scope-row"><%= t("ask.page.responses") %><span class="val"><%= number_with_delimiter(@coverage[:responses]) %></span></div>
+    <% stats.each do |stat| %>
+      <div class="ask-stat" style="--stat-accent:<%= stat[:accent] %>;">
+        <span class="ask-stat-dot"></span>
+        <span class="ask-stat-num"><%= number_with_delimiter(stat[:value]) %></span>
+        <span class="ask-stat-label"><%= t("js.ask.stat_#{stat[:key]}") %></span>
+      </div>
+    <% end %>
 
     <div class="ask-rail-sec"><%= t("ask.page.threads") %></div>
-    <%= form_with url: ask_threads_path, method: :post, local: true, style: "margin:0;padding:2px 14px 6px;" do %>
-      <button type="submit" class="ask-thread" style="border:none;background:none;cursor:pointer;padding-inline:0;color:#01EACB;">
-        + <%= t("ask.page.new_thread") %>
+    <%= form_with url: ask_threads_path, method: :post, local: true, style: "margin:0;" do %>
+      <button type="submit" class="ask-thread ask-thread-new">
+        <span class="ask-thread-dot" style="background:#01EACB;"></span>
+        <span class="ask-thread-label">+ <%= t("ask.page.new_thread") %></span>
       </button>
     <% end %>
-    <% @threads.each do |thread| %>
-      <%= link_to thread.display_title, ask_path(thread_id: thread.id),
-            class: "ask-thread #{"is-current" if @thread && thread.id == @thread.id}" %>
+    <% @threads.each_with_index do |thread, i| %>
+      <%= link_to ask_path(thread_id: thread.id),
+            class: "ask-thread #{"is-current" if @thread && thread.id == @thread.id}",
+            style: "--thread-accent:#{thread_colours[i % thread_colours.size]};" do %>
+        <span class="ask-thread-dot"></span>
+        <span class="ask-thread-label"><%= thread.display_title %></span>
+      <% end %>
     <% end %>
 
     <div class="ask-rail-foot"><%= t("ask.page.eligible") %></div>
@@ -64,16 +102,57 @@
     </div>
 
     <div class="ask-feed" data-ask-verto-target="feed">
+
+      <%# Floating scope pills. Only rendered when a filter is actually set —
+          an empty pill row would advertise a control that does nothing. %>
+      <% if @thread&.scope.present? %>
+        <div class="ask-scope-pills">
+          <% @thread.scope.each_with_index do |(_key, value), i| %>
+            <span class="ask-scope-pill" style="--pill-accent:<%= thread_colours[i % thread_colours.size] %>;">
+              <span class="ask-scope-pill-dot"></span><%= value %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+
       <div class="ask-conv" data-ask-verto-target="messages">
-        <% if @coverage[:vertos].zero? %>
-          <div class="ask-msg-ai">
-            <span class="ask-ai-mark">✦</span>
-            <div class="ask-ai-body"><%= t("js.ask.empty_corpus") %></div>
-          </div>
-        <% elsif @messages.empty? %>
-          <div class="ask-msg-ai">
-            <span class="ask-ai-mark">✦</span>
-            <div class="ask-ai-body"><%= t("js.ask.greeting") %></div>
+        <% if @messages.empty? %>
+          <%# ── The cold start ──
+              The screen's one designed moment. Suggestions are built from what
+              the corpus actually holds (CorpusTools#suggestions), so a chip
+              never opens onto "I don't have data on that". %>
+          <div class="ask-hero" data-ask-verto-target="hero">
+            <div class="ask-hero-eyebrow gen-shimmer--brand"><%= t("js.ask.hero_eyebrow") %></div>
+            <h1 class="ask-hero-title"><%= @coverage[:vertos].zero? ? t("ask.page.title") : t("js.ask.hero_title") %></h1>
+            <p class="ask-hero-body">
+              <%= @coverage[:vertos].zero? ? t("js.ask.empty_corpus") : t("js.ask.hero_body") %>
+            </p>
+
+            <% if @coverage[:vertos].positive? %>
+              <div class="ask-hero-stats">
+                <% stats.each do |stat| %>
+                  <div class="ask-hero-stat" style="--stat-accent:<%= stat[:accent] %>;">
+                    <span class="ask-hero-stat-num"><%= number_with_delimiter(stat[:value]) %></span>
+                    <span class="ask-hero-stat-label"><%= t("js.ask.stat_#{stat[:key]}") %></span>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="ask-suggests">
+                <% @suggestions.each_with_index do |suggestion, i| %>
+                  <button type="button" class="ask-suggest"
+                          style="--tile-accent:<%= suggestion[:accent] %>;--i:<%= i %>;"
+                          data-question="<%= suggestion[:question] %>"
+                          data-action="click->ask-verto#askSuggestion">
+                    <span class="ask-suggest-icon"><%= suggestion[:icon] %></span>
+                    <span class="ask-suggest-body">
+                      <span class="ask-suggest-q"><%= suggestion[:question] %></span>
+                      <span class="ask-suggest-meta"><%= suggestion[:meta] %></span>
+                    </span>
+                  </button>
+                <% end %>
+              </div>
+            <% end %>
           </div>
         <% else %>
           <%# Replayed from the database, markers resolved server-side so a
@@ -111,6 +190,7 @@
         <button type="button" class="ask-fab ask-fab-sources"
                 data-ask-verto-target="sourcesFab"
                 data-action="click->ask-verto#openSources">
+          <span class="ask-fab-dots" data-ask-verto-target="fabDots"></span>
           <%= t("js.ask.sources") %> <span class="n" data-ask-verto-target="sourceCount">0</span>
         </button>
       </div>

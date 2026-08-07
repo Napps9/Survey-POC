@@ -179,6 +179,16 @@ ar:
     consent_gate: []
   js:
     ask:
+      answering: "جارٍ كتابة الإجابة…"
+      hero_body: "يعود كل رقم ومعه الـ Verto والسؤال وعدد الأشخاص وراءه. ابدأ بأحد هذه الأسئلة، أو اطرح سؤالك."
+      hero_eyebrow: "إجابات موثّقة"
+      hero_title: "اسأل البيانات"
+      jump_to_sources: "عرض المصادر"
+      reading: "جارٍ قراءة النتائج…"
+      searching: "جارٍ البحث في البيانات…"
+      stat_countries: "البلدان"
+      stat_responses: "الإجابات"
+      stat_vertos: "Vertos"
       consent_aggregates: "لم تُشارك سوى المجاميع — ولا أي إجابة فردية"
       consent_approved: "راجعه Verto ووافق عليه"
       consent_opted_in: "عرض منشئ هذا الـ Verto مشاركته مع Ask Verto"
@@ -1473,6 +1483,18 @@ ar:
       shuffle_failed: "تعذّر خلط الصور — يرجى المحاولة مرة أخرى."
       unpublished: "تم إلغاء نشر الـ Verto — عاد مسودة يمكنك تعديلها."
   ask:
+    suggest:
+      agreement: "أين تتفق نتائج %{theme} بين الـ Vertos؟"
+      agreement_label: "حيث تتفق"
+      countries: "كيف تختلف الإجابات حسب البلد؟"
+      countries_label: "عبر البلدان"
+      meta_countries: "%{count} بلدًا"
+      meta_questions: "%{count} سؤالًا"
+      meta_responses: "%{count} إجابة"
+      meta_vertos: "%{count} Vertos"
+      own_words: "ما الذي يتكرر أكثر في كلماتهم الخاصة؟"
+      own_words_label: "بكلماتهم الخاصة"
+      theme: "ماذا يقول الناس عن %{theme}؟"
     chat:
       error: "عذرًا، تعذّر الإجابة على ذلك الآن."
     opt_in:

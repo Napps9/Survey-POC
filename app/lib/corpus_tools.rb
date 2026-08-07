@@ -114,9 +114,84 @@ class CorpusTools
     {
       vertos:    entries.count,
       responses: entries.sum(:response_count),
-      countries: CorpusQuestion.where(corpus_entry_id: entries.select(:id))
-                               .distinct.count(:corpus_entry_id)
+      countries: entries.joins(survey: :responses)
+                        .where.not(responses: { region_country: nil })
+                        .distinct.count("responses.region_country")
     }
+  end
+
+  # Opening questions for the empty screen.
+  #
+  # Derived, never invented. Each one is built from something the corpus actually
+  # holds — a theme with enough questions behind it to answer, the largest
+  # open-text question, a country split that exists. A suggestion that returns
+  # "I don't have data on that" is worse than no suggestion, so nothing is
+  # offered unless the data behind it is already there.
+  #
+  # It also means these are a DISCLOSURE: the chips name themes from the corpus,
+  # so they must be built from `citable` like everything else here. A withdrawn
+  # Verto's themes must not survive on the front page.
+  MAX_SUGGESTIONS = 6
+
+  def suggestions
+    questions = base_questions.to_a
+    return [] if questions.empty?
+
+    out = []
+
+    # The best-covered themes. Two questions minimum, so there is something to
+    # compare rather than one card to recite.
+    questions.group_by { |q| q.theme.presence }.compact
+             .reject { |_theme, group| group.size < 2 }
+             .sort_by { |_theme, group| -group.sum(&:response_count) }
+             .first(3)
+             .each do |theme, group|
+      out << {
+        label:    theme,
+        question: I18n.t("ask.suggest.theme", theme: theme.downcase),
+        accent:   CardTypes.accent(group.max_by(&:response_count).card_type),
+        icon:     CardTypes.icon(group.max_by(&:response_count).card_type),
+        meta:     I18n.t("ask.suggest.meta_questions", count: group.size)
+      }
+    end
+
+    # Open text, if any survived redaction into quotable form.
+    open_text = questions.select(&:open_text?).max_by(&:response_count)
+    if open_text
+      out << {
+        label:    I18n.t("ask.suggest.own_words_label"),
+        question: I18n.t("ask.suggest.own_words"),
+        accent:   CardTypes.accent("open_ended"),
+        icon:     CardTypes.icon("open_ended"),
+        meta:     I18n.t("ask.suggest.meta_responses", count: open_text.response_count)
+      }
+    end
+
+    # A country split, only when there is genuinely more than one.
+    if coverage[:countries] > 1
+      out << {
+        label:    I18n.t("ask.suggest.countries_label"),
+        question: I18n.t("ask.suggest.countries"),
+        accent:   "#0CA7FF",
+        icon:     "🌍",
+        meta:     I18n.t("ask.suggest.meta_countries", count: coverage[:countries])
+      }
+    end
+
+    # Agreement across Vertos, only when a theme actually spans two of them.
+    shared = questions.group_by { |q| q.theme.presence }.compact
+                      .find { |_theme, group| group.map(&:corpus_entry_id).uniq.size > 1 }
+    if shared
+      out << {
+        label:    I18n.t("ask.suggest.agreement_label"),
+        question: I18n.t("ask.suggest.agreement", theme: shared.first.downcase),
+        accent:   "#01EACB",
+        icon:     "⇌",
+        meta:     I18n.t("ask.suggest.meta_vertos", count: shared.last.map(&:corpus_entry_id).uniq.size)
+      }
+    end
+
+    out.first(MAX_SUGGESTIONS)
   end
 
   private
@@ -273,7 +348,18 @@ class CorpusTools
       "organisation"       => entry.organisation.name,
       "responses"          => question.response_count,
       "fielded"            => fielded_window(entry),
-      "theme"              => question.theme
+      "theme"              => question.theme,
+      # Presentation, carried on the source so the live stream and the
+      # server-rendered replay colour a citation identically without either
+      # having to look the type up again.
+      #
+      # `accent` is the question TYPE's hue — what kind of evidence this is.
+      # `brand` is the VERTO's own primary — which study it came from. Both are
+      # on the card; only the accent reaches the inline chip, because a chip is
+      # too small to carry two signals.
+      "accent"             => CardTypes.accent(question.card_type),
+      "icon"               => CardTypes.icon(question.card_type),
+      "brand"              => entry.survey.brand_palette["primary"]
     }
     number
   end

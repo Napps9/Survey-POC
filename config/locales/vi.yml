@@ -179,6 +179,16 @@ vi:
     consent_gate: []
   js:
     ask:
+      answering: "Đang viết câu trả lời…"
+      hero_body: "Mỗi con số đều kèm theo Verto, câu hỏi và số người đứng sau nó. Bắt đầu với một trong số này, hoặc tự đặt câu hỏi."
+      hero_eyebrow: "Câu trả lời có nguồn"
+      hero_title: "Hỏi dữ liệu"
+      jump_to_sources: "Xem nguồn"
+      reading: "Đang đọc kết quả…"
+      searching: "Đang tìm trong kho dữ liệu…"
+      stat_countries: "Quốc gia"
+      stat_responses: "Phản hồi"
+      stat_vertos: "Vertos"
       consent_aggregates: "Chỉ có số liệu tổng hợp được chia sẻ — không có phản hồi cá nhân nào"
       consent_approved: "Verto đã xem xét và phê duyệt"
       consent_opted_in: "Người tạo đã đề nghị Verto này cho Ask Verto"
@@ -1457,6 +1467,18 @@ vi:
       shuffle_failed: "Không xáo trộn được hình ảnh — vui lòng thử lại."
       unpublished: "Đã gỡ xuất bản Verto — nó trở lại thành bản nháp mà bạn có thể chỉnh sửa."
   ask:
+    suggest:
+      agreement: "Các phát hiện về %{theme} đồng thuận ở đâu giữa các Verto?"
+      agreement_label: "Nơi họ đồng thuận"
+      countries: "Câu trả lời khác nhau thế nào giữa các quốc gia?"
+      countries_label: "Giữa các quốc gia"
+      meta_countries: "%{count} quốc gia"
+      meta_questions: "%{count} câu hỏi"
+      meta_responses: "%{count} phản hồi"
+      meta_vertos: "%{count} Verto"
+      own_words: "Điều gì xuất hiện nhiều nhất trong lời của chính họ?"
+      own_words_label: "Bằng lời của chính họ"
+      theme: "Mọi người nói gì về %{theme}?"
     chat:
       error: "Rất tiếc, hiện chưa thể trả lời câu hỏi này."
     opt_in:

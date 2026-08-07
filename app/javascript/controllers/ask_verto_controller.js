@@ -10,13 +10,21 @@ import { t } from "lib/i18n"
 // do that without an event hop.
 //
 // The panel follows editor_panel_controller exactly — a class on the grid
-// (`is-panel-open`), and CSS does the sliding. Nothing here animates anything.
+// (`is-panel-open`), and CSS does the sliding. Nothing here animates anything;
+// entrance pops and the thinking flourish are all CSS the app already had.
+//
+// COLOUR. Each source arrives from the server carrying `accent` (its question
+// type's hue) and `brand` (its Verto's own primary). The chip takes the accent
+// only — it is too small to carry two signals — and the source card carries
+// both. Neither is computed here; the server is the one place that decides.
+const DEFAULT_ACCENT = "#8B85FF"
+
 export default class extends Controller {
   static targets = [
-    "grid", "feed", "messages", "input", "send", "sourcesFab", "sourceCount",
-    "tab", "tabCount", "pane", "sourceList", "detailTitle", "detailBody", "consentBody"
+    "grid", "feed", "messages", "input", "send", "sourcesFab", "sourceCount", "fabDots",
+    "tab", "tabCount", "pane", "sourceList", "detailTitle", "detailBody", "consentBody", "hero"
   ]
-  static values = { threadUrl: String, newThreadUrl: String }
+  static values = { threadUrl: String, newThreadUrl: String, sources: Array }
 
   // Sources for the CURRENT answer, keyed by their number. Replaced each turn:
   // the rail describes the answer you are reading, not everything ever fetched.
@@ -41,6 +49,13 @@ export default class extends Controller {
     el.style.height = `${Math.min(el.scrollHeight, 96)}px`
   }
 
+  // A suggestion chip is just a pre-filled question — it goes through exactly
+  // the same path as anything typed, so there is no second way to ask.
+  askSuggestion(event) {
+    this.inputTarget.value = event.currentTarget.dataset.question || ""
+    this.send()
+  }
+
   send() {
     const text = this.inputTarget.value.trim()
     if (!text || this._loading) return
@@ -55,6 +70,10 @@ export default class extends Controller {
     this.inputTarget.value = ""
     this.autogrow()
     this.sendTarget.disabled = true
+
+    // The hero is the cold start only — it goes the moment there's a real
+    // conversation to read.
+    if (this.hasHeroTarget) this.heroTarget.remove()
 
     this._appendUser(text)
     const body = this._appendAssistant()
@@ -84,10 +103,15 @@ export default class extends Controller {
   // One JSON object per line. Lines can be split across network chunks, so the
   // tail is held back until a newline arrives.
   async _stream(question, body) {
-    const status = document.createElement("span")
-    status.className = "ask-status"
-    status.textContent = t("ask.thinking")
-    body.appendChild(status)
+    // The answer bubble IS a .summary-card: is-generating switches on the 3px
+    // rainbow sweep and the teal glow, exactly as the results screen's AI card
+    // does, and both drop on the first token rather than on completion.
+    body.classList.add("summary-card", "is-generating")
+    const rainbow = document.createElement("div")
+    rainbow.className = "summary-rainbow"
+    body.appendChild(rainbow)
+
+    const steps = this._appendSteps(body)
 
     try {
       const token = document.querySelector('meta[name="csrf-token"]')?.content
@@ -121,24 +145,32 @@ export default class extends Controller {
           } catch (_) {
             continue
           }
-          this._handle(event, body, status)
+          this._handle(event, body, steps)
         }
       }
     } catch (_) {
-      status.remove()
+      this._settle(body, steps)
       body.appendChild(document.createTextNode(t("ask.error")))
     }
 
-    status.remove()
+    this._settle(body, steps)
     this._loading = false
     this.sendTarget.disabled = false
     this.inputTarget.focus()
   }
 
-  _handle(event, body, status) {
+  // Drop the thinking chrome. Idempotent — called on first token, on error and
+  // at the end, and the last two may both fire.
+  _settle(body, steps) {
+    body.classList.remove("is-generating")
+    body.querySelector(".summary-rainbow")?.remove()
+    steps?.remove()
+  }
+
+  _handle(event, body, steps) {
     switch (event.t) {
       case "status":
-        status.textContent = event.text
+        this._advanceSteps(steps, event.text)
         break
 
       case "source":
@@ -147,17 +179,17 @@ export default class extends Controller {
         break
 
       case "token":
-        status.remove()
+        this._settle(body, steps)
         body.appendChild(document.createTextNode(event.text))
         break
 
       case "cite":
-        status.remove()
+        this._settle(body, steps)
         body.appendChild(this._citeChip(event.n))
         break
 
       case "quote":
-        status.remove()
+        this._settle(body, steps)
         body.appendChild(this._quoteBlock(event))
         break
 
@@ -166,8 +198,12 @@ export default class extends Controller {
         break
 
       case "error":
-        status.remove()
+        this._settle(body, steps)
         body.appendChild(document.createTextNode(event.text))
+        break
+
+      case "done":
+        if (this._sources.size) body.appendChild(this._jumpPill())
         break
     }
     this._scroll()
@@ -199,6 +235,44 @@ export default class extends Controller {
     return body
   }
 
+  // The generating stage's step row: search → read → answer, with the active
+  // dot pulsing. Which step is active is driven by the server's status events.
+  _appendSteps(body) {
+    const row = document.createElement("div")
+    row.className = "ask-steps"
+    for (const key of ["searching", "reading", "answering"]) {
+      const step = document.createElement("span")
+      step.className = "ask-step"
+      step.dataset.step = key
+      step.dataset.state = key === "searching" ? "active" : "idle"
+      const dot = document.createElement("span")
+      dot.className = "ask-step-dot"
+      const label = document.createElement("span")
+      label.textContent = t(`ask.${key}`)
+      step.append(dot, label)
+      row.appendChild(step)
+    }
+    body.appendChild(row)
+    return row
+  }
+
+  // The server's status text names the stage; map it onto the row rather than
+  // printing it, so the same three steps always appear in the same order.
+  _advanceSteps(steps, text) {
+    if (!steps) return
+    const order = ["searching", "reading", "answering"]
+    const lower = (text || "").toLowerCase()
+    let current = lower.includes("read") ? 1 : 0
+    if (lower.includes("answer") || lower.includes("writ")) current = 2
+
+    order.forEach((key, i) => {
+      const el = steps.querySelector(`[data-step="${key}"]`)
+      if (!el) return
+      el.dataset.state = i < current ? "done" : i === current ? "active" : "idle"
+      if (i < current) el.querySelector(".ask-step-dot").textContent = "✓"
+    })
+  }
+
   _citeChip(n) {
     const chip = document.createElement("button")
     chip.type = "button"
@@ -207,7 +281,10 @@ export default class extends Controller {
     chip.dataset.action = "click->ask-verto#openCitation"
     chip.dataset.source = n
     const source = this._sources.get(n)
-    if (source) chip.title = `${source.verto} · ${source.question}`
+    if (source) {
+      chip.style.setProperty("--cite-accent", source.accent || DEFAULT_ACCENT)
+      chip.title = `${source.verto} · ${source.question}`
+    }
     return chip
   }
 
@@ -231,6 +308,33 @@ export default class extends Controller {
     el.className = "ask-warning"
     el.textContent = text
     return el
+  }
+
+  // A floating way back to the sources, carrying one dot per source in its
+  // type's colour — the mix of evidence, readable without opening anything.
+  _jumpPill() {
+    const pill = document.createElement("button")
+    pill.type = "button"
+    pill.className = "ask-jump"
+    pill.dataset.action = "click->ask-verto#openSources"
+    pill.append(this._dotStack("ask-jump-dot"), document.createTextNode(t("ask.jump_to_sources")))
+    return pill
+  }
+
+  _dotStack(className) {
+    const wrap = document.createElement("span")
+    wrap.className = "ask-jump-dots"
+    for (const source of this._orderedSources()) {
+      const dot = document.createElement("span")
+      dot.className = className
+      dot.style.setProperty("--dot", source.accent || DEFAULT_ACCENT)
+      wrap.appendChild(dot)
+    }
+    return wrap
+  }
+
+  _orderedSources() {
+    return [...this._sources.entries()].sort((a, b) => a[0] - b[0]).map(([, s]) => s)
   }
 
   _scroll() {
@@ -295,6 +399,7 @@ export default class extends Controller {
     const count = this._sources.size
     this.sourceCountTarget.textContent = count
     this.tabCountTarget.textContent = count
+    this.fabDotsTarget.replaceChildren(...this._dotStack("ask-fab-dot").childNodes)
 
     this.sourceListTarget.replaceChildren()
     if (count === 0) {
@@ -305,40 +410,53 @@ export default class extends Controller {
       return
     }
 
-    for (const [n, source] of [...this._sources.entries()].sort((a, b) => a[0] - b[0])) {
+    this._orderedSources().forEach((source, i) => {
       const card = document.createElement("button")
       card.type = "button"
       card.className = "ask-src"
-      card.dataset.source = n
+      card.dataset.source = source.n
       card.dataset.action = "click->ask-verto#selectSource"
+      card.style.setProperty("--src-accent", source.accent || DEFAULT_ACCENT)
+      // The Verto's own brand colour on the leading edge, so two sources from
+      // one study visibly belong together whatever kind of question they are.
+      if (source.brand) card.style.setProperty("--verto-brand", source.brand)
+      card.style.setProperty("--i", i)
 
-      const head = document.createElement("div")
+      const icon = document.createElement("span")
+      icon.className = "ask-src-icon"
+      icon.textContent = source.icon || "◆"
+
+      const main = document.createElement("span")
+      main.className = "ask-src-main"
+
+      const head = document.createElement("span")
       head.className = "ask-src-n"
       const num = document.createElement("span")
-      num.textContent = n
+      num.textContent = source.n
       const who = document.createElement("span")
       who.className = "who"
       who.textContent = `${source.verto} · ${source.organisation}`
       head.append(num, who)
 
-      const question = document.createElement("div")
+      const question = document.createElement("span")
       question.className = "ask-src-q"
       question.textContent = source.question
 
-      const meta = document.createElement("div")
+      const meta = document.createElement("span")
       meta.className = "ask-src-meta"
-      const n_el = document.createElement("span")
-      n_el.textContent = `n ${source.responses.toLocaleString()}`
-      meta.appendChild(n_el)
+      const nEl = document.createElement("span")
+      nEl.textContent = `n ${Number(source.responses || 0).toLocaleString()}`
+      meta.appendChild(nEl)
       if (source.fielded) {
         const when = document.createElement("span")
         when.textContent = source.fielded
         meta.appendChild(when)
       }
 
-      card.append(head, question, meta)
+      main.append(head, question, meta)
+      card.append(icon, main)
       this.sourceListTarget.appendChild(card)
-    }
+    })
   }
 
   _renderDetail(source) {
@@ -347,6 +465,8 @@ export default class extends Controller {
 
     const island = document.createElement("div")
     island.className = "ask-island"
+    island.style.setProperty("--src-accent", source.accent || DEFAULT_ACCENT)
+
     const lab = document.createElement("p")
     lab.className = "ask-lab"
     lab.textContent = source.question
@@ -355,7 +475,7 @@ export default class extends Controller {
     const prov = [
       ["Verto", source.verto],
       ["Org", source.organisation],
-      [t("ask.responses"), source.responses.toLocaleString()],
+      [t("ask.responses"), Number(source.responses || 0).toLocaleString()],
       ["Fielded", source.fielded],
       ["Theme", source.theme]
     ]
@@ -407,19 +527,18 @@ export default class extends Controller {
     this.consentBodyTarget.appendChild(island)
   }
 
-  // A reloaded page renders its answers server-side, so the chips exist but the
-  // source map doesn't. Rebuild it from the last answer's chips so clicking one
-  // still opens something rather than silently doing nothing.
+  // A reloaded page renders its answers server-side, so the chips are on the
+  // page but the source map isn't. It is hydrated from the stored citations the
+  // server serialised into sourcesValue — not scraped from the chips, which
+  // carry only an accent and would leave every restored card showing a fallback
+  // glyph and a count of zero.
   _restoreSourcesFromLastAnswer() {
-    const bodies = this.element.querySelectorAll(".ask-ai-body")
-    const last = bodies[bodies.length - 1]
-    if (!last) return
+    const stored = this.hasSourcesValue ? this.sourcesValue : []
+    if (!stored.length) return
 
-    last.querySelectorAll(".ask-cite").forEach((chip) => {
-      const n = Number(chip.dataset.source)
-      const [verto, question] = (chip.title || " · ").split(" · ")
-      this._sources.set(n, { n, verto, question, organisation: "", responses: 0 })
-    })
+    for (const source of stored) {
+      if (source && source.n != null) this._sources.set(Number(source.n), source)
+    }
     this._renderSources()
   }
 }

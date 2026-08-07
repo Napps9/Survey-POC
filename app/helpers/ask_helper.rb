@@ -40,9 +40,19 @@ module AskHelper
     # was written; this is belt and braces for older rows.
     return "".html_safe if source.nil?
 
+    # The chip is painted in its question type's accent, so a reader can see
+    # what KIND of evidence an answer leans on before opening anything: pink for
+    # someone's own words, gold for a rating, indigo for a choice.
+    #
+    # Read from the stored citation where present, and derived from the card type
+    # otherwise — rows written before accents shipped still colour correctly
+    # rather than falling back to a uniform violet.
+    accent = source["accent"].presence || CardTypes.accent(source["card_type"])
+
     tag.button(number,
                type:  "button",
                class: "ask-cite",
+               style: "--cite-accent:#{accent};",
                title: "#{source["verto"]} · #{source["question"]}",
                data:  { action: "click->ask-verto#openCitation", source: number })
   end

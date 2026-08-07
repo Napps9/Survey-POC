@@ -179,6 +179,16 @@ ko:
     consent_gate: []
   js:
     ask:
+      answering: "답변을 작성하는 중…"
+      hero_body: "모든 수치는 해당 Verto, 질문, 응답자 수와 함께 제공됩니다. 아래에서 하나로 시작하거나 직접 질문해 보세요."
+      hero_eyebrow: "출처가 있는 답변"
+      hero_title: "데이터에 물어보세요"
+      jump_to_sources: "출처 보기"
+      reading: "결과를 읽는 중…"
+      searching: "데이터를 검색하는 중…"
+      stat_countries: "국가 수"
+      stat_responses: "응답 수"
+      stat_vertos: "Verto 수"
       consent_aggregates: "집계 값만 공유되었으며 개별 응답은 포함되지 않습니다"
       consent_approved: "Verto가 검토하고 승인했습니다"
       consent_opted_in: "제작자가 이 Verto를 Ask Verto에 제공했습니다"
@@ -1456,6 +1466,18 @@ ko:
       shuffle_failed: "애셋을 섞을 수 없습니다 — 다시 시도해 주세요."
       unpublished: "Verto 게시를 취소했습니다 — 편집할 수 있는 초안으로 돌아갔습니다."
   ask:
+    suggest:
+      agreement: "%{theme} 결과는 여러 Verto에서 어디가 일치하나요?"
+      agreement_label: "일치하는 지점"
+      countries: "국가에 따라 답변은 어떻게 다른가요?"
+      countries_label: "국가별 비교"
+      meta_countries: "%{count}개국"
+      meta_questions: "질문 %{count}개"
+      meta_responses: "응답 %{count}개"
+      meta_vertos: "Verto %{count}개"
+      own_words: "사람들의 표현에서 가장 많이 나오는 것은 무엇인가요?"
+      own_words_label: "그들의 말로"
+      theme: "%{theme}에 대해 사람들은 어떻게 말하나요?"
     chat:
       error: "죄송합니다. 지금은 답변할 수 없었습니다."
     opt_in:

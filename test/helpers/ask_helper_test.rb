@@ -40,8 +40,9 @@ class AskHelperTest < ActionView::TestCase
 
   def citation(n = 1)
     { "n" => n, "corpus_question_id" => @question.id, "question" => @question.question_text,
-      "verto" => "Valparaíso Youth Pulse", "organisation" => "Anglo American Foundation",
-      "responses" => 2648 }
+      "card_type" => "multiple_choice", "verto" => "Valparaíso Youth Pulse",
+      "organisation" => "Anglo American Foundation", "responses" => 2648,
+      "accent" => CardTypes.accent("multiple_choice") }
   end
 
   test "a citation marker becomes a clickable chip carrying its source" do
@@ -51,6 +52,35 @@ class AskHelperTest < ActionView::TestCase
     assert_includes html, "Valparaíso Youth Pulse · How worried are you about climate change?"
     assert_includes html, "Worry is high"
     assert_not_includes html, "[[c:1]]"
+  end
+
+  # Colour carries meaning here: a chip's hue says what KIND of evidence it
+  # points at, using the same families the results screen paints its card rails
+  # with. A uniform violet would throw that away.
+  test "a chip is painted in its question type's accent" do
+    html = render_ask_answer(answer("Worry is high [[c:1]].",
+                                    citations: [ citation.merge("accent" => "#FFCC00") ]))
+
+    assert_includes html, "--cite-accent:#FFCC00"
+  end
+
+  test "a chip stored before accents shipped still colours from its card type" do
+    stored = citation
+    stored.delete("accent")
+    html = render_ask_answer(answer("Worry is high [[c:1]].", citations: [ stored ]))
+
+    assert_includes html, "--cite-accent:#{CardTypes.accent("multiple_choice")}",
+      "an older row must not fall back to a single flat colour"
+  end
+
+  test "different question types produce visibly different chips" do
+    html = render_ask_answer(answer(
+      "A [[c:1]] and B [[c:2]].",
+      citations: [ citation, citation(2).merge("card_type" => "open_ended", "accent" => nil) ]
+    ))
+
+    assert_includes html, "--cite-accent:#{CardTypes.accent("multiple_choice")}"
+    assert_includes html, "--cite-accent:#{CardTypes.accent("open_ended")}"
   end
 
   test "a marker with no stored source leaves nothing behind" do

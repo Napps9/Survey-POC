@@ -179,6 +179,16 @@ uk:
     consent_gate: []
   js:
     ask:
+      answering: "Пишу відповідь…"
+      hero_body: "Кожна цифра повертається разом із Verto, запитанням і кількістю людей за нею. Почніть з одного з них або поставте своє."
+      hero_eyebrow: "Відповіді з джерелом"
+      hero_title: "Запитайте дані"
+      jump_to_sources: "Показати джерела"
+      reading: "Читаю результати…"
+      searching: "Пошук у корпусі…"
+      stat_countries: "Країни"
+      stat_responses: "Відповіді"
+      stat_vertos: "Vertos"
       consent_aggregates: "Передавалися лише підсумки — жодної окремої відповіді"
       consent_approved: "Verto перевірив і схвалив його"
       consent_opted_in: "Автор запропонував цей Verto для Ask Verto"
@@ -1468,6 +1478,18 @@ uk:
       shuffle_failed: "Не вдалося перемішати зображення — спробуйте ще раз."
       unpublished: "Публікацію Verto скасовано — він знову став чернеткою, яку можна редагувати."
   ask:
+    suggest:
+      agreement: "У чому висновки щодо «%{theme}» збігаються між Vertos?"
+      agreement_label: "Де вони збігаються"
+      countries: "Чим відповіді відрізняються за країнами?"
+      countries_label: "За країнами"
+      meta_countries: "країн: %{count}"
+      meta_questions: "запитань: %{count}"
+      meta_responses: "відповідей: %{count}"
+      meta_vertos: "Vertos: %{count}"
+      own_words: "Що найчастіше звучить у їхніх власних словах?"
+      own_words_label: "Їхніми власними словами"
+      theme: "Що люди кажуть про «%{theme}»?"
     chat:
       error: "Вибачте, зараз не вдалося відповісти."
     opt_in:

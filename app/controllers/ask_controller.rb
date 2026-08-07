@@ -26,6 +26,11 @@ class AskController < ApplicationController
                  @threads.first
     end
     @messages = @thread ? @thread.ask_messages.to_a : []
-    @coverage = CorpusTools.new.coverage
+
+    tools    = CorpusTools.new
+    @coverage = tools.coverage
+    # Only built for the cold start — the hero is the only thing that renders
+    # them, and they cost a pass over the index.
+    @suggestions = @messages.empty? ? tools.suggestions : []
   end
 end

@@ -179,6 +179,16 @@ hi:
     consent_gate: []
   js:
     ask:
+      answering: "उत्तर लिखा जा रहा है…"
+      hero_body: "हर आँकड़ा अपने Verto, प्रश्न और उसके पीछे के लोगों की संख्या के साथ आता है। इनमें से किसी एक से शुरू करें, या अपना प्रश्न पूछें।"
+      hero_eyebrow: "स्रोत सहित उत्तर"
+      hero_title: "डेटा से पूछें"
+      jump_to_sources: "स्रोत देखें"
+      reading: "परिणाम पढ़े जा रहे हैं…"
+      searching: "डेटा संग्रह में खोजा जा रहा है…"
+      stat_countries: "देश"
+      stat_responses: "उत्तर"
+      stat_vertos: "Vertos"
       consent_aggregates: "केवल कुल आँकड़े साझा हुए — कोई व्यक्तिगत उत्तर नहीं"
       consent_approved: "Verto ने इसकी समीक्षा कर स्वीकृति दी"
       consent_opted_in: "निर्माता ने यह Verto Ask Verto को दिया"
@@ -1458,6 +1468,18 @@ hi:
       shuffle_failed: "एसेट शफ़ल नहीं किए जा सके — कृपया फिर से कोशिश करें।"
       unpublished: "Verto अप्रकाशित कर दिया गया — यह वापस एक ड्राफ़्ट बन गया है जिसे आप संपादित कर सकते हैं।"
   ask:
+    suggest:
+      agreement: "%{theme} के निष्कर्ष विभिन्न Vertos में कहाँ सहमत हैं?"
+      agreement_label: "कहाँ सहमति है"
+      countries: "देश के अनुसार उत्तर कैसे भिन्न हैं?"
+      countries_label: "देशों के बीच"
+      meta_countries: "%{count} देश"
+      meta_questions: "%{count} प्रश्न"
+      meta_responses: "%{count} उत्तर"
+      meta_vertos: "%{count} Vertos"
+      own_words: "लोगों के अपने शब्दों में सबसे ज़्यादा क्या सामने आता है?"
+      own_words_label: "उनके अपने शब्दों में"
+      theme: "%{theme} के बारे में लोग क्या कहते हैं?"
     chat:
       error: "क्षमा करें, अभी इसका उत्तर नहीं दिया जा सका।"
     opt_in:

@@ -179,6 +179,16 @@ he:
     consent_gate: []
   js:
     ask:
+      answering: "כותב את התשובה…"
+      hero_body: "כל נתון חוזר עם ה-Verto, השאלה ומספר האנשים שמאחוריו. התחילו באחת מאלה, או שאלו משלכם."
+      hero_eyebrow: "תשובות עם מקור"
+      hero_title: "שאלו את הנתונים"
+      jump_to_sources: "הצג מקורות"
+      reading: "קורא את התוצאות…"
+      searching: "מחפש במאגר…"
+      stat_countries: "מדינות"
+      stat_responses: "תשובות"
+      stat_vertos: "Vertos"
       consent_aggregates: "רק סיכומים שותפו — אף תשובה בודדת לא"
       consent_approved: "Verto בדקה ואישרה אותו"
       consent_opted_in: "היוצר הציע את ה-Verto הזה ל-Ask Verto"
@@ -1465,6 +1475,18 @@ he:
       shuffle_failed: "לא ניתן היה לערבב את הנכסים — נסו שוב."
       unpublished: "פרסום ה-Verto בוטל — הוא חזר להיות טיוטה שאתם יכולים לערוך."
   ask:
+    suggest:
+      agreement: "היכן הממצאים על %{theme} מסכימים בין Vertos?"
+      agreement_label: "היכן יש הסכמה"
+      countries: "כיצד התשובות משתנות בין מדינות?"
+      countries_label: "בין מדינות"
+      meta_countries: "%{count} מדינות"
+      meta_questions: "%{count} שאלות"
+      meta_responses: "%{count} תשובות"
+      meta_vertos: "%{count} Vertos"
+      own_words: "מה עולה הכי הרבה במילים שלהם?"
+      own_words_label: "במילים שלהם"
+      theme: "מה אנשים אומרים על %{theme}?"
     chat:
       error: "מצטערים, לא ניתן היה לענות כרגע."
     opt_in:

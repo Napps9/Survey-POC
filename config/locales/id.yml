@@ -179,6 +179,16 @@ id:
     consent_gate: []
   js:
     ask:
+      answering: "Menulis jawaban…"
+      hero_body: "Setiap angka datang dengan Verto, pertanyaan, dan jumlah orang di baliknya. Mulai dari salah satu ini, atau tanyakan milik Anda."
+      hero_eyebrow: "Jawaban bersumber"
+      hero_title: "Tanya datanya"
+      jump_to_sources: "Lihat sumber"
+      reading: "Membaca hasilnya…"
+      searching: "Mencari di korpus…"
+      stat_countries: "Negara"
+      stat_responses: "Tanggapan"
+      stat_vertos: "Vertos"
       consent_aggregates: "Hanya total yang dibagikan — tidak ada tanggapan individual"
       consent_approved: "Verto meninjau dan menyetujuinya"
       consent_opted_in: "Pembuatnya menawarkan Verto ini ke Ask Verto"
@@ -1457,6 +1467,18 @@ id:
       shuffle_failed: "Tidak dapat mengacak aset — silakan coba lagi."
       unpublished: "Verto batal diterbitkan — kembali menjadi draf yang bisa Anda edit."
   ask:
+    suggest:
+      agreement: "Di mana temuan tentang %{theme} sepakat antar Verto?"
+      agreement_label: "Di mana mereka sepakat"
+      countries: "Bagaimana jawaban berbeda menurut negara?"
+      countries_label: "Antar negara"
+      meta_countries: "%{count} negara"
+      meta_questions: "%{count} pertanyaan"
+      meta_responses: "%{count} tanggapan"
+      meta_vertos: "%{count} Verto"
+      own_words: "Apa yang paling sering muncul dalam kata-kata mereka sendiri?"
+      own_words_label: "Dengan kata-kata mereka sendiri"
+      theme: "Apa kata orang tentang %{theme}?"
     chat:
       error: "Maaf, saat ini belum bisa dijawab."
     opt_in:

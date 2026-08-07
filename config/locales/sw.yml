@@ -179,6 +179,16 @@ sw:
     consent_gate: []
   js:
     ask:
+      answering: "Inaandika jibu…"
+      hero_body: "Kila takwimu hurudi na Verto yake, swali na idadi ya watu waliopo nyuma yake. Anza na mojawapo ya haya, au uliza lako."
+      hero_eyebrow: "Majibu yenye vyanzo"
+      hero_title: "Uliza data"
+      jump_to_sources: "Ona vyanzo"
+      reading: "Inasoma matokeo…"
+      searching: "Inatafuta kwenye data…"
+      stat_countries: "Nchi"
+      stat_responses: "Majibu"
+      stat_vertos: "Vertos"
       consent_aggregates: "Ni jumla tu zilizoshirikiwa — hakuna jibu la mtu binafsi"
       consent_approved: "Verto iliikagua na kuidhinisha"
       consent_opted_in: "Mtayarishaji aliitoa Verto hii kwa Ask Verto"
@@ -1458,6 +1468,18 @@ sw:
       shuffle_failed: "Imeshindikana kuchanganya nyenzo — tafadhali jaribu tena."
       unpublished: "Uchapishaji umeondolewa — Verto imerudi kuwa rasimu unayoweza kuhariri."
   ask:
+    suggest:
+      agreement: "Matokeo ya %{theme} yanakubaliana wapi kati ya Vertos?"
+      agreement_label: "Wanapokubaliana"
+      countries: "Majibu yanatofautianaje kwa nchi?"
+      countries_label: "Kati ya nchi"
+      meta_countries: "nchi %{count}"
+      meta_questions: "maswali %{count}"
+      meta_responses: "majibu %{count}"
+      meta_vertos: "Vertos %{count}"
+      own_words: "Ni nini kinachojitokeza zaidi katika maneno yao wenyewe?"
+      own_words_label: "Kwa maneno yao wenyewe"
+      theme: "Watu wanasema nini kuhusu %{theme}?"
     chat:
       error: "Samahani, sikuweza kujibu hilo kwa sasa."
     opt_in:

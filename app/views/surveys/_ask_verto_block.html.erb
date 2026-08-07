@@ -37,10 +37,13 @@
     <% end %>
 
     <% if state != :off %>
-      <div style="margin-top:13px;padding:11px 12px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:<%= state == :live ? "#01EACB" : (state == :declined ? "#FF6B84" : "#FFC24B") %>;"></span>
-          <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.85);"><%= t("ask.opt_in.state_#{state}") %></span>
+      <%# The state's own colour on the edge and behind the panel, so status is
+          visible at a glance rather than read off a sentence. %>
+      <% state_accent = { live: "#01EACB", declined: "#FF1E6F", pending: "#FFC24B" }[state] %>
+      <div class="ask-optin-status" style="--state-accent:<%= state_accent %>;">
+        <div class="ask-optin-state">
+          <span class="dot"></span>
+          <span><%= t("ask.opt_in.state_#{state}") %></span>
         </div>
         <div style="display:flex;flex-direction:column;gap:7px;">
           <div style="display:flex;gap:9px;font-size: var(--text-xs);color:rgba(255,255,255,0.55);line-height:1.5;">

@@ -179,6 +179,16 @@ ja:
     consent_gate: []
   js:
     ask:
+      answering: "回答を作成中…"
+      hero_body: "すべての数値は、その Verto・設問・回答人数とともに返ります。以下のいずれかから始めるか、ご自由に質問してください。"
+      hero_eyebrow: "出典つきの回答"
+      hero_title: "データに聞く"
+      jump_to_sources: "出典を見る"
+      reading: "結果を読み取り中…"
+      searching: "データを検索中…"
+      stat_countries: "国数"
+      stat_responses: "回答数"
+      stat_vertos: "Verto 数"
       consent_aggregates: "共有されたのは集計値のみで、個々の回答は含まれません"
       consent_approved: "Verto が確認し、承認しました"
       consent_opted_in: "作成者がこの Verto を Ask Verto に提供しました"
@@ -1456,6 +1466,18 @@ ja:
       shuffle_failed: "アセットをシャッフルできませんでした — もう一度お試しください。"
       unpublished: "Verto の公開を取り消しました — 編集できる下書きに戻りました。"
   ask:
+    suggest:
+      agreement: "%{theme}の結果は Verto 間でどこが一致していますか？"
+      agreement_label: "一致している点"
+      countries: "回答は国によってどう違いますか？"
+      countries_label: "国ごとの比較"
+      meta_countries: "%{count} か国"
+      meta_questions: "%{count} 件の設問"
+      meta_responses: "%{count} 件の回答"
+      meta_vertos: "%{count} 件の Verto"
+      own_words: "本人の言葉で最も多く挙がるのは何ですか？"
+      own_words_label: "本人の言葉で"
+      theme: "%{theme}について人々は何と言っていますか？"
     chat:
       error: "申し訳ありません。ただいま回答できませんでした。"
     opt_in:

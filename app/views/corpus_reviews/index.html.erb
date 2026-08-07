@@ -11,6 +11,10 @@
 
 <div style="min-height:100vh;background:#1C2034;">
 
+  <%# The brand ribbon the create menu uses — this is a Verto-side surface, and
+      it should read as part of the product rather than an admin table. %>
+  <div class="ask-ribbon"></div>
+
   <div style="position:relative;overflow:hidden;padding:30px 36px 26px;border-bottom:1px solid rgba(255,255,255,0.06);">
     <div class="gen-orbs" style="opacity:0.22;">
       <div class="gen-orb gen-orb-3"></div>
@@ -26,12 +30,16 @@
         Vertos whose creators have offered them and which are waiting on us.
       </p>
 
-      <div style="display:flex;gap:6px;margin-top:20px;flex-wrap:wrap;">
+      <%# Each tab in its own state colour, so the queue's shape reads before
+          any of it is; the counts are the accent, not grey. %>
+      <% tab_accents = { "pending" => "#FFC24B", "approved" => "#01EACB",
+                         "declined" => "#FF1E6F", "withdrawn" => "#8B85FF" } %>
+      <div style="display:flex;gap:7px;margin-top:20px;flex-wrap:wrap;">
         <% CorpusReviewsController::TABS.each do |tab| %>
           <%= link_to corpus_reviews_path(tab: tab),
-                style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-base);padding:5px 13px;border-radius:100px;text-decoration:none;border:1px solid #{@tab == tab ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)"};background:#{@tab == tab ? "rgba(255,255,255,0.08)" : "transparent"};color:#{@tab == tab ? "#fff" : "rgba(255,255,255,0.4)"};" do %>
-            <%= tab.capitalize %>
-            <span style="color:rgba(255,255,255,0.3);margin-inline-start:5px;font-variant-numeric:tabular-nums;"><%= @counts[tab] %></span>
+                class: "ask-rq-tab #{"is-active" if @tab == tab}",
+                style: "--tab-accent:#{tab_accents[tab]};" do %>
+            <%= tab.capitalize %><span class="n"><%= @counts[tab] %></span>
           <% end %>
         <% end %>
       </div>
@@ -82,12 +90,13 @@
                   <% end %>
                 </td>
                 <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;">
-                  <div style="display:flex;flex-direction:column;gap:4px;">
+                  <%# Pills rather than a paragraph: a failing check should be
+                      findable without reading the row. %>
+                  <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
                     <% checks.each do |check| %>
-                      <% colour = { pass: "#01EACB", warn: "#FFC24B", fail: "#FF6B84" }[check.status] %>
-                      <% mark   = { pass: "✓", warn: "!", fail: "✕" }[check.status] %>
-                      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:<%= check.status == :pass ? "rgba(255,255,255,0.4)" : colour %>;line-height:1.4;">
-                        <span style="color:<%= colour %>;"><%= mark %></span> <%= check.label %>
+                      <% mark = { pass: "✓", warn: "!", fail: "✕" }[check.status] %>
+                      <span class="ask-check ask-check--<%= check.status %>">
+                        <span class="mark"><%= mark %></span><%= check.label %>
                       </span>
                     <% end %>
                   </div>
