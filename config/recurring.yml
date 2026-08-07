@@ -20,3 +20,12 @@ production:
   sweep_report_renders:
     command: "ReportRender.sweepable.find_each(&:destroy)"
     schedule: every day at 4am
+
+  # An approved Verto keeps collecting, so its Ask Verto index goes stale the day
+  # after it is approved. This enqueues one job PER Verto rather than doing the
+  # work here — Solid Queue runs inside Puma on a small instance, and one job
+  # holding every contributed Verto's aggregation at once is exactly the memory
+  # shape the watchdog restarts the process for.
+  refresh_ask_verto_corpus:
+    command: "IndexCorpusEntryJob.refresh_all!"
+    schedule: every day at 3am

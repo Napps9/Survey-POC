@@ -129,11 +129,34 @@ Rails.application.routes.draw do
   get  "surveys/:id/results/summary", to: "survey_summaries#show",  as: :survey_results_summary
   get  "surveys/:id/results/summarize_texts", to: "survey_summaries#texts", as: :survey_results_summarize_texts
   post "surveys/:survey_id/chat",     to: "survey_chats#create",    as: :survey_chat
+  # The creator's Ask Verto opt-in. Its own route rather than a settings field:
+  # offering another organisation's researchers access to what your respondents
+  # said is an admin decision with an audit trail, not an editing toggle.
+  post   "surveys/:survey_id/corpus_entry", to: "corpus_entries#create",  as: :survey_corpus_entry
+  delete "surveys/:survey_id/corpus_entry", to: "corpus_entries#destroy"
   delete "surveys/bulk_archive",        to: "surveys#bulk_archive",        as: :bulk_archive_surveys
   delete "surveys/bulk_destroy",        to: "surveys#bulk_destroy",        as: :bulk_destroy_surveys
   delete "surveys/:id/destroy_forever", to: "surveys#destroy_forever",     as: :destroy_forever_survey
   post   "surveys/:id/restore",          to: "surveys#restore",             as: :restore_survey
   resources :surveys, only: [ :show, :update, :destroy ]
+
+  # ── Ask Verto ──────────────────────────────────────────────────────────────
+  # Cross-Verto question answering over the shared corpus. Open to any signed-in
+  # account: what can be answered is decided by the corpus (CorpusEntry.citable),
+  # not by who is asking, so there is one authorisation rule rather than two.
+  get    "ask",                     to: "ask#show",             as: :ask
+  post   "ask/threads",             to: "ask_threads#create",   as: :ask_threads
+  delete "ask/threads/:id",         to: "ask_threads#destroy",  as: :ask_thread
+  post   "ask/threads/:id/messages", to: "ask_messages#create", as: :ask_thread_messages
+
+  # The staff review queue. Gated by a routing CONSTRAINT rather than a filter,
+  # exactly like /blazer above and for the same reason: a non-staff request gets
+  # a 404, because the existence of an internal surface over other customers'
+  # data is itself something customers have no reason to learn.
+  constraints(->(request) { BlazerAccess.staff_request?(request) }) do
+    get   "ask/review",     to: "corpus_reviews#index",  as: :corpus_reviews
+    patch "ask/review/:id", to: "corpus_reviews#update", as: :corpus_review
+  end
 
   # Common Questions — reusable sets attached to many Vertos
   resources :common_question_sets, path: "common-question-sets" do

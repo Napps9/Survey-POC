@@ -7762,3 +7762,386 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .editor-grid { transition: none; }
   .right-tab-folder, .editor-leave-btn, .editor-undo-btn, .editor-score-cta { transition: none; }
 }
+
+/* ═══ Ask Verto ═══════════════════════════════════════════════════════════════
+   Cross-Verto question answering. The whole surface is built from the EDITOR's
+   vocabulary rather than the results screen's — a floating panel that slides in
+   when it's asked for, colour-coded folder tabs, and dark-glass pill CTAs over
+   an ambient backdrop. Each block below names the editor rule it mirrors, so the
+   two stay recognisably the same product when either is changed.
+
+   Violet (#8B85FF) is the one addition to the palette, reserved for the citation
+   layer: teal already means "Verto is speaking", and provenance needs to read as
+   its own thing rather than as more of the same. */
+
+/* The shell. Same trick as .editor-grid: the panel column is 0 wide until it's
+   wanted, and the width transition IS the slide. */
+.ask-grid {
+  display: grid;
+  grid-template-columns: 190px 1fr 0;
+  transition: grid-template-columns 0.28s ease;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: #1C2034;
+}
+.ask-grid.is-panel-open { grid-template-columns: 64px 1fr 468px; }
+
+/* ── Scope rail. Collapses to circles when the panel opens, exactly as
+      .card-rail does — the conversation gets its width back. ── */
+.ask-rail {
+  position: relative; z-index: 1;
+  background: rgba(11,14,27,0.72);
+  backdrop-filter: blur(10px);
+  border-inline-end: 1px solid rgba(255,255,255,0.07);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.ask-rail-head { padding: 15px 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.ask-rail-brand { display: flex; align-items: center; gap: 8px; }
+.ask-rail-mark {
+  width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0;
+  background: rgba(1,234,203,0.14); color: #01EACB;
+  display: flex; align-items: center; justify-content: center; font-size: 12px;
+}
+.ask-rail-brand span {
+  font-family: "Alata", sans-serif; font-size: 15px; color: #fff;
+  letter-spacing: 0.02em; white-space: nowrap;
+}
+.ask-rail-sec {
+  font-family: "Alata", sans-serif; font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.2);
+  padding: 15px 14px 6px; white-space: nowrap;
+}
+.ask-scope-row {
+  display: flex; align-items: center; gap: 8px; padding: 5px 14px;
+  font-family: "ABeeZee", sans-serif; font-size: 12.5px;
+  color: rgba(255,255,255,0.58); white-space: nowrap;
+}
+.ask-scope-row .val {
+  margin-inline-start: auto; color: rgba(255,255,255,0.34); font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+.ask-thread {
+  display: block; padding: 7px 14px; text-decoration: none;
+  font-family: "ABeeZee", sans-serif; font-size: 12.5px;
+  color: rgba(255,255,255,0.34); line-height: 1.4;
+  border-inline-start: 2px solid transparent;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ask-thread:hover { color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.03); }
+.ask-thread.is-current {
+  color: rgba(255,255,255,0.88); border-inline-start-color: #01EACB;
+  background: rgba(1,234,203,0.05);
+}
+.ask-rail-foot {
+  margin-top: auto; padding: 11px 14px; border-top: 1px solid rgba(255,255,255,0.07);
+  font-family: "ABeeZee", sans-serif; font-size: 11px;
+  color: rgba(255,255,255,0.24); line-height: 1.5;
+}
+/* Collapsed: the words go, the marks stay. */
+.ask-grid.is-panel-open .ask-rail-brand span,
+.ask-grid.is-panel-open .ask-rail-sec,
+.ask-grid.is-panel-open .ask-scope-row,
+.ask-grid.is-panel-open .ask-thread,
+.ask-grid.is-panel-open .ask-rail-foot { display: none; }
+.ask-grid.is-panel-open .ask-rail-head {
+  padding: 15px 0; display: flex; justify-content: center;
+}
+.ask-rail-mini { display: none; flex-direction: column; align-items: center; gap: 12px; padding: 16px 0; }
+.ask-grid.is-panel-open .ask-rail-mini { display: flex; }
+.ask-rail-mini-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.34); font-family: "Alata", sans-serif; font-size: 11px;
+}
+.ask-rail-mini-btn.is-on {
+  background: rgba(1,234,203,0.14); border-color: rgba(1,234,203,0.35); color: #01EACB;
+}
+
+/* ── Conversation column ── */
+.ask-main { position: relative; z-index: 1; display: flex; flex-direction: column; min-width: 0; }
+.ask-top {
+  height: 52px; flex-shrink: 0; display: flex; align-items: center; gap: 11px;
+  padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: rgba(28,32,52,0.72); backdrop-filter: blur(10px);
+}
+.ask-top .lab {
+  font-family: "Alata", sans-serif; font-size: 10.5px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.34);
+}
+.ask-top .nm {
+  font-family: "ABeeZee", sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.58);
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Room at the bottom for the floating composer, which overlaps the feed. */
+.ask-feed { flex: 1; overflow-y: auto; padding: 26px 24px 96px; position: relative; }
+.ask-conv { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+.ask-msg-user { display: flex; justify-content: flex-end; }
+.ask-msg-user .b {
+  max-width: 80%; background: #01EACB; color: #04221E; padding: 10px 15px;
+  border-radius: 16px 16px 3px 16px;
+  font-family: "ABeeZee", sans-serif; font-size: 13.5px; line-height: 1.5;
+}
+.ask-msg-ai { display: flex; gap: 10px; align-items: flex-start; }
+.ask-ai-mark {
+  width: 24px; height: 24px; border-radius: 7px; flex-shrink: 0; margin-top: 2px;
+  background: rgba(1,234,203,0.15); color: #01EACB;
+  display: flex; align-items: center; justify-content: center; font-size: 11px;
+}
+.ask-ai-body {
+  flex: 1; min-width: 0;
+  background: rgba(22,27,46,0.82); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 3px 16px 16px 16px;
+  padding: 15px 18px;
+  font-family: "ABeeZee", sans-serif; font-size: 13.5px; line-height: 1.72;
+  color: rgba(255,255,255,0.8); white-space: pre-wrap;
+}
+.ask-status {
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
+  color: rgba(255,255,255,0.3); font-style: italic;
+}
+.ask-warning {
+  margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.07);
+  font-family: "ABeeZee", sans-serif; font-size: 12px; color: #FFC24B; line-height: 1.55;
+}
+
+/* The citation chip — the handle that opens the folder onto its source. */
+.ask-cite {
+  display: inline-block; vertical-align: 2px; margin: 0 1px; padding: 2px 6px;
+  border-radius: 5px; cursor: pointer;
+  font-family: "Alata", sans-serif; font-size: 9.5px; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: rgba(139,133,255,0.18); border: 1px solid rgba(139,133,255,0.42);
+  color: #B6B1FF;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, color 0.15s;
+}
+.ask-cite:hover, .ask-cite.is-active {
+  background: #8B85FF; border-color: #8B85FF; color: #14122E;
+  box-shadow: 0 0 12px 1px rgba(139,133,255,0.5);
+}
+/* A quote is printed from the record, never from the model — see AskVertoChat. */
+.ask-quote {
+  margin: 10px 0; padding: 10px 14px; border-radius: 9px;
+  border-inline-start: 2px solid rgba(139,133,255,0.6);
+  background: rgba(139,133,255,0.08);
+  font-family: "ABeeZee", sans-serif; font-size: 13px; line-height: 1.6;
+  color: rgba(255,255,255,0.86); white-space: normal;
+}
+.ask-quote .theme {
+  display: block; margin-top: 5px;
+  font-family: "Alata", sans-serif; font-size: 9.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.28);
+}
+
+/* ── Floating CTAs. .add-media-fab's recipe: dark glass, blur, Alata, teal on
+      hover — so the conversation column carries no docked chrome at all. ── */
+.ask-fab-row {
+  position: absolute; inset-inline-start: 50%; bottom: 20px;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px; z-index: 3;
+  width: min(760px, calc(100% - 48px));
+}
+.ask-composer {
+  flex: 1; display: flex; align-items: center; gap: 10px;
+  padding: 8px 8px 8px 18px; border-radius: 999px;
+  background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(8px); box-shadow: 0 12px 34px rgba(0,0,0,0.45);
+  transition: border-color 0.15s;
+}
+.ask-composer:focus-within { border-color: rgba(1,234,203,0.5); }
+.ask-composer textarea {
+  flex: 1; background: transparent; border: none; outline: none; resize: none;
+  color: rgba(255,255,255,0.88); font-family: "ABeeZee", sans-serif;
+  font-size: 13.5px; line-height: 1.5; max-height: 96px; padding: 5px 0;
+}
+.ask-composer textarea::placeholder { color: rgba(255,255,255,0.34); }
+.ask-send {
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; border: none;
+  background: #01EACB; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.ask-send:hover { background: #18F0D4; }
+.ask-send:disabled { opacity: 0.45; cursor: default; }
+.ask-fab {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.18); color: #fff;
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.04em;
+  backdrop-filter: blur(8px); box-shadow: 0 12px 34px rgba(0,0,0,0.45);
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
+}
+.ask-fab:hover {
+  background: rgba(1,234,203,0.85); color: #1C2034; border-color: #01EACB;
+  transform: translateY(-1px);
+}
+.ask-fab .n { font-variant-numeric: tabular-nums; opacity: 0.7; }
+.ask-grid.is-panel-open .ask-fab-sources { display: none; }
+
+/* ── The folder panel. Mirrors .right-column: the COLUMN is transparent and
+      inset; the solid rounded paper is the body below the tab strip. ── */
+.ask-panel {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; min-height: 0;
+  width: 440px; margin: 14px 14px 14px 0; margin-block-start: 60px;
+  /* Unfocusable while collapsed; the delay lets the slide finish first. */
+  visibility: hidden; transition: visibility 0s linear 0.3s;
+}
+.ask-grid.is-panel-open .ask-panel { visibility: visible; transition-delay: 0s; }
+
+.ask-tabs {
+  flex-shrink: 0; display: flex; gap: 3px; align-items: flex-end;
+  padding-inline: 12px 46px; position: relative;
+}
+/* Same folder-tab treatment as .right-tab-folder: solid in its own colour,
+   dimmed until active, fusing to the paper below via the negative margin. */
+.ask-tab {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  border: 1px solid transparent; border-bottom: none; border-radius: 10px 10px 0 0;
+  padding: 7px 11px 8px;
+  font-family: "Alata", sans-serif; font-size: 10.5px; letter-spacing: 0.02em;
+  background: var(--tab-color); color: var(--tab-ink);
+  filter: brightness(0.82);
+  transition: filter 0.15s, box-shadow 0.15s;
+}
+.ask-tab:hover {
+  filter: brightness(1);
+  box-shadow: 0 0 14px 2px color-mix(in srgb, var(--tab-color) 70%, transparent);
+}
+.ask-tab.is-active {
+  filter: brightness(1); box-shadow: none;
+  border-color: var(--panel-edge);
+  padding-top: 9px; margin-bottom: -1px; position: relative; z-index: 1;
+}
+.ask-tab .n { opacity: 0.72; font-variant-numeric: tabular-nums; }
+.ask-tab--sources { --tab-color: #8B85FF; --panel-edge: #635DD6; --tab-ink: #14122E; }
+.ask-tab--detail  { --tab-color: #0CA7FF; --panel-edge: #0880C7; --tab-ink: #03253A; }
+.ask-tab--consent { --tab-color: #01EACB; --panel-edge: #01AD97; --tab-ink: #04221E; }
+.ask-tab-close {
+  position: absolute; inset-inline-end: 8px; bottom: 5px; cursor: pointer;
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.14); border-radius: 100px;
+  padding: 4px 10px; font-family: "ABeeZee", sans-serif; font-size: 12px;
+  color: rgba(255,255,255,0.55);
+}
+.ask-tab-close:hover { color: #fff; }
+
+.ask-paper {
+  flex: 1; min-height: 0; display: none; flex-direction: column; overflow: hidden;
+  border-radius: 16px; border: 1px solid var(--panel-edge);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.35);
+  background: var(--paper);
+}
+.ask-paper.is-active { display: flex; }
+.ask-paper--sources { --paper: #2A2856; --panel-edge: #635DD6; }
+.ask-paper--detail  { --paper: #12324A; --panel-edge: #0880C7; }
+.ask-paper--consent { --paper: #0C332D; --panel-edge: #01AD97; }
+.ask-paper-head {
+  flex-shrink: 0; padding: 14px 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.09);
+}
+.ask-paper-head .t {
+  font-family: "Alata", sans-serif; font-size: 14px; color: #fff;
+  display: flex; align-items: center; gap: 8px;
+}
+.ask-paper-head p {
+  margin: 6px 0 0; font-family: "ABeeZee", sans-serif; font-size: 11.5px;
+  color: rgba(255,255,255,0.55); line-height: 1.5;
+}
+.ask-paper-body {
+  flex: 1; overflow-y: auto; padding: 12px;
+  display: flex; flex-direction: column; gap: 9px;
+}
+/* Content sits in dark islands so text keeps its designed white-on-dark
+   contrast on the tinted folder paper — the editor's own rule for its
+   colour-coded panels. */
+.ask-island {
+  background: rgba(10,12,24,0.55); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 11px; padding: 12px 13px;
+}
+.ask-lab {
+  font-family: "Alata", sans-serif; font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.42); margin: 0 0 10px;
+}
+
+.ask-src {
+  display: block; width: 100%; text-align: start; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-inline-start: 2px solid rgba(255,255,255,0.28);
+  border-radius: 10px; background: rgba(10,12,24,0.5); padding: 10px 12px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.ask-src:hover { background: rgba(10,12,24,0.7); border-inline-start-color: #fff; }
+.ask-src.is-active {
+  border-color: rgba(255,255,255,0.4); border-inline-start-color: #fff;
+  background: rgba(10,12,24,0.78);
+}
+.ask-src-n {
+  font-family: "Alata", sans-serif; font-size: 9.5px; letter-spacing: 0.08em;
+  color: #C9C5FF; display: flex; align-items: center; gap: 7px; margin-bottom: 5px;
+}
+.ask-src-n .who {
+  color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase;
+}
+.ask-src-q {
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.45;
+  color: rgba(255,255,255,0.92); margin-bottom: 6px;
+}
+.ask-src-meta {
+  display: flex; flex-wrap: wrap; gap: 3px 9px;
+  font-family: "ABeeZee", sans-serif; font-size: 10.5px;
+  color: rgba(255,255,255,0.55); font-variant-numeric: tabular-nums;
+}
+
+.ask-bars { display: flex; flex-direction: column; gap: 8px; }
+.ask-bar-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+.ask-bar-lab { font-family: "ABeeZee", sans-serif; font-size: 12.5px; color: rgba(255,255,255,0.75); }
+.ask-bar-val {
+  font-family: "ABeeZee", sans-serif; font-size: 12px; color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.ask-bar-track {
+  grid-column: 1 / -1; height: 6px; border-radius: 3px;
+  background: rgba(255,255,255,0.1); overflow: hidden;
+}
+.ask-bar-fill { height: 100%; border-radius: 3px; background: #01EACB; }
+
+.ask-prov-row {
+  display: grid; grid-template-columns: 82px 1fr; gap: 11px; padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.ask-prov-row:last-child { border-bottom: 0; }
+.ask-prov-k {
+  font-family: "Alata", sans-serif; font-size: 9.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.38); padding-top: 2px;
+}
+.ask-prov-v {
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.45;
+  color: rgba(255,255,255,0.78); font-variant-numeric: tabular-nums;
+}
+.ask-cc-row {
+  display: flex; align-items: flex-start; gap: 9px; padding: 4px 0;
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.45;
+  color: rgba(255,255,255,0.75);
+}
+.ask-cc-row .ok { color: #01EACB; flex-shrink: 0; }
+
+.ask-empty {
+  font-family: "ABeeZee", sans-serif; font-size: 12.5px;
+  color: rgba(255,255,255,0.4); line-height: 1.6; padding: 8px 4px;
+}
+
+/* Narrow screens: the panel takes the whole width when open rather than
+   squeezing the conversation into nothing. */
+@media (max-width: 900px) {
+  .ask-grid { grid-template-columns: 0 1fr 0; }
+  .ask-grid.is-panel-open { grid-template-columns: 0 0 100%; }
+  .ask-panel { width: 100%; margin: 14px; margin-block-start: 14px; }
+}
+
+/* Same courtesy the editor extends: no slide, no folder-tab transitions. */
+@media (prefers-reduced-motion: reduce) {
+  .ask-grid { transition: none; }
+  .ask-tab, .ask-fab, .ask-cite, .ask-src { transition: none; }
+}

@@ -1,0 +1,103 @@
+<%# The creator's half of the Ask Verto consent gate.
+    Same <details class="publish-block"> shell, teal checkbox and submit-on-change
+    form as every other block in this panel — a creator shouldn't have to learn a
+    new control to answer a question about consent.
+
+    The offer only makes sense once a Verto has responses, so the block is absent
+    on a deck nobody has answered rather than sitting inert from creation. %>
+<% completed = @survey.responses.where(status: "completed").count %>
+<% if completed.positive? %>
+  <% state = @corpus_entry.creator_state %>
+  <details class="publish-block">
+    <summary class="publish-block-title">
+      <%= t("ask.opt_in.title") %>
+      <% case state
+         when :pending %>
+        <span class="pill-wait" style="margin-inline-start:8px;font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.06em;background:rgba(255,194,75,0.16);border:1px solid rgba(255,194,75,0.3);color:#FFC24B;border-radius:20px;padding:2px 8px;"><%= t("ask.opt_in.badge_pending") %></span>
+      <% when :live %>
+        <span style="margin-inline-start:8px;font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.06em;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.3);color:#01EACB;border-radius:20px;padding:2px 8px;"><%= t("ask.opt_in.badge_live") %></span>
+      <% when :declined %>
+        <span style="margin-inline-start:8px;font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.06em;background:rgba(216,0,39,0.16);border:1px solid rgba(216,0,39,0.4);color:#FF6B84;border-radius:20px;padding:2px 8px;"><%= t("ask.opt_in.badge_declined") %></span>
+      <% end %>
+      <span class="pub-chev">⌄</span>
+    </summary>
+
+    <%# Offering and withdrawing are different verbs on different routes, so the
+        checkbox posts to whichever one its next state needs. %>
+    <%= form_with url: survey_corpus_entry_path(@survey),
+                  method: (state == :off ? :post : :delete),
+                  local: true, style: "margin:0;" do %>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+        <input type="checkbox" name="offered" value="1"
+               <%= "checked" if state != :off %>
+               onchange="this.form.requestSubmit()"
+               style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+        <span><%= t("ask.opt_in.description") %></span>
+      </label>
+    <% end %>
+
+    <% if state != :off %>
+      <div style="margin-top:13px;padding:11px 12px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:<%= state == :live ? "#01EACB" : (state == :declined ? "#FF6B84" : "#FFC24B") %>;"></span>
+          <span style="font-size: var(--text-sm);color:rgba(255,255,255,0.85);"><%= t("ask.opt_in.state_#{state}") %></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;gap:9px;font-size: var(--text-xs);color:rgba(255,255,255,0.55);line-height:1.5;">
+            <span style="color:#01EACB;width:14px;flex-shrink:0;text-align:center;">✓</span>
+            <span><%= t("ask.opt_in.step_offered", date: l(@corpus_entry.opted_in_at.to_date, format: :long)) if @corpus_entry.opted_in_at %></span>
+          </div>
+          <% if state == :pending %>
+            <div style="display:flex;gap:9px;font-size: var(--text-xs);color:rgba(255,255,255,0.55);line-height:1.5;">
+              <span style="color:#FFC24B;width:14px;flex-shrink:0;text-align:center;">◷</span>
+              <span><%= t("ask.opt_in.step_reviewing") %></span>
+            </div>
+          <% elsif state == :live %>
+            <div style="display:flex;gap:9px;font-size: var(--text-xs);color:rgba(255,255,255,0.55);line-height:1.5;">
+              <span style="color:#01EACB;width:14px;flex-shrink:0;text-align:center;">✓</span>
+              <span><%= t("ask.opt_in.step_live", count: @corpus_entry.corpus_questions.count) %></span>
+            </div>
+          <% elsif state == :declined %>
+            <%# The reason is shown verbatim. "Fewer than 30 completed responses"
+                is actionable; "not accepted" is not. %>
+            <div style="display:flex;gap:9px;font-size: var(--text-xs);color:rgba(255,255,255,0.7);line-height:1.5;">
+              <span style="color:#FF6B84;width:14px;flex-shrink:0;text-align:center;">✕</span>
+              <span><%= @corpus_entry.review_note %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# What crosses the boundary, stated before the decision rather than in a
+        policy page after it. %>
+    <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;border:1px solid rgba(255,255,255,0.08);border-radius:9px;overflow:hidden;">
+      <div style="padding:10px 11px;border-inline-end:1px solid rgba(255,255,255,0.08);background:rgba(1,234,203,0.04);">
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.11em;text-transform:uppercase;color:#01EACB;margin-bottom:7px;"><%= t("ask.opt_in.shared_title") %></div>
+        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;">
+          <% t("ask.opt_in.shared_items").each do |item| %>
+            <li style="font-size: var(--text-2xs);color:rgba(255,255,255,0.55);line-height:1.4;"><%= item %></li>
+          <% end %>
+        </ul>
+      </div>
+      <div style="padding:10px 11px;background:rgba(216,0,39,0.05);">
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.11em;text-transform:uppercase;color:#FF6B84;margin-bottom:7px;"><%= t("ask.opt_in.never_title") %></div>
+        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;">
+          <% t("ask.opt_in.never_items").each do |item| %>
+            <li style="font-size: var(--text-2xs);color:rgba(255,255,255,0.55);line-height:1.4;"><%= item %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <%# Verbatim quotes are the part a creator is most likely to be surprised by,
+        so it is called out in its own paragraph rather than buried in the list. %>
+    <p style="margin:12px 0 0;font-size: var(--text-xs);color:rgba(255,255,255,0.45);line-height:1.55;">
+      <strong style="color:#FFC24B;font-weight:400;"><%= t("ask.opt_in.quotes_warning_lead") %></strong>
+      <%= t("ask.opt_in.quotes_warning") %>
+    </p>
+    <p style="margin:8px 0 0;font-size: var(--text-xs);color:rgba(255,255,255,0.45);line-height:1.55;">
+      <%= t("ask.opt_in.withdraw_note") %>
+    </p>
+  </details>
+<% end %>

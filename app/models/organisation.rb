@@ -5,6 +5,13 @@ class Organisation < ApplicationRecord
   has_many :verto_builds, dependent: :destroy
   has_many :invites, dependent: :destroy
 
+  # Ask Verto. corpus_entries are the account's offers of its own Vertos to the
+  # shared corpus; ask_threads are its conversations with it. Both go when the
+  # account does — deleting an organisation must take its consent record with it,
+  # not leave an orphan pointing at a deleted survey.
+  has_many :corpus_entries, dependent: :destroy
+  has_many :ask_threads, dependent: :destroy
+
   has_many :partnerships, dependent: :destroy
   has_many :partnership_memberships, dependent: :destroy
   has_many :member_partnerships, through: :partnership_memberships, source: :partnership

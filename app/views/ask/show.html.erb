@@ -1,0 +1,170 @@
+<%# Ask Verto.
+
+    Three columns — scope rail, conversation, folder — laid out with the editor's
+    own geometry (see .ask-grid in application.css, which mirrors .editor-grid).
+    The folder is closed until it's asked for: clicking a citation chip or the
+    Sources CTA slides it in over 0.28s and collapses the rail to circles, which
+    is the same trade the editor makes when you select a card. %>
+<div class="ask-grid"
+     data-controller="ask-verto"
+     data-ask-verto-thread-url-value="<%= @thread ? ask_thread_messages_path(@thread) : "" %>"
+     data-ask-verto-new-thread-url-value="<%= ask_threads_path %>"
+     data-ask-verto-target="grid">
+
+  <%# The backdrop the floating panel floats on — the app's own orbs, at the
+      results screen's opacity. %>
+  <div class="gen-orbs results-orbs" aria-hidden="true">
+    <div class="gen-orb gen-orb-1"></div>
+    <div class="gen-orb gen-orb-2"></div>
+    <div class="gen-orb gen-orb-3"></div>
+    <div class="gen-orb gen-orb-4"></div>
+  </div>
+
+  <%# ── Scope rail ── %>
+  <div class="ask-rail">
+    <div class="ask-rail-head">
+      <div class="ask-rail-brand">
+        <span class="ask-rail-mark">✦</span>
+        <span><%= t("ask.page.title") %></span>
+      </div>
+    </div>
+
+    <%# Shown only while the panel is open, in place of everything below. %>
+    <div class="ask-rail-mini" aria-hidden="true">
+      <span class="ask-rail-mini-btn is-on"><%= @coverage[:vertos] %></span>
+      <button type="button" class="ask-rail-mini-btn"
+              data-action="click->ask-verto#closePanel"
+              title="<%= t("js.ask.close") %>">≡</button>
+    </div>
+
+    <div class="ask-rail-sec"><%= t("ask.page.scope") %></div>
+    <div class="ask-scope-row"><%= t("ask.page.vertos") %><span class="val"><%= number_with_delimiter(@coverage[:vertos]) %></span></div>
+    <div class="ask-scope-row"><%= t("ask.page.responses") %><span class="val"><%= number_with_delimiter(@coverage[:responses]) %></span></div>
+
+    <div class="ask-rail-sec"><%= t("ask.page.threads") %></div>
+    <%= form_with url: ask_threads_path, method: :post, local: true, style: "margin:0;padding:2px 14px 6px;" do %>
+      <button type="submit" class="ask-thread" style="border:none;background:none;cursor:pointer;padding-inline:0;color:#01EACB;">
+        + <%= t("ask.page.new_thread") %>
+      </button>
+    <% end %>
+    <% @threads.each do |thread| %>
+      <%= link_to thread.display_title, ask_path(thread_id: thread.id),
+            class: "ask-thread #{"is-current" if @thread && thread.id == @thread.id}" %>
+    <% end %>
+
+    <div class="ask-rail-foot"><%= t("ask.page.eligible") %></div>
+  </div>
+
+  <%# ── Conversation ── %>
+  <div class="ask-main">
+    <div class="ask-top">
+      <span class="lab"><%= t("ask.page.title") %></span>
+      <span style="color:rgba(255,255,255,0.2);">·</span>
+      <span class="nm"><%= @thread ? @thread.display_title : t("ask.page.subtitle") %></span>
+    </div>
+
+    <div class="ask-feed" data-ask-verto-target="feed">
+      <div class="ask-conv" data-ask-verto-target="messages">
+        <% if @coverage[:vertos].zero? %>
+          <div class="ask-msg-ai">
+            <span class="ask-ai-mark">✦</span>
+            <div class="ask-ai-body"><%= t("js.ask.empty_corpus") %></div>
+          </div>
+        <% elsif @messages.empty? %>
+          <div class="ask-msg-ai">
+            <span class="ask-ai-mark">✦</span>
+            <div class="ask-ai-body"><%= t("js.ask.greeting") %></div>
+          </div>
+        <% else %>
+          <%# Replayed from the database, markers resolved server-side so a
+              reloaded conversation reads exactly as it did when it was written. %>
+          <% @messages.each do |message| %>
+            <% if message.user? %>
+              <div class="ask-msg-user"><div class="b"><%= message.text %></div></div>
+            <% else %>
+              <div class="ask-msg-ai">
+                <span class="ask-ai-mark">✦</span>
+                <div class="ask-ai-body"><%= render_ask_answer(message) %></div>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <%# Floating CTAs — no docked chrome on this column at all. %>
+      <div class="ask-fab-row">
+        <div class="ask-composer">
+          <textarea data-ask-verto-target="input"
+                    data-action="keydown->ask-verto#keydown input->ask-verto#autogrow"
+                    rows="1"
+                    placeholder="<%= t("js.ask.placeholder") %>"
+                    aria-label="<%= t("js.ask.placeholder") %>"></textarea>
+          <button type="button" class="ask-send"
+                  data-ask-verto-target="send"
+                  data-action="click->ask-verto#send"
+                  aria-label="<%= t("js.ask.send") %>">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M1 7h12M7 1l6 6-6 6" stroke="#04221E" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <button type="button" class="ask-fab ask-fab-sources"
+                data-ask-verto-target="sourcesFab"
+                data-action="click->ask-verto#openSources">
+          <%= t("js.ask.sources") %> <span class="n" data-ask-verto-target="sourceCount">0</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <%# ── The folder ── %>
+  <div class="ask-panel">
+    <div class="ask-tabs" role="tablist">
+      <button type="button" class="ask-tab ask-tab--sources is-active" role="tab" aria-selected="true"
+              data-ask-verto-target="tab" data-pane="sources"
+              data-action="click->ask-verto#showPane">
+        <%= t("js.ask.sources") %> <span class="n" data-ask-verto-target="tabCount">0</span>
+      </button>
+      <button type="button" class="ask-tab ask-tab--detail" role="tab" aria-selected="false"
+              data-ask-verto-target="tab" data-pane="detail"
+              data-action="click->ask-verto#showPane"><%= t("js.ask.detail") %></button>
+      <button type="button" class="ask-tab ask-tab--consent" role="tab" aria-selected="false"
+              data-ask-verto-target="tab" data-pane="consent"
+              data-action="click->ask-verto#showPane"><%= t("js.ask.why_citable") %></button>
+      <button type="button" class="ask-tab-close"
+              data-action="click->ask-verto#closePanel"
+              aria-label="<%= t("js.ask.close") %>">✕</button>
+    </div>
+
+    <div class="ask-paper ask-paper--sources is-active" role="tabpanel"
+         data-ask-verto-target="pane" data-pane="sources">
+      <div class="ask-paper-head">
+        <div class="t"><%= t("js.ask.sources") %></div>
+        <p><%= t("ask.page.eligible") %></p>
+      </div>
+      <div class="ask-paper-body" data-ask-verto-target="sourceList">
+        <p class="ask-empty"><%= t("js.ask.no_sources") %></p>
+      </div>
+    </div>
+
+    <div class="ask-paper ask-paper--detail" role="tabpanel"
+         data-ask-verto-target="pane" data-pane="detail">
+      <div class="ask-paper-head">
+        <div class="t" data-ask-verto-target="detailTitle"><%= t("js.ask.detail") %></div>
+      </div>
+      <div class="ask-paper-body" data-ask-verto-target="detailBody">
+        <p class="ask-empty"><%= t("js.ask.no_sources") %></p>
+      </div>
+    </div>
+
+    <div class="ask-paper ask-paper--consent" role="tabpanel"
+         data-ask-verto-target="pane" data-pane="consent">
+      <div class="ask-paper-head">
+        <div class="t"><%= t("js.ask.why_citable") %></div>
+      </div>
+      <div class="ask-paper-body" data-ask-verto-target="consentBody">
+        <p class="ask-empty"><%= t("js.ask.no_sources") %></p>
+      </div>
+    </div>
+  </div>
+</div>
