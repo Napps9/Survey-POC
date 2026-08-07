@@ -219,11 +219,16 @@ class PlayerFooterTest < ApplicationSystemTestCase
     end
   end
 
-  # Capped is not the same as shrunk to nothing — the label still has to be
-  # readable on the narrowest screen anyone owns.
-  test "the label keeps a floor as well as a ceiling" do
-    box = next_box_at(280, 653)
+  # The button box scales down; the words in it do not. Sizing the label off
+  # the viewport gave a 280px Fold an 11px label — smaller than the reference
+  # it was supposedly scaling down TO, on the screen least able to spare the
+  # legibility. When 13px genuinely will not fit, the arrow takes over.
+  test "the label is desktop's size everywhere, not a scale of it" do
+    desktop = next_box_at(1280, 900)
 
-    assert box["fs"] >= 11, "a 280px Fold cover screen set the label at #{box["fs"]}px"
+    [ [ 280, 653 ], [ 375, 553 ], [ 393, 660 ], [ 1024, 1290 ] ].each do |w, h|
+      assert_in_delta desktop["fs"], next_box_at(w, h)["fs"], 0.1,
+                      "#{w}x#{h} set the label at a different size to the desktop card"
+    end
   end
 end

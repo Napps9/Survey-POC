@@ -5875,10 +5875,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
     min-height: var(--play-btn-h);
     padding: 10px clamp(8px, 3.2vw, 18px);
     min-width: 0;
-    /* Floored as well as capped: a bare min() took the label to 9.5px on a
-       280px Fold, which is a cap doing its job and a floor missing. If 11px
-       still will not fit, _fitFooter drops the whole label for an arrow. */
-    font-size: clamp(11px, 3.4vw, var(--play-btn-fs));
+    /* Desktop's 13px flat, not a scale. Sizing it off the viewport meant a
+       280px Fold got an 11px label — smaller than the reference this is
+       supposed to be scaling DOWN to, and on the screen least able to spare
+       the legibility. The button box shrinks; the words in it do not. When
+       13px genuinely will not fit, _fitFooter drops the label for an arrow,
+       which is a better answer than shrinking it past reading. */
+    font-size: var(--play-btn-fs);
     white-space: nowrap;
     border-radius: 14px;
   }
