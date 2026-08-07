@@ -45,6 +45,26 @@ class PhoneFitRuleTest < ActiveSupport::TestCase
                     "round tells creators the options are at risk while the card is still fine."
   end
 
+  # The editor stops a grid tile label being typed past this, and the Rules of
+  # the Game panel advises the same number — because they ARE the same number.
+  # GRID_LABEL_MAX is derived from OPTION_LIMITS rather than written out again,
+  # so this asserts the derivation is still in place and not a copy that has
+  # drifted. A creator being nagged at 20 and stopped at 25 is the editor
+  # disagreeing with itself, which is what the cap existed to end.
+  test "the hard cap is the number the rules already advise" do
+    assert_match(/GRID_LABEL_MAX\s*=\s*OPTION_LIMITS\.select_one_grid/, source,
+                 "GRID_LABEL_MAX should be derived from OPTION_LIMITS, not restated — " \
+                 "two copies of a limit is one copy too many.")
+
+    limits = source[/const OPTION_LIMITS\s*=\s*\{(.*?)\}/m, 1]
+    assert limits, "OPTION_LIMITS is gone or reshaped past recognition"
+    grid = limits.scan(/select_(?:one|many)_grid:\s*(\d+)/).flatten.map(&:to_i)
+
+    assert_equal [ 20, 20 ], grid,
+                 "both image-grid types carry the tile-label cap and it is 20: measured at " \
+                 "16px, a 393px phone gives the grid column ~172px and ~8.6px a character."
+  end
+
   test "the check counts the Other box, the way the count rule does" do
     body = source[/function phoneFitCheck\(card\)\s*\{(.*?)\n\}/m, 1]
 

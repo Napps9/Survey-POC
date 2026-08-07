@@ -52,12 +52,26 @@ const PAGE_LENGTH_LIMIT = 400
 // §2 — answer label budget per card type. Image lists and Prioritise rows
 // get 30, grid tiles and scale labels stay at a scannable 20, and Tap
 // statements read as full mini-statements so they get 40.
+//
+// The grid figure is no longer only advice. survey_editor imports GRID_LABEL_MAX
+// below and stops a tile label being typed past it, because the phone player
+// draws the tile at a fixed proportion with one line of label under it, and 20
+// characters is what that holds: measured at 16px, a 393px phone gives a grid
+// column ~172px wide and ~8.6px a character, and a 280px Fold gives ~14
+// characters a line. Advising a number and not enforcing it is how a creator
+// ends up shown one card on a desktop and a respondent shown another.
 const OPTION_LIMITS = {
   multiple_choice: 30, select_many: 30, prioritise: 30,
   select_one_grid: 20, select_many_grid: 20,
   range: 20, rating: 20, nps: 20,
   tap_card: 40, scenario: 40
 }
+
+// The hard cap, exported so there is ONE number rather than the editor's copy
+// of the rule and the rule. Both grids carry the same limit; asserted in
+// test/lib/phone_fit_rule_test.rb so a change to one has to be a change to both.
+export const GRID_LABEL_TYPES = [ "select_one_grid", "select_many_grid" ]
+export const GRID_LABEL_MAX = OPTION_LIMITS.select_one_grid
 
 // §2 — TEXT_MIN is the target floor shown in copy only; short is never flagged.
 const TEXT_MIN = 50, TEXT_MAX = 70, TEXT_HARD_MAX = 100

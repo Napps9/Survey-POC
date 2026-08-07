@@ -2360,6 +2360,38 @@
 }
 .freeform-counter.over { color: var(--color-red); font-weight: 600; }
 
+/* Editor only: the character counter under the grid-tile label being edited.
+   Deliberately the same object as .freeform-counter above — the pill, the
+   "n/max characters" wording and the goes-hot-when-full behaviour — because a
+   creator has already met that counter as a respondent, and a second dialect
+   for the same idea is a second thing to learn.
+   Placed by survey_editor#_showLabelCount, which moves one node to whichever
+   label has focus rather than putting ten of these on a ten-tile grid. */
+.option-limit-counter {
+  margin: 4px auto 0;
+  width: fit-content;
+  font-family: "Alata", sans-serif;
+  font-size: 11px;
+  color: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 2px 9px;
+  user-select: none;
+  pointer-events: none;   /* never steals the click that would edit the label */
+}
+.option-limit-counter.is-full { color: #FF1E6F; font-weight: 600; }
+/* The keystroke that was refused. Without this the cap is silent — the letter
+   simply doesn't appear, which reads as a broken keyboard rather than a limit. */
+.option-limit-counter.is-rejected { animation: option-limit-nudge 0.22s ease; }
+@keyframes option-limit-nudge {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-3px); }
+  75%      { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .option-limit-counter.is-rejected { animation: none; }
+}
+
 /* ── "Other" free-text option (all question types) ── */
 .other-block { margin-top: 14px; }
 
@@ -5890,10 +5922,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(2, 1fr);
-    /* Rows follow the cards, and a card is its tile plus its label. The tile
-       sizes itself off the column width (see .choice-card-bg's cqw bounds),
-       so there is nothing left for a row minimum to usefully say — it only
-       ever disagreed, and when it lost the tile overflowed onto the label. */
+    /* Rows still take an equal share of whatever the panel has, and still
+       floor at what their card needs when it has nothing spare. Tried
+       `min-content` here when the tile became a fixed proportion, on the
+       reasoning that a fixed tile leaves nothing to distribute — but the tile
+       is not the whole card, and hugging the content left a 200px hole under a
+       six-option grid and half an empty panel under a seven-row list. The
+       tile's size is settled by its own aspect-ratio now, so `1fr` can go back
+       to doing the one thing it is good at: spreading the answer over the room
+       it has been given. */
     grid-auto-rows: minmax(min-content, 1fr);
     gap: clamp(8px, 1.4svh, 12px);
     align-content: start;
@@ -5912,13 +5949,40 @@ body.generating-overlay-active .bottom-bar { display: none; }
     height: 100%;
     aspect-ratio: auto;
     border-radius: 14px;
+    /* Tiles hang from the top of their cell rather than floating in the middle
+       of it. The base rule centres the tile-plus-label block, which was
+       invisible while the tile stretched to fill the cell — now that it is a
+       fixed proportion, centring would set two tiles in the same row at
+       different heights up the screen whenever their labels ran to a different
+       number of lines. Same size AND the same line: the spare falls below the
+       label, where it reads as spacing rather than as a wobble. */
+    justify-content: flex-start;
   }
-  /* Drop the desktop card's fixed 74px so the tile's smallest legal size is
-     its own cqw floor, not a number from a 850px-wide layout. It still grows
-     into spare height; this only decides how tightly the grid may pack when
-     there isn't any, which is the difference between one row of scrolling
-     and two. */
-  .preview-overlay .choice-card-bg { height: auto; }
+  /* ONE tile size. The tile used to state a proportion RANGE — anywhere from
+     38cqw to 58cqw of its column — and then flex to fill whatever the row had
+     spare. Which meant option count decided how tall it was: on a 393px phone
+     a four-option grid drew a 100px tile, six drew 75px and nine drew 66px, so
+     paging through a deck the artwork visibly breathed in and out. Inside one
+     card it was worse: a label that wrapped to three lines where its
+     neighbours wrapped to two took the difference out of its own tile, so two
+     tiles side by side were different heights.
+
+     A single ratio instead of a range and a flex. 2.37:1 is the desktop card's
+     own tile (175.5 / 74) — the reference everything else here scales down
+     from. The tile still sizes off its column, so a tablet's is bigger than a
+     Fold's; it is the same SHAPE everywhere, which is what "the same size"
+     can honestly mean across screens three times apart.
+
+     flex: 0 0 auto so the row can no longer stretch it. The cqw bounds stay on
+     the base rule for the desktop card and the dashboard's mini mockups, which
+     size their tiles their own way. */
+  .preview-overlay .choice-card-bg {
+    height: auto;
+    aspect-ratio: 2.37;
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: none;
+  }
 
   /* ── Running out of room: shed the pictures, never the controls ─────────
      The order is fixed and it is a priority, not a fallback: a respondent
@@ -6019,16 +6083,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
      border. It was also outranking .art-off's own selected rule (same
      specificity, later in the file), which repainted a brand-coloured row in
      hardcoded magenta. */
-  /* Label furniture, retuned for a panel rather than a desktop card. The base
-     rule reserves 2.4em — two lines whether or not the label wraps — plus a
-     flat 7px margin. Across three grid rows that is 106px, more than the whole
-     footer, spent on blank space beneath one-word options.
+  /* Label furniture, retuned for a panel rather than a desktop card — the base
+     rule's flat 7px margin is a number from an 850px-wide layout.
 
-     One line is enough now because the row equalises anyway: grid-auto-rows is
-     minmax(min-content, 1fr) and every .choice-card is height:100%, so a
-     neighbour's second line grows the row and both tiles give up the same
-     amount. That is the thing the two-line reserve was protecting against, and
-     the grid handles it without reserving anything.
+     One line reserved, not two. Two looks like the safe answer once labels are
+     capped at 20 characters — 20 is two lines on the narrowest column measured
+     (a 280px Fold, ~14 characters a line) — but a reserve was never what kept
+     the tiles equal. The tile's own aspect-ratio does that, and it cannot be
+     squashed by a neighbour's second line however long the label runs. What a
+     two-line reserve actually bought was a uniform GAP between a row's labels
+     and the next row's tiles, and it charged 19px a row for it: enough to push
+     a seven-option grid off a 393px phone and down to the list treatment,
+     losing all its artwork to tidy up some whitespace. Wrong trade.
 
      Scoped to .preview-overlay: the unscoped version of this rule was landing
      on the editor canvas too, which is not a phone and never asked. */
@@ -6039,6 +6105,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
     /* Was clamp(11px, 3vw, 13px) — the answer itself, set smaller than any
        other text on the card and smaller than desktop draws it. */
     font-size: var(--play-label);
+    /* Nothing in this file states a wrapping rule, so a single word longer
+       than the column overflows it — impossible under the cap, still possible
+       for a legacy label or a long compound. */
+    overflow-wrap: anywhere;
   }
 
   /* "+ Other" carries the desktop card's flat 8/16px padding into a panel

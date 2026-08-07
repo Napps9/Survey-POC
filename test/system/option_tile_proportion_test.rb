@@ -86,6 +86,83 @@ class OptionTileProportionTest < ApplicationSystemTestCase
     end
   end
 
+  # ── One size, whatever the card holds ────────────────────────────────────
+  #
+  # The band above says a tile is never DISTORTED. This says something
+  # stronger and newer: within one Verto every tile is the same size, so paging
+  # through a deck the artwork doesn't visibly breathe in and out.
+  #
+  # It used to. The tile stated a proportion range (38cqw to 58cqw) and flexed
+  # to absorb whatever height the row had spare, so option count decided it: on
+  # a 393px phone a four-option grid drew a 100px tile, six drew 75px and nine
+  # drew 66px. Inside one card it was worse — a label that wrapped to three
+  # lines where its neighbours wrapped to two took the difference out of its
+  # own tile, so two tiles side by side came out different heights. The tile is
+  # a single aspect-ratio now and neither can happen.
+
+  COUNTS = [ 4, 6, 9 ].freeze
+
+  def counted_survey
+    opts = %w[Automation Brand Measurement Creative Leadership Sustainability
+              Partnerships Innovation Insight Content]
+    cards = [ { "type" => "welcome_card", "title" => "Welcome" } ]
+    COUNTS.each_with_index do |n, i|
+      cards << { "type" => "select_one_grid", "cid" => "n#{i}",
+                 "text" => "Which of these #{n}?", "image" => "/nope.jpg",
+                 "options" => opts.first(n) }
+    end
+    s = @org.surveys.create!(title: "Counts", theme: "Th", audience_age: "adults",
+                             key_insight: "k", default_locale: "en", locales: [ "en" ],
+                             cards: cards)
+    s.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
+    s
+  end
+
+  # Tile height and ratio on the card `step` clicks past the welcome card.
+  def tile_box_at(step)
+    step.times { click_button "Next" }
+    sleep 0.4 # the fit runs a frame after the card lands
+    page.evaluate_script(<<~JS)
+      (() => {
+        const els = [...document.querySelectorAll(".preview-card.active .choice-card-bg")]
+        if (!els.length) return null
+        const boxes = els.map(e => e.getBoundingClientRect())
+        return { h: +Math.max(...boxes.map(b => b.height)).toFixed(1),
+                 hMin: +Math.min(...boxes.map(b => b.height)).toFixed(1),
+                 ratio: +(boxes[0].width / boxes[0].height).toFixed(2),
+                 shed: !!document.querySelector(".preview-card.active .choice-grid.art-off") }
+      })()
+    JS
+  end
+
+  [ [ "iPhone 15", 393, 660 ], [ "Galaxy Fold cover", 280, 653 ], [ "iPad mini portrait", 768, 954 ] ].each do |name, w, h|
+    test "every tile in a deck is the same size on a #{name}" do
+      survey = counted_survey
+      page.driver.browser.resize(width: w, height: h)
+      visit "/play/#{survey.publish_token}"
+      dismiss_cookie_banner
+      click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+
+      seen = []
+      COUNTS.each_index do |i|
+        box = tile_box_at(i.zero? ? 1 : 1)
+        next if box.nil? || box["shed"] # no banner left to compare
+        # Within the card first: a label wrapping further than its neighbour's
+        # must not shorten its own tile.
+        assert_in_delta box["h"], box["hMin"], 1.0,
+                        "#{name}: tiles on the #{COUNTS[i]}-option card differ by " \
+                        "#{(box["h"] - box["hMin"]).round(1)}px within the same card"
+        seen << box
+      end
+
+      assert_operator seen.length, :>=, 2, "not enough cards kept their artwork to compare"
+      heights = seen.map { |b| b["h"] }
+      assert_in_delta heights.max, heights.min, 1.0,
+                      "#{name}: option count changed the tile — #{COUNTS.first(seen.length).zip(heights).inspect}. " \
+                      "A four-option card and a nine-option card must draw the same tile."
+    end
+  end
+
   # The specific shape that exposed it: the same phone, turned. It used to
   # answer with a 2:1 tile upright and a 4.6:1 smear sideways. Now it either
   # keeps the proportion or drops the artwork — what it must never do again is
