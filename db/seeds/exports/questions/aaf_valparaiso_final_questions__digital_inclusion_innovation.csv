@@ -1,0 +1,17 @@
+,,,,,,,,,,Group 1 ,,Group 2,,Group 3,,Group 4,,Group 5,
+Q#,Theme,Question,Question_ESP,Question Type,Suggested Answers,Suggested Answers_ESP,Methodology Layer,CMI Alignment,Tags/Notes,RAG SYSTEM,Comments,RAG SYSTEM,Comments,RAG SYSTEM,Comments,RAG SYSTEM,Comments,RAG SYSTEM,Comments
+9,Digital Inclusion & Innovation,What best describes your internet and device access?,¿Qué describe mejor tu acceso a internet y a tus dispositivos?,,"I don’t have any access
+I share a device or connection with others
+I have my own device but limited internet
+I have internet sometimes but it’s not reliable
+I have my own device and reliable internet","No tengo acceso
+Comparto un dispositivo o conexión con otros
+Tengo mi propio dispositivo, pero internet limitado
+A veces tengo internet, pero no es fiable
+Tengo mi propio dispositivo e internet fiable",Awareness,,Baseline access – Assesses digital equity and reach,,,,,,,,,,
+10,Digital Inclusion & Innovation,How often do you use digital tools to express yourself creatively?,¿Con qué frecuencia utilizas herramientas digitales para expresarte de forma creativa?,,Never → Daily,Nunca → Diario,Agency,,Creative expression – Tracks tech as identity/voice amplifier,,,,,,,,,,
+11,Digital Inclusion & Innovation,How confident are you using digital tools to solve problems or express ideas?,¿Qué tan seguro te sientes al usar herramientas digitales para resolver problemas o expresar ideas?,,Not confident → Very confident,No estoy seguro → Estoy muy seguro,Agency,,Confidence in using tech – Sheds light on digital agency,,,,,,,,,,
+12,Digital Inclusion & Innovation,Have you or someone you know experienced online scams or fraud?,¿Usted o alguien que conoce ha sido víctima de estafas o fraudes en línea?,,Yes / No / Not sure / I feel well equiped to avoid them,Sí / No / No estoy seguro / Me siento bien preparado para evitarlos,Awareness,,Digital safety experience – Flags vulnerability to online threats,,,,,,,,,,
+13,Digital Inclusion & Innovation,How do you feel about the future of AI in your life and work?,¿Qué opinas del futuro de la IA en tu vida y en tu trabajo?,,Curious / Worried / Excited / Cautious/ Don’t care,Curioso/a / Preocupado/a / Emocionado/a / Cauteloso/a / Me da igual,Intent,,AI perceptions – Gauges hope/fear balance for future tech. This is anticipatory attitude — useful as Intent if treated as emotional orientation toward future tools,,,,,,,,,,
+14,Digital Inclusion & Innovation,Have you used AI tools (like ChatGPT)?,¿Has utilizado herramientas de IA (como ChatGPT)?,,For fun / For school / For work / Other (please share),"Para divertirse / Para la escuela / Para el trabajo / Otro (por favor, indique)",Awareness,,AI familiarity – Measures exposure and barriers,,,,,,,,,,
+15,Digital Inclusion & Innovation,"If you had access to an AI tool, what would you use it for?","Si tuvieras acceso a una herramienta de IA, ¿para qué la usarías?",,Study / Build confidence / Mental health / Create ideas,Estudiar / Desarrollar la confianza / Salud mental / Generar ideas,Agency,,AI for good use cases – Reveals aspirational drivers of AI use,,,,,,,,,,

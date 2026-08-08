@@ -88,6 +88,39 @@ namespace :verto do
     report_variances(importer)
   end
 
+  desc "Rewrite db/seeds/exports/manifest.yml from the files that are there. " \
+       "Records each export's source workbook, sheet, row and column counts and the " \
+       "SHA-256 of its decompressed bytes — which the importer checks before reading, " \
+       "so a citation always traces to a file whose contents are known. " \
+       "Run it after adding or replacing an export, and commit the result."
+  task manifest: :environment do
+    existing = ExportManifest.entries
+    out = {}
+
+    Dir[ExportManifest::DIR.join("*.csv.gz")].sort.each do |path|
+      name  = File.basename(path)
+      shape = ExportManifest.shape(path)
+      # Provenance is human knowledge and is never overwritten — only the
+      # digest and the counts are re-derived from the file.
+      out[name] = (existing[name] || { "source" => "UNKNOWN — fill this in", "sheet" => "", "conversion" => "" })
+                    .merge(shape).merge("sha256" => ExportManifest.digest(path))
+      puts format("  %-58s %7d rows × %2d cols", name, shape["rows"], shape["columns"])
+    end
+
+    File.write(ExportManifest::FILE, <<~HEADER + out.to_yaml.sub(/\A---\n/, ""))
+      # What each committed export is, and proof that it still is.
+      #
+      # `sha256` is of the DECOMPRESSED bytes, so re-gzipping at a different
+      # compression level does not read as a different dataset. VertoCsvImporter
+      # checks it before reading a row and refuses a file that does not match:
+      # a silently edited export would otherwise import cleanly, move every
+      # number, and say nothing about why.
+      #
+      # Regenerate with: bin/rails verto:manifest
+    HEADER
+    puts "Wrote #{ExportManifest::FILE.relative_path_from(Rails.root)} (#{out.size} exports)."
+  end
+
   desc "Build a Verto from a deck alone, with no export to replay — for a deck " \
        "we have the questions for but not the answers. Creates the account and the " \
        "playable Verto, nothing else. Requires IMPORT_DECK and IMPORT_PASSWORD (12+ chars). " \

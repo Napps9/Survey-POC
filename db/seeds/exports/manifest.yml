@@ -1,0 +1,282 @@
+# What each committed export is, and proof that it still is.
+#
+# `sha256` is of the DECOMPRESSED bytes, so re-gzipping at a different
+# compression level does not read as a different dataset. VertoCsvImporter
+# checks it before reading a row and refuses a file that does not match:
+# a silently edited export would otherwise import cleanly, move every
+# number, and say nothing about why.
+#
+# Regenerate with: bin/rails verto:manifest
+aaf_valparaiso_final_raw_data__accepted_polling_and_survey.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: accepted_polling_and_survey
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__age.csv.gz:
+  columns: 3
+  conversion: trailing blank rows dropped
+  rows: 464
+  sha256: c032639017d2194d022a46893424404bfa8d1bbff170f3e358e8056648f6f18d
+  sheet: age
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__all_raw_data_removed_blanks_on.csv.gz:
+  columns: 65
+  conversion: trailing blank rows dropped
+  rows: 3179
+  sha256: 281e416cf5d6b8b3360c25f796e5558857adfd94f10a2e30d1d122223a41462b
+  sheet: all_raw_data_removed_blanks_on
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__copy_of_raw_data_general.csv.gz:
+  columns: 64
+  conversion: trailing blank rows dropped
+  rows: 3477
+  sha256: 7c6f677195f0ddb5c2e39dd0624ec0871aa877e5a8c480a3afc4d280241f2268
+  sheet: copy_of_raw_data_general
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__distribution.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: distribution
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__fundacion_piensa.csv.gz:
+  columns: 5
+  conversion: trailing blank rows dropped
+  rows: 15
+  sha256: fec38205b942403396d8a8a3f7c88624f5e09d35114cc292bc3c351eef7c3ea2
+  sheet: fundacion_piensa
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__gender.csv.gz:
+  columns: 3
+  conversion: trailing blank rows dropped
+  rows: 10
+  sha256: ba0a30748e0c69d5ffe9d1b0e3dd27162ed01d13ab15a4531df6dd910bb642a7
+  sheet: gender
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__links.csv.gz:
+  columns: 7
+  conversion: trailing blank rows dropped
+  rows: 19
+  sha256: b3f4dd2149259d5857db70a9b4bc8f781feb99e45a02d3006aba1e4bc22de16d
+  sheet: links
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__location.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: location
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__players.csv.gz:
+  columns: 11
+  conversion: trailing blank rows dropped
+  rows: 11
+  sha256: ff2e5d72c04dfeb1b8ea92726e5632b8f66ae6e6d957eb29fa07425b60be9082
+  sheet: players
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q1.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: q1
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q10.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: q10
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q12.csv.gz:
+  columns: 3
+  conversion: trailing blank rows dropped
+  rows: 20
+  sha256: 2314b1789d36fa7ba6304d5bbce640da96ed8180b1ae0eb20de81e9a62ec2d35
+  sheet: q12
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q2.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: q2
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q3.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: q3
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q4.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: q4
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q5.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: q5
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q6.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: q6
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q7.csv.gz:
+  columns: 0
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  sheet: q7
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q8.csv.gz:
+  columns: 2
+  conversion: trailing blank rows dropped
+  rows: 0
+  sha256: 27063fb4f727d322a842e393ea864804b5c2d951d33a90d094c93f4c23dbd628
+  sheet: q8
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__q9.csv.gz:
+  columns: 3
+  conversion: trailing blank rows dropped
+  rows: 56
+  sha256: cf174cd4dc7381a945acefc83f6a911f7a85e41f86ad18b7dfd0a3e4618d9cbc
+  sheet: q9
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__raw_data_completion_percentage.csv.gz:
+  columns: 64
+  conversion: trailing blank rows dropped
+  rows: 2630
+  sha256: 022b667956001e70cad1c786c6db97d04bc05e1b8b0cb6880f0a92965b6705dc
+  sheet: raw_data_completion_percentage
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__raw_data_general.csv.gz:
+  columns: 64
+  conversion: trailing blank rows dropped
+  rows: 3477
+  sha256: 7c6f677195f0ddb5c2e39dd0624ec0871aa877e5a8c480a3afc4d280241f2268
+  sheet: raw_data_general
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__raw_data_multi.csv.gz:
+  columns: 61
+  conversion: trailing blank rows dropped
+  rows: 3477
+  sha256: be251d01820ab2733afd48951e3141978c2303f360738d5c3c0ce53d948f0a71
+  sheet: raw_data_multi
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__raw_data_multi_removed_blanks_o.csv.gz:
+  columns: 62
+  conversion: trailing blank rows dropped
+  rows: 3179
+  sha256: 4f78dfc59dcc03495187acc010df100dcb7394bbea174242b40d8e7f36343832
+  sheet: raw_data_multi_removed_blanks_o
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__sheet6.csv.gz:
+  columns: 64
+  conversion: trailing blank rows dropped
+  rows: 564
+  sha256: 5182e63edc9b78c09dc233deb34ce69d9d653a4933f0706ae01dabcbead6b603
+  sheet: sheet6
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__single_raw_data_removed_blanks.csv.gz:
+  columns: 51
+  conversion: trailing blank rows dropped
+  rows: 3179
+  sha256: ac8cbfd53b4aa114fa8738e85eaac93eca378d3d49ff1d1db7dbbe7191ba76bc
+  sheet: single_raw_data_removed_blanks
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+aaf_valparaiso_final_raw_data__summary.csv.gz:
+  columns: 3
+  conversion: trailing blank rows dropped
+  rows: 6
+  sha256: 7ddd6c3120db0d0080657a757c5b3810187bae76b80d234c98f057e78f4fb464
+  sheet: summary
+  source: AAF_Valparaiso__Final_Raw_Data.xlsx
+the_big_green_legacy_moe_raw_data.csv.gz:
+  columns: 49
+  conversion: trailing blank rows dropped; no title row in the source
+  rows: 126895
+  sha256: cbe1591cf9154ec422907a1b90a52b56b27d9973f8863cd887d1200b29f8ada0
+  sheet: Sheet 1
+  source: The_Big_Green_Legacy_MOE__Raw_Data.xlsx
+unyouth_sport_raw_data.csv.gz:
+  columns: 68
+  conversion: title row stripped; trailing blank rows dropped
+  rows: 1376
+  sha256: 78ca2cabc157a29133602bb78c6a905161eb34193493ca9e98488e55596d8972
+  sheet: Sheet 1
+  source: UNYouth_Sport__Raw_Data.xlsx
+walls_the_happiness_project_final_questions_adult_child_flow__adults_flow.csv.gz:
+  columns: 13
+  conversion: trailing blank rows dropped
+  rows: 24
+  sha256: 365b8571e978a6539cbfcdd40c419347de744011e1b5ca262ec2c3cc7e147eab
+  sheet: adults_flow
+  source: Walls_The_Happiness_Project__Final_Questions_Adult__Child_FLow.xlsx
+walls_the_happiness_project_final_questions_adult_child_flow__brainstorm.csv.gz:
+  columns: 6
+  conversion: trailing blank rows dropped
+  rows: 49
+  sha256: 85d0e3a904f428c1819d3acf008f3439694054c028ac8d8b9ba4d2f48a7a7494
+  sheet: brainstorm
+  source: Walls_The_Happiness_Project__Final_Questions_Adult__Child_FLow.xlsx
+walls_the_happiness_project_final_questions_adult_child_flow__childrens_flow.csv.gz:
+  columns: 13
+  conversion: trailing blank rows dropped
+  rows: 53
+  sha256: a7c58f3d64d7be52a27003e7ea31c8561fbe75787f1f052733191b86221a6e32
+  sheet: childrens_flow
+  source: Walls_The_Happiness_Project__Final_Questions_Adult__Child_FLow.xlsx
+walls_the_happiness_project_final_questions_adult_child_flow__childrens_flow_version_with_c.csv.gz:
+  columns: 6
+  conversion: trailing blank rows dropped
+  rows: 12
+  sha256: e285bffeeeded5790f88967012ae8549b3a36289157ec6798dbef5e22d6b4cd7
+  sheet: childrens_flow_version_with_c
+  source: Walls_The_Happiness_Project__Final_Questions_Adult__Child_FLow.xlsx
+walls_the_happiness_project_final_questions_adult_child_flow__final_adult_flow.csv.gz:
+  columns: 7
+  conversion: trailing blank rows dropped
+  rows: 18
+  sha256: 18d3fe4bcb07aaa98948fc4e67c266608f988bb152ef949d70271667b49dd33f
+  sheet: final_adult_flow
+  source: Walls_The_Happiness_Project__Final_Questions_Adult__Child_FLow.xlsx
+walls_the_happiness_project_final_questions_adult_child_flow__final_adults_flow.csv.gz:
+  columns: 4
+  conversion: trailing blank rows dropped
+  rows: 12
+  sha256: 0b2f53c1a63c23597b5f0bb5338c0bbec805f346988d5c97fb8b0a8eab75cfd3
+  sheet: final_adults_flow
+  source: Walls_The_Happiness_Project__Final_Questions_Adult__Child_FLow.xlsx
+walls_the_happiness_project_final_questions_adult_child_flow__final_childrens_flow.csv.gz:
+  columns: 5
+  conversion: trailing blank rows dropped
+  rows: 17
+  sha256: 3ba6ac680ab5ef84d12522aa71cc455bc1ca09c4faca1cdac68fc16038464c66
+  sheet: final_childrens_flow
+  source: Walls_The_Happiness_Project__Final_Questions_Adult__Child_FLow.xlsx
+wll_transforming_education_raw_data_digital.csv.gz:
+  columns: 69
+  conversion: title row stripped; trailing blank rows dropped
+  rows: 50835
+  sha256: ca84452da30c0a1def50e61a2d2cdb12c46aee59bb1c9822ea19b40fc4f099da
+  sheet: Sheet 1
+  source: WLL_Transforming_Education__Raw_Data_Digital.xlsx
+wll_transforming_education_raw_data_paper.csv.gz:
+  columns: 65
+  conversion: title row stripped; trailing blank rows dropped
+  rows: 3483
+  sha256: 5dbb8a60f73f7ab7462bb124b231fbea07ae8f0542ea51b42248443e52ee279a
+  sheet: Sheet 1
+  source: WLL_Transforming_Education__Raw_Data_Paper.xlsx

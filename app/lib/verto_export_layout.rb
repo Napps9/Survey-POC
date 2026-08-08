@@ -97,6 +97,14 @@ module VertoExportLayout
 
   class AmbiguousLayout < StandardError; end
 
+  # What the header should have been. `headers` is the corrected list — long
+  # enough to cover the data, with placeholders where the export named nothing
+  # and any orphaned names moved to the end.
+  Plan = Struct.new(:headers, :shift, :tail_shift, :confidence, keyword_init: true) do
+    def realigned? = shift.positive?
+    def piecewise? = shift != tail_shift
+  end
+
   Result = Struct.new(:rows, :shift, :tail_shift, :confidence, keyword_init: true) do
     def realigned? = shift.positive?
 
@@ -111,34 +119,45 @@ module VertoExportLayout
   # Aligned files are returned untouched — no copying, no risk of changing
   # behaviour for the exports that were always fine.
   def realign(table)
-    headers = table.headers.map(&:to_s)
-    sample  = sample_rows(table)
+    plan = plan_for(table.headers.map(&:to_s), sample_rows(table.each.map(&:fields)))
+    rows = plan.realigned? ? table.map { |row| CSV::Row.new(plan.headers, row.fields) } : table.each.to_a
+    # `each.to_a`, not `to_a`: CSV::Table#to_a yields the header plus raw field
+    # ARRAYS, which have no `row["Language"]` — every caller downstream reads by
+    # name, so rows must stay CSV::Row.
+    Result.new(rows: rows, shift: plan.shift, tail_shift: plan.tail_shift, confidence: plan.confidence)
+  end
 
+  # The decision on its own, without the rows.
+  #
+  # An export large enough to matter (127 MB, 126,895 rows) cannot be held in
+  # memory to be corrected — but the DECISION only ever needed the header and a
+  # bounded sample. So the caller reads a little, asks for a plan, and then
+  # streams the whole file against `plan.headers`, which is the corrected header
+  # list every `row["Some Question (range)"]` lookup resolves through.
+  #
+  # `sample` is raw field arrays, not CSV::Row, precisely so a streaming caller
+  # does not have to build rows before it knows what the header is.
+  def plan_for(headers, sample)
     scores = CANDIDATE_SHIFTS.to_h { |shift| [ shift, score(headers, sample, shift) ] }
     shift  = decide!(scores, "preamble")
 
-    if shift.zero?
-      # `each.to_a`, not `to_a`: CSV::Table#to_a yields the header plus raw field
-      # ARRAYS, which have no `row["Language"]` — every caller downstream reads
-      # by name, so rows must stay CSV::Row.
-      return Result.new(rows: table.each.to_a, shift: 0, tail_shift: 0, confidence: scores[shift])
-    end
+    return Plan.new(headers: headers, shift: 0, tail_shift: 0, confidence: scores[shift]) if shift.zero?
 
     tail_scores = (0..shift).to_h { |s| [ s, question_score(headers, sample, s) ] }
     tail_shift  = decide!(tail_scores, "question")
 
-    Result.new(rows: shifted_rows(table, headers, shift, tail_shift),
-               shift: shift, tail_shift: tail_shift, confidence: scores[shift])
+    Plan.new(headers: padded_headers(headers, shift, tail_shift),
+             shift: shift, tail_shift: tail_shift, confidence: scores[shift])
   end
 
   # The rows worth scoring: the first SAMPLE_SIZE with real content, falling
   # back to the first SAMPLE_SIZE outright when nothing clears the bar (a tiny
   # fixture, an export of abandonments) so the decision is still made on
   # evidence rather than on an empty set.
-  def sample_rows(table)
-    filled = table.each.lazy.select { |row| row.fields.count { |v| v.to_s.strip != "" } >= MIN_ROW_FILL }
-                  .first(SAMPLE_SIZE)
-    filled.presence || table.first(SAMPLE_SIZE)
+  def sample_rows(rows)
+    filled = rows.lazy.select { |fields| fields.count { |v| v.to_s.strip != "" } >= MIN_ROW_FILL }
+                 .first(SAMPLE_SIZE)
+    filled.presence || rows.first(SAMPLE_SIZE)
   end
 
   # How many probe values land where `shift` says they should.
@@ -161,7 +180,7 @@ module VertoExportLayout
   end
 
   def hits(sample, target, test)
-    sample.count { |row| target < row.fields.size && test.call(row.fields[target]) }
+    sample.count { |fields| target < fields.size && test.call(fields[target]) }
   end
 
   # Picks the winning shift, or refuses. A near-tie means the evidence doesn't
@@ -188,6 +207,37 @@ module VertoExportLayout
   def shifted_rows(table, headers, shift, tail_shift)
     padded = padded_headers(headers, shift, tail_shift)
     table.map { |row| CSV::Row.new(padded, row.fields) }
+  end
+
+  # Reads only as much of the file as the decision needs, then hands back the
+  # corrected header. `open` yields a fresh IO positioned at the start.
+  SCAN_LIMIT = 20_000
+
+  def plan_from(&open)
+    headers = nil
+    sample  = []
+
+    open.call.then do |io|
+      begin
+        CSV.new(io).each do |fields|
+          if headers.nil?
+            # A BOM survives as part of the first header name and would make
+            # row["Viewing ID"] miss by one invisible character.
+            headers = fields.map(&:to_s)
+            headers[0] = headers[0].delete_prefix("\uFEFF")
+            next
+          end
+          sample << fields
+          break if sample.size >= SCAN_LIMIT
+        end
+      ensure
+        io.close
+      end
+    end
+
+    raise AmbiguousLayout, "This export has no header row." if headers.nil?
+
+    plan_for(headers, sample_rows(sample))
   end
 
   def padded_headers(headers, shift, tail_shift)

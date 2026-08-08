@@ -22,6 +22,7 @@
 #     bin/rails "verto:import_csv[db/seeds/unyo_sport_x_changemaking_2026.csv]"
 class VertoCsvImporter
   require "csv"
+  require "zlib"
 
   DEFAULT_ORG_NAME    = "UNYO".freeze
   DEFAULT_ORG_SLUG    = "unyo".freeze
@@ -185,7 +186,7 @@ class VertoCsvImporter
   # Builds the account + Verto + responses in one transaction. Returns the Survey.
   def call
     require_password!
-    rows  = read_rows
+    plan!
     specs = build_specs
     cards = specs.map { |s| s[:card] }
 
@@ -195,12 +196,34 @@ class VertoCsvImporter
       org = create_organisation!
       create_admin!(org)
       survey = create_survey!(org, cards)
-      rows.each do |row|
+
+      batch = []
+      each_row do |row|
         attrs = response_attributes(specs, row)
-        survey.responses.create!(attrs) if attrs
+        next unless attrs
+
+        batch << attrs.merge(survey_id: survey.id)
+        batch = flush!(batch) if batch.size >= INSERT_BATCH
       end
+      flush!(batch, force: true)
     end
-    survey
+    survey.reload
+  end
+
+  # Rows go in a batch at a time rather than one Response at a time, because the
+  # largest export here is 126,895 of them and per-row validation, callbacks and
+  # broadcasts are most of that cost.
+  #
+  # `answered` is normally kept in step by a before_save, so it is computed here
+  # instead — it is the flag the corpus counts on, and an insert that skipped it
+  # would leave a whole import invisible to Ask Verto.
+  INSERT_BATCH = 1_000
+
+  def flush!(batch, force: false)
+    return batch if batch.empty? || (!force && batch.size < INSERT_BATCH)
+
+    Response.insert_all!(batch)
+    []
   end
 
   # Upsert the CSV into an EXISTING account + Verto instead of rebuilding: adds
@@ -209,7 +232,7 @@ class VertoCsvImporter
   # Verto (and its /play link) and any organically-collected responses (which
   # carry random tokens) are left untouched. Returns { survey:, added:, updated: }.
   def append!
-    rows  = read_rows
+    plan!
     specs = build_specs
     cards = specs.map { |s| s[:card] }
 
@@ -230,7 +253,7 @@ class VertoCsvImporter
     added = 0
     updated = 0
     ActiveRecord::Base.transaction do
-      rows.each do |row|
+      each_row do |row|
         attrs = response_attributes(specs, row)
         next unless attrs
 
@@ -337,12 +360,51 @@ class VertoCsvImporter
   # import of comprehensively wrong answers. VertoExportLayout detects that from
   # the shape of the data and either corrects it or refuses the file. Aligned
   # exports pass through untouched.
-  def read_rows
-    table = CSV.read(@csv_path, headers: true, encoding: "bom|utf-8")
-    result = VertoExportLayout.realign(table)
-    @layout_shift = result.shift
-    @headers = result.rows.first&.headers&.map(&:to_s) || []
-    result.rows
+  def plan!
+    ExportManifest.verify!(@csv_path)
+    @plan = VertoExportLayout.plan_from { open_export }
+    @layout_shift = @plan.shift
+    @headers = @plan.headers
+    @plan
+  end
+
+  # Every data row, as a CSV::Row over the CORRECTED header.
+  #
+  # Streamed rather than materialised: the largest export here is 127 MB
+  # decompressed, and `CSV.read` on it would build the whole table in Ruby
+  # objects before a single response was written. The layout decision is made
+  # first, from the header plus a bounded sample, so this pass only has to
+  # attach a header it already knows.
+  # Public because reading the export is not only the import's business: the
+  # reconciliation task recomputes every distribution straight from these rows
+  # and compares it to what was stored, which is the whole proof that the
+  # import changed nothing.
+  public def each_row
+    return enum_for(:each_row) unless block_given?
+
+    plan! if @plan.nil?
+    io = open_export
+    first = true
+    CSV.new(io).each do |fields|
+      if first
+        first = false
+        next
+      end
+      yield CSV::Row.new(@plan.headers, fields)
+    end
+  ensure
+    io&.close
+  end
+
+  # Exports are committed gzipped — the Big Green file is 127.7 MB as CSV and
+  # GitHub rejects anything over 100 MB — so the importer reads either form.
+  # Nothing else in the path knows the difference.
+  def open_export
+    if @csv_path.to_s.end_with?(".gz")
+      Zlib::GzipReader.new(File.open(@csv_path, "rb"), external_encoding: "UTF-8")
+    else
+      File.open(@csv_path, "r:bom|utf-8")
+    end
   end
 
   # Response attributes for one CSV row (nil when the row has no Viewing ID).
@@ -389,6 +451,11 @@ class VertoCsvImporter
       # the paper cohort would upsert over the digital one and both would be
       # wrong, silently.
       session_token:  [ @org_slug, @deck.collection_mode, token ].compact.join("-"),
+      # Normally kept in step by Response#sync_answered. Rows go in through
+      # insert_all! for speed, which skips callbacks — and this is the flag the
+      # whole corpus counts on, so an import that left it false would be a
+      # Verto that imported perfectly and was invisible to Ask Verto.
+      answered:       answers.values.any? { |a| Response.answered_entry?(a) },
       # A fact about the session, not a gate. Nothing in the corpus path reads
       # it — a respondent who answered eleven of twenty-four questions answered
       # those eleven, and each question counts the people who answered it.

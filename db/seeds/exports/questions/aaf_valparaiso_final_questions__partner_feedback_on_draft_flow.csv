@@ -1,0 +1,208 @@
+,,,,,,,,,Group 1 ,,,Group 2,,,Group 3,,,Group 4,,,Group 5,,
+Column 1,Theme,Question,Esp_Question_translation,Suggested Answers,Esp_Answer_translation,Methodology Layer,Tags/Notes,Used in other PV games,RAG SYSTEM,Comments,Eng_translation,RAG SYSTEM,Comments,Eng_translation,RAG SYSTEM,Comments,Eng_translation,RAG SYSTEM,Comments,Eng_translation,RAG SYSTEM,Comments,Eng_translation
+,Mental Health & Wellbeing,Imagine a space where young people feel mentally safe — what’s in it?,Imagina un espacio donde los jóvenes se sientan mentalmente seguros: ¿qué características tendría?,"Art or creativity
+Movement or physical activity
+Quiet or calm
+Trusted support (e.g. adults, peers)
+Nature or outdoor space
+Music or sound
+Other (please share)","Arte o creatividad
+Movimiento o actividad física
+Tranquilidad o calma
+Apoyo de confianza (por ejemplo, adultos, compañeros)
+Naturaleza o espacio al aire libre
+Música o sonido
+Otro (por favor, indique)",Awareness - Intent (hybrid),"Ideal mental health spaces – Inspires partner-led design ideas. While this is forward-looking, it’s largely imaginative awareness — how young people mentally construct safety",,Reword,Sugerimos cambiar esta por 2 preguntas; ¿cómo sería tu espacio seguro? y ¿qué actividades te hacen sentir seguro?,We suggest replacing this with two questions: What would your safe space be like? and What activities make you feel safe?,Reword,,N/A,Reword,"Que sea selección multiple, con un máximo de tres respuestas. 
+Las opciones con ""o"" cambiarlos a y/o. Ejempli: arte y/o creatividad 
+Agregar condición habitacional segura.","Make it a multiple-choice question with a maximum of three answers.
+
+Change options with ""or"" to ""and/or"". Example: art and/or creativity
+
+Add safe housing conditions.",Reword,Ampliar más espacios. Y contextualizar según el territorio,Expand spaces. And contextualize them according to the territory.,Reword,"Para menores de 16 años, puede que no entiendan o reconozcan el término ""mentalmente seguro"", se podría utilizar un término más concreto. Además, la segunda pregunta se refiere a el individuo, no a  los jóvenes, podrían ambas referirse a un individuo o a los ""jóvenes"". Esta no debería ser la primera pregunta, primero deberían ser las preguntas para conocer quién es el estudiante y quizás partir con preguntas más generales. ","For those under 16, the term ""mentally safe"" may not be understood or recognized; a more specific term could be used. Furthermore, the second question refers to the individual, not young people in general; both questions could refer to an individual or to ""young people"" in general. This shouldn't be the first question; the initial questions should focus on understanding who the student is, perhaps starting with more general inquiries."
+,Mental Health & Wellbeing,"When you're feeling low or overwhelmed, who or what do you turn to?","Cuando te sientes decaído o abrumado, ¿a quién o a qué recurres?","Friends or Family
+Music or art
+Nature or being outside
+Social media or online content
+I don’t know
+Other (please type)","Amigos o familia
+Música o arte
+Naturaleza o actividades al aire libre
+Redes sociales o contenido en línea
+No lo sé
+Otro (por favor, escriba)",Awareness,Support pathways – Reveals where youth turn in moments of stress,,Reword,"Cuando te sientes triste, ¿a quién recurres? y ¿qué haces?","When you feel sad, who do you turn to? And what do you do?",Reword,"Dividir en personas y acciones, en las opciones de respuestas","Divide into people and actions, in the answer options",Reword,"Las opciones ""o"" dejarlas en y/o.
+Agregar necesito estar solo en un tiempo de introspección. 
+Agregar hacer deporte. 
+Agregar ""no tengo a quién recurrir"" (o agregar una pregunta previa si cuento con una red de contención) 
+ 
+","Leave the ""or"" options as ""and/or"".
+
+Add ""I need to be alone for some time of introspection"".
+
+Add ""I do sports"".
+
+Add ""I have no one to turn to"" (or add a question beforehand if I have a support network).
+
+",Reword,"Incluir deporte y escuela. Inluir alcohol y drogas. La pregunta debería decir: ¿Cuando te sientes TRISTE, SOLO Y SOBREPASADO.....","Include sports and school. Include alcohol and drugs. The question should be: When you feel SAD, LONELY, and OVERWHELMED...",Reword,"En la pregunta, la palabra ""deprimido"" quizás puede ser considerada muy extrema. Podrían separar en las respuestas las categorías de amigos y familia. Incluir un encuadre: piensa en esta situación... ayudarlos a imaginar primero antes de llevarlo a la pregunta. Esta pregunta debería estar más hacia el final o después de preguntar cómo se sienten sobre distintas cosas, pues los encuadra en una perspectiva de la tristeza.","In the question, the word ""depressed"" might be considered too extreme. You could separate the responses into the categories of friends and family. Include a frame: think about this situation... help them imagine it first before leading them to the question. This question should be placed toward the end or after asking how they feel about different things, as it frames them within a perspective of sadness."
+,Digital Inclusion & Innovation,How do you feel about the future of AI in your life and work?,¿Qué opinas del futuro de la IA en tu vida y en tu trabajo?,Curious / Worried / Excited / Don’t care,Curioso/a / Preocupado/a / Emocionado/a / Me da igual,Intent,AI perceptions – Gauges hope/fear balance for future tech. This is anticipatory attitude — useful as Intent if treated as emotional orientation toward future tools,,Reword,Eliminar la palabra futuro para evitar la incertidumbre,Remove the word future to avoid uncertainty,Keep,,N/A,Reword,"En relación a la incorporación de la inteligencia artificial, ¿cómo te sientes acerca del futuro en tu contexto personal, educativo y laboral? Elegir la que más te hace sentido. 
+","Regarding the integration of artificial intelligence, how do you feel about the future in your personal, educational, and professional context? Choose the one that makes the most sense to you.
+
+",Reword,Escribir en primera persona. ,Write in the first person.,Keep,,N/A
+,Digital Inclusion & Innovation,How confident are you using digital tools to solve problems or express ideas?,¿Qué tan seguro te sientes al usar herramientas digitales para resolver problemas o expresar ideas?,Not confident → Very confident,No estoy seguro → Estoy muy seguro,Agency,Confidence in using tech – Sheds light on digital agency,,Remove,Eliminar,Eliminate,Remove,,N/A,Keep,"Sugerimos ""tutear"" ","We suggest using the informal ""tú"" form.",Keep,Incluir una tabla de puntuación de confianza. ¿Cuanta confianza te da usar herrmientas digitales para resolver porblemas....?,Include a confidence scoring table. How confident are you in using digital tools to solve problems...?,Reword,"Las opciones de respuesta podrían ser en escala Likert. Incluir ejemplos concretos de ""herramientas digitales"".","Response options could be on a Likert scale. Include specific examples of ""digital tools""."
+,Civic Engagement & Youth Leadership,Have you ever taken action to make change in your community?,¿Alguna vez has tomado medidas para generar un cambio en tu comunidad?,Yes / No / Not sure,Sí / No / No estoy seguro,Agency,Civic action history – Baseline of prior engagement,,Reword,¿alguna vez has participado en una acción para ayudar a hacer un cambio en tu barrio? Reflexionamos como los jóvenes entienden el concepto de comunidad.,Have you ever participated in an action to help make a change in your neighborhood? We reflect on how young people understand the concept of community.,Keep,,N/A,Keep,,N/A,Keep,Inluir una cuarta respuesta que sea: No he tenido la oportunidad,Include a fourth answer that is: I haven't had the opportunity,Reword,"Consideramos que esta pregunta es muy amplia, se podría ejemplificar por ejemplo según rango etario.  Se podría por ejemplo preguntar si ha participado en un proyecto comunitario dando ejemplos de a qué se refieren estos y así en base a si responde sí o no, tendría más sentido preguntar sobre participar en proyectos comunitarios.","We believe this question is too broad; it could be broken down by age group, for example. One could ask if the person has participated in a community project, giving examples of what these projects entail, and then, based on the yes or no answer, it would be more relevant to ask about participating in community projects."
+,Civic Engagement & Youth Leadership,What’s the best way for young people to influence change?,¿Cuál es la mejor manera para que los jóvenes influyan en el cambio?,"Protest, Policy, Art, Social media, Community work","Protesta, Política, Arte, Redes sociales, Trabajo comunitario",Intent,Influence methods – Maps what young people believe is effective,,Reword,"¿cuál crees tu, que es la mejor manera de generar cambios?",What do you think is the best way to generate change?,Reword,Considerar espacios publicos,Consider public spaces,Reword,"Agregar academia (investigación, tesis, otras)
+Agregar otro y dejar espacio de respuesta ","Add academic background (research, thesis, other)
+Add another and leave space for reply",Remove,"Si quieren preguntar sobre el cambio, que la pregunta sea sobre los apsectos de la sociedad que preocupan al joven","If they want to ask about change, let the question be about the aspects of society that concern young people.",Reword,"Creemos que la pregunta es muy amplia. Podría ser algo un poco más concreto que ""influyan en el cambio"" por ejemplo ""generar un cambio en XX contextos"". Incluir la respuesta ""otro"" y que puedan escribir. Además todas las respuestas podrían ser ""política"". ","We believe the question is too broad. It could be more specific, such as ""influence change,"" for example, ""generate change in XX contexts."" Include an ""other"" response option and allow participants to write in their responses. Additionally, all responses could be ""political."""
+,Civic Engagement & Youth Leadership,Taking part in community projects or speaking up helps me…,Participar en proyectos comunitarios o alzar la voz me ayuda…,"feel more confident in myself
+connect with people who are different to me
+feel like I belong
+care more about the planet
+stay calm when things get hard
+believe I can make a difference
+feel hopeful for the future of the planet""","Me siento más segura de mí misma
+Conecto con personas diferentes a mí
+Siento que pertenezco a un grupo
+Me preocupo más por el planeta
+Mantengo la calma cuando las cosas se ponen difíciles
+Creo que puedo marcar la diferencia
+Tengo esperanza en el futuro del planeta",Agency,Impact of participation – Encourages self-awareness of growth,,Reword,"En el caso de participar en actividades comunitarias y sociales, me ayuda a...",Participating in community and social activities helps me to...,Reword,"en la pregunta sacariamos ""o hablar"" porque es confuso ","In the question we would remove ""or speak"" because it is confusing",Reword,Sugerimos que la pregunta sea: participar en proyectos comunitarios me ayuda... ,We suggest asking the question: Does participating in community projects help me...,Reword,Reformular la pregunta: ¿Particpar o ser embajador de causas comunitarias...... OJO CON LA TRADUCCIÓN DE LAS RESPUESTAS,Rephrase the question: Participate or be an ambassador for community causes... PAY ATTENTION TO THE TRANSLATION OF THE ANSWERS,Reword,"Puede que hayan personas que no hayan participado en proyectos comunitarios, o que no sepan que es un proyecto comunitario. ","There may be people who have not participated in community projects, or who do not know what a community project is."
+,Economic Opportunity & Green Entrepreneurship,What kind of work or career feels most meaningful to you?,¿Qué tipo de trabajo o carrera profesional te resulta más significativo?,"Helping others
+Protecting nature
+Solving problems
+Creating new things
+Teaching or mentoring
+Building communities
+Telling stories or creating art
+Innovating with technology
+Standing up for justice
+I’m still figuring it out","Ayudar a los demás
+Proteger la naturaleza
+Resolver problemas
+Crear cosas nuevas
+Enseñar o guiar
+Construir comunidades
+Contar historias o crear arte
+Innovar con la tecnología
+Defender la justicia
+Todavía estoy descubriéndolo",Intent,Purpose in work – Reveals values-career alignment,,,,N/A,Reword,"Poner como alternativa el enfoque economico,  por ejemplo ""algo que me de dinero""","Offer an economic approach as an alternative, for example ""something that will give me money""",Reword,"Cambiar la redacción: Qué acciones te importan más.
+Alternativa: identificar y resolver problemas. ","Change the wording: What actions matter most to you?
+
+Alternative: Identify and solve problems.",Reword,"La pregunta debe estar vinculada con el propósito de vida, por ejemplo: De las siguientes acciones, cuál se conecta más con el propósito de tu vida?","The question should be linked to your life purpose, for example: Of the following actions, which one connects most with your life purpose?",Reword,"No nos gusta aquí la palabra ""trabajo"", podría ser por ejemplo cuál de las siguientes es ""tu propósito"" o con cual de estas te sientes más representado. Además que pregunten por el más significativo hace competir alternativas que pueden ser complementarias o que son parte de una misma carrera o profesión. Esta pregunta se podría aprovechar como un encuadre donde las alternativas sean las 4 temáticas que tiene el estudio por ejemplo. ","We don't like the word ""work"" here; it could be, for example, ""Which of the following is 'your purpose'?"" or ""Which of these do you feel most represented by?"" Furthermore, asking about the most significant option creates competition between alternatives that might be complementary or part of the same career or profession. This question could be used as a framework where the alternatives are the four themes of the study, for example."
+,Economic Opportunity & Green Entrepreneurship,"Right now, what matters most to you when looking for work?",¿Qué es lo que más te importa ahora mismo a la hora de buscar trabajo?,"Purpose, Pay, Security, Skills, Experience","Propósito, Remuneración, Seguridad, Habilidades, Experiencia",Awareness,Work motivators – Informs incentive-alignment strategies,,,,N/A,Keep,,N/A,Reword,Agregar seguridad/estabilidad,Add security/stability,Reword,"Inlcluir: clima laboral, horarios, modalidad laboral (híbrido, presencial, digital) Incluir la posibilidad de respuesta de alternativa múltiple","Include: work environment, schedules, work modality (hybrid, in-person, digital). Include the possibility of multiple-choice responses.",Keep,"Incluir en las alternativas ""no tengo interés""","Include ""I'm not interested"" in the alternatives"
+,Economic Opportunity & Green Entrepreneurship,Do you think green jobs are realistic where you live?,¿Crees que los empleos verdes son una opción realista en tu lugar de residencia?,"Yes — they already exist
+Maybe — but they’re hard to access
+Not yet — but they should be
+No — they don’t seem possible here
+Not sure","Sí, ya existen.
+Quizás, pero son difíciles de acceder.
+Todavía no, pero deberían.
+No, no parecen posibles aquí.
+No estoy seguro.",Awareness - Intent (hybrid),Green job viability – Perceived opportunity environment,,,,N/A,Reword,"Explicar que es un empleo verde, porque no se entiende.","Explain what a green job is, because it's not understood.",Reword,Agregar definición de qué es un empleo verde o sacar la pregunta,"Add a definition of what a green job is, or remove the question.",Remove,No hay conocimiento noi pennetración del concepto,"There is no knowledge, no penetration of the concept",Reword,Falta definir qué es un empleo verde,We need to define what a green job is.
+,Economic Opportunity & Green Entrepreneurship,How confident are you you’ll find (or create) work that fits your values?,¿Qué tan seguro estás de que encontrarás (o crearás) un trabajo que se ajuste a tus valores?,Not confident → Very confident,No estoy seguro → Estoy muy seguro,Agency,Confidence in alignment – Measures alignment hope vs. reality,,,,N/A,Keep,,N/A,Keep,,N/A,Reword,Cambiar valores por sueños,Swap values ​​for dreams,Remove,,N/A
+,Climate Action & Sustainability,What are some things you currently do to help the environment?,¿Qué cosas haces actualmente para ayudar al medio ambiente?,"I recycle or reuse things
+I walk, bike or use public transport instead of a car
+I save water or energy at home
+I avoid plastic when I can
+I speak up or post about climate issues
+I help others learn or take action
+I spend money on eco-friendly products or brands
+I vote (or would vote) based on climate issues
+I don’t do anything yet — but I want to
+I don’t do anything and I’m not sure why
+Other (please type)","Reciclo o reutilizo cosas
+Camino, uso la bicicleta o el transporte público en lugar del coche
+Ahorro agua o energía en casa
+Evito el plástico siempre que puedo
+Hablo o publico sobre temas climáticos
+Ayudo a otros a aprender o a tomar medidas
+Gasto dinero en productos o marcas ecológicas
+Voto (o votaría) en función de temas climáticos
+Aún no hago nada, pero quiero hacerlo
+No hago nada y no sé por qué
+Otro (por favor, escriba)",Agency,"Eco-action habits – Surfaces everyday behaviours that reflect environmental agency and intent to act, even at small scales.",,,,N/A,Keep,,N/A,Keep,Marcar todas las opciones que quieran,Select all the options you want,,,N/A,Reword,"Cambiar conducir por movilizarse en auto. E incluir la opción ""no hago nada porque no me interesa"". ","Replace driving with getting around by car. And include the option ""I do nothing because I'm not interested""."
+,Climate Action & Sustainability,What stops young people from doing more for the planet?,¿Qué impide a los jóvenes hacer más por el planeta?,"Cost
+Time
+Lack of information
+Lack of support
+Doubt it makes a difference
+No motivation
+Other (please specify)","Costo
+Tiempo
+Falta de información
+Falta de apoyo
+Dudo que marque la diferencia
+Falta de motivación
+Otro (especifique)",Awareness,Barriers to action – Systemic inhibitors for action,,,,N/A,Reword,"Cambiar ""Falta de Motivación"" en vez de sin motivación. ","Change ""Lack of Motivation"" to ""without motivation"".",Keep,,N/A,,,N/A,Reword,En la opción costo se podría especificar que se refiere al costo económico.,"In the cost option, you could specify that it refers to the economic cost."
+,Mental Health / Climate Action & Sustainability,How worried are you about climate change?,¿Qué tan preocupado/a está usted por el cambio climático?,"Not at all worried
+Not very worried
+Somewhat worried
+Very worried","Nada preocupado
+No muy preocupado
+Algo preocupado
+Muy preocupado",Awareness,Climate concern – Gauges emotional connection to the climate crisis and how present or urgent it feels in daily life,,,,N/A,Keep,,N/A,Keep,,N/A,,,N/A,Reword,"Se podría incluir una definición de qué es el cambio climático. Respecto a la temática de cambio climático en general creemos que hay muchas preguntas enfocadas en ""el presente"" y solo 1 enfocada en el futuro.","A definition of climate change could be included. Regarding the topic of climate change in general, we believe there are many questions focused on ""the present"" and only one focused on the future."
+,Reflection,What do you dream about for the future — for yourself or your community?,"¿Qué sueñas para el futuro, ya sea para ti o para tu comunidad?",Free text,Texto libre,Intent,"Aspirational dreams – Raw, personal insight for storytelling",,,,N/A,Keep,,N/A,Keep,,N/A,,,N/A,Keep,,N/A
+,Demographics,How old are you?,¿Cuántos años tiene?,"Under 16
+16–18
+19–21
+22–24
+25–29
+Over 29","Menores de 16 años
+16–18 años
+19–21 años
+22–24 años
+25–29 años
+Mayores de 29 años",,,,,,N/A,Keep,,N/A,Keep,,N/A,,,N/A,Keep,Las preguntas de caracterización deberían ir al comienzo. ,Characterization questions should go at the beginning.
+,Demographics,"What is your gender?
+","¿Cuál es tu género?
+","Female
+Male
+Prefer not to say","Mujer
+Hombre
+Prefiero no decirlo",,,,,,N/A,Reword,Agregaríamos la opción Otros y la opción especificar si es que el encuestado quiere decirlo,"We would add the ""Other"" option and the option to specify if the respondent wants to say so.",Keep,,N/A,,,N/A,Keep,,N/A
+,Demographics,"Where do you live
+(Select your commune within the Valparaíso region)","¿Dónde vives?
+(Selecciona tu comuna dentro de la región de Valparaíso)","Cabildo
+Cartagena
+Concón
+El Quisco
+El Tabo
+Isla de Pascua (Rapa Nui)
+La Ligua
+Limache
+Los Andes
+Olmué
+Papudo
+Petorca
+Quilpué
+San Antonio
+San Felipe
+Santo Domingo
+Valparaíso
+Villa Alemana
+Viña del Mar
+Zapallar","Cabildo
+cartagena
+Concón
+El Quisco
+El Tabo
+Isla de Pascua (Rapa Nui)
+LaLigua
+limache
+Los Andes
+Olmué
+papudo
+petorca
+Quilpué
+San Antonio
+San Felipe
+santo domingo
+Valparaíso
+Villa Alemana
+viña del mar
+Zapallar",,,,,,N/A,Reword,"Faltan comunas, como Casablanca, Quintero, Llai Llai, Hijuela, etc. Se recomienda revisar todas las comunas de la región Adicionalmente  se recomienda que se refiera a Rapanui, sólo como rapa nui y que no este la opción Isla de Pascua, ya que para la cultura Rapa nui es ofensivo que le digan Isla de Pascua. ","Some municipalities are missing, such as Casablanca, Quintero, Llai Llai, Hijuela, etc. It is recommended to review all municipalities in the region. Additionally, it is recommended that Rapanui be referred to only as Rapa Nui and that the option Easter Island not be included, as it is offensive to the Rapa Nui culture to be called Easter Island.",Keep,,N/A,,,N/A,Keep,,N/A
+To check with collaborators on Tuesday,Economic Opportunity & Green Entrepreneurship,Which of these best describes your income situation?,¿Cuál de estas opciones describe mejor su situación de ingresos?,"I have no personal income
+I earn sometimes, but it’s not regular
+I earn regularly, but it only covers basics
+I earn regularly and can save or spend on extras","No tengo ingresos personales.
+Gano a veces, pero no es regular.
+Gano regularmente, pero solo me alcanza para lo básico.
+Gano regularmente y puedo ahorrar o gastar en extras.",Awareness,Income level – Useful for stratifying results,,,,N/A,Reword,"Modificariamos la ultima opción a ""Tengo estabilidad economica  y puedo ahorrar, invertir o gastar en extras"" Tambien seria interesante agregar el ""no necesito trabajar y tener ingresos""","We would modify the last option to ""I have financial stability and can save, invest, or spend on extras."" It would also be interesting to add ""I don't need to work and have an income.""",,,N/A,,,N/A,,,N/A
