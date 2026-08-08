@@ -110,9 +110,20 @@ class OpenTextThemer
     }
   }.freeze
 
-  def initialize(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
-    @client = build_anthropic_client(api_key)
+  # The key is read lazily and its absence is not fatal.
+  #
+  # Themes and quotes are the enrichment; the counts are the point. A Verto
+  # indexed where no key is configured stays fully citable for every closed
+  # question and simply carries no themes — which is what index_quotes' own
+  # rescue already says should happen when the call fails, and it could not
+  # happen while the client was built in the constructor.
+  def initialize(api_key: nil)
+    @api_key = api_key || ENV["ANTHROPIC_API_KEY"]
   end
+
+  def configured? = @api_key.present?
+
+  def client = @client ||= build_anthropic_client(@api_key)
 
   # Returns { themes: [{ "label" =>, "count" => }], quotes: [{ body:, theme: }],
   #           read:, of:, sampled: }.
@@ -127,6 +138,7 @@ class OpenTextThemer
   # a regex cannot, it does not repeat what a regex already did.
   def call(question_text:, texts:)
     texts = Array(texts).map(&:to_s).reject(&:blank?)
+    return empty(texts.size) unless configured?
     return empty(texts.size) if texts.size < CorpusEntry.min_sample_size
 
     batches = batches_for(texts)
@@ -165,7 +177,7 @@ class OpenTextThemer
   end
 
   def theme_one(question_text, batch)
-    response = @client.messages.create(
+    response = client.messages.create(
       model:       MODEL,
       max_tokens:  MAX_TOKENS,
       system:      SYSTEM_WITH_SAFETY,
