@@ -63,6 +63,21 @@ that: push green.
 
 ## Gotchas
 
+- Importing a partner's survey export means writing a **deck**
+  (`app/lib/verto_decks/`), not editing `VertoCsvImporter` — the importer is the
+  machinery, a deck is the questions and the account. Spec ORDER is card order
+  is the positional key every answer is stored under, so reordering a deck after
+  an import re-points every stored answer. `IMPORT_DECK=<key>` selects one;
+  `VertoDecks.available` lists them.
+- Some exports carry a data column their header doesn't name, and the two halves
+  of one export can be shifted **differently** — WLL's paper file is +1 to the
+  end, its digital file is +1 for six preamble columns and then aligned again.
+  `VertoExportLayout` measures the preamble and the questions separately and
+  refuses an ambiguous file. Don't replace it with a fixed offset: the importer
+  reads every column by name, so a wrong offset produces a clean-looking import
+  of comprehensively wrong answers.
+- Respondent-level exports are **not** committed. The importer and a synthetic
+  fixture ship; the real CSVs are handed over out of band.
 - The test suite stubs all Anthropic clients, but service constructors do
   `ENV.fetch("ANTHROPIC_API_KEY")` — the var must exist (any value) to run
   tests. CI sets a stub value.

@@ -63,7 +63,23 @@ class CorpusIndexer
     # already floored at MIN_SAMPLE_SIZE overall — a segment that can't clear it
     # in total will never clear it on a question.
     def segments(base)
-      gender(base) + age(base) + country(base)
+      gender(base) + age(base) + country(base) + collection_mode(base)
+    end
+
+    # How the response was collected, when a Verto was run more than one way.
+    #
+    # Absent for almost every Verto — the column is NULL when a response came
+    # through the player, which is the ordinary case — so this dimension simply
+    # doesn't appear rather than producing a single meaningless "everyone" cell.
+    # It exists because a programme that ran on paper AND digitally is one study
+    # whose two halves are worth comparing, and merging them into one Verto
+    # would otherwise throw that comparison away.
+    def collection_mode(base)
+      base.reorder(nil).where.not(collection_mode: nil)
+          .group(:collection_mode).count
+          .select { |_mode, n| n >= CorpusEntry::MIN_SAMPLE_SIZE }
+          .sort_by { |_mode, n| -n }.first(MAX_PER_DIMENSION)
+          .map { |mode, _n| [ "Collected: #{mode}", base.where(collection_mode: mode) ] }
     end
 
     def gender(base)

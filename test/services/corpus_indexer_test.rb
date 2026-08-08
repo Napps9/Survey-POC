@@ -188,6 +188,54 @@ class CorpusIndexerTest < ActiveSupport::TestCase
   end
 
   # ── Segments ──────────────────────────────────────────────────────────────
+  # A programme run twice — digitally and on paper — is one study whose halves
+  # are worth comparing. Merging them into one Verto is what lets Ask Verto cite
+  # the combined sample; this dimension is what stops that merge losing the
+  # comparison.
+  test "collection mode becomes a breakdown when a Verto was run more than one way" do
+    survey = survey_with([ { "type" => "multiple_choice", "cid" => "c_m", "text" => "Why?",
+                             "options" => [ "Money", "Time" ] } ])
+    seed!(survey, 40) { { "0" => { "value" => "Money" } } }
+    survey.responses.limit(40).update_all(collection_mode: "digital")
+    seed!(survey, 35) { { "0" => { "value" => "Time" } } }
+    survey.responses.where(collection_mode: nil).update_all(collection_mode: "paper")
+
+    segments = index!(survey).corpus_questions.find_by(cid: "c_m").segments
+
+    assert segments.key?("Collected: digital")
+    assert segments.key?("Collected: paper")
+    assert_equal 40, segments["Collected: digital"]["n"]
+    assert_equal 35, segments["Collected: paper"]["n"]
+    assert_equal 40, segments["Collected: digital"]["distribution"]["Money"]
+  end
+
+  test "an ordinary Verto gets no collection-mode breakdown at all" do
+    # Every response came through the player, so the column is NULL and the
+    # dimension must simply not appear — not appear as one meaningless cell.
+    survey = survey_with([ { "type" => "multiple_choice", "cid" => "c_m", "text" => "Why?",
+                             "options" => [ "Money", "Time" ] } ])
+    seed!(survey, 40) { { "0" => { "value" => "Money" } } }
+
+    segments = index!(survey).corpus_questions.find_by(cid: "c_m").segments
+
+    assert(segments.keys.none? { |k| k.start_with?("Collected:") })
+  end
+
+  test "a collection mode under the floor is suppressed like any other cell" do
+    survey = survey_with([ { "type" => "multiple_choice", "cid" => "c_m", "text" => "Why?",
+                             "options" => [ "Money", "Time" ] } ])
+    seed!(survey, 40) { { "0" => { "value" => "Money" } } }
+    survey.responses.limit(40).update_all(collection_mode: "digital")
+    seed!(survey, 5) { { "0" => { "value" => "Time" } } }
+    survey.responses.where(collection_mode: nil).update_all(collection_mode: "paper")
+
+    segments = index!(survey).corpus_questions.find_by(cid: "c_m").segments
+
+    assert segments.key?("Collected: digital")
+    assert_not segments.key?("Collected: paper"),
+      "a mode with 5 respondents describes individuals, not a cohort"
+  end
+
   test "a segment cell under the floor is absent, not zero" do
     survey = survey_with([ { "type" => "multiple_choice", "cid" => "c_m", "text" => "Why?",
                              "options" => [ "Money", "Time" ] } ])

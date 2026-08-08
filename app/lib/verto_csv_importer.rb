@@ -122,19 +122,25 @@ class VertoCsvImporter
     "the gambia" => "GM", "gambia" => "GM", "south african" => "ZA"
   }.freeze
 
-  def initialize(csv_path:, admin_password: nil,
-                 org_name: DEFAULT_ORG_NAME, org_slug: DEFAULT_ORG_SLUG,
-                 admin_email: DEFAULT_ADMIN_EMAIL, admin_name: nil,
-                 title: DEFAULT_TITLE, verto_slug: DEFAULT_VERTO_SLUG,
+  # `deck` names which source survey this export is (see VertoDecks). It
+  # defaults to the UNYouth deck this class was originally written for, so every
+  # existing caller behaves exactly as it did; explicit org/title/slug kwargs
+  # still win over the deck's own, which is what the rake task's ENV overrides
+  # and the tests rely on.
+  def initialize(csv_path:, admin_password: nil, deck: nil,
+                 org_name: nil, org_slug: nil,
+                 admin_email: nil, admin_name: nil,
+                 title: nil, verto_slug: nil,
                  translations: nil)
+    @deck           = VertoDecks.fetch(deck || VertoDecks::DEFAULT)
     @csv_path       = csv_path
     @admin_password = admin_password
-    @org_name       = org_name
-    @org_slug       = org_slug
-    @admin_email    = admin_email
-    @admin_name     = admin_name || "#{org_name} Admin"
-    @title          = title
-    @verto_slug     = verto_slug
+    @org_name       = org_name    || @deck.org_name
+    @org_slug       = org_slug    || @deck.org_slug
+    @admin_email    = admin_email || @deck.admin_email
+    @admin_name     = admin_name  || "#{@org_name} Admin"
+    @title          = title       || @deck.title
+    @verto_slug     = verto_slug  || @deck.verto_slug
     @name_to_code   = WorldRegions::COUNTRIES.map { |code, c| [ c[:name].downcase, code ] }.to_h
     # Optional sidecar mapping translated answer labels → the canonical English
     # option, for survey-specific lists our locale files can't know about.
@@ -149,10 +155,15 @@ class VertoCsvImporter
   # here is the first place to look when counts seem low.
   attr_reader :unmatched
 
+  # Where this import lands, after the deck's own identity and any explicit
+  # override have been resolved — so a caller (the rake tasks) can find the
+  # account it just built without repeating that resolution.
+  attr_reader :org_slug, :verto_slug
+
   # Builds the account + Verto + responses in one transaction. Returns the Survey.
   def call
     require_password!
-    rows  = CSV.read(@csv_path, headers: true, encoding: "bom|utf-8")
+    rows  = read_rows
     specs = build_specs
     cards = specs.map { |s| s[:card] }
 
@@ -176,7 +187,7 @@ class VertoCsvImporter
   # Verto (and its /play link) and any organically-collected responses (which
   # carry random tokens) are left untouched. Returns { survey:, added:, updated: }.
   def append!
-    rows  = CSV.read(@csv_path, headers: true, encoding: "bom|utf-8")
+    rows  = read_rows
     specs = build_specs
     cards = specs.map { |s| s[:card] }
 
@@ -212,6 +223,27 @@ class VertoCsvImporter
       end
     end
     { survey: survey, added: added, updated: updated }
+  end
+
+  # Builds the account and the Verto from the deck alone, with no export to
+  # replay. Returns the Survey.
+  #
+  # Idempotent per VERTO, not per account — unlike `call`, which owns its whole
+  # organisation. Sibling decks share one account (the Happiness Project's child
+  # and adult flows are both Walls), so rebuilding one must not take the other
+  # down with it. Only the Verto this deck names is replaced.
+  def build!
+    require_password!
+    cards = build_specs.map { |spec| spec[:card] }
+
+    survey = nil
+    ActiveRecord::Base.transaction do
+      org = Organisation.find_by(slug: @org_slug) || create_organisation!
+      create_admin!(org) unless User.exists?(email_address: @admin_email)
+      org.surveys.where(slug: @verto_slug).find_each(&:destroy!)
+      survey = create_survey!(org, cards)
+    end
+    survey
   end
 
   # Removes the org this importer owns and its admin user (and, by dependent
@@ -252,7 +284,7 @@ class VertoCsvImporter
   end
 
   def create_organisation!
-    Organisation.create!(name: @org_name, slug: @org_slug, default_brand_palette: BRAND_PALETTE)
+    Organisation.create!(name: @org_name, slug: @org_slug, default_brand_palette: @deck.brand_palette)
   end
 
   def create_admin!(org)
@@ -263,17 +295,29 @@ class VertoCsvImporter
 
   def create_survey!(org, cards)
     survey = Survey.create!(
+      **@deck.survey_attributes,
       organisation: org, title: @title,
-      theme: "sport, wellbeing and changemaking", audience_age: "youth",
-      key_insight: "How young people experience sport — activity, wellbeing, skills, access and voice.",
       default_locale: "en", locales: [ "en" ], cards: cards,
-      show_results_comparison: true,
-      compare_note: "See how your answers compare with everyone else who took part.",
       slug: (Survey.slug_taken?(@verto_slug) ? nil : @verto_slug),
-      brand_palette: BRAND_PALETTE
+      brand_palette: @deck.brand_palette
     )
     survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
     survey
+  end
+
+  # The export's rows, with the header put back over the right columns.
+  #
+  # Some exports carry one more DATA column than their header names, which makes
+  # every `row["…"]` lookup below resolve to its neighbour — a clean-looking
+  # import of comprehensively wrong answers. VertoExportLayout detects that from
+  # the shape of the data and either corrects it or refuses the file. Aligned
+  # exports pass through untouched.
+  def read_rows
+    table = CSV.read(@csv_path, headers: true, encoding: "bom|utf-8")
+    result = VertoExportLayout.realign(table)
+    @layout_shift = result.shift
+    @headers = result.rows.first&.headers&.map(&:to_s) || []
+    result.rows
   end
 
   # Response attributes for one CSV row (nil when the row has no Viewing ID).
@@ -284,31 +328,106 @@ class VertoCsvImporter
     return nil if token.empty?
 
     answers = {}
+    demo    = {}
     specs.each_with_index do |spec, idx|
       source = spec[:col] || spec[:cols]
       next unless source
 
       entry = spec[:get].call(row, source)
-      answers[idx.to_s] = entry if entry
+      next unless entry
+
+      answers[idx.to_s] = entry
+      demo[spec[:demo]] = entry["value"] if spec[:demo]
     end
 
     country, label = region_from(answers)
     created = parse_created_at(row["Start date"], row["Start time"]) || Time.current
 
     {
-      session_token:  "#{@org_slug}-#{token}",
+      # Two exports of the SAME programme are two collection channels, and a
+      # Viewing ID is only unique within one file. Without the mode in the key
+      # the paper cohort would upsert over the digital one and both would be
+      # wrong, silently.
+      session_token:  [ @org_slug, @deck.collection_mode, token ].compact.join("-"),
       status:         (row["Completion percentage"].to_f >= 100.0 ? "completed" : "started"),
       answers:        answers,
       region_country: country, region_label: label,
       locale:         row["Language"].to_s.strip.presence || "en",
+      # Only set when the deck says this export was collected some way other
+      # than through the player — it is what keeps a paper cohort comparable
+      # after two exports are merged into one Verto.
+      collection_mode: @deck.collection_mode,
+      # The segment dimensions Ask Verto publishes read these columns, not the
+      # answers hash — PlayerController fills them in for a live respondent, so
+      # an imported one has to be given them too or the Verto contributes no
+      # gender or age breakdown at all.
+      demographic_gender:     demo[:gender].to_s.presence,
+      demographic_birth_year: birth_year_from(demo[:age], created),
       created_at:     created, updated_at: created
     }
   end
 
+  # Age is stored as the number the respondent typed; the segment aggregator
+  # bands on birth year. Derived against the row's own date, not today's — an
+  # export replayed years later must not age its respondents.
+  def birth_year_from(age, created)
+    years = age.to_s[/\A\d{1,2}\z/]&.to_i
+    return nil unless years
+
+    year = created.year - years
+    year.between?(1900, Date.current.year) ? year : nil
+  end
+
+  # ── the deck API ──────────────────────────────────────────────────────────
+  # Everything below here is what a VertoDecks deck calls to describe itself.
+  # It is public because decks are separate objects now: a deck's `specs` method
+  # is handed this importer and builds its cards out of these.
+  public
+
+  # The first of `names` this export actually has a column for, nil if none.
+  #
+  # Two exports of one programme word the same question's header differently
+  # ("Where do you live? Type and choose…" on paper, "…Type your country &amp;
+  # choose…" digitally). A deck lists both spellings and gets whichever is
+  # here, so one deck covers both files.
+  def column(*names)
+    names.flatten.compact.find { |name| headers.include?(name) }
+  end
+
+  def headers = @headers ||= []
+
+  # A cell's answer atoms: separator-split, entity-decoded, de-duplicated, with
+  # the deck's non-answers ("Skipped") removed.
+  #
+  # Splitting on the bare "|||" and stripping afterwards is deliberate — the
+  # exports pad the separator with anything from no spaces to 44 of them, and
+  # splitting on " ||| " leaves that padding on a third of the atoms, turning
+  # every affected option into its own unmatched bucket.
+  def atoms(cell)
+    split_atoms(cell).uniq.reject { |a| non_answer?(a) }
+  end
+
+  # The single value of a single-select cell. Some cells repeat their answer
+  # ("Happy ||| Happy") and a handful hold two genuinely different ones; the
+  # first is the answer either way.
+  def single_atom(cell) = atoms(cell).first
+
+  # A card with no column behind it, for a deck we have the QUESTIONS for but
+  # not (yet) the answers. It builds a real, playable Verto; it contributes
+  # nothing to Ask Verto until somebody actually answers it, which is the
+  # honest state of a survey that hasn't been fielded.
+  def card_spec(card) = { card: card, get: ->(_row, _source) { nil } }
+
   # ── card deck + per-row extractors ────────────────────────────────────────
   # Each spec: { card:, col:/cols:, get: ->(row, source) => answer-entry|nil }.
   # Order here == card order == the positional string keys in `answers`.
+  # An optional `demo:` (:gender or :age) also feeds the response's demographic
+  # column, which is what Ask Verto segments on.
   def build_specs
+    @deck.specs(self)
+  end
+
+  def unyo_specs
     specs = []
     specs << welcome_spec
 
@@ -372,10 +491,98 @@ class VertoCsvImporter
     lookup = indexer(options)
     { card: { "type" => "range", "text" => text, "options" => options }, col: col,
       get: ->(row, source) {
-        i = lookup.call(row[source])
-        record_unmatched(source, row[source]) if i.nil?
+        v = single_atom(row[source])
+        i = lookup.call(v)
+        record_unmatched(source, v) if i.nil?
         range_entry(i)
       } }
+  end
+
+  # A genuine 0–10 scale, cut down to the five stops a Playverto range card has.
+  #
+  # The export mixes types on this column: the two endpoints arrive as the
+  # strings "0- No" and "10 - Yes" (note the missing space in the first) while
+  # 1–9 arrive as integers, so it is read as "the leading number" rather than
+  # matched against labels.
+  def nps_scale_spec(text, labels, col, max: 10)
+    step = (max + 1) / labels.size.to_f
+    { card: { "type" => "range", "text" => text, "options" => labels }, col: col,
+      get: ->(row, source) {
+        raw = single_atom(row[source])
+        n = raw.to_s[/\A(\d{1,2})/, 1]&.to_i
+        next record_unmatched(source, raw) unless n&.between?(0, max)
+
+        range_entry([ (n / step).floor, labels.size - 1 ].min)
+      } }
+  end
+
+  # A ranking. The order of the atoms in the cell IS the answer — set-ifying or
+  # sorting them produces a clean-looking import with the entire signal gone.
+  def prioritise_spec(text, options, col)
+    { card: { "type" => "prioritise", "text" => text, "options" => options }, col: col,
+      get: ->(row, source) {
+        ranked = atoms(row[source]).map { |a| canonical(a, options) }
+        ranked.each { |a| record_unmatched(source, a) unless options.include?(a) }
+        kept = ranked.select { |a| options.include?(a) }
+        kept.empty? ? nil : { "type" => "prioritise", "value" => kept }
+      } }
+  end
+
+  # Free text, stored as the respondent wrote it — in their own language, and
+  # with the export's HTML entities decoded so a quote reads as a quote.
+  def open_text_spec(text, col)
+    { card: { "type" => "open_ended", "text" => text }, col: col,
+      get: ->(row, source) {
+        v = unescape(row[source]).strip
+        v.empty? ? nil : { "type" => "open_ended", "value" => v }
+      } }
+  end
+
+  # An age in years (not the "YYYY-MM" birth month the UNYouth export carries).
+  # `plausible` is the deck's call: these exports have a junk tail (99 appears
+  # 119 times) that would band real children with imaginary pensioners.
+  def age_spec(text, col, plausible: (4..25))
+    { card: { "type" => "open_ended", "input" => "number", "text" => text, "demographic" => true },
+      col: col, demo: :age,
+      get: ->(row, source) {
+        raw = single_atom(row[source])
+        years = raw.to_s[/\A\d{1,3}\z/]&.to_i
+        next record_unmatched(source, raw) unless years && plausible.cover?(years)
+
+        { "type" => "open_ended", "value" => years.to_s }
+      } }
+  end
+
+  # A "<Country name> - <CC>" location column.
+  def country_spec(text, col)
+    { card: { "type" => "open_ended", "input" => "location", "text" => text,
+              "description" => "Used to build a map you can explore after finishing.",
+              "demographic" => true },
+      col: col,
+      get: ->(row, source) {
+        raw = single_atom(row[source])
+        code = country_code_from(raw)
+        next record_unmatched(source, raw) unless code
+
+        { "type" => "open_ended", "value" => "#{code}|#{WorldRegions.name_for(code)}" }
+      } }
+  end
+
+  # A card-sort with a named pile per answer, rather than the yes/no the
+  # tap_card type is built around. Each statement becomes its own
+  # multiple_choice so a citation reads "Not enough", which is what the
+  # respondent actually said — mapping a three-point sufficiency scale onto
+  # yes/no/unsure would publish a different question's answer.
+  def pile_specs(text, statements, piles)
+    statements.map do |statement|
+      { card: { "type" => "multiple_choice", "text" => "#{text} #{statement}",
+                "options" => piles.keys },
+        cols: piles,
+        get: ->(row, source) {
+          label, = source.find { |_pile, col| atoms(row[col]).any? { |a| canon(a) == canon(statement) } }
+          label.nil? ? nil : { "type" => "multiple_choice", "value" => label }
+        } }
+    end
   end
 
   def matrix_spec(statement)
@@ -399,11 +606,13 @@ class VertoCsvImporter
       } }
   end
 
-  def pick_one_spec(text, options, col)
-    { card: { "type" => "multiple_choice", "text" => text, "options" => options }, col: col,
+  def pick_one_spec(text, options, col, demographic: false, demo: nil)
+    card = { "type" => "multiple_choice", "text" => text, "options" => options }
+    card["demographic"] = true if demographic
+    { card: card, col: col, demo: demo,
       get: ->(row, source) {
-        v = row[source].to_s.strip
-        next nil if v.empty?
+        v = single_atom(row[source])
+        next nil if v.nil?
         cv = canonical(v, options)
         record_unmatched(source, v) unless options.include?(cv)
         { "type" => "multiple_choice", "value" => cv }
@@ -413,9 +622,9 @@ class VertoCsvImporter
   def pick_many_spec(text, options, col)
     { card: { "type" => "select_many", "text" => text, "options" => options }, col: col,
       get: ->(row, source) {
-        atoms = split_atoms(row[source]).map { |a| canonical(a, options) }
-        atoms.each { |a| record_unmatched(source, a) unless options.include?(a) }
-        atoms.empty? ? nil : { "type" => "select_many", "value" => atoms }
+        chosen = atoms(row[source]).map { |a| canonical(a, options) }
+        chosen.each { |a| record_unmatched(source, a) unless options.include?(a) }
+        chosen.empty? ? nil : { "type" => "select_many", "value" => chosen }
       } }
   end
 
@@ -451,10 +660,10 @@ class VertoCsvImporter
   def gender_spec
     { card: { "type" => "multiple_choice", "text" => "What gender do you identify as?",
               "options" => GENDER_OPTS, "demographic" => true },
-      col: "What gender do you identify as? (gender)",
+      col: "What gender do you identify as? (gender)", demo: :gender,
       get: ->(row, source) {
-        v = row[source].to_s.strip
-        next nil if v.empty?
+        v = single_atom(row[source])
+        next nil if v.nil?
         cv = canonical(v, GENDER_OPTS)
         next record_unmatched(source, v) unless GENDER_OPTS.include?(cv)
         { "type" => "multiple_choice", "value" => cv }
@@ -462,14 +671,49 @@ class VertoCsvImporter
   end
 
   # ── value coercion helpers ────────────────────────────────────────────────
+  private
 
-  # Unify apostrophe variants and surrounding whitespace. The export mixes
-  # curly (’) and straight (') apostrophes for the same label, so without this a
-  # value like "No, I don't take part in sport" wouldn't match the reconstructed
-  # "…don’t…" option — dropping the answer (scales) or splitting it into its own
-  # results bucket (choices).
+  # Unify apostrophe variants, case and surrounding whitespace. The exports mix
+  # curly (’) and straight (') apostrophes for the same label, and one export
+  # writes "to understand the world and help make it better" in one column and
+  # "To understand…" in another — so without this, 377 respondents' answers
+  # become their own results bucket. Matching is on the canon; the label that
+  # gets STORED is always the deck's own, so folding case here doesn't change
+  # what a citation reads.
   def canon(text)
-    text.to_s.strip.tr("’‘", "''")
+    text.to_s.strip.tr("’‘", "''").downcase
+  end
+
+  # The exports carry HTML entities in both values and header names
+  # (&#39;, &quot;, &amp;) — a quote printed with them in is not the sentence
+  # the respondent wrote.
+  def unescape(text) = CGI.unescapeHTML(text.to_s)
+
+  # Values that mean "no answer" rather than an answer. Deck-declared, because
+  # "Skipped" is a real option label somewhere, just not in these decks.
+  def non_answer?(value)
+    @deck.non_answers.any? { |n| canon(n) == canon(value) }
+  end
+
+  # The country behind a "<Country name> - <CC>" cell. The NAME decides when
+  # the two disagree: the trailing token is a real code often enough to be
+  # worth trying, and wrong often enough ("United Kingdom - EN", "Spain - EN",
+  # "Bangladesh - Comics") that trusting it would file thousands of respondents
+  # under a country they don't live in.
+  def country_code_from(raw)
+    s = raw.to_s.strip
+    return nil if s.empty?
+
+    # rpartition anchors on the RIGHTMOST place the pattern can start, which is
+    # the dash itself — the leading \s* matches nothing, so the country name
+    # comes back with its trailing space still on it.
+    name, sep, code = s.rpartition(/\s*-\s*/)
+    name = (sep.empty? ? s : name).strip
+
+    by_name = COUNTRY_ALIASES[name.downcase] || @name_to_code[name.downcase]
+    return by_name if by_name
+
+    code.to_s.strip.upcase.then { |c| WorldRegions.valid?(c) ? c : nil }
   end
 
   # ── multilingual matching ─────────────────────────────────────────────────
@@ -559,7 +803,7 @@ class VertoCsvImporter
   end
 
   def split_atoms(cell)
-    cell.to_s.split("|||").map(&:strip).reject(&:empty?)
+    unescape(cell).split("|||").map(&:strip).reject(&:empty?)
   end
 
   # A decision column holds a JSON array whose single element is a "|||"-joined
@@ -577,18 +821,20 @@ class VertoCsvImporter
     Array(parsed).flat_map { |chunk| split_atoms(chunk) }
   end
 
+  # The three tap_card piles, from up to three columns. When the export has no
+  # explicit third column, "unsure" is what's left over — an option the
+  # respondent sorted into neither pile. When it does have one ("I don't
+  # know"), that column is read rather than inferred, so an option nobody
+  # sorted at all stays unsure either way.
   def tap_value(row, cols, options)
-    yes = decision_atoms(row[cols[:yes]]).map { |a| canonical(a, options) }
-    no  = decision_atoms(row[cols[:no]]).map { |a| canonical(a, options) }
-    (yes - options).each { |a| record_unmatched(cols[:yes], a) }
-    (no  - options).each { |a| record_unmatched(cols[:no],  a) }
-    return nil if yes.empty? && no.empty?
+    piles = %i[yes no unsure].index_with do |pile|
+      cols[pile] ? decision_atoms(row[cols[pile]]).map { |a| canonical(a, options) } : []
+    end
+    piles.each { |pile, values| (values - options).each { |a| record_unmatched(cols[pile], a) } }
+    return nil if piles.values.all?(&:empty?)
 
     value = options.index_with do |opt|
-      if yes.include?(opt) then "yes"
-      elsif no.include?(opt) then "no"
-      else "unsure"
-      end
+      piles.keys.find { |pile| piles[pile].include?(opt) }&.to_s || "unsure"
     end
     { "type" => "tap_card", "value" => value }
   end
