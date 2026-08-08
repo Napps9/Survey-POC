@@ -24,9 +24,19 @@ class OpenTextThemer
   MODEL      = ClaudeModels::FAST
   MAX_TOKENS = 2000
 
-  # Enough to find the themes; more than this and the prompt cost stops earning
-  # its keep, because themes stabilise long before the tail does.
-  MAX_ANSWERS_IN_PROMPT = 250
+  # How many answers go into one call. Not a sample any more — a BATCH size.
+  #
+  # This used to be the whole story: the first 250 answers were themed and the
+  # rest were never read. That is not a sample, it is a head slice in whatever
+  # order the rows were imported — on a paper file, whichever school happened to
+  # be transcribed first — and the themes it produced described that school.
+  # Every answer now goes through, in batches, and the batches are merged.
+  BATCH_SIZE = 250
+
+  # A ceiling on calls per question, so one enormous column cannot run away with
+  # the indexing budget. When it bites, the batches are drawn EVENLY across the
+  # whole column rather than off the top, and `sampled` says so in the result.
+  MAX_BATCHES = ENV.fetch("ASK_VERTO_MAX_THEME_BATCHES", 40).to_i
 
   # Per question. A source card shows a few illustrative quotes, not a reader.
   MAX_QUOTES = 6
@@ -104,35 +114,71 @@ class OpenTextThemer
     @client = build_anthropic_client(api_key)
   end
 
-  # Returns { themes: [{ "label" =>, "count" => }], quotes: [{ body:, theme: }] }.
+  # Returns { themes: [{ "label" =>, "count" => }], quotes: [{ body:, theme: }],
+  #           read:, of:, sampled: }.
+  #
+  # `read` and `of` are the honest denominators: how many answers the themes
+  # were actually derived from, and how many the question has. They travel with
+  # the result because a theme count and a response count used to be handed to
+  # Ask Verto side by side with nothing saying they were counted over different
+  # numbers of people.
   #
   # `texts` must already have been through QuoteRedactor — this pass judges what
   # a regex cannot, it does not repeat what a regex already did.
   def call(question_text:, texts:)
     texts = Array(texts).map(&:to_s).reject(&:blank?)
-    return { themes: [], quotes: [] } if texts.size < CorpusEntry::MIN_SAMPLE_SIZE
+    return empty(texts.size) if texts.size < CorpusEntry.min_sample_size
 
-    sample = texts.first(MAX_ANSWERS_IN_PROMPT)
+    batches = batches_for(texts)
+    read    = batches.sum(&:size)
+    merged  = Hash.new(0)
+    quotes  = []
 
+    batches.each do |batch|
+      payload = theme_one(question_text, batch)
+      next unless payload
+
+      clean_themes(payload["themes"], batch.size).each { |t| merged[t["label"]] += t["count"] }
+      quotes.concat(resolve_quotes(payload["quotes"], batch))
+    end
+
+    { themes: merged.sort_by { |_label, count| -count }.first(6).map { |label, count| { "label" => label, "count" => count } },
+      # Spread the quotes across the batches rather than taking the first
+      # batch's six, so they illustrate the column and not its opening pages.
+      quotes:  quotes.uniq { |q| q[:body] }.first(MAX_QUOTES),
+      read: read, of: texts.size, sampled: read < texts.size }
+  end
+
+  private
+
+  def empty(total) = { themes: [], quotes: [], read: 0, of: total, sampled: false }
+
+  # Consecutive batches when the whole column fits inside MAX_BATCHES; an even
+  # stride across the whole column when it does not. Either way every part of
+  # the column is represented — the one thing a head slice never managed.
+  def batches_for(texts)
+    whole = texts.each_slice(BATCH_SIZE).to_a
+    return whole if whole.size <= MAX_BATCHES
+
+    stride = whole.size / MAX_BATCHES.to_f
+    (0...MAX_BATCHES).map { |i| whole[(i * stride).floor] }
+  end
+
+  def theme_one(question_text, batch)
     response = @client.messages.create(
       model:       MODEL,
       max_tokens:  MAX_TOKENS,
       system:      SYSTEM_WITH_SAFETY,
       tools:       [ TOOL ],
       tool_choice: { type: "tool", name: "emit_themes" },
-      messages:    [ { role: "user", content: build_prompt(question_text, sample) } ]
+      messages:    [ { role: "user", content: build_prompt(question_text, batch) } ]
     )
 
     log_usage("OpenTextThemer", response.usage, model: MODEL)
 
     block = Array(response.content).find { |b| tool_use?(b) }
-    return { themes: [], quotes: [] } unless block
-
-    payload = deep_stringify(input_of(block))
-    { themes: clean_themes(payload["themes"], sample.size), quotes: resolve_quotes(payload["quotes"], sample) }
+    block && deep_stringify(input_of(block))
   end
-
-  private
 
   def build_prompt(question_text, sample)
     lines = [ "Question: \"#{question_text}\"", "",

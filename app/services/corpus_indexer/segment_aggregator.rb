@@ -1,13 +1,16 @@
 # Per-question breakdowns by gender, age band and country, with small-cell
 # suppression applied to every cell.
 #
-# The suppression rule is the important part and it is stricter than the one the
-# results screen uses. Inside an account, a segment of five is shown because the
-# creator already holds the raw responses — nothing is revealed that they cannot
-# already see. Ask Verto publishes across an organisation boundary, so the floor
-# is CorpusEntry::MIN_SAMPLE_SIZE (30) and it is applied per CELL, not per
-# segment: a segment that clears 30 respondents overall can still fail on a single
-# question that most of them skipped.
+# The suppression rule is applied per CELL, not per segment: a segment that
+# clears the floor overall can still fail on a single question that most of them
+# skipped.
+#
+# The floor itself is CorpusEntry.min_sample_size, an account setting. It
+# defaults to 1 — no suppression — on this deployment, by the owner's decision:
+# every answer counts. `ASK_VERTO_MIN_CELL=30` restores the original, which is
+# stricter than the results screen's, because inside an account a segment of
+# five reveals nothing the creator cannot already see, and Ask Verto publishes
+# across an organisation boundary.
 #
 # A failing cell is DROPPED, never zeroed. A published "0" is as identifying as a
 # published "1" — it says nobody in that group answered that way, which in a small
@@ -20,10 +23,15 @@ class CorpusIndexer
   class SegmentAggregator
     include AggregatesSurveyResults
 
-    # How many segments one Verto contributes, per dimension. A Verto fielded
-    # across forty countries would otherwise multiply the index by forty for
-    # diminishing value; the largest few are where the answers are.
-    MAX_PER_DIMENSION = 8
+    # How many segments one Verto contributes, per dimension.
+    #
+    # A cap trades coverage for index size, and it does so SILENTLY — a Verto
+    # fielded in 219 countries used to publish the largest 8 and simply not
+    # mention the other 211, so "how did respondents in Togo answer?" had no
+    # answer and no explanation. The default is now unlimited, matching the
+    # standing instruction that every answer counts; `ASK_VERTO_MAX_SEGMENTS=8`
+    # restores the old behaviour if the index ever needs bounding.
+    MAX_PER_DIMENSION = ENV.fetch("ASK_VERTO_MAX_SEGMENTS", 10_000).to_i
 
     def initialize(survey, cards)
       @survey = survey
@@ -32,7 +40,7 @@ class CorpusIndexer
 
     # Returns { card_index => { segment_label => { "distribution" => {...}, "n" => 123 } } }
     def call
-      base = @survey.responses.where(status: "completed")
+      base = CorpusIndexer.countable_responses(@survey)
       out  = Hash.new { |h, k| h[k] = {} }
 
       segments(base).each do |label, scope|
@@ -45,9 +53,9 @@ class CorpusIndexer
           n = result[:total].to_i
           # The cell rule. Below the floor this segment simply does not exist for
           # this question.
-          next if n < CorpusEntry::MIN_SAMPLE_SIZE
+          next if n < CorpusEntry.min_sample_size
 
-          counts = countable(result)
+          counts = countable(result, @cards[idx] || {})
           next if counts.blank?
 
           out[idx][label] = { "n" => n, "distribution" => counts }
@@ -77,7 +85,7 @@ class CorpusIndexer
     def collection_mode(base)
       base.reorder(nil).where.not(collection_mode: nil)
           .group(:collection_mode).count
-          .select { |_mode, n| n >= CorpusEntry::MIN_SAMPLE_SIZE }
+          .select { |_mode, n| n >= CorpusEntry.min_sample_size }
           .sort_by { |_mode, n| -n }.first(MAX_PER_DIMENSION)
           .map { |mode, _n| [ "Collected: #{mode}", base.where(collection_mode: mode) ] }
     end
@@ -85,7 +93,7 @@ class CorpusIndexer
     def gender(base)
       base.reorder(nil).where.not(demographic_gender: nil)
           .group(:demographic_gender).count
-          .select { |_g, n| n >= CorpusEntry::MIN_SAMPLE_SIZE }
+          .select { |_g, n| n >= CorpusEntry.min_sample_size }
           .sort_by { |_g, n| -n }.first(MAX_PER_DIMENSION)
           .map { |gender, _n| [ "Gender: #{gender}", base.where(demographic_gender: gender) ] }
     end
@@ -95,7 +103,7 @@ class CorpusIndexer
 
       ResolvesResultSegments::AGE_BANDS.filter_map do |label, min_age, max_age|
         scope = base.where(demographic_birth_year: (this_year - max_age)..(this_year - min_age))
-        next if scope.reorder(nil).count < CorpusEntry::MIN_SAMPLE_SIZE
+        next if scope.reorder(nil).count < CorpusEntry.min_sample_size
 
         [ "Age: #{label}", scope ]
       end.first(MAX_PER_DIMENSION)
@@ -107,22 +115,42 @@ class CorpusIndexer
     def country(base)
       base.reorder(nil).where.not(region_country: nil)
           .group(:region_country).count
-          .select { |_c, n| n >= CorpusEntry::MIN_SAMPLE_SIZE }
+          .select { |_c, n| n >= CorpusEntry.min_sample_size }
           .sort_by { |_c, n| -n }.first(MAX_PER_DIMENSION)
           .map do |code, _n|
             [ "Country: #{WorldRegions.name_for(code)}", base.where(region_country: code) ]
           end
     end
 
-    # Segment breakdowns are only published for the types whose counts are
-    # frequencies. prioritise is excluded here for the same reason it is handled
-    # separately in the indexer — its counts are rank sums, and a segmented rank
-    # sum is even easier to misread than a whole-Verto one.
-    def countable(result)
-      type = result[:type].to_s
-      return {} unless CorpusIndexer::COUNT_TYPES.include?(type)
+    # Segment breakdowns are published for every type whose counts are
+    # frequencies — which is every indexable type except prioritise.
+    #
+    # It used to be COUNT_TYPES only, so `range`, `nps`, `rating`, `tap_card`
+    # and `open_ended` got no breakdown at all: on the WLL deck that was every
+    # scale question, meaning "how did girls answer this scale?" had no answer
+    # anywhere in the corpus even though the data was sitting right there.
+    #
+    # A scale's counts are keyed by INDEX, so they are resolved to the card's
+    # own labels here — a segment reading "Somewhat: 41" and a whole-Verto
+    # figure reading "step 3: 41" would be the same number wearing two names.
+    #
+    # prioritise stays out, for the reason it is special-cased everywhere else:
+    # its counts are rank sums, and a segmented rank sum is even easier to
+    # misread than a whole-Verto one. open_ended stays out because its "counts"
+    # are themes from a model call, which is not something to run per segment.
+    SEGMENTABLE_TYPES = (CorpusIndexer::COUNT_TYPES + %w[range nps rating tap_card]).freeze
 
-      result[:counts].each_with_object({}) { |(k, v), out| out[k.to_s] = v.to_i }
+    def countable(result, card)
+      type = result[:type].to_s
+      return {} unless SEGMENTABLE_TYPES.include?(type)
+      return result[:counts] if type == "tap_card" # {label => {yes:, no:, unsure:}}, already right
+
+      labels = Array(card["options"]).map(&:to_s)
+      result[:counts].each_with_object({}) do |(key, value), out|
+        # Scale counts are keyed by index; choice counts by the label itself.
+        label = (type == "range" || type == "nps") ? labels[key.to_i] : key.to_s
+        out[(label.presence || key.to_s)] = value.to_i if value.is_a?(Numeric)
+      end
     end
   end
 end

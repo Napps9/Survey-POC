@@ -315,6 +315,16 @@ class CorpusTools
     when "open_ended"
       row[:responses] = question.distribution["responses"].to_i
       row[:themes]    = Array(question.distribution["themes"])
+      # A theme count and a response count are taken over DIFFERENT numbers of
+      # people — redaction removes answers before theming sees them, and a very
+      # large column is themed across a stride. Handed over side by side with
+      # nothing distinguishing them, "Cost: 40" reads as 40 of the responses.
+      themed = question.distribution["themed_over"].to_i
+      if themed.positive? && themed != row[:responses]
+        row[:themes_counted_over] = themed
+        row[:reading] = "Theme counts are out of #{themed} answers read, NOT the #{row[:responses]} responses. " \
+                        "Cite a theme as a share of the answers read, or not as a number at all."
+      end
       row[:quotes]    = question.quotes.limit(QUOTE_LIMIT).map { |q| { quote: q.id, theme: q.theme } }
       row[:quote_note] = "Refer to a quote as [[q:<id>]] using the quote id. Do NOT retype the words — the page prints them."
     when "rating"
@@ -367,8 +377,11 @@ class CorpusTools
   # Month precision, not timestamps. "3 June 2025, 14:02" narrows a respondent
   # far more than "June 2025" and answers no question anyone is asking.
   def fielded_window(entry)
-    first = entry.survey.responses.where(status: "completed").minimum(:created_at)
-    last  = entry.survey.responses.where(status: "completed").maximum(:created_at)
+    # The same population the corpus counts — every respondent who answered
+    # something, not only the ones who reached the last card.
+    answered = CorpusIndexer.countable_responses(entry.survey)
+    first = answered.minimum(:created_at)
+    last  = answered.maximum(:created_at)
     return nil if first.nil?
 
     from = first.strftime("%b %Y")

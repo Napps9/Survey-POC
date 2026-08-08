@@ -79,6 +79,11 @@ class AskVertoConsentTest < ActionDispatch::IntegrationTest
   end
 
   test "a Verto under the sample floor is declined with a reason the creator can act on" do
+    # The floor defaults to 1 here — the owner's decision that every answer
+    # counts — so this sets it, because what is being proved is that the review
+    # queue still surfaces a blocking check as a decline reason for anyone who
+    # turns suppression back on.
+    CorpusEntry.min_sample_size = 30
     @survey.responses.limit(35).destroy_all
     sign_in
     post survey_corpus_entry_path(@survey)
@@ -88,7 +93,7 @@ class AskVertoConsentTest < ActionDispatch::IntegrationTest
       assert_response :success
       # The blocking check is pre-filled as the decline reason, so the reviewer
       # doesn't have to write "no" in their own words.
-      assert_match(/Fewer than #{CorpusEntry::MIN_SAMPLE_SIZE} completed responses/, response.body)
+      assert_match(/Fewer than #{CorpusEntry.min_sample_size} completed responses/, response.body)
 
       patch corpus_review_path(entry, decision: "decline",
                                review_note: "Fewer than 30 completed responses.")
@@ -98,6 +103,8 @@ class AskVertoConsentTest < ActionDispatch::IntegrationTest
     assert_equal "Fewer than 30 completed responses.", entry.review_note
     # The creator's yes survives our no.
     assert entry.opted_in?
+  ensure
+    CorpusEntry.min_sample_size = nil
     assert_equal :declined, entry.creator_state
   end
 

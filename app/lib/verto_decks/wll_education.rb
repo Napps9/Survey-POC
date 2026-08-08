@@ -91,11 +91,16 @@ module VertoDecks
       "Creativity and curiosity", "Strength and resilience"
     ].freeze
 
-    # The source column is a real 0–10 scale; a Playverto range card has five
-    # stops. Cutting it into fifths keeps the shape of the answer and gives a
-    # citation words to print instead of a bare number.
+    # A real 0–10 scale, stored as the eleven values the export actually holds.
+    #
+    # It used to be cut into the five stops a range card has, which threw seven
+    # of every eleven distinctions away and made NPS itself uncomputable from
+    # the database — 2,420 people who said 10 and 53 who said 9 became one
+    # number. The export writes its endpoints as strings ("0- No" with no space
+    # before the dash, "10 - Yes" with spaces both sides) and 1–9 as bare
+    # integers; all eleven are reproduced here exactly.
     SKILLS_TAUGHT = [
-      "Not at all (0–2)", "A little (3–4)", "Somewhat (5–6)", "Mostly (7–8)", "Yes, definitely (9–10)"
+      "0- No", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10 - Yes"
     ].freeze
 
     DATA_LITERACY = [ "I don't know what data is", "Never", "Sometimes", "All the time" ].freeze
@@ -185,7 +190,7 @@ module VertoDecks
       specs << importer.prioritise_spec("Which skills do you think you need to start change?",
         CHANGE_SKILLS, "Which skills do you think you need to start change?&nbsp; (priority)")
 
-      specs << importer.nps_scale_spec("Are you learning these skills in school?", SKILLS_TAUGHT,
+      specs << importer.pick_one_spec("Are you learning these skills in school?", SKILLS_TAUGHT,
         "Are you learning these skills in school? (netPromoter)")
 
       specs << importer.pick_one_spec("Have you learned about data and how to use it in school?",

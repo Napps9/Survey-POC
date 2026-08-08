@@ -43,7 +43,7 @@ class CorpusEnrolmentTest < ActiveSupport::TestCase
 
   # The guarantee that makes this safe.
   test "a Verto below the sample floor is offered but NOT approved" do
-    result = enrol(survey_with(responses: CorpusEntry::MIN_SAMPLE_SIZE - 1))
+    result = enrol(survey_with(responses: CorpusEntry.min_sample_size - 1))
 
     assert result.blocked?
     assert_not result.entry.citable?

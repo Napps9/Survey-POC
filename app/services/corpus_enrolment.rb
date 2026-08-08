@@ -39,8 +39,11 @@ class CorpusEnrolment
   # Returns a Result — never raises for a blocked Verto, because "this one needs
   # a human" is an ordinary outcome of importing several at once.
   def call(index: true)
-    completed = @survey.responses.where(status: "completed").count
-    checks    = CorpusChecks.run(@survey, completed_count: completed)
+    # The same population the indexer will count: everyone who answered
+    # something. Checking the sample floor against finishers and then indexing
+    # answerers would fail a Verto for a sample it does not actually use.
+    answered = CorpusIndexer.countable_responses(@survey).count
+    checks   = CorpusChecks.run(@survey, completed_count: answered)
     blocking  = CorpusChecks.blocking(checks)
 
     entry = CorpusEntry.for(@survey)

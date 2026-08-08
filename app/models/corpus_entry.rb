@@ -30,11 +30,40 @@ class CorpusEntry < ApplicationRecord
   REVIEW_STATUSES = %w[pending approved declined].freeze
   validates :review_status, inclusion: { in: REVIEW_STATUSES }
 
-  # Small-cell suppression. Below this, a distribution starts describing
-  # identifiable individuals rather than a population — the same reasoning behind
-  # Response::MIN_REGION_SAMPLE_SIZE, set higher here because this data crosses an
-  # organisation boundary rather than staying inside the account that collected it.
-  MIN_SAMPLE_SIZE = 30
+  # Small-cell suppression: the smallest group Ask Verto will publish a figure
+  # about. Below it, a distribution starts describing identifiable individuals
+  # rather than a population — the same reasoning behind
+  # Response::MIN_REGION_SAMPLE_SIZE, and it matters more here because this data
+  # crosses an organisation boundary rather than staying inside the account that
+  # collected it.
+  #
+  # It is a setting rather than a constant because the account owner decides how
+  # their own respondents may be published. `ASK_VERTO_MIN_CELL=30` restores the
+  # original floor; the default of 1 suppresses nothing, which is the owner's
+  # standing instruction on this deployment (2026-08-08). Note what that means
+  # in practice: with no floor, a segment containing one child is publishable to
+  # anyone with an account, and so is the fact that they were the only one.
+  #
+  # Importing is unaffected either way — every response is stored whatever this
+  # says. The floor only ever governed what may be cited.
+  DEFAULT_MIN_SAMPLE_SIZE = [ ENV.fetch("ASK_VERTO_MIN_CELL", 1).to_i, 1 ].max
+
+  class << self
+    attr_writer :min_sample_size
+
+    def min_sample_size = @min_sample_size || DEFAULT_MIN_SAMPLE_SIZE
+
+    # Run a block with a different floor. The setting is read at call time
+    # rather than load time so this can exist: the suppression machinery still
+    # has to be provably correct even on a deployment that has turned it off.
+    def with_min_sample_size(value)
+      previous = @min_sample_size
+      @min_sample_size = value
+      yield
+    ensure
+      @min_sample_size = previous
+    end
+  end
 
   # The creator's half of the gate: offered and not taken back.
   scope :offered, -> { where.not(opted_in_at: nil).where(withdrawn_at: nil) }

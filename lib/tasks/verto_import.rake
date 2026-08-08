@@ -4,6 +4,28 @@
 # override that is actually SET is passed on — handing the importer a nil (or,
 # as this task used to, the UNYouth constants) would quietly file every deck
 # under the same organisation.
+# Everything the import did NOT store exactly as the file had it.
+#
+# Printed after every run, because the promise this importer makes is that a
+# cited figure came from the question and the people it says it did. A
+# transformation nobody can see is indistinguishable from a mistake, so both
+# tallies are surfaced even when they are empty.
+def report_variances(importer)
+  importer.unmatched.each do |col, values|
+    puts "  UNMATCHED in #{col}:"
+    values.sort_by { |_v, n| -n }.first(10).each { |v, n| puts "    #{n}× #{v.inspect}" }
+    puts "    …the deck's option list does not contain these. Add them, or map them in " \
+         "<csv>.translations.yml (translated label → English option), and re-run."
+  end
+
+  importer.dropped.each do |col, values|
+    puts "  NOT STORED in #{col}:"
+    values.sort_by { |_v, n| -n }.first(10).each { |v, n| puts "    #{n}× #{v}" }
+  end
+
+  puts "  #{importer.rows_without_id} rows had no Viewing ID and could not be replayed." if importer.rows_without_id.positive?
+end
+
 def deck_identity
   {
     deck:        ENV.fetch("IMPORT_DECK", VertoDecks::DEFAULT),
@@ -43,11 +65,7 @@ namespace :verto do
     puts "── Verto CSV import complete ──"
     importer.summary_for(survey).each { |k, v| puts format("  %-10s %s", "#{k}:", v) }
     puts "  login pw:  the value you set in IMPORT_PASSWORD"
-    importer.unmatched.each do |col, values|
-      puts "  UNMATCHED in #{col}:"
-      values.sort_by { |_v, n| -n }.first(10).each { |v, n| puts "    #{n}× #{v.inspect}" }
-      puts "    …map these in <csv>.translations.yml (translated label → English option) and re-run."
-    end
+    report_variances(importer)
   end
 
   desc "Append/refresh a CSV export into the EXISTING imported Verto without " \
@@ -67,6 +85,7 @@ namespace :verto do
     puts "  added:     #{result[:added]} new responses"
     puts "  updated:   #{result[:updated]} existing responses"
     importer.summary_for(result[:survey]).each { |k, v| puts format("  %-10s %s", "#{k}:", v) }
+    report_variances(importer)
   end
 
   desc "Build a Verto from a deck alone, with no export to replay — for a deck " \

@@ -45,12 +45,12 @@ module CorpusChecks
   end
 
   def sample_size(completed_count)
-    if completed_count >= CorpusEntry::MIN_SAMPLE_SIZE
+    if completed_count >= CorpusEntry.min_sample_size
       Check.new(key: :sample_size, status: :pass,
                 label: "Sample size · #{completed_count} completed responses")
     else
       Check.new(key: :sample_size, status: :fail,
-                label: "Fewer than #{CorpusEntry::MIN_SAMPLE_SIZE} completed responses " \
+                label: "Fewer than #{CorpusEntry.min_sample_size} completed responses " \
                        "(#{completed_count}). Re-offer once the Verto has more.")
     end
   end

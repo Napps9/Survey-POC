@@ -44,6 +44,25 @@ class CorpusIndexer
 
   def self.indexable?(type) = INDEXABLE_TYPES.include?(type.to_s)
 
+  # Every response that answered SOMETHING — not only the ones that reached the
+  # last card.
+  #
+  # Completion used to be the gate here and in SegmentAggregator: `status`
+  # is "completed" only when the export said 100%, and half of some exports
+  # never did (WLL digital: 22,572 of 50,835 sessions, against 44,585 carrying
+  # real answers). But a respondent who answered eleven of twenty-four questions
+  # answered those eleven, and a per-question distribution has always counted
+  # the people who answered THAT question. The completion filter was never
+  # making the numbers more honest — it was removing answers that were given.
+  #
+  # Sessions with nothing in them are still out: they are real and they are
+  # stored, but they belong in no question's denominator. `answered` is the
+  # app's own canonical definition of that (Response.answered_entry?), kept in
+  # step by a before_save and indexed alongside survey_id.
+  def self.countable_responses(survey)
+    survey.responses.where(answered: true)
+  end
+
   def initialize(entry, themer: OpenTextThemer.new)
     @entry  = entry
     @survey = entry.survey
@@ -57,9 +76,9 @@ class CorpusIndexer
   # delete-and-recreate would silently re-point every citation already stored on
   # an answered message.
   def call
-    responses = @survey.responses.where(status: "completed")
+    responses = self.class.countable_responses(@survey)
     total     = responses.count
-    return skip!(total) if total < CorpusEntry::MIN_SAMPLE_SIZE
+    return skip!(total) if total < CorpusEntry.min_sample_size
 
     cards      = Array(@survey.cards)
     aggregated = aggregate_results(cards, responses)
@@ -73,7 +92,7 @@ class CorpusIndexer
         next unless self.class.indexable?(type) || type == "prioritise"
 
         result = aggregated[idx]
-        next if result.nil? || result[:total].to_i < CorpusEntry::MIN_SAMPLE_SIZE
+        next if result.nil? || result[:total].to_i < CorpusEntry.min_sample_size
 
         cid = card["cid"].presence || "idx_#{idx}"
         seen_cids << cid
@@ -172,18 +191,50 @@ class CorpusIndexer
       distribution: {
         "responses" => result[:total].to_i,
         "themes"    => themed[:themes],
+        # The denominator the THEME counts were taken over, which is not the
+        # same number as `responses`: redaction drops answers before theming
+        # ever sees them, and an enormous column is batched across a stride.
+        # Handing both to Ask Verto with nothing distinguishing them is how a
+        # theme covering 40 of 250 read answers gets cited as 40 of 27,088.
+        "themed_over" => themed[:read].to_i,
+        "sampled"     => !!themed[:sampled],
         "redacted"  => drops.transform_keys(&:to_s)
-      }
+      }.compact
     )
 
-    question.corpus_quotes.destroy_all
-    themed[:quotes].each do |quote|
-      question.corpus_quotes.create!(body: quote[:body], theme: quote[:theme])
-    end
+    sync_quotes!(question, themed[:quotes])
   rescue => e
     # A Verto must still be citable for its closed questions when the theming
     # call fails. Quotes are the enrichment, not the point.
     ErrorReporting.report("CorpusIndexer#index_quotes", e, corpus_question_id: question.id)
     question.update!(distribution: { "responses" => result[:total].to_i })
+  end
+
+  # A quote's id IS a citation — an answered message stores "[[q:1234]]" and
+  # renders it server-side on replay. Destroying and recreating the set on every
+  # re-index therefore re-pointed every quote marker already sitting in someone's
+  # thread: the same care corpus_questions get from being matched on `cid`, and
+  # for the same reason.
+  #
+  # A quote has no id of its own in the source, so it is matched on its redacted
+  # body — which is what it is. Same words, same row, same id.
+  def sync_quotes!(question, quotes)
+    existing = question.corpus_quotes.index_by(&:body)
+    kept = []
+
+    quotes.each do |quote|
+      row = existing[quote[:body]]
+      if row
+        row.update!(theme: quote[:theme])
+      else
+        row = question.corpus_quotes.create!(body: quote[:body], theme: quote[:theme])
+      end
+      kept << row.id
+    end
+
+    # A quote the model no longer picks does go — a citation to it becomes a
+    # stale source, which AskMessage#stale_sources already tells the reader
+    # about. That is honest; silently re-pointing it at different words is not.
+    question.corpus_quotes.where.not(id: kept).destroy_all
   end
 end
