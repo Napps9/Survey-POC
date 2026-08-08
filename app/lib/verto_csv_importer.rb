@@ -850,6 +850,14 @@ class VertoCsvImporter
       get: ->(row, source) { difficult_value(row[source]) || unstorable(source, row[source]) } }
   end
 
+  # A birth DATE column, stored to month precision. "Invalid date" — 488 of
+  # them in the AAF export — has no month in it and is reported.
+  def birth_month_spec(text, col)
+    { card: { "type" => "open_ended", "input" => "month", "text" => text, "demographic" => true },
+      col: col, demo: :born,
+      get: ->(row, source) { born_value(row[source]) || unstorable(source, row[source]) } }
+  end
+
   def born_spec
     { card: { "type" => "open_ended", "input" => "month", "text" => "When were you born?", "demographic" => true },
       col: "When were you born? (age)", demo: :born,
@@ -897,7 +905,16 @@ class VertoCsvImporter
   # The exports carry HTML entities in both values and header names
   # (&#39;, &quot;, &amp;) — a quote printed with them in is not the sentence
   # the respondent wrote.
-  def unescape(text) = CGI.unescapeHTML(text.to_s)
+  # CGI.unescapeHTML knows the five XML entities and numeric references, and
+  # NOT &nbsp; — which is the one this family of exports uses most. Left
+  # encoded, every "5&nbsp;" on Big Green's scale is a value the deck has never
+  # heard of: 8,071 respondents, the whole "5" bucket, reported as unmatched
+  # and stored nowhere.
+  NAMED_ENTITIES = { "&nbsp;" => " " }.freeze
+
+  def unescape(text)
+    CGI.unescapeHTML(text.to_s.gsub(/&nbsp;/i) { NAMED_ENTITIES["&nbsp;"] })
+  end
 
   # Values that mean "no answer" rather than an answer. Deck-declared, because
   # "Skipped" is a real option label somewhere, just not in these decks.
@@ -954,6 +971,7 @@ class VertoCsvImporter
           map[canon(label)] ||= GENDER_OPTS[i] if GENDER_OPTS[i]
         end
       end
+      @deck.option_aliases.each { |from, to| map[canon(from)] = to.to_s }
       sidecar_translations.each { |from, to| map[canon(from)] = to.to_s }
       map
     end
@@ -1052,8 +1070,14 @@ class VertoCsvImporter
   end
 
   def split_atoms(cell)
-    unescape(cell).split("|||").map(&:strip).reject(&:empty?)
+    @deck.sanitise(unescape(cell)).split("|||").map { |a| tidy(a) }.reject(&:empty?)
   end
+
+  # Strip, including the characters an export leaves behind that String#strip
+  # does not consider whitespace: a decoded &nbsp; is U+00A0, and the
+  # left-to-right marks around a number are invisible in every viewer anyone
+  # would check the file in.
+  def tidy(text) = text.to_s.gsub(/[\u200e\u200f\u00a0]/, " ").strip
 
   # A decision column holds a JSON array whose single element is a "|||"-joined
   # list of the options the respondent sorted into that pile.
@@ -1197,7 +1221,7 @@ class VertoCsvImporter
   end
 
   def parse_created_at(date, time)
-    d = date.to_s.strip
+    d = @deck.repair_date(date) || date.to_s.strip
     return nil if d.empty?
 
     has_time = !time.to_s.strip.empty?

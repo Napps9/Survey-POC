@@ -137,7 +137,8 @@ namespace :verto do
       puts "  #{report.problems.size} column(s) do not add up:"
       report.problems.each do |line|
         puts "    #{line.column}"
-        puts "      #{line.difference} source answers are neither stored nor reported."
+        line.missing.each { |col| puts "      MISSING COLUMN: #{col}" }
+        puts "      #{line.difference} source answers are neither stored nor reported." unless line.difference.zero?
         line.labels.sort_by { |_v, n| -n }.first(8).each { |value, n| puts "        #{n}× #{value.inspect}" }
       end
       abort "Reconciliation FAILED. The Verto does not account for everything its export holds."

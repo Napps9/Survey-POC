@@ -48,5 +48,34 @@ module VertoDecks
     # somewhere else: dropping "Skipped" globally would one day silently delete
     # a real answer.
     def non_answers = [].freeze
+
+    # A last chance to clean a cell before it is split into answers.
+    #
+    # Some exports wrap their values in markup or invisible characters that are
+    # encoding accidents rather than data — Big Green ships 113,957 cells inside
+    # <div> tags, and every "5" on one of its scales carries three left-to-right
+    # marks and a &nbsp;. Untouched, each affected label becomes a SECOND,
+    # separate option and the real one reads 12.6% low.
+    #
+    # Only remove what is provably not an answer. This is not a place to
+    # normalise wording.
+    def sanitise(value) = value
+
+    # canon(label as the export writes it) => the option this deck stores it
+    # under, for labels the app's own locale files cannot know about.
+    #
+    # Big Green localises exactly one option ("Under 12", four ways, 3,805
+    # rows) and leaves every other closed answer in English regardless of the
+    # respondent's language.
+    def option_aliases = {}.freeze
+
+    # A date the spreadsheet ate on the way out.
+    #
+    # AAF's export has 1,117 Start dates (32%) written ISO with the month and
+    # day SWAPPED — Excel parsed "09/09/2025" as a date and wrote it back in
+    # its own order. Read as written, the field window is January to December
+    # 2025; read correctly it is 9 September to 4 December, which is the
+    # campaign. Returning nil means "leave it to the ordinary parser".
+    def repair_date(_value) = nil
   end
 end

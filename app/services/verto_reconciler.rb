@@ -29,13 +29,18 @@
 class VertoReconciler
   # Per question column. `difference` is the number of source answers that are
   # neither stored nor accounted for — the only number that has to be zero.
-  Line = Struct.new(:column, :question, :source, :stored, :reported, :inferred, :labels, keyword_init: true) do
+  Line = Struct.new(:column, :question, :source, :stored, :reported, :inferred, :missing, :labels, keyword_init: true) do
     # source + inferred == stored + reported, rearranged. `inferred` is the one
     # place the Verto says MORE than the export did — a two-pile card sort
     # records "in neither pile" as unsure — and it is counted here rather than
     # waved through, so the identity still has to close.
     def difference = source + inferred - stored - reported
-    def clean? = difference.zero?
+
+    # A column the export does not have reads 0 against 0 and would otherwise
+    # pass — which is how a mistyped header (AAF's "Vote in electionsmatrix)"
+    # is missing a space AND a parenthesis) turns a whole question into a
+    # silent nothing. A question the deck claims must exist.
+    def clean? = difference.zero? && missing.empty?
   end
 
   Report = Struct.new(:lines, :rows, :responses, :rows_without_id, keyword_init: true) do
@@ -71,17 +76,34 @@ class VertoReconciler
         stored:   group[:indexes].sum { |idx| stored[idx].to_i },
         reported: group[:columns].sum { |col| reported_for(col) },
         inferred: group[:columns].sum { |col| @importer.inferred[col.to_s].values.sum },
+        missing:  group[:columns].reject { |col| @importer.headers.include?(col) },
         labels:   group[:columns].each_with_object(Hash.new(0)) { |col, out| @values[col].each { |v, n| out[v] += n } }
       )
     end
 
-    Report.new(lines: lines, rows: rows, responses: @responses,
+    Report.new(lines: lines + unbound(specs), rows: rows, responses: @responses,
                rows_without_id: @importer.rows_without_id)
   end
 
   private
 
   def columns_for(spec) = spec[:col] ? [ spec[:col] ] : Array(spec[:cols]&.values).compact
+
+  # A spec whose column resolved to nil — the deck asked for a header that is
+  # not in this file — has no columns at all and would drop out of the report
+  # entirely. It is listed as its own problem line instead.
+  def unbound(specs)
+    specs.filter_map do |spec|
+      # A deck with no export at all (Walls) has no columns anywhere and is not
+      # what this is looking for: the case is a spec that ASKED for a column,
+      # via importer.column(...), and got nil back.
+      next if columns_for(spec).any? || !spec.key?(:col)
+
+      Line.new(column: "(no column)", question: spec[:card]["text"].to_s, source: 0, stored: 0,
+               reported: 0, inferred: 0, missing: [ "this deck asked for a column this export does not have" ],
+               labels: {})
+    end
+  end
 
   # Specs that read the SAME columns, grouped. Eight statement cards reading
   # one card sort's three piles are one group: between them they account for
