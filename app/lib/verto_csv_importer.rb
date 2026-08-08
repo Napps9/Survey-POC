@@ -154,6 +154,8 @@ class VertoCsvImporter
     @translations_path = translations || default_translations_path
     @unmatched = Hash.new { |h, k| h[k] = Hash.new(0) }
     @dropped   = Hash.new { |h, k| h[k] = Hash.new(0) }
+    @notes     = Hash.new { |h, k| h[k] = Hash.new(0) }
+    @inferred  = Hash.new { |h, k| h[k] = Hash.new(0) }
     @rows_without_id = 0
   end
 
@@ -174,6 +176,22 @@ class VertoCsvImporter
   # mistake.
   attr_reader :dropped
 
+  # { "column" => { "value (note)" => count } } of values that WERE stored but
+  # were treated specially — an age outside the bandable range, a country code
+  # overruled by its own country name. Reported for the same reason as
+  # #dropped, and kept apart from it because these are not losses.
+  attr_reader :notes
+
+  # { "column" => { "value (why)" => count } } of answers the import ADDED —
+  # not present in the source, derived from its shape. There is exactly one:
+  # a two-pile card sort, where "in neither pile" is how that platform records
+  # "didn't sort it" and unsure is the card's word for that.
+  #
+  # It is tallied because it is the only place the Verto says more than the
+  # export did, and the reconciliation arithmetic has to know: stored is
+  # otherwise larger than source with no explanation.
+  attr_reader :inferred
+
   # Rows the export contained that carry no Viewing ID and so cannot become a
   # response at all.
   attr_reader :rows_without_id
@@ -182,6 +200,11 @@ class VertoCsvImporter
   # override have been resolved — so a caller (the rake tasks) can find the
   # account it just built without repeating that resolution.
   attr_reader :org_slug, :verto_slug
+
+  # The prefix every session token from THIS export carries. Two collection
+  # channels of one programme land in the same Verto, so this is what tells
+  # their responses apart afterwards.
+  def token_prefix = "#{[ @org_slug, @deck.collection_mode ].compact.join('-')}-"
 
   # Builds the account + Verto + responses in one transaction. Returns the Survey.
   def call
@@ -311,6 +334,10 @@ class VertoCsvImporter
       regions:    "#{tagged.count} tagged across #{tagged.distinct.count(:region_country)} countries",
       unmatched:  (@unmatched.empty? ? "none — every answer matched an option" :
                      "#{@unmatched.values.sum { |h| h.values.sum }} values across #{@unmatched.size} columns (see #unmatched)"),
+      inferred:   (@inferred.empty? ? "none — nothing was added that the file did not say" :
+                     "#{@inferred.values.sum { |h| h.values.sum }} answers derived from the export's shape (see #inferred)"),
+      notes:      (@notes.empty? ? "none" :
+                     "#{@notes.values.sum { |h| h.values.sum }} values stored with a note (see #notes)"),
       dropped:    (@dropped.empty? ? "none — nothing was deliberately left out" :
                      "#{@dropped.values.sum { |h| h.values.sum }} values across #{@dropped.size} columns (see #dropped)"),
       no_id:      (@rows_without_id.zero? ? "none" : "#{@rows_without_id} rows had no Viewing ID and could not be replayed")
@@ -360,7 +387,9 @@ class VertoCsvImporter
   # import of comprehensively wrong answers. VertoExportLayout detects that from
   # the shape of the data and either corrects it or refuses the file. Aligned
   # exports pass through untouched.
-  def plan!
+  # Public alongside #each_row, for the same reason: the reconciler has to
+  # know the corrected header before it can ask the deck which columns it reads.
+  public def plan!
     ExportManifest.verify!(@csv_path)
     @plan = VertoExportLayout.plan_from { open_export }
     @layout_shift = @plan.shift
@@ -420,6 +449,8 @@ class VertoCsvImporter
       return nil
     end
 
+    # Per-row memo for columns several specs share (see piles_holding).
+    @pile_cache = {}
     answers = {}
     demo    = {}
     genders = {}
@@ -647,7 +678,7 @@ class VertoCsvImporter
       get: ->(row, source) {
         v = single_atom(row[source], source)
         i = lookup.call(v)
-        record_unmatched(source, v) if i.nil?
+        unstorable(source, v) if i.nil?
         range_entry(i)
       } }
   end
@@ -658,7 +689,7 @@ class VertoCsvImporter
     { card: { "type" => "prioritise", "text" => text, "options" => options }, col: col,
       get: ->(row, source) {
         ranked = atoms(row[source], source).map { |a| canonical(a, options) }
-        ranked.each { |a| record_unmatched(source, a) unless options.include?(a) }
+        ranked.each { |a| unstorable(source, a) unless options.include?(a) }
         kept = ranked.select { |a| options.include?(a) }
         kept.empty? ? nil : { "type" => "prioritise", "value" => kept }
       } }
@@ -687,9 +718,9 @@ class VertoCsvImporter
       get: ->(row, source) {
         raw = single_atom(row[source], source)
         years = raw.to_s[/\A\d{1,3}\z/]&.to_i
-        next record_unmatched(source, raw) unless years
+        next unstorable(source, raw) unless years
 
-        record_dropped(source, raw, "outside #{plausible} — kept as an answer, not banded") unless plausible.cover?(years)
+        record_note(source, raw, "outside #{plausible} — kept as an answer, not banded") unless plausible.cover?(years)
         { "type" => "open_ended", "value" => years.to_s, "banded" => plausible.cover?(years) }
       } }
   end
@@ -707,13 +738,13 @@ class VertoCsvImporter
       get: ->(row, source) {
         raw = single_atom(row[source], source)
         code = country_code_from(raw)
-        next record_unmatched(source, raw) unless code
+        next unstorable(source, raw) unless code
 
         # The export's own trailing token, where it had one and it disagreed —
         # "United Kingdom - EN", "Bangladesh - Comics". Resolving by name is
         # right, and silently is not.
         exported = raw.to_s[/-\s*([A-Za-z]{2})\s*\z/, 1]&.upcase
-        record_dropped(source, raw, "exported code #{exported} resolved to #{code} by name") if exported && exported != code
+        record_note(source, raw, "exported code #{exported} resolved to #{code} by name") if exported && exported != code
 
         { "type" => "open_ended", "value" => "#{code}|#{raw}" }
       } }
@@ -730,10 +761,30 @@ class VertoCsvImporter
                 "options" => piles.keys },
         cols: piles,
         get: ->(row, source) {
-          label, = source.find { |_pile, col| atoms(row[col], col).any? { |a| canon(a) == canon(statement) } }
-          label.nil? ? nil : { "type" => "multiple_choice", "value" => label }
+          placed = piles_holding(row, source, statement)
+          next nil if placed.empty?
+
+          # As with tap_card: the export lets one statement land in two piles.
+          # Keep the first, report the rest — a contradiction resolved in
+          # silence is a contradiction nobody can check.
+          placed.drop(1).each { |pile| record_dropped(source[pile], statement, "also sorted into #{placed.first}") }
+          { "type" => "multiple_choice", "value" => placed.first }
         } }
     end
+  end
+
+  # Which piles hold this statement, in the deck's pile order.
+  #
+  # Parsed once per row rather than once per statement: eight statement cards
+  # share three pile columns, so a per-statement parse would split the same
+  # cells eight times over — and, worse, would report every non-answer in them
+  # eight times, which would make the reconciliation arithmetic wrong in the
+  # direction that looks like everything is fine.
+  def piles_holding(row, cols, statement)
+    @pile_cache ||= {}
+    members = (@pile_cache[cols] ||= cols.transform_values { |col| atoms(row[col], col).map { |a| canon(a) } })
+    wanted = canon(statement)
+    members.select { |_pile, atoms| atoms.include?(wanted) }.keys
   end
 
   def matrix_spec(statement)
@@ -744,7 +795,7 @@ class VertoCsvImporter
         # Labels first. matrix_index reads any digit run in the cell, so trying
         # it first would swallow every label that happens to contain a numeral.
         i = agree.call(row[source]) || matrix_index(row[source])
-        record_unmatched(source, row[source]) if i.nil?
+        unstorable(source, row[source]) if i.nil?
         range_entry(i)
       } }
   end
@@ -754,7 +805,7 @@ class VertoCsvImporter
     { card: { "type" => "rating", "text" => text, "options" => options }, col: col,
       get: ->(row, source) {
         i = lookup.call(row[source])
-        record_unmatched(source, row[source]) if i.nil?
+        unstorable(source, row[source]) if i.nil?
         i.nil? ? nil : { "type" => "rating", "value" => i + 1 }
       } }
   end
@@ -796,13 +847,13 @@ class VertoCsvImporter
               "text" => "What makes it difficult for you to take part in sport regularly?",
               "options" => DIFFICULT_OPTS, "allow_other" => true },
       col: "What makes it difficult for you to take part in sport regularly? (pickOne)",
-      get: ->(row, source) { difficult_value(row[source]) } }
+      get: ->(row, source) { difficult_value(row[source]) || unstorable(source, row[source]) } }
   end
 
   def born_spec
     { card: { "type" => "open_ended", "input" => "month", "text" => "When were you born?", "demographic" => true },
       col: "When were you born? (age)", demo: :born,
-      get: ->(row, source) { born_value(row[source]) } }
+      get: ->(row, source) { born_value(row[source]) || unstorable(source, row[source]) } }
   end
 
   def location_spec
@@ -824,7 +875,7 @@ class VertoCsvImporter
         v = single_atom(row[source], source)
         next nil if v.nil?
         cv = canonical(v, GENDER_OPTS)
-        next record_unmatched(source, v) unless GENDER_OPTS.include?(cv)
+        next unstorable(source, v) unless GENDER_OPTS.include?(cv)
         { "type" => "multiple_choice", "value" => cv }
       } }
   end
@@ -957,6 +1008,37 @@ class VertoCsvImporter
     nil
   end
 
+  def record_inferred(col, value, why)
+    v = value.to_s.strip
+    @inferred[col.to_s][%(#{v} — #{why})] += 1 unless v.empty?
+    nil
+  end
+
+  # A value that WAS stored, with something worth saying about it — an age too
+  # implausible to band, a country code the name overruled. It belongs in the
+  # report and not in the not-stored ledger: counting it as lost would make the
+  # reconciliation arithmetic disagree with itself.
+  def record_note(col, value, note)
+    v = value.to_s.strip
+    @notes[col.to_s][%(#{v} — #{note})] += 1 unless v.empty?
+    nil
+  end
+
+  # A value the deck did not recognise AND could not store anyway.
+  #
+  # A range or rating card holds an INDEX, so it has nowhere to put a label it
+  # cannot place; a multiple_choice holds the label itself and keeps it (see
+  # pick_one_spec). Both cases are reported as unmatched — the deck's option
+  # list is wrong either way — but only this one also loses the answer, so only
+  # this one goes in the not-stored ledger.
+  #
+  # Keeping that ledger complete is what lets `verto:reconcile` close the
+  # arithmetic: every atom in the source is either stored or listed here.
+  def unstorable(col, value)
+    record_unmatched(col, value)
+    record_dropped(col, value, "no option to store it under")
+  end
+
   # A value the deck understood and deliberately did not store. `reason` is
   # part of the key so one column can report several kinds of loss separately.
   def record_dropped(col, value, reason)
@@ -1000,9 +1082,33 @@ class VertoCsvImporter
     piles.each { |pile, values| (values - options).each { |a| record_unmatched(cols[pile], a) } }
     return nil if piles.values.all?(&:empty?)
 
-    value = options.index_with do |opt|
-      piles.keys.find { |pile| piles[pile].include?(opt) }&.to_s || "unsure"
-    end
+    # What an unsorted option means depends on whether the export named a third
+    # pile.
+    #
+    # With only yes and no columns, "in neither" is how that platform records
+    # "didn't sort it", and unsure is the card's word for that — so it is
+    # inferred, as it always was. But when the export DOES name a third pile
+    # ("I don't know", 22,589 answers in the WLL digital file), an option in
+    # none of the three was not answered at all, and filling it in as unsure
+    # would put words in 2,088 respondents' mouths and count them alongside the
+    # people who actually said it.
+    named_unsure = cols[:unsure].present?
+
+    value = options.filter_map do |opt|
+      placed = piles.keys.select { |p| piles[p].include?(opt) }
+      # The export lets one statement land in two piles — 102 rows do it in the
+      # Big Green file. The first is kept, and the others are reported, because
+      # a contradiction resolved in silence is a contradiction nobody can check.
+      placed.drop(1).each { |p| record_dropped(cols[p], opt, "also sorted into #{placed.first}") }
+      pile = placed.first
+      next [ opt, pile.to_s ] if pile
+      next if named_unsure
+
+      record_inferred(cols[:yes], opt, "in neither pile — recorded as unsure")
+      [ opt, "unsure" ]
+    end.to_h
+    return nil if value.empty?
+
     { "type" => "tap_card", "value" => value }
   end
 
@@ -1021,7 +1127,15 @@ class VertoCsvImporter
     # SHAPE, not the English prefix, so a localized export's Other rows keep
     # their free text instead of becoming a one-off value bucket.
     if v =~ /\A[^\[\]]+\(([^()\[\]]+)\)\s*\[(.*)\]\s*\z/m
-      { "type" => "multiple_choice", "value" => nil, "other" => Regexp.last_match(2).to_s.strip.presence }.compact
+      # "Other" with nothing typed in it has nowhere to go: an allow_other card
+      # counts a write-in by its TEXT (AggregatesSurveyResults only banks an
+      # `other` that is present), so an empty one would be stored and then
+      # counted by nothing. Returning nil sends it to the not-stored ledger,
+      # where at least it is visible — two respondents in the UNYouth export.
+      text = Regexp.last_match(2).to_s.strip
+      return nil if text.empty?
+
+      { "type" => "multiple_choice", "value" => nil, "other" => text }
     else
       cv = canonical(v, DIFFICULT_OPTS)
       record_unmatched("What makes it difficult for you to take part in sport regularly? (pickOne)", v) unless DIFFICULT_OPTS.include?(cv)

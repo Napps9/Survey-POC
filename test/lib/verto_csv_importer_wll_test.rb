@@ -168,8 +168,9 @@ class VertoCsvImporterWllTest < ActiveSupport::TestCase
     assert_equal 39, @survey.responses.where.not(demographic_birth_year: nil).count,
       "…but it must not band a child cohort with an imaginary pensioner"
     assert_equal 40, @survey.responses.where.not(demographic_gender: nil).count
-    assert @importer.dropped["How old are you? (age)"].keys.any? { |k| k.start_with?("99 —") },
-      "and the decision has to be visible in the import report"
+    assert @importer.notes["How old are you? (age)"].keys.any? { |k| k.start_with?("99 —") },
+      "and the decision has to be visible in the import report — as a note, not a loss, " \
+      "because the answer is still there"
   end
 
   test "a second answer in a single-answer cell is reported, not silently dropped" do
@@ -219,7 +220,7 @@ class VertoCsvImporterWllTest < ActiveSupport::TestCase
 
     assert_includes values, "GB|United Kingdom - EN"
     assert_includes values, "MG|Madagascar-MG"
-    assert @importer.dropped.values.flat_map(&:keys).any? { |k| k.include?("resolved to GB by name") },
+    assert @importer.notes.values.flat_map(&:keys).any? { |k| k.include?("resolved to GB by name") },
       "a code overruled by the country name has to be reported"
   end
 

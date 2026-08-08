@@ -1,15 +1,10 @@
-# Which source survey this export is, and the identity that goes with it.
-#
-# The deck already knows the account, title and slug it belongs to, so only an
-# override that is actually SET is passed on — handing the importer a nil (or,
-# as this task used to, the UNYouth constants) would quietly file every deck
-# under the same organisation.
-# Everything the import did NOT store exactly as the file had it.
+# Everything the import did not store exactly as the file had it.
 #
 # Printed after every run, because the promise this importer makes is that a
 # cited figure came from the question and the people it says it did. A
-# transformation nobody can see is indistinguishable from a mistake, so both
-# tallies are surfaced even when they are empty.
+# transformation nobody can see is indistinguishable from a mistake, so all
+# three tallies are surfaced: values the deck did not recognise, values it
+# recognised and did not store, and values it stored with a caveat.
 def report_variances(importer)
   importer.unmatched.each do |col, values|
     puts "  UNMATCHED in #{col}:"
@@ -23,9 +18,25 @@ def report_variances(importer)
     values.sort_by { |_v, n| -n }.first(10).each { |v, n| puts "    #{n}× #{v}" }
   end
 
+  importer.inferred.each do |col, values|
+    puts "  ADDED (not in the file) in #{col}:"
+    values.sort_by { |_v, n| -n }.first(10).each { |v, n| puts "    #{n}× #{v}" }
+  end
+
+  importer.notes.each do |col, values|
+    puts "  STORED, WITH A NOTE, in #{col}:"
+    values.sort_by { |_v, n| -n }.first(10).each { |v, n| puts "    #{n}× #{v}" }
+  end
+
   puts "  #{importer.rows_without_id} rows had no Viewing ID and could not be replayed." if importer.rows_without_id.positive?
 end
 
+# Which source survey this export is, and the identity that goes with it.
+#
+# The deck already knows the account, title and slug it belongs to, so only an
+# override that is actually SET is passed on — handing the importer a nil (or,
+# as this task used to, the UNYouth constants) would quietly file every deck
+# under the same organisation.
 def deck_identity
   {
     deck:        ENV.fetch("IMPORT_DECK", VertoDecks::DEFAULT),
@@ -86,6 +97,51 @@ namespace :verto do
     puts "  updated:   #{result[:updated]} existing responses"
     importer.summary_for(result[:survey]).each { |k, v| puts format("  %-10s %s", "#{k}:", v) }
     report_variances(importer)
+  end
+
+  desc "Check that an imported Verto still says what its export said. For every " \
+       "question column: atoms in the source == values stored + values the import " \
+       "reported as not stored. Reads the source as raw text rather than through the " \
+       "deck, so a spec that loses an answer cannot also hide it. Exits non-zero on a " \
+       "difference, so CI can run it. " \
+       "Usage: IMPORT_DECK=<deck> bin/rails 'verto:reconcile[db/seeds/exports/<file>.csv.gz]'"
+  task :reconcile, [ :path ] => :environment do |_t, args|
+    path = args[:path] || ENV["CSV_PATH"]
+    abort "usage: bin/rails 'verto:reconcile[path/to/export.csv.gz]'" if path.blank?
+    abort "Export not found: #{path}" unless File.exist?(path)
+
+    importer = VertoCsvImporter.new(csv_path: path, **deck_identity)
+    org      = Organisation.find_by(slug: importer.org_slug)
+    abort "No organisation '#{importer.org_slug}' — run verto:import_csv first." unless org
+
+    survey = org.surveys.kept.find_by(slug: importer.verto_slug) || org.surveys.kept.order(:id).first
+    abort "No Verto found in '#{importer.org_slug}'." unless survey
+
+    report = VertoReconciler.new(importer, survey).call
+
+    puts "── Reconciling #{survey.title} against #{File.basename(path)} ──"
+    puts format("  %-46s %8s %8s %8s %8s %6s", "question", "source", "stored", "reported", "inferred", "diff")
+    report.lines.each do |line|
+      puts format("  %-46s %8d %8d %8d %8d %6d%s",
+                  line.question.to_s[0, 46], line.source, line.stored, line.reported, line.inferred,
+                  line.difference, line.clean? ? "" : "  ← UNACCOUNTED")
+    end
+
+    puts
+    puts "  rows read:  #{report.rows}"
+    puts "  responses:  #{report.responses}#{" (#{report.rows_without_id} rows had no Viewing ID)" if report.rows_without_id.positive?}"
+
+    if report.clean?
+      puts "  RECONCILED — every answer in the export is either stored or accounted for."
+    else
+      puts "  #{report.problems.size} column(s) do not add up:"
+      report.problems.each do |line|
+        puts "    #{line.column}"
+        puts "      #{line.difference} source answers are neither stored nor reported."
+        line.labels.sort_by { |_v, n| -n }.first(8).each { |value, n| puts "        #{n}× #{value.inspect}" }
+      end
+      abort "Reconciliation FAILED. The Verto does not account for everything its export holds."
+    end
   end
 
   desc "Rewrite db/seeds/exports/manifest.yml from the files that are there. " \
