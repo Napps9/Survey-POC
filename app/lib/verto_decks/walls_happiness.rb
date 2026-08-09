@@ -35,7 +35,14 @@ module VertoDecks
 
     # The two flows below are the decks; this class is the account and the card
     # vocabulary they share.
-    def self.abstract? = true
+    #
+    # `self ==`, not `true`: a bare `true` is INHERITED, so both flows were
+    # abstract too — which quietly removed them from VertoDecks.available, and
+    # therefore from the deck tests that iterate it, from `verto:preflight`, and
+    # from the list `IMPORT_DECK` offers. They still imported, because fetch
+    # resolves any deck by name; they were just invisible to everything that
+    # asks what decks exist.
+    def self.abstract? = self == VertoDecks::WallsHappiness
 
     def org_name    = ORG_NAME
     def org_slug    = ORG_SLUG

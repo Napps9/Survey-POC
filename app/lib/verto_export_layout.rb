@@ -209,13 +209,34 @@ module VertoExportLayout
     table.map { |row| CSV::Row.new(padded, row.fields) }
   end
 
+  # How far into a file to keep looking for rows with real content in them.
+  #
+  # Only reached by an export that opens with a long run of abandoned sessions;
+  # the scan normally stops as soon as it has SAMPLE_SIZE usable rows. It exists
+  # so a file of nothing but abandonments still terminates, not as a buffer to
+  # fill.
+  SCAN_LIMIT = 2_000
+
   # Reads only as much of the file as the decision needs, then hands back the
   # corrected header. `open` yields a fresh IO positioned at the start.
-  SCAN_LIMIT = 20_000
-
+  #
+  # "As much as it needs" is about MEMORY, not about the answer. The sample has
+  # always been capped at SAMPLE_SIZE, so the decision never changed \u2014 but this
+  # used to buffer up to 20,000 raw rows before picking 200 of them, which on a
+  # 49-column export is around a million Ruby strings held at once for no
+  # reason. It matters because the smallest box this can run in is a 512MB
+  # instance whose whole configuration (`render.yaml`) is an argument with the
+  # OOM killer.
+  #
+  # Measured on the 127MB Big Green export: peak RSS +2MB over baseline. There
+  # is no unit test for it \u2014 a byte counter measures CSV's read-ahead chunking
+  # rather than what is retained, and an assertion about the returned plan
+  # passes either way. A test that cannot fail is worse than none.
   def plan_from(&open)
     headers = nil
-    sample  = []
+    filled  = []
+    any     = []
+    scanned = 0
 
     open.call.then do |io|
       begin
@@ -227,8 +248,14 @@ module VertoExportLayout
             headers[0] = headers[0].delete_prefix("\uFEFF")
             next
           end
-          sample << fields
-          break if sample.size >= SCAN_LIMIT
+
+          scanned += 1
+          # A handful of rows are kept whatever they hold, so a file where
+          # nothing clears MIN_ROW_FILL is still decided on evidence.
+          any << fields if any.size < SAMPLE_SIZE
+          filled << fields if fields.count { |v| v.to_s.strip != "" } >= MIN_ROW_FILL
+
+          break if filled.size >= SAMPLE_SIZE || scanned >= SCAN_LIMIT
         end
       ensure
         io.close
@@ -237,7 +264,7 @@ module VertoExportLayout
 
     raise AmbiguousLayout, "This export has no header row." if headers.nil?
 
-    plan_for(headers, sample_rows(sample))
+    plan_for(headers, filled.presence || any)
   end
 
   def padded_headers(headers, shift, tail_shift)

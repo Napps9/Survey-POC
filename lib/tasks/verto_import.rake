@@ -99,6 +99,72 @@ namespace :verto do
     report_variances(importer)
   end
 
+  desc "Read-only check of the database an import is about to be run against. " \
+       "Reports the schema version, what each importable deck's account currently " \
+       "holds (and whether any of it was collected through the player rather than " \
+       "imported), the database size, and whether the Anthropic key works. " \
+       "Exits non-zero on anything that should stop a run. " \
+       "Usage: bin/rails verto:preflight"
+  task preflight: :environment do
+    ok = true
+    puts "── Preflight: #{ActiveRecord::Base.connection.adapter_name} " \
+         "#{ActiveRecord::Base.connection_db_config.database} ──"
+
+    # ── schema ──────────────────────────────────────────────────────────────
+    # An import writes columns that a stale database does not have. Better to
+    # say so here than to fail 90,000 rows in.
+    pending = ActiveRecord::Base.connection_pool.migration_context.needs_migration?
+    puts "  schema:    #{ActiveRecord::Migrator.current_version}#{pending ? '  ← MIGRATIONS PENDING' : ''}"
+    ok &&= !pending
+
+    # ── what is already there ───────────────────────────────────────────────
+    puts "  accounts:"
+    VertoDecks.available.map { |key| VertoDecks.fetch(key) }.group_by(&:org_slug).each do |slug, decks|
+      org = Organisation.find_by(slug: slug)
+      if org.nil?
+        puts format("    %-16s absent — will be created by %s", slug, decks.map(&:key).join(", "))
+        next
+      end
+
+      responses = Response.where(survey: org.surveys)
+      # A response whose token this importer did not mint was collected through
+      # the player. "Rebuild the account" is a decision about IMPORTED data;
+      # organic answers are somebody's actual respondents and are not ours to
+      # replace on a rule.
+      prefixes = decks.map { |d| "#{[ slug, d.collection_mode ].compact.join('-')}-" }
+      organic  = responses.reject { |r| prefixes.any? { |p| r.session_token.to_s.start_with?(p) } }
+
+      puts format("    %-16s %d Verto(s), %d responses%s", slug, org.surveys.kept.count, responses.count,
+                  organic.any? ? "  ← #{organic.size} NOT from an import" : "")
+      ok = false if organic.any?
+    end
+
+    # ── room ────────────────────────────────────────────────────────────────
+    if ActiveRecord::Base.connection.adapter_name.match?(/postg/i)
+      size = ActiveRecord::Base.connection.select_value(
+        "SELECT pg_size_pretty(pg_database_size(current_database()))")
+      puts "  db size:   #{size} (plan limit is not visible from here — check the dashboard)"
+    end
+    puts "  projected: ~0.5GB of responses once all five imports have run"
+
+    # ── the key, before 200 batches discover it is wrong ────────────────────
+    themer = OpenTextThemer.new
+    if !themer.configured?
+      puts "  anthropic: NO KEY — closed questions would still index, themes and quotes would not"
+    else
+      begin
+        themer.call(question_text: "preflight", texts: Array.new(CorpusEntry.min_sample_size + 1) { "ping" })
+        puts "  anthropic: key works"
+      rescue => e
+        puts "  anthropic: KEY FAILED — #{e.class}: #{e.message.to_s.first(120)}"
+        ok = false
+      end
+    end
+
+    puts ok ? "  READY" : "  NOT READY — see the marked lines above."
+    abort "Preflight failed." unless ok
+  end
+
   desc "Check that an imported Verto still says what its export said. For every " \
        "question column: atoms in the source == values stored + values the import " \
        "reported as not stored. Reads the source as raw text rather than through the " \

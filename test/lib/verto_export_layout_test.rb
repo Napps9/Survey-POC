@@ -1,5 +1,6 @@
 require "test_helper"
 require "csv"
+require "stringio"
 
 # Putting a shifted export's header back over the right columns.
 #
@@ -126,6 +127,21 @@ class VertoExportLayoutTest < ActiveSupport::TestCase
     empty = CSV::Table.new([ CSV::Row.new(table(ALIGNED).headers, []) ])
 
     assert_raises(VertoExportLayout::AmbiguousLayout) { VertoExportLayout.realign(empty) }
+  end
+
+  # ── What it costs to decide ──────────────────────────────────────────────
+  test "a file where nothing clears the fill bar is still decided on evidence" do
+    # Every row is nearly empty, so none of them ever clears MIN_ROW_FILL. The
+    # decision still has to be made on the rows that exist rather than on none.
+    sparse = lambda do
+      body = +"Viewing ID,Completion percentage,Position,Language,Viewing path\n"
+      50.times { |i| body << "v#{i},100,1/1,en,\"[1]\"\n" }
+      StringIO.new(body)
+    end
+
+    plan = VertoExportLayout.plan_from(&sparse)
+
+    assert_equal 0, plan.shift
   end
 
   test "scoring rewards the shift that makes the preamble make sense" do

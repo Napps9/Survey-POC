@@ -23,6 +23,21 @@ class VertoDecksTest < ActiveSupport::TestCase
     end
   end
 
+  test "every concrete deck is listed, and only the shared parents are not" do
+    # `abstract?` marks a class that exists only to be subclassed. Declared as a
+    # bare `true` it is INHERITED, which silently removed both Happiness Project
+    # flows from this list — and so from every test that iterates it, from
+    # verto:preflight, and from the decks IMPORT_DECK offers. They still
+    # imported, because fetch resolves any deck by name; nothing that asks what
+    # decks exist could see them.
+    on_disk = Dir[Rails.root.join("app/lib/verto_decks/*.rb")].map { |f| File.basename(f, ".rb") } - [ "base" ]
+
+    assert_equal [ "walls_happiness" ], (on_disk - VertoDecks.available).sort,
+      "only the shared parent class should be missing from the deck list"
+    assert_includes VertoDecks.available, "walls_happiness_child"
+    assert_includes VertoDecks.available, "walls_happiness_adult"
+  end
+
   test "an unknown deck names the ones that exist rather than failing bare" do
     error = assert_raises(ArgumentError) { VertoDecks.fetch("no_such_deck") }
 
