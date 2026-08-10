@@ -66,6 +66,41 @@ class OnePagerFitTest < ApplicationSystemTestCase
     FileUtils.rm_f(Rails.root.join(PROBE))
   end
 
+  test "the phone takes the live Verto on tap, and hands it back" do
+    survey = published_survey
+    origin = Capybara.current_session.server.base_url
+    serve_probe_copy(origin, survey.publish_token)
+
+    visit "#{origin}/__fit_probe.html"
+    assert_selector "#demoMockup.is-live", wait: 15
+    assert_selector "#phonePlayOverlay", visible: :visible
+
+    find("#phonePlayOverlay").click
+    assert_selector "#phoneMockup.is-live", wait: 15
+    # ONE live frame at a time — the whole point (shared session token).
+    assert_no_selector "#demoMockup.is-live"
+    assert_no_selector "#demoMockup .screen-embed"
+
+    # The phone frame runs the player's real phone layout, not a shrunken
+    # desktop: 390 logical is under the 767px breakpoint.
+    width = within_frame(find(".phone-screen-embed")) do
+      page.evaluate_script("window.innerWidth")
+    end
+    assert_equal 390, width
+
+    # Playable, not a picture: the deck is reachable inside the phone.
+    within_frame(find(".phone-screen-embed")) do
+      assert_selector "[data-card-type]", minimum: 1, wait: 10
+    end
+
+    find("#laptopPlayOverlay").click
+    assert_selector "#demoMockup.is-live", wait: 15
+    assert_no_selector "#phoneMockup.is-live"
+    assert_no_selector ".phone-screen-embed"
+  ensure
+    FileUtils.rm_f(Rails.root.join(PROBE))
+  end
+
   test "the frame fills the screen area exactly, without spilling onto the bezel" do
     survey = published_survey
     origin = Capybara.current_session.server.base_url
