@@ -16,6 +16,7 @@ class AskMessagesController < ApplicationController
   include ActionController::Live
   include LimitsConcurrentStreams
   include ThrottlesAiSpend
+  include RequiresAskVertoAccess
 
   limit_concurrent_streams only: :create
 

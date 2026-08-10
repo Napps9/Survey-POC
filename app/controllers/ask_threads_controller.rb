@@ -4,6 +4,8 @@
 # question — an answer a colleague already got is worth finding again, and the
 # corpus behind it is identical either way.
 class AskThreadsController < ApplicationController
+  include RequiresAskVertoAccess
+
   def create
     thread = Current.organisation.ask_threads.create!(
       user:  Current.user,

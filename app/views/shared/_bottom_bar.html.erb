@@ -43,11 +43,13 @@
           <%= org.funder_enabled? ? t("nav.dashboard") : t("nav.funders") %>
         </a>
       <% end %>
-      <%# Violet, matching the citation layer it leads to. %>
-      <a href="<%= ask_path %>" class="bottom-bar-chip" data-active="<%= active_ask %>">
-        <span class="bottom-bar-chip-dot" style="background:#8B85FF;"></span>
-        <%= t("ask.page.title") %>
-      </a>
+      <% if AskVertoAccess.allowed?(Current.user) %>
+        <%# Violet, matching the citation layer it leads to. %>
+        <a href="<%= ask_path %>" class="bottom-bar-chip" data-active="<%= active_ask %>">
+          <span class="bottom-bar-chip-dot" style="background:#8B85FF;"></span>
+          <%= t("ask.page.title") %>
+        </a>
+      <% end %>
     <% end %>
   </div>
 
