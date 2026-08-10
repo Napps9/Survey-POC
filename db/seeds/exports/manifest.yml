@@ -266,6 +266,13 @@ walls_the_happiness_project_final_questions_adult_child_flow__final_childrens_fl
   sha256: 3ba6ac680ab5ef84d12522aa71cc455bc1ca09c4faca1cdac68fc16038464c66
   sheet: final_childrens_flow
   source: Walls_The_Happiness_Project__Final_Questions_Adult__Child_FLow.xlsx
+walls_the_happiness_project_raw_data_adults__master.csv.gz:
+  source: UNKNOWN — fill this in
+  sheet: ''
+  conversion: ''
+  rows: 8372
+  columns: 35
+  sha256: 34d08918e1d9a4d42301f141aeecc9a24767dda5c0d805572ad4535ad7277d09
 wll_transforming_education_raw_data_digital.csv.gz:
   columns: 69
   conversion: title row stripped; trailing blank rows dropped
