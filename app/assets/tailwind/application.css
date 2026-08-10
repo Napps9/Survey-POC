@@ -5747,6 +5747,65 @@ body.generating-overlay-active .bottom-bar { display: none; }
      basis to the content, which is what every number above is built on. */
   .preview-overlay .split-card:has(.nps-lottie) { height: auto; }
 
+  /* Spare height goes to the PICTURE, not to the void. On every media card
+     the strip rule above gives the hero a preferred height and lets the
+     answer panel — the only grow item — absorb whatever is left over, which
+     on a card with a short answer paints as blank white centring: a rating
+     card on the marketing embed drew a 219px photo and a 360px void around
+     five stars. Swap the grow factors and the surplus becomes photograph
+     instead. Nothing else moves: the panel still opens at its
+     --play-right-min stage (grow:0 does not touch min-height), the shrink
+     phase is untouched so a long answer still pins the panel at its floor and
+     scrolls inside .mt-2, and the shed ladder still prices the hero exactly
+     as before. The one visible change is where the SURPLUS lands — and a
+     respondent given a taller cover-fit photo sees more of it, which is the
+     entire request. */
+  .preview-overlay .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-left {
+    flex-grow: 1;
+  }
+  .preview-overlay .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-right {
+    flex-grow: 0;
+  }
+
+  /* Rating and yes/no go further — the full range treatment, because they
+     share the property that earned range its inversion: the answer CANNOT
+     grow. Five stars are five stars and yes/no is two rows, on every phone
+     ever made, so there is nothing for a --play-right-min stage to hold room
+     for and the panel may simply hug its content. Scoped to cards that HAVE
+     a hero: on a bare rating card there is nothing above to give the space
+     to, and the centred base layout is the right look. The same
+     answer-cannot-grow logic does NOT extend to lists, grids or prioritise —
+     their option counts are authored, their .mt-2 owns the overflow, and
+     _fitCard's ladder needs the panel's stage to measure against. */
+  .preview-overlay .preview-card:is([data-card-type="rating"], [data-card-type="yes_no"])
+    .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-left {
+    flex: 1 1 auto;
+    height: auto;               /* same load-bearing auto as the range rule above */
+    min-height: var(--play-hero-min);
+  }
+  .preview-overlay .preview-card:is([data-card-type="rating"], [data-card-type="yes_no"])
+    .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-right {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+  /* The same two companions the range inversion needed, for the same
+     reasons: an unshrinkable answer panel must be able to push the CARD past
+     the viewport (height: max-content opts it out of the body's stretch
+     clamp, so .preview-body genuinely scrolls — reachable here at a raised
+     root font on a sideways phone, where a two-line question plus two rows
+     plus the hero floor no longer fit 390px), and the card must not read the
+     desktop split-card's 680px height as its flex basis while sizing from
+     content. Without these, the overflow dies inside overflow:hidden and
+     the answer is clipped with nothing scrollable — and _fitCard cannot
+     rescue a content-sized panel, because its .mt-2 never overflows. */
+  .preview-overlay .preview-card.active:is([data-card-type="rating"], [data-card-type="yes_no"]):has(.split-left-img, .split-left-video, .card-lottie) {
+    height: max-content;
+  }
+  .preview-overlay .preview-card:is([data-card-type="rating"], [data-card-type="yes_no"])
+    .split-card:has(.split-left-img, .split-left-video, .card-lottie) {
+    height: auto;
+  }
+
   /* NPS on mobile: drop the media "header" panel entirely and give the liquid
      container the whole card, centred; shrink it to fit a phone viewport. */
   .preview-overlay .split-card:has(.nps-slider) .split-left { display: none; }
@@ -5764,12 +5823,23 @@ body.generating-overlay-active .bottom-bar { display: none; }
     flex: 1 1 auto;
     height: auto;
   }
-  .preview-overlay .nps-control { height: 232px; }
+  /* The vessel scales with the phone instead of assuming the smallest one.
+     232px was chosen so the liquid column fits a short viewport, and then
+     applied to every viewport — so a tall phone drew the same small vessel
+     inside a panel with hundreds of px to spare. Fluid between that proven
+     floor and desktop's own 320px (the ceiling assets scale down from): a
+     390px-tall sideways phone keeps exactly the 232 it had, a 660px phone
+     gets ~277, and the tall marketing embed reaches desktop size. The labels
+     column MUST carry the same track — the digits align to the steps by
+     sharing the vessel's height — so the number is a custom property stated
+     once: two hand-kept copies of a clamp is how the labels shear off the
+     steps the day someone tunes one of them. */
+  .preview-overlay { --nps-vessel-h: clamp(232px, 42svh, 320px); }
+  .preview-overlay .nps-control { height: var(--nps-vessel-h); }
   .preview-overlay .nps-slider { gap: 8px; }
   .preview-overlay .nps-slider-stage { gap: 12px; }
   .preview-overlay .nps-slider-labels {
-    /* match the shrunk .nps-control height so labels align with steps */
-    height: 232px;
+    height: var(--nps-vessel-h);   /* the vessel's own track — see above */
     min-width: 44px;
   }
   /* NPS is the one scale that keeps 13px — see the .slider-label-text rule
@@ -6042,19 +6112,32 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(2, 1fr);
-    /* Rows still take an equal share of whatever the panel has, and still
-       floor at what their card needs when it has nothing spare. Tried
-       `min-content` here when the tile became a fixed proportion, on the
-       reasoning that a fixed tile leaves nothing to distribute — but the tile
-       is not the whole card, and hugging the content left a 200px hole under a
-       six-option grid and half an empty panel under a seven-row list. The
-       tile's size is settled by its own aspect-ratio now, so `1fr` can go back
-       to doing the one thing it is good at: spreading the answer over the room
-       it has been given. */
-    grid-auto-rows: minmax(min-content, 1fr);
+    /* Rows hug their content and the BLOCK centres in the stage. This has
+       been each of three ways now, and the history is the argument: rows
+       were `1fr` (stretchy) while the tile filled its row, then `min-content`
+       with `align-content: start` — which left a 200px hole UNDER a grid in
+       a full-height panel — then `1fr` again once the tile got a fixed
+       proportion. But a stretched row with a fixed-proportion, top-anchored
+       tile paints its stretch as a GAP between one row's label and the next
+       row's tile, and on a tall panel those gaps grew to a couple of hundred
+       px of nothing mid-answer. The stretch was only ever tolerable while
+       the tile consumed it.
+
+       `min-content` rows with the grid HUGGING its content fix both earlier
+       failures at once: rows are tight (no mid-answer gaps), and the
+       centring comes from the base rule's auto margins on the grid itself —
+       the pattern the desktop block documents (search "auto margins resolve
+       to 0"): when the grid outgrows the scrollport the margins collapse and
+       it scrolls flush from the top, where `align-content: center` would
+       have centred the OVERFLOW and clipped the first row above an
+       unreachable scroll position — while also halving what _fitCard's
+       over() can see. `flex: 0 1 auto`, because a grow-stretched grid fills
+       the scrollport and starves those margins of the free space they centre
+       with. */
+    grid-auto-rows: min-content;
     gap: clamp(8px, 1.4svh, 12px);
     align-content: start;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     width: 100%;
     min-height: 0;
   }
