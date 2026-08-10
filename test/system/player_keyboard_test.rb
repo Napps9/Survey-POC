@@ -16,7 +16,11 @@ class PlayerKeyboardTest < ApplicationSystemTestCase
     # _read has a value for it from first paint and only the _touched mark
     # holds the glow back. See "tabbing across a range card".
     { "type" => "range", "cid" => "c3", "text" => "How confident?",
-      "options" => [ "Not at all", "A little", "Somewhat", "Fairly", "Very" ] }
+      "options" => [ "Not at all", "A little", "Somewhat", "Fairly", "Very" ] },
+    # Deck tail so the range card is not last: on the last card the Next
+    # button yields to Submit and stays hidden, and the glow assertions above
+    # it need a VISIBLE Next button to mean anything.
+    { "type" => "open_ended", "cid" => "c4", "text" => "Anything else?" }
   ].freeze
 
   def setup
@@ -121,6 +125,16 @@ class PlayerKeyboardTest < ApplicationSystemTestCase
     )
   end
 
+  # The glow sync is rAF-deferred, so a one-shot read straight after a key
+  # press races the frame. Positive expectations go through assert_selector
+  # (which retries); negative ones must instead SETTLE first — wait out two
+  # frames so the sync has provably run before concluding it did nothing.
+  def settle_frames
+    page.evaluate_async_script(
+      "const done = arguments[0]; requestAnimationFrame(() => requestAnimationFrame(done))"
+    )
+  end
+
   # Walks the deck to the range card, answering the two cards before it by
   # pointer — the keyboard behaviour under test lives on the range card, and
   # how the earlier cards were answered is not part of it.
@@ -168,18 +182,19 @@ class PlayerKeyboardTest < ApplicationSystemTestCase
     press(:Enter)
 
     assert_equal "true", find('.preview-card.active li[role="radio"]', match: :first)["aria-checked"]
-    assert next_glowing?, "a captured keyboard answer must light the glow like a click does"
+    assert_selector ".preview-btn-next.is-answered", wait: 3
   end
 
   test "operating the range slider by arrow key lights the next glow" do
     open_range_card
+    settle_frames # the glow going OFF for the new card is rAF-deferred too
     assert_not next_glowing?,
       "the thumb renders mid-scale, but an untouched range card is unanswered"
 
     focus_via_dom('.preview-card.active .slider-wrap[role="slider"]')
     press(:right)
 
-    assert next_glowing?, "an arrow press IS the answer on a slider"
+    assert_selector ".preview-btn-next.is-answered", wait: 3
   end
 
   test "tabbing across the range card does not light the next glow" do
@@ -190,6 +205,7 @@ class PlayerKeyboardTest < ApplicationSystemTestCase
 
     press(:Tab)   # deck focus (the card wrapper) -> the slider itself
     press(:Tab)   # ...and out the other side
+    settle_frames # any wrongly-queued glow sync has now run
     focused = evaluate_script("document.activeElement && document.activeElement.className")
 
     assert_not next_glowing?,

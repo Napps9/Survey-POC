@@ -627,6 +627,7 @@
 .split-right .choice-grid,
 .split-right .slider-wrap,
 .split-right .freeform-wrap,
+.split-right .contact-form-wrap,
 .split-right .rating-wrap,
 .split-right .rotate-wrap { text-align: left; }
 
@@ -2019,7 +2020,17 @@
 .size-xl { font-size: 1.5em; }
 
 /* ── Contact card (lead capture) ─────────────────── */
-.contact-form-wrap { display: flex; flex-direction: column; gap: 10px; }
+/* Same vessel recipe as .freeform-wrap: every typed answer in the player sits
+   in this soft grey container with left-aligned content. Without it the form
+   was four naked white fields floating full-bleed on the white card with
+   centre-aligned labels — the one answer widget that didn't look like the
+   platform. */
+.contact-form-wrap {
+  display: flex; flex-direction: column; gap: 12px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 14px;
+  padding: 14px;
+}
 .contact-field-row { display: flex; flex-direction: column; gap: 4px; }
 .contact-field-label {
   font-family: "Alata", sans-serif;
@@ -2030,8 +2041,8 @@
 .contact-field {
   width: 100%;
   padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px; /* the pick rows' radius, not the vessel's 14 */
+  border: 1px solid rgba(0, 0, 0, 0.08);
   background: #fff;
   font-family: "ABeeZee", sans-serif;
   font-size: var(--text-base);
@@ -2040,7 +2051,9 @@
   transition: border-color 0.12s;
 }
 .contact-field:focus { border-color: var(--brand-primary, #01EACB); }
-.contact-field:disabled { background: rgba(0, 0, 0, 0.03); cursor: default; }
+/* Editor preview: half-opaque white on the vessel, so the fields still read
+   as fields (a black-tint here vanished into the vessel's own grey). */
+.contact-field:disabled { background: rgba(255, 255, 255, 0.55); cursor: default; }
 .contact-email-error {
   font-family: "ABeeZee", sans-serif;
   font-size: var(--text-sm);
