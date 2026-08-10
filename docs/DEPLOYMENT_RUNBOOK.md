@@ -88,7 +88,7 @@ IMPORT_DECK=<deck>                      bin/rails verto:enrol_corpus
 | 1 | `unyo_sport` (plus `IMPORT_ORG_SLUG=unyo`) | `unyouth_sport_raw_data` | 1,376 |
 | 2 | `aaf_valparaiso` | `aaf_valparaiso_final_raw_data__raw_data_general` | 3,477 |
 | 3 | `walls_happiness_adult` — **`verto:build_deck` then `verto:append_csv`**, not import | `walls_the_happiness_project_raw_data_adults__master` | 10,754 |
-| 4 | `walls_happiness_child` — **`verto:build_deck` then `verto:append_csv`**, not import | `walls_the_happiness_project_raw_data_children__master` | 11,491 |
+| 4 | `walls_happiness_child` — **`verto:build_deck` then `verto:append_csv`**, not import | `walls_the_happiness_project_raw_data_children__master` | 17,932 |
 | 5 | `wll_education_digital` | `wll_transforming_education_raw_data_digital` | 50,835 |
 | 6 | `wll_education_paper` — **`verto:append_csv`**, not import | `wll_transforming_education_raw_data_paper` | 3,483 |
 | 7 | `big_green_legacy` | `the_big_green_legacy_moe_raw_data` | 126,895 |
