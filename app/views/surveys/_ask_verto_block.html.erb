@@ -5,8 +5,11 @@
 
     The offer only makes sense once a Verto has responses, so the block is absent
     on a deck nobody has answered rather than sitting inert from creation. %>
-<% completed = @survey.responses.where(status: "completed").count %>
-<% if completed.positive? %>
+<%# The same population the indexer counts (everyone who answered something),
+    or a Verto whose respondents rarely reach the last card could never be
+    offered even though it would index fine. %>
+<% answered = CorpusIndexer.countable_responses(@survey).count %>
+<% if answered.positive? %>
   <% state = @corpus_entry.creator_state %>
   <details class="publish-block">
     <summary class="publish-block-title">

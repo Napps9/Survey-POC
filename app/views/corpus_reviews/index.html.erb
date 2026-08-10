@@ -75,7 +75,7 @@
                   </span>
                 </td>
                 <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.8);font-variant-numeric:tabular-nums;">
-                  <%= number_with_delimiter(entry.survey.responses.where(status: "completed").count) %>
+                  <%= number_with_delimiter(CorpusIndexer.countable_responses(entry.survey).count) %>
                 </td>
                 <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.8);font-variant-numeric:tabular-nums;">
                   <%= Array(entry.survey.cards).count { |c| CorpusIndexer.indexable?(c["type"].to_s) } %>

@@ -242,6 +242,6 @@ class AskVertoChatTest < ActiveSupport::TestCase
 
     scope_block = client.calls.first[:system].last[:text]
     assert_match(/1 Vertos/, scope_block)
-    assert_match(/40 completed responses/, scope_block)
+    assert_match(/40 responses with answers/, scope_block)
   end
 end

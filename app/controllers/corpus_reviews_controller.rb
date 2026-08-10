@@ -22,7 +22,7 @@ class CorpusReviewsController < ApplicationController
     @entries = entries_for(@tab).includes(:survey, :organisation, :opted_in_by).limit(100)
     # Checks are computed for display only. Nothing here decides anything — the
     # reviewer does, on a pre-flagged row rather than from scratch.
-    @checks = @entries.to_h { |entry| [ entry.id, CorpusChecks.run(entry.survey, completed_count: completed_count(entry)) ] }
+    @checks = @entries.to_h { |entry| [ entry.id, CorpusChecks.run(entry.survey, answered_count: answered_count(entry)) ] }
   end
 
   def update
@@ -59,8 +59,10 @@ class CorpusReviewsController < ApplicationController
     end
   end
 
-  def completed_count(entry)
-    entry.survey.responses.where(status: "completed").count
+  # The population the indexer will actually count — everyone who answered
+  # something — so the queue's check agrees with what enrolment would do.
+  def answered_count(entry)
+    CorpusIndexer.countable_responses(entry.survey).count
   end
 
   def verto_name(entry)

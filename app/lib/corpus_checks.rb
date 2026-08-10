@@ -31,12 +31,15 @@ module CorpusChecks
     def to_h  = { "key" => key.to_s, "status" => status.to_s, "label" => label }
   end
 
-  # Run every check for one Verto. `entry` may be unsaved.
-  def run(survey, completed_count:)
+  # Run every check for one Verto. `entry` may be unsaved. `answered_count` is
+  # CorpusIndexer.countable_responses — the population the index will actually
+  # be built over. Checking a different one (completion used to be the gate
+  # here) failed Vertos for a sample the corpus does not use.
+  def run(survey, answered_count:)
     cards = Array(survey.cards)
 
     [
-      sample_size(completed_count),
+      sample_size(answered_count),
       pii_options(cards),
       free_text(cards),
       contact_forms(cards),
@@ -44,14 +47,14 @@ module CorpusChecks
     ]
   end
 
-  def sample_size(completed_count)
-    if completed_count >= CorpusEntry.min_sample_size
+  def sample_size(answered_count)
+    if answered_count >= CorpusEntry.min_sample_size
       Check.new(key: :sample_size, status: :pass,
-                label: "Sample size · #{completed_count} completed responses")
+                label: "Sample size · #{answered_count} responses with answers")
     else
       Check.new(key: :sample_size, status: :fail,
-                label: "Fewer than #{CorpusEntry.min_sample_size} completed responses " \
-                       "(#{completed_count}). Re-offer once the Verto has more.")
+                label: "Fewer than #{CorpusEntry.min_sample_size} responses with answers " \
+                       "(#{answered_count}). Re-offer once the Verto has more.")
     end
   end
 

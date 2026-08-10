@@ -150,7 +150,7 @@ class AskVertoChat
       { type: "text", text: SYSTEM_WITH_SAFETY, cache_control: { type: "ephemeral" } },
       { type: "text", text: <<~SCOPE }
         CORPUS AVAILABLE TO YOU RIGHT NOW
-        #{coverage[:vertos]} Vertos, #{coverage[:responses]} completed responses.
+        #{coverage[:vertos]} Vertos, #{coverage[:responses]} responses with answers.
         This is every Verto whose creator has opted in AND which Verto has
         approved. If a survey you would expect is missing, it is because one of
         those two has not happened — say that rather than guessing at its data.

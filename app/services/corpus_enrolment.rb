@@ -43,7 +43,7 @@ class CorpusEnrolment
     # something. Checking the sample floor against finishers and then indexing
     # answerers would fail a Verto for a sample it does not actually use.
     answered = CorpusIndexer.countable_responses(@survey).count
-    checks   = CorpusChecks.run(@survey, completed_count: answered)
+    checks   = CorpusChecks.run(@survey, answered_count: answered)
     blocking  = CorpusChecks.blocking(checks)
 
     entry = CorpusEntry.for(@survey)

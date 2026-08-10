@@ -93,7 +93,7 @@ class AskVertoConsentTest < ActionDispatch::IntegrationTest
       assert_response :success
       # The blocking check is pre-filled as the decline reason, so the reviewer
       # doesn't have to write "no" in their own words.
-      assert_match(/Fewer than #{CorpusEntry.min_sample_size} completed responses/, response.body)
+      assert_match(/Fewer than #{CorpusEntry.min_sample_size} responses with answers/, response.body)
 
       patch corpus_review_path(entry, decision: "decline",
                                review_note: "Fewer than 30 completed responses.")
@@ -106,6 +106,24 @@ class AskVertoConsentTest < ActionDispatch::IntegrationTest
   ensure
     CorpusEntry.min_sample_size = nil
     assert_equal :declined, entry.creator_state
+  end
+
+  test "answered-but-unfinished respondents count on the consent surfaces" do
+    CorpusEntry.min_sample_size = 30
+    # Everyone answered something; nobody reached the last card. The indexer
+    # counts these (answered: true), so the queue's check must too — or the
+    # queue shows a red FAIL for a Verto enrolment would index happily.
+    @survey.responses.update_all(status: "started")
+    sign_in
+    post survey_corpus_entry_path(@survey)
+
+    with_staff do
+      get corpus_reviews_path
+      assert_response :success
+      assert_match(/Sample size · 40 responses with answers/, response.body)
+    end
+  ensure
+    CorpusEntry.min_sample_size = nil
   end
 
   test "declining removes any rows the Verto already had" do
