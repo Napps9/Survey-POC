@@ -87,12 +87,21 @@ IMPORT_DECK=<deck>                      bin/rails verto:enrol_corpus
 |---|---|---|---|
 | 1 | `unyo_sport` (plus `IMPORT_ORG_SLUG=unyo`) | `unyouth_sport_raw_data` | 1,376 |
 | 2 | `aaf_valparaiso` | `aaf_valparaiso_final_raw_data__raw_data_general` | 3,477 |
-| 3 | `wll_education_digital` | `wll_transforming_education_raw_data_digital` | 50,835 |
-| 4 | `wll_education_paper` — **`verto:append_csv`**, not import | `wll_transforming_education_raw_data_paper` | 3,483 |
-| 5 | `big_green_legacy` | `the_big_green_legacy_moe_raw_data` | 126,895 |
+| 3 | `walls_happiness_adult` — **`verto:build_deck` then `verto:append_csv`**, not import | `walls_the_happiness_project_raw_data_adults__master` | 8,372 |
+| 4 | `wll_education_digital` | `wll_transforming_education_raw_data_digital` | 50,835 |
+| 5 | `wll_education_paper` — **`verto:append_csv`**, not import | `wll_transforming_education_raw_data_paper` | 3,483 |
+| 6 | `big_green_legacy` | `the_big_green_legacy_moe_raw_data` | 126,895 |
 
-Step 4 appends because both WLL halves are one Verto; importing it would rebuild
+Step 5 appends because both WLL halves are one Verto; importing it would rebuild
 the account and take the digital half with it.
+
+Step 3 must never use `verto:import_csv` for a different reason: the two
+Happiness Project flows are **sibling Vertos sharing one org**, and a full
+import destroys the whole org — including the child flow. `verto:build_deck`
+replaces only its own Verto, and `verto:append_csv` upserts the responses, so
+neither touches the sibling. Re-running the pair is idempotent, and the same
+appended export can be regenerated and re-appended as more country files
+arrive (the combined CSV keeps each row's provenance in its Country column).
 
 `verto:reconcile` must report **zero unaccounted answers**. It is the whole
 claim — every answer in the export is either stored or listed as a deliberate
