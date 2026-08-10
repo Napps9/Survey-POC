@@ -270,6 +270,39 @@ class AskFlowTest < ActionDispatch::IntegrationTest
     assert_select "form.ask-thread-delwrap[action=?]", ask_thread_path(mine)
   end
 
+  test "a replayed answer warns when a cited source has left the corpus" do
+    sign_in
+    mine = thread
+    mine.ask_messages.create!(role: "user", text: "Are people worried?")
+    mine.ask_messages.create!(role: "assistant", text: "Worry is high [[c:1]].",
+                              citations: [ citation ])
+
+    get ask_path(thread_id: mine.id)
+    assert_response :success
+    assert_no_match(/#{Regexp.escape(I18n.t("ask.stale_note"))}/, response.body)
+
+    CorpusEntry.find_by(survey_id: @survey.id).withdraw!
+
+    get ask_path(thread_id: mine.id)
+    assert_match I18n.t("ask.stale_note"), response.body,
+      "a reader about to quote a figure deserves to know its source was pulled"
+  end
+
+  test "the review-queue door is in the palette for staff only" do
+    sign_in
+
+    get ask_path
+    assert_no_match(%r{/ask/review}, response.body,
+      "non-staff must not learn the surface exists")
+
+    original = ENV["BLAZER_STAFF_EMAILS"]
+    ENV["BLAZER_STAFF_EMAILS"] = @user.email_address
+    get ask_path
+    assert_match %r{/ask/review}, response.body
+  ensure
+    ENV["BLAZER_STAFF_EMAILS"] = original
+  end
+
   test "a service failure surfaces as an error event, not a 500" do
     sign_in
     mine = thread

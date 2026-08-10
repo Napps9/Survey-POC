@@ -1468,6 +1468,7 @@ tr:
       shuffle_failed: "Görseller karıştırılamadı — lütfen tekrar deneyin."
       unpublished: "Verto yayından kaldırıldı — düzenleyebileceğiniz bir taslağa döndü."
   ask:
+    stale_note: "Bu yanıtta alıntılanan bazı kaynaklar artık ortak derlemde yer almıyor."
     suggest:
       agreement: "%{theme} bulguları Verto'lar arasında nerede örtüşüyor?"
       agreement_label: "Nerede örtüşüyor"

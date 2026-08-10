@@ -1478,6 +1478,7 @@ pl:
       shuffle_failed: "Nie udało się przetasować obrazów — spróbuj jeszcze raz."
       unpublished: "Publikacja Verto cofnięta — wróciło do wersji roboczej, którą możesz edytować."
   ask:
+    stale_note: "Niektóre źródła cytowane w tej odpowiedzi nie należą już do wspólnego korpusu."
     suggest:
       agreement: "W czym wyniki dotyczące %{theme} zgadzają się między Verto?"
       agreement_label: "Gdzie się zgadzają"

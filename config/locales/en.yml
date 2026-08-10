@@ -1489,6 +1489,7 @@ en:
       shuffle_failed: "Couldn't shuffle assets — please try again."
       unpublished: "Verto unpublished — it's back to a draft you can edit."
   ask:
+    stale_note: "Some sources cited in this answer have since left the shared corpus."
     suggest:
       agreement: "Where do %{theme} findings agree across Vertos?"
       agreement_label: "Where they agree"

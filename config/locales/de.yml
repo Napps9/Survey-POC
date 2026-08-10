@@ -1468,6 +1468,7 @@ de:
       portfolio_not_found: "Portfolio nicht gefunden."
       funder_only: "Das kann nur der Förderer tun."
   ask:
+    stale_note: "Einige in dieser Antwort zitierte Quellen sind inzwischen nicht mehr Teil des gemeinsamen Korpus."
     suggest:
       agreement: "Worin stimmen die Ergebnisse zu %{theme} über Vertos hinweg überein?"
       agreement_label: "Wo sie übereinstimmen"

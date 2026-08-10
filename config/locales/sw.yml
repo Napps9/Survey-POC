@@ -1468,6 +1468,7 @@ sw:
       shuffle_failed: "Imeshindikana kuchanganya nyenzo — tafadhali jaribu tena."
       unpublished: "Uchapishaji umeondolewa — Verto imerudi kuwa rasimu unayoweza kuhariri."
   ask:
+    stale_note: "Baadhi ya vyanzo vilivyotajwa katika jibu hili havimo tena kwenye mkusanyiko wa pamoja."
     suggest:
       agreement: "Matokeo ya %{theme} yanakubaliana wapi kati ya Vertos?"
       agreement_label: "Wanapokubaliana"

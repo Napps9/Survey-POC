@@ -1467,6 +1467,7 @@ id:
       shuffle_failed: "Tidak dapat mengacak aset — silakan coba lagi."
       unpublished: "Verto batal diterbitkan — kembali menjadi draf yang bisa Anda edit."
   ask:
+    stale_note: "Beberapa sumber yang dikutip dalam jawaban ini sudah tidak ada lagi di korpus bersama."
     suggest:
       agreement: "Di mana temuan tentang %{theme} sepakat antar Verto?"
       agreement_label: "Di mana mereka sepakat"

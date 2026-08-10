@@ -1468,6 +1468,7 @@ es:
       portfolio_not_found: "Cartera no encontrada."
       funder_only: "Solo el financiador puede hacer eso."
   ask:
+    stale_note: "Algunas fuentes citadas en esta respuesta ya no forman parte del corpus compartido."
     suggest:
       agreement: "¿En qué coinciden los hallazgos sobre %{theme} entre Vertos?"
       agreement_label: "Dónde coinciden"

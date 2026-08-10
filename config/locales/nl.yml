@@ -1468,6 +1468,7 @@ nl:
       portfolio_not_found: "Portfolio niet gevonden."
       funder_only: "Alleen de financier kan dat doen."
   ask:
+    stale_note: "Sommige bronnen die in dit antwoord worden geciteerd, maken inmiddels geen deel meer uit van het gedeelde corpus."
     suggest:
       agreement: "Waarover zijn de bevindingen over %{theme} het eens tussen Verto's?"
       agreement_label: "Waar ze het eens zijn"

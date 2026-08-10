@@ -1466,6 +1466,7 @@ ja:
       shuffle_failed: "アセットをシャッフルできませんでした — もう一度お試しください。"
       unpublished: "Verto の公開を取り消しました — 編集できる下書きに戻りました。"
   ask:
+    stale_note: "この回答で引用された情報源の一部は、その後共有コーパスから削除されました。"
     suggest:
       agreement: "%{theme}の結果は Verto 間でどこが一致していますか？"
       agreement_label: "一致している点"

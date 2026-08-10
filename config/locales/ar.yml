@@ -1483,6 +1483,7 @@ ar:
       shuffle_failed: "تعذّر خلط الصور — يرجى المحاولة مرة أخرى."
       unpublished: "تم إلغاء نشر الـ Verto — عاد مسودة يمكنك تعديلها."
   ask:
+    stale_note: "بعض المصادر المذكورة في هذه الإجابة لم تعد ضمن المجموعة المشتركة."
     suggest:
       agreement: "أين تتفق نتائج %{theme} بين الـ Vertos؟"
       agreement_label: "حيث تتفق"

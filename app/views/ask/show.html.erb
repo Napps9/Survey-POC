@@ -177,7 +177,15 @@
             <% else %>
               <div class="ask-msg-ai">
                 <span class="ask-ai-mark">✦</span>
-                <div class="ask-ai-body"><%= render_ask_answer(message) %></div>
+                <div class="ask-ai-body">
+                  <%= render_ask_answer(message) %>
+                  <%# A reader about to quote a figure deserves to know its
+                      source has since left the corpus — the note three code
+                      comments promised and no view rendered. %>
+                  <% if message.stale_sources.any? %>
+                    <div class="ask-warning"><%= t("ask.stale_note") %></div>
+                  <% end %>
+                </div>
               </div>
             <% end %>
           <% end %>

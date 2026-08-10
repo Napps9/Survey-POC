@@ -1466,6 +1466,7 @@ ko:
       shuffle_failed: "애셋을 섞을 수 없습니다 — 다시 시도해 주세요."
       unpublished: "Verto 게시를 취소했습니다 — 편집할 수 있는 초안으로 돌아갔습니다."
   ask:
+    stale_note: "이 답변에 인용된 일부 출처는 이후 공유 코퍼스에서 제외되었습니다."
     suggest:
       agreement: "%{theme} 결과는 여러 Verto에서 어디가 일치하나요?"
       agreement_label: "일치하는 지점"
