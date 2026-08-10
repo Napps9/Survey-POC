@@ -11,8 +11,10 @@ require "anthropic"
 # ABOUT is fixed by its questions, not by who answered — which is also why no
 # PromptSafety wrapping is needed here.
 #
-# Tags are enrichment, not the point: every failure path returns [] so an
-# import or seed can never be blocked by a classification call.
+# Tags are enrichment, not the point: no failure path ever raises mid-import,
+# and every failure path returns nil — a MISSING verdict, which callers must
+# never store — while [] is a real verdict ("no goal clearly applies"). See
+# #call for the full contract.
 class SdgClassifier
   include AnthropicHelpers
 
@@ -110,8 +112,19 @@ class SdgClassifier
 
     log_usage("SdgClassifier", response.usage, model: MODEL)
 
+    # A response with no usable tool call is a FAILED verdict, not an empty
+    # one. It happens: max_tokens truncation (the budget here is deliberately
+    # small), a refusal stop, or a tool input missing the required key. The
+    # old `sanitize(block && …)` collapsed all of those to [] — a storable
+    # "no goals clearly apply" — so a backfill or re-import over a tagged
+    # survey would erase good tags on an abnormal API response, which is the
+    # precise erasure the nil contract exists to prevent.
     block = Array(response.content).find { |b| tool_use?(b) }
-    UnSdgs.sanitize(block && deep_stringify(input_of(block))["sdgs"])
+    return nil unless block
+    sdgs = deep_stringify(input_of(block))["sdgs"]
+    return nil if sdgs.nil?
+
+    UnSdgs.sanitize(sdgs)
   rescue => e
     ErrorReporting.report("SdgClassifier", e, survey_id: survey.id)
     nil

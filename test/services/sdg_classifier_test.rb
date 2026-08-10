@@ -3,7 +3,8 @@ require "ostruct"
 
 # SDG tags are enrichment: the contract under test is that classification can
 # never break the import or seed that asked for it — junk output is sanitised,
-# failures come back as [], and no key means no client is ever built.
+# every failure comes back as nil (a MISSING verdict, never mistakable for
+# []'s "no goals clearly apply"), and no key means no client is ever built.
 class SdgClassifierTest < ActiveSupport::TestCase
   # Replays one canned tool_use response (or raises), recording the kwargs of
   # the create call so tests can assert what was actually sent.
@@ -22,10 +23,16 @@ class SdgClassifierTest < ActiveSupport::TestCase
       raise @error if @error
 
       OpenStruct.new(
-        content: [ OpenStruct.new(type: "tool_use", input: @input) ],
+        content: @content || [ OpenStruct.new(type: "tool_use", input: @input) ],
         usage: OpenStruct.new(input_tokens: 10, output_tokens: 5,
                               cache_creation_input_tokens: 0, cache_read_input_tokens: 0)
       )
+    end
+
+    # An abnormal response: the forced tool call never happened — what comes
+    # back from a max_tokens truncation or a refusal stop.
+    def self.without_tool_block(text: "I cannot")
+      new.tap { |c| c.instance_variable_set(:@content, [ OpenStruct.new(type: "text", text: text) ]) }
     end
   end
 
@@ -62,6 +69,22 @@ class SdgClassifierTest < ActiveSupport::TestCase
     client = ScriptedClient.new(input: { "sdgs" => [] })
 
     assert_equal [], classifier_with(client).call(survey: survey)
+  end
+
+  # The abnormal-response family: the API answered, but not with a verdict.
+  # These must be nil — collapsing them to [] is how a FORCE=1 backfill or a
+  # re-import erases a survey's real tags on a truncated response.
+  test "a response with no tool block is a missing verdict, not 'no goals'" do
+    client = ScriptedClient.without_tool_block
+
+    assert_nil classifier_with(client).call(survey: survey),
+      "a truncation or refusal produced no tool call — there is no verdict to store"
+  end
+
+  test "a tool call missing the sdgs key is a missing verdict too" do
+    client = ScriptedClient.new(input: { "unexpected" => true })
+
+    assert_nil classifier_with(client).call(survey: survey)
   end
 
   test "no API key means no verdict and no client built" do
