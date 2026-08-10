@@ -15,10 +15,22 @@ class AskMessage < ApplicationRecord
   ROLES = %w[user assistant].freeze
   validates :role, inclusion: { in: ROLES }
 
+  # A citation or quote marker as stored in an assistant turn's text.
+  MARKER = /\[\[(?:c|q):\d+\]\]/
+
   def user?      = role == "user"
   def assistant? = role == "assistant"
 
   def citation_list = Array(citations)
+
+  # The text as it may be handed back to the model in a later turn. Source
+  # numbers restart at 1 every turn, so a raw [[c:1]] from an old answer names
+  # whatever happens to be source 1 THIS turn — a marker that passes the
+  # validation check while pointing at the wrong question. History carries the
+  # prose only.
+  def prompt_text
+    text.to_s.gsub(MARKER, "").squeeze(" ")
+  end
 
   # Sources cited here that are no longer citable — withdrawn by their creator, or
   # un-approved since. Shown as a note on the old answer rather than hidden: a

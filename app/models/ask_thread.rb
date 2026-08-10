@@ -21,9 +21,11 @@ class AskThread < ApplicationRecord
   end
 
   # The messages Claude is given. Bounded, and only the prose — a previous turn's
-  # citations are already resolved and would only re-enter as unverifiable text.
+  # markers are stripped (see AskMessage#prompt_text), because their numbers were
+  # minted per-turn and would re-enter as valid-looking citations of the wrong
+  # sources.
   def prompt_messages(limit: 20)
-    ask_messages.last(limit).map { |m| { role: m.role, content: m.text } }
+    ask_messages.last(limit).map { |m| { role: m.role, content: m.prompt_text } }
   end
 
   # Trim the oldest threads past the cap. Called after a thread is created, so the

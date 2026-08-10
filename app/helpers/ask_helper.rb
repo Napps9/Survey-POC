@@ -10,8 +10,6 @@
 # simply disappears rather than leaving a dangling reference; the answer reads a
 # little thinner, which is the honest outcome.
 module AskHelper
-  MARKER = /\[\[(c|q):(\d+)\]\]/
-
   def render_ask_answer(message)
     numbers = message.citation_list.index_by { |c| c["n"] }
     quotes  = quote_bodies(message)
