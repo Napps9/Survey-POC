@@ -84,6 +84,30 @@ class AskFlowTest < ActionDispatch::IntegrationTest
     assert_equal @user, created.user
   end
 
+  test "the first question rides through thread creation instead of being discarded" do
+    sign_in
+
+    post ask_threads_path, params: { q: "How worried are people?" }
+
+    created = @org.ask_threads.recent.first
+    assert_redirected_to ask_path(thread_id: created.id, q: "How worried are people?")
+
+    follow_redirect!
+    assert_response :success
+    assert_match "data-ask-verto-initial-question-value", response.body
+  end
+
+  test "the carried question is not re-asked once the thread has messages" do
+    sign_in
+    mine = thread
+    mine.ask_messages.create!(role: "user", text: "Asked already")
+
+    get ask_path(thread_id: mine.id, q: "Asked already")
+
+    assert_response :success
+    assert_no_match(/data-ask-verto-initial-question-value/, response.body)
+  end
+
   test "deleting a thread removes it and its messages" do
     sign_in
     mine = thread

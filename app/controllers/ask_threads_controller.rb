@@ -12,7 +12,10 @@ class AskThreadsController < ApplicationController
     )
     AskThread.prune!(Current.organisation)
 
-    redirect_to ask_path(thread_id: thread.id)
+    # A question composed before any thread existed rides through the redirect
+    # and is asked by the client on arrival — otherwise the first thing a fresh
+    # account types is discarded by the reload that creates its thread.
+    redirect_to ask_path(thread_id: thread.id, q: params[:q].presence&.truncate(2000))
   end
 
   def destroy

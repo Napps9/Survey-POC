@@ -34,6 +34,12 @@
          the chips instead would only recover what a chip carries, which is the
          accent and nothing else. %>
      data-ask-verto-sources-value="<%= (@messages.reverse.find(&:assistant?)&.citation_list || []).to_json %>"
+     <%# A question typed before the thread existed, carried through the
+         create redirect. Only rendered onto an EMPTY thread: once the question
+         persists, @messages is non-empty and a reload cannot re-ask it. %>
+     <% if @thread && @messages.empty? && params[:q].present? %>
+     data-ask-verto-initial-question-value="<%= params[:q] %>"
+     <% end %>
      data-ask-verto-target="grid">
 
   <%# The backdrop the floating panel floats on — the app's own orbs, pitched

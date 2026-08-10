@@ -24,7 +24,7 @@ export default class extends Controller {
     "grid", "feed", "messages", "input", "send", "sourcesFab", "sourceCount", "fabDots",
     "tab", "tabCount", "pane", "sourceList", "detailTitle", "detailBody", "consentBody", "hero"
   ]
-  static values = { threadUrl: String, newThreadUrl: String, sources: Array }
+  static values = { threadUrl: String, newThreadUrl: String, sources: Array, initialQuestion: String }
 
   // Sources for the CURRENT answer, keyed by their number. Replaced each turn:
   // the rail describes the answer you are reading, not everything ever fetched.
@@ -33,6 +33,23 @@ export default class extends Controller {
 
   connect() {
     this._restoreSourcesFromLastAnswer()
+    this._askInitialQuestion()
+  }
+
+  // A question typed before the thread existed: _startThread() carried it
+  // through the create redirect and the server echoed it back on this value,
+  // only onto an empty thread. The URL is scrubbed before sending so a reload
+  // mid-stream cannot re-ask it.
+  _askInitialQuestion() {
+    const question = this.hasInitialQuestionValue ? this.initialQuestionValue.trim() : ""
+    if (!question) return
+
+    const url = new URL(window.location)
+    url.searchParams.delete("q")
+    history.replaceState(null, "", url)
+
+    this.inputTarget.value = question
+    this.send()
   }
 
   // ── Composing ───────────────────────────────────────────────────────────
@@ -94,6 +111,17 @@ export default class extends Controller {
       input.name = "authenticity_token"
       input.value = token
       form.appendChild(input)
+    }
+    // The composed question rides along — the server hands it back on the new
+    // thread's page and _askInitialQuestion() sends it. Without this the first
+    // question a fresh account types is silently thrown away by the reload.
+    const text = this.inputTarget.value.trim()
+    if (text) {
+      const q = document.createElement("input")
+      q.type = "hidden"
+      q.name = "q"
+      q.value = text
+      form.appendChild(q)
     }
     document.body.appendChild(form)
     form.submit()
