@@ -147,7 +147,7 @@ Rails.application.routes.draw do
   get    "ask",                     to: "ask#show",             as: :ask
   post   "ask/threads",             to: "ask_threads#create",   as: :ask_threads
   delete "ask/threads/:id",         to: "ask_threads#destroy",  as: :ask_thread
-  post   "ask/threads/:id/messages", to: "ask_messages#create", as: :ask_thread_messages
+  post   "ask/threads/:thread_id/messages", to: "ask_messages#create", as: :ask_thread_messages
 
   # The staff review queue. Gated by a routing CONSTRAINT rather than a filter,
   # exactly like /blazer above and for the same reason: a non-staff request gets
