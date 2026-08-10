@@ -1468,6 +1468,7 @@ it:
       portfolio_not_found: "Portafoglio non trovato."
       funder_only: "Solo il finanziatore può farlo."
   ask:
+    stale_note: "Alcune fonti citate in questa risposta non fanno più parte del corpus condiviso."
     suggest:
       agreement: "Su cosa concordano i risultati su %{theme} fra i Vertos?"
       agreement_label: "Dove concordano"
@@ -1530,4 +1531,5 @@ it:
       declined: "«%{verto}» rifiutato: il motivo è stato registrato per chi lo ha creato."
       unknown_decision: "Decisione non riconosciuta."
     thread:
+      delete_confirm: "Eliminare questa conversazione?"
       deleted: "Domanda eliminata."

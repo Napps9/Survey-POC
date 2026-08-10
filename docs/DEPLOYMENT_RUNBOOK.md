@@ -118,6 +118,38 @@ open-text column in batches through Claude Haiku. Big Green's freeform alone is
 the datasets, expect 150–200 calls. Lower that variable for a cheaper first pass;
 re-running enrolment later fills the themes in.
 
+One more thing it needs: a **present** `ANTHROPIC_API_KEY`, not just a working
+one. Preflight fails a key that answers wrongly but only *warns* when the key
+is absent — enrolment then still succeeds, indexing every closed question,
+and silently produces **no themes and no quotes** for any open-text question.
+That is recoverable (re-run enrolment with a key later), but nothing in the
+task's output says the quotes are missing, so don't discover it from the
+product.
+
+### The consent path (customer-offered Vertos)
+
+The import above is the VertoNow half — data held under an agreement, where
+`verto:enrol_corpus` legitimately turns both consent keys itself. Everything
+else enters Ask Verto through two people:
+
+1. **The creator offers.** The "Ask Verto" block in the editor's publish
+   panel (admins of the owning org only; visible once the Verto has any
+   answered responses) posts the offer, which lands in the review queue as
+   `pending`.
+2. **Staff approve or decline** at `/ask/review`. The route is gated by the
+   same `BLAZER_STAFF_EMAILS` allowlist as `/blazer`, and it is
+   **deny-by-default: while that variable is unset in Render, the queue 404s
+   for everyone and no offered Verto can ever be approved** — the corpus can
+   then only grow through the rake task. Set it (Render dashboard →
+   Environment) to the staff sign-in email(s) before expecting the queue to
+   exist.
+
+Approval enqueues the indexing job; declining records a reason the creator
+reads verbatim. A Verto the automated checks BLOCK (sample floor, no citable
+questions) is left `pending` in this queue even by `verto:enrol_corpus` —
+blocked Vertos are a human's decision — so the allowlist matters for the
+import path too.
+
 ## 3. Backing up the Active Record encryption keys
 
 Render dashboard → the `survey-poc` service → **Environment** tab → reveal

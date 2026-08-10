@@ -232,6 +232,77 @@ class AskFlowTest < ActionDispatch::IntegrationTest
     assert_equal 0, AskMessage.count
   end
 
+  test "an empty corpus refuses questions server-side before anything persists" do
+    CorpusEntry.find_by(survey_id: @survey.id).withdraw!
+    sign_in
+    mine = thread
+
+    fake = FakeChat.new
+    stub_method(AskVertoChat, :new, ->(*) { fake }) do
+      post ask_thread_messages_path(mine),
+           params: { message: "Anything in there?" }.to_json,
+           headers: { "Content-Type" => "application/json" }
+    end
+
+    assert_response :unprocessable_entity
+    assert_equal 0, mine.ask_messages.count, "no dangling question with no possible answer"
+    assert_empty fake.calls, "an empty corpus must not cost a tool loop"
+  end
+
+  test "the composer is disabled while the corpus is empty" do
+    CorpusEntry.find_by(survey_id: @survey.id).withdraw!
+    sign_in
+
+    get ask_path
+
+    assert_response :success
+    assert_select ".ask-composer textarea[disabled]"
+    assert_select ".ask-send[disabled]"
+  end
+
+  test "each thread row carries a delete control" do
+    sign_in
+    mine = thread
+
+    get ask_path
+
+    assert_response :success
+    assert_select "form.ask-thread-delwrap[action=?]", ask_thread_path(mine)
+  end
+
+  test "a replayed answer warns when a cited source has left the corpus" do
+    sign_in
+    mine = thread
+    mine.ask_messages.create!(role: "user", text: "Are people worried?")
+    mine.ask_messages.create!(role: "assistant", text: "Worry is high [[c:1]].",
+                              citations: [ citation ])
+
+    get ask_path(thread_id: mine.id)
+    assert_response :success
+    assert_no_match(/#{Regexp.escape(I18n.t("ask.stale_note"))}/, response.body)
+
+    CorpusEntry.find_by(survey_id: @survey.id).withdraw!
+
+    get ask_path(thread_id: mine.id)
+    assert_match I18n.t("ask.stale_note"), response.body,
+      "a reader about to quote a figure deserves to know its source was pulled"
+  end
+
+  test "the review-queue door is in the palette for staff only" do
+    sign_in
+
+    get ask_path
+    assert_no_match(%r{/ask/review}, response.body,
+      "non-staff must not learn the surface exists")
+
+    original = ENV["BLAZER_STAFF_EMAILS"]
+    ENV["BLAZER_STAFF_EMAILS"] = @user.email_address
+    get ask_path
+    assert_match %r{/ask/review}, response.body
+  ensure
+    ENV["BLAZER_STAFF_EMAILS"] = original
+  end
+
   test "a service failure surfaces as an error event, not a 500" do
     sign_in
     mine = thread

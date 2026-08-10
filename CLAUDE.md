@@ -76,8 +76,10 @@ that: push green.
   refuses an ambiguous file. Don't replace it with a fixed offset: the importer
   reads every column by name, so a wrong offset produces a clean-looking import
   of comprehensively wrong answers.
-- Respondent-level exports are **not** committed. The importer and a synthetic
-  fixture ship; the real CSVs are handed over out of band.
+- The partner export CSVs **are** committed, gzipped, under
+  `db/seeds/exports/` (~18MB — deliberate, so any checkout can run the
+  runbook's import; see `docs/DEPLOYMENT_RUNBOOK.md` §2). Anything not
+  already in that directory is handed over out of band.
 - The test suite stubs all Anthropic clients, but service constructors do
   `ENV.fetch("ANTHROPIC_API_KEY")` — the var must exist (any value) to run
   tests. CI sets a stub value.
@@ -86,7 +88,8 @@ that: push green.
 - Locale strings live in 19 files under `config/locales/` — new UI strings
   must be added to all of them (they mirror en.yml's structure).
   `test/lib/locale_structure_parity_test.rb` enforces this for the
-  browser-facing namespaces (`js`, `defaults`, `card`); JS reads strings via
+  browser-facing namespaces (`js`, `defaults`, `card`, `templates`,
+  `demographics`, `ask`); JS reads strings via
   `window.I18N`, which carries `js:` plus the curated slice in
   `app/views/layouts/_i18n_js.html.erb` — a JS-facing string anywhere else
   renders as a raw dotted key.

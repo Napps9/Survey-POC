@@ -8,12 +8,13 @@ require "test_helper"
 #
 # Scoped to the namespaces the browser depends on — `js` (window.I18N),
 # `defaults` (placeholder card content, resolved per Verto locale) and `card`
-# (curated into window.I18N by _i18n_js) — because a hole in these is
-# user-visible English in a non-English UI, the exact defect this pass
-# removed. Widening it to every namespace is desirable but needs the
-# backfill done first.
+# (curated into window.I18N by _i18n_js) — plus `ask`, whose 45 server-rendered
+# strings were complete in all 19 files only by discipline until they were
+# guarded here. A hole in any of these is user-visible English in a
+# non-English UI, the exact defect this pass removed. Widening it to every
+# namespace is desirable but needs the backfill done first.
 class LocaleStructureParityTest < ActiveSupport::TestCase
-  NAMESPACES = %w[js defaults card templates demographics].freeze
+  NAMESPACES = %w[js defaults card templates demographics ask].freeze
 
   def locale_files
     Dir[Rails.root.join("config/locales/*.yml")]

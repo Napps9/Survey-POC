@@ -1489,6 +1489,7 @@ en:
       shuffle_failed: "Couldn't shuffle assets — please try again."
       unpublished: "Verto unpublished — it's back to a draft you can edit."
   ask:
+    stale_note: "Some sources cited in this answer have since left the shared corpus."
     suggest:
       agreement: "Where do %{theme} findings agree across Vertos?"
       agreement_label: "Where they agree"
@@ -1551,4 +1552,5 @@ en:
       declined: "“%{verto}” declined — the reason has been recorded for its creator."
       unknown_decision: "That decision wasn't recognised."
     thread:
+      delete_confirm: "Delete this conversation?"
       deleted: "Question deleted."

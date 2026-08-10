@@ -7889,6 +7889,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .ask-thread-new:hover { background: rgba(1,234,203,0.07); color: #18F0D4; }
 
+/* A thread row is the link plus its delete control; the ✕ only surfaces on
+   hover (or keyboard focus) so the rail stays quiet. */
+.ask-thread-row { position: relative; }
+.ask-thread-row .ask-thread { padding-inline-end: 30px; }
+.ask-thread-delwrap {
+  position: absolute; inset-inline-end: 8px; top: 50%; transform: translateY(-50%);
+  margin: 0;
+}
+.ask-thread-del {
+  border: none; background: none; cursor: pointer;
+  padding: 3px 6px; border-radius: 5px; line-height: 1;
+  font-size: 11px; color: rgba(255,255,255,0.28);
+  opacity: 0; transition: opacity 0.15s ease, color 0.15s ease;
+}
+.ask-thread-row:hover .ask-thread-del,
+.ask-thread-del:focus-visible { opacity: 1; }
+.ask-thread-del:hover { color: #FF6B84; background: rgba(216,0,39,0.12); }
+
 .ask-rail-foot {
   margin-top: auto; padding: 11px 14px; border-top: 1px solid rgba(255,255,255,0.07);
   font-family: "ABeeZee", sans-serif; font-size: 11px;
@@ -8188,6 +8206,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-size: 13.5px; line-height: 1.5; max-height: 96px; padding: 5px 0;
 }
 .ask-composer textarea::placeholder { color: rgba(255,255,255,0.34); }
+.ask-composer textarea:disabled { cursor: not-allowed; opacity: 0.55; }
 .ask-send {
   width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; border: none;
   background: #01EACB; cursor: pointer;

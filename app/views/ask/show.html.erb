@@ -88,12 +88,20 @@
       </button>
     <% end %>
     <% @threads.each_with_index do |thread, i| %>
-      <%= link_to ask_path(thread_id: thread.id),
-            class: "ask-thread #{"is-current" if @thread && thread.id == @thread.id}",
-            style: "--thread-accent:#{thread_colours[i % thread_colours.size]};" do %>
-        <span class="ask-thread-dot"></span>
-        <span class="ask-thread-label"><%= thread.display_title %></span>
-      <% end %>
+      <div class="ask-thread-row" style="--thread-accent:<%= thread_colours[i % thread_colours.size] %>;">
+        <%= link_to ask_path(thread_id: thread.id),
+              class: "ask-thread #{"is-current" if @thread && thread.id == @thread.id}" do %>
+          <span class="ask-thread-dot"></span>
+          <span class="ask-thread-label"><%= thread.display_title %></span>
+        <% end %>
+        <%# Deleting is rail furniture: confirm inline, stay here. The route
+            and flash existed from the start; this is the first handle on them. %>
+        <%= button_to "✕", ask_thread_path(thread), method: :delete,
+              class: "ask-thread-del", form_class: "ask-thread-delwrap",
+              form: { data: { turbo_confirm: t("ask.thread.delete_confirm") } },
+              title: t("ask.thread.delete_confirm"),
+              "aria-label": t("ask.thread.delete_confirm") %>
+      </div>
     <% end %>
 
     <div class="ask-rail-foot"><%= t("ask.page.eligible") %></div>
@@ -169,7 +177,15 @@
             <% else %>
               <div class="ask-msg-ai">
                 <span class="ask-ai-mark">✦</span>
-                <div class="ask-ai-body"><%= render_ask_answer(message) %></div>
+                <div class="ask-ai-body">
+                  <%= render_ask_answer(message) %>
+                  <%# A reader about to quote a figure deserves to know its
+                      source has since left the corpus — the note three code
+                      comments promised and no view rendered. %>
+                  <% if message.stale_sources.any? %>
+                    <div class="ask-warning"><%= t("ask.stale_note") %></div>
+                  <% end %>
+                </div>
               </div>
             <% end %>
           <% end %>
@@ -177,14 +193,21 @@
       </div>
 
       <%# Floating CTAs — no docked chrome on this column at all. %>
+      <%# With nothing citable, a question would still cost a full tool loop
+          to answer "I have no data" — the composer says so instead of
+          spending it. The server refuses too (AskMessagesController), so
+          this is presentation, not the guard. %>
+      <% corpus_empty = @coverage[:vertos].zero? %>
       <div class="ask-fab-row">
         <div class="ask-composer">
           <textarea data-ask-verto-target="input"
                     data-action="keydown->ask-verto#keydown input->ask-verto#autogrow"
                     rows="1"
-                    placeholder="<%= t("js.ask.placeholder") %>"
+                    <%= "disabled" if corpus_empty %>
+                    placeholder="<%= corpus_empty ? t("js.ask.empty_corpus") : t("js.ask.placeholder") %>"
                     aria-label="<%= t("js.ask.placeholder") %>"></textarea>
           <button type="button" class="ask-send"
+                  <%= "disabled" if corpus_empty %>
                   data-ask-verto-target="send"
                   data-action="click->ask-verto#send"
                   aria-label="<%= t("js.ask.send") %>">

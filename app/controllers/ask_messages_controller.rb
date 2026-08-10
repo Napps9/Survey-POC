@@ -28,6 +28,11 @@ class AskMessagesController < ApplicationController
 
   def create
     thread = Current.organisation.ask_threads.find(params[:thread_id])
+    # The composer is disabled while the corpus is empty, but the API must not
+    # be pokeable into a five-Claude-call way to hear "I have no data" — and
+    # refusing BEFORE the question persists means no dangling turn either.
+    return head(:unprocessable_entity) if CorpusEntry.citable.none?
+
     body     = JSON.parse(request.body.read)
     question = body["message"].to_s.strip
     return head(:bad_request) if question.blank?

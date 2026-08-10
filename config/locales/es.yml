@@ -1468,6 +1468,7 @@ es:
       portfolio_not_found: "Cartera no encontrada."
       funder_only: "Solo el financiador puede hacer eso."
   ask:
+    stale_note: "Algunas fuentes citadas en esta respuesta ya no forman parte del corpus compartido."
     suggest:
       agreement: "¿En qué coinciden los hallazgos sobre %{theme} entre Vertos?"
       agreement_label: "Dónde coinciden"
@@ -1530,4 +1531,5 @@ es:
       declined: "«%{verto}» rechazado: se ha registrado el motivo para su creador."
       unknown_decision: "No se reconoció esa decisión."
     thread:
+      delete_confirm: "¿Eliminar esta conversación?"
       deleted: "Pregunta eliminada."

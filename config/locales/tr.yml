@@ -1468,6 +1468,7 @@ tr:
       shuffle_failed: "Görseller karıştırılamadı — lütfen tekrar deneyin."
       unpublished: "Verto yayından kaldırıldı — düzenleyebileceğiniz bir taslağa döndü."
   ask:
+    stale_note: "Bu yanıtta alıntılanan bazı kaynaklar artık ortak derlemde yer almıyor."
     suggest:
       agreement: "%{theme} bulguları Verto'lar arasında nerede örtüşüyor?"
       agreement_label: "Nerede örtüşüyor"
@@ -1530,4 +1531,5 @@ tr:
       declined: "“%{verto}” reddedildi — gerekçe sahibi için kaydedildi."
       unknown_decision: "Bu karar tanınmadı."
     thread:
+      delete_confirm: "Bu konuşma silinsin mi?"
       deleted: "Soru silindi."

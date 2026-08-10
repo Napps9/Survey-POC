@@ -1468,6 +1468,7 @@ sw:
       shuffle_failed: "Imeshindikana kuchanganya nyenzo — tafadhali jaribu tena."
       unpublished: "Uchapishaji umeondolewa — Verto imerudi kuwa rasimu unayoweza kuhariri."
   ask:
+    stale_note: "Baadhi ya vyanzo vilivyotajwa katika jibu hili havimo tena kwenye mkusanyiko wa pamoja."
     suggest:
       agreement: "Matokeo ya %{theme} yanakubaliana wapi kati ya Vertos?"
       agreement_label: "Wanapokubaliana"
@@ -1530,4 +1531,5 @@ sw:
       declined: "“%{verto}” imekataliwa — sababu imehifadhiwa kwa mtayarishaji."
       unknown_decision: "Uamuzi huo haukutambuliwa."
     thread:
+      delete_confirm: "Ufute mazungumzo haya?"
       deleted: "Swali limefutwa."

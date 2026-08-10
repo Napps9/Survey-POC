@@ -117,6 +117,11 @@ class DemoSeeder
       # @community_safety stays a draft with zero responses — nothing to seed there.
     end
 
+    # Outside the transaction — enrolment writes its own rows and indexes
+    # synchronously, and a demo without it lands on Ask Verto's 0/0/0 empty
+    # state, which demos the one thing the feature does when it has nothing.
+    enrol_ask_verto!
+
     print_summary
   end
 
@@ -515,6 +520,18 @@ class DemoSeeder
 
   # ── summary ──────────────────────────────────────────────────────────────
 
+  # The three answered Vertos are offered and approved into the Ask Verto
+  # corpus, the same both-keys step verto:enrol_corpus performs for imports —
+  # the demo admin is legitimately both the creator and (for a demo) the
+  # reviewer. OpenTextThemer degrades to no-themes without an API key, so this
+  # costs nothing and needs nothing; closed questions index fully either way.
+  def enrol_ask_verto!
+    admin = User.find_by!(email_address: ADMIN_EMAIL)
+    [ @money_matters, @workplace, @campus ].each do |survey|
+      CorpusEnrolment.new(survey, user: admin, reviewer: admin.email_address).call
+    end
+  end
+
   def print_summary
     puts "\nVertoNow demo account ready:"
     puts "  Organisation : VertoNow Demo (#{ORG_SLUG})"
@@ -526,5 +543,7 @@ class DemoSeeder
       status = s.published? ? "live" : "draft"
       puts "    - #{s.title} (#{status}, #{s.responses.count} responses)"
     end
+    puts "  Ask Verto    : #{CorpusEntry.citable.where(organisation_id: @org.id).count} Vertos citable, " \
+         "#{CorpusQuestion.joins(:corpus_entry).merge(CorpusEntry.citable.where(organisation_id: @org.id)).count} questions indexed"
   end
 end
