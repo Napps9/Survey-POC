@@ -25,9 +25,16 @@ class AskThreadsController < ApplicationController
 
   private
 
-  # Only the filters the corpus actually understands. Anything else would be
-  # stored, shown back as if it applied, and silently ignored by the tools.
+  # Only the filters the corpus actually applies — today that is :country
+  # alone (CorpusTools#scoped_entries). :theme used to be permitted here,
+  # which stored it, rendered it as a scope pill, and never narrowed anything:
+  # exactly the failure being stored-and-ignored this method exists to
+  # prevent. Guarded against scalar params (?scope=foo) because String has no
+  # #permit and a malformed query string should not be a 500.
   def scope_params
-    params.fetch(:scope, {}).permit(:theme, :country).to_h.compact_blank
+    scope = params[:scope]
+    return {} unless scope.is_a?(ActionController::Parameters)
+
+    scope.permit(:country).to_h.compact_blank
   end
 end

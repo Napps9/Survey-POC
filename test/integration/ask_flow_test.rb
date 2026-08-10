@@ -108,6 +108,24 @@ class AskFlowTest < ActionDispatch::IntegrationTest
     assert_no_match(/data-ask-verto-initial-question-value/, response.body)
   end
 
+  test "a scalar scope param is ignored, not a 500" do
+    sign_in
+
+    post ask_threads_path, params: { scope: "foo" }
+
+    assert_response :redirect
+    assert_equal({}, @org.ask_threads.recent.first.scope)
+  end
+
+  test "only filters the tools implement are stored on a thread" do
+    sign_in
+
+    post ask_threads_path, params: { scope: { theme: "Climate Action", country: "CL" } }
+
+    assert_equal({ "country" => "CL" }, @org.ask_threads.recent.first.scope,
+      "a stored filter the tools ignore would be shown back as if it applied")
+  end
+
   test "deleting a thread removes it and its messages" do
     sign_in
     mine = thread
