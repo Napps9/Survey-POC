@@ -1528,4 +1528,5 @@ ja:
       declined: "「%{verto}」を見送りました。理由は作成者向けに記録しました。"
       unknown_decision: "その操作を認識できませんでした。"
     thread:
+      delete_confirm: "この会話を削除しますか？"
       deleted: "質問を削除しました。"

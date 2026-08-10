@@ -1529,4 +1529,5 @@ id:
       declined: "“%{verto}” ditolak — alasannya dicatat untuk pembuatnya."
       unknown_decision: "Keputusan itu tidak dikenali."
     thread:
+      delete_confirm: "Hapus percakapan ini?"
       deleted: "Pertanyaan dihapus."

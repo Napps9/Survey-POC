@@ -1530,4 +1530,5 @@ it:
       declined: "«%{verto}» rifiutato: il motivo è stato registrato per chi lo ha creato."
       unknown_decision: "Decisione non riconosciuta."
     thread:
+      delete_confirm: "Eliminare questa conversazione?"
       deleted: "Domanda eliminata."

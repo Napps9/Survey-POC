@@ -1530,4 +1530,5 @@ fr:
       declined: "« %{verto} » refusé — le motif a été enregistré pour son créateur."
       unknown_decision: "Décision non reconnue."
     thread:
+      delete_confirm: "Supprimer cette conversation ?"
       deleted: "Question supprimée."

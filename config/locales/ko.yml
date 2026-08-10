@@ -1528,4 +1528,5 @@ ko:
       declined: "“%{verto}”을(를) 거절했습니다. 사유를 제작자에게 기록했습니다."
       unknown_decision: "해당 결정을 인식하지 못했습니다."
     thread:
+      delete_confirm: "이 대화를 삭제할까요?"
       deleted: "질문을 삭제했습니다."

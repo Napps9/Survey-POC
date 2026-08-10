@@ -1545,4 +1545,5 @@ ar:
       declined: "تم رفض “%{verto}” — وسُجّل السبب لمنشئه."
       unknown_decision: "لم يتم التعرف على هذا القرار."
     thread:
+      delete_confirm: "هل تريد حذف هذه المحادثة؟"
       deleted: "تم حذف السؤال."

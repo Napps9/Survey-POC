@@ -232,6 +232,44 @@ class AskFlowTest < ActionDispatch::IntegrationTest
     assert_equal 0, AskMessage.count
   end
 
+  test "an empty corpus refuses questions server-side before anything persists" do
+    CorpusEntry.find_by(survey_id: @survey.id).withdraw!
+    sign_in
+    mine = thread
+
+    fake = FakeChat.new
+    stub_method(AskVertoChat, :new, ->(*) { fake }) do
+      post ask_thread_messages_path(mine),
+           params: { message: "Anything in there?" }.to_json,
+           headers: { "Content-Type" => "application/json" }
+    end
+
+    assert_response :unprocessable_entity
+    assert_equal 0, mine.ask_messages.count, "no dangling question with no possible answer"
+    assert_empty fake.calls, "an empty corpus must not cost a tool loop"
+  end
+
+  test "the composer is disabled while the corpus is empty" do
+    CorpusEntry.find_by(survey_id: @survey.id).withdraw!
+    sign_in
+
+    get ask_path
+
+    assert_response :success
+    assert_select ".ask-composer textarea[disabled]"
+    assert_select ".ask-send[disabled]"
+  end
+
+  test "each thread row carries a delete control" do
+    sign_in
+    mine = thread
+
+    get ask_path
+
+    assert_response :success
+    assert_select "form.ask-thread-delwrap[action=?]", ask_thread_path(mine)
+  end
+
   test "a service failure surfaces as an error event, not a 500" do
     sign_in
     mine = thread

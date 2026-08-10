@@ -1530,4 +1530,5 @@ sw:
       declined: "“%{verto}” imekataliwa — sababu imehifadhiwa kwa mtayarishaji."
       unknown_decision: "Uamuzi huo haukutambuliwa."
     thread:
+      delete_confirm: "Ufute mazungumzo haya?"
       deleted: "Swali limefutwa."

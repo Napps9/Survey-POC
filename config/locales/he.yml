@@ -1537,4 +1537,5 @@ he:
       declined: "“%{verto}” נדחה — הסיבה נרשמה עבור היוצר."
       unknown_decision: "ההחלטה לא זוהתה."
     thread:
+      delete_confirm: "למחוק את השיחה הזו?"
       deleted: "השאלה נמחקה."

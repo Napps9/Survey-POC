@@ -1530,4 +1530,5 @@ tr:
       declined: "“%{verto}” reddedildi — gerekçe sahibi için kaydedildi."
       unknown_decision: "Bu karar tanınmadı."
     thread:
+      delete_confirm: "Bu konuşma silinsin mi?"
       deleted: "Soru silindi."

@@ -1530,4 +1530,5 @@ de:
       declined: "„%{verto}“ abgelehnt — die Begründung wurde für die Erstellerin hinterlegt."
       unknown_decision: "Diese Entscheidung wurde nicht erkannt."
     thread:
+      delete_confirm: "Diese Unterhaltung löschen?"
       deleted: "Frage gelöscht."

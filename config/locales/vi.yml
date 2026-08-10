@@ -1529,4 +1529,5 @@ vi:
       declined: "“%{verto}” bị từ chối — lý do đã được ghi lại cho người tạo."
       unknown_decision: "Không nhận diện được quyết định đó."
     thread:
+      delete_confirm: "Xóa cuộc trò chuyện này?"
       deleted: "Đã xoá câu hỏi."

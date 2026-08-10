@@ -1551,4 +1551,5 @@ en:
       declined: "“%{verto}” declined — the reason has been recorded for its creator."
       unknown_decision: "That decision wasn't recognised."
     thread:
+      delete_confirm: "Delete this conversation?"
       deleted: "Question deleted."

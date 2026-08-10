@@ -1530,4 +1530,5 @@ es:
       declined: "«%{verto}» rechazado: se ha registrado el motivo para su creador."
       unknown_decision: "No se reconoció esa decisión."
     thread:
+      delete_confirm: "¿Eliminar esta conversación?"
       deleted: "Pregunta eliminada."

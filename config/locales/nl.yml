@@ -1530,4 +1530,5 @@ nl:
       declined: "“%{verto}” afgewezen — de reden is vastgelegd voor de maker."
       unknown_decision: "Die beslissing werd niet herkend."
     thread:
+      delete_confirm: "Dit gesprek verwijderen?"
       deleted: "Vraag verwijderd."

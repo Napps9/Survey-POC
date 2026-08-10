@@ -1540,4 +1540,5 @@ pl:
       declined: "„%{verto}” odrzucone — powód zapisano dla twórcy."
       unknown_decision: "Nie rozpoznano tej decyzji."
     thread:
+      delete_confirm: "Usunąć tę rozmowę?"
       deleted: "Pytanie usunięte."
