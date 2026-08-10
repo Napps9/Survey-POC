@@ -210,6 +210,16 @@ class AskVertoChatTest < ActiveSupport::TestCase
     assert_operator source_at, :<, token_at, "the rail should fill while the answer is still being written"
   end
 
+  test "a source fetched twice is announced once, with no bookkeeping on the record" do
+    result, events = run_chat([ fetch_step, fetch_step, "Worry is high [[c:1]]." ])
+
+    sources = events.select { |e| e[:t] == "source" }
+    assert_equal 1, sources.size, "the same question fetched twice is one source, announced once"
+    assert_not sources.first[:source].key?("announced")
+    assert_not result[:citations].first.key?("announced"),
+      "the snapshot is the stored record of what was cited — bookkeeping must not ride into it"
+  end
+
   test "the tool loop stops after MAX_TOOL_ROUNDS even if the model keeps calling" do
     chat = AskVertoChat.allocate
     endless = Array.new(20) { [ { name: "search_corpus", input: { "query" => "climate" } } ] }

@@ -106,6 +106,7 @@ class AskVertoChat
     tools     = CorpusTools.new(scope: scope)
     convo     = Array(messages).map { |m| { role: m[:role] || m["role"], content: m[:content] || m["content"] } }
     seen_quotes = {}
+    announced   = Set.new
 
     MAX_TOOL_ROUNDS.times do
       response = @client.messages.create(
@@ -127,11 +128,12 @@ class AskVertoChat
       convo << { role: "user", content: tool_uses.map { |b| run_tool(b, tools) } }
 
       # Announce sources as they land, so the rail fills while the answer is
-      # still being written rather than all at once at the end.
+      # still being written rather than all at once at the end. Which numbers
+      # are already announced is tracked here, never flagged on the hash — the
+      # same hashes become the persisted citation snapshot, and bookkeeping
+      # must not ride into the record.
       tools.sources.each do |source|
-        next if source["announced"]
-        source["announced"] = true
-        emit&.call(t: "source", source: source.except("announced"))
+        emit&.call(t: "source", source: source) if announced.add?(source["n"])
       end
     end
 
