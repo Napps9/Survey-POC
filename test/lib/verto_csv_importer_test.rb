@@ -9,9 +9,12 @@ class VertoCsvImporterTest < ActiveSupport::TestCase
   APPEND_FIXTURE = Rails.root.join("test/fixtures/files/verto_import_append.csv").to_s
   PASSWORD       = "import-test-passphrase"
 
+  # classifier: nil — SDG tagging is a Claude call, and the test env's stub
+  # ANTHROPIC_API_KEY would otherwise make the importer attempt real HTTP.
   def import!
     VertoCsvImporter.new(csv_path: FIXTURE, admin_password: PASSWORD,
-                         org_slug: "unyo-test", admin_email: "admin@unyo.test").call
+                         org_slug: "unyo-test", admin_email: "admin@unyo.test",
+                         classifier: nil).call
   end
 
   test "rebuilds the account, org membership and a published Verto" do
@@ -234,7 +237,8 @@ class VertoCsvImporterTest < ActiveSupport::TestCase
 
   test "a clean English import reports nothing unmatched" do
     imp = VertoCsvImporter.new(csv_path: FIXTURE, admin_password: PASSWORD,
-                               org_slug: "unyo-test", admin_email: "admin@unyo.test")
+                               org_slug: "unyo-test", admin_email: "admin@unyo.test",
+                               classifier: nil)
     survey = imp.call
     assert_equal({}, imp.unmatched.reject { |_c, v| v.empty? },
                  "the all-English fixture matched everything before; a regression here " \
@@ -247,5 +251,33 @@ class VertoCsvImporterTest < ActiveSupport::TestCase
     entry = imp.send(:difficult_value, "Autre (précisez) [le coût du transport]")
     assert_nil entry["value"]
     assert_equal "le coût du transport", entry["other"]
+  end
+
+  # ── SDG tagging ───────────────────────────────────────────────────────────
+  test "the finished import carries the classifier's SDG tags" do
+    fake = Class.new do
+      def configured? = true
+      def call(survey:) = [ 3, 4 ]
+    end.new
+
+    survey = VertoCsvImporter.new(csv_path: FIXTURE, admin_password: PASSWORD,
+                                  org_slug: "unyo-test", admin_email: "admin@unyo.test",
+                                  classifier: fake).call
+
+    assert_equal [ 3, 4 ], survey.sdgs
+  end
+
+  test "a classifier failure leaves the import intact and untagged" do
+    fake = Class.new do
+      def configured? = true
+      def call(survey:) = raise("classifier down")
+    end.new
+
+    survey = VertoCsvImporter.new(csv_path: FIXTURE, admin_password: PASSWORD,
+                                  org_slug: "unyo-test", admin_email: "admin@unyo.test",
+                                  classifier: fake).call
+
+    assert_equal [], survey.sdgs, "tags are enrichment; a failure stores none"
+    assert_equal 5, survey.responses.count, "and the committed import is untouched"
   end
 end

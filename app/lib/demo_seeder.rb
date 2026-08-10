@@ -121,6 +121,7 @@ class DemoSeeder
     # synchronously, and a demo without it lands on Ask Verto's 0/0/0 empty
     # state, which demos the one thing the feature does when it has nothing.
     enrol_ask_verto!
+    tag_sdgs!
 
     print_summary
   end
@@ -532,6 +533,21 @@ class DemoSeeder
     end
   end
 
+  # SDG tags, same posture as enrolment above: outside the transaction, and
+  # SdgClassifier degrades to no-tags without an API key, so a keyless demo
+  # seeds cleanly and simply shows no SDG chips. The draft is tagged too — it
+  # appears on the dashboard, and its questions are as real as the others'.
+  def tag_sdgs!
+    classifier = SdgClassifier.new
+    return unless classifier.configured?
+
+    [ @money_matters, @workplace, @campus, @community_safety ].each do |survey|
+      survey.update_column(:sdgs, classifier.call(survey: survey))
+    rescue => e
+      ErrorReporting.report("DemoSeeder#tag_sdgs", e, survey_id: survey.id)
+    end
+  end
+
   def print_summary
     puts "\nVertoNow demo account ready:"
     puts "  Organisation : VertoNow Demo (#{ORG_SLUG})"
@@ -541,7 +557,9 @@ class DemoSeeder
     puts "  Vertos:"
     [ @money_matters, @workplace, @campus, @community_safety ].each do |s|
       status = s.published? ? "live" : "draft"
-      puts "    - #{s.title} (#{status}, #{s.responses.count} responses)"
+      sdgs = s.reload.sdgs
+      sdg_note = sdgs.any? ? ", #{sdgs.map { |n| UnSdgs.label(n) }.join(' ')}" : ""
+      puts "    - #{s.title} (#{status}, #{s.responses.count} responses#{sdg_note})"
     end
     puts "  Ask Verto    : #{CorpusEntry.citable.where(organisation_id: @org.id).count} Vertos citable, " \
          "#{CorpusQuestion.joins(:corpus_entry).merge(CorpusEntry.citable.where(organisation_id: @org.id)).count} questions indexed"

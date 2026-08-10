@@ -162,4 +162,15 @@ class ThankYouScreenTest < ActionDispatch::IntegrationTest
     assert_equal "https://acme.example", copy.forward_url
     assert_equal "Book your place", copy.forward_label
   end
+
+  # duplicate! enumerates its columns explicitly, so a new column left off the
+  # list vanishes silently on every Duplicate action — this pins sdgs on it.
+  test "duplicating a Verto carries its SDG tags without re-deriving them" do
+    org = sign_in_org("dup-sdg")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS)
+    s.update_column(:sdgs, [ 4, 13 ])
+
+    assert_equal [ 4, 13 ], s.reload.duplicate!.sdgs
+  end
 end

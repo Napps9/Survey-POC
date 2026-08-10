@@ -359,6 +359,10 @@ class CorpusTools
       "responses"          => question.response_count,
       "fielded"            => fielded_window(entry),
       "theme"              => question.theme,
+      # Display-only provenance for the source rail and detail panel. Not in
+      # result_row, deliberately: the model has no validated way to make SDG
+      # claims, so it is not handed the tags to claim with.
+      "sdgs"               => entry.survey.sdgs,
       # Presentation, carried on the source so the live stream and the
       # server-rendered replay colour a citation identically without either
       # having to look the type up again.

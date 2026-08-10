@@ -480,6 +480,13 @@ export default class extends Controller {
         when.textContent = source.fielded
         meta.appendChild(when)
       }
+      // Absent on citations stored before SDG tagging existed — the snapshot
+      // renders as it was answered, so old sources simply show no SDG entry.
+      if (Array.isArray(source.sdgs) && source.sdgs.length > 0) {
+        const sdgs = document.createElement("span")
+        sdgs.textContent = `SDG ${source.sdgs.join(" · ")}`
+        meta.appendChild(sdgs)
+      }
 
       main.append(head, question, meta)
       card.append(icon, main)
@@ -505,7 +512,10 @@ export default class extends Controller {
       ["Org", source.organisation],
       [t("ask.responses"), Number(source.responses || 0).toLocaleString()],
       ["Fielded", source.fielded],
-      ["Theme", source.theme]
+      ["Theme", source.theme],
+      // Joins to "" for pre-SDG citation snapshots, which the falsy guard
+      // below then skips — old answers honestly show no SDG row.
+      ["SDG", (source.sdgs || []).map((n) => `SDG ${n}`).join(", ")]
     ]
     for (const [key, value] of prov) {
       if (!value) continue

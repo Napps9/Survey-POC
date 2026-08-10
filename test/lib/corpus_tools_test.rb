@@ -78,6 +78,18 @@ class CorpusToolsTest < ActiveSupport::TestCase
     assert result[:error].present?, "a known id must stop resolving the moment consent is withdrawn"
   end
 
+  test "a stamped source carries the survey's SDG tags for the rail" do
+    entry = indexed_verto
+    entry.survey.update_column(:sdgs, [ 4, 13 ])
+    id = entry.corpus_questions.first.id
+
+    tools = CorpusTools.new
+    tools.call("get_questions", { "ids" => [ id ] })
+
+    assert_equal [ 4, 13 ], tools.sources.first["sdgs"],
+      "the source snapshot is what the rail, the citation record and the replay all read"
+  end
+
   test "list_vertos shows only citable Vertos" do
     indexed_verto(title: "Live one")
     indexed_verto(title: "Pending one", review_status: "pending")

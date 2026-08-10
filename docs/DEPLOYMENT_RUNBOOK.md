@@ -56,7 +56,10 @@ export SECRET_KEY_BASE=$(openssl rand -hex 32) # throwaway: nothing here signs a
 export APP_HOST=example.invalid                # throwaway: satisfies MailConfigCheck
 export SMTP_ADDRESS=smtp.invalid
 export MAIL_FROM=noreply@example.invalid
-export ANTHROPIC_API_KEY='…'                   # only needed for verto:enrol_corpus
+export ANTHROPIC_API_KEY='…'                   # needed for verto:enrol_corpus, and drives
+                                               # automatic UN SDG tagging during import —
+                                               # absent, the import succeeds untagged
+                                               # (run sdg:backfill later)
 ```
 
 **Do not copy the `ACTIVE_RECORD_ENCRYPTION_*` keys.** An import neither reads
@@ -109,6 +112,12 @@ CSV keeps every row's provenance in its Country column).
 claim — every answer in the export is either stored or listed as a deliberate
 omission — and a production import that does not reconcile should be rolled
 back, not investigated in place.
+
+`verto:import_csv` and `verto:build_deck` also tag the Verto with UN SDGs
+(one Haiku call reading the deck; the import summary prints the result).
+`verto:append_csv` never re-tags — it only runs when the deck is unchanged,
+so the tags cannot be stale. Datasets imported before tagging existed get
+theirs from `bin/rails sdg:backfill` (`DRY_RUN=1` to preview).
 
 ### What is safe about this
 

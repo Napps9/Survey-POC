@@ -74,6 +74,15 @@ class AnthropicCostOptimisationTest < ActiveSupport::TestCase
     assert_equal ClaudeModels::FAST, kwargs[:model]
   end
 
+  test "SdgClassifier caches the SDG rubric and uses the FAST (Haiku) model" do
+    classifier = SdgClassifier.new(api_key: "test")
+    kwargs = capture(classifier) do |c|
+      c.call(survey: Survey.new(title: "Climate worries", theme: "climate"))
+    end
+    assert_equal ClaudeModels::FAST, kwargs[:model]
+    assert cached?(kwargs)
+  end
+
   test "model tiers are distinct so generation stays on Sonnet while cheap tasks move to Haiku" do
     assert_equal "claude-sonnet-4-6", ClaudeModels::DEFAULT
     assert_not_equal ClaudeModels::DEFAULT, ClaudeModels::FAST

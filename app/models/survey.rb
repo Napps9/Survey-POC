@@ -1095,6 +1095,9 @@ class Survey < ApplicationRecord
       show_results_comparison: show_results_comparison,
       tokenisation_enabled:    tokenisation_enabled,
       token_types:             token_types,
+      # Identical creator content means identical SDG tags — copying is free,
+      # re-deriving would spend a Claude call to compute the same answer.
+      sdgs:                    read_attribute(:sdgs),
       compare_note:            compare_note,
       thankyou_title:          thankyou_title,
       thankyou_body:           thankyou_body,
@@ -1258,6 +1261,12 @@ class Survey < ApplicationRecord
 
   def flows_list
     Array(read_attribute(:flows))
+  end
+
+  # UN SDG tags, derived by SdgClassifier at import/seed time (see UnSdgs).
+  # Always an array; empty means "no goal clearly applies", not "untagged".
+  def sdgs
+    Array(read_attribute(:sdgs))
   end
 
   # Coerce creator-submitted flows into a safe, bounded array: opaque `f_` ids

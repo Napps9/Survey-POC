@@ -56,7 +56,7 @@
         <table style="width:100%;border-collapse:collapse;min-width:900px;">
           <thead>
             <tr>
-              <% [ "Verto", "Responses", "Questions", "Offered", "Automated checks", "Decision" ].each do |heading| %>
+              <% [ "Verto", "SDGs", "Responses", "Questions", "Offered", "Automated checks", "Decision" ].each do |heading| %>
                 <th style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.13em;text-transform:uppercase;color:rgba(255,255,255,0.3);text-align:start;font-weight:400;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;"><%= heading %></th>
               <% end %>
             </tr>
@@ -73,6 +73,17 @@
                   <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">
                     <%= entry.organisation.name %>
                   </span>
+                </td>
+                <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;">
+                  <% if entry.survey.sdgs.any? %>
+                    <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
+                      <% entry.survey.sdgs.each do |n| %>
+                        <span class="ask-check" style="--check-accent:#8B85FF;" title="<%= UnSdgs.title(n) %>"><%= UnSdgs.label(n) %></span>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">—</span>
+                  <% end %>
                 </td>
                 <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.8);font-variant-numeric:tabular-nums;">
                   <%= number_with_delimiter(CorpusIndexer.countable_responses(entry.survey).count) %>

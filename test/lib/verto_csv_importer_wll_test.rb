@@ -17,8 +17,10 @@ class VertoCsvImporterWllTest < ActiveSupport::TestCase
   FIXTURE = Rails.root.join("test/fixtures/files/wll_import_sample.csv")
 
   def setup
+    # classifier: nil — SDG tagging is a Claude call, and the test env's stub
+    # ANTHROPIC_API_KEY would otherwise make the importer attempt real HTTP.
     @importer = VertoCsvImporter.new(csv_path: FIXTURE, admin_password: "a-long-enough-passphrase",
-                                     deck: "wll_education_digital")
+                                     deck: "wll_education_digital", classifier: nil)
     @survey = @importer.call
   end
 
@@ -204,7 +206,7 @@ class VertoCsvImporterWllTest < ActiveSupport::TestCase
     file.close
 
     survey = VertoCsvImporter.new(csv_path: file.path, admin_password: "a-long-enough-passphrase",
-                                  deck: "wll_education_digital").call
+                                  deck: "wll_education_digital", classifier: nil).call
     first = survey.responses.order(:session_token).first
 
     assert_equal "IN", first.region_country

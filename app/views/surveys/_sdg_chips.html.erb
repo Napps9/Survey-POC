@@ -1,0 +1,23 @@
+<%# The Verto's UN SDG tags (surveys.sdgs, derived by SdgClassifier), as small
+    neutral chips beside the status badges. Untagged Vertos render nothing —
+    "no goal applies" is a quiet verdict, not a state to advertise.
+
+    Capped at three chips plus a "+N" overflow whose tooltip lists the rest, so
+    a broadly-tagged Verto can't crowd the badge row off the tile.
+
+    Chip text is "SDG n" — the UN's own locale-independent shorthand — and the
+    tooltip carries the official goal title, a proper noun served from UnSdgs.
+    Deliberately no locale strings in v1 (vs CLAUDE.md's all-19-files rule):
+    nothing here is translatable UI chrome. If that changes, the upgrade path
+    is a `sdg.goals.*` namespace mirrored across all 19 files. %>
+<% sdgs = survey.sdgs %>
+<% if sdgs.any? %>
+  <% chip_style = "font-family:'Alata',sans-serif;font-size: var(--text-2xs);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:rgba(255,255,255,0.10);color:rgba(255,255,255,0.75);backdrop-filter:blur(4px);white-space:nowrap;" %>
+  <% shown, overflow = sdgs.first(3), sdgs.drop(3) %>
+  <% shown.each do |n| %>
+    <span title="<%= UnSdgs.title(n) %>" style="<%= chip_style %>"><%= UnSdgs.label(n) %></span>
+  <% end %>
+  <% if overflow.any? %>
+    <span title="<%= overflow.map { |n| UnSdgs.label_with_title(n) }.join(", ") %>" style="<%= chip_style %>">+<%= overflow.size %></span>
+  <% end %>
+<% end %>

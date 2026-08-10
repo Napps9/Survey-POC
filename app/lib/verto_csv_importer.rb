@@ -133,12 +133,16 @@ class VertoCsvImporter
   # existing caller behaves exactly as it did; explicit org/title/slug kwargs
   # still win over the deck's own, which is what the rake task's ENV overrides
   # and the tests rely on.
+  # `classifier` is the SdgClassifier that tags the finished Verto with UN
+  # SDGs — injectable (the CorpusIndexer `themer:` seam) so tests never make a
+  # Claude call, and nil-able to skip tagging entirely.
   def initialize(csv_path:, admin_password: nil, deck: nil,
                  org_name: nil, org_slug: nil,
                  admin_email: nil, admin_name: nil,
                  title: nil, verto_slug: nil,
-                 translations: nil)
+                 translations: nil, classifier: SdgClassifier.new)
     @deck           = VertoDecks.fetch(deck || VertoDecks::DEFAULT)
+    @classifier     = classifier
     @csv_path       = csv_path
     @admin_password = admin_password
     @org_name       = org_name    || @deck.org_name
@@ -230,6 +234,10 @@ class VertoCsvImporter
       end
       flush!(batch, force: true)
     end
+    # After the commit, deliberately: a tagging hiccup must never roll back a
+    # 127k-row import, and an import with no API key simply lands untagged
+    # (sdg:backfill picks it up later).
+    apply_sdg_tags!(survey)
     survey.reload
   end
 
@@ -268,6 +276,11 @@ class VertoCsvImporter
     # Answer keys are positional indices into the deck, so appending is only
     # safe when the live Verto's questions still match the CSV's reconstructed
     # deck — otherwise a full re-import is the right tool.
+    #
+    # This guard is also why append! never re-runs SDG tagging: classification
+    # reads only creator-authored content, and the equality check proves that
+    # content is byte-identical to what was already tagged. If this guard is
+    # ever relaxed, tagging must be revisited with it.
     unless survey.cards == cards
       raise ArgumentError, "The Verto's questions differ from the CSV's reconstructed deck — " \
                            "appending would misalign answers. Re-run the full import instead."
@@ -311,6 +324,7 @@ class VertoCsvImporter
       org.surveys.where(slug: @verto_slug).find_each(&:destroy!)
       survey = create_survey!(org, cards)
     end
+    apply_sdg_tags!(survey)
     survey
   end
 
@@ -328,6 +342,7 @@ class VertoCsvImporter
       title:      survey.title,
       play_link:  "/play/#{survey.slug || survey.publish_token}",
       cards:      survey.cards.size,
+      sdgs:       (survey.sdgs.any? ? survey.sdgs.map { |n| UnSdgs.label(n) }.join(", ") : "none"),
       responses:  survey.responses.count,
       completed:  survey.responses.where(status: "completed").count,
       answered:   survey.responders_count,
@@ -345,6 +360,17 @@ class VertoCsvImporter
   end
 
   private
+
+  # Tag the finished Verto with UN SDGs. Belt and braces on the classifier's
+  # own rescue-to-[]: a tag is enrichment, and neither a missing key, a failed
+  # call nor a nil classifier may disturb an import that already committed.
+  def apply_sdg_tags!(survey)
+    return unless @classifier&.configured?
+
+    survey.update_column(:sdgs, @classifier.call(survey: survey))
+  rescue => e
+    ErrorReporting.report("VertoCsvImporter#apply_sdg_tags", e, survey_id: survey.id)
+  end
 
   def require_password!
     return if @admin_password.to_s.length >= 12
