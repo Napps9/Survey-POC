@@ -5634,9 +5634,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
      Hero/NPS variants override below with explicit height + position. */
   .preview-overlay .split-card .split-left { display: contents; }
 
-  /* Image cards OR NPS cards: full-width hero strip with rounded bottom
-     corners. NPS shows its slider-reactive Lottie in the strip; other
-     cards show their card["image"].
+  /* Media cards: full-width hero strip with the content panel riding over
+     its lower edge. Image, video and pasted-Lottie cards all belong on this
+     list because they are the same construction — an absolutely-positioned
+     inset:0 element that fills whatever box the strip gives it. Video and
+     card-lottie were missing from it, and off the list they fell through to
+     the display:contents branch above, where inset:0 resolves against the
+     whole .split-card instead: the card-lottie (z-index 1) sat ON TOP of the
+     answer panel and covered the card, and the video (z-index auto) sat
+     UNDERNEATH the white panel and played to nobody. Measured, not
+     theoretical — a pasted Lottie drew itself 600px tall over a 660px phone.
 
      `flex: 0 1 auto` is the whole point: the strip states a PREFERRED
      height and is the only shrinkable child of .split-card, so when the
@@ -5646,8 +5653,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
      — an unshrinkable 220px+ band that ate ~40% of a phone, which is why a
      six-option grid ended up squeezed into ~100px of clipped card. The
      floor (--play-hero-min) keeps the photo readable as a photo. */
-  .preview-overlay .split-card:has(.split-left-img) .split-left,
-  .preview-overlay .split-card:has(.nps-lottie)     .split-left {
+  .preview-overlay .split-card:has(.split-left-img)   .split-left,
+  .preview-overlay .split-card:has(.split-left-video) .split-left,
+  .preview-overlay .split-card:has(.card-lottie)      .split-left,
+  .preview-overlay .split-card:has(.nps-lottie)       .split-left {
     display: block;
     position: relative;
     width: 100%;
@@ -5663,12 +5672,80 @@ body.generating-overlay-active .bottom-bar { display: none; }
     overflow: hidden;
     background: var(--brand-panel, #2E3564);
   }
-  /* NPS hero strip is shorter so the vertical slider fits beneath the
-     question text in the remaining viewport. */
+  /* RANGE runs the bargain above in reverse. `.nps-lottie` is the range
+     card's slider-reactive reaction animation — the class name is a fossil;
+     NPS proper dropped this strip long ago (see :has(.nps-slider) below) —
+     and a range card is the one card whose answer CANNOT grow: a track, a
+     thumb and a row of scale words cost the same on every phone ever made.
+     The rule above states a preferred hero height and lets the answer push
+     it around; applied to range (worse, with a special SHORTER clamp, written
+     when this class was believed to be NPS's) it bought a 104-190px strip and
+     painted the rest of the phone as blank centring around the slider, while
+     desktop gives the same animation a 425x680 panel with a 380px character.
+
+     So here the answer is content-sized and unshrinkable, and the strip is
+     the card's only grow item: every pixel the answer doesn't need lands on
+     the animation.
+
+     `height: auto` is load-bearing, not tidiness. The strip's children are
+     all absolutely positioned, so its content height is ~0 and its flex base
+     contributes nothing to the card's intrinsic height — only the
+     --play-hero-min floor propagates into the scroll story. Leave the
+     inherited height: var(--play-hero-h) in place and that preferred size
+     comes back through the intrinsic-size math, and a short viewport scrolls
+     under a tall hero instead of shrinking it.
+
+     The strip is deliberately uncapped: the MOUNT inside caps at 380px — the
+     desktop asset ceiling, and assets scale DOWN from desktop, never past it
+     — so past that the strip is brand-panel stage around the character,
+     which is the desktop panel's own proportion. When the answer plus the
+     floor genuinely don't fit (a vertical slider on a raised root font), the
+     floor propagates as the strip's intrinsic contribution and .preview-body
+     scrolls — the same escape every other card uses. */
   .preview-overlay .split-card:has(.nps-lottie) .split-left {
-    height: clamp(104px, 20svh, 190px);
-    min-height: 88px;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: var(--play-hero-min);
   }
+  /* The answer half of the same bargain. min-height: 0 must be said out
+     loud: without it the base .split-right rule's --play-right-min — a
+     300-520px claim written for answers that scroll — still applies, and the
+     void this exists to remove comes straight back as "minimum". And
+     flex-shrink 0 rather than a shrink plus a min-height guard, decisively:
+     .split-right is overflow: hidden, which zeroes its automatic minimum, so
+     a shrinkable panel would not degrade gracefully — it would clip the
+     slider invisibly, which is exactly what it was doing to vertical sliders
+     on sideways phones before this (measured: track and labels off-box with
+     nothing scrollable). An answer may cost a scroll; it may never cost a
+     control. */
+  .preview-overlay .split-card:has(.nps-lottie) .split-right {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+  /* The escape hatch, made real. The scroll story this file tells — "the
+     card grows past the viewport and .preview-body scrolls" — turns out not
+     to engage: .preview-body is a ROW flex container, so align-items:stretch
+     clamps the card's height to the body exactly and the overflow dies
+     inside .split-card's overflow:hidden. Measured on the baseline: a
+     vertical slider on a sideways phone had its track and labels clipped
+     with nothing scrollable — an answer silently costing a control, the one
+     forbidden outcome. `height: max-content` opts the card out of the
+     stretch (stretch only applies to an auto cross size), so a card taller
+     than the body makes the body genuinely scrollable; min-height:100% still
+     pulls a short card to full height, so the everyday case renders exactly
+     as before. Scoped to range because range is where the unshrinkable
+     answer makes it reachable — a grid card's intrinsic height includes its
+     whole option list, and unclamping THAT would give the body the scroll
+     the .mt-2 container is supposed to own. */
+  .preview-overlay .preview-card.active:has(.nps-lottie) { height: max-content; }
+  /* …and the fossil that surfaces. The desktop .split-card rule pins
+     height: 680px, and the mobile rule never overrode it — harmlessly, until
+     now, because the card was always stretch-clamped definite and flex simply
+     shrank the 680 basis to fit. A card sizing from its content reads that
+     basis at face value and balloons to desktop height (measured: a sideways
+     phone drew a 680px card and 346px of needless scroll). auto returns the
+     basis to the content, which is what every number above is built on. */
+  .preview-overlay .split-card:has(.nps-lottie) { height: auto; }
 
   /* NPS on mobile: drop the media "header" panel entirely and give the liquid
      container the whole card, centred; shrink it to fit a phone viewport. */
@@ -5722,11 +5799,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card:has(.split-left-img) .split-left-overlay {
     background: linear-gradient(transparent 42%, rgba(0,0,0,0.34) 88%, rgba(0,0,0,0.5));
   }
-  /* The content panel rides over the bottom of the image. Scoped to the cards
-     that actually have a hero — on an imageless card .split-left is
-     display:contents and there would be nothing above to overlap. */
-  .preview-overlay .split-card:has(.split-left-img) .split-right,
-  .preview-overlay .split-card:has(.nps-lottie)     .split-right {
+  /* The content panel rides over the bottom of the hero. Scoped to the cards
+     that actually have one — on a bare card .split-left is display:contents
+     and there would be nothing above to overlap. Same four-way list as the
+     strip rule: whoever gets a strip gets the lip. */
+  .preview-overlay .split-card:has(.split-left-img)   .split-right,
+  .preview-overlay .split-card:has(.split-left-video) .split-right,
+  .preview-overlay .split-card:has(.card-lottie)      .split-right,
+  .preview-overlay .split-card:has(.nps-lottie)       .split-right {
     margin-top: -22px;
     border-radius: 22px 22px 0 0;
     z-index: 1;
@@ -6108,13 +6188,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
      bar living inside the panel still renders — it is the one thing in there
      that is not decoration. Its siblings have to be hidden by hand for the
      same reason: freed from the panel, an inset-0 image would position
-     against the whole card and cover it. */
+     against the whole card and cover it.
+
+     .nps-lottie is on the list even though a range card never sheds today —
+     _fitCard's floor step adds hero-off and removes it inside one task, and a
+     range answer never overflows its box — because it was the one inset-0
+     element NOT hidden here, i.e. the one that would cover the whole card the
+     day that stops being true. */
   .preview-overlay .preview-card.hero-off .split-card .split-left { display: contents; }
   .preview-overlay .preview-card.hero-off .split-left-img,
   .preview-overlay .preview-card.hero-off .split-left-video,
   .preview-overlay .preview-card.hero-off .split-left-overlay,
   .preview-overlay .preview-card.hero-off .split-left-credit,
-  .preview-overlay .preview-card.hero-off .card-lottie { display: none; }
+  .preview-overlay .preview-card.hero-off .card-lottie,
+  .preview-overlay .preview-card.hero-off .nps-lottie { display: none; }
   .preview-overlay .preview-card.hero-off .split-card .split-right {
     margin-top: 0;
     border-radius: 0;
