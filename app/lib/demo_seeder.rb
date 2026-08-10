@@ -542,7 +542,9 @@ class DemoSeeder
     return unless classifier.configured?
 
     [ @money_matters, @workplace, @campus, @community_safety ].each do |survey|
-      survey.update_column(:sdgs, classifier.call(survey: survey))
+      sdgs = classifier.call(survey: survey)
+      # nil is "no verdict" (call failed), not "no goals" — store only verdicts.
+      survey.update_column(:sdgs, sdgs) if sdgs
     rescue => e
       ErrorReporting.report("DemoSeeder#tag_sdgs", e, survey_id: survey.id)
     end

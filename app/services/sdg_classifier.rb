@@ -84,11 +84,13 @@ class SdgClassifier
 
   def client = @client ||= build_anthropic_client(@api_key)
 
-  # Returns sorted unique goal numbers (possibly []), and [] on any failure —
-  # a tag is enrichment, and no caller should have to guard against this
-  # raising mid-import.
+  # Returns sorted unique goal numbers when a verdict was reached — [] is a
+  # real verdict ("no goal clearly applies") — and nil when no verdict could
+  # be reached (no key, or the call failed). The distinction matters: a caller
+  # may store a verdict over existing tags, but writing a failure over them
+  # would erase good data and read as "none". Never raises mid-import.
   def call(survey:)
-    return [] unless configured?
+    return nil unless configured?
 
     digest = digest_for(survey)
     return [] if digest.blank?
@@ -96,7 +98,11 @@ class SdgClassifier
     response = client.messages.create(
       model:       MODEL,
       max_tokens:  MAX_TOKENS,
-      system:      [ { type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } } ],
+      # Plain string, not a cache_control block: this prefix is a few hundred
+      # tokens, far under Haiku's minimum cacheable size, so a marker would be
+      # silently ignored — asserting a cache that never exists. Revisit only
+      # if the rubric grows past the model's minimum.
+      system:      SYSTEM,
       tools:       [ TOOL ],
       tool_choice: { type: "tool", name: "tag_sdgs" },
       messages:    [ { role: "user", content: digest } ]
@@ -108,14 +114,16 @@ class SdgClassifier
     UnSdgs.sanitize(block && deep_stringify(input_of(block))["sdgs"])
   rescue => e
     ErrorReporting.report("SdgClassifier", e, survey_id: survey.id)
-    []
+    nil
   end
 
   private
 
   # Creator-authored content only. Options ride along because scale labels
   # often carry the subject ("Very worried about climate change") when the
-  # question stem is generic.
+  # question stem is generic. Pages ride along for the same reason: a
+  # scenario's stem is often "What would you do?" while the subject matter
+  # lives entirely in its narrative pages.
   def digest_for(survey)
     lines = []
     lines << "Title: #{survey.title}"            if survey.title.present?
@@ -124,11 +132,12 @@ class SdgClassifier
 
     Array(survey.cards).first(MAX_CARDS).each do |card|
       next unless card.is_a?(Hash)
-      text = card["text"].to_s.strip
-      next if text.blank?
+      text  = card["text"].to_s.strip
+      pages = Array(card["pages"]).filter_map { |p| p["text"].to_s.strip.presence if p.is_a?(Hash) }.join(" ")
+      next if text.blank? && pages.blank?
 
       options = Array(card["options"]).map(&:to_s).reject(&:blank?)
-      line = "Q: #{text}"
+      line = "Q: #{[ text, pages ].reject(&:blank?).join(" ")}"
       line += " [#{options.join(" / ")}]" if options.any?
       lines << line.first(MAX_CARD_CHARS)
     end

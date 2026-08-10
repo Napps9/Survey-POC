@@ -51,18 +51,25 @@ class SdgClassifierTest < ActiveSupport::TestCase
     assert_equal [ 3, 4, 13 ], classifier_with(client).call(survey: survey)
   end
 
-  test "a failed call returns [] rather than raising into the import" do
+  test "a failed call returns nil — a missing verdict, never mistakable for 'no goals'" do
     client = ScriptedClient.new(error: RuntimeError.new("api down"))
+
+    assert_nil classifier_with(client).call(survey: survey),
+      "[] is a verdict a caller may store over existing tags; a failure must not look like one"
+  end
+
+  test "an empty verdict is [], distinct from failure's nil" do
+    client = ScriptedClient.new(input: { "sdgs" => [] })
 
     assert_equal [], classifier_with(client).call(survey: survey)
   end
 
-  test "no API key means no tags and no client built" do
+  test "no API key means no verdict and no client built" do
     original = ENV.delete("ANTHROPIC_API_KEY")
     classifier = SdgClassifier.new
 
     assert_not classifier.configured?
-    assert_equal [], classifier.call(survey: survey)
+    assert_nil classifier.call(survey: survey)
     assert_nil classifier.instance_variable_get(:@client),
       "an unconfigured classifier must never construct a client"
   ensure
@@ -96,5 +103,21 @@ class SdgClassifierTest < ActiveSupport::TestCase
 
     assert_equal [], classifier_with(client).call(survey: Survey.new)
     assert_nil client.last_kwargs, "no digest, no call"
+  end
+
+  test "a scenario's narrative pages reach the classifier even when its stem is generic" do
+    paged = Survey.new(
+      id: 2, title: "Money choices",
+      cards: [ { "type" => "scenario", "text" => "What would you do?",
+                 "pages" => [ { "id" => "pg_1", "text" => "Your laptop dies and the replacement costs $600." },
+                              { "id" => "pg_2", "text" => "You have an emergency fund and a credit card." } ],
+                 "options" => [ "Use the fund", "Use the card" ] } ]
+    )
+    client = ScriptedClient.new(input: { "sdgs" => [ 1 ] })
+    classifier_with(client).call(survey: paged)
+
+    prompt = client.last_kwargs[:messages].first[:content]
+    assert_includes prompt, "emergency fund",
+      "a scenario's subject matter lives in its pages, not its stem"
   end
 end

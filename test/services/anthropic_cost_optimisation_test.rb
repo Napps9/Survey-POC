@@ -74,13 +74,18 @@ class AnthropicCostOptimisationTest < ActiveSupport::TestCase
     assert_equal ClaudeModels::FAST, kwargs[:model]
   end
 
-  test "SdgClassifier caches the SDG rubric and uses the FAST (Haiku) model" do
+  # Deliberately uncached: the rubric + tool prefix is a few hundred tokens,
+  # under Haiku's minimum cacheable prefix size, so a cache_control marker
+  # would be silently ignored by the API — code asserting a cache that never
+  # exists. This pins the honest shape; add the marker back only if the
+  # rubric grows past the model's minimum.
+  test "SdgClassifier uses the FAST (Haiku) model with a deliberately uncached prompt" do
     classifier = SdgClassifier.new(api_key: "test")
     kwargs = capture(classifier) do |c|
       c.call(survey: Survey.new(title: "Climate worries", theme: "climate"))
     end
     assert_equal ClaudeModels::FAST, kwargs[:model]
-    assert cached?(kwargs)
+    assert_not cached?(kwargs)
   end
 
   test "model tiers are distinct so generation stays on Sonnet while cheap tasks move to Haiku" do

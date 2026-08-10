@@ -361,13 +361,16 @@ class VertoCsvImporter
 
   private
 
-  # Tag the finished Verto with UN SDGs. Belt and braces on the classifier's
-  # own rescue-to-[]: a tag is enrichment, and neither a missing key, a failed
-  # call nor a nil classifier may disturb an import that already committed.
+  # Tag the finished Verto with UN SDGs. Only a verdict is stored — a nil
+  # (no key, call failed) writes nothing, so a fresh import stays at the
+  # column default and a re-import over a tagged Verto cannot erase good tags
+  # with a failure. The rescue is belt and braces: a tag is enrichment, and
+  # nothing here may disturb an import that already committed.
   def apply_sdg_tags!(survey)
     return unless @classifier&.configured?
 
-    survey.update_column(:sdgs, @classifier.call(survey: survey))
+    sdgs = @classifier.call(survey: survey)
+    survey.update_column(:sdgs, sdgs) if sdgs
   rescue => e
     ErrorReporting.report("VertoCsvImporter#apply_sdg_tags", e, survey_id: survey.id)
   end
