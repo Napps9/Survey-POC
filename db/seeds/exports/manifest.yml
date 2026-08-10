@@ -270,9 +270,16 @@ walls_the_happiness_project_raw_data_adults__master.csv.gz:
   source: UNKNOWN — fill this in
   sheet: ''
   conversion: ''
-  rows: 8372
+  rows: 10754
   columns: 35
-  sha256: 34d08918e1d9a4d42301f141aeecc9a24767dda5c0d805572ad4535ad7277d09
+  sha256: 6dbf22eb8196d3f6304aaaf25639ead5641ec218f45c762d7c0d648cad2b3214
+walls_the_happiness_project_raw_data_children__master.csv.gz:
+  source: UNKNOWN — fill this in
+  sheet: ''
+  conversion: ''
+  rows: 11491
+  columns: 31
+  sha256: e26b14453220db9068a5fa5b5531f552dc62239fe8148924e2649cd9c84de83f
 wll_transforming_education_raw_data_digital.csv.gz:
   columns: 69
   conversion: title row stripped; trailing blank rows dropped

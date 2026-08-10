@@ -115,13 +115,17 @@ class VertoDecksTest < ActiveSupport::TestCase
     assert_empty VertoDecks.fetch("unyo_sport").non_answers
   end
 
-  test "a deck with questions but no answers still builds a playable Verto" do
-    deck  = VertoDecks.fetch("walls_happiness_child")
-    specs = deck.specs(importer_for("walls_happiness_child"))
+  test "a spec with no column behind it builds a card and never an answer" do
+    # The card_spec path — welcome cards today, and whole decks whenever we
+    # hold the questions but not (yet) the answers, as both Happiness flows
+    # were before their exports arrived. Their welcome cards still walk it.
+    %w[walls_happiness_child walls_happiness_adult].each do |key|
+      spec = VertoDecks.fetch(key).specs(importer_for(key)).first
 
-    assert(specs.all? { |spec| spec[:col].nil? && spec[:cols].nil? },
-      "this deck has no export, so no spec may claim a column")
-    assert(specs.all? { |spec| spec[:get].call(nil, nil).nil? },
-      "and no spec may produce an answer")
+      assert_equal "welcome_card", spec[:card]["type"]
+      assert_nil spec[:col], "#{key}: a no-answer spec must claim no column"
+      assert_nil spec[:cols]
+      assert_nil spec[:get].call(nil, nil), "#{key}: and must never produce an answer"
+    end
   end
 end

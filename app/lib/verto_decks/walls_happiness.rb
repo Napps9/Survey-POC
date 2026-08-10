@@ -28,9 +28,12 @@ module VertoDecks
       "Once a week", "2-3 times a week", "Every day",
       "I only play with other children", "I don't play at all"
     ].freeze
+    # As FIELDED, in both flows' exports — the design workbook wrote "listen
+    # too" and "Project and ideas", the survey ran with these spellings. (The
+    # adult flow additionally offered two more options; see ADULT_TOOLS.)
     TOOLS = [
-      "Games", "Activities", "Things to watch or listen too",
-      "Project and ideas to work in my community", "Learning from happiness experts", "Other"
+      "Games", "Activities", "Things to watch or listen to",
+      "Projects and ideas to work in my community", "Learning from happiness experts", "Other"
     ].freeze
 
     # The two flows below are the decks; this class is the account and the card
