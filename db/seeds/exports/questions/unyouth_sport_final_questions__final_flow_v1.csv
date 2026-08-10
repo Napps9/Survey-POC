@@ -1,0 +1,33 @@
+Question ID,Theme,Competency,Question,Suggested Options,Verto Answer Type,Outcome,"Please use the RAG system below to review the questions:
+        •        Red = Remove
+        •        Orange = Reword
+        •        Green = Keep as is",Notes,,,,,,,,,,,,,,,,
+Welcome Page,,,,,,,,,,,,,,,,,,,,,,,,
+Q1,Physical Activity,Awareness,"In a typical week, how physically active are you?",I’m not active at the moment | Less than 30 minutes a week | About 30–60 minutes a week | About 1–2 hours a week | 2+ hours a week,Range,Level of physical activity for baseline segmentation,,,,,,,,,,,,,,,,,,
+Q2,Participation Type,Awareness,Which types of sport do you take part in most often?,PE or school sport | Community sport club | Informal play with friends | Gym or exercise | Dance or movement | Online/virtual fitness | I don’t regularly take part,Select many (list),Understanding participation environments. Enables comparison between structured and informal participation experiences,,,,,,,,,,,,,,,,,,
+Q3,Joy & Motivation,Intent,What do you enjoy most about sport?,Spending time with friends | Feeling healthy or strong | Having fun | Learning new skills | Feeling confident | Competing | Relaxing or reducing stress | Being part of a team,Select one (grid),"Primary motivations and sources of enjoyment
+
+Builds on interest in understanding intrinsic motivation and positive emotional outcomes",,,,,,,,,,,,,,,,,,
+Q4,Sport Outcomes,Awareness,Playing sport or being active helps me…,Feel more confident in myself | Feel like I belong | Connect with people different from me | Stay calm when things get hard | Care more about the planet | Feel connected to nature | Believe I can make a difference | Deal with challenges in life,Matrix (1-5),Multi-dimensional outcomes of sport,,,,,,,,,,,,,,,,,,
+Q5,Hope + Sport,Awareness,Does sport influence how hopeful you feel about your life?,"Yes, a lot | A little | Very little | Not at all | I don’t take part in sport",Range,Perceived link between sport and hope which can be correlated with other answers,,,,,,,,,,,,,,,,,,
+Q6,Mental Health,Intent,How important is sport to supporting your mental wellbeing?,Very important | Quite important | Neutral | Not very important | Not important at all,Rating,Belief in sport as wellbeing tool,,,,,,,,,,,,,,,,,,
+Q7,Skills Development,Awareness,Which skills are you developing through sport?,Teamwork | Confidence | Speaking up | Handling stress | Leadership | Problem-solving | Focus | Social connections | Not sure,Tap (yes/no),Skills gained through sport,,,,,,,,,,,,,,,,,,
+Q8,Resilience,Agency,"When things go wrong in your life, how confident are you that you can bounce back?",Not confident at all | Slightly confident | Somewhat confident | Confident | Very confident,NPS,Personal resilience,,,,,,,,,,,,,,,,,,
+Q9,Access,Awareness,How easy is it for you to access sport where you live?,Very easy | Quite easy | Difficult (go to Q10) | Very difficult (go to Q10) | No access (go to Q10),Range (logic),Access to sport,,,,,,,,,,,,,,,,,,
+Q10 (Logic Q follow on),Time & Practical Barriers,Awareness,What makes it difficult for you to take part in sport regularly?,Lack of time | School or work pressure | Cost | Not interested | Other,Select one,"Builds on UN findings around access and inequality by adding lived constraints such as time, pressure and competing priorities",,,,,,,,,,,,,,,,,,
+Q11,Negative Experiences,Awareness,Have you ever had a negative experience in sport that affected your wellbeing?,"Yes, often | Yes, sometimes | Rarely | Never | Not sure",Rating,Builds on UN focus on safe sport and wellbeing by explicitly capturing downside experiences often underrepresented in reporting,,,,,,,,,,,,,,,,,,
+Q12,Trusted Adults,Awareness,Adults involved in sport,"positively influence my experience
+
+help me feel more confident
+
+help create safe environments
+
+make me feel comfortable asking them for help
+
+make me feel included",Tap (yes/no),"Builds on UN emphasis on role of trusted adults and safe environments, enabling correlation with wellbeing, confidence and belonging",,,,,,,,,,,,,,,,,,
+Q13,World Cup + Hope,Awareness,Do events like the World Cup make you feel more connected to your local community?,"Yes, a lot | A little | Not sure | Not really | Not at all",Select one,Link between global events and community cohesion,,,,,,,,,,,,,,,,,,
+Q14,Participation Drivers,Intent,What would help more young people take part in sport where you live? (Select up to 3),Better places to play | Free or low-cost activities | Supportive coaches | Fun social activities | Feeling welcome | More choice in activities,Select three,Solutions for increasing participation,,,,,,,,,,,,,,,,,,
+Q15,Voice,Agency,Do you feel your voice is heard when decisions are made about sport in your community?,Always | Often | Sometimes | Rarely | Never,Range,Perceived influence,,,,,,,,,,,,,,,,,,
+Q16,Age,Demo,How old are you?,Open / age bands,,Demographic segmentation,,,,,,,,,,,,,,,,,,
+Q17,Country,Demo,What country do you live in?,Open,,Demographic segmentation,,,,,,,,,,,,,,,,,,
+Q18,Gender,Demo,What gender do you identify as?,Open / standard categories,,Demographic segmentation,,,,,,,,,,,,,,,,,,

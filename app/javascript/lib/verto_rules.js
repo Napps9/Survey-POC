@@ -49,15 +49,60 @@ const COUNT_RULES = {
 const PAGE_RULES = { min: 1, max: 5 }
 const PAGE_LENGTH_LIMIT = 400
 
-// §2 — answer label budget per card type. Image lists and Prioritise rows
-// get 30, grid tiles and scale labels stay at a scannable 20, and Tap
-// statements read as full mini-statements so they get 40.
+// §2 — answer label budget per card type, and the numbers are the width the
+// label actually gets rather than a house style. Measured at 16px by laying
+// real text out in the real font, on the phones that matter:
+//
+//                 grid tile     list row
+//   Fold 280        15 chars     19 chars
+//   iPhone SE 375   21           30
+//   iPhone 15 393   22           32
+//   iPhone Max 430  24           35
+//   iPad mini 768   26           66
+//
+// A LIST row spans the answer panel; a GRID tile gets a column of it, so the
+// list gets roughly half as much again and the two limits are properly
+// different. Lists 40, grids 20, scale captions 20 (they sit side by side
+// across the panel), Tap statements 40 (they read as mini-statements).
+//
+// The grid figure is the only one that is not merely advice. survey_editor
+// imports GRID_LABEL_MAX below and stops a tile label being typed past it,
+// because the phone player draws the tile at a fixed proportion with one line
+// of label under it and 20 characters is what that line holds — past it the
+// label wraps, the row grows, and the tile stops matching its neighbours.
+// Advising a number and not enforcing it is how a creator ends up shown one
+// card on a desktop and a respondent shown another.
+//
+// A list label is not load-bearing in the same way: the row simply gets
+// taller, and the square tile beside it does not depend on the label at all.
+// So 40 is shown and scored, never enforced.
+//
+// Keep in step with app/services/survey_generator.rb, which states these same
+// budgets in prose for the model — pinned by
+// test/services/survey_generator_rules_test.rb.
 const OPTION_LIMITS = {
-  multiple_choice: 30, select_many: 30, prioritise: 30,
+  multiple_choice: 40, select_many: 40, prioritise: 40,
   select_one_grid: 20, select_many_grid: 20,
   range: 20, rating: 20, nps: 20,
   tap_card: 40, scenario: 40
 }
+
+// The hard cap, exported so there is ONE number rather than the editor's copy
+// of the rule and the rule. Both grids carry the same limit; asserted in
+// test/lib/phone_fit_rule_test.rb so a change to one has to be a change to both.
+export const GRID_LABEL_TYPES = [ "select_one_grid", "select_many_grid" ]
+export const GRID_LABEL_MAX = OPTION_LIMITS.select_one_grid
+
+// Which types show the creator a live character count while they type. The
+// grids, where the count is a hard stop, plus the three list types, where it
+// is a nudge. Not every type with a budget: a scale caption or a Tap statement
+// has one too, and nobody has asked to be counted while writing those.
+export const COUNTED_LABEL_TYPES = [
+  ...GRID_LABEL_TYPES, "multiple_choice", "select_many", "prioritise"
+]
+
+// The budget for a type, or null where there isn't one (yes_no's fixed pair).
+export const optionLabelLimit = (type) => OPTION_LIMITS[type] ?? null
 
 // §2 — TEXT_MIN is the target floor shown in copy only; short is never flagged.
 const TEXT_MIN = 50, TEXT_MAX = 70, TEXT_HARD_MAX = 100
@@ -114,6 +159,12 @@ export function analyzeCard(card) {
   const optionCheck = card.demographic ? null : optionLengthCheck(card)
   if (optionCheck) checks.push(optionCheck)
 
+  // Same exemption as the two above: a demographic card's options are a fixed
+  // platform taxonomy, so telling the creator to trim them is advice they
+  // cannot take.
+  const phoneCheck = card.demographic ? null : phoneFitCheck(card)
+  if (phoneCheck) checks.push(phoneCheck)
+
   // Every paged type, not just scenario. A no-op today — analyzeCard returns
   // null for non-questions above and consent_gate is one — but the rule being
   // expressed is "does this card have pages", and writing it as a literal type
@@ -166,6 +217,37 @@ function countCheck(card, rule) {
     return check("count", YELLOW, t(key, { n }))
   }
   return check("count", GREEN, t("editor.rules.count_ok", { n, min, max }))
+}
+
+// Will this image grid work on a phone? COUNT_RULES allows a grid up to ten
+// answers, and a creator building on a desktop sees all ten as tiles — but the
+// phone player has a fixed budget and buys the imagery back only while the
+// answer still fits (player_controller#_fitCard). Past a certain count it
+// can't, and the card the respondent gets is not the card the creator was
+// shown. Better to say so here than to degrade it silently in front of them.
+//
+// The numbers are measured, not guessed: a two-column grid at the 16px option
+// label, walked across a 280px Fold, a 375 SE, a 393 iPhone and a 430 Max.
+// Seven is where the hero image stops fitting on all four; nine is where the
+// options themselves start scrolling even with the hero already gone. Counted
+// the way countCheck counts, so the Other box is one of them.
+//
+// Rated INFO — a tip, not a mark against the card (CARD_PENALTY[INFO] is 0).
+// Ten answers is inside the Rules of the Game and a creator who wants ten on a
+// desktop-first Verto is not doing anything wrong; they just deserve to know
+// what the phone will do with it.
+const PHONE_HERO_LIMIT = 7    // at or above this, a phone drops the card image
+const PHONE_FIT_LIMIT  = 9    // at or above this, the options scroll as well
+
+function phoneFitCheck(card) {
+  if (card.type !== "select_one_grid" && card.type !== "select_many_grid") return null
+  let n = cleanOptions(card).length
+  if (!n) return null
+  if (card.allowOther) n += 1
+
+  if (n >= PHONE_FIT_LIMIT) return check("phone", INFO, t("editor.rules.phone_scroll", { n }))
+  if (n >= PHONE_HERO_LIMIT) return check("phone", INFO, t("editor.rules.phone_hero", { n }))
+  return null
 }
 
 // §2 — answer labels within their per-type budget (see OPTION_LIMITS).

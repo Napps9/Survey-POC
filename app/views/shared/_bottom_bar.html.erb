@@ -7,6 +7,7 @@
   active_funders   = org && path.start_with?("/funders")
   active_results   = path == "/"
   active_create    = org && path == new_survey_path
+  active_ask       = org && path.start_with?("/ask")
   show_funders     = org && (org.funder_enabled? || org.member_funders.exists?)
 %>
 <nav class="bottom-bar" aria-label="Primary">
@@ -42,6 +43,11 @@
           <%= org.funder_enabled? ? t("nav.dashboard") : t("nav.funders") %>
         </a>
       <% end %>
+      <%# Violet, matching the citation layer it leads to. %>
+      <a href="<%= ask_path %>" class="bottom-bar-chip" data-active="<%= active_ask %>">
+        <span class="bottom-bar-chip-dot" style="background:#8B85FF;"></span>
+        <%= t("ask.page.title") %>
+      </a>
     <% end %>
   </div>
 

@@ -43,6 +43,18 @@ class AiSpendThrottleTest < ActionDispatch::IntegrationTest
     assert_includes SurveysController.ai_throttled_actions, :shuffle_assets
   end
 
+  # A turn here is up to MAX_TOOL_ROUNDS + 1 Sonnet calls against the per-Verto
+  # chat's single Haiku call, so it takes BOTH guards — the rate limit and the
+  # per-organisation daily cap that the older streaming endpoints skip.
+  test "the Ask Verto tool loop is throttled and capped" do
+    assert_includes AskMessagesController.ai_throttled_actions, :create
+    assert_includes AskMessagesController.ai_capped_actions, :create,
+      "the daily cap is the guard that bounds what reaches an invoice"
+
+    assert_operator AskMessagesController::HOURLY_LIMIT, :<, 60,
+      "a tool loop costs several Claude calls per message; its ceiling must be below the chat's"
+  end
+
   test "the streaming and question-set generators are throttled" do
     assert_includes SurveyChatsController.ai_throttled_actions, :create
     assert_includes SurveySummariesController.ai_throttled_actions, :show

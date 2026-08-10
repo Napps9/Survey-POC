@@ -12,6 +12,7 @@
 range:
   badge:        "RANGE"
   badge_css:    "sb-range"
+  accent:       "#615BF5"
   panel_label:  "DRAG THE SLIDER"
   eyebrow:      "Drag the slider"
   picker_name:  "Range / Slider"
@@ -23,6 +24,7 @@ range:
 rating:
   badge:        "RATING"
   badge_css:    "sb-range"
+  accent:       "#FFCC00"
   panel_label:  "TAP TO RATE"
   eyebrow:      "Tap to rate"
   picker_name:  "Rating"
@@ -34,6 +36,7 @@ rating:
 nps:
   badge:        "NPS"
   badge_css:    "sb-range"
+  accent:       "#FFCC00"
   panel_label:  "DRAG TO RATE"
   eyebrow:      "Drag to rate"
   picker_name:  "NPS / Reactive scale"
@@ -45,6 +48,7 @@ nps:
 multiple_choice:
   badge:        "PICK ONE"
   badge_css:    "sb-range"
+  accent:       "#615BF5"
   panel_label:  "CHOOSE ONE"
   eyebrow:      "Choose one"
   picker_name:  "Image List — One"
@@ -56,6 +60,7 @@ multiple_choice:
 select_many:
   badge:        "SELECT MANY"
   badge_css:    "sb-range"
+  accent:       "#615BF5"
   panel_label:  "CHOOSE ALL THAT APPLY"
   eyebrow:      "Choose all that apply"
   picker_name:  "Image List — Many"
@@ -67,6 +72,7 @@ select_many:
 prioritise:
   badge:        "PRIORITISE"
   badge_css:    "sb-rank"
+  accent:       "#8B85FF"
   panel_label:  "DRAG INTO ORDER"
   eyebrow:      "Click and drag to arrange in order of priority"
   picker_name:  "Prioritise"
@@ -78,6 +84,7 @@ prioritise:
 yes_no:
   badge:        "YES / NO"
   badge_css:    "sb-range"
+  accent:       "#0CA7FF"
   panel_label:  "CHOOSE ONE"
   eyebrow:      "Choose one"
   picker_name:  "Yes / No"
@@ -89,6 +96,7 @@ yes_no:
 select_one_grid:
   badge:        "IMAGE GRID"
   badge_css:    "sb-choice"
+  accent:       "#615BF5"
   panel_label:  "CHOOSE ONE"
   eyebrow:      "Choose one"
   picker_name:  "Image Grid — One"
@@ -100,6 +108,7 @@ select_one_grid:
 select_many_grid:
   badge:        "IMAGE GRID"
   badge_css:    "sb-choice"
+  accent:       "#615BF5"
   panel_label:  "CHOOSE ALL THAT APPLY"
   eyebrow:      "Choose all that apply"
   picker_name:  "Image Grid — Many"
@@ -111,6 +120,7 @@ select_many_grid:
 tap_card:
   badge:        "SWIPE"
   badge_css:    "sb-swipe"
+  accent:       "#0CA7FF"
   panel_label:  "SWIPE TO RESPOND"
   eyebrow:      "Swipe to respond"
   picker_name:  "Swipe Cards"
@@ -122,6 +132,7 @@ tap_card:
 scenario:
   badge:        "SCENARIO"
   badge_css:    "sb-swipe"
+  accent:       "#0CA7FF"
   panel_label:  "READ ON, THEN CHOOSE"
   eyebrow:      "Read on, then choose"
   picker_name:  "Scenario"
@@ -133,6 +144,7 @@ scenario:
 open_ended:
   badge:        "OPEN TEXT"
   badge_css:    "sb-text"
+  accent:       "#FF1E6F"
   panel_label:  "TYPE YOUR ANSWER"
   eyebrow:      "Type your answer"
   picker_name:  "Open Text"
@@ -144,6 +156,7 @@ open_ended:
 contact_form:
   badge:        "CONTACT"
   badge_css:    "sb-text"
+  accent:       "#FF1E6F"
   panel_label:  "SHARE YOUR DETAILS"
   eyebrow:      "Share your details"
   picker_name:  "Contact details"
@@ -155,6 +168,7 @@ contact_form:
 welcome_card:
   badge:        "WELCOME CARD"
   badge_css:    "sb-welcome"
+  accent:       "#01EACB"
   panel_label:  ""
   eyebrow:      ""
   picker_name:  "Welcome Card"
@@ -166,6 +180,7 @@ welcome_card:
 token_checkpoint:
   badge:        "CHECKPOINT"
   badge_css:    "sb-welcome"
+  accent:       "#01EACB"
   panel_label:  ""
   eyebrow:      ""
   picker_name:  "Points Checkpoint"
@@ -182,6 +197,7 @@ token_checkpoint:
 consent_gate:
   badge:        "CONSENT"
   badge_css:    "sb-welcome"
+  accent:       "#FFC24B"
   panel_label:  ""
   eyebrow:      ""
   picker_name:  "Consent screens"

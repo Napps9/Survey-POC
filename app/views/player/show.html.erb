@@ -92,18 +92,13 @@
   <% if @test_mode %>
     <%# Test Mode strip: viewers are unauthenticated testers, so no exit link
         into the studio — just what this link is and that nothing is saved. %>
-    <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 14px;background:rgba(255,250,119,0.1);border-bottom:1px solid rgba(255,250,119,0.3);">
-      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:#FFFA77;">
-        ⚗ <%= t("player.test_mode_banner") %>
-      </span>
+    <div class="play-banner play-banner-test">
+      <span class="play-banner-text">⚗ <%= t("player.test_mode_banner") %></span>
     </div>
   <% elsif preview_mode %>
-    <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:7px 14px;background:rgba(1,234,203,0.1);border-bottom:1px solid rgba(1,234,203,0.25);">
-      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:#01EACB;">
-        ▶ <%= t("player.preview_banner") %>
-      </span>
-      <%= link_to t("player.exit_preview"), root_path,
-            style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm, 12px);color:rgba(255,255,255,0.85);text-decoration:underline;text-underline-offset:3px;" %>
+    <div class="play-banner play-banner-preview">
+      <span class="play-banner-text">▶ <%= t("player.preview_banner") %></span>
+      <%= link_to t("player.exit_preview"), root_path, class: "play-banner-link" %>
     </div>
   <% end %>
 
@@ -283,12 +278,12 @@
             CTAs/panels — redundant and confusing when both are on. One button
             now opens one panel with whichever section(s) apply. %>
         <% show_quiz_scores = quiz_mode && scores_url.present? %>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:22px;width:100%;">
+        <div class="play-end-actions">
           <% if show_quiz_scores || show_comparison %>
             <button type="button"
                     data-player-target="compareBtn"
                     data-action="click->player#showCompare"
-                    style="padding:11px 22px;border-radius:100px;background:var(--brand-cta,#01EACB);color:var(--brand-cta-text,#1C2034);font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:none;cursor:pointer;">
+                    class="play-end-btn play-end-btn-primary">
               <%= show_comparison ? t("player.compare_cta") : t("player.quiz_compare_cta") %>
             </button>
           <% end %>
@@ -298,8 +293,7 @@
               links — e.g. a per-hub Stripe page — swapped in by _applyEndScreen. %>
           <a data-player-target="forwardBtn"
              href="<%= @survey.forward_url %>" target="_blank" rel="noopener"
-             class="<%= "hidden" unless @survey.forward_url? %>"
-             style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);text-decoration:none;cursor:pointer;">
+             class="play-end-btn<%= " hidden" unless @survey.forward_url? %>">
             <%= @survey.forward_label.presence || t("player.visit_website") %> →
           </a>
 
@@ -310,7 +304,7 @@
             <button type="button"
                     data-player-target="shareBtn"
                     data-action="click->player#share"
-                    style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);cursor:pointer;">
+                    class="play-end-btn">
               <%= t("player.share") %>
             </button>
           <% end %>
@@ -319,16 +313,16 @@
             <button type="button"
                     data-player-target="regionsBtn"
                     data-action="click->player#showRegions"
-                    style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size:13px;letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);cursor:pointer;">
+                    class="play-end-btn">
               🌍 <%= t("player.see_regions") %>
             </button>
           <% end %>
         </div>
 
         <%# Small "Powered by Playverto" wordmark at the bottom. %>
-        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;opacity:0.45;">
-          <span style="font-family:'ABeeZee',sans-serif;font-size:10px;color:#fff;"><%= t("player.powered_by") %></span>
-          <%= image_tag "playverto.svg", alt: "", style: "height:12px;width:auto;" %>
+        <div class="play-powered">
+          <span class="play-powered-text"><%= t("player.powered_by") %></span>
+          <%= image_tag "playverto.svg", alt: "", class: "play-powered-mark" %>
         </div>
       </div>
 
@@ -366,9 +360,8 @@
           </div>
 
           <div data-player-target="regionDetail" class="hidden regions-detail">
-            <div data-player-target="regionDetailTitle"
-                 style="font-family:'Alata',sans-serif;font-size:16px;color:#01EACB;margin-bottom:12px;text-align:center;"></div>
-            <div data-player-target="regionDetailList" style="display:flex;flex-direction:column;gap:14px;"></div>
+            <div data-player-target="regionDetailTitle" class="play-region-title"></div>
+            <div data-player-target="regionDetailList" class="play-panel-list"></div>
           </div>
         </div>
       <% end %>
@@ -380,34 +373,30 @@
           alone when only its setting is on; both stack when the creator has
           turned on both quiz mode and results comparison. %>
       <% if show_quiz_scores || show_comparison %>
-        <div data-player-target="comparePanel" class="hidden"
-             style="width:100%;max-width:640px;margin:0 auto;padding:24px 22px 28px;overflow-y:auto;max-height:calc(100vh - 120px);background:#1C2034;border:1px solid rgba(255,255,255,0.08);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.35);">
+        <div data-player-target="comparePanel" class="hidden play-panel">
           <% if show_quiz_scores %>
             <div data-player-target="scoresSection">
-              <div style="text-align:center;margin-bottom:18px;">
-                <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.quiz_compare_title") %></div>
-                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"
-                     data-player-target="scoresMeta"></div>
+              <div class="play-panel-head">
+                <div class="play-panel-title"><%= t("player.quiz_compare_title") %></div>
+                <div class="play-panel-meta" data-player-target="scoresMeta"></div>
               </div>
-              <div data-player-target="scoresList" style="display:flex;flex-direction:column;gap:14px;"></div>
+              <div data-player-target="scoresList" class="play-panel-list"></div>
             </div>
           <% end %>
 
           <% if show_comparison %>
-            <div data-player-target="comparisonSection" style="<%= "margin-top:28px;" if show_quiz_scores %>">
-              <div style="text-align:center;margin-bottom:18px;">
-                <div style="font-family:'Alata',sans-serif;font-size:22px;color:#fff;letter-spacing:0.02em;"><%= t("player.comparison_title") %></div>
-                <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;"
-                     data-player-target="comparisonMeta"></div>
+            <div data-player-target="comparisonSection"
+                 class="<%= "play-panel-section-next" if show_quiz_scores %>">
+              <div class="play-panel-head">
+                <div class="play-panel-title"><%= t("player.comparison_title") %></div>
+                <div class="play-panel-meta" data-player-target="comparisonMeta"></div>
               </div>
-              <div data-player-target="comparisonList" style="display:flex;flex-direction:column;gap:14px;"></div>
+              <div data-player-target="comparisonList" class="play-panel-list"></div>
             </div>
           <% end %>
 
-          <div style="display:flex;justify-content:center;margin-top:18px;">
-            <button type="button"
-                    data-action="click->player#hideCompare"
-                    style="padding:9px 18px;border-radius:100px;background:transparent;color:#fff;font-family:'ABeeZee',sans-serif;font-size:12px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">
+          <div class="play-panel-foot">
+            <button type="button" data-action="click->player#hideCompare" class="play-panel-back">
               <%= t("player.back") %>
             </button>
           </div>

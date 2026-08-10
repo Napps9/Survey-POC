@@ -1145,6 +1145,8 @@
           <% end %>
         </details>
 
+        <%= render "surveys/ask_verto_block" %>
+
         <%# Recently deleted cards. In-session undo (⌘Z) handles a mistake you
             notice straight away; this is the one that survives a reload. %>
         <% recently_deleted = live_locked ? [] : @survey.recently_deleted_cards %>

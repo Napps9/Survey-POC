@@ -1,0 +1,151 @@
+<%# VertoNow's review queue for Ask Verto.
+    Reached only through the staff routing constraint in config/routes.rb — a
+    non-staff request never gets here, it gets a 404.
+
+    The automated checks are rendered, not enforced. They exist so a reviewer
+    reads a pre-flagged row instead of auditing a Verto from scratch; the
+    decision is still a person's. %>
+<% content_for :head do %>
+  <style>body { overflow:auto !important; height:auto !important; }</style>
+<% end %>
+
+<div style="min-height:100vh;background:#1C2034;">
+
+  <%# The brand ribbon the create menu uses — this is a Verto-side surface, and
+      it should read as part of the product rather than an admin table. %>
+  <div class="ask-ribbon"></div>
+
+  <div style="position:relative;overflow:hidden;padding:30px 36px 26px;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div class="gen-orbs" style="opacity:0.22;">
+      <div class="gen-orb gen-orb-3"></div>
+      <div class="gen-orb gen-orb-4"></div>
+    </div>
+    <div style="position:relative;z-index:1;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#8B85FF;box-shadow:0 0 12px rgba(139,133,255,0.7);"></span>
+        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;">Ask Verto · staff</span>
+      </div>
+      <h1 style="font-family:'Alata',sans-serif;font-size:32px;color:#fff;line-height:1.1;margin:0 0 6px;">Review queue</h1>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
+        Vertos whose creators have offered them and which are waiting on us.
+      </p>
+
+      <%# Each tab in its own state colour, so the queue's shape reads before
+          any of it is; the counts are the accent, not grey. %>
+      <% tab_accents = { "pending" => "#FFC24B", "approved" => "#01EACB",
+                         "declined" => "#FF1E6F", "withdrawn" => "#8B85FF" } %>
+      <div style="display:flex;gap:7px;margin-top:20px;flex-wrap:wrap;">
+        <% CorpusReviewsController::TABS.each do |tab| %>
+          <%= link_to corpus_reviews_path(tab: tab),
+                class: "ask-rq-tab #{"is-active" if @tab == tab}",
+                style: "--tab-accent:#{tab_accents[tab]};" do %>
+            <%= tab.capitalize %><span class="n"><%= @counts[tab] %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:24px 36px 60px;">
+    <% if @entries.empty? %>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.35);padding:40px 0;text-align:center;">
+        Nothing in this list.
+      </p>
+    <% else %>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:900px;">
+          <thead>
+            <tr>
+              <% [ "Verto", "Responses", "Questions", "Offered", "Automated checks", "Decision" ].each do |heading| %>
+                <th style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.13em;text-transform:uppercase;color:rgba(255,255,255,0.3);text-align:start;font-weight:400;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;"><%= heading %></th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody>
+            <% @entries.each do |entry| %>
+              <% checks = @checks[entry.id] || [] %>
+              <% blocking = CorpusChecks.blocking(checks) %>
+              <tr>
+                <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;">
+                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:#fff;display:block;line-height:1.35;margin-bottom:3px;">
+                    <%= entry.survey.title.presence || entry.survey.theme %>
+                  </span>
+                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">
+                    <%= entry.organisation.name %>
+                  </span>
+                </td>
+                <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.8);font-variant-numeric:tabular-nums;">
+                  <%= number_with_delimiter(CorpusIndexer.countable_responses(entry.survey).count) %>
+                </td>
+                <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.8);font-variant-numeric:tabular-nums;">
+                  <%= Array(entry.survey.cards).count { |c| CorpusIndexer.indexable?(c["type"].to_s) } %>
+                  <% if entry.indexed_at %>
+                    <span style="display:block;font-size: var(--text-2xs);color:rgba(255,255,255,0.28);margin-top:2px;"><%= entry.corpus_questions.count %> indexed</span>
+                  <% end %>
+                </td>
+                <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.55);">
+                  <%= entry.opted_in_at ? l(entry.opted_in_at.to_date, format: :long) : "—" %>
+                  <% if entry.opted_in_by %>
+                    <span style="display:block;font-size: var(--text-2xs);color:rgba(255,255,255,0.28);margin-top:2px;"><%= entry.opted_in_by.email_address %></span>
+                  <% end %>
+                </td>
+                <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;">
+                  <%# Pills rather than a paragraph: a failing check should be
+                      findable without reading the row. %>
+                  <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-start;">
+                    <% checks.each do |check| %>
+                      <% mark = { pass: "✓", warn: "!", fail: "✕" }[check.status] %>
+                      <span class="ask-check ask-check--<%= check.status %>">
+                        <span class="mark"><%= mark %></span><%= check.label %>
+                      </span>
+                    <% end %>
+                  </div>
+                </td>
+                <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;">
+                  <% if @tab == "withdrawn" %>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">
+                      Withdrawn <%= l(entry.withdrawn_at.to_date, format: :long) if entry.withdrawn_at %>
+                    </span>
+                  <% elsif @tab == "declined" %>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.5);line-height:1.45;display:block;">
+                      <%= entry.review_note %>
+                    </span>
+                    <%= button_to "Approve now", corpus_review_path(entry, tab: @tab, decision: "approve"),
+                          method: :patch,
+                          style: "margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);padding:5px 11px;border-radius:100px;background:transparent;border:1px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.6);cursor:pointer;" %>
+                  <% elsif @tab == "approved" %>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);display:block;margin-bottom:8px;">
+                      Approved <%= l(entry.reviewed_at.to_date, format: :long) if entry.reviewed_at %>
+                      <span style="display:block;color:rgba(255,255,255,0.25);"><%= entry.reviewed_by_email %></span>
+                    </span>
+                    <%= form_with url: corpus_review_path(entry, tab: @tab), method: :patch, local: true, style: "margin:0;" do %>
+                      <input type="hidden" name="decision" value="decline" />
+                      <input type="text" name="review_note" placeholder="Reason (shown to the creator)"
+                             style="width:100%;box-sizing:border-box;padding:6px 9px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);outline:none;margin-bottom:6px;" />
+                      <button type="submit" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);padding:5px 11px;border-radius:100px;background:transparent;border:1px solid rgba(216,0,39,0.4);color:#FF6B84;cursor:pointer;">Remove</button>
+                    <% end %>
+                  <% else %>
+                    <%# Pending. A decline needs a reason, so it is a form rather
+                        than a button — the creator reads whatever is typed here
+                        verbatim, and "not accepted" tells them nothing. %>
+                    <%= button_to "Approve", corpus_review_path(entry, tab: @tab, decision: "approve"),
+                          method: :patch,
+                          style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);padding:5px 13px;border-radius:100px;background:#01EACB;border:1px solid #01EACB;color:#04221E;cursor:pointer;margin-bottom:8px;" %>
+                    <%= form_with url: corpus_review_path(entry, tab: @tab), method: :patch, local: true, style: "margin:0;" do %>
+                      <input type="hidden" name="decision" value="decline" />
+                      <input type="text" name="review_note" required
+                             value="<%= blocking.first&.label %>"
+                             placeholder="Reason (shown to the creator)"
+                             style="width:100%;box-sizing:border-box;padding:6px 9px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);outline:none;margin-bottom:6px;" />
+                      <button type="submit" style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);padding:5px 11px;border-radius:100px;background:transparent;border:1px solid rgba(216,0,39,0.4);color:#FF6B84;cursor:pointer;">Decline</button>
+                    <% end %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</div>

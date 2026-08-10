@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
-import { analyzeCard, analyzeVerto, typeLabel } from "lib/verto_rules"
+import { analyzeCard, analyzeVerto, typeLabel, GRID_LABEL_MAX, GRID_LABEL_TYPES,
+         COUNTED_LABEL_TYPES, optionLabelLimit } from "lib/verto_rules"
 import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_types"
 import { isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
@@ -17,6 +18,22 @@ const CHOICE_TYPES = [ "multiple_choice", "select_many", "yes_no", "select_one_g
 // Flow colours — mirrors Survey::FLOW_COLORS (and the flow map's LANE_PALETTE)
 // so a flow minted client-side gets the same palette the server would assign.
 const FLOW_COLORS = [ "#8B85FF", "#01EACB", "#F59E0B", "#F472B6", "#38BDF8", "#A3E635" ]
+
+// Where a card type keeps its option labels. The single definition of "an
+// option label" on this side: _optionEls reads it to serialize a card, and the
+// character counter reads it to know what it is counting. It used to be an
+// object literal inside _optionEls, which was fine while serializing was the
+// only caller — a second caller is exactly when a private literal becomes a
+// second opinion waiting to drift.
+const OPTION_LABEL_SELECTORS = {
+  multiple_choice: ".pick-text", select_many: ".pick-text", yes_no: ".pick-text",
+  prioritise: ".choice-list-label",
+  select_one_grid: ".choice-label", select_many_grid: ".choice-label",
+  range: ".slider-label-text", nps: ".slider-label-text",
+  rating: ".rating-label",
+  tap_card: ".rotate-card span[contenteditable]",
+  scenario: ".pick-text"
+}
 
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
@@ -51,6 +68,7 @@ export default class extends Controller {
     this._activeFlowTabs = new Map()
     this._seedStore()
     this._bindUndo()
+    this._bindGridLabelCap()
     this.refreshAll()
 
     // Safety net for the 1.5s autosave debounce: if the page is hidden or
@@ -71,6 +89,7 @@ export default class extends Controller {
     window.removeEventListener("beforeunload", this._flushHandler)
     document.removeEventListener("visibilitychange", this._visibilityHandler)
     document.removeEventListener("keydown", this._undoHandler)
+    this._hideLabelCount()
   }
 
   // ── Undo ──────────────────────────────────────────────────────────────────
@@ -89,6 +108,221 @@ export default class extends Controller {
   // the browser's own contenteditable undo, which is better at them than anything
   // here would be. Gates, end screens and token types save through
   // update_settings rather than serialize(), so they're outside this entirely.
+
+  // ── Grid tile labels: a cap, and a counter that shows it ─────────────────
+  //
+  // An image-grid tile is drawn at a fixed proportion with a line of label
+  // under it, and 20 characters is what that line holds — measured at 16px, a
+  // 393px phone gives the column ~172px and ~8.6px a character; a 280px Fold
+  // gives about 14 characters. Past that a label wraps, the row grows, and the
+  // card a respondent gets stops being the card the creator was shown.
+  //
+  // The number is NOT a new one: OPTION_LIMITS in lib/verto_rules has said 20
+  // for grid tiles all along and the Rules of the Game panel already tells
+  // creators to shorten past it. This makes the editor stop advising something
+  // it doesn't enforce, and imports the figure rather than copying it.
+  //
+  // Delegated from the editor root rather than hooked per row, because these
+  // labels are emitted from two places that have to mirror each other —
+  // shared/_card_component.html.erb and lib/choice_templates.js — and that
+  // file's own header records what happens when they drift.
+  //
+  // A LIST row is counted but not capped, and the asymmetry is the point
+  // rather than an inconsistency: a list row spans the answer panel, so a long
+  // label just makes the row taller and the square tile beside it does not
+  // depend on the label at all. Nothing breaks, so nothing is refused — the
+  // count is a nudge toward the Rules of the Game budget (40 for lists,
+  // measured: an iPhone 15 list row fits ~32 characters a line against a grid
+  // tile's ~22).
+  _bindGridLabelCap() {
+    // Capture, so a rich-text or picker handler can't swallow it first.
+    this.element.addEventListener("beforeinput", (e) => this._capGridLabel(e), { capture: true })
+    this.element.addEventListener("focusin",  (e) => this._showLabelCount(e))
+    this.element.addEventListener("focusout", () => this._hideLabelCount())
+    // Typing fires beforeinput then input; the counter reads the settled value.
+    this.element.addEventListener("input", (e) => {
+      const label = this._optionLabelOf(e.target)
+      if (!label) return
+      if (this._isCapped(label)) this._trimGridLabel(label)
+      this._renderLabelCount(label)
+    })
+  }
+
+  // The option label being edited, if the event is inside one on a card type
+  // that gets a counter. Resolves through OPTION_LABEL_SELECTORS rather than a
+  // hardcoded class, so a grid tile and a list row are found the same way.
+  _optionLabelOf(node) {
+    const card = node?.closest?.("[data-survey-editor-target='card']")
+    const type = card?.dataset.cardType
+    if (!COUNTED_LABEL_TYPES.includes(type)) return null
+    const sel = OPTION_LABEL_SELECTORS[type]
+    const label = sel ? node.closest(sel) : null
+    return label?.isContentEditable ? label : null
+  }
+
+  // Whether this label's limit is a wall or a line on the floor. Only the
+  // grids refuse the keystroke; see _bindGridLabelCap for why.
+  _isCapped(label) {
+    const type = label.closest("[data-survey-editor-target='card']")?.dataset.cardType
+    return GRID_LABEL_TYPES.includes(type)
+  }
+
+  // The budget for the label being edited — 20 on a grid tile, 40 on a list
+  // row — read from OPTION_LIMITS so the counter and the Rules of the Game
+  // panel can never quote different numbers at the same label.
+  _limitFor(label) {
+    const type = label.closest("[data-survey-editor-target='card']")?.dataset.cardType
+    return optionLabelLimit(type)
+  }
+
+  // Refuse anything that would make the label longer once it is at the cap.
+  //
+  // Blocks INSERTION, never deletion — a Verto written before the cap can hold
+  // a 40-character label, and truncating it the moment someone put a cursor in
+  // it would take 20 characters away that nobody asked to lose. Over-length
+  // labels can still be edited down; they just can't grow.
+  //
+  // beforeinput rather than keydown: one handler covers typing, paste, drop,
+  // autocomplete and IME commit, which is the whole surface. Length is counted
+  // on textContent, not innerHTML — these labels carry rich-text markup and a
+  // bold tag is not a character the respondent reads.
+  //
+  // This is the first of two passes. It can only act on inputs that declare
+  // how much text they are about to insert, and not all of them do: a bulk
+  // insert can arrive with `data` null and no dataTransfer, in which case
+  // there is nothing here to measure and _trimGridLabel below catches it after
+  // the fact. Doing it in this order matters — predicting first means the
+  // ordinary keystroke at the cap is simply refused, with no character ever
+  // painted and taken away again.
+  _capGridLabel(event) {
+    const label = this._optionLabelOf(event.target)
+    if (!label || !this._isCapped(label)) return
+    if (!event.inputType?.startsWith("insert")) return
+
+    const incoming = event.data?.length ??
+                     event.dataTransfer?.getData("text/plain")?.length ?? null
+    if (incoming === null) return   // unmeasurable — leave it to the backstop
+
+    const selected = this._selectionLengthIn(label)
+    if (label.textContent.length - selected + incoming <= GRID_LABEL_MAX) return
+
+    event.preventDefault()
+    this._renderLabelCount(label, { rejected: true })
+  }
+
+  // The backstop, run after the DOM has settled. Trims a label that got past
+  // the guard above back to the cap.
+  //
+  // Scoped by whether the label was already COMPLIANT when it was focused: a
+  // legacy 45-character label is left at 45 and can only ever shrink, while
+  // one inside the cap is held to it however the text arrived. That
+  // distinction is the whole reason this isn't a blanket
+  // `textContent = slice(0, 20)`.
+  //
+  // Compliance is read at focus rather than from the beforeinput above,
+  // because not every insertion fires beforeinput — document.execCommand does
+  // not, and that is not a test artefact: anything driving the editor
+  // programmatically takes the same path. Anchoring on focus means the
+  // backstop holds whatever route the text came in by.
+  //
+  // Trims from the last text node backwards rather than reassigning
+  // textContent, because these labels carry rich-text markup and flattening
+  // them would silently drop a creator's bold on every overlong paste.
+  _trimGridLabel(label) {
+    if (label.textContent.length <= GRID_LABEL_MAX) {
+      // Brought under the cap by hand — hold it there from now on, so a legacy
+      // label that has been tidied up doesn't stay exempt for the rest of the
+      // session.
+      this._labelCompliant = true
+      return
+    }
+    if (!this._labelCompliant) return
+
+    let excess = label.textContent.length - GRID_LABEL_MAX
+    const walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT)
+    const texts = []
+    while (walker.nextNode()) texts.push(walker.currentNode)
+    for (const node of texts.reverse()) {
+      if (excess <= 0) break
+      const drop = Math.min(excess, node.data.length)
+      node.data = node.data.slice(0, node.data.length - drop)
+      excess -= drop
+    }
+
+    // Caret to the end, which is where someone who just typed or pasted
+    // expects it — leaving it where the browser put it would drop it past the
+    // text that no longer exists.
+    const sel = window.getSelection?.()
+    if (sel && label.contains(document.activeElement) || document.activeElement === label) {
+      const range = document.createRange()
+      range.selectNodeContents(label)
+      range.collapse(false)
+      sel?.removeAllRanges()
+      sel?.addRange(range)
+    }
+    this._renderLabelCount(label, { rejected: true })
+  }
+
+  // How much of the label the pending input would replace — without it, typing
+  // over a fully-selected 20-character label would be refused as if it were an
+  // append, and the label could never be rewritten once full.
+  _selectionLengthIn(label) {
+    const sel = window.getSelection?.()
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) return 0
+    const range = sel.getRangeAt(0)
+    return label.contains(range.commonAncestorContainer) ? range.toString().length : 0
+  }
+
+  // ── The counter ──────────────────────────────────────────────────────────
+  // Same shape as the free-text counter respondents already get
+  // (freeform_controller): "n/max characters", going hot when the limit is
+  // reached. One node that follows the focus rather than one per option, which
+  // on a ten-tile grid would be ten pieces of chrome for one that is in use.
+  //
+  // Two hot states, because there are two kinds of limit and they must not
+  // look alike: .is-full is a wall (a grid tile at 20 — the next keystroke
+  // does nothing) and .is-over is a line already crossed (a list row past 40 —
+  // still typable). A creator who learns that pink means "stop" on a grid
+  // would otherwise be confused when it doesn't on a list.
+  _showLabelCount(event) {
+    const label = this._optionLabelOf(event.target)
+    if (!label) return
+    // Read compliance here, not on input — see _trimGridLabel.
+    this._labelCompliant = label.textContent.length <= this._limitFor(label)
+    this._labelCounter ||= Object.assign(document.createElement("div"),
+                                         { className: "option-limit-counter" })
+    label.after(this._labelCounter)
+    this._renderLabelCount(label)
+  }
+
+  _hideLabelCount() {
+    this._labelCounter?.remove()
+  }
+
+  _renderLabelCount(label = null, { rejected = false } = {}) {
+    const el = this._labelCounter
+    if (!el?.isConnected) return
+    const target = label || el.previousElementSibling
+    if (!target) return
+    const limit = this._limitFor(target)
+    if (limit == null) return
+    const len = target.textContent.length
+    el.textContent = `${len}/${limit} ${t("card.characters")}`
+    // A capped label reads as full AT the limit — that is the moment the next
+    // keystroke stops doing anything, so saying so a character early would be
+    // a lie in the other direction. An advisory one only goes hot once the
+    // limit is actually behind it, because reaching 40 on a list is fine.
+    const capped = this._isCapped(target)
+    el.classList.toggle("is-full", capped && len >= limit)
+    el.classList.toggle("is-over", !capped && len > limit)
+    // A flash on the keystroke that was refused, so the cap is felt and not
+    // just silently ignored.
+    if (rejected) {
+      el.classList.remove("is-rejected")
+      void el.offsetWidth   // restart the animation rather than let it no-op
+      el.classList.add("is-rejected")
+    }
+  }
 
   MAX_UNDO = 25
 
@@ -322,15 +556,7 @@ export default class extends Controller {
 
   // Option-label elements for a card, by type — the same nodes serialize reads.
   _optionEls(cardEl) {
-    const sel = {
-      multiple_choice: ".pick-text", select_many: ".pick-text", yes_no: ".pick-text",
-      prioritise: ".choice-list-label",
-      select_one_grid: ".choice-label", select_many_grid: ".choice-label",
-      range: ".slider-label-text", nps: ".slider-label-text",
-      rating: ".rating-label",
-      tap_card: ".rotate-card span[contenteditable]",
-      scenario: ".pick-text"
-    }[cardEl.dataset.cardType]
+    const sel = OPTION_LABEL_SELECTORS[cardEl.dataset.cardType]
     return sel ? Array.from(cardEl.querySelectorAll(sel)) : []
   }
 

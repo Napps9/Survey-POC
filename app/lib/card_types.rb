@@ -29,6 +29,39 @@ module CardTypes
     meta(type)["badge_css"].to_s
   end
 
+  # The brand hue that stands for this question type across the product.
+  #
+  # These are not new colours. The results screen has always painted each type's
+  # card rail with a family gradient (see `left_bg_for` in
+  # app/views/surveys/results.html.erb) — indigo for choice and scale, ocean for
+  # binary and swipe, amber for ratings, magenta for open text — and the `.sb-*`
+  # answer badges use the same families. `accent` is that family at chip
+  # brightness, so an Ask Verto citation is painted the same hue the results page
+  # already paints the question it cites.
+  #
+  # Every type must have one: a citation chip with no colour is a citation that
+  # says less than the others, and CardTypesAccentTest fails the build rather
+  # than let a new type ship colourless.
+  ACCENT_FALLBACK = "#8B85FF".freeze
+
+  def accent(type)
+    meta(type)["accent"].presence || ACCENT_FALLBACK
+  end
+
+  # A soft wash of the type's accent, for tinted grounds. Kept here rather than
+  # in CSS so Ruby and JS derive it identically.
+  def accent_soft(type, alpha = 0.14)
+    hex = accent(type).delete_prefix("#")
+    r, g, b = hex.scan(/../).map { |pair| pair.to_i(16) }
+    "rgba(#{r}, #{g}, #{b}, #{alpha})"
+  end
+
+  # The glyph the editor's type picker already uses. Reused on Ask Verto source
+  # cards so a source is recognisable as "open text" or "rating" at a glance.
+  def icon(type)
+    meta(type)["picker_icon"].presence || "◆"
+  end
+
   # Types gated behind a feature flag: hidden from the picker and the AI
   # generator unless their env flag is enabled. Lets the code ship dormant.
   FLAGGED = {}.freeze

@@ -1,0 +1,64 @@
+,,,,,,,,,Group 1 ,,Group 2,,Group 3,,Group 4,,Group 5,
+Q#,Theme,Question,Question_ESP,Suggested Answers,Suggested Answers_ESP,Methodology Layer,CMI Alignment,Tags/Notes,RAG SYSTEM,Comments,RAG SYSTEM,Comments,RAG SYSTEM,Comments,RAG SYSTEM,Comments,RAG SYSTEM,Comments
+29,Economic Opportunity & Green Entrepreneurship,What kind of work or career feels most meaningful to you?,¿Qué tipo de trabajo o carrera profesional te resulta más significativo?,"Helping others
+Protecting nature
+Solving problems
+Creating new things
+Teaching or mentoring
+Building communities
+Telling stories or creating art
+Innovating with technology
+Standing up for justice
+I’m still figuring it out","Ayudar a los demás
+Proteger la naturaleza
+Resolver problemas
+Crear cosas nuevas
+Enseñar o guiar
+Construir comunidades
+Contar historias o crear arte
+Innovar con la tecnología
+Defender la justicia
+Todavía estoy descubriéndolo",Intent,,Purpose in work – Reveals values-career alignment,,,,,,,,,,
+30,Economic Opportunity & Green Entrepreneurship,"Right now, what matters most to you when looking for work?",¿Qué es lo que más te importa ahora mismo a la hora de buscar trabajo?,"Purpose, Pay, Security, Skills, Experience","Propósito, Remuneración, Seguridad, Habilidades, Experiencia",Awareness,,Work motivators – Informs incentive-alignment strategies,,,,,,,,,,
+31,Economic Opportunity & Green Entrepreneurship,Which of these best describes your income situation?,¿Cuál de estas opciones describe mejor su situación de ingresos?,"I have no personal income
+I earn sometimes, but it’s not regular
+I earn regularly, but it only covers basics
+I earn regularly and can save or spend on extras","No tengo ingresos personales.
+Gano a veces, pero no es regular.
+Gano regularmente, pero solo me alcanza para lo básico.
+Gano regularmente y puedo ahorrar o gastar en extras.",Awareness,,Income level – Useful for stratifying results,,,,,,,,,,
+32,Economic Opportunity & Green Entrepreneurship,Which skills do you most want to develop right now?,¿Qué habilidades te gustaría desarrollar más ahora mismo?,"Tech
+Advocacy
+Green skills
+Public speaking
+Leadership
+Teamwork
+Emotional resilience
+Other (please specify)","Tecnología
+Promoción
+Habilidades ecológicas
+Oratoria
+Liderazgo
+Trabajo en equipo
+Resiliencia emocional
+Otros (especifique)",Intent,,Skill priorities – Indicates where investment is needed,,,,,,,,,,
+33,Economic Opportunity & Green Entrepreneurship,Where do you use these skills in your life now?,¿En qué aspectos de tu vida actual utilizas estas habilidades?,"School, Home, Work, Volunteering, Online","Escuela, hogar, trabajo, voluntariado, en línea",Awareness,,Skill application context – Indicates skills-to-context gap,,,,,,,,,,
+34,Economic Opportunity & Green Entrepreneurship,Have you heard of “green jobs”?,¿Has oído hablar de los “empleos verdes”?,"Yes — I know what they are
+Yes — but I’m not sure what they mean
+No — I’ve never heard of them
+Not sure","Sí, sé lo que son.
+Sí, pero no estoy seguro de lo que significan.
+No, nunca he oído hablar de ellos.
+No estoy seguro.",Awareness,,Green job awareness – Baseline knowledge check,,,,,,,,,,
+35,Economic Opportunity & Green Entrepreneurship,Do you think green jobs are realistic where you live?,¿Crees que los empleos verdes son una opción realista en tu lugar de residencia?,"Yes — they already exist
+Maybe — but they’re hard to access
+Not yet — but they should be
+No — they don’t seem possible here
+Not sure","Sí, ya existen.
+Quizás, pero son difíciles de acceder.
+Todavía no, pero deberían.
+No, no parecen posibles aquí.
+No estoy seguro.",Awareness - Intent (hybrid),,Green job viability – Perceived opportunity environment,,,,,,,,,,
+36,Economic Opportunity & Green Entrepreneurship,"If you started your own initiative, what issue would it solve?","Si pusieras en marcha tu propia iniciativa, ¿qué problema resolvería?","Climate, Inequality, Mental health, Education, Social cohesion, other (please share)","Clima, desigualdad, salud mental, educación, cohesión social, otros (por favor, comparta)",Agency,,Social venture interest – Precursor to entrepreneurial action,,,,,,,,,,
+37,Economic Opportunity & Green Entrepreneurship,How confident are you you’ll find (or create) work that fits your values?,¿Qué tan seguro estás de que encontrarás (o crearás) un trabajo que se ajuste a tus valores?,Not confident → Very confident,No estoy seguro → Estoy muy seguro,Agency,,Confidence in alignment – Measures alignment hope vs. reality,,,,,,,,,,
+38,Economic Opportunity & Green Entrepreneurship,I’m the kind of person who…,Soy el tipo de persona que…,Fixes things / Brings people together / Tries new ideas / Steps up when others won’t,Arregla las cosas / Une a la gente / Prueba nuevas ideas / Da un paso al frente cuando otros no lo hacen,Intent,Creative Action,Personal changemaker trait – Aligns with identity and aspiration,,,,,,,,,,

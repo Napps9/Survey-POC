@@ -1,0 +1,138 @@
+Q#,Theme,Question,Question_ESP,Question Type,Suggested Answers,Suggested Answers_ESP,Methodology Layer,CMI Alignment,Tags/Notes,,"RAG SYSTEM
+","Comments
+Please let us know if you have any comments on this question."
+1,Mental Health & Wellbeing,"When you're feeling low or overwhelmed, who or what do you turn to?","Cuando te sientes decaído o abrumado, ¿a quién o a qué recurres?",,"Friends or Family
+Music or art
+Nature or being outside
+Social media or online content
+I don’t know
+Other (please type)","Amigos o familia
+Música o arte
+Naturaleza o actividades al aire libre
+Redes sociales o contenido en línea
+No lo sé
+Otro (por favor, escriba)",Awareness,,Support pathways – Reveals where youth turn in moments of stress,,
+2,Mental Health & Wellbeing,How openly do people talk about mental health in your community?,¿Con qué franqueza se habla de salud mental en tu comunidad?,,"Not at all
+Rarely
+Sometimes
+Often
+Very openly","En absoluto
+Rara vez
+A veces
+A menudo
+Muy abiertamente",Awareness,,Community openness – Gauges stigma levels and cultural dialogue,,,
+3,Mental Health & Wellbeing,Imagine a space where young people feel mentally safe — what’s in it?,Imagina un espacio donde los jóvenes se sientan mentalmente seguros: ¿qué características tendría?,,"Art or creativity
+Movement or physical activity
+Quiet or calm
+Trusted support (e.g. adults, peers)
+Nature or outdoor space
+Music or sound
+Other (please type)","Arte o creatividad
+Movimiento o actividad física
+Tranquilidad o calma
+Apoyo de confianza (p. ej., adultos, compañeros)
+Naturaleza o espacio al aire libre
+Música o sonido
+Otro (especifique)",Awareness - Intent (hybrid),,"Ideal mental health spaces – Inspires partner-led design ideas. While this is forward-looking, it’s largely imaginative awareness — how young people mentally construct safety",,,
+4,Mental Health & Wellbeing,How confident are you in helping a friend who’s struggling mentally?,¿Qué tan seguro te sientes al ayudar a un amigo que está pasando por dificultades mentales?,,"Not at all 
+A little 
+Somewhat 
+Quite 
+Very ","Para nada
+Un poco
+Algo
+Bastante
+Mucho",Agency,,Peer-based support confidence – Indicates readiness for peer programs,,,
+5,Mental Health & Wellbeing,"If someone your age talks about mental health struggles, how do people usually respond?","Si alguien de tu edad habla de sus problemas de salud mental, ¿cómo suele reaccionar la gente?",,"They get judged or made fun of
+People avoid or change the subject
+Some listen, some don’t
+Most people are kind, but unsure how to help
+They feel supported and understood","Son juzgados o ridiculizados.
+La gente evita el tema o cambia de conversación.
+Algunos escuchan, otros no.
+La mayoría es amable, pero no sabe cómo ayudar.
+Se sienten apoyados y comprendidos.",Awareness,,Perceived responses – Reflects stigma and normalisation barriers,,,
+6,Mental Health & Wellbeing,"When someone disagrees with you, how do you usually respond?","Cuando alguien no está de acuerdo contigo, ¿cómo sueles responder?",,Avoid it / Listen / Debate / Learn from it,Evítalo / Escucha / Debate / Aprende de ello,Awareness,Empathy – Conflict Openness,Disagreement navigation – Surfaces empathy and social resilience ,,,
+7,Mental Health & Wellbeing,What matters more: helping others or achieving your own goals?,¿Qué es más importante: ayudar a los demás o alcanzar tus propias metas?,,Strongly personal → Strongly social,Fuertemente personal → Fuertemente social,Intent,Empathy – Purpose Alignment,Purpose vs. self-interest – Uncovers values motivation (and awareness),,,
+8,Mental Health & Wellbeing,I learn the most from people who…,Aprendo más de las personas que…,,"Share my views
+Are different from me
+Challenge how I think
+Understand what I’m going through","Comparte mis puntos de vista
+Son diferentes a los míos
+Cuestiona mi forma de pensar
+Comprende por lo que estoy pasando",Intent,Empathy – Perspective Taking,Learning sources – Reflects cognitive flexibility and inclusion mindset. Helps us understand/ surfice personal drivers (intent),,,
+9,Digital Inclusion & Innovation,What best describes your internet and device access?,¿Qué describe mejor tu acceso a internet y a tus dispositivos?,,"I don’t have any access
+I share a device or connection with others
+I have my own device but limited internet
+I have internet sometimes but it’s not reliable
+I have my own device and reliable internet","No tengo acceso
+Comparto un dispositivo o conexión con otros
+Tengo mi propio dispositivo, pero internet limitado
+A veces tengo internet, pero no es fiable
+Tengo mi propio dispositivo e internet fiable",Awareness,,Baseline access – Assesses digital equity and reach,,,
+10,Digital Inclusion & Innovation,How often do you use digital tools to express yourself creatively?,¿Con qué frecuencia utilizas herramientas digitales para expresarte de forma creativa?,,Never → Daily,Nunca → Diario,Agency,,Creative expression – Tracks tech as identity/voice amplifier,,,
+11,Digital Inclusion & Innovation,How confident are you using digital tools to solve problems or express ideas?,¿Qué tan seguro te sientes al usar herramientas digitales para resolver problemas o expresar ideas?,,Not confident → Very confident,No estoy seguro → Estoy muy seguro,Agency,,Confidence in using tech – Sheds light on digital agency,,,
+12,Digital Inclusion & Innovation,Have you or someone you know experienced online scams or fraud?,¿Usted o alguien que conoce ha sido víctima de estafas o fraudes en línea?,,Yes / No / Not sure / I feel well equiped to avoid them,Sí / No / No estoy seguro / Me siento bien preparado para evitarlos,Awareness,,Digital safety experience – Flags vulnerability to online threats,,,
+13,Digital Inclusion & Innovation,How do you feel about the future of AI in your life and work?,¿Qué opinas del futuro de la IA en tu vida y en tu trabajo?,,Curious / Worried / Excited / Don’t care,Curioso/a / Preocupado/a / Emocionado/a / Me da igual,Intent,,AI perceptions – Gauges hope/fear balance for future tech. This is anticipatory attitude — useful as Intent if treated as emotional orientation toward future tools,,,
+14,Digital Inclusion & Innovation,Have you used AI tools (like ChatGPT)?,¿Has utilizado herramientas de IA (como ChatGPT)?,,For fun / For school / For work / Other (please share),"Para divertirse / Para la escuela / Para el trabajo / Otro (por favor, indique)",Awareness,,AI familiarity – Measures exposure and barriers,,,
+15,Digital Inclusion & Innovation,"If you had access to an AI tool, what would you use it for?","Si tuvieras acceso a una herramienta de IA, ¿para qué la usarías?",,Study / Build confidence / Mental health / Create ideas,Estudiar / Desarrollar la confianza / Salud mental / Generar ideas,Agency,,AI for good use cases – Reveals aspirational drivers of AI use,,,
+16,Civic Engagement & Youth Leadership,Have you ever taken action to make change in your community?,¿Alguna vez has tomado medidas para generar un cambio en tu comunidad?,,Yes / No / Not sure,Sí / No / No estoy seguro,Awareness,,Civic action history – Baseline of prior engagement,,,
+17,Civic Engagement & Youth Leadership,What issues would you speak up about if given the chance?,¿Sobre qué temas te pronunciarías si tuvieras la oportunidad?,,"Safety, Climate, Jobs, Education, Inequality","Seguridad, Clima, Empleo, Educación, Desigualdad",Intent,,Youth-led issues – Helps partners identify shared concerns,,,
+18,Civic Engagement & Youth Leadership,What’s the best way for young people to influence change?,¿Cuál es la mejor manera para que los jóvenes influyan en el cambio?,,"Protest, Policy, Art, Social media, Community work","Protesta, Política, Arte, Redes sociales, Trabajo comunitario",Agency,,Influence methods – Maps what young people believe is effective,,,
+19,Civic Engagement & Youth Leadership,How often do you feel people in power truly listen to people like you?,¿Con qué frecuencia sientes que las personas en el poder realmente escuchan a personas como tú?,,Never → Always,Nunca → Siempre,Agency,,Power listening perception – Insight into trust in institutions,,,
+20,Civic Engagement & Youth Leadership,"If a local leader wanted to hear from youth, what should they do?","Si un líder local quisiera escuchar a los jóvenes, ¿qué debería hacer?",,"Youth panels, Social media, Schools, Digital surveys","Paneles juveniles, redes sociales, escuelas, encuestas digitales",Intent - Agency (hybrid),,Advice to power – Reveals what engagement channels youth would trust and prefer — reveals intent to be heard and strategic comfort with civic mechanisms.,,,
+21,Civic Engagement & Youth Leadership,What kind of leader do you think the world needs more of?,¿Qué tipo de líder crees que el mundo necesita?,,"Listener, Problem-solver, Risk-taker, Someone like me","Alguien que sabe escuchar, que resuelve problemas, que se arriesga, alguien como yo.",Intent,,Leadership archetypes – Reflects admired changemaker traits,,,
+22,Civic Engagement & Youth Leadership,"If you had to organise something that mattered to you, how confident would you feel?","Si tuvieras que organizar algo que te importara, ¿cuánta confianza sentirías?",,Not confident → Very confident,No estoy seguro → Estoy muy seguro,Agency,,Action confidence – Gauges sense of readiness,,,
+23,Civic Engagement & Youth Leadership,"In a space where youth voices are heard, how do you want to feel?","En un espacio donde se escuchan las voces de los jóvenes, ¿cómo te gustaría sentirte?",,"Safe, Respected, Brave, Inspired, Calm","Seguro, respetado, valiente, inspirado, tranquilo",Awareness,,Safe participation space – Guides youth participation design as may surface psychological safety expectations,,,
+24,Civic Engagement & Youth Leadership,Taking part in community projects or speaking up helps me…,Participar en proyectos comunitarios o alzar la voz me ayuda…,Matrix,"I feel more confident, I learn about myself, I connect with others, I feel powerful","Me siento más segura, aprendo sobre mí misma, conecto con los demás, me siento poderosa.",Agency,,Impact of participation – Encourages self-awareness of growth,,,
+25,Civic Engagement & Youth Leadership,What kind of leader are you today?,¿Qué tipo de líder eres hoy?,,Listener / Doer / Firestarter / Planner / Not sure yet,Oyente / Hacedor / Incendiario / Planificador / Aún no estoy seguro,Intent,Self-Leadership,Self-view of leadership – Surfaces identity alignment with changemaking,,,
+26,Civic Engagement & Youth Leadership,"In a group, I usually…","En un grupo, normalmente…",,Take charge / Support others / Come up with ideas / Keep it going,Toma las riendas / Apoya a los demás / Propón ideas / Sigue adelante,Intent,Role Clarity,Role comfort in groups - shows how player see's themselves behaving– Indicates collaboration preferences. ,,,
+27,Civic Engagement & Youth Leadership,Have you ever led something you cared about?,¿Alguna vez has liderado algo que te importaba?,,Yes / Not yet but want to / No,"Sí / Todavía no, pero quiero / No",Agency,Practice Experience,Leadership experience – Tracks practice opportunity,,,
+28,Civic Engagement & Youth Leadership,"If something’s not working in your community, what do you usually do?","Si algo no funciona en tu comunidad, ¿qué sueles hacer?",,Tell someone / Try a new idea / Wait / Research / Not sure,Díselo a alguien / Prueba una nueva idea / Espera / Investiga / No estoy seguro,Agency,Initiative,Personal initiative in real-world settings,,,
+29,Economic Opportunity & Green Entrepreneurship,What kind of work or career feels most meaningful to you?,¿Qué tipo de trabajo o carrera profesional te resulta más significativo?,,"Helping others
+Protecting nature
+Solving problems
+Creating new things
+Teaching or mentoring
+Building communities
+Telling stories or creating art
+Innovating with technology
+Standing up for justice
+I’m still figuring it out","Ayudar a los demás
+Proteger la naturaleza
+Resolver problemas
+Crear cosas nuevas
+Enseñar o guiar
+Construir comunidades
+Contar historias o crear arte
+Innovar con la tecnología
+Defender la justicia
+Todavía estoy descubriéndolo",Intent,,Purpose in work – Reveals values-career alignment,,,
+30,Economic Opportunity & Green Entrepreneurship,"Right now, what matters most to you when looking for work?",¿Qué es lo que más te importa ahora mismo a la hora de buscar trabajo?,,"Purpose, Pay, Security, Skills","Propósito, Remuneración, Seguridad, Habilidades",Awareness,,Work motivators – Informs incentive-alignment strategies,,,
+31,Economic Opportunity & Green Entrepreneurship,Which of these best describes your income situation?,¿Cuál de estas opciones describe mejor su situación de ingresos?,,"I have no personal income
+I earn sometimes, but it’s not regular
+I earn regularly, but it only covers basics
+I earn regularly and can save or spend on extras","No tengo ingresos personales.
+Gano a veces, pero no es regular.
+Gano regularmente, pero solo me alcanza para lo básico.
+Gano regularmente y puedo ahorrar o gastar en extras.",Awareness,,Income level – Useful for stratifying results,,,
+32,Economic Opportunity & Green Entrepreneurship,Which skills do you most want to develop right now?,¿Qué habilidades te gustaría desarrollar más ahora mismo?,,"Tech, Advocacy, Green skills, Public speaking","Tecnología, activismo, habilidades ecológicas, oratoria.",Intent,,Skill priorities – Indicates where investment is needed,,,
+33,Economic Opportunity & Green Entrepreneurship,Have you heard of “green jobs”?,¿Has oído hablar de los “empleos verdes”?,,"Yes (know them), Yes (not sure), No","Sí (los conozco), Sí (no estoy seguro), No",Awareness,,Green job awareness – Baseline knowledge check,,,
+34,Economic Opportunity & Green Entrepreneurship,Do you think green jobs are realistic where you live?,¿Crees que los empleos verdes son una opción realista en tu lugar de residencia?,,Yes / No / Not sure,Sí / No / No estoy seguro,Awareness - Intent (hybrid),,Green job viability – Perceived opportunity environment,,,
+35,Economic Opportunity & Green Entrepreneurship,"If you started your own initiative, what issue would it solve?","Si pusieras en marcha tu propia iniciativa, ¿qué problema resolvería?",,"Climate, Inequality, Mental health, Education","Clima, desigualdad, salud mental, educación",Agency,,Social venture interest – Precursor to entrepreneurial action,,,
+36,Economic Opportunity & Green Entrepreneurship,How confident are you you’ll find (or create) work that fits your values?,¿Qué tan seguro estás de que encontrarás (o crearás) un trabajo que se ajuste a tus valores?,,Not confident → Very confident,No estoy seguro → Estoy muy seguro,Agency,,Confidence in alignment – Measures alignment hope vs. reality,,,
+37,Economic Opportunity & Green Entrepreneurship,Which of these skills are most important for your future?,¿Cuáles de estas habilidades son las más importantes para tu futuro?,,"Teamwork, Confidence, Creativity, Focus","Trabajo en equipo, confianza, creatividad, concentración.",Intent,,Key life skills – Shows perception of what's valuable,,,
+38,Economic Opportunity & Green Entrepreneurship,Where do you use these skills in your life now?,¿En qué aspectos de tu vida actual utilizas estas habilidades?,,"School, Home, Work, Volunteering, Online","Escuela, hogar, trabajo, voluntariado, en línea",Awareness,,Skill application context – Indicates skills-to-context gap,,,
+39,Economic Opportunity & Green Entrepreneurship,"If something’s not working in your community, what do you usually do?","Si algo no funciona en tu comunidad, ¿qué sueles hacer?",,Tell someone / Try a new idea / Wait / Research / Not sure,Díselo a alguien / Prueba una nueva idea / Espera / Investiga / No estoy seguro,Agency,Initiative,Community problem response – Surfaces change agency,,,
+40,Economic Opportunity & Green Entrepreneurship,I’m the kind of person who…,Soy el tipo de persona que…,,Fixes things / Brings people together / Tries new ideas / Steps up when others won’t,Arregla las cosas / Une a la gente / Prueba nuevas ideas / Da un paso al frente cuando otros no lo hacen,Intent,Creative Action,Personal changemaker trait – Aligns with identity and aspiration,,,
+41,Climate Action & Sustainability,What environmental changes do you notice where you live?,¿Qué cambios ambientales observas en el lugar donde vives?,,"Heat, Flooding, Pollution, Deforestation","Calor, inundaciones, contaminación, deforestación",Awareness,,Environmental observation – Awareness of real-world symptoms,,,
+42,Climate Action & Sustainability,How connected do you feel to nature in your everyday life?,¿Qué tan conectado/a te sientes con la naturaleza en tu vida cotidiana?,,Very connected → Not at all,Muy conectado → Para nada,Awareness,,Nature connectedness – Reveals how emotionally and physically connected young people feel to nature,,,
+43,Climate Action & Sustainability,How comfortable do you feel in wild or natural places?,¿Qué tan cómodo te sientes en lugares salvajes o naturales?,,Very → Not at all,Muy → Para nada,Awareness,,Comfort in wild spaces – Confidence in nature,,,
+44,Climate Action & Sustainability,How often do you spend time outdoors or in green spaces?,¿Con qué frecuencia pasas tiempo al aire libre o en espacios verdes?,,Never → Daily,Nunca → Diario,Intent,,Outdoor time – Insight into barriers to natural access,,,
+45,Climate Action & Sustainability,What’s one small thing you do (or want to do) to help the environment?,¿Qué pequeña cosa haces (o quieres hacer) para ayudar al medio ambiente?,,"Recycle, Walk more, Reduce plastic","Recicla, camina más, reduce el consumo de plástico.",Awareness - Intent (hybrid),,Eco-action commitment – Small behavioural intent insight,,,
+46,Climate Action & Sustainability,What stops young people from doing more for the planet?,¿Qué impide a los jóvenes hacer más por el planeta?,,"Cost, Time, Lack of info, No support","Costo, tiempo, falta de información, falta de soporte",Awareness,,Barriers to action – Systemic inhibitors for action,,,
+47,Climate Action & Sustainability,Who or what inspires you to care about the planet?,¿Quién o qué te inspira a preocuparte por el planeta?,,"Friends, Elders, Nature, Media, Nobody","Amigos, Ancianos, Naturaleza, Medios de comunicación, Nadie",Awareness - Intent (hybrid),,Inspiration drivers – Who/what activates green action,,,
+48,Climate Action & Sustainability,How much do you think climate change will impact you personally?,¿Cuánto crees que te afectará personalmente el cambio climático?,,"Not at all, Only a little, A moderate amount, A great deal, Don’t know","En absoluto, Un poco, Una cantidad moderada, Mucho, No lo sé",Awareness,,Gauges personal perception of climate vulnerability and relevance. Helps surface whether climate is seen as a distant issue or a lived concern.,,,
+49,Climate Action & Sustainability,Do you think young people should be included in Chile’s climate decisions?,¿Crees que los jóvenes deberían participar en las decisiones climáticas de Chile?,,Yes / No / Not sure,Sí / No / No estoy seguro,Agency,,Policy inclusion perception – Youth opinion on role in governance,,,
+50,Climate Action & Sustainability,"If you could change one thing about your school, community or workplace to make it greener, what would it be?","Si pudieras cambiar una sola cosa de tu escuela, comunidad o lugar de trabajo para hacerlo más ecológico, ¿qué sería?",,Free text,Texto libre,Intent,,Green solution ideation – Direct input for action planning,,,
+51,Reflection,What do you dream about for the future — for yourself or your community?,"¿Qué sueñas para el futuro, ya sea para ti o para tu comunidad?",,Free text,Texto libre,Intent,,"Aspirational dreams – Raw, personal insight for storytelling",,,

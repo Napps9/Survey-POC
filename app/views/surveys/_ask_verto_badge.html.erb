@@ -1,0 +1,18 @@
+<%# The tile's Ask Verto state, if it has one.
+    Read from @ask_states (one grouped query in SurveysController#index) rather
+    than a lookup per tile. A Verto that has never been offered has no entry and
+    therefore no badge — the dashboard shouldn't advertise a decision nobody has
+    made yet. %>
+<% state = (@ask_states || {})[survey.id] %>
+<% if state && state != :off %>
+  <% colours = {
+       pending:  [ "rgba(255,194,75,0.18)", "#FFC24B" ],
+       live:     [ "rgba(1,234,203,0.16)",  "#01EACB" ],
+       declined: [ "rgba(216,0,39,0.16)",   "#FF6B84" ]
+     } %>
+  <% bg, fg = colours[state] %>
+  <span title="<%= t("ask.opt_in.state_#{state}") %>"
+        style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:<%= bg %>;color:<%= fg %>;backdrop-filter:blur(4px);white-space:nowrap;">
+    <%= state == :live ? t("ask.opt_in.badge_live") : t("ask.opt_in.badge_#{state}") %>
+  </span>
+<% end %>

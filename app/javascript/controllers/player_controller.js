@@ -104,6 +104,10 @@ export default class extends Controller {
   _tokenLocked = new Set()
   _tokenTotals = {}
 
+  // Card indices the respondent has actually interacted with — see
+  // _markTouched for why the Next button's glow needs this and _read doesn't.
+  _touched = new Set()
+
   connect() {
     // The one signal sw_register.js reads before its corrective reload on
     // controllerchange: any gesture inside the player means a reload could
@@ -137,6 +141,216 @@ export default class extends Controller {
     if (this.quizValue) this._initQuiz()
     if (this.tokenisationValue) this._initTokens()
     if (this.hasRegionsMapViewportTarget) this._setupMapPanZoom()
+    this._watchFooterFit()
+
+    // Live answered-state for the Next button. Delegated on the deck rather
+    // than wired per widget: every answer type ultimately lands as a pointer
+    // press, a click or a typed character, and _answerOf() already knows what
+    // each type counts as answered.
+    //
+    // CAPTURE phase, because several widgets stop the bubble — rating_controller
+    // calls stopPropagation() on every pick, so a bubble-phase listener here
+    // never hears a star being chosen. Capture runs on the way DOWN, before
+    // anything can stop it.
+    //
+    // Which means the read has to be deferred, and NOT with a microtask: the
+    // browser takes a microtask checkpoint between listener invocations, so a
+    // microtask queued in the capture phase runs BEFORE the picker's own
+    // handler has selected anything, and the button stays dark until the next
+    // unrelated event nudges it. A frame is the right unit — it lands after
+    // the whole dispatch, and before the paint that has to show the glow.
+    for (const evt of [ "pointerdown", "click", "input", "change" ]) {
+      this.element.addEventListener(evt, (e) => {
+        this._markTouched(e)
+        this._queueAnsweredSync()
+        // `input` as well as `click`: a freeform answer grows its textarea as
+        // it is typed, which changes what the card can afford, and a click was
+        // never going to arrive to tell us about it.
+        if (e.type === "click" || e.type === "input") {
+          requestAnimationFrame(() => this._fitCard())
+        }
+      }, { capture: true, passive: true })
+    }
+  }
+
+  // One tap is a pointerdown AND a click; coalesce them into a single read.
+  _queueAnsweredSync() {
+    if (this._answeredFrame) return
+    this._answeredFrame = requestAnimationFrame(() => {
+      this._answeredFrame = null
+      this._syncAnswered()
+    })
+  }
+
+  disconnect() {
+    this._footerObserver?.disconnect()
+    if (this._answeredFrame) cancelAnimationFrame(this._answeredFrame)
+  }
+
+  // ── Footer: answered glow + the cramped-bar fallback ─────────────────────
+
+  // Light the primary button once the card holds an answer — per the answer
+  // TYPE's own rule, which is the only definition that means anything: one
+  // star is a rating, one tick is a multi-select, a moved thumb is a scale,
+  // a non-blank string is an open question. _answerOf/_read own that table
+  // (and the server agrees with it — see test/system/answer_parity_test.rb).
+  //
+  // Silent: this runs on every keystroke, and the contact card's read would
+  // otherwise flash its email nudge while someone is still typing the address.
+  // Which cards the respondent has actually put a finger on. A Range slider
+  // renders with its thumb at the middle of the scale and a dot already
+  // marked active, so _read gives it a value from the moment it paints — and
+  // the button would greet the respondent already lit, which is the one thing
+  // this feature must not do. What _read returns is left alone (the server
+  // grades against the same table — test/system/answer_parity_test.rb); the
+  // GLOW is what gets the extra condition, because the glow is feedback for
+  // something you did.
+  _markTouched(event) {
+    const card = event.target?.closest?.(".preview-card")
+    if (card?.dataset.cardIndex) this._touched.add(card.dataset.cardIndex)
+  }
+
+  _syncAnswered() {
+    const card = this.cardTargets[this.currentValue]
+    const key  = card?.dataset.cardIndex
+    // Touched now, or answered on an earlier pass and stepped back to.
+    const owned = key != null &&
+      (this._touched.has(key) || this._isAnswerGiven(this._answers[key]))
+    const answered = !!card && owned &&
+      this._isAnswerGiven(this._answerOf(card, { silent: true }))
+
+    for (const btn of [ this.hasNextBtnTarget   && this.nextBtnTarget,
+                        this.hasFinishBtnTarget && this.finishBtnTarget ]) {
+      if (btn) btn.classList.toggle("is-answered", answered)
+    }
+  }
+
+  // Back and Next carry a translated label ("← Back", "Weiter →", "Enviar ✓"),
+  // and on a narrow phone — or a wide one once the quiz and points chips are
+  // sharing the bar — those labels stop fitting. Rather than guess a breakpoint
+  // that only holds for English, measure: nowrap means a label that no longer
+  // fits overflows its button, and an overflowing button is the definition of
+  // cramped. The CSS then drops both to arrow-only CTAs.
+  // How wide the label actually wants to be. NOT scrollWidth: on an element
+  // with `overflow: visible` — which a pill button is — browsers report
+  // scrollWidth as the padding box and ignore text spilling out of it, so it
+  // always answers "it fits". A Range over the button's contents measures the
+  // laid-out text itself, which is the number this needs.
+  _labelWidth(btn) {
+    const range = document.createRange()
+    range.selectNodeContents(btn)
+    const w = range.getBoundingClientRect().width
+    range.detach?.()
+    return w
+  }
+
+  _fitFooter() {
+    const footer = this._footerEl ||= this.element.querySelector(".preview-footer")
+    if (!footer) return
+
+    // Measure at full size. The collapsed state zeroes the label, so leaving
+    // the class on would make the next measurement say "it fits" and flip the
+    // buttons back and forth.
+    footer.classList.remove("is-tight")
+    const tight = [ this.hasBackBtnTarget   && this.backBtnTarget,
+                    this.hasNextBtnTarget   && this.nextBtnTarget,
+                    this.hasFinishBtnTarget && this.finishBtnTarget ]
+      .filter(b => b && !b.classList.contains("hidden"))
+      .some(b => {
+        const cs = getComputedStyle(b)
+        const room = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
+        return room > 0 && this._labelWidth(b) > room + 1
+      })
+    footer.classList.toggle("is-tight", tight)
+  }
+
+  // ── What the card can afford ────────────────────────────────────────────
+  //
+  // This used to render everything and then strip until it stopped hurting.
+  // That reads fine and behaves badly: a degradation path has no bottom, so
+  // whatever is cheapest to shave keeps getting shaved — which is how the
+  // option labels ended up at 11px. So it runs the other way now. Start from
+  // what the card cannot do without — the question, the answer widget, the
+  // footer — and BUY BACK the imagery, in priority order, only while the card
+  // can pay for it.
+  //
+  // The price of everything is measured in one currency: how much of the
+  // answer ends up off the bottom of the screen. At the floor that number is
+  // whatever the options themselves cost — six options on a short phone are
+  // six options, and no amount of shedding changes it — so the floor's figure
+  // is the DEBT, and an enhancement is affordable when it doesn't add to it.
+  //
+  // Two rungs, bought in this order:
+  //
+  //   1. The option artwork, because a tile is part of the ANSWER — it is how
+  //      one option tells itself apart from the next.
+  //   2. The card's hero image, which is decoration and goes last.
+  //
+  // Both on the same terms: free, or not at all. There is deliberately no
+  // "it's only a bit over" allowance. The old code had one — start shedding
+  // once more than a third of the answer is hidden — and it was the right
+  // shape for a question this no longer asks. As a TRIGGER ("is it bad enough
+  // to act?") a threshold is reasonable. Re-read as a LICENCE ("may I spend
+  // this?") the same number let a sideways phone buy tile artwork that pushed
+  // 29% of the options off screen, when the undecorated list had shown all of
+  // them. A respondent can answer a question with no photograph on it. They
+  // cannot answer one whose options are below the fold.
+  //
+  // Measured rather than guessed, because how much room an answer needs
+  // depends on the option count, the label lengths, the question's own height
+  // and the phone, and no breakpoint knows any of that. Nothing paints
+  // mid-flight: reading scrollHeight forces layout synchronously, so all of
+  // this resolves inside one task and the browser paints once, already
+  // correct. And it starts from the floor every time, so a card that gained
+  // room back (a rotation, the keyboard closing) buys its pictures again
+  // instead of staying stripped for the rest of the deck.
+  //
+  // The widget, the question and the footer are never on the list.
+  _fitCard() {
+    const card = this.cardTargets[this.currentValue]
+    if (!card) return
+    const box = card.querySelector(".split-right > .mt-2")
+    if (!box) return
+    const grid = box.querySelector(".choice-grid")
+
+    // A pixel of slack throughout: these are sub-pixel layout figures and an
+    // enhancement that rounds to "costs 0.4px" is free.
+    const over = () => box.scrollHeight - box.clientHeight
+
+    // The floor: the answer, undecorated.
+    card.classList.add("hero-off")
+    grid?.classList.add("art-off")
+    let owed = over()
+
+    // Rung 1 — the option artwork. It can come out CHEAPER than the floor as
+    // well as dearer: dropping tiles turns the grid into full-width rows, and
+    // on a narrow phone that is taller than the two-column grid it replaced.
+    // Hence re-reading the debt rather than assuming it only ever grows.
+    if (grid) {
+      grid.classList.remove("art-off")
+      if (over() > owed + 1) grid.classList.add("art-off")
+      else owed = over()
+    }
+
+    // Rung 2 — the hero, against whatever rung 1 settled on.
+    card.classList.remove("hero-off")
+    if (over() > owed + 1) card.classList.add("hero-off")
+
+    // The "more below" fade is drawn over the last of the content, so it has
+    // to know whether there IS anything below — left unconditional it greys
+    // out the final row's label on an answer that fits perfectly well.
+    box.classList.toggle("is-scrollable", over() > 1)
+  }
+
+  _watchFooterFit() {
+    this._fitFooter()
+    const footer = this._footerEl
+    if (!footer || typeof ResizeObserver === "undefined") return
+    // Catches rotation, the iOS toolbar collapsing, and a keyboard opening.
+    // Label and chip changes call _fitFooter directly — they don't resize the
+    // bar itself, so the observer would never hear about them.
+    this._footerObserver = new ResizeObserver(() => { this._fitFooter(); this._fitCard() })
+    this._footerObserver.observe(footer)
   }
 
   // Consent card (the first card): agreeing advances into the deck; declining
@@ -597,14 +811,25 @@ export default class extends Controller {
     if (!card) return
     const key = card.dataset.cardIndex
     if (key === undefined || key === "") return
+    this._answers[key] = this._answerOf(card)
+  }
+
+  // What this card holds right now, in the shape _isAnswerGiven reads.
+  // _capture stores it on the way past; the Next button's answered state asks
+  // the same question live, on every tap. Both go through here so the button
+  // can never light up for something the deck wouldn't actually record.
+  //
+  // `silent` is for the live path: reading a contact_form has the side effect
+  // of showing or hiding its inline email nudge, and that must happen when the
+  // respondent moves on — not on every keystroke while they are still mid
+  // address.
+  _answerOf(card, { silent = false } = {}) {
     const type  = card.dataset.cardType
-    const value = this._read(card, type)
+    const value = this._read(card, type, { silent })
     // "Other" is a standalone answer: if the respondent typed free text it
     // replaces any normal selection for this card.
     const other = card.querySelector("[data-other-input]")?.value.trim()
-    this._answers[key] = other
-      ? { type, value: null, other }
-      : { type, value }
+    return other ? { type, value: null, other } : { type, value }
   }
 
   // The canonical (primary-language) label an option element answers as.
@@ -615,7 +840,7 @@ export default class extends Controller {
     return el.querySelector(".pick-text, .choice-label")?.textContent.trim() ?? null
   }
 
-  _read(card, type) {
+  _read(card, type, { silent = false } = {}) {
     switch (type) {
       // Choice answers store the CANONICAL (primary-language) option label, so
       // results aggregate across languages regardless of the displayed text.
@@ -683,9 +908,9 @@ export default class extends Controller {
         })
         const error = card.querySelector("[data-contact-error]")
         if (out.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(out.email)) {
-          if (error) error.hidden = false
+          if (error && !silent) error.hidden = false
           delete out.email
-        } else if (error) {
+        } else if (error && !silent) {
           error.hidden = true
         }
         return Object.keys(out).length ? out : null
@@ -860,7 +1085,7 @@ export default class extends Controller {
     list.innerHTML = ""
     if (regions.length === 0) {
       const empty = document.createElement("div")
-      empty.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);text-align:center;padding:10px;"
+      empty.className = "play-panel-empty"
       empty.textContent = t("player.region_empty")
       list.appendChild(empty)
       return
@@ -871,13 +1096,13 @@ export default class extends Controller {
       row.className = "region-row"
       row.dataset.country = region.country
       const name = document.createElement("span")
-      name.style.cssText = "flex:1;text-align:start;font-family:'ABeeZee',sans-serif;font-size:13px;color:#fff;"
+      name.className = "play-region-name"
       name.textContent = region.label ? `${region.country_name} · ${region.label}` : region.country_name
       const count = document.createElement("span")
-      count.style.cssText = "font-family:'Alata',sans-serif;font-size:12px;color:#01EACB;"
+      count.className = "play-region-count"
       count.textContent = t("player.region_answered", { count: region.responders })
       const arrow = document.createElement("span")
-      arrow.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.45);"
+      arrow.className = "play-region-arrow"
       arrow.textContent = t("player.region_compare")
       row.append(name, count, arrow)
       row.addEventListener("click", () => this._showRegionDetail(region))
@@ -1077,12 +1302,12 @@ export default class extends Controller {
     wrap.style.cssText = "background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;"
 
     const prompt = document.createElement("div")
-    prompt.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:13px;color:#fff;line-height:1.45;margin-bottom:10px;"
+    prompt.className = "play-compare-prompt"
     prompt.textContent = row.prompt || `Question ${row.index + 1}`
     wrap.appendChild(prompt)
 
     const yourPill = document.createElement("div")
-    yourPill.style.cssText = "display:inline-block;padding:4px 10px;border-radius:100px;background:var(--brand-primary-soft,rgba(1,234,203,0.15));color:var(--brand-primary,#01EACB);font-family:'ABeeZee',sans-serif;font-size:11px;margin-bottom:10px;"
+    yourPill.className = "play-compare-mine"
     yourPill.textContent = `Your answer: ${this._formatMine(mine, row)}`
     wrap.appendChild(yourPill)
 
@@ -1120,7 +1345,7 @@ export default class extends Controller {
       for (let i = 1; i <= max; i++) entries.push([`${i} ★`, counts[i] || counts[String(i)] || 0, i])
     } else if (row.type === "open_ended") {
       const note = document.createElement("div")
-      note.style.cssText = "font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;"
+      note.className = "play-compare-note"
       note.textContent = `${row.total || 0} open-ended response${row.total === 1 ? "" : "s"} total`
       container.appendChild(note)
       return container
@@ -1198,17 +1423,17 @@ export default class extends Controller {
     head.style.cssText = "display:flex;align-items:baseline;gap:8px;"
 
     const lbl = document.createElement("span")
-    lbl.style.cssText = `flex:1;min-width:0;font-family:'ABeeZee',sans-serif;font-size:12px;line-height:1.35;color:${isMine ? "var(--brand-primary,#01EACB)" : "rgba(255,255,255,0.82)"};`
+    lbl.className = `play-bar-label${isMine ? " is-mine" : ""}`
     lbl.textContent = (isMine ? "● " : "") + label
     head.appendChild(lbl)
 
     const pctEl = document.createElement("span")
-    pctEl.style.cssText = "flex-shrink:0;font-family:'Alata',sans-serif;font-size:14px;color:#fff;"
+    pctEl.className = "play-bar-pct"
     pctEl.textContent = `${pct}%`
     head.appendChild(pctEl)
 
     const countEl = document.createElement("span")
-    countEl.style.cssText = "flex-shrink:0;min-width:22px;text-align:right;font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.4);"
+    countEl.className = "play-bar-count"
     countEl.textContent = count
     head.appendChild(countEl)
     row.appendChild(head)
@@ -1281,6 +1506,12 @@ export default class extends Controller {
     this.finishBtnTarget.classList.toggle("hidden", !isLast)
     if (this.quizValue) this._labelQuizNav()
     if (this.tokenisationValue) this._maybeRenderCheckpoint(idx)
+    // Which button is showing, and what it says, both just changed — and on a
+    // card the respondent has already answered (stepping back) the glow has to
+    // be on the moment the card appears, not on their next tap.
+    this._syncAnswered()
+    this._fitFooter()
+    this._fitCard()
   }
 
   // ── Quiz: per-card grading, reveal, lock, running score ──────────────────
@@ -1546,12 +1777,14 @@ export default class extends Controller {
     if (!this.hasScoreChipTarget || !this.quizValue || this._quizMax <= 0) return
     this.scoreChipTarget.classList.remove("hidden")
     this.scoreChipTarget.textContent = t("player.quiz_score", { score: this._quizScore, max: this._quizMax })
+    this._fitFooter() // a chip in the bar is exactly what leaves the labels no room
   }
 
   _labelQuizNav() {
     const pending = this._needsReveal(this.currentValue)
     if (this.hasNextBtnTarget)   this.nextBtnTarget.textContent   = pending ? t("player.quiz_check") : this._nextLabel
     if (this.hasFinishBtnTarget) this.finishBtnTarget.textContent = pending ? t("player.quiz_check") : this._finishLabel
+    this._fitFooter() // "Check answer" is a good deal longer than "Next →"
   }
 
   _renderQuizScore() {
@@ -1606,7 +1839,7 @@ export default class extends Controller {
     })
     if ((data.per_question || []).length) {
       const head = document.createElement("div")
-      head.style.cssText = "font-family:'Alata',sans-serif;font-size:13px;color:#fff;margin:8px 0 -4px;"
+      head.className = "play-compare-head"
       head.textContent = t("player.quiz_per_question")
       list.appendChild(head)
       data.per_question.forEach(q => list.appendChild(this._buildBar(q.prompt || `#${q.index + 1}`, q.correct, q.pct, false)))
@@ -1821,6 +2054,7 @@ export default class extends Controller {
     this.tokenScoreChipTarget.innerHTML = this.tokenTypesValue.map(tt =>
       `<span class="token-score-pill">${this._esc(tt.icon)} ${this._tokenTotals[tt.id] || 0}</span>`
     ).join("")
+    this._fitFooter() // points chips share the bar with the labels
   }
 
   // Points Checkpoint: when the active card is a checkpoint, fill in its

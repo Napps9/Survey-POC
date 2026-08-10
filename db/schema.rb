@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_05_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_08_100000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -37,6 +37,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_140000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ask_messages", force: :cascade do |t|
+    t.integer "ask_thread_id", null: false
+    t.json "citations", default: [], null: false
+    t.datetime "created_at", null: false
+    t.string "role", null: false
+    t.text "text", default: "", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ask_thread_id", "created_at"], name: "index_ask_messages_on_ask_thread_id_and_created_at"
+    t.index ["ask_thread_id"], name: "index_ask_messages_on_ask_thread_id"
+    t.check_constraint "role IN ('user', 'assistant')", name: "chk_ask_messages_role"
+  end
+
+  create_table "ask_threads", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "organisation_id", null: false
+    t.json "scope", default: {}, null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["organisation_id", "updated_at"], name: "index_ask_threads_on_organisation_id_and_updated_at"
+    t.index ["organisation_id"], name: "index_ask_threads_on_organisation_id"
+    t.index ["user_id"], name: "index_ask_threads_on_user_id"
   end
 
   create_table "blazer_audits", force: :cascade do |t|
@@ -120,6 +144,58 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_140000) do
     t.datetime "updated_at", null: false
     t.index ["common_question_set_id", "position"], name: "index_common_questions_on_common_question_set_id_and_position"
     t.index ["common_question_set_id"], name: "index_common_questions_on_common_question_set_id"
+  end
+
+  create_table "corpus_entries", force: :cascade do |t|
+    t.json "check_results", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "indexed_at"
+    t.datetime "opted_in_at"
+    t.integer "opted_in_by_id"
+    t.integer "organisation_id", null: false
+    t.integer "response_count", default: 0, null: false
+    t.text "review_note"
+    t.string "review_status", default: "pending", null: false
+    t.datetime "reviewed_at"
+    t.string "reviewed_by_email"
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "withdrawn_at"
+    t.index ["opted_in_by_id"], name: "index_corpus_entries_on_opted_in_by_id"
+    t.index ["organisation_id"], name: "index_corpus_entries_on_organisation_id"
+    t.index ["review_status", "opted_in_at"], name: "index_corpus_entries_on_review_status_and_opted_in_at"
+    t.index ["review_status"], name: "index_corpus_entries_on_review_status"
+    t.index ["survey_id"], name: "index_corpus_entries_on_survey_id", unique: true
+    t.check_constraint "review_status IN ('pending', 'approved', 'declined')", name: "chk_corpus_entries_review_status"
+  end
+
+  create_table "corpus_questions", force: :cascade do |t|
+    t.string "card_type", null: false
+    t.string "cid"
+    t.integer "corpus_entry_id", null: false
+    t.datetime "created_at", null: false
+    t.json "distribution", default: {}, null: false
+    t.json "options", default: [], null: false
+    t.integer "position"
+    t.text "question_text", null: false
+    t.integer "response_count", default: 0, null: false
+    t.json "segments", default: {}, null: false
+    t.string "theme"
+    t.datetime "updated_at", null: false
+    t.index ["card_type"], name: "index_corpus_questions_on_card_type"
+    t.index ["corpus_entry_id", "position"], name: "index_corpus_questions_on_corpus_entry_id_and_position"
+    t.index ["corpus_entry_id"], name: "index_corpus_questions_on_corpus_entry_id"
+  end
+
+  create_table "corpus_quotes", force: :cascade do |t|
+    t.boolean "approved", default: true, null: false
+    t.text "body", null: false
+    t.integer "corpus_question_id", null: false
+    t.datetime "created_at", null: false
+    t.string "theme"
+    t.datetime "updated_at", null: false
+    t.index ["corpus_question_id", "approved"], name: "index_corpus_quotes_on_corpus_question_id_and_approved"
+    t.index ["corpus_question_id"], name: "index_corpus_quotes_on_corpus_question_id"
   end
 
   create_table "flow_generations", force: :cascade do |t|
@@ -309,6 +385,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_140000) do
   create_table "responses", force: :cascade do |t|
     t.boolean "answered", default: false, null: false
     t.json "answers", default: {}, null: false
+    t.string "collection_mode"
     t.datetime "completed_at"
     t.datetime "consent_agreed_at"
     t.datetime "consent_declined_at"
@@ -334,6 +411,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_140000) do
     t.datetime "updated_at", null: false
     t.index ["session_token"], name: "index_responses_on_session_token", unique: true
     t.index ["survey_id", "answered", "status"], name: "index_responses_on_survey_answered_status"
+    t.index ["survey_id", "collection_mode"], name: "index_responses_on_survey_and_collection_mode"
     t.index ["survey_id", "demographic_birth_year"], name: "index_responses_on_survey_id_and_demographic_birth_year"
     t.index ["survey_id", "demographic_gender"], name: "index_responses_on_survey_id_and_demographic_gender"
     t.index ["survey_id", "demographic_heritage"], name: "index_responses_on_survey_id_and_demographic_heritage"
@@ -620,8 +698,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_140000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ask_messages", "ask_threads"
+  add_foreign_key "ask_threads", "organisations"
+  add_foreign_key "ask_threads", "users"
   add_foreign_key "common_question_sets", "organisations"
   add_foreign_key "common_questions", "common_question_sets"
+  add_foreign_key "corpus_entries", "organisations"
+  add_foreign_key "corpus_entries", "surveys"
+  add_foreign_key "corpus_entries", "users", column: "opted_in_by_id"
+  add_foreign_key "corpus_questions", "corpus_entries"
+  add_foreign_key "corpus_quotes", "corpus_questions"
   add_foreign_key "flow_generations", "surveys"
   add_foreign_key "flow_generations", "users"
   add_foreign_key "funder_memberships", "funders"

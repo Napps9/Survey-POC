@@ -31,7 +31,94 @@ If you need to run a migration or one-off command without a full deploy, use
 Render's **Shell** tab, not a manual restart — a restart no longer re-runs
 `db:prepare` (moved to `preDeployCommand`).
 
-## 2. Backing up the Active Record encryption keys
+## 2. Running a data import against production
+
+The exports live in the image (`db/seeds/exports/`, ~18MB gzipped), so the
+Render **Shell** can run these commands directly. **Prefer not to.** That Shell
+runs inside the live web container, which is a 512MB starter instance whose
+whole configuration in `render.yaml` — the memory watchdog, `WEB_CONCURRENCY=0`,
+capped malloc arenas, hand-tuned GC — exists because it was OOM crash-looping.
+Replaying a 126,895-row export next to the serving process is the most likely
+way to take the site down.
+
+Run it from a workstation instead, pointed at the production database. Then only
+the `INSERT`s cross the network and the parsing happens somewhere with room.
+
+### The minimum environment
+
+A data-only rake task boots in `production` with **throwaway values for
+everything except the database**:
+
+```bash
+export RAILS_ENV=production
+export DATABASE_URL='…'                       # the real one, from the Render dashboard
+export SECRET_KEY_BASE=$(openssl rand -hex 32) # throwaway: nothing here signs a cookie
+export APP_HOST=example.invalid                # throwaway: satisfies MailConfigCheck
+export SMTP_ADDRESS=smtp.invalid
+export MAIL_FROM=noreply@example.invalid
+export ANTHROPIC_API_KEY='…'                   # only needed for verto:enrol_corpus
+```
+
+**Do not copy the `ACTIVE_RECORD_ENCRYPTION_*` keys.** An import neither reads
+nor writes an encrypted attribute, so it does not need them — and those three
+are the one secret in this app with no recovery path (see section 3). Copying
+them onto a laptop to run a task that never uses them is pure downside.
+
+### The order
+
+```bash
+bin/rails verto:preflight        # read-only; exits non-zero if anything should stop you
+```
+
+Preflight reports the schema version, what each deck's account already holds —
+flagging any response that was collected through the player rather than
+imported — the database size, and whether the Anthropic key actually answers.
+Fix whatever it flags before going on.
+
+Then, per dataset, **smallest first** so a mistake is cheap:
+
+```bash
+IMPORT_DECK=<deck> IMPORT_PASSWORD='…' bin/rails "verto:import_csv[db/seeds/exports/<file>.csv.gz]"
+IMPORT_DECK=<deck>                      bin/rails "verto:reconcile[db/seeds/exports/<file>.csv.gz]"
+IMPORT_DECK=<deck>                      bin/rails verto:enrol_corpus
+```
+
+| Order | `IMPORT_DECK` | Export | Rows |
+|---|---|---|---|
+| 1 | `unyo_sport` (plus `IMPORT_ORG_SLUG=unyo`) | `unyouth_sport_raw_data` | 1,376 |
+| 2 | `aaf_valparaiso` | `aaf_valparaiso_final_raw_data__raw_data_general` | 3,477 |
+| 3 | `wll_education_digital` | `wll_transforming_education_raw_data_digital` | 50,835 |
+| 4 | `wll_education_paper` — **`verto:append_csv`**, not import | `wll_transforming_education_raw_data_paper` | 3,483 |
+| 5 | `big_green_legacy` | `the_big_green_legacy_moe_raw_data` | 126,895 |
+
+Step 4 appends because both WLL halves are one Verto; importing it would rebuild
+the account and take the digital half with it.
+
+`verto:reconcile` must report **zero unaccounted answers**. It is the whole
+claim — every answer in the export is either stored or listed as a deliberate
+omission — and a production import that does not reconcile should be rolled
+back, not investigated in place.
+
+### What is safe about this
+
+Each import is a single transaction (`VertoCsvImporter#call` wraps
+destroy → create → insert), so a dropped connection or a killed terminal rolls
+back to the previous state. There is no partial-import case to clean up.
+
+Each import also **destroys and rebuilds its own account first** — that is what
+makes it repeatable. `IMPORT_DECK=<deck> bin/rails verto:destroy_import` removes
+one imported account outright. Both are scoped to the deck's own org slug and
+touch nothing else.
+
+### What it costs
+
+`verto:enrol_corpus` is the only step that spends money: it themes every
+open-text column in batches through Claude Haiku. Big Green's freeform alone is
+59,620 answers, capped at 40 calls by `ASK_VERTO_MAX_THEME_BATCHES`. Across all
+the datasets, expect 150–200 calls. Lower that variable for a cheaper first pass;
+re-running enrolment later fills the themes in.
+
+## 3. Backing up the Active Record encryption keys
 
 Render dashboard → the `survey-poc` service → **Environment** tab → reveal
 and copy each of:
@@ -56,7 +143,7 @@ already-encrypted data keeps decrypting during the transition. See the [Active
 Record Encryption guide](https://guides.rubyonrails.org/active_record_encryption.html#key-rotation)
 for the exact config shape.
 
-## 3. GitHub branch protection on `Main`
+## 4. GitHub branch protection on `Main`
 
 `CLAUDE.md` stands by pushing straight to `Main` with no PR. The textbook
 branch-protection setup ("require a pull request before merging," "require
@@ -81,7 +168,7 @@ that's a workflow change, not a settings change, and isn't decided here.
 Revisit if the direct-to-`Main` convention ever stops fitting how this repo
 is worked on.
 
-## 4. Sentry setup (one-time)
+## 5. Sentry setup (one-time)
 
 Do this **before** setting `SENTRY_DSN` anywhere — the region choice below
 can't be changed after the fact.

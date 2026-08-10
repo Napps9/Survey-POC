@@ -33,6 +33,10 @@ module ThrottlesAiSpend
     # newly added AI endpoint didn't get missed. Rails' `rate_limit` hides its
     # configuration inside a before_action lambda, which can't be introspected.
     class_attribute :ai_throttled_actions, default: [], instance_writer: false
+    # The same, for `cap_ai_spend`. Its before_action is an anonymous block, so
+    # without this there is no way to assert an endpoint took the daily cap —
+    # and the cap is the guard that bounds what actually reaches an invoice.
+    class_attribute :ai_capped_actions, default: [], instance_writer: false
   end
 
   class_methods do
@@ -54,7 +58,10 @@ module ThrottlesAiSpend
     end
 
     def cap_ai_spend(only:, respond:)
-      before_action(only: Array(only)) { enforce_daily_ai_cap!(respond) }
+      actions = Array(only)
+      self.ai_capped_actions = (ai_capped_actions + actions).uniq
+
+      before_action(only: actions) { enforce_daily_ai_cap!(respond) }
     end
   end
 

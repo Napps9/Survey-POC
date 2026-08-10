@@ -5,6 +5,9 @@ class Survey < ApplicationRecord
   has_many :partnership_vertos, dependent: :destroy
   has_many :report_renders, dependent: :destroy
   has_many :flow_generations, dependent: :destroy
+  # The Verto's Ask Verto consent record. Destroyed with it, so a deleted Verto
+  # cannot leave a corpus entry that still reads as citable.
+  has_one :corpus_entry, dependent: :destroy
 
   # Creator-uploaded card/background imagery. Previously these lived inline in
   # the `cards` JSON as base64 data-URLs, which meant every render of a Verto

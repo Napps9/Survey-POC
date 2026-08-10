@@ -1,0 +1,61 @@
+,,,,,,,,,,Group 1 ,,Group 2,,Group 3,,Group 4,,Group 5,
+Q#,Theme,Question,Question_ESP,Question Type,Suggested Answers,Suggested Answers_ESP,Methodology Layer,CMI Alignment,Tags/Notes,RAG SYSTEM,Comments,RAG SYSTEM,Comments,RAG SYSTEM,Comments,RAG SYSTEM,Comments,RAG SYSTEM,Comments
+,,How worried are you about climate change?,¿Qué tan preocupado/a está usted por el cambio climático?,,"Not at all worried
+Not very worried
+Somewhat worried
+Very worried","Nada preocupado
+No muy preocupado
+Algo preocupado
+Muy preocupado",Awareness,Empathy – Conflict Openness,Climate concern – Gauges emotional connection to the climate crisis and how present or urgent it feels in daily life,,,,,,,,,,
+40,Climate Action & Sustainability,What environmental changes do you notice where you live?,¿Qué cambios ambientales observas en el lugar donde vives?,,"Heat, Flooding, Pollution, Deforestation","Calor, inundaciones, contaminación, deforestación",Awareness,,Environmental observation – Awareness of real-world symptoms,,,,,,,,,,
+41,Climate Action & Sustainability,How connected do you feel to nature in your everyday life?,¿Qué tan conectado/a te sientes con la naturaleza en tu vida cotidiana?,,"Very connected 
+Connected 
+Somewhate connected 
+A little connected 
+Not connected ","Muy conectado
+Conectado
+Algo conectado
+Poco conectado
+Sin conexión",Awareness,,Nature connectedness – Reveals how emotionally and physically connected young people feel to nature,,,,,,,,,,
+42,Climate Action & Sustainability,Spending time in nature helps me...,Pasar tiempo en la naturaleza me ayuda...,,"feel more confident in myself
+connect with people who are different to me
+feel like I belong
+care more about the planet
+understand how nature connects to my life
+stay calm when things get hard
+believe I can make a difference
+feel hopeful for the future of the planet","Sentirme más segura de mí misma
+Conectar con personas diferentes a mí
+Sentir que pertenezco a un grupo
+Preocuparme más por el planeta
+Comprender cómo la naturaleza se conecta con mi vida
+Mantener la calma cuando las cosas se ponen difíciles
+Creer que puedo marcar la diferencia
+Tener esperanza en el futuro del planeta",Awareness,,Comfort in wild spaces – Confidence in nature,,,,,,,,,,
+43,Climate Action & Sustainability,How often do you spend time outdoors or in green spaces?,¿Con qué frecuencia pasas tiempo al aire libre o en espacios verdes?,,Never → Daily,Nunca → Diario,Intent,,Outdoor time – Insight into barriers to natural access,,,,,,,,,,
+44,Climate Action & Sustainability,What are some things you currently do to help the environment?,¿Qué cosas haces actualmente para ayudar al medio ambiente?,,"I recycle or reuse things
+I walk or cycle instead of driving
+I save water or energy at home
+I avoid plastic when I can
+I speak up or post about climate issues
+I help others learn or take action
+I try to spend money on eco-friendly brands or products
+I vote (or would vote) based on climate and sustainability
+I don’t do anything yet — but I want to
+I don’t do anything and I’m not sure why
+Other (please specify)","Reciclo o reutilizo cosas
+Camino o uso la bicicleta en lugar del coche
+Ahorro agua o energía en casa
+Evito el plástico siempre que puedo
+Hablo o publico sobre temas climáticos
+Ayudo a otros a aprender o a tomar medidas
+Intento gastar dinero en marcas o productos ecológicos
+Voto (o votaría) en función del clima y la sostenibilidad
+Aún no hago nada, pero quiero hacerlo
+No hago nada y no sé por qué
+Otro (especifique)",Agency,,"Eco-action habits – Surfaces everyday behaviours that reflect environmental agency and intent to act, even at small scales.",,,,,,,,,,
+45,Climate Action & Sustainability,What stops young people from doing more for the planet?,¿Qué impide a los jóvenes hacer más por el planeta?,,"Cost, Time, Lack of info, No support","Costo, tiempo, falta de información, falta de soporte",Awareness,,Barriers to action – Systemic inhibitors for action,,,,,,,,,,
+46,Climate Action & Sustainability,Who or what inspires you to care about the planet?,¿Quién o qué te inspira a preocuparte por el planeta?,,"Friends, Elders, Nature, Media, Nobody","Amigos, Ancianos, Naturaleza, Medios de comunicación, Nadie",Awareness - Intent (hybrid),,Inspiration drivers – Who/what activates green action,,,,,,,,,,
+47,Climate Action & Sustainability,How much do you think climate change will impact you personally?,¿Cuánto crees que te afectará personalmente el cambio climático?,,"Not at all, Only a little, A moderate amount, A great deal, Don’t know","En absoluto, Un poco, Una cantidad moderada, Mucho, No lo sé",Awareness,,Gauges personal perception of climate vulnerability and relevance. Helps surface whether climate is seen as a distant issue or a lived concern.,,,,,,,,,,
+48,Climate Action & Sustainability,Do you think young people should be included in Chile’s climate decisions?,¿Crees que los jóvenes deberían participar en las decisiones climáticas de Chile?,,Yes / No / Not sure,Sí / No / No estoy seguro,Agency,,Policy inclusion perception – Youth opinion on role in governance,,,,,,,,,,
+49,Climate Action & Sustainability,"If you could change one thing about your school, community or workplace to make it greener, what would it be?","Si pudieras cambiar una sola cosa de tu escuela, comunidad o lugar de trabajo para hacerlo más ecológico, ¿qué sería?",,Free text,Texto libre,Intent,,Green solution ideation – Direct input for action planning,,,,,,,,,,

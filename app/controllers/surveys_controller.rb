@@ -98,6 +98,11 @@ class SurveysController < ApplicationController
     @response_counts            = Response.where(survey_id: ids).group(:survey_id).count
     @responder_counts           = Response.where(survey_id: ids, answered: true).group(:survey_id).count
     @responder_completed_counts = Response.where(survey_id: ids, answered: true, status: "completed").group(:survey_id).count
+    # Ask Verto state per tile, as ONE query rather than a CorpusEntry lookup per
+    # card. Only Vertos that have actually been offered are in here; everything
+    # else has no entry and therefore no badge.
+    @ask_states = CorpusEntry.where(survey_id: ids)
+                             .to_h { |entry| [ entry.survey_id, entry.creator_state ] }
     render :index, layout: "fullscreen"
   end
 
@@ -111,6 +116,9 @@ class SurveysController < ApplicationController
     # The editor hides the global top nav — it gets a "Leave editor" CTA in
     # its brief strip instead (the command palette stays reachable via ⌘K).
     @hide_main_nav = true
+    # Unsaved unless this Verto has actually been offered — rendering the panel
+    # must not enrol a Verto in the corpus by looking at it.
+    @corpus_entry = CorpusEntry.for(@survey)
     render :show
   end
 

@@ -1,0 +1,366 @@
+Column 1,Theme,Question,Spanish_questions_translation,Suggested Answers,Spanish_answer types_translation,eng_Info box,esp_Info box,Answer type ,Methodology Layer,Tags/Notes_es,Tag/notes_en,Used in other PV games
+,,"Welcome to Play Verto
+This is your space to say what you see, feel, and hope for in Valpo.
+Your voice will help shape real decisions, projects, and opportunities in your community.
+This experience is supported by a network of over 30 organisations working together to amplify youth voice across Valparaíso.
+It only takes 3 minutes. It’s anonymous. And it matters.
+Tap to begin. Let’s reimagine Valpo together.","Bienvenido a Play Verto
+
+Este es tu espacio para decir lo que ves, sientes y esperas de la Región de Valpo.
+
+Tu voz ayudará a dar forma a decisiones, proyectos y oportunidades reales en tu comunidad.
+Esta experiencia cuenta con el apoyo de una red de más de 30 organizaciones que trabajan juntas para amplificar la voz de los jóvenes en todo Valparaíso.
+
+Solo te llevará 3 minutos. Es anónimo. Y es importante.
+Toca para comenzar. Reimaginemos la región de Valpo juntos.",,,,,,,"Es importante mencionar que estamos trabajando para los jovenes de la Región de Valparaiso, porque sino se entiende que solo estamos trabajando con los jovenes de la comuna de la Valparaiso","It is important to mention that we are working for the young people of the Valparaiso Region, because otherwise it is understood that we are only working with the young people of the Valparaiso commune.",
+,,How are you feeling today?,,,,,,,,,#VALUE!,
+,Mental Health & Wellbeing,When you feel sad or stressed — who or what do you usually turn to?,"Cuando te sientes triste o estresado, ¿qué haces normalmente?","Doing something creative
+Being in nature or outdoors
+Sport or physical activity
+Spending time alone
+Talking to someone I trust
+Using social media or online content
+Relaxing with alcohol or drugs / Consume alcohol or drugs
+I don’t know
+I don’t have anyone to turn to
+Other (please type)
+
+Shortened Version:
+Create something
+Go out in nature
+Do sports
+Be alone
+Talk to someone I trust
+Social media / watch stuff online
+Alcohol or drugs
+Don’t know
+No one/nothing to turn to
+Other","Hacer algo creativo
+Estar en la naturaleza o al aire libre
+Deporte o actividad física
+Pasar tiempo a solas
+Hablar con alguien de confianza
+Usar redes sociales o ver contenido en línea
+Relajarme con alcohol o drogas / Consumir alcohol o drogas
+No sé
+No tengo a nadie a quien recurrir
+Otro (escriba)
+
+Versión Corta: 
+Crear algo
+Salir a la naturaleza
+Hacer deporte
+Estar solo/a
+Hablar con alguien de confianza
+Redes sociales / ver cosas online
+Alcohol o drogas
+No sé
+No tengo a quién o que recurrir
+Otro",,,Select top 3 ,Awareness,Support pathways – Reveals where youth turn in moments of stress /las alternativas estan bien solo modifique como esta redactada la pregunta,"Support pathways – Reveals where youth turn in moments of stress /The alternatives are fine, just modify how the question is worded",
+,Digital Inclusion & Innovation,"How do you feel about AI being part of your life - in education, work, or beyond? Alternative wording: How do you feel about AI being part of your life (school, work, etc.)?","¿Qué opinas acerca de que la IA sea parte de tu vida, en la educación, el trabajo y todo lo demás? Alternative version: ¿Qué piensas de que la IA esté en tu vida (estudios, pega, etc.)?","Very excited
+Mostly positive
+Mixed or unsure
+Mostly worried
+Very worried
+
+Shortened Version:
+Super excited
+Feels good / positive
+Not sure / mixed feelings
+A bit worried
+Really worried
+
+Explanation of what AI is: Artificial intelligence is a technology that allows machines to learn from data and perform tasks that normally require human intelligence, such as recognising images, answering questions, or making decisions","Muy emocionado
+Sobretod Emocionado/a
+Mixto o inseguro/a
+Sobretodo preocupado/a
+Muy preocupado/a
+
+Versión corta:
+Súper emocionado/a
+Con ganas / positivo
+No sé bien / tengo dudas
+Me preocupa un poco
+Me preocupa mucho
+
+Explicación de que es la IA: La inteligencia artificial es una tecnología que permite a las máquinas aprender de datos y realizar tareas que normalmente requieren inteligencia humana, como reconocer imágenes, responder preguntas o tomar decisiones.",,,Range,Intent,AI perceptions – Gauges hope/fear balance for future tech. This is anticipatory attitude — useful as Intent if treated as emotional orientation toward future tools,AI perceptions – Gauges hope/fear balance for future tech. This is anticipatory attitude — useful as Intent if treated as emotional orientation toward future tools,
+,Civic Engagement & Youth Leadership,"Which of these ways of taking action feel right for you? Other ways to word this: How would you like to get involved? OR Which of these ways of participating feels most like you?
+Volunteer for a cause or event
+Start a project or campaign
+Share ideas to fix what’s not working
+Join a protest, march, or online campaign
+Help someone in your community
+Support a group or movement (e.g. repost, donate, attend)
+Vote in elections 
+
+Shortened Version:
+Volunteer
+Start a project or campaign 
+Share ideas to improve what’s not working
+Join a protest/march/online action
+Help someone nearby
+Support a group/movement
+Vote","¿Cuál de estas maneras de actuar te parece la más adecuada? Otras maneras de expresarlo: ¿De qué forma te gustaría involucrarte? OR ¿Cuál de estas formas de participar va más contigo?
+Ofrecerte como voluntario/a para una causa o evento
+Iniciar un proyecto o campaña
+Compartir ideas para solucionar lo que no esta funcionando
+Unirte a una protesta, marcha o campaña en línea
+Ayudar a alguien de tu comunidad
+Apoyar a un grupo o movimiento (por ejemplo, republicando, donando, asistiendo)
+Votar en las elecciones
+
+Versión corta:
+Ser voluntario/a
+Iniciar un proyecto o campaña 
+Compartir ideas para mejorar lo que anda mal
+Unirme a una protesta/marcha/acción online
+Ayudar a alguien cerca
+Apoyar un grupo/movimiento
+Votar","for each choice a player selects:
+Already do  
+Ready to try 
+Maybe 
+I don’t know 
+Not for me 
+
+","Para cada opción que un jugador selecciona:
+Ya lo hago
+Listo para intentarlo / Quiero probar
+Quizás
+No lo sé
+No es para mí
+
+",,,Matrix,Intent - Agency (hybrid),"Civic action history – Baseline of prior engagement and methods thye believe are effective/ Yo dejaría la pregunta: ¿que tipo actividad te gustaría realizar en el barrio donde vives?  Estan bien las alternativas, pero agregaría algo donde ellos pudieran decir alguna actividad o acción que les gustaría realizar pero que no esta dentro de las alternativas.","Civic action history – Baseline of prior engagement and methods they believe are effective/ I would leave the question: What kind of activity would you like to do in the neighborhood where you live? The alternatives are good, but I would add something where they could say an activity or action that they would like to do but that is not among the alternatives.",
+,Economic Opportunity & Green Entrepreneurship,"Apart from financial security, what matters most to you in the kind of work you’d like to do? New Spanish version: Apart from making money, what matters most to you in a job?","Aparte de la seguridad financiera, ¿qué es lo que más te importa en el tipo de trabajo que te gustaría realizar? / Aparte de ganar plata,  ¿qué es lo que más te importa en el tipo de trabajo que te gustaría realizar? ","Helping others
+Protecting nature
+Solving problems
+Creating new things
+Teaching/ mentoring
+Building community
+Being creative
+techn innovation
+Defending justice
+I'll continue thinking
+
+Shortened version: 
+Helping others
+Protecting nature
+Solving problems
+Teaching / guiding
+Building community
+Being creative
+Innovating with tech
+Defending justice
+Still figuring it out","Ayudar a los demás
+Proteger la naturaleza
+Resolver problemas
+Crear cosas nuevas
+Enseñar o ser mentor/a
+Construir comunidades
+Expresarme creativamente
+Innovar con la tecnología
+Defender la justicia
+Todavía lo estoy descubriendo
+
+Versión corta:
+Ayudar a otros
+Cuidar la naturaleza
+Resolver problemas
+Enseñar o ser mentor/a
+Crear comunidad
+Ser creativo/a
+Innovar con tecnología
+Defender la justicia
+Todavía lo estoy pensando",,,Select one,Intent,"Purpose in work – Reveals values-career alignment/No se entiende el foco de la pregunta en relación a las alternativas planteadas, ¿Cúal es el objetivo de la pregunta? ¿Conocer las caracteristicas que los jovenes piensan que es un trabajo ideal? o ¿ que tematicas son mas interesantes en lo que ellos quisieran trabajar. Sabiendo eso puedo arreglar la pregunta o las alternativas","Purpose in work – Reveals values-career alignment/The focus of the question in relation to the proposed alternatives is unclear. What is the objective of the question? Is it to understand the characteristics that young people consider an ideal job? Or what topics are most interesting for them to work on? Knowing this, I can refine the question or the alternatives.",
+,Economic Opportunity & Green Entrepreneurship,"On a scale of 1 - 10, How confident are you that you’ll find (or create) work that feels right for you?","En una escala del 1 al 10, ¿qué tan seguro/a está de que encontrará (o creará) un trabajo que sea adecuado para usted? / En una escala del 1 al 10, ¿qué tan seguro/a estás de que vas a encontrar (o crear) un trabajo que sea para ti?","(1 = Not confident at all, 10 = Extremely confident)","(1 = Nada seguro, 10 = Extremadamente Muy seguro)",,,NPS,Agency,"Confidence in alignment – Measures alignment hope vs. reality/También me genera duda esta pregunta por dos cosas la primera tiene que ver con la alta tasa de desempleo Juvenil, entonces el ya mencionar la frase que tan seguro estas de encontrar trabajo suena mas a una amenaza que una pregunta. y lo segundo el decir la frase "" encontrar un trabajo que sea para ti"" entiendo a lo que van pero creo que conceptualmente no es correcta pensando en la temática trabajo.","Confidence in alignment – ​​Measures alignment hope vs. reality/This question also raises doubts for me for two reasons. The first is related to the high rate of youth unemployment, so mentioning the phrase ""how sure are you about finding a job?"" sounds more like a threat than a question. Secondly, saying ""find a job that's right for you"" is understandable, but I think it's conceptually incorrect when considering the topic of work.",
+,Economic Opportunity & Green Entrepreneurship,"Do you think jobs that help the planet are realistic where you live?
+(For example: clean energy, conservation, recycling, eco-friendly tech) / Alternative wording: Do you think there are jobs that help the planet where you live? / Are there job opportunities around you that help the planet?
+
+How interested are you in training or a career helping climate change and the environment?*","¿Crees que los trabajos que ayudan al planeta son realistas en tu zona? (Por ejemplo: energía limpia, conservación, reciclaje, tecnología ecológica) / Wording alternativo: ¿Crees que existen trabajos que ayuden al planeta donde vives? / ¿Piensas que en tu zona hay trabajos que cuiden el medio ambiente?","Yes — I see jobs like that around me
+Maybe — but they’re hard to find or get
+Not yet — but I think we should have them
+No — I don’t think that’s possible here
+Not sure
+
+Shortened Version:
+Yes, I see them around me
+Maybe, but they’re hard to find
+Not yet, but we should have them
+No, don’t think it’s possible here
+Not sure
+
+ 1. Not at all
+ 2. A little Interested
+ 3. I don't know
+ 4. Somewhat Interested
+ 5. Very Interested","Sí, veo trabajos así a mi alrededor.
+Tal vez, pero son difíciles de encontrar o conseguir.
+Todavía no, pero creo que deberíamos tenerlos.
+No, no creo que sea posible aquí.
+No estoy seguro.
+
+Versión corta:
+Sí, los veo cerca mío
+Tal vez, pero son pocos/difíciles de encontrar
+Todavía no, pero deberíamos tener
+No lo veo posible acá
+No sé","Planet (in this question) refers to work that supports environmental sustainability and protects natural resources. This includes jobs in areas such as clean energy, conservation, recycling, and eco-friendly technology—roles that contribute to reducing harm to the environment and promoting a healthier planet for future generations.","Planeta (en esta pregunta) se refiere al trabajo que promueve la sostenibilidad ambiental y protege los recursos naturales. Esto incluye empleos en áreas como energía limpia, conservación, reciclaje y tecnología ecológica; roles que contribuyen a reducir el daño ambiental y a promover un planeta más saludable para las generaciones futuras.",Rating,Awareness - Intent (hybrid),"Green job viability – Perceived opportunity environment/ Con respecto a esta pregunta en vez de trabajo pondría iniciativas o acciones, yo dejaría la pregunta asi : ¿ Existen iniciativas o acciones en tu barrio o en tu comuna que cuiden el medioambiente?","Green job viability – Perceived opportunity environment/ Regarding this question, instead of ""job"" I would put ""initiatives or actions."" I would leave the question like this: Are there initiatives or actions in your neighborhood or community that take care of the environment?",
+,Climate Action & Sustainability,"What do you currently do (or try to do) to help the environment?
+(Yes, Sometimes, no)
+","¿Qué hace actualmente (o intenta hacer) para ayudar al medio ambiente? / ¿Qué haces (o intentas hacer) para cuidar el medioambiente?
+(Sí, A veces, No)
+","Recycle or reuse
+Walk, bike, or use public transport
+Save water or energy at home
+Cut down on plastic
+Speak up or post about climate issues
+Encourage others to take action
+Choose eco-friendly products or brands
+Vote with climate in mind","Reciclo o reutilizo
+Camino, uso la bicicleta o el transporte público / Camino, ando en bici o tomo metro
+Ahorro agua o energía en casa / Ahorro agua o luz en la casa
+Reduzco mi uso del plástico / Uso menos plástico
+Hablo o publico sobre los problemas climáticos / Hablo o posteo sobre el clima
+Animo a otros a actuar / Animo a otros a sumarse
+Elijo productos o marcas ecológicos / Compro más ecológico
+Voto pensando en el clima",,,Tap (yes/no),Agency,"Eco-action habits – Surfaces everyday behaviours that reflect environmental agency and intent to act, even at small scales.","Eco-action habits – Surfaces everyday behaviors that reflect environmental agency and intent to act, even at small scales.",
+,Climate Action & Sustainability,"In your opinion, what is the main reason people aren’t doing more for the planet? / Alternative version: Why do you think people don’t do more for the planet?","En su opinión, ¿cuál es la principal razón por la que la gente no hace más por el planeta? / ¿Por qué crees que la gente no hace más por el planeta?","Money
+Time
+Lack of info
+No support
+Doubt it helps
+Low motivation
+I don't know
+Other (please type)","Dinero / Plata
+Tiempo
+Falta de información / Falta de info
+No hay apoyos / No hay apoyo
+Dudar que ayude / No creen que sirva
+Baja motivación / Poca motivacion (From feedback: Poco interés)
+No lo sé / No se
+Otro (escriba, por favor)",,,Select one (GRID),Awareness,Barriers to action – Systemic inhibitors for action,Barriers to action – Systemic inhibitors for action,
+,Mental Health / Climate Action & Sustainability,"How worried are you about climate change? 
+[include definition of climate change]",¿Qué tan preocupado está usted por el cambio climático? [Incluya la definición de cambio climático] / ¿Qué tan preocupado/a estás por el cambio climático?,"Not at all worried
+Not very worried
+Somewhat worried
+Very worried","Nada preocupado
+No muy preocupado
+Algo preocupado
+Muy preocupado","Climate change is the long-term change in the average weather patterns of Earth’s local, regional, and global climates.","El cambio climático es la alteración a largo plazo de los patrones meteorológicos promedio de los climas locales, regionales y globales de la Tierra.",Range,Awareness,Climate concern – Gauges emotional connection to the climate crisis and how present or urgent it feels in daily life,Climate concern – Gauges emotional connection to the climate crisis and how present or urgent it feels in daily life,
+,Reflection,What do you dream about for the future — for yourself or your community?,"¿Qué sueñas para el futuro, para ti o para tu comunidad?",Free text,Texto libre,,,Open text,Intent,"Aspirational dreams – Raw, personal insight for storytelling","Aspirational dreams – Raw, personal insight for storytelling",
+,,"Thinking about your family’s total income, would you say that…","Pensando en el ingreso total de su familia, ¿dirías que…","It is enough, and you can save without difficulties
+It is enough, and you can save with some difficulties
+It is enough, but you cannot save
+It is not enough, you struggle to make it to the end of the month
+It is not enough, you need to go into debt to make it to the end of the month
+Don’t know / No answer
+
+Shortened version:
+Enough, can save easily
+Enough, can save with difficulty
+Enough, but can’t save
+Not enough, hard to make it to month-end
+Not enough, need debt to get to month-end
+Don’t know / No answer","Es suficiente y puede ahorrar sin dificultad.
+Es suficiente y puede ahorrar con algunas dificultades.
+Es suficiente, pero no puede ahorrar.
+No es suficiente; le cuesta llegar a fin de mes.
+No es suficiente; necesita endeudarse para llegar a fin de mes.
+No sé/No contesto.
+
+Versión corta:
+Suficiente, ahorro fácil
+Suficiente, ahorro con dificultad
+Suficiente, pero no ahorro
+No suficiente, cuesta llegar a fin de mes
+No suficiente, me endeudo
+No sé / No respondo",,,,,Esta pregunta no lo haría pensando en un prototipo. si se quiere hacer una segmentación socioeconomica es mejor utilizar estadisticas de libre acceso que te ayudan a crear un panorama general de la zona o de la comuna.,"I wouldn't ask this question if I were thinking about a prototype. If you want to do socioeconomic segmentation, it's better to use freely available statistics that help you create a general overview of the area or municipality.",
+,Demographics,How old are you?,¿Cuántos años tienes?,"Under 16
+16–18
+19–21
+22–24
+25–29
+Over 29","Menor de 16
+16–18
+19–21
+22–24
+25–29
+Mayor de 29",,,Demographic Age,,,#VALUE!,
+,Demographics,"What is your gender?
+",¿Cuál es tu género?,"Female
+Male
+Prefer not to say
+Other","Mujer
+Hombre
+Prefiero no decirlo
+Otro",,,Demographic Range,,,#VALUE!,
+,Demographics,"Where do you live
+(Select your commune within the Valparaíso region)","¿Dónde vives?
+(Selecciona tu comuna dentro de la Región de Valparaíso)","Valparaíso (provincial and regional capital)
+Viña del Mar
+Concón
+Quilpué
+Villa Alemana
+Quilpué (provincial capital)
+Villa Alemana
+Limache
+Olmué
+Quillota (provincial capital)
+La Cruz
+La Calera
+Nogales
+Hijuelas
+San Antonio (provincial capital)
+Santo Domingo
+Algarrobo
+Cartagena
+El Quisco
+El Tabo
+San Felipe (provincial capital)
+Catemu
+Llaillay
+Panquehue
+Putaendo
+Santa María
+Los Andes (provincial capital)
+San Esteban
+Calle Larga
+Rinconada
+La Ligua (provincial capital)
+Cabildo
+Petorca
+Zapallar","Valparaíso (capital provincial y regional)
+viña del mar
+Concón
+Quilpué
+Villa Alemana
+Quilpué (capital provincial)
+Villa Alemana
+limache
+Olmué
+Quillota (capital provincial)
+lacruz
+La Calera
+Nogales
+Hijuelas
+San Antonio (capital provincial)
+santo domingo
+Algarrobó
+cartagena
+El Quisco
+El Tabo
+San Felipe (capital provincial)
+Catemu
+Llaillay
+Panquehue
+Putaendo
+Santa María
+Los Andes (capital provincial)
+san esteban
+Calle Larga
+Rinconada
+La Ligua (capital provincial)
+Cabildo
+petorca
+Zapallar",,,Demographic Drop-down,,,#VALUE!,
+,,End / thank you ,Fin / gracias,,,,,,,,#VALUE!,

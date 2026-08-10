@@ -1,0 +1,78 @@
+slide_type,category,question_name,description,choices
+Static,Image,Welcome / intro,,
+Question,pickMany,When you feel sad or stressed — who or what do you usually turn to?,,"Doing something creative|
+Being in nature or outdoors|
+Sport or physical activity|
+Spending time alone|
+Talking to someone I trust|
+Using social media or online content|
+Relaxing with alcohol or drugs|
+I don’t know|
+I don’t have anyone to turn to|
+Other (please type)|"
+Question,range,"How do you feel about AI being part of your life - in education, work, or beyond?",,"Very excited|
+Mostly positive|
+Mixed or unsure|
+Mostly worried|
+Very worried|"
+Question,matrix,Which of these ways of taking action feel right for you?,,"Volunteer your time for a cause or local event|
+Start a project, club, or campaign about something you care about|
+Speak up or give ideas to improve something that’s not working|
+Join a protest, march, or online campaign|
+Help out someone in your community (e.g. a neighbour, peer, stranger)|
+Support a group or movement (e.g. repost, donate, show up)|"
+Question,pickOne,"Apart from financial security, what matters most to you in the kind of work you’d like to do?",,"Helping others|
+Protecting nature|
+Solving problems|
+Creating new things|
+Teaching or mentoring|
+Building communities|
+Expressing myself creatively|
+Innovating with technology|
+Standing up for justice|
+I’m still figuring it out|"
+Question,netPromoter,"On a scale of 1 - 10, How confident are you that you’ll find (or create) work that feels right for you?",,"(1 = Not confident at all, 10 = Extremely confident)|"
+Question,rating,"Do you think jobs that help the planet are realistic where you live?
+(For example: clean energy, conservation, recycling, eco-friendly tech)",,"Yes — I see jobs like that around me|
+Maybe — but they’re hard to find or get|
+Not yet — but I think we should have them|
+No — I don’t think that’s possible here|
+Not sure|"
+Question,pickMany,What do you currently do (or try to do) to help the environment?,,"I recycle or reuse things|
+I walk, bike or use public transport instead of a car|
+I save water or energy at home|
+I avoid plastic when I can|
+I speak up or post about climate issues|
+I help others learn or take action|
+I spend money on eco-friendly products or brands|
+I vote (or would vote) based on climate issues|
+I don’t do anything yet — but I want to|
+I don’t do anything and I’m not sure why|
+Other (please type)|"
+Question,pickOne,"In your opinion, what is the main reason people aren’t doing more for the planet?",,"Money|
+Time|
+Lack of info|
+No support|
+Doubt it helps|
+Low motivation|
+I don't know|
+Other (please type)|"
+Question,range,"How worried are you about climate change? 
+[include definition of climate change]",,"Not at all worried|
+Not very worried|
+Somewhat worried|
+Very worried|"
+Question,freeform,What do you dream about for the future — for yourself or your community?,,Free text|
+Question,age,How old are you?,,"Under 16|
+16–18|
+19–21|
+22–24|
+25–29|
+Over 29|"
+Question,gender,"What is your gender?
+",,"Female|
+Male|
+Prefer not to say|"
+Question,location,"Where do you live
+(Select your commune within the Valparaíso region)",,
+Static,Image,End / thank you ,,

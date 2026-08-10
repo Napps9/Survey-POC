@@ -45,10 +45,10 @@ class ManualQuestionImporter
                   select_many_grid, prioritise, tap_card, range, rating, nps, scenario. Use the
                   options the user wrote when present; otherwise generate sensible,
                   mutually-exclusive options that satisfy the bounds:
-                  - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 30 chars
+                  - multiple_choice / select_many: ODD count — 3 or 5 options, each <= 40 chars
                   - select_one_grid / select_many_grid: EVEN count, 4 to 10 including any
                     "Other", each label <= 20 chars
-                  - prioritise: 4 or 5 options (4 ideal), each <= 30 chars
+                  - prioritise: 4 or 5 options (4 ideal), each <= 40 chars
                   - tap_card: 5 to 8 statements covering negative, neutral and positive
                     sentiments in that order, each <= 40 chars
                   - range: EXACTLY 5 points — never 3, never 4 — with a genuinely
