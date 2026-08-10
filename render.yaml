@@ -93,6 +93,12 @@ services:
         value: "33554432"
       - key: ANTHROPIC_API_KEY
         sync: false
+      # Staff allowlist for /blazer AND the Ask Verto review queue at
+      # /ask/review — deny-by-default, so while this is unset nobody can
+      # approve an offered Verto and the Ask Verto corpus can never grow
+      # through the app. Comma/space-separated sign-in emails.
+      - key: BLAZER_STAFF_EMAILS
+        sync: false
       # Error tracking. See config/initializers/sentry.rb and
       # docs/DEPLOYMENT_RUNBOOK.md for the one-time Sentry org setup (EU data
       # region is chosen there, not here). Blank = errors only reach the logs.
