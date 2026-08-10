@@ -864,11 +864,16 @@ class VertoCsvImporter
       get: ->(row, source) { born_value(row[source]) || unstorable(source, row[source]) } }
   end
 
-  def location_spec
-    { card: { "type" => "open_ended", "input" => "location", "text" => "What country do you live in?",
+  # A location column resolved through resolve_location — "City, Country",
+  # bare country names, and "[OTHER] …" write-ins all land as "CC|Label".
+  # Defaults are the UNYouth export's wording; a deck with its own location
+  # question passes its own.
+  def location_spec(text: "What country do you live in?",
+                    col: "What country do you live in? (location)")
+    { card: { "type" => "open_ended", "input" => "location", "text" => text,
               "description" => "Powered by OpenStreetMap — helps build a map you can explore after finishing.",
               "demographic" => true },
-      col: "What country do you live in? (location)", demo: :region,
+      col: col, demo: :region,
       get: ->(row, source) {
         loc = resolve_location(row[source])
         loc.nil? ? nil : { "type" => "open_ended", "value" => loc }
