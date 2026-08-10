@@ -68,6 +68,15 @@ class AskVertoChat
     id. Do not retype the respondent's words — the page prints them from the
     record. Never invent, translate or tidy a quote.
 
+    DATE THE DATA
+    Anchor results in time, in the answer itself: the first time you use a
+    Verto's results, say when they were collected — "research collected in
+    2023 found…", "in a survey fielded across 2021 and 2022…". The years come
+    from the "fielded" window in the tool result and nowhere else; if a result
+    carries no fielded window, say the collection date isn't recorded rather
+    than guessing one. When you compare Vertos collected in different years,
+    date each one — time may be the explanation.
+
     PRIORITISE QUESTIONS
     Some results come back as "mean_rank". These are average positions in an
     ordered list, NOT counts, and a LOWER number means a HIGHER priority. Say so
@@ -305,6 +314,15 @@ class AskVertoChat
     if citations.empty? && full.match?(FIGURE_PATTERN) && full.length > 120
       Rails.logger.warn("[AskVerto] answer stated figures with no valid citation")
       emit&.call(t: "warning", text: "This answer isn't backed by a source in the corpus — treat its figures with care.")
+    end
+
+    # Dating is instructional where citing is structural, so it can drift
+    # without anything failing. A cited answer that names none of the years its
+    # sources were fielded in still reaches the reader — the source rail shows
+    # the window regardless — but the log is what makes the drift visible.
+    fielded_years = citations.flat_map { |c| c["fielded"].to_s.scan(/\b\d{4}\b/) }.uniq
+    if fielded_years.any? && fielded_years.none? { |year| full.include?(year) }
+      Rails.logger.warn("[AskVerto] cited answer named no fielded year (sources span #{fielded_years.join(', ')})")
     end
 
     emit&.call(t: "done", citations: citations)

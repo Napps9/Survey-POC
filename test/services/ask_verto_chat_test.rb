@@ -200,6 +200,30 @@ class AskVertoChatTest < ActiveSupport::TestCase
     assert_nil events.find { |e| e[:t] == "warning" }
   end
 
+  # ── Dating the data ───────────────────────────────────────────────────────
+  # The prompt requires the answer itself to say when the research was
+  # collected. That rule is instructional, not structural, so the service logs
+  # when it is missed — these pin the guard on both sides.
+  test "a cited answer that names no fielded year is logged as drift" do
+    logged = []
+    stub_method(Rails.logger, :warn, ->(msg) { logged << msg }) do
+      run_chat([ fetch_step, "75% are very worried [[c:1]]." ])
+    end
+
+    assert logged.any? { |msg| msg.include?("named no fielded year") },
+      "an undated answer must be visible in the log, or the dating rule rots silently"
+  end
+
+  test "a cited answer that dates its research is not logged" do
+    year = Time.current.year.to_s
+    logged = []
+    stub_method(Rails.logger, :warn, ->(msg) { logged << msg }) do
+      run_chat([ fetch_step, "Research collected in #{year} found 75% very worried [[c:1]]." ])
+    end
+
+    assert_not logged.any? { |msg| msg.include?("named no fielded year") }
+  end
+
   # ── Loop behaviour ────────────────────────────────────────────────────────
   test "sources are announced as they are fetched, before the answer streams" do
     _result, events = run_chat([ fetch_step, "Worry is high [[c:1]]." ])
