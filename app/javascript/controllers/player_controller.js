@@ -145,8 +145,12 @@ export default class extends Controller {
 
     // Live answered-state for the Next button. Delegated on the deck rather
     // than wired per widget: every answer type ultimately lands as a pointer
-    // press, a click or a typed character, and _answerOf() already knows what
-    // each type counts as answered.
+    // press, a click, a typed character — or an OPERATING key. keydown is on
+    // the list because every widget's keyboard path (picker Enter/Space,
+    // slider and rating arrows) mutates the answer on keydown with
+    // preventDefault, so no click is ever synthesized and none of the other
+    // four events fire: a keyboard respondent used to answer correctly and
+    // watch the button stay dark until they navigated.
     //
     // CAPTURE phase, because several widgets stop the bubble — rating_controller
     // calls stopPropagation() on every pick, so a bubble-phase listener here
@@ -159,8 +163,21 @@ export default class extends Controller {
     // handler has selected anything, and the button stays dark until the next
     // unrelated event nudges it. A frame is the right unit — it lands after
     // the whole dispatch, and before the paint that has to show the glow.
-    for (const evt of [ "pointerdown", "click", "input", "change" ]) {
+    //
+    // OPERATE_KEYS is a filter, not a nicety. _markTouched runs on every event
+    // here, and marking is what lets a first-paint value count as an answer —
+    // the Range slider renders with its thumb mid-scale precisely so _touched
+    // can hold the glow until the respondent actually does something. A bare
+    // keydown would mark a card when a keyboard user merely Tabs ACROSS it,
+    // and the untouched slider would greet the next Tab already lit. So only
+    // the keys that operate a widget count; Tab, Escape and friends do not.
+    // (Every widget's key set today: Enter, Space, arrows; Home/End for the
+    // sliders.)
+    const OPERATE_KEYS = [ "Enter", " ", "ArrowUp", "ArrowDown", "ArrowLeft",
+                           "ArrowRight", "Home", "End" ]
+    for (const evt of [ "pointerdown", "click", "input", "change", "keydown" ]) {
       this.element.addEventListener(evt, (e) => {
+        if (e.type === "keydown" && !OPERATE_KEYS.includes(e.key)) return
         this._markTouched(e)
         this._queueAnsweredSync()
         // `input` as well as `click`: a freeform answer grows its textarea as

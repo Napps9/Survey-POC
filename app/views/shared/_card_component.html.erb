@@ -418,19 +418,25 @@
               <div class="book-page-kicker">
                 <%= editable ? t("js.editor.scenario.answer_kicker", default: "Answer options") : t("js.editor.scenario.choose_kicker", default: "Make your choice") %>
               </div>
+              <%# The same radiogroup/radio + keyboard layer as multiple_choice
+                  (P2-4): this list is a hand-copied MC block, and leaving the
+                  helpers off left it pointer-only and role-less — the one
+                  answer list a screen reader heard as a bare text list. %>
               <ul class="choice-list choice-list--single"
+                  <%= editable ? "".html_safe : tag.attributes(role: "radiogroup") %>
                   data-controller="<%= picker_controllers %>"
                   data-picker-mode-value="single">
                 <% items.each_with_index do |opt, i| %>
                   <% style = option_style_at(card, i) %>
                   <li class="choice-list-item pick-item"
                       data-picker-target="item"
-                      data-action="click->picker#pick"
+                      data-action="<%= pick_actions %>"
                       data-canonical="<%= canon[i] %>"
                       data-correct="<%= mark_correct.call(canon[i]) %>"
                       <%= option_style_data_attrs(style) if editable %>
-                      data-selected="false">
-                    <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], index: i) %></div>
+                      data-selected="false"
+                      <%= pick_a11y.call(false) %>>
+                    <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], index: i) %></div>
                     <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
                     <span class="choice-list-tick pick-dot">✓</span>
                     <% if quiz_mode %>

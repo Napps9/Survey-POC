@@ -45,10 +45,38 @@ export default class extends Controller {
     item.style.zIndex = "10"
     try { item.setPointerCapture(event.pointerId) } catch (_) { /* older browsers */ }
 
-    this._onMove = (e) => this._move(e)
-    this._onUp   = () => this._end()
-    window.addEventListener("pointermove", this._onMove)
-    window.addEventListener("pointerup",   this._onUp, { once: true })
+    this._onMove   = (e) => this._move(e)
+    this._onUp     = () => this._end()
+    // The browser fires pointercancel when it claims the gesture for itself
+    // (scroll, alert, tab switch). Without this handler the drag never ends:
+    // the row stays stuck mid-air in .is-dragging, and the still-armed
+    // pointerup commits a reorder on the next tap anywhere on the page.
+    this._onCancel = () => this._cancel()
+    window.addEventListener("pointermove",   this._onMove)
+    window.addEventListener("pointerup",     this._onUp)
+    window.addEventListener("pointercancel", this._onCancel)
+  }
+
+  // Both terminal paths (_end and _cancel) must drop ALL three window
+  // listeners — a partial removal is exactly the stuck-pointerup bug above.
+  _teardown() {
+    window.removeEventListener("pointermove",   this._onMove)
+    window.removeEventListener("pointerup",     this._onUp)
+    window.removeEventListener("pointercancel", this._onCancel)
+  }
+
+  // Abandon the drag: the DOM was never reordered (only transforms moved
+  // rows), so clearing styles restores the pre-drag order exactly. Nothing is
+  // committed — no touched mark, no changed dispatch.
+  _cancel() {
+    this._teardown()
+    const drag = this.dragEl
+    if (!drag) return
+    this.dragEl = null
+
+    this.items.forEach((el) => { el.style.transition = ""; el.style.transform = ""; el.style.zIndex = "" })
+    drag.classList.remove("is-dragging")
+    this._renumber()
   }
 
   _move(event) {
@@ -81,7 +109,7 @@ export default class extends Controller {
   }
 
   _end() {
-    window.removeEventListener("pointermove", this._onMove)
+    this._teardown()
     const drag = this.dragEl
     if (!drag) return
     this.dragEl = null // stop further moves

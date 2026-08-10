@@ -633,13 +633,17 @@
 /* Long option lists: .split-card is a fixed-height, overflow:hidden box, so
    a list/grid with more options than the card is tall used to be silently
    clipped past the card edge. Pin the question (.q-header) at the top and
-   let the option container scroll internally instead — scoped to list/grid
-   answer types only (:has(> .choice-list/.choice-grid/.prioritise-list)) so
-   other card types (slider, tap-card, freeform, …) keep their own layout. */
+   let the option container scroll internally instead — scoped to the answer
+   types that genuinely stack taller than the card (:has(> .choice-list /
+   .choice-grid / .prioritise-list / .contact-form-wrap)) so other card types
+   (slider, tap-card, freeform, …) keep their own layout. The contact form
+   earns its place on sideways phones: five stacked fields plus the privacy
+   note clip at both ends there without an internal scroll path. */
 .split-right > .q-header { flex: 0 0 auto; }
 .split-right > .mt-2:has(> .choice-list),
 .split-right > .mt-2:has(> .choice-grid),
-.split-right > .mt-2:has(> .prioritise-list) {
+.split-right > .mt-2:has(> .prioritise-list),
+.split-right > .mt-2:has(> .contact-form-wrap) {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -656,7 +660,8 @@
    unreachable, negative scroll position. */
 .split-right > .mt-2:has(> .choice-list) > .choice-list,
 .split-right > .mt-2:has(> .choice-grid) > .choice-grid,
-.split-right > .mt-2:has(> .prioritise-list) > .prioritise-list {
+.split-right > .mt-2:has(> .prioritise-list) > .prioritise-list,
+.split-right > .mt-2:has(> .contact-form-wrap) > .contact-form-wrap {
   margin-top: auto;
   margin-bottom: auto;
 }
@@ -1804,8 +1809,14 @@
 }
 
 /* ── Prioritise (drag-to-rank list) ───────────────── */
-.prioritise-list { touch-action: pan-y; }
-.prioritise-item { cursor: grab; user-select: none; -webkit-user-select: none; }
+/* touch-action: none, NOT pan-y: the drag is vertical, so pan-y told the
+   browser every touch-drag on a row was a scroll — it fired pointercancel and
+   drag-to-rank simply never worked on touch. The whole row is the drag handle
+   (the ⋮⋮ grip is decorative), so the trade is that a touch-scroll can't START
+   on a row. Acceptable while COUNT_RULES bounds the list at 4–5 rows, which
+   fits every supported viewport without scrolling; if long lists ever appear,
+   the escalation path is grip-only drag, not pan-y. */
+.prioritise-item { touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
 .prioritise-item .choice-list-label { cursor: grab; }
 /* The dragged row follows the finger via an inline transform, so only the
    lift chrome lives here (no transform — it would fight the inline one). */
@@ -5948,15 +5959,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
   /* ── The answer widget is the card's scroll container ──────────────────
      Mirrors the desktop rule (search ".split-right > .mt-2:has") and is
-     scoped to the same three list/grid shapes, so slider / rating /
-     freeform / tap-card / book layouts keep their own sizing. The desktop
-     rule already supplies overflow-y; what mobile adds is the flex-grow
-     that lets the container claim the panel's spare height, plus momentum
-     scrolling and scroll containment so a flick through the options doesn't
-     drag the page behind it. */
+     scoped to the same shapes, so slider / rating / freeform / tap-card /
+     book layouts keep their own sizing. The desktop rule already supplies
+     overflow-y; what mobile adds is the flex-grow that lets the container
+     claim the panel's spare height, plus momentum scrolling and scroll
+     containment so a flick through the options doesn't drag the page
+     behind it. */
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-list),
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-grid),
-  .preview-overlay .split-card .split-right > .mt-2:has(> .prioritise-list) {
+  .preview-overlay .split-card .split-right > .mt-2:has(> .prioritise-list),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .contact-form-wrap) {
     flex: 1 1 auto;
     min-height: 0;
     -webkit-overflow-scrolling: touch;

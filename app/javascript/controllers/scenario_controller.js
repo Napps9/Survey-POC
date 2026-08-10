@@ -166,6 +166,13 @@ export default class extends Controller {
       }
       page.style.transition = this.formsMode ? "none" : ""
       page.style.transform = transform
+      // The visual stack hides non-current pages with opacity/pointer-events
+      // only, which leaves every page in the accessibility tree and tab order
+      // at once — a screen reader hears the whole book on arrival. inert
+      // removes them from both; aria-hidden is the belt to its braces on
+      // engines older than inert (pre-iOS 15.5 / Chrome 102).
+      page.toggleAttribute("inert", pos !== 0)
+      page.setAttribute("aria-hidden", String(pos !== 0))
       this._checkOverflow(page)
     })
 

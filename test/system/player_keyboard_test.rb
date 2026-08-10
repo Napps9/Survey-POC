@@ -11,7 +11,12 @@ class PlayerKeyboardTest < ApplicationSystemTestCase
     { "type" => "welcome_card", "title" => "Welcome" },
     { "type" => "multiple_choice", "cid" => "c1", "text" => "Which colour?",
       "options" => %w[Red Blue Green] },
-    { "type" => "rating", "cid" => "c2", "text" => "Rate it", "options" => [ "Poor", "Great" ] }
+    { "type" => "rating", "cid" => "c2", "text" => "Rate it", "options" => [ "Poor", "Great" ] },
+    # The tab-across guard's card: a Range renders with its thumb mid-scale, so
+    # _read has a value for it from first paint and only the _touched mark
+    # holds the glow back. See "tabbing across a range card".
+    { "type" => "range", "cid" => "c3", "text" => "How confident?",
+      "options" => [ "Not at all", "A little", "Somewhat", "Fairly", "Very" ] }
   ].freeze
 
   def setup
@@ -110,6 +115,25 @@ class PlayerKeyboardTest < ApplicationSystemTestCase
                  "Tab must still walk the card's own controls, not the wrapper"
   end
 
+  def next_glowing?
+    page.evaluate_script(
+      "!!document.querySelector('.preview-btn-next')?.classList.contains('is-answered')"
+    )
+  end
+
+  # Walks the deck to the range card, answering the two cards before it by
+  # pointer — the keyboard behaviour under test lives on the range card, and
+  # how the earlier cards were answered is not part of it.
+  def open_range_card
+    open_player
+    click_button "Next"
+    find('.preview-card.active li[role="radio"]', match: :first).click
+    click_button "Next"
+    all('.preview-card.active .rating-star[role="radio"]')[2].click
+    click_button "Next"
+    assert_selector '.preview-card.active .slider-wrap[role="slider"]', wait: 5
+  end
+
   test "rating stars are keyboard operable and individually labelled" do
     open_player
     click_button "Next"
@@ -129,5 +153,46 @@ class PlayerKeyboardTest < ApplicationSystemTestCase
     press(:left)
     assert_equal "true",  stars[2]["aria-checked"]
     assert_equal "false", stars[3]["aria-checked"]
+  end
+
+  # The Next glow (`is-answered`) is the player's only "you can move on" cue.
+  # It used to be lit by pointerdown/click/input alone, so a keyboard answer —
+  # fully captured, aria-checked and all — left the button dark. These three
+  # pin the fix and its one deliberate exclusion.
+  test "answering with the keyboard lights the next glow" do
+    open_player
+    click_button "Next"
+    assert_not next_glowing?, "the glow must start dark on an unanswered card"
+
+    focus_via_dom('.preview-card.active li[role="radio"]')
+    press(:Enter)
+
+    assert_equal "true", find('.preview-card.active li[role="radio"]', match: :first)["aria-checked"]
+    assert next_glowing?, "a captured keyboard answer must light the glow like a click does"
+  end
+
+  test "operating the range slider by arrow key lights the next glow" do
+    open_range_card
+    assert_not next_glowing?,
+      "the thumb renders mid-scale, but an untouched range card is unanswered"
+
+    focus_via_dom('.preview-card.active .slider-wrap[role="slider"]')
+    press(:right)
+
+    assert next_glowing?, "an arrow press IS the answer on a slider"
+  end
+
+  test "tabbing across the range card does not light the next glow" do
+    # The reason the keydown hook is filtered to operating keys: the slider has
+    # a value from first paint, so an unfiltered listener would treat mere
+    # focus traversal as answering.
+    open_range_card
+
+    press(:Tab)   # deck focus (the card wrapper) -> the slider itself
+    press(:Tab)   # ...and out the other side
+    focused = evaluate_script("document.activeElement && document.activeElement.className")
+
+    assert_not next_glowing?,
+      "Tab passed through the slider (focus ended on #{focused.inspect}) — traversal is not an answer"
   end
 end

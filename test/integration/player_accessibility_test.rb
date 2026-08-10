@@ -187,6 +187,43 @@ class PlayerAccessibilityTest < ActionDispatch::IntegrationTest
     assert_includes html, "keydown->nps-slider#key"
   end
 
+  # ── Scenario's answer page (P2-4, the arm that was missed) ──────────────
+  # The scenario answer list is a hand-copied multiple_choice block that
+  # predates the a11y helpers, so it shipped pointer-only and role-less while
+  # every sibling type got the treatment. These are the MC section's
+  # assertions, pointed at the copy.
+
+  SCENARIO = { "type" => "scenario", "cid" => "c", "text" => "What would you do?",
+               "pages" => [ { "id" => "pg_1", "text" => "Your laptop dies." },
+                            { "id" => "pg_2", "text" => "A new one costs $600." } ],
+               "options" => [ "Use savings", "Use credit" ] }.freeze
+
+  test "scenario options are radios in a radiogroup, focusable and keyboard operable" do
+    html = render_card(SCENARIO, mode: :player)
+
+    assert_includes html, 'role="radiogroup"'
+    assert_equal 2, html.scan(/role="radio"/).size
+    assert_equal 2, html.scan(/tabindex="0"/).size
+    assert_equal 2, html.scan(/aria-checked="false"/).size
+    assert_includes html, "keydown->picker#pickOnKey"
+  end
+
+  test "scenario option tiles are hidden from assistive tech" do
+    html = render_card(SCENARIO, mode: :player)
+    assert_equal 2, html.scan(/class="choice-list-tile choice-bg-\d" aria-hidden="true"/).size
+  end
+
+  test "the scenario editor keeps plain, non-focusable list items" do
+    html = render_card(SCENARIO, mode: :editor)
+
+    assert_equal 0, html.scan(/role="radio"/).size
+    assert_equal 0, html.scan(/role="radiogroup"/).size
+    assert_equal 0, html.scan(/tabindex="0"/).size
+    assert_equal 0, html.scan(/aria-checked/).size
+    assert_not_includes html, "pickOnKey"
+    assert_includes html, "click->picker#pick", "the guard must not cost the editor its click behaviour"
+  end
+
   # ── Focus management ────────────────────────────────────────────────────
 
   test "the player moves focus when the card changes" do
