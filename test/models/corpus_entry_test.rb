@@ -73,12 +73,27 @@ class CorpusEntryTest < ActiveSupport::TestCase
 
   test "a declined Verto keeps the creator's opt-in" do
     e = entry(opted_in: true, withdrawn: false, review_status: "pending")
-    e.decline!("staff@vertonow.com", "Fewer than 30 completed responses.")
+    e.decline!("staff@vertonow.com", "Fewer than 30 responses with answers.")
 
     assert_equal "declined", e.review_status
     assert e.opted_in?, "the creator said yes; a decline must not make them say it again"
     assert_equal :declined, e.creator_state
-    assert_equal "Fewer than 30 completed responses.", e.review_note
+    assert_equal "Fewer than 30 responses with answers.", e.review_note
+  end
+
+  test "a reviewer passed as a User is recorded by their address" do
+    e = entry(opted_in: true, withdrawn: false, review_status: "pending")
+    e.approve!(@user)
+
+    assert_equal @user.email_address, e.reviewed_by_email,
+      'ActiveRecord would happily cast a User with to_s, and "#<User:0x…>" names nobody'
+  end
+
+  test "a reviewer that is neither an address nor a user is refused" do
+    e = entry(opted_in: true, withdrawn: false, review_status: "pending")
+
+    assert_raises(ArgumentError) { e.approve!(Object.new) }
+    assert_equal "pending", e.reload.review_status
   end
 
   test "declining without a reason still stores something the creator can read" do

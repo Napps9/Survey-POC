@@ -128,15 +128,29 @@ class CorpusEntry < ApplicationRecord
 
   def approve!(reviewer_email)
     update!(review_status: "approved", reviewed_at: Time.current,
-            reviewed_by_email: reviewer_email, review_note: nil)
+            reviewed_by_email: reviewer_address(reviewer_email), review_note: nil)
   end
 
   # A reason is required. The creator reads it verbatim, and "not accepted" tells
   # them nothing they can act on.
   def decline!(reviewer_email, note)
     update!(review_status: "declined", reviewed_at: Time.current,
-            reviewed_by_email: reviewer_email, review_note: note.to_s.strip.presence || "No reason given.")
+            reviewed_by_email: reviewer_address(reviewer_email),
+            review_note: note.to_s.strip.presence || "No reason given.")
   end
+
+  # The audit column is an address, but a caller holds a User as naturally as a
+  # string — accept either and refuse everything else, because ActiveRecord
+  # would otherwise cast whatever arrives with to_s, and "#<User:0x…>" in
+  # reviewed_by_email is an audit trail that names nobody. (The import rake
+  # task did exactly that, silently, until this guard.)
+  def reviewer_address(reviewer)
+    reviewer = reviewer.email_address if reviewer.respond_to?(:email_address)
+    raise ArgumentError, "reviewer must be an email String or respond to #email_address, got #{reviewer.class}" unless reviewer.is_a?(String)
+
+    reviewer
+  end
+  private :reviewer_address
 
   # Find-or-build for a survey, without persisting: the opt-in action creates the
   # row, and merely rendering the editor panel must not.

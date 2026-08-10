@@ -291,7 +291,7 @@ namespace :verto do
     admin = org.memberships.order(:id).first&.user
     abort "No member of '#{importer.org_slug}' to record as the creator." unless admin
 
-    result = CorpusEnrolment.new(survey, user: admin, reviewer: admin).call
+    result = CorpusEnrolment.new(survey, user: admin, reviewer: admin.email_address).call
 
     puts "── Ask Verto enrolment ──"
     puts "  verto:     #{survey.title}"
