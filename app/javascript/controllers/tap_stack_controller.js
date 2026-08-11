@@ -20,7 +20,12 @@ export default class extends Controller {
   pick(event) {
     if (event.target.isContentEditable) return
     event.stopPropagation() // don't also select/apply the type underneath
-    const dir = event.currentTarget.dataset.tapStackDirection || "right"
+    this._commit(event.currentTarget.dataset.tapStackDirection || "right")
+  }
+
+  // Shared answer path for the buttons and the drag: record the result, throw
+  // the top card off in `dir`, surface the next one.
+  _commit(dir) {
     const top = this.cardTargets[this.position]
     if (!top) return
     // Key by the canonical (primary-language) label so tap results aggregate
@@ -43,6 +48,103 @@ export default class extends Controller {
     }
   }
 
+  // ── Pointer drag — the swipe the copy has promised all along ──────────
+  // Player only (the action is rendered `unless editable`; editor statements
+  // are contenteditable and a drag would fight text selection). Same shape as
+  // prioritise_controller: pointer capture, window-level move/up/cancel, and
+  // a full three-listener teardown on every terminal path so a lost pointerup
+  // can't leave a stuck half-dragged card.
+  dragStart(event) {
+    if (this.formsMode) return // form mode has no swipe animation — buttons only
+    if (this.dragCard) return
+    if (event.target.isContentEditable) return
+    if (event.target.closest("button")) return
+    const card = event.currentTarget
+    if (card !== this.cardTargets[this.position]) return
+    event.preventDefault()
+
+    const stack = card.parentElement.getBoundingClientRect()
+    this.dragCard = card
+    this.dragW    = stack.width  || 320
+    this.dragH    = stack.height || 430
+    this.dragX0   = event.clientX
+    this.dragY0   = event.clientY
+    this.dragT0   = event.timeStamp
+
+    card.style.transition = "none" // follow the finger 1:1
+    try { card.setPointerCapture(event.pointerId) } catch (_) { /* older browsers */ }
+
+    this._onDragMove   = (e) => this._dragMove(e)
+    this._onDragUp     = (e) => this._dragEnd(e)
+    this._onDragCancel = () => this._dragCancel()
+    window.addEventListener("pointermove",   this._onDragMove)
+    window.addEventListener("pointerup",     this._onDragUp)
+    window.addEventListener("pointercancel", this._onDragCancel)
+  }
+
+  _dragMove(event) {
+    if (!this.dragCard) return
+    const dx  = event.clientX - this.dragX0
+    const dy  = event.clientY - this.dragY0
+    // Rotation follows the horizontal pull toward the same ±15° the fling
+    // exits at, so a committed release continues the arc it started.
+    const rot = Math.max(-15, Math.min(15, dx * 0.08))
+    this.dragCard.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`
+    // Light up the button the release would press.
+    if (this.hasControlsTarget) {
+      this.controlsTarget.dataset.intent = this._dragIntent(dx, dy) || ""
+    }
+  }
+
+  // Which answer a release at (dx, dy) means, or null for "not far enough".
+  // Horizontal beats vertical unless the pull is clearly upward — Unsure is
+  // deliberately the hardest gesture to hit by accident.
+  _dragIntent(dx, dy) {
+    if (dy <= -Math.max(64, this.dragH * 0.22) && Math.abs(dy) > Math.abs(dx)) return "up"
+    if (dx >=  Math.max(72, this.dragW * 0.30)) return "right"
+    if (dx <= -Math.max(72, this.dragW * 0.30)) return "left"
+    return null
+  }
+
+  _dragEnd(event) {
+    const card = this.dragCard
+    if (!card) return
+    const dx = event.clientX - this.dragX0
+    const dy = event.clientY - this.dragY0
+    const dt = Math.max(1, event.timeStamp - this.dragT0)
+    let dir  = this._dragIntent(dx, dy)
+    // A quick horizontal flick commits before the distance threshold.
+    if (!dir && Math.abs(dx) >= 24 && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) / dt >= 0.5) {
+      dir = dx > 0 ? "right" : "left"
+    }
+    this._dragTeardown()
+    if (dir) {
+      this._commit(dir) // sets its own transition; animates on from the dragged pose
+    } else {
+      this.layout() // snap back to the resting stack transform
+    }
+  }
+
+  // The browser fires pointercancel when it claims the gesture for itself
+  // (alert, tab switch). Restore the stack; nothing is committed.
+  _dragCancel() {
+    if (!this.dragCard) return
+    this._dragTeardown()
+    this.layout()
+  }
+
+  _dragTeardown() {
+    this.dragCard = null
+    if (this.hasControlsTarget) delete this.controlsTarget.dataset.intent
+    window.removeEventListener("pointermove",   this._onDragMove)
+    window.removeEventListener("pointerup",     this._onDragUp)
+    window.removeEventListener("pointercancel", this._onDragCancel)
+  }
+
+  disconnect() {
+    this._dragTeardown()
+  }
+
   reset(event) {
     if (event) event.preventDefault()
     this.position = 0
@@ -59,6 +161,10 @@ export default class extends Controller {
   layout() {
     const total = this.cardTargets.length
     this._syncDots(total)
+    // Deck exhausted → the .rotate-complete face replaces the cards and the
+    // controls bow out (all CSS, keyed off this class). Running it here rather
+    // than in pick() means reset() and re-connect clear it for free.
+    this.element.classList.toggle("is-complete", total > 0 && this.position >= total)
     // The response buttons sit in an overlay layered on top of the card stack
     // (see .rotate-card-controls), so they must out-rank every card's z-index
     // (top card = `total`) or an extra-long statement list (past the CSS

@@ -43,6 +43,7 @@ ja:
     swipe_hint: カードをドラッグして回答
     swipe_yes: はい
     reset: リセット
+    tap_done: すべて回答しました！
     answer_placeholder: 回答を入力…
     characters: 文字数
     char_limit_label: '回答の長さ'

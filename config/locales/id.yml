@@ -43,6 +43,7 @@ id:
     swipe_hint: seret kartu untuk menjawab
     swipe_yes: Ya
     reset: Atur ulang
+    tap_done: Semua terjawab!
     answer_placeholder: Ketik jawaban…
     characters: Karakter
     char_limit_label: 'Panjang jawaban'

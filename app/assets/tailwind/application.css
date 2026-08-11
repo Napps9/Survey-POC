@@ -666,6 +666,16 @@
   margin-top: auto;
   margin-bottom: auto;
 }
+/* A scroll container clips at its padding box on BOTH axes (overflow-y: auto
+   forces overflow-x to auto too), and the selection glow on .choice-card
+   paints ~10px outside the card. Padding moves the clip edge out; the
+   negative margin gives that padding's footprint back, so the grid's content
+   box — and the `answer` container width the @container rule queries — stays
+   exactly where it was. */
+.split-right > .mt-2:has(> .choice-grid) {
+  padding: 12px;
+  margin: -12px;
+}
 
 /* ── "Add media" / "Change animation" floating CTA on left panel ── */
 .add-media-fab,
@@ -1643,9 +1653,37 @@
 /* Grip lines sit on the brand-coloured thumb, so they read in white. */
 .s-line { width: 2px; height: 11px; background: rgba(255,255,255,0.8); border-radius: 1px; }
 .slider-labels { display: flex; justify-content: space-between; padding: 0 4px; margin-top: 6px; }
-.slider-label-text { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75); flex: 1; text-align: center; outline: none; }
+.slider-label-text { font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75); flex: 1; text-align: center; outline: none; min-width: 0; overflow-wrap: break-word; }
 .slider-label-text:first-child { text-align: left; }
 .slider-label-text:last-child { text-align: right; }
+/* Five labels in one row cannot fit a phone-width track at the player's 16px:
+   a flex item refuses to shrink below its longest word, so the row printed as
+   one unbroken string. Stagger them instead — a 4-track grid whose LINES sit
+   on the dot positions (0/25/50/75/100%), labels 1/3/5 on the top row, 2/4 on
+   a second, so every label centres under its own dot with roughly double the
+   width. Scoped to exactly five labels: legacy 4-point decks and the vertical
+   axis keep the flex layout above (grid-area is inert under flex). */
+.slider-wrap[data-slider-axis-value="horizontal"]
+  .slider-labels:has(> .slider-label-text:nth-child(5):last-child) {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 3px;
+}
+.slider-labels > .slider-label-text:nth-child(1) { grid-area: 1 / 1 / 2 / 2; }
+.slider-labels > .slider-label-text:nth-child(2) { grid-area: 2 / 1 / 3 / 3; }
+.slider-labels > .slider-label-text:nth-child(3) { grid-area: 1 / 2 / 2 / 4; }
+.slider-labels > .slider-label-text:nth-child(4) { grid-area: 2 / 3 / 3 / 5; }
+.slider-labels > .slider-label-text:nth-child(5) { grid-area: 1 / 4 / 2 / 5; }
+/* The chosen step's label answers the thumb (same convention as the NPS
+   is-active label). Scoped under .slider-labels so the NPS column, which
+   shares the span class, keeps its own treatment. */
+.slider-labels > .slider-label-text.is-active {
+  color: var(--brand-primary, var(--color-green-500));
+  font-weight: 700;
+}
+/* Labels are tap targets in the player (click->slider#jump); the editor's are
+   contenteditable and keep the text cursor. */
+.preview-overlay .slider-labels > .slider-label-text { cursor: pointer; }
 
 /* Layout toggle (auto/horizontal/vertical cycle) — always in the corner so
    it never competes with the track/labels for flex space in either axis. */
@@ -1836,6 +1874,17 @@
   font-family: "Alata", sans-serif; font-size: 13px; font-weight: 700;
   line-height: 1;
 }
+/* The badge rides the tile's top-left corner instead of owning a flex slot —
+   that slot (24px + the row gap) was width the label needs on a phone. It
+   overhangs the tile by 6px but stays inside the row box (row padding ≥8px),
+   so the list's scroll container can never clip it. The white ring keeps the
+   number legible over emoji and photo tiles. */
+.prioritise-item .prioritise-rank {
+  position: absolute;
+  top: -6px; left: -6px;
+  z-index: 1;
+  box-shadow: 0 0 0 2px #fff;
+}
 .prioritise-grip {
   margin-left: auto;
   color: rgba(0,0,0,0.28);
@@ -1866,7 +1915,7 @@
   justify-content: center;
   border-radius: 14px;
   cursor: pointer;
-  transition: transform 0.15s;
+  transition: transform 0.15s, box-shadow 0.18s;
   outline: 0 solid var(--brand-primary, var(--color-green-500));
   outline-offset: 2px;
   /* Lets the tile below size itself against ITS OWN width (cqw) instead of
@@ -1875,7 +1924,17 @@
   container-type: inline-size;
 }
 .choice-card:hover { transform: scale(1.02); }
-.choice-card[data-selected="true"] { outline-width: 3px; }
+/* Selection is a glow, not a stroke: a hard outline read as a cage around the
+   tile+caption box and clipped flat wherever it met the scroll container's
+   edge. The 2px spread ring keeps the state legible for low-vision users; the
+   16px halo is the affordance. Clearance for the ~10px of outward paint comes
+   from the scroll container's 12px padding (see the .mt-2 rules). */
+.choice-card[data-selected="true"] {
+  outline-width: 0;
+  box-shadow:
+    0 0 0 2px var(--brand-primary, var(--color-green-500)),
+    0 0 16px 4px color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 55%, transparent);
+}
 /* The coloured/image tile. The label now sits BELOW it (see .choice-label) so
    text never overlaps the artwork. flex:1 lets the tile fill taller cells
    (mobile stretches the grid), height pins it in the fixed desktop layout. */
@@ -2131,6 +2190,14 @@
   overflow: hidden;
   transition: transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.3s;
 }
+/* The player's card claims every touch for itself — the drag IS the interface
+   (tap-stack#dragStart) — so the browser never turns a horizontal pull into
+   history navigation (Chrome/Android overscroll-nav) or a page pan. Player
+   only: in the editor the same card must not eat canvas scrolling. iOS
+   Safari's screen-EDGE back-swipe is not suppressible from CSS/JS; the card
+   sits inset from the edge, so drags on it capture cleanly. */
+.preview-overlay .rotate-card { touch-action: none; }
+.preview-overlay .rotate-card:active { cursor: grabbing; }
 /* Full-bleed image/gradient, with the statement in a dark band at the TOP. */
 .rotate-card-media {
   position: absolute; inset: 0;
@@ -2159,6 +2226,47 @@
   border-radius: 0 0 20px 20px;
 }
 .rotate-card-controls .rotate-action-label { color: rgba(255,255,255,0.9); }
+/* End-of-deck face. Answered cards fade to nothing, which used to leave the
+   stack as a transparent void under a still-visible button scrim — an empty
+   frame with live-looking dead buttons. tap-stack#layout toggles .is-complete
+   on .rotate-wrap: this panel takes the cards' place and the controls bow
+   out. visibility flips alongside opacity so the dead buttons and the
+   dormant panel also leave the accessibility tree and tab order. Each state
+   carries its own transition (a transition animates whatever rule matches
+   the DESTINATION state). */
+.rotate-complete {
+  position: absolute; inset: 0; z-index: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, #f4f6fb, #e9edf6);
+  border: 1px dashed rgba(28,32,52,0.18);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  /* The way back out (Reset): quick fade, then leave the a11y tree. */
+  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
+.rotate-wrap.is-complete .rotate-complete {
+  opacity: 1; visibility: visible;
+  /* The way in: wait out most of the last card's 350ms fling first. */
+  transition: opacity 0.25s ease 0.2s, visibility 0s linear 0.2s;
+}
+.rotate-card-controls { transition: opacity 0.2s ease, visibility 0s; }
+.rotate-wrap.is-complete .rotate-card-controls {
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
+.rotate-complete-check {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--brand-primary, var(--color-green-500));
+  color: #fff;
+}
+.rotate-complete-text {
+  font-family: "Alata", sans-serif;
+  font-size: 15px;
+  color: rgba(28,32,52,0.75);
+}
 .rotate-dots { display: flex; gap: 6px; align-items: center; }
 .rotate-dot {
   width: 7px; height: 7px; border-radius: 50%;
@@ -2193,6 +2301,11 @@
   transition: transform 0.12s;
 }
 .rotate-action-btn:hover { transform: scale(1.1); }
+/* Mid-drag, the button the release would press swells (tap-stack#_dragMove
+   writes the live direction onto the controls as data-intent). */
+.rotate-card-controls[data-intent="left"]  .rotate-action-no,
+.rotate-card-controls[data-intent="up"]    .rotate-action-unsure,
+.rotate-card-controls[data-intent="right"] .rotate-action-yes { transform: scale(1.15); }
 /* Inline SVG response icons (see ApplicationHelper#tap_response_icon) — sized
    to the circular button and tinted by the button's currentColor. */
 .rotate-action-icon { display: block; width: 22px; height: 22px; }
@@ -5609,6 +5722,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
     background: #1C2034;
     flex: 1 1 auto;
     min-height: 0;
+    /* A gesture that starts a hair off the tap card (which claims its own
+       touches via touch-action) must not chain into pull-to-refresh or
+       overscroll history navigation. */
+    overscroll-behavior: none;
   }
   .preview-card { width: 100%; max-width: 100%; }
 
@@ -6046,6 +6163,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
     height: clamp(40px, 6.4svh, 56px);
     --tile-emoji: clamp(19px, 3.2svh, 26px);
   }
+  /* Prioritise-only slimming: with the badge on the tile, the row gap and the
+     grip are the chrome left between the label and its width — every px here
+     is a px of option text on a 393px phone. */
+  .preview-overlay .prioritise-item { gap: clamp(6px, 1.8vw, 10px); }
+  .preview-overlay .prioritise-rank { width: 20px; height: 20px; font-size: 11px; }
+  .preview-overlay .prioritise-grip { font-size: 14px; letter-spacing: -2px; padding: 0; }
   .preview-overlay .choice-list-label,
   .preview-overlay .pick-text { font-size: var(--play-label); line-height: 1.3; }
   .preview-overlay .choice-list-label,
@@ -6117,6 +6240,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
        decision stays with _fitCard, which can see what CSS can't. */
     container-type: inline-size;
     container-name: answer;
+    /* Clip clearance for the selection glow (mirrors the desktop .mt-2 rule):
+       the negative margin must survive the `.split-right > .mt-2` margin-top
+       reset earlier in this block — equal specificity, this rule is later, so
+       it wins; don't reorder them. Content-box width is unchanged, so the
+       `answer` container query is unaffected. */
+    padding: 12px;
+    margin: -12px;
   }
   /* The same "there is more below" fade the option lists get. A grid can't
      carry it on itself — a ::after inside a grid becomes a cell — so it hangs

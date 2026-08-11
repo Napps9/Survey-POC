@@ -43,6 +43,7 @@ hi:
     swipe_hint: उत्तर देने के लिए कार्ड खींचें
     swipe_yes: हाँ
     reset: रीसेट करें
+    tap_done: सभी के उत्तर दिए गए!
     answer_placeholder: उत्तर लिखें…
     characters: वर्ण
     char_limit_label: 'उत्तर की लंबाई'

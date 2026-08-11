@@ -56,13 +56,13 @@ export function choiceListItemHtml(label, i, mode, style = null) {
         </li>`
 }
 
-// A drag-to-rank prioritise row.
+// A drag-to-rank prioritise row. The rank badge lives INSIDE the tile (it
+// rides the corner via CSS) — its old flex slot was width the label needs.
 export function prioritiseItemHtml(label, i, style = null) {
   return `
         <li class="choice-list-item pick-item prioritise-item" data-prioritise-target="item"
             data-action="pointerdown->prioritise#start"${styleAttrs(style)}>
-          <span class="prioritise-rank" data-prioritise-target="rank">${i + 1}</span>
-          <div class="choice-list-tile choice-bg-${(i % 6) + 1}" style="${esc(tileStyle(style))}">${tileInner(style)}</div>
+          <div class="choice-list-tile choice-bg-${(i % 6) + 1}" style="${esc(tileStyle(style))}"><span class="prioritise-rank" data-prioritise-target="rank">${i + 1}</span>${tileInner(style)}</div>
           <span class="pick-text choice-list-label" contenteditable="true">${esc(label)}</span>
           <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
           ${styleBtnHtml()}

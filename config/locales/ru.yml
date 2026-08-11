@@ -43,6 +43,7 @@ ru:
     swipe_hint: перетащите карточку, чтобы ответить
     swipe_yes: Да
     reset: Сбросить
+    tap_done: Все ответы даны!
     answer_placeholder: Введите ответ…
     characters: Символы
     char_limit_label: 'Длина ответа'

@@ -43,6 +43,7 @@ it:
     swipe_hint: trascina la carta per rispondere
     swipe_yes: Sì
     reset: Reimposta
+    tap_done: Hai risposto a tutto!
     answer_placeholder: Scrivi la risposta…
     characters: Caratteri
     char_limit_label: 'Lunghezza risposta'

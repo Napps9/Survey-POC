@@ -43,6 +43,7 @@ vi:
     swipe_hint: kéo thẻ để trả lời
     swipe_yes: Có
     reset: Đặt lại
+    tap_done: Đã trả lời tất cả!
     answer_placeholder: Nhập câu trả lời…
     characters: Ký tự
     char_limit_label: 'Độ dài câu trả lời'

@@ -43,6 +43,7 @@ de:
     swipe_hint: Karte ziehen, um zu antworten
     swipe_yes: Ja
     reset: Zurücksetzen
+    tap_done: Alle beantwortet!
     answer_placeholder: Antwort eingeben…
     characters: Zeichen
     char_limit_label: 'Antwortlänge'

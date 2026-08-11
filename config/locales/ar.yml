@@ -43,6 +43,7 @@ ar:
     swipe_hint: اسحب البطاقة للإجابة
     swipe_yes: نعم
     reset: إعادة تعيين
+    tap_done: تمت الإجابة على الكل!
     answer_placeholder: اكتب الإجابة…
     characters: الأحرف
     char_limit_label: 'طول الإجابة'

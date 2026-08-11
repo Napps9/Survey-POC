@@ -43,6 +43,7 @@ uk:
     swipe_hint: перетягніть картку, щоб відповісти
     swipe_yes: Так
     reset: Скинути
+    tap_done: Усі відповіді надано!
     answer_placeholder: Введіть відповідь…
     characters: Символи
     char_limit_label: 'Довжина відповіді'

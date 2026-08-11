@@ -43,6 +43,7 @@ ko:
     swipe_hint: 카드를 끌어 답변하세요
     swipe_yes: 예
     reset: 초기화
+    tap_done: 모두 응답했어요!
     answer_placeholder: 답변 입력…
     characters: 글자 수
     char_limit_label: '답변 길이'

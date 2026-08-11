@@ -59,6 +59,19 @@ export default class extends Controller {
     this._dispatchScaleValue()
   }
 
+  // Tapping a label jumps straight to that step — with five 16px labels the
+  // words are a far larger target than the dots they sit under. Player only:
+  // the editor's labels are contenteditable and never carry this action.
+  jump(event) {
+    if (event.target.isContentEditable) return
+    const idx = this.labelTargets.indexOf(event.currentTarget)
+    if (idx < 0 || idx === this.indexValue) return
+    this.indexValue = idx
+    this.render()
+    this._dispatchScaleValue()
+    this.dispatch("settle", { detail: { index: this.indexValue } })
+  }
+
   start(event) {
     if (event.target.isContentEditable) return
     event.preventDefault()
@@ -122,6 +135,12 @@ export default class extends Controller {
 
     this.dotTargets.forEach((dot, i) =>
       dot.classList.toggle("active", i === this.indexValue)
+    )
+
+    // Same convention as the NPS labels: the chosen step's label lights up, so
+    // the value reads without hunting for the active dot.
+    this.labelTargets.forEach((label, i) =>
+      label.classList.toggle("is-active", i === this.indexValue)
     )
 
     // Keep the announced value in step with the visible thumb. Only where the

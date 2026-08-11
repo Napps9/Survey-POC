@@ -43,6 +43,7 @@ pt:
     swipe_hint: arraste o cartão para responder
     swipe_yes: Sim
     reset: Repor
+    tap_done: Tudo respondido!
     answer_placeholder: Escreva a resposta…
     characters: Caracteres
     char_limit_label: 'Comprimento da resposta'

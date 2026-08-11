@@ -43,6 +43,7 @@ he:
     swipe_hint: גרור את הכרטיס כדי לענות
     swipe_yes: כן
     reset: אפס
+    tap_done: עניתם על הכול!
     answer_placeholder: הקלד תשובה…
     characters: תווים
     char_limit_label: 'אורך התשובה'

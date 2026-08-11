@@ -43,6 +43,7 @@ sw:
     swipe_hint: buruta kadi ili kujibu
     swipe_yes: Ndiyo
     reset: Weka upya
+    tap_done: Yote yamejibiwa!
     answer_placeholder: Andika jibu…
     characters: Herufi
     char_limit_label: 'Urefu wa jibu'

@@ -45,6 +45,7 @@ en:
     swipe_hint: "Drag or tap to answer"
     swipe_yes: "Yes"
     reset: "Reset"
+    tap_done: "All answered!"
     answer_placeholder: "Type answer…"
     characters: "Characters"
     char_limit_label: 'Answer length'

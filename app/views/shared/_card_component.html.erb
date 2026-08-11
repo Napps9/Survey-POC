@@ -216,8 +216,9 @@
               data-canonical="<%= canon[i] %>"
               <%= option_style_data_attrs(style) if editable %>
               data-action="pointerdown->prioritise#start">
-            <span class="prioritise-rank" data-prioritise-target="rank"><%= i + 1 %></span>
-            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], keyword_fallback: false, index: i) %></div>
+            <%# Rank badge rides the tile's corner (see .prioritise-item
+                .prioritise-rank) — its old flex slot was label width. %>
+            <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" style="<%= option_tile_style(style) %>"><span class="prioritise-rank" data-prioritise-target="rank"><%= i + 1 %></span><%= option_tile_icon(style, canon[i], keyword_fallback: false, index: i) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span>
             <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
             <% if editable %>
@@ -317,9 +318,13 @@
             <% bg_style = img.present? ?
                  "background:#fff url('#{img}') center/cover no-repeat;" :
                  "background:linear-gradient(135deg,#{bg_a},#{bg_b});" %>
+            <%# Players can also drag the card off (tap-stack#dragStart); the
+                editor's statements are contenteditable, where a drag would
+                fight text selection, so the action is player-only. %>
             <div class="rotate-card"
                  data-tap-stack-target="card"
-                 data-canonical="<%= canon[i] %>">
+                 data-canonical="<%= canon[i] %>"
+                 <%= editable ? "".html_safe : 'data-action="pointerdown->tap-stack#dragStart"'.html_safe %>>
               <div class="rotate-card-media" style="<%= bg_style %>"></div>
               <%# Statement sits in a dark band at the TOP of the card. %>
               <div class="rotate-card-statement"><span <%= ce_attr %>><%= opt %></span></div>
@@ -341,6 +346,15 @@
               <% end %>
             </div>
           <% end %>
+
+          <%# End-of-deck face: answered cards fade out, and without this the
+              stack kept its full footprint as a transparent void under the
+              button scrim. tap-stack#layout toggles .is-complete on
+              .rotate-wrap; CSS does the rest (see .rotate-complete). %>
+          <div class="rotate-complete">
+            <span class="rotate-complete-check"><%= tap_response_icon("yes") %></span>
+            <span class="rotate-complete-text"><%= t("card.tap_done") %></span>
+          </div>
 
           <%# Controls live INSIDE the card: three responses (No swipe-left,
               Unsure swipe-up off the top, Yes swipe-right) over a bottom scrim,
@@ -603,8 +617,11 @@
           </div>
         </div>
         <div class="slider-labels">
+          <%# Players can tap a label to jump to that step; editor labels are
+              contenteditable, so they never carry the action. %>
           <% labels.each do |opt| %>
-            <span class="slider-label-text" data-slider-target="label" <%= ce_attr %>><%= opt %></span>
+            <span class="slider-label-text" data-slider-target="label" <%= ce_attr %>
+                  <%= editable ? "".html_safe : 'data-action="click->slider#jump"'.html_safe %>><%= opt %></span>
           <% end %>
         </div>
         <% if editable %>

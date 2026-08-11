@@ -43,6 +43,7 @@ nl:
     swipe_hint: sleep de kaart om te antwoorden
     swipe_yes: Ja
     reset: Resetten
+    tap_done: Alles beantwoord!
     answer_placeholder: Typ je antwoord…
     characters: Tekens
     char_limit_label: 'Antwoordlengte'
