@@ -148,6 +148,11 @@ Rails.application.routes.draw do
   post   "ask/threads",             to: "ask_threads#create",   as: :ask_threads
   delete "ask/threads/:id",         to: "ask_threads#destroy",  as: :ask_thread
   post   "ask/threads/:thread_id/messages", to: "ask_messages#create", as: :ask_thread_messages
+  # The "Submit your Verto data" picker: a batch of opt-ins with question-set
+  # granularity. Org-admin only (the controller enforces it) — offering
+  # respondents' data outward is an admin decision, exactly as the per-survey
+  # corpus_entry routes above.
+  post   "ask/submissions",         to: "ask_submissions#create", as: :ask_submissions
 
   # The staff review queue. Gated by a routing CONSTRAINT rather than a filter,
   # exactly like /blazer above and for the same reason: a non-staff request gets

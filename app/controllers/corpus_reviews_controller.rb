@@ -23,6 +23,12 @@ class CorpusReviewsController < ApplicationController
     # Checks are computed for display only. Nothing here decides anything — the
     # reviewer does, on a pre-flagged row rather than from scratch.
     @checks = @entries.to_h { |entry| [ entry.id, CorpusChecks.run(entry.survey, answered_count: answered_count(entry)) ] }
+
+    # One entry's on-demand answer preview — aggregated in memory for exactly
+    # the row the reviewer expanded, never for the whole queue, because the
+    # aggregation walks every response of the Verto.
+    @preview_entry = @entries.find { |entry| entry.id == params[:preview].to_i } if params[:preview].present?
+    @preview_rows  = @preview_entry ? CorpusIndexer.new(@preview_entry).preview_rows : []
   end
 
   def update
@@ -34,12 +40,16 @@ class CorpusReviewsController < ApplicationController
       # Indexing happens in a job: aggregating every response of a large Verto is
       # exactly the memory shape that restarts this process (see the job).
       IndexCorpusEntryJob.perform_later(entry.id)
+      AskSubmissionMailer.decision(entry).deliver_later
       notice = t("ask.review.approved", verto: verto_name(entry))
     when "decline"
       entry.decline!(reviewer_email, params[:review_note])
       # A declined Verto's rows go now rather than at the next refresh — we have
       # said no, so holding an index of it is holding data we decided not to use.
       entry.corpus_questions.destroy_all
+      # The creator reads the note verbatim, in their own language, from
+      # their inbox — not only if they happen to revisit the survey page.
+      AskSubmissionMailer.decision(entry).deliver_later
       notice = t("ask.review.declined", verto: verto_name(entry))
     else
       return redirect_to corpus_reviews_path, alert: t("ask.review.unknown_decision")

@@ -65,6 +65,14 @@ class CorpusEntry < ApplicationRecord
     end
   end
 
+  # The submit-your-data picker's eligibility bar: published, with at least
+  # this many responses carrying answers. PROVISIONAL — the Verto team is
+  # still deciding the final rules (owner's note, 2026-08-11) — which is why
+  # it is one constant with one call site (`submittable_state`) rather than
+  # anything structural. Distinct from min_sample_size: that governs what may
+  # be CITED, this governs what may be OFFERED from the picker.
+  SUBMISSION_MIN_RESPONSES = 50
+
   # The creator's half of the gate: offered and not taken back.
   scope :offered, -> { where.not(opted_in_at: nil).where(withdrawn_at: nil) }
 
@@ -104,6 +112,52 @@ class CorpusEntry < ApplicationRecord
     :pending
   end
 
+  # ── Offered scope: question-set granularity ────────────────────────────────
+  # `offered_scope` narrows WHAT was offered, the way opted_in_at records THAT
+  # it was. `{}` — the default, and every pre-existing row — means the whole
+  # Verto. A narrowed scope looks like:
+  #
+  #   { "common_question_set_ids" => [3], "own_questions" => false }
+  #
+  # The indexer asks this predicate per card, so a question outside the offer
+  # never becomes a corpus row — the boundary is enforced where the data
+  # crosses, not in the picker UI.
+  def offers_card?(card)
+    return true if offered_scope.blank?
+
+    set_id = card["common_question_set_id"]
+    if set_id.present?
+      Array(offered_scope["common_question_set_ids"]).include?(set_id)
+    else
+      offered_scope["own_questions"] == true
+    end
+  end
+
+  def whole_verto_offered? = offered_scope.blank?
+
+  # Why a Verto can (or cannot) be picked in the submit-your-data modal.
+  # One value so the picker renders states without re-deriving consent logic:
+  #
+  #   :ready      selectable
+  #   :unpublished, :too_few_responses   locked, with the reason
+  #   :pending, :live                    already offered — locked, informative
+  #   :declined   locked; the review note explains, and the survey page's
+  #               existing opt-in block is where a re-offer negotiation lives
+  def self.submittable_state(survey, answered_count:)
+    entry = find_by(survey_id: survey.id)
+    if entry&.opted_in?
+      return :live     if entry.approved?
+      return :declined if entry.declined?
+
+      return :pending
+    end
+
+    return :unpublished       unless survey.published?
+    return :too_few_responses if answered_count < SUBMISSION_MIN_RESPONSES
+
+    :ready
+  end
+
   # ── Transitions ────────────────────────────────────────────────────────────
   # Each one is a whole statement about consent, so each is its own method rather
   # than callers assembling update! calls that drift apart.
@@ -111,12 +165,17 @@ class CorpusEntry < ApplicationRecord
   # The creator offers the Verto. Re-offering after a withdrawal clears the
   # withdrawal and starts review again: our previous approval was granted against
   # a consent that has since been revoked, so it does not carry over.
-  def opt_in!(user)
+  #
+  # `scope` narrows the offer to question sets (see offers_card?). nil means
+  # "don't touch what's stored" so the survey page's whole-Verto toggle keeps
+  # its meaning; pass {} explicitly to widen a narrowed offer back out.
+  def opt_in!(user, scope: nil)
     update!(
       opted_in_at:   opted_in_at.presence || Time.current,
       opted_in_by:   opted_in_by || user,
       withdrawn_at:  nil,
-      review_status: withdrawn? ? "pending" : review_status
+      review_status: withdrawn? ? "pending" : review_status,
+      **(scope.nil? ? {} : { offered_scope: scope })
     )
   end
 

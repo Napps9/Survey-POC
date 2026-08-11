@@ -70,9 +70,25 @@
                   <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:#fff;display:block;line-height:1.35;margin-bottom:3px;">
                     <%= entry.survey.title.presence || entry.survey.theme %>
                   </span>
-                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);">
+                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.3);display:block;">
                     <%= entry.organisation.name %>
                   </span>
+                  <%# What was actually offered — the whole deck, or a narrowed
+                      question-set selection (offered_scope). The preview below
+                      shows only the offered questions, so approval and offer
+                      always cover the same thing. %>
+                  <% indexable = Array(entry.survey.cards).select { |c| CorpusIndexer.indexable?(c["type"].to_s) } %>
+                  <% offered = indexable.count { |c| entry.offers_card?(c) } %>
+                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:<%= entry.whole_verto_offered? ? "rgba(255,255,255,0.35)" : "#0CA7FF" %>;display:block;margin-top:3px;">
+                    <%= entry.whole_verto_offered? ? "Whole Verto offered" : "#{offered} of #{indexable.size} questions offered" %>
+                  </span>
+                  <% if @preview_entry == entry %>
+                    <%= link_to "Hide preview", corpus_reviews_path(tab: @tab),
+                          style: "display:inline-block;margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:#01EACB;text-decoration:none;" %>
+                  <% else %>
+                    <%= link_to "Preview answers ▾", corpus_reviews_path(tab: @tab, preview: entry.id),
+                          style: "display:inline-block;margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.45);text-decoration:none;" %>
+                  <% end %>
                 </td>
                 <td style="padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:top;">
                   <% if entry.survey.sdgs.any? %>
@@ -153,6 +169,46 @@
                   <% end %>
                 </td>
               </tr>
+
+              <% if @preview_entry == entry %>
+                <%# The expanded preview: the offered questions with the same
+                    answer-breakdown bars the citation Detail pane uses, so
+                    what is approved is exactly what Ask Verto would cite. %>
+                <tr>
+                  <td colspan="7" style="padding:4px 14px 18px;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(10,12,24,0.35);">
+                    <% if @preview_rows.empty? %>
+                      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);margin:12px 0 0;">
+                        Nothing to preview — no offered question has any answers yet.
+                      </p>
+                    <% else %>
+                      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px;">
+                        <% @preview_rows.each do |row| %>
+                          <div class="ask-island" style="--src-accent:<%= CardTypes.accent(row[:type]) %>;">
+                            <p class="ask-lab" style="margin-bottom:8px;">
+                              <%= CardTypes.icon(row[:type]) %> <%= row[:text] %> · n <%= number_with_delimiter(row[:total]) %>
+                            </p>
+                            <% if row[:bars].empty? %>
+                              <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.35);margin:0;">
+                                <%= row[:type] == "open_ended" ? "Open text — themes are built at indexing, after approval." : "No per-option counts for this type." %>
+                              </p>
+                            <% else %>
+                              <div class="ask-bars">
+                                <% row[:bars].each do |bar| %>
+                                  <div class="ask-bar-row">
+                                    <span class="ask-bar-lab"><%= bar[:label] %></span>
+                                    <span class="ask-bar-val"><%= bar[:percent] %>% · <%= number_with_delimiter(bar[:count]) %></span>
+                                    <div class="ask-bar-track"><div class="ask-bar-fill" style="width:<%= [ bar[:percent], 100 ].min %>%;"></div></div>
+                                  </div>
+                                <% end %>
+                              </div>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
             <% end %>
           </tbody>
         </table>

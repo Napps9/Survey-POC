@@ -182,4 +182,82 @@ class CorpusEntryTest < ActiveSupport::TestCase
       CorpusEntry.create!(survey: s, organisation: @org)
     end
   end
+
+  # ── Offered scope: question-set granularity ────────────────────────────────
+  OWN_CARD    = { "type" => "multiple_choice", "cid" => "c1", "text" => "Own?" }.freeze
+  COMMON_CARD = { "type" => "multiple_choice", "cid" => "c2", "text" => "Common?",
+                  "common_question_set_id" => 77 }.freeze
+
+  test "an empty scope offers every card — the meaning every pre-picker row has" do
+    e = CorpusEntry.create!(survey: survey, organisation: @org)
+
+    assert e.whole_verto_offered?
+    assert e.offers_card?(OWN_CARD)
+    assert e.offers_card?(COMMON_CARD)
+  end
+
+  test "a common-set-only scope excludes the Verto's own questions" do
+    e = CorpusEntry.create!(survey: survey, organisation: @org,
+                            offered_scope: { "own_questions" => false, "common_question_set_ids" => [ 77 ] })
+
+    assert_not e.whole_verto_offered?
+    assert_not e.offers_card?(OWN_CARD)
+    assert e.offers_card?(COMMON_CARD)
+    assert_not e.offers_card?(COMMON_CARD.merge("common_question_set_id" => 78)),
+      "a set outside the offer is outside the offer"
+  end
+
+  test "an own-questions-only scope excludes every common set" do
+    e = CorpusEntry.create!(survey: survey, organisation: @org,
+                            offered_scope: { "own_questions" => true, "common_question_set_ids" => [] })
+
+    assert e.offers_card?(OWN_CARD)
+    assert_not e.offers_card?(COMMON_CARD)
+  end
+
+  test "opt_in! stores a scope when given one and leaves it alone when not" do
+    e = CorpusEntry.create!(survey: survey, organisation: @org)
+    e.opt_in!(@user, scope: { "own_questions" => true, "common_question_set_ids" => [] })
+    assert_equal true, e.reload.offered_scope["own_questions"]
+
+    # The survey page's whole-Verto toggle passes no scope — a re-offer from
+    # there must not silently widen or narrow what the picker stored.
+    e.opt_in!(@user)
+    assert_equal true, e.reload.offered_scope["own_questions"]
+  end
+
+  # ── The picker's eligibility bar ───────────────────────────────────────────
+  def published_survey
+    s = survey
+    s.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    s
+  end
+
+  test "submittable_state walks the bar in order" do
+    s = survey
+    assert_equal :unpublished, CorpusEntry.submittable_state(s, answered_count: 100)
+
+    s = published_survey
+    assert_equal :too_few_responses,
+                 CorpusEntry.submittable_state(s, answered_count: CorpusEntry::SUBMISSION_MIN_RESPONSES - 1)
+    assert_equal :ready,
+                 CorpusEntry.submittable_state(s, answered_count: CorpusEntry::SUBMISSION_MIN_RESPONSES)
+  end
+
+  test "an already-offered Verto reports its review state, not :ready" do
+    s = published_survey
+    e = CorpusEntry.create!(survey: s, organisation: @org, opted_in_at: 1.day.ago)
+
+    assert_equal :pending, CorpusEntry.submittable_state(s, answered_count: 100)
+
+    e.update!(review_status: "approved")
+    assert_equal :live, CorpusEntry.submittable_state(s, answered_count: 100)
+
+    e.update!(review_status: "declined")
+    assert_equal :declined, CorpusEntry.submittable_state(s, answered_count: 100)
+
+    # Withdrawn clears the offer, so the bar applies afresh.
+    e.withdraw!
+    assert_equal :ready, CorpusEntry.submittable_state(s, answered_count: 100)
+  end
 end

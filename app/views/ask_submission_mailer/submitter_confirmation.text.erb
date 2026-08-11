@@ -1,0 +1,9 @@
+<%= t("ask_submission_mailer.confirmation_heading") %>
+
+<%= t("ask_submission_mailer.confirmation_intro") %>
+
+<% @rows.each do |row| -%>
+* <%= row[:name] %> — <%= t("js.ask.people_answered", count: number_with_delimiter(row[:responses])) %> · <%= row[:whole] ? t("ask_submission_mailer.offer_all", count: row[:total]) : t("ask_submission_mailer.offer_partial", offered: row[:offered], total: row[:total]) %>
+<% end -%>
+
+<%= t("ask_submission_mailer.confirmation_outro") %>

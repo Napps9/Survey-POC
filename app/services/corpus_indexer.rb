@@ -90,6 +90,11 @@ class CorpusIndexer
       cards.each_with_index do |card, idx|
         type = card["type"].to_s
         next unless self.class.indexable?(type) || type == "prioritise"
+        # The offered scope is enforced here, where data crosses the boundary
+        # — a question outside the offer never becomes a corpus row, whatever
+        # the picker sent. Questions excluded by a narrowed re-offer drop out
+        # via the seen_cids sweep below, like any other removed question.
+        next unless @entry.offers_card?(card)
 
         result = aggregated[idx]
         next if result.nil? || result[:total].to_i < CorpusEntry.min_sample_size
@@ -123,6 +128,48 @@ class CorpusIndexer
     end
 
     @entry
+  end
+
+  # A read-only preview for the review queue: the same aggregation `call`
+  # would store, computed in memory and never persisted, filtered to what the
+  # creator actually offered — so a reviewer approves exactly what would
+  # become citable. Flat-count types render as bars; open text and nested
+  # shapes (tap_card) show their totals only, because previewing themes
+  # honestly would need the themer and a decline must not cost an AI pass.
+  PREVIEW_QUESTIONS = 6
+  PREVIEW_BARS = 5
+
+  def preview_rows
+    responses  = self.class.countable_responses(@survey)
+    cards      = Array(@survey.cards)
+    aggregated = aggregate_results(cards, responses)
+
+    rows = []
+    cards.each_with_index do |card, idx|
+      break if rows.size >= PREVIEW_QUESTIONS
+
+      type = card["type"].to_s
+      next unless self.class.indexable?(type)
+      next unless @entry.offers_card?(card)
+
+      result = aggregated[idx]
+      next if result.nil? || result[:total].to_i.zero?
+
+      counts = type == "open_ended" ? {} : distribution_for(type, result, card).except("avg")
+      counts = counts.select { |_label, value| value.is_a?(Numeric) }
+      counted = counts.values.sum
+
+      rows << {
+        text:  card["text"].to_s.presence || card["title"].to_s,
+        type:  type,
+        total: result[:total].to_i,
+        bars:  counts.sort_by { |_label, value| -value }.first(PREVIEW_BARS).map do |label, value|
+          { label: label, count: value.to_i,
+            percent: counted.zero? ? 0 : (value * 100.0 / counted).round(1) }
+        end
+      }
+    end
+    rows
   end
 
   private

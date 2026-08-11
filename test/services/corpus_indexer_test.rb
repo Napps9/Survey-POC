@@ -408,4 +408,59 @@ class CorpusIndexerTest < ActiveSupport::TestCase
       "a published zero is as identifying as a published one — the cell must be absent"
     end
   end
+
+  # ── Offered scope: the boundary is enforced at indexing ───────────────────
+  def scoped_cards
+    [
+      { "type" => "multiple_choice", "cid" => "c_own", "text" => "Own question?",
+        "options" => [ "Yes", "No" ] },
+      { "type" => "multiple_choice", "cid" => "c_common", "text" => "Common question?",
+        "options" => [ "Yes", "No" ], "common_question_set_id" => 77 }
+    ]
+  end
+
+  test "a question outside the offered scope never becomes a corpus row" do
+    survey = survey_with(scoped_cards)
+    seed!(survey, 40) { { "0" => { "value" => "Yes" }, "1" => { "value" => "No" } } }
+
+    entry = CorpusEntry.create!(survey: survey, organisation: @org,
+                                opted_in_at: Time.current, review_status: "approved",
+                                offered_scope: { "own_questions" => false,
+                                                 "common_question_set_ids" => [ 77 ] })
+    CorpusIndexer.new(entry, themer: NullThemer.new).call
+
+    assert_equal [ "c_common" ], entry.corpus_questions.pluck(:cid),
+      "the picker is presentation — this filter is the boundary"
+  end
+
+  test "a narrowed re-offer sweeps previously indexed questions out" do
+    survey = survey_with(scoped_cards)
+    seed!(survey, 40) { { "0" => { "value" => "Yes" }, "1" => { "value" => "No" } } }
+    entry = index!(survey)
+    assert_equal %w[c_own c_common].sort, entry.corpus_questions.pluck(:cid).sort
+
+    entry.update!(offered_scope: { "own_questions" => true, "common_question_set_ids" => [] })
+    CorpusIndexer.new(entry, themer: NullThemer.new).call
+
+    assert_equal [ "c_own" ], entry.corpus_questions.pluck(:cid),
+      "a question the creator stopped offering must leave the corpus at re-index"
+  end
+
+  test "preview_rows shows only offered questions, with shares" do
+    survey = survey_with(scoped_cards)
+    seed!(survey, 40) { |i| { "0" => { "value" => i < 30 ? "Yes" : "No" }, "1" => { "value" => "No" } } }
+    entry = CorpusEntry.create!(survey: survey, organisation: @org,
+                                opted_in_at: Time.current,
+                                offered_scope: { "own_questions" => true,
+                                                 "common_question_set_ids" => [] })
+
+    rows = CorpusIndexer.new(entry, themer: NullThemer.new).preview_rows
+
+    assert_equal [ "Own question?" ], rows.map { |r| r[:text] }
+    top = rows.first[:bars].first
+    assert_equal "Yes", top[:label]
+    assert_equal 30, top[:count]
+    assert_in_delta 75.0, top[:percent], 0.01
+    assert_equal 40, rows.first[:total]
+  end
 end

@@ -1,0 +1,94 @@
+<%# The "Submit your Verto data" picker (agreed rounds 12-13). Rendered only
+    for org admins (@submittable is empty otherwise). A plain form of real
+    checkboxes — the Verto-level tick-all and the live counter are Stimulus
+    conveniences on top, not the mechanism — posting one batch submission to
+    AskSubmissionsController. `?submitted=N` re-opens the modal onto its
+    success pane after the redirect. %>
+<% submitted = params[:submitted].to_i %>
+<div class="ask-modal-overlay <%= "is-open" if submitted.positive? %>"
+     data-ask-verto-target="submitOverlay"
+     data-action="click->ask-verto#overlayClose">
+  <div class="ask-modal <%= "is-done" if submitted.positive? %>" data-ask-verto-target="submitModal">
+
+    <div class="ask-modal-picker">
+      <div class="ask-modal-title"><%= t("ask.submit.title") %></div>
+      <p class="ask-modal-sub"><%= t("ask.submit.intro") %></p>
+
+      <%= form_with url: ask_submissions_path, method: :post, local: true, style: "margin:0;" do %>
+        <% @submittable.each do |row| %>
+          <% survey = row[:survey] %>
+          <% if row[:state] == :ready %>
+            <div class="ask-pick-group">
+              <button type="button" class="ask-pick" data-action="click->ask-verto#togglePick">
+                <span class="ask-pick-box"></span>
+                <span class="ask-pick-main">
+                  <span class="ask-pick-name"><%= survey.title.presence || survey.theme %></span>
+                  <span class="ask-pick-meta">
+                    <span><%= t("js.ask.people_answered", count: number_with_delimiter(row[:answered])) %></span>
+                    <span>·</span>
+                    <span><%= t("ask.suggest.meta_questions", count: row[:total]) %></span>
+                    <% survey.sdgs.first(2).each do |n| %>
+                      <span class="ask-sdg-chip" style="--sdg:<%= UnSdgs.color(n) %>;"><i></i><%= UnSdgs.label(n) %> · <%= UnSdgs.title(n) %></span>
+                    <% end %>
+                  </span>
+                </span>
+              </button>
+              <div class="ask-pick-sets">
+                <% row[:sets].each do |set| %>
+                  <label class="ask-set">
+                    <input type="checkbox" name="vertos[<%= survey.id %>][set_ids][]" value="<%= set[:id] %>"
+                           data-q="<%= set[:count] %>" data-n="<%= row[:answered] %>"
+                           data-action="change->ask-verto#refreshPicks">
+                    <span class="ask-pick-box"></span>
+                    <span><%= t("ask.submit.set_questions", name: set[:name], count: set[:count]) %></span>
+                    <span class="ask-set-tag"><%= t("ask.submit.common_set") %></span>
+                  </label>
+                <% end %>
+                <% if row[:own_count].positive? %>
+                  <label class="ask-set">
+                    <input type="checkbox" name="vertos[<%= survey.id %>][own]" value="1"
+                           data-q="<%= row[:own_count] %>" data-n="<%= row[:answered] %>"
+                           data-action="change->ask-verto#refreshPicks">
+                    <span class="ask-pick-box"></span>
+                    <span><%= t("ask.submit.own_questions", count: row[:own_count]) %></span>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+          <% else %>
+            <div class="ask-pick is-locked">
+              <span class="ask-pick-box"></span>
+              <span class="ask-pick-main">
+                <span class="ask-pick-name"><%= survey.title.presence || survey.theme %></span>
+                <span class="ask-pick-meta"><span class="ask-pick-lock">🔒
+                  <%= case row[:state]
+                      when :unpublished        then t("ask.submit.locked_unpublished")
+                      when :too_few_responses  then t("ask.submit.locked_min_responses", min: CorpusEntry::SUBMISSION_MIN_RESPONSES, count: row[:answered])
+                      when :pending            then t("ask.submit.locked_pending")
+                      when :live               then t("ask.submit.locked_live")
+                      else t("ask.submit.locked_declined")
+                      end %>
+                </span></span>
+              </span>
+            </div>
+          <% end %>
+        <% end %>
+
+        <p class="ask-pick-note"><%= t("ask.submit.note", min: CorpusEntry::SUBMISSION_MIN_RESPONSES) %></p>
+
+        <div class="ask-modal-foot">
+          <span class="ask-modal-count" data-ask-verto-target="pickCount"><%= t("js.ask.picker_none") %></span>
+          <button type="button" class="ask-modal-cancel" data-action="click->ask-verto#closeSubmit"><%= t("ask.submit.cancel") %></button>
+          <button type="submit" class="ask-modal-submit" data-ask-verto-target="submitGo" disabled><%= t("ask.submit.go") %></button>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="ask-modal-success">
+      <div class="ask-success-ring">✓</div>
+      <div class="ask-modal-title" style="text-align:center;"><%= t("ask.submit.done_title") %></div>
+      <p class="ask-modal-sub" style="text-align:center;"><%= t("ask.submit.done_body", count: submitted) %></p>
+      <button type="button" class="ask-modal-cancel" data-action="click->ask-verto#closeSubmit"><%= t("js.ask.close") %></button>
+    </div>
+  </div>
+</div>

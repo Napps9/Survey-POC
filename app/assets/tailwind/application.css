@@ -8627,6 +8627,120 @@ body.generating-overlay-active .bottom-bar { display: none; }
   color: rgba(255,255,255,0.4); line-height: 1.6; padding: 8px 4px;
 }
 
+/* ── Submit-your-data CTA + picker modal ───────────────────────────────────
+   The corpus's front door for creators: pick whole Vertos or their question
+   sets, submit for the Verto team's review. A plain form of real checkboxes;
+   the classes below carry the visual states the controller mirrors. */
+.ask-submit-cta {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
+  padding: 9px 16px; border-radius: 999px; cursor: pointer;
+  background: rgba(1,234,203,0.1); border: 1px solid rgba(1,234,203,0.45);
+  color: #01EACB; font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.04em;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.ask-submit-cta:hover { background: rgba(1,234,203,0.18); box-shadow: 0 6px 18px rgba(1,234,203,0.2); }
+.ask-submit-cta--paper { width: 100%; justify-content: center; margin-top: 0; }
+.ask-submit-sub {
+  margin: 7px 0 0; font-family: "ABeeZee", sans-serif; font-size: 10.5px;
+  color: rgba(255,255,255,0.4); text-align: center;
+}
+
+.ask-modal-overlay {
+  position: absolute; inset: 0; z-index: 80; display: none;
+  background: rgba(6,8,18,0.66); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 24px;
+}
+.ask-modal-overlay.is-open { display: flex; }
+.ask-modal {
+  width: min(540px, 100%); max-height: 100%; overflow-y: auto;
+  background: #191D33; border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px; box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  padding: 20px 20px 16px; text-align: start;
+}
+.ask-modal-title { font-family: "Alata", sans-serif; font-size: 17px; color: #fff; margin: 0 0 6px; }
+.ask-modal-sub {
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
+  color: rgba(255,255,255,0.55); line-height: 1.6; margin: 0 0 14px;
+}
+.ask-pick {
+  display: flex; align-items: center; gap: 11px; width: 100%; text-align: start;
+  padding: 11px 12px; border-radius: 12px; cursor: pointer; margin-bottom: 7px;
+  background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.09);
+  transition: border-color 0.15s, background 0.15s;
+  font-family: "ABeeZee", sans-serif; color: inherit;
+}
+.ask-pick:hover { border-color: rgba(255,255,255,0.2); }
+.ask-pick.is-checked { border-color: rgba(1,234,203,0.6); background: rgba(1,234,203,0.06); }
+.ask-pick-box {
+  width: 19px; height: 19px; border-radius: 6px; flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #04221E; transition: background 0.15s, border-color 0.15s;
+}
+.ask-pick-box::after { content: "✓"; opacity: 0; }
+.ask-pick.is-checked .ask-pick-box { background: #01EACB; border-color: #01EACB; }
+.ask-pick.is-checked .ask-pick-box::after { opacity: 1; }
+.ask-pick.is-partial { border-color: rgba(1,234,203,0.4); }
+.ask-pick.is-partial .ask-pick-box { background: #01EACB; border-color: #01EACB; }
+.ask-pick.is-partial .ask-pick-box::after { content: "–"; opacity: 1; }
+.ask-pick-main { min-width: 0; flex: 1; }
+.ask-pick-name { display: block; font-size: 12.5px; color: #fff; margin-bottom: 3px; }
+.ask-pick-meta {
+  display: flex; gap: 5px 8px; flex-wrap: wrap; align-items: center;
+  font-size: 10.5px; color: rgba(255,255,255,0.5);
+}
+.ask-pick.is-locked { opacity: 0.55; cursor: not-allowed; }
+.ask-pick.is-locked .ask-pick-box { border-style: dashed; }
+.ask-pick-lock { font-size: 10.5px; color: #FFB43A; }
+.ask-pick-sets { margin: -1px 0 9px 30px; }
+.ask-set {
+  display: flex; align-items: center; gap: 9px; width: 100%; text-align: start;
+  padding: 7px 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px;
+  background: none; border: 1px dashed rgba(255,255,255,0.13);
+  font-family: "ABeeZee", sans-serif; color: rgba(255,255,255,0.65); font-size: 11.5px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.ask-set:hover { border-color: rgba(255,255,255,0.28); }
+.ask-set input { position: absolute; opacity: 0; pointer-events: none; }
+.ask-set.is-checked { border-style: solid; border-color: rgba(1,234,203,0.55); background: rgba(1,234,203,0.05); color: #fff; }
+.ask-set .ask-pick-box { width: 16px; height: 16px; border-radius: 5px; font-size: 10px; }
+.ask-set.is-checked .ask-pick-box { background: #01EACB; border-color: #01EACB; }
+.ask-set.is-checked .ask-pick-box::after { opacity: 1; }
+.ask-set-tag {
+  margin-inline-start: auto; flex-shrink: 0; font-size: 9.5px; padding: 2px 8px; border-radius: 99px;
+  color: #0CA7FF; border: 1px solid rgba(12,167,255,0.4); background: rgba(12,167,255,0.08);
+  white-space: nowrap;
+}
+.ask-pick-note {
+  font-family: "ABeeZee", sans-serif; font-size: 10.5px;
+  color: rgba(255,255,255,0.38); margin: 2px 2px 0; line-height: 1.5;
+}
+.ask-modal-foot {
+  display: flex; align-items: center; gap: 10px; margin-top: 14px;
+  padding-top: 13px; border-top: 1px solid rgba(255,255,255,0.09);
+}
+.ask-modal-count { font-size: 11.5px; font-family: "ABeeZee", sans-serif; color: rgba(255,255,255,0.55); flex: 1; }
+.ask-modal-cancel {
+  padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  background: none; border: 1px solid rgba(255,255,255,0.18); color: rgba(255,255,255,0.7);
+  font-family: "Alata", sans-serif; font-size: 12px;
+}
+.ask-modal-cancel:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
+.ask-modal-submit {
+  padding: 8px 18px; border-radius: 999px; cursor: pointer; border: none;
+  background: #01EACB; color: #04221E;
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.03em;
+}
+.ask-modal-submit:disabled { opacity: 0.4; cursor: default; }
+.ask-modal-success { display: none; text-align: center; padding: 18px 6px 10px; }
+.ask-modal.is-done .ask-modal-success { display: block; }
+.ask-modal.is-done .ask-modal-picker { display: none; }
+.ask-success-ring {
+  width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 14px;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+  background: rgba(1,234,203,0.12); border: 1.5px solid rgba(1,234,203,0.55); color: #01EACB;
+}
+
 /* ── Review queue + opt-in block ───────────────────────────────────────────
    The staff surface and the creator's block get the same colour discipline: a
    state hue that reads at a glance rather than a wall of grey rows. */

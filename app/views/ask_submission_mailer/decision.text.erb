@@ -1,0 +1,11 @@
+<%= @entry.approved? ? t("ask_submission_mailer.approved_heading") : t("ask_submission_mailer.declined_heading") %>
+
+<%= @entry.approved? ? t("ask_submission_mailer.approved_body", verto: @verto) : t("ask_submission_mailer.declined_body", verto: @verto) %>
+<% unless @entry.approved? %>
+
+> <%= @entry.review_note %>
+
+<%= t("ask_submission_mailer.declined_outro") %>
+<% end %>
+
+<%= @entry.approved? ? t("ask_submission_mailer.cta_ask") : t("ask_submission_mailer.cta_verto") %>: <%= @entry.approved? ? ask_url : survey_url(@entry.survey) %>

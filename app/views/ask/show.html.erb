@@ -108,6 +108,13 @@
             </div>
           <% end %>
         </div>
+        <% if @submittable.any? %>
+          <div class="ask-island">
+            <button type="button" class="ask-submit-cta ask-submit-cta--paper"
+                    data-action="click->ask-verto#openSubmit">✚ <%= t("ask.submit.cta") %></button>
+            <p class="ask-submit-sub"><%= t("ask.submit.cta_sub") %></p>
+          </div>
+        <% end %>
       </div>
     </div>
 
@@ -260,6 +267,11 @@
                 <% end %>
               </div>
             <% end %>
+
+            <% if @submittable.any? %>
+              <button type="button" class="ask-submit-cta"
+                      data-action="click->ask-verto#openSubmit">✚ <%= t("ask.submit.cta") %></button>
+            <% end %>
           </div>
         <% else %>
           <%# Replayed from the database, markers resolved server-side so a
@@ -361,4 +373,8 @@
       </div>
     </div>
   </div>
+
+  <% if @submittable.any? %>
+    <%= render "ask/submit_modal" %>
+  <% end %>
 </div>

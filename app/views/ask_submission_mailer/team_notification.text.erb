@@ -1,0 +1,12 @@
+<%= @entries.size %> <%= "Verto".pluralize(@entries.size) %> submitted to the Ask corpus
+
+<%= @user.name.presence || @user.email_address %> (<%= @organisation.name %>) has offered these Vertos to Ask Verto. Nothing joins the corpus until the Verto team approves it.
+
+<% @rows.each do |row| -%>
+* <%= row[:name] %> — <%= number_with_delimiter(row[:responses]) %> people answered · <%= row[:whole] ? "all #{row[:total]} questions" : "#{row[:offered]} of #{row[:total]} questions" %>
+<% end -%>
+
+Review the submission: <%= corpus_reviews_url %>
+
+You're receiving this because the Verto team reviews Ask Verto submissions.
+Aggregate figures only — raw responses never leave the Verto.

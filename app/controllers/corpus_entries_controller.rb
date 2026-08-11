@@ -15,6 +15,13 @@ class CorpusEntriesController < ApplicationController
     entry.save! unless entry.persisted?
     entry.opt_in!(Current.user)
 
+    # The same loop the ask screen's batch picker closes: the Verto team
+    # hears about every offer, the submitter gets a receipt. One entry here,
+    # but the same pair of emails, so an offer is an offer wherever it was
+    # made from.
+    AskSubmissionMailer.team_notification(Current.user, [ entry ]).deliver_later
+    AskSubmissionMailer.submitter_confirmation(Current.user, [ entry ]).deliver_later
+
     redirect_back fallback_location: survey_path(@survey),
                   notice: t("ask.opt_in.offered")
   end

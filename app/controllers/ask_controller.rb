@@ -38,5 +38,39 @@ class AskController < ApplicationController
     # Only built for the cold start — the hero is the only thing that renders
     # them, and they cost a pass over the index.
     @suggestions = @messages.empty? ? tools.suggestions : []
+
+    @submittable = submittable_vertos
+  end
+
+  private
+
+  # The "Submit your Verto data" picker's material: the org's Vertos with a
+  # submittable state each, and the question sets a ready one can be narrowed
+  # to. Admins only — offering respondents' data outward is an admin decision
+  # (the same rule CorpusEntriesController enforces) — so for everyone else
+  # the CTA and modal simply don't render. Bounded to the 30 newest kept
+  # Vertos; an org past that bound manages the rest from each survey's page.
+  PICKER_LIMIT = 30
+
+  def submittable_vertos
+    return [] unless current_membership&.admin?
+
+    Current.organisation.surveys.kept.order(created_at: :desc).limit(PICKER_LIMIT).map do |survey|
+      answered = CorpusIndexer.countable_responses(survey).count
+      cards    = Array(survey.cards).select { |c| CorpusIndexer.indexable?(c["type"].to_s) }
+      groups   = cards.group_by { |c| c["common_question_set_id"] }
+
+      {
+        survey:    survey,
+        answered:  answered,
+        state:     CorpusEntry.submittable_state(survey, answered_count: answered),
+        total:     cards.size,
+        own_count: (groups[nil] || []).size,
+        sets:      groups.except(nil).map do |set_id, group|
+          set = CommonQuestionSet.find_by(id: set_id)
+          { id: set_id, name: set&.name.presence || t("ask.submit.common_set"), count: group.size }
+        end
+      }
+    end.sort_by { |row| row[:state] == :ready ? 0 : 1 }
   end
 end

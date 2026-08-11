@@ -24,7 +24,8 @@ export default class extends Controller {
   static targets = [
     "grid", "main", "feed", "messages", "input", "send", "sourcesFab", "sourceCount", "fabDots",
     "tab", "tabCount", "pane", "sourceList", "detailTitle", "detailBody", "consentBody", "hero",
-    "railTab", "railPane", "eyebrow", "titlePill", "fabRow"
+    "railTab", "railPane", "eyebrow", "titlePill", "fabRow",
+    "submitOverlay", "submitModal", "pickCount", "submitGo"
   ]
   static values = {
     threadUrl: String, newThreadUrl: String, sources: Array, initialQuestion: String,
@@ -451,6 +452,67 @@ export default class extends Controller {
       tab.classList.toggle("is-active", on)
       tab.setAttribute("aria-selected", on ? "true" : "false")
     })
+  }
+
+  // ── The submit-your-data picker ─────────────────────────────────────────
+  // A plain form of real checkboxes; this only adds the conveniences — the
+  // Verto-level tick-all, the parent's checked/partial state, and the live
+  // counter. The server re-derives everything the form claims.
+  openSubmit() {
+    this.submitOverlayTarget.classList.add("is-open")
+  }
+
+  closeSubmit() {
+    this.submitOverlayTarget.classList.remove("is-open")
+    // After a submission the URL carries ?submitted=N so the redirect lands
+    // on the success pane; scrub it so a reload doesn't replay the modal.
+    const url = new URL(window.location)
+    if (url.searchParams.has("submitted")) {
+      url.searchParams.delete("submitted")
+      history.replaceState(null, "", url)
+      this.submitModalTarget.classList.remove("is-done")
+    }
+  }
+
+  overlayClose(event) {
+    if (event.target === this.submitOverlayTarget) this.closeSubmit()
+  }
+
+  // The Verto row ticks (or unticks) every set beneath it.
+  togglePick(event) {
+    const group = event.currentTarget.closest(".ask-pick-group")
+    const boxes = [...group.querySelectorAll(".ask-set input[type=checkbox]")]
+    const all = boxes.every((box) => box.checked)
+    boxes.forEach((box) => { box.checked = !all })
+    this.refreshPicks()
+  }
+
+  refreshPicks() {
+    let questions = 0, questionsOf = 0, responses = 0, vertos = 0
+
+    this.submitOverlayTarget.querySelectorAll(".ask-pick-group").forEach((group) => {
+      const boxes = [...group.querySelectorAll(".ask-set input[type=checkbox]")]
+      const on = boxes.filter((box) => box.checked)
+      boxes.forEach((box) => box.closest(".ask-set").classList.toggle("is-checked", box.checked))
+
+      const parent = group.querySelector(".ask-pick")
+      parent.classList.toggle("is-checked", boxes.length > 0 && on.length === boxes.length)
+      parent.classList.toggle("is-partial", on.length > 0 && on.length < boxes.length)
+
+      if (on.length) {
+        vertos += 1
+        responses += Number(boxes[0].dataset.n || 0)
+        boxes.forEach((box) => { questionsOf += Number(box.dataset.q || 0) })
+        on.forEach((box) => { questions += Number(box.dataset.q || 0) })
+      }
+    })
+
+    this.submitGoTarget.disabled = vertos === 0
+    this.pickCountTarget.textContent = vertos === 0
+      ? t("ask.picker_none")
+      : t("ask.picker_count", {
+          questions, total: questionsOf, responses: responses.toLocaleString()
+        })
   }
 
   // ── The sources folder ──────────────────────────────────────────────────
