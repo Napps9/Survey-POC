@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_11_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_11_130200) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -339,6 +339,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_120000) do
     t.check_constraint "status IN ('active', 'pending', 'revoked')", name: "chk_partnerships_status"
   end
 
+  create_table "player_aliases", force: :cascade do |t|
+    t.string "anon_name", null: false
+    t.datetime "created_at", null: false
+    t.string "key_digest", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_id", "anon_name"], name: "index_player_aliases_on_survey_id_and_anon_name", unique: true
+    t.index ["survey_id", "key_digest"], name: "index_player_aliases_on_survey_id_and_key_digest", unique: true
+    t.index ["survey_id"], name: "index_player_aliases_on_survey_id"
+  end
+
   create_table "portfolio_common_question_sets", force: :cascade do |t|
     t.integer "common_question_set_id", null: false
     t.datetime "created_at", null: false
@@ -398,6 +409,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_120000) do
     t.string "demographic_neurodiversity"
     t.string "device_kind"
     t.string "locale"
+    t.string "player_key_digest"
     t.integer "quiz_max"
     t.string "region_country"
     t.string "region_label"
@@ -417,6 +429,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_120000) do
     t.index ["survey_id", "demographic_gender"], name: "index_responses_on_survey_id_and_demographic_gender"
     t.index ["survey_id", "demographic_heritage"], name: "index_responses_on_survey_id_and_demographic_heritage"
     t.index ["survey_id", "demographic_neurodiversity"], name: "index_responses_on_survey_id_and_demographic_neurodiversity"
+    t.index ["survey_id", "player_key_digest"], name: "index_responses_on_survey_and_player_key"
     t.index ["survey_id", "region_country"], name: "index_responses_on_survey_and_region_country"
     t.index ["survey_id", "respondent_code_digest"], name: "index_responses_on_survey_and_respondent_code"
     t.index ["survey_id"], name: "index_responses_on_survey_id"
@@ -612,6 +625,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_120000) do
     t.string "forward_label"
     t.string "forward_url"
     t.text "key_insight"
+    t.boolean "leaderboard_enabled", default: false, null: false
+    t.string "leaderboard_retake_policy", default: "accumulate", null: false
     t.json "locales"
     t.boolean "logic", default: false, null: false
     t.integer "organisation_id", null: false
@@ -649,6 +664,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_120000) do
     t.index ["publish_token"], name: "index_surveys_on_publish_token", unique: true
     t.index ["slug"], name: "index_surveys_on_slug", unique: true
     t.index ["test_token"], name: "index_surveys_on_test_token", unique: true
+    t.check_constraint "leaderboard_retake_policy IN ('accumulate', 'no_redo', 'restart')", name: "chk_surveys_leaderboard_retake_policy"
   end
 
   create_table "translation_cache", force: :cascade do |t|
@@ -729,6 +745,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_11_120000) do
   add_foreign_key "partnership_vertos", "partnerships"
   add_foreign_key "partnership_vertos", "surveys"
   add_foreign_key "partnerships", "organisations"
+  add_foreign_key "player_aliases", "surveys"
   add_foreign_key "portfolio_common_question_sets", "common_question_sets"
   add_foreign_key "portfolio_common_question_sets", "portfolios"
   add_foreign_key "portfolio_memberships", "funder_memberships"

@@ -15,6 +15,9 @@ class Survey < ApplicationRecord
   # The Verto's Ask Verto consent record. Destroyed with it, so a deleted Verto
   # cannot leave a corpus entry that still reads as citable.
   has_one :corpus_entry, dependent: :destroy
+  # The leaderboard's anonymous names. Scoped to the Verto (a name is an
+  # identity on ONE board) and gone with it.
+  has_many :player_aliases, dependent: :destroy
 
   # Creator-uploaded card/background imagery. Previously these lived inline in
   # the `cards` JSON as base64 data-URLs, which meant every render of a Verto
@@ -1113,7 +1116,9 @@ class Survey < ApplicationRecord
       consent_text:            consent_text,
       consent_image:           consent_image,
       consent_image_credit:    consent_image_credit,
-      consent_image_credit_url: consent_image_credit_url
+      consent_image_credit_url: consent_image_credit_url,
+      leaderboard_enabled:     leaderboard_enabled,
+      leaderboard_retake_policy: leaderboard_retake_policy
     )
   end
 
@@ -1397,6 +1402,32 @@ class Survey < ApplicationRecord
     render_mode == "form"
   end
 
+  # What a retake does to a player's leaderboard score. A string enum per the
+  # render_mode precedent, normalized on write (update_settings) and CHECK-
+  # constrained in the database, so an unknown value can't arrive silently.
+  #
+  #   accumulate — retakes add to the total (the default: the most game-like
+  #                reading of "play again", and the least surprising).
+  #   no_redo    — one play each; the player skips a recognised returner
+  #                straight to the board, and aggregation ignores stray extras.
+  #   restart    — a retake wipes the old score and starts over.
+  LEADERBOARD_RETAKE_POLICIES = %w[accumulate no_redo restart].freeze
+
+  def self.normalize_leaderboard_retake_policy(value)
+    LEADERBOARD_RETAKE_POLICIES.include?(value.to_s) ? value.to_s : "accumulate"
+  end
+
+  # The board only ranks token totals, so without tokenisation there is
+  # nothing to rank — leaderboard_enabled alone is inert (the flag survives a
+  # pre-live tokenisation switch-off, but nothing renders or records).
+  def leaderboard_active?
+    tokenisation_enabled? && leaderboard_enabled?
+  end
+
+  def leaderboard_no_redo?
+    leaderboard_retake_policy == "no_redo"
+  end
+
   # Coerce a creator-entered website into a safe http(s) URL for the
   # forward-to-website CTA on the thank-you screen. Adds a scheme when missing;
   # returns nil for blank or non-http(s) input so the CTA simply doesn't show.
@@ -1642,5 +1673,22 @@ class Survey < ApplicationRecord
   # only ever comparable to each other).
   def respondent_code_key
     Rails.application.key_generator.generate_key("respondent_code/survey/#{id}", 32)
+  end
+
+  # The leaderboard identity digest — respondent_code_digest's sibling, same
+  # posture: the raw browser-minted key is never stored, and the per-survey
+  # key means a digest is comparable only within this Verto, so identities
+  # can't be joined across surveys. nil for blank input ("no identity"), and
+  # the length bound keeps an abusive payload from becoming HMAC fodder — a
+  # legitimate key is a 36-char UUID.
+  def player_key_digest(key)
+    normalised = key.to_s.strip.first(80)
+    return nil if normalised.blank?
+
+    OpenSSL::HMAC.hexdigest("SHA256", player_key_hmac_key, normalised)
+  end
+
+  def player_key_hmac_key
+    Rails.application.key_generator.generate_key("player_key/survey/#{id}", 32)
   end
 end

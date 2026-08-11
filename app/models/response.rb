@@ -105,6 +105,9 @@ class Response < ApplicationRecord
     self.quiz_max = nil
     self.token_totals = {}
     self.respondent_code_digest = nil
+    # The leaderboard identity is a durable handle on this person's plays —
+    # exactly the kind of thing the decline purge exists to drop.
+    self.player_key_digest = nil
   end
 
   # Whether this response holds a real answer to at least one question.
