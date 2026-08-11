@@ -5,6 +5,13 @@ class Survey < ApplicationRecord
   has_many :partnership_vertos, dependent: :destroy
   has_many :report_renders, dependent: :destroy
   has_many :flow_generations, dependent: :destroy
+  # Builds outlive the Verto they produced — they're the account's generation
+  # log, deleted with the organisation, not the survey. Nullify rather than
+  # nothing because verto_builds.survey_id carries a real FK: without this,
+  # destroying a survey that a build points at raises InvalidForeignKey
+  # (bitten in production by verto:import_csv rebuilding an org whose
+  # placeholder Verto was wizard-built).
+  has_many :verto_builds, dependent: :nullify
   # The Verto's Ask Verto consent record. Destroyed with it, so a deleted Verto
   # cannot leave a corpus entry that still reads as citable.
   has_one :corpus_entry, dependent: :destroy
