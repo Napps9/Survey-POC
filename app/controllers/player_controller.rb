@@ -18,7 +18,7 @@ class PlayerController < ApplicationController
   # Public read endpoints that aggregate over the whole response set — cap them
   # too, so they can't be hammered as a memory-amplification vector. Generous:
   # a respondent hits each once after finishing.
-  rate_limit to: 120, within: 1.minute, only: [ :results, :scores, :regions ],
+  rate_limit to: 120, within: 1.minute, only: [ :results, :scores, :regions, :leaderboard ],
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # Consent is written at most twice per legitimate session (a decline, or a
   # decline followed by an explicit re-agree), and declining PURGES the
@@ -141,6 +141,7 @@ class PlayerController < ApplicationController
     # what's already stored so an already-answered graded card can't be changed.
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     apply_respondent_code(resp, data["respondent_code"])
+    apply_player_key(resp, data["player_key"])
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
@@ -171,6 +172,7 @@ class PlayerController < ApplicationController
     return if refuse_if_declined(resp)
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     apply_respondent_code(resp, data["respondent_code"])
+    apply_player_key(resp, data["player_key"])
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
     resp.status  = "completed"
@@ -183,6 +185,16 @@ class PlayerController < ApplicationController
     apply_quiz_score(resp)
     apply_token_totals(resp)
     resp.save!
+    # Best-effort: have the finisher's anonymous name minted before the thank-you
+    # screen fetches the board. A naming hiccup must never fail the write that
+    # just stored the answers — #leaderboard's backfill names anyone missed.
+    if @survey.leaderboard_active? && resp.player_key_digest.present?
+      begin
+        PlayerAlias.ensure_for!(survey: @survey, key_digest: resp.player_key_digest)
+      rescue => e
+        ErrorReporting.report("PlayerController#submit alias", e)
+      end
+    end
     payload = { ok: true }
     payload.merge!(score: resp.score, max: resp.quiz_max) if @survey.quiz?
     payload.merge!(token_totals: resp.token_totals) if @survey.tokenisation_enabled?
@@ -258,6 +270,7 @@ class PlayerController < ApplicationController
     return if refuse_if_declined(resp)
     first_time = !answered?(stored_answers(resp)[idx.to_s])
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    apply_player_key(resp, data["player_key"])
     ai_normalize_open_ended_answer!(resp, idx) if first_time
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
@@ -373,6 +386,51 @@ class PlayerController < ApplicationController
     render json: { ok: true, total:, max:, average: avg,
                    distribution: (0..max).map { |s| { score: s, count: dist[s] } },
                    per_question: }
+  end
+
+  # How many standings rows the board shows. "You" rides along even from
+  # further down, with your true rank.
+  LEADERBOARD_TOP = 10
+
+  # The token leaderboard: identities ranked under the creator's retake policy,
+  # wearing their system-made anonymous names. Enablement is enforced here, not
+  # just by hiding the CTA (the #results posture), and the whole payload is
+  # anonymous by construction — names and totals, no answers, no identities.
+  def leaderboard
+    return render json: { ok: false }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
+    unless @survey.leaderboard_active?
+      return render json: { ok: false, error: "Leaderboard not enabled" }, status: :forbidden
+    end
+
+    standings = TokenLeaderboard.standings(@survey)
+
+    # Resolve "you": the saved row's digest once this session has written, else
+    # the raw key the client sent — a recognised returner opening a fresh
+    # session (no_redo's straight-to-board path) has a key but no row yet.
+    token = params[:session_token].to_s
+    resp  = token.present? ? @survey.responses.find_by(session_token: token) : nil
+    you_digest = resp&.player_key_digest.presence || @survey.player_key_digest(params[:player_key])
+    you_index  = you_digest ? standings.index { |e| e[:key_digest] == you_digest } : nil
+
+    # Read-time backfill: name everyone about to be rendered (≤11 idempotent
+    # finds). Submit already minted most of them; this covers identities from
+    # before a mid-flight enable, and seeded rows.
+    top = standings.first(LEADERBOARD_TOP)
+    shown = top.map { |e| e[:key_digest] }
+    shown |= [ you_digest ] if you_index
+    shown.each { |digest| PlayerAlias.ensure_for!(survey: @survey, key_digest: digest) }
+    names = @survey.player_aliases.where(key_digest: shown).pluck(:key_digest, :anon_name).to_h
+
+    entries = top.each_with_index.map do |e, i|
+      { rank: i + 1, name: names[e[:key_digest]], total: e[:total], you: e[:key_digest] == you_digest }
+    end
+    you = if you_index
+      { rank: you_index + 1, name: names[you_digest],
+        total: standings[you_index][:total], of: standings.size }
+    end
+    render json: { ok: true, policy: @survey.leaderboard_retake_policy,
+                   total_players: standings.size, entries:, you: }
   end
 
   def results
@@ -540,6 +598,17 @@ class PlayerController < ApplicationController
 
     digest = @survey.respondent_code_digest(code)
     resp.respondent_code_digest = digest if digest
+  end
+
+  # The leaderboard identity, same discipline as the respondent code above:
+  # recorded only while the feature is on, only as a digest, and set once per
+  # response — a reload keeps the identity it started with.
+  def apply_player_key(resp, key)
+    return unless @survey.leaderboard_active?
+    return if resp.player_key_digest.present?
+
+    digest = @survey.player_key_digest(key)
+    resp.player_key_digest = digest if digest
   end
 
   # NB: the status column defaults to "completed", so a freshly initialized

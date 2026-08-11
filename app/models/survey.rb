@@ -927,6 +927,19 @@ class Survey < ApplicationRecord
     OpenSSL::HMAC.hexdigest("SHA256", respondent_code_key, normalised)
   end
 
+  # The leaderboard identity digest — respondent_code_digest's sibling, same
+  # posture: the raw browser-minted key is never stored, and the per-survey
+  # key means a digest is comparable only within this Verto, so identities
+  # can't be joined across surveys. nil for blank input ("no identity"), and
+  # the length bound keeps an abusive payload from becoming HMAC fodder — a
+  # legitimate key is a 36-char UUID.
+  def player_key_digest(key)
+    normalised = key.to_s.strip.first(80)
+    return nil if normalised.blank?
+
+    OpenSSL::HMAC.hexdigest("SHA256", player_key_hmac_key, normalised)
+  end
+
   # Case and spacing shouldn't decide whether someone matches themselves — a
   # respondent typing "Sam 14" in wave two after "sam14" in wave one is the same
   # person, and the whole feature is worthless if that misses.
@@ -1673,19 +1686,6 @@ class Survey < ApplicationRecord
   # only ever comparable to each other).
   def respondent_code_key
     Rails.application.key_generator.generate_key("respondent_code/survey/#{id}", 32)
-  end
-
-  # The leaderboard identity digest — respondent_code_digest's sibling, same
-  # posture: the raw browser-minted key is never stored, and the per-survey
-  # key means a digest is comparable only within this Verto, so identities
-  # can't be joined across surveys. nil for blank input ("no identity"), and
-  # the length bound keeps an abusive payload from becoming HMAC fodder — a
-  # legitimate key is a 36-char UUID.
-  def player_key_digest(key)
-    normalised = key.to_s.strip.first(80)
-    return nil if normalised.blank?
-
-    OpenSSL::HMAC.hexdigest("SHA256", player_key_hmac_key, normalised)
   end
 
   def player_key_hmac_key
