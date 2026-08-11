@@ -164,6 +164,22 @@ class JsConstantParityTest < ActiveSupport::TestCase
     end
   end
 
+  # The SDG titles and official colours live twice: UnSdgs stamps a source with
+  # goal NUMBERS only, and the Ask Verto stream resolves them to chips
+  # client-side. A drifted copy paints goal 13 a different green in the live
+  # stream than in the server-rendered replay of the very same answer.
+  test "lib/un_sdgs.js titles and colours match UnSdgs" do
+    source = js("lib/un_sdgs.js")
+    js_map = ->(name) do
+      body = source[/export const #{name} = \{(.*?)\n\}/m, 1]
+      assert body, "lib/un_sdgs.js no longer exports #{name}"
+      body.scan(/(\d+):\s*"([^"]+)"/).to_h { |n, v| [ n.to_i, v ] }
+    end
+
+    assert_equal UnSdgs::TITLES, js_map.call("SDG_TITLES")
+    assert_equal UnSdgs::COLORS, js_map.call("SDG_COLORS")
+  end
+
   # The palette maths lives twice (live preview vs server render); the roles
   # drifting means a colour a creator can pick that one side silently ignores.
   test "lib/brand_palette.js roles and defaults match BrandPalette" do

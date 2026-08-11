@@ -139,6 +139,24 @@ class CorpusTools
 
     out = []
 
+    # The UN goals the corpus can actually speak to, ranked by the people
+    # behind them, each tile in the goal's own official colour. Derived like
+    # every other suggestion: a goal no citable Verto declares is never
+    # offered, so a withdrawn Verto's goals leave the front page with it.
+    sdg_tallies = Hash.new(0)
+    scoped_entries.includes(:survey).each do |entry|
+      UnSdgs.sanitize(entry.survey.sdgs).each { |n| sdg_tallies[n] += entry.response_count }
+    end
+    sdg_tallies.sort_by { |_n, responses| -responses }.first(3).each do |n, _responses|
+      out << {
+        label:    UnSdgs.label(n),
+        question: I18n.t("ask.suggest.sdg", goal: UnSdgs.title(n)),
+        accent:   UnSdgs.color(n),
+        icon:     n.to_s,
+        meta:     "#{UnSdgs.label(n)} · #{UnSdgs.title(n)}"
+      }
+    end
+
     # The best-covered themes. Two questions minimum, so there is something to
     # compare rather than one card to recite.
     questions.group_by { |q| q.theme.presence }.compact
@@ -373,9 +391,45 @@ class CorpusTools
       # too small to carry two signals.
       "accent"             => CardTypes.accent(question.card_type),
       "icon"               => CardTypes.icon(question.card_type),
-      "brand"              => entry.survey.brand_palette["primary"]
+      "brand"              => entry.survey.brand_palette["primary"],
+      # The Detail pane's answer bars: every option (or open-text theme) with
+      # its share, largest first. Display-only, like `sdgs` — result_row hands
+      # the model richer, labelled numbers; this is the pane's snapshot of the
+      # same facts, so a reader can see the whole distribution behind a cited
+      # figure without a second fetch. Absent on pre-breakdown snapshots,
+      # which render as they always did.
+      "breakdown"          => breakdown_for(question)
     }
     number
+  end
+
+  # At most this many bars in a Detail pane breakdown — enough to show the
+  # shape of a distribution, few enough to stay a glance.
+  BREAKDOWN_LIMIT = 8
+
+  def breakdown_for(question)
+    rows =
+      case question.card_type
+      when "prioritise"
+        # A mean rank is not a count — a bar would read as a share of people,
+        # which is exactly the misreading result_row spells out against.
+        []
+      when "open_ended"
+        themes = Array(question.distribution["themes"])
+        total  = themes.sum { |theme| theme["count"].to_i }
+        themes.map do |theme|
+          count = theme["count"].to_i
+          { "label"   => theme["label"].to_s,
+            "count"   => count,
+            "percent" => total.zero? ? 0 : (count * 100.0 / total).round(1) }
+        end
+      else
+        question.ranked_options.map do |option|
+          { "label" => option[:label], "count" => option[:count], "percent" => option[:percent] }
+        end
+      end
+
+    rows.first(BREAKDOWN_LIMIT)
   end
 
   # Month precision, not timestamps. "3 June 2025, 14:02" narrows a respondent

@@ -17,11 +17,14 @@ class AskController < ApplicationController
 
   # An app shell, like the editor and the results screen: the conversation and
   # the folder scroll inside their own columns, and the page itself never does.
-  # Keeps the bottom nav — unlike the editor, this is a destination you arrive
-  # at rather than a workspace you leave.
   layout "fullscreen"
 
   def show
+    # The editor's trade, adopted 2026-08-11: the nav strip goes, and its
+    # survivors float — a glass back pill top-left, the language pill pinned
+    # top-right. The command palette stays reachable via ⌘K.
+    @hide_main_nav = true
+
     @threads = Current.organisation.ask_threads.recent.limit(20)
     @thread  = if params[:thread_id].present?
                  Current.organisation.ask_threads.find_by(id: params[:thread_id])

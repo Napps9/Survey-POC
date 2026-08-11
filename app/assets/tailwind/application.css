@@ -7987,58 +7987,50 @@ body.generating-overlay-active .bottom-bar { display: none; }
    A chip is too small to carry both, which is why only the accent reaches it. */
 
 /* ── The shell ─────────────────────────────────────────────────────────────
-   Same trick as .editor-grid: the panel column is 0 wide until it's wanted, and
-   the width transition IS the slide. */
+   Same trick as .editor-grid: BOTH folder columns are 0 wide until they're
+   wanted, and the width transition IS the slide. Threads/scope on the left,
+   sources on the right; they can be out together on a wide screen. */
 .ask-grid {
   display: grid;
-  grid-template-columns: 210px 1fr 0;
+  grid-template-columns: 0 1fr 0;
   transition: grid-template-columns 0.28s ease;
   position: relative;
   height: 100%;
   overflow: hidden;
   background: #1C2034;
 }
-.ask-grid.is-panel-open { grid-template-columns: 64px 1fr 468px; }
+.ask-grid.is-rail-open  { grid-template-columns: 300px 1fr 0; }
+.ask-grid.is-panel-open { grid-template-columns: 0 1fr 468px; }
+.ask-grid.is-rail-open.is-panel-open { grid-template-columns: 300px 1fr 468px; }
 
 /* The aurora sits between the results page's restraint (10%) and the generating
    screen's full 35%: this is a reading surface, but it's also the shop window. */
 .ask-orbs .gen-orb   { opacity: 0.17; }
 .ask-orbs .gen-orb-4 { opacity: 0.13; }
 
-/* ── Scope rail ────────────────────────────────────────────────────────────
-   Collapses to circles when the panel opens, exactly as .card-rail does. */
-.ask-rail {
-  position: relative; z-index: 1;
-  background: rgba(11,14,27,0.72);
-  backdrop-filter: blur(10px);
-  border-inline-end: 1px solid rgba(255,255,255,0.07);
-  display: flex; flex-direction: column; overflow: hidden;
+/* ── The left folder: Scope + Threads ──────────────────────────────────────
+   The old docked rail, restaged as a tab-paper folder mirroring .ask-panel on
+   the other side — same tabs, same solid paper, sliding out on demand. */
+.ask-lpanel {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; min-height: 0;
+  width: 286px; margin: 14px 0 14px 14px; margin-block-start: 60px;
+  visibility: hidden; transition: visibility 0s linear 0.3s;
 }
-.ask-rail-head { padding: 15px 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.07); }
-.ask-rail-brand { display: flex; align-items: center; gap: 8px; }
-.ask-rail-mark {
-  width: 26px; height: 26px; border-radius: 9px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 13px;
-  /* The create-menu icon-badge recipe, in Ask Verto's violet. */
-  background: linear-gradient(135deg, rgba(139,133,255,0.30), rgba(1,234,203,0.12));
-  border: 1px solid rgba(139,133,255,0.45);
-  color: #C9C5FF;
-}
-.ask-rail-brand span {
-  font-family: "Alata", sans-serif; font-size: 15px; color: #fff;
-  letter-spacing: 0.02em; white-space: nowrap;
-}
-.ask-rail-sec {
-  font-family: "Alata", sans-serif; font-size: 9.5px; letter-spacing: 0.14em;
-  text-transform: uppercase; color: rgba(255,255,255,0.28);
-  padding: 16px 14px 8px; white-space: nowrap;
-}
+.ask-grid.is-rail-open .ask-lpanel { visibility: visible; transition-delay: 0s; }
+.ask-tab--scope   { --tab-color: #01EACB; --panel-edge: #01AD97; --tab-ink: #04221E; }
+.ask-tab--threads { --tab-color: #8B85FF; --panel-edge: #635DD6; --tab-ink: #14122E; }
+.ask-paper--scope   { --paper: #0C332D; --panel-edge: #01AD97; }
+.ask-paper--threads { --paper: #2A2856; --panel-edge: #635DD6; }
+/* The handle pill hides itself while the folder is out — the ✕ on the tab
+   strip is the way back. */
+.ask-grid.is-rail-open .ask-rail-handle { display: none; }
 
 /* Scope numbers as mini stat tiles — the dashboard's gradient-tile recipe at
-   rail scale, so the corpus size reads as a fact rather than a table row. */
+   folder scale, so the corpus size reads as a fact rather than a table row. */
 .ask-stat {
   display: flex; align-items: center; gap: 9px;
-  margin: 0 12px 6px; padding: 8px 10px; border-radius: 11px;
+  margin: 0 0 6px; padding: 8px 10px; border-radius: 11px;
   background: linear-gradient(135deg, color-mix(in srgb, var(--stat-accent, #01EACB) 18%, transparent),
                                       color-mix(in srgb, var(--stat-accent, #01EACB) 4%, transparent));
   border: 1px solid color-mix(in srgb, var(--stat-accent, #01EACB) 26%, transparent);
@@ -8102,55 +8094,45 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .ask-thread-del:focus-visible { opacity: 1; }
 .ask-thread-del:hover { color: #FF6B84; background: rgba(216,0,39,0.12); }
 
-.ask-rail-foot {
-  margin-top: auto; padding: 11px 14px; border-top: 1px solid rgba(255,255,255,0.07);
-  font-family: "ABeeZee", sans-serif; font-size: 11px;
-  color: rgba(255,255,255,0.24); line-height: 1.5;
-}
-/* Collapsed: the words go, the marks stay. */
-.ask-grid.is-panel-open .ask-rail-brand span,
-.ask-grid.is-panel-open .ask-rail-sec,
-.ask-grid.is-panel-open .ask-stat,
-.ask-grid.is-panel-open .ask-thread,
-.ask-grid.is-panel-open .ask-rail-foot { display: none; }
-.ask-grid.is-panel-open .ask-rail-head { padding: 15px 0; display: flex; justify-content: center; }
-.ask-rail-mini { display: none; flex-direction: column; align-items: center; gap: 10px; padding: 16px 0; }
-.ask-grid.is-panel-open .ask-rail-mini { display: flex; }
-.ask-rail-mini-btn {
-  width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
-  border: 1px solid color-mix(in srgb, var(--stat-accent, #01EACB) 32%, transparent);
-  background: color-mix(in srgb, var(--stat-accent, #01EACB) 13%, transparent);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--stat-accent, #01EACB);
-  font-family: "Alata", sans-serif; font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.ask-rail-mini-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--stat-accent, #01EACB) 35%, transparent);
-}
-
-/* ── Conversation column ───────────────────────────────────────────────── */
+/* ── Conversation column + the floating chrome ─────────────────────────────
+   The editor's corner grammar, adopted whole: stacked glass pills top-left
+   (back, then the folder handle), a pinned cluster top-right (language pill +
+   Sources counter) that neither folder opening can move. */
 .ask-main { position: relative; z-index: 1; display: flex; flex-direction: column; min-width: 0; }
-.ask-top {
-  height: 52px; flex-shrink: 0; display: flex; align-items: center; gap: 11px;
-  padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.07);
-  background: rgba(28,32,52,0.72); backdrop-filter: blur(10px);
+.ask-float-bar {
+  position: absolute; top: 12px; inset-inline-start: 16px; z-index: 30;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
 }
-.ask-top .lab {
-  font-family: "Alata", sans-serif; font-size: 10.5px; letter-spacing: 0.12em;
-  text-transform: uppercase; color: rgba(255,255,255,0.34);
+.ask-float-row { display: flex; align-items: center; gap: 8px; }
+.ask-float-pinned {
+  position: absolute; top: 12px; inset-inline-end: 16px; z-index: 31;
+  display: flex; align-items: center; gap: 8px;
 }
-.ask-top .nm {
-  font-family: "ABeeZee", sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.58);
-  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+/* The editor's title pill: the current thread's first question, display-only. */
+.ask-title-pill {
+  padding: 7px 13px; border-radius: 100px;
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.14);
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.03em;
+  color: rgba(255,255,255,0.85); white-space: nowrap;
+  max-width: 300px; overflow: hidden; text-overflow: ellipsis;
 }
+/* The language pill: the shared switcher restyled onto the editor's dark
+   glass, so removing the nav didn't remove the way to change language. */
+.ask-float-pinned .lang-switcher-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 13px; border-radius: 100px; cursor: pointer;
+  background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.8);
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.06em;
+}
+.ask-float-pinned .lang-switcher-btn:hover { background: rgba(20,23,38,0.85); border-color: rgba(255,255,255,0.3); }
 
-/* Floating scope pills — the .add-media-fab recipe, sitting over the feed
-   rather than docked into the rail, one dot each. */
+/* Floating scope pills — the .add-media-fab recipe, cleared below the
+   floating chrome, one dot each. */
 .ask-scope-pills {
-  position: absolute; top: 14px; inset-inline-start: 50%; transform: translateX(-50%);
+  position: absolute; top: 60px; inset-inline-start: 50%; transform: translateX(-50%);
   display: flex; gap: 7px; flex-wrap: wrap; justify-content: center;
   z-index: 3; pointer-events: none;
 }
@@ -8168,13 +8150,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
   box-shadow: 0 0 8px color-mix(in srgb, var(--pill-accent, #01EACB) 70%, transparent);
 }
 
-.ask-feed { flex: 1; overflow-y: auto; padding: 26px 24px 100px; position: relative; }
+.ask-feed { flex: 1; overflow-y: auto; padding: 64px 24px 100px; position: relative; }
 .ask-conv { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 /* On the cold start the hero is the only thing here, so it sits in the middle of
    the column rather than at the top with a void beneath it. Once there is a
    conversation the rule stops applying and messages stack from the top, which is
    where you read them from. */
-.ask-conv:has(.ask-hero) { min-height: calc(100dvh - 250px); justify-content: center; }
+.ask-conv:has(.ask-hero) { min-height: calc(100dvh - 190px); justify-content: center; }
 
 /* ── The cold-start hero ────────────────────────────────────────────────────
    The empty screen was 800px of nothing. This is the screen's one designed
@@ -8185,11 +8167,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
   max-width: 760px; margin: 0 auto; padding: 22px 0 8px;
   display: flex; flex-direction: column; align-items: center; text-align: center;
 }
+/* Rotating: a fixed line height so a phrase swap never shifts the title
+   below, and the shimmer lives on the .rot span so the gradient survives
+   the text swap. */
 .ask-hero-eyebrow {
   font-family: "Alata", sans-serif; font-size: 11px;
   letter-spacing: 0.22em; text-transform: uppercase; font-weight: 700;
   margin-bottom: 14px;
+  height: 15px; line-height: 15px; overflow: visible;
 }
+.ask-hero-eyebrow .rot {
+  display: inline-block;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+.ask-hero-eyebrow .rot.is-out { opacity: 0; transform: translateY(-7px); }
+.ask-hero-eyebrow .rot.is-in  { opacity: 0; transform: translateY(7px); transition: none; }
 .ask-hero-title {
   font-family: "Alata", sans-serif; font-size: clamp(28px, 4vw, 40px);
   color: #fff; line-height: 1.06; margin: 0 0 12px; text-wrap: balance;
@@ -8198,9 +8190,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "ABeeZee", sans-serif; font-size: 14px; line-height: 1.7;
   color: rgba(255,255,255,0.5); margin: 0 0 24px; max-width: 56ch;
 }
-.ask-hero-stats { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 28px; }
+.ask-hero-stats { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 26px; }
+/* Centred — number and label both on the tile's centre line. */
 .ask-hero-stat {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 3px;
   padding: 12px 18px; border-radius: 14px; min-width: 116px;
   background: linear-gradient(135deg, color-mix(in srgb, var(--stat-accent) 18%, transparent),
                                       color-mix(in srgb, var(--stat-accent) 4%, transparent));
@@ -8239,9 +8232,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
   box-shadow: 0 10px 22px color-mix(in srgb, var(--tile-accent, #01EACB) 22%, transparent);
   background: color-mix(in srgb, var(--tile-accent, #01EACB) 10%, #1C2034);
 }
+/* Alata for the SDG-number tiles; emoji glyphs are unaffected by the face. */
 .ask-suggest-icon {
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   width: 38px; height: 38px; border-radius: 11px; font-size: 17px;
+  font-family: "Alata", sans-serif;
   background: linear-gradient(135deg, color-mix(in srgb, var(--tile-accent, #01EACB) 22%, transparent),
                                       color-mix(in srgb, var(--tile-accent, #01EACB) 6%, transparent));
   border: 1px solid color-mix(in srgb, var(--tile-accent, #01EACB) 40%, transparent);
@@ -8367,12 +8362,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .ask-jump-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dot, #8B85FF); }
 
 /* ── Floating CTAs ─────────────────────────────────────────────────────────
-   .add-media-fab's recipe — dark glass, blur, Alata, teal on hover — so the
-   conversation column carries no docked chrome at all. */
+   .add-media-fab's recipe — dark glass, blur, Alata, teal on hover. The
+   composer row is the cold start's centrepiece (in flow, inside the hero) and
+   docks bottom-centre once a conversation is running — same node, one class. */
 .ask-fab-row {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; margin-bottom: 24px;
+}
+.ask-fab-row--docked {
   position: absolute; inset-inline-start: 50%; bottom: 20px;
   transform: translateX(-50%);
-  display: flex; align-items: center; gap: 10px; z-index: 3;
+  margin-bottom: 0; z-index: 3;
   width: min(760px, calc(100% - 48px));
 }
 .ask-composer {
@@ -8568,6 +8568,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "ABeeZee", sans-serif; font-size: 10.5px;
   color: rgba(255,255,255,0.55); font-variant-numeric: tabular-nums;
 }
+/* The UN goals as named, colour-coded chips — each in its goal's official
+   colour (UnSdgs::COLORS), title untranslated because the titles are the UN's
+   proper nouns (see UnSdgs). */
+.ask-src-sdgs { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.ask-sdg-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 9px; border-radius: 99px;
+  font-family: "Alata", sans-serif; font-size: 9.5px; letter-spacing: 0.04em;
+  background: color-mix(in srgb, var(--sdg, #8B85FF) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sdg, #8B85FF) 48%, transparent);
+  color: color-mix(in srgb, var(--sdg, #8B85FF) 60%, #fff);
+  white-space: nowrap;
+}
+.ask-sdg-chip i { width: 7px; height: 7px; border-radius: 2px; background: var(--sdg, #8B85FF); flex-shrink: 0; }
 
 .ask-bars { display: flex; flex-direction: column; gap: 8px; }
 .ask-bar-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
@@ -8673,12 +8687,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
   box-shadow: 0 0 9px color-mix(in srgb, var(--state-accent, #01EACB) 70%, transparent);
 }
 
-/* Narrow screens: the panel takes the whole width when open rather than
-   squeezing the conversation into nothing. */
+/* Narrow screens: an open folder takes the whole width rather than squeezing
+   the conversation into nothing, and the last-opened one wins. */
 @media (max-width: 900px) {
-  .ask-grid { grid-template-columns: 0 1fr 0; }
+  .ask-grid.is-rail-open  { grid-template-columns: 100% 0 0; }
   .ask-grid.is-panel-open { grid-template-columns: 0 0 100%; }
-  .ask-panel { width: 100%; margin: 14px; margin-block-start: 14px; }
+  .ask-grid.is-rail-open.is-panel-open { grid-template-columns: 0 0 100%; }
+  .ask-panel  { width: 100%; margin: 14px; margin-block-start: 14px; }
+  .ask-lpanel { width: calc(100% - 28px); margin: 14px; margin-block-start: 60px; }
   .ask-scope-pills { display: none; }
 }
 
@@ -8689,4 +8705,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .ask-suggest, .ask-src { animation: none; }
   .ask-composer:focus-within { animation: none; }
   .ask-step[data-state="active"] .ask-step-dot { animation: none; }
+  /* The controller also holds the rotation on the first phrase. */
+  .ask-hero-eyebrow .rot { transition: none; }
 }

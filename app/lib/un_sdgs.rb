@@ -31,10 +31,41 @@ module UnSdgs
 
   NUMBERS = (1..17)
 
+  # The official goal colours from the UN's SDG brand guidelines — fixed like
+  # the titles, so goal 13 is the same green on every surface and in every
+  # language. Mirrored in app/javascript/lib/un_sdgs.js for the source cards
+  # the Ask Verto stream renders client-side; JsConstantParityTest keeps the
+  # two copies in step.
+  COLORS = {
+    1  => "#E5243B",
+    2  => "#DDA63A",
+    3  => "#4C9F38",
+    4  => "#C5192D",
+    5  => "#FF3A21",
+    6  => "#26BDE2",
+    7  => "#FCC30B",
+    8  => "#A21942",
+    9  => "#FD6925",
+    10 => "#DD1367",
+    11 => "#FD9D24",
+    12 => "#BF8B2E",
+    13 => "#3F7E44",
+    14 => "#0A97D9",
+    15 => "#56C02B",
+    16 => "#00689D",
+    17 => "#19486A"
+  }.freeze
+
   # "SDG 13" — the UN's own locale-independent shorthand, used verbatim on
   # every chip.
   def label(number)
     "SDG #{number}"
+  end
+
+  # The goal's official colour. Ask Verto's violet as the fallback, so an
+  # unknown number degrades to the product hue rather than to unstyled.
+  def color(number)
+    COLORS.fetch(number.to_i, "#8B85FF")
   end
 
   # The official goal title, for tooltips. Empty string for an unknown number

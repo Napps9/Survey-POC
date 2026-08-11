@@ -34,7 +34,7 @@ class AskThreadTest < ActiveSupport::TestCase
   end
 
   test "display_title falls back to the opening question" do
-    assert_equal "New question", @thread.display_title
+    assert_equal "New thread", @thread.display_title
 
     @thread.ask_messages.create!(role: "user", text: "How worried are people about climate change?")
     assert_equal "How worried are people about climate change?", @thread.display_title

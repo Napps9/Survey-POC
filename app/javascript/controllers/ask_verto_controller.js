@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
+import { sdgChipText, sdgColor } from "lib/un_sdgs"
 
 // Ask Verto: the conversation, the NDJSON stream, and the folder panel.
 //
@@ -21,10 +22,14 @@ const DEFAULT_ACCENT = "#8B85FF"
 
 export default class extends Controller {
   static targets = [
-    "grid", "feed", "messages", "input", "send", "sourcesFab", "sourceCount", "fabDots",
-    "tab", "tabCount", "pane", "sourceList", "detailTitle", "detailBody", "consentBody", "hero"
+    "grid", "main", "feed", "messages", "input", "send", "sourcesFab", "sourceCount", "fabDots",
+    "tab", "tabCount", "pane", "sourceList", "detailTitle", "detailBody", "consentBody", "hero",
+    "railTab", "railPane", "eyebrow", "titlePill", "fabRow"
   ]
-  static values = { threadUrl: String, newThreadUrl: String, sources: Array, initialQuestion: String }
+  static values = {
+    threadUrl: String, newThreadUrl: String, sources: Array, initialQuestion: String,
+    greetings: Object, phrases: Array
+  }
 
   // Sources for the CURRENT answer, keyed by their number. Replaced each turn:
   // the rail describes the answer you are reading, not everything ever fetched.
@@ -33,7 +38,45 @@ export default class extends Controller {
 
   connect() {
     this._restoreSourcesFromLastAnswer()
+    this._startEyebrow()
     this._askInitialQuestion()
+  }
+
+  disconnect() {
+    clearInterval(this._eyebrowTimer)
+  }
+
+  // ── The rotating eyebrow ────────────────────────────────────────────────
+  // Opens with a time-aware greeting — picked by the CLIENT's clock, so
+  // "Good morning" tracks the reader, not the server — then cycles the brand
+  // phrases with a soft fade-up. Under prefers-reduced-motion it holds still
+  // on the greeting.
+  _startEyebrow() {
+    if (!this.hasEyebrowTarget) return
+
+    const hour = new Date().getHours()
+    const greetings = this.hasGreetingsValue ? this.greetingsValue : {}
+    const greeting = greetings[hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening"]
+    const phrases = [greeting, ...(this.hasPhrasesValue ? this.phrasesValue : [])].filter(Boolean)
+    if (!phrases.length) return
+
+    this.eyebrowTarget.textContent = phrases[0]
+    if (phrases.length < 2) return
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+    let index = 0
+    this._eyebrowTimer = setInterval(() => {
+      index = (index + 1) % phrases.length
+      const el = this.eyebrowTarget
+      el.classList.add("is-out")
+      setTimeout(() => {
+        el.textContent = phrases[index]
+        el.classList.remove("is-out")
+        el.classList.add("is-in")
+        void el.offsetWidth // commit the below-the-line start before releasing it
+        el.classList.remove("is-in")
+      }, 300)
+    }, 3400)
   }
 
   // A question typed before the thread existed: _startThread() carried it
@@ -88,9 +131,7 @@ export default class extends Controller {
     this.autogrow()
     this.sendTarget.disabled = true
 
-    // The hero is the cold start only — it goes the moment there's a real
-    // conversation to read.
-    if (this.hasHeroTarget) this.heroTarget.remove()
+    this._leaveColdStart(text)
 
     this._appendUser(text)
     const body = this._appendAssistant()
@@ -98,6 +139,26 @@ export default class extends Controller {
     this._renderSources()
 
     this._stream(text, body)
+  }
+
+  // The hero is the cold start only — it goes the moment there's a real
+  // conversation to read. Its composer survives: the same node docks to the
+  // bottom (the server renders it docked on a reloaded conversation), and the
+  // thread's first question becomes the floating title pill, exactly as
+  // AskThread#display_title will name it after the reload.
+  _leaveColdStart(question) {
+    if (this.hasTitlePillTarget && this.titlePillTarget.hidden) {
+      this.titlePillTarget.textContent = question.length > 60 ? `${question.slice(0, 57)}…` : question
+      this.titlePillTarget.hidden = false
+    }
+    if (!this.hasHeroTarget) return
+
+    clearInterval(this._eyebrowTimer)
+    if (this.hasFabRowTarget && this.hasMainTarget) {
+      this.fabRowTarget.classList.add("ask-fab-row--docked")
+      this.mainTarget.appendChild(this.fabRowTarget)
+    }
+    this.heroTarget.remove()
   }
 
   _startThread() {
@@ -369,7 +430,30 @@ export default class extends Controller {
     this.feedTarget.scrollTop = this.feedTarget.scrollHeight
   }
 
-  // ── The folder ──────────────────────────────────────────────────────────
+  // ── The left folder: scope + threads ────────────────────────────────────
+  // Same trick as the sources folder: one class on the grid, CSS does the
+  // sliding. The handle pill hides itself while the folder is out (CSS).
+  openRail() {
+    this.gridTarget.classList.add("is-rail-open")
+  }
+
+  closeRail() {
+    this.gridTarget.classList.remove("is-rail-open")
+  }
+
+  showRailPane(event) {
+    const name = event.currentTarget.dataset.lpane
+    this.railPaneTargets.forEach((pane) => {
+      pane.classList.toggle("is-active", pane.dataset.lpane === name)
+    })
+    this.railTabTargets.forEach((tab) => {
+      const on = tab.dataset.lpane === name
+      tab.classList.toggle("is-active", on)
+      tab.setAttribute("aria-selected", on ? "true" : "false")
+    })
+  }
+
+  // ── The sources folder ──────────────────────────────────────────────────
   openSources() {
     this.gridTarget.classList.add("is-panel-open")
     this._showPane("sources")
@@ -470,28 +554,47 @@ export default class extends Controller {
       question.className = "ask-src-q"
       question.textContent = source.question
 
+      // Plain language, not survey shorthand: "12,304 people answered ·
+      // asked Jan – Jun 2025", with the UN goals as named, colour-coded chips.
       const meta = document.createElement("span")
       meta.className = "ask-src-meta"
       const nEl = document.createElement("span")
-      nEl.textContent = `n ${Number(source.responses || 0).toLocaleString()}`
+      nEl.textContent = t("ask.people_answered", { count: Number(source.responses || 0).toLocaleString() })
       meta.appendChild(nEl)
       if (source.fielded) {
         const when = document.createElement("span")
-        when.textContent = source.fielded
+        when.textContent = t("ask.asked_window", { window: source.fielded })
         meta.appendChild(when)
-      }
-      // Absent on citations stored before SDG tagging existed — the snapshot
-      // renders as it was answered, so old sources simply show no SDG entry.
-      if (Array.isArray(source.sdgs) && source.sdgs.length > 0) {
-        const sdgs = document.createElement("span")
-        sdgs.textContent = `SDG ${source.sdgs.join(" · ")}`
-        meta.appendChild(sdgs)
       }
 
       main.append(head, question, meta)
+      // Absent on citations stored before SDG tagging existed — the snapshot
+      // renders as it was answered, so old sources simply show no SDG chips.
+      const sdgRow = this._sdgChips(source)
+      if (sdgRow) main.appendChild(sdgRow)
       card.append(icon, main)
       this.sourceListTarget.appendChild(card)
     })
+  }
+
+  // Named, colour-coded SDG chips — each goal in its official UN colour, with
+  // its official (untranslated) title. Returns null when the snapshot carries
+  // no goals, so old citations honestly show nothing.
+  _sdgChips(source) {
+    const numbers = Array.isArray(source.sdgs) ? source.sdgs : []
+    if (!numbers.length) return null
+
+    const row = document.createElement("span")
+    row.className = "ask-src-sdgs"
+    for (const n of numbers) {
+      const chip = document.createElement("span")
+      chip.className = "ask-sdg-chip"
+      chip.style.setProperty("--sdg", sdgColor(n))
+      const dot = document.createElement("i")
+      chip.append(dot, document.createTextNode(sdgChipText(n)))
+      row.appendChild(chip)
+    }
+    return row
   }
 
   _renderDetail(source) {
@@ -515,7 +618,7 @@ export default class extends Controller {
       ["Theme", source.theme],
       // Joins to "" for pre-SDG citation snapshots, which the falsy guard
       // below then skips — old answers honestly show no SDG row.
-      ["SDG", (source.sdgs || []).map((n) => `SDG ${n}`).join(", ")]
+      ["SDG", (source.sdgs || []).map((n) => sdgChipText(n)).join(", ")]
     ]
     for (const [key, value] of prov) {
       if (!value) continue
@@ -531,6 +634,44 @@ export default class extends Controller {
       island.appendChild(row)
     }
     this.detailBodyTarget.appendChild(island)
+
+    // The answer breakdown: every option (or theme) with its share, as bars
+    // in the source's own accent. Stamped server-side onto the citation
+    // snapshot — a pre-breakdown snapshot simply shows no bars.
+    const breakdown = Array.isArray(source.breakdown) ? source.breakdown : []
+    if (breakdown.length) {
+      const bars = document.createElement("div")
+      bars.className = "ask-island"
+      bars.style.setProperty("--src-accent", source.accent || DEFAULT_ACCENT)
+
+      const barsLab = document.createElement("p")
+      barsLab.className = "ask-lab"
+      barsLab.textContent = t("ask.breakdown")
+      bars.appendChild(barsLab)
+
+      const list = document.createElement("div")
+      list.className = "ask-bars"
+      for (const row of breakdown) {
+        const item = document.createElement("div")
+        item.className = "ask-bar-row"
+        const label = document.createElement("span")
+        label.className = "ask-bar-lab"
+        label.textContent = row.label
+        const val = document.createElement("span")
+        val.className = "ask-bar-val"
+        val.textContent = `${Number(row.percent) || 0}% · ${Number(row.count || 0).toLocaleString()}`
+        const track = document.createElement("div")
+        track.className = "ask-bar-track"
+        const fill = document.createElement("div")
+        fill.className = "ask-bar-fill"
+        fill.style.width = `${Math.min(Number(row.percent) || 0, 100)}%`
+        track.appendChild(fill)
+        item.append(label, val, track)
+        list.appendChild(item)
+      }
+      bars.appendChild(list)
+      this.detailBodyTarget.appendChild(bars)
+    }
   }
 
   // Why this source may be cited at all. Every line here is a fact the server

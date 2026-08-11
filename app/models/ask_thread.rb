@@ -17,7 +17,7 @@ class AskThread < ApplicationRecord
   # The rail's label. Falls back to the opening question, trimmed, because a thread
   # named "Untitled" is no easier to find than an unnamed one.
   def display_title
-    title.presence || ask_messages.find_by(role: "user")&.text&.truncate(60) || "New question"
+    title.presence || ask_messages.find_by(role: "user")&.text&.truncate(60) || "New thread"
   end
 
   # The messages Claude is given. Bounded, and only the prose — a previous turn's

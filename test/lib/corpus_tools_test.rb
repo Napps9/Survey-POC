@@ -90,6 +90,58 @@ class CorpusToolsTest < ActiveSupport::TestCase
       "the source snapshot is what the rail, the citation record and the replay all read"
   end
 
+  test "a stamped source carries its answer breakdown for the Detail pane" do
+    entry = indexed_verto
+    tools = CorpusTools.new
+    tools.call("get_questions", { "ids" => [ entry.corpus_questions.first.id ] })
+
+    breakdown = tools.sources.first["breakdown"]
+    assert_equal "Very worried", breakdown.first["label"]
+    assert_equal 30, breakdown.first["count"]
+    assert_in_delta 75.0, breakdown.first["percent"], 0.01
+  end
+
+  test "a prioritise source carries no breakdown — a rank is not a count" do
+    survey = @org.surveys.create!(title: "P", theme: "T", audience_age: "all", key_insight: "x",
+                                  default_locale: "en", locales: [ "en" ],
+                                  cards: [ { "type" => "prioritise", "cid" => "c_p", "text" => "Rank these",
+                                             "options" => %w[Money Time] } ])
+    40.times do
+      survey.responses.create!(session_token: SecureRandom.hex(8), status: "completed",
+                               answers: { "0" => { "value" => %w[Money Time] } })
+    end
+    entry = CorpusEntry.create!(survey: survey, organisation: @org, review_status: "approved",
+                                opted_in_at: 1.day.ago)
+    CorpusIndexer.new(entry, themer: null_themer).call
+
+    tools = CorpusTools.new
+    tools.call("get_questions", { "ids" => [ entry.corpus_questions.first.id ] })
+
+    assert_empty tools.sources.first["breakdown"],
+      "bars over mean ranks would read as shares of people — the misreading result_row warns against"
+  end
+
+  test "an SDG a citable survey declares becomes a suggestion tile in the goal's colour" do
+    entry = indexed_verto
+    entry.survey.update_column(:sdgs, [ 13 ])
+
+    suggestion = CorpusTools.new.suggestions.find { |s| s[:icon] == "13" }
+
+    assert suggestion, "a declared goal with citable data behind it should be offered"
+    assert_equal UnSdgs.color(13), suggestion[:accent]
+    assert_includes suggestion[:question], UnSdgs.title(13)
+    assert_includes suggestion[:meta], "SDG 13"
+  end
+
+  test "a withdrawn Verto's SDGs leave the suggestions with it" do
+    entry = indexed_verto
+    entry.survey.update_column(:sdgs, [ 13 ])
+    entry.withdraw!
+
+    assert_nil CorpusTools.new.suggestions.find { |s| s[:icon] == "13" },
+      "suggestions are a disclosure — a withdrawn Verto's goals must not survive on the front page"
+  end
+
   test "list_vertos shows only citable Vertos" do
     indexed_verto(title: "Live one")
     indexed_verto(title: "Pending one", review_status: "pending")
