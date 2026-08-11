@@ -52,6 +52,13 @@
   token_mode         = @survey.tokenisation_enabled?
   token_awarding_set = token_mode ? @survey.token_awarding_indices.to_set : Set.new
 
+  # Leaderboard: only meaningful with tokens to rank (leaderboard_active?).
+  # The URL derives from play_token like every optional endpoint above, so
+  # owner preview and Test Mode carry no live endpoint and the board simply
+  # doesn't render there.
+  leaderboard_mode = token_mode && @survey.leaderboard_enabled?
+  leaderboard_url  = leaderboard_mode && !preview_mode && play_token.present? ? player_leaderboard_url(play_token) : ""
+
   # Answer-branching: a card's routing config is public (like token config), so
   # the player follows the graph entirely client-side from the same cards JSON.
   logic_mode = @survey.logic?
@@ -85,6 +92,9 @@
      data-player-token-types-value="<%= @survey.token_types.to_json %>"
      data-player-token-reveal-value="<%= @survey.token_reveal_enabled? %>"
      data-player-token-back-nav-value="<%= @survey.token_back_nav_enabled? %>"
+     data-player-leaderboard-value="<%= leaderboard_mode %>"
+     data-player-leaderboard-url-value="<%= leaderboard_url %>"
+     data-player-retake-policy-value="<%= @survey.leaderboard_retake_policy %>"
      data-player-logic-value="<%= logic_mode %>"
      data-player-end-screens-value="<%= @survey.end_screens_list.to_json %>"
      data-player-forward-label-value="<%= t('player.visit_website') %>">
@@ -271,6 +281,12 @@
           <div class="token-result-card hidden" data-player-target="tokenScore"></div>
         <% end %>
 
+        <%# Leaderboard — filled in by the player on finish from the live
+            endpoint (blank URL in preview/test keeps it empty there). %>
+        <% if leaderboard_mode %>
+          <div class="leaderboard-card hidden" data-player-target="leaderboard"></div>
+        <% end %>
+
         <%# Thank-you actions: compare (brand CTA) then the outline secondaries —
             forward-to-website, share, and regions. Quiz score comparison and
             general answer comparison are independent settings (a creator can
@@ -315,6 +331,17 @@
                     data-action="click->player#showRegions"
                     class="play-end-btn">
               🌍 <%= t("player.see_regions") %>
+            </button>
+          <% end %>
+
+          <%# Play again — the retake the leaderboard exists to reward. Only
+              where a retake can change the standings: under no_redo a second
+              run is ignored, so offering one would be a lie. %>
+          <% if leaderboard_mode && !@survey.leaderboard_no_redo? %>
+            <button type="button"
+                    data-action="click->player#playAgain"
+                    class="play-end-btn">
+              🔁 <%= t("player.play_again") %>
             </button>
           <% end %>
         </div>

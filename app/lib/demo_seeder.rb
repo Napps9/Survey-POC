@@ -258,6 +258,9 @@ class DemoSeeder
       default_locale: "en", locales: [ "en" ], cards: cards,
       quiz: true, tokenisation_enabled: true,
       token_types: [ { "id" => "coin", "name" => "Gold Coins", "icon" => "🪙" }, { "id" => "gem", "name" => "Gems", "icon" => "💎" } ],
+      # The leaderboard demo lives here too — the one Verto with points on, so
+      # /verify and demos can see the board and the anonymous names.
+      leaderboard_enabled: true,
       show_results_comparison: true,
       compare_note: "See how your money mindset compares with everyone else who took this.",
       consent_text: "By continuing you agree to let us use your anonymised answers for research on financial wellbeing among young adults.",
@@ -436,6 +439,11 @@ class DemoSeeder
         answers: answers,
         score: quiz_result&.dig(:score), quiz_max: quiz_result&.dig(:max),
         token_totals: token_totals,
+        # Same rule as the player: an identity digest exists only while the
+        # leaderboard is active. One fresh identity per simulated respondent —
+        # without this every seeded row is identity-less and the demo board is
+        # empty. Names are minted lazily at first board view.
+        player_key_digest: survey.leaderboard_active? ? survey.player_key_digest(SecureRandom.uuid) : nil,
         # The location question sits near the end of the deck (a demographic
         # tail card), so a "started" respondent who dropped off a few cards in
         # never actually reached it — same as a real one wouldn't. Only tag a

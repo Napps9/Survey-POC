@@ -177,6 +177,8 @@ de:
     quiz_compare_cta: "Sieh, wie du abschneidest →"
     quiz_compare_title: "Wie du abschneidest"
     tokens_welcome_note: "Bei jeder Antwort sammelst du Punkte — du kannst nicht zurückgehen und eine Antwort ändern, um mehr zu bekommen."
+    leaderboard_teaser: "Die besten Punktesammler landen am Ende auf der Bestenliste!"
+    play_again: "Nochmal spielen"
   defaults:
     range: ["Stimme überhaupt nicht zu", "Stimme nicht zu", "Neutral", "Stimme zu", "Stimme voll zu"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ de:
       tokens_result_label: "Du hast gesammelt"
       tokens_earned: 'Punkte erhalten'
       tokens_earned_none: 'Dafür keine Punkte'
+      leaderboard_title: "Bestenliste"
+      leaderboard_you: "Du"
+      leaderboard_played_as: "Du hast als %{name} gespielt"
+      leaderboard_rank: "Du bist Platz %{rank} von %{of} Spielern"
+      leaderboard_queued: "Sobald du wieder online bist, stehst du auf der Liste — dein Ergebnis ist gespeichert."
+      leaderboard_empty: "Sei die erste Person auf der Liste!"
+      already_played: "Du hast diesen Verto schon gespielt — so steht die Liste gerade."
     editor:
       delete_card_confirm: Diese Karte löschen?
       save_to_library: "Auch in meiner Markenbibliothek speichern"

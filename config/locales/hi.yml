@@ -177,6 +177,8 @@ hi:
     quiz_compare_cta: "देखें आप कैसे तुलना करते हैं →"
     quiz_compare_title: "आपकी तुलना कैसी है"
     tokens_welcome_note: "हर प्रश्न का उत्तर देने पर आपको अंक मिलेंगे — आप पीछे जाकर उत्तर बदलकर और अंक नहीं कमा सकते।"
+    leaderboard_teaser: "सबसे ज़्यादा अंक जुटाने वाले अंत में लीडरबोर्ड पर आते हैं!"
+    play_again: "फिर से खेलें"
   defaults:
     range: ["बिल्कुल असहमत", "असहमत", "तटस्थ", "सहमत", "पूरी तरह सहमत"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ hi:
       tokens_result_label: "आपने अर्जित किए"
       tokens_earned: 'अंक मिले'
       tokens_earned_none: 'इसके लिए कोई अंक नहीं'
+      leaderboard_title: "लीडरबोर्ड"
+      leaderboard_you: "आप"
+      leaderboard_played_as: "आपने %{name} के नाम से खेला"
+      leaderboard_rank: "आप %{of} खिलाड़ियों में %{rank}वें स्थान पर हैं"
+      leaderboard_queued: "ऑनलाइन लौटते ही आप बोर्ड पर आ जाएँगे — आपका स्कोर सहेज लिया गया है।"
+      leaderboard_empty: "बोर्ड पर पहले बनें!"
+      already_played: "आप यह Verto पहले ही खेल चुके हैं — बोर्ड की मौजूदा स्थिति यह है।"
     editor:
       delete_card_confirm: इस कार्ड को हटाएं?
       save_to_library: "मेरी ब्रांड लाइब्रेरी में भी सहेजें"

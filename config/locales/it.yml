@@ -177,6 +177,8 @@ it:
     quiz_compare_cta: "Scopri come ti confronti →"
     quiz_compare_title: "Come ti confronti"
     tokens_welcome_note: "Guadagnerai punti rispondendo a ogni domanda — non puoi tornare indietro e cambiare una risposta per guadagnarne altri."
+    leaderboard_teaser: "Chi raccoglie più punti entra in classifica alla fine!"
+    play_again: "Gioca ancora"
   defaults:
     range: ["Per niente d'accordo", "In disaccordo", "Neutrale", "D'accordo", "Completamente d'accordo"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ it:
       tokens_result_label: "Hai raccolto"
       tokens_earned: 'Punti guadagnati'
       tokens_earned_none: 'Nessun punto per questa'
+      leaderboard_title: "Classifica"
+      leaderboard_you: "Tu"
+      leaderboard_played_as: "Hai giocato come %{name}"
+      leaderboard_rank: "Sei %{rank}º su %{of} giocatori"
+      leaderboard_queued: "Entrerai in classifica appena torni online — il tuo punteggio è salvato."
+      leaderboard_empty: "Sii il primo in classifica!"
+      already_played: "Hai già giocato questo Verto — ecco la classifica attuale."
     editor:
       delete_card_confirm: Eliminare questa carta?
       save_to_library: "Salva anche nella mia libreria del brand"

@@ -28,7 +28,7 @@ export default class extends Controller {
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
                     "consentMain", "consentDeclined", "respondentCode",
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
-                    "tokenScoreChip", "tokenScore"]
+                    "tokenScoreChip", "tokenScore", "leaderboard"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
@@ -50,6 +50,12 @@ export default class extends Controller {
     // Let a respondent return to a tokenised card they left unanswered and
     // still earn its points — what the server has always permitted.
     tokenBackNav: { type: Boolean, default: false },
+    // Leaderboard: on only when tokenisation is too (leaderboard_active?).
+    // The URL is blank in owner preview and Test Mode, which is what keeps the
+    // board (and the durable player key) out of those contexts.
+    leaderboard: { type: Boolean, default: false },
+    leaderboardUrl: { type: String, default: "" },
+    retakePolicy: { type: String, default: "accumulate" },
     // Answer-branching: when on, next()/back() follow the answer-logic graph
     // instead of stepping linearly. Off ⇒ byte-identical linear behaviour.
     logic: { type: Boolean, default: false },
@@ -130,12 +136,22 @@ export default class extends Controller {
     }
 
     this._sessionToken = this._ensureToken()
+    if (this.leaderboardValue) this._playerKey = this._ensurePlayerKey()
     this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
     this._finishLabel = this.hasFinishBtnTarget ? this.finishBtnTarget.textContent : ""
     this._path = [this.currentValue]
     this._hops = 0
     if (this.logicValue) {
       this._cidIndex = new Map(this.cardTargets.map((c, i) => [c.dataset.cardCid, i]))
+    }
+    // No-redo gate: a device that already finished lands straight on the board
+    // instead of replaying a run the standings would ignore. Best-effort by
+    // design — cleared storage gets someone back in, and the server-side
+    // aggregation ignoring extra runs is the real enforcement.
+    if (this.leaderboardValue && this.leaderboardUrlValue &&
+        this.retakePolicyValue === "no_redo" && this._playedBefore()) {
+      this._showAlreadyPlayed()
+      return
     }
     this._update()
     if (this.quizValue) this._initQuiz()
@@ -500,6 +516,9 @@ export default class extends Controller {
     // own. The server hashes it and drops the plaintext; it's only sent until a
     // digest is recorded, and the server ignores a second one anyway.
     if (this._respondentCode) payload.respondent_code = this._respondentCode
+    // The leaderboard identity rides the same way, under the same discipline:
+    // hashed server-side, set once per response, ignored while the board is off.
+    if (this._playerKey) payload.player_key = this._playerKey
     return payload
   }
 
@@ -577,6 +596,12 @@ export default class extends Controller {
       rejected = navigator.onLine
     } finally {
       if (this.hasFinishBtnTarget) this.finishBtnTarget.dataset.disabled = "false"
+    }
+    // The no-redo gate's marker. Set even when queued — the service worker
+    // will deliver that run, so this device HAS played. Not on rejected:
+    // nothing was stored, so the door stays open.
+    if (this.leaderboardValue && !rejected) {
+      try { localStorage.setItem(`verto_played_${this.submitUrlValue}`, "1") } catch (_) { /* storage blocked */ }
     }
     this._showThankyou(queued, rejected)
   }
@@ -747,6 +772,45 @@ export default class extends Controller {
     } catch (_) {
       return newToken()
     }
+  }
+
+  // The durable per-Verto identity behind the leaderboard's stable anonymous
+  // names: localStorage, so unlike the session token above it survives the tab
+  // and a retake groups with the earlier runs. Minted only while the board is
+  // on (connect gates the call) — no leaderboard, no durable identifier on the
+  // device. Storage-blocked browsers degrade to a per-visit identity (a fresh
+  // name each time) rather than failing.
+  _ensurePlayerKey() {
+    const newKey = () =>
+      (typeof crypto !== "undefined" && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2)
+    const key = `verto_player_${this.submitUrlValue}`
+    try {
+      let k = localStorage.getItem(key)
+      if (!k) { k = newKey(); localStorage.setItem(key, k) }
+      return k
+    } catch (_) {
+      return newKey()
+    }
+  }
+
+  _playedBefore() {
+    try {
+      return !!localStorage.getItem(`verto_played_${this.submitUrlValue}`)
+    } catch (_) {
+      return false
+    }
+  }
+
+  // Play again (accumulate/restart only — the button isn't rendered under
+  // no_redo). A fresh session token means a fresh response row; the durable
+  // player key survives, so the runs group under the same identity and name.
+  // A reload rather than in-place state surgery: connect() is the only place
+  // the deck's state machine starts clean.
+  playAgain() {
+    try { sessionStorage.removeItem(`verto_session_${this.submitUrlValue}`) } catch (_) { /* storage blocked */ }
+    window.location.reload()
   }
 
   // Register this session as a responder once it has ≥1 real answer, so people
@@ -976,6 +1040,7 @@ export default class extends Controller {
     }
     if (this.quizValue) this._renderQuizScore()
     if (this.tokenisationValue) this._renderTokenScore()
+    if (this.leaderboardValue) this._renderLeaderboard(queued, rejected)
   }
 
   // Swap the thank-you screen's title / message / forward CTA to the end screen
@@ -2101,6 +2166,68 @@ export default class extends Controller {
           <span class="token-result-amount">${this._tokenTotals[tt.id] || 0}</span>
           <span class="token-result-name">${this._esc(tt.name)}</span>
         </div>`).join("")
+  }
+
+  // The end-of-play leaderboard. Three degraded states before the happy path:
+  // no live URL (preview/test) renders nothing; a rejected submit renders
+  // nothing (nothing was stored — a board would imply otherwise); a queued
+  // submit renders the title and a promise instead of fetching, because the
+  // row may land hours from now when the service worker drains the queue.
+  async _renderLeaderboard(queued = false, rejected = false) {
+    if (!this.hasLeaderboardTarget || !this.leaderboardUrlValue || rejected) return
+    const el = this.leaderboardTarget
+    const title = `<div class="leaderboard-title">🏆 ${this._esc(t("player.leaderboard_title"))}</div>`
+    el.classList.remove("hidden")
+    if (queued) {
+      el.innerHTML = title + `<div class="leaderboard-note">${this._esc(t("player.leaderboard_queued"))}</div>`
+      return
+    }
+    try {
+      const params = new URLSearchParams()
+      if (this._sessionToken) params.set("session_token", this._sessionToken)
+      if (this._playerKey) params.set("player_key", this._playerKey)
+      const res = await fetch(`${this.leaderboardUrlValue}?${params}`)
+      if (!res.ok) throw new Error(`status ${res.status}`)
+      const data = await res.json()
+      const entries = data.entries || []
+      const rows = entries.map(e => `
+        <div class="leaderboard-row${e.you ? " is-you" : ""}">
+          <span class="leaderboard-rank">${Number(e.rank) || 0}</span>
+          <span class="leaderboard-name">${this._esc(e.name)}${e.you ? `<span class="leaderboard-you-badge">${this._esc(t("player.leaderboard_you"))}</span>` : ""}</span>
+          <span class="leaderboard-total">${Number(e.total) || 0}</span>
+        </div>`).join("")
+      let self = ""
+      if (data.you) {
+        self += `<div class="leaderboard-self">${this._esc(t("player.leaderboard_played_as", { name: data.you.name }))}</div>`
+        if (!entries.some(e => e.you)) {
+          self += `<div class="leaderboard-self">${this._esc(t("player.leaderboard_rank", { rank: data.you.rank, of: data.you.of }))}</div>`
+        }
+      }
+      const empty = rows ? "" : `<div class="leaderboard-note">${this._esc(t("player.leaderboard_empty"))}</div>`
+      el.innerHTML = title + rows + empty + self
+    } catch (_) {
+      el.innerHTML = title + `<div class="leaderboard-note">${this._esc(t("player.compare_error"))}</div>`
+    }
+  }
+
+  // The no-redo landing for a device that already finished: the thank-you
+  // screen with the live board and an explanatory pill, no replay. This
+  // session holds no tallies, so the quiz/token result cards stay hidden and
+  // nothing is submitted.
+  _showAlreadyPlayed() {
+    this.cardTargets.forEach(c => c.classList.remove("active"))
+    this.thankyouTarget.classList.add("active")
+    this.backBtnTarget.classList.add("hidden")
+    this.nextBtnTarget.classList.add("hidden")
+    this.finishBtnTarget.classList.add("hidden")
+    this.progressTarget.textContent = ""
+    if (this.hasThankyouMainTarget && !this.thankyouMainTarget.querySelector(".preview-queued-pill")) {
+      const pill = document.createElement("div")
+      pill.className = "preview-queued-pill"
+      pill.textContent = t("player.already_played")
+      this.thankyouMainTarget.appendChild(pill)
+    }
+    this._renderLeaderboard()
   }
 
   _esc(s) {

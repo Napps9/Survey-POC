@@ -17,5 +17,10 @@
         <% end %>
       </div>
     <% end %>
+    <%# The board is announced where the points promise already lands, so
+        respondents know before playing that there's something to climb. %>
+    <% if @survey.leaderboard_enabled? %>
+      <div class="welcome-intake-tokens-note leaderboard-tease">🏆 <%= t("player.leaderboard_teaser") %></div>
+    <% end %>
   </div>
 </div>

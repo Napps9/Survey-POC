@@ -179,6 +179,8 @@ en:
     quiz_compare_cta: "See how you compare →"
     quiz_compare_title: "How you compare"
     tokens_welcome_note: "You'll earn points as you answer each question — you can't go back and change an answer to earn more."
+    leaderboard_teaser: "Top point collectors make the leaderboard at the end!"
+    play_again: "Play again"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are
@@ -270,6 +272,13 @@ en:
       tokens_result_label: "You collected"
       tokens_earned: 'Points earned'
       tokens_earned_none: 'No points for that one'
+      leaderboard_title: "Leaderboard"
+      leaderboard_you: "You"
+      leaderboard_played_as: "You played as %{name}"
+      leaderboard_rank: "You're #%{rank} of %{of} players"
+      leaderboard_queued: "You're on the board once you're back online — your score is saved."
+      leaderboard_empty: "Be the first on the board!"
+      already_played: "You've already played this Verto — here's how the board stands."
     editor:
       delete_card_confirm: "Delete this card?"
       save_to_library: "Also save to my brand library"

@@ -177,6 +177,8 @@ nl:
     quiz_compare_cta: "Bekijk hoe jij je verhoudt →"
     quiz_compare_title: "Hoe jij je verhoudt"
     tokens_welcome_note: "Je verdient punten bij elke vraag die je beantwoordt — je kunt niet terug om een antwoord te wijzigen en zo meer te verdienen."
+    leaderboard_teaser: "De beste puntenverzamelaars komen aan het einde op het scorebord!"
+    play_again: "Opnieuw spelen"
   defaults:
     range: ["Helemaal oneens", "Oneens", "Neutraal", "Eens", "Helemaal eens"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ nl:
       tokens_result_label: "Je hebt verzameld"
       tokens_earned: 'Punten verdiend'
       tokens_earned_none: 'Hiervoor geen punten'
+      leaderboard_title: "Scorebord"
+      leaderboard_you: "Jij"
+      leaderboard_played_as: "Je speelde als %{name}"
+      leaderboard_rank: "Je staat op plek %{rank} van %{of} spelers"
+      leaderboard_queued: "Zodra je weer online bent, sta je op het bord — je score is opgeslagen."
+      leaderboard_empty: "Wees de eerste op het bord!"
+      already_played: "Je hebt deze Verto al gespeeld — zo staat het bord er nu voor."
     editor:
       delete_card_confirm: Deze kaart verwijderen?
       save_to_library: "Ook opslaan in mijn merkbibliotheek"

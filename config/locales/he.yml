@@ -177,6 +177,8 @@ he:
     quiz_compare_cta: "ראה איך אתה משתווה →"
     quiz_compare_title: "איך אתה משתווה"
     tokens_welcome_note: "תרוויח נקודות עם כל שאלה שתענה — לא תוכל לחזור אחורה ולשנות תשובה כדי להרוויח עוד."
+    leaderboard_teaser: "אוספי הנקודות המובילים נכנסים ללוח המובילים בסוף!"
+    play_again: "לשחק שוב"
   defaults:
     range: ["מאוד לא מסכים", "לא מסכים", "ניטרלי", "מסכים", "מסכים מאוד"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ he:
       tokens_result_label: "צברת"
       tokens_earned: 'נקודות שהושגו'
       tokens_earned_none: 'אין נקודות על זו'
+      leaderboard_title: "לוח מובילים"
+      leaderboard_you: "אתם"
+      leaderboard_played_as: "שיחקתם בתור %{name}"
+      leaderboard_rank: "אתם במקום %{rank} מתוך %{of} שחקנים"
+      leaderboard_queued: "תופיעו בלוח ברגע שתחזרו לרשת — התוצאה שלכם שמורה."
+      leaderboard_empty: "היו הראשונים בלוח!"
+      already_played: "כבר שיחקתם ב-Verto הזה — כך נראה הלוח כרגע."
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
       save_to_library: "שמור גם בספריית המותג שלי"

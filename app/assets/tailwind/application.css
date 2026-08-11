@@ -7622,6 +7622,57 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .token-result-amount { font-family: "Alata", sans-serif; font-size: 26px; color: #fff; }
 .token-result-name { font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,0.7); }
 
+/* ── Leaderboard: thank-you screen card + intro teaser ──────────────────────
+   Populated client-side from GET /play/:token/leaderboard on finish. Rows are
+   anonymous by construction (system-assigned names, no answers), which is why
+   this renders even for tiny boards — see TokenLeaderboard's suppression note.
+   Type floor: ≥0.875rem prose, ≥0.75rem counts/meta (see the play-bar block). */
+.leaderboard-card {
+  margin: 18px auto 4px; padding: 16px 22px; border-radius: 18px;
+  width: min(100%, 340px);
+  background: var(--brand-primary-soft, rgba(1,234,203,0.12));
+  border: 1px solid var(--brand-primary, rgba(1,234,203,0.4));
+  display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+}
+.leaderboard-title {
+  font-family: "Alata", sans-serif; font-size: 0.75rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--brand-primary, #01EACB); text-align: center;
+}
+.leaderboard-row {
+  display: flex; align-items: center; gap: 10px; padding: 2px 0;
+}
+.leaderboard-row.is-you {
+  background: var(--brand-primary-soft, rgba(1,234,203,0.16));
+  border: 1px solid var(--brand-primary, rgba(1,234,203,0.4));
+  border-radius: 10px; padding: 4px 8px; margin: 0 -8px;
+}
+.leaderboard-rank {
+  font-family: "Alata", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.55);
+  min-width: 1.5em; text-align: end;
+}
+.leaderboard-name {
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: #fff;
+  flex: 1; min-width: 0; text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.leaderboard-you-badge {
+  font-family: "Alata", sans-serif; font-size: 0.75rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--brand-cta-text, #1C2034);
+  background: var(--brand-cta, #01EACB); border-radius: 100px;
+  padding: 1px 8px; margin-inline-start: 8px; vertical-align: middle;
+}
+.leaderboard-total { font-family: "Alata", sans-serif; font-size: 1.125rem; color: #fff; }
+.leaderboard-self {
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: rgba(255,255,255,0.7);
+  text-align: center; margin-top: 2px;
+}
+.leaderboard-note {
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: rgba(255,255,255,0.7);
+  text-align: center;
+}
+/* The token-intro teaser line inherits .welcome-intake-tokens-note sizing;
+   only the emphasis differs. */
+.leaderboard-tease { color: var(--brand-primary, #01EACB); }
+
 /* Points Checkpoint card body (player) — populated client-side. */
 .token-checkpoint-body { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .token-checkpoint-row {

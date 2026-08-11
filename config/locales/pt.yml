@@ -177,6 +177,8 @@ pt:
     quiz_compare_cta: "Veja como se compara →"
     quiz_compare_title: "Como se compara"
     tokens_welcome_note: "Vai ganhar pontos a cada pergunta respondida — não pode voltar atrás e mudar uma resposta para ganhar mais."
+    leaderboard_teaser: "Quem junta mais pontos entra no placar no final!"
+    play_again: "Jogar de novo"
   defaults:
     range: ["Discordo totalmente", "Discordo", "Neutro", "Concordo", "Concordo totalmente"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ pt:
       tokens_result_label: "Pontos reunidos"
       tokens_earned: 'Pontos ganhos'
       tokens_earned_none: 'Sem pontos nesta'
+      leaderboard_title: "Placar"
+      leaderboard_you: "Você"
+      leaderboard_played_as: "Você jogou como %{name}"
+      leaderboard_rank: "Você está em %{rank}º de %{of} jogadores"
+      leaderboard_queued: "Você entra no placar assim que voltar a ficar on-line — sua pontuação está salva."
+      leaderboard_empty: "Seja a primeira pessoa no placar!"
+      already_played: "Você já jogou este Verto — veja como está o placar."
     editor:
       delete_card_confirm: Eliminar este cartão?
       save_to_library: "Salvar também na minha biblioteca de marca"

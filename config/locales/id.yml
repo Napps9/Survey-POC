@@ -177,6 +177,8 @@ id:
     quiz_compare_cta: "Lihat perbandinganmu →"
     quiz_compare_title: "Perbandinganmu"
     tokens_welcome_note: "Kamu akan mendapatkan poin setiap menjawab pertanyaan — kamu tidak bisa kembali dan mengubah jawaban untuk mendapatkan lebih banyak."
+    leaderboard_teaser: "Pengumpul poin terbanyak masuk papan peringkat di akhir!"
+    play_again: "Main lagi"
   defaults:
     range: ["Sangat tidak setuju", "Tidak setuju", "Netral", "Setuju", "Sangat setuju"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ id:
       tokens_result_label: "Kamu mengumpulkan"
       tokens_earned: 'Poin diperoleh'
       tokens_earned_none: 'Tidak ada poin untuk itu'
+      leaderboard_title: "Papan peringkat"
+      leaderboard_you: "Kamu"
+      leaderboard_played_as: "Kamu bermain sebagai %{name}"
+      leaderboard_rank: "Kamu peringkat %{rank} dari %{of} pemain"
+      leaderboard_queued: "Kamu akan masuk papan begitu kembali online — skormu sudah tersimpan."
+      leaderboard_empty: "Jadilah yang pertama di papan!"
+      already_played: "Kamu sudah memainkan Verto ini — beginilah papan saat ini."
     editor:
       delete_card_confirm: Hapus kartu ini?
       save_to_library: "Simpan juga ke pustaka merek saya"

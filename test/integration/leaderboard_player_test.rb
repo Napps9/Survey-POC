@@ -163,6 +163,28 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     assert body["entries"].first["name"].present?, "read-time backfill names rows submit never named"
   end
 
+  test "the player page wires the board: values, slot, teaser, and the retake button" do
+    s = board_survey
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_select "[data-player-leaderboard-value='true']"
+    assert_select "[data-player-retake-policy-value='accumulate']"
+    assert_select "[data-player-target='leaderboard']", count: 1
+    assert_select ".leaderboard-tease", count: 1, text: /🏆/
+    assert_select "[data-action='click->player#playAgain']", count: 1
+
+    no_redo = board_survey(policy: "no_redo")
+    get play_survey_path(no_redo.publish_token)
+    assert_select "[data-action='click->player#playAgain']", false,
+      "a retake the standings would ignore must not be offered"
+
+    off = board_survey(leaderboard_enabled: false)
+    get play_survey_path(off.publish_token)
+    assert_select "[data-player-leaderboard-value='false']"
+    assert_select "[data-player-target='leaderboard']", false
+    assert_select ".leaderboard-tease", false
+  end
+
   test "declining consent purges the leaderboard identity with everything else" do
     s = board_survey
     session = play!(s, player_key: "gone")

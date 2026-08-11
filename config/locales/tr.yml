@@ -177,6 +177,8 @@ tr:
     quiz_compare_cta: "Nasıl karşılaştırıldığını gör →"
     quiz_compare_title: "Nasıl karşılaştırılıyorsunuz"
     tokens_welcome_note: "Her soruyu cevapladıkça puan kazanacaksınız — daha fazla kazanmak için geri dönüp bir cevabı değiştiremezsiniz."
+    leaderboard_teaser: "En çok puan toplayanlar sonunda liderlik tablosuna girer!"
+    play_again: "Tekrar oyna"
   defaults:
     range: ["Kesinlikle katılmıyorum", "Katılmıyorum", "Kararsızım", "Katılıyorum", "Kesinlikle katılıyorum"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ tr:
       tokens_result_label: "Topladığınız puan"
       tokens_earned: 'Kazanılan puan'
       tokens_earned_none: 'Bunda puan yok'
+      leaderboard_title: "Liderlik tablosu"
+      leaderboard_you: "Sen"
+      leaderboard_played_as: "%{name} olarak oynadın"
+      leaderboard_rank: "%{of} oyuncu arasında %{rank}. sıradasın"
+      leaderboard_queued: "Tekrar çevrimiçi olduğunda tabloya gireceksin — puanın kaydedildi."
+      leaderboard_empty: "Tablodaki ilk kişi ol!"
+      already_played: "Bu Verto'yu zaten oynadın — tablonun şu anki durumu."
     editor:
       delete_card_confirm: Bu kart silinsin mi?
       save_to_library: "Marka kitaplığıma da kaydet"

@@ -177,6 +177,8 @@ fr:
     quiz_compare_cta: "Voyez comment vous vous situez →"
     quiz_compare_title: "Comment vous vous situez"
     tokens_welcome_note: "Vous gagnerez des points à chaque question — vous ne pouvez pas revenir en arrière et modifier une réponse pour en gagner plus."
+    leaderboard_teaser: "Les meilleurs collectionneurs de points entrent au classement à la fin !"
+    play_again: "Rejouer"
   defaults:
     range: ["Pas du tout d'accord", "Pas d'accord", "Neutre", "D'accord", "Tout à fait d'accord"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ fr:
       tokens_result_label: "Vous avez collecté"
       tokens_earned: 'Points gagnés'
       tokens_earned_none: 'Aucun point pour celle-ci'
+      leaderboard_title: "Classement"
+      leaderboard_you: "Vous"
+      leaderboard_played_as: "Vous avez joué sous le nom %{name}"
+      leaderboard_rank: "Vous êtes %{rank}e sur %{of} joueurs"
+      leaderboard_queued: "Vous rejoindrez le classement dès votre retour en ligne — votre score est enregistré."
+      leaderboard_empty: "Soyez le premier au classement !"
+      already_played: "Vous avez déjà joué ce Verto — voici le classement actuel."
     editor:
       delete_card_confirm: Supprimer cette carte ?
       save_to_library: "Enregistrer aussi dans ma bibliothèque de marque"

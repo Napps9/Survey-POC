@@ -177,6 +177,8 @@ ko:
     quiz_compare_cta: "내 비교 결과 보기 →"
     quiz_compare_title: "내 비교 결과"
     tokens_welcome_note: "질문에 답할 때마다 포인트를 얻어요 — 답을 바꾸려고 되돌아갈 수는 없어요."
+    leaderboard_teaser: "포인트를 가장 많이 모은 사람은 마지막에 리더보드에 올라요!"
+    play_again: "다시 하기"
   defaults:
     range: ["전혀 동의하지 않는다", "동의하지 않는다", "보통이다", "동의한다", "매우 동의한다"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ ko:
       tokens_result_label: "모은 포인트"
       tokens_earned: '획득한 점수'
       tokens_earned_none: '이 문항은 점수 없음'
+      leaderboard_title: "리더보드"
+      leaderboard_you: "나"
+      leaderboard_played_as: "%{name}(으)로 플레이했어요"
+      leaderboard_rank: "%{of}명 중 %{rank}위예요"
+      leaderboard_queued: "다시 온라인이 되면 보드에 올라가요 — 점수는 저장되어 있어요."
+      leaderboard_empty: "보드의 첫 주인공이 되어 보세요!"
+      already_played: "이 Verto는 이미 플레이했어요 — 현재 보드는 이렇습니다."
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       save_to_library: "브랜드 라이브러리에도 저장"

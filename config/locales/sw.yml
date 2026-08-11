@@ -177,6 +177,8 @@ sw:
     quiz_compare_cta: "Ona jinsi unavyolinganishwa →"
     quiz_compare_title: "Jinsi unavyolinganishwa"
     tokens_welcome_note: "Utapata pointi kila unapojibu swali — huwezi kurudi nyuma na kubadilisha jibu ili kupata zaidi."
+    leaderboard_teaser: "Wakusanyaji bora wa pointi huingia kwenye ubao wa wanaoongoza mwishoni!"
+    play_again: "Cheza tena"
   defaults:
     range: ["Sikubaliani kabisa", "Sikubaliani", "Sina upande", "Nakubaliana", "Nakubaliana kabisa"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ sw:
       tokens_result_label: "Umekusanya"
       tokens_earned: 'Pointi zilizopatikana'
       tokens_earned_none: 'Hakuna pointi kwa hili'
+      leaderboard_title: "Ubao wa wanaoongoza"
+      leaderboard_you: "Wewe"
+      leaderboard_played_as: "Ulicheza kama %{name}"
+      leaderboard_rank: "Uko nafasi ya %{rank} kati ya wachezaji %{of}"
+      leaderboard_queued: "Utaonekana kwenye ubao mara urudipo mtandaoni — alama zako zimehifadhiwa."
+      leaderboard_empty: "Kuwa wa kwanza kwenye ubao!"
+      already_played: "Umeshacheza Verto hii — hivi ndivyo ubao ulivyo sasa."
     editor:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"

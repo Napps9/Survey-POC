@@ -177,6 +177,8 @@ ja:
     quiz_compare_cta: "あなたの順位を見る →"
     quiz_compare_title: "あなたの順位"
     tokens_welcome_note: "各質問に答えるとポイントがもらえます — 一度答えると後で戻って変更し、さらに獲得することはできません。"
+    leaderboard_teaser: "ポイントを多く集めた人は最後にリーダーボードに載ります!"
+    play_again: "もう一度プレイ"
   defaults:
     range: ["全くそう思わない", "そう思わない", "どちらとも言えない", "そう思う", "強くそう思う"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ ja:
       tokens_result_label: "獲得ポイント"
       tokens_earned: '獲得ポイント'
       tokens_earned_none: 'この回答ではポイントなし'
+      leaderboard_title: "リーダーボード"
+      leaderboard_you: "あなた"
+      leaderboard_played_as: "あなたは %{name} としてプレイしました"
+      leaderboard_rank: "%{of}人中%{rank}位です"
+      leaderboard_queued: "オンラインに戻り次第ボードに載ります — スコアは保存済みです。"
+      leaderboard_empty: "ボードの最初のひとりになろう!"
+      already_played: "このVertoはプレイ済みです — 現在のボードはこちら。"
     editor:
       delete_card_confirm: このカードを削除しますか？
       save_to_library: "ブランドライブラリにも保存"

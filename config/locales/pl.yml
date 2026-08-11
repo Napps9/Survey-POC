@@ -177,6 +177,8 @@ pl:
     quiz_compare_cta: "Zobacz, jak wypadasz →"
     quiz_compare_title: "Jak wypadasz"
     tokens_welcome_note: "Będziesz zdobywać punkty za każdą odpowiedź — nie możesz cofnąć się i zmienić odpowiedzi, aby zdobyć ich więcej."
+    leaderboard_teaser: "Najlepsi zbieracze punktów trafiają na koniec do rankingu!"
+    play_again: "Zagraj jeszcze raz"
   defaults:
     range: ["Zdecydowanie się nie zgadzam", "Nie zgadzam się", "Neutralnie", "Zgadzam się", "Zdecydowanie się zgadzam"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -262,6 +264,13 @@ pl:
       tokens_result_label: "Zebrane punkty"
       tokens_earned: 'Zdobyte punkty'
       tokens_earned_none: 'Bez punktów za to'
+      leaderboard_title: "Ranking"
+      leaderboard_you: "Ty"
+      leaderboard_played_as: "Grasz jako %{name}"
+      leaderboard_rank: "Zajmujesz miejsce %{rank} z %{of} graczy"
+      leaderboard_queued: "Znajdziesz się w rankingu, gdy wrócisz online — twój wynik jest zapisany."
+      leaderboard_empty: "Bądź pierwszą osobą w rankingu!"
+      already_played: "Ten Verto masz już za sobą — tak wygląda ranking."
     editor:
       delete_card_confirm: Usunąć tę kartę?
       save_to_library: "Zapisz też w mojej bibliotece marki"
