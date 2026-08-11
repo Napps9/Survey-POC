@@ -156,6 +156,29 @@ class AskSubmissionsTest < ActionDispatch::IntegrationTest
     assert_select ".ask-modal.is-done"
   end
 
+  test "a declined Verto is resubmittable from the picker and restarts review" do
+    survey = build_survey
+    entry = CorpusEntry.create!(survey: survey, organisation: @org,
+                                opted_in_at: 1.day.ago, opted_in_by: @admin)
+    entry.decline!("reviewer@playverto.com", "Hold back the open text.")
+    sign_in @admin
+
+    # The row renders selectable, carrying the reviewer's note.
+    get ask_path
+    assert_select ".ask-pick-declined", text: /Hold back the open text\./
+    assert_select ".ask-pick-lock", count: 0
+
+    # Resubmitting — narrowed this time — goes back to pending and re-notifies.
+    assert_enqueued_emails 2 do
+      post ask_submissions_path, params: { vertos: { survey.id => { set_ids: [ "77" ] } } }
+    end
+
+    assert_redirected_to ask_path(submitted: 1)
+    entry.reload
+    assert entry.pending?, "a resubmission is a fresh review request"
+    assert_equal [ 77 ], entry.offered_scope["common_question_set_ids"]
+  end
+
   test "approving from the review queue emails the submitter their decision" do
     survey = build_survey
     sign_in @admin

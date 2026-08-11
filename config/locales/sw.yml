@@ -1572,7 +1572,7 @@ sw:
       locked_min_responses: "Inahitaji majibu %{min}+ (ina %{count})"
       locked_pending: "Tayari imewasilishwa — inakaguliwa na timu ya Verto"
       locked_live: "Tayari iko katika Ask Verto"
-      locked_declined: "Imekataliwa — angalia maelezo kwenye ukurasa wa Verto"
+      declined_note: "Ilikataliwa mara ya mwisho — %{note}"
       note: "Masharti (imechapishwa, majibu %{min}+) ni ya muda — timu ya Verto bado inakagua kiwango."
       cancel: "Ghairi"
       go: "Wasilisha kwa ukaguzi"

@@ -1572,7 +1572,7 @@ tr:
       locked_min_responses: "%{min}+ yanıt gerekiyor (%{count} var)"
       locked_pending: "Zaten gönderildi — Verto ekibi inceliyor"
       locked_live: "Zaten Ask Verto'da yayında"
-      locked_declined: "Reddedildi — Verto sayfasındaki nota bak"
+      declined_note: "Geçen sefer reddedildi — %{note}"
       note: "Uygunluk kuralları (yayımlanmış, %{min}+ yanıt) geçicidir — Verto ekibi eşiği hâlâ değerlendiriyor."
       cancel: "İptal"
       go: "İncelemeye gönder"

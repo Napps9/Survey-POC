@@ -36,7 +36,10 @@ class AskSubmissionsController < ApplicationController
     return nil unless survey
 
     answered = CorpusIndexer.countable_responses(survey).count
-    return nil unless CorpusEntry.submittable_state(survey, answered_count: answered) == :ready
+    # :declined is a resubmission — opt_in! moves the entry back to pending,
+    # so the fix-and-offer-again loop closes right here in the picker.
+    state = CorpusEntry.submittable_state(survey, answered_count: answered)
+    return nil unless %i[ready declined].include?(state)
 
     scope = scope_for(survey, selection)
     return nil if scope == :nothing

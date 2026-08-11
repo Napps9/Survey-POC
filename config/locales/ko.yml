@@ -1570,7 +1570,7 @@ ko:
       locked_min_responses: "%{min}개 이상의 응답 필요 (현재 %{count}개)"
       locked_pending: "이미 제출됨 — Verto 팀 검토 중"
       locked_live: "이미 Ask Verto에 게시됨"
-      locked_declined: "거절됨 — Verto 페이지의 메모를 확인하세요"
+      declined_note: "지난번에 거절됨 — %{note}"
       note: "자격 기준(게시됨, %{min}개 이상 응답)은 잠정적입니다 — Verto 팀이 기준을 검토 중입니다."
       cancel: "취소"
       go: "검토 요청 제출"

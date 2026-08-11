@@ -1571,7 +1571,7 @@ vi:
       locked_min_responses: "Cần %{min}+ câu trả lời (hiện có %{count})"
       locked_pending: "Đã gửi — đội ngũ Verto đang duyệt"
       locked_live: "Đã có trong Ask Verto"
-      locked_declined: "Bị từ chối — xem ghi chú trên trang Verto"
+      declined_note: "Lần trước bị từ chối — %{note}"
       note: "Điều kiện (đã xuất bản, %{min}+ câu trả lời) là tạm thời — đội ngũ Verto vẫn đang xem xét ngưỡng."
       cancel: "Hủy"
       go: "Gửi để duyệt"

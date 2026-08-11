@@ -1582,7 +1582,7 @@ uk:
       locked_min_responses: "Потрібно %{min}+ відповідей (зараз %{count})"
       locked_pending: "Уже подано — на перевірці в команди Verto"
       locked_live: "Уже в Ask Verto"
-      locked_declined: "Відхилено — див. нотатку на сторінці Verto"
+      declined_note: "Минулого разу відхилено — %{note}"
       note: "Правила допуску (опубліковано, %{min}+ відповідей) попередні — команда Verto ще уточнює поріг."
       cancel: "Скасувати"
       go: "Надіслати на перевірку"

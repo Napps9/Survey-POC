@@ -1572,7 +1572,7 @@ de:
       locked_min_responses: "Braucht %{min}+ Antworten (hat %{count})"
       locked_pending: "Bereits eingereicht — beim Verto-Team zur Prüfung"
       locked_live: "Bereits live in Ask Verto"
-      locked_declined: "Abgelehnt — siehe die Notiz auf der Verto-Seite"
+      declined_note: "Beim letzten Mal abgelehnt — %{note}"
       note: "Die Zulassungsregeln (veröffentlicht, %{min}+ Antworten) sind vorläufig — das Verto-Team prüft die Schwelle noch."
       cancel: "Abbrechen"
       go: "Zur Prüfung einreichen"

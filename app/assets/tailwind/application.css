@@ -8692,6 +8692,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .ask-pick.is-locked { opacity: 0.55; cursor: not-allowed; }
 .ask-pick.is-locked .ask-pick-box { border-style: dashed; }
 .ask-pick-lock { font-size: 10.5px; color: #FFB43A; }
+/* Declined last time, selectable again — the reviewer's note rides the row so
+   the fix precedes the resubmission. */
+.ask-pick-declined {
+  display: block; margin-top: 5px; font-size: 10.5px; line-height: 1.5;
+  color: #FF8CB4;
+}
 .ask-pick-sets { margin: -1px 0 9px 30px; }
 .ask-set {
   display: flex; align-items: center; gap: 9px; width: 100%; text-align: start;

@@ -59,11 +59,15 @@ class AskController < ApplicationController
       answered = CorpusIndexer.countable_responses(survey).count
       cards    = Array(survey.cards).select { |c| CorpusIndexer.indexable?(c["type"].to_s) }
       groups   = cards.group_by { |c| c["common_question_set_id"] }
+      state    = CorpusEntry.submittable_state(survey, answered_count: answered)
 
       {
         survey:    survey,
         answered:  answered,
-        state:     CorpusEntry.submittable_state(survey, answered_count: answered),
+        state:     state,
+        # A declined row is selectable again — resubmitting restarts review —
+        # and carries the reviewer's note so the admin knows what to fix first.
+        decline_note: (CorpusEntry.find_by(survey_id: survey.id)&.review_note if state == :declined),
         total:     cards.size,
         own_count: (groups[nil] || []).size,
         sets:      groups.except(nil).map do |set_id, group|
@@ -71,6 +75,6 @@ class AskController < ApplicationController
           { id: set_id, name: set&.name.presence || t("ask.submit.common_set"), count: group.size }
         end
       }
-    end.sort_by { |row| row[:state] == :ready ? 0 : 1 }
+    end.sort_by { |row| %i[ready declined].include?(row[:state]) ? 0 : 1 }
   end
 end

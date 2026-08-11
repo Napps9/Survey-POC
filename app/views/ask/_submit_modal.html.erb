@@ -17,7 +17,7 @@
       <%= form_with url: ask_submissions_path, method: :post, local: true, style: "margin:0;" do %>
         <% @submittable.each do |row| %>
           <% survey = row[:survey] %>
-          <% if row[:state] == :ready %>
+          <% if %i[ready declined].include?(row[:state]) %>
             <div class="ask-pick-group">
               <button type="button" class="ask-pick" data-action="click->ask-verto#togglePick">
                 <span class="ask-pick-box"></span>
@@ -31,6 +31,11 @@
                       <span class="ask-sdg-chip" style="--sdg:<%= UnSdgs.color(n) %>;"><i></i><%= UnSdgs.label(n) %> · <%= UnSdgs.title(n) %></span>
                     <% end %>
                   </span>
+                  <% if row[:state] == :declined %>
+                    <%# Declined last time — resubmitting restarts review. The
+                        reviewer's note verbatim, so the fix precedes the tick. %>
+                    <span class="ask-pick-declined"><%= t("ask.submit.declined_note", note: row[:decline_note].to_s) %></span>
+                  <% end %>
                 </span>
               </button>
               <div class="ask-pick-sets">
@@ -65,8 +70,7 @@
                       when :unpublished        then t("ask.submit.locked_unpublished")
                       when :too_few_responses  then t("ask.submit.locked_min_responses", min: CorpusEntry::SUBMISSION_MIN_RESPONSES, count: row[:answered])
                       when :pending            then t("ask.submit.locked_pending")
-                      when :live               then t("ask.submit.locked_live")
-                      else t("ask.submit.locked_declined")
+                      else t("ask.submit.locked_live")
                       end %>
                 </span></span>
               </span>

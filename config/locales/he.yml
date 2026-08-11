@@ -1579,7 +1579,7 @@ he:
       locked_min_responses: "נדרשות %{min}+ תשובות (יש %{count})"
       locked_pending: "כבר הוגש — בבדיקת צוות Verto"
       locked_live: "כבר פעיל ב-Ask Verto"
-      locked_declined: "נדחה — ראו את ההערה בעמוד ה-Verto"
+      declined_note: "נדחה בפעם הקודמת — %{note}"
       note: "כללי הזכאות (פורסם, %{min}+ תשובות) זמניים — צוות Verto עדיין בוחן את הסף."
       cancel: "ביטול"
       go: "שליחה לבדיקה"

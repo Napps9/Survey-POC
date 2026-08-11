@@ -1572,7 +1572,7 @@ nl:
       locked_min_responses: "Heeft %{min}+ antwoorden nodig (heeft %{count})"
       locked_pending: "Al ingediend — in beoordeling bij het Verto-team"
       locked_live: "Al live in Ask Verto"
-      locked_declined: "Afgewezen — zie de notitie op de Verto-pagina"
+      declined_note: "Vorige keer afgewezen — %{note}"
       note: "De regels (gepubliceerd, %{min}+ antwoorden) zijn voorlopig — het Verto-team beoordeelt de drempel nog."
       cancel: "Annuleren"
       go: "Indienen voor beoordeling"

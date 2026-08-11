@@ -1582,7 +1582,7 @@ pl:
       locked_min_responses: "Wymaga %{min}+ odpowiedzi (ma %{count})"
       locked_pending: "Już zgłoszone — w ocenie zespołu Verto"
       locked_live: "Już dostępne w Ask Verto"
-      locked_declined: "Odrzucone — zobacz notatkę na stronie Verto"
+      declined_note: "Ostatnio odrzucone — %{note}"
       note: "Zasady (opublikowane, %{min}+ odpowiedzi) są tymczasowe — zespół Verto wciąż ustala próg."
       cancel: "Anuluj"
       go: "Prześlij do oceny"

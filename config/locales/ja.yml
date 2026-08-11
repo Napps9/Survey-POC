@@ -1570,7 +1570,7 @@ ja:
       locked_min_responses: "%{min}件以上の回答が必要（現在%{count}件）"
       locked_pending: "提出済み — Vertoチームが審査中"
       locked_live: "Ask Vertoで公開中"
-      locked_declined: "不承認 — Vertoのページのメモをご覧ください"
+      declined_note: "前回は不承認 — %{note}"
       note: "参加条件（公開済み・%{min}件以上）は暫定です — Vertoチームが基準を検討中です。"
       cancel: "キャンセル"
       go: "審査に提出"

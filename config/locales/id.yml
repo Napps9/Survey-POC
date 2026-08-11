@@ -1571,7 +1571,7 @@ id:
       locked_min_responses: "Perlu %{min}+ jawaban (ada %{count})"
       locked_pending: "Sudah dikirim — sedang ditinjau tim Verto"
       locked_live: "Sudah tayang di Ask Verto"
-      locked_declined: "Ditolak — lihat catatan di halaman Verto"
+      declined_note: "Ditolak sebelumnya — %{note}"
       note: "Aturan kelayakan (terbit, %{min}+ jawaban) bersifat sementara — tim Verto masih meninjau ambangnya."
       cancel: "Batal"
       go: "Kirim untuk ditinjau"

@@ -141,21 +141,22 @@ class CorpusEntry < ApplicationRecord
   #   :ready      selectable
   #   :unpublished, :too_few_responses   locked, with the reason
   #   :pending, :live                    already offered — locked, informative
-  #   :declined   locked; the review note explains, and the survey page's
-  #               existing opt-in block is where a re-offer negotiation lives
+  #   :declined   SELECTABLE — declined last time, the review note shown on
+  #               the row, and resubmitting restarts review (opt_in! moves a
+  #               declined entry back to pending). The base bar still applies
+  #               first: a declined Verto that is now unpublished or under the
+  #               floor locks on that reason, as any fresh offer would.
   def self.submittable_state(survey, answered_count:)
     entry = find_by(survey_id: survey.id)
     if entry&.opted_in?
-      return :live     if entry.approved?
-      return :declined if entry.declined?
-
-      return :pending
+      return :live    if entry.approved?
+      return :pending if entry.pending?
     end
 
     return :unpublished       unless survey.published?
     return :too_few_responses if answered_count < SUBMISSION_MIN_RESPONSES
 
-    :ready
+    entry&.opted_in? && entry.declined? ? :declined : :ready
   end
 
   # ── Transitions ────────────────────────────────────────────────────────────
@@ -164,7 +165,12 @@ class CorpusEntry < ApplicationRecord
 
   # The creator offers the Verto. Re-offering after a withdrawal clears the
   # withdrawal and starts review again: our previous approval was granted against
-  # a consent that has since been revoked, so it does not carry over.
+  # a consent that has since been revoked, so it does not carry over. Re-offering
+  # after a DECLINE also restarts review — the class comment always promised
+  # that ("if the reason is later fixed, they should not have to say it again"),
+  # and the picker's resubmit path (2026-08-11) is where it comes true. The
+  # decline's note stays on the row until the next decision overwrites it, so
+  # the reviewer sees what was objected to last time.
   #
   # `scope` narrows the offer to question sets (see offers_card?). nil means
   # "don't touch what's stored" so the survey page's whole-Verto toggle keeps
@@ -174,7 +180,7 @@ class CorpusEntry < ApplicationRecord
       opted_in_at:   opted_in_at.presence || Time.current,
       opted_in_by:   opted_in_by || user,
       withdrawn_at:  nil,
-      review_status: withdrawn? ? "pending" : review_status,
+      review_status: withdrawn? || declined? ? "pending" : review_status,
       **(scope.nil? ? {} : { offered_scope: scope })
     )
   end

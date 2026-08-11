@@ -1572,7 +1572,7 @@ es:
       locked_min_responses: "Necesita %{min}+ respuestas (tiene %{count})"
       locked_pending: "Ya enviado — en revisión por el equipo de Verto"
       locked_live: "Ya está en Ask Verto"
-      locked_declined: "Rechazado — mira la nota en la página del Verto"
+      declined_note: "Rechazado la última vez — %{note}"
       note: "Las reglas (publicado, %{min}+ respuestas) son provisionales — el equipo de Verto sigue revisando el umbral."
       cancel: "Cancelar"
       go: "Enviar a revisión"

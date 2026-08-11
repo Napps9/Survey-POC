@@ -1593,7 +1593,7 @@ en:
       locked_min_responses: "Needs %{min}+ responses (has %{count})"
       locked_pending: "Already offered — with the Verto team for review"
       locked_live: "Already live in Ask Verto"
-      locked_declined: "Declined — see the note on the Verto's page"
+      declined_note: "Declined last time — %{note}"
       note: "The eligibility rules (published, %{min}+ responses) are provisional — the bar is still under review by the Verto team."
       cancel: "Cancel"
       go: "Submit for review"

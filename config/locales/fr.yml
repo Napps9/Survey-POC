@@ -1572,7 +1572,7 @@ fr:
       locked_min_responses: "Nécessite %{min}+ réponses (en a %{count})"
       locked_pending: "Déjà soumis — en relecture par l'équipe Verto"
       locked_live: "Déjà en ligne dans Ask Verto"
-      locked_declined: "Refusé — voir la note sur la page du Verto"
+      declined_note: "Refusé la dernière fois — %{note}"
       note: "Les règles d'éligibilité (publié, %{min}+ réponses) sont provisoires — l'équipe Verto examine encore le seuil."
       cancel: "Annuler"
       go: "Soumettre pour relecture"

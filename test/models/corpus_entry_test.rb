@@ -253,11 +253,30 @@ class CorpusEntryTest < ActiveSupport::TestCase
     e.update!(review_status: "approved")
     assert_equal :live, CorpusEntry.submittable_state(s, answered_count: 100)
 
+    # Declined is SELECTABLE — the picker's resubmit path — so it reports
+    # itself only when the base bar passes; below the bar, the bar's reason
+    # wins, exactly as it would for a fresh offer.
     e.update!(review_status: "declined")
     assert_equal :declined, CorpusEntry.submittable_state(s, answered_count: 100)
+    assert_equal :too_few_responses,
+                 CorpusEntry.submittable_state(s, answered_count: CorpusEntry::SUBMISSION_MIN_RESPONSES - 1)
+    s.update!(unpublished_at: Time.current)
+    assert_equal :unpublished, CorpusEntry.submittable_state(s, answered_count: 100)
+    s.update!(unpublished_at: nil)
 
     # Withdrawn clears the offer, so the bar applies afresh.
     e.withdraw!
     assert_equal :ready, CorpusEntry.submittable_state(s, answered_count: 100)
+  end
+
+  test "re-offering a declined Verto restarts review and keeps the note for the reviewer" do
+    e = CorpusEntry.create!(survey: survey, organisation: @org, opted_in_at: 1.day.ago)
+    e.decline!("reviewer@playverto.com", "Too much identifying free text.")
+
+    e.opt_in!(@user)
+
+    assert e.reload.pending?, "a fixed Verto must not need a withdrawal to be reviewed again"
+    assert_equal "Too much identifying free text.", e.review_note,
+      "the last objection stays visible until the next decision overwrites it"
   end
 end

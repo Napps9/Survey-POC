@@ -1587,7 +1587,7 @@ ar:
       locked_min_responses: "يتطلب %{min}+ إجابة (لديه %{count})"
       locked_pending: "قُدّم بالفعل — قيد مراجعة فريق Verto"
       locked_live: "منشور بالفعل في Ask Verto"
-      locked_declined: "مرفوض — راجع الملاحظة في صفحة الـVerto"
+      declined_note: "رُفض في المرة السابقة — %{note}"
       note: "قواعد الأهلية (منشور، %{min}+ إجابة) مؤقتة — لا يزال فريق Verto يراجع الحد."
       cancel: "إلغاء"
       go: "قدّم للمراجعة"

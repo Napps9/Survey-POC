@@ -1572,7 +1572,7 @@ hi:
       locked_min_responses: "%{min}+ जवाब चाहिए (अभी %{count} हैं)"
       locked_pending: "पहले से सबमिट — Verto टीम की समीक्षा में"
       locked_live: "Ask Verto में पहले से लाइव"
-      locked_declined: "अस्वीकृत — Verto के पेज पर नोट देखें"
+      declined_note: "पिछली बार अस्वीकृत — %{note}"
       note: "पात्रता नियम (प्रकाशित, %{min}+ जवाब) अस्थायी हैं — Verto टीम अभी सीमा की समीक्षा कर रही है।"
       cancel: "रद्द करें"
       go: "समीक्षा के लिए भेजें"

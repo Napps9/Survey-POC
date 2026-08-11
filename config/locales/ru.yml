@@ -1581,7 +1581,7 @@ ru:
       locked_min_responses: "Нужно %{min}+ ответов (сейчас %{count})"
       locked_pending: "Уже отправлен — на проверке у команды Verto"
       locked_live: "Уже в Ask Verto"
-      locked_declined: "Отклонён — см. заметку на странице Verto"
+      declined_note: "В прошлый раз отклонён — %{note}"
       note: "Правила допуска (опубликован, %{min}+ ответов) предварительные — команда Verto ещё уточняет порог."
       cancel: "Отмена"
       go: "Отправить на проверку"
