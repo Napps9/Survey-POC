@@ -69,9 +69,15 @@ class SurveysController < ApplicationController
   # `logic` and `render_mode` are deliberately NOT here: they change which cards
   # a respondent is routed through and how cards are presented, not what anyone
   # agreed to and not how a stored answer scores.
+  #
+  # `leaderboard_retake_policy` IS here: flipping it silently rewrites standings
+  # respondents have already been shown (accumulate→restart collapses a
+  # three-run total to one run), exactly like the scoring switches.
+  # `leaderboard_enabled` is not — it only shows or hides a board computed at
+  # read time.
   SETTINGS_LOCKED_IN_USE = %i[
     consent_text consent_image consent_image_credit consent_image_credit_url
-    tokenisation_enabled token_types quiz
+    tokenisation_enabled token_types quiz leaderboard_retake_policy
   ].freeze
 
   def settings_locked_message = t("flash.surveys.settings_locked")
@@ -641,11 +647,17 @@ class SurveysController < ApplicationController
     # Presentation switches — safe to change at any point in a Verto's life, so
     # deliberately NOT in SETTINGS_LOCKED_IN_USE. None of them re-scores an
     # answer or changes what anyone agreed to; they only affect what a
-    # respondent is shown from here on.
+    # respondent is shown from here on. leaderboard_enabled belongs here too:
+    # the standings are computed at read time from data that exists either way,
+    # so the toggle only shows or hides them.
     %i[token_reveal_enabled token_back_nav_enabled share_enabled regions_enabled
-       respondent_code_enabled].each do |flag|
+       respondent_code_enabled leaderboard_enabled].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
+    end
+    if params.key?(:leaderboard_retake_policy)
+      attrs[:leaderboard_retake_policy] =
+        Survey.normalize_leaderboard_retake_policy(params[:leaderboard_retake_policy])
     end
     if params.key?(:respondent_code_prompt)
       attrs[:respondent_code_prompt] =

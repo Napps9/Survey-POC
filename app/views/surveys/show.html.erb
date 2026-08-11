@@ -851,6 +851,52 @@
               </label>
             <% end %>
           <% end %>
+
+          <%# Leaderboard — editor-only (not in the creation wizard: it depends
+              on token config that doesn't exist at wizard time). If tokenisation
+              is later switched off (only possible pre-live), the flag stays set
+              but the player and endpoint gate on leaderboard_active?, so
+              nothing renders or records. The enable toggle is deliberately its
+              own form, separate from the policy radios below: update_settings
+              refuses a request WHOLESALE when any locked key rides along, and
+              the policy is locked once answers exist while the toggle never is. %>
+          <% if @survey.tokenisation_enabled? %>
+            <%= form_with url: survey_settings_path(@survey), method: :post, local: true,
+                  style: "margin:12px 0 0;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);" do %>
+              <input type="hidden" name="return_tab" value="tokens" />
+              <input type="hidden" name="leaderboard_enabled" value="0" />
+              <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+                <input type="checkbox" name="leaderboard_enabled" value="1"
+                       <%= "checked" if @survey.leaderboard_enabled? %>
+                       onchange="this.form.requestSubmit()"
+                       style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+                <span>🏆 Show a leaderboard of token collectors at the end. Players get a system-made anonymous name — like “Clever Axolotl” — that stays theirs on every retake and can't be edited.</span>
+              </label>
+            <% end %>
+
+            <% if @survey.leaderboard_enabled? %>
+              <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0 24px;" do %>
+                <input type="hidden" name="return_tab" value="tokens" />
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin-bottom:6px;">
+                  When someone plays again<%= " — 🔒 locked while the Verto is live" if live_locked %>
+                </div>
+                <% [
+                  [ "accumulate", "Gain points", "Retakes add to their total, so they can climb the board." ],
+                  [ "no_redo",    "No redos",    "One play each. A returning player lands straight on the board." ],
+                  [ "restart",    "Restart points", "A retake wipes their old score and starts over." ]
+                ].each do |value, name, hint| %>
+                  <label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+                    <input type="radio" name="leaderboard_retake_policy" value="<%= value %>"
+                           <%= "checked" if @survey.leaderboard_retake_policy == value %>
+                           <%= "disabled" if live_locked %>
+                           onchange="this.form.requestSubmit()"
+                           style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+                    <span><strong style="font-weight:normal;color:#fff;"><%= name %></strong> — <%= hint %></span>
+                  </label>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
         </div>
       </div>
 

@@ -110,6 +110,19 @@ class SurveyDuplicateTest < ActionDispatch::IntegrationTest
     assert_equal "hi", original.cards.first["title"]
   end
 
+  test "the leaderboard settings are copied" do
+    original = @org.surveys.create!(title: "T", theme: "Theme", audience_age: "all", key_insight: "k",
+                                     default_locale: "en", locales: [ "en" ], cards: CARDS.map(&:dup),
+                                     tokenisation_enabled: true,
+                                     leaderboard_enabled: true, leaderboard_retake_policy: "no_redo")
+
+    post duplicate_survey_path(original)
+    copy = @org.surveys.order(:id).last
+
+    assert copy.leaderboard_enabled?, "duplicate! must carry the new columns or Duplicate silently drops them"
+    assert_equal "no_redo", copy.leaderboard_retake_policy
+  end
+
   test "results-report columns are not copied" do
     original = @org.surveys.create!(title: "T", theme: "Theme", audience_age: "all", key_insight: "k",
                                      default_locale: "en", locales: [ "en" ], cards: CARDS.map(&:dup),

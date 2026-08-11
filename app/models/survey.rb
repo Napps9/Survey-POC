@@ -1426,6 +1426,12 @@ class Survey < ApplicationRecord
   #   restart    — a retake wipes the old score and starts over.
   LEADERBOARD_RETAKE_POLICIES = %w[accumulate no_redo restart].freeze
 
+  # The column carries a database CHECK (P2-8), and the coverage rule in
+  # enum_constraints_test is that a constrained column also declares its values
+  # in the model — a bad value should surface as a validation error, not a raw
+  # database exception.
+  validates :leaderboard_retake_policy, inclusion: { in: LEADERBOARD_RETAKE_POLICIES }
+
   def self.normalize_leaderboard_retake_policy(value)
     LEADERBOARD_RETAKE_POLICIES.include?(value.to_s) ? value.to_s : "accumulate"
   end

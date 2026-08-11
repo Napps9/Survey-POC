@@ -24,6 +24,17 @@ class EnumConstraintsTest < ActiveSupport::TestCase
     )
   end
 
+  test "a leaderboard retake policy outside the enum is rejected by the database" do
+    assert_raises(ActiveRecord::StatementInvalid) do
+      raw_update("surveys", @survey.id, "leaderboard_retake_policy", "honour_system")
+    end
+    assert_equal "accumulate", @survey.reload.leaderboard_retake_policy
+
+    Survey::LEADERBOARD_RETAKE_POLICIES.each do |policy|
+      assert_nothing_raised { raw_update("surveys", @survey.id, "leaderboard_retake_policy", policy) }
+    end
+  end
+
   test "a response status outside the allowed set is rejected by the database" do
     resp = @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed")
 
@@ -82,7 +93,7 @@ class EnumConstraintsTest < ActiveSupport::TestCase
       Funder => :status, FunderMembership => :status, Invite => :kind,
       Membership => :role, Partnership => :status, PartnershipMembership => :status,
       FlowGeneration => :status, ReportRender => :status, VertoBuild => :status,
-      Response => :status
+      Response => :status, Survey => :leaderboard_retake_policy
     }.each do |model, column|
       declared = model.respond_to?(:defined_enums) && model.defined_enums.key?(column.to_s)
       validated = model.validators_on(column).any? { |v| v.is_a?(ActiveModel::Validations::InclusionValidator) }
@@ -94,5 +105,8 @@ class EnumConstraintsTest < ActiveSupport::TestCase
   test "the constraints are actually present in the schema" do
     names = ActiveRecord::Base.connection.check_constraints(:responses).map(&:name)
     assert_includes names, "chk_responses_status"
+
+    survey_names = ActiveRecord::Base.connection.check_constraints(:surveys).map(&:name)
+    assert_includes survey_names, "chk_surveys_leaderboard_retake_policy"
   end
 end
