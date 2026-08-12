@@ -62,4 +62,51 @@ class AskVertoComposeTest < ApplicationSystemTestCase
     assert_equal "Are young people worried?", created.ask_messages.first.text
     assert_no_match(/[?&]q=/, current_url, "the carried question is scrubbed from the URL")
   end
+
+  # Streams nothing at all — the shape of a turn the server killed before it
+  # could write anything, which used to leave a permanently empty bubble.
+  class SilentChat
+    def call(messages:, scope: {}, &emit)
+      { text: "", citations: [] }
+    end
+  end
+
+  test "a stream that says nothing shows the error and releases the composer" do
+    stub_method(AskVertoChat, :new, ->(*) { SilentChat.new }) do
+      sign_in_as(@user)
+      visit ask_path
+      dismiss_cookie_banner
+
+      find(".ask-composer textarea").fill_in(with: "Anything in there?")
+      find(".ask-composer textarea").send_keys(:enter)
+
+      assert_text "Anything in there?", wait: 5
+      assert_text I18n.t("js.ask.error"), wait: 5
+
+      # The turn failed but the composer recovered: a second question sends,
+      # which is exactly what a wedged _loading flag used to prevent.
+      assert_no_selector ".ask-send[disabled]"
+      find(".ask-composer textarea").fill_in(with: "Still there?")
+      find(".ask-composer textarea").send_keys(:enter)
+      assert_text "Still there?", wait: 5
+    end
+  end
+
+  test "a refused turn shows the server's own explanation" do
+    thread = @org.ask_threads.create!(user: @user)
+    thread.ask_messages.create!(role: "user", text: "Earlier question")
+    thread.ask_messages.create!(role: "assistant", text: "Earlier answer.")
+
+    stub_method(LimitsConcurrentStreams::POOL, :acquire, false) do
+      sign_in_as(@user)
+      visit ask_path(thread_id: thread.id)
+      dismiss_cookie_banner
+
+      find(".ask-composer textarea").fill_in(with: "One more?")
+      find(".ask-composer textarea").send_keys(:enter)
+
+      # The 503's plain-text body, verbatim — not the generic apology.
+      assert_text LimitsConcurrentStreams::BUSY_MESSAGE, wait: 5
+    end
+  end
 end

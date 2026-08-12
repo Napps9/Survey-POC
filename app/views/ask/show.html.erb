@@ -310,12 +310,17 @@
     <% if @messages.any? %>
       <div class="ask-fab-row ask-fab-row--docked" data-ask-verto-target="fabRow">
         <div class="ask-composer">
+          <%# Same empty-corpus guard as the hero composer above: a withdrawal
+              or decline can empty the corpus under an existing conversation,
+              and the server refuses those messages with a bare 422. %>
           <textarea data-ask-verto-target="input"
                     data-action="keydown->ask-verto#keydown input->ask-verto#autogrow"
                     rows="1"
-                    placeholder="<%= t("js.ask.placeholder") %>"
+                    <%= "disabled" if @coverage[:vertos].zero? %>
+                    placeholder="<%= @coverage[:vertos].zero? ? t("js.ask.empty_corpus") : t("js.ask.placeholder") %>"
                     aria-label="<%= t("js.ask.placeholder") %>"></textarea>
           <button type="button" class="ask-send"
+                  <%= "disabled" if @coverage[:vertos].zero? %>
                   data-ask-verto-target="send"
                   data-action="click->ask-verto#send"
                   aria-label="<%= t("js.ask.send") %>">

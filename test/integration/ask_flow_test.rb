@@ -260,6 +260,23 @@ class AskFlowTest < ActionDispatch::IntegrationTest
     assert_select ".ask-send[disabled]"
   end
 
+  # The docked composer is a different ERB branch from the hero one above, and
+  # it once shipped without the guard: a live composer over a corpus the server
+  # refuses with a bare 422.
+  test "the docked composer is disabled when the corpus empties under a conversation" do
+    sign_in
+    mine = thread
+    mine.ask_messages.create!(role: "user", text: "Are people worried?")
+    mine.ask_messages.create!(role: "assistant", text: "Worry is high.")
+    CorpusEntry.find_by(survey_id: @survey.id).withdraw!
+
+    get ask_path(thread_id: mine.id)
+
+    assert_response :success
+    assert_select ".ask-fab-row--docked textarea[disabled]"
+    assert_select ".ask-fab-row--docked .ask-send[disabled]"
+  end
+
   test "each thread row carries a delete control" do
     sign_in
     mine = thread

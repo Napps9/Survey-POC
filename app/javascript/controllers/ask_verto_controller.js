@@ -192,18 +192,25 @@ export default class extends Controller {
   // ── The stream ──────────────────────────────────────────────────────────
   // One JSON object per line. Lines can be split across network chunks, so the
   // tail is held back until a newline arrives.
+  //
+  // Everything, prelude included, runs inside the try: send() fires this
+  // without awaiting it, so a throw anywhere outside it would be an unhandled
+  // rejection that leaves _loading stuck true and the composer dead.
   async _stream(question, body) {
-    // The answer bubble IS a .summary-card: is-generating switches on the 3px
-    // rainbow sweep and the teal glow, exactly as the results screen's AI card
-    // does, and both drop on the first token rather than on completion.
-    body.classList.add("summary-card", "is-generating")
-    const rainbow = document.createElement("div")
-    rainbow.className = "summary-rainbow"
-    body.appendChild(rainbow)
-
-    const steps = this._appendSteps(body)
+    let steps = null
+    const state = { terminal: false, contentful: false }
 
     try {
+      // The answer bubble IS a .summary-card: is-generating switches on the 3px
+      // rainbow sweep and the teal glow, exactly as the results screen's AI card
+      // does, and both drop on the first token rather than on completion.
+      body.classList.add("summary-card", "is-generating")
+      const rainbow = document.createElement("div")
+      rainbow.className = "summary-rainbow"
+      body.appendChild(rainbow)
+
+      steps = this._appendSteps(body)
+
       const token = document.querySelector('meta[name="csrf-token"]')?.content
       const res = await fetch(this.threadUrlValue, {
         method: "POST",
@@ -213,7 +220,10 @@ export default class extends Controller {
         },
         body: JSON.stringify({ message: question })
       })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      // A followed redirect means the session is gone: the 200 is a login
+      // page, and reading it as events would end as a silently empty answer.
+      if (res.redirected) throw new Error("redirected")
+      if (!res.ok) throw await this._refusal(res)
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -235,18 +245,36 @@ export default class extends Controller {
           } catch (_) {
             continue
           }
-          this._handle(event, body, steps)
+          this._handle(event, body, steps, state)
         }
       }
-    } catch (_) {
-      this._settle(body, steps)
-      body.appendChild(document.createTextNode(t("ask.error")))
-    }
 
-    this._settle(body, steps)
-    this._loading = false
-    this.sendTarget.disabled = false
-    this.inputTarget.focus()
+      // A close with neither a terminal event nor any content is a failure the
+      // server could not report — a killed stream, a zero-byte response. A
+      // stream that already showed text stands as a partial answer instead.
+      if (!state.terminal && !state.contentful) throw new Error("empty stream")
+    } catch (err) {
+      this._settle(body, steps)
+      body.appendChild(document.createTextNode(err?.display || t("ask.error")))
+    } finally {
+      this._settle(body, steps)
+      this._loading = false
+      // Mirrors the input, so a composer the server rendered disabled stays so.
+      this.sendTarget.disabled = this.inputTarget.disabled
+      this.inputTarget.focus()
+    }
+  }
+
+  // A refusal with a plain-text body is the server explaining itself — the
+  // hourly throttle, the daily cap, the busy stream slot. Those words beat the
+  // generic apology; anything else (an HTML error page) falls through to it.
+  async _refusal(res) {
+    const err = new Error(`HTTP ${res.status}`)
+    if ((res.headers.get("Content-Type") || "").startsWith("text/plain")) {
+      const text = (await res.text()).trim()
+      if (text) err.display = text
+    }
+    return err
   }
 
   // Drop the thinking chrome. Idempotent — called on first token, on error and
@@ -257,7 +285,10 @@ export default class extends Controller {
     steps?.remove()
   }
 
-  _handle(event, body, steps) {
+  // `state` is _stream's ledger of what actually arrived: `contentful` once any
+  // of the answer itself has been shown, `terminal` once the server closed the
+  // turn deliberately — the difference between a finished stream and a killed one.
+  _handle(event, body, steps, state) {
     switch (event.t) {
       case "status":
         this._advanceSteps(steps, event.text)
@@ -269,16 +300,19 @@ export default class extends Controller {
         break
 
       case "token":
+        state.contentful = true
         this._settle(body, steps)
         body.appendChild(document.createTextNode(event.text))
         break
 
       case "cite":
+        state.contentful = true
         this._settle(body, steps)
         body.appendChild(this._citeChip(event.n))
         break
 
       case "quote":
+        state.contentful = true
         this._settle(body, steps)
         body.appendChild(this._quoteBlock(event))
         break
@@ -288,11 +322,13 @@ export default class extends Controller {
         break
 
       case "error":
+        state.terminal = true
         this._settle(body, steps)
         body.appendChild(document.createTextNode(event.text))
         break
 
       case "done":
+        state.terminal = true
         if (this._sources.size) body.appendChild(this._jumpPill())
         break
     }
