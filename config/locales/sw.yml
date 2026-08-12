@@ -1370,6 +1370,9 @@ sw:
     welcome_confirm: "Karibu Playverto! Angalia %{email} ili kuthibitisha anwani yako."
   flash:
     comms:
+      send_cancelled: "Utumaji umeghairiwa."
+      send_started: "Utumaji umeanza."
+      test_sent: "Barua pepe ya majaribio imetumwa kwa %{email}."
       list_deleted: "Orodha imefutwa."
       list_imported: 'Orodha "%{name}" imeingizwa — anwani: %{count}, zilizorukwa: %{skipped}.'
       campaign_deleted: "Kampeni imefutwa."

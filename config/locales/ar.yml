@@ -1369,6 +1369,9 @@ ar:
     welcome_confirm: "مرحباً بك في Playverto! تحقق من %{email} لتأكيد عنوانك."
   flash:
     comms:
+      send_cancelled: "تم إلغاء الإرسال."
+      send_started: "بدأ الإرسال."
+      test_sent: "تم إرسال رسالة تجريبية إلى %{email}."
       list_deleted: "تم حذف القائمة."
       list_imported: 'تم استيراد القائمة "%{name}" — جهات الاتصال: %{count}، المتجاهَل: %{skipped}.'
       campaign_deleted: "تم حذف الحملة."

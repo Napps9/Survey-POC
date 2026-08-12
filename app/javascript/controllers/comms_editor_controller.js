@@ -17,7 +17,7 @@ import { hasEmailFormatting } from "lib/rich_text"
 export default class extends Controller {
   static targets = ["title", "status", "undoBtn", "canvas", "paper", "slot", "block",
                     "panelTitle", "panelEmpty", "controls", "blockView", "designView",
-                    "audienceView", "addMenu", "previewOverlay", "previewFrame"]
+                    "audienceView", "sendView", "addMenu", "previewOverlay", "previewFrame"]
   static values = { url: String, previewUrl: String, locked: Boolean }
 
   static MAX_UNDO = 25
@@ -334,10 +334,7 @@ export default class extends Controller {
   // ── Design takeover ───────────────────────────────────────────────────────
 
   openDesign() {
-    this.element.classList.add("is-panel-open")
-    this.blockViewTarget.hidden = true
-    if (this.hasAudienceViewTarget) this.audienceViewTarget.hidden = true
-    this.designViewTarget.hidden = false
+    this._openTakeover("designView")
     this.designViewTarget.querySelectorAll("[data-setting]").forEach((input) => {
       const key = input.dataset.setting
       const value = this.paperTarget.dataset["setting" + key.charAt(0).toUpperCase() + key.slice(1)]
@@ -345,26 +342,29 @@ export default class extends Controller {
     })
   }
 
-  openAudience() {
-    if (!this.hasAudienceViewTarget) return
+  openAudience() { this._openTakeover("audienceView") }
+  closeAudience() { this._closeTakeovers() }
+  openSend() { this._openTakeover("sendView") }
+  closeSend() { this._closeTakeovers() }
+
+  _openTakeover(name) {
+    if (!this[`has${name.charAt(0).toUpperCase() + name.slice(1)}Target`]) return
     this.element.classList.add("is-panel-open")
     this.blockViewTarget.hidden = true
-    this.designViewTarget.hidden = true
-    this.audienceViewTarget.hidden = false
-  }
-
-  closeAudience() {
-    if (!this.hasAudienceViewTarget) return
-    this.audienceViewTarget.hidden = true
-    this.blockViewTarget.hidden = false
-  }
-
-  closeDesign() {
-    if (!this.hasDesignViewTarget) return
-    this.designViewTarget.hidden = true
+    if (this.hasDesignViewTarget) this.designViewTarget.hidden = true
     if (this.hasAudienceViewTarget) this.audienceViewTarget.hidden = true
+    if (this.hasSendViewTarget) this.sendViewTarget.hidden = true
+    this[`${name}Target`].hidden = false
+  }
+
+  _closeTakeovers() {
+    if (this.hasDesignViewTarget) this.designViewTarget.hidden = true
+    if (this.hasAudienceViewTarget) this.audienceViewTarget.hidden = true
+    if (this.hasSendViewTarget) this.sendViewTarget.hidden = true
     this.blockViewTarget.hidden = false
   }
+
+  closeDesign() { this._closeTakeovers() }
 
   // ── Structure: add / duplicate / move / delete + undo ─────────────────────
 

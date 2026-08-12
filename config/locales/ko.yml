@@ -1368,6 +1368,9 @@ ko:
     welcome_confirm: "Playverto에 오신 것을 환영합니다! %{email}에서 주소를 확인하세요."
   flash:
     comms:
+      send_cancelled: "발송이 취소되었습니다."
+      send_started: "발송이 시작되었습니다."
+      test_sent: "%{email} 주소로 테스트 이메일을 보냈습니다."
       list_deleted: "목록이 삭제되었습니다."
       list_imported: '목록 "%{name}"을(를) 가져왔습니다 — 연락처: %{count}, 건너뜀: %{skipped}.'
       campaign_deleted: "캠페인이 삭제되었습니다."

@@ -9,8 +9,8 @@
   settings = doc["settings"]
   editable = @campaign.editable?
 %>
-<div class="editor-grid" data-editor-panel-target="grid"
-     data-controller="comms-editor editor-panel device-frame media-picker rich-text"
+<div class="editor-grid <%= "is-panel-open" unless editable %>" data-editor-panel-target="grid"
+     data-controller="comms-editor editor-panel device-frame media-picker rich-text emoji-picker"
      data-comms-editor-url-value="<%= comms_campaign_path(@campaign) %>"
      data-comms-editor-preview-url-value="<%= preview_comms_campaign_path(@campaign) %>"
      data-comms-editor-locked-value="<%= @campaign.editing_locked? %>"
@@ -23,6 +23,12 @@
                   input->comms-editor#markDirty">
 
   <div class="editor-backdrop"></div>
+
+  <% if flash[:notice] || flash[:alert] %>
+    <div class="comms-flash <%= "comms-flash--alert" if flash[:alert] %>">
+      <%= flash[:notice] || flash[:alert] %>
+    </div>
+  <% end %>
 
   <%# ── LEFT: the canvas column ─────────────────────────────────────────── %>
   <div class="flex-1 min-h-0 relative flex flex-col">
@@ -111,14 +117,50 @@
           <button type="button" class="editor-leave-btn" data-action="click->comms-editor#openAudience">
             <span class="editor-leave-label">👥 <%= t("comms.editor.audience", default: "Audience") %></span>
           </button>
+          <button type="button" class="editor-leave-btn" data-action="click->comms-editor#openSend">
+            <span class="editor-leave-label">🚀 <%= t("comms.editor.send", default: "Send") %></span>
+          </button>
         </div>
       </div>
     <% end %>
   </div>
 
-  <%# ── RIGHT: block inspector + design takeover ────────────────────────── %>
+  <%# ── RIGHT: block inspector + design/audience/send takeovers, or the
+      send-status panel once the campaign is past editing ─────────────── %>
   <div class="right-column">
-    <div class="type-panel panel-paper panel--types" data-comms-editor-target="blockView">
+    <% unless editable %>
+      <div class="type-panel panel-paper panel--types"
+           data-controller="comms-campaign-status"
+           data-comms-campaign-status-url-value="<%= status_comms_campaign_path(@campaign) %>"
+           data-comms-campaign-status-status-value="<%= @campaign.status %>">
+        <div class="type-panel-top">
+          <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.75);">
+            <%= t("comms.editor.status_eyebrow", default: "Campaign status") %>
+          </div>
+          <div data-comms-campaign-status-target="state"
+               style="font-family:'Alata',sans-serif;font-size:20px;color:#fff;text-transform:capitalize;"><%= @campaign.status %></div>
+        </div>
+        <div class="panel-island comms-controls">
+          <% counts = @campaign.email_campaign_recipients.group(:status).count %>
+          <div class="comms-count-card">
+            <span class="comms-count-num"><%= @campaign.recipient_count %></span>
+            <span class="comms-count-label"><%= t("comms.editor.recipients_label", default: "recipients") %></span>
+          </div>
+          <div data-comms-campaign-status-target="counts"
+               style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.8);">
+            <% if counts.any? %>
+              <%= counts.map { |status, n| "#{status}: #{n}" }.join(" · ") %>
+            <% end %>
+          </div>
+          <% if @campaign.sending? %>
+            <%= button_to t("comms.editor.cancel_send", default: "Stop sending"), cancel_send_comms_campaign_path(@campaign),
+                  method: :post, form: { data: { turbo: false } },
+                  style: "background:#FF1E6F;color:#fff;font-family:'Alata',sans-serif;font-size:13px;border:none;border-radius:100px;padding:9px 18px;cursor:pointer;width:100%;" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <div class="type-panel panel-paper panel--types" data-comms-editor-target="blockView" <%= "hidden" unless editable %>>
       <div class="type-panel-top">
         <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.75);">
           <%= t("comms.editor.block_eyebrow", default: "Selected block") %>
@@ -298,6 +340,84 @@
           </div>
         </div>
       </div>
+
+      <%# Send takeover: the publish panel's grammar — message fields, a
+          test send, and the one-way door. %>
+      <div class="type-panel panel-paper panel--logic" data-comms-editor-target="sendView" hidden
+           data-controller="comms-send"
+           data-comms-send-url-value="<%= comms_campaign_path(@campaign) %>">
+        <div class="type-panel-top">
+          <button type="button" class="publish-panel-back" data-action="click->comms-editor#closeSend">←
+            <%= t("comms.editor.back_to_block", default: "Block") %></button>
+          <div style="font-family:'Alata',sans-serif;font-size:18px;color:#fff;"><%= t("comms.editor.send", default: "Send") %></div>
+        </div>
+        <div class="publish-panel-body" style="overflow-y:auto;">
+          <details class="publish-block" open>
+            <summary class="publish-block-title"><%= t("comms.editor.message", default: "Message") %> <span class="pub-chev">▾</span></summary>
+            <div class="comms-controls">
+              <label style="flex-direction:column;align-items:stretch;gap:4px;">
+                <span><%= t("comms.editor.subject", default: "Subject") %>
+                  <button type="button" data-emoji-picker-trigger
+                          data-action="click->emoji-picker#open"
+                          style="background:none;border:none;cursor:pointer;font-size:14px;">😊</button>
+                </span>
+                <input type="text" data-comms-send-target="subject"
+                       data-action="input->comms-send#changed"
+                       value="<%= @campaign.subject %>" style="max-width:none;">
+              </label>
+              <label style="flex-direction:column;align-items:stretch;gap:4px;">
+                <span><%= t("comms.editor.preheader", default: "Preheader (inbox snippet)") %></span>
+                <input type="text" data-comms-send-target="preheader"
+                       data-action="input->comms-send#changed"
+                       value="<%= @campaign.preheader %>" style="max-width:none;">
+              </label>
+            </div>
+          </details>
+
+          <details class="publish-block">
+            <summary class="publish-block-title"><%= t("comms.editor.sender", default: "Sender") %> <span class="pub-chev">▾</span></summary>
+            <div class="comms-controls">
+              <label style="flex-direction:column;align-items:stretch;gap:4px;">
+                <span><%= t("comms.editor.from_name", default: "From name") %></span>
+                <input type="text" data-comms-send-target="fromName"
+                       data-action="input->comms-send#changed"
+                       value="<%= @campaign.from_name %>" placeholder="Playverto" style="max-width:none;">
+              </label>
+              <label style="flex-direction:column;align-items:stretch;gap:4px;">
+                <span><%= t("comms.editor.reply_to", default: "Reply-to") %></span>
+                <input type="email" data-comms-send-target="replyTo"
+                       data-action="input->comms-send#changed"
+                       value="<%= @campaign.reply_to %>" placeholder="nick@playverto.com" style="max-width:none;">
+              </label>
+            </div>
+          </details>
+
+          <details class="publish-block">
+            <summary class="publish-block-title"><%= t("comms.editor.test_send", default: "Send a test to me") %> <span class="pub-chev">▾</span></summary>
+            <div class="comms-controls">
+              <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.75);margin:0;">
+                <%= t("comms.editor.test_send_hint", default: "Mails the current draft to %{email} with tracking stubbed.", email: Current.user.email_address) %>
+              </p>
+              <%= button_to t("comms.editor.test_send_cta", default: "Send test email"), test_send_comms_campaign_path(@campaign),
+                    method: :post, form: { data: { turbo: false } },
+                    style: "background:rgba(255,255,255,0.12);color:#fff;font-family:'Alata',sans-serif;font-size:13px;border:1px solid rgba(255,255,255,0.25);border-radius:100px;padding:9px 18px;cursor:pointer;width:100%;" %>
+            </div>
+          </details>
+
+          <details class="publish-block" open>
+            <summary class="publish-block-title"><%= t("comms.editor.send_now", default: "Send now") %> <span class="pub-chev">▾</span></summary>
+            <div class="comms-controls">
+              <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.75);margin:0;">
+                <%= t("comms.editor.send_now_hint", default: "Freezes the email exactly as approved and starts delivery. Edits after this land on the next campaign, not this one.") %>
+              </p>
+              <%= button_to t("comms.editor.send_now_cta", default: "Send to the audience now"), send_now_comms_campaign_path(@campaign),
+                    method: :post,
+                    form: { data: { turbo_confirm: t("comms.editor.send_confirm", default: "Send this campaign now?") } },
+                    style: "background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:14px;border:none;border-radius:100px;padding:11px 18px;cursor:pointer;width:100%;" %>
+            </div>
+          </details>
+        </div>
+      </div>
     <% end %>
   </div>
 
@@ -326,6 +446,22 @@
           aria-label="<%= t("js.editor.rich_font") %>"></select>
   <select data-rich-text-target="sizeSelect" data-action="change->rich-text#sizeChanged"
           aria-label="<%= t("js.editor.rich_size") %>"></select>
+</div>
+
+<%# Emoji popover (subject field) — the survey editor's markup verbatim. %>
+<div class="emoji-picker-popover" data-emoji-picker-target="popover" hidden
+     role="dialog" aria-label="<%= t("editor.emoji_pick", default: "Choose an emoji") %>">
+  <div class="emoji-picker-head">
+    <input type="search" class="emoji-picker-search"
+           data-emoji-picker-target="search"
+           data-action="input->emoji-picker#onSearch"
+           placeholder="<%= t("editor.emoji_search", default: "Search emoji…") %>"
+           aria-label="<%= t("editor.emoji_search", default: "Search emoji…") %>" />
+    <button type="button" class="emoji-picker-clear"
+            data-action="click->emoji-picker#clear"><%= t("editor.emoji_clear", default: "Clear") %></button>
+  </div>
+  <div class="emoji-picker-tabs" data-emoji-picker-target="tabs"></div>
+  <div class="emoji-picker-grid" data-emoji-picker-target="grid"></div>
 </div>
 <% end %>
 

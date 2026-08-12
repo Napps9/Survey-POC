@@ -1370,6 +1370,9 @@ nl:
     welcome_confirm: "Welkom bij Playverto! Check %{email} om je adres te bevestigen."
   flash:
     comms:
+      send_cancelled: "Verzenden geannuleerd."
+      send_started: "Verzenden gestart."
+      test_sent: "Test-e-mail verzonden naar %{email}."
       list_deleted: "Lijst verwijderd."
       list_imported: 'Lijst "%{name}" geïmporteerd — contacten: %{count}, overgeslagen: %{skipped}.'
       campaign_deleted: "Campagne verwijderd."

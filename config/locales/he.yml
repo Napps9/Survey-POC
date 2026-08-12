@@ -1369,6 +1369,9 @@ he:
     welcome_confirm: "ברוך הבא ל-Playverto! בדוק את %{email} כדי לאשר את הכתובת."
   flash:
     comms:
+      send_cancelled: "השליחה בוטלה."
+      send_started: "השליחה החלה."
+      test_sent: "אימייל ניסיון נשלח אל %{email}."
       list_deleted: "הרשימה נמחקה."
       list_imported: 'הרשימה "%{name}" יובאה — אנשי קשר: %{count}, דולגו: %{skipped}.'
       campaign_deleted: "הקמפיין נמחק."

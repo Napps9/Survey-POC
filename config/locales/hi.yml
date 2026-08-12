@@ -1370,6 +1370,9 @@ hi:
     welcome_confirm: "Playverto में आपका स्वागत है! अपना पता पुष्ट करने के लिए %{email} देखें।"
   flash:
     comms:
+      send_cancelled: "भेजना रद्द कर दिया गया।"
+      send_started: "भेजना शुरू हो गया।"
+      test_sent: "%{email} पर परीक्षण ईमेल भेजा गया।"
       list_deleted: "सूची हटाई गई।"
       list_imported: 'सूची "%{name}" आयात की गई — संपर्क: %{count}, छोड़े गए: %{skipped}।'
       campaign_deleted: "अभियान हटाया गया।"

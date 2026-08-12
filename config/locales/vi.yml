@@ -1369,6 +1369,9 @@ vi:
     welcome_confirm: "Chào mừng đến Playverto! Kiểm tra %{email} để xác nhận địa chỉ của bạn."
   flash:
     comms:
+      send_cancelled: "Đã hủy gửi."
+      send_started: "Đã bắt đầu gửi."
+      test_sent: "Đã gửi email thử nghiệm đến %{email}."
       list_deleted: "Đã xóa danh sách."
       list_imported: 'Đã nhập danh sách "%{name}" — liên hệ: %{count}, bỏ qua: %{skipped}.'
       campaign_deleted: "Đã xóa chiến dịch."

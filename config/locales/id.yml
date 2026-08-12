@@ -1369,6 +1369,9 @@ id:
     welcome_confirm: "Selamat datang di Playverto! Periksa %{email} untuk mengonfirmasi alamat Anda."
   flash:
     comms:
+      send_cancelled: "Pengiriman dibatalkan."
+      send_started: "Pengiriman dimulai."
+      test_sent: "Email uji dikirim ke %{email}."
       list_deleted: "Daftar dihapus."
       list_imported: 'Daftar "%{name}" diimpor — kontak: %{count}, dilewati: %{skipped}.'
       campaign_deleted: "Kampanye dihapus."

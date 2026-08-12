@@ -1372,6 +1372,9 @@ uk:
     welcome_confirm: "Вітаємо у Playverto! Перевірте %{email}, щоб підтвердити адресу."
   flash:
     comms:
+      send_cancelled: "Надсилання скасовано."
+      send_started: "Надсилання розпочато."
+      test_sent: "Тестовий лист надіслано на %{email}."
       list_deleted: "Список видалено."
       list_imported: 'Список "%{name}" імпортовано — контакти: %{count}, пропущено: %{skipped}.'
       campaign_deleted: "Кампанію видалено."

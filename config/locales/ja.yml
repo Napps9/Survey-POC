@@ -1368,6 +1368,9 @@ ja:
     welcome_confirm: "Playverto へようこそ！%{email} を確認してアドレスを認証してください。"
   flash:
     comms:
+      send_cancelled: "送信をキャンセルしました。"
+      send_started: "送信を開始しました。"
+      test_sent: "%{email} にテストメールを送信しました。"
       list_deleted: "リストを削除しました。"
       list_imported: 'リスト「%{name}」をインポートしました — 連絡先: %{count}、スキップ: %{skipped}。'
       campaign_deleted: "キャンペーンを削除しました。"

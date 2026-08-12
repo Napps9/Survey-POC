@@ -1370,6 +1370,9 @@ tr:
     welcome_confirm: "Playverto'ya hoş geldiniz! Adresinizi onaylamak için %{email} adresini kontrol edin."
   flash:
     comms:
+      send_cancelled: "Gönderim iptal edildi."
+      send_started: "Gönderim başladı."
+      test_sent: "%{email} adresine test e-postası gönderildi."
       list_deleted: "Liste silindi."
       list_imported: '"%{name}" listesi içe aktarıldı — kişiler: %{count}, atlanan: %{skipped}.'
       campaign_deleted: "Kampanya silindi."

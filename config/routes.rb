@@ -180,6 +180,10 @@ Rails.application.routes.draw do
     post   "comms/campaigns/:id/moderate_image", to: "comms/campaigns#moderate_image", as: :moderate_image_comms_campaign
     get    "comms/campaigns/:id/pexels",         to: "comms/campaigns#pexels_search",  as: :pexels_comms_campaign
     post   "comms/campaigns/:id/audience_count", to: "comms/campaigns#audience_count", as: :audience_count_comms_campaign
+    post   "comms/campaigns/:id/send_now",       to: "comms/campaigns#send_now",       as: :send_now_comms_campaign
+    post   "comms/campaigns/:id/test_send",      to: "comms/campaigns#test_send",      as: :test_send_comms_campaign
+    post   "comms/campaigns/:id/cancel_send",    to: "comms/campaigns#cancel_send",    as: :cancel_send_comms_campaign
+    get    "comms/campaigns/:id/status",         to: "comms/campaigns#status",         as: :status_comms_campaign
     get    "comms/lists",                        to: "comms/lists#index",              as: :comms_lists
     post   "comms/lists",                        to: "comms/lists#create"
     get    "comms/lists/:id",                    to: "comms/lists#show",               as: :comms_list

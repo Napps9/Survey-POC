@@ -4,7 +4,9 @@ class Comms::CampaignsController < Comms::BaseController
   # model's transition methods only (the freeze-at-approval rule).
   UPDATABLE_KEYS = %w[title subject preheader from_name reply_to design audience subject_variants].freeze
 
-  before_action :set_campaign, only: %i[edit update destroy preview image moderate_image pexels_search]
+  before_action :set_campaign,
+                only: %i[edit update destroy preview image moderate_image pexels_search
+                         audience_count send_now test_send cancel_send status]
   before_action :require_editable!, only: %i[update image]
 
   # The compiled email is wall-to-wall inline styles; the app CSP would
@@ -143,6 +145,49 @@ class Comms::CampaignsController < Comms::BaseController
   # number shown is the number mailed.
   def audience_count
     render json: { ok: true, count: Comms::AudienceResolver.count(audience_definition_param) }
+  end
+
+  # Approve and go: freeze (compile + snapshot) and enqueue the dispatcher
+  # immediately. The freezer's refusals (no subject, warnings, empty
+  # audience) come back as the flash alert.
+  def send_now
+    result = Comms::CampaignFreezer.call(@campaign)
+    if result.ok?
+      Comms::StartCampaignSendJob.perform_later(@campaign.id)
+      redirect_to edit_comms_campaign_path(@campaign), notice: t("flash.comms.send_started")
+    else
+      redirect_to edit_comms_campaign_path(@campaign), alert: result.error
+    end
+  end
+
+  # Proof to the author's own inbox — current document, nothing frozen,
+  # nothing tracked.
+  def test_send
+    Comms::CampaignMailer.test_email(@campaign.id, Current.user.email_address).deliver_now
+    redirect_to edit_comms_campaign_path(@campaign),
+                notice: t("flash.comms.test_sent", email: Current.user.email_address)
+  end
+
+  # Mid-flight stop: queued recipients are skipped, already-sent mail is
+  # already sent — the campaign closes as cancelled. The batch job also
+  # notices between batches.
+  def cancel_send
+    if @campaign.sending?
+      @campaign.update_columns(status: "cancelled", updated_at: Time.current)
+      @campaign.email_campaign_recipients.where(status: "queued")
+               .update_all(status: "skipped", updated_at: Time.current)
+      redirect_to edit_comms_campaign_path(@campaign), notice: t("flash.comms.send_cancelled")
+    else
+      redirect_to edit_comms_campaign_path(@campaign)
+    end
+  end
+
+  # Status JSON for the polling panel (the verto_build shape).
+  def status
+    counts = @campaign.email_campaign_recipients.group(:status).count
+    render json: { ok: true, status: @campaign.status,
+                   recipient_count: @campaign.recipient_count,
+                   sent_at: @campaign.sent_at, counts: counts }
   end
 
   private

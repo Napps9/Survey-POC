@@ -9208,6 +9208,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .comms-controls input[type="color"] { width: 34px; height: 26px; border: none; background: none; padding: 0; cursor: pointer; }
 .comms-controls input[type="range"] { flex: 1; max-width: 200px; accent-color: #01EACB; }
 
+/* Flash banner over the editor chrome. */
+.comms-flash {
+  position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+  z-index: 60; max-width: min(560px, 90vw);
+  background: rgba(1, 234, 203, 0.14); border: 1px solid rgba(1, 234, 203, 0.5);
+  color: #F7F7F7; font-family: "ABeeZee", sans-serif; font-size: 13px;
+  border-radius: 12px; padding: 10px 18px;
+}
+.comms-flash--alert { background: rgba(255, 30, 111, 0.14); border-color: rgba(255, 30, 111, 0.5); }
+
 /* Audience panel. */
 .comms-count-card {
   display: flex; flex-direction: column; gap: 2px;

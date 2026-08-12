@@ -1370,6 +1370,9 @@ fr:
     welcome_confirm: "Bienvenue sur Playverto ! Consultez %{email} pour confirmer votre adresse."
   flash:
     comms:
+      send_cancelled: "Envoi annulé."
+      send_started: "Envoi démarré."
+      test_sent: "E-mail de test envoyé à %{email}."
       list_deleted: "Liste supprimée."
       list_imported: 'Liste "%{name}" importée — contacts : %{count}, ignorés : %{skipped}.'
       campaign_deleted: "Campagne supprimée."

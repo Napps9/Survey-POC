@@ -29,3 +29,13 @@ production:
   refresh_ask_verto_corpus:
     command: "IndexCorpusEntryJob.refresh_all!"
     schedule: every day at 3am
+
+  # The safety net under Comms' set(wait_until:) scheduling: Solid Queue
+  # rides inside Puma and the memory watchdog restarts Puma, so a scheduled
+  # send's job can vanish and an in-flight batch can die mid-claim. The sweep
+  # re-enqueues due campaigns, reaps stuck recipients, re-pokes stalled sends
+  # and finalizes finished ones (all idempotent — claims make double-enqueues
+  # harmless).
+  comms_sweep:
+    class: Comms::SweepJob
+    schedule: every 5 minutes
