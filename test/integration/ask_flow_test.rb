@@ -296,6 +296,11 @@ class AskFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "form.ask-newchat-form[action=?]:not([hidden])", ask_threads_path,
       { count: 1 }, "mid-conversation, starting over shouldn't require opening the folder"
+    # The corner pills carry Verto's colours: the name pill its thread's own
+    # flow colour, the action pills their fixed accents.
+    assert_select ".ask-title-pill[style*=?]", "--pill-accent:#{Survey::FLOW_COLORS.first}",
+      { count: 1 }, "the conversation's name should wear the same colour as its dot in the Threads list"
+    assert_select ".ask-newchat-btn[style*=?]", "--pill-accent:#01EACB", count: 1
 
     # The cold start IS a fresh chat — the pill would be a door to where you
     # already are, so it ships hidden and the controller reveals it live.

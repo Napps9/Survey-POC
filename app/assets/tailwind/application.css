@@ -8348,6 +8348,29 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.06em;
 }
 .ask-float-pinned .lang-switcher-btn:hover { background: rgba(20,23,38,0.85); border-color: rgba(255,255,255,0.3); }
+/* Verto colour on the floating chrome. Each pill takes an accent the screen
+   already speaks — the folder handle the Threads tab's purple, New chat the
+   send arrow's teal, the conversation's name its own thread's flow colour
+   (the same dot the Threads list gives it). The accent tints the glass and
+   colours the icon; the text stays white, so contrast is untouched. The
+   back pill stays neutral — it leaves this surface rather than driving it.
+   Declared after the pills' base rules so the tint wins the cascade. */
+.ask-pill-tinted {
+  --pill-accent: #8B85FF;
+  background: color-mix(in srgb, var(--pill-accent) 13%, rgba(20,23,38,0.6));
+  border-color: color-mix(in srgb, var(--pill-accent) 42%, rgba(255,255,255,0.14));
+}
+.ask-pill-tinted:hover {
+  background: color-mix(in srgb, var(--pill-accent) 24%, rgba(20,23,38,0.85));
+  border-color: color-mix(in srgb, var(--pill-accent) 65%, rgba(255,255,255,0.3));
+}
+.ask-pill-tinted svg { color: var(--pill-accent); }
+/* The name pill leads with its thread's dot, exactly as the rail row does. */
+.ask-title-pill.ask-pill-tinted::before {
+  content: ""; display: inline-block; width: 7px; height: 7px;
+  border-radius: 50%; background: var(--pill-accent);
+  margin-inline-end: 7px; vertical-align: 1px;
+}
 
 /* Floating scope pills — the .add-media-fab recipe, cleared below the
    floating chrome, one dot each. */

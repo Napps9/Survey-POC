@@ -26,6 +26,10 @@
   # Threads cycle the categorical set the flows editor already uses, so two
   # conversations are never the same colour side by side.
   thread_colours = Survey::FLOW_COLORS
+  # The conversation's name pill wears its thread's own flow colour — the same
+  # dot the Threads list gives it, so the pill and the list agree. A thread
+  # past the rail's 20 (deep-linked) falls back to the first colour.
+  title_accent = @thread ? thread_colours[(@threads.to_a.index { |th| th.id == @thread.id } || 0) % thread_colours.size] : thread_colours.first
 
   # The rotating eyebrow's material. The greeting is picked by the CLIENT's
   # clock (the controller re-picks on connect); the server's choice is only the
@@ -89,11 +93,12 @@
         </svg>
         <span><%= t("ask.page.back") %></span>
       <% end %>
-      <span class="ask-title-pill" data-ask-verto-target="titlePill"
+      <span class="ask-title-pill ask-pill-tinted" style="--pill-accent:<%= title_accent %>;"
+            data-ask-verto-target="titlePill"
             <%= "hidden" if @messages.empty? %>><%= @thread&.display_title if @messages.any? %></span>
     </div>
     <div class="ask-float-row">
-      <button type="button" class="editor-leave-btn ask-rail-handle"
+      <button type="button" class="editor-leave-btn ask-rail-handle ask-pill-tinted" style="--pill-accent:#8B85FF;"
               data-action="click->ask-verto#openRail"
               title="<%= t("ask.page.scope") %> · <%= t("ask.page.threads") %>">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -109,7 +114,7 @@
           it reveals the title pill. %>
       <%= form_with url: ask_threads_path, method: :post, class: "ask-newchat-form",
             data: { ask_verto_target: "newChat" }, html: { hidden: @messages.empty? } do %>
-        <button type="submit" class="editor-leave-btn ask-newchat-btn">
+        <button type="submit" class="editor-leave-btn ask-newchat-btn ask-pill-tinted" style="--pill-accent:#01EACB;">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M8 3.2v9.6M3.2 8h9.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
