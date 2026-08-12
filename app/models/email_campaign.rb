@@ -15,6 +15,10 @@ class EmailCampaign < ApplicationRecord
 
   belongs_to :created_by, class_name: "User", optional: true
 
+  has_many :email_campaign_recipients, dependent: :delete_all
+  has_many :email_campaign_links, dependent: :delete_all
+  has_many :email_events, dependent: :delete_all
+
   # Image-block uploads (media picker) — bytes live here, short blob paths
   # live in the design json, same shape as Survey#card_images.
   has_many_attached :images

@@ -508,6 +508,12 @@ pl:
       compare_summarizing: 'Podsumowywanie…'
       compare_summarize_error: 'Nie udało się teraz podsumować.'
       chat_error: "Przepraszamy, coś poszło nie tak. Spróbuj ponownie."
+  unsubscribe:
+    title: "Wypisz się z e-maili Playverto"
+    body: "Przestać wysyłać e-maile kampanii na adres %{email}?"
+    confirm: "Wypisz się"
+    done_title: "Wypisano Cię"
+    done_body: "Nie będziemy już wysyłać e-maili kampanii na ten adres."
   nav:
     comms: "Comms"
     partnerships: "Partnerzy"

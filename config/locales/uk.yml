@@ -508,6 +508,12 @@ uk:
       compare_summarizing: 'Узагальнюємо…'
       compare_summarize_error: 'Зараз не вдалося узагальнити.'
       chat_error: "Вибачте, щось пішло не так. Спробуйте ще раз."
+  unsubscribe:
+    title: "Відписатися від листів Playverto"
+    body: "Більше не надсилати листи кампаній на %{email}?"
+    confirm: "Відписатися"
+    done_title: "Вас відписано"
+    done_body: "Ми більше не надсилатимемо листи кампаній на цю адресу."
   nav:
     comms: "Comms"
     partnerships: "Партнери"

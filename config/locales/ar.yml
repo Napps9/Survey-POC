@@ -508,6 +508,12 @@ ar:
       compare_summarizing: 'جارٍ التلخيص…'
       compare_summarize_error: 'تعذّر التلخيص الآن.'
       chat_error: "عذرًا، حدث خطأ ما. حاول مرة أخرى."
+  unsubscribe:
+    title: "إلغاء الاشتراك في رسائل Playverto"
+    body: "هل تريد إيقاف إرسال رسائل الحملات إلى %{email}؟"
+    confirm: "إلغاء الاشتراك"
+    done_title: "تم إلغاء اشتراكك"
+    done_body: "لن نرسل رسائل حملات إلى هذا العنوان مرة أخرى."
   nav:
     comms: "Comms"
     partnerships: "الشركاء"

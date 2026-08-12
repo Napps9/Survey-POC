@@ -1,0 +1,18 @@
+<%# Recipient-facing confirm page — fully localized (all 19 files carry the
+    unsubscribe: namespace; the structure parity test enforces it). The POST
+    is the act; this page exists so a prefetching scanner can't opt someone
+    out by following the GET. %>
+<div style="max-width:480px;margin:0 auto;padding:72px 24px;text-align:center;">
+  <h1 style="font-family:'Alata',sans-serif;font-size:24px;color:#F7F7F7;margin:0 0 12px;">
+    <%= t("unsubscribe.title") %>
+  </h1>
+  <p style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(247,247,247,0.75);margin:0 0 28px;line-height:1.6;">
+    <%= t("unsubscribe.body", email: @recipient.email) %>
+  </p>
+  <%= form_with url: comms_unsubscribe_path(token: @recipient.token), method: :post, data: { turbo: false } do %>
+    <button type="submit"
+            style="background:#FF1E6F;color:#fff;font-family:'Alata',sans-serif;font-size:15px;border:none;border-radius:100px;padding:12px 28px;cursor:pointer;">
+      <%= t("unsubscribe.confirm") %>
+    </button>
+  <% end %>
+</div>

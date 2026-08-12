@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
   # Matched on path rather than controller so the mounted Blazer engine — whose
   # controllers inherit from this class but are not ours to annotate — is
   # covered by the same rule.
-  NOINDEX_PATHS = %r{\A/(play|test|invites|funder_invites|blazer)(/|\z)}
+  NOINDEX_PATHS = %r{\A/(play|test|invites|funder_invites|blazer|e)(/|\z)}
 
   private
 

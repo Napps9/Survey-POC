@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_100100) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_12_110000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -199,6 +199,41 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_100100) do
     t.index ["corpus_question_id"], name: "index_corpus_quotes_on_corpus_question_id"
   end
 
+  create_table "email_campaign_links", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "email_campaign_id", null: false
+    t.text "url", null: false
+    t.index ["email_campaign_id"], name: "index_email_campaign_links_on_email_campaign_id"
+  end
+
+  create_table "email_campaign_recipients", force: :cascade do |t|
+    t.integer "click_count", default: 0, null: false
+    t.datetime "complained_at"
+    t.datetime "created_at", null: false
+    t.datetime "delivered_at"
+    t.string "email", null: false
+    t.integer "email_campaign_id", null: false
+    t.integer "email_list_contact_id"
+    t.string "error"
+    t.datetime "first_clicked_at"
+    t.datetime "first_opened_at"
+    t.datetime "last_clicked_at"
+    t.datetime "last_opened_at"
+    t.string "name"
+    t.integer "open_count", default: 0, null: false
+    t.datetime "sent_at"
+    t.string "status", default: "queued", null: false
+    t.integer "subject_variant", default: 0, null: false
+    t.string "token", null: false
+    t.datetime "unsubscribed_at"
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["email_campaign_id", "email"], name: "index_email_campaign_recipients_on_email_campaign_id_and_email", unique: true
+    t.index ["email_campaign_id", "status"], name: "idx_on_email_campaign_id_status_90909c2255"
+    t.index ["token"], name: "index_email_campaign_recipients_on_token", unique: true
+    t.check_constraint "status IN ('queued','sending','sent','delivered','simulated','bounced','failed','skipped')", name: "chk_email_campaign_recipients_status"
+  end
+
   create_table "email_campaigns", force: :cascade do |t|
     t.json "audience"
     t.text "compiled_html"
@@ -223,6 +258,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_100100) do
     t.index ["scheduled_for"], name: "index_email_campaigns_on_scheduled_for"
     t.index ["status"], name: "index_email_campaigns_on_status"
     t.check_constraint "status IN ('draft','scheduled','sending','sent','failed','cancelled')", name: "chk_email_campaigns_status"
+  end
+
+  create_table "email_events", force: :cascade do |t|
+    t.integer "email_campaign_id"
+    t.integer "email_campaign_recipient_id"
+    t.string "kind", null: false
+    t.json "meta"
+    t.datetime "occurred_at", null: false
+    t.text "url"
+    t.index ["email_campaign_id", "kind"], name: "index_email_events_on_email_campaign_id_and_kind"
+    t.index ["occurred_at"], name: "index_email_events_on_occurred_at"
+    t.check_constraint "kind IN ('queued','sent','delivered','open','click','bounce','complaint','unsubscribe','failed','simulated','skipped')", name: "chk_email_events_kind"
   end
 
   create_table "email_list_contacts", force: :cascade do |t|

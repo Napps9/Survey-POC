@@ -508,6 +508,12 @@ de:
       compare_summarizing: 'Wird zusammengefasst…'
       compare_summarize_error: 'Konnte gerade nicht zusammengefasst werden.'
       chat_error: "Entschuldigung, etwas ist schiefgelaufen. Bitte versuchen Sie es noch einmal."
+  unsubscribe:
+    title: "Playverto-E-Mails abbestellen"
+    body: "Keine Kampagnen-E-Mails mehr an %{email} senden?"
+    confirm: "Abbestellen"
+    done_title: "Du bist abgemeldet"
+    done_body: "Wir senden keine Kampagnen-E-Mails mehr an diese Adresse."
   nav:
     comms: "Comms"
     partnerships: "Partner"

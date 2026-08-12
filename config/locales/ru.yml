@@ -508,6 +508,12 @@ ru:
       compare_summarizing: 'Обобщаем…'
       compare_summarize_error: 'Сейчас не удалось обобщить.'
       chat_error: "К сожалению, что-то пошло не так. Попробуйте ещё раз."
+  unsubscribe:
+    title: "Отписаться от писем Playverto"
+    body: "Больше не отправлять письма кампаний на %{email}?"
+    confirm: "Отписаться"
+    done_title: "Вы отписаны"
+    done_body: "Мы больше не будем отправлять письма кампаний на этот адрес."
   nav:
     comms: "Comms"
     partnerships: "Партнёры"

@@ -508,6 +508,12 @@ it:
       compare_summarizing: 'Riassumendo…'
       compare_summarize_error: 'Impossibile riassumere in questo momento.'
       chat_error: "Spiacenti, qualcosa è andato storto. Riprova."
+  unsubscribe:
+    title: "Annulla l'iscrizione alle email di Playverto"
+    body: "Smettere di inviare email di campagne a %{email}?"
+    confirm: "Annulla iscrizione"
+    done_title: "Iscrizione annullata"
+    done_body: "Non invieremo più email di campagne a questo indirizzo."
   nav:
     comms: "Comms"
     partnerships: "Partner"

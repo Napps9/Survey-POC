@@ -516,6 +516,12 @@ en:
       compare_summarizing: "Summarising…"
       compare_summarize_error: "Couldn't summarise right now."
       chat_error: "Sorry, something went wrong. Please try again."
+  unsubscribe:
+    title: "Unsubscribe from Playverto emails"
+    body: "Stop sending campaign emails to %{email}?"
+    confirm: "Unsubscribe"
+    done_title: "You're unsubscribed"
+    done_body: "We won't send campaign emails to this address again."
   nav:
     comms: "Comms"
     partnerships: "Partners"

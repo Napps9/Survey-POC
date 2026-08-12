@@ -1,0 +1,16 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "d04406a25700e153fdc9116ca82151ea359e3fd997e029f135848dd8c87c5b6e",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/comms/tracking_controller.rb",
+      "line": 38,
+      "note": "Closed redirect, not an open one: the destination is EmailCampaignLink#url, written server-side at campaign freeze time from the author's compiled document (Comms::LinkExtractor), validated against \\Ahttps?://\\S+\\z, and looked up by id SCOPED to the recipient's own campaign. No URL from the request is ever redirected to — the request only carries the recipient token and a link id, and a link id from another campaign 404s. This is the click-tracking design (short URLs, author-stored destinations) chosen precisely to avoid an open ?u= redirect."
+    }
+  ],
+  "updated": "2026-08-12",
+  "brakeman_version": "8.0.5"
+}

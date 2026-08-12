@@ -186,6 +186,16 @@ Rails.application.routes.draw do
     delete "comms/lists/:id",                    to: "comms/lists#destroy"
   end
 
+  # Public Comms endpoints — recipients are not platform users, so these sit
+  # OUTSIDE the CommsAccess constraint. Identity is the recipient's random
+  # token, never an id; unknown tokens 404. GET on the unsubscribe path only
+  # confirms (scanner protection); the POST is the act, and RFC 8058
+  # one-click unsubscribes land on it too.
+  get  "e/o/:token",          to: "comms/tracking#open",     as: :comms_open
+  get  "e/c/:token/:link_id", to: "comms/tracking#click",    as: :comms_click
+  get  "e/u/:token",          to: "comms/unsubscribes#show", as: :comms_unsubscribe
+  post "e/u/:token",          to: "comms/unsubscribes#create"
+
   # Common Questions — reusable sets attached to many Vertos
   resources :common_question_sets, path: "common-question-sets" do
     collection do

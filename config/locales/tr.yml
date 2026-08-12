@@ -508,6 +508,12 @@ tr:
       compare_summarizing: 'Özetleniyor…'
       compare_summarize_error: 'Şu anda özetlenemedi.'
       chat_error: "Üzgünüz, bir şeyler ters gitti. Lütfen tekrar deneyin."
+  unsubscribe:
+    title: "Playverto e-postalarından çık"
+    body: "%{email} adresine kampanya e-postaları gönderilmesin mi?"
+    confirm: "Abonelikten çık"
+    done_title: "Abonelikten çıktınız"
+    done_body: "Bu adrese artık kampanya e-postası göndermeyeceğiz."
   nav:
     comms: "Comms"
     partnerships: "Ortaklar"

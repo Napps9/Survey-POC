@@ -508,6 +508,12 @@ ja:
       compare_summarizing: "要約しています…"
       compare_summarize_error: "現在要約できませんでした。"
       chat_error: "申し訳ありません。問題が発生しました。もう一度お試しください。"
+  unsubscribe:
+    title: "Playvertoのメール配信を停止"
+    body: "%{email} へのキャンペーンメール配信を停止しますか？"
+    confirm: "配信を停止"
+    done_title: "配信を停止しました"
+    done_body: "このアドレスにキャンペーンメールを送信することはありません。"
   nav:
     comms: "Comms"
     partnerships: "パートナー"

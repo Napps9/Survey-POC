@@ -508,6 +508,12 @@ fr:
       compare_summarizing: 'Résumé en cours…'
       compare_summarize_error: 'Impossible de résumer pour le moment.'
       chat_error: "Désolé, une erreur est survenue. Veuillez réessayer."
+  unsubscribe:
+    title: "Se désabonner des e-mails Playverto"
+    body: "Ne plus envoyer d'e-mails de campagne à %{email} ?"
+    confirm: "Se désabonner"
+    done_title: "Vous êtes désabonné(e)"
+    done_body: "Nous n'enverrons plus d'e-mails de campagne à cette adresse."
   nav:
     comms: "Comms"
     partnerships: "Partenaires"

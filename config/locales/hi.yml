@@ -508,6 +508,12 @@ hi:
       compare_summarizing: 'सारांशित किया जा रहा है…'
       compare_summarize_error: 'अभी सारांशित नहीं किया जा सका.'
       chat_error: "क्षमा करें, कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।"
+  unsubscribe:
+    title: "Playverto ईमेल से सदस्यता समाप्त करें"
+    body: "%{email} पर अभियान ईमेल भेजना बंद करें?"
+    confirm: "सदस्यता समाप्त करें"
+    done_title: "आपकी सदस्यता समाप्त हो गई"
+    done_body: "हम इस पते पर फिर से अभियान ईमेल नहीं भेजेंगे।"
   nav:
     comms: "Comms"
     partnerships: "साझेदार"

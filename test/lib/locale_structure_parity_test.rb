@@ -14,7 +14,7 @@ require "test_helper"
 # non-English UI, the exact defect this pass removed. Widening it to every
 # namespace is desirable but needs the backfill done first.
 class LocaleStructureParityTest < ActiveSupport::TestCase
-  NAMESPACES = %w[js defaults card templates demographics ask].freeze
+  NAMESPACES = %w[js defaults card templates demographics ask unsubscribe].freeze
 
   def locale_files
     Dir[Rails.root.join("config/locales/*.yml")]

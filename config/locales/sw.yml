@@ -508,6 +508,12 @@ sw:
       compare_summarizing: 'Inafupisha…'
       compare_summarize_error: 'Imeshindwa kufupisha kwa sasa.'
       chat_error: "Samahani, hitilafu imetokea. Tafadhali jaribu tena."
+  unsubscribe:
+    title: "Jiondoe kwenye barua pepe za Playverto"
+    body: "Kuacha kutuma barua pepe za kampeni kwa %{email}?"
+    confirm: "Jiondoe"
+    done_title: "Umejiondoa"
+    done_body: "Hatutatuma tena barua pepe za kampeni kwa anwani hii."
   nav:
     comms: "Comms"
     partnerships: "Washirika"

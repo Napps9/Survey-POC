@@ -508,6 +508,12 @@ ko:
       compare_summarizing: "요약하는 중…"
       compare_summarize_error: "지금은 요약할 수 없습니다."
       chat_error: "죄송합니다. 문제가 발생했습니다. 다시 시도해 주세요."
+  unsubscribe:
+    title: "Playverto 이메일 수신 거부"
+    body: "%{email} 주소로 캠페인 이메일 발송을 중단할까요?"
+    confirm: "수신 거부"
+    done_title: "수신 거부되었습니다"
+    done_body: "이 주소로 더 이상 캠페인 이메일을 보내지 않습니다."
   nav:
     comms: "Comms"
     partnerships: "파트너"

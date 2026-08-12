@@ -508,6 +508,12 @@ pt:
       compare_summarizing: 'A resumir…'
       compare_summarize_error: 'Não foi possível resumir agora.'
       chat_error: "Lamentamos, algo correu mal. Tente novamente."
+  unsubscribe:
+    title: "Cancelar a assinatura dos e-mails da Playverto"
+    body: "Parar de enviar e-mails de campanhas para %{email}?"
+    confirm: "Cancelar assinatura"
+    done_title: "Assinatura cancelada"
+    done_body: "Não enviaremos mais e-mails de campanhas para este endereço."
   nav:
     comms: "Comms"
     partnerships: "Parceiros"

@@ -508,6 +508,12 @@ vi:
       compare_summarizing: 'Đang tóm tắt…'
       compare_summarize_error: 'Hiện không thể tóm tắt.'
       chat_error: "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại."
+  unsubscribe:
+    title: "Hủy đăng ký email Playverto"
+    body: "Ngừng gửi email chiến dịch đến %{email}?"
+    confirm: "Hủy đăng ký"
+    done_title: "Bạn đã hủy đăng ký"
+    done_body: "Chúng tôi sẽ không gửi email chiến dịch đến địa chỉ này nữa."
   nav:
     comms: "Comms"
     partnerships: "Đối tác"

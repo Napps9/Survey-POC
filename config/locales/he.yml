@@ -508,6 +508,12 @@ he:
       compare_summarizing: 'מסכם…'
       compare_summarize_error: 'לא ניתן לסכם כרגע.'
       chat_error: "מצטערים, משהו השתבש. נסו שוב."
+  unsubscribe:
+    title: "ביטול הרשמה להודעות Playverto"
+    body: "להפסיק לשלוח הודעות קמפיין אל %{email}?"
+    confirm: "ביטול הרשמה"
+    done_title: "ההרשמה בוטלה"
+    done_body: "לא נשלח עוד הודעות קמפיין לכתובת זו."
   nav:
     comms: "Comms"
     partnerships: "שותפים"

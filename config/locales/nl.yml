@@ -508,6 +508,12 @@ nl:
       compare_summarizing: 'Wordt samengevat…'
       compare_summarize_error: 'Kon nu niet worden samengevat.'
       chat_error: "Sorry, er ging iets mis. Probeer het opnieuw."
+  unsubscribe:
+    title: "Afmelden voor Playverto-e-mails"
+    body: "Geen campagne-e-mails meer sturen naar %{email}?"
+    confirm: "Afmelden"
+    done_title: "Je bent afgemeld"
+    done_body: "We sturen geen campagne-e-mails meer naar dit adres."
   nav:
     comms: "Comms"
     partnerships: "Partners"

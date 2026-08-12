@@ -508,6 +508,12 @@ id:
       compare_summarizing: 'Meringkas…'
       compare_summarize_error: 'Tidak dapat meringkas saat ini.'
       chat_error: "Maaf, terjadi kesalahan. Silakan coba lagi."
+  unsubscribe:
+    title: "Berhenti berlangganan email Playverto"
+    body: "Berhenti mengirim email kampanye ke %{email}?"
+    confirm: "Berhenti berlangganan"
+    done_title: "Anda telah berhenti berlangganan"
+    done_body: "Kami tidak akan mengirim email kampanye ke alamat ini lagi."
   nav:
     comms: "Comms"
     partnerships: "Mitra"
