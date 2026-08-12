@@ -8351,18 +8351,32 @@ body.generating-overlay-active .bottom-bar { display: none; }
 /* Verto colour on the floating chrome. Each pill takes an accent the screen
    already speaks — the folder handle the Threads tab's purple, New chat the
    send arrow's teal, the conversation's name its own thread's flow colour
-   (the same dot the Threads list gives it). The accent tints the glass and
-   colours the icon; the text stays white, so contrast is untouched. The
-   back pill stays neutral — it leaves this surface rather than driving it.
-   Declared after the pills' base rules so the tint wins the cascade. */
+   (the same dot the Threads list gives it). The back pill stays neutral —
+   it leaves this surface rather than driving it. Declared after the pills'
+   base rules so the colour wins the cascade.
+
+   Two weights. The ACTION pills go solid — accent fill, dark ink — the same
+   pairing the send arrow (#01EACB on #04221E) and the active Threads tab
+   (#8B85FF on #14122E) already make. The NAME pill is display-only, so it
+   keeps the glass, tinted deep enough to read as its thread's colour. */
+.ask-pill-solid {
+  --pill-accent: #01EACB; --pill-ink: #04221E;
+  background: var(--pill-accent); border-color: var(--pill-accent);
+  color: var(--pill-ink);
+}
+.ask-pill-solid:hover {
+  background: color-mix(in srgb, var(--pill-accent) 86%, #fff);
+  border-color: color-mix(in srgb, var(--pill-accent) 86%, #fff);
+}
 .ask-pill-tinted {
   --pill-accent: #8B85FF;
-  background: color-mix(in srgb, var(--pill-accent) 13%, rgba(20,23,38,0.6));
-  border-color: color-mix(in srgb, var(--pill-accent) 42%, rgba(255,255,255,0.14));
+  background: color-mix(in srgb, var(--pill-accent) 30%, rgba(20,23,38,0.7));
+  border-color: color-mix(in srgb, var(--pill-accent) 75%, transparent);
+  color: #fff;
 }
 .ask-pill-tinted:hover {
-  background: color-mix(in srgb, var(--pill-accent) 24%, rgba(20,23,38,0.85));
-  border-color: color-mix(in srgb, var(--pill-accent) 65%, rgba(255,255,255,0.3));
+  background: color-mix(in srgb, var(--pill-accent) 42%, rgba(20,23,38,0.85));
+  border-color: var(--pill-accent);
 }
 .ask-pill-tinted svg { color: var(--pill-accent); }
 /* The name pill leads with its thread's dot, exactly as the rail row does. */

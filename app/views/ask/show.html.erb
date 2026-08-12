@@ -98,7 +98,7 @@
             <%= "hidden" if @messages.empty? %>><%= @thread&.display_title if @messages.any? %></span>
     </div>
     <div class="ask-float-row">
-      <button type="button" class="editor-leave-btn ask-rail-handle ask-pill-tinted" style="--pill-accent:#8B85FF;"
+      <button type="button" class="editor-leave-btn ask-rail-handle ask-pill-solid" style="--pill-accent:#8B85FF;--pill-ink:#14122E;"
               data-action="click->ask-verto#openRail"
               title="<%= t("ask.page.scope") %> · <%= t("ask.page.threads") %>">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -114,7 +114,7 @@
           it reveals the title pill. %>
       <%= form_with url: ask_threads_path, method: :post, class: "ask-newchat-form",
             data: { ask_verto_target: "newChat" }, html: { hidden: @messages.empty? } do %>
-        <button type="submit" class="editor-leave-btn ask-newchat-btn ask-pill-tinted" style="--pill-accent:#01EACB;">
+        <button type="submit" class="editor-leave-btn ask-newchat-btn ask-pill-solid" style="--pill-accent:#01EACB;--pill-ink:#04221E;">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M8 3.2v9.6M3.2 8h9.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
