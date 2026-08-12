@@ -215,4 +215,37 @@ class AskVertoReplayTest < ApplicationSystemTestCase
     assert_no_selector ".ask-suggest"
     assert_text I18n.t("js.ask.empty_corpus").first(40)
   end
+
+  # The floating chrome is anchored to the grid, not the conversation column,
+  # so a folder sliding out must not push a pill (2026-08-12: the back pill
+  # used to travel right when the scope/threads folder opened). Only a browser
+  # can see where a pill actually lands, so this is asserted here.
+  test "the floating chrome holds its corners while the folders slide" do
+    empty = @org.ask_threads.create!(user: @user, title: "New")
+
+    sign_in_as(@user)
+    visit ask_path(thread_id: empty.id)
+    dismiss_cookie_banner
+
+    back_pill = "document.querySelector('a.editor-leave-btn').getBoundingClientRect().left"
+    # The CLUSTER's edge, not a pill inside it — the Sources fab hides while
+    # the folder is out (by design), so the pills reflow within the cluster;
+    # what must never move is where the cluster itself is anchored.
+    pinned = "document.querySelector('.ask-float-pinned').getBoundingClientRect().right"
+
+    back_before   = evaluate_script(back_pill)
+    pinned_before = evaluate_script(pinned)
+
+    find(".ask-rail-handle").click
+    assert_selector ".ask-grid.is-rail-open"
+    sleep 0.4 # the 0.28s column slide, settled
+    assert_equal back_before, evaluate_script(back_pill),
+      "the back pill must hold the top-left corner while the threads folder is out"
+
+    find(".ask-fab-sources").click
+    assert_selector ".ask-grid.is-panel-open"
+    sleep 0.4
+    assert_equal pinned_before, evaluate_script(pinned),
+      "the pinned cluster must hold the top-right corner while the sources folder is out"
+  end
 end

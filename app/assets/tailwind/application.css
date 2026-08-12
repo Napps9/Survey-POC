@@ -8291,7 +8291,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
 /* ── Conversation column + the floating chrome ─────────────────────────────
    The editor's corner grammar, adopted whole: stacked glass pills top-left
    (back, then the folder handle), a pinned cluster top-right (language pill +
-   Sources counter) that neither folder opening can move. */
+   Sources counter). Both are children of the GRID, not this column, so they
+   anchor to the screen's corners and a folder sliding out never pushes them
+   (2026-08-12 — the back pill used to travel with the shrinking column). The
+   folders' 60px top margin is what keeps this strip clear of their tabs. */
 .ask-main { position: relative; z-index: 1; display: flex; flex-direction: column; min-width: 0; }
 .ask-float-bar {
   position: absolute; top: 12px; inset-inline-start: 16px; z-index: 30;

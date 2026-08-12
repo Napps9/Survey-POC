@@ -75,6 +75,48 @@
     <div class="gen-orb gen-orb-4"></div>
   </div>
 
+  <%# The floating chrome — children of the GRID, not the conversation column,
+      so a folder sliding out never pushes a pill (the editor's own rule for
+      its pinned corner). Both folders start 60px down precisely so this strip
+      keeps the top of the screen to itself. %>
+
+  <%# Stacked glass pills top-left — the editor's corner grammar. %>
+  <div class="ask-float-bar">
+    <div class="ask-float-row">
+      <%= link_to root_path, class: "editor-leave-btn" do %>
+        <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span><%= t("ask.page.back") %></span>
+      <% end %>
+      <span class="ask-title-pill" data-ask-verto-target="titlePill"
+            <%= "hidden" if @messages.empty? %>><%= @thread&.display_title if @messages.any? %></span>
+    </div>
+    <div class="ask-float-row">
+      <button type="button" class="editor-leave-btn ask-rail-handle"
+              data-action="click->ask-verto#openRail"
+              title="<%= t("ask.page.scope") %> · <%= t("ask.page.threads") %>">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="1.5" y="2.5" width="13" height="11" rx="2.2" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M6.2 2.5v11" stroke="currentColor" stroke-width="1.4"/>
+        </svg>
+        <span><%= t("ask.page.title") %></span>
+      </button>
+    </div>
+  </div>
+
+  <%# Pinned cluster top-right — holds the corner whatever the folders do.
+      The language pill quietly restores what removing the nav lost. %>
+  <div class="ask-float-pinned">
+    <%= render "shared/locale_switcher" %>
+    <button type="button" class="ask-fab ask-fab-sources"
+            data-ask-verto-target="sourcesFab"
+            data-action="click->ask-verto#openSources">
+      <span class="ask-fab-dots" data-ask-verto-target="fabDots"></span>
+      <%= t("js.ask.sources") %> <span class="n" data-ask-verto-target="sourceCount">0</span>
+    </button>
+  </div>
+
   <%# ── The left folder: Scope + Threads as tab-papers ── %>
   <div class="ask-lpanel">
     <div class="ask-tabs" role="tablist">
@@ -152,43 +194,6 @@
 
   <%# ── Conversation ── %>
   <div class="ask-main" data-ask-verto-target="main">
-    <%# Stacked glass pills top-left — the editor's corner grammar. %>
-    <div class="ask-float-bar">
-      <div class="ask-float-row">
-        <%= link_to root_path, class: "editor-leave-btn" do %>
-          <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span><%= t("ask.page.back") %></span>
-        <% end %>
-        <span class="ask-title-pill" data-ask-verto-target="titlePill"
-              <%= "hidden" if @messages.empty? %>><%= @thread&.display_title if @messages.any? %></span>
-      </div>
-      <div class="ask-float-row">
-        <button type="button" class="editor-leave-btn ask-rail-handle"
-                data-action="click->ask-verto#openRail"
-                title="<%= t("ask.page.scope") %> · <%= t("ask.page.threads") %>">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <rect x="1.5" y="2.5" width="13" height="11" rx="2.2" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M6.2 2.5v11" stroke="currentColor" stroke-width="1.4"/>
-          </svg>
-          <span><%= t("ask.page.title") %></span>
-        </button>
-      </div>
-    </div>
-
-    <%# Pinned cluster top-right — holds the corner whatever the folders do.
-        The language pill quietly restores what removing the nav lost. %>
-    <div class="ask-float-pinned">
-      <%= render "shared/locale_switcher" %>
-      <button type="button" class="ask-fab ask-fab-sources"
-              data-ask-verto-target="sourcesFab"
-              data-action="click->ask-verto#openSources">
-        <span class="ask-fab-dots" data-ask-verto-target="fabDots"></span>
-        <%= t("js.ask.sources") %> <span class="n" data-ask-verto-target="sourceCount">0</span>
-      </button>
-    </div>
-
     <div class="ask-feed" data-ask-verto-target="feed">
 
       <%# Floating scope pills. Only rendered when a filter is actually set —
