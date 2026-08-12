@@ -818,6 +818,12 @@ class SurveysController < ApplicationController
     redirect_to root_path, notice: t("flash.surveys.bulk_destroyed_forever", count: count)
   end
 
+  # How many standings rows the creator's results page lists. More generous
+  # than the player's top ten — this is the person running the game — but
+  # still bounded: an imported Verto can hold thousands of responses, and a
+  # page is not an export.
+  RESULTS_LEADERBOARD_ROWS = 20
+
   def results
     @date_range = params[:range].presence
     base, @segments, @active_segment = resolve_result_segments(@survey, params[:segment], @date_range)
@@ -826,6 +832,21 @@ class SurveysController < ApplicationController
     @responses  = @active_segment[:scope]
     @total      = @active_segment[:count]
     @aggregated = aggregate_results(Array(@survey.cards), @responses)
+
+    # The creator's view of the board. Whole-Verto on purpose — identities
+    # span the date/segment filters, and the retake policy already decides
+    # which runs count, so a filtered board would show partial sums matching
+    # nothing any respondent was shown. Same read-time alias backfill as the
+    # player endpoint, bounded to the rendered rows.
+    if @survey.leaderboard_active?
+      standings = TokenLeaderboard.standings(@survey)
+      @leaderboard_player_count = standings.size
+      @leaderboard = standings.first(RESULTS_LEADERBOARD_ROWS)
+      digests = @leaderboard.map { |e| e[:key_digest] }
+      digests.each { |d| PlayerAlias.ensure_for!(survey: @survey, key_digest: d) }
+      @leaderboard_names = @survey.player_aliases.where(key_digest: digests)
+                                  .pluck(:key_digest, :anon_name).to_h
+    end
     render :results, layout: "fullscreen"
   end
 

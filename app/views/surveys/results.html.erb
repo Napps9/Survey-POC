@@ -319,6 +319,51 @@
             <div style="margin:0 0 10px;padding:9px 14px;border-radius:10px;background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.3);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#FF6FA0;">Couldn’t connect to Google Sheets. Please try again.</div>
           <% end %>
 
+          <%# ── Leaderboard (creator's view) ── Deliberately ABOVE the
+              date/segment pills: the board is whole-Verto (identities span
+              the filters, and the retake policy already decides which runs
+              count), so it must not read as filtered by the pills below. %>
+          <% if @survey.leaderboard_active? && @leaderboard %>
+            <div class="s-card" style="cursor:default;overflow:visible;margin-bottom:10px;">
+              <div class="s-card-header" style="padding:9px 14px;gap:10px;">
+                <span class="s-badge" style="background:rgba(245,158,11,0.15);color:#F59E0B;">🏆 Leaderboard</span>
+                <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);">
+                  <%= { "accumulate" => "Retakes add points",
+                        "no_redo"    => "One play each",
+                        "restart"    => "Retakes restart points" }[@survey.leaderboard_retake_policy] %>
+                </span>
+                <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:<%= @leaderboard_player_count > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;">
+                  <%= @leaderboard_player_count %> player<%= @leaderboard_player_count == 1 ? "" : "s" %>
+                </span>
+              </div>
+              <div style="padding:10px 16px 12px;">
+                <% if @leaderboard.empty? %>
+                  <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);padding:6px 0;">
+                    No players on the board yet — finished plays appear here with their token totals.
+                  </div>
+                <% else %>
+                  <% @leaderboard.each_with_index do |entry, i| %>
+                    <div style="display:flex;align-items:center;gap:10px;padding:5px 0;<%= 'border-top:1px solid rgba(255,255,255,0.06);' if i.positive? %>">
+                      <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.75);min-width:1.8em;text-align:right;"><%= i + 1 %></span>
+                      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:#fff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= @leaderboard_names[entry[:key_digest]] %></span>
+                      <span style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;"><%= entry[:total] %></span>
+                    </div>
+                  <% end %>
+                  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.55);">
+                      Names are system-made and anonymous — they can't be traced back to a respondent.
+                    </span>
+                    <% if @leaderboard_player_count > @leaderboard.size %>
+                      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.55);">
+                        Showing the top <%= @leaderboard.size %> of <%= @leaderboard_player_count %>.
+                      </span>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
           <%# Date window. Narrows the base, so the segment counts below are
               counted within the window too — a range that only moved the charts
               while the pills kept whole-Verto totals would misreport one of them. %>
