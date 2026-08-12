@@ -179,6 +179,11 @@ Rails.application.routes.draw do
     post   "comms/campaigns/:id/image",          to: "comms/campaigns#image",          as: :image_comms_campaign
     post   "comms/campaigns/:id/moderate_image", to: "comms/campaigns#moderate_image", as: :moderate_image_comms_campaign
     get    "comms/campaigns/:id/pexels",         to: "comms/campaigns#pexels_search",  as: :pexels_comms_campaign
+    post   "comms/campaigns/:id/audience_count", to: "comms/campaigns#audience_count", as: :audience_count_comms_campaign
+    get    "comms/lists",                        to: "comms/lists#index",              as: :comms_lists
+    post   "comms/lists",                        to: "comms/lists#create"
+    get    "comms/lists/:id",                    to: "comms/lists#show",               as: :comms_list
+    delete "comms/lists/:id",                    to: "comms/lists#destroy"
   end
 
   # Common Questions — reusable sets attached to many Vertos

@@ -1364,6 +1364,8 @@ pt:
     welcome_confirm: "Bem-vindo ao Playverto! Verifique %{email} para confirmar o seu endereço."
   flash:
     comms:
+      list_deleted: "Lista excluída."
+      list_imported: 'Lista "%{name}" importada — contatos: %{count}, ignorados: %{skipped}.'
       campaign_deleted: "Campanha excluída."
     surveys:
       editing_locked: "A edição está bloqueada — este Verto está no ar, ou já recolheu respostas."

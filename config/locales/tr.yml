@@ -1364,6 +1364,8 @@ tr:
     welcome_confirm: "Playverto'ya hoş geldiniz! Adresinizi onaylamak için %{email} adresini kontrol edin."
   flash:
     comms:
+      list_deleted: "Liste silindi."
+      list_imported: '"%{name}" listesi içe aktarıldı — kişiler: %{count}, atlanan: %{skipped}.'
       campaign_deleted: "Kampanya silindi."
     common_question_sets:
       add_question_failed: "Soru eklenemedi — %{reason}"

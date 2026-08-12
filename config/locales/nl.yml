@@ -1364,6 +1364,8 @@ nl:
     welcome_confirm: "Welkom bij Playverto! Check %{email} om je adres te bevestigen."
   flash:
     comms:
+      list_deleted: "Lijst verwijderd."
+      list_imported: 'Lijst "%{name}" geïmporteerd — contacten: %{count}, overgeslagen: %{skipped}.'
       campaign_deleted: "Campagne verwijderd."
     surveys:
       image_unverified: "We konden die afbeelding niet controleren — probeer het opnieuw."

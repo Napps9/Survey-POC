@@ -17,7 +17,7 @@ import { hasEmailFormatting } from "lib/rich_text"
 export default class extends Controller {
   static targets = ["title", "status", "undoBtn", "canvas", "paper", "slot", "block",
                     "panelTitle", "panelEmpty", "controls", "blockView", "designView",
-                    "addMenu", "previewOverlay", "previewFrame"]
+                    "audienceView", "addMenu", "previewOverlay", "previewFrame"]
   static values = { url: String, previewUrl: String, locked: Boolean }
 
   static MAX_UNDO = 25
@@ -336,6 +336,7 @@ export default class extends Controller {
   openDesign() {
     this.element.classList.add("is-panel-open")
     this.blockViewTarget.hidden = true
+    if (this.hasAudienceViewTarget) this.audienceViewTarget.hidden = true
     this.designViewTarget.hidden = false
     this.designViewTarget.querySelectorAll("[data-setting]").forEach((input) => {
       const key = input.dataset.setting
@@ -344,9 +345,24 @@ export default class extends Controller {
     })
   }
 
+  openAudience() {
+    if (!this.hasAudienceViewTarget) return
+    this.element.classList.add("is-panel-open")
+    this.blockViewTarget.hidden = true
+    this.designViewTarget.hidden = true
+    this.audienceViewTarget.hidden = false
+  }
+
+  closeAudience() {
+    if (!this.hasAudienceViewTarget) return
+    this.audienceViewTarget.hidden = true
+    this.blockViewTarget.hidden = false
+  }
+
   closeDesign() {
     if (!this.hasDesignViewTarget) return
     this.designViewTarget.hidden = true
+    if (this.hasAudienceViewTarget) this.audienceViewTarget.hidden = true
     this.blockViewTarget.hidden = false
   }
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_12_100100) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -223,6 +223,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_090000) do
     t.index ["scheduled_for"], name: "index_email_campaigns_on_scheduled_for"
     t.index ["status"], name: "index_email_campaigns_on_status"
     t.check_constraint "status IN ('draft','scheduled','sending','sent','failed','cancelled')", name: "chk_email_campaigns_status"
+  end
+
+  create_table "email_list_contacts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.integer "email_list_id", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["email_list_id", "email"], name: "index_email_list_contacts_on_email_list_id_and_email", unique: true
+  end
+
+  create_table "email_lists", force: :cascade do |t|
+    t.integer "contacts_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.integer "created_by_id"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_email_lists_on_created_at"
+  end
+
+  create_table "email_suppressions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "reason", null: false
+    t.integer "source_campaign_id"
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["email"], name: "index_email_suppressions_on_email", unique: true
+    t.check_constraint "reason IN ('unsubscribe','hard_bounce','complaint','manual')", name: "chk_email_suppressions_reason"
   end
 
   create_table "flow_generations", force: :cascade do |t|

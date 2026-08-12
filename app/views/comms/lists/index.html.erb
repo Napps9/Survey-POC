@@ -1,0 +1,71 @@
+<%# Imported contact lists. Internal surface — English-default copy. %>
+<div style="max-width:1040px;margin:0 auto;padding:48px 24px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div>
+      <p style="font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#FFC24B;margin:0 0 6px;">
+        <%= t("comms.index.eyebrow", default: "Playverto internal") %>
+      </p>
+      <h1 style="font-family:'Alata',sans-serif;font-size:28px;margin:0;color:#F7F7F7;">
+        <%= t("comms.lists.title", default: "Contact lists") %>
+      </h1>
+    </div>
+    <%= link_to "← " + t("comms.editor.back", default: "Comms"), comms_path,
+          style: "font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;text-decoration:none;" %>
+  </div>
+
+  <% if flash[:notice] || flash[:alert] %>
+    <div style="margin-top:20px;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.4);border-radius:12px;padding:12px 16px;font-family:'ABeeZee',sans-serif;font-size:13px;color:#F7F7F7;">
+      <%= flash[:notice] || flash[:alert] %>
+    </div>
+  <% end %>
+
+  <div style="margin-top:28px;background:rgba(20,23,38,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:20px;">
+    <h2 style="font-family:'Alata',sans-serif;font-size:16px;color:#F7F7F7;margin:0 0 12px;">
+      <%= t("comms.lists.import_title", default: "Import a list") %>
+    </h2>
+    <%= form_with url: comms_lists_path, method: :post, multipart: true, data: { turbo: false } do |f| %>
+      <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;color:rgba(247,247,247,0.75);margin-bottom:6px;">
+        <%= t("comms.lists.name_label", default: "List name") %>
+      </label>
+      <%= f.text_field :name, required: true, class: "form-input", style: "max-width:360px;" %>
+
+      <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;color:rgba(247,247,247,0.75);margin:14px 0 6px;">
+        <%= t("comms.lists.paste_label", default: "Paste addresses — one per line, optionally \"email, name\"") %>
+      </label>
+      <%= f.text_area :emails_text, rows: 6, class: "form-input",
+            placeholder: "jo@example.org, Jo Doe\nsam@example.org", style: "font-family:monospace;font-size:12px;" %>
+
+      <label style="display:block;font-family:'Alata',sans-serif;font-size:12px;color:rgba(247,247,247,0.75);margin:14px 0 6px;">
+        <%= t("comms.lists.csv_label", default: "…or upload a CSV (email in the first column, optional name in the second)") %>
+      </label>
+      <%= f.file_field :csv, accept: ".csv,text/csv", style: "font-family:'ABeeZee',sans-serif;font-size:12px;color:#F7F7F7;" %>
+
+      <div style="margin-top:16px;">
+        <%= f.submit t("comms.lists.import_cta", default: "Import"),
+              style: "background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:14px;border:none;border-radius:100px;padding:10px 22px;cursor:pointer;" %>
+        <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(247,247,247,0.5);margin-left:10px;">
+          <%= t("comms.lists.cap_note", default: "Up to 10,000 rows per import. Invalid rows are skipped, not fatal.") %>
+        </span>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @lists.any? %>
+    <div style="margin-top:28px;display:flex;flex-direction:column;gap:10px;">
+      <% @lists.each do |list| %>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;background:rgba(20,23,38,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px 20px;">
+          <a href="<%= comms_list_path(list) %>" style="text-decoration:none;min-width:0;">
+            <div style="font-family:'Alata',sans-serif;font-size:15px;color:#F7F7F7;"><%= list.name %></div>
+            <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(247,247,247,0.55);margin-top:2px;">
+              <%= t("comms.lists.contacts", default: "contacts") %>: <%= list.contacts_count %>
+              · <%= l list.created_at, format: :short %>
+            </div>
+          </a>
+          <%= button_to "✕", comms_list_path(list), method: :delete,
+                form: { data: { turbo_confirm: t("comms.lists.delete_confirm", default: "Delete this list?") } },
+                style: "background:rgba(255,30,111,0.15);color:#FF1E6F;border:none;border-radius:100px;width:30px;height:30px;cursor:pointer;" %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

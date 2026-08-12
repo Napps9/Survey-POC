@@ -1,0 +1,26 @@
+<div style="max-width:1040px;margin:0 auto;padding:48px 24px;">
+  <%= link_to "← " + t("comms.lists.title", default: "Contact lists"), comms_lists_path,
+        style: "font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;text-decoration:none;" %>
+
+  <% if flash[:notice] %>
+    <div style="margin-top:16px;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.4);border-radius:12px;padding:12px 16px;font-family:'ABeeZee',sans-serif;font-size:13px;color:#F7F7F7;">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+  <h1 style="font-family:'Alata',sans-serif;font-size:26px;margin:14px 0 4px;color:#F7F7F7;"><%= @list.name %></h1>
+  <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(247,247,247,0.6);margin:0;">
+    <%= t("comms.lists.contacts", default: "contacts") %>: <%= @list.contacts_count %>
+    <% if @list.contacts_count > @contacts.size %>
+      · <%= t("comms.lists.showing_first", default: "showing the first %{n}", n: @contacts.size) %>
+    <% end %>
+  </p>
+
+  <div style="margin-top:24px;background:rgba(20,23,38,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:8px 20px;">
+    <% @contacts.each do |contact| %>
+      <div style="display:flex;gap:16px;border-bottom:1px solid rgba(255,255,255,0.06);padding:9px 0;font-family:'ABeeZee',sans-serif;font-size:13px;">
+        <span style="color:#F7F7F7;"><%= contact.email %></span>
+        <span style="color:rgba(247,247,247,0.5);"><%= contact.name %></span>
+      </div>
+    <% end %>
+  </div>
+</div>

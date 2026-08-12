@@ -1364,6 +1364,8 @@ hi:
     welcome_confirm: "Playverto में आपका स्वागत है! अपना पता पुष्ट करने के लिए %{email} देखें।"
   flash:
     comms:
+      list_deleted: "सूची हटाई गई।"
+      list_imported: 'सूची "%{name}" आयात की गई — संपर्क: %{count}, छोड़े गए: %{skipped}।'
       campaign_deleted: "अभियान हटाया गया।"
     common_question_sets:
       add_question_failed: "प्रश्न नहीं जोड़ा जा सका — %{reason}"

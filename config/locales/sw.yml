@@ -1364,6 +1364,8 @@ sw:
     welcome_confirm: "Karibu Playverto! Angalia %{email} ili kuthibitisha anwani yako."
   flash:
     comms:
+      list_deleted: "Orodha imefutwa."
+      list_imported: 'Orodha "%{name}" imeingizwa — anwani: %{count}, zilizorukwa: %{skipped}.'
       campaign_deleted: "Kampeni imefutwa."
     common_question_sets:
       add_question_failed: "Imeshindikana kuongeza swali — %{reason}"

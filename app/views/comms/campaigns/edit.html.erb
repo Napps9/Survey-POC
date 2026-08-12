@@ -108,6 +108,9 @@
           <button type="button" class="editor-leave-btn" data-action="click->comms-editor#openDesign">
             <span class="editor-leave-label">🎨 <%= t("comms.editor.design", default: "Design") %></span>
           </button>
+          <button type="button" class="editor-leave-btn" data-action="click->comms-editor#openAudience">
+            <span class="editor-leave-label">👥 <%= t("comms.editor.audience", default: "Audience") %></span>
+          </button>
         </div>
       </div>
     <% end %>
@@ -223,6 +226,79 @@
         <label>Heading letter spacing <input type="range" min="-2" max="6" data-setting="headingLetterSpacing" data-action="input->comms-editor#applySetting"></label>
       </div>
     </div>
+
+    <%# Audience takeover: who this campaign goes to. Its own controller —
+        it PATCHes the audience slice itself (brand-palette shape) and keeps
+        the live count fresh via the resolver-backed count endpoint. %>
+    <% if editable %>
+      <div class="type-panel panel-paper panel--tokens" data-comms-editor-target="audienceView" hidden
+           data-controller="comms-audience"
+           data-comms-audience-url-value="<%= comms_campaign_path(@campaign) %>"
+           data-comms-audience-count-url-value="<%= audience_count_comms_campaign_path(@campaign) %>"
+           data-comms-audience-definition-value="<%= (@campaign.audience.presence || { "kind" => "all_users" }).to_json %>">
+        <div class="type-panel-top">
+          <button type="button" class="publish-panel-back" data-action="click->comms-editor#closeAudience">←
+            <%= t("comms.editor.back_to_block", default: "Block") %></button>
+          <div style="font-family:'Alata',sans-serif;font-size:18px;color:#1C2034;"><%= t("comms.editor.audience", default: "Audience") %></div>
+        </div>
+
+        <div class="panel-island comms-controls">
+          <div class="comms-count-card">
+            <span class="comms-count-num" data-comms-audience-target="count">…</span>
+            <span class="comms-count-label"><%= t("comms.editor.recipients", default: "recipients after unsubscribes & suppressions") %></span>
+          </div>
+
+          <label class="comms-kind-row"><input type="radio" name="audience_kind" value="all_users"
+                 data-comms-audience-target="kind" data-action="change->comms-audience#changed">
+            <%= t("comms.editor.all_users", default: "All platform users (verified)") %></label>
+
+          <label class="comms-kind-row"><input type="radio" name="audience_kind" value="organisations"
+                 data-comms-audience-target="kind" data-action="change->comms-audience#changed">
+            <%= t("comms.editor.by_org", default: "Members of specific organisations") %></label>
+          <div data-comms-audience-target="section" data-audience-section="organisations" hidden
+               style="display:flex;flex-direction:column;gap:8px;">
+            <select multiple size="6" data-comms-audience-target="orgSelect"
+                    data-action="change->comms-audience#changed" style="width:100%;">
+              <% @organisations.each do |org| %>
+                <option value="<%= org.id %>"><%= org.name %></option>
+              <% end %>
+            </select>
+            <label>Role
+              <select data-comms-audience-target="roleSelect" data-action="change->comms-audience#changed">
+                <option value="any">Everyone</option>
+                <option value="admin">Admins only</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="comms-kind-row"><input type="radio" name="audience_kind" value="users"
+                 data-comms-audience-target="kind" data-action="change->comms-audience#changed">
+            <%= t("comms.editor.picked_users", default: "Specific users (by email)") %></label>
+          <div data-comms-audience-target="section" data-audience-section="users" hidden>
+            <textarea rows="4" data-comms-audience-target="emailsInput"
+                      data-action="input->comms-audience#changed"
+                      placeholder="nick@playverto.com&#10;someone@example.org"
+                      style="width:100%;font-family:monospace;font-size:12px;"></textarea>
+          </div>
+
+          <label class="comms-kind-row"><input type="radio" name="audience_kind" value="list"
+                 data-comms-audience-target="kind" data-action="change->comms-audience#changed">
+            <%= t("comms.editor.from_list", default: "An imported list") %></label>
+          <div data-comms-audience-target="section" data-audience-section="list" hidden
+               style="display:flex;flex-direction:column;gap:8px;">
+            <select data-comms-audience-target="listSelect" data-action="change->comms-audience#changed" style="width:100%;">
+              <option value=""><%= t("comms.editor.pick_list", default: "Pick a list…") %></option>
+              <% @lists.each do |list| %>
+                <option value="<%= list.id %>"><%= list.name %> (<%= list.contacts_count %>)</option>
+              <% end %>
+            </select>
+            <a href="<%= comms_lists_path %>" target="_blank"
+               style="font-family:'Alata',sans-serif;font-size:12px;color:#1C2034;text-decoration:underline;">
+              <%= t("comms.editor.manage_lists", default: "Manage lists ↗") %></a>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
 
 <% if editable %>

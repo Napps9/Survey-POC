@@ -1385,6 +1385,8 @@ en:
     welcome_confirm: "Welcome to Playverto! Check %{email} to confirm your address."
   flash:
     comms:
+      list_deleted: "List deleted."
+      list_imported: 'List "%{name}" imported — contacts: %{count}, skipped: %{skipped}.'
       campaign_deleted: "Campaign deleted."
     common_question_sets:
       add_question_failed: "Couldn't add the question — %{reason}"

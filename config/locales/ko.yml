@@ -1362,6 +1362,8 @@ ko:
     welcome_confirm: "Playverto에 오신 것을 환영합니다! %{email}에서 주소를 확인하세요."
   flash:
     comms:
+      list_deleted: "목록이 삭제되었습니다."
+      list_imported: '목록 "%{name}"을(를) 가져왔습니다 — 연락처: %{count}, 건너뜀: %{skipped}.'
       campaign_deleted: "캠페인이 삭제되었습니다."
     common_question_sets:
       add_question_failed: "질문을 추가할 수 없습니다 — %{reason}"

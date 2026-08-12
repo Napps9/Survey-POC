@@ -26,6 +26,8 @@ class Comms::CampaignsController < Comms::BaseController
   def edit
     @hide_main_nav = true
     @playverto_brand = playverto_brand
+    @organisations = Organisation.order(:name)
+    @lists = EmailList.recent
   end
 
   # JSON autosave from the builder. Only keys present in the payload are
@@ -136,7 +138,35 @@ class Comms::CampaignsController < Comms::BaseController
     render json: { images: [], error: "search_failed" }, status: :bad_gateway
   end
 
+  # Live recipient count for the audience panel. POST because the definition
+  # is a JSON body; resolved by the same resolver the send path uses, so the
+  # number shown is the number mailed.
+  def audience_count
+    render json: { ok: true, count: Comms::AudienceResolver.count(audience_definition_param) }
+  end
+
   private
+
+  # The posted definition reduced to typed scalars before it goes anywhere
+  # near a query: ids through Integer(), strings through to_s, unknown keys
+  # dropped. The resolver only ever builds parameterized AR relations, but
+  # this keeps the taint analysis (and the reader) from having to prove that.
+  def audience_definition_param
+    raw = request.request_parameters["audience"]
+    return {} unless raw.is_a?(Hash)
+
+    out = { "kind" => raw["kind"].to_s }
+    out["role"] = raw["role"].to_s if raw.key?("role")
+    if raw.key?("organisation_ids")
+      out["organisation_ids"] = Array(raw["organisation_ids"]).filter_map { |v| Integer(v, exception: false) }
+    end
+    if raw.key?("user_ids")
+      out["user_ids"] = Array(raw["user_ids"]).filter_map { |v| Integer(v, exception: false) }
+    end
+    out["emails"] = Array(raw["emails"]).map { |e| Comms.normalize_email(e) } if raw.key?("emails")
+    out["list_id"] = Integer(raw["list_id"], exception: false) if raw.key?("list_id")
+    out
+  end
 
   def set_campaign
     @campaign = EmailCampaign.find(params[:id])

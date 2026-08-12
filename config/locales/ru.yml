@@ -1365,6 +1365,8 @@ ru:
     welcome_confirm: "Добро пожаловать в Playverto! Проверьте %{email}, чтобы подтвердить адрес."
   flash:
     comms:
+      list_deleted: "Список удалён."
+      list_imported: 'Список "%{name}" импортирован — контакты: %{count}, пропущено: %{skipped}.'
       campaign_deleted: "Кампания удалена."
     common_question_sets:
       add_question_failed: "Не удалось добавить вопрос — %{reason}"

@@ -1363,6 +1363,8 @@ ar:
     welcome_confirm: "مرحباً بك في Playverto! تحقق من %{email} لتأكيد عنوانك."
   flash:
     comms:
+      list_deleted: "تم حذف القائمة."
+      list_imported: 'تم استيراد القائمة "%{name}" — جهات الاتصال: %{count}، المتجاهَل: %{skipped}.'
       campaign_deleted: "تم حذف الحملة."
     common_question_sets:
       add_question_failed: "تعذّرت إضافة السؤال — %{reason}"

@@ -1362,6 +1362,8 @@ ja:
     welcome_confirm: "Playverto へようこそ！%{email} を確認してアドレスを認証してください。"
   flash:
     comms:
+      list_deleted: "リストを削除しました。"
+      list_imported: 'リスト「%{name}」をインポートしました — 連絡先: %{count}、スキップ: %{skipped}。'
       campaign_deleted: "キャンペーンを削除しました。"
     common_question_sets:
       add_question_failed: "質問を追加できませんでした — %{reason}"

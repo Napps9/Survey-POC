@@ -18,9 +18,13 @@
         <%= t("comms.index.subtitle", default: "Email campaigns to Playverto's users and imported lists — composed, scheduled and tracked from here.") %>
       </p>
     </div>
-    <%= button_to t("comms.index.new_campaign", default: "＋ New campaign"), comms_campaigns_path,
-          method: :post, form: { data: { turbo: false } },
-          style: "background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:14px;border:none;border-radius:100px;padding:10px 22px;cursor:pointer;" %>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <%= link_to t("comms.lists.title", default: "Contact lists"), comms_lists_path,
+            style: "font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;text-decoration:none;" %>
+      <%= button_to t("comms.index.new_campaign", default: "＋ New campaign"), comms_campaigns_path,
+            method: :post, form: { data: { turbo: false } },
+            style: "background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:14px;border:none;border-radius:100px;padding:10px 22px;cursor:pointer;" %>
+    </div>
   </div>
 
   <% if flash[:notice] %>

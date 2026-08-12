@@ -1363,6 +1363,8 @@ vi:
     welcome_confirm: "Chào mừng đến Playverto! Kiểm tra %{email} để xác nhận địa chỉ của bạn."
   flash:
     comms:
+      list_deleted: "Đã xóa danh sách."
+      list_imported: 'Đã nhập danh sách "%{name}" — liên hệ: %{count}, bỏ qua: %{skipped}.'
       campaign_deleted: "Đã xóa chiến dịch."
     common_question_sets:
       add_question_failed: "Không thêm được câu hỏi — %{reason}"

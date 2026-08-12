@@ -1364,6 +1364,8 @@ de:
     welcome_confirm: "Willkommen bei Playverto! Prüfe %{email}, um deine Adresse zu bestätigen."
   flash:
     comms:
+      list_deleted: "Liste gelöscht."
+      list_imported: 'Liste "%{name}" importiert — Kontakte: %{count}, übersprungen: %{skipped}.'
       campaign_deleted: "Kampagne gelöscht."
     surveys:
       image_unverified: "Wir konnten dieses Bild nicht prüfen — bitte versuche es erneut."

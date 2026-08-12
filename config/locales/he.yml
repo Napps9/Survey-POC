@@ -1363,6 +1363,8 @@ he:
     welcome_confirm: "ברוך הבא ל-Playverto! בדוק את %{email} כדי לאשר את הכתובת."
   flash:
     comms:
+      list_deleted: "הרשימה נמחקה."
+      list_imported: 'הרשימה "%{name}" יובאה — אנשי קשר: %{count}, דולגו: %{skipped}.'
       campaign_deleted: "הקמפיין נמחק."
     common_question_sets:
       add_question_failed: "לא ניתן היה להוסיף את השאלה — %{reason}"

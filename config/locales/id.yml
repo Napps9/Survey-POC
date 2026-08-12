@@ -1363,6 +1363,8 @@ id:
     welcome_confirm: "Selamat datang di Playverto! Periksa %{email} untuk mengonfirmasi alamat Anda."
   flash:
     comms:
+      list_deleted: "Daftar dihapus."
+      list_imported: 'Daftar "%{name}" diimpor — kontak: %{count}, dilewati: %{skipped}.'
       campaign_deleted: "Kampanye dihapus."
     common_question_sets:
       add_question_failed: "Tidak dapat menambahkan pertanyaan — %{reason}"
