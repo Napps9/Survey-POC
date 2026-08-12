@@ -6,17 +6,20 @@ class Comms::AutomationMailer < ApplicationMailer
   def automation_email(run_id)
     run = EmailAutomationRun.find(run_id)
     automation = run.email_automation
+    # A step run sends the step's content and subject; sender identity stays
+    # the automation's.
+    source = run.email_automation_step || automation
 
     unsub = comms_unsubscribe_url(token: run.token)
-    html = Comms::Personalizer.html(automation.compiled_html.to_s, unsubscribe_url: unsub,
-                                                                   pixel_url: comms_open_url(token: run.token))
-    text = Comms::Personalizer.text(automation.compiled_text.to_s, unsubscribe_url: unsub)
+    html = Comms::Personalizer.html(source.compiled_html.to_s, unsubscribe_url: unsub,
+                                                               pixel_url: comms_open_url(token: run.token))
+    text = Comms::Personalizer.text(source.compiled_text.to_s, unsubscribe_url: unsub)
 
     headers["X-Entity-Ref-ID"] = SecureRandom.uuid
     headers["List-Unsubscribe"] = "<#{unsub}>"
     headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
 
-    options = { to: run.email, subject: automation.subject }
+    options = { to: run.email, subject: source.subject.presence || automation.subject }
     if automation.from_name.present?
       options[:from] = email_address_with_name(Comms.from_address, automation.from_name)
     end

@@ -9,6 +9,7 @@ class EmailAutomationRun < ApplicationRecord
   has_secure_token :token, length: 24
 
   belongs_to :email_automation
+  belongs_to :email_automation_step, optional: true
   belongs_to :user, optional: true
 
   normalizes :email, with: ->(e) { Comms.normalize_email(e) }

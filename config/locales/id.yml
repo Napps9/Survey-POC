@@ -1369,6 +1369,7 @@ id:
     welcome_confirm: "Selamat datang di Playverto! Periksa %{email} untuk mengonfirmasi alamat Anda."
   flash:
     comms:
+      step_deleted: "Tindak lanjut dihapus."
       automation_deleted: "Otomatisasi dihapus."
       automation_disabled: "Otomatisasi dinonaktifkan."
       automation_enabled: "Otomatisasi diaktifkan."

@@ -37,7 +37,10 @@ class Comms::SendAutomationRunsJob < ApplicationJob
 
   def deliver(run)
     automation = run.email_automation
-    if automation.nil? || !automation.enabled? || automation.compiled_html.blank?
+    # A step run whose step was deleted, or whose content emptied, skips —
+    # same for a primary whose automation was disabled or emptied.
+    source = run.email_automation_step_id ? run.email_automation_step : automation
+    if automation.nil? || !automation.enabled? || source.nil? || source.compiled_html.blank?
       run.update_columns(status: "skipped", updated_at: Time.current)
       return
     end

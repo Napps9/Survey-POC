@@ -1,19 +1,18 @@
-# An event-triggered email: when a VertoNow-native event fires for a subject
-# (a user, or an org's members), a run is enqueued after delay_minutes,
-# optionally rolled to a send window (send_hour / send_days, interpreted in
-# COMMS_TIME_ZONE). Compiles on save — an enabled automation always sends
-# its latest saved content; the runs ledger's unique idempotency keys are
-# what stop re-sends, not frozen copies.
-class EmailAutomation < ApplicationRecord
-  TRIGGER_TYPES = %w[user_signed_up user_inactive first_verto_published first_response_received].freeze
+# One follow-up in an automation's drip sequence. delay_minutes anchors on
+# the TRIGGER event, not the previous step. Compiles on save like its
+# parent; a step without content simply never books (the enqueue sweep
+# skips uncompiled steps).
+class EmailAutomationStep < ApplicationRecord
+  belongs_to :email_automation
+  has_many :email_automation_runs, dependent: :nullify
 
-  belongs_to :created_by, class_name: "User", optional: true
-  has_many :email_automation_runs, dependent: :delete_all
-  has_many :email_automation_steps, dependent: :destroy
-  has_many_attached :images
+  # A booked-but-unsent run must not survive its step's deletion as a
+  # primary send (the nullify would re-point it at the automation's own
+  # content). Sent runs keep their history, step reference nullified.
+  # prepend: the association's own dependent-nullify callback registered
+  # first and would empty the association before this ran.
+  before_destroy :skip_queued_runs, prepend: true
 
-  validates :name, presence: true
-  validates :trigger_type, inclusion: { in: TRIGGER_TYPES }
   validates :delay_minutes, numericality: { greater_than_or_equal_to: 0 }
   validates :send_hour, numericality: { in: 0..23 }, allow_nil: true
 
@@ -21,7 +20,7 @@ class EmailAutomation < ApplicationRecord
   before_save :sanitize_send_days!
   before_save :compile!
 
-  scope :recent, -> { order(created_at: :desc) }
+  scope :ordered, -> { order(:position, :id) }
 
   def document
     Comms::EmailDocument.coerce(design)
@@ -31,13 +30,16 @@ class EmailAutomation < ApplicationRecord
     Comms::EmailDocument.warnings(document)
   end
 
-  # Enabling is refused until there is something sendable — the switch in
-  # the UI reports the reason.
-  def enableable?
-    subject.present? && compiled_html.present? && warnings.empty?
+  def sendable?
+    subject.present? && compiled_html.present?
   end
 
   private
+
+  def skip_queued_runs
+    email_automation_runs.where(status: "queued")
+                         .update_all(status: "skipped", updated_at: Time.current)
+  end
 
   def sanitize_design!
     self.design = Comms::EmailDocument.sanitize(design) if will_save_change_to_design?

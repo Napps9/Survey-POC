@@ -1368,6 +1368,7 @@ ko:
     welcome_confirm: "Playverto에 오신 것을 환영합니다! %{email}에서 주소를 확인하세요."
   flash:
     comms:
+      step_deleted: "후속 메일이 삭제되었습니다."
       automation_deleted: "자동화가 삭제되었습니다."
       automation_disabled: "자동화가 꺼졌습니다."
       automation_enabled: "자동화가 켜졌습니다."

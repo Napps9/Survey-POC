@@ -1370,6 +1370,7 @@ de:
     welcome_confirm: "Willkommen bei Playverto! Prüfe %{email}, um deine Adresse zu bestätigen."
   flash:
     comms:
+      step_deleted: "Follow-up gelöscht."
       automation_deleted: "Automation gelöscht."
       automation_disabled: "Automation ausgeschaltet."
       automation_enabled: "Automation eingeschaltet."

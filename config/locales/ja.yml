@@ -1368,6 +1368,7 @@ ja:
     welcome_confirm: "Playverto へようこそ！%{email} を確認してアドレスを認証してください。"
   flash:
     comms:
+      step_deleted: "フォローアップを削除しました。"
       automation_deleted: "自動配信を削除しました。"
       automation_disabled: "自動配信をオフにしました。"
       automation_enabled: "自動配信をオンにしました。"

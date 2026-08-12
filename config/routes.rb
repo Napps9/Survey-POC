@@ -201,6 +201,11 @@ Rails.application.routes.draw do
     get    "comms/automations/:id/pexels",       to: "comms/automations#pexels_search", as: :pexels_comms_automation
     post   "comms/automations/:id/toggle",       to: "comms/automations#toggle",       as: :toggle_comms_automation
     post   "comms/automations/:id/test_send",    to: "comms/automations#test_send",    as: :test_send_comms_automation
+    post   "comms/automations/:automation_id/steps",              to: "comms/automation_steps#create",  as: :comms_automation_steps
+    get    "comms/automations/:automation_id/steps/:id/edit",     to: "comms/automation_steps#edit",    as: :edit_comms_automation_step
+    patch  "comms/automations/:automation_id/steps/:id",          to: "comms/automation_steps#update",  as: :comms_automation_step
+    delete "comms/automations/:automation_id/steps/:id",          to: "comms/automation_steps#destroy"
+    get    "comms/automations/:automation_id/steps/:id/preview",  to: "comms/automation_steps#preview", as: :preview_comms_automation_step
   end
 
   # Public Comms endpoints — recipients are not platform users, so these sit

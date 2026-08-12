@@ -1369,6 +1369,7 @@ vi:
     welcome_confirm: "Chào mừng đến Playverto! Kiểm tra %{email} để xác nhận địa chỉ của bạn."
   flash:
     comms:
+      step_deleted: "Đã xóa email tiếp theo."
       automation_deleted: "Đã xóa tự động hóa."
       automation_disabled: "Đã tắt tự động hóa."
       automation_enabled: "Đã bật tự động hóa."

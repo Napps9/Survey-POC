@@ -1370,6 +1370,7 @@ nl:
     welcome_confirm: "Welkom bij Playverto! Check %{email} om je adres te bevestigen."
   flash:
     comms:
+      step_deleted: "Follow-up verwijderd."
       automation_deleted: "Automatisering verwijderd."
       automation_disabled: "Automatisering uitgeschakeld."
       automation_enabled: "Automatisering ingeschakeld."

@@ -231,6 +231,30 @@
           </div>
         </details>
 
+        <details class="publish-block">
+          <summary class="publish-block-title"><%= t("comms.automations.followups", default: "Follow-ups") %> <span class="pub-chev">▾</span></summary>
+          <div class="comms-controls">
+            <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.65);">
+              <%= t("comms.automations.followups_hint", default: "A drip sequence: each follow-up is its own email, delayed from the trigger event. Adding one later never re-sends the earlier steps.") %>
+            </span>
+            <% @automation.email_automation_steps.ordered.each do |step| %>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                <a href="<%= edit_comms_automation_step_path(@automation, step) %>"
+                   style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'ABeeZee',sans-serif;font-size:12px;color:#fff;text-decoration:underline;">
+                  +<%= (step.delay_minutes / 1440.0).round(1) %>d ·
+                  <%= step.subject.presence || t("comms.automations.no_subject", default: "no subject yet") %>
+                </a>
+                <%= button_to "✕", comms_automation_step_path(@automation, step), method: :delete,
+                      form: { data: { turbo_confirm: t("comms.automations.delete_step_confirm", default: "Delete this follow-up?") } },
+                      style: "background:rgba(255,30,111,0.18);color:#FF6EA7;border:none;border-radius:100px;width:24px;height:24px;cursor:pointer;flex-shrink:0;font-size:11px;" %>
+              </div>
+            <% end %>
+            <%= button_to t("comms.automations.add_step", default: "＋ Add follow-up"), comms_automation_steps_path(@automation),
+                  method: :post, form: { data: { turbo: false } },
+                  style: "background:rgba(255,255,255,0.12);color:#fff;font-family:'Alata',sans-serif;font-size:13px;border:1px solid rgba(255,255,255,0.25);border-radius:100px;padding:9px 18px;cursor:pointer;width:100%;" %>
+          </div>
+        </details>
+
         <details class="publish-block" open>
           <summary class="publish-block-title"><%= t("comms.automations.switch", default: "Switch") %> <span class="pub-chev">▾</span></summary>
           <div class="comms-controls">

@@ -1371,6 +1371,7 @@ ru:
     welcome_confirm: "Добро пожаловать в Playverto! Проверьте %{email}, чтобы подтвердить адрес."
   flash:
     comms:
+      step_deleted: "Последующее письмо удалено."
       automation_deleted: "Автоматизация удалена."
       automation_disabled: "Автоматизация выключена."
       automation_enabled: "Автоматизация включена."

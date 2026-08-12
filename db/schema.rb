@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_12_150000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -203,6 +203,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_130000) do
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.integer "email_automation_id", null: false
+    t.integer "email_automation_step_id"
     t.string "error"
     t.string "idempotency_key", null: false
     t.string "name"
@@ -213,10 +214,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_130000) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.index ["email_automation_id"], name: "index_email_automation_runs_on_email_automation_id"
+    t.index ["email_automation_step_id"], name: "index_email_automation_runs_on_email_automation_step_id"
     t.index ["idempotency_key"], name: "index_email_automation_runs_on_idempotency_key", unique: true
     t.index ["status", "scheduled_at"], name: "index_email_automation_runs_on_status_and_scheduled_at"
     t.index ["token"], name: "index_email_automation_runs_on_token", unique: true
     t.check_constraint "status IN ('queued','sending','sent','failed','skipped','suppressed','simulated')", name: "chk_email_automation_runs_status"
+  end
+
+  create_table "email_automation_steps", force: :cascade do |t|
+    t.text "compiled_html"
+    t.text "compiled_text"
+    t.datetime "created_at", null: false
+    t.integer "delay_minutes", default: 1440, null: false
+    t.json "design"
+    t.integer "email_automation_id", null: false
+    t.integer "position", default: 1, null: false
+    t.string "preheader", default: "", null: false
+    t.json "send_days"
+    t.integer "send_hour"
+    t.string "subject", default: "", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_automation_id"], name: "index_email_automation_steps_on_email_automation_id"
+    t.check_constraint "delay_minutes >= 0", name: "chk_email_automation_steps_delay"
+    t.check_constraint "send_hour IS NULL OR (send_hour >= 0 AND send_hour <= 23)", name: "chk_email_automation_steps_hour"
   end
 
   create_table "email_automations", force: :cascade do |t|

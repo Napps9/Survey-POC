@@ -1372,6 +1372,7 @@ uk:
     welcome_confirm: "Вітаємо у Playverto! Перевірте %{email}, щоб підтвердити адресу."
   flash:
     comms:
+      step_deleted: "Наступний лист видалено."
       automation_deleted: "Автоматизацію видалено."
       automation_disabled: "Автоматизацію вимкнено."
       automation_enabled: "Автоматизацію увімкнено."

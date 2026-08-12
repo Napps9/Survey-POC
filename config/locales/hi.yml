@@ -1370,6 +1370,7 @@ hi:
     welcome_confirm: "Playverto में आपका स्वागत है! अपना पता पुष्ट करने के लिए %{email} देखें।"
   flash:
     comms:
+      step_deleted: "फ़ॉलो-अप हटाया गया।"
       automation_deleted: "स्वचालन हटाया गया।"
       automation_disabled: "स्वचालन बंद किया गया।"
       automation_enabled: "स्वचालन चालू किया गया।"

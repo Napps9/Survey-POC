@@ -1391,6 +1391,7 @@ en:
     welcome_confirm: "Welcome to Playverto! Check %{email} to confirm your address."
   flash:
     comms:
+      step_deleted: "Follow-up deleted."
       automation_deleted: "Automation deleted."
       automation_disabled: "Automation turned off."
       automation_enabled: "Automation turned on."
