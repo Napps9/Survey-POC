@@ -7670,6 +7670,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
   padding: 1px 8px; margin-inline-start: 8px; vertical-align: middle;
 }
 .leaderboard-total { font-family: "Alata", sans-serif; font-size: 1.125rem; color: #fff; }
+/* The break between the visible top of the board and your own appended row
+   (aria-hidden "⋯" — decorative, but held to the text floor anyway so it
+   never reads as a smudge). */
+.leaderboard-gap {
+  font-family: "Alata", sans-serif; font-size: 0.875rem; line-height: 0.6;
+  color: rgba(255,255,255,0.7); text-align: center; letter-spacing: 0.3em;
+}
 .leaderboard-self {
   font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: rgba(255,255,255,0.7);
   text-align: center; margin-top: 2px;

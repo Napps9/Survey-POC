@@ -92,7 +92,8 @@ class LeaderboardContrastTest < ActiveSupport::TestCase
       ".leaderboard-name"  => "player name",
       ".leaderboard-total" => "token total",
       ".leaderboard-self"  => "\"you played as\" line",
-      ".leaderboard-note"  => "queued/empty note"
+      ".leaderboard-note"  => "queued/empty note",
+      ".leaderboard-gap"   => "gap marker above your appended row"
     }.each do |selector, label|
       assert_contrast declared(selector, "color"), board_bg, 4.5, label
     end

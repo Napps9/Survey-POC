@@ -2190,16 +2190,20 @@ export default class extends Controller {
       if (!res.ok) throw new Error(`status ${res.status}`)
       const data = await res.json()
       const entries = data.entries || []
-      const rows = entries.map(e => `
-        <div class="leaderboard-row${e.you ? " is-you" : ""}">
-          <span class="leaderboard-rank">${Number(e.rank) || 0}</span>
-          <span class="leaderboard-name">${this._esc(e.name)}${e.you ? `<span class="leaderboard-you-badge">${this._esc(t("player.leaderboard_you"))}</span>` : ""}</span>
-          <span class="leaderboard-total">${Number(e.total) || 0}</span>
-        </div>`).join("")
+      const youListed = entries.some(e => e.you)
+      let rows = entries.map(e => this._leaderboardRow(e.rank, e.name, e.total, e.you)).join("")
+      // Your row is always ON the board, "You" badge beside the anonymous
+      // name. From below the visible top it rides in after a gap marker, so a
+      // mid-table player sees their placement as a row, not just a sentence
+      // about it.
+      if (data.you && !youListed) {
+        rows += `<div class="leaderboard-gap" aria-hidden="true">⋯</div>` +
+                this._leaderboardRow(data.you.rank, data.you.name, data.you.total, true)
+      }
       let self = ""
       if (data.you) {
         self += `<div class="leaderboard-self">${this._esc(t("player.leaderboard_played_as", { name: data.you.name }))}</div>`
-        if (!entries.some(e => e.you)) {
+        if (!youListed) {
           self += `<div class="leaderboard-self">${this._esc(t("player.leaderboard_rank", { rank: data.you.rank, of: data.you.of }))}</div>`
         }
       }
@@ -2208,6 +2212,18 @@ export default class extends Controller {
     } catch (_) {
       el.innerHTML = title + `<div class="leaderboard-note">${this._esc(t("player.compare_error"))}</div>`
     }
+  }
+
+  // One board row. The "You" badge sits directly beside the anonymous name so
+  // a player can find themselves without reading the footnote lines.
+  _leaderboardRow(rank, name, total, you) {
+    const badge = you ? `<span class="leaderboard-you-badge">${this._esc(t("player.leaderboard_you"))}</span>` : ""
+    return `
+      <div class="leaderboard-row${you ? " is-you" : ""}">
+        <span class="leaderboard-rank">${Number(rank) || 0}</span>
+        <span class="leaderboard-name">${this._esc(name)}${badge}</span>
+        <span class="leaderboard-total">${Number(total) || 0}</span>
+      </div>`
   }
 
   // The no-redo landing for a device that already finished: the thank-you
