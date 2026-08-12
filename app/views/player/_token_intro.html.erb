@@ -18,7 +18,10 @@
       </div>
     <% end %>
     <%# The board is announced where the points promise already lands, so
-        respondents know before playing that there's something to climb. %>
+        respondents know before playing that there's something to climb.
+        leaderboard-tease adds no styling of its own — the note's amber is the
+        readable colour on this light pill (brand primary is not; see the
+        comment beside .leaderboard-tease in application.css). %>
     <% if @survey.leaderboard_enabled? %>
       <div class="welcome-intake-tokens-note leaderboard-tease">🏆 <%= t("player.leaderboard_teaser") %></div>
     <% end %>

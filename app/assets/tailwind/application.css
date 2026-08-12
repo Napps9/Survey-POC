@@ -7631,7 +7631,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
   margin: 18px auto 4px; padding: 16px 22px; border-radius: 18px;
   width: min(100%, 340px);
   background: var(--brand-primary-soft, rgba(1,234,203,0.12));
-  border: 1px solid var(--brand-primary, rgba(1,234,203,0.4));
+  /* Border fallbacks here and on .is-you are 0.75 alpha, not the 0.4 the
+     older result cards use: at 0.4 the boundary measures ~2.2:1 against the
+     tinted card, under the 3:1 UI-component floor the contrast test holds
+     these to. A set palette replaces the fallback with the full primary. */
+  border: 1px solid var(--brand-primary, rgba(1,234,203,0.75));
   display: flex; flex-direction: column; align-items: stretch; gap: 8px;
 }
 .leaderboard-title {
@@ -7643,11 +7647,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .leaderboard-row.is-you {
   background: var(--brand-primary-soft, rgba(1,234,203,0.16));
-  border: 1px solid var(--brand-primary, rgba(1,234,203,0.4));
+  border: 1px solid var(--brand-primary, rgba(1,234,203,0.75));
   border-radius: 10px; padding: 4px 8px; margin: 0 -8px;
 }
 .leaderboard-rank {
-  font-family: "Alata", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.55);
+  /* 0.75 alpha, not the dimmer 0.55 the meta text elsewhere uses: at 0.75rem
+     this is the smallest text on the board, and 0.55 white measures ~4.9:1 on
+     the tinted card — passing for the default palette but with no margin once
+     a lighter brand primary raises the tint. 0.75 keeps it visibly secondary
+     at ~7.7:1. */
+  font-family: "Alata", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.75);
   min-width: 1.5em; text-align: end;
 }
 .leaderboard-name {
@@ -7669,9 +7678,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: rgba(255,255,255,0.7);
   text-align: center;
 }
-/* The token-intro teaser line inherits .welcome-intake-tokens-note sizing;
-   only the emphasis differs. */
-.leaderboard-tease { color: var(--brand-primary, #01EACB); }
+/* The token-intro teaser (.leaderboard-tease) deliberately has NO rule here:
+   it inherits .welcome-intake-tokens-note wholesale — amber #B45309 on the
+   near-white pill (4.7:1). It briefly overrode the colour to brand primary,
+   which on that light pill is unreadable for most palettes (the default teal
+   measures 1.45:1); the 🏆 emoji is the differentiation. The class stays in
+   the markup as the stable hook for tests and the contrast audit
+   (test/lib/leaderboard_contrast_test.rb). */
 
 /* Points Checkpoint card body (player) — populated client-side. */
 .token-checkpoint-body { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
