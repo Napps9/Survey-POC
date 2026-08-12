@@ -509,6 +509,7 @@ it:
       compare_summarize_error: 'Impossibile riassumere in questo momento.'
       chat_error: "Spiacenti, qualcosa è andato storto. Riprova."
   nav:
+    comms: "Comms"
     partnerships: "Partner"
     funders: "Finanziatori"
     dashboard: "Dashboard"

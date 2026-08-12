@@ -509,6 +509,7 @@ ru:
       compare_summarize_error: 'Сейчас не удалось обобщить.'
       chat_error: "К сожалению, что-то пошло не так. Попробуйте ещё раз."
   nav:
+    comms: "Comms"
     partnerships: "Партнёры"
     funders: "Спонсоры"
     dashboard: "Панель управления"

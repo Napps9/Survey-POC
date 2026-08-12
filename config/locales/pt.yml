@@ -509,6 +509,7 @@ pt:
       compare_summarize_error: 'Não foi possível resumir agora.'
       chat_error: "Lamentamos, algo correu mal. Tente novamente."
   nav:
+    comms: "Comms"
     partnerships: "Parceiros"
     funders: "Financiadores"
     dashboard: "Painel"

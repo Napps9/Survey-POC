@@ -8,6 +8,7 @@
   active_results   = path == "/"
   active_create    = org && path == new_survey_path
   active_ask       = org && path.start_with?("/ask")
+  active_comms     = path.start_with?("/comms")
   show_funders     = org && (org.funder_enabled? || org.member_funders.exists?)
 %>
 <nav class="bottom-bar" aria-label="Primary">
@@ -48,6 +49,13 @@
         <a href="<%= ask_path %>" class="bottom-bar-chip" data-active="<%= active_ask %>">
           <span class="bottom-bar-chip-dot" style="background:#8B85FF;"></span>
           <%= t("ask.page.title") %>
+        </a>
+      <% end %>
+      <% if CommsAccess.allowed?(Current.user) %>
+        <%# Amber, matching the palette's internal entries. %>
+        <a href="<%= comms_path %>" class="bottom-bar-chip" data-active="<%= active_comms %>">
+          <span class="bottom-bar-chip-dot" style="background:#FFC24B;"></span>
+          <%= t("nav.comms") %>
         </a>
       <% end %>
     <% end %>

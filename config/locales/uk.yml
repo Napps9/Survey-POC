@@ -509,6 +509,7 @@ uk:
       compare_summarize_error: 'Зараз не вдалося узагальнити.'
       chat_error: "Вибачте, щось пішло не так. Спробуйте ще раз."
   nav:
+    comms: "Comms"
     partnerships: "Партнери"
     funders: "Донори"
     dashboard: "Панель керування"

@@ -509,6 +509,7 @@ vi:
       compare_summarize_error: 'Hiện không thể tóm tắt.'
       chat_error: "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại."
   nav:
+    comms: "Comms"
     partnerships: "Đối tác"
     funders: "Nhà tài trợ"
     dashboard: "Bảng điều khiển"

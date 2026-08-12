@@ -509,6 +509,7 @@ ko:
       compare_summarize_error: "지금은 요약할 수 없습니다."
       chat_error: "죄송합니다. 문제가 발생했습니다. 다시 시도해 주세요."
   nav:
+    comms: "Comms"
     partnerships: "파트너"
     funders: "펀더"
     dashboard: "대시보드"

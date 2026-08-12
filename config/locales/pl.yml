@@ -509,6 +509,7 @@ pl:
       compare_summarize_error: 'Nie udało się teraz podsumować.'
       chat_error: "Przepraszamy, coś poszło nie tak. Spróbuj ponownie."
   nav:
+    comms: "Comms"
     partnerships: "Partnerzy"
     funders: "Fundatorzy"
     dashboard: "Panel"

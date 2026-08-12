@@ -509,6 +509,7 @@ es:
       compare_summarize_error: 'No se pudo resumir en este momento.'
       chat_error: "Lo sentimos, algo salió mal. Inténtalo de nuevo."
   nav:
+    comms: "Comms"
     partnerships: "Socios"
     funders: "Financiadores"
     dashboard: "Panel"

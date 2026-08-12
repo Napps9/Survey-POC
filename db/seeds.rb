@@ -28,5 +28,21 @@ else
   puts "Seeded: org=#{org.name}. Set SEED_ADMIN_PASSWORD to also seed an admin user."
 end
 
+# Comms (the email campaign surface, /comms) is gated by membership of the
+# Playverto org — make sure the owner's account is a member wherever seeds
+# run. Create-only and credential-free: a missing user is created
+# password-pending with a throwaway password (the partner/funder account
+# idiom) and claims access through the normal password-reset flow; an
+# existing user only gains the membership.
+owner = User.find_or_create_by!(email_address: "nick@playverto.com") do |u|
+  u.name             = "Nick"
+  u.password         = SecureRandom.hex(32)
+  u.password_pending = true
+end
+
+Membership.find_or_create_by!(user: owner, organisation: org) do |m|
+  m.role = "admin"
+end
+
 # Internal BI: starter Blazer queries for VertoNow staff (idempotent).
 load Rails.root.join("db/seeds/blazer_starter_queries.rb")

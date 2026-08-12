@@ -509,6 +509,7 @@ he:
       compare_summarize_error: 'לא ניתן לסכם כרגע.'
       chat_error: "מצטערים, משהו השתבש. נסו שוב."
   nav:
+    comms: "Comms"
     partnerships: "שותפים"
     funders: "מממנים"
     dashboard: "לוח בקרה"

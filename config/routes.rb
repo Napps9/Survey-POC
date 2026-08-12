@@ -164,6 +164,15 @@ Rails.application.routes.draw do
     patch "ask/review/:id", to: "corpus_reviews#update", as: :corpus_review
   end
 
+  # ── Comms ──────────────────────────────────────────────────────────────────
+  # Email campaigns to the platform's users and imported lists. A Playverto
+  # staff surface (CommsAccess: membership of the Playverto org), gated by a
+  # routing CONSTRAINT exactly like /blazer and /ask/review above and for the
+  # same reason: for anyone else these routes simply don't exist (404).
+  constraints(->(request) { CommsAccess.allowed_request?(request) }) do
+    get "comms", to: "comms/campaigns#index", as: :comms
+  end
+
   # Common Questions — reusable sets attached to many Vertos
   resources :common_question_sets, path: "common-question-sets" do
     collection do

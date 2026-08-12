@@ -509,6 +509,7 @@ de:
       compare_summarize_error: 'Konnte gerade nicht zusammengefasst werden.'
       chat_error: "Entschuldigung, etwas ist schiefgelaufen. Bitte versuchen Sie es noch einmal."
   nav:
+    comms: "Comms"
     partnerships: "Partner"
     funders: "Förderer"
     dashboard: "Dashboard"

@@ -509,6 +509,7 @@ ar:
       compare_summarize_error: 'تعذّر التلخيص الآن.'
       chat_error: "عذرًا، حدث خطأ ما. حاول مرة أخرى."
   nav:
+    comms: "Comms"
     partnerships: "الشركاء"
     funders: "الممولون"
     dashboard: "لوحة التحكم"

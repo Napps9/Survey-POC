@@ -509,6 +509,7 @@ fr:
       compare_summarize_error: 'Impossible de résumer pour le moment.'
       chat_error: "Désolé, une erreur est survenue. Veuillez réessayer."
   nav:
+    comms: "Comms"
     partnerships: "Partenaires"
     funders: "Financeurs"
     dashboard: "Tableau de bord"

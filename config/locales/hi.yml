@@ -509,6 +509,7 @@ hi:
       compare_summarize_error: 'अभी सारांशित नहीं किया जा सका.'
       chat_error: "क्षमा करें, कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।"
   nav:
+    comms: "Comms"
     partnerships: "साझेदार"
     funders: "फंडर्स"
     dashboard: "डैशबोर्ड"

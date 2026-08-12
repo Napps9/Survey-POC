@@ -509,6 +509,7 @@ id:
       compare_summarize_error: 'Tidak dapat meringkas saat ini.'
       chat_error: "Maaf, terjadi kesalahan. Silakan coba lagi."
   nav:
+    comms: "Comms"
     partnerships: "Mitra"
     funders: "Pendana"
     dashboard: "Dasbor"

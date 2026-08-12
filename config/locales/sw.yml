@@ -509,6 +509,7 @@ sw:
       compare_summarize_error: 'Imeshindwa kufupisha kwa sasa.'
       chat_error: "Samahani, hitilafu imetokea. Tafadhali jaribu tena."
   nav:
+    comms: "Comms"
     partnerships: "Washirika"
     funders: "Wafadhili"
     dashboard: "Dashibodi"

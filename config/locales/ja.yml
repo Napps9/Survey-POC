@@ -509,6 +509,7 @@ ja:
       compare_summarize_error: "現在要約できませんでした。"
       chat_error: "申し訳ありません。問題が発生しました。もう一度お試しください。"
   nav:
+    comms: "Comms"
     partnerships: "パートナー"
     funders: "資金提供者"
     dashboard: "ダッシュボード"

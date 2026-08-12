@@ -509,6 +509,7 @@ tr:
       compare_summarize_error: 'Şu anda özetlenemedi.'
       chat_error: "Üzgünüz, bir şeyler ters gitti. Lütfen tekrar deneyin."
   nav:
+    comms: "Comms"
     partnerships: "Ortaklar"
     funders: "Fon Sağlayıcılar"
     dashboard: "Panel"

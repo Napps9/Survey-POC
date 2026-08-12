@@ -1,0 +1,25 @@
+<%# Comms home: the campaign list. Playverto-internal surface, so copy uses
+    the English-default t(..., default:) pattern rather than 19-file keys —
+    only nav.comms lives in the locale files. %>
+<div style="max-width:1040px;margin:0 auto;padding:48px 24px;">
+  <div>
+    <p style="font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#FFC24B;margin:0 0 6px;">
+      <%= t("comms.index.eyebrow", default: "Playverto internal") %>
+    </p>
+    <h1 style="font-family:'Alata',sans-serif;font-size:28px;margin:0;color:#F7F7F7;">
+      <%= t("comms.index.title", default: "Comms") %>
+    </h1>
+    <p style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(247,247,247,0.72);margin:8px 0 0;max-width:56ch;">
+      <%= t("comms.index.subtitle", default: "Email campaigns to Playverto's users and imported lists — composed, scheduled and tracked from here.") %>
+    </p>
+  </div>
+
+  <div style="margin-top:36px;border:1px dashed rgba(255,255,255,0.18);border-radius:16px;padding:48px 24px;text-align:center;background:rgba(20,23,38,0.35);">
+    <p style="font-family:'Alata',sans-serif;font-size:16px;color:#F7F7F7;margin:0;">
+      <%= t("comms.index.empty_title", default: "No campaigns yet") %>
+    </p>
+    <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(247,247,247,0.6);margin:8px 0 0;">
+      <%= t("comms.index.empty_body", default: "The campaign builder is on its way — drafts, scheduled sends and reports will live here.") %>
+    </p>
+  </div>
+</div>

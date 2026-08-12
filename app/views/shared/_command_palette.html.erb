@@ -81,6 +81,20 @@
           </a>
         <% end %>
 
+        <% if CommsAccess.allowed?(user) %>
+          <a href="<%= comms_path %>"
+             class="command-palette-tile"
+             style="--tile-accent:#FFC24B;"
+             data-command-palette-target="item"
+             data-search-text="comms email campaign newsletter send schedule">
+            <svg class="command-palette-tile-icon" viewBox="0 0 15 15" fill="none">
+              <rect x="1.5" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M2 4.2l5.5 4 5.5-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <%= t("nav.comms") %>
+          </a>
+        <% end %>
+
         <%# Staff-only door to the review queue, gated by the same allowlist as
             the routing constraint — everyone else keeps not learning the
             surface exists (routes.rb's 404 rationale). English label like the

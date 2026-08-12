@@ -509,6 +509,7 @@ nl:
       compare_summarize_error: 'Kon nu niet worden samengevat.'
       chat_error: "Sorry, er ging iets mis. Probeer het opnieuw."
   nav:
+    comms: "Comms"
     partnerships: "Partners"
     funders: "Financiers"
     dashboard: "Dashboard"
