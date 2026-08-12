@@ -1365,6 +1365,8 @@ uk:
     accept_terms_html: "Я приймаю %{terms} і %{privacy}."
     welcome_confirm: "Вітаємо у Playverto! Перевірте %{email}, щоб підтвердити адресу."
   flash:
+    comms:
+      campaign_deleted: "Кампанію видалено."
     common_question_sets:
       add_question_failed: "Не вдалося додати запитання — %{reason}"
       classification_failed: "Не вдалося визначити тип цього запитання — спробуйте переформулювати."

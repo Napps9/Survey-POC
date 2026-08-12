@@ -1363,6 +1363,8 @@ tr:
     accept_terms_html: "%{terms} ve %{privacy} şartlarını kabul ediyorum."
     welcome_confirm: "Playverto'ya hoş geldiniz! Adresinizi onaylamak için %{email} adresini kontrol edin."
   flash:
+    comms:
+      campaign_deleted: "Kampanya silindi."
     common_question_sets:
       add_question_failed: "Soru eklenemedi — %{reason}"
       classification_failed: "Bu soruyu sınıflandıramadık — farklı bir ifadeyle deneyin."

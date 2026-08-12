@@ -9080,3 +9080,148 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* The controller also holds the rotation on the first phrase. */
   .ask-hero-eyebrow .rot { transition: none; }
 }
+
+/* ── Comms email builder ─────────────────────────────────────────────────
+   The Verto Editor's chrome applied to an email canvas: one white "paper"
+   of block rows inside the editor-grid shell. Block slots reuse the
+   card-slot grammar (the slot is the reorder unit, the wrap carries state);
+   the rail is a compact per-block hover dock. */
+
+.comms-canvas {
+  min-height: 100%;
+  border-radius: 18px;
+  padding: 40px 16px 64px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.comms-paper {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  padding: 12px 0 0;
+  transition: max-width 0.2s ease;
+}
+.comms-block-slot { position: relative; }
+.comms-block { position: relative; border-radius: 8px; }
+.comms-block-body { padding: 12px 24px; }
+.comms-block:hover { outline: 2px dashed rgba(1, 234, 203, 0.45); outline-offset: -2px; }
+.comms-block.is-selected { outline: 2px solid #FF1E6F; outline-offset: -2px; }
+.comms-block [contenteditable]:focus { outline: none; }
+
+.comms-block-rail {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: -14px;
+  transform: translateY(-50%);
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(17, 20, 34, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 6px;
+  z-index: 5;
+}
+.comms-block:hover .comms-block-rail,
+.comms-block.is-selected .comms-block-rail { display: flex; }
+.comms-rail-btn {
+  width: 26px; height: 26px;
+  border: none; border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #F7F7F7; font-size: 11px; line-height: 1;
+  cursor: pointer;
+}
+.comms-rail-btn:hover { background: rgba(1, 234, 203, 0.25); }
+.comms-rail-del.is-armed {
+  background: #FF1E6F; color: #fff;
+  font-family: "Alata", sans-serif; font-size: 10px;
+  width: auto; padding: 0 6px;
+  animation: comms-arm-pulse 1s ease-in-out infinite;
+}
+@keyframes comms-arm-pulse { 50% { transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .comms-rail-del.is-armed { animation: none; } }
+
+.comms-btn { display: inline-block; padding: 12px 24px; font-size: 16px; font-weight: 600; }
+.comms-div { height: 1px; }
+.comms-spacer {
+  display: flex; align-items: center; justify-content: center;
+  background: repeating-linear-gradient(45deg, rgba(148, 163, 184, 0.08), rgba(148, 163, 184, 0.08) 6px, transparent 6px, transparent 12px);
+  border-radius: 4px;
+}
+.comms-spacer span { font-size: 10px; color: #94A3B8; font-family: "Alata", sans-serif; }
+.comms-img { max-width: 100%; height: auto; cursor: pointer; }
+.comms-img-empty {
+  width: 100%; padding: 36px 12px;
+  border: 2px dashed rgba(148, 163, 184, 0.5); border-radius: 10px;
+  background: rgba(148, 163, 184, 0.08); color: #64748B;
+  font-family: "Alata", sans-serif; font-size: 13px; cursor: pointer;
+}
+.comms-footer-note {
+  border-top: 1px solid #E2E8F0;
+  margin-top: 8px; padding: 14px 24px 18px;
+  font-size: 11px; color: #94A3B8; text-align: center;
+  font-family: "ABeeZee", sans-serif;
+}
+
+.comms-add-row { display: flex; justify-content: center; padding: 10px 0 6px; position: relative; }
+.comms-add-btn { font-size: 12px; }
+.comms-add-menu {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+  background: rgba(17, 20, 34, 0.95); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 12px;
+  padding: 8px; z-index: 20; min-width: 280px;
+}
+.comms-add-menu button {
+  border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 100px;
+  background: rgba(255, 255, 255, 0.06); color: #F7F7F7;
+  font-family: "Alata", sans-serif; font-size: 12px;
+  padding: 6px 12px; cursor: pointer;
+}
+.comms-add-menu button:hover { background: rgba(1, 234, 203, 0.22); }
+
+/* Inspector controls (right panel islands). */
+.comms-controls { display: flex; flex-direction: column; gap: 10px; padding: 12px; }
+.comms-controls label {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  font-family: "Alata", sans-serif; font-size: 12px; color: rgba(255, 255, 255, 0.85);
+}
+.comms-controls input[type="text"], .comms-controls input[type="url"], .comms-controls select {
+  flex: 1; min-width: 0; max-width: 200px;
+  background: #171B2C; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 8px;
+  color: #F7F7F7; font-size: 12px; padding: 6px 8px;
+}
+.comms-controls input[type="color"] { width: 34px; height: 26px; border: none; background: none; padding: 0; cursor: pointer; }
+.comms-controls input[type="range"] { flex: 1; max-width: 200px; accent-color: #01EACB; }
+
+/* The survey toggle's buttons are 30px icon wells; the comms toggle labels
+   them with words. */
+.comms-device-btn { width: auto; padding: 0 10px; font-family: "Alata", sans-serif; font-size: 11px; }
+
+/* Device reframe: the mobile preview narrows the paper into a bezel, the
+   same reframe-don't-scale approach as the survey editor's device classes. */
+.comms-feed.device-mobile .comms-paper {
+  max-width: 400px !important;
+  border: 8px solid #0e1020; border-radius: 34px;
+}
+
+/* Compiled-artifact preview overlay. */
+.comms-preview-overlay {
+  position: fixed; inset: 0; z-index: 80;
+  background: rgba(10, 12, 22, 0.82); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.comms-preview-frame-wrap {
+  width: min(720px, 94vw); height: min(86vh, 900px);
+  background: #fff; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+}
+.comms-preview-frame-wrap iframe { width: 100%; height: 100%; border: 0; }
+.comms-preview-close {
+  position: fixed; top: 18px; inset-inline-end: 20px;
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(17, 20, 34, 0.8); color: #fff; font-size: 15px; cursor: pointer;
+}

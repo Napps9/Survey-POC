@@ -1362,6 +1362,8 @@ he:
     accept_terms_html: "אני מסכים ל%{terms} ול%{privacy}."
     welcome_confirm: "ברוך הבא ל-Playverto! בדוק את %{email} כדי לאשר את הכתובת."
   flash:
+    comms:
+      campaign_deleted: "הקמפיין נמחק."
     common_question_sets:
       add_question_failed: "לא ניתן היה להוסיף את השאלה — %{reason}"
       classification_failed: "לא הצלחנו לסווג את השאלה הזו — נסו לנסח אותה מחדש."

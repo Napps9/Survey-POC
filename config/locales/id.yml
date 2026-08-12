@@ -1362,6 +1362,8 @@ id:
     accept_terms_html: "Saya menyetujui %{terms} dan %{privacy}."
     welcome_confirm: "Selamat datang di Playverto! Periksa %{email} untuk mengonfirmasi alamat Anda."
   flash:
+    comms:
+      campaign_deleted: "Kampanye dihapus."
     common_question_sets:
       add_question_failed: "Tidak dapat menambahkan pertanyaan — %{reason}"
       classification_failed: "Kami tidak dapat mengklasifikasikan pertanyaan itu — coba ubah kalimatnya."

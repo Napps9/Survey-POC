@@ -1363,6 +1363,8 @@ es:
     accept_terms_html: "Acepto los %{terms} y la %{privacy}."
     welcome_confirm: "¡Bienvenido a Playverto! Revisa %{email} para confirmar tu dirección."
   flash:
+    comms:
+      campaign_deleted: "Campaña eliminada."
     surveys:
       editing_locked: "La edición está bloqueada — este Verto está en vivo o ya ha recogido respuestas."
       settings_locked: "Este Verto está en vivo o ya tiene respuestas — los ajustes de consentimiento y puntuación ya no se pueden cambiar."

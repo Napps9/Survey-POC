@@ -1,0 +1,24 @@
+<%# One email block on the canvas. The wrap carries every serializable
+    non-text field as data-block-* (the survey editor's data-card-* grammar);
+    text lives in the contenteditable body. DOM order is document order. %>
+<div class="comms-block-slot" data-comms-editor-target="slot">
+  <div class="comms-block" <%= comms_block_data_attrs(block) %>
+       data-comms-editor-target="block"
+       data-action="click->comms-editor#selectBlock">
+    <div class="comms-block-body">
+      <%= comms_block_body(block, settings, editable: editable) %>
+    </div>
+    <% if editable %>
+      <div class="comms-block-rail" aria-label="Block actions">
+        <button type="button" class="comms-rail-btn" title="Move up"
+                data-action="click->comms-editor#moveUp">▲</button>
+        <button type="button" class="comms-rail-btn" title="Move down"
+                data-action="click->comms-editor#moveDown">▼</button>
+        <button type="button" class="comms-rail-btn" title="Duplicate"
+                data-action="click->comms-editor#duplicateBlock">⧉</button>
+        <button type="button" class="comms-rail-btn comms-rail-del" title="Delete"
+                data-resting-label="✕" data-action="click->comms-editor#deleteBlock">✕</button>
+      </div>
+    <% end %>
+  </div>
+</div>

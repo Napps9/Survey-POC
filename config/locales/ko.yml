@@ -1361,6 +1361,8 @@ ko:
     accept_terms_html: "%{terms} 및 %{privacy}에 동의합니다."
     welcome_confirm: "Playverto에 오신 것을 환영합니다! %{email}에서 주소를 확인하세요."
   flash:
+    comms:
+      campaign_deleted: "캠페인이 삭제되었습니다."
     common_question_sets:
       add_question_failed: "질문을 추가할 수 없습니다 — %{reason}"
       classification_failed: "이 질문을 분류할 수 없었습니다 — 다르게 표현해 보세요."

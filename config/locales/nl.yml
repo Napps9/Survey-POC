@@ -1363,6 +1363,8 @@ nl:
     accept_terms_html: "Ik ga akkoord met de %{terms} en het %{privacy}."
     welcome_confirm: "Welkom bij Playverto! Check %{email} om je adres te bevestigen."
   flash:
+    comms:
+      campaign_deleted: "Campagne verwijderd."
     surveys:
       image_unverified: "We konden die afbeelding niet controleren — probeer het opnieuw."
       editing_locked: "Bewerken is vergrendeld — deze Verto is live of heeft al reacties verzameld."

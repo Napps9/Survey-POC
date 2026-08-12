@@ -1363,6 +1363,8 @@ sw:
     accept_terms_html: "Ninakubali %{terms} na %{privacy}."
     welcome_confirm: "Karibu Playverto! Angalia %{email} ili kuthibitisha anwani yako."
   flash:
+    comms:
+      campaign_deleted: "Kampeni imefutwa."
     common_question_sets:
       add_question_failed: "Imeshindikana kuongeza swali — %{reason}"
       classification_failed: "Hatukuweza kuainisha swali hilo — jaribu kulieleza kwa maneno mengine."

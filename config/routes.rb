@@ -170,7 +170,15 @@ Rails.application.routes.draw do
   # routing CONSTRAINT exactly like /blazer and /ask/review above and for the
   # same reason: for anyone else these routes simply don't exist (404).
   constraints(->(request) { CommsAccess.allowed_request?(request) }) do
-    get "comms", to: "comms/campaigns#index", as: :comms
+    get    "comms",                              to: "comms/campaigns#index",          as: :comms
+    post   "comms/campaigns",                    to: "comms/campaigns#create",         as: :comms_campaigns
+    get    "comms/campaigns/:id/edit",           to: "comms/campaigns#edit",           as: :edit_comms_campaign
+    patch  "comms/campaigns/:id",                to: "comms/campaigns#update",         as: :comms_campaign
+    delete "comms/campaigns/:id",                to: "comms/campaigns#destroy"
+    get    "comms/campaigns/:id/preview",        to: "comms/campaigns#preview",        as: :preview_comms_campaign
+    post   "comms/campaigns/:id/image",          to: "comms/campaigns#image",          as: :image_comms_campaign
+    post   "comms/campaigns/:id/moderate_image", to: "comms/campaigns#moderate_image", as: :moderate_image_comms_campaign
+    get    "comms/campaigns/:id/pexels",         to: "comms/campaigns#pexels_search",  as: :pexels_comms_campaign
   end
 
   # Common Questions — reusable sets attached to many Vertos

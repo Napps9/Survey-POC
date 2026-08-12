@@ -1362,6 +1362,8 @@ ar:
     accept_terms_html: "أوافق على %{terms} و%{privacy}."
     welcome_confirm: "مرحباً بك في Playverto! تحقق من %{email} لتأكيد عنوانك."
   flash:
+    comms:
+      campaign_deleted: "تم حذف الحملة."
     common_question_sets:
       add_question_failed: "تعذّرت إضافة السؤال — %{reason}"
       classification_failed: "تعذّر علينا تصنيف هذا السؤال — جرّب إعادة صياغته."

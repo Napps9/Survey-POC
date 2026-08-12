@@ -32,3 +32,12 @@ export const SIZE_LABELS = {
 export function hasFormatting(el) {
   return !!el && !!el.querySelector(ALLOWED_TAGS.filter((t) => t !== "br").join(","))
 }
+
+// The Comms email profile additionally allows anchors
+// (RichTextSanitizer::EMAIL_ALLOWED_TAGS is the authority).
+export const EMAIL_EXTRA_TAGS = [ "a" ]
+
+export function hasEmailFormatting(el) {
+  const tags = ALLOWED_TAGS.filter((t) => t !== "br").concat(EMAIL_EXTRA_TAGS)
+  return !!el && !!el.querySelector(tags.join(","))
+}

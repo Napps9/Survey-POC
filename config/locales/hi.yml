@@ -1363,6 +1363,8 @@ hi:
     accept_terms_html: "मैं %{terms} और %{privacy} से सहमत हूँ।"
     welcome_confirm: "Playverto में आपका स्वागत है! अपना पता पुष्ट करने के लिए %{email} देखें।"
   flash:
+    comms:
+      campaign_deleted: "अभियान हटाया गया।"
     common_question_sets:
       add_question_failed: "प्रश्न नहीं जोड़ा जा सका — %{reason}"
       classification_failed: "हम उस प्रश्न को वर्गीकृत नहीं कर सके — इसे दूसरे शब्दों में लिखकर देखें।"

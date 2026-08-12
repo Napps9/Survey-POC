@@ -1362,6 +1362,8 @@ vi:
     accept_terms_html: "Tôi đồng ý với %{terms} và %{privacy}."
     welcome_confirm: "Chào mừng đến Playverto! Kiểm tra %{email} để xác nhận địa chỉ của bạn."
   flash:
+    comms:
+      campaign_deleted: "Đã xóa chiến dịch."
     common_question_sets:
       add_question_failed: "Không thêm được câu hỏi — %{reason}"
       classification_failed: "Chúng tôi không thể phân loại câu hỏi đó — hãy thử diễn đạt lại."

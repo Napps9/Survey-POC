@@ -13,7 +13,7 @@ import { FONT_LABELS, SIZE_LABELS, FONT_CLASSES, SIZE_CLASSES } from "lib/rich_t
 // fine — the server sanitiser and the textContent-canonical plain layer are
 // the safety net.
 export default class extends Controller {
-  static targets = ["toolbar", "fontSelect", "sizeSelect", "boldBtn", "italicBtn", "underlineBtn"]
+  static targets = ["toolbar", "fontSelect", "sizeSelect", "boldBtn", "italicBtn", "underlineBtn", "linkBtn"]
 
   connect() {
     this._buildSelects()
@@ -79,6 +79,7 @@ export default class extends Controller {
     this.boldBtnTarget.classList.toggle("is-active", !!within("b,strong"))
     this.italicBtnTarget.classList.toggle("is-active", !!within("i,em"))
     this.underlineBtnTarget.classList.toggle("is-active", !!within("u"))
+    if (this.hasLinkBtnTarget) this.linkBtnTarget.classList.toggle("is-active", !!within("a"))
     const fontSpan = FONT_CLASSES.map(c => within(`span.${c}`)).find(Boolean)
     this.fontSelectTarget.value = fontSpan ? FONT_CLASSES.find(c => fontSpan.classList.contains(c)) : ""
     const sizeSpan = SIZE_CLASSES.map(c => within(`span.${c}`)).find(Boolean)
@@ -90,6 +91,29 @@ export default class extends Controller {
   bold(event) { event.preventDefault(); this._toggleTag("b", "b,strong") }
   italic(event) { event.preventDefault(); this._toggleTag("i", "i,em") }
   underline(event) { event.preventDefault(); this._toggleTag("u", "u") }
+
+  // Email-only (the button renders on the Comms toolbar alone): wrap the
+  // selection in an anchor, or unlink when it's already inside one. Scheme
+  // allowlist mirrors RichTextSanitizer::EMAIL_HREF_SCHEMES — anything else
+  // would be stripped server-side anyway.
+  link(event) {
+    event.preventDefault()
+    const range = this._liveRange()
+    if (!range) return
+    const region = this._regionEl
+    if (this._rangeFullyWithin(range, region, "a")) {
+      this._intersecting(region, "a", range).forEach(el => this._unwrap(el))
+    } else {
+      const url = window.prompt("Link URL (https://… or mailto:…)", "https://")
+      if (!url) return
+      const trimmed = url.trim()
+      if (!/^(https?:|mailto:)/i.test(trimmed)) return
+      const a = document.createElement("a")
+      a.setAttribute("href", trimmed)
+      this._wrapRange(range, a)
+    }
+    this._finish(region)
+  }
 
   fontChanged() { this._setClass(FONT_CLASSES, this.fontSelectTarget.value) }
   sizeChanged() { this._setClass(SIZE_CLASSES, this.sizeSelectTarget.value) }

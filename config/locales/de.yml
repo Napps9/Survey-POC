@@ -1363,6 +1363,8 @@ de:
     accept_terms_html: "Ich stimme den %{terms} und der %{privacy} zu."
     welcome_confirm: "Willkommen bei Playverto! Prüfe %{email}, um deine Adresse zu bestätigen."
   flash:
+    comms:
+      campaign_deleted: "Kampagne gelöscht."
     surveys:
       image_unverified: "Wir konnten dieses Bild nicht prüfen — bitte versuche es erneut."
       editing_locked: "Bearbeiten ist gesperrt — dieses Verto ist live oder hat bereits Antworten gesammelt."

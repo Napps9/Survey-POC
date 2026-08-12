@@ -75,6 +75,29 @@ export default class extends Controller {
     document.addEventListener("keydown", this._escListener)
   }
 
+  // Opens the same modal for a Comms email image block. Photos only, no
+  // Lottie, no per-card recommendations. Applying dispatches
+  // media-picker:commsImage — comms_editor_controller owns the selected
+  // block and paints it, so this controller stays survey-markup-free here.
+  openComms(event) {
+    event?.preventDefault()
+    event?.stopPropagation()
+    this._mode = "comms"
+    this._activeCard = null
+    this._pendingUrl = null
+    this._pendingVideo = null
+    this._setApplyEnabled(false)
+    this._switchTabKey("upload")
+    this._setMedia("photos")
+    this._showMediaToggle(false)
+    this._showLottieSection(false)
+    this.clearBtnTarget.hidden = true
+    this._renderRecommended([], "")
+    this._seedSearch()
+    this.backdropTarget.hidden = false
+    document.addEventListener("keydown", this._escListener)
+  }
+
   // Opens the same modal but targets the Verto's backdrop instead of a card.
   openBackground(event) {
     event?.preventDefault()
@@ -488,6 +511,18 @@ export default class extends Controller {
       // Consent gate is photos only (the video toggle is hidden here).
       if (this._pendingUrl) {
         this.dispatch("consentImage", { detail: {
+          url: this._pendingUrl,
+          credit: this._pendingCredit || "",
+          creditUrl: this._pendingCreditUrl || ""
+        } })
+        this.close()
+      }
+      return
+    }
+    if (this._mode === "comms") {
+      // Email image blocks are photos only (the video toggle is hidden here).
+      if (this._pendingUrl) {
+        this.dispatch("commsImage", { detail: {
           url: this._pendingUrl,
           credit: this._pendingCredit || "",
           creditUrl: this._pendingCreditUrl || ""

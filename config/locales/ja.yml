@@ -1361,6 +1361,8 @@ ja:
     accept_terms_html: "%{terms}と%{privacy}に同意します。"
     welcome_confirm: "Playverto へようこそ！%{email} を確認してアドレスを認証してください。"
   flash:
+    comms:
+      campaign_deleted: "キャンペーンを削除しました。"
     common_question_sets:
       add_question_failed: "質問を追加できませんでした — %{reason}"
       classification_failed: "その質問を分類できませんでした — 表現を変えてお試しください。"

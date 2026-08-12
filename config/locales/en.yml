@@ -1384,6 +1384,8 @@ en:
     accept_terms_html: "I agree to the %{terms} and the %{privacy}."
     welcome_confirm: "Welcome to Playverto! Check %{email} to confirm your address."
   flash:
+    comms:
+      campaign_deleted: "Campaign deleted."
     common_question_sets:
       add_question_failed: "Couldn't add the question — %{reason}"
       classification_failed: "We couldn't classify that question — try rephrasing."
