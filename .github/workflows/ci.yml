@@ -150,6 +150,36 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+  # Deploys are triggered from HERE, the moment every check above is green,
+  # by POSTing the service's Render Deploy Hook. Render's own checksPass
+  # trigger stays on as the fallback — it has been observed lagging a green
+  # commit by a full hour (2026-08-12, 89802a7: checks green 11:43, auto
+  # deploy 12:43), which is what forced manual deploys. With the
+  # RENDER_DEPLOY_HOOK_URL secret unset this job is a no-op and the fallback
+  # carries the deploy exactly as before.
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ test, test_postgres, system_test, scan_ruby, scan_js, lint, build_image ]
+    if: github.ref == 'refs/heads/Main' && github.event_name == 'push'
+
+    steps:
+      - name: Trigger the Render deploy
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        # The URL embeds a key — it must never be echoed, so curl talks to it
+        # silently and only the outcome is printed.
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL is not set — leaving this deploy to Render's checksPass trigger."
+            exit 0
+          fi
+          if curl -fsS -X POST "$HOOK" -o /dev/null; then
+            echo "Render deploy triggered."
+          else
+            echo "Deploy hook POST failed — Render's checksPass trigger remains the fallback." >&2
+            exit 1
+          fi
+
   build_image:
     runs-on: ubuntu-latest
 
