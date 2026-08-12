@@ -87,7 +87,7 @@
              data-setting-button-radius="<%= settings["buttonRadius"] %>"
              style="background:<%= settings["contentBackgroundColor"] %>;max-width:<%= settings["contentWidth"] %>px;font-family:<%= settings["fontFamily"] %>;">
           <% doc["blocks"].each do |block| %>
-            <%= render "block_row", block: block, settings: settings, editable: editable %>
+            <%= render "comms/shared/block_row", block: block, settings: settings, editable: editable %>
           <% end %>
           <% if editable %>
             <div class="comms-add-row" data-comms-editor-target="addRow">
@@ -216,114 +216,9 @@
         <% end %>
       </div>
     <% end %>
-    <div class="type-panel panel-paper panel--types" data-comms-editor-target="blockView" <%= "hidden" unless editable %>>
-      <div class="type-panel-top">
-        <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.75);">
-          <%= t("comms.editor.block_eyebrow", default: "Selected block") %>
-        </div>
-        <div data-comms-editor-target="panelTitle"
-             style="font-family:'Alata',sans-serif;font-size:18px;color:#fff;">—</div>
-      </div>
-      <div class="type-panel-empty" data-comms-editor-target="panelEmpty">
-        ↖ <%= t("comms.editor.select_hint", default: "Select a block on the canvas to edit it") %>
-      </div>
+    <%= render "comms/shared/block_panel", editable: editable %>
 
-      <%# Generic inspector: one section per block type; inputs carry
-          data-field and write straight back to the selected block. %>
-      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="heading" hidden>
-        <label>Level
-          <select data-field="level" data-action="change->comms-editor#applyField">
-            <option value="1">H1</option><option value="2">H2</option><option value="3">H3</option>
-          </select>
-        </label>
-        <label>Align
-          <select data-field="align" data-action="change->comms-editor#applyField">
-            <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
-          </select>
-        </label>
-        <label>Color <input type="color" data-field="color" data-action="input->comms-editor#applyField"></label>
-      </div>
-
-      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="text" hidden>
-        <label>Align
-          <select data-field="align" data-action="change->comms-editor#applyField">
-            <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
-          </select>
-        </label>
-        <label>Color <input type="color" data-field="color" data-action="input->comms-editor#applyField"></label>
-      </div>
-
-      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="button" hidden>
-        <label>Link URL <input type="url" data-field="href" placeholder="https://…"
-               data-action="input->comms-editor#applyField"></label>
-        <label>Align
-          <select data-field="align" data-action="change->comms-editor#applyField">
-            <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
-          </select>
-        </label>
-        <label>Background <input type="color" data-field="backgroundColor" data-action="input->comms-editor#applyField"></label>
-        <label>Text color <input type="color" data-field="textColor" data-action="input->comms-editor#applyField"></label>
-        <label>Corners <input type="range" min="0" max="24" data-field="radius" data-action="input->comms-editor#applyField"></label>
-      </div>
-
-      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="image" hidden>
-        <button type="button" class="media-btn-ghost" style="width:100%;margin-bottom:10px;"
-                data-action="click->media-picker#openComms"><%= t("comms.editor.change_image", default: "Choose image…") %></button>
-        <label>Alt text <input type="text" data-field="alt" data-action="input->comms-editor#applyField"></label>
-        <label>Link URL <input type="url" data-field="href" placeholder="https://…"
-               data-action="input->comms-editor#applyField"></label>
-        <label>Width <input type="range" min="10" max="100" data-field="widthPct" data-action="input->comms-editor#applyField"></label>
-        <label>Align
-          <select data-field="align" data-action="change->comms-editor#applyField">
-            <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="divider" hidden>
-        <label>Color <input type="color" data-field="color" data-action="input->comms-editor#applyField"></label>
-      </div>
-
-      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="spacer" hidden>
-        <label>Height <input type="range" min="4" max="160" data-field="height" data-action="input->comms-editor#applyField"></label>
-      </div>
-    </div>
-
-    <%# Design takeover: document-wide settings, brand-palette-controller
-        grammar (live apply, saved by the same autosave PATCH). %>
-    <div class="type-panel panel-paper panel--why" data-comms-editor-target="designView" hidden>
-      <div class="type-panel-top">
-        <button type="button" class="publish-panel-back" data-action="click->comms-editor#closeDesign">←
-          <%= t("comms.editor.back_to_block", default: "Block") %></button>
-        <div style="font-family:'Alata',sans-serif;font-size:18px;color:#fff;"><%= t("comms.editor.design", default: "Design") %></div>
-      </div>
-      <div class="panel-island comms-controls">
-        <label>Page background <input type="color" data-setting="backgroundColor" data-action="input->comms-editor#applySetting"></label>
-        <label>Card background <input type="color" data-setting="contentBackgroundColor" data-action="input->comms-editor#applySetting"></label>
-        <label>Link color <input type="color" data-setting="linkColor" data-action="input->comms-editor#applySetting"></label>
-        <label>Content width <input type="range" min="320" max="800" step="10" data-setting="contentWidth" data-action="input->comms-editor#applySetting"></label>
-        <label>Font
-          <select data-setting="fontFamily" data-action="change->comms-editor#applySetting">
-            <option value="<%= Comms::EmailDocument::SYSTEM_FONT_STACK %>">System (safest)</option>
-            <% Survey::BRAND_FONTS.each do |token, font| %>
-              <option value="<%= font[:stack] %>"><%= font[:label] %></option>
-            <% end %>
-          </select>
-        </label>
-        <label>Heading weight
-          <select data-setting="headingWeight" data-action="change->comms-editor#applySetting">
-            <option value="400">Regular</option><option value="600">Semibold</option>
-            <option value="700">Bold</option><option value="800">Heavy</option>
-          </select>
-        </label>
-        <label>Heading style
-          <select data-setting="headingTransform" data-action="change->comms-editor#applySetting">
-            <option value="none">Normal</option><option value="uppercase">UPPERCASE</option>
-          </select>
-        </label>
-        <label>Heading letter spacing <input type="range" min="-2" max="6" data-setting="headingLetterSpacing" data-action="input->comms-editor#applySetting"></label>
-      </div>
-    </div>
+    <%= render "comms/shared/design_panel" %>
 
     <%# Audience takeover: who this campaign goes to. Its own controller —
         it PATCHes the audience slice itself (brand-palette shape) and keeps
@@ -519,58 +414,5 @@
     <% end %>
   </div>
 
-<% if editable %>
-<%# Block templates for client-side insertion — the same partial the server
-    renders, so added blocks are byte-identical to loaded ones. %>
-<% brand = @playverto_brand %>
-<% Comms::EmailDocument::TYPES.each do |type| %>
-  <template data-comms-template="<%= type %>">
-    <%= render "block_row", block: Comms::EmailDocument.create_block(type, brand: brand),
-                            settings: settings, editable: true %>
-  </template>
-<% end %>
-
-<%# Floating rich-text toolbar — the survey editor's, plus Link (email only). %>
-<div class="rich-text-toolbar" data-rich-text-target="toolbar" hidden>
-  <button type="button" data-rich-text-target="boldBtn"
-          data-action="click->rich-text#bold" title="<%= t("js.editor.rich_bold") %>"><b>B</b></button>
-  <button type="button" data-rich-text-target="italicBtn"
-          data-action="click->rich-text#italic" title="<%= t("js.editor.rich_italic") %>"><i>I</i></button>
-  <button type="button" data-rich-text-target="underlineBtn"
-          data-action="click->rich-text#underline" title="<%= t("js.editor.rich_underline") %>"><u>U</u></button>
-  <button type="button" data-rich-text-target="linkBtn"
-          data-action="click->rich-text#link" title="<%= t("comms.editor.rich_link", default: "Link") %>">🔗</button>
-  <select data-rich-text-target="fontSelect" data-action="change->rich-text#fontChanged"
-          aria-label="<%= t("js.editor.rich_font") %>"></select>
-  <select data-rich-text-target="sizeSelect" data-action="change->rich-text#sizeChanged"
-          aria-label="<%= t("js.editor.rich_size") %>"></select>
-</div>
-
-<%# Emoji popover (subject field) — the survey editor's markup verbatim. %>
-<div class="emoji-picker-popover" data-emoji-picker-target="popover" hidden
-     role="dialog" aria-label="<%= t("editor.emoji_pick", default: "Choose an emoji") %>">
-  <div class="emoji-picker-head">
-    <input type="search" class="emoji-picker-search"
-           data-emoji-picker-target="search"
-           data-action="input->emoji-picker#onSearch"
-           placeholder="<%= t("editor.emoji_search", default: "Search emoji…") %>"
-           aria-label="<%= t("editor.emoji_search", default: "Search emoji…") %>" />
-    <button type="button" class="emoji-picker-clear"
-            data-action="click->emoji-picker#clear"><%= t("editor.emoji_clear", default: "Clear") %></button>
-  </div>
-  <div class="emoji-picker-tabs" data-emoji-picker-target="tabs"></div>
-  <div class="emoji-picker-grid" data-emoji-picker-target="grid"></div>
-</div>
-<% end %>
-
-<%# Compiled-artifact preview: the sandboxed iframe shows the real table-based
-    email HTML, not the canvas — proving the compile. %>
-<div class="comms-preview-overlay" data-comms-editor-target="previewOverlay" hidden>
-  <div class="comms-preview-frame-wrap">
-    <iframe data-comms-editor-target="previewFrame" sandbox="" title="Email preview"></iframe>
-  </div>
-  <button type="button" class="comms-preview-close" data-action="click->comms-editor#closePreview" aria-label="Close">✕</button>
-</div>
-
-<%= render "surveys/media_modal" if editable %>
+<%= render "comms/shared/builder_tail", editable: editable, brand: @playverto_brand, settings: settings %>
 </div>

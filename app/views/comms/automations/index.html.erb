@@ -1,61 +1,57 @@
-<%# Comms home: the campaign list. Playverto-internal surface, so copy uses
-    the English-default t(..., default:) pattern rather than 19-file keys —
-    only nav.comms and flash.comms.* live in the locale files. %>
+<%# Automations: event-triggered emails. Internal surface, English-default copy. %>
 <%
-  status_tones = { "draft" => "#94A3B8", "scheduled" => "#FFC24B", "sending" => "#0CA7FF",
-                   "sent" => "#01EACB", "failed" => "#FF1E6F", "cancelled" => "#94A3B8" }
+  trigger_labels = {
+    "user_signed_up" => "New user verified", "user_inactive" => "User went quiet",
+    "first_verto_published" => "Org published its first Verto",
+    "first_response_received" => "Org got its first response"
+  }
 %>
 <div style="max-width:1040px;margin:0 auto;padding:48px 24px;">
-  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
     <div>
       <p style="font-family:'Alata',sans-serif;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#FFC24B;margin:0 0 6px;">
         <%= t("comms.index.eyebrow", default: "Playverto internal") %>
       </p>
       <h1 style="font-family:'Alata',sans-serif;font-size:28px;margin:0;color:#F7F7F7;">
-        <%= t("comms.index.title", default: "Comms") %>
+        <%= t("comms.automations.title", default: "Automations") %>
       </h1>
       <p style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(247,247,247,0.72);margin:8px 0 0;max-width:56ch;">
-        <%= t("comms.index.subtitle", default: "Email campaigns to Playverto's users and imported lists — composed, scheduled and tracked from here.") %>
+        <%= t("comms.automations.subtitle", default: "Event-triggered emails: a platform event fires, the booked message follows after its delay — once per subject per event.") %>
       </p>
     </div>
     <div style="display:flex;align-items:center;gap:14px;">
-      <%= link_to t("comms.automations.title", default: "Automations"), comms_automations_path,
+      <%= link_to "← " + t("comms.editor.back", default: "Comms"), comms_path,
             style: "font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;text-decoration:none;" %>
-      <%= link_to t("comms.lists.title", default: "Contact lists"), comms_lists_path,
-            style: "font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;text-decoration:none;" %>
-      <%= button_to t("comms.index.new_campaign", default: "＋ New campaign"), comms_campaigns_path,
+      <%= button_to t("comms.automations.new", default: "＋ New automation"), comms_automations_path,
             method: :post, form: { data: { turbo: false } },
             style: "background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:14px;border:none;border-radius:100px;padding:10px 22px;cursor:pointer;" %>
     </div>
   </div>
 
-  <% if flash[:notice] %>
+  <% if flash[:notice] || flash[:alert] %>
     <div style="margin-top:20px;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.4);border-radius:12px;padding:12px 16px;font-family:'ABeeZee',sans-serif;font-size:13px;color:#F7F7F7;">
-      <%= flash[:notice] %>
+      <%= flash[:notice] || flash[:alert] %>
     </div>
   <% end %>
 
-  <% if @campaigns.any? %>
+  <% if @automations.any? %>
     <div style="margin-top:32px;display:flex;flex-direction:column;gap:12px;">
-      <% @campaigns.each do |campaign| %>
-        <a href="<%= edit_comms_campaign_path(campaign) %>"
+      <% @automations.each do |automation| %>
+        <a href="<%= edit_comms_automation_path(automation) %>"
            style="display:flex;align-items:center;justify-content:space-between;gap:16px;background:rgba(20,23,38,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 20px;text-decoration:none;">
           <div style="min-width:0;">
             <div style="font-family:'Alata',sans-serif;font-size:16px;color:#F7F7F7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-              <%= campaign.title %>
+              <%= automation.name %>
             </div>
             <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(247,247,247,0.55);margin-top:4px;">
-              <%= campaign.subject.presence || t("comms.index.no_subject", default: "No subject yet") %>
-              <% if campaign.scheduled? && campaign.scheduled_for.present? %>
-                · <%= t("comms.index.scheduled_for", default: "scheduled") %> <%= l campaign.scheduled_for, format: :short %> UTC
-              <% else %>
-                · <%= t("comms.index.updated", default: "updated") %> <%= l campaign.updated_at, format: :short %>
-              <% end %>
+              <%= trigger_labels.fetch(automation.trigger_type, automation.trigger_type) %>
+              · <%= t("comms.automations.after", default: "after") %> <%= automation.delay_minutes %> min
+              · <%= automation.email_automation_runs.where(status: %w[sent simulated]).count %> <%= t("comms.automations.sent_count", default: "sent") %>
             </div>
           </div>
           <span style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;font-family:'Alata',sans-serif;font-size:12px;color:#F7F7F7;background:rgba(255,255,255,0.06);border-radius:100px;padding:6px 12px;">
-            <span style="width:8px;height:8px;border-radius:50%;background:<%= status_tones.fetch(campaign.status, "#94A3B8") %>;"></span>
-            <%= campaign.status.capitalize %>
+            <span style="width:8px;height:8px;border-radius:50%;background:<%= automation.enabled? ? "#01EACB" : "#94A3B8" %>;"></span>
+            <%= automation.enabled? ? t("comms.automations.on", default: "On") : t("comms.automations.off", default: "Off") %>
           </span>
         </a>
       <% end %>
@@ -63,10 +59,10 @@
   <% else %>
     <div style="margin-top:36px;border:1px dashed rgba(255,255,255,0.18);border-radius:16px;padding:48px 24px;text-align:center;background:rgba(20,23,38,0.35);">
       <p style="font-family:'Alata',sans-serif;font-size:16px;color:#F7F7F7;margin:0;">
-        <%= t("comms.index.empty_title", default: "No campaigns yet") %>
+        <%= t("comms.automations.empty_title", default: "No automations yet") %>
       </p>
       <p style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(247,247,247,0.6);margin:8px 0 0;">
-        <%= t("comms.index.empty_body", default: "Create your first campaign — it opens straight into the builder.") %>
+        <%= t("comms.automations.empty_body", default: "Create one — a welcome note when a user verifies, a nudge when someone goes quiet.") %>
       </p>
     </div>
   <% end %>

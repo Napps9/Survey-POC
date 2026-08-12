@@ -1371,6 +1371,9 @@ ru:
     welcome_confirm: "Добро пожаловать в Playverto! Проверьте %{email}, чтобы подтвердить адрес."
   flash:
     comms:
+      automation_deleted: "Автоматизация удалена."
+      automation_disabled: "Автоматизация выключена."
+      automation_enabled: "Автоматизация включена."
       schedule_cancelled: "Расписание отменено — снова черновик."
       schedule_set: "Отправка запланирована."
       send_cancelled: "Отправка отменена."

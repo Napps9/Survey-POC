@@ -1,0 +1,75 @@
+<%# The generic block inspector: one section per block type; inputs carry
+    data-field and write straight back to the selected block via
+    comms-editor#applyField. Shared by the campaign and automation builders. %>
+    <div class="type-panel panel-paper panel--types" data-comms-editor-target="blockView" <%= "hidden" unless editable %>>
+      <div class="type-panel-top">
+        <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.75);">
+          <%= t("comms.editor.block_eyebrow", default: "Selected block") %>
+        </div>
+        <div data-comms-editor-target="panelTitle"
+             style="font-family:'Alata',sans-serif;font-size:18px;color:#fff;">—</div>
+      </div>
+      <div class="type-panel-empty" data-comms-editor-target="panelEmpty">
+        ↖ <%= t("comms.editor.select_hint", default: "Select a block on the canvas to edit it") %>
+      </div>
+
+      <%# Generic inspector: one section per block type; inputs carry
+          data-field and write straight back to the selected block. %>
+      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="heading" hidden>
+        <label>Level
+          <select data-field="level" data-action="change->comms-editor#applyField">
+            <option value="1">H1</option><option value="2">H2</option><option value="3">H3</option>
+          </select>
+        </label>
+        <label>Align
+          <select data-field="align" data-action="change->comms-editor#applyField">
+            <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
+          </select>
+        </label>
+        <label>Color <input type="color" data-field="color" data-action="input->comms-editor#applyField"></label>
+      </div>
+
+      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="text" hidden>
+        <label>Align
+          <select data-field="align" data-action="change->comms-editor#applyField">
+            <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
+          </select>
+        </label>
+        <label>Color <input type="color" data-field="color" data-action="input->comms-editor#applyField"></label>
+      </div>
+
+      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="button" hidden>
+        <label>Link URL <input type="url" data-field="href" placeholder="https://…"
+               data-action="input->comms-editor#applyField"></label>
+        <label>Align
+          <select data-field="align" data-action="change->comms-editor#applyField">
+            <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
+          </select>
+        </label>
+        <label>Background <input type="color" data-field="backgroundColor" data-action="input->comms-editor#applyField"></label>
+        <label>Text color <input type="color" data-field="textColor" data-action="input->comms-editor#applyField"></label>
+        <label>Corners <input type="range" min="0" max="24" data-field="radius" data-action="input->comms-editor#applyField"></label>
+      </div>
+
+      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="image" hidden>
+        <button type="button" class="media-btn-ghost" style="width:100%;margin-bottom:10px;"
+                data-action="click->media-picker#openComms"><%= t("comms.editor.change_image", default: "Choose image…") %></button>
+        <label>Alt text <input type="text" data-field="alt" data-action="input->comms-editor#applyField"></label>
+        <label>Link URL <input type="url" data-field="href" placeholder="https://…"
+               data-action="input->comms-editor#applyField"></label>
+        <label>Width <input type="range" min="10" max="100" data-field="widthPct" data-action="input->comms-editor#applyField"></label>
+        <label>Align
+          <select data-field="align" data-action="change->comms-editor#applyField">
+            <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="divider" hidden>
+        <label>Color <input type="color" data-field="color" data-action="input->comms-editor#applyField"></label>
+      </div>
+
+      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="spacer" hidden>
+        <label>Height <input type="range" min="4" max="160" data-field="height" data-action="input->comms-editor#applyField"></label>
+      </div>
+    </div>

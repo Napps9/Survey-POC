@@ -1368,6 +1368,9 @@ ja:
     welcome_confirm: "Playverto へようこそ！%{email} を確認してアドレスを認証してください。"
   flash:
     comms:
+      automation_deleted: "自動配信を削除しました。"
+      automation_disabled: "自動配信をオフにしました。"
+      automation_enabled: "自動配信をオンにしました。"
       schedule_cancelled: "予約をキャンセルしました — 下書きに戻ります。"
       schedule_set: "送信を予約しました。"
       send_cancelled: "送信をキャンセルしました。"

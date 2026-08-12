@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_12_130000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -199,6 +199,51 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_110000) do
     t.index ["corpus_question_id"], name: "index_corpus_quotes_on_corpus_question_id"
   end
 
+  create_table "email_automation_runs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.integer "email_automation_id", null: false
+    t.string "error"
+    t.string "idempotency_key", null: false
+    t.string "name"
+    t.datetime "scheduled_at"
+    t.datetime "sent_at"
+    t.string "status", default: "queued", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["email_automation_id"], name: "index_email_automation_runs_on_email_automation_id"
+    t.index ["idempotency_key"], name: "index_email_automation_runs_on_idempotency_key", unique: true
+    t.index ["status", "scheduled_at"], name: "index_email_automation_runs_on_status_and_scheduled_at"
+    t.index ["token"], name: "index_email_automation_runs_on_token", unique: true
+    t.check_constraint "status IN ('queued','sending','sent','failed','skipped','suppressed','simulated')", name: "chk_email_automation_runs_status"
+  end
+
+  create_table "email_automations", force: :cascade do |t|
+    t.text "compiled_html"
+    t.text "compiled_text"
+    t.json "conditions"
+    t.datetime "created_at", null: false
+    t.integer "created_by_id"
+    t.integer "delay_minutes", default: 0, null: false
+    t.json "design"
+    t.boolean "enabled", default: false, null: false
+    t.string "from_name"
+    t.string "name", default: "Untitled automation", null: false
+    t.json "params"
+    t.string "preheader", default: "", null: false
+    t.string "reply_to"
+    t.json "send_days"
+    t.integer "send_hour"
+    t.string "subject", default: "", null: false
+    t.string "trigger_type", default: "user_signed_up", null: false
+    t.datetime "updated_at", null: false
+    t.index ["enabled"], name: "index_email_automations_on_enabled"
+    t.check_constraint "delay_minutes >= 0", name: "chk_email_automations_delay"
+    t.check_constraint "send_hour IS NULL OR (send_hour >= 0 AND send_hour <= 23)", name: "chk_email_automations_hour"
+    t.check_constraint "trigger_type IN ('user_signed_up','user_inactive','first_verto_published','first_response_received')", name: "chk_email_automations_trigger"
+  end
+
   create_table "email_campaign_links", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "email_campaign_id", null: false
@@ -261,12 +306,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_110000) do
   end
 
   create_table "email_events", force: :cascade do |t|
+    t.integer "email_automation_run_id"
     t.integer "email_campaign_id"
     t.integer "email_campaign_recipient_id"
     t.string "kind", null: false
     t.json "meta"
     t.datetime "occurred_at", null: false
     t.text "url"
+    t.index ["email_automation_run_id"], name: "index_email_events_on_email_automation_run_id"
     t.index ["email_campaign_id", "kind"], name: "index_email_events_on_email_campaign_id_and_kind"
     t.index ["occurred_at"], name: "index_email_events_on_occurred_at"
     t.check_constraint "kind IN ('queued','sent','delivered','open','click','bounce','complaint','unsubscribe','failed','simulated','skipped')", name: "chk_email_events_kind"

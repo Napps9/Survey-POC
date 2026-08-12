@@ -190,6 +190,17 @@ Rails.application.routes.draw do
     post   "comms/lists",                        to: "comms/lists#create"
     get    "comms/lists/:id",                    to: "comms/lists#show",               as: :comms_list
     delete "comms/lists/:id",                    to: "comms/lists#destroy"
+    get    "comms/automations",                  to: "comms/automations#index",        as: :comms_automations
+    post   "comms/automations",                  to: "comms/automations#create"
+    get    "comms/automations/:id/edit",         to: "comms/automations#edit",         as: :edit_comms_automation
+    patch  "comms/automations/:id",              to: "comms/automations#update",       as: :comms_automation
+    delete "comms/automations/:id",              to: "comms/automations#destroy"
+    get    "comms/automations/:id/preview",      to: "comms/automations#preview",      as: :preview_comms_automation
+    post   "comms/automations/:id/image",        to: "comms/automations#image",        as: :image_comms_automation
+    post   "comms/automations/:id/moderate_image", to: "comms/automations#moderate_image", as: :moderate_image_comms_automation
+    get    "comms/automations/:id/pexels",       to: "comms/automations#pexels_search", as: :pexels_comms_automation
+    post   "comms/automations/:id/toggle",       to: "comms/automations#toggle",       as: :toggle_comms_automation
+    post   "comms/automations/:id/test_send",    to: "comms/automations#test_send",    as: :test_send_comms_automation
   end
 
   # Public Comms endpoints — recipients are not platform users, so these sit

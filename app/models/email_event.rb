@@ -5,14 +5,16 @@ class EmailEvent < ApplicationRecord
 
   belongs_to :email_campaign, optional: true
   belongs_to :email_campaign_recipient, optional: true
+  belongs_to :email_automation_run, optional: true
 
   validates :kind, inclusion: { in: KINDS }
 
-  def self.log!(kind, recipient: nil, campaign: nil, url: nil, meta: nil)
+  def self.log!(kind, recipient: nil, campaign: nil, automation_run: nil, url: nil, meta: nil)
     create!(
       kind: kind,
       email_campaign_recipient: recipient,
       email_campaign: campaign || recipient&.email_campaign,
+      email_automation_run: automation_run,
       url: url, meta: meta, occurred_at: Time.current
     )
   end

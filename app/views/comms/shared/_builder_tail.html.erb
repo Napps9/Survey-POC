@@ -1,0 +1,57 @@
+<%# Everything the builder floats over the page: block templates for
+    client-side insertion, the rich-text toolbar (with the email-only Link
+    button), the emoji popover, the compiled-preview overlay and the media
+    modal. Locals: editable, brand, settings. Shared by both builders. %>
+<% if editable %>
+<%# Block templates for client-side insertion — the same partial the server
+    renders, so added blocks are byte-identical to loaded ones. %>
+<% Comms::EmailDocument::TYPES.each do |type| %>
+  <template data-comms-template="<%= type %>">
+    <%= render "comms/shared/block_row", block: Comms::EmailDocument.create_block(type, brand: brand),
+                            settings: settings, editable: true %>
+  </template>
+<% end %>
+
+<%# Floating rich-text toolbar — the survey editor's, plus Link (email only). %>
+<div class="rich-text-toolbar" data-rich-text-target="toolbar" hidden>
+  <button type="button" data-rich-text-target="boldBtn"
+          data-action="click->rich-text#bold" title="<%= t("js.editor.rich_bold") %>"><b>B</b></button>
+  <button type="button" data-rich-text-target="italicBtn"
+          data-action="click->rich-text#italic" title="<%= t("js.editor.rich_italic") %>"><i>I</i></button>
+  <button type="button" data-rich-text-target="underlineBtn"
+          data-action="click->rich-text#underline" title="<%= t("js.editor.rich_underline") %>"><u>U</u></button>
+  <button type="button" data-rich-text-target="linkBtn"
+          data-action="click->rich-text#link" title="<%= t("comms.editor.rich_link", default: "Link") %>">🔗</button>
+  <select data-rich-text-target="fontSelect" data-action="change->rich-text#fontChanged"
+          aria-label="<%= t("js.editor.rich_font") %>"></select>
+  <select data-rich-text-target="sizeSelect" data-action="change->rich-text#sizeChanged"
+          aria-label="<%= t("js.editor.rich_size") %>"></select>
+</div>
+
+<%# Emoji popover (subject field) — the survey editor's markup verbatim. %>
+<div class="emoji-picker-popover" data-emoji-picker-target="popover" hidden
+     role="dialog" aria-label="<%= t("editor.emoji_pick", default: "Choose an emoji") %>">
+  <div class="emoji-picker-head">
+    <input type="search" class="emoji-picker-search"
+           data-emoji-picker-target="search"
+           data-action="input->emoji-picker#onSearch"
+           placeholder="<%= t("editor.emoji_search", default: "Search emoji…") %>"
+           aria-label="<%= t("editor.emoji_search", default: "Search emoji…") %>" />
+    <button type="button" class="emoji-picker-clear"
+            data-action="click->emoji-picker#clear"><%= t("editor.emoji_clear", default: "Clear") %></button>
+  </div>
+  <div class="emoji-picker-tabs" data-emoji-picker-target="tabs"></div>
+  <div class="emoji-picker-grid" data-emoji-picker-target="grid"></div>
+</div>
+<% end %>
+
+<%# Compiled-artifact preview: the sandboxed iframe shows the real table-based
+    email HTML, not the canvas — proving the compile. %>
+<div class="comms-preview-overlay" data-comms-editor-target="previewOverlay" hidden>
+  <div class="comms-preview-frame-wrap">
+    <iframe data-comms-editor-target="previewFrame" sandbox="" title="Email preview"></iframe>
+  </div>
+  <button type="button" class="comms-preview-close" data-action="click->comms-editor#closePreview" aria-label="Close">✕</button>
+</div>
+
+<%= render "surveys/media_modal" if editable %>

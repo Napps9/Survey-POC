@@ -1,0 +1,36 @@
+    <%# Design takeover: document-wide settings, brand-palette-controller
+        grammar (live apply, saved by the same autosave PATCH). %>
+    <div class="type-panel panel-paper panel--why" data-comms-editor-target="designView" hidden>
+      <div class="type-panel-top">
+        <button type="button" class="publish-panel-back" data-action="click->comms-editor#closeDesign">←
+          <%= t("comms.editor.back_to_block", default: "Block") %></button>
+        <div style="font-family:'Alata',sans-serif;font-size:18px;color:#fff;"><%= t("comms.editor.design", default: "Design") %></div>
+      </div>
+      <div class="panel-island comms-controls">
+        <label>Page background <input type="color" data-setting="backgroundColor" data-action="input->comms-editor#applySetting"></label>
+        <label>Card background <input type="color" data-setting="contentBackgroundColor" data-action="input->comms-editor#applySetting"></label>
+        <label>Link color <input type="color" data-setting="linkColor" data-action="input->comms-editor#applySetting"></label>
+        <label>Content width <input type="range" min="320" max="800" step="10" data-setting="contentWidth" data-action="input->comms-editor#applySetting"></label>
+        <label>Font
+          <select data-setting="fontFamily" data-action="change->comms-editor#applySetting">
+            <option value="<%= Comms::EmailDocument::SYSTEM_FONT_STACK %>">System (safest)</option>
+            <% Survey::BRAND_FONTS.each do |token, font| %>
+              <option value="<%= font[:stack] %>"><%= font[:label] %></option>
+            <% end %>
+          </select>
+        </label>
+        <label>Heading weight
+          <select data-setting="headingWeight" data-action="change->comms-editor#applySetting">
+            <option value="400">Regular</option><option value="600">Semibold</option>
+            <option value="700">Bold</option><option value="800">Heavy</option>
+          </select>
+        </label>
+        <label>Heading style
+          <select data-setting="headingTransform" data-action="change->comms-editor#applySetting">
+            <option value="none">Normal</option><option value="uppercase">UPPERCASE</option>
+          </select>
+        </label>
+        <label>Heading letter spacing <input type="range" min="-2" max="6" data-setting="headingLetterSpacing" data-action="input->comms-editor#applySetting"></label>
+      </div>
+    </div>
+

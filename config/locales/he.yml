@@ -1369,6 +1369,9 @@ he:
     welcome_confirm: "ברוך הבא ל-Playverto! בדוק את %{email} כדי לאשר את הכתובת."
   flash:
     comms:
+      automation_deleted: "האוטומציה נמחקה."
+      automation_disabled: "האוטומציה כובתה."
+      automation_enabled: "האוטומציה הופעלה."
       schedule_cancelled: "התזמון בוטל — חזרה לטיוטה."
       schedule_set: "השליחה תוזמנה."
       send_cancelled: "השליחה בוטלה."

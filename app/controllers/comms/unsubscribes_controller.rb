@@ -10,21 +10,36 @@ class Comms::UnsubscribesController < ApplicationController
   protect_from_forgery with: :null_session, only: [ :create ]
 
   def show
-    @recipient = EmailCampaignRecipient.find_by!(token: params[:token])
+    @recipient = find_recipientish!
   end
 
   def create
-    recipient = EmailCampaignRecipient.find_by!(token: params[:token])
+    recipient = find_recipientish!
 
-    already = recipient.unsubscribed_at.present?
-    unless already
-      recipient.update_columns(unsubscribed_at: Time.current)
-      EmailSuppression.record!(recipient.email, reason: "unsubscribe",
-                               user_id: recipient.user_id,
-                               source_campaign_id: recipient.email_campaign_id)
-      EmailEvent.log!("unsubscribe", recipient: recipient)
+    if recipient.is_a?(EmailCampaignRecipient)
+      unless recipient.unsubscribed_at.present?
+        recipient.update_columns(unsubscribed_at: Time.current)
+        EmailSuppression.record!(recipient.email, reason: "unsubscribe",
+                                 user_id: recipient.user_id,
+                                 source_campaign_id: recipient.email_campaign_id)
+        EmailEvent.log!("unsubscribe", recipient: recipient)
+      end
+    else
+      unless EmailSuppression.exists?(email: recipient.email)
+        EmailSuppression.record!(recipient.email, reason: "unsubscribe", user_id: recipient.user_id)
+        EmailEvent.log!("unsubscribe", automation_run: recipient)
+      end
     end
 
     render :done
+  end
+
+  private
+
+  # Campaign recipients and automation runs share the token contract (and
+  # the #email/#token the pages need); either kind of mail lands here.
+  def find_recipientish!
+    EmailCampaignRecipient.find_by(token: params[:token]) ||
+      EmailAutomationRun.find_by!(token: params[:token])
   end
 end

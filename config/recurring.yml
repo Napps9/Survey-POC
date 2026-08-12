@@ -39,3 +39,10 @@ production:
   comms_sweep:
     class: Comms::SweepJob
     schedule: every 5 minutes
+
+  # Books automation runs for newly-eligible subjects. Safe to re-run any
+  # number of times: the runs ledger's UNIQUE idempotency key absorbs every
+  # duplicate booking attempt.
+  comms_enqueue_automations:
+    class: Comms::EnqueueAutomationRunsJob
+    schedule: every hour at minute 7

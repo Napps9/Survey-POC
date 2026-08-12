@@ -1,0 +1,259 @@
+<%# The automation builder: the same canvas and grammar as the campaign
+    builder (shared partials), with a Trigger takeover instead of
+    Audience/Send — an automation's "audience" is its trigger. %>
+<%
+  doc      = @automation.document
+  settings = doc["settings"]
+  editable = true
+  trigger_labels = {
+    "user_signed_up" => t("comms.automations.trigger_signed_up", default: "New user verified their email"),
+    "user_inactive" => t("comms.automations.trigger_inactive", default: "User went quiet for N days"),
+    "first_verto_published" => t("comms.automations.trigger_published", default: "Org published its first Verto"),
+    "first_response_received" => t("comms.automations.trigger_response", default: "Org received its first response")
+  }
+%>
+<div class="editor-grid" data-editor-panel-target="grid"
+     data-controller="comms-editor editor-panel device-frame media-picker rich-text emoji-picker"
+     data-comms-editor-url-value="<%= comms_automation_path(@automation) %>"
+     data-comms-editor-preview-url-value="<%= preview_comms_automation_path(@automation) %>"
+     data-comms-editor-locked-value="false"
+     data-media-picker-moderate-url-value="<%= moderate_image_comms_automation_path(@automation) %>"
+     data-media-picker-card-image-url-value="<%= image_comms_automation_path(@automation) %>"
+     data-media-picker-pexsearch-url-value="<%= pexels_comms_automation_path(@automation) %>"
+     data-media-picker-library-url-value="<%= current_membership&.admin? ? organisation_assets_path(current_organisation, format: :json) : "" %>"
+     data-action="rich-text:changed->comms-editor#markDirty
+                  media-picker:commsImage->comms-editor#applyImage
+                  input->comms-editor#markDirty">
+
+  <div class="editor-backdrop"></div>
+
+  <% if flash[:notice] || flash[:alert] %>
+    <div class="comms-flash <%= "comms-flash--alert" if flash[:alert] %>">
+      <%= flash[:notice] || flash[:alert] %>
+    </div>
+  <% end %>
+
+  <%# ── LEFT: the canvas column ─────────────────────────────────────────── %>
+  <div class="flex-1 min-h-0 relative flex flex-col">
+
+    <div class="editor-float-bar">
+      <div class="editor-float-group">
+        <%= link_to comms_automations_path, class: "editor-leave-btn" do %>
+          <svg class="editor-leave-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="editor-leave-label"><%= t("comms.automations.title", default: "Automations") %></span>
+        <% end %>
+        <span class="editor-verto-title" contenteditable="true"
+              data-comms-editor-target="title"
+              data-action="input->comms-editor#renameCampaign:stop keydown.enter->comms-editor#commitRename blur->comms-editor#restoreRenameIfBlank"
+              spellcheck="false"><%= @automation.name %></span>
+        <span class="editor-save-pill"><span data-comms-editor-target="status" class="text-xs text-smoke/60">Saved</span></span>
+        <button type="button" class="editor-undo-btn" disabled
+                data-comms-editor-target="undoBtn"
+                data-action="click->comms-editor#undo"
+                aria-keyshortcuts="Control+Z Meta+Z">
+          <span class="editor-undo-label">Undo</span>
+        </button>
+        <span class="editor-save-pill" style="<%= @automation.enabled? ? "border-color:rgba(1,234,203,0.5);" : "" %>">
+          <span class="text-xs <%= @automation.enabled? ? "text-aquamarine" : "text-smoke/60" %>">
+            <%= @automation.enabled? ? t("comms.automations.on", default: "On") : t("comms.automations.off", default: "Off") %>
+          </span>
+        </span>
+      </div>
+
+      <div class="editor-float-group editor-float-pinned" style="display:flex;gap:8px;align-items:center;">
+        <div class="device-toggle" role="group" aria-label="Preview device">
+          <button type="button" class="device-toggle-btn comms-device-btn is-active" data-device="desktop"
+                  data-device-frame-target="btn" data-action="click->device-frame#set" aria-pressed="true">Desktop</button>
+          <button type="button" class="device-toggle-btn comms-device-btn" data-device="mobile"
+                  data-device-frame-target="btn" data-action="click->device-frame#set" aria-pressed="false">Mobile</button>
+        </div>
+        <button type="button" class="editor-leave-btn" data-action="click->comms-editor#openPreview">
+          <span class="editor-leave-label">▶ <%= t("comms.editor.preview", default: "Preview email") %></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-feed comms-feed device-desktop" data-device-frame-target="feed"
+         style="flex:1;min-height:0;overflow-y:auto;padding:76px 16px 96px;">
+      <div class="comms-canvas" data-comms-editor-target="canvas"
+           style="background:<%= settings["backgroundColor"] %>;">
+        <div class="comms-paper" data-comms-editor-target="paper"
+             data-setting-background-color="<%= settings["backgroundColor"] %>"
+             data-setting-content-background-color="<%= settings["contentBackgroundColor"] %>"
+             data-setting-text-color="<%= settings["textColor"] %>"
+             data-setting-link-color="<%= settings["linkColor"] %>"
+             data-setting-font-family="<%= settings["fontFamily"] %>"
+             data-setting-content-width="<%= settings["contentWidth"] %>"
+             data-setting-heading-weight="<%= settings["headingWeight"] %>"
+             data-setting-heading-transform="<%= settings["headingTransform"] %>"
+             data-setting-heading-letter-spacing="<%= settings["headingLetterSpacing"] %>"
+             data-setting-button-radius="<%= settings["buttonRadius"] %>"
+             style="background:<%= settings["contentBackgroundColor"] %>;max-width:<%= settings["contentWidth"] %>px;font-family:<%= settings["fontFamily"] %>;">
+          <% doc["blocks"].each do |block| %>
+            <%= render "comms/shared/block_row", block: block, settings: settings, editable: true %>
+          <% end %>
+          <div class="comms-add-row" data-comms-editor-target="addRow">
+            <button type="button" class="aq-trigger-btn comms-add-btn"
+                    data-action="click->comms-editor#toggleAddMenu">＋ <%= t("comms.editor.add_block", default: "Add block") %></button>
+            <div class="comms-add-menu" data-comms-editor-target="addMenu" hidden>
+              <% Comms::EmailDocument::TYPES.each do |type| %>
+                <button type="button" data-action="click->comms-editor#addBlock"
+                        data-type="<%= type %>"><%= type.capitalize %></button>
+              <% end %>
+            </div>
+          </div>
+          <div class="comms-footer-note">
+            <%= t("comms.editor.footer_note", default: "Footer with the unsubscribe link is added automatically — use Preview to see the real email.") %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-float-bar editor-float-bottom">
+      <div class="editor-float-group">
+        <button type="button" class="editor-leave-btn" data-action="click->comms-editor#openDesign">
+          <span class="editor-leave-label">🎨 <%= t("comms.editor.design", default: "Design") %></span>
+        </button>
+        <button type="button" class="editor-leave-btn" data-action="click->comms-editor#openAudience">
+          <span class="editor-leave-label">⚡ <%= t("comms.automations.trigger", default: "Trigger") %></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <%# ── RIGHT: block inspector + design + trigger takeover ──────────────── %>
+  <div class="right-column">
+    <%= render "comms/shared/block_panel", editable: true %>
+
+    <%= render "comms/shared/design_panel" %>
+
+    <%# The Trigger takeover reuses the audienceView slot in comms-editor:
+        an automation's audience IS its trigger. %>
+    <div class="type-panel panel-paper panel--tokens" data-comms-editor-target="audienceView" hidden
+         data-controller="comms-trigger comms-send"
+         data-comms-trigger-url-value="<%= comms_automation_path(@automation) %>"
+         data-comms-send-url-value="<%= comms_automation_path(@automation) %>">
+      <div class="type-panel-top">
+        <button type="button" class="publish-panel-back" data-action="click->comms-editor#closeAudience">←
+          <%= t("comms.editor.back_to_block", default: "Block") %></button>
+        <div style="font-family:'Alata',sans-serif;font-size:18px;color:#1C2034;"><%= t("comms.automations.trigger", default: "Trigger") %></div>
+      </div>
+
+      <div class="publish-panel-body" style="overflow-y:auto;">
+        <details class="publish-block" open>
+          <summary class="publish-block-title"><%= t("comms.automations.event", default: "Event") %> <span class="pub-chev">▾</span></summary>
+          <div class="comms-controls">
+            <label style="flex-direction:column;align-items:stretch;gap:4px;">
+              <span><%= t("comms.automations.when", default: "When") %></span>
+              <select data-comms-trigger-target="triggerType" data-action="change->comms-trigger#changed" style="max-width:none;">
+                <% trigger_labels.each do |value, label| %>
+                  <option value="<%= value %>" <%= "selected" if @automation.trigger_type == value %>><%= label %></option>
+                <% end %>
+              </select>
+            </label>
+            <div data-comms-trigger-target="section" data-trigger-section="user_inactive"
+                 <%= "hidden" unless @automation.trigger_type == "user_inactive" %>>
+              <label><%= t("comms.automations.quiet_days", default: "Quiet for (days)") %>
+                <input type="number" min="1" max="365" data-comms-trigger-target="inactiveDays"
+                       data-action="input->comms-trigger#changed"
+                       value="<%= (@automation.params.is_a?(Hash) && @automation.params["inactive_days"]) || 30 %>"></label>
+            </div>
+            <label><%= t("comms.automations.delay", default: "Send after (minutes)") %>
+              <input type="number" min="0" max="129600" data-comms-trigger-target="delay"
+                     data-action="input->comms-trigger#changed" value="<%= @automation.delay_minutes %>"></label>
+            <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.55);">
+              <%= t("comms.automations.once_note", default: "Each subject is booked once per event — the ledger's idempotency key, not luck.") %>
+            </span>
+          </div>
+        </details>
+
+        <details class="publish-block">
+          <summary class="publish-block-title"><%= t("comms.automations.conditions", default: "Only for") %> <span class="pub-chev">▾</span></summary>
+          <div class="comms-controls">
+            <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.65);">
+              <%= t("comms.automations.conditions_hint", default: "Leave empty to fire for everyone, or restrict to these organisations:") %>
+            </span>
+            <% picked = Array(@automation.conditions.is_a?(Hash) ? @automation.conditions["organisation_ids"] : nil).map(&:to_i) %>
+            <select multiple size="6" data-comms-trigger-target="orgSelect"
+                    data-action="change->comms-trigger#changed" style="width:100%;max-width:none;">
+              <% @organisations.each do |org| %>
+                <option value="<%= org.id %>" <%= "selected" if picked.include?(org.id) %>><%= org.name %></option>
+              <% end %>
+            </select>
+          </div>
+        </details>
+
+        <details class="publish-block">
+          <summary class="publish-block-title"><%= t("comms.automations.window", default: "Send window") %> <span class="pub-chev">▾</span></summary>
+          <div class="comms-controls">
+            <label><%= t("comms.automations.at_hour", default: "At hour (UTC)") %>
+              <select data-comms-trigger-target="sendHour" data-action="change->comms-trigger#changed">
+                <option value=""><%= t("comms.automations.any_time", default: "As due") %></option>
+                <% 24.times do |h| %>
+                  <option value="<%= h %>" <%= "selected" if @automation.send_hour == h %>><%= format("%02d:00", h) %></option>
+                <% end %>
+              </select>
+            </label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <% days = Array(@automation.send_days).map(&:to_i) %>
+              <% %w[Mon Tue Wed Thu Fri Sat Sun].each_with_index do |label, i| %>
+                <label style="justify-content:flex-start;gap:4px;font-size:11px;">
+                  <input type="checkbox" value="<%= i + 1 %>" <%= "checked" if days.include?(i + 1) %>
+                         data-comms-trigger-target="sendDay" data-action="change->comms-trigger#changed"
+                         style="accent-color:#01EACB;"><%= label %>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        </details>
+
+        <details class="publish-block" open>
+          <summary class="publish-block-title"><%= t("comms.editor.message", default: "Message") %> <span class="pub-chev">▾</span></summary>
+          <div class="comms-controls">
+            <label style="flex-direction:column;align-items:stretch;gap:4px;">
+              <span><%= t("comms.editor.subject", default: "Subject") %>
+                <button type="button" data-emoji-picker-trigger data-action="click->emoji-picker#open"
+                        style="background:none;border:none;cursor:pointer;font-size:14px;">😊</button>
+              </span>
+              <input type="text" data-comms-send-target="subject" data-action="input->comms-send#changed"
+                     value="<%= @automation.subject %>" style="max-width:none;">
+            </label>
+            <label style="flex-direction:column;align-items:stretch;gap:4px;">
+              <span><%= t("comms.editor.from_name", default: "From name") %></span>
+              <input type="text" data-comms-send-target="fromName" data-action="input->comms-send#changed"
+                     value="<%= @automation.from_name %>" placeholder="Playverto" style="max-width:none;">
+            </label>
+            <%= button_to t("comms.editor.test_send_cta", default: "Send test email"), test_send_comms_automation_path(@automation),
+                  method: :post, form: { data: { turbo: false } },
+                  style: "background:rgba(255,255,255,0.12);color:#fff;font-family:'Alata',sans-serif;font-size:13px;border:1px solid rgba(255,255,255,0.25);border-radius:100px;padding:9px 18px;cursor:pointer;width:100%;" %>
+          </div>
+        </details>
+
+        <details class="publish-block" open>
+          <summary class="publish-block-title"><%= t("comms.automations.switch", default: "Switch") %> <span class="pub-chev">▾</span></summary>
+          <div class="comms-controls">
+            <%= button_to @automation.enabled? ? t("comms.automations.turn_off", default: "Turn off") : t("comms.automations.turn_on", default: "Turn on"),
+                  toggle_comms_automation_path(@automation),
+                  method: :post, form: { data: { turbo: false } },
+                  style: "background:#{@automation.enabled? ? "rgba(255,30,111,0.18)" : "#01EACB"};color:#{@automation.enabled? ? "#FF6EA7" : "#1C2034"};font-family:'Alata',sans-serif;font-size:14px;border:none;border-radius:100px;padding:11px 18px;cursor:pointer;width:100%;" %>
+            <% if @recent_runs.any? %>
+              <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:0.08em;text-transform:uppercase;">
+                <%= t("comms.automations.recent_runs", default: "Recent runs") %>
+              </span>
+              <% @recent_runs.each do |run| %>
+                <div style="display:flex;justify-content:space-between;gap:10px;font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.75);">
+                  <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= run.email %></span>
+                  <span style="flex-shrink:0;"><%= run.status %></span>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+<%= render "comms/shared/builder_tail", editable: true, brand: @playverto_brand, settings: settings %>
+</div>

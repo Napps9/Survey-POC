@@ -11,10 +11,17 @@ class Comms::TrackingController < ApplicationController
 
   def open
     recipient = EmailCampaignRecipient.find_by(token: params[:token])
-    return head :not_found unless recipient
+    run = recipient ? nil : EmailAutomationRun.find_by(token: params[:token])
+    return head :not_found unless recipient || run
 
-    recipient.record_open!
-    EmailEvent.log!("open", recipient: recipient)
+    if recipient
+      recipient.record_open!
+      EmailEvent.log!("open", recipient: recipient)
+    else
+      # Automation opens are ledger facts only — the run row carries no
+      # engagement counters in v1.
+      EmailEvent.log!("open", automation_run: run)
+    end
 
     response.headers["Cache-Control"] = "no-store"
     send_data PIXEL, type: "image/gif", disposition: "inline"

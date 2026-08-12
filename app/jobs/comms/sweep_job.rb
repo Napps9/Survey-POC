@@ -19,6 +19,15 @@ class Comms::SweepJob < ApplicationJob
       Comms::StartCampaignSendJob.perform_later(campaign.id)
     end
 
+    # Automation runs: reap stuck claims (at-most-once — never resend), then
+    # re-poke the drain if due work is sitting idle.
+    EmailAutomationRun.where(status: "sending").where(updated_at: ..STALE_AFTER.ago)
+                      .update_all(status: "failed", error: "lost to a restart mid-send",
+                                  updated_at: Time.current)
+    if EmailAutomationRun.where(status: "queued").where(scheduled_at: ..STALE_AFTER.ago).exists?
+      Comms::SendAutomationRunsJob.perform_later
+    end
+
     EmailCampaign.where(status: "sending").where(updated_at: ..STALE_AFTER.ago).find_each do |campaign|
       campaign.email_campaign_recipients
               .where(status: "sending").where(updated_at: ..STALE_AFTER.ago)

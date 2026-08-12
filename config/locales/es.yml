@@ -1370,6 +1370,9 @@ es:
     welcome_confirm: "¡Bienvenido a Playverto! Revisa %{email} para confirmar tu dirección."
   flash:
     comms:
+      automation_deleted: "Automatización eliminada."
+      automation_disabled: "Automatización desactivada."
+      automation_enabled: "Automatización activada."
       schedule_cancelled: "Programación cancelada — vuelve a borrador."
       schedule_set: "Envío programado."
       send_cancelled: "Envío cancelado."

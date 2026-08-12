@@ -1370,6 +1370,9 @@ sw:
     welcome_confirm: "Karibu Playverto! Angalia %{email} ili kuthibitisha anwani yako."
   flash:
     comms:
+      automation_deleted: "Otomatiki imefutwa."
+      automation_disabled: "Otomatiki imezimwa."
+      automation_enabled: "Otomatiki imewashwa."
       schedule_cancelled: "Ratiba imeghairiwa — imerudi kuwa rasimu."
       schedule_set: "Utumaji umepangwa."
       send_cancelled: "Utumaji umeghairiwa."
