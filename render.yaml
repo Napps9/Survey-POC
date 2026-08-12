@@ -11,9 +11,14 @@ services:
     plan: starter
     region: oregon
     branch: Main
-    # Deploy automatically only once the commit's CI checks (tests, RuboCop,
-    # Brakeman, importmap audit) are green on GitHub.
-    autoDeployTrigger: checksPass
+    # Deploys are triggered by CI's `deploy` job POSTing this service's Deploy
+    # Hook the moment every check is green (see .github/workflows/ci.yml), so
+    # a green commit deploys within a minute of its checks finishing. Render's
+    # own checksPass trigger is off: it was observed starting a deploy a full
+    # hour after the checks passed (2026-08-12, 89802a7), and with both on
+    # every commit would deploy twice. Restore `checksPass` here if the hook
+    # path ever needs to be retired.
+    autoDeployTrigger: off
     healthCheckPath: /up
     # Runs once against a fresh instance before it's swapped into rotation -
     # not on every boot like bin/docker-entrypoint's own db:prepare still
