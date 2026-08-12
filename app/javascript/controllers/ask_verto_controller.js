@@ -24,7 +24,7 @@ export default class extends Controller {
   static targets = [
     "grid", "main", "feed", "messages", "input", "send", "sourcesFab", "sourceCount", "fabDots",
     "tab", "tabCount", "pane", "sourceList", "detailTitle", "detailBody", "consentBody", "hero",
-    "railTab", "railPane", "eyebrow", "titlePill", "fabRow",
+    "railTab", "railPane", "eyebrow", "titlePill", "fabRow", "newChat",
     "submitOverlay", "submitModal", "pickCount", "submitGo"
   ]
   static values = {
@@ -155,6 +155,8 @@ export default class extends Controller {
       this.titlePillTarget.textContent = question.length > 60 ? `${question.slice(0, 57)}…` : question
       this.titlePillTarget.hidden = false
     }
+    // The way out of the conversation appears with the conversation.
+    if (this.hasNewChatTarget) this.newChatTarget.hidden = false
     if (!this.hasHeroTarget) return
 
     clearInterval(this._eyebrowTimer)

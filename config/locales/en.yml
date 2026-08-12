@@ -1593,6 +1593,7 @@ en:
       back: "My Vertos"
       right_now: "Right now"
       scope_tab: "Scope"
+      new_chat: "New chat"
       new_thread: "New thread"
       responses: "Responses"
       scope: "Corpus scope"

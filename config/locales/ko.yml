@@ -1570,6 +1570,7 @@ ko:
       back: "내 Verto"
       right_now: "현재"
       scope_tab: "범위"
+      new_chat: "새 채팅"
       new_thread: "새 스레드"
       responses: "응답 수"
       scope: "데이터 범위"

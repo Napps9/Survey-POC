@@ -1572,6 +1572,7 @@ pt:
       back: "Os meus Vertos"
       right_now: "Neste momento"
       scope_tab: "Âmbito"
+      new_chat: "Nova conversa"
       new_thread: "Novo tópico"
       responses: "Respostas"
       scope: "Âmbito do corpus"

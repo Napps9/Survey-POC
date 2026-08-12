@@ -48,6 +48,10 @@ class AskVertoComposeTest < ApplicationSystemTestCase
       visit ask_path
       dismiss_cookie_banner
 
+      # The New chat pill has nothing to offer on the cold start — the screen
+      # already is one — so it waits for a conversation to exist.
+      assert_no_selector ".ask-newchat-btn"
+
       find(".ask-composer textarea").fill_in(with: "Are young people worried?")
       find(".ask-composer textarea").send_keys(:enter)
 
@@ -58,12 +62,43 @@ class AskVertoComposeTest < ApplicationSystemTestCase
       # A finished live answer carries the same listen control a replayed one
       # is rendered with.
       assert_selector ".ask-msg-ai .ask-listen", wait: 5
+      # The way out appears with the conversation — the same reveal the title
+      # pill gets, without waiting for a reload.
+      assert_selector ".ask-newchat-btn", wait: 5
     end
 
     created = @org.ask_threads.order(:id).last
     assert_equal %w[user assistant], created.ask_messages.map(&:role)
     assert_equal "Are young people worried?", created.ask_messages.first.text
     assert_no_match(/[?&]q=/, current_url, "the carried question is scrubbed from the URL")
+  end
+
+  test "the New chat pill yields to the open folder and opens a fresh cold start" do
+    conversation = @org.ask_threads.create!(user: @user)
+    conversation.ask_messages.create!(role: "user", text: "Are young people worried?")
+    conversation.ask_messages.create!(role: "assistant", text: "Worry is high across the corpus.")
+
+    sign_in_as(@user)
+    visit ask_path(thread_id: conversation.id)
+    dismiss_cookie_banner
+
+    assert_selector ".ask-newchat-btn"
+
+    # Opening the folder slides its tab strip under the pill's row. The pill
+    # hides with the handle — left standing (z 30 over the folder's z 2) it
+    # intercepted clicks aimed at the Scope tab and turned them into
+    # thread-creating POSTs.
+    find(".ask-rail-handle").click
+    assert_no_selector ".ask-newchat-btn"
+    find(".ask-lpanel .ask-tab-close").click
+
+    # The pill really submits from the floating bar: a fresh thread, landing
+    # on the cold start with the pill back in waiting.
+    assert_difference -> { @org.ask_threads.count } => 1 do
+      find(".ask-newchat-btn").click
+      assert_selector ".ask-hero", wait: 5
+    end
+    assert_no_selector ".ask-newchat-btn"
   end
 
   # Streams nothing at all — the shape of a turn the server killed before it

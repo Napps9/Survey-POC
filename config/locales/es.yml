@@ -1572,6 +1572,7 @@ es:
       back: "Mis Vertos"
       right_now: "Ahora mismo"
       scope_tab: "Alcance"
+      new_chat: "Nuevo chat"
       new_thread: "Nuevo hilo"
       responses: "Respuestas"
       scope: "Alcance del corpus"

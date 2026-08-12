@@ -1582,6 +1582,7 @@ pl:
       back: "Moje Verto"
       right_now: "W tej chwili"
       scope_tab: "Zakres"
+      new_chat: "Nowy czat"
       new_thread: "Nowy wątek"
       responses: "Odpowiedzi"
       scope: "Zakres korpusu"

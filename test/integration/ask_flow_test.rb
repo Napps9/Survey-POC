@@ -287,6 +287,24 @@ class AskFlowTest < ActionDispatch::IntegrationTest
     assert_select "form.ask-thread-delwrap[action=?]", ask_thread_path(mine)
   end
 
+  test "a running conversation carries the New chat pill; the cold start hides it" do
+    sign_in
+    mine = thread
+    mine.ask_messages.create!(role: "user", text: "Are people worried?")
+
+    get ask_path(thread_id: mine.id)
+    assert_response :success
+    assert_select "form.ask-newchat-form[action=?]:not([hidden])", ask_threads_path,
+      { count: 1 }, "mid-conversation, starting over shouldn't require opening the folder"
+
+    # The cold start IS a fresh chat — the pill would be a door to where you
+    # already are, so it ships hidden and the controller reveals it live.
+    mine.ask_messages.destroy_all
+    get ask_path(thread_id: mine.id)
+    assert_response :success
+    assert_select "form.ask-newchat-form[hidden]", count: 1
+  end
+
   test "a replayed answer warns when a cited source has left the corpus" do
     sign_in
     mine = thread

@@ -1581,6 +1581,7 @@ ru:
       back: "Мои Vertos"
       right_now: "Сейчас"
       scope_tab: "Объём"
+      new_chat: "Новый чат"
       new_thread: "Новый тред"
       responses: "Ответы"
       scope: "Объём корпуса"

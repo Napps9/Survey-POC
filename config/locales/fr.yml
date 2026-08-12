@@ -1572,6 +1572,7 @@ fr:
       back: "Mes Vertos"
       right_now: "En ce moment"
       scope_tab: "Portée"
+      new_chat: "Nouvelle conversation"
       new_thread: "Nouveau fil"
       responses: "Réponses"
       scope: "Portée du corpus"

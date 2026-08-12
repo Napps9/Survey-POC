@@ -3056,6 +3056,10 @@
   transition: background 0.15s, border-color 0.15s;
 }
 .editor-leave-btn:hover { background: rgba(20,23,38,0.85); border-color: rgba(255,255,255,0.3); }
+/* The glass pill is usually a link (pointer for free); as a <button> — the
+   Ask rail handle, the New chat pill — nothing sets the cursor, since neither
+   this project nor Tailwind v4's preflight has a global button rule. */
+button.editor-leave-btn { cursor: pointer; }
 .editor-leave-arrow { flex-shrink: 0; }
 [dir="rtl"] .editor-leave-arrow { transform: scaleX(-1); }
 /* Undo — the ⌘Z stack's visible face, beside the save pill. Same glass pill
@@ -8228,8 +8232,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .ask-paper--scope   { --paper: #0C332D; --panel-edge: #01AD97; }
 .ask-paper--threads { --paper: #2A2856; --panel-edge: #635DD6; }
 /* The handle pill hides itself while the folder is out — the ✕ on the tab
-   strip is the way back. */
-.ask-grid.is-rail-open .ask-rail-handle { display: none; }
+   strip is the way back. The New chat pill goes with it: left in place it
+   would slide into the vacated slot and sit on the folder's Scope tab
+   (z 30 over z 2), turning a tab click into a thread-creating POST — and the
+   open folder already carries "+ New thread". */
+.ask-grid.is-rail-open .ask-rail-handle,
+.ask-grid.is-rail-open .ask-newchat-form { display: none; }
 
 /* Scope numbers as mini stat tiles — the dashboard's gradient-tile recipe at
    folder scale, so the corpus size reads as a fact rather than a table row. */
@@ -8316,6 +8324,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
   position: absolute; top: 12px; inset-inline-end: 16px; z-index: 31;
   display: flex; align-items: center; gap: 8px;
 }
+/* New chat — a glass pill beside the folder handle, wrapping the same POST
+   the rail's "+ New thread" makes. The [hidden] attribute (cold start) wins
+   over this display via Tailwind's preflight. */
+.ask-newchat-form { display: inline-flex; margin: 0; }
 /* The editor's title pill: the current thread's first question, display-only. */
 .ask-title-pill {
   padding: 7px 13px; border-radius: 100px;

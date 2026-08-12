@@ -1572,6 +1572,7 @@ nl:
       back: "Mijn Vertos"
       right_now: "Op dit moment"
       scope_tab: "Omvang"
+      new_chat: "Nieuwe chat"
       new_thread: "Nieuwe thread"
       responses: "Antwoorden"
       scope: "Omvang van het corpus"

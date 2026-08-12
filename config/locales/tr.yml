@@ -1572,6 +1572,7 @@ tr:
       back: "Verto'larım"
       right_now: "Şu anda"
       scope_tab: "Kapsam"
+      new_chat: "Yeni sohbet"
       new_thread: "Yeni konu"
       responses: "Yanıtlar"
       scope: "Veri kümesi kapsamı"

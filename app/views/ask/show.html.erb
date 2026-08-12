@@ -102,6 +102,20 @@
         </svg>
         <span><%= t("ask.page.title") %></span>
       </button>
+      <%# New chat — the same POST as the rail's "+ New thread", surfaced as a
+          pill so leaving a conversation doesn't require opening the folder.
+          Hidden on the cold start (that screen already IS a fresh chat); the
+          controller reveals it the moment a conversation starts, exactly as
+          it reveals the title pill. %>
+      <%= form_with url: ask_threads_path, method: :post, class: "ask-newchat-form",
+            data: { ask_verto_target: "newChat" }, html: { hidden: @messages.empty? } do %>
+        <button type="submit" class="editor-leave-btn ask-newchat-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 3.2v9.6M3.2 8h9.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <span><%= t("ask.page.new_chat") %></span>
+        </button>
+      <% end %>
     </div>
   </div>
 

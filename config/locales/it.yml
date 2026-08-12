@@ -1572,6 +1572,7 @@ it:
       back: "I miei Vertos"
       right_now: "In questo momento"
       scope_tab: "Ampiezza"
+      new_chat: "Nuova chat"
       new_thread: "Nuovo thread"
       responses: "Risposte"
       scope: "Ampiezza del corpus"
