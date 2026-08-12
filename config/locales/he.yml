@@ -1369,6 +1369,8 @@ he:
     welcome_confirm: "ברוך הבא ל-Playverto! בדוק את %{email} כדי לאשר את הכתובת."
   flash:
     comms:
+      schedule_cancelled: "התזמון בוטל — חזרה לטיוטה."
+      schedule_set: "השליחה תוזמנה."
       send_cancelled: "השליחה בוטלה."
       send_started: "השליחה החלה."
       test_sent: "אימייל ניסיון נשלח אל %{email}."

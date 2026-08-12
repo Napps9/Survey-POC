@@ -1391,6 +1391,8 @@ en:
     welcome_confirm: "Welcome to Playverto! Check %{email} to confirm your address."
   flash:
     comms:
+      schedule_cancelled: "Schedule cancelled — back to draft."
+      schedule_set: "Send scheduled."
       send_cancelled: "Sending cancelled."
       send_started: "Sending started."
       test_sent: "Test email sent to %{email}."

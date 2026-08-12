@@ -6,7 +6,8 @@ class Comms::CampaignsController < Comms::BaseController
 
   before_action :set_campaign,
                 only: %i[edit update destroy preview image moderate_image pexels_search
-                         audience_count send_now test_send cancel_send status]
+                         audience_count send_now test_send cancel_send status
+                         schedule cancel_schedule]
   before_action :require_editable!, only: %i[update image]
 
   # The compiled email is wall-to-wall inline styles; the app CSP would
@@ -166,6 +167,41 @@ class Comms::CampaignsController < Comms::BaseController
     Comms::CampaignMailer.test_email(@campaign.id, Current.user.email_address).deliver_now
     redirect_to edit_comms_campaign_path(@campaign),
                 notice: t("flash.comms.test_sent", email: Current.user.email_address)
+  end
+
+  # Book a future send: same freeze as send-now plus a wall-clock target.
+  # The primary trigger is set(wait_until:); the 5-minute sweeper is the
+  # safety net for a job lost to a restart.
+  def schedule
+    at = begin
+      Time.iso8601(params[:scheduled_at].to_s)
+    rescue ArgumentError
+      nil
+    end
+    unless at&.future?
+      return redirect_to edit_comms_campaign_path(@campaign),
+                         alert: t("comms.editor.schedule_invalid", default: "Pick a time in the future.")
+    end
+
+    result = Comms::CampaignFreezer.call(@campaign, scheduled_for: at)
+    if result.ok?
+      Comms::StartCampaignSendJob.set(wait_until: at).perform_later(@campaign.id)
+      redirect_to edit_comms_campaign_path(@campaign), notice: t("flash.comms.schedule_set")
+    else
+      redirect_to edit_comms_campaign_path(@campaign), alert: result.error
+    end
+  end
+
+  # Call the booking off: back to a plain draft. The already-queued job is
+  # not deleted — its own guard (must be `scheduled` and due) makes the
+  # stale firing a no-op.
+  def cancel_schedule
+    if @campaign.scheduled?
+      Comms::CampaignFreezer.unfreeze!(@campaign)
+      redirect_to edit_comms_campaign_path(@campaign), notice: t("flash.comms.schedule_cancelled")
+    else
+      redirect_to edit_comms_campaign_path(@campaign)
+    end
   end
 
   # Mid-flight stop: queued recipients are skipped, already-sent mail is

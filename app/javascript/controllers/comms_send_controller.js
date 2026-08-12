@@ -4,7 +4,7 @@ import { Controller } from "@hotwired/stimulus"
 // a small debounced PATCH of just those keys against the campaign's
 // only-touch-present-keys endpoint — the brand-palette shape.
 export default class extends Controller {
-  static targets = ["subject", "preheader", "fromName", "replyTo"]
+  static targets = ["subject", "preheader", "fromName", "replyTo", "variant"]
   static values = { url: String }
 
   changed() {
@@ -24,6 +24,9 @@ export default class extends Controller {
     if (this.hasPreheaderTarget) body.preheader = this.preheaderTarget.value
     if (this.hasFromNameTarget) body.from_name = this.fromNameTarget.value
     if (this.hasReplyToTarget) body.reply_to = this.replyToTarget.value
+    if (this.hasVariantTarget) {
+      body.subject_variants = this.variantTargets.map((v) => v.value.trim()).filter(Boolean)
+    }
     try {
       fetch(this.urlValue, {
         method: "PATCH", keepalive: true,

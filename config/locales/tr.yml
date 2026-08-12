@@ -1370,6 +1370,8 @@ tr:
     welcome_confirm: "Playverto'ya hoş geldiniz! Adresinizi onaylamak için %{email} adresini kontrol edin."
   flash:
     comms:
+      schedule_cancelled: "Plan iptal edildi — taslağa dönüldü."
+      schedule_set: "Gönderim planlandı."
       send_cancelled: "Gönderim iptal edildi."
       send_started: "Gönderim başladı."
       test_sent: "%{email} adresine test e-postası gönderildi."

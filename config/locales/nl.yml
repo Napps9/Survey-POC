@@ -1370,6 +1370,8 @@ nl:
     welcome_confirm: "Welkom bij Playverto! Check %{email} om je adres te bevestigen."
   flash:
     comms:
+      schedule_cancelled: "Planning geannuleerd — terug naar concept."
+      schedule_set: "Verzending ingepland."
       send_cancelled: "Verzenden geannuleerd."
       send_started: "Verzenden gestart."
       test_sent: "Test-e-mail verzonden naar %{email}."

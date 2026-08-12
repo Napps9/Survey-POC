@@ -44,7 +44,11 @@
             </div>
             <div style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(247,247,247,0.55);margin-top:4px;">
               <%= campaign.subject.presence || t("comms.index.no_subject", default: "No subject yet") %>
-              · <%= t("comms.index.updated", default: "updated") %> <%= l campaign.updated_at, format: :short %>
+              <% if campaign.scheduled? && campaign.scheduled_for.present? %>
+                · <%= t("comms.index.scheduled_for", default: "scheduled") %> <%= l campaign.scheduled_for, format: :short %> UTC
+              <% else %>
+                · <%= t("comms.index.updated", default: "updated") %> <%= l campaign.updated_at, format: :short %>
+              <% end %>
             </div>
           </div>
           <span style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;font-family:'Alata',sans-serif;font-size:12px;color:#F7F7F7;background:rgba(255,255,255,0.06);border-radius:100px;padding:6px 12px;">

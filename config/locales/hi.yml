@@ -1370,6 +1370,8 @@ hi:
     welcome_confirm: "Playverto में आपका स्वागत है! अपना पता पुष्ट करने के लिए %{email} देखें।"
   flash:
     comms:
+      schedule_cancelled: "शेड्यूल रद्द — ड्राफ़्ट पर वापस।"
+      schedule_set: "भेजना शेड्यूल किया गया।"
       send_cancelled: "भेजना रद्द कर दिया गया।"
       send_started: "भेजना शुरू हो गया।"
       test_sent: "%{email} पर परीक्षण ईमेल भेजा गया।"

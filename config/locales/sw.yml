@@ -1370,6 +1370,8 @@ sw:
     welcome_confirm: "Karibu Playverto! Angalia %{email} ili kuthibitisha anwani yako."
   flash:
     comms:
+      schedule_cancelled: "Ratiba imeghairiwa — imerudi kuwa rasimu."
+      schedule_set: "Utumaji umepangwa."
       send_cancelled: "Utumaji umeghairiwa."
       send_started: "Utumaji umeanza."
       test_sent: "Barua pepe ya majaribio imetumwa kwa %{email}."

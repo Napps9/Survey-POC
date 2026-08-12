@@ -27,6 +27,7 @@ class EmailCampaign < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
 
   before_save :sanitize_design!
+  before_save :sanitize_subject_variants!
 
   scope :recent, -> { order(created_at: :desc) }
 
@@ -55,5 +56,13 @@ class EmailCampaign < ApplicationRecord
 
   def sanitize_design!
     self.design = Comms::EmailDocument.sanitize(design) if will_save_change_to_design?
+  end
+
+  # Up to three extra subjects (variant 0 is the subject itself) — the A/B
+  # split is decided at recipient snapshot, deterministically.
+  def sanitize_subject_variants!
+    return unless will_save_change_to_subject_variants?
+
+    self.subject_variants = Array(subject_variants).map { |v| v.to_s.strip }.reject(&:blank?).first(3)
   end
 end

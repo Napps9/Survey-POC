@@ -1368,6 +1368,8 @@ ko:
     welcome_confirm: "Playverto에 오신 것을 환영합니다! %{email}에서 주소를 확인하세요."
   flash:
     comms:
+      schedule_cancelled: "예약이 취소되었습니다 — 초안으로 돌아갑니다."
+      schedule_set: "발송이 예약되었습니다."
       send_cancelled: "발송이 취소되었습니다."
       send_started: "발송이 시작되었습니다."
       test_sent: "%{email} 주소로 테스트 이메일을 보냈습니다."

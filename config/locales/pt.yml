@@ -1370,6 +1370,8 @@ pt:
     welcome_confirm: "Bem-vindo ao Playverto! Verifique %{email} para confirmar o seu endereço."
   flash:
     comms:
+      schedule_cancelled: "Agendamento cancelado — de volta ao rascunho."
+      schedule_set: "Envio agendado."
       send_cancelled: "Envio cancelado."
       send_started: "Envio iniciado."
       test_sent: "E-mail de teste enviado para %{email}."

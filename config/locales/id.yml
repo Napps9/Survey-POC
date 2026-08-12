@@ -1369,6 +1369,8 @@ id:
     welcome_confirm: "Selamat datang di Playverto! Periksa %{email} untuk mengonfirmasi alamat Anda."
   flash:
     comms:
+      schedule_cancelled: "Jadwal dibatalkan — kembali ke draf."
+      schedule_set: "Pengiriman dijadwalkan."
       send_cancelled: "Pengiriman dibatalkan."
       send_started: "Pengiriman dimulai."
       test_sent: "Email uji dikirim ke %{email}."

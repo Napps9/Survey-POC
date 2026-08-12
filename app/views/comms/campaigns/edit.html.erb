@@ -158,6 +158,62 @@
                   style: "background:#FF1E6F;color:#fff;font-family:'Alata',sans-serif;font-size:13px;border:none;border-radius:100px;padding:9px 18px;cursor:pointer;width:100%;" %>
           <% end %>
         </div>
+
+        <%# The report: engagement facts once the send is over. Opens and
+            clicks only exist where the pixel/redirect fired — absence is
+            unmeasured, not zero, hence counts rather than percentages at
+            small n. %>
+        <% if %w[sent failed cancelled].include?(@campaign.status) %>
+          <%
+            scope = @campaign.email_campaign_recipients
+            report = {
+              t("comms.report.delivered", default: "delivered") => scope.where.not(delivered_at: nil).count,
+              t("comms.report.opened", default: "opened") => scope.where.not(first_opened_at: nil).count,
+              t("comms.report.clicked", default: "clicked") => scope.where.not(first_clicked_at: nil).count,
+              t("comms.report.unsubscribed", default: "unsubscribed") => scope.where.not(unsubscribed_at: nil).count,
+              t("comms.report.failed", default: "failed") => counts.fetch("failed", 0),
+              t("comms.report.skipped", default: "skipped") => counts.fetch("skipped", 0)
+            }
+          %>
+          <div class="panel-island comms-controls">
+            <div class="comms-report-tiles">
+              <% report.each do |label, n| %>
+                <div class="comms-report-tile">
+                  <span class="comms-count-num" style="font-size:20px;"><%= n %></span>
+                  <span class="comms-count-label"><%= label %></span>
+                </div>
+              <% end %>
+            </div>
+
+            <% snapshot = @campaign.scheduled_snapshot || {} %>
+            <% subjects = [ snapshot["subject"] || @campaign.subject ] + Array(snapshot["subject_variants"]) %>
+            <% if subjects.size > 1 %>
+              <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:0.08em;text-transform:uppercase;">
+                <%= t("comms.report.variants", default: "Subject variants") %>
+              </span>
+              <% sent_by = scope.group(:subject_variant).count %>
+              <% opened_by = scope.where.not(first_opened_at: nil).group(:subject_variant).count %>
+              <% subjects.each_with_index do |subj, i| %>
+                <div style="display:flex;justify-content:space-between;gap:10px;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.85);">
+                  <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= subj %></span>
+                  <span style="flex-shrink:0;"><%= opened_by.fetch(i, 0) %>/<%= sent_by.fetch(i, 0) %> <%= t("comms.report.opens", default: "opens") %></span>
+                </div>
+              <% end %>
+            <% end %>
+
+            <% events = @campaign.email_events.order(occurred_at: :desc).limit(8) %>
+            <% if events.any? %>
+              <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:0.08em;text-transform:uppercase;">
+                <%= t("comms.report.recent", default: "Recent activity") %>
+              </span>
+              <% events.each do |event| %>
+                <div style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.7);">
+                  <%= event.kind %> · <%= l event.occurred_at, format: :short %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
       </div>
     <% end %>
     <div class="type-panel panel-paper panel--types" data-comms-editor-target="blockView" <%= "hidden" unless editable %>>
@@ -371,6 +427,48 @@
                        data-action="input->comms-send#changed"
                        value="<%= @campaign.preheader %>" style="max-width:none;">
               </label>
+              <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:0.08em;text-transform:uppercase;">
+                <%= t("comms.editor.ab_variants", default: "A/B subject variants (optional)") %>
+              </span>
+              <% variants = Array(@campaign.subject_variants) %>
+              <% 3.times do |i| %>
+                <input type="text" data-comms-send-target="variant"
+                       data-action="input->comms-send#changed"
+                       value="<%= variants[i] %>"
+                       placeholder="<%= t("comms.editor.variant_placeholder", default: "Variant %{n} subject", n: i + 1) %>"
+                       style="max-width:none;">
+              <% end %>
+              <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.55);">
+                <%= t("comms.editor.ab_hint", default: "Recipients are split evenly across the subject and the variants — the split is fixed when the send is approved.") %>
+              </span>
+            </div>
+          </details>
+
+          <details class="publish-block" <%= "open" if @campaign.scheduled? %>>
+            <summary class="publish-block-title"><%= t("comms.editor.schedule", default: "Schedule") %> <span class="pub-chev">▾</span></summary>
+            <div class="comms-controls">
+              <% if @campaign.scheduled? && @campaign.scheduled_for.present? %>
+                <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.85);margin:0;">
+                  <%= t("comms.editor.scheduled_banner", default: "Booked for %{time} (UTC). The email was frozen as approved — edits land on the next send, not this one.", time: @campaign.scheduled_for.utc.strftime("%Y-%m-%d %H:%M")) %>
+                </p>
+                <%= button_to t("comms.editor.cancel_schedule", default: "Cancel schedule"), cancel_schedule_comms_campaign_path(@campaign),
+                      method: :post, form: { data: { turbo: false } },
+                      style: "background:rgba(255,30,111,0.18);color:#FF6EA7;font-family:'Alata',sans-serif;font-size:13px;border:1px solid rgba(255,30,111,0.4);border-radius:100px;padding:9px 18px;cursor:pointer;width:100%;" %>
+              <% else %>
+                <%= form_with url: schedule_comms_campaign_path(@campaign), method: :post,
+                      data: { turbo: false, controller: "comms-schedule", action: "submit->comms-schedule#submit" } do %>
+                  <input type="datetime-local" data-comms-schedule-target="input"
+                         style="width:100%;background:#171B2C;border:1px solid rgba(255,255,255,0.14);border-radius:8px;color:#F7F7F7;font-size:12px;padding:6px 8px;margin-bottom:10px;">
+                  <input type="hidden" name="scheduled_at" data-comms-schedule-target="hidden">
+                  <button type="submit"
+                          style="background:rgba(255,255,255,0.12);color:#fff;font-family:'Alata',sans-serif;font-size:13px;border:1px solid rgba(255,255,255,0.25);border-radius:100px;padding:9px 18px;cursor:pointer;width:100%;">
+                    <%= t("comms.editor.schedule_cta", default: "Book this send") %>
+                  </button>
+                <% end %>
+                <span style="font-family:'ABeeZee',sans-serif;font-size:11px;color:rgba(255,255,255,0.55);">
+                  <%= t("comms.editor.schedule_hint", default: "Times are your local clock; delivery starts within about five minutes of the slot.") %>
+                </span>
+              <% end %>
             </div>
           </details>
 

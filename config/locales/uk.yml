@@ -1372,6 +1372,8 @@ uk:
     welcome_confirm: "Вітаємо у Playverto! Перевірте %{email}, щоб підтвердити адресу."
   flash:
     comms:
+      schedule_cancelled: "Розклад скасовано — знову чернетка."
+      schedule_set: "Надсилання заплановано."
       send_cancelled: "Надсилання скасовано."
       send_started: "Надсилання розпочато."
       test_sent: "Тестовий лист надіслано на %{email}."
