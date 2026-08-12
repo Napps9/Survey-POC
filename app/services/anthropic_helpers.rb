@@ -25,6 +25,15 @@ module AnthropicHelpers
     )
   end
 
+  # The SDK's messages endpoints spread their own 600s per-request timeout over
+  # whatever the client was built with (`{timeout: 600, **options}`), so the
+  # client-level bound above never reaches a create/stream_raw call. Only a
+  # per-request option survives that merge — pass this on any call whose route
+  # has no rack-timeout of its own.
+  def anthropic_request_options
+    { timeout: ANTHROPIC_TIMEOUT_SECONDS }
+  end
+
   def tool_use?(block)
     type = block.respond_to?(:type) ? block.type : block[:type] || block["type"]
     type.to_s == "tool_use"

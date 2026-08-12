@@ -34,6 +34,7 @@ module RequestTimeout
     survey_results_summarize_texts
     survey_results_report_stream
     survey_chat
+    ask_thread_messages
   ].freeze
 
   # Claude calls, imports and exports: slow on purpose, but not unbounded.

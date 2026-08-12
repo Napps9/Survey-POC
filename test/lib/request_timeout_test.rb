@@ -40,6 +40,14 @@ class RequestTimeoutTest < ActiveSupport::TestCase
     end
   end
 
+  # Pinned by path, not by iterating SKIP_ROUTES: removing the symbol from the
+  # list must fail here rather than silently dropping the endpoint to 45s. Ask
+  # Verto runs its whole tool-round phase before the first stream write, so the
+  # default bound kills it invisibly (the raise bypasses the controller rescue).
+  test "the Ask Verto message stream is on the skip tier" do
+    assert_equal :skip, RequestTimeout.tier_for("POST", "/ask/threads/42/messages")
+  end
+
   test "AI, import and export endpoints get the slow bound" do
     RequestTimeout::SLOW_ROUTES.each do |name|
       verb, path = example_request_for(name)

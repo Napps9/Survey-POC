@@ -24,6 +24,23 @@ class AskThreadTest < ActiveSupport::TestCase
       "pass validation while citing the wrong live source"
   end
 
+  test "prompt_messages drops a turn whose prose was only markers" do
+    @thread.ask_messages.create!(role: "user", text: "q")
+    @thread.ask_messages.create!(role: "assistant", text: "[[c:1]] [[q:88]]")
+
+    messages = @thread.prompt_messages
+
+    assert_equal [ "q" ], messages.map { |m| m[:content] },
+      "stripping left no prose — an empty content block is an API 400 on the next turn"
+  end
+
+  test "prompt_messages drops an empty user row" do
+    @thread.ask_messages.create!(role: "user", text: "")
+    @thread.ask_messages.create!(role: "user", text: "real question")
+
+    assert_equal [ "real question" ], @thread.prompt_messages.map { |m| m[:content] }
+  end
+
   test "prompt_messages is bounded to the newest turns" do
     25.times { |i| @thread.ask_messages.create!(role: "user", text: "q#{i}") }
 

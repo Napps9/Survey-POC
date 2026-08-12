@@ -23,9 +23,13 @@ class AskThread < ApplicationRecord
   # The messages Claude is given. Bounded, and only the prose — a previous turn's
   # markers are stripped (see AskMessage#prompt_text), because their numbers were
   # minted per-turn and would re-enter as valid-looking citations of the wrong
-  # sources.
+  # sources. A turn that stripping leaves empty (an answer that was only markers)
+  # is dropped entirely: the API rejects an empty content block, and consecutive
+  # same-role turns are legal — they're combined server-side.
   def prompt_messages(limit: 20)
-    ask_messages.last(limit).map { |m| { role: m.role, content: m.prompt_text } }
+    ask_messages.last(limit)
+                .map { |m| { role: m.role, content: m.prompt_text } }
+                .reject { |m| m[:content].blank? }
   end
 
   # Trim the oldest threads past the cap. Called after a thread is created, so the

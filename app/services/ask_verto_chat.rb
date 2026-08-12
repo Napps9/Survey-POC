@@ -119,11 +119,12 @@ class AskVertoChat
 
     MAX_TOOL_ROUNDS.times do
       response = @client.messages.create(
-        model:       MODEL,
-        max_tokens:  MAX_TOKENS,
-        system:      system_blocks(tools),
-        tools:       tools.definitions,
-        messages:    convo
+        model:           MODEL,
+        max_tokens:      MAX_TOKENS,
+        system:          system_blocks(tools),
+        tools:           tools.definitions,
+        messages:        convo,
+        request_options: anthropic_request_options
       )
       log_usage("AskVertoChat", response.usage, model: MODEL)
 
@@ -195,11 +196,20 @@ class AskVertoChat
     buffer = +""
     full   = +""
 
+    # The convo carries the tool rounds' tool_use/tool_result blocks, and the
+    # API rejects those unless the tools they reference are declared — so the
+    # definitions ride along even though this call must not use them.
+    # tool_choice "none" is the other half: with tools declared, a "final"
+    # turn could otherwise answer with another tool call, which this loop
+    # would render as an empty answer.
     stream = @client.messages.stream_raw(
-      model:      MODEL,
-      max_tokens: MAX_TOKENS,
-      system:     system_blocks(tools),
-      messages:   convo
+      model:           MODEL,
+      max_tokens:      MAX_TOKENS,
+      system:          system_blocks(tools),
+      tools:           tools.definitions,
+      tool_choice:     { type: "none" },
+      messages:        convo,
+      request_options: anthropic_request_options
     )
 
     usage = nil

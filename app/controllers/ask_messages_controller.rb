@@ -54,7 +54,13 @@ class AskMessagesController < ApplicationController
     raise # a clean 404 before any stream is opened
   rescue => e
     ErrorReporting.report("AskMessagesController", e)
-    write_event(t: "error", text: t("ask.chat.error")) rescue nil
+    begin
+      write_event(t: "error", text: t("ask.chat.error"))
+    rescue => write_error
+      # The client gets a zero-byte 200 in this case — this log line is the
+      # only trace that the turn failed twice.
+      Rails.logger.warn("[AskVerto] failed to write error event: #{write_error.class}: #{write_error.message}")
+    end
   ensure
     response.stream.close if response.committed?
   end

@@ -25,7 +25,7 @@ class AskVertoChatTest < ActiveSupport::TestCase
     def messages = self
 
     def create(**kwargs)
-      @calls << kwargs
+      @calls << kwargs.merge(op: :create)
       step = @script.first
       if step.is_a?(Array)
         @script.shift
@@ -38,7 +38,7 @@ class AskVertoChatTest < ActiveSupport::TestCase
     end
 
     def stream_raw(**kwargs)
-      @calls << kwargs
+      @calls << kwargs.merge(op: :stream_raw)
       text = @script.find { |s| s.is_a?(String) } || ""
       events = [ OpenStruct.new(type: :message_start, message: OpenStruct.new(usage: usage)) ]
       # Three characters at a time, so "[[c:1]]" is guaranteed to straddle deltas.
@@ -252,9 +252,38 @@ class AskVertoChatTest < ActiveSupport::TestCase
 
     chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
 
-    creates = client.calls.count { |c| c.key?(:tools) }
+    creates = client.calls.count { |c| c[:op] == :create }
     assert_operator creates, :<=, AskVertoChat::MAX_TOOL_ROUNDS,
       "each round is a paid Claude call; the ceiling is the per-message cost bound"
+  end
+
+  test "the final stream call declares the tools the conversation's blocks reference" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, "Worry is high [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+
+    stream_call = client.calls.find { |c| c[:op] == :stream_raw }
+    # The convo it sends carries tool_use/tool_result blocks, which the API
+    # rejects unless the tools they reference are declared — and with tools
+    # declared, only tool_choice "none" guarantees the answer is prose.
+    assert_equal client.calls.first[:tools], stream_call[:tools]
+    assert_equal({ type: "none" }, stream_call[:tool_choice])
+  end
+
+  test "every Claude call carries the per-request timeout the client-level setting cannot deliver" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, "Answer [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+
+    client.calls.each do |call|
+      assert_equal AnthropicHelpers::ANTHROPIC_TIMEOUT_SECONDS,
+                   call.dig(:request_options, :timeout),
+                   "#{call[:op]} must carry request_options — the SDK overrides the client timeout"
+    end
   end
 
   test "the corpus size is stated in the system prompt so the model knows its denominator" do
