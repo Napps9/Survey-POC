@@ -191,7 +191,10 @@ class CorpusIndexerTest < ActiveSupport::TestCase
     survey = survey_with([ { "type" => "range", "cid" => "c_r", "text" => "How worried?",
                              "options" => [ "Not at all", "Not very", "Neutral", "Somewhat", "Very" ] } ])
     seed!(survey, 40) { |i| { "0" => { "value" => i < 25 ? 4 : 1 } } }
-    survey.responses.limit(25).update_all(demographic_gender: "Female")
+    # order(:id): an unordered LIMIT returns insertion order on SQLite but
+    # arbitrary rows on Postgres, and these 25 must be the 25 who answered 4
+    # (this exact line failed CI's test_postgres while passing locally).
+    survey.responses.order(:id).limit(25).update_all(demographic_gender: "Female")
     survey.responses.where(demographic_gender: nil).update_all(demographic_gender: "Male")
 
     segments = index!(survey).corpus_questions.find_by(cid: "c_r").segments
