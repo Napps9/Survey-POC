@@ -38,6 +38,8 @@ export default class extends Controller {
   _loading = false
 
   connect() {
+    // No speechSynthesis, no listen buttons — CSS hides them off this class.
+    if (!window.speechSynthesis) this.element.classList.add("no-speech")
     this._restoreSourcesFromLastAnswer()
     this._startEyebrow()
     this._askInitialQuestion()
@@ -45,6 +47,7 @@ export default class extends Controller {
 
   disconnect() {
     clearInterval(this._eyebrowTimer)
+    window.speechSynthesis?.cancel()
   }
 
   // ── The rotating eyebrow ────────────────────────────────────────────────
@@ -198,7 +201,7 @@ export default class extends Controller {
   // rejection that leaves _loading stuck true and the composer dead.
   async _stream(question, body) {
     let steps = null
-    const state = { terminal: false, contentful: false }
+    const state = { terminal: false, contentful: false, text: "" }
 
     try {
       // The answer bubble IS a .summary-card: is-generating switches on the 3px
@@ -258,6 +261,7 @@ export default class extends Controller {
       body.appendChild(document.createTextNode(err?.display || t("ask.error")))
     } finally {
       this._settle(body, steps)
+      body.classList.remove("is-streaming")
       this._loading = false
       // Mirrors the input, so a composer the server rendered disabled stays so.
       this.sendTarget.disabled = this.inputTarget.disabled
@@ -299,11 +303,20 @@ export default class extends Controller {
         this._renderSources()
         break
 
-      case "token":
+      case "token": {
         state.contentful = true
+        state.text += event.text
         this._settle(body, steps)
-        body.appendChild(document.createTextNode(event.text))
+        // A span per chunk, not a bare text node: the fade-up on .ask-token is
+        // what makes the answer read as being written. The caret rides on the
+        // bubble while the stream is open; _stream's finally lifts it.
+        body.classList.add("is-streaming")
+        const chunk = document.createElement("span")
+        chunk.className = "ask-token"
+        chunk.textContent = event.text
+        body.appendChild(chunk)
         break
+      }
 
       case "cite":
         state.contentful = true
@@ -329,7 +342,9 @@ export default class extends Controller {
 
       case "done":
         state.terminal = true
+        body.classList.remove("is-streaming")
         if (this._sources.size) body.appendChild(this._jumpPill())
+        if (state.text.trim()) body.appendChild(this._answerTools(state.text))
         break
     }
     this._scroll()
@@ -344,7 +359,9 @@ export default class extends Controller {
     bubble.textContent = text
     wrap.appendChild(bubble)
     this.messagesTarget.appendChild(wrap)
-    this._scroll()
+    // Forced: asking a question always snaps the feed to the fresh exchange,
+    // wherever the reader had scrolled to before.
+    this._scroll(true)
   }
 
   _appendAssistant() {
@@ -463,8 +480,67 @@ export default class extends Controller {
     return [...this._sources.entries()].sort((a, b) => a[0] - b[0]).map(([, s]) => s)
   }
 
-  _scroll() {
-    this.feedTarget.scrollTop = this.feedTarget.scrollHeight
+  // Follow the stream only while the reader is already at the bottom. Forcing
+  // every event to the bottom would snatch the feed back from someone who
+  // scrolled up to reread an earlier answer mid-stream.
+  _scroll(force = false) {
+    const el = this.feedTarget
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120
+    if (force || nearBottom) el.scrollTop = el.scrollHeight
+  }
+
+  // ── Listen ──────────────────────────────────────────────────────────────
+  // The browser's own voice (SpeechSynthesis) — no audio leaves the device and
+  // nothing is sent anywhere. The text comes from data-speech-text: the
+  // answer's prose without markers, set by the server on replayed answers and
+  // from the accumulated stream on live ones, so the voice never reads chrome.
+  toggleSpeech(event) {
+    const synth = window.speechSynthesis
+    if (!synth) return
+    const button = event.currentTarget
+    const wasSpeaking = button.classList.contains("is-speaking")
+
+    // One voice at a time: whatever was being read stops before anything else
+    // happens — including when the same button is asked to stop.
+    synth.cancel()
+    this._clearSpeaking()
+    if (wasSpeaking) return
+
+    const utterance = new SpeechSynthesisUtterance(button.dataset.speechText || "")
+    utterance.lang = document.documentElement.lang || "en"
+    utterance.onend = utterance.onerror = () => this._clearSpeaking()
+    button.classList.add("is-speaking")
+    button.setAttribute("aria-label", t("ask.listen_stop"))
+    button.title = t("ask.listen_stop")
+    synth.speak(utterance)
+  }
+
+  _clearSpeaking() {
+    this.element.querySelectorAll(".ask-listen.is-speaking").forEach((button) => {
+      button.classList.remove("is-speaking")
+      button.setAttribute("aria-label", t("ask.listen"))
+      button.title = t("ask.listen")
+    })
+  }
+
+  // The same control the server renders under a replayed answer, built for a
+  // just-streamed one.
+  _answerTools(text) {
+    const row = document.createElement("div")
+    row.className = "ask-answer-tools"
+    const button = document.createElement("button")
+    button.type = "button"
+    button.className = "ask-listen"
+    button.dataset.action = "click->ask-verto#toggleSpeech"
+    button.dataset.speechText = text.trim()
+    button.setAttribute("aria-label", t("ask.listen"))
+    button.title = t("ask.listen")
+    button.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">' +
+      '<path d="M2.5 6v4h2.8L9 13V3L5.3 6H2.5z" fill="currentColor"/>' +
+      '<path d="M11 5.5a3.4 3.4 0 0 1 0 5M12.8 3.7a6 6 0 0 1 0 8.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>'
+    button.appendChild(document.createTextNode(t("ask.listen")))
+    row.appendChild(button)
+    return row
   }
 
   // ── The left folder: scope + threads ────────────────────────────────────

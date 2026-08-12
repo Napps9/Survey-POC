@@ -213,6 +213,8 @@ vi:
       picker_none: "Chưa chọn gì"
       picker_count: "%{questions}/%{total} câu hỏi · %{responses} câu trả lời"
       jump_to_sources: "Xem nguồn"
+      listen: "Nghe"
+      listen_stop: "Dừng đọc"
       reading: "Đang đọc kết quả…"
       searching: "Đang tìm trong kho dữ liệu…"
       stat_countries: "Quốc gia"

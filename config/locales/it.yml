@@ -213,6 +213,8 @@ it:
       picker_none: "Ancora nessuna selezione"
       picker_count: "%{questions} di %{total} domande · %{responses} risposte"
       jump_to_sources: "Vedi le fonti"
+      listen: "Ascolta"
+      listen_stop: "Interrompi la lettura"
       reading: "Lettura dei risultati…"
       searching: "Ricerca nel corpus…"
       stat_countries: "Paesi"

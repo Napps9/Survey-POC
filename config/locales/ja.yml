@@ -213,6 +213,8 @@ ja:
       picker_none: "まだ何も選択されていません"
       picker_count: "%{total}問中%{questions}問 · %{responses}件の回答"
       jump_to_sources: "出典を見る"
+      listen: "読み上げ"
+      listen_stop: "読み上げを停止"
       reading: "結果を読み取り中…"
       searching: "データを検索中…"
       stat_countries: "国数"

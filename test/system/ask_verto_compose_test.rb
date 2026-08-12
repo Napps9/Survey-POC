@@ -55,6 +55,9 @@ class AskVertoComposeTest < ApplicationSystemTestCase
       # and the (scripted) answer streams in after it.
       assert_text "Are young people worried?", wait: 5
       assert_text "Worry is high across the corpus.", wait: 5
+      # A finished live answer carries the same listen control a replayed one
+      # is rendered with.
+      assert_selector ".ask-msg-ai .ask-listen", wait: 5
     end
 
     created = @org.ask_threads.order(:id).last

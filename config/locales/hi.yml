@@ -213,6 +213,8 @@ hi:
       picker_none: "अभी कुछ नहीं चुना गया"
       picker_count: "%{total} में से %{questions} प्रश्न · %{responses} जवाब"
       jump_to_sources: "स्रोत देखें"
+      listen: "सुनें"
+      listen_stop: "पढ़ना बंद करें"
       reading: "परिणाम पढ़े जा रहे हैं…"
       searching: "डेटा संग्रह में खोजा जा रहा है…"
       stat_countries: "देश"

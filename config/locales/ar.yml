@@ -213,6 +213,8 @@ ar:
       picker_none: "لم يتم اختيار شيء بعد"
       picker_count: "%{questions} من %{total} سؤال · %{responses} إجابة"
       jump_to_sources: "عرض المصادر"
+      listen: "استمع"
+      listen_stop: "أوقف القراءة الصوتية"
       reading: "جارٍ قراءة النتائج…"
       searching: "جارٍ البحث في البيانات…"
       stat_countries: "البلدان"

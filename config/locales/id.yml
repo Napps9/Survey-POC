@@ -213,6 +213,8 @@ id:
       picker_none: "Belum ada yang dipilih"
       picker_count: "%{questions} dari %{total} pertanyaan · %{responses} jawaban"
       jump_to_sources: "Lihat sumber"
+      listen: "Dengarkan"
+      listen_stop: "Hentikan pembacaan"
       reading: "Membaca hasilnya…"
       searching: "Mencari di korpus…"
       stat_countries: "Negara"

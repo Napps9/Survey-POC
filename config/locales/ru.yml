@@ -213,6 +213,8 @@ ru:
       picker_none: "Пока ничего не выбрано"
       picker_count: "%{questions} из %{total} вопросов · ответов: %{responses}"
       jump_to_sources: "Показать источники"
+      listen: "Прослушать"
+      listen_stop: "Остановить чтение"
       reading: "Читаю результаты…"
       searching: "Поиск по корпусу…"
       stat_countries: "Страны"

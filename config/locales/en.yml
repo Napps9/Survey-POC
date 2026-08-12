@@ -221,6 +221,8 @@ en:
       picker_none: "Nothing selected yet"
       picker_count: "%{questions} of %{total} questions · %{responses} responses"
       jump_to_sources: "See sources"
+      listen: "Listen"
+      listen_stop: "Stop reading aloud"
       reading: "Reading the results…"
       searching: "Searching the corpus…"
       stat_countries: "Countries"

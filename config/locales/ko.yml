@@ -213,6 +213,8 @@ ko:
       picker_none: "아직 선택된 항목이 없습니다"
       picker_count: "질문 %{total}개 중 %{questions}개 · 응답 %{responses}개"
       jump_to_sources: "출처 보기"
+      listen: "듣기"
+      listen_stop: "읽기 중지"
       reading: "결과를 읽는 중…"
       searching: "데이터를 검색하는 중…"
       stat_countries: "국가 수"

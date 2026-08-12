@@ -213,6 +213,8 @@ sw:
       picker_none: "Hakuna kilichochaguliwa bado"
       picker_count: "Maswali %{questions} kati ya %{total} · majibu %{responses}"
       jump_to_sources: "Ona vyanzo"
+      listen: "Sikiliza"
+      listen_stop: "Simamisha usomaji"
       reading: "Inasoma matokeo…"
       searching: "Inatafuta kwenye data…"
       stat_countries: "Nchi"

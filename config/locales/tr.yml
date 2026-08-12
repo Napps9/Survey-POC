@@ -213,6 +213,8 @@ tr:
       picker_none: "Henüz bir şey seçilmedi"
       picker_count: "%{total} sorudan %{questions} tanesi · %{responses} yanıt"
       jump_to_sources: "Kaynakları gör"
+      listen: "Dinle"
+      listen_stop: "Okumayı durdur"
       reading: "Sonuçlar okunuyor…"
       searching: "Veri kümesi aranıyor…"
       stat_countries: "Ülkeler"

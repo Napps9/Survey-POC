@@ -213,6 +213,8 @@ uk:
       picker_none: "Поки нічого не вибрано"
       picker_count: "%{questions} із %{total} запитань · відповідей: %{responses}"
       jump_to_sources: "Показати джерела"
+      listen: "Прослухати"
+      listen_stop: "Зупинити читання"
       reading: "Читаю результати…"
       searching: "Пошук у корпусі…"
       stat_countries: "Країни"

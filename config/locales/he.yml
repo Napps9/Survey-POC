@@ -213,6 +213,8 @@ he:
       picker_none: "עוד לא נבחר דבר"
       picker_count: "%{questions} מתוך %{total} שאלות · %{responses} תשובות"
       jump_to_sources: "הצג מקורות"
+      listen: "האזנה"
+      listen_stop: "עצירת ההקראה"
       reading: "קורא את התוצאות…"
       searching: "מחפש במאגר…"
       stat_countries: "מדינות"

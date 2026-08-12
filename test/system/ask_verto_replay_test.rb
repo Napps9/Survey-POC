@@ -248,4 +248,44 @@ class AskVertoReplayTest < ApplicationSystemTestCase
     assert_equal pinned_before, evaluate_script(pinned),
       "the pinned cluster must hold the top-right corner while the sources folder is out"
   end
+
+  test "a long conversation scrolls inside the feed" do
+    # Enough stored turns to overflow any viewport. The regression: the grid's
+    # implicit row grew with the conversation instead of pinning to the grid's
+    # height, so the feed's overflow-y never engaged and the tail of an answer
+    # was simply clipped — nothing scrolled anywhere.
+    6.times do |i|
+      @thread.ask_messages.create!(role: "user", text: "Question #{i}?")
+      @thread.ask_messages.create!(role: "assistant", text: "Answer #{i}. #{"A long paragraph of findings. " * 60}")
+    end
+    open_ask
+
+    assert evaluate_script("document.querySelector('.ask-feed').scrollHeight > document.querySelector('.ask-feed').clientHeight"),
+      "the conversation must overflow the feed, not grow it"
+
+    execute_script("document.querySelector('.ask-feed').scrollTop = 99999")
+    assert evaluate_script("document.querySelector('.ask-feed').scrollTop").positive?,
+      "the feed must actually scroll — scrollTop pinned at 0 means the row grew instead"
+  end
+
+  test "an answer can be read aloud and stopped" do
+    open_ask
+
+    # The real speechSynthesis fires onend/onerror on its own schedule (and a
+    # voiceless CI Chromium errors immediately), so the browser's engine is
+    # stubbed out and what's asserted is our wiring: the toggle, the state
+    # class, and the label swap.
+    execute_script("window.speechSynthesis.speak = () => {}; window.speechSynthesis.cancel = () => {};")
+
+    button = find(".ask-listen", match: :first)
+    assert_equal I18n.t("js.ask.listen"), button["aria-label"]
+
+    button.click
+    assert_selector ".ask-listen.is-speaking"
+    assert_equal I18n.t("js.ask.listen_stop"), find(".ask-listen.is-speaking")["aria-label"]
+
+    find(".ask-listen.is-speaking").click
+    assert_no_selector ".ask-listen.is-speaking"
+    assert_equal I18n.t("js.ask.listen"), find(".ask-listen", match: :first)["aria-label"]
+  end
 end

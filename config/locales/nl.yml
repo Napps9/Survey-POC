@@ -213,6 +213,8 @@ nl:
       picker_none: "Nog niets geselecteerd"
       picker_count: "%{questions} van %{total} vragen · %{responses} antwoorden"
       jump_to_sources: "Bronnen bekijken"
+      listen: "Beluisteren"
+      listen_stop: "Voorlezen stoppen"
       reading: "De resultaten lezen…"
       searching: "Het corpus doorzoeken…"
       stat_countries: "Landen"

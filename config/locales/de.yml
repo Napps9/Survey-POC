@@ -213,6 +213,8 @@ de:
       picker_none: "Noch nichts ausgewählt"
       picker_count: "%{questions} von %{total} Fragen · %{responses} Antworten"
       jump_to_sources: "Quellen ansehen"
+      listen: "Anhören"
+      listen_stop: "Vorlesen stoppen"
       reading: "Ergebnisse werden gelesen…"
       searching: "Der Datenbestand wird durchsucht…"
       stat_countries: "Länder"
