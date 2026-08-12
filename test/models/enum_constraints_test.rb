@@ -18,10 +18,16 @@ class EnumConstraintsTest < ActiveSupport::TestCase
                                    cards: [])
   end
 
+  # Inside a savepoint (requires_new), because on Postgres a statement that
+  # violates a CHECK poisons the test-wrapping transaction — every later
+  # statement in the test would fail with InFailedSqlTransaction. SQLite
+  # carries on regardless; the savepoint makes both engines behave alike.
   def raw_update(table, id, column, value)
-    ActiveRecord::Base.connection.execute(
-      "UPDATE #{table} SET #{column} = '#{value}' WHERE id = #{id}"
-    )
+    ActiveRecord::Base.transaction(requires_new: true) do
+      ActiveRecord::Base.connection.execute(
+        "UPDATE #{table} SET #{column} = '#{value}' WHERE id = #{id}"
+      )
+    end
   end
 
   test "a leaderboard retake policy outside the enum is rejected by the database" do

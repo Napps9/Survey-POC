@@ -15,12 +15,18 @@ class ReferentialIntegrityTest < ActiveSupport::TestCase
                          password: "verylongpassword")
   end
 
+  # The violating statements run inside a savepoint (requires_new) with
+  # portable CURRENT_TIMESTAMP: on Postgres a failed statement poisons the
+  # test-wrapping transaction, and datetime('now') is SQLite-only — either one
+  # makes these tests engine-specific when the suite runs against Postgres.
   test "an identity cannot point at a user that isn't there" do
     assert_raises(ActiveRecord::InvalidForeignKey) do
-      ActiveRecord::Base.connection.execute(
-        "INSERT INTO identities (provider, uid, user_id, created_at, updated_at) " \
-        "VALUES ('google', 'ri-#{SecureRandom.hex(3)}', 999999, datetime('now'), datetime('now'))"
-      )
+      ActiveRecord::Base.transaction(requires_new: true) do
+        ActiveRecord::Base.connection.execute(
+          "INSERT INTO identities (provider, uid, user_id, created_at, updated_at) " \
+          "VALUES ('google', 'ri-#{SecureRandom.hex(3)}', 999999, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+        )
+      end
     end
   end
 
@@ -64,11 +70,13 @@ class ReferentialIntegrityTest < ActiveSupport::TestCase
     set = @org.common_question_sets.create!(name: "S", theme: "T", key_insight: "x",
                                             default_locale: "en")
     assert_raises(ActiveRecord::InvalidForeignKey) do
-      ActiveRecord::Base.connection.execute(
-        "INSERT INTO partnership_common_question_sets " \
-        "(partnership_id, common_question_set_id, created_at, updated_at) " \
-        "VALUES (999999, #{set.id}, datetime('now'), datetime('now'))"
-      )
+      ActiveRecord::Base.transaction(requires_new: true) do
+        ActiveRecord::Base.connection.execute(
+          "INSERT INTO partnership_common_question_sets " \
+          "(partnership_id, common_question_set_id, created_at, updated_at) " \
+          "VALUES (999999, #{set.id}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+        )
+      end
     end
   end
 

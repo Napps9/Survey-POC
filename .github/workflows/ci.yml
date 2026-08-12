@@ -29,6 +29,46 @@ jobs:
           bin/rails db:test:prepare
           bin/rails test
 
+  test_postgres:
+    runs-on: ubuntu-latest
+
+    # The suite, on production's engine. Dev and test run SQLite while Render
+    # runs Postgres, and the two disagree on real things — LOWER() over a json
+    # column, DISTINCT over rows that contain one — that SQLite lets straight
+    # through. Ask Verto shipped broken exactly that way; this job turns that
+    # class of production-only failure into a red check that blocks the deploy.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: [ "5432:5432" ]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run tests against Postgres
+        env:
+          RAILS_ENV: test
+          ANTHROPIC_API_KEY: ci-stub-key-no-real-calls
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/survey_poc_test
+        run: |
+          bin/rails db:test:prepare
+          bin/rails test
+
   system_test:
     runs-on: ubuntu-latest
 

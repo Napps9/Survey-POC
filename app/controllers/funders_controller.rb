@@ -112,10 +112,13 @@ class FundersController < ApplicationController
   end
 
   def load_member_show_data
-    @other_members = @funder.member_organisations
-                       .where(funder_memberships: { status: "active" })
-                       .where.not(id: current_organisation.id)
-                       .distinct
+    # Deduped via an id subquery, not DISTINCT: organisations carries a json
+    # column, and Postgres cannot DISTINCT a row that contains one.
+    @other_members = Organisation.where(
+                       id: @funder.member_organisations
+                             .where(funder_memberships: { status: "active" })
+                             .select("organisations.id")
+                     ).where.not(id: current_organisation.id)
     @total_partner_count = @funder.funder_memberships.active.count
   end
 end

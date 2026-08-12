@@ -119,10 +119,13 @@ class PartnershipsController < ApplicationController
   end
 
   def load_partner_show_data
-    @other_members = @partnership.member_organisations
-                       .where.not(id: current_organisation.id)
-                       .where(partnership_memberships: { status: "active" })
-                       .distinct
+    # Deduped via an id subquery, not DISTINCT: organisations carries a json
+    # column, and Postgres cannot DISTINCT a row that contains one.
+    @other_members = Organisation.where(
+                       id: @partnership.member_organisations
+                             .where(partnership_memberships: { status: "active" })
+                             .select("organisations.id")
+                     ).where.not(id: current_organisation.id)
     @total_partner_count = @partnership.partnership_memberships.active.count
 
     @partnership_vertos = @partnership.partnership_vertos.includes(:survey).order(:created_at)

@@ -93,6 +93,13 @@ that: push green.
   `window.I18N`, which carries `js:` plus the curated slice in
   `app/views/layouts/_i18n_js.html.erb` — a JS-facing string anywhere else
   renders as a raw dotted key.
+- Dev/test run SQLite; production runs Postgres, and they disagree on real
+  things — `LOWER()` on a `json` column and `DISTINCT` over rows containing
+  one both pass SQLite and 500 on Postgres (this took Ask Verto down in prod,
+  2026-08-12). Raw SQL must run on both engines (`LOWER(CAST(col AS TEXT))`,
+  dedupe via id-subquery instead of `.distinct` on full rows). CI's
+  `test_postgres` job runs the whole suite on Postgres to catch this class;
+  keep it green, don't delete it to get a deploy out.
 - Dashboard/player styling is mostly inline `style` attributes plus classes
   in `app/assets/tailwind/application.css`; match the file you're editing.
 - `/play/:token` is served through a Service Worker (`app/views/pwa/service-worker.js`)

@@ -246,7 +246,9 @@ class CorpusTools
     relation = base_questions
     relation = relation.where("LOWER(theme) LIKE ?", "%#{sanitize(input["theme"].to_s.downcase)}%") if input["theme"].present?
 
-    clause = terms.map { "(LOWER(question_text) LIKE ? OR LOWER(theme) LIKE ? OR LOWER(options) LIKE ?)" }.join(" OR ")
+    # `options` is a json column, and Postgres has no LOWER(json) — the cast is
+    # what lets the same clause run on SQLite in dev and Postgres in prod.
+    clause = terms.map { "(LOWER(question_text) LIKE ? OR LOWER(theme) LIKE ? OR LOWER(CAST(options AS TEXT)) LIKE ?)" }.join(" OR ")
     args   = terms.flat_map { |t| [ "%#{sanitize(t)}%" ] * 3 }
 
     matches = relation.where(clause, *args).order(response_count: :desc).limit(SEARCH_LIMIT)
@@ -271,9 +273,13 @@ class CorpusTools
   # ── list_vertos ───────────────────────────────────────────────────────────
   def list_vertos(input)
     entries = scoped_entries.includes(:survey, :organisation)
-    entries = entries.joins(:corpus_questions)
-                     .where("LOWER(corpus_questions.theme) LIKE ?", "%#{sanitize(input["theme"].to_s.downcase)}%")
-                     .distinct if input["theme"].present?
+    # An id subquery, not joins+distinct: corpus_entries carries json columns,
+    # and Postgres cannot DISTINCT a row that contains one.
+    if input["theme"].present?
+      themed = CorpusQuestion.where("LOWER(theme) LIKE ?", "%#{sanitize(input["theme"].to_s.downcase)}%")
+                             .select(:corpus_entry_id)
+      entries = entries.where(id: themed)
+    end
 
     { vertos: entries.map { |e| verto_row(e) } }
   end

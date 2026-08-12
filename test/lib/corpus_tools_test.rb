@@ -151,6 +151,31 @@ class CorpusToolsTest < ActiveSupport::TestCase
     assert_equal [ "Live one" ], names
   end
 
+  # The theme filter once went through joins+DISTINCT over full corpus_entries
+  # rows, which Postgres refuses on a table with json columns — every themed
+  # listing in production returned "That lookup failed" while SQLite passed.
+  test "list_vertos filters by theme without tripping over json columns" do
+    indexed_verto(title: "Climate one")
+
+    rows = CorpusTools.new.call("list_vertos", { "theme" => "climate" })
+
+    assert_nil rows[:error]
+    assert_equal [ "Climate one" ], rows[:vertos].map { |v| v[:verto] }
+    assert_empty CorpusTools.new.call("list_vertos", { "theme" => "biodiversity" })[:vertos]
+  end
+
+  # Same production-only failure shape: LOWER() over the json options column
+  # needs an explicit text cast on Postgres. The match must actually work —
+  # "somewhat" appears in an option label and nowhere else on the question.
+  test "search matches inside answer options across databases" do
+    indexed_verto
+
+    rows = search("somewhat")
+
+    assert_nil rows[:error]
+    assert_equal 1, rows[:questions].size
+  end
+
   test "coverage counts only what can be cited" do
     indexed_verto(title: "Live one")
     indexed_verto(title: "Pending one", review_status: "pending")
