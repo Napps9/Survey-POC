@@ -66,32 +66,50 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
 
   # ── The country-tailored heritage card ────────────────────────────────────
 
-  test "heritage_tail_options is the registry's own escape-hatch pair, per locale" do
+  test "the heritage tail resolves per locale, and splits into its two roles" do
     assert_equal [ "Another heritage", "Prefer not to say" ],
                  DemographicQuestions.heritage_tail_options
     assert_equal DemographicQuestions.optional_card("heritage", locale: "fr")["options"].last(2),
                  DemographicQuestions.heritage_tail_options(locale: "fr")
+
+    # One is what a typed answer is recorded as, the other is a real choice.
+    assert_equal "Another heritage", DemographicQuestions.another_heritage_label
+    assert_equal "Prefer not to say", DemographicQuestions.heritage_decline_option
   end
 
-  test "country_heritage_card swaps the taxonomy but keeps the escape hatches" do
+  test "country_heritage_card swaps the taxonomy and keeps declining a choice" do
     five = [ "White British", "Indian", "Pakistani", "Black Caribbean", "Chinese" ]
     card = DemographicQuestions.country_heritage_card(country: "gb", five: five)
 
-    assert_equal five + DemographicQuestions.heritage_tail_options, card["options"]
-    assert_equal 7, card["options"].size
+    assert_equal five + [ DemographicQuestions.heritage_decline_option ], card["options"]
+    assert_equal 6, card["options"].size
     assert card["allow_other"], "five categories will miss people"
     assert_equal "GB", card["heritage_country"], "the code is normalised, not echoed"
     assert_equal "heritage", card["demographic_key"], "it is still the same question"
     assert card["demographic"]
   end
 
-  test "a French Verto's tailored card carries the French question and tail" do
+  test "a tailored card offers no 'Another heritage' button — you type it instead" do
+    card = DemographicQuestions.country_heritage_card(
+      country: "GB", five: %w[a b c d e]
+    )
+
+    refute_includes card["options"], DemographicQuestions.another_heritage_label,
+                    "a radio reading 'Another heritage' records that someone didn't fit " \
+                    "without ever asking what they are; the Other box asks"
+    assert card["allow_other"], "which only works because the free-text box is there"
+    assert_equal DemographicQuestions.heritage_decline_option, card["options"].last,
+                 "declining is a different answer from not fitting, so it stays a choice"
+  end
+
+  test "a French Verto's tailored card carries the French question and decline option" do
     card = DemographicQuestions.country_heritage_card(
       country: "FR", five: %w[un deux trois quatre cinq], locale: "fr"
     )
 
     assert_equal DemographicQuestions.optional_card("heritage", locale: "fr")["text"], card["text"]
-    assert_equal DemographicQuestions.heritage_tail_options(locale: "fr"), card["options"].last(2)
+    assert_equal DemographicQuestions.heritage_decline_option(locale: "fr"), card["options"].last
+    refute_includes card["options"], DemographicQuestions.another_heritage_label(locale: "fr")
   end
 
   test "no usable list means the plain registry card, never a half-tailored one" do

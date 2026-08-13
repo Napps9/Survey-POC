@@ -843,10 +843,30 @@ class PlayerController < ApplicationController
 
     # Opt-in demographics (DemographicQuestions::OPTIONAL_CARDS), same
     # tamper-guard posture: values must be options the card actually offers.
+    #
+    # A country-tailored card has no "Another heritage" button — someone whose
+    # heritage isn't among the five types it into the Other box instead. That
+    # answer arrives as { value: nil, other: "..." }, so without the second
+    # branch below it would denormalise to nothing and those respondents would
+    # vanish from the segments entirely, which is the opposite of what asking
+    # in local terms was for.
+    #
+    # What gets STORED is the registry's own "Another heritage" label, never
+    # the typed text: a respondent-authored string in this column renders
+    # straight into the creator's dashboard as a segment pill, which is exactly
+    # what the allowlist above exists to prevent. The words themselves are kept
+    # on the answer and reach the creator through the card's own free-text
+    # panel and the exports.
     heritage_idx = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["demographic_key"] == "heritage" }
     heritage     = heritage_idx ? answers[heritage_idx.to_s]&.dig("value").to_s.strip.presence : nil
+    h_other      = heritage_idx ? answers[heritage_idx.to_s]&.dig("other").to_s.strip.presence : nil
     h_allowed    = heritage_idx ? Array(cards[heritage_idx]["options"]).map(&:to_s) : []
-    resp.demographic_heritage = h_allowed.include?(heritage) ? heritage : nil
+    resp.demographic_heritage =
+      if h_allowed.include?(heritage)
+        heritage
+      elsif h_other && cards[heritage_idx]["allow_other"]
+        DemographicQuestions.another_heritage_label(locale: @survey.default_locale)
+      end
 
     # Neurodiversity is a multi-select; packed pipe-wrapped and sorted (see
     # the column migration). A label containing "|" would corrupt the packing

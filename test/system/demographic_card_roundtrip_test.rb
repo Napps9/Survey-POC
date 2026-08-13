@@ -101,6 +101,6 @@ class DemographicCardRoundtripTest < ApplicationSystemTestCase
     assert_equal "GB", card["heritage_country"],
                  "without this the Verto forgets which country's taxonomy it is asking in"
     assert card["allow_other"], "the free-text Other box must survive too"
-    assert_equal five + DemographicQuestions.heritage_tail_options, card["options"]
+    assert_equal five + [ DemographicQuestions.heritage_decline_option ], card["options"]
   end
 end

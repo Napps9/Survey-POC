@@ -43,6 +43,31 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
                "only options the card actually offers may become segment labels"
   end
 
+  # A country-tailored card has no "Another heritage" button — someone whose
+  # heritage isn't among the five types it instead. That has to still count.
+  test "a typed heritage counts as Another heritage, and never as itself" do
+    tailored = DemographicQuestions.country_heritage_card(
+      country: "GB", five: [ "White British", "Indian", "Pakistani", "Black Caribbean", "Chinese" ]
+    )
+    @survey.update!(cards: @survey.cards.first(4) + [ tailored, @survey.cards.last ])
+
+    resp = submit!({ "4" => { "type" => "multiple_choice", "value" => nil, "other" => "Cornish" } })
+
+    assert_equal "Another heritage", resp.demographic_heritage,
+                 "without this the people the tailored list missed vanish from the segments"
+    refute_equal "Cornish", resp.demographic_heritage,
+                 "a respondent's own words must never become a dashboard segment label"
+    assert_equal "Cornish", resp.answers["4"]["other"],
+                 "their words are kept on the answer, for the free-text panel and the exports"
+  end
+
+  test "a typed heritage is ignored on a card that doesn't offer the box" do
+    # The global card has its own "Another heritage" option and no Other box;
+    # an `other` payload against it is a tampered one.
+    resp = submit!({ "4" => { "type" => "multiple_choice", "value" => nil, "other" => "Cornish" } })
+    assert_nil resp.demographic_heritage
+  end
+
   test "gender still syncs with heritage in the deck — the collision guard" do
     resp = submit!({ "3" => { "type" => "multiple_choice", "value" => "Female" },
                      "4" => { "type" => "multiple_choice", "value" => "Indigenous heritage" } })
