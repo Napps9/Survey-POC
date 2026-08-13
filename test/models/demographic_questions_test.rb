@@ -34,7 +34,7 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
     en = DemographicQuestions.optional_card("neurodiversity")
 
     refute_equal en["text"], fr["text"], "the French Verto must ask in French"
-    assert_equal 8, fr["options"].size
+    assert_equal 7, fr["options"].size, "9 vocabulary entries, two retired"
     assert_equal en, DemographicQuestions.optional_card("neurodiversity", locale: "xx-nope")
   end
 
@@ -71,30 +71,53 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
   # POSITION in each registry list; move an entry without moving the index and
   # a typed answer starts being filed under a real category instead. Nothing
   # else would raise, so this is the alarm.
-  test "the off-list index points at the label it claims, on both cards" do
+  test "the retired indexes point at the labels they claim, on both cards" do
     {
-      "heritage"       => "Another heritage",
-      "neurodiversity" => "Another form of neurodivergence"
-    }.each do |key, label|
-      idx = DemographicQuestions::OFF_LIST_OPTION_INDEX[key]
-      assert_equal label, DemographicQuestions::OPTIONAL_CARDS[key]["options"][idx],
-                   "#{key}: OFF_LIST_OPTION_INDEX has drifted from the registry list"
-      assert_equal label, DemographicQuestions.off_list_label(key)
-      assert_includes DemographicQuestions.translated_options(key), label,
-                      "it stays in the vocabulary — it is still what a typed answer is recorded as"
-      refute_includes DemographicQuestions.shown_options(key), label,
-                      "but it is never offered as a choice"
+      "heritage"       => { 7 => "Another heritage" },
+      "neurodiversity" => { 6 => "Another form of neurodivergence", 7 => "None of these" }
+    }.each do |key, expected|
+      assert_equal expected.keys, DemographicQuestions::RETIRED_OPTION_INDEXES[key],
+                   "#{key}: retired list has drifted"
+      expected.each do |idx, label|
+        assert_equal label, DemographicQuestions::OPTIONAL_CARDS[key]["options"][idx],
+                     "#{key}[#{idx}]: RETIRED_OPTION_INDEXES has drifted from the registry list"
+        assert_includes DemographicQuestions.translated_options(key), label,
+                        "retired entries stay in the vocabulary — older decks still offer them"
+        refute_includes DemographicQuestions.shown_options(key), label,
+                        "but a new card never offers them"
+      end
     end
   end
 
-  test "both cards drop their dead end and take the free-text box instead" do
-    DemographicQuestions::OPTIONAL_CARDS.each_key do |key|
+  test "the off-list label is one of the retired entries, and is recorded not shown" do
+    { "heritage" => "Another heritage",
+      "neurodiversity" => "Another form of neurodivergence" }.each do |key, label|
+      idx = DemographicQuestions::OFF_LIST_OPTION_INDEX[key]
+      assert_includes DemographicQuestions::RETIRED_OPTION_INDEXES[key], idx,
+                      "#{key}: a label that is still shown cannot also be the typed-answer label"
+      assert_equal label, DemographicQuestions.off_list_label(key)
+    end
+  end
+
+  test "both cards drop their dead ends and take the free-text box instead" do
+    {
+      "heritage" => 8,        # 9 vocabulary entries, "Another heritage" retired
+      "neurodiversity" => 7   # …plus "None of these": ticking nothing already says it
+    }.each do |key, shown|
       card = DemographicQuestions.optional_card(key)
-      assert_equal 8, card["options"].size, "#{key}: 9 vocabulary entries, 8 shown"
+      assert_equal shown, card["options"].size
       assert card["allow_other"], "#{key}: nowhere to say 'not on your list' otherwise"
       assert_equal DemographicQuestions.decline_option(key), card["options"].last,
                    "#{key}: declining stays a real choice"
     end
+  end
+
+  # The exclusivity rule outlives the option: decks inserted before it was
+  # retired still offer "None of these", and their answers still have to sort.
+  test "neuro_exclusive_labels still recognises the retired 'None of these'" do
+    refute_includes DemographicQuestions.shown_options("neurodiversity"), "None of these"
+    assert_includes DemographicQuestions.neuro_exclusive_labels, "None of these"
+    assert_includes DemographicQuestions.neuro_exclusive_labels, "Aucune de ces réponses"
   end
 
   test "the off-list and decline labels resolve per locale and stay distinct" do

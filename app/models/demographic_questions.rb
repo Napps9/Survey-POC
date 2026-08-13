@@ -81,24 +81,35 @@ module DemographicQuestions
   # allowlist change.
   DEMOGRAPHIC_KEYS = (OPTIONAL_CARDS.keys + [ "gender" ]).freeze
 
-  # The one entry in each registry list that is NOT shown on the card.
+  # Registry entries the card no longer OFFERS. They stay in the list because
+  # the list is the translated vocabulary, not the card:
   #
-  # "Another heritage" and "Another form of neurodivergence" were dead ends: a
-  # radio recording that someone didn't fit the list without ever asking what
-  # they are. The card offers the free-text box instead (optional_card sets
-  # allow_other), so "another" is something you type.
+  #   · decks inserted before they were retired still carry them as real
+  #     options, and their stored answers still have to validate;
+  #   · one of them is still the label a typed answer is recorded as
+  #     (OFF_LIST_OPTION_INDEX below);
+  #   · neuro_exclusive_labels reads "None of these" positionally across every
+  #     locale, and must keep recognising it for those older decks.
   #
-  # The label stays in the list because it is still the label a typed answer is
-  # RECORDED as (PlayerController#sync_demographics_from_answers!) — never the
-  # respondent's own words, which would put respondent-authored text into the
-  # creator's dashboard as a segment pill. It has to be translated in all 19
-  # locale files to do that job, and responses already collected carry it, so
-  # removing it would split those segments from every new one.
+  # Retired so far:
+  #   heritage       7 "Another heritage"
+  #   neurodiversity 6 "Another form of neurodivergence"
+  #                    — both dead ends: a button recording that someone didn't
+  #                      fit the list without ever asking what they are. The
+  #                      free-text box (optional_card sets allow_other) asks.
+  #   neurodiversity 7 "None of these"
+  #                    — the card is a select-many asking "choose any that
+  #                      apply", so ticking nothing already says none of them do.
   #
   # Pinned by INDEX, because the locale merge is positional and the parity test
-  # compares translated lists to this constant by length. Moving an entry in
-  # either list without moving its index here is caught by the registry guard
-  # in test/models/demographic_questions_test.rb.
+  # compares translated lists to the registry by length. Reorder a list without
+  # moving these and the registry guard in
+  # test/models/demographic_questions_test.rb fails.
+  RETIRED_OPTION_INDEXES = { "heritage" => [ 7 ], "neurodiversity" => [ 6, 7 ] }.freeze
+
+  # Which retired entry a typed answer is recorded as — never the respondent's
+  # own words, which would put respondent-authored text into the creator's
+  # dashboard as a segment pill.
   OFF_LIST_OPTION_INDEX = { "heritage" => 7, "neurodiversity" => 6 }.freeze
 
   # One optional card resolved in `locale`, or nil for an unknown key. Deep
@@ -151,12 +162,11 @@ module DemographicQuestions
     spec["options"].dup
   end
 
-  # The options a card actually offers: the vocabulary without its off-list
-  # label. A key with no off-list entry (none today) shows the list whole.
+  # The options a card actually offers: the vocabulary minus whatever has been
+  # retired from it. A key with nothing retired shows the list whole.
   def self.shown_options(key, locale: nil)
-    opts = translated_options(key, locale: locale)
-    idx  = OFF_LIST_OPTION_INDEX[key.to_s]
-    idx ? opts.reject.with_index { |_, i| i == idx } : opts
+    retired = RETIRED_OPTION_INDEXES[key.to_s] || []
+    translated_options(key, locale: locale).reject.with_index { |_, i| retired.include?(i) }
   end
 
   # The label a typed answer on `key`'s card is recorded as — "Another

@@ -34,6 +34,15 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
     @survey.responses.order(:id).last
   end
 
+  # A deck inserted before an option was retired: the card carries the full
+  # vocabulary as real options, which is what its stored answers validate
+  # against. The rules that sort those answers have to outlive the option.
+  def with_legacy_options!(idx, key)
+    cards = @survey.cards.dup
+    cards[idx] = cards[idx].merge("options" => DemographicQuestions.translated_options(key))
+    @survey.update!(cards: cards)
+  end
+
   test "a heritage answer denormalises; a tampered one is refused" do
     resp = submit!({ "4" => { "type" => "multiple_choice", "value" => "Asian heritage" } })
     assert_equal "Asian heritage", resp.demographic_heritage
@@ -88,6 +97,11 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
   end
 
   test "real conditions beat the exclusive picks; exclusives store alone" do
+    # "None of these" is retired from new cards — ticking nothing on a
+    # select-many already says it — but decks that predate that still offer it,
+    # and their answers must keep sorting the same way.
+    with_legacy_options!(5, "neurodiversity")
+
     resp = submit!({ "5" => { "type" => "select_many", "value" => [ "ADHD", "None of these" ] } })
     assert_equal "|ADHD|", resp.demographic_neurodiversity
 
@@ -96,6 +110,18 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
 
     resp = submit!({ "5" => { "type" => "select_many", "value" => [ "None of these", "Prefer not to say" ] } })
     assert_equal "|None of these|", resp.demographic_neurodiversity, "first-picked exclusive wins, alone"
+  end
+
+  test "a new card no longer offers 'None of these' — ticking nothing says it" do
+    card = @survey.cards[5]
+    refute_includes card["options"], "None of these"
+    assert_equal "Prefer not to say", card["options"].last,
+                 "declining is still a distinct answer from nothing applying"
+
+    # And a payload claiming it against a card that doesn't offer it is dropped,
+    # like any other value the card never showed.
+    resp = submit!({ "5" => { "type" => "select_many", "value" => [ "None of these" ] } })
+    assert_nil resp.demographic_neurodiversity
   end
 
   test "tampered neurodiversity values are dropped" do
@@ -118,8 +144,10 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
 
   test "a typed neurodivergence beats an exclusive pick" do
     # The Other box replaces the selection platform-wide, so this is really a
-    # tampered payload — but if it ever arrives, a real condition wins, exactly
-    # as a ticked one does.
+    # tampered payload — but if it ever arrives on a deck that still offers the
+    # exclusive, a real condition wins, exactly as a ticked one does.
+    with_legacy_options!(5, "neurodiversity")
+
     resp = submit!({ "5" => { "type" => "select_many",
                               "value" => [ "None of these" ], "other" => "Misophonia" } })
     assert_equal "|Another form of neurodivergence|", resp.demographic_neurodiversity
