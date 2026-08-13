@@ -14,6 +14,7 @@ require "open3"
 require "time"
 require "fileutils"
 require_relative "trello_client"
+require_relative "claude_client"
 
 module StoryPointEstimator
   FIB_SEQUENCE = [ 1, 2, 3, 5, 8, 13 ].freeze
@@ -139,7 +140,7 @@ module StoryPointEstimator
   # ─────────────────────────────────────────────────────────────
 
   module Scoring
-    DEFAULT_MODEL       = ENV.fetch("CLAUDE_MODEL_FAST", "claude-haiku-4-5-20251001")
+    DEFAULT_MODEL       = ClaudeClient::DEFAULT_MODEL
     # Nonzero on purpose — see self_consistency below. Sampling at temp 0
     # three times mostly just returns the same answer three times and burns
     # 3x the cost for near-zero extra signal; real self-consistency needs
@@ -311,35 +312,12 @@ module StoryPointEstimator
       MSG
     end
 
-    def self.http_client_for(uri)
-      # Same proxy-detection gap as trello_log: Net::HTTP's :ENV proxy only
-      # reads http_proxy, never https_proxy — read it directly.
-      proxy_env = ENV["https_proxy"] || ENV["HTTPS_PROXY"]
-      proxy_uri = URI(proxy_env) if proxy_env
-      http = Net::HTTP.new(uri.host, uri.port, proxy_uri&.host, proxy_uri&.port)
-      http.use_ssl = true
-      http
-    end
-
     def self.call_claude(system:, user_message:, api_key:, model:, temperature:)
-      uri = URI("https://api.anthropic.com/v1/messages")
-      request = Net::HTTP::Post.new(uri)
-      request["x-api-key"] = api_key
-      request["anthropic-version"] = "2023-06-01"
-      request["content-type"] = "application/json"
-      request.body = JSON.generate(
-        model: model,
-        max_tokens: MAX_TOKENS,
-        temperature: temperature,
-        system: system,
-        tools: [ TOOL ],
-        tool_choice: { type: "tool", name: TOOL[:name] },
-        messages: [ { role: "user", content: user_message } ]
+      ClaudeClient.messages(
+        api_key: api_key, model: model, max_tokens: MAX_TOKENS,
+        system: system, user_message: user_message, temperature: temperature,
+        tools: [ TOOL ], tool_choice: { type: "tool", name: TOOL[:name] }
       )
-      response = http_client_for(uri).start { |h| h.request(request) }
-      raise "Anthropic API error #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
-
-      JSON.parse(response.body)
     end
 
     def self.points_for_sum(sum)

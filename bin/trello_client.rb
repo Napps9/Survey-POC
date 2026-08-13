@@ -10,6 +10,7 @@ require "date"
 
 module TrelloClient
   BOARD_ID = "ntNghZRN"
+  WEEKLY_LIST_PREFIX = "Done - Week of "
 
   # Fibonacci story points, mapped onto the board's 6 default (unnamed) label
   # colors instead of creating new labels.
@@ -115,7 +116,18 @@ module TrelloClient
 
   def self.weekly_done_list_name(date)
     monday = week_monday(date)
-    "Done - Week of #{ordinal(monday.day)} #{monday.strftime('%B')} #{monday.year}"
+    "#{WEEKLY_LIST_PREFIX}#{ordinal(monday.day)} #{monday.strftime('%B')} #{monday.year}"
+  end
+
+  # Inverse of weekly_done_list_name: the week's Monday, or nil for any list
+  # that isn't a weekly Done list. The prefix guard matters — Date.parse is
+  # happy to find a date in unrelated list names.
+  def self.week_monday_from_name(name)
+    return nil unless name.start_with?(WEEKLY_LIST_PREFIX)
+
+    Date.parse(name.delete_prefix(WEEKLY_LIST_PREFIX).sub(/(\d+)(st|nd|rd|th)\b/, "\\1"))
+  rescue Date::Error
+    nil
   end
 
   # Trello ObjectIds embed their creation time: first 8 hex chars = unix
@@ -134,7 +146,7 @@ module TrelloClient
     found = lists.find { |l| l["name"].casecmp?(name) }
     return found if found
 
-    leftmost = lists.select { |l| l["name"].start_with?("Done - Week of") }
+    leftmost = lists.select { |l| l["name"].start_with?(WEEKLY_LIST_PREFIX) }
                     .map { |l| l["pos"].to_f }.min
     pos = leftmost.nil? || leftmost <= 1 ? "bottom" : leftmost - 1
     request(:post, "/boards/#{BOARD_ID}/lists", auth.merge(name: name, pos: pos))

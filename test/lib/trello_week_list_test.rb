@@ -26,6 +26,20 @@ class TrelloWeekListTest < ActiveSupport::TestCase
                  TrelloClient.weekly_done_list_name(Date.new(2027, 1, 2))
   end
 
+  test "week_monday_from_name round-trips weekly_done_list_name" do
+    [ Date.new(2026, 7, 13), Date.new(2026, 8, 10), Date.new(2026, 12, 28) ].each do |monday|
+      assert_equal monday, TrelloClient.week_monday_from_name(TrelloClient.weekly_done_list_name(monday))
+    end
+  end
+
+  test "week_monday_from_name rejects non-weekly and garbled list names" do
+    assert_nil TrelloClient.week_monday_from_name("Backlog")
+    assert_nil TrelloClient.week_monday_from_name("Done")
+    assert_nil TrelloClient.week_monday_from_name("Done - Week of sometime soon")
+    # Date-parseable, but not a weekly Done list — the prefix guard must win.
+    assert_nil TrelloClient.week_monday_from_name("May 2026 tasks")
+  end
+
   test "card id embeds its creation time in UTC" do
     created = Time.utc(2026, 8, 10, 12, 30, 5)
     card_id = "#{created.to_i.to_s(16)}0000000000000000"

@@ -58,6 +58,21 @@ level, never committed). If they're not present in this session, skip logging
 rather than failing the push — the code change is what matters, the log
 entry is best-effort.
 
+Each weekly list also carries a pinned `Week summary — N pts · M cards` card
+maintained by `bin/trello_week_summary` (no args = the week containing today,
+UTC; `--week DATE`; `--all` for every weekly list; `--dry-run` to preview):
+story-point totals, frontend/backend split, test-checklist tally, and
+Claude-written theme highlights (`CLAUDE_MODEL_FAST`; falls back to a plain
+title list when `ANTHROPIC_API_KEY` is absent or the call fails). A Claude
+session running without that key should compose the bullets itself instead:
+`--print-cards` emits the week's card lines, `--highlights PATH` (or `-`)
+feeds the composed bullets back in place of the API call. The
+`Week summary` title prefix is **reserved** — never `bin/trello_log` a card
+whose title starts with it. A scheduled Sunday-evening task re-runs the
+script for the closing week; re-runs idempotently update the existing card
+(cards logged late Sunday are picked up by the next run), so there's no need
+to run it after every push.
+
 ## Deploys
 
 Render deploys the `Main` branch automatically, gated on CI: `render.yaml`

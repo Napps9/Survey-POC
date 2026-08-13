@@ -1,0 +1,128 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Writes (or idempotently updates) the pinned "Week summary" card atop a
+# weekly "Done - Week of ..." list: story-point totals, card counts, and
+# Claude-written theme highlights (deterministic title list when the API key
+# is absent or the call fails — a broken summarizer must not fail the run;
+# a broken Trello write must, loudly).
+
+require "optparse"
+require "date"
+require_relative "trello_client"
+require_relative "claude_client"
+require_relative "week_summary_lib"
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: bin/trello_week_summary [--week DATE] [--all] [--dry-run]"
+  opts.on("--week DATE", "Summarize the week containing DATE (default: today, UTC)") { |v| options[:week] = v }
+  opts.on("--all", "Summarize every weekly Done list on the board") { options[:all] = true }
+  opts.on("--dry-run", "Print the card that would be written without writing it") { options[:dry_run] = true }
+  opts.on("--print-cards", "Print the week's card lines (the highlights input) and exit") { options[:print_cards] = true }
+  opts.on("--highlights PATH", "Use pre-written highlight bullets from PATH (- for stdin)",
+          "instead of calling the Anthropic API — for sessions that are",
+          "themselves Claude and can compose the bullets directly") { |v| options[:highlights] = v }
+end.parse!(ARGV)
+
+abort "--highlights targets a single week — it can't be combined with --all" if options[:highlights] && options[:all]
+
+auth = { key: ENV.fetch("TRELLO_API_KEY"), token: ENV.fetch("TRELLO_TOKEN") }
+
+lists = TrelloClient.request(:get, "/boards/#{TrelloClient::BOARD_ID}/lists", auth)
+targets = if options[:all]
+  lists.filter_map { |l| (monday = TrelloClient.week_monday_from_name(l["name"])) && [ monday, l ] }
+       .sort_by(&:first)
+else
+  monday = TrelloClient.week_monday(options[:week] ? Date.parse(options[:week]) : Time.now.utc.to_date)
+  list_name = TrelloClient.weekly_done_list_name(monday)
+  list = lists.find { |l| l["name"].casecmp?(list_name) }
+  unless list
+    # A week with no logged cards never had its list created — that's a quiet
+    # week, not an error (the scheduled Sunday run must exit cleanly on it).
+    puts "No list named #{list_name.inspect} on the board — nothing to summarize."
+    exit 0
+  end
+
+  [ [ monday, list ] ]
+end
+
+if targets.empty?
+  puts "No weekly Done lists on the board."
+  exit 0
+end
+
+def claude_highlights(cards, monday, totals)
+  api_key = ENV["ANTHROPIC_API_KEY"].to_s
+  if api_key.empty?
+    warn "[trello_week_summary] ANTHROPIC_API_KEY not set — using the fallback highlight list."
+    return nil
+  end
+
+  response = ClaudeClient.messages(
+    api_key: api_key, model: ClaudeClient::DEFAULT_MODEL, max_tokens: 700,
+    system: WeekSummary.build_claude_system,
+    user_message: WeekSummary.build_claude_user(cards, monday, totals)
+  )
+  WeekSummary.extract_bullets(ClaudeClient.first_text(response))
+rescue StandardError => e
+  warn "[trello_week_summary] Claude highlights failed (falling back to the plain list): #{e.class}: #{e.message}"
+  nil
+end
+
+# Trello writes retry twice on rate limiting, then fail the run for real.
+def trello_write(method, path, params)
+  attempts = 0
+  begin
+    TrelloClient.request(method, path, params)
+  rescue RuntimeError => e
+    raise unless e.message.include?("429") && (attempts += 1) <= 2
+
+    sleep 10
+    retry
+  end
+end
+
+targets.each_with_index do |(monday, list), index|
+  sleep 0.15 if index.positive?
+  cards = TrelloClient.request(:get, "/lists/#{list['id']}/cards",
+                               auth.merge(fields: "name,desc,labels,badges", limit: 1000))
+  existing = cards.find { |c| WeekSummary.summary_card?(c) }
+  totals = WeekSummary.aggregate(cards)
+
+  if options[:print_cards]
+    puts WeekSummary.build_claude_user(cards, monday, totals)
+    next
+  end
+
+  if totals["cards"].zero?
+    highlights = "- No cards were logged this week."
+    source = "fallback"
+  elsif options[:highlights]
+    raw = options[:highlights] == "-" ? $stdin.read : File.read(options[:highlights])
+    highlights = WeekSummary.extract_bullets(raw)
+    abort "--highlights #{options[:highlights]} contains no markdown bullets" unless highlights
+    source = "claude"
+  else
+    highlights = claude_highlights(cards, monday, totals)
+    source = highlights ? "claude" : "fallback"
+    highlights ||= WeekSummary.fallback_highlights(cards)
+  end
+
+  name = WeekSummary.card_name(totals)
+  desc = WeekSummary.render_desc(totals: totals, highlights_md: highlights, monday: monday,
+                                 generated_on: Time.now.utc.to_date, source: source)
+
+  if options[:dry_run]
+    action = existing ? "update #{existing['name'].inspect}" : "create"
+    puts "── #{list['name']} — would #{action}:", name, "", desc, ""
+    next
+  end
+
+  card = if existing
+    trello_write(:put, "/cards/#{existing['id']}", auth.merge(name: name, desc: desc, pos: "top"))
+  else
+    trello_write(:post, "/cards", auth.merge(idList: list["id"], name: name, desc: desc, pos: "top"))
+  end
+  puts "#{existing ? 'Updated' : 'Created'} #{name.inspect} (highlights: #{source}): #{card['shortUrl']}"
+end

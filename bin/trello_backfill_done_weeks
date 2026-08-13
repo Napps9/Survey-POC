@@ -11,12 +11,6 @@ require "optparse"
 require "date"
 require_relative "trello_client"
 
-def week_monday_from_name(name)
-  Date.parse(name.delete_prefix("Done - Week of ").sub(/(\d+)(st|nd|rd|th)\b/, "\\1"))
-rescue Date::Error
-  nil
-end
-
 options = { source: "Done" }
 OptionParser.new do |opts|
   opts.banner = "Usage: bin/trello_backfill_done_weeks [--dry-run] [--source NAME] [--keep-source]"
@@ -61,8 +55,7 @@ end
 # reading newest week leftmost regardless of how the lists came to exist.
 weekly = (lists + week_lists.values)
          .uniq { |l| l["id"] }
-         .select { |l| l["name"].start_with?("Done - Week of ") }
-         .filter_map { |l| (monday = week_monday_from_name(l["name"])) && [ monday, l ] }
+         .filter_map { |l| (monday = TrelloClient.week_monday_from_name(l["name"])) && [ monday, l ] }
 weekly.sort_by(&:first).reverse_each do |_monday, list|
   TrelloClient.request(:put, "/lists/#{list['id']}", auth.merge(pos: "bottom"))
 end
