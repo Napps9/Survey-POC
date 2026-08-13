@@ -113,8 +113,10 @@ class CommsNewsletterTest < ActionDispatch::IntegrationTest
   test "the Projects placeholder is present and unmistakable" do
     run_job
     doc = EmailCampaign.find_by(newsletter_week: WEEK).document
-    texts = doc["blocks"].map { |b| b["text"].to_s }
-    assert_includes texts, Comms::NewsletterDocument::PROJECTS_PLACEHOLDER
+    callout = doc["blocks"].find { |b| b["type"] == "callout" }
+    assert callout
+    assert_equal Comms::NewsletterDocument::PROJECTS_HEADING, callout["eyebrow"]
+    assert_equal Comms::NewsletterDocument::PROJECTS_PLACEHOLDER, callout["text"]
   end
 
   test "falls back to commit subjects when Claude is unavailable" do
@@ -122,8 +124,8 @@ class CommsNewsletterTest < ActionDispatch::IntegrationTest
     campaign = EmailCampaign.find_by(newsletter_week: WEEK)
 
     assert_includes campaign.subject, "What's new in VertoNow"
-    headings = campaign.document["blocks"].select { |b| b["type"] == "heading" }.map { |b| b["text"] }
-    assert_includes headings, "The importer learns to count"
+    titles = campaign.document["blocks"].select { |b| b["type"] == "feature" }.map { |b| b["text"] }
+    assert_includes titles, "The importer learns to count"
     assert_equal [], campaign.warnings
   end
 

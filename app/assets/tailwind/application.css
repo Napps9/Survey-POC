@@ -9194,6 +9194,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
 .comms-btn { display: inline-block; padding: 12px 24px; font-size: 16px; font-weight: 600; }
 .comms-div { height: 1px; }
+
+/* Composite blocks. The canvas mirrors the compiled email closely enough to
+   trust — same paddings, same accent bar — but these are divs, not the
+   nested tables the renderer emits for Outlook. */
+.comms-masthead { margin: -12px -24px; padding: 28px 24px; }
+.comms-masthead-logo { width: 180px; max-width: 60%; height: auto; cursor: pointer; }
+.comms-feature { padding: 16px 18px; border-radius: 6px; }
+.comms-callout { padding: 18px 20px; border-radius: 8px; }
+/* An empty run in a composite block still needs to be clickable to type into,
+   and needs to say what it is for. text-transform is deliberately dropped on
+   the placeholder so a hint never reads as shouting. */
+.comms-block [contenteditable][data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.4;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: normal;
+}
 .comms-spacer {
   display: flex; align-items: center; justify-content: center;
   background: repeating-linear-gradient(45deg, rgba(148, 163, 184, 0.08), rgba(148, 163, 184, 0.08) 6px, transparent 6px, transparent 12px);

@@ -152,6 +152,32 @@ export default class extends Controller {
         return { ...base, src: d.blockSrc || "", alt: d.blockAlt || "",
                  href: d.blockHref || "", widthPct: parseInt(d.blockWidthPct, 10) || 100,
                  align: d.blockAlign || "center" }
+      case "masthead":
+        return { ...base, text: this._field(el, "text"), eyebrow: this._field(el, "eyebrow"),
+                 src: d.blockSrc || "", alt: d.blockAlt || "", href: d.blockHref || "",
+                 backgroundColor: d.blockBackgroundColor || "#1C2034",
+                 textColor: d.blockTextColor || "#F7F7F7",
+                 align: d.blockAlign || "center" }
+      case "feature": {
+        const body = el.querySelector("[data-block-field='body']")
+        const block = { ...base, eyebrow: this._field(el, "eyebrow"), text: this._field(el, "text"),
+                        body: this._plain(body), href: d.blockHref || "",
+                        linkLabel: this._field(el, "linkLabel"),
+                        accentColor: d.blockAccentColor || "#01EACB",
+                        backgroundColor: d.blockBackgroundColor || "#F8FAFC",
+                        textColor: d.blockTextColor || "#0F172A" }
+        if (body && hasEmailFormatting(body)) block.body_html = body.innerHTML
+        return block
+      }
+      case "callout": {
+        const text = el.querySelector("[data-block-field='text']")
+        const block = { ...base, eyebrow: this._field(el, "eyebrow"), text: this._plain(text),
+                        accentColor: d.blockAccentColor || "#01EACB",
+                        backgroundColor: d.blockBackgroundColor || "#F1F5F9",
+                        textColor: d.blockTextColor || "#0F172A" }
+        if (text && hasEmailFormatting(text)) block.text_html = text.innerHTML
+        return block
+      }
       case "divider":
         return { ...base, color: d.blockColor || "#E2E8F0" }
       case "spacer":
@@ -159,6 +185,25 @@ export default class extends Controller {
       default:
         return null
     }
+  }
+
+  // One named editable run inside a composite block (masthead / feature /
+  // callout each carry several).
+  //
+  // textContent, not innerText: eyebrows are displayed through
+  // `text-transform: uppercase`, and innerText returns text AS RENDERED — so
+  // reading it back would store the shouted version and permanently lose the
+  // author's casing on the first autosave. These runs are single-line, so
+  // nothing depends on innerText's newline handling.
+  _field(el, name) {
+    const node = el.querySelector(`[data-block-field='${name}']`)
+    if (!node) return ""
+    return node.textContent.replace(/ /g, " ").trim()
+  }
+
+  _tint(root, field, color) {
+    const el = root.querySelector(`[data-block-field='${field}']`)
+    if (el && color) el.style.color = color
   }
 
   _plain(el) {
@@ -271,6 +316,38 @@ export default class extends Controller {
           body.style.textAlign = d.blockAlign
         }
         break
+      case "masthead": {
+        const band = block.querySelector(".comms-masthead")
+        if (!band) break
+        band.style.background = d.blockBackgroundColor
+        band.style.textAlign = d.blockAlign
+        band.querySelectorAll("[data-block-field]").forEach((el) => { el.style.color = d.blockTextColor })
+        const logo = band.querySelector("img.comms-masthead-logo")
+        if (logo) {
+          logo.alt = d.blockAlt || ""
+          if (d.blockSrc && logo.getAttribute("src") !== d.blockSrc) logo.src = d.blockSrc
+        }
+        break
+      }
+      case "feature": {
+        const card = block.querySelector(".comms-feature")
+        if (!card) break
+        card.style.background = d.blockBackgroundColor
+        card.style.borderLeftColor = d.blockAccentColor
+        this._tint(card, "eyebrow", d.blockAccentColor)
+        this._tint(card, "linkLabel", d.blockAccentColor)
+        this._tint(card, "text", d.blockTextColor)
+        this._tint(card, "body", d.blockTextColor)
+        break
+      }
+      case "callout": {
+        const panel = block.querySelector(".comms-callout")
+        if (!panel) break
+        panel.style.background = d.blockBackgroundColor
+        this._tint(panel, "eyebrow", d.blockAccentColor)
+        this._tint(panel, "text", d.blockTextColor)
+        break
+      }
       case "button": {
         const span = block.querySelector(".comms-btn")
         if (span) {

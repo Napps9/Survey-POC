@@ -65,6 +65,35 @@
         </label>
       </div>
 
+      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="masthead" hidden>
+        <button type="button" class="media-btn-ghost" style="width:100%;margin-bottom:10px;"
+                data-action="click->media-picker#openComms"><%= t("comms.editor.change_logo", default: "Choose logo…") %></button>
+        <label>Logo alt text <input type="text" data-field="alt" data-action="input->comms-editor#applyField"></label>
+        <label>Link URL <input type="url" data-field="href" placeholder="https://…"
+               data-action="input->comms-editor#applyField"></label>
+        <label>Band colour <input type="color" data-field="backgroundColor" data-action="input->comms-editor#applyField"></label>
+        <label>Text colour <input type="color" data-field="textColor" data-action="input->comms-editor#applyField"></label>
+        <label>Align
+          <select data-field="align" data-action="change->comms-editor#applyField">
+            <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="feature" hidden>
+        <label>Link URL <input type="url" data-field="href" placeholder="https://…"
+               data-action="input->comms-editor#applyField"></label>
+        <label>Accent <input type="color" data-field="accentColor" data-action="input->comms-editor#applyField"></label>
+        <label>Background <input type="color" data-field="backgroundColor" data-action="input->comms-editor#applyField"></label>
+        <label>Text colour <input type="color" data-field="textColor" data-action="input->comms-editor#applyField"></label>
+      </div>
+
+      <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="callout" hidden>
+        <label>Accent <input type="color" data-field="accentColor" data-action="input->comms-editor#applyField"></label>
+        <label>Background <input type="color" data-field="backgroundColor" data-action="input->comms-editor#applyField"></label>
+        <label>Text colour <input type="color" data-field="textColor" data-action="input->comms-editor#applyField"></label>
+      </div>
+
       <div class="panel-island comms-controls" data-comms-editor-target="controls" data-block-controls="divider" hidden>
         <label>Color <input type="color" data-field="color" data-action="input->comms-editor#applyField"></label>
       </div>

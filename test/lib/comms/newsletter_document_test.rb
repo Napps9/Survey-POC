@@ -30,28 +30,43 @@ class CommsNewsletterDocumentTest < ActiveSupport::TestCase
     assert_equal doc["blocks"].size, Comms::EmailDocument.coerce(doc)["blocks"].size
   end
 
-  test "blocks run in reading order: intro, features, projects, CTA, sign-off" do
+  test "blocks run in reading order: masthead, intro, features, projects, CTA, sign-off" do
     blocks = build["blocks"]
-    headings = blocks.select { |b| b["type"] == "heading" }.map { |b| b["text"] }
 
+    assert_equal "masthead", blocks.first["type"], "the brand band opens the email"
+    headings = blocks.select { |b| b["type"] == "heading" }.map { |b| b["text"] }
     assert_equal COPY["subject"], headings.first
     assert_includes headings, "New this week"
-    assert_includes headings, Comms::NewsletterDocument::PROJECTS_HEADING
-    assert_includes headings, "Imports keep their columns straight"
 
-    # The projects placeholder sits after the feature items and before the CTA.
-    texts = blocks.map { |b| b["text"].to_s }
-    projects_at = texts.index(Comms::NewsletterDocument::PROJECTS_PLACEHOLDER)
-    feature_at  = texts.index("Imports keep their columns straight")
-    button_at   = blocks.index { |b| b["type"] == "button" }
-    assert projects_at, "projects placeholder present"
-    assert_operator feature_at, :<, projects_at
-    assert_operator projects_at, :<, button_at
+    features = blocks.select { |b| b["type"] == "feature" }
+    assert_equal [ "Imports keep their columns straight", "A title with no body" ],
+                 features.map { |b| b["text"] }
+    assert_equal "No more re-checking.", features.first["body"]
+
+    callout = blocks.find { |b| b["type"] == "callout" }
+    assert_equal Comms::NewsletterDocument::PROJECTS_HEADING, callout["eyebrow"]
+    assert_equal Comms::NewsletterDocument::PROJECTS_PLACEHOLDER, callout["text"]
+
+    # Projects sits after the news and before the CTA.
+    assert_operator blocks.index(features.first), :<, blocks.index(callout)
+    assert_operator blocks.index(callout), :<, blocks.index { |b| b["type"] == "button" }
   end
 
-  test "an item with no body emits only its heading" do
-    bodies = build["blocks"].select { |b| b["type"] == "text" }.map { |b| b["text"] }
-    assert_not_includes bodies, ""
+  test "the masthead carries the logo, the week and a link, on the brand colour" do
+    masthead = block_of(build(COPY, week: Date.new(2026, 8, 10)), "masthead")
+
+    assert_includes masthead["src"], "playverto-email"
+    assert_equal "Week of 10 August 2026", masthead["eyebrow"]
+    assert masthead["href"].start_with?("http")
+    assert_equal BrandPalette::DEFAULT["bg"], masthead["backgroundColor"]
+    # The wordmark is white on navy, so the text colour has to follow the band.
+    assert_equal "#FFFFFF", masthead["textColor"]
+  end
+
+  test "an item with no body leaves the feature's body empty rather than emitting a blank block" do
+    features = build["blocks"].select { |b| b["type"] == "feature" }
+    assert_equal "", features.last["body"]
+    assert_equal [], Comms::EmailDocument.warnings(build)
   end
 
   test "the CTA button carries a real absolute href" do
@@ -72,7 +87,9 @@ class CommsNewsletterDocumentTest < ActiveSupport::TestCase
     assert_equal [], Comms::EmailDocument.warnings(doc)
     headings = doc["blocks"].select { |b| b["type"] == "heading" }.map { |b| b["text"] }
     assert_not_includes headings, "New this week"
-    assert_includes headings, Comms::NewsletterDocument::PROJECTS_HEADING
+    assert_empty doc["blocks"].select { |b| b["type"] == "feature" }
+    assert block_of(doc, "callout"), "Projects still needs filling in on a quiet week"
+    assert block_of(doc, "masthead")
   end
 
   test "no image blocks are emitted — a blank src would block the send" do

@@ -17,8 +17,21 @@ module Comms
   module EmailDocument
     module_function
 
-    TYPES = %w[heading text button image divider spacer].freeze
+    # masthead / feature / callout are composite blocks: one block that
+    # renders a whole designed unit (branded header, accent-bar news card,
+    # tinted panel). They exist because building those out of heading + text
+    # + divider gives you the words without the design, and an author editing
+    # six loose blocks per news item cannot keep a newsletter looking like
+    # one thing.
+    TYPES = %w[masthead heading text feature callout button image divider spacer].freeze
     ALIGNS = %w[left center right].freeze
+
+    # Prose fields that may carry a sanitized rich-text twin (`<field>_html`),
+    # per block type. Short labels (eyebrows, link labels) stay plain.
+    RICH_FIELDS = {
+      "heading" => %w[text], "text" => %w[text],
+      "feature" => %w[body], "callout" => %w[text]
+    }.freeze
 
     # What email clients actually render — web fonts mostly don't load, so
     # the default is the system stack, same as Temple.
@@ -45,6 +58,22 @@ module Comms
       palette = BrandPalette.resolve(brand || {})
       id ||= generate_id
       case type.to_s
+      when "masthead"
+        { "id" => id, "type" => "masthead", "text" => "Playverto", "eyebrow" => "",
+          "src" => "", "alt" => "Playverto", "href" => "",
+          "backgroundColor" => BrandPalette::DEFAULT["bg"], "textColor" => "#F7F7F7",
+          "align" => "center" }
+      when "feature"
+        { "id" => id, "type" => "feature", "eyebrow" => "NEW",
+          "text" => "What your reader can now do", "body" => "One or two sentences on why it helps.",
+          "href" => "", "linkLabel" => "",
+          "accentColor" => palette["primary"], "backgroundColor" => "#F8FAFC",
+          "textColor" => "#0F172A" }
+      when "callout"
+        { "id" => id, "type" => "callout", "eyebrow" => "Note",
+          "text" => "Something worth pulling out of the flow.",
+          "accentColor" => palette["primary"], "backgroundColor" => "#F1F5F9",
+          "textColor" => "#0F172A" }
       when "heading"
         { "id" => id, "type" => "heading", "text" => "Your headline", "level" => 2,
           "align" => "left", "color" => "#0F172A" }
@@ -120,12 +149,15 @@ module Comms
     def sanitize(raw, brand: nil)
       doc = coerce(raw, brand: brand)
       doc["blocks"].each do |b|
-        next unless b.key?("text_html")
+        RICH_FIELDS.fetch(b["type"], []).each do |field|
+          twin = "#{field}_html"
+          next unless b.key?(twin)
 
-        cleaned = RichTextSanitizer.clean_equivalent(
-          b["text_html"], b["text"], tags: RichTextSanitizer::EMAIL_ALLOWED_TAGS
-        )
-        cleaned ? b["text_html"] = cleaned : b.delete("text_html")
+          cleaned = RichTextSanitizer.clean_equivalent(
+            b[twin], b[field], tags: RichTextSanitizer::EMAIL_ALLOWED_TAGS
+          )
+          cleaned ? b[twin] = cleaned : b.delete(twin)
+        end
       end
       doc
     end
@@ -153,6 +185,28 @@ module Comms
 
       id = str(raw["id"], nil) || generate_id
       case raw["type"]
+      when "masthead"
+        { "id" => id, "type" => "masthead", "text" => str(raw["text"], "Playverto"),
+          "eyebrow" => str(raw["eyebrow"], ""), "src" => str(raw["src"], ""),
+          "alt" => str(raw["alt"], ""), "href" => str(raw["href"], ""),
+          "backgroundColor" => str(raw["backgroundColor"], BrandPalette::DEFAULT["bg"]),
+          "textColor" => str(raw["textColor"], "#F7F7F7"),
+          "align" => align(raw["align"]) }
+      when "feature"
+        with_html_twin(raw,
+                       "id" => id, "type" => "feature", "eyebrow" => str(raw["eyebrow"], ""),
+                       "text" => str(raw["text"], ""), "body" => str(raw["body"], ""),
+                       "href" => str(raw["href"], ""), "linkLabel" => str(raw["linkLabel"], ""),
+                       "accentColor" => str(raw["accentColor"], BrandPalette::DEFAULT["primary"]),
+                       "backgroundColor" => str(raw["backgroundColor"], "#F8FAFC"),
+                       "textColor" => str(raw["textColor"], "#0F172A"))
+      when "callout"
+        with_html_twin(raw,
+                       "id" => id, "type" => "callout", "eyebrow" => str(raw["eyebrow"], ""),
+                       "text" => str(raw["text"], ""),
+                       "accentColor" => str(raw["accentColor"], BrandPalette::DEFAULT["primary"]),
+                       "backgroundColor" => str(raw["backgroundColor"], "#F1F5F9"),
+                       "textColor" => str(raw["textColor"], "#0F172A"))
       when "heading"
         with_html_twin(raw,
                        "id" => id, "type" => "heading", "text" => str(raw["text"], ""),
@@ -181,7 +235,10 @@ module Comms
     end
 
     def with_html_twin(raw, block)
-      block["text_html"] = raw["text_html"] if raw["text_html"].is_a?(String)
+      RICH_FIELDS.fetch(block["type"], []).each do |field|
+        twin = "#{field}_html"
+        block[twin] = raw[twin] if raw[twin].is_a?(String)
+      end
       block
     end
 

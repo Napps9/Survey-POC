@@ -59,6 +59,22 @@ module Comms
         case b["type"]
         when "heading", "text"
           parts << b["text"].strip if b["text"].to_s.strip.present?
+        when "masthead"
+          line = [ b["text"].to_s.strip.presence || b["alt"].to_s.strip, b["eyebrow"].to_s.strip ]
+          parts << line.reject(&:blank?).join(" — ") if line.any?(&:present?)
+        when "feature"
+          item = []
+          item << b["eyebrow"].to_s.strip.upcase if b["eyebrow"].to_s.strip.present?
+          item << b["text"].to_s.strip if b["text"].to_s.strip.present?
+          item << b["body"].to_s.strip if b["body"].to_s.strip.present?
+          href = safe_href(b["href"])
+          item << "#{b["linkLabel"].to_s.strip.presence || "Read more"}: #{href}" if href.present?
+          parts << item.join("\n") if item.any?
+        when "callout"
+          item = []
+          item << "#{b["eyebrow"].to_s.strip.upcase}:" if b["eyebrow"].to_s.strip.present?
+          item << b["text"].to_s.strip if b["text"].to_s.strip.present?
+          parts << item.join("\n") if item.any?
         when "button"
           href = safe_href(b["href"])
           parts << (href.present? ? "#{b["text"]}: #{href}" : b["text"])
@@ -93,13 +109,26 @@ module Comms
       trimmed.match?(SAFE_HREF) ? trimmed : ""
     end
 
+    # The masthead is a full-bleed band: it owns its own padding so its
+    # background reaches the edges of the content table.
+    FULL_BLEED = %w[masthead].freeze
+
     def render_row(block, settings)
+      return %(<tr><td style="padding:0;">#{render_block(block, settings)}</td></tr>) if
+        FULL_BLEED.include?(block["type"])
+
       v_pad = block["type"] == "spacer" ? 0 : 12
       %(<tr><td style="padding:#{v_pad}px 24px;">#{render_block(block, settings)}</td></tr>)
     end
 
     def render_block(block, s)
       case block["type"]
+      when "masthead"
+        render_masthead(block)
+      when "feature"
+        render_feature(block, s)
+      when "callout"
+        render_callout(block, s)
       when "heading"
         size = HEADING_SIZES.fetch(block["level"], 22)
         body = rich_or_plain(block, size, s["linkColor"])
@@ -139,19 +168,115 @@ module Comms
       end
     end
 
+    # The branded band across the top. A logo when one is set (email clients
+    # don't render SVG, so this must be a raster src), otherwise the wordmark
+    # as live text — a masthead that silently disappears when an image is
+    # blocked is worse than one made of letters.
+    def render_masthead(b)
+      logo =
+        if b["src"].present?
+          # Most clients block images by default, so the alt text is the
+          # masthead a good share of readers actually see: it inherits these
+          # type styles and the band's colour rather than rendering as small
+          # blue link text.
+          %(<img src="#{h(b["src"])}" alt="#{h(b["alt"].presence || b["text"])}" width="180" ) +
+            %(style="display:inline-block;width:180px;max-width:60%;height:auto;border:0;) +
+            %(outline:none;text-decoration:none;font-size:24px;font-weight:700;) +
+            %(letter-spacing:-0.5px;color:#{b["textColor"]};" />)
+        else
+          %(<span style="font-size:26px;font-weight:700;letter-spacing:-0.5px;) +
+            %(color:#{b["textColor"]};">#{h(b["text"])}</span>)
+        end
+      href = safe_href(b["href"])
+      if href.present?
+        logo = %(<a href="#{h(href)}" target="_blank" ) +
+               %(style="text-decoration:none;color:#{b["textColor"]};">#{logo}</a>)
+      end
+
+      eyebrow =
+        if b["eyebrow"].to_s.strip.present?
+          %(<div style="margin-top:10px;font-size:12px;line-height:1.5;letter-spacing:0.14em;) +
+            %(text-transform:uppercase;color:#{b["textColor"]};opacity:0.75;">#{h(b["eyebrow"])}</div>)
+        else
+          ""
+        end
+
+      %(<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" ) +
+        %(style="background-color:#{b["backgroundColor"]};"><tr>) +
+        %(<td align="#{b["align"]}" style="padding:28px 24px;text-align:#{b["align"]};">) +
+        %(#{logo}#{eyebrow}</td></tr></table>)
+    end
+
+    # One piece of news as a card: an accent bar down the left (a border, not
+    # an image — it survives image blocking), an eyebrow, a title, prose and
+    # an optional link.
+    def render_feature(b, s)
+      parts = []
+      if b["eyebrow"].to_s.strip.present?
+        parts << %(<div style="font-size:11px;font-weight:700;letter-spacing:0.14em;) +
+                  %(text-transform:uppercase;color:#{b["accentColor"]};margin:0 0 6px;">) +
+                  %(#{h(b["eyebrow"])}</div>)
+      end
+      if b["text"].to_s.strip.present?
+        parts << %(<div style="font-size:18px;font-weight:700;line-height:1.35;) +
+                  %(color:#{b["textColor"]};margin:0;">#{multiline(b["text"])}</div>)
+      end
+      if b["body"].to_s.strip.present?
+        body = rich_or_plain_field(b, "body", TEXT_SIZE, s["linkColor"])
+        parts << %(<div style="font-size:15px;line-height:1.6;color:#{b["textColor"]};) +
+                  %(margin:8px 0 0;opacity:0.9;">#{body}</div>)
+      end
+      href = safe_href(b["href"])
+      if href.present?
+        label = b["linkLabel"].to_s.strip.presence || "Read more"
+        parts << %(<div style="margin:12px 0 0;"><a href="#{h(href)}" target="_blank" ) +
+                  %(style="font-size:14px;font-weight:600;color:#{b["accentColor"]};) +
+                  %(text-decoration:none;">#{h(label)} &rarr;</a></div>)
+      end
+
+      %(<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" ) +
+        %(style="background-color:#{b["backgroundColor"]};border-left:4px solid #{b["accentColor"]};) +
+        %(border-radius:6px;"><tr><td style="padding:16px 18px;">#{parts.join}</td></tr></table>)
+    end
+
+    # A tinted panel for something that should sit outside the flow.
+    def render_callout(b, s)
+      label =
+        if b["eyebrow"].to_s.strip.present?
+          %(<div style="font-size:11px;font-weight:700;letter-spacing:0.14em;) +
+            %(text-transform:uppercase;color:#{b["accentColor"]};margin:0 0 8px;">) +
+            %(#{h(b["eyebrow"])}</div>)
+        else
+          ""
+        end
+      body = rich_or_plain_field(b, "text", TEXT_SIZE, s["linkColor"])
+
+      %(<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" ) +
+        %(style="background-color:#{b["backgroundColor"]};border-radius:8px;">) +
+        %(<tr><td style="padding:18px 20px;">#{label}) +
+        %(<div style="font-size:#{TEXT_SIZE}px;line-height:1.6;color:#{b["textColor"]};">) +
+        %(#{body}</div></td></tr></table>)
+    end
+
     # A heading/text block's body: the sanitized rich twin with class tokens
     # resolved to inline styles when it survives the gate, else the escaped
     # plain text. Re-sanitising at render is defence in depth, same as
     # rich_card_text.
     def rich_or_plain(block, base_px, link_color)
-      html = block["text_html"]
+      rich_or_plain_field(block, "text", base_px, link_color)
+    end
+
+    # The same rule for any prose field that carries a twin (feature bodies
+    # and callouts keep theirs under a different key).
+    def rich_or_plain_field(block, field, base_px, link_color)
+      html = block["#{field}_html"]
       if html.present?
         cleaned = RichTextSanitizer.clean_equivalent(
-          html, block["text"], tags: RichTextSanitizer::EMAIL_ALLOWED_TAGS
+          html, block[field], tags: RichTextSanitizer::EMAIL_ALLOWED_TAGS
         )
         return inline_styles(cleaned, base_px, link_color) if cleaned
       end
-      multiline(block["text"])
+      multiline(block[field])
     end
 
     # Rewrites the sanitizer's class tokens into literal inline styles: font

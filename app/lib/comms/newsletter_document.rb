@@ -2,10 +2,16 @@
 # the builder edits — so the owner opens a generated draft and edits it with
 # exactly the controls they'd have on a hand-built one.
 #
+# The design is the Playverto palette applied to an email's constraints: a
+# navy masthead carrying the logo, each piece of news as an accent-barred
+# feature card, the Projects section as a tinted callout, and one mint CTA.
+# Colour comes from the org's brand palette where it exists, so a rebrand
+# moves the newsletter with it.
+#
 # Everything here must clear Comms::EmailDocument.warnings, which is the send
 # gate: a button whose href is blank OR the literal "https://" blocks the
-# freeze. The CTA therefore points at a real absolute URL, and no image blocks
-# are emitted at all (an empty src would block it too).
+# freeze. The CTA therefore points at a real absolute URL. The masthead logo
+# is exempt — a blank src falls back to the wordmark as live text.
 module Comms
   module NewsletterDocument
     module_function
@@ -20,35 +26,47 @@ module Comms
       "landing next, anything you want early adopters to weigh in on. " \
       "Delete this block if there's nothing to share this week.]".freeze
 
-    def build(copy, brand: nil, cta_url: nil)
-      url = cta_url.presence || default_cta_url
-      blocks = []
+    PAPER      = "#FFFFFF".freeze
+    CANVAS     = "#EEF1F8".freeze
+    INK        = "#1C2034".freeze
+    CARD_TINT  = "#F6F8FC".freeze
+    LOGO_PATH  = "playverto-email.png".freeze
 
-      blocks << heading(copy["subject"], brand: brand, level: 2, align: "left")
-      blocks << text(copy["intro"], brand: brand)
-      blocks << divider(brand: brand)
+    def build(copy, brand: nil, cta_url: nil, week: nil)
+      palette = BrandPalette.resolve(brand || {})
+      url     = cta_url.presence || default_cta_url
+      accent  = palette["primary"]
+      blocks  = []
 
-      if Array(copy["items"]).any?
-        blocks << heading("New this week", brand: brand, level: 3, align: "left")
-        Array(copy["items"]).each do |item|
-          blocks << heading(item["title"], brand: brand, level: 3, align: "left")
-          blocks << text(item["body"], brand: brand) if item["body"].to_s.strip.present?
-        end
-        blocks << divider(brand: brand)
+      blocks << masthead(palette, week: week, url: url)
+      blocks << heading(copy["subject"], level: 2, color: INK)
+      blocks << text(copy["intro"], color: INK)
+
+      items = Array(copy["items"])
+      if items.any?
+        blocks << heading("New this week", level: 3, color: accent_ink(accent))
+        items.each { |item| blocks << feature(item, accent: accent) }
       end
 
-      blocks << heading(PROJECTS_HEADING, brand: brand, level: 3, align: "left")
-      blocks << text(PROJECTS_PLACEHOLDER, brand: brand)
-      blocks << divider(brand: brand)
+      blocks << callout(PROJECTS_HEADING, PROJECTS_PLACEHOLDER, accent: palette["cta"])
+      blocks << spacer(8)
+      blocks << button(copy["cta_label"], url, palette: palette)
+      blocks << text(copy["sign_off"], color: INK, align: "center") if copy["sign_off"].to_s.strip.present?
 
-      blocks << button(copy["cta_label"], url, brand: brand)
-      blocks << text(copy["sign_off"], brand: brand) if copy["sign_off"].to_s.strip.present?
+      { "version" => 1, "settings" => settings(palette), "blocks" => blocks }
+    end
 
-      {
-        "version"  => 1,
-        "settings" => Comms::EmailDocument.default_settings(brand),
-        "blocks"   => blocks
-      }
+    # A newsletter's own paper: the app's canvas grey behind white paper, with
+    # links in the brand colour. Hand-built campaigns keep EmailDocument's
+    # neutral defaults — this is the newsletter's identity, not a global one.
+    def settings(palette)
+      Comms::EmailDocument.default_settings.merge(
+        "backgroundColor"        => CANVAS,
+        "contentBackgroundColor" => PAPER,
+        "textColor"              => INK,
+        "linkColor"              => palette["primary"],
+        "contentWidth"           => 600
+      )
     end
 
     # The freeze absolutizes root-relative paths against Comms.app_origin, but
@@ -59,23 +77,79 @@ module Comms
       Comms.app_origin.presence || "https://playverto.com"
     end
 
-    def heading(value, brand:, level:, align:)
-      Comms::EmailDocument.create_block("heading", brand: brand)
-                          .merge("text" => value.to_s, "level" => level, "align" => align)
+    def masthead(palette, week:, url:)
+      Comms::EmailDocument.create_block("masthead").merge(
+        "src"             => logo_url,
+        "alt"             => "Playverto",
+        "href"            => url,
+        "eyebrow"         => week ? "Week of #{week.strftime("%-d %B %Y")}" : "",
+        "backgroundColor" => palette["bg"],
+        "textColor"       => BrandPalette.contrast_text(palette["bg"]),
+        "align"           => "center"
+      )
     end
 
-    def text(value, brand:)
-      Comms::EmailDocument.create_block("text", brand: brand).merge("text" => value.to_s)
+    # SVG doesn't render in most inboxes, so the masthead uses the raster
+    # export. Root-relative here; the freeze makes it absolute.
+    def logo_url
+      ActionController::Base.helpers.image_path(LOGO_PATH)
+    rescue StandardError
+      ""
     end
 
-    def divider(brand:)
-      Comms::EmailDocument.create_block("divider", brand: brand)
+    def feature(item, accent:)
+      Comms::EmailDocument.create_block("feature").merge(
+        "eyebrow"         => "",
+        "text"            => item["title"].to_s,
+        "body"            => item["body"].to_s,
+        "href"            => "",
+        "linkLabel"       => "",
+        "accentColor"     => accent,
+        "backgroundColor" => CARD_TINT,
+        "textColor"       => INK
+      )
     end
 
-    def button(label, url, brand:)
-      Comms::EmailDocument.create_block("button", brand: brand)
-                          .merge("text" => label.presence || "Open VertoNow",
-                                 "href" => url, "align" => "center")
+    def callout(label, body, accent:)
+      Comms::EmailDocument.create_block("callout").merge(
+        "eyebrow"         => label,
+        "text"            => body,
+        "accentColor"     => accent,
+        "backgroundColor" => CARD_TINT,
+        "textColor"       => INK
+      )
+    end
+
+    # A heading tinted with the brand only reads if it stays legible on white;
+    # the mint is a background colour, not a text colour.
+    def accent_ink(accent)
+      BrandPalette.luminance(accent) > 0.55 ? INK : accent
+    end
+
+    def heading(value, level:, color:, align: "left")
+      Comms::EmailDocument.create_block("heading")
+                          .merge("text" => value.to_s, "level" => level,
+                                 "align" => align, "color" => color)
+    end
+
+    def text(value, color:, align: "left")
+      Comms::EmailDocument.create_block("text")
+                          .merge("text" => value.to_s, "align" => align, "color" => color)
+    end
+
+    def spacer(height)
+      Comms::EmailDocument.create_block("spacer").merge("height" => height)
+    end
+
+    def button(label, url, palette:)
+      Comms::EmailDocument.create_block("button").merge(
+        "text"            => label.presence || "Open VertoNow",
+        "href"            => url,
+        "align"           => "center",
+        "backgroundColor" => palette["cta"],
+        "textColor"       => BrandPalette.contrast_text(palette["cta"]),
+        "radius"          => 100
+      )
     end
   end
 end
