@@ -1529,6 +1529,7 @@ en:
       create_blank_failed: "We couldn't create your Verto — %{reason}"
       destroyed_forever: "“%{name}” permanently deleted. All responses and data have been erased."
       editing_locked: "Editing is locked — this Verto is live, or has already collected responses."
+      audience_country_failed: "Couldn't update the audience country — please try again."
       generate_failed: "We couldn't generate your Verto — %{reason}"
       google_form_import_failed: "We couldn't import that Google Form — %{reason}"
       google_form_url_required: "Paste your Google Form's edit link, e.g. https://docs.google.com/forms/d/…/edit"

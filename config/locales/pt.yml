@@ -1386,6 +1386,7 @@ pt:
       campaign_deleted: "Campanha excluída."
     surveys:
       editing_locked: "A edição está bloqueada — este Verto está no ar, ou já recolheu respostas."
+      audience_country_failed: "Não foi possível atualizar o país do público — tente novamente."
       settings_locked: "Este Verto está no ar ou já tem respostas — as definições de consentimento e de pontuação já não podem ser alteradas."
       brief_required: "Diga-nos sobre o que é o seu Verto e quem vai responder — ambos são obrigatórios."
       learning_goal_required: "Acrescente o que quer aprender, ou escolha algumas Perguntas comuns — uma das duas coisas é obrigatória."

@@ -1387,6 +1387,7 @@ de:
     surveys:
       image_unverified: "Wir konnten dieses Bild nicht prüfen — bitte versuche es erneut."
       editing_locked: "Bearbeiten ist gesperrt — dieses Verto ist live oder hat bereits Antworten gesammelt."
+      audience_country_failed: "Das Zielland konnte nicht aktualisiert werden — bitte versuche es erneut."
       settings_locked: "Dieses Verto ist live oder hat bereits Antworten — Einwilligungs- und Bewertungseinstellungen lassen sich jetzt nicht mehr ändern."
       brief_required: "Sag uns, worum es in deinem Verto geht und wer antwortet — beides ist erforderlich."
       learning_goal_required: "Ergänze, was du erfahren möchtest, oder wähle einige Gemeinsame Fragen — eines von beidem ist erforderlich."

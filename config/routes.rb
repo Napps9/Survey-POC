@@ -98,6 +98,9 @@ Rails.application.routes.draw do
   post "surveys/:id/card_image",      to: "surveys#card_image", as: :card_image_survey
   post "surveys/:id/card_lottie",     to: "surveys#card_lottie", as: :card_lottie_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
+  # Separate from #settings because it can spend at Anthropic (re-tailoring the
+  # Heritage card), and the settings endpoint must stay free to call.
+  post "surveys/:id/audience_country", to: "surveys#update_audience_country", as: :audience_country_survey
   post "surveys/:id/shuffle_assets",  to: "surveys#shuffle_assets",  as: :shuffle_survey_assets
   get  "surveys/:id/results",         to: "surveys#results",  as: :survey_results
   get  "surveys/:id/results/compare", to: "surveys#results_compare", as: :survey_results_compare

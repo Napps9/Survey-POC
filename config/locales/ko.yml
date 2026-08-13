@@ -1506,6 +1506,7 @@ ko:
       create_blank_failed: "Verto를 만들 수 없었습니다 — %{reason}"
       destroyed_forever: "“%{name}”을(를) 영구 삭제했습니다. 모든 응답과 데이터가 삭제되었습니다."
       editing_locked: "편집이 잠겨 있습니다 — 이 Verto는 라이브 중이거나 이미 응답을 수집했습니다."
+      audience_country_failed: "대상 국가를 업데이트하지 못했습니다 — 다시 시도해 주세요."
       generate_failed: "Verto를 생성할 수 없었습니다 — %{reason}"
       google_form_import_failed: "이 Google Form을 가져올 수 없었습니다 — %{reason}"
       google_form_url_required: "Google Form의 편집 링크를 붙여넣으세요. 예: https://docs.google.com/forms/d/…/edit"

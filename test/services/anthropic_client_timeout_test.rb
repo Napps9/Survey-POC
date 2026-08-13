@@ -24,7 +24,8 @@ class AnthropicClientTimeoutTest < ActiveSupport::TestCase
     QuizAnswerGrader,
     FlowGenerator,
     CardOptimiser,
-    NewsletterWriter
+    NewsletterWriter,
+    HeritageOptionsGenerator
   ].freeze
 
   test "the shared Anthropic timeout is bounded well below the SDK default" do

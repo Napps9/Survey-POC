@@ -1387,6 +1387,7 @@ it:
     surveys:
       image_unverified: "Non siamo riusciti a controllare quell'immagine — riprova."
       editing_locked: "La modifica è bloccata — questo Verto è live oppure ha già raccolto risposte."
+      audience_country_failed: "Impossibile aggiornare il paese del pubblico — riprova."
       settings_locked: "Questo Verto è live o ha già delle risposte — le impostazioni di consenso e di punteggio non si possono più cambiare."
       brief_required: "Dicci di cosa parla il tuo Verto e chi risponderà — sono entrambi obbligatori."
       learning_goal_required: "Aggiungi cosa vuoi scoprire, oppure scegli alcune Domande comuni — serve almeno una delle due."

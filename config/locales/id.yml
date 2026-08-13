@@ -1507,6 +1507,7 @@ id:
       create_blank_failed: "Kami tidak dapat membuat Verto Anda — %{reason}"
       destroyed_forever: "“%{name}” dihapus secara permanen. Semua tanggapan dan data telah dihapus."
       editing_locked: "Pengeditan terkunci — Verto ini sedang live, atau sudah mengumpulkan tanggapan."
+      audience_country_failed: "Tidak dapat memperbarui negara audiens — silakan coba lagi."
       generate_failed: "Kami tidak dapat menghasilkan Verto Anda — %{reason}"
       google_form_import_failed: "Kami tidak dapat mengimpor Google Form itu — %{reason}"
       google_form_url_required: "Tempel tautan edit Google Form Anda, mis. https://docs.google.com/forms/d/…/edit"

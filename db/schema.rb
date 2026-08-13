@@ -775,6 +775,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_090000) do
 
   create_table "surveys", force: :cascade do |t|
     t.string "audience_age"
+    t.string "audience_country"
     t.text "background_image"
     t.boolean "brand_answer_tint", default: false, null: false
     t.string "brand_font"

@@ -19,7 +19,7 @@ class SurveysController < ApplicationController
   # they exist to stop a retry loop or a scripted client, not to ration work.
   throttle_ai to: 20,  within: 1.hour, name: "ai-deck", respond: :html,
               only: %i[ generate import_pdf import_manual import_google_form
-                        finalize_import create_blank ]
+                        finalize_import create_blank update_audience_country ]
   throttle_ai to: 20,  within: 1.hour, name: "ai-deck-json", respond: :json,
               only: %i[ resume_import generate_flow ]
   throttle_ai to: 120, within: 1.hour, name: "ai-card", respond: :json,
@@ -34,7 +34,7 @@ class SurveysController < ApplicationController
   # pexels_search and shuffle_assets are rate-limited above but cost nothing.
   cap_ai_spend respond: :html,
                only: %i[ generate import_pdf import_manual import_google_form
-                         finalize_import create_blank ]
+                         finalize_import create_blank update_audience_country ]
   cap_ai_spend respond: :json,
                only: %i[ resume_import generate_flow generate_card optimise_card
                          moderate_image ]
@@ -83,7 +83,7 @@ class SurveysController < ApplicationController
   def settings_locked_message = t("flash.surveys.settings_locked")
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy ]
-  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :update_settings, :qr ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :update_settings, :update_audience_country, :qr ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
@@ -1054,6 +1054,20 @@ class SurveysController < ApplicationController
     unless card
       return render json: { ok: false, error: "Unknown demographic question." }, status: :unprocessable_entity
     end
+    # Heritage is the one registry card that isn't the same everywhere: with an
+    # audience country set, the global nine categories give way to the five
+    # people in that country actually identify with. HeritageOptions returns nil
+    # when Claude couldn't be reached or answered unusably, and country_heritage_card
+    # hands back the plain registry card for a nil — the creator gets a working
+    # Heritage question either way, just an untailored one.
+    tailored = false
+    if key == "heritage" && survey.audience_country.present?
+      five = HeritageOptions.for(country: survey.audience_country, locale: survey.default_locale)
+      card = DemographicQuestions.country_heritage_card(
+        country: survey.audience_country, five: five, locale: survey.default_locale
+      )
+      tailored = card["heritage_country"].present?
+    end
     # Belt-and-braces behind the tile grey-out (which reads the live DOM):
     # one of each per deck, or the answer sync's first-match would be arbitrary.
     if Array(survey.cards).any? { |c| c.is_a?(Hash) && c["demographic_key"] == key }
@@ -1061,13 +1075,21 @@ class SurveysController < ApplicationController
     end
 
     card["cid"] = "c_#{SecureRandom.hex(3)}"
-    # The translations are already sitting in the locale files — prefill i18n
-    # so a multilingual Verto's next autosave doesn't persist the card
-    # monolingual. No Claude call needed, unlike generate_card.
-    (Array(survey.locales) - [ survey.default_locale ]).each do |loc|
-      tr = DemographicQuestions.optional_card(key, locale: loc)
-      (card["i18n"] ||= {})[loc] =
-        { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"] }.compact
+    if tailored
+      # A tailored card's options were written moments ago, so there is nothing
+      # in the locale files to prefill from — it takes the same route a freshly
+      # generated card takes (one SurveyTranslator call per secondary locale,
+      # TranslationCache-backed) rather than a second, parallel path.
+      card = translate_card!(card, survey)
+    else
+      # The translations are already sitting in the locale files — prefill i18n
+      # so a multilingual Verto's next autosave doesn't persist the card
+      # monolingual. No Claude call needed, unlike generate_card.
+      (Array(survey.locales) - [ survey.default_locale ]).each do |loc|
+        tr = DemographicQuestions.optional_card(key, locale: loc)
+        (card["i18n"] ||= {})[loc] =
+          { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"] }.compact
+      end
     end
 
     render json: { ok: true, card: card, html: render_card_html(survey, card) }
@@ -1079,7 +1101,89 @@ class SurveysController < ApplicationController
            status: :unprocessable_entity
   end
 
+  # POST /surveys/:id/audience_country
+  # The Verto's audience country — which today means one thing: whether the
+  # Heritage question asks in global categories or the ones this country's
+  # people use.
+  #
+  # Deliberately NOT part of update_settings. The heritage card is materialised
+  # into surveys.cards when it's inserted, so a country change has to rewrite an
+  # existing card's options or the setting is a lie — and that means a Claude
+  # call. Hanging one off update_settings would put an AI throttle on the ~40
+  # ordinary settings that share it, and every toggle in the editor would start
+  # counting against an AI budget.
+  def update_audience_country
+    # editing_locked? is `published? || responses.exists?`, so passing it means
+    # nobody has answered yet. That is exactly when rewriting an options list is
+    # safe: there are no stored demographic_heritage values to orphan. Once a
+    # Verto is live its audience is settled along with the rest of its content.
+    if @survey.editing_locked?
+      return redirect_to survey_path(@survey, panel: "publish"), alert: settings_locked_message
+    end
+
+    country = Survey.normalize_audience_country(params[:audience_country])
+    @survey.update!(audience_country: country)
+    retailor_heritage_card!(@survey)
+
+    redirect_to survey_path(@survey, panel: "publish")
+  rescue => e
+    ErrorReporting.report("SurveysController#update_audience_country", e, survey_id: @survey&.id)
+    redirect_to survey_path(@survey, panel: "publish"),
+                alert: t("flash.surveys.audience_country_failed")
+  end
+
   private
+
+  # Rebuild the deck's Heritage card for the Verto's current audience country,
+  # if it has one of each. A no-op for a deck without the card, which is the
+  # common case — most Vertos never add it, and changing the country then costs
+  # nothing.
+  #
+  # Rewrites in place rather than appending: the card's position is the key
+  # every answer is stored under, so it has to keep it.
+  def retailor_heritage_card!(survey)
+    cards = Array(survey.cards).map { |c| c.is_a?(Hash) ? c.dup : c }
+    idx   = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["demographic_key"] == "heritage" }
+    return if idx.nil?
+
+    rebuilt =
+      if survey.audience_country.present?
+        five = HeritageOptions.for(country: survey.audience_country, locale: survey.default_locale)
+        DemographicQuestions.country_heritage_card(
+          country: survey.audience_country, five: five, locale: survey.default_locale
+        )
+      else
+        # Cleared back to "not set" — the card goes back to the global taxonomy,
+        # rather than keeping a country's list the Verto no longer claims.
+        DemographicQuestions.optional_card("heritage", locale: survey.default_locale)
+      end
+    return if rebuilt.nil?
+
+    # Keep the card's identity and anything the creator did to it that isn't the
+    # taxonomy — its cid (logic and flows point at it) and its imagery. Only the
+    # options, the Other box and the provenance change.
+    card = cards[idx]
+    card["options"] = rebuilt["options"]
+    # Both ride with the taxonomy: the Other box exists because five categories
+    # miss people, and the provenance has to stop claiming a country the card
+    # is no longer built for.
+    rebuilt["allow_other"] ? card["allow_other"] = true : card.delete("allow_other")
+    if rebuilt["heritage_country"].present?
+      card["heritage_country"] = rebuilt["heritage_country"]
+    else
+      card.delete("heritage_country")
+    end
+    # The old list's translations describe options that no longer exist, and
+    # localized_card merges by position — leaving them would show a French
+    # respondent the previous country's categories.
+    card.delete("i18n")
+
+    # Only the rebuilt card is translated, not the deck: translate_cards! would
+    # overwrite every card's i18n entry from the translation cache, silently
+    # undoing any translation the creator had hand-corrected.
+    cards[idx] = translate_card!(card, survey)
+    survey.update!(cards: cards)
+  end
 
   def pexels_photo_results(query, orientation, context, age = [])
     PexelsClient.new.search(query: query, orientation: orientation, per_page: 24)

@@ -68,8 +68,16 @@
             server-rendered for first paint, re-synced client-side on open. %>
         <div class="aq-section-label">Demographics</div>
         <div class="aq-choice-grid">
-          <% [["heritage", "👥", "Heritage",
-               "Ethnic or cultural background — optional question added to the end of your Verto"],
+          <%# The Heritage tile says which taxonomy it will insert, because the
+              audience country that decides it lives in a different panel — a
+              creator would otherwise never learn the setting exists. %>
+          <% heritage_desc =
+               if @survey.audience_country.present?
+                 "Ethnic or cultural background, tailored to #{@survey.audience_country_name} — added to the end of your Verto"
+               else
+                 "Ethnic or cultural background — optional question added to the end of your Verto. Set an audience country in Publish & share to tailor it."
+               end %>
+          <% [["heritage", "👥", "Heritage", heritage_desc],
               ["neurodiversity", "🧠", "Neurodiversity",
                "How people think and process information — optional, never framed around disability"]].each do |key, icon, name, desc| %>
             <% already = Array(@survey.cards).any? { |c| c.is_a?(Hash) && c["demographic_key"] == key } %>

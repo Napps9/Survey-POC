@@ -509,6 +509,21 @@ class Survey < ApplicationRecord
           c.delete("demographic_key")
         end
       end
+      # Which country's heritage taxonomy this card was built from — provenance,
+      # so the editor can tell a tailored card from the global nine and rebuild
+      # it when the Verto's audience country changes. Only a real WorldRegions
+      # code survives, and only on the heritage card itself: it says nothing
+      # about any other card, and a crafted payload hanging it elsewhere would
+      # make the rebuild pick the wrong card. Same allowlist-or-drop shape as
+      # demographic_key above.
+      if c.key?("heritage_country")
+        code = c["heritage_country"].to_s.upcase
+        if c["demographic"] && c["demographic_key"].to_s == "heritage" && WorldRegions.valid?(code)
+          c["heritage_country"] = code
+        else
+          c.delete("heritage_country")
+        end
+      end
       # A range card's reaction-animation theme — only a known slug survives, and
       # only on a range card, so the helper always resolves to a real asset
       # folder (NpsHelper owns the theme list).
@@ -1104,6 +1119,10 @@ class Survey < ApplicationRecord
       description:             description,
       theme:                   self.class.append_copy_suffix(theme),
       audience_age:            audience_age,
+      # Carried with the deck, not left behind: dup_cards copies any tailored
+      # Heritage card's heritage_country along with it, so a copy that forgot
+      # the setting would claim a country's taxonomy while saying it has none.
+      audience_country:        audience_country,
       key_insight:             key_insight,
       cards:                   dup_cards,
       flows:                   dup_flows,
@@ -1409,6 +1428,26 @@ class Survey < ApplicationRecord
 
   def self.normalize_render_mode(value)
     RENDER_MODES.include?(value.to_s) ? value.to_s : "cards"
+  end
+
+  # The audience's country as an ISO 3166-1 alpha-2 code, or nil for "not set".
+  # Allowlist-or-nil against WorldRegions rather than a CHECK constraint: the
+  # value set is 249 rows that already live in Ruby, and "not set" is a normal
+  # state rather than an error, so an unknown code degrades to the global
+  # heritage taxonomy instead of failing a save.
+  def self.normalize_audience_country(value)
+    code = value.to_s.strip.upcase.presence
+    code if code && WorldRegions.valid?(code)
+  end
+
+  # Belt-and-braces behind normalize_audience_country: the column has no CHECK
+  # (249 ISO codes is not a readable constraint, and region_country — same
+  # registry, same shape — has none either), so the model is where a bad code
+  # has to surface. allow_nil because "no country" is a real state, not a gap.
+  validates :audience_country, inclusion: { in: WorldRegions::COUNTRIES.keys }, allow_nil: true
+
+  def audience_country_name
+    WorldRegions.name_for(audience_country) if audience_country.present?
   end
 
   def forms_mode?

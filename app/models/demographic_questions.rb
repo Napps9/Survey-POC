@@ -105,6 +105,42 @@ module DemographicQuestions
     card
   end
 
+  # The heritage card's last two options ("Another heritage", "Prefer not to
+  # say") in `locale` — the escape hatches that survive when the seven
+  # country-specific categories replace the global taxonomy. Identified
+  # positionally as the LAST TWO registry options, the same convention
+  # neuro_exclusive_labels uses, so a locale that translated the list whole
+  # gets its own wording and one that didn't falls back to English.
+  def self.heritage_tail_options(locale: nil)
+    Array(optional_card("heritage", locale: locale)["options"]).last(2)
+  end
+
+  # The heritage card with `five` country-specific categories in place of the
+  # global nine, keeping the registry's tail pair below them — so the card asks
+  # about Kenyan or Brazilian heritage while a respondent who fits none of it,
+  # or would rather not say, still has somewhere to go.
+  #
+  # Pure: `five` arrives already generated and sanitised (HeritageOptions), so
+  # nothing here calls a service or can fail. A blank list returns the plain
+  # registry card, which is what makes "Claude was unreachable" degrade to the
+  # global taxonomy rather than to an error.
+  #
+  # `allow_other` rides along because a five-item list WILL miss people: the
+  # free-text box is the difference between a respondent seeing themselves as
+  # "Another heritage" and being able to say what they actually are.
+  def self.country_heritage_card(country:, five:, locale: nil)
+    card = optional_card("heritage", locale: locale)
+    return card if card.nil? || Array(five).empty?
+
+    code = country.to_s.upcase
+    return card unless WorldRegions.valid?(code)
+
+    card["options"]          = Array(five).map(&:to_s) + heritage_tail_options(locale: locale)
+    card["allow_other"]      = true
+    card["heritage_country"] = code
+    card
+  end
+
   # The neurodiversity card's two mutually-exclusive options ("None of these",
   # "Prefer not to say") in EVERY available locale. Stored answers are
   # canonical primary-language labels, so a French Verto stores the French

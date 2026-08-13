@@ -1515,6 +1515,7 @@ he:
       create_blank_failed: "לא הצלחנו ליצור את ה-Verto שלכם — %{reason}"
       destroyed_forever: "“%{name}” נמחק לצמיתות. כל התגובות והנתונים נמחקו."
       editing_locked: "העריכה נעולה — ה-Verto הזה פעיל, או שכבר אסף תגובות."
+      audience_country_failed: "לא הצלחנו לעדכן את מדינת הקהל — נסו שוב."
       generate_failed: "לא הצלחנו לייצר את ה-Verto שלכם — %{reason}"
       google_form_import_failed: "לא הצלחנו לייבא את טופס Google הזה — %{reason}"
       google_form_url_required: "הדביקו את קישור העריכה של טופס Google שלכם, למשל https://docs.google.com/forms/d/…/edit"

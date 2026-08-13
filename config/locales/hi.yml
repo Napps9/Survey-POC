@@ -1508,6 +1508,7 @@ hi:
       create_blank_failed: "हम आपका Verto नहीं बना सके — %{reason}"
       destroyed_forever: "“%{name}” स्थायी रूप से हटा दिया गया। सभी उत्तर और डेटा मिटा दिए गए हैं।"
       editing_locked: "संपादन लॉक है — यह Verto लाइव है, या इसने पहले ही उत्तर एकत्र कर लिए हैं।"
+      audience_country_failed: "श्रोता का देश अपडेट नहीं हो सका — कृपया फिर से प्रयास करें।"
       generate_failed: "हम आपका Verto तैयार नहीं कर सके — %{reason}"
       google_form_import_failed: "हम उस Google Form को आयात नहीं कर सके — %{reason}"
       google_form_url_required: "अपने Google Form का संपादन लिंक पेस्ट करें, उदा. https://docs.google.com/forms/d/…/edit"

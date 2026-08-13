@@ -1191,6 +1191,37 @@
           <% end %>
         </details>
 
+        <%# Who this Verto is for. One setting today — the country — and it
+            feeds one thing: whether the opt-in Heritage question asks in the
+            global nine categories or the ones this country's own census uses.
+            Its own endpoint rather than #settings, because re-tailoring an
+            already-added Heritage card costs a Claude call and the settings
+            endpoint has to stay free to call. Frozen once the Verto is live,
+            like every other change to what respondents see. %>
+        <details class="publish-block">
+          <summary class="publish-block-title">Audience <span class="pub-chev">⌄</span></summary>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;margin-bottom:10px;">
+            Where the people answering this live. Respondents never see it — it
+            tailors the optional Heritage question to that country's own
+            categories instead of a global list.
+          </div>
+          <%= form_with url: audience_country_survey_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <select name="audience_country" id="audience-country"
+                    onchange="this.form.requestSubmit()"
+                    <%= "disabled" if live_locked %>
+                    style="width:100%;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;">
+              <option value="">No specific country — use the global list</option>
+              <%= options_for_select(WorldRegions.options, @survey.audience_country) %>
+            </select>
+            <% if @survey.audience_country.present? %>
+              <div style="font-size: var(--text-sm);color:rgba(255,255,255,0.55);line-height:1.45;margin-top:6px;">
+                Check the Heritage options read right for <%= @survey.audience_country_name %>
+                before you publish — you can edit any of them like any other card.
+              </div>
+            <% end %>
+          <% end %>
+        </details>
+
         <%= render "surveys/ask_verto_block" %>
 
         <%# Recently deleted cards. In-session undo (⌘Z) handles a mistake you

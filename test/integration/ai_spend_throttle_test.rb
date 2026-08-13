@@ -27,10 +27,13 @@ class AiSpendThrottleTest < ActionDispatch::IntegrationTest
   test "every Claude-spending action in SurveysController is throttled" do
     # Hand-maintained on purpose: adding an AI endpoint should require a
     # deliberate decision about its limit, and this failing is the reminder.
+    # update_audience_country spends when the Verto has both an audience
+    # country and a Heritage card: it regenerates that card's options for the
+    # new country.
     expected = %i[
       generate import_pdf import_manual import_google_form finalize_import
       create_blank resume_import generate_flow generate_card optimise_card
-      moderate_image
+      moderate_image update_audience_country
     ]
 
     missing = expected - SurveysController.ai_throttled_actions
