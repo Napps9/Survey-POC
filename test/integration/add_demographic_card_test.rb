@@ -63,7 +63,7 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
     fr = json.dig("card", "i18n", "fr")
     assert fr.present?, "the next autosave must not persist the card monolingual"
     refute_equal json.dig("card", "text"), fr["text"]
-    assert_equal 8, fr["options"].size
+    assert_equal 7, fr["options"].size, "neurodiversity retires two vocabulary entries"
   end
 
   test "a French-default Verto gets the French card at the top level" do
@@ -154,7 +154,7 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
       HeritageOptionsGenerator.singleton_class.remove_method(:new)
     end
 
-    assert_equal 8, JSON.parse(response.body)["card"]["options"].size
+    assert_equal 7, JSON.parse(response.body)["card"]["options"].size
     refute called, "only heritage varies by country"
   end
 
