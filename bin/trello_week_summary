@@ -100,7 +100,9 @@ targets.each_with_index do |(monday, list), index|
     source = "fallback"
   elsif options[:highlights]
     raw = options[:highlights] == "-" ? $stdin.read : File.read(options[:highlights])
-    highlights = WeekSummary.extract_bullets(raw)
+    # A locale-less environment (cron, containers) reads files as US-ASCII;
+    # the bytes are UTF-8 regardless — relabel before any string operation.
+    highlights = WeekSummary.extract_bullets(raw.force_encoding(Encoding::UTF_8))
     abort "--highlights #{options[:highlights]} contains no markdown bullets" unless highlights
     source = "claude"
   else
