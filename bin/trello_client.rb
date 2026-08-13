@@ -6,6 +6,7 @@
 require "net/http"
 require "uri"
 require "json"
+require "date"
 
 module TrelloClient
   BOARD_ID = "ntNghZRN"
@@ -88,9 +89,54 @@ module TrelloClient
     label_id
   end
 
-  def self.find_or_create_list(list_name, auth)
+  def self.find_or_create_list(list_name, auth, pos: nil)
     lists = request(:get, "/boards/#{BOARD_ID}/lists", auth)
+    create_params = auth.merge(name: list_name)
+    create_params[:pos] = pos if pos
     lists.find { |l| l["name"].casecmp?(list_name) } ||
-      request(:post, "/boards/#{BOARD_ID}/lists", auth.merge(name: list_name))
+      request(:post, "/boards/#{BOARD_ID}/lists", create_params)
+  end
+
+  # 11th/12th/13th take "th" despite ending in 1/2/3 — the %100 check runs first.
+  def self.ordinal(n)
+    suffix = if (11..13).cover?(n % 100)
+      "th"
+    else
+      { 1 => "st", 2 => "nd", 3 => "rd" }.fetch(n % 10, "th")
+    end
+    "#{n}#{suffix}"
+  end
+
+  # Monday of the week containing date (weeks run Monday–Sunday; Sunday's wday
+  # is 0, so the %7 folds it back to the previous Monday).
+  def self.week_monday(date)
+    date - ((date.wday - 1) % 7)
+  end
+
+  def self.weekly_done_list_name(date)
+    monday = week_monday(date)
+    "Done - Week of #{ordinal(monday.day)} #{monday.strftime('%B')} #{monday.year}"
+  end
+
+  # Trello ObjectIds embed their creation time: first 8 hex chars = unix
+  # seconds, UTC.
+  def self.card_created_at(card_id)
+    Time.at(card_id[0, 8].to_i(16)).utc
+  end
+
+  # Weekly variant of find_or_create_list: a new week's list is created
+  # immediately LEFT of the leftmost existing weekly list, so the board keeps
+  # the newest week where the old flat "Done" list sat. The first-ever weekly
+  # list appends at the board's right edge instead.
+  def self.find_or_create_weekly_done_list(date, auth)
+    name = weekly_done_list_name(date)
+    lists = request(:get, "/boards/#{BOARD_ID}/lists", auth)
+    found = lists.find { |l| l["name"].casecmp?(name) }
+    return found if found
+
+    leftmost = lists.select { |l| l["name"].start_with?("Done - Week of") }
+                    .map { |l| l["pos"].to_f }.min
+    pos = leftmost.nil? || leftmost <= 1 ? "bottom" : leftmost - 1
+    request(:post, "/boards/#{BOARD_ID}/lists", auth.merge(name: name, pos: pos))
   end
 end

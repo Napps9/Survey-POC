@@ -1,0 +1,108 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Regroups a flat "Done" list into per-week "Done - Week of ..." lists (weeks
+# run Monday–Sunday, cards grouped by the creation date embedded in their id,
+# newest week kept leftmost). Idempotent: re-running moves nothing already in
+# place, resumes an interrupted run, and exits cleanly once the source list is
+# gone or empty.
+
+require "optparse"
+require "date"
+require_relative "trello_client"
+
+def week_monday_from_name(name)
+  Date.parse(name.delete_prefix("Done - Week of ").sub(/(\d+)(st|nd|rd|th)\b/, "\\1"))
+rescue Date::Error
+  nil
+end
+
+options = { source: "Done" }
+OptionParser.new do |opts|
+  opts.banner = "Usage: bin/trello_backfill_done_weeks [--dry-run] [--source NAME] [--keep-source]"
+  opts.on("--dry-run", "Print the plan without writing anything") { options[:dry_run] = true }
+  opts.on("--source NAME", "List to drain (default: Done)") { |v| options[:source] = v }
+  opts.on("--keep-source", "Leave the emptied source list on the board instead of archiving it") do
+    options[:keep_source] = true
+  end
+end.parse!(ARGV)
+
+auth = { key: ENV.fetch("TRELLO_API_KEY"), token: ENV.fetch("TRELLO_TOKEN") }
+
+lists = TrelloClient.request(:get, "/boards/#{TrelloClient::BOARD_ID}/lists", auth)
+source = lists.find { |l| l["name"].casecmp?(options[:source]) }
+if source.nil?
+  puts "No open list named #{options[:source].inspect} — nothing to move."
+  exit 0
+end
+
+cards = TrelloClient.request(:get, "/lists/#{source['id']}/cards",
+                             auth.merge(fields: "name,idList", limit: 1000))
+groups = cards.group_by { |c| TrelloClient.week_monday(TrelloClient.card_created_at(c["id"]).to_date) }
+
+if options[:dry_run]
+  puts "Would move #{cards.size} cards from #{source['name'].inspect} into #{groups.size} weekly lists:"
+  groups.keys.sort.each do |monday|
+    puts "  #{TrelloClient.weekly_done_list_name(monday)}: #{groups[monday].size} cards"
+  end
+  puts "Would then #{options[:keep_source] ? 'keep' : 'archive'} the emptied source list."
+  exit 0
+end
+
+week_lists = {}
+groups.keys.sort.each do |monday|
+  week_lists[monday] = TrelloClient.find_or_create_list(
+    TrelloClient.weekly_done_list_name(monday), auth, pos: "bottom")
+end
+
+# Re-bottom ALL weekly lists newest-first — not just the weeks present in the
+# source, or a re-run whose source only holds newer (or older) weeks would
+# shove untouched weeks out of order. Sequential bottoming leaves the board
+# reading newest week leftmost regardless of how the lists came to exist.
+weekly = (lists + week_lists.values)
+         .uniq { |l| l["id"] }
+         .select { |l| l["name"].start_with?("Done - Week of ") }
+         .filter_map { |l| (monday = week_monday_from_name(l["name"])) && [ monday, l ] }
+weekly.sort_by(&:first).reverse_each do |_monday, list|
+  TrelloClient.request(:put, "/lists/#{list['id']}", auth.merge(pos: "bottom"))
+end
+
+# Cards arrive pos-ascending = newest-first; sequential bottom-appends in that
+# order reproduce the newest-at-top reading inside every weekly list. The
+# sleep keeps ~300 requests under Trello's 100-per-10s token limit.
+moved = 0
+skipped = 0
+cards.each do |card|
+  target = week_lists[TrelloClient.week_monday(TrelloClient.card_created_at(card["id"]).to_date)]
+  if card["idList"] == target["id"]
+    skipped += 1
+    next
+  end
+
+  attempts = 0
+  begin
+    TrelloClient.request(:put, "/cards/#{card['id']}", auth.merge(idList: target["id"], pos: "bottom"))
+  rescue RuntimeError => e
+    raise unless e.message.include?("429") && (attempts += 1) <= 2
+
+    sleep 10
+    retry
+  end
+  moved += 1
+  puts "[#{moved + skipped}/#{cards.size}] #{target['name']} <- #{card['name']}"
+  sleep 0.15
+end
+
+remaining = TrelloClient.request(:get, "/lists/#{source['id']}/cards", auth.merge(fields: "idList"))
+archived = false
+if options[:keep_source]
+  puts "Leaving #{source['name'].inspect} on the board (--keep-source)."
+elsif remaining.empty?
+  TrelloClient.request(:put, "/lists/#{source['id']}/closed", auth.merge(value: true))
+  archived = true
+else
+  puts "#{source['name'].inspect} still has #{remaining.size} cards — left unarchived."
+end
+
+puts "Done: #{moved} moved, #{skipped} already in place, " \
+     "#{week_lists.size} weekly lists#{archived ? ", source list archived" : ""}."

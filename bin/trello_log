@@ -40,14 +40,20 @@ if options[:points] && !TrelloClient::FIB_LABEL_COLORS.key?(options[:points])
 end
 
 summary = ARGV[1] || ""
-list_name = ENV.fetch("TRELLO_LIST_NAME", "Done")
+list_name = ENV["TRELLO_LIST_NAME"]
 auth = { key: ENV.fetch("TRELLO_API_KEY"), token: ENV.fetch("TRELLO_TOKEN") }
 
 description = summary.dup
 description << "\n\n## Frontend\n#{options[:frontend]}" if options[:frontend]
 description << "\n\n## Backend\n#{options[:backend]}" if options[:backend]
 
-list = TrelloClient.find_or_create_list(list_name, auth)
+# An explicit TRELLO_LIST_NAME still targets that list verbatim; the default
+# is the current week's "Done - Week of ..." list (weeks run Monday–Sunday).
+list = if list_name
+  TrelloClient.find_or_create_list(list_name, auth)
+else
+  TrelloClient.find_or_create_weekly_done_list(Time.now.utc.to_date, auth)
+end
 
 card_params = auth.merge(idList: list["id"], name: title, desc: description)
 # A manual --points still wins outright — set the label at creation time,

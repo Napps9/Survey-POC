@@ -33,8 +33,13 @@ bin/trello_log "Short title of what shipped" "1-3 sentence summary" \
   --points 5
 ```
 
-This posts to the `Done` list on the team's Trello board
-(https://trello.com/b/ntNghZRN) via the REST API. `--frontend`/`--backend` are
+This posts to the current week's list on the team's Trello board
+(https://trello.com/b/ntNghZRN) via the REST API — `Done - Week of 10th
+August 2026`-style, weeks running Monday–Sunday, named for the Monday. The
+list is found-or-created automatically, with the newest week kept leftmost of
+the weekly block; setting `TRELLO_LIST_NAME` still targets that list verbatim
+instead. (`bin/trello_backfill_done_weeks` regroups an old flat `Done` list
+into weekly lists, should one reappear.) `--frontend`/`--backend` are
 rendered as `## Frontend`/`## Backend` sections in the card description —
 omit whichever side didn't change. `--test NAME:STATUS` (repeatable) adds a
 "Tests" checklist item per suite, checked iff STATUS is `pass` — use the
