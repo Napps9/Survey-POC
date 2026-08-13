@@ -1504,6 +1504,7 @@ ja:
       create_blank_failed: "Verto を作成できませんでした — %{reason}"
       destroyed_forever: "「%{name}」を完全に削除しました。すべての回答とデータが消去されました。"
       editing_locked: "編集はロックされています — この Verto は公開中か、すでに回答を集めています。"
+      audience_country_failed: "対象国を更新できませんでした — もう一度お試しください。"
       generate_failed: "Verto を生成できませんでした — %{reason}"
       google_form_import_failed: "その Googleフォームをインポートできませんでした — %{reason}"
       google_form_url_required: "Googleフォームの編集リンクを貼り付けてください。例: https://docs.google.com/forms/d/…/edit"

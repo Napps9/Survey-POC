@@ -1516,6 +1516,7 @@ uk:
       create_blank_failed: "Не вдалося створити ваш Verto — %{reason}"
       destroyed_forever: "«%{name}» видалено назавжди. Усі відповіді та дані стерто."
       editing_locked: "Редагування заблоковано — цей Verto активний або вже зібрав відповіді."
+      audience_country_failed: "Не вдалося оновити країну аудиторії — спробуйте ще раз."
       generate_failed: "Не вдалося створити ваш Verto — %{reason}"
       google_form_import_failed: "Не вдалося імпортувати цю Google Форму — %{reason}"
       google_form_url_required: "Вставте посилання на редагування вашої Google Форми, наприклад https://docs.google.com/forms/d/…/edit"

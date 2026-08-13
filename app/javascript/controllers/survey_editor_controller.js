@@ -1313,6 +1313,12 @@ export default class extends Controller {
       // card to an unkeyed demographic MC that then collides with the gender
       // finder. Sanitised server-side against DemographicQuestions::DEMOGRAPHIC_KEYS.
       if (card.dataset.cardDemographicKey) out.demographic_key = card.dataset.cardDemographicKey
+      // Which country's heritage taxonomy this card was built from. Nothing in
+      // the editor displays it, so without carrying it here the first autosave
+      // would drop it and the Verto would forget its Heritage card was ever
+      // tailored — a later country change would then have nothing to compare
+      // against. Sanitised server-side against WorldRegions.
+      if (card.dataset.cardHeritageCountry) out.heritage_country = card.dataset.cardHeritageCountry
 
       // Common Question provenance — the ids that let results aggregate the
       // same question across Vertos. Nothing in the editor displays them, so

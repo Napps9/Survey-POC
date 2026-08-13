@@ -13,11 +13,25 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
     post session_path, params: { email_address: @user.email_address, password: "verylongpassword" }
   end
 
-  def survey(locales: [ "en" ], default_locale: "en", cards: [])
+  FIVE = [ "White British", "Indian", "Pakistani", "Black Caribbean", "Chinese" ].freeze
+
+  def survey(locales: [ "en" ], default_locale: "en", cards: [], audience_country: nil)
     @org.surveys.create!(
       title: "S", theme: "Sports", audience_age: "all", key_insight: "x",
-      default_locale: default_locale, locales: locales, cards: cards
+      default_locale: default_locale, locales: locales, cards: cards,
+      audience_country: audience_country
     )
+  end
+
+  # The five country heritages arrive from Claude; stub the generator so the
+  # endpoint's own behaviour is what's under test.
+  def with_generator(result)
+    fake = Object.new
+    fake.define_singleton_method(:call) { |**| result }
+    HeritageOptionsGenerator.define_singleton_method(:new) { |*| fake }
+    yield
+  ensure
+    HeritageOptionsGenerator.singleton_class.remove_method(:new)
   end
 
   def add!(s, key)
@@ -83,6 +97,62 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
 
     add!(foreign, "heritage")
     assert_response :not_found
+  end
+
+  # ── Tailored to the Verto's audience country ──────────────────────────────
+
+  test "with an audience country set, heritage arrives tailored to it" do
+    with_generator(FIVE) { add!(survey(audience_country: "GB"), "heritage") }
+
+    assert_response :success
+    card = JSON.parse(response.body)["card"]
+    assert_equal FIVE + DemographicQuestions.heritage_tail_options, card["options"]
+    assert_equal 7, card["options"].size, "five categories plus the two escape hatches"
+    assert card["allow_other"], "five will miss people — the free-text box is where they go"
+    assert_equal "GB", card["heritage_country"]
+    assert_equal "heritage", card["demographic_key"], "it is still the same question"
+  end
+
+  test "the tailored card's provenance and Other box reach the editor row" do
+    with_generator(FIVE) { add!(survey(audience_country: "GB"), "heritage") }
+
+    html = JSON.parse(response.body)["html"]
+    assert_includes html, 'data-card-heritage-country="GB"',
+                    "the row must carry it or the first autosave strips it"
+    assert_includes html, 'data-card-allow-other="true"'
+  end
+
+  test "an unreachable generator still returns a working question" do
+    with_generator(nil) { add!(survey(audience_country: "GB"), "heritage") }
+
+    assert_response :success, "an API blip must not put an error where a card should be"
+    card = JSON.parse(response.body)["card"]
+    assert_equal 9, card["options"].size, "it falls back to the global taxonomy"
+    assert_nil card["heritage_country"], "and doesn't claim a tailoring it didn't get"
+    refute card["allow_other"]
+  end
+
+  test "a country the platform doesn't know is treated as no country" do
+    s = survey
+    s.update_column(:audience_country, "ZZ") # bypasses the model, as a stale row would
+    with_generator(FIVE) { add!(s, "heritage") }
+
+    assert_equal 9, JSON.parse(response.body)["card"]["options"].size
+  end
+
+  test "neurodiversity is untouched by the audience country" do
+    called = false
+    fake = Object.new
+    fake.define_singleton_method(:call) { |**| called = true; FIVE }
+    HeritageOptionsGenerator.define_singleton_method(:new) { |*| fake }
+    begin
+      add!(survey(audience_country: "GB"), "neurodiversity")
+    ensure
+      HeritageOptionsGenerator.singleton_class.remove_method(:new)
+    end
+
+    assert_equal 9, JSON.parse(response.body)["card"]["options"].size
+    refute called, "only heritage varies by country"
   end
 
   test "the editor renders the tiles and greys out an added one" do

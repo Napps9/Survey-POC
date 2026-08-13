@@ -1385,6 +1385,7 @@ nl:
     surveys:
       image_unverified: "We konden die afbeelding niet controleren — probeer het opnieuw."
       editing_locked: "Bewerken is vergrendeld — deze Verto is live of heeft al reacties verzameld."
+      audience_country_failed: "Kon het land van het publiek niet bijwerken — probeer het opnieuw."
       settings_locked: "Deze Verto is live of heeft al reacties — instellingen voor toestemming en scoring kun je nu niet meer wijzigen."
       brief_required: "Vertel ons waar je Verto over gaat en wie er antwoordt — die twee zijn verplicht."
       learning_goal_required: "Voeg toe wat je wilt leren, of kies een paar Gemeenschappelijke vragen — een van de twee is verplicht."

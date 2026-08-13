@@ -1515,6 +1515,7 @@ ru:
       create_blank_failed: "Не удалось создать ваш Verto — %{reason}"
       destroyed_forever: "«%{name}» удалён навсегда. Все ответы и данные стёрты."
       editing_locked: "Редактирование заблокировано — этот Verto активен или уже собрал ответы."
+      audience_country_failed: "Не удалось обновить страну аудитории — попробуйте ещё раз."
       generate_failed: "Не удалось создать ваш Verto — %{reason}"
       google_form_import_failed: "Не удалось импортировать эту Google Форму — %{reason}"
       google_form_url_required: "Вставьте ссылку на редактирование вашей Google Формы, например https://docs.google.com/forms/d/…/edit"

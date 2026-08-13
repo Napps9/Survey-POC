@@ -1506,6 +1506,7 @@ tr:
       create_blank_failed: "Verto'nuzu oluşturamadık — %{reason}"
       destroyed_forever: "“%{name}” kalıcı olarak silindi. Tüm yanıtlar ve veriler silindi."
       editing_locked: "Düzenleme kilitli — bu Verto yayında ya da hâlihazırda yanıt toplamış."
+      audience_country_failed: "Hedef kitle ülkesi güncellenemedi — lütfen tekrar deneyin."
       generate_failed: "Verto'nuzu oluşturamadık — %{reason}"
       google_form_import_failed: "Bu Google Formu içe aktaramadık — %{reason}"
       google_form_url_required: "Google Formunuzun düzenleme bağlantısını yapıştırın, örn. https://docs.google.com/forms/d/…/edit"

@@ -1521,6 +1521,7 @@ ar:
       create_blank_failed: "تعذّر علينا إنشاء Verto الخاص بك — %{reason}"
       destroyed_forever: "تم حذف «%{name}» نهائيًا. تم محو جميع الإجابات والبيانات."
       editing_locked: "التعديل مقفل — هذا الـ Verto مباشر، أو أنه جمع إجابات بالفعل."
+      audience_country_failed: "تعذّر تحديث بلد الجمهور — يُرجى المحاولة مرة أخرى."
       generate_failed: "تعذّر علينا توليد Verto الخاص بك — %{reason}"
       google_form_import_failed: "تعذّر علينا استيراد نموذج Google هذا — %{reason}"
       google_form_url_required: "ألصق رابط تعديل نموذج Google الخاص بك، مثال: https://docs.google.com/forms/d/…/edit"

@@ -23,7 +23,8 @@ class AnthropicClientTimeoutTest < ActiveSupport::TestCase
     # close. FlowGenerator and CardOptimiser are the editor-side equivalents.
     QuizAnswerGrader,
     FlowGenerator,
-    CardOptimiser
+    CardOptimiser,
+    HeritageOptionsGenerator
   ].freeze
 
   test "the shared Anthropic timeout is bounded well below the SDK default" do

@@ -24,6 +24,7 @@
      data-card-input="<%= card['input'].to_s %>"
      data-card-demographic="<%= card['demographic'] ? 'true' : 'false' %>"
      <% if card['demographic_key'].present? %>data-card-demographic-key="<%= card['demographic_key'] %>"<% end %>
+     <% if card['heritage_country'].present? %>data-card-heritage-country="<%= card['heritage_country'] %>"<% end %>
      data-card-options="<%= Array(card['options']).to_json %>"
      data-card-pages="<%= Array(card['pages']).to_json %>"
      data-card-option-images="<%= Array(card['option_images']).to_json %>"

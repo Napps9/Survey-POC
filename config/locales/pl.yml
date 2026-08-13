@@ -1516,6 +1516,7 @@ pl:
       create_blank_failed: "Nie udało się utworzyć Twojego Verto — %{reason}"
       destroyed_forever: "„%{name}” usunięte na zawsze. Wszystkie odpowiedzi i dane zostały wymazane."
       editing_locked: "Edycja jest zablokowana — to Verto jest aktywne albo zebrało już odpowiedzi."
+      audience_country_failed: "Nie udało się zaktualizować kraju odbiorców — spróbuj ponownie."
       generate_failed: "Nie udało się wygenerować Twojego Verto — %{reason}"
       google_form_import_failed: "Nie udało się zaimportować tego Google Form — %{reason}"
       google_form_url_required: "Wklej link do edycji swojego Google Form, np. https://docs.google.com/forms/d/…/edit"

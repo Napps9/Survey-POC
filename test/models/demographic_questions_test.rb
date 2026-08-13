@@ -64,6 +64,56 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
     refute_includes labels, "ADHD", "a real condition must never be treated as exclusive"
   end
 
+  # ── The country-tailored heritage card ────────────────────────────────────
+
+  test "heritage_tail_options is the registry's own escape-hatch pair, per locale" do
+    assert_equal [ "Another heritage", "Prefer not to say" ],
+                 DemographicQuestions.heritage_tail_options
+    assert_equal DemographicQuestions.optional_card("heritage", locale: "fr")["options"].last(2),
+                 DemographicQuestions.heritage_tail_options(locale: "fr")
+  end
+
+  test "country_heritage_card swaps the taxonomy but keeps the escape hatches" do
+    five = [ "White British", "Indian", "Pakistani", "Black Caribbean", "Chinese" ]
+    card = DemographicQuestions.country_heritage_card(country: "gb", five: five)
+
+    assert_equal five + DemographicQuestions.heritage_tail_options, card["options"]
+    assert_equal 7, card["options"].size
+    assert card["allow_other"], "five categories will miss people"
+    assert_equal "GB", card["heritage_country"], "the code is normalised, not echoed"
+    assert_equal "heritage", card["demographic_key"], "it is still the same question"
+    assert card["demographic"]
+  end
+
+  test "a French Verto's tailored card carries the French question and tail" do
+    card = DemographicQuestions.country_heritage_card(
+      country: "FR", five: %w[un deux trois quatre cinq], locale: "fr"
+    )
+
+    assert_equal DemographicQuestions.optional_card("heritage", locale: "fr")["text"], card["text"]
+    assert_equal DemographicQuestions.heritage_tail_options(locale: "fr"), card["options"].last(2)
+  end
+
+  test "no usable list means the plain registry card, never a half-tailored one" do
+    [ nil, [] ].each do |five|
+      card = DemographicQuestions.country_heritage_card(country: "GB", five: five)
+      assert_equal 9, card["options"].size
+      assert_nil card["heritage_country"], "a fallback must not claim a tailoring it didn't get"
+    end
+
+    unknown = DemographicQuestions.country_heritage_card(country: "ZZ", five: %w[a b c d e])
+    assert_equal 9, unknown["options"].size
+    assert_nil unknown["heritage_country"]
+  end
+
+  test "building a tailored card never corrupts the frozen registry" do
+    DemographicQuestions.country_heritage_card(country: "GB", five: %w[a b c d e])
+
+    assert_equal 9, DemographicQuestions::OPTIONAL_CARDS["heritage"]["options"].size
+    refute DemographicQuestions::OPTIONAL_CARDS["heritage"].key?("allow_other")
+    refute DemographicQuestions::OPTIONAL_CARDS["heritage"].key?("heritage_country")
+  end
+
   test "the optional questions never leak into the auto-appended tail" do
     assert_equal 3, DemographicQuestions.cards.size
     assert_equal 3, DemographicQuestions.append_to([]).size

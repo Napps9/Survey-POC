@@ -1384,6 +1384,7 @@ fr:
       campaign_deleted: "Campagne supprimée."
     surveys:
       editing_locked: "La modification est verrouillée — ce Verto est en ligne, ou a déjà recueilli des réponses."
+      audience_country_failed: "Impossible de mettre à jour le pays du public — veuillez réessayer."
       settings_locked: "Ce Verto est en ligne ou a déjà des réponses — les réglages de consentement et de notation ne peuvent plus changer."
       brief_required: "Dites-nous le sujet de votre Verto et qui y répond — ces deux éléments sont obligatoires."
       learning_goal_required: "Ajoutez ce que vous souhaitez apprendre, ou choisissez des Questions communes — l'un des deux est obligatoire."
