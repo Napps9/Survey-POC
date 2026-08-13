@@ -57,6 +57,12 @@ export default class extends Controller {
     live: { type: Boolean, default: false }
   }
 
+  // Largest body flushSave will entrust to a keepalive request on unload. The
+  // spec's ceiling is 64KB and it is shared across every in-flight keepalive
+  // request, so this sits well under it: measured in Chromium, 32KB sends and
+  // 63KB is rejected outright when anything else is in flight.
+  static KEEPALIVE_MAX_BYTES = 32 * 1024
+
   _saveTimer = null
   _dirty = false
 
@@ -76,7 +82,10 @@ export default class extends Controller {
     // draft on the server never lags behind what's on screen (the cause of
     // "edits not saved" / draft-vs-preview drift). pagehide covers bfcache and
     // mobile; visibilitychange covers tab-switch/app-background.
-    this._flushHandler = () => this.flushSave()
+    // The event is passed through: on beforeunload — and only there — flushSave
+    // may need to stop the navigation, because a deck too big for a keepalive
+    // request cannot be delivered once the page is gone.
+    this._flushHandler = (event) => this.flushSave(event)
     window.addEventListener("pagehide", this._flushHandler)
     window.addEventListener("beforeunload", this._flushHandler)
     document.addEventListener("visibilitychange", this._visibilityHandler = () => {
@@ -463,28 +472,58 @@ export default class extends Controller {
     return card
   }
 
-  // Best-effort synchronous-ish flush of a pending autosave. Uses fetch with
-  // keepalive so the request survives the page unload (sendBeacon can't send a
-  // PATCH with a CSRF header). No-op when nothing is pending or the Verto is
-  // live (the server rejects edits to a published Verto anyway).
-  flushSave() {
+  // Best-effort synchronous-ish flush of a pending autosave. Small decks go by
+  // fetch with keepalive, the only kind of request that survives the page
+  // unload (sendBeacon can't send a PATCH with a CSRF header); decks past what
+  // keepalive can carry take the slower path below. No-op when nothing is
+  // pending or the Verto is live (the server rejects edits to a published
+  // Verto anyway).
+  flushSave(event) {
     if (!this._dirty || this.liveValue) return
     if (!this.hasUrlValue || !this.urlValue) return
     clearTimeout(this._saveTimer)
-    this._dirty = false
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+    const headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "X-CSRF-Token": csrfToken
+    }
+    let body
     try {
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
-      fetch(this.urlValue, {
-        method: "PATCH",
-        keepalive: true,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "X-CSRF-Token": csrfToken
-        },
-        body: JSON.stringify(this.serialize())
-      })
-    } catch (_) { /* unload path — nothing more we can do */ }
+      body = JSON.stringify(this.serialize())
+    } catch (_) {
+      return // can't build a payload — leave _dirty set so the debounce retries
+    }
+
+    // A keepalive request is the only kind that outlives the page, but the Fetch
+    // spec caps its body at 64KB and the browser REJECTS anything larger — an
+    // asynchronous rejection the old `try` around fetch() could never catch. It
+    // had already set _dirty = false, so on a deck over that size every pending
+    // edit was dropped on refresh with nothing on screen to say so. Measured: a
+    // 32KB body sends, 63KB+ does not, and the quota is shared with any other
+    // keepalive request still in flight — hence the conservative ceiling.
+    if (new Blob([ body ]).size <= this.constructor.KEEPALIVE_MAX_BYTES) {
+      this._dirty = false
+      fetch(this.urlValue, { method: "PATCH", keepalive: true, headers, body })
+        // Still possible: the shared quota was already spent. Put the flag back
+        // so a later flush (tab-switch, or the next edit's debounce) retries.
+        .catch(() => { this._dirty = true })
+      return
+    }
+
+    // Too big to survive the page going away. Send it normally — it lands if the
+    // browser sticks around long enough — and on an actual navigation ask first,
+    // so a creator with a long or multilingual deck is given the second it needs
+    // instead of silently losing the edit. Browsers ignore custom wording here,
+    // so there is no string to translate.
+    fetch(this.urlValue, { method: "PATCH", headers, body })
+      .then(() => { this._dirty = false })
+      .catch(() => { /* stays dirty; the next flush or edit retries */ })
+    if (event?.type === "beforeunload") {
+      event.preventDefault()
+      event.returnValue = ""
+    }
   }
 
   // ── Language tabs ──────────────────────────────────────

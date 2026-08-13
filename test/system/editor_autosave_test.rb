@@ -86,6 +86,52 @@ class EditorAutosaveTest < ApplicationSystemTestCase
                  "a blank title must not overwrite the Verto's name"
   end
 
+  # A keepalive request is the only kind that outlives the page, and the Fetch
+  # spec caps its body at 64KB — the browser rejects anything larger, and does
+  # it asynchronously, so the `try` that used to wrap the fetch never saw it.
+  # flushSave had already cleared _dirty, so a creator on a long or multilingual
+  # deck who refreshed inside the 1.5s autosave debounce lost the edit outright,
+  # with nothing on screen to say so. Measured: 32KB sends, 63KB+ does not.
+  test "an edit to an oversized deck is not silently dropped on unload" do
+    # 20 languages across a real number of cards — what a translated Verto is,
+    # and comfortably past the keepalive ceiling.
+    locales = (I18n.available_locales.map(&:to_s) - [ "en" ]).first(19)
+    big = Array.new(30) do |i|
+      text = "Question #{i}: how safe do you feel here day to day, and how much do you feel part of this community?"
+      { "type" => "yes_no", "cid" => "big#{i}", "text" => text, "options" => %w[Yes No],
+        "i18n" => locales.index_with { |_l| { "text" => text, "options" => %w[Yes No] } } }
+    end
+    @survey.update!(cards: [ CARDS.first ] + big, locales: [ "en" ] + locales)
+
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+
+    payload_bytes = evaluate_script(<<~JS)
+      (() => {
+        const el = document.querySelector('[data-controller~="survey-editor"]')
+        const c = window.Stimulus.getControllerForElementAndIdentifier(el, "survey-editor")
+        return new Blob([JSON.stringify(c.serialize())]).size
+      })()
+    JS
+    assert_operator payload_bytes, :>, 64 * 1024,
+                    "precondition: this deck must exceed what a keepalive request can carry"
+
+    execute_script(<<~JS)
+      const el = document.querySelector("[data-survey-editor-target='vertoTitle']")
+      el.textContent = "Saved Despite The Size"
+      el.dispatchEvent(new Event("input", { bubbles: true }))
+    JS
+
+    # Flush the way a refresh does, before the 1.5s debounce could have fired.
+    execute_script("window.dispatchEvent(new Event('pagehide'))")
+
+    Timeout.timeout(10) do
+      sleep 0.25 until @survey.reload.title == "Saved Despite The Size"
+    end
+    assert_equal "Saved Despite The Size", @survey.reload.title
+  end
+
   test "a live Verto refuses structural edits in the editor" do
     # Answers are keyed by card index, so editing a deck that already has
     # responses silently misaligns what is stored. The server enforces it; this
