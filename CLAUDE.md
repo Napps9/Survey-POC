@@ -38,7 +38,8 @@ This posts to the current week's list on the team's Trello board
 August 2026`-style, weeks running Monday–Sunday, named for the Monday. The
 list is found-or-created automatically, with the newest week kept leftmost of
 the weekly block; setting `TRELLO_LIST_NAME` still targets that list verbatim
-instead. (`bin/trello_backfill_done_weeks` regroups an old flat `Done` list
+instead. Cards land newest-first, directly under the week's pinned summary
+card (see below). (`bin/trello_backfill_done_weeks` regroups an old flat `Done` list
 into weekly lists, should one reappear.) `--frontend`/`--backend` are
 rendered as `## Frontend`/`## Backend` sections in the card description —
 omit whichever side didn't change. `--test NAME:STATUS` (repeatable) adds a

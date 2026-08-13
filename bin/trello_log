@@ -4,6 +4,7 @@
 require "optparse"
 require_relative "trello_client"
 require_relative "estimate_points_lib"
+require_relative "week_summary_lib"
 
 options = { tests: [], screenshots: [] }
 parser = OptionParser.new do |opts|
@@ -55,7 +56,10 @@ else
   TrelloClient.find_or_create_weekly_done_list(Time.now.utc.to_date, auth)
 end
 
-card_params = auth.merge(idList: list["id"], name: title, desc: description)
+# pos: "top" keeps the weekly list reading newest-first — the order the
+# backfill established. Trello's POST default is "bottom", which would bury
+# each new card under the whole week.
+card_params = auth.merge(idList: list["id"], name: title, desc: description, pos: "top")
 # A manual --points still wins outright — set the label at creation time,
 # same as before, and skip the auto-estimator entirely below.
 card_params[:idLabels] = TrelloClient.points_label_id(options[:points], auth) if options[:points]
@@ -74,6 +78,17 @@ unless options[:tests].empty?
 end
 
 options[:screenshots].each { |path| TrelloClient.attach(card["id"], path, auth) }
+
+# The new card now sits above the week's pinned summary — put the summary
+# back on top. Best-effort, like the estimator below: a failed re-pin must
+# never make a successfully logged card look failed.
+begin
+  summary = TrelloClient.request(:get, "/lists/#{list['id']}/cards", auth.merge(fields: "name", limit: 1000))
+                        .find { |c| c["name"].start_with?(WeekSummary::SUMMARY_CARD_PREFIX) }
+  TrelloClient.request(:put, "/cards/#{summary['id']}", auth.merge(pos: "top")) if summary
+rescue => e
+  warn "[trello_log] Could not re-pin the week summary card (card was still logged): #{e.class}: #{e.message}"
+end
 
 puts "Logged to Trello: #{card['shortUrl']}"
 
