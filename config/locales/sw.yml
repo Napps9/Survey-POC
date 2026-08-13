@@ -1370,6 +1370,8 @@ sw:
     welcome_confirm: "Karibu Playverto! Angalia %{email} ili kuthibitisha anwani yako."
   flash:
     comms:
+      newsletter_failed: "Jarida halikuweza kuundwa — angalia kumbukumbu."
+      test_bad_address: "Hiyo haionekani kama anwani ya barua pepe."
       step_deleted: "Ufuatiliaji umefutwa."
       automation_deleted: "Otomatiki imefutwa."
       automation_disabled: "Otomatiki imezimwa."

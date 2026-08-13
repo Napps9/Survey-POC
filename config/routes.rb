@@ -172,6 +172,7 @@ Rails.application.routes.draw do
   constraints(->(request) { CommsAccess.allowed_request?(request) }) do
     get    "comms",                              to: "comms/campaigns#index",          as: :comms
     post   "comms/campaigns",                    to: "comms/campaigns#create",         as: :comms_campaigns
+    post   "comms/newsletter",                   to: "comms/campaigns#generate_newsletter", as: :generate_comms_newsletter
     get    "comms/campaigns/:id/edit",           to: "comms/campaigns#edit",           as: :edit_comms_campaign
     patch  "comms/campaigns/:id",                to: "comms/campaigns#update",         as: :comms_campaign
     delete "comms/campaigns/:id",                to: "comms/campaigns#destroy"

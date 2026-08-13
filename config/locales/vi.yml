@@ -1369,6 +1369,8 @@ vi:
     welcome_confirm: "Chào mừng đến Playverto! Kiểm tra %{email} để xác nhận địa chỉ của bạn."
   flash:
     comms:
+      newsletter_failed: "Không thể tạo bản tin — hãy kiểm tra nhật ký."
+      test_bad_address: "Đó không giống một địa chỉ email."
       step_deleted: "Đã xóa email tiếp theo."
       automation_deleted: "Đã xóa tự động hóa."
       automation_disabled: "Đã tắt tự động hóa."

@@ -45,6 +45,10 @@ class CommsNewsletterTest < ActionDispatch::IntegrationTest
     def call(_commits, week:) = @copy
   end
 
+  def sign_in_staff
+    post session_path, params: { email_address: @staff.email_address, password: "verylongpassword" }
+  end
+
   def raw_commit(subject, body = "")
     message = body.present? ? "#{subject}\n\n#{body}" : subject
     { "sha" => SecureRandom.hex(20),
@@ -168,6 +172,55 @@ class CommsNewsletterTest < ActionDispatch::IntegrationTest
     assert_match "Fill in the Projects section before you book it", response.body
     # The suggested Monday seeds the schedule input, so booking is one click.
     assert_match campaign.scheduled_for.utc.iso8601, response.body
+  end
+
+  test "the generate button builds this week's newsletter on demand and is idempotent" do
+    sign_in_staff
+
+    stub_method(Comms::GithubCommits, :since, [ raw_commit("A change this week") ]) do
+      stub_method(NewsletterWriter, :new, ->(*_a, **_k) { FakeWriter.new(WRITTEN_COPY) }) do
+        assert_difference -> { EmailCampaign.count }, 1 do
+          post generate_comms_newsletter_path
+        end
+        campaign = EmailCampaign.find_by(newsletter_week: Comms::NewsletterSource.week_of(Date.current))
+        assert_redirected_to edit_comms_campaign_path(campaign)
+
+        # Pressing it again opens the same draft rather than minting a second.
+        assert_no_difference -> { EmailCampaign.count } do
+          post generate_comms_newsletter_path
+        end
+        assert_redirected_to edit_comms_campaign_path(campaign)
+      end
+    end
+  end
+
+  test "generating is behind the gate like everything else in Comms" do
+    post generate_comms_newsletter_path
+    assert_response :not_found
+    assert_equal 0, EmailCampaign.count
+  end
+
+  test "a test send goes to any address you name, and refuses a junk one" do
+    run_job
+    campaign = EmailCampaign.find_by(newsletter_week: WEEK)
+    sign_in_staff
+
+    post test_send_comms_campaign_path(campaign), params: { to: "someone-else@example.com" }
+    assert_redirected_to edit_comms_campaign_path(campaign)
+    mail = ActionMailer::Base.deliveries.last
+    assert_equal [ "someone-else@example.com" ], mail.to
+    assert_includes mail.subject, "[Test]"
+    # The proof carries the real design, with the unsubscribe stubbed.
+    assert_includes mail.html_part.body.to_s, "Projects"
+
+    assert_no_difference -> { ActionMailer::Base.deliveries.size } do
+      post test_send_comms_campaign_path(campaign), params: { to: "not an address" }
+    end
+    assert_equal I18n.t("flash.comms.test_bad_address"), flash[:alert]
+
+    # No address falls back to the signed-in account, as before.
+    post test_send_comms_campaign_path(campaign)
+    assert_equal [ @staff.email_address ], ActionMailer::Base.deliveries.last.to
   end
 
   test "a hand-built campaign carries no newsletter markings" do

@@ -1370,6 +1370,8 @@ pt:
     welcome_confirm: "Bem-vindo ao Playverto! Verifique %{email} para confirmar o seu endereço."
   flash:
     comms:
+      newsletter_failed: "Não foi possível criar a newsletter — verifique os registos."
+      test_bad_address: "Isso não parece um endereço de e-mail."
       step_deleted: "Follow-up excluído."
       automation_deleted: "Automação excluída."
       automation_disabled: "Automação desativada."

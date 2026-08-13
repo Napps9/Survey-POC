@@ -414,14 +414,22 @@
           </details>
 
           <details class="publish-block">
-            <summary class="publish-block-title"><%= t("comms.editor.test_send", default: "Send a test to me") %> <span class="pub-chev">▾</span></summary>
+            <summary class="publish-block-title"><%= t("comms.editor.test_send", default: "Send a test") %> <span class="pub-chev">▾</span></summary>
             <div class="comms-controls">
               <p style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.75);margin:0;">
-                <%= t("comms.editor.test_send_hint", default: "Mails the current draft to %{email} with tracking stubbed.", email: Current.user.email_address) %>
+                <%= t("comms.editor.test_send_hint_any",
+                      default: "Mails the current draft to any address, tracking stubbed — the only way to see how it lands in a real client.") %>
               </p>
-              <%= button_to t("comms.editor.test_send_cta", default: "Send test email"), test_send_comms_campaign_path(@campaign),
-                    method: :post, form: { data: { turbo: false } },
-                    style: "background:rgba(255,255,255,0.12);color:#fff;font-family:'Alata',sans-serif;font-size:13px;border:1px solid rgba(255,255,255,0.25);border-radius:100px;padding:9px 18px;cursor:pointer;width:100%;" %>
+              <%= form_with url: test_send_comms_campaign_path(@campaign), method: :post,
+                            data: { turbo: false } do %>
+                <input type="email" name="to" value="<%= Current.user.email_address %>"
+                       placeholder="you@example.com"
+                       style="width:100%;background:#171B2C;border:1px solid rgba(255,255,255,0.14);border-radius:8px;color:#F7F7F7;font-size:12px;padding:6px 8px;margin-bottom:10px;">
+                <button type="submit"
+                        style="background:rgba(255,255,255,0.12);color:#fff;font-family:'Alata',sans-serif;font-size:13px;border:1px solid rgba(255,255,255,0.25);border-radius:100px;padding:9px 18px;cursor:pointer;width:100%;">
+                  <%= t("comms.editor.test_send_cta", default: "Send test email") %>
+                </button>
+              <% end %>
             </div>
           </details>
 

@@ -23,6 +23,13 @@
             style: "font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;text-decoration:none;" %>
       <%= link_to t("comms.lists.title", default: "Contact lists"), comms_lists_path,
             style: "font-family:'Alata',sans-serif;font-size:13px;color:#01EACB;text-decoration:none;" %>
+      <%# Thursday's task builds this on its own; the button is for seeing it
+          now, and for the week you want it early. Idempotent — pressing it
+          again opens the week's existing draft. %>
+      <%= button_to t("comms.index.generate_newsletter", default: "This week's newsletter"),
+            generate_comms_newsletter_path,
+            method: :post, form: { data: { turbo: false } },
+            style: "background:rgba(255,255,255,0.1);color:#F7F7F7;font-family:'Alata',sans-serif;font-size:14px;border:1px solid rgba(255,255,255,0.22);border-radius:100px;padding:10px 20px;cursor:pointer;" %>
       <%= button_to t("comms.index.new_campaign", default: "＋ New campaign"), comms_campaigns_path,
             method: :post, form: { data: { turbo: false } },
             style: "background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size:14px;border:none;border-radius:100px;padding:10px 22px;cursor:pointer;" %>

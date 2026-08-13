@@ -1369,6 +1369,8 @@ he:
     welcome_confirm: "ברוך הבא ל-Playverto! בדוק את %{email} כדי לאשר את הכתובת."
   flash:
     comms:
+      newsletter_failed: "לא ניתן היה ליצור את הניוזלטר — בדקו את היומנים."
+      test_bad_address: "זו לא נראית ככתובת אימייל."
       step_deleted: "הודעת ההמשך נמחקה."
       automation_deleted: "האוטומציה נמחקה."
       automation_disabled: "האוטומציה כובתה."

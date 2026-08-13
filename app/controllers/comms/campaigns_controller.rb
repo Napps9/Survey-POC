@@ -50,6 +50,23 @@ class Comms::CampaignsController < Comms::BaseController
                    warnings: @campaign.warnings, subject_review: @campaign.subject_review }
   end
 
+  # Build this week's newsletter now instead of waiting for Thursday's task.
+  # Runs inline so the draft exists by the time the redirect lands; the job's
+  # week-stamp makes a second press open the existing draft rather than mint
+  # a duplicate.
+  def generate_newsletter
+    week = Comms::NewsletterSource.week_of(Date.current)
+    Comms::GenerateNewsletterJob.perform_now unless EmailCampaign.exists?(newsletter_week: week)
+    campaign = EmailCampaign.find_by(newsletter_week: week)
+
+    if campaign
+      redirect_to edit_comms_campaign_path(campaign)
+    else
+      redirect_to comms_path, alert: t("flash.comms.newsletter_failed",
+                                       default: "The newsletter couldn't be built — check the logs.")
+    end
+  end
+
   def destroy
     @campaign.destroy!
     redirect_to comms_path, notice: t("flash.comms.campaign_deleted")
@@ -75,12 +92,19 @@ class Comms::CampaignsController < Comms::BaseController
     end
   end
 
-  # Proof to the author's own inbox — current document, nothing frozen,
-  # nothing tracked.
+  # A proof of the current document — nothing frozen, nothing tracked.
+  # Defaults to the author's own inbox, but takes any address: the account
+  # you sign in with often isn't the mailbox you want to read the proof in,
+  # and checking how a design lands means checking it in a real client.
   def test_send
-    Comms::CampaignMailer.test_email(@campaign.id, Current.user.email_address).deliver_now
-    redirect_to edit_comms_campaign_path(@campaign),
-                notice: t("flash.comms.test_sent", email: Current.user.email_address)
+    to = params[:to].to_s.strip.presence || Current.user.email_address
+    unless to.match?(URI::MailTo::EMAIL_REGEXP)
+      return redirect_to edit_comms_campaign_path(@campaign),
+                         alert: t("flash.comms.test_bad_address", default: "That doesn't look like an email address.")
+    end
+
+    Comms::CampaignMailer.test_email(@campaign.id, to).deliver_now
+    redirect_to edit_comms_campaign_path(@campaign), notice: t("flash.comms.test_sent", email: to)
   end
 
   # Book a future send: same freeze as send-now plus a wall-clock target.

@@ -1368,6 +1368,8 @@ ja:
     welcome_confirm: "Playverto へようこそ！%{email} を確認してアドレスを認証してください。"
   flash:
     comms:
+      newsletter_failed: "ニュースレターを作成できませんでした。ログを確認してください。"
+      test_bad_address: "メールアドレスの形式ではないようです。"
       step_deleted: "フォローアップを削除しました。"
       automation_deleted: "自動配信を削除しました。"
       automation_disabled: "自動配信をオフにしました。"

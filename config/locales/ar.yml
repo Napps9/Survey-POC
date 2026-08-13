@@ -1369,6 +1369,8 @@ ar:
     welcome_confirm: "مرحباً بك في Playverto! تحقق من %{email} لتأكيد عنوانك."
   flash:
     comms:
+      newsletter_failed: "تعذّر إنشاء النشرة الإخبارية — راجع السجلات."
+      test_bad_address: "لا يبدو هذا عنوان بريد إلكتروني."
       step_deleted: "تم حذف رسالة المتابعة."
       automation_deleted: "تم حذف الأتمتة."
       automation_disabled: "تم إيقاف الأتمتة."

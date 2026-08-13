@@ -1370,6 +1370,8 @@ tr:
     welcome_confirm: "Playverto'ya hoş geldiniz! Adresinizi onaylamak için %{email} adresini kontrol edin."
   flash:
     comms:
+      newsletter_failed: "Bülten oluşturulamadı — günlükleri kontrol edin."
+      test_bad_address: "Bu bir e-posta adresine benzemiyor."
       step_deleted: "Takip e-postası silindi."
       automation_deleted: "Otomasyon silindi."
       automation_disabled: "Otomasyon kapatıldı."

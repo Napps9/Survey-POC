@@ -1371,6 +1371,8 @@ ru:
     welcome_confirm: "Добро пожаловать в Playverto! Проверьте %{email}, чтобы подтвердить адрес."
   flash:
     comms:
+      newsletter_failed: "Не удалось создать рассылку — проверьте логи."
+      test_bad_address: "Это не похоже на адрес электронной почты."
       step_deleted: "Последующее письмо удалено."
       automation_deleted: "Автоматизация удалена."
       automation_disabled: "Автоматизация выключена."
