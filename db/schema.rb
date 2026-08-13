@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_13_090000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -307,6 +307,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_160000) do
     t.integer "created_by_id"
     t.json "design"
     t.string "from_name"
+    t.date "newsletter_week"
     t.string "preheader", default: "", null: false
     t.integer "recipient_count", default: 0, null: false
     t.string "reply_to"
@@ -320,6 +321,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_160000) do
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_email_campaigns_on_created_at"
     t.index ["created_by_id"], name: "index_email_campaigns_on_created_by_id"
+    t.index ["newsletter_week"], name: "index_email_campaigns_on_newsletter_week", unique: true
     t.index ["scheduled_for"], name: "index_email_campaigns_on_scheduled_for"
     t.index ["status"], name: "index_email_campaigns_on_status"
     t.check_constraint "status IN ('draft','scheduled','sending','sent','failed','cancelled')", name: "chk_email_campaigns_status"

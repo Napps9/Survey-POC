@@ -46,3 +46,12 @@ production:
   comms_enqueue_automations:
     class: Comms::EnqueueAutomationRunsJob
     schedule: every hour at minute 7
+
+  # Thursday's newsletter DRAFT — it never sends, it only writes a draft for
+  # the owner to review and book for Monday. Cron rather than English because
+  # this is the file's only weekday-specific schedule; 4 is Thursday, in UTC.
+  # Re-running is harmless: email_campaigns.newsletter_week is UNIQUE, so a
+  # second run for the same week is a no-op.
+  comms_generate_newsletter:
+    class: Comms::GenerateNewsletterJob
+    schedule: "0 7 * * 4"

@@ -23,7 +23,8 @@ class AnthropicClientTimeoutTest < ActiveSupport::TestCase
     # close. FlowGenerator and CardOptimiser are the editor-side equivalents.
     QuizAnswerGrader,
     FlowGenerator,
-    CardOptimiser
+    CardOptimiser,
+    NewsletterWriter
   ].freeze
 
   test "the shared Anthropic timeout is bounded well below the SDK default" do
@@ -35,7 +36,10 @@ class AnthropicClientTimeoutTest < ActiveSupport::TestCase
 
   test "every Claude service builds its client with the bounded timeout and capped retries" do
     CLAUDE_SERVICES.each do |klass|
-      client = klass.new(api_key: "test-key").instance_variable_get(:@client)
+      service = klass.new(api_key: "test-key")
+      # Services that build their client lazily (so a missing key degrades
+      # instead of raising) have no @client until first use — force it.
+      client = service.instance_variable_get(:@client) || service.send(:client)
 
       assert_equal AnthropicHelpers::ANTHROPIC_TIMEOUT_SECONDS, client.timeout,
                    "#{klass} must build its Claude client through the bounded builder"
