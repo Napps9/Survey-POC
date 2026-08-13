@@ -62,8 +62,13 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
   end
 
   test "a typed heritage is ignored on a card that doesn't offer the box" do
-    # The global card has its own "Another heritage" option and no Other box;
-    # an `other` payload against it is a tampered one.
+    # Decks inserted before the box existed carry the old 9 options and no
+    # allow_other. A typed payload against one of those is tampering, and the
+    # card's own shape is what says so.
+    legacy = @survey.cards.dup
+    legacy[4] = legacy[4].except("allow_other")
+    @survey.update!(cards: legacy)
+
     resp = submit!({ "4" => { "type" => "multiple_choice", "value" => nil, "other" => "Cornish" } })
     assert_nil resp.demographic_heritage
   end
@@ -98,6 +103,38 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
     assert_equal "|ADHD|", resp.demographic_neurodiversity
   end
 
+  # The neurodiversity card lost its "Another form of neurodivergence" button
+  # for the same reason heritage lost "Another heritage": it recorded that
+  # someone didn't fit without asking what they are.
+  test "a typed neurodivergence packs under the canonical label" do
+    resp = submit!({ "5" => { "type" => "select_many", "value" => nil, "other" => "Misophonia" } })
+
+    assert_equal "|Another form of neurodivergence|", resp.demographic_neurodiversity,
+                 "otherwise the people the list missed vanish from the segments"
+    refute_match(/Misophonia/, resp.demographic_neurodiversity.to_s,
+                 "a respondent's own words must never become a dashboard segment label")
+    assert_equal "Misophonia", resp.answers["5"]["other"]
+  end
+
+  test "a typed neurodivergence beats an exclusive pick" do
+    # The Other box replaces the selection platform-wide, so this is really a
+    # tampered payload — but if it ever arrives, a real condition wins, exactly
+    # as a ticked one does.
+    resp = submit!({ "5" => { "type" => "select_many",
+                              "value" => [ "None of these" ], "other" => "Misophonia" } })
+    assert_equal "|Another form of neurodivergence|", resp.demographic_neurodiversity
+  end
+
+  test "a typed answer is ignored on a card that doesn't offer the box" do
+    # Decks inserted before the box existed carry 9 options and no allow_other.
+    legacy = @survey.cards.dup
+    legacy[5] = legacy[5].except("allow_other")
+    @survey.update!(cards: legacy)
+
+    resp = submit!({ "5" => { "type" => "select_many", "value" => nil, "other" => "Misophonia" } })
+    assert_nil resp.demographic_neurodiversity
+  end
+
   test "heritage and neurodiversity segments appear at the sample floor and overlap correctly" do
     5.times do
       submit!({ "4" => { "type" => "multiple_choice", "value" => "Mixed or multiple heritage" },
@@ -122,7 +159,11 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
   end
 
   test "the results page renders the new pills" do
-    5.times { submit!({ "4" => { "type" => "multiple_choice", "value" => "Another heritage" } }) }
+    # "Another heritage" is no longer a button — it is what a TYPED answer is
+    # recorded as. The pill it produces is unchanged, which is the whole reason
+    # the label was kept rather than retired: these roll up with the answers
+    # collected back when it was still an option.
+    5.times { submit!({ "4" => { "type" => "multiple_choice", "value" => nil, "other" => "Cornish" } }) }
     @survey.responses.update_all(status: "completed")
 
     post session_path, params: { email_address: @user.email_address, password: "verylongpassword" }

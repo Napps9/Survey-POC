@@ -50,7 +50,8 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
     assert card["cid"].present?
     assert card["demographic"]
     assert_equal "heritage", card["demographic_key"]
-    assert_equal 9, card["options"].size
+    assert_equal 8, card["options"].size
+    assert card["allow_other"], "the free-text box replaced the 'Another heritage' dead end"
     assert_includes json["html"], 'data-card-demographic-key="heritage"',
                     "the editor row must carry the key or autosave strips it"
   end
@@ -62,7 +63,7 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
     fr = json.dig("card", "i18n", "fr")
     assert fr.present?, "the next autosave must not persist the card monolingual"
     refute_equal json.dig("card", "text"), fr["text"]
-    assert_equal 9, fr["options"].size
+    assert_equal 8, fr["options"].size
   end
 
   test "a French-default Verto gets the French card at the top level" do
@@ -108,7 +109,7 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
     card = JSON.parse(response.body)["card"]
     assert_equal FIVE + [ DemographicQuestions.heritage_decline_option ], card["options"]
     assert_equal 6, card["options"].size, "five categories plus 'Prefer not to say'"
-    refute_includes card["options"], DemographicQuestions.another_heritage_label,
+    refute_includes card["options"], DemographicQuestions.off_list_label("heritage"),
                     "'another' is the free-text box, not a radio"
     assert card["allow_other"], "five will miss people — the free-text box is where they go"
     assert_equal "GB", card["heritage_country"]
@@ -129,9 +130,9 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
 
     assert_response :success, "an API blip must not put an error where a card should be"
     card = JSON.parse(response.body)["card"]
-    assert_equal 9, card["options"].size, "it falls back to the global taxonomy"
+    assert_equal 8, card["options"].size, "it falls back to the global taxonomy"
     assert_nil card["heritage_country"], "and doesn't claim a tailoring it didn't get"
-    refute card["allow_other"]
+    assert card["allow_other"], "which has the box too — it is the same question, just a global list"
   end
 
   test "a country the platform doesn't know is treated as no country" do
@@ -139,7 +140,7 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
     s.update_column(:audience_country, "ZZ") # bypasses the model, as a stale row would
     with_generator(FIVE) { add!(s, "heritage") }
 
-    assert_equal 9, JSON.parse(response.body)["card"]["options"].size
+    assert_equal 8, JSON.parse(response.body)["card"]["options"].size
   end
 
   test "neurodiversity is untouched by the audience country" do
@@ -153,7 +154,7 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
       HeritageOptionsGenerator.singleton_class.remove_method(:new)
     end
 
-    assert_equal 9, JSON.parse(response.body)["card"]["options"].size
+    assert_equal 8, JSON.parse(response.body)["card"]["options"].size
     refute called, "only heritage varies by country"
   end
 

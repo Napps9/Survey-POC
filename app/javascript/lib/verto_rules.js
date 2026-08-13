@@ -150,9 +150,9 @@ export function analyzeCard(card) {
 
   // Demographic cards (the set tail + the opt-in Heritage/Neurodiversity
   // questions) are platform-set instruments, not creator copy: their option
-  // lists are fixed taxonomies (9 heritage categories, 9 neurodiversity
-  // entries), so the 3–5-options and label-length advice would mark down
-  // every deck that adds them for choices the creator didn't make.
+  // lists are fixed taxonomies, so the 3–5-options and label-length advice
+  // would mark down every deck that adds them for choices the creator didn't
+  // make.
   const countRule = COUNT_RULES[card.type]
   if (countRule && !card.demographic) checks.push(countCheck(card, countRule))
 

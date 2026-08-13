@@ -844,19 +844,21 @@ class PlayerController < ApplicationController
     # Opt-in demographics (DemographicQuestions::OPTIONAL_CARDS), same
     # tamper-guard posture: values must be options the card actually offers.
     #
-    # A country-tailored card has no "Another heritage" button — someone whose
-    # heritage isn't among the five types it into the Other box instead. That
-    # answer arrives as { value: nil, other: "..." }, so without the second
-    # branch below it would denormalise to nothing and those respondents would
-    # vanish from the segments entirely, which is the opposite of what asking
-    # in local terms was for.
+    # Neither card has an "Another…" button any more — someone the list misses
+    # types it into the Other box instead. That answer arrives as
+    # { value: nil, other: "..." }, so without the second branch below it would
+    # denormalise to nothing and exactly the people the list failed would vanish
+    # from the segments, which is the opposite of what removing the dead end
+    # was for.
     #
-    # What gets STORED is the registry's own "Another heritage" label, never
-    # the typed text: a respondent-authored string in this column renders
-    # straight into the creator's dashboard as a segment pill, which is exactly
-    # what the allowlist above exists to prevent. The words themselves are kept
-    # on the answer and reach the creator through the card's own free-text
-    # panel and the exports.
+    # What gets STORED is the registry's own off-list label, never the typed
+    # text: a respondent-authored string in this column renders straight into
+    # the creator's dashboard as a segment pill, which is what the allowlist
+    # above exists to prevent. The words themselves stay on the answer and reach
+    # the creator through the card's own free-text panel and the exports.
+    #
+    # Guarded on the card's own allow_other, so a decks inserted before the box
+    # existed — 9 options, no box — treat a typed payload as the tampering it is.
     heritage_idx = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["demographic_key"] == "heritage" }
     heritage     = heritage_idx ? answers[heritage_idx.to_s]&.dig("value").to_s.strip.presence : nil
     h_other      = heritage_idx ? answers[heritage_idx.to_s]&.dig("other").to_s.strip.presence : nil
@@ -865,7 +867,7 @@ class PlayerController < ApplicationController
       if h_allowed.include?(heritage)
         heritage
       elsif h_other && cards[heritage_idx]["allow_other"]
-        DemographicQuestions.another_heritage_label(locale: @survey.default_locale)
+        DemographicQuestions.off_list_label("heritage", locale: @survey.default_locale)
       end
 
     # Neurodiversity is a multi-select; packed pipe-wrapped and sorted (see
@@ -875,11 +877,24 @@ class PlayerController < ApplicationController
     # not to say" if both were ticked; among exclusives alone, first wins.
     neuro_idx = cards.find_index { |c| c.is_a?(Hash) && c["demographic"] && c["demographic_key"] == "neurodiversity" }
     picked    = neuro_idx ? Array(answers[neuro_idx.to_s]&.dig("value")).map { |v| v.to_s.strip } : []
+    n_other   = neuro_idx ? answers[neuro_idx.to_s]&.dig("other").to_s.strip.presence : nil
     n_allowed = neuro_idx ? Array(cards[neuro_idx]["options"]).map(&:to_s) : []
     valid      = (picked & n_allowed).reject { |v| v.include?("|") }
     conditions = valid.reject { |v| DemographicQuestions.neuro_exclusive_labels.include?(v) }
-    chosen     = conditions.any? ? conditions : valid.first(1)
-    resp.demographic_neurodiversity = chosen.any? ? "|#{chosen.sort.join('|')}|" : nil
+    # Same off-list handling as heritage. The Other box is a standalone answer
+    # platform-wide — typing replaces the ticks — so `picked` is empty whenever
+    # `other` is set, and this can't collide with a real selection. A typed
+    # answer is a real condition, so it beats the exclusives for the same
+    # reason a ticked one does.
+    chosen =
+      if conditions.any?
+        conditions
+      elsif n_other && cards[neuro_idx]["allow_other"]
+        [ DemographicQuestions.off_list_label("neurodiversity", locale: @survey.default_locale) ]
+      else
+        valid.first(1)
+      end
+    resp.demographic_neurodiversity = chosen.compact.any? ? "|#{chosen.compact.sort.join('|')}|" : nil
   end
 
   # The Verto content language to render: an explicit ?lang=, else the

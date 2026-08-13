@@ -24,7 +24,8 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
     assert card["demographic"]
     assert_equal "heritage", card["demographic_key"]
     assert_equal "multiple_choice", card["type"]
-    assert_equal 9, card["options"].size
+    assert_equal 8, card["options"].size, "the vocabulary is 9; the off-list label is not shown"
+    assert card["allow_other"], "which is only fair because the free-text box replaced it"
     assert_nil DemographicQuestions.optional_card("astrology")
   end
 
@@ -33,7 +34,7 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
     en = DemographicQuestions.optional_card("neurodiversity")
 
     refute_equal en["text"], fr["text"], "the French Verto must ask in French"
-    assert_equal 9, fr["options"].size
+    assert_equal 8, fr["options"].size
     assert_equal en, DemographicQuestions.optional_card("neurodiversity", locale: "xx-nope")
   end
 
@@ -41,7 +42,7 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
     I18n.backend.store_translations(:en, demographics: { optional: { heritage: { options: %w[a b] } } })
     card = DemographicQuestions.optional_card("heritage")
 
-    assert_equal DemographicQuestions::OPTIONAL_CARDS["heritage"]["options"].size, card["options"].size
+    assert_equal DemographicQuestions.shown_options("heritage").size, card["options"].size
   ensure
     I18n.backend.reload!
   end
@@ -51,7 +52,7 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
     card["options"] << "tampered"
     card["cid"] = "c_x"
 
-    assert_equal 9, DemographicQuestions.optional_card("heritage")["options"].size
+    assert_equal 8, DemographicQuestions.optional_card("heritage")["options"].size
     refute DemographicQuestions::OPTIONAL_CARDS["heritage"].key?("cid")
   end
 
@@ -66,14 +67,52 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
 
   # ── The country-tailored heritage card ────────────────────────────────────
 
-  test "the heritage tail resolves per locale, and splits into its two roles" do
+  # The pin that everything else rests on. OFF_LIST_OPTION_INDEX names a
+  # POSITION in each registry list; move an entry without moving the index and
+  # a typed answer starts being filed under a real category instead. Nothing
+  # else would raise, so this is the alarm.
+  test "the off-list index points at the label it claims, on both cards" do
+    {
+      "heritage"       => "Another heritage",
+      "neurodiversity" => "Another form of neurodivergence"
+    }.each do |key, label|
+      idx = DemographicQuestions::OFF_LIST_OPTION_INDEX[key]
+      assert_equal label, DemographicQuestions::OPTIONAL_CARDS[key]["options"][idx],
+                   "#{key}: OFF_LIST_OPTION_INDEX has drifted from the registry list"
+      assert_equal label, DemographicQuestions.off_list_label(key)
+      assert_includes DemographicQuestions.translated_options(key), label,
+                      "it stays in the vocabulary — it is still what a typed answer is recorded as"
+      refute_includes DemographicQuestions.shown_options(key), label,
+                      "but it is never offered as a choice"
+    end
+  end
+
+  test "both cards drop their dead end and take the free-text box instead" do
+    DemographicQuestions::OPTIONAL_CARDS.each_key do |key|
+      card = DemographicQuestions.optional_card(key)
+      assert_equal 8, card["options"].size, "#{key}: 9 vocabulary entries, 8 shown"
+      assert card["allow_other"], "#{key}: nowhere to say 'not on your list' otherwise"
+      assert_equal DemographicQuestions.decline_option(key), card["options"].last,
+                   "#{key}: declining stays a real choice"
+    end
+  end
+
+  test "the off-list and decline labels resolve per locale and stay distinct" do
+    fr_off     = DemographicQuestions.off_list_label("heritage", locale: "fr")
+    fr_decline = DemographicQuestions.decline_option("heritage", locale: "fr")
+
+    assert_equal "Autre héritage", fr_off, "a French Verto records the French label"
+    refute_equal fr_off, fr_decline
+    refute_equal DemographicQuestions.off_list_label("heritage"), fr_off
+  end
+
+  # The regression this rebase exists to prevent: read off the CARD instead of
+  # the vocabulary and this returns ["Mixed or multiple heritage", ...], so
+  # HeritageOptions.sanitize starts rejecting a country's real "Mixed" category.
+  test "heritage_tail_options reads the vocabulary, not the card" do
     assert_equal [ "Another heritage", "Prefer not to say" ],
                  DemographicQuestions.heritage_tail_options
-    assert_equal DemographicQuestions.optional_card("heritage", locale: "fr")["options"].last(2),
-                 DemographicQuestions.heritage_tail_options(locale: "fr")
-
-    # One is what a typed answer is recorded as, the other is a real choice.
-    assert_equal "Another heritage", DemographicQuestions.another_heritage_label
+    refute_includes DemographicQuestions.heritage_tail_options, "Mixed or multiple heritage"
     assert_equal "Prefer not to say", DemographicQuestions.heritage_decline_option
   end
 
@@ -94,7 +133,7 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
       country: "GB", five: %w[a b c d e]
     )
 
-    refute_includes card["options"], DemographicQuestions.another_heritage_label,
+    refute_includes card["options"], DemographicQuestions.off_list_label("heritage"),
                     "a radio reading 'Another heritage' records that someone didn't fit " \
                     "without ever asking what they are; the Other box asks"
     assert card["allow_other"], "which only works because the free-text box is there"
@@ -109,18 +148,18 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
 
     assert_equal DemographicQuestions.optional_card("heritage", locale: "fr")["text"], card["text"]
     assert_equal DemographicQuestions.heritage_decline_option(locale: "fr"), card["options"].last
-    refute_includes card["options"], DemographicQuestions.another_heritage_label(locale: "fr")
+    refute_includes card["options"], DemographicQuestions.off_list_label("heritage", locale: "fr")
   end
 
   test "no usable list means the plain registry card, never a half-tailored one" do
     [ nil, [] ].each do |five|
       card = DemographicQuestions.country_heritage_card(country: "GB", five: five)
-      assert_equal 9, card["options"].size
+      assert_equal 8, card["options"].size
       assert_nil card["heritage_country"], "a fallback must not claim a tailoring it didn't get"
     end
 
     unknown = DemographicQuestions.country_heritage_card(country: "ZZ", five: %w[a b c d e])
-    assert_equal 9, unknown["options"].size
+    assert_equal 8, unknown["options"].size
     assert_nil unknown["heritage_country"]
   end
 
