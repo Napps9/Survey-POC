@@ -35,13 +35,14 @@ class OrganisationAssetsController < ApplicationController
     # active_storage.rb), so scrub it before it reaches storage. A file the
     # sanitizer can't salvage is rejected like any other invalid asset.
     attachables = files.map do |f|
-      next f unless f.content_type == "image/svg+xml"
+      name = storable_filename(f.original_filename, f.content_type)
+      next { io: f.tempfile.tap(&:rewind), filename: name, content_type: f.content_type } unless f.content_type == "image/svg+xml"
       cleaned = SvgSanitizer.clean_document(f.read)
       if cleaned.nil?
         return redirect_to organisation_memberships_path(org),
           alert: t("flash.organisation_assets.invalid_asset_file", filename: f.original_filename, size: Organisation::ASSET_MAX_BYTES / 1.megabyte)
       end
-      { io: StringIO.new(cleaned), filename: f.original_filename, content_type: "image/svg+xml" }
+      { io: StringIO.new(cleaned), filename: name, content_type: "image/svg+xml" }
     end
 
     org.assets.attach(attachables)
@@ -123,6 +124,24 @@ class OrganisationAssetsController < ApplicationController
       return nil unless bytes
     end
     [ bytes, content_type ]
+  end
+
+  # The name to store a branding-page upload under. What makes a file a valid
+  # asset here is its CONTENT TYPE, but what decides whether the resulting blob
+  # path survives Survey.sanitize_image_url is its EXTENSION — so a library
+  # image called "logo" or "holiday.jfif" was stored happily, picked happily in
+  # the editor, and then silently dropped from the card on save, leaving the
+  # creator with "Saved, but an image didn't stick — check and re-upload it."
+  # every time, and re-uploading the same file reproduced it exactly.
+  #
+  # An extension the sanitiser already accepts is kept as-is (the creator's own
+  # filename is what the library lists). Anything else gains the one matching
+  # its content type — appended rather than substituted, so "report.v2" stays
+  # recognisable instead of being truncated to "report".
+  def storable_filename(original, content_type)
+    base = File.basename(original.to_s).presence || "asset"
+    return base if Survey.image_extension?(base)
+    "#{base}.#{EXTENSIONS.fetch(content_type)}"
   end
 
   def valid_asset?(file)

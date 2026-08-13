@@ -144,14 +144,22 @@ class Survey < ApplicationRecord
   # so the value is safe to drop into an inline `style` attribute. Anything
   # else (or blank) clears the background.
   DATA_IMAGE_URL  = %r{\Adata:image/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=\s]+\z}
-  ASSET_IMAGE_URL = %r{\A/[\w\-./]+\.(?:png|jpe?g|webp|svg|gif)\z}i
+  # The extensions a same-origin image path may end in. Named once and
+  # interpolated into the two patterns below, because uploaders have to name a
+  # blob so that it PASSES those patterns (see Survey.image_extension?) — and a
+  # rule spelled out separately in each place that needs it is how BUG-031/032
+  # happened. `image/jpeg` is stored as `.jpg`, but a creator's own file may
+  # well be `.jpeg`, so both are accepted.
+  IMAGE_EXTENSIONS = %w[png jpg jpeg webp svg gif].freeze
+  IMAGE_EXT_GROUP  = "(?:#{IMAGE_EXTENSIONS.join('|')})".freeze
+  ASSET_IMAGE_URL = %r{\A/[\w\-./]+\.#{IMAGE_EXT_GROUP}\z}i
   # Same-origin Active Storage image paths — the organisation brand-asset
   # library (and logos). Broader than ASSET_IMAGE_URL because a signed-id path
   # segment can carry base64url characters ASSET_IMAGE_URL's charset excludes,
   # and blob URLs may append a query. Still anchored to the app's OWN
   # /rails/active_storage/ mount and an image extension, and it excludes quotes/
   # angles/whitespace so it stays safe inside an inline `url('…')` style.
-  ACTIVE_STORAGE_IMAGE_URL = %r{\A/rails/active_storage/[^\s'"<>?]+\.(?:png|jpe?g|webp|svg|gif)(?:\?[^\s'"<>]*)?\z}i
+  ACTIVE_STORAGE_IMAGE_URL = %r{\A/rails/active_storage/[^\s'"<>?]+\.#{IMAGE_EXT_GROUP}(?:\?[^\s'"<>]*)?\z}i
   # Same-origin Active Storage animation JSON — the ONLY form a card `lottie`
   # value may take. Pasted LottieFiles URLs are fetched, scrubbed and stored by
   # CardLottieStore first (see there for why hotlinking was rejected), so an
@@ -403,6 +411,17 @@ class Survey < ApplicationRecord
 
   def self.sanitize_background_image(value)
     sanitize_image_url(value)
+  end
+
+  # Whether a blob filename already ends in an extension ACTIVE_STORAGE_IMAGE_URL
+  # accepts. Active Storage serves a blob at /rails/active_storage/…/<filename>,
+  # so the name a file was uploaded under decides whether its path survives
+  # sanitize_image_url — an image called "logo" or "holiday.jfif" is a perfectly
+  # valid PNG/JPEG by content type (which is what the uploaders validate) but
+  # yields a path the card sanitiser drops. Uploaders call this to give a blob a
+  # name that will pass, rather than re-listing the extensions themselves.
+  def self.image_extension?(filename)
+    IMAGE_EXTENSIONS.include?(File.extname(filename.to_s).delete_prefix(".").downcase)
   end
 
   # A card left-panel video URL — only the Pexels video CDN is allowed.
@@ -667,8 +686,18 @@ class Survey < ApplicationRecord
       end
       if c.key?("option_images")
         before = Array(c["option_images"])
-        c["option_images"] = before.map { |u| sanitize_image_url(u) }
-        warnings << "option_images" if warnings && before.any?(&:present?) && c["option_images"].any?(&:nil?)
+        after  = before.map { |u| sanitize_image_url(u) }
+        c["option_images"] = after
+        # Compared slot by slot, NOT array-wide. option_images is positional —
+        # index i is statement i — so an empty slot means "this statement has no
+        # picture", which is the ordinary state of any tap card where the creator
+        # cleared one image or where only some statements were given one. The old
+        # test ("something is present" AND "something is nil") read those blanks
+        # as drops and fired on every autosave, telling the creator to re-upload
+        # an image they had deliberately removed, forever, with nothing wrong.
+        if warnings && before.each_with_index.any? { |u, i| u.present? && after[i].nil? }
+          warnings << "option_images"
+        end
       end
 
       # A card's left panel holds a photo OR a video OR a Lottie animation.

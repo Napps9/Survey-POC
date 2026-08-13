@@ -30,6 +30,60 @@ class OrganisationAssetsTest < ActionDispatch::IntegrationTest
     assert_redirected_to organisation_memberships_path(@org)
   end
 
+  # What makes an upload a valid asset here is its content type; what decides
+  # whether the stored blob PATH survives Survey.sanitize_image_url is its
+  # extension. An asset named "logo" or "holiday.jfif" used to be stored under
+  # that name, pick fine in the editor, and then be dropped from the card on
+  # save — "Saved, but an image didn't stick — check and re-upload it.", every
+  # time, with re-uploading the same file reproducing it exactly.
+  test "an upload with no usable extension is stored under a name a card can keep" do
+    login(@admin)
+    post organisation_assets_path(@org), params: { assets: [ png_upload("company-logo") ] }
+
+    stored = @org.reload.assets.attachments.last.blob
+    assert_equal "company-logo.png", stored.filename.to_s
+    path = Rails.application.routes.url_helpers.rails_blob_path(stored, only_path: true)
+    assert_equal path, Survey.sanitize_image_url(path), "the stored path must survive the card sanitiser"
+  end
+
+  test "an upload whose extension the sanitiser rejects gains one that works" do
+    login(@admin)
+    jfif = Rack::Test::UploadedFile.new(StringIO.new("\xFF\xD8\xFF"), "image/jpeg", original_filename: "holiday.jfif")
+    post organisation_assets_path(@org), params: { assets: [ jfif ] }
+
+    stored = @org.reload.assets.attachments.last.blob
+    assert_equal "holiday.jfif.jpg", stored.filename.to_s, "the creator's own name stays recognisable"
+    path = Rails.application.routes.url_helpers.rails_blob_path(stored, only_path: true)
+    assert_equal path, Survey.sanitize_image_url(path)
+  end
+
+  test "an upload that already has a usable extension keeps its own filename" do
+    login(@admin)
+    post organisation_assets_path(@org), params: { assets: [ png_upload("Autumn Campaign.PNG") ] }
+
+    assert_equal "Autumn Campaign.PNG", @org.reload.assets.attachments.last.blob.filename.to_s
+  end
+
+  test "an SVG upload is still scrubbed, and keeps its bytes" do
+    login(@admin)
+    svg = Rack::Test::UploadedFile.new(
+      StringIO.new(%(<svg xmlns="http://www.w3.org/2000/svg"><rect width="4" height="4"/></svg>)),
+      "image/svg+xml", original_filename: "mark"
+    )
+    post organisation_assets_path(@org), params: { assets: [ svg ] }
+
+    stored = @org.reload.assets.attachments.last.blob
+    assert_equal "mark.svg", stored.filename.to_s
+    assert_match "<rect", stored.download, "the sanitised SVG body is what got stored"
+  end
+
+  test "the bytes of a renamed upload are the bytes that were uploaded" do
+    login(@admin)
+    post organisation_assets_path(@org), params: { assets: [ png_upload("no-extension") ] }
+
+    assert_equal "\x89PNG\r\n\x1a\n".b, @org.reload.assets.attachments.last.blob.download.b
+  end
+
   test "a non-admin cannot upload brand assets" do
     login(@member)
     assert_no_difference -> { @org.reload.assets.attachments.size } do

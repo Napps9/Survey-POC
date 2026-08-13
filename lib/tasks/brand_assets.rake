@@ -77,4 +77,59 @@ namespace :brand_assets do
 
     puts "Queued #{queued} thumbnail transform(s); skipped #{skipped} (vector, or already built)."
   end
+
+  # Active Storage serves a blob at /rails/active_storage/…/<filename>, and
+  # Survey::ACTIVE_STORAGE_IMAGE_URL only accepts such a path when it ends in a
+  # real image extension. The branding page validated uploads by content type
+  # and stored them under their original name, so an asset called "logo" or
+  # "holiday.jfif" was pickable in the editor but dropped from the card on save
+  # — the creator saw "an image didn't stick — check and re-upload it" every
+  # time, and re-uploading the same file did the same thing.
+  #
+  # New uploads are named correctly at ingest (OrganisationAssetsController).
+  # This renames the ones already in storage. Renaming is safe: no card can be
+  # holding the old path, because the sanitiser is exactly what refused to store
+  # it. The blob key is untouched, so nothing is re-uploaded or re-transformed.
+  #
+  #   bin/rails brand_assets:fix_filenames            # every organisation
+  #   bin/rails "brand_assets:fix_filenames[acme]"    # one, by slug or name
+  #   DRY_RUN=1 bin/rails brand_assets:fix_filenames  # preview only
+  desc "Give brand assets stored under an unusable filename a real image extension: brand_assets:fix_filenames[org]"
+  task :fix_filenames, [ :org ] => :environment do |_t, args|
+    dry_run = ENV["DRY_RUN"].present?
+    ident   = args[:org].to_s.strip
+    scope =
+      if ident.empty?
+        Organisation.all
+      else
+        org = Organisation.find_by(slug: ident) || Organisation.find_by(name: ident)
+        abort "No organisation matching #{ident.inspect} (by slug or name)." unless org
+        Organisation.where(id: org.id)
+      end
+
+    extensions = { "image/png" => "png", "image/jpeg" => "jpg", "image/gif" => "gif",
+                   "image/webp" => "webp", "image/svg+xml" => "svg" }
+    renamed = skipped = 0
+    scope.find_each do |organisation|
+      organisation.assets.attachments.each do |attachment|
+        blob = attachment.blob
+        name = blob.filename.to_s
+        next skipped += 1 if Survey.image_extension?(name)
+
+        ext = extensions[blob.content_type]
+        # Not an image type at all: leave it alone and say so — renaming it would
+        # only dress a non-image up as one.
+        next warn("  ? #{organisation.slug} / #{name} — #{blob.content_type}, not renamed") unless ext
+
+        fixed = "#{name.presence || 'asset'}.#{ext}"
+        puts "  #{dry_run ? '[DRY RUN] ' : ''}#{organisation.slug}: #{name} -> #{fixed}"
+        blob.update!(filename: fixed) unless dry_run
+        renamed += 1
+      rescue => e
+        warn "  ! #{organisation.slug} / #{blob&.filename} — #{e.class}: #{e.message}"
+      end
+    end
+
+    puts "#{dry_run ? '[DRY RUN] ' : ''}Renamed #{renamed} asset(s); skipped #{skipped} (already usable)."
+  end
 end

@@ -21,6 +21,36 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
                  Survey.sanitize_image_url("/rails/active_storage/blobs/x.webp")
   end
 
+  # Uploaders name a blob so its path will pass ACTIVE_STORAGE_IMAGE_URL, and
+  # they ask Survey.image_extension? rather than re-listing the extensions. The
+  # two must therefore agree about every extension, in both directions.
+  test "image_extension? agrees with what sanitize_image_url accepts on a blob path" do
+    Survey::IMAGE_EXTENSIONS.each do |ext|
+      name = "brand-asset.#{ext}"
+      assert Survey.image_extension?(name), "#{ext} should be a storable extension"
+      path = "/rails/active_storage/blobs/redirect/eyJfcmFpbHMi--abc123/#{name}"
+      assert_equal path, Survey.sanitize_image_url(path), "#{ext} blob path should survive"
+    end
+  end
+
+  test "image_extension? rejects names that would be dropped from a card" do
+    # Valid images by content type, unusable as a blob path: the branding page
+    # accepted these and the card sanitiser then dropped them, which is what
+    # produced "an image didn't stick" however often the creator re-uploaded.
+    [ "company-logo", "holiday.jfif", "scan.jpe", "chart.bmp", "" ].each do |name|
+      assert_not Survey.image_extension?(name), "#{name.inspect} should not be storable as-is"
+      assert_nil Survey.sanitize_image_url("/rails/active_storage/blobs/redirect/eyJfcmFpbHMi--abc123/#{name}")
+    end
+    assert_not Survey.image_extension?(nil)
+  end
+
+  test "image_extension? is case-insensitive, like the sanitiser" do
+    assert Survey.image_extension?("Logo.JPG")
+    assert Survey.image_extension?("Logo.PNG")
+    path = "/rails/active_storage/blobs/redirect/eyJfcmFpbHMi--abc123/Logo.JPG"
+    assert_equal path, Survey.sanitize_image_url(path)
+  end
+
   test "sanitize_image_url rejects other hosts and CSS-breaking input" do
     assert_nil Survey.sanitize_image_url("https://evil.example.com/x.jpg")
     assert_nil Survey.sanitize_image_url("https://images.pexels.com/x.jpg');background:url('http://evil")
@@ -154,6 +184,35 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil out[0]["image"]
     assert_equal [ PEXELS_URL, nil ], out[1]["option_images"]
     assert_equal %w[image option_images], warnings.sort
+  end
+
+  # option_images is POSITIONAL — index i is statement i — so an empty slot is a
+  # statement with no picture, not a picture that was dropped. The warning used
+  # to be array-wide ("something present" && "something nil"), so a tap card
+  # where the creator had cleared one statement's image warned on EVERY autosave
+  # and told them to re-upload the image they had just deliberately removed.
+  test "sanitize_cards_images! does not warn about option_images slots that were already empty" do
+    cards = [
+      { "type" => "tap_card", "text" => "Swipe", "option_images" => [ "", "", PEXELS_URL, "" ] },
+      { "type" => "tap_card", "text" => "Swipe", "option_images" => [ nil, PEXELS_URL ] },
+      { "type" => "tap_card", "text" => "Swipe", "option_images" => [ "", "" ] }
+    ]
+    warnings = []
+    out = Survey.sanitize_cards_images!(cards, warnings: warnings)
+
+    assert_equal [ nil, nil, PEXELS_URL, nil ], out[0]["option_images"], "blank slots still normalise to nil"
+    assert_empty warnings, "an empty statement slot is not a dropped image"
+  end
+
+  test "sanitize_cards_images! still warns when a present option_image is dropped beside empty slots" do
+    oversized = "data:image/png;base64,#{"A" * (Survey::MAX_BACKGROUND_DATA_URL_BYTES + 1)}"
+    cards = [ { "type" => "tap_card", "text" => "Swipe",
+                "option_images" => [ "", PEXELS_URL, oversized, "" ] } ]
+    warnings = []
+    out = Survey.sanitize_cards_images!(cards, warnings: warnings)
+
+    assert_equal [ nil, PEXELS_URL, nil, nil ], out[0]["option_images"]
+    assert_equal [ "option_images" ], warnings
   end
 
   test "sanitize_cards_images! defaults to not tracking warnings" do
