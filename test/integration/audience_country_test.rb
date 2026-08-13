@@ -96,8 +96,10 @@ class AudienceCountryTest < ActionDispatch::IntegrationTest
     with_generator(FIVE) { set_country!(s, "GB") }
 
     card = heritage_card(s)
-    assert_equal FIVE + DemographicQuestions.heritage_tail_options, card["options"]
-    assert_equal 7, card["options"].size
+    assert_equal FIVE + [ DemographicQuestions.heritage_decline_option ], card["options"]
+    assert_equal 6, card["options"].size
+    refute_includes card["options"], DemographicQuestions.another_heritage_label,
+                    "'another' is something you type, not a dead-end radio"
     assert card["allow_other"], "a five-item list will miss people; the Other box is where they go"
     assert_equal "GB", card["heritage_country"]
     assert_equal "c_her", card["cid"], "the cid is what logic and answers point at — it must survive"

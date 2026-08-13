@@ -106,8 +106,10 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     card = JSON.parse(response.body)["card"]
-    assert_equal FIVE + DemographicQuestions.heritage_tail_options, card["options"]
-    assert_equal 7, card["options"].size, "five categories plus the two escape hatches"
+    assert_equal FIVE + [ DemographicQuestions.heritage_decline_option ], card["options"]
+    assert_equal 6, card["options"].size, "five categories plus 'Prefer not to say'"
+    refute_includes card["options"], DemographicQuestions.another_heritage_label,
+                    "'another' is the free-text box, not a radio"
     assert card["allow_other"], "five will miss people — the free-text box is where they go"
     assert_equal "GB", card["heritage_country"]
     assert_equal "heritage", card["demographic_key"], "it is still the same question"

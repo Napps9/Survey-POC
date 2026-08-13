@@ -106,28 +106,48 @@ module DemographicQuestions
   end
 
   # The heritage card's last two options ("Another heritage", "Prefer not to
-  # say") in `locale` — the escape hatches that survive when the seven
-  # country-specific categories replace the global taxonomy. Identified
-  # positionally as the LAST TWO registry options, the same convention
-  # neuro_exclusive_labels uses, so a locale that translated the list whole
-  # gets its own wording and one that didn't falls back to English.
+  # say") in `locale`. Identified positionally as the LAST TWO registry
+  # options, the same convention neuro_exclusive_labels uses, so a locale that
+  # translated the list whole gets its own wording and one that didn't falls
+  # back to English.
+  #
+  # Both are what a generated list must never duplicate; only the second one
+  # goes on a tailored card (see country_heritage_card).
   def self.heritage_tail_options(locale: nil)
     Array(optional_card("heritage", locale: locale)["options"]).last(2)
   end
 
+  # "Another heritage" — the registry's own name for a heritage that isn't on
+  # the list. On a tailored card it is what a free-text answer is RECORDED as
+  # (PlayerController#sync_demographics_from_answers!), never what the
+  # respondent is shown: they type their own words instead.
+  def self.another_heritage_label(locale: nil)
+    heritage_tail_options(locale: locale).first
+  end
+
+  # "Prefer not to say" — declining is a distinct answer from not fitting the
+  # list, so it stays a choice on every heritage card.
+  def self.heritage_decline_option(locale: nil)
+    heritage_tail_options(locale: locale).last
+  end
+
   # The heritage card with `five` country-specific categories in place of the
-  # global nine, keeping the registry's tail pair below them — so the card asks
-  # about Kenyan or Brazilian heritage while a respondent who fits none of it,
-  # or would rather not say, still has somewhere to go.
+  # global nine — so the card asks about Kenyan or Brazilian heritage, while a
+  # respondent who fits none of it, or would rather not say, still has
+  # somewhere to go.
   #
   # Pure: `five` arrives already generated and sanitised (HeritageOptions), so
   # nothing here calls a service or can fail. A blank list returns the plain
   # registry card, which is what makes "Claude was unreachable" degrade to the
   # global taxonomy rather than to an error.
   #
-  # `allow_other` rides along because a five-item list WILL miss people: the
-  # free-text box is the difference between a respondent seeing themselves as
-  # "Another heritage" and being able to say what they actually are.
+  # SIX options, not seven: "Another heritage" is deliberately NOT among them.
+  # A five-item list will miss people, and a radio button reading "Another
+  # heritage" is a dead end — it records that someone didn't fit without ever
+  # asking what they are. `allow_other` gives them the free-text box instead,
+  # so "another" is something you type. The sync still records those answers
+  # under the canonical "Another heritage" label, so the segment survives and
+  # the respondent's own words stay out of the creator's dashboard.
   def self.country_heritage_card(country:, five:, locale: nil)
     card = optional_card("heritage", locale: locale)
     return card if card.nil? || Array(five).empty?
@@ -135,7 +155,7 @@ module DemographicQuestions
     code = country.to_s.upcase
     return card unless WorldRegions.valid?(code)
 
-    card["options"]          = Array(five).map(&:to_s) + heritage_tail_options(locale: locale)
+    card["options"]          = Array(five).map(&:to_s) + [ heritage_decline_option(locale: locale) ]
     card["allow_other"]      = true
     card["heritage_country"] = code
     card
