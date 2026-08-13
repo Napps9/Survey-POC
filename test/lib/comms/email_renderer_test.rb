@@ -50,6 +50,25 @@ class Comms::EmailRendererTest < ActiveSupport::TestCase
     assert_not_includes without, "mso-hide:all"
   end
 
+  test "the preheader is padded so body copy can't spill into the inbox snippet" do
+    html = Comms::EmailRenderer.render_html(doc(blocks: [ { "type" => "text", "text" => "Body copy" } ]),
+                                            preheader: "A short line.")
+    hidden = html[/<span style="display:none[^>]*>(.*?)<\/span>/m, 1]
+
+    assert hidden.start_with?("A short line.")
+    # Whatever the preheader doesn't fill, a client takes from the top of the
+    # body — the padding occupies that space without printing anything.
+    assert_operator hidden.scan("&zwnj;").size, :>, 50
+    assert_not_includes hidden, "Body copy"
+  end
+
+  test "a preheader at full length needs no padding" do
+    html = Comms::EmailRenderer.render_html(doc, preheader: "x" * 200)
+    hidden = html[/<span style="display:none[^>]*>(.*?)<\/span>/m, 1]
+
+    assert_not_includes hidden, "&zwnj;"
+  end
+
   test "contentWidth threads into the shell table" do
     html = Comms::EmailRenderer.render_html(doc(settings: { "contentWidth" => 480 }))
 

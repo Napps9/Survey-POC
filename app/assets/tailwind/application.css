@@ -9202,10 +9202,53 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .comms-masthead-logo { width: 180px; max-width: 60%; height: auto; cursor: pointer; }
 .comms-feature { padding: 16px 18px; border-radius: 6px; }
 .comms-callout { padding: 18px 20px; border-radius: 8px; }
+/* The inbox row preview in the Send panel: a light card among the dark
+   islands, because that is how it will appear in a mail client. */
+.comms-inbox-preview {
+  background: #FFFFFF; border-radius: 10px; padding: 12px 14px; margin-top: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+.comms-inbox-preview.is-phone { max-width: 280px; }
+.comms-inbox-meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: "Alata", sans-serif; font-size: 12px; color: #0F172A; margin-bottom: 2px;
+}
+.comms-inbox-device { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #94A3B8; }
+.comms-inbox-subject {
+  font-family: "Alata", sans-serif; font-size: 13px; font-weight: 700; color: #0F172A;
+  line-height: 1.35; word-break: break-word;
+}
+.comms-inbox-snippet {
+  font-family: "ABeeZee", sans-serif; font-size: 12px; color: #64748B;
+  line-height: 1.4; margin-top: 2px; word-break: break-word;
+}
+.comms-inbox-subject.is-empty, .comms-inbox-snippet.is-empty { color: #CBD5E1; font-style: italic; }
+.comms-inbox-counts {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  font-family: "ABeeZee", sans-serif; font-size: 11px; color: rgba(255, 255, 255, 0.6);
+}
+.comms-inbox-counts .is-over { color: #FFC24B; }
+.comms-inbox-toggle {
+  background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100px; color: #F7F7F7; font-family: "Alata", sans-serif; font-size: 11px;
+  padding: 4px 10px; cursor: pointer;
+}
+.comms-review { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.comms-review li {
+  font-family: "ABeeZee", sans-serif; font-size: 11px; line-height: 1.5;
+  padding-left: 16px; position: relative;
+}
+.comms-review-warn { color: #FFC24B; }
+.comms-review-tip { color: rgba(255, 255, 255, 0.6); }
+.comms-review-warn::before { content: "!"; position: absolute; left: 4px; font-weight: 700; }
+.comms-review-tip::before { content: "·"; position: absolute; left: 6px; }
+
 /* An empty run in a composite block still needs to be clickable to type into,
    and needs to say what it is for. text-transform is deliberately dropped on
    the placeholder so a hint never reads as shouting. */
-.comms-block [contenteditable][data-placeholder]:empty::before {
+.comms-block:hover [contenteditable][data-placeholder]:empty::before,
+.comms-block.is-selected [contenteditable][data-placeholder]:empty::before,
+.comms-block [contenteditable][data-placeholder]:focus:empty::before {
   content: attr(data-placeholder);
   opacity: 0.4;
   font-style: italic;

@@ -58,6 +58,11 @@ class EmailCampaign < ApplicationRecord
     Comms::EmailDocument.warnings(document)
   end
 
+  # Advisory notes on the inbox row — never blocking, unlike `warnings`.
+  def subject_review
+    Comms::SubjectLine.review(subject: subject, preheader: preheader)
+  end
+
   private
 
   def sanitize_design!

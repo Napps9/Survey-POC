@@ -23,6 +23,7 @@ class CommsNewsletterTest < ActionDispatch::IntegrationTest
                        "body"  => "Your uploads land where you expect them to." } ],
     "cta_label" => "Build your next Verto",
     "sign_off"  => "Tell us what you'd like next.",
+    "subject_variants" => [ "What changed in imports this week" ],
     "source"    => "claude"
   }.freeze
 
@@ -61,6 +62,10 @@ class CommsNewsletterTest < ActionDispatch::IntegrationTest
     assert_equal "Newsletter — week of 10 August 2026", campaign.title
     assert_equal WRITTEN_COPY["subject"], campaign.subject
     assert_equal WRITTEN_COPY["preheader"], campaign.preheader
+    # The A/B machinery has been there since M6 with nothing to test — every
+    # weekly send now splits across subjects and reports per-variant opens.
+    assert_equal WRITTEN_COPY["subject_variants"], campaign.subject_variants
+    assert_empty campaign.subject_review, "a generated subject shouldn't trip its own review"
 
     list = EmailList.find_by(name: Comms::GenerateNewsletterJob::LIST_NAME)
     assert list, "the list is created if it doesn't exist yet"

@@ -81,6 +81,25 @@ class CommsCampaignsTest < ActionDispatch::IntegrationTest
     assert_equal "August news", campaign.reload.title
   end
 
+  test "the save response carries the inbox-row review so the panel can paint it" do
+    campaign = EmailCampaign.create!(title: "Review me", design: { "blocks" => [] })
+    sign_in @staff
+
+    patch comms_campaign_path(campaign),
+          params: { subject: "BIG NEWS!!!", preheader: "" }, as: :json
+    assert_response :success
+
+    review = response.parsed_body["subject_review"]
+    assert review.present?, "the review rides back on the same save the panel already makes"
+    assert_includes review.map { |n| n["text"] }.join(" "), "capitals"
+    assert_equal [ "warn" ], review.select { |n| n["text"].include?("top of the email") }.map { |n| n["level"] }
+
+    # Advisory only — it must never become a send gate.
+    patch comms_campaign_path(campaign),
+          params: { subject: "A calm, clear subject", preheader: "With a second line." }, as: :json
+    assert_empty response.parsed_body["subject_review"]
+  end
+
   test "a drifted html twin is not stored" do
     sign_in @staff
     campaign = create_campaign

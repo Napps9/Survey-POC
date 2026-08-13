@@ -296,7 +296,8 @@
           test send, and the one-way door. %>
       <div class="type-panel panel-paper panel--logic" data-comms-editor-target="sendView" hidden
            data-controller="comms-send"
-           data-comms-send-url-value="<%= comms_campaign_path(@campaign) %>">
+           data-comms-send-url-value="<%= comms_campaign_path(@campaign) %>"
+           data-comms-send-review-value="<%= @campaign.subject_review.to_json %>">
         <div class="type-panel-top">
           <button type="button" class="publish-panel-back" data-action="click->comms-editor#closeSend">←
             <%= t("comms.editor.back_to_block", default: "Block") %></button>
@@ -322,6 +323,26 @@
                        data-action="input->comms-send#changed"
                        value="<%= @campaign.preheader %>" style="max-width:none;">
               </label>
+              <%# What the row actually looks like in a list of other mail —
+                  the only part of a campaign most people ever read. %>
+              <div class="comms-inbox-preview" data-comms-send-target="preview">
+                <div class="comms-inbox-meta">
+                  <span data-comms-send-target="previewFrom"><%= @campaign.from_name.presence || "Playverto" %></span>
+                  <span class="comms-inbox-device" data-comms-send-target="previewDevice">Desktop</span>
+                </div>
+                <div class="comms-inbox-subject" data-comms-send-target="previewSubject"></div>
+                <div class="comms-inbox-snippet" data-comms-send-target="previewSnippet"></div>
+              </div>
+              <div class="comms-inbox-counts">
+                <button type="button" class="comms-inbox-toggle"
+                        data-comms-send-target="deviceToggle"
+                        data-action="click->comms-send#toggleDevice">
+                  <%= t("comms.editor.preview_phone", default: "Show as phone") %>
+                </button>
+                <span data-comms-send-target="subjectCount"></span>
+              </div>
+              <ul class="comms-review" data-comms-send-target="review"></ul>
+
               <span style="font-family:'Alata',sans-serif;font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:0.08em;text-transform:uppercase;">
                 <%= t("comms.editor.ab_variants", default: "A/B subject variants (optional)") %>
               </span>

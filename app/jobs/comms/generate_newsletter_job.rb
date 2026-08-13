@@ -43,9 +43,10 @@ class Comms::GenerateNewsletterJob < ApplicationJob
 
   def create_campaign(copy, week:, list:, today:)
     EmailCampaign.create!(
-      title:           "Newsletter — week of #{week.strftime("%-d %B %Y")}",
-      subject:         copy["subject"],
-      preheader:       copy["preheader"],
+      title:            "Newsletter — week of #{week.strftime("%-d %B %Y")}",
+      subject:          copy["subject"],
+      subject_variants: Array(copy["subject_variants"]),
+      preheader:        copy["preheader"],
       from_name:       ENV.fetch("NEWSLETTER_FROM_NAME", "Playverto"),
       design:          Comms::NewsletterDocument.build(copy, brand: playverto_brand),
       audience:        { "kind" => "list", "list_id" => list.id },

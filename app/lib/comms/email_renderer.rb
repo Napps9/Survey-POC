@@ -30,13 +30,7 @@ module Comms
       s = doc["settings"]
       rows = Array(doc["blocks"]).map { |b| render_row(b, s) }.join
       footer = render_footer(unsubscribe_url, footer_business, footer_address)
-      pre =
-        if preheader.present?
-          %(<span style="display:none!important;visibility:hidden;opacity:0;color:transparent;) +
-            %(height:0;width:0;overflow:hidden;mso-hide:all;">#{h(preheader)}</span>)
-        else
-          ""
-        end
+      pre = render_preheader(preheader)
       %(<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">) +
         %(<meta name="viewport" content="width=device-width,initial-scale=1">) +
         %(<meta name="x-apple-disable-message-reformatting"></head>) +
@@ -91,6 +85,26 @@ module Comms
       parts << "-" * 20
       parts << footer.join("\n")
       parts.join("\n\n")
+    end
+
+    # The hidden line an inbox shows after the subject.
+    #
+    # The padding matters as much as the text: a client fills the preview row
+    # to its own length, and whatever the preheader doesn't fill it takes
+    # from the top of the body — which here is the masthead's alt text and
+    # the week number. Trailing zero-width non-joiners separated by
+    # non-breaking spaces occupy that space without printing anything, so the
+    # preview ends where the sentence ends.
+    PREHEADER_TARGET_CHARS = 110
+    PREHEADER_PAD = "&zwnj;&nbsp;".freeze
+
+    def render_preheader(preheader)
+      return "" if preheader.blank?
+
+      pad_count = [ PREHEADER_TARGET_CHARS - preheader.to_s.length, 0 ].max
+      %(<span style="display:none!important;visibility:hidden;opacity:0;color:transparent;) +
+        %(height:0;width:0;overflow:hidden;mso-hide:all;">#{h(preheader)}) +
+        (PREHEADER_PAD * pad_count) + %(</span>)
     end
 
     def h(input)

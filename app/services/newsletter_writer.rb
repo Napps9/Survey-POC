@@ -21,6 +21,9 @@ class NewsletterWriter
   MAX_ITEMS       = 6
   MAX_TITLE_CHARS = 80
   MAX_BODY_CHARS  = 400
+  # The campaign model keeps three at most; two alternates plus the subject
+  # itself splits a small early-adopter list into groups still worth reading.
+  MAX_VARIANTS    = 2
 
   TOOL = {
     name: "compose_newsletter",
@@ -32,9 +35,14 @@ class NewsletterWriter
           type: "string",
           description: "Email subject line. Concrete and specific to this week's changes — not 'Your weekly update'. Under 60 characters. No emoji."
         },
+        subject_variants: {
+          type: "array",
+          description: "Two alternative subject lines to test against the main one. Each must take a GENUINELY different angle — e.g. one naming the concrete change, one asking the question the reader has, one leading with the benefit. Same length rules. Not rewordings of each other.",
+          items: { type: "string" }
+        },
         preheader: {
           type: "string",
-          description: "The preview line after the subject in an inbox. One sentence, adds to the subject rather than repeating it. Under 90 characters."
+          description: "The preview line after the subject in an inbox. It is a second line of space, not a repeat: it must say something the subject does not. One sentence, under 90 characters."
         },
         intro: {
           type: "string",
@@ -61,7 +69,7 @@ class NewsletterWriter
           description: "One closing sentence. Encouraging, inviting a reply with what they'd like next."
         }
       },
-      required: %w[subject preheader intro items cta_label sign_off]
+      required: %w[subject subject_variants preheader intro items cta_label sign_off]
     }
   }.freeze
 
@@ -163,8 +171,14 @@ class NewsletterWriter
     # unusable and let the caller fall back rather than ship half an edition.
     return nil if items.empty? || subject.blank?
 
+    variants = Array(raw["subject_variants"]).filter_map { |v| str(v, 140).presence }
+                                             .reject { |v| v.casecmp?(subject) }
+                                             .uniq(&:downcase)
+                                             .first(MAX_VARIANTS)
+
     {
-      "subject"   => subject,
+      "subject"          => subject,
+      "subject_variants" => variants,
       "preheader" => str(raw["preheader"], 200),
       "intro"     => str(raw["intro"], 600),
       "items"     => items,

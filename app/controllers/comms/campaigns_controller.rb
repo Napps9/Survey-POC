@@ -47,7 +47,7 @@ class Comms::CampaignsController < Comms::BaseController
     end
     @campaign.save!
     render json: { ok: true, id: @campaign.id, updated_at: @campaign.updated_at,
-                   warnings: @campaign.warnings }
+                   warnings: @campaign.warnings, subject_review: @campaign.subject_review }
   end
 
   def destroy

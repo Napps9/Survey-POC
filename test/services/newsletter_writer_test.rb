@@ -30,6 +30,7 @@ class NewsletterWriterTest < ActiveSupport::TestCase
 
   GOOD = {
     "subject" => "Three things got easier",
+    "subject_variants" => [ "What changed in imports this week", "Your uploads just got quieter" ],
     "preheader" => "A short note.",
     "intro" => "Here's the week.",
     "items" => [ { "title" => "Faster imports", "body" => "They just work." } ],
@@ -62,6 +63,22 @@ class NewsletterWriterTest < ActiveSupport::TestCase
     assert client.last_kwargs[:request_options][:timeout].present?
     # The commit body reaches the prompt, so the copy can be about something.
     assert_includes client.last_kwargs[:messages].first[:content], "Why it mattered."
+  end
+
+  test "subject variants come back for the A/B split, deduped against the subject" do
+    writer, = writer_with(GOOD)
+    copy = writer.call(COMMITS, week: WEEK)
+
+    assert_equal [ "What changed in imports this week", "Your uploads just got quieter" ],
+                 copy["subject_variants"]
+
+    # A "variant" that is the subject again would split the audience for
+    # nothing, and a third one would be dropped by the model anyway.
+    echoed, = writer_with(GOOD.merge("subject_variants" => [
+      "three things got easier", "A real alternative", "A REAL ALTERNATIVE", "One too many"
+    ]))
+    variants = echoed.call(COMMITS, week: WEEK)["subject_variants"]
+    assert_equal [ "A real alternative", "One too many" ], variants
   end
 
   test "the model's structure is never trusted: junk fields are dropped or bounded" do
