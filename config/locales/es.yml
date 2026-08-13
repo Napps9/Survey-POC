@@ -31,6 +31,21 @@ es:
     add_option: Agregar opción
     new_option: Nueva opción
     style_option: Estilizar esta respuesta
+    new_response: "Nueva respuesta"
+    add_response: "Añadir una respuesta"
+    remove_response: "Eliminar esta respuesta"
+    response_scale: "Respuestas por afirmación"
+    tap_scale:
+      "no": "No"
+      "yes": "Sí"
+      unsure: "No estoy seguro"
+      neutral: "Neutral"
+      disagree: "En desacuerdo"
+      agree: "De acuerdo"
+      strongly_disagree: "Totalmente en desacuerdo"
+      strongly_agree: "Totalmente de acuerdo"
+      slightly_disagree: "Algo en desacuerdo"
+      slightly_agree: "Algo de acuerdo"
     contact_name: "Nombre"
     contact_company: "Empresa"
     contact_industry: "Sector"
@@ -39,7 +54,7 @@ es:
     contact_email_invalid: "Eso no parece una dirección de correo — revísala, por favor."
     add_statement: Agregar enunciado
     swipe_no: "No"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "No estoy seguro"
     swipe_hint: arrastra la tarjeta para responder
     swipe_yes: Sí
     reset: Restablecer

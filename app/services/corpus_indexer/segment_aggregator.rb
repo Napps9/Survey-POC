@@ -143,7 +143,18 @@ class CorpusIndexer
     def countable(result, card)
       type = result[:type].to_s
       return {} unless SEGMENTABLE_TYPES.include?(type)
-      return result[:counts] if type == "tap_card" # {label => {yes:, no:, unsure:}}, already right
+      # {statement => {response key => count}} — already nested per statement, so
+      # only the keys need resolving to the words the respondent saw. Same reason
+      # the scales resolve their indices below: a segment reading
+      # "strongly_agree: 41" beside a whole-Verto figure reading
+      # "Strongly agree: 41" is the same number wearing two names.
+      if type == "tap_card"
+        labels = TapScales.for_card(card).to_h { |r| [ r["key"], r["label"] ] }
+        return result[:counts].transform_values { |v|
+          next v unless v.is_a?(Hash)
+          v.each_with_object({}) { |(key, n), out| out[labels[key.to_s] || key.to_s] = n.to_i }
+        }
+      end
 
       labels = Array(card["options"]).map(&:to_s)
       result[:counts].each_with_object({}) do |(key, value), out|

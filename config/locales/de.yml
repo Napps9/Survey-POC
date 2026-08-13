@@ -31,6 +31,21 @@ de:
     add_option: Option hinzufügen
     new_option: Neue Option
     style_option: Diese Antwort gestalten
+    new_response: "Neue Antwort"
+    add_response: "Antwort hinzufügen"
+    remove_response: "Diese Antwort entfernen"
+    response_scale: "Antworten pro Aussage"
+    tap_scale:
+      "no": "Nein"
+      "yes": "Ja"
+      unsure: "Unsicher"
+      neutral: "Neutral"
+      disagree: "Stimme nicht zu"
+      agree: "Stimme zu"
+      strongly_disagree: "Stimme überhaupt nicht zu"
+      strongly_agree: "Stimme voll zu"
+      slightly_disagree: "Stimme eher nicht zu"
+      slightly_agree: "Stimme eher zu"
     contact_name: "Name"
     contact_company: "Unternehmen"
     contact_industry: "Branche"
@@ -39,7 +54,7 @@ de:
     contact_email_invalid: "Das sieht nicht wie eine E-Mail-Adresse aus — bitte prüfen."
     add_statement: Aussage hinzufügen
     swipe_no: "Nein"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "Unsicher"
     swipe_hint: Karte ziehen, um zu antworten
     swipe_yes: Ja
     reset: Zurücksetzen

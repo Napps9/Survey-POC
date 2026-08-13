@@ -31,6 +31,21 @@ he:
     add_option: הוסף אפשרות
     new_option: אפשרות חדשה
     style_option: עיצוב תשובה זו
+    new_response: "תשובה חדשה"
+    add_response: "הוספת תשובה"
+    remove_response: "הסרת תשובה זו"
+    response_scale: "תשובות לכל היגד"
+    tap_scale:
+      "no": "לא"
+      "yes": "כן"
+      unsure: "לא בטוח"
+      neutral: "ניטרלי"
+      disagree: "לא מסכים"
+      agree: "מסכים"
+      strongly_disagree: "מאוד לא מסכים"
+      strongly_agree: "מסכים מאוד"
+      slightly_disagree: "נוטה לא להסכים"
+      slightly_agree: "נוטה להסכים"
     contact_name: "שם"
     contact_company: "חברה"
     contact_industry: "תחום"
@@ -39,7 +54,7 @@ he:
     contact_email_invalid: "זה לא נראה כמו כתובת אימייל — נא לבדוק."
     add_statement: הוסף משפט
     swipe_no: "לא"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "לא בטוח"
     swipe_hint: גרור את הכרטיס כדי לענות
     swipe_yes: כן
     reset: אפס

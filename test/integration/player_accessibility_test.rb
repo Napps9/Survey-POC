@@ -125,6 +125,33 @@ class PlayerAccessibilityTest < ActionDispatch::IntegrationTest
                  "the three swipe actions should stay labelled"
   end
 
+  # The strip is 2-6 wide now (TapScales), and the case above keeps passing on a
+  # card that never left the default three — so it would not have noticed a
+  # fifth response shipping with no accessible name on it.
+  test "every response on a wider scale is labelled and reachable" do
+    html = render_card({ "type" => "tap_card", "cid" => "c", "text" => "Statements",
+                         "options" => [ "One" ],
+                         "responses" => TapScales.preset(5) }, mode: :player)
+
+    assert_equal 5, html.scan(/data-tap-response\b/).size
+    assert_equal 5, html.scan(/aria-label=/).size, "a pill with no accessible name is unusable by screen reader"
+    TapScales.preset(5).each do |r|
+      assert_includes html, %(aria-label="#{r["label"]}")
+    end
+    assert_equal 5, html.scan(/<button type="button" class="rotate-action/).size,
+                 "each response must be a real button, not a div with a click handler"
+  end
+
+  test "the editor's response strip is editable and not announced as a control" do
+    html = render_card({ "type" => "tap_card", "cid" => "c", "text" => "Statements",
+                         "options" => [ "One" ],
+                         "responses" => TapScales.preset(5) }, mode: :editor)
+
+    assert_equal 5, html.scan(/data-tap-response-label/).size, "each label must hold a caret in the editor"
+    refute_match(/<button type="button" class="rotate-action[" ]/, html,
+                 "a contenteditable inside a <button> does not reliably take a caret")
+  end
+
   # ── The other answer controls (P2-4, second pass) ───────────────────────
 
   RANGE  = { "type" => "range", "cid" => "c", "text" => "How confident?",

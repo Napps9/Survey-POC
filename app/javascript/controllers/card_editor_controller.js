@@ -1,5 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { choiceListItemHtml, prioritiseItemHtml } from "lib/choice_templates"
+import { tapResponseStripHtml } from "lib/tap_response_templates"
+import { resolveResponses, presetFor, MIN_TAP_RESPONSES, MAX_TAP_RESPONSES } from "lib/tap_scales"
 import { t } from "lib/i18n"
 
 const SWIPE_FILLS = [
@@ -117,6 +119,88 @@ export default class extends Controller {
       window.getSelection()?.removeAllRanges()
       window.getSelection()?.addRange(range)
     }
+  }
+
+  // ── The response scale (tap cards) ──────────────────────────────────────
+  // The strip IS the record, exactly as the option rows are: serialize() reads
+  // it straight back off the DOM, so adding, removing and relabelling need no
+  // bookkeeping beyond rewriting the markup. Every change rebuilds the whole
+  // strip rather than splicing one node, because a response's swipe direction
+  // and the circles-versus-pills shape are both functions of how many there
+  // are — add a fifth by hand and the other four would still claim the layout
+  // and the directions they had when there were four.
+
+  addResponse(event) {
+    event.stopPropagation() // don't also select/apply the type underneath
+    const strip = event.currentTarget.closest("[data-tap-responses]")
+    if (!strip) return
+    const list = this._responsesFromDom(strip)
+    if (list.length >= MAX_TAP_RESPONSES) return
+    // Appended at the positive end: the scale reads most-negative first, so the
+    // new answer is the strongest agreement until the creator says otherwise —
+    // which is also why it starts on the positive glyph rather than falling
+    // through to a keyword emoji, where it would be the one circle in the strip
+    // not wearing the strip's own artwork.
+    list.push({ key: `r_${this._randomKey()}`,
+                label: t("card.new_response", { default: "New answer" }),
+                glyph: "yes" })
+    this._rewriteStrip(strip, list)
+  }
+
+  deleteResponse(event) {
+    event.stopPropagation()
+    const strip = event.currentTarget.closest("[data-tap-responses]")
+    const row = event.currentTarget.closest("[data-tap-response]")
+    if (!strip || !row) return
+    const list = this._responsesFromDom(strip)
+    // Below two there is no question left to ask. The × is hidden at the floor
+    // (CSS), so this is the belt to that braces.
+    if (list.length <= MIN_TAP_RESPONSES) return
+    const index = Array.from(strip.querySelectorAll("[data-tap-response]")).indexOf(row)
+    if (index < 0) return
+    list.splice(index, 1)
+    this._rewriteStrip(strip, list)
+  }
+
+  // Reseed from a preset, keeping nothing — the point of picking "5" is to get
+  // the five-point scale, not to have last scale's words survive into it.
+  setResponsePreset(count) {
+    const strip = this.element.querySelector("[data-tap-responses]")
+    if (!strip) return
+    const preset = presetFor(count)
+    if (preset.length) this._rewriteStrip(strip, preset)
+  }
+
+  _responsesFromDom(strip) {
+    return Array.from(strip.querySelectorAll("[data-tap-response]")).map((el) => {
+      const out = { key: el.dataset.responseKey }
+      const label = el.querySelector("[data-tap-response-label]")?.textContent?.trim()
+      if (label) out.label = label
+      if (el.dataset.responseGlyph) out.glyph = el.dataset.responseGlyph
+      // The 🎨 popover writes these three; they are the same data-option-*
+      // attributes an option row carries, which is why option-style needs no
+      // special case for a response.
+      if (el.dataset.optionIcon) out.icon = el.dataset.optionIcon
+      if (el.dataset.optionEmoji) out.emoji = el.dataset.optionEmoji
+      if (el.dataset.optionColor) out.color = el.dataset.optionColor
+      if (el.classList.contains("is-strong")) out.strong = true
+      return out
+    })
+  }
+
+  _rewriteStrip(strip, responses) {
+    const holder = document.createElement("template")
+    holder.innerHTML = tapResponseStripHtml(resolveResponses(responses)).trim()
+    const next = holder.content.firstElementChild
+    if (!next) return
+    strip.replaceWith(next)
+    this.dispatch("changed")
+  }
+
+  _randomKey() {
+    const bytes = new Uint8Array(4)
+    crypto.getRandomValues(bytes)
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")
   }
 
   _readOptionImages(cardRow) {

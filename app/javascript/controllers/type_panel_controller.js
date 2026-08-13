@@ -4,6 +4,8 @@ import { PAGED_TYPES, isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
 import { DEFAULT_OPTIONS, defaultOptionsFor } from "lib/default_options"
 import { choiceListItemHtml, prioritiseItemHtml, choiceGridItemHtml, addOptionBtnHtml } from "lib/choice_templates"
+import { tapResponseStripHtml, tapGlyphSvg } from "lib/tap_response_templates"
+import { resolveResponses } from "lib/tap_scales"
 import { injectIcons } from "lib/option_icons"
 import { t } from "lib/i18n"
 
@@ -207,18 +209,27 @@ const COMPONENTS = {
   select_one_grid:  (opts, ctx = {}) => gridHtml(opts, "single", ctx.optionStyles),
   select_many_grid: (opts, ctx = {}) => gridHtml(opts, "multi", ctx.optionStyles),
 
+  // Mirrors the "when tap_card" branch in _card_component.html.erb. It had
+  // drifted badly — a bare <span> where the partial has a media layer and a
+  // statement band, no controls wrapper, no remaining-cards dots, and a
+  // two-button ✕/✓ strip that predated the third response — so a card rebuilt
+  // by a type switch looked nothing like the same card after a reload. The
+  // response strip now comes from lib/tap_response_templates, which is the one
+  // place its markup is written on this side of the wire.
   tap_card: (opts, ctx = {}) => {
     const optionImages = ctx.optionImages || []
+    const responses = resolveResponses(ctx.responses)
     return `
-    <div class="rotate-wrap" data-controller="tap-stack card-editor">
+    <div class="rotate-wrap" data-controller="tap-stack card-editor"
+         data-action="tap-stack:reset->tap-stack#reset">
       <div class="rotate-card-stack">
         ${opts.map((o,i) => {
           const img = optionImages[i]
           const [a,b] = SWIPE_FILLS[i % SWIPE_FILLS.length]
           const bg = img ? `#fff url('${img.replace(/'/g, "\\'")}') center/cover no-repeat` : `linear-gradient(135deg,${a},${b})`
-          return `<div class="rotate-card" data-tap-stack-target="card"
-                       style="background:${bg};">
-                    <span contenteditable="true" style="font-family:'ABeeZee',sans-serif;font-size:14px;color:#111;text-align:center;">${esc(o)}</span>
+          return `<div class="rotate-card" data-tap-stack-target="card" data-canonical="${esc(o)}">
+                    <div class="rotate-card-media" style="background:${bg};"></div>
+                    <div class="rotate-card-statement"><span contenteditable="true">${esc(o)}</span></div>
                     <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${i}" title="${esc(t("editor.change_statement_image_title"))}">
                       <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
                     </button>
@@ -226,20 +237,16 @@ const COMPONENTS = {
                   </div>`
         }).join("")}
         <div class="rotate-complete">
-          <span class="rotate-complete-check"><svg class="rotate-action-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1z"/></svg></span>
+          <span class="rotate-complete-check">${tapGlyphSvg("yes")}</span>
           <span class="rotate-complete-text">${esc(t("card.tap_done"))}</span>
         </div>
+        <div class="rotate-card-controls" data-tap-stack-target="controls">
+          ${tapResponseStripHtml(responses)}
+          <div class="rotate-dots" data-tap-stack-target="dots"></div>
+        </div>
       </div>
-      <div class="swipe-indicator">
-        <span style="color:#D80027;font-weight:700">← ${esc(t("card.swipe_no"))}</span>
-        <span class="mx-3">${esc(t("card.swipe_hint"))}</span>
-        <span style="color:#01EACB;font-weight:700">${esc(t("card.swipe_yes"))} →</span>
-      </div>
-      <div class="rotate-actions">
-        <button type="button" class="rotate-action-btn rotate-action-no"
-                data-action="click->tap-stack#pick" data-tap-stack-direction="left">✕</button>
-        <button type="button" class="rotate-action-btn rotate-action-yes"
-                data-action="click->tap-stack#pick" data-tap-stack-direction="right">✓</button>
+      <div class="rotate-reset-row">
+        <button type="button" class="rotate-reset-btn" data-action="click->tap-stack#reset">↺ ${esc(t("card.reset"))}</button>
       </div>
       <button type="button" class="tap-add-btn" data-action="click->card-editor#addTapOption">＋ ${esc(t("card.add_statement"))}</button>
     </div>`
@@ -1152,7 +1159,8 @@ export default class extends Controller {
         sliderAxis:      card.dataset.cardSliderAxis || "auto",
         pages:           this._pagesFor(card, type),
         optionImages:    this._optionImagesFor(card, type),
-        optionStyles:    this._optionStylesFor(card)
+        optionStyles:    this._optionStylesFor(card),
+        responses:       this._responsesFor(card)
       })
       // The server renders option icons inline; rebuilt markup must get the
       // same pass or a type switch strips every icon until the next reload.
@@ -1339,6 +1347,20 @@ export default class extends Controller {
     try {
       const styles = JSON.parse(card.dataset.cardOptionStyles || "[]")
       return Array.isArray(styles) ? styles : []
+    } catch (_) {
+      return []
+    }
+  }
+
+  // The tap card's response scale for the rebuild, from the same snapshot
+  // serialize() refreshes (data-card-responses). Carried through a type switch
+  // like option_images, so a creator who built a 5-point scale, tried Range and
+  // came back finds their scale rather than the default three. An empty array
+  // means "no stored scale", which resolveResponses reads as the historic three.
+  _responsesFor(card) {
+    try {
+      const list = JSON.parse(card.dataset.cardResponses || "[]")
+      return Array.isArray(list) ? list : []
     } catch (_) {
       return []
     }

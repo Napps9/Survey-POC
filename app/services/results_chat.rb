@@ -80,10 +80,15 @@ class ResultsChat
           lines << "  #{label}: #{count} (#{((count / grand) * 100).round}%)"
         end
       when "tap_card"
-        result[:counts].each do |label, dirs|
-          yes_c = dirs["yes"].to_i; no_c = dirs["no"].to_i; uns_c = dirs["unsure"].to_i
-          tot   = [ (yes_c + no_c + uns_c).to_f, 1.0 ].max
-          lines << "  \"#{label}\" → Yes #{yes_c} (#{((yes_c / tot) * 100).round}%), Unsure #{uns_c} (#{((uns_c / tot) * 100).round}%), No #{no_c} (#{((no_c / tot) * 100).round}%)"
+        responses = TapScales.for_card(card)
+        result[:counts].each do |label, tallies|
+          tallies = {} unless tallies.is_a?(Hash)
+          tot = [ responses.sum { |r| tallies[r["key"]].to_i }.to_f, 1.0 ].max
+          parts = responses.map do |r|
+            n = tallies[r["key"]].to_i
+            "#{r['label']} #{n} (#{((n / tot) * 100).round}%)"
+          end
+          lines << "  \"#{label}\" → #{parts.join(', ')}"
         end
       when "range"
         labels = Array(card["options"])

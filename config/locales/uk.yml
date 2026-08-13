@@ -31,6 +31,21 @@ uk:
     add_option: Додати варіант
     new_option: Новий варіант
     style_option: Оформити цю відповідь
+    new_response: "Нова відповідь"
+    add_response: "Додати відповідь"
+    remove_response: "Видалити цю відповідь"
+    response_scale: "Відповідей на твердження"
+    tap_scale:
+      "no": "Ні"
+      "yes": "Так"
+      unsure: "Не впевнений"
+      neutral: "Нейтрально"
+      disagree: "Не погоджуюсь"
+      agree: "Погоджуюсь"
+      strongly_disagree: "Цілком не погоджуюсь"
+      strongly_agree: "Цілком погоджуюсь"
+      slightly_disagree: "Радше не погоджуюсь"
+      slightly_agree: "Радше погоджуюсь"
     contact_name: "Ім'я"
     contact_company: "Компанія"
     contact_industry: "Галузь"
@@ -39,7 +54,7 @@ uk:
     contact_email_invalid: "Це не схоже на адресу електронної пошти — перевірте, будь ласка."
     add_statement: Додати твердження
     swipe_no: "Ні"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "Не впевнений"
     swipe_hint: перетягніть картку, щоб відповісти
     swipe_yes: Так
     reset: Скинути

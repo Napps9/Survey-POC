@@ -7,7 +7,7 @@
 # the PDF and the summary CSV can never disagree about a question's numbers.
 # They are genuinely different per type: choice cards key counts by label, range
 # by scale index, rating by star, nps by score, and tap_card nests a
-# yes/unsure/no hash per statement.
+# per-response tally per statement, keyed by the card's own scale (TapScales).
 #
 # prioritise is deliberately absent. Its `counts` hold a SUM OF RANKS, not a
 # tally — drawing those as bars would read as "how many people chose this" and
@@ -41,11 +41,19 @@ module ReportChartRows
 
     rows.first(MAX_ROWS).map do |label, count, denominator|
       # A row can name its own denominator. tap_card needs it: each statement is
-      # its own yes/unsure/no question, so a share against the whole card's
-      # answers would read as "9% said yes" when 43% of that statement did.
+      # its own question, so a share against the whole card's answers would read
+      # as "9% said yes" when 43% of that statement did.
       base = (denominator || grand).to_f
       Row.new(label: label, count: count, pct: base.positive? ? (count * 100.0 / base).round : 0)
     end
+  end
+
+  # How many whole statements a tap card gets to show. Each statement spends one
+  # row per response, so a six-point scale fits two statements where the historic
+  # three-point one fitted four. Floored at one: a chart with no statements at
+  # all says less than a truncated one.
+  def statement_budget(result)
+    [ MAX_ROWS / [ TapScales.count_for(result[:card]), 1 ].max, 1 ].max
   end
 
   # Whether anything was left out, so the note only appears when it's true.
@@ -54,7 +62,7 @@ module ReportChartRows
   def truncated?(result)
     counts = result[:counts]
     return false unless counts.is_a?(Hash)
-    return counts.size > MAX_ROWS / 3 if result[:type].to_s == "tap_card"
+    return counts.size > statement_budget(result) if result[:type].to_s == "tap_card"
 
     raw_rows(result).size > MAX_ROWS
   end
@@ -80,16 +88,14 @@ module ReportChartRows
     when "nps"
       counts.keys.sort_by(&:to_i).map { |k| [ k.to_s, counts[k].to_i ] }
     when "tap_card"
-      # Whole statements only — MAX_ROWS/3 of them — so truncation never cuts a
-      # statement off mid-way and leaves a stray "— No" with no question.
-      counts.first(MAX_ROWS / 3).flat_map do |label, dirs|
-        next [] unless dirs.is_a?(Hash)
+      # Whole statements only — see statement_budget — so truncation never cuts
+      # a statement off mid-way and leaves a stray "— No" with no question.
+      responses = TapScales.for_card(result[:card])
+      counts.first(statement_budget(result)).flat_map do |label, tallies|
+        next [] unless tallies.is_a?(Hash)
 
-        yes, unsure, no = dirs["yes"].to_i, dirs["unsure"].to_i, dirs["no"].to_i
-        statement_total = yes + unsure + no
-        [ [ "#{label} — Yes", yes, statement_total ],
-          [ "#{label} — Unsure", unsure, statement_total ],
-          [ "#{label} — No", no, statement_total ] ]
+        statement_total = responses.sum { |r| tallies[r["key"]].to_i }
+        responses.map { |r| [ "#{label} — #{r['label']}", tallies[r["key"]].to_i, statement_total ] }
       end
     else
       []

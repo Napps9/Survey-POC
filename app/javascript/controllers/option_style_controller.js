@@ -34,7 +34,10 @@ export default class extends Controller {
   open(event) {
     event.preventDefault()
     event.stopPropagation()
-    const row = event.currentTarget.closest("li")
+    // An option row is an <li>; a tap card's response is a chip in the swipe
+    // card's control strip. Both carry their style as the same data-option-*
+    // attributes, so the popover treats them identically from here on.
+    const row = event.currentTarget.closest("li, [data-tap-response]")
     if (!row || !this.hasPopoverTarget) return
     if (this._row === row && !this.popoverTarget.hidden) return this.close()
     this._row = row

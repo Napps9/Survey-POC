@@ -1,0 +1,44 @@
+<%# One stacked bar per swipe statement, split by the card's response scale.
+
+    Locals:
+      result — an aggregate_results entry for a tap_card (needs :counts, :card)
+
+    Shared by the Verto results page and the Common Question results page,
+    which had grown two copies of the same three-segment bar. It is a loop over
+    TapScales now rather than a hand-written Yes/Unsure/No triple, so a
+    five-point card reports on five and neither page has to know that.
+
+    Each segment is painted in its own response's colour and captioned in
+    whichever of black or white reads on it (BrandPalette.contrast_text), so a
+    creator who restyles an answer restyles its bar too. The last segment takes
+    flex:1 rather than a width, so rounding never leaves a hairline gap.
+%>
+<% responses = TapScales.for_card(result[:card]) %>
+<div style="display:flex;flex-direction:column;gap:8px;">
+  <% result[:counts].each do |label, tallies| %>
+    <% next unless tallies.is_a?(Hash) %>
+    <% counts = responses.map { |r| tallies[r["key"]].to_i } %>
+    <% total  = [ counts.sum.to_f, 1.0 ].max %>
+    <% pcts   = counts.map { |c| ((c / total) * 100).round } %>
+    <div>
+      <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.45);margin-bottom:3px;"><%= label.truncate(55) %></div>
+      <div style="display:flex;height:18px;border-radius:5px;overflow:hidden;">
+        <% responses.each_with_index do |response, i| %>
+          <% color = response["color"].presence || "#8B85FF" %>
+          <% last  = (i == responses.length - 1) %>
+          <div style="background:<%= color %>;<%= last ? 'flex:1;' : "width:#{pcts[i]}%;" %>display:flex;align-items:center;justify-content:center;">
+            <% if pcts[i] > 15 %>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:<%= BrandPalette.contrast_text(color) %>;white-space:nowrap;"><%= pcts[i] %>% <%= response["label"] %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <%# The legend wraps: six responses will not sit on one line under a bar. %>
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;margin-top:2px;gap:4px 8px;">
+        <% responses.each_with_index do |response, i| %>
+          <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);color:<%= response["color"].presence || "#8B85FF" %>;"><%= response["label"] %> · <%= counts[i] %></span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

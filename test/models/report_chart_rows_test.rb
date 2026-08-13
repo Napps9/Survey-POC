@@ -45,8 +45,13 @@ class ReportChartRowsTest < ActiveSupport::TestCase
     }
     rows = ReportChartRows.rows_for(result("tap_card", counts))
 
+    # Rows run in SCALE order (most negative first), for the reason raw_rows
+    # gives for range and NPS: a scale drawn in any other order scrambles the
+    # thing it measures. No 57%, Unsure 0%, Yes 43%.
     first = rows.first(3)
-    assert_equal [ 43, 0, 57 ], first.map(&:pct)
+    assert_equal [ "Renting is wasted — No", "Renting is wasted — Unsure", "Renting is wasted — Yes" ],
+                 first.map(&:label)
+    assert_equal [ 57, 0, 43 ], first.map(&:pct)
     assert_equal 100, first.sum(&:pct), "a statement's shares should account for its own answers"
   end
 

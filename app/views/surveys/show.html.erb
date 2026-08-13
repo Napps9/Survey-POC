@@ -36,6 +36,12 @@
     content, not chrome. See card_default_options_i18n / defaultOptionsFor. %>
 <script id="card-defaults" type="application/json"><%= card_default_options_i18n(@survey).to_json.html_safe %></script>
 
+<%# Tap-card response scales (2-6), labels in the VERTO's default locale for the
+    same reason as card-defaults — a preset label is card content the moment the
+    creator keeps it. Read by lib/tap_scales.js `presetFor`, which the response
+    strip is rebuilt from on a type switch or a preset change. %>
+<script id="tap-scales" type="application/json"><%= TapScales.to_json(@survey.default_locale).html_safe %></script>
+
 <%# Option-icon lookup for markup built client-side (type switches, new
     options): keyword→URL for label matching, id→URL for explicit picks. URLs
     only — the SVG bodies total ~200KB and are fetched on demand. See
@@ -625,6 +631,22 @@
             <span class="card-flag-track" aria-hidden="true"></span>
             <span class="card-flag-label"><%= t("card.required") %></span>
           </label>
+
+          <%# Tap cards only: how many answers each swipe statement is judged on.
+              A shortcut, not the only way in — the strip itself carries ＋ and ×
+              so a creator can build any set between two and six by hand. Picking
+              a number here reseeds from that preset, labels and all. %>
+          <div class="card-flag-scale" data-survey-editor-target="responseScale" hidden>
+            <span class="card-flag-label"><%= t("card.response_scale", default: "Answers per statement") %></span>
+            <div class="response-scale-picker" role="group"
+                 aria-label="<%= t("card.response_scale", default: "Answers per statement") %>">
+              <% TapScales.preset_counts.each do |n| %>
+                <button type="button" class="response-scale-btn"
+                        data-response-count="<%= n %>"
+                        data-action="click->survey-editor#setResponseScale"><%= n %></button>
+              <% end %>
+            </div>
+          </div>
         </div>
 
       </div>

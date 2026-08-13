@@ -108,6 +108,32 @@ class AggregatesSurveyResultsTest < ActiveSupport::TestCase
     assert_equal 2, row[:total]
   end
 
+  test "a card with its own scale is tallied on that scale, not the historic three" do
+    # The seed used to be a literal {"yes"=>0,"no"=>0,"unsure"=>0}, which meant a
+    # five-point card's answers landed in a hash with no slot for them and were
+    # dropped on the floor — the results page would have shown nothing at all.
+    cards = [ { "type" => "tap_card", "text" => "Tap", "responses" => TapScales.preset(5) } ]
+    responses = [
+      resp({ "0" => { "value" => { "Stmt" => "strongly_agree" } } }),
+      resp({ "0" => { "value" => { "Stmt" => "neutral" } } }),
+      resp({ "0" => { "value" => { "Stmt" => "strongly_agree" } } })
+    ]
+    row = @agg.run(cards, responses)[0]
+
+    assert_equal({ "strongly_disagree" => 0, "disagree" => 0, "neutral" => 1,
+                   "agree" => 0, "strongly_agree" => 2 }, row[:counts]["Stmt"],
+                 "every response on the scale gets a slot, including the ones nobody picked")
+    assert_equal 3, row[:total]
+  end
+
+  test "an answer keyed off the card's scale is ignored rather than invented" do
+    cards = [ { "type" => "tap_card", "text" => "Tap", "responses" => TapScales.preset(2) } ]
+    row = @agg.run(cards, [ resp({ "0" => { "value" => { "Stmt" => "neutral" } } }) ])[0]
+
+    assert_equal({ "no" => 0, "yes" => 0 }, row[:counts]["Stmt"],
+                 "a card re-scaled after collection must not grow a bar for an answer it no longer offers")
+  end
+
   test "tap_card counts the unsure direction" do
     responses = [
       resp({ "4" => { "value" => { "Statement 1" => "unsure" } } }),

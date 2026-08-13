@@ -37,7 +37,7 @@ const OPTION_LABEL_SELECTORS = {
 
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
-    "cardFlags", "panelOther", "panelRequired", "vertoTitle", "undoBtn"]
+    "cardFlags", "panelOther", "panelRequired", "responseScale", "vertoTitle", "undoBtn"]
   static values  = {
     url: String, title: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -584,6 +584,9 @@ export default class extends Controller {
       text: c.text || "",
       description: c.description || "",
       options: Array.isArray(c.options) ? c.options.slice() : [],
+      // Tap-card response labels, positional against the card's scale — the
+      // words only; a response's key, colour and glyph are language-neutral.
+      responses: Array.isArray(c.responses) ? c.responses.slice() : [],
       pages: Array.isArray(c.pages) ? c.pages.map(p => ({ id: p?.id || "", text: p?.text || "", html: p?.html || null })) : [],
       // Rich-text layer — meaningful on the PRIMARY entry only (translations
       // are plain by design; the server strips any html they might carry).
@@ -597,6 +600,15 @@ export default class extends Controller {
   _optionEls(cardEl) {
     const sel = OPTION_LABEL_SELECTORS[cardEl.dataset.cardType]
     return sel ? Array.from(cardEl.querySelectorAll(sel)) : []
+  }
+
+  // A tap card's response labels. Kept out of OPTION_LABEL_SELECTORS on
+  // purpose: that table maps a type to its OPTIONS, and a tap card's options
+  // are its statements. The responses are a second, independent list on the
+  // same card, and conflating them would have the statements overwritten by
+  // the answer scale on every language switch.
+  _responseLabelEls(cardEl) {
+    return Array.from(cardEl.querySelectorAll("[data-tap-response-label]"))
   }
 
   // Scenario narrative-page text elements, excluding the answer page (whose
@@ -614,6 +626,7 @@ export default class extends Controller {
       text: titleEl?.textContent.trim() || "",
       description: descEl?.textContent.trim() || "",
       options: optEls.map(el => el.textContent.trim()),
+      responses: this._responseLabelEls(cardEl).map(el => el.textContent.trim()),
       pages: this._pageEls(cardEl).map(el => ({
         id: el.closest(".book-page")?.dataset.pageId || "",
         text: el.textContent.trim(),
@@ -652,6 +665,12 @@ export default class extends Controller {
     const optsHtml = content.options_html || []
     this._optionEls(cardEl).forEach((el, k) => {
       write(el, optsHtml[k], (opts[k] && opts[k].trim()) || fopts[k] || el.textContent)
+    })
+    // Response labels, positional against the scale, same fall-back-per-slot
+    // rule as options. Always plain: a response label has no rich-text layer.
+    const resps = content.responses || [], fresps = fallback.responses || []
+    this._responseLabelEls(cardEl).forEach((el, k) => {
+      el.textContent = (resps[k] && resps[k].trim()) || fresps[k] || el.textContent
     })
     // Pages align by id (not index) — a creator plausibly reorders narrative
     // pages after translating them, unlike options.
@@ -1186,6 +1205,37 @@ export default class extends Controller {
     if (!isQ) return
     if (this.hasPanelOtherTarget)    this.panelOtherTarget.checked    = card.dataset.cardAllowOther === "true"
     if (this.hasPanelRequiredTarget) this.panelRequiredTarget.checked = card.dataset.cardRequired === "true"
+    this._syncResponseScale(card)
+  }
+
+  // The 2-6 scale picker: tap cards only, with the current size marked. Counted
+  // off the rendered strip rather than the stored `responses`, because a card
+  // that has never been re-scaled has no stored set and is still on three.
+  _syncResponseScale(card) {
+    if (!this.hasResponseScaleTarget) return
+    const isTap = card?.dataset.cardType === "tap_card"
+    this.responseScaleTarget.hidden = !isTap
+    if (!isTap) return
+    const count = card.querySelectorAll("[data-tap-response]").length
+    this.responseScaleTarget.querySelectorAll(".response-scale-btn").forEach((btn) => {
+      btn.classList.toggle("is-active", Number(btn.dataset.responseCount) === count)
+      btn.setAttribute("aria-pressed", String(Number(btn.dataset.responseCount) === count))
+    })
+  }
+
+  // Reseed the selected tap card's scale from a preset. Delegated to the card's
+  // own card-editor controller, which owns the strip markup — this panel knows
+  // which card is selected, not how a response is drawn.
+  setResponseScale(event) {
+    const card = this._selectedCard()
+    if (!card) return
+    const count = Number(event.currentTarget.dataset.responseCount)
+    const wrap = card.querySelector("[data-controller~='card-editor']")
+    const editor = wrap && this.application.getControllerForElementAndIdentifier(wrap, "card-editor")
+    if (!editor) return
+    editor.setResponsePreset(count)
+    this._syncResponseScale(card)
+    this.markDirty()
   }
 
   togglePanelOther(event) {
@@ -1462,6 +1512,29 @@ export default class extends Controller {
         }
       } catch (_) { /* ignore malformed */ }
 
+      // tap_card response scale — the 2-6 answers each statement is judged on.
+      // Read off the strip, which is the record (see card_editor#addResponse),
+      // and mirrored back onto the row so a type switch away and back rebuilds
+      // the creator's scale instead of the default three. Only emitted while
+      // the card IS a tap card: `responses` is meaningless on any other type
+      // and the server drops it there anyway.
+      let primResponses = []
+      if (type === "tap_card") {
+        const responses = this._readResponses(card)
+        primResponses = responses.map(r => r.label || "")
+        if (responses.length) {
+          out.responses = responses
+          card.dataset.cardResponses = JSON.stringify(responses)
+        } else {
+          delete card.dataset.cardResponses
+        }
+      } else if (card.dataset.cardResponses) {
+        try {
+          const carried = JSON.parse(card.dataset.cardResponses)
+          if (Array.isArray(carried) && carried.length) out.responses = carried
+        } catch (_) { /* ignore malformed */ }
+      }
+
       // Quiz: a card with a marked correct answer carries `correct` (+ optional
       // `explanation`); leaving it unmarked keeps the card as a measurement Q.
       if (this.quizValue) {
@@ -1544,6 +1617,13 @@ export default class extends Controller {
             return { id: p.id, text: (match && match.text.trim()) || p.text }
           })
         }
+        // Response labels align positionally against the primary scale, exactly
+        // like options — a slot with no translation falls back to the primary
+        // wording, which is what the player renders for it anyway.
+        if (primResponses.length) {
+          const tresp = t.responses || []
+          tEntry.responses = primResponses.map((p, k) => ((tresp[k] || "").trim()) || p)
+        }
         if (Object.keys(tEntry).length) i18n[loc] = tEntry
       })
       if (Object.keys(i18n).length) out.i18n = i18n
@@ -1588,6 +1668,28 @@ export default class extends Controller {
     return wrap ? this._logicScope(wrap) : null
   }
 
+  // A tap card's response scale, read off the strip that renders it. The DOM is
+  // the record here exactly as it is for option rows: a response's style lives
+  // on the element as data-option-* (written by the 🎨 popover), its label is
+  // the contenteditable inside it, and its key never moves — which is the whole
+  // point of the key being separate from the label, since answers already
+  // collected are stored against it.
+  _readResponses(card) {
+    return Array.from(card.querySelectorAll("[data-tap-response]")).flatMap((el) => {
+      const key = (el.dataset.responseKey || "").trim()
+      if (!key) return []
+      const out = { key }
+      const label = el.querySelector("[data-tap-response-label]")?.textContent?.trim()
+      if (label) out.label = label
+      if (el.dataset.responseGlyph) out.glyph = el.dataset.responseGlyph
+      if (el.dataset.optionIcon) out.icon = el.dataset.optionIcon
+      if (el.dataset.optionEmoji) out.emoji = el.dataset.optionEmoji
+      if (el.dataset.optionColor) out.color = el.dataset.optionColor
+      if (el.classList.contains("is-strong")) out.strong = true
+      return [ out ]
+    })
+  }
+
   // The marked correct answer for a card, in the shape QuizGrading expects.
   _readCorrect(card, type) {
     const labelOf = item => {
@@ -1604,10 +1706,16 @@ export default class extends Controller {
         return Array.from(card.querySelectorAll('[data-picker-target="item"][data-correct="true"]'))
                     .map(labelOf).filter(Boolean)
       case "tap_card": {
+        // Any key on this card's scale is a markable answer. It used to be
+        // "yes" or "no" only, which was fine when those were the only answers
+        // worth being right about; on a five-point scale the correct answer is
+        // as likely to be "Strongly agree", and a hardcoded pair would silently
+        // refuse to record it.
+        const keys = new Set(this._readResponses(card).map(r => r.key))
         const map = {}
         this._quizScope(card).querySelectorAll(".quiz-tap-row").forEach(row => {
           const dir = row.dataset.correctDir
-          if (dir === "yes" || dir === "no") map[(row.dataset.statement || "").trim()] = dir
+          if (dir && keys.has(dir)) map[(row.dataset.statement || "").trim()] = dir
         })
         return map
       }

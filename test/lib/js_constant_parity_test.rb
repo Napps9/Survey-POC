@@ -139,6 +139,68 @@ class JsConstantParityTest < ActiveSupport::TestCase
     end
   end
 
+  # A tap card's response strip existed twice the moment it existed at all: the
+  # server partial and the type panel's rebuild. The previous pair had already
+  # drifted — COMPONENTS.tap_card was still emitting a two-button ✕/✓ strip long
+  # after the card had grown a third response and a controls scrim — so a card
+  # rebuilt by a type switch looked nothing like the same card after a reload.
+  test "the response-strip markup is defined once" do
+    # The wrapper's own class is interpolated (it varies with `strong`), so the
+    # markers are the two fixed classes inside it plus the hook the serializer
+    # finds the strip by — between them nothing can build a strip elsewhere.
+    [ %(class="rotate-action-btn"), %(class="rotate-action-label"), "data-tap-response-label>" ].each do |marker|
+      definitions = Dir[Rails.root.join("app/javascript/**/*.js")].select do |path|
+        File.read(path).include?(marker)
+      end.map { |path| path.sub("#{Rails.root}/app/javascript/", "") }
+
+      assert_equal [ "lib/tap_response_templates.js" ], definitions,
+                   "build the response strip via lib/tap_response_templates instead of " \
+                   "re-typing the markup (#{marker}) — the last two copies of it drifted apart"
+    end
+  end
+
+  # The scale itself lives twice: Ruby renders it, the editor rebuilds it. A
+  # drifted key is worse than a drifted label — the key IS the stored answer, so
+  # a strip rebuilt with the wrong one records answers nothing can read back.
+  test "lib/tap_scales.js matches TapScales" do
+    source = js("lib/tap_scales.js")
+    table  = source[/export const TAP_PRESETS = \{(.*?)\n\}/m]
+    assert table, "lib/tap_scales.js no longer exports a TAP_PRESETS table"
+
+    TapScales.preset_counts.each do |count|
+      TapScales.preset(count).each do |entry|
+        assert_includes table, %(key: "#{entry["key"]}"),
+                        "preset #{count} names #{entry["key"]} in Ruby but not in JS"
+      end
+    end
+
+    %w[MIN_TAP_RESPONSES MAX_TAP_RESPONSES DEFAULT_TAP_COUNT TAP_PILL_THRESHOLD].zip(
+      [ TapScales::MIN_RESPONSES, TapScales::MAX_RESPONSES,
+        TapScales::DEFAULT_COUNT, TapScales::PILL_THRESHOLD ]
+    ).each do |name, value|
+      assert_match(/export const #{name} = #{value}\b/, source,
+                   "#{name} disagrees with Ruby, so the editor and the server bound the scale differently")
+    end
+  end
+
+  # The swipe glyphs are inline SVG on both sides (the editor cannot wait for a
+  # round trip to draw a strip). A drifted path is a button with the wrong
+  # artwork on it — or, since they are drawn from a shared fallback, the wrong
+  # answer's artwork.
+  test "the tap glyph paths match ApplicationHelper::TAP_RESPONSE_ICONS" do
+    source = js("lib/tap_response_templates.js")
+    ApplicationHelper::TAP_RESPONSE_ICONS.each do |name, svg|
+      path = svg[/ d="([^"]+)"/, 1]
+      assert_includes source, path, "the #{name} glyph has drifted from the Ruby constant"
+    end
+  end
+
+  test "serialize emits the tap response scale" do
+    assert_match(/out\.responses/, js("controllers/survey_editor_controller.js"),
+                 "serialize() no longer emits responses — every re-scaled tap card " \
+                 "falls back to the default three on the next autosave")
+  end
+
   # Per-option style overrides are serialized for exactly the types the server
   # sanitiser accepts them on — drift in either direction silently loses a
   # creator's colours/icons on the next autosave.

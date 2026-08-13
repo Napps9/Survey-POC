@@ -31,6 +31,21 @@ tr:
     add_option: Seçenek ekle
     new_option: Yeni seçenek
     style_option: Bu yanıtı biçimlendir
+    new_response: "Yeni yanıt"
+    add_response: "Yanıt ekle"
+    remove_response: "Bu yanıtı kaldır"
+    response_scale: "İfade başına yanıt"
+    tap_scale:
+      "no": "Hayır"
+      "yes": "Evet"
+      unsure: "Emin değilim"
+      neutral: "Kararsızım"
+      disagree: "Katılmıyorum"
+      agree: "Katılıyorum"
+      strongly_disagree: "Kesinlikle katılmıyorum"
+      strongly_agree: "Kesinlikle katılıyorum"
+      slightly_disagree: "Kısmen katılmıyorum"
+      slightly_agree: "Kısmen katılıyorum"
     contact_name: "Ad"
     contact_company: "Şirket"
     contact_industry: "Sektör"
@@ -39,7 +54,7 @@ tr:
     contact_email_invalid: "Bu bir e-posta adresine benzemiyor — lütfen kontrol et."
     add_statement: İfade ekle
     swipe_no: "Hayır"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "Emin değilim"
     swipe_hint: cevaplamak için kartı sürükleyin
     swipe_yes: Evet
     reset: Sıfırla

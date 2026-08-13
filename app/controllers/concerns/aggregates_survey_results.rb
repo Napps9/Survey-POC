@@ -15,7 +15,7 @@ module AggregatesSurveyResults
   # Response.new rows) — each_response handles both.
   def aggregate_results(cards, responses)
     types  = cards.map { |card| card["type"].to_s }
-    states = types.map { |type| new_card_state(type) }
+    states = cards.each_with_index.map { |card, i| new_card_state(types[i], card) }
     total  = 0
 
     each_response(responses) do |answers|
@@ -53,8 +53,14 @@ module AggregatesSurveyResults
     end
   end
 
-  def new_card_state(_type)
-    { value_count: 0, other_texts: [], counts: Hash.new(0), texts: [], sum: 0.0 }
+  # A tap card carries its own answer keys into the state, because they are the
+  # only thing that says what an answer to THIS card can be — a five-point scale
+  # and the historic yes/unsure/no are both tap cards, and a tally seeded with
+  # the wrong set drops every answer it has no slot for.
+  def new_card_state(type, card = nil)
+    st = { value_count: 0, other_texts: [], counts: Hash.new(0), texts: [], sum: 0.0 }
+    st[:response_keys] = TapScales.keys_for(card) if type == "tap_card"
+    st
   end
 
   def accumulate_value(st, type, value)
@@ -70,10 +76,13 @@ module AggregatesSurveyResults
       Array(value).each_with_index { |label, i| st[:counts][label.to_s] += (i + 1) }
     when "tap_card"
       if value.is_a?(Hash)
+        keys = st[:response_keys] || TapScales.keys_for(nil)
         value.each do |label, dir|
           # st[:counts] has a 0 default (for the scalar types), so guard on
-          # is_a?(Hash) rather than ||= when nesting per-label yes/no tallies.
-          st[:counts][label] = { "yes" => 0, "no" => 0, "unsure" => 0 } unless st[:counts][label].is_a?(Hash)
+          # is_a?(Hash) rather than ||= when nesting per-statement tallies.
+          # Seeded from the card's own scale so every response shows on the
+          # results page, including the ones nobody picked.
+          st[:counts][label] = keys.index_with { 0 } unless st[:counts][label].is_a?(Hash)
           st[:counts][label][dir.to_s] += 1 if st[:counts][label].key?(dir.to_s)
         end
       end

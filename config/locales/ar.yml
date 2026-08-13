@@ -31,6 +31,21 @@ ar:
     add_option: إضافة خيار
     new_option: خيار جديد
     style_option: تنسيق هذه الإجابة
+    new_response: "إجابة جديدة"
+    add_response: "إضافة إجابة"
+    remove_response: "حذف هذه الإجابة"
+    response_scale: "عدد الإجابات لكل عبارة"
+    tap_scale:
+      "no": "لا"
+      "yes": "نعم"
+      unsure: "غير متأكد"
+      neutral: "محايد"
+      disagree: "غير موافق"
+      agree: "موافق"
+      strongly_disagree: "غير موافق بشدة"
+      strongly_agree: "موافق بشدة"
+      slightly_disagree: "أميل إلى عدم الموافقة"
+      slightly_agree: "أميل إلى الموافقة"
     contact_name: "الاسم"
     contact_company: "الشركة"
     contact_industry: "القطاع"
@@ -39,7 +54,7 @@ ar:
     contact_email_invalid: "هذا لا يبدو كعنوان بريد إلكتروني — يرجى التحقق منه."
     add_statement: إضافة عبارة
     swipe_no: "لا"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "غير متأكد"
     swipe_hint: اسحب البطاقة للإجابة
     swipe_yes: نعم
     reset: إعادة تعيين

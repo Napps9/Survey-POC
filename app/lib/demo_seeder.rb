@@ -489,7 +489,8 @@ class DemoSeeder
       biased_subset(card["options"], card["correct"])
     when "tap_card"
       correct = card["correct"] || {}
-      Array(card["options"]).index_with { |statement| biased_direction(correct[statement]) }
+      scale   = TapScales.keys_for(card)
+      Array(card["options"]).index_with { |statement| biased_direction(correct[statement], scale) }
     when "range", "nps"
       rand(Array(card["options"]).size)
     when "rating"
@@ -511,9 +512,11 @@ class DemoSeeder
     options.sample(rand(1..[ options.size, 3 ].min))
   end
 
-  def biased_direction(correct_dir)
-    return %w[yes no unsure].sample if correct_dir.blank?
-    rand < CORRECT_ANSWER_CHANCE ? correct_dir : (%w[yes no] - [ correct_dir ]).sample
+  # `scale` is the card's own answer keys, so a seeded 5-point card gets 5-point
+  # answers rather than a yes/no/unsure sample its results page has no bar for.
+  def biased_direction(correct_key, scale)
+    return scale.sample if correct_key.blank?
+    rand < CORRECT_ANSWER_CHANCE ? correct_key : ((scale - [ correct_key ]).presence || scale).sample
   end
 
   def open_ended_value(card, region:)

@@ -31,6 +31,21 @@ id:
     add_option: Tambah opsi
     new_option: Opsi baru
     style_option: Gaya jawaban ini
+    new_response: "Jawaban baru"
+    add_response: "Tambah jawaban"
+    remove_response: "Hapus jawaban ini"
+    response_scale: "Jawaban per pernyataan"
+    tap_scale:
+      "no": "Tidak"
+      "yes": "Ya"
+      unsure: "Tidak yakin"
+      neutral: "Netral"
+      disagree: "Tidak setuju"
+      agree: "Setuju"
+      strongly_disagree: "Sangat tidak setuju"
+      strongly_agree: "Sangat setuju"
+      slightly_disagree: "Agak tidak setuju"
+      slightly_agree: "Agak setuju"
     contact_name: "Nama"
     contact_company: "Perusahaan"
     contact_industry: "Industri"
@@ -39,7 +54,7 @@ id:
     contact_email_invalid: "Itu tidak tampak seperti alamat email — mohon periksa."
     add_statement: Tambah pernyataan
     swipe_no: "Tidak"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "Tidak yakin"
     swipe_hint: seret kartu untuk menjawab
     swipe_yes: Ya
     reset: Atur ulang

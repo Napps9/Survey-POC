@@ -12,7 +12,7 @@ require "set"
 # that type (see player_controller.js `_read`):
 #   multiple_choice / yes_no / select_one_grid / scenario → a canonical option label (String)
 #   select_many / select_many_grid             → an array of canonical labels
-#   tap_card                                    → { "statement" => "yes"|"no" }
+#   tap_card                                    → { "statement" => "<response key>" }, any key on the card's scale (TapScales)
 #   range / nps / rating                        → an Integer (step / value / stars)
 #   open_ended                                  → an array of accepted answers
 module QuizGrading
@@ -26,7 +26,7 @@ module QuizGrading
   def graded?(card)
     return false unless card.is_a?(Hash)
     return false unless CardTypes.question?(card["type"])
-    correct_defined?(card["type"].to_s, card["correct"])
+    correct_defined?(card["type"].to_s, card["correct"], card)
   end
 
   # The card indices (positions in the cards array — i.e. the answer keys) that
@@ -41,7 +41,7 @@ module QuizGrading
     return false unless card.is_a?(Hash)
     type    = card["type"].to_s
     correct = card["correct"]
-    return false unless correct_defined?(type, correct)
+    return false unless correct_defined?(type, correct, card)
 
     case type
     when *CHOICE_ONE
@@ -49,7 +49,7 @@ module QuizGrading
     when *CHOICE_MANY
       to_label_set(value) == to_label_set(correct)
     when "tap_card"
-      tap_correct?(correct, value)
+      tap_correct?(correct, value, TapScales.keys_for(card))
     when *SCALES
       return false if blank_value?(value)
       (value.to_i - correct.to_i).abs <= card["correct_tolerance"].to_i
@@ -91,12 +91,13 @@ module QuizGrading
 
   # ── internals ──────────────────────────────────────────────────────────────
 
-  def correct_defined?(type, correct)
+  def correct_defined?(type, correct, card = nil)
     case type
     when *CHOICE_MANY, "open_ended"
       Array(correct).any? { |x| x.to_s.strip != "" }
     when "tap_card"
-      correct.is_a?(Hash) && correct.values.any? { |v| %w[yes no].include?(v.to_s) }
+      scale = TapScales.keys_for(card)
+      correct.is_a?(Hash) && correct.values.any? { |v| scale.include?(v.to_s) }
     when *SCALES
       !blank_value?(correct)
     else
@@ -104,9 +105,14 @@ module QuizGrading
     end
   end
 
-  def tap_correct?(correct, value)
+  # `scale` is the card's own answer keys. It used to be the literal %w[yes no],
+  # which was fine when those were the only answers a statement could be right
+  # about; on a five-point scale the correct answer is as likely to be
+  # "strongly_agree", and a hardcoded pair would grade every such card as
+  # ungraded and quietly drop it out of the score.
+  def tap_correct?(correct, value, scale)
     return false unless correct.is_a?(Hash) && value.is_a?(Hash)
-    keys = correct.keys.select { |k| %w[yes no].include?(correct[k].to_s) }
+    keys = correct.keys.select { |k| scale.include?(correct[k].to_s) }
     keys.any? && keys.all? { |k| value[k].to_s == correct[k].to_s }
   end
 

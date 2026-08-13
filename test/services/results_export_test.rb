@@ -73,7 +73,9 @@ class ResultsExportTest < ActiveSupport::TestCase
     assert_equal "Apple; Cherry", first[META + 1]           # select_many joined
     assert_equal "Good", first[META + 2]                    # range index 3 -> options[3]
     assert_equal "5", first[META + 3]                        # rating
-    assert_equal "Stmt A: yes; Stmt B: no", first[META + 4] # tap_card hash
+    # The response LABEL, not the key it is stored under: "strongly_agree" is
+    # not a thing anyone said, and on a renamed scale it isn't even close.
+    assert_equal "Stmt A: Yes; Stmt B: No", first[META + 4] # tap_card hash
     assert_equal "Left", first[META + 5]                     # scenario, formatted like multiple_choice
     assert_equal "Great job", first[META + 6]
 

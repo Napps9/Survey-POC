@@ -1,0 +1,81 @@
+<%# A tap card's response strip — the 2-6 answers a respondent chooses between,
+    over the bottom scrim of the swipe card.
+
+    Locals:
+      responses — a resolved TapScales.for_card array (ordered most-negative
+        first; each entry carries its key, label, mark, colour and direction)
+      editable  — editor mode: labels become contenteditable and each response
+        gains the 🎨 style popover and a delete button
+
+    The player renders each response as a real <button> with the label inside,
+    so the whole circle-and-caption (or the whole pill) is one target with one
+    accessible name. The editor can't: the label has to hold a caret, and a
+    contenteditable inside a <button> doesn't reliably take one. So it renders
+    the same spans in a <div> that carries the same click action — the identical
+    split _card_component already makes between `pick_actions` and the editable
+    option row, for the identical reason.
+
+    At five responses and up the strip switches from labelled circles to pills
+    (rotate-actions--pills); the DOM is the same either way and CSS does the
+    rest, so a creator adding a fifth response doesn't rebuild anything.
+%>
+<% count = responses.length %>
+<div class="rotate-actions<%= " rotate-actions--pills" if TapScales.pills?(count) %>"
+     data-tap-responses
+     data-response-count="<%= count %>">
+  <% responses.each_with_index do |response, i| %>
+    <%
+      key   = response["key"]
+      label = response["label"].to_s
+      # The response's hue rides in as a custom property so one rule paints the
+      # ring, the pill border and the drag-intent highlight from a single value.
+      style = "--tap-response-color: #{response['color']};" if response["color"].present?
+      classes = [ "rotate-action" ]
+      classes << "is-strong" if response["strong"]
+    %>
+    <% if editable %>
+      <div class="<%= classes.join(" ") %>"
+           style="<%= style %>"
+           data-tap-response
+           data-response-key="<%= key %>"
+           data-response-glyph="<%= response["glyph"] %>"
+           data-action="click->tap-stack#pick"
+           data-tap-stack-key="<%= key %>"
+           data-tap-stack-direction="<%= response["direction"] %>"
+           <%= option_style_data_attrs(response) %>>
+        <span class="rotate-action-btn" aria-hidden="true"><%= tap_response_mark(response, index: i) %></span>
+        <span class="rotate-action-label" contenteditable="true"
+              data-tap-response-label><%= label %></span>
+        <button type="button" class="option-style-btn tap-response-style-btn"
+                data-action="click->option-style#open"
+                title="<%= t("card.style_option") %>">🎨</button>
+        <button type="button" class="tap-response-delete"
+                data-action="click->card-editor#deleteResponse"
+                title="<%= t("card.remove_response", default: "Remove this answer") %>"
+                aria-label="<%= t("card.remove_response", default: "Remove this answer") %>">×</button>
+      </div>
+    <% else %>
+      <button type="button" class="<%= classes.join(" ") %>"
+              style="<%= style %>"
+              data-tap-response
+              data-response-key="<%= key %>"
+              data-action="click->tap-stack#pick"
+              data-tap-stack-key="<%= key %>"
+              data-tap-stack-direction="<%= response["direction"] %>"
+              aria-label="<%= label %>">
+        <span class="rotate-action-btn" aria-hidden="true"><%= tap_response_mark(response, index: i) %></span>
+        <span class="rotate-action-label"><%= label %></span>
+      </button>
+    <% end %>
+  <% end %>
+
+  <%# 2-6: below the floor there is no question left to ask, above it the strip
+      stops fitting a phone card. The button hides itself at the ceiling rather
+      than going dead, so a full scale never offers an add that does nothing. %>
+  <% if editable && count < TapScales::MAX_RESPONSES %>
+    <button type="button" class="tap-response-add"
+            data-action="click->card-editor#addResponse"
+            title="<%= t("card.add_response", default: "Add an answer") %>"
+            aria-label="<%= t("card.add_response", default: "Add an answer") %>">＋</button>
+  <% end %>
+</div>

@@ -132,7 +132,7 @@ class TapCardSwipeTest < ApplicationSystemTestCase
     open_tap_card
     first = top_card_statement
 
-    find(".preview-card.active .rotate-action-no").click
+    find(".preview-card.active [data-response-key='no']").click
     assert_equal "no", results[first], "the tap path must survive the swipe refactor"
   end
 

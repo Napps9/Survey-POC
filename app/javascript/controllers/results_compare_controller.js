@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { NON_QUESTION_TYPES } from "lib/question_types"
 import { t } from "lib/i18n"
+import { presetFor, DEFAULT_TAP_COUNT } from "lib/tap_scales"
 
 // Categorical palette (dataviz skill's validated 8-hue dark-mode set,
 // re-validated against this page's own dark surface #1C2034). Colour is
@@ -340,7 +341,7 @@ export default class extends Controller {
 
         selected.forEach(seg => {
           const agg = this._data.aggregates[seg.id][card.index]
-          const { pct, detail } = this._valueFor(card.type, agg, key)
+          const { pct, detail } = this._valueFor(card, agg, key)
           const item = document.createElement("div")
           item.className = "compare-bar-item"
           item.innerHTML =
@@ -468,11 +469,19 @@ export default class extends Controller {
 
   _sortWeight(type, counts, key) {
     const v = counts[key]
-    if (type === "tap_card") return (v?.yes || 0) + (v?.no || 0) + (v?.unsure || 0)
+    // A tap card's count is a per-statement tally, so its "weight" is how many
+    // people answered that statement at all — every response on the card's
+    // scale, whatever the creator called them, not a hardcoded three.
+    if (type === "tap_card") {
+      return v && typeof v === "object"
+        ? Object.values(v).reduce((n, x) => n + (Number(x) || 0), 0)
+        : 0
+    }
     return Number(v) || 0
   }
 
-  _valueFor(type, agg, key) {
+  _valueFor(card, agg, key) {
+    const type = card.type
     if (!agg) return { pct: 0, detail: "0%" }
     const counts = agg.counts || {}
 
@@ -486,11 +495,21 @@ export default class extends Controller {
     }
 
     if (type === "tap_card") {
-      const dirs = counts[key] || {}
-      const yes = Number(dirs.yes || 0), no = Number(dirs.no || 0), unsure = Number(dirs.unsure || 0)
-      const tot = Math.max(yes + no + unsure, 1)
-      const pct = Math.round((yes / tot) * 100)
-      return { pct, detail: `${pct}% yes (${yes})` }
+      // The bar reads as the share who gave the MOST POSITIVE answer — which
+      // was "yes" when that was the only positive answer there was, and is
+      // "Strongly agree" on a five-point scale. The scale runs most-negative
+      // first (TapScales), so the top end is always its last key.
+      const tallies = counts[key] || {}
+      // The scale rides in on the card (results_compare's payload); an older
+      // deck without one is still on yes/unsure/no, whose top end is "yes".
+      const scale = Array.isArray(card.responses) && card.responses.length
+        ? card.responses
+        : presetFor(DEFAULT_TAP_COUNT)
+      const top = scale[scale.length - 1]
+      const tot = Math.max(Object.values(tallies).reduce((n, x) => n + (Number(x) || 0), 0), 1)
+      const n = Number(tallies[top.key] || 0)
+      const pct = Math.round((n / tot) * 100)
+      return { pct, detail: `${pct}% ${top.label.toLowerCase()} (${n})` }
     }
 
     const grand = Math.max(Object.values(counts).reduce((s, v) => s + Number(v || 0), 0), 1)

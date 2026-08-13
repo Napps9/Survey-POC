@@ -29,6 +29,7 @@
      data-card-pages="<%= Array(card['pages']).to_json %>"
      data-card-option-images="<%= Array(card['option_images']).to_json %>"
      <% if card['option_styles'].present? %>data-card-option-styles="<%= Array(card['option_styles']).to_json %>"<% end %>
+     <% if card['responses'].present? %>data-card-responses="<%= Array(card['responses']).to_json %>"<% end %>
      data-card-recommended-images="<%= AssetPopulator.recommended_paths(@survey, context: :card, card: card).to_json %>"
      <% if card['next'].is_a?(Hash) %>data-card-next="<%= card['next'].to_json %>"<% end %>
      <% if card['lane_label'].present? %>data-card-lane-label="<%= card['lane_label'] %>"<% end %>

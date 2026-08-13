@@ -861,8 +861,12 @@ class SurveysController < ApplicationController
     render json: {
       ok: true,
       cards: cards.map.with_index { |card, idx|
+        # `responses` rides on the card, not on each segment's aggregate: the
+        # scale is a property of the question, and repeating it per segment
+        # would multiply it by however many segments are being compared.
         { index: idx, type: card["type"], text: card["text"], options: card["options"],
-          demographic: card["demographic"].present? }
+          demographic: card["demographic"].present?,
+          responses: (TapScales.for_card(card).map { |r| r.slice("key", "label") } if card["type"].to_s == "tap_card") }.compact
       },
       segments: segments.map { |seg| seg.slice(:id, :label, :count) },
       aggregates: segments.each_with_object({}) { |seg, acc| acc[seg[:id]] = aggregate_results(cards, seg[:scope]) }

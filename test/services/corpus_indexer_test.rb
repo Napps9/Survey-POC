@@ -213,8 +213,13 @@ class CorpusIndexerTest < ActiveSupport::TestCase
 
     cell = index!(survey).corpus_questions.find_by(cid: "c_t").segments.dig("Gender: Female", "distribution")
 
-    assert_equal 40, cell.dig("Cost", "yes")
-    assert_equal 40, cell.dig("Time", "no")
+    # Keyed by the WORDS, not the stored keys — the same rule the range case
+    # above states: a breakdown reading "yes: 40" beside a whole-Verto figure
+    # reading "Yes: 40" is the same number wearing two names. It matters more
+    # now a creator can rename a response, at which point the key stops being
+    # a word anyone chose.
+    assert_equal 40, cell.dig("Cost", "Yes")
+    assert_equal 40, cell.dig("Time", "No")
   end
 
   test "prioritise still gets no breakdown, because a segmented rank sum is worse than none" do

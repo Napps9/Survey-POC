@@ -15,7 +15,7 @@
 # player records for that type (see player_controller.js `_read`):
 #   multiple_choice / yes_no / select_one_grid / scenario → { "<canonical option>" => {token_id => amount} }, matched by the chosen label
 #   select_many / select_many_grid             → same shape, summed across every chosen label
-#   tap_card                                    → { "<statement>" => { "yes"|"no"|"unsure" => {token_id => amount} } }, matched by the chosen swipe direction
+#   tap_card                                    → { "<statement>" => { "<response key>" => {token_id => amount} } }, matched by the response the player chose (TapScales)
 #   range / nps / rating / open_ended / prioritise → a flat `token_award` = {token_id => amount}, earned just for answering
 #
 # Choice-shaped cards (list/grid/yes-no) default to the per-option `tokens`

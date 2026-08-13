@@ -135,7 +135,15 @@ class ResultsExport
       when "range"
         range_label(card, value)
       when "tap_card"
-        value.is_a?(Hash) ? value.map { |label, dir| "#{label}: #{dir}" }.join("; ") : ""
+        # The stored value is a key ("strongly_agree"); the cell says what the
+        # respondent actually saw ("Strongly agree"), falling back to the raw key
+        # for an answer collected on a scale the card no longer carries.
+        if value.is_a?(Hash)
+          labels = TapScales.for_card(card).to_h { |r| [ r["key"], r["label"] ] }
+          value.map { |label, key| "#{label}: #{labels[key.to_s] || key}" }.join("; ")
+        else
+          ""
+        end
       when "contact_form"
         # "Name: …; Company: …" — one readable cell, fields in a fixed order.
         value.is_a?(Hash) ? Survey::CONTACT_FIELDS.filter_map { |f| "#{f.capitalize}: #{value[f]}" if value[f].present? }.join("; ") : ""
@@ -187,14 +195,14 @@ class ResultsExport
             .sort_by { |_l, mean| mean }
             .each_with_index.map { |(label, mean), i| [ "#{i + 1}. #{label}", "avg #{mean.round(2)}", nil ] }
     when "tap_card"
-      counts.flat_map do |label, dirs|
-        yes_c = dirs.is_a?(Hash) ? dirs["yes"].to_i    : 0
-        no_c  = dirs.is_a?(Hash) ? dirs["no"].to_i     : 0
-        uns_c = dirs.is_a?(Hash) ? dirs["unsure"].to_i : 0
-        tot   = yes_c + no_c + uns_c
-        [ [ "#{label} — Yes", yes_c, pct(yes_c, tot) ],
-          [ "#{label} — Unsure", uns_c, pct(uns_c, tot) ],
-          [ "#{label} — No", no_c, pct(no_c, tot) ] ]
+      responses = TapScales.for_card(result[:card])
+      counts.flat_map do |label, tallies|
+        tallies = {} unless tallies.is_a?(Hash)
+        tot = responses.sum { |r| tallies[r["key"]].to_i }
+        responses.map do |r|
+          n = tallies[r["key"]].to_i
+          [ "#{label} — #{r['label']}", n, pct(n, tot) ]
+        end
       end + other_rows(result)
     when "open_ended"
       [ [ "(free-text responses)", Array(result[:texts]).size, nil ] ] + other_rows(result)

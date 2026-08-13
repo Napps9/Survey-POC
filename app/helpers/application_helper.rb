@@ -117,6 +117,27 @@ module ApplicationHelper
     %(<svg class="rotate-action-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">#{path}</svg>).html_safe
   end
 
+  # The mark on one response button, from a TapScales.for_card entry. Same
+  # precedence as option_tile_icon above — a creator's explicit pick beats
+  # anything the scale supplies — with the built-in swipe glyph standing in for
+  # the keyword lookup, because a response is a point on a scale and its artwork
+  # comes from where it sits, not from what it happens to be called.
+  #
+  # TapScales has already decided whether this card shows glyphs or emoji (a
+  # circle wears the glyph, a pill wears the emoji), so this only picks between
+  # what it handed over; nil for the field it didn't fill.
+  def tap_response_mark(response, index: 0)
+    if (svg = OptionIconLibrary.svg_by_id(response["icon"].to_s))
+      svg
+    elsif response["emoji"].present?
+      emoji_tile_span(response["emoji"])
+    elsif response["glyph"].present?
+      tap_response_icon(response["glyph"])
+    else
+      emoji_tile_span(OptionIconLibrary.emoji_for(response["label"], index))
+    end
+  end
+
   def rating_icon(survey)
     signal = %i[theme title key_insight]
              .filter_map { |m| survey.public_send(m) if survey.respond_to?(m) }
@@ -149,6 +170,9 @@ module ApplicationHelper
       "description" => card["description"],
       "options"     => card["options"],
       "pages"       => card["pages"],
+      # A tap card's response labels are translatable content too — just the
+      # words, not the keys, colours or glyphs, which are language-neutral.
+      "responses"   => Array(card["responses"]).map { |r| r.is_a?(Hash) ? r["label"].to_s : "" }.presence,
       # Rich-text layer (primary locale only — translations are plain), so
       # the editor's store starts with the same html the DOM shows.
       "text_html"        => card["text_html"],
@@ -158,7 +182,8 @@ module ApplicationHelper
     if card["i18n"].is_a?(Hash)
       out["i18n"] = card["i18n"].transform_values do |tr|
         tr = tr || {}
-        { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"], "pages" => tr["pages"] }.compact
+        { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"],
+          "pages" => tr["pages"], "responses" => tr["responses"] }.compact
       end
     end
     out.compact

@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
 import { haptic } from "lib/haptics"
+import { presetFor, DEFAULT_TAP_COUNT } from "lib/tap_scales"
 
 const MAP_MIN_SCALE = 1
 const MAP_MAX_SCALE = 8
@@ -1457,12 +1458,18 @@ export default class extends Controller {
       })
       return container
     } else if (row.type === "tap_card") {
-      Object.entries(counts).forEach(([label, yn]) => {
-        const yes = (yn && yn.yes) || 0, no = (yn && yn.no) || 0, unsure = (yn && yn.unsure) || 0
-        const sum = yes + no + unsure || 1
-        entries.push([`${label} — Yes`,    yes,    `${label}:yes`,    sum])
-        entries.push([`${label} — Unsure`, unsure, `${label}:unsure`, sum])
-        entries.push([`${label} — No`,     no,     `${label}:no`,     sum])
+      // One bar per response on the card's own scale, in scale order — the
+      // server sends it alongside the counts (aggregate_rows) because the keys
+      // alone don't say what a creator called them or which order they run in.
+      const scale = Array.isArray(row.responses) && row.responses.length
+        ? row.responses
+        : presetFor(DEFAULT_TAP_COUNT)
+      Object.entries(counts).forEach(([label, tallies]) => {
+        const t = tallies || {}
+        const sum = scale.reduce((n, r) => n + (Number(t[r.key]) || 0), 0) || 1
+        scale.forEach(r => {
+          entries.push([ `${label} — ${r.label}`, Number(t[r.key]) || 0, `${label}:${r.key}`, sum ])
+        })
       })
     } else {
       // Unordered options (multiple choice, yes/no, …) read best as a ranked
@@ -1489,8 +1496,13 @@ export default class extends Controller {
     if (row.type === "range" || row.type === "nps") return Number(mine) === Number(key)
     if (row.type === "rating") return Number(mine) === Number(key)
     if (row.type === "tap_card" && typeof mine === "object" && typeof key === "string") {
-      const [label, choice] = key.split(":")
-      return mine[label] === choice
+      // "<statement>:<response key>". Split on the LAST colon, not the first: a
+      // response key never contains one but a statement very well might ("Cost:
+      // too high"), and splitting from the front would hand back half a
+      // statement and lose the answer.
+      const cut = key.lastIndexOf(":")
+      if (cut < 0) return false
+      return mine[key.slice(0, cut)] === key.slice(cut + 1)
     }
     return String(mine) === String(key)
   }
@@ -1725,13 +1737,13 @@ export default class extends Controller {
     if (correct === null || correct === undefined || correct === "" ||
         (Array.isArray(correct) && correct.length === 0)) return null
     const value = this._answers[card.dataset.cardIndex]?.value
-    return { correct: this._matchCorrect(card.dataset.cardType, value, correct),
+    return { correct: this._matchCorrect(card.dataset.cardType, value, correct, card),
              correctAnswer: correct, explanation: card.dataset.cardExplanation || "", mine: value }
   }
 
   // Client mirror of QuizGrading#correct? — used ONLY for owner preview, where
   // the correct answers are embedded on the page. Live grading is server-side.
-  _matchCorrect(type, value, correct) {
+  _matchCorrect(type, value, correct, card = null) {
     const norm  = v => String(v ?? "").trim()
     const normT = v => norm(v).toLowerCase().replace(/\s+/g, " ")
     switch (type) {
@@ -1744,7 +1756,11 @@ export default class extends Controller {
       }
       case "tap_card": {
         if (typeof value !== "object" || !value || typeof correct !== "object" || !correct) return false
-        const keys = Object.keys(correct).filter(k => correct[k] === "yes" || correct[k] === "no")
+        // Any key on this card's scale is a markable answer — mirrors
+        // QuizGrading#tap_correct?, which used to hardcode yes/no here too and
+        // so graded a five-point card as if it defined no correct answer.
+        const scale = new Set(this._responseKeys(card))
+        const keys = Object.keys(correct).filter(k => scale.has(correct[k]))
         return keys.length > 0 && keys.every(k => value[k] === correct[k])
       }
       case "range": case "nps": case "rating":
@@ -2119,6 +2135,15 @@ export default class extends Controller {
       return sumHashes(Object.entries(value).map(([statement, dir]) => tokens[statement]?.[dir]))
     }
     return {}
+  }
+
+  // A tap card's answer keys, read off the response strip the respondent just
+  // used. The DOM is where the player learns a card's scale — the server renders
+  // the strip and the keys ride on it, so there is nothing extra to ship.
+  _responseKeys(card) {
+    const keys = Array.from(card?.querySelectorAll("[data-tap-response]") || [])
+      .map(el => el.dataset.responseKey).filter(Boolean)
+    return keys.length ? keys : presetFor(DEFAULT_TAP_COUNT).map(r => r.key)
   }
 
   _parseJSON(str, fallback) {

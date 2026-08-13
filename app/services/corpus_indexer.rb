@@ -191,8 +191,16 @@ class CorpusIndexer
     when *COUNT_TYPES
       stringify_counts(result[:counts])
     when "tap_card"
-      # {label => {"yes"=>, "no"=>, "unsure"=>}} — already the right shape.
-      result[:counts].transform_values { |v| v.is_a?(Hash) ? v.transform_values(&:to_i) : v.to_i }
+      # {statement => {response key => count}}, already the right shape — but the
+      # keys are resolved to the words the respondent saw, for the same reason
+      # `range` resolves its indices below: a citation should read "Strongly
+      # agree", not "strongly_agree", and on a relabelled scale the key may not
+      # even be the creator's word for it.
+      labels = TapScales.for_card(card).to_h { |r| [ r["key"], r["label"] ] }
+      result[:counts].transform_values do |v|
+        next v.to_i unless v.is_a?(Hash)
+        v.each_with_object({}) { |(key, n), out| out[labels[key.to_s] || key.to_s] = n.to_i }
+      end
     when "range", "nps"
       # Steps are indices into the card's option labels; resolve them here so a
       # citation reads "Very worried", not "step 3".

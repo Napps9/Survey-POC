@@ -1,0 +1,80 @@
+# Single source of truth for a tap card's RESPONSE scale — the set of answers a
+# respondent chooses between on each swipe statement.
+#
+# Consumed by:
+#   - Ruby: app/lib/tap_scales.rb (used by the card renderer, aggregation,
+#           grading, exports and the AI summaries)
+#   - JS:   app/javascript/lib/tap_scales.js, which reads a JSON blob emitted by
+#           surveys/show.html.erb (from this same YAML)
+#
+# `key` is the STORED ANSWER VALUE. It is deliberately independent of the label,
+# which the creator may rewrite freely: a tap answer is saved as
+# {statement => key}, and `tokens` / `correct` are keyed off it too, so a key
+# that moved with its label would silently re-point every response already
+# collected. Labels are content; keys are identity.
+#
+# `label` is the ENGLISH fallback, and the locale string `card.tap_scale.<key>`
+# overrides it — resolved in the VERTO's language, not the viewer's, because a
+# preset label becomes card content the moment the creator keeps it (the same
+# rule the `defaults:` locale namespace follows). Same shape as
+# Survey::RANGE_DEFAULT_LABELS + I18n.t("defaults.range").
+#
+# Order is meaning: every preset runs MOST NEGATIVE first. That order drives the
+# swipe direction (the left half flings left, the right half flings right, the
+# exact middle of an odd scale flings up) and the order of the bars on the
+# results page, so a reordered preset is a different scale, not a cosmetic
+# change.
+#
+# A response's mark resolves in one order, everywhere: `icon` (the creator's pick
+# from OptionIconLibrary) beats `emoji` beats `glyph`. Each preset therefore
+# carries exactly ONE of the last two — whichever its size renders — so the order
+# never has to be special-cased by count:
+#
+#   2, 3, 4  →  `glyph`, one of ApplicationHelper::TAP_RESPONSE_ICONS: the
+#               thumbs-up / thumbs-down / question SVGs the card has always used,
+#               inside the circles it has always used them in. `strong` fills
+#               that circle instead of outlining it, which is how a 4-point scale
+#               tells "strongly disagree" from "disagree" with no new artwork.
+#   5, 6     →  `emoji`, on a text pill: at five responses the circles no longer
+#               fit across the card, and a 22px thumb can't carry the difference
+#               between "Disagree" and "Strongly disagree" anyway.
+#
+# `glyph` is deliberately not called `icon`: they name ids from two different
+# catalogues, and one field holding both would resolve to the wrong artwork.
+# Setting an emoji on a 2-to-4 response is a supported creator choice — it simply
+# outranks the glyph, which is what editing it is supposed to do.
+#
+# 3 is the historic scale — the only one that existed before response sets were
+# configurable — so its keys are the ones already sitting in production data and
+# must never change. A card with no stored `responses` renders exactly this.
+
+presets:
+  2:
+    - { key: "no",  label: "No",  glyph: "no",  color: "#D80027" }
+    - { key: "yes", label: "Yes", glyph: "yes", color: "#01EACB" }
+
+  3:
+    - { key: "no",     label: "No",     glyph: "no",     color: "#D80027" }
+    - { key: "unsure", label: "Unsure", glyph: "unsure", color: "#F5A623" }
+    - { key: "yes",    label: "Yes",    glyph: "yes",    color: "#01EACB" }
+
+  4:
+    - { key: "strongly_disagree", label: "Strongly disagree", glyph: "no",  strong: true, color: "#D80027" }
+    - { key: "disagree",          label: "Disagree",          glyph: "no",                color: "#F0663F" }
+    - { key: "agree",             label: "Agree",             glyph: "yes",               color: "#4FBF9F" }
+    - { key: "strongly_agree",    label: "Strongly agree",    glyph: "yes", strong: true, color: "#01EACB" }
+
+  5:
+    - { key: "strongly_disagree", label: "Strongly disagree", emoji: "❤️", color: "#D80027" }
+    - { key: "disagree",          label: "Disagree",          emoji: "🙁", color: "#F0663F" }
+    - { key: "neutral",           label: "Neutral",           emoji: "😐", color: "#F5A623" }
+    - { key: "agree",             label: "Agree",             emoji: "🙂", color: "#4FBF9F" }
+    - { key: "strongly_agree",    label: "Strongly agree",    emoji: "💚", color: "#01EACB" }
+
+  6:
+    - { key: "strongly_disagree", label: "Strongly disagree", emoji: "❤️", color: "#D80027" }
+    - { key: "disagree",          label: "Disagree",          emoji: "🙁", color: "#F0663F" }
+    - { key: "slightly_disagree", label: "Slightly disagree", emoji: "😕", color: "#F7B32B" }
+    - { key: "slightly_agree",    label: "Slightly agree",    emoji: "🙂", color: "#9DC66B" }
+    - { key: "agree",             label: "Agree",             emoji: "😊", color: "#4FBF9F" }
+    - { key: "strongly_agree",    label: "Strongly agree",    emoji: "💚", color: "#01EACB" }

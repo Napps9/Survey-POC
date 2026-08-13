@@ -752,8 +752,13 @@ class PlayerController < ApplicationController
         options: row[:card]["options"],
         total:  row[:total],
         counts: row[:counts],
-        avg:    row[:avg]
-      }
+        avg:    row[:avg],
+        # A tap card's counts are keyed by response key; the bars need the words
+        # and the order that go with them, and the client has no other way to
+        # learn a scale the creator wrote. Key + label only — the colours are
+        # already on the card the respondent just answered.
+        responses: (TapScales.for_card(row[:card]).map { |r| r.slice("key", "label") } if row[:type] == "tap_card")
+      }.compact
     end
   end
 

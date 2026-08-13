@@ -31,6 +31,21 @@ nl:
     add_option: Optie toevoegen
     new_option: Nieuwe optie
     style_option: Dit antwoord stylen
+    new_response: "Nieuw antwoord"
+    add_response: "Antwoord toevoegen"
+    remove_response: "Dit antwoord verwijderen"
+    response_scale: "Antwoorden per stelling"
+    tap_scale:
+      "no": "Nee"
+      "yes": "Ja"
+      unsure: "Weet ik niet"
+      neutral: "Neutraal"
+      disagree: "Oneens"
+      agree: "Eens"
+      strongly_disagree: "Helemaal oneens"
+      strongly_agree: "Helemaal eens"
+      slightly_disagree: "Enigszins oneens"
+      slightly_agree: "Enigszins eens"
     contact_name: "Naam"
     contact_company: "Bedrijf"
     contact_industry: "Branche"
@@ -39,7 +54,7 @@ nl:
     contact_email_invalid: "Dat lijkt geen e-mailadres — controleer het even."
     add_statement: Stelling toevoegen
     swipe_no: "Nee"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "Weet ik niet"
     swipe_hint: sleep de kaart om te antwoorden
     swipe_yes: Ja
     reset: Resetten

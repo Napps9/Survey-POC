@@ -612,6 +612,64 @@ class Survey < ApplicationRecord
           c.delete("option_styles")
         end
       end
+
+      # A tap card's RESPONSE SCALE — the 2-6 answers a respondent chooses
+      # between on each swipe statement, ordered most-negative first. Same
+      # allowlist-or-drop shape as option_styles above, with one difference that
+      # matters: `key` is not decoration, it is the value the answer is STORED
+      # as (and what `tokens` and `correct` are keyed off), so it is minted when
+      # missing and de-duplicated within the card exactly like `cid`, rather
+      # than being allowed through as whatever the client sent.
+      #
+      # Anything short of a whole valid scale is dropped rather than half-kept:
+      # TapScales.for_card falls back to the historic 3-point set when the key is
+      # absent, which is a working card, whereas a one-button scale is not.
+      #
+      # Deliberately NOT gated on the card's current type, for the reason
+      # option_images isn't either: a creator who builds a six-point scale, tries
+      # Range to compare and switches back should find their scale, not the
+      # default three. Only tap cards ever read the key, and every field in it is
+      # bounded here whatever type it arrives on, so carrying it costs nothing.
+      if c.key?("responses")
+        seen = Set.new
+        list = Array(c["responses"]).first(TapScales::MAX_RESPONSES).filter_map do |entry|
+          next unless entry.is_a?(Hash)
+          key = entry["key"].to_s.strip.downcase
+          key = "r_#{SecureRandom.hex(4)}" while key.blank? || !key.match?(TapScales::KEY_FORMAT) || seen.include?(key)
+          seen << key
+          out = { "key" => key }
+          label = entry["label"].to_s.strip.first(TapScales::MAX_LABEL)
+          out["label"] = label if label.present?
+          out["glyph"] = entry["glyph"].to_s if TapScales::GLYPHS.include?(entry["glyph"].to_s)
+          out["icon"]  = entry["icon"].to_s  if OptionIconLibrary.valid_id?(entry["icon"].to_s)
+          emoji = entry["emoji"].to_s.strip
+          out["emoji"]  = emoji.first(MAX_TOKEN_ICON) if emoji.present?
+          color = entry["color"].to_s
+          out["color"]  = "#" + color.strip.delete_prefix("#").downcase if BrandPalette.valid_hex?(color)
+          out["strong"] = true if entry["strong"]
+          out
+        end
+        if list.length >= TapScales::MIN_RESPONSES
+          c["responses"] = list
+        else
+          c.delete("responses")
+        end
+      end
+      # Translated response labels align POSITIONALLY, exactly like `options`, so
+      # a resized scale has to resize its translations too — otherwise locale N
+      # shows response 4's words on response 5. A translation that comes up short
+      # falls back to the primary label, which is what the player renders anyway.
+      if c["i18n"].is_a?(Hash)
+        size = Array(c["responses"]).length
+        c["i18n"] = c["i18n"].transform_values do |tr|
+          next tr unless tr.is_a?(Hash) && tr.key?("responses")
+          next tr.except("responses") if size.zero?
+          labels = Array(tr["responses"]).first(size)
+                                         .map { |l| l.to_s.strip.first(TapScales::MAX_LABEL) }
+          labels += [ "" ] * (size - labels.length) if labels.length < size
+          tr.merge("responses" => labels)
+        end
+      end
       # A range card's slider orientation — "auto" (heuristic decides at
       # render time) or an explicit creator override, and only on a range
       # card. Same allowlist-or-drop shape as range_theme above.

@@ -31,6 +31,21 @@ sw:
     add_option: Ongeza chaguo
     new_option: Chaguo jipya
     style_option: Panga mtindo wa jibu hili
+    new_response: "Jibu jipya"
+    add_response: "Ongeza jibu"
+    remove_response: "Ondoa jibu hili"
+    response_scale: "Majibu kwa kila kauli"
+    tap_scale:
+      "no": "Hapana"
+      "yes": "Ndiyo"
+      unsure: "Sina uhakika"
+      neutral: "Sina upande"
+      disagree: "Sikubaliani"
+      agree: "Nakubaliana"
+      strongly_disagree: "Sikubaliani kabisa"
+      strongly_agree: "Nakubaliana kabisa"
+      slightly_disagree: "Sikubaliani kiasi"
+      slightly_agree: "Nakubaliana kiasi"
     contact_name: "Jina"
     contact_company: "Kampuni"
     contact_industry: "Sekta"
@@ -39,7 +54,7 @@ sw:
     contact_email_invalid: "Hiyo haionekani kama anwani ya barua pepe — tafadhali angalia."
     add_statement: Ongeza kauli
     swipe_no: "Hapana"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "Sina uhakika"
     swipe_hint: buruta kadi ili kujibu
     swipe_yes: Ndiyo
     reset: Weka upya

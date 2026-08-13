@@ -82,7 +82,7 @@
           <%# tap_card drops whole statements, not individual answers, so the
               note has to say which — "top 12 answers" would be wrong there. %>
           <% if result[:type].to_s == "tap_card" %>
-            Showing the first <%= ReportChartRows::MAX_ROWS / 3 %> statements — the rest are in the CSV export.
+            Showing the first <%= ReportChartRows.statement_budget(result) %> statements — the rest are in the CSV export.
           <% else %>
             Showing the top <%= ReportChartRows::MAX_ROWS %> answers — the full list is in the CSV export.
           <% end %>

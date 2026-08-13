@@ -1,9 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
+import { indexForDirection } from "lib/tap_scales"
 
 // Card-stack widget. Each card is a tap-stack#card target.
-// Choice buttons carry data-tap-stack-direction="left|up|right".
-// On click, the top card animates off-screen in that direction and the
-// next card surfaces.
+//
+// The response strip is 2-6 answers wide (TapScales). Each carries the value it
+// stores as data-tap-stack-key and the way the card should fly as
+// data-tap-stack-direction, both resolved server-side from the card's scale — so
+// this controller never has to know what a scale contains, only what the button
+// it was handed says. On click, the top card animates off-screen in that
+// direction and the next card surfaces.
 export default class extends Controller {
   static targets = ["card", "counter", "dots", "controls"]
 
@@ -12,28 +17,31 @@ export default class extends Controller {
     this.swipeResults = {}
     // In form mode the deck loses its swipe-off animation — the card just snaps
     // to the next one — so it reads as a plain question, not a game (the answer
-    // is captured from the Yes/Unsure/No buttons either way).
+    // is captured from the response buttons either way).
     this.formsMode = !!this.element.closest(".forms-mode")
     this.layout()
   }
 
   pick(event) {
     if (event.target.isContentEditable) return
+    if (event.target.closest(".option-style-btn, .tap-response-delete, .tap-response-add")) return
     event.stopPropagation() // don't also select/apply the type underneath
-    this._commit(event.currentTarget.dataset.tapStackDirection || "right")
+    const el = event.currentTarget
+    this._commit(el.dataset.tapStackKey, el.dataset.tapStackDirection || "right")
   }
 
   // Shared answer path for the buttons and the drag: record the result, throw
   // the top card off in `dir`, surface the next one.
-  _commit(dir) {
+  _commit(key, dir) {
     const top = this.cardTargets[this.position]
-    if (!top) return
+    if (!top || !key) return
     // Key by the canonical (primary-language) label so tap results aggregate
     // across languages; fall back to the visible text for legacy markup.
     const label = top.dataset.canonical?.trim()
+                  || top.querySelector(".rotate-card-statement span")?.textContent?.trim()
                   || top.querySelector("span")?.textContent?.trim()
                   || `Card ${this.position + 1}`
-    this.swipeResults[label] = dir === "right" ? "yes" : dir === "up" ? "unsure" : "no"
+    this.swipeResults[label] = key
     this.element.dataset.swipeResults = JSON.stringify(this.swipeResults)
     const tx = dir === "left" ? "-120%" : dir === "right" ? "120%" : "0"
     const ty = dir === "up"   ? "-120%" : "0"
@@ -46,6 +54,22 @@ export default class extends Controller {
     if (this.position >= this.cardTargets.length) {
       this.dispatch("complete", { detail: { results: this.swipeResults } })
     }
+  }
+
+  // The response buttons, in scale order (most-negative first).
+  get _responses() {
+    return Array.from(this.element.querySelectorAll("[data-tap-response]"))
+  }
+
+  // Which response a fling in `dir` commits. A drag can only ever express three
+  // intents, so on a wider scale it commits the most extreme answer on that side
+  // — tapping is how a respondent picks the ones in between. null when the
+  // gesture has no answer to give (a fling upward on an even scale), and the
+  // card snaps back rather than guessing.
+  _responseForDirection(dir) {
+    const list = this._responses
+    const i = indexForDirection(dir, list.length)
+    return i === null ? null : list[i]
   }
 
   // ── Pointer drag — the swipe the copy has promised all along ──────────
@@ -90,15 +114,22 @@ export default class extends Controller {
     // exits at, so a committed release continues the arc it started.
     const rot = Math.max(-15, Math.min(15, dx * 0.08))
     this.dragCard.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`
-    // Light up the button the release would press.
-    if (this.hasControlsTarget) {
-      this.controlsTarget.dataset.intent = this._dragIntent(dx, dy) || ""
-    }
+    // Light up the button the release would press. The strip is keyed off the
+    // response itself rather than a direction class, because on a 4-or-6 point
+    // scale two responses share a direction and only one of them — the extreme
+    // — is the one a release would commit.
+    this._markIntent(this._dragIntent(dx, dy))
   }
 
-  // Which answer a release at (dx, dy) means, or null for "not far enough".
-  // Horizontal beats vertical unless the pull is clearly upward — Unsure is
-  // deliberately the hardest gesture to hit by accident.
+  _markIntent(dir) {
+    if (this.hasControlsTarget) this.controlsTarget.dataset.intent = dir || ""
+    const wanted = dir ? this._responseForDirection(dir) : null
+    this._responses.forEach((el) => el.classList.toggle("is-intent", el === wanted))
+  }
+
+  // Which direction a release at (dx, dy) means, or null for "not far enough".
+  // Horizontal beats vertical unless the pull is clearly upward — the middle
+  // answer is deliberately the hardest gesture to hit by accident.
   _dragIntent(dx, dy) {
     if (dy <= -Math.max(64, this.dragH * 0.22) && Math.abs(dy) > Math.abs(dx)) return "up"
     if (dx >=  Math.max(72, this.dragW * 0.30)) return "right"
@@ -118,8 +149,13 @@ export default class extends Controller {
       dir = dx > 0 ? "right" : "left"
     }
     this._dragTeardown()
-    if (dir) {
-      this._commit(dir) // sets its own transition; animates on from the dragged pose
+    // A fling upward on an even scale has no middle answer to land on, so it is
+    // no answer at all — the card snaps back rather than being rounded to a
+    // neighbour the respondent didn't choose.
+    const target = dir ? this._responseForDirection(dir) : null
+    if (target) {
+      // sets its own transition; animates on from the dragged pose
+      this._commit(target.dataset.tapStackKey, target.dataset.tapStackDirection || dir)
     } else {
       this.layout() // snap back to the resting stack transform
     }
@@ -136,6 +172,7 @@ export default class extends Controller {
   _dragTeardown() {
     this.dragCard = null
     if (this.hasControlsTarget) delete this.controlsTarget.dataset.intent
+    this._responses.forEach((el) => el.classList.remove("is-intent"))
     window.removeEventListener("pointermove",   this._onDragMove)
     window.removeEventListener("pointerup",     this._onDragUp)
     window.removeEventListener("pointercancel", this._onDragCancel)

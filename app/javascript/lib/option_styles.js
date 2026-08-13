@@ -6,6 +6,7 @@
 // the rows back, so DOM order IS the positional alignment with `options`.
 import { lighten } from "lib/brand_palette"
 import { iconInto, iconIntoById, emojiInto } from "lib/option_icons"
+import { tapGlyphSvg } from "lib/tap_response_templates"
 
 // Same gradient shape as the stock choice-bg-N classes, from the picked hex.
 export function tileStyle(style) {
@@ -37,10 +38,50 @@ function keywordFallback(li) {
   return !(li.classList.contains("prioritise-item") || li.closest(".choice-list--yesno"))
 }
 
+// A tap card's response wears its style differently from an option row: the
+// colour is the ring (or the pill border) rather than a tile gradient, and the
+// mark sits inside the button. It arrives here because it carries the same
+// data-option-* attributes and shares the 🎨 popover — see
+// option_style_controller#open — so this is where the two shapes part.
+function repaintTapResponse(el, style) {
+  const slot = el.querySelector(".rotate-action-btn")
+  if (!slot) return
+  if (style?.color) {
+    el.style.setProperty("--tap-response-color", style.color)
+  } else {
+    el.style.removeProperty("--tap-response-color")
+  }
+  slot.querySelectorAll("svg, img, .choice-icon-emoji").forEach((n) => n.remove())
+  if (style?.icon) {
+    iconIntoById(slot, style.icon)
+  } else if (style?.emoji) {
+    const span = document.createElement("span")
+    span.className = "choice-icon-emoji"
+    span.setAttribute("aria-hidden", "true")
+    span.textContent = style.emoji
+    slot.appendChild(span)
+  } else {
+    // Nothing explicit left — fall back to the scale's own glyph, which is what
+    // the server does (ApplicationHelper#tap_response_mark), so a cleared style
+    // returns the response to the artwork its preset gave it rather than to a
+    // keyword guess at its label.
+    const glyph = el.dataset.responseGlyph
+    if (glyph) {
+      slot.insertAdjacentHTML("afterbegin", tapGlyphSvg(glyph))
+    } else {
+      const label = el.querySelector("[data-tap-response-label]")?.textContent
+      const index = [ ...(el.parentElement?.children || []) ].indexOf(el)
+      emojiInto(slot, label, index)
+    }
+  }
+}
+
 // Repaint one option row to match a style (or its absence): tile background,
 // then the icon slot with the same precedence as the server — explicit icon,
 // emoji, keyword match, nothing.
 export function repaintRow(li, style) {
+  if (li.matches?.("[data-tap-response]")) return repaintTapResponse(li, style)
+
   const tile = li.querySelector(".choice-list-tile, .choice-card-bg")
   if (!tile) return
   tile.style.background = style?.color

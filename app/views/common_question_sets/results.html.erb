@@ -150,23 +150,12 @@
                   <% end %>
                 </div>
 
+              <%# Was a hand-rolled yes/no split that left Unsure out of both the
+                  bar AND the denominator, so a statement 40% of people were
+                  unsure about reported as a straight majority. The shared
+                  partial counts every response on the card's scale. %>
               <% elsif type == "tap_card" %>
-                <% counts = result[:counts] || {} %>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <% counts.each do |statement, dist| %>
-                    <% yes = dist["yes"].to_i; no = dist["no"].to_i; total = yes + no; yes_pct = total.positive? ? ((yes.to_f / total) * 100).round : 0 %>
-                    <div>
-                      <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#111;margin-bottom:3px;"><%= statement %></div>
-                      <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;">
-                        <div style="background:#01EACB;width:<%= yes_pct %>%;"></div>
-                        <div style="background:rgba(255,30,111,0.5);width:<%= 100 - yes_pct %>%;"></div>
-                      </div>
-                      <div style="display:flex;justify-content:space-between;font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(0,0,0,0.45);margin-top:3px;">
-                        <span>Yes <%= yes %> (<%= yes_pct %>%)</span><span>No <%= no %> (<%= 100 - yes_pct %>%)</span>
-                      </div>
-                    </div>
-                  <% end %>
-                </div>
+                <%= render "shared/tap_result_bars", result: result %>
 
               <% elsif type == "open_ended" %>
                 <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#111;line-height:1.5;">

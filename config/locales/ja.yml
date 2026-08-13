@@ -31,6 +31,21 @@ ja:
     add_option: 選択肢を追加
     new_option: 新しい選択肢
     style_option: この選択肢のスタイル
+    new_response: "新しい回答"
+    add_response: "回答を追加"
+    remove_response: "この回答を削除"
+    response_scale: "1文あたりの回答数"
+    tap_scale:
+      "no": "いいえ"
+      "yes": "はい"
+      unsure: "わからない"
+      neutral: "どちらとも言えない"
+      disagree: "そう思わない"
+      agree: "そう思う"
+      strongly_disagree: "全くそう思わない"
+      strongly_agree: "強くそう思う"
+      slightly_disagree: "どちらかといえばそう思わない"
+      slightly_agree: "どちらかといえばそう思う"
     contact_name: "名前"
     contact_company: "会社"
     contact_industry: "業種"
@@ -39,7 +54,7 @@ ja:
     contact_email_invalid: "メールアドレスの形式が正しくないようです — ご確認ください。"
     add_statement: ステートメントを追加
     swipe_no: "いいえ"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "わからない"
     swipe_hint: カードをドラッグして回答
     swipe_yes: はい
     reset: リセット

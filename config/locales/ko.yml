@@ -31,6 +31,21 @@ ko:
     add_option: 옵션 추가
     new_option: 새 옵션
     style_option: 이 답변 스타일
+    new_response: "새 답변"
+    add_response: "답변 추가"
+    remove_response: "이 답변 삭제"
+    response_scale: "문항당 답변 수"
+    tap_scale:
+      "no": "아니요"
+      "yes": "예"
+      unsure: "잘 모르겠다"
+      neutral: "보통이다"
+      disagree: "동의하지 않는다"
+      agree: "동의한다"
+      strongly_disagree: "전혀 동의하지 않는다"
+      strongly_agree: "매우 동의한다"
+      slightly_disagree: "약간 동의하지 않는다"
+      slightly_agree: "약간 동의한다"
     contact_name: "이름"
     contact_company: "회사"
     contact_industry: "업종"
@@ -39,7 +54,7 @@ ko:
     contact_email_invalid: "이메일 주소 형식이 아닌 것 같습니다 — 확인해 주세요."
     add_statement: 문장 추가
     swipe_no: "아니요"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "잘 모르겠다"
     swipe_hint: 카드를 끌어 답변하세요
     swipe_yes: 예
     reset: 초기화

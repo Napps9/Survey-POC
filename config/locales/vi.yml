@@ -31,6 +31,21 @@ vi:
     add_option: Thêm tùy chọn
     new_option: Tùy chọn mới
     style_option: Tùy chỉnh câu trả lời này
+    new_response: "Câu trả lời mới"
+    add_response: "Thêm câu trả lời"
+    remove_response: "Xóa câu trả lời này"
+    response_scale: "Số câu trả lời mỗi phát biểu"
+    tap_scale:
+      "no": "Không"
+      "yes": "Có"
+      unsure: "Không chắc"
+      neutral: "Trung lập"
+      disagree: "Không đồng ý"
+      agree: "Đồng ý"
+      strongly_disagree: "Hoàn toàn không đồng ý"
+      strongly_agree: "Hoàn toàn đồng ý"
+      slightly_disagree: "Hơi không đồng ý"
+      slightly_agree: "Hơi đồng ý"
     contact_name: "Họ tên"
     contact_company: "Công ty"
     contact_industry: "Ngành"
@@ -39,7 +54,7 @@ vi:
     contact_email_invalid: "Đó có vẻ không phải là địa chỉ email — vui lòng kiểm tra lại."
     add_statement: Thêm phát biểu
     swipe_no: "Không"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "Không chắc"
     swipe_hint: kéo thẻ để trả lời
     swipe_yes: Có
     reset: Đặt lại

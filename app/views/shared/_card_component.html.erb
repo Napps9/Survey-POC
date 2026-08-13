@@ -126,6 +126,14 @@
   # blob emitted in surveys/show.html.erb.
   eyebrow = t("card.eyebrow.#{type}", locale: display_locale,
               default: CardTypes.eyebrow(type).presence || type.tr("_", " "))
+
+  # A tap card's response scale — the 2-6 answers each statement is judged on,
+  # resolved for the language this card is being shown in. Computed up here
+  # rather than inside the tap_card branch because the quiz and tokenisation
+  # blocks further down need it too, and they are a long way from that branch.
+  # Empty on every other type, so those blocks simply render nothing.
+  tap_responses = type == "tap_card" ?
+    TapScales.for_card(card, locale: locale, default_locale: default_locale) : []
 %>
 
 <div class="split-right<%= ' split-right--book' if Survey::PAGED_TYPES.include?(type) %>">
@@ -356,33 +364,13 @@
             <span class="rotate-complete-text"><%= t("card.tap_done") %></span>
           </div>
 
-          <%# Controls live INSIDE the card: three responses (No swipe-left,
-              Unsure swipe-up off the top, Yes swipe-right) over a bottom scrim,
-              and the remaining-cards dots. The controller builds the dots. %>
+          <%# Controls live INSIDE the card: the response strip over a bottom
+              scrim, and the remaining-cards dots. The strip is 2-6 answers wide
+              (TapScales) — a card with no stored `responses` gets the historic
+              No / Unsure / Yes, which is why every deck predating configurable
+              scales renders unchanged. The controller builds the dots. %>
           <div class="rotate-card-controls" data-tap-stack-target="controls">
-            <div class="rotate-actions rotate-actions-3">
-              <div class="rotate-action">
-                <button type="button" class="rotate-action-btn rotate-action-no"
-                        data-action="click->tap-stack#pick"
-                        data-tap-stack-direction="left"
-                        aria-label="<%= t("card.swipe_no") %>"><%= tap_response_icon("no") %></button>
-                <span class="rotate-action-label"><%= t("card.swipe_no") %></span>
-              </div>
-              <div class="rotate-action">
-                <button type="button" class="rotate-action-btn rotate-action-unsure"
-                        data-action="click->tap-stack#pick"
-                        data-tap-stack-direction="up"
-                        aria-label="<%= t("card.swipe_unsure", default: "Unsure") %>"><%= tap_response_icon("unsure") %></button>
-                <span class="rotate-action-label"><%= t("card.swipe_unsure", default: "Unsure") %></span>
-              </div>
-              <div class="rotate-action">
-                <button type="button" class="rotate-action-btn rotate-action-yes"
-                        data-action="click->tap-stack#pick"
-                        data-tap-stack-direction="right"
-                        aria-label="<%= t("card.swipe_yes") %>"><%= tap_response_icon("yes") %></button>
-                <span class="rotate-action-label"><%= t("card.swipe_yes") %></span>
-              </div>
-            </div>
+            <%= render "shared/tap_responses", responses: tap_responses, editable: editable %>
             <div class="rotate-dots" data-tap-stack-target="dots"></div>
           </div>
         </div>
@@ -882,14 +870,22 @@
 
       <% case type
          when "tap_card" %>
+        <%# One button per response, not the old fixed ✕/✓ pair: on a five-point
+            scale "correct" may well be "Strongly agree", which a yes/no toggle
+            has no way to say. %>
         <% Array(display["options"]).each_with_index do |opt, i| %>
           <% dir = correct_map[canon[i]].to_s %>
           <div class="quiz-tap-row" data-statement="<%= canon[i] %>" data-correct-dir="<%= dir %>">
             <span class="quiz-tap-label"><%= opt %></span>
-            <button type="button" class="quiz-tap-btn no<%= ' is-on' if dir == 'no' %>"
-                    data-dir="no" data-action="click->survey-editor#toggleTapCorrect">✕</button>
-            <button type="button" class="quiz-tap-btn yes<%= ' is-on' if dir == 'yes' %>"
-                    data-dir="yes" data-action="click->survey-editor#toggleTapCorrect">✓</button>
+            <% tap_responses.each do |response| %>
+              <button type="button"
+                      class="quiz-tap-btn<%= ' is-on' if dir == response["key"] %>"
+                      style="--tap-response-color: <%= response["color"] %>;"
+                      data-dir="<%= response["key"] %>"
+                      title="<%= response["label"] %>"
+                      aria-label="<%= response["label"] %>"
+                      data-action="click->survey-editor#toggleTapCorrect"><%= tap_response_mark(response, index: i) %></button>
+            <% end %>
           </div>
         <% end %>
 
@@ -950,16 +946,19 @@
         </label>
 
         <% if type == "tap_card" %>
+          <%# One column of amounts per response on this card's scale, not the
+              fixed yes/unsure/no three — a six-point scale awards on six. %>
           <% Array(display["options"]).each_with_index do |opt, i| %>
             <div class="token-tap-row" data-statement="<%= canon[i] %>">
               <span class="token-award-label"><%= opt %></span>
-              <% %w[yes unsure no].each do |dir| %>
+              <% tap_responses.each do |response| %>
+                <% dir = response["key"] %>
                 <div class="token-inputs" data-direction="<%= dir %>">
                   <% token_types.each do |tt| %>
                     <input type="number" class="token-amount-input"
                            data-token-statement="<%= canon[i] %>" data-token-direction="<%= dir %>" data-token-id="<%= tt['id'] %>"
                            value="<%= tokens_map.dig(canon[i], dir, tt['id']) || 0 %>"
-                           title="<%= "#{tt['name']} — #{dir}" %>"
+                           title="<%= "#{tt['name']} — #{response['label']}" %>"
                            data-action="input->survey-editor#markDirty" />
                   <% end %>
                 </div>

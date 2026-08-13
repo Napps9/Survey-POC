@@ -2282,17 +2282,38 @@
 }
 .rotate-reset-btn:hover { color: var(--brand-primary, #01EACB); }
 
-.rotate-actions { display: flex; gap: 24px; margin-top: 4px; align-items: flex-start; }
-/* Three labelled responses: No / Unsure / Yes. */
-.rotate-actions-3 { gap: 28px; }
-.rotate-action { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+/* ── The response strip — 2 to 6 answers (TapScales) ──────────────────────
+   Two shapes, one DOM (see shared/_tap_responses.html.erb): up to four
+   responses are labelled circles, the look the card has always had; five and
+   six become text-and-emoji pills, because four 48px circles already fill the
+   width of a 320px card and "Strongly disagree" will not fit under a fifth.
+   Each response carries its own hue as --tap-response-color, so one rule
+   paints the ring, the pill border and the drag highlight. */
+.rotate-actions {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 24px; margin-top: 4px; align-items: flex-start;
+}
+/* The circles have to clear the scrim's usable width — 292px on the desktop
+   card, 276px on .phone-bottom — so the gap closes as the scale grows. */
+.rotate-actions[data-response-count="2"] { gap: 32px; }
+.rotate-actions[data-response-count="3"] { gap: 28px; }
+.rotate-actions[data-response-count="4"] { gap: 14px; }
+.rotate-action {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  /* It's a <button> in the player and a <div> in the editor; neither should
+     bring a button's chrome, and both are the whole click target. */
+  appearance: none; background: none; border: 0; padding: 0; margin: 0;
+  font: inherit; color: inherit; text-align: center; cursor: pointer;
+  position: relative;
+}
 .rotate-action-label {
   font-family: "Alata", sans-serif; font-size: 11px; color: rgba(0,0,0,0.55);
 }
 .rotate-action-btn {
   width: 48px; height: 48px;
   border-radius: 50%;
-  border: 2px solid;
+  border: 2px solid var(--tap-response-color, #F5A623);
+  color: var(--tap-response-color, #F5A623);
   background: white;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -2300,19 +2321,91 @@
   font-size: 18px; font-weight: 700;
   transition: transform 0.12s;
 }
-.rotate-action-btn:hover { transform: scale(1.1); }
-/* Mid-drag, the button the release would press swells (tap-stack#_dragMove
-   writes the live direction onto the controls as data-intent). */
-.rotate-card-controls[data-intent="left"]  .rotate-action-no,
-.rotate-card-controls[data-intent="up"]    .rotate-action-unsure,
-.rotate-card-controls[data-intent="right"] .rotate-action-yes { transform: scale(1.15); }
-/* Inline SVG response icons (see ApplicationHelper#tap_response_icon) — sized
+.rotate-action:hover .rotate-action-btn { transform: scale(1.1); }
+/* A four-point scale has no middle, so "strongly" is carried by weight rather
+   than by a glyph that doesn't exist: the extremes fill their ring instead of
+   outlining it. Same artwork, read louder. */
+.rotate-action.is-strong .rotate-action-btn {
+  background: var(--tap-response-color, #F5A623);
+  color: #fff;
+}
+/* Mid-drag, the response the release would commit swells. Keyed off the
+   response element (tap-stack#_markIntent) rather than a direction class,
+   because on a 4- or 6-point scale two answers share a direction and only the
+   extreme one is what a fling actually lands on. */
+.rotate-action.is-intent .rotate-action-btn { transform: scale(1.15); }
+/* Inline SVG response icons (see ApplicationHelper#tap_response_mark) — sized
    to the circular button and tinted by the button's currentColor. */
 .rotate-action-icon { display: block; width: 22px; height: 22px; }
 .phone-bottom .rotate-action-icon { width: 19px; height: 19px; }
-.rotate-action-no     { border-color: var(--color-red);        color: var(--color-red); }
-.rotate-action-unsure { border-color: #F5A623;                color: #F5A623; }
-.rotate-action-yes    { border-color: var(--brand-primary, var(--color-green-500));  color: var(--brand-primary, var(--color-green-500)); }
+.rotate-action .choice-icon-emoji { font-size: 20px; line-height: 1; }
+
+/* Pills: five or six responses, where the label has to carry the meaning and
+   the emoji is the accent rather than the whole mark. They wrap to a second
+   row inside the scrim, which is what makes six fit a phone at all. */
+.rotate-actions--pills { gap: 6px; }
+.rotate-actions--pills .rotate-action {
+  flex-direction: row; gap: 5px;
+  background: #fff;
+  border: 1.5px solid var(--tap-response-color, #F5A623);
+  border-radius: 999px;
+  padding: 4px 10px 4px 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+  transition: transform 0.12s;
+}
+.rotate-actions--pills .rotate-action-btn {
+  width: auto; height: auto;
+  border: 0; border-radius: 0; background: none; box-shadow: none;
+  padding: 0;
+}
+.rotate-actions--pills .rotate-action.is-strong .rotate-action-btn {
+  background: none; color: var(--tap-response-color, #F5A623);
+}
+.rotate-actions--pills .rotate-action.is-strong { border-width: 2.5px; }
+.rotate-actions--pills .rotate-action-label {
+  font-size: 11px; color: #1C2034; line-height: 1.15;
+}
+.rotate-actions--pills .rotate-action .choice-icon-emoji { font-size: 14px; }
+.rotate-actions--pills .rotate-action:hover { transform: scale(1.06); }
+.rotate-actions--pills .rotate-action:hover .rotate-action-btn { transform: none; }
+.rotate-actions--pills .rotate-action.is-intent { transform: scale(1.12); }
+.rotate-actions--pills .rotate-action.is-intent .rotate-action-btn { transform: none; }
+.phone-bottom .rotate-actions--pills .rotate-action { padding: 3px 8px 3px 7px; }
+.phone-bottom .rotate-actions--pills .rotate-action-label { font-size: 10px; }
+
+/* ── Editor-only response chrome ──────────────────────────────────────────
+   The 🎨 popover and the × sit on the response itself, exactly as they do on a
+   choice option row, so a creator styles an answer where they read it. Both
+   stay out of the way until the strip is hovered — six responses each wearing
+   two permanent buttons is a control panel, not a card. */
+.tap-response-style-btn, .tap-response-delete {
+  position: absolute; top: -7px;
+  width: 17px; height: 17px; padding: 0;
+  border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; line-height: 1;
+  opacity: 0; transition: opacity 0.15s;
+}
+.tap-response-style-btn { right: -6px; background: rgba(255,255,255,0.92); }
+.tap-response-delete    { left: -6px; background: var(--color-red, #D80027); color: #fff; font-size: 12px; }
+.rotate-actions:hover .tap-response-style-btn,
+.rotate-actions:hover .tap-response-delete { opacity: 1; }
+/* Two is the floor — below it there is no question left to ask — so the × goes
+   away rather than going dead, the mirror of how ＋ leaves at six. */
+.rotate-actions[data-response-count="2"] .tap-response-delete { display: none; }
+.rotate-action-label[contenteditable]:focus {
+  outline: 2px solid rgba(1,234,203,0.8); outline-offset: 2px; border-radius: 4px;
+}
+.tap-response-add {
+  width: 34px; height: 34px; align-self: center;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.14);
+  color: #fff; font-size: 15px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.tap-response-add:hover { background: rgba(255,255,255,0.28); border-color: #fff; }
 .swipe-indicator {
   display: flex; gap: 8px; align-items: center; justify-content: center;
   font-family: "ABeeZee", sans-serif;
@@ -2619,6 +2712,24 @@
 }
 .card-flag input:checked + .card-flag-track { background: #FF1E6F; }
 .card-flag input:checked + .card-flag-track::after { transform: translateX(16px); }
+
+/* How many answers a tap card's statements are judged on (2-6). A shortcut to
+   the presets — the strip on the card is where a set is built by hand. */
+.card-flag-scale { display: flex; flex-direction: column; gap: 7px; }
+.card-flag-scale[hidden] { display: none; }
+.response-scale-picker { display: flex; gap: 5px; }
+.response-scale-btn {
+  flex: 1; padding: 5px 0; border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.75);
+  font-family: "Alata", sans-serif; font-size: 13px; cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.response-scale-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.response-scale-btn.is-active {
+  background: #01EACB; border-color: #01EACB; color: #1C2034;
+}
 .card-flag input:focus-visible + .card-flag-track { outline: 2px solid #01EACB; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   .card-flag-track, .card-flag-track::after { transition: none; }
@@ -7934,15 +8045,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .quiz-correct-textarea { resize: vertical; line-height: 1.45; }
 
 /* Per-statement correct-swipe rows for tap_card. */
-.quiz-tap-row { display: flex; align-items: center; gap: 8px; }
+.quiz-tap-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .quiz-tap-label { flex: 1; min-width: 0; font-family: "ABeeZee", sans-serif; font-size: 13px; color: #1C2034; }
 .quiz-tap-btn {
   flex-shrink: 0; width: 30px; height: 26px; border-radius: 8px;
   border: 1.5px solid rgba(0,0,0,0.16); background: #fff; cursor: pointer;
   font-size: 12px; line-height: 1; color: rgba(0,0,0,0.4); transition: all 0.12s;
+  display: flex; align-items: center; justify-content: center; padding: 0;
 }
-.quiz-tap-btn.yes.is-on { background: #10B981; border-color: #10B981; color: #fff; }
-.quiz-tap-btn.no.is-on  { background: #D80027; border-color: #D80027; color: #fff; }
+/* One button per response on the card's scale, each carrying that response's
+   own hue — it used to be a green ✓ and a red ✕, which only had names for the
+   two answers a three-point scale happened to end with. */
+.quiz-tap-btn.is-on {
+  background: var(--tap-response-color, #10B981);
+  border-color: var(--tap-response-color, #10B981);
+  color: #fff;
+}
+.quiz-tap-btn .rotate-action-icon { width: 14px; height: 14px; }
+.quiz-tap-btn .choice-icon-emoji { font-size: 12px; line-height: 1; }
 
 /* Tokenisation: per-option token-amount inputs (list/grid/tap_card), and the
    flat token-award block for scale/open/prioritise cards. Amber accent so it

@@ -31,6 +31,21 @@ ru:
     add_option: Добавить вариант
     new_option: Новый вариант
     style_option: Оформить этот ответ
+    new_response: "Новый ответ"
+    add_response: "Добавить ответ"
+    remove_response: "Удалить этот ответ"
+    response_scale: "Ответов на утверждение"
+    tap_scale:
+      "no": "Нет"
+      "yes": "Да"
+      unsure: "Не уверен"
+      neutral: "Нейтрально"
+      disagree: "Не согласен"
+      agree: "Согласен"
+      strongly_disagree: "Совершенно не согласен"
+      strongly_agree: "Полностью согласен"
+      slightly_disagree: "Скорее не согласен"
+      slightly_agree: "Скорее согласен"
     contact_name: "Имя"
     contact_company: "Компания"
     contact_industry: "Отрасль"
@@ -39,7 +54,7 @@ ru:
     contact_email_invalid: "Это не похоже на адрес электронной почты — проверьте, пожалуйста."
     add_statement: Добавить утверждение
     swipe_no: "Нет"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "Не уверен"
     swipe_hint: перетащите карточку, чтобы ответить
     swipe_yes: Да
     reset: Сбросить

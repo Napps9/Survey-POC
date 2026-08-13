@@ -31,6 +31,21 @@ hi:
     add_option: विकल्प जोड़ें
     new_option: नया विकल्प
     style_option: इस उत्तर को सजाएँ
+    new_response: "नया उत्तर"
+    add_response: "उत्तर जोड़ें"
+    remove_response: "यह उत्तर हटाएँ"
+    response_scale: "प्रति कथन उत्तर"
+    tap_scale:
+      "no": "नहीं"
+      "yes": "हाँ"
+      unsure: "अनिश्चित"
+      neutral: "तटस्थ"
+      disagree: "असहमत"
+      agree: "सहमत"
+      strongly_disagree: "बिल्कुल असहमत"
+      strongly_agree: "पूरी तरह सहमत"
+      slightly_disagree: "कुछ हद तक असहमत"
+      slightly_agree: "कुछ हद तक सहमत"
     contact_name: "नाम"
     contact_company: "कंपनी"
     contact_industry: "उद्योग"
@@ -39,7 +54,7 @@ hi:
     contact_email_invalid: "यह ईमेल पता जैसा नहीं लगता — कृपया जांचें।"
     add_statement: कथन जोड़ें
     swipe_no: "नहीं"
-    swipe_unsure: "Unsure"
+    swipe_unsure: "अनिश्चित"
     swipe_hint: उत्तर देने के लिए कार्ड खींचें
     swipe_yes: हाँ
     reset: रीसेट करें
