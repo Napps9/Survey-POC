@@ -39,6 +39,12 @@ class EmailCampaign < ApplicationRecord
     EDITABLE_STATUSES.include?(status)
   end
 
+  # Written by Comms::GenerateNewsletterJob rather than by hand, which is why
+  # it still has a Projects placeholder in it.
+  def newsletter?
+    newsletter_week.present?
+  end
+
   # Mirrors Survey#editing_locked? — every mutation endpoint 423s on it.
   def editing_locked?
     !editable?

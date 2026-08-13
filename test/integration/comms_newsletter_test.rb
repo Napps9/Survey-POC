@@ -146,6 +146,33 @@ class CommsNewsletterTest < ActionDispatch::IntegrationTest
     assert_includes body, "/comms/campaigns/"
   end
 
+  test "a generated draft is marked for review in the index and the builder" do
+    run_job
+    campaign = EmailCampaign.find_by(newsletter_week: WEEK)
+    assert campaign.newsletter?
+
+    post session_path, params: { email_address: @staff.email_address, password: "verylongpassword" }
+    get comms_path
+    assert_response :success
+    assert_match "Needs review", response.body
+
+    get edit_comms_campaign_path(campaign)
+    assert_response :success
+    assert_match "Fill in the Projects section before you book it", response.body
+    # The suggested Monday seeds the schedule input, so booking is one click.
+    assert_match campaign.scheduled_for.utc.iso8601, response.body
+  end
+
+  test "a hand-built campaign carries no newsletter markings" do
+    campaign = EmailCampaign.create!(title: "Hand-built", design: Comms::EmailDocument.starter_document)
+    assert_not campaign.newsletter?
+
+    post session_path, params: { email_address: @staff.email_address, password: "verylongpassword" }
+    get edit_comms_campaign_path(campaign)
+    assert_response :success
+    assert_no_match "Fill in the Projects section", response.body
+  end
+
   test "the notification reports the real audience size once the list has contacts" do
     list = EmailList.create!(name: Comms::GenerateNewsletterJob::LIST_NAME)
     list.email_list_contacts.create!(email: "reader@example.com", name: "Reader")
