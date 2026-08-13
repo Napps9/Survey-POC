@@ -58,7 +58,7 @@ class DemographicCardRoundtripTest < ApplicationSystemTestCase
                  "the key must survive the DOM round trip — without it the card " \
                  "collides with the gender finder"
     assert card["demographic"]
-    assert_equal 9, card["options"].size, "the 9 taxonomy options must survive too"
+    assert_equal 8, card["options"].size, "the taxonomy options must survive too"
 
     # And the tile is greyed out on the next open.
     visit survey_path(@survey)

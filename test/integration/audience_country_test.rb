@@ -98,7 +98,7 @@ class AudienceCountryTest < ActionDispatch::IntegrationTest
     card = heritage_card(s)
     assert_equal FIVE + [ DemographicQuestions.heritage_decline_option ], card["options"]
     assert_equal 6, card["options"].size
-    refute_includes card["options"], DemographicQuestions.another_heritage_label,
+    refute_includes card["options"], DemographicQuestions.off_list_label("heritage"),
                     "'another' is something you type, not a dead-end radio"
     assert card["allow_other"], "a five-item list will miss people; the Other box is where they go"
     assert_equal "GB", card["heritage_country"]
@@ -113,9 +113,9 @@ class AudienceCountryTest < ActionDispatch::IntegrationTest
     set_country!(s, "")
 
     card = heritage_card(s)
-    assert_equal 9, card["options"].size
+    assert_equal 8, card["options"].size
     assert_nil card["heritage_country"]
-    refute card["allow_other"], "the global list carries its own catch-all, so the box goes away with it"
+    assert card["allow_other"], "the global card has the box too — only the list changed back"
   end
 
   test "a deck with no Heritage card costs nothing to retarget" do
@@ -142,14 +142,14 @@ class AudienceCountryTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to survey_path(s, panel: "publish")
     card = heritage_card(s)
-    assert_equal 9, card["options"].size, "it falls back to the global taxonomy"
+    assert_equal 8, card["options"].size, "it falls back to the global taxonomy"
     assert_nil card["heritage_country"], "and says so, rather than claiming a tailoring it didn't get"
   end
 
   test "retailoring drops translations that describe options no longer offered" do
     stale = DemographicQuestions.optional_card("heritage").merge(
       "cid"  => "c_her",
-      "i18n" => { "fr" => { "text" => "vieux", "options" => Array.new(9, "vieux") } }
+      "i18n" => { "fr" => { "text" => "vieux", "options" => Array.new(8, "vieux") } }
     )
     s = survey(cards: [ stale ], locales: %w[en fr])
 
@@ -158,7 +158,7 @@ class AudienceCountryTest < ActionDispatch::IntegrationTest
     fr = heritage_card(s).dig("i18n", "fr")
     # localized_card merges options by position, so keeping the old array would
     # show a French respondent the previous taxonomy's categories.
-    refute_equal Array.new(9, "vieux"), fr&.dig("options")
+    refute_equal Array.new(8, "vieux"), fr&.dig("options")
   end
 
   # ── Cross-cutting registrations ───────────────────────────────────────────

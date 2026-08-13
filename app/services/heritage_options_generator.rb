@@ -23,10 +23,9 @@ class HeritageOptionsGenerator
   MODEL      = ClaudeModels::FAST
   MAX_TOKENS = 512
 
-  # How many categories a tailored card offers. Five leaves room for the two
-  # registry tail options ("Another heritage", "Prefer not to say") inside a
-  # seven-option card — long enough to be recognisable, short enough to read on
-  # a phone.
+  # How many categories a tailored card offers. Five plus "Prefer not to say"
+  # makes a six-option card — long enough to be recognisable, short enough to
+  # read on a phone. Anyone the five miss uses the free-text box.
   WANTED = 5
 
   TOOL = {

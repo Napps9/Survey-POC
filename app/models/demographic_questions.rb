@@ -81,54 +81,114 @@ module DemographicQuestions
   # allowlist change.
   DEMOGRAPHIC_KEYS = (OPTIONAL_CARDS.keys + [ "gender" ]).freeze
 
+  # The one entry in each registry list that is NOT shown on the card.
+  #
+  # "Another heritage" and "Another form of neurodivergence" were dead ends: a
+  # radio recording that someone didn't fit the list without ever asking what
+  # they are. The card offers the free-text box instead (optional_card sets
+  # allow_other), so "another" is something you type.
+  #
+  # The label stays in the list because it is still the label a typed answer is
+  # RECORDED as (PlayerController#sync_demographics_from_answers!) — never the
+  # respondent's own words, which would put respondent-authored text into the
+  # creator's dashboard as a segment pill. It has to be translated in all 19
+  # locale files to do that job, and responses already collected carry it, so
+  # removing it would split those segments from every new one.
+  #
+  # Pinned by INDEX, because the locale merge is positional and the parity test
+  # compares translated lists to this constant by length. Moving an entry in
+  # either list without moving its index here is caught by the registry guard
+  # in test/models/demographic_questions_test.rb.
+  OFF_LIST_OPTION_INDEX = { "heritage" => 7, "neurodiversity" => 6 }.freeze
+
   # One optional card resolved in `locale`, or nil for an unknown key. Deep
   # dup (options array included) — callers mutate the hash (cid stamping,
   # i18n prefill). Same translation posture as `cards`: text/description only
   # when present, options only whole and at registry length, English on an
   # invalid locale.
+  #
+  # What the card SHOWS is the registry vocabulary minus its off-list label,
+  # plus the free-text box that replaced it — see OFF_LIST_OPTION_INDEX.
   def self.optional_card(key, locale: nil)
     spec = OPTIONAL_CARDS[key.to_s]
     return nil unless spec
 
     card = spec.dup
-    card["options"] = spec["options"].dup
+    card["options"] = shown_options(key, locale: locale)
+    # A short list will always miss someone. The box is the difference between
+    # a respondent being filed under "another" and being able to say what they
+    # actually are.
+    card["allow_other"] = true
+
     tr = I18n.t("demographics.optional.#{key}", locale: locale.presence || I18n.locale, default: nil)
     return card unless tr.is_a?(Hash)
 
     tr = tr.transform_keys(&:to_s)
     card["text"]        = tr["text"].to_s        if tr["text"].to_s.strip.present?
     card["description"] = tr["description"].to_s if tr["description"].to_s.strip.present?
-    opts = tr["options"]
-    card["options"] = opts.map(&:to_s) if opts.is_a?(Array) && opts.size == spec["options"].size
     card
   rescue I18n::InvalidLocale
     card
   end
 
-  # The heritage card's last two options ("Another heritage", "Prefer not to
-  # say") in `locale`. Identified positionally as the LAST TWO registry
-  # options, the same convention neuro_exclusive_labels uses, so a locale that
-  # translated the list whole gets its own wording and one that didn't falls
-  # back to English.
+  # The FULL registry list for `key`, resolved in `locale` — the translated
+  # vocabulary, off-list label included. This is the positional source of truth
+  # every helper below reads; only optional_card narrows it to what a card
+  # displays.
   #
-  # Both are what a generated list must never duplicate; only the second one
-  # goes on a tailored card (see country_heritage_card).
+  # A translated list is taken only whole and at registry length, because
+  # answers are stored as positional canonical labels: a short list would
+  # silently re-point every entry after the gap.
+  def self.translated_options(key, locale: nil)
+    spec = OPTIONAL_CARDS[key.to_s]
+    return [] unless spec
+
+    opts = I18n.t("demographics.optional.#{key}.options", locale: locale.presence || I18n.locale, default: nil)
+    return opts.map(&:to_s) if opts.is_a?(Array) && opts.size == spec["options"].size
+
+    spec["options"].dup
+  rescue I18n::InvalidLocale
+    spec["options"].dup
+  end
+
+  # The options a card actually offers: the vocabulary without its off-list
+  # label. A key with no off-list entry (none today) shows the list whole.
+  def self.shown_options(key, locale: nil)
+    opts = translated_options(key, locale: locale)
+    idx  = OFF_LIST_OPTION_INDEX[key.to_s]
+    idx ? opts.reject.with_index { |_, i| i == idx } : opts
+  end
+
+  # The label a typed answer on `key`'s card is recorded as — "Another
+  # heritage", "Another form of neurodivergence" — in `locale`. Never shown to
+  # a respondent; see OFF_LIST_OPTION_INDEX for why it still exists.
+  def self.off_list_label(key, locale: nil)
+    idx = OFF_LIST_OPTION_INDEX[key.to_s]
+    idx && translated_options(key, locale: locale)[idx]
+  end
+
+  # "Prefer not to say" — the LAST entry of both registry lists. Declining is a
+  # different answer from not fitting the list, so unlike the off-list label it
+  # stays a real choice on every card.
+  def self.decline_option(key, locale: nil)
+    translated_options(key, locale: locale).last
+  end
+
+  # The two heritage labels a generated country list must never duplicate:
+  # "Another heritage" and "Prefer not to say", in `locale`.
+  #
+  # Reads the VOCABULARY, not the card. Rebasing this onto optional_card would
+  # return ["Mixed or multiple heritage", "Prefer not to say"] — so
+  # HeritageOptions.sanitize would start rejecting a country's real "Mixed"
+  # category (Brazil's largest) while no longer guarding against the label it
+  # exists to guard against, silently and for months.
   def self.heritage_tail_options(locale: nil)
-    Array(optional_card("heritage", locale: locale)["options"]).last(2)
+    [ off_list_label("heritage", locale: locale), decline_option("heritage", locale: locale) ].compact
   end
 
-  # "Another heritage" — the registry's own name for a heritage that isn't on
-  # the list. On a tailored card it is what a free-text answer is RECORDED as
-  # (PlayerController#sync_demographics_from_answers!), never what the
-  # respondent is shown: they type their own words instead.
-  def self.another_heritage_label(locale: nil)
-    heritage_tail_options(locale: locale).first
-  end
-
-  # "Prefer not to say" — declining is a distinct answer from not fitting the
-  # list, so it stays a choice on every heritage card.
+  # Kept as the readable name at the two heritage-specific call sites.
   def self.heritage_decline_option(locale: nil)
-    heritage_tail_options(locale: locale).last
+    decline_option("heritage", locale: locale)
   end
 
   # The heritage card with `five` country-specific categories in place of the
@@ -141,13 +201,9 @@ module DemographicQuestions
   # registry card, which is what makes "Claude was unreachable" degrade to the
   # global taxonomy rather than to an error.
   #
-  # SIX options, not seven: "Another heritage" is deliberately NOT among them.
-  # A five-item list will miss people, and a radio button reading "Another
-  # heritage" is a dead end — it records that someone didn't fit without ever
-  # asking what they are. `allow_other` gives them the free-text box instead,
-  # so "another" is something you type. The sync still records those answers
-  # under the canonical "Another heritage" label, so the segment survives and
-  # the respondent's own words stay out of the creator's dashboard.
+  # Six options: the five categories plus "Prefer not to say". Anyone the five
+  # miss types it into the box optional_card already switched on — the same
+  # shape as the global card, just a shorter and more local list.
   def self.country_heritage_card(country:, five:, locale: nil)
     card = optional_card("heritage", locale: locale)
     return card if card.nil? || Array(five).empty?
@@ -156,7 +212,6 @@ module DemographicQuestions
     return card unless WorldRegions.valid?(code)
 
     card["options"]          = Array(five).map(&:to_s) + [ heritage_decline_option(locale: locale) ]
-    card["allow_other"]      = true
     card["heritage_country"] = code
     card
   end
