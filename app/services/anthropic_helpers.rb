@@ -67,16 +67,22 @@ module AnthropicHelpers
   #   model:   the model string actually used
   #   output_tokens: override for streaming, where the final output count arrives
   #            on the message_delta event rather than on message_start
-  def log_usage(service, usage, model: nil, output_tokens: nil)
+  #   ms:      wall clock for the call, when the caller measured it
+  #   phase:   which call this was, for services that make several per request
+  #            (e.g. "tool_round_2", "answer_stream") — without it a multi-call
+  #            service's log lines are indistinguishable from each other
+  def log_usage(service, usage, model: nil, output_tokens: nil, ms: nil, phase: nil)
     return unless usage
 
     out = output_tokens || usage.output_tokens
     Rails.logger.info(
       "[AnthropicUsage] #{service}" \
       "#{" model=#{model}" if model}" \
+      "#{" phase=#{phase}" if phase}" \
       " in=#{usage.input_tokens} out=#{out}" \
       " cache_write=#{usage.cache_creation_input_tokens || 0}" \
-      " cache_read=#{usage.cache_read_input_tokens || 0}"
+      " cache_read=#{usage.cache_read_input_tokens || 0}" \
+      "#{" ms=#{ms}" if ms}"
     )
   rescue => e
     # Logging must never break a generation path.

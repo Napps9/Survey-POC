@@ -45,8 +45,12 @@
 class AskVertoChat
   include AnthropicHelpers
 
-  MODEL      = ClaudeModels::DEFAULT
-  MAX_TOKENS = 2000
+  # The answer is what a person reads, so it stays on the better model. The
+  # rounds — pick search words, pick question ids — are a separate ENV knob,
+  # defaulted to the same thing. See ClaudeModels::ASK_TOOL_ROUNDS.
+  MODEL       = ClaudeModels::DEFAULT
+  ROUND_MODEL = ClaudeModels::ASK_TOOL_ROUNDS
+  MAX_TOKENS  = 2000
 
   # How many times the model may call tools before it has to answer. Each round
   # is a Claude call, so this is the per-message cost ceiling. Four is enough to
@@ -148,10 +152,15 @@ class AskVertoChat
     announced   = Set.new
 
     drafted = nil
+    rounds  = 0
+    @turn_started = monotonic
+    @ttft_ms      = nil
 
-    MAX_TOOL_ROUNDS.times do
+    MAX_TOOL_ROUNDS.times do |round|
+      rounds  = round + 1
+      call_at = monotonic
       response = @client.messages.create(
-        model:           MODEL,
+        model:           ROUND_MODEL,
         max_tokens:      MAX_TOKENS,
         system:          system_blocks(tools),
         tools:           tools.definitions,
@@ -161,7 +170,8 @@ class AskVertoChat
         messages:        convo,
         request_options: anthropic_request_options
       )
-      log_usage("AskVertoChat", response.usage, model: MODEL)
+      log_usage("AskVertoChat", response.usage, model: ROUND_MODEL,
+                                                ms: elapsed(call_at), phase: "tool_round_#{rounds}")
 
       blocks    = Array(response.content)
       tool_uses = blocks.select { |b| tool_use?(b) }
@@ -185,6 +195,7 @@ class AskVertoChat
 
       convo << { role: "assistant", content: blocks }
       convo << { role: "user", content: tool_uses.map { |b| run_tool(b, tools) } }
+      mark_cache_breakpoint!(convo)
 
       # Announce sources as they land, so the rail fills while the answer is
       # still being written rather than all at once at the end. Which numbers
@@ -196,15 +207,58 @@ class AskVertoChat
       end
     end
 
-    stream_answer(convo, tools, seen_quotes, drafted: drafted, &emit)
+    result = stream_answer(convo, tools, seen_quotes, drafted: drafted, &emit)
+    log_turn(tools, rounds: rounds, ms: elapsed(@turn_started))
+    result
   end
 
   private
 
+  def monotonic = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+  def elapsed(from) = ((monotonic - from) * 1000).round
+
+  # One line per turn, because the two questions asked of this feature — is it
+  # quick, and does it use more than one Verto — are both unanswerable from the
+  # per-call lines alone. `vertos` is the second one, measured rather than felt.
+  def log_turn(tools, rounds:, ms:)
+    vertos = tools.sources.map { |s| s["verto"] }.uniq.size
+    Rails.logger.info(
+      "[AskVerto] turn done rounds=#{rounds} sources=#{tools.sources.size} " \
+      "vertos=#{vertos} ttft=#{@ttft_ms || '-'}ms total=#{ms}ms"
+    )
+  rescue => e
+    Rails.logger.warn("[AskVerto] failed to log turn: #{e.class}: #{e.message}")
+  end
+
+  # Cache the conversation so far, so the next round re-reads the tool results
+  # rather than reprocessing them. Only the newest breakpoint is kept — the API
+  # allows four and the system block holds one, so leaving old markers in place
+  # would eventually overflow the budget.
+  #
+  # Note what this does NOT buy: the final stream_raw call sets tool_choice
+  # "none" where the rounds set "any", and changing tool_choice invalidates the
+  # messages tier. The call the reader is actually waiting on can never read
+  # this cache. Do not "fix" that by dropping tool_choice "none" — see
+  # stream_answer for why it is there.
+  def mark_cache_breakpoint!(convo)
+    convo.each do |message|
+      Array(message[:content]).each do |block|
+        block.delete(:cache_control) if block.is_a?(Hash)
+      end
+    end
+
+    last = Array(convo.last[:content]).last
+    last[:cache_control] = { type: "ephemeral" } if last.is_a?(Hash)
+  end
+
   # The instructions are stable and the coverage line is not, so they are
   # separate blocks and only the first is cached.
   def system_blocks(tools)
-    coverage = tools.coverage
+    # headline_coverage, not coverage: the countries figure costs a join across
+    # the whole responses table, nothing here uses it, and this runs on every
+    # call of the turn.
+    coverage = tools.headline_coverage
     [
       { type: "text", text: SYSTEM_WITH_SAFETY, cache_control: { type: "ephemeral" } },
       { type: "text", text: <<~SCOPE }
@@ -236,13 +290,19 @@ class AskVertoChat
   end
 
   def run_tool(block, tools)
-    name = name_of(block)
-    id   = block.respond_to?(:id) ? block.id : block[:id]
-    {
-      type:        "tool_result",
-      tool_use_id: id,
-      content:     tools.call(name, deep_stringify(input_of(block))).to_json
-    }
+    name    = name_of(block)
+    id      = block.respond_to?(:id) ? block.id : block[:id]
+    call_at = monotonic
+    content = tools.call(name, deep_stringify(input_of(block))).to_json
+
+    # Size, because that is the thing this feature keeps getting wrong: a
+    # fetched question used to carry every one of its segments, and nothing
+    # measured the result until it was tens of thousands of tokens paid on
+    # every round. Characters rather than tokens — there is no tokenizer here
+    # and the trend is the point.
+    Rails.logger.info("[AskVerto] tool #{name} -> #{content.length} chars in #{elapsed(call_at)}ms")
+
+    { type: "tool_result", tool_use_id: id, content: content }
   end
 
   # The final turn, streamed. Markers are resolved as they complete, which means
@@ -274,6 +334,7 @@ class AskVertoChat
     # tool_choice "none" is the other half: with tools declared, a "final"
     # turn could otherwise answer with another tool call, which this loop
     # would render as an empty answer.
+    stream_at = monotonic
     stream = @client.messages.stream_raw(
       model:           MODEL,
       max_tokens:      MAX_TOKENS,
@@ -304,7 +365,8 @@ class AskVertoChat
     end
     # Whatever is left can no longer be the start of a marker.
     flush!(buffer, allowed_sources, allowed_quotes, seen_quotes, final: true, &emit)
-    log_usage("AskVertoChat", usage, model: MODEL, output_tokens: final_output)
+    log_usage("AskVertoChat", usage, model: MODEL, output_tokens: final_output,
+                                     ms: elapsed(stream_at), phase: "answer_stream")
 
     finish(full, allowed_sources, seen_quotes, &emit)
   end
@@ -367,8 +429,14 @@ class AskVertoChat
     0
   end
 
+  # The moment the reader stops waiting. Recorded here rather than at the API's
+  # first delta because a delta the buffer holds back (a half-written marker) is
+  # not something anyone can read yet.
   def emit_text(text, &emit)
-    emit&.call(t: "token", text: text) if text.present?
+    return if text.blank?
+
+    @ttft_ms ||= elapsed(@turn_started) if @turn_started
+    emit&.call(t: "token", text: text)
   end
 
   # Quote ids the tools handed over this turn, with the body the SERVER will

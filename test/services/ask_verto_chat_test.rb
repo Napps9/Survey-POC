@@ -403,6 +403,38 @@ class AskVertoChatTest < ActiveSupport::TestCase
       "a round's thinking-aloud is plumbing; only the answer turn is prose the reader sees"
   end
 
+  # ── Model tiering and caching ─────────────────────────────────────────────
+  test "the answer stays on the answering model while the rounds follow their own knob" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, answer_now_step, "Worry is high [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+
+    assert client.calls.select { |c| c[:op] == :create }.all? { |c| c[:model] == AskVertoChat::ROUND_MODEL }
+    assert_equal AskVertoChat::MODEL, client.calls.find { |c| c[:op] == :stream_raw }[:model]
+  end
+
+  # The API allows four breakpoints and the system block holds one, so leaving
+  # every round's marker in place would eventually overflow the budget.
+  test "only the newest round carries a cache breakpoint" do
+    chat = AskVertoChat.allocate
+    search = [ { name: "search_corpus", input: { "query" => "climate" } } ]
+    client = ScriptedClient.new([ search, fetch_step, answer_now_step, "Worry is high [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+
+    sent   = client.calls.find { |c| c[:op] == :stream_raw }[:messages]
+    marked = sent.flat_map { |m| Array(m[:content]) }
+                 .select { |b| b.is_a?(Hash) && b[:cache_control] }
+
+    assert_equal 1, marked.size, "old markers must be cleared, not accumulated"
+    assert_equal({ type: "ephemeral" }, marked.first[:cache_control])
+    assert_equal "tool_result", marked.first[:type],
+      "the breakpoint belongs on the newest tool result — that is the prefix a later round re-reads"
+  end
+
   test "the corpus size is stated in the system prompt so the model knows its denominator" do
     chat = AskVertoChat.allocate
     client = ScriptedClient.new([ "No tools needed." ])

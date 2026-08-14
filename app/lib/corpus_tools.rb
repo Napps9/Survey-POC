@@ -1,6 +1,7 @@
 # The only door into the Ask Verto corpus.
 #
-# Three tools, and every one of them starts from CorpusEntry.citable. There is no
+# Four tools that read (plus `answer_now`, which reads nothing), and every one of
+# them starts from CorpusEntry.citable. There is no
 # method here that takes a relation, an organisation, or a survey id from outside
 # — the caller cannot widen what a tool can see, because there is no parameter
 # that would let them. That is deliberate: this is the one place in the app that
@@ -137,6 +138,7 @@ class CorpusTools
     @scope   = scope.to_h.symbolize_keys
     @sources = []
     @by_question_id = {}
+    @fielded = {}
   end
 
   def definitions = DEFINITIONS
@@ -163,15 +165,27 @@ class CorpusTools
 
   # How much of the corpus this conversation can see. Shown to the user, and put
   # in the system prompt so the model knows its own denominator.
-  def coverage
-    entries = scoped_entries
-    {
-      vertos:    entries.count,
-      responses: entries.sum(:response_count),
-      countries: entries.joins(survey: :responses)
-                        .where.not(responses: { region_country: nil })
-                        .distinct.count("responses.region_country")
-    }
+  # `countries` is lazy because it is the expensive one — a join across the
+  # whole responses table — and the answer path never looks at it. The system
+  # prompt states the corpus size on every Claude call and uses only the first
+  # two keys; the page's stat row is what needs the third. Computing it eagerly
+  # meant that join ran on every round of the tool loop for nothing.
+  def coverage = headline_coverage.merge(countries: country_count)
+
+  # Just the two cheap counts, and the only ones the answer path asks for.
+  def headline_coverage
+    @headline_coverage ||= begin
+      entries = scoped_entries
+      { vertos: entries.count, responses: entries.sum(:response_count) }
+    end
+  end
+
+  def country_count
+    return @country_count if defined?(@country_count)
+
+    @country_count = scoped_entries.joins(survey: :responses)
+                                   .where.not(responses: { region_country: nil })
+                                   .distinct.count("responses.region_country")
   end
 
   # Opening questions for the empty screen.
@@ -282,9 +296,12 @@ class CorpusTools
                .distinct.select(:id)
   end
 
+  # `organisation` rides along because every row builder here names it —
+  # summary_row, result_row and stamp all read entry.organisation.name, which
+  # without this is one query per distinct Verto in a result set.
   def base_questions
     CorpusQuestion.where(corpus_entry_id: scoped_entries.select(:id))
-                  .includes(corpus_entry: :survey)
+                  .includes(corpus_entry: [ :survey, :organisation ])
   end
 
   # ── search_corpus ─────────────────────────────────────────────────────────
@@ -465,22 +482,34 @@ class CorpusTools
       entries = entries.where(id: themed)
     end
 
-    { vertos: entries.map { |e| verto_row(e) } }
+    entries = entries.to_a
+    # One grouped count rather than a COUNT per Verto. Deliberately not
+    # `includes(:corpus_questions)`: that loads every question row, and a
+    # question row carries the segments column this change exists to keep out
+    # of memory.
+    counts = CorpusQuestion.where(corpus_entry_id: entries.map(&:id)).group(:corpus_entry_id).count
+
+    { vertos: entries.map { |e| verto_row(e, counts[e.id].to_i) } }
   end
 
   # ── Row builders ──────────────────────────────────────────────────────────
 
-  def verto_row(entry)
+  def verto_row(entry, question_count)
     {
-      verto:        entry.survey.title.presence || entry.survey.theme,
+      verto:        verto_name(entry),
       organisation: entry.organisation.name,
       theme:        entry.survey.theme,
       completed_responses: entry.response_count,
       fielded:      fielded_window(entry),
       languages:    Array(entry.survey.locales).presence || [ entry.survey.default_locale ],
-      questions:    entry.corpus_questions.size
+      questions:    question_count
     }
   end
+
+  # What a Verto is called wherever one is named. Its own method because four
+  # row builders used to spell it out, and a Verto that answers to two names
+  # across a source rail and a tool result is one the reader can't match up.
+  def verto_name(entry) = entry.survey.title.presence || entry.survey.theme
 
   # Search results carry no numbers. That keeps a search cheap, and it means the
   # model has to fetch a question before it can say anything about it — which is
@@ -492,7 +521,7 @@ class CorpusTools
       type:     question.card_type,
       options:  question.option_labels,
       responses: question.response_count,
-      verto:    question.corpus_entry.survey.title.presence || question.corpus_entry.survey.theme,
+      verto:    verto_name(question.corpus_entry),
       organisation: question.corpus_entry.organisation.name,
       theme:    question.theme
     }
@@ -509,7 +538,7 @@ class CorpusTools
       source:   number,
       question: question.question_text,
       type:     question.card_type,
-      verto:    entry.survey.title.presence || entry.survey.theme,
+      verto:    verto_name(entry),
       organisation: entry.organisation.name,
       responses: question.response_count,
       fielded:  fielded_window(entry)
@@ -591,7 +620,7 @@ class CorpusTools
       "corpus_question_id" => question.id,
       "question"           => question.question_text,
       "card_type"          => question.card_type,
-      "verto"              => entry.survey.title.presence || entry.survey.theme,
+      "verto"              => verto_name(entry),
       "organisation"       => entry.organisation.name,
       "responses"          => question.response_count,
       "fielded"            => fielded_window(entry),
@@ -653,7 +682,19 @@ class CorpusTools
 
   # Month precision, not timestamps. "3 June 2025, 14:02" narrows a respondent
   # far more than "June 2025" and answers no question anyone is asking.
+  #
+  # Memoised per turn because it is the one thing here that still reads
+  # `responses`, and it was reading it a lot: result_row asks, then stamp asks
+  # again for the same entry, so a fetch of twelve questions from one Verto ran
+  # forty-eight MIN/MAX aggregates over a table with tens of thousands of rows.
+  # Now it runs two, once per entry.
   def fielded_window(entry)
+    return @fielded[entry.id] if @fielded.key?(entry.id)
+
+    @fielded[entry.id] = compute_fielded_window(entry)
+  end
+
+  def compute_fielded_window(entry)
     # The same population the corpus counts — every respondent who answered
     # something, not only the ones who reached the last card.
     answered = CorpusIndexer.countable_responses(entry.survey)

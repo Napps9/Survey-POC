@@ -7,11 +7,15 @@
 # for the next.
 #
 # ── Spend ─────────────────────────────────────────────────────────────────────
-# A turn here is up to MAX_TOOL_ROUNDS + 1 Sonnet calls; the per-Verto chat is
+# A turn here is up to MAX_TOOL_ROUNDS + 1 Claude calls; the per-Verto chat is
 # one Haiku call. So the rate limit is a third of that endpoint's, and unlike it
 # this one also takes the per-organisation daily cap — a tool loop is the most
 # expensive thing a signed-in user can trigger in this app, and the runaway case
 # (a stuck client retrying) is the one that shows up on an invoice.
+#
+# The rounds are cheaper than they read: each one now ends in a tool call rather
+# than a discarded answer, and CLAUDE_MODEL_ASK_TOOL_ROUNDS can move them off
+# Sonnet entirely. The ceiling below is still sized for the worst case.
 class AskMessagesController < ApplicationController
   include ActionController::Live
   include LimitsConcurrentStreams
