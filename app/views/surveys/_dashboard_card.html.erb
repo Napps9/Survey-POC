@@ -192,6 +192,22 @@
       </div>
     <% end %>
   <% else %>
+    <%# Sending is what a creator came to a live Verto to do — collecting
+        responses is the point of publishing one, and nothing happens until the
+        link is in front of somebody. So it leads, at full width, and Edit and
+        Results step down to the row below it. Only for a live Verto: a draft's
+        link doesn't resolve yet, so Publish stays its primary action. %>
+    <% if published && current_membership&.admin? %>
+      <div style="padding:10px 16px 0;">
+        <button type="button"
+                data-action="click->send-modal#open"
+                data-send-url="<%= send_survey_path(survey) %>"
+                style="display:block;width:100%;box-sizing:border-box;text-align:center;padding:11px 12px;border-radius:12px;background:#FF1E6F;border:none;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.03em;cursor:pointer;box-shadow:0 8px 20px rgba(255,30,111,0.28);transition:filter 0.15s,transform 0.15s;"
+                onmouseover="this.style.filter='brightness(1.08)';this.style.transform='translateY(-1px)'"
+                onmouseout="this.style.filter='';this.style.transform=''"><%= t("dashboard_card.send") %></button>
+      </div>
+    <% end %>
+
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 0;">
       <%= link_to t("dashboard_card.edit"), survey_path(survey),
             style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;white-space:nowrap;",

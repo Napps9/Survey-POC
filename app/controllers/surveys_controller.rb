@@ -595,7 +595,11 @@ class SurveysController < ApplicationController
   # screen. 404s for a draft: there is no public link to encode yet, and a QR
   # pointing at a dead URL is worse than no QR.
   def qr
-    key = @survey.public_link_key
+    # ?link_id= asks for a named send link's own code, so an audience with its
+    # own address gets its own printable QR rather than the Verto's. Still
+    # gated on the Verto being live: a link's slug only resolves once it is.
+    link = params[:link_id].present? ? @survey.survey_links.find_by(id: params[:link_id]) : nil
+    key  = @survey.published? && link ? link.play_key : @survey.public_link_key
     return head :not_found if key.blank?
 
     send_data helpers.verto_qr_svg_document(play_survey_url(key)),
@@ -740,6 +744,12 @@ class SurveysController < ApplicationController
       # Forms in the right panel's feature tabs (quiz / tokens / logic) send
       # return_tab so the reload reopens their tab instead of the Publish view.
       format.html do
+        # The dashboard's Send modal posts the same fields from a Turbo Frame,
+        # so it has to land back on the panel that drew them — a redirect to
+        # the editor would leave the frame with no matching frame to swap in.
+        if params[:return_to].to_s == "send"
+          next redirect_to send_survey_path(@survey, slug_error: (slug_taken ? "taken" : nil))
+        end
         return_tab = params[:return_tab].to_s.presence
         redirect_to survey_path(@survey, slug_error: (slug_taken ? "taken" : nil),
           panel: (return_tab ? nil : "publish"), tab: return_tab)

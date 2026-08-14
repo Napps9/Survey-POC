@@ -7,8 +7,10 @@
     The tokenisation intro used to live here too. It's now player/_token_intro,
     rendered against whichever card Survey#token_intro_card_cid names — still the
     welcome card by default, so nothing moves unless a creator moves it. %>
-<% if @survey.show_results_comparison? %>
+<%# play_settings, not @survey: a send link that turns comparison off must not
+    promise it on the welcome card either. %>
+<% if play_settings.compare_results? %>
   <div class="welcome-intake">
-    <div class="welcome-intake-compare">🏁 <%= @survey.compare_note_text %></div>
+    <div class="welcome-intake-compare">🏁 <%= play_settings.compare_note_text %></div>
   </div>
 <% end %>

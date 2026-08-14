@@ -17,6 +17,18 @@ class ApplicationController < ActionController::Base
   # covered by the same rule.
   NOINDEX_PATHS = %r{\A/(play|test|invites|funder_invites|blazer|e)(/|\z)}
 
+  # What a respondent is offered once they finish — results comparison, the
+  # Share button, the regions map. The named send link they arrived through
+  # answers first (its overrides are the reason it exists), otherwise the Verto
+  # does. Both objects answer #compare_results?, #share_button? and
+  # #regions_map?, so nothing downstream branches on which one it got.
+  #
+  # Lives here rather than on PlayerController because player/show.html.erb is
+  # also rendered by SurveysController#preview, where there is no link at all.
+  helper_method def play_settings
+    @survey_link || @survey
+  end
+
   private
 
   def discourage_indexing

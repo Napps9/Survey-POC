@@ -93,6 +93,10 @@ Rails.application.routes.draw do
   post   "surveys/:id/test_link",     to: "surveys#enable_test_link",  as: :test_link_survey
   delete "surveys/:id/test_link",     to: "surveys#disable_test_link"
   post "surveys/:id/duplicate",       to: "surveys#duplicate", as: :duplicate_survey
+  # The Send modal, fetched into a Turbo Frame over the dashboard. A GET that
+  # renders the panel; the nested link routes below mutate and redirect back to
+  # it, so the frame re-renders itself with no JSON round-trip to hand-write.
+  get  "surveys/:id/send",            to: "survey_links#show", as: :send_survey
   get  "surveys/:id/preview",         to: "surveys#preview",  as: :preview_survey
   get  "surveys/:id/qr",              to: "surveys#qr",       as: :qr_survey
   post "surveys/:id/card_image",      to: "surveys#card_image", as: :card_image_survey
@@ -142,7 +146,11 @@ Rails.application.routes.draw do
   delete "surveys/bulk_destroy",        to: "surveys#bulk_destroy",        as: :bulk_destroy_surveys
   delete "surveys/:id/destroy_forever", to: "surveys#destroy_forever",     as: :destroy_forever_survey
   post   "surveys/:id/restore",          to: "surveys#restore",             as: :restore_survey
-  resources :surveys, only: [ :show, :update, :destroy ]
+  resources :surveys, only: [ :show, :update, :destroy ] do
+    # Named send links (SurveyLink). Nested because a link has no life of its
+    # own — it's one of the addresses a particular Verto is reachable at.
+    resources :links, only: [ :create, :update, :destroy ], controller: "survey_links"
+  end
 
   # ── Ask Verto ──────────────────────────────────────────────────────────────
   # Cross-Verto question answering over the shared corpus. Open to any signed-in

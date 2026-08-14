@@ -1,0 +1,290 @@
+<%# The Send panel: everything needed to put this Verto in front of someone.
+    Rendered into a Turbo Frame the dashboard opens as a modal, and re-rendered
+    by the same frame after every change made inside it, so there is exactly one
+    description of this screen.
+
+    Not the editor's Publish & share panel with a new hat: that one is where a
+    Verto goes live and gets configured. This is the send step on its own — the
+    address(es), who they're for, and what each audience is shown at the end. %>
+<%= turbo_frame_tag SurveyLinksController::FRAME_ID do %>
+  <%
+    # Two names, deliberately. The heading matches the dashboard card this modal
+    # was opened from (theme first — see _dashboard_card), so it's obviously the
+    # same Verto. What goes out to a respondent uses the creator's own title
+    # first, which is the wording written to be read by someone else.
+    heading     = @survey.theme.presence || @survey.title.presence || t("dashboard_card.untitled")
+    share_name  = @survey.title.presence || @survey.theme.presence || t("dashboard_card.fallback_name")
+    main_key    = @survey.public_link_key
+    main_url    = main_key.present? ? play_survey_url(main_key) : nil
+    live        = @survey.published?
+    error       = params[:link_error].to_s.presence
+    at_limit    = @links.size >= SurveyLink::MAX_PER_SURVEY
+    share_text  = t("send_modal.share_text", name: share_name)
+  %>
+
+  <div class="send-modal">
+    <div class="send-modal__bar"></div>
+
+    <div class="send-modal__head">
+      <div style="min-width:0;">
+        <div class="send-modal__eyebrow"><%= t("send_modal.eyebrow") %></div>
+        <div class="send-modal__title"><%= heading %></div>
+      </div>
+      <button type="button" data-action="click->send-modal#close"
+              aria-label="<%= t("send_modal.close") %>" class="send-modal__close">✕</button>
+    </div>
+
+    <div class="send-modal__body">
+
+      <% if error.present? %>
+        <div class="send-alert">
+          <%= case error
+              when "taken"      then t("send_modal.error_taken")
+              when "slug_blank" then t("send_modal.error_slug_blank")
+              when "limit"      then t("send_modal.error_limit", count: SurveyLink::MAX_PER_SURVEY)
+              else                   t("send_modal.error_create")
+              end %>
+        </div>
+      <% end %>
+
+      <% unless live %>
+        <%# A draft has no address to hand out. Links can still be prepared here
+            (they resolve the moment it goes live), so the panel stays usable —
+            it just says plainly that nothing works yet. %>
+        <div class="send-notice">
+          <div class="send-notice__title"><%= t("send_modal.not_live_title") %></div>
+          <div class="send-notice__body"><%= t("send_modal.not_live_body") %></div>
+          <%= link_to t("send_modal.not_live_cta"), survey_path(@survey, panel: "publish"),
+                data: { turbo_frame: "_top" }, class: "send-btn send-btn--primary",
+                style: "margin-top:12px;display:inline-block;text-decoration:none;" %>
+        </div>
+      <% end %>
+
+      <%# ── The Verto's own link ──────────────────────────────────────────── %>
+      <section class="send-section">
+        <div class="send-section__head">
+          <span class="send-section__title"><%= t("send_modal.main_link") %></span>
+          <span class="send-count"><%= t("send_modal.responders", count: @default_responder_count) %></span>
+        </div>
+
+        <% if live %>
+          <div class="send-url-row">
+            <input type="text" readonly id="send-url-main" value="<%= main_url %>" class="send-url" />
+            <button type="button" class="send-btn send-btn--primary"
+                    data-copy-label="<%= t("send_modal.copy") %>"
+                    onclick="(navigator.clipboard?.writeText(document.getElementById('send-url-main').value) ?? Promise.reject()).then(()=>{this.textContent='<%= j t("send_modal.copied") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2000)}).catch(()=>{this.textContent='<%= j t("send_modal.copy_failed") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2500)})"><%= t("send_modal.copy") %></button>
+          </div>
+
+          <%# The one button that actually opens a send: the OS share sheet on a
+              phone, where most links are passed on. Hidden where the browser
+              has no navigator.share rather than shown as a dead control. %>
+          <div class="send-share-row">
+            <button type="button" class="send-chip send-chip--native" hidden
+                    data-send-modal-target="nativeShare"
+                    data-share-title="<%= share_name %>"
+                    data-share-text="<%= share_text %>"
+                    data-share-url="<%= main_url %>"
+                    data-action="click->send-modal#nativeShare">📤 <%= t("send_modal.share_sheet") %></button>
+            <%= link_to "✉ #{t("send_modal.via_email")}",
+                  "mailto:?subject=#{CGI.escape(share_name)}&body=#{CGI.escape("#{share_text}\n\n#{main_url}")}",
+                  class: "send-chip", target: "_blank", rel: "noopener" %>
+            <%= link_to "💬 #{t("send_modal.via_whatsapp")}",
+                  "https://wa.me/?text=#{CGI.escape("#{share_text} #{main_url}")}",
+                  class: "send-chip", target: "_blank", rel: "noopener" %>
+            <%= link_to "✕ #{t("send_modal.via_x")}",
+                  "https://twitter.com/intent/tweet?text=#{CGI.escape(share_text)}&url=#{CGI.escape(main_url)}",
+                  class: "send-chip", target: "_blank", rel: "noopener" %>
+            <%= link_to "in #{t("send_modal.via_linkedin")}",
+                  "https://www.linkedin.com/sharing/share-offsite/?url=#{CGI.escape(main_url)}",
+                  class: "send-chip", target: "_blank", rel: "noopener" %>
+          </div>
+
+          <div class="send-qr-row">
+            <div class="send-qr-plate">
+              <div style="width:84px;height:84px;"><%= verto_qr_svg(main_url) %></div>
+            </div>
+            <div style="min-width:0;">
+              <div class="send-hint"><%= t("send_modal.qr_hint") %></div>
+              <%= link_to t("send_modal.download_qr"), qr_survey_path(@survey),
+                    data: { turbo_frame: "_top" }, class: "send-btn",
+                    style: "margin-top:8px;display:inline-block;text-decoration:none;" %>
+            </div>
+          </div>
+        <% end %>
+
+        <%# The Verto's own vanity address. Same field as the editor's Publish
+            panel, in the place a creator is actually looking for it. %>
+        <div class="send-field">
+          <label class="send-label" for="send-main-slug"><%= t("send_modal.custom_url") %></label>
+          <%= form_with url: survey_settings_path(@survey), method: :post, class: "send-slug-form" do %>
+            <input type="hidden" name="return_to" value="send" />
+            <span class="send-slug-prefix"><%= root_url %>play/</span>
+            <input type="text" name="slug" id="send-main-slug" maxlength="<%= Survey::MAX_SLUG_LENGTH %>"
+                   value="<%= @survey.slug %>"
+                   placeholder="<%= t("send_modal.custom_url_placeholder") %>"
+                   onchange="this.form.requestSubmit()" class="send-input" />
+          <% end %>
+          <% if params[:slug_error] == "taken" %>
+            <div class="send-error"><%= t("send_modal.error_taken") %></div>
+          <% else %>
+            <div class="send-hint"><%= t("send_modal.custom_url_hint") %></div>
+          <% end %>
+        </div>
+
+        <%# The three switches every respondent notices after Finish. These are
+            the Verto's own answers — an extra link below can disagree. %>
+        <div class="send-field">
+          <div class="send-label"><%= t("send_modal.after_finish") %></div>
+          <%= form_with url: survey_settings_path(@survey), method: :post, style: "margin:0;" do %>
+            <input type="hidden" name="return_to" value="send" />
+            <input type="hidden" name="show_results_comparison" value="0" />
+            <label class="send-check">
+              <input type="checkbox" name="show_results_comparison" value="1"
+                     <%= "checked" if @survey.show_results_comparison? %>
+                     onchange="this.form.requestSubmit()" />
+              <span><%= t("send_modal.setting_compare") %></span>
+            </label>
+          <% end %>
+          <% if @survey.show_results_comparison? %>
+            <%# Logical properties, not margin-left: this panel renders in ar/he too. %>
+            <%= form_with url: survey_settings_path(@survey), method: :post,
+                  style: "margin:0;margin-block-start:6px;margin-inline-start:24px;" do %>
+              <input type="hidden" name="return_to" value="send" />
+              <input type="text" name="compare_note" maxlength="160"
+                     value="<%= @survey.compare_note_text %>"
+                     onchange="this.form.requestSubmit()" class="send-input"
+                     aria-label="<%= t("send_modal.compare_note_label") %>" />
+            <% end %>
+          <% end %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, style: "margin:8px 0 0;" do %>
+            <input type="hidden" name="return_to" value="send" />
+            <input type="hidden" name="share_enabled" value="0" />
+            <label class="send-check">
+              <input type="checkbox" name="share_enabled" value="1"
+                     <%= "checked" if @survey.share_enabled? %>
+                     onchange="this.form.requestSubmit()" />
+              <span><%= t("send_modal.setting_share") %></span>
+            </label>
+          <% end %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, style: "margin:8px 0 0;" do %>
+            <input type="hidden" name="return_to" value="send" />
+            <input type="hidden" name="regions_enabled" value="0" />
+            <label class="send-check">
+              <input type="checkbox" name="regions_enabled" value="1"
+                     <%= "checked" if @survey.regions_enabled? %>
+                     onchange="this.form.requestSubmit()" />
+              <span><%= t("send_modal.setting_regions") %></span>
+            </label>
+          <% end %>
+        </div>
+      </section>
+
+      <%# ── Extra send links ──────────────────────────────────────────────── %>
+      <section class="send-section">
+        <div class="send-section__head">
+          <span class="send-section__title"><%= t("send_modal.links_title") %></span>
+          <span class="send-count"><%= @links.size %>/<%= SurveyLink::MAX_PER_SURVEY %></span>
+        </div>
+        <div class="send-hint" style="margin-bottom:12px;"><%= t("send_modal.links_hint") %></div>
+
+        <% @links.each do |link| %>
+          <% link_url = play_survey_url(link.play_key) %>
+          <div class="send-link<%= " send-link--paused" unless link.active? %>">
+            <div class="send-link__top">
+              <%= form_with url: survey_link_path(@survey, link), method: :patch, style: "margin:0;flex:1;min-width:0;" do %>
+                <input type="text" name="name" value="<%= link.name %>"
+                       maxlength="<%= SurveyLink::MAX_NAME %>"
+                       onchange="this.form.requestSubmit()"
+                       class="send-link__name"
+                       aria-label="<%= t("send_modal.link_name_label") %>" />
+              <% end %>
+              <span class="send-count"><%= t("send_modal.responders", count: (@link_responder_counts[link.id] || 0)) %></span>
+            </div>
+
+            <div class="send-url-row">
+              <input type="text" readonly id="send-url-<%= link.id %>" value="<%= link_url %>" class="send-url" />
+              <button type="button" class="send-btn"
+                      data-copy-label="<%= t("send_modal.copy") %>"
+                      onclick="(navigator.clipboard?.writeText(document.getElementById('send-url-<%= link.id %>').value) ?? Promise.reject()).then(()=>{this.textContent='<%= j t("send_modal.copied") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2000)}).catch(()=>{this.textContent='<%= j t("send_modal.copy_failed") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2500)})"><%= t("send_modal.copy") %></button>
+            </div>
+
+            <%= form_with url: survey_link_path(@survey, link), method: :patch, class: "send-slug-form" do %>
+              <span class="send-slug-prefix"><%= root_url %>play/</span>
+              <input type="text" name="slug" value="<%= link.slug %>"
+                     maxlength="<%= Survey::MAX_SLUG_LENGTH %>"
+                     onchange="this.form.requestSubmit()" class="send-input"
+                     aria-label="<%= t("send_modal.custom_url") %>" />
+            <% end %>
+
+            <div class="send-link__settings">
+              <% [
+                   [ :show_results_comparison, t("send_modal.compare_label"), link.show_results_comparison ],
+                   [ :share_enabled,           t("send_modal.share_label"),   link.share_enabled ],
+                   [ :regions_enabled,         t("send_modal.regions_label"), link.regions_enabled ]
+                 ].each do |field, label, value| %>
+                <%= form_with url: survey_link_path(@survey, link), method: :patch, class: "send-override" do %>
+                  <span class="send-override__label"><%= label %></span>
+                  <select name="<%= field %>" onchange="this.form.requestSubmit()" class="send-select">
+                    <option value=""  <%= "selected" if value.nil?   %>><%= t("send_modal.override_inherit") %></option>
+                    <option value="1" <%= "selected" if value == true  %>><%= t("send_modal.override_on") %></option>
+                    <option value="0" <%= "selected" if value == false %>><%= t("send_modal.override_off") %></option>
+                  </select>
+                <% end %>
+              <% end %>
+            </div>
+
+            <div class="send-link__foot">
+              <%= form_with url: survey_link_path(@survey, link), method: :patch, style: "margin:0;" do %>
+                <input type="hidden" name="active" value="0" />
+                <label class="send-check send-check--tight">
+                  <input type="checkbox" name="active" value="1"
+                         <%= "checked" if link.active? %>
+                         onchange="this.form.requestSubmit()" />
+                  <span><%= link.active? ? t("send_modal.active_label") : t("send_modal.paused_label") %></span>
+                </label>
+              <% end %>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <%= link_to t("send_modal.download_qr_short"), qr_survey_path(@survey, link_id: link.id),
+                      data: { turbo_frame: "_top" }, class: "send-link__action" %>
+                <%= button_to t("send_modal.delete_link"), survey_link_path(@survey, link), method: :delete,
+                      form: { style: "margin:0;", data: { turbo_confirm: t("send_modal.delete_confirm", name: link.name) } },
+                      class: "send-link__action send-link__action--danger" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @links.empty? %>
+          <div class="send-hint" style="margin-bottom:12px;"><%= t("send_modal.links_empty") %></div>
+        <% end %>
+
+        <% if at_limit %>
+          <div class="send-hint"><%= t("send_modal.error_limit", count: SurveyLink::MAX_PER_SURVEY) %></div>
+        <% else %>
+          <%= form_with url: survey_links_path(@survey), method: :post, class: "send-new" do %>
+            <input type="text" name="name" class="send-input"
+                   placeholder="<%= t("send_modal.new_name_placeholder") %>"
+                   maxlength="<%= SurveyLink::MAX_NAME %>" />
+            <div class="send-slug-form" style="margin:0;">
+              <span class="send-slug-prefix"><%= root_url %>play/</span>
+              <input type="text" name="slug" class="send-input"
+                     placeholder="<%= t("send_modal.new_url_placeholder") %>"
+                     maxlength="<%= Survey::MAX_SLUG_LENGTH %>"
+                     aria-label="<%= t("send_modal.custom_url") %>" />
+            </div>
+            <div class="send-override">
+              <span class="send-override__label"><%= t("send_modal.compare_label") %></span>
+              <select name="show_results_comparison" class="send-select">
+                <option value=""><%= t("send_modal.override_inherit") %></option>
+                <option value="1"><%= t("send_modal.override_on") %></option>
+                <option value="0"><%= t("send_modal.override_off") %></option>
+              </select>
+            </div>
+            <button type="submit" class="send-btn send-btn--primary"><%= t("send_modal.add_link") %></button>
+          <% end %>
+        <% end %>
+      </section>
+
+    </div>
+  </div>
+<% end %>
