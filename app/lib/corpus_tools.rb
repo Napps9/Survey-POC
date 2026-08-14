@@ -103,8 +103,21 @@ class CorpusTools
         },
         required: []
       }
+    },
+    {
+      name: "answer_now",
+      description: <<~DESC,
+        Call this — ALONE, and only once — the moment you have the evidence you need.
+        It returns no data. It ends the research phase and lets you write the answer.
+        Do not call it in the same turn as another tool: anything alongside it is
+        discarded, so you would lose that lookup.
+      DESC
+      input_schema: { type: "object", properties: {}, required: [] }
     }
   ].freeze
+
+  # The sentinel's name, in one place — AskVertoChat watches for it.
+  ANSWER_NOW = "answer_now"
 
   # Sources stamped this turn: source number => the row it came from. AskVertoChat
   # reads this to resolve the model's markers and to build the source rail.
@@ -127,6 +140,10 @@ class CorpusTools
     when "get_questions" then get_questions(input)
     when "get_breakdown" then get_breakdown(input)
     when "list_vertos"   then list_vertos(input)
+    # Never reached — AskVertoChat breaks out of the loop without running this
+    # one. Handled anyway so a future change that does run it gets an
+    # acknowledgement rather than the "Unknown tool" branch.
+    when ANSWER_NOW      then { ok: true }
     else { error: "Unknown tool #{name}." }
     end
   rescue => e

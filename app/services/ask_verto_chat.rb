@@ -25,6 +25,23 @@
 # blocks — a subtle failure that surfaces as the model querying the wrong
 # question rather than as an error. Only the final answer streams, token by
 # token, which is the part a person is waiting on.
+#
+# ── How the loop ends ─────────────────────────────────────────────────────────
+# It used to end by noticing that a round came back without tool calls. That
+# noticing cost a whole answer: the model had already written ~450 tokens of
+# prose, the loop discarded it, and stream_answer generated the same answer
+# again. The reader waited through a generation they never saw.
+#
+# So the rounds run under tool_choice "any" — a round CANNOT write prose — and
+# `answer_now` is the move that means "I have enough". A terminating round is
+# now ~20 tokens instead of a full answer. Breaking on it appends nothing to
+# the conversation, so stream_answer still sees a clean sequence of
+# tool_use/tool_result pairs, exactly as before.
+#
+# `drafted` is the belt to that pair of braces: if a round somehow answers
+# anyway, the text is replayed through the same flush! pipeline rather than
+# regenerated. Same code path, so the citation check is the same check — a
+# second, parallel one is how a guarantee quietly stops holding.
 class AskVertoChat
   include AnthropicHelpers
 
@@ -35,6 +52,11 @@ class AskVertoChat
   # is a Claude call, so this is the per-message cost ceiling. Four is enough to
   # search, widen a failed search, fetch, and fetch once more.
   MAX_TOOL_ROUNDS = 4
+
+  # How much of a replayed draft is handed over at a time. Only the reader
+  # notices this: it is what makes a reused answer arrive like a streamed one
+  # rather than landing in a single block.
+  DRAFT_CHUNK = 40
 
   CITE_PATTERN  = /\[\[c:(\d+)\]\]/
   QUOTE_PATTERN = /\[\[q:(\d+)\]\]/
@@ -50,7 +72,14 @@ class AskVertoChat
     HOW YOU WORK
     You have no data in front of you. Everything you say about the data must
     come from a tool call in THIS conversation turn. Search first, then fetch
-    the questions you want numbers from, then answer.
+    the questions you want numbers from, then call answer_now and answer.
+
+    USE MORE THAN ONE VERTO
+    When more than one Verto has data on the question, use more than one. A
+    search tells you how many Vertos matched; where it offered questions from
+    several, fetch from at least two and say where they agree and where they
+    differ. One study is a finding about one study — if only one Verto covers
+    the topic, say so plainly rather than letting it stand for everyone.
 
     CITING — this is the part that matters most
     Every figure, percentage, count, average or comparison you state must be
@@ -61,7 +90,8 @@ class AskVertoChat
     - You may add two percentages from the SAME question (e.g. "somewhat" plus
       "very"), and when you do, say what you added.
     - Never combine numbers from different questions or different Vertos into a
-      new figure.
+      new figure. Comparing two Vertos' figures side by side is fine; averaging
+      or summing them is not.
 
     QUOTING
     When a tool returns quotes, refer to one by writing [[q:88]] with its quote
@@ -117,12 +147,17 @@ class AskVertoChat
     seen_quotes = {}
     announced   = Set.new
 
+    drafted = nil
+
     MAX_TOOL_ROUNDS.times do
       response = @client.messages.create(
         model:           MODEL,
         max_tokens:      MAX_TOKENS,
         system:          system_blocks(tools),
         tools:           tools.definitions,
+        # A round researches; it does not answer. Without this the model ends
+        # the loop by writing a whole answer that is then thrown away.
+        tool_choice:     { type: "any" },
         messages:        convo,
         request_options: anthropic_request_options
       )
@@ -130,7 +165,21 @@ class AskVertoChat
 
       blocks    = Array(response.content)
       tool_uses = blocks.select { |b| tool_use?(b) }
-      break if tool_uses.empty?
+
+      # tool_choice "any" should make this unreachable. If it happens anyway,
+      # keep the prose rather than paying for it twice.
+      if tool_uses.empty?
+        drafted = text_of(blocks)
+        break
+      end
+
+      # Anything alongside the sentinel is dropped on purpose. Running it would
+      # stamp sources whose numbers the model never gets to see, which is how an
+      # answer ends up citing a row it was never shown.
+      if tool_uses.any? { |b| name_of(b) == CorpusTools::ANSWER_NOW }
+        emit&.call(t: "status", text: "Writing the answer…")
+        break
+      end
 
       emit&.call(t: "status", text: status_for(tool_uses, tools))
 
@@ -147,7 +196,7 @@ class AskVertoChat
       end
     end
 
-    stream_answer(convo, tools, seen_quotes, &emit)
+    stream_answer(convo, tools, seen_quotes, drafted: drafted, &emit)
   end
 
   private
@@ -169,15 +218,25 @@ class AskVertoChat
   end
 
   def status_for(tool_uses, _tools)
-    names = tool_uses.map { |b| b.respond_to?(:name) ? b.name : b[:name] }.map(&:to_s)
+    names = tool_uses.map { |b| name_of(b).to_s }
     return "Searching the corpus…" if names.include?("search_corpus")
-    return "Reading the results…"  if names.include?("get_questions")
+    return "Reading the results…"  if names.intersect?(%w[get_questions get_breakdown])
 
     "Looking at what data exists…"
   end
 
+  # The text of an assistant turn, ignoring any non-text blocks.
+  def text_of(blocks)
+    blocks.filter_map do |block|
+      type = block.respond_to?(:type) ? block.type : (block[:type] || block["type"])
+      next unless type.to_s == "text"
+
+      block.respond_to?(:text) ? block.text : (block[:text] || block["text"])
+    end.join
+  end
+
   def run_tool(block, tools)
-    name = block.respond_to?(:name) ? block.name : block[:name]
+    name = name_of(block)
     id   = block.respond_to?(:id) ? block.id : block[:id]
     {
       type:        "tool_result",
@@ -189,12 +248,25 @@ class AskVertoChat
   # The final turn, streamed. Markers are resolved as they complete, which means
   # buffering: "[[c:" can arrive in one delta and "3]]" in the next, and emitting
   # the raw text would show the reader the plumbing.
-  def stream_answer(convo, tools, seen_quotes, &emit)
+  def stream_answer(convo, tools, seen_quotes, drafted: nil, &emit)
     allowed_sources = tools.sources.to_h { |s| [ s["n"], s ] }
     allowed_quotes  = quote_lookup(tools)
 
     buffer = +""
     full   = +""
+
+    # A round answered despite tool_choice "any". Replay what it wrote through
+    # the same pipeline rather than paying for the same answer twice — the
+    # markers still resolve against the same stamped sources, because it is
+    # literally the same code doing the resolving.
+    if drafted.present?
+      drafted.chars.each_slice(DRAFT_CHUNK) do |chunk|
+        buffer << chunk.join
+        flush!(buffer, allowed_sources, allowed_quotes, seen_quotes, &emit)
+      end
+      flush!(buffer, allowed_sources, allowed_quotes, seen_quotes, final: true, &emit)
+      return finish(drafted, allowed_sources, seen_quotes, &emit)
+    end
 
     # The convo carries the tool rounds' tool_use/tool_result blocks, and the
     # API rejects those unless the tools they reference are declared — so the
@@ -318,9 +390,10 @@ class AskVertoChat
     used = full.scan(CITE_PATTERN).flatten.map(&:to_i).uniq.select { |n| allowed_sources.key?(n) }
     citations = used.map { |n| allowed_sources[n] }
 
-    # tool_choice is auto, so the model MAY decline to call anything and answer
-    # from its own knowledge — confident prose with no citations passes every
-    # other check here. This is the one shape that catches it.
+    # The rounds are forced (tool_choice "any"), so the model cannot answer
+    # mid-loop from its own knowledge. The FINAL turn is free prose, and there
+    # it still can: confident writing with no citations passes every other
+    # check here. This is the one shape that catches it.
     if citations.empty? && full.match?(FIGURE_PATTERN) && full.length > 120
       Rails.logger.warn("[AskVerto] answer stated figures with no valid citation")
       emit&.call(t: "warning", text: "This answer isn't backed by a source in the corpus — treat its figures with care.")

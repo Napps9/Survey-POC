@@ -39,6 +39,10 @@ module AnthropicHelpers
     type.to_s == "tool_use"
   end
 
+  def name_of(block)
+    block.respond_to?(:name) ? block.name : (block[:name] || block["name"])
+  end
+
   def input_of(block)
     raw = block.respond_to?(:input) ? block.input : (block[:input] || block["input"])
     raw.respond_to?(:to_h) ? raw.to_h : raw

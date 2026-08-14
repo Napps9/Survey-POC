@@ -14,6 +14,11 @@ class AskVertoChatTest < ActiveSupport::TestCase
   # A client that plays a scripted sequence: each entry is either a list of
   # tool_use blocks (a tool round) or a string (the final answer, streamed a few
   # characters at a time so marker-splitting across deltas is exercised).
+  #
+  # An entry in a tool round may also be `{ text: "…" }`, which becomes a text
+  # block instead of a tool_use. That covers the two shapes the loop has to
+  # survive: a round that answers in prose despite tool_choice "any", and a
+  # round that writes a preamble alongside its tool call.
   class ScriptedClient
     attr_reader :calls
 
@@ -30,7 +35,11 @@ class AskVertoChatTest < ActiveSupport::TestCase
       if step.is_a?(Array)
         @script.shift
         OpenStruct.new(content: step.map.with_index { |s, i|
-          OpenStruct.new(type: "tool_use", id: "tu_#{i}", name: s[:name], input: s[:input])
+          if s.key?(:text)
+            OpenStruct.new(type: "text", text: s[:text])
+          else
+            OpenStruct.new(type: "tool_use", id: "tu_#{i}", name: s[:name], input: s[:input])
+          end
         }, usage: usage)
       else
         OpenStruct.new(content: [ OpenStruct.new(type: "text", text: "") ], usage: usage)
@@ -284,6 +293,114 @@ class AskVertoChatTest < ActiveSupport::TestCase
                    call.dig(:request_options, :timeout),
                    "#{call[:op]} must carry request_options — the SDK overrides the client timeout"
     end
+  end
+
+  # ── Ending the loop without paying for the answer twice ───────────────────
+  #
+  # The loop used to end by noticing a round came back without tool calls — and
+  # that noticing cost a whole generation, because the model had already
+  # written the answer and the loop threw it away before regenerating it. These
+  # pin both halves of the replacement: the sentinel that ends the loop cheaply,
+  # and the fallback that reuses prose rather than paying for it again.
+
+  def answer_now_step = [ { name: "answer_now", input: {} } ]
+
+  test "a research round cannot answer, and the answer turn cannot call a tool" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, answer_now_step, "Worry is high [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+
+    creates = client.calls.select { |c| c[:op] == :create }
+    assert creates.any?
+    assert creates.all? { |c| c[:tool_choice] == { type: "any" } },
+      "a round that may write prose ends the loop by generating an answer nobody reads"
+    assert_equal({ type: "none" }, client.calls.find { |c| c[:op] == :stream_raw }[:tool_choice])
+  end
+
+  test "answer_now ends the loop without a second generation" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, answer_now_step, "Worry is high [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+
+    assert_equal 2, client.calls.count { |c| c[:op] == :create }
+    assert_equal 1, client.calls.count { |c| c[:op] == :stream_raw }
+
+    sent = client.calls.find { |c| c[:op] == :stream_raw }[:messages].to_json
+    assert_not_includes sent, "answer_now",
+      "breaking on the sentinel must append nothing — the convo stays clean tool_use/tool_result pairs"
+  end
+
+  test "a lookup made alongside answer_now is dropped rather than stamped unseen" do
+    chat = AskVertoChat.allocate
+    combined = [ { name: "get_questions", input: { "ids" => [ @question.id ] } },
+                 { name: "answer_now", input: {} } ]
+    client = ScriptedClient.new([ combined, "Worry is high [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    events = []
+    result = chat.call(messages: [ { role: "user", content: "hi" } ]) { |e| events << e }
+
+    assert_empty events.select { |e| e[:t] == "source" },
+      "running it would stamp a source whose numbers the model never sees, and then it cites a row it was never shown"
+    assert_empty result[:citations]
+  end
+
+  test "a round that answers anyway is reused, not regenerated" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, [ { text: "75% are very worried [[c:1]]." } ] ])
+    chat.instance_variable_set(:@client, client)
+
+    events = []
+    result = chat.call(messages: [ { role: "user", content: "hi" } ]) { |e| events << e }
+
+    assert_equal 0, client.calls.count { |c| c[:op] == :stream_raw },
+      "the answer was already written and paid for — generating it again is the bug this replaced"
+    assert_equal "75% are very worried .", text_of(events)
+    assert_equal [ 1 ], events.select { |e| e[:t] == "cite" }.map { |e| e[:n] }
+    assert_equal 1, result[:citations].size
+  end
+
+  # The guarantee has to hold on BOTH paths, or the fallback is a hole in it.
+  test "a fabricated citation is still dropped when the draft is reused" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, [ { text: "Worry is high [[c:1]] and [[c:7]] agrees." } ] ])
+    chat.instance_variable_set(:@client, client)
+
+    events = []
+    result = chat.call(messages: [ { role: "user", content: "hi" } ]) { |e| events << e }
+
+    assert_equal [ 1 ], events.select { |e| e[:t] == "cite" }.map { |e| e[:n] }
+    assert_not_includes text_of(events), "[[c:7]]"
+    assert_equal 1, result[:citations].size
+  end
+
+  test "sources are still announced before the first token when the draft is reused" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, [ { text: "75% are very worried [[c:1]]." } ] ])
+    chat.instance_variable_set(:@client, client)
+
+    events = []
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |e| events << e }
+
+    assert_operator events.index { |e| e[:t] == "source" }, :<, events.index { |e| e[:t] == "token" }
+  end
+
+  test "a preamble written alongside a tool call never reaches the reader" do
+    chat = AskVertoChat.allocate
+    preamble = [ { text: "Let me search the corpus for that." },
+                 { name: "get_questions", input: { "ids" => [ @question.id ] } } ]
+    client = ScriptedClient.new([ preamble, answer_now_step, "Worry is high [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    events = []
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |e| events << e }
+
+    assert_not_includes text_of(events), "Let me search",
+      "a round's thinking-aloud is plumbing; only the answer turn is prose the reader sees"
   end
 
   test "the corpus size is stated in the system prompt so the model knows its denominator" do
