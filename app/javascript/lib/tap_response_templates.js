@@ -14,7 +14,7 @@
 // keep those hooks on any markup change.
 import { t } from "lib/i18n"
 import { iconMap, emojiFor } from "lib/option_icons"
-import { pills, MAX_TAP_RESPONSES } from "lib/tap_scales"
+import { fans, MAX_TAP_RESPONSES } from "lib/tap_scales"
 
 // Local rather than imported from lib/choice_templates: option_styles.js needs
 // tapGlyphSvg from here, choice_templates already imports option_styles, and
@@ -66,7 +66,13 @@ function styleAttrs(response) {
 // rebuilt client-side.
 export function tapResponseHtml(response, index) {
   const cls = `rotate-action${response.strong ? " is-strong" : ""}`
-  const style = response.color ? ` style="--tap-response-color: ${esc(response.color)};"` : ""
+  // Colour and place on the arc ride in as custom properties; the row layout
+  // simply ignores the coordinates. See _tap_responses.html.erb.
+  const vars = [
+    response.color ? `--tap-response-color: ${esc(response.color)};` : "",
+    response.fan ? `--tap-x: ${response.x}%; --tap-y: ${response.y}%;` : ""
+  ].join("")
+  const style = vars ? ` style="${vars}"` : ""
   return `
     <div class="${cls}"${style}
          data-tap-response
@@ -96,7 +102,7 @@ export function tapResponseStripHtml(responses) {
                aria-label="${esc(t("card.add_response", { default: "Add an answer" }))}">＋</button>`
     : ""
   return `
-    <div class="rotate-actions${pills(responses.length) ? " rotate-actions--pills" : ""}"
+    <div class="rotate-actions${fans(responses.length) ? " rotate-actions--fan" : ""}"
          data-tap-responses
          data-response-count="${responses.length}">
       ${responses.map((r, i) => tapResponseHtml(r, i)).join("")}

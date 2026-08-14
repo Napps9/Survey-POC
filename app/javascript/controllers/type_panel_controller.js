@@ -5,7 +5,7 @@ import { NON_QUESTION_TYPES } from "lib/question_types"
 import { DEFAULT_OPTIONS, defaultOptionsFor } from "lib/default_options"
 import { choiceListItemHtml, prioritiseItemHtml, choiceGridItemHtml, addOptionBtnHtml } from "lib/choice_templates"
 import { tapResponseStripHtml, tapGlyphSvg } from "lib/tap_response_templates"
-import { resolveResponses } from "lib/tap_scales"
+import { resolveResponses, fans } from "lib/tap_scales"
 import { injectIcons } from "lib/option_icons"
 import { t } from "lib/i18n"
 
@@ -240,7 +240,7 @@ const COMPONENTS = {
           <span class="rotate-complete-check">${tapGlyphSvg("yes")}</span>
           <span class="rotate-complete-text">${esc(t("card.tap_done"))}</span>
         </div>
-        <div class="rotate-card-controls" data-tap-stack-target="controls">
+        <div class="rotate-card-controls${fans(responses.length) ? " rotate-card-controls--fan" : ""}" data-tap-stack-target="controls">
           ${tapResponseStripHtml(responses)}
           <div class="rotate-dots" data-tap-stack-target="dots"></div>
         </div>

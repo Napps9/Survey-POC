@@ -174,9 +174,11 @@ class JsConstantParityTest < ActiveSupport::TestCase
       end
     end
 
-    %w[MIN_TAP_RESPONSES MAX_TAP_RESPONSES DEFAULT_TAP_COUNT TAP_PILL_THRESHOLD].zip(
+    %w[MIN_TAP_RESPONSES MAX_TAP_RESPONSES DEFAULT_TAP_COUNT TAP_FAN_THRESHOLD
+       FAN_START FAN_END].zip(
       [ TapScales::MIN_RESPONSES, TapScales::MAX_RESPONSES,
-        TapScales::DEFAULT_COUNT, TapScales::PILL_THRESHOLD ]
+        TapScales::DEFAULT_COUNT, TapScales::FAN_THRESHOLD,
+        TapScales::FAN_START.to_i, TapScales::FAN_END.to_i ]
     ).each do |name, value|
       assert_match(/export const #{name} = #{value}\b/, source,
                    "#{name} disagrees with Ruby, so the editor and the server bound the scale differently")

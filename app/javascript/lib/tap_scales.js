@@ -48,7 +48,12 @@ export const TAP_PRESETS = {
 export const DEFAULT_TAP_COUNT = 3
 export const MIN_TAP_RESPONSES = 2
 export const MAX_TAP_RESPONSES = 6
-export const TAP_PILL_THRESHOLD = 5
+export const TAP_FAN_THRESHOLD = 5
+
+// The arc the wide scales are laid out on — see TapScales::FAN_* in Ruby.
+export const FAN_START = 232
+export const FAN_END = -52
+const FAN_CX = 50, FAN_CY = 57.5, FAN_RX = 30, FAN_RY = 22
 
 // Parsed per call, not cached at module level: the module survives Turbo
 // navigations but the blob is per-survey (each Verto has its own default
@@ -85,8 +90,23 @@ export function defaultsForKey(key) {
   return null
 }
 
-export function pills(count) {
-  return Number(count) >= TAP_PILL_THRESHOLD
+// Five and up fan out over the photo; four and under stay a row of circles.
+export function fans(count) {
+  return Number(count) >= TAP_FAN_THRESHOLD
+}
+
+// [x, y] percentages for one response on the fan. Mirrors
+// TapScales.fan_position — most-negative at the bottom left, the middle at the
+// apex, most-positive at the bottom right.
+export function fanPosition(index, count) {
+  const n = Number(count)
+  if (!(n >= 2)) return [ FAN_CX, FAN_CY ]
+  const deg = FAN_START + ((FAN_END - FAN_START) / (n - 1)) * index
+  const rad = (deg * Math.PI) / 180
+  return [
+    Math.round((FAN_CX + FAN_RX * Math.cos(rad)) * 100) / 100,
+    Math.round((FAN_CY - FAN_RY * Math.sin(rad)) * 100) / 100
+  ]
 }
 
 // Which way the card flies when this response is chosen. The scale is ordered
@@ -131,9 +151,10 @@ export function storedResponses(list) {
 export function resolveResponses(list) {
   const stored = storedResponses(list) || presetFor(DEFAULT_TAP_COUNT)
   const count = stored.length
-  const isPill = pills(count)
+  const isFan = fans(count)
   return stored.map((entry, i) => {
     const fallback = defaultsForKey(String(entry.key)) || {}
+    const [ x, y ] = fanPosition(i, count)
     return {
       key:       String(entry.key),
       label:     entry.label || fallback.label || String(entry.key),
@@ -144,7 +165,8 @@ export function resolveResponses(list) {
       strong:    entry.strong === undefined ? !!fallback.strong : !!entry.strong,
       index:     i,
       direction: directionFor(i, count),
-      pill:      isPill
+      fan:       isFan,
+      x, y
     }
   })
 }

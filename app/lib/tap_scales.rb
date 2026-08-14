@@ -24,10 +24,32 @@ module TapScales
   MIN_RESPONSES = 2
   MAX_RESPONSES = 6
 
-  # From this many responses up, the strip renders as text-and-emoji pills rather
-  # than labelled circles: five 48px circles do not fit across a 320px card, and
-  # "Strongly disagree" is not a word a 22px glyph can carry on its own.
-  PILL_THRESHOLD = 5
+  # From this many responses up, the strip stops being a row of labelled circles
+  # in the scrim and fans out over the photo as text pills: five 48px circles do
+  # not fit across a 320px card, and "Strongly disagree" is not a word a 22px
+  # glyph can carry on its own.
+  FAN_THRESHOLD = 5
+
+  # Where a fanned response sits on the card, as percentages.
+  #
+  # The design lays the wide scales out on an ARC over the photo rather than in
+  # a row: most-negative at the bottom left, the middle at the apex, most
+  # positive at the bottom right. Measured off the design, the five pills sit at
+  # 231°, 160°, 89°, 17° and -54° — evenly spaced around 285° of a slightly
+  # squashed circle — which is the geometry below.
+  #
+  # It is not decoration. The arc is the same shape as the gesture: everything
+  # left of the apex flies left, the apex flies up, everything right flies right,
+  # so where an answer SITS is where the card goes when you pick it. A row can't
+  # say that.
+  # Symmetric about the apex (232 - 90 == 90 - -52), so the two extremes sit
+  # exactly level and an odd scale's middle lands exactly on the centre line.
+  FAN_START  = 232.0   # bottom left, the most negative answer
+  FAN_END    = -52.0   # bottom right, the most positive
+  FAN_CX     = 50.0
+  FAN_CY     = 57.5
+  FAN_RX     = 30.0
+  FAN_RY     = 22.0
 
   # The historic three were translated as `card.swipe_*` long before this module
   # existed and are already carried in all 19 locale files. Preferring those keys
@@ -66,8 +88,22 @@ module TapScales
     DEFAULTS_BY_KEY[key.to_s]
   end
 
-  def pills?(count)
-    count.to_i >= PILL_THRESHOLD
+  # Five and up fan out over the photo; four and under stay a row of circles in
+  # the scrim, which is what the design shows and what the card has always done.
+  def fan?(count)
+    count.to_i >= FAN_THRESHOLD
+  end
+
+  # [x, y] percentages for one response on the fan. Evenly spaced along the arc,
+  # first entry at FAN_START, last at FAN_END.
+  def fan_position(index, count)
+    count = count.to_i
+    return [ FAN_CX, FAN_CY ] if count < 2
+
+    degrees = FAN_START + ((FAN_END - FAN_START) / (count - 1)) * index
+    radians = degrees * Math::PI / 180
+    [ (FAN_CX + FAN_RX * Math.cos(radians)).round(2),
+      (FAN_CY - FAN_RY * Math.sin(radians)).round(2) ]
   end
 
   # Which way the card flies when this response is chosen. The scale is ordered
@@ -124,9 +160,10 @@ module TapScales
     count   = entries.size
     shown   = translated_labels(card, locale, default_locale)
 
-    pill = pills?(count)
+    fan = fan?(count)
 
     entries.each_with_index.map do |entry, i|
+      x, y = fan_position(i, count)
       key      = entry["key"].to_s
       fallback = DEFAULTS_BY_KEY[key] || {}
       # A STORED label is the creator's own words and always wins. A preset one
@@ -145,7 +182,9 @@ module TapScales
         "strong"    => entry.key?("strong") ? !!entry["strong"] : !!fallback["strong"],
         "index"     => i,
         "direction" => direction_for(i, count),
-        "pill"      => pill
+        "fan"       => fan,
+        "x"         => x,
+        "y"         => y
       }
     end
   end
@@ -160,7 +199,7 @@ module TapScales
   def to_json(locale = nil)
     { "presets" => presets_i18n(locale), "default_count" => DEFAULT_COUNT,
       "min" => MIN_RESPONSES, "max" => MAX_RESPONSES,
-      "pill_threshold" => PILL_THRESHOLD }.to_json
+      "fan_threshold" => FAN_THRESHOLD }.to_json
   end
 
   def presets_i18n(locale = nil)

@@ -364,12 +364,16 @@
             <span class="rotate-complete-text"><%= t("card.tap_done") %></span>
           </div>
 
-          <%# Controls live INSIDE the card: the response strip over a bottom
-              scrim, and the remaining-cards dots. The strip is 2-6 answers wide
-              (TapScales) — a card with no stored `responses` gets the historic
-              No / Unsure / Yes, which is why every deck predating configurable
-              scales renders unchanged. The controller builds the dots. %>
-          <div class="rotate-card-controls" data-tap-stack-target="controls">
+          <%# Controls live INSIDE the card: the response strip and the
+              remaining-cards dots. The strip is 2-6 answers wide (TapScales) —
+              a card with no stored `responses` gets the historic No / Unsure /
+              Yes, which is why every deck predating configurable scales renders
+              unchanged. The controller builds the dots.
+              Up to four responses the strip is a row over a bottom scrim; at
+              five and up it fans across the whole card, so the wrapper has to
+              stop being a bottom strip and cover the photo. %>
+          <div class="rotate-card-controls<%= " rotate-card-controls--fan" if TapScales.fan?(tap_responses.length) %>"
+               data-tap-stack-target="controls">
             <%= render "shared/tap_responses", responses: tap_responses, editable: editable %>
             <div class="rotate-dots" data-tap-stack-target="dots"></div>
           </div>

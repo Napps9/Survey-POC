@@ -22,7 +22,7 @@ class TapScalesTest < ActiveSupport::TestCase
     assert_equal %w[No Unsure Yes], resolved.map { |r| r["label"] }
     assert_equal %w[left up right], resolved.map { |r| r["direction"] }
     assert_equal %w[no unsure yes], resolved.map { |r| r["glyph"] }
-    refute resolved.any? { |r| r["pill"] }, "three responses are circles, not pills"
+    refute resolved.any? { |r| r["fan"] }, "three responses are a row of circles, not a fan"
   end
 
   test "every preset is ordered most-negative first" do
@@ -51,10 +51,54 @@ class TapScalesTest < ActiveSupport::TestCase
     end
   end
 
-  test "five and up render as pills, four and under as circles" do
-    refute TapScales.pills?(4)
-    assert TapScales.pills?(5)
-    assert TapScales.for_card({ "type" => "tap_card", "responses" => TapScales.preset(5) }).all? { |r| r["pill"] }
+  test "five and up fan out, four and under stay a row" do
+    refute TapScales.fan?(4)
+    assert TapScales.fan?(5)
+    assert TapScales.for_card({ "type" => "tap_card", "responses" => TapScales.preset(5) }).all? { |r| r["fan"] }
+  end
+
+  # The arc is the same shape as the gesture, so these are not free numbers: the
+  # first response has to sit left of centre, the last right of it, and an odd
+  # scale's middle has to sit at the apex above both — otherwise a respondent is
+  # told to fling one way by the layout and another by the animation.
+  # The arc is the same shape as the gesture, so these are not free numbers.
+  # Where a response SITS has to agree with where the card FLIES when you pick
+  # it, or the layout tells a respondent one thing and the animation another.
+  #
+  # Note the arc curls back in at its ends — the most extreme answers sit closer
+  # to the centre line than their neighbours, exactly as the design has them. So
+  # the invariant is which SIDE a response is on, never how far along x it is.
+  test "each fanned response sits on the side its swipe flies to" do
+    [ 5, 6 ].each do |n|
+      (0...n).each do |i|
+        x, _y = TapScales.fan_position(i, n)
+        case TapScales.direction_for(i, n)
+        when "left"  then assert_operator x, :<, TapScales::FAN_CX, "#{n}/#{i} flies left but sits right of centre"
+        when "right" then assert_operator x, :>, TapScales::FAN_CX, "#{n}/#{i} flies right but sits left of centre"
+        when "up"    then assert_in_delta TapScales::FAN_CX, x, 2.0, "#{n}/#{i} flies up, so it belongs at the apex"
+        end
+      end
+    end
+  end
+
+  test "the apex is the top of the arc and the extremes are level" do
+    ys = (0...5).map { |i| TapScales.fan_position(i, 5).last }
+
+    assert_equal ys.min, ys[2], "the middle of an odd scale is the apex — the answer a fling upward means"
+    assert_in_delta ys.first, ys.last, 1.0, "the two extremes sit level with each other"
+    assert_equal [ ys.first, ys.last ].max, ys.max, "the scale opens at the bottom of the card"
+  end
+
+  test "every fanned response lands inside the card" do
+    [ 5, 6 ].each do |n|
+      (0...n).each do |i|
+        x, y = TapScales.fan_position(i, n)
+        assert_operator x, :>, 10, "#{n}/#{i} would hang off the left edge"
+        assert_operator x, :<, 90, "#{n}/#{i} would hang off the right edge"
+        assert_operator y, :>, 20, "#{n}/#{i} would sit under the statement band"
+        assert_operator y, :<, 85, "#{n}/#{i} would sit under the remaining-cards dots"
+      end
+    end
   end
 
   test "presets carry exactly the mark their shape renders" do

@@ -15,12 +15,17 @@
     split _card_component already makes between `pick_actions` and the editable
     option row, for the identical reason.
 
-    At five responses and up the strip switches from labelled circles to pills
-    (rotate-actions--pills); the DOM is the same either way and CSS does the
-    rest, so a creator adding a fifth response doesn't rebuild anything.
+    Up to four responses are a row of labelled circles in the bottom scrim. At
+    five and up the strip FANS: the pills are placed on an arc over the photo,
+    most-negative at the bottom left, the middle at the apex, most-positive at
+    the bottom right (TapScales.fan_position). The DOM is the same either way —
+    each response just carries its place on the arc as --tap-x / --tap-y, which
+    CSS uses only in fan mode — so a creator adding a fifth response doesn't
+    rebuild anything.
 %>
 <% count = responses.length %>
-<div class="rotate-actions<%= " rotate-actions--pills" if TapScales.pills?(count) %>"
+<% fan   = TapScales.fan?(count) %>
+<div class="rotate-actions<%= " rotate-actions--fan" if fan %>"
      data-tap-responses
      data-response-count="<%= count %>">
   <% responses.each_with_index do |response, i| %>
@@ -29,7 +34,11 @@
       label = response["label"].to_s
       # The response's hue rides in as a custom property so one rule paints the
       # ring, the pill border and the drag-intent highlight from a single value.
-      style = "--tap-response-color: #{response['color']};" if response["color"].present?
+      # Its place on the arc rides in the same way, and is simply ignored by the
+      # row layout — one set of attributes, whichever shape the strip is in.
+      style = +""
+      style << "--tap-response-color: #{response['color']};" if response["color"].present?
+      style << "--tap-x: #{response['x']}%; --tap-y: #{response['y']}%;" if fan
       classes = [ "rotate-action" ]
       classes << "is-strong" if response["strong"]
     %>

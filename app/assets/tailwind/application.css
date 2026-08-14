@@ -2283,23 +2283,30 @@
 .rotate-reset-btn:hover { color: var(--brand-primary, #01EACB); }
 
 /* ── The response strip — 2 to 6 answers (TapScales) ──────────────────────
-   Two shapes, one DOM (see shared/_tap_responses.html.erb): up to four
-   responses are labelled circles, the look the card has always had; five and
-   six become text-and-emoji pills, because four 48px circles already fill the
-   width of a 320px card and "Strongly disagree" will not fit under a fifth.
-   Each response carries its own hue as --tap-response-color, so one rule
-   paints the ring, the pill border and the drag highlight. */
+   Two shapes, one DOM (see shared/_tap_responses.html.erb).
+
+   Up to four: a row of labelled circles over the bottom scrim, the look the
+   card has always had. It must stay ONE row — the first cut let it wrap and
+   four broke 3 + 1, because a flex item is as wide as its LABEL and "Strongly
+   disagree" is twice the width of "Agree". So the row doesn't wrap, each item
+   gets an equal share of the width, and the caption wraps inside it instead.
+
+   Five and up: the pills FAN across the photo on an arc (TapScales.fan_position
+   puts each one at --tap-x / --tap-y). Most-negative bottom left, the middle at
+   the apex, most-positive bottom right — the same shape as the gesture, so
+   where an answer sits is where the card flies when you choose it.
+
+   Each response carries its own hue as --tap-response-color, so one rule paints
+   the ring, the pill border and the drag highlight. */
 .rotate-actions {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: 24px; margin-top: 4px; align-items: flex-start;
+  display: flex; flex-wrap: nowrap; justify-content: center; align-items: flex-start;
+  gap: 10px; margin-top: 4px; width: 100%;
 }
-/* The circles have to clear the scrim's usable width — 292px on the desktop
-   card, 276px on .phone-bottom — so the gap closes as the scale grows. */
-.rotate-actions[data-response-count="2"] { gap: 32px; }
-.rotate-actions[data-response-count="3"] { gap: 28px; }
-.rotate-actions[data-response-count="4"] { gap: 14px; }
 .rotate-action {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
+  /* Equal shares, so the widest caption can't push a neighbour onto a new row.
+     min-width:0 is what actually lets the caption wrap rather than overflow. */
+  flex: 1 1 0; min-width: 0;
   /* It's a <button> in the player and a <div> in the editor; neither should
      bring a button's chrome, and both are the whole click target. */
   appearance: none; background: none; border: 0; padding: 0; margin: 0;
@@ -2308,8 +2315,13 @@
 }
 .rotate-action-label {
   font-family: "Alata", sans-serif; font-size: 11px; color: rgba(0,0,0,0.55);
+  line-height: 1.15; overflow-wrap: break-word; hyphens: auto; max-width: 100%;
 }
+/* Four captions across a 292px scrim is ~68px each — "Strongly disagree" only
+   fits at this size, on two lines. */
+.rotate-actions[data-response-count="4"] .rotate-action-label { font-size: 10px; }
 .rotate-action-btn {
+  flex-shrink: 0;
   width: 48px; height: 48px;
   border-radius: 50%;
   border: 2px solid var(--tap-response-color, #F5A623);
@@ -2321,6 +2333,7 @@
   font-size: 18px; font-weight: 700;
   transition: transform 0.12s;
 }
+.rotate-actions[data-response-count="4"] .rotate-action-btn { width: 44px; height: 44px; }
 .rotate-action:hover .rotate-action-btn { transform: scale(1.1); }
 /* A four-point scale has no middle, so "strongly" is carried by weight rather
    than by a glyph that doesn't exist: the extremes fill their ring instead of
@@ -2340,38 +2353,55 @@
 .phone-bottom .rotate-action-icon { width: 19px; height: 19px; }
 .rotate-action .choice-icon-emoji { font-size: 20px; line-height: 1; }
 
-/* Pills: five or six responses, where the label has to carry the meaning and
-   the emoji is the accent rather than the whole mark. They wrap to a second
-   row inside the scrim, which is what makes six fit a phone at all. */
-.rotate-actions--pills { gap: 6px; }
-.rotate-actions--pills .rotate-action {
+/* ── The fan: five or six responses, placed on an arc over the photo ─────
+   The wrapper stops being a bottom strip and covers the card; the scrim shrinks
+   to a band behind the dots, because the pills are solid white and carry their
+   own contrast wherever they land on the photo. */
+.rotate-card-controls--fan {
+  top: 0;
+  padding: 0;
+  justify-content: flex-end;
+  background: linear-gradient(transparent 78%, rgba(0,0,0,0.42));
+}
+.rotate-actions--fan {
+  position: absolute; inset: 0;
+  display: block; margin: 0; gap: 0;
+}
+.rotate-actions--fan .rotate-action {
+  position: absolute;
+  left: var(--tap-x, 50%); top: var(--tap-y, 50%);
+  transform: translate(-50%, -50%);
+  flex: 0 0 auto;
+  /* Wide enough for "Slightly disagree" on two lines, narrow enough that the
+     two bottom pills clear each other at the ends of the arc. */
+  width: max-content; max-width: 32%;
   flex-direction: row; gap: 5px;
   background: #fff;
   border: 1.5px solid var(--tap-response-color, #F5A623);
   border-radius: 999px;
-  padding: 4px 10px 4px 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+  padding: 5px 11px 5px 9px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.22);
   transition: transform 0.12s;
 }
-.rotate-actions--pills .rotate-action-btn {
+.rotate-actions--fan .rotate-action-btn {
   width: auto; height: auto;
   border: 0; border-radius: 0; background: none; box-shadow: none;
   padding: 0;
 }
-.rotate-actions--pills .rotate-action.is-strong .rotate-action-btn {
+.rotate-actions--fan .rotate-action.is-strong .rotate-action-btn {
   background: none; color: var(--tap-response-color, #F5A623);
 }
-.rotate-actions--pills .rotate-action.is-strong { border-width: 2.5px; }
-.rotate-actions--pills .rotate-action-label {
-  font-size: 11px; color: #1C2034; line-height: 1.15;
+.rotate-actions--fan .rotate-action.is-strong { border-width: 2.5px; }
+.rotate-actions--fan .rotate-action-label {
+  font-size: 11px; color: #1C2034; text-align: left;
 }
-.rotate-actions--pills .rotate-action .choice-icon-emoji { font-size: 14px; }
-.rotate-actions--pills .rotate-action:hover { transform: scale(1.06); }
-.rotate-actions--pills .rotate-action:hover .rotate-action-btn { transform: none; }
-.rotate-actions--pills .rotate-action.is-intent { transform: scale(1.12); }
-.rotate-actions--pills .rotate-action.is-intent .rotate-action-btn { transform: none; }
-.phone-bottom .rotate-actions--pills .rotate-action { padding: 3px 8px 3px 7px; }
-.phone-bottom .rotate-actions--pills .rotate-action-label { font-size: 10px; }
+.rotate-actions--fan .rotate-action .choice-icon-emoji { font-size: 14px; }
+.rotate-actions--fan .rotate-action:hover { transform: translate(-50%, -50%) scale(1.07); }
+.rotate-actions--fan .rotate-action:hover .rotate-action-btn { transform: none; }
+.rotate-actions--fan .rotate-action.is-intent { transform: translate(-50%, -50%) scale(1.13); }
+.rotate-actions--fan .rotate-action.is-intent .rotate-action-btn { transform: none; }
+.phone-bottom .rotate-actions--fan .rotate-action { padding: 4px 9px 4px 8px; }
+.phone-bottom .rotate-actions--fan .rotate-action-label { font-size: 10px; }
 
 /* ── Editor-only response chrome ──────────────────────────────────────────
    The 🎨 popover and the × sit on the response itself, exactly as they do on a
@@ -2386,18 +2416,40 @@
   font-size: 10px; line-height: 1;
   opacity: 0; transition: opacity 0.15s;
 }
-.tap-response-style-btn { right: -6px; background: rgba(255,255,255,0.92); }
-.tap-response-delete    { left: -6px; background: var(--color-red, #D80027); color: #fff; font-size: 12px; }
-.rotate-actions:hover .tap-response-style-btn,
-.rotate-actions:hover .tap-response-delete { opacity: 1; }
+/* Above the pill's own background and border, and above any neighbour that
+   paints after it — a badge sitting half-under the thing it belongs to reads
+   as a rendering fault rather than a control. */
+.tap-response-style-btn, .tap-response-delete { z-index: 3; }
+.tap-response-style-btn {
+  right: -7px; background: #fff;
+  border: 1px solid rgba(28,32,52,0.18);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.tap-response-delete    { left: -7px; background: var(--color-red, #D80027); color: #fff; font-size: 12px; }
+/* The fanned pills overlap each other's badges by DOM order, so the one being
+   pointed at comes forward. */
+.rotate-actions--fan .rotate-action:hover,
+.rotate-actions--fan .rotate-action:focus-within { z-index: 4; }
+/* Per RESPONSE, not per strip. Revealing all of them at once put six pairs of
+   badges on the card simultaneously, and in the fan the tight pills overlap
+   each other's — so a creator saw a row of half-hidden circles instead of the
+   two controls belonging to the answer they were pointing at. focus-within
+   keeps them reachable from the keyboard. */
+.rotate-action:hover .tap-response-style-btn,
+.rotate-action:hover .tap-response-delete,
+.rotate-action:focus-within .tap-response-style-btn,
+.rotate-action:focus-within .tap-response-delete { opacity: 1; }
 /* Two is the floor — below it there is no question left to ask — so the × goes
    away rather than going dead, the mirror of how ＋ leaves at six. */
 .rotate-actions[data-response-count="2"] .tap-response-delete { display: none; }
 .rotate-action-label[contenteditable]:focus {
   outline: 2px solid rgba(1,234,203,0.8); outline-offset: 2px; border-radius: 4px;
 }
+/* In the fan there is no "after the last pill" to sit in, so the add button
+   takes the one corner the arc never reaches. */
+.rotate-actions--fan .tap-response-add { position: absolute; right: 10px; bottom: 12px; }
 .tap-response-add {
-  width: 34px; height: 34px; align-self: center;
+  width: 34px; height: 34px; align-self: center; flex-shrink: 0;
   border-radius: 50%;
   border: 1.5px dashed rgba(255,255,255,0.6);
   background: rgba(255,255,255,0.14);
