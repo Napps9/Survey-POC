@@ -65,7 +65,7 @@ class QuestionTypeClassifier
                   - tap_card: 5 to 8 statements covering negative, neutral and positive
                     sentiments in that order, each <= 40 chars
                   - range: EXACTLY 5 points — never 3, never 4 — with a genuinely
-                    neutral MIDDLE label (the 3rd)
+                    neutral MIDDLE label (the 3rd), each label <= 17 chars
                   - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
                   - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
                   - scenario: 2 or 3 options, each <= 30 chars

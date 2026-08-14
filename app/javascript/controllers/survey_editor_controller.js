@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
-import { analyzeCard, analyzeVerto, typeLabel, GRID_LABEL_MAX, GRID_LABEL_TYPES,
-         COUNTED_LABEL_TYPES, optionLabelLimit } from "lib/verto_rules"
+import { analyzeCard, analyzeVerto, typeLabel, CAPPED_LABEL_TYPES,
+         COUNTED_LABEL_TYPES, SCALE_LABEL_MAX, optionLabelLimit } from "lib/verto_rules"
 import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_types"
 import { isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
@@ -74,7 +74,7 @@ export default class extends Controller {
     this._activeFlowTabs = new Map()
     this._seedStore()
     this._bindUndo()
-    this._bindGridLabelCap()
+    this._bindLabelCap()
     this.refreshAll()
 
     // Safety net for the 1.5s autosave debounce: if the page is hidden or
@@ -143,24 +143,32 @@ export default class extends Controller {
   // count is a nudge toward the Rules of the Game budget (40 for lists,
   // measured: an iPhone 15 list row fits ~32 characters a line against a grid
   // tile's ~22).
-  _bindGridLabelCap() {
+  _bindLabelCap() {
     // Capture, so a rich-text or picker handler can't swallow it first.
-    this.element.addEventListener("beforeinput", (e) => this._capGridLabel(e), { capture: true })
+    this.element.addEventListener("beforeinput", (e) => this._capLabel(e), { capture: true })
     this.element.addEventListener("focusin",  (e) => this._showLabelCount(e))
     this.element.addEventListener("focusout", () => this._hideLabelCount())
     // Typing fires beforeinput then input; the counter reads the settled value.
     this.element.addEventListener("input", (e) => {
-      const label = this._optionLabelOf(e.target)
+      const label = this._budgetedLabelOf(e.target)
       if (!label) return
-      if (this._isCapped(label)) this._trimGridLabel(label)
+      if (this._isCapped(label)) this._trimLabel(label)
       this._renderLabelCount(label)
     })
   }
 
-  // The option label being edited, if the event is inside one on a card type
-  // that gets a counter. Resolves through OPTION_LABEL_SELECTORS rather than a
-  // hardcoded class, so a grid tile and a list row are found the same way.
-  _optionLabelOf(node) {
+  // The label being edited, if it has a budget. Two kinds qualify:
+  //
+  //   - an OPTION label on a counted type, resolved through
+  //     OPTION_LABEL_SELECTORS rather than a hardcoded class, so a grid tile
+  //     and a list row are found the same way;
+  //   - a tap card's RESPONSE label, which is a separate list on the same card
+  //     (a tap card's options are its statements) and so has to be matched on
+  //     its own hook rather than through that table.
+  _budgetedLabelOf(node) {
+    const response = node?.closest?.("[data-tap-response-label]")
+    if (response) return response.isContentEditable ? response : null
+
     const card = node?.closest?.("[data-survey-editor-target='card']")
     const type = card?.dataset.cardType
     if (!COUNTED_LABEL_TYPES.includes(type)) return null
@@ -169,17 +177,26 @@ export default class extends Controller {
     return label?.isContentEditable ? label : null
   }
 
-  // Whether this label's limit is a wall or a line on the floor. Only the
-  // grids refuse the keystroke; see _bindGridLabelCap for why.
+  _isResponseLabel(label) {
+    return !!label?.closest?.("[data-tap-response-label]")
+  }
+
+  // Whether this label's limit is a wall or a line on the floor. The kinds
+  // that refuse the keystroke are the ones whose layout DEPENDS on the length:
+  // a grid tile, a range slider's stops, and a tap card's responses. A list row
+  // just gets taller, so its budget stays advisory. See _bindLabelCap.
   _isCapped(label) {
+    if (this._isResponseLabel(label)) return true
     const type = label.closest("[data-survey-editor-target='card']")?.dataset.cardType
-    return GRID_LABEL_TYPES.includes(type)
+    return CAPPED_LABEL_TYPES.includes(type)
   }
 
   // The budget for the label being edited — 20 on a grid tile, 40 on a list
-  // row — read from OPTION_LIMITS so the counter and the Rules of the Game
-  // panel can never quote different numbers at the same label.
+  // row, 17 on either scale's answer label — read from the rules module so the
+  // counter and the Rules of the Game panel can never quote different numbers
+  // at the same label.
   _limitFor(label) {
+    if (this._isResponseLabel(label)) return SCALE_LABEL_MAX
     const type = label.closest("[data-survey-editor-target='card']")?.dataset.cardType
     return optionLabelLimit(type)
   }
@@ -199,12 +216,12 @@ export default class extends Controller {
   // This is the first of two passes. It can only act on inputs that declare
   // how much text they are about to insert, and not all of them do: a bulk
   // insert can arrive with `data` null and no dataTransfer, in which case
-  // there is nothing here to measure and _trimGridLabel below catches it after
+  // there is nothing here to measure and _trimLabel below catches it after
   // the fact. Doing it in this order matters — predicting first means the
   // ordinary keystroke at the cap is simply refused, with no character ever
   // painted and taken away again.
-  _capGridLabel(event) {
-    const label = this._optionLabelOf(event.target)
+  _capLabel(event) {
+    const label = this._budgetedLabelOf(event.target)
     if (!label || !this._isCapped(label)) return
     if (!event.inputType?.startsWith("insert")) return
 
@@ -213,7 +230,7 @@ export default class extends Controller {
     if (incoming === null) return   // unmeasurable — leave it to the backstop
 
     const selected = this._selectionLengthIn(label)
-    if (label.textContent.length - selected + incoming <= GRID_LABEL_MAX) return
+    if (label.textContent.length - selected + incoming <= this._limitFor(label)) return
 
     event.preventDefault()
     this._renderLabelCount(label, { rejected: true })
@@ -237,8 +254,9 @@ export default class extends Controller {
   // Trims from the last text node backwards rather than reassigning
   // textContent, because these labels carry rich-text markup and flattening
   // them would silently drop a creator's bold on every overlong paste.
-  _trimGridLabel(label) {
-    if (label.textContent.length <= GRID_LABEL_MAX) {
+  _trimLabel(label) {
+    const max = this._limitFor(label)
+    if (label.textContent.length <= max) {
       // Brought under the cap by hand — hold it there from now on, so a legacy
       // label that has been tidied up doesn't stay exempt for the rest of the
       // session.
@@ -247,7 +265,7 @@ export default class extends Controller {
     }
     if (!this._labelCompliant) return
 
-    let excess = label.textContent.length - GRID_LABEL_MAX
+    let excess = label.textContent.length - max
     const walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT)
     const texts = []
     while (walker.nextNode()) texts.push(walker.currentNode)
@@ -294,25 +312,35 @@ export default class extends Controller {
   // still typable). A creator who learns that pink means "stop" on a grid
   // would otherwise be confused when it doesn't on a list.
   _showLabelCount(event) {
-    const label = this._optionLabelOf(event.target)
+    const label = this._budgetedLabelOf(event.target)
     if (!label) return
-    // Read compliance here, not on input — see _trimGridLabel.
+    // Read compliance here, not on input — see _trimLabel.
     this._labelCompliant = label.textContent.length <= this._limitFor(label)
     this._labelCounter ||= Object.assign(document.createElement("div"),
                                          { className: "option-limit-counter" })
-    label.after(this._labelCounter)
+    // A grid tile or list row can take the counter as a sibling. The two scales
+    // cannot: a slider's labels are five columns of one row and a tap card's
+    // are a strip, so a sixth child would shove the layout sideways under the
+    // creator mid-keystroke. Those get it pinned to the widget instead.
+    const pinned = label.closest(".slider-wrap, .rotate-wrap")
+    this._labelCounter.classList.toggle("option-limit-counter--pinned", !!pinned)
+    pinned ? pinned.appendChild(this._labelCounter) : label.after(this._labelCounter)
     this._renderLabelCount(label)
   }
 
   _hideLabelCount() {
     this._labelCounter?.remove()
+    this._countedLabel = null
   }
 
   _renderLabelCount(label = null, { rejected = false } = {}) {
     const el = this._labelCounter
     if (!el?.isConnected) return
-    const target = label || el.previousElementSibling
+    // When pinned it has no label sibling to fall back to, so remember which
+    // label it is counting.
+    const target = label || this._countedLabel || el.previousElementSibling
     if (!target) return
+    this._countedLabel = target
     const limit = this._limitFor(target)
     if (limit == null) return
     const len = target.textContent.length

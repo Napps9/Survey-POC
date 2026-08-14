@@ -71,7 +71,7 @@ class SurveyGenerator
                   - tap_card: 5 to 8 statements covering negative, neutral and positive
                     sentiments in that order, each <= 40 chars
                   - range: EXACTLY 5 points — never 3, never 4 — with a genuinely
-                    neutral MIDDLE label (the 3rd)
+                    neutral MIDDLE label (the 3rd), each label <= 17 chars
                   - rating: 3 to 5 points (5 ideal), ONE label per point, never more than 5
                   - nps: EXACTLY 11 numeric labels, "0" through "10" — no word labels
                 DESC
@@ -133,8 +133,10 @@ class SurveyGenerator
       card to card. An even count like 4 has no true centre and forces
       someone who genuinely sits in the middle to lean. The 3rd label is
       that centre and must be genuinely neutral (e.g. "Neutral" / "Unsure" /
-      "Neither agree nor disagree"), never leaning positive or negative.
+      "No strong view"), never leaning positive or negative.
       The slider starts resting on that neutral centre by default.
+      Each label is <= 17 chars: all five print side by side under one
+      track, so a long one doesn't just wrap, it re-sizes the whole row.
     - rating: 3 to 5 points (5 ideal — the visual is a 5-star row). Supply
       ONE label per point, not just the two end captions.
     - nps: the traditional 0-10 likelihood-to-recommend scale on a plain
@@ -300,8 +302,8 @@ class SurveyGenerator
     [ ] No more than 2 of the same answer type in a row
     [ ] Lists ODD 3 or 5 options (each <= 40 chars); grids EVEN and 4-10 (each <= 20 chars);
         prioritise 4-5 (4 ideal); tap_card 5-8 statements (neg -> neutral -> pos, each <= 40 chars);
-        range EXACTLY 5 points with a genuine neutral middle label; rating 3-5 with one label per
-        point; nps EXACTLY 11 numeric labels "0"-"10"
+        range EXACTLY 5 points with a genuine neutral middle label (each <= 17 chars); rating 3-5
+        with one label per point; nps EXACTLY 11 numeric labels "0"-"10"
     [ ] Every question's text plus its description <= 100 chars
     [ ] "How often" -> range with its 5 points and a neutral middle
     [ ] Every question card has an `outcome`; competency/condition tagged where they apply

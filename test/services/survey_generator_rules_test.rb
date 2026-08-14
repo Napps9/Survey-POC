@@ -63,6 +63,37 @@ class SurveyGeneratorRulesTest < ActiveSupport::TestCase
     assert_match(/Grids.*20 chars/m, rules, "grids stay at 20 — a tile has a column, not a panel")
   end
 
+  # A range slider prints all five of its labels at once, under one track, so
+  # the budget is tighter than anything else's and it is a hard cap in the
+  # editor (SCALE_LABEL_MAX). A prompt that still asks for long scale words
+  # produces Vertos whose own editor refuses to let a creator retype them.
+  test "every prompt that states the range bounds states its 17-char budget" do
+    LABEL_BUDGET_PROMPTS.each do |name, source|
+      text = source.call
+      next unless text.match?(/range EXACTLY 5 points|range: EXACTLY 5 points/)
+
+      assert_match(/17 chars/, text,
+                   "#{name} states the range bounds but not its label budget. OPTION_LIMITS.range " \
+                   "is 17 and the editor refuses the 18th character — a prompt left behind writes " \
+                   "scale words the creator can no longer edit.")
+    end
+  end
+
+  # Every example label the prompts hold up has to be inside the budget it is
+  # illustrating. "Neither agree nor disagree" was the neutral example for
+  # years and is 26 characters — a model copying it lands 9 over the cap.
+  test "the neutral middle examples fit the budget they illustrate" do
+    LABEL_BUDGET_PROMPTS.each do |name, source|
+      overlong = source.call.scan(/"([^"\n]{18,})"/).flatten.select do |example|
+        example.match?(/\A(?:Neither|Strongly|Slightly|Somewhat|Very|Not at all)\b/i)
+      end
+
+      assert_empty overlong,
+                   "#{name} offers #{overlong.inspect} as a scale label example, and each is " \
+                   "over the 17-character cap the same prompt states."
+    end
+  end
+
   test "the SYSTEM prompt scores cards, keeps variety per-type, and drops the scale family" do
     system = SurveyGenerator::SYSTEM
     assert_match "12 to 15 cards TOTAL", system

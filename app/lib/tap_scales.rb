@@ -67,8 +67,18 @@ module TapScales
   # tap_scales_test asserts the two lists stay in step.
   GLYPHS = %w[no unsure yes].freeze
 
-  # Longest a response label may be. A response sits on a pill inside a 320px
-  # card, so this is shorter than an option label's budget by design.
+  # Longest a response label may be ON SAVE. Deliberately NOT the 17 the editor
+  # refuses to type past (verto_rules' SCALE_LABEL_MAX) — the two numbers are
+  # answering different questions.
+  #
+  # 17 is what a column of the strip holds, and it is an authoring-time guard:
+  # it stops a creator writing a label that won't fit, and never touches one
+  # that already exists. This is the storage bound, and it has to clear every
+  # label the app itself ships — 13 of the 19 locales translate an agreement
+  # preset past 17 ("Zdecydowanie się nie zgadzam" is 28), so truncating here
+  # would mangle a Polish or German Verto that nobody had even opened.
+  #
+  # Lower it to 17 and you do not tighten the cap; you corrupt the translations.
   MAX_LABEL = 40
 
   # The seed set for a count, or nil if that count has no preset. Dup'd, because

@@ -18,6 +18,7 @@ require "application_system_test_case"
 class OptionLabelCapTest < ApplicationSystemTestCase
   CAP = 20         # grid tiles — enforced
   LIST_LIMIT = 40  # list rows — counted only
+  SCALE_CAP = 17   # a range slider's stops and a tap card's answers — enforced
 
   CARDS = [
     { "type" => "welcome_card", "title" => "Hello" },
@@ -28,7 +29,20 @@ class OptionLabelCapTest < ApplicationSystemTestCase
       "options" => [ "A legacy label far too long for a tile", "Short one" ] },
     # A list type: full panel width, keeps its advisory-only 30, no hard cap.
     { "type" => "multiple_choice", "cid" => "m1", "text" => "Or one of these?",
-      "options" => [ "Automation", "Brand building" ] }
+      "options" => [ "Automation", "Brand building" ] },
+    # A range slider, whose five stops print side by side under one track. Its
+    # first label is over the scale cap on purpose, for the same reason the
+    # grid has a legacy one: 13 of the 19 locales ship a preset agreement label
+    # longer than 17 characters ("Zdecydowanie się nie zgadzam" is 28), so
+    # over-length scale labels are ordinary shipped content, not a mistake.
+    { "type" => "range", "cid" => "r1", "text" => "How does that land?",
+      "options" => [ "Neither agree nor disagree", "Disagree", "Neutral", "Agree",
+                     "Strongly agree" ] },
+    # A tap card. Its `options` are the STATEMENTS a respondent swipes; the
+    # answers they swipe them into are the `responses`, and those are what the
+    # scale cap applies to.
+    { "type" => "tap_card", "cid" => "t1", "text" => "How do you feel?",
+      "options" => [ "They drain the life out of me" ] }
   ].freeze
 
   def setup
@@ -239,5 +253,93 @@ class OptionLabelCapTest < ApplicationSystemTestCase
 
     assert page.has_no_css?(".option-limit-counter", wait: 2),
            "the counter should leave with the focus"
+  end
+
+  # ── The two scales: capped tighter, for a reason of their own ────────────
+  #
+  # A grid tile is capped because ONE label breaks ONE tile. These are capped
+  # because every label prints at once, side by side, sharing one width: five
+  # slider stops under a single track, or a tap card's answers across the foot
+  # of the swipe card. A long one doesn't merely wrap, it re-sizes the row it
+  # is in — so what the creator was shown stops being what the respondent gets.
+  # 17 is what a column holds: measured, ~69px on a 390px phone at five across,
+  # which is also exactly the length of "Strongly disagree".
+
+  def slider_label(n = 0)
+    page.all("[data-card-type='range'] .slider-label-text[contenteditable]", minimum: 1)[n]
+  end
+
+  def response_label(n = 0)
+    page.all("[data-tap-response-label]", minimum: 1)[n]
+  end
+
+  test "a slider stop stops at the scale cap" do
+    open_editor
+    el = slider_label(1)
+    focus_and_clear(el)
+    el.send_keys("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+    assert_equal SCALE_CAP, el.text.length,
+                 "typed 26 characters into a #{SCALE_CAP}-character slider stop and got #{el.text.inspect}"
+  end
+
+  test "a tap card's answer stops at the same cap" do
+    open_editor
+    el = response_label
+    focus_and_clear(el)
+    el.send_keys("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+    assert_equal SCALE_CAP, el.text.length,
+                 "a tap answer shares the slider's cap — both are one row of labels " \
+                 "dividing one width — but got #{el.text.inspect}"
+  end
+
+  # The whole reason the cap is an authoring-time guard and not a validation:
+  # every non-English agreement scale the app ships is over it. Truncating on
+  # load, or on save, would mangle a Polish or German Verto nobody had touched.
+  test "an over-length scale label is left alone, and can still be shortened" do
+    open_editor
+
+    legacy = slider_label
+    assert_operator legacy.text.length, :>, SCALE_CAP,
+                    "the over-length label was truncated on load — the cap blocks insertion only"
+
+    before = legacy.text.length
+    legacy.click
+    8.times { legacy.send_keys(:backspace) }
+
+    assert_operator legacy.text.length, :<, before,
+                    "deleting from an over-length scale label has to keep working, or a " \
+                    "translated deck can never be brought under the cap"
+  end
+
+  test "a slider stop is counted against the scale cap, not the grid's" do
+    open_editor
+    el = slider_label(1)
+    focus_and_clear(el)
+    el.send_keys("Disagree")
+
+    c = counter
+    assert c, "no counter appeared while a slider stop had focus"
+    assert_match(%r{8/#{SCALE_CAP}}, c.text,
+                 "a slider stop should be counted against #{SCALE_CAP}, not the grid's #{CAP}")
+  end
+
+  # A grid tile or list row can take the counter as a sibling; these cannot.
+  # Both are fixed-width rows, so an extra child would shove the layout
+  # sideways under the creator mid-keystroke — it floats over the widget.
+  test "the counter floats over the scale rather than joining its row" do
+    open_editor
+    focus_and_clear(slider_label(1))
+
+    assert page.has_css?(".option-limit-counter--pinned", wait: 2),
+           "the slider's counter should be pinned to the widget, not inserted into the label row"
+
+    page.execute_script("document.activeElement.blur()")
+    focus_and_clear(grid_label)
+
+    assert page.has_css?(".option-limit-counter", wait: 2)
+    assert page.has_no_css?(".option-limit-counter--pinned", wait: 1),
+           "a grid tile has room for the counter beside it and should not get the pinned variant"
   end
 end

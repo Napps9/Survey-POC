@@ -40,8 +40,9 @@ class FlowGenerator
           (each <= 40 chars); grids EVEN and 4-10 including any "Other"
           (each <= 20 chars); prioritise 4-5 (4 ideal, each <= 40 chars);
           tap_card 5-8 statements (neg -> neutral -> pos, each <= 40
-          chars); range EXACTLY 5 points with a neutral middle; rating 3-5 with
-          one label per point; nps EXACTLY 11 numeric labels "0"-"10".
+          chars); range EXACTLY 5 points with a neutral middle (each label
+          <= 17 chars); rating 3-5 with one label per point; nps EXACTLY 11
+          numeric labels "0"-"10".
         DESC
       },
       competency: {

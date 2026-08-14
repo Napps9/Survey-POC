@@ -80,6 +80,31 @@ class PhoneFitRuleTest < ActiveSupport::TestCase
                  "the list types share one budget and it is 40, wider than the grids' 20")
   end
 
+  # The tightest budget in the table, and the only one shared by two card types
+  # that don't look alike: a range slider's five stops and a tap card's response
+  # strip. Both print EVERY label at once, side by side, so each gets the width
+  # divided by the count — about 70px on a 390px phone at five across. Seventeen
+  # is what fits there, and it is exactly the length of "Strongly disagree", the
+  # longest label either scale ships.
+  #
+  # Pinned because raising it silently un-does the slider's one-row layout: the
+  # stagger onto two rows was removed on the strength of this number, and a
+  # label past it puts the row's height back under the creator's control.
+  test "the scale answer labels carry the tightest budget, and it is one number" do
+    assert_match(/SCALE_LABEL_MAX\s*=\s*OPTION_LIMITS\.range/, source,
+                 "SCALE_LABEL_MAX should be derived from OPTION_LIMITS, not restated — " \
+                 "the slider's cap and the tap strip's cap are the same cap.")
+
+    limits = source[/const OPTION_LIMITS\s*=\s*\{(.*?)\}/m, 1]
+    assert_equal 17, limits[/\brange:\s*(\d+)/, 1].to_i,
+                 "measured: five labels across a 390px phone give each ~70px, which holds 17 " \
+                 "characters wrapped inside its own column — and 'Strongly disagree' is 17."
+
+    assert_match(/CAPPED_LABEL_TYPES\s*=\s*\[\s*\.\.\.GRID_LABEL_TYPES,\s*"range"/, source,
+                 "range has to be in CAPPED_LABEL_TYPES, not merely counted: an over-long stop " \
+                 "changes the height of the whole label row rather than just its own.")
+  end
+
   test "the check counts the Other box, the way the count rule does" do
     body = source[/function phoneFitCheck\(card\)\s*\{(.*?)\n\}/m, 1]
 

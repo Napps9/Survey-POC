@@ -83,9 +83,31 @@ const PAGE_LENGTH_LIMIT = 400
 const OPTION_LIMITS = {
   multiple_choice: 40, select_many: 40, prioritise: 40,
   select_one_grid: 20, select_many_grid: 20,
-  range: 20, rating: 20, nps: 20,
+  range: 17, rating: 20, nps: 20,
   tap_card: 40, scenario: 40
 }
+
+// §2 — the ANSWER-LABEL budget for the two scales that print all their labels
+// at once: a range slider's five stops, and a tap card's response strip.
+//
+// 17 is not a house number either. Both lay their labels out side by side, so
+// each one gets the track divided by however many there are — ~70px per label
+// on a 390px phone at five across. Measured in the real face, 17 characters is
+// what fits that column on two lines with nothing clipped, and it is exactly
+// the length of "Strongly disagree", the longest label either scale ships.
+//
+// Enforced, not merely advised, for the same reason the grid tile is: both
+// scales draw every label at once, so one long one doesn't just wrap — it
+// changes the height of the whole row and the layout the creator was shown
+// stops being the layout the respondent gets.
+//
+// Enforced HERE and nowhere else, though. This is an authoring-time guard: it
+// refuses the 18th character as it is typed or pasted, and never touches a
+// label that already exists. It cannot become a validation, because 13 of the
+// 19 locales translate a preset agreement label past it ("Zdecydowanie się nie
+// zgadzam" is 28) — the storage bound stays TapScales::MAX_LABEL at 40, which
+// has its own note on why.
+export const SCALE_LABEL_MAX = OPTION_LIMITS.range
 
 // The hard cap, exported so there is ONE number rather than the editor's copy
 // of the rule and the rule. Both grids carry the same limit; asserted in
@@ -93,12 +115,17 @@ const OPTION_LIMITS = {
 export const GRID_LABEL_TYPES = [ "select_one_grid", "select_many_grid" ]
 export const GRID_LABEL_MAX = OPTION_LIMITS.select_one_grid
 
+// Types whose OPTION labels are refused past their budget rather than merely
+// scored. The grids, where a tile label past 20 breaks the tile; and range,
+// whose five stops share one track.
+export const CAPPED_LABEL_TYPES = [ ...GRID_LABEL_TYPES, "range" ]
+
 // Which types show the creator a live character count while they type. The
 // grids, where the count is a hard stop, plus the three list types, where it
 // is a nudge. Not every type with a budget: a scale caption or a Tap statement
 // has one too, and nobody has asked to be counted while writing those.
 export const COUNTED_LABEL_TYPES = [
-  ...GRID_LABEL_TYPES, "multiple_choice", "select_many", "prioritise"
+  ...CAPPED_LABEL_TYPES, "multiple_choice", "select_many", "prioritise"
 ]
 
 // The budget for a type, or null where there isn't one (yes_no's fixed pair).
