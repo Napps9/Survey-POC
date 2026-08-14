@@ -324,8 +324,77 @@ export default class extends Controller {
     // creator mid-keystroke. Those get it pinned to the widget instead.
     const pinned = label.closest(".slider-wrap, .rotate-wrap")
     this._labelCounter.classList.toggle("option-limit-counter--pinned", !!pinned)
-    pinned ? pinned.appendChild(this._labelCounter) : label.after(this._labelCounter)
+    if (pinned) {
+      pinned.appendChild(this._labelCounter)
+    } else {
+      this._labelCounter.style.left = this._labelCounter.style.top = ""
+      label.after(this._labelCounter)
+    }
     this._renderLabelCount(label)
+  }
+
+  // Park the pinned counter next to the label it is counting, inside the widget
+  // it was appended to, without covering any of the OTHER labels.
+  //
+  // Anchored to the label rather than parked in a corner of the widget: at a
+  // fixed bottom-centre it sat on the slider's own middle stop and on the tap
+  // card's Add-statement button. Chrome that hides other people's words is
+  // worse than chrome that shifts a row, which is the whole reason this floats
+  // rather than sitting in flow.
+  //
+  // Then four candidate spots rather than one, because the same widget lays its
+  // labels out more than one way and "above" is only right for some of them: a
+  // horizontal slider's five stops are a row (above is clear), the SAME slider
+  // on its vertical axis is a column (above is the previous stop), and a tap
+  // strip past four is an arc, where neither is reliably true. Try above, below,
+  // right, left, and take the first that lands on nothing.
+  //
+  // Measured from bounding rects rather than offsetLeft: the tap strip's pills
+  // are absolutely positioned on an arc with a translate on them, so their
+  // offset parent chain says nothing useful about where they actually are.
+  PINNED_PEERS = ".slider-label-text, [data-tap-response-label]"
+
+  _placeLabelCounter(label) {
+    const el = this._labelCounter
+    const host = el?.parentElement
+    if (!host || !el.classList.contains("option-limit-counter--pinned")) return
+
+    const h = host.getBoundingClientRect()
+    const l = label.getBoundingClientRect()
+    const c = el.getBoundingClientRect()
+    const GAP = 6
+
+    const peers = Array.from(host.querySelectorAll(this.PINNED_PEERS))
+      .filter((n) => n !== label)
+      .map((n) => n.getBoundingClientRect())
+      .filter((r) => r.width > 0 && r.height > 0)
+
+    // Host-relative, and never so far out that the counter leaves the widget.
+    const inX = (x) => Math.min(Math.max(x, 2), Math.max(2, h.width - c.width - 2))
+    const inY = (y) => Math.min(Math.max(y, 2), Math.max(2, h.height - c.height - 2))
+    const midX = inX((l.left - h.left) + (l.width - c.width) / 2)
+    const midY = inY((l.top - h.top) + (l.height - c.height) / 2)
+
+    const spots = [
+      [ midX, (l.top - h.top) - c.height - GAP ],          // above
+      [ midX, (l.bottom - h.top) + GAP ],                  // below
+      [ (l.right - h.left) + GAP, midY ],                  // right
+      [ (l.left - h.left) - c.width - GAP, midY ]          // left
+    ]
+
+    const clear = ([ x, y ]) => {
+      if (x < 0 || y < 0 || x + c.width > h.width || y + c.height > h.height) return false
+      const box = { left: h.left + x, top: h.top + y,
+                    right: h.left + x + c.width, bottom: h.top + y + c.height }
+      return !peers.some((r) => box.left < r.right && box.right > r.left &&
+                                box.top < r.bottom && box.bottom > r.top)
+    }
+
+    // Nothing clear anywhere (a widget smaller than the counter): keep it on the
+    // label rather than flinging it somewhere arbitrary.
+    const [ x, y ] = spots.find(clear) || [ midX, midY ]
+    el.style.left = `${Math.round(x)}px`
+    el.style.top = `${Math.round(y)}px`
   }
 
   _hideLabelCount() {
@@ -352,6 +421,9 @@ export default class extends Controller {
     const capped = this._isCapped(target)
     el.classList.toggle("is-full", capped && len >= limit)
     el.classList.toggle("is-over", !capped && len > limit)
+    // After the text is set, so the width it is centred on is the width it
+    // will actually have.
+    this._placeLabelCounter(target)
     // A flash on the keystroke that was refused, so the cap is felt and not
     // just silently ignored.
     if (rejected) {

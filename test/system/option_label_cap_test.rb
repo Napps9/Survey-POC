@@ -342,4 +342,53 @@ class OptionLabelCapTest < ApplicationSystemTestCase
     assert page.has_no_css?(".option-limit-counter--pinned", wait: 1),
            "a grid tile has room for the counter beside it and should not get the pinned variant"
   end
+
+  # Floating over the widget is only half the requirement. The first version
+  # parked it at a fixed bottom-centre, which on a five-stop slider landed
+  # squarely on the MIDDLE label and on a swipe card covered the Add-statement
+  # button. Chrome that hides other people's words is worse than chrome that
+  # moves the row. It is anchored to the label being edited instead.
+  OVERLAP_JS = <<~JS
+    const counter = document.querySelector(".option-limit-counter")
+    const mine = document.activeElement
+    if (!counter) return "no counter"
+    const c = counter.getBoundingClientRect()
+    const hits = [...document.querySelectorAll(arguments[0])]
+      .filter((el) => el !== mine)
+      .filter((el) => {
+        const r = el.getBoundingClientRect()
+        if (!r.width || !r.height) return false
+        return c.left < r.right && c.right > r.left && c.top < r.bottom && c.bottom > r.top
+      })
+      .map((el) => el.textContent.trim())
+    return hits.join(", ")
+  JS
+
+  test "the pinned counter never covers a label other than the one being edited" do
+    open_editor
+
+    # The middle stop of five: the position a fixed bottom-centre counter sat on.
+    el = slider_label(1)
+    focus_and_clear(el)
+    el.send_keys("Disagree")
+
+    covered = page.evaluate_script("(function(){#{OVERLAP_JS}}).call(null, arguments[0])",
+                                   "[data-card-type='range'] .slider-label-text")
+    assert_equal "", covered,
+                 "the character counter is sitting on top of #{covered.inspect} — a creator " \
+                 "cannot read the scale it is counting"
+  end
+
+  test "the same is true on a tap card, where the strip sits on the artwork" do
+    open_editor
+
+    el = response_label(0)
+    focus_and_clear(el)
+    el.send_keys("Strongly disagree")
+
+    covered = page.evaluate_script("(function(){#{OVERLAP_JS}}).call(null, arguments[0])",
+                                   "[data-tap-response-label]")
+    assert_equal "", covered,
+                 "the counter is covering the answer(s) #{covered.inspect} on the swipe card"
+  end
 end

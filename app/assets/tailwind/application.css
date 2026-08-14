@@ -2681,17 +2681,6 @@
    Amber rather than the Rules of the Game panel's own #FFFA77: that yellow is
    drawn for the dark analysis panel and would be unreadable on this near-white
    pill. This is the same signal at a weight that works on a light surface. */
-/* Pinned variant: the slider's label row and the tap card's response strip are
-   both fixed-width layouts, so the counter floats over the widget rather than
-   joining the row and pushing it about while someone types. */
-.option-limit-counter--pinned {
-  position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
-  margin: 0; z-index: 8;
-  background: rgba(28,32,52,0.88); color: rgba(255,255,255,0.92);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.28);
-}
-.option-limit-counter--pinned.is-full { background: #FF1E6F; color: #fff; }
-.option-limit-counter--pinned.is-over { background: #FFCC00; color: #4A3B00; }
 .option-limit-counter.is-full {
   color: #FF1E6F; font-weight: 600;
   background: rgba(255,30,111,0.10);
@@ -2700,6 +2689,23 @@
   color: #8A6600; font-weight: 600;
   background: rgba(255,204,0,0.18);
 }
+/* Pinned variant: the slider's label row and the tap card's response strip are
+   both fixed-width layouts, so the counter floats over the widget rather than
+   joining the row and pushing it about while someone types.
+   `left`/`top` come from the controller, which anchors it just ABOVE the label
+   being edited — a fixed corner of the widget would land on the neighbouring
+   stop, or on the swipe card's own furniture, and obscure the very thing the
+   creator is looking at. Solid rather than tinted, because it is over artwork
+   and a track gradient here, not over the editor's white panel.
+   After the base .is-full/.is-over so those tints don't win on source order. */
+.option-limit-counter--pinned {
+  position: absolute; margin: 0; z-index: 12;
+  pointer-events: none; white-space: nowrap;
+  background: rgba(28,32,52,0.92); color: rgba(255,255,255,0.94);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+}
+.option-limit-counter--pinned.is-full { background: #FF1E6F; color: #fff; }
+.option-limit-counter--pinned.is-over { background: #FFCC00; color: #4A3B00; }
 /* A grid tile stacks its label under its artwork, so the counter can sit in
    normal flow beneath it. A LIST row is a flex line — tile, label, tick — and
    a counter dropped into it becomes a fourth flex item that takes its width
