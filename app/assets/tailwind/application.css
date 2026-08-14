@@ -616,7 +616,15 @@
   position: relative;           /* anchors the welcome-card logo overlay */
   display: flex;
   flex-direction: column;
-  justify-content: center;      /* vertical centring */
+  /* `safe`, not plain `center`. A centred flex line puts overflow at BOTH ends,
+     so a card holding more than fits pushed .q-header to a negative offset and
+     .split-card's overflow:hidden took the top of the question away — the
+     failure one_pager_fit_test records as "1000x567 cut 82px off the top of
+     every card". `safe` aligns to start the moment content overflows, so the
+     overflow can only ever go off the BOTTOM, where the scroll container below
+     can reach it. Short content still centres exactly as before, and browsers
+     without `safe` fall back to plain `center`, i.e. today's behaviour. */
+  justify-content: safe center; /* vertical centring — see above */
   align-items: stretch;
   gap: 14px;
   text-align: center;           /* horizontal centring of text content */
@@ -631,20 +639,30 @@
 .split-right .rating-wrap,
 .split-right .rotate-wrap { text-align: left; }
 
-/* Long option lists: .split-card is a fixed-height, overflow:hidden box, so
-   a list/grid with more options than the card is tall used to be silently
-   clipped past the card edge. Pin the question (.q-header) at the top and
-   let the option container scroll internally instead — scoped to the answer
-   types that genuinely stack taller than the card (:has(> .choice-list /
-   .choice-grid / .prioritise-list / .contact-form-wrap)) so other card types
-   (slider, tap-card, freeform, …) keep their own layout. The contact form
-   earns its place on sideways phones: five stacked fields plus the privacy
-   note clip at both ends there without an internal scroll path. */
+/* .split-card is a fixed-height, overflow:hidden box, so an answer widget
+   taller than the card was silently clipped past its edge. Pin the question
+   (.q-header) at the top and let the answer container scroll internally
+   instead.
+   This used to be scoped to the four answer shapes that stack — lists, grids,
+   prioritise and the contact form — on the reasoning that "other card types
+   (slider, tap-card, freeform, …) keep their own layout". That reasoning was
+   wrong: keeping their own layout meant having no scroll path at all, so for
+   them overflow was not a scroll, it was a silent cut. The swipe card is the
+   worst of them — a rigid card plus a reset row plus ＋Add statement, against a
+   608px interior, leaves the question about 90px before it goes off the top.
+   Every shape that can outgrow the card is on the list now; a type is here
+   because its widget has a natural height the card cannot always afford, not
+   because it happens to be a list. */
 .split-right > .q-header { flex: 0 0 auto; }
 .split-right > .mt-2:has(> .choice-list),
 .split-right > .mt-2:has(> .choice-grid),
 .split-right > .mt-2:has(> .prioritise-list),
-.split-right > .mt-2:has(> .contact-form-wrap) {
+.split-right > .mt-2:has(> .contact-form-wrap),
+.split-right > .mt-2:has(> .rotate-wrap),
+.split-right > .mt-2:has(> .slider-wrap),
+.split-right > .mt-2:has(> .nps-slider),
+.split-right > .mt-2:has(> .rating-wrap),
+.split-right > .mt-2:has(> .freeform-wrap) {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -662,9 +680,20 @@
 .split-right > .mt-2:has(> .choice-list) > .choice-list,
 .split-right > .mt-2:has(> .choice-grid) > .choice-grid,
 .split-right > .mt-2:has(> .prioritise-list) > .prioritise-list,
-.split-right > .mt-2:has(> .contact-form-wrap) > .contact-form-wrap {
+.split-right > .mt-2:has(> .contact-form-wrap) > .contact-form-wrap,
+.split-right > .mt-2:has(> .slider-wrap) > .slider-wrap,
+.split-right > .mt-2:has(> .nps-slider) > .nps-slider,
+.split-right > .mt-2:has(> .rating-wrap) > .rating-wrap,
+.split-right > .mt-2:has(> .freeform-wrap) > .freeform-wrap {
   margin-top: auto;
   margin-bottom: auto;
+}
+/* The swipe card is the exception: it does not centre inside the scroller, it
+   GROWS to fill it (see .rotate-card-stack), so auto margins would fight the
+   flex growth for the space. */
+.split-right > .mt-2:has(> .rotate-wrap) > .rotate-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 /* A scroll container clips at its padding box on BOTH axes (overflow-y: auto
    forces overflow-x to auto too), and the selection glow on .choice-card
@@ -2182,8 +2211,31 @@
    to hang off — see .option-limit-counter--pinned. */
 .rotate-wrap { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 /* Bigger, portrait card; the cards fill the stack and the controls overlay
-   sits at the bottom inside it. */
-.rotate-card-stack { position: relative; width: 320px; max-width: 100%; height: 430px; margin: 0 auto; }
+   sits at the bottom inside it.
+   The height is FLUID, not the flat 430px it was. Measured across four scenes,
+   no single number can be both bigger and scroll-free: the editor's card gives
+   an interior of about 600px and a tall phone's answer panel about 800, so a
+   flat 540 fills the phone beautifully and costs the editor 210px of scroll.
+   Growing into whatever the panel has instead is bigger exactly where there is
+   room to be — 560 on an iPhone 15, 480 on the desktop player — and never adds
+   a pixel of scroll over the old size anywhere.
+   430 is the FLOOR, deliberately: it is today's card, and the alternative on a
+   short phone would be shrinking the answer text under the floor that
+   player_type_floor_test exists to defend. Where the room isn't there, the
+   scroller above takes the overflow.
+   This is the same fix the NPS vessel already had for the same reason — it was
+   a flat 232px until "a tall phone drew the same small vessel inside a panel
+   with hundreds of px to spare"; see --nps-vessel-h.
+   `flex`, not `height: 100%`: the percentage resolves against .rotate-wrap,
+   which has no definite height, so it silently falls back to auto and the card
+   stays 430 on every viewport while looking like it works. */
+.rotate-card-stack {
+  position: relative;
+  width: 320px; max-width: 100%;
+  height: auto; flex: 1 1 auto;
+  min-height: 430px; max-height: 560px;
+  margin: 0 auto;
+}
 .rotate-card {
   position: absolute; inset: 0;
   border-radius: 20px;
@@ -2369,6 +2421,14 @@
   justify-content: flex-end;
   background: linear-gradient(transparent 78%, rgba(0,0,0,0.42));
 }
+/* The dots keep the 14px of clearance the row layout gives them (see the
+   padding on .rotate-card-controls). They are the only in-flow child here —
+   .rotate-actions--fan is absolute — so with the wrapper's padding zeroed they
+   were landing hard on the card's rounded bottom edge, reading as if they had
+   fallen out of the card. The clearance goes on the DOTS, not back on the
+   wrapper: .rotate-actions--fan is inset: 0 against the wrapper's padding box,
+   so padding there would drag the whole arc up with it. */
+.rotate-card-controls--fan .rotate-dots { margin-bottom: 14px; }
 .rotate-actions--fan {
   position: absolute; inset: 0;
   display: block; margin: 0; gap: 0;
@@ -6299,8 +6359,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
     /* justify-content centres the content group vertically; align-items
        stays at the default `stretch` so .choice-list, the freeform-wrap
        and other flex children fill the card width at their natural
-       height. Headings centre horizontally via text-align. */
-    justify-content: center;
+       height. Headings centre horizontally via text-align.
+       `safe` for the same reason as the desktop rule: this panel is also
+       overflow: hidden, so plain centring spends an overflow off the top of
+       the card — where the question is — as readily as off the bottom. */
+    justify-content: safe center;
     gap: var(--play-gap);
     overflow: hidden;
     position: relative;
@@ -6335,16 +6398,25 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
   /* ── The answer widget is the card's scroll container ──────────────────
      Mirrors the desktop rule (search ".split-right > .mt-2:has") and is
-     scoped to the same shapes, so slider / rating / freeform / tap-card /
-     book layouts keep their own sizing. The desktop rule already supplies
-     overflow-y; what mobile adds is the flex-grow that lets the container
-     claim the panel's spare height, plus momentum scrolling and scroll
-     containment so a flick through the options doesn't drag the page
-     behind it. */
+     scoped to the same shapes — which is now every shape that can outgrow
+     the card, the swipe/slider/rating/NPS/freeform widgets included. They
+     used to be left out on the grounds that they "keep their own sizing";
+     what that meant in practice was having no scroll path, so their
+     overflow was cut rather than scrolled. The book layout is still out,
+     because .split-right--book opts out of centring entirely and paginates
+     instead. The desktop rule already supplies overflow-y; what mobile adds
+     is the flex-grow that lets the container claim the panel's spare
+     height, plus momentum scrolling and scroll containment so a flick
+     through the options doesn't drag the page behind it. */
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-list),
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-grid),
   .preview-overlay .split-card .split-right > .mt-2:has(> .prioritise-list),
-  .preview-overlay .split-card .split-right > .mt-2:has(> .contact-form-wrap) {
+  .preview-overlay .split-card .split-right > .mt-2:has(> .contact-form-wrap),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .rotate-wrap),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .slider-wrap),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .nps-slider),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .rating-wrap),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .freeform-wrap) {
     flex: 1 1 auto;
     min-height: 0;
     -webkit-overflow-scrolling: touch;

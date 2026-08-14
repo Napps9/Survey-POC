@@ -97,6 +97,42 @@ class TapResponseAddTest < ApplicationSystemTestCase
     JS
   end
 
+  # The dots say which statement of the deck you are on, and they belong inside
+  # the card at every scale. Up to four answers the controls wrapper's 14px of
+  # bottom padding gives them that; past four the fan zeroes the padding so the
+  # strip can cover the whole photo, and the dots — the only in-flow child left —
+  # went with it, landing on the card's rounded bottom edge.
+  #
+  # Asserted as a distance from the card's bottom rather than a class, because
+  # the fix is a margin and the thing that matters is the gap a creator sees.
+  def dots_clearance
+    evaluate_script(<<~JS)
+      (() => {
+        const card = document.querySelector("[data-card-cid='t1']")
+        const dots = card.querySelector(".rotate-dots")
+        const stack = card.querySelector(".rotate-card-stack")
+        if (!dots || !stack) return null
+        return Math.round(stack.getBoundingClientRect().bottom - dots.getBoundingClientRect().bottom)
+      })()
+    JS
+  end
+
+  test "the dots stay inside the card at every scale, not just the narrow ones" do
+    open_editor
+
+    row = dots_clearance
+    assert_operator row, :>=, 10,
+                    "at three answers the dots should already sit clear of the card's bottom edge"
+
+    2.times { add_response }   # 3 -> 5, where the strip fans
+    assert_operator dots_clearance, :>=, 10,
+                    "on a fanned card the dots are pressed against the bottom edge — the fan " \
+                    "zeroes the wrapper's padding, so they need their own clearance"
+    assert_equal row, dots_clearance,
+                 "the dots should sit the same distance inside the card whichever shape the " \
+                 "strip is in; a scale that moves its own progress dots reads as two components"
+  end
+
   test "the strip and its scrim agree about fanning, all the way up and back down" do
     open_editor
 
