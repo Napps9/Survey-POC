@@ -742,13 +742,33 @@ export default class extends Controller {
 
   selectCard(event) {
     if (event.target.closest("button[data-action*='deleteCard']")) return
+    this.selectCardElement(event.currentTarget, { source: "click" })
+  }
 
-    // If the publish-and-share panel is open, drop back to the answer-type
-    // picker so the click reveals the card's edit options.
-    this.dispatch("cardSelected")
+  // The selection itself, without a click to read it out of. editor-scroll-sync
+  // calls this with source: "scroll" when the feed settles on a different card,
+  // so the panel edits what the creator is actually looking at.
+  //
+  // Re-selecting the already-active card returns early on purpose: everything
+  // below relocates three DOM blocks and rebuilds two lists, and the scroll sync
+  // would otherwise repeat all of it every time the feed came to rest.
+  selectCardElement(card, { source = "click" } = {}) {
+    if (!card) return
+
+    // A click is a deliberate arrival at this card: if the publish-and-share
+    // panel is open, drop back to the answer-type picker so the click reveals
+    // the card's edit options — and open the column if it's collapsed. It fires
+    // even for the already-active card, because clicking the selected card is
+    // how you reopen a panel you closed with ✕.
+    //
+    // A scroll is not an arrival. It re-points the panel underneath whichever
+    // view is open without yanking the creator off Publish/Design, and without
+    // opening a column they chose to close.
+    if (source === "click") this.dispatch("cardSelected")
     this._disarmDelete() // moving on ⇒ any half-armed Delete stands down
 
-    const card = event.currentTarget
+    if (card === this.activeCardEl) return
+
     this.cardTargets.forEach(c => c.classList.remove("selected"))
     card.classList.add("selected")
     this.activeCardEl = card

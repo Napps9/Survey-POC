@@ -10,6 +10,12 @@
 <div class="survey-card-wrap"
      data-type-panel-target="card"
      data-survey-editor-target="card"
+     <%# editor-scroll-sync observes each card so the right panel follows the one
+         the creator scrolls to. It has to be declared HERE, not in show.html.erb:
+         cards spliced in after load are re-rendered from this partial (see
+         RendersCardHtml), and one without the target is invisible to the
+         observer — it would silently never become the edited card. %>
+     data-editor-scroll-sync-target="card"
      data-card-type="<%= type %>"
      data-card-cid="<%= card['cid'].to_s %>"
      data-card-num="<%= idx + 1 %>"

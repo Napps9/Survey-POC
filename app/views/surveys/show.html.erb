@@ -49,7 +49,7 @@
 <script id="option-icon-map" type="application/json"><%= option_icon_map_data.to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel gate-cards score-modal flows option-style rich-text emoji-picker"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel editor-scroll-sync gate-cards score-modal flows option-style rich-text emoji-picker"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
@@ -89,7 +89,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.editing_locked? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent focusout->survey-editor#syncBranchingEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -99,7 +99,10 @@
 
   <%# Main grid: cards feed | type panel. The panel column is collapsed until
       a card click / Publish / Design opens it (editor-panel controller). %>
-  <div class="flex-1 overflow-hidden editor-grid" data-editor-panel-target="grid">
+  <%# editor-scroll-sync reads .is-panel-open off this element too: it re-points
+      an open panel at the scrolled-to card, and does nothing while it's shut. %>
+  <div class="flex-1 overflow-hidden editor-grid" data-editor-panel-target="grid"
+       data-editor-scroll-sync-target="grid">
 
     <%# The Verto's backdrop, painted once behind BOTH columns so the floating
         right panel sits on the Verto's own background. A dedicated underlay
@@ -286,6 +289,10 @@
            data-add-question-target="cardsFeed"
            data-survey-editor-target="feed"
            data-device-frame-target="feed"
+           <%# The scroller editor-scroll-sync watches: it's the IntersectionObserver
+               root, collapsed to this element's centre line — the same line the
+               cards below scroll-snap to. %>
+           data-editor-scroll-sync-target="feed"
            style="padding-top:64px;padding-bottom:84px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;<%= verto_backdrop_style_attr(@survey, image: false) %>">
 
         <%# ── Consent gate slot — a CTA above the welcome card until a consent
@@ -498,7 +505,11 @@
     </div><%# /cards column %>
 
     <%# ── RIGHT: Answer type panel + Publish panel (toggled) ── %>
-    <div class="right-column">
+    <%# Named for editor-scroll-sync: while focus is inside this column the
+        creator is editing THROUGH the panel — and the panel is holding DOM
+        blocks moved out of the selected card — so a scroll must not re-point it
+        until they leave. %>
+    <div class="right-column" data-editor-scroll-sync-target="panel">
 
     <%# Right-column tabs — the four feature tabs in Verto brand colours
         (answer types navy, quiz yellow, tokenisation teal, logic blue), then
@@ -537,7 +548,11 @@
         <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:5px;">
           <%= t("editor.answer_type") %>
         </div>
+        <%# role=status so the panel says WHICH card it's on out loud: scrolling
+            the feed now re-points it, and a screen-reader user who moved by
+            keyboard would otherwise have no signal that it changed. %>
         <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:#FF5C93;line-height:1.3;min-height:18px;"
+             role="status"
              data-type-panel-target="panelCardName"><%= t("editor.select_card") %></div>
         <div style="font-size: var(--text-md);color:rgba(255,255,255,0.75);margin-top:5px;line-height:1.45;"
              data-type-panel-target="panelHint"><%= t("editor.click_any") %></div>
