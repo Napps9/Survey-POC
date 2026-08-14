@@ -123,6 +123,15 @@ that: push green.
   keep it green, don't delete it to get a deploy out.
 - Dashboard/player styling is mostly inline `style` attributes plus classes
   in `app/assets/tailwind/application.css`; match the file you're editing.
+- System tests render the **compiled** `app/assets/builds/tailwind.css`, which is
+  gitignored and is NOT rebuilt just because `app/assets/tailwind/application.css`
+  changed underneath it. Pull, rebase or switch branches across a CSS commit and
+  the browser keeps serving the stylesheet from whenever the build last ran, so
+  a layout test fails locally on markup it can see and rules it can't. CI never
+  hits this (fresh checkout ⇒ no build ⇒ it compiles one). Run
+  `bin/rails tailwindcss:build` before believing a local CSS-dependent system
+  failure — 2026-08-14, a stale build made a passing fan-arc test look like a
+  geometry bug in someone else's commit.
 - `/play/:token` is served through a Service Worker (`app/views/pwa/service-worker.js`)
   with **network-first (3.5s timeout) + offline cache fallback** for the
   player HTML. Content/markup/CSS fixes therefore reach respondents on their
