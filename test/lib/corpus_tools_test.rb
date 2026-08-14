@@ -350,6 +350,105 @@ class CorpusToolsTest < ActiveSupport::TestCase
     assert_operator CorpusTools.new.suggestions.size, :<=, CorpusTools::MAX_SUGGESTIONS
   end
 
+  # ── Breakdowns: named on the question, fetched one dimension at a time ────
+  #
+  # A fetched question used to carry its `segments` column whole. On a Verto
+  # fielded across 124 countries that is tens of thousands of tokens per
+  # question, re-sent on every later round — most of what made an answer slow,
+  # and why one Verto's questions crowded every other Verto out of the context
+  # window. Nothing asserted its size, which is why it grew unnoticed.
+
+  # A Verto whose respondents span many countries and two genders, so the
+  # indexer has real segments to write.
+  def segmented_verto(countries: 30)
+    survey = @org.surveys.create!(title: "Global Pulse", theme: "Climate Action", audience_age: "all",
+                                  key_insight: "x", default_locale: "en", locales: [ "en" ],
+                                  cards: [ { "type" => "multiple_choice", "cid" => "c_g",
+                                             "text" => "How worried are you about climate change?",
+                                             "options" => [ "Very worried", "Somewhat worried", "Not worried" ] } ])
+    countries.times do |c|
+      code = format("%c%c", 65 + (c / 26), 65 + (c % 26))
+      6.times do |i|
+        survey.responses.create!(session_token: SecureRandom.hex(8), status: "completed",
+                                 region_country: code,
+                                 demographic_gender: i.even? ? "female" : "male",
+                                 answers: { "0" => { "value" => i < 4 ? "Very worried" : "Not worried" } })
+      end
+    end
+    entry = CorpusEntry.create!(survey: survey, organisation: @org, review_status: "approved",
+                                opted_in_at: 1.day.ago)
+    CorpusIndexer.new(entry, themer: null_themer).call
+    entry.reload
+  end
+
+  test "a fetched question names its split dimensions instead of dumping them" do
+    entry = segmented_verto
+    row = CorpusTools.new.call("get_questions", { "ids" => [ entry.corpus_questions.first.id ] })[:results].first
+
+    dimensions = row[:breakdowns]["dimensions"].to_h { |d| [ d["dimension"], d["segments"] ] }
+    assert_equal 30, dimensions["Country"], "the count must be honest — nothing is silently dropped"
+    assert_equal 2,  dimensions["Gender"]
+
+    named = row[:breakdowns]["dimensions"].find { |d| d["dimension"] == "Country" }["largest"]
+    assert_equal CorpusTools::BREAKDOWN_NAME_LIMIT, named.size
+    assert named.all?(String), "largest names segments; a number beside a name would read as a result"
+  end
+
+  # The assertion that would have caught this in the first place.
+  test "a fetched question stays small however many segments it has" do
+    entry = segmented_verto(countries: 120)
+    row = CorpusTools.new.call("get_questions", { "ids" => [ entry.corpus_questions.first.id ] })[:results].first
+
+    assert_operator row.to_json.length, :<, 4_000,
+      "a question's payload must not scale with its segment count — that cost is paid again every round"
+  end
+
+  test "get_breakdown returns one dimension's numbers and says what it held back" do
+    entry = segmented_verto(countries: 30)
+    result = CorpusTools.new.call("get_breakdown",
+                                  { "question_id" => entry.corpus_questions.first.id, "dimension" => "Country" })
+
+    assert_equal CorpusTools::BREAKDOWN_SEGMENT_LIMIT, result[:segments].size
+    assert_equal 5, result[:omitted], "what is left out is stated, never silently absent"
+
+    segment = result[:segments].first
+    assert_equal 6, segment[:responses]
+    assert_in_delta 66.7, segment[:answers].first[:percent], 0.1
+  end
+
+  test "a breakdown cites as the question it came from" do
+    entry = segmented_verto(countries: 3)
+    tools = CorpusTools.new
+    id    = entry.corpus_questions.first.id
+
+    question_source  = tools.call("get_questions", { "ids" => [ id ] })[:results].first[:source]
+    breakdown_source = tools.call("get_breakdown", { "question_id" => id, "dimension" => "Gender" })[:source]
+
+    assert_equal question_source, breakdown_source,
+      "a segment figure is a figure from that question — two rail entries would describe one source"
+    assert_equal 1, tools.sources.size
+  end
+
+  test "get_breakdown refuses a question from a Verto that is not citable" do
+    entry = segmented_verto(countries: 3)
+    id    = entry.corpus_questions.first.id
+    assert CorpusTools.new.call("get_breakdown", { "question_id" => id, "dimension" => "Gender" })[:segments].present?
+
+    entry.withdraw!
+
+    result = CorpusTools.new.call("get_breakdown", { "question_id" => id, "dimension" => "Gender" })
+    assert result[:error].present?, "a known id must stop resolving the moment consent is withdrawn"
+  end
+
+  test "get_breakdown names the dimensions it does have when asked for one it doesn't" do
+    entry = segmented_verto(countries: 3)
+    result = CorpusTools.new.call("get_breakdown",
+                                  { "question_id" => entry.corpus_questions.first.id, "dimension" => "Heritage" })
+
+    assert result[:error].present?
+    assert_includes result[:dimensions], "Country"
+  end
+
   # ── Behaviour under bad input ─────────────────────────────────────────────
   test "an unknown tool name is an error the model can recover from, not a raise" do
     assert_equal({ error: "Unknown tool nonsense." }, CorpusTools.new.call("nonsense", {}))

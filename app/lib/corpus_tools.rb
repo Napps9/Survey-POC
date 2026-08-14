@@ -23,6 +23,10 @@ class CorpusTools
   FETCH_LIMIT = 6
   # Quotes shown per question in a tool result.
   QUOTE_LIMIT = 4
+  # Segments returned by one get_breakdown call, and how many of a dimension's
+  # segments are NAMED (never valued) in the summary a fetched question carries.
+  BREAKDOWN_SEGMENT_LIMIT = 25
+  BREAKDOWN_NAME_LIMIT    = 3
 
   DEFINITIONS = [
     {
@@ -48,8 +52,9 @@ class CorpusTools
       name: "get_questions",
       description: <<~DESC,
         Fetch full results for up to #{FETCH_LIMIT} questions by id: every answer option
-        with its count and percentage, the sample size, any demographic or country
-        breakdowns, and — for open-text questions — themes with counts and quotes.
+        with its count and percentage, the sample size, and — for open-text questions
+        — themes with counts and quotes. Demographic and country splits are NAMED
+        here, not included; call get_breakdown for the numbers behind one.
         Each result carries a "source" number. Use that number to cite it.
       DESC
       input_schema: {
@@ -59,6 +64,27 @@ class CorpusTools
                  description: "Question ids returned by search_corpus." }
         },
         required: [ "ids" ]
+      }
+    },
+    {
+      name: "get_breakdown",
+      description: <<~DESC,
+        Fetch one question's results split by ONE dimension — how the answers differ
+        by country, gender, age band, or how the data was collected. A fetched
+        question tells you which dimensions it has and how many segments each holds;
+        this is how you get the numbers behind one of them.
+        Returns at most #{BREAKDOWN_SEGMENT_LIMIT} segments, largest first, under the
+        SAME source number as the question itself — cite a segment figure with that
+        number.
+      DESC
+      input_schema: {
+        type: "object",
+        properties: {
+          question_id: { type: "integer", description: "The question's id, as returned by search_corpus or get_questions." },
+          dimension:   { type: "string", description: "One of the dimension names the question listed, e.g. 'Country', 'Gender', 'Age'." },
+          limit:       { type: "integer", description: "Optional. Segments to return, up to #{BREAKDOWN_SEGMENT_LIMIT}." }
+        },
+        required: [ "question_id", "dimension" ]
       }
     },
     {
@@ -99,6 +125,7 @@ class CorpusTools
     case name.to_s
     when "search_corpus" then search_corpus(input)
     when "get_questions" then get_questions(input)
+    when "get_breakdown" then get_breakdown(input)
     when "list_vertos"   then list_vertos(input)
     else { error: "Unknown tool #{name}." }
     end
@@ -270,6 +297,77 @@ class CorpusTools
     { results: rows }
   end
 
+  # ── get_breakdown ─────────────────────────────────────────────────────────
+  # One question, one dimension. This exists because the alternative — handing
+  # over every segment with every fetched question — is what a question's
+  # `segments` column actually holds, and on a Verto fielded in 124 countries
+  # that is tens of thousands of tokens per question, paid again on every
+  # subsequent round. `result_row` therefore NAMES the dimensions and this
+  # fetches one.
+  #
+  # The distinction that matters: the old top-8 cap dropped 211 countries
+  # SILENTLY (see SegmentAggregator's comment on why it was removed). Nothing
+  # is dropped here — the summary says the dimension holds 124, and this
+  # returns them a page at a time. Absent is absent; deferred is deferred.
+  def get_breakdown(input)
+    question = base_questions.find_by(id: input["question_id"].to_i)
+    return { error: "That question id is not in the corpus." } if question.nil?
+
+    grouped = segments_by_dimension(question)
+    wanted  = grouped.keys.find { |d| d.casecmp?(input["dimension"].to_s.strip) }
+    if wanted.nil?
+      return { error: "That question has no #{input['dimension']} breakdown.",
+               dimensions: grouped.keys }
+    end
+
+    rows  = grouped[wanted]
+    limit = input["limit"].to_i
+    limit = BREAKDOWN_SEGMENT_LIMIT unless limit.positive?
+    shown = rows.first([ limit, BREAKDOWN_SEGMENT_LIMIT ].min)
+
+    out = {
+      # The same number the question was stamped with — a segment figure is a
+      # figure from that question, so it cites as that question.
+      source:    stamp(question),
+      question:  question.question_text,
+      dimension: wanted,
+      segments:  shown.map { |label, cell| breakdown_segment(label, cell) }
+    }
+    if rows.size > shown.size
+      out[:omitted] = rows.size - shown.size
+      out[:note]    = "#{out[:omitted]} more #{wanted.downcase} segments exist. Ask for them with a higher limit."
+    end
+    out
+  end
+
+  # {"Country: Kenya" => {...}} → {"Country" => [["Kenya", {...}], ...]},
+  # each dimension's segments largest first. A label with no dimension prefix
+  # is grouped under "Other" rather than dropped.
+  def segments_by_dimension(question)
+    segments = question.segments
+    return {} unless segments.is_a?(Hash)
+
+    segments.each_with_object({}) do |(label, cell), out|
+      dimension, value = label.to_s.split(": ", 2)
+      dimension, value = "Other", label.to_s if value.nil?
+      (out[dimension] ||= []) << [ value, cell ]
+    end.each_value { |rows| rows.sort_by! { |_value, cell| -cell.to_h["n"].to_i } }
+  end
+
+  # One segment's answers, shaped like a question's own. Percentages are
+  # computed the same way CorpusQuestion#ranked_options computes them, so a
+  # segment's share and a whole-Verto share are rounded by one rule.
+  def breakdown_segment(value, cell)
+    counts = cell.to_h["distribution"].to_h
+    total  = counts.values.sum { |v| v.to_i }
+    answers = counts.sort_by { |_label, v| -v.to_i }.map do |label, count|
+      { label: label.to_s, count: count.to_i,
+        percent: total.zero? ? 0.0 : (count.to_i * 100.0 / total).round(1) }
+    end
+
+    { segment: value, responses: cell.to_h["n"].to_i, answers: answers }
+  end
+
   # ── list_vertos ───────────────────────────────────────────────────────────
   def list_vertos(input)
     entries = scoped_entries.includes(:survey, :organisation)
@@ -358,8 +456,37 @@ class CorpusTools
       row[:answers] = question.ranked_options
     end
 
-    row[:breakdowns] = question.segments if question.segments.present?
+    # Which splits exist, NOT the splits themselves. See get_breakdown.
+    summary = breakdown_dimensions(question)
+    row[:breakdowns] = summary if summary
     row
+  end
+
+  # A fetched question's splits, named and counted but never valued.
+  #
+  # `segments` is the biggest thing a corpus_question carries — one WLL question
+  # holds ~124 country cells plus gender, age and collection mode, each with a
+  # full distribution — and it used to ride out whole on every fetched question.
+  # Six of those is a tool result in the tens of thousands of tokens, re-sent on
+  # every later round, which is most of what made an answer slow AND why one
+  # Verto's questions crowded every other Verto out of the context window.
+  #
+  # `largest` names three segments and carries no numbers at all. Naming them is
+  # what lets the model decide whether a split is worth a get_breakdown call; a
+  # count beside a name would be read as a result.
+  def breakdown_dimensions(question)
+    grouped = segments_by_dimension(question)
+    return nil if grouped.empty?
+
+    {
+      "note" => "These splits are not shown here. Call get_breakdown with this " \
+                "question's id and one dimension for the numbers behind it.",
+      "dimensions" => grouped.map do |dimension, rows|
+        { "dimension" => dimension,
+          "segments"  => rows.size,
+          "largest"   => rows.first(BREAKDOWN_NAME_LIMIT).map(&:first) }
+      end
+    }
   end
 
   # Assign (or reuse) this turn's source number for a question. Reused so the
