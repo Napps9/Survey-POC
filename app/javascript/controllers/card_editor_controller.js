@@ -193,7 +193,24 @@ export default class extends Controller {
     holder.innerHTML = tapResponseStripHtml(resolveResponses(responses)).trim()
     const next = holder.content.firstElementChild
     if (!next) return
+
+    // Fanning is a TWO-element change and only one of them is the strip. Going
+    // to five, .rotate-actions--fan takes the strip out of flow and stretches it
+    // over the card (inset: 0), and .rotate-card-controls--fan is what gives the
+    // parent a card-height box to stretch inside — without it the parent stays
+    // the short bar it is in row mode, collapses to its own padding once its
+    // only child goes absolute, and every pill's --tap-x/--tap-y resolves
+    // against ~49px instead of 430. Which is what a creator saw: click ＋ on a
+    // four-point scale and the five answers landed in a heap on top of each
+    // other at the foot of the card.
+    //
+    // Read off `next` rather than recomputing fans(): the invariant is that the
+    // two classes agree, and taking them from one source is how that is kept.
+    // Captured before replaceWith, because a detached node has no ancestors.
+    const controls = strip.closest(".rotate-card-controls")
     strip.replaceWith(next)
+    controls?.classList.toggle("rotate-card-controls--fan",
+                               next.classList.contains("rotate-actions--fan"))
     this.dispatch("changed")
   }
 

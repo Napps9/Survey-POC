@@ -1308,6 +1308,16 @@ export default class extends Controller {
     this._syncResponseScale(card)
   }
 
+  // The strip's ＋ and × change the same number the picker reports, so the
+  // picker has to follow them. Without this it only ever updated when a card
+  // was selected: add two answers to a three-point scale and the panel went on
+  // claiming 3 while the card showed 5 — the picker disagreeing with the card
+  // it is pointing at.
+  syncResponseScaleEvent(event) {
+    const card = event.target?.closest?.("[data-survey-editor-target='card']")
+    if (card && card === this._selectedCard()) this._syncResponseScale(card)
+  }
+
   // The 2-6 scale picker: tap cards only, with the current size marked. Counted
   // off the rendered strip rather than the stored `responses`, because a card
   // that has never been re-scaled has no stored set and is still on three.
