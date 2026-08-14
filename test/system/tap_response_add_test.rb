@@ -119,6 +119,50 @@ class TapResponseAddTest < ApplicationSystemTestCase
     end
   end
 
+  # Every pin on a card is one box. Sized to their own text they ran 23% to 32%
+  # of the card wide — "Agree" against "Strongly disagree" — which read as a
+  # ragged set of labels rather than one scale.
+  #
+  # offsetWidth/Height rather than a bounding rect, because a rect includes
+  # transforms and these pills grow 7% under the pointer. Deleting an answer
+  # leaves the mouse over its neighbour, so a rect would report that one pill
+  # bigger than the rest and fail on the hover rather than on the layout. The
+  # laid-out box is what "the same size" means here anyway.
+  #
+  # Whole pixels: a fixed percentage of a 320px card lands on a fraction, and
+  # two pills can differ in the sub-pixel without differing to anyone looking.
+  def pill_boxes
+    evaluate_script(<<~JS)
+      (() => {
+        const pills = [...document.querySelectorAll("[data-card-cid='t1'] [data-tap-response]")]
+        return pills.map((p) => `${Math.round(p.offsetWidth)}x${Math.round(p.offsetHeight)}`)
+      })()
+    JS
+  end
+
+  test "every answer on a fanned card is the same size" do
+    open_editor
+
+    2.times { add_response }   # 3 -> 5, the first size that fans
+    assert_equal 1, pill_boxes.uniq.size,
+                 "five answers came out in #{pill_boxes.uniq.size} different sizes: #{pill_boxes.tally.inspect}"
+
+    add_response               # -> 6
+    assert_equal 1, pill_boxes.uniq.size,
+                 "six answers came out in #{pill_boxes.uniq.size} different sizes: #{pill_boxes.tally.inspect}"
+
+    # Not the same size at BOTH counts, and deliberately so: the six-answer arc
+    # brings its middle pair within 28.5% of the card of each other where the
+    # five-answer one keeps its closest pair 36.9% apart, so one width can't
+    # serve both without either colliding at six or wasting the card at five.
+    six = pill_boxes.first
+    remove_last_response       # -> 5
+    assert_equal 1, pill_boxes.uniq.size
+    assert_not_equal six, pill_boxes.first,
+                     "five and six should NOT share a pill size — six has to be narrower for its " \
+                     "middle pair to clear. Equal here means one of the two is wrong."
+  end
+
   test "answers never land on top of each other, at any size a creator can build" do
     open_editor
     assert_equal 0, overlapping_pairs, "three answers overlap before anything was even clicked"

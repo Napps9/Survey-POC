@@ -2372,20 +2372,53 @@
 .rotate-actions--fan {
   position: absolute; inset: 0;
   display: block; margin: 0; gap: 0;
+
+  /* ── One pill size per card ──────────────────────────────────────────────
+     Every pin on a card is the same box. Sized to content they ran 23% to 32%
+     of the card wide ("Agree" against "Strongly disagree"), which read as a
+     ragged set of labels rather than one scale.
+
+     The ceiling is the CLOSEST SAME-HEIGHT PAIR, because the arc is symmetric
+     and only pills at the same height can meet — a step apart on the curve is
+     ~19% of the card's height, more than twice a pill's, so those never touch
+     however wide they get. That pair is not the same pair at both sizes, which
+     is why this is a variable and not a number:
+
+       five  — the two ends of the scale, at 31.53% and 68.47%: 36.94% apart
+       six   — the middle pair, near the apex where the arc flattens,
+               at 35.73% and 64.27%: 28.54% apart
+
+     Take a couple of points off each for a visible gutter. Six is the tighter
+     card, so it also loses a little chrome to keep the same words inside a
+     narrower pill. */
+  --tap-pill-w: 34%;
+  --tap-pill-h: 40px;
+  --tap-pill-pad: 5px 11px 5px 9px;
+  --tap-pill-gap: 5px;
+}
+.rotate-actions--fan[data-response-count="6"] {
+  --tap-pill-w: 27%;
+  --tap-pill-pad: 5px 8px 5px 7px;
+  --tap-pill-gap: 4px;
 }
 .rotate-actions--fan .rotate-action {
   position: absolute;
   left: var(--tap-x, 50%); top: var(--tap-y, 50%);
   transform: translate(-50%, -50%);
   flex: 0 0 auto;
-  /* Wide enough for "Slightly disagree" on two lines, narrow enough that the
-     two bottom pills clear each other at the ends of the arc. */
-  width: max-content; max-width: 32%;
-  flex-direction: row; gap: 5px;
+  /* Fixed, not max-content: the point is that they match. min-height rather
+     than height so a label that needs a third line still gets one instead of
+     being clipped — uniform is the intent, hiding an answer is not. */
+  width: var(--tap-pill-w); max-width: none;
+  min-height: var(--tap-pill-h);
+  flex-direction: row; gap: var(--tap-pill-gap);
+  /* The mark and the label ride as one centred group. Left-aligned in a fixed
+     box, a short answer sat against the left edge with a hole beside it. */
+  align-items: center; justify-content: center;
   background: #fff;
   border: 1.5px solid var(--tap-response-color, #F5A623);
   border-radius: 999px;
-  padding: 5px 11px 5px 9px;
+  padding: var(--tap-pill-pad);
   box-shadow: 0 4px 14px rgba(0,0,0,0.22);
   transition: transform 0.12s;
 }
@@ -2397,16 +2430,39 @@
 .rotate-actions--fan .rotate-action.is-strong .rotate-action-btn {
   background: none; color: var(--tap-response-color, #F5A623);
 }
-.rotate-actions--fan .rotate-action.is-strong { border-width: 2.5px; }
+/* "Strongly" wears a heavier ring, drawn INWARD rather than as a thicker
+   border. A 2.5px border against the others' 1.5px added 2px to the box, so
+   the two ends of every scale were a size of their own — small, but it is the
+   one thing the fixed width above exists to stop. An inset shadow is the same
+   ring with no layout at all. The drop shadow rides along because a second
+   box-shadow declaration would replace it, not add to it. */
+.rotate-actions--fan .rotate-action.is-strong {
+  box-shadow: inset 0 0 0 1.5px var(--tap-response-color, #F5A623),
+              0 4px 14px rgba(0,0,0,0.22);
+}
 .rotate-actions--fan .rotate-action-label {
   font-size: 11px; color: #1C2034; text-align: left;
+  /* Only as wide as its words, so the group centres; and never wider than the
+     pill it is in, so a long single word breaks rather than pushing the box
+     out and undoing the uniform width. */
+  flex: 0 1 auto; min-width: 0; overflow-wrap: break-word; hyphens: auto;
 }
 .rotate-actions--fan .rotate-action .choice-icon-emoji { font-size: 14px; }
 .rotate-actions--fan .rotate-action:hover { transform: translate(-50%, -50%) scale(1.07); }
 .rotate-actions--fan .rotate-action:hover .rotate-action-btn { transform: none; }
 .rotate-actions--fan .rotate-action.is-intent { transform: translate(-50%, -50%) scale(1.13); }
 .rotate-actions--fan .rotate-action.is-intent .rotate-action-btn { transform: none; }
-.phone-bottom .rotate-actions--fan .rotate-action { padding: 4px 9px 4px 8px; }
+/* The editor's phone-preview chrome draws the same card smaller. Set the
+   tokens rather than the pill, so the one-size-per-card rule above still holds
+   here — overriding padding directly would leave the width behind and put the
+   pills back out of step. */
+.phone-bottom .rotate-actions--fan {
+  --tap-pill-h: 36px;
+  --tap-pill-pad: 4px 9px 4px 8px;
+}
+.phone-bottom .rotate-actions--fan[data-response-count="6"] {
+  --tap-pill-pad: 4px 7px 4px 6px;
+}
 .phone-bottom .rotate-actions--fan .rotate-action-label { font-size: 10px; }
 
 /* ── Editor-only response chrome ──────────────────────────────────────────
