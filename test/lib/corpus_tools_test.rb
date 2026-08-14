@@ -350,6 +350,84 @@ class CorpusToolsTest < ActiveSupport::TestCase
     assert_operator CorpusTools.new.suggestions.size, :<=, CorpusTools::MAX_SUGGESTIONS
   end
 
+  # ── Breadth: a search describes the corpus, not its largest Verto ─────────
+  #
+  # Search used to be ORDER BY response_count DESC LIMIT 12 across everything.
+  # The real corpus is skewed by an order of magnitude — one Verto has ~50,000
+  # responses where another has ~500 — so every slot went to the biggest one,
+  # the model fetched six of its questions, and the answer described a single
+  # survey. That is the whole of "it only pulls from one Verto at a time".
+
+  # A Verto whose questions all match "climate", at a chosen scale.
+  def sized_verto(title:, responses:, questions: 6)
+    cards = Array.new(questions) do |i|
+      { "type" => "multiple_choice", "cid" => "c_#{i}", "text" => "Climate question #{i} about worry",
+        "options" => [ "Yes", "No" ] }
+    end
+    survey = @org.surveys.create!(title: title, theme: "Climate Action", audience_age: "all",
+                                  key_insight: "x", default_locale: "en", locales: [ "en" ], cards: cards)
+    entry = CorpusEntry.create!(survey: survey, organisation: @org, review_status: "approved",
+                                opted_in_at: 1.day.ago)
+    cards.each_with_index do |card, i|
+      entry.corpus_questions.create!(cid: card["cid"], position: i, card_type: "multiple_choice",
+                                     theme: "Climate Action", question_text: card["text"],
+                                     options: card["options"], response_count: responses,
+                                     distribution: { "Yes" => responses })
+    end
+    entry
+  end
+
+  test "a search spreads across the Vertos that matched instead of filling up on the largest" do
+    sized_verto(title: "Huge study",  responses: 50_000)
+    sized_verto(title: "Middling",    responses: 5_000)
+    sized_verto(title: "Small but relevant", responses: 500)
+
+    rows = search("climate worry")
+
+    assert_equal 3, rows[:vertos_matched]
+    assert_equal 3, rows[:questions].map { |q| q[:verto] }.uniq.size,
+      "a global sort by response count gives every slot to the biggest Verto — the bug this replaces"
+    assert_includes rows[:note], "3 different Vertos"
+  end
+
+  test "no Verto takes more than its share of a search" do
+    sized_verto(title: "Huge study", responses: 50_000, questions: 20)
+    sized_verto(title: "Small but relevant", responses: 500)
+
+    counts = search("climate worry")[:questions].group_by { |q| q[:verto] }.transform_values(&:size)
+
+    assert_operator counts["Huge study"], :<=, CorpusTools::SEARCH_PER_VERTO
+    assert counts["Small but relevant"].to_i.positive?, "a small Verto must survive a large one"
+  end
+
+  test "the first results come from different Vertos, not one after another" do
+    sized_verto(title: "Huge study", responses: 50_000)
+    sized_verto(title: "Small but relevant", responses: 500)
+
+    first_two = search("climate worry")[:questions].first(2).map { |q| q[:verto] }
+
+    assert_equal 2, first_two.uniq.size,
+      "a model weights what it reads first — top-K-then-fill still front-loads the largest Verto"
+  end
+
+  test "a search matching one Verto says so rather than implying breadth" do
+    sized_verto(title: "Only one", responses: 500)
+
+    rows = search("climate worry")
+
+    assert_equal 1, rows[:vertos_matched]
+    assert_includes rows[:note], "Only one Verto"
+  end
+
+  test "the search spread counts the whole match set, not just what fits" do
+    5.times { |i| sized_verto(title: "Verto #{i}", responses: 1_000, questions: 6) }
+
+    rows = search("climate worry")
+
+    assert_equal 5, rows[:vertos_matched]
+    assert_equal CorpusTools::SEARCH_LIMIT, rows[:questions].size
+  end
+
   # ── Breakdowns: named on the question, fetched one dimension at a time ────
   #
   # A fetched question used to carry its `segments` column whole. On a Verto

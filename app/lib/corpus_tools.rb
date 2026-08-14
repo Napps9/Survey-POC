@@ -17,10 +17,16 @@
 class CorpusTools
   # Cap on how much one search returns. Enough to find the right question,
   # small enough that the model reads all of it.
-  SEARCH_LIMIT = 12
+  SEARCH_LIMIT = 15
+  # How many of those one Verto may contribute, and how wide a net is cast
+  # before the spreading happens. See `diversify`.
+  SEARCH_PER_VERTO = 4
+  SEARCH_CANDIDATES = 60
   # Cap on questions fetched in one go, so a single tool call can't pull the
-  # whole corpus into the context window.
-  FETCH_LIMIT = 6
+  # whole corpus into the context window. Large enough that ONE fetch can span
+  # three or four Vertos, which is what an answer covering the corpus needs;
+  # affordable only because a fetched question no longer carries its segments.
+  FETCH_LIMIT = 12
   # Quotes shown per question in a tool result.
   QUOTE_LIMIT = 4
   # Segments returned by one get_breakdown call, and how many of a dimension's
@@ -35,6 +41,9 @@ class CorpusTools
         Find survey questions in the corpus that relate to a topic. Returns matching
         questions with their Verto, sample size and answer options — but NOT their
         results. Call get_questions with the ids you want the numbers for.
+        Results are spread across the Vertos that matched rather than filled up from
+        the largest one, and "vertos_matched" tells you how many hold data on this
+        topic. Where that is more than one, fetch from more than one.
         Search by plain keywords. If a search returns nothing, try broader or
         different words before concluding the corpus has no data on the topic.
       DESC
@@ -42,8 +51,7 @@ class CorpusTools
         type: "object",
         properties: {
           query:   { type: "string", description: "Keywords to match against question wording, theme and answer options." },
-          theme:   { type: "string", description: "Optional. Restrict to a theme, e.g. 'Climate Action'." },
-          country: { type: "string", description: "Optional. ISO country code, e.g. 'CL'." }
+          theme:   { type: "string", description: "Optional. Restrict to a theme, e.g. 'Climate Action'." }
         },
         required: [ "query" ]
       }
@@ -51,7 +59,9 @@ class CorpusTools
     {
       name: "get_questions",
       description: <<~DESC,
-        Fetch full results for up to #{FETCH_LIMIT} questions by id: every answer option
+        Fetch full results for up to #{FETCH_LIMIT} questions by id. Where the search
+        offered questions from more than one Verto, prefer ids that span them —
+        one fetch is meant to cover the corpus, not one survey. Returns every answer option
         with its count and percentage, the sample size, and — for open-text questions
         — themes with counts and quotes. Demographic and country splits are NAMED
         here, not included; call get_breakdown for the numbers behind one.
@@ -90,16 +100,16 @@ class CorpusTools
     {
       name: "list_vertos",
       description: <<~DESC,
-        List the surveys in the corpus: name, organisation, theme, country, when it
-        was fielded and how many people completed it. Use this to answer questions
-        about coverage ("what data do you have on X?") or to decide which surveys
-        are worth searching.
+        List the surveys in the corpus: name, organisation, theme, when it was fielded
+        and how many people completed it. Use this to answer questions about coverage
+        ("what data do you have on X?") or to decide which surveys are worth searching.
+        For how one survey's answers differ by country, fetch the question and call
+        get_breakdown.
       DESC
       input_schema: {
         type: "object",
         properties: {
-          theme:   { type: "string", description: "Optional. Filter by theme." },
-          country: { type: "string", description: "Optional. ISO country code." }
+          theme: { type: "string", description: "Optional. Filter by theme." }
         },
         required: []
       }
@@ -287,20 +297,79 @@ class CorpusTools
     terms = input["query"].to_s.downcase.split(/\W+/).reject { |t| t.length < 3 }
     return { questions: [], note: "Give me some keywords to search for." } if terms.empty?
 
-    relation = base_questions
+    relation = CorpusQuestion.where(corpus_entry_id: scoped_entries.select(:id))
     relation = relation.where("LOWER(theme) LIKE ?", "%#{sanitize(input["theme"].to_s.downcase)}%") if input["theme"].present?
 
     # `options` is a json column, and Postgres has no LOWER(json) — the cast is
     # what lets the same clause run on SQLite in dev and Postgres in prod.
     clause = terms.map { "(LOWER(question_text) LIKE ? OR LOWER(theme) LIKE ? OR LOWER(CAST(options AS TEXT)) LIKE ?)" }.join(" OR ")
     args   = terms.flat_map { |t| [ "%#{sanitize(t)}%" ] * 3 }
+    matched = relation.where(clause, *args)
 
-    matches = relation.where(clause, *args).order(response_count: :desc).limit(SEARCH_LIMIT)
+    # Per-Verto match counts over the WHOLE match set, not just what is shown —
+    # this is how the model learns that a topic it is about to answer from one
+    # survey is covered by four.
+    tallies = matched.group(:corpus_entry_id).count
+    if tallies.empty?
+      return { questions: [],
+               note: "No questions matched those words. Try broader terms, or call list_vertos to see what the corpus covers." }
+    end
 
-    {
-      questions: matches.map { |q| summary_row(q) },
-      note: matches.empty? ? "No questions matched those words. Try broader terms, or call list_vertos to see what the corpus covers." : nil
-    }.compact
+    ids  = diversify(matched.reorder(response_count: :desc).limit(SEARCH_CANDIDATES).pluck(:id, :corpus_entry_id))
+    rows = base_questions.where(id: ids).index_by(&:id)
+
+    questions = ids.filter_map { |id| rows[id] }.map { |q| summary_row(q) }
+    { questions: questions }.merge(spread_note(tallies, questions))
+  end
+
+  # Take one question from each Verto in turn, rather than the top N overall.
+  #
+  # The old ORDER BY response_count DESC LIMIT 12 was a GLOBAL sort, and the
+  # corpus is skewed by an order of magnitude — one Verto has ~50,000 responses
+  # where another has ~500. So every slot went to the largest Verto, the model
+  # fetched six of its questions, and the answer described one survey. That is
+  # the whole of "it only pulls from one Verto at a time".
+  #
+  # Round-robin rather than top-K-then-fill: filling still front-loads the
+  # largest Verto, and a model weights what it reads first. This puts a
+  # different Verto in slots 1, 2 and 3.
+  #
+  # Done in Ruby on purpose. The SQL for it is ROW_NUMBER() OVER (PARTITION BY
+  # …) over a table carrying json columns, which is exactly the shape that
+  # passes on SQLite and 500s on Postgres.
+  def diversify(candidates)
+    # `candidates` arrives largest-first, so group_by yields Vertos ordered by
+    # their best question and each group ordered within itself.
+    groups = candidates.group_by(&:last).values.map { |rows| rows.first(SEARCH_PER_VERTO).map(&:first) }
+
+    picked = []
+    depth  = 0
+    while picked.size < SEARCH_LIMIT && groups.any? { |g| g.size > depth }
+      groups.each do |group|
+        break if picked.size >= SEARCH_LIMIT
+
+        picked << group[depth] if group[depth]
+      end
+      depth += 1
+    end
+    picked
+  end
+
+  # What the model is told about breadth. `vertos_matched` counts the full match
+  # set, so a truncated spread still says how much is out there.
+  def spread_note(tallies, questions)
+    shown = questions.group_by { |q| q[:verto] }.transform_values(&:size)
+    note =
+      if tallies.size > 1
+        "These questions come from #{tallies.size} different Vertos. Fetch from more " \
+        "than one and compare them rather than reporting whichever is largest."
+      else
+        "Only one Verto in the corpus has questions matching this. Say so in your answer."
+      end
+
+    { vertos_matched: tallies.size,
+      spread:         shown.map { |verto, count| { verto: verto, questions: count } },
+      note:           note }
   end
 
   # ── get_questions ─────────────────────────────────────────────────────────
