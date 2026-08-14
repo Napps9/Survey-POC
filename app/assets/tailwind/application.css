@@ -2219,18 +2219,22 @@
    Growing into whatever the panel has instead is bigger exactly where there is
    room to be — 560 on an iPhone 15, 480 on the desktop player — and never adds
    a pixel of scroll over the old size anywhere.
-   430 is the FLOOR, deliberately: it is today's card, and the alternative on a
-   short phone would be shrinking the answer text under the floor that
-   player_type_floor_test exists to defend. Where the room isn't there, the
-   scroller above takes the overflow.
+   430 is the floor on the editor canvas, where it is today's card and a creator
+   scrolling a fixed workspace is ordinary. The PLAYER floors much lower — see
+   the mobile rule — because scrolling a swipe card is not ordinary at all.
    This is the same fix the NPS vessel already had for the same reason — it was
    a flat 232px until "a tall phone drew the same small vessel inside a panel
    with hundreds of px to spare"; see --nps-vessel-h.
    `flex`, not `height: 100%`: the percentage resolves against .rotate-wrap,
    which has no definite height, so it silently falls back to auto and the card
-   stays 430 on every viewport while looking like it works. */
+   stays 430 on every viewport while looking like it works.
+
+   `container-type: size` so the answers can size themselves against the CARD
+   rather than the viewport (see --tap-pill-h). The card's height comes from
+   flex, never from its contents, so size containment costs nothing here. */
 .rotate-card-stack {
   position: relative;
+  container-type: size; container-name: swipecard;
   width: 320px; max-width: 100%;
   height: auto; flex: 1 1 auto;
   min-height: 430px; max-height: 560px;
@@ -2452,10 +2456,24 @@
      card, so it also loses a little chrome to keep the same words inside a
      narrower pill. */
   --tap-pill-w: 34%;
-  --tap-pill-h: 40px;
+  /* Height tracks the CARD, because the arc does. The arc's vertical radius is
+     22% of the card height, so a shorter card flattens it and the rows close on
+     each other: measured, a five-point scale's tightest row pair sits 14.84% of
+     the card's height apart, and the pills touch at 380px with a fixed 56px
+     pill. Keeping the pill under 12% of the card means that gap can never close,
+     at any height — 56px on a full-size card, 43px on an iPhone SE, and it is
+     the arc's own geometry doing the arithmetic rather than a table of
+     breakpoints. Six is the roomier scale (its rows are 17.5% apart, not 14.8),
+     so the five-point figure governs both. */
+  --tap-pill-h: clamp(34px, 12cqh, 56px);
   --tap-pill-pad: 5px 11px 5px 9px;
   --tap-pill-gap: 5px;
 }
+/* The mark shrinks with the pill for the same reason. min() rather than clamp:
+   44px is the touch-target floor on a full card, but the PILL is the target
+   here — 109×43 on an SE clears 44×44 comfortably on its long axis — so the
+   inner circle is free to give its height back to the arc. */
+.rotate-actions--fan .rotate-action-btn { min-height: min(44px, 8cqh); }
 .rotate-actions--fan[data-response-count="6"] {
   --tap-pill-w: 27%;
   --tap-pill-pad: 5px 8px 5px 7px;
@@ -6270,6 +6288,22 @@ body.generating-overlay-active .bottom-bar { display: none; }
     flex: 1 1 auto;
     height: auto;
   }
+  /* The card fits the phone rather than the phone scrolling the card. Scrolling
+     a swipe card is the wrong verb — you swipe it — and the desktop floor of
+     430px was forcing exactly that: 73px of scroll on an iPhone SE, 143px on a
+     320×480. Dropping the floor to 260 lets it take whatever the panel has, and
+     nothing scrolls on any upright phone: 412 on a Fold, 357 on an SE, 450 on a
+     393px iPhone, 560 where there is room for it.
+
+     260 rather than 0 because the pills still have to clear each other, and
+     that is a floor the arc sets, not a taste: the answers stop shrinking at
+     34px (a two-line label plus its chrome), and a five-point scale needs about
+     250px of card before rows that tall touch. 260 keeps a visible gap.
+
+     The one viewport that still scrolls is a landscape phone — 844×390 offers
+     the card 228px, less than five answers can be drawn in — and it now scrolls
+     32px instead of the ~200 the fixed floor cost it. */
+  .preview-overlay .rotate-card-stack { min-height: 260px; }
   /* The vessel scales with the phone instead of assuming the smallest one.
      232px was chosen so the liquid column fits a short viewport, and then
      applied to every viewport — so a tall phone drew the same small vessel
