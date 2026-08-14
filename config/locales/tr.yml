@@ -1057,6 +1057,60 @@ tr:
     bulk_destroy_confirm:
       one: "%{count} Verto kalıcı olarak silinsin? Tüm yanıtlar ve veriler silinecek. Bu işlem geri alınamaz."
       other: "%{count} Verto kalıcı olarak silinsin? Tüm yanıtlar ve veriler silinecek. Bu işlem geri alınamaz."
+    share: "Paylaş →"
+  share_modal:
+    eyebrow: "Bu Verto'yu paylaş"
+    close: "Kapat"
+    loading: "Yükleniyor…"
+    share_text: "“%{name}” için iki dakikanızı ayırın"
+    main_link: "Ana bağlantı"
+    responders:
+      one: "%{count} katılımcı"
+      other: "%{count} katılımcı"
+    copy: "Bağlantıyı kopyala"
+    copied: "Kopyalandı!"
+    copy_failed: "Kopyalanamadı — seçip kopyalayın"
+    share_sheet: "Paylaş…"
+    via_email: "E-posta"
+    via_whatsapp: "WhatsApp"
+    via_x: "X"
+    via_linkedin: "LinkedIn"
+    qr_hint: "Bu Verto'yu açmak için tarayın. Afiş ve sunumlar için kodu indirin."
+    download_qr: "QR indir (SVG)"
+    download_qr_short: "QR kodu"
+    custom_url: "Özel URL"
+    custom_url_placeholder: "summer-feedback-2026"
+    custom_url_hint: "İsteğe bağlı — yukarıdakinin yanında akılda kalıcı bir adres. İkisi de çalışır."
+    after_finish: "Katılımcılar bitirdikten sonra ne görecek"
+    setting_compare: "Herkesin nasıl yanıtladığını onlara göster"
+    compare_note_label: "Karşılama kartında gösterilen vaat"
+    setting_share: "Bağlantıyı iletebilmeleri için Paylaş düğmesi sun"
+    setting_regions: "Diğer bölgelerin nasıl yanıtladığını haritada görmelerini sağla"
+    links_title: "Ek paylaşım bağlantıları"
+    links_hint: "Her kitleye kendi URL'sini — ve yukarıdaki ayarlara kendi yanıtlarını — verin. Bir gruba herkesin nasıl yanıtladığını gösteren, diğerine göstermeyen bir bağlantı gönderin."
+    links_empty: "Henüz ek bağlantı yok. Herkes yukarıdaki ana bağlantıdan geliyor."
+    link_name_label: "Bağlantı adı"
+    compare_label: "Karşılaştırma"
+    share_label: "Paylaş düğmesi"
+    regions_label: "Bölge haritası"
+    override_inherit: "Verto ile aynı"
+    override_on: "Açık"
+    override_off: "Kapalı"
+    active_label: "Etkin"
+    paused_label: "Duraklatıldı"
+    delete_link: "Sil"
+    delete_confirm: "“%{name}” bağlantısı silinsin mi? Hemen çalışmayı durdurur. Bu bağlantıyla toplanan yanıtlar saklanır."
+    new_name_placeholder: "Kime? örn. Bülten"
+    new_url_placeholder: "newsletter"
+    add_link: "Bağlantı oluştur"
+    new_link_default_name: "Yeni bağlantı"
+    not_live_title: "Bu Verto henüz yayında değil"
+    not_live_body: "Yayınlayın, bu bağlantılar çalışmaya başlasın. Şimdiden hazırlayabilirsiniz."
+    not_live_cta: "Yayınla ve paylaş →"
+    error_taken: "Bu URL zaten kullanımda — başka bir tane deneyin."
+    error_slug_blank: "Bir bağlantının URL'si olmalı."
+    error_limit: "Bir Verto için %{count} ek bağlantı sınırına ulaştınız."
+    error_create: "Bu bağlantı oluşturulamadı — farklı bir ad deneyin."
   dashboard:
     welcome_back: Tekrar hoş geldiniz
     heading_html: <span style="color:#01EACB;">Verto'larınız</span>
@@ -1236,7 +1290,7 @@ tr:
     quiz_preset_badge: "Quiz"
     step_counter: Adım %{n} / %{total}
   templates:
-    eyebrow: Şablonlar
+    eyebrow: "Bu Verto'yu paylaş"
     heading_html: Bir <span style="color:#615BF5;">şablonla</span> başlayın
     subtitle: Hazır bir Verto seçin ve dakikalar içinde yanıt toplamaya başlayın — her
       şablon tamamen düzenlenebilir.

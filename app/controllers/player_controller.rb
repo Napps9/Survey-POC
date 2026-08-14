@@ -436,7 +436,10 @@ class PlayerController < ApplicationController
   def results
     return render json: { ok: false, error: "Survey not found" }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
-    unless @survey.show_results_comparison?
+    # The link decides, not just the Verto — otherwise a cohort sent a
+    # comparison-off link could still read the aggregate straight off this
+    # endpoint, which is the exact thing turning it off was meant to prevent.
+    unless play_settings.compare_results?
       return render json: { ok: false, error: "Comparison not enabled" }, status: :forbidden
     end
 
@@ -572,6 +575,9 @@ class PlayerController < ApplicationController
       raise CrossSurveyToken
     end
     resp.survey_share ||= @survey_share
+    # Which named share link this respondent came in on, so the Share panel can
+    # say what each audience actually returned. Set once, like the share.
+    resp.survey_link ||= @survey_link
     resp
   end
 
@@ -915,6 +921,12 @@ class PlayerController < ApplicationController
     if (share = SurveyShare.find_by(share_token: token))
       @survey_share = share
       @survey = Survey.without_report_text.find_by(id: share.survey_id)
+    elsif (link = SurveyLink.active.find_by(slug: token))
+      # A named share link. Only active ones resolve, so pausing a link takes it
+      # off /play for its reads AND its writes in one step — a page loaded
+      # before the pause can't keep posting answers through it.
+      @survey_link = link
+      @survey = Survey.without_report_text.find_by(id: link.survey_id)
     else
       # publish_token is the default opaque link; slug is the creator's
       # optional custom/vanity alternative — either resolves the same survey.

@@ -1057,6 +1057,60 @@ fr:
     bulk_destroy_confirm:
       one: Supprimer définitivement %{count} Verto ? Toutes les réponses et données seront effacées. Cette action est irréversible.
       other: Supprimer définitivement %{count} Vertos ? Toutes les réponses et données seront effacées. Cette action est irréversible.
+    share: "Partager →"
+  share_modal:
+    eyebrow: "Partager ce Verto"
+    close: "Fermer"
+    loading: "Chargement…"
+    share_text: "Prenez deux minutes pour répondre à « %{name} »"
+    main_link: "Lien principal"
+    responders:
+      one: "%{count} répondant"
+      other: "%{count} répondants"
+    copy: "Copier le lien"
+    copied: "Copié !"
+    copy_failed: "Copie impossible — sélectionnez et copiez"
+    share_sheet: "Partager…"
+    via_email: "E-mail"
+    via_whatsapp: "WhatsApp"
+    via_x: "X"
+    via_linkedin: "LinkedIn"
+    qr_hint: "Scannez pour ouvrir ce Verto. Téléchargez le code pour vos affiches et diapositives."
+    download_qr: "Télécharger le QR (SVG)"
+    download_qr_short: "Code QR"
+    custom_url: "URL personnalisée"
+    custom_url_placeholder: "summer-feedback-2026"
+    custom_url_hint: "Facultatif — une adresse facile à retenir en plus de celle du dessus. Les deux fonctionnent."
+    after_finish: "Ce que les répondants obtiennent à la fin"
+    setting_compare: "Leur montrer comment les autres ont répondu"
+    compare_note_label: "Promesse affichée sur la carte d'accueil"
+    setting_share: "Proposer un bouton Partager pour qu'ils transmettent le lien"
+    setting_regions: "Leur montrer sur une carte comment d'autres régions ont répondu"
+    links_title: "Liens de partage supplémentaires"
+    links_hint: "Donnez à chaque public sa propre URL — et ses propres réponses aux réglages ci-dessus. Envoyez à un groupe un lien qui montre les réponses de tous les autres, et à un autre groupe un lien qui ne le fait pas."
+    links_empty: "Aucun lien supplémentaire pour l'instant. Tout le monde arrive par le lien principal."
+    link_name_label: "Nom du lien"
+    compare_label: "Comparaison"
+    share_label: "Bouton Partager"
+    regions_label: "Carte des régions"
+    override_inherit: "Comme le Verto"
+    override_on: "Oui"
+    override_off: "Non"
+    active_label: "Actif"
+    paused_label: "En pause"
+    delete_link: "Supprimer"
+    delete_confirm: "Supprimer le lien « %{name} » ? Il cesse de fonctionner immédiatement. Les réponses déjà recueillies sont conservées."
+    new_name_placeholder: "Pour qui ? ex. Newsletter"
+    new_url_placeholder: "newsletter"
+    add_link: "Créer le lien"
+    new_link_default_name: "Nouveau lien"
+    not_live_title: "Ce Verto n'est pas encore en ligne"
+    not_live_body: "Publiez-le et ces liens deviendront actifs. Vous pouvez déjà les préparer."
+    not_live_cta: "Publier et partager →"
+    error_taken: "Cette URL est déjà prise — essayez-en une autre."
+    error_slug_blank: "Un lien a besoin d'une URL."
+    error_limit: "Vous avez atteint la limite de %{count} liens supplémentaires par Verto."
+    error_create: "Ce lien n'a pas pu être créé — essayez un autre nom."
   dashboard:
     welcome_back: Bon retour
     heading_html: Vos <span style="color:#01EACB;">Vertos</span>
@@ -1236,7 +1290,7 @@ fr:
     quiz_preset_badge: "Quiz"
     step_counter: Étape %{n} sur %{total}
   templates:
-    eyebrow: Modèles
+    eyebrow: "Partager ce Verto"
     heading_html: Partez d’un <span style="color:#615BF5;">modèle</span>
     subtitle: Choisissez un Verto prêt à l’emploi et commencez à collecter en quelques
       minutes — chaque modèle est entièrement modifiable.

@@ -2,6 +2,9 @@ class Survey < ApplicationRecord
   belongs_to :organisation
   has_many :responses, dependent: :destroy
   has_many :survey_shares, dependent: :destroy
+  # Named share links — extra /play/ addresses for this Verto, each with its own
+  # respondent-facing overrides. See SurveyLink.
+  has_many :survey_links, dependent: :destroy
   has_many :partnership_vertos, dependent: :destroy
   has_many :report_renders, dependent: :destroy
   has_many :flow_generations, dependent: :destroy
@@ -1290,6 +1293,17 @@ class Survey < ApplicationRecord
     compare_note.presence || I18n.t("player.compare_promise")
   end
 
+  # ── What a respondent is offered after they finish ────────────────────────
+  # SurveyLink answers these same three questions, overriding them per link
+  # (see SurveyLink#compare_results?). Anything rendering the player asks
+  # whichever object it arrived through — `(@survey_link || @survey)` — so the
+  # player never has to know whether a share link is in play. They exist as
+  # aliases rather than the columns themselves so a link's own nil-means-inherit
+  # column reader stays readable for the settings form.
+  def compare_results? = show_results_comparison?
+  def share_button?    = share_enabled?
+  def regions_map?     = regions_enabled?
+
   # Thank-you screen copy shown after Finish. Both fall back to the default
   # localized copy when the creator hasn't set their own.
   def thankyou_title_text
@@ -1602,14 +1616,21 @@ class Survey < ApplicationRecord
   end
 
   # True when `value` is already in use anywhere in the /play/:token
-  # namespace — this Verto's own publish_token, another Verto's slug or
-  # publish_token, or a share token — so a creator-chosen slug can never
-  # make PlayerController#load_survey_and_share resolve ambiguously.
-  def self.slug_taken?(value, excluding_id: nil)
+  # namespace — a Verto's slug or publish_token, a partner share token, or a
+  # share link's slug — so nothing a creator chooses can make
+  # PlayerController#load_survey_and_share resolve ambiguously. Each excluding_
+  # argument spares the record doing the asking from colliding with itself.
+  def self.play_key_taken?(value, excluding_survey_id: nil, excluding_link_id: nil)
     return false if value.blank?
-    Survey.where.not(id: excluding_id).exists?(slug: value) ||
-      Survey.where.not(id: excluding_id).exists?(publish_token: value) ||
-      SurveyShare.exists?(share_token: value)
+    Survey.where.not(id: excluding_survey_id).exists?(slug: value) ||
+      Survey.where.not(id: excluding_survey_id).exists?(publish_token: value) ||
+      SurveyShare.exists?(share_token: value) ||
+      SurveyLink.where.not(id: excluding_link_id).exists?(slug: value)
+  end
+
+  # The Verto's own custom-link form asks the same question about itself.
+  def self.slug_taken?(value, excluding_id: nil)
+    play_key_taken?(value, excluding_survey_id: excluding_id)
   end
 
   # A "responder" is anyone who answered at least one question (not just those

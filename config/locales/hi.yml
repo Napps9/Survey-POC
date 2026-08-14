@@ -1057,6 +1057,60 @@ hi:
     bulk_destroy_confirm:
       one: "%{count} Verto को स्थायी रूप से हटाएं? सभी प्रतिक्रियाएं और डेटा मिटा दिए जाएंगे। इसे पूर्ववत नहीं किया जा सकता।"
       other: "%{count} Vertos को स्थायी रूप से हटाएं? सभी प्रतिक्रियाएं और डेटा मिटा दिए जाएंगे। इसे पूर्ववत नहीं किया जा सकता।"
+    share: "साझा करें →"
+  share_modal:
+    eyebrow: "यह Verto साझा करें"
+    close: "बंद करें"
+    loading: "लोड हो रहा है…"
+    share_text: "“%{name}” का उत्तर देने के लिए दो मिनट निकालें"
+    main_link: "मुख्य लिंक"
+    responders:
+      one: "%{count} उत्तरदाता"
+      other: "%{count} उत्तरदाता"
+    copy: "लिंक कॉपी करें"
+    copied: "कॉपी हो गया!"
+    copy_failed: "कॉपी नहीं हो सका — चुनकर कॉपी करें"
+    share_sheet: "साझा करें…"
+    via_email: "ईमेल"
+    via_whatsapp: "WhatsApp"
+    via_x: "X"
+    via_linkedin: "LinkedIn"
+    qr_hint: "यह Verto खोलने के लिए स्कैन करें। पोस्टर और स्लाइड के लिए कोड डाउनलोड करें।"
+    download_qr: "QR डाउनलोड करें (SVG)"
+    download_qr_short: "QR कोड"
+    custom_url: "कस्टम URL"
+    custom_url_placeholder: "summer-feedback-2026"
+    custom_url_hint: "वैकल्पिक — ऊपर वाले के साथ एक आसानी से याद रहने वाला पता। दोनों काम करते हैं।"
+    after_finish: "पूरा करने के बाद उत्तरदाताओं को क्या मिलता है"
+    setting_compare: "उन्हें दिखाएँ कि बाकी सबने क्या उत्तर दिया"
+    compare_note_label: "स्वागत कार्ड पर दिखाया गया वादा"
+    setting_share: "साझा करें बटन दें ताकि वे लिंक आगे भेज सकें"
+    setting_regions: "उन्हें नक्शे पर दिखाएँ कि दूसरे क्षेत्रों ने क्या उत्तर दिया"
+    links_title: "अतिरिक्त साझा लिंक"
+    links_hint: "हर दर्शक-समूह को उसका अपना URL दें — और ऊपर की सेटिंग्स के अपने उत्तर भी। एक समूह को ऐसा लिंक भेजें जो उन्हें बाकी सबके उत्तर दिखाए, और दूसरे को ऐसा जो न दिखाए।"
+    links_empty: "अभी कोई अतिरिक्त लिंक नहीं। सभी ऊपर दिए मुख्य लिंक से आते हैं।"
+    link_name_label: "लिंक का नाम"
+    compare_label: "तुलना"
+    share_label: "साझा करें बटन"
+    regions_label: "क्षेत्र मानचित्र"
+    override_inherit: "Verto जैसा"
+    override_on: "चालू"
+    override_off: "बंद"
+    active_label: "सक्रिय"
+    paused_label: "रोका गया"
+    delete_link: "हटाएँ"
+    delete_confirm: "“%{name}” लिंक हटाएँ? यह तुरंत काम करना बंद कर देगा। इससे मिले उत्तर सुरक्षित रहेंगे।"
+    new_name_placeholder: "किसके लिए? जैसे न्यूज़लेटर"
+    new_url_placeholder: "newsletter"
+    add_link: "लिंक बनाएँ"
+    new_link_default_name: "नया लिंक"
+    not_live_title: "यह Verto अभी लाइव नहीं है"
+    not_live_body: "इसे प्रकाशित करें और ये लिंक काम करने लगेंगे। आप इन्हें अभी तैयार कर सकते हैं।"
+    not_live_cta: "प्रकाशित करें और साझा करें →"
+    error_taken: "यह URL पहले से लिया जा चुका है — कोई और आज़माएँ।"
+    error_slug_blank: "लिंक के लिए URL ज़रूरी है।"
+    error_limit: "आप एक Verto पर %{count} अतिरिक्त लिंक की सीमा तक पहुँच गए हैं।"
+    error_create: "यह लिंक नहीं बन सका — कोई दूसरा नाम आज़माएँ।"
   dashboard:
     welcome_back: वापसी पर स्वागत है
     heading_html: आपके <span style="color:#01EACB;">Verto</span>
@@ -1236,7 +1290,7 @@ hi:
     quiz_preset_badge: "क्विज़"
     step_counter: चरण %{n} / %{total}
   templates:
-    eyebrow: टेम्पलेट
+    eyebrow: "यह Verto साझा करें"
     heading_html: किसी <span style="color:#615BF5;">टेम्पलेट</span> से शुरू करें
     subtitle: तैयार Verto चुनें और मिनटों में जवाब जुटाना शुरू करें — हर टेम्पलेट पूरी
       तरह संपादन योग्य है।

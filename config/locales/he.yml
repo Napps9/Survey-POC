@@ -1057,6 +1057,60 @@ he:
     bulk_destroy_confirm:
       one: למחוק את %{count} Verto באופן קבוע? כל התגובות והנתונים יימחקו. לא ניתן לבטל פעולה זו.
       other: למחוק את %{count} Vertos באופן קבוע? כל התגובות והנתונים יימחקו. לא ניתן לבטל פעולה זו.
+    share: "שיתוף ←"
+  share_modal:
+    eyebrow: "שיתוף ה-Verto הזה"
+    close: "סגירה"
+    loading: "טוען…"
+    share_text: "הקדישו שתי דקות למענה על „%{name}”"
+    main_link: "קישור ראשי"
+    responders:
+      one: "משיב %{count}"
+      other: "%{count} משיבים"
+    copy: "העתקת קישור"
+    copied: "הועתק!"
+    copy_failed: "ההעתקה נכשלה — סמנו והעתיקו"
+    share_sheet: "שיתוף…"
+    via_email: "אימייל"
+    via_whatsapp: "WhatsApp"
+    via_x: "X"
+    via_linkedin: "LinkedIn"
+    qr_hint: "סרקו כדי לפתוח את ה-Verto. הורידו את הקוד לפוסטרים ולמצגות."
+    download_qr: "הורדת QR (SVG)"
+    download_qr_short: "קוד QR"
+    custom_url: "כתובת מותאמת"
+    custom_url_placeholder: "summer-feedback-2026"
+    custom_url_hint: "אופציונלי — כתובת קלה לזכירה לצד זו שלמעלה. שתיהן עובדות."
+    after_finish: "מה המשיבים מקבלים בסיום"
+    setting_compare: "להראות להם איך כולם ענו"
+    compare_note_label: "ההבטחה שמוצגת בכרטיס הפתיחה"
+    setting_share: "להציע כפתור שיתוף כדי שיעבירו את הקישור הלאה"
+    setting_regions: "לאפשר להם לראות במפה איך אזורים אחרים ענו"
+    links_title: "קישורי שיתוף נוספים"
+    links_hint: "תנו לכל קהל כתובת משלו — ותשובות משלו להגדרות שלמעלה. שלחו לקבוצה אחת קישור שמראה להם איך כולם ענו, ולקבוצה אחרת קישור שלא."
+    links_empty: "אין עדיין קישורים נוספים. כולם מגיעים דרך הקישור הראשי שלמעלה."
+    link_name_label: "שם הקישור"
+    compare_label: "השוואה"
+    share_label: "כפתור שיתוף"
+    regions_label: "מפת אזורים"
+    override_inherit: "כמו ב-Verto"
+    override_on: "פעיל"
+    override_off: "כבוי"
+    active_label: "פעיל"
+    paused_label: "מושהה"
+    delete_link: "מחיקה"
+    delete_confirm: "למחוק את הקישור „%{name}”? הוא יפסיק לעבוד מיד. התשובות שנאספו דרכו יישמרו."
+    new_name_placeholder: "למי זה מיועד? למשל ניוזלטר"
+    new_url_placeholder: "newsletter"
+    add_link: "יצירת קישור"
+    new_link_default_name: "קישור חדש"
+    not_live_title: "ה-Verto הזה עדיין לא פורסם"
+    not_live_body: "פרסמו אותו והקישורים האלה יתחילו לעבוד. אפשר להכין אותם כבר עכשיו."
+    not_live_cta: "פרסום ושיתוף ←"
+    error_taken: "הכתובת הזו כבר תפוסה — נסו אחרת."
+    error_slug_blank: "לקישור דרושה כתובת."
+    error_limit: "הגעתם למגבלה של %{count} קישורים נוספים ל-Verto אחד."
+    error_create: "לא ניתן היה ליצור את הקישור — נסו שם אחר."
   dashboard:
     welcome_back: ברוך שובך
     heading_html: ה-<span style="color:#01EACB;">Vertos</span> שלך
@@ -1236,7 +1290,7 @@ he:
     quiz_preset_badge: "חידון"
     step_counter: שלב %{n} מתוך %{total}
   templates:
-    eyebrow: תבניות
+    eyebrow: "שיתוף ה-Verto הזה"
     heading_html: התחילו מ<span style="color:#615BF5;">תבנית</span>
     subtitle: בחרו Verto מוכן והתחילו לאסוף תשובות תוך דקות — כל תבנית ניתנת לעריכה
       מלאה.

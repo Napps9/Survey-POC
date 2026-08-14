@@ -1057,6 +1057,60 @@ de:
     bulk_destroy_confirm:
       one: "%{count} Verto dauerhaft löschen? Alle Antworten und Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden."
       other: "%{count} Vertos dauerhaft löschen? Alle Antworten und Daten werden gelöscht. Dies kann nicht rückgängig gemacht werden."
+    share: "Teilen →"
+  share_modal:
+    eyebrow: "Dieses Verto teilen"
+    close: "Schließen"
+    loading: "Wird geladen…"
+    share_text: "Nimm dir zwei Minuten für „%{name}“"
+    main_link: "Hauptlink"
+    responders:
+      one: "%{count} Teilnehmer"
+      other: "%{count} Teilnehmende"
+    copy: "Link kopieren"
+    copied: "Kopiert!"
+    copy_failed: "Kopieren fehlgeschlagen — markieren und kopieren"
+    share_sheet: "Teilen…"
+    via_email: "E-Mail"
+    via_whatsapp: "WhatsApp"
+    via_x: "X"
+    via_linkedin: "LinkedIn"
+    qr_hint: "Scannen, um dieses Verto zu öffnen. Code für Plakate und Folien herunterladen."
+    download_qr: "QR herunterladen (SVG)"
+    download_qr_short: "QR-Code"
+    custom_url: "Eigene URL"
+    custom_url_placeholder: "summer-feedback-2026"
+    custom_url_hint: "Optional — eine einprägsame Adresse zusätzlich zur obigen. Beide funktionieren."
+    after_finish: "Was Teilnehmende nach dem Abschluss bekommen"
+    setting_compare: "Zeigen, wie alle anderen geantwortet haben"
+    compare_note_label: "Versprechen auf der Willkommenskarte"
+    setting_share: "Teilen-Button anbieten, damit sie den Link weitergeben können"
+    setting_regions: "Auf einer Karte zeigen, wie andere Regionen geantwortet haben"
+    links_title: "Weitere Freigabelinks"
+    links_hint: "Gib einer Zielgruppe ihre eigene URL — und ihre eigenen Antworten auf die Einstellungen oben. Schick einer Gruppe einen Link, der zeigt, wie alle anderen geantwortet haben, und einer anderen einen, der das nicht tut."
+    links_empty: "Noch keine weiteren Links. Alle kommen über den Hauptlink oben."
+    link_name_label: "Name des Links"
+    compare_label: "Vergleich"
+    share_label: "Teilen-Button"
+    regions_label: "Regionenkarte"
+    override_inherit: "Wie das Verto"
+    override_on: "An"
+    override_off: "Aus"
+    active_label: "Aktiv"
+    paused_label: "Pausiert"
+    delete_link: "Löschen"
+    delete_confirm: "Den Link „%{name}“ löschen? Er funktioniert sofort nicht mehr. Bereits darüber erfasste Antworten bleiben erhalten."
+    new_name_placeholder: "Für wen? z. B. Newsletter"
+    new_url_placeholder: "newsletter"
+    add_link: "Link erstellen"
+    new_link_default_name: "Neuer Link"
+    not_live_title: "Dieses Verto ist noch nicht live"
+    not_live_body: "Veröffentliche es, dann funktionieren diese Links. Du kannst sie jetzt schon einrichten."
+    not_live_cta: "Veröffentlichen & teilen →"
+    error_taken: "Diese URL ist bereits vergeben — probier eine andere."
+    error_slug_blank: "Ein Link braucht eine URL."
+    error_limit: "Du hast das Limit von %{count} zusätzlichen Links pro Verto erreicht."
+    error_create: "Dieser Link konnte nicht erstellt werden — probier einen anderen Namen."
   dashboard:
     welcome_back: Willkommen zurück
     heading_html: Deine <span style="color:#01EACB;">Vertos</span>
@@ -1236,7 +1290,7 @@ de:
     quiz_preset_badge: "Quiz"
     step_counter: Schritt %{n} von %{total}
   templates:
-    eyebrow: Vorlagen
+    eyebrow: "Dieses Verto teilen"
     heading_html: Mit einer <span style="color:#615BF5;">Vorlage</span> starten
     subtitle: Wähle ein fertiges Verto und sammle in Minuten Antworten – jede Vorlage
       ist voll bearbeitbar.

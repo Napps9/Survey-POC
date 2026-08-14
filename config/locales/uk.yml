@@ -1059,6 +1059,60 @@ uk:
     bulk_destroy_confirm:
       one: Остаточно видалити %{count} Verto? Усі відповіді та дані будуть стерті. Це неможливо скасувати.
       other: Остаточно видалити %{count} Vertos? Усі відповіді та дані будуть стерті. Це неможливо скасувати.
+    share: "Поділитися →"
+  share_modal:
+    eyebrow: "Поділитися цим Verto"
+    close: "Закрити"
+    loading: "Завантаження…"
+    share_text: "Приділіть дві хвилини й дайте відповідь на «%{name}»"
+    main_link: "Основне посилання"
+    responders:
+      one: "%{count} респондент"
+      other: "%{count} респондентів"
+    copy: "Скопіювати посилання"
+    copied: "Скопійовано!"
+    copy_failed: "Не вдалося скопіювати — виділіть і скопіюйте"
+    share_sheet: "Поділитися…"
+    via_email: "Ел. пошта"
+    via_whatsapp: "WhatsApp"
+    via_x: "X"
+    via_linkedin: "LinkedIn"
+    qr_hint: "Відскануйте, щоб відкрити це Verto. Завантажте код для плакатів і слайдів."
+    download_qr: "Завантажити QR (SVG)"
+    download_qr_short: "QR-код"
+    custom_url: "Власна адреса"
+    custom_url_placeholder: "summer-feedback-2026"
+    custom_url_hint: "Необов'язково — легка для запам'ятовування адреса поряд із наведеною вище. Працюють обидві."
+    after_finish: "Що респонденти отримують після завершення"
+    setting_compare: "Показати їм, як відповіли всі інші"
+    compare_note_label: "Обіцянка на вітальній картці"
+    setting_share: "Запропонувати кнопку «Поділитися», щоб вони передали посилання далі"
+    setting_regions: "Показати на карті, як відповіли інші регіони"
+    links_title: "Додаткові посилання для доступу"
+    links_hint: "Дайте кожній аудиторії власну адресу — і власні відповіді на налаштування вище. Одній групі надішліть посилання, що показує відповіді всіх інших, а іншій — те, що не показує."
+    links_empty: "Додаткових посилань поки немає. Усі приходять за основним посиланням вище."
+    link_name_label: "Назва посилання"
+    compare_label: "Порівняння"
+    share_label: "Кнопка «Поділитися»"
+    regions_label: "Карта регіонів"
+    override_inherit: "Як у Verto"
+    override_on: "Увімк."
+    override_off: "Вимк."
+    active_label: "Активне"
+    paused_label: "Призупинене"
+    delete_link: "Видалити"
+    delete_confirm: "Видалити посилання «%{name}»? Воно перестане працювати негайно. Зібрані через нього відповіді збережуться."
+    new_name_placeholder: "Для кого? напр. Розсилка"
+    new_url_placeholder: "newsletter"
+    add_link: "Створити посилання"
+    new_link_default_name: "Нове посилання"
+    not_live_title: "Це Verto ще не опубліковане"
+    not_live_body: "Опублікуйте його — і ці посилання запрацюють. Налаштувати їх можна вже зараз."
+    not_live_cta: "Опублікувати та поділитися →"
+    error_taken: "Ця адреса вже зайнята — спробуйте іншу."
+    error_slug_blank: "Посиланню потрібна адреса."
+    error_limit: "Досягнуто ліміт у %{count} додаткових посилань на одне Verto."
+    error_create: "Не вдалося створити це посилання — спробуйте іншу назву."
   dashboard:
     welcome_back: З поверненням
     heading_html: Ваші <span style="color:#01EACB;">Vertos</span>
@@ -1238,7 +1292,7 @@ uk:
     quiz_preset_badge: "Квіз"
     step_counter: Крок %{n} з %{total}
   templates:
-    eyebrow: Шаблони
+    eyebrow: "Поділитися цим Verto"
     heading_html: Почніть із <span style="color:#615BF5;">шаблону</span>
     subtitle: Виберіть готовий Verto та почніть збирати відповіді за кілька хвилин —
       кожен шаблон повністю редагується.

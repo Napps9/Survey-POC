@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_14_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_14_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -590,6 +590,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_120000) do
     t.datetime "started_at"
     t.string "status", default: "completed", null: false
     t.integer "survey_id", null: false
+    t.integer "survey_link_id"
     t.integer "survey_share_id"
     t.json "token_totals", default: {}, null: false
     t.datetime "updated_at", null: false
@@ -605,6 +606,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_120000) do
     t.index ["survey_id", "region_country"], name: "index_responses_on_survey_and_region_country"
     t.index ["survey_id", "respondent_code_digest"], name: "index_responses_on_survey_and_respondent_code"
     t.index ["survey_id"], name: "index_responses_on_survey_id"
+    t.index ["survey_link_id"], name: "index_responses_on_survey_link_id"
     t.index ["survey_share_id"], name: "index_responses_on_survey_share_id"
     t.check_constraint "status IN ('started', 'completed')", name: "chk_responses_status"
   end
@@ -758,6 +760,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_120000) do
     t.index ["expires_at"], name: "index_solid_queue_semaphores_on_expires_at"
     t.index ["key", "value"], name: "index_solid_queue_semaphores_on_key_and_value"
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
+  end
+
+  create_table "survey_links", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.boolean "regions_enabled"
+    t.boolean "share_enabled"
+    t.boolean "show_results_comparison"
+    t.string "slug", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_survey_links_on_slug", unique: true
+    t.index ["survey_id", "created_at"], name: "index_survey_links_on_survey_id_and_created_at"
+    t.index ["survey_id"], name: "index_survey_links_on_survey_id"
   end
 
   create_table "survey_shares", force: :cascade do |t|
@@ -926,6 +943,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_120000) do
   add_foreign_key "portfolios", "funders"
   add_foreign_key "report_renders", "surveys"
   add_foreign_key "report_renders", "users"
+  add_foreign_key "responses", "survey_links"
   add_foreign_key "responses", "survey_shares"
   add_foreign_key "responses", "surveys"
   add_foreign_key "sessions", "users"
@@ -935,6 +953,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_120000) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "survey_links", "surveys"
   add_foreign_key "survey_shares", "organisations", column: "partner_organisation_id"
   add_foreign_key "survey_shares", "partnership_vertos"
   add_foreign_key "survey_shares", "surveys"

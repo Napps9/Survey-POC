@@ -1057,6 +1057,60 @@ nl:
     bulk_destroy_confirm:
       one: "%{count} Verto permanent verwijderen? Alle reacties en gegevens worden gewist. Dit kan niet ongedaan worden gemaakt."
       other: "%{count} Vertos permanent verwijderen? Alle reacties en gegevens worden gewist. Dit kan niet ongedaan worden gemaakt."
+    share: "Delen →"
+  share_modal:
+    eyebrow: "Deze Verto delen"
+    close: "Sluiten"
+    loading: "Laden…"
+    share_text: "Neem twee minuten om “%{name}” te beantwoorden"
+    main_link: "Hoofdlink"
+    responders:
+      one: "%{count} deelnemer"
+      other: "%{count} deelnemers"
+    copy: "Link kopiëren"
+    copied: "Gekopieerd!"
+    copy_failed: "Kopiëren mislukt — selecteer en kopieer"
+    share_sheet: "Delen…"
+    via_email: "E-mail"
+    via_whatsapp: "WhatsApp"
+    via_x: "X"
+    via_linkedin: "LinkedIn"
+    qr_hint: "Scan om deze Verto te openen. Download de code voor posters en slides."
+    download_qr: "QR downloaden (SVG)"
+    download_qr_short: "QR-code"
+    custom_url: "Eigen URL"
+    custom_url_placeholder: "summer-feedback-2026"
+    custom_url_hint: "Optioneel — een makkelijk te onthouden adres naast die hierboven. Beide werken."
+    after_finish: "Wat deelnemers krijgen als ze klaar zijn"
+    setting_compare: "Laat zien hoe alle anderen hebben geantwoord"
+    compare_note_label: "Belofte op de welkomstkaart"
+    setting_share: "Bied een Deel-knop zodat ze de link kunnen doorgeven"
+    setting_regions: "Laat ze op een kaart zien hoe andere regio's hebben geantwoord"
+    links_title: "Extra deellinks"
+    links_hint: "Geef een doelgroep een eigen URL — en eigen antwoorden op de instellingen hierboven. Stuur de ene groep een link die laat zien hoe anderen antwoordden en de andere groep een link die dat niet doet."
+    links_empty: "Nog geen extra links. Iedereen komt binnen via de hoofdlink hierboven."
+    link_name_label: "Naam van de link"
+    compare_label: "Vergelijking"
+    share_label: "Deel-knop"
+    regions_label: "Regiokaart"
+    override_inherit: "Zoals de Verto"
+    override_on: "Aan"
+    override_off: "Uit"
+    active_label: "Actief"
+    paused_label: "Gepauzeerd"
+    delete_link: "Verwijderen"
+    delete_confirm: "De link “%{name}” verwijderen? Hij werkt direct niet meer. Al verzamelde antwoorden blijven bewaard."
+    new_name_placeholder: "Voor wie? bijv. Nieuwsbrief"
+    new_url_placeholder: "newsletter"
+    add_link: "Link maken"
+    new_link_default_name: "Nieuwe link"
+    not_live_title: "Deze Verto staat nog niet live"
+    not_live_body: "Publiceer hem en deze links gaan werken. Je kunt ze nu al klaarzetten."
+    not_live_cta: "Publiceren en delen →"
+    error_taken: "Die URL is al bezet — probeer een andere."
+    error_slug_blank: "Een link heeft een URL nodig."
+    error_limit: "Je hebt de limiet van %{count} extra links per Verto bereikt."
+    error_create: "Die link kon niet worden gemaakt — probeer een andere naam."
   dashboard:
     welcome_back: Welkom terug
     heading_html: Jouw <span style="color:#01EACB;">Vertos</span>
@@ -1236,7 +1290,7 @@ nl:
     quiz_preset_badge: "Quiz"
     step_counter: Stap %{n} van %{total}
   templates:
-    eyebrow: Sjablonen
+    eyebrow: "Deze Verto delen"
     heading_html: Begin met een <span style="color:#615BF5;">sjabloon</span>
     subtitle: Kies een kant-en-klaar Verto en verzamel binnen enkele minuten antwoorden
       — elk sjabloon is volledig aanpasbaar.

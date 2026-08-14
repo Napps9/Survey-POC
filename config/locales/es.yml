@@ -1057,6 +1057,60 @@ es:
     bulk_destroy_confirm:
       one: "¿Eliminar permanentemente %{count} Verto? Todas las respuestas y datos se borrarán. Esta acción no se puede deshacer."
       other: "¿Eliminar permanentemente %{count} Vertos? Todas las respuestas y datos se borrarán. Esta acción no se puede deshacer."
+    share: "Compartir →"
+  share_modal:
+    eyebrow: "Compartir este Verto"
+    close: "Cerrar"
+    loading: "Cargando…"
+    share_text: "Dedica dos minutos a responder «%{name}»"
+    main_link: "Enlace principal"
+    responders:
+      one: "%{count} participante"
+      other: "%{count} participantes"
+    copy: "Copiar enlace"
+    copied: "¡Copiado!"
+    copy_failed: "No se pudo copiar — selecciona y copia"
+    share_sheet: "Compartir…"
+    via_email: "Correo"
+    via_whatsapp: "WhatsApp"
+    via_x: "X"
+    via_linkedin: "LinkedIn"
+    qr_hint: "Escanea para abrir este Verto. Descarga el código para carteles y diapositivas."
+    download_qr: "Descargar QR (SVG)"
+    download_qr_short: "Código QR"
+    custom_url: "URL personalizada"
+    custom_url_placeholder: "summer-feedback-2026"
+    custom_url_hint: "Opcional: una dirección fácil de recordar junto a la de arriba. Ambas funcionan."
+    after_finish: "Qué reciben las personas al terminar"
+    setting_compare: "Mostrarles cómo respondieron los demás"
+    compare_note_label: "Promesa que se muestra en la tarjeta de bienvenida"
+    setting_share: "Ofrecer un botón de Compartir para que pasen el enlace"
+    setting_regions: "Dejarles ver en un mapa cómo respondieron otras regiones"
+    links_title: "Enlaces adicionales para compartir"
+    links_hint: "Da a cada público su propia URL, y sus propias respuestas a los ajustes de arriba. Envía a un grupo un enlace que les muestre cómo respondieron los demás y a otro grupo uno que no."
+    links_empty: "Aún no hay enlaces adicionales. Todo el mundo llega por el enlace principal."
+    link_name_label: "Nombre del enlace"
+    compare_label: "Comparación"
+    share_label: "Botón Compartir"
+    regions_label: "Mapa de regiones"
+    override_inherit: "Igual que el Verto"
+    override_on: "Sí"
+    override_off: "No"
+    active_label: "Activo"
+    paused_label: "En pausa"
+    delete_link: "Eliminar"
+    delete_confirm: "¿Eliminar el enlace «%{name}»? Dejará de funcionar de inmediato. Las respuestas ya recogidas se conservan."
+    new_name_placeholder: "¿Para quién? p. ej. Boletín"
+    new_url_placeholder: "newsletter"
+    add_link: "Crear enlace"
+    new_link_default_name: "Nuevo enlace"
+    not_live_title: "Este Verto aún no está publicado"
+    not_live_body: "Publícalo y estos enlaces empezarán a funcionar. Puedes prepararlos ya."
+    not_live_cta: "Publicar y compartir →"
+    error_taken: "Esa URL ya está ocupada: prueba con otra."
+    error_slug_blank: "Un enlace necesita una URL."
+    error_limit: "Has alcanzado el límite de %{count} enlaces adicionales por Verto."
+    error_create: "No se pudo crear ese enlace: prueba con otro nombre."
   dashboard:
     welcome_back: Bienvenido de nuevo
     heading_html: Tus <span style="color:#01EACB;">Vertos</span>
@@ -1236,7 +1290,7 @@ es:
     quiz_preset_badge: "Quiz"
     step_counter: Paso %{n} de %{total}
   templates:
-    eyebrow: Plantillas
+    eyebrow: "Compartir este Verto"
     heading_html: Empieza con una <span style="color:#615BF5;">plantilla</span>
     subtitle: 'Elige un Verto listo para usar y empieza a recoger respuestas en minutos:
       cada plantilla es totalmente editable.'

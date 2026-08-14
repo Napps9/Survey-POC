@@ -1,6 +1,10 @@
 class Response < ApplicationRecord
   belongs_to :survey
   belongs_to :survey_share, optional: true
+  # Which named send link this respondent arrived through, if any. Optional:
+  # everyone on the Verto's own /play link has none, and so does every response
+  # collected before send links existed.
+  belongs_to :survey_link, optional: true
   validates :session_token, presence: true, uniqueness: true
 
   # The only two states a response is ever in: "started" once it has an answer,

@@ -1057,6 +1057,60 @@ ar:
     bulk_destroy_confirm:
       one: حذف Verto واحد من %{count} بشكل دائم؟ سيتم حذف جميع الإجابات والبيانات. لا يمكن التراجع عن هذا.
       other: حذف %{count} Vertos بشكل دائم؟ سيتم حذف جميع الإجابات والبيانات. لا يمكن التراجع عن هذا.
+    share: "مشاركة ←"
+  share_modal:
+    eyebrow: "شارك هذا الفيرتو"
+    close: "إغلاق"
+    loading: "جارٍ التحميل…"
+    share_text: "خصّص دقيقتين للإجابة على «%{name}»"
+    main_link: "الرابط الرئيسي"
+    responders:
+      one: "%{count} مجيب"
+      other: "%{count} مجيبين"
+    copy: "نسخ الرابط"
+    copied: "تم النسخ!"
+    copy_failed: "تعذّر النسخ — حدّد النص وانسخه"
+    share_sheet: "مشاركة…"
+    via_email: "البريد"
+    via_whatsapp: "WhatsApp"
+    via_x: "X"
+    via_linkedin: "LinkedIn"
+    qr_hint: "امسح الرمز لفتح هذا الفيرتو. نزّل الرمز للملصقات والشرائح."
+    download_qr: "تنزيل رمز QR (SVG)"
+    download_qr_short: "رمز QR"
+    custom_url: "رابط مخصّص"
+    custom_url_placeholder: "summer-feedback-2026"
+    custom_url_hint: "اختياري — عنوان يسهل تذكّره إلى جانب العنوان أعلاه. كلاهما يعمل."
+    after_finish: "ما يحصل عليه المجيبون بعد الانتهاء"
+    setting_compare: "أظهر لهم كيف أجاب الآخرون"
+    compare_note_label: "الوعد الظاهر على بطاقة الترحيب"
+    setting_share: "أتِح زر المشاركة ليمرّروا الرابط"
+    setting_regions: "دعهم يرون على خريطة كيف أجابت المناطق الأخرى"
+    links_title: "روابط مشاركة إضافية"
+    links_hint: "امنح كل جمهور رابطه الخاص — وإجاباته الخاصة على الإعدادات أعلاه. أرسل لمجموعة رابطًا يُظهر لهم إجابات الآخرين، ولمجموعة أخرى رابطًا لا يفعل ذلك."
+    links_empty: "لا توجد روابط إضافية بعد. يصل الجميع عبر الرابط الرئيسي أعلاه."
+    link_name_label: "اسم الرابط"
+    compare_label: "المقارنة"
+    share_label: "زر المشاركة"
+    regions_label: "خريطة المناطق"
+    override_inherit: "مثل الفيرتو"
+    override_on: "مفعّل"
+    override_off: "معطّل"
+    active_label: "نشط"
+    paused_label: "متوقّف"
+    delete_link: "حذف"
+    delete_confirm: "حذف رابط «%{name}»؟ سيتوقّف عن العمل فورًا. تبقى الإجابات المجمَّعة عبره محفوظة."
+    new_name_placeholder: "لمن؟ مثلاً: النشرة"
+    new_url_placeholder: "newsletter"
+    add_link: "إنشاء رابط"
+    new_link_default_name: "رابط جديد"
+    not_live_title: "هذا الفيرتو غير منشور بعد"
+    not_live_body: "انشره لتبدأ هذه الروابط في العمل. يمكنك إعدادها الآن."
+    not_live_cta: "انشر وشارك ←"
+    error_taken: "هذا الرابط مستخدَم بالفعل — جرّب رابطًا آخر."
+    error_slug_blank: "الرابط يحتاج إلى عنوان."
+    error_limit: "لقد بلغت حدّ %{count} روابط إضافية لفيرتو واحد."
+    error_create: "تعذّر إنشاء هذا الرابط — جرّب اسمًا آخر."
   dashboard:
     welcome_back: مرحبًا بعودتك
     heading_html: <span style="color:#01EACB;">فيرتوهاتك</span>
@@ -1236,7 +1290,7 @@ ar:
     quiz_preset_badge: "اختبار"
     step_counter: الخطوة %{n} من %{total}
   templates:
-    eyebrow: القوالب
+    eyebrow: "شارك هذا الفيرتو"
     heading_html: ابدأ من <span style="color:#615BF5;">قالب</span>
     subtitle: اختر Verto جاهزًا وابدأ بجمع الإجابات في دقائق — كل قالب قابل للتعديل
       بالكامل.

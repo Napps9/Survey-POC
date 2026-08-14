@@ -19,19 +19,22 @@
   progress_url    = preview_mode ? "" : progress_survey_url(play_token)
   submit_url      = preview_mode ? "" : submit_survey_url(play_token)
   consent_url     = preview_mode ? "" : consent_survey_url(play_token)
-  results_url     = @survey.show_results_comparison? && play_token.present? ? player_results_url(play_token) : ""
-  show_comparison = @survey.show_results_comparison? && results_url.present?
+  # play_settings is the send link this respondent arrived through, if any,
+  # else the Verto — so a link that pins comparison off gets no results URL at
+  # all, not a hidden button (ApplicationController#play_settings).
+  results_url     = play_settings.compare_results? && play_token.present? ? player_results_url(play_token) : ""
+  show_comparison = play_settings.compare_results? && results_url.present?
   # The public play link respondents can pass on via the Share button on the
   # thank-you screen. Blank in owner preview (and for token-less drafts).
   # Creators can switch Share off; it defaults on, because it has been on for
   # every published Verto up to now.
-  share_url       = preview_mode || play_token.blank? || !@survey.share_enabled? ? "" : play_survey_url(play_token)
+  share_url       = preview_mode || play_token.blank? || !play_settings.share_button? ? "" : play_survey_url(play_token)
 
   # Every Verto captures region data via the "Where do you live?" demographic
   # question, so the post-finish map is always available — it just needs a
   # reachable token (drafts in preview have none) and the creator's say-so
   # (regions_enabled, also default on for the same reason).
-  regions_url = play_token.present? && @survey.regions_enabled? ? player_regions_url(play_token) : ""
+  regions_url = play_token.present? && play_settings.regions_map? ? player_regions_url(play_token) : ""
 
   # Quiz mode: each graded card is scored server-side as the player advances.
   # The grade/state endpoints need a reachable token, so they're blank in owner
