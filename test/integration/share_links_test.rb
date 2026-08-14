@@ -1,11 +1,11 @@
 require "test_helper"
 
-# Send links: the dashboard's Send modal and the named /play/ addresses it
+# Share links: the dashboard's Share modal and the named /play/ addresses it
 # manages. The interesting half is the per-link override — the reason the
 # feature exists is that one audience should be able to see how everyone else
 # answered while another can't, so the tests below check BOTH the page and the
 # endpoint that would otherwise hand the aggregate over anyway.
-class SendLinksTest < ActionDispatch::IntegrationTest
+class ShareLinksTest < ActionDispatch::IntegrationTest
   CARDS = [
     { "type" => "welcome_card", "title" => "hi" },
     { "type" => "yes_no", "text" => "Q", "options" => [ "Yes", "No" ] }
@@ -38,31 +38,31 @@ class SendLinksTest < ActionDispatch::IntegrationTest
 
     get root_path
     assert_response :success
-    assert_select "button[data-action='click->send-modal#open']", 1
-    assert_select "[data-send-modal-target='modal']", 1
+    assert_select "button[data-action='click->share-modal#open']", 1
+    assert_select "[data-share-modal-target='modal']", 1
   end
 
-  test "a non-admin member gets no Send button and no panel" do
+  test "a non-admin member gets no Share button and no panel" do
     org = sign_in_org("member", role: "member")
     survey = published_survey(org)
 
     get root_path
-    assert_select "button[data-action='click->send-modal#open']", 0
+    assert_select "button[data-action='click->share-modal#open']", 0
 
-    get send_survey_path(survey)
+    get share_survey_path(survey)
     assert_redirected_to root_path
   end
 
   # ── The panel ─────────────────────────────────────────────────────────────
 
-  test "the Send panel renders inside the turbo frame with the live link" do
+  test "the Share panel renders inside the turbo frame with the live link" do
     org = sign_in_org("panel")
     survey = published_survey(org)
 
-    get send_survey_path(survey)
+    get share_survey_path(survey)
     assert_response :success
-    assert_select "turbo-frame#send-modal"
-    assert_select "input#send-url-main[value=?]", play_survey_url(survey.publish_token)
+    assert_select "turbo-frame#share-modal"
+    assert_select "input#share-url-main[value=?]", play_survey_url(survey.publish_token)
   end
 
   test "the panel says a draft isn't live yet but still manages links" do
@@ -70,10 +70,10 @@ class SendLinksTest < ActionDispatch::IntegrationTest
     draft = org.surveys.create!(title: "D", theme: "T", audience_age: "all", key_insight: "x",
                                 default_locale: "en", locales: [ "en" ], cards: CARDS)
 
-    get send_survey_path(draft)
+    get share_survey_path(draft)
     assert_response :success
-    assert_select ".send-notice__title"
-    assert_select "input#send-url-main", 0
+    assert_select ".share-notice__title"
+    assert_select "input#share-url-main", 0
     assert_select "form[action=?]", survey_links_path(draft)
   end
 
@@ -82,7 +82,7 @@ class SendLinksTest < ActionDispatch::IntegrationTest
     theirs = published_survey(other)
     sign_in_org("cross")
 
-    get send_survey_path(theirs)
+    get share_survey_path(theirs)
     assert_response :not_found
   end
 
@@ -93,7 +93,7 @@ class SendLinksTest < ActionDispatch::IntegrationTest
     survey = published_survey(org)
 
     post survey_links_path(survey), params: { name: "Control Group!" }
-    assert_redirected_to send_survey_path(survey)
+    assert_redirected_to share_survey_path(survey)
     link = survey.survey_links.sole
     assert_equal "Control Group!", link.name
     assert_equal "control-group", link.slug
@@ -123,24 +123,24 @@ class SendLinksTest < ActionDispatch::IntegrationTest
     assert_equal "already-lowercase-token-2", survey.survey_links.sole.slug
   end
 
-  test "a Verto's own custom slug cannot take a send link's address" do
+  test "a Verto's own custom slug cannot take a share link's address" do
     org = sign_in_org("reverse-ns")
     survey = published_survey(org)
     other  = published_survey(org)
     other.survey_links.create!(name: "N", slug: "town-hall")
 
-    post survey_settings_path(survey), params: { slug: "town-hall", return_to: "send" }
+    post survey_settings_path(survey), params: { slug: "town-hall", return_to: "share" }
     assert_nil survey.reload.slug
     assert_includes response.headers["Location"], "slug_error=taken"
-    assert_includes response.headers["Location"], "/send"
+    assert_includes response.headers["Location"], "/share"
   end
 
   test "settings posted from the modal come back to the modal" do
     org = sign_in_org("return-to")
     survey = published_survey(org)
 
-    post survey_settings_path(survey), params: { show_results_comparison: "1", return_to: "send" }
-    assert_redirected_to send_survey_path(survey)
+    post survey_settings_path(survey), params: { show_results_comparison: "1", return_to: "share" }
+    assert_redirected_to share_survey_path(survey)
     assert survey.reload.show_results_comparison?
   end
 
@@ -194,7 +194,7 @@ class SendLinksTest < ActionDispatch::IntegrationTest
 
   # ── The player ────────────────────────────────────────────────────────────
 
-  test "the player resolves a Verto by a send link's slug" do
+  test "the player resolves a Verto by a share link's slug" do
     org = sign_in_org("resolve")
     survey = published_survey(org)
     survey.survey_links.create!(name: "Newsletter", slug: "news-2026")
@@ -221,7 +221,7 @@ class SendLinksTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "a send link's slug does not reach an unpublished Verto" do
+  test "a share link's slug does not reach an unpublished Verto" do
     org = sign_in_org("draft-link")
     draft = org.surveys.create!(title: "D", theme: "T", audience_age: "all", key_insight: "x",
                                 default_locale: "en", locales: [ "en" ], cards: CARDS)

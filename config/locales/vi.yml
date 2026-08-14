@@ -1057,9 +1057,9 @@ vi:
     bulk_destroy_confirm:
       one: Xóa vĩnh viễn %{count} Verto? Tất cả các phản hồi và dữ liệu sẽ bị xóa. Không thể hoàn tác hành động này.
       other: Xóa vĩnh viễn %{count} Vertos? Tất cả các phản hồi và dữ liệu sẽ bị xóa. Không thể hoàn tác hành động này.
-    send: "Gửi →"
-  send_modal:
-    eyebrow: "Gửi Verto này"
+    share: "Chia sẻ →"
+  share_modal:
+    eyebrow: "Chia sẻ Verto này"
     close: "Đóng"
     loading: "Đang tải…"
     share_text: "Dành hai phút để trả lời “%{name}”"
@@ -1086,7 +1086,7 @@ vi:
     compare_note_label: "Lời hứa hiện trên thẻ chào mừng"
     setting_share: "Hiện nút Chia sẻ để họ chuyển tiếp liên kết"
     setting_regions: "Cho họ xem trên bản đồ các khu vực khác trả lời thế nào"
-    links_title: "Liên kết gửi bổ sung"
+    links_title: "Liên kết chia sẻ bổ sung"
     links_hint: "Cho mỗi nhóm đối tượng một URL riêng — và câu trả lời riêng cho các thiết lập ở trên. Gửi một nhóm liên kết cho họ xem mọi người khác trả lời thế nào, và nhóm còn lại một liên kết không có điều đó."
     links_empty: "Chưa có liên kết bổ sung. Mọi người đều vào qua liên kết chính ở trên."
     link_name_label: "Tên liên kết"
@@ -1290,7 +1290,7 @@ vi:
     quiz_preset_badge: "Quiz"
     step_counter: Bước %{n} / %{total}
   templates:
-    eyebrow: Mẫu
+    eyebrow: "Chia sẻ Verto này"
     heading_html: Bắt đầu từ một <span style="color:#615BF5;">mẫu</span>
     subtitle: Chọn một Verto có sẵn và bắt đầu thu thập câu trả lời trong vài phút —
       mọi mẫu đều có thể chỉnh sửa hoàn toàn.

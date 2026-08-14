@@ -1,20 +1,20 @@
-# The Send panel and the named links it manages.
+# The Share panel and the named links it manages.
 #
 # #show renders the panel itself into a Turbo Frame the dashboard opens as a
 # modal; every mutation redirects straight back to it, so the frame re-renders
 # from the same code path that drew it in the first place and there is no
 # second, JSON-shaped copy of this screen to keep in step.
 #
-# Send links exist to hand different audiences different terms (see SurveyLink),
+# Share links exist to hand different audiences different terms (see SurveyLink),
 # which is an account-level decision about who sees whose answers — hence
 # admin-only, the same bar as partner shares and Ask Verto opt-in.
 class SurveyLinksController < ApplicationController
   before_action :require_admin!
   before_action :set_survey
 
-  FRAME_ID = "send-modal".freeze
+  FRAME_ID = "share-modal".freeze
 
-  # GET /surveys/:id/send
+  # GET /surveys/:id/share
   def show
     load_links
     render layout: false
@@ -27,14 +27,14 @@ class SurveyLinksController < ApplicationController
     end
 
     link = @survey.survey_links.new(
-      name: params[:name].presence || t("send_modal.new_link_default_name"),
+      name: params[:name].presence || t("share_modal.new_link_default_name"),
       show_results_comparison: tri_state(params[:show_results_comparison]),
       share_enabled:           tri_state(params[:share_enabled]),
       regions_enabled:         tri_state(params[:regions_enabled])
     )
     # Minted rather than validated-and-rejected: a creator who typed a custom
     # URL someone else already holds wants a working link, not a form error in
-    # a modal they opened to send something. The suffix is visible in the list
+    # a modal they opened to share something. The suffix is visible in the list
     # the moment it renders, so nothing is hidden from them.
     link.slug = SurveyLink.mint_slug(params[:slug], fallback: link.name)
     link.save!
@@ -112,6 +112,6 @@ class SurveyLinksController < ApplicationController
   end
 
   def redirect_back_to_panel(error: nil)
-    redirect_to send_survey_path(@survey, link_error: error)
+    redirect_to share_survey_path(@survey, link_error: error)
   end
 end

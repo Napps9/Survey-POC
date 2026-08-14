@@ -575,7 +575,7 @@ class PlayerController < ApplicationController
       raise CrossSurveyToken
     end
     resp.survey_share ||= @survey_share
-    # Which named send link this respondent came in on, so the Send panel can
+    # Which named share link this respondent came in on, so the Share panel can
     # say what each audience actually returned. Set once, like the share.
     resp.survey_link ||= @survey_link
     resp
@@ -922,7 +922,7 @@ class PlayerController < ApplicationController
       @survey_share = share
       @survey = Survey.without_report_text.find_by(id: share.survey_id)
     elsif (link = SurveyLink.active.find_by(slug: token))
-      # A named send link. Only active ones resolve, so pausing a link takes it
+      # A named share link. Only active ones resolve, so pausing a link takes it
       # off /play for its reads AND its writes in one step — a page loaded
       # before the pause can't keep posting answers through it.
       @survey_link = link

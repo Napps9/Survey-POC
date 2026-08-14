@@ -1057,9 +1057,9 @@ he:
     bulk_destroy_confirm:
       one: למחוק את %{count} Verto באופן קבוע? כל התגובות והנתונים יימחקו. לא ניתן לבטל פעולה זו.
       other: למחוק את %{count} Vertos באופן קבוע? כל התגובות והנתונים יימחקו. לא ניתן לבטל פעולה זו.
-    send: "שליחה ←"
-  send_modal:
-    eyebrow: "שליחת ה-Verto הזה"
+    share: "שיתוף ←"
+  share_modal:
+    eyebrow: "שיתוף ה-Verto הזה"
     close: "סגירה"
     loading: "טוען…"
     share_text: "הקדישו שתי דקות למענה על „%{name}”"
@@ -1086,7 +1086,7 @@ he:
     compare_note_label: "ההבטחה שמוצגת בכרטיס הפתיחה"
     setting_share: "להציע כפתור שיתוף כדי שיעבירו את הקישור הלאה"
     setting_regions: "לאפשר להם לראות במפה איך אזורים אחרים ענו"
-    links_title: "קישורי שליחה נוספים"
+    links_title: "קישורי שיתוף נוספים"
     links_hint: "תנו לכל קהל כתובת משלו — ותשובות משלו להגדרות שלמעלה. שלחו לקבוצה אחת קישור שמראה להם איך כולם ענו, ולקבוצה אחרת קישור שלא."
     links_empty: "אין עדיין קישורים נוספים. כולם מגיעים דרך הקישור הראשי שלמעלה."
     link_name_label: "שם הקישור"
@@ -1290,7 +1290,7 @@ he:
     quiz_preset_badge: "חידון"
     step_counter: שלב %{n} מתוך %{total}
   templates:
-    eyebrow: תבניות
+    eyebrow: "שיתוף ה-Verto הזה"
     heading_html: התחילו מ<span style="color:#615BF5;">תבנית</span>
     subtitle: בחרו Verto מוכן והתחילו לאסוף תשובות תוך דקות — כל תבנית ניתנת לעריכה
       מלאה.

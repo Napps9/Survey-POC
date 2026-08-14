@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The dashboard's Send modal. The panel itself is server-rendered
+// The dashboard's Share modal. The panel itself is server-rendered
 // (SurveyLinksController#show) into a Turbo Frame, so this controller only
 // owns opening, closing and the one thing HTML can't express: whether the
 // browser has an OS share sheet.
@@ -11,8 +11,11 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["modal", "frame", "nativeShare"]
 
+  // data-panel-url, not data-share-url: the native-share button below already
+  // uses that for the URL being handed to the OS sheet, which is a different
+  // address entirely (a /play link, not this panel).
   open(event) {
-    const url = event.currentTarget.dataset.sendUrl
+    const url = event.currentTarget.dataset.panelUrl
     if (!url) return
     this.frameTarget.src = url
     this.modalTarget.classList.remove("hidden")

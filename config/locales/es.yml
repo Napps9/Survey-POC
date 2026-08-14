@@ -1057,9 +1057,9 @@ es:
     bulk_destroy_confirm:
       one: "¿Eliminar permanentemente %{count} Verto? Todas las respuestas y datos se borrarán. Esta acción no se puede deshacer."
       other: "¿Eliminar permanentemente %{count} Vertos? Todas las respuestas y datos se borrarán. Esta acción no se puede deshacer."
-    send: "Enviar →"
-  send_modal:
-    eyebrow: "Enviar este Verto"
+    share: "Compartir →"
+  share_modal:
+    eyebrow: "Compartir este Verto"
     close: "Cerrar"
     loading: "Cargando…"
     share_text: "Dedica dos minutos a responder «%{name}»"
@@ -1086,7 +1086,7 @@ es:
     compare_note_label: "Promesa que se muestra en la tarjeta de bienvenida"
     setting_share: "Ofrecer un botón de Compartir para que pasen el enlace"
     setting_regions: "Dejarles ver en un mapa cómo respondieron otras regiones"
-    links_title: "Enlaces de envío adicionales"
+    links_title: "Enlaces adicionales para compartir"
     links_hint: "Da a cada público su propia URL, y sus propias respuestas a los ajustes de arriba. Envía a un grupo un enlace que les muestre cómo respondieron los demás y a otro grupo uno que no."
     links_empty: "Aún no hay enlaces adicionales. Todo el mundo llega por el enlace principal."
     link_name_label: "Nombre del enlace"
@@ -1290,7 +1290,7 @@ es:
     quiz_preset_badge: "Quiz"
     step_counter: Paso %{n} de %{total}
   templates:
-    eyebrow: Plantillas
+    eyebrow: "Compartir este Verto"
     heading_html: Empieza con una <span style="color:#615BF5;">plantilla</span>
     subtitle: 'Elige un Verto listo para usar y empieza a recoger respuestas en minutos:
       cada plantilla es totalmente editable.'

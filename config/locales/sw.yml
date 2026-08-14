@@ -1057,9 +1057,9 @@ sw:
     bulk_destroy_confirm:
       one: Futa milele %{count} Verto? Majibu yote na data itafutwa. Hii haiwezi kutenduliwa.
       other: Futa milele %{count} Vertos? Majibu yote na data itafutwa. Hii haiwezi kutenduliwa.
-    send: "Tuma →"
-  send_modal:
-    eyebrow: "Tuma Verto hii"
+    share: "Shiriki →"
+  share_modal:
+    eyebrow: "Shiriki Verto hii"
     close: "Funga"
     loading: "Inapakia…"
     share_text: "Tumia dakika mbili kujibu “%{name}”"
@@ -1086,7 +1086,7 @@ sw:
     compare_note_label: "Ahadi inayoonyeshwa kwenye kadi ya karibu"
     setting_share: "Toa kitufe cha Shiriki ili waweze kupitisha kiungo"
     setting_regions: "Waache waone kwenye ramani jinsi maeneo mengine yalivyojibu"
-    links_title: "Viungo vya ziada vya kutuma"
+    links_title: "Viungo vya ziada vya kushiriki"
     links_hint: "Mpe kila hadhira URL yake — na majibu yake kwa mipangilio iliyo hapo juu. Tuma kikundi kimoja kiungo kinachowaonyesha jinsi wengine walivyojibu, na kingine kiungo kisichofanya hivyo."
     links_empty: "Bado hakuna viungo vya ziada. Kila mtu anaingia kupitia kiungo kikuu hapo juu."
     link_name_label: "Jina la kiungo"
@@ -1290,7 +1290,7 @@ sw:
     quiz_preset_badge: "Chemsha bongo"
     step_counter: Hatua %{n} kati ya %{total}
   templates:
-    eyebrow: Violezo
+    eyebrow: "Shiriki Verto hii"
     heading_html: Anza na <span style="color:#615BF5;">kiolezo</span>
     subtitle: Chagua Verto iliyo tayari na uanze kukusanya majibu kwa dakika chache
       — kila kiolezo kinaweza kuhaririwa kikamilifu.

@@ -1057,9 +1057,9 @@ fr:
     bulk_destroy_confirm:
       one: Supprimer définitivement %{count} Verto ? Toutes les réponses et données seront effacées. Cette action est irréversible.
       other: Supprimer définitivement %{count} Vertos ? Toutes les réponses et données seront effacées. Cette action est irréversible.
-    send: "Envoyer →"
-  send_modal:
-    eyebrow: "Envoyer ce Verto"
+    share: "Partager →"
+  share_modal:
+    eyebrow: "Partager ce Verto"
     close: "Fermer"
     loading: "Chargement…"
     share_text: "Prenez deux minutes pour répondre à « %{name} »"
@@ -1086,7 +1086,7 @@ fr:
     compare_note_label: "Promesse affichée sur la carte d'accueil"
     setting_share: "Proposer un bouton Partager pour qu'ils transmettent le lien"
     setting_regions: "Leur montrer sur une carte comment d'autres régions ont répondu"
-    links_title: "Liens d'envoi supplémentaires"
+    links_title: "Liens de partage supplémentaires"
     links_hint: "Donnez à chaque public sa propre URL — et ses propres réponses aux réglages ci-dessus. Envoyez à un groupe un lien qui montre les réponses de tous les autres, et à un autre groupe un lien qui ne le fait pas."
     links_empty: "Aucun lien supplémentaire pour l'instant. Tout le monde arrive par le lien principal."
     link_name_label: "Nom du lien"
@@ -1290,7 +1290,7 @@ fr:
     quiz_preset_badge: "Quiz"
     step_counter: Étape %{n} sur %{total}
   templates:
-    eyebrow: Modèles
+    eyebrow: "Partager ce Verto"
     heading_html: Partez d’un <span style="color:#615BF5;">modèle</span>
     subtitle: Choisissez un Verto prêt à l’emploi et commencez à collecter en quelques
       minutes — chaque modèle est entièrement modifiable.

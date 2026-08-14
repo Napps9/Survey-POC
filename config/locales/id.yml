@@ -1057,9 +1057,9 @@ id:
     bulk_destroy_confirm:
       one: Hapus %{count} Verto secara permanen? Semua respons dan data akan dihapus. Tindakan ini tidak dapat dibatalkan.
       other: Hapus %{count} Vertos secara permanen? Semua respons dan data akan dihapus. Tindakan ini tidak dapat dibatalkan.
-    send: "Kirim →"
-  send_modal:
-    eyebrow: "Kirim Verto ini"
+    share: "Bagikan →"
+  share_modal:
+    eyebrow: "Bagikan Verto ini"
     close: "Tutup"
     loading: "Memuat…"
     share_text: "Luangkan dua menit untuk menjawab “%{name}”"
@@ -1086,7 +1086,7 @@ id:
     compare_note_label: "Janji yang tampil di kartu sambutan"
     setting_share: "Tawarkan tombol Bagikan agar mereka bisa meneruskan tautan"
     setting_regions: "Biarkan mereka melihat jawaban wilayah lain di peta"
-    links_title: "Tautan pengiriman tambahan"
+    links_title: "Tautan berbagi tambahan"
     links_hint: "Beri setiap audiens URL-nya sendiri — dan jawabannya sendiri untuk pengaturan di atas. Kirim satu kelompok tautan yang menampilkan jawaban orang lain, dan kelompok lain tautan yang tidak."
     links_empty: "Belum ada tautan tambahan. Semua orang masuk lewat tautan utama di atas."
     link_name_label: "Nama tautan"
@@ -1290,7 +1290,7 @@ id:
     quiz_preset_badge: "Kuis"
     step_counter: Langkah %{n} dari %{total}
   templates:
-    eyebrow: Templat
+    eyebrow: "Bagikan Verto ini"
     heading_html: Mulai dari <span style="color:#615BF5;">templat</span>
     subtitle: Pilih Verto siap pakai dan mulai mengumpulkan jawaban dalam hitungan menit
       — setiap templat sepenuhnya dapat diedit.

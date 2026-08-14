@@ -1057,9 +1057,9 @@ pt:
     bulk_destroy_confirm:
       one: Deletar permanentemente %{count} Verto? Todas as respostas e dados serão apagados. Isso não pode ser desfeito.
       other: Deletar permanentemente %{count} Vertos? Todas as respostas e dados serão apagados. Isso não pode ser desfeito.
-    send: "Enviar →"
-  send_modal:
-    eyebrow: "Enviar este Verto"
+    share: "Partilhar →"
+  share_modal:
+    eyebrow: "Partilhar este Verto"
     close: "Fechar"
     loading: "A carregar…"
     share_text: "Reserve dois minutos para responder a “%{name}”"
@@ -1086,7 +1086,7 @@ pt:
     compare_note_label: "Promessa mostrada no cartão de boas-vindas"
     setting_share: "Oferecer um botão Partilhar para passarem a ligação adiante"
     setting_regions: "Deixá-los ver num mapa como outras regiões responderam"
-    links_title: "Ligações de envio adicionais"
+    links_title: "Ligações de partilha adicionais"
     links_hint: "Dê a cada público a sua própria URL — e as suas próprias respostas às definições acima. Envie a um grupo uma ligação que mostra como todos responderam e a outro grupo uma que não mostra."
     links_empty: "Ainda não há ligações adicionais. Todos chegam pela ligação principal acima."
     link_name_label: "Nome da ligação"
@@ -1290,7 +1290,7 @@ pt:
     quiz_preset_badge: "Quiz"
     step_counter: Passo %{n} de %{total}
   templates:
-    eyebrow: Modelos
+    eyebrow: "Partilhar este Verto"
     heading_html: Comece com um <span style="color:#615BF5;">modelo</span>
     subtitle: Escolha um Verto pronto e comece a coletar respostas em minutos — cada
       modelo é totalmente editável.

@@ -6,7 +6,7 @@
 # The overrides are three-state on purpose. nil — the default — means "follow
 # the Verto", so a creator who changes the Verto's own setting later moves
 # every link that never disagreed with it. true/false pin the answer for
-# everyone arriving through this link, which is the whole point: send one
+# everyone arriving through this link, which is the whole point: give one
 # cohort a link that shows them how everyone else answered, and another one
 # that doesn't.
 class SurveyLink < ApplicationRecord
@@ -15,7 +15,7 @@ class SurveyLink < ApplicationRecord
   # came in through it. They fall back to counting as the Verto's own.
   has_many :responses, dependent: :nullify
 
-  # A cap, not a business rule — a send list this long is a sign something
+  # A cap, not a business rule — a share list this long is a sign something
   # else is wanted (partner groups), and it keeps the modal a modal.
   MAX_PER_SURVEY = 25
   MAX_NAME       = 60
@@ -25,7 +25,7 @@ class SurveyLink < ApplicationRecord
   before_validation :apply_defaults
   validates :name, presence: true, length: { maximum: MAX_NAME }
   validates :slug, presence: true
-  # Covers other send links too, so there is no separate uniqueness validation
+  # Covers other share links too, so there is no separate uniqueness validation
   # to disagree with it.
   validate  :slug_free_in_play_namespace
 
@@ -79,7 +79,7 @@ class SurveyLink < ApplicationRecord
     self.slug = Survey.normalize_slug(slug)
   end
 
-  # The uniqueness validation above only sees other send links. This is the
+  # The uniqueness validation above only sees other share links. This is the
   # rest of the namespace PlayerController#load_survey_and_share resolves —
   # without it a link could shadow a live Verto's own address.
   def slug_free_in_play_namespace

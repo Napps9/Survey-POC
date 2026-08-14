@@ -1065,9 +1065,9 @@ en:
     bulk_destroy_confirm:
       one: "Permanently delete %{count} Verto? All responses and data will be erased. This cannot be undone."
       other: "Permanently delete %{count} Vertos? All responses and data will be erased. This cannot be undone."
-    send: "Send →"
-  send_modal:
-    eyebrow: "Send this Verto"
+    share: "Share →"
+  share_modal:
+    eyebrow: "Share this Verto"
     close: "Close"
     loading: "Loading…"
     share_text: "Take two minutes to answer “%{name}”"
@@ -1094,7 +1094,7 @@ en:
     compare_note_label: "Promise shown on the welcome card"
     setting_share: "Offer a Share button so they can pass the link on"
     setting_regions: "Let them see how other regions answered, on a map"
-    links_title: "Extra send links"
+    links_title: "Extra share links"
     links_hint: "Give an audience its own URL — and its own answers to the settings above. Send one group a link that shows them how everyone else answered, and another group one that doesn't."
     links_empty: "No extra links yet. Everyone arrives on the main link above."
     link_name_label: "Link name"
@@ -1298,7 +1298,7 @@ en:
     quiz_preset_badge: "Quiz"
     step_counter: "Step %{n} of %{total}"
   templates:
-    eyebrow: Templates
+    eyebrow: "Share this Verto"
     heading_html: Start from a <span style="color:#615BF5;">template</span>
     subtitle: Pick a ready-made Verto and start collecting in minutes — every template
       is fully editable.

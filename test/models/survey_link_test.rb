@@ -2,7 +2,7 @@ require "test_helper"
 
 # SurveyLink's two jobs: minting an address nothing else in the /play/
 # namespace already answers to, and resolving the three-state overrides that
-# are the reason send links exist at all.
+# are the reason share links exist at all.
 class SurveyLinkTest < ActiveSupport::TestCase
   def setup
     @org = Organisation.create!(name: "O", slug: "sl-#{SecureRandom.hex(3)}")

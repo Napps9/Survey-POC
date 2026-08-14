@@ -2,7 +2,7 @@ class Survey < ApplicationRecord
   belongs_to :organisation
   has_many :responses, dependent: :destroy
   has_many :survey_shares, dependent: :destroy
-  # Named send links — extra /play/ addresses for this Verto, each with its own
+  # Named share links — extra /play/ addresses for this Verto, each with its own
   # respondent-facing overrides. See SurveyLink.
   has_many :survey_links, dependent: :destroy
   has_many :partnership_vertos, dependent: :destroy
@@ -1297,7 +1297,7 @@ class Survey < ApplicationRecord
   # SurveyLink answers these same three questions, overriding them per link
   # (see SurveyLink#compare_results?). Anything rendering the player asks
   # whichever object it arrived through — `(@survey_link || @survey)` — so the
-  # player never has to know whether a send link is in play. They exist as
+  # player never has to know whether a share link is in play. They exist as
   # aliases rather than the columns themselves so a link's own nil-means-inherit
   # column reader stays readable for the settings form.
   def compare_results? = show_results_comparison?
@@ -1617,7 +1617,7 @@ class Survey < ApplicationRecord
 
   # True when `value` is already in use anywhere in the /play/:token
   # namespace — a Verto's slug or publish_token, a partner share token, or a
-  # send link's slug — so nothing a creator chooses can make
+  # share link's slug — so nothing a creator chooses can make
   # PlayerController#load_survey_and_share resolve ambiguously. Each excluding_
   # argument spares the record doing the asking from colliding with itself.
   def self.play_key_taken?(value, excluding_survey_id: nil, excluding_link_id: nil)

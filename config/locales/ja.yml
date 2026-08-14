@@ -1057,9 +1057,9 @@ ja:
     bulk_destroy_confirm:
       one: "%{count}個のVertoを完全に削除しますか？すべての回答とデータが消去されます。この操作は取り消せません。"
       other: "%{count}個のVertosを完全に削除しますか？すべての回答とデータが消去されます。この操作は取り消せません。"
-    send: "送る →"
-  send_modal:
-    eyebrow: "この Verto を送る"
+    share: "共有 →"
+  share_modal:
+    eyebrow: "この Verto を共有"
     close: "閉じる"
     loading: "読み込み中…"
     share_text: "2分だけ「%{name}」に答えてください"
@@ -1086,7 +1086,7 @@ ja:
     compare_note_label: "ウェルカムカードに表示する約束"
     setting_share: "共有ボタンを表示して、リンクを渡せるようにする"
     setting_regions: "他の地域の回答を地図で見せる"
-    links_title: "追加の送信リンク"
+    links_title: "追加の共有リンク"
     links_hint: "相手ごとに専用の URL を用意し、上の設定も個別に決められます。あるグループには他の人の回答が見えるリンクを、別のグループには見えないリンクを送れます。"
     links_empty: "追加のリンクはまだありません。全員が上のメインリンクから参加します。"
     link_name_label: "リンク名"
@@ -1290,7 +1290,7 @@ ja:
     quiz_preset_badge: "クイズ"
     step_counter: "%{total}ステップ中 %{n}"
   templates:
-    eyebrow: テンプレート
+    eyebrow: "この Verto を共有"
     heading_html: <span style="color:#615BF5;">テンプレート</span>から始める
     subtitle: すぐ使えるVertoを選んで、数分で回答集めを開始できます。どのテンプレートも自由に編集できます。
     back: ダッシュボードに戻る

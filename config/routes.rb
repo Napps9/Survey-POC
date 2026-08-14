@@ -93,10 +93,10 @@ Rails.application.routes.draw do
   post   "surveys/:id/test_link",     to: "surveys#enable_test_link",  as: :test_link_survey
   delete "surveys/:id/test_link",     to: "surveys#disable_test_link"
   post "surveys/:id/duplicate",       to: "surveys#duplicate", as: :duplicate_survey
-  # The Send modal, fetched into a Turbo Frame over the dashboard. A GET that
+  # The Share modal, fetched into a Turbo Frame over the dashboard. A GET that
   # renders the panel; the nested link routes below mutate and redirect back to
   # it, so the frame re-renders itself with no JSON round-trip to hand-write.
-  get  "surveys/:id/send",            to: "survey_links#show", as: :send_survey
+  get  "surveys/:id/share",           to: "survey_links#show", as: :share_survey
   get  "surveys/:id/preview",         to: "surveys#preview",  as: :preview_survey
   get  "surveys/:id/qr",              to: "surveys#qr",       as: :qr_survey
   post "surveys/:id/card_image",      to: "surveys#card_image", as: :card_image_survey

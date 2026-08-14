@@ -1,4 +1,4 @@
-# Send links: named, individually-addressed /play/ URLs for one Verto.
+# Share links: named, individually-addressed /play/ URLs for one Verto.
 #
 # The Verto already had exactly one public address (publish_token, plus an
 # optional vanity slug) and one set of respondent-facing switches. That makes
@@ -6,7 +6,7 @@
 # comparison on for the cohort you want to show the aggregate to also turns it
 # on for the control group who must not see it.
 #
-# A send link is that address made plural. Each carries its own slug in the
+# A share link is that address made plural. Each carries its own slug in the
 # same /play/:token namespace (see Survey.play_key_taken? — a slug here can
 # never shadow a publish_token, another Verto's slug or a partner share token)
 # and its own three-state overrides: nil means "whatever the Verto says",
@@ -32,7 +32,7 @@ class CreateSurveyLinks < ActiveRecord::Migration[8.1]
     add_index :survey_links, :slug, unique: true
     add_index :survey_links, [ :survey_id, :created_at ]
 
-    # Attribution: which link a respondent arrived through, so the send modal
+    # Attribution: which link a respondent arrived through, so the share modal
     # can say what each audience actually returned. Nullable — every response
     # collected before this existed, and everyone arriving on the Verto's own
     # link, has none. Mirrors responses.survey_share_id.

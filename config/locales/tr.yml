@@ -1057,9 +1057,9 @@ tr:
     bulk_destroy_confirm:
       one: "%{count} Verto kalıcı olarak silinsin? Tüm yanıtlar ve veriler silinecek. Bu işlem geri alınamaz."
       other: "%{count} Verto kalıcı olarak silinsin? Tüm yanıtlar ve veriler silinecek. Bu işlem geri alınamaz."
-    send: "Gönder →"
-  send_modal:
-    eyebrow: "Bu Verto'yu gönder"
+    share: "Paylaş →"
+  share_modal:
+    eyebrow: "Bu Verto'yu paylaş"
     close: "Kapat"
     loading: "Yükleniyor…"
     share_text: "“%{name}” için iki dakikanızı ayırın"
@@ -1086,7 +1086,7 @@ tr:
     compare_note_label: "Karşılama kartında gösterilen vaat"
     setting_share: "Bağlantıyı iletebilmeleri için Paylaş düğmesi sun"
     setting_regions: "Diğer bölgelerin nasıl yanıtladığını haritada görmelerini sağla"
-    links_title: "Ek gönderim bağlantıları"
+    links_title: "Ek paylaşım bağlantıları"
     links_hint: "Her kitleye kendi URL'sini — ve yukarıdaki ayarlara kendi yanıtlarını — verin. Bir gruba herkesin nasıl yanıtladığını gösteren, diğerine göstermeyen bir bağlantı gönderin."
     links_empty: "Henüz ek bağlantı yok. Herkes yukarıdaki ana bağlantıdan geliyor."
     link_name_label: "Bağlantı adı"
@@ -1290,7 +1290,7 @@ tr:
     quiz_preset_badge: "Quiz"
     step_counter: Adım %{n} / %{total}
   templates:
-    eyebrow: Şablonlar
+    eyebrow: "Bu Verto'yu paylaş"
     heading_html: Bir <span style="color:#615BF5;">şablonla</span> başlayın
     subtitle: Hazır bir Verto seçin ve dakikalar içinde yanıt toplamaya başlayın — her
       şablon tamamen düzenlenebilir.
