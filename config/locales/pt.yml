@@ -363,6 +363,10 @@ pt:
       delete_card_confirm: Eliminar este cartão?
       save_to_library: "Salvar também na minha biblioteca de marca"
       lottie_failed: "Esse link não parece uma animação do LottieFiles."
+      appeal_note_prompt: "Quer dizer algo ao revisor? (opcional)"
+      appeal_submitting: "A enviar para revisão…"
+      appeal_submitted: "Enviado para revisão — avisamos assim que for verificado."
+      appeal_failed: "Não foi possível enviar para revisão — tente novamente."
       emoji_none: "Nenhum emoji corresponde."
       rich_bold: "Negrito"
       rich_italic: "Itálico"

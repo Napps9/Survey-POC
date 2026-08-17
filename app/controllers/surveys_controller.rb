@@ -449,9 +449,11 @@ class SurveysController < ApplicationController
     if verdict[:safe]
       render json: { ok: true }
     elsif verdict[:ambiguous]
-      render json: { ok: false, reason: could_not_verify_image_message }, status: :bad_gateway
+      # appealable: a creator who thinks a technical "couldn't verify" is
+      # wrong has the same escape hatch as an outright rejection below.
+      render json: { ok: false, reason: could_not_verify_image_message, appealable: true }, status: :bad_gateway
     else
-      render json: { ok: false, reason: verdict[:reason].presence || "That image isn't PG or age-appropriate for this Verto." }
+      render json: { ok: false, reason: verdict[:reason].presence || "That image isn't PG or age-appropriate for this Verto.", appealable: true }
     end
   rescue ActiveRecord::RecordNotFound
     raise # let it 404 rather than read as "couldn't check"

@@ -363,6 +363,10 @@ vi:
       delete_card_confirm: Xóa thẻ này?
       save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"
       lottie_failed: "Liên kết đó không giống hoạt ảnh LottieFiles."
+      appeal_note_prompt: "Bạn có muốn nhắn gì cho người xét duyệt không? (không bắt buộc)"
+      appeal_submitting: "Đang gửi để xét duyệt…"
+      appeal_submitted: "Đã gửi để xét duyệt — chúng tôi sẽ thông báo khi có kết quả."
+      appeal_failed: "Không thể gửi để xét duyệt — vui lòng thử lại."
       emoji_none: "Không có emoji phù hợp."
       rich_bold: "Đậm"
       rich_italic: "Nghiêng"

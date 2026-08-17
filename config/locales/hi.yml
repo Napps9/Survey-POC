@@ -363,6 +363,10 @@ hi:
       delete_card_confirm: इस कार्ड को हटाएं?
       save_to_library: "मेरी ब्रांड लाइब्रेरी में भी सहेजें"
       lottie_failed: "यह लिंक LottieFiles एनिमेशन जैसा नहीं लगता।"
+      appeal_note_prompt: "क्या आप समीक्षक को कुछ बताना चाहेंगे? (वैकल्पिक)"
+      appeal_submitting: "समीक्षा के लिए भेजा जा रहा है…"
+      appeal_submitted: "समीक्षा के लिए भेजा गया — जांच पूरी होते ही हम आपको बताएंगे।"
+      appeal_failed: "समीक्षा के लिए भेजा नहीं जा सका — कृपया फिर से प्रयास करें।"
       emoji_none: "कोई इमोजी मेल नहीं खाता।"
       rich_bold: "बोल्ड"
       rich_italic: "इटैलिक"

@@ -363,6 +363,10 @@ id:
       delete_card_confirm: Hapus kartu ini?
       save_to_library: "Simpan juga ke pustaka merek saya"
       lottie_failed: "Tautan itu sepertinya bukan animasi LottieFiles."
+      appeal_note_prompt: "Ada yang ingin disampaikan ke peninjau? (opsional)"
+      appeal_submitting: "Mengirim untuk ditinjau…"
+      appeal_submitted: "Terkirim untuk ditinjau — kami akan memberitahumu setelah diperiksa."
+      appeal_failed: "Tidak dapat mengirim untuk ditinjau — silakan coba lagi."
       emoji_none: "Tidak ada emoji yang cocok."
       rich_bold: "Tebal"
       rich_italic: "Miring"

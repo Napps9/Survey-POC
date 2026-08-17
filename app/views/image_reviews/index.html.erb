@@ -1,0 +1,85 @@
+<%# VertoNow's review queue for appealed image rejections.
+    Reached only through the staff routing constraint in config/routes.rb — a
+    non-staff request never gets here, it gets a 404. Structurally the same
+    shape as /ask/review (CorpusReviewsController): tabs, counts, a decision
+    that's a person's call, not an automated one. %>
+<% content_for :head do %>
+  <style>body { overflow:auto !important; height:auto !important; }</style>
+<% end %>
+
+<div style="min-height:100vh;background:#1C2034;">
+  <div style="padding:30px 36px 26px;border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:#8B85FF;box-shadow:0 0 12px rgba(139,133,255,0.7);"></span>
+      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;">Image reviews · staff</span>
+    </div>
+    <h1 style="font-family:'Alata',sans-serif;font-size:32px;color:#fff;line-height:1.1;margin:0 0 6px;">Appealed uploads</h1>
+    <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);margin:0;">
+      Uploads ImageModerator rejected, appealed back by their creator.
+    </p>
+
+    <div style="display:flex;gap:7px;margin-top:20px;flex-wrap:wrap;">
+      <% tab_accents = { "pending" => "#FFC24B", "approved" => "#01EACB", "rejected" => "#FF1E6F" } %>
+      <% ImageReviewsController::TABS.each do |tab| %>
+        <%= link_to image_reviews_path(tab: tab),
+              style: "display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);text-decoration:none;" \
+                     "#{tab == @tab ? "background:#{tab_accents[tab]}1A;border:1px solid #{tab_accents[tab]}66;color:#{tab_accents[tab]};" : "background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);"}" do %>
+          <%= tab.capitalize %><span style="opacity:0.6;"><%= @counts[tab] %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="padding:24px 36px 60px;">
+    <% if @requests.empty? %>
+      <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.35);padding:40px 0;text-align:center;">
+        Nothing in this list.
+      </p>
+    <% else %>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;">
+        <% @requests.each do |req| %>
+          <div style="border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);overflow:hidden;">
+            <% if req.image.attached? %>
+              <div style="aspect-ratio:16/9;background:#0A0C18;background-image:url('<%= rails_blob_path(req.image, only_path: true) %>');background-size:cover;background-position:center;"></div>
+            <% end %>
+            <div style="padding:14px 16px;">
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:#fff;margin-bottom:2px;">
+                <%= req.survey.title.presence || req.survey.theme %>
+              </div>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);margin-bottom:10px;">
+                <%= req.organisation.name %> · <%= req.user.email_address %> · <%= l(req.created_at.to_date, format: :long) %>
+              </div>
+
+              <% if req.reason_given.present? %>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:#FF6B84;background:rgba(255,30,111,0.08);border-radius:8px;padding:8px 10px;margin-bottom:8px;">
+                  <strong style="font-weight:600;">Moderator flagged:</strong> <%= req.reason_given %>
+                </div>
+              <% end %>
+              <% if req.note.present? %>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.04);border-radius:8px;padding:8px 10px;margin-bottom:12px;">
+                  <strong style="font-weight:600;color:rgba(255,255,255,0.8);">Creator says:</strong> <%= req.note %>
+                </div>
+              <% end %>
+
+              <% if @tab == "pending" %>
+                <div style="display:flex;gap:8px;">
+                  <%= button_to "Approve", image_review_path(req, tab: @tab, decision: "approve"),
+                        method: :patch,
+                        style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);padding:6px 14px;border-radius:100px;background:#01EACB;border:1px solid #01EACB;color:#04221E;cursor:pointer;" %>
+                  <%= button_to "Reject", image_review_path(req, tab: @tab, decision: "reject"),
+                        method: :patch,
+                        style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);padding:6px 14px;border-radius:100px;background:transparent;border:1px solid rgba(216,0,39,0.4);color:#FF6B84;cursor:pointer;" %>
+                </div>
+              <% else %>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">
+                  <%= @tab.capitalize %> <%= l(req.reviewed_at.to_date, format: :long) if req.reviewed_at %>
+                  <span style="display:block;color:rgba(255,255,255,0.25);"><%= req.reviewed_by_email %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

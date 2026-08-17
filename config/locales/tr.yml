@@ -363,6 +363,10 @@ tr:
       delete_card_confirm: Bu kart silinsin mi?
       save_to_library: "Marka kitaplığıma da kaydet"
       lottie_failed: "Bu bağlantı bir LottieFiles animasyonuna benzemiyor."
+      appeal_note_prompt: "İncelemeciye iletmek istediğiniz bir şey var mı? (isteğe bağlı)"
+      appeal_submitting: "İnceleme için gönderiliyor…"
+      appeal_submitted: "İnceleme için gönderildi — kontrol edilir edilmez size bildireceğiz."
+      appeal_failed: "İnceleme için gönderilemedi — lütfen tekrar deneyin."
       emoji_none: "Eşleşen emoji yok."
       rich_bold: "Kalın"
       rich_italic: "İtalik"

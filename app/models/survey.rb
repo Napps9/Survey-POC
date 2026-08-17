@@ -11,6 +11,9 @@ class Survey < ApplicationRecord
   has_many :survey_waves, -> { order(:position) }, dependent: :destroy
   has_many :partnership_vertos, dependent: :destroy
   has_many :report_renders, dependent: :destroy
+  # Appeals filed against this Verto's rejected uploads — see
+  # ImageReviewRequest and ImageAppealsController.
+  has_many :image_review_requests, dependent: :destroy
   has_many :flow_generations, dependent: :destroy
   # Builds outlive the Verto they produced — they're the account's generation
   # log, deleted with the organisation, not the survey. Nullify rather than

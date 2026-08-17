@@ -48,6 +48,20 @@
              data-media-picker-target="uploadError"
              style="margin-top:10px;color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size:13px;line-height:1.4;"
              hidden></div>
+        <%# Shown alongside a rejection the server marked appealable — see
+            SurveysController#moderate_image and ImageAppealsController. The
+            rejected image and the moderator's own reason are what get sent;
+            the moderator's verdict isn't re-run, it's exactly what's being
+            appealed. Absent on pages media-picker mounts on without a survey
+            behind it (the Comms builder) — no appeal-create URL, no button. %>
+        <button type="button" class="media-btn-ghost"
+                data-media-picker-target="appealBtn"
+                data-action="click->media-picker#requestReview"
+                style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size:12px;padding:5px 12px;"
+                hidden><%= t("editor.request_review", default: "Request review") %></button>
+        <div data-media-picker-target="appealStatus"
+             style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.4;"
+             hidden></div>
         <%# Admin opt-in: also file this upload in the org's brand library so
             it becomes pickable in every Verto. Off by default — the library
             caps at Organisation::MAX_ASSETS and one-off card art shouldn't
@@ -153,6 +167,17 @@
                 </div>
               </section>
             <% end %>
+            <%# Uploads a staff reviewer approved on appeal, for this survey —
+                fetched on open (ImageAppealsController#index) rather than
+                rendered here, so a decision made after this page loaded
+                still shows up without a refresh. Tiles apply exactly like
+                any other library item: pickLibraryItem sets a same-origin
+                URL as the pending pick, so re-applying never re-moderates. %>
+            <section class="media-library-section"
+                     data-media-picker-target="approvedSection" hidden>
+              <h4 class="media-library-section-label"><%= t("editor.approved_by_review", default: "Approved by review") %></h4>
+              <div class="media-library-grid" data-media-picker-target="approvedGrid"></div>
+            </section>
             <section class="media-library-section"
                      data-media-picker-target="recommendedSection" hidden>
               <h4 class="media-library-section-label"

@@ -363,6 +363,10 @@ he:
       delete_card_confirm: למחוק את הכרטיס הזה?
       save_to_library: "שמור גם בספריית המותג שלי"
       lottie_failed: "הקישור הזה לא נראה כמו אנימציית LottieFiles."
+      appeal_note_prompt: "יש משהו שתרצו לומר לבודק? (אופציונלי)"
+      appeal_submitting: "שולח לבדיקה…"
+      appeal_submitted: "נשלח לבדיקה — נודיע לכם ברגע שהיא תיבדק."
+      appeal_failed: "לא ניתן היה לשלוח לבדיקה — נסו שוב."
       emoji_none: "אין אימוג'י תואם."
       rich_bold: "מודגש"
       rich_italic: "נטוי"

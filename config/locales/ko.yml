@@ -363,6 +363,10 @@ ko:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       save_to_library: "브랜드 라이브러리에도 저장"
       lottie_failed: "이 링크는 LottieFiles 애니메이션이 아닌 것 같습니다."
+      appeal_note_prompt: "검토자에게 전달하고 싶은 내용이 있나요? (선택 사항)"
+      appeal_submitting: "검토를 위해 제출하는 중…"
+      appeal_submitted: "검토를 위해 제출되었습니다 — 확인되는 대로 알려드릴게요."
+      appeal_failed: "검토 제출에 실패했습니다 — 다시 시도해 주세요."
       emoji_none: "일치하는 이모지가 없습니다."
       rich_bold: "굵게"
       rich_italic: "기울임"

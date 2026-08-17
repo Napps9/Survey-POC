@@ -98,6 +98,10 @@ Rails.application.routes.draw do
   post "surveys/import_manual",       to: "surveys#import_manual", as: :import_manual_survey
   post "surveys/create_blank",        to: "surveys#create_blank", as: :create_blank_survey
   post "surveys/:id/moderate_image",  to: "surveys#moderate_image", as: :moderate_image_survey
+  # Appeal flow for a rejected upload — file one, and list this survey's
+  # already-approved ones for the picker strip. See ImageAppealsController.
+  post "surveys/:id/image_appeal",    to: "image_appeals#create",  as: :image_appeal_survey
+  get  "surveys/:id/image_appeals",   to: "image_appeals#index",   as: :image_appeals_survey
   post "surveys/finalize_import",     to: "surveys#finalize_import", as: :finalize_import_survey
   post "surveys/:id/publish",         to: "surveys#publish",  as: :publish_survey
   post "surveys/:id/unpublish",       to: "surveys#unpublish", as: :unpublish_survey
@@ -194,6 +198,11 @@ Rails.application.routes.draw do
   constraints(->(request) { BlazerAccess.staff_request?(request) }) do
     get   "ask/review",     to: "corpus_reviews#index",  as: :corpus_reviews
     patch "ask/review/:id", to: "corpus_reviews#update", as: :corpus_review
+
+    # The appeal queue for rejected uploads — see ImageReviewsController's
+    # class comment for why this is staff-only rather than an org-admin call.
+    get   "image_reviews",     to: "image_reviews#index",  as: :image_reviews
+    patch "image_reviews/:id", to: "image_reviews#update", as: :image_review
   end
 
   # ── Comms ──────────────────────────────────────────────────────────────────

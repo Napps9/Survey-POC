@@ -363,6 +363,10 @@ nl:
       delete_card_confirm: Deze kaart verwijderen?
       save_to_library: "Ook opslaan in mijn merkbibliotheek"
       lottie_failed: "Die link lijkt geen LottieFiles-animatie te zijn."
+      appeal_note_prompt: "Wil je de beoordelaar nog iets laten weten? (optioneel)"
+      appeal_submitting: "Wordt ingediend ter beoordeling…"
+      appeal_submitted: "Ingediend ter beoordeling — we laten het je weten zodra het is gecontroleerd."
+      appeal_failed: "Kon dit niet ter beoordeling indienen — probeer het opnieuw."
       emoji_none: "Geen emoji gevonden."
       rich_bold: "Vet"
       rich_italic: "Cursief"

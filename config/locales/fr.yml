@@ -363,6 +363,10 @@ fr:
       delete_card_confirm: Supprimer cette carte ?
       save_to_library: "Enregistrer aussi dans ma bibliothèque de marque"
       lottie_failed: "Ce lien ne semble pas être une animation LottieFiles."
+      appeal_note_prompt: "Souhaitez-vous préciser quelque chose au relecteur ? (facultatif)"
+      appeal_submitting: "Envoi pour examen…"
+      appeal_submitted: "Envoyé pour examen — nous vous préviendrons une fois vérifié."
+      appeal_failed: "Impossible d'envoyer pour examen — veuillez réessayer."
       emoji_none: "Aucun émoji correspondant."
       rich_bold: "Gras"
       rich_italic: "Italique"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_180100) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_190000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -421,6 +421,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_180100) do
     t.integer "user_id", null: false
     t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true
     t.index ["user_id"], name: "index_identities_on_user_id"
+  end
+
+  create_table "image_review_requests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "note"
+    t.integer "organisation_id", null: false
+    t.text "reason_given"
+    t.datetime "reviewed_at"
+    t.string "reviewed_by_email"
+    t.string "status", default: "pending", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["organisation_id"], name: "index_image_review_requests_on_organisation_id"
+    t.index ["status", "created_at"], name: "index_image_review_requests_on_status_and_created_at"
+    t.index ["survey_id", "status"], name: "index_image_review_requests_on_survey_id_and_status"
+    t.index ["survey_id"], name: "index_image_review_requests_on_survey_id"
+    t.index ["user_id"], name: "index_image_review_requests_on_user_id"
+    t.check_constraint "status IN ('pending', 'approved', 'rejected')", name: "chk_image_review_requests_status"
   end
 
   create_table "invites", force: :cascade do |t|
@@ -943,6 +962,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_180100) do
   add_foreign_key "funder_memberships", "organisations"
   add_foreign_key "funders", "organisations"
   add_foreign_key "identities", "users"
+  add_foreign_key "image_review_requests", "organisations"
+  add_foreign_key "image_review_requests", "surveys"
+  add_foreign_key "image_review_requests", "users"
   add_foreign_key "invites", "funders"
   add_foreign_key "invites", "organisations"
   add_foreign_key "invites", "partnerships"
@@ -966,7 +988,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_180100) do
   add_foreign_key "report_renders", "users"
   add_foreign_key "responses", "survey_links"
   add_foreign_key "responses", "survey_shares"
-  add_foreign_key "responses", "survey_waves", column: "survey_wave_id"
+  add_foreign_key "responses", "survey_waves"
   add_foreign_key "responses", "surveys"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

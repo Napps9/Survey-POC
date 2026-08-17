@@ -109,7 +109,7 @@ export default class extends Controller {
 
     if (!list.length) {
       this.gridTarget.innerHTML =
-        `<div class="emoji-picker-empty">${t("js.editor.emoji_none", { default: "No emoji match that." })}</div>`
+        `<div class="emoji-picker-empty">${t("editor.emoji_none", { default: "No emoji match that." })}</div>`
       return
     }
     this.gridTarget.innerHTML = list.map(e => `

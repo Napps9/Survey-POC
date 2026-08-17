@@ -59,6 +59,8 @@
      data-media-picker-card-image-url-value="<%= card_image_survey_path(@survey) %>"
      data-media-picker-card-lottie-url-value="<%= card_lottie_survey_path(@survey) %>"
      data-media-picker-library-url-value="<%= current_membership&.admin? ? organisation_assets_path(current_organisation, format: :json) : "" %>"
+     data-media-picker-appeal-create-url-value="<%= image_appeal_survey_path(@survey) %>"
+     data-media-picker-appeals-list-url-value="<%= image_appeals_survey_path(@survey) %>"
      data-media-picker-theme-value="<%= @survey.theme %>"
      data-rating-icon-on="<%= rating_icon(@survey)[:on] %>"
      data-rating-icon-off="<%= rating_icon(@survey)[:off] %>"

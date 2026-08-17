@@ -15,9 +15,10 @@ export default class extends Controller {
     "mediaToggle", "mediaTab",
     "saveToLibrary", "brandGrid", "libraryFileInput", "brandStatus",
     "lottieSection", "lottieInput", "lottieError", "lottieBtn",
-    "cropStage", "cropFrame", "cropImg", "cropZoom"
+    "cropStage", "cropFrame", "cropImg", "cropZoom",
+    "appealBtn", "appealStatus", "approvedSection", "approvedGrid"
   ]
-  static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, cardLottieUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array }
+  static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, cardLottieUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array, appealCreateUrl: String, appealsListUrl: String }
 
   // Uploaded images are normalised before they're stored: capped in source
   // size, downscaled to a max edge, and re-encoded to a compact format. Raw
@@ -55,6 +56,7 @@ export default class extends Controller {
     this._searchMedia = "photos"
     this._escListener = (e) => { if (e.key === "Escape") this.close() }
     this._cropImgEl = null
+    this._pendingAppeal = null
   }
 
   open(event) {
@@ -81,6 +83,7 @@ export default class extends Controller {
 
     this._renderRecommended(this._parseUrls(card.dataset.cardRecommendedImages), "Recommended for this card")
     this._seedSearch()
+    this._loadApprovedAppeals()
 
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
@@ -125,6 +128,7 @@ export default class extends Controller {
     this.clearBtnTarget.hidden = !this._currentBg()
     this._renderRecommended(this.hasBackgroundRecommendedValue ? this.backgroundRecommendedValue : [], "Recommended backgrounds")
     this._seedSearch()
+    this._loadApprovedAppeals()
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
   }
@@ -150,6 +154,7 @@ export default class extends Controller {
     // gate has none, so lean on the theme-seeded stock search instead.
     this._renderRecommended([], "")
     this._seedSearch()
+    this._loadApprovedAppeals()
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
   }
@@ -188,6 +193,7 @@ export default class extends Controller {
     // wrong slot.
     this._renderRecommended([], "")
     this._seedSearch()
+    this._loadApprovedAppeals()
 
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
@@ -203,6 +209,7 @@ export default class extends Controller {
     if (this.hasFileInputTarget) this.fileInputTarget.value = ""
     this._clearUploadError()
     this._renderRecommended([], "")
+    this._renderApproved([])
     this._clearSearch()
     this._closeCropStage()
     document.removeEventListener("keydown", this._escListener)
@@ -535,6 +542,12 @@ export default class extends Controller {
     if (!this.hasUploadErrorTarget) return
     this.uploadErrorTarget.textContent = ""
     this.uploadErrorTarget.hidden = true
+    this._pendingAppeal = null
+    if (this.hasAppealBtnTarget) {
+      this.appealBtnTarget.hidden = true
+      this.appealBtnTarget.disabled = false
+    }
+    this._setAppealStatus("")
   }
 
   // ── Library tab ────────────────────────────────────────
@@ -797,6 +810,14 @@ export default class extends Controller {
       const data = await res.json().catch(() => ({}))
       if (data.ok) return true
       this._showUploadError(data.reason || "That image can’t be used — it isn’t PG or age-appropriate for this Verto.")
+      // Offer the appeal escape hatch only when the server marked this
+      // particular verdict appealable AND this page has somewhere to send
+      // one (the Comms builder mounts this same controller with no survey
+      // behind it, so appealCreateUrlValue is simply absent there).
+      if (data.appealable && this.hasAppealCreateUrlValue && this.hasAppealBtnTarget) {
+        this._pendingAppeal = { dataUrl, reason: data.reason || "" }
+        this.appealBtnTarget.hidden = false
+      }
       return false
     } catch (_) {
       this._showUploadError("We couldn’t check that image — please try again.")
@@ -804,6 +825,90 @@ export default class extends Controller {
     } finally {
       this._setApplyEnabled(true)
     }
+  }
+
+  // ── Appeals ─────────────────────────────────────────────
+  // The escape hatch for a rejection ImageModerator got wrong: resend the
+  // SAME rejected image and its reason to platform staff (never re-run the
+  // moderator — that verdict is exactly what's being appealed). Decisions
+  // happen in ImageReviewsController, behind the staff routing constraint;
+  // this controller only ever sees "pending" until a later page load shows
+  // the result in the approved strip.
+  async requestReview(event) {
+    event?.preventDefault()
+    if (!this._pendingAppeal || !this.hasAppealCreateUrlValue) return
+
+    const note = (window.prompt(t("editor.appeal_note_prompt")) || "").trim()
+    this.appealBtnTarget.disabled = true
+    this._setAppealStatus(t("editor.appeal_submitting"))
+    try {
+      const res = await fetch(this.appealCreateUrlValue, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+        },
+        body: JSON.stringify({ image: this._pendingAppeal.dataUrl, reason: this._pendingAppeal.reason, note })
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!data.ok) throw new Error(data.error || "appeal failed")
+      this.appealBtnTarget.hidden = true
+      this._setAppealStatus(t("editor.appeal_submitted"))
+      this._pendingAppeal = null
+    } catch (_e) {
+      this.appealBtnTarget.disabled = false
+      this._setAppealStatus(t("editor.appeal_failed"))
+    }
+  }
+
+  _setAppealStatus(text) {
+    if (!this.hasAppealStatusTarget) return
+    this.appealStatusTarget.textContent = text || ""
+    this.appealStatusTarget.hidden = !text
+  }
+
+  // This survey's already-approved appeals, for the Library tab's "Approved
+  // by review" strip. Fetched fresh on every open() rather than rendered
+  // server-side, so a decision staff made after this page loaded still shows
+  // up without a reload. Best-effort: a failed fetch just leaves the strip
+  // empty, same as an empty result would.
+  async _loadApprovedAppeals() {
+    if (!this.hasAppealsListUrlValue || !this.hasApprovedGridTarget) return
+    try {
+      const res = await fetch(this.appealsListUrlValue, { headers: { "Accept": "application/json" } })
+      const data = await res.json().catch(() => ({}))
+      this._renderApproved(Array.isArray(data.images) ? data.images : [])
+    } catch (_e) {
+      this._renderApproved([])
+    }
+  }
+
+  // Tiles apply exactly like any other library item: pickLibraryItem sets a
+  // same-origin URL as the pending pick, so re-applying an approved appeal
+  // never re-moderates (applyImage only checks data: URLs).
+  _renderApproved(images) {
+    if (!this.hasApprovedSectionTarget || !this.hasApprovedGridTarget) return
+    this.approvedGridTarget.replaceChildren()
+    if (!images.length) {
+      this.approvedSectionTarget.hidden = true
+      return
+    }
+    const frag = document.createDocumentFragment()
+    for (const image of images) {
+      if (!image?.url) continue
+      const btn = document.createElement("button")
+      btn.type = "button"
+      btn.className = "media-library-item"
+      btn.style.backgroundImage = `url('${image.url.replace(/'/g, "\\'")}')`
+      btn.dataset.url = image.url
+      btn.dataset.mediaPickerTarget = "libraryItem"
+      btn.dataset.action = "click->media-picker#pickLibraryItem"
+      btn.setAttribute("aria-selected", "false")
+      frag.appendChild(btn)
+    }
+    this.approvedGridTarget.appendChild(frag)
+    this.approvedSectionTarget.hidden = false
   }
 
   // ── Brand library ──────────────────────────────────────
@@ -820,11 +925,11 @@ export default class extends Controller {
     event.target.value = ""
     if (!file) return
     if (file.size > this.constructor.SOURCE_BYTE_CAP) {
-      this._brandStatus(t("js.editor.library_save_failed"))
+      this._brandStatus(t("editor.library_save_failed"))
       return
     }
     const done = async (dataUrl) => {
-      this._brandStatus(t("js.editor.library_saving"))
+      this._brandStatus(t("editor.library_saving"))
       const ok = await this._moderateLibraryUpload(dataUrl)
       if (!ok) return
       await this._saveToLibrary(dataUrl)
@@ -849,10 +954,10 @@ export default class extends Controller {
       })
       const data = await res.json().catch(() => ({}))
       if (data.ok) return true
-      this._brandStatus(data.reason || t("js.editor.library_save_failed"))
+      this._brandStatus(data.reason || t("editor.library_save_failed"))
       return false
     } catch (_) {
-      this._brandStatus(t("js.editor.library_save_failed"))
+      this._brandStatus(t("editor.library_save_failed"))
       return false
     }
   }
@@ -874,13 +979,13 @@ export default class extends Controller {
       })
       const data = await res.json().catch(() => ({}))
       if (!data.ok) {
-        this._brandStatus(data.error || t("js.editor.library_save_failed"))
+        this._brandStatus(data.error || t("editor.library_save_failed"))
         return
       }
       this._brandStatus("")
       this._prependBrandTile(data)
     } catch (_) {
-      this._brandStatus(t("js.editor.library_save_failed"))
+      this._brandStatus(t("editor.library_save_failed"))
     }
   }
 
@@ -1115,7 +1220,7 @@ export default class extends Controller {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok || !data.ok || !data.url) {
-        this.lottieErrorTarget.textContent = data.error || t("js.editor.lottie_failed", { default: "That link doesn't look like a LottieFiles animation." })
+        this.lottieErrorTarget.textContent = data.error || t("editor.lottie_failed", { default: "That link doesn't look like a LottieFiles animation." })
         this.lottieErrorTarget.hidden = false
         return
       }
@@ -1124,7 +1229,7 @@ export default class extends Controller {
       this._notifyDirty()
       this.close()
     } catch (_) {
-      this.lottieErrorTarget.textContent = t("js.editor.lottie_failed", { default: "That link doesn't look like a LottieFiles animation." })
+      this.lottieErrorTarget.textContent = t("editor.lottie_failed", { default: "That link doesn't look like a LottieFiles animation." })
       this.lottieErrorTarget.hidden = false
     } finally {
       this.lottieBtnTarget.disabled = false

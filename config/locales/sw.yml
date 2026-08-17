@@ -363,6 +363,10 @@ sw:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"
       lottie_failed: "Kiungo hicho hakionekani kama uhuishaji wa LottieFiles."
+      appeal_note_prompt: "Kuna kitu ungependa kumwambia mkaguzi? (si lazima)"
+      appeal_submitting: "Inatuma kwa ukaguzi…"
+      appeal_submitted: "Imetumwa kwa ukaguzi — tutakujulisha mara ikaguliwapo."
+      appeal_failed: "Imeshindwa kutuma kwa ukaguzi — tafadhali jaribu tena."
       emoji_none: "Hakuna emoji inayolingana."
       rich_bold: "Nzito"
       rich_italic: "Mlazo"

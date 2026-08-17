@@ -379,6 +379,10 @@ en:
       delete_card_confirm: "Delete this card?"
       save_to_library: "Also save to my brand library"
       lottie_failed: "That link doesn't look like a LottieFiles animation."
+      appeal_note_prompt: "Anything you'd like to tell the reviewer? (optional)"
+      appeal_submitting: "Submitting for review…"
+      appeal_submitted: "Submitted for review — we'll let you know once it's checked."
+      appeal_failed: "Couldn't submit that for review — please try again."
       emoji_none: "No emoji match that."
       rich_bold: "Bold"
       rich_italic: "Italic"
@@ -1022,6 +1026,8 @@ en:
     crop_hint: "Drag to reposition, use the slider to zoom"
     crop_skip: "Skip"
     crop_apply: "Use this crop"
+    request_review: "Request review"
+    approved_by_review: "Approved by review"
     required_chip: 'Required'
     ty_title_label: 'Thank-you title'
     ty_body_label: 'Thank-you message'

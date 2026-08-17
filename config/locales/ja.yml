@@ -363,6 +363,10 @@ ja:
       delete_card_confirm: このカードを削除しますか？
       save_to_library: "ブランドライブラリにも保存"
       lottie_failed: "このリンクはLottieFilesのアニメーションではないようです。"
+      appeal_note_prompt: "レビュー担当者に伝えたいことはありますか?(任意)"
+      appeal_submitting: "レビューに送信しています…"
+      appeal_submitted: "レビューに送信しました — 確認が済み次第お知らせします。"
+      appeal_failed: "レビューへの送信に失敗しました — もう一度お試しください。"
       emoji_none: "一致する絵文字がありません。"
       rich_bold: "太字"
       rich_italic: "斜体"

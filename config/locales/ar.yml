@@ -363,6 +363,10 @@ ar:
       delete_card_confirm: حذف هذه البطاقة؟
       save_to_library: "حفظ أيضًا في مكتبة العلامة التجارية"
       lottie_failed: "لا يبدو أن هذا الرابط رسوم متحركة من LottieFiles."
+      appeal_note_prompt: "هل تريد إخبار المراجع بأي شيء؟ (اختياري)"
+      appeal_submitting: "جارٍ الإرسال للمراجعة…"
+      appeal_submitted: "تم الإرسال للمراجعة — سنُعلمك بمجرد التحقق منها."
+      appeal_failed: "تعذّر إرسال ذلك للمراجعة — يرجى المحاولة مرة أخرى."
       emoji_none: "لا توجد رموز مطابقة."
       rich_bold: "غامق"
       rich_italic: "مائل"

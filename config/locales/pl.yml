@@ -363,6 +363,10 @@ pl:
       delete_card_confirm: Usunąć tę kartę?
       save_to_library: "Zapisz też w mojej bibliotece marki"
       lottie_failed: "Ten link nie wygląda na animację LottieFiles."
+      appeal_note_prompt: "Chcesz coś przekazać osobie weryfikującej? (opcjonalnie)"
+      appeal_submitting: "Wysyłanie do weryfikacji…"
+      appeal_submitted: "Wysłano do weryfikacji — powiadomimy Cię, gdy zostanie sprawdzone."
+      appeal_failed: "Nie udało się wysłać do weryfikacji — spróbuj ponownie."
       emoji_none: "Brak pasujących emoji."
       rich_bold: "Pogrubienie"
       rich_italic: "Kursywa"

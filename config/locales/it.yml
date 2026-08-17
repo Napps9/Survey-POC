@@ -363,6 +363,10 @@ it:
       delete_card_confirm: Eliminare questa carta?
       save_to_library: "Salva anche nella mia libreria del brand"
       lottie_failed: "Quel link non sembra un'animazione LottieFiles."
+      appeal_note_prompt: "Vuoi dire qualcosa al revisore? (facoltativo)"
+      appeal_submitting: "Invio per la revisione…"
+      appeal_submitted: "Inviato per la revisione — ti avviseremo appena sarà verificato."
+      appeal_failed: "Impossibile inviare per la revisione — riprova."
       emoji_none: "Nessuna emoji corrispondente."
       rich_bold: "Grassetto"
       rich_italic: "Corsivo"

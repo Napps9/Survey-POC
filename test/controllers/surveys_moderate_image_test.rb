@@ -36,7 +36,7 @@ class SurveysModerateImageTest < ActionDispatch::IntegrationTest
     assert_equal true, JSON.parse(response.body)["ok"]
   end
 
-  test "blocks an unsafe upload with the reason" do
+  test "blocks an unsafe upload with the reason, and marks it appealable" do
     stub_method(ImageModerator, :configured?, true) do
       stub_method(ImageModerator, :new, returns_moderator(safe: false, reason: "shows alcohol")) do
         post moderate_image_survey_path(@survey), params: { image: PNG }, as: :json
@@ -45,9 +45,10 @@ class SurveysModerateImageTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal false, body["ok"]
     assert_equal "shows alcohol", body["reason"]
+    assert_equal true, body["appealable"]
   end
 
-  test "shows an honest couldn't-verify message for an ambiguous verdict, not the not-PG copy" do
+  test "shows an honest couldn't-verify message for an ambiguous verdict, not the not-PG copy — also appealable" do
     stub_method(ImageModerator, :configured?, true) do
       stub_method(ImageModerator, :new, returns_moderator(safe: false, ambiguous: true)) do
         post moderate_image_survey_path(@survey), params: { image: PNG }, as: :json
@@ -57,6 +58,7 @@ class SurveysModerateImageTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal false, body["ok"]
     assert_equal I18n.t("flash.surveys.image_unverified"), body["reason"]
+    assert_equal true, body["appealable"]
   end
 
   test "allows through when moderation is unconfigured" do
