@@ -2003,17 +2003,24 @@ export default class extends Controller {
   // moves before the motion guards below, since a respondent on reduced motion
   // or in forms mode still needs the focus to follow the deck.
   _animateCardEntry(card, idx) {
-    const first   = this._enteredIdx === undefined
-    const changed = this._enteredIdx !== idx
+    const first    = this._enteredIdx === undefined
+    const changed  = this._enteredIdx !== idx
+    const prevIdx  = this._enteredIdx
     this._enteredIdx = idx
     if (changed && !first) this._focusCard(card)
     if (!card || !changed) return
     if (this.formsValue) return           // form mode strips game-like motion
     if (this._reducedMotion) return
 
-    card.classList.remove("is-entering", "is-entering-back")
+    card.classList.remove("is-entering", "is-entering-back", "is-entering--from-book")
     void card.offsetWidth                 // reflow, so a re-entry restarts it
-    const cls = this._navBack ? "is-entering-back" : "is-entering"
+    // Leaving a scenario's answer page turns its book at 0.52s; the deck's
+    // ordinary 0.26s entry for the NEXT card then read as an abrupt cut right
+    // after that more leisurely turn. Only the forward step off a scenario
+    // gets the slower pacing — an ordinary Next stays snappy.
+    const fromBook = !this._navBack && !first &&
+      this.cardTargets[prevIdx]?.dataset.cardType === "scenario"
+    const cls = this._navBack ? "is-entering-back" : fromBook ? "is-entering--from-book" : "is-entering"
     card.classList.add(cls)
     card.addEventListener("animationend", () => card.classList.remove(cls), { once: true })
   }

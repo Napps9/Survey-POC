@@ -327,17 +327,29 @@ presets, a real `maxlength`, and — new — server-side enforcement in
 `PlayerController#progress`/`#submit`, which today write straight into the JSON
 column untruncated. Applies to the "Other" box too (`:828-834`).
 
-**Scenario page-turn visibility (S).** Root cause found: the outgoing page fades
-on a **0.38 s** opacity transition while its rotation runs **0.5 s**
-(`application.css:1750`), so it is fully invisible before the turn finishes —
-you only ever see the first ~75 % of the arc, already fading. The incoming page
-meanwhile barely moves (`translateY(7px) scale(0.96)` → `0/1`). Fix: delay and
-lengthen the opacity so the rotation stays legible, soften the outgoing
-`rotateY(-122deg)`, and give the incoming page more travel
-(`scenario_controller.js:128-153`). Also note the **deck** advance has no
-animation at all (`.preview-card` toggles `display`, `application.css:3713-3714`),
-so the last tap of a scenario card jumps instantly — that inconsistency is
-plausibly part of what users are describing. Bump `CACHE_VERSION`.
+**Scenario page-turn visibility (S). SHIPPED.** Root cause found: the outgoing
+page faded on a **0.38 s** opacity transition while its rotation ran **0.5 s**,
+so it was fully invisible before the turn finished — you only ever saw the
+first ~75 % of the arc, already fading. Fixed: the outgoing page's fade now
+waits, then finishes with the rotation (`.book-page.is-turning`,
+`application.css:2644-2646`, 0.52 s transform / 0.3 s opacity delayed 0.22 s),
+the outgoing rotation was softened to `rotateY(-104deg)`, and the incoming page
+was given more travel (`scenario_controller.js#layout`). The **deck** advance
+also gained the animation it was missing (`.preview-card.is-entering`,
+`application.css:5112-5121`), closing the instant jump on the last tap of a
+scenario card and on every ordinary Next.
+One residual inconsistency remained after that: the step **off** a scenario's
+answer page still handed the next card the same snappy 0.26 s entry as any
+other Next, right after the book's slower 0.52 s turn — a pace change,
+mid-gesture. Fixed by giving that one transition its own slower entry
+(`.preview-card.is-entering--from-book`, `application.css:5122-5125`,
+`player_controller.js#_animateCardEntry`), applied only when the departed card
+was a scenario. Covered by
+`test/system/scenario_player_aria_test.rb`.
+No `CACHE_VERSION` bump was needed for any of this — `/play` is served
+network-first with an offline cache fallback (see `CLAUDE.md`), so player
+content/CSS/JS changes reach respondents on their next ordinary online visit.
+A bump is only required when the service worker's *own* behaviour changes.
 
 ---
 

@@ -86,4 +86,58 @@ class ScenarioPlayerAriaTest < ApplicationSystemTestCase
     JS
     assert landed, "on the open answer page the same radio must accept focus"
   end
+
+  # The book's own last page turn takes 0.52s (.book-page.is-turning); the
+  # deck's ordinary card-entry animation is 0.26s. Stepping off a scenario's
+  # answer page onto the next card used to cut straight from one pace to the
+  # other. player_controller#_animateCardEntry now hands that one transition
+  # a slower "from-book" entry instead — this pins it in a real browser,
+  # where the class is transient and removed on animationend.
+  test "leaving a scenario paces the next card off the book's own turn" do
+    org = Organisation.create!(name: "O2", slug: "aria2-#{SecureRandom.hex(3)}")
+    survey = org.surveys.create!(
+      title: "BookThenQuestion", theme: "Th", audience_age: "adults", key_insight: "k",
+      default_locale: "en", locales: [ "en" ],
+      cards: CARDS + [ { "type" => "yes_no", "cid" => "q2", "text" => "Was that hard?" } ]
+    )
+    survey.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
+
+    visit "/play/#{survey.publish_token}"
+    dismiss_cookie_banner
+    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    click_button "Next" # past the welcome card, into the scenario
+    assert_selector ".preview-card.active .book-page", count: 3, wait: 5
+
+    find('.preview-card.active .book-chevron[aria-label="Next page"]').click # page 2
+    find('.preview-card.active .book-chevron[aria-label="Next page"]').click # answer page
+    find('.preview-card.active .book-page.is-answer li[role="radio"]', match: :first).click
+    click_button "Next" # off the scenario, onto the yes/no card
+
+    assert_selector ".preview-card.active.is-entering--from-book", wait: 1,
+      text: "Was that hard?"
+  end
+
+  test "an ordinary Next keeps the snappy entry, not the from-book pacing" do
+    org = Organisation.create!(name: "O3", slug: "aria3-#{SecureRandom.hex(3)}")
+    survey = org.surveys.create!(
+      title: "TwoQuestions", theme: "Th", audience_age: "adults", key_insight: "k",
+      default_locale: "en", locales: [ "en" ],
+      cards: [
+        { "type" => "welcome_card", "title" => "Welcome" },
+        { "type" => "yes_no", "cid" => "q1", "text" => "Ready?" },
+        { "type" => "yes_no", "cid" => "q2", "text" => "Still ready?" }
+      ]
+    )
+    survey.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
+
+    visit "/play/#{survey.publish_token}"
+    dismiss_cookie_banner
+    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    click_button "Next" # welcome -> q1
+    find(".preview-card.active li[role='radio']", match: :first).click
+    click_button "Next" # q1 -> q2, an ordinary step
+
+    assert_selector ".preview-card.active.is-entering", wait: 1, text: "Still ready?"
+    assert_no_selector ".preview-card.active.is-entering--from-book"
+  end
 end

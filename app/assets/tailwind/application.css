@@ -5119,14 +5119,21 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .preview-card.is-entering      { animation: player-card-in      0.26s cubic-bezier(.4, 0, .2, 1) both; }
 .preview-card.is-entering-back { animation: player-card-in-back 0.26s cubic-bezier(.4, 0, .2, 1) both; }
+/* The one step off a scenario's answer page (player_controller#_animateCardEntry):
+   the book's own last turn takes 0.52s, so the deck's usual 0.26s entry for the
+   card after it read as a cut rather than a continuation. Same slide, same
+   direction, just paced closer to the turn it follows. */
+.preview-card.is-entering--from-book { animation: player-card-in 0.4s cubic-bezier(.4, 0, .2, 1) both; }
 /* Form mode strips the game-like motion, and reduced-motion means it. Both are
    belt-and-braces — player_controller skips adding the class in either case —
    but a stylesheet shouldn't rely on that. */
 .forms-mode .preview-card.is-entering,
-.forms-mode .preview-card.is-entering-back { animation: none; }
+.forms-mode .preview-card.is-entering-back,
+.forms-mode .preview-card.is-entering--from-book { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .preview-card.is-entering,
-  .preview-card.is-entering-back { animation: none; }
+  .preview-card.is-entering-back,
+  .preview-card.is-entering--from-book { animation: none; }
 }
 
 /* Create-wizard cards grow with their content (the auto-growing name/theme/
