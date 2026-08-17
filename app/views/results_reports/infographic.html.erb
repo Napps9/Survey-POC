@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title><%= (survey.title.presence || survey.theme.presence || "Verto") %> — Share card</title>
+  <style>
+    /* No flexbox anywhere in this file — deliberately, like every other
+       wkhtmltopdf template in this app (_figures.html.erb uses
+       display:table/table-cell for the same reason). Confirmed the hard way:
+       a flex .card with a margin-top:auto footer rendered correctly on
+       screen but still pushed wkhtmltopdf onto a phantom, near-blank second
+       PDF page with real (longer) demo content — its bundled WebKit is an
+       old Qt build whose flex/page-break interaction can't be trusted.
+       Table layout for the stat row and bars, position:absolute for the
+       footer; both are what the proven report template already uses.
+
+       .card fills the page via 100vw/100vh, NOT a fixed mm size matching
+       render_infographic_pdf's page_width/page_height "148mm" — tried that
+       first too and it left a visible band of the PDF's default white page
+       background below the card, because wkhtmltopdf sizes the page itself
+       and lays out CSS mm units at a DIFFERENT internal DPI. A page-relative
+       unit sidesteps that mismatch by definition. Internal spacing stays in
+       mm/pt — only the outer box has to match the page exactly.
+       overflow:hidden on that one box is the single-page guarantee: a
+       truncated card beats a two-page one. */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body { font-family: "Helvetica Neue", Arial, sans-serif; }
+    .card {
+      position: relative; width: 100vw; height: 100vh; overflow: hidden;
+      background: #1C2034; color: #fff; padding: 9mm 10mm;
+    }
+
+    .brand { margin-bottom: 6mm; }
+    .brand-dot { display: inline-block; width: 2.4mm; height: 2.4mm; border-radius: 50%;
+                 background: #01EACB; vertical-align: middle; margin-right: 2mm; }
+    .brand-word { font-size: 10pt; font-weight: 700; letter-spacing: 0.02em; vertical-align: middle; }
+    .brand-word .hi { color: #FF1E6F; }
+
+    .theme {
+      font-size: 17pt; font-weight: 700; line-height: 1.2; margin: 0 0 8mm;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .stats { display: table; width: 100%; margin-bottom: 7mm; }
+    .stat { display: table-cell; width: 33%; }
+    .stat-value { font-size: 20pt; font-weight: 700; color: #01EACB; line-height: 1.05; font-variant-numeric: tabular-nums; }
+    .stat-label { font-size: 7.5pt; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1mm; }
+
+    .divider { height: 1px; background: rgba(255,255,255,0.12); margin-bottom: 7mm; }
+
+    .q-block { margin-bottom: 6mm; }
+    .q-text {
+      font-size: 10pt; font-weight: 700; margin: 0 0 3mm;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .bar-row { display: table; width: 100%; margin-bottom: 2mm; }
+    .bar-label { display: table-cell; width: 30mm; vertical-align: middle; font-size: 8.5pt; color: rgba(255,255,255,0.7);
+                 overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 3mm; }
+    .bar-track-cell { display: table-cell; vertical-align: middle; }
+    .bar-track { height: 4mm; background: rgba(255,255,255,0.08); border-radius: 2mm; overflow: hidden; }
+    .bar-fill { height: 100%; background: #01EACB; border-radius: 2mm; }
+    .bar-pct { display: table-cell; width: 12mm; vertical-align: middle; text-align: right; font-size: 8.5pt;
+               color: rgba(255,255,255,0.55); font-variant-numeric: tabular-nums; padding-left: 2mm; }
+
+    .foot { position: absolute; left: 10mm; right: 10mm; bottom: 9mm; font-size: 7pt; color: rgba(255,255,255,0.3); }
+    .foot .foot-date { float: right; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span class="brand-word">play<span class="hi">verto</span></span>
+    </div>
+
+    <div class="theme"><%= (survey.theme.presence || survey.title.presence || "Verto").truncate(46) %></div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value"><%= number_with_delimiter(stats[:responders]) %></div>
+        <div class="stat-label">Responses</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value"><%= stats[:completion] %>%</div>
+        <div class="stat-label">Completion</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value"><%= stats[:questions] %></div>
+        <div class="stat-label">Questions</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <%# Two questions, three bars each — a deliberately small cut of
+        ReportChartRows.rows_for (the full report shows up to MAX_ROWS): a
+        share card is read in a few seconds, not studied. %>
+    <% headline = aggregated.select { |r| ReportChartRows.chartable?(r) }.first(2) %>
+    <% headline.each do |result| %>
+      <% rows = ReportChartRows.rows_for(result).first(3) %>
+      <% peak = [ rows.map(&:count).max, 1 ].max %>
+      <div class="q-block">
+        <div class="q-text"><%= (result[:card]["text"].presence || result[:card]["title"]).to_s.truncate(50) %></div>
+        <% rows.each do |row| %>
+          <div class="bar-row">
+            <div class="bar-label"><%= row.label.to_s.truncate(18) %></div>
+            <div class="bar-track-cell">
+              <div class="bar-track"><div class="bar-fill" style="width:<%= row.count.zero? ? 0 : [ (row.count * 100.0 / peak).round, 3 ].max %>%;"></div></div>
+            </div>
+            <div class="bar-pct"><%= row.pct %>%</div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="foot">
+      <span class="foot-date"><%= Date.current.strftime("%B %-d, %Y") %></span>
+      <span>playverto.com</span>
+    </div>
+  </div>
+</body>
+</html>

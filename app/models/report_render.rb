@@ -19,6 +19,14 @@ class ReportRender < ApplicationRecord
   STATUSES = %w[pending running succeeded failed].freeze
   validates :status, inclusion: { in: STATUSES }
 
+  # "report" is the full AI-written prose document; "infographic" is the
+  # compact, figures-only share card (RenderInfographicJob) — both render to
+  # PDF today, so this describes the document's PURPOSE, not its format.
+  KINDS = %w[report infographic].freeze
+  validates :kind, inclusion: { in: KINDS }
+
+  def infographic? = kind == "infographic"
+
   # True for a render requested anonymously off a shared-results link, never
   # by a signed-in creator. RenderReportPdfJob reads this to refuse the
   # regenerate-on-drift path (results_report_markdown) for such a render —

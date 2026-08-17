@@ -225,14 +225,25 @@ export default class extends Controller {
     if (this.hasDriveBtnTarget) this.driveBtnTarget.disabled = false
   }
 
-  // ── PDF download ───────────────────────────────────────────
-  // The render spawns a wkhtmltopdf process using 100-200MB transiently, so it
-  // happens in a job rather than on the request thread. Ask for one, watch it,
-  // then collect the file.
+  // ── Render downloads (PDF report, PDF share card) ─────────────────────────
+  // Both renders spawn a wkhtmltopdf process using 100-200MB transiently, so
+  // each happens in a job rather than on the request thread — ask for one,
+  // watch it, then collect the file. Same create endpoint, differing only in
+  // the `kind` sent (see ReportRendersController#create / ReportRender::KINDS).
   async downloadPdf(event) {
+    return this._requestRender(event, "report")
+  }
+
+  // The share card: a compact, figures-only single page — no AI step, so it
+  // never needs a report to already exist (see RenderInfographicJob).
+  async downloadInfographic(event) {
+    return this._requestRender(event, "infographic")
+  }
+
+  async _requestRender(event, kind) {
     event.preventDefault()
     const btn = event.currentTarget
-    const url = btn.dataset.reportExportPdfUrl
+    const url = btn.dataset.reportExportRenderUrl
     if (!url || btn.disabled) return
 
     const original = btn.textContent
@@ -243,12 +254,14 @@ export default class extends Controller {
       const csrf = document.querySelector('meta[name="csrf-token"]')?.content
       const res  = await fetch(url, {
         method: "POST",
-        headers: { "Accept": "application/json", ...(csrf ? { "X-CSRF-Token": csrf } : {}) }
+        headers: { "Accept": "application/json", "Content-Type": "application/json",
+                   ...(csrf ? { "X-CSRF-Token": csrf } : {}) },
+        body: JSON.stringify({ kind })
       })
       const data = await res.json()
       if (!data.ok) throw new Error(data.error || "Couldn't start the download")
 
-      const href = await this._awaitPdf(data.poll_url)
+      const href = await this._awaitRender(data.poll_url)
       // A plain navigation, so the browser handles it as a download and the
       // modal stays exactly as the creator left it.
       window.location = href
@@ -261,13 +274,13 @@ export default class extends Controller {
   }
 
   // Resolves to the download URL, or throws with a reason to show.
-  async _awaitPdf(pollUrl) {
+  async _awaitRender(pollUrl) {
     const deadline = Date.now() + 120000 // the render itself is seconds; this is a backstop
     while (Date.now() < deadline) {
       const res  = await fetch(pollUrl, { headers: { "Accept": "application/json" } })
       const data = await res.json()
       if (data.download_url) return data.download_url
-      if (data.status === "failed") throw new Error(data.error || "That PDF couldn't be built.")
+      if (data.status === "failed") throw new Error(data.error || "That file couldn't be built.")
       await new Promise(r => setTimeout(r, 1200))
     }
     throw new Error("That took longer than expected — please try again.")

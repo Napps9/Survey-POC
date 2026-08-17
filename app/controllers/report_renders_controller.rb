@@ -8,8 +8,9 @@ class ReportRendersController < ApplicationController
   # POST /surveys/:survey_id/results/report/renders
   def create
     survey = Current.organisation.surveys.find(params[:survey_id])
-    render_row = survey.report_renders.create!(user: Current.user)
-    RenderReportPdfJob.perform_later(render_row.id)
+    kind = ReportRender::KINDS.include?(params[:kind].to_s) ? params[:kind].to_s : "report"
+    render_row = survey.report_renders.create!(user: Current.user, kind: kind)
+    job_for(kind).perform_later(render_row.id)
 
     render json: { ok: true, id: render_row.id, poll_url: report_render_path(render_row) }
   rescue ActiveRecord::RecordNotFound
@@ -40,11 +41,15 @@ class ReportRendersController < ApplicationController
 
     send_data render_row.document.download,
               filename:    render_row.document.filename.to_s,
-              type:        "application/pdf",
+              type:        render_row.document.content_type,
               disposition: "attachment"
   end
 
   private
+
+  def job_for(kind)
+    kind == "infographic" ? RenderInfographicJob : RenderReportPdfJob
+  end
 
   # Scoped through the org's surveys, so a render id from another account is
   # simply not found — the same rule every other results path follows.

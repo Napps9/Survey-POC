@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -574,6 +574,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_190000) do
   create_table "report_renders", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "error_message"
+    t.string "kind", default: "report", null: false
     t.string "status", default: "pending", null: false
     t.integer "survey_id", null: false
     t.datetime "updated_at", null: false
@@ -581,6 +582,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_190000) do
     t.index ["status", "created_at"], name: "index_report_renders_on_status_and_created_at"
     t.index ["survey_id"], name: "index_report_renders_on_survey_id"
     t.index ["user_id"], name: "index_report_renders_on_user_id"
+    t.check_constraint "kind IN ('report', 'infographic')", name: "chk_report_renders_kind"
     t.check_constraint "status IN ('pending', 'running', 'succeeded', 'failed')", name: "chk_report_renders_status"
   end
 

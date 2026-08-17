@@ -139,4 +139,26 @@ module GeneratesResultsReport
       WickedPdf.new.pdf_from_string(html, **opts)
     end
   end
+
+  # The share card (RenderInfographicJob): a fixed square page rather than a
+  # flowing multi-page document, so it reads as one shareable image even
+  # though it's still a PDF under the hood.
+  #
+  # This was meant to be a PNG — imgkit + wkhtmltoimage-binary, the sibling of
+  # the wicked_pdf/wkhtmltopdf-binary pair above — but wkhtmltoimage-binary's
+  # newest release (0.12.5, older than wkhtmltopdf-binary's own 0.12.6.10 and
+  # not maintained further) bundles a binary that fails to start on a modern
+  # Linux base image: `libpng12.so.0: cannot open shared object file` —
+  # libpng12 was dropped from distro repositories years ago in favour of
+  # libpng16. Confirmed directly (IMGKit::CommandFailedError) rather than
+  # assumed; there's no newer gem release to try. Shipping the same template
+  # through the ALREADY-PROVEN wkhtmltopdf path — same lock, same binary
+  # that's rendering the full report right now — beats gambling a new,
+  # unmaintained native dependency onto the deploy image untested. A real PNG
+  # remains possible later via ruby-vips (once it's part of the deploy image
+  # the tests can run against) or a hosted rasterizer; see the roadmap.
+  def render_infographic_pdf(html)
+    render_report_pdf(html, page_width: "148mm", page_height: "148mm",
+                            margin: { top: 0, bottom: 0, left: 0, right: 0 })
+  end
 end

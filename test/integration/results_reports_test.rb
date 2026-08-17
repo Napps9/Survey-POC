@@ -86,8 +86,54 @@ class ResultsReportsTest < ActionDispatch::IntegrationTest
 
     get survey_results_path(@survey)
     assert_response :success
-    assert_select "[data-action='click->report-export#downloadPdf'][data-report-export-pdf-url=?]",
+    assert_select "[data-action='click->report-export#downloadPdf'][data-report-export-render-url=?]",
                   survey_report_renders_path(@survey)
+  end
+
+  test "the results page also offers the share-card button, wired to the same render endpoint" do
+    @survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    get survey_results_path(@survey)
+    assert_response :success
+    assert_select "[data-action='click->report-export#downloadInfographic'][data-report-export-render-url=?]",
+                  survey_report_renders_path(@survey)
+  end
+
+  # ── Share card (kind: "infographic") ────────────────────────────────────
+  # Pure figures, no AI step — see RenderInfographicJob's own comment. This is
+  # the load-bearing proof: a real PDF comes back with NO ResultsReportGenerator
+  # stub in scope, for a Verto that has never generated a report at all.
+  test "requesting a share card renders it in the background with no AI report needed, and serves a real PDF" do
+    assert_nil @survey.results_report
+    perform_enqueued_jobs { post survey_report_renders_path(@survey), params: { kind: "infographic" } }
+    assert_response :success
+    poll_url = JSON.parse(response.body)["poll_url"]
+
+    get poll_url
+    body = JSON.parse(response.body)
+    assert_equal "succeeded", body["status"]
+
+    get body["download_url"]
+    assert_response :success
+    assert_equal "application/pdf", response.media_type
+    assert_match(/attachment/, response.headers["Content-Disposition"])
+    assert_equal "%PDF", response.body[0, 4]
+    assert_equal "infographic", ReportRender.last.kind
+  end
+
+  test "an unrecognised kind falls back to the full report, not a 500" do
+    stub_method(ResultsReportGenerator, :call, MD) do
+      perform_enqueued_jobs { post survey_report_renders_path(@survey), params: { kind: "poster" } }
+    end
+    assert_response :success
+    assert_equal "report", ReportRender.last.kind
+  end
+
+  test "an absent kind defaults to the full report — existing PDF callers are unaffected" do
+    stub_method(ResultsReportGenerator, :call, MD) do
+      perform_enqueued_jobs { post survey_report_renders_path(@survey) }
+    end
+    assert_equal "report", ReportRender.last.kind
   end
 
   test "the download is not offered until the render has finished" do
