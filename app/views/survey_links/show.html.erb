@@ -3,9 +3,12 @@
     by the same frame after every change made inside it, so there is exactly one
     description of this screen.
 
-    Not the editor's Publish & share panel with a new hat: that one is where a
-    Verto goes live and gets configured. This is the sharing step on its own — the
-    address(es), who they're for, and what each audience is shown at the end. %>
+    Deliberately narrow (2026-08-17 simplification): sharing the main link,
+    creating/recalling custom links, and the two take-down moves — unpublish and
+    convert to Test Mode. What a respondent sees after they finish is the
+    editor's Publish & share panel's business, not this modal's; per-link
+    overrides of those settings are still honoured by the player for links that
+    carry them, they just aren't edited here. %>
 <%= turbo_frame_tag SurveyLinksController::FRAME_ID do %>
   <%
     # Two names, deliberately. The heading matches the dashboard card this modal
@@ -39,10 +42,9 @@
       <% if error.present? %>
         <div class="share-alert">
           <%= case error
-              when "taken"      then t("share_modal.error_taken")
-              when "slug_blank" then t("share_modal.error_slug_blank")
-              when "limit"      then t("share_modal.error_limit", count: SurveyLink::MAX_PER_SURVEY)
-              else                   t("share_modal.error_create")
+              when "taken" then t("share_modal.error_taken")
+              when "limit" then t("share_modal.error_limit", count: SurveyLink::MAX_PER_SURVEY)
+              else              t("share_modal.error_create")
               end %>
         </div>
       <% end %>
@@ -130,56 +132,9 @@
             <div class="share-hint"><%= t("share_modal.custom_url_hint") %></div>
           <% end %>
         </div>
-
-        <%# The three switches every respondent notices after Finish. These are
-            the Verto's own answers — an extra link below can disagree. %>
-        <div class="share-field">
-          <div class="share-label"><%= t("share_modal.after_finish") %></div>
-          <%= form_with url: survey_settings_path(@survey), method: :post, style: "margin:0;" do %>
-            <input type="hidden" name="return_to" value="share" />
-            <input type="hidden" name="show_results_comparison" value="0" />
-            <label class="share-check">
-              <input type="checkbox" name="show_results_comparison" value="1"
-                     <%= "checked" if @survey.show_results_comparison? %>
-                     onchange="this.form.requestSubmit()" />
-              <span><%= t("share_modal.setting_compare") %></span>
-            </label>
-          <% end %>
-          <% if @survey.show_results_comparison? %>
-            <%# Logical properties, not margin-left: this panel renders in ar/he too. %>
-            <%= form_with url: survey_settings_path(@survey), method: :post,
-                  style: "margin:0;margin-block-start:6px;margin-inline-start:24px;" do %>
-              <input type="hidden" name="return_to" value="share" />
-              <input type="text" name="compare_note" maxlength="160"
-                     value="<%= @survey.compare_note_text %>"
-                     onchange="this.form.requestSubmit()" class="share-input"
-                     aria-label="<%= t("share_modal.compare_note_label") %>" />
-            <% end %>
-          <% end %>
-          <%= form_with url: survey_settings_path(@survey), method: :post, style: "margin:8px 0 0;" do %>
-            <input type="hidden" name="return_to" value="share" />
-            <input type="hidden" name="share_enabled" value="0" />
-            <label class="share-check">
-              <input type="checkbox" name="share_enabled" value="1"
-                     <%= "checked" if @survey.share_enabled? %>
-                     onchange="this.form.requestSubmit()" />
-              <span><%= t("share_modal.setting_share") %></span>
-            </label>
-          <% end %>
-          <%= form_with url: survey_settings_path(@survey), method: :post, style: "margin:8px 0 0;" do %>
-            <input type="hidden" name="return_to" value="share" />
-            <input type="hidden" name="regions_enabled" value="0" />
-            <label class="share-check">
-              <input type="checkbox" name="regions_enabled" value="1"
-                     <%= "checked" if @survey.regions_enabled? %>
-                     onchange="this.form.requestSubmit()" />
-              <span><%= t("share_modal.setting_regions") %></span>
-            </label>
-          <% end %>
-        </div>
       </section>
 
-      <%# ── Extra share links ──────────────────────────────────────────────── %>
+      <%# ── Custom links ───────────────────────────────────────────────────── %>
       <section class="share-section">
         <div class="share-section__head">
           <span class="share-section__title"><%= t("share_modal.links_title") %></span>
@@ -198,6 +153,9 @@
                        class="share-link__name"
                        aria-label="<%= t("share_modal.link_name_label") %>" />
               <% end %>
+              <% unless link.active? %>
+                <span class="share-count share-count--recalled"><%= t("share_modal.recalled_badge") %></span>
+              <% end %>
               <span class="share-count"><%= t("share_modal.responders", count: (@link_responder_counts[link.id] || 0)) %></span>
             </div>
 
@@ -208,40 +166,15 @@
                       onclick="(navigator.clipboard?.writeText(document.getElementById('share-url-<%= link.id %>').value) ?? Promise.reject()).then(()=>{this.textContent='<%= j t("share_modal.copied") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2000)}).catch(()=>{this.textContent='<%= j t("share_modal.copy_failed") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2500)})"><%= t("share_modal.copy") %></button>
             </div>
 
-            <%= form_with url: survey_link_path(@survey, link), method: :patch, class: "share-slug-form" do %>
-              <span class="share-slug-prefix"><%= root_url %>play/</span>
-              <input type="text" name="slug" value="<%= link.slug %>"
-                     maxlength="<%= Survey::MAX_SLUG_LENGTH %>"
-                     onchange="this.form.requestSubmit()" class="share-input"
-                     aria-label="<%= t("share_modal.custom_url") %>" />
-            <% end %>
-
-            <div class="share-link__settings">
-              <% [
-                   [ :show_results_comparison, t("share_modal.compare_label"), link.show_results_comparison ],
-                   [ :share_enabled,           t("share_modal.share_label"),   link.share_enabled ],
-                   [ :regions_enabled,         t("share_modal.regions_label"), link.regions_enabled ]
-                 ].each do |field, label, value| %>
-                <%= form_with url: survey_link_path(@survey, link), method: :patch, class: "share-override" do %>
-                  <span class="share-override__label"><%= label %></span>
-                  <select name="<%= field %>" onchange="this.form.requestSubmit()" class="share-select">
-                    <option value=""  <%= "selected" if value.nil?   %>><%= t("share_modal.override_inherit") %></option>
-                    <option value="1" <%= "selected" if value == true  %>><%= t("share_modal.override_on") %></option>
-                    <option value="0" <%= "selected" if value == false %>><%= t("share_modal.override_off") %></option>
-                  </select>
-                <% end %>
-              <% end %>
-            </div>
-
             <div class="share-link__foot">
+              <%# Recall is the reversible take-back: the address stops resolving
+                  — reads and writes both — until restored. No confirm: undoing
+                  it is one click on the button this one becomes. %>
               <%= form_with url: survey_link_path(@survey, link), method: :patch, style: "margin:0;" do %>
-                <input type="hidden" name="active" value="0" />
-                <label class="share-check share-check--tight">
-                  <input type="checkbox" name="active" value="1"
-                         <%= "checked" if link.active? %>
-                         onchange="this.form.requestSubmit()" />
-                  <span><%= link.active? ? t("share_modal.active_label") : t("share_modal.paused_label") %></span>
-                </label>
+                <input type="hidden" name="active" value="<%= link.active? ? 0 : 1 %>" />
+                <button type="submit" class="share-link__action<%= " share-link__action--warn" if link.active? %>">
+                  <%= link.active? ? t("share_modal.recall_link") : t("share_modal.restore_link") %>
+                </button>
               <% end %>
               <div style="display:flex;align-items:center;gap:10px;">
                 <%= link_to t("share_modal.download_qr_short"), qr_survey_path(@survey, link_id: link.id),
@@ -272,16 +205,59 @@
                      maxlength="<%= Survey::MAX_SLUG_LENGTH %>"
                      aria-label="<%= t("share_modal.custom_url") %>" />
             </div>
-            <div class="share-override">
-              <span class="share-override__label"><%= t("share_modal.compare_label") %></span>
-              <select name="show_results_comparison" class="share-select">
-                <option value=""><%= t("share_modal.override_inherit") %></option>
-                <option value="1"><%= t("share_modal.override_on") %></option>
-                <option value="0"><%= t("share_modal.override_off") %></option>
-              </select>
-            </div>
             <button type="submit" class="share-btn share-btn--primary"><%= t("share_modal.add_link") %></button>
           <% end %>
+        <% end %>
+      </section>
+
+      <%# ── Test Mode & status ─────────────────────────────────────────────── %>
+      <section class="share-section">
+        <div class="share-section__head">
+          <span class="share-section__title"><%= t("share_modal.test_mode_title") %></span>
+        </div>
+        <div class="share-hint" style="margin-bottom:10px;"><%= t("share_modal.test_mode_hint") %></div>
+
+        <% if @survey.test_token.present? %>
+          <div class="share-url-row">
+            <input type="text" readonly id="share-url-test" value="<%= test_survey_url(@survey.test_token) %>"
+                   class="share-url share-url--test" />
+            <button type="button" class="share-btn"
+                    data-copy-label="<%= t("share_modal.copy") %>"
+                    onclick="(navigator.clipboard?.writeText(document.getElementById('share-url-test').value) ?? Promise.reject()).then(()=>{this.textContent='<%= j t("share_modal.copied") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2000)}).catch(()=>{this.textContent='<%= j t("share_modal.copy_failed") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2500)})"><%= t("share_modal.copy") %></button>
+          </div>
+          <%= button_to t("share_modal.test_link_off"), test_link_survey_path(@survey, return_to: "share"), method: :delete,
+                form: { style: "margin:8px 0 0;", data: { turbo_confirm: t("share_modal.test_link_off_confirm") } },
+                class: "share-btn", style: "width:100%;" %>
+        <% elsif live %>
+          <%# One step, two effects — the confirm text carries both: off /play,
+              test link on. Only offered while there is no test link yet;
+              afterwards the Status block below is the take-down control. %>
+          <%= button_to t("share_modal.convert_test_button"), test_mode_survey_path(@survey), method: :post,
+                form: { style: "margin:0;", data: { turbo_confirm: t("share_modal.convert_test_confirm") } },
+                class: "share-btn", style: "width:100%;" %>
+        <% else %>
+          <%= button_to t("share_modal.test_link_create"), test_link_survey_path(@survey, return_to: "share"), method: :post,
+                form: { style: "margin:0;" },
+                class: "share-btn", style: "width:100%;" %>
+        <% end %>
+
+        <% if live %>
+          <% has_responses = @survey.responses.exists? %>
+          <div class="share-field">
+            <div class="share-label"><%= t("share_modal.status_title") %></div>
+            <%# Same fork as the editor's Publish panel: with responses in, a
+                take-down closes the Verto (results kept, deck stays locked);
+                without any, it goes back to an editable draft. Either way the
+                publish token is kept, so publishing again restores the link. %>
+            <%= button_to (has_responses ? t("share_modal.unpublish_close") : t("share_modal.unpublish_draft")),
+                  unpublish_survey_path(@survey, return_to: "share"), method: :post,
+                  form: { style: "margin:0;", data: { turbo_confirm:
+                    has_responses ? t("share_modal.unpublish_confirm_close") : t("share_modal.unpublish_confirm_draft") } },
+                  class: "share-btn share-btn--warn", style: "width:100%;" %>
+            <div class="share-hint" style="margin-top:6px;">
+              <%= has_responses ? t("share_modal.unpublish_hint_close") : t("share_modal.unpublish_hint_draft") %>
+            </div>
+          </div>
         <% end %>
       </section>
 

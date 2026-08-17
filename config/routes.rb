@@ -92,6 +92,7 @@ Rails.application.routes.draw do
   post "surveys/:id/unpublish",       to: "surveys#unpublish", as: :unpublish_survey
   post   "surveys/:id/test_link",     to: "surveys#enable_test_link",  as: :test_link_survey
   delete "surveys/:id/test_link",     to: "surveys#disable_test_link"
+  post   "surveys/:id/test_mode",     to: "surveys#convert_to_test_mode", as: :test_mode_survey
   post "surveys/:id/duplicate",       to: "surveys#duplicate", as: :duplicate_survey
   # The Share modal, fetched into a Turbo Frame over the dashboard. A GET that
   # renders the panel; the nested link routes below mutate and redirect back to

@@ -1,10 +1,10 @@
 require "test_helper"
 
 # Share links: the dashboard's Share modal and the named /play/ addresses it
-# manages. The interesting half is the per-link override — the reason the
-# feature exists is that one audience should be able to see how everyone else
-# answered while another can't, so the tests below check BOTH the page and the
-# endpoint that would otherwise hand the aggregate over anyway.
+# manages. The per-link comparison override matters even though the modal no
+# longer edits it (2026-08-17 simplification): links created before then still
+# carry overrides, the player still honours them, so the tests below check BOTH
+# the page and the endpoint that would otherwise hand the aggregate over anyway.
 class ShareLinksTest < ActionDispatch::IntegrationTest
   CARDS = [
     { "type" => "welcome_card", "title" => "hi" },
@@ -313,6 +313,104 @@ class ShareLinksTest < ActionDispatch::IntegrationTest
 
     get play_survey_path("quiet-link")
     assert_not_includes response.body, player_regions_url("quiet-link")
+  end
+
+  # ── The simplified panel: recall, Test Mode, unpublish ────────────────────
+
+  test "the modal keeps sharing simple — no override selects or settings checkboxes" do
+    org = sign_in_org("simple")
+    survey = published_survey(org)
+    survey.survey_links.create!(name: "Newsletter", slug: "simple-check")
+
+    get share_survey_path(survey)
+    assert_response :success
+    assert_select "select", 0
+    assert_select "input[type=checkbox]", 0
+  end
+
+  test "an active link offers Recall, a recalled one offers Restore" do
+    org = sign_in_org("recall")
+    survey = published_survey(org)
+    link = survey.survey_links.create!(name: "Poster", slug: "recall-me")
+
+    get share_survey_path(survey)
+    assert_select "form[action=?] input[name=active][value='0']", survey_link_path(survey, link)
+
+    link.update!(active: false)
+    get share_survey_path(survey)
+    assert_select "form[action=?] input[name=active][value='1']", survey_link_path(survey, link)
+    assert_select ".share-link--paused", 1
+  end
+
+  test "a live Verto's modal offers Convert to Test Mode and Unpublish" do
+    org = sign_in_org("tm-offer")
+    survey = published_survey(org)
+
+    get share_survey_path(survey)
+    assert_select "form[action=?]", test_mode_survey_path(survey)
+    assert_select "form[action=?]", unpublish_survey_path(survey, return_to: "share")
+  end
+
+  test "converting to Test Mode takes the Verto off /play and mints a test link" do
+    org = sign_in_org("tm-convert")
+    survey = published_survey(org)
+
+    post test_mode_survey_path(survey)
+    assert_redirected_to share_survey_path(survey)
+
+    survey.reload
+    assert_not survey.published?
+    assert survey.test_token.present?
+
+    get play_survey_path(survey.publish_token)
+    assert_response :gone
+    get test_survey_path(survey.test_token)
+    assert_response :success
+  end
+
+  test "converting to Test Mode keeps an existing test link instead of rotating it" do
+    org = sign_in_org("tm-keep")
+    survey = published_survey(org, test_token: "already-testing")
+
+    post test_mode_survey_path(survey)
+    assert_equal "already-testing", survey.reload.test_token
+  end
+
+  test "a draft's modal offers Create test link rather than Convert" do
+    org = sign_in_org("tm-draft")
+    draft = org.surveys.create!(title: "D", theme: "T", audience_age: "all", key_insight: "x",
+                                default_locale: "en", locales: [ "en" ], cards: CARDS)
+
+    get share_survey_path(draft)
+    assert_select "form[action=?]", test_link_survey_path(draft, return_to: "share")
+    assert_select "form[action=?]", test_mode_survey_path(draft), 0
+    assert_select "form[action=?]", unpublish_survey_path(draft, return_to: "share"), 0
+  end
+
+  test "the modal shows the test link once Test Mode is on, and can turn it off" do
+    org = sign_in_org("tm-show")
+    survey = published_survey(org, test_token: "show-me-testing")
+
+    get share_survey_path(survey)
+    assert_select "input#share-url-test[value=?]", test_survey_url("show-me-testing")
+
+    delete test_link_survey_path(survey, return_to: "share")
+    assert_redirected_to share_survey_path(survey)
+    assert_nil survey.reload.test_token
+  end
+
+  test "unpublish posted from the modal comes back to the modal" do
+    org = sign_in_org("unpub")
+    survey = published_survey(org)
+
+    post unpublish_survey_path(survey, return_to: "share")
+    assert_redirected_to share_survey_path(survey)
+    assert_not survey.reload.published?
+
+    # Off the modal, the editor keeps its own redirect.
+    survey.update!(unpublished_at: nil)
+    post unpublish_survey_path(survey)
+    assert_redirected_to survey_path(survey)
   end
 
   # ── QR ────────────────────────────────────────────────────────────────────

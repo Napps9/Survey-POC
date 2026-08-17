@@ -83,7 +83,7 @@ class SurveysController < ApplicationController
   def settings_locked_message = t("flash.surveys.settings_locked")
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy ]
-  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :update_settings, :update_audience_country, :qr ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_audience_country, :qr ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
@@ -515,13 +515,17 @@ class SurveysController < ApplicationController
   # never be used as a route to editing a deck people have already answered.
   def unpublish
     unless @survey.published?
-      return redirect_to survey_path(@survey), alert: t("flash.surveys.not_live")
+      return redirect_to from_share_modal? ? share_survey_path(@survey) : survey_path(@survey),
+                         alert: t("flash.surveys.not_live")
     end
 
     @survey.update!(unpublished_at: Time.current)
     notice = @survey.closed? ? t("flash.surveys.closed") :
                                t("flash.surveys.unpublished")
-    redirect_to survey_path(@survey), notice: notice
+    # The Share modal posts this from a Turbo Frame; the redirect has to land
+    # back on the panel or the frame is left with nothing to swap in (same
+    # reason as update_settings' return_to).
+    redirect_to from_share_modal? ? share_survey_path(@survey) : survey_path(@survey), notice: notice
   end
 
   # POST /surveys/:id/test_link — mint (or regenerate) the Test Mode token.
@@ -532,13 +536,26 @@ class SurveysController < ApplicationController
   # try-before-verify.
   def enable_test_link
     @survey.update!(test_token: SecureRandom.urlsafe_base64(18))
-    redirect_to survey_path(@survey, panel: "publish")
+    redirect_to from_share_modal? ? share_survey_path(@survey) : survey_path(@survey, panel: "publish")
   end
 
   # DELETE /surveys/:id/test_link — turn the link off (404s immediately).
   def disable_test_link
     @survey.update!(test_token: nil)
-    redirect_to survey_path(@survey, panel: "publish")
+    redirect_to from_share_modal? ? share_survey_path(@survey) : survey_path(@survey, panel: "publish")
+  end
+
+  # POST /surveys/:id/test_mode — the Share modal's one-step take-down into
+  # Test Mode: off /play (when live) plus a test link that records nothing.
+  # An existing test_token is kept, not rotated — that URL may already be in
+  # testers' hands, and rotating it here would kill it as a side effect. The
+  # unpublish half carries the same consequences as #unpublish (closed vs
+  # back-to-draft), which the modal's confirm text spells out.
+  def convert_to_test_mode
+    attrs = { test_token: @survey.test_token || SecureRandom.urlsafe_base64(18) }
+    attrs[:unpublished_at] = Time.current if @survey.published?
+    @survey.update!(attrs)
+    redirect_to share_survey_path(@survey)
   end
 
   # POST /surveys/:id/card_image
@@ -1234,6 +1251,11 @@ class SurveysController < ApplicationController
       }
     end
   end
+
+  # True when a publish-lifecycle action was posted from the dashboard's Share
+  # modal (its forms send return_to=share), so the redirect must re-render the
+  # modal's Turbo Frame rather than the editor.
+  def from_share_modal? = params[:return_to].to_s == "share"
 
   def set_survey
     @survey = Current.organisation.surveys.kept.without_report_text.find(params[:id])
