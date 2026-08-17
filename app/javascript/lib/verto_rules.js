@@ -155,7 +155,15 @@ const TYPE_LABEL = {
 }
 
 const isQuestion = (c) => isQuestionType(c && c.type ? c.type : "")
-export const typeLabel = (ty) => TYPE_LABEL[ty] || (ty || "").replace(/_/g, " ")
+// Tries card.type_label.<ty> first (t() returns the raw key on a miss, per
+// lib/i18n.js) — TYPE_LABEL is the load-bearing English fallback, not dead
+// code: it's what every locale without a translation for this key still
+// falls back to, same contract as every other t()-with-fallback call site.
+export const typeLabel = (ty) => {
+  const key = `card.type_label.${ty}`
+  const translated = t(key)
+  return translated !== key ? translated : (TYPE_LABEL[ty] || (ty || "").replace(/_/g, " "))
+}
 const cleanOptions = (c) => (Array.isArray(c.options) ? c.options : [])
   .map((o) => (o || "").toString().trim()).filter(Boolean)
 const cleanPages = (c) => (Array.isArray(c.pages) ? c.pages : [])

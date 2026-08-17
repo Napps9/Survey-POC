@@ -291,6 +291,23 @@ class JsConstantParityTest < ActiveSupport::TestCase
   # the first version listed two paths by hand and missed lib/verto_rules.js,
   # which still had the literal. A ban that only covers the files you already
   # edited bans nothing.
+  # TYPE_LABEL is the load-bearing English fallback typeLabel() (Rules of the
+  # Game variety feedback) falls back to when card.type_label.<ty> has no
+  # translation for the current locale — including English itself, since
+  # en.yml carries the same key/value pairs rather than relying on the miss
+  # path (see card.eyebrow's identical precedent). A drifted copy would
+  # silently change what an English creator sees the moment ANY locale's
+  # translation exists, because the two are meant to read identically.
+  test "en.yml's card.type_label matches lib/verto_rules.js's TYPE_LABEL" do
+    source = js("lib/verto_rules.js")
+    body   = source[/const TYPE_LABEL = \{(.*?)\n\}/m, 1]
+    assert body, "lib/verto_rules.js no longer defines TYPE_LABEL in the expected shape"
+    js_map = body.scan(/(\w+):\s*"([^"]+)"/).to_h
+
+    assert js_map.size >= 10, "expected TYPE_LABEL to be substantial, parsed #{js_map.size} entries"
+    assert_equal js_map, I18n.t("card.type_label", locale: :en).transform_keys(&:to_s)
+  end
+
   test "no editor JS gates paged behaviour on the literal type name" do
     offenders = Dir[Rails.root.join("app/javascript/**/*.js")].filter_map do |path|
       rel = path.sub("#{Rails.root}/app/javascript/", "")

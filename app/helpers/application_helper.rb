@@ -237,7 +237,7 @@ module ApplicationHelper
   def card_type_meta(type)
     m = CardTypes.meta(type)
     return { badge: type.to_s.tr("_", " ").upcase, badge_css: "sb-range", q_label: "" } if m.empty?
-    { badge: m["badge"], badge_css: m["badge_css"], q_label: m["panel_label"] }
+    { badge: CardTypes.badge(type), badge_css: m["badge_css"], q_label: CardTypes.panel_label(type) }
   end
 
   # Per-type "how to answer" caption (card_component's `eyebrow`), translated

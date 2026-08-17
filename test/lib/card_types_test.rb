@@ -47,4 +47,47 @@ class CardTypesTest < ActiveSupport::TestCase
     assert CardTypes.pickable_for(tokenised).any? { |key, _attrs| key == "token_checkpoint" }
     refute CardTypes.pickable_for(nil).any? { |key, _attrs| key == "token_checkpoint" }
   end
+
+  # ── badge/panel_label: i18n-aware, YAML-value default (2.7) ────────────────
+
+  test "badge/panel_label pick up the given locale, falling back to the YAML default" do
+    assert_equal "RANGE", CardTypes.badge("range", locale: :en)
+    assert_equal "ÉCHELLE", CardTypes.badge("range", locale: :fr)
+    assert_equal "DRAG THE SLIDER", CardTypes.panel_label("range", locale: :en)
+    assert_equal "FAITES GLISSER LE CURSEUR", CardTypes.panel_label("range", locale: :fr)
+  end
+
+  test "badge/panel_label default to the ambient I18n.locale when none is given" do
+    I18n.with_locale(:fr) do
+      assert_equal "ÉCHELLE", CardTypes.badge("range")
+      assert_equal "FAITES GLISSER LE CURSEUR", CardTypes.panel_label("range")
+    end
+  end
+
+  test "badge/panel_label degrade to blank for an unknown type, same as meta()" do
+    assert_equal "", CardTypes.badge("not_a_real_type")
+    assert_equal "", CardTypes.panel_label("not_a_real_type")
+  end
+
+  # Every type with a non-blank badge/panel_label in config/card_types.yml
+  # must have a matching en.yml entry that mirrors it exactly. Without this a
+  # new type (or a retext of an existing one) silently keeps working — the
+  # YAML default still renders — right up until a translation exists for any
+  # OTHER locale and this one alone is left showing stale/absent English.
+  test "en.yml's card.badge/panel_label mirror config/card_types.yml exactly" do
+    problems = []
+    CardTypes.all.each do |key, attrs|
+      if attrs["badge"].to_s.present?
+        en = I18n.t("card.badge.#{key}", locale: :en, default: nil)
+        problems << "card.badge.#{key} missing from en.yml" if en.nil?
+        problems << "card.badge.#{key} (#{en.inspect}) has drifted from card_types.yml (#{attrs['badge'].inspect})" if en && en != attrs["badge"]
+      end
+      if attrs["panel_label"].to_s.present?
+        en = I18n.t("card.panel_label.#{key}", locale: :en, default: nil)
+        problems << "card.panel_label.#{key} missing from en.yml" if en.nil?
+        problems << "card.panel_label.#{key} (#{en.inspect}) has drifted from card_types.yml (#{attrs['panel_label'].inspect})" if en && en != attrs["panel_label"]
+      end
+    end
+    assert_empty problems, problems.join("\n")
+  end
 end

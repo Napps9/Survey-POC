@@ -97,6 +97,60 @@ en:
       open_ended: "Type your answer"
       contact_form: "Share your details"
       scenario: "Read on, then choose"
+    # Dashboard chrome only (results screen, the editor's deleted-cards list,
+    # the "Rules of the Game" scoring feedback) — never rendered to a
+    # respondent, so these follow the CREATOR's own platform language
+    # (CardTypes.badge/panel_label default to I18n.locale), not any Verto's
+    # content locale the way eyebrow above does. Source values mirror
+    # config/card_types.yml's badge/panel_label fields and
+    # lib/verto_rules.js's TYPE_LABEL map exactly — both stay the English
+    # fallback a locale with no translation for a key still gets.
+    badge:
+      range: "RANGE"
+      rating: "RATING"
+      nps: "NPS"
+      multiple_choice: "PICK ONE"
+      select_many: "SELECT MANY"
+      prioritise: "PRIORITISE"
+      yes_no: "YES / NO"
+      select_one_grid: "IMAGE GRID"
+      select_many_grid: "IMAGE GRID"
+      tap_card: "SWIPE"
+      scenario: "SCENARIO"
+      open_ended: "OPEN TEXT"
+      contact_form: "CONTACT"
+      welcome_card: "WELCOME CARD"
+      token_checkpoint: "CHECKPOINT"
+      consent_gate: "CONSENT"
+    panel_label:
+      range: "DRAG THE SLIDER"
+      rating: "TAP TO RATE"
+      nps: "DRAG TO RATE"
+      multiple_choice: "CHOOSE ONE"
+      select_many: "CHOOSE ALL THAT APPLY"
+      prioritise: "DRAG INTO ORDER"
+      yes_no: "CHOOSE ONE"
+      select_one_grid: "CHOOSE ONE"
+      select_many_grid: "CHOOSE ALL THAT APPLY"
+      tap_card: "SWIPE TO RESPOND"
+      scenario: "READ ON, THEN CHOOSE"
+      open_ended: "TYPE YOUR ANSWER"
+      contact_form: "SHARE YOUR DETAILS"
+    type_label:
+      multiple_choice: "Pick one (list)"
+      select_many: "Select many (list)"
+      select_one_grid: "Pick one (grid)"
+      select_many_grid: "Select many (grid)"
+      tap_card: "Tap"
+      range: "Range"
+      rating: "Rating"
+      nps: "NPS"
+      yes_no: "Yes / No"
+      open_ended: "Freeform"
+      welcome_card: "Welcome"
+      token_checkpoint: "Points Checkpoint"
+      prioritise: "Prioritise"
+      scenario: "Scenario"
   ask_submission_mailer:
     confirmation_subject: "Your Verto data was submitted to Ask Verto"
     confirmation_heading: "Submitted for review"

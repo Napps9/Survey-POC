@@ -21,8 +21,23 @@ module CardTypes
     meta(type)["eyebrow"].to_s
   end
 
-  def badge(type)
-    meta(type)["badge"].to_s
+  # I18n-aware: tries card.badge.<type> in `locale` first, falling back to
+  # the YAML's own English value — same shape as _card_component's eyebrow
+  # lookup (t(..., default: CardTypes.eyebrow(type))). Defaults to the
+  # ambient I18n.locale, which is the CREATOR's own platform language for
+  # every call site today (all under switch_locale) — badge/panel_label are
+  # dashboard chrome (results, the editor's deleted-cards list), never
+  # rendered to a respondent, so they follow the viewer, not any Verto's
+  # content locale.
+  def badge(type, locale: I18n.locale)
+    I18n.t("card.badge.#{type}", locale: locale, default: meta(type)["badge"].to_s)
+  end
+
+  # Same shape as badge above, for the picker-style caption shown above a
+  # question in the results dashboard (application_helper#card_type_meta's
+  # q_label).
+  def panel_label(type, locale: I18n.locale)
+    I18n.t("card.panel_label.#{type}", locale: locale, default: meta(type)["panel_label"].to_s)
   end
 
   def badge_css(type)
