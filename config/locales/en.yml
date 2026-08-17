@@ -196,6 +196,7 @@ en:
     tokens_welcome_note: "You'll earn points as you answer each question — you can't go back and change an answer to earn more."
     leaderboard_teaser: "Top point collectors make the leaderboard at the end!"
     play_again: "Play again"
+    font_size: "Text size"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are

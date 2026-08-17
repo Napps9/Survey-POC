@@ -194,6 +194,7 @@ sw:
     tokens_welcome_note: "Utapata pointi kila unapojibu swali — huwezi kurudi nyuma na kubadilisha jibu ili kupata zaidi."
     leaderboard_teaser: "Wakusanyaji bora wa pointi huingia kwenye ubao wa wanaoongoza mwishoni!"
     play_again: "Cheza tena"
+    font_size: "Ukubwa wa maandishi"
   defaults:
     range: ["Sikubaliani kabisa", "Sikubaliani", "Sina upande", "Nakubaliana", "Nakubaliana kabisa"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

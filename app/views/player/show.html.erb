@@ -137,13 +137,15 @@
       publishing org's logo (when uploaded) sits at the top of the welcome
       card itself — see player/_play_card. %>
 
-  <%# Slim content-language switcher for multilingual Vertos, so respondents can
-      still change the content language. %>
-  <% if @survey.multilingual? %>
-    <div class="player-lang-bar">
+  <%# Slim top-utility bar: the content-language switcher (multilingual Vertos
+      only) alongside the text-size control (always — a reading preference,
+      not a per-Verto one). %>
+  <div class="player-lang-bar">
+    <% if @survey.multilingual? %>
       <%= render "player/content_lang_switcher" %>
-    </div>
-  <% end %>
+    <% end %>
+    <%= render "player/font_scale_control" %>
+  </div>
 
   <div class="preview-body">
     <%# Consent gate as the first card in the deck (reuses the creator's consent

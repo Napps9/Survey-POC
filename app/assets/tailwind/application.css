@@ -8000,9 +8000,53 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .player-lang-bar {
   flex-shrink: 0;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 8px;
   padding: 8px 14px 0;
 }
+
+.font-scale-pill {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 4px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(20,23,38,0.5);
+  backdrop-filter: blur(8px);
+}
+.font-scale-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 0; background: transparent;
+  color: rgba(255,255,255,0.6);
+  font-family: "ABeeZee", sans-serif; line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.font-scale-btn:hover { color: #fff; }
+.font-scale-btn.is-active { background: rgba(1,234,203,0.18); color: #01EACB; }
+
+/* ── Text-size tiers for the reading surfaces only (never the footer CTAs or
+   chrome labels) — player_controller.js#_applyFontScale sets data-font-scale
+   on .preview-overlay. Deliberately qualified as
+   ".preview-overlay[data-font-scale=…] SELECTOR" rather than just
+   "[data-font-scale=…] SELECTOR": that extra class of specificity (0,3,0)
+   beats every existing pin on these same selectors — the .phone-bottom
+   compact tier (0,2,0), and the ones inside the narrow-viewport @media
+   blocks (0,1,0–0,2,0) — regardless of source order, so this one block
+   covers every breakpoint without having to be duplicated inside each of
+   them or kept below all of them in the file. ── */
+.preview-overlay[data-font-scale="large"] .q-title           { font-size: 25px; }
+.preview-overlay[data-font-scale="larger"] .q-title          { font-size: 28px; }
+.preview-overlay[data-font-scale="large"] .pick-text         { font-size: 17px; }
+.preview-overlay[data-font-scale="larger"] .pick-text        { font-size: 19px; }
+.preview-overlay[data-font-scale="large"] .book-page-text    { font-size: 18px; }
+.preview-overlay[data-font-scale="larger"] .book-page-text   { font-size: 21px; }
+.preview-overlay[data-font-scale="large"] .play-consent-body { font-size: 16px; }
+.preview-overlay[data-font-scale="larger"] .play-consent-body{ font-size: 18px; }
+.preview-overlay[data-font-scale="large"] .freeform-textarea { font-size: 17px; }
+.preview-overlay[data-font-scale="larger"] .freeform-textarea{ font-size: 19px; }
+.preview-overlay[data-font-scale="large"] .contact-field     { font-size: 16px; }
+.preview-overlay[data-font-scale="larger"] .contact-field    { font-size: 18px; }
 
 /* Floating Close for the editor's inline Preview overlay (no nav bar). */
 .preview-close-float {

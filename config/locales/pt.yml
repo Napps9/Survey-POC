@@ -194,6 +194,7 @@ pt:
     tokens_welcome_note: "Vai ganhar pontos a cada pergunta respondida — não pode voltar atrás e mudar uma resposta para ganhar mais."
     leaderboard_teaser: "Quem junta mais pontos entra no placar no final!"
     play_again: "Jogar de novo"
+    font_size: "Tamanho do texto"
   defaults:
     range: ["Discordo totalmente", "Discordo", "Neutro", "Concordo", "Concordo totalmente"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

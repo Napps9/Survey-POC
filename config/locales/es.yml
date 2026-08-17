@@ -194,6 +194,7 @@ es:
     tokens_welcome_note: "Ganarás puntos al responder cada pregunta — no puedes volver atrás y cambiar una respuesta para ganar más."
     leaderboard_teaser: "¡Quienes más puntos reúnen entran en la tabla de clasificación al final!"
     play_again: "Jugar otra vez"
+    font_size: "Tamaño del texto"
   defaults:
     range: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

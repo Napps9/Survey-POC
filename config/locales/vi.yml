@@ -194,6 +194,7 @@ vi:
     tokens_welcome_note: "Bạn sẽ nhận điểm khi trả lời mỗi câu hỏi — bạn không thể quay lại và đổi câu trả lời để nhận thêm điểm."
     leaderboard_teaser: "Người gom nhiều điểm nhất sẽ vào bảng xếp hạng ở cuối!"
     play_again: "Chơi lại"
+    font_size: "Cỡ chữ"
   defaults:
     range: ["Hoàn toàn không đồng ý", "Không đồng ý", "Trung lập", "Đồng ý", "Hoàn toàn đồng ý"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

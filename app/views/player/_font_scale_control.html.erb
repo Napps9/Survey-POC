@@ -1,0 +1,16 @@
+<%# Respondent-local text-size control: three steps (default/large/larger),
+    remembered across every Verto this browser plays — see
+    player_controller.js#setFontScale/_applyFontScale. Unlike the content
+    language switcher this isn't about the Verto itself, so it's always
+    shown, not gated behind @survey.multilingual?. %>
+<div class="font-scale-pill" role="group" aria-label="<%= t("player.font_size") %>">
+  <% [ [ "default", "14px" ], [ "large", "17px" ], [ "larger", "20px" ] ].each do |scale, size| %>
+    <button type="button" class="font-scale-btn<%= " is-active" if scale == "default" %>"
+            style="font-size:<%= size %>;"
+            data-player-target="fontScaleBtn"
+            data-action="click->player#setFontScale"
+            data-player-font-scale-param="<%= scale %>"
+            data-scale="<%= scale %>"
+            aria-pressed="<%= scale == "default" %>">A</button>
+  <% end %>
+</div>

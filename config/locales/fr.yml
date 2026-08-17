@@ -194,6 +194,7 @@ fr:
     tokens_welcome_note: "Vous gagnerez des points à chaque question — vous ne pouvez pas revenir en arrière et modifier une réponse pour en gagner plus."
     leaderboard_teaser: "Les meilleurs collectionneurs de points entrent au classement à la fin !"
     play_again: "Rejouer"
+    font_size: "Taille du texte"
   defaults:
     range: ["Pas du tout d'accord", "Pas d'accord", "Neutre", "D'accord", "Tout à fait d'accord"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

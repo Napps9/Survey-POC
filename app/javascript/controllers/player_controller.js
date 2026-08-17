@@ -19,6 +19,12 @@ const CONSENT_TYPES = [ "consent_card", "consent_gate" ]
 // respondent-code gate.
 const SELF_DRIVING_TYPES = [ ...CONSENT_TYPES, "respondent_code_card" ]
 
+// Respondent-local text-size preference (the "Aa" pill) — a person's own
+// reading accessibility need, not a per-Verto setting, so it's one fixed key
+// rather than scoped by survey/submit URL like verto_played_* above.
+const FONT_SCALE_KEY    = "verto_font_scale"
+const FONT_SCALE_STEPS  = [ "default", "large", "larger" ]
+
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "thankyouTitle", "thankyouSub", "forwardBtn", "compareBtn", "comparePanel",
@@ -29,7 +35,7 @@ export default class extends Controller {
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
                     "consentMain", "consentDeclined", "respondentCode",
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
-                    "tokenScoreChip", "tokenScore", "leaderboard"]
+                    "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
@@ -154,6 +160,9 @@ export default class extends Controller {
       this._showAlreadyPlayed()
       return
     }
+    // Before the first render, so the very first card already paints at the
+    // remembered size instead of flashing default-size and then jumping.
+    this._applyFontScale(this._loadFontScale())
     this._update()
     if (this.quizValue) this._initQuiz()
     if (this.tokenisationValue) this._initTokens()
@@ -385,6 +394,46 @@ export default class extends Controller {
     // bar itself, so the observer would never hear about them.
     this._footerObserver = new ResizeObserver(() => { this._fitFooter(); this._fitCard() })
     this._footerObserver.observe(footer)
+  }
+
+  // ── Text size ("Aa" pill) ──────────────────────────────────────────────
+  // A respondent accessibility preference, not a creator setting: three
+  // steps, remembered across every Verto this browser plays. data-font-scale
+  // on the overlay drives CSS tiers on the reading surfaces only (the
+  // question title, option labels, book pages, consent copy, free-text and
+  // contact inputs) — footer buttons and chrome are deliberately untouched.
+  _loadFontScale() {
+    try {
+      const v = localStorage.getItem(FONT_SCALE_KEY)
+      return FONT_SCALE_STEPS.includes(v) ? v : "default"
+    } catch (_e) {
+      return "default"
+    }
+  }
+
+  // Bound via data-action="click->player#setFontScale" with a
+  // data-player-font-scale-param on each of the three pill buttons.
+  setFontScale(event) {
+    const scale = event.params?.fontScale
+    if (!FONT_SCALE_STEPS.includes(scale)) return
+    this._applyFontScale(scale)
+    try { localStorage.setItem(FONT_SCALE_KEY, scale) } catch (_e) { /* private mode */ }
+  }
+
+  _applyFontScale(scale) {
+    this.element.dataset.fontScale = scale
+    this.fontScaleBtnTargets.forEach(btn => {
+      const active = btn.dataset.scale === scale
+      btn.classList.toggle("is-active", active)
+      btn.setAttribute("aria-pressed", active ? "true" : "false")
+    })
+    // Bigger reading text costs the card its artwork before it costs the
+    // respondent an option that's clipped below the fold — same rule
+    // _fitCard already enforces for any other reason a card runs short of
+    // room. The footer can shift too (a long label at a new zoom level),
+    // hence both, mirroring every other call that changes what a card holds.
+    this._fitCard()
+    this._fitFooter()
   }
 
   // Consent card (the first card): agreeing advances into the deck; declining
