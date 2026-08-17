@@ -8,7 +8,7 @@ import { Controller } from "@hotwired/stimulus"
 // they always reflect a saved edit.
 export default class extends Controller {
   static targets = ["modal", "status", "body", "driveBtn", "driveStatus",
-                    "brief", "goal", "audience", "length",
+                    "brief", "goal", "audience", "length", "sectionBoxes",
                     "editor", "editBtn", "saveBtn", "regenBtn", "pdfBtn"]
   static values  = { streamUrl: String, driveUrl: String, saveUrl: String,
                      exists: Boolean, brief: String }
@@ -38,12 +38,16 @@ export default class extends Controller {
     const goal     = this.hasGoalTarget     ? this.goalTarget.value.trim()     : ""
     const audience = this.hasAudienceTarget ? this.audienceTarget.value.trim() : ""
     const length   = this.hasLengthTarget   ? this.lengthTarget.value          : ""
+    // The executive summary is always included server-side regardless of
+    // these — this is only the three optional sections.
+    const sections = this.sectionBoxesTargets.filter((b) => b.checked).map((b) => b.value)
     if (goal)     params.set("goal", goal)
     if (audience) params.set("audience", audience)
     if (length)   params.set("length", length)
+    sections.forEach((s) => params.append("sections[]", s))
     // Keep the local copy in step with what the server will persist, so a
     // later Regenerate prefills the brief the creator actually used.
-    this.briefValue = JSON.stringify({ goal, audience, length })
+    this.briefValue = JSON.stringify({ goal, audience, length, sections })
     this._hideBrief()
     this._load(`${this.streamUrlValue}?${params}`)
   }
@@ -64,6 +68,12 @@ export default class extends Controller {
     if (this.hasGoalTarget     && saved.goal)     this.goalTarget.value     = saved.goal
     if (this.hasAudienceTarget && saved.audience) this.audienceTarget.value = saved.audience
     if (this.hasLengthTarget   && saved.length)   this.lengthTarget.value   = saved.length
+    // No saved brief yet: leave every box at its checked-by-default markup
+    // state. A saved brief always carries an explicit array — even an empty
+    // one, from unchecking everything — so it fully overrides the markup.
+    if (Array.isArray(saved.sections)) {
+      this.sectionBoxesTargets.forEach((b) => { b.checked = saved.sections.includes(b.value) })
+    }
     this.briefTarget.classList.remove("hidden")
   }
 

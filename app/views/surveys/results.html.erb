@@ -281,6 +281,24 @@
                             <option value="detailed">Detailed — full breakdown</option>
                           </select>
                         </label>
+                        <div class="report-brief-field">
+                          What should it include?
+                          <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+                            <label style="display:flex;align-items:center;gap:8px;font-weight:normal;cursor:pointer;">
+                              <input type="checkbox" checked value="key_findings" data-report-export-target="sectionBoxes" />
+                              Key findings
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;font-weight:normal;cursor:pointer;">
+                              <input type="checkbox" checked value="breakdown" data-report-export-target="sectionBoxes" />
+                              Question-by-question breakdown
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;font-weight:normal;cursor:pointer;">
+                              <input type="checkbox" checked value="patterns" data-report-export-target="sectionBoxes" />
+                              Patterns &amp; recommendations
+                            </label>
+                          </div>
+                          <span style="display:block;margin-top:4px;font-size:12px;opacity:0.65;">The executive summary is always included.</span>
+                        </div>
                         <button type="button" class="report-foot-btn report-foot-primary" style="align-self:flex-start;"
                                 data-action="click->report-export#generate">✨ Generate report</button>
                       </div>

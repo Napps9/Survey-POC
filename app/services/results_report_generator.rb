@@ -19,34 +19,60 @@ class ResultsReportGenerator
   }.freeze
   DEFAULT_LENGTH = "standard".freeze
 
-  SYSTEM = <<~PROMPT.freeze
-    You are an expert survey analyst writing a polished results report for the
-    survey's creator and their stakeholders. Produce a clear, well-structured
-    report in GitHub-flavoured Markdown using these sections, in order:
+  # One entry per toggleable section, in canonical output order — iterating
+  # SECTIONS.keys (not the caller's array) is what keeps the report's section
+  # order stable regardless of how a brief lists them. "exec_summary" is
+  # always included (see ALWAYS_ON below); the other three are what the
+  # editor's "What should it include?" checkboxes toggle.
+  SECTIONS = {
+    "exec_summary" => <<~MD,
+      ## Executive summary
+      Three to four sentences capturing the headline findings.
 
-    ## Executive summary
-    Three to four sentences capturing the headline findings.
+    MD
+    "key_findings" => <<~MD,
+      ## Key findings
+      A handful of concise bullet points, each citing specific figures
+      (percentages, counts) where they're revealing.
 
-    ## Key findings
-    A handful of concise bullet points, each citing specific figures
-    (percentages, counts) where they're revealing.
+    MD
+    "breakdown" => <<~MD,
+      ## Question-by-question breakdown
+      For each question a "### " heading with the question, then 1-3 sentences
+      interpreting the distribution — what stands out and why it matters.
 
-    ## Question-by-question breakdown
-    For each question a "### " heading with the question, then 1-3 sentences
-    interpreting the distribution — what stands out and why it matters.
+    MD
+    "patterns" => <<~MD
+      ## Patterns & recommendations
+      Notable cross-question patterns, then 2-4 concrete, actionable recommendations.
 
-    ## Patterns & recommendations
-    Notable cross-question patterns, then 2-4 concrete, actionable recommendations.
+    MD
+  }.freeze
+  ALWAYS_ON = %w[exec_summary].freeze
 
-    Rules: ground every claim in the figures provided; be specific and concrete;
-    never invent data that isn't present; keep a professional, lightly warm tone.
-    Use Markdown headings (##/###), bold and bullet lists — but no tables and no
-    code blocks. Honour the report brief at the top of the input: write for its
-    stated goal and audience, and stay within its requested length — a shorter,
-    sharper report beats a longer one. Under a tight length budget, compress the
-    question-by-question section rather than the summary or recommendations.
-  PROMPT
-  SYSTEM_WITH_SAFETY = (SYSTEM + PromptSafety::INSTRUCTION).freeze
+  # Builds the system prompt for exactly the requested sections. `keys` is
+  # whitelisted against SECTIONS — unknown values are silently dropped, since
+  # the brief JSON round-trips into future prompts and this is closed-vocabulary
+  # by design. An absent or empty list means "everything", matching every
+  # report generated before this toggle existed.
+  def self.system_prompt(keys)
+    requested = Array(keys).map(&:to_s) & SECTIONS.keys
+    chosen    = requested.empty? ? SECTIONS.keys : (SECTIONS.keys & (ALWAYS_ON | requested))
+    <<~PROMPT + PromptSafety::INSTRUCTION
+      You are an expert survey analyst writing a polished results report for the
+      survey's creator and their stakeholders. Produce a clear, well-structured
+      report in GitHub-flavoured Markdown using these sections, in order:
+
+      #{SECTIONS.values_at(*chosen).join}
+      Rules: ground every claim in the figures provided; be specific and concrete;
+      never invent data that isn't present; keep a professional, lightly warm tone.
+      Use Markdown headings (##/###), bold and bullet lists — but no tables and no
+      code blocks. Honour the report brief at the top of the input: write for its
+      stated goal and audience, and stay within its requested length — a shorter,
+      sharper report beats a longer one. Under a tight length budget, compress
+      detail sections rather than the summary or recommendations.
+    PROMPT
+  end
 
   def self.call(...) = new.call(...)
 
@@ -65,7 +91,7 @@ class ResultsReportGenerator
     stream = @client.messages.stream_raw(
       model:      MODEL,
       max_tokens: length[:max_tokens],
-      system:     SYSTEM_WITH_SAFETY,
+      system:     self.class.system_prompt(brief["sections"]),
       messages:   [ { role: "user", content: prompt } ]
     )
 

@@ -25,7 +25,7 @@ class ResultsReportStreamsController < ApplicationController
     # The modal's explicit Generate click regenerates (never replays the
     # cache) and carries the creator's report brief; a plain open replays.
     force = params[:regenerate].present?
-    brief = force ? params.permit(:goal, :audience, :length).to_h.compact_blank : nil
+    brief = force ? params.permit(:goal, :audience, :length, sections: []).to_h.compact_blank : nil
 
     stream_results_report(survey, brief: brief, force: force) { |chunk| response.stream.write(chunk) }
   rescue ActiveRecord::RecordNotFound

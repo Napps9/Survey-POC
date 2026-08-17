@@ -77,12 +77,19 @@ class PromptSafetyTest < ActiveSupport::TestCase
   test "every service that embeds respondent text carries the instruction" do
     # The half that's easy to forget when adding a new AI surface: wrapping the
     # text without telling the model what the wrapper means achieves nothing.
-    [ ResultsChat, OpenTextSummariser, ResultsReportGenerator, ResultsSummariser ].each do |service|
+    [ ResultsChat, OpenTextSummariser, ResultsSummariser ].each do |service|
       assert service.const_defined?(:SYSTEM_WITH_SAFETY),
              "#{service} should define SYSTEM_WITH_SAFETY"
       assert_includes service::SYSTEM_WITH_SAFETY, PromptSafety::INSTRUCTION,
                       "#{service}'s system prompt must carry the respondent-text instruction"
     end
+
+    # ResultsReportGenerator's prompt varies with the creator's chosen report
+    # sections (see SECTIONS/system_prompt), so it has no single fixed system
+    # string — but the instruction is appended unconditionally, outside the
+    # section selection, so any one call proves it can't be toggled away.
+    assert_includes ResultsReportGenerator.system_prompt(nil), PromptSafety::INSTRUCTION
+    assert_includes ResultsReportGenerator.system_prompt([ "breakdown" ]), PromptSafety::INSTRUCTION
   end
 
   test "the digest that feeds the report delimits its sample answers" do

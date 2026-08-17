@@ -181,6 +181,28 @@ class ResultsReportsTest < ActionDispatch::IntegrationTest
     assert_equal "short", @survey.reload.results_report_brief_data["length"]
   end
 
+  test "generate passes chosen sections through to the generator and persists them" do
+    captured = nil
+    grabber  = ->(survey:, aggregated:, total:, brief: {}, &blk) { captured = brief; blk&.call(MD); MD }
+    stub_method(ResultsReportGenerator, :call, grabber) do
+      get survey_results_report_stream_path(@survey,
+            regenerate: "1", sections: %w[key_findings patterns])
+    end
+    assert_response :success
+    assert_equal %w[key_findings patterns], captured["sections"]
+    assert_equal %w[key_findings patterns], @survey.reload.results_report_brief_data["sections"]
+  end
+
+  test "unchecking every optional section still generates the full report — an empty list means everything" do
+    captured = nil
+    grabber  = ->(survey:, aggregated:, total:, brief: {}, &blk) { captured = brief; blk&.call(MD); MD }
+    stub_method(ResultsReportGenerator, :call, grabber) do
+      get survey_results_report_stream_path(@survey, regenerate: "1")
+    end
+    assert_response :success
+    assert_nil captured["sections"], "no sections param at all — the generator itself defaults an absent list to everything"
+  end
+
   test "generate forces a regeneration even when the cache is fresh" do
     @survey.update!(results_report: "## Cached\n\nStale take.", results_report_response_count: 1)
     yielder = ->(survey:, aggregated:, total:, brief: {}, &blk) { blk&.call(MD); MD }
