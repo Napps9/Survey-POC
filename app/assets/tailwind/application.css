@@ -705,6 +705,22 @@
   padding: 12px;
   margin: -12px;
 }
+/* "There are more options below" — the desktop counterpart of the mobile
+   .is-scrollable::after cue further down (search "is-scrollable .choice-list"
+   for the full rationale: a sticky last child, not a background-attachment
+   shadow, because the option pills paint over that). is-scrollable is set by
+   _fitCard regardless of viewport; only this visual cue was mobile-only. */
+.split-right > .mt-2.is-scrollable .choice-list::after,
+.split-right > .mt-2.is-scrollable .prioritise-list::after {
+  content: "";
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  height: 22px;
+  margin-top: -22px;
+  background: linear-gradient(rgba(255,255,255,0), #fff 78%);
+  pointer-events: none;
+}
 
 /* ── "Add media" / "Change animation" floating CTA on left panel ── */
 .add-media-fab,
@@ -1862,6 +1878,26 @@
 }
 .choice-list-label { flex: 1; }
 .choice-list-tick { margin-left: auto; }
+
+/* ── Long option lists (7+) ────────────────────────
+   COUNT_RULES flags 6+ in the editor, but imported decks legitimately exceed
+   it. `.prioritise-list` is always the same element as `.choice-list` (see
+   _card_component.html.erb) so this reaches both without a second selector.
+   Pure CSS keyed on live child count — no markup change, so it tracks edits
+   in the editor and stays correct in the player. Reuses the numbers already
+   proven at `.phone-bottom .choice-list-item` below; this is the desktop (and
+   under-7-options-on-mobile) case that had no equivalent until now. */
+.choice-list:has(> .choice-list-item:nth-child(7)) { gap: 4px; }
+.choice-list:has(> .choice-list-item:nth-child(7)) > .choice-list-item {
+  padding: 6px 10px 6px 6px;
+  border-radius: 10px;
+}
+.choice-list:has(> .choice-list-item:nth-child(7)) .choice-list-tile {
+  width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 19px;
+}
+.choice-list:has(> .choice-list-item:nth-child(7)) .pick-text {
+  font-size: 13px;
+}
 
 /* ── Per-type accents ─────────────────────────────
    The list types share one chrome; these modifier classes (emitted by both
