@@ -438,6 +438,9 @@
                  data-gate-cards-target="tyBody"
                  data-default-text="<%= t("player.thank_you_from", org: @survey.organisation.name) %>"
                  data-action="input->gate-cards#queueThankyouSave:stop"><%= @survey.thankyou_body_text %></div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.45);padding:0 4px;">
+              Personalise with %{name}, %{score}, %{max}, %{points} — add a fallback for when it's missing, e.g. %{name|there}
+            </div>
 
             <%# Off-site link — the "Visit website →" button the respondent sees
                 after finishing. Backed by the survey's own forward_url/label

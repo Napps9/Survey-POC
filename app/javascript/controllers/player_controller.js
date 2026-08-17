@@ -1052,10 +1052,11 @@ export default class extends Controller {
     const s = screens.find(x => x.id === id) ||
               screens.find(x => x.id === "default") || screens[0]
     if (!s) return
-    if (this.hasThankyouTitleTarget && s.title) this.thankyouTitleTarget.textContent = s.title
+    const vars = this._endScreenVars()
+    if (this.hasThankyouTitleTarget && s.title) this.thankyouTitleTarget.textContent = this._interpolateEndScreen(s.title, vars)
     if (this.hasThankyouSubTarget && s.body != null) {
       this.thankyouSubTarget.replaceChildren()
-      String(s.body).split("\n").forEach((line, i) => {
+      this._interpolateEndScreen(String(s.body), vars).split("\n").forEach((line, i) => {
         if (i) this.thankyouSubTarget.appendChild(document.createElement("br"))
         this.thankyouSubTarget.appendChild(document.createTextNode(line))
       })
@@ -1069,6 +1070,43 @@ export default class extends Controller {
         this.forwardBtnTarget.classList.add("hidden")
       }
     }
+  }
+
+  // Template variables an end-screen title/body may reference: %{name} (from
+  // an answered contact_form card's name field — the first one found, if a
+  // deck somehow has more than one), %{score}/%{max} (quiz totals, only when
+  // this Verto actually grades), %{points} (summed across every token type)
+  // and %{points:<token_id>} (one type only). Deliberately never covers
+  // forward_url — that stays a creator-authored literal link, not text.
+  _endScreenVars() {
+    let name = null
+    for (const key in this._answers) {
+      const a = this._answers[key]
+      if (a?.type === "contact_form" && a.value && typeof a.value === "object" && a.value.name) {
+        name = a.value.name
+        break
+      }
+    }
+    const hasTokens = Object.keys(this._tokenTotals).length > 0
+    return {
+      name,
+      score: this._quizMax > 0 ? this._quizScore : null,
+      max: this._quizMax > 0 ? this._quizMax : null,
+      points: hasTokens ? Object.values(this._tokenTotals).reduce((sum, v) => sum + (v || 0), 0) : null
+    }
+  }
+
+  // %{var}, %{points:<token_id>} for one token type, and an inline fallback
+  // %{var|text} for when the value never resolved (no contact card on this
+  // path, not a quiz, tokenisation off) — stripped to "" without a fallback,
+  // same as the rest of this method already did for a missing var before
+  // personalisation existed, so an unanswered path never prints a raw %{...}.
+  _interpolateEndScreen(str, vars) {
+    return str.replace(/%\{(\w+)(?::([\w-]+))?(?:\|([^}]*))?\}/g, (_match, key, sub, fallback) => {
+      const value = (key === "points" && sub) ? this._tokenTotals[sub] : vars[key]
+      if (value == null || value === "") return fallback != null ? fallback : ""
+      return String(value)
+    })
   }
 
   // One button, one panel: the quiz score section and the general answer-

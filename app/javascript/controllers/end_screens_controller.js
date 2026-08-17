@@ -26,6 +26,9 @@ export default class extends Controller {
       </div>
       <textarea data-end-screens-target="body" maxlength="400" rows="2" placeholder="${t("editor.end_screens.body_placeholder").replace(/"/g, "&quot;")}"
                 style="width:100%;box-sizing:border-box;resize:vertical;${inp}"></textarea>
+      <div style="font-size:11px;color:rgba(255,255,255,0.45);">
+        Personalise with %{name}, %{score}, %{max}, %{points} — add a fallback for when it's missing, e.g. %{name|there}
+      </div>
       <input type="url" data-end-screens-target="forwardUrl" placeholder="${t("editor.end_screens.url_placeholder").replace(/"/g, "&quot;")}"
              style="width:100%;box-sizing:border-box;${inp}" />
       <input type="text" data-end-screens-target="forwardLabel" maxlength="40" placeholder="${t("editor.end_screens.button_placeholder").replace(/"/g, "&quot;")}"

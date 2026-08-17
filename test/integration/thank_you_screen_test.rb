@@ -66,6 +66,29 @@ class ThankYouScreenTest < ActionDispatch::IntegrationTest
     assert_select "a[href='https://acme.example'][target='_blank'][rel='noopener']"
   end
 
+  # Personalisation (%{name}/%{score}/%{max}/%{points}, with an optional
+  # %{var|fallback}) is interpolated client-side in player_controller.js —
+  # the server's only job is to store and render the template syntax
+  # untouched, never attempt its own substitution or escape the braces away.
+  test "template variable syntax in the thank-you copy round-trips and renders literally" do
+    org = sign_in_org("tmpl")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS,
+                              publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    post survey_settings_path(s), params: {
+      thankyou_title: "Nice one, %{name|friend}!",
+      thankyou_body:  "You scored %{score}/%{max} and earned %{points} points."
+    }
+    assert_equal "Nice one, %{name|friend}!", s.reload.thankyou_title
+    assert_equal "You scored %{score}/%{max} and earned %{points} points.", s.thankyou_body
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_select ".preview-thankyou-title", text: "Nice one, %{name|friend}!"
+    assert_match "You scored %{score}/%{max} and earned %{points} points.", response.body
+  end
+
   test "without customisation the thank-you falls back to defaults and shows no website CTA" do
     s = published_survey
 

@@ -12,6 +12,9 @@
   </div>
   <textarea data-end-screens-target="body" maxlength="400" rows="2" placeholder="Message"
             style="width:100%;box-sizing:border-box;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;resize:vertical;"><%= es['body'] %></textarea>
+  <div style="font-size:11px;color:rgba(255,255,255,0.45);">
+    Personalise with %{name}, %{score}, %{max}, %{points} — add a fallback for when it's missing, e.g. %{name|there}
+  </div>
   <input type="url" data-end-screens-target="forwardUrl" value="<%= es['forward_url'] %>"
          placeholder="https://buy.stripe.com/… (optional link)"
          style="width:100%;box-sizing:border-box;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;" />
