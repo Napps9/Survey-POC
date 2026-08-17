@@ -1542,6 +1542,12 @@ export default class extends Controller {
       if (card.dataset.cardCondition)  out.condition  = card.dataset.cardCondition
       if (card.dataset.cardOutcome)    out.outcome    = card.dataset.cardOutcome
 
+      // AI-extracted photographable subject (CardSubjectExtractor), read by
+      // AssetPopulator#card_query to anchor Pexels queries on Shuffle. Nothing
+      // in the editor displays or edits it, so without carrying it here the
+      // first autosave would silently drop it.
+      if (card.dataset.cardSubject) out.subject = card.dataset.cardSubject
+
       // Range cards carry the reaction-animation theme picked in the editor.
       // Server-side sanitize drops it if it isn't a known slug on a range card.
       if (type === "range" && card.dataset.cardRangeTheme) out.range_theme = card.dataset.cardRangeTheme

@@ -51,6 +51,11 @@
      data-card-competency="<%= card['competency'].to_s %>"
      data-card-outcome="<%= card['outcome'].to_s %>"
      data-card-condition="<%= card['condition'].to_s %>"
+     <%# CardSubjectExtractor's photographable-noun-phrase stamp — nothing in
+         the editor displays or edits it, but AssetPopulator reads it on every
+         Shuffle, so the DOM round-trip has to carry it like the Framework
+         provenance above or the first autosave silently drops it. %>
+     <% if card['subject'].present? %>data-card-subject="<%= card['subject'] %>"<% end %>
      data-action="click->type-panel#selectCard">
 
   <%# CTA rail — every per-card control stacked on the card's inline-start

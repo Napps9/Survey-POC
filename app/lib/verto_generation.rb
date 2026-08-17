@@ -82,9 +82,25 @@ module VertoGeneration
   # a Pexels outage must not fail the creation, it just means an unillustrated
   # deck the creator can fill in themselves.
   def auto_populate_assets!(survey)
+    extract_card_subjects!(survey)
     AssetPopulator.new(survey).populate!
   rescue => e
     ErrorReporting.report("AssetPopulator", e)
+  end
+
+  # Names each question card's photographable subject (card["subject"]) BEFORE
+  # populate! runs, so AssetPopulator#card_query can read it on this very
+  # first pass — see CardSubjectExtractor for what it does and why a failure
+  # here is invisible rather than fatal. Mutates survey.cards in memory only;
+  # populate! (immediately after) is what actually saves, so the subject
+  # stamps and the image picks land in the same write instead of two.
+  # Independently best-effort from populate! itself — one Pexels/Claude
+  # outage must never take out the other.
+  def extract_card_subjects!(survey)
+    return unless CardSubjectExtractor.configured?
+    survey.cards = CardSubjectExtractor.new.call(cards: survey.cards)
+  rescue => e
+    ErrorReporting.report("CardSubjectExtractor", e)
   end
 
   # Creator-facing failure text: the API's own message when Claude returned one

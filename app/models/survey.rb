@@ -177,6 +177,7 @@ class Survey < ApplicationRecord
   PEXELS_CREDIT_URL = %r{\Ahttps://(?:www\.)?pexels\.com/[\w@\-./?=&%]*\z}i
   MAX_CREDIT_NAME   = 80
   MAX_LANE_LABEL    = 60 # branch name shown on the flow map (stored on the entry card)
+  MAX_CARD_SUBJECT  = 60 # CardSubjectExtractor's photographable-noun-phrase stamp
   MAX_SCENARIO_PAGES       = 6
   MAX_SCENARIO_PAGE_LENGTH = 600
   # The plain-language "what this card tells you" line in the Why panel. Free
@@ -796,6 +797,17 @@ class Survey < ApplicationRecord
           c.delete("image_credit")
           c.delete("image_credit_url")
         end
+      end
+
+      # CardSubjectExtractor's photographable-noun-phrase stamp, read by
+      # AssetPopulator#card_query to anchor Pexels queries — provenance
+      # metadata, not shown to a respondent, so it's simply bounded plain text
+      # like lane_label/outcome above rather than tied to the card carrying an
+      # image (a subject can be stamped before any image is picked, and
+      # outlives a later image being cleared).
+      if c.key?("subject")
+        c["subject"] = c["subject"].to_s.strip.first(MAX_CARD_SUBJECT).presence
+        c.delete("subject") if c["subject"].blank?
       end
       c
     end.then { |list| enforce_single_welcome(list, warnings: warnings) }

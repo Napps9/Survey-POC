@@ -493,7 +493,7 @@ class AssetPopulator
   # photo (mirrors the curated de-dup).
   def pexels_card_photo(card, idx, used)
     query  = card_query(card)
-    photos = relevant(pexels_photos(query, :card), card_relevance_words(card), query_theme_words(query)) { |p| p["alt"] }
+    photos = relevant_with_subject_retry(card, query, ->(q) { pexels_photos(q, :card) }) { |p| p["alt"] }
     return nil if photos.empty?
     ordered = photos.shuffle(random: rand_for("px-#{idx}"))
     ordered.find { |p| !used.include?(PexelsClient.url_for(p, :card)) } || ordered.first
@@ -504,7 +504,7 @@ class AssetPopulator
   # no usable video is found (caller falls back to a photo).
   def pexels_card_video(card, idx, used)
     query  = card_query(card)
-    videos = relevant(pexels_videos(query), card_relevance_words(card), query_theme_words(query)) { |v| v["url"] }
+    videos = relevant_with_subject_retry(card, query, ->(q) { pexels_videos(q) }) { |v| v["url"] }
     return nil if videos.empty?
 
     ordered = videos.shuffle(random: rand_for("pxv-#{idx}"))
@@ -540,7 +540,7 @@ class AssetPopulator
   def pexels_swipe_urls(card, card_idx, count, swipe_used)
     return nil unless PexelsClient.configured?
     query  = card_query(card)
-    photos = relevant(pexels_photos(query, :swipe), card_relevance_words(card), query_theme_words(query)) { |p| p["alt"] }
+    photos = relevant_with_subject_retry(card, query, ->(q) { pexels_photos(q, :swipe) }) { |p| p["alt"] }
     urls   = photos.map { |p| PexelsClient.url_for(p, :swipe) }.compact.uniq
     return nil if urls.empty?
 
@@ -621,23 +621,56 @@ class AssetPopulator
   # a welcome card's "your voice matters…" landing on protest stock).
   #
   # Scaffolding cards (welcome/checkpoint) have no subject of their own — they
-  # are theme-only, no per-word analysis. Ordinary question cards may REFINE
-  # the theme base with their own concrete terms, but only ones that survive
-  # the hygiene strips (geo, proper nouns, charged) — fail-closed: an unknown
-  # word is simply not added, never allowed to steer the query on its own.
-  # TODO(phase two): a real concrete-noun / depictable-subject extractor so a
-  # card like "How was the school canteen?" contributes "canteen".
+  # are theme-only, no per-word analysis. Ordinary question cards REFINE the
+  # theme base with a concrete subject: CardSubjectExtractor's AI-picked
+  # phrase when generation stamped one (card["subject"]), or the keyword
+  # heuristic otherwise — an older Verto, or one built before the extractor
+  # was configured. Either way the refinement only survives the same hygiene
+  # strips (geo, proper nouns, charged) as before: the subject is untrusted
+  # model output, no less than any other AI generation step, and
+  # ContentSafety.scrub_query runs over the final joined query regardless of
+  # which branch produced it. Fail-closed throughout: an unknown word is
+  # simply not added, never allowed to steer the query on its own.
   def card_query(card)
     base = clean_theme_terms.first(2)
     refine =
       if theme_only_card?(card)
         []
+      elsif card["subject"].to_s.strip.present?
+        subject_terms(salient_words(card["subject"]), proper_nouns(card["subject"]))
       else
         subject_terms(card_keywords(card), proper_nouns("#{card['text']} #{card['description']}"))
       end
     terms = (base + refine).uniq { |w| w.singularize }
     raw   = terms.join(" ").presence || clean_theme_terms.first(3).join(" ").presence || "abstract"
     ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract"
+  end
+
+  # The query stripped back to just the theme base, no card refinement at all
+  # — used by relevant_with_subject_retry below when a subject-refined query
+  # comes back with nothing Pexels-relevant. A subject can legitimately be
+  # more specific than what this theme+audience's Pexels library covers
+  # ("vintage bicycle" vs. plain "commute"), and a theme-anchored photo still
+  # beats none.
+  def theme_base_query
+    raw = clean_theme_terms.first(3).join(" ").presence || "abstract"
+    ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract"
+  end
+
+  # Runs `fetch` (->(query) { API results }) for `query`, relevance-filters
+  # the results, and — only when `query` was refined by the AI-extracted
+  # subject and NOTHING survives the floor — retries once against the plain
+  # theme base before the caller falls through to the curated library.
+  # Skipped (not just a no-op retry) when the card carries no subject, or the
+  # theme base IS the query already: nothing would change on a second try.
+  def relevant_with_subject_retry(card, query, fetch, &text_for)
+    items = relevant(fetch.call(query), card_relevance_words(card), query_theme_words(query), &text_for)
+    return items if items.any? || card["subject"].to_s.strip.blank?
+
+    fallback = theme_base_query
+    return items if fallback == query
+
+    relevant(fetch.call(fallback), card_relevance_words(card), query_theme_words(fallback), &text_for)
   end
 
   # Cards imaged from the Verto theme ONLY, ignoring their own copy: scaffolding

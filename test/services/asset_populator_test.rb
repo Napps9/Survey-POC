@@ -291,6 +291,49 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_includes q, "travel", "an all-filler question should fall back to the theme"
   end
 
+  # ── CardSubjectExtractor's stamp (card["subject"]) ────────────────────────
+
+  test "card query prefers the AI-extracted subject over the keyword heuristic" do
+    s = make_survey(theme: "Commuting", audience_age: "all",
+                    cards: [ { "type" => "open_ended", "text" => "How was the journey in?",
+                               "subject" => "vintage bicycle" } ])
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+
+    assert_includes q, "vintage"
+    assert_includes q, "bicycle"
+    refute_includes q, "journey", "the subject replaces the keyword heuristic, it doesn't blend with it"
+  end
+
+  test "card query falls back to the keyword heuristic when no subject was extracted" do
+    s = make_survey(theme: "Commuting", audience_age: "all",
+                    cards: [ { "type" => "open_ended", "text" => "How was the journey in?" } ])
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+
+    assert_includes q, "journey", "with no subject stamped, today's keyword heuristic still runs"
+  end
+
+  test "an AI-extracted subject still has geography and proper nouns stripped" do
+    s = make_survey(theme: "Local schools", audience_age: "11-16",
+                    cards: [ { "type" => "multiple_choice", "text" => "Which do you enjoy most?",
+                               "subject" => "North London school gates", "options" => %w[Maths Art] } ])
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+
+    %w[london north].each { |w| refute_includes q, w, "#{w.inspect} is geography, not a subject — even from the AI extractor" }
+    # Singular or plural: the theme ("Local schools") already contributes
+    # "schools", and card_query's own dedup (uniq by singularize) correctly
+    # drops the card's singular "school" as the same concept — not a bug.
+    assert(q.any? { |w| w.singularize == "school" }, "the subject's own concrete term must survive")
+    assert_includes q, "gates"
+  end
+
+  test "a demographic card's subject is ignored, same as its own copy" do
+    demo_card = GENDER_CARD.merge("subject" => "gender identity")
+    s = make_survey(theme: "Secondary School exclusions", audience_age: "11-16", cards: [ demo_card ])
+
+    q = AssetPopulator.new(s).send(:card_query, s.cards[0]).split
+    refute_includes q, "gender", "a demographic card stays theme-only even when a subject was stamped"
+  end
+
   # ── Pexels source (primary when configured) ──────────────────────────────
 
   # Shared fixture: the Pexels-primary tests below use the "Mountains" theme,
@@ -466,6 +509,50 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     s.reload
     assert_match %r{/assets/verto-library/backgrounds/}, s.background_image
     assert_includes s.cards[0]["image"], "verto-library/"
+  end
+
+  # A Pexels stub whose results depend on the exact query string sent — unlike
+  # with_pexels above (same fixed list for every query), this is what proves
+  # relevant_with_subject_retry's SECOND call actually ran with a different
+  # (theme-base) query rather than just re-filtering the same result set.
+  def with_pexels_by_query(by_query)
+    fake = Object.new
+    fake.define_singleton_method(:search) { |**kw| by_query[kw[:query]] || [] }
+    fake.define_singleton_method(:search_videos) { |**_kw| [] }
+    stub_method(PexelsClient, :configured?, true) do
+      stub_method(PexelsClient, :new, fake) { yield }
+    end
+  end
+
+  test "an AI subject too specific for Pexels retries once against the theme base" do
+    s = make_survey(theme: "Mountains", audience_age: "18-24",
+                    cards: [ { "type" => "open_ended", "text" => "Tell us about it",
+                               "subject" => "yak herding festival" } ])
+    populator     = AssetPopulator.new(s)
+    subject_query = populator.send(:card_query, s.cards[0])
+    theme_query   = populator.send(:theme_base_query)
+    assert_not_equal subject_query, theme_query, "the fixture must actually exercise two different queries"
+
+    # Nothing at all for the (too-specific) subject query; a relevant photo
+    # only for the plain theme-base query the retry falls back to.
+    relevant_photo = pexels_photo(1, "Snowy mountain peak and alpine landscape")
+    with_pexels_by_query(theme_query => [ relevant_photo ]) { AssetPopulator.new(s).populate! }
+
+    s.reload
+    assert_includes s.cards[0]["image"].to_s, "/photos/1/",
+      "nothing cleared the subject query's relevance floor, so the retry against the theme base must supply the pick"
+  end
+
+  test "still falls through to curated art when both the subject and theme-base queries come back empty" do
+    s = make_survey(theme: "Football fans", audience_age: "18-24",
+                    cards: [ { "type" => "multiple_choice", "text" => "Favourite team?",
+                               "subject" => "team mascot costume", "options" => %w[Arsenal Chelsea] } ])
+
+    with_pexels([]) { AssetPopulator.new(s).populate! }
+
+    s.reload
+    assert_includes s.cards[0]["image"], "verto-library/",
+      "both the subject query and its theme-base retry came back empty — curated fallback must still run"
   end
 
   # ── Relevance + neutrality (theme-anchored queries, floor, suppression) ────
