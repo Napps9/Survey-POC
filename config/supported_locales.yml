@@ -37,3 +37,9 @@ locales:
   - { code: id, english_name: Indonesian,          native_name: Bahasa Indonesia,   flag: "🇮🇩", dir: ltr }
   - { code: vi, english_name: Vietnamese,          native_name: Tiếng Việt,         flag: "🇻🇳", dir: ltr }
   - { code: sw, english_name: Swahili,             native_name: Kiswahili,          flag: "🇰🇪", dir: ltr }
+  - { code: af, english_name: Afrikaans,           native_name: Afrikaans,          flag: "🇿🇦", dir: ltr }
+  - { code: zu, english_name: Zulu,                native_name: isiZulu,            flag: "🇿🇦", dir: ltr }
+  - { code: xh, english_name: Xhosa,               native_name: isiXhosa,           flag: "🇿🇦", dir: ltr }
+  - { code: st, english_name: Southern Sotho,      native_name: Sesotho,            flag: "🇱🇸", dir: ltr }
+  - { code: tn, english_name: Tswana,              native_name: Setswana,           flag: "🇧🇼", dir: ltr }
+  - { code: sn, english_name: Shona,               native_name: chiShona,           flag: "🇿🇼", dir: ltr }
