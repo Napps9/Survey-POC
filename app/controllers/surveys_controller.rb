@@ -78,6 +78,7 @@ class SurveysController < ApplicationController
   SETTINGS_LOCKED_IN_USE = %i[
     consent_text consent_image consent_image_credit consent_image_credit_url
     tokenisation_enabled token_types quiz leaderboard_retake_policy
+    capture_postcode
   ].freeze
 
   def settings_locked_message = t("flash.surveys.settings_locked")
@@ -687,6 +688,13 @@ class SurveysController < ApplicationController
     if params.key?(:leaderboard_retake_policy)
       attrs[:leaderboard_retake_policy] =
         Survey.normalize_leaderboard_retake_policy(params[:leaderboard_retake_policy])
+    end
+    # Unlike the presentation switches above, this one DOES change what's
+    # collected — toggling it mid-collection would ask different respondents
+    # a different question, so it's in SETTINGS_LOCKED_IN_USE rather than the
+    # shared loop.
+    if params.key?(:capture_postcode)
+      attrs[:capture_postcode] = ActiveModel::Type::Boolean.new.cast(params[:capture_postcode])
     end
     if params.key?(:respondent_code_prompt)
       attrs[:respondent_code_prompt] =

@@ -811,15 +811,41 @@ class PlayerController < ApplicationController
     value = idx && resp.answers.is_a?(Hash) ? resp.answers[idx.to_s]&.dig("value") : nil
     sep = value.to_s.index("|")
     country = sep ? value[0...sep].to_s.upcase.presence : nil
-    label   = sep ? value[(sep + 1)..].to_s.strip.first(60).presence : nil
+    # Everything after the first "|" used to be the WHOLE label — now it may
+    # itself carry a second "|POSTCODE" segment (capture_postcode). Parsed
+    # from `rest`, not the raw value, so a legacy two-segment "CC|Label"
+    # answer (no second pipe) still resolves exactly as it always did: sep2
+    # is nil, postcode stays nil, label is `rest` unchanged.
+    rest    = sep ? value[(sep + 1)..].to_s : nil
+    sep2    = rest&.index("|")
+    label   = rest ? (sep2 ? rest[0...sep2] : rest).strip.first(60).presence : nil
+    postcode = rest && sep2 ? rest[(sep2 + 1)..] : nil
 
     if country && WorldRegions.valid?(country)
-      resp.region_country = country
-      resp.region_label   = label
+      resp.region_country  = country
+      resp.region_label    = label
+      # Re-derived from the toggle's CURRENT state, same as every other
+      # region field here — a respondent who answered while the toggle was on
+      # loses the postcode from this denormalised column if a creator somehow
+      # turns it off again (SETTINGS_LOCKED_IN_USE makes that rare, not
+      # impossible — a duplicated draft, for instance), matching how turning
+      # regions off entirely already blanks region_country/region_label.
+      resp.region_postcode = @survey.capture_postcode? ? sanitize_postcode(postcode) : nil
     else
-      resp.region_country = nil
-      resp.region_label   = nil
+      resp.region_country  = nil
+      resp.region_label    = nil
+      resp.region_postcode = nil
     end
+  end
+
+  # Upcased, bounded, and stripped to a conservative charset — letters,
+  # digits, spaces and hyphens cover UK/US/CA/AU-style postcodes without
+  # opening the door to anything that could carry markup or break a CSV
+  # export. Untrusted input either way: the client packs whatever the
+  # respondent typed into the hidden field verbatim.
+  POSTCODE_CHARS = /[^A-Z0-9 \-]/
+  def sanitize_postcode(raw)
+    raw.to_s.strip.upcase.gsub(POSTCODE_CHARS, "").first(10).presence
   end
 
   # Denormalise the two set demographic answers that make useful filter

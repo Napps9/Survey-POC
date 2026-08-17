@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -584,6 +584,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_130000) do
     t.integer "quiz_max"
     t.string "region_country"
     t.string "region_label"
+    t.string "region_postcode"
     t.string "respondent_code_digest"
     t.integer "score"
     t.string "session_token", null: false
@@ -799,6 +800,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_130000) do
     t.string "brand_font"
     t.string "brand_font_heading"
     t.json "brand_palette"
+    t.boolean "capture_postcode", default: false, null: false
     t.json "cards"
     t.boolean "chrome_follows_verto_language", default: false, null: false
     t.string "compare_note"

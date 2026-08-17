@@ -7,8 +7,15 @@ import { Controller } from "@hotwired/stimulus"
 // generically like any other open_ended answer (see player_controller.js's
 // _read/_applyValue) — never raw search text, never coordinates (the
 // server-side client never returns lat/lon).
+//
+// When capture_postcode is on, the card also renders an optional postcode
+// field (postcodeTarget); the packed value grows a third segment,
+// "CC|Label|POSTCODE" — see PlayerController#sync_region_from_answers! for
+// the matching three-segment parse. postcodeTarget is only present in the
+// DOM at all when the toggle is on, so its presence IS the signal for
+// whether to pack two or three segments — no separate value needed.
 export default class extends Controller {
-  static targets = ["input", "results", "selected", "selectedText", "value"]
+  static targets = ["input", "results", "selected", "selectedText", "value", "postcode"]
   static values  = { url: String }
 
   connect() {
@@ -88,7 +95,24 @@ export default class extends Controller {
     this.inputTarget.hidden = true
     if (this.hasSelectedTarget) this.selectedTarget.hidden = false
     if (this.hasSelectedTextTarget) this.selectedTextTarget.textContent = result.display_name
-    if (this.hasValueTarget) this.valueTarget.value = `${result.country_code}|${result.label || ""}`
+    if (this.hasValueTarget) this.valueTarget.value = this._pack(result.country_code, result.label || "")
+  }
+
+  // Re-packs the hidden value when the postcode field changes AFTER a
+  // location has already been picked. Country/label come from whatever's
+  // already packed, not fresh state — re-picking a location always goes
+  // through _pick above, which repacks from scratch anyway.
+  postcodeChanged() {
+    if (!this.hasValueTarget) return
+    const [ country, label ] = this.valueTarget.value.split("|")
+    if (!country) return // nothing picked yet — a postcode alone packs nothing
+    this.valueTarget.value = this._pack(country, label || "")
+  }
+
+  _pack(country, label) {
+    let value = `${country}|${label}`
+    if (this.hasPostcodeTarget) value += `|${this.postcodeTarget.value.trim()}`
+    return value
   }
 
   _clearResults() {

@@ -20,9 +20,10 @@ class LocationDemographicTest < ActionDispatch::IntegrationTest
     org
   end
 
-  def create_survey(org)
+  def create_survey(org, capture_postcode: false)
     org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
                         default_locale: "en", locales: [ "en" ], cards: CARDS,
+                        capture_postcode: capture_postcode,
                         publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
   end
 
@@ -54,6 +55,73 @@ class LocationDemographicTest < ActionDispatch::IntegrationTest
     resp = s.responses.reload.last
     assert_equal "US", resp.region_country
     assert_equal "Austin, Texas", resp.region_label
+  end
+
+  # ── Postcode capture (Survey#capture_postcode?) ───────────────────────────
+
+  test "a three-segment CC|Label|POSTCODE answer populates region_postcode when the toggle is on" do
+    org = create_org_and_sign_in("postcode")
+    s   = create_survey(org, capture_postcode: true)
+
+    json_post submit_survey_path(s.publish_token),
+              { session_token: "loc-#{SecureRandom.hex(4)}",
+                answers: {
+                  "1" => { "type" => "yes_no", "value" => "Yes" },
+                  "2" => { "type" => "open_ended", "value" => "GB|Bristol|BS1 4DJ" }
+                } }
+    assert_response :success
+    resp = s.responses.reload.last
+    assert_equal "GB", resp.region_country
+    assert_equal "Bristol", resp.region_label
+    assert_equal "BS1 4DJ", resp.region_postcode
+  end
+
+  test "a legacy two-segment CC|Label answer never leaks into region_postcode, even with the toggle on" do
+    org = create_org_and_sign_in("postcode-legacy")
+    s   = create_survey(org, capture_postcode: true)
+
+    json_post submit_survey_path(s.publish_token),
+              { session_token: "loc-#{SecureRandom.hex(4)}",
+                answers: {
+                  "1" => { "type" => "yes_no", "value" => "Yes" },
+                  "2" => { "type" => "open_ended", "value" => "US|Austin, Texas" }
+                } }
+    resp = s.responses.reload.last
+    assert_equal "US", resp.region_country
+    assert_equal "Austin, Texas", resp.region_label, "the label must not have absorbed a phantom third segment"
+    assert_nil resp.region_postcode
+  end
+
+  test "region_postcode stays nil when the toggle is off, even if a three-segment answer arrives" do
+    org = create_org_and_sign_in("postcode-off")
+    s   = create_survey(org, capture_postcode: false)
+
+    json_post submit_survey_path(s.publish_token),
+              { session_token: "loc-#{SecureRandom.hex(4)}",
+                answers: {
+                  "1" => { "type" => "yes_no", "value" => "Yes" },
+                  "2" => { "type" => "open_ended", "value" => "GB|Bristol|BS1 4DJ" }
+                } }
+    resp = s.responses.reload.last
+    assert_equal "GB", resp.region_country, "country/label still resolve independently of the toggle"
+    assert_nil resp.region_postcode, "the toggle being off must block the column, regardless of what the client sent"
+  end
+
+  test "a tampered postcode segment is normalised, not stored raw" do
+    org = create_org_and_sign_in("postcode-tamper")
+    s   = create_survey(org, capture_postcode: true)
+
+    json_post submit_survey_path(s.publish_token),
+              { session_token: "loc-#{SecureRandom.hex(4)}",
+                answers: {
+                  "1" => { "type" => "yes_no", "value" => "Yes" },
+                  "2" => { "type" => "open_ended", "value" => "GB|Bristol| bs1<script>4dj-99999|extra|pipes" }
+                } }
+    resp = s.responses.reload.last
+    assert_equal "GB", resp.region_country
+    assert_equal "Bristol", resp.region_label
+    assert_match(/\A[A-Z0-9 \-]{1,10}\z/, resp.region_postcode)
+    refute_includes resp.region_postcode, "<"
   end
 
   test "an invalid country code leaves the response untagged" do
