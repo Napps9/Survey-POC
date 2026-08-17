@@ -117,6 +117,17 @@ class TestModeTest < ActionDispatch::IntegrationTest
     assert @survey.test_token.present?, "the test link is not"
   end
 
+  test "a test link still carries OpenGraph tags — it is built to be shared" do
+    token = mint_token!
+    delete session_path
+
+    get test_survey_path(token)
+
+    assert_response :success
+    assert_select "meta[property='og:title'][content=?]", "Sports · Playverto"
+    assert_select "meta[property='og:url'][content=?]", test_survey_url(token)
+  end
+
   test "the publish panel shows the test-link block" do
     mint_token!
     get survey_path(@survey)

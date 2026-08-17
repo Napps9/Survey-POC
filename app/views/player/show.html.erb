@@ -1,4 +1,21 @@
 <% content_for :title, "#{@survey.theme} · Playverto" %>
+<% content_for :theme_color, BrandPalette.resolve(@survey.brand_palette)["bg"] %>
+<%# Shared /play (and /test) links unfurl as nothing in WhatsApp/Slack/etc.
+    without these — social recruitment is a real distribution channel for a
+    Verto, and Test Mode is explicitly built to be a no-signup shareable link
+    too. Skipped only for the owner's own dashboard preview (@preview without
+    @test_mode) — that's an authed iframe, never a shared URL. %>
+<% unless @preview && !@test_mode %>
+  <% content_for :head do %>
+    <%= tag.meta property: "og:title", content: "#{@survey.theme} · Playverto" %>
+    <%# The creator's editing brief — becomes public the moment a link is shared. %>
+    <%= tag.meta property: "og:description", content: (@survey.description.presence || @survey.theme).to_s.truncate(200) %>
+    <%= tag.meta property: "og:type", content: "website" %>
+    <%= tag.meta property: "og:site_name", content: "Playverto" %>
+    <%= tag.meta property: "og:url", content: request.base_url + request.path %>
+    <%= tag.meta name: "twitter:card", content: "summary" %>
+  <% end %>
+<% end %>
 <%
   cards   = Array(@survey.cards)
   total_q = cards.count { |c| CardTypes.question?(c["type"]) }
