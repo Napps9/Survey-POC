@@ -255,4 +255,21 @@ class TokenisationOptionsTest < ActionDispatch::IntegrationTest
     assert s.token_reveal_enabled?
     assert s.token_back_nav_enabled?
   end
+
+  # ── Item 7: the HUD toggle — a "blind scoring" opt-out ────────────────────
+
+  test "the HUD defaults on, like Share and the regions map" do
+    s = tokenised
+    assert s.token_hud_enabled?
+  end
+
+  test "the HUD toggle is editable on a live Verto" do
+    sign_in!
+    s = tokenised
+    post survey_settings_path(s), params: { token_hud_enabled: "0" }
+    assert_not s.reload.token_hud_enabled?
+
+    post survey_settings_path(s), params: { token_hud_enabled: "1" }
+    assert s.reload.token_hud_enabled?
+  end
 end

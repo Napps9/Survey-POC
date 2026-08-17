@@ -143,4 +143,20 @@ class TokenPlayerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     refute body["results"].any? { |r| r["type"] == "token_total" }
   end
+
+  test "the HUD pill renders by default and omits only its own target when switched off" do
+    s = tokenised_survey
+    get play_survey_path(s.publish_token)
+    assert_select "[data-player-target='tokenScoreChip']"
+
+    s.update!(token_hud_enabled: false)
+    get play_survey_path(s.publish_token)
+    assert_select "[data-player-target='tokenScoreChip']", false
+    # Totals are still tracked server-side and still returned to the client —
+    # this setting only hides the live number, not the underlying scoring.
+    body = json_post submit_survey_path(s.publish_token),
+                     session_token: "hud-off",
+                     answers: { "1" => { "type" => "multiple_choice", "value" => "Pizza" } }
+    assert_equal({ "gold" => 5, "coal" => 0 }, body["token_totals"])
+  end
 end

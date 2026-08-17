@@ -886,6 +886,15 @@
                        style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
                 <span>Let players go back and answer a points question they skipped. A question they already answered stays locked either way.</span>
               </label>
+
+              <input type="hidden" name="token_hud_enabled" value="0" />
+              <label style="display:flex;align-items:flex-start;gap:10px;margin-top:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+                <input type="checkbox" name="token_hud_enabled" value="1"
+                       <%= "checked" if @survey.token_hud_enabled? %>
+                       onchange="this.form.requestSubmit()"
+                       style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+                <span>Show the running points total in the footer while playing. Checkpoints and the final tally still work either way — this only hides the live number.</span>
+              </label>
             <% end %>
           <% end %>
 

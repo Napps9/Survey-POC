@@ -467,8 +467,13 @@
     <%# Quiz running score — shown only on a quiz, updated after each graded card. %>
     <span class="quiz-score-chip hidden" data-player-target="scoreChip" aria-live="polite"></span>
     <%# Tokenisation running total — shown only when tokenisation is on,
-        updated after each token-awarding card is answered. %>
-    <span class="token-score-chip hidden" data-player-target="tokenScoreChip" aria-live="polite"></span>
+        updated after each token-awarding card is answered. token_hud_enabled
+        is a "blind scoring" opt-out: checkpoints, per-answer reveal and the
+        final tally read from the same stored totals regardless, so omitting
+        just this target is enough — _renderTokenChip no-ops without it. %>
+    <% if @survey.token_hud_enabled? %>
+      <span class="token-score-chip hidden" data-player-target="tokenScoreChip" aria-live="polite"></span>
+    <% end %>
     <button class="preview-btn preview-btn-next"
             data-player-target="nextBtn"
             data-action="click->player#next"><%= t("player.next") %></button>

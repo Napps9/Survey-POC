@@ -671,8 +671,8 @@ class SurveysController < ApplicationController
     # respondent is shown from here on. leaderboard_enabled belongs here too:
     # the standings are computed at read time from data that exists either way,
     # so the toggle only shows or hides them.
-    %i[token_reveal_enabled token_back_nav_enabled share_enabled regions_enabled
-       respondent_code_enabled leaderboard_enabled].each do |flag|
+    %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled share_enabled
+       regions_enabled respondent_code_enabled leaderboard_enabled].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
     end

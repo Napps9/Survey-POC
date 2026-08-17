@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_14_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -843,6 +843,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_140000) do
     t.string "theme"
     t.string "title"
     t.boolean "token_back_nav_enabled", default: false, null: false
+    t.boolean "token_hud_enabled", default: true, null: false
     t.string "token_intro_cid"
     t.boolean "token_reveal_enabled", default: false, null: false
     t.json "token_types", default: [], null: false
