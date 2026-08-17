@@ -1007,6 +1007,7 @@ id:
     thank_you_screen: 'Layar terima kasih'
     verto_name: 'Nama Verto'
     delete_card_n: 'Hapus kartu %{n}'
+    drag_to_reorder: 'Seret untuk mengatur ulang urutan'
     remove_consent_gate: 'Hapus gerbang persetujuan'
     remove_thankyou_screen: 'Hapus layar terima kasih'
     remove: 'Hapus'

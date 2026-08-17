@@ -1009,6 +1009,7 @@ pl:
     thank_you_screen: 'Ekran podziękowania'
     verto_name: 'Nazwa Verto'
     delete_card_n: 'Usuń kartę %{n}'
+    drag_to_reorder: 'Przeciągnij, aby zmienić kolejność'
     remove_consent_gate: 'Usuń ekran zgody'
     remove_thankyou_screen: 'Usuń ekran podziękowania'
     remove: 'Usuń'

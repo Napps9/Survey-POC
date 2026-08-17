@@ -1007,6 +1007,7 @@ ja:
     thank_you_screen: 'サンクス画面'
     verto_name: 'Verto の名前'
     delete_card_n: 'カード %{n} を削除'
+    drag_to_reorder: 'ドラッグして並べ替え'
     remove_consent_gate: '同意画面を削除'
     remove_thankyou_screen: 'サンクス画面を削除'
     remove: '削除'

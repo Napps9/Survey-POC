@@ -85,6 +85,27 @@ class EditorReorderInsertTest < ActionDispatch::IntegrationTest
     assert_select ".card-delete-btn[aria-label=?]", I18n.t("editor.delete_card_n", n: 1)
   end
 
+  # Drag-and-drop reorder (2.9): a grip alongside ▲▼, inside the same
+  # unless-live guard — .card-reorder already covers the whole block, but the
+  # grip is checked directly since it's the one new element here.
+  test "every card on a draft gets a drag grip, wired to the drag events" do
+    get survey_path(@survey)
+    assert_response :success
+    cards = Array(@survey.cards).size
+    assert_equal cards, response.body.scan('data-role="grip"').size
+    assert_select ".card-grip[draggable='true']", cards
+    assert_select ".card-grip[data-action*='survey-editor#dragStart']", cards
+    assert_select ".card-grip[data-action*='survey-editor#dragEnd']", cards
+    assert_select ".card-grip[aria-label=?]", I18n.t("editor.drag_to_reorder"), count: cards
+  end
+
+  test "a live Verto hides the drag grip along with the rest of .card-reorder" do
+    @survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    get survey_path(@survey)
+    assert_response :success
+    assert_select ".card-grip", false
+  end
+
   test "render_card renders a question with reorder controls (regression: @survey was nil)" do
     post render_survey_card_path(@survey),
          params: { type: "multiple_choice", text: "New Q?", options: %w[a b] }.to_json,

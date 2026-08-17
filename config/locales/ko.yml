@@ -1007,6 +1007,7 @@ ko:
     thank_you_screen: '감사 화면'
     verto_name: 'Verto 이름'
     delete_card_n: '카드 %{n} 삭제'
+    drag_to_reorder: '드래그해서 순서 변경'
     remove_consent_gate: '동의 화면 삭제'
     remove_thankyou_screen: '감사 화면 삭제'
     remove: '제거'

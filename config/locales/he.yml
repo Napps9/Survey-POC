@@ -1007,6 +1007,7 @@ he:
     thank_you_screen: 'מסך תודה'
     verto_name: 'שם הוורטו'
     delete_card_n: 'מחיקת כרטיס %{n}'
+    drag_to_reorder: 'גרור כדי לסדר מחדש'
     remove_consent_gate: 'הסרת מסך ההסכמה'
     remove_thankyou_screen: 'הסרת מסך התודה'
     remove: 'הסרה'

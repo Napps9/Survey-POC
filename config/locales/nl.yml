@@ -1007,6 +1007,7 @@ nl:
     thank_you_screen: 'Bedankscherm'
     verto_name: 'Verto-naam'
     delete_card_n: 'Kaart %{n} verwijderen'
+    drag_to_reorder: 'Sleep om opnieuw te ordenen'
     remove_consent_gate: 'Toestemmingsscherm verwijderen'
     remove_thankyou_screen: 'Bedankscherm verwijderen'
     remove: 'Verwijderen'

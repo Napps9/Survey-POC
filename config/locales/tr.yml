@@ -1007,6 +1007,7 @@ tr:
     thank_you_screen: 'Teşekkür ekranı'
     verto_name: 'Verto adı'
     delete_card_n: '%{n}. kartı sil'
+    drag_to_reorder: 'Yeniden sıralamak için sürükleyin'
     remove_consent_gate: 'Onay ekranını kaldır'
     remove_thankyou_screen: 'Teşekkür ekranını kaldır'
     remove: 'Kaldır'

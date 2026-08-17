@@ -1007,6 +1007,7 @@ de:
     thank_you_screen: 'Dankeschön-Seite'
     verto_name: 'Verto-Name'
     delete_card_n: 'Karte %{n} löschen'
+    drag_to_reorder: 'Zum Neuanordnen ziehen'
     remove_consent_gate: 'Einwilligungs-Gate entfernen'
     remove_thankyou_screen: 'Dankeschön-Seite entfernen'
     remove: 'Entfernen'

@@ -1007,6 +1007,7 @@ vi:
     thank_you_screen: 'Màn hình cảm ơn'
     verto_name: 'Tên Verto'
     delete_card_n: 'Xoá thẻ %{n}'
+    drag_to_reorder: 'Kéo để sắp xếp lại'
     remove_consent_gate: 'Xoá màn hình đồng ý'
     remove_thankyou_screen: 'Xoá màn hình cảm ơn'
     remove: 'Gỡ bỏ'

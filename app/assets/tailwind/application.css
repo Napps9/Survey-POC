@@ -1624,6 +1624,20 @@
 }
 .card-move-btn:disabled { opacity: 0.3; cursor: default; }
 
+.card-grip { cursor: grab; font-size: 13px; }
+.card-grip:active { cursor: grabbing; }
+
+/* ── Drag-and-drop reorder (2.9) ──────────────────────────────────────────
+   .is-dragging is the card being lifted; .is-drop-target marks every legal
+   gap for the WHOLE gesture (painted once at dragstart from _legalGapsFor);
+   .is-drop-here-before/-after is the single nearest one, updated live as the
+   pointer moves — the border a two-way "will land here" cue keyed off which
+   edge the drop actually lands on (see survey_editor_controller#_applyGap). */
+.card-slot.is-dragging { opacity: 0.4; }
+.card-slot.is-drop-target { outline: 1.5px dashed rgba(1,234,203,0.35); outline-offset: 4px; border-radius: 16px; }
+.card-slot.is-drop-here-before { box-shadow: inset 0 3px 0 0 #01EACB; }
+.card-slot.is-drop-here-after  { box-shadow: inset 0 -3px 0 0 #01EACB; }
+
 .token-type-add-btn:disabled { opacity: 0.4; cursor: default; }
 
 /* Insert/reorder chrome is editing-only: hide it on translation tabs (structural

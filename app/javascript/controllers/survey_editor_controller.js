@@ -484,9 +484,21 @@ export default class extends Controller {
   // Where a slot currently sits, as a closure that puts it back there. Captured
   // BEFORE the move, so a reorder undoes to its exact previous neighbour rather
   // than to an index that other edits may have shifted.
+  //
+  // The next .card-slot specifically — NOT the literal nextElementSibling.
+  // _paintFlowChrome (called by every renumberCards(), including the one this
+  // very move triggers) unconditionally removes and rebuilds every
+  // .flow-header-row/.flow-tabs-row on each repaint, so a slot sitting right
+  // before one would capture a node that's already gone by the time undo
+  // runs — silently falling through to the parent.appendChild(slot) branch
+  // below and restoring to the END of the feed instead of its real neighbour.
+  // Real .card-slot elements are never torn down that way, only the chrome
+  // between them, so walking past any chrome to the next actual slot is what
+  // survives a repaint.
   _slotRestorer(slot) {
     const parent = slot.parentNode
-    const next   = slot.nextElementSibling
+    let next = slot.nextElementSibling
+    while (next && !next.classList.contains("card-slot")) next = next.nextElementSibling
     return () => {
       if (!parent) return
       if (next && next.parentNode === parent) parent.insertBefore(slot, next)
@@ -901,6 +913,123 @@ export default class extends Controller {
     void card.offsetWidth // restart the pulse so the move reads as a move
     card.classList.add("card-flash")
     setTimeout(() => card.classList.remove("card-flash"), 1300)
+  }
+
+  // ── Drag-and-drop reorder ─────────────────────────────────────────────────
+  // Native HTML5 drag events, not a package — SortableJS (or similar) has no
+  // idea about the invariants below and would happily drop a flow member
+  // outside its flow, or a question ahead of the welcome card. Touch keeps
+  // ▲/▼: native drag doesn't reach touch devices without a polyfill this
+  // deck doesn't carry.
+
+  // The full set of legal drop gaps for `card` (currently at `slot`) — the
+  // SAME rules moveCardUp/moveCardDown already enforce one step at a time
+  // (flow membership via _reorderNeighbor's own walk, welcome pinned first,
+  // a gate never ends up below a question), generalised from "how far can one
+  // ▲/▼ press move it" to "everywhere a drag could legally drop it". Walks
+  // outward in both directions, reusing _reorderNeighbor iteratively — it
+  // only ever reads `slot`'s siblings, so feeding it each hit's own slot
+  // continues the same walk further out — until a boundary invariant stops
+  // it, which is also the exact point no FURTHER gap in that direction could
+  // be legal either (the boundary only gets closer, never further away), so
+  // it's safe to stop collecting there rather than merely skip one.
+  //
+  // Returns [{ ref, dir, hopped }]: dir<0 entries came from walking up
+  // (earlier in the doc), dir>0 from walking down; `ref` + `hopped` are
+  // exactly what moveCardUp/moveCardDown already key their own before/after
+  // placement off (see _applyGap).
+  _legalGapsFor(card, slot) {
+    const type = card.dataset.cardType
+    const gaps = []
+    for (const dir of [ -1, 1 ]) {
+      let cursor = slot
+      let hit = this._reorderNeighbor(card, cursor, dir)
+      while (hit) {
+        const targetType = hit.slot.querySelector("[data-survey-editor-target='card']")?.dataset.cardType
+        // Mirrors moveCardUp's inline pin check: nothing but a consent gate
+        // may land at or ahead of the welcome card.
+        if (targetType === "welcome_card" && type !== "consent_gate") break
+        // Mirrors _gateBlockedBelow: a gate can walk down only as far as the
+        // last card still ahead of every question.
+        if (dir > 0 && this._gateBlockedBelow(card, hit)) break
+        gaps.push({ ref: hit.slot, dir, hopped: hit.hopped })
+        cursor = hit.slot
+        hit = this._reorderNeighbor(card, cursor, dir)
+      }
+    }
+    return gaps
+  }
+
+  // The same before/after choice moveCardUp/moveCardDown already make from
+  // { dir, hopped }: lands BEFORE ref moving up without a hop, or moving down
+  // WITH one — a hop always lands on the near side of whatever run it
+  // jumped, which flips which edge counts as "near" per direction.
+  _applyGap(slot, gap) {
+    const landsBefore = (gap.dir < 0) !== gap.hopped
+    if (landsBefore) gap.ref.before(slot)
+    else gap.ref.after(slot)
+  }
+
+  dragStart(event) {
+    event.stopPropagation()
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    const slot = card?.closest(".card-slot")
+    if (!card || !slot) { event.preventDefault(); return }
+
+    this._dragCard  = card
+    this._dragSlot  = slot
+    this._dragGaps  = this._legalGapsFor(card, slot)
+    this._dragUndo  = this._slotRestorer(slot) // one gesture, captured once, before any move
+    this._dragMoved = false
+
+    event.dataTransfer.effectAllowed = "move"
+    // Some engines refuse to start a drag at all with no data set.
+    event.dataTransfer.setData("text/plain", card.dataset.cardCid || "")
+
+    slot.classList.add("is-dragging")
+    this._dragGaps.forEach(g => g.ref.classList.add("is-drop-target"))
+  }
+
+  // Delegated on the feed (data-survey-editor-target="feed"), not per-slot:
+  // one listener has to answer for wherever the pointer currently is.
+  dragOver(event) {
+    if (!this._dragSlot) return
+    const slot = event.target.closest?.(".card-slot")
+    const gap  = slot && this._dragGaps.find(g => g.ref === slot)
+    if (!gap) return
+    event.preventDefault() // only ever allowed over a legal gap — see above
+    event.dataTransfer.dropEffect = "move"
+    if (this._dragHoverSlot !== slot) {
+      this._dragHoverSlot?.classList.remove("is-drop-here-before", "is-drop-here-after")
+      const before = (gap.dir < 0) !== gap.hopped
+      slot.classList.add(before ? "is-drop-here-before" : "is-drop-here-after")
+      this._dragHoverSlot = slot
+    }
+  }
+
+  drop(event) {
+    if (!this._dragSlot) return
+    event.preventDefault()
+    const slot = event.target.closest?.(".card-slot")
+    const gap  = slot && this._dragGaps.find(g => g.ref === slot)
+    if (!gap) return
+    this._applyGap(this._dragSlot, gap)
+    this._dragMoved = true
+  }
+
+  // Fires on the drag SOURCE (the grip) whether the drop landed or was
+  // cancelled, so this — not drop — is the one place cleanup and the single
+  // undo entry for the whole gesture belong.
+  dragEnd() {
+    if (this._dragMoved) {
+      this._pushUndo(this._dragUndo)
+      this._afterReorder(this._dragCard)
+    }
+    this._dragGaps?.forEach(g => g.ref.classList.remove("is-drop-target"))
+    this._dragHoverSlot?.classList.remove("is-drop-here-before", "is-drop-here-after")
+    this._dragSlot?.classList.remove("is-dragging")
+    this._dragCard = this._dragSlot = this._dragGaps = this._dragUndo = this._dragHoverSlot = null
+    this._dragMoved = false
   }
 
   // Re-stamp each card's number, progress bar and reorder-button state after a

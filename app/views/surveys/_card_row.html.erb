@@ -74,6 +74,14 @@
             autosave persists the new order (the serialiser reads cards in
             document order). %>
         <div class="card-reorder">
+          <%# Drag handle — touch has no native HTML5 drag without a polyfill
+              this deck doesn't carry, so ▲▼ stay the touch/keyboard path;
+              this is a pointer-only addition, not a replacement. %>
+          <button type="button" class="card-move-btn card-grip" data-role="grip"
+                  draggable="true"
+                  title="<%= t('editor.drag_to_reorder') %>"
+                  aria-label="<%= t('editor.drag_to_reorder') %>"
+                  data-action="dragstart->survey-editor#dragStart dragend->survey-editor#dragEnd">⠿</button>
           <button type="button" class="card-move-btn" data-role="move-up"
                   title="<%= t('editor.move_up', default: 'Move question up') %>"
                   aria-label="<%= t('editor.move_up', default: 'Move question up') %>"

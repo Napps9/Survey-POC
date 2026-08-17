@@ -1007,6 +1007,7 @@ fr:
     thank_you_screen: 'Écran de remerciement'
     verto_name: 'Nom du Verto'
     delete_card_n: 'Supprimer la carte %{n}'
+    drag_to_reorder: 'Faites glisser pour réorganiser'
     remove_consent_gate: 'Supprimer l’écran de consentement'
     remove_thankyou_screen: 'Supprimer l’écran de remerciement'
     remove: 'Retirer'

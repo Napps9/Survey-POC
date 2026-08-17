@@ -293,6 +293,11 @@
                root, collapsed to this element's centre line — the same line the
                cards below scroll-snap to. %>
            data-editor-scroll-sync-target="feed"
+           <%# Delegated drag-and-drop reorder: one listener answers for
+               wherever the pointer currently is, rather than one per
+               .card-slot (dragStart/dragEnd are bound on each card's own grip
+               instead — see _card_row.html.erb). %>
+           data-action="dragover->survey-editor#dragOver drop->survey-editor#drop"
            style="padding-top:64px;padding-bottom:84px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.08) transparent;<%= verto_backdrop_style_attr(@survey, image: false) %>">
 
         <%# ── Consent gate slot — a CTA above the welcome card until a consent

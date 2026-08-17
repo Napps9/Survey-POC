@@ -1007,6 +1007,7 @@ sw:
     thank_you_screen: 'Skrini ya shukrani'
     verto_name: 'Jina la Verto'
     delete_card_n: 'Futa kadi %{n}'
+    drag_to_reorder: 'Buruta ili kupanga upya'
     remove_consent_gate: 'Ondoa skrini ya idhini'
     remove_thankyou_screen: 'Ondoa skrini ya shukrani'
     remove: 'Ondoa'

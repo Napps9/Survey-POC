@@ -1007,6 +1007,7 @@ hi:
     thank_you_screen: 'धन्यवाद स्क्रीन'
     verto_name: 'वर्टो का नाम'
     delete_card_n: 'कार्ड %{n} हटाएँ'
+    drag_to_reorder: 'क्रम बदलने के लिए खींचें'
     remove_consent_gate: 'सहमति स्क्रीन हटाएँ'
     remove_thankyou_screen: 'धन्यवाद स्क्रीन हटाएँ'
     remove: 'हटाएं'
