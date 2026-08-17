@@ -30,6 +30,22 @@ class OrganisationAssetsTest < ActionDispatch::IntegrationTest
     assert_redirected_to organisation_memberships_path(@org)
   end
 
+  test "the multipart path enforces the library cap" do
+    stub_max = Organisation::MAX_ASSETS
+    Organisation.send(:remove_const, :MAX_ASSETS)
+    Organisation.const_set(:MAX_ASSETS, 1)
+    attach_asset
+    login(@admin)
+    assert_no_difference -> { @org.reload.assets.attachments.size } do
+      post organisation_assets_path(@org), params: { assets: [ png_upload("a.png"), png_upload("b.png") ] }
+    end
+    assert_redirected_to organisation_memberships_path(@org)
+    assert_match(/exceed your 1-asset limit/, flash[:alert])
+  ensure
+    Organisation.send(:remove_const, :MAX_ASSETS)
+    Organisation.const_set(:MAX_ASSETS, stub_max)
+  end
+
   # What makes an upload a valid asset here is its content type; what decides
   # whether the stored blob PATH survives Survey.sanitize_image_url is its
   # extension. An asset named "logo" or "holiday.jfif" used to be stored under
