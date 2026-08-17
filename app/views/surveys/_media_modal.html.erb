@@ -204,5 +204,33 @@
               disabled>Apply</button>
     </div>
 
+    <%# Crop stage — shown after choosing an upload for a fixed-ratio slot
+        (card / background / tap-option art), in place of the tabs/body/foot
+        above, before the pick is applied. Uploads only: library and Pexels
+        picks arrive pre-cropped server-side (PexelsClient::CROP_FOR). Drag to
+        reposition, slider to zoom; "Skip" keeps the plain uncropped image. %>
+    <div class="media-crop-stage" data-media-picker-target="cropStage" hidden>
+      <div class="media-crop-frame"
+           data-media-picker-target="cropFrame"
+           data-action="pointerdown->media-picker#cropDragStart pointermove->media-picker#cropDrag pointerup->media-picker#cropDragEnd pointercancel->media-picker#cropDragEnd">
+        <img class="media-crop-img" data-media-picker-target="cropImg" alt="" draggable="false" />
+      </div>
+      <div class="media-crop-controls">
+        <span class="media-crop-zoom-icon" aria-hidden="true">−</span>
+        <input type="range" class="media-crop-zoom" min="1" max="3" step="0.01" value="1"
+               data-media-picker-target="cropZoom"
+               aria-label="<%= t("editor.crop_zoom", default: "Zoom") %>"
+               data-action="input->media-picker#cropZoomChanged" />
+        <span class="media-crop-zoom-icon" aria-hidden="true">+</span>
+      </div>
+      <div class="media-crop-hint"><%= t("editor.crop_hint", default: "Drag to reposition, use the slider to zoom") %></div>
+      <div class="media-crop-actions">
+        <button type="button" class="media-btn-ghost"
+                data-action="click->media-picker#cropSkip"><%= t("editor.crop_skip", default: "Skip") %></button>
+        <button type="button" class="media-btn-primary"
+                data-action="click->media-picker#cropApply"><%= t("editor.crop_apply", default: "Use this crop") %></button>
+      </div>
+    </div>
+
   </div>
 </div>

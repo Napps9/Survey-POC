@@ -994,6 +994,10 @@ en:
     lottie_placeholder: "Paste a LottieFiles link, e.g. https://lottie.host/….json"
     lottie_apply: "Use animation"
     lottie_hint: "Direct .json links from lottiefiles.com or lottie.host. The animation replaces the card's photo or video."
+    crop_zoom: "Zoom"
+    crop_hint: "Drag to reposition, use the slider to zoom"
+    crop_skip: "Skip"
+    crop_apply: "Use this crop"
     required_chip: 'Required'
     ty_title_label: 'Thank-you title'
     ty_body_label: 'Thank-you message'

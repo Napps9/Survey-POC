@@ -14,7 +14,8 @@ export default class extends Controller {
     "searchInput", "searchSection", "searchStatus", "searchGrid",
     "mediaToggle", "mediaTab",
     "saveToLibrary", "brandGrid", "libraryFileInput", "brandStatus",
-    "lottieSection", "lottieInput", "lottieError", "lottieBtn"
+    "lottieSection", "lottieInput", "lottieError", "lottieBtn",
+    "cropStage", "cropFrame", "cropImg", "cropZoom"
   ]
   static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, cardLottieUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array }
 
@@ -27,6 +28,15 @@ export default class extends Controller {
   static MAX_EDGE        = 1600             // longest side, px
   static ENCODE_QUALITY  = 0.82
   static SVG_BYTE_CAP    = 500 * 1024       // SVGs skip downscaling, so cap them directly
+
+  // Fixed [width, height] output ratio per slot, matching PexelsClient::CROP_FOR
+  // — a Pexels pick already arrives pre-cropped to these dimensions server-side,
+  // so an upload should land on the card at the same shape. Only the modes
+  // listed here get an interactive crop stage; consent/comms uploads keep
+  // today's plain-downscale path (their slot isn't a fixed ratio the way a
+  // card/background/tap-option art frame is).
+  static CROP_RATIO = { card: [ 720, 1280 ], background: [ 1920, 1080 ], tapOption: [ 800, 800 ] }
+  static CROP_ZOOM_MAX = 3 // how far past cover-fit the slider lets an editor punch in
 
   // Same gradient pairs _card_component.html.erb falls back to when a tap-card
   // statement has no image, so a cleared/never-set slot repaints identically
@@ -44,6 +54,7 @@ export default class extends Controller {
     this._optionIndex = null
     this._searchMedia = "photos"
     this._escListener = (e) => { if (e.key === "Escape") this.close() }
+    this._cropImgEl = null
   }
 
   open(event) {
@@ -193,6 +204,7 @@ export default class extends Controller {
     this._clearUploadError()
     this._renderRecommended([], "")
     this._clearSearch()
+    this._closeCropStage()
     document.removeEventListener("keydown", this._escListener)
   }
 
@@ -258,7 +270,8 @@ export default class extends Controller {
     // SVGs are vector and usually tiny; rasterising them on a canvas would only
     // make them bigger and blurry, so keep them as-is — but a hand-exported or
     // embedded-raster SVG can still be large, so cap it directly since it skips
-    // the downscale step that normally bounds upload size.
+    // the downscale step that normally bounds upload size. Bypasses the crop
+    // stage entirely too, for the same reason: there's no raster to re-encode.
     if (file.type === "image/svg+xml") {
       if (file.size > this.constructor.SVG_BYTE_CAP) {
         const kb = Math.round(this.constructor.SVG_BYTE_CAP / 1024)
@@ -268,11 +281,43 @@ export default class extends Controller {
       this._readAsDataUrl(file)
       return
     }
-    this._downscale(file)
+    // A fixed-ratio slot gets an interactive crop stage; everything else
+    // (consent gate, comms image block) keeps the plain downscale-and-stash
+    // path this always had.
+    if (this.constructor.CROP_RATIO[this._mode]) this._openCropStage(file)
+    else this._downscale(file)
   }
 
-  // Draw the upload onto a canvas resized to MAX_EDGE and re-encode it to WebP
-  // (JPEG fallback) so every stored image is small and a consistent format.
+  // Re-encodes a canvas to WebP, falling back to JPEG. Shared by the plain
+  // downscale path and the crop stage's single final encode.
+  _encodeCanvas(canvas) {
+    const q = this.constructor.ENCODE_QUALITY
+    try {
+      const webp = canvas.toDataURL("image/webp", q)
+      // Browsers without WebP encoding silently return PNG — fall back to JPEG
+      // so we never store an unexpectedly large PNG.
+      if (webp.startsWith("data:image/webp")) return webp
+    } catch (_e) { /* fall through to JPEG */ }
+    return canvas.toDataURL("image/jpeg", q)
+  }
+
+  // Draws an already-decoded image onto a canvas capped at MAX_EDGE on its
+  // longest side and encodes it — the plain, uncropped path a fresh upload
+  // (via _downscale) and a skipped crop stage both end up at.
+  _downscaledDataUrl(img) {
+    const maxEdge = this.constructor.MAX_EDGE
+    const scale = Math.min(1, maxEdge / Math.max(img.width, img.height))
+    const w = Math.max(1, Math.round(img.width * scale))
+    const h = Math.max(1, Math.round(img.height * scale))
+    const canvas = document.createElement("canvas")
+    canvas.width = w
+    canvas.height = h
+    canvas.getContext("2d").drawImage(img, 0, 0, w, h)
+    return this._encodeCanvas(canvas)
+  }
+
+  // Decode + downscale + re-encode, skipping the crop stage outright (used for
+  // brand-library uploads, which aren't headed for any one fixed-ratio slot).
   // Both encoders complete through `done`, defaulting to the card-apply flow
   // (stash as the pending pick). The add-to-library tile passes its own
   // completion instead.
@@ -281,26 +326,7 @@ export default class extends Controller {
     const img = new Image()
     img.onload = () => {
       URL.revokeObjectURL(url)
-      const maxEdge = this.constructor.MAX_EDGE
-      const scale = Math.min(1, maxEdge / Math.max(img.width, img.height))
-      const w = Math.max(1, Math.round(img.width * scale))
-      const h = Math.max(1, Math.round(img.height * scale))
-      const canvas = document.createElement("canvas")
-      canvas.width = w
-      canvas.height = h
-      const ctx = canvas.getContext("2d")
-      ctx.drawImage(img, 0, 0, w, h)
-      const q = this.constructor.ENCODE_QUALITY
-      let out
-      try {
-        out = canvas.toDataURL("image/webp", q)
-        // Browsers without WebP encoding silently return PNG — fall back to JPEG
-        // so we never store an unexpectedly large PNG.
-        if (!out.startsWith("data:image/webp")) out = canvas.toDataURL("image/jpeg", q)
-      } catch (_e) {
-        out = canvas.toDataURL("image/jpeg", q)
-      }
-      done(out)
+      done(this._downscaledDataUrl(img))
     }
     img.onerror = () => {
       URL.revokeObjectURL(url)
@@ -309,6 +335,183 @@ export default class extends Controller {
       this._readAsDataUrl(file, done)
     }
     img.src = url
+  }
+
+  // ── Crop stage ──────────────────────────────────────────
+  // Sits between decode and stash for a fixed-ratio slot (card/background/
+  // tap-option — see CROP_RATIO): drag to reposition, a slider to zoom, single
+  // final encode straight from the ORIGINAL decoded image so quality is never
+  // lost to an intermediate downscale. Runs before moderation and persistence
+  // — applyImage() moderates and stores whatever _stashPending receives here,
+  // same as any other pending pick, so the crop is exactly what ships.
+
+  // Decode the file once, then open the crop UI against that one Image —
+  // Skip and Apply both read from it, so nothing is decoded twice.
+  _openCropStage(file) {
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      this._cropObjectUrl = url
+      this._cropImgEl = img
+      if (this.hasCropImgTarget) this.cropImgTarget.src = url
+      const [ rw, rh ] = this.constructor.CROP_RATIO[this._mode]
+      if (this.hasCropFrameTarget) this.cropFrameTarget.style.aspectRatio = `${rw} / ${rh}`
+      this._showCropStage(true)
+      // The frame's rendered size depends on the aspect-ratio just applied —
+      // defer a frame so getBoundingClientRect reflects the real layout.
+      requestAnimationFrame(() => this._layoutCrop())
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      // Couldn't decode for cropping either — degrade exactly like _downscale
+      // does: forward the raw file rather than blocking the upload.
+      this._readAsDataUrl(file)
+    }
+    img.src = url
+  }
+
+  // Cover-fits the image into the frame (never leaves a gap), centred, at
+  // zoom 1 — the same starting point every time the stage opens.
+  _layoutCrop() {
+    if (!this._cropImgEl || !this.hasCropFrameTarget) return
+    const rect = this.cropFrameTarget.getBoundingClientRect()
+    this._cropFrameW = rect.width
+    this._cropFrameH = rect.height
+    this._cropMinScale = Math.max(
+      this._cropFrameW / this._cropImgEl.naturalWidth,
+      this._cropFrameH / this._cropImgEl.naturalHeight
+    )
+    this._cropZoomFactor = 1
+    if (this.hasCropZoomTarget) this.cropZoomTarget.value = "1"
+    this._cropScale = this._cropMinScale
+    this._setCropOffset(
+      (this._cropFrameW - this._cropImgEl.naturalWidth * this._cropScale) / 2,
+      (this._cropFrameH - this._cropImgEl.naturalHeight * this._cropScale) / 2
+    )
+  }
+
+  // Clamp so the image always fully covers the frame (no gap on any edge),
+  // then paint.
+  _setCropOffset(x, y) {
+    const dispW = this._cropImgEl.naturalWidth  * this._cropScale
+    const dispH = this._cropImgEl.naturalHeight * this._cropScale
+    const minX = Math.min(0, this._cropFrameW - dispW)
+    const minY = Math.min(0, this._cropFrameH - dispH)
+    this._cropOffsetX = Math.min(0, Math.max(minX, x))
+    this._cropOffsetY = Math.min(0, Math.max(minY, y))
+    this._paintCropTransform()
+  }
+
+  _paintCropTransform() {
+    if (!this.hasCropImgTarget) return
+    this.cropImgTarget.style.transform = `translate(${this._cropOffsetX}px, ${this._cropOffsetY}px) scale(${this._cropScale})`
+  }
+
+  cropDragStart(event) {
+    if (!this._cropImgEl) return
+    event.preventDefault()
+    // Best-effort: a pointer id the browser won't let us capture (some
+    // synthetic/edge-case pointers) should still let the drag itself proceed
+    // via the ordinary move/up events rather than aborting cropDragStart here.
+    try { this.cropFrameTarget.setPointerCapture?.(event.pointerId) } catch (_e) { /* no-op */ }
+    this._cropDragging = true
+    this._cropDragStartX = event.clientX
+    this._cropDragStartY = event.clientY
+    this._cropDragOriginX = this._cropOffsetX
+    this._cropDragOriginY = this._cropOffsetY
+  }
+
+  cropDrag(event) {
+    if (!this._cropDragging) return
+    event.preventDefault()
+    this._setCropOffset(
+      this._cropDragOriginX + (event.clientX - this._cropDragStartX),
+      this._cropDragOriginY + (event.clientY - this._cropDragStartY)
+    )
+  }
+
+  cropDragEnd(event) {
+    if (!this._cropDragging) return
+    this._cropDragging = false
+    try { this.cropFrameTarget.releasePointerCapture?.(event.pointerId) } catch (_e) { /* no-op */ }
+  }
+
+  // Zoom slider: 1 = cover-fit, CROP_ZOOM_MAX = punched all the way in.
+  // Re-anchors on the frame's centre point (in image space) so zooming feels
+  // centred instead of yanking the image toward the top-left corner.
+  cropZoomChanged(event) {
+    if (!this._cropImgEl) return
+    const factor = parseFloat(event.target.value) || 1
+    const oldScale = this._cropScale
+    const cx = (this._cropFrameW / 2 - this._cropOffsetX) / oldScale
+    const cy = (this._cropFrameH / 2 - this._cropOffsetY) / oldScale
+    this._cropScale = this._cropMinScale * factor
+    this._setCropOffset(
+      this._cropFrameW / 2 - cx * this._cropScale,
+      this._cropFrameH / 2 - cy * this._cropScale
+    )
+  }
+
+  // Output canvas size for the active slot: the mode's fixed ratio, scaled
+  // down (never up) so its longest edge respects MAX_EDGE — mirrors how the
+  // plain downscale path bounds its own output.
+  _cropOutputDims() {
+    const [ rw, rh ] = this.constructor.CROP_RATIO[this._mode]
+    const scale = Math.min(1, this.constructor.MAX_EDGE / Math.max(rw, rh))
+    return [ Math.max(1, Math.round(rw * scale)), Math.max(1, Math.round(rh * scale)) ]
+  }
+
+  // Single encode straight from the original decoded image: the frame's
+  // current pan/zoom converts directly to a source rectangle, drawn once onto
+  // the target-sized canvas — no intermediate downscale to lose quality to.
+  cropApply(event) {
+    event?.preventDefault()
+    if (!this._cropImgEl) return
+    const srcX = -this._cropOffsetX / this._cropScale
+    const srcY = -this._cropOffsetY / this._cropScale
+    const srcW = this._cropFrameW / this._cropScale
+    const srcH = this._cropFrameH / this._cropScale
+    const [ outW, outH ] = this._cropOutputDims()
+    const canvas = document.createElement("canvas")
+    canvas.width = outW
+    canvas.height = outH
+    canvas.getContext("2d").drawImage(this._cropImgEl, srcX, srcY, srcW, srcH, 0, 0, outW, outH)
+    const dataUrl = this._encodeCanvas(canvas)
+    this._closeCropStage()
+    this._stashPending(dataUrl)
+  }
+
+  // "Skip" — today's behaviour, unchanged: the plain MAX_EDGE-capped
+  // downscale of the whole original image, no fixed ratio forced on it.
+  cropSkip(event) {
+    event?.preventDefault()
+    if (!this._cropImgEl) return
+    const dataUrl = this._downscaledDataUrl(this._cropImgEl)
+    this._closeCropStage()
+    this._stashPending(dataUrl)
+  }
+
+  _showCropStage(show) {
+    if (this.hasCropStageTarget) this.cropStageTarget.hidden = !show
+    // The crop stage takes over the modal's content area — the normal
+    // tabs/body/foot (Upload/Library, Cancel/Apply) sit this out meanwhile.
+    const tabs = this.element.querySelector(".media-modal-tabs")
+    const body = this.element.querySelector(".media-modal-body")
+    const foot = this.element.querySelector(".media-modal-foot")
+    if (tabs) tabs.hidden = show
+    if (body) body.hidden = show
+    if (foot) foot.hidden = show
+  }
+
+  _closeCropStage() {
+    this._showCropStage(false)
+    if (this._cropObjectUrl) URL.revokeObjectURL(this._cropObjectUrl)
+    this._cropObjectUrl = null
+    this._cropImgEl = null
+    if (this.hasCropImgTarget) {
+      this.cropImgTarget.removeAttribute("src")
+      this.cropImgTarget.style.transform = ""
+    }
   }
 
   _readAsDataUrl(file, done = this._stashPending.bind(this)) {

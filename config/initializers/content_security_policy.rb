@@ -40,7 +40,18 @@ Rails.application.configure do
     # App assets + Active Storage logos (self), survey background data: URLs,
     # Pexels stock photos (editor media picker + auto-populated Verto imagery,
     # served from the Pexels image CDN), and Clarity's tracking pixels.
-    policy.img_src    :self, :data, "https://images.pexels.com", "https://*.clarity.ms"
+    #
+    # blob: — media_picker_controller.js decodes every upload (downscale +
+    # the 2.10 crop stage) by pointing an Image() at URL.createObjectURL(file).
+    # Without this, the browser blocks that fetch under img-src (confirmed via
+    # a captured securitypolicyviolation event, directive "img-src", blocked
+    # "blob"), img.onload silently never fires, and decode falls through to
+    # onerror's raw-file fallback — meaning every upload was storing the
+    # original, undownscaled file as a data URL instead of the compressed
+    # MAX_EDGE-capped re-encode the comment two blocks up says this exists to
+    # produce. That fallback exists for genuinely exotic formats a canvas
+    # can't decode, not as the path every ordinary JPEG/PNG silently took.
+    policy.img_src    :self, :data, :blob, "https://images.pexels.com", "https://*.clarity.ms"
 
     # Pexels stock videos stream from the Pexels video CDN (autoplaying card
     # art). Without this the browser blocks the <video>, like img_src did for
