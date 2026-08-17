@@ -91,6 +91,10 @@ gem "googleauth"             # Signet OAuth2: authorize URL, code exchange, toke
 gem "google-apis-sheets_v4"  # create spreadsheet + write values (Drive API not needed)
 gem "google-apis-drive_v3"   # create the AI report as a Google Doc in the user's Drive
 
+# Results export as .xlsx alongside the streamed CSV — pure Ruby, no native
+# binary. rubyzip above is what a test unzips the generated workbook with.
+gem "caxlsx"
+
 # Internal BI: read-only SQL dashboards over the app DB for VertoNow staff.
 # Mounted at /blazer, gated to a staff-email allowlist (see config/routes.rb
 # and app/lib/blazer_access.rb). Runs against Postgres in prod.

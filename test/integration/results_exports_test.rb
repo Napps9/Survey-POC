@@ -46,11 +46,42 @@ class ResultsExportsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "results page shows the Download CSV control and hides Google when unconfigured" do
+  test "results page shows the Download control, all four export links, and hides Google when unconfigured" do
     get survey_results_path(@survey)
     assert_response :success
-    assert_match "Download CSV", response.body
+    assert_match "⤓ Download", response.body
+    assert_match "Raw responses (.csv)", response.body
+    assert_match "Summary (.csv)", response.body
+    assert_match "Raw responses (.xlsx)", response.body
+    assert_match "Summary (.xlsx)", response.body
     assert_no_match(/Connect Google Sheets|Export to Google Sheets/, response.body)
+  end
+
+  test "downloads the raw-responses XLSX with the right content type and filename" do
+    get survey_results_export_path(@survey, kind: "responses", format: "xlsx")
+    assert_response :success
+    assert_equal "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response.media_type
+    assert_match "attachment", response.headers["Content-Disposition"]
+    assert_match "verto-#{@survey.id}-responses", response.headers["Content-Disposition"]
+    assert_match(/\.xlsx"?$/, response.headers["Content-Disposition"])
+    assert response.body.start_with?("PK"), "expected a real zip/xlsx container, not an error page"
+  end
+
+  test "downloads the aggregated summary XLSX" do
+    get survey_results_export_path(@survey, kind: "summary", format: "xlsx")
+    assert_response :success
+    assert_match "verto-#{@survey.id}-summary", response.headers["Content-Disposition"]
+    assert response.body.start_with?("PK")
+  end
+
+  test "cannot export another org's Verto as XLSX either" do
+    other = User.create!(name: "Z", email_address: "zx-#{SecureRandom.hex(3)}@test.com", password: "verylongpassword")
+    org2  = Organisation.create!(name: "O2", slug: "ex3-#{SecureRandom.hex(3)}")
+    org2.memberships.create!(user: other, role: "admin")
+    sign_in(other)
+
+    get survey_results_export_path(@survey, kind: "responses", format: "xlsx")
+    assert_response :not_found
   end
 
   test "results page shows Connect when configured but not connected, Export once connected" do

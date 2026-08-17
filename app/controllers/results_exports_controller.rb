@@ -10,8 +10,24 @@ class ResultsExportsController < ApplicationController
     survey          = export_survey
     export, _active = build_results_export(survey, params[:segment])
 
-    summary  = params[:kind].to_s == "summary"
-    label    = summary ? "summary" : "responses"
+    summary = params[:kind].to_s == "summary"
+    label   = summary ? "summary" : "responses"
+
+    if params[:format].to_s == "xlsx"
+      send_xlsx(export, survey, label, summary)
+    else
+      send_csv(export, survey, label, summary)
+    end
+  rescue ActiveRecord::RecordNotFound
+    raise
+  rescue => e
+    ErrorReporting.report("ResultsExportsController", e)
+    redirect_to survey_results_path(params[:survey_id]), alert: t("flash.results_exports.export_failed", reason: e.message)
+  end
+
+  private
+
+  def send_csv(export, survey, label, summary)
     filename = "verto-#{survey.id}-#{label}-#{Date.current.iso8601}.csv"
 
     response.headers["Content-Type"]        = "text/csv; charset=utf-8"
@@ -25,10 +41,16 @@ class ResultsExportsController < ApplicationController
       out << "﻿"
       export.each_row(summary: summary) { |row| out << CSV.generate_line(row) }
     end
-  rescue ActiveRecord::RecordNotFound
-    raise
-  rescue => e
-    ErrorReporting.report("ResultsExportsController", e)
-    redirect_to survey_results_path(params[:survey_id]), alert: t("flash.results_exports.export_failed", reason: e.message)
+  end
+
+  # Unlike the CSV path this can't stream — Axlsx builds the whole workbook in
+  # memory before it can be serialised (see ResultsExportXlsx). Fine at survey
+  # scale; keep CSV as the streaming path if that ever stops being true.
+  def send_xlsx(export, survey, label, summary)
+    filename = "verto-#{survey.id}-#{label}-#{Date.current.iso8601}.xlsx"
+    send_data ResultsExportXlsx.new(export, summary: summary).to_stream,
+      filename: filename,
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      disposition: "attachment"
   end
 end
