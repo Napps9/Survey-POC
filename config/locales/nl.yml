@@ -265,6 +265,8 @@ nl:
     leaderboard_teaser: "De beste puntenverzamelaars komen aan het einde op het scorebord!"
     play_again: "Opnieuw spelen"
     font_size: "Tekstgrootte"
+    lite_mode: "Databesparende modus"
+    lite_mode_short: "Lite"
   defaults:
     range: ["Helemaal oneens", "Oneens", "Neutraal", "Eens", "Helemaal eens"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

@@ -265,6 +265,8 @@ de:
     leaderboard_teaser: "Die besten Punktesammler landen am Ende auf der Bestenliste!"
     play_again: "Nochmal spielen"
     font_size: "Textgröße"
+    lite_mode: "Datensparmodus"
+    lite_mode_short: "Lite"
   defaults:
     range: ["Stimme überhaupt nicht zu", "Stimme nicht zu", "Neutral", "Stimme zu", "Stimme voll zu"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

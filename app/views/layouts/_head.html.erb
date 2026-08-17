@@ -18,7 +18,10 @@
 
 <%= yield :head %>
 
-<link rel="manifest" href="<%= pwa_manifest_path %>">
+<%# @pwa_manifest_url (PlayerController#show) swaps in the per-Verto
+    manifest so "Add to Home Screen" installs the Verto itself, scoped to
+    /play/, instead of the studio-wide one every other page keeps. %>
+<link rel="manifest" href="<%= @pwa_manifest_url || pwa_manifest_path %>">
 <%= favicon_link_tag "favicon.svg", type: "image/svg+xml" %>
 <%= favicon_link_tag "favicon.svg", rel: "apple-touch-icon", type: "image/svg+xml" %>
 <%# ABeeZee/Alata are now self-hosted (app/assets/tailwind/application.css +

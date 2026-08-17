@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   get  "play/:token/regions", to: "player#regions", as: :player_regions
   get  "play/:token/leaderboard", to: "player#leaderboard", as: :player_leaderboard
   get  "play/:token/location_search", to: "player#location_search", as: :player_location_search
+  # Per-Verto PWA install manifest — see PlayerController#manifest.
+  get  "play/:token/manifest", to: "player#manifest", as: :play_manifest
 
   # Test Mode: shareable while still editable, records nothing. Deliberately
   # OUTSIDE /play/ — the service worker's scope is /play/ only and it serves

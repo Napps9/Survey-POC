@@ -265,6 +265,8 @@ es:
     leaderboard_teaser: "¡Quienes más puntos reúnen entran en la tabla de clasificación al final!"
     play_again: "Jugar otra vez"
     font_size: "Tamaño del texto"
+    lite_mode: "Modo de ahorro de datos"
+    lite_mode_short: "Lite"
   defaults:
     range: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

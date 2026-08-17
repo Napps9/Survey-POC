@@ -265,6 +265,8 @@ pt:
     leaderboard_teaser: "Quem junta mais pontos entra no placar no final!"
     play_again: "Jogar de novo"
     font_size: "Tamanho do texto"
+    lite_mode: "Modo de poupança de dados"
+    lite_mode_short: "Lite"
   defaults:
     range: ["Discordo totalmente", "Discordo", "Neutro", "Concordo", "Concordo totalmente"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

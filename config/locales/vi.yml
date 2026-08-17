@@ -265,6 +265,8 @@ vi:
     leaderboard_teaser: "Người gom nhiều điểm nhất sẽ vào bảng xếp hạng ở cuối!"
     play_again: "Chơi lại"
     font_size: "Cỡ chữ"
+    lite_mode: "Chế độ tiết kiệm dữ liệu"
+    lite_mode_short: "Nhẹ"
   defaults:
     range: ["Hoàn toàn không đồng ý", "Không đồng ý", "Trung lập", "Đồng ý", "Hoàn toàn đồng ý"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

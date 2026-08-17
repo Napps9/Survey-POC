@@ -124,7 +124,42 @@ class PlayerController < ApplicationController
     # explanation for a respondent, not the archived-forever one.
     return render :unavailable, status: :gone unless @survey.published?
     @display_locale = resolve_play_locale
+    # Not set for test_show or the owner's dashboard preview (SurveysController's
+    # own action) — the studio's own /manifest keeps serving those, matching the
+    # design note that /test is outside the service worker's /play/ scope in the
+    # first place. Reuses whatever token got here (share/link slug/publish
+    # token/vanity slug all resolved through load_survey_and_share already),
+    # so the manifest's start_url is the exact link this respondent is on.
+    @pwa_manifest_url = play_manifest_path(params[:token])
     render_with_chrome_language
+  end
+
+  # GET /play/:token/manifest — a per-Verto install manifest, so "Add to Home
+  # Screen" offers the Verto's own name and icon rather than "Verto Studio".
+  # The service worker is already scoped to /play/ (sw_register.js) and every
+  # installability prerequisite it needs — a controlling SW, a 512px icon,
+  # standalone display — is already met; this fills in the one missing piece,
+  # a manifest that isn't the studio's. No worker BEHAVIOUR changes here, so
+  # no CACHE_VERSION bump: this GET flows through the SW's existing
+  # network-first handler exactly like any other same-origin request.
+  def manifest
+    return head :not_found unless @survey&.published? && !@survey.deleted?
+
+    name = @survey.theme.presence || @survey.title.presence || "Playverto"
+    render json: {
+      name:             name,
+      short_name:       name.truncate(20, omission: "…"),
+      description:      "#{name} · Playverto",
+      icons: [
+        { src: "/icon.png", type: "image/png", sizes: "512x512" },
+        { src: "/icon.png", type: "image/png", sizes: "512x512", purpose: "maskable" }
+      ],
+      start_url:        play_survey_path(params[:token]),
+      display:          "standalone",
+      scope:             "/play/",
+      theme_color:      BrandPalette.resolve(@survey.brand_palette)["bg"],
+      background_color: "#1C2034"
+    }
   end
 
   # Partial save while the player is mid-survey, so we can count people who

@@ -130,4 +130,38 @@ class PlayerShowSmokeTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_select "meta[property='og:title']", false
   end
+
+  # ── Per-Verto PWA manifest (see PlayerController#manifest) ───────────────
+
+  test "the player page links its own per-Verto manifest, not the studio's" do
+    survey = published_survey
+    get play_survey_path(survey.publish_token)
+    assert_response :success
+    assert_select "link[rel='manifest'][href=?]", play_manifest_path(survey.publish_token)
+  end
+
+  test "Test Mode keeps the studio-wide manifest — /test is outside the service worker's /play/ scope" do
+    survey = published_survey
+    survey.update!(test_token: SecureRandom.hex(8))
+
+    get test_survey_path(survey.test_token)
+    assert_response :success
+    assert_select "link[rel='manifest'][href='/manifest']"
+  end
+
+  test "the owner's dashboard preview keeps the studio-wide manifest" do
+    org  = Organisation.create!(name: "Acme", slug: "acme-#{SecureRandom.hex(2)}")
+    user = User.create!(name: "U", email_address: "u-#{SecureRandom.hex(2)}@test.com",
+                        password: "verylongpassword")
+    org.memberships.create!(user: user, role: "admin")
+    survey = org.surveys.create!(
+      title: "Draft", theme: "Draft", audience_age: "all", key_insight: "x",
+      default_locale: "en", locales: [ "en" ], cards: [ { "type" => "welcome_card", "title" => "hi" } ]
+    )
+    post session_path, params: { email_address: user.email_address, password: "verylongpassword" }
+
+    get preview_survey_path(survey)
+    assert_response :success
+    assert_select "link[rel='manifest'][href='/manifest']"
+  end
 end

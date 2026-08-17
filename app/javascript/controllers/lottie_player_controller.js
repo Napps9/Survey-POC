@@ -29,6 +29,12 @@ export default class extends Controller {
     // .split-card, so scoping here keeps each card's animation its own.
     this._scope = this.element.closest(".split-card") || document
     this._scope.addEventListener("verto:scaleValue", this._onChange)
+    // Lite mode (player_controller.js#toggleLite) skips DECORATIVE loops
+    // only — a pasted card animation, loop: true, no verto:scaleValue ever
+    // drives it. The slider's own reaction frames (loop: false) stay
+    // mounted regardless: they're the answer's feedback, not decoration,
+    // and gating them would break the control respondents are using.
+    if (this.loopValue && this.element.closest(".lite-mode")) return
     // Derive the resting frame from the set actually mounted when the server
     // didn't name one, so a theme shipping a different frame count still opens
     // centred rather than on whatever NEUTRAL_FRAME happens to say.
