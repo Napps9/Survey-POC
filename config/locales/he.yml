@@ -203,6 +203,7 @@ he:
     total_responses:
       one: "תגובה %{count}"
       other: "%{count} תגובות"
+    of_overall: "מתוך %{count} בסך הכול"
     published_on: "פורסם ב-%{date}"
     ai_summary: סיכום AI
     regions_title: מהיכן הגיעו התגובות

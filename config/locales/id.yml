@@ -203,6 +203,7 @@ id:
     total_responses:
       one: "%{count} tanggapan"
       other: "%{count} tanggapan"
+    of_overall: "dari %{count} total"
     published_on: "Dipublikasikan %{date}"
     ai_summary: Ringkasan AI
     regions_title: Asal tanggapan

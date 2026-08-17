@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_180100) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -593,6 +593,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_170000) do
     t.integer "survey_id", null: false
     t.integer "survey_link_id"
     t.integer "survey_share_id"
+    t.integer "survey_wave_id"
     t.json "token_totals", default: {}, null: false
     t.datetime "updated_at", null: false
     t.index ["session_token"], name: "index_responses_on_session_token", unique: true
@@ -606,6 +607,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_170000) do
     t.index ["survey_id", "player_key_digest"], name: "index_responses_on_survey_and_player_key"
     t.index ["survey_id", "region_country"], name: "index_responses_on_survey_and_region_country"
     t.index ["survey_id", "respondent_code_digest"], name: "index_responses_on_survey_and_respondent_code"
+    t.index ["survey_id", "survey_wave_id"], name: "index_responses_on_survey_id_and_survey_wave_id"
     t.index ["survey_id"], name: "index_responses_on_survey_id"
     t.index ["survey_link_id"], name: "index_responses_on_survey_link_id"
     t.index ["survey_share_id"], name: "index_responses_on_survey_share_id"
@@ -792,6 +794,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_170000) do
     t.index ["survey_id"], name: "index_survey_shares_on_survey_id"
   end
 
+  create_table "survey_waves", force: :cascade do |t|
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.string "label"
+    t.datetime "opened_at", null: false
+    t.integer "position", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_id", "position"], name: "index_survey_waves_on_survey_id_and_position", unique: true
+    t.index ["survey_id"], name: "index_survey_waves_on_survey_id"
+  end
+
   create_table "surveys", force: :cascade do |t|
     t.string "audience_age"
     t.string "audience_country"
@@ -952,6 +966,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_170000) do
   add_foreign_key "report_renders", "users"
   add_foreign_key "responses", "survey_links"
   add_foreign_key "responses", "survey_shares"
+  add_foreign_key "responses", "survey_waves", column: "survey_wave_id"
   add_foreign_key "responses", "surveys"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -964,6 +979,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_170000) do
   add_foreign_key "survey_shares", "organisations", column: "partner_organisation_id"
   add_foreign_key "survey_shares", "partnership_vertos"
   add_foreign_key "survey_shares", "surveys"
+  add_foreign_key "survey_waves", "surveys"
   add_foreign_key "surveys", "organisations"
   add_foreign_key "verto_builds", "organisations"
   add_foreign_key "verto_builds", "surveys"

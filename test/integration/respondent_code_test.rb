@@ -114,6 +114,37 @@ class RespondentCodeTest < ActionDispatch::IntegrationTest
     assert_equal 1, s.returning_respondents_count, "one person came back; the other appeared once"
   end
 
+  test "the same code across two waves counts as returning for the later wave" do
+    s = survey
+    first = answer!(s, code: "sam14")
+    s.start_next_wave!
+    second = answer!(s, code: "Sam 14", value: "No") # normalises to the same digest
+
+    assert_equal first.reload.respondent_code_digest, second.respondent_code_digest
+    wave2 = s.current_wave
+    assert_equal wave2.id, second.survey_wave_id, "a response created after start_next_wave! belongs to the new wave"
+    assert_equal 1, s.wave_returning_count(wave2)
+  end
+
+  test "a different code across two waves is not counted as returning" do
+    s = survey
+    answer!(s, code: "sam14")
+    s.start_next_wave!
+    answer!(s, code: "someone-else")
+
+    assert_equal 0, s.wave_returning_count(s.current_wave)
+  end
+
+  test "responses answered before any wave existed are retroactively wave 1 once one starts" do
+    s = survey
+    resp = answer!(s, code: "sam14")
+    assert_nil resp.survey_wave_id, "wave 1 stays implicit (nil) until start_next_wave! is first called"
+
+    s.start_next_wave!
+    wave1 = s.survey_waves.find_by(position: 1)
+    assert_equal wave1.id, resp.reload.survey_wave_id
+  end
+
   test "a code cannot be changed once recorded for a response" do
     s = survey
     token = SecureRandom.uuid

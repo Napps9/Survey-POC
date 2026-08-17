@@ -203,6 +203,7 @@ vi:
     total_responses:
       one: "%{count} phản hồi"
       other: "%{count} phản hồi"
+    of_overall: "trong tổng số %{count}"
     published_on: "Đã xuất bản %{date}"
     ai_summary: Tóm tắt AI
     regions_title: Phản hồi đến từ đâu

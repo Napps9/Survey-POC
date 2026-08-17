@@ -203,6 +203,7 @@ sw:
     total_responses:
       one: "jibu %{count}"
       other: "majibu %{count}"
+    of_overall: "kati ya %{count} kwa jumla"
     published_on: "Ilichapishwa %{date}"
     ai_summary: Muhtasari wa AI
     regions_title: Majibu yalitoka wapi

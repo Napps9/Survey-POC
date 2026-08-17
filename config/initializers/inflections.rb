@@ -14,3 +14,13 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym "RESTful"
 # end
+
+# Rails' default -ve/-ves rule (for knife/knives, wife/wives, life/lives)
+# over-matches "waves": singularize("waves") comes back "wafe" without this,
+# which breaks `has_many :survey_waves` (Survey#survey_waves tries to
+# resolve a SurveyWafe model). "wave" isn't one of the -ife/-ives words the
+# built-in rule is actually meant for, so it gets its own irregular entry
+# instead of a broader regex change that could affect other words.
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.irregular "wave", "waves"
+end

@@ -109,6 +109,10 @@ Rails.application.routes.draw do
   post   "surveys/:id/results_share", to: "results_shares#create",  as: :results_share_survey
   patch  "surveys/:id/results_share", to: "results_shares#update"
   delete "surveys/:id/results_share", to: "results_shares#destroy"
+  # Repeat participation: start the next wave (closes whatever's open),
+  # rename one.
+  post  "surveys/:survey_id/waves",     to: "survey_waves#create", as: :survey_waves
+  patch "surveys/:survey_id/waves/:id", to: "survey_waves#update", as: :survey_wave
   post "surveys/:id/duplicate",       to: "surveys#duplicate", as: :duplicate_survey
   # The Share modal, fetched into a Turbo Frame over the dashboard. A GET that
   # renders the panel; the nested link routes below mutate and redirect back to

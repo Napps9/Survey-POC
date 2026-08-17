@@ -203,6 +203,7 @@ hi:
     total_responses:
       one: "%{count} प्रतिक्रिया"
       other: "%{count} प्रतिक्रियाएं"
+    of_overall: "कुल %{count} में से"
     published_on: "%{date} को प्रकाशित"
     ai_summary: AI सारांश
     regions_title: प्रतिक्रियाएं कहाँ से आईं

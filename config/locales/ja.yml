@@ -203,6 +203,7 @@ ja:
     total_responses:
       one: "%{count}件の回答"
       other: "%{count}件の回答"
+    of_overall: "全%{count}件中"
     published_on: "%{date}に公開"
     ai_summary: AI要約
     regions_title: 回答者の地域

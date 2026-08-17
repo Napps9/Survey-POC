@@ -579,6 +579,10 @@ class PlayerController < ApplicationController
     # Which named share link this respondent came in on, so the Share panel can
     # say what each audience actually returned. Set once, like the share.
     resp.survey_link ||= @survey_link
+    # Wave 1 is implicit (current_wave is nil until start_next_wave! is first
+    # called), so this is a no-op until then — exactly the "nil means wave 1"
+    # contract Survey#waved? relies on.
+    resp.survey_wave_id ||= @survey.current_wave&.id
     resp
   end
 

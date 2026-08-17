@@ -203,6 +203,7 @@ uk:
     total_responses:
       one: "%{count} відповідь"
       other: "%{count} відповідей"
+    of_overall: "з %{count} загалом"
     published_on: "Опубліковано %{date}"
     ai_summary: Підсумок ШІ
     regions_title: Звідки надійшли відповіді

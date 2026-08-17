@@ -5,7 +5,8 @@ module ResolvesResultSegments
 
   # Response segments for the results filter: always "Overall", plus a
   # "Direct link" and one entry per partner share when this Verto is shared,
-  # plus one entry per region tag when this Verto is region-tagged.
+  # one entry per wave when it's been run more than once, and one entry per
+  # region tag when this Verto is region-tagged.
   # Each entry is { id:, label:, scope:, count: }. Shared by the results screen
   # and the CSV / Google Sheets exports so they all scope responses identically.
   def result_segments(survey, base)
@@ -26,6 +27,27 @@ module ResolvesResultSegments
         partnership_name = share.partnership_verto&.partnership&.name
         label = partnership_name ? "#{share.display_name} · #{partnership_name}" : share.display_name
         segments << { id: "share_#{share.id}", label: label, scope: scope, count: scope.count }
+      end
+    end
+
+    # Waves — explicit open/close cycles of running the same Verto again (see
+    # Survey#start_next_wave!). Deliberately NO small-cell suppression: unlike
+    # regions/demographics (identity slices that could re-identify someone), a
+    # wave is a structural grouping the owner explicitly created, and stays a
+    # segment even at zero responses so a freshly-started wave shows as "0" —
+    # not silently missing from the pills.
+    if survey.survey_waves.any?
+      survey.survey_waves.each do |wave|
+        # Wave 1's scope also absorbs nil: responses genuinely written in the
+        # brief window around start_next_wave!'s backfill transaction (a
+        # live /progress landing between the UPDATE and the commit) can in
+        # principle stay unstamped — folding nil into wave 1 specifically
+        # (never a later wave) keeps that rare race from going uncounted
+        # anywhere, matching what nil already means everywhere else: "at or
+        # before wave 1".
+        ids   = wave.position == 1 ? [ wave.id, nil ] : wave.id
+        scope = base.where(survey_wave_id: ids)
+        segments << { id: "wave_#{wave.position}", label: wave.display_label, scope: scope, count: scope.count }
       end
     end
 

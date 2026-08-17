@@ -203,6 +203,7 @@ ar:
     total_responses:
       one: "%{count} رد"
       other: "%{count} ردود"
+    of_overall: "من %{count} إجمالاً"
     published_on: "تم النشر %{date}"
     ai_summary: ملخص الذكاء الاصطناعي
     regions_title: من أين وردت الردود

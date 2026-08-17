@@ -20,7 +20,19 @@
           date.formats itself (see results.html.erb's own published-date line),
           so a localised long-date format only silently falls back to English
           via config.i18n.fallbacks rather than actually translating. %>
-      <%= t("shared_results.total_responses", count: @overall_total) %><% if @survey.published_at %> · <%= t("shared_results.published_on", date: @survey.published_at.strftime("%B %-d, %Y")) %><% end %>
+      <%# A non-overall segment (a wave, a region, a share) shows its OWN
+          count as the headline figure, plus "of N overall" beside it — the
+          same split results.html.erb's stats strip makes (@total vs
+          @overall_total). Always showing @overall_total here would make the
+          header silently disagree with the cards it sits above the moment
+          someone opens a segment=wave_2-style link. %>
+      <% if @active_segment[:id] == "overall" %>
+        <%= t("shared_results.total_responses", count: @overall_total) %>
+      <% else %>
+        <%= t("shared_results.total_responses", count: @total) %>
+        <span style="color:rgba(255,255,255,0.25);"><%= t("shared_results.of_overall", count: @overall_total) %></span>
+      <% end %>
+      <% if @survey.published_at %> · <%= t("shared_results.published_on", date: @survey.published_at.strftime("%B %-d, %Y")) %><% end %>
     </div>
 
     <%# Cached AI summary — never generated here, only shown if already cached. %>

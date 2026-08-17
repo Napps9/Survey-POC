@@ -46,10 +46,15 @@ class SharedResultsTest < ActionDispatch::IntegrationTest
     )
   end
 
-  def add_plain_responses(count, value: "Blue")
+  # wave: nil reproduces the exact create! this helper always issued (the
+  # column then takes its default, nil) — existing callers predate waves and
+  # are unaffected. Pass an explicit wave to land responses inside it, same
+  # as PlayerController#find_or_init_response would at write time.
+  def add_plain_responses(count, value: "Blue", wave: nil)
     count.times do
       @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed",
-                                answers: { "1" => { "value" => value } })
+                                answers: { "1" => { "value" => value } },
+                                survey_wave_id: wave&.id)
     end
   end
 
@@ -222,6 +227,27 @@ class SharedResultsTest < ActionDispatch::IntegrationTest
     # one that doesn't exist must land safely on overall rather than erroring.
     get shared_results_path(token, segment: "gender_nonexistent")
     assert_response :success
+  end
+
+  # Waves ride the exact same ResolvesResultSegments seam as region/demographic
+  # segments (see resolves_result_segments.rb) — this is that seam's one
+  # cross-feature check, proving a shared-results viewer sees wave pills too,
+  # with zero SharedResultsController changes required for it.
+  test "wave segments appear on the shared page too, for free" do
+    add_plain_responses(2, value: "Blue")
+    @survey.start_next_wave!
+    add_plain_responses(3, value: "Green", wave: @survey.current_wave)
+    token = enable_share!
+    delete session_path
+
+    get shared_results_path(token)
+    assert_response :success
+    assert_select "a.seg-pill[href*='segment=wave_1']"
+    assert_select "a.seg-pill[href*='segment=wave_2']"
+
+    get shared_results_path(token, segment: "wave_2")
+    assert_response :success
+    assert_match "3 responses", response.body # wave 2's own count, not the whole Verto's 5
   end
 
   # ── Report: cached-only, never generates ───────────────────────────────────

@@ -203,6 +203,7 @@ ko:
     total_responses:
       one: "응답 %{count}건"
       other: "응답 %{count}건"
+    of_overall: "전체 %{count}건 중"
     published_on: "%{date}에 게시됨"
     ai_summary: AI 요약
     regions_title: 응답이 시작된 지역

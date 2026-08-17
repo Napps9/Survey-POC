@@ -5,6 +5,10 @@ class Survey < ApplicationRecord
   # Named share links — extra /play/ addresses for this Verto, each with its own
   # respondent-facing overrides. See SurveyLink.
   has_many :survey_links, dependent: :destroy
+  # Explicit open/close cycles of running the same Verto again to measure
+  # change — see start_next_wave! for why these are real records rather than
+  # a derived time window.
+  has_many :survey_waves, -> { order(:position) }, dependent: :destroy
   has_many :partnership_vertos, dependent: :destroy
   has_many :report_renders, dependent: :destroy
   has_many :flow_generations, dependent: :destroy
@@ -1087,6 +1091,67 @@ class Survey < ApplicationRecord
              .group(:respondent_code_digest)
              .having("COUNT(*) > 1")
              .count.size
+  end
+
+  # ── Waves ───────────────────────────────────────────────────────────────────
+  # Explicit records the owner opens and closes, not a time window derived from
+  # published_at/unpublished_at: those are single columns a re-publish
+  # overwrites (#publish keeps the original published_at and nils
+  # unpublished_at — no open/close history survives), and responses.completed_at
+  # is server-receipt time, not answer time — the offline submit queue can drain
+  # after the next wave has already opened, so a timestamp comparison would
+  # misfile it. A response is stamped with the CURRENT wave once, at write time
+  # (PlayerController#find_or_init_response), and that stamp never moves.
+  #
+  # Wave 1 stays implicit — no SurveyWave row — until start_next_wave! is first
+  # called, at which point every response collected so far (survey_wave_id nil)
+  # retroactively becomes wave 1's membership by backfill.
+
+  def waved?
+    survey_waves.exists?
+  end
+
+  # The wave any new response belongs to right now, or nil while wave 1 is
+  # still implicit. At most one wave is ever open at a time — start_next_wave!
+  # closes the previous one in the same transaction that opens the next.
+  def current_wave
+    survey_waves.find_by(closed_at: nil)
+  end
+
+  # Closes whatever wave is open and opens a new one, materialising the
+  # implicit wave 1 (backfilling every pre-existing response into it) the
+  # first time this is ever called. `label` is the owner's optional name for
+  # the NEW wave; the one being closed keeps whatever label it already had.
+  def start_next_wave!(label: nil)
+    transaction do
+      if waved?
+        close_current_wave!
+      else
+        wave1 = survey_waves.create!(position: 1, opened_at: published_at || created_at)
+        responses.where(survey_wave_id: nil).update_all(survey_wave_id: wave1.id)
+        wave1.update!(closed_at: Time.current)
+      end
+      next_position = survey_waves.maximum(:position).to_i + 1
+      survey_waves.create!(position: next_position, label: label.presence, opened_at: Time.current)
+    end
+  end
+
+  def close_current_wave!
+    current_wave&.update!(closed_at: Time.current)
+  end
+
+  # How many respondents in `wave` gave a code that also appears in an
+  # EARLIER wave — i.e. came back for this run specifically, not merely
+  # "answered more than once ever" (returning_respondents_count, whole-Verto).
+  # Same discipline: counted in SQL, digests never leave the database.
+  def wave_returning_count(wave)
+    earlier_ids = survey_waves.where("position < ?", wave.position).pluck(:id)
+    return 0 if earlier_ids.empty? # nothing can return before the first wave
+
+    responses.where(survey_wave_id: wave.id)
+             .where.not(respondent_code_digest: nil)
+             .where(respondent_code_digest: responses.where(survey_wave_id: earlier_ids).select(:respondent_code_digest))
+             .count
   end
 
   # ── Recently deleted cards ─────────────────────────────────────────────────

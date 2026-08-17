@@ -203,6 +203,7 @@ tr:
     total_responses:
       one: "%{count} yanıt"
       other: "%{count} yanıt"
+    of_overall: "toplam %{count} içinden"
     published_on: "%{date} tarihinde yayınlandı"
     ai_summary: AI özeti
     regions_title: Yanıtların geldiği yerler

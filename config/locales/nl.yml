@@ -203,6 +203,7 @@ nl:
     total_responses:
       one: "%{count} reactie"
       other: "%{count} reacties"
+    of_overall: "van %{count} in totaal"
     published_on: "Gepubliceerd op %{date}"
     ai_summary: AI-samenvatting
     regions_title: Waar de reacties vandaan kwamen

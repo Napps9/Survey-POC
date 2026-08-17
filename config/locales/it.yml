@@ -203,6 +203,7 @@ it:
     total_responses:
       one: "%{count} risposta"
       other: "%{count} risposte"
+    of_overall: "di %{count} in totale"
     published_on: "Pubblicato il %{date}"
     ai_summary: Riepilogo IA
     regions_title: Da dove provengono le risposte

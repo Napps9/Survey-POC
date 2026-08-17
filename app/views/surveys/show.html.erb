@@ -1346,11 +1346,14 @@
           </details>
         <% end %>
 
-        <%# Respondent code — links one person's answers across waves of the same
-            Verto without identifying them. Only a per-survey HMAC is stored, so
-            the code can't be read back or matched against another Verto. %>
+        <%# Repeat participation & waves — respondent codes link one person's
+            answers across runs without identifying them (only a per-survey
+            HMAC is stored, unreadable and unmatchable against another Verto);
+            waves are the explicit open/close records of each run itself. See
+            Survey#start_next_wave! for why waves are real rows, not a time
+            window derived from published_at. %>
         <details class="publish-block">
-          <summary class="publish-block-title">Repeat participation <span class="pub-chev">⌄</span></summary>
+          <summary class="publish-block-title">Repeat participation &amp; waves <span class="pub-chev">⌄</span></summary>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
             <input type="hidden" name="respondent_code_enabled" value="0" />
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
@@ -1375,6 +1378,38 @@
               </div>
             <% end %>
           <% end %>
+
+          <%# Waves — run the same Verto again, replay don't duplicate. %>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+            <% if @survey.waved? %>
+              <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
+                <% @survey.survey_waves.each do |wave| %>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span title="<%= wave.open? ? "Open" : "Closed" %>"
+                          style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:<%= wave.open? ? "#01EACB" : "rgba(255,255,255,0.25)" %>;"></span>
+                    <%= form_with url: survey_wave_path(@survey, wave), method: :patch, local: true, style: "flex:1;min-width:0;margin:0;" do %>
+                      <input type="text" name="label" value="<%= wave.label %>" placeholder="<%= wave.display_label %>"
+                             maxlength="80" onchange="this.form.requestSubmit()"
+                             style="width:100%;box-sizing:border-box;padding:6px 9px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                    <% end %>
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);white-space:nowrap;flex-shrink:0;">
+                      <%= pluralize(wave.responses.count, "response") %>
+                    </span>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+            <%= form_with url: survey_waves_path(@survey), method: :post, local: true,
+                  data: { turbo_confirm: @survey.waved? ? "Start the next wave? #{@survey.current_wave&.display_label} closes to new responses immediately." : "Start wave 2? Every response so far becomes Wave 1, closed to new responses from now on." },
+                  style: "margin:0;" do %>
+              <button type="submit" style="width:100%;padding:9px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">
+                <%= @survey.waved? ? "Start next wave" : "Start wave 2" %>
+              </button>
+            <% end %>
+            <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);line-height:1.45;">
+              Run the same Verto again to measure change — don't duplicate it, start a new wave on this one. Turn on respondent codes above first, so people who come back can be matched to their own earlier answers.
+            </div>
+          </div>
         </details>
 
         <%# Results comparison toggle %>

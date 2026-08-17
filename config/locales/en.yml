@@ -213,6 +213,7 @@ en:
     total_responses:
       one: "%{count} response"
       other: "%{count} responses"
+    of_overall: "of %{count} overall"
     published_on: "Published %{date}"
     ai_summary: "AI summary"
     regions_title: "Where responses came from"

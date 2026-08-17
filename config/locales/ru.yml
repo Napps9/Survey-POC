@@ -203,6 +203,7 @@ ru:
     total_responses:
       one: "%{count} ответ"
       other: "%{count} ответов"
+    of_overall: "из %{count} в целом"
     published_on: "Опубликовано %{date}"
     ai_summary: Сводка ИИ
     regions_title: Откуда пришли ответы

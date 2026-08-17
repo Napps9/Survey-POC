@@ -157,4 +157,38 @@ class ResultsCompareTest < ActionDispatch::IntegrationTest
     assert overall
     refute overall.key?("lat")
   end
+
+  test "wave segments carry their own per-wave aggregates, same shape as any other segment" do
+    org = create_org_and_sign_in("waves")
+    s   = create_survey(org)
+    s.responses.create!(session_token: "w1-#{SecureRandom.hex(3)}", status: "completed",
+                        answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    s.start_next_wave!
+    s.responses.create!(session_token: "w2-#{SecureRandom.hex(3)}", status: "completed",
+                        answers: { "1" => { "type" => "yes_no", "value" => "No" } }, survey_wave_id: s.current_wave.id)
+
+    get survey_results_compare_path(s)
+    assert_response :success
+
+    data = JSON.parse(response.body)
+    wave_ids = data["segments"].map { |seg| seg["id"] }.select { |id| id.start_with?("wave_") }
+    assert_equal %w[wave_1 wave_2], wave_ids
+    assert data["aggregates"].key?("wave_1")
+    assert data["aggregates"].key?("wave_2")
+  end
+
+  test "the compare box mounts and preselects waves even with no region data at all" do
+    org = create_org_and_sign_in("waves-only")
+    s   = create_survey(org)
+    s.responses.create!(session_token: "a-#{SecureRandom.hex(3)}", status: "completed",
+                        answers: { "1" => { "type" => "yes_no", "value" => "Yes" } })
+    s.start_next_wave!
+    s.responses.create!(session_token: "b-#{SecureRandom.hex(3)}", status: "completed",
+                        answers: { "1" => { "type" => "yes_no", "value" => "No" } }, survey_wave_id: s.current_wave.id)
+
+    get survey_results_path(s)
+    assert_response :success
+    assert_select "[data-controller~='results-compare']"
+    assert_select "[data-results-compare-preselect-value=?]", '["overall","wave_1","wave_2"]'
+  end
 end

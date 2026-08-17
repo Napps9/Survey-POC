@@ -29,7 +29,7 @@ const SKIP_TYPES = new Set(NON_QUESTION_TYPES)
 
 export default class extends Controller {
   static targets = [ "stage", "panel", "meta", "picker", "pickerWrap", "body", "openBtn", "mapStage" ]
-  static values  = { url: String, summarizeUrl: String }
+  static values  = { url: String, summarizeUrl: String, preselect: String }
 
   _data     = null
   _selected = new Set()
@@ -88,9 +88,22 @@ export default class extends Controller {
       this._data = null
       return
     }
-    const overall = this._data.segments.find(s => s.id === "overall")
-    const regions = this._data.segments.filter(s => s.id.startsWith("region_")).slice(0, 3)
-    ;[ overall, ...regions ].filter(Boolean).forEach(s => this._selected.add(s.id))
+
+    // preselectValue (rendered server-side — see results.html.erb, wave_ids)
+    // overrides the default overall+3-regions selection when present, e.g.
+    // to open already comparing this Verto's waves. Falls through to the
+    // default if it names segments this survey doesn't actually have.
+    if (this.hasPreselectValue && this.preselectValue) {
+      let ids = []
+      try { ids = JSON.parse(this.preselectValue) } catch (_e) { ids = [] }
+      const valid = new Set(this._data.segments.map(s => s.id))
+      ids.filter(id => valid.has(id)).forEach(id => this._selected.add(id))
+    }
+    if (this._selected.size === 0) {
+      const overall = this._data.segments.find(s => s.id === "overall")
+      const regions = this._data.segments.filter(s => s.id.startsWith("region_")).slice(0, 3)
+      ;[ overall, ...regions ].filter(Boolean).forEach(s => this._selected.add(s.id))
+    }
     this._paintMap()
   }
 

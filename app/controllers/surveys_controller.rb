@@ -890,6 +890,26 @@ class SurveysController < ApplicationController
       @leaderboard_names = @survey.player_aliases.where(key_digest: digests)
                                   .pluck(:key_digest, :anon_name).to_h
     end
+
+    # Wave over wave — whole-Verto and date/segment-filter-independent, same
+    # reasoning as the leaderboard above: waves ARE the axis of comparison,
+    # so the pills below must not also narrow them. resolve_result_segments
+    # is called a second time, unfiltered, purely to reuse its wave-segment
+    # scoping (including wave 1's nil-absorption) rather than re-deriving it.
+    if @survey.survey_waves.size >= 2
+      _unfiltered_base, unfiltered_segments, = resolve_result_segments(@survey, nil, nil)
+      wave_segments = unfiltered_segments.select { |s| s[:id].to_s.start_with?("wave_") }
+      @wave_stats = @survey.survey_waves.filter_map do |wave|
+        seg = wave_segments.find { |s| s[:id] == "wave_#{wave.position}" }
+        seg && { wave: wave, count: seg[:count], returning: @survey.wave_returning_count(wave) }
+      end
+      baseline_seg = wave_segments.first
+      latest_seg   = wave_segments.last
+      @wave_deltas = wave_headline_deltas(
+        aggregate_results(Array(@survey.cards), baseline_seg[:scope]),
+        aggregate_results(Array(@survey.cards), latest_seg[:scope])
+      )
+    end
     render :results, layout: "fullscreen"
   end
 
@@ -1180,6 +1200,35 @@ class SurveysController < ApplicationController
   end
 
   private
+
+  # The top few choice-question movements between a baseline and a latest
+  # wave: for each question's baseline-leading option, how its share moved
+  # by the latest wave. A simple, skimmable signal — not a full breakdown,
+  # which "Compare waves" already offers per question.
+  WAVE_DELTA_TYPES = %w[multiple_choice yes_no select_one_grid].freeze
+  MAX_WAVE_DELTAS  = 3
+
+  def wave_headline_deltas(baseline_agg, latest_agg)
+    deltas = []
+    baseline_agg.zip(latest_agg).each do |baseline_result, latest_result|
+      next unless baseline_result && latest_result
+      next unless WAVE_DELTA_TYPES.include?(baseline_result[:type])
+      next if baseline_result[:total].to_i.zero? || latest_result[:total].to_i.zero?
+
+      counts = baseline_result[:counts]
+      next if counts.blank?
+      top_label, top_count = counts.max_by { |_, count| count }
+      next unless top_label
+
+      baseline_pct = (top_count.to_f / baseline_result[:total] * 100).round
+      latest_pct   = (latest_result[:counts][top_label].to_i.to_f / latest_result[:total] * 100).round
+
+      deltas << { question: baseline_result[:card]["text"].to_s, label: top_label.to_s,
+                  delta: latest_pct - baseline_pct }
+      break if deltas.size >= MAX_WAVE_DELTAS
+    end
+    deltas
+  end
 
   # Rebuild the deck's Heritage card for the Verto's current audience country,
   # if it has one of each. A no-op for a deck without the card, which is the

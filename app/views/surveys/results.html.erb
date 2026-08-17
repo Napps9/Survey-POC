@@ -79,9 +79,14 @@
           })()
         </script>
 
-        <%# ── Regions map — where responses came from (region-tagged Vertos) ── %>
+        <%# ── Regions map — where responses came from (region-tagged Vertos) ──
+            Also the compare-panel's mount point, so it appears whenever
+            there's anything to compare even without a single tagged region:
+            _setupMap already tolerates empty map data (results_compare_
+            controller.js), the map just shows untinted in that case. %>
         <% region_segments = @segments.select { |s| s[:id].to_s.start_with?("region_") } %>
-        <% if region_segments.any? %>
+        <% wave_ids = @wave_stats&.size.to_i >= 2 ? @wave_stats.map { |s| "wave_#{s[:wave].position}" } : [] %>
+        <% if region_segments.any? || wave_ids.any? %>
           <%
             # cc → { count:, name:, segment_ids: [...] }: one region segment
             # per country (see ResolvesResultSegments), keyed here by its
@@ -97,10 +102,17 @@
           %>
           <div class="regions-box" data-controller="results-compare"
                data-results-compare-url-value="<%= survey_results_compare_path(@survey) %>"
-               data-results-compare-summarize-url-value="<%= survey_results_summarize_texts_path(@survey) %>">
+               data-results-compare-summarize-url-value="<%= survey_results_summarize_texts_path(@survey) %>"
+               <%# Waves take priority as the default comparison when both exist
+                   — running waves usually means the owner is mid-study and
+                   wants that lens first; regions stay one click away in the
+                   same picker either way. %>
+               data-results-compare-preselect-value="<%= wave_ids.any? ? (["overall"] + wave_ids).to_json : "" %>">
             <div class="regions-box-head">
-              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 Audience segments</span>
-              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">Click a country on the map to compare segments of your audience</span>
+              <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 <%= region_segments.any? ? "Audience segments" : "Compare segments" %></span>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.35);">
+                <%= region_segments.any? ? "Click a country on the map to compare segments of your audience" : "Compare waves, or any other segment, side by side" %>
+              </span>
               <button type="button" class="compare-open-btn" style="margin-left:auto;"
                       data-results-compare-target="openBtn"
                       data-action="click->results-compare#toggle">⛶ Compare segments</button>
@@ -386,6 +398,54 @@
             <div style="margin:0 0 10px;padding:9px 14px;border-radius:10px;background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#01EACB;">✓ Google connected. Click “Export to Google Sheets” to create your spreadsheet.</div>
           <% elsif params[:google_error] %>
             <div style="margin:0 0 10px;padding:9px 14px;border-radius:10px;background:rgba(255,30,111,0.1);border:1px solid rgba(255,30,111,0.3);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#FF6FA0;">Couldn’t connect to Google Sheets. Please try again.</div>
+          <% end %>
+
+          <%# ── Wave over wave (creator's view) ── Deliberately ABOVE the
+              date/segment pills too, same reasoning as the leaderboard below:
+              waves ARE the axis of comparison, so the pills must not also
+              narrow them. %>
+          <% if @wave_stats&.size.to_i >= 2 %>
+            <div class="s-card" style="cursor:default;overflow:visible;margin-bottom:10px;">
+              <div class="s-card-header" style="padding:9px 14px;gap:10px;">
+                <span class="s-badge" style="background:rgba(97,91,245,0.18);color:#9d97ff;">🔁 Wave over wave</span>
+                <%# The "Compare segments" trigger further down opens this same
+                    panel already preselected to these waves — see the regions
+                    box below, which mounts the results-compare controller
+                    this card sits outside of (a second button here would have
+                    no controller ancestor to dispatch to). %>
+                <span style="margin-left:auto;font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.35);">↓ Compare below</span>
+              </div>
+              <div style="padding:10px 16px 12px;">
+                <div style="display:flex;gap:20px;flex-wrap:wrap;<%= "margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06);" if @wave_deltas.present? %>">
+                  <% @wave_stats.each do |stat| %>
+                    <div style="min-width:96px;">
+                      <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px;"><%= stat[:wave].display_label %></div>
+                      <div style="font-family:'Alata',sans-serif;font-size: var(--text-2xl);color:#fff;line-height:1.3;"><%= stat[:count] %></div>
+                      <% if stat[:returning].positive? %>
+                        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:#01EACB;"><%= pluralize(stat[:returning], "returner") %></div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+                <% if @wave_deltas.present? %>
+                  <div style="display:flex;flex-direction:column;gap:6px;">
+                    <% @wave_deltas.each do |d| %>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<%= d[:question] %>">
+                          <%= d[:question].truncate(44) %> <span style="color:rgba(255,255,255,0.35);">· <%= d[:label].truncate(20) %></span>
+                        </span>
+                        <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);white-space:nowrap;color:<%= d[:delta] > 0 ? "#01EACB" : (d[:delta] < 0 ? "#FF6FA0" : "rgba(255,255,255,0.4)") %>;">
+                          <%= d[:delta] > 0 ? "+" : "" %><%= d[:delta] %>pp
+                        </span>
+                      </div>
+                    <% end %>
+                    <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.35);margin-top:2px;">
+                      Baseline (<%= @wave_stats.first[:wave].display_label %>) vs latest (<%= @wave_stats.last[:wave].display_label %>), leading option at baseline.
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
           <% end %>
 
           <%# ── Leaderboard (creator's view) ── Deliberately ABOVE the
