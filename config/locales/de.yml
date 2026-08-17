@@ -197,6 +197,29 @@ de:
     editor: "← Editor"
     ask_verto: Verto fragen
     analysing: Antworten werden analysiert…
+  shared_results:
+    title: Ergebnisse
+    read_only_badge: Schreibgeschützt
+    total_responses:
+      one: "%{count} Antwort"
+      other: "%{count} Antworten"
+    published_on: "Veröffentlicht am %{date}"
+    ai_summary: KI-Zusammenfassung
+    regions_title: Herkunft der Antworten
+    when: Zeitraum
+    view: Ansicht
+    hidden_answers:
+      one: "%{count} Antwort — auf geteilten Links ausgeblendet"
+      other: "%{count} Antworten — auf geteilten Links ausgeblendet"
+    report_title: Vollständiger KI-Bericht
+    report_hint: Eine längere schriftliche Analyse, die der Ersteller aus diesen Ergebnissen erstellt hat.
+    view_report: Bericht ansehen
+    download_pdf: PDF herunterladen
+    powered_by: Bereitgestellt von Playverto
+    gone_title: Diese Ergebnisse sind nicht mehr verfügbar
+    gone_body: Der Ersteller hat dieses Verto geschlossen oder entfernt.
+    unavailable_title: Dieser Ergebnislink ist nicht verfügbar
+    unavailable_body: Er wurde möglicherweise vom Ersteller pausiert oder deaktiviert, oder die Adresse wurde falsch eingegeben.
   player:
     compare_promise: "Mach bis zum Ende weiter und sieh, wie deine Antworten im Vergleich zu allen anderen abschneiden."
     region_search_placeholder: "Suche nach deiner Stadt oder Region…"

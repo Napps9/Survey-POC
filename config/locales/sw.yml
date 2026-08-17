@@ -197,6 +197,29 @@ sw:
     editor: "← Mhariri"
     ask_verto: Muulize Verto
     analysing: Inachambua majibu…
+  shared_results:
+    title: Matokeo
+    read_only_badge: Kusoma tu
+    total_responses:
+      one: "jibu %{count}"
+      other: "majibu %{count}"
+    published_on: "Ilichapishwa %{date}"
+    ai_summary: Muhtasari wa AI
+    regions_title: Majibu yalitoka wapi
+    when: Wakati
+    view: Mwonekano
+    hidden_answers:
+      one: "jibu %{count} — limefichwa kwenye viungo vilivyoshirikiwa"
+      other: "majibu %{count} — yamefichwa kwenye viungo vilivyoshirikiwa"
+    report_title: Ripoti kamili ya AI
+    report_hint: Uchambuzi mrefu zaidi ulioandikwa ambao muundaji aliutengeneza kutoka matokeo haya.
+    view_report: Ona ripoti
+    download_pdf: Pakua PDF
+    powered_by: Inaendeshwa na Playverto
+    gone_title: Matokeo haya hayapatikani tena
+    gone_body: Muundaji wake amefunga au kuondoa Verto hii.
+    unavailable_title: Kiungo hiki cha matokeo hakipatikani
+    unavailable_body: Huenda kimesitishwa au kuzimwa na muundaji wake, au anwani iliandikwa vibaya.
   player:
     compare_promise: "Maliza ili uone jinsi majibu yako yanavyolinganishwa na ya wengine."
     region_search_placeholder: "Tafuta jiji au eneo lako…"

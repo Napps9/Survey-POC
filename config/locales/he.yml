@@ -197,6 +197,29 @@ he:
     editor: "← עורך"
     ask_verto: שאל את Verto
     analysing: מנתח תגובות…
+  shared_results:
+    title: תוצאות
+    read_only_badge: לקריאה בלבד
+    total_responses:
+      one: "תגובה %{count}"
+      other: "%{count} תגובות"
+    published_on: "פורסם ב-%{date}"
+    ai_summary: סיכום AI
+    regions_title: מהיכן הגיעו התגובות
+    when: מתי
+    view: תצוגה
+    hidden_answers:
+      one: "תשובה %{count} — מוסתרת בקישורים משותפים"
+      other: "%{count} תשובות — מוסתרות בקישורים משותפים"
+    report_title: דוח AI מלא
+    report_hint: ניתוח כתוב ומעמיק יותר שהיוצר יצר מהתוצאות הללו.
+    view_report: צפייה בדוח
+    download_pdf: הורדת PDF
+    powered_by: מופעל על ידי Playverto
+    gone_title: התוצאות הללו כבר אינן זמינות
+    gone_body: היוצר שלה סגר או הסיר אותה.
+    unavailable_title: קישור התוצאות הזה אינו זמין
+    unavailable_body: ייתכן שהיוצר השהה או כיבה אותו, או שהכתובת הוקלדה בטעות.
   player:
     compare_promise: "סיימו כדי לראות איך התשובות שלכם בהשוואה לכולם."
     region_search_placeholder: "חפשו את העיר או האזור שלכם…"

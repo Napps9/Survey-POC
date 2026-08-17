@@ -8,7 +8,9 @@
 # problem fed the other. Off the request thread entirely, neither applies.
 class ReportRender < ApplicationRecord
   belongs_to :survey
-  belongs_to :user
+  # Optional: a render requested from a public /results/:token page (see
+  # SharedResultsController#create_render) has no signed-in requester.
+  belongs_to :user, optional: true
 
   # The finished file. Attached rather than held in a column: it's a binary
   # document of unbounded size and has no business in the database.
@@ -16,6 +18,15 @@ class ReportRender < ApplicationRecord
 
   STATUSES = %w[pending running succeeded failed].freeze
   validates :status, inclusion: { in: STATUSES }
+
+  # True for a render requested anonymously off a shared-results link, never
+  # by a signed-in creator. RenderReportPdfJob reads this to refuse the
+  # regenerate-on-drift path (results_report_markdown) for such a render —
+  # the cached report is the only thing an anonymous request may ever trigger
+  # wkhtmltopdf on, never a fresh Claude call.
+  def shared_request?
+    user_id.nil?
+  end
 
   def succeeded? = status == "succeeded"
   def failed?    = status == "failed"

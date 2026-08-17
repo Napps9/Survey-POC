@@ -197,6 +197,29 @@ ar:
     editor: "← المحرر"
     ask_verto: اسأل Verto
     analysing: جارٍ تحليل الإجابات…
+  shared_results:
+    title: النتائج
+    read_only_badge: للقراءة فقط
+    total_responses:
+      one: "%{count} رد"
+      other: "%{count} ردود"
+    published_on: "تم النشر %{date}"
+    ai_summary: ملخص الذكاء الاصطناعي
+    regions_title: من أين وردت الردود
+    when: متى
+    view: عرض
+    hidden_answers:
+      one: "%{count} إجابة — مخفية في الروابط المشتركة"
+      other: "%{count} إجابات — مخفية في الروابط المشتركة"
+    report_title: التقرير الكامل بالذكاء الاصطناعي
+    report_hint: تحليل مكتوب أطول أنشأه المُنشئ من هذه النتائج.
+    view_report: عرض التقرير
+    download_pdf: تنزيل PDF
+    powered_by: بدعم من Playverto
+    gone_title: هذه النتائج لم تعد متاحة
+    gone_body: قام منشئها بإغلاقها أو إزالتها.
+    unavailable_title: رابط النتائج هذا غير متاح
+    unavailable_body: ربما تم إيقافه مؤقتًا أو تعطيله من قِبل منشئه، أو أن العنوان كُتب بشكل خاطئ.
   player:
     compare_promise: "أكمل لترى كيف تُقارن إجاباتك بإجابات الآخرين."
     region_search_placeholder: "ابحث عن مدينتك أو منطقتك…"

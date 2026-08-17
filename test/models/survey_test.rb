@@ -83,4 +83,45 @@ class SurveyTest < ActiveSupport::TestCase
     org.destroy!
     assert_not VertoBuild.exists?(build.id)
   end
+
+  # ── results_share_enabled? / results_share_live? ───────────────────────────
+
+  def build_share_survey(**attrs)
+    org = Organisation.create!(name: "Share Org", slug: "st-#{SecureRandom.hex(3)}")
+    org.surveys.create!(
+      title: "S", theme: "T", audience_age: "all", key_insight: "x",
+      default_locale: "en", locales: [ "en" ], cards: [], **attrs
+    )
+  end
+
+  test "no token minted: neither enabled nor live" do
+    survey = build_share_survey
+    refute survey.results_share_enabled?
+    refute survey.results_share_live?
+  end
+
+  test "a minted, active token is live" do
+    survey = build_share_survey(results_share_token: SecureRandom.urlsafe_base64(18))
+    assert survey.results_share_enabled?
+    assert survey.results_share_live?
+  end
+
+  test "a paused token is enabled but not live" do
+    survey = build_share_survey(results_share_token: SecureRandom.urlsafe_base64(18), results_share_active: false)
+    assert survey.results_share_enabled?
+    refute survey.results_share_live?
+  end
+
+  test "an archived Verto's share is never live, even with an active token" do
+    survey = build_share_survey(results_share_token: SecureRandom.urlsafe_base64(18))
+    survey.archive!
+    assert survey.results_share_enabled?
+    refute survey.results_share_live?
+  end
+
+  test "results_share_live? does not depend on published? — a draft or closed Verto can still share" do
+    survey = build_share_survey(results_share_token: SecureRandom.urlsafe_base64(18))
+    refute survey.published?
+    assert survey.results_share_live?
+  end
 end

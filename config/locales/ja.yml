@@ -197,6 +197,29 @@ ja:
     editor: "← エディター"
     ask_verto: Vertoに聞く
     analysing: 回答を分析中…
+  shared_results:
+    title: 結果
+    read_only_badge: 読み取り専用
+    total_responses:
+      one: "%{count}件の回答"
+      other: "%{count}件の回答"
+    published_on: "%{date}に公開"
+    ai_summary: AI要約
+    regions_title: 回答者の地域
+    when: 期間
+    view: 表示
+    hidden_answers:
+      one: "%{count}件の回答 — 共有リンクでは非表示"
+      other: "%{count}件の回答 — 共有リンクでは非表示"
+    report_title: AIレポート全文
+    report_hint: 作成者がこれらの結果から生成した、より詳細な分析レポートです。
+    view_report: レポートを見る
+    download_pdf: PDFをダウンロード
+    powered_by: Playverto提供
+    gone_title: この結果は利用できなくなりました
+    gone_body: 作成者がこのVertoを終了または削除しました。
+    unavailable_title: この結果リンクは利用できません
+    unavailable_body: 作成者によって一時停止または無効化されたか、URLの入力が間違っている可能性があります。
   player:
     compare_promise: "最後まで答えると、自分の回答をみんなと比べられます。"
     region_search_placeholder: "都市または地域を検索…"

@@ -1,0 +1,122 @@
+<% content_for :title, "#{@survey.theme} · #{t("shared_results.title")} · Playverto" %>
+
+<style>
+  .shared-results-wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 64px; }
+</style>
+
+<div style="min-height:100%;background:#1C2034;">
+  <div class="shared-results-wrap">
+
+    <%# Header %>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+      <%= image_tag "playverto.svg", alt: "Playverto", style: "height:22px;width:auto;" %>
+      <span style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;background:rgba(1,234,203,0.12);border:1px solid rgba(1,234,203,0.3);color:#01EACB;font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;">
+        <%= t("shared_results.read_only_badge") %>
+      </span>
+    </div>
+    <h1 style="font-family:'Alata',sans-serif;font-size:26px;color:#fff;margin:14px 0 4px;line-height:1.25;"><%= @survey.theme %></h1>
+    <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);margin-bottom:24px;">
+      <%# strftime, not l(...) — this app has no rails-i18n gem and defines no
+          date.formats itself (see results.html.erb's own published-date line),
+          so a localised long-date format only silently falls back to English
+          via config.i18n.fallbacks rather than actually translating. %>
+      <%= t("shared_results.total_responses", count: @overall_total) %><% if @survey.published_at %> · <%= t("shared_results.published_on", date: @survey.published_at.strftime("%B %-d, %Y")) %><% end %>
+    </div>
+
+    <%# Cached AI summary — never generated here, only shown if already cached. %>
+    <% if @cached_summary.present? %>
+      <div style="border-radius:14px;background:rgba(1,234,203,0.05);border:1px solid rgba(1,234,203,0.18);padding:18px 22px;margin-bottom:16px;">
+        <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;"><%= t("shared_results.ai_summary") %></div>
+        <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.65);line-height:1.8;white-space:pre-wrap;"><%= @cached_summary %></div>
+      </div>
+    <% end %>
+
+    <%# Regions map — static, read-only tint (shared_map_controller.js), same
+        #results-region-map-data JSON contract the owner's page renders. %>
+    <% region_segments = @segments.select { |s| s[:id].to_s.start_with?("region_") } %>
+    <% if region_segments.any? %>
+      <%
+        map_data = {}
+        region_segments.each do |seg|
+          next if seg[:country].blank?
+          cc = seg[:country].downcase
+          map_data[cc] ||= { count: 0, name: WorldRegions.name_for(seg[:country]), segment_ids: [] }
+          map_data[cc][:count] += seg[:count]
+          map_data[cc][:segment_ids] << seg[:id]
+        end
+      %>
+      <div class="regions-box" data-controller="shared-map" style="margin-bottom:16px;">
+        <div class="regions-box-head">
+          <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);">🌍 <%= t("shared_results.regions_title") %></span>
+        </div>
+        <div class="regions-box-body">
+          <div style="max-width:640px;margin:0 auto;">
+            <%= render "shared/world_map" %>
+          </div>
+        </div>
+      </div>
+      <script type="application/json" id="results-region-map-data"><%= map_data.to_json.html_safe %></script>
+    <% end %>
+
+    <%# Date window %>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 0 8px;">
+      <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-right:2px;"><%= t("shared_results.when") %></span>
+      <% date_range_options.each do |opt| %>
+        <% current = (@date_range.presence || "all") == opt[:id] %>
+        <%# Same "don't carry a segment across a date window that suppresses
+            it" behaviour as the owner's page — resolve_result_segments falls
+            back to overall on its own if the segment no longer exists. %>
+        <%= link_to opt[:label],
+              shared_results_path(@survey.results_share_token, range: (opt[:id] == "all" ? nil : opt[:id])),
+              class: "seg-pill", aria: { current: current.to_s } %>
+      <% end %>
+    </div>
+
+    <%# Segment pills — partner shares, regions, demographics; identical
+        source (ResolvesResultSegments) so small-cell suppression matches the
+        owner's page exactly. %>
+    <% if @segments.size > 1 %>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 0 16px;">
+        <span style="font-family:'Alata',sans-serif;font-size: var(--text-2xs);letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-right:2px;"><%= t("shared_results.view") %></span>
+        <% @segments.each do |seg| %>
+          <%= link_to shared_results_path(@survey.results_share_token, segment: seg[:id], range: @date_range),
+                class: "seg-pill", aria: { current: (seg[:id] == @active_segment[:id]).to_s } do %>
+            <%= seg[:label] %><span class="seg-pill-count"><%= seg[:count] %></span>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Per-question cards — the exact partial the owner's results page
+        renders, with shared: true redacting free-text sections. %>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <%= render "surveys/result_cards", aggregated: @aggregated, total: @total, shared: true %>
+    </div>
+
+    <%# Report — read-only, cached-only. Never offered if the owner hasn't
+        already generated and kept one. %>
+    <% if @has_report %>
+      <div style="margin-top:24px;padding:18px 22px;border-radius:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:#fff;margin-bottom:2px;"><%= t("shared_results.report_title") %></div>
+          <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);"><%= t("shared_results.report_hint") %></div>
+        </div>
+        <%= link_to t("shared_results.view_report"), shared_results_report_path(@survey.results_share_token), target: "_blank",
+              style: "padding:8px 16px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px solid rgba(255,255,255,0.2);text-decoration:none;" %>
+        <button type="button" data-controller="shared-report-download"
+                data-shared-report-download-render-url-value="<%= shared_results_renders_path(@survey.results_share_token) %>"
+                data-action="click->shared-report-download#download"
+                data-shared-report-download-target="button"
+                style="padding:8px 16px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:none;cursor:pointer;font-weight:600;">
+          <%= t("shared_results.download_pdf") %>
+        </button>
+      </div>
+    <% end %>
+
+    <div style="margin-top:32px;text-align:center;">
+      <%= link_to t("shared_results.powered_by"), root_path, target: "_blank",
+            style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.25);text-decoration:none;" %>
+    </div>
+
+  </div>
+</div>

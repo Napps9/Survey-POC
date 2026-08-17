@@ -197,6 +197,29 @@ vi:
     editor: "← Trình chỉnh sửa"
     ask_verto: Hỏi Verto
     analysing: Đang phân tích phản hồi…
+  shared_results:
+    title: Kết quả
+    read_only_badge: Chỉ xem
+    total_responses:
+      one: "%{count} phản hồi"
+      other: "%{count} phản hồi"
+    published_on: "Đã xuất bản %{date}"
+    ai_summary: Tóm tắt AI
+    regions_title: Phản hồi đến từ đâu
+    when: Thời gian
+    view: Chế độ xem
+    hidden_answers:
+      one: "%{count} câu trả lời — ẩn trên liên kết chia sẻ"
+      other: "%{count} câu trả lời — ẩn trên liên kết chia sẻ"
+    report_title: Báo cáo AI đầy đủ
+    report_hint: Một bản phân tích viết chi tiết hơn mà người tạo đã tạo ra từ các kết quả này.
+    view_report: Xem báo cáo
+    download_pdf: Tải PDF
+    powered_by: Được cung cấp bởi Playverto
+    gone_title: Kết quả này không còn khả dụng
+    gone_body: Người tạo đã đóng hoặc xóa Verto này.
+    unavailable_title: Liên kết kết quả này không khả dụng
+    unavailable_body: Liên kết có thể đã bị người tạo tạm dừng hoặc tắt, hoặc địa chỉ đã bị gõ sai.
   player:
     compare_promise: "Hoàn thành để xem câu trả lời của bạn so với mọi người như thế nào."
     region_search_placeholder: "Tìm thành phố hoặc khu vực của bạn…"

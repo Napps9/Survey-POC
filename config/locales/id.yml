@@ -197,6 +197,29 @@ id:
     editor: "← Editor"
     ask_verto: Tanya Verto
     analysing: Menganalisis tanggapan…
+  shared_results:
+    title: Hasil
+    read_only_badge: Hanya baca
+    total_responses:
+      one: "%{count} tanggapan"
+      other: "%{count} tanggapan"
+    published_on: "Dipublikasikan %{date}"
+    ai_summary: Ringkasan AI
+    regions_title: Asal tanggapan
+    when: Kapan
+    view: Tampilan
+    hidden_answers:
+      one: "%{count} jawaban — disembunyikan pada tautan bersama"
+      other: "%{count} jawaban — disembunyikan pada tautan bersama"
+    report_title: Laporan AI lengkap
+    report_hint: Analisis tertulis yang lebih panjang yang dibuat kreator dari hasil ini.
+    view_report: Lihat laporan
+    download_pdf: Unduh PDF
+    powered_by: Didukung oleh Playverto
+    gone_title: Hasil ini tidak lagi tersedia
+    gone_body: Kreator telah menutup atau menghapusnya.
+    unavailable_title: Tautan hasil ini tidak tersedia
+    unavailable_body: Mungkin telah dijeda atau dimatikan oleh kreator, atau alamatnya salah ketik.
   player:
     compare_promise: "Selesaikan untuk melihat perbandingan jawabanmu dengan semua orang."
     region_search_placeholder: "Cari kota atau wilayahmu…"

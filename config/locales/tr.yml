@@ -197,6 +197,29 @@ tr:
     editor: "← Editör"
     ask_verto: Verto'ya sor
     analysing: Yanıtlar analiz ediliyor…
+  shared_results:
+    title: Sonuçlar
+    read_only_badge: Salt okunur
+    total_responses:
+      one: "%{count} yanıt"
+      other: "%{count} yanıt"
+    published_on: "%{date} tarihinde yayınlandı"
+    ai_summary: AI özeti
+    regions_title: Yanıtların geldiği yerler
+    when: Ne zaman
+    view: Görünüm
+    hidden_answers:
+      one: "%{count} yanıt — paylaşılan bağlantılarda gizli"
+      other: "%{count} yanıt — paylaşılan bağlantılarda gizli"
+    report_title: Tam AI raporu
+    report_hint: Oluşturucunun bu sonuçlardan hazırladığı daha ayrıntılı yazılı bir analiz.
+    view_report: Raporu görüntüle
+    download_pdf: PDF indir
+    powered_by: Playverto tarafından desteklenmektedir
+    gone_title: Bu sonuçlar artık kullanılamıyor
+    gone_body: Oluşturucusu bu Verto'yu kapattı veya kaldırdı.
+    unavailable_title: Bu sonuç bağlantısı kullanılamıyor
+    unavailable_body: Oluşturucusu tarafından duraklatılmış veya kapatılmış olabilir ya da adres yanlış yazılmış olabilir.
   player:
     compare_promise: "Bitir ve yanıtlarının herkesle nasıl karşılaştırıldığını gör."
     region_search_placeholder: "Şehrinizi veya bölgenizi arayın…"

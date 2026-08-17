@@ -197,6 +197,29 @@ uk:
     editor: "← Редактор"
     ask_verto: Запитати Verto
     analysing: Аналіз відповідей…
+  shared_results:
+    title: Результати
+    read_only_badge: Лише перегляд
+    total_responses:
+      one: "%{count} відповідь"
+      other: "%{count} відповідей"
+    published_on: "Опубліковано %{date}"
+    ai_summary: Підсумок ШІ
+    regions_title: Звідки надійшли відповіді
+    when: Коли
+    view: Перегляд
+    hidden_answers:
+      one: "%{count} відповідь — прихована в спільних посиланнях"
+      other: "%{count} відповідей — приховані в спільних посиланнях"
+    report_title: Повний звіт ШІ
+    report_hint: Розгорнутий письмовий аналіз, який автор створив на основі цих результатів.
+    view_report: Переглянути звіт
+    download_pdf: Завантажити PDF
+    powered_by: На основі Playverto
+    gone_title: Ці результати більше недоступні
+    gone_body: Автор закрив або видалив цей Verto.
+    unavailable_title: Це посилання на результати недоступне
+    unavailable_body: Можливо, його призупинив або вимкнув автор, або адресу введено неправильно.
   player:
     compare_promise: "Дійдіть до кінця, щоб порівняти свої відповіді з відповідями інших."
     region_search_placeholder: "Знайдіть своє місто або регіон…"

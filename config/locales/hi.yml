@@ -197,6 +197,29 @@ hi:
     editor: "← संपादक"
     ask_verto: Verto से पूछें
     analysing: उत्तरों का विश्लेषण किया जा रहा है…
+  shared_results:
+    title: परिणाम
+    read_only_badge: केवल पढ़ने के लिए
+    total_responses:
+      one: "%{count} प्रतिक्रिया"
+      other: "%{count} प्रतिक्रियाएं"
+    published_on: "%{date} को प्रकाशित"
+    ai_summary: AI सारांश
+    regions_title: प्रतिक्रियाएं कहाँ से आईं
+    when: कब
+    view: देखें
+    hidden_answers:
+      one: "%{count} उत्तर — साझा लिंक पर छिपाया गया"
+      other: "%{count} उत्तर — साझा लिंक पर छिपाए गए"
+    report_title: पूर्ण AI रिपोर्ट
+    report_hint: एक लंबा लिखित विश्लेषण जो निर्माता ने इन परिणामों से तैयार किया।
+    view_report: रिपोर्ट देखें
+    download_pdf: PDF डाउनलोड करें
+    powered_by: Playverto द्वारा संचालित
+    gone_title: ये परिणाम अब उपलब्ध नहीं हैं
+    gone_body: इसके निर्माता ने इसे बंद या हटा दिया है।
+    unavailable_title: यह परिणाम लिंक उपलब्ध नहीं है
+    unavailable_body: हो सकता है इसे निर्माता ने रोक दिया हो या बंद कर दिया हो, या पता गलत टाइप किया गया हो।
   player:
     compare_promise: "पूरा करें और देखें कि आपके जवाब बाकी सबसे कैसे तुलना करते हैं।"
     region_search_placeholder: "अपना शहर या क्षेत्र खोजें…"

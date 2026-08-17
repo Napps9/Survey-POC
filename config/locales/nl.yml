@@ -197,6 +197,29 @@ nl:
     editor: "← Editor"
     ask_verto: Vraag het Verto
     analysing: Antwoorden analyseren…
+  shared_results:
+    title: Resultaten
+    read_only_badge: Alleen-lezen
+    total_responses:
+      one: "%{count} reactie"
+      other: "%{count} reacties"
+    published_on: "Gepubliceerd op %{date}"
+    ai_summary: AI-samenvatting
+    regions_title: Waar de reacties vandaan kwamen
+    when: Wanneer
+    view: Weergave
+    hidden_answers:
+      one: "%{count} antwoord — verborgen op gedeelde links"
+      other: "%{count} antwoorden — verborgen op gedeelde links"
+    report_title: Volledig AI-rapport
+    report_hint: Een uitgebreidere geschreven analyse die de maker op basis van deze resultaten heeft gegenereerd.
+    view_report: Rapport bekijken
+    download_pdf: PDF downloaden
+    powered_by: Mogelijk gemaakt door Playverto
+    gone_title: Deze resultaten zijn niet meer beschikbaar
+    gone_body: De maker heeft dit Verto gesloten of verwijderd.
+    unavailable_title: Deze resultatenlink is niet beschikbaar
+    unavailable_body: Deze is mogelijk gepauzeerd of uitgeschakeld door de maker, of het adres is verkeerd getypt.
   player:
     compare_promise: "Maak het af om te zien hoe jouw antwoorden zich verhouden tot die van anderen."
     region_search_placeholder: "Zoek je stad of regio…"

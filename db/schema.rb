@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_170000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -558,7 +558,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_140000) do
     t.string "status", default: "pending", null: false
     t.integer "survey_id", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.index ["status", "created_at"], name: "index_report_renders_on_status_and_created_at"
     t.index ["survey_id"], name: "index_report_renders_on_survey_id"
     t.index ["user_id"], name: "index_report_renders_on_user_id"
@@ -834,6 +834,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_140000) do
     t.text "results_report_brief"
     t.datetime "results_report_edited_at"
     t.integer "results_report_response_count"
+    t.boolean "results_share_active", default: true, null: false
+    t.string "results_share_token"
     t.text "results_summary"
     t.integer "results_summary_response_count"
     t.json "sdgs", default: [], null: false
@@ -856,6 +858,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_140000) do
     t.index ["deleted_at"], name: "index_surveys_on_deleted_at"
     t.index ["organisation_id"], name: "index_surveys_on_organisation_id"
     t.index ["publish_token"], name: "index_surveys_on_publish_token", unique: true
+    t.index ["results_share_token"], name: "index_surveys_on_results_share_token", unique: true
     t.index ["slug"], name: "index_surveys_on_slug", unique: true
     t.index ["test_token"], name: "index_surveys_on_test_token", unique: true
     t.check_constraint "leaderboard_retake_policy IN ('accumulate', 'no_redo', 'restart')", name: "chk_surveys_leaderboard_retake_policy"

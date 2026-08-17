@@ -1,0 +1,14 @@
+<% content_for :title, "Playverto" %>
+<%# /results/:token didn't resolve to a live share. @oops_gone distinguishes an
+    archived Verto (410) from a token that never resolves — never enabled,
+    paused, or revoked all look the same from here, exactly like a paused
+    SurveyLink on /play. %>
+<% if @oops_gone %>
+  <%= render "shared/oops_page",
+        title: t("shared_results.gone_title"),
+        body:  t("shared_results.gone_body") %>
+<% else %>
+  <%= render "shared/oops_page",
+        title: t("shared_results.unavailable_title"),
+        body:  t("shared_results.unavailable_body") %>
+<% end %>

@@ -22,8 +22,16 @@ class RenderReportPdfJob < ApplicationJob
     render.start!
     survey = render.survey
 
+    # results_report_markdown regenerates via a fresh Claude call whenever the
+    # response count has drifted since the cached copy was written — exactly
+    # right for a creator's own download, wrong for an anonymous shared-link
+    # request, which must never be able to trigger AI spend. A shared render
+    # gets the cached column verbatim, or fails outright if there isn't one.
+    markdown = render.shared_request? ? survey.results_report.presence : results_report_markdown(survey)
+    return render.fail!("This report hasn't been generated yet.") if markdown.blank?
+
     pdf = render_report_pdf(
-      results_report_document(survey, results_report_markdown(survey)),
+      results_report_document(survey, markdown),
       page_size: "A4",
       margin:    { top: 14, bottom: 16, left: 14, right: 14 }
     )

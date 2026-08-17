@@ -18,6 +18,17 @@ Rails.application.routes.draw do
   # one edit behind forever (see app/javascript/sw_register.js).
   get "test/:token", to: "player#test_show", as: :test_survey
 
+  # Shareable results/report links (no auth) — a public, read-only view of a
+  # Verto's aggregated results, distinct from /play (that's the respondent
+  # experience) and outside it on purpose: /play/ is the service worker's
+  # whole scope, and a results page has no business being cached offline.
+  # See SharedResultsController for the PII/spend boundaries.
+  get  "results/:token",                             to: "shared_results#show",          as: :shared_results
+  get  "results/:token/report",                       to: "shared_results#report",        as: :shared_results_report
+  post "results/:token/report/renders",                to: "shared_results#create_render", as: :shared_results_renders
+  get  "results/:token/report/renders/:id",            to: "shared_results#render_status", as: :shared_results_render
+  get  "results/:token/report/renders/:id/download",   to: "shared_results#render_download", as: :download_shared_results_render
+
   # Auth
   resource  :session,       only: [ :new, :create, :destroy ]
   resources :passwords,     param: :token, only: [ :new, :create, :edit, :update ]
@@ -93,6 +104,11 @@ Rails.application.routes.draw do
   post   "surveys/:id/test_link",     to: "surveys#enable_test_link",  as: :test_link_survey
   delete "surveys/:id/test_link",     to: "surveys#disable_test_link"
   post   "surveys/:id/test_mode",     to: "surveys#convert_to_test_mode", as: :test_mode_survey
+  # The results top bar's Share-results popover: mint/pause-resume/reset/
+  # revoke the one results_share_token, same shape as test_link above.
+  post   "surveys/:id/results_share", to: "results_shares#create",  as: :results_share_survey
+  patch  "surveys/:id/results_share", to: "results_shares#update"
+  delete "surveys/:id/results_share", to: "results_shares#destroy"
   post "surveys/:id/duplicate",       to: "surveys#duplicate", as: :duplicate_survey
   # The Share modal, fetched into a Turbo Frame over the dashboard. A GET that
   # renders the panel; the nested link routes below mutate and redirect back to

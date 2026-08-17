@@ -197,6 +197,29 @@ ru:
     editor: "← Редактор"
     ask_verto: Спросить Verto
     analysing: Анализ ответов…
+  shared_results:
+    title: Результаты
+    read_only_badge: Только для чтения
+    total_responses:
+      one: "%{count} ответ"
+      other: "%{count} ответов"
+    published_on: "Опубликовано %{date}"
+    ai_summary: Сводка ИИ
+    regions_title: Откуда пришли ответы
+    when: Когда
+    view: Вид
+    hidden_answers:
+      one: "%{count} ответ — скрыт в общих ссылках"
+      other: "%{count} ответов — скрыты в общих ссылках"
+    report_title: Полный отчёт ИИ
+    report_hint: Более развёрнутый письменный анализ, созданный автором на основе этих результатов.
+    view_report: Смотреть отчёт
+    download_pdf: Скачать PDF
+    powered_by: Работает на Playverto
+    gone_title: Эти результаты больше недоступны
+    gone_body: Автор закрыл или удалил этот Verto.
+    unavailable_title: Эта ссылка на результаты недоступна
+    unavailable_body: Возможно, автор приостановил или отключил её, либо адрес введён неверно.
   player:
     compare_promise: "Дойдите до конца, чтобы сравнить свои ответы с ответами остальных."
     region_search_placeholder: "Найдите свой город или регион…"

@@ -197,6 +197,29 @@ pl:
     editor: "← Edytor"
     ask_verto: Zapytaj Verto
     analysing: Analizowanie odpowiedzi…
+  shared_results:
+    title: Wyniki
+    read_only_badge: Tylko do odczytu
+    total_responses:
+      one: "%{count} odpowiedź"
+      other: "%{count} odpowiedzi"
+    published_on: "Opublikowano %{date}"
+    ai_summary: Podsumowanie AI
+    regions_title: Skąd pochodziły odpowiedzi
+    when: Kiedy
+    view: Widok
+    hidden_answers:
+      one: "%{count} odpowiedź — ukryta w udostępnionych linkach"
+      other: "%{count} odpowiedzi — ukryte w udostępnionych linkach"
+    report_title: Pełny raport AI
+    report_hint: Dłuższa pisemna analiza, którą twórca wygenerował na podstawie tych wyników.
+    view_report: Zobacz raport
+    download_pdf: Pobierz PDF
+    powered_by: Obsługiwane przez Playverto
+    gone_title: Te wyniki nie są już dostępne
+    gone_body: Twórca zamknął lub usunął to Verto.
+    unavailable_title: Ten link do wyników jest niedostępny
+    unavailable_body: Mógł zostać wstrzymany lub wyłączony przez twórcę, albo adres został błędnie wpisany.
   player:
     compare_promise: "Dokończ, aby zobaczyć, jak twoje odpowiedzi wypadają na tle innych."
     region_search_placeholder: "Wyszukaj swoje miasto lub region…"

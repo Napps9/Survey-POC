@@ -1019,6 +1019,22 @@ class Survey < ApplicationRecord
     published? && !deleted?
   end
 
+  # A results-share token has been minted — distribution state, like
+  # test_token/slug, so nothing here touches editing_locked? or published?.
+  # The data being shared already exists regardless of whether /play is still
+  # collecting more of it.
+  def results_share_enabled?
+    results_share_token.present?
+  end
+
+  # Reachable by anyone at /results/:token: a token exists, hasn't been
+  # paused, and the Verto isn't archived. Deliberately NOT gated on
+  # published? — a closed Verto's results stay shareable, and the owner
+  # controls the whole thing explicitly either way.
+  def results_share_live?
+    results_share_enabled? && results_share_active? && !deleted?
+  end
+
   # ── Respondent code ────────────────────────────────────────────────────────
   # An optional self-invented code ("your nickname and the day of the month you
   # were born") that links one person's answers across waves of the same Verto
