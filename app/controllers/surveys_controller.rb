@@ -136,7 +136,14 @@ class SurveysController < ApplicationController
     @preview    = true
     @chromeless = true
     @display_locale = @survey.display_locale_for(params[:lang], Current.locale)
-    render "player/show", layout: "fullscreen"
+    # Mirrors PlayerController#render_with_chrome_language — the owner's
+    # preview should show the same chrome-language behaviour a respondent
+    # would actually get, not the platform default regardless of the toggle.
+    if @survey.chrome_follows_verto_language?
+      I18n.with_locale(@display_locale) { render "player/show", layout: "fullscreen" }
+    else
+      render "player/show", layout: "fullscreen"
+    end
   end
 
   def generate
@@ -672,7 +679,8 @@ class SurveysController < ApplicationController
     # the standings are computed at read time from data that exists either way,
     # so the toggle only shows or hides them.
     %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled share_enabled
-       regions_enabled respondent_code_enabled leaderboard_enabled].each do |flag|
+       regions_enabled respondent_code_enabled leaderboard_enabled
+       chrome_follows_verto_language].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
     end

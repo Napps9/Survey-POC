@@ -106,7 +106,7 @@ class PlayerController < ApplicationController
     @preview   = true
     @test_mode = true
     @display_locale = resolve_play_locale
-    render :show
+    render_with_chrome_language
   end
 
   def show
@@ -124,6 +124,7 @@ class PlayerController < ApplicationController
     # explanation for a respondent, not the archived-forever one.
     return render :unavailable, status: :gone unless @survey.published?
     @display_locale = resolve_play_locale
+    render_with_chrome_language
   end
 
   # Partial save while the player is mid-survey, so we can count people who
@@ -912,6 +913,24 @@ class PlayerController < ApplicationController
   # respondent's UI locale if the Verto has it, else the Verto's primary.
   def resolve_play_locale
     @survey.display_locale_for(params[:lang], Current.locale)
+  end
+
+  # ApplicationController#switch_locale already wraps this whole request in
+  # Current.locale (the visitor's platform locale) — that's why the player's
+  # chrome (Back/Next/Submit, consent gate, the required hint, the thank-you
+  # screen) has always followed the VISITOR, while card content follows the
+  # VERTO (resolve_play_locale). chrome_follows_verto_language nests a second,
+  # narrower override around just this render: t() calls made while rendering
+  # (which includes the layout, so <html lang/dir> and window.I18N move too)
+  # read @display_locale instead, for this response only. Falls back to
+  # English chrome for a Verto locale with no chrome translations, via the
+  # ordinary i18n fallback chain (config.i18n.fallbacks) — never a raw key.
+  def render_with_chrome_language
+    if @survey.chrome_follows_verto_language?
+      I18n.with_locale(@display_locale) { render :show }
+    else
+      render :show
+    end
   end
 
   def load_survey_and_share

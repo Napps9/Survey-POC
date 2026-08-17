@@ -1237,6 +1237,27 @@
           <% end %>
         </details>
 
+        <%# Card content has always followed the Verto's own language
+            (default_locale / ?lang=); the surrounding chrome — Back/Next,
+            consent, the required hint, the thank-you screen — has always
+            followed the visitor's own browser/account locale instead, so a
+            Spanish-language Verto opened by an English-browser visitor shows
+            Spanish questions against English buttons. This is the one
+            override for that, off by default. %>
+        <details class="publish-block">
+          <summary class="publish-block-title">Language <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="chrome_follows_verto_language" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="chrome_follows_verto_language" value="1"
+                     <%= "checked" if @survey.chrome_follows_verto_language? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Show Back, Next and the other player controls in the Verto's own language, not the respondent's.</span>
+            </label>
+          <% end %>
+        </details>
+
         <%# Who this Verto is for. One setting today — the country — and it
             feeds one thing: whether the opt-in Heritage question asks in the
             global nine categories or the ones this country's own census uses.
