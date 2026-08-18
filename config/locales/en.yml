@@ -246,6 +246,8 @@ en:
     preview_banner: "Preview mode — responses aren't saved"
     test_mode_banner: "Test Mode — try it out freely, nothing you enter is saved"
     exit_preview: "Exit preview"
+    test_mode_enter: "Start test mode"
+    exit_test_mode: "Exit test mode"
     thank_you_title: "Thanks for taking part!"
     thank_you_sub: "Your responses have been recorded."
     thank_you_from: "from %{org}"

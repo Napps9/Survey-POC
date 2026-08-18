@@ -29,6 +29,17 @@ const FONT_SCALE_STEPS  = [ "default", "large", "larger" ]
 // font-size key above — one browser-wide toggle, not a per-Verto setting.
 const LITE_MODE_KEY = "verto_lite_mode"
 
+// The hidden Test Mode hatch (player/_test_mode_hatch). Two deliberate acts,
+// both timed: hold the unlabelled hotspot this long to arm the confirm chip,
+// and the chip stays live only this long before it hides itself again. HOLD is
+// well past the ~500ms a browser calls a long-press and past any accidental
+// resting finger; ARM is long enough to read the chip's label and decide, short
+// enough that it is gone by the time anyone drifts back. SLOP disarms the
+// moment the gesture looks like a scroll or a swipe instead of a hold.
+const TEST_HOLD_MS      = 2000
+const TEST_ARM_MS       = 5000
+const TEST_HOLD_SLOP_PX = 12
+
 export default class extends Controller {
   static targets = ["card", "backBtn", "nextBtn", "finishBtn", "thankyou", "progress",
                     "thankyouMain", "thankyouTitle", "thankyouSub", "forwardBtn", "compareBtn", "comparePanel",
@@ -39,7 +50,8 @@ export default class extends Controller {
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
                     "consentMain", "consentDeclined", "respondentCode",
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
-                    "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn", "liteModeBtn"]
+                    "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn", "liteModeBtn",
+                    "testConfirm"]
   static values  = {
     progressUrl: { type: String, default: "" },
     submitUrl: String,
@@ -77,7 +89,11 @@ export default class extends Controller {
     current: { type: Number, default: 0 },
     // Form mode: same flow, but drop the game-like haptic buzz so it reads as a
     // plain questionnaire (motion/swipe are stripped via CSS + tap_stack).
-    forms: { type: Boolean, default: false }
+    forms: { type: Boolean, default: false },
+    // Where the hidden Test Mode hatch goes. Blank in owner preview and in Test
+    // Mode itself, and the hatch is inert while it is blank — so the one page
+    // that must never carry a live endpoint doesn't gain one here either.
+    testModeUrl: { type: String, default: "" }
   }
 
   // Haptic feedback, suppressed in form mode.
@@ -233,6 +249,7 @@ export default class extends Controller {
   disconnect() {
     this._footerObserver?.disconnect()
     if (this._answeredFrame) cancelAnimationFrame(this._answeredFrame)
+    this._clearTestTimers()
   }
 
   // ── Footer: answered glow + the cramped-bar fallback ─────────────────────
@@ -481,6 +498,89 @@ export default class extends Controller {
     // same as a font-scale change — both fit passes have to re-run.
     this._fitCard()
     this._fitFooter()
+  }
+
+  // ── Test Mode hatch ──────────────────────────────────────────────────────
+  //
+  // Lets whoever is holding a live play link say "this run isn't real" and land
+  // in Test Mode, where every recording endpoint is blank. Built for the person
+  // demoing a Verto on the real link — at an event, on a partner's phone —
+  // whose run would otherwise sit in the creator's results forever.
+  //
+  // The whole design constraint is that a RESPONDENT must not be able to fall
+  // into it, because for them it would silently throw away real answers. Hence
+  // no label, no visible target, and two separate deliberate acts: hold, then
+  // confirm. See player/_test_mode_hatch.html.erb for the markup and why the
+  // hotspot is aria-hidden.
+
+  testHoldStart(event) {
+    // Blank URL ⇒ owner preview or Test Mode itself; there is nowhere to go and
+    // the partial isn't even rendered. Belt and braces.
+    if (!this.testModeUrlValue) return
+    // A fresh hold always starts from disarmed, so pressing again while a chip
+    // is still showing re-runs the whole gesture rather than leaving that chip
+    // up with nothing left to time it out.
+    this._disarmTestMode()
+    this._testHoldFrom = { x: event.clientX, y: event.clientY }
+    this._testHoldTimer = setTimeout(() => this._armTestMode(), TEST_HOLD_MS)
+  }
+
+  // A hold that travels is a scroll or a swipe that happened to start here, not
+  // a press — drop it rather than arming behind the gesture the person meant.
+  testHoldMove(event) {
+    if (!this._testHoldTimer || !this._testHoldFrom) return
+    const dx = event.clientX - this._testHoldFrom.x
+    const dy = event.clientY - this._testHoldFrom.y
+    if (Math.hypot(dx, dy) > TEST_HOLD_SLOP_PX) this.testHoldCancel()
+  }
+
+  // Lifting, sliding off, or a cancelled pointer all end the hold. Only the
+  // arm timer is left alone: once the chip is showing it runs on its own clock,
+  // so letting go is exactly what you do before tapping it.
+  testHoldCancel() {
+    clearTimeout(this._testHoldTimer)
+    this._testHoldTimer = null
+    this._testHoldFrom = null
+  }
+
+  _armTestMode() {
+    this.testHoldCancel()
+    if (!this.hasTestConfirmTarget) return
+    this.testConfirmTarget.hidden = false
+    // The only feedback that the hold worked, and the only reason a stray press
+    // is noticeable at all. Suppressed in forms mode like every other buzz.
+    this._buzz([ 12, 40, 12 ])
+    this._testArmTimer = setTimeout(() => this._disarmTestMode(), TEST_ARM_MS)
+  }
+
+  _disarmTestMode() {
+    this._clearTestTimers()
+    if (this.hasTestConfirmTarget) this.testConfirmTarget.hidden = true
+  }
+
+  _clearTestTimers() {
+    clearTimeout(this._testHoldTimer)
+    clearTimeout(this._testArmTimer)
+    this._testHoldTimer = null
+    this._testArmTimer = null
+    this._testHoldFrom = null
+  }
+
+  enterTestMode() {
+    if (!this.testModeUrlValue) return
+    // Orphan this run's session token on the way out, for the same reason
+    // playAgain() does: whatever was started here is finished with, and a later
+    // real run on this device must open a new response row rather than merge
+    // into it. (Anything already saved stays saved — it was a real answer when
+    // it was given, and abandoning a deck mid-way is not new behaviour.)
+    try {
+      sessionStorage.removeItem(`verto_session_${this.submitUrlValue}`)
+    } catch (_e) { /* storage blocked */ }
+    // A full navigation, not in-place surgery: Test Mode's guarantee is that the
+    // page carries no live endpoint at all, and only a server render can make
+    // that true. Same reasoning as playAgain()'s reload — connect() is the one
+    // place the deck's state machine starts clean.
+    window.location.assign(this.testModeUrlValue)
   }
 
   // Consent card (the first card): agreeing advances into the deck; declining

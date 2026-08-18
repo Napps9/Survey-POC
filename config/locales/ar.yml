@@ -236,6 +236,8 @@ ar:
     preview_banner: "وضع المعاينة — لن يتم حفظ الإجابات"
     test_mode_banner: وضع الاختبار — جرّب بحرية، لا يتم حفظ أي شيء تدخله
     exit_preview: "إنهاء المعاينة"
+    test_mode_enter: "بدء وضع الاختبار"
+    exit_test_mode: "إنهاء وضع الاختبار"
     thank_you_title: شكرًا لك!
     thank_you_sub: تم تسجيل إجاباتك.
     thank_you_from: من %{org}

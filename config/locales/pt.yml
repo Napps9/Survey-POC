@@ -236,6 +236,8 @@ pt:
     preview_banner: "Modo de pré-visualização — as respostas não são guardadas"
     test_mode_banner: Modo de teste — experimente à vontade, nada do que você digitar é salvo
     exit_preview: "Sair da pré-visualização"
+    test_mode_enter: "Iniciar modo de teste"
+    exit_test_mode: "Sair do modo de teste"
     thank_you_title: Obrigado!
     thank_you_sub: As suas respostas foram registadas.
     thank_you_from: de %{org}

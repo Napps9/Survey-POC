@@ -236,6 +236,8 @@ es:
     preview_banner: "Modo de vista previa — las respuestas no se guardan"
     test_mode_banner: Modo de prueba — pruébalo libremente, nada de lo que escribas se guarda
     exit_preview: "Salir de la vista previa"
+    test_mode_enter: "Iniciar modo de prueba"
+    exit_test_mode: "Salir del modo de prueba"
     thank_you_title: "¡Gracias!"
     thank_you_sub: Tus respuestas han sido registradas.
     thank_you_from: de %{org}

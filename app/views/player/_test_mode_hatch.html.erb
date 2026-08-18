@@ -1,0 +1,40 @@
+<%# The way into Test Mode for whoever is holding a LIVE play link — a
+    facilitator demoing the Verto at an event, a creator checking it on a real
+    phone, a partner walking a funder through it. Their run shouldn't land in
+    the results, and until now their only options were to pollute them or to go
+    back to the studio for a different link.
+
+    It has to be here, in the respondent's player, and it has to be impossible
+    to reach by accident: anyone with the public link can find it, and a
+    respondent who trips into it would have their real answers silently
+    discarded. So: no label, no visible affordance, and two deliberate acts.
+    Press and hold the (invisible) hotspot for TEST_HOLD_MS to arm the confirm
+    chip, then tap the chip within TEST_ARM_MS. Sliding off, letting go early,
+    or simply waiting all disarm it. Same arm/disarm shape as the editor's
+    delete button (type_panel_controller.js#delete), for the same reason.
+
+    Nothing here can WRITE anything — the worst a respondent who finds it can
+    do is decline to submit, which closing the tab already achieves. That is why
+    it needs no owner setting and no token.
+
+    aria-hidden on the hotspot is deliberate: a hidden affordance announced by a
+    screen reader isn't hidden. The equivalent for anyone who can't perform the
+    gesture is the URL itself (/test/live/:token), which is a plain link. The
+    chip, once armed, IS announced — by then it's a real button with a real
+    label. %>
+<span class="test-hatch-hotspot" aria-hidden="true"
+      data-action="pointerdown->player#testHoldStart
+                   pointermove->player#testHoldMove
+                   pointerup->player#testHoldCancel
+                   pointerleave->player#testHoldCancel
+                   pointercancel->player#testHoldCancel"></span>
+<%# title, not aria-label: the accessible name has to keep the visible label
+    ("Start test mode") inside it, or voice control can't act on what it can
+    see. The banner string is the description on top of that name, not a
+    replacement for it — and the ⚗ is hidden because it is a mark, not a word. %>
+<button type="button" class="test-hatch-confirm" hidden
+        data-player-target="testConfirm"
+        title="<%= t("player.test_mode_banner") %>"
+        data-action="click->player#enterTestMode">
+  <span aria-hidden="true">⚗</span> <%= t("player.test_mode_enter") %>
+</button>

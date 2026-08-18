@@ -236,6 +236,8 @@ pl:
     preview_banner: "Tryb podglądu — odpowiedzi nie są zapisywane"
     test_mode_banner: Tryb testowy — wypróbuj swobodnie, nic co wpiszesz nie jest zapisywane
     exit_preview: "Zamknij podgląd"
+    test_mode_enter: "Włącz tryb testowy"
+    exit_test_mode: "Zamknij tryb testowy"
     thank_you_title: Dziękujemy!
     thank_you_sub: Twoje odpowiedzi zostały zapisane.
     thank_you_from: od %{org}

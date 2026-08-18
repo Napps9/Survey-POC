@@ -236,6 +236,8 @@ fr:
     preview_banner: "Mode aperçu — les réponses ne sont pas enregistrées"
     test_mode_banner: Mode test — essayez librement, rien de ce que vous saisissez n'est enregistré
     exit_preview: "Quitter l'aperçu"
+    test_mode_enter: "Lancer le mode test"
+    exit_test_mode: "Quitter le mode test"
     thank_you_title: Merci !
     thank_you_sub: Vos réponses ont bien été enregistrées.
     thank_you_from: de la part de %{org}

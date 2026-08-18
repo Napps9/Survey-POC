@@ -245,6 +245,8 @@ xh:
     preview_banner: "Inkqubo yokujonga kuqala — iimpendulo azigcinwa"
     test_mode_banner: "Inkqubo yoVavanyo — yizame ngokukhululekileyo, akukho nto uyifakayo egcinwayo"
     exit_preview: "Phuma kujongo lokuqala"
+    test_mode_enter: "Qalisa inkqubo yovavanyo"
+    exit_test_mode: "Phuma kwinkqubo yovavanyo"
     thank_you_title: "Enkosi ngokuthatha inxaxheba!"
     thank_you_sub: "Iimpendulo zakho zigciniwe."
     thank_you_from: "ivela ku-%{org}"

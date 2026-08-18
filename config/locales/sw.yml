@@ -236,6 +236,8 @@ sw:
     preview_banner: "Hali ya kuhakiki — majibu hayahifadhiwi"
     test_mode_banner: Hali ya Jaribio — jaribu kwa uhuru, hakuna unachoingiza kinachohifadhiwa
     exit_preview: "Funga hakiki"
+    test_mode_enter: "Anza hali ya jaribio"
+    exit_test_mode: "Toka hali ya jaribio"
     thank_you_title: Asante!
     thank_you_sub: Majibu yako yamehifadhiwa.
     thank_you_from: kutoka %{org}

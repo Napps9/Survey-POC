@@ -236,6 +236,8 @@ vi:
     preview_banner: "Chế độ xem trước — câu trả lời không được lưu"
     test_mode_banner: Chế độ thử nghiệm — thoải mái dùng thử, không có gì bạn nhập được lưu lại
     exit_preview: "Thoát xem trước"
+    test_mode_enter: "Bật chế độ thử nghiệm"
+    exit_test_mode: "Thoát chế độ thử nghiệm"
     thank_you_title: Cảm ơn bạn!
     thank_you_sub: Câu trả lời của bạn đã được ghi nhận.
     thank_you_from: từ %{org}

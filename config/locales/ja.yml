@@ -236,6 +236,8 @@ ja:
     preview_banner: "プレビューモード — 回答は保存されません"
     test_mode_banner: テストモード — 自由にお試しください。入力内容は保存されません
     exit_preview: "プレビューを終了"
+    test_mode_enter: "テストモードを開始"
+    exit_test_mode: "テストモードを終了"
     thank_you_title: ありがとうございました！
     thank_you_sub: 回答が記録されました。
     thank_you_from: "%{org} より"

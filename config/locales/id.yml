@@ -236,6 +236,8 @@ id:
     preview_banner: "Mode pratinjau — jawaban tidak disimpan"
     test_mode_banner: Mode Uji — coba dengan bebas, tidak ada yang Anda masukkan disimpan
     exit_preview: "Keluar dari pratinjau"
+    test_mode_enter: "Mulai mode uji"
+    exit_test_mode: "Keluar dari mode uji"
     thank_you_title: Terima kasih!
     thank_you_sub: Tanggapan Anda telah dicatat.
     thank_you_from: dari %{org}
