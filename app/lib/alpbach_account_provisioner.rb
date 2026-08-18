@@ -1,15 +1,17 @@
-# Provisions the Alpbach client account and Jamie's access to it.
+# Provisions the Alpbach client account and the Playverto people who work in it.
 #
 # Alpbach is a MANAGED account: the Playverto team builds its Verto, so the org
-# is created with verto_creation_enabled false. Jamie builds it, so he is an
-# admin of Alpbach and a member of the Playverto org — and it is that Playverto
-# membership, not his Alpbach role, that lets him create inside a restricted
-# account (see PlayvertoStaff).
+# is created with verto_creation_enabled false. Jamie builds it and Nick (the
+# owner) works in it too, so both are admins of Alpbach — but it is their
+# membership of the PLAYVERTO org, not their Alpbach role, that actually lets
+# them create inside a restricted account (see PlayvertoStaff).
 #
-# Called from db/migrate/20260818120001_provision_alpbach_account.rb rather than
+# Called from the data migrations under db/migrate rather than only from
 # db/seeds.rb because Render's pre-deploy `db:prepare` migrates an existing
 # database but never re-seeds it — the same reason GrantCommsAccessToOwner is a
-# migration. Lives here rather than inline in the migration so it can be tested.
+# migration. Lives here rather than inline in a migration so it can be tested,
+# and so a later change (adding a person) is one edit plus a migration that
+# re-runs it, not a rewrite.
 #
 # EVERY write is create-only, which is what makes it safe to re-run:
 #   * an existing user keeps their password and name (Jamie already has an
@@ -22,19 +24,29 @@ class AlpbachAccountProvisioner
   ORG_NAME    = "Alpbach"
   JAMIE_EMAIL = "jamie@playverto.com"
   JAMIE_NAME  = "Jamie"
+  NICK_EMAIL  = "nick@playverto.com"
+  NICK_NAME   = "Nick"
 
   def call
     alpbach   = find_or_create_alpbach!
     playverto = find_or_create_playverto!
-    jamie     = find_or_create_jamie!
+
+    jamie = find_or_create_user!(JAMIE_EMAIL, JAMIE_NAME)
+    nick  = find_or_create_user!(NICK_EMAIL, NICK_NAME)
 
     # Admin in Alpbach is "full features in the Alpbach account".
     Membership.find_or_create_by!(user: jamie, organisation: alpbach) { |m| m.role = "admin" }
-    # Member — not admin — of Playverto: the membership itself is the staff
-    # capability, and Jamie has no need to administer Playverto's own org.
-    Membership.find_or_create_by!(user: jamie, organisation: playverto) { |m| m.role = "member" }
+    Membership.find_or_create_by!(user: nick,  organisation: alpbach) { |m| m.role = "admin" }
 
-    [ alpbach, jamie ]
+    # Member — not admin — of Playverto for Jamie: the membership itself is the
+    # staff capability, and he has no need to administer Playverto's own org.
+    # Nick's Playverto membership is created by db/seeds.rb and by
+    # GrantCommsAccessToOwner as an ADMIN, and find_or_create_by! leaves it
+    # alone — this line only matters on a database where neither has run.
+    Membership.find_or_create_by!(user: jamie, organisation: playverto) { |m| m.role = "member" }
+    Membership.find_or_create_by!(user: nick,  organisation: playverto) { |m| m.role = "admin" }
+
+    [ alpbach, jamie, nick ]
   end
 
   private
@@ -52,11 +64,12 @@ class AlpbachAccountProvisioner
 
   # Credential-free: a user we have to create gets a throwaway password and
   # claims the account through the ordinary password-reset flow, the same idiom
-  # the partner/funder accounts use. Jamie already exists, so in practice this
-  # branch is the safety net, not the path.
-  def find_or_create_jamie!
-    User.find_or_create_by!(email_address: JAMIE_EMAIL) do |u|
-      u.name             = JAMIE_NAME
+  # the partner/funder accounts use. Both of these people already have accounts,
+  # so in practice the create branch is the safety net, not the path — and
+  # because it only runs on create, an existing password is never touched.
+  def find_or_create_user!(email, name)
+    User.find_or_create_by!(email_address: email) do |u|
+      u.name             = name
       u.password         = SecureRandom.hex(32)
       u.password_pending = true
     end
