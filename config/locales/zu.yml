@@ -243,6 +243,8 @@ zu:
     preview_banner: "Imodi yokubuka kuqala — izimpendulo azilondolozwa"
     test_mode_banner: "Imodi Yokuhlola — zizamele ngokukhululekile, akukho lokho okufakayo okulondolozwayo"
     exit_preview: "Phuma ekubukeni kuqala"
+    test_mode_enter: "Qalisa imodi yokuhlola"
+    exit_test_mode: "Phuma kwimodi yokuhlola"
     thank_you_title: "Siyabonga ngokubamba iqhaza!"
     thank_you_sub: "Izimpendulo zakho zirekhodiwe."
     thank_you_from: "kusuka ku-%{org}"

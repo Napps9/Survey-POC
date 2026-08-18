@@ -83,12 +83,15 @@ class PlayerController < ApplicationController
   # `content_security_policy` macro — see config/initializers/blazer.rb: that
   # macro shallow-clones and mutates the shared global policy, leaking the
   # relaxation into every other response in the process.
-  after_action :allow_embedding, only: %i[ show test_show ]
+  after_action :allow_embedding, only: %i[ show test_show live_test_show ]
 
+  # live_test_show is deliberately NOT excepted: it is reached by an ordinary
+  # play address, so it must resolve through exactly the same four-way lookup
+  # (share token / link slug / publish token / vanity slug) that #show uses.
   before_action :load_survey_and_share, except: :test_show
   # A tester opening a shared link is read-only traffic; aligned with the
   # other public read endpoints above.
-  rate_limit to: 120, within: 1.minute, only: :test_show
+  rate_limit to: 120, within: 1.minute, only: %i[ test_show live_test_show ]
 
   # GET /test/:token — Test Mode. The exact respondent experience (drafts
   # included) with every recording endpoint blanked, shareable without
@@ -106,6 +109,41 @@ class PlayerController < ApplicationController
     @preview   = true
     @test_mode = true
     @display_locale = resolve_play_locale
+    render_with_chrome_language
+  end
+
+  # GET /test/live/:token — Test Mode entered from a live play link, by whoever
+  # is holding it: a facilitator demoing the Verto at an event, a creator
+  # checking it on a real phone, a partner walking a funder through it. Reached
+  # only through the player's hidden press-and-hold hatch (or by pasting this
+  # URL), never by an ordinary respondent stumbling into it.
+  #
+  # Records nothing, by exactly the same mechanism as #test_show rather than by
+  # a second one: @preview blanks progress/submit/consent, and @test_mode blanks
+  # the play token itself, which kills the whole results/regions/quiz/leaderboard
+  # /share URL family at its source (see player/show.html.erb). There is no
+  # "test response" to filter out anywhere downstream because no write endpoint
+  # reaches this page at all.
+  #
+  # @live_test is the one thing this does that #test_show doesn't: it means "we
+  # got here from a real play link", which is what lets the banner offer a way
+  # back to it. params[:token] IS that link, so the exit is exact.
+  def live_test_show
+    return render :unavailable, status: :not_found unless @survey
+    if @survey.deleted?
+      @oops_gone = true
+      return render :unavailable, status: :gone
+    end
+    # Only a live Verto has a real run to opt out of. A draft or an unpublished
+    # one is the creator's own /test/:token case, not this one.
+    return render :unavailable, status: :gone unless @survey.published?
+    @preview   = true
+    @test_mode = true
+    @live_test = true
+    @display_locale = resolve_play_locale
+    # No @pwa_manifest_url on purpose — same reasoning as #show's note below:
+    # this route is outside the service worker's scope, so there is nothing here
+    # to install.
     render_with_chrome_language
   end
 

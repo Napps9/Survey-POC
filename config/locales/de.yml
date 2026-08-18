@@ -235,6 +235,8 @@ de:
     preview_banner: "Vorschau-Modus — Antworten werden nicht gespeichert"
     test_mode_banner: Testmodus — frei ausprobieren, nichts wird gespeichert
     exit_preview: "Vorschau beenden"
+    test_mode_enter: "Testmodus starten"
+    exit_test_mode: "Testmodus beenden"
     thank_you_title: Vielen Dank!
     thank_you_sub: Deine Antworten wurden gespeichert.
     thank_you_from: von %{org}

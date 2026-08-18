@@ -245,6 +245,8 @@ tn:
     preview_banner: "Mokgwa wa go leba fela — dikarabo ga di bolokwe"
     test_mode_banner: "Mokgwa wa Teko — leka ka bolokwe, ga go sepe se o se tsenyang se se bolokwang"
     exit_preview: "Tswa mo pontshong"
+    test_mode_enter: "Simolola mokgwa wa teko"
+    exit_test_mode: "Tswa mo mokgweng wa teko"
     thank_you_title: "Re a leboga go tsaya karolo!"
     thank_you_sub: "Dikarabo tsa gago di begilwe."
     thank_you_from: "go tswa go %{org}"

@@ -235,6 +235,8 @@ nl:
     preview_banner: "Voorbeeldmodus — antwoorden worden niet opgeslagen"
     test_mode_banner: Testmodus — probeer vrijuit, niets wat je invoert wordt opgeslagen
     exit_preview: "Voorbeeld sluiten"
+    test_mode_enter: "Testmodus starten"
+    exit_test_mode: "Testmodus sluiten"
     thank_you_title: Bedankt!
     thank_you_sub: Je antwoorden zijn vastgelegd.
     thank_you_from: van %{org}

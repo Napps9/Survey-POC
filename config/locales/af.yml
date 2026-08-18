@@ -236,6 +236,8 @@ af:
     preview_banner: "Voorskou-modus — antwoorde word nie gestoor nie"
     test_mode_banner: "Toetsmodus — probeer dit gerus uit, niks wat jy invoer word gestoor nie"
     exit_preview: "Verlaat voorskou"
+    test_mode_enter: "Begin toetsmodus"
+    exit_test_mode: "Verlaat toetsmodus"
     thank_you_title: "Dankie dat jy deelgeneem het!"
     thank_you_sub: "Jou antwoorde is aangeteken."
     thank_you_from: "van %{org}"

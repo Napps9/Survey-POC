@@ -235,6 +235,8 @@ tr:
     preview_banner: "Önizleme modu — yanıtlar kaydedilmez"
     test_mode_banner: Test Modu — özgürce dene, girdiğin hiçbir şey kaydedilmez
     exit_preview: "Önizlemeden çık"
+    test_mode_enter: "Test modunu başlat"
+    exit_test_mode: "Test modundan çık"
     thank_you_title: Teşekkürler!
     thank_you_sub: Yanıtlarınız kaydedildi.
     thank_you_from: "%{org} tarafından"

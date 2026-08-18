@@ -245,6 +245,8 @@ st:
     preview_banner: "Mokgwa wa Pontsho — dikarabo ha di bolokwe"
     test_mode_banner: "Mokgwa wa Teko — e leke ka bolokolohi, ha ho letho leo o le kenyang le bolokwang"
     exit_preview: "Tswa pontshong"
+    test_mode_enter: "Qala mokgwa wa teko"
+    exit_test_mode: "Tswa mokgweng wa teko"
     thank_you_title: "Kea leboha ka ho nka karolo!"
     thank_you_sub: "Dikarabo tsa hao di ngodisitswe."
     thank_you_from: "ho tswa ho %{org}"

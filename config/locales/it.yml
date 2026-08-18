@@ -235,6 +235,8 @@ it:
     preview_banner: "Modalità anteprima — le risposte non vengono salvate"
     test_mode_banner: Modalità test — prova liberamente, nulla di ciò che inserisci viene salvato
     exit_preview: "Esci dall'anteprima"
+    test_mode_enter: "Avvia modalità test"
+    exit_test_mode: "Esci dalla modalità test"
     thank_you_title: Grazie!
     thank_you_sub: Le tue risposte sono state registrate.
     thank_you_from: da %{org}

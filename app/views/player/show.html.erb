@@ -117,13 +117,26 @@
      data-player-retake-policy-value="<%= @survey.leaderboard_retake_policy %>"
      data-player-logic-value="<%= logic_mode %>"
      data-player-end-screens-value="<%= @survey.end_screens_list.to_json %>"
-     data-player-forward-label-value="<%= t('player.visit_website') %>">
+     data-player-forward-label-value="<%= t('player.visit_website') %>"
+     <%# Where the hidden press-and-hold hatch goes (player/_test_mode_hatch).
+         Blank in owner preview and in Test Mode itself, so the hatch is inert
+         there twice over — the partial isn't rendered, and the controller has
+         nowhere to send anyone. Blank is also what Test Mode's "no live endpoint
+         may reach this page" test already asserts of every *-url-value. %>
+     data-player-test-mode-url-value="<%= preview_mode ? "" : live_test_survey_url(play_token) %>">
 
   <% if @test_mode %>
     <%# Test Mode strip: viewers are unauthenticated testers, so no exit link
-        into the studio — just what this link is and that nothing is saved. %>
+        into the studio — just what this link is and that nothing is saved.
+        The one exception is @live_test (PlayerController#live_test_show): that
+        person arrived from a real play link and params[:token] still IS it, so
+        there is somewhere honest to send them back to. %>
     <div class="play-banner play-banner-test">
       <span class="play-banner-text">⚗ <%= t("player.test_mode_banner") %></span>
+      <% if @live_test %>
+        <%= link_to t("player.exit_test_mode"), play_survey_path(params[:token]),
+                    class: "play-banner-link" %>
+      <% end %>
     </div>
   <% elsif preview_mode %>
     <div class="play-banner play-banner-preview">
@@ -141,6 +154,12 @@
       only) alongside the text-size control (always — a reading preference,
       not a per-Verto one). %>
   <div class="player-lang-bar">
+    <%# Nothing to see — literally. See the partial. Rendered FIRST so its
+        margin-right:auto parks it at the leading edge and every visible control
+        below keeps the exact position it has today, multilingual or not. %>
+    <% unless preview_mode %>
+      <%= render "player/test_mode_hatch" %>
+    <% end %>
     <% if @survey.multilingual? %>
       <%= render "player/content_lang_switcher" %>
     <% end %>

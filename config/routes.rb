@@ -19,6 +19,15 @@ Rails.application.routes.draw do
   # player HTML stale-while-revalidate, which would pin a mutable test link
   # one edit behind forever (see app/javascript/sw_register.js).
   get "test/:token", to: "player#test_show", as: :test_survey
+  # Test Mode entered from a LIVE play link by whoever is holding it — the
+  # hidden press-and-hold hatch in the player (player_controller.js#enterTestMode).
+  # Same /test/ namespace as above and for the same reason: it has to sit outside
+  # the service worker's /play/ scope, or a records-nothing page would land in a
+  # respondent's offline page cache. :token here is the ordinary play address
+  # (share token / link slug / publish token / vanity slug), not a test_token.
+  # Declared after the line above and safe: :token matches one segment, so
+  # "test/live/abc" can never be read as test/:token.
+  get "test/live/:token", to: "player#live_test_show", as: :live_test_survey
 
   # Shareable results/report links (no auth) — a public, read-only view of a
   # Verto's aggregated results, distinct from /play (that's the respondent

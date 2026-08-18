@@ -8174,6 +8174,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  /* A no-op for the controls that were here first — they have always fitted.
+     It only ever engages for the Test Mode chip below, which is a full phrase
+     rather than a pill and can be long in some locales; wrapping beats it
+     pushing the text-size control off the edge of a narrow phone. */
+  flex-wrap: wrap;
   gap: 8px;
   padding: 8px 14px 0;
 }
@@ -8210,6 +8215,36 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .lite-mode-btn:hover { color: #fff; }
 .lite-mode-btn.is-active { background: rgba(1,234,203,0.18); border-color: rgba(1,234,203,0.4); color: #01EACB; }
+
+/* Player: the hidden Test Mode hatch (player/_test_mode_hatch.html.erb).
+   The hotspot has to read as empty space — no background, no border, no
+   cursor change, no hover state — or it stops being hidden. margin-right:auto
+   is what keeps it free: .player-lang-bar is justify-content:flex-end, so an
+   auto margin on the FIRST child parks it at the leading edge and swallows the
+   free space, leaving every visible control exactly where it was.
+   touch-action:none stops a hold turning into the browser's own long-press
+   (text selection, the iOS callout) mid-gesture. */
+.test-hatch-hotspot {
+  width: 34px; height: 26px; flex-shrink: 0; margin-right: auto;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+/* Armed. Same pill as .lite-mode-btn, in the Test Mode yellow of
+   .play-banner-test — the chip looks like where it is about to take you. */
+.test-hatch-confirm {
+  display: inline-flex; align-items: center;
+  height: 26px; padding: 0 11px; border-radius: 100px;
+  border: 1px solid rgba(255,250,119,0.4);
+  background: rgba(255,250,119,0.12);
+  backdrop-filter: blur(8px);
+  color: #FFFA77;
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.test-hatch-confirm:hover { background: rgba(255,250,119,0.2); }
+.test-hatch-confirm[hidden] { display: none; }
 
 /* ── Text-size tiers for the reading surfaces only (never the footer CTAs or
    chrome labels) — player_controller.js#_applyFontScale sets data-font-scale

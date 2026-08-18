@@ -237,6 +237,8 @@ sn:
     preview_banner: "Muitiro Wekutarisa — mhinduro hadzichengetwi"
     test_mode_banner: "Muitiro Wekuedza — edza wakasununguka, hapana chaunoisa chinochengetwa"
     exit_preview: "Buda Pakutarisa"
+    test_mode_enter: "Tanga muitiro wekuedza"
+    exit_test_mode: "Buda mumuitiro wekuedza"
     thank_you_title: "Tinotenda Nekutora Chikamu!"
     thank_you_sub: "Mhinduro dzako dzanyorwa."
     thank_you_from: "kubva ku%{org}"
