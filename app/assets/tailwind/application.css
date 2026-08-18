@@ -282,7 +282,12 @@
 }
 .split-left {
   width: 425px;                 /* equal half of 850 */
-  flex: 0 0 425px;
+  /* Allowed to SHRINK. Both halves were flex:0 0 425px, so an 850px row stayed
+     850px however narrow its column got — with the editor's right panel open
+     the far edge of the card, and anything near it, rendered outside
+     .split-card's overflow:hidden. They still never GROW past half. */
+  flex: 0 1 425px;
+  min-width: 0;
   position: relative;
   background: var(--brand-panel, #2E3564);
   display: flex;
@@ -663,7 +668,8 @@
 
 .split-right {
   width: 425px;                 /* equal half of 850 */
-  flex: 0 0 425px;
+  flex: 0 1 425px;              /* shrinkable — see .split-left */
+  min-width: 0;
   padding: 36px 32px;
   position: relative;           /* anchors the welcome-card logo overlay */
   display: flex;
@@ -756,6 +762,20 @@
 .split-right > .mt-2:has(> .choice-grid) {
   padding: 12px;
   margin: -12px;
+}
+/* Same trick, for the slider's thumb. overflow-y:auto above forces overflow-x
+   to auto as well, so the pane clips on BOTH axes — and the thumb is a 56px
+   circle centred with translate(-50%) on an inline left:0%/100%, so it hangs
+   28px past each end of its track. On the left that overflow is unreachable
+   (there is no negative scroll position), so it was simply cut off: "in
+   designer, answer type gets cut off", with the first scale label sheared with
+   it. Padding gives the overhang somewhere to live and the negative margin
+   gives the space back, so nothing else moves. */
+.split-right > .mt-2:has(> .slider-wrap) {
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-left: -30px;
+  margin-right: -30px;
 }
 /* "There are more options below" — the desktop counterpart of the mobile
    .is-scrollable::after cue further down (search "is-scrollable .choice-list"
@@ -2105,7 +2125,7 @@
   border-radius: 10px;
 }
 .choice-list:has(> .choice-list-item:nth-child(7)) .choice-list-tile {
-  width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 19px;
+  width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 25px;
 }
 .choice-list:has(> .choice-list-item:nth-child(7)) .pick-text {
   font-size: 13px;
@@ -2661,7 +2681,12 @@
    to the circular button and tinted by the button's currentColor. */
 .rotate-action-icon { display: block; width: 22px; height: 22px; }
 .phone-bottom .rotate-action-icon { width: 19px; height: 19px; }
-.rotate-action .choice-icon-emoji { font-size: 20px; line-height: 1; }
+.rotate-action /* Every tile emoji is sized from this ONE property — which is the whole reason
+   it exists, and why "increase emoji size by, maybe 30%?" (18 Aug) is a set of
+   value changes rather than a hunt through the stylesheet. The glyph now takes
+   roughly 60% of its tile rather than 46%, which is what reads as "an icon"
+   instead of "a small mark in a large box". */
+.choice-icon-emoji { font-size: 20px; line-height: 1; }
 
 /* ── The fan: five or six responses, placed on an arc over the photo ─────
    The wrapper stops being a bottom strip and covers the card; the scrim shrinks
@@ -2672,6 +2697,18 @@
   padding: 0;
   justify-content: flex-end;
   background: linear-gradient(transparent 78%, rgba(0,0,0,0.42));
+  /* Fanning turns this wrapper into a full-card box (top:0 over the existing
+     left/right/bottom:0), and tap_stack_controller deliberately lifts it above
+     every card so a long statement list can't bury the answers. Together that
+     put a transparent, hit-testable sheet over the whole card: the statement's
+     contenteditable and the image/delete chips are inside .rotate-card, whose
+     inline z-index makes it a stacking context, so nothing in it could out-rank
+     the sheet. Clicks died on the overlay — reported as "when I go above 3
+     answer choices, I cannot edit the text in the dark box" and "cannot find
+     the button to change the card image" (both actually start at the FIFTH
+     chip, where fanning begins). The layer is only a positioning frame, so it
+     should never be a target; its interactive children opt back in below. */
+  pointer-events: none;
 }
 /* The dots keep the 14px of clearance the row layout gives them (see the
    padding on .rotate-card-controls). They are the only in-flow child here —
@@ -2684,6 +2721,11 @@
 .rotate-actions--fan {
   position: absolute; inset: 0;
   display: block; margin: 0; gap: 0;
+  /* Same reasoning as .rotate-card-controls--fan above: an inset:0 frame, not a
+     target. The chips, the add button and the dots take their hits back on the
+     rules just below, which is the pattern this stylesheet already uses for
+     .swipe-indicator and the leaderboard overlay. */
+  pointer-events: none;
 
   /* ── One pill size per card ──────────────────────────────────────────────
      Every pin on a card is the same box. Sized to content they ran 23% to 32%
@@ -2697,8 +2739,10 @@
      is why this is a variable and not a number:
 
        five  — the two ends of the scale, at 31.53% and 68.47%: 36.94% apart
-       six   — the middle pair, near the apex where the arc flattens,
-               at 35.73% and 64.27%: 28.54% apart
+       six   — also the two ends, 36.94% apart. (Before the rows were evened
+               out this was the middle pair at 28.54%; spacing by row rather
+               than by angle pushed the near-apex pins outward, so six is now
+               no tighter than five. The 27% below is therefore conservative.)
 
      Take a couple of points off each for a visible gutter. Six is the tighter
      card, so it also loses a little chrome to keep the same words inside a
@@ -2706,13 +2750,13 @@
   --tap-pill-w: 34%;
   /* Height tracks the CARD, because the arc does. The arc's vertical radius is
      22% of the card height, so a shorter card flattens it and the rows close on
-     each other: measured, a five-point scale's tightest row pair sits 14.84% of
-     the card's height apart, and the pills touch at 380px with a fixed 56px
-     pill. Keeping the pill under 12% of the card means that gap can never close,
-     at any height — 56px on a full-size card, 43px on an iPhone SE, and it is
-     the arc's own geometry doing the arithmetic rather than a table of
-     breakpoints. Six is the roomier scale (its rows are 17.5% apart, not 14.8),
-     so the five-point figure governs both. */
+     each other. The rows are evenly spaced now (see TapScales.fan_position), so
+     the tightest pair is six's 15.73% rather than five's old 14.84% — five is
+     the roomier scale at 19.67%. Keeping the pill under 12% of the card means
+     that gap can never close, at any height — 56px on a full-size card, 43px on
+     an iPhone SE, and it is the arc's own geometry doing the arithmetic rather
+     than a table of breakpoints. Six is the tighter scale vertically, so the
+     six-point figure governs both. */
   --tap-pill-h: clamp(34px, 12cqh, 56px);
   --tap-pill-pad: 5px 11px 5px 9px;
   --tap-pill-gap: 5px;
@@ -2748,6 +2792,15 @@
   box-shadow: 0 4px 14px rgba(0,0,0,0.22);
   transition: transform 0.12s;
 }
+/* The interactive children of the two pointer-events:none frames above. Listed
+   together so it is obvious what is and isn't clickable inside a fanned card —
+   anything not here is decoration and must let clicks through to the statement
+   text and the image/delete chips underneath. */
+.rotate-actions--fan .rotate-action,
+.rotate-actions--fan .tap-response-add,
+.rotate-card-controls--fan .rotate-dots {
+  pointer-events: auto;
+}
 .rotate-actions--fan .rotate-action-btn {
   width: auto; height: auto;
   border: 0; border-radius: 0; background: none; box-shadow: none;
@@ -2756,15 +2809,17 @@
 .rotate-actions--fan .rotate-action.is-strong .rotate-action-btn {
   background: none; color: var(--tap-response-color, #F5A623);
 }
-/* "Strongly" wears a heavier ring, drawn INWARD rather than as a thicker
-   border. A 2.5px border against the others' 1.5px added 2px to the box, so
-   the two ends of every scale were a size of their own — small, but it is the
-   one thing the fixed width above exists to stop. An inset shadow is the same
-   ring with no layout at all. The drop shadow rides along because a second
-   box-shadow declaration would replace it, not add to it. */
+/* "Strongly" used to wear an extra inset ring on top of the 1.5px border every
+   chip already has — an effective 3px stroke against the other three, i.e. the
+   two ENDS of the scale drawn twice as heavily as its middle. That is a
+   leading design: weight pulls the eye, and the ends of an agree/disagree
+   scale are exactly where you least want a thumb on the scale. Every chip now
+   carries the same border and the same drop shadow; `is-strong` is still
+   distinguished, by COLOUR (see the rule above), which biases nothing.
+   Reported 18 Aug: "both stronglys are thicker currently and could be argued
+   as leading." */
 .rotate-actions--fan .rotate-action.is-strong {
-  box-shadow: inset 0 0 0 1.5px var(--tap-response-color, #F5A623),
-              0 4px 14px rgba(0,0,0,0.22);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.22);
 }
 .rotate-actions--fan .rotate-action-label {
   font-size: 11px; color: #1C2034; text-align: left;
@@ -3768,10 +3823,10 @@ button.editor-leave-btn { cursor: pointer; }
 
 .phone-bottom .choice-list { gap: 4px; }
 .phone-bottom .choice-list-item { padding: 6px 10px 6px 6px; border-radius: 10px; }
-.phone-bottom .choice-list-tile { width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 19px; }
+.phone-bottom .choice-list-tile { width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 25px; }
 
 .phone-bottom .choice-grid { gap: 6px; }
-.phone-bottom .choice-card-bg { height: 56px; border-radius: 10px; --tile-emoji: 23px; }
+.phone-bottom .choice-card-bg { height: 56px; border-radius: 10px; --tile-emoji: 30px; }
 .phone-bottom .choice-label { font-size: 10px; padding: 2px 4px; margin-top: 4px; }
 
 .phone-bottom .slider-wrap { gap: 8px; padding-top: 8px; }
@@ -3868,11 +3923,16 @@ button.editor-leave-btn { cursor: pointer; }
 .card-rail .rail-label { min-width: 0; }
 .card-rail .card-num-pill { justify-content: center; gap: 3px; }
 .card-rail .required-chip { justify-content: center; margin-top: 0; }
-/* The reorder pair defines the rail's column rhythm — every other row lines
-   up with these two. */
+/* Move, up and down on ONE row of three circles. It was a two-column grid
+   holding three children, so the down arrow wrapped onto a line of its own and
+   sat apart from the pair it belongs with — "the up and down arrow feels weird
+   being separated like this" (18 Aug). Three columns puts all three on the same
+   plane, and the circle shape below is the one the collapsed rail already
+   uses, so the two states now agree. */
 .card-rail .card-reorder {
   grid-column: 1 / -1; padding: 0;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items: stretch;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  justify-items: center; align-items: center;
 }
 /* Controls whose label is a whole phrase keep a row to themselves — the
    destructive/insert pair included, so Delete card sits above Add question
@@ -3882,8 +3942,16 @@ button.editor-leave-btn { cursor: pointer; }
 .card-rail .card-duplicate-btn,
 .card-rail .card-delete-btn,
 .card-rail .rail-add-btn { grid-column: 1 / -1; }
+/* Circles, not pills: these three carry a glyph and no words, so a stretched
+   lozenge only made them read as three different-sized buttons depending on the
+   column they landed in. A fixed 30px circle is what the collapsed rail has
+   always used for them. */
 .card-rail .card-move-btn {
-  flex: 1 1 0; width: auto; height: auto; min-height: 30px; border-radius: 100px;
+  flex: 0 0 auto;
+  width: 30px; height: 30px; min-height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
   background: #232838; border: 1px solid rgba(255,255,255,0.25);
   color: rgba(255,255,255,0.85);
 }
@@ -4080,8 +4148,14 @@ button.editor-leave-btn { cursor: pointer; }
 }
 
 /* The per-card checklist, shown below the chrome row when the light is tapped. */
+/* Sits in the rail beneath .rail-top, so it matches the dock it hangs off:
+   same fill, same blur, same radius, same shadow — "same looking box with same
+   dark opacity" — with the rail's own 12px gap doing the "small gap" between
+   them. Full rail width, and it grows the RAIL rather than the card column, so
+   opening it no longer shoves the designer through its scroll snap. */
 .card-analysis {
-  margin: 0 4px 8px; padding: 12px 14px; border-radius: 12px;
+  width: 100%;
+  margin: 0; padding: 12px 14px; border-radius: 16px;
   /* Near-solid dark surface (not translucent) so the busy card backdrop behind
      it never bleeds through and the analysis text stays legible. */
   background: rgba(20,24,40,0.94); border: 1px solid rgba(255,255,255,0.14);
@@ -5009,8 +5083,34 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .rating-labels {
   display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 8px;
   width: 100%; padding: 0 4px;
 }
+/* The middle captions share one centred slot between the two end captions, so
+   the row reads as a two-ended scale until a star in between is touched. They
+   are stacked on top of each other rather than laid out in a line: only one is
+   ever shown, and reserving the height of the tallest keeps the row from
+   jumping as the reveal changes. */
+.rating-mid-labels {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-items: center;
+  text-align: center;
+}
+.rating-mid-labels > .rating-label-mid {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.rating-mid-labels > .rating-label-mid.is-shown { opacity: 1; }
+/* In the editor every caption must be reachable to type in, so they lay out in
+   a row and stay legible rather than hiding behind a hover the creator would
+   have to hold. */
+.editor-feed .rating-mid-labels {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+}
+.editor-feed .rating-mid-labels > .rating-label-mid { opacity: 1; }
 .rating-label {
   font-size: 11px; color: rgba(0,0,0,0.4);
   font-family: "ABeeZee", sans-serif;
@@ -5076,16 +5176,16 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
    but an emoji is text and needs a px value. Before this, the emoji stayed at
    26/30px while the tile shrank to 40/56px in phone preview and overflowed. */
 .choice-icon-emoji {
-  font-size: var(--tile-emoji, 26px); line-height: 1;
+  font-size: var(--tile-emoji, 34px); line-height: 1;
   display: flex; align-items: center; justify-content: center;
 }
-.choice-list-tile { --tile-emoji: 26px; }
+.choice-list-tile { --tile-emoji: 34px; }
 /* Card tiles size their art against the tile's own width, so a 305px tablet
    tile does not carry the same 30px emoji as a 172px phone one and look
    half-empty. cqw is safe here and NOT on .choice-list-tile above: only
    .choice-card declares a container, and a cqw with no container ancestor
    silently falls back to the viewport. */
-.choice-card-bg { --tile-emoji: clamp(18px, 16cqw, 34px); }
+.choice-card-bg { --tile-emoji: clamp(23px, 21cqw, 44px); }
 .choice-card-bg .choice-icon-svg {
   width: 18cqw; height: 18cqw;
   min-width: 20px; min-height: 20px;
@@ -5271,7 +5371,13 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   opacity: 0; transition: opacity 0.15s, background 0.15s, color 0.15s;
   z-index: 10; padding: 0;
 }
-.rotate-card:hover .tap-card-image-btn { opacity: 1; }
+/* :focus-within alongside :hover, matching .tap-card-delete. Without it the
+   chip was unreachable by keyboard and — more to the point — stayed invisible
+   while a creator was typing in the statement right beside it, which is how
+   "cannot find the button to change the card image" happens on a control that
+   works perfectly once you know it is there. */
+.rotate-card:hover .tap-card-image-btn,
+.rotate-card:focus-within .tap-card-image-btn { opacity: 1; }
 .tap-card-image-btn:hover { background: rgba(1,234,203,0.85); color: #1C2034; }
 .tap-add-btn {
   background: transparent;
@@ -6857,7 +6963,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .choice-list-tile {
     width:  clamp(40px, 6.4svh, 56px);
     height: clamp(40px, 6.4svh, 56px);
-    --tile-emoji: clamp(19px, 3.2svh, 26px);
+    --tile-emoji: clamp(25px, 4.2svh, 34px);
   }
   /* Prioritise-only slimming: with the badge on the tile, the row gap and the
      grip are the chrome left between the label and its width — every px here
@@ -7097,7 +7203,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
     min-height: 0; max-height: none;
     border-radius: 9px;
     box-shadow: none;
-    --tile-emoji: 18px;
+    --tile-emoji: 23px;
   }
   .preview-overlay .choice-grid.art-off .choice-icon-svg {
     width: 19px; height: 19px; min-width: 0; min-height: 0;

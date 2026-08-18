@@ -66,3 +66,21 @@ export const OPTION_TYPES = new Set([
 
 // Types whose details form shows min / max scale labels instead of a list.
 export const LABEL_TYPES = new Set([ "range", "rating" ])
+
+// The placeholder for the Nth option row (0-based), continuing the same lettered
+// sequence the seeded rows use. It used to be `Option ${n + 1}`, so a
+// multiple-choice card seeded with "Option A/B/C" carried on "Option 4, Option
+// 5…" — two naming schemes in one list, which is what "just for consistency,
+// use letters or numbers" was about (18 Aug).
+//
+// Past Z it doubles up (AA, AB…) rather than falling back to digits, so the
+// sequence stays one kind of thing however many options a creator adds.
+export function optionPlaceholder(index) {
+  let n = Math.max(0, Math.floor(Number(index) || 0))
+  let letters = ""
+  do {
+    letters = String.fromCharCode(65 + (n % 26)) + letters
+    n = Math.floor(n / 26) - 1
+  } while (n >= 0)
+  return `Option ${letters}`
+}

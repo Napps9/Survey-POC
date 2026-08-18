@@ -245,6 +245,12 @@ class Survey < ApplicationRecord
   # partial, and it was advisory only — no maxlength on the textarea and no
   # server check anywhere, so the counter turned pink and the answer saved in
   # full regardless. Now it's per-card and actually enforced.
+  # A rating card is always five stars. Answers are stored as the star NUMBER
+  # and results count 1..5, so this is the card type's contract rather than a
+  # function of how many captions a particular card happens to carry — a card
+  # with only min/max labels is still a five-star card.
+  RATING_STARS = 5
+
   DEFAULT_FREE_TEXT_LIMIT = 200
   # Bounds on what a creator can choose. The floor keeps a limit from being set
   # so low the question can't be answered; the ceiling keeps a single answer from

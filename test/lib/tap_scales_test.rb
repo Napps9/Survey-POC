@@ -210,4 +210,48 @@ class TapScalesTest < ActiveSupport::TestCase
     assert_equal TapScales::MAX_RESPONSES, blob["max"]
     assert_equal "Neutre", blob.dig("presets", "5", 2, "label")
   end
+
+  # The eye reads the ROWS of the fan, not the angles between the pins. An even
+  # angle step bunches at the apex — a five-point scale's rows sat 14.84% then
+  # 24.50% of the card apart, so the two "strongly" pins hung below the rest and
+  # the scale read as bottom-heavy (and, with the extremes also drawn in a
+  # heavier stroke at the time, as leading). fan_position spaces by row instead.
+  test "the fan's rows are evenly spaced, at every scale size" do
+    (TapScales::FAN_THRESHOLD..6).each do |count|
+      rows = (0...count).map { |i| TapScales.fan_position(i, count)[1] }.uniq.sort
+      gaps = rows.each_cons(2).map { |a, b| (b - a).round(2) }
+
+      assert gaps.any?, "#{count}-point fan collapsed to a single row"
+      assert_in_delta gaps.min, gaps.max, 0.05,
+                      "#{count}-point fan rows are unevenly spaced: #{rows.inspect} (gaps #{gaps.inspect})"
+    end
+  end
+
+  # Evening the rows must not move the ends of the scale or the apex — those are
+  # what the arc reads as, and what the pill-width ceiling is measured against.
+  test "evening the rows leaves the arc's extremes and apex where they were" do
+    five = (0...5).map { |i| TapScales.fan_position(i, 5) }
+
+    assert_equal [ 31.53, 74.84 ], five.first, "the bottom-left end of the scale moved"
+    assert_equal [ 68.47, 74.84 ], five.last,  "the bottom-right end of the scale moved"
+    assert_equal [ 50.0,  35.5  ], five[2],    "the apex is no longer centred at the top"
+  end
+
+  # The pill width is bounded by the closest SAME-HEIGHT pair (see the
+  # --tap-pill-w note in application.css). Spacing by row moved the near-apex
+  # pins outward, so that bound must not have tightened.
+  test "no same-height pair is closer than the pill width allows" do
+    (TapScales::FAN_THRESHOLD..6).each do |count|
+      by_row = (0...count).map { |i| TapScales.fan_position(i, count) }
+                          .group_by(&:last)
+                          .transform_values { |pts| pts.map(&:first) }
+
+      by_row.each do |y, xs|
+        next if xs.size < 2
+        assert (xs.max - xs.min) >= 34.0,
+               "#{count}-point fan: row at #{y}% has pins only #{(xs.max - xs.min).round(2)}% apart, " \
+               "which is inside --tap-pill-w"
+      end
+    end
+  end
 end

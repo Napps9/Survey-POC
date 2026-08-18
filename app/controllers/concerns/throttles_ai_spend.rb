@@ -45,12 +45,16 @@ module ThrottlesAiSpend
     # form posts, and the JSON ones don't all send an Accept header, so
     # request.format would say "html" for several of them and the client would
     # get a redirect where it expected a body it could parse.
-    def throttle_ai(to:, within:, name:, respond:, only:)
+    # `message:` overrides the default copy. Not every throttled endpoint is an
+    # AI-spend endpoint — the stock-media ones cost nothing and exist only to
+    # stop a runaway client — and telling a creator we can't afford their photo
+    # search is both untrue and unhelpful.
+    def throttle_ai(to:, within:, name:, respond:, only:, message: nil)
       actions = Array(only)
       self.ai_throttled_actions = (ai_throttled_actions + actions).uniq
 
-      message = "You're making AI requests faster than we can pay for them — " \
-                "give it a minute and try again."
+      message ||= "You're making AI requests faster than we can pay for them — " \
+                  "give it a minute and try again."
 
       rate_limit to: to, within: within, name: name, only: actions,
                  by:   -> { ai_actor_key },
@@ -103,7 +107,14 @@ module ThrottlesAiSpend
   def deny_ai_request(respond, message)
     case respond
     when :json
-      render json: { ok: false, error: message }, status: :too_many_requests
+      # `code` is the machine-readable half. Clients used to get only the
+      # human message under `error`, and a JSON client that didn't recognise
+      # it had no way to tell "you are going too fast" apart from any other
+      # failure — the media picker reported this exact response as
+      # "Couldn't reach the stock service", which sent a creator hunting for
+      # an outage that wasn't happening.
+      render json: { ok: false, code: "rate_limited", error: message },
+             status: :too_many_requests
     when :plain
       # The streaming endpoints write text/plain, and their clients already
       # display whatever body comes back — that's how LimitsConcurrentStreams

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { haptic } from "lib/haptics"
 
 export default class extends Controller {
-  static targets = ["star"]
+  static targets = ["star", "midLabel", "endLabel"]
   static values  = { index: { type: Number, default: -1 } }
 
   connect() { this._render() }
@@ -53,7 +53,20 @@ export default class extends Controller {
     })
   }
 
+  // Show the caption belonging to the star being pointed at or chosen. The two
+  // end captions are always up, so the middles only need to appear for the
+  // stars in between — which is what was asked for: "maybe you tap star 2, 3 or
+  // 4, and the text appears in the middle". `upTo` of -1 (nothing chosen, and
+  // not hovering) clears it.
+  _showMidLabel(index) {
+    if (!this.hasMidLabelTarget) return
+    this.midLabelTargets.forEach((el) => {
+      el.classList.toggle("is-shown", Number(el.dataset.ratingIndex) === index)
+    })
+  }
+
   _highlight(upTo) {
+    this._showMidLabel(upTo)
     this.starTargets.forEach((star, i) => {
       const active = i <= upTo
       star.classList.toggle("active", active)

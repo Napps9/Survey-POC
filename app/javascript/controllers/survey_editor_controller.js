@@ -30,6 +30,12 @@ const OPTION_LABEL_SELECTORS = {
   prioritise: ".choice-list-label",
   select_one_grid: ".choice-label", select_many_grid: ".choice-label",
   range: ".slider-label-text", nps: ".slider-label-text",
+  // Every caption, not just the two ends. While this matched only the two end
+  // spans, serialize() rebuilt a rating card's options from those two nodes and
+  // a generated or templated five-label card was cut to two on its first
+  // autosave — the middle labels were being thrown away silently. The mid
+  // captions are .rating-label too and sit between the ends in DOM order, so
+  // the list comes back out in the right order.
   rating: ".rating-label",
   tap_card: ".rotate-card span[contenteditable]",
   scenario: ".pick-text"

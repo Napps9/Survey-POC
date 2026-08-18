@@ -46,6 +46,34 @@ class AiSpendThrottleTest < ActionDispatch::IntegrationTest
     assert_includes SurveysController.ai_throttled_actions, :shuffle_assets
   end
 
+  # A JSON client that can't tell "you are going too fast" from any other
+  # failure will guess, and the media picker guessed wrong: it reported this
+  # response as "Couldn't reach the stock service", which cost a creator a
+  # morning of believing Pexels was down (18 Aug). The machine-readable code is
+  # what lets the picker say what actually happened.
+  test "a throttled JSON request carries a machine-readable code" do
+    rendered = nil
+    controller = SurveysController.new
+    controller.define_singleton_method(:render) { |**kwargs| rendered = kwargs }
+    controller.send(:deny_ai_request, :json, "slow down")
+
+    assert_equal :too_many_requests, rendered[:status]
+    assert_equal "rate_limited", rendered[:json][:code]
+    assert_equal "slow down", rendered[:json][:error]
+    refute rendered[:json][:ok]
+  end
+
+  # The stock endpoints spend nothing — Pexels is free — so the old copy
+  # ("faster than we can pay for them") was both untrue and unhelpful, and the
+  # 60/hour ceiling was low enough that a creator illustrating one Verto could
+  # trip it just by working. The picker fires a search per keystroke pause, per
+  # modal open, per media-tab switch and per Load-more page.
+  test "the stock throttle is sized for real editing and says something true" do
+    assert_no_match(/pay for them/i, SurveysController::STOCK_THROTTLE_MESSAGE,
+                    "stock search costs nothing — don't tell creators otherwise")
+    assert_match(/stock searches/i, SurveysController::STOCK_THROTTLE_MESSAGE)
+  end
+
   # A turn here is up to MAX_TOOL_ROUNDS + 1 Sonnet calls against the per-Verto
   # chat's single Haiku call, so it takes BOTH guards — the rate limit and the
   # per-organisation daily cap that the older streaming endpoints skip.

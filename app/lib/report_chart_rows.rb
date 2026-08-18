@@ -84,7 +84,20 @@ module ReportChartRows
         [ (labels[i].presence || "Step #{i + 1}").to_s, counts[i].to_i ]
       end
     when "rating"
-      (1..5).map { |star| [ "#{star} star#{star == 1 ? '' : 's'}", counts[star].to_i ] }
+      # Label each bar with the star's OWN caption, the way range does directly
+      # above — "1 (first time)" and "8+ times" say what the answer meant;
+      # "1 star" and "5 stars" only say where it sat. Falls back to the star
+      # count for a card that genuinely has no caption there.
+      labels = Array(result.dig(:card, "options"))
+      stars  = Survey::RATING_STARS
+      # Only when there is a caption PER STAR. A two-label card carries its min
+      # and max, not stars 1 and 2 — naming the second bar "Great" there would
+      # be plainly wrong.
+      per_star = labels.size >= stars ? labels : nil
+      (1..stars).map do |star|
+        caption = per_star&.[](star - 1).presence
+        [ (caption || "#{star} star#{star == 1 ? '' : 's'}").to_s, counts[star].to_i ]
+      end
     when "nps"
       counts.keys.sort_by(&:to_i).map { |k| [ k.to_s, counts[k].to_i ] }
     when "tap_card"

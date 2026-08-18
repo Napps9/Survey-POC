@@ -41,4 +41,42 @@ class OptionEmojiFallbackTest < ActiveSupport::TestCase
                       "#{emoji} is longer than a tile can hold"
     end
   end
+
+  # The matcher used to compare the WHOLE normalised label against the
+  # catalogue, so a keyword only ever fired for a label that was nothing but
+  # that keyword. Every option on a "how did you hear about us?" card fell
+  # through to the coloured shapes — reported 18 Aug as "auto emoji picker only
+  # picks these shapes… would be amazing if it could select a close match".
+  test "a keyword inside a longer label matches" do
+    assert_equal "📱", OptionIconLibrary.emoji_for("Social media")
+    assert_equal "🗣️", OptionIconLibrary.emoji_for("Word of mouth")
+    assert_equal "🔍", OptionIconLibrary.emoji_for("Online search")
+    assert_equal "🎟️", OptionIconLibrary.emoji_for("Previous attendee")
+  end
+
+  # A leading article shouldn't hide an otherwise exact keyword.
+  test "stopwords don't block a match" do
+    assert_equal "👥", OptionIconLibrary.emoji_for("A colleague")
+    assert_equal OptionIconLibrary.emoji_for("colleague"), OptionIconLibrary.emoji_for("The colleague")
+  end
+
+  # Longest run wins, so a two-word entry beats either of its halves.
+  test "a longer keyword beats a shorter one inside the same label" do
+    assert_equal "📰", OptionIconLibrary.emoji_for("Email newsletter"),
+                 "'email newsletter' should win over the bare 'email'"
+    refute_equal OptionIconLibrary.emoji_for("email"), OptionIconLibrary.emoji_for("Email newsletter")
+  end
+
+  # Some catalogue keys contain stopwords themselves; stripping stopwords before
+  # trying the label as written would stop those keys ever matching.
+  test "a catalogue key containing a stopword still matches its own label" do
+    assert_equal "🏠", OptionIconLibrary.emoji_for("Buy a home")
+  end
+
+  # Being looser must not make it loose enough to be surprising: a label with no
+  # catalogued subject still gets a neutral shape, not a bad guess.
+  test "a label with nothing catalogued in it still falls back" do
+    assert_includes OptionIconLibrary::EMOJI_FALLBACKS,
+                    OptionIconLibrary.emoji_for("Zorbing on Tuesdays", 0)
+  end
 end

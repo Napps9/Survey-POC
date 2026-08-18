@@ -44,15 +44,47 @@ module OptionIconLibrary
   EMOJI_KEYWORDS = EMOJI_DATA.fetch("keywords", {}).to_h { |k, v| [ k.to_s.downcase.strip, v.to_s ] }.freeze
   EMOJI_FALLBACKS = Array(EMOJI_DATA.fetch("fallbacks", [])).map(&:to_s).freeze
 
+  # Words that carry no subject of their own. Dropped before matching so a
+  # leading article can't hide an otherwise perfect keyword — "A colleague"
+  # matched nothing while "colleague" would have.
+  EMOJI_STOPWORDS = %w[a an the of my our your their this that and or to for in
+                       on at by with from is are was were be been].freeze
+
   def emoji_for(label, index = 0)
     norm = normalize(label)
     return nil if EMOJI_FALLBACKS.empty?
-    return EMOJI_KEYWORDS[norm] if EMOJI_KEYWORDS.key?(norm)
 
-    singular = norm.sub(/s\z/, "")
-    return EMOJI_KEYWORDS[singular] if EMOJI_KEYWORDS.key?(singular)
+    keyword_emoji(norm) || EMOJI_FALLBACKS[index.to_i % EMOJI_FALLBACKS.length]
+  end
 
-    EMOJI_FALLBACKS[index.to_i % EMOJI_FALLBACKS.length]
+  # The whole label first, then progressively shorter runs of its words, then
+  # single words — longest match wins, so "social media" beats "media" and
+  # "email newsletter" beats "email".
+  #
+  # This used to be an exact hash lookup on the whole normalised label, which
+  # meant a keyword only ever matched a label that was ONLY that keyword. Every
+  # option on a "how did you hear about us?" card ("Social media", "Word of
+  # mouth", "Email newsletter", "A colleague", "Online search", "Previous
+  # attendee") therefore fell through to the coloured-shape fallback — reported
+  # 18 Aug as "auto emoji picker only picks these shapes".
+  def keyword_emoji(norm)
+    # The whole label as written, first. Some catalogue keys contain stopwords
+    # themselves ("buy a home"), and stripping them before this would stop those
+    # keys ever matching the label they were written for.
+    exact = EMOJI_KEYWORDS[norm] || EMOJI_KEYWORDS[norm.sub(/s\z/, "")]
+    return exact if exact
+
+    words = norm.split(" ") - EMOJI_STOPWORDS
+    return nil if words.empty?
+
+    words.length.downto(1) do |span|
+      words.each_cons(span) do |run|
+        phrase = run.join(" ")
+        hit = EMOJI_KEYWORDS[phrase] || EMOJI_KEYWORDS[phrase.sub(/s\z/, "")]
+        return hit if hit
+      end
+    end
+    nil
   end
 
   # ── Explicit picks (per-option `option_styles.icon`) ─────────────────────

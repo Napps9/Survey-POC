@@ -88,7 +88,21 @@ export default class extends Controller {
     this._loadApprovedAppeals()
 
     this.backdropTarget.hidden = false
+    this._resetModalScroll()
     document.addEventListener("keydown", this._escListener)
+  }
+
+  // The modal is toggled with `hidden` rather than torn down, so its scroller
+  // keeps whatever offset it had — and the sections above the fold (the stock
+  // grid, the approved strip) un-hide ASYNCHRONOUSLY after it is already on
+  // screen, pushing the view further down. Between them a creator opening Add
+  // media landed part-way down the asset list, sometimes at the very bottom.
+  // Called on open and again once those late sections have landed.
+  _resetModalScroll() {
+    const body = this.element.querySelector(".media-modal-body")
+    if (!body) return
+    body.scrollTop = 0
+    requestAnimationFrame(() => { body.scrollTop = 0 })
   }
 
   // Opens the same modal for a Comms email image block. Photos only, no
@@ -111,6 +125,7 @@ export default class extends Controller {
     this._renderRecommended([], "")
     this._seedSearch()
     this.backdropTarget.hidden = false
+    this._resetModalScroll()
     document.addEventListener("keydown", this._escListener)
   }
 
@@ -132,6 +147,7 @@ export default class extends Controller {
     this._seedSearch()
     this._loadApprovedAppeals()
     this.backdropTarget.hidden = false
+    this._resetModalScroll()
     document.addEventListener("keydown", this._escListener)
   }
 
@@ -158,6 +174,7 @@ export default class extends Controller {
     this._seedSearch()
     this._loadApprovedAppeals()
     this.backdropTarget.hidden = false
+    this._resetModalScroll()
     document.addEventListener("keydown", this._escListener)
   }
 
@@ -198,6 +215,7 @@ export default class extends Controller {
     this._loadApprovedAppeals()
 
     this.backdropTarget.hidden = false
+    this._resetModalScroll()
     document.addEventListener("keydown", this._escListener)
   }
 
@@ -653,6 +671,14 @@ export default class extends Controller {
       this._searchPage = Number(data.page) || page
 
       const items = Array.isArray(data.images) ? data.images : []
+      // Our OWN rate limiter, not a Pexels problem. This used to fall through
+      // to the generic branch below and report "Couldn't reach the stock
+      // service", which is how a creator spent a morning believing the stock
+      // server was down. Show the server's own message instead.
+      if (resp.status === 429 || data.code === "rate_limited") {
+        this._showSearchStatus(data.error || "You've searched a lot recently — give it a few minutes.")
+        return
+      }
       if (data.error === "search_unavailable") {
         this._showSearchStatus("Stock search isn’t configured.")
         return
@@ -750,7 +776,11 @@ export default class extends Controller {
   }
 
   _showSearchStatus(text) {
+    // Un-hiding the stock section inserts a grid ABOVE everything already laid
+    // out, so the view has to be pulled back to the top with it.
+    const wasHidden = this.hasSearchSectionTarget && this.searchSectionTarget.hidden
     if (this.hasSearchSectionTarget) this.searchSectionTarget.hidden = false
+    if (wasHidden) this._resetModalScroll()
     if (this.hasSearchStatusTarget) this.searchStatusTarget.textContent = text || ""
   }
 

@@ -75,6 +75,7 @@ const COMPATIBILITY = {
     { type: "select_many_grid", score: 70,  note: "Same visual grid, but lets people pick more than one — switch to this when the answer isn't a single choice." },
     { type: "select_many",      score: 60,  note: "Image list, multi-pick — same tile-left layout, broader answer set; use when the grid can't fit." },
     { type: "yes_no",           score: 55,  note: "Collapses nuance to two answers — only do this if you genuinely want a hard yes/no signal." },
+    { type: "prioritise",       score: 65,  note: "Same options, but respondents drag them into an order of priority — richer data (the ORDER of preference), not just which they picked." },
     { type: "range",            score: 40,  note: "Loses the categorical clarity of a list — only swap if the answer is really on a scale." },
   ],
   select_many: [
@@ -93,12 +94,14 @@ const COMPATIBILITY = {
     { type: "select_one_grid",  score: 100, note: "Visual single-pick — best when imagery or colour does the talking and you want a fast, gut response." },
     { type: "select_many_grid", score: 80,  note: "Same imagery, multi-pick — better when more than one option might resonate." },
     { type: "multiple_choice",  score: 55,  note: "Image list, single pick — small tile left of each option. Switch when options are long or there are too many to fit a grid." },
+    { type: "prioritise",       score: 65,  note: "Same options, but respondents drag them into an order of priority — richer data (the ORDER of preference), not just which they picked." },
     { type: "select_many",      score: 40,  note: "Image list, multi-pick — same tile-left layout, loses the single-pick clarity." },
   ],
   select_many_grid: [
     { type: "select_many_grid", score: 100, note: "Visual multi-pick — best when respondents may identify with several image-led options at once." },
     { type: "select_one_grid",  score: 80,  note: "Same visual feel but constrained to one — pick this if you need a single decisive choice." },
     { type: "select_many",      score: 55,  note: "Image list, multi-pick — small tile left of each option. Fall back when labels are long or there are too many to grid." },
+    { type: "prioritise",       score: 65,  note: "Same options, but respondents drag them into an order of priority — richer data (the ORDER of preference), not just which they picked." },
     { type: "multiple_choice",  score: 40,  note: "Image list, single pick — same tile-left layout, sharpest read but most reductive option here." },
   ],
   tap_card: [
@@ -354,12 +357,20 @@ const COMPONENTS = {
     const icon = ctx.ratingIcon || { on: "★", off: "☆", kind: "star" }
     const fallback = defaultOptionsFor("rating")
     const labels = opts.length >= 2 ? opts : fallback
-    const first  = labels[0] || fallback[0]
-    const last   = labels[labels.length - 1] || fallback[fallback.length - 1]
+    // One star and one caption per label — mirrors the `when "rating"` branch of
+    // _card_component.html.erb. Emitting only the two ends here would hand the
+    // serializer a two-option card and quietly drop the middle captions, which
+    // is the bug this pair of renderers had.
+    // Always five — see Survey::RATING_STARS. Only a full ladder has a caption
+    // per star; a two-label card is min/max on a five-star scale.
+    const stars = 5
+    const mids  = labels.length >= stars
+      ? labels.map((lbl, i) => ({ lbl, i })).filter(({ i }) => i > 0 && i < stars - 1)
+      : []
     return `
       <div class="rating-wrap rating-kind-${icon.kind}" data-controller="rating">
         <div class="rating-stars">
-          ${[0,1,2,3,4].map(i => `
+          ${[...Array(stars)].map((_, i) => `
             <span class="rating-star"
                   data-rating-target="star"
                   data-rating-index="${i}"
@@ -369,19 +380,46 @@ const COMPONENTS = {
           `).join("")}
         </div>
         <div class="rating-labels">
-          <span class="rating-label" contenteditable="true">${esc(first)}</span>
-          <span class="rating-label" contenteditable="true">${esc(last)}</span>
+          <span class="rating-label" data-rating-target="endLabel" contenteditable="true">${esc(labels[0] || fallback[0])}</span>
+          <span class="rating-mid-labels" data-rating-target="midLabels">
+            ${mids.map(({ lbl, i }) => `
+              <span class="rating-label rating-label-mid"
+                    data-rating-target="midLabel"
+                    data-rating-index="${i}" contenteditable="true">${esc(lbl)}</span>
+            `).join("")}
+          </span>
+          <span class="rating-label" data-rating-target="endLabel" contenteditable="true">${esc(labels[labels.length - 1] || fallback[fallback.length - 1])}</span>
         </div>
       </div>`
   },
 
-  open_ended: () => `
-    <div class="freeform-wrap" data-controller="freeform" data-freeform-max-value="200">
+  // Carries the card's own char_limit and the Answer-length select, both of
+  // which this rebuild used to drop: a card switched to Open Text lost its
+  // stored limit back to 200 and lost the control for changing it until the
+  // page was reloaded.
+  open_ended: (_opts, ctx = {}) => {
+    const max = Number(ctx.charLimit) || 200
+    const presets = (ctx.charLimitPresets || [ 80, 140, 200, 500, 1000 ]).slice()
+    if (!presets.includes(max)) presets.push(max)
+    return `
+    <div class="freeform-wrap" data-controller="freeform" data-freeform-max-value="${max}">
       <textarea class="freeform-textarea" placeholder="${esc(t("card.answer_placeholder"))}"
+                maxlength="${max}"
                 data-freeform-target="input"
                 data-action="input->freeform#update"></textarea>
-      <div class="freeform-counter" data-freeform-target="counter">0/200 ${esc(t("card.characters"))}</div>
-    </div>`,
+      <div class="freeform-counter" data-freeform-target="counter">0/${max} ${esc(t("card.characters"))}</div>
+      <label class="freeform-limit-row">
+        <span>${esc(t("card.char_limit_label"))}</span>
+        <select data-char-limit
+                data-freeform-target="limit"
+                data-action="change->freeform#setLimit change->survey-editor#markDirty">
+          ${presets.sort((a, b) => a - b).map(n => `
+            <option value="${n}"${n === max ? " selected" : ""}>${esc(t("card.char_limit_option", { n }))}</option>
+          `).join("")}
+        </select>
+      </label>
+    </div>`
+  },
 
   welcome_card: () => "",
 
@@ -661,8 +699,15 @@ export default class extends Controller {
   static values = { quiz: Boolean, tokenisation: Boolean, logic: Boolean, defaultLocale: { type: String, default: "en" } }
 
   // Emoji shown next to each recommended type in the side panel — 1st-4th place.
-  RANK_EMOJI = ["🥇", "🥈", "🥉", "⭐"]
-  TOP_N      = 4
+  RANK_EMOJI = ["🥇", "🥈", "🥉", "⭐", "⭐"]
+  // Five, not four. Everything outside this list is display:none — not ranked
+  // low, GONE — so a type missing from a card's COMPATIBILITY row is
+  // unreachable from that card entirely. Prioritise was in two rows out of
+  // thirteen, which is why it took "a few different answer types to find it"
+  // (18 Aug): the only route was switching to Image List — Many first, where it
+  // happened to land in the last visible slot. It is in every option-list row
+  // now, and the extra slot means adding it displaced nothing.
+  TOP_N      = 5
 
   activeCardEl = null
   pendingType  = null
@@ -1199,7 +1244,10 @@ export default class extends Controller {
         pages:           this._pagesFor(card, type),
         optionImages:    this._optionImagesFor(card, type),
         optionStyles:    this._optionStylesFor(card),
-        responses:       this._responsesFor(card)
+        responses:       this._responsesFor(card),
+        // Kept off the card's own dataset because it is only ever read here;
+        // the select the builder renders is what owns it from then on.
+        charLimit:       parseInt(card.querySelector("[data-char-limit]")?.value, 10) || undefined
       })
       // The server renders option icons inline; rebuilt markup must get the
       // same pass or a type switch strips every icon until the next reload.

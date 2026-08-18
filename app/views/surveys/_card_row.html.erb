@@ -135,6 +135,18 @@
       <% end %>
     </div>
 
+    <%# Rules-of-the-Game analysis for this card — populated + toggled by
+        survey_editor_controller when the traffic light is clicked.
+        It lives in the RAIL, directly beneath the dock whose score chip opens
+        it. It used to be the first child of .card-col, above the 680px card, so
+        un-hiding it pushed the card down inside a mandatory scroll-snap
+        container and the whole designer jumped — "it comes up as a big box, and
+        'pops' the verto designer down/up". In the rail it is a sibling of the
+        card instead of a predecessor, and the rail is what grows. %>
+    <% if is_q %>
+      <div class="card-analysis" data-role="card-analysis" hidden></div>
+    <% end %>
+
     <%# The card's FOOT: destructive + structural-insert, pinned to the
         bottom — Delete kept away from the everyday controls above, and Add
         question beside the seam where the new card will actually appear. %>
@@ -167,12 +179,6 @@
   </div><%# /card-rail %>
 
   <div class="card-col">
-    <%# Rules-of-the-Game analysis for this card — populated + toggled by
-        survey_editor_controller when the traffic light is clicked. %>
-    <% if is_q %>
-      <div class="card-analysis" data-role="card-analysis" hidden></div>
-    <% end %>
-
     <%# Horizontal split-card %>
     <div class="split-card">
       <%= render "shared/split_left",     card: card, progress: progress, mode: :editor %>

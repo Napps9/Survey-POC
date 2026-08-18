@@ -104,16 +104,46 @@ module TapScales
     count.to_i >= FAN_THRESHOLD
   end
 
-  # [x, y] percentages for one response on the fan. Evenly spaced along the arc,
-  # first entry at FAN_START, last at FAN_END.
+  # [x, y] percentages for one response on the fan.
+  #
+  # Spaced by ROW rather than by angle. Stepping the angle evenly is the obvious
+  # reading of "evenly spaced along the arc", but the eye reads the ROWS, and a
+  # circle's vertical projection bunches at its apex: on a five-point scale the
+  # rows landed 14.84% then 24.50% of the card apart, so the two "strongly"
+  # pins hung well below the rest and the scale looked bottom-heavy. Reported
+  # 18 Aug — "can the distances between the lozenges be equal, vertically? I
+  # would bring up the strongly buttons".
+  #
+  # `depth` is the row's distance from the apex: 0 at the middle of the scale,
+  # 1 at its ends. It is symmetric and linear in the index for any count, so
+  # spacing y linearly in `depth` makes every row gap identical — five now sits
+  # at 35.5 / 55.17 / 74.84, six at 43.37 / 59.10 / 74.84. x then comes back off
+  # the ellipse so the pins still describe an arc and not a triangle, which
+  # keeps the ends of the scale exactly where they were (31.53 / 68.47) and the
+  # apex dead centre.
   def fan_position(index, count)
     count = count.to_i
     return [ FAN_CX, FAN_CY ] if count < 2
 
-    degrees = FAN_START + ((FAN_END - FAN_START) / (count - 1)) * index
-    radians = degrees * Math::PI / 180
-    [ (FAN_CX + FAN_RX * Math.cos(radians)).round(2),
-      (FAN_CY - FAN_RY * Math.sin(radians)).round(2) ]
+    t     = index.to_f / (count - 1)
+    depth = (2 * t - 1).abs
+
+    y = fan_apex_y + (fan_end_y - fan_apex_y) * depth
+
+    sin = ((FAN_CY - y) / FAN_RY).clamp(-1.0, 1.0)
+    cos = Math.sqrt([ 1.0 - sin * sin, 0.0 ].max) * (t < 0.5 ? -1 : 1)
+
+    [ (FAN_CX + FAN_RX * cos).round(2), y.round(2) ]
+  end
+
+  # The top of the arc, and the height of its two ends. FAN_START and FAN_END
+  # mirror each other about the apex, so either yields the same y — averaging
+  # them keeps that assumption honest if anyone re-tunes one of them.
+  def fan_apex_y = FAN_CY - FAN_RY
+
+  def fan_end_y
+    FAN_CY - FAN_RY * (Math.sin(FAN_START * Math::PI / 180) +
+                       Math.sin(FAN_END * Math::PI / 180)) / 2
   end
 
   # Which way the card flies when this response is chosen. The scale is ordered

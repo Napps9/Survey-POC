@@ -344,9 +344,10 @@
                 <button type="button" class="tap-card-image-btn"
                         data-action="click->media-picker#openTapOption"
                         data-media-picker-option-index="<%= i %>"
-                        title="<%= t("editor.change_statement_image_title", default: "Change this statement's image") %>">
+                        title="<%= t("editor.change_statement_image_title", default: "Change this statement's image") %>"
+                        aria-label="<%= t("editor.change_statement_image_title", default: "Change this statement's image") %>">
                   <span aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <rect x="3" y="3" width="18" height="18" rx="2"></rect>
                       <circle cx="8.5" cy="8.5" r="1.5"></circle>
                       <path d="M21 15l-5-5L5 21"></path>
@@ -687,19 +688,36 @@
       </div>
 
     <% when "rating" %>
-      <% labels    = Array(display["options"]) %>
-      <% rating_defaults = t("defaults.rating", default: [ "Poor", "Fair", "Good", "Great", "Excellent" ]) %>
-      <% first_lbl = labels.first || rating_defaults.first %>
-      <% last_lbl  = labels.last  || rating_defaults.last %>
+      <%# Every star carries its own label, and every label is rendered — the two
+          end captions sit under the ends as they always have, and the ones in
+          between are revealed as a single centred caption when that star is
+          tapped or hovered. Rendering all of them is not just the feature that
+          was asked for ("we will need to see the answer that each star
+          contains"): the editor's autosave rebuilds a card's options FROM THE
+          DOM, so while only two labels existed, a five-label rating card was
+          silently rewritten to two the first time anything on the deck was
+          edited. The middle three are the data — hiding them cost them. %>
+      <% rating_defaults = Array(t("defaults.rating", default: [ "Poor", "Fair", "Good", "Great", "Excellent" ])) %>
+      <% labels    = Array(display["options"]).presence || rating_defaults %>
+      <%# Always five stars. The count is the card type's contract, not a
+          function of how many labels happen to be stored: answers are recorded
+          as a star NUMBER and results count 1..5, so a two-label card (the old
+          min/max shape, still all over existing decks) is a five-star card with
+          two end captions — not a two-star card. `full_ladder` is what tells
+          the two apart, and only a full ladder has a caption to show per star. %>
+      <% stars       = Survey::RATING_STARS %>
+      <% full_ladder = labels.size >= stars %>
       <% icon      = rating_icon(@survey) %>
       <% rating_actions = (editable ? "click->rating#pick mouseover->rating#hover mouseout->rating#unhover" :
                                        "click->rating#pick mouseover->rating#hover mouseout->rating#unhover keydown->rating#pickOnKey").html_safe %>
       <div class="rating-wrap rating-kind-<%= icon[:kind] %>" data-controller="rating">
         <div class="rating-stars" <%= editable ? "".html_safe : tag.attributes(role: "radiogroup") %>>
-          <% 5.times do |i| %>
-            <%# Radio rather than slider semantics: five discrete, individually
+          <% stars.times do |i| %>
+            <%# Radio rather than slider semantics: discrete, individually
                 labelled choices is what a rating is, and it's what a screen
-                reader user expects from stars (P2-4). %>
+                reader user expects from stars (P2-4). The star's own label is
+                the accessible name where there is one — "3 of 5" tells a screen
+                reader user nothing about what 3 means. %>
             <span class="rating-star"
                   data-rating-target="star"
                   data-rating-index="<%= i %>"
@@ -707,13 +725,26 @@
                   data-rating-off="<%= icon[:off] %>"
                   <%= editable ? "".html_safe : tag.attributes(
                         role: "radio", tabindex: 0, "aria-checked": "false",
-                        "aria-label": t("card.rating_star", number: i + 1, total: 5, locale: display_locale, default: "#{i + 1} of 5")) %>
+                        "aria-label": (full_ladder ? labels[i].presence : nil) ||
+                          t("card.rating_star", number: i + 1, total: stars, locale: display_locale, default: "#{i + 1} of #{stars}")) %>
                   data-action="<%= rating_actions %>"><%= icon[:off] %></span>
           <% end %>
         </div>
         <div class="rating-labels">
-          <span class="rating-label" <%= ce_attr %>><%= first_lbl %></span>
-          <span class="rating-label" <%= ce_attr %>><%= last_lbl %></span>
+          <%# The ends are always visible; the middle ones share one centred slot
+              so the row stays a two-ended scale at rest. Every label is a real
+              node either way, which is what keeps them in the deck. %>
+          <span class="rating-label" data-rating-target="endLabel" <%= ce_attr %>><%= labels.first %></span>
+          <span class="rating-mid-labels" data-rating-target="midLabels">
+            <% if full_ladder %>
+              <% (1..(stars - 2)).each do |i| %>
+                <span class="rating-label rating-label-mid"
+                      data-rating-target="midLabel"
+                      data-rating-index="<%= i %>" <%= ce_attr %>><%= labels[i] %></span>
+              <% end %>
+            <% end %>
+          </span>
+          <span class="rating-label" data-rating-target="endLabel" <%= ce_attr %>><%= labels.last %></span>
         </div>
       </div>
 
@@ -812,7 +843,9 @@
           <% if editable %>
             <label class="freeform-limit-row">
               <span><%= t("card.char_limit_label", default: "Answer length") %></span>
-              <select data-char-limit data-action="change->survey-editor#markDirty">
+              <select data-char-limit
+                      data-freeform-target="limit"
+                      data-action="change->freeform#setLimit change->survey-editor#markDirty">
                 <% Survey::FREE_TEXT_LIMIT_PRESETS.each do |preset| %>
                   <option value="<%= preset %>" <%= "selected" if preset == char_limit %>>
                     <%= t("card.char_limit_option", n: preset, default: "#{preset} characters") %>

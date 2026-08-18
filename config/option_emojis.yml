@@ -5,11 +5,18 @@
 # explicit 🎨 emoji, an emoji hoisted out of the label, a curated SVG from
 # config/option_icons.yml, and finally an emoji from here.
 #
-# `keywords` matches EXACTLY (after normalising case/punctuation/whitespace),
-# same rule as option_icons.yml — conservative on purpose, so an option never
-# picks up a surprising emoji. `fallbacks` is the cycle used when nothing
-# matches: deliberately neutral shapes that carry no meaning of their own, so
-# they decorate the row without asserting anything about the answer.
+# `keywords` matches the whole normalised label first, then the longest run of
+# its words (articles and other stopwords dropped) — so "Email newsletter"
+# finds "email newsletter", and "A colleague" finds "colleague". It used to
+# match the whole label ONLY, which meant a keyword fired only for a label that
+# was nothing but that keyword; a "how did you hear about us?" card matched
+# nothing at all and every option got a coloured shape.
+#
+# Longest match wins, so a two-word entry beats either of its words. Keys must
+# be lowercase, alphanumeric and spaces only (option_emoji_fallback_test checks
+# this). `fallbacks` is the cycle used when nothing matches: deliberately
+# neutral shapes that carry no meaning of their own, so they decorate the row
+# without asserting anything about the answer.
 #
 # Loaded once at boot — restart the dev server after editing.
 
@@ -106,3 +113,46 @@ keywords:
   "sometimes": "🔁"
   "often": "🔁"
   "rarely": "🌙"
+
+  # How people found you — "how did you hear about us?" is one of the most
+  # common questions in any survey and had no coverage at all, so every one of
+  # its options came out as a numbered shape.
+  "social media": "📱"
+  "social": "📱"
+  "word of mouth": "🗣️"
+  "friend": "🫂"
+  "colleague": "👥"
+  "coworker": "👥"
+  "family": "👨‍👩‍👧"
+  "email": "✉️"
+  "newsletter": "📰"
+  "email newsletter": "📰"
+  "online search": "🔍"
+  "search engine": "🔍"
+  "google": "🔍"
+  "website": "🌐"
+  "online": "🌐"
+  "advert": "📢"
+  "advertisement": "📢"
+  "advertising": "📢"
+  "radio": "📻"
+  "podcast": "🎧"
+  "tv": "📺"
+  "television": "📺"
+  "poster": "🪧"
+  "flyer": "🪧"
+  "leaflet": "🪧"
+  "press": "📰"
+  "news": "📰"
+  "magazine": "📰"
+  "event": "🎪"
+  "conference": "🎤"
+  "previous attendee": "🎟️"
+  "attendee": "🎟️"
+  "referral": "🤝"
+  "recommendation": "🤝"
+  "partner": "🤝"
+  "employer": "🏢"
+  "school": "🏫"
+  "university": "🎓"
+  "other": "➕"

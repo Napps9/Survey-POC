@@ -98,14 +98,31 @@ export function fans(count) {
 // [x, y] percentages for one response on the fan. Mirrors
 // TapScales.fan_position — most-negative at the bottom left, the middle at the
 // apex, most-positive at the bottom right.
+//
+// Spaced by ROW, not by angle: a circle's vertical projection bunches at its
+// apex, so an even angle step left a five-point scale's rows 14.84% then
+// 24.50% of the card apart and the two "strongly" pins hung below the rest.
+// `depth` (0 at the apex, 1 at the ends) is linear in the index, so spacing y
+// linearly in it makes every row gap equal; x comes back off the ellipse so the
+// pins still describe an arc. See the Ruby for the full note.
+const FAN_APEX_Y = FAN_CY - FAN_RY
+const FAN_END_Y  = FAN_CY - FAN_RY *
+  (Math.sin((FAN_START * Math.PI) / 180) + Math.sin((FAN_END * Math.PI) / 180)) / 2
+
 export function fanPosition(index, count) {
   const n = Number(count)
   if (!(n >= 2)) return [ FAN_CX, FAN_CY ]
-  const deg = FAN_START + ((FAN_END - FAN_START) / (n - 1)) * index
-  const rad = (deg * Math.PI) / 180
+
+  const t     = index / (n - 1)
+  const depth = Math.abs(2 * t - 1)
+  const y     = FAN_APEX_Y + (FAN_END_Y - FAN_APEX_Y) * depth
+
+  const sin = Math.max(-1, Math.min(1, (FAN_CY - y) / FAN_RY))
+  const cos = Math.sqrt(Math.max(1 - sin * sin, 0)) * (t < 0.5 ? -1 : 1)
+
   return [
-    Math.round((FAN_CX + FAN_RX * Math.cos(rad)) * 100) / 100,
-    Math.round((FAN_CY - FAN_RY * Math.sin(rad)) * 100) / 100
+    Math.round((FAN_CX + FAN_RX * cos) * 100) / 100,
+    Math.round(y * 100) / 100
   ]
 }
 

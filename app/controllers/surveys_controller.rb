@@ -24,10 +24,22 @@ class SurveysController < ApplicationController
               only: %i[ resume_import generate_flow ]
   throttle_ai to: 120, within: 1.hour, name: "ai-card", respond: :json,
               only: %i[ generate_card optimise_card moderate_image ]
-  throttle_ai to: 60,  within: 1.hour, name: "stock-media", respond: :json,
-              only: %i[ pexels_search ]
+  # Stock search is the one throttled endpoint a creator can trip just by
+  # WORKING. The picker searches on a 350ms keystroke debounce, re-searches when
+  # the modal opens, again on the Photos/Videos switch, and once more per Load
+  # more — so illustrating a ten-card Verto could burn 60 in well under an hour,
+  # after which every search failed for the rest of it. That is what "the stock
+  # server has been missing since 11am" was: our own limiter, not Pexels. The
+  # endpoint spends nothing (Pexels is free), so the ceiling is now set near
+  # Pexels' own 200/hour rather than an order of magnitude below it, and the
+  # message says what actually happened.
+  STOCK_THROTTLE_MESSAGE = "You've run a lot of stock searches in the last hour — " \
+                           "give it a few minutes and try again.".freeze
+
+  throttle_ai to: 200, within: 1.hour, name: "stock-media", respond: :json,
+              only: %i[ pexels_search ], message: STOCK_THROTTLE_MESSAGE
   throttle_ai to: 60,  within: 1.hour, name: "stock-shuffle", respond: :html,
-              only: %i[ shuffle_assets ]
+              only: %i[ shuffle_assets ], message: STOCK_THROTTLE_MESSAGE
 
   # Stock search paging. 24 was previously an inline literal at each call site
   # and there was no way to ask for a second page, so the library simply ended

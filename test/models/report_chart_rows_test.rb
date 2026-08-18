@@ -102,4 +102,27 @@ class ReportChartRowsTest < ActiveSupport::TestCase
     assert_equal 50, stats[:completion]
     assert_equal 1, stats[:questions], "the welcome card isn't a question"
   end
+
+  # A rating card's captions are the answer, not decoration: "1 (first time)"
+  # and "8+ times" say what the star MEANT. Results used to label every rating
+  # bar "1 star… 5 stars" while range right next door already used the card's
+  # own options, so a counting question came back unreadable.
+  test "rating rows are labelled with the card's own captions when it has one per star" do
+    card = { "options" => [ "1 (first time)", "2", "3-4", "5-7", "8+ times" ] }
+    rows = ReportChartRows.rows_for(result("rating", { 1 => 3, 2 => 1, 3 => 0, 4 => 2, 5 => 6 }, card: card))
+
+    assert_equal [ "1 (first time)", "2", "3-4", "5-7", "8+ times" ], rows.map(&:label)
+    assert_equal [ 3, 1, 0, 2, 6 ], rows.map(&:count)
+  end
+
+  # But a two-label card carries its MIN and MAX, not stars 1 and 2 — the old
+  # add-question flow only ever stored those two, and they are all over existing
+  # decks. Captioning bar 2 "Great" there would be actively wrong.
+  test "rating rows fall back to star counts when captions aren't per-star" do
+    card = { "options" => [ "Poor", "Great" ] }
+    rows = ReportChartRows.rows_for(result("rating", { 1 => 1, 5 => 4 }, card: card))
+
+    assert_equal [ "1 star", "2 stars", "3 stars", "4 stars", "5 stars" ], rows.map(&:label)
+    assert_equal 5, rows.size, "a rating card is always five stars"
+  end
 end

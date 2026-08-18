@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { defaultOptionsFor, OPTION_TYPES, LABEL_TYPES } from "lib/default_options"
+import { defaultOptionsFor, OPTION_TYPES, LABEL_TYPES, optionPlaceholder } from "lib/default_options"
 import { t } from "lib/i18n"
 
 
@@ -219,7 +219,7 @@ export default class extends Controller {
   addOption(event) {
     event.preventDefault()
     const count = this.optionsListTarget.querySelectorAll(".aq-option-row").length
-    const row = this._makeOptionRow(`Option ${count + 1}`)
+    const row = this._makeOptionRow(optionPlaceholder(count))
     // Insert before the "Add option" button (always the last child of the list)
     this.optionsListTarget.lastElementChild.before(row)
     row.querySelector(".aq-option-input")?.focus()
@@ -437,16 +437,15 @@ export default class extends Controller {
       const defaults = defaultOptionsFor(type)
       const min = this.minLabelTarget.value.trim() || defaults[0] || ""
       const max = this.maxLabelTarget.value.trim() || defaults[defaults.length - 1] || ""
-      // Range: emit full 5-point label array; Rating: emit min+max only
-      if (type === "range") {
-        card.options = defaults.map((d, i) => {
-          if (i === 0) return min || d
-          if (i === defaults.length - 1) return max || d
-          return d
-        })
-      } else {
-        card.options = [min, max].filter(Boolean)
-      }
+      // Both range and rating emit the FULL label ladder, with the creator's
+      // two ends substituted in. Rating used to emit just [min, max]: the card
+      // then had two options for five stars, so the middle three had no text of
+      // their own to show and results could only label the bars "3 stars".
+      card.options = defaults.map((d, i) => {
+        if (i === 0) return min || d
+        if (i === defaults.length - 1) return max || d
+        return d
+      })
     }
 
     return card
