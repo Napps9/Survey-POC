@@ -1626,6 +1626,16 @@ export default class extends Controller {
         if (credit) out.image_credit = credit
         if (creditUrl) out.image_credit_url = creditUrl
       }
+      // The animation backdrop rides on the card row as JSON, because the
+      // colour/image pair has no text node in the card to be re-derived from —
+      // exactly like option_styles. Dropped for a card whose panel is a photo
+      // or video, mirroring the server's own rule.
+      if (!video && !image && card.dataset.cardMediaBg) {
+        try {
+          const bg = JSON.parse(card.dataset.cardMediaBg)
+          if (bg && (bg.color || bg.image)) out.media_bg = bg
+        } catch (_) { /* malformed — let the server default apply */ }
+      }
       if (card.dataset.cardAllowOther === "true") out.allow_other = true
       if (card.dataset.cardRequired === "true") out.required = true
 

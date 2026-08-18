@@ -220,6 +220,12 @@ export default class extends Controller {
       try { frames = (JSON.parse(el.dataset.lottiePlayerUrlsValue || "[]") || []).length } catch (_) { /* leave as-is */ }
       if (frames) el.dataset.lottiePlayerCurrentValue = String(Math.ceil(frames / 2))
     })
+    // The clone is deep, so it carries the <svg> lottie-web already rendered
+    // into the editor's mount. Empty the mounts so the preview's own
+    // lottie-player starts from a bare container and draws exactly one
+    // animation rather than stacking a second under the cloned one.
+    clone.querySelectorAll(".nps-lottie-mount, .card-lottie-mount")
+         .forEach(el => el.replaceChildren())
 
     // 7. Drop the editor's active-card outline class if present.
     clone.classList.remove("selected")

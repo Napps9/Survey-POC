@@ -34,6 +34,7 @@ nl:
     new_response: "Nieuw antwoord"
     add_response: "Antwoord toevoegen"
     remove_response: "Dit antwoord verwijderen"
+    remove_option: "Kaart verwijderen"
     response_scale: "Antwoorden per stelling"
     tap_scale:
       "no": "Nee"
@@ -84,7 +85,7 @@ nl:
     eyebrow:
       range: "Sleep de schuifregelaar"
       rating: "Tik om te beoordelen"
-      nps: "Sleep om te beoordelen"
+      nps: "Sleep de vloeistof"
       multiple_choice: "Kies één optie"
       select_many: "Kies alles wat van toepassing is"
       prioritise: "Sleep om te rangschikken op prioriteit"
@@ -115,7 +116,7 @@ nl:
     panel_label:
       range: "SLEEP DE SCHUIFREGELAAR"
       rating: "TIK OM TE BEOORDELEN"
-      nps: "SLEEP OM TE BEOORDELEN"
+      nps: "SLEEP DE VLOEISTOF"
       multiple_choice: "KIES ÉÉN OPTIE"
       select_many: "KIES ALLES WAT VAN TOEPASSING IS"
       prioritise: "SLEEP OM TE RANGSCHIKKEN"
@@ -364,6 +365,8 @@ nl:
     editor:
       delete_card_confirm: Deze kaart verwijderen?
       save_to_library: "Ook opslaan in mijn merkbibliotheek"
+      stock_search_hint: "Gebruik trefwoorden die bij de vraag passen voor betere resultaten"
+      load_more: "Meer laden"
       lottie_failed: "Die link lijkt geen LottieFiles-animatie te zijn."
       appeal_note_prompt: "Wil je de beoordelaar nog iets laten weten? (optioneel)"
       appeal_submitting: "Wordt ingediend ter beoordeling…"
@@ -1009,9 +1012,14 @@ nl:
     emoji_search: "Zoek emoji…"
     emoji_clear: "Wissen"
     lottie_section: "Animatie (Lottie)"
-    lottie_placeholder: "Plak een LottieFiles-link, bijv. https://lottie.host/….json"
+    lottie_placeholder: "Plak een LottieFiles-link, bijv. https://lottie.host/….lottie"
     lottie_apply: "Animatie gebruiken"
-    lottie_hint: "Directe .json-links van lottiefiles.com of lottie.host. De animatie vervangt de foto of video van de kaart."
+    lottie_hint: ".json- of .lottie-links van lottiefiles.com of lottie.host. De animatie vervangt de foto of video van de kaart."
+    animation_bg: "Animatieachtergrond"
+    animation_bg_colour: "Achtergrondkleur"
+    animation_bg_image: "Afbeelding gebruiken"
+    animation_bg_clear: "Terug naar merkkleur"
+    animation_bg_hint: "Staat alleen op deze kaart achter de animatie. Zonder deze instelling gebruikt de kaart de panelkleur van je merk."
     required_chip: 'Verplicht'
     ty_title_label: 'Bedanktitel'
     ty_body_label: 'Bedankbericht'

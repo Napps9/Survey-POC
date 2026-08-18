@@ -565,6 +565,28 @@ class Survey < ApplicationRecord
           c.delete("range_theme")
         end
       end
+      # Animation backdrop — the colour or image behind a Lottie / range
+      # animation, overriding the Verto-wide --brand-panel for this one card.
+      # Only meaningful where an animation actually fills the panel (a photo or
+      # video covers the panel itself), so it is dropped anywhere else rather
+      # than kept as dead data that would surprise whoever adds media later.
+      # Same allowlist-or-drop shape as range_theme above.
+      if c.key?("media_bg")
+        bg  = c["media_bg"].is_a?(Hash) ? c["media_bg"] : {}
+        out = {}
+        color = bg["color"].to_s
+        out["color"] = "#" + color.strip.delete_prefix("#").downcase if BrandPalette.valid_hex?(color)
+        if (img = sanitize_image_url(bg["image"])).present?
+          out["image"] = img
+        end
+        animated = c["type"].to_s == "range" || c["lottie"].present?
+        if animated && out.any?
+          c["media_bg"] = out
+        else
+          c.delete("media_bg")
+        end
+      end
+
       # Rich-text layer: presentation-only HTML twins of the plain text
       # fields (text_html / description_html / options_html; page html is
       # handled in the PAGED_TYPES block below). Every value passes

@@ -93,6 +93,27 @@
           <div class="media-upload-error" data-media-picker-target="lottieError"
                style="margin-top:8px;color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size:13px;line-height:1.4;" hidden></div>
         </div>
+
+        <%# Animation backdrop. Shown only for a card whose panel is actually an
+            animation (a pasted Lottie, or a range card's reaction set) — behind
+            a photo or video there is nothing to see, so the section stays
+            hidden rather than offering a control that does nothing.
+            media-picker toggles it in _syncAnimationBg. %>
+        <div class="media-animbg-section" data-media-picker-target="animBgSection" hidden>
+          <div class="media-lottie-label"><%= t("editor.animation_bg", default: "Animation background") %></div>
+          <div class="media-animbg-row">
+            <input type="color" class="media-animbg-color"
+                   data-media-picker-target="animBgColor"
+                   data-action="input->media-picker#setAnimBgColor"
+                   aria-label="<%= t("editor.animation_bg_colour", default: "Background colour") %>" />
+            <button type="button" class="media-animbg-btn"
+                    data-action="click->media-picker#openAnimBgImage"><%= t("editor.animation_bg_image", default: "Use an image") %></button>
+            <button type="button" class="media-animbg-btn is-clear"
+                    data-media-picker-target="animBgClear"
+                    data-action="click->media-picker#clearAnimBg"><%= t("editor.animation_bg_clear", default: "Reset to brand colour") %></button>
+          </div>
+          <div class="media-lottie-hint"><%= t("editor.animation_bg_hint", default: "Sits behind the animation on this card only. Without one the card uses your brand's panel colour.") %></div>
+        </div>
       </div>
 
       <%# Library pane %>
@@ -117,6 +138,7 @@
                  placeholder="Search stock photos…"
                  data-media-picker-target="searchInput"
                  data-action="input->media-picker#searchPexels keydown->media-picker#searchKeydown" />
+          <p class="media-search-hint"><%= t("js.editor.stock_search_hint") %></p>
         </div>
         <section class="media-library-section"
                  data-media-picker-target="searchSection" hidden>
@@ -125,6 +147,10 @@
                data-media-picker-target="searchStatus"></div>
           <div class="media-library-grid"
                data-media-picker-target="searchGrid"></div>
+          <button type="button" class="media-load-more"
+                  data-media-picker-target="loadMore"
+                  data-action="click->media-picker#loadMoreStock"
+                  hidden><%= t("js.editor.load_more") %></button>
         </section>
 
         <% groups = verto_library_images %>

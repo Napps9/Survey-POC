@@ -123,4 +123,101 @@ class CardLottieStoreTest < ActiveSupport::TestCase
     assert_equal "data:image/png;base64,AAAA", stored["assets"][1]["p"],
                  "an embedded base64 asset is self-contained and stays"
   end
+
+  # ── dotLottie (.lottie) ────────────────────────────────────────────────
+  # A .lottie is a ZIP wrapping the same animation JSON. lottie-web cannot read
+  # one, so the archive is unpacked at paste time and stored as plain JSON —
+  # which is why every assertion below ends up looking like the .json case.
+
+  def dotlottie(entries)
+    buf = Zip::OutputStream.write_buffer(StringIO.new) do |zos|
+      entries.each { |name, content| zos.put_next_entry(name); zos.write(content) }
+    end
+    buf.string
+  end
+
+  def attach_dotlottie(body)
+    result = nil
+    with_fetch(body) do
+      result = Survey::CardLottieStore.fetch_and_attach(@survey, "https://lottie.host/abc/anim.lottie")
+    end
+    result
+  end
+
+  test "the source allowlist accepts .lottie on the same hosts" do
+    assert Survey::CardLottieStore.source_url?("https://lottie.host/9f2/anim.lottie")
+    assert Survey::CardLottieStore.source_url?("https://assets-v2.lottiefiles.com/a/b.lottie")
+    refute Survey::CardLottieStore.source_url?("https://example.com/anim.lottie"),
+           "the host allowlist still applies to .lottie"
+    refute Survey::CardLottieStore.source_url?("https://lottie.host/abc/anim.zip")
+  end
+
+  test "a dotLottie is unpacked and stored as plain json" do
+    blob = attach_dotlottie(dotlottie(
+      "manifest.json"          => { "animations" => [ { "id" => "anim" } ] }.to_json,
+      "animations/anim.json"   => ANIMATION.to_json
+    ))
+
+    assert blob, "a well-formed dotLottie should attach"
+    assert blob.filename.to_s.end_with?(".json"),
+           "must be stored as .json — ACTIVE_STORAGE_LOTTIE_URL accepts nothing else"
+    assert_equal "application/json", blob.content_type
+    assert_equal ANIMATION["layers"], JSON.parse(blob.download)["layers"]
+  end
+
+  test "a dotLottie's bundled images are inlined as data URIs" do
+    # Real PNG magic bytes — binary, so the comparison below is forced to the
+    # same encoding rather than tripping over UTF-8 vs ASCII-8BIT.
+    png = ("\x89PNG\r\n\x1a\n" + ("a" * 16)).b
+    animation = ANIMATION.merge(
+      "assets" => [ { "id" => "image_0", "u" => "images/", "p" => "img_0.png", "e" => 0 } ]
+    )
+    blob = attach_dotlottie(dotlottie(
+      "manifest.json"        => { "animations" => [ { "id" => "anim" } ] }.to_json,
+      "animations/anim.json" => animation.to_json,
+      "images/img_0.png"     => png
+    ))
+
+    asset = JSON.parse(blob.download)["assets"].first
+    assert_equal "", asset["u"], "the relative path must not survive — it resolves to nothing once stored"
+    assert asset["p"].start_with?("data:image/png;base64,"), "expected an inlined image, got #{asset['p'].inspect}"
+    assert_equal 1, asset["e"], "e=1 tells lottie-web the payload is embedded"
+    assert_equal png, Base64.strict_decode64(asset["p"].split(",", 2).last).b
+  end
+
+  test "a dotLottie with no animation entry is refused" do
+    assert_nil attach_dotlottie(dotlottie("manifest.json" => { "animations" => [] }.to_json))
+  end
+
+  test "a .lottie that isn't a zip is refused" do
+    assert_nil attach_dotlottie("not a zip at all")
+  end
+
+  test "a zip bomb is refused rather than inflated" do
+    huge = dotlottie(
+      "manifest.json"        => { "animations" => [ { "id" => "anim" } ] }.to_json,
+      # Highly compressible, and far past MAX_BYTES once inflated.
+      "animations/anim.json" => "a" * (Survey::CardLottieStore::MAX_BYTES + 1_000)
+    )
+    assert huge.bytesize < Survey::CardLottieStore::MAX_BYTES,
+           "the fixture must be small enough to pass the download cap, so the INFLATED cap is what's under test"
+    assert_nil attach_dotlottie(huge)
+  end
+
+  test "a dotLottie holding more entries than the cap is refused" do
+    entries = { "manifest.json" => { "animations" => [ { "id" => "anim" } ] }.to_json,
+                "animations/anim.json" => ANIMATION.to_json }
+    (Survey::CardLottieStore::DOTLOTTIE_MAX_ENTRIES + 2).times { |i| entries["images/i#{i}.png"] = "x" }
+    assert_nil attach_dotlottie(dotlottie(entries))
+  end
+
+  test "expression scrubbing still applies to an unpacked dotLottie" do
+    animation = ANIMATION.merge("layers" => [ { "ty" => 4, "x" => "var $bm_rt = 1;" } ])
+    blob = attach_dotlottie(dotlottie(
+      "manifest.json"        => { "animations" => [ { "id" => "anim" } ] }.to_json,
+      "animations/anim.json" => animation.to_json
+    ))
+    refute JSON.parse(blob.download)["layers"].first.key?("x"),
+           "the ZIP path must go through the same scrub! as a plain .json"
+  end
 end

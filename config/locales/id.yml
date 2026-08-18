@@ -34,6 +34,7 @@ id:
     new_response: "Jawaban baru"
     add_response: "Tambah jawaban"
     remove_response: "Hapus jawaban ini"
+    remove_option: "Hapus kartu"
     response_scale: "Jawaban per pernyataan"
     tap_scale:
       "no": "Tidak"
@@ -84,7 +85,7 @@ id:
     eyebrow:
       range: "Seret slider"
       rating: "Ketuk untuk menilai"
-      nps: "Seret untuk menilai"
+      nps: "Seret cairan"
       multiple_choice: "Pilih salah satu"
       select_many: "Pilih semua yang sesuai"
       prioritise: "Klik dan seret untuk mengatur urutan prioritas"
@@ -115,7 +116,7 @@ id:
     panel_label:
       range: "GESER PENGGESER"
       rating: "KETUK UNTUK MENILAI"
-      nps: "SERET UNTUK MENILAI"
+      nps: "SERET CAIRAN"
       multiple_choice: "PILIH SATU OPSI"
       select_many: "PILIH SEMUA YANG SESUAI"
       prioritise: "SERET UNTUK MENGURUTKAN"
@@ -364,6 +365,8 @@ id:
     editor:
       delete_card_confirm: Hapus kartu ini?
       save_to_library: "Simpan juga ke pustaka merek saya"
+      stock_search_hint: "Gunakan kata kunci yang terkait dengan pertanyaan untuk hasil yang lebih baik"
+      load_more: "Muat lagi"
       lottie_failed: "Tautan itu sepertinya bukan animasi LottieFiles."
       appeal_note_prompt: "Ada yang ingin disampaikan ke peninjau? (opsional)"
       appeal_submitting: "Mengirim untuk ditinjau…"
@@ -1009,9 +1012,14 @@ id:
     emoji_search: "Cari emoji…"
     emoji_clear: "Hapus"
     lottie_section: "Animasi (Lottie)"
-    lottie_placeholder: "Tempel tautan LottieFiles, mis. https://lottie.host/….json"
+    lottie_placeholder: "Tempel tautan LottieFiles, mis. https://lottie.host/….lottie"
     lottie_apply: "Gunakan animasi"
-    lottie_hint: "Tautan .json langsung dari lottiefiles.com atau lottie.host. Animasi menggantikan foto atau video kartu."
+    lottie_hint: "Tautan .json atau .lottie dari lottiefiles.com atau lottie.host. Animasi menggantikan foto atau video kartu."
+    animation_bg: "Latar belakang animasi"
+    animation_bg_colour: "Warna latar belakang"
+    animation_bg_image: "Gunakan gambar"
+    animation_bg_clear: "Setel ulang ke warna merek"
+    animation_bg_hint: "Tampil di belakang animasi hanya pada kartu ini. Tanpa ini, kartu memakai warna panel merek Anda."
     required_chip: 'Wajib'
     ty_title_label: 'Judul terima kasih'
     ty_body_label: 'Pesan terima kasih'

@@ -34,6 +34,7 @@ uk:
     new_response: "Нова відповідь"
     add_response: "Додати відповідь"
     remove_response: "Видалити цю відповідь"
+    remove_option: "Видалити картку"
     response_scale: "Відповідей на твердження"
     tap_scale:
       "no": "Ні"
@@ -84,7 +85,7 @@ uk:
     eyebrow:
       range: "Перетягніть повзунок"
       rating: "Торкніться, щоб оцінити"
-      nps: "Перетягніть, щоб оцінити"
+      nps: "Потягніть рідину"
       multiple_choice: "Виберіть один варіант"
       select_many: "Виберіть усі, що підходять"
       prioritise: "Натисніть і перетягніть, щоб розташувати за пріоритетом"
@@ -115,7 +116,7 @@ uk:
     panel_label:
       range: "ПЕРЕТЯГНІТЬ ПОВЗУНОК"
       rating: "ТОРКНІТЬСЯ, ЩОБ ОЦІНИТИ"
-      nps: "ПЕРЕТЯГНІТЬ, ЩОБ ОЦІНИТИ"
+      nps: "ПОТЯГНІТЬ РІДИНУ"
       multiple_choice: "ВИБЕРІТЬ ОДИН ВАРІАНТ"
       select_many: "ВИБЕРІТЬ УСІ, ЩО ПІДХОДЯТЬ"
       prioritise: "ПЕРЕТЯГНІТЬ, ЩОБ УПОРЯДКУВАТИ"
@@ -364,6 +365,8 @@ uk:
     editor:
       delete_card_confirm: Видалити цю картку?
       save_to_library: "Також зберегти в бібліотеку бренду"
+      stock_search_hint: "Використовуйте ключові слова, пов'язані з питанням, щоб отримати кращі результати"
+      load_more: "Показати ще"
       lottie_failed: "Це посилання не схоже на анімацію LottieFiles."
       appeal_note_prompt: "Хочете щось повідомити перевіряючому? (необов'язково)"
       appeal_submitting: "Надсилання на перевірку…"
@@ -1011,9 +1014,14 @@ uk:
     emoji_search: "Пошук емодзі…"
     emoji_clear: "Очистити"
     lottie_section: "Анімація (Lottie)"
-    lottie_placeholder: "Вставте посилання LottieFiles, напр. https://lottie.host/….json"
+    lottie_placeholder: "Вставте посилання LottieFiles, наприклад https://lottie.host/….lottie"
     lottie_apply: "Використати анімацію"
-    lottie_hint: "Прямі посилання .json з lottiefiles.com або lottie.host. Анімація замінює фото або відео картки."
+    lottie_hint: "Посилання .json або .lottie з lottiefiles.com чи lottie.host. Анімація замінює фото або відео картки."
+    animation_bg: "Тло анімації"
+    animation_bg_colour: "Колір тла"
+    animation_bg_image: "Використати зображення"
+    animation_bg_clear: "Повернути колір бренду"
+    animation_bg_hint: "Відображається за анімацією лише на цій картці. Без нього картка використовує колір панелі вашого бренду."
     required_chip: 'Обовʼязкове'
     ty_title_label: 'Заголовок подяки'
     ty_body_label: 'Повідомлення подяки'

@@ -92,4 +92,71 @@ class PexelsClientTest < ActiveSupport::TestCase
   ensure
     old.each { |k, v| v.nil? ? ENV.delete(k) : ENV[k] = v }
   end
+
+  # ── Failure vs emptiness ───────────────────────────────────────────────
+  # Both come back as [] so AssetPopulator keeps degrading to the curated
+  # library, but they are NOT the same fact: an outage reported as "No photos
+  # found." sent creators hunting for better search terms while Pexels was
+  # down (18 Aug). #last_error is what lets the editor tell them apart.
+
+  # Stub the one impure step. Returns the client so the caller can inspect
+  # #last_error afterwards.
+  def client_with_response(response)
+    c = PexelsClient.new(api_key: "test-key")
+    c.define_singleton_method(:get_json) do |_url, _params|
+      raise response if response.is_a?(Class) || response.is_a?(Exception)
+      response
+    end
+    c
+  end
+
+  test "a successful but empty search reports no error" do
+    c = client_with_response({ "photos" => [] })
+    assert_empty c.search(query: "aardvark trombone", per_page: 5)
+    assert_nil c.last_error, "an genuinely empty result must not look like a failure"
+  end
+
+  test "an HTTP failure is recorded with its status code" do
+    c = PexelsClient.new(api_key: "test-key")
+    # get_json's own contract on a non-2xx: log, record, return nil.
+    c.define_singleton_method(:get_json) do |_url, _params|
+      instance_variable_set(:@last_error, :http_429)
+      nil
+    end
+    assert_empty c.search(query: "graduation", per_page: 5)
+    assert_equal :http_429, c.last_error,
+                 "the code is the diagnosis — 401 is a dead key, 429 is a spent quota"
+  end
+
+  test "a raised network error is recorded rather than swallowed silently" do
+    c = client_with_response(Timeout::Error.new("execution expired"))
+    assert_empty c.search(query: "graduation", per_page: 5)
+    assert_equal :exception, c.last_error
+  end
+
+  test "an unconfigured client is distinguishable from an outage" do
+    c = PexelsClient.new(api_key: nil)
+    assert_empty c.search(query: "graduation", per_page: 5)
+    assert_equal :unconfigured, c.last_error
+  end
+
+  test "last_error resets between searches so a recovery isn't reported as broken" do
+    c = PexelsClient.new(api_key: "test-key")
+    calls = 0
+    c.define_singleton_method(:get_json) do |_url, _params|
+      calls += 1
+      calls == 1 ? (instance_variable_set(:@last_error, :http_500); nil) : { "photos" => [ PHOTO ] }
+    end
+    c.search(query: "x", per_page: 5)
+    assert_equal :http_500, c.last_error
+    assert_equal 1, c.search(query: "x", per_page: 5).size
+    assert_nil c.last_error, "a later success must clear the earlier failure"
+  end
+
+  test "a blank query is neither an error nor a request" do
+    c = PexelsClient.new(api_key: "test-key")
+    c.define_singleton_method(:get_json) { |_u, _p| flunk "a blank query must not reach the API" }
+    assert_empty c.search(query: "   ", per_page: 5)
+    assert_nil c.last_error
+  end
 end

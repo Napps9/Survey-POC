@@ -34,6 +34,7 @@ it:
     new_response: "Nuova risposta"
     add_response: "Aggiungi una risposta"
     remove_response: "Rimuovi questa risposta"
+    remove_option: "Elimina scheda"
     response_scale: "Risposte per affermazione"
     tap_scale:
       "no": "No"
@@ -84,7 +85,7 @@ it:
     eyebrow:
       range: "Trascina il cursore"
       rating: "Tocca per valutare"
-      nps: "Trascina per valutare"
+      nps: "Trascina il liquido"
       multiple_choice: "Scegli un'opzione"
       select_many: "Scegli tutte le opzioni pertinenti"
       prioritise: "Clicca e trascina per ordinare in base alla priorità"
@@ -115,7 +116,7 @@ it:
     panel_label:
       range: "TRASCINA IL CURSORE"
       rating: "TOCCA PER VALUTARE"
-      nps: "TRASCINA PER VALUTARE"
+      nps: "TRASCINA IL LIQUIDO"
       multiple_choice: "SCEGLI UN'OPZIONE"
       select_many: "SCEGLI TUTTE LE OPZIONI PERTINENTI"
       prioritise: "TRASCINA PER ORDINARE"
@@ -364,6 +365,8 @@ it:
     editor:
       delete_card_confirm: Eliminare questa carta?
       save_to_library: "Salva anche nella mia libreria del brand"
+      stock_search_hint: "Usa parole chiave collegate alla domanda per ottenere risultati migliori"
+      load_more: "Carica altri"
       lottie_failed: "Quel link non sembra un'animazione LottieFiles."
       appeal_note_prompt: "Vuoi dire qualcosa al revisore? (facoltativo)"
       appeal_submitting: "Invio per la revisione…"
@@ -1009,9 +1012,14 @@ it:
     emoji_search: "Cerca emoji…"
     emoji_clear: "Cancella"
     lottie_section: "Animazione (Lottie)"
-    lottie_placeholder: "Incolla un link LottieFiles, es. https://lottie.host/….json"
+    lottie_placeholder: "Incolla un link LottieFiles, es. https://lottie.host/….lottie"
     lottie_apply: "Usa animazione"
-    lottie_hint: "Link .json diretti da lottiefiles.com o lottie.host. L'animazione sostituisce la foto o il video della scheda."
+    lottie_hint: "Link .json o .lottie da lottiefiles.com o lottie.host. L'animazione sostituisce la foto o il video della scheda."
+    animation_bg: "Sfondo dell'animazione"
+    animation_bg_colour: "Colore di sfondo"
+    animation_bg_image: "Usa un'immagine"
+    animation_bg_clear: "Ripristina il colore del brand"
+    animation_bg_hint: "Compare dietro l'animazione solo su questa scheda. Senza, la scheda usa il colore del pannello del tuo brand."
     required_chip: 'Obbligatoria'
     ty_title_label: 'Titolo di ringraziamento'
     ty_body_label: 'Messaggio di ringraziamento'

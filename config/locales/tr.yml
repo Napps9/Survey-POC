@@ -34,6 +34,7 @@ tr:
     new_response: "Yeni yanıt"
     add_response: "Yanıt ekle"
     remove_response: "Bu yanıtı kaldır"
+    remove_option: "Kartı sil"
     response_scale: "İfade başına yanıt"
     tap_scale:
       "no": "Hayır"
@@ -84,7 +85,7 @@ tr:
     eyebrow:
       range: "Kaydırıcıyı sürükleyin"
       rating: "Puanlamak için dokunun"
-      nps: "Puanlamak için sürükleyin"
+      nps: "Sıvıyı sürükleyin"
       multiple_choice: "Birini seçin"
       select_many: "Uygun olan tüm seçenekleri seçin"
       prioritise: "Öncelik sırasına göre düzenlemek için tıklayıp sürükleyin"
@@ -115,7 +116,7 @@ tr:
     panel_label:
       range: "KAYDIRICIYI SÜRÜKLE"
       rating: "PUANLAMAK İÇİN DOKUNUN"
-      nps: "PUANLAMAK İÇİN SÜRÜKLEYİN"
+      nps: "SIVIYI SÜRÜKLEYIN"
       multiple_choice: "BİR SEÇENEK SEÇİN"
       select_many: "UYGUN OLAN TÜM SEÇENEKLERİ SEÇİN"
       prioritise: "SIRALAMAK İÇİN SÜRÜKLEYİN"
@@ -364,6 +365,8 @@ tr:
     editor:
       delete_card_confirm: Bu kart silinsin mi?
       save_to_library: "Marka kitaplığıma da kaydet"
+      stock_search_hint: "Daha iyi sonuçlar için soruyla ilgili anahtar kelimeler kullanın"
+      load_more: "Daha fazla yükle"
       lottie_failed: "Bu bağlantı bir LottieFiles animasyonuna benzemiyor."
       appeal_note_prompt: "İncelemeciye iletmek istediğiniz bir şey var mı? (isteğe bağlı)"
       appeal_submitting: "İnceleme için gönderiliyor…"
@@ -1009,9 +1012,14 @@ tr:
     emoji_search: "Emoji ara…"
     emoji_clear: "Temizle"
     lottie_section: "Animasyon (Lottie)"
-    lottie_placeholder: "LottieFiles bağlantısı yapıştırın, örn. https://lottie.host/….json"
+    lottie_placeholder: "Bir LottieFiles bağlantısı yapıştırın, ör. https://lottie.host/….lottie"
     lottie_apply: "Animasyonu kullan"
-    lottie_hint: "lottiefiles.com veya lottie.host'tan doğrudan .json bağlantıları. Animasyon kartın fotoğraf veya videosunun yerini alır."
+    lottie_hint: "lottiefiles.com veya lottie.host adresinden .json ya da .lottie bağlantıları. Animasyon, kartın fotoğrafının veya videosunun yerini alır."
+    animation_bg: "Animasyon arka planı"
+    animation_bg_colour: "Arka plan rengi"
+    animation_bg_image: "Bir görsel kullan"
+    animation_bg_clear: "Marka rengine sıfırla"
+    animation_bg_hint: "Yalnızca bu kartta animasyonun arkasında görünür. Ayarlanmazsa kart, markanızın panel rengini kullanır."
     required_chip: 'Zorunlu'
     ty_title_label: 'Teşekkür başlığı'
     ty_body_label: 'Teşekkür mesajı'

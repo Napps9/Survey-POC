@@ -315,6 +315,54 @@ module ApplicationHelper
     "background:linear-gradient(135deg, #{BrandPalette.lighten(hex, 0.18)}, #{hex});"
   end
 
+  # A card's animation backdrop, as an inline style for .split-left. An image
+  # wins over a colour when both are set (the colour still paints underneath,
+  # so a transparent PNG sits on it rather than on the brand panel). "" when
+  # the card hasn't set one, leaving the CSS default --brand-panel in charge.
+  #
+  # The model already refuses a backdrop on a card whose panel holds a photo or
+  # video (Survey.sanitize_cards_images!), so there is no exclusivity check
+  # here — but a card being edited client-side can be mid-change, hence the
+  # animated? guard.
+  def card_media_bg_style(card)
+    bg = card_media_bg(card)
+    return "" if bg.blank?
+
+    parts = []
+    parts << "background-color:#{bg['color']}" if bg["color"].present?
+    if (img = bg["image"]).present?
+      # Escaped for a single-quoted CSS url(), NOT URL-encoded: these URLs
+      # legitimately carry query strings (Pexels crops are
+      # ?auto=compress&cs=tinysrgb&w=720…) and percent-encoding the & and =
+      # would break the image. The value is already host-allowlisted by
+      # Survey.sanitize_image_url; this only stops a quote or backslash from
+      # closing the url() and escaping into the style attribute.
+      escaped = img.delete("\n\r").gsub(/["'\\]/) { |c| "\\" + c }
+      parts << "background-image:url('#{escaped}')"
+      parts << "background-size:cover"
+      parts << "background-position:center"
+    end
+    parts.join(";")
+  end
+
+  # The same value as a JSON attribute, so the editor's serialiser can read the
+  # backdrop back off the DOM (survey_editor_controller#_readCard) — the deck is
+  # rebuilt from the rendered card, so anything not written here is dropped on
+  # the next autosave.
+  def card_media_bg_attr(card)
+    bg = card_media_bg(card)
+    bg.blank? ? "" : bg.to_json
+  end
+
+  def card_media_bg(card)
+    return nil unless card.is_a?(Hash)
+    animated = card["type"].to_s == "range" || card["lottie"].present?
+    return nil unless animated
+
+    bg = card["media_bg"]
+    bg.is_a?(Hash) && bg.slice("color", "image").compact_blank.any? ? bg.slice("color", "image").compact_blank : nil
+  end
+
   # The tile's icon slot, in precedence order: the creator's explicit icon
   # pick, their explicit emoji, the keyword-matched icon (where the type shows
   # them), and finally a fallback emoji — because a selection answer with an

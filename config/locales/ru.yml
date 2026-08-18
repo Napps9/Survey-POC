@@ -34,6 +34,7 @@ ru:
     new_response: "Новый ответ"
     add_response: "Добавить ответ"
     remove_response: "Удалить этот ответ"
+    remove_option: "Удалить карточку"
     response_scale: "Ответов на утверждение"
     tap_scale:
       "no": "Нет"
@@ -84,7 +85,7 @@ ru:
     eyebrow:
       range: "Перетащите ползунок"
       rating: "Нажмите, чтобы оценить"
-      nps: "Перетащите, чтобы оценить"
+      nps: "Потяните жидкость"
       multiple_choice: "Выберите один вариант"
       select_many: "Отметьте все подходящие варианты"
       prioritise: "Нажмите и перетащите, чтобы расставить по приоритету"
@@ -115,7 +116,7 @@ ru:
     panel_label:
       range: "ПЕРЕТАЩИТЕ ПОЛЗУНОК"
       rating: "НАЖМИТЕ, ЧТОБЫ ОЦЕНИТЬ"
-      nps: "ПЕРЕТАЩИТЕ, ЧТОБЫ ОЦЕНИТЬ"
+      nps: "ПОТЯНИТЕ ЖИДКОСТЬ"
       multiple_choice: "ВЫБЕРИТЕ ОДИН ВАРИАНТ"
       select_many: "ОТМЕТЬТЕ ВСЕ ПОДХОДЯЩИЕ ВАРИАНТЫ"
       prioritise: "ПЕРЕТАЩИТЕ, ЧТОБЫ УПОРЯДОЧИТЬ"
@@ -364,6 +365,8 @@ ru:
     editor:
       delete_card_confirm: Удалить эту карточку?
       save_to_library: "Также сохранить в библиотеку бренда"
+      stock_search_hint: "Используйте ключевые слова, связанные с вопросом, чтобы получить лучшие результаты"
+      load_more: "Показать ещё"
       lottie_failed: "Эта ссылка не похожа на анимацию LottieFiles."
       appeal_note_prompt: "Хотите что-то сообщить проверяющему? (необязательно)"
       appeal_submitting: "Отправка на проверку…"
@@ -1011,9 +1014,14 @@ ru:
     emoji_search: "Поиск эмодзи…"
     emoji_clear: "Очистить"
     lottie_section: "Анимация (Lottie)"
-    lottie_placeholder: "Вставьте ссылку LottieFiles, напр. https://lottie.host/….json"
+    lottie_placeholder: "Вставьте ссылку LottieFiles, например https://lottie.host/….lottie"
     lottie_apply: "Использовать анимацию"
-    lottie_hint: "Прямые ссылки .json с lottiefiles.com или lottie.host. Анимация заменяет фото или видео карточки."
+    lottie_hint: "Ссылки .json или .lottie с lottiefiles.com или lottie.host. Анимация заменяет фото или видео карточки."
+    animation_bg: "Фон анимации"
+    animation_bg_colour: "Цвет фона"
+    animation_bg_image: "Использовать изображение"
+    animation_bg_clear: "Вернуть цвет бренда"
+    animation_bg_hint: "Отображается за анимацией только на этой карточке. Без него карточка использует цвет панели вашего бренда."
     required_chip: 'Обязательный'
     ty_title_label: 'Заголовок благодарности'
     ty_body_label: 'Сообщение благодарности'

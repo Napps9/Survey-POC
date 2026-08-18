@@ -50,6 +50,11 @@ export default class extends Controller {
     this._scope = null
     this.instance?.destroy()
     this.instance = null
+    // Forget which frame was on screen. show() early-returns when the requested
+    // value equals `shown`, so a controller that reconnects (Turbo restore, or
+    // the element being moved in the DOM) would take that early return and
+    // never re-mount — leaving an empty panel where destroy() cleared the SVG.
+    this.shown = null
   }
 
   // The editor's theme picker swaps the `urls` value to a different animation
@@ -73,6 +78,16 @@ export default class extends Controller {
     // of snapping back to the mount default.
     this.currentValue = v
     this.instance?.destroy()
+    // Empty the mount before loading. loadAnimation APPENDS an <svg>, and
+    // destroy() only clears the SVG this controller instance made — so any
+    // <svg> that arrived already rendered inside the mount survives and the new
+    // one stacks under it. Two SVGs, each forced to height:100% by
+    // .card-lottie-mount svg, is the "animation drawn twice, second copy cut
+    // off by the card edge" glitch. It reaches the mount two ways: a Turbo Drive
+    // cache restore (the snapshot holds the rendered SVG, while a fresh
+    // controller has no `instance` to destroy), and preview_verto_controller's
+    // deep clone of an already-rendered card.
+    this.mountTarget.replaceChildren()
     this.instance = lottie.loadAnimation({
       container: this.mountTarget,
       renderer: "svg",

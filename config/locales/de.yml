@@ -34,6 +34,7 @@ de:
     new_response: "Neue Antwort"
     add_response: "Antwort hinzufügen"
     remove_response: "Diese Antwort entfernen"
+    remove_option: "Karte löschen"
     response_scale: "Antworten pro Aussage"
     tap_scale:
       "no": "Nein"
@@ -84,7 +85,7 @@ de:
     eyebrow:
       range: "Regler ziehen"
       rating: "Tippen zum Bewerten"
-      nps: "Ziehen zum Bewerten"
+      nps: "Flüssigkeit ziehen"
       multiple_choice: "Eine Option wählen"
       select_many: "Alle zutreffenden Optionen wählen"
       prioritise: "Klicken und ziehen, um nach Priorität zu ordnen"
@@ -115,7 +116,7 @@ de:
     panel_label:
       range: "REGLER ZIEHEN"
       rating: "TIPPEN ZUM BEWERTEN"
-      nps: "ZIEHEN ZUM BEWERTEN"
+      nps: "FLÜSSIGKEIT ZIEHEN"
       multiple_choice: "EINE OPTION WÄHLEN"
       select_many: "ALLE ZUTREFFENDEN WÄHLEN"
       prioritise: "ZUM SORTIEREN ZIEHEN"
@@ -364,6 +365,8 @@ de:
     editor:
       delete_card_confirm: Diese Karte löschen?
       save_to_library: "Auch in meiner Markenbibliothek speichern"
+      stock_search_hint: "Verwende Schlüsselwörter, die zur Frage passen, für bessere Ergebnisse"
+      load_more: "Mehr laden"
       lottie_failed: "Dieser Link scheint keine LottieFiles-Animation zu sein."
       appeal_note_prompt: "Möchtest du dem Prüfer etwas mitteilen? (optional)"
       appeal_submitting: "Wird zur Prüfung eingereicht…"
@@ -1009,9 +1012,14 @@ de:
     emoji_search: "Emoji suchen…"
     emoji_clear: "Löschen"
     lottie_section: "Animation (Lottie)"
-    lottie_placeholder: "LottieFiles-Link einfügen, z. B. https://lottie.host/….json"
+    lottie_placeholder: "Füge einen LottieFiles-Link ein, z. B. https://lottie.host/….lottie"
     lottie_apply: "Animation verwenden"
-    lottie_hint: "Direkte .json-Links von lottiefiles.com oder lottie.host. Die Animation ersetzt Foto oder Video der Karte."
+    lottie_hint: ".json- oder .lottie-Links von lottiefiles.com oder lottie.host. Die Animation ersetzt das Foto oder Video der Karte."
+    animation_bg: "Animationshintergrund"
+    animation_bg_colour: "Hintergrundfarbe"
+    animation_bg_image: "Bild verwenden"
+    animation_bg_clear: "Auf Markenfarbe zurücksetzen"
+    animation_bg_hint: "Liegt nur auf dieser Karte hinter der Animation. Ohne eigene Angabe nutzt die Karte die Panelfarbe deiner Marke."
     required_chip: 'Pflicht'
     ty_title_label: 'Titel der Dankeschön-Seite'
     ty_body_label: 'Nachricht der Dankeschön-Seite'

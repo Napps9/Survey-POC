@@ -34,6 +34,7 @@ fr:
     new_response: "Nouvelle réponse"
     add_response: "Ajouter une réponse"
     remove_response: "Supprimer cette réponse"
+    remove_option: "Supprimer la carte"
     response_scale: "Réponses par affirmation"
     tap_scale:
       "no": "Non"
@@ -84,7 +85,7 @@ fr:
     eyebrow:
       range: "Faites glisser le curseur"
       rating: "Touchez pour noter"
-      nps: "Faites glisser pour noter"
+      nps: "Faites glisser le liquide"
       multiple_choice: "Choisissez une réponse"
       select_many: "Sélectionnez toutes les réponses qui s'appliquent"
       prioritise: "Cliquez et faites glisser pour classer par ordre de priorité"
@@ -115,7 +116,7 @@ fr:
     panel_label:
       range: "FAITES GLISSER LE CURSEUR"
       rating: "TOUCHEZ POUR NOTER"
-      nps: "FAITES GLISSER POUR NOTER"
+      nps: "FAITES GLISSER LE LIQUIDE"
       multiple_choice: "CHOISISSEZ UNE RÉPONSE"
       select_many: "SÉLECTIONNEZ TOUTES LES RÉPONSES QUI S'APPLIQUENT"
       prioritise: "GLISSEZ POUR CLASSER"
@@ -364,6 +365,8 @@ fr:
     editor:
       delete_card_confirm: Supprimer cette carte ?
       save_to_library: "Enregistrer aussi dans ma bibliothèque de marque"
+      stock_search_hint: "Utilisez des mots-clés liés à la question pour de meilleurs résultats"
+      load_more: "Afficher plus"
       lottie_failed: "Ce lien ne semble pas être une animation LottieFiles."
       appeal_note_prompt: "Souhaitez-vous préciser quelque chose au relecteur ? (facultatif)"
       appeal_submitting: "Envoi pour examen…"
@@ -1009,9 +1012,14 @@ fr:
     emoji_search: "Rechercher un émoji…"
     emoji_clear: "Effacer"
     lottie_section: "Animation (Lottie)"
-    lottie_placeholder: "Collez un lien LottieFiles, p. ex. https://lottie.host/….json"
+    lottie_placeholder: "Collez un lien LottieFiles, par ex. https://lottie.host/….lottie"
     lottie_apply: "Utiliser l'animation"
-    lottie_hint: "Liens .json directs depuis lottiefiles.com ou lottie.host. L'animation remplace la photo ou la vidéo de la carte."
+    lottie_hint: "Liens .json ou .lottie depuis lottiefiles.com ou lottie.host. L'animation remplace la photo ou la vidéo de la carte."
+    animation_bg: "Arrière-plan de l'animation"
+    animation_bg_colour: "Couleur d'arrière-plan"
+    animation_bg_image: "Utiliser une image"
+    animation_bg_clear: "Rétablir la couleur de marque"
+    animation_bg_hint: "S'affiche derrière l'animation sur cette carte uniquement. Sans cela, la carte utilise la couleur de panneau de votre marque."
     required_chip: 'Obligatoire'
     ty_title_label: 'Titre de remerciement'
     ty_body_label: 'Message de remerciement'

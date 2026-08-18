@@ -34,6 +34,7 @@ ko:
     new_response: "새 답변"
     add_response: "답변 추가"
     remove_response: "이 답변 삭제"
+    remove_option: "카드 삭제"
     response_scale: "문항당 답변 수"
     tap_scale:
       "no": "아니요"
@@ -84,7 +85,7 @@ ko:
     eyebrow:
       range: "슬라이더를 드래그하세요"
       rating: "탭해서 평가하세요"
-      nps: "드래그해서 평가하세요"
+      nps: "액체를 드래그하세요"
       multiple_choice: "하나를 선택하세요"
       select_many: "해당하는 항목을 모두 선택하세요"
       prioritise: "드래그해서 우선순위 순서대로 정렬하세요"
@@ -115,7 +116,7 @@ ko:
     panel_label:
       range: "슬라이더를 드래그하세요"
       rating: "탭해서 평가하세요"
-      nps: "드래그해서 평가하세요"
+      nps: "액체를 드래그하세요"
       multiple_choice: "하나를 선택하세요"
       select_many: "해당하는 항목을 모두 선택하세요"
       prioritise: "드래그해서 순서를 정하세요"
@@ -364,6 +365,8 @@ ko:
     editor:
       delete_card_confirm: 이 카드를 삭제하시겠습니까?
       save_to_library: "브랜드 라이브러리에도 저장"
+      stock_search_hint: "질문과 관련된 키워드를 사용하면 더 좋은 결과를 얻을 수 있습니다"
+      load_more: "더 보기"
       lottie_failed: "이 링크는 LottieFiles 애니메이션이 아닌 것 같습니다."
       appeal_note_prompt: "검토자에게 전달하고 싶은 내용이 있나요? (선택 사항)"
       appeal_submitting: "검토를 위해 제출하는 중…"
@@ -1009,9 +1012,14 @@ ko:
     emoji_search: "이모지 검색…"
     emoji_clear: "지우기"
     lottie_section: "애니메이션 (Lottie)"
-    lottie_placeholder: "LottieFiles 링크를 붙여넣으세요 (예: https://lottie.host/….json)"
+    lottie_placeholder: "LottieFiles 링크를 붙여넣으세요. 예: https://lottie.host/….lottie"
     lottie_apply: "애니메이션 사용"
-    lottie_hint: "lottiefiles.com 또는 lottie.host의 직접 .json 링크. 애니메이션이 카드의 사진이나 영상을 대체합니다."
+    lottie_hint: "lottiefiles.com 또는 lottie.host의 .json 또는 .lottie 링크. 애니메이션이 카드의 사진이나 동영상을 대체합니다."
+    animation_bg: "애니메이션 배경"
+    animation_bg_colour: "배경색"
+    animation_bg_image: "이미지 사용"
+    animation_bg_clear: "브랜드 색상으로 되돌리기"
+    animation_bg_hint: "이 카드의 애니메이션 뒤에만 표시됩니다. 설정하지 않으면 브랜드의 패널 색상이 사용됩니다."
     required_chip: '필수'
     ty_title_label: '감사 제목'
     ty_body_label: '감사 메시지'

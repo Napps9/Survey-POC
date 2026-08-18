@@ -34,6 +34,7 @@ pl:
     new_response: "Nowa odpowiedź"
     add_response: "Dodaj odpowiedź"
     remove_response: "Usuń tę odpowiedź"
+    remove_option: "Usuń kartę"
     response_scale: "Odpowiedzi na stwierdzenie"
     tap_scale:
       "no": "Nie"
@@ -84,7 +85,7 @@ pl:
     eyebrow:
       range: "Przeciągnij suwak"
       rating: "Stuknij, aby ocenić"
-      nps: "Przeciągnij, aby ocenić"
+      nps: "Przeciągnij płyn"
       multiple_choice: "Wybierz jedną odpowiedź"
       select_many: "Zaznacz wszystkie pasujące odpowiedzi"
       prioritise: "Kliknij i przeciągnij, aby ułożyć według priorytetu"
@@ -115,7 +116,7 @@ pl:
     panel_label:
       range: "PRZECIĄGNIJ SUWAK"
       rating: "STUKNIJ, ABY OCENIĆ"
-      nps: "PRZECIĄGNIJ, ABY OCENIĆ"
+      nps: "PRZECIĄGNIJ PŁYN"
       multiple_choice: "WYBIERZ JEDNĄ ODPOWIEDŹ"
       select_many: "ZAZNACZ WSZYSTKIE PASUJĄCE ODPOWIEDZI"
       prioritise: "PRZECIĄGNIJ, ABY UŁOŻYĆ"
@@ -364,6 +365,8 @@ pl:
     editor:
       delete_card_confirm: Usunąć tę kartę?
       save_to_library: "Zapisz też w mojej bibliotece marki"
+      stock_search_hint: "Użyj słów kluczowych związanych z pytaniem, aby uzyskać lepsze wyniki"
+      load_more: "Załaduj więcej"
       lottie_failed: "Ten link nie wygląda na animację LottieFiles."
       appeal_note_prompt: "Chcesz coś przekazać osobie weryfikującej? (opcjonalnie)"
       appeal_submitting: "Wysyłanie do weryfikacji…"
@@ -1011,9 +1014,14 @@ pl:
     emoji_search: "Szukaj emoji…"
     emoji_clear: "Wyczyść"
     lottie_section: "Animacja (Lottie)"
-    lottie_placeholder: "Wklej link LottieFiles, np. https://lottie.host/….json"
+    lottie_placeholder: "Wklej link LottieFiles, np. https://lottie.host/….lottie"
     lottie_apply: "Użyj animacji"
-    lottie_hint: "Bezpośrednie linki .json z lottiefiles.com lub lottie.host. Animacja zastępuje zdjęcie lub wideo karty."
+    lottie_hint: "Linki .json lub .lottie z lottiefiles.com albo lottie.host. Animacja zastępuje zdjęcie lub wideo karty."
+    animation_bg: "Tło animacji"
+    animation_bg_colour: "Kolor tła"
+    animation_bg_image: "Użyj obrazu"
+    animation_bg_clear: "Przywróć kolor marki"
+    animation_bg_hint: "Widoczne za animacją tylko na tej karcie. Bez tego karta używa koloru panelu Twojej marki."
     required_chip: 'Wymagane'
     ty_title_label: 'Tytuł podziękowania'
     ty_body_label: 'Wiadomość podziękowania'

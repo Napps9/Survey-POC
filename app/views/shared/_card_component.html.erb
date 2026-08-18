@@ -194,7 +194,9 @@
               <button type="button" class="option-style-btn"
                       data-action="click->option-style#open" title="<%= t('card.style_option') %>">🎨</button>
               <button type="button" class="pick-item-delete"
-                      data-action="click->card-editor#deleteOption">×</button>
+                      data-action="click->card-editor#deleteOption"
+                      title="<%= t("card.remove_option", default: "Delete card") %>"
+                      aria-label="<%= t("card.remove_option", default: "Delete card") %>">×</button>
             <% end %>
           </li>
         <% end %>
@@ -233,7 +235,9 @@
               <button type="button" class="option-style-btn"
                       data-action="click->option-style#open" title="<%= t('card.style_option') %>">🎨</button>
               <button type="button" class="pick-item-delete"
-                      data-action="click->card-editor#deleteOption">×</button>
+                      data-action="click->card-editor#deleteOption"
+                      title="<%= t("card.remove_option", default: "Delete card") %>"
+                      aria-label="<%= t("card.remove_option", default: "Delete card") %>">×</button>
             <% end %>
           </li>
         <% end %>
@@ -350,7 +354,9 @@
                   </span>
                 </button>
                 <button type="button" class="tap-card-delete"
-                        data-action="click->card-editor#deleteOption">×</button>
+                        data-action="click->card-editor#deleteOption"
+                        title="<%= t("card.remove_option", default: "Delete card") %>"
+                        aria-label="<%= t("card.remove_option", default: "Delete card") %>">×</button>
               <% end %>
             </div>
           <% end %>
@@ -453,7 +459,9 @@
                       <button type="button" class="option-style-btn"
                               data-action="click->option-style#open" title="<%= t('card.style_option') %>">🎨</button>
                       <button type="button" class="pick-item-delete"
-                              data-action="click->card-editor#deleteOption">×</button>
+                              data-action="click->card-editor#deleteOption"
+                              title="<%= t("card.remove_option", default: "Delete card") %>"
+                              aria-label="<%= t("card.remove_option", default: "Delete card") %>">×</button>
                     <% end %>
                   </li>
                 <% end %>
@@ -668,7 +676,7 @@
            data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
            tabindex="0" role="slider"
            aria-valuemin="0" aria-valuemax="<%= n - 1 %>">
-        <div class="nps-slider-stage">
+        <div class="nps-slider-stage" style="<%= nps_stage_style(nps_container_shape(@survey)) %>">
           <div class="slider-labels nps-slider-labels">
             <% labels.each do |opt| %>
               <span class="slider-label-text" data-nps-slider-target="label" <%= ce_attr %>><%= opt %></span>

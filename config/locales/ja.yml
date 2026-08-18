@@ -34,6 +34,7 @@ ja:
     new_response: "新しい回答"
     add_response: "回答を追加"
     remove_response: "この回答を削除"
+    remove_option: "カードを削除"
     response_scale: "1文あたりの回答数"
     tap_scale:
       "no": "いいえ"
@@ -84,7 +85,7 @@ ja:
     eyebrow:
       range: "スライダーをドラッグ"
       rating: "タップして評価"
-      nps: "ドラッグして評価"
+      nps: "液体をドラッグ"
       multiple_choice: "1つ選択"
       select_many: "当てはまるものをすべて選択"
       prioritise: "ドラッグして優先順位を並べ替え"
@@ -115,7 +116,7 @@ ja:
     panel_label:
       range: "スライダーをドラッグ"
       rating: "タップして評価"
-      nps: "ドラッグして評価"
+      nps: "液体をドラッグ"
       multiple_choice: "1つ選択"
       select_many: "当てはまるものをすべて選択"
       prioritise: "ドラッグして並べ替え"
@@ -364,6 +365,8 @@ ja:
     editor:
       delete_card_confirm: このカードを削除しますか？
       save_to_library: "ブランドライブラリにも保存"
+      stock_search_hint: "質問に関連するキーワードを使うと、より良い結果が得られます"
+      load_more: "もっと見る"
       lottie_failed: "このリンクはLottieFilesのアニメーションではないようです。"
       appeal_note_prompt: "レビュー担当者に伝えたいことはありますか?(任意)"
       appeal_submitting: "レビューに送信しています…"
@@ -1009,9 +1012,14 @@ ja:
     emoji_search: "絵文字を検索…"
     emoji_clear: "クリア"
     lottie_section: "アニメーション（Lottie）"
-    lottie_placeholder: "LottieFilesのリンクを貼り付け（例: https://lottie.host/….json）"
+    lottie_placeholder: "LottieFiles のリンクを貼り付け（例: https://lottie.host/….lottie）"
     lottie_apply: "アニメーションを使用"
-    lottie_hint: "lottiefiles.com または lottie.host の直接 .json リンク。アニメーションはカードの写真や動画と置き換わります。"
+    lottie_hint: "lottiefiles.com または lottie.host の .json / .lottie リンク。アニメーションはカードの写真や動画に置き換わります。"
+    animation_bg: "アニメーションの背景"
+    animation_bg_colour: "背景色"
+    animation_bg_image: "画像を使う"
+    animation_bg_clear: "ブランドカラーに戻す"
+    animation_bg_hint: "このカードのアニメーションの背面にのみ表示されます。未設定の場合はブランドのパネル色が使われます。"
     required_chip: '必須'
     ty_title_label: 'サンクスのタイトル'
     ty_body_label: 'サンクスのメッセージ'

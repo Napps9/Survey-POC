@@ -34,6 +34,7 @@ vi:
     new_response: "Câu trả lời mới"
     add_response: "Thêm câu trả lời"
     remove_response: "Xóa câu trả lời này"
+    remove_option: "Xoá thẻ"
     response_scale: "Số câu trả lời mỗi phát biểu"
     tap_scale:
       "no": "Không"
@@ -84,7 +85,7 @@ vi:
     eyebrow:
       range: "Kéo thanh trượt"
       rating: "Chạm để đánh giá"
-      nps: "Kéo để đánh giá"
+      nps: "Kéo chất lỏng"
       multiple_choice: "Chọn một"
       select_many: "Chọn tất cả đáp án phù hợp"
       prioritise: "Chạm và kéo để sắp xếp theo thứ tự ưu tiên"
@@ -115,7 +116,7 @@ vi:
     panel_label:
       range: "KÉO THANH TRƯỢT"
       rating: "CHẠM ĐỂ ĐÁNH GIÁ"
-      nps: "KÉO ĐỂ ĐÁNH GIÁ"
+      nps: "KÉO CHẤT LỎNG"
       multiple_choice: "CHỌN MỘT ĐÁP ÁN"
       select_many: "CHỌN TẤT CẢ ĐÁP ÁN PHÙ HỢP"
       prioritise: "KÉO ĐỂ SẮP XẾP"
@@ -364,6 +365,8 @@ vi:
     editor:
       delete_card_confirm: Xóa thẻ này?
       save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"
+      stock_search_hint: "Dùng từ khoá liên quan đến câu hỏi để có kết quả tốt hơn"
+      load_more: "Tải thêm"
       lottie_failed: "Liên kết đó không giống hoạt ảnh LottieFiles."
       appeal_note_prompt: "Bạn có muốn nhắn gì cho người xét duyệt không? (không bắt buộc)"
       appeal_submitting: "Đang gửi để xét duyệt…"
@@ -1009,9 +1012,14 @@ vi:
     emoji_search: "Tìm emoji…"
     emoji_clear: "Xóa"
     lottie_section: "Hoạt ảnh (Lottie)"
-    lottie_placeholder: "Dán liên kết LottieFiles, vd. https://lottie.host/….json"
+    lottie_placeholder: "Dán liên kết LottieFiles, ví dụ https://lottie.host/….lottie"
     lottie_apply: "Dùng hoạt ảnh"
-    lottie_hint: "Liên kết .json trực tiếp từ lottiefiles.com hoặc lottie.host. Hoạt ảnh thay thế ảnh hoặc video của thẻ."
+    lottie_hint: "Liên kết .json hoặc .lottie từ lottiefiles.com hoặc lottie.host. Ảnh động sẽ thay thế ảnh hoặc video của thẻ."
+    animation_bg: "Nền ảnh động"
+    animation_bg_colour: "Màu nền"
+    animation_bg_image: "Dùng hình ảnh"
+    animation_bg_clear: "Đặt lại về màu thương hiệu"
+    animation_bg_hint: "Chỉ hiển thị phía sau ảnh động trên thẻ này. Nếu không đặt, thẻ sẽ dùng màu bảng của thương hiệu bạn."
     required_chip: 'Bắt buộc'
     ty_title_label: 'Tiêu đề cảm ơn'
     ty_body_label: 'Lời nhắn cảm ơn'

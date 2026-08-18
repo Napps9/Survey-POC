@@ -11,10 +11,11 @@ export default class extends Controller {
     "libraryItem", "applyBtn", "clearBtn",
     "bgThumb", "bgRemoveBtn",
     "recommendedSection", "recommendedLabel", "recommendedGrid",
-    "searchInput", "searchSection", "searchStatus", "searchGrid",
+    "searchInput", "searchSection", "searchStatus", "searchGrid", "loadMore",
     "mediaToggle", "mediaTab",
     "saveToLibrary", "brandGrid", "libraryFileInput", "brandStatus",
     "lottieSection", "lottieInput", "lottieError", "lottieBtn",
+    "animBgSection", "animBgColor", "animBgClear",
     "cropStage", "cropFrame", "cropImg", "cropZoom",
     "appealBtn", "appealStatus", "approvedSection", "approvedGrid"
   ]
@@ -77,6 +78,7 @@ export default class extends Controller {
     this._setMedia("photos")            // cards can be photo or video
     this._showMediaToggle(true)
     this._showLottieSection(true)       // paste-a-LottieFiles-URL, cards only
+    this._syncAnimationBg()             // backdrop, only when the panel animates
 
     const currentUrl = card.dataset.cardImage || card.dataset.cardVideo || card.dataset.cardLottie || ""
     this.clearBtnTarget.hidden = !currentUrl
@@ -621,7 +623,14 @@ export default class extends Controller {
     this._searchTimer = setTimeout(() => this._runSearch(), 350)
   }
 
-  async _runSearch() {
+  // The Load more button. Walks to the next page of the SAME query and appends,
+  // so what the creator has already scrolled past stays put.
+  loadMoreStock(event) {
+    event?.preventDefault()
+    this._runSearch((this._searchPage || 1) + 1)
+  }
+
+  async _runSearch(page = 1) {
     if (!this.hasPexsearchUrlValue || !this.hasSearchGridTarget) return
     const q = (this.hasSearchInputTarget ? this.searchInputTarget.value : "").trim()
     if (!q) { this._clearSearch(); return }
@@ -629,15 +638,19 @@ export default class extends Controller {
     const context = this._mode === "background" ? "background" : "card"
     const media   = this._searchMedia
     const noun    = media === "videos" ? "videos" : "photos"
-    this._showSearchStatus("Searching…")
-    this.searchGridTarget.replaceChildren()
+    const append  = page > 1
+    this._showSearchStatus(append ? "" : "Searching…")
+    this._showLoadMore(false)
+    // Page 1 is a NEW search and replaces the grid; later pages extend it.
+    if (!append) this.searchGridTarget.replaceChildren()
 
     const token = (this._searchToken = (this._searchToken || 0) + 1)
     try {
-      const url = `${this.pexsearchUrlValue}?q=${encodeURIComponent(q)}&context=${context}&media=${media}`
+      const url = `${this.pexsearchUrlValue}?q=${encodeURIComponent(q)}&context=${context}&media=${media}&page=${page}`
       const resp = await fetch(url, { headers: { "Accept": "application/json" } })
       const data = await resp.json()
       if (token !== this._searchToken) return // a newer search superseded this one
+      this._searchPage = Number(data.page) || page
 
       const items = Array.isArray(data.images) ? data.images : []
       if (data.error === "search_unavailable") {
@@ -649,38 +662,91 @@ export default class extends Controller {
         return
       }
       if (!items.length) {
+        // On a later page an empty result just means the well ran dry; only say
+        // so from page 1, where it's the answer to what the creator asked.
+        if (append) { this._showLoadMore(false); return }
         this._showSearchStatus(data.error ? "Couldn’t reach the stock service." : `No ${noun} found.`)
         return
       }
       this._showSearchStatus("")
       const frag = document.createDocumentFragment()
       for (const item of items) {
-        const isVideo = item && item.type === "video"
-        if (!item || (!item.url && !item.video)) continue
-        const btn = document.createElement("button")
-        btn.type = "button"
-        btn.className = isVideo ? "media-library-item is-video" : "media-library-item"
-        const verb = isVideo ? "Video" : "Photo"
-        btn.title = item.photographer ? `${verb} by ${item.photographer}` : (item.alt || "")
-        const thumb = item.thumb || item.poster || item.url
-        if (thumb) btn.style.backgroundImage = `url('${String(thumb).replace(/'/g, "\\'")}')`
-        if (isVideo) {
-          btn.dataset.video = item.video
-          if (item.poster) btn.dataset.poster = item.poster
-        } else {
-          btn.dataset.url = item.url
-        }
-        if (item.photographer) btn.dataset.credit = item.photographer
-        if (item.photographer_url) btn.dataset.creditUrl = item.photographer_url
-        btn.dataset.mediaPickerTarget = "libraryItem"
-        btn.dataset.action = "click->media-picker#pickLibraryItem"
-        btn.setAttribute("aria-selected", "false")
-        frag.appendChild(btn)
+        const tile = this._stockTile(item)
+        if (tile) frag.appendChild(tile)
       }
       this.searchGridTarget.appendChild(frag)
+      this._showLoadMore(data.more !== false)
     } catch (_e) {
       if (token === this._searchToken) this._showSearchStatus("Couldn’t reach the stock service.")
     }
+  }
+
+  // One stock result tile. Returns null for a result with nothing to show.
+  _stockTile(item) {
+    const isVideo = item && item.type === "video"
+    if (!item || (!item.url && !item.video)) return null
+    const btn = document.createElement("button")
+    btn.type = "button"
+    btn.className = isVideo ? "media-library-item is-video" : "media-library-item"
+    const verb = isVideo ? "Video" : "Photo"
+    btn.title = item.photographer ? `${verb} by ${item.photographer}` : (item.alt || "")
+    const thumb = item.thumb || item.poster || item.url
+    if (thumb) btn.style.backgroundImage = `url('${String(thumb).replace(/'/g, "\\'")}')`
+    if (isVideo) {
+      btn.dataset.video = item.video
+      if (item.poster) btn.dataset.poster = item.poster
+      // Preview on hover. The playable mp4 already rides on the tile for the
+      // apply path, so this costs no extra request until someone points at it.
+      btn.addEventListener("mouseenter", () => this._previewVideo(btn))
+      btn.addEventListener("mouseleave", () => this._stopPreview(btn))
+      btn.addEventListener("focus", () => this._previewVideo(btn))
+      btn.addEventListener("blur", () => this._stopPreview(btn))
+    } else {
+      btn.dataset.url = item.url
+    }
+    if (item.photographer) btn.dataset.credit = item.photographer
+    if (item.photographer_url) btn.dataset.creditUrl = item.photographer_url
+    btn.dataset.mediaPickerTarget = "libraryItem"
+    btn.dataset.action = "click->media-picker#pickLibraryItem"
+    btn.setAttribute("aria-selected", "false")
+    return btn
+  }
+
+  // Muted, looping, inline — a thumbnail that moves, not a player. Held back
+  // behind a short dwell so sweeping the pointer across the grid doesn't kick
+  // off a dozen downloads, and skipped entirely when the viewer has asked for
+  // reduced motion or the device can't hover (a touch "hover" is a tap, which
+  // is the apply gesture).
+  _previewVideo(btn) {
+    if (!btn.dataset.video || btn.querySelector("video")) return
+    if (window.matchMedia("(prefers-reduced-motion: reduce), (hover: none)").matches) return
+    clearTimeout(btn._previewTimer)
+    btn._previewTimer = setTimeout(() => {
+      if (btn.querySelector("video")) return
+      const vid = document.createElement("video")
+      vid.className = "media-library-preview"
+      vid.src = btn.dataset.video
+      vid.muted = true
+      vid.loop = true
+      vid.playsInline = true
+      vid.preload = "metadata"
+      if (btn.dataset.poster) vid.poster = btn.dataset.poster
+      btn.appendChild(vid)
+      vid.play().catch(() => { /* autoplay refused — the poster still shows */ })
+    }, 180)
+  }
+
+  _stopPreview(btn) {
+    clearTimeout(btn._previewTimer)
+    const vid = btn.querySelector("video")
+    if (!vid) return
+    vid.pause()
+    vid.remove()
+  }
+
+  _showLoadMore(show) {
+    if (!this.hasLoadMoreTarget) return
+    this.loadMoreTarget.hidden = !show
   }
 
   _showSearchStatus(text) {
@@ -691,6 +757,8 @@ export default class extends Controller {
   _clearSearch() {
     clearTimeout(this._searchTimer)
     this._searchToken = (this._searchToken || 0) + 1 // invalidate in-flight results
+    this._searchPage = 1
+    this._showLoadMore(false)
     if (this.hasSearchInputTarget) this.searchInputTarget.value = ""
     if (this.hasSearchGridTarget) this.searchGridTarget.replaceChildren()
     if (this.hasSearchStatusTarget) this.searchStatusTarget.textContent = ""
@@ -748,6 +816,13 @@ export default class extends Controller {
       return
     }
     if (!this._activeCard) return
+    if (this._mode === "animBg") {
+      // Behind the animation, not instead of it — the card's own lottie/range
+      // media is untouched.
+      if (this._pendingUrl) this._writeAnimBg({ ...this._readAnimBg(), image: this._pendingUrl })
+      this.close()
+      return
+    }
     if (this._mode === "tapOption") {
       // Tap-card statements are photos only (the video toggle stays hidden
       // for this mode), so there's nothing to check for _pendingVideo here.
@@ -1198,6 +1273,82 @@ export default class extends Controller {
   _showLottieSection(show) {
     if (this.hasLottieSectionTarget) this.lottieSectionTarget.hidden = !show
     if (show && this.hasLottieErrorTarget) this.lottieErrorTarget.hidden = true
+  }
+
+  // ── Animation backdrop ────────────────────────────────────────────────
+  // A per-card colour/image behind a Lottie or a range card's reaction set,
+  // overriding the Verto-wide --brand-panel. Stored as card.media_bg and read
+  // back off the card row by the editor serialiser.
+
+  get _cardAnimates() {
+    const card = this._activeCard
+    if (!card) return false
+    return card.dataset.cardType === "range" || !!card.dataset.cardLottie
+  }
+
+  _readAnimBg() {
+    try { return JSON.parse(this._activeCard?.dataset.cardMediaBg || "{}") || {} }
+    catch (_) { return {} }
+  }
+
+  // One writer for the card row's dataset, the live panel style and the dirty
+  // flag, so the preview and what autosave will send can never disagree.
+  _writeAnimBg(bg) {
+    const card = this._activeCard
+    if (!card) return
+    const clean = {}
+    if (bg?.color) clean.color = bg.color
+    if (bg?.image) clean.image = bg.image
+
+    if (Object.keys(clean).length) card.dataset.cardMediaBg = JSON.stringify(clean)
+    else delete card.dataset.cardMediaBg
+
+    const left = card.querySelector(".split-left")
+    if (left) {
+      left.style.backgroundColor = clean.color || ""
+      left.style.backgroundImage = clean.image ? `url('${String(clean.image).replace(/'/g, "\\'")}')` : ""
+      left.style.backgroundSize     = clean.image ? "cover" : ""
+      left.style.backgroundPosition = clean.image ? "center" : ""
+    }
+    // _notifyDirty, not dispatch("changed"): the editor root listens for
+    // `input`, and there is no media-picker:changed binding to pick up — a
+    // custom event here would leave the backdrop unsaved until some unrelated
+    // edit happened to mark the deck dirty.
+    this._notifyDirty()
+  }
+
+  _syncAnimationBg() {
+    const show = this._mode === "card" && this._cardAnimates
+    if (this.hasAnimBgSectionTarget) this.animBgSectionTarget.hidden = !show
+    if (!show) return
+    const bg = this._readAnimBg()
+    if (this.hasAnimBgColorTarget && bg.color) this.animBgColorTarget.value = bg.color
+    if (this.hasAnimBgClearTarget) this.animBgClearTarget.hidden = !(bg.color || bg.image)
+  }
+
+  setAnimBgColor(event) {
+    this._writeAnimBg({ ...this._readAnimBg(), color: event.target.value })
+    this._syncAnimationBg()
+  }
+
+  // Reuse the library/upload picker for the backdrop image by flipping the
+  // mode — applyImage routes back here rather than onto the card's own media,
+  // so the animation stays put and only what is behind it changes.
+  openAnimBgImage(event) {
+    event?.preventDefault()
+    this._mode = "animBg"
+    this._switchTabKey("library")
+    this._setMedia("photos")
+    this._showMediaToggle(false)
+    this._showLottieSection(false)
+    if (this.hasAnimBgSectionTarget) this.animBgSectionTarget.hidden = true
+  }
+
+  clearAnimBg(event) {
+    event?.preventDefault()
+    this._writeAnimBg({})
+    if (this.hasAnimBgColorTarget) this.animBgColorTarget.value = "#2E3564"
+    this._syncAnimationBg()
   }
 
   async applyLottie(event) {

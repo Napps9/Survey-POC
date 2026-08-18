@@ -34,6 +34,7 @@ pt:
     new_response: "Nova resposta"
     add_response: "Adicionar uma resposta"
     remove_response: "Remover esta resposta"
+    remove_option: "Eliminar cartão"
     response_scale: "Respostas por afirmação"
     tap_scale:
       "no": "Não"
@@ -84,7 +85,7 @@ pt:
     eyebrow:
       range: "Arraste o cursor"
       rating: "Toque para avaliar"
-      nps: "Arraste para avaliar"
+      nps: "Arraste o líquido"
       multiple_choice: "Escolha uma opção"
       select_many: "Escolha todas as opções aplicáveis"
       prioritise: "Clique e arraste para ordenar por prioridade"
@@ -115,7 +116,7 @@ pt:
     panel_label:
       range: "ARRASTE O CONTROLE DESLIZANTE"
       rating: "TOQUE PARA AVALIAR"
-      nps: "ARRASTE PARA AVALIAR"
+      nps: "ARRASTE O LÍQUIDO"
       multiple_choice: "ESCOLHA UMA OPÇÃO"
       select_many: "ESCOLHA TODAS AS OPÇÕES APLICÁVEIS"
       prioritise: "ARRASTE PARA ORDENAR"
@@ -364,6 +365,8 @@ pt:
     editor:
       delete_card_confirm: Eliminar este cartão?
       save_to_library: "Salvar também na minha biblioteca de marca"
+      stock_search_hint: "Use palavras-chave relacionadas com a pergunta para obter melhores resultados"
+      load_more: "Carregar mais"
       lottie_failed: "Esse link não parece uma animação do LottieFiles."
       appeal_note_prompt: "Quer dizer algo ao revisor? (opcional)"
       appeal_submitting: "A enviar para revisão…"
@@ -1009,9 +1012,14 @@ pt:
     emoji_search: "Procurar emoji…"
     emoji_clear: "Limpar"
     lottie_section: "Animação (Lottie)"
-    lottie_placeholder: "Cole um link do LottieFiles, ex.: https://lottie.host/….json"
+    lottie_placeholder: "Cole um link do LottieFiles, ex. https://lottie.host/….lottie"
     lottie_apply: "Usar animação"
-    lottie_hint: "Links .json diretos de lottiefiles.com ou lottie.host. A animação substitui a foto ou o vídeo do cartão."
+    lottie_hint: "Links .json ou .lottie de lottiefiles.com ou lottie.host. A animação substitui a foto ou o vídeo do cartão."
+    animation_bg: "Fundo da animação"
+    animation_bg_colour: "Cor de fundo"
+    animation_bg_image: "Usar uma imagem"
+    animation_bg_clear: "Repor a cor da marca"
+    animation_bg_hint: "Aparece por trás da animação apenas neste cartão. Sem isto, o cartão usa a cor de painel da sua marca."
     required_chip: 'Obrigatória'
     ty_title_label: 'Título de agradecimento'
     ty_body_label: 'Mensagem de agradecimento'

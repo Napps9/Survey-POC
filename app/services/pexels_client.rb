@@ -88,44 +88,71 @@ class PexelsClient
     end
   end
 
+  # Why a search came back empty, or nil when it genuinely was empty. The
+  # search methods still return [] on failure so AssetPopulator keeps degrading
+  # to the curated library, but "Pexels is down" and "nobody has photographed
+  # this" are different facts and the editor needs to tell a creator which one
+  # it hit. Without this the media picker reported an outage as "No photos
+  # found." — a rate-limit or an expired key read as a bad search term.
+  attr_reader :last_error
+
   def initialize(api_key: self.class.api_key)
-    @api_key = api_key
+    @api_key    = api_key
+    @last_error = nil
   end
 
   # Returns the parsed `photos` array (possibly empty). Never raises — any
-  # network/parse/non-200 error is logged and yields [] so callers degrade to
-  # their fallback instead of breaking Verto creation or the editor.
+  # network/parse/non-200 error is logged, recorded on #last_error, and yields
+  # [] so callers degrade to their fallback instead of breaking Verto creation
+  # or the editor.
   def search(query:, orientation: nil, per_page: 30, page: 1)
-    q = query.to_s.strip
-    return [] if q.blank? || @api_key.blank?
-
-    params = { query: q, per_page: per_page.clamp(1, 80), page: [ page.to_i, 1 ].max }
-    params[:orientation] = orientation if orientation.present?
-
-    body = get_json(ENDPOINT, params)
-    Array(body && body["photos"])
-  rescue => e
-    ErrorReporting.report("PexelsClient", e)
-    []
+    fetch_list("photos", ENDPOINT, query:, orientation:, per_page:, page:)
   end
 
   # Returns the parsed `videos` array (possibly empty). Same graceful contract
   # as #search — never raises.
   def search_videos(query:, orientation: nil, per_page: 15, page: 1)
+    fetch_list("videos", VIDEO_ENDPOINT, query:, orientation:, per_page:, page:)
+  end
+
+  private
+
+  def fetch_list(key, endpoint, query:, orientation:, per_page:, page:)
+    @last_error = nil
     q = query.to_s.strip
-    return [] if q.blank? || @api_key.blank?
+    return [] if q.blank?
+    if @api_key.blank?
+      @last_error = :unconfigured
+      return []
+    end
 
     params = { query: q, per_page: per_page.clamp(1, 80), page: [ page.to_i, 1 ].max }
     params[:orientation] = orientation if orientation.present?
 
-    body = get_json(VIDEO_ENDPOINT, params)
-    Array(body && body["videos"])
+    body = cached(key, endpoint, params) { get_json(endpoint, params) }
+    Array(body && body[key])
   rescue => e
-    ErrorReporting.report("PexelsClient", e)
+    ErrorReporting.report("PexelsClient", e, endpoint: endpoint, query: query.to_s)
+    @last_error = :exception
     []
   end
 
-  private
+  # Memoise successful responses briefly. The picker searches on a 350 ms
+  # debounce, so a creator typing "graduation" spends a request per keystroke
+  # pause and repeats every one of them each time they reopen the modal — a
+  # cheap way to spend a rate limit that a whole team shares. Only hits are
+  # cached: a failure must be retried, not pinned for the TTL.
+  CACHE_TTL = 15.minutes
+
+  def cached(key, endpoint, params)
+    cache_key = [ "pexels", key, endpoint, params.sort.to_h ].join("/")
+    if (hit = Rails.cache.read(cache_key))
+      return hit
+    end
+    body = yield
+    Rails.cache.write(cache_key, body, expires_in: CACHE_TTL) if body
+    body
+  end
 
   # Isolated HTTP seam so tests can stub a canned response.
   def get_json(url, params)
@@ -143,7 +170,12 @@ class PexelsClient
 
     res = http.request(req)
     unless res.is_a?(Net::HTTPSuccess)
+      # The code is the diagnosis: 401 means the key was revoked or rotated,
+      # 429 means the shared quota is spent, 5xx means Pexels itself. Keep it in
+      # the log line AND on last_error so an outage is answerable without
+      # guesswork.
       Rails.logger.warn("[PexelsClient] HTTP #{res.code} for query")
+      @last_error = :"http_#{res.code}"
       return nil
     end
     JSON.parse(res.body)

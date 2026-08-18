@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { choiceListItemHtml, prioritiseItemHtml } from "lib/choice_templates"
+import { choiceListItemHtml, prioritiseItemHtml, esc } from "lib/choice_templates"
 import { tapResponseStripHtml } from "lib/tap_response_templates"
 import { resolveResponses, presetFor, MIN_TAP_RESPONSES, MAX_TAP_RESPONSES } from "lib/tap_scales"
 import { t } from "lib/i18n"
@@ -9,12 +9,23 @@ const SWIPE_FILLS = [
   ["#f8d7da","#f5a8b0"], ["#e2d9f3","#c3aee8"]
 ]
 
+// The fewest options a card may be cut down to from the editor. One is enough
+// to keep the card a question and to give "add option" a row to clone.
+const MIN_CARD_OPTIONS = 1
+
 export default class extends Controller {
   deleteOption(event) {
     event.stopPropagation()
     const item = event.currentTarget.closest(".pick-item, .rotate-card")
     if (!item) return
     const wasTapCard = item.classList.contains("rotate-card")
+    // Floor guard, matching deleteResponse's MIN_TAP_RESPONSES: a card with no
+    // options left is not a question any more, and the editor gives no way back
+    // — the "add" row is the only route and it needs somewhere to add to. Now
+    // that the delete chip is actually visible this is reachable by accident,
+    // where before it was hidden behind an invisible control.
+    const peers = item.parentElement?.querySelectorAll(wasTapCard ? ".rotate-card" : ".pick-item")
+    if (peers && peers.length <= MIN_CARD_OPTIONS) return
     // A tap card's option_images are POSITIONAL — image[i] belongs to
     // statement[i] — and serialize() bounds the array by truncating its TAIL.
     // So removing a statement without removing its image shifted every picture
@@ -97,7 +108,7 @@ export default class extends Controller {
     card.innerHTML = `
       <div class="rotate-card-media" style="background:${mediaBg}"></div>
       <div class="rotate-card-statement"><span contenteditable="true">New statement</span></div>
-      <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption">×</button>
+      <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption" title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>
     `
     stack.appendChild(card)
 

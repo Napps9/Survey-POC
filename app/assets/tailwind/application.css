@@ -268,6 +268,15 @@
   margin: 0 auto;
   border-radius: 24px;
   overflow: hidden;
+  /* Hoisted out of the mobile block (where it was added for the hero strip):
+     .card-lottie/.nps-lottie are position:absolute;inset:0 and normally resolve
+     against .split-left, but any rule that makes .split-left display:contents
+     (the hero strip, .hero-off) removes its box — and with no positioned
+     ancestor here they'd resolve against the fixed, full-viewport
+     .preview-overlay and paint outside the card. Keeping it positioned at every
+     width means the card is always the containing block.
+     See test/lib/player_hero_css_test.rb for the mobile half of this. */
+  position: relative;
   box-shadow: 0 16px 40px rgba(0,0,0,0.25);
   background: white;
 }
@@ -414,8 +423,8 @@
 .nps-control {
   position: relative;
   width: auto;
-  height: 320px;
-  aspect-ratio: var(--nps-aspect, 84 / 340);
+  height: var(--nps-h, 320px);
+  aspect-ratio: var(--nps-aspect, 168 / 340);
   flex: 0 0 auto;
 }
 .nps-vessel {
@@ -428,8 +437,13 @@
    grows: at fill 0 it's translated fully below the vessel (empty); at fill 1
    its surface reaches the brim (full). Waves + bubbles animate inside it, so
    they only ever show within the fluid. */
+/* At fill 1 the surface rests on --nps-top (the vessel's brim); at fill 0 it
+   has fallen --nps-travel to the floor. Both come from the shape's own path via
+   nps_stage_style, replacing a single hard-coded 306px that fitted only half
+   the silhouettes — the default pill kept liquid showing at "0", and every
+   shape overshot its brim so the top few steps were indistinguishable. */
 .nps-liquid {
-  transform: translateY(calc((1 - var(--nps-fill, 0)) * 306px));
+  transform: translateY(calc(var(--nps-top, 4px) + (1 - var(--nps-fill, 0)) * var(--nps-travel, 306px)));
   transition: transform 0.24s cubic-bezier(.34,1.1,.64,1);
 }
 .nps-wave  { animation: nps-wave 2.3s linear infinite; }
@@ -608,18 +622,39 @@
    equal 1/N share of the column height (flex:1) and centres its text
    vertically — so the label centres land exactly where the inset thumb
    travels. */
-.nps-slider-labels {
+/* The digits are positioned against the LIQUID's range, not the column's own
+   height. Padding insets the track to the vessel's interior (--nps-top-f /
+   --nps-bot-f, the same path-derived bounds the fill uses), and space-between
+   over zero-height items puts label i's centre exactly on fill level i — so "0"
+   sits on the empty line and the last label on the brim. The old rule split the
+   full column into N equal bands, which spaces centres at (i+0.5)/N instead of
+   i/(N-1): a ~14px error at the bottom of an 11-point scale, and the reason the
+   tube looked like it stopped short of 0 and 10. */
+/* Compound selector on purpose: the generic `.slider-labels` rule further down
+   the file sets `padding: 0 4px` and `margin-top: 6px`, and at equal
+   specificity the later rule wins — which silently zeroed the insets below and
+   pushed the whole column 6px down, putting "0" 38px under the vessel floor.
+   Matching both classes outranks it wherever it sits. */
+.slider-labels.nps-slider-labels {
   display: flex;
   flex-direction: column-reverse;
-  height: 320px;
+  justify-content: space-between;
+  box-sizing: border-box;
+  height: var(--nps-h, 320px);
+  margin-top: 0;
+  padding: calc(var(--nps-h, 320px) * var(--nps-top-f, 0)) 4px
+           calc(var(--nps-h, 320px) * var(--nps-bot-f, 0));
   min-width: 48px;
 }
 .nps-slider-labels .slider-label-text {
-  flex: 1 0 0;
+  flex: 0 0 0;
+  height: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   text-align: right;
+  overflow: visible;
+  white-space: nowrap;
 }
 .nps-slider-labels .slider-label-text.is-active {
   color: var(--brand-primary, #01EACB);
@@ -886,7 +921,15 @@
   overflow-y: auto;
   flex: 1;
 }
+/* display:block is load-bearing, not tidiness. This is a <label> (so clicking
+   anywhere in it opens the hidden file input), and a label is display:inline by
+   default — Tailwind's preflight blockifies img/svg/video/… but not label. An
+   inline box holding block children gets split around them, and the leading
+   fragment here is empty, so the dashed border painted as a one-line-tall sliver
+   floating to the LEFT of the pane instead of a box around the dropzone. The
+   padding, radius and centring below only apply once it generates a block box. */
 .media-upload-zone {
+  display: block;
   border: 1.5px dashed rgba(255,255,255,0.18);
   border-radius: 14px;
   padding: 40px 24px;
@@ -923,6 +966,19 @@
 }
 .media-library-item:hover { border-color: rgba(1,234,203,0.5); transform: translateY(-2px); }
 .media-library-item[aria-selected="true"] { border-color: #01EACB; }
+/* Hover preview for a stock video tile. Covers the poster it is previewing, so
+   the tile keeps its exact footprint and the grid never reflows; pointer-events
+   stay off so the click still lands on the button underneath and picks the
+   video. Only mounted while hovered/focused — see media_picker#_previewVideo. */
+.media-library-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  border-radius: 10px;
+}
 /* The admin "add to library" tile — same footprint as an asset tile, drawn
    as an affordance rather than an image. */
 .media-library-add {
@@ -973,6 +1029,70 @@
 }
 .media-search-input::placeholder { color: rgba(255,255,255,0.4); }
 .media-search-input:focus { outline: none; border-color: rgba(1,234,203,0.6); }
+/* Coaching line under the search box — stock results are only as good as the
+   words, and creators tended to search the card's whole question. */
+/* Animation backdrop control — the per-card colour/image behind a Lottie or a
+   range card's reaction set. Same visual family as the Lottie row above it. */
+.media-animbg-section { margin-top: 18px; }
+.media-animbg-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.media-animbg-color {
+  width: 38px; height: 38px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+}
+.media-animbg-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.8);
+  font-family: "ABeeZee", sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.media-animbg-btn:hover {
+  background: rgba(1,234,203,0.08);
+  border-color: rgba(1,234,203,0.45);
+  color: #fff;
+}
+.media-animbg-btn.is-clear { margin-left: auto; }
+
+.media-search-hint {
+  margin: 6px 2px 0;
+  color: rgba(255,255,255,0.45);
+  font-size: 12px;
+  line-height: 1.4;
+}
+/* Load more sits under the results grid, full width so it reads as "the list
+   continues" rather than as an action on any one tile. */
+.media-load-more {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.media-load-more:hover {
+  background: rgba(1,234,203,0.08);
+  border-color: rgba(1,234,203,0.45);
+  color: #fff;
+}
 .media-library-status {
   color: rgba(255,255,255,0.45);
   font-size: 13px;
@@ -5122,16 +5242,26 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .pick-add-btn:hover { background: rgba(1,234,203,0.04); }
 
-/* ── Tap card delete & add ───────────────────────── */
+/* ── Tap card delete & add ─────────────────────────
+   Mirrors .tap-card-image-btn below: same size and offset, opposite corner. It
+   used to be a bare 20%-black glyph with no backdrop, which on a photographic
+   statement card was invisible even while hovered — creators asked how to
+   remove a statement because they could not see the control that does it. The
+   circular chip gives it something to read against on any image.
+   :focus-within on the card keeps it reachable by keyboard, matching
+   .tap-response-delete. */
 .tap-card-delete {
   position: absolute; top: 7px; right: 9px;
-  background: transparent; border: none;
-  cursor: pointer; color: rgba(0,0,0,0.2); font-size: 15px;
-  opacity: 0; transition: opacity 0.15s, color 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  background: rgba(0,0,0,0.55); border: none; border-radius: 50%;
+  cursor: pointer; color: #fff; font-size: 14px;
+  opacity: 0; transition: opacity 0.15s, background 0.15s, color 0.15s;
   z-index: 10; line-height: 1; padding: 0;
 }
-.rotate-card:hover .tap-card-delete { opacity: 1; }
-.tap-card-delete:hover { color: #D80027; }
+.rotate-card:hover .tap-card-delete,
+.rotate-card:focus-within .tap-card-delete { opacity: 1; }
+.tap-card-delete:hover { background: #D80027; color: #fff; }
 .tap-card-image-btn {
   position: absolute; top: 7px; left: 9px;
   display: flex; align-items: center; justify-content: center;
@@ -6529,14 +6659,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
      sharing the vessel's height — so the number is a custom property stated
      once: two hand-kept copies of a clamp is how the labels shear off the
      steps the day someone tunes one of them. */
-  .preview-overlay { --nps-vessel-h: clamp(232px, 42svh, 320px); }
-  .preview-overlay .nps-control { height: var(--nps-vessel-h); }
+  /* One assignment now does both: --nps-h is what .nps-control and
+     .nps-slider-labels each size from (and what the labels' interior insets are
+     computed against), so there is no longer a pair of heights to keep in step
+     by hand — the concern the comment above was written about. */
+  .preview-overlay { --nps-vessel-h: clamp(232px, 42svh, 320px); --nps-h: var(--nps-vessel-h); }
   .preview-overlay .nps-slider { gap: 8px; }
   .preview-overlay .nps-slider-stage { gap: 12px; }
-  .preview-overlay .nps-slider-labels {
-    height: var(--nps-vessel-h);   /* the vessel's own track — see above */
-    min-width: 44px;
-  }
+  .preview-overlay .nps-slider-labels { min-width: 44px; }
   /* NPS is the one scale that keeps 13px — see the .slider-label-text rule
      further down for why. */
   .preview-overlay .nps-slider-labels .slider-label-text {
@@ -7480,9 +7610,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
 }
 
-/* Touch-only — show controls that desktop reveals on :hover */
+/* Touch-only — show controls that desktop reveals on :hover. A control that is
+   ONLY reachable via :hover does not exist on a tablet, so every hover-revealed
+   editor affordance belongs on this list. The tap card's two chips were missing
+   from it, which is why a statement could not be deleted or re-imaged on an
+   iPad at all. */
 @media (hover: none) and (pointer: coarse) {
-  .pick-item-delete { opacity: 1; }
+  .pick-item-delete,
+  .tap-card-delete,
+  .tap-card-image-btn { opacity: 1; }
 }
 
 /* ── Queued-submit pill: shown on the thank-you screen when the offline

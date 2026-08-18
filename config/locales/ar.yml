@@ -34,6 +34,7 @@ ar:
     new_response: "إجابة جديدة"
     add_response: "إضافة إجابة"
     remove_response: "حذف هذه الإجابة"
+    remove_option: "حذف البطاقة"
     response_scale: "عدد الإجابات لكل عبارة"
     tap_scale:
       "no": "لا"
@@ -84,7 +85,7 @@ ar:
     eyebrow:
       range: "اسحب شريط التمرير"
       rating: "اضغط للتقييم"
-      nps: "اسحب للتقييم"
+      nps: "اسحب السائل"
       multiple_choice: "اختر خيارًا واحدًا"
       select_many: "اختر كل ما ينطبق"
       prioritise: "اضغط واسحب لترتيبها حسب الأولوية"
@@ -115,7 +116,7 @@ ar:
     panel_label:
       range: "اسحب المؤشر"
       rating: "اضغط للتقييم"
-      nps: "اسحب للتقييم"
+      nps: "اسحب السائل"
       multiple_choice: "اختر خيارًا واحدًا"
       select_many: "اختر كل ما ينطبق"
       prioritise: "اسحب لترتيبها"
@@ -364,6 +365,8 @@ ar:
     editor:
       delete_card_confirm: حذف هذه البطاقة؟
       save_to_library: "حفظ أيضًا في مكتبة العلامة التجارية"
+      stock_search_hint: "استخدم كلمات مفتاحية مرتبطة بالسؤال للحصول على نتائج أفضل"
+      load_more: "تحميل المزيد"
       lottie_failed: "لا يبدو أن هذا الرابط رسوم متحركة من LottieFiles."
       appeal_note_prompt: "هل تريد إخبار المراجع بأي شيء؟ (اختياري)"
       appeal_submitting: "جارٍ الإرسال للمراجعة…"
@@ -1009,9 +1012,14 @@ ar:
     emoji_search: "ابحث عن رمز…"
     emoji_clear: "مسح"
     lottie_section: "رسوم متحركة (Lottie)"
-    lottie_placeholder: "الصق رابط LottieFiles، مثل https://lottie.host/….json"
+    lottie_placeholder: "الصق رابط LottieFiles، مثل https://lottie.host/….lottie"
     lottie_apply: "استخدام الرسوم"
-    lottie_hint: "روابط .json مباشرة من lottiefiles.com أو lottie.host. تحل الرسوم المتحركة محل صورة البطاقة أو فيديوها."
+    lottie_hint: "روابط ‎.json‎ أو ‎.lottie‎ من lottiefiles.com أو lottie.host. تحل الرسوم المتحركة محل صورة البطاقة أو الفيديو."
+    animation_bg: "خلفية الرسوم المتحركة"
+    animation_bg_colour: "لون الخلفية"
+    animation_bg_image: "استخدام صورة"
+    animation_bg_clear: "إعادة التعيين إلى لون العلامة"
+    animation_bg_hint: "يظهر خلف الرسوم المتحركة في هذه البطاقة فقط. بدونه تستخدم البطاقة لون لوحة علامتك التجارية."
     required_chip: 'إلزامي'
     ty_title_label: 'عنوان الشكر'
     ty_body_label: 'رسالة الشكر'

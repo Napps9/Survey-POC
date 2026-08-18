@@ -34,6 +34,7 @@ sw:
     new_response: "Jibu jipya"
     add_response: "Ongeza jibu"
     remove_response: "Ondoa jibu hili"
+    remove_option: "Futa kadi"
     response_scale: "Majibu kwa kila kauli"
     tap_scale:
       "no": "Hapana"
@@ -84,7 +85,7 @@ sw:
     eyebrow:
       range: "Buruta kitelezi"
       rating: "Gusa ili kukadiria"
-      nps: "Buruta ili kukadiria"
+      nps: "Buruta kimiminika"
       multiple_choice: "Chagua moja"
       select_many: "Chagua zote zinazofaa"
       prioritise: "Bofya na buruta ili kupanga kwa vipaumbele"
@@ -115,7 +116,7 @@ sw:
     panel_label:
       range: "BURUTA KITELEZI"
       rating: "GUSA ILI KUKADIRIA"
-      nps: "BURUTA ILI KUKADIRIA"
+      nps: "BURUTA KIMIMINIKA"
       multiple_choice: "CHAGUA CHAGUO MOJA"
       select_many: "CHAGUA ZOTE ZINAZOFAA"
       prioritise: "BURUTA ILI KUPANGA"
@@ -364,6 +365,8 @@ sw:
     editor:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"
+      stock_search_hint: "Tumia maneno muhimu yanayohusiana na swali ili kupata matokeo bora"
+      load_more: "Pakia zaidi"
       lottie_failed: "Kiungo hicho hakionekani kama uhuishaji wa LottieFiles."
       appeal_note_prompt: "Kuna kitu ungependa kumwambia mkaguzi? (si lazima)"
       appeal_submitting: "Inatuma kwa ukaguzi…"
@@ -1009,9 +1012,14 @@ sw:
     emoji_search: "Tafuta emoji…"
     emoji_clear: "Futa"
     lottie_section: "Uhuishaji (Lottie)"
-    lottie_placeholder: "Bandika kiungo cha LottieFiles, k.m. https://lottie.host/….json"
+    lottie_placeholder: "Bandika kiungo cha LottieFiles, mfano https://lottie.host/….lottie"
     lottie_apply: "Tumia uhuishaji"
-    lottie_hint: "Viungo vya moja kwa moja vya .json kutoka lottiefiles.com au lottie.host. Uhuishaji huchukua nafasi ya picha au video ya kadi."
+    lottie_hint: "Viungo vya .json au .lottie kutoka lottiefiles.com au lottie.host. Uhuishaji hubadilisha picha au video ya kadi."
+    animation_bg: "Mandharinyuma ya uhuishaji"
+    animation_bg_colour: "Rangi ya mandharinyuma"
+    animation_bg_image: "Tumia picha"
+    animation_bg_clear: "Rudisha rangi ya chapa"
+    animation_bg_hint: "Huonekana nyuma ya uhuishaji kwenye kadi hii pekee. Bila hiyo, kadi hutumia rangi ya paneli ya chapa yako."
     required_chip: 'Lazima'
     ty_title_label: 'Kichwa cha shukrani'
     ty_body_label: 'Ujumbe wa shukrani'

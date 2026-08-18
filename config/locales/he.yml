@@ -34,6 +34,7 @@ he:
     new_response: "תשובה חדשה"
     add_response: "הוספת תשובה"
     remove_response: "הסרת תשובה זו"
+    remove_option: "מחיקת כרטיס"
     response_scale: "תשובות לכל היגד"
     tap_scale:
       "no": "לא"
@@ -84,7 +85,7 @@ he:
     eyebrow:
       range: "גרור את המחוון"
       rating: "הקש כדי לדרג"
-      nps: "גרור כדי לדרג"
+      nps: "גררו את הנוזל"
       multiple_choice: "בחר אפשרות אחת"
       select_many: "סמן את כל האפשרויות המתאימות"
       prioritise: "לחץ וגרור כדי לסדר לפי סדר עדיפויות"
@@ -115,7 +116,7 @@ he:
     panel_label:
       range: "גרור את המחוון"
       rating: "הקש כדי לדרג"
-      nps: "גרור כדי לדרג"
+      nps: "גררו את הנוזל"
       multiple_choice: "בחר אפשרות אחת"
       select_many: "סמן את כל האפשרויות המתאימות"
       prioritise: "גרור כדי לסדר"
@@ -364,6 +365,8 @@ he:
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
       save_to_library: "שמור גם בספריית המותג שלי"
+      stock_search_hint: "השתמשו במילות מפתח הקשורות לשאלה לקבלת תוצאות טובות יותר"
+      load_more: "טעינת עוד"
       lottie_failed: "הקישור הזה לא נראה כמו אנימציית LottieFiles."
       appeal_note_prompt: "יש משהו שתרצו לומר לבודק? (אופציונלי)"
       appeal_submitting: "שולח לבדיקה…"
@@ -1009,9 +1012,14 @@ he:
     emoji_search: "חיפוש אימוג'י…"
     emoji_clear: "ניקוי"
     lottie_section: "אנימציה (Lottie)"
-    lottie_placeholder: "הדביקו קישור LottieFiles, למשל https://lottie.host/….json"
+    lottie_placeholder: "הדביקו קישור LottieFiles, למשל https://lottie.host/….lottie"
     lottie_apply: "שימוש באנימציה"
-    lottie_hint: "קישורי .json ישירים מ-lottiefiles.com או lottie.host. האנימציה מחליפה את התמונה או הווידאו של הכרטיס."
+    lottie_hint: "קישורי ‎.json‎ או ‎.lottie‎ מ-lottiefiles.com או lottie.host. האנימציה מחליפה את התמונה או הסרטון של הכרטיס."
+    animation_bg: "רקע האנימציה"
+    animation_bg_colour: "צבע רקע"
+    animation_bg_image: "שימוש בתמונה"
+    animation_bg_clear: "איפוס לצבע המותג"
+    animation_bg_hint: "מופיע מאחורי האנימציה בכרטיס הזה בלבד. בלעדיו הכרטיס משתמש בצבע הפאנל של המותג שלך."
     required_chip: 'חובה'
     ty_title_label: 'כותרת התודה'
     ty_body_label: 'הודעת התודה'

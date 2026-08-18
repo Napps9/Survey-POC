@@ -301,4 +301,54 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_nil out[2]["image_credit"], "credit is cleared when the image is rejected"
     assert_nil out[2]["image_credit_url"]
   end
+
+  # ── Animation backdrop (media_bg) ──────────────────────────────────────
+  # A per-card colour/image behind a Lottie or a range card's reaction set,
+  # overriding the Verto-wide --brand-panel. Allowlist-or-drop, like
+  # range_theme: only a real hex and a real image URL survive, and only on a
+  # card whose panel actually animates.
+
+  test "media_bg keeps a valid colour on a lottie card" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "lottie" => LOTTIE_BLOB_URL,
+                "media_bg" => { "color" => "#FF00AA" } } ]
+    out = Survey.sanitize_cards_images!(cards).first
+    assert_equal({ "color" => "#ff00aa" }, out["media_bg"],
+                 "hex is normalised the way option_styles does it")
+  end
+
+  test "media_bg keeps a colour and an image together on a range card" do
+    cards = [ { "type" => "range", "text" => "Q", "options" => %w[a b c d e],
+                "media_bg" => { "color" => "#123456", "image" => ASSET_PATH } } ]
+    out = Survey.sanitize_cards_images!(cards).first
+    assert_equal "#123456",   out["media_bg"]["color"]
+    assert_equal ASSET_PATH,  out["media_bg"]["image"]
+  end
+
+  test "media_bg is dropped on a card whose panel is a photo" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH,
+                "media_bg" => { "color" => "#123456" } } ]
+    refute Survey.sanitize_cards_images!(cards).first.key?("media_bg"),
+           "there is nothing to see behind a photo — the photo covers the panel"
+  end
+
+  test "media_bg drops a junk colour and an off-allowlist image" do
+    cards = [ { "type" => "range", "text" => "Q", "options" => %w[a b c d e],
+                "media_bg" => { "color" => "javascript:alert(1)", "image" => "https://evil.com/x.png" } } ]
+    refute Survey.sanitize_cards_images!(cards).first.key?("media_bg"),
+           "nothing valid survived, so the key should go rather than persist as {}"
+  end
+
+  test "media_bg survives only what it can validate, not the whole hash" do
+    cards = [ { "type" => "range", "text" => "Q", "options" => %w[a b c d e],
+                "media_bg" => { "color" => "#abcdef", "image" => "https://evil.com/x.png",
+                                "onclick" => "boom" } } ]
+    out = Survey.sanitize_cards_images!(cards).first
+    assert_equal({ "color" => "#abcdef" }, out["media_bg"])
+  end
+
+  test "media_bg is dropped when it is not a hash" do
+    cards = [ { "type" => "range", "text" => "Q", "options" => %w[a b c d e],
+                "media_bg" => "#ff0000" } ]
+    refute Survey.sanitize_cards_images!(cards).first.key?("media_bg")
+  end
 end

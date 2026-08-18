@@ -233,7 +233,7 @@ const COMPONENTS = {
                     <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${i}" title="${esc(t("editor.change_statement_image_title"))}">
                       <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
                     </button>
-                    <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption">×</button>
+                    <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption" title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>
                   </div>`
         }).join("")}
         <div class="rotate-complete">
@@ -435,25 +435,31 @@ function gridHtml(opts, mode, styles = []) {
 }
 
 // Mirror of nps_helper.rb's NPS_VESSELS: each themed container is a real
-// object silhouette with its own width. [w, cx, hw, kind, path] — see the Ruby
-// constant for the field meanings. Keep the two in sync.
+// object silhouette with its own width. [w, cx, hw, kind, top, bottom, path] —
+// see the Ruby constant for the field meanings. Keep the two in sync;
+// test/lib/nps_vessel_parity_test.rb fails the build when they drift.
 const NPS_VESSELS = {
-  tube:     { w: 68,  cx: 34, hw: 11, kind: null,  path: "M20,16 L20,300 A14,14 0 0 0 48,300 L48,16" },
-  pill:     { w: 78,  cx: 39, hw: 13, kind: null,  path: "M24,54 Q24,24 39,24 Q54,24 54,54 L54,286 Q54,316 39,316 Q24,316 24,286 Z" },
-  can:      { w: 92,  cx: 46, hw: 26, kind: null,  path: "M16,52 Q16,36 46,36 Q76,36 76,52 L76,288 Q76,304 46,304 Q16,304 16,288 Z" },
-  bottle:   { w: 96,  cx: 48, hw: 22, kind: null,  path: "M40,18 L40,74 Q24,94 24,134 L24,296 Q24,306 32,306 L64,306 Q72,306 72,296 L72,134 Q72,94 56,74 L56,18" },
-  popsicle: { w: 98,  cx: 49, hw: 26, kind: "pop", path: "M20,54 Q20,26 49,26 Q78,26 78,54 L78,258 Q78,268 68,268 L30,268 Q20,268 20,258 Z" },
-  glass:    { w: 106, cx: 53, hw: 28, kind: null,  path: "M18,24 L30,300 Q30,306 36,306 L70,306 Q76,306 76,300 L88,24" },
-  beaker:   { w: 116, cx: 58, hw: 38, kind: null,  path: "M18,44 L18,298 Q18,306 26,306 L90,306 Q98,306 98,298 L98,52 L110,40" },
-  jar:      { w: 118, cx: 59, hw: 40, kind: "jar", path: "M18,64 L18,298 Q18,306 26,306 L92,306 Q100,306 100,298 L100,64 L94,50 L24,50 Z" },
-  flask:    { w: 130, cx: 65, hw: 22, kind: null,  path: "M54,22 L58,34 L58,90 L10,296 Q10,306 20,306 L110,306 Q120,306 120,296 L72,90 L72,34 L76,22" },
-  mug:      { w: 132, cx: 54, hw: 34, kind: "mug", path: "M16,52 L16,300 Q16,308 24,308 L84,308 Q92,308 92,300 L92,52" },
+  tube:     { w: 68,  cx: 34, hw: 11, kind: null, top: 16, bottom: 314,  path: "M20,16 L20,300 A14,14 0 0 0 48,300 L48,16" },
+  pill:     { w: 78,  cx: 39, hw: 13, kind: null, top: 24, bottom: 316,  path: "M24,54 Q24,24 39,24 Q54,24 54,54 L54,286 Q54,316 39,316 Q24,316 24,286 Z" },
+  can:      { w: 92,  cx: 46, hw: 26, kind: null, top: 36, bottom: 304,  path: "M16,52 Q16,36 46,36 Q76,36 76,52 L76,288 Q76,304 46,304 Q16,304 16,288 Z" },
+  bottle:   { w: 96,  cx: 48, hw: 22, kind: null, top: 18, bottom: 306,  path: "M40,18 L40,74 Q24,94 24,134 L24,296 Q24,306 32,306 L64,306 Q72,306 72,296 L72,134 Q72,94 56,74 L56,18" },
+  popsicle: { w: 98,  cx: 49, hw: 26, kind: "pop", top: 26, bottom: 268, path: "M20,54 Q20,26 49,26 Q78,26 78,54 L78,258 Q78,268 68,268 L30,268 Q20,268 20,258 Z" },
+  glass:    { w: 106, cx: 53, hw: 28, kind: null, top: 24, bottom: 306,  path: "M18,24 L30,300 Q30,306 36,306 L70,306 Q76,306 76,300 L88,24" },
+  beaker:   { w: 116, cx: 58, hw: 38, kind: null, top: 44, bottom: 306,  path: "M18,44 L18,298 Q18,306 26,306 L90,306 Q98,306 98,298 L98,52 L110,40" },
+  jar:      { w: 118, cx: 59, hw: 40, kind: "jar", top: 50, bottom: 306, path: "M18,64 L18,298 Q18,306 26,306 L92,306 Q100,306 100,298 L100,64 L94,50 L24,50 Z" },
+  flask:    { w: 130, cx: 65, hw: 22, kind: null, top: 22, bottom: 306,  path: "M54,22 L58,34 L58,90 L10,296 Q10,306 20,306 L110,306 Q120,306 120,296 L72,90 L72,34 L76,22" },
+  mug:      { w: 132, cx: 54, hw: 34, kind: "mug", top: 52, bottom: 308, path: "M16,52 L16,300 Q16,308 24,308 L84,308 Q92,308 92,300 L92,52" },
 }
 
+// Mirrors NpsHelper::VESSEL_H / WIDTH_SCALE / STROKE_W.
+const VESSEL_H    = 340
+const WIDTH_SCALE = 2
+const STROKE_W    = 3
+
 const NPS_EXTRAS = {
-  jar: `<rect x="22" y="22" width="74" height="26" rx="8" fill="#dfe2ee" stroke="#1a1a1a" stroke-width="6"/>`,
-  mug: `<path d="M92,116 C130,120 130,244 92,248" fill="none" stroke="#1a1a1a" stroke-width="13" stroke-linecap="round"/>`,
-  pop: `<rect x="41" y="260" width="16" height="52" rx="6" fill="#c9a678" stroke="#1a1a1a" stroke-width="4"/>`,
+  jar: `<rect x="22" y="22" width="74" height="26" rx="8" fill="#dfe2ee" stroke="#1a1a1a" stroke-width="${STROKE_W}" vector-effect="non-scaling-stroke"/>`,
+  mug: `<path d="M92,116 C130,120 130,244 92,248" fill="none" stroke="#1a1a1a" stroke-width="${Math.round(STROKE_W * 2.2)}" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`,
+  pop: `<rect x="41" y="260" width="16" height="52" rx="6" fill="#c9a678" stroke="#1a1a1a" stroke-width="${(STROKE_W * 0.7).toFixed(1)}" vector-effect="non-scaling-stroke"/>`,
 }
 
 function npsBubbles(cx, hw) {
@@ -470,11 +476,23 @@ function npsBubbles(cx, hw) {
   return s
 }
 
+// Mirror of nps_helper.rb#nps_stage_style — the custom properties that tie the
+// digits, the vessel and the liquid to one set of path-derived numbers.
+function npsStageStyle(v) {
+  return [
+    `--nps-aspect: ${v.w * WIDTH_SCALE} / ${VESSEL_H}`,
+    `--nps-top: ${v.top}px`,
+    `--nps-travel: ${v.bottom - v.top}px`,
+    `--nps-top-f: ${(v.top / VESSEL_H).toFixed(4)}`,
+    `--nps-bot-f: ${((VESSEL_H - v.bottom) / VESSEL_H).toFixed(4)}`,
+  ].join("; ")
+}
+
 // The SVG vessel — mirror of nps_helper.rb#nps_vessel_svg.
 function npsVesselSvg(shape, v) {
   const wave = y => `M-40,${y} q32.5,-8 65,0 t65,0 t65,0 t65,0 t65,0 L290,430 L-40,430 Z`
   return `
-    <svg class="nps-vessel" viewBox="0 0 ${v.w} 340" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+    <svg class="nps-vessel" viewBox="0 0 ${v.w * WIDTH_SCALE} ${VESSEL_H}" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="nps-g-${shape}" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" style="stop-color: var(--brand-primary, #16e0c4)"/>
@@ -482,19 +500,21 @@ function npsVesselSvg(shape, v) {
         </linearGradient>
         <clipPath id="nps-c-${shape}"><path d="${v.path} Z"/></clipPath>
       </defs>
-      <g clip-path="url(#nps-c-${shape})">
-        <rect x="-40" y="0" width="${v.w + 80}" height="340" fill="#eef0f6"/>
-        <g class="nps-liquid">
-          <g class="nps-surface">
-            <path class="nps-wave2" d="${wave(3)}" fill="url(#nps-g-${shape})"/>
-            <path class="nps-wave"  d="${wave(0)}" fill="url(#nps-g-${shape})"/>
+      <g transform="scale(${WIDTH_SCALE} 1)">
+        <g clip-path="url(#nps-c-${shape})">
+          <rect x="-40" y="0" width="${v.w + 80}" height="${VESSEL_H}" fill="#eef0f6"/>
+          <g class="nps-liquid">
+            <g class="nps-surface">
+              <path class="nps-wave2" d="${wave(3)}" fill="url(#nps-g-${shape})"/>
+              <path class="nps-wave"  d="${wave(0)}" fill="url(#nps-g-${shape})"/>
+            </g>
+            <rect x="-40" y="4" width="${v.w + 80}" height="440" fill="url(#nps-g-${shape})"/>
+            ${npsBubbles(v.cx, v.hw)}
           </g>
-          <rect x="-40" y="4" width="${v.w + 80}" height="440" fill="url(#nps-g-${shape})"/>
-          ${npsBubbles(v.cx, v.hw)}
         </g>
+        <path d="${v.path}" fill="none" stroke="#1a1a1a" stroke-width="${STROKE_W}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        ${v.kind ? NPS_EXTRAS[v.kind] : ""}
       </g>
-      <path d="${v.path}" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
-      ${v.kind ? NPS_EXTRAS[v.kind] : ""}
     </svg>`
 }
 
@@ -515,13 +535,12 @@ function npsHtml(opts, shape) {
          data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
          tabindex="0" role="slider"
          aria-valuemin="0" aria-valuemax="${n - 1}">
-      <div class="nps-slider-stage">
+      <div class="nps-slider-stage" style="${npsStageStyle(v)}">
         <div class="slider-labels nps-slider-labels">
           ${labels.map(o => `<span class="slider-label-text" data-nps-slider-target="label" contenteditable="true">${esc(o)}</span>`).join("")}
         </div>
-        <div class="nps-control nps-shape-${key}" style="--nps-aspect: ${v.w} / 340" data-axis="vertical">
+        <div class="nps-control nps-shape-${key}" data-axis="vertical">
           ${npsVesselSvg(key, v)}
-          <div class="nps-thumb"><span class="nps-thumb-val"></span></div>
         </div>
       </div>
     </div>`

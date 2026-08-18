@@ -34,6 +34,7 @@ hi:
     new_response: "नया उत्तर"
     add_response: "उत्तर जोड़ें"
     remove_response: "यह उत्तर हटाएँ"
+    remove_option: "कार्ड हटाएँ"
     response_scale: "प्रति कथन उत्तर"
     tap_scale:
       "no": "नहीं"
@@ -84,7 +85,7 @@ hi:
     eyebrow:
       range: "स्लाइडर खींचें"
       rating: "रेटिंग के लिए टैप करें"
-      nps: "रेटिंग के लिए खींचें"
+      nps: "तरल खींचें"
       multiple_choice: "एक चुनें"
       select_many: "सभी लागू विकल्प चुनें"
       prioritise: "प्राथमिकता के क्रम में लगाने के लिए खींचें"
@@ -115,7 +116,7 @@ hi:
     panel_label:
       range: "स्लाइडर खींचें"
       rating: "रेटिंग के लिए टैप करें"
-      nps: "रेटिंग के लिए खींचें"
+      nps: "तरल खींचें"
       multiple_choice: "एक चुनें"
       select_many: "सभी लागू विकल्प चुनें"
       prioritise: "क्रम में लगाने के लिए खींचें"
@@ -364,6 +365,8 @@ hi:
     editor:
       delete_card_confirm: इस कार्ड को हटाएं?
       save_to_library: "मेरी ब्रांड लाइब्रेरी में भी सहेजें"
+      stock_search_hint: "बेहतर परिणामों के लिए प्रश्न से जुड़े कीवर्ड इस्तेमाल करें"
+      load_more: "और लोड करें"
       lottie_failed: "यह लिंक LottieFiles एनिमेशन जैसा नहीं लगता।"
       appeal_note_prompt: "क्या आप समीक्षक को कुछ बताना चाहेंगे? (वैकल्पिक)"
       appeal_submitting: "समीक्षा के लिए भेजा जा रहा है…"
@@ -1009,9 +1012,14 @@ hi:
     emoji_search: "इमोजी खोजें…"
     emoji_clear: "हटाएँ"
     lottie_section: "एनिमेशन (Lottie)"
-    lottie_placeholder: "LottieFiles लिंक पेस्ट करें, जैसे https://lottie.host/….json"
+    lottie_placeholder: "LottieFiles लिंक पेस्ट करें, जैसे https://lottie.host/….lottie"
     lottie_apply: "एनिमेशन उपयोग करें"
-    lottie_hint: "lottiefiles.com या lottie.host से सीधे .json लिंक। एनिमेशन कार्ड की फ़ोटो या वीडियो की जगह लेता है।"
+    lottie_hint: "lottiefiles.com या lottie.host से .json या .lottie लिंक। एनिमेशन कार्ड की फ़ोटो या वीडियो की जगह ले लेता है।"
+    animation_bg: "एनिमेशन पृष्ठभूमि"
+    animation_bg_colour: "पृष्ठभूमि का रंग"
+    animation_bg_image: "छवि इस्तेमाल करें"
+    animation_bg_clear: "ब्रांड रंग पर रीसेट करें"
+    animation_bg_hint: "सिर्फ़ इस कार्ड पर एनिमेशन के पीछे दिखता है। इसके बिना कार्ड आपके ब्रांड का पैनल रंग इस्तेमाल करता है।"
     required_chip: 'अनिवार्य'
     ty_title_label: 'धन्यवाद शीर्षक'
     ty_body_label: 'धन्यवाद संदेश'

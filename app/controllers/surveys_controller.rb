@@ -29,6 +29,16 @@ class SurveysController < ApplicationController
   throttle_ai to: 60,  within: 1.hour, name: "stock-shuffle", respond: :html,
               only: %i[ shuffle_assets ]
 
+  # Stock search paging. 24 was previously an inline literal at each call site
+  # and there was no way to ask for a second page, so the library simply ended
+  # after 24 results — creators read that as "this is everything Verto has".
+  # Pexels caps per_page at 80; 24 stays the PAGE size (three tidy rows in the
+  # grid) and Load more walks pages instead. STOCK_MAX_PAGE bounds how far one
+  # search can walk, since the stock-media throttle above is per hour and each
+  # page is a request.
+  STOCK_PER_PAGE = 24
+  STOCK_MAX_PAGE = 10
+
   # The organisation-wide daily ceiling, which is the number that shows up on
   # the Anthropic invoice. Only the Claude endpoints count against it —
   # pexels_search and shuffle_assets are rate-limited above but cost nothing.
@@ -487,13 +497,28 @@ class SurveysController < ApplicationController
     return render json: { images: [], error: "search_blocked" } if query.blank?
 
     orientation = PexelsClient::ORIENTATION_FOR[context]
+    page        = params[:page].to_i.clamp(1, STOCK_MAX_PAGE)
+    client      = PexelsClient.new
     images =
       if params[:media].to_s == "videos"
-        pexels_video_results(query, orientation, age)
+        pexels_video_results(query, orientation, age, page: page, client: client)
       else
-        pexels_photo_results(query, orientation, context, age)
+        pexels_photo_results(query, orientation, context, age, page: page, client: client)
       end
-    render json: { images: images }
+
+    # An empty page is only "nothing to show" when the call actually succeeded.
+    # Pexels failing (429 on the shared quota, a rotated key, a timeout) also
+    # yields no images, and reporting that as "No photos found." sent creators
+    # hunting for better search terms during an outage.
+    if images.empty? && client.last_error
+      return render json: { images: [], page: page, error: "search_failed" }, status: :bad_gateway
+    end
+
+    # `more` drives the Load more button. Ask the page size, not the filtered
+    # count: safety filtering and unusable-mp4 drops mean a full page from
+    # Pexels can arrive here short, and treating that as the end of the results
+    # would strand the rest behind a button that never appears.
+    render json: { images: images, page: page, more: page < STOCK_MAX_PAGE }
   rescue => e
     ErrorReporting.report("SurveysController#pexels_search", e)
     render json: { images: [], error: "search_failed" }, status: :bad_gateway
@@ -1291,8 +1316,8 @@ class SurveysController < ApplicationController
     survey.update!(cards: cards)
   end
 
-  def pexels_photo_results(query, orientation, context, age = [])
-    PexelsClient.new.search(query: query, orientation: orientation, per_page: 24)
+  def pexels_photo_results(query, orientation, context, age = [], page: 1, client: PexelsClient.new)
+    client.search(query: query, orientation: orientation, per_page: STOCK_PER_PAGE, page: page)
       .select { |p| ContentSafety.safe?(p["alt"], age) }
       .map do |p|
       {
@@ -1307,8 +1332,8 @@ class SurveysController < ApplicationController
     end
   end
 
-  def pexels_video_results(query, orientation, age = [])
-    PexelsClient.new.search_videos(query: query, orientation: orientation, per_page: 24)
+  def pexels_video_results(query, orientation, age = [], page: 1, client: PexelsClient.new)
+    client.search_videos(query: query, orientation: orientation, per_page: STOCK_PER_PAGE, page: page)
       .select { |v| ContentSafety.safe?(v["url"], age) }
       .filter_map do |v|
       url = PexelsClient.video_file_url(v)

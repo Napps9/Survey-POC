@@ -231,23 +231,75 @@ module NpsHelper
   # Each entry: w (viewBox width), cx/hw (bubble column centre + half-spread),
   # kind (extra: jar lid / mug handle / popsicle stick), path (the open-topped
   # body outline; also the fill clip when closed with Z).
+  # `top`/`bottom` are the y bounds of the vessel's INTERIOR — where the liquid
+  # is empty and where it is brim-full. They are read off each path above and
+  # are the whole reason "0" and "10" now line up with the vessel: the fill used
+  # to translate by a single hard-coded 306, which only suited the five shapes
+  # whose floor happens to sit at 306. The default `pill` bottoms at 316, so it
+  # kept a slug of liquid at value 0; `popsicle` (268) over-emptied by 38. The
+  # brim end was worse — every shape overshot its own top, and the clipPath hid
+  # it, so the last two or three steps of the scale looked identical.
+  # The label column is positioned off the same two numbers (see
+  # nps_stage_style), which is what keeps the digits level with the liquid.
   NPS_VESSELS = {
-    "tube"     => { w: 68,  cx: 34, hw: 11, kind: nil,   path: "M20,16 L20,300 A14,14 0 0 0 48,300 L48,16" },
-    "pill"     => { w: 78,  cx: 39, hw: 13, kind: nil,   path: "M24,54 Q24,24 39,24 Q54,24 54,54 L54,286 Q54,316 39,316 Q24,316 24,286 Z" },
-    "can"      => { w: 92,  cx: 46, hw: 26, kind: nil,   path: "M16,52 Q16,36 46,36 Q76,36 76,52 L76,288 Q76,304 46,304 Q16,304 16,288 Z" },
-    "bottle"   => { w: 96,  cx: 48, hw: 22, kind: nil,   path: "M40,18 L40,74 Q24,94 24,134 L24,296 Q24,306 32,306 L64,306 Q72,306 72,296 L72,134 Q72,94 56,74 L56,18" },
-    "popsicle" => { w: 98,  cx: 49, hw: 26, kind: "pop", path: "M20,54 Q20,26 49,26 Q78,26 78,54 L78,258 Q78,268 68,268 L30,268 Q20,268 20,258 Z" },
-    "glass"    => { w: 106, cx: 53, hw: 28, kind: nil,   path: "M18,24 L30,300 Q30,306 36,306 L70,306 Q76,306 76,300 L88,24" },
-    "beaker"   => { w: 116, cx: 58, hw: 38, kind: nil,   path: "M18,44 L18,298 Q18,306 26,306 L90,306 Q98,306 98,298 L98,52 L110,40" },
-    "jar"      => { w: 118, cx: 59, hw: 40, kind: "jar", path: "M18,64 L18,298 Q18,306 26,306 L92,306 Q100,306 100,298 L100,64 L94,50 L24,50 Z" },
-    "flask"    => { w: 130, cx: 65, hw: 22, kind: nil,   path: "M54,22 L58,34 L58,90 L10,296 Q10,306 20,306 L110,306 Q120,306 120,296 L72,90 L72,34 L76,22" },
-    "mug"      => { w: 132, cx: 54, hw: 34, kind: "mug", path: "M16,52 L16,300 Q16,308 24,308 L84,308 Q92,308 92,300 L92,52" }
+    "tube"     => { w: 68,  cx: 34, hw: 11, kind: nil,   top: 16, bottom: 314, path: "M20,16 L20,300 A14,14 0 0 0 48,300 L48,16" },
+    "pill"     => { w: 78,  cx: 39, hw: 13, kind: nil,   top: 24, bottom: 316, path: "M24,54 Q24,24 39,24 Q54,24 54,54 L54,286 Q54,316 39,316 Q24,316 24,286 Z" },
+    "can"      => { w: 92,  cx: 46, hw: 26, kind: nil,   top: 36, bottom: 304, path: "M16,52 Q16,36 46,36 Q76,36 76,52 L76,288 Q76,304 46,304 Q16,304 16,288 Z" },
+    "bottle"   => { w: 96,  cx: 48, hw: 22, kind: nil,   top: 18, bottom: 306, path: "M40,18 L40,74 Q24,94 24,134 L24,296 Q24,306 32,306 L64,306 Q72,306 72,296 L72,134 Q72,94 56,74 L56,18" },
+    "popsicle" => { w: 98,  cx: 49, hw: 26, kind: "pop", top: 26, bottom: 268, path: "M20,54 Q20,26 49,26 Q78,26 78,54 L78,258 Q78,268 68,268 L30,268 Q20,268 20,258 Z" },
+    "glass"    => { w: 106, cx: 53, hw: 28, kind: nil,   top: 24, bottom: 306, path: "M18,24 L30,300 Q30,306 36,306 L70,306 Q76,306 76,300 L88,24" },
+    "beaker"   => { w: 116, cx: 58, hw: 38, kind: nil,   top: 44, bottom: 306, path: "M18,44 L18,298 Q18,306 26,306 L90,306 Q98,306 98,298 L98,52 L110,40" },
+    "jar"      => { w: 118, cx: 59, hw: 40, kind: "jar", top: 50, bottom: 306, path: "M18,64 L18,298 Q18,306 26,306 L92,306 Q100,306 100,298 L100,64 L94,50 L24,50 Z" },
+    "flask"    => { w: 130, cx: 65, hw: 22, kind: nil,   top: 22, bottom: 306, path: "M54,22 L58,34 L58,90 L10,296 Q10,306 20,306 L110,306 Q120,306 120,296 L72,90 L72,34 L76,22" },
+    "mug"      => { w: 132, cx: 54, hw: 34, kind: "mug", top: 52, bottom: 308, path: "M16,52 L16,300 Q16,308 24,308 L84,308 Q92,308 92,300 L92,52" }
   }.freeze
 
+  # The viewBox is 340 tall for every shape; widths vary per silhouette.
+  VESSEL_H = 340
+
+  # Vessels render twice as wide as they are drawn. Applied as an SVG transform
+  # rather than by rewriting ten hand-authored paths in two files, so there is
+  # one number to re-tune visually instead of ~60 coordinates to keep in sync.
+  # The stroked paths carry vector-effect="non-scaling-stroke" so the outline
+  # keeps its intended weight instead of smearing to 2x horizontally.
+  WIDTH_SCALE = 2
+
+  # Outline weight. Was 6, which against a 68-132 unit viewBox read as 5-9% of
+  # the vessel's width — a very heavy black keyline for what is a soft,
+  # liquid-filled object.
+  STROKE_W = 3
+
+  def nps_vessel_for(shape)
+    NPS_VESSELS.fetch(shape.to_s) { NPS_VESSELS.fetch("pill") }
+  end
+
+  # The custom properties that tie the label column, the vessel and the liquid
+  # to ONE set of numbers. Emitted on .nps-slider-stage — the nearest common
+  # ancestor of the digits and the vessel — because the two used to be sized
+  # independently (an 11-band flex column against a hard-coded fill travel) and
+  # drifted apart by ~14px at value 0.
+  #
+  #   --nps-aspect  the control's width:height, now including WIDTH_SCALE
+  #   --nps-top     where a FULL vessel's surface sits, in viewBox units
+  #   --nps-travel  how far the liquid falls from full to empty
+  #   --nps-top-f / --nps-bot-f  the same bounds as fractions of the viewBox
+  #                 height, used to inset the label column so digit i lands on
+  #                 fill level i (padding, because a percentage padding would
+  #                 resolve against width, not height)
+  def nps_stage_style(shape)
+    v = nps_vessel_for(shape)
+    [
+      "--nps-aspect: #{v[:w] * WIDTH_SCALE} / #{VESSEL_H}",
+      "--nps-top: #{v[:top]}px",
+      "--nps-travel: #{v[:bottom] - v[:top]}px",
+      "--nps-top-f: #{(v[:top].to_f / VESSEL_H).round(4)}",
+      "--nps-bot-f: #{((VESSEL_H - v[:bottom]).to_f / VESSEL_H).round(4)}"
+    ].join("; ")
+  end
+
   def render_nps_control(shape: "pill", steps: NPS_STEPS)
-    v = NPS_VESSELS.fetch(shape) { NPS_VESSELS.fetch("pill") }
+    v = nps_vessel_for(shape)
     content_tag :div, class: "nps-control nps-shape-#{shape}",
-                style: "--nps-aspect: #{v[:w]} / 340",
                 data: { axis: "vertical" } do
       concat nps_vessel_svg(shape, v)
     end
@@ -260,14 +312,22 @@ module NpsHelper
     w   = v[:w]
     rng = Random.new(Digest::SHA256.hexdigest(shape)[0, 8].to_i(16))
     wave = ->(y) { "M-40,#{y} q32.5,-8 65,0 t65,0 t65,0 t65,0 t65,0 L290,430 L-40,430 Z" }
+    # Same treatment as the outline: keyed off STROKE_W so the whole drawing
+    # re-weights together, and non-scaling so WIDTH_SCALE doesn't smear them.
+    # The mug handle stays the heaviest line on the object (it reads as a
+    # thick ceramic loop), just proportionally lighter than it was.
     extras = {
-      "jar" => %(<rect x="22" y="22" width="74" height="26" rx="8" fill="#dfe2ee" stroke="#1a1a1a" stroke-width="6"/>),
-      "mug" => %(<path d="M92,116 C130,120 130,244 92,248" fill="none" stroke="#1a1a1a" stroke-width="13" stroke-linecap="round"/>),
-      "pop" => %(<rect x="41" y="260" width="16" height="52" rx="6" fill="#c9a678" stroke="#1a1a1a" stroke-width="4"/>)
+      "jar" => %(<rect x="22" y="22" width="74" height="26" rx="8" fill="#dfe2ee" stroke="#1a1a1a" stroke-width="#{STROKE_W}" vector-effect="non-scaling-stroke"/>),
+      "mug" => %(<path d="M92,116 C130,120 130,244 92,248" fill="none" stroke="#1a1a1a" stroke-width="#{(STROKE_W * 2.2).round}" stroke-linecap="round" vector-effect="non-scaling-stroke"/>),
+      "pop" => %(<rect x="41" y="260" width="16" height="52" rx="6" fill="#c9a678" stroke="#1a1a1a" stroke-width="#{(STROKE_W * 0.7).round(1)}" vector-effect="non-scaling-stroke"/>)
     }[v[:kind]].to_s
 
+    # Everything is drawn in the ORIGINAL coordinate space and stretched by
+    # WIDTH_SCALE, so the ten silhouettes above stay exactly as authored.
+    # vector-effect keeps the stroke round under that non-uniform scale — it
+    # would otherwise be twice as thick on the vertical sides as on the curves.
     <<~SVG.html_safe
-      <svg class="nps-vessel" viewBox="0 0 #{w} 340" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+      <svg class="nps-vessel" viewBox="0 0 #{w * WIDTH_SCALE} #{VESSEL_H}" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
         <defs>
           <linearGradient id="nps-g-#{shape}" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" style="stop-color: var(--brand-primary, #16e0c4)"/>
@@ -275,19 +335,21 @@ module NpsHelper
           </linearGradient>
           <clipPath id="nps-c-#{shape}"><path d="#{v[:path]} Z"/></clipPath>
         </defs>
-        <g clip-path="url(#nps-c-#{shape})">
-          <rect x="-40" y="0" width="#{w + 80}" height="340" fill="#eef0f6"/>
-          <g class="nps-liquid">
-            <g class="nps-surface">
-              <path class="nps-wave2" d="#{wave.call(3)}" fill="url(#nps-g-#{shape})"/>
-              <path class="nps-wave"  d="#{wave.call(0)}" fill="url(#nps-g-#{shape})"/>
+        <g transform="scale(#{WIDTH_SCALE} 1)">
+          <g clip-path="url(#nps-c-#{shape})">
+            <rect x="-40" y="0" width="#{w + 80}" height="#{VESSEL_H}" fill="#eef0f6"/>
+            <g class="nps-liquid">
+              <g class="nps-surface">
+                <path class="nps-wave2" d="#{wave.call(3)}" fill="url(#nps-g-#{shape})"/>
+                <path class="nps-wave"  d="#{wave.call(0)}" fill="url(#nps-g-#{shape})"/>
+              </g>
+              <rect x="-40" y="4" width="#{w + 80}" height="440" fill="url(#nps-g-#{shape})"/>
+              #{nps_bubbles(v[:cx], v[:hw], rng)}
             </g>
-            <rect x="-40" y="4" width="#{w + 80}" height="440" fill="url(#nps-g-#{shape})"/>
-            #{nps_bubbles(v[:cx], v[:hw], rng)}
           </g>
+          <path d="#{v[:path]}" fill="none" stroke="#1a1a1a" stroke-width="#{STROKE_W}" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+          #{extras}
         </g>
-        <path d="#{v[:path]}" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
-        #{extras}
       </svg>
     SVG
   end

@@ -52,7 +52,7 @@ export function choiceListItemHtml(label, i, mode, style = null) {
           <span class="pick-text choice-list-label" contenteditable="true">${esc(label)}</span>
           <span class="choice-list-tick ${tick}">✓</span>
           ${styleBtnHtml()}
-          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
+          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption" title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>
         </li>`
 }
 
@@ -66,7 +66,7 @@ export function prioritiseItemHtml(label, i, style = null) {
           <span class="pick-text choice-list-label" contenteditable="true">${esc(label)}</span>
           <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
           ${styleBtnHtml()}
-          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption">×</button>
+          <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption" title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>
         </li>`
 }
 
