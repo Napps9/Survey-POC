@@ -614,6 +614,10 @@ it:
     shared_vertos: Vertos condivisi
     my_vertos: I miei Vertos
     create: Crea
+    workspaces: "Spazi di lavoro"
+    switch_workspace: "Cambia spazio di lavoro"
+    role_admin: "Amministratore"
+    role_member: "Membro"
     members: Membri
     sign_out: Esci
   partnerships:
@@ -1221,6 +1225,8 @@ it:
     empty_title: Ancora nessun Verto
     empty_body: Crea il tuo primo Verto e inizia a raccogliere intuizioni dal tuo pubblico.
     empty_cta: Crea il tuo primo Verto →
+    empty_title_managed: "Nessun Verto per ora"
+    empty_body_managed: "Il tuo team Playverto pubblica qui i Vertos. Appariranno non appena il primo sarà pronto."
     section_live: Live
     section_drafts: Bozze
     section_archived: Archiviati
@@ -1633,6 +1639,7 @@ it:
     organisation_scope:
       no_organisation: "Nessuna organizzazione trovata."
       not_authorised: "Non autorizzato."
+      verto_creation_disabled: "Il tuo account non crea Vertos: il tuo team Playverto li crea per te."
     sessions:
       rate_limited: "Riprova più tardi."
       invalid_credentials: "Prova con un altro indirizzo email o un'altra password."

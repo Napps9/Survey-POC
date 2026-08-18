@@ -614,6 +614,10 @@ ja:
     shared_vertos: 共有Vertos
     my_vertos: マイVertos
     create: 作成
+    workspaces: "ワークスペース"
+    switch_workspace: "ワークスペースを切り替える"
+    role_admin: "管理者"
+    role_member: "メンバー"
     members: メンバー
     sign_out: ログアウト
   partnerships:
@@ -1221,6 +1225,8 @@ ja:
     empty_title: Vertosがありません
     empty_body: 最初のVertoを作成して、オーディエンスからインサイトを収集しましょう。
     empty_cta: 最初のVertoを作成 →
+    empty_title_managed: "まだ Verto がありません"
+    empty_body_managed: "Playverto チームがここに Verto を公開します。最初の 1 つが完成すると表示されます。"
     section_live: ライブ
     section_drafts: 下書き
     section_archived: アーカイブ済み
@@ -1591,6 +1597,7 @@ ja:
     organisation_scope:
       no_organisation: "組織が見つかりません。"
       not_authorised: "権限がありません。"
+      verto_creation_disabled: "このアカウントでは Verto を作成できません。Playverto チームが代わりに作成します。"
     partnership_common_question_sets:
       creator_only: "この操作はパートナーシップの作成者のみが行えます。"
       partnership_not_found: "パートナーシップが見つかりません。"

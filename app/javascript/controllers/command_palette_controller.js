@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["backdrop", "input", "item", "empty", "userPopover"]
+  static targets = ["backdrop", "input", "item", "empty", "userPopover", "workspacePopover"]
 
   connect() {
     this.boundKeydown = this.handleGlobalKeydown.bind(this)
@@ -42,13 +42,23 @@ export default class extends Controller {
     }
   }
 
+  // Both chrome popovers (user, workspaces) close on an outside click. Kept as
+  // a list rather than one hardcoded pair so adding a third doesn't reintroduce
+  // a popover that only closes by navigating away.
+  get _popovers() {
+    return [
+      [this.hasUserPopoverTarget && this.userPopoverTarget, "toggleUser"],
+      [this.hasWorkspacePopoverTarget && this.workspacePopoverTarget, "toggleWorkspace"]
+    ].filter(([el]) => el)
+  }
+
   handleDocClick(event) {
-    if (this.hasUserPopoverTarget && !this.userPopoverTarget.hidden) {
-      if (!this.userPopoverTarget.contains(event.target) &&
-          !event.target.closest("[data-action*='command-palette#toggleUser']")) {
-        this.userPopoverTarget.hidden = true
-      }
-    }
+    this._popovers.forEach(([popover, action]) => {
+      if (popover.hidden) return
+      if (popover.contains(event.target)) return
+      if (event.target.closest(`[data-action*='command-palette#${action}']`)) return
+      popover.hidden = true
+    })
   }
 
   isOpen() {
@@ -122,10 +132,20 @@ export default class extends Controller {
     }
   }
 
+  // Opening one popover closes the other: on a 56px bar two open at once overlap.
   toggleUser(event) {
     event.preventDefault()
     event.stopPropagation()
+    if (this.hasWorkspacePopoverTarget) this.workspacePopoverTarget.hidden = true
     if (!this.hasUserPopoverTarget) return
     this.userPopoverTarget.hidden = !this.userPopoverTarget.hidden
+  }
+
+  toggleWorkspace(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    if (this.hasUserPopoverTarget) this.userPopoverTarget.hidden = true
+    if (!this.hasWorkspacePopoverTarget) return
+    this.workspacePopoverTarget.hidden = !this.workspacePopoverTarget.hidden
   }
 }

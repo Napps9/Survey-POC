@@ -242,10 +242,15 @@
             onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
     </div>
 
-    <div style="padding:0 16px 12px;display:flex;align-items:center;justify-content:space-between;">
-      <%= button_to t("dashboard_card.duplicate"), duplicate_survey_path(survey), method: :post,
-            form: { style: "margin:0;" },
-            style: "background:none;border:none;padding:4px 8px;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;text-decoration:underline;text-underline-offset:3px;" %>
+    <%# Duplicate is a creation door, so it goes for a managed account. Without
+        it the row has one child, and space-between would strand Delete on the
+        left — so the justification follows what's actually rendered. %>
+    <div style="padding:0 16px 12px;display:flex;align-items:center;justify-content:<%= can_create_vertos? ? 'space-between' : 'flex-end' %>;">
+      <% if can_create_vertos? %>
+        <%= button_to t("dashboard_card.duplicate"), duplicate_survey_path(survey), method: :post,
+              form: { style: "margin:0;" },
+              style: "background:none;border:none;padding:4px 8px;color:rgba(255,255,255,0.35);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);cursor:pointer;text-decoration:underline;text-underline-offset:3px;" %>
+      <% end %>
       <% if current_membership&.admin? %>
         <%= button_to t("dashboard_card.delete"), survey_path(survey), method: :delete,
               data: { turbo_confirm: delete_warning },

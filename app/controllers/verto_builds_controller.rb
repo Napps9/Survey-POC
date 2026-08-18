@@ -4,6 +4,11 @@
 class VertoBuildsController < ApplicationController
   layout "fullscreen"
 
+  # Defence in depth: a managed account can never start a build, so it has no
+  # business on the wait screen either. Gated for the JSON poll as much as the
+  # HTML — deny_verto_creation answers both.
+  gate_verto_creation only: %i[ show ]
+
   # GET /verto_builds/:id       — the "building your Verto" screen
   # GET /verto_builds/:id.json  — what that screen polls
   def show

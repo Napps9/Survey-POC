@@ -44,5 +44,20 @@ Membership.find_or_create_by!(user: owner, organisation: org) do |m|
   m.role = "admin"
 end
 
+# The Alpbach client account and Jamie's access to it. Needed HERE as well as
+# in db/migrate/20260818120001_provision_alpbach_account.rb, and the split is
+# not redundancy — the two paths are disjoint:
+#
+#   * an EXISTING database (production) runs the pending migration and never
+#     re-seeds, so the migration is the only thing that provisions it; while
+#   * a FRESH database loads db/schema.rb and marks every migration as already
+#     run WITHOUT executing it, then seeds — so the migration never fires and
+#     this line is the only thing that provisions it.
+#
+# Same reasoning as the Comms owner grant above, which lives in both places for
+# exactly this reason. AlpbachAccountProvisioner is create-only, so whichever
+# path runs first, the other is a no-op.
+AlpbachAccountProvisioner.new.call
+
 # Internal BI: starter Blazer queries for VertoNow staff (idempotent).
 load Rails.root.join("db/seeds/blazer_starter_queries.rb")

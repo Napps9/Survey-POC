@@ -1,0 +1,16 @@
+<%# A workspace's mark for the switcher: its uploaded logo when it has one,
+    otherwise a coloured initial. The initial's hue is derived from the org id
+    so a given workspace is always the same colour — which is what makes the
+    chip scannable at a glance rather than just decorative.
+
+    Locals:
+      organisation  Organisation
+%>
+<% if organisation.logo.attached? %>
+  <%= image_tag rails_blob_path(organisation.logo, only_path: true),
+        alt: "", class: "bottom-bar-workspace-logo" %>
+<% else %>
+  <span class="bottom-bar-workspace-initial"
+        style="background:hsl(<%= organisation.id * 47 % 360 %>,52%,42%);"
+        aria-hidden="true"><%= organisation.name.to_s.strip.first.to_s.upcase %></span>
+<% end %>

@@ -630,6 +630,10 @@ en:
     shared_vertos: "Shared Vertos"
     my_vertos: "My Vertos"
     create: "Create"
+    workspaces: "Workspaces"
+    switch_workspace: "Switch workspace"
+    role_admin: "Admin"
+    role_member: "Member"
     members: "Members"
     sign_out: "Sign out"
   partnerships:
@@ -1243,6 +1247,8 @@ en:
     empty_title: "No Vertos yet"
     empty_body: "Create your first Verto and start collecting insights from your audience."
     empty_cta: "Create your first Verto →"
+    empty_title_managed: "No Vertos yet"
+    empty_body_managed: "Your Playverto team publishes Vertos here. They'll appear as soon as the first one is ready."
     section_live: "Live"
     section_drafts: "Drafts"
     section_archived: "Archived"
@@ -1632,6 +1638,7 @@ en:
     organisation_scope:
       no_organisation: "No organisation found."
       not_authorised: "Not authorised."
+      verto_creation_disabled: "Your account doesn't create Vertos — your Playverto team creates them for you."
     partnership_common_question_sets:
       creator_only: "Only the partnership creator can do that."
       partnership_not_found: "Partnership not found."

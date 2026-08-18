@@ -614,6 +614,10 @@ ar:
     shared_vertos: فيرتوهات مشتركة
     my_vertos: فيرتوهاتي
     create: إنشاء
+    workspaces: "مساحات العمل"
+    switch_workspace: "تبديل مساحة العمل"
+    role_admin: "مسؤول"
+    role_member: "عضو"
     members: الأعضاء
     sign_out: تسجيل الخروج
   partnerships:
@@ -1221,6 +1225,8 @@ ar:
     empty_title: لا توجد فيرتوهات بعد
     empty_body: أنشئ أول فيرتو لك وابدأ في جمع الرؤى من جمهورك.
     empty_cta: أنشئ أول فيرتو لك ←
+    empty_title_managed: "لا توجد Vertos بعد"
+    empty_body_managed: "ينشر فريق Playverto الـ Vertos هنا. ستظهر بمجرد أن يصبح أولها جاهزًا."
     section_live: مباشر
     section_drafts: مسودات
     section_archived: المؤرشفة
@@ -1600,6 +1606,7 @@ ar:
     organisation_scope:
       no_organisation: "لم يتم العثور على أي مؤسسة."
       not_authorised: "غير مصرَّح به."
+      verto_creation_disabled: "حسابك لا ينشئ Vertos — فريق Playverto ينشئها نيابةً عنك."
     partnership_common_question_sets:
       creator_only: "منشئ الشراكة وحده من يمكنه فعل ذلك."
       partnership_not_found: "الشراكة غير موجودة."

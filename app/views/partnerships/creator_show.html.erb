@@ -207,7 +207,7 @@
 
           <% if @available_surveys.empty? %>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);padding:14px 0;">
-              <%= t("partnerships.no_more_vertos") %> <%= link_to t("partnerships.create_new_verto"), new_survey_path, style: "color:#01EACB;text-decoration:none;" %>
+              <%= t("partnerships.no_more_vertos") %><% if can_create_vertos? %> <%= link_to t("partnerships.create_new_verto"), new_survey_path, style: "color:#01EACB;text-decoration:none;" %><% end %>
             </div>
           <% else %>
             <%= form_with url: partnership_partnership_vertos_path(@partnership), method: :post, local: true,

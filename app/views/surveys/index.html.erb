@@ -28,7 +28,8 @@
   # own OAuth round-trip banner does for the fullscreen layout.
   google_form_error       = (flash[:reopen_google_form_modal] && flash[:alert].present? ? flash[:alert] : nil) ||
                              (params[:google_error].present? ? t("dashboard.google_connect_failed") : nil)
-  open_google_form_modal  = google_form_error.present? || params[:open_import].present?
+  open_google_form_modal  = can_create_vertos? &&
+                            (google_form_error.present? || params[:open_import].present?)
 %>
 
 <%# Rendered here rather than in the layout: the dashboard is served with
@@ -69,7 +70,7 @@
             </p>
           </div>
 
-          <% if @surveys.any? %>
+          <% if @surveys.any? && can_create_vertos? %>
             <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
               <button type="button" data-action="click->create-menu#open"
                     style="display:inline-flex;align-items:center;gap:8px;background:#01EACB;border:none;border-radius:100px;padding:12px 22px;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(1,234,203,0.28);cursor:pointer;">
@@ -87,6 +88,7 @@
         start-from-scratch flow. source=dashboard on the import form tells the
         controller to send errors (and a Connect-Google round trip) back here,
         where the reopen value lands straight in the Form panel. ── %>
+    <% if can_create_vertos? %>
     <div data-create-menu-target="modal" class="app-modal hidden">
       <div class="app-modal__backdrop" data-action="click->create-menu#close"></div>
       <div class="app-modal__panel" style="max-width:480px;background:#1C2034;border:1px solid rgba(255,255,255,0.1);">
@@ -184,6 +186,7 @@
 
       </div>
     </div>
+    <% end %>
 
     <%# ── Share modal — the dashboard's primary action on a live Verto. One
         shell for the whole page; the panel inside is fetched per Verto from
@@ -233,15 +236,20 @@
       <% if @surveys.empty? && archived.empty? %>
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 32px;text-align:center;gap:20px;">
           <div>
-            <div style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#fff;margin-bottom:8px;"><%= t("dashboard.empty_title") %></div>
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#fff;margin-bottom:8px;"><%= can_create_vertos? ? t("dashboard.empty_title") : t("dashboard.empty_title_managed") %></div>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:320px;line-height:1.6;">
-              <%= t("dashboard.empty_body") %>
+              <%= can_create_vertos? ? t("dashboard.empty_body") : t("dashboard.empty_body_managed") %>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;">
-            <button type="button" data-action="click->create-menu#open"
-                  style="padding:12px 26px;border-radius:100px;background:#01EACB;color:#1C2034;border:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;"><%= t("dashboard.empty_cta") %></button>
-          </div>
+          <%# No CTA for a managed account. The absence is the message: an empty
+              state with no button reads as "nothing here yet", one with a button
+              that bounces reads as broken. %>
+          <% if can_create_vertos? %>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;">
+              <button type="button" data-action="click->create-menu#open"
+                    style="padding:12px 26px;border-radius:100px;background:#01EACB;color:#1C2034;border:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;"><%= t("dashboard.empty_cta") %></button>
+            </div>
+          <% end %>
         </div>
 
       <% else %>

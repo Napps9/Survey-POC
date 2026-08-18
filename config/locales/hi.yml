@@ -614,6 +614,10 @@ hi:
     shared_vertos: साझा किए गए Verto
     my_vertos: मेरे Verto
     create: बनाएं
+    workspaces: "कार्यक्षेत्र"
+    switch_workspace: "कार्यक्षेत्र बदलें"
+    role_admin: "व्यवस्थापक"
+    role_member: "सदस्य"
     members: सदस्य
     sign_out: साइन आउट
   partnerships:
@@ -1221,6 +1225,8 @@ hi:
     empty_title: अभी तक कोई Verto नहीं
     empty_body: अपना पहला Verto बनाएं और अपने दर्शकों से अंतर्दृष्टि एकत्र करना शुरू करें।
     empty_cta: अपना पहला Verto बनाएं →
+    empty_title_managed: "अभी तक कोई Verto नहीं"
+    empty_body_managed: "आपकी Playverto टीम यहाँ Vertos प्रकाशित करती है। पहला तैयार होते ही वे दिखाई देंगे।"
     section_live: लाइव
     section_drafts: ड्राफ़्ट
     section_archived: संग्रहीत
@@ -1593,6 +1599,7 @@ hi:
     organisation_scope:
       no_organisation: "कोई संगठन नहीं मिला।"
       not_authorised: "अधिकृत नहीं।"
+      verto_creation_disabled: "आपका खाता Vertos नहीं बनाता — आपकी Playverto टीम उन्हें आपके लिए बनाती है।"
     partnership_common_question_sets:
       creator_only: "यह केवल साझेदारी बनाने वाला ही कर सकता है।"
       partnership_not_found: "साझेदारी नहीं मिली।"

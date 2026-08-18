@@ -37,7 +37,7 @@
 
     <%# Create Verto %>
     <% is_create = active_key == "create" %>
-    <% if current_organisation %>
+    <% if current_organisation && can_create_vertos? %>
     <a href="<%= new_survey_path %>"
        style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border-left:2px solid <%= is_create ? '#01EACB' : 'transparent' %>;background:<%= is_create ? 'rgba(1,234,203,0.12)' : 'transparent' %>;color:<%= is_create ? '#fff' : 'rgba(255,255,255,0.65)' %>;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;transition:background 0.15s,color 0.15s;"
        onmouseover="if(this.style.borderLeftColor!=='rgb(0, 169, 80)'){this.style.background='rgba(255,255,255,0.05)';this.style.color='#fff'}"

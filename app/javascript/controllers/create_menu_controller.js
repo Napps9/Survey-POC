@@ -14,6 +14,15 @@ export default class extends Controller {
     if (this.reopenValue) this.openForm()
   }
 
+  // Every entry point below is a no-op without the modal in the DOM. A managed
+  // account (Organisation#verto_creation_enabled false) doesn't render it, and
+  // ?open_import=1 would otherwise arrive here and dereference a missing target.
+  // The view already forces reopen false in that case; this is the half that
+  // survives someone removing the modal again later.
+  _hasModal() {
+    return this.hasModalTarget
+  }
+
   open() {
     this._show()
     this._swap(false)
@@ -31,6 +40,7 @@ export default class extends Controller {
   }
 
   close() {
+    if (!this._hasModal()) return
     this.modalTarget.classList.add("hidden")
     document.body.style.overflow = ""
   }
@@ -40,6 +50,7 @@ export default class extends Controller {
   }
 
   _show() {
+    if (!this._hasModal()) return
     this.modalTarget.classList.remove("hidden")
     document.body.style.overflow = "hidden"
   }

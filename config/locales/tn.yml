@@ -630,6 +630,10 @@ tn:
     shared_vertos: "Vertos tse di Abelanngwang"
     my_vertos: "Vertos tsa me"
     create: "Tlhama"
+    workspaces: "Mafelo a tiro"
+    switch_workspace: "Fetola lefelo la tiro"
+    role_admin: "Molaodi"
+    role_member: "Leloko"
     members: "Maloko"
     sign_out: "Tswa"
   partnerships:
@@ -1243,6 +1247,8 @@ tn:
     empty_title: "Ga go na di-Verto go fitlha jaanong"
     empty_body: "Tlhama Verto ya gago ya ntlha mme o simolole go kgobokanya dikitso go tswa mo batheeledeng ba gago."
     empty_cta: "Tlhama Verto ya gago ya ntlha →"
+    empty_title_managed: "Ga go na Vertos go fitlha jaanong"
+    empty_body_managed: "Setlhopha sa gago sa Playverto se phasalatsa Vertos fano. Di tla bonala fela fa ya ntlha e siame."
     section_live: "E Teng"
     section_drafts: "Dintlhamo"
     section_archived: "Tse di Bolokilweng"
@@ -1630,6 +1636,7 @@ tn:
     organisation_scope:
       no_organisation: "Ga go na mokgatlho o o fitlhetsweng."
       not_authorised: "Ga o na tetlelelo."
+      verto_creation_disabled: "Akhaonto ya gago ga e tlhame Vertos — setlhopha sa gago sa Playverto se di go tlhamela."
     partnership_common_question_sets:
       creator_only: "Ke motlhami wa kgolagano fela yo o ka dirang seo."
       partnership_not_found: "Kgolagano ga e a fitlhelwa."

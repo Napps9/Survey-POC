@@ -614,6 +614,10 @@ vi:
     shared_vertos: Vertos được chia sẻ
     my_vertos: Vertos của tôi
     create: Tạo
+    workspaces: "Không gian làm việc"
+    switch_workspace: "Chuyển không gian làm việc"
+    role_admin: "Quản trị viên"
+    role_member: "Thành viên"
     members: Thành viên
     sign_out: Đăng xuất
   partnerships:
@@ -1221,6 +1225,8 @@ vi:
     empty_title: Chưa có Verto nào
     empty_body: Tạo Verto đầu tiên và bắt đầu thu thập thông tin chi tiết từ khán giả của bạn.
     empty_cta: Tạo Verto đầu tiên của bạn →
+    empty_title_managed: "Chưa có Verto nào"
+    empty_body_managed: "Nhóm Playverto của bạn đăng Vertos tại đây. Chúng sẽ xuất hiện ngay khi cái đầu tiên sẵn sàng."
     section_live: Trực tiếp
     section_drafts: Bản nháp
     section_archived: Đã lưu trữ
@@ -1592,6 +1598,7 @@ vi:
     organisation_scope:
       no_organisation: "Không tìm thấy tổ chức nào."
       not_authorised: "Không có quyền."
+      verto_creation_disabled: "Tài khoản của bạn không tạo Vertos — nhóm Playverto sẽ tạo giúp bạn."
     partnership_common_question_sets:
       creator_only: "Chỉ người tạo nhóm đối tác mới có thể làm điều đó."
       partnership_not_found: "Không tìm thấy nhóm đối tác."

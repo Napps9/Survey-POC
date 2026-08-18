@@ -614,6 +614,10 @@ uk:
     shared_vertos: Спільні Vertos
     my_vertos: Мої Vertos
     create: Створити
+    workspaces: "Робочі простори"
+    switch_workspace: "Змінити робочий простір"
+    role_admin: "Адміністратор"
+    role_member: "Учасник"
     members: Учасники
     sign_out: Вийти
   partnerships:
@@ -1223,6 +1227,8 @@ uk:
     empty_title: Ще немає Vertos
     empty_body: Створіть свій перший Verto та починайте збирати інсайти від аудиторії.
     empty_cta: Створити перший Verto →
+    empty_title_managed: "Поки що немає жодного Verto"
+    empty_body_managed: "Команда Playverto публікує Vertos тут. Вони з'являться, щойно буде готовий перший."
     section_live: Активні
     section_drafts: Чернетки
     section_archived: Архів
@@ -1599,6 +1605,7 @@ uk:
     organisation_scope:
       no_organisation: "Організацію не знайдено."
       not_authorised: "Немає доступу."
+      verto_creation_disabled: "Ваш обліковий запис не створює Vertos — їх створює для вас команда Playverto."
     partnership_common_question_sets:
       creator_only: "Це може зробити лише творець партнерства."
       partnership_not_found: "Партнерство не знайдено."

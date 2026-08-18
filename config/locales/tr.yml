@@ -614,6 +614,10 @@ tr:
     shared_vertos: Paylaşılan Verto'lar
     my_vertos: Verto'larım
     create: Oluştur
+    workspaces: "Çalışma alanları"
+    switch_workspace: "Çalışma alanını değiştir"
+    role_admin: "Yönetici"
+    role_member: "Üye"
     members: Üyeler
     sign_out: Çıkış yap
   partnerships:
@@ -1221,6 +1225,8 @@ tr:
     empty_title: Henüz Verto yok
     empty_body: İlk Verto'nuzu oluşturun ve hedef kitlenizden içgörüler toplamaya başlayın.
     empty_cta: İlk Verto'nuzu oluşturun →
+    empty_title_managed: "Henüz Verto yok"
+    empty_body_managed: "Playverto ekibiniz Vertos'ları burada yayımlar. İlki hazır olur olmaz görünecekler."
     section_live: Canlı
     section_drafts: Taslaklar
     section_archived: Arşivlenenler
@@ -1593,6 +1599,7 @@ tr:
     organisation_scope:
       no_organisation: "Kuruluş bulunamadı."
       not_authorised: "Yetkiniz yok."
+      verto_creation_disabled: "Hesabınız Verto oluşturmaz — Playverto ekibiniz sizin için oluşturur."
     partnership_common_question_sets:
       creator_only: "Bunu yalnızca ortaklığı oluşturan kişi yapabilir."
       partnership_not_found: "Ortaklık bulunamadı."

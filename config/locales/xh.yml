@@ -630,6 +630,10 @@ xh:
     shared_vertos: "IiVerto Ezabelweneyo"
     my_vertos: "IiVerto Zam"
     create: "Yenza"
+    workspaces: "Iindawo zokusebenza"
+    switch_workspace: "Tshintsha indawo yokusebenza"
+    role_admin: "Umlawuli"
+    role_member: "Ilungu"
     members: "Amalungu"
     sign_out: "Phuma"
   partnerships:
@@ -1243,6 +1247,8 @@ xh:
     empty_title: "Azikho iiVerto okwangoku"
     empty_body: "Yenza iVerto yakho yokuqala uze uqale ukuqokelela ingqiqo evela kubaphulaphuli bakho."
     empty_cta: "Yenza iVerto yakho yokuqala →"
+    empty_title_managed: "Akukho ii-Vertos okwangoku"
+    empty_body_managed: "Iqela lakho lasePlayverto lipapasha ii-Vertos apha. Ziya kubonakala nje ukuba eyokuqala ilungile."
     section_live: "Iyasebenza"
     section_drafts: "Uyilo"
     section_archived: "Igciniwe"
@@ -1632,6 +1638,7 @@ xh:
     organisation_scope:
       no_organisation: "Akukho mbutho ufunyenweyo."
       not_authorised: "Akuvunyelwanga."
+      verto_creation_disabled: "I-akhawunti yakho ayenzi ii-Vertos — iqela lakho lasePlayverto lizenzela wena."
     partnership_common_question_sets:
       creator_only: "Ngumdali weqela lamaqabane kuphela onokwenza oko."
       partnership_not_found: "Iqela lamaqabane alifunyanwanga."

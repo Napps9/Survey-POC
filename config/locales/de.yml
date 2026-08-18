@@ -614,6 +614,10 @@ de:
     shared_vertos: Geteilte Vertos
     my_vertos: Meine Vertos
     create: Erstellen
+    workspaces: "Arbeitsbereiche"
+    switch_workspace: "Arbeitsbereich wechseln"
+    role_admin: "Admin"
+    role_member: "Mitglied"
     members: Mitglieder
     sign_out: Abmelden
   partnerships:
@@ -1221,6 +1225,8 @@ de:
     empty_title: Noch keine Vertos
     empty_body: Erstelle dein erstes Verto und beginne, Erkenntnisse von deinem Publikum zu sammeln.
     empty_cta: Erstelle dein erstes Verto →
+    empty_title_managed: "Noch keine Vertos"
+    empty_body_managed: "Dein Playverto-Team veröffentlicht hier Vertos. Sie erscheinen, sobald das erste fertig ist."
     section_live: Live
     section_drafts: Entwürfe
     section_archived: Archiviert
@@ -1633,6 +1639,7 @@ de:
     organisation_scope:
       no_organisation: "Keine Organisation gefunden."
       not_authorised: "Nicht berechtigt."
+      verto_creation_disabled: "Dein Konto erstellt keine Vertos — dein Playverto-Team erstellt sie für dich."
     sessions:
       rate_limited: "Bitte versuche es später erneut."
       invalid_credentials: "Versuche es mit einer anderen E-Mail-Adresse oder einem anderen Passwort."

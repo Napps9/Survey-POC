@@ -3,6 +3,11 @@
 # instantiates it into a real, editable Verto under the current organisation —
 # no AI call, no external cost — and drops the creator straight into the editor.
 class TemplatesController < ApplicationController
+  # The gallery is gated as well as #create: its only action is "Use this
+  # template", so leaving it reachable for a managed account would be a page of
+  # buttons that all bounce.
+  gate_verto_creation only: %i[ index create ]
+
   def index
     @templates = SurveyTemplates.all
     render :index, layout: "fullscreen"

@@ -614,6 +614,10 @@ nl:
     shared_vertos: Gedeelde Vertos
     my_vertos: Mijn Vertos
     create: Aanmaken
+    workspaces: "Werkruimtes"
+    switch_workspace: "Werkruimte wisselen"
+    role_admin: "Beheerder"
+    role_member: "Lid"
     members: Leden
     sign_out: Uitloggen
   partnerships:
@@ -1221,6 +1225,8 @@ nl:
     empty_title: Nog geen Vertos
     empty_body: Maak je eerste Verto en begin met het verzamelen van inzichten uit je publiek.
     empty_cta: Maak je eerste Verto →
+    empty_title_managed: "Nog geen Vertos"
+    empty_body_managed: "Je Playverto-team publiceert hier Vertos. Ze verschijnen zodra de eerste klaar is."
     section_live: Live
     section_drafts: Concepten
     section_archived: Gearchiveerd
@@ -1633,6 +1639,7 @@ nl:
     organisation_scope:
       no_organisation: "Geen organisatie gevonden."
       not_authorised: "Niet gemachtigd."
+      verto_creation_disabled: "Je account maakt geen Vertos — je Playverto-team maakt ze voor je."
     sessions:
       rate_limited: "Probeer het later opnieuw."
       invalid_credentials: "Probeer een ander e-mailadres of wachtwoord."

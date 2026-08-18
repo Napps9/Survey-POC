@@ -2,12 +2,22 @@ class OrganisationsController < ApplicationController
   layout "fullscreen"
   before_action :require_admin!, only: [ :edit, :update ]
 
+  # The Workspaces switcher. Deliberately does NOT honour a return_to: you
+  # switch workspaces from pages like /surveys/123/results, and every one of
+  # those is scoped to Current.organisation.surveys — so returning there after
+  # the org changes would 404. Home is the only destination that always exists.
+  #
+  # default_landing_url (Authentication) resolves the home of the org we just
+  # switched TO, since it reads session[:current_organisation_id] — so a
+  # funder-owner workspace lands on its Funders dashboard rather than a My
+  # Vertos screen it doesn't use. An unauthorised id is a silent no-op: it
+  # leaks nothing, and a revoked membership just lands you back home.
   def switch
     organisation_id = params[:organisation_id].to_i
     if Current.user.organisations.exists?(organisation_id)
       session[:current_organisation_id] = organisation_id
     end
-    redirect_to root_path
+    redirect_to default_landing_url
   end
 
   def edit

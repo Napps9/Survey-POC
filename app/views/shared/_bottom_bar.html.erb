@@ -6,10 +6,15 @@
   active_partnerships = org && path.start_with?("/partnerships")
   active_funders   = org && path.start_with?("/funders")
   active_results   = path == "/"
-  active_create    = org && path == new_survey_path
+  active_create    = org && can_create_vertos? && path == new_survey_path
   active_ask       = org && path.start_with?("/ask")
   active_comms     = path.start_with?("/comms")
   show_funders     = org && (org.funder_enabled? || org.member_funders.exists?)
+
+  # The Workspaces switcher. Roles are preloaded into one hash: current_membership
+  # issues a query per call, and the popover asks once per workspace.
+  workspaces       = Current.user ? Current.user.organisations.order(:name).to_a : []
+  workspace_roles  = Current.user ? Current.user.memberships.pluck(:organisation_id, :role).to_h : {}
 %>
 <nav class="bottom-bar" aria-label="Primary">
   <div class="bottom-bar-left">
@@ -18,6 +23,56 @@
             aria-label="Open command palette">
       <%= image_tag "playverto.svg", alt: "Playverto" %>
     </button>
+
+    <%# ── Workspaces ──────────────────────────────────────────────────────
+        Which account you are ACTING IN belongs next to the logo, not buried in
+        the user menu: it is where you are, not who you are. One membership
+        renders a static chip (the context is still worth showing, a one-row
+        menu is not); several render the switcher. ── %>
+    <% if org %>
+      <div style="position:relative;">
+        <% if workspaces.many? %>
+          <button type="button" class="bottom-bar-workspace"
+                  data-action="click->command-palette#toggleWorkspace"
+                  aria-haspopup="true" aria-label="<%= t("nav.switch_workspace") %>">
+            <%= render "shared/workspace_avatar", organisation: org %>
+            <span class="bottom-bar-workspace-name"><%= org.name %></span>
+            <svg class="bottom-bar-user-caret" width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="bottom-bar-workspace-popover" data-command-palette-target="workspacePopover" hidden>
+            <div class="bottom-bar-user-popover-section"><%= t("nav.workspaces") %></div>
+            <% workspaces.each do |w| %>
+              <% role_label = workspace_roles[w.id] == "admin" ? t("nav.role_admin") : t("nav.role_member") %>
+              <% if w.id == org.id %>
+                <div class="bottom-bar-workspace-item" data-current="true">
+                  <%= render "shared/workspace_avatar", organisation: w %>
+                  <span class="bottom-bar-workspace-item-name"><%= w.name %></span>
+                  <span class="bottom-bar-workspace-role"><%= role_label %></span>
+                  <span class="bottom-bar-workspace-tick" aria-hidden="true">✓</span>
+                </div>
+              <% else %>
+                <%= button_to switch_organisation_path, method: :post,
+                      params: { organisation_id: w.id },
+                      class: "bottom-bar-workspace-item",
+                      form: { style: "margin:0;" } do %>
+                  <%= render "shared/workspace_avatar", organisation: w %>
+                  <span class="bottom-bar-workspace-item-name"><%= w.name %></span>
+                  <span class="bottom-bar-workspace-role"><%= role_label %></span>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="bottom-bar-workspace" data-static="true">
+            <%= render "shared/workspace_avatar", organisation: org %>
+            <span class="bottom-bar-workspace-name"><%= org.name %></span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
   <div class="bottom-bar-centre">
@@ -34,10 +89,14 @@
     </a>
 
     <% if org %>
-      <a href="<%= new_survey_path %>" class="bottom-bar-chip" data-active="<%= active_create %>">
-        <span class="bottom-bar-chip-dot" style="background:#0CA7FF;"></span>
-        <%= t("nav.create") %>
-      </a>
+      <%# Hidden entirely for a managed account — a chip that bounces reads as
+          broken, an absent one reads as "not your job". %>
+      <% if can_create_vertos? %>
+        <a href="<%= new_survey_path %>" class="bottom-bar-chip" data-active="<%= active_create %>">
+          <span class="bottom-bar-chip-dot" style="background:#0CA7FF;"></span>
+          <%= t("nav.create") %>
+        </a>
+      <% end %>
       <% if show_funders %>
         <a href="<%= funders_path %>" class="bottom-bar-chip" data-active="<%= active_funders %>">
           <span class="bottom-bar-chip-dot" style="background:#615BF5;"></span>
@@ -74,17 +133,11 @@
         </button>
 
         <div class="bottom-bar-user-popover" data-command-palette-target="userPopover" hidden>
+          <%# The org list that used to live here has moved to the Workspaces
+              switcher beside the logo. The name stays as the section label for
+              the Members link below it. %>
           <% if org %>
             <div class="bottom-bar-user-popover-section"><%= org.name %></div>
-            <% if Current.user.organisations.many? %>
-              <% Current.user.organisations.each do |o| %>
-                <% next if o == org %>
-                <%= button_to o.name, switch_organisation_path, method: :post,
-                      params: { organisation_id: o.id },
-                      class: "bottom-bar-user-item",
-                      form: { style: "margin:0;" } %>
-              <% end %>
-            <% end %>
           <% end %>
 
           <% if mem&.admin? %>

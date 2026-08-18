@@ -614,6 +614,10 @@ sw:
     shared_vertos: Vertos Zilizoshirikishwa
     my_vertos: Vertos Zangu
     create: Unda
+    workspaces: "Nafasi za kazi"
+    switch_workspace: "Badilisha nafasi ya kazi"
+    role_admin: "Msimamizi"
+    role_member: "Mwanachama"
     members: Wanachama
     sign_out: Toka
   partnerships:
@@ -1221,6 +1225,8 @@ sw:
     empty_title: Hakuna Vertos bado
     empty_body: Unda Verto yako ya kwanza na uanze kukusanya maarifa kutoka kwa hadhira yako.
     empty_cta: Unda Verto yako ya kwanza →
+    empty_title_managed: "Bado hakuna Verto"
+    empty_body_managed: "Timu yako ya Playverto huchapisha Vertos hapa. Zitaonekana mara tu ya kwanza itakapokuwa tayari."
     section_live: Hai
     section_drafts: Rasimu
     section_archived: Yaliyohifadhiwa
@@ -1593,6 +1599,7 @@ sw:
     organisation_scope:
       no_organisation: "Hakuna shirika lililopatikana."
       not_authorised: "Huna ruhusa."
+      verto_creation_disabled: "Akaunti yako haitengenezi Vertos — timu yako ya Playverto huzitengeneza kwa niaba yako."
     partnership_common_question_sets:
       creator_only: "Ni mwanzilishi wa ushirikiano pekee anayeweza kufanya hilo."
       partnership_not_found: "Ushirikiano haukupatikana."

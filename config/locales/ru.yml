@@ -614,6 +614,10 @@ ru:
     shared_vertos: Общие Vertos
     my_vertos: Мои Vertos
     create: Создать
+    workspaces: "Рабочие пространства"
+    switch_workspace: "Сменить рабочее пространство"
+    role_admin: "Администратор"
+    role_member: "Участник"
     members: Участники
     sign_out: Выйти
   partnerships:
@@ -1223,6 +1227,8 @@ ru:
     empty_title: Пока нет Vertos
     empty_body: Создайте свой первый Verto и начните собирать инсайты от аудитории.
     empty_cta: Создать первый Verto →
+    empty_title_managed: "Пока нет ни одного Verto"
+    empty_body_managed: "Команда Playverto публикует Vertos здесь. Они появятся, как только будет готов первый."
     section_live: Активные
     section_drafts: Черновики
     section_archived: Архив
@@ -1598,6 +1604,7 @@ ru:
     organisation_scope:
       no_organisation: "Организация не найдена."
       not_authorised: "Нет доступа."
+      verto_creation_disabled: "Ваш аккаунт не создаёт Vertos — их создаёт для вас команда Playverto."
     partnership_common_question_sets:
       creator_only: "Это может сделать только создатель партнёрства."
       partnership_not_found: "Партнёрство не найдено."

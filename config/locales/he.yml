@@ -614,6 +614,10 @@ he:
     shared_vertos: Vertos משותפים
     my_vertos: ה-Vertos שלי
     create: צור
+    workspaces: "מרחבי עבודה"
+    switch_workspace: "החלפת מרחב עבודה"
+    role_admin: "מנהל"
+    role_member: "חבר"
     members: חברים
     sign_out: התנתק
   partnerships:
@@ -1221,6 +1225,8 @@ he:
     empty_title: אין Vertos עדיין
     empty_body: צור את ה-Verto הראשון שלך והתחל לאסוף תובנות מהקהל שלך.
     empty_cta: צור את ה-Verto הראשון שלך →
+    empty_title_managed: "אין עדיין Vertos"
+    empty_body_managed: "צוות Playverto מפרסם כאן Vertos. הם יופיעו ברגע שהראשון יהיה מוכן."
     section_live: פעיל
     section_drafts: טיוטות
     section_archived: ארכיון
@@ -1596,6 +1602,7 @@ he:
     organisation_scope:
       no_organisation: "לא נמצא ארגון."
       not_authorised: "אין הרשאה."
+      verto_creation_disabled: "החשבון שלך אינו יוצר Vertos — צוות Playverto יוצר אותם עבורך."
     partnership_common_question_sets:
       creator_only: "רק יוצר השותפות יכול לעשות זאת."
       partnership_not_found: "השותפות לא נמצאה."

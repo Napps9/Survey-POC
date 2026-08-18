@@ -5890,6 +5890,81 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .bottom-bar-user-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
 
+/* ── Workspaces switcher ───────────────────────────────────
+   Which ACCOUNT you are acting in, anchored top-left beside the
+   logo. Deliberately shaped like .bottom-bar-user (same pill,
+   border and hover) because they are siblings in the chrome —
+   but anchored left, since it opens from the left slot.
+   ───────────────────────────────────────────────────────── */
+.bottom-bar-workspace {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.75);
+  font-family: "ABeeZee", sans-serif;
+  font-size: var(--text-md);
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 240px; overflow: hidden;
+}
+.bottom-bar-workspace:hover { background: rgba(255,255,255,0.06); color: #fff; }
+/* One workspace: context worth showing, but nothing to open. */
+.bottom-bar-workspace[data-static="true"] { cursor: default; }
+.bottom-bar-workspace[data-static="true"]:hover {
+  background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.75);
+}
+.bottom-bar-workspace-name {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;
+}
+.bottom-bar-workspace-logo {
+  height: 16px; width: 16px; object-fit: contain; border-radius: 4px; flex-shrink: 0;
+}
+.bottom-bar-workspace-initial {
+  height: 16px; width: 16px; border-radius: 4px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: "Alata", sans-serif; font-size: 10px; line-height: 1; color: #fff;
+}
+
+.bottom-bar-workspace-popover {
+  position: absolute; top: calc(100% + 8px); left: 0;
+  min-width: 260px;
+  background: #1C2034;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  display: flex; flex-direction: column; gap: 2px;
+  z-index: 41;
+}
+.bottom-bar-workspace-popover[hidden] { display: none; }
+.bottom-bar-workspace-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 8px;
+  color: rgba(255,255,255,0.75);
+  font-family: "ABeeZee", sans-serif;
+  font-size: var(--text-md);
+  text-decoration: none;
+  background: transparent; border: 0;
+  text-align: left; width: 100%;
+  cursor: pointer;
+}
+.bottom-bar-workspace-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.bottom-bar-workspace-item[data-current="true"] {
+  background: rgba(1,234,203,0.10); color: #fff; cursor: default;
+}
+.bottom-bar-workspace-item-name {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.bottom-bar-workspace-role {
+  flex-shrink: 0;
+  font-family: "Alata", sans-serif;
+  font-size: var(--text-2xs);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+.bottom-bar-workspace-tick { flex-shrink: 0; color: #01EACB; }
+
 /* ── Command palette modal ─────────────────────────── */
 .command-palette-backdrop {
   position: fixed; inset: 0; z-index: 50;
@@ -7321,6 +7396,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .bottom-bar-centre { gap: 4px; flex-wrap: wrap; }
   .bottom-bar-chip { padding: 6px 10px; font-size: 12px; }
   .bottom-bar-user-name { display: none; }
+  .bottom-bar-workspace-name { display: none; }
   .has-bottom-bar { padding-top: 64px; }
 }
 

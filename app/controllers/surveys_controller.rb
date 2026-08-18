@@ -39,6 +39,14 @@ class SurveysController < ApplicationController
                only: %i[ resume_import generate_flow generate_card optimise_card
                          moderate_image ]
 
+  # Managed accounts (Organisation#verto_creation_enabled false) have their
+  # Vertos built for them, so every door into creating one is closed — the AI
+  # wizard, all three imports, start-from-scratch, the template gallery and
+  # duplicate. Playverto staff acting inside such an account still get through;
+  # they are the ones doing the building. See OrganisationScope.
+  gate_verto_creation only: %i[ new generate import_pdf import_manual import_google_form
+                                create_blank resume_import finalize_import duplicate ]
+
   MAX_PDF_BYTES = 10.megabytes
 
   # Shown for moderate_image when we genuinely couldn't get a verdict (API
