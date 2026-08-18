@@ -630,6 +630,10 @@ st:
     shared_vertos: "Vertos tse Arolelanweng"
     my_vertos: "Vertos tsa ka"
     create: "Theha"
+    workspaces: "Libaka tsa Mosebetsi"
+    switch_workspace: "Fetola sebaka sa mosebetsi"
+    role_admin: "Molaodi"
+    role_member: "Setho"
     members: "Ditho"
     sign_out: "Tswa"
   partnerships:
@@ -1243,6 +1247,8 @@ st:
     empty_title: "Ha ho diVerto ho fihlela jwale"
     empty_body: "Theha Verto ya hao ya pele mme o qale ho bokella tsebo ho tswa bamameling ba hao."
     empty_cta: "Theha Verto ya hao ya pele →"
+    empty_title_managed: "Ha ho diVerto ho fihlela jwale"
+    empty_body_managed: "Sehlopha sa hao sa Playverto se phatlalatsa diVerto mona. Di tla hlaha hang ha ya pele e loketse."
     section_live: "E A Phela"
     section_drafts: "Meralo"
     section_archived: "Tse Bolokilweng"
@@ -1630,6 +1636,7 @@ st:
     organisation_scope:
       no_organisation: "Ha ho mokgatlo o fumanweng."
       not_authorised: "Ha o na tumello."
+      verto_creation_disabled: "Akhaonto ya hao ha e thehe diVerto — sehlopha sa hao sa Playverto se di u thehela."
     partnership_common_question_sets:
       creator_only: "Ke motheha wa selekane feela ya ka etsang seo."
       partnership_not_found: "Selekane ha se a fumanwa."

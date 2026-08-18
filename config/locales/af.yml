@@ -615,6 +615,10 @@ af:
     shared_vertos: "Gedeelde Vertos"
     my_vertos: "My Vertos"
     create: "Skep"
+    workspaces: "Werkruimtes"
+    switch_workspace: "Wissel werkruimte"
+    role_admin: "Admin"
+    role_member: "Lid"
     members: "Lede"
     sign_out: "Meld af"
   partnerships:
@@ -1228,6 +1232,8 @@ af:
     empty_title: "Nog geen Vertos nie"
     empty_body: "Skep jou eerste Verto en begin insigte van jou gehoor insamel."
     empty_cta: "Skep jou eerste Verto →"
+    empty_title_managed: "Nog geen Vertos nie"
+    empty_body_managed: "Jou Playverto-span publiseer Vertos hier. Hulle sal verskyn sodra die eerste een gereed is."
     section_live: "Regstreeks"
     section_drafts: "Konsepte"
     section_archived: "Geargiveer"
@@ -1598,6 +1604,7 @@ af:
     organisation_scope:
       no_organisation: "Geen organisasie gevind nie."
       not_authorised: "Nie gemagtig nie."
+      verto_creation_disabled: "Jou rekening skep nie Vertos nie — jou Playverto-span skep dit vir jou."
     partnership_common_question_sets:
       creator_only: "Slegs die vennootgroep se skepper kan dit doen."
       partnership_not_found: "Vennootgroep nie gevind nie."

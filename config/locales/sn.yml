@@ -618,6 +618,10 @@ sn:
     shared_vertos: "Vertos Dzakagovaniswa"
     my_vertos: "Vertos Dzangu"
     create: "Gadzira"
+    workspaces: "Nzvimbo Dzebasa"
+    switch_workspace: "Chinja nzvimbo yebasa"
+    role_admin: "Mutungamiriri"
+    role_member: "Nhengo"
     members: "Nhengo"
     sign_out: "Buda"
   partnerships:
@@ -1231,6 +1235,8 @@ sn:
     empty_title: "Hapana Vertos Parizvino"
     empty_body: "Gadzira Verto yako yekutanga uye utange kuunganidza zivo kubva kuvateereri vako."
     empty_cta: "Gadzira Verto Yako Yekutanga →"
+    empty_title_managed: "Hapana Vertos Parizvino"
+    empty_body_managed: "Boka rako rePlayverto rinobudisa Vertos pano. Dzichaonekwa kana yekutanga yagadzirira."
     section_live: "Pachena"
     section_drafts: "Madhirafiti"
     section_archived: "Zvakachengetwa"
@@ -1603,6 +1609,7 @@ sn:
     organisation_scope:
       no_organisation: "Hapana sangano rakawanikwa."
       not_authorised: "Hauna mvumo."
+      verto_creation_disabled: "Akaunti yako haigadziri Vertos — boka rako rePlayverto rinozvigadzirira iwe."
     partnership_common_question_sets:
       creator_only: "Mugadziri weushirikiano chete ndiye anogona kuita izvozvo."
       partnership_not_found: "Ushirikiano hahuna kuwanikwa."

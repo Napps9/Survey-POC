@@ -628,6 +628,10 @@ zu:
     shared_vertos: "Ama-Verto Ahlanganyelwe"
     my_vertos: "Ama-Verto Ami"
     create: "Dala"
+    workspaces: "Izikhala Zomsebenzi"
+    switch_workspace: "Shintsha isikhala somsebenzi"
+    role_admin: "Umphathi"
+    role_member: "Ilungu"
     members: "Amalungu"
     sign_out: "Phuma"
   partnerships:
@@ -1241,6 +1245,8 @@ zu:
     empty_title: "Azikho ama-Verto okwamanje"
     empty_body: "Dala i-Verto yakho yokuqala futhi uqale ukuqoqa imibono kusuka ezethamelini zakho."
     empty_cta: "Dala i-Verto yakho yokuqala →"
+    empty_title_managed: "Azikho ama-Verto okwamanje"
+    empty_body_managed: "Ithimba lakho lasePlayverto lishicilela ama-Verto lapha. Azovela ngokushesha nje uma elokuqala selilungile."
     section_live: "Isesikhundleni"
     section_drafts: "Izinhlaka"
     section_archived: "Okulondoloziwe"
@@ -1628,6 +1634,7 @@ zu:
     organisation_scope:
       no_organisation: "Ayikho inhlangano etholakele."
       not_authorised: "Awugunyaziwe."
+      verto_creation_disabled: "I-akhawunti yakho ayidali ama-Verto — ithimba lakho lasePlayverto liwadalela wena."
     partnership_common_question_sets:
       creator_only: "Umdali weqembu lozakwethu kuphela ongakwenza lokho."
       partnership_not_found: "Iqembu lozakwethu alitholakalanga."
