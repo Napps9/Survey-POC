@@ -571,6 +571,31 @@ class Survey < ApplicationRecord
           c.delete("range_theme")
         end
       end
+      # Where a card's image sits vertically inside the MOBILE header strip.
+      # 0-100, a percentage handed straight to background-position; 50 (centre)
+      # is the default and is stored as nothing. The card image is a 9:16
+      # portrait while the mobile hero is roughly 3:1, so `cover` + centre shows
+      # only the middle band of a tall photo and a face at the top of the frame
+      # is simply gone — "to drag the image up and down to choose the perfect
+      # spot for mobile headers. This would be a huge win" (18 Aug).
+      #
+      # A stored position rather than a second crop: the original stays intact,
+      # so it can be re-adjusted later and every other surface keeps the whole
+      # image.
+      if c.key?("focal_y")
+        raw   = c["focal_y"]
+        # `.to_f` alone would turn any junk into 0.0, i.e. silently pin the
+        # header to the top of the image. A value that isn't a number is a
+        # value we don't understand — drop it and use the centre.
+        numeric = raw.is_a?(Numeric) || raw.to_s.strip.match?(/\A-?\d+(?:\.\d+)?\z/)
+        focal   = numeric ? raw.to_f.clamp(0, 100).round : nil
+        if c["image"].present? && focal && focal != 50
+          c["focal_y"] = focal
+        else
+          c.delete("focal_y")
+        end
+      end
+
       # Animation backdrop — the colour or image behind a Lottie / range
       # animation, overriding the Verto-wide --brand-panel for this one card.
       # Only meaningful where an animation actually fills the panel (a photo or
@@ -585,7 +610,11 @@ class Survey < ApplicationRecord
         if (img = sanitize_image_url(bg["image"])).present?
           out["image"] = img
         end
-        animated = c["type"].to_s == "range" || c["lottie"].present?
+        # Reads the card's OWN lottie value, which at this point has not been
+        # through sanitize_lottie_url yet — a card carrying an off-allowlist
+        # animation would have its backdrop kept and the animation dropped.
+        # Check the value the way that sanitiser will.
+        animated = c["type"].to_s == "range" || sanitize_lottie_url(c["lottie"]).present?
         if animated && out.any?
           c["media_bg"] = out
         else
@@ -1365,7 +1394,26 @@ class Survey < ApplicationRecord
       consent_image_credit_url: consent_image_credit_url,
       leaderboard_enabled:     leaderboard_enabled,
       leaderboard_retake_policy: leaderboard_retake_policy
-    )
+    ).tap { |copy| copy_card_attachments_to(copy) }
+  end
+
+  # Blobs a card's JSON points at — uploaded stills and stored Lottie
+  # animations — belong to the survey they were attached to. The cards JSON is
+  # copied verbatim above, so without this the copy's media is served entirely
+  # out of the ORIGINAL's attachments: the paths resolve, nothing looks wrong,
+  # and the copy silently depends on a survey it has no relationship with.
+  # Re-attaching the same blobs gives the copy its own claim on them (Active
+  # Storage keeps one blob, two attachments), so neither survey can pull the
+  # media out from under the other.
+  def copy_card_attachments_to(copy)
+    referenced = card_images.blobs.select do |blob|
+      copy.cards.to_json.include?(blob.filename.to_s)
+    end
+    copy.card_images.attach(referenced) if referenced.any?
+  rescue StandardError => e
+    # A copy without its attachments still works today (the paths point at the
+    # original's blobs), so this is a hardening step, not a precondition.
+    ErrorReporting.report("Survey#copy_card_attachments_to", e, survey_id: id)
   end
 
   # Give every card a fresh cid and rewrite each branching target (route +

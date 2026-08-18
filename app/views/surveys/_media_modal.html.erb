@@ -94,26 +94,7 @@
                style="margin-top:8px;color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size:13px;line-height:1.4;" hidden></div>
         </div>
 
-        <%# Animation backdrop. Shown only for a card whose panel is actually an
-            animation (a pasted Lottie, or a range card's reaction set) — behind
-            a photo or video there is nothing to see, so the section stays
-            hidden rather than offering a control that does nothing.
-            media-picker toggles it in _syncAnimationBg. %>
-        <div class="media-animbg-section" data-media-picker-target="animBgSection" hidden>
-          <div class="media-lottie-label"><%= t("editor.animation_bg", default: "Animation background") %></div>
-          <div class="media-animbg-row">
-            <input type="color" class="media-animbg-color"
-                   data-media-picker-target="animBgColor"
-                   data-action="input->media-picker#setAnimBgColor"
-                   aria-label="<%= t("editor.animation_bg_colour", default: "Background colour") %>" />
-            <button type="button" class="media-animbg-btn"
-                    data-action="click->media-picker#openAnimBgImage"><%= t("editor.animation_bg_image", default: "Use an image") %></button>
-            <button type="button" class="media-animbg-btn is-clear"
-                    data-media-picker-target="animBgClear"
-                    data-action="click->media-picker#clearAnimBg"><%= t("editor.animation_bg_clear", default: "Reset to brand colour") %></button>
-          </div>
-          <div class="media-lottie-hint"><%= t("editor.animation_bg_hint", default: "Sits behind the animation on this card only. Without one the card uses your brand's panel colour.") %></div>
-        </div>
+
       </div>
 
       <%# Library pane %>
@@ -239,6 +220,49 @@
             to populate this picker.
           </div>
         <% end %>
+      </div>
+
+      <%# Per-card media SETTINGS, shared by both source tabs. They live
+          outside the panes on purpose: they describe the card, not where
+          its picture came from, and inside the Upload pane they were
+          invisible whenever the modal opened on the Verto Library (which
+          it does by default). %>
+      <%# Mobile header position. A card's image is a 9:16 portrait but the
+          mobile header is a ~3:1 band, so `cover` shows only its middle
+          stripe — a face near the top of the photo simply isn't there on a
+          phone. Dragging this preview picks which stripe. Width stays full
+          and there is no horizontal axis, by request: "not left or right —
+          keep the width full and sticky — but to drag the image up and down
+          to choose the perfect spot for mobile headers." %>
+      <div class="media-focal-section" data-media-picker-target="focalSection" hidden>
+        <div class="media-lottie-label"><%= t("editor.focal_label", default: "Mobile header position") %></div>
+        <div class="media-focal-frame"
+             data-media-picker-target="focalFrame"
+             data-action="pointerdown->media-picker#focalStart">
+          <div class="media-focal-img" data-media-picker-target="focalImg"></div>
+          <span class="media-focal-hint"><%= t("editor.focal_hint", default: "Drag up or down") %></span>
+        </div>
+        <div class="media-lottie-hint"><%= t("editor.focal_note", default: "Only affects the header on phones — the full image is kept, so you can change this any time.") %></div>
+      </div>
+      <%# Animation backdrop. Shown only for a card whose panel is actually an
+          animation (a pasted Lottie, or a range card's reaction set) — behind
+          a photo or video there is nothing to see, so the section stays
+          hidden rather than offering a control that does nothing.
+          media-picker toggles it in _syncAnimationBg. %>
+      <div class="media-animbg-section" data-media-picker-target="animBgSection" hidden>
+        <div class="media-lottie-label"><%= t("editor.animation_bg", default: "Animation background") %></div>
+        <div class="media-animbg-row">
+          <input type="color" class="media-animbg-color"
+                 data-media-picker-target="animBgColor"
+                 data-action="input->media-picker#setAnimBgColor"
+                 aria-label="<%= t("editor.animation_bg_colour", default: "Background colour") %>" />
+          <button type="button" class="media-animbg-btn"
+                  data-action="click->media-picker#openAnimBgImage"><%= t("editor.animation_bg_image", default: "Use an image") %></button>
+          <button type="button" class="media-animbg-btn is-clear"
+                  data-media-picker-target="animBgClear"
+                  data-action="click->media-picker#clearAnimBg"><%= t("editor.animation_bg_clear", default: "Reset to brand colour") %></button>
+        </div>
+        <div class="media-lottie-hint"><%= t("editor.animation_bg_hint", default: "Sits behind the animation on this card only. Without one the card uses your brand's panel colour.") %></div>
       </div>
     </div>
 

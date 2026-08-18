@@ -329,6 +329,15 @@ class AssetPopulator
     # tap_card's imagery rides on its statement cards; range shows the reactive
     # Lottie animation on its left panel — neither takes a left-panel still.
     return nil if type == "tap_card" || type == "range"
+    # Nor does a card the creator has given their own animation to. Shuffle used
+    # to stamp a stock photo onto it: the card then held BOTH `lottie` and
+    # `image`, the illegal state Survey.sanitize_cards_images! exists to forbid
+    # — and this writes straight to the column without going through it. The
+    # editor still drew the animation (it wins the render), but the card now
+    # carried a photo the creator never chose, and clearing the image from the
+    # media picker wipes `lottie` along with it. A deliberate animation is not
+    # Shuffle's to overwrite.
+    return nil if card["lottie"].present?
 
     if PexelsClient.configured?
       if prefer_video && (vid = pexels_card_video(card, idx, used))

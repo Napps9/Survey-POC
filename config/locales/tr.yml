@@ -1022,6 +1022,9 @@ tr:
     animation_bg_image: "Bir görsel kullan"
     animation_bg_clear: "Marka rengine sıfırla"
     animation_bg_hint: "Yalnızca bu kartta animasyonun arkasında görünür. Ayarlanmazsa kart, markanızın panel rengini kullanır."
+    focal_label: "Mobil başlık konumu"
+    focal_hint: "Yukarı veya aşağı sürükleyin"
+    focal_note: "Yalnızca telefonlardaki başlığı etkiler — görselin tamamı korunur, bu yüzden istediğiniz zaman değiştirebilirsiniz."
     required_chip: 'Zorunlu'
     ty_title_label: 'Teşekkür başlığı'
     ty_body_label: 'Teşekkür mesajı'

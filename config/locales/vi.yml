@@ -1022,6 +1022,9 @@ vi:
     animation_bg_image: "Dùng hình ảnh"
     animation_bg_clear: "Đặt lại về màu thương hiệu"
     animation_bg_hint: "Chỉ hiển thị phía sau ảnh động trên thẻ này. Nếu không đặt, thẻ sẽ dùng màu bảng của thương hiệu bạn."
+    focal_label: "Vị trí tiêu đề trên di động"
+    focal_hint: "Kéo lên hoặc xuống"
+    focal_note: "Chỉ ảnh hưởng đến tiêu đề trên điện thoại — ảnh gốc vẫn được giữ nên bạn có thể thay đổi bất cứ lúc nào."
     required_chip: 'Bắt buộc'
     ty_title_label: 'Tiêu đề cảm ơn'
     ty_body_label: 'Lời nhắn cảm ơn'

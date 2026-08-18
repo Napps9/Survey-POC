@@ -315,6 +315,15 @@ module ApplicationHelper
     "background:linear-gradient(135deg, #{BrandPalette.lighten(hex, 0.18)}, #{hex});"
   end
 
+  # Where the card's image sits vertically in the mobile header strip, as a
+  # percentage for background-position. 50 (centre) unless the creator has
+  # dragged it.
+  def card_focal_y(card)
+    return 50 unless card.is_a?(Hash)
+    y = card["focal_y"]
+    y.presence ? y.to_f.clamp(0, 100).round : 50
+  end
+
   # A card's animation backdrop, as an inline style for .split-left. An image
   # wins over a colour when both are set (the colour still paints underneath,
   # so a transparent PNG sits on it rather than on the brand panel). "" when

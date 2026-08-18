@@ -1022,6 +1022,9 @@ sw:
     animation_bg_image: "Tumia picha"
     animation_bg_clear: "Rudisha rangi ya chapa"
     animation_bg_hint: "Huonekana nyuma ya uhuishaji kwenye kadi hii pekee. Bila hiyo, kadi hutumia rangi ya paneli ya chapa yako."
+    focal_label: "Nafasi ya kichwa cha simu"
+    focal_hint: "Buruta juu au chini"
+    focal_note: "Huathiri kichwa kwenye simu pekee — picha kamili huhifadhiwa, kwa hivyo unaweza kubadilisha hili wakati wowote."
     required_chip: 'Lazima'
     ty_title_label: 'Kichwa cha shukrani'
     ty_body_label: 'Ujumbe wa shukrani'

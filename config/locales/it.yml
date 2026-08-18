@@ -1022,6 +1022,9 @@ it:
     animation_bg_image: "Usa un'immagine"
     animation_bg_clear: "Ripristina il colore del brand"
     animation_bg_hint: "Compare dietro l'animazione solo su questa scheda. Senza, la scheda usa il colore del pannello del tuo brand."
+    focal_label: "Posizione dell'intestazione mobile"
+    focal_hint: "Trascina su o giù"
+    focal_note: "Riguarda solo l'intestazione su telefono — l'immagine completa viene conservata, quindi puoi cambiarla quando vuoi."
     required_chip: 'Obbligatoria'
     ty_title_label: 'Titolo di ringraziamento'
     ty_body_label: 'Messaggio di ringraziamento'

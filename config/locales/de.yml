@@ -1022,6 +1022,9 @@ de:
     animation_bg_image: "Bild verwenden"
     animation_bg_clear: "Auf Markenfarbe zurücksetzen"
     animation_bg_hint: "Liegt nur auf dieser Karte hinter der Animation. Ohne eigene Angabe nutzt die Karte die Panelfarbe deiner Marke."
+    focal_label: "Position der mobilen Kopfzeile"
+    focal_hint: "Nach oben oder unten ziehen"
+    focal_note: "Betrifft nur die Kopfzeile auf Telefonen — das vollständige Bild bleibt erhalten, du kannst das jederzeit ändern."
     required_chip: 'Pflicht'
     ty_title_label: 'Titel der Dankeschön-Seite'
     ty_body_label: 'Nachricht der Dankeschön-Seite'

@@ -16,6 +16,7 @@ export default class extends Controller {
     "saveToLibrary", "brandGrid", "libraryFileInput", "brandStatus",
     "lottieSection", "lottieInput", "lottieError", "lottieBtn",
     "animBgSection", "animBgColor", "animBgClear",
+    "focalSection", "focalFrame", "focalImg",
     "cropStage", "cropFrame", "cropImg", "cropZoom",
     "appealBtn", "appealStatus", "approvedSection", "approvedGrid"
   ]
@@ -79,6 +80,7 @@ export default class extends Controller {
     this._showMediaToggle(true)
     this._showLottieSection(true)       // paste-a-LottieFiles-URL, cards only
     this._syncAnimationBg()             // backdrop, only when the panel animates
+    this._syncFocal()                   // mobile header position, images only
 
     const currentUrl = card.dataset.cardImage || card.dataset.cardVideo || card.dataset.cardLottie || ""
     this.clearBtnTarget.hidden = !currentUrl
@@ -1216,6 +1218,10 @@ export default class extends Controller {
   }
 
   _setCardImage(card, url, credit = "", creditUrl = "") {
+    // A different picture has a different subject, so an old mobile-header
+    // focal point is meaningless against it — back to centre.
+    if (card) delete card.dataset.cardFocalY
+
     card.dataset.cardImage = url || ""
     card.dataset.cardImageCredit = url ? (credit || "") : ""
     card.dataset.cardImageCreditUrl = url ? (creditUrl || "") : ""
@@ -1303,6 +1309,69 @@ export default class extends Controller {
   _showLottieSection(show) {
     if (this.hasLottieSectionTarget) this.lottieSectionTarget.hidden = !show
     if (show && this.hasLottieErrorTarget) this.lottieErrorTarget.hidden = true
+  }
+
+  // ── Mobile header position ────────────────────────────────────────────
+  // The card image is stored whole; this records only WHICH horizontal stripe
+  // of it the mobile header shows, as a background-position percentage. Nothing
+  // is re-cropped, so it stays adjustable and every other surface still gets
+  // the full picture.
+
+  get _focalY() {
+    const y = parseInt(this._activeCard?.dataset.cardFocalY, 10)
+    return Number.isFinite(y) ? Math.min(100, Math.max(0, y)) : 50
+  }
+
+  _syncFocal() {
+    const card  = this._activeCard
+    const image = card?.dataset.cardImage
+    const show  = this._mode === "card" && !!image
+    if (this.hasFocalSectionTarget) this.focalSectionTarget.hidden = !show
+    if (!show || !this.hasFocalImgTarget) return
+    this.focalImgTarget.style.backgroundImage = `url('${String(image).replace(/'/g, "\\'")}')`
+    this._paintFocal(this._focalY)
+  }
+
+  _paintFocal(y) {
+    if (this.hasFocalImgTarget) this.focalImgTarget.style.backgroundPosition = `50% ${y}%`
+  }
+
+  // Dragging DOWN reveals more of the top of the picture, so the stored
+  // percentage goes down with it — the image follows the pointer, which is what
+  // "drag the image up and down" means. The frame's height is the full range.
+  focalStart(event) {
+    if (!this.hasFocalFrameTarget) return
+    event.preventDefault()
+    const frame  = this.focalFrameTarget
+    const height = Math.max(frame.getBoundingClientRect().height, 1)
+    const from   = this._focalY
+    const startY = event.clientY
+    frame.setPointerCapture?.(event.pointerId)
+
+    const move = (e) => {
+      const delta = ((e.clientY - startY) / height) * 100
+      const next  = Math.round(Math.min(100, Math.max(0, from - delta)))
+      this._paintFocal(next)
+      this._writeFocal(next)
+    }
+    const stop = () => {
+      frame.removeEventListener("pointermove", move)
+      frame.removeEventListener("pointerup", stop)
+      frame.removeEventListener("pointercancel", stop)
+    }
+    frame.addEventListener("pointermove", move)
+    frame.addEventListener("pointerup", stop)
+    frame.addEventListener("pointercancel", stop)
+  }
+
+  _writeFocal(y) {
+    const card = this._activeCard
+    if (!card) return
+    card.dataset.cardFocalY = String(y)
+    // Repaint the card's own hero at once — the custom property is what the
+    // mobile and device frames crop against.
+    card.querySelector(".split-left-img")?.style.setProperty("--focal-y", `${y}%`)
+    this._notifyDirty()
   }
 
   // ── Animation backdrop ────────────────────────────────────────────────

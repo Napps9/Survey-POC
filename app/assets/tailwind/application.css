@@ -347,7 +347,12 @@
 .split-left-img {
   position: absolute; inset: 0;
   background-size: cover;
-  background-position: center;
+  /* --focal-y is the card's stored vertical focal point (default 50%). It only
+     changes anything where the frame crops vertically — the mobile header strip
+     and the editor's device frames, where a 9:16 image is shown in a ~3:1 band.
+     On desktop the panel is taller than it is wide, so the crop is horizontal
+     and this is a no-op. */
+  background-position: 50% var(--focal-y, 50%);
 }
 .split-left-video {
   position: absolute; inset: 0;
@@ -560,6 +565,17 @@
   height: 88%;
   max-width: 380px;
   max-height: 380px;
+}
+/* An animation that could not be fetched. Without this the panel was simply
+   blank — indistinguishable from a card that never had one, which is why a
+   failed load got reported as the link "disappearing". */
+.card-lottie.is-broken::after,
+.nps-lottie.is-broken::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border: 1.5px dashed rgba(255,255,255,0.35);
+  border-radius: 14px;
 }
 .card-lottie-mount svg {
   width: 100% !important;
@@ -1051,6 +1067,41 @@
 .media-search-input:focus { outline: none; border-color: rgba(1,234,203,0.6); }
 /* Coaching line under the search box — stock results are only as good as the
    words, and creators tended to search the card's whole question. */
+/* Mobile header position. The frame is the mobile hero's own proportion
+   (390x232 ≈ 5:3), so what the creator drags is exactly what a phone will show
+   — no interpretation needed between the control and the result. */
+.media-focal-section { margin-top: 18px; }
+.media-focal-frame {
+  position: relative;
+  margin-top: 8px;
+  aspect-ratio: 390 / 232;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  cursor: ns-resize;
+  touch-action: none;   /* the drag IS the gesture; don't scroll the modal */
+  user-select: none;
+}
+.media-focal-img {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+.media-focal-hint {
+  position: absolute;
+  left: 50%; bottom: 8px; transform: translateX(-50%);
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(0,0,0,0.55);
+  color: rgba(255,255,255,0.85);
+  font-family: "ABeeZee", sans-serif;
+  font-size: 11px;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.media-focal-frame:active .media-focal-hint { opacity: 0; }
+
 /* Animation backdrop control — the per-card colour/image behind a Lottie or a
    range card's reaction set. Same visual family as the Lottie row above it. */
 .media-animbg-section { margin-top: 18px; }
@@ -3994,12 +4045,22 @@ button.editor-leave-btn { cursor: pointer; }
 /* Collapsed, every control is the same 30px circle, so the columns are fixed
    to that width and each row is exactly two circles wide — including the
    reorder pair, which the rest now matches. */
-.editor-grid.is-panel-open .rail-top,
+/* The top dock is THREE circles wide because its first row is the reorder trio
+   — move, up, down. At two it wrapped the down arrow onto its own line and, once
+   the trio was put on one row, spilled it outside the dock's rounded edge. The
+   foot holds exactly two buttons, so it stays a pair. */
+.editor-grid.is-panel-open .rail-top {
+  grid-template-columns: repeat(3, 30px); justify-content: center; padding: 6px;
+}
 .editor-grid.is-panel-open .rail-bottom {
   grid-template-columns: repeat(2, 30px); justify-content: center; padding: 6px;
 }
+/* Three across here too — this row has three children, and two columns wrapped
+   the down arrow onto a line of its own in BOTH rail states. It is allowed to
+   be wider than the two-circle rows above it; keeping the trio together reads
+   better than lining its edges up with them. */
 .editor-grid.is-panel-open .card-rail .card-reorder {
-  grid-template-columns: repeat(2, 30px);
+  grid-template-columns: repeat(3, 30px);
 }
 /* Nothing spans the row once it's a circle — they pair up like the rest. */
 .editor-grid.is-panel-open .card-rail .card-light,
@@ -5106,11 +5167,15 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .rating-mid-labels > .rating-label-mid.is-shown { opacity: 1; }
 /* In the editor every caption must be reachable to type in, so they lay out in
    a row and stay legible rather than hiding behind a hover the creator would
-   have to hold. */
+   have to hold. space-around spreads the three middles across the gap between
+   the two end captions, which lands them under roughly their own stars —
+   bunched in the centre they read as one run-on label. */
 .editor-feed .rating-mid-labels {
-  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+  display: flex; gap: 6px; justify-content: space-around; align-items: flex-start;
 }
-.editor-feed .rating-mid-labels > .rating-label-mid { opacity: 1; }
+.editor-feed .rating-mid-labels > .rating-label-mid {
+  opacity: 1; text-align: center; min-width: 0;
+}
 .rating-label {
   font-size: 11px; color: rgba(0,0,0,0.4);
   font-family: "ABeeZee", sans-serif;
@@ -8364,42 +8429,66 @@ body.generating-overlay-active .bottom-bar { display: none; }
      wrap for the same reason). */
   flex-shrink: 0;
 }
-/* Tablet mirrors the mobile stack — hero image on top, question below — just
-   at a larger scale (wider frame, taller hero, roomier padding). The desktop
-   side-by-side split would clip inside the narrower frame. */
-.device-tablet .split-card {
-  flex-direction: column; height: auto; min-height: 760px;
-  max-width: 720px; width: 100%; margin: 0 auto;
-  border: 14px solid #0e1020; border-radius: 28px;
+/* ── Real device viewports ────────────────────────────────────────────────
+   The frames used to be content-sized — `height: auto` with a min-height floor
+   — so a two-option card was 580px and a ten-option card was however tall its
+   list happened to be. Every question was a different shape, which is not what
+   designing for a phone is: "keep every mobile question the same height, so it
+   feels like the same mobile device. For example, picking an iPhone 12 Pro and
+   showing the verto in that container when designing" (18 Aug).
+
+   So the frame is now a FIXED viewport and the card scrolls inside it, exactly
+   as it would on the device. The numbers are the real CSS-pixel viewports
+   (iPhone 12 Pro 390x844, iPad 768x1024), set as custom properties so a device
+   picker later is a change of two values rather than a rewrite. The bezel sits
+   outside them, like a real bezel does. */
+.device-tablet .split-card,
+.device-mobile .split-card {
+  flex-direction: column;
+  width: var(--device-w); max-width: 100%;
+  height: var(--device-h);
+  margin: 0 auto;
   box-shadow: 0 16px 40px rgba(0,0,0,0.4);
   overflow: hidden; background: #0e1020;
 }
-.device-tablet .split-left {
-  width: 100%; flex: 0 0 auto; min-height: 320px; max-height: 400px;
-  border-radius: 0 0 18px 18px; overflow: hidden; position: relative;
+.device-tablet .split-card {
+  --device-w: 768px; --device-h: 1024px;
+  border: 14px solid #0e1020; border-radius: 28px;
 }
-.device-tablet .split-right {
-  width: 100%; flex: 1 1 auto; padding: 32px 40px;
-  justify-content: flex-start; background: #fff;
+.device-mobile .split-card {
+  --device-w: 390px; --device-h: 844px;
+  border: 8px solid #0e1020; border-radius: 34px;
 }
 
-.device-mobile .split-card {
-  flex-direction: column; height: auto; min-height: 580px;
-  max-width: 400px; width: 100%; margin: 0 auto;
-  border: 8px solid #0e1020; border-radius: 34px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
-  overflow: hidden; background: #0e1020;
-}
-/* Hero strip: round the bottom like the real mobile player and keep the
-   image clipped to it. */
+/* Hero strip: a share of the viewport rather than a pixel band, so it keeps its
+   proportion whichever device is being previewed. */
+.device-tablet .split-left,
 .device-mobile .split-left {
-  width: 100%; flex: 0 0 auto; min-height: 190px; max-height: 240px;
-  border-radius: 0 0 18px 18px; overflow: hidden; position: relative;
+  width: 100%; flex: 0 0 auto;
+  height: 28%; min-height: 0; max-height: none;
+  border-radius: 0; overflow: hidden; position: relative;
 }
+/* The answer panel takes the rest and SCROLLS — the frame is the viewport now,
+   so a long option list behaves the way it will on the phone instead of
+   stretching the phone.
+
+   It also rides up over the foot of the hero with a rounded top, which is what
+   covers the two dark wedges the old build left there: the strip had rounded
+   BOTTOM corners sitting directly on the near-black bezel fill, and the white
+   panel started flush below it, so the bezel showed through at both corners —
+   "the white bg should go up further to cover the black corners at the bottom
+   of the mobile header". Same construction the real player uses. */
+.device-tablet .split-right,
 .device-mobile .split-right {
-  width: 100%; flex: 1 1 auto; padding: 24px 22px;
+  width: 100%; flex: 1 1 auto; min-height: 0;
   justify-content: flex-start; background: #fff;
+  overflow-y: auto; overscroll-behavior: contain;
+  position: relative; z-index: 1;
+  margin-top: -18px;
+  border-radius: 18px 18px 0 0;
 }
+.device-tablet .split-right { padding: 32px 40px; }
+.device-mobile .split-right { padding: 24px 22px; }
 /* Selected: the split-card's 2px transparent border IS the bezel in device
    modes, so the desktop rule's pink border-color would paint the whole
    14px/8px bezel. Keep the bezel dark and ring the frame instead. */

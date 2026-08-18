@@ -1022,6 +1022,9 @@ ja:
     animation_bg_image: "画像を使う"
     animation_bg_clear: "ブランドカラーに戻す"
     animation_bg_hint: "このカードのアニメーションの背面にのみ表示されます。未設定の場合はブランドのパネル色が使われます。"
+    focal_label: "モバイルヘッダーの位置"
+    focal_hint: "上下にドラッグ"
+    focal_note: "スマートフォンのヘッダーにのみ影響します。元の画像はそのまま残るので、いつでも変更できます。"
     required_chip: '必須'
     ty_title_label: 'サンクスのタイトル'
     ty_body_label: 'サンクスのメッセージ'

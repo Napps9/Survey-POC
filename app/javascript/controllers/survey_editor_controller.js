@@ -1625,6 +1625,10 @@ export default class extends Controller {
         if (card.dataset.cardVideoPoster) out.video_poster = card.dataset.cardVideoPoster
       } else if (image) {
         out.image = image
+        // Where that image sits in the mobile header. Only carried when it has
+        // been moved off centre — the server drops a 50 anyway.
+        const focal = parseInt(card.dataset.cardFocalY, 10)
+        if (Number.isFinite(focal) && focal !== 50) out.focal_y = focal
       }
       if (video || image) {
         const credit    = card.dataset.cardImageCredit

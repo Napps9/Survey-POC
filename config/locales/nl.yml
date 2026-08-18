@@ -1022,6 +1022,9 @@ nl:
     animation_bg_image: "Afbeelding gebruiken"
     animation_bg_clear: "Terug naar merkkleur"
     animation_bg_hint: "Staat alleen op deze kaart achter de animatie. Zonder deze instelling gebruikt de kaart de panelkleur van je merk."
+    focal_label: "Positie van mobiele koptekst"
+    focal_hint: "Sleep omhoog of omlaag"
+    focal_note: "Heeft alleen invloed op de koptekst op telefoons — de volledige afbeelding blijft bewaard, dus je kunt dit altijd wijzigen."
     required_chip: 'Verplicht'
     ty_title_label: 'Bedanktitel'
     ty_body_label: 'Bedankbericht'

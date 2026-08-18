@@ -1022,6 +1022,9 @@ es:
     animation_bg_image: "Usar una imagen"
     animation_bg_clear: "Restablecer al color de marca"
     animation_bg_hint: "Se muestra detrás de la animación solo en esta tarjeta. Sin uno, la tarjeta usa el color de panel de tu marca."
+    focal_label: "Posición del encabezado móvil"
+    focal_hint: "Arrastra hacia arriba o abajo"
+    focal_note: "Solo afecta al encabezado en móviles: se conserva la imagen completa, así que puedes cambiarlo cuando quieras."
     required_chip: 'Obligatoria'
     ty_title_label: 'Título de agradecimiento'
     ty_body_label: 'Mensaje de agradecimiento'

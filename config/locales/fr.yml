@@ -1022,6 +1022,9 @@ fr:
     animation_bg_image: "Utiliser une image"
     animation_bg_clear: "Rétablir la couleur de marque"
     animation_bg_hint: "S'affiche derrière l'animation sur cette carte uniquement. Sans cela, la carte utilise la couleur de panneau de votre marque."
+    focal_label: "Position de l'en-tête mobile"
+    focal_hint: "Faites glisser vers le haut ou le bas"
+    focal_note: "N'affecte que l'en-tête sur mobile — l'image complète est conservée, vous pouvez donc la modifier à tout moment."
     required_chip: 'Obligatoire'
     ty_title_label: 'Titre de remerciement'
     ty_body_label: 'Message de remerciement'

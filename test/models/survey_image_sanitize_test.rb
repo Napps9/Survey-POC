@@ -351,4 +351,45 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
                 "media_bg" => "#ff0000" } ]
     refute Survey.sanitize_cards_images!(cards).first.key?("media_bg")
   end
+
+  # ── Mobile header focal point (focal_y) ────────────────────────────────
+  # The card image is a 9:16 portrait; the mobile header is a ~3:1 band. `cover`
+  # + centre therefore shows only the middle stripe, and a subject near the top
+  # of the photo is simply absent on a phone. focal_y records which stripe to
+  # show, WITHOUT re-cropping, so the original stays whole and adjustable.
+
+  test "focal_y is kept on a card with an image" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH, "focal_y" => 18 } ]
+    assert_equal 18, Survey.sanitize_cards_images!(cards).first["focal_y"]
+  end
+
+  test "focal_y is clamped to the percentage range and rounded" do
+    [ [ -40, 0 ], [ 0, 0 ], [ 33.4, 33 ], [ 100, 100 ], [ 180, 100 ] ].each do |given, want|
+      cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH, "focal_y" => given } ]
+      assert_equal want, Survey.sanitize_cards_images!(cards).first["focal_y"],
+                   "focal_y #{given.inspect} should clamp to #{want}"
+    end
+  end
+
+  # Centre is the default everywhere, so storing it is storing nothing.
+  test "a centred focal_y is dropped rather than stored" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH, "focal_y" => 50 } ]
+    refute Survey.sanitize_cards_images!(cards).first.key?("focal_y")
+  end
+
+  test "focal_y is dropped on a card with no image to position" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "focal_y" => 20 } ]
+    refute Survey.sanitize_cards_images!(cards).first.key?("focal_y")
+
+    lottie = [ { "type" => "multiple_choice", "text" => "Q",
+                 "lottie" => LOTTIE_BLOB_URL, "focal_y" => 20 } ]
+    refute Survey.sanitize_cards_images!(lottie).first.key?("focal_y"),
+           "an animation fills the panel — there is no crop to reposition"
+  end
+
+  test "a junk focal_y is dropped rather than stored" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH,
+                "focal_y" => "top; background:url(evil)" } ]
+    refute Survey.sanitize_cards_images!(cards).first.key?("focal_y")
+  end
 end

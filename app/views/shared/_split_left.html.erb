@@ -51,8 +51,10 @@
         <source src="<%= card["video"] %>" type="video/mp4">
       </video>
     <% else %>
+      <%# --focal-y only bites where the frame crops vertically — the mobile
+          header strip — so desktop is unaffected by it. %>
       <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
-           style="background-image:url('<%= card["image"] %>');"></div>
+           style="background-image:url('<%= card["image"] %>'); --focal-y: <%= card_focal_y(card) %>%;"></div>
     <% end %>
     <div class="split-left-overlay"<%= " data-card-media".html_safe if editable %>></div>
     <%# Subtle creator credit (Pexels picks). Doubles as the link back to

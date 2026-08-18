@@ -1022,6 +1022,9 @@ pt:
     animation_bg_image: "Usar uma imagem"
     animation_bg_clear: "Repor a cor da marca"
     animation_bg_hint: "Aparece por trás da animação apenas neste cartão. Sem isto, o cartão usa a cor de painel da sua marca."
+    focal_label: "Posição do cabeçalho móvel"
+    focal_hint: "Arraste para cima ou para baixo"
+    focal_note: "Afeta apenas o cabeçalho nos telemóveis — a imagem completa é mantida, por isso pode alterar isto a qualquer momento."
     required_chip: 'Obrigatória'
     ty_title_label: 'Título de agradecimento'
     ty_body_label: 'Mensagem de agradecimento'

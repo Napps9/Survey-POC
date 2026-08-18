@@ -95,5 +95,16 @@ export default class extends Controller {
       autoplay: true,
       path: url,
     })
+    // A failed fetch left an EMPTY mount inside an invisible inset:0 box, so
+    // the card showed a bare brand panel with its "Change media" button still
+    // there and nothing to say why — reported as "the lottie links disappear
+    // randomly after added and platform saved" when the link had not gone
+    // anywhere. Mark the wrapper so the panel can show its empty state, and say
+    // so once in the console for anyone looking.
+    this.element.classList.remove("is-broken")
+    this.instance.addEventListener("data_failed", () => {
+      this.element.classList.add("is-broken")
+      console.warn(`[lottie-player] could not load ${url}`)
+    })
   }
 }
