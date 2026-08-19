@@ -8129,7 +8129,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .create-menu-tile-icon {
   display: flex; align-items: center; justify-content: center;
-  width: 42px; height: 42px; border-radius: 12px; font-size: 19px; flex-shrink: 0;
+  width: 42px; height: 42px; border-radius: 12px; font-size: 25px; flex-shrink: 0;
   background: linear-gradient(135deg, color-mix(in srgb, var(--tile-accent, #01EACB) 22%, transparent), color-mix(in srgb, var(--tile-accent, #01EACB) 6%, transparent));
   border: 1px solid color-mix(in srgb, var(--tile-accent, #01EACB) 40%, transparent);
 }
