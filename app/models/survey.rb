@@ -844,7 +844,13 @@ class Survey < ApplicationRecord
           warnings << "lottie" if warnings && had_lottie
         else
           # Mirrors the client's exclusivity: applying an animation clears the
-          # photo/video (and with them the credit fields, below).
+          # photo/video (and with them the credit fields, below). Warn on
+          # this same as an outright-rejected image — a card should never
+          # reach this branch with both set (the client never sends both,
+          # and Shuffle is guarded against it too), so if one does, whatever
+          # put it there deserves a visible flag, not a silent drop.
+          warnings << "image" if warnings && c["image"].present?
+          warnings << "video" if warnings && c["video"].present?
           c.delete("image")
           c.delete("video")
           c.delete("video_poster")

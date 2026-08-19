@@ -1770,10 +1770,18 @@ export default class extends Controller {
       // current option count while tap_card is actually active — primOpts is
       // some OTHER type's options otherwise, and truncating against it would
       // destroy statements this card isn't even showing right now.
+      //
+      // Guard against primOpts reading empty for a genuine tap_card: that
+      // means _optionEls found no ".rotate-card span[contenteditable]"
+      // nodes, which is a serialization miss, not "this card has zero
+      // statements" — a tap_card always renders at least one. Slicing
+      // against a length of 0 would wipe every stored option_image, so an
+      // empty read is treated as untrustworthy and the array is carried
+      // through unsliced instead.
       try {
         const optImgs = JSON.parse(card.dataset.cardOptionImages || "[]")
         if (Array.isArray(optImgs) && optImgs.length) {
-          out.option_images = type === "tap_card" ? optImgs.slice(0, primOpts.length) : optImgs
+          out.option_images = (type === "tap_card" && primOpts.length) ? optImgs.slice(0, primOpts.length) : optImgs
         }
       } catch (_) { /* ignore malformed */ }
 

@@ -54,6 +54,7 @@
       <%# --focal-y only bites where the frame crops vertically — the mobile
           header strip — so desktop is unaffected by it. %>
       <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
+           data-controller="bg-image-healer"
            style="background-image:url('<%= card["image"] %>'); --focal-y: <%= card_focal_y(card) %>%;"></div>
     <% end %>
     <div class="split-left-overlay"<%= " data-card-media".html_safe if editable %>></div>

@@ -337,7 +337,7 @@
                  data-tap-stack-target="card"
                  data-canonical="<%= canon[i] %>"
                  <%= editable ? "".html_safe : 'data-action="pointerdown->tap-stack#dragStart"'.html_safe %>>
-              <div class="rotate-card-media" style="<%= bg_style %>"></div>
+              <div class="rotate-card-media"<%= ' data-controller="bg-image-healer"'.html_safe if img.present? %> style="<%= bg_style %>"></div>
               <%# Statement sits in a dark band at the TOP of the card. %>
               <div class="rotate-card-statement"><span <%= ce_attr %>><%= opt %></span></div>
               <% if editable %>

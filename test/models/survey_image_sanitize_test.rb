@@ -102,6 +102,32 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     refute out.key?("image_credit"), "credits belong to photos/videos only"
   end
 
+  test "sanitize_cards_images! warns when an animation silently drops a stored photo or video" do
+    # A card should never reach this state (both `image` and `lottie` set) —
+    # the client enforces the same exclusivity, and every writer is meant to
+    # go through this sanitiser. It happened anyway once (a Shuffle bug,
+    # fixed separately): whatever put a card here deserves a visible warning
+    # instead of a silent drop, same as an outright-rejected image would get.
+    warnings = []
+    cards = [ { "type" => "multiple_choice", "text" => "Q",
+                "lottie" => LOTTIE_BLOB_URL, "image" => ASSET_PATH,
+                "video" => "https://videos.pexels.com/x/clip.mp4" } ]
+    out = Survey.sanitize_cards_images!(cards, warnings: warnings).first
+
+    refute out.key?("image")
+    refute out.key?("video")
+    assert_includes warnings, "image"
+    assert_includes warnings, "video"
+  end
+
+  test "sanitize_cards_images! does not warn when an animation has no photo or video to drop" do
+    warnings = []
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "lottie" => LOTTIE_BLOB_URL } ]
+    Survey.sanitize_cards_images!(cards, warnings: warnings)
+
+    assert_empty warnings
+  end
+
   test "sanitize_cards_images! drops an external lottie URL with a warning" do
     warnings = []
     cards = [ { "type" => "multiple_choice", "text" => "Q",

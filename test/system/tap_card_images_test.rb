@@ -95,4 +95,37 @@ class TapCardImagesTest < ApplicationSystemTestCase
     assert_equal STATEMENTS.first(3), card["options"]
     assert_equal IMAGES.first(3), card["option_images"]
   end
+
+  # 19 Aug: "the push wiped my assets" turned out not to be data loss (a hard
+  # refresh brought everything back) — but chasing it surfaced a REAL, if
+  # unconfirmed-in-the-wild, footgun next to this one: serialize() bounds
+  # option_images to the number of statement nodes _optionEls() finds, and if
+  # that selector ever misses on a genuine tap_card (nothing found, rather
+  # than nothing to find), the bound is 0 and every image is wiped — silently,
+  # same as the deletion bug above, just total instead of partial. This forces
+  # that miss directly rather than waiting to reproduce whatever would cause
+  # it live.
+  test "a statement-selector miss carries option_images through instead of wiping them" do
+    open_editor
+    before = @survey.updated_at
+
+    ok = evaluate_script(<<~JS)
+      (() => {
+        const spans = document.querySelectorAll("[data-card-cid='t1'] .rotate-card span[contenteditable]")
+        if (!spans.length) return false
+        spans.forEach(s => s.removeAttribute("contenteditable"))
+        const editorEl = document.querySelector('[data-controller~="survey-editor"]')
+        const ctrl = window.Stimulus.getControllerForElementAndIdentifier(editorEl, "survey-editor")
+        if (!ctrl) return false
+        ctrl.markDirty()
+        return true
+      })()
+    JS
+    assert ok, "expected statement spans and the survey-editor controller on the page"
+
+    Timeout.timeout(15) { sleep 0.25 while @survey.reload.updated_at == before }
+
+    assert_equal IMAGES, stored_card["option_images"],
+                 "a statement-selector miss must not truncate option_images to empty"
+  end
 end
