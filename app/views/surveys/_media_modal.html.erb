@@ -264,6 +264,18 @@
         </div>
         <div class="media-lottie-hint"><%= t("editor.animation_bg_hint", default: "Sits behind the animation on this card only. Without one the card uses your brand's panel colour.") %></div>
       </div>
+      <%# Slow push-in/out loop on the card's own photo or Lottie — never
+          video (its own motion is enough) or range (already animates via
+          its reaction set). media-picker toggles it in _syncAnimateAsset. %>
+      <div class="media-animate-section" data-media-picker-target="animateAssetSection" hidden>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.75);">
+          <input type="checkbox" data-media-picker-target="animateAssetToggle"
+                 data-action="change->media-picker#toggleAnimateAsset"
+                 style="width:15px;height:15px;accent-color:#01EACB;" />
+          <%= t("editor.animate_asset", default: "Animate asset") %>
+        </label>
+        <div class="media-lottie-hint"><%= t("editor.animate_asset_hint", default: "A slow, gentle push in and out on loop.") %></div>
+      </div>
     </div>
 
     <div class="media-modal-foot">

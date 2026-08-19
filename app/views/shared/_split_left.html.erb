@@ -14,13 +14,14 @@
   has_img    = card["image"].present?
   has_media  = has_video || has_img
   credit_word = has_video ? "Video by" : "Photo by"
+  animate_asset = card["animate_asset"] == true
 %>
 
 <%# The animation backdrop (card["media_bg"]) paints only where an animation
     fills the panel; a photo or video covers .split-left itself, so there would
     be nothing to see. Falls through to the Verto-wide --brand-panel when the
     card hasn't set one. %>
-<div class="split-left" style="<%= card_media_bg_style(card) %>">
+<div class="split-left<%= " has-asset-breathe" if animate_asset %>" style="<%= card_media_bg_style(card) %>">
   <% if card["type"].to_s == "range" %>
     <%# Range: the LEFT panel plays a Lottie animation that swaps to match the
         slider position. The lottie-player controller listens for the

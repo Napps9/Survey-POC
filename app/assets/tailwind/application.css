@@ -289,6 +289,11 @@
   flex: 0 1 425px;
   min-width: 0;
   position: relative;
+  /* Needed for .has-asset-breathe below: a scaled child must clip at THIS
+     box's edge, not just .split-card's outer one — otherwise a few percent
+     of zoom bleeds sideways into .split-right before the card boundary
+     catches it. */
+  overflow: hidden;
   background: var(--brand-panel, #2E3564);
   display: flex;
   flex-direction: column;
@@ -353,6 +358,20 @@
      On desktop the panel is taller than it is wide, so the crop is horizontal
      and this is a no-op. */
   background-position: 50% var(--focal-y, 50%);
+}
+/* Optional slow push-in/out on a card's own photo or Lottie (never video —
+   its own motion is enough — or range, whose reaction set already
+   animates). 2.5s in, 2.5s out, matching the ask exactly: "approx 2.5
+   seconds in, 2.5 seconds out, restart." Scaling the CHILD rather than
+   .split-left itself keeps the overlay gradient and photo credit static —
+   only the imagery breathes. */
+@keyframes verto-asset-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.045); }
+}
+.has-asset-breathe > .split-left-img,
+.has-asset-breathe > .card-lottie {
+  animation: verto-asset-breathe 5s ease-in-out infinite;
 }
 .split-left-video {
   position: absolute; inset: 0;
@@ -5372,6 +5391,10 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
   color: rgba(255,255,255,0.9); font-size: var(--text-base); outline: none;
 }
+/* Swatch + typed hex, paired as one control — the swatch stays the fast
+   pick, the hex field is for matching an exact brand colour by number. */
+.option-color-field { display: flex; align-items: center; gap: 8px; }
+.option-color-hex { width: 84px !important; text-transform: uppercase; }
 .option-style-row--icons { flex-direction: column; align-items: flex-start; }
 .option-style-icon-grid {
   display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; width: 100%;
@@ -8496,6 +8519,25 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .device-mobile .survey-card-wrap.selected .split-card {
   border-color: #0e1020;
   box-shadow: 0 0 0 3px rgba(255,30,111,0.45), 0 16px 40px rgba(0,0,0,0.4);
+}
+
+/* Player: persistent brand masthead above the deck, desktop only — a phone
+   screen has no room to spare above the card for a masthead, so mobile
+   keeps the logo where it already lived, inside the thank-you card
+   (.player-thankyou-logo below). */
+.player-brand-header { display: none; }
+/* Own display rule rather than the inline style brand_logo_tag's caller used
+   to set — an inline `display:block` beats a class selector regardless of
+   the media query below, which otherwise silently failed to hide it. */
+.player-thankyou-logo { display: block; }
+@media (min-width: 768px) {
+  .player-brand-header {
+    display: flex; justify-content: center;
+    padding: 18px 16px 0;
+  }
+  /* The masthead already covers the thank-you card at this width — a second
+     copy inside the card itself would double up. */
+  .player-thankyou-logo { display: none; }
 }
 
 /* Player: slim language switcher bar (replaces the old logo+title nav).

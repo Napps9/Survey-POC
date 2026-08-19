@@ -145,10 +145,13 @@
     </div>
   <% end %>
 
-  <%# The compare-results promise used to be a top banner; it now lives on the
-      welcome card (player/welcome_intake) to free up screen space. The
-      publishing org's logo (when uploaded) sits at the top of the welcome
-      card itself — see player/_play_card. %>
+  <%# Publishing org's logo (or the Playverto mark, for an org with none),
+      centred above the deck — desktop only. Mobile has no room for a
+      persistent masthead above the card, so the brand there stays where it
+      already was: inside the thank-you card at the very end (below). %>
+  <div class="player-brand-header">
+    <%= brand_logo_tag @survey.organisation, style: "height:36px;width:auto;max-width:50%;" %>
+  </div>
 
   <%# Slim top-utility bar: the content-language switcher (multilingual Vertos
       only) alongside the text-size control (always — a reading preference,
@@ -299,10 +302,12 @@
 
     <div class="preview-thankyou" data-player-target="thankyou">
       <div data-player-target="thankyouMain" class="preview-thankyou-card">
-        <%# Publishing org's logo sits prominently at the top of the
-            thank-you card — the player nav is hidden on mobile, so this
-            is the only place the brand is shown. %>
-        <%= brand_logo_tag @survey.organisation, style: "height:44px;width:auto;max-width:60%;margin:0 auto 18px;display:block;" %>
+        <%# Publishing org's logo, mobile only — desktop already has the
+            persistent masthead above the deck (.player-brand-header), and
+            showing both would double up on the thank-you screen. %>
+        <%= brand_logo_tag @survey.organisation,
+              style: "height:44px;width:auto;max-width:60%;margin:0 auto 18px;",
+              class: "player-thankyou-logo" %>
 
         <div class="preview-thankyou-title" data-player-target="thankyouTitle"><%= @survey.thankyou_title_text %></div>
         <div class="preview-thankyou-sub" data-player-target="thankyouSub">

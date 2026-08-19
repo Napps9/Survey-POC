@@ -1630,6 +1630,9 @@ export default class extends Controller {
         const focal = parseInt(card.dataset.cardFocalY, 10)
         if (Number.isFinite(focal) && focal !== 50) out.focal_y = focal
       }
+      // Slow push-in/out on the card's own imagery — meaningless for video,
+      // so only carried alongside a photo or animation.
+      if ((lottie || image) && card.dataset.cardAnimateAsset === "true") out.animate_asset = true
       if (video || image) {
         const credit    = card.dataset.cardImageCredit
         const creditUrl = card.dataset.cardImageCreditUrl

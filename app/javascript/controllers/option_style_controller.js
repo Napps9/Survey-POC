@@ -8,7 +8,7 @@ import { styleFromRow, writeStyleToRow, repaintRow } from "lib/option_styles"
 // style follows its option through deletes and reorders with no extra
 // bookkeeping. Lives on the editor root; one popover serves every row.
 export default class extends Controller {
-  static targets = ["popover", "colorInput", "emojiInput", "iconGrid"]
+  static targets = ["popover", "colorInput", "hexInput", "emojiInput", "iconGrid"]
 
   connect() {
     this._onDocClick = (e) => {
@@ -44,6 +44,7 @@ export default class extends Controller {
     this._buildIconGrid()
     const style = styleFromRow(row) || {}
     this.colorInputTarget.value = style.color || "#ffffff"
+    if (this.hasHexInputTarget) this.hexInputTarget.value = this.colorInputTarget.value
     this.emojiInputTarget.value = style.emoji || ""
     this._markIcon(style.icon || "")
     this._position(event.currentTarget)
@@ -56,7 +57,23 @@ export default class extends Controller {
   }
 
   onColor(event) {
-    this._update((style) => { style.color = event.target.value.toLowerCase() })
+    const color = event.target.value.toLowerCase()
+    if (this.hasHexInputTarget) this.hexInputTarget.value = color
+    this._update((style) => { style.color = color })
+  }
+
+  // The native swatch (onColor above) always carries a full, valid value —
+  // this is the free-text twin next to it, so it has to tolerate a color
+  // that isn't one yet: partial input while typing, a leading '#' or not, 3-
+  // or 6-digit shorthand. Only a complete, valid hex commits a change; an
+  // incomplete one is left alone rather than snapping the swatch to black.
+  onHex(event) {
+    const raw = event.target.value.trim().replace(/^#/, "")
+    if (!/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(raw)) return
+    const full = raw.length === 3 ? raw.split("").map((c) => c + c).join("") : raw
+    const color = `#${full.toLowerCase()}`
+    this.colorInputTarget.value = color
+    this._update((style) => { style.color = color })
   }
 
   // Emoji and icon are one slot visually — picking one clears the other, so
@@ -85,6 +102,7 @@ export default class extends Controller {
     writeStyleToRow(this._row, null)
     repaintRow(this._row, null)
     this.colorInputTarget.value = "#ffffff"
+    if (this.hasHexInputTarget) this.hexInputTarget.value = "#ffffff"
     this.emojiInputTarget.value = ""
     this._markIcon("")
     this.dispatch("changed")

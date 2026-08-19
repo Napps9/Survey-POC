@@ -857,6 +857,20 @@ class Survey < ApplicationRecord
         end
       end
 
+      # A slow, looping push-in/out on the card's own photo or Lottie — never
+      # video (its own motion is enough) or range (the reaction set already
+      # animates). Checked against image/lottie AFTER both are sanitised
+      # above, so a card whose animation just got rejected doesn't keep a
+      # flag for motion it no longer has anything to apply to.
+      if c.key?("animate_asset")
+        animatable = c["type"].to_s != "range" && (c["image"].present? || c["lottie"].present?)
+        if animatable && c["animate_asset"] == true
+          c["animate_asset"] = true
+        else
+          c.delete("animate_asset")
+        end
+      end
+
       if c.key?("image_credit") || c.key?("image_credit_url")
         if c["image"].present? || c["video"].present?
           c["image_credit"]     = c["image_credit"].to_s.strip.first(MAX_CREDIT_NAME).presence

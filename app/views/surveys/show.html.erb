@@ -1904,8 +1904,15 @@
     <div class="option-style-popover-title"><%= t("js.editor.option_style_title") %></div>
     <label class="option-style-row">
       <span><%= t("js.editor.option_color") %></span>
-      <input type="color" data-option-style-target="colorInput"
-             data-action="input->option-style#onColor" />
+      <span class="option-color-field">
+        <input type="color" data-option-style-target="colorInput"
+               data-action="input->option-style#onColor" />
+        <input type="text" class="option-color-hex" maxlength="7"
+               data-option-style-target="hexInput"
+               data-action="input->option-style#onHex"
+               placeholder="#FFFFFF"
+               aria-label="<%= t("js.editor.option_color_hex") %>" />
+      </span>
     </label>
     <div class="option-style-row">
       <span><%= t("js.editor.option_emoji") %></span>

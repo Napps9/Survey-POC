@@ -102,6 +102,38 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     refute out.key?("image_credit"), "credits belong to photos/videos only"
   end
 
+  test "sanitize_cards_images! keeps animate_asset on a card with a photo or a lottie" do
+    cards = [
+      { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH, "animate_asset" => true },
+      { "type" => "open_ended", "text" => "Q2", "lottie" => LOTTIE_BLOB_URL, "animate_asset" => true }
+    ]
+    out = Survey.sanitize_cards_images!(cards)
+
+    assert_equal true, out[0]["animate_asset"]
+    assert_equal true, out[1]["animate_asset"]
+  end
+
+  test "sanitize_cards_images! drops animate_asset on video, range, and a card with no media" do
+    cards = [
+      { "type" => "multiple_choice", "text" => "Q", "video" => "https://videos.pexels.com/x/clip.mp4", "animate_asset" => true },
+      { "type" => "range", "text" => "Q2", "options" => %w[1 2 3], "animate_asset" => true },
+      { "type" => "multiple_choice", "text" => "Q3", "animate_asset" => true }
+    ]
+    out = Survey.sanitize_cards_images!(cards)
+
+    refute out[0].key?("animate_asset"), "video has its own motion already"
+    refute out[1].key?("animate_asset"), "range already animates via its reaction set"
+    refute out[2].key?("animate_asset"), "nothing to animate without a photo or lottie"
+  end
+
+  test "sanitize_cards_images! drops animate_asset when the image it referred to is rejected" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => "not a real url", "animate_asset" => true } ]
+    out = Survey.sanitize_cards_images!(cards).first
+
+    assert_nil out["image"]
+    refute out.key?("animate_asset")
+  end
+
   test "sanitize_cards_images! warns when an animation silently drops a stored photo or video" do
     # A card should never reach this state (both `image` and `lottie` set) —
     # the client enforces the same exclusivity, and every writer is meant to

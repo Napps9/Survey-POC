@@ -463,16 +463,18 @@ module ApplicationHelper
   # `brand-logo` is the backstop. A blob whose bytes are genuinely gone can't
   # be rescued by any URL scheme, and a respondent should get no logo rather
   # than a broken-image glyph on someone's Verto.
-  def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil)
+  def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil, class: nil)
+    css_class = binding.local_variable_get(:class)
     if organisation&.logo&.attached?
       image_tag(
         rails_storage_proxy_path(organisation.logo, only_path: true),
         style: "#{style};object-fit:contain;",
         alt:   alt || "#{organisation.name} logo",
+        class: css_class,
         data:  { controller: "brand-logo", action: "error->brand-logo#failed" }
       )
     else
-      image_tag("playverto.svg", style: style, alt: alt || "Playverto")
+      image_tag("playverto.svg", style: style, alt: alt || "Playverto", class: css_class)
     end
   end
 

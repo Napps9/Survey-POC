@@ -16,6 +16,7 @@ export default class extends Controller {
     "saveToLibrary", "brandGrid", "libraryFileInput", "brandStatus",
     "lottieSection", "lottieInput", "lottieError", "lottieBtn",
     "animBgSection", "animBgColor", "animBgClear",
+    "animateAssetSection", "animateAssetToggle",
     "focalSection", "focalFrame", "focalImg",
     "cropStage", "cropFrame", "cropImg", "cropZoom",
     "appealBtn", "appealStatus", "approvedSection", "approvedGrid"
@@ -80,6 +81,7 @@ export default class extends Controller {
     this._showMediaToggle(true)
     this._showLottieSection(true)       // paste-a-LottieFiles-URL, cards only
     this._syncAnimationBg()             // backdrop, only when the panel animates
+    this._syncAnimateAsset()            // push in/out loop, photo or lottie only
     this._syncFocal()                   // mobile header position, images only
 
     const currentUrl = card.dataset.cardImage || card.dataset.cardVideo || card.dataset.cardLottie || ""
@@ -1221,6 +1223,10 @@ export default class extends Controller {
     // A different picture has a different subject, so an old mobile-header
     // focal point is meaningless against it — back to centre.
     if (card) delete card.dataset.cardFocalY
+    // "Animate asset" is a preference, not tied to one specific photo, so it
+    // survives swapping to a different picture — cleared only when the card
+    // ends up with no picture at all.
+    if (card && !url) delete card.dataset.cardAnimateAsset
 
     card.dataset.cardImage = url || ""
     card.dataset.cardImageCredit = url ? (credit || "") : ""
@@ -1230,6 +1236,7 @@ export default class extends Controller {
     card.dataset.cardVideo = ""
     card.dataset.cardVideoPoster = ""
     card.dataset.cardLottie = ""
+    this._syncAnimateAssetClass(card)
     const left = card.querySelector(".split-left")
     if (!left) return
     left.querySelector(".split-left-video[data-card-media]")?.remove()
@@ -1267,6 +1274,10 @@ export default class extends Controller {
     card.dataset.cardImageCredit = video ? (credit || "") : ""
     card.dataset.cardImageCreditUrl = video ? (creditUrl || "") : ""
     card.dataset.cardLottie = ""
+    // The breathe toggle only applies to a photo or a Lottie — irrelevant
+    // once the panel is a video, whose own motion is enough.
+    delete card.dataset.cardAnimateAsset
+    this._syncAnimateAssetClass(card)
     const left = card.querySelector(".split-left")
     if (!left) return
     left.querySelector(".split-left-img[data-card-media]")?.remove()
@@ -1450,6 +1461,40 @@ export default class extends Controller {
     this._syncAnimationBg()
   }
 
+  // Slow push-in/out loop on the card's own imagery. Meaningless for video
+  // (its own motion is enough) and for range (the reaction set already
+  // animates) — shown only when the panel is a photo or a Lottie.
+  get _cardCanAnimateAsset() {
+    const card = this._activeCard
+    if (!card || card.dataset.cardType === "range") return false
+    return !!(card.dataset.cardImage || card.dataset.cardLottie)
+  }
+
+  _syncAnimateAsset() {
+    const show = this._mode === "card" && this._cardCanAnimateAsset
+    if (this.hasAnimateAssetSectionTarget) this.animateAssetSectionTarget.hidden = !show
+    if (show && this.hasAnimateAssetToggleTarget) {
+      this.animateAssetToggleTarget.checked = this._activeCard.dataset.cardAnimateAsset === "true"
+    }
+  }
+
+  toggleAnimateAsset(event) {
+    const card = this._activeCard
+    if (!card) return
+    if (event.target.checked) card.dataset.cardAnimateAsset = "true"
+    else delete card.dataset.cardAnimateAsset
+    this._syncAnimateAssetClass(card)
+    this._notifyDirty()
+  }
+
+  // One place to keep the live preview's CSS class in step with the dataset
+  // — called here and from every media setter, since switching to video (or
+  // clearing the card entirely) makes the toggle's state meaningless.
+  _syncAnimateAssetClass(card) {
+    card.querySelector(".split-left")
+      ?.classList.toggle("has-asset-breathe", card.dataset.cardAnimateAsset === "true")
+  }
+
   async applyLottie(event) {
     event?.preventDefault()
     if (this._mode !== "card" || !this._activeCard || !this.hasCardLottieUrlValue) return
@@ -1496,6 +1541,10 @@ export default class extends Controller {
     card.dataset.cardImageCreditUrl = ""
     card.dataset.cardVideo = ""
     card.dataset.cardVideoPoster = ""
+    // Same preference-not-tied-to-one-asset rule as a photo: survives
+    // swapping to a different animation, cleared only when there's none left.
+    if (!url) delete card.dataset.cardAnimateAsset
+    this._syncAnimateAssetClass(card)
     const left = card.querySelector(".split-left")
     if (!left) return
     left.querySelector(".split-left-img[data-card-media]")?.remove()
